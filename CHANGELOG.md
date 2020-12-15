@@ -8,6 +8,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Create index pattern even if there aren´t available indices [#2620](https://github.com/wazuh/wazuh-kibana-app/issues/2620)
 - Top bar overlayed over expanded visualizations [#2667](https://github.com/wazuh/wazuh-kibana-app/issues/2667)
+- Empty inventory data in Solaris agents [#2680](https://github.com/wazuh/wazuh-kibana-app/pull/2680)
+- Wrong parameters in the dev-tools autocomplete section [#2675](https://github.com/wazuh/wazuh-kibana-app/issues/2675)
 
 ## Wazuh v4.0.3 - Kibana v7.9.1, v7.9.2, v7.9.3 - Revision 4014
 

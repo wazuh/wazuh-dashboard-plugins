@@ -389,19 +389,6 @@ export class DevToolsController {
         const editorCursor = editor.getCursor();
         // Get http method, path, query params from API request
         let [inputRequest, inputHttpMethod, inputPath, inputQueryParamsStart, inputQueryParams] = (currentGroup && currentGroup.requestText && currentGroup.requestText.match(/^(GET|PUT|POST|DELETE) ([^\?]*)(\?)?(\S+)?/)) || [];
-        // console.log("ANTES", inputQueryParams)
-        // let t = 0;
-        // if (inputRequest != undefined){
-        //   inputRequest = inputRequest.replace(/\?/g, (match) => {
-        //     t++;
-        //     return t > 1 ? '' : match
-        //   });
-        // }
-
-        // if (inputQueryParams != undefined) {
-        //   inputQueryParams = inputQueryParams.replace(/\?/g, '');
-        // }
-        // console.log("DESPUES", inputQueryParams)
         // Split the input request path as array and lowercase
         const inputEndpoint = inputPath && inputPath.split('/').filter(item => item).map(item => item.toLowerCase()) || [];
         // Get all API endpoints with http method in the request
@@ -421,7 +408,10 @@ export class DevToolsController {
               return { key, value };
             }) || [];
             // It is defining query param value query_param=
-            const definingQueryParamValue = inputQueryParams && inputQueryParams.includes('&') ? inputRequest.lastIndexOf('=') > inputRequest.lastIndexOf('&') : (inputRequest.lastIndexOf('=') > inputRequest.lastIndexOf('?'));
+            const definingQueryParamValue =
+              inputQueryParams && inputQueryParams.includes('&')
+                ? inputRequest.lastIndexOf('=') > inputRequest.lastIndexOf('&')
+                : !!(inputQueryParams || '').includes('?') || (inputRequest.lastIndexOf('=') > inputRequest.lastIndexOf('?'));
 
             if (!definingQueryParamValue && apiEndpoint && apiEndpoint.query) {
               const inputQueryPreviousEntriesKeys = inputQuery.filter(query => query.key && query.value).map(query => query.key);
@@ -541,14 +531,14 @@ export class DevToolsController {
         } else {
           hints = model.map(a => a.method);
         }
-        const nuevoArrayConReemplazos = hints.map(cadena => {
+        const final_hints = hints.map(chain => {
           let t = 0;
-          return cadena = cadena.replace(/\?/g, (match) => {
+          return chain = chain.replace(/\?/g, (match) => {
             t++;
             return t > 1 ? '' : match
           });
         })
-        return nuevoArrayConReemplazos;
+        return final_hints;
       }
 
       const cur = editor.getCursor();
