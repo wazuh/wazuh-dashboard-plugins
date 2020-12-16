@@ -13,6 +13,7 @@
 
 import { uiModules } from 'ui/modules';
 import { NidsUtilsController } from './nids-utils';
+import { LogCommandsController } from './log-commands';
 import { NidsFiles } from './components/nids-files';
 import { ServiceCommands } from './components/service-commands';
 
@@ -20,5 +21,6 @@ const app = uiModules.get('app/wazuh', []);
 
 app
   .controller('NidsUtilsController', NidsUtilsController)
+  .controller('LogCommandsController', LogCommandsController)
   .value('NidsFiles', NidsFiles)
   .value('ServiceCommands', ServiceCommands)

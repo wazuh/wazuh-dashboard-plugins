@@ -149,12 +149,22 @@ export const SuricataTable = withReduxProvider(() => {
         name: 'Description',
         sortable: true,
         render: item => {
+          //falta el uuid del service para hacer la llamada a master.
           if (serviceStatus.ack == "false") {
             return (
               <>
                 <EuiTextColor color="default">{item}</EuiTextColor>
                 <EuiBadge 
-                  onClick={ev => AppNavigate.navigateToModule(ev, 'service-commands', {})}
+                  onClick={ev => 
+                    //falta el uuid del service para hacer la llamada a master.
+                    //falta el uuid del service para hacer la llamada a master.
+                    //falta el uuid del service para hacer la llamada a master.
+                    //falta el uuid del service para hacer la llamada a master.
+                    //falta el uuid del service para hacer la llamada a master.
+                    //falta el uuid del service para hacer la llamada a master.
+                    dispatch(getServiceCommands({uuid: nodeDetail.uuid, service:asdasdasd, name:item})),
+                    AppNavigate.navigateToModule(ev, 'nids-commands', {})
+                  }
                   color='warning'>
                     Error - View log
                 </EuiBadge>

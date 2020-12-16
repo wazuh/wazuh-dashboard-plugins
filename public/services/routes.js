@@ -35,7 +35,8 @@ import blankScreenTemplate from '../templates/error-handler/blank-screen.html';
 import toolsTemplate from '../templates/tools/tools.pug';
 import nidsTemplate from '../templates/nids/nids.pug';
 import nodeTemplate from '../templates/node/node.pug';
-import nodeFilesTemplate from '../templates/nids-files/nids-files.pug';
+import nodeUtilsTemplate from '../templates/nids-files/nids-files.pug';
+import nodeCommandsTemplate from '../templates/nids-files/nids-commands.html';
 import { WazuhConfig } from '../react-services/wazuh-config';
 import { GenericRequest } from '../react-services/generic-request';
 import { WzMisc } from '../factories/misc';
@@ -182,16 +183,16 @@ routes
     template: nidsTemplate,
     resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
   })
-  // .when('/service-commands/', {
-  //   template: NidsCommandController,
-  //   resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
-  // })
+  .when('/nids-commands/', {
+    template: nodeCommandsTemplate,
+    resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
+  })
   .when('/node/', {
     template: nodeTemplate,
     resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
   })
   .when('/nids-files/', {
-    template: nodeFilesTemplate,
+    template: nodeUtilsTemplate,
     resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
   })
   .when('/doc/:pattern?/:index?/:type?/:id?', {

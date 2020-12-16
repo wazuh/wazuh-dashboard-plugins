@@ -401,7 +401,6 @@ export class ManageNidsHosts {
       //get active master and basic url
       const url = this.getActiveMasterURL()
 
-
       req.data.param="status"
 
       const options = {
