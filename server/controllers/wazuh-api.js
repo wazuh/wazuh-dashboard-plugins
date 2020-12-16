@@ -880,7 +880,7 @@ export class WazuhApiCtrl {
         typeof daemons['wazuh-clusterd'] !== 'undefined';
       const wazuhdbExists = typeof daemons['wazuh-db'] !== 'undefined';
 
-      const execd = daemons['ossec-execd'] === 'running';
+      const execd = daemons['wazuh-execd'] === 'running';
       const modulesd = daemons['wazuh-modulesd'] === 'running';
       const wazuhdb = wazuhdbExists ? daemons['wazuh-db'] === 'running' : true;
       const clusterd = isCluster ? daemons['wazuh-clusterd'] === 'running' : true;

@@ -157,7 +157,7 @@ export const checkDaemons = async () => {
     const daemons = ((response || {}).data || {}).data || {};
     const wazuhdbExists = typeof daemons['wazuh-db'] !== 'undefined';
 
-    const execd = daemons['ossec-execd'] === 'running';
+    const execd = daemons['wazuh-execd'] === 'running';
     const modulesd = daemons['wazuh-modulesd'] === 'running';
     const wazuhdb = wazuhdbExists ? daemons['wazuh-db'] === 'running' : true;
     const clusterStatus = (((await clusterReq()) || {}).data || {}).data || {};
@@ -509,7 +509,7 @@ export const checkCurrentSecurityPlatform = async () => {
       '/elastic/security/current-platform',
       {}
     );
-    const platform = (result.data || {}).platform || 'elastic'; 
+    const platform = (result.data || {}).platform || 'elastic';
 
     return platform;
   } catch (error) {
