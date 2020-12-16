@@ -21,9 +21,11 @@ import { AppDependencies } from './types';
 //import { ToastNotificationsModal } from './components/notifications/modal';
 import { HealthCheck } from './components/health-check';
 import { MainOverview } from './components/main-overview';
+import { MainManagement } from "./components/management/components/main-management";
 
 
 const LANDING_PAGE_URL = '/overview';
+const MANAGER_PAGE_URL = '/management';
 
 export function AppRouter(props: AppDependencies) {
   return (
@@ -32,6 +34,7 @@ export function AppRouter(props: AppDependencies) {
         <EuiPageBody>
           <Switch>
             <Route path={LANDING_PAGE_URL} render={() => <MainOverview />} />
+            <Route path={MANAGER_PAGE_URL} render={() => <MainManagement />} />
             <Route path="/health-check" render={() => <HealthCheck />} />
             <Redirect exact from="/" to={LANDING_PAGE_URL} />
           </Switch>
