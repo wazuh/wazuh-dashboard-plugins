@@ -367,7 +367,7 @@ export class DevToolsController {
     const currentState = AppState.getCurrentDevTools();
     if (!currentState) {
       const demoStr =
-        'GET /agents?status=active\n\n#Example comment\n\n#You can use ? if you need hints \n#for your query\n\nGET /manager/info\n\nGET /syscollector/000/packages?search=ssh&limit=1\n\nPOST /agents\n' +
+        'GET /agents?status=active\n\n#Example comment\n\n#You can use ? after the endpoint \n#in order to get suggestions \n#for your query params\n\nGET /manager/info\n\nGET /syscollector/000/packages?search=ssh&limit=1\n\nPOST /agents\n' +
         JSON.stringify({ name: "NewAgent" }, null, 2);
 
       AppState.setCurrentDevTools(demoStr);
@@ -388,7 +388,7 @@ export class DevToolsController {
         const currentGroup = self.calculateWhichGroup();
         const editorCursor = editor.getCursor();
         // Get http method, path, query params from API request
-        let [inputRequest, inputHttpMethod, inputPath, inputQueryParamsStart, inputQueryParams] = (currentGroup && currentGroup.requestText && currentGroup.requestText.match(/^(GET|PUT|POST|DELETE) ([^\?]*)(\?)?(\S+)?/)) || [];
+        const [inputRequest, inputHttpMethod, inputPath, inputQueryParamsStart, inputQueryParams] = (currentGroup && currentGroup.requestText && currentGroup.requestText.match(/^(GET|PUT|POST|DELETE) ([^\?]*)(\?)?(\S+)?/)) || [];
         // Split the input request path as array and lowercase
         const inputEndpoint = inputPath && inputPath.split('/').filter(item => item).map(item => item.toLowerCase()) || [];
         // Get all API endpoints with http method in the request
@@ -553,7 +553,10 @@ export class DevToolsController {
       return {
         list: (!curWord
           ? []
-          : getDictionary(curLine, curWord)
+          : getDictionary(curLine, curWord).filter(function (item) {
+            const text = item.text || item;
+            return text.toUpperCase().includes(curWord.toUpperCase());
+          })
         ).sort(),
         from: CodeMirror.Pos(cur.line, start),
         to: CodeMirror.Pos(cur.line, end)
