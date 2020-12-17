@@ -23,7 +23,6 @@ import { generateAlerts } from '../lib/generate-alerts/generate-alerts-script';
 import { WAZUH_MONITORING_PATTERN, WAZUH_ALERTS_PATTERN, WAZUH_SAMPLE_ALERT_PREFIX, WAZUH_ROLE_ADMINISTRATOR_ID, WAZUH_SAMPLE_ALERTS_INDEX_SHARDS, WAZUH_SAMPLE_ALERTS_INDEX_REPLICAS } from '../../util/constants';
 import jwtDecode from 'jwt-decode';
 import { ManageHosts } from '../lib/manage-hosts';
-import { ApiInterceptor } from '../lib/api-interceptor';
 import { WAZUH_SECURITY_PLUGIN_XPACK_SECURITY, WAZUH_SECURITY_PLUGIN_OPEN_DISTRO_FOR_ELASTICSEARCH } from '../../util/constants';
 import { KibanaRequest, RequestHandlerContext, KibanaResponseFactory, SavedObject, SavedObjectsFindResponse } from 'src/core/server';
 import { getCookieValueByName } from '../lib/cookie';
@@ -33,12 +32,10 @@ export class WazuhElasticCtrl {
   wzWrapper: ElasticWrapper;
   wzSampleAlertsIndexPrefix: string
   manageHosts: ManageHosts
-  apiInterceptor: ApiInterceptor
   constructor() {
     this.wzWrapper = new ElasticWrapper();
     this.wzSampleAlertsIndexPrefix  = this.getSampleAlertPrefix();
     this.manageHosts = new ManageHosts();
-    this.apiInterceptor = new ApiInterceptor();
   }
 
   /**
@@ -787,12 +784,11 @@ export class WazuhElasticCtrl {
         return ErrorResponse('No administrator role', 401, 401, response);
       };
       // Check the provided token is valid
-      const idHost = getCookieValueByName(request.headers.cookie, 'wz-api');
-      if( !idHost ){
+      const apiHostID = getCookieValueByName(request.headers.cookie, 'wz-api');
+      if( !apiHostID ){
         return ErrorResponse('No API id provided', 401, 401, response);
       };
-      const api = await this.manageHosts.getHostById(idHost);
-      const responseTokenIsWorking = await this.apiInterceptor.requestToken('GET', `${api.url}:${api.port}//`, {}, {idHost}, token);
+      const responseTokenIsWorking = await context.wazuh.api.client.asCurrentUser.request('GET', `//`, {}, {apiHostID});
       if(responseTokenIsWorking.status !== 200){
         return ErrorResponse('Token is not valid', 500, 500, response);
       };
@@ -883,16 +879,14 @@ export class WazuhElasticCtrl {
         return ErrorResponse('No administrator role', 401, 401, response);
       };
       // Check the provided token is valid
-      const idHost = getCookieValueByName(request.headers.cookie, 'wz-api');
-      if( !idHost ){
+      const apiHostID = getCookieValueByName(request.headers.cookie, 'wz-api');
+      if( !apiHostID ){
         return ErrorResponse('No API id provided', 401, 401, response);
       };
-      const api = await this.manageHosts.getHostById(idHost);
-      const responseTokenIsWorking = await this.apiInterceptor.requestToken('GET', `${api.url}:${api.port}//`, {}, {idHost}, token);
+      const responseTokenIsWorking = await context.wazuh.api.client.asCurrentUser.request('GET', `//`, {}, {apiHostID});
       if(responseTokenIsWorking.status !== 200){
         return ErrorResponse('Token is not valid', 500, 500, response);
       };
-
 
       // Check if Wazuh sample alerts index exists
       const existsSampleIndex = await context.core.elasticsearch.client.asCurrentUser.indices.exists({

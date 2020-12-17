@@ -1,5 +1,5 @@
 import { AxiosResponse }from 'axios';
-import { ApiInterceptor } from '../api-interceptor.js';
+import * as ApiInterceptor  from '../api-interceptor.js';
 
 export interface IApi {
   id: string
@@ -18,19 +18,17 @@ export class ApiRequest {
   private api: IApi;
   private request: string;
   private params: {};
-  private apiInterceptor: ApiInterceptor;
 
   constructor(request:string, api:IApi, params:{}={}, ) {
     this.request = request;
     this.api = api;
     this.params = params;
-    this.apiInterceptor = new ApiInterceptor()
   }
 
   private async makeRequest():Promise<AxiosResponse> {
     const {id, url, port} = this.api;
     
-    const response: AxiosResponse = await this.apiInterceptor.request(
+    const response: AxiosResponse = await ApiInterceptor.requestAsInternalUser(
       'GET',
       `${url}:${port}/${this.request}`,
       this.params,

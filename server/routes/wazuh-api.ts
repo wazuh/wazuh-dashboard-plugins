@@ -1,11 +1,10 @@
 
-import { IRouter, RequestHandlerContext } from 'kibana/server';
+import { IRouter } from 'kibana/server';
 import { WazuhApiCtrl } from '../controllers/wazuh-api';
 import { schema } from '@kbn/config-schema';
-import { ISecurityFactory } from '../lib/security-factory';
 
-export function WazuhApiRoutes(router: IRouter, securityObj: ISecurityFactory) {
-  const ctrl = new WazuhApiCtrl(securityObj);
+export function WazuhApiRoutes(router: IRouter) {
+  const ctrl = new WazuhApiCtrl();
 
   // Returns if the wazuh-api configuration is working
   router.post({

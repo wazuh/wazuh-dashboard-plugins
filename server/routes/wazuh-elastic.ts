@@ -14,7 +14,7 @@ import { IRouter, RequestHandlerContext } from 'kibana/server';
 import { schema } from '@kbn/config-schema';
 import { WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY, WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING, WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION } from '../../util/constants';
 
-export function WazuhElasticRouter(router: IRouter) {
+export function WazuhElasticRoutes(router: IRouter) {
   const ctrl = new WazuhElasticCtrl();
   const schemaSampleAlertsCategories = schema.oneOf([
     WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
