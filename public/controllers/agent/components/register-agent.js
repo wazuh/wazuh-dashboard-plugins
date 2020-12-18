@@ -339,7 +339,7 @@ export class RegisterAgent extends Component {
           Select one or more existing groups
         </p>
         <EuiComboBox
-          placeholder="Select agent group"
+          placeholder="Select group"
           options={this.state.groups}
           selectedOptions={this.state.selectedGroup}
           onChange={group => {
