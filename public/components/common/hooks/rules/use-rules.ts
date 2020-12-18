@@ -2,11 +2,10 @@ import { useEffect, useState } from 'react';
 import WzRequest from '../../../../react-services/wz-request';
 
 /**
- * This fetch agent group
+ * This fetch management rules
  */
-export const useAgentsGroup = (group: string): [boolean, any, string | undefined] => {
-  const [agentsGroup, setAgentsGroup] = useState({
-    totalSelectedAgents: [],
+export const useRules = (): [boolean, any, string | undefined] => {
+  const [rules, setRules] = useState({
     failed_items: [],
     total_affected_items: 0,
     total_failed_items: 0,
@@ -18,9 +17,9 @@ export const useAgentsGroup = (group: string): [boolean, any, string | undefined
   useEffect(() => {
     setLoading(true);
     setError(undefined);
-    WzRequest.apiReq('GET', `/groups/${group}/agents/`, {})
+    WzRequest.apiReq('GET', `/rules/`, {})
       .then((response) => {
-        setAgentsGroup(response.data.data as any);
+        setRules(response.data.data as any);
         setLoading(false);
       })
       .catch((error) => {
@@ -29,5 +28,5 @@ export const useAgentsGroup = (group: string): [boolean, any, string | undefined
       });
   }, []);
 
-  return [loading, agentsGroup, error];
+  return [loading, rules, error];
 };
