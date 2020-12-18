@@ -14,17 +14,20 @@
 
 import { EuiPage, EuiPageBody } from '@elastic/eui';
 import React from 'react';
-import { Router, Route, Switch, Redirect } from 'react-router-dom';
+import { Redirect, Route, Router, Switch } from 'react-router-dom';
 import { AppDependencies } from './types';
 //import { WzMenuWrapper } from './components/wz-menu/wz-menu-wrapper';
 //import { WzAgentSelectorWrapper } from './components/wz-agent-selector/wz-agent-selector-wrapper';
 //import { ToastNotificationsModal } from './components/notifications/modal';
 import { HealthCheck } from './components/health-check';
 import { MainOverview } from './components/main-overview';
-import { MainManagement } from "./components/management/components/main-management";
-
+import { WzManagement } from './components/management/container/management-provider';
+import WzRulesetOverview from './components/management/components/ruleset/ruleset-overview';
+import WzRuleInfo from './components/management/components/ruleset/rule-info';
 
 const LANDING_PAGE_URL = '/overview';
+const MANAGER_RULES_ID_PAGE_URL = '/management/rules/:id';
+const MANAGER_RULES_PAGE_URL = '/management/rules';
 const MANAGER_PAGE_URL = '/management';
 
 export function AppRouter(props: AppDependencies) {
@@ -34,9 +37,14 @@ export function AppRouter(props: AppDependencies) {
         <EuiPageBody>
           <Switch>
             <Route path={LANDING_PAGE_URL} render={() => <MainOverview />} />
-            <Route path={MANAGER_PAGE_URL} render={() => <MainManagement />} />
+            <Route path={MANAGER_RULES_ID_PAGE_URL} render={() => <WzRuleInfo />} />
+            <Route
+              path={MANAGER_RULES_PAGE_URL}
+              render={() => <WzRulesetOverview section={'rules'} />}
+            />
+            <Route path={MANAGER_PAGE_URL} render={() => <WzManagement />} />
             <Route path="/health-check" render={() => <HealthCheck />} />
-            <Redirect exact from="/" to={LANDING_PAGE_URL} />
+            <Redirect from="/" to={LANDING_PAGE_URL} />
           </Switch>
         </EuiPageBody>
         {/* <WzMenuWrapper/>
