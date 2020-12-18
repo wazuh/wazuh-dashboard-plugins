@@ -70,9 +70,9 @@ export default class WzRuleset extends Component {
       <WzReduxProvider>
         {(ruleInfo && <WzRuleInfo />) ||
           (decoderInfo && <WzDecoderInfo />) ||
-          (listInfo && <WzListEditor />) ||
-          ((fileContent || addingRulesetFile) && <WzRulesetEditor />) || (
-            <WzRulesetOverview />
+          (listInfo && <WzListEditor clusterStatus={this.props.clusterStatus} />) ||
+          ((fileContent || addingRulesetFile) && <WzRulesetEditor clusterStatus={this.props.clusterStatus}/>) || (
+            <WzRulesetOverview clusterStatus={this.props.clusterStatus} />
           )}
       </WzReduxProvider>
     );
