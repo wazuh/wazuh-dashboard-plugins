@@ -10,7 +10,8 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React from 'react';
+import React, { useCallback } from 'react';
+import { useHistory } from 'react-router-dom';
 import {
   EuiCard,
   EuiFlexGroup,
@@ -21,12 +22,19 @@ import {
   EuiSpacer,
 } from '@elastic/eui';
 import WzReduxProvider from '../../../redux/wz-redux-provider';
-import { switchTab } from '../service/management-tabs.service';
+import { updateRulesetSection } from '../../../redux/actions/rulesetActions';
+import { updateManagementSection } from '../../../redux/actions/managementActions';
 
-export const ManagementWelcome = () => {
+import { connect } from 'react-redux';
+
+const ManagementWelcome = (props) => {
+  const history = useHistory();
+  const handleOnClick = useCallback((path) => history.push(path), [history]);
+
   const switchSection = (section) => {
-    switchTab(section, true);
-    //this.props.updateManagementSection(section);
+    props.updateRulesetSection(section);
+    props.updateManagementSection(section);
+    handleOnClick(`/${section}`);
   };
 
   return (
@@ -43,7 +51,7 @@ export const ManagementWelcome = () => {
                     className="homSynopsis__card"
                     icon={<EuiIcon size="xl" type="indexRollupApp" color="primary" />}
                     title="Rules"
-                    onClick={() => switchSection('rules')}
+                    onClick={() => handleOnClick('/management/rules')}
                     description="Manage your Wazuh cluster rules."
                   />
                 </EuiFlexItem>
@@ -162,3 +170,18 @@ export const ManagementWelcome = () => {
     </WzReduxProvider>
   );
 };
+
+const mapStateToProps = (state) => {
+  return {
+    state: [state.rulesetReducers, state.managementReducers],
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    updateRulesetSection: (section) => dispatch(updateRulesetSection(section)),
+    updateManagementSection: (section) => dispatch(updateManagementSection(section)),
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(ManagementWelcome);

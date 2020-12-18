@@ -25,6 +25,8 @@ import { getHttp } from '../kibana-services';
  * @param {String} method
  * @param {String} path
  * @param {Object} payload
+ * @param {Boolean} customTimeout
+ * @param {Boolean }shouldRetry
  */
 const genericReq = async (
   method,
