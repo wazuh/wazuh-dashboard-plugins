@@ -1,0 +1,22 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Main overview container should render a Main overview screen 1`] = `
+<EuiFlexGroup
+  direction="column"
+>
+  <EuiFlexItem
+    grow={false}
+  >
+    <OverviewStats
+      summary={Object {}}
+    />
+  </EuiFlexItem>
+  <EuiFlexItem
+    grow={false}
+  >
+    <OverviewWelcome
+      extensions={Object {}}
+    />
+  </EuiFlexItem>
+</EuiFlexGroup>
+`;
