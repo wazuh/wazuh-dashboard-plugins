@@ -11,7 +11,7 @@
  */
 import React, { Component, Fragment } from 'react';
 // Eui components
-import { EuiFlexItem, EuiButtonEmpty, EuiGlobalToastList } from '@elastic/eui';
+import { EuiFlexItem, EuiButtonEmpty } from '@elastic/eui';
 import { toastNotifications } from 'ui/notify';
 
 import { connect } from 'react-redux';
@@ -22,11 +22,10 @@ import {
   updteAddingRulesetFile,
   updateListContent,
   updateIsProcessing,
-  updatePageIndex
+  updatePageIndex,
 } from '../../../../../redux/actions/rulesetActions';
 
 import { WzRequest } from '../../../../../react-services/wz-request';
-import { ErrorHandler } from '../../../../../react-services/error-handler';
 import exportCsv from '../../../../../react-services/wz-csv';
 import { UploadFiles } from '../../upload-files';
 import columns from './utils/columns';
@@ -164,28 +163,73 @@ class WzRulesetActionButtons extends Component {
   render() {
     const { section, showingFiles } = this.props.state;
 
+    const getPermissionsFiles = () => {
+      const permissions = [
+        {
+          action: `cluster:status`,
+          resource: `*:*:*`,
+        },
+      ];
+
+      if (((this.props || {}).clusterStatus || {}).contextConfigServer === 'cluster') {
+        permissions.push(
+          {
+            action: `cluster:upload_file`,
+            resource: `node:id:*`,
+          },
+          {
+            action: `cluster:read`,
+            resource: `node:id:*`,
+          },
+          {
+            action: `cluster:read_file`,
+            resource: `node:id:*&file:path:*`,
+          }
+        );
+      } else {
+        permissions.push(
+          {
+            action: `manager:upload_file`,
+            resource: `file:path:/etc/${section}`,
+          },
+          {
+            action: `manager:read`,
+            resource: `file:path:/etc/${section}`,
+          },
+          {
+            action: `manager:read_file`,
+            resource: `file:path:/etc/${section}`,
+          }
+        );
+      }
+
+      return permissions;
+    };
+
     // Export button
     const exportButton = (
-      <EuiButtonEmpty
+      <WzButtonPermissions
+        buttonType="empty"
+        permissions={getPermissionsFiles()}
         iconType="exportAction"
+        iconSide="left"
         onClick={async () => await this.generateCsv()}
-        isLoading={this.state.generatingCsv}
       >
         Export formatted
-      </EuiButtonEmpty>
+      </WzButtonPermissions>
     );
 
     // Add new rule button
     const addNewRuleButton = (
       <WzButtonPermissions
-        permissions={[{action: 'manager:upload_file', resource: `file:path:/etc/${section}`}]}
-        buttonType='empty'
+        permissions={getPermissionsFiles()}
+        buttonType="empty"
         iconType="plusInCircle"
         onClick={() =>
           this.props.updteAddingRulesetFile({
             name: '',
             content: '<!-- Modify it at your will. -->',
-            path: `etc/${section}`
+            path: `etc/${section}`,
           })
         }
       >
@@ -193,17 +237,60 @@ class WzRulesetActionButtons extends Component {
       </WzButtonPermissions>
     );
 
+    const getPermissionsNewFileCDB = () => {
+      const permissions = [
+        {
+          action: `cluster:status`,
+          resource: `*:*:*`,
+        },
+      ];
+
+      if (((this.props || {}).clusterStatus || {}).contextConfigServer === 'cluster') {
+        permissions.push(
+          {
+            action: `cluster:upload_file`,
+            resource: `node:id:*`,
+          },
+          {
+            action: `cluster:read`,
+            resource: `node:id:*`,
+          },
+          {
+            action: `cluster:read_file`,
+            resource: `node:id:*&file:path:*`,
+          }
+        );
+      } else {
+        permissions.push(
+          {
+            action: `manager:read_file`,
+            resource: `file:path:/etc/${section}`,
+          },
+          {
+            action: `manager:read`,
+            resource: `*:*:*`,
+          },
+          {
+            action: `manager:upload_file`,
+            resource: `file:path:/etc/${section}`,
+          }
+        );
+      }
+
+      return permissions;
+    };
+
     //Add new CDB list button
     const addNewCdbListButton = (
       <WzButtonPermissions
-        buttonType='empty'
-        permissions={[{action: 'manager:upload_file', resource: 'file:path:/etc/lists/files'}]}
+        buttonType="empty"
+        permissions={getPermissionsNewFileCDB()}
         iconType="plusInCircle"
         onClick={() =>
           this.props.updateListContent({
             name: false,
             content: '',
-            path: 'etc/lists'
+            path: 'etc/lists',
           })
         }
       >
@@ -214,8 +301,8 @@ class WzRulesetActionButtons extends Component {
     // Manage files
     const manageFiles = (
       <WzButtonPermissions
-        buttonType='empty'
-        permissions={[{action: 'manager:upload_file', resource: `file:path:/etc/${section}`}]}
+        buttonType="empty"
+        permissions={getPermissionsFiles()}
         iconType={showingFiles ? 'apmTrace' : 'folderClosed'}
         onClick={async () => await this.toggleFiles()}
       >
@@ -252,6 +339,7 @@ class WzRulesetActionButtons extends Component {
         {(section === 'lists' || showingFiles) && (
           <EuiFlexItem grow={false}>
             <UploadFiles
+              clusterStatus={this.props.clusterStatus}
               msg={section}
               path={`etc/${section}`}
               upload={uploadFile}

@@ -157,4 +157,15 @@ export const updateToastNotificationsModal = toastNotification => {
     type: 'UPDATE_TOAST_NOTIFICATIONS_MODAL',
     toastNotification
   };
- };
+};
+
+/**
+ * Updates ClusterOrManagerConfiguration in the appState store
+ * @param clusterStatus
+ */
+export const updateClusterStatus = (clusterStatus) => {
+  return {
+    type: 'UPDATE_CLUSTER_STATUS',
+    clusterStatus,
+  };
+};

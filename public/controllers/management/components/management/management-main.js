@@ -22,6 +22,8 @@ import WzReporting from './reporting/reporting-main';
 import WzConfiguration from './configuration/configuration-main';
 import WzStatistics from './statistics/statistics-main';
 import { connect } from 'react-redux';
+import { clusterReq } from './configuration/utils/wz-fetch';
+import { updateClusterStatus } from '../../../../redux/actions/appStateActions';
 
 class WzManagementMain extends Component {
   constructor(props) {
@@ -37,6 +39,33 @@ class WzManagementMain extends Component {
     store.dispatch(updateRulesetSection(''));
   }
 
+  componentDidMount() {
+    this.isClusterOrManager();
+  }
+
+  isClusterOrManager = async () => {
+    try {
+      const clusterStatus = await clusterReq();
+      if (clusterStatus.data.data.enabled === 'yes' && clusterStatus.data.data.running === 'yes') {
+        this.props.updateClusterStatus({
+          status: true,
+          contextConfigServer: 'cluster',
+        });
+      } else {
+        this.props.updateClusterStatus({
+          status: false,
+          contextConfigServer: 'manager',
+        });
+      }
+    } catch (error) {
+      console.warn(`Error when try to get cluster status`, error);
+      this.props.updateClusterStatus({
+        status: false,
+        contextConfigServer: 'manager',
+      });
+    }
+  };
+
   render() {
     const { section } = this.props;
     const ruleset = ['ruleset', 'rules', 'decoders', 'lists'];
@@ -48,8 +77,7 @@ class WzManagementMain extends Component {
           (section === 'statistics' && <WzStatistics />) ||
           (section === 'logs' && <WzLogs />) ||
           (section === 'configuration' && <WzConfiguration {...this.props.configurationProps} />) ||
-          (ruleset.includes(section) && <WzRuleset />)
-        }
+          (ruleset.includes(section) && <WzRuleset clusterStatus={this.props.clusterStatus} />)}
       </Fragment>
     );
   }
@@ -57,17 +85,16 @@ class WzManagementMain extends Component {
 
 function mapStateToProps(state) {
   return {
-    state: state.managementReducers
+    state: state.managementReducers,
+    clusterStatus: state.appStateReducers.clusterStatus,
   };
 }
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch) => {
   return {
-    updateRulesetSection: section => dispatch(updateRulesetSection(section))
+    updateRulesetSection: (section) => dispatch(updateRulesetSection(section)),
+    updateClusterStatus: (clusterStatus) => dispatch(updateClusterStatus(clusterStatus)),
   };
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WzManagementMain);
+export default connect(mapStateToProps, mapDispatchToProps)(WzManagementMain);
