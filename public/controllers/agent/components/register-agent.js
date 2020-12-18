@@ -77,6 +77,26 @@ const versionButtonsCentos = [
     label: 'CentOS6 or higher'
   }
 ];
+
+const osButtons = [
+  {
+    id: 'rpm',
+    label: 'Red Hat / CentOS'
+  },
+  {
+    id: 'deb',
+    label: 'Debian / Ubuntu'
+  },
+  {
+    id: 'win',
+    label: 'Windows'
+  },
+  {
+    id: 'macos',
+    label: 'MacOS'
+  }
+];
+
 export class RegisterAgent extends Component {
   constructor(props) {
     super(props);
@@ -279,46 +299,34 @@ export class RegisterAgent extends Component {
     }
   }
 
+  checkMissingOSSelection(){
+    if(!this.state.selectedOS){
+      return ['Operating system'];
+    };
+    switch (this.state.selectedOS) {
+      case 'rpm':
+        return [
+          ...(!this.state.selectedVersion ? ['OS version'] : []),
+          ...(this.state.selectedVersion && !this.state.selectedArchitecture ? ['OS architecture'] : [])
+        ];
+      case 'deb':
+        return [
+          ...(!this.state.selectedArchitecture ? ['OS architecture'] : [])
+        ];
+      default:
+        return [];
+    }
+  };
+
   render() {
-    const rpmButton = (
-      <EuiButtonToggle
-        label="Red Hat / CentOS"
-        onChange={() => this.selectOS('rpm')}
-        fill={this.state.selectedOS === 'rpm'}
-      />
-    );
-
-    const debButton = (
-      <EuiButtonToggle
-        label="Debian / Ubuntu"
-        onChange={() => this.selectOS('deb')}
-        fill={this.state.selectedOS === 'deb'}
-      />
-    );
-
-    const windowsButton = (
-      <EuiButtonToggle
-        label="Windows"
-        onChange={() => this.selectOS('win')}
-        fill={this.state.selectedOS === 'win'}
-      />
-    );
-
-    const macOSButton = (
-      <EuiButtonToggle
-        label="MacOS"
-        onChange={() => this.selectOS('macos')}
-        fill={this.state.selectedOS === 'macos'}
-      />
-    );
-
+    const missingOSSelection = this.checkMissingOSSelection();
     const ipInput = (
       <EuiText>
         <p>
           You can predefine the Wazuh server address with the <EuiCode>enrollment.dns</EuiCode> Wazuh app setting.
         </p>
         <EuiFieldText
-          placeholder="Server address..."
+          placeholder="Server address"
           value={this.state.serverAddress}
           onChange={event => this.setServerAddress(event)}
         />
@@ -328,7 +336,7 @@ export class RegisterAgent extends Component {
     const groupInput = (
       <EuiText>
         <p>
-          You can predefine the group where you want to enroll the agent.
+          Select one or more existing groups
         </p>
         <EuiComboBox
           placeholder="Select agent group"
@@ -337,6 +345,7 @@ export class RegisterAgent extends Component {
           onChange={group => {
             this.setGroupName(group);
           }}
+          isDisabled={!this.state.groups.length}
           isClearable={true}
           data-test-subj="demoComboBox"
         />
@@ -345,7 +354,7 @@ export class RegisterAgent extends Component {
 
     const passwordInput = (
       <EuiFieldText
-        placeholder="Wazuh password..."
+        placeholder="Wazuh password"
         value={this.state.wazuhPassword}
         onChange={event => this.setWazuhPassword(event)}
       />
@@ -381,7 +390,7 @@ export class RegisterAgent extends Component {
       <div>
         {this.state.selectedOS && (
           <EuiText>
-            <p>You can use this command to install and enroll the Wazuh agent in one or more host.</p>
+            <p>You can use this command to install and enroll the Wazuh agent in one or more hosts.</p>
             <EuiCodeBlock style={codeBlock} language={language}>
               {this.state.wazuhPassword ? this.obfuscatePassword(text) : text}
             </EuiCodeBlock>
@@ -402,39 +411,40 @@ export class RegisterAgent extends Component {
     );
     const steps = [
       {
-        title: 'Choose OS',
-        children: (
-          <Fragment>
-            {rpmButton} {debButton} {windowsButton} {macOSButton}
-          </Fragment>
-        )
+        title: 'Choose the Operating system',
+        children: <EuiButtonGroup
+          color='primary'
+          options={osButtons}
+          idSelected={this.state.selectedOS}
+          onChange={os => this.selectOS(os)}
+        />
       },
       ...((this.state.selectedOS == 'rpm') ? [{
-        title: 'Choose your CentOS version',
-        children: <Fragment><EuiButtonGroup
+        title: 'Choose the version',
+        children: <EuiButtonGroup
           color='primary'
           options={versionButtonsCentos}
           idSelected={this.state.selectedVersion}
           onChange={version => this.setVersion(version)}
-        /></Fragment>
+        />
       }] : []),
       ...((this.state.selectedOS == 'rpm' && this.state.selectedVersion == 'centos5') ? [{
-        title: 'Choose your architecture',
-        children: <Fragment><EuiButtonGroup
+        title: 'Choose the architecture',
+        children: <EuiButtonGroup
           color='primary'
           options={this.state.architectureCentos5}
           idSelected={this.state.selectedArchitecture}
           onChange={architecture => this.setArchitecture(architecture)}
-        /></Fragment>
+        />
       }] : []),
       ...((this.state.selectedOS == 'deb' || (this.state.selectedOS == 'rpm' && this.state.selectedVersion == 'centos6')) ? [{
-        title: 'Choose your architecture',
-        children: <Fragment><EuiButtonGroup
+        title: 'Choose the architecture',
+        children: <EuiButtonGroup
           color='primary'
           options={this.state.architectureButtons}
           idSelected={this.state.selectedArchitecture}
           onChange={architecture => this.setArchitecture(architecture)}
-        /></Fragment>
+        />
       }] : []),
       {
         title: 'Wazuh server address',
@@ -448,17 +458,17 @@ export class RegisterAgent extends Component {
         title: 'Assign the agent to a group',
         children: <Fragment>{groupInput}</Fragment>
       },
-      ...((this.state.selectedArchitecture || this.state.selectedOS == 'win' || this.state.selectedOS == 'macos') ? [{
+      {
         title: 'Install and enroll the agent',
-        children: (
-          <div>
-            <Fragment>
-              <div>{guide}</div>
-            </Fragment>
-          </div>
-        )
-      }] : []),
-      ...(this.state.selectedOS && restartAgentCommand ? [
+        children: missingOSSelection.length
+          ? <EuiCallOut
+              color="warning"
+              title={`Please select the ${missingOSSelection.join(', ')}.`}
+              iconType="iInCircle"
+            />  
+          : <div>{guide}</div>
+      },
+      ...(!missingOSSelection.length && restartAgentCommand ? [
         {
           title: 'Start the agent',
           children: (
