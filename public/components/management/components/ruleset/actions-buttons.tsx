@@ -136,7 +136,6 @@ const WzRulesetActionButtons = (props) => {
     }
   };
 
-  debugger;
   const { section, showingFiles } = props.state;
 
   // Export button

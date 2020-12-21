@@ -26,6 +26,7 @@ import { updateRulesetSection } from '../../../redux/actions/rulesetActions';
 import { updateManagementSection } from '../../../redux/actions/managementActions';
 
 import { connect } from 'react-redux';
+import './welcome.scss';
 
 const ManagementWelcome = (props) => {
   const history = useHistory();

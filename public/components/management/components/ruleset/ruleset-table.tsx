@@ -74,6 +74,7 @@ const WzRulesetTable = (props) => {
             rule_ids: id,
           },
         });
+        // @ts-ignore
         const items = ((result.data || {}).data || {}).affected_items || [];
         if (items.length) {
           const info = rulesetHandler.getRuleInformation(items[0].filename, parseInt(id));
@@ -106,6 +107,7 @@ const WzRulesetTable = (props) => {
       return {};
     });
 
+    // @ts-ignore
     const { affected_items = [], total_affected_items = 0 } =
       ((rawItems || {}).data || {}).data || {};
     props.updateTotalItems(total_affected_items);
@@ -191,10 +193,9 @@ const WzRulesetTable = (props) => {
       const { id, name } = item;
 
       const extraSectionPermissions = extraSectionPrefixResource[props.state.section];
-      return {
-        'data-test-subj': `row-${id || name}`,
-        className: 'customRowClass',
-        onClick: WzUserPermissions.checkMissingUserPermissions(
+
+      const onClickEditRule = () => {
+        return !WzUserPermissions.checkMissingUserPermissions(
           [
             [
               {
@@ -216,7 +217,6 @@ const WzRulesetTable = (props) => {
           ? async () => {
               if (isLoading) return;
               setIsLoading(true);
-              debugger;
               const { section } = props.state;
               if (section === 'rules') {
                 const result = await rulesetHandler.getRuleInformation(item.filename, id);
@@ -234,7 +234,13 @@ const WzRulesetTable = (props) => {
               setIsLoading(false);
               handleOnClickRedirect(`/management/rules/${id}`);
             }
-          : undefined,
+          : undefined;
+      };
+
+      return {
+        'data-test-subj': `row-${id || name}`,
+        className: 'customRowClass',
+        onClick: onClickEditRule(),
       };
     };
 
@@ -272,6 +278,7 @@ const WzRulesetTable = (props) => {
           onChange={onTableChange}
           loading={isLoading || isRedirect}
           rowProps={(!props.state.showingFiles && getRowProps) || undefined}
+          // @ts-ignore
           sorting={sorting}
           message={message}
         />

@@ -18,7 +18,7 @@ import WzRulesetTable from './ruleset-table';
 import WzRulesetSearchBar from './ruleset-search-bar';
 import './ruleset-overview.scss';
 import { withGlobalBreadcrumb } from '../../../common/hocs/withGlobalBreadcrumb';
-//import { withUserAuthorizationPrompt } from '../../../common/hocs/withUserAuthorization';
+import { withUserAuthorizationPrompt } from '../../../common/hocs/withUserAuthorization';
 import { compose } from 'redux';
 import WzRulesetActionButtons from './actions-buttons';
 
@@ -100,12 +100,11 @@ export default compose(
       { text: 'Management', href: '/app/wazuh#/manager' },
       { text: sectionNames[props.state.section] },
     ];
-  })
-  // @ts-ignore
-  // withUserAuthorizationPrompt((props) => [
-  //   {
-  //     action: `${props.state.section}:read`,
-  //     resource: `${props.state.section.slice(0, -1)}:${SectionResourceType[props.state.section]}:*`,
-  //   },
-  // ])
+  }),
+  withUserAuthorizationPrompt((props) => [
+    {
+      action: `${props.state.section}:read`,
+      resource: `${props.state.section.slice(0, -1)}:${SectionResourceType[props.state.section]}:*`,
+    },
+  ])
 )(WzRulesetOverview);

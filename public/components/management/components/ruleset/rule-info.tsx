@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 // Eui components
 import {
   EuiAccordion,
@@ -18,9 +18,9 @@ import {
   EuiToolTip,
 } from '@elastic/eui';
 
-import { connect } from 'react-redux';
+import {connect} from 'react-redux';
 import WzRequest from '../../../../react-services/wz-request';
-import { useHistory } from 'react-router-dom';
+import {useHistory} from 'react-router-dom';
 
 import RulesetHandler from './utils/ruleset-handler';
 
@@ -66,7 +66,7 @@ const WzRuleInfo = (props) => {
 
   useEffect(() => {
     document.body.scrollTop = 0; // For Safari
-    document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+    document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and OperPa
   }, []);
 
   /**
@@ -261,7 +261,6 @@ const WzRuleInfo = (props) => {
    * @param {Array} groups
    */
   const renderGroups = (groups) => {
-    debugger;
     const listGroups = [];
     groups.forEach((group, index) => {
       listGroups.push(
