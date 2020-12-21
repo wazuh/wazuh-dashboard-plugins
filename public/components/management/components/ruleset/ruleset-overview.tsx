@@ -87,9 +87,8 @@ const mapDispatchToProps = (dispatch) => {
   };
 };
 
-export default compose(
-  connect(mapStateToProps, mapDispatchToProps),
-  withGlobalBreadcrumb((props) => {
+const globalBreadcrumb = () => {
+  return withGlobalBreadcrumb((props) => {
     const sectionNames = {
       rules: 'Rules',
       decoders: 'Decoders',
@@ -100,11 +99,20 @@ export default compose(
       { text: 'Management', href: '/app/wazuh#/manager' },
       { text: sectionNames[props.state.section] },
     ];
-  }),
-  withUserAuthorizationPrompt((props) => [
+  });
+};
+
+const userAuthorizationPrompt = () => {
+  return withUserAuthorizationPrompt((props) => [
     {
       action: `${props.state.section}:read`,
       resource: `${props.state.section.slice(0, -1)}:${SectionResourceType[props.state.section]}:*`,
     },
-  ])
+  ]);
+};
+
+export default compose(
+  connect(mapStateToProps, mapDispatchToProps),
+  globalBreadcrumb,
+  userAuthorizationPrompt
 )(WzRulesetOverview);
