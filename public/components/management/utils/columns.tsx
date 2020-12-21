@@ -1,8 +1,8 @@
 import React from 'react';
 import { EuiBadge, EuiButtonIcon, EuiToolTip } from '@elastic/eui';
 import RulesetHandler from './ruleset-handler';
-import exportCsv from '../../../../../react-services/wz-csv';
-import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
+import exportCsv from '../../../react-services/wz-csv';
+import { WzButtonPermissions } from '../../common/permissions/button';
 
 export default class RulesetColumns {
   constructor(tableProps) {

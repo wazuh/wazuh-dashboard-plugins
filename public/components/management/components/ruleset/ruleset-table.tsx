@@ -14,7 +14,7 @@ import { EuiBasicTable, EuiCallOut, EuiConfirmModal, EuiOverlayMask } from '@ela
 import { useHistory } from 'react-router-dom';
 
 import { connect } from 'react-redux';
-import RulesetHandler from './utils/ruleset-handler';
+import RulesetHandler from '../../utils/ruleset-handler';
 import {
   updateDecoderInfo,
   updateDefaultItems,
@@ -26,7 +26,7 @@ import {
   updateShowModal,
 } from '../../../../redux/actions/rulesetActions';
 
-import RulesetColums from './utils/columns';
+import RulesetColums from '../../utils/columns';
 import WzRequest from '../../../../react-services/wz-request';
 import { filtersToObject } from '../../../wz-search-bar';
 import { withUserPermissions } from '../../../common/hocs/withUserPermissions';
@@ -191,7 +191,6 @@ const WzRulesetTable = (props) => {
 
     const getRowProps = (item) => {
       const { id, name } = item;
-
       const extraSectionPermissions = extraSectionPrefixResource[props.state.section];
 
       const onClickEditRule = () => {
@@ -221,9 +220,13 @@ const WzRulesetTable = (props) => {
               if (section === 'rules') {
                 const result = await rulesetHandler.getRuleInformation(item.filename, id);
                 await props.updateRuleInfo(result);
+                setIsLoading(false);
+                handleOnClickRedirect(`/management/${props.state.section}/${id}`);
               } else if (section === 'decoders') {
                 const result = await rulesetHandler.getDecoderInformation(item.filename, name);
                 await props.updateDecoderInfo(result);
+                setIsLoading(false);
+                handleOnClickRedirect(`/management/${props.state.section}/${name}`);
               } else {
                 const result = await rulesetHandler.getCdbList(
                   `${item.relative_dirname}/${item.filename}`
@@ -231,8 +234,6 @@ const WzRulesetTable = (props) => {
                 const file = { name: item.filename, content: result, path: item.relative_dirname };
                 await props.updateListContent(file);
               }
-              setIsLoading(false);
-              handleOnClickRedirect(`/management/rules/${id}`);
             }
           : undefined;
       };

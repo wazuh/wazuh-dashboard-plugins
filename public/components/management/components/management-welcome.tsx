@@ -62,7 +62,7 @@ const ManagementWelcome = (props) => {
                     className="homSynopsis__card"
                     icon={<EuiIcon size="xl" type="indexRollupApp" color="primary" />}
                     title="Decoders"
-                    onClick={() => switchSection('decoders')}
+                    onClick={() => switchSection('/management/decoders')}
                     description="Manage your Wazuh cluster decoders."
                   />
                 </EuiFlexItem>
@@ -84,7 +84,7 @@ const ManagementWelcome = (props) => {
                     className="homSynopsis__card"
                     icon={<EuiIcon size="xl" type="usersRolesApp" color="primary" />}
                     title="Groups"
-                    onClick={() => switchSection('groups')}
+                    onClick={() => switchSection('/management/groups')}
                     description="Manage your agent groups."
                   />
                 </EuiFlexItem>
@@ -96,7 +96,7 @@ const ManagementWelcome = (props) => {
                     className="homSynopsis__card"
                     icon={<EuiIcon size="xl" type="devToolsApp" color="primary" />}
                     title="Configuration"
-                    onClick={() => switchSection('configuration')}
+                    onClick={() => switchSection('/management/configuration')}
                     description="Manage your Wazuh cluster configuration."
                   />
                 </EuiFlexItem>
@@ -124,7 +124,7 @@ const ManagementWelcome = (props) => {
                     className="homSynopsis__card"
                     icon={<EuiIcon size="xl" type="indexPatternApp" color="primary" />}
                     title="Cluster"
-                    onClick={() => switchSection('monitoring')}
+                    onClick={() => switchSection('/management/monitoring')}
                     description="Visualize your Wazuh cluster."
                   />
                 </EuiFlexItem>
@@ -146,7 +146,7 @@ const ManagementWelcome = (props) => {
                     className="homSynopsis__card"
                     icon={<EuiIcon size="xl" type="reportingApp" color="primary" />}
                     title="Reporting"
-                    onClick={() => switchSection('reporting')}
+                    onClick={() => switchSection('/management/reporting')}
                     description="Check your stored Wazuh reports."
                   />
                 </EuiFlexItem>
@@ -158,7 +158,7 @@ const ManagementWelcome = (props) => {
                     className="homSynopsis__card"
                     icon={<EuiIcon size="xl" type="visualizeApp" color="primary" />}
                     title="Statistics"
-                    onClick={() => switchSection('statistics')}
+                    onClick={() => switchSection('/management/statistics')}
                     description="Information about the Wazuh environment"
                   />
                 </EuiFlexItem>

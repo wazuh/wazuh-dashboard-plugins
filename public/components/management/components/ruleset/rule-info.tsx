@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 // Eui components
 import {
   EuiAccordion,
@@ -18,11 +18,11 @@ import {
   EuiToolTip,
 } from '@elastic/eui';
 
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 import WzRequest from '../../../../react-services/wz-request';
-import {useHistory} from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 
-import RulesetHandler from './utils/ruleset-handler';
+import RulesetHandler from '../../utils/ruleset-handler';
 
 import {
   cleanFileContent,

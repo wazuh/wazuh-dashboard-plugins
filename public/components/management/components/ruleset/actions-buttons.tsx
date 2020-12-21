@@ -26,7 +26,7 @@ import {
 
 import exportCsvService from '../../../../react-services/wz-csv';
 import { UploadFiles } from '../../service/upload-files';
-import RulesetHandler from './utils/ruleset-handler';
+import RulesetHandler from '../../utils/ruleset-handler';
 import { WzButtonPermissions } from '../../../common/permissions/button';
 import { getToasts } from '../../../../kibana-services';
 
