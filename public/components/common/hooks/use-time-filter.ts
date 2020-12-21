@@ -9,18 +9,21 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { useState, useEffect } from 'react';
-//@ts-ignore
-import { getServices } from '../../../../../../src/plugins/discover/public/kibana_services';
+import { useEffect, useState } from 'react';
+import { getDataPlugin } from '../../../kibana-services';
 
 export function useTimeFilter() {
-  const { timefilter, } = getServices();
-  const [timeFilter, setTimeFilter] = useState(timefilter.getTime());
-  const [timeHistory, setTimeHistory] = useState(timefilter._history);
+  const _timeFilter = getDataPlugin().query.timefilter.timefilter();
+  const [timeFilter, setTimeFilter] = useState(_timeFilter.getTime());
+  const [timeHistory, setTimeHistory] = useState(_timeFilter._history);
   useEffect(() => {
-    const subscription = timefilter.getTimeUpdate$().subscribe(
-      () => { setTimeFilter(timefilter.getTime()); setTimeHistory(timefilter._history) });
-    return () => { subscription.unsubscribe(); }
+    const subscription = _timeFilter.getTimeUpdate$().subscribe(() => {
+      setTimeFilter(_timeFilter.getTime());
+      setTimeHistory(_timeFilter._history);
+    });
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
-  return { timeFilter, setTimeFilter: timefilter.setTime, timeHistory };
+  return { timeFilter, setTimeFilter: _timeFilter.setTime, timeHistory };
 }

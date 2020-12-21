@@ -9,18 +9,17 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { useState, useEffect} from 'react';
-//@ts-ignore
-import { getServices } from '../../../../../../src/plugins/discover/public/kibana_services';
-import { AppState } from '../../../react-services/app-state';
+import { useEffect, useState } from 'react';
+import AppState from '../../../react-services/app-state';
 import { IIndexPattern } from '../../../../../../src/plugins/data/public';
+import { getIndexPattern } from '../../../kibana-services';
 
 export const useIndexPattern = (): IIndexPattern | undefined => {
+  const _indexPatterns = getIndexPattern().query.indexPatterns;
   const [indexPattern, setIndexPattern] = useState();
   useEffect(() => {
-  const idIndexPattern = AppState.getCurrentPattern();
-  getServices().indexPatterns.get(idIndexPattern)
-    .then(setIndexPattern);
+    const idIndexPattern = AppState.getCurrentPattern();
+    _indexPatterns.get(idIndexPattern).then(setIndexPattern);
   }, []);
   return indexPattern;
-}
+};
