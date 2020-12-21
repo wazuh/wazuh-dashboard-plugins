@@ -24,10 +24,13 @@ import { MainOverview } from './components/main-overview';
 import { WzManagement } from './components/management/container/management-provider';
 import WzRulesetOverview from './components/management/components/ruleset/ruleset-overview';
 import WzRuleInfo from './components/management/components/ruleset/rule-info';
+import WzDecoderInfo from './components/management/components/decoder/decoder-info';
 
 const LANDING_PAGE_URL = '/overview';
 const MANAGER_RULES_ID_PAGE_URL = '/management/rules/:id';
 const MANAGER_RULES_PAGE_URL = '/management/rules';
+const MANAGER_DECODERS_PAGE_URL = '/management/decoders';
+const MANAGER_DECODERS_ID_PAGE_URL = '/management/decoders/:id';
 const MANAGER_PAGE_URL = '/management';
 
 export function AppRouter(props: AppDependencies) {
@@ -39,8 +42,16 @@ export function AppRouter(props: AppDependencies) {
             <Route path={LANDING_PAGE_URL} render={() => <MainOverview />} />
             <Route path={MANAGER_RULES_ID_PAGE_URL} render={() => <WzRuleInfo />} />
             <Route
+              path={MANAGER_DECODERS_ID_PAGE_URL}
+              render={() => <WzDecoderInfo {...props} />}
+            />
+            <Route
               path={MANAGER_RULES_PAGE_URL}
               render={() => <WzRulesetOverview section={'rules'} />}
+            />
+            <Route
+              path={MANAGER_DECODERS_PAGE_URL}
+              render={() => <WzRulesetOverview section={'decoders'} />}
             />
             <Route path={MANAGER_PAGE_URL} render={() => <WzManagement />} />
             <Route path="/health-check" render={() => <HealthCheck />} />
