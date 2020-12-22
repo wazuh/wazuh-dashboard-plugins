@@ -20,7 +20,7 @@ import {
   EuiSpacer,
 } from '@elastic/eui';
 import ErrorHandler from '../../../react-services/error-handler';
-import React from 'react';
+import React, { Fragment } from 'react';
 import { useState, useEffect } from 'react';
 import { useAppConfig } from '../../../components/common/hooks/use-app-config';
 import {
@@ -35,7 +35,6 @@ import {
 import { CheckResult } from '../components/check-result';
 import AppState from '../../../react-services/app-state';
 import { useAppDeps } from '../../../components/common/hooks/use-app-deps';
-import { Fragment } from 'react';
 
 const checks = {
   api: {    
@@ -120,6 +119,7 @@ export function HealthCheck() {
             color="danger"
             iconType="alert"
             style={{ textAlign: 'left' }}
+            data-test-subj='callOutError'
           ></EuiCallOut>
           <EuiSpacer size="xs" />
         </Fragment>

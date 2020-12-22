@@ -1,0 +1,104 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Health Check container should render a Health check screen 1`] = `
+<div
+  className="health-check"
+>
+  <EuiLoadingSpinner
+    className="health-check-loader"
+  />
+  <img
+    alt=""
+    className="health-check-logo"
+    src="/plugins/wazuh/assets/icon_blue.svg"
+  />
+  <div
+    className="margin-top-30"
+  >
+    <EuiDescriptionList
+      align="center"
+      textStyle="reverse"
+      type="column"
+    >
+      <CheckResult
+        awaitFor={Array []}
+        check={true}
+        checksReady={Object {}}
+        handleCheckReady={[Function]}
+        handleErrors={[Function]}
+        isLoading={false}
+        key="0"
+        name="api"
+        title="Check Wazuh API connection"
+        validationService={[Function]}
+      />
+      <CheckResult
+        awaitFor={
+          Array [
+            "api",
+          ]
+        }
+        check={true}
+        checksReady={Object {}}
+        handleCheckReady={[Function]}
+        handleErrors={[Function]}
+        isLoading={false}
+        key="1"
+        name="setup"
+        title="Check for Wazuh API version"
+        validationService={[Function]}
+      />
+      <CheckResult
+        awaitFor={Array []}
+        check={true}
+        checksReady={Object {}}
+        handleCheckReady={[Function]}
+        handleErrors={[Function]}
+        isLoading={false}
+        key="2"
+        name="pattern"
+        title="Check Elasticsearch index pattern"
+        validationService={[Function]}
+      />
+      <CheckResult
+        awaitFor={
+          Array [
+            "pattern",
+          ]
+        }
+        check={true}
+        checksReady={Object {}}
+        handleCheckReady={[Function]}
+        handleErrors={[Function]}
+        isLoading={false}
+        key="3"
+        name="template"
+        title="Check Elasticsearch template"
+        validationService={[Function]}
+      />
+      <CheckResult
+        awaitFor={
+          Array [
+            "pattern",
+          ]
+        }
+        check={true}
+        checksReady={Object {}}
+        handleCheckReady={[Function]}
+        handleErrors={[Function]}
+        isLoading={false}
+        key="4"
+        name="fields"
+        title="Check index pattern fields"
+        validationService={[Function]}
+      />
+    </EuiDescriptionList>
+  </div>
+  <EuiSpacer
+    size="xxl"
+  />
+  <EuiSpacer
+    size="xxl"
+  />
+</div>
+`;

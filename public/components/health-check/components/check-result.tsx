@@ -18,7 +18,6 @@ import {
   EuiIcon,
   EuiLoadingSpinner,
 } from '@elastic/eui';
-import { useStartTyping } from 'react-use';
 
 type Result = 'loading' | 'ready' | 'error' | 'disabled';
 
