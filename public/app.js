@@ -75,7 +75,7 @@ import { updateCurrentPlatform } from './redux/actions/appStateActions';
 import { WzAuthentication } from './react-services/wz-authentication'
 
 import { getAngularModule } from './kibana-services';
-const app = getAngularModule('app/wazuh');
+const app = getAngularModule();
 
 app.config([
   '$compileProvider',
@@ -96,7 +96,7 @@ app.config([
 app.run([
   '$injector',
   function (_$injector) {
-    chrome
+/*     chrome
       .setRootTemplate(
         `<div>
         <div class="wazuhNotReadyYet"></div>
@@ -107,7 +107,7 @@ app.run([
        </div>
         `
       )
-      .setRootController(() => require('./app'));
+      .setRootController(() => require('./app')); */
     changeWazuhNavLogo();
     app.$injector = _$injector;
 

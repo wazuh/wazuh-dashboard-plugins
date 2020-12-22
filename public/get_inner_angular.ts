@@ -72,22 +72,22 @@ export function getInnerAngularModuleEmbeddable(
 let initialized = false;
 
 export function initializeInnerAngularModule(
-  name = 'app/discover',
+  name = 'app/wazuh',
   core: CoreStart,
   navigation: NavigationStart,
   data: DataPublicPluginStart,
   embeddable = false
 ) {
-  if (!initialized) {
+   if (!initialized) {
     createLocalI18nModule();
     createLocalPrivateModule();
     createLocalPromiseModule();
-    createLocalTopNavModule(navigation);
+ /*    createLocalTopNavModule(navigation);
     createLocalStorageModule();
     createPagerFactoryModule();
-    createDocTableModule();
+    createDocTableModule(); */
     initialized = true;
-  }
+  } 
 
   if (embeddable) {
     return angular
@@ -97,12 +97,12 @@ export function initializeInnerAngularModule(
         'ngCookies',
         'ngMaterial',
         'chart.js',
-        /*         'ui.bootstrap',
-        'discoverI18n',
-        'discoverPrivate',
-        'discoverDocTable',
-        'discoverPagerFactory',
-        'discoverPromise', */
+        'ui.bootstrap',
+        'wazuhI18n',
+        'wazuhPrivate',
+        'wazuhPromise',
+        //'wazuhDocTable',
+        //'wazuhPagerFactory',
       ])
       .config(watchMultiDecorator)
       .directive('icon', (reactDirective) => reactDirective(EuiIcon));
@@ -117,14 +117,14 @@ export function initializeInnerAngularModule(
       'ngCookies',
       'ngMaterial',
       'chart.js',
-      /*       'ui.bootstrap',
-      'discoverI18n',
-      'discoverPrivate',
-      'discoverPromise',
-      'discoverTopNav',
-      'discoverLocalStorageProvider',
-      'discoverDocTable',
-      'discoverPagerFactory', */
+      'ui.bootstrap',
+      'wazuhI18n',
+      'wazuhPrivate',
+      'wazuhPromise',
+      /* 'wazuhTopNav',
+      'wazuhLocalStorageProvider',
+      'wazuhDocTable',
+      'wazuhPagerFactory', */
     ])
     .config(watchMultiDecorator)
     .run(registerListenEventListener);
@@ -134,23 +134,23 @@ export function initializeInnerAngularModule(
 }
 
 function createLocalPromiseModule() {
-  angular.module('discoverPromise', []).service('Promise', PromiseServiceCreator);
+  angular.module('wazuhPromise', []).service('Promise', PromiseServiceCreator);
 }
 
 function createLocalPrivateModule() {
-  angular.module('discoverPrivate', []).provider('Private', PrivateProvider);
+  angular.module('wazuhPrivate', []).provider('Private', PrivateProvider);
 }
 
 function createLocalTopNavModule(navigation: NavigationStart) {
   angular
-    .module('discoverTopNav', ['react'])
+    .module('wazuhTopNav', ['react'])
     .directive('kbnTopNav', createTopNavDirective)
     .directive('kbnTopNavHelper', createTopNavHelper(navigation.ui));
 }
 
 function createLocalI18nModule() {
   angular
-    .module('discoverI18n', [])
+    .module('wazuhI18n', [])
     .provider('i18n', I18nProvider)
     .filter('i18n', i18nFilter)
     .directive('i18nId', i18nDirective);
@@ -158,7 +158,7 @@ function createLocalI18nModule() {
 
 function createLocalStorageModule() {
   angular
-    .module('discoverLocalStorageProvider', ['discoverPrivate'])
+    .module('wazuhLocalStorageProvider', ['wazuhPrivate'])
     .service('localStorage', createLocalStorageService('localStorage'))
     .service('sessionStorage', createLocalStorageService('sessionStorage'));
 }
@@ -174,7 +174,7 @@ function createPagerFactoryModule() {
 }
 
 function createDocTableModule() {
-  angular.module('discoverDocTable', ['discoverPagerFactory', 'react']);
+  angular.module('wazuhDocTable', ['discoverPagerFactory', 'react']);
   /*.directive('docTable', createDocTableDirective)
     .directive('kbnTableHeader', createTableHeaderDirective)
     .directive('toolBarPagerText', createToolBarPagerTextDirective)

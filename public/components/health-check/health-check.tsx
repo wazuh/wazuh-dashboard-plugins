@@ -326,7 +326,7 @@ export class HealthCheck extends Component {
     }
 
     render() {
-        const logo_url = getHttp().basePath.prepend('/plugins/wazuh/img/icon_blue.svg');
+        const logo_url = getHttp().basePath.prepend('/plugins/wazuh/assets/icon_blue.svg');
         return (
             <div className="health-check">
                 <EuiLoadingSpinner className="health-check-loader" />

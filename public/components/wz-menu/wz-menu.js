@@ -727,7 +727,7 @@ class WzMenu extends Component {
       </div>
     );
 
-    const logotype_url = chrome.addBasePath('/plugins/wazuh/img/logotype.svg');
+    const logotype_url = chrome.addBasePath('/plugins/wazuh/assets/logotype.svg');
     const mainButton = (
       <button className="eui" onClick={() => this.switchMenuOpened()}>
         <EuiFlexGroup

@@ -19,7 +19,6 @@ export function getIp(
   $q,
   $window,
   $location,
-  Private,
   appState,
   genericReq,
   errorHandler,
