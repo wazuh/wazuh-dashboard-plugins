@@ -149,19 +149,22 @@ const WzRulesetActionButtons = (props) => {
     </EuiButtonEmpty>
   );
 
+  const getOnClickNewRule = () => {
+    props.updteAddingRulesetFile({
+      name: '',
+      content: '<!-- Modify it at your will. -->',
+      path: `etc/${section}`,
+    });
+    props.params.history.push(`/management/${section}/new`);
+  };
+
   // Add new rule button
   const addNewRuleButton = (
     <WzButtonPermissions
       permissions={[{ action: 'manager:upload_file', resource: `file:path:/etc/${section}` }]}
       buttonType="empty"
       iconType="plusInCircle"
-      onClick={() =>
-        props.updteAddingRulesetFile({
-          name: '',
-          content: '<!-- Modify it at your will. -->',
-          path: `etc/${section}`,
-        })
-      }
+      onClick={getOnClickNewRule}
     >
       {`Add new ${section} file`}
     </WzButtonPermissions>

@@ -261,6 +261,9 @@ export default class RulesetColumns {
                         path: item.relative_dirname,
                       };
                       this.tableProps.updateFileContent(file);
+                      this.tableProps.params.history.push(
+                        `/management/rules/view/${item.filename}`
+                      );
                     }}
                     color="primary"
                   />

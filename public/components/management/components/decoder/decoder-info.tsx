@@ -28,7 +28,7 @@ import {
 } from '../../../../redux/actions/rulesetActions';
 import { colors } from '../../utils/colors';
 
-class WzDecoderInfo extends Component {
+class WzDecoderInfo extends Component<any> {
   constructor(props) {
     super(props);
     this.rulesetHandler = RulesetHandler;

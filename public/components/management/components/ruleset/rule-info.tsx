@@ -19,6 +19,7 @@ import {
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
+import { compose } from 'redux';
 import WzRequest from '../../../../react-services/wz-request';
 import { useHistory } from 'react-router-dom';
 
@@ -34,7 +35,25 @@ import {
 
 import WzTextWithTooltipTruncated from '../../../../components/common/wz-text-with-tooltip-if-truncated';
 
-const WzRuleInfo = (props) => {
+const mapStateToProps = (state) => {
+  return {
+    state: state.rulesetReducers,
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    updateFileContent: (content) => dispatch(updateFileContent(content)),
+    cleanFileContent: () => dispatch(cleanFileContent()),
+    updateFilters: (filters) => dispatch(updateFilters(filters)),
+    cleanFilters: () => dispatch(cleanFilters()),
+    cleanInfo: () => dispatch(cleanInfo()),
+  };
+};
+
+export const WzRuleInfo = compose(
+  connect(mapStateToProps, mapDispatchToProps
+  )((props) => {
   const [complianceEquivalences, setComplianceEquivalences] = useState({
     pci: 'PCI DSS',
     gdpr: 'GDPR',
@@ -653,22 +672,6 @@ const WzRuleInfo = (props) => {
       </EuiFlexGroup>
     </EuiPage>
   );
-};
+})
+) as React.ElementType;
 
-const mapStateToProps = (state) => {
-  return {
-    state: state.rulesetReducers,
-  };
-};
-
-const mapDispatchToProps = (dispatch) => {
-  return {
-    updateFileContent: (content) => dispatch(updateFileContent(content)),
-    cleanFileContent: () => dispatch(cleanFileContent()),
-    updateFilters: (filters) => dispatch(updateFilters(filters)),
-    cleanFilters: () => dispatch(cleanFilters()),
-    cleanInfo: () => dispatch(cleanInfo()),
-  };
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(WzRuleInfo);

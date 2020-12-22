@@ -13,7 +13,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
 import { updateFilters, updateIsProcessing } from '../../../../redux/actions/rulesetActions';
-import { WzRequest } from '../../../../react-services/wz-request';
+import WzRequest from '../../../../react-services/wz-request';
 import { WzSearchBar } from '../../../wz-search-bar';
 
 class WzRulesetSearchBar extends Component {
