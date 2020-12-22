@@ -26,7 +26,7 @@ import {
     EuiButtonIcon
 } from '@elastic/eui';
 
-import { toastNotifications } from 'ui/notify';
+import {getUiSettings} from '../kibana-services'
 import { WzRequest } from '../../react-services/wz-request';
 import { AppState } from '../../react-services/app-state';
 import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../util/constants';
@@ -80,7 +80,7 @@ export default class WzSampleData extends Component {
         accum[cur.categorySampleAlertsIndex] = WzRequest.genericReq('GET', `/elastic/samplealerts/${cur.categorySampleAlertsIndex}`)
         return accum
       },{}));
-  
+
       this.setState(Object.keys(results).reduce((accum, cur) => {
         accum[cur] = {
           ...this.state[cur],
@@ -103,7 +103,7 @@ export default class WzSampleData extends Component {
           node: clusterName
         };
       };
-      
+
     }catch(error){}
   }
   showToast(color: string, title: string = '', text: string = '', time: number = 3000){

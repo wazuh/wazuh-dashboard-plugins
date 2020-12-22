@@ -9,8 +9,8 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import chrome from 'ui/chrome';
 import moment from 'moment-timezone';
+import {getUiSettings} from '../kibana-services'
 
 export class TimeService {
   /**
@@ -20,7 +20,7 @@ export class TimeService {
   static offset(d) {
     try {
       const dateUTC = moment.utc(d);
-      const kibanaTz = chrome.getUiSettingsClient().get('dateFormat:tz');
+      const kibanaTz = getUiSettings().get('dateFormat:tz');
       const dateLocate =
         kibanaTz === 'Browser'
           ? moment(dateUTC).local()
