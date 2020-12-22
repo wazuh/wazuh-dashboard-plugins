@@ -51,16 +51,13 @@ const assignPreviousLocation = ($rootScope, $location) => {
   }
 };
 
-function ip($q, $rootScope, $window, $location, errorHandler) {
+function ip($q, $rootScope, $window, $location) {
   const wzMisc = new WzMisc();
   assignPreviousLocation($rootScope, $location);
   return getIp(
     $q,
     $window,
     $location,
-    AppState,
-    GenericRequest,
-    errorHandler,
     wzMisc
   );
 }

@@ -19,9 +19,6 @@ export function getIp(
   $q,
   $window,
   $location,
-  appState,
-  genericReq,
-  errorHandler,
   wzMisc
 ) {
   const deferred = $q.defer();

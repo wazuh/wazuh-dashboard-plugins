@@ -25,14 +25,14 @@ export class CommonData {
    * @param {*} $location
    * @param {*} globalState
    */
-  constructor($rootScope, $timeout, errorHandler, $location, globalState, $window, $route) {
+  constructor($rootScope, $timeout, errorHandler, $location, $window, $route) {
     this.$rootScope = $rootScope;
     this.$timeout = $timeout;
     this.genericReq = GenericRequest;
     this.errorHandler = errorHandler;
     this.$location = $location;
     this.shareAgent = new ShareAgent();
-    this.globalState = globalState;
+//    this.globalState = globalState;
     this.savedTimefilter = null;
     this.$window = $window;
     this.$route = $route;
