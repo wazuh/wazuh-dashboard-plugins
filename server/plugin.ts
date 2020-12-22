@@ -28,6 +28,7 @@ import {
 import { WazuhPluginSetup, WazuhPluginStart, PluginSetup } from './types';
 import { SecurityObj, ISecurityFactory } from './lib/security-factory';
 import { setupRoutes } from './routes';
+import { jobMonitoringRun } from './start/monitoring';
 import { getCookieValueByName } from './lib/cookie';
 import * as ApiInterceptor  from './lib/api-interceptor';
 declare module 'kibana/server' {
@@ -83,10 +84,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       };
     });
 
-    // TODO: implement router
+    // Routes
     const router = core.http.createRouter();
     setupRoutes(router);
-    // TODO: implement Wazuh monitoring
 
     // TODO: implement Scheduler handler
 
@@ -95,6 +95,24 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
   }
 
   public start(core: CoreStart) {
+    const wazuhApiClient = {
+      client: {
+        asInternalUser: {
+          authenticate: async (apiHostID) => await ApiInterceptor.authenticate(apiHostID),
+          request: async (method, path, data, options) => await ApiInterceptor.requestAsInternalUser(method, path, data, options),
+        }
+      }
+    };
+
+    // Monitoring
+    jobMonitoringRun({
+      core, 
+      wazuh: {
+        logger: this.logger.get('monitoring'),
+        api: wazuhApiClient
+      }
+    });
+
     return {};
   }
 

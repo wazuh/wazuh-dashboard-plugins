@@ -15,6 +15,12 @@ export const WAZUH_ALERTS_PREFIX = "wazuh-alerts-";
 export const WAZUH_ALERTS_PATTERN = "wazuh-alerts-*";
 export const WAZUH_MONITORING_PREFIX = "wazuh-monitoring-";
 export const WAZUH_MONITORING_PATTERN = "wazuh-monitoring-*";
+export const WAZUH_MONITORING_TEMPLATE_NAME = "wazuh-agent";
+export const WAZUH_MONITORING_DEFAULT_INDICES_SHARDS = 2;
+export const WAZUH_MONITORING_DEFAULT_CREATION = 'd';
+export const WAZUH_MONITORING_DEFAULT_ENABLED = true;
+export const WAZUH_MONITORING_DEFAULT_FREQUENCY = 900;
+export const WAZUH_MONITORING_DEFAULT_CRON_FREQ = '0 * * * * *';
 
 // Permissions
 export const WAZUH_ROLE_ADMINISTRATOR_ID = 1;

@@ -10,13 +10,8 @@
  * Find more information about this on the LICENSE file.
  */
 
-import axios from 'axios';
-import {
-  ManageHosts
-} from './manage-hosts';
-import {
-  UpdateRegistry
-} from './update-registry';
+import axios, { AxiosResponse } from 'axios';
+import { ManageHosts } from './manage-hosts';
 
 process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
 
@@ -27,12 +22,23 @@ interface APIHost{
   password: string
 }
 
+export interface APIInterceptorRequestOptions{
+  apiHostID: string
+  token: string
+  forceRefresh?: boolean
+}
+
+export interface APIInterceptorRequestOptionsInternalUser{
+  apiHostID: string
+  forceRefresh?: boolean
+}
+
 const manageHosts = new ManageHosts();
 
 // Cache to save the token for the internal user by API host ID
 const CacheInternalUserAPIHostToken = new Map<string,string>();
 
-export const authenticate = async (apiHostID: string, authContext?: any) => {
+export const authenticate = async (apiHostID: string, authContext?: any): Promise<string> => {
   try{
     const api: APIHost = await manageHosts.getHostById(apiHostID);
     const optionsRequest = {
@@ -48,7 +54,7 @@ export const authenticate = async (apiHostID: string, authContext?: any) => {
       ...(!!authContext ? { data: authContext } : {})
     };
 
-    const response = await axios(optionsRequest);
+    const response: AxiosResponse = await axios(optionsRequest);
     const token: string = (((response || {}).data || {}).data || {}).token;
     if (!authContext) {
       CacheInternalUserAPIHostToken.set(apiHostID, token);
@@ -59,8 +65,8 @@ export const authenticate = async (apiHostID: string, authContext?: any) => {
   }
 };
 
-const buildRequestOptions = async (method: string, path: string, data: any, { idHost, forceRefresh, token }) => {
-  const api = await manageHosts.getHostById(idHost);
+const buildRequestOptions = async (method: string, path: string, data: any, { apiHostID, forceRefresh, token }: APIInterceptorRequestOptions) => {
+  const api = await manageHosts.getHostById(apiHostID);
   return {
     method: method,
     headers: {
@@ -74,7 +80,7 @@ const buildRequestOptions = async (method: string, path: string, data: any, { id
   }
 }
 
-export const requestAsInternalUser = async (method: string, path: string, data: any, options: any) => {
+export const requestAsInternalUser = async (method: string, path: string, data: any, options: APIInterceptorRequestOptionsInternalUser) => {
   try{
     const token = CacheInternalUserAPIHostToken.has(options.apiHostID) && options.forceRefresh
       ? CacheInternalUserAPIHostToken.get(options.apiHostID)
@@ -83,7 +89,7 @@ export const requestAsInternalUser = async (method: string, path: string, data: 
   }catch(error){
     if (error.response && error.response.status === 401) {
       try{
-        const token = await authenticate(options.idHost);
+        const token: string = await authenticate(options.apiHostID);
         return await request(method, path, data, {...options, token});
       }catch(error){
         throw error;
@@ -93,14 +99,14 @@ export const requestAsInternalUser = async (method: string, path: string, data: 
   }
 };
 
-export const requestAsCurrentUser = async (method: string, path: string, data: any, options: any) => {
+export const requestAsCurrentUser = async (method: string, path: string, data: any, options: APIInterceptorRequestOptions) => {
   return await request(method, path, data, options)
 };
 
-const request = async (method: string, path: string, data: any, options: any) => {
+const request = async (method: string, path: string, data: any, options: any): Promise<AxiosResponse> => {
   try{
-    const optionsRequest = buildRequestOptions(method, path, data, options)
-    const response = await axios(optionsRequest);
+    const optionsRequest = await buildRequestOptions(method, path, data, options)
+    const response: AxiosResponse = await axios(optionsRequest);
     return response;
   }catch(error){
     throw error;
