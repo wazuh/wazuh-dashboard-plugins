@@ -11,7 +11,7 @@ import IApiResponse from '../../../../react-services/interfaces/api-response.int
  * Find more information about this on the LICENSE file.
  */
 
-import { WzRequest } from '../../../../react-services/wz-request';
+import WzRequest from '../../../../react-services/wz-request';
 import { Role } from '../types/role.type';
 
 const GetRolesService = async (): Promise<Role[]> => {

@@ -21,6 +21,7 @@ import { AppDependencies } from './types';
 //import { ToastNotificationsModal } from './components/notifications/modal';
 import { HealthCheck } from './components/health-check';
 import { MainOverview } from './components/main-overview';
+import { MainSecurity } from './components/main-security';
 
 
 const LANDING_PAGE_URL = '/overview';
@@ -33,6 +34,7 @@ export function AppRouter(props: AppDependencies) {
           <Switch>
             <Route path={LANDING_PAGE_URL} render={() => <MainOverview />} />
             <Route path="/health-check" render={() => <HealthCheck />} />
+            <Route path="/security" render={() => <MainSecurity />} />
             <Redirect exact from="/" to={LANDING_PAGE_URL} />
           </Switch>
         </EuiPageBody>

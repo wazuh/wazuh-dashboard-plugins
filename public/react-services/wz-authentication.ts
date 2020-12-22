@@ -32,6 +32,7 @@ const login = async (force = false) => {
     return Promise.reject(error);
   }
 };
+
 const refresh = async (force = false) => {
   try {
     // Get user token
@@ -42,6 +43,8 @@ const refresh = async (force = false) => {
     // Decode token and get expiration time
     const jwtPayload = jwtDecode(token);
 
+    
+    
     // Get user Policies
     const userPolicies = await getUserPolicies();
     // Dispatch actions to set permissions and roles

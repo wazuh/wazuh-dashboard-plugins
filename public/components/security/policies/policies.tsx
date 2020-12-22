@@ -21,9 +21,10 @@ import {
   EuiInMemoryTable
 } from '@elastic/eui';
 import { PoliciesTable } from './policies-table';
-import { WzRequest } from '../../../react-services/wz-request';
+import WzRequest from '../../../react-services/wz-request';
 import { WazuhSecurity } from '../../../factories/wazuh-security'
-import { ErrorHandler } from '../../../react-services/error-handler';
+// import { ErrorHandler } from '../../../react-services/error-handler';
+import * as  ErrorHandler from '../../../react-services/error-handler';
 import { EditPolicyFlyout } from './edit-policy';
 
 export const Policies = () => {
@@ -42,6 +43,10 @@ export const Policies = () => {
   const [loading, setLoading] = useState(false);
   const [isEditingPolicy, setIsEditingPolicy] = useState(false);
   const [editingPolicy, setEditingPolicy] = useState('');
+
+  // useEffect(() => { console.log("---------------"); console.log(addedResources); console.log(addedActions);  }, []);
+  // useEffect(() => { console.log("---------------"); console.log(addedActions) }, [addedActions]);
+  // useEffect(() => { console.log("---------------"); console.log(addedResources) }, [addedResources]);
 
   useEffect(() => { loadResources() }, [addedActions]);
 

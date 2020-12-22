@@ -12,7 +12,7 @@ import {
   EuiComboBox,
   EuiFieldText,
 } from '@elastic/eui';
-import { ErrorHandler } from '../../../../react-services/error-handler';
+import ErrorHandler from '../../../../react-services/error-handler';
 import { RuleEditor } from './rule-editor';
 import RulesServices from '../../rules/services';
 import RolesServices from '../../roles/services';
@@ -29,8 +29,8 @@ export const RolesMappingCreate = ({
   const [ruleName, setRuleName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const getRolesList = roles => {
-    const list = roles.map(item => {
+  const getRolesList = roles => {    
+    const list = (roles || []).map(item => {
       return { label: rolesEquivalences[item.id], id: item.id };
     });
     return list;

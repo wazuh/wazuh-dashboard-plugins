@@ -104,7 +104,7 @@ export class WazuhApiCtrl {
             `wz-api=${idHost};Path=/;HttpOnly`,
           ],
         },
-        body: {}
+        body: {token}
       });
     } catch (error) {
       const errorMessage = ((error.response || {}).data || {}).detail || error.message || error;

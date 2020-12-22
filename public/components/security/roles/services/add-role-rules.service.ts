@@ -11,7 +11,7 @@
  */
 
 import { Role } from '../types/role.type';
-import { WzRequest } from '../../../../react-services/wz-request';
+import WzRequest from '../../../../react-services/wz-request';
 import IApiResponse from '../../../../react-services/interfaces/api-response.interface';
 
 const AddRoleRulesService = async (roleId: number, rules: number[]): Promise<Role> => {
