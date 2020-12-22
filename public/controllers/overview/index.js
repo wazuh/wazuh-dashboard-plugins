@@ -9,7 +9,6 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules';
 import { OverviewController } from './overview';
 import { OverviewWelcome } from '../../components/common/welcome/overview-welcome';
 import { WzCurrentOverviewSectionWrapper } from '../../components/common/modules/overview-current-section-wrapper';
@@ -18,8 +17,9 @@ import { Mitre } from '../../components/overview'
 import { Stats } from './components/stats';
 import { SelectAgent } from './components/select-agent';
 import { RequirementCard } from './components/requirement-card';
+import { getAngularModule } from '../../kibana-services';
 
-const app = uiModules.get('app/wazuh', ['react']);
+const app = getAngularModule();
 
 app
   .controller('overviewController', OverviewController)

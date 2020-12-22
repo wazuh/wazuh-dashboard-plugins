@@ -14,7 +14,7 @@ import { EuiBasicTable, EuiCallOut, EuiSpacer } from '@elastic/eui';
 
 import { connect } from 'react-redux';
 import GroupsHandler from './utils/groups-handler';
-import { toastNotifications } from 'ui/notify';
+import { getToasts }  from '../../../../../kibana-services';
 
 import {
   updateLoadingStatus,
@@ -174,7 +174,7 @@ class WzGroupFilesTable extends Component {
   }
 
   showToast = (color, title, text, time) => {
-    toastNotifications.add({
+    getToasts().add({
       color: color,
       title: title,
       text: text,

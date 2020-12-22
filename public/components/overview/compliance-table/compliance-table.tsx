@@ -16,11 +16,9 @@ import {
   EuiFlexItem,
 } from '@elastic/eui';
 import { SearchBar, FilterManager } from '../../../../../../src/plugins/data/public/';
-import { KibanaContextProvider } from '../../../../../../src/plugins/kibana_react/public/context';
 
 import { I18nProvider } from '@kbn/i18n/react';
 //@ts-ignore
-import { getServices } from '../../../../../../src/plugins/discover/public/kibana_services';
 import { ComplianceRequirements } from './components/requirements';
 import { ComplianceSubrequirements } from './components/subrequirements';
 import { getElasticAlerts, getIndexPattern, IFilterParams } from '../mitre/lib';
@@ -30,6 +28,7 @@ import { hipaaRequirementsFile } from '../../../../server/integration-files/hipa
 import { nistRequirementsFile } from '../../../../server/integration-files/nist-requirements';
 import { tscRequirementsFile } from '../../../../server/integration-files/tsc-requirements';
 import { KbnSearchBar } from '../../kbn-search-bar';
+import { getDataPlugin } from '../../../kibana-services';
 
 
 export class ComplianceTable extends Component {
@@ -57,9 +56,9 @@ export class ComplianceTable extends Component {
 
   constructor(props) {
     super(props);
-    this.KibanaServices = getServices();
+    this.KibanaServices = getDataPlugin().query;
     this.filterManager = this.KibanaServices.filterManager;
-    this.timefilter = this.KibanaServices.timefilter;
+    this.timefilter = this.KibanaServices.timefilter.timefilter;
     this.state = {
       selectedRequirement: "",
       flyoutOn: true,
@@ -81,8 +80,8 @@ export class ComplianceTable extends Component {
 
   async componentDidMount() {
     this._isMount = true;
-    this.filtersSubscriber = this.filterManager.updated$.subscribe(() => {
-      this.onFiltersUpdated(this.filterManager.filters)
+    this.filtersSubscriber = this.filterManager.getUpdates$().subscribe(() => {
+      this.onFiltersUpdated(this.filterManager.getFilters())
     });
     this.indexPattern = await getIndexPattern();
     this.buildComplianceObject();

@@ -10,8 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { npStart } from 'ui/new_platform';
 import './kibana-discover';
-import './saved_visualizations';
+import { getNavigationPlugin } from '../kibana-services'
 import { loadWzTopNavDirectives } from './wz-top-nav';
-loadWzTopNavDirectives(npStart.plugins.navigation.ui);
+loadWzTopNavDirectives(getNavigationPlugin().ui);

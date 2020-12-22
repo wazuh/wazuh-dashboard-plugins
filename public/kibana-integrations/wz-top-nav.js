@@ -19,6 +19,7 @@
 
 import angular from 'angular';
 import 'ngreact';
+import { getAngularModule } from '../kibana-services';
 
 export function createTopNavDirective() {
   return {
@@ -120,8 +121,7 @@ let isLoaded = false;
 export function loadWzTopNavDirectives(navUi) {
   if (!isLoaded) {
     isLoaded = true;
-    angular
-      .module('kibana')
+   getAngularModule()
       .directive('wzTopNav', createTopNavDirective)
       .directive('wzTopNavHelper', createTopNavHelper(navUi));
   }

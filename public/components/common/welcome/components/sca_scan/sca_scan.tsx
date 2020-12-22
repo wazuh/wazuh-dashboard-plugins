@@ -29,10 +29,10 @@ import {
   EuiIcon
 } from '@elastic/eui';
 import moment from 'moment-timezone';
-import chrome from 'ui/chrome';
 import store from '../../../../../redux/store';
 import { updateCurrentAgentData } from '../../../../../redux/actions/appStateActions';
 import { WzRequest } from '../../../../../react-services/wz-request';
+import { getAngularModule } from '../../../../../kibana-services';
 
 export class ScaScan extends Component {
   _isMount = false;
@@ -56,7 +56,7 @@ export class ScaScan extends Component {
 
   async componentDidMount() {
     this._isMount = true;
-    const $injector = await chrome.dangerouslyGetActiveInjector();
+    const $injector = getAngularModule().injector();
     this.router = $injector.get('$route');
     this.getLastScan(this.props.agent.id);
   }

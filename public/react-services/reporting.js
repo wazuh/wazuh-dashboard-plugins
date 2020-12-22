@@ -17,8 +17,8 @@ import { GenericRequest } from '../react-services/generic-request';
 import { Vis2PNG } from '../factories/vis2png';
 import { RawVisualizations } from '../factories/raw-visualizations';
 import { VisHandlers } from '../factories/vis-handlers';
-import { toastNotifications } from 'ui/notify';
-import { getAngularModule } from '../../../../src/plugins/discover/public/kibana_services';
+import { getToasts }  from '../kibana-services';
+import { getAngularModule } from '../kibana-services';
 const app = getAngularModule('app/wazuh');
 
 export class ReportingService {
@@ -32,7 +32,7 @@ export class ReportingService {
   }
 
   showToast = (color, title, text, time) => {
-    toastNotifications.add({
+    getToasts().add({
       color: color,
       title: title,
       text: text,

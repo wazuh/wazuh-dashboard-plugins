@@ -46,7 +46,7 @@ import {
   clusterReq
 } from '../utils/wz-fetch';
 import { validateXML } from '../utils/xml';
-import { toastNotifications } from 'ui/notify';
+import { getToasts }  from '../../../../../..//kibana-services';
 
 import { connect } from 'react-redux';
 import { compose } from 'redux';
@@ -67,7 +67,7 @@ class WzEditConfiguration extends Component {
     };
   }
   addToast(toast){
-    toastNotifications.add(toast);
+    getToasts().add(toast);
   }
   async editorSave() {
     try {

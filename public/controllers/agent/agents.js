@@ -17,12 +17,11 @@ import { UnsupportedComponents } from '../../utils/components-os-support';
 import { visualizations } from '../../templates/agents/visualizations';
 
 import { ConfigurationHandler } from '../../utils/config-handler';
-import { timefilter } from 'ui/timefilter';
 import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { GenericRequest } from '../../react-services/generic-request';
 import { WzRequest } from '../../react-services/wz-request';
-import { toastNotifications } from 'ui/notify';
+import { getToasts }  from '../../kibana-services';
 import { ShareAgent } from '../../factories/share-agent';
 import { TabVisualizations } from '../../factories/tab-visualizations';
 import { TimeService } from '../../react-services/time-service';
@@ -31,6 +30,7 @@ import { GroupHandler } from '../../react-services/group-handler';
 import store from '../../redux/store';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
 import { WAZUH_ALERTS_PATTERN } from '../../../util/constants';
+import { getDataPlugin } from '../../kibana-services';
 
 export class AgentsController {
   /**
@@ -116,7 +116,7 @@ export class AgentsController {
   async $onInit() {
     const savedTimefilter = this.commonData.getTimefilter();
     if (savedTimefilter) {
-      timefilter.setTime(savedTimefilter);
+      getDataPlugin().query.timefilter.timefilter.setTime(savedTimefilter);
       this.commonData.removeTimefilter();
     }
 
@@ -480,6 +480,7 @@ export class AgentsController {
    * @param {*} force
    */
   async switchTab(tab, force = false) {
+    const timefilter = getDataPlugin().query.timefilter;
     this.tabVisualizations.setTab(tab);
     this.$rootScope.rendered = false;
     this.$rootScope.$applyAsync();
@@ -685,7 +686,7 @@ export class AgentsController {
   }
 
   showToast = (color, title, text, time) => {
-    toastNotifications.add({
+    getToasts().add({
       color: color,
       title: title,
       text: text,

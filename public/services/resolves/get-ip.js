@@ -12,8 +12,8 @@
 
 import { healthCheck } from './health-check';
 import { AppState } from '../../react-services/app-state';
-import { npStart } from 'ui/new_platform';
 import { ErrorHandler } from '../../react-services/error-handler';
+import { getDataPlugin, getSavedObjects } from '../../kibana-services';
 
 export function getIp(
   $q,
@@ -29,7 +29,7 @@ export function getIp(
 
   const buildSavedObjectsClient = async () => {
     try {
-      const savedObjectsClient = npStart.core.savedObjects.client;
+      const savedObjectsClient = getSavedObjects().client;
 
       const savedObjectsData = await savedObjectsClient.find({
         type: 'index-pattern',
@@ -61,7 +61,7 @@ export function getIp(
         return;
       }
 
-      const courierData = await npStart.plugins.data.indexPatterns.get(currentPattern);
+      const courierData = await getDataPlugin().indexPatterns.get(currentPattern);
 
       deferred.resolve({
         list: onlyWazuhAlerts,

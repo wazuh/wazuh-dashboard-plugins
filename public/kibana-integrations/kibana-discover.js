@@ -18,11 +18,11 @@
  */
 
 import discoverTemplate from '../templates/discover/discover.html';
-import { uiModules } from 'ui/modules';
 import store from '../redux/store';
 import { updateVis } from '../redux/actions/visualizationsActions';
+import { getAngularModule } from '../kibana-services';
 
-uiModules.get('app/wazuh', []).directive('kbnDis', [
+getAngularModule().directive('kbnDis', [
   function () {
     return {
       restrict: 'E',
@@ -34,11 +34,11 @@ uiModules.get('app/wazuh', []).directive('kbnDis', [
 
 // Added dependencies (from Kibana module)
 import './discover_dependencies';
-import 'ui/directives/render_directive';
-import '../../../../src/plugins/discover/public/application/angular/directives';
-import { DocViewsRegistry } from '../../../../src/plugins/discover/public/application/doc_views/doc_views_registry';
-import { DocViewTable } from '../../../../src/plugins/discover/public/application/components/table/table';
-import { JsonCodeBlock } from '../../../../src/plugins/discover/public/application/components/json_code_block/json_code_block';
+//import 'ui/directives/render_directive';
+//import '../../../../src/plugins/discover/public/application/angular/directives';
+//import { DocViewsRegistry } from '../../../../src/plugins/discover/public/application/doc_views/doc_views_registry';
+//import { DocViewTable } from '../../../../src/plugins/discover/public/application/components/table/table';
+//import { JsonCodeBlock } from '../../../../src/plugins/discover/public/application/components/json_code_block/json_code_block';
 import _ from 'lodash';
 
 import { Subscription, Subject, merge } from 'rxjs';
@@ -46,16 +46,16 @@ import { debounceTime } from 'rxjs/operators';
 import moment from 'moment';
 import dateMath from '@elastic/datemath';
 import { i18n } from '@kbn/i18n';
-import { getState, splitState } from '../../../../src/plugins/discover/public/application/angular/discover_state';
+//import { getState, splitState } from '../../../../src/plugins/discover/public/application/angular/discover_state';
 
 import { RequestAdapter } from '../../../../src/plugins/inspector/public';
-import { getSortArray, getSortForSearchSource } from '../../../../src/plugins/discover/public/application/angular/doc_table';
-import * as columnActions from '../../../../src/plugins/discover/public/application/angular/doc_table/actions/columns';
+//import { getSortArray, getSortForSearchSource } from '../../../../src/plugins/discover/public/application/angular/doc_table';
+//import * as columnActions from '../../../../src/plugins/discover/public/application/angular/doc_table/actions/columns';
 
-import '../../../../src/plugins/discover/public/application/components/fetch_error/';
-import { getPainlessError } from '../../../../src/plugins/discover/public/application/angular/get_painless_error';
-import { discoverResponseHandler } from '../../../../src/plugins/discover/public/application/angular/response_handler';
-import {
+//import '../../../../src/plugins/discover/public/application/components/fetch_error/';
+//import { getPainlessError } from '../../../../src/plugins/discover/public/application/angular/get_painless_error';
+//import { discoverResponseHandler } from '../../../../src/plugins/discover/public/application/angular/response_handler';
+/* import {
   getRequestInspectorStats,
   getResponseInspectorStats,
   getServices,
@@ -64,15 +64,15 @@ import {
   subscribeWithScope,
   tabifyAggResponse,
   getAngularModule,
-} from '../../../../src/plugins/discover/public/kibana_services';
+} from '../../../../src/plugins/discover/public/kibana_services'; */
 
 ///WAZUH///
-import { buildServices } from '../../../../src/plugins/discover/public/build_services';
-import { npStart } from 'ui/new_platform';
+//import { buildServices } from '../../../../src/plugins/discover/public/build_services';
+//import { npStart } from 'ui/new_platform';
 import { WazuhConfig } from '../react-services/wazuh-config';
 import { ModulesHelper } from '../components/common/modules/modules-helper';
 ///////////
-import { validateTimeRange } from '../../../../src/plugins/discover/public/application/helpers/validate_time_range';
+//import { validateTimeRange } from '../../../../src/plugins/discover/public/application/helpers/validate_time_range';
 import {
   fieldFormats,
   esFilters,
@@ -85,13 +85,13 @@ import {
 } from '../../../../src/plugins/data/public';
 import { addFatalError } from '../../../../src/plugins/kibana_legacy/public';
 import { WAZUH_ALERTS_PATTERN } from '../../util/constants';
-import {
+/* import {
   DEFAULT_COLUMNS_SETTING,
   SAMPLE_SIZE_SETTING,
   SORT_DEFAULT_ORDER_SETTING,
   SEARCH_ON_PAGE_LOAD_SETTING,
   DOC_HIDE_TIME_COLUMN_SETTING,
-} from '../../../../src/plugins/discover/common/';
+} from '../../../../src/plugins/discover/common/'; */
 import { AppState } from '../react-services/app-state';
 
 const fetchStatuses = {
@@ -100,16 +100,16 @@ const fetchStatuses = {
   COMPLETE: 'complete',
 };
 
-const app = uiModules.get('app/discover', []);
-const wazuhApp = getAngularModule('app/wazuh');
-app.run(async () => {
+const app = angular.module('app/discover', []);
+const wazuhApp = getAngularModule();
+/* app.run(async () => {
   const services = await buildServices(
     npStart.core,
     npStart.plugins,
     { env: { packageInfo: { branch: "7.9" } } }
   );
   setServices(services);
-});
+}); */
 
 app.directive('discoverAppW', function () {
   return {
@@ -151,11 +151,11 @@ function discoverController(
   }
 
   (async () => {
-    const services = await buildServices(
+   /*  const services = await buildServices(
       npStart.core,
       npStart.plugins,
       { env: { packageInfo: { branch: "7.9" } } }
-    );
+    ); */
     this.docViewsRegistry = new DocViewsRegistry();
     setDocViewsRegistry(this.docViewsRegistry);
     this.docViewsRegistry.addDocView({
@@ -664,7 +664,7 @@ function discoverController(
         if (fetchError) {
           $scope.fetchError = fetchError;
         } else {
-          toastNotifications.addError(error, {
+          getToasts().addError(error, {
             title: i18n.translate('discover.errorLoadingData', {
               defaultMessage: 'Error loading data',
             }),
@@ -756,17 +756,6 @@ function discoverController(
     $scope.rows = resp.hits.hits;
     // Ensure we have "hits" and "rows" available as soon as possible
     $scope.$applyAsync();
-
-    // if we haven't counted yet, reset the counts
-    const counts = ($scope.fieldCounts = $scope.fieldCounts || {});
-
-    $scope.rows.forEach((hit) => {
-      const fields = Object.keys($scope.indexPattern.flattenHit(hit));
-      fields.forEach((fieldName) => {
-        counts[fieldName] = (counts[fieldName] || 0) + 1;
-      });
-    });
-
     $scope.fetchStatus = fetchStatuses.COMPLETE;
   }
 
@@ -1006,7 +995,7 @@ function discoverController(
       const warningTitle = getIndexPatternWarning();
 
       if (ownIndexPattern) {
-        toastNotifications.addWarning({
+        getToasts().addWarning({
           title: warningTitle,
           text: i18n.translate('discover.showingSavedIndexPatternWarningDescription', {
             defaultMessage:
@@ -1020,7 +1009,7 @@ function discoverController(
         return ownIndexPattern;
       }
 
-      toastNotifications.addWarning({
+      getToasts().addWarning({
         title: warningTitle,
         text: i18n.translate('discover.showingDefaultIndexPatternWarningDescription', {
           defaultMessage:

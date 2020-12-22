@@ -24,9 +24,9 @@ import {
 } from '@elastic/eui';
 import { FlyoutTechnique } from '../../../../../components/overview/mitre/components/techniques/components/flyout-technique';
 import { getIndexPattern } from '../../../../../components/overview/mitre/lib';
-import { getServices } from '../../../../../../../../src/plugins/discover/public/kibana_services';
 import { getMitreCount } from './lib';
 import { AppNavigate } from '../../../../../react-services/app-navigate';
+import { getDataPlugin } from '../../../../../kibana-services';
 
 export class MitreTopTactics extends Component {
   _isMount = false;
@@ -50,8 +50,8 @@ export class MitreTopTactics extends Component {
 
   constructor(props) {
     super(props);
-    this.KibanaServices = getServices();
-    this.timefilter = this.KibanaServices.timefilter;
+    this.KibanaServices = getDataPlugin().query;
+    this.timefilter = this.KibanaServices.timefilter.timefilter;
     this.state = {
       alertsCount: [],
       isLoading: true,

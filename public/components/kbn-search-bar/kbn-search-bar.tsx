@@ -12,11 +12,11 @@
 import React, {} from 'react';
 import { I18nProvider } from '@kbn/i18n/react';
 //@ts-ignore
-import { getServices } from '../../../../../src/plugins/discover/public/kibana_services';
 import { SearchBar, TimeRange, Query, Filter } from '../../../../../src/plugins/data/public';
 import { KibanaContextProvider } from '../../../../../src/plugins/kibana_react/public';
 import { withKibanaContext, withKibanaContextExtendsProps } from '../common/hocs';
 import { storage } from './lib';
+import { getDataPlugin } from '../../kibana-services';
 
 export interface IKbnSearchBarProps{
   appName?: string
@@ -30,11 +30,11 @@ export interface IKbnSearchBarProps{
 
 //@ts-ignore
 const KbnSearchBar: React.FunctionComponent<IKbnSearchBarProps> = (props: IKbnSearchBarProps & withKibanaContextExtendsProps) => {
-  const KibanaServices = getServices();
+  const KibanaServices = getDataPlugin();
   const { filterManager, indexPattern, timeFilter, timeHistory, query } = props;
   const data = {
-    ...KibanaServices.data,
-    query: {...KibanaServices.data.query, filterManager, },
+    ...KibanaServices,
+    query: {...KibanaServices.query, filterManager, },
   }
   return (
     <KibanaContextProvider services={{
@@ -51,7 +51,7 @@ const KbnSearchBar: React.FunctionComponent<IKbnSearchBarProps> = (props: IKbnSe
           {...props}
           //@ts-ignore
           indexPatterns={[indexPattern]}
-          filters={(filterManager && filterManager.filters) || []}
+          filters={(filterManager && filterManager.getFilters()) || []}
           dateRangeFrom={timeFilter.from}
           dateRangeTo={timeFilter.to}
           onQuerySubmit={(payload) => onQuerySubmit(payload, props)}

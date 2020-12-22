@@ -36,7 +36,7 @@ import {
 import RulesetHandler from './utils/ruleset-handler';
 import validateConfigAfterSent from './utils/valid-configuration';
 
-import { toastNotifications } from 'ui/notify';
+import { getToasts }  from '../../../../../kibana-services';
 import { updateWazuhNotReadyYet } from '../../../../../redux/actions/appStateActions';
 import WzRestartClusterManagerCallout from '../../../../../components/common/restart-cluster-manager-callout';
 import { validateXML } from '../configuration/utils/xml';
@@ -132,7 +132,7 @@ class WzRulesetEditor extends Component {
   }
 
   showToast = (color, title, text, time) => {
-    toastNotifications.add({
+    getToasts().add({
       color: color,
       title: title,
       text: text,

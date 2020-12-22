@@ -3,8 +3,8 @@ import ReactDOM from 'react-dom';
 import { EuiBreadcrumbs, EuiToolTip } from '@elastic/eui';
 import { connect } from 'react-redux';
 import './globalBreadcrumb.scss';
-import chrome from 'ui/chrome';
 import { AppNavigate } from '../../../react-services/app-navigate';
+import { getAngularModule, getChrome } from '../../../kibana-services';
 
 class WzGlobalBreadcrumb extends Component {
   props: { state: { breadcrumb: [] } };
@@ -14,7 +14,7 @@ class WzGlobalBreadcrumb extends Component {
   }
 
   async componentDidMount() {
-    const $injector = await chrome.dangerouslyGetActiveInjector();
+    const $injector = getAngularModule().injector();
     this.router = $injector.get('$route');
     $('#breadcrumbNoTitle').attr("title", "");
   }

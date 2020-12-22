@@ -17,8 +17,8 @@
  * under the License.
  */
 import { ChromeStart, SavedObjectsClientContract, SavedObjectsFindOptions } from 'kibana/public';
-import { SavedObject } from '../../../../src/plugins/saved_objects/public/types';
-import { StringUtils } from '../../../../src/plugins/saved_objects/public/saved_object/helpers/string_utils';
+import { SavedObject } from '../../../../src/plugins/saved_objects/public';
+import { StringTools } from '../utils/strings-tools';
 
 /**
  * The SavedObjectLoader class provides some convenience functions
@@ -33,6 +33,7 @@ export class SavedObjectLoader {
   public type: string;
   public lowercaseType: string;
   public loaderProperties: Record<string, string>;
+  private stringUtils: any;
 
   constructor(
     SavedObjectClass: any,
@@ -42,10 +43,11 @@ export class SavedObjectLoader {
     this.type = SavedObjectClass.type;
     this.Class = SavedObjectClass;
     this.lowercaseType = this.type.toLowerCase();
-
+    this.stringUtils = new StringTools();
+    
     this.loaderProperties = {
       name: `${this.lowercaseType}s`,
-      noun: StringUtils.upperFirst(this.type),
+      noun: this.stringUtils.upperFirst(this.type),
       nouns: `${this.lowercaseType}s`,
     };
   }

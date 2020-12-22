@@ -26,7 +26,6 @@ import {
 } from '@elastic/eui';
 import { Discover } from '../../../common/modules/discover'
 // @ts-ignore
-import { getServices } from '../../../../../../../src/plugins/discover/public/kibana_services';
 import { ModulesHelper } from '../../../common/modules/modules-helper'
 import { ICustomBadges } from '../../../wz-search-bar/components';
 import { buildPhraseFilter, IIndexPattern } from '../../../../../../../src/plugins/data/common';
@@ -34,6 +33,7 @@ import { getIndexPattern } from '../../../overview/mitre/lib';
 import moment from 'moment-timezone';
 import { AppNavigate } from '../../../../react-services/app-navigate';
 import { TruncateHorizontalComponents } from '../../../common/util';
+import { getDataPlugin } from '../../../../kibana-services';
 
 export class FileDetails extends Component {
 
@@ -195,9 +195,10 @@ export class FileDetails extends Component {
   }
 
   async checkFilterManager(filters) {
-    const { filterManager } = getServices();
-    if (filterManager.filters && filterManager.filters.length) {
-      const syscheckPathFilters = filterManager.filters.filter(x => {
+    const { filterManager } = getDataPlugin().query;
+    const _filters = filterManager.getFilters() ;
+    if (_filters && _filters.length) {
+      const syscheckPathFilters = _filters.filter(x => {
         return x.meta.key === 'syscheck.path';
       });
       syscheckPathFilters.map(x => {

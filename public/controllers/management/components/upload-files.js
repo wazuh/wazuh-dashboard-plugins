@@ -26,7 +26,7 @@ import {
   EuiPopover
 } from '@elastic/eui';
 
-import { toastNotifications } from 'ui/notify';
+import { getToasts }  from '../../../kibana-services';
 import { WzButtonPermissions } from '../../../components/common/permissions/button';
 export class UploadFiles extends Component {
   constructor(props) {
@@ -240,7 +240,7 @@ export class UploadFiles extends Component {
   }
 
   showToast(color, title, text, time = 3000) {
-    toastNotifications.add({
+    getToasts().add({
       color: color,
       title: title,
       text: text,
@@ -248,10 +248,33 @@ export class UploadFiles extends Component {
     });
   }
   render() {
+    const getPermissionsImportFiles = () => {
+      const permissions = [
+        {
+          action: 'cluster:status',
+          resource: `*:*:*`,
+        },
+      ];
+
+      if (((this.props || {}).clusterStatus || {}).contextConfigServer === 'cluster') {
+        permissions.push({
+          action: 'cluster:upload_file',
+          resource: `node:id:*`,
+        });
+      } else {
+        permissions.push({
+          action: 'manager:upload_file',
+          resource: `file:path:/etc/${this.props.msg}`,
+        });
+      }
+
+      return permissions;
+    };
+
     const button = (
       <WzButtonPermissions
-        buttonType='empty'
-        permissions={[{action: 'manager:upload_file', resource: `file:path:/etc/${this.props.msg}`}]}
+        buttonType="empty"
+        permissions={getPermissionsImportFiles()}
         iconType="importAction"
         iconSide="left"
         onClick={() => this.onButtonClick()}

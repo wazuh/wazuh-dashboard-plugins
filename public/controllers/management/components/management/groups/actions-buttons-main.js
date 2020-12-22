@@ -32,7 +32,7 @@ import {
 
 import exportCsv from '../../../../../react-services/wz-csv';
 import GroupsHandler from './utils/groups-handler';
-import { toastNotifications } from 'ui/notify';
+import { getToasts }  from '../../../../../kibana-services';
 
 class WzGroupsActionButtons extends Component {
   _isMounted = false;
@@ -192,7 +192,7 @@ class WzGroupsActionButtons extends Component {
   }
 
   showToast = (color, title, text, time) => {
-    toastNotifications.add({
+    getToasts().add({
       color: color,
       title: title,
       text: text,

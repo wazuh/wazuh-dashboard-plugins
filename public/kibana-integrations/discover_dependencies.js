@@ -1,4 +1,4 @@
-import { getAngularModule } from '../../../../src/plugins/discover/public/kibana_services';
+/* import { getAngularModule } from '../kibana-services';
 import { createDocTableDirective } from '../../../../src/plugins/discover/public/application/angular/doc_table/doc_table';
 import { createPagerFactory } from '../../../../src/plugins/discover/public/application/angular/doc_table/lib/pager/pager_factory';
 import { createTableHeaderDirective } from '../../../../src/plugins/discover/public/application/angular/doc_table/components/table_header';
@@ -38,3 +38,4 @@ app
   .directive('loadingSpinner', createLoadingSpinnerDirective)
   .directive('timechartHeader', createTimechartHeaderDirective)
   .directive('contextErrorMessage', createContextErrorMessageDirective)
+ */

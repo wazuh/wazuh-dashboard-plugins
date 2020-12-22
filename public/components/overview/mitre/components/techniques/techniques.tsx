@@ -31,12 +31,12 @@ import {
 import { FlyoutTechnique } from './components/flyout-technique/';
 import { mitreTechniques, getElasticAlerts, IFilterParams } from '../../lib'
 import { ITactic } from '../../';
-import { getServices } from '../../../../../../../../src/plugins/discover/public/kibana_services';
 import { withWindowSize } from '../../../../../components/common/hocs/withWindowSize';
 import { WzRequest } from '../../../../../react-services/wz-request';
 import {WAZUH_ALERTS_PATTERN} from '../../../../../../util/constants';
 import { AppState } from '../../../../../react-services/app-state';
 import { WzFieldSearchDelay } from '../../../../common/search'
+import { getDataPlugin } from '../../../../../kibana-services';
 
 export const Techniques = withWindowSize(class Techniques extends Component {
   _isMount = false;
@@ -286,7 +286,7 @@ export const Techniques = withWindowSize(class Techniques extends Component {
    * @param filter 
    */
   addFilter(filter) {    
-    const { filterManager } = getServices();
+    const { filterManager } = getDataPlugin().query;
     const matchPhrase = {};
     matchPhrase[filter.key] = filter.value;
     const newFilter = {

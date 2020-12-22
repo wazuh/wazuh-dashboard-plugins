@@ -1,10 +1,8 @@
-import { getAngularModule } from '../../../../../../src/plugins/discover/public/kibana_services';
-import { getServices } from '../../../../../../src/plugins/discover/public/kibana_services';
-import chrome from 'ui/chrome';
+import { getAngularModule, getDataPlugin } from '../../../kibana-services';
 
 export class ModulesHelper {
   static async getDiscoverScope() {
-    const $injector = await chrome.dangerouslyGetActiveInjector();
+    const $injector = getAngularModule().injector();
     const location = $injector.get('$location');
     const initialTab = location.search().tab;
     return new Promise(resolve => {
@@ -41,8 +39,8 @@ export class ModulesHelper {
   };
 
   static activeNoImplicitsFilters() {
-    const { filterManager } = getServices();
-    const implicitFilters = filterManager.filters.filter((x) => {
+    const { filterManager } = getDataPlugin().query;
+    const implicitFilters = filterManager.getFilters().filter((x) => {
       return x.$state.isImplicit
     }
     );

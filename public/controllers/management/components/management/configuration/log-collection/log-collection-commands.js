@@ -23,6 +23,8 @@ import {
 import { settingsListBuilder } from '../utils/builders';
 import helpLinks from './help-links';
 
+const renderTargetField = item => item ? item.join(', ') : 'agent';
+
 const mainSettings = [
   { field: 'logformat', label: 'Log format' },
   { field: 'command', label: 'Run this command', render: renderValueOrNoValue },
@@ -39,7 +41,6 @@ const mainSettings = [
   }
 ];
 
-const renderTargetField = item => item ? item.join(', ') : 'agent';
 
 class WzConfigurationLogCollectionCommands extends Component {
   constructor(props) {

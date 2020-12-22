@@ -11,7 +11,7 @@
  */
 
 import domtoimage from '../utils/dom-to-image';
-import { getAngularModule } from '../../../../src/plugins/discover/public/kibana_services';
+import { getAngularModule } from '../kibana-services';
 const app = getAngularModule('app/wazuh');
 
 export class Vis2PNG {

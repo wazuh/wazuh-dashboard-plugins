@@ -12,8 +12,6 @@
 
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
-import chrome from 'ui/chrome';
-const IS_DARK_THEME = chrome.getUiSettingsClient().get('theme:darkMode');
 
 import {
   EuiFlexGroup,
@@ -24,6 +22,9 @@ import {
 } from '@elastic/eui';
 
 import WzConfigurationSettingsGroup from './configuration-settings-group';
+import { getUiSettings } from '../../../../../../kibana-services';
+
+const IS_DARK_THEME = getUiSettings().get('theme:darkMode');
 
 class WzConfigurationSettingsListSelector extends Component {
   constructor(props) {

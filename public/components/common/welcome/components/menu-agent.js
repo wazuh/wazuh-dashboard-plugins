@@ -14,11 +14,10 @@ import { EuiFlexGroup, EuiFlexItem, EuiFlexGrid, EuiButtonEmpty, EuiSideNav, Eui
 import { WzRequest } from './../../../../react-services/wz-request';
 import { connect } from 'react-redux';
 import store from './../../../../redux/store';
-import chrome from 'ui/chrome';
 import { updateCurrentAgentData } from '../../../../redux/actions/appStateActions';
 import { AppState } from './../../../../react-services/app-state';
 import { UnsupportedComponents } from './../../../../utils/components-os-support';
-import { toastNotifications } from 'ui/notify';
+import { getAngularModule, getToasts }  from '../../../../kibana-services';
 
 class WzMenuAgent extends Component {
   constructor(props) {
@@ -83,7 +82,7 @@ class WzMenuAgent extends Component {
   async componentDidMount() {
     const extensions = await AppState.getExtensions(this.currentApi);
     this.setState({ extensions });
-    const $injector = await chrome.dangerouslyGetActiveInjector();
+    const $injector = getAngularModule().injector();
     this.router = $injector.get('$route');
   }
 
@@ -100,7 +99,7 @@ class WzMenuAgent extends Component {
   };
 
   addToast({color, title, text, time = 3000}){
-    toastNotifications.add({title, text, toastLifeTimeMs: time, color})
+    getToasts().add({title, text, toastLifeTimeMs: time, color})
   }
 
   createItems = items => {

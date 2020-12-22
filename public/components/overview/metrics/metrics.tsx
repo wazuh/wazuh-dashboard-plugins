@@ -20,9 +20,9 @@ import { FilterManager } from '../../../../../../src/plugins/data/public/';
 import { buildRangeFilter, buildPhrasesFilter,buildPhraseFilter, buildExistsFilter} from '../../../../../../src/plugins/data/common';
 
 //@ts-ignore
-import { getServices } from '../../../../../../src/plugins/discover/public/kibana_services';
 import { getElasticAlerts, getIndexPattern } from '../mitre/lib';
 import { ModulesHelper } from '../../common/modules/modules-helper'
+import { getDataPlugin } from '../../../kibana-services';
 
 
 
@@ -50,9 +50,9 @@ export class Metrics extends Component {
 
   constructor(props) {
     super(props);
-    this.KibanaServices = getServices();
+    this.KibanaServices = getDataPlugin();
     this.filterManager = this.KibanaServices.filterManager;
-    this.timefilter = this.KibanaServices.timefilter;
+    this.timefilter = this.KibanaServices.timefilter.timefilter;
     this.state = {
       resultState: "",
       results: {},
@@ -131,13 +131,13 @@ export class Metrics extends Component {
 
   buildMetric(){
     if(!this.metricsList[this.props.section] || !this._isMount) return <></>;
-    const newFilters = this.filterManager.filters;
+    const newFilters = this.filterManager.getFilters();
     const searchBarQuery = this.scope.state.query;
     const newTime = this.timefilter.getTime();
       const filterParams = {};
       filterParams["time"] = this.timefilter.getTime(); 
       filterParams["query"] = searchBarQuery; 
-      filterParams["filters"] = this.filterManager.filters; 
+      filterParams["filters"] = this.filterManager.getFilters(); 
       this.setState({filterParams, loading: true, results:{}})
       const newOnClick = {};
       

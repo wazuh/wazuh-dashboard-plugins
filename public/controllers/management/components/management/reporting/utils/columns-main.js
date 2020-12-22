@@ -1,11 +1,10 @@
 import React from 'react';
 import { EuiToolTip, EuiButtonIcon } from '@elastic/eui';
 import ReportingHandler from './reporting-handler';
-
-import chrome from 'ui/chrome';
 import moment from 'moment-timezone';
 import { WzButtonPermissions } from '../../../../../../components/common/permissions/button';
 import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../../../../../util/constants';
+import { getHttp, getUiSettings } from '../../../../../../kibana-services';
 
 export default class ReportingColums {
   constructor(tableProps) {
@@ -78,7 +77,7 @@ export default class ReportingColums {
    * @param {*} name The name of the report
    */
   goReport(name) {
-    window.open(chrome.addBasePath(`/reports/${name}`), '_blank');
+    window.open(getHttp().basePath.prepend(`/reports/${name}`), '_blank');
   }
 
   /**
@@ -88,7 +87,7 @@ export default class ReportingColums {
   offset(d) {
     try {
       const dateUTC = moment.utc(d);
-      const kibanaTz = chrome.getUiSettingsClient().get('dateFormat:tz');
+      const kibanaTz = getUiSettings().get('dateFormat:tz');
       const dateLocate =
         kibanaTz === 'Browser'
           ? moment(dateUTC).local()

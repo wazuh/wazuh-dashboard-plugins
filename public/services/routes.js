@@ -11,7 +11,8 @@
  */
 
 // Require routes
-import routes from 'ui/routes';
+//import routes from 'ui/routes';
+import 'angular-route';
 
 // Functions to be executed before loading certain routes
 import {
@@ -25,19 +26,20 @@ import {
 
 // HTML templates
 import healthCheckTemplate from '../templates/health-check/health-check.html';
-import agentsTemplate from '../templates/agents/dashboards.pug';
-import agentsPrevTemplate from '../templates/agents-prev/agents-prev.pug';
-import managementTemplate from '../templates/management/management.pug';
-import overviewTemplate from '../templates/visualize/dashboards.pug';
-import settingsTemplate from '../templates/settings/settings.pug';
+//import agentsTemplate from '../templates/agents/dashboards.pug';
+//import agentsPrevTemplate from '../templates/agents-prev/agents-prev.pug';
+//import managementTemplate from '../templates/management/management.pug';
+//import overviewTemplate from '../templates/visualize/dashboards.pug';
+//import settingsTemplate from '../templates/settings/settings.pug';
 import securityTemplate from '../templates/security/security.html';
 import blankScreenTemplate from '../templates/error-handler/blank-screen.html';
-import toolsTemplate from '../templates/tools/tools.pug';
+//import toolsTemplate from '../templates/tools/tools.pug';
 import { WazuhConfig } from '../react-services/wazuh-config';
 import { GenericRequest } from '../react-services/generic-request';
 import { WzMisc } from '../factories/misc';
 import { ApiCheck } from '../react-services/wz-api-check';
 import { AppState } from '../react-services/app-state';
+import { getAngularModule } from '../kibana-services';
 
 const assignPreviousLocation = ($rootScope, $location) => {
   const path = $location.path();	
@@ -133,8 +135,10 @@ function enableWzMenu($rootScope, $location) {
 }
 
 //Routes
-routes.enable();
-routes
+const app = getAngularModule();
+
+app.config(($routeProvider) => {
+  $routeProvider
   .when('/health-check', {
     template: healthCheckTemplate,
     resolve: { apiCount, wzConfig, ip }
@@ -196,3 +200,4 @@ routes
   .otherwise({
     redirectTo: '/overview'
   });
+});

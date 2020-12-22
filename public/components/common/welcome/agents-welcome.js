@@ -50,10 +50,10 @@ import { VisFactoryHandler } from '../../../react-services/vis-factory-handler';
 import { AppState } from '../../../react-services/app-state';
 import { FilterHandler } from '../../../utils/filter-handler';
 import { TabVisualizations } from '../../../factories/tab-visualizations';
-import chrome from 'ui/chrome';
 import { updateCurrentAgentData } from '../../../redux/actions/appStateActions';
 import WzTextWithTooltipIfTruncated from '../wz-text-with-tooltip-if-truncated';
 import { UnsupportedComponents } from './../../../utils/components-os-support';
+import { getAngularModule } from '../../../kibana-services';
 
 export class AgentsWelcome extends Component {
   _isMount = false;
@@ -141,7 +141,7 @@ export class AgentsWelcome extends Component {
       null,
       this.props.agent.id
     );
-    const $injector = await chrome.dangerouslyGetActiveInjector();
+    const $injector = getAngularModule();
     this.router = $injector.get('$route');
     window.addEventListener('resize', this.updateWidth); //eslint-disable-line
   }

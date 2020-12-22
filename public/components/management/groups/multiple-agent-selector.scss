@@ -46,7 +46,7 @@
 }
 
 .wzMultipleSelectorLeft, .wzMultipleSelectorRight{
-    width: calc("50% - 65px");
+    width: calc(#{"50% - 65px"});
     float: left;
 }
 

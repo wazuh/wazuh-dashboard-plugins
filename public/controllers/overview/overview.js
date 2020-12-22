@@ -13,7 +13,6 @@ import { FilterHandler } from '../../utils/filter-handler';
 import { TabNames } from '../../utils/tab-names';
 import { TabDescription } from '../../../server/reporting/tab-description';
 
-import { timefilter } from 'ui/timefilter';
 import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { WzRequest } from '../../react-services/wz-request';
@@ -24,6 +23,7 @@ import { VisFactoryHandler } from '../../react-services/vis-factory-handler';
 import { RawVisualizations } from '../../factories/raw-visualizations';
 import store from '../../redux/store';
 import { WAZUH_ALERTS_PATTERN } from '../../../util/constants';
+import { getDataPlugin } from '../../kibana-services';
 
 export class OverviewController {
   /**
@@ -239,6 +239,7 @@ export class OverviewController {
 
   // Switch tab
   async switchTab(newTab, force = false) {
+    const timefilter = getDataPlugin().query.timefilter.timefilter;
     this.overviewModuleReady = false;
     this.visFactoryService.clear();
     this.tabVisualizations.setTab(newTab);

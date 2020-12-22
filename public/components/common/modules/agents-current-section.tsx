@@ -17,9 +17,9 @@ import {
 import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
 import { updateCurrentTab } from '../../../redux/actions/appStateActions';
 import store from '../../../redux/store';
-import chrome from 'ui/chrome';
 import { connect } from 'react-redux';
 import { TabDescription } from '../../../../server/reporting/tab-description';
+import { getAngularModule } from '../../../kibana-services';
 
 class WzCurrentAgentsSection extends Component {
   constructor(props) {
@@ -54,7 +54,7 @@ class WzCurrentAgentsSection extends Component {
   async componentDidMount() {
     this.setGlobalBreadcrumb();
     store.dispatch(updateCurrentTab(this.props.currentTab));
-    const $injector = await chrome.dangerouslyGetActiveInjector();
+    const $injector = getAngularModule().injector();
     this.router = $injector.get('$route');
   }
 

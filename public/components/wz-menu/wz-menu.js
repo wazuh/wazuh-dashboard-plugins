@@ -35,15 +35,13 @@ import Management from './wz-menu-management';
 import MenuSettings from './wz-menu-settings';
 import MenuSecurity from './wz-menu-security';
 import Overview from './wz-menu-overview';
-import { npStart } from 'ui/new_platform';
-import { toastNotifications } from 'ui/notify';
+import { getAngularModule, getToasts }  from '../../kibana-services';
 import { GenericRequest } from '../../react-services/generic-request';
 import { ApiCheck } from '../../react-services/wz-api-check';
-import chrome from 'ui/chrome';
 import { WzGlobalBreadcrumbWrapper } from '../common/globalBreadcrumb/globalBreadcrumbWrapper';
 import { AppNavigate } from '../../react-services/app-navigate';
 import WzTextWithTooltipIfTruncated from '../../components/common/wz-text-with-tooltip-if-truncated';
-import { getServices } from '../../../../../src/plugins/discover/public/kibana_services';
+import { getDataPlugin } from '../../kibana-services';
 
 const sections = {
   'overview': 'overview',
@@ -76,12 +74,12 @@ class WzMenu extends Component {
     this.store = store;
     this.genericReq = GenericRequest;
     this.wazuhConfig = new WazuhConfig();
-    this.indexPatterns = npStart.plugins.data.indexPatterns;
+    this.indexPatterns = getDataPlugin().indexPatterns;
     this.isLoading = false;
   }
 
   async componentDidMount() {
-    const $injector = await chrome.dangerouslyGetActiveInjector();
+    const $injector = getAngularModule().injector();
     this.router = $injector.get('$route');
     try{
       const result = await this.genericReq.request('GET', '/hosts/apis', {});
@@ -105,7 +103,7 @@ class WzMenu extends Component {
   }
 
   showToast = (color, title, text, time) => {
-    toastNotifications.add({
+    getToasts().add({
       color: color,
       title: title,
       text: text,
@@ -212,7 +210,7 @@ class WzMenu extends Component {
   changePattern = event => {
     try {
       if (!AppState.getPatternSelector()) return;
-      PatternHandler.changePattern(event.target.value); // TODO: This needs of index pattern's title as second parameter. We should modify it.
+      PatternHandler.changePattern(event.target.value);
       this.setState({ currentSelectedPattern: event.target.value });
       if (this.state.currentMenuTab !== 'wazuh-dev') {
         this.router.reload();
@@ -502,8 +500,8 @@ class WzMenu extends Component {
       this.route.reload();
       return;
     }
-    const { filterManager } = getServices();
-    const currentAppliedFilters = filterManager.filters;
+    const { filterManager } = getDataPlugin().query;
+    const currentAppliedFilters = filterManager.getFilters();
     const agentFilters = currentAppliedFilters.filter(x => {
       return x.meta.key === 'agent.id';
     });
@@ -729,7 +727,7 @@ class WzMenu extends Component {
       </div>
     );
 
-    const logotype_url = chrome.addBasePath('/plugins/wazuh/assets/logotype.svg');
+    const logotype_url = chrome.addBasePath('/plugins/wazuh/img/logotype.svg');
     const mainButton = (
       <button className="eui" onClick={() => this.switchMenuOpened()}>
         <EuiFlexGroup

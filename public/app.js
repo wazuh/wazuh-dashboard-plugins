@@ -10,8 +10,8 @@
  * Find more information about this on the LICENSE file.
  */
 import { checkPluginVersion } from "./utils";
-import 'ui/autoload/all';
-import 'uiExports/visTypes';
+//import 'ui/autoload/all';
+/* import 'uiExports/visTypes';
 import 'uiExports/visResponseHandlers';
 import 'uiExports/visRequestHandlers';
 import 'uiExports/visEditorTypes';
@@ -25,11 +25,11 @@ import 'uiExports/devTools';
 import 'uiExports/docViews';
 import 'uiExports/embeddableFactories';
 import 'uiExports/autocompleteProviders';
-import 'uiExports/interpreter';
+import 'uiExports/interpreter'; */
 import 'angular-sanitize';
 
 // Require CSS
-import './scss/loader';
+import './styles';
 // Require lib to dashboards PDFs
 require('./utils/dom-to-image.js');
 
@@ -43,22 +43,21 @@ import 'angular-chart.js';
 import { changeWazuhNavLogo } from './utils/wz-logo-menu';
 
 // Font Awesome, Kibana UI framework and others
-import './utils/fontawesome/css/font-awesome.min.scss';
+import './utils/fontawesome/scss/font-awesome.scss';
 
 // Dev tools
-import './utils/codemirror';
+//import './utils/codemirror';
 
 import './utils/jquery-ui';
 
 // Material
-import 'angular-material/angular-material.scss';
+import 'angular-material/angular-material.css';
 import 'angular-aria/angular-aria';
 import 'angular-animate/angular-animate';
 import 'angular-material/angular-material';
 
 // Cookies
 import 'angular-cookies/angular-cookies';
-import chrome from 'ui/chrome';
 
 // Set up Wazuh app
 import './setup';
@@ -75,7 +74,7 @@ import store from './redux/store';
 import { updateCurrentPlatform } from './redux/actions/appStateActions';
 import { WzAuthentication } from './react-services/wz-authentication'
 
-import { getAngularModule } from '../../../src/plugins/discover/public/kibana_services';
+import { getAngularModule } from './kibana-services';
 const app = getAngularModule('app/wazuh');
 
 app.config([

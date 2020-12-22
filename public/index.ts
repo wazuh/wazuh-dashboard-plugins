@@ -5,7 +5,7 @@ import { WazuhSetup, WazuhSetupDeps, WazuhStart, WazuhStartDeps } from './types'
 export const plugin: PluginInitializer<WazuhSetup, WazuhStart, WazuhSetupDeps, WazuhStartDeps> = (
   initializerContext: PluginInitializerContext
 ) => {
-  return new WazuhPlugin();
+  return new WazuhPlugin(initializerContext);
 };
 
 // These are your public types & static code

@@ -48,7 +48,7 @@ class WzRulesetOverview extends Component {
               </EuiTitle>
             </EuiFlexItem>
             <EuiFlexItem></EuiFlexItem>
-            <WzRulesetActionButtons />
+            <WzRulesetActionButtons clusterStatus={this.props.clusterStatus} />
           </EuiFlexGroup>
           <EuiFlexGroup>
             <EuiFlexItem>
@@ -60,7 +60,11 @@ class WzRulesetOverview extends Component {
           <WzRulesetSearchBar />
           <EuiFlexGroup>
             <EuiFlexItem>
-              <WzRulesetTable request={section} updateTotalItems={(totalItems) => this.setState({totalItems})} />
+              <WzRulesetTable
+                clusterStatus={this.props.clusterStatus}
+                request={section}
+                updateTotalItems={(totalItems) => this.setState({ totalItems })}
+              />
             </EuiFlexItem>
           </EuiFlexGroup>
         </EuiPanel>

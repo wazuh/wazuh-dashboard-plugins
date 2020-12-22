@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import * as d3 from 'd3';
-import chrome from 'ui/chrome';
+import { getUiSettings } from '../../kibana-services';
 
 export class Pie extends Component {
   constructor(props) {
@@ -9,7 +9,7 @@ export class Pie extends Component {
   }
 
   componentDidMount() {
-    const isDarkTheme = chrome.getUiSettingsClient().get('theme:darkMode');
+    const isDarkTheme = getUiSettings().get('theme:darkMode');
     this.pieElement = d3.select('body')
       .append('div')
       .attr('class', 'tooltip-donut')

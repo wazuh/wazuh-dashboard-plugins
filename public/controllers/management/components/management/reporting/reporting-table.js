@@ -19,7 +19,7 @@ import {
 
 import { connect } from 'react-redux';
 import ReportingHandler from './utils/reporting-handler';
-import { toastNotifications } from 'ui/notify';
+import { getToasts }  from '../../../../../kibana-services';
 
 import {
   updateIsProcessing,
@@ -125,7 +125,7 @@ class WzReportingTable extends Component {
   }
 
   showToast = (color, title, text, time) => {
-    toastNotifications.add({
+    getToasts().add({
       color: color,
       title: title,
       text: text,

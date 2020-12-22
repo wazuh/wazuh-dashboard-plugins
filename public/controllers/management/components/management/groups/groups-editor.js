@@ -32,7 +32,7 @@ import {
 
 import GroupsHandler from './utils/groups-handler';
 
-import { toastNotifications } from 'ui/notify';
+import { getToasts }  from '../../../../../kibana-services';
 import 'brace/theme/textmate';
 import { validateXML } from '../configuration/utils/xml';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
@@ -119,7 +119,7 @@ class WzGroupsEditor extends Component {
   }
 
   showToast = (color, title, text, time) => {
-    toastNotifications.add({
+    getToasts().add({
       color: color,
       title: title,
       text: text,

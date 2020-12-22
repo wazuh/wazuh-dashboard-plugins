@@ -27,7 +27,6 @@ import {
 import '../../common/modules/module.scss';
 import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
 import store from '../../../redux/store';
-import chrome from 'ui/chrome';
 import { FilterHandler } from '../../../utils/filter-handler';
 import { AppState } from '../../../react-services/app-state';
 import { ReportingService } from '../../../react-services/reporting';
@@ -39,6 +38,7 @@ import Overview from '../../wz-menu/wz-menu-overview';
 import { MainFim } from '../../agents/fim';
 import { MainSca } from '../../agents/sca';
 import { MainMitre } from '../modules/main-mitre';
+import { getAngularModule } from '../../../kibana-services';
 
 export class MainModuleAgent extends Component {
   props!: {
@@ -100,7 +100,7 @@ export class MainModuleAgent extends Component {
   }
 
   async componentDidMount() {
-    const $injector = await chrome.dangerouslyGetActiveInjector();
+    const $injector = getAngularModule().injector();
     this.router = $injector.get('$route');
     this.setGlobalBreadcrumb();
   }

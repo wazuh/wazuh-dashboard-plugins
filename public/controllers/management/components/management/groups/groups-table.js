@@ -21,7 +21,7 @@ import {
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 import GroupsHandler from './utils/groups-handler';
-import { toastNotifications } from 'ui/notify';
+import { getToasts }  from '../../../../../kibana-services';
 import { WzSearchBar, filtersToObject } from '../../../../../components/wz-search-bar';
 import { WzRequest } from '../../../../../react-services/wz-request';
 import { withUserPermissions } from '../../../../../components/common/hocs/withUserPermissions';
@@ -225,7 +225,7 @@ class WzGroupsTable extends Component {
   }
 
   showToast = (color, title, text, time) => {
-    toastNotifications.add({
+    getToasts().add({
       color: color,
       title: title,
       text: text,

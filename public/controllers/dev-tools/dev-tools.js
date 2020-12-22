@@ -15,7 +15,6 @@ import { ExcludedIntelliSenseTriggerKeys } from '../../../util/excluded-devtools
 import queryString from 'querystring-browser';
 import $ from 'jquery';
 import * as FileSaver from '../../services/file-saver';
-import chrome from 'ui/chrome';
 import { DynamicHeight } from '../../utils/dynamic-height';
 import { AppState } from '../../react-services/app-state';
 import { GenericRequest } from '../../react-services/generic-request';
@@ -23,6 +22,7 @@ import store from '../../redux/store';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
 import { WzRequest } from '../../react-services/wz-request';
 import { ErrorHandler } from '../../react-services/error-handler';
+import { getUiSettings } from '../../kibana-services';
 
 export class DevToolsController {
   /**
@@ -42,7 +42,7 @@ export class DevToolsController {
     this.linesWithClass = [];
     this.widgets = [];
     this.multipleKeyPressed = [];
-    this.IS_DARK_THEME = chrome.getUiSettingsClient().get('theme:darkMode');
+    this.IS_DARK_THEME = getUiSettings().get('theme:darkMode');
     this.$scope = $scope;
   }
 

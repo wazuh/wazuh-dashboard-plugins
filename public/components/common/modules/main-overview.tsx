@@ -24,7 +24,6 @@ import {
 import '../../common/modules/module.scss';
 import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
 import store from '../../../redux/store';
-import chrome from 'ui/chrome';
 import { ReportingService } from '../../../react-services/reporting';
 import { AppNavigate } from '../../../react-services/app-navigate';
 import { TabDescription } from '../../../../server/reporting/tab-description';
@@ -93,8 +92,6 @@ export class MainModuleOverview extends Component {
       }
     }
     
-    const $injector = await chrome.dangerouslyGetActiveInjector();
-    this.router = $injector.get('$route');
     this.setGlobalBreadcrumb();
   }
 

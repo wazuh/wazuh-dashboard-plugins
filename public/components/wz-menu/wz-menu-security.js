@@ -14,7 +14,6 @@ import { EuiFlexItem, EuiFlexGroup, EuiSideNav, EuiIcon } from '@elastic/eui';
 import { WzRequest } from '../../react-services/wz-request';
 import { connect } from 'react-redux';
 import { AppNavigate } from '../../react-services/app-navigate';
-import chrome from 'ui/chrome';
 
 class WzMenuSecurity extends Component {
   constructor(props) {

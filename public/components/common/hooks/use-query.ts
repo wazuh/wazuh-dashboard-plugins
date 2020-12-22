@@ -10,38 +10,28 @@
  * Find more information about this on the LICENSE file.
  */
 import { useState, useEffect } from 'react';
-// import { ModulesHelper } from '../modules/modules-helper';
+import { ModulesHelper } from '../modules/modules-helper';
 
-/// TODO migrate
-
-export function useQuery(): [
-  {
-    language: 'kuery' | 'lucene';
-    query: string;
-  },
-  (query: any) => void
-] {
-  const [query, setQuery] = useState<{
-    language: 'kuery' | 'lucene';
-    query: string;
-  }>({ language: 'kuery', query: '' });
+export function useQuery(): [{
+  language: 'kuery' | 'lucene';
+  query: string;
+}, ((query: any) => void)] {
+  const [query, setQuery] = useState({ language: 'kuery', query: '' });
   useEffect(() => {
     let subscription;
-    /*  ModulesHelper.getDiscoverScope()
+    ModulesHelper.getDiscoverScope()
       .then(scope => {
         setQuery(scope.state.query);
         subscription = scope.$watchCollection('fetchStatus',
         () => {setQuery(scope.state.query)});
-      }); */
-    return () => {
-      subscription && subscription();
-    };
+      });
+    return () => { subscription && subscription(); }
   }, []);
   const updateQuery = (query) => {
-    /*  ModulesHelper.getDiscoverScope()
+    ModulesHelper.getDiscoverScope()
       .then(scope => {
         scope.updateQuery({query});
-      }) */
-  };
-  return [query, updateQuery];
+      })
+  }
+  return [ query, updateQuery ];
 }

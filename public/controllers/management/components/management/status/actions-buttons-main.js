@@ -29,7 +29,7 @@ import {
 } from '../../../../../redux/actions/statusActions';
 
 import StatusHandler from './utils/status-handler';
-import { toastNotifications } from 'ui/notify';
+import { getToasts }  from '../../../../../kibana-services';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 
 class WzStatusActionButtons extends Component {
@@ -135,7 +135,7 @@ class WzStatusActionButtons extends Component {
   }
 
   showToast = (color, text, time) => {
-    toastNotifications.add({
+    getToasts().add({
       color: color,
       title: text,
       toastLifeTimeMs: time

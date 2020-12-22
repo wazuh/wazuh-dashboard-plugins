@@ -24,7 +24,7 @@ import {
 import { WzRequest } from '../../../react-services/wz-request';
 import TimeService from '../../../react-services/time-service'
 import exportCsv from '../../../react-services/wz-csv';
-import { toastNotifications } from 'ui/notify';
+import { getToasts }  from '../../../kibana-services';
 import { WzSearchBar, filtersToObject } from '../../../components/wz-search-bar';
 import { RuleText, ComplianceText } from './components';
 
@@ -287,7 +287,7 @@ export class Inventory extends Component {
         this.buildSuggestionSearchBar(policy.policy_id, this.checks);
       } catch (err) {
         // We can't ensure the suggestions contains valid characters
-        toastNotifications.add({
+        getToasts().add({
           color: 'danger',
           title: 'Error',
           text: 'The filter contains invalid characters',
@@ -373,7 +373,7 @@ export class Inventory extends Component {
   };
 
   showToast = (color, title, time) => {
-    toastNotifications.add({
+    getToasts().add({
       color: color,
       title: title,
       toastLifeTimeMs: time,
