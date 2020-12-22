@@ -1,5 +1,17 @@
 import { AppMountParameters, CoreSetup, CoreStart, Plugin } from 'kibana/public';
-import { setDataPlugin, setHttp, setToasts, setUiSettings, setChrome } from './kibana-services';
+import {
+  setDataPlugin,
+  setHttp,
+  setToasts,
+  setUiSettings,
+  setChrome,
+  setAngularModule,
+  setNavigationPlugin,
+  setVisualizationsPlugin,
+  setSavedObjects,
+  setOverlays,
+  setScopedHistory,
+} from './kibana-services';
 import { resolveApis } from './react-services/api-resolver.service';
 import { loadAppConfig } from './react-services/load-app-config.service';
 import { checkCurrentSecurityPlatform } from './react-services/security-utils';
@@ -43,6 +55,10 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupDep
     setDataPlugin(plugins.data);
     setUiSettings(core.uiSettings);
     setChrome(core.chrome);
+    setNavigationPlugin(plugins.navigation);
+    setVisualizationsPlugin(plugins.visualizations);
+    setSavedObjects(core.savedObjects);
+    setOverlays(core.overlays);
 
     changeWazuhNavLogo();
 

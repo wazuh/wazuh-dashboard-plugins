@@ -2,20 +2,11 @@
     "id": "wazuh",
     "version": "4.0.0",
     "kibanaVersion": "kibana",
-    "configPath": [
-        "wazuh"
-    ],
-    "requiredPlugins": ["navigation", "data"],
-    "optionalPlugins": [
-        "security",
-        "opendistroSecurity",
-        "searchguard",
-        "spaces"
-    ],
-    "requiredBundles": [
-        "kibanaReact",
-        "kibanaUtils"
-      ],
+    "configPath": ["wazuh"],
+    "requiredPlugins": ["navigation", "data", "discover", "inspector", "visualizations", "kibanaLegacy"],
+    "optionalPlugins": ["security", "opendistroSecurity", "searchguard", "spaces"],
+    "requiredBundles": ["kibanaReact", "kibanaUtils"],
     "server": true,
     "ui": true
-}
+  }
+  
