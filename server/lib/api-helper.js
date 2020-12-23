@@ -34,7 +34,7 @@ export async function fetchAllAgents(api, maxSize, payload, options) {
         'GET',
         `${getPath(api)}/agents`,
         {params: payload},
-        {idHost: api.id}
+        {apiHostID: api.id}
       );
       if (!response.error && response.data.data.affected_items) {
         agents = agents.concat(response.data.data.affected_items);

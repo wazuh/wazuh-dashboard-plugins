@@ -177,19 +177,19 @@ export class Monitoring {
         'GET',
         getPath(api) + '/agents',
         {params: payload},
-        { idHost: api.id}
+        { apiHostID: api.id}
       );
 
       const isCluster = await this.apiInterceptor.request(
         'GET',
         getPath(api) + '/cluster/status',
         {},
-        { idHost: api.id}
+        { apiHostID: api.id}
       );
 
       const clusterName =
       (((isCluster || {}).data || {}).data || {}).enabled === 'yes'
-      ? await this.apiInterceptor.request('GET', `${getPath(api)}/cluster/local/info`, {},  { idHost: api.id})
+      ? await this.apiInterceptor.request('GET', `${getPath(api)}/cluster/local/info`, {},  { apiHostID: api.id})
       : false;
       
       if( (((clusterName || {}).data   || {}).data || {}).affected_items) {

@@ -56,9 +56,6 @@ import 'angular-aria/angular-aria';
 import 'angular-animate/angular-animate';
 import 'angular-material/angular-material';
 
-// Cookies
-import 'angular-cookies/angular-cookies';
-
 // Set up Wazuh app
 import './setup';
 

@@ -35,6 +35,9 @@ import { APIUserAllowRunAs, CacheInMemoryAPIUserAllowRunAs, API_USER_STATUS_RUN_
 import { getCookieValueByName } from '../lib/cookie';
 
 export class WazuhApiCtrl {
+  manageHosts: any;
+  queue: any;
+  updateRegistry: any;
 
   constructor() {
     this.queue = Queue;
@@ -102,9 +105,8 @@ export class WazuhApiCtrl {
   async checkStoredAPI(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
     try {
       // Get config from wazuh.yml
-      const id = request.body.id || request.body;
+      const id = request.body.id;
       const api = await this.manageHosts.getHostById(id);
-
       // Check Manage Hosts
       if (!Object.keys(api).length) {
         throw new Error('Could not find Wazuh API entry on wazuh.yml');
@@ -134,29 +136,29 @@ export class WazuhApiCtrl {
       if (responseManagerInfo.status === 200 && responseManagerInfo.data) {
         // Clear and update cluster information before being sent back to frontend
         delete api.cluster_info;
-        const responseAgents = await context.wazuh.api.client.asInternalUser(
+        const responseAgents = await context.wazuh.api.client.asInternalUser.request(
           'get',
           `/agents`,
           { params: { agents_list: '000' } },
-          { idHost: id }
+          { apiHostID: id }
         );
 
         if (responseAgents.status === 200) {
           const managerName = responseAgents.data.data.affected_items[0].manager;
 
-          const responseClusterStatus = await context.wazuh.api.client.asInternalUser(
+          const responseClusterStatus = await context.wazuh.api.client.asInternalUser.request(
             'get',
             `/cluster/status`,
             {},
-            { idHost: id }
+            { apiHostID: id }
           );
           if (responseClusterStatus.status === 200) {
             if (responseClusterStatus.data.data.enabled === 'yes') {
-              const responseClusterLocalInfo = await context.wazuh.api.client.asInternalUser(
+              const responseClusterLocalInfo = await context.wazuh.api.client.asInternalUser.request(
                 'get',
                 `/cluster/local/info`,
                 {},
-                { idHost: id }
+                { apiHostID: id }
               );
               if (responseClusterLocalInfo.status === 200) {
                 const clusterEnabled = responseClusterStatus.data.data.enabled === 'yes';
@@ -185,7 +187,6 @@ export class WazuhApiCtrl {
               cluster: 'Disabled',
             };
           }
-
           if (api.cluster_info) {
             // Update cluster information in the wazuh-registry.json
             await this.updateRegistry.updateClusterInfo(id, api.cluster_info);
@@ -248,11 +249,11 @@ export class WazuhApiCtrl {
                 );
               }
               if (response.status === 200) {
-                request.body = id;
+                request.body.id = id;
                 request.idChanged = id;
-                return this.checkStoredAPI(context, request, response);
+                //return await this.checkStoredAPI(context, request, response);
               }
-            } catch (error) { } // eslint-disable-line
+            } catch (error) {} // eslint-disable-line
           }
         } catch (error) {
           return ErrorResponse(error.message || error, 3020, 500, response);
@@ -1295,7 +1296,7 @@ export class WazuhApiCtrl {
       } else if (output && output.data && output.data.data && !output.data.data.total_affected_items) {
         throw new Error('No results');
       } else {
-        throw new Error(`An error occurred fetching data from the Wazuh API${output && output.body && output.body.message ? `: ${output.body.message}` : ''}`);
+        throw new Error(`An error occurred fetching data from the Wazuh API ${output && output.data && output.data.detail ? `: ${output.data.detail}` : ''}`);
       }
     } catch (error) {
       log('wazuh-api:csv', error.message || error);

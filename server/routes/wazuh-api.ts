@@ -12,7 +12,7 @@ export function WazuhApiRoutes(router: IRouter) {
     validate: {
       body: schema.object({
         id: schema.string(),
-        idChanged: schema.any()
+        idChanged: schema.nullable(schema.any())
       })
     }
   },
@@ -36,7 +36,7 @@ export function WazuhApiRoutes(router: IRouter) {
           node: schema.string(),
           cluster: schema.string()
         }),
-        run_as: schema.boolean(),
+        run_as: schema.nullable(schema.boolean()),
         extensions: schema.any(),
         allow_run_as: schema.number()
       })
@@ -65,7 +65,7 @@ export function WazuhApiRoutes(router: IRouter) {
         id: schema.string(),
         method: schema.string(),
         path: schema.string(),
-        body: schema.object({}),
+        body: schema.any(),
       })
     }
   },

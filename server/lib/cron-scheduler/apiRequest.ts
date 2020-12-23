@@ -32,7 +32,7 @@ export class ApiRequest {
       'GET',
       `${url}:${port}/${this.request}`,
       this.params,
-      {idHost: id }
+      {apiHostID: id }
     )
     return response;
   }

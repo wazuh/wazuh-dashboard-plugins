@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import Cookies from '../utils/js-cookie';
+import { Cookies as _Cookies } from 'react-cookie';
 import store from '../redux/store';
 import {
   updateCurrentApi,
@@ -23,6 +23,8 @@ import { CSVRequest } from '../services/csv-request';
 import { getToasts }  from '../kibana-services';
 import * as FileSaver from '../services/file-saver';
 import { WzAuthentication } from './wz-authentication';
+
+const Cookies = new _Cookies();
 
 export class AppState {
 

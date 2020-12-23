@@ -94,13 +94,12 @@ export function initializeInnerAngularModule(
       .module(name, [
         'ngSanitize',
         'react',
-        'ngCookies',
         'ngMaterial',
         'chart.js',
         'ui.bootstrap',
         'wazuhI18n',
         'wazuhPrivate',
-        'wazuhPromise',
+        'wazuhPromise',        
         //'wazuhDocTable',
         //'wazuhPagerFactory',
       ])
@@ -114,7 +113,6 @@ export function initializeInnerAngularModule(
       'ngSanitize',
       'ngRoute',
       'react',
-      'ngCookies',
       'ngMaterial',
       'chart.js',
       'ui.bootstrap',
