@@ -134,8 +134,8 @@ export class WazuhApiCtrl {
       if (responseManagerInfo.status === 200 && responseManagerInfo.data) {
         // Clear and update cluster information before being sent back to frontend
         delete api.cluster_info;
-        const responseAgents = await context.wazuh.api.client.asInternalUser(
-          'get',
+        const responseAgents = await context.wazuh.api.client.asInternalUser.request(
+          'GET',
           `/agents`,
           { params: { agents_list: '000' } },
           { idHost: id }
@@ -144,16 +144,16 @@ export class WazuhApiCtrl {
         if (responseAgents.status === 200) {
           const managerName = responseAgents.data.data.affected_items[0].manager;
 
-          const responseClusterStatus = await context.wazuh.api.client.asInternalUser(
-            'get',
+          const responseClusterStatus = await context.wazuh.api.client.asInternalUser.request(
+            'GET',
             `/cluster/status`,
             {},
             { idHost: id }
           );
           if (responseClusterStatus.status === 200) {
             if (responseClusterStatus.data.data.enabled === 'yes') {
-              const responseClusterLocalInfo = await context.wazuh.api.client.asInternalUser(
-                'get',
+              const responseClusterLocalInfo = await context.wazuh.api.client.asInternalUser.request(
+                'GET',
                 `/cluster/local/info`,
                 {},
                 { idHost: id }
@@ -233,7 +233,7 @@ export class WazuhApiCtrl {
               const host = api[id];
 
               const response = await context.wazuh.api.client.asInternalUser.request(
-                'get',
+                'GET',
                 `/manager/info`,
                 {},
                 { apiHostID: id }
