@@ -26,14 +26,29 @@ import {
 } from 'kibana/server';
 
 import { WazuhPluginSetup, WazuhPluginStart, PluginSetup } from './types';
-import { SecurityObj } from './lib/security-factory';
+import { SecurityObj, ISecurityFactory } from './lib/security-factory';
 import { setupRoutes } from './routes';
-
+import { jobMonitoringRun } from './start/monitoring';
+import { getCookieValueByName } from './lib/cookie';
+import * as ApiInterceptor  from './lib/api-interceptor';
 declare module 'kibana/server' {
   interface RequestHandlerContext {
     wazuh: {
       logger: Logger,
-      plugins: PluginSetup
+      plugins: PluginSetup,
+      security: ISecurityFactory
+      api: {
+        client: {
+          asInternalUser: {
+            authenticate: (apiHostID: string) => Promise<string>
+            request: (method: string, path: string, data: any, options: {apiHostID: string, forceRefresh?:boolean}) => Promise<any>
+          },
+          asCurrentUser: {
+            authenticate: (apiHostID: string) => Promise<string>
+            request: (method: string, path: string, data: any, options: {apiHostID: string, forceRefresh?:boolean}) => Promise<any>
+          }
+        }
+      }
     };
   }
 }
@@ -46,19 +61,32 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
 
   public setup(core: CoreSetup, plugins: PluginSetup) {
     this.logger.debug('Wazuh-wui: Setup');
+    
+    const wazuhSecurity = SecurityObj(plugins);
 
     core.http.registerRouteHandlerContext('wazuh', (context, request) => {
       return {
         logger: this.logger,
         plugins,
+        security: wazuhSecurity,
+        api: {
+          client: {
+            asInternalUser: {
+              authenticate: async (apiHostID) => await ApiInterceptor.authenticate(apiHostID),
+              request: async (method, path, data, options) => await ApiInterceptor.requestAsInternalUser(method, path, data, options),
+            },
+            asCurrentUser: {
+              authenticate: async (apiHostID) => await ApiInterceptor.authenticate(apiHostID, (await wazuhSecurity.getCurrentUser(request, context)).authContext),
+              request: async (method, path, data, options) => await ApiInterceptor.requestAsCurrentUser(method, path, data, {...options, token: getCookieValueByName(request.headers.cookie, 'wz-token')}),
+            }
+          }
+        }
       };
     });
 
-    const securityObj = SecurityObj(plugins);
-    // TODO: implement router
+    // Routes
     const router = core.http.createRouter();
-    setupRoutes(router, securityObj);
-    // TODO: implement Wazuh monitoring
+    setupRoutes(router);
 
     // TODO: implement Scheduler handler
 
@@ -67,6 +95,24 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
   }
 
   public start(core: CoreStart) {
+    const wazuhApiClient = {
+      client: {
+        asInternalUser: {
+          authenticate: async (apiHostID) => await ApiInterceptor.authenticate(apiHostID),
+          request: async (method, path, data, options) => await ApiInterceptor.requestAsInternalUser(method, path, data, options),
+        }
+      }
+    };
+
+    // Monitoring
+    jobMonitoringRun({
+      core, 
+      wazuh: {
+        logger: this.logger.get('monitoring'),
+        api: wazuhApiClient
+      }
+    });
+
     return {};
   }
 

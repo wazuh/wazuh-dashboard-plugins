@@ -465,6 +465,7 @@ export class ElasticWrapper {
     }
   }
 
+
   async usingCredentials(elasticClient: IScopedClusterClient) {
     try {
       const data = await elasticClient.asInternalUser.cluster.getSettings(

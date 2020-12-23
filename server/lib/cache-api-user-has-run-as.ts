@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { ApiInterceptor } from './api-interceptor';
+import * as ApiInterceptor from './api-interceptor';
 import { ManageHosts } from './manage-hosts';
 import { log } from '../logger';
 // Private variable to save the cache
@@ -30,7 +30,6 @@ export const CacheInMemoryAPIUserAllowRunAs = {
   has: (apiID: string, username: string): boolean => _cache[apiID] && typeof _cache[apiID][username] !== 'undefined' ? true : false
 };
 
-const apiInterceptor = new ApiInterceptor();
 const manageHosts = new ManageHosts();
 
 export const APIUserAllowRunAs = {
@@ -46,7 +45,7 @@ export const APIUserAllowRunAs = {
       if(CacheInMemoryAPIUserAllowRunAs.has(apiId, api.username)){
         return CacheInMemoryAPIUserAllowRunAs.get(apiId, api.username);
       };
-      const response = await apiInterceptor.request(
+      const response = await ApiInterceptor.requestAsInternalUser(
         'get',
         `${api.url}:${api.port}/security/users/me`,
         {},

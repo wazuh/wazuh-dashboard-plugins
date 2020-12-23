@@ -12,7 +12,6 @@
 
 import { ManageHosts } from '../lib/manage-hosts';
 import { UpdateRegistry } from '../lib/update-registry';
-import { ApiInterceptor } from '../lib/api-interceptor';
 import { log } from '../../server/logger';
 import { ErrorResponse } from './error-response';
 import { APIUserAllowRunAs } from '../lib/cache-api-user-has-run-as';
@@ -22,7 +21,6 @@ export class WazuhHostsCtrl {
   constructor() {
     this.manageHosts = new ManageHosts();
     this.updateRegistry = new UpdateRegistry();
-    this.apiInterceptor = new ApiInterceptor();
   }
 
   /**

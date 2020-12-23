@@ -22,59 +22,33 @@ import { Parser } from 'json2csv';
 import { log } from '../logger';
 import { KeyEquivalence } from '../../util/csv-key-equivalence';
 import { ApiErrorEquivalence } from '../../util/api-errors-equivalence';
-import { cleanKeys } from '../../util/remove-key';
 import apiRequestList from '../../util/api-request-list';
 import * as ApiHelper from '../lib/api-helper';
 import { Queue } from '../jobs/queue';
 import fs from 'fs';
 import { ManageHosts } from '../lib/manage-hosts';
 import { UpdateRegistry } from '../lib/update-registry';
-import { ApiInterceptor } from '../lib/api-interceptor';
-import { ISecurityFactory } from '../lib/security-factory';
+import * as ApiInterceptor from '../lib/api-interceptor';
 import jwtDecode from 'jwt-decode';
 import { KibanaRequest, RequestHandlerContext, KibanaResponseFactory } from 'src/core/server';
 import { APIUserAllowRunAs, CacheInMemoryAPIUserAllowRunAs, API_USER_STATUS_RUN_AS } from '../lib/cache-api-user-has-run-as';
+import { getCookieValueByName } from '../lib/cookie';
 
 export class WazuhApiCtrl {
 
-  constructor(private securityObj: ISecurityFactory) {
+  constructor() {
     this.queue = Queue;
     // this.monitoringInstance = new Monitoring(server, true);
     this.manageHosts = new ManageHosts();
     this.updateRegistry = new UpdateRegistry();
-    this.apiInterceptor = new ApiInterceptor();
-  }
-
-  getApiIdFromCookie(cookie) {
-    if (!cookie) return false;
-    const getWzApi = /.*wz-api=([^;]+)/;
-    const wzApi = cookie.match(getWzApi)
-    if (wzApi && wzApi.length && wzApi[1]) return wzApi[1];
-    return false;
-  }
-
-  getTokenFromCookie(cookie) {
-    if (!cookie) return false;
-    const getWzToken = /.*wz-token=([^;]+)/;
-    const wzToken = cookie.match(getWzToken)
-    if (wzToken && wzToken.length && wzToken[1]) return wzToken[1];
-    return false;
-  }
-
-  getUserFromCookie(cookie) {
-    if (!cookie) return false;
-    const getWzUser = /.*wz-user=([^;]+)/;
-    const wzUser = cookie.match(getWzUser)
-    if (wzUser && wzUser.length && wzUser[1]) return wzUser[1];
-    return false;
   }
 
   async getToken(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
     try {
       const { force, idHost } = request.body;
-      const { userName, authContext } = await this.securityObj.getCurrentUser(request, context);
-      if (!force && request.headers.cookie && userName === this.getUserFromCookie(request.headers.cookie) && idHost === this.getApiIdFromCookie(request.headers.cookie)) {
-        const wzToken = this.getTokenFromCookie(request.headers.cookie);
+      const { userName, authContext } = await context.wazuh.security.getCurrentUser(request, context);
+      if (!force && request.headers.cookie && userName === getCookieValueByName(request.headers.cookie, 'wz-user') && idHost === getCookieValueByName(request.headers.cookie,'wz-api')) {
+        const wzToken = getCookieValueByName(request.headers.cookie, 'wz-user');
         if (wzToken) {
           try { // if the current token is not a valid jwt token we ask for a new one
             const decodedToken = jwtDecode(wzToken);
@@ -91,9 +65,9 @@ export class WazuhApiCtrl {
       }
       let token;
       if (await APIUserAllowRunAs.canUse(idHost)) {
-        token = await this.apiInterceptor.authenticateApi(idHost, authContext)
+        token = await ApiInterceptor.authenticate(idHost, authContext)
       } else {
-        token = await this.apiInterceptor.authenticateApi(idHost)
+        token = await ApiInterceptor.authenticate(idHost)
       };
 
       return response.ok({
@@ -104,7 +78,7 @@ export class WazuhApiCtrl {
             `wz-api=${idHost};Path=/;HttpOnly`,
           ],
         },
-        body: {}
+        body: { token }
       });
     } catch (error) {
       const errorMessage = ((error.response || {}).data || {}).detail || error.message || error;
@@ -139,11 +113,11 @@ export class WazuhApiCtrl {
       log('wazuh-api:checkStoredAPI', `${id} exists`, 'debug');
 
       // Fetch needed information about the cluster and the manager itself
-      const responseManagerInfo = await this.apiInterceptor.request(
+      const responseManagerInfo = await context.wazuh.api.client.asInternalUser.request(
         'get',
-        `${api.url}:${api.port}/manager/info`,
+        `/manager/info`,
         {},
-        { idHost: id, forceRefresh: true }
+        { apiHostID: id, forceRefresh: true }
       );
 
       // Look for socket-related errors
@@ -160,9 +134,9 @@ export class WazuhApiCtrl {
       if (responseManagerInfo.status === 200 && responseManagerInfo.data) {
         // Clear and update cluster information before being sent back to frontend
         delete api.cluster_info;
-        const responseAgents = await this.apiInterceptor.request(
+        const responseAgents = await context.wazuh.api.client.asInternalUser(
           'get',
-          `${api.url}:${api.port}/agents`,
+          `/agents`,
           { params: { agents_list: '000' } },
           { idHost: id }
         );
@@ -170,17 +144,17 @@ export class WazuhApiCtrl {
         if (responseAgents.status === 200) {
           const managerName = responseAgents.data.data.affected_items[0].manager;
 
-          const responseClusterStatus = await this.apiInterceptor.request(
+          const responseClusterStatus = await context.wazuh.api.client.asInternalUser(
             'get',
-            `${api.url}:${api.port}/cluster/status`,
+            `/cluster/status`,
             {},
             { idHost: id }
           );
           if (responseClusterStatus.status === 200) {
             if (responseClusterStatus.data.data.enabled === 'yes') {
-              const responseClusterLocalInfo = await this.apiInterceptor.request(
+              const responseClusterLocalInfo = await context.wazuh.api.client.asInternalUser(
                 'get',
-                `${api.url}:${api.port}/cluster/local/info`,
+                `/cluster/local/info`,
                 {},
                 { idHost: id }
               );
@@ -258,11 +232,11 @@ export class WazuhApiCtrl {
               const id = Object.keys(api)[0];
               const host = api[id];
 
-              const response = await this.apiInterceptor(
+              const response = await context.wazuh.api.client.asInternalUser.request(
                 'get',
-                `${host.url}:${host.port}/manager/info`,
+                `/manager/info`,
                 {},
-                { idHost: id }
+                { apiHostID: id }
               );
 
               if (this.checkResponseIsDown(response)) {
@@ -343,14 +317,14 @@ export class WazuhApiCtrl {
         apiAvailable = request.body;
         apiAvailable.password = Buffer.from(request.body.password, 'base64').toString('ascii');
       }
-      const options = { idHost: request.body.id };
+      const options = { apiHostID: request.body.id };
       if (request.body.forceRefresh) {
         options["forceRefresh"] = request.body.forceRefresh;
       }
 
-      let responseManagerInfo = await this.apiInterceptor.request(
+      let responseManagerInfo = await context.wazuh.api.client.asInternalUser.request(
         'GET',
-        `${apiAvailable.url}:${apiAvailable.port}/manager/info`,
+        `/manager/info`,
         {},
         options
       );
@@ -372,31 +346,31 @@ export class WazuhApiCtrl {
       }
       log('wazuh-api:checkAPI', `${request.body.id} credentials are valid`, 'debug');
       if (responseManagerInfo.status === 200 && responseManagerInfo.data) {
-        let responseAgents = await this.apiInterceptor.request(
+        let responseAgents = await context.wazuh.api.client.asInternalUser.request(
           'GET',
-          `${apiAvailable.url}:${apiAvailable.port}/agents`,
+          `/agents`,
           { params: { agents_list: '000' } },
-          { idHost: request.body.id }
+          { apiHostID: request.body.id }
         );
 
         if (responseAgents.status === 200) {
           const managerName = responseAgents.data.data.affected_items[0].manager;
 
-          let responseCluster = await this.apiInterceptor.request(
+          let responseCluster = await context.wazuh.api.client.asInternalUser.request(
             'GET',
-            `${apiAvailable.url}:${apiAvailable.port}/cluster/status`,
+            `/cluster/status`,
             {},
-            { idHost: request.body.id }
+            { apiHostID: request.body.id }
           );
 
           // Check the run_as for the API user and update it
           let apiUserAllowRunAs = API_USER_STATUS_RUN_AS.DISABLED;
           if (apiAvailable.run_as) {
-            const responseApiUserAllowRunAs = await this.apiInterceptor.request(
+            const responseApiUserAllowRunAs = await context.wazuh.api.client.asInternalUser.request(
               'GET',
-              `${apiAvailable.url}:${apiAvailable.port}/security/users/me`,
+              `/security/users/me`,
               {},
-              { idHost: request.body.id }
+              { apiHostID: request.body.id }
             );
             if (responseApiUserAllowRunAs.status === 200) {
               apiUserAllowRunAs = responseApiUserAllowRunAs.data.data.affected_items[0].allow_run_as ? API_USER_STATUS_RUN_AS.ENABLED : API_USER_STATUS_RUN_AS.NOT_ALLOWED;
@@ -408,11 +382,11 @@ export class WazuhApiCtrl {
             log('wazuh-api:checkStoredAPI', `Wazuh API response is valid`, 'debug');
             if (responseCluster.data.data.enabled === 'yes') {
               // If cluster mode is active
-              let responseClusterLocal = await this.apiInterceptor.request(
+              let responseClusterLocal = await context.wazuh.api.client.asInternalUser.request(
                 'GET',
-                `${apiAvailable.url}:${apiAvailable.port}/cluster/local/info`,
+                `/cluster/local/info`,
                 {},
-                { idHost: request.body.id }
+                { apiHostID: request.body.id }
               );
 
               if (responseClusterLocal.status === 200) {
@@ -502,11 +476,11 @@ export class WazuhApiCtrl {
           return ErrorResponse('Unexpected error getting host credentials', 3007, 400, response);
         }
 
-        const responseRequirement = await this.apiInterceptor.request(
+        const responseRequirement = await context.wazuh.api.client.asInternalUser.request(
           'get',
-          `${api.url}:${api.port}/rules/requirement/pci`,
+          `/rules/requirement/pci`,
           {},
-          { idHost: apiId }
+          { apiHostID: apiId }
         );
 
         if ((((responseRequirement || {}).data || {}).data || {}).affected_items) {
@@ -572,11 +546,11 @@ export class WazuhApiCtrl {
         const api = await this.manageHosts.getHostById(apiId);
 
         // Checking for GDPR
-        const version = await this.apiInterceptor.request(
+        const version = await context.wazuh.api.client.asInternalUser.request(
           'get',
-          `${api.url}:${api.port}//`,
+          '//',
           {},
-          { idHost: apiId }
+          { apiHostID: apiId }
         );
         const number = version.data.api_version;
 
@@ -592,11 +566,11 @@ export class WazuhApiCtrl {
           return ErrorResponse('Unexpected error getting host credentials', 3024, 400, response);
         }
 
-        const responseRequirement = await this.apiInterceptor.request(
+        const responseRequirement = await context.wazuh.api.client.asInternalUser.request(
           'get',
-          `${api.url}:${api.port}/rules/requirement/gdpr`,
+          `/rules/requirement/gdpr`,
           {},
-          { idHost: apiId }
+          { apiHostID: apiId }
         );
 
         if ((((responseRequirement || {}).data || {}).data || {}).affected_items) {
@@ -681,11 +655,11 @@ export class WazuhApiCtrl {
           return ErrorResponse('Unexpected error getting host credentials', 3007, 400, response);
         }
 
-        const responseRequirement = await this.apiInterceptor.request(
+        const responseRequirement = await context.wazuh.api.client.asInternalUser.request(
           'get',
-          `${api.url}:${api.port}/rules/requirement/hipaa`,
+          `/rules/requirement/hipaa`,
           {},
-          { idHost: apiId }
+          { apiHostID: apiId }
         );
 
         if ((((responseRequirement || {}).data || {}).data || {}).affected_items) {
@@ -755,11 +729,11 @@ export class WazuhApiCtrl {
           return ErrorResponse('Unexpected error getting host credentials', 3007, 400, response);
         }
 
-        const responseRequirement = await this.apiInterceptor.request(
+        const responseRequirement = await context.wazuh.api.client.asInternalUser.request(
           'get',
-          `${api.url}:${api.port}/rules/requirement/nist-800-53`,
+          `/rules/requirement/nist-800-53`,
           {},
-          { idHost: apiId }
+          { apiHostID: apiId }
         );
         if ((((responseRequirement || {}).data || {}).data || {}).affected_items) {
           let NISTobject = {};
@@ -889,16 +863,17 @@ export class WazuhApiCtrl {
 
   /**
    * Check main Wazuh daemons status
+   * @param {*} context Endpoint context
    * @param {*} api API entry stored in .wazuh
    * @param {*} path Optional. Wazuh API target path.
    */
-  async checkDaemons(api, path) {
+  async checkDaemons(context, api, path) {
     try {
-      const response = await this.apiInterceptor.request(
+      const response = await context.wazuh.api.client.asInternalUser.request(
         'GET',
-        getPath(api) + '/manager/status',
+        '/manager/status',
         {},
-        { idHost: api.id }
+        { apiHostID: api.id }
       );
 
       const daemons = ((((response || {}).data || {}).data || {}).affected_items || [])[0] || {};
@@ -965,7 +940,7 @@ export class WazuhApiCtrl {
    * @param {Object} response
    * @returns {Object} API response or ErrorResponse
    */
-  async makeRequest(method, path, data, id, response, token) {
+  async makeRequest(context, method, path, data, id, response) {
     const devTools = !!(data || {}).devTools;
     try {
       const api = await this.manageHosts.getHostById(id);
@@ -979,38 +954,41 @@ export class WazuhApiCtrl {
         return ErrorResponse('Could not get host credentials', 3011, 404, response);
       }
 
-      let body = {}
       if (!data) {
         data = {};
-      }
+      };
 
-      const options = {};
-      options['idHost'] = id;
+      if (!data.headers) {
+        data.headers = {};
+      };
+
+      const options = {
+        apiHostID: id
+      };
 
       // Set content type application/xml if needed
       if (typeof (data || {}).body === 'string' && (data || {}).origin === 'xmleditor') {
-        options.content_type = 'application/xml';
+        data.headers.content_type = 'application/xml';
         delete data.origin;
       }
 
       if (typeof (data || {}).body === 'string' && (data || {}).origin === 'json') {
-        options.content_type = 'application/json';
+        data.headers.content_type = 'application/json';
         delete data.origin;
       }
 
       if (typeof (data || {}).body === 'string' && (data || {}).origin === 'raw') {
-        options.content_type = 'application/octet-stream';
+        data.headers.content_type = 'application/octet-stream';
         delete data.origin;
       }
       const delay = (data || {}).delay || 0;
-      let fullUrl = getPath(api) + path;
       if (delay) {
         const current = new Date();
         this.queue.addJob({
           startAt: new Date(current.getTime() + delay),
           type: 'request',
           method,
-          fullUrl,
+          path,
           data,
           options,
         });
@@ -1021,7 +999,7 @@ export class WazuhApiCtrl {
 
       if (path === '/ping') {
         try {
-          const check = await this.checkDaemons(api, path);
+          const check = await this.checkDaemons(context, api, path);
           return check;
         } catch (error) {
           const isDown = (error || {}).code === 'ECONNREFUSED';
@@ -1037,7 +1015,7 @@ export class WazuhApiCtrl {
         }
       }
 
-      log('wazuh-api:makeRequest', `${method} ${fullUrl}`, 'debug');
+      log('wazuh-api:makeRequest', `${method} ${path}`, 'debug');
 
       // Extract keys from parameters
       const dataProperties = Object.keys(data);
@@ -1053,7 +1031,8 @@ export class WazuhApiCtrl {
         }
       }
 
-      const responseToken = await this.apiInterceptor.requestToken(method, fullUrl, data, options, token);
+      const responseToken = await context.wazuh.api.client.asCurrentUser.request(method, path, data, options);
+
       const responseIsDown = this.checkResponseIsDown(responseToken);
       if (responseIsDown) {
         return ErrorResponse(
@@ -1118,61 +1097,6 @@ export class WazuhApiCtrl {
   }
 
   /**
-   * This performs a generic request and returs its response
-   * @param {String} method Method: GET, PUT, POST, DELETE
-   * @param {String} path API route
-   * @param {Object} data data and params to perform the request
-   * @param {String} id API id
-   */
-  async makeGenericRequest(method, path, data, id) {
-    try {
-      const api = await this.manageHosts.getHostById(id);
-      if (!Object.keys(api).length) {
-        //Can not get credentials from wazuh-hosts
-        throw new Error('Could not get host credentials');
-      }
-
-      if (!method.match(/^(?:GET|PUT|POST|DELETE)$/)) {
-        log('wazuh-api:makeRequest', 'Request method is not valid.');
-        //Method is not a valid HTTP request method
-        throw new Error('Request method is not valid.');
-      }
-
-      if (!path.match(/^\/.+/)) {
-        log('wazuh-api:makeRequest', 'Request path is not valid.');
-        //Path doesn't start with '/'
-        throw new Error('Request path is not valid.');
-      }
-
-      if (!data) {
-        data = {};
-      }
-
-      const fullUrl = getPath(api) + path;
-
-      log('wazuh-api:makeGenericRequest', `${method} ${fullUrl}`, 'debug');
-
-      const response = await this.apiInterceptor.request(
-        'GET',
-        fullUrl,
-        data,
-        { idHost: id }
-      );
-
-      if (response && response.data && !response.data.error && response.data.data) {
-        cleanKeys(response);
-        return response.data;
-      }
-      throw ((response || {}).data || {}).error && ((response || {}).data || {}).message
-        ? { message: response.data.message, code: response.data.error }
-        : new Error('Unexpected error fetching data from the Wazuh API');
-    } catch (error) {
-      log('wazuh-api:makeGenericRequest', error.message || error);
-      return Promise.reject(error);
-    }
-  }
-
-  /**
    * This make a request to API
    * @param {Object} context
    * @param {Object} request
@@ -1181,8 +1105,7 @@ export class WazuhApiCtrl {
    */
   requestApi(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
 
-    const token = this.getTokenFromCookie(request.headers.cookie);
-    const idApi = this.getApiIdFromCookie(request.headers.cookie);
+    const idApi = getCookieValueByName(request.headers.cookie, 'wz-api');
     if (idApi !== request.body.id) { // if the current token belongs to a different API id, we relogin to obtain a new token
       return ErrorResponse(
         'status code 401',
@@ -1205,12 +1128,12 @@ export class WazuhApiCtrl {
       return ErrorResponse('Request path is not valid.', 3015, 400, response);
     } else {
       return this.makeRequest(
+        context,
         request.body.method,
         request.body.path,
         request.body.body,
         request.body.id,
-        response,
-        token
+        response
       );
     }
   }
@@ -1276,11 +1199,11 @@ export class WazuhApiCtrl {
 
       let itemsArray = [];
 
-      const output = await this.apiInterceptor.request(
+      const output = await context.wazuh.api.client.asInternalUser.request(
         'GET',
-        `${config.url}:${config.port}/${tmpPath}`,
+        `/${tmpPath}`,
         { params: params },
-        { idHost: request.body.id }
+        { apiHostID: request.body.id }
       );
 
       const isList = request.body.path.includes('/lists') && request.body.filters && request.body.filters.length && request.body.filters.find(filter => filter._isCDBList);
@@ -1292,11 +1215,11 @@ export class WazuhApiCtrl {
         itemsArray.push(...output.data.data.affected_items);
         while (itemsArray.length < totalItems && params.offset < totalItems) {
           params.offset += params.limit;
-          const tmpData = await this.apiInterceptor.request(
+          const tmpData = await context.wazuh.api.client.asInternalUser.request(
             'GET',
-            `${config.url}:${config.port}/${tmpPath}`,
+            `/${tmpPath}`,
             { params: params },
-            { idHost: request.body.id }
+            { apiHostID: request.body.id }
           );
           itemsArray.push(...tmpData.data.data.affected_items);
         }
@@ -1393,13 +1316,11 @@ export class WazuhApiCtrl {
 
       const config = await this.manageHosts.getHostById(request.params.api);
 
-      const distinctUrl = `${config.url}:${config.port}/overview​/agents`;
-
-      const data = await this.apiInterceptor.request(
+      const data = await context.wazuh.api.client.asInternalUser.request(
         'get',
-        distinctUrl,
+        `/overview​/agents`,
         {},
-        { idHost: request.body.id }
+        { apiHostID: request.body.id }
       );
       const responseData = (data || {}).data || {};
 
@@ -1605,18 +1526,16 @@ export class WazuhApiCtrl {
    */
   async getSyscollector(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
     try {
-      const idApi = this.getApiIdFromCookie(request.headers.cookie);
-      if (!request.params || !idApi || !request.params.agent) {
+      const apiHostID = getCookieValueByName(request.headers.cookie,'wz-api');
+      if (!request.params || !apiHostID || !request.params.agent) {
         throw new Error('Agent ID and API ID are required');
       }
 
       const { agent } = request.params;
 
-      const config = await this.manageHosts.getHostById(idApi);
-
       const data = await Promise.all([
-        this.apiInterceptor.request('GET', `${config.url}:${config.port}/syscollector/${agent}/hardware`, {}, { idHost: idApi }),
-        this.apiInterceptor.request('GET', `${config.url}:${config.port}/syscollector/${agent}/os`, {}, { idHost: idApi })
+        context.wazuh.api.client.asInternalUser.request('GET', `/syscollector/${agent}/hardware`, {}, { apiHostID }),
+        context.wazuh.api.client.asInternalUser.request('GET', `/syscollector/${agent}/os`, {}, { apiHostID })
       ]);
 
       const result = data.map(item => (item.data || {}).data || []);
