@@ -80,34 +80,20 @@ const app = getAngularModule();
 app.config([
   '$compileProvider',
   function ($compileProvider) {
-    $compileProvider.aHrefSanitizationWhitelist(
-      /^\s*(https?|ftp|mailto|data|blob):/
-    );
-  }
+    $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|data|blob):/);
+  },
 ]);
 
 app.config([
   '$httpProvider',
   function ($httpProvider) {
     $httpProvider.useApplyAsync(true);
-  }
+  },
 ]);
 
 app.run([
   '$injector',
   function (_$injector) {
-/*     chrome
-      .setRootTemplate(
-        `<div>
-        <div class="wazuhNotReadyYet"></div>
-        <div ng-view class="mainView"></div>
-        <react-component name="WzMenuWrapper" props=""></react-component>
-        <react-component name="WzAgentSelectorWrapper" props=""></react-component>
-        <react-component name="ToastNotificationsModal" props=""></react-component>
-       </div>
-        `
-      )
-      .setRootController(() => require('./app')); */
     changeWazuhNavLogo();
     app.$injector = _$injector;
 
@@ -118,5 +104,16 @@ app.run([
 
     // Init the process of refreshing the user's token when app start.
     checkPluginVersion().finally(WzAuthentication.refresh);
-  }
+  },
 ]);
+
+app.run(function ($rootElement) {
+  $rootElement.append(`
+    <div>
+      <div class="wazuhNotReadyYet"></div>
+      <div ng-view class="mainView"></div>
+      <react-component name="WzMenuWrapper" props=""></react-component>
+      <react-component name="WzAgentSelectorWrapper" props=""></react-component>
+      <react-component name="ToastNotificationsModal" props=""></react-component>
+    </div>`);
+});

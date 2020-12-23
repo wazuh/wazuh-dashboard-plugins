@@ -35,7 +35,7 @@ import Management from './wz-menu-management';
 import MenuSettings from './wz-menu-settings';
 import MenuSecurity from './wz-menu-security';
 import Overview from './wz-menu-overview';
-import { getAngularModule, getToasts }  from '../../kibana-services';
+import { getAngularModule, getHttp, getToasts } from '../../kibana-services';
 import { GenericRequest } from '../../react-services/generic-request';
 import { ApiCheck } from '../../react-services/wz-api-check';
 import { WzGlobalBreadcrumbWrapper } from '../common/globalBreadcrumb/globalBreadcrumbWrapper';
@@ -727,7 +727,8 @@ class WzMenu extends Component {
       </div>
     );
 
-    const logotype_url = chrome.addBasePath('/plugins/wazuh/assets/logotype.svg');
+
+    const logotype_url = getHttp().basePath.prepend('/plugins/wazuh/assets/logotype.svg');
     const mainButton = (
       <button className="eui" onClick={() => this.switchMenuOpened()}>
         <EuiFlexGroup
