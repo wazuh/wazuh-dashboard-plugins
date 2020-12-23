@@ -24,7 +24,7 @@ import SettingsLogs from '../components/settings-logs'
 import { WzSampleDataProvider } from '../components/settings-sample-data'
 import { EnableModulesWrapper } from '../components/settings-modules'
 import {AboutSettings} from  '../components/settings-about'
-import  WzConfigurationSetting  from '../components/settings-configuration'
+import  {WzConfigurationSettings}  from '../components/settings-configuration'
 
 
 
@@ -75,13 +75,14 @@ const tabs = [
 ];
 
 export const MainSettings = compose(withGlobalBreadcrumb([{ text: '' }, { text: 'Settings' }]))(
-  () => {
+  (props) => {
+    console.log(props)
     const history = useHistory();
     const settingTabs = tabs.map((tab, index) => (
       <EuiTab
         // {...(tab.href && { href: tab.href, target: '_blank' })}
         onClick={() => history.push(`${SETTINGS_PAGE_URL}/${tab.id}`)}
-        // isSelected={tab.id === selectedTabId}
+        isSelected={tab.id === props.match.params.section}
         // disabled={tab.disabled}
         key={index}>
         {tab.name}
@@ -92,7 +93,7 @@ export const MainSettings = compose(withGlobalBreadcrumb([{ text: '' }, { text: 
       <Switch>
         <Route path={SETTINGS_API_PAGE_URL} render={() => <ApiTable />} />
         <Route path={SETTINGS_MODULES_PAGE_URL} render={() => <EnableModulesWrapper />} />
-        <Route path={SETTINGS_CONFIGURATION_PAGE_URL} render={() => <WzConfigurationSetting />} />
+        <Route path={SETTINGS_CONFIGURATION_PAGE_URL} render={() => <WzConfigurationSettings />} />
         <Route path={SETTINGS_ABOUT_PAGE_URL} render={() => <AboutSettings />} />
         <Route path={SETTINGS_SAMPLE_DATA_PAGE_URL} render={() => <WzSampleDataProvider />} />
         <Route path={SETTINGS_LOGS_PAGE_URL} render={() => <SettingsLogs />} />
