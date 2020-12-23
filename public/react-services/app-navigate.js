@@ -10,7 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 
-import Cookies from '../utils/js-cookie';
 import store from '../redux/store';
 import {} from '../redux/actions/appStateActions';
 import { getIndexPattern } from '../components/overview/mitre/lib';
@@ -61,7 +60,7 @@ export class AppNavigate {
 
       if(Object.keys(params).length){
         Object.keys(params).forEach(key => {
-          if(key === "filters"){ 
+          if(key === "filters"){
             urlParams["_w"] = this.buildFilter_w(params[key], indexPattern);
           }else{
             urlParams[key] = params[key];

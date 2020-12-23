@@ -18,6 +18,7 @@ import {
   EuiPageBody,
   EuiPageHeader,
   Query,
+  EuiSpacer
 } from '@elastic/eui';
 import {
   configEquivalences,
@@ -29,7 +30,6 @@ import WzReduxProvider from '../../../redux/wz-redux-provider'
 import store from '../../../redux/store'
 import { updateSelectedSettingsSection } from '../../../redux/actions/appStateActions';
 import { withUserAuthorizationPrompt } from '../../common/hocs/withUserAuthorization'
-import { EuiSpacer } from '@elastic/eui';
 import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../../util/constants';
 
 export type ISetting = {

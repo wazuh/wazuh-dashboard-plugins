@@ -23,8 +23,8 @@ import { ApiTable } from '../components/settings-api'
 import SettingsLogs from '../components/settings-logs'
 import { WzSampleDataProvider } from '../components/settings-sample-data'
 import { EnableModulesWrapper } from '../components/settings-modules'
-import {AboutSettings} from  '../components/settings-about'
-import  {WzConfigurationSettings}  from '../components/settings-configuration'
+import { AboutSettings } from  '../components/settings-about'
+import { WzConfigurationSettings }  from '../components/settings-configuration'
 
 
 
@@ -76,7 +76,6 @@ const tabs = [
 
 export const MainSettings = compose(withGlobalBreadcrumb([{ text: '' }, { text: 'Settings' }]))(
   (props) => {
-    console.log(props)
     const history = useHistory();
     const settingTabs = tabs.map((tab, index) => (
       <EuiTab
