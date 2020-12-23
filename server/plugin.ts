@@ -29,6 +29,7 @@ import { WazuhPluginSetup, WazuhPluginStart, PluginSetup } from './types';
 import { SecurityObj, ISecurityFactory } from './lib/security-factory';
 import { setupRoutes } from './routes';
 import { jobMonitoringRun } from './start/monitoring';
+import { jobSchedulerRun } from './lib/cron-scheduler';
 import { getCookieValueByName } from './lib/cookie';
 import * as ApiInterceptor  from './lib/api-interceptor';
 declare module 'kibana/server' {
@@ -113,6 +114,14 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       }
     });
 
+    // Scheduler
+    jobSchedulerRun({
+      core, 
+      wazuh: {
+        logger: this.logger.get('cron-scheduler'),
+        api: wazuhApiClient
+      }
+    })
     return {};
   }
 
