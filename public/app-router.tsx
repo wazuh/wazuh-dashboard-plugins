@@ -34,7 +34,7 @@ export function AppRouter(props: AppDependencies) {
         <EuiPageBody>
           <Switch>
             <Route path={LANDING_PAGE_URL} render={() => <MainOverview />} />
-            <Route path={SETTINGS_PAGE_URL} render={() => <MainSettings />} />
+            <Route path={SETTINGS_PAGE_URL + '/:section'} render={(props) => <MainSettings {...props} />}/>
             <Route path="/health-check" render={() => <HealthCheck />} />
             <Redirect exact from="/" to={LANDING_PAGE_URL} />
           </Switch>

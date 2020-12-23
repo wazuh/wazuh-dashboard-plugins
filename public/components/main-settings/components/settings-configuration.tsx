@@ -1,5 +1,6 @@
 /*
- * Wazuh app - React component for render configuration setting.
+ * Wazuh app - React component building the configuration component.
+ *
  * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -9,82 +10,81 @@
  *
  * Find more information about this on the LICENSE file.
  */
-
-import React, { Component, Fragment } from 'react';
-import PropTypes from 'prop-types';
-
+import React, { useState, useEffect } from 'react';
+import { Header, Categories, BottomBar } from '../../settings/configuration/components';
+import { useKbnLoadingIndicator} from '../../common/hooks'
 import {
-  EuiFieldText,
-  EuiSpacer,
-  EuiTextAlign
+  EuiPage,
+  EuiPageBody,
+  EuiPageHeader,
+  Query,
 } from '@elastic/eui';
+import {
+  configEquivalences,
+  nameEquivalence,
+  categoriesEquivalence,
+  formEquivalence
+} from '../../../utils/config-equivalences';
+import WzReduxProvider from '../../../redux/wz-redux-provider'
+import store from '../../../redux/store'
+import { updateSelectedSettingsSection } from '../../../redux/actions/appStateActions';
+import { withUserAuthorizationPrompt } from '../../common/hocs/withUserAuthorization'
+import { EuiSpacer } from '@elastic/eui';
+import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../../util/constants';
 
-class WzConfigurationSetting extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      isMobile: false
-    };
-    this.limitResize = 760;
-    this.resize = this.resize.bind(this);
-  }
-  componentDidMount() {
-    window.addEventListener('resize', this.resize);
-    this.resize();
-  }
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.resize);
-  }
-  resize() {
-    this.setState({ isMobile: window.innerWidth < this.limitResize });
-  }
-  render() {
-    const { isMobile } = this.state;
-    const { keyItem, label, value } = this.props;
-    return (value || typeof value === 'number' || typeof value === 'boolean')  ? (
-      <Fragment>
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            flexDirection: isMobile ? 'column' : 'row'
-          }}
-        >
-          <div
-            style={
-              isMobile
-                ? { margin: '1em', width: '100%' }
-                : { justifySelf: 'flex-end', margin: '1em', width: '35%' }
-            }
-          >
-            <EuiTextAlign textAlign={isMobile ? 'left' : 'right'}>
-              {label}
-            </EuiTextAlign>
-          </div>
-          <div style={isMobile ? { width: '100%' } : { width: '65%' }}>
-            {Array.isArray(value) ? (
-              <ul>
-                {value.map((v, key) => (
-                  <li key={`${keyItem}-${label}-${key}`}>
-                    <EuiFieldText value={String(v)} readOnly />
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <EuiFieldText value={String(value)} readOnly />
-            )}
-          </div>
-        </div>
-        <EuiSpacer size="s" />
-      </Fragment>
-    ) : null;
-  }
+export type ISetting = {
+  setting: string
+  value: boolean | string | number | object
+  description: string
+  category: string
+  name: string
+  readonly?: boolean
+  form: { type: string, params: {} }
 }
 
-WzConfigurationSetting.propTypes = {
-  keyItem: PropTypes.string.isRequired,
-  label: PropTypes.string.isRequired
-  // value: PropTypes.string
-};
-
-export default WzConfigurationSetting;
+const WzConfigurationSettingsProvider = (props) => {
+  const [loading, setLoading ] = useKbnLoadingIndicator();
+  const [config, setConfig] = useState<ISetting[]>([]);
+  const [query, setQuery] = useState('');
+  const [updatedConfig, setUpdateConfig] = useState({});
+  useEffect(() => {
+    store.dispatch(updateSelectedSettingsSection('configuration'));
+    const rawConfig = props.wazuhConfig.getConfig();
+    const formatedConfig = Object.keys(rawConfig).reduce<ISetting[]>((acc, conf) => [
+      ...acc,
+      {
+        setting: conf,
+        value: rawConfig[conf],
+        description: configEquivalences[conf],
+        category: categoriesEquivalence[conf],
+        name: nameEquivalence[conf],
+        form: formEquivalence[conf],
+      }
+    ], []);
+    setConfig(formatedConfig);
+  }, []);
+  return (
+    <EuiPage >
+      <EuiPageBody className='mgtPage__body' restrictWidth>
+        <EuiPageHeader>
+          <Header query={query} setQuery={setQuery} />
+        </EuiPageHeader>
+        <Categories config={Query.execute(query.query || query, config)} updatedConfig={updatedConfig} setUpdatedConfig={setUpdateConfig} />
+        <EuiSpacer size="xxl" />
+        <BottomBar
+          updatedConfig={updatedConfig}
+          setUpdateConfig={setUpdateConfig}
+          setLoading={setLoading}
+          config={config} />
+      </EuiPageBody>
+    </EuiPage>
+  );
+}
+const WzConfigurationSettingsWrapper = withUserAuthorizationPrompt(null, [WAZUH_ROLE_ADMINISTRATOR_NAME])(WzConfigurationSettingsProvider);
+export function WzConfigurationSettings(props) {
+  return(
+    <WzReduxProvider>
+      <WzConfigurationSettingsWrapper {...props}/>
+    </WzReduxProvider>
+  );
+}
