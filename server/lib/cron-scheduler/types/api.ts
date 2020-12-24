@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Module to export all the controllers
+ * Wazuh app - API interface
  * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -9,7 +9,16 @@
  *
  * Find more information about this on the LICENSE file.
  */
-export { WazuhElasticCtrl } from './wazuh-elastic';
-export { WazuhApiCtrl } from './wazuh-api';
-export { WazuhUtilsCtrl } from './wazuh-utils';
-export { WazuhReportingCtrl } from './wazuh-reporting';
+
+export interface IApi {
+  id: string
+  user: string
+  password: string
+  url: string
+  port: number
+  cluster_info: {
+    manager: string
+    cluster: 'Disabled' | 'Enabled'
+    status: 'disabled' | 'enabled'
+  }
+}

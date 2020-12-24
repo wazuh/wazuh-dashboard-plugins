@@ -12,16 +12,16 @@
 
 /**
  * Returns well formatted object to set shards and replicas when creating/updating indices.
- * @param {object} file Parsed content from wazuh.yml file
+ * @param {*} file Parsed content from wazuh.yml file
  * @param {string} indexName Target index name
  * @param {number} defaultShards Default shards value if missing in configuration
  * @param {number} defaulReplicas Default replicas value if missing in configuration
  */
-export function BuildBody(
-  file,
-  indexName,
-  defaultShards = 1,
-  defaulReplicas = 0
+export function buildIndexSettings(
+  file: any,
+  indexName: string,
+  defaultShards: number = 1,
+  defaulReplicas: number = 0
 ) {
   if (indexName) {
     const shards =

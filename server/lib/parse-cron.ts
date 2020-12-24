@@ -11,33 +11,40 @@
  */
 import { log } from '../logger';
 import cron from 'node-cron';
+import { WAZUH_MONITORING_DEFAULT_CRON_FREQ } from '../../util/constants';
 
-export function parseCron(interval) {
+export function parseCron(interval: string) {
   try {
     if (!interval) throw new Error('Interval not found');
 
-    const parsed = parseInt(interval);
+    const intervalToNumber = parseInt(interval);
 
-    if (!parsed || typeof parsed !== 'number')
+    if (!intervalToNumber || typeof intervalToNumber !== 'number'){
       throw new Error('Interval not valid');
-    if (parsed < 60) throw new Error('Interval too low');
-    if (parsed >= 84600) throw new Error('Interval too high');
+    };
+    if (intervalToNumber < 60){ // 60 seconds / 1 minute
+      throw new Error('Interval too low');
+    };
+    if (intervalToNumber >= 84600){
+      throw new Error('Interval too high');
+    } 
 
-    const minutes = parseInt(parsed / 60);
+    const minutes = parseInt(intervalToNumber / 60);
 
     const cronstr = `0 */${minutes} * * * *`;
 
-    if (!cron.validate(cronstr))
+    if (!cron.validate(cronstr)){
       throw new Error(
         'Generated cron expression not valid for node-cron module'
       );
+    }
     log('cron:parse-interval', `Using the next interval: ${cronstr}`, 'debug');
     return cronstr;
   } catch (error) {
     log(
       'cron:parse-interval',
-      `Using default value due to: ${error.message || error}`
+      `Using default value ${WAZUH_MONITORING_DEFAULT_CRON_FREQ} due to: ${error.message || error}`
     );
-    return '0 1 * * * *';
+    return WAZUH_MONITORING_DEFAULT_CRON_FREQ;
   }
 }

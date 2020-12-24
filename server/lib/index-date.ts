@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-export function indexDate(interval) {
+export function indexDate(interval: 'h' | 'd' | 'w' | 'm') {
   try {
     if (!interval) throw new Error('Creation interval not found');
     const d = new Date()
@@ -48,7 +48,7 @@ export function indexDate(interval) {
   }
 }
 
-var weekOfYear = function() {
+function weekOfYear(): number {
   var d = new Date();
   d.setHours(0, 0, 0);
   d.setDate(d.getDate() + 4 - (d.getDay() || 7));

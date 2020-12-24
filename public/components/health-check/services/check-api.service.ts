@@ -51,15 +51,13 @@ export const checkApiService = async (): Promise<{ errors: string[] }> => {
   try {
     const currentApi = JSON.parse(AppState.getCurrentAPI() || '{}');
 
-    let data;
-
-    data = await ApiCheck.checkStored(currentApi.id).catch(async (err) => {
+    const data = await ApiCheck.checkStored(currentApi.id).catch(async (err) => {
       const newApi = await trySetDefault();
       if (newApi.error) {
         return { error: newApi.error };
       }
-      data = await ApiCheck.checkStored(newApi, true);
       apiChanged = true;
+      return await ApiCheck.checkStored(newApi, true);
     });
 
     if (apiChanged) {

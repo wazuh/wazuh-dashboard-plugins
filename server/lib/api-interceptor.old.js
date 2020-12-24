@@ -59,6 +59,7 @@ export class ApiInterceptor {
       return {};
     }
     const idHost = options.idHost;
+    const api = await this.manageHosts.getHostById(idHost);
     let token = await this.updateRegistry.getTokenById(idHost);
 
     if (token === null || options.forceRefresh) {
@@ -75,7 +76,7 @@ export class ApiInterceptor {
         },
         data: data.body || data || {},
         params: data.params || {},
-        url: path,
+        url: `${api.url}:${api.port}${path}`,
       };
     } else {
       return null;
@@ -88,6 +89,7 @@ export class ApiInterceptor {
       return {};
     }
     const idHost = options.idHost;
+    const api = await this.manageHosts.getHostById(idHost);
 
     if (token === null) {
        //TODO 
@@ -103,7 +105,7 @@ export class ApiInterceptor {
         },
         data: data.body || data || {},
         params: data.params || {},
-        url: path,
+        url: `${api.url}:${api.port}${path}`,
       };
     } else {
       return null;

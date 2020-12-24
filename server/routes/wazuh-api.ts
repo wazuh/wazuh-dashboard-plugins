@@ -1,28 +1,10 @@
 
-import { IRouter, RequestHandlerContext } from 'kibana/server';
+import { IRouter } from 'kibana/server';
 import { WazuhApiCtrl } from '../controllers/wazuh-api';
 import { schema } from '@kbn/config-schema';
-import { ISecurityFactory } from '../lib/security-factory';
 
-export function WazuhApiRoutes(router: IRouter, securityObj: ISecurityFactory) {
-  const ctrl = new WazuhApiCtrl(securityObj);
-
-  router.get({
-    path: '/api/wazuh/test',
-    validate: false
-  },
-  async (context, request, response) => {
-      const result = await context.core.elasticsearch.client.asInternalUser.search({
-        body: {
-          query: {
-            match_all: {}
-          }
-        }
-      });
-      return response.ok({
-        body: result
-      });
-    })
+export function WazuhApiRoutes(router: IRouter) {
+  const ctrl = new WazuhApiCtrl();
 
   // Returns if the wazuh-api configuration is working
   router.post({
@@ -30,6 +12,7 @@ export function WazuhApiRoutes(router: IRouter, securityObj: ISecurityFactory) {
     validate: {
       body: schema.object({
         id: schema.string(),
+        idChanged: schema.any()
       })
     }
   },
@@ -47,7 +30,15 @@ export function WazuhApiRoutes(router: IRouter, securityObj: ISecurityFactory) {
         port: schema.number(),
         username: schema.string(),
         forceRefresh: schema.boolean({defaultValue:false}),
-        cluster_info: schema.object({}),
+        cluster_info: schema.object({
+          status: schema.string(),
+          manager: schema.string(),
+          node: schema.string(),
+          cluster: schema.string()
+        }),
+        run_as: schema.boolean(),
+        extensions: schema.any(),
+        allow_run_as: schema.number()
       })
     }
   },
