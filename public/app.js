@@ -46,7 +46,7 @@ import { changeWazuhNavLogo } from './utils/wz-logo-menu';
 import './utils/fontawesome/scss/font-awesome.scss';
 
 // Dev tools
-//import './utils/codemirror';
+import './utils/codemirror';
 
 import './utils/jquery-ui';
 
