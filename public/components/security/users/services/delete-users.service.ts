@@ -11,7 +11,7 @@
  */
 
 import { User } from '../types/user.type';
-import { WzRequest } from '../../../../react-services/wz-request';
+import WzRequest from '../../../../react-services/wz-request';
 import IApiResponse from '../../../../react-services/interfaces/api-response.interface';
 
 const DeleteUsersService = async (

@@ -10,7 +10,7 @@ import {
 } from '@elastic/eui';
 import { WzButtonModalConfirm } from '../../../common/buttons';
 import UsersServices from '../services';
-import { ErrorHandler } from '../../../../react-services/error-handler';
+import ErrorHandler from '../../../../react-services/error-handler';
 import { WzAPIUtils } from '../../../../react-services/wz-api-utils';
 
 export const UsersTable = ({ users, editUserFlyover, rolesLoading, roles, onSave }) => {
@@ -76,10 +76,10 @@ export const UsersTable = ({ users, editUserFlyover, rolesLoading, roles, onSave
             onConfirm={async () => {
               try {
                 await UsersServices.DeleteUsers([item.id]);
-                ErrorHandler.info('User was successfully deleted');
+                ErrorHandler.info('User was successfully deleted','');
                 onSave();
               } catch (err) {
-                ErrorHandler.error(err);
+                ErrorHandler.handle(err,'There are an error');
               }
             }}
             modalProps={{ buttonColor: 'danger' }}

@@ -27,6 +27,7 @@ const login = async (force = false) => {
     }
     const response = await WzRequest.genericReq('POST', '/api/login', { idHost, force });
     const token = ((response || {}).data || {}).token;
+
     return token as string;
   } catch (error) {
     return Promise.reject(error);

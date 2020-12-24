@@ -23,7 +23,7 @@ import { Role } from '../../roles/types/role.type';
 import { CreateUser as TCreateUser } from '../types/user.type';
 import UsersServices from '../services';
 import RolesServices from '../../roles/services';
-import { ErrorHandler } from '../../../../react-services/error-handler';
+import ErrorHandler from '../../../../react-services/error-handler';
 import { useDebouncedEffect } from '../../../common/hooks/useDebouncedEffect';
 
 export const CreateUser = ({ closeFlyout }) => {
@@ -130,7 +130,7 @@ export const CreateUser = ({ closeFlyout }) => {
 
   const editUser = async () => {
     if (!isValidForm()) {
-      ErrorHandler.warning('Please resolve the incorrect fields.');
+      ErrorHandler.warning('Please resolve the incorrect fields.','');
       return;
     }
 
@@ -146,7 +146,7 @@ export const CreateUser = ({ closeFlyout }) => {
       const user = await UsersServices.CreateUser(userData);
       await addRoles(user.id);
 
-      ErrorHandler.info('User was successfully created');
+      ErrorHandler.info('User was successfully created','');
       closeFlyout(true);
     } catch (error) {
       ErrorHandler.handle(error, 'There was an error');

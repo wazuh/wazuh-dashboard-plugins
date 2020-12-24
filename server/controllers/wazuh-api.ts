@@ -73,8 +73,10 @@ export class WazuhApiCtrl {
     try {
       const { force, idHost } = request.body;
       const { userName, authContext } = await this.securityObj.getCurrentUser(request, context);
+      
       if (!force && request.headers.cookie && userName === this.getUserFromCookie(request.headers.cookie) && idHost === this.getApiIdFromCookie(request.headers.cookie)) {
         const wzToken = this.getTokenFromCookie(request.headers.cookie);
+
         if (wzToken) {
           try { // if the current token is not a valid jwt token we ask for a new one
             const decodedToken = jwtDecode(wzToken);
@@ -966,6 +968,13 @@ export class WazuhApiCtrl {
    * @returns {Object} API response or ErrorResponse
    */
   async makeRequest(method, path, data, id, response, token) {
+    // console.log("makeRequest");
+    // console.log(method);
+    // console.log(method, path );
+    // console.log(method, path, data );
+    // console.log(method, path, data, id );
+    // console.log(method, path, data, id, response)
+    
     const devTools = !!(data || {}).devTools;
     try {
       const api = await this.manageHosts.getHostById(id);
@@ -1053,7 +1062,10 @@ export class WazuhApiCtrl {
         }
       }
 
-      const responseToken = await this.apiInterceptor.requestToken(method, fullUrl, data, options, token);
+      const responseToken = await this.apiInterceptor.requestToken(method, fullUrl, data, options, token);  
+
+      console.log(responseToken.data, path);
+      
       const responseIsDown = this.checkResponseIsDown(responseToken);
       if (responseIsDown) {
         return ErrorResponse(
