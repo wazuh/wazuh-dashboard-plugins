@@ -54,7 +54,7 @@ class WzCurrentAgentsSection extends Component {
   async componentDidMount() {
     this.setGlobalBreadcrumb();
     store.dispatch(updateCurrentTab(this.props.currentTab));
-    const $injector = getAngularModule().injector();
+    const $injector = getAngularModule().$injector;
     this.router = $injector.get('$route');
   }
 

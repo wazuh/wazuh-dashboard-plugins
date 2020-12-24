@@ -36,7 +36,7 @@ class WzAgentSelector extends Component {
   }
 
   async componentDidMount() {
-    const $injector = getAngularModule().injector();
+    const $injector = getAngularModule().$injector;
     this.route = $injector.get('$route');
     this.location = $injector.get('$location');
   }

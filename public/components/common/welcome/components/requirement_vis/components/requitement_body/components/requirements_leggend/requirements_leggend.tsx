@@ -44,7 +44,7 @@ export function Requirements_leggend({ data, colors, requirement, agent }) {
 
 const goToDashboardWithFilter = (requirement, item, agent) => {
   store.dispatch(updateCurrentAgentData(agent));
-  const $injector = getAngularModule().injector();
+  const $injector = getAngularModule().$injector;
   const route = $injector.get('$route');
   getIndexPattern().then(indexPattern => {
     const filters = [{

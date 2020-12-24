@@ -60,7 +60,7 @@ export class VisFactoryHandler {
     const rawVisualizations = new RawVisualizations();
     //if(rawVisualizations.getType() !== 'general'){
       rawVisualizations.setType('general');
-      const $injector = getAngularModule().injector();
+      const $injector = getAngularModule().$injector;
       const commonData = $injector.get('commonData');
   
       try {
@@ -96,7 +96,7 @@ export class VisFactoryHandler {
     const rawVisualizations = new RawVisualizations();
   //  if (rawVisualizations.getType() !== 'agents') {
       rawVisualizations.setType('agents');
-      const $injector = getAngularModule().injector();
+      const $injector = getAngularModule().$injector;
       const commonData = $injector.get('commonData');
 
       try {

@@ -56,7 +56,7 @@ export class ScaScan extends Component {
 
   async componentDidMount() {
     this._isMount = true;
-    const $injector = getAngularModule().injector();
+    const $injector = getAngularModule().$injector;
     this.router = $injector.get('$route');
     this.getLastScan(this.props.agent.id);
   }

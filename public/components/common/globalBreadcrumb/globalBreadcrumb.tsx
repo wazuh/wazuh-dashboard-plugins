@@ -14,7 +14,7 @@ class WzGlobalBreadcrumb extends Component {
   }
 
   async componentDidMount() {
-    const $injector = getAngularModule().injector();
+    const $injector = getAngularModule().$injector;
     this.router = $injector.get('$route');
     $('#breadcrumbNoTitle').attr("title", "");
   }

@@ -63,7 +63,7 @@ class WzMenuSettings extends Component {
     this.props.closePopover();
     AppNavigate.navigateToModule(ev, 'settings', { tab: section });
     if (this.props.currentMenuTab === 'settings') {
-      const $injector = getAngularModule().injector();
+      const $injector = getAngularModule().$injector;
       const router = $injector.get('$route');
       router.reload();
     }

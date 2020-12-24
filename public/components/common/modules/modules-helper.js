@@ -2,7 +2,7 @@ import { getAngularModule, getDataPlugin } from '../../../kibana-services';
 
 export class ModulesHelper {
   static async getDiscoverScope() {
-    const $injector = getAngularModule().injector();
+    const $injector = getAngularModule().$injector;
     const location = $injector.get('$location');
     const initialTab = location.search().tab;
     return new Promise(resolve => {

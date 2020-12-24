@@ -82,7 +82,7 @@ class WzMenuAgent extends Component {
   async componentDidMount() {
     const extensions = await AppState.getExtensions(this.currentApi);
     this.setState({ extensions });
-    const $injector = getAngularModule().injector();
+    const $injector = getAngularModule().$injector;
     this.router = $injector.get('$route');
   }
 
