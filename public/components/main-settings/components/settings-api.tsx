@@ -28,13 +28,13 @@ import {
   EuiProgress,
   EuiIcon
 } from '@elastic/eui';
-import ApiCheck from '../../../react-services/wz-api-check';
 import { WzButtonPermissions } from '../../common/permissions/button';
 import GenericRequest from '../../../react-services/generic-request';
 import WzReduxProvider from '../../../redux/wz-redux-provider';
 import ErrorHandler from '../../../react-services/error-handler';
 import store from '../../../redux/store';
 import { updateSelectedSettingsSection } from '../../../redux/actions/appStateActions';
+import  ApiCheck  from '../../../react-services/wz-api-check';
 import AppState from '../../../react-services/app-state';
 import { API_USER_STATUS_RUN_AS } from '../../../../server/lib/cache-api-user-has-run-as';
 
@@ -52,7 +52,7 @@ export class ApiTable extends Component {
 
   async componentDidMount() {
     store.dispatch(updateSelectedSettingsSection('api'));
-    await this.getHosts();
+    await this.refresh();
 
   }
 
@@ -61,6 +61,7 @@ export class ApiTable extends Component {
       const apiEntriesResponse = await GenericRequest.request('GET', '/hosts/apis', {});
       const apiEntries = apiEntriesResponse.data;
       this.setState({ apiEntries, isLoading: false });
+      return apiEntries
     }
     catch (error) {
       this.setState({ isLoading: false });
@@ -96,10 +97,13 @@ export class ApiTable extends Component {
 
   showAddApiWithInitialError(error) {
     this.addApiProps.errorsAtInit = error;
-    this.apiEntries = [];
+    this.setState({ apiEntries: [] })
     this.addingApi = true;
   }
 
+  async testApi(entry, force) {
+    return await ApiCheck.checkApi(entry, force)
+  }
   /**
    * Refresh the API entries
    */
@@ -111,39 +115,41 @@ export class ApiTable extends Component {
       this.setState({
         refreshingEntries: true,
         apiEntries: hosts
-      });
-      const entries = this.state.apiEntries;
-      let numErr = 0;
-      for (let idx in entries) {
-        const entry = entries[idx];
-        try {
-          const data = await this.testApi(entry, true); // token refresh is forced
-          const clusterInfo = data.data || {};
-          const id = entries[idx].id;
-          entries[idx].status = 'online';
-          entries[idx].cluster_info = clusterInfo;
-          //Updates the cluster info in the registry
-          await this.updateClusterInfoInRegistry(id, clusterInfo);
-        } catch (error) {
-          numErr = numErr + 1;
-          const code = ((error || {}).data || {}).code;
-          const downReason = typeof error === 'string' ? error :
-            (error || {}).message || ((error || {}).data || {}).message || 'Wazuh is not reachable';
-          const status = code === 3099 ? 'down' : 'unknown';
-          entries[idx].status = { status, downReason };
-          if (entries[idx].id === this.props.currentDefault) { // if the selected API is down, we remove it so a new one will selected
-            AppState.removeCurrentAPI();
+      }, async() => {
+        const entries = this.state.apiEntries;
+        let numErr = 0;
+        for (let idx in entries) {
+          const entry = entries[idx];
+          try {
+            const data = await this.testApi(entry, true); // token refresh is forced
+            const clusterInfo = data.data || {};
+            const id = entries[idx].id;
+            entries[idx].status = 'online';
+            entries[idx].cluster_info = clusterInfo;
+            //Updates the cluster info in the registry
+            await this.updateClusterInfoInRegistry(id, clusterInfo);
+          } catch (error) {
+            numErr = numErr + 1;
+            const code = ((error || {}).data || {}).code;
+            const downReason = typeof error === 'string' ? error :
+              (error || {}).message || ((error || {}).data || {}).message || 'Wazuh is not reachable';
+            const status = code === 3099 ? 'down' : 'unknown';
+            entries[idx].status = { status, downReason };
+            if (entries[idx].id === this.currentDefault) {
+              AppState.removeCurrentAPI();
+            }
           }
         }
-      }
-      if (numErr) {
-        if (numErr >= entries.length) this.showApiIsDown();
-      }
-      this.setState({
-        apiEntries: entries,
-        status: status,
-        refreshingEntries: false
+        if (numErr) {
+          if (numErr >= entries.length) this.showApiIsDown();
+        }
+        this.setState({
+          apiEntries: entries,
+          status: status,
+          refreshingEntries: false
+        });
       });
+
     } catch (error) {
       if (
         error &&
@@ -414,7 +420,7 @@ export class ApiTable extends Component {
                 roles={[]}
                 tooltip={{ position: 'top', content: <p>Set as default</p> }}
                 iconType={
-                  item.id === this.props.currentDefault
+                  item.id === this.currentDefault
                     ? 'starFilled'
                     : 'starEmpty'
                 }
