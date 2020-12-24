@@ -11,7 +11,7 @@ export class OpendistroFactory implements ISecurityFactory {
     try {
       const elasticRequest = this.server.plugins.elasticsearch.getCluster('data');
       const params = {
-        path: `_opendistro/_security/api/account`,
+        path: `/_opendistro/_security/api/account`,
         method: 'GET',
       };
       
