@@ -49,7 +49,7 @@ export const RolesMappingCreate = ({
       await Promise.all(
         formattedRoles.map(async role => await RolesServices.AddRoleRules(role, [newRule.id]))
       );
-      ErrorHandler.info('Role mapping was successfully created');
+      ErrorHandler.info('Role mapping was successfully created','');
     } catch (error) {
       ErrorHandler.handle(error, 'There was an error');
     }

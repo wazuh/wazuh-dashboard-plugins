@@ -137,6 +137,7 @@ export const WzSecurity = compose(
             <RolesMapping></RolesMapping>
           } */}
           <Switch>
+            {/* <Route path="/security" render={() => <Users />} /> */}
             <Route path="/security/users" render={() => <Users />} />
             <Route path="/security/roles" render={() => <Roles />} />
             <Route path="/security/policies" render={() => <Policies />} />

@@ -17,8 +17,8 @@ import {
     EuiInMemoryTable,
     EuiFieldText,
 } from '@elastic/eui';
-import { WzRequest } from '../../../react-services/wz-request';
-import { ErrorHandler } from '../../../react-services/error-handler';
+import WzRequest from '../../../react-services/wz-request';
+import ErrorHandler from '../../../react-services/error-handler';
 import { WzAPIUtils } from '../../../react-services/wz-api-utils';
 
 
@@ -62,7 +62,7 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
             if (data.failed_items && data.failed_items.length) {
                 return;
             }
-            ErrorHandler.info('Role was successfully updated with the selected policies');
+            ErrorHandler.info('Role was successfully updated with the selected policies','');
             closeFlyout();
         }catch(error){ 
             ErrorHandler.handle(error, 'Unexpected error');

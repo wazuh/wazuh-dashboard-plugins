@@ -12,8 +12,9 @@ import {
     EuiComboBox
 } from '@elastic/eui';
 
-import { WzRequest } from '../../../react-services/wz-request';
-import { ErrorHandler } from '../../../react-services/error-handler';
+import WzRequest from '../../../react-services/wz-request';
+// import * as ErrorHandler from '../../../react-services/error-handler';
+import ErrorHandler from '../../../react-services/error-handler';
 
 
 
@@ -41,7 +42,7 @@ export const CreateRole = ({ closeFlyout }) => {
 
 
 
-    const createUser = async () => {
+    const createRole = async () => {
         if (!roleName) {
             setRoleNameError(true);
             return;
@@ -88,10 +89,10 @@ export const CreateRole = ({ closeFlyout }) => {
             if(policiesData.failed_items && policiesData.failed_items.length){
                 return;
             }
-            ErrorHandler.info('Role was successfully created with the selected policies');
+            ErrorHandler.info('Role was successfully created with the selected policies', '');
 
         } catch (error) {
-            ErrorHandler.handle(error, "There was an error");
+            ErrorHandler.handle(error, "Error creating a new role");
         }
         closeFlyout(false)
     }
@@ -142,7 +143,7 @@ export const CreateRole = ({ closeFlyout }) => {
                     />
                 </EuiFormRow>
                 <EuiSpacer />
-                <EuiButton fill onClick={createUser}>
+                <EuiButton fill onClick={createRole}>
                     Create role
                 </EuiButton>
             </EuiForm>

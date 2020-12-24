@@ -6,8 +6,8 @@ import {
     EuiToolTip,
     EuiButtonIcon
 } from '@elastic/eui';
-import { WzRequest } from '../../../react-services/wz-request';
-import { ErrorHandler } from '../../../react-services/error-handler';
+import WzRequest from '../../../react-services/wz-request';
+import ErrorHandler from '../../../react-services/error-handler';
 import { WzAPIUtils } from '../../../react-services/wz-api-utils';
 import { WzButtonModalConfirm } from '../../common/buttons';
 
@@ -92,7 +92,7 @@ export const PoliciesTable = ({policies, loading, editPolicy, updatePolicies}) =
                     if (data.failed_items && data.failed_items.length){
                         return;
                     }
-                    ErrorHandler.info('Policy was successfully deleted');
+                    ErrorHandler.info('Policy was successfully deleted','');
                     await updatePolicies();
                 }catch(error){
                     ErrorHandler.handle(error, 'Error deleting policy');

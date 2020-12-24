@@ -15,8 +15,8 @@ import {
     EuiComboBox,
 } from '@elastic/eui';
 
-import { WzRequest } from '../../../react-services/wz-request';
-import { ErrorHandler } from '../../../react-services/error-handler';
+import WzRequest from '../../../react-services/wz-request';
+import ErrorHandler from '../../../react-services/error-handler';
 import { EditRolesTable } from './edit-role-table';
 
 const reservedRoles = ['administrator', 'readonly', 'users_admin', 'agents_readonly', 'agents_admin', 'cluster_readonly', 'cluster_admin'];
@@ -76,7 +76,7 @@ export const EditRole = ({ role, closeFlyout }) => {
 
 
 
-    const addPolicy = async () => {
+    const editPolicy = async () => {
         if (!selectedPolicies.length) {
             setSelectedPoliciesError(true);
             return;
@@ -104,7 +104,7 @@ export const EditRole = ({ role, closeFlyout }) => {
             if (policiesData.failed_items && policiesData.failed_items.length) {
                 return;
             }
-            ErrorHandler.info('Role was successfully updated with the selected policies');
+            ErrorHandler.info('Role was successfully updated with the selected policies','');
             setSelectedPolicies([])
             await update();
         } catch (error) {
@@ -154,7 +154,7 @@ export const EditRole = ({ role, closeFlyout }) => {
                         </EuiFormRow>
                     </EuiFlexItem>
                     <EuiFlexItem grow={true}>
-                        <EuiButton style={{ marginTop: 20, maxWidth: 45 }} isDisabled={isReserved} fill onClick={addPolicy}>
+                        <EuiButton style={{ marginTop: 20, maxWidth: 45 }} isDisabled={isReserved} fill onClick={editPolicy}>
                             Add policy
                     </EuiButton>
 
