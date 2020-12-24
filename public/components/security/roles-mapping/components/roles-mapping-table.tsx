@@ -60,18 +60,20 @@ export const RolesMappingTable = ({ rolesEquivalences, rules, loading, editRule,
       field: 'id',
       name: 'Status',
       render (item, obj){
-        if( (obj.name == "wui_elastic_admin" || obj.name == "wui_opendistro_admin") && WzAPIUtils.isReservedID(item)){
-          return(
-            <EuiFlexGroup wrap>
-              <EuiBadge color="primary">Reserved</EuiBadge>
-              <EuiToolTip position="top" content="wui_ rules belong to wazuh-wui API user">
-                <EuiBadge color="accent">wazuh-wui</EuiBadge>
-              </EuiToolTip>
-            </EuiFlexGroup>
-          );
+        if(WzAPIUtils.isReservedID(item)){
+          if( (obj.name == "wui_elastic_admin" || obj.name == "wui_opendistro_admin")){
+            return(
+              <EuiFlexGroup wrap>
+                <EuiBadge color="primary">Reserved</EuiBadge>
+                <EuiToolTip position="top" content="wui_ rules belong to wazuh-wui API user">
+                  <EuiBadge color="accent">wazuh-wui</EuiBadge>
+                </EuiToolTip>
+              </EuiFlexGroup>
+            );
+          }
+          else
+            return <EuiBadge color="primary">Reserved</EuiBadge>;
         }
-        else if(WzAPIUtils.isReservedID(item))
-          return <EuiBadge color="primary">Reserved</EuiBadge>;
       },
       width: '150',
       sortable: false,
