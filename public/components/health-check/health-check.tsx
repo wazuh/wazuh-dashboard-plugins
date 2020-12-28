@@ -13,13 +13,14 @@ import { WAZUH_MONITORING_PATTERN } from '../../../util/constants';
 import { checkKibanaSettings, checkKibanaSettingsTimeFilter } from './lib';
 
 export class HealthCheck extends Component {
+    checkPatternCount = 0;
     constructor(props) {
         super(props);
         this.state = {
             checks: [],
             results: [],
             errors: []
-        };
+        };        
     }
     async componentDidMount() {
         const app = getAngularModule();
@@ -49,6 +50,8 @@ export class HealthCheck extends Component {
      * This validates a pattern
      */
     async checkPatterns() {
+        this.checkPatternCount++;
+        if (this.checkPatternCount > 5) throw new Error('Error trying to check patterns.');
         try {
             const patternId = AppState.getCurrentPattern();
             let patternTitle = '';
