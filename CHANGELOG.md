@@ -10,6 +10,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Top bar overlayed over expanded visualizations [#2667](https://github.com/wazuh/wazuh-kibana-app/issues/2667)
 - Wrong permissions on edit CDB list [#2665](https://github.com/wazuh/wazuh-kibana-app/pull/2665)
 - fix(frontend): add the metafields when refreshing the index pattern [#2681](https://github.com/wazuh/wazuh-kibana-app/pull/2681)
+- Error toast is showing about Elasticsearch users for environments without security [#2713](https://github.com/wazuh/wazuh-kibana-app/issues/2713)
 
 ## Wazuh v4.0.3 - Kibana v7.9.1, v7.9.2, v7.9.3 - Revision 4014
 
