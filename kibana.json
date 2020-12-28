@@ -3,7 +3,7 @@
   "version": "4.0.0",
   "kibanaVersion": "kibana",
   "configPath": ["wazuh"],
-  "requiredPlugins": ["navigation", "data", "discover", "inspector", "visualizations", "kibanaLegacy"],
+  "requiredPlugins": ["navigation", "data", "discover", "inspector", "visualizations", "kibanaLegacy", "uiActions"],
   "optionalPlugins": ["security", "opendistroSecurity", "searchguard", "spaces"],
   "requiredBundles": ["kibanaReact", "kibanaUtils"],
   "server": true,
