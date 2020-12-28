@@ -32,13 +32,9 @@ import { KibanaRequest, RequestHandlerContext, KibanaResponseFactory } from 'src
 import { ReportPrinter } from '../reporting/printer';
 
 import { log } from '../logger';
-import { WAZUH_ALERTS_PATTERN } from '../../util/constants';
-import { createDirectoryIfNotExists } from '../lib/filesystem';
+import { WAZUH_ALERTS_PATTERN, WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH, WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH } from '../../util/constants';
+import { createDirectoryIfNotExists, createDataDirectoryIfNotExists } from '../lib/filesystem';
 
-const DATA_WAZUH_BASE_PATH = '../../../../optimize';
-const DATA_WAZUH_PATH = path.join(__dirname, DATA_WAZUH_BASE_PATH, 'wazuh');
-const DATA_WAZUH_DOWNLOADS_PATH = path.join(DATA_WAZUH_PATH, 'downloads');
-const DATA_WAZUH_REPORTS_PATH = path.join(DATA_WAZUH_DOWNLOADS_PATH, 'reports');
 
 export class WazuhReportingCtrl {
   constructor() {}
@@ -1142,10 +1138,10 @@ export class WazuhReportingCtrl {
       const printer = new ReportPrinter();
 
       const {username: userID} = await context.wazuh.security.getCurrentUser(request, context);
-      createDirectoryIfNotExists(DATA_WAZUH_PATH);
-      createDirectoryIfNotExists(DATA_WAZUH_DOWNLOADS_PATH);
-      createDirectoryIfNotExists(DATA_WAZUH_REPORTS_PATH);
-      createDirectoryIfNotExists(path.join(DATA_WAZUH_REPORTS_PATH, userID));
+      createDataDirectoryIfNotExists();
+      createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
+      createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH);
+      createDirectoryIfNotExists(path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, userID));
 
       if (request.body && request.body.array) {
         const body = (request || {}).body || {};
@@ -1767,10 +1763,10 @@ export class WazuhReportingCtrl {
       const printer = new ReportPrinter();
       const section = 'overview';
       const {username: userID} = await context.wazuh.security.getCurrentUser(request, context);
-      createDirectoryIfNotExists(DATA_WAZUH_PATH);
-      createDirectoryIfNotExists(DATA_WAZUH_DOWNLOADS_PATH);
-      createDirectoryIfNotExists(DATA_WAZUH_REPORTS_PATH);
-      createDirectoryIfNotExists(path.join(DATA_WAZUH_REPORTS_PATH, userID));
+      createDataDirectoryIfNotExists();
+      createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
+      createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH);
+      createDirectoryIfNotExists(path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, userID));
 
       await this.renderHeader(context, printer, section, moduleID, agents, apiId);
       
@@ -1832,10 +1828,10 @@ export class WazuhReportingCtrl {
       const printer = new ReportPrinter();
 
       const {username: userID} = await context.wazuh.security.getCurrentUser(request, context);
-      createDirectoryIfNotExists(DATA_WAZUH_PATH);
-      createDirectoryIfNotExists(DATA_WAZUH_DOWNLOADS_PATH);
-      createDirectoryIfNotExists(DATA_WAZUH_REPORTS_PATH);
-      createDirectoryIfNotExists(path.join(DATA_WAZUH_REPORTS_PATH, userID));
+      createDataDirectoryIfNotExists();
+      createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
+      createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH);
+      createDirectoryIfNotExists(path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, userID));
 
       let tables = [];
       const equivalences = {
@@ -2129,10 +2125,10 @@ export class WazuhReportingCtrl {
       const printer = new ReportPrinter();
 
       const {username: userID} = await context.wazuh.security.getCurrentUser(request, context);
-      createDirectoryIfNotExists(DATA_WAZUH_PATH);
-      createDirectoryIfNotExists(DATA_WAZUH_DOWNLOADS_PATH);
-      createDirectoryIfNotExists(DATA_WAZUH_REPORTS_PATH);
-      createDirectoryIfNotExists(path.join(DATA_WAZUH_REPORTS_PATH, userID));
+      createDataDirectoryIfNotExists();
+      createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
+      createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH);
+      createDirectoryIfNotExists(path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, userID));
 
       let wmodulesResponse = {};
       let tables = [];
@@ -2401,10 +2397,10 @@ export class WazuhReportingCtrl {
       const printer = new ReportPrinter();
 
       const {username: userID} = await context.wazuh.security.getCurrentUser(request, context);
-      createDirectoryIfNotExists(DATA_WAZUH_PATH);
-      createDirectoryIfNotExists(DATA_WAZUH_DOWNLOADS_PATH);
-      createDirectoryIfNotExists(DATA_WAZUH_REPORTS_PATH);
-      createDirectoryIfNotExists(path.join(DATA_WAZUH_REPORTS_PATH, userID));
+      createDataDirectoryIfNotExists();
+      createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
+      createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH);
+      createDirectoryIfNotExists(path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, userID));
 
       log('reporting:createReportsAgentsInventory', `Syscollector report`, 'debug');
       const sanitizedFilters = filters ? this.sanitizeKibanaFilters(filters, searchBar) : false;
@@ -2616,10 +2612,10 @@ export class WazuhReportingCtrl {
     try {
       log('reporting:getReports', `Fetching created reports`, 'info');
       const {username: userID} = await context.wazuh.security.getCurrentUser(request, context);
-      createDirectoryIfNotExists(DATA_WAZUH_PATH);
-      createDirectoryIfNotExists(DATA_WAZUH_DOWNLOADS_PATH);
-      createDirectoryIfNotExists(DATA_WAZUH_REPORTS_PATH);
-      const userReportsDirectory = path.join(DATA_WAZUH_REPORTS_PATH, userID);
+      createDataDirectoryIfNotExists();
+      createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
+      createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH);
+      const userReportsDirectory = path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, userID);
       createDirectoryIfNotExists(userReportsDirectory);
       log('reporting:getReports', `Directory: ${userReportsDirectory}`, 'debug');
       

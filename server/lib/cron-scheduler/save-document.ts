@@ -74,65 +74,6 @@ export class SaveDocument {
       throw error;
   }
 
-  private async checkIndexPatternAndCreateIfNotExists(index) {
-    const KIBANA_INDEX = this.getKibanaIndex();
-    log(this.logPath, `Internal index of kibana: ${KIBANA_INDEX}`, 'debug');
-    const result = await this.esClientInternalUser.search('search', { //TODO: need saved object client?
-      index: KIBANA_INDEX,
-      type: '_doc',
-      body: {
-        query: {
-          match: {
-            _id: `index-pattern:${index}-*`
-          }
-        }
-      }
-    });
-    if (result.hits.total.value === 0) {
-      await this.createIndexPattern(KIBANA_INDEX, index);
-    }
-  }
-
-  private async createIndexPattern(KIBANA_INDEX: any, index: any) {
-    try {
-      const response = await this.esClientInternalUser.create({
-        index: KIBANA_INDEX,
-        type: '_doc',
-        'id': `index-pattern:${index}-*`,
-        body: {
-          type: 'index-pattern',
-          'index-pattern': {
-            title: `${index}-*`,
-            timeFieldName: 'timestamp',
-          }
-        }
-      });
-      log(
-        this.logPath,
-        `The indexPattern no exist, response of createIndexPattern: ${JSON.stringify(response)}`,
-        'debug'
-      );
-    } catch (error) {
-      this.checkDuplicateIndexPatterError(error);
-    }
-  }
-
-  private checkDuplicateIndexPatterError(error) {
-    const { type } = ((error || {}).body || {}).error || {};
-    if (!['version_conflict_engine_exception', 'resource_already_exists_exception'].includes(type))
-      throw error;
-  }
-
-  // Deprecated
-  private getKibanaIndex() {
-    return ((((this.server || {})
-      // @ts-ignore
-      .registrations || {})
-      .kibana || {})
-      .options || {})
-      .index || '.kibana';
-  }
-
   private createDocument(doc, index, mapping: string): BulkIndexDocumentsParams {
     const createDocumentObject: BulkIndexDocumentsParams = {
       index,

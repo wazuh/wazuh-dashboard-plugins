@@ -35,6 +35,9 @@ import { APIUserAllowRunAs, CacheInMemoryAPIUserAllowRunAs, API_USER_STATUS_RUN_
 import { getCookieValueByName } from '../lib/cookie';
 
 export class WazuhApiCtrl {
+  queue: Queue
+  manageHosts: ManageHosts
+  updateRegistry: UpdateRegistry
 
   constructor() {
     this.queue = Queue;
@@ -65,9 +68,9 @@ export class WazuhApiCtrl {
       }
       let token;
       if (await APIUserAllowRunAs.canUse(idHost)) {
-        token = await ApiInterceptor.authenticate(idHost, authContext)
+        token = await context.wazuh.api.client.asCurrentUser.authenticate(idHost);
       } else {
-        token = await ApiInterceptor.authenticate(idHost)
+        token = await context.wazuh.api.client.asINternalUser.authenticate(idHost);
       };
 
       return response.ok({
@@ -102,7 +105,7 @@ export class WazuhApiCtrl {
   async checkStoredAPI(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
     try {
       // Get config from wazuh.yml
-      const id = request.body.id || request.body;
+      const id = request.body.id;
       const api = await this.manageHosts.getHostById(id);
 
       // Check Manage Hosts
@@ -138,7 +141,7 @@ export class WazuhApiCtrl {
           'GET',
           `/agents`,
           { params: { agents_list: '000' } },
-          { idHost: id }
+          { apiHostID: id }
         );
 
         if (responseAgents.status === 200) {
@@ -148,7 +151,7 @@ export class WazuhApiCtrl {
             'GET',
             `/cluster/status`,
             {},
-            { idHost: id }
+            { apiHostID: id }
           );
           if (responseClusterStatus.status === 200) {
             if (responseClusterStatus.data.data.enabled === 'yes') {
@@ -156,7 +159,7 @@ export class WazuhApiCtrl {
                 'GET',
                 `/cluster/local/info`,
                 {},
-                { idHost: id }
+                { apiHostID: id }
               );
               if (responseClusterLocalInfo.status === 200) {
                 const clusterEnabled = responseClusterStatus.data.data.enabled === 'yes';
@@ -230,7 +233,6 @@ export class WazuhApiCtrl {
           for (const api of apis) {
             try {
               const id = Object.keys(api)[0];
-              const host = api[id];
 
               const response = await context.wazuh.api.client.asInternalUser.request(
                 'GET',
@@ -248,9 +250,9 @@ export class WazuhApiCtrl {
                 );
               }
               if (response.status === 200) {
-                request.body = id;
-                request.idChanged = id;
-                return this.checkStoredAPI(context, request, response);
+                request.body.id = id;
+                request.body.idChanged = id;
+                return await this.checkStoredAPI(context, request, response);
               }
             } catch (error) { } // eslint-disable-line
           }
@@ -304,18 +306,12 @@ export class WazuhApiCtrl {
       if (notValid) return ErrorResponse(notValid, 3003, 500, response);
       log('wazuh-api:checkAPI', `${request.body.id} is valid`, 'debug');
       // Check if a Wazuh API id is given (already stored API)
-      if (request.body && request.body.id && !request.body.password) {
-        const data = await this.manageHosts.getHostById(request.body.id);
-        if (data) {
-          apiAvailable = data;
-        } else {
-          log('wazuh-api:checkAPI', `API ${request.body.id} not found`);
-          return ErrorResponse(`The API ${request.body.id} was not found`, 3029, 500, response);
-        }
-        // Check if a password is given
-      } else if (request.body && request.body.password) { // TODO: Check if this is in use
-        apiAvailable = request.body;
-        apiAvailable.password = Buffer.from(request.body.password, 'base64').toString('ascii');
+      const data = await this.manageHosts.getHostById(request.body.id);
+      if (data) {
+        apiAvailable = data;
+      } else {
+        log('wazuh-api:checkAPI', `API ${request.body.id} not found`);
+        return ErrorResponse(`The API ${request.body.id} was not found`, 3029, 500, response);
       }
       const options = { apiHostID: request.body.id };
       if (request.body.forceRefresh) {
@@ -1295,7 +1291,7 @@ export class WazuhApiCtrl {
       } else if (output && output.data && output.data.data && !output.data.data.total_affected_items) {
         throw new Error('No results');
       } else {
-        throw new Error(`An error occurred fetching data from the Wazuh API${output && output.body && output.body.message ? `: ${output.body.message}` : ''}`);
+        throw new Error(`An error occurred fetching data from the Wazuh API${output && output.data && output.data.detail ? `: ${output.body.detail}` : ''}`);
       }
     } catch (error) {
       log('wazuh-api:csv', error.message || error);

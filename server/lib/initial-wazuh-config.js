@@ -200,8 +200,6 @@ export const initialWazuhConfig = `---
       #   - false or not defined: get same permissions of Wazuh API user.
       # run_as: <true|false>
  
- 
-
 hosts:
   - default:
      url: https://localhost
