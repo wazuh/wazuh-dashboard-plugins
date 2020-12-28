@@ -66,7 +66,7 @@ export const RolesMapping = () => {
       ErrorHandler.handle('There was an error loading internal users');
     }
   };
-
+  
   const getRules = async () => {
     try {
       const _rules = await RulesServices.GetRules();
@@ -79,7 +79,9 @@ export const RolesMapping = () => {
   const initData = async () => {
     setLoadingTable(true);
     await getRules();
-    await getInternalUsers();
+    if(currentPlatform !== "elastic"){
+      await getInternalUsers();
+    }
     setLoadingTable(false);
   };
 
