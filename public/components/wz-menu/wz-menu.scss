@@ -34,9 +34,9 @@ wz-menu {
 }
 
 .wz-menu-wrapper{
-    margin-top: -16px;
-    margin-left: -16px;
-    margin-bottom: -16px;
+    margin-top: 1.6rem;
+    margin-left: -1.6rem;
+    margin-bottom: -1.1rem;
     display: flex;
 }
 
@@ -101,7 +101,7 @@ wz-menu {
     border-bottom: 12px solid #fafbfd!important;
 }
 
-.wz-menu-popover-under .euiPopover__panelArrow.euiPopover__panelArrow--bottom:after, 
+.wz-menu-popover-under .euiPopover__panelArrow.euiPopover__panelArrow--bottom:after,
 .wz-menu-popover-under .euiPopover__panelArrow.euiPopover__panelArrow--bottom:before {
     display: none;
 }
@@ -185,7 +185,7 @@ wz-menu {
     filter: hue-rotate(30deg) brightness(0.8);
     margin-top: 4px;
   }
-  
+
 .wz-menu-button {
     font-size: 14px !important;
     transition: none !important;
