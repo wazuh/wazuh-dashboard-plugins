@@ -11,6 +11,8 @@ import {
   setSavedObjects,
   setOverlays,
   setScopedHistory,
+  setCore,
+  setPlugins,
 } from './kibana-services';
 import {
   AppPluginStartDependencies,
@@ -41,7 +43,6 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupDep
         const { renderApp } = await import('./application');
         // Get start services as specified in kibana.json
         const [coreStart, depsStart] = await core.getStartServices();
-
         setHttp(core.http);
         await this.initializeInnerAngular();
 
@@ -76,6 +77,8 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupDep
       this.innerAngularInitialized = true;
     };
 
+    setCore(core);
+    setPlugins(plugins);
     setHttp(core.http);
     setToasts(core.notifications.toasts);
     setDataPlugin(plugins.data);

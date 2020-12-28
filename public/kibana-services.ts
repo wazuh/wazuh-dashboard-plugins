@@ -8,12 +8,16 @@ import {
   SavedObjectsStart,
   OverlayStart,
   ScopedHistory,
+  CoreStart,
 } from 'kibana/public';
 import { createGetterSetter } from '../../../src/plugins/kibana_utils/common';
 import { DataPublicPluginStart } from '../../../src/plugins/data/public';
 import { VisualizationsStart } from '../../../src/plugins/visualizations/public';
 import { NavigationPublicPluginStart } from '../../../src/plugins/navigation/public';
+import { AppPluginStartDependencies } from './types';
 
+export const [getCore, setCore] = createGetterSetter<CoreStart>('Core');
+export const [getPlugins, setPlugins] = createGetterSetter<AppPluginStartDependencies>('Plugins');
 export const [getToasts, setToasts] = createGetterSetter<ToastsStart>('Toasts');
 export const [getHttp, setHttp] = createGetterSetter<HttpStart>('Http');
 export const [getUiSettings, setUiSettings] = createGetterSetter<IUiSettingsClient>('UiSettings');

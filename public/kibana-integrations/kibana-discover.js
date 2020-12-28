@@ -20,7 +20,7 @@
 import discoverTemplate from '../templates/discover/discover.html';
 import store from '../redux/store';
 import { updateVis } from '../redux/actions/visualizationsActions';
-import { getAngularModule } from '../kibana-services';
+import { getAngularModule, getCore, getPlugins } from '../kibana-services';
 
 getAngularModule().directive('kbnDis', [
   function () {
@@ -35,10 +35,10 @@ getAngularModule().directive('kbnDis', [
 // Added dependencies (from Kibana module)
 import './discover_dependencies';
 //import 'ui/directives/render_directive';
-//import '../../../../src/plugins/discover/public/application/angular/directives';
-//import { DocViewsRegistry } from '../../../../src/plugins/discover/public/application/doc_views/doc_views_registry';
-//import { DocViewTable } from '../../../../src/plugins/discover/public/application/components/table/table';
-//import { JsonCodeBlock } from '../../../../src/plugins/discover/public/application/components/json_code_block/json_code_block';
+import './discover/application/angular/directives';
+import { DocViewsRegistry } from './discover/application/doc_views/doc_views_registry';
+import { DocViewTable } from './discover/application/components/table/table';
+import { JsonCodeBlock } from './discover/application/components/json_code_block/json_code_block';
 import _ from 'lodash';
 
 import { Subscription, Subject, merge } from 'rxjs';
@@ -46,16 +46,14 @@ import { debounceTime } from 'rxjs/operators';
 import moment from 'moment';
 import dateMath from '@elastic/datemath';
 import { i18n } from '@kbn/i18n';
-//import { getState, splitState } from '../../../../src/plugins/discover/public/application/angular/discover_state';
+import { getState, splitState } from './discover/application/angular/discover_state';
 
 import { RequestAdapter } from '../../../../src/plugins/inspector/public';
-//import { getSortArray, getSortForSearchSource } from '../../../../src/plugins/discover/public/application/angular/doc_table';
-//import * as columnActions from '../../../../src/plugins/discover/public/application/angular/doc_table/actions/columns';
+import { getSortArray, getSortForSearchSource } from './discover/application/angular/doc_table';
+import * as columnActions from './discover/application/angular/doc_table/actions/columns';
 
-//import '../../../../src/plugins/discover/public/application/components/fetch_error/';
-//import { getPainlessError } from '../../../../src/plugins/discover/public/application/angular/get_painless_error';
-//import { discoverResponseHandler } from '../../../../src/plugins/discover/public/application/angular/response_handler';
-/* import {
+import { discoverResponseHandler } from './discover/application/angular/response_handler';
+import {
   getRequestInspectorStats,
   getResponseInspectorStats,
   getServices,
@@ -63,16 +61,14 @@ import { RequestAdapter } from '../../../../src/plugins/inspector/public';
   setDocViewsRegistry,
   subscribeWithScope,
   tabifyAggResponse,
-  getAngularModule,
-} from '../../../../src/plugins/discover/public/kibana_services'; */
+} from './discover/kibana_services';
 
 ///WAZUH///
-//import { buildServices } from '../../../../src/plugins/discover/public/build_services';
-//import { npStart } from 'ui/new_platform';
+import { buildServices } from './discover/build_services';
 import { WazuhConfig } from '../react-services/wazuh-config';
 import { ModulesHelper } from '../components/common/modules/modules-helper';
 ///////////
-//import { validateTimeRange } from '../../../../src/plugins/discover/public/application/helpers/validate_time_range';
+import { validateTimeRange } from './discover/application/helpers/validate_time_range';
 import {
   fieldFormats,
   esFilters,
@@ -85,31 +81,33 @@ import {
 } from '../../../../src/plugins/data/public';
 import { addFatalError } from '../../../../src/plugins/kibana_legacy/public';
 import { WAZUH_ALERTS_PATTERN } from '../../util/constants';
-/* import {
+import {
   DEFAULT_COLUMNS_SETTING,
   SAMPLE_SIZE_SETTING,
   SORT_DEFAULT_ORDER_SETTING,
   SEARCH_ON_PAGE_LOAD_SETTING,
   DOC_HIDE_TIME_COLUMN_SETTING,
-} from '../../../../src/plugins/discover/common/'; */
+} from './discover/common';
 import { AppState } from '../react-services/app-state';
 
 const fetchStatuses = {
   UNINITIALIZED: 'uninitialized',
   LOADING: 'loading',
   COMPLETE: 'complete',
+  NO_RESULTS: 'none'
 };
 
 const app = angular.module('app/discover', []);
 const wazuhApp = getAngularModule();
-/* app.run(async () => {
+app.run(async () => {
   const services = await buildServices(
-    npStart.core,
-    npStart.plugins,
-    { env: { packageInfo: { branch: "7.9" } } }
+    getCore(),
+    getPlugins(),
+    { env: { packageInfo: { branch: "7.10" } } },
+    () => {}
   );
   setServices(services);
-}); */
+});
 
 app.directive('discoverAppW', function () {
   return {
@@ -151,11 +149,12 @@ function discoverController(
   }
 
   (async () => {
-   /*  const services = await buildServices(
-      npStart.core,
-      npStart.plugins,
-      { env: { packageInfo: { branch: "7.9" } } }
-    ); */
+     const services = await buildServices(
+      getCore(),
+      getPlugins(),
+      { env: { packageInfo: { branch: "7.10" } } },
+      () => {}
+    );
     this.docViewsRegistry = new DocViewsRegistry();
     setDocViewsRegistry(this.docViewsRegistry);
     this.docViewsRegistry.addDocView({
@@ -658,19 +657,10 @@ function discoverController(
       .catch((error) => {
         // If the request was aborted then no need to surface this error in the UI
         if (error instanceof Error && error.name === 'AbortError') return;
-
-        const fetchError = getPainlessError(error);
-
-        if (fetchError) {
-          $scope.fetchError = fetchError;
-        } else {
-          getToasts().addError(error, {
-            title: i18n.translate('discover.errorLoadingData', {
-              defaultMessage: 'Error loading data',
-            }),
-            toastMessage: error.shortMessage || error.body?.message,
-          });
-        }
+      
+        $scope.fetchStatus = fetchStatuses.NO_RESULTS;
+        $scope.rows = [];
+        data.search.showError(error);
       });
   };
 

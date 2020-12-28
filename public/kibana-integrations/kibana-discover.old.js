@@ -36,10 +36,10 @@ app.directive('kbnDis', [
 // Added dependencies (from Kibana module)
 import './discover_dependencies';
 import 'ui/directives/render_directive';
-import '../../../../src/plugins/discover/public/application/angular/directives';
-import { DocViewsRegistry } from '../../../../src/plugins/discover/public/application/doc_views/doc_views_registry';
-import { DocViewTable } from '../../../../src/plugins/discover/public/application/components/table/table';
-import { JsonCodeBlock } from '../../../../src/plugins/discover/public/application/components/json_code_block/json_code_block';
+import './discover/application/angular/directives';
+import { DocViewsRegistry } from './discover/application/doc_views/doc_views_registry';
+import { DocViewTable } from './discover/application/components/table/table';
+import { JsonCodeBlock } from './discover/application/components/json_code_block/json_code_block';
 import _ from 'lodash';
 
 import { Subscription, Subject, merge } from 'rxjs';
@@ -47,15 +47,15 @@ import { debounceTime } from 'rxjs/operators';
 import moment from 'moment';
 import dateMath from '@elastic/datemath';
 import { i18n } from '@kbn/i18n';
-import { getState, splitState } from '../../../../src/plugins/discover/public/application/angular/discover_state';
+import { getState, splitState } from './discover/application/angular/discover_state';
 
 import { RequestAdapter } from '../../../../src/plugins/inspector/public';
-import { getSortArray, getSortForSearchSource } from '../../../../src/plugins/discover/public/application/angular/doc_table';
-import * as columnActions from '../../../../src/plugins/discover/public/application/angular/doc_table/actions/columns';
+import { getSortArray, getSortForSearchSource } from './discover/application/angular/doc_table';
+import * as columnActions from './discover/application/angular/doc_table/actions/columns';
 
-import '../../../../src/plugins/discover/public/application/components/fetch_error/';
-import { getPainlessError } from '../../../../src/plugins/discover/public/application/angular/get_painless_error';
-import { discoverResponseHandler } from '../../../../src/plugins/discover/public/application/angular/response_handler';
+import './discover/application/components/fetch_error/';
+import { getPainlessError } from './discover/application/angular/get_painless_error';
+import { discoverResponseHandler } from './discover/application/angular/response_handler';
 import {
   getRequestInspectorStats,
   getResponseInspectorStats,
@@ -72,7 +72,7 @@ import { buildServices } from '../../../../src/plugins/discover/public/build_ser
 import { WazuhConfig } from '../react-services/wazuh-config';
 import { ModulesHelper } from '../components/common/modules/modules-helper';
 ///////////
-import { validateTimeRange } from '../../../../src/plugins/discover/public/application/helpers/validate_time_range';
+import { validateTimeRange } from './discover/application/helpers/validate_time_range';
 import {
   fieldFormats,
   esFilters,
