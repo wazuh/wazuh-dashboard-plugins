@@ -44,7 +44,7 @@ export const RolesMapping = () => {
       setRolesEquivalences(_rolesObject);
     }
     if (rolesError) {
-      ErrorHandler.error('There was an error loading roles');
+      ErrorHandler.handle('There was an error loading roles');
     }
   }, [rolesLoading]);
 
@@ -63,7 +63,7 @@ export const RolesMapping = () => {
       }).sort((a, b) => (a.user > b.user) ? 1 : (a.user < b.user) ? -1 : 0);      
       setInternalUsers(_users);
     } catch (error) {
-      ErrorHandler.error('There was an error loading internal users');
+      ErrorHandler.handle('There was an error loading internal users');
     }
   };
 
@@ -72,7 +72,7 @@ export const RolesMapping = () => {
       const _rules = await RulesServices.GetRules();
       setRules(_rules);
     } catch (error) {
-      ErrorHandler.error('There was an error loading rules');
+      ErrorHandler.handle('There was an error loading rules');
     }
   };
 
