@@ -24,21 +24,21 @@ export function WazuhApiRoutes(router: IRouter) {
   router.post({
     path: '/api/check-api',
     validate: {
-      body: schema.object({
-        id: schema.string(),
-        url: schema.string(),
-        port: schema.number(),
-        username: schema.string(),
-        forceRefresh: schema.boolean({defaultValue:false}),
-        cluster_info: schema.object({
-          status: schema.string(),
-          manager: schema.string(),
-          node: schema.string(),
-          cluster: schema.string()
-        }),
-        run_as: schema.nullable(schema.boolean()),
-        extensions: schema.any(),
-        allow_run_as: schema.number()
+      body: schema.any({ // TODO: not ready
+        //id: schema.string(),
+        // url: schema.string(),
+        // port: schema.number(),
+        // username: schema.string(),
+        //forceRefresh: schema.boolean({defaultValue:false}),
+        // cluster_info: schema.object({
+        //   status: schema.string(),
+        //   manager: schema.string(),
+        //   node: schema.string(),
+        //   cluster: schema.string()
+        // }),
+        // run_as: schema.boolean(),
+        // extensions: schema.any(),
+        // allow_run_as: schema.number()
       })
     }
   },

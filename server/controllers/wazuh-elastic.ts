@@ -831,10 +831,7 @@ export class WazuhElasticCtrl {
           'debug'
         );
       }
-      // await context.core.elasticsearch.client.asInternalUser.bulk({
-        index: sampleAlertsIndex,
-        body: bulk
-      });
+
       await context.core.elasticsearch.client.asInternalUser.bulk({
         index: sampleAlertsIndex,
         body: bulk
