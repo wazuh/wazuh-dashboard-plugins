@@ -62,7 +62,7 @@ export const RolesMappingTable = ({ rolesEquivalences, rules, loading, editRule,
       name: 'Status',
       render (item, obj){
         if(WzAPIUtils.isReservedID(item)){
-          if( (obj.id == 1 || obj.id == 2)){
+          if( (obj.id === 1 || obj.id === 2)){
             return(
               <EuiFlexGroup>
               <EuiBadge color="primary">Reserved</EuiBadge>
