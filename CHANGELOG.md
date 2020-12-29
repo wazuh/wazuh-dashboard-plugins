@@ -15,6 +15,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Wrong permissions on edit CDB list [#2665](https://github.com/wazuh/wazuh-kibana-app/pull/2665)
 - fix(frontend): add the metafields when refreshing the index pattern [#2681](https://github.com/wazuh/wazuh-kibana-app/pull/2681)
 - Error about Handler.error in Role Mapping fixed [#2702](https://github.com/wazuh/wazuh-kibana-app/issues/2702)
+- Fixed message in reserved users actions [#2702](https://github.com/wazuh/wazuh-kibana-app/issues/2702)
 
 ## Wazuh v4.0.3 - Kibana v7.9.1, v7.9.2, v7.9.3 - Revision 4014
 
