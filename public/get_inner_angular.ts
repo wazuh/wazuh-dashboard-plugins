@@ -41,6 +41,8 @@ import {
 } from '../../../src/plugins/kibana_legacy/public';
 import { AppPluginStartDependencies } from './types';
 import { getScopedHistory } from './kibana-services';
+import { createDiscoverLegacyDirective } from './kibana-integrations/discover/application/components/create_discover_legacy_directive';
+import { createContextErrorMessageDirective } from './kibana-integrations/discover/application/components/context_error_message';
 
 /**
  * returns the main inner angular module, it contains all the parts of Angular Discover
@@ -82,10 +84,8 @@ export function initializeInnerAngularModule(
     createLocalI18nModule();
     createLocalPrivateModule();
     createLocalPromiseModule();
- /*    createLocalTopNavModule(navigation);
+    createLocalTopNavModule(navigation);
     createLocalStorageModule();
-    createPagerFactoryModule();
-    createDocTableModule(); */
     initialized = true;
   } 
 
@@ -97,15 +97,12 @@ export function initializeInnerAngularModule(
         'ngMaterial',
         'chart.js',
         'ui.bootstrap',
-        'wazuhI18n',
-        'wazuhPrivate',
-        'wazuhPromise',        
-        //'wazuhDocTable',
-        //'wazuhPagerFactory',
+        'discoverI18n',
+        'discoverPrivate',
+        'discoverPromise',        
       ])
       .config(watchMultiDecorator)
-      .directive('icon', (reactDirective) => reactDirective(EuiIcon));
-    //.directive('renderComplete', createRenderCompleteDirective);
+      .directive('icon', (reactDirective) => reactDirective(EuiIcon))
   }
 
   return angular
@@ -116,39 +113,36 @@ export function initializeInnerAngularModule(
       'ngMaterial',
       'chart.js',
       'ui.bootstrap',
-      'wazuhI18n',
-      'wazuhPrivate',
-      'wazuhPromise',
-      /* 'wazuhTopNav',
-      'wazuhLocalStorageProvider',
-      'wazuhDocTable',
-      'wazuhPagerFactory', */
+      'discoverI18n',
+      'discoverPrivate',
+      'discoverPromise',
+      'discoverTopNav',
+      'discoverLocalStorageProvider',
     ])
     .config(watchMultiDecorator)
-    .run(registerListenEventListener);
-  //.directive('renderComplete', createRenderCompleteDirective)
-  //.directive('discoverLegacy', createDiscoverLegacyDirective)
-  //.directive('contextErrorMessage', createContextErrorMessageDirective);
+    .run(registerListenEventListener)
+  .directive('discoverLegacy', createDiscoverLegacyDirective)
+  .directive('contextErrorMessage', createContextErrorMessageDirective);
 }
 
 function createLocalPromiseModule() {
-  angular.module('wazuhPromise', []).service('Promise', PromiseServiceCreator);
+  angular.module('discoverPromise', []).service('Promise', PromiseServiceCreator);
 }
 
 function createLocalPrivateModule() {
-  angular.module('wazuhPrivate', []).provider('Private', PrivateProvider);
+  angular.module('discoverPrivate', []).provider('Private', PrivateProvider);
 }
 
 function createLocalTopNavModule(navigation: NavigationStart) {
   angular
-    .module('wazuhTopNav', ['react'])
+    .module('discoverTopNav', ['react'])
     .directive('kbnTopNav', createTopNavDirective)
     .directive('kbnTopNavHelper', createTopNavHelper(navigation.ui));
 }
 
 function createLocalI18nModule() {
   angular
-    .module('wazuhI18n', [])
+    .module('discoverI18n', [])
     .provider('i18n', I18nProvider)
     .filter('i18n', i18nFilter)
     .directive('i18nId', i18nDirective);
@@ -156,7 +150,7 @@ function createLocalI18nModule() {
 
 function createLocalStorageModule() {
   angular
-    .module('wazuhLocalStorageProvider', ['wazuhPrivate'])
+    .module('discoverLocalStorageProvider', ['discoverPrivate'])
     .service('localStorage', createLocalStorageService('localStorage'))
     .service('sessionStorage', createLocalStorageService('sessionStorage'));
 }
@@ -167,17 +161,5 @@ const createLocalStorageService = function (type: string) {
   };
 };
 
-function createPagerFactoryModule() {
-  //angular.module('discoverPagerFactory', []).factory('pagerFactory', createPagerFactory);
-}
 
-function createDocTableModule() {
-  angular.module('wazuhDocTable', ['discoverPagerFactory', 'react']);
-  /*.directive('docTable', createDocTableDirective)
-    .directive('kbnTableHeader', createTableHeaderDirective)
-    .directive('toolBarPagerText', createToolBarPagerTextDirective)
-    .directive('kbnTableRow', createTableRowDirective)
-    .directive('toolBarPagerButtons', createToolBarPagerButtonsDirective)
-    .directive('kbnInfiniteScroll', createInfiniteScrollDirective)
-    .directive('docViewer', createDocViewerDirective);*/
-}
+

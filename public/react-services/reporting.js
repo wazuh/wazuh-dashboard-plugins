@@ -19,7 +19,7 @@ import { RawVisualizations } from '../factories/raw-visualizations';
 import { VisHandlers } from '../factories/vis-handlers';
 import { getToasts }  from '../kibana-services';
 import { getAngularModule } from '../kibana-services';
-const app = getAngularModule('app/wazuh');
+const app = getAngularModule();
 
 export class ReportingService {
   constructor() {

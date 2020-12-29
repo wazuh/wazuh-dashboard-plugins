@@ -12,7 +12,6 @@ export async function renderApp(moduleName: string, element: HTMLElement) {
 function mountWazuhApp(moduleName: string, element: HTMLElement) {
   const mountpoint = document.createElement('div');
   const appWrapper = document.createElement('div');
-  //appWrapper.setAttribute('ng-view', '');
   mountpoint.appendChild(appWrapper);
   // bootstrap angular into detached element and attach it later to
   // make angular-within-angular possible

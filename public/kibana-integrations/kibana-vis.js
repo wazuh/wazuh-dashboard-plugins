@@ -214,8 +214,8 @@ class KibanaVis extends Component {
           this.renderInProgress = true;
           const rawVis = raw.filter((item) => item && item.id === this.visID);
           this.visualization = await this.savedObjectLoaderVisualize.get(
-            this.visID,
-            rawVis[0]
+            rawVis[0].type,
+            rawVis[0].id
           );
           this.visualization.searchSource = await getDataPlugin().search.searchSource.create();
           // Visualization doesn't need the "_source"

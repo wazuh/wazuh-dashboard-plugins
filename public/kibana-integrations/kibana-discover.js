@@ -109,7 +109,7 @@ const fetchStatuses = {
 const app = angular.module('app/discover', []);
 const wazuhApp = getAngularModule();
 
-app.directive('discoverAppW', function () {
+getAngularModule().directive('discoverAppW', function () {
   return {
     restrict: 'E',
     controllerAs: 'discoverApp',
