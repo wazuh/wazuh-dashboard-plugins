@@ -8,6 +8,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Create index pattern even if there aren´t available indices [#2620](https://github.com/wazuh/wazuh-kibana-app/issues/2620)
 - Top bar overlayed over expanded visualizations [#2667](https://github.com/wazuh/wazuh-kibana-app/issues/2667)
+- Empty inventory data in Solaris agents [#2680](https://github.com/wazuh/wazuh-kibana-app/pull/2680)
+- Wrong parameters in the dev-tools autocomplete section [#2675](https://github.com/wazuh/wazuh-kibana-app/issues/2675)
 - Wrong permissions on edit CDB list [#2665](https://github.com/wazuh/wazuh-kibana-app/pull/2665)
 - fix(frontend): add the metafields when refreshing the index pattern [#2681](https://github.com/wazuh/wazuh-kibana-app/pull/2681)
 
