@@ -37,4 +37,4 @@ app
   //.directive('hitsCounter', createHitsCounterDirective)
   //.directive('loadingSpinner', createLoadingSpinnerDirective)
   //.directive('timechartHeader', createTimechartHeaderDirective)
-  .directive('contextErrorMessage', createContextErrorMessageDirective) */
+  .directive('contextErrorMessage', createContextErrorMessageDirective)

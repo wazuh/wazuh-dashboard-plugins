@@ -17,7 +17,7 @@ import { read } from 'read-last-lines';
 import path from 'path';
 import { UpdateConfigurationFile } from '../lib/update-configuration';
 import jwtDecode from 'jwt-decode';
-import { WAZUH_ROLE_ADMINISTRATOR_ID } from '../../util/constants';
+import { WAZUH_ROLE_ADMINISTRATOR_ID, WAZUH_DATA_LOGS_RAW_PATH } from '../../util/constants';
 import { ManageHosts } from '../lib/manage-hosts';
 import { KibanaRequest, RequestHandlerContext, KibanaResponseFactory } from 'src/core/server';
 import { getCookieValueByName } from '../lib/cookie';
@@ -109,7 +109,7 @@ export class WazuhUtilsCtrl {
   async getAppLogs(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
     try {
       const lastLogs = await read(
-        path.join(__dirname, '../../../../optimize/wazuh/logs/wazuhapp.log'),
+        WAZUH_DATA_LOGS_RAW_PATH,
         50
       );
       const spliterLog = lastLogs.split('\n');

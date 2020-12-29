@@ -10,15 +10,13 @@
  * Find more information about this on the LICENSE file.
  */
 import fs from 'fs';
-import path from 'path';
 import { log } from '../logger';
-
-const OPTIMIZE_WAZUH_PATH = '../../../../optimize/wazuh';
+import { WAZUH_DATA_CONFIG_REGISTRY_PATH } from '../../util/constants';
 
 export class UpdateRegistry {
   constructor() {
     this.busy = false;
-    this.file = path.join(__dirname, `${OPTIMIZE_WAZUH_PATH}/config/wazuh-registry.json`);
+    this.file = WAZUH_DATA_CONFIG_REGISTRY_PATH;
   }
 
   /**

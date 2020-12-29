@@ -1,27 +1,25 @@
 import { BulkIndexDocumentsParams } from 'elasticsearch';
 import { getConfiguration } from '../get-configuration';
 import { log } from '../../logger.js';
-import { indexDate } from '../index-date.js';
+import { indexDate } from '../index-date';
 import { WAZUH_INDEX_SHARDS, WAZUH_INDEX_REPLICAS } from '../../../util/constants'
 
 export interface IIndexConfiguration {
   name: string
   creation: 'h' | 'd' | 'w' | 'm'
   mapping?: string
-  shards: number
-  replicas: number
+  shards?: number
+  replicas?: number
 }
 
 export class SaveDocument {
-  server: object;
-  callWithRequest: Function
-  callWithInternalUser: Function
+  context: any;
+  esClientInternalUser: any;
   logPath = 'cron-scheduler|SaveDocument';
 
-  constructor(server) {
-    this.server = server;
-    this.callWithRequest = server.plugins.elasticsearch.getCluster('data').callWithRequest;
-    this.callWithInternalUser = server.plugins.elasticsearch.getCluster('data').callWithInternalUser;
+  constructor(context) {
+    this.context = context;
+    this.esClientInternalUser = context.core.elasticsearch.client.asInternalUser;
   }
 
   async save(doc: object[], indexConfig: IIndexConfiguration) {
@@ -29,11 +27,11 @@ export class SaveDocument {
     const index = this.addIndexPrefix(name);
     const indexCreation = `${index}-${indexDate(creation)}`;
     try {
-      await this.checkIndexAndCreateIfNotExists(indexCreation ,shards, replicas);
+      await this.checkIndexAndCreateIfNotExists(indexCreation, shards, replicas);
       const createDocumentObject = this.createDocument(doc, indexCreation, mapping);
-      const response = await this.callWithInternalUser('bulk', createDocumentObject);
+      const response = await this.esClientInternalUser.bulk(createDocumentObject);
       log(this.logPath, `Response of create new document ${JSON.stringify(response)}`, 'debug');
-      await this.checkIndexPatternAndCreateIfNotExists(index);
+      // await this.checkIndexPatternAndCreateIfNotExists(index);
     } catch (error) {
       if (error.status === 403)
         throw { error: 403, message: `Authorization Exception in the index "${index}"` }
@@ -45,11 +43,12 @@ export class SaveDocument {
 
   private async checkIndexAndCreateIfNotExists(index, shards, replicas) {
     try {
-      const exists = await this.callWithInternalUser('indices.exists', { index });
-      log(this.logPath, `Index '${index}' exists? ${exists}`, 'debug');
-      if (!exists) {
-        const response = await this.callWithInternalUser('indices.create',
-        {
+      try{
+        const exists = await this.esClientInternalUser.indices.exists({ index });
+        log(this.logPath, `Index '${index}' exists? ${exists.body}`, 'debug');
+      }catch(error){
+        log(this.logPath, `Index '${index}' exists? false`, 'debug');
+        const response = await this.esClientInternalUser.indices.create({
           index,
           body: {
             settings: {
@@ -62,6 +61,7 @@ export class SaveDocument {
         });
         
         log(this.logPath, `Status of create a new index: ${JSON.stringify(response)}`, 'debug');
+
       }
     } catch (error) {
       this.checkDuplicateIndexError(error);
@@ -72,65 +72,6 @@ export class SaveDocument {
     const { type } = ((error || {}).body || {}).error || {};
     if (!['resource_already_exists_exception'].includes(type))
       throw error;
-  }
-
-  private async checkIndexPatternAndCreateIfNotExists(index) {
-    const KIBANA_INDEX = this.getKibanaIndex();
-    log(this.logPath, `Internal index of kibana: ${KIBANA_INDEX}`, 'debug');
-    const result = await this.callWithInternalUser('search', {
-      index: KIBANA_INDEX,
-      type: '_doc',
-      body: {
-        query: {
-          match: {
-            _id: `index-pattern:${index}-*`
-          }
-        }
-      }
-    });
-    if (result.hits.total.value === 0) {
-      await this.createIndexPattern(KIBANA_INDEX, index);
-    }
-  }
-
-  private async createIndexPattern(KIBANA_INDEX: any, index: any) {
-    try {
-      const response = await this.callWithInternalUser('create', {
-        index: KIBANA_INDEX,
-        type: '_doc',
-        'id': `index-pattern:${index}-*`,
-        body: {
-          type: 'index-pattern',
-          'index-pattern': {
-            title: `${index}-*`,
-            timeFieldName: 'timestamp',
-          }
-        }
-      });
-      log(
-        this.logPath,
-        `The indexPattern no exist, response of createIndexPattern: ${JSON.stringify(response)}`,
-        'debug'
-      );
-    } catch (error) {
-      this.checkDuplicateIndexPatterError(error);
-    }
-  }
-
-  private checkDuplicateIndexPatterError(error) {
-    const { type } = ((error || {}).body || {}).error || {};
-    if (!['version_conflict_engine_exception', 'resource_already_exists_exception'].includes(type))
-      throw error;
-  }
-
-
-  private getKibanaIndex() {
-    return ((((this.server || {})
-      // @ts-ignore
-      .registrations || {})
-      .kibana || {})
-      .options || {})
-      .index || '.kibana';
   }
 
   private createDocument(doc, index, mapping: string): BulkIndexDocumentsParams {

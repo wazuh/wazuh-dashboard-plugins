@@ -13,6 +13,7 @@ import fs from 'fs';
 import path from 'path';
 import { log } from '../logger';
 import { getConfiguration } from './get-configuration';
+import { WAZUH_DATA_CONFIG_APP_PATH } from '../../util/constants';
 
 const needRestartFields = [
   'pattern',
@@ -34,10 +35,7 @@ const newReloadFields = [
 export class UpdateConfigurationFile {
   constructor() {
     this.busy = false;
-    this.file = path.join(
-      __dirname,
-      '../../../../optimize/wazuh/config/wazuh.yml'
-    );
+    this.file = WAZUH_DATA_CONFIG_APP_PATH;
   }
 
   /**

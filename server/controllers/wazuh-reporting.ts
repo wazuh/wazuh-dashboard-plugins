@@ -32,13 +32,9 @@ import { KibanaRequest, RequestHandlerContext, KibanaResponseFactory } from 'src
 import { ReportPrinter } from '../reporting/printer';
 
 import { log } from '../logger';
-import { WAZUH_ALERTS_PATTERN } from '../../util/constants';
-import { createDirectoryIfNotExists } from '../lib/filesystem';
+import { WAZUH_ALERTS_PATTERN, WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH, WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH } from '../../util/constants';
+import { createDirectoryIfNotExists, createDataDirectoryIfNotExists } from '../lib/filesystem';
 
-const DATA_WAZUH_BASE_PATH = '../../../../optimize';
-const DATA_WAZUH_PATH = path.join(__dirname, DATA_WAZUH_BASE_PATH, 'wazuh');
-const DATA_WAZUH_DOWNLOADS_PATH = path.join(DATA_WAZUH_PATH, 'downloads');
-const DATA_WAZUH_REPORTS_PATH = path.join(DATA_WAZUH_DOWNLOADS_PATH, 'reports');
 
 export class WazuhReportingCtrl {
   constructor() {}
@@ -125,7 +121,7 @@ export class WazuhReportingCtrl {
       if (isAgents && typeof isAgents === 'object') {
         await this.buildAgentsTable(
           context,
-          printer, 
+          printer,
           isAgents,
           apiId,
           section === 'groupConfig' ? tab : false
@@ -198,7 +194,7 @@ export class WazuhReportingCtrl {
             manager: agent.manager || agent.manager_host,
             os: (agent.os && agent.os.name && agent.os.version) ? `${agent.os.name} ${agent.os.version}` : ''
           }));
-          
+
         }catch(error){
           log(
             'reporting:buildAgentsTable',
@@ -228,7 +224,7 @@ export class WazuhReportingCtrl {
               `Skip agent due to: ${error.message || error}`,
               'debug'
             );
-          }          
+          }
         }
       }
       printer.addSimpleTable({
@@ -315,7 +311,7 @@ export class WazuhReportingCtrl {
               filters,
               pattern
             );
-            return count 
+            return count
               ? `${count} of ${totalAgents} agents have ${vulnerabilitiesLevel.toLocaleLowerCase()} vulnerabilities.`
               : undefined;
           }catch(error){
@@ -327,7 +323,7 @@ export class WazuhReportingCtrl {
           title: { text: 'Summary', style: 'h2' },
           list: vulnerabilitiesResponsesCount
         });
-        
+
         log(
           'reporting:extendedInformation',
           'Fetching overview vulnerability detector top 3 agents by category',
@@ -926,7 +922,7 @@ export class WazuhReportingCtrl {
         if(syscollectorLists){
           syscollectorLists.filter(syscollectorList => syscollectorList).forEach(syscollectorList => printer.addList(syscollectorList))
         };
-        
+
         const vulnerabilitiesRequests = ['Critical', 'High'];
 
         const vulnerabilitiesResponsesItems = (await Promise.all(vulnerabilitiesRequests.map(async vulnerabilitiesLevel => {
@@ -936,7 +932,7 @@ export class WazuhReportingCtrl {
               `Fetching top ${vulnerabilitiesLevel} packages`,
               'debug'
             );
-            
+
             return await VulnerabilityRequest.topPackages(
               context,
               from,
@@ -1051,7 +1047,7 @@ export class WazuhReportingCtrl {
     let plainData = {};
     const nestedData = [];
     const tableData = [];
-    
+
     if (data.length === 1 && Array.isArray(data)) {
       tableData[section.config[tab].configuration] = data;
     } else {
@@ -1142,10 +1138,10 @@ export class WazuhReportingCtrl {
       const printer = new ReportPrinter();
 
       const {username: userID} = await context.wazuh.security.getCurrentUser(request, context);
-      createDirectoryIfNotExists(DATA_WAZUH_PATH);
-      createDirectoryIfNotExists(DATA_WAZUH_DOWNLOADS_PATH);
-      createDirectoryIfNotExists(DATA_WAZUH_REPORTS_PATH);
-      createDirectoryIfNotExists(path.join(DATA_WAZUH_REPORTS_PATH, userID));
+      createDataDirectoryIfNotExists();
+      createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
+      createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH);
+      createDirectoryIfNotExists(path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, userID));
 
       if (request.body && request.body.array) {
         const body = (request || {}).body || {};
@@ -1218,15 +1214,15 @@ export class WazuhReportingCtrl {
             try {
               configuration = await context.wazuh.api.client.asCurrentUser.request(
                 'GET',
-                `/groups/${g_id}/configuration`, 
+                `/groups/${g_id}/configuration`,
                 {},
                 {apiHostID: apiId}
               );
             } catch (error) {
               log('reporting:report', error.message || error, 'debug');
-              
+
             };
-            
+
             if (Object.keys(configuration.data.data.affected_items[0].config).length) {
               printer.addContent({
                 text: 'Configurations',
@@ -1682,13 +1678,13 @@ export class WazuhReportingCtrl {
           }
         }
         if (isSycollector) {
-          
+
         }
 
         if (!isAgentConfig && !isGroupConfig) {
           await this.renderHeader(context, printer, section, tab, isAgents, apiId);
         }
-        
+
         const sanitizedFilters = filters ? this.sanitizeKibanaFilters(kfilters, searchBar) : false;
 
         if (!isSycollector && request.body.time && sanitizedFilters) {
@@ -1767,13 +1763,13 @@ export class WazuhReportingCtrl {
       const printer = new ReportPrinter();
       const section = 'overview';
       const {username: userID} = await context.wazuh.security.getCurrentUser(request, context);
-      createDirectoryIfNotExists(DATA_WAZUH_PATH);
-      createDirectoryIfNotExists(DATA_WAZUH_DOWNLOADS_PATH);
-      createDirectoryIfNotExists(DATA_WAZUH_REPORTS_PATH);
-      createDirectoryIfNotExists(path.join(DATA_WAZUH_REPORTS_PATH, userID));
+      createDataDirectoryIfNotExists();
+      createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
+      createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH);
+      createDirectoryIfNotExists(path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, userID));
 
       await this.renderHeader(context, printer, section, moduleID, agents, apiId);
-      
+
       const sanitizedFilters = filters ? this.sanitizeKibanaFilters(filters, searchBar) : false;
 
       if (time && sanitizedFilters) {
@@ -1832,10 +1828,10 @@ export class WazuhReportingCtrl {
       const printer = new ReportPrinter();
 
       const {username: userID} = await context.wazuh.security.getCurrentUser(request, context);
-      createDirectoryIfNotExists(DATA_WAZUH_PATH);
-      createDirectoryIfNotExists(DATA_WAZUH_DOWNLOADS_PATH);
-      createDirectoryIfNotExists(DATA_WAZUH_REPORTS_PATH);
-      createDirectoryIfNotExists(path.join(DATA_WAZUH_REPORTS_PATH, userID));
+      createDataDirectoryIfNotExists();
+      createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
+      createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH);
+      createDirectoryIfNotExists(path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, userID));
 
       let tables = [];
       const equivalences = {
@@ -1859,15 +1855,15 @@ export class WazuhReportingCtrl {
         try {
           configuration = await context.wazuh.api.client.asCurrentUser.request(
             'GET',
-            `/groups/${group}/configuration`, 
+            `/groups/${group}/configuration`,
             {},
             {apiHostID: apiId}
           );
         } catch (error) {
           log('reporting:createReportsGroups', error.message || error, 'debug');
-          
+
         };
-        
+
         if (Object.keys(configuration.data.data.affected_items[0].config).length) {
           printer.addContent({
             text: 'Configurations',
@@ -2075,7 +2071,7 @@ export class WazuhReportingCtrl {
           apiId
         );
       }
-      
+
       const sanitizedFilters = filters ? this.sanitizeKibanaFilters(filters, searchBar) : false;
 
       if (time && sanitizedFilters) {
@@ -2129,10 +2125,10 @@ export class WazuhReportingCtrl {
       const printer = new ReportPrinter();
 
       const {username: userID} = await context.wazuh.security.getCurrentUser(request, context);
-      createDirectoryIfNotExists(DATA_WAZUH_PATH);
-      createDirectoryIfNotExists(DATA_WAZUH_DOWNLOADS_PATH);
-      createDirectoryIfNotExists(DATA_WAZUH_REPORTS_PATH);
-      createDirectoryIfNotExists(path.join(DATA_WAZUH_REPORTS_PATH, userID));
+      createDataDirectoryIfNotExists();
+      createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
+      createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH);
+      createDirectoryIfNotExists(path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, userID));
 
       let wmodulesResponse = {};
       let tables = [];
@@ -2146,7 +2142,7 @@ export class WazuhReportingCtrl {
       } catch (error) {
         log('reporting:report', error.message || error, 'debug');
       }
-      
+
       await this.renderHeader(context, printer, 'agentConfig', 'agentConfig', agentID, apiId);
 
       let idxComponent = 0;
@@ -2190,9 +2186,9 @@ export class WazuhReportingCtrl {
                     };
                   }
                 }
-                
+
                 const agentConfig = agentConfigResponse && agentConfigResponse.data && agentConfigResponse.data.data;
-                
+
                 if (!titleOfSection) {
                   printer.addContent({
                     text: config.title,
@@ -2362,7 +2358,7 @@ export class WazuhReportingCtrl {
           tables = [];
         }
       }
-      
+
       const sanitizedFilters = filters ? this.sanitizeKibanaFilters(filters, searchBar) : false;
 
       if (time && sanitizedFilters) {
@@ -2401,14 +2397,14 @@ export class WazuhReportingCtrl {
       const printer = new ReportPrinter();
 
       const {username: userID} = await context.wazuh.security.getCurrentUser(request, context);
-      createDirectoryIfNotExists(DATA_WAZUH_PATH);
-      createDirectoryIfNotExists(DATA_WAZUH_DOWNLOADS_PATH);
-      createDirectoryIfNotExists(DATA_WAZUH_REPORTS_PATH);
-      createDirectoryIfNotExists(path.join(DATA_WAZUH_REPORTS_PATH, userID));
+      createDataDirectoryIfNotExists();
+      createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
+      createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH);
+      createDirectoryIfNotExists(path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, userID));
 
       log('reporting:createReportsAgentsInventory', `Syscollector report`, 'debug');
       const sanitizedFilters = filters ? this.sanitizeKibanaFilters(filters, searchBar) : false;
-      
+
       // Get the agent OS
       let agentOs = '';
       try {
@@ -2432,7 +2428,7 @@ export class WazuhReportingCtrl {
       if (time && sanitizedFilters) {
         printer.addTimeRangeAndFilters(from, to, sanitizedFilters, browserTimezone);
       };
-      
+
       // Add table with the agent info
       await this.buildAgentsTable(context, printer, [agentID], apiId);
 
@@ -2445,9 +2441,9 @@ export class WazuhReportingCtrl {
             title: 'Packages',
             columns: agentOs === 'windows'
               ? [
-                  {id: 'name', label: 'Name'}, 
-                  {id: 'architecture', label: 'Architecture'}, 
-                  {id: 'version', label: 'Version'}, 
+                  {id: 'name', label: 'Name'},
+                  {id: 'architecture', label: 'Architecture'},
+                  {id: 'version', label: 'Version'},
                   {id: 'vendor', label: 'Vendor'}
                 ]
               : [
@@ -2551,14 +2547,14 @@ export class WazuhReportingCtrl {
             agentRequestInventory.loggerMessage,
             'debug'
           );
-          
+
           const inventoryResponse = await context.wazuh.api.client.asCurrentUser.request(
             'GET',
             agentRequestInventory.endpoint,
             {},
             {apiHostID: apiId}
           );
-          
+
           const inventory = inventoryResponse && inventoryResponse.data && inventoryResponse.data.data && inventoryResponse.data.data.affected_items;
           if(inventory){
             return {
@@ -2570,7 +2566,7 @@ export class WazuhReportingCtrl {
           log('reporting:createReportsAgentsInventory', error.message || error, 'debug');
         };
       }
-      
+
       if (time) {
         await this.extendedInformation(
           context,
@@ -2616,13 +2612,13 @@ export class WazuhReportingCtrl {
     try {
       log('reporting:getReports', `Fetching created reports`, 'info');
       const {username: userID} = await context.wazuh.security.getCurrentUser(request, context);
-      createDirectoryIfNotExists(DATA_WAZUH_PATH);
-      createDirectoryIfNotExists(DATA_WAZUH_DOWNLOADS_PATH);
-      createDirectoryIfNotExists(DATA_WAZUH_REPORTS_PATH);
-      const userReportsDirectory = path.join(DATA_WAZUH_REPORTS_PATH, userID);
+      createDataDirectoryIfNotExists();
+      createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
+      createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH);
+      const userReportsDirectory = path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, userID);
       createDirectoryIfNotExists(userReportsDirectory);
       log('reporting:getReports', `Directory: ${userReportsDirectory}`, 'debug');
-      
+
       const sortReportsByDate = (a, b) =>
         a.date < b.date ? 1 : a.date > b.date ? -1 : 0;
 
