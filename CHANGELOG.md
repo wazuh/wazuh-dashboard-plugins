@@ -10,6 +10,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Top bar overlayed over expanded visualizations [#2667](https://github.com/wazuh/wazuh-kibana-app/issues/2667)
 - Empty inventory data in Solaris agents [#2680](https://github.com/wazuh/wazuh-kibana-app/pull/2680)
 - Wrong parameters in the dev-tools autocomplete section [#2675](https://github.com/wazuh/wazuh-kibana-app/issues/2675)
+- Wrong permissions on edit CDB list [#2665](https://github.com/wazuh/wazuh-kibana-app/pull/2665)
+- fix(frontend): add the metafields when refreshing the index pattern [#2681](https://github.com/wazuh/wazuh-kibana-app/pull/2681)
 
 ## Wazuh v4.0.3 - Kibana v7.9.1, v7.9.2, v7.9.3 - Revision 4014
 
@@ -23,6 +25,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Replace user by username key in the monitoring logic [#2654](https://github.com/wazuh/wazuh-kibana-app/pull/2654)
 - Security alerts and reporting issues when using private tenants [#2639](https://github.com/wazuh/wazuh-kibana-app/issues/2639)
 - Manager restart in rule editor does not work with Wazuh cluster enabled [#2640](https://github.com/wazuh/wazuh-kibana-app/issues/2640)
+- fix(frontend): Empty inventory data in Solaris agents [#2680](https://github.com/wazuh/wazuh-kibana-app/pull/2680)
 
 ## Wazuh v4.0.3 - Kibana v7.9.1, v7.9.2, v7.9.3 - Revision 4013
 
