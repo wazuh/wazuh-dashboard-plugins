@@ -69,7 +69,7 @@ export class WazuhApiCtrl {
       if (await APIUserAllowRunAs.canUse(idHost)) {
         token = await context.wazuh.api.client.asCurrentUser.authenticate(idHost);
       } else {
-        token = await context.wazuh.api.client.asINternalUser.authenticate(idHost);
+        token = await context.wazuh.api.client.asInternalUser.authenticate(idHost);
       };
 
       return response.ok({
