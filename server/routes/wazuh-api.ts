@@ -103,7 +103,12 @@ export function WazuhApiRoutes(router: IRouter) {
 
   router.post({
     path: '/api/extensions',
-    validate: false,
+    validate: {
+      body: schema.object({
+        id: schema.string(),
+        extensions: schema.any()
+      })
+    },
   },
     async (context, request, response) => ctrl.setExtensions(context, request, response)
   );

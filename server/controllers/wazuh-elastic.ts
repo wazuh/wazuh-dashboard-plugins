@@ -820,7 +820,6 @@ export class WazuhElasticCtrl {
           }
         };
 
-        // await this.wzWrapper.createIndexByName(sampleAlertsIndex, configuration);
         await context.core.elasticsearch.client.asInternalUser.indices.create({
           index: sampleAlertsIndex,
           body: configuration
@@ -934,6 +933,7 @@ export class WazuhElasticCtrl {
         index: statisticsPattern,
         allow_no_indices: false
       });
+      //TODO: unify response to an object. This need changes in frontend
       return response.ok({
         body: existIndex.body
       });

@@ -70,7 +70,7 @@ export class WazuhApiCtrl {
       if (await APIUserAllowRunAs.canUse(idHost)) {
         token = await context.wazuh.api.client.asCurrentUser.authenticate(idHost);
       } else {
-        token = await context.wazuh.api.client.asINternalUser.authenticate(idHost);
+        token = await context.wazuh.api.client.asInternalUser.authenticate(idHost);
       };
 
       return response.ok({
@@ -252,7 +252,7 @@ export class WazuhApiCtrl {
               if (response.status === 200) {
                 request.body.id = id;
                 request.body.idChanged = id;
-                return await this.checkStoredAPI(context, request, response);
+                // return await this.checkStoredAPI(context, request, response);
               }
             } catch (error) { } // eslint-disable-line
           }
@@ -302,8 +302,8 @@ export class WazuhApiCtrl {
   async checkAPI(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
     try {
       let apiAvailable = null;
-      const notValid = this.validateCheckApiParams(request.body);
-      if (notValid) return ErrorResponse(notValid, 3003, 500, response);
+      // const notValid = this.validateCheckApiParams(request.body);
+      // if (notValid) return ErrorResponse(notValid, 3003, 500, response);
       log('wazuh-api:checkAPI', `${request.body.id} is valid`, 'debug');
       // Check if a Wazuh API id is given (already stored API)
       const data = await this.manageHosts.getHostById(request.body.id);
@@ -317,29 +317,23 @@ export class WazuhApiCtrl {
       if (request.body.forceRefresh) {
         options["forceRefresh"] = request.body.forceRefresh;
       }
-
-      let responseManagerInfo = await context.wazuh.api.client.asInternalUser.request(
-        'GET',
-        `/manager/info`,
-        {},
-        options
-      );
-      const responseIsDown = this.checkResponseIsDown(responseManagerInfo);
-
-      if (responseIsDown) {
+      let responseManagerInfo;
+      try{
+        responseManagerInfo = await context.wazuh.api.client.asInternalUser.request(
+          'GET',
+          `/manager/info`,
+          {},
+          options
+        );
+      }catch(error){
         return ErrorResponse(
-          `ERROR3099 - ${responseManagerInfo.data.detail || 'Wazuh not ready yet'}`,
+          `ERROR3099 - ${error.response.data.detail || 'Wazuh not ready yet'}`,
           3099,
           500,
           response
         );
       }
 
-      // Check wrong credentials
-      if (parseInt(responseManagerInfo.status) === 401) {
-        log('wazuh-api:checkAPI', `Wrong Wazuh API credentials used`);
-        return ErrorResponse('Wrong credentials', 3004, 500, response);
-      }
       log('wazuh-api:checkAPI', `${request.body.id} credentials are valid`, 'debug');
       if (responseManagerInfo.status === 200 && responseManagerInfo.data) {
         let responseAgents = await context.wazuh.api.client.asInternalUser.request(
@@ -410,10 +404,6 @@ export class WazuhApiCtrl {
           }
         }
       }
-
-      const tmpMsg = responseManagerInfo.data.detail || 'Unexpected error checking the Wazuh API';
-
-      throw new Error(tmpMsg);
     } catch (error) {
       log('wazuh-api:checkAPI', error.message || error);
 

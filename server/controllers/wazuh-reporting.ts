@@ -1723,7 +1723,7 @@ export class WazuhReportingCtrl {
           printer.addTables(request.body.tables);
         }
 
-        await printer.print(path.join(DATA_WAZUH_REPORTS_PATH, userID, request.body.name));
+        await printer.print(path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, userID, request.body.name));
       }
       return response.ok({
         body: { error: 0, data: null }
@@ -1734,11 +1734,11 @@ export class WazuhReportingCtrl {
       // if (
       //   ((request || {}).body || {}).name &&
       //   fs.existsSync(
-      //     path.join(DATA_WAZUH_REPORTS_PATH, userID, request.body.name)
+      //     path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, userID, request.body.name)
       //   )
       // ) {
       //   fs.unlinkSync(
-      //     path.join(DATA_WAZUH_REPORTS_PATH, userID, request.body.name)
+      //     path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, userID, request.body.name)
       //   );
       // }
       return ErrorResponse(error.message || error, 5029, 500, response);
@@ -1797,7 +1797,7 @@ export class WazuhReportingCtrl {
         tables.forEach(table => printer.addTables(table));
       };
 
-      await printer.print(path.join(DATA_WAZUH_REPORTS_PATH, userID, name));
+      await printer.print(path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, userID, name));
 
       return response.ok({
         body: {
@@ -2093,7 +2093,7 @@ export class WazuhReportingCtrl {
         );
       };
 
-      await printer.print(path.join(DATA_WAZUH_REPORTS_PATH, userID, name));
+      await printer.print(path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, userID, name));
 
       return response.ok({
         body: {
@@ -2365,7 +2365,7 @@ export class WazuhReportingCtrl {
         printer.addTimeRangeAndFilters(from, to, sanitizedFilters, browserTimezone);
       };
 
-      await printer.print(path.join(DATA_WAZUH_REPORTS_PATH, userID, name));
+      await printer.print(path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, userID, name));
 
       return response.ok({
         body: {
@@ -2587,7 +2587,7 @@ export class WazuhReportingCtrl {
         .filter(table => table).forEach(table => printer.addSimpleTable(table));
 
       // Print the document
-      await printer.print(path.join(DATA_WAZUH_REPORTS_PATH, userID, name));
+      await printer.print(path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, userID, name));
 
       return response.ok({
         body: {
@@ -2657,7 +2657,7 @@ export class WazuhReportingCtrl {
     try {
       log('reporting:getReportByName', `Getting ${request.params.name} report`, 'debug');
       const {username: userID} = await context.wazuh.security.getCurrentUser(request, context);
-      const reportFileBuffer = fs.readFileSync(path.join(DATA_WAZUH_REPORTS_PATH, userID, request.params.name ));
+      const reportFileBuffer = fs.readFileSync(path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, userID, request.params.name ));
       return response.ok({
         headers: { 'Content-Type': 'application/pdf' },
         body: reportFileBuffer
@@ -2680,7 +2680,7 @@ export class WazuhReportingCtrl {
       log('reporting:deleteReportByName', `Deleting ${request.params.name} report`, 'debug');
       const {username: userID} = await context.wazuh.security.getCurrentUser(request, context);
       fs.unlinkSync(
-        path.join(DATA_WAZUH_REPORTS_PATH, userID, request.params.name)
+        path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, userID, request.params.name)
       );
       log('reporting:deleteReportByName', `${request.params.name} report was deleted`, 'info');
       return response.ok({
