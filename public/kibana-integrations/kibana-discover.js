@@ -21,6 +21,15 @@ import discoverTemplate from '../templates/discover/discover.html';
 import store from '../redux/store';
 import { updateVis } from '../redux/actions/visualizationsActions';
 import { getAngularModule, getCore, getPlugins } from '../kibana-services';
+import {
+  getRequestInspectorStats,
+  getResponseInspectorStats,
+  getServices,
+  setServices,
+  setDocViewsRegistry,
+  subscribeWithScope,
+  tabifyAggResponse,
+} from './discover/kibana_services';
 
 getAngularModule().directive('kbnDis', [
   function () {
@@ -30,7 +39,16 @@ getAngularModule().directive('kbnDis', [
       template: discoverTemplate
     };
   }
-]);
+])
+.run(async () => {
+  const services = await buildServices(
+    getCore(),
+    getPlugins(),
+    { env: { packageInfo: { branch: "7.10" } } },
+    () => {}
+  );
+  setServices(services);
+});
 
 // Added dependencies (from Kibana module)
 import './discover_dependencies';
@@ -53,15 +71,6 @@ import { getSortArray, getSortForSearchSource } from './discover/application/ang
 import * as columnActions from './discover/application/angular/doc_table/actions/columns';
 
 import { discoverResponseHandler } from './discover/application/angular/response_handler';
-import {
-  getRequestInspectorStats,
-  getResponseInspectorStats,
-  getServices,
-  setServices,
-  setDocViewsRegistry,
-  subscribeWithScope,
-  tabifyAggResponse,
-} from './discover/kibana_services';
 
 ///WAZUH///
 import { buildServices } from './discover/build_services';
@@ -99,15 +108,6 @@ const fetchStatuses = {
 
 const app = angular.module('app/discover', []);
 const wazuhApp = getAngularModule();
-app.run(async () => {
-  const services = await buildServices(
-    getCore(),
-    getPlugins(),
-    { env: { packageInfo: { branch: "7.10" } } },
-    () => {}
-  );
-  setServices(services);
-});
 
 app.directive('discoverAppW', function () {
   return {

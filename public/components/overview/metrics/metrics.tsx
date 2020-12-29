@@ -50,7 +50,7 @@ export class Metrics extends Component {
 
   constructor(props) {
     super(props);
-    this.KibanaServices = getDataPlugin();
+    this.KibanaServices = getDataPlugin().query;
     this.filterManager = this.KibanaServices.filterManager;
     this.timefilter = this.KibanaServices.timefilter.timefilter;
     this.state = {

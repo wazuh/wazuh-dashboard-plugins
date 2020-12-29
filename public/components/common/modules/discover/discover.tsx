@@ -107,9 +107,9 @@ export const Discover = compose(
   }
   constructor(props) {
     super(props);
-    this.KibanaServices = getDataPlugin().query;
-    this.filterManager = props.shareFilterManager ? this.KibanaServices.filterManager : new FilterManager(getUiSettings);
-    this.timefilter = this.KibanaServices.timefilter;
+    this.KibanaServices = getDataPlugin();
+    this.filterManager = props.shareFilterManager ? this.KibanaServices.query.filterManager : new FilterManager(getUiSettings);
+    this.timefilter = this.KibanaServices.query.timefilter.timefilter;
     this.state = {
       sort: {},
       selectedTechnique: "",
@@ -304,7 +304,7 @@ export const Discover = compose(
         undefined,
         query,
         [...searchBarFilters, ...extraFilters, ...shareFilterManager],
-        getEsQueryConfig(getUiSettings)
+        getEsQueryConfig(getUiSettings())
       );
 
     const { sortField, sortDirection } = this.state;

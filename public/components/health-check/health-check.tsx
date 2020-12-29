@@ -51,7 +51,7 @@ export class HealthCheck extends Component {
      */
     async checkPatterns() {
         this.checkPatternCount++;
-        if (this.checkPatternCount > 5) throw new Error('Error trying to check patterns.');
+        if (this.checkPatternCount > 10) return Promise.reject('Error trying to check patterns.');
         try {
             const patternId = AppState.getCurrentPattern();
             let patternTitle = '';
@@ -76,7 +76,7 @@ export class HealthCheck extends Component {
                     if (patternList.length) {
                         const currentPattern = patternList[0].id;
                         AppState.setCurrentPattern(currentPattern);
-                        return this.checkPatterns();
+                        return await this.checkPatterns();
                     } else {
                         errors.push('The selected index-pattern is not present.');
                         results[i].description = <span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span>;

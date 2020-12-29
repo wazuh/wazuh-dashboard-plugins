@@ -58,22 +58,8 @@ class KibanaVis extends Component {
     this.tabVisualizations = new TabVisualizations();
     this.state = {
       visRefreshingIndex: false,
-    };
-    this.savedVisualizations = getVisualizationsPlugin().savedVisualizationsLoader;
-    const services = {
-      savedObjectsClient: getSavedObjects().client,
-      indexPatterns: getDataPlugin().indexPatterns,
-      search: getDataPlugin().search,
-      chrome: getChrome(),
-      overlays: getOverlays(),
-    };
-    const servicesForVisualizations = {
-      ...services,
-      ...{ visualizationTypes: new TypesService().start() },
-    };
-    this.savedObjectLoaderVisualize = this.savedVisualizations.createSavedVisLoader(
-      servicesForVisualizations
-    );
+    };   
+    this.savedObjectLoaderVisualize = getVisualizationsPlugin().savedVisualizationsLoader.savedObjectsClient;
     this.visID = this.props.visID;
     this.tab = this.props.tab;
   }
@@ -85,23 +71,6 @@ class KibanaVis extends Component {
       text: text,
       toastLifeTimeMs: time,
     });
-  };
-
-  resetSavedObjectLoaderVisualize = () => {
-    const services = {
-      savedObjectsClient: getSavedObjects().client,
-      indexPatterns: getDataPlugin().indexPatterns,
-      search: getDataPlugin().search,
-      chrome: getChrome(),
-      overlays: getOverlays(),
-    };
-    const servicesForVisualizations = {
-      ...services,
-      ...{ visualizationTypes: new TypesService().start() },
-    };
-    this.savedObjectLoaderVisualize = this.savedVisualizations.createSavedVisLoader(
-      servicesForVisualizations
-    );
   };
 
   componentDidMount() {
