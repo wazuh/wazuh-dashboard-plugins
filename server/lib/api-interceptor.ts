@@ -82,7 +82,7 @@ const buildRequestOptions = async (method: string, path: string, data: any, { ap
 
 export const requestAsInternalUser = async (method: string, path: string, data: any, options: APIInterceptorRequestOptionsInternalUser) => {
   try{
-    const token = CacheInternalUserAPIHostToken.has(options.apiHostID) && options.forceRefresh
+    const token = CacheInternalUserAPIHostToken.has(options.apiHostID) && !options.forceRefresh
       ? CacheInternalUserAPIHostToken.get(options.apiHostID)
       : await authenticate(options.apiHostID);
     return await request(method, path, data, {...options, token});

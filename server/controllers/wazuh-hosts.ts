@@ -114,9 +114,6 @@ export class WazuhHostsCtrl {
     try {
       const { entries } = request.body;
       log('wazuh-hosts:cleanRegistry', 'Cleaning registry', 'debug');
-      if (!entries){
-        throw new Error('No entries given to check');
-      };
       await this.updateRegistry.removeOrphanEntries(entries);
       return response.ok({
         body: { statusCode: 200, message: 'ok' }

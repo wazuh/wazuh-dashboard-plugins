@@ -99,8 +99,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     return {};
   }
 
+  public async start(core: CoreStart) {
+    const globalConfiguration: SharedGlobalConfig = await this.initializerContext.config.legacy.globalConfig$.pipe(first()).toPromise();
 
-  public start(core: CoreStart) {
     const wazuhApiClient = {
       client: {
         asInternalUser: {
@@ -116,9 +117,35 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       wazuh: {
         logger: this.logger.get('monitoring'),
         api: wazuhApiClient
+      },
+      server: {
+        config: globalConfiguration
       }
     });
 
+    // Scheduler
+    jobSchedulerRun({
+      core,
+      wazuh: {
+        logger: this.logger.get('cron-scheduler'),
+        api: wazuhApiClient
+      },
+      server: {
+        config: globalConfiguration
+      }
+    });
+
+    // Initialize
+    jobInitializeRun({
+      core,
+      wazuh: {
+        logger: this.logger.get('initialize'),
+        api: wazuhApiClient
+      },
+      server: {
+        config: globalConfiguration
+      }
+    })
     return {};
   }
 
