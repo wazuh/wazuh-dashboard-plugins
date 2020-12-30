@@ -598,12 +598,12 @@ class WzListEditor extends Component {
                               {
                                 _isCDBList: true,
                                 name: 'relative_dirname',
-                                value: `${path}`
+                                value: path
                               },
                               {
                                 _isCDBList: true,
                                 name: 'filename',
-                                value: `${name}`
+                                value: name
                               }
                             ],
                             name
