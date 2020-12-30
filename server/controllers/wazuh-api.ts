@@ -16,7 +16,6 @@ import { gdprRequirementsFile } from '../integration-files/gdpr-requirements';
 import { hipaaRequirementsFile } from '../integration-files/hipaa-requirements';
 import { nistRequirementsFile } from '../integration-files/nist-requirements';
 import { tscRequirementsFile } from '../integration-files/tsc-requirements';
-import { getPath } from '../../util/get-path';
 import { ErrorResponse } from './error-response';
 import { Parser } from 'json2csv';
 import { log } from '../logger';
@@ -28,7 +27,6 @@ import { Queue } from '../jobs/queue';
 import fs from 'fs';
 import { ManageHosts } from '../lib/manage-hosts';
 import { UpdateRegistry } from '../lib/update-registry';
-import * as ApiInterceptor from '../lib/api-interceptor';
 import jwtDecode from 'jwt-decode';
 import { KibanaRequest, RequestHandlerContext, KibanaResponseFactory } from 'src/core/server';
 import { APIUserAllowRunAs, CacheInMemoryAPIUserAllowRunAs, API_USER_STATUS_RUN_AS } from '../lib/cache-api-user-has-run-as';
@@ -202,7 +200,7 @@ export class WazuhApiCtrl {
               body: {
                 statusCode: 200,
                 data: copied,
-                idChanged: request.idChanged || null,
+                idChanged: request.body.idChanged || null,
               }
             });
           }
@@ -234,14 +232,14 @@ export class WazuhApiCtrl {
             try {
               const id = Object.keys(api)[0];
 
-              const response = await context.wazuh.api.client.asInternalUser.request(
+              const responseManagerInfo = await context.wazuh.api.client.asInternalUser.request(
                 'GET',
                 `/manager/info`,
                 {},
                 { apiHostID: id }
               );
 
-              if (this.checkResponseIsDown(response)) {
+              if (this.checkResponseIsDown(responseManagerInfo)) {
                 return ErrorResponse(
                   `ERROR3099 - ${response.data.detail || 'Wazuh not ready yet'}`,
                   3099,
@@ -249,7 +247,7 @@ export class WazuhApiCtrl {
                   response
                 );
               }
-              if (response.status === 200) {
+              if (responseManagerInfo.status === 200) {
                 request.body.id = id;
                 request.body.idChanged = id;
                 // return await this.checkStoredAPI(context, request, response);

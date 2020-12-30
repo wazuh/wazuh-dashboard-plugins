@@ -31,7 +31,7 @@ export const getTop3AgentsSudoNonSuccessful = async (
   try {
     const base = {};
 
-    Object.assign(base, Base(pattern, filters, gte, lte));
+    Object.assign(base, Base(filters, gte, lte));
 
     Object.assign(base.aggs, {
       '3': {
@@ -98,7 +98,7 @@ export const getTop3AgentsFailedSyscalls = async (
   try {
     const base = {};
 
-    Object.assign(base, Base(pattern, filters, gte, lte));
+    Object.assign(base, Base(filters, gte, lte));
 
     Object.assign(base.aggs, {
       '3': {
@@ -177,7 +177,7 @@ export const getTopFailedSyscalls = async (
   try {
     const base = {};
 
-    Object.assign(base, Base(pattern, filters, gte, lte));
+    Object.assign(base, Base(filters, gte, lte));
 
     Object.assign(base.aggs, {
       '2': {

@@ -58,6 +58,26 @@ export const WAZUH_TIME_FILTER_DEFAULT = {
   to: 'now'
 };
 
+// App configuration
+export const WAZUH_CONFIGURATION_CACHE_TIME = 10000 // time in ms;
+export const WAZUH_CONFIGURATION_SETTINGS_NEED_RESTART = [
+  'pattern',
+  'wazuh.monitoring.enabled',
+  'wazuh.monitoring.frequency',
+  'wazuh.monitoring.shards',
+  'wazuh.monitoring.replicas',
+  'wazuh.monitoring.creation',
+  'wazuh.monitoring.pattern',
+  'alerts.sample.prefix',
+  'cron.statistics.index.shards',
+  'cron.statistics.index.replicas',
+  'logs.level',
+];
+export const WAZUH_CONFIGURATION_SETTINGS_NEED_RELOAD = [
+  'hideManagerAlerts',
+];
+
+
 // Default number of shards and remplicas for indices
 export const WAZUH_INDEX_SHARDS = 2;
 export const WAZUH_INDEX_REPLICAS = 0;

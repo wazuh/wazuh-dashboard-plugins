@@ -13,7 +13,7 @@
  * Gets the correct path of given url
  * @param {*} config
  */
-export function getPath(config) {
+export function getPath(config: {url: string, port: number}): string {
   let path = config.url;
   let protocol;
   if (config.url.startsWith('https://')) {
