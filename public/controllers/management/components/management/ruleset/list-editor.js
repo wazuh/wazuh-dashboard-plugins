@@ -593,12 +593,17 @@ class WzListEditor extends Component {
                         try {
                           this.setState({ generatingCsv: true });
                           await exportCsv(
-                            `/lists?path=${path}/${name}`,
+                            `/lists`,
                             [
                               {
                                 _isCDBList: true,
-                                name: 'path',
-                                value: `${path}/${name}`
+                                name: 'relative_dirname',
+                                value: `${path}`
+                              },
+                              {
+                                _isCDBList: true,
+                                name: 'filename',
+                                value: `${name}`
                               }
                             ],
                             name
