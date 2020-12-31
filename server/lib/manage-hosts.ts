@@ -15,13 +15,13 @@ import path from 'path';
 import { log } from '../logger';
 import { UpdateRegistry } from './update-registry';
 import { initialWazuhConfig } from './initial-wazuh-config';
-
-const OPTIMIZE_WAZUH_PATH = '../../../../optimize/wazuh';
+import { WAZUH_DATA_CONFIG_APP_PATH } from '../../util/constants';
+import { createDataDirectoryIfNotExists } from '../lib/filesystem';
 
 export class ManageHosts {
   constructor() {
     this.busy = false;
-    this.file = path.join(__dirname, `${OPTIMIZE_WAZUH_PATH}/config/wazuh.yml`);
+    this.file = WAZUH_DATA_CONFIG_APP_PATH;
     this.updateRegistry = new UpdateRegistry();
     this.initialConfig = initialWazuhConfig;
   }
@@ -68,17 +68,9 @@ export class ManageHosts {
     try {
       this.checkBusy();
       this.busy = true;
-      if (!fs.existsSync(path.join(__dirname, OPTIMIZE_WAZUH_PATH))) {
-        fs.mkdirSync(path.join(__dirname, OPTIMIZE_WAZUH_PATH));
-      }
-      if (!fs.existsSync(path.join(__dirname, `${OPTIMIZE_WAZUH_PATH}/config`))) {
-        fs.mkdirSync(path.join(__dirname, `${OPTIMIZE_WAZUH_PATH}/config`));
-      }
-      if (
-        !fs.existsSync(
-          path.join(__dirname, '../../../../optimize/wazuh/config/wazuh.yml')
-        )
-      ) {
+      createDataDirectoryIfNotExists();
+      createDataDirectoryIfNotExists('config');
+      if (!fs.existsSync(WAZUH_DATA_CONFIG_APP_PATH)) {
         await fs.writeFileSync(this.file, this.initialConfig, { encoding: 'utf8', mode: 0o600 });
       }
       const raw = fs.readFileSync(this.file, { encoding: 'utf-8' });

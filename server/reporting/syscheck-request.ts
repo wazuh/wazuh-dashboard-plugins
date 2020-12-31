@@ -31,7 +31,7 @@ export const top3agents = async (
   try {
     const base = {};
 
-    Object.assign(base, Base(pattern, filters, gte, lte));
+    Object.assign(base, Base(filters, gte, lte));
 
     Object.assign(base.aggs, {
       '2': {
@@ -83,7 +83,7 @@ export const top3Rules = async (
   try {
     const base = {};
 
-    Object.assign(base, Base(pattern, filters, gte, lte));
+    Object.assign(base, Base(filters, gte, lte));
 
     Object.assign(base.aggs, {
       '2': {
@@ -142,7 +142,7 @@ export const lastTenDeletedFiles = async (
   try {
     const base = {};
 
-    Object.assign(base, Base(pattern, filters, gte, lte));
+    Object.assign(base, Base(filters, gte, lte));
 
     Object.assign(base.aggs, {
       '2': {
@@ -195,7 +195,7 @@ export const lastTenModifiedFiles = async (
   try {
     const base = {};
 
-    Object.assign(base, Base(pattern, filters, gte, lte));
+    Object.assign(base, Base(filters, gte, lte));
 
     Object.assign(base.aggs, {
       '2': {

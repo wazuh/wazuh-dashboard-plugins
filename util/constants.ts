@@ -9,6 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import path  from 'path';
 
 // Index patterns
 export const WAZUH_ALERTS_PREFIX = "wazuh-alerts-";
@@ -21,6 +22,8 @@ export const WAZUH_MONITORING_DEFAULT_CREATION = 'd';
 export const WAZUH_MONITORING_DEFAULT_ENABLED = true;
 export const WAZUH_MONITORING_DEFAULT_FREQUENCY = 900;
 export const WAZUH_MONITORING_DEFAULT_CRON_FREQ = '0 * * * * *';
+export const WAZUH_INDEX = '.wazuh';
+export const WAZUH_VERSION_INDEX = '.wazuh-version';
 
 // Permissions
 export const WAZUH_ROLE_ADMINISTRATOR_ID = 1;
@@ -40,7 +43,6 @@ export const WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS = {
   [WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION]: [{ vulnerabilities: true }, { virustotal: true }, { osquery: true }, { docker: true }, { mitre: true }]
 };
 
-
 // Security
 export const WAZUH_SECURITY_PLUGIN_XPACK_SECURITY = 'X-Pack Security';
 export const WAZUH_SECURITY_PLUGIN_OPEN_DISTRO_FOR_ELASTICSEARCH = 'Open Distro for Elasticsearch';
@@ -56,6 +58,26 @@ export const WAZUH_TIME_FILTER_DEFAULT = {
   to: 'now'
 };
 
+// App configuration
+export const WAZUH_CONFIGURATION_CACHE_TIME = 10000 // time in ms;
+export const WAZUH_CONFIGURATION_SETTINGS_NEED_RESTART = [
+  'pattern',
+  'wazuh.monitoring.enabled',
+  'wazuh.monitoring.frequency',
+  'wazuh.monitoring.shards',
+  'wazuh.monitoring.replicas',
+  'wazuh.monitoring.creation',
+  'wazuh.monitoring.pattern',
+  'alerts.sample.prefix',
+  'cron.statistics.index.shards',
+  'cron.statistics.index.replicas',
+  'logs.level',
+];
+export const WAZUH_CONFIGURATION_SETTINGS_NEED_RELOAD = [
+  'hideManagerAlerts',
+];
+
+
 // Default number of shards and remplicas for indices
 export const WAZUH_INDEX_SHARDS = 2;
 export const WAZUH_INDEX_REPLICAS = 0;
@@ -63,6 +85,20 @@ export const WAZUH_INDEX_REPLICAS = 0;
 // Reserved ids for Users/Role mapping
 export const WAZUH_API_RESERVED_ID_LOWER_THAN = 100;
 
+// Wazuh data path
+export const WAZUH_DATA_PATH = 'data/wazuh';
+export const WAZUH_DATA_ABSOLUTE_PATH = path.join(__dirname, '../../../', WAZUH_DATA_PATH);
+
+export const WAZUH_DATA_CONFIG_DIRECTORY_PATH = path.join(WAZUH_DATA_ABSOLUTE_PATH, 'config');
+export const WAZUH_DATA_CONFIG_APP_PATH = path.join(WAZUH_DATA_CONFIG_DIRECTORY_PATH, 'wazuh.yml');
+export const WAZUH_DATA_CONFIG_REGISTRY_PATH = path.join(WAZUH_DATA_CONFIG_DIRECTORY_PATH, 'wazuh-registry.json');
+
+export const WAZUH_DATA_LOGS_DIRECTORY_PATH = path.join(WAZUH_DATA_ABSOLUTE_PATH, 'logs');
+export const WAZUH_DATA_LOGS_PLAIN_PATH = path.join(WAZUH_DATA_LOGS_DIRECTORY_PATH, 'wazuhapp-plain.log');
+export const WAZUH_DATA_LOGS_RAW_PATH = path.join(WAZUH_DATA_LOGS_DIRECTORY_PATH, 'wazuhapp.log');
+
+export const WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH = path.join(WAZUH_DATA_ABSOLUTE_PATH, 'downloads');
+export const WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH = path.join(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH, 'reports');
 
 // Default App Config
 export const WAZUH_DEFAULT_APP_CONFIG = {

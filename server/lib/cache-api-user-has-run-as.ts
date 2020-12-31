@@ -49,7 +49,7 @@ export const APIUserAllowRunAs = {
         'get',
         `${api.url}:${api.port}/security/users/me`,
         {},
-        { idHost: apiId }
+        { apiHostID: apiId }
       );
       const APIUserAllowRunAs = response.data.data.affected_items[0].allow_run_as ? API_USER_STATUS_RUN_AS.ENABLED : API_USER_STATUS_RUN_AS.NOT_ALLOWED;
       

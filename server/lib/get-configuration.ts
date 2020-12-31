@@ -11,19 +11,17 @@
  */
 import fs from 'fs';
 import yml from 'js-yaml';
-import path from 'path';
-let cachedConfiguration = null;
-let lastAssign = new Date().getTime();
-export function getConfiguration(isUpdating = false) {
+import { WAZUH_DATA_CONFIG_APP_PATH, WAZUH_CONFIGURATION_CACHE_TIME } from '../../util/constants';
+
+let cachedConfiguration: any = null;
+let lastAssign: number = new Date().getTime();
+
+export function getConfiguration(isUpdating: boolean = false) {
   try {
     const now = new Date().getTime();
     const dateDiffer = now - lastAssign;
-    if (!cachedConfiguration || dateDiffer >= 10000 || isUpdating) {
-      const customPath = path.join(
-        __dirname,
-        '../../../../optimize/wazuh/config/wazuh.yml'
-      );
-      const raw = fs.readFileSync(customPath, { encoding: 'utf-8' });
+    if (!cachedConfiguration || dateDiffer >= WAZUH_CONFIGURATION_CACHE_TIME || isUpdating) {
+      const raw = fs.readFileSync(WAZUH_DATA_CONFIG_APP_PATH, { encoding: 'utf-8' });
       const file = yml.load(raw);
 
       for (const host of file.hosts) {

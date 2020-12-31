@@ -10,34 +10,14 @@
  * Find more information about this on the LICENSE file.
  */
 import fs from 'fs';
-import path from 'path';
 import { log } from '../logger';
 import { getConfiguration } from './get-configuration';
+import { WAZUH_DATA_CONFIG_APP_PATH, WAZUH_CONFIGURATION_SETTINGS_NEED_RESTART, WAZUH_CONFIGURATION_SETTINGS_NEED_RELOAD } from '../../util/constants';
 
-const needRestartFields = [
-  'pattern',
-  'wazuh.monitoring.enabled',
-  'wazuh.monitoring.frequency',
-  'wazuh.monitoring.shards',
-  'wazuh.monitoring.replicas',
-  'wazuh.monitoring.creation',
-  'wazuh.monitoring.pattern',
-  'alerts.sample.prefix',
-  'cron.statistics.index.shards',
-  'cron.statistics.index.replicas',
-  'logs.level',
-];
-
-const newReloadFields = [
-  'hideManagerAlerts',
-];
 export class UpdateConfigurationFile {
   constructor() {
     this.busy = false;
-    this.file = path.join(
-      __dirname,
-      '../../../../optimize/wazuh/config/wazuh.yml'
-    );
+    this.file = WAZUH_DATA_CONFIG_APP_PATH;
   }
 
   /**
@@ -98,8 +78,8 @@ export class UpdateConfigurationFile {
         'debug'
       );
       return {
-        needRestart: needRestartFields.includes(key),
-        needReload: newReloadFields.includes(key)
+        needRestart: WAZUH_CONFIGURATION_SETTINGS_NEED_RESTART.includes(key),
+        needReload: WAZUH_CONFIGURATION_SETTINGS_NEED_RELOAD.includes(key)
       };
     } catch (error) {
       log('update-configuration:updateConfiguration', error.message || error);

@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-export function cleanKeys(response) {
+export function cleanKeys(response: any): any {
   // Remove agent key
   if (response.data.data.internal_key) {
     response.data.data.internal_key = '********';

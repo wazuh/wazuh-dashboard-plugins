@@ -23,15 +23,21 @@ import {
   Logger,
   Plugin,
   PluginInitializerContext,
+  SharedGlobalConfig
 } from 'kibana/server';
 
 import { WazuhPluginSetup, WazuhPluginStart, PluginSetup } from './types';
 import { SecurityObj, ISecurityFactory } from './lib/security-factory';
 import { setupRoutes } from './routes';
+import { jobInitializeRun } from './start/initialize';
 import { jobMonitoringRun } from './start/monitoring';
 import { jobSchedulerRun } from './lib/cron-scheduler';
 import { getCookieValueByName } from './lib/cookie';
 import * as ApiInterceptor  from './lib/api-interceptor';
+import { schema, TypeOf } from '@kbn/config-schema';
+import type { Observable } from 'rxjs';
+import { first } from 'rxjs/operators';
+
 declare module 'kibana/server' {
   interface RequestHandlerContext {
     wazuh: {
@@ -53,6 +59,7 @@ declare module 'kibana/server' {
     };
   }
 }
+
 export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
   private readonly logger: Logger;
 
@@ -60,7 +67,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     this.logger = initializerContext.logger.get();
   }
 
-  public setup(core: CoreSetup, plugins: PluginSetup) {
+  public async setup(core: CoreSetup, plugins: PluginSetup) {
     this.logger.debug('Wazuh-wui: Setup');
     
     const wazuhSecurity = SecurityObj(plugins);
@@ -89,13 +96,12 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     const router = core.http.createRouter();
     setupRoutes(router);
 
-    // TODO: implement Scheduler handler
-
-    return {
-    };
+    return {};
   }
 
-  public start(core: CoreStart) {
+  public async start(core: CoreStart) {
+    const globalConfiguration: SharedGlobalConfig = await this.initializerContext.config.legacy.globalConfig$.pipe(first()).toPromise();
+
     const wazuhApiClient = {
       client: {
         asInternalUser: {
@@ -111,6 +117,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       wazuh: {
         logger: this.logger.get('monitoring'),
         api: wazuhApiClient
+      },
+      server: {
+        config: globalConfiguration
       }
     });
 
@@ -120,6 +129,21 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       wazuh: {
         logger: this.logger.get('cron-scheduler'),
         api: wazuhApiClient
+      },
+      server: {
+        config: globalConfiguration
+      }
+    });
+
+    // Initialize
+    jobInitializeRun({
+      core, 
+      wazuh: {
+        logger: this.logger.get('initialize'),
+        api: wazuhApiClient
+      },
+      server: {
+        config: globalConfiguration
       }
     })
     return {};

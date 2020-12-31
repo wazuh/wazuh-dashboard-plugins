@@ -84,7 +84,7 @@ export class SchedulerJob {
     for (const param of paramList) {
       const paramRequest = typeof request !== 'string' && request.request.replace(/\{.+\}/, param);
       if(!!paramRequest){
-        const apiResponse = await this.apiClient.request('/GET', paramRequest, params, { apiHostID: host.id});
+        const apiResponse = await this.apiClient.request('GET', paramRequest, params, { apiHostID: host.id });
         data.push({
           ...apiResponse.data,
           apiName: host.id,
@@ -107,7 +107,7 @@ export class SchedulerJob {
   private async getParamList(fieldName, host) {
     const { request } = jobs[this.jobName];
     // @ts-ignore
-    const apiResponse = await this.apiClient.request('/GET', request.params[fieldName].request, {}, { apiHostID: host.id});
+    const apiResponse = await this.apiClient.request('GET', request.params[fieldName].request, {}, { apiHostID: host.id });
     const { affected_items } = apiResponse.data.data;
     if (affected_items === undefined || affected_items.length === 0 ) throw {error: 10005, message: `Empty response when tried to get the parameters list: ${JSON.stringify(apiResponse.data)}`}
     const values = affected_items.map(this.mapParamList)

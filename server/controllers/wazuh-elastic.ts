@@ -264,23 +264,22 @@ export class WazuhElasticCtrl {
    * @param {Object} req
    * @returns {Array<Object>} List of allowed index
    */
-  async filterAllowedIndexPatternList(list, req) {
+  async filterAllowedIndexPatternList(context, list, req) {
     //TODO: review if necesary to delete
     let finalList = [];
     for (let item of list) {
       let results = false,
         forbidden = false;
       try {
-        results = await this.wzWrapper.searchWazuhElementsByIndexWithRequest(
-          req,
-          item.title
-        );
+        results = await context.core.elasticsearch.client.asCurrentUser.search({
+          index: item.title
+        });
       } catch (error) {
         forbidden = true;
       }
       if (
-        ((results || {}).hits || {}).total.value >= 1 ||
-        (!forbidden && ((results || {}).hits || {}).total === 0)
+        (((results || {}).body || {}).hits || {}).total.value >= 1 ||
+        (!forbidden && (((results || {}).body || {}).hits || {}).total === 0)
       ) {
         finalList.push(item);
       }
@@ -397,7 +396,7 @@ export class WazuhElasticCtrl {
           body: {
             data:
             isXpackEnabled && !isSuperUser
-            ? await this.filterAllowedIndexPatternList(list, request)
+            ? await this.filterAllowedIndexPatternList(context, list, request)
             : list
           }
         })
@@ -801,7 +800,7 @@ export class WazuhElasticCtrl {
       const alertGenerateParams = request.body && request.body.params || {};
 
       const sampleAlerts = WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS[request.params.category].map((typeAlert) => generateAlerts({ ...typeAlert, ...alertGenerateParams }, request.body.alerts || typeAlert.alerts || WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_ALERTS)).flat();
-      const bulk = sampleAlerts.map(sampleAlert => `${bulkPrefix}\n${JSON.stringify(sampleAlert)}`).join('\n');
+      const bulk = sampleAlerts.map(sampleAlert => `${bulkPrefix}\n${JSON.stringify(sampleAlert)}\n`).join('');
 
       // Index alerts
 
@@ -821,8 +820,7 @@ export class WazuhElasticCtrl {
           }
         };
 
-        // await this.wzWrapper.createIndexByName(sampleAlertsIndex, configuration);
-        await context.core.elasticsearch.client.asInternalUser.indices.exists({
+        await context.core.elasticsearch.client.asInternalUser.indices.create({
           index: sampleAlertsIndex,
           body: configuration
         });
@@ -832,7 +830,6 @@ export class WazuhElasticCtrl {
           'debug'
         );
       }
-      // await this.wzWrapper.elasticRequest.callWithInternalUser('bulk', { body: bulk });
       await context.core.elasticsearch.client.asInternalUser.bulk({
         index: sampleAlertsIndex,
         body: bulk
@@ -936,6 +933,7 @@ export class WazuhElasticCtrl {
         index: statisticsPattern,
         allow_no_indices: false
       });
+      //TODO: unify response to an object. This need changes in frontend
       return response.ok({
         body: existIndex.body
       });

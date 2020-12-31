@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import { WazuhElasticCtrl } from '../controllers';
-import { IRouter, RequestHandlerContext } from 'kibana/server';
+import { IRouter } from 'kibana/server';
 import { schema } from '@kbn/config-schema';
 import { WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY, WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING, WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION } from '../../util/constants';
 
