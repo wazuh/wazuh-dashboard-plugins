@@ -23,7 +23,7 @@ import { KeyEquivalence } from '../../util/csv-key-equivalence';
 import { ApiErrorEquivalence } from '../../util/api-errors-equivalence';
 import apiRequestList from '../../util/api-request-list';
 import * as ApiHelper from '../lib/api-helper';
-import { addQueueJob } from '../jobs/queue';
+import { addJobToQueue } from '../jobs/queue';
 import fs from 'fs';
 import { ManageHosts } from '../lib/manage-hosts';
 import { UpdateRegistry } from '../lib/update-registry';
@@ -965,8 +965,8 @@ export class WazuhApiCtrl {
       }
       const delay = (data || {}).delay || 0;
       if (delay) {
-        addQueueJob({
-          startAt: (new Date(Date.now() + delay)).getTime(),
+        addJobToQueue({
+          startAt: new Date(Date.now() + delay),
           run: async () => {
             try{
               await context.wazuh.api.client.asCurrentUser.request(method, path, data, options);

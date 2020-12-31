@@ -16,8 +16,8 @@ import { WAZUH_QUEUE_CRON_FREQ } from '../../util/constants';
 export let queue = [];
 
 export interface IQueueJob{
-  /** Date in miliseconds */
-  startAt: number
+  /** Date object to start the job */
+  startAt: Date
   /** Function to execute */
   run: () => void
 };
@@ -26,7 +26,7 @@ export interface IQueueJob{
  * Add a job to the queue.
  * @param job Job to add to queue
  */
-export function addQueueJob(job: IQueueJob) {
+export function addJobToQueue(job: IQueueJob) {
   log('queue:addJob', `New job added`, 'debug');
   queue.push(job);
 };
@@ -34,7 +34,7 @@ export function addQueueJob(job: IQueueJob) {
 async function executePendingJobs() {
   try {
     if (!queue || !queue.length) return;
-    const now: number = Date.now();
+    const now: Date = new Date();
     const pendingJobs: IQueueJob[] = queue.filter(item => item.startAt <= now);
     log(
       'queue:executePendingJobs',
@@ -44,7 +44,7 @@ async function executePendingJobs() {
     if (!pendingJobs || !pendingJobs.length){
       return;
     };
-    queue = queue.filter(item => item.startAt > now);
+    queue = queue.filter((item: IQueueJob) => item.startAt > now);
 
     for (const job of pendingJobs) {
       try {
