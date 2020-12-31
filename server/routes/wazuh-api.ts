@@ -107,15 +107,9 @@ export function WazuhApiRoutes(router: IRouter) {
     validate: {
       body: schema.object({
         id: schema.string(),
-<<<<<<< HEAD
-        extensions: schema.any({})
-      })
-    }
-=======
         extensions: schema.any()
       })
     },
->>>>>>> 1cb0999113608354b0dc5f20de1a61f41009ace9
   },
     async (context, request, response) =>  ctrl.setExtensions(context, request, response)
   );
@@ -152,7 +146,7 @@ export function WazuhApiRoutes(router: IRouter) {
     async (context, request, response) => ctrl.getSyscollector(context, request, response)
   );
 
-  //#region TODO: Remove these end point if not used 
+  //#region TODO: Remove these end point if not used
   // Return a PCI requirement description
   router.get({
     path: '/api/pci/{requirement}',
@@ -233,6 +227,6 @@ export function WazuhApiRoutes(router: IRouter) {
     async (context, request, response) => ctrl.getAgentsFieldsUniqueCount(context, request, response)
   );
 
-  //#endregion 
+  //#endregion
 
 }
