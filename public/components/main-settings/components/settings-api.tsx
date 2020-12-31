@@ -126,8 +126,9 @@ export class ApiTable extends Component {
             const id = entries[idx].id;
             entries[idx].status = 'online';
             entries[idx].cluster_info = clusterInfo;
+            const {allow_run_as,...clusterInfoDataRegistry} = clusterInfo;
             //Updates the cluster info in the registry
-            await this.updateClusterInfoInRegistry(id, clusterInfo);
+            await this.updateClusterInfoInRegistry(id, clusterInfoDataRegistry);
           } catch (error) {
             numErr = numErr + 1;
             const code = ((error || {}).data || {}).code;

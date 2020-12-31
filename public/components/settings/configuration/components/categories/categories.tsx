@@ -12,13 +12,12 @@
  */
 import React, { } from 'react';
 import { Category } from './components';
-import { ISetting } from '../../configuration';
+import { ISetting } from '../../../../../components/main-settings/components/settings-configuration';
 import { EuiFlexGroup } from '@elastic/eui';
-
 interface ICategoriesProps {
   config: ISetting[],
   updatedConfig: {[field:string]: string | number | boolean | []}
-  setUpdatedConfig({}): void 
+  setUpdatedConfig({}): void
 }
 
 export const Categories:React.FunctionComponent<ICategoriesProps> = ({ config, updatedConfig, setUpdatedConfig }) => {
@@ -34,12 +33,12 @@ export const Categories:React.FunctionComponent<ICategoriesProps> = ({ config, u
   }, {})
   return (
     <EuiFlexGroup direction='column'>
-      {Object.keys(categories).map((category, idx) => ( 
-        <Category 
+      {Object.keys(categories).map((category, idx) => (
+        <Category
           key={idx}
           name={category}
           items={categories[category]}
-          updatedConfig={updatedConfig} 
+          updatedConfig={updatedConfig}
           setUpdatedConfig={setUpdatedConfig} />))}
     </EuiFlexGroup>
   );

@@ -31,6 +31,7 @@ import store from '../../../redux/store'
 import { updateSelectedSettingsSection } from '../../../redux/actions/appStateActions';
 import { withUserAuthorizationPrompt } from '../../common/hocs/withUserAuthorization'
 import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../../util/constants';
+import { WazuhConfig } from '../../../react-services/wazuh-config'
 
 export type ISetting = {
   setting: string
@@ -42,14 +43,15 @@ export type ISetting = {
   form: { type: string, params: {} }
 }
 
-const WzConfigurationSettingsProvider = (props) => {
+const WzConfigurationSettingsProvider = () => {
   const [loading, setLoading ] = useKbnLoadingIndicator();
   const [config, setConfig] = useState<ISetting[]>([]);
   const [query, setQuery] = useState('');
   const [updatedConfig, setUpdateConfig] = useState({});
   useEffect(() => {
     store.dispatch(updateSelectedSettingsSection('configuration'));
-    const rawConfig = props.wazuhConfig.getConfig();
+    const wazuhConfig = new WazuhConfig()
+    const rawConfig = wazuhConfig.getConfig();
     const formatedConfig = Object.keys(rawConfig).reduce<ISetting[]>((acc, conf) => [
       ...acc,
       {
@@ -65,7 +67,7 @@ const WzConfigurationSettingsProvider = (props) => {
   }, []);
   return (
     <EuiPage >
-      <EuiPageBody className='mgtPage__body' restrictWidth>
+      <EuiPageBody style={{maxWidth: '1200px' }} >
         <EuiPageHeader>
           <Header query={query} setQuery={setQuery} />
         </EuiPageHeader>

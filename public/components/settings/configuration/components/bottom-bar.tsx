@@ -67,7 +67,6 @@ const CancelButton = ({ setUpdateConfig }) => (
       iconSide='left'
       iconType='cross'
       color="ghost"
-      className="mgtAdvancedSettingsForm__button"
       onClick={() => setUpdateConfig({})}>
       Cancel changes
     </EuiButtonEmpty>
@@ -82,7 +81,6 @@ const SaveButton = ({ updatedConfig, setUpdateConfig, setLoading, config }) => (
       iconSide='left'
       iconType='check'
       color='secondary'
-      className="mgtAdvancedSettingsForm__button"
       onClick={() => saveSettings(updatedConfig, setUpdateConfig, setLoading, config)} >
       Save changes
       </EuiButton>

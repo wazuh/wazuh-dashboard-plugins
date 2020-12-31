@@ -9,11 +9,11 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { getDataPlugin } from '../../../kibana-services';
 import { useState, useEffect} from 'react';
-//@ts-ignore
-import { getServices } from '../../../../../../src/plugins/discover/public/kibana_services';
+
 
 export const useFilterManager = () => {
-    const [filterManager, setFilterManager] = useState(getServices().filterManager);
+    const [filterManager, setFilterManager] = useState(getDataPlugin().query.filterManager);
     return filterManager;
 }

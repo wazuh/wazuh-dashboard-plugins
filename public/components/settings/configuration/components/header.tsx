@@ -24,6 +24,7 @@ import {
   EuiSearchBar,
 } from '@elastic/eui';
 import { EuiFormErrorText } from '@elastic/eui';
+import { useLocation } from 'react-router-dom';
 
 export const Header = ({query, setQuery}) => {
   return (
@@ -79,12 +80,21 @@ const SubTitle = () => {
 }
 
 const SearchBar = ({query, setQuery}) => {
+  const location = useLocation();
   const [categories, setCategories] = useState([]);
   const [error, setError] = useState();
+  console.log(location)
+  const getDefaultCategory = () => {
+
+    const queryUrlParams = new URLSearchParams(location.search)
+    const category = queryUrlParams.get('category')
+    category && setQuery(`category:(${category})`)
+  }
+
   useEffect(() => {
     const cats = categoriesNames.map(item => ({value: item}));
     setCategories(cats);
-    getDefaultCategory(setQuery)
+    getDefaultCategory()
   }, [])
   const onChange = (args) => {
     if(args.error){
@@ -96,7 +106,7 @@ const SearchBar = ({query, setQuery}) => {
   }
   return (
     <Fragment>
-      <EuiSearchBar 
+      <EuiSearchBar
         filters={[{
           type:'field_value_selection',
           field:'category',
@@ -114,7 +124,3 @@ const SearchBar = ({query, setQuery}) => {
   )
 }
 
-const getDefaultCategory = (setQuery) => {
-  const category:string | undefined = AppNavigate.getUrlParameter('category')
-  category && setQuery(`category:(${category})`)
-}

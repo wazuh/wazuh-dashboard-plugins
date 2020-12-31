@@ -14,7 +14,7 @@
 import React, { useEffect, useState, } from 'react';
 import { Route, Switch } from 'react-router-dom';
 import { compose } from 'redux';
-import AppState from '../../../react-services/app-state';
+import {getWzConfig} from '../../../react-services/get-config';
 import { withGlobalBreadcrumb } from '../../common/hocs/withGlobalBreadcrumb';
 import { useHistory } from 'react-router-dom';
 import { useAgentsSummary } from '../../common/hooks/agents/use-agents-summary';
@@ -76,6 +76,8 @@ const tabs = [
 
 export const MainSettings = compose(withGlobalBreadcrumb([{ text: '' }, { text: 'Settings' }]))(
   (props) => {
+    useEffect(()=> {getWzConfig()},[]
+    )
     const history = useHistory();
     const settingTabs = tabs.map((tab, index) => (
       <EuiTab

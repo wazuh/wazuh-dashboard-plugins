@@ -21,7 +21,7 @@ export class AppNavigate {
 
 
   static getUrlParameter(sParam) {
-    var sPageURL = window.location.hash.split('?')[1],
+    var sPageURL = window.location.pathname.split('?')[1],
         sURLVariables = sPageURL.split('&'),
         sParameterName,
         i;
