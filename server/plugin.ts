@@ -32,6 +32,7 @@ import { setupRoutes } from './routes';
 import { jobInitializeRun } from './start/initialize';
 import { jobMonitoringRun } from './start/monitoring';
 import { jobSchedulerRun } from './lib/cron-scheduler';
+import { jobQueueRun } from './jobs/queue';
 import { getCookieValueByName } from './lib/cookie';
 import * as ApiInterceptor  from './lib/api-interceptor';
 import { schema, TypeOf } from '@kbn/config-schema';
@@ -111,28 +112,18 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       }
     };
 
-    // Monitoring
-    jobMonitoringRun({
-      core, 
-      wazuh: {
-        logger: this.logger.get('monitoring'),
-        api: wazuhApiClient
-      },
-      server: {
-        config: globalConfiguration
-      }
-    });
+    const contextServer = {
+      config: globalConfiguration
+    };
 
-    // Scheduler
-    jobSchedulerRun({
+    // Jobs queue
+    jobQueueRun({
       core, 
       wazuh: {
-        logger: this.logger.get('cron-scheduler'),
+        logger: this.logger.get('queue'),
         api: wazuhApiClient
       },
-      server: {
-        config: globalConfiguration
-      }
+      server: contextServer
     });
 
     // Initialize
@@ -142,10 +133,29 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         logger: this.logger.get('initialize'),
         api: wazuhApiClient
       },
-      server: {
-        config: globalConfiguration
-      }
-    })
+      server: contextServer
+    });
+
+    // Monitoring
+    jobMonitoringRun({
+      core, 
+      wazuh: {
+        logger: this.logger.get('monitoring'),
+        api: wazuhApiClient
+      },
+      server: contextServer
+    });
+
+    // Scheduler
+    jobSchedulerRun({
+      core, 
+      wazuh: {
+        logger: this.logger.get('cron-scheduler'),
+        api: wazuhApiClient
+      },
+      server: contextServer
+    });
+
     return {};
   }
 

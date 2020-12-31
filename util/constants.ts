@@ -77,7 +77,6 @@ export const WAZUH_CONFIGURATION_SETTINGS_NEED_RELOAD = [
   'hideManagerAlerts',
 ];
 
-
 // Default number of shards and remplicas for indices
 export const WAZUH_INDEX_SHARDS = 2;
 export const WAZUH_INDEX_REPLICAS = 0;
@@ -99,6 +98,9 @@ export const WAZUH_DATA_LOGS_RAW_PATH = path.join(WAZUH_DATA_LOGS_DIRECTORY_PATH
 
 export const WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH = path.join(WAZUH_DATA_ABSOLUTE_PATH, 'downloads');
 export const WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH = path.join(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH, 'reports');
+
+// Queue
+export const WAZUH_QUEUE_CRON_FREQ = '*/15 * * * * *'; // Every 15 seconds
 
 // Default App Config
 export const WAZUH_DEFAULT_APP_CONFIG = {

@@ -23,7 +23,7 @@ import { KeyEquivalence } from '../../util/csv-key-equivalence';
 import { ApiErrorEquivalence } from '../../util/api-errors-equivalence';
 import apiRequestList from '../../util/api-request-list';
 import * as ApiHelper from '../lib/api-helper';
-import { Queue } from '../jobs/queue';
+import { addQueueJob } from '../jobs/queue';
 import fs from 'fs';
 import { ManageHosts } from '../lib/manage-hosts';
 import { UpdateRegistry } from '../lib/update-registry';
@@ -33,12 +33,10 @@ import { APIUserAllowRunAs, CacheInMemoryAPIUserAllowRunAs, API_USER_STATUS_RUN_
 import { getCookieValueByName } from '../lib/cookie';
 
 export class WazuhApiCtrl {
-  queue: Queue
   manageHosts: ManageHosts
   updateRegistry: UpdateRegistry
 
   constructor() {
-    this.queue = Queue;
     // this.monitoringInstance = new Monitoring(server, true);
     this.manageHosts = new ManageHosts();
     this.updateRegistry = new UpdateRegistry();
@@ -967,14 +965,13 @@ export class WazuhApiCtrl {
       }
       const delay = (data || {}).delay || 0;
       if (delay) {
-        const current = new Date();
-        this.queue.addJob({
-          startAt: new Date(current.getTime() + delay),
-          type: 'request',
-          method,
-          path,
-          data,
-          options,
+        addQueueJob({
+          startAt: (new Date(Date.now() + delay)).getTime(),
+          run: async () => {
+            try{
+              await context.wazuh.api.client.asCurrentUser.request(method, path, data, options);
+            }catch(error){};
+          }
         });
         return response.ok({
           body: { error: 0, message: 'Success' }
