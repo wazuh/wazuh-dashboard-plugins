@@ -1005,7 +1005,7 @@ export class WzUserPermissions{
             ? !isAllow(userPermissions[actionName][userResource])
             : true;
         } else {
-          !isAllow(userPermissions[actionName][userResource]);
+          return !isAllow(userPermissions[actionName][userResource]);
         }
       };
 
@@ -1019,7 +1019,7 @@ export class WzUserPermissions{
               return notAllowInWazuhPermissions(resource);
             }
           })
-        : userPartialResources?.length
+        : (userPartialResources || []).length
         ? userPartialResources.some((resource) => !isAllow(userPermissions[actionName][resource]))
         : wazuhPermissions[actionName].resources.find(
             (resource) => resource === RESOURCE_ANY_SHORT
