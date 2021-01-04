@@ -16,8 +16,8 @@ import {
   WAZUH_MONITORING_PATTERN,
   WAZUH_SAMPLE_ALERT_PREFIX
 } from "../../util/constants";
-import {genericReq} from './wz-request'
-import {WazuhConfig} from './wazuh-config'
+import WzRequest from './wz-request'
+import { WazuhConfig } from './wazuh-config'
 
 export async function getWzConfig() {
   // Remember to keep this values equal to default wazuh.yml values
@@ -71,8 +71,7 @@ export async function getWzConfig() {
   const wazuhConfig = new WazuhConfig();
 
   try {
-    const config = await genericReq('GET', '/utils/configuration', {});
-
+    const config = await WzRequest.genericReq('GET', '/utils/configuration', {});
     if (!config || !config.data || !config.data.data)
       throw new Error('No config available');
 

@@ -10,8 +10,8 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { WzRequest } from '../../../../react-services/wz-request';
-import { AppState } from '../../../../react-services/app-state';
+import WzRequest  from '../../../../react-services/wz-request';
+import AppState from '../../../../react-services/app-state';
 
 export default class ConfigurationHandler {
   /**
