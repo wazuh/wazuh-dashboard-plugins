@@ -34,7 +34,7 @@ import WzReduxProvider from '../../../redux/wz-redux-provider';
 import ErrorHandler from '../../../react-services/error-handler';
 import store from '../../../redux/store';
 import { updateSelectedSettingsSection } from '../../../redux/actions/appStateActions';
-import  ApiCheck  from '../../../react-services/wz-api-check';
+import ApiCheck from '../../../react-services/wz-api-check';
 import AppState from '../../../react-services/app-state';
 import { API_USER_STATUS_RUN_AS } from '../../../../server/lib/cache-api-user-has-run-as';
 
@@ -47,6 +47,7 @@ export class ApiTable extends Component {
       apiEntries: [],
       refreshingEntries: false,
       isLoading: true,
+      currentDefault,
     };
   }
 
@@ -102,6 +103,7 @@ export class ApiTable extends Component {
   }
 
   async testApi(entry, force) {
+    console.log("Apicheck", entry, force)
     return await ApiCheck.checkApi(entry, force)
   }
   /**
@@ -115,7 +117,7 @@ export class ApiTable extends Component {
       this.setState({
         refreshingEntries: true,
         apiEntries: hosts
-      }, async() => {
+      }, async () => {
         const entries = this.state.apiEntries;
         let numErr = 0;
         for (let idx in entries) {
@@ -126,7 +128,7 @@ export class ApiTable extends Component {
             const id = entries[idx].id;
             entries[idx].status = 'online';
             entries[idx].cluster_info = clusterInfo;
-            const {allow_run_as,...clusterInfoDataRegistry} = clusterInfo;
+            const { allow_run_as, ...clusterInfoDataRegistry } = clusterInfo;
             //Updates the cluster info in the registry
             await this.updateClusterInfoInRegistry(id, clusterInfoDataRegistry);
           } catch (error) {
@@ -169,7 +171,9 @@ export class ApiTable extends Component {
    */
   async checkApi(api) {
     try {
+      console.log("PETA AQUI")
       const entries = this.state.apiEntries;
+      console.log("PETA AQUI")
       const idx = entries.map(e => e.id).indexOf(api.id);
       try {
         await this.checkManager(api);
@@ -191,8 +195,8 @@ export class ApiTable extends Component {
 
   // Get current API index
   getCurrentAPIIndex() {
-    if (this.apiEntries.length) {
-      const idx = this.apiEntries
+    if (this.state.apiEntries.length) {
+      const idx = this.state.apiEntries
         .map(entry => entry.id)
         .indexOf(this.currentDefault);
       this.currentApiEntryIndex = idx;
@@ -221,11 +225,11 @@ export class ApiTable extends Component {
       const api = this.apiEntries[index];
       const { username, url, port, id } = api;
       const tmpData = {
-        username: username,
-        url: url,
-        port: port,
-        cluster_info: {},
-        insecure: 'true',
+        // username: username,
+        // url: url,
+        // port: port,
+        // cluster_info: {},
+        // insecure: 'true',
         id: id
       };
 
