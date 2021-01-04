@@ -28,7 +28,7 @@ export class Pie extends Component {
 
   render() {
     const createPie = d3
-      .pie()
+      .layout.pie()
       .value(d => d.value)
       .sort(null);
 
@@ -72,12 +72,12 @@ export class Pie extends Component {
                 fill={colors[i]}
                 stroke={colors[i]}
               ></rect>
-              {this.props.legendAction && 
+              {this.props.legendAction &&
                     <text onClick={() => {this.props.legendAction(d.data.label)}} x="15" y="10" style={{ fontSize: 12, cursor: "pointer" }}>
-                      <title>Filter {d.data.label.toLowerCase()} agents</title> 
+                      <title>Filter {d.data.label.toLowerCase()} agents</title>
                       {d.data.label}
                     </text>
-              || 
+              ||
 
               <text x="15" y="10" style={{ fontSize: 12 }}>
                 {d.data.label}
@@ -160,7 +160,7 @@ class Slice extends React.Component {
     }
     const newValue = { ...value, endAngle: value.endAngle - 0.01 };
     let arc = d3
-      .arc()
+      .svg.arc()
       .innerRadius(innerRadius)
       .outerRadius(outerRadius)
       .cornerRadius(cornerRadius)

@@ -53,7 +53,7 @@ export class AgentsController {
     reportingService,
     visFactoryService,
     csvReq
-    
+
   ) {
     this.$scope = $scope;
     this.$location = $location;
@@ -480,7 +480,7 @@ export class AgentsController {
    * @param {*} force
    */
   async switchTab(tab, force = false) {
-    const timefilter = getDataPlugin().query.timefilter;
+    const timefilter = getDataPlugin().query.timefilter.timefilter;
     this.tabVisualizations.setTab(tab);
     this.$rootScope.rendered = false;
     this.$rootScope.$applyAsync();
@@ -630,7 +630,7 @@ export class AgentsController {
    */
   addMitrefilter(id) {
     const filter = `{"meta":{"index": ${AppState.getCurrentPattern() || WAZUH_ALERTS_PATTERN}},"query":{"match":{"rule.mitre.id":{"query":"${id}","type":"phrase"}}}}`;
-    this.$rootScope.$emit('addNewKibanaFilter', { 
+    this.$rootScope.$emit('addNewKibanaFilter', {
       filter: JSON.parse(filter)
     });
   }
