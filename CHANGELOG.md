@@ -76,6 +76,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Fixed
 
 - Restore the tables in the agents' reports [#2628](https://github.com/wazuh/wazuh-kibana-app/issues/2628)
+- [RBAC] Issues detected when using RBAC [#2579](https://github.com/wazuh/wazuh-kibana-app/issues/2579)
 - Changes done via a worker's API are overwritten [#2626](https://github.com/wazuh/wazuh-kibana-app/issues/2626)
 
 ### Fixed
@@ -159,6 +160,11 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ## Wazuh v3.13.2 - Kibana v7.9.1 - Revision 887
 
+### Added
+
+- Support for Wazuh v3.13.2
+
+## Wazuh v3.13.2 - Kibana v7.8.0 - Revision 887
 ### Added
 
 - Support for Wazuh v3.13.2
