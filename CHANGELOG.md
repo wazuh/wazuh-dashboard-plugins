@@ -20,6 +20,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Error toast is showing about Elasticsearch users for environments without security [#2713](https://github.com/wazuh/wazuh-kibana-app/issues/2713)
 - Error about Handler.error in Role Mapping fixed [#2702](https://github.com/wazuh/wazuh-kibana-app/issues/2702)
 - Fixed message in reserved users actions [#2702](https://github.com/wazuh/wazuh-kibana-app/issues/2702)
+- Error 500 on Export formatted CDB list [#2692](https://github.com/wazuh/wazuh-kibana-app/pull/2692)
 
 ## Wazuh v4.0.3 - Kibana v7.9.1, v7.9.2, v7.9.3 - Revision 4014
 
