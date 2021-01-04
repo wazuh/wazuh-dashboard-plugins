@@ -15,6 +15,7 @@ import { useDispatch } from 'react-redux';
 import { EuiEmptyPrompt, EuiButton } from '@elastic/eui';
 import { showExploreAgentModal } from '../../redux/actions/appStateActions';
 
+
 export const PromptNoSelectedAgent = ({body}) => {
   const dispatch = useDispatch();
   const openAgentSelector = () => dispatch(showExploreAgentModal(true));
