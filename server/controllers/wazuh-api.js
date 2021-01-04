@@ -1403,12 +1403,12 @@ export class WazuhApiCtrl {
 
       if (summary) {
         Object.assign(result.summary, {
-          agentsCountActive: summary.Active,
+          agentsCountActive: summary.Active - 1,
           agentsCountDisconnected: summary.Disconnected,
           agentsCountNeverConnected: summary['Never connected'],
-          agentsCountTotal: summary.Total,
+          agentsCountTotal: summary.Total - 1,
           agentsCoverity:
-            summary.Total ? ((summary.Active) / (summary.Total)) * 100 : 0,
+            summary.Total - 1 ? ((summary.Active - 1) / (summary.Total - 1)) * 100 : 0,
         });
       }
 
