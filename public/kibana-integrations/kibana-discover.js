@@ -20,7 +20,7 @@
 import discoverTemplate from '../templates/discover/discover.html';
 import store from '../redux/store';
 import { updateVis } from '../redux/actions/visualizationsActions';
-import { getAngularModule, getCore, getPlugins } from '../kibana-services';
+import { getAngularModule, getCore, getDiscoverModule, getPlugins } from '../kibana-services';
 import {
   getRequestInspectorStats,
   getResponseInspectorStats,
@@ -39,16 +39,7 @@ getAngularModule().directive('kbnDis', [
       template: discoverTemplate
     };
   }
-])
-.run(async () => {
-  const services = await buildServices(
-    getCore(),
-    getPlugins(),
-    { env: { packageInfo: { branch: "7.10" } } },
-    () => {}
-  );
-  setServices(services);
-});
+]);
 
 // Added dependencies (from Kibana module)
 import './discover_dependencies';
@@ -106,10 +97,21 @@ const fetchStatuses = {
   NO_RESULTS: 'none'
 };
 
-const app = angular.module('app/discover', []);
+const appDiscover = getDiscoverModule();
+
+appDiscover.run(async () => {
+  const services = await buildServices(
+    getCore(),
+    getPlugins(),
+    { env: { packageInfo: { branch: "7.10" } } },
+    () => {}
+  );
+  setServices(services);
+});
+
 const wazuhApp = getAngularModule();
 
-getAngularModule().directive('discoverAppW', function () {
+appDiscover.directive('discoverAppW', function () {
   return {
     restrict: 'E',
     controllerAs: 'discoverApp',
@@ -1093,5 +1095,5 @@ function discoverController(
 
   init();
   // Propagate current app state to url, then start syncing
-  replaceUrlAppState().then(() => startStateSync());
+  //replaceUrlAppState().then(() => startStateSync());
 }

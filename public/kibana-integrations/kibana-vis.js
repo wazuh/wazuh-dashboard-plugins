@@ -22,9 +22,9 @@ import { TabVisualizations } from "../factories/tab-visualizations";
 import store from "../redux/store";
 import { updateMetric } from "../redux/actions/visualizationsActions";
 import { GenericRequest } from "../react-services/generic-request";
-import { TypesService } from "../../../../src/plugins/visualizations/public";
 import { Vis } from "../../../../src/plugins/visualizations/public";
-import { convertToSerializedVis } from "../../../../src/plugins/visualizations/public";
+import { createSavedVisLoader } from "./visualizations/saved_visualizations";
+import { TypesService } from "../../../../src/plugins/visualizations/public";
 import {
   EuiLoadingChart,
   EuiLoadingSpinner,
@@ -59,7 +59,20 @@ class KibanaVis extends Component {
     this.state = {
       visRefreshingIndex: false,
     };   
-    this.savedObjectLoaderVisualize = getVisualizationsPlugin().savedVisualizationsLoader.savedObjectsClient;
+    const services = {
+      savedObjectsClient: getSavedObjects().client,
+      indexPatterns: getDataPlugin().indexPatterns,
+      search: getDataPlugin().search,
+      chrome: getChrome(),
+      overlays: getOverlays(),
+    };
+    const servicesForVisualizations = {
+      ...services,
+      ...{ visualizationTypes: new TypesService().start() },
+    };
+    this.savedObjectLoaderVisualize = createSavedVisLoader(
+      servicesForVisualizations
+    );
     this.visID = this.props.visID;
     this.tab = this.props.tab;
   }
@@ -75,7 +88,7 @@ class KibanaVis extends Component {
 
   componentDidMount() {
     this._isMounted = true;
-    const app = getAngularModule("app/wazuh");
+    const app = getAngularModule();
     this.$rootScope = app.$injector.get("$rootScope");
   }
 
@@ -214,15 +227,15 @@ class KibanaVis extends Component {
           this.renderInProgress = true;
           const rawVis = raw.filter((item) => item && item.id === this.visID);
           this.visualization = await this.savedObjectLoaderVisualize.get(
-            rawVis[0].type,
-            rawVis[0].id
+            this.visID,
+            rawVis[0]
           );
           this.visualization.searchSource = await getDataPlugin().search.searchSource.create();
           // Visualization doesn't need the "_source"
           this.visualization.searchSource.setField("source", false);
           // Visualization doesn't need "hits"
           this.visualization.searchSource.setField('size', 0);
-          const visState = await convertToSerializedVis(this.visualization);
+          const visState = await getVisualizationsPlugin().convertToSerializedVis(this.visualization);
           const vis = new Vis(this.visualization.visState.type, visState);
           await vis.setState(visState);
           this.visHandler = await getVisualizationsPlugin().__LEGACY.createVisEmbeddableFromObject(
@@ -271,6 +284,7 @@ class KibanaVis extends Component {
         this.renderInProgress = false;
         return this.myRender(raw);
       } else {
+        console.error(error);
       }
     }
 

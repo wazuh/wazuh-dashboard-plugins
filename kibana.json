@@ -11,7 +11,8 @@
     "visualizations",
     "kibanaLegacy",
     "uiActions",
-    "charts"
+    "charts",
+    "savedObjects"
   ],
   "optionalPlugins": ["security", "opendistroSecurity", "searchguard", "spaces"],
   "requiredBundles": ["kibanaReact", "kibanaUtils"],

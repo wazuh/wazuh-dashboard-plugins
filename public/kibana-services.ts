@@ -1,4 +1,5 @@
 let angularModule: any = null;
+let discoverModule: any = null;
 
 import {
   ChromeStart,
@@ -49,4 +50,18 @@ export function setAngularModule(module: any) {
  */
 export function getAngularModule() {
   return angularModule;
+}
+
+/**
+ * set bootstrapped inner dicover module
+ */
+export function setDiscoverModule(module: any) {
+  discoverModule = module;
+}
+
+/**
+ * get boostrapped inner dicover module
+ */
+export function getDiscoverModule() {
+  return discoverModule;
 }

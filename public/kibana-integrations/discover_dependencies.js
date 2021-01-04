@@ -1,4 +1,4 @@
-import { getAngularModule } from '../kibana-services';
+import { getDiscoverModule } from '../kibana-services';
 import { createDocTableDirective } from './discover/application/angular/doc_table/doc_table';
 import { createPagerFactory } from './discover/application/angular/doc_table/lib/pager/pager_factory';
 import { createTableHeaderDirective } from './discover/application/angular/doc_table/components/table_header';
@@ -19,7 +19,7 @@ import { createRenderCompleteDirective } from './discover/application/angular/di
 import { createContextErrorMessageDirective } from './discover/application/components/context_error_message';
 //import { createSkipBottomButtonDirective } from './discover/application/components/skip_bottom_button';
 
-const app = getAngularModule();
+const app = getDiscoverModule();
 
 app
   .factory('pagerFactory', createPagerFactory)

@@ -23,10 +23,8 @@
 import angular from 'angular';
 // required for `ngSanitize` angular module
 import 'angular-sanitize';
-import { EuiIcon } from '@elastic/eui';
 import { i18nDirective, i18nFilter, I18nProvider } from '@kbn/i18n/angular';
 import { CoreStart, PluginInitializerContext } from 'kibana/public';
-import { DataPublicPluginStart } from '../../../src/plugins/data/public';
 import { Storage } from '../../../src/plugins/kibana_utils/public';
 import { NavigationPublicPluginStart as NavigationStart } from '../../../src/plugins/navigation/public';
 import {
@@ -40,7 +38,7 @@ import {
   createTopNavHelper,
 } from '../../../src/plugins/kibana_legacy/public';
 import { AppPluginStartDependencies } from './types';
-import { getScopedHistory } from './kibana-services';
+import { getScopedHistory, setDiscoverModule } from './kibana-services';
 import { createDiscoverLegacyDirective } from './kibana-integrations/discover/application/components/create_discover_legacy_directive';
 import { createContextErrorMessageDirective } from './kibana-integrations/discover/application/components/context_error_message';
 
@@ -55,55 +53,32 @@ export function getInnerAngularModule(
   context: PluginInitializerContext
 ) {
   initAngularBootstrap();
-  const module = initializeInnerAngularModule(name, core, deps.navigation, deps.data);
+  const module = initializeInnerAngularModule(name, deps.navigation);
   configureAppAngularModule(module, { core, env: context.env }, true, getScopedHistory);
   return module;
 }
 
-/**
- * returns a slimmer inner angular module for embeddable rendering
- */
-export function getInnerAngularModuleEmbeddable(
-  name: string,
-  core: CoreStart,
-  deps: AppPluginStartDependencies
-) {
-  return initializeInnerAngularModule(name, core, deps.navigation, deps.data, true);
-}
-
 let initialized = false;
 
-export function initializeInnerAngularModule(
-  name = 'app/wazuh',
-  core: CoreStart,
-  navigation: NavigationStart,
-  data: DataPublicPluginStart,
-  embeddable = false
-) {
-   if (!initialized) {
+export function initializeInnerAngularModule(name = 'app/wazuh', navigation: NavigationStart) {
+  if (!initialized) {
     createLocalI18nModule();
     createLocalPrivateModule();
     createLocalPromiseModule();
     createLocalTopNavModule(navigation);
     createLocalStorageModule();
     initialized = true;
-  } 
-
-  if (embeddable) {
-    return angular
-      .module(name, [
-        'ngSanitize',
-        'react',
-        'ngMaterial',
-        'chart.js',
-        'ui.bootstrap',
-        'discoverI18n',
-        'discoverPrivate',
-        'discoverPromise',        
-      ])
-      .config(watchMultiDecorator)
-      .directive('icon', (reactDirective) => reactDirective(EuiIcon))
   }
+
+  const discoverModule = angular.module('app/discover', [
+    'discoverI18n',
+    'discoverPrivate',
+    'discoverPromise',
+    'discoverTopNav',
+    'discoverLocalStorageProvider',
+  ]);
+
+  setDiscoverModule(discoverModule);
 
   return angular
     .module(name, [
@@ -113,16 +88,12 @@ export function initializeInnerAngularModule(
       'ngMaterial',
       'chart.js',
       'ui.bootstrap',
-      'discoverI18n',
-      'discoverPrivate',
-      'discoverPromise',
-      'discoverTopNav',
-      'discoverLocalStorageProvider',
+      'app/discover',
     ])
     .config(watchMultiDecorator)
     .run(registerListenEventListener)
-  .directive('discoverLegacy', createDiscoverLegacyDirective)
-  .directive('contextErrorMessage', createContextErrorMessageDirective);
+    .directive('discoverLegacy', createDiscoverLegacyDirective)
+    .directive('contextErrorMessage', createContextErrorMessageDirective);
 }
 
 function createLocalPromiseModule() {
@@ -160,6 +131,3 @@ const createLocalStorageService = function (type: string) {
     return new Storage($window[type]);
   };
 };
-
-
-
