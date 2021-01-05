@@ -12,8 +12,7 @@
 
 import { GenericRequest } from './generic-request';
 import { KnownFields } from '../utils/known-fields'
-import { getDataPlugin } from '../kibana-services';
-
+zz
 export class SavedObject {
   /**
    *

@@ -15,7 +15,7 @@ export type IOperator = '=' | '!=' | '<' | '>' | '~';
 export interface queryObject {
   field: string
   operator?: IOperator
-  value?: string 
+  value?: string
   conjuntion?: IConjuntions
 }
 
@@ -25,7 +25,7 @@ export class QInterpreter {
   conjuntions = / and | AND | or | OR /;
   operators = /=|!=|<|>|~/;
 
-  constructor(query:string) {
+  constructor(query: string) {
     this.query = query;
     this.queryObjects = this.descomposeQuery(query);
   }
@@ -34,19 +34,22 @@ export class QInterpreter {
     const descomposeRegex = new RegExp("((?<conjuntion>and |or )?(?<field>[\\w\\.\\-]+)?(?<operator>=|!=|<|>|~)?(?<value>[\\[\\]\\{\\}\\\\\\w\\.\\-\\:\\%\\/\\s]+)?)","i");
     const getQueryObjects = (query, queries=[]):queryObject[] => {
       const firstConjuntion = / and | or /i.exec(query);
-      const currentQ = !!firstConjuntion ? query.slice(0,firstConjuntion.index) : query;
-      currentQ && queries.push(descomposeRegex.exec(currentQ).groups);
-      if (firstConjuntion) return getQueryObjects(query.slice(firstConjuntion.index+1), queries);
-      return !!queries.length ? queries : [{field:''}];
+      const currentQ = !!firstConjuntion ? query.slice(0, firstConjuntion.index) : query;
+      const descomposeQuery = currentQ && descomposeRegex.exec(currentQ);
+      const { 1: conjuntion = undefined, 2: field = '', 3: operator = undefined, 4: value = undefined } = descomposeQuery || [];
+      const queryObj: queryObject = { conjuntion, field, operator, value }
+      queries.push(queryObj)
+      if (firstConjuntion) return getQueryObjects(query.slice(firstConjuntion.index + 1), queries);
+      return !!queries.length ? queries : [{ field: '' }];
     };
     return getQueryObjects(query);
   }
 
   private appendConjuntions(queryObjects, query) {
     for (const qObject of queryObjects) {
-      const propertyLength = (property) => {return (qObject[property]) ? qObject[property].length : 0 };
+      const propertyLength = (property) => { return (qObject[property]) ? qObject[property].length : 0 };
       const conjuntion = query[0];
-      if(conjuntion.match(this.conjuntions)){
+      if (conjuntion.match(this.conjuntions)) {
         qObject['conjuntion'] = conjuntion;
         query = query.slice(1);
       }
@@ -55,14 +58,14 @@ export class QInterpreter {
     }
   }
 
-  private parseQueryObject(item:string):queryObject {
+  private parseQueryObject(item: string): queryObject {
     const operator = item.match(this.operators);
     if (operator === null) {
       return {
         field: item,
       };
     } else {
-      const {0: field, 1: value} = item.split(this.operators);
+      const { 0: field, 1: value } = item.split(this.operators);
       return {
         field,
         operator: operator[0],
@@ -71,32 +74,32 @@ export class QInterpreter {
     }
   }
 
-  qNumber():number {
+  qNumber(): number {
     return this.queryObjects.length
   }
 
 
-  getQuery(index:number):queryObject {
+  getQuery(index: number): queryObject {
     return this.queryObjects[index];
   }
 
-  
-  setlastQuery(newInput: string, field):queryObject {
+
+  setlastQuery(newInput: string, field): queryObject {
     const lastQuery = {
       ...this.lastQuery(),
-      [field]:newInput
+      [field]: newInput
     };
-    
-    this.queryObjects[this.qNumber()-1] = lastQuery;
+
+    this.queryObjects[this.qNumber() - 1] = lastQuery;
     return lastQuery;
   }
 
-  lastQuery():queryObject {
-    const lastQuery = this.queryObjects.length -1
+  lastQuery(): queryObject {
+    const lastQuery = this.queryObjects.length - 1
     return this.queryObjects[lastQuery];
   }
 
-  addNewQuery(conjuntion:IConjuntions, field='', operator=false, value=false) {
+  addNewQuery(conjuntion: IConjuntions, field = '', operator = false, value = false) {
     const newQuery: queryObject = {
       conjuntion,
       field
@@ -116,22 +119,22 @@ export class QInterpreter {
     this.queryObjects[index] = newQuery;
   }
 
-  deleteByIndex(index:number) {
+  deleteByIndex(index: number) {
     this.queryObjects = this.queryObjects.filter((f, i) => index !== i)
-    if (this.queryObjects.length && this.queryObjects[0].conjuntion){
-      delete this.queryObjects[0].conjuntion;  
+    if (this.queryObjects.length && this.queryObjects[0].conjuntion) {
+      delete this.queryObjects[0].conjuntion;
     }
-  } 
+  }
 
   cleanQuery() {
     this.query = '';
     this.queryObjects = [];
   }
 
-  toString():string { 
+  toString(): string {
     let query = '';
     for (const qObject of this.queryObjects) {
-      const { conjuntion='', field, operator='', value=''} = qObject;
+      const { conjuntion = '', field, operator = '', value = '' } = qObject;
       query += (!!conjuntion ? ` ${conjuntion}` : '') + field + operator + value;
     }
     this.query = query;

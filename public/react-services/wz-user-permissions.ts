@@ -205,7 +205,7 @@ const wazuhPermissions = {
   "group:read": {
     "description": "Access to one or more groups basic information (id, name, agents, etc)",
     "resources": [
-      "*:*"
+      "group:id"
     ],
     "example": {
       "actions": [
@@ -994,7 +994,7 @@ export class WzUserPermissions{
                   .join(':');
               })
               .join('&')
-              .replaceAll(':*', '')
+              .replace(/:\*/g, '')
           );
         });
       };
@@ -1005,7 +1005,7 @@ export class WzUserPermissions{
             ? !isAllow(userPermissions[actionName][userResource])
             : true;
         } else {
-          !isAllow(userPermissions[actionName][userResource]);
+          return !isAllow(userPermissions[actionName][userResource]);
         }
       };
 
@@ -1019,7 +1019,7 @@ export class WzUserPermissions{
               return notAllowInWazuhPermissions(resource);
             }
           })
-        : userPartialResources?.length
+        : (userPartialResources || []).length
         ? userPartialResources.some((resource) => !isAllow(userPermissions[actionName][resource]))
         : wazuhPermissions[actionName].resources.find(
             (resource) => resource === RESOURCE_ANY_SHORT

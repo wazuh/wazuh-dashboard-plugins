@@ -235,7 +235,8 @@ export class RegistryTable extends Component {
         {this.state.isFlyoutVisible && (
           <EuiOverlayMask
             headerZindexLocation="below"
-            onClick={() => this.closeFlyout()} >
+            onClick={() => this.closeFlyout()}
+          >
             <FlyoutDetail
               fileName={this.state.currentFile.file}
               agentId={this.props.agent.id}
