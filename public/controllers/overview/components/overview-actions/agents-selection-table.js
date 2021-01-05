@@ -30,7 +30,7 @@ import {
   EuiToolTip
 } from '@elastic/eui';
 
-import { WzRequest } from '../../../../react-services/wz-request';
+import WzRequest from '../../../../react-services/wz-request';
 import { LEFT_ALIGNMENT, RIGHT_ALIGNMENT, SortableProperties } from '@elastic/eui/lib/services';
 import {  updateCurrentAgentData } from '../../../../redux/actions/appStateActions';
 import  store  from '../../../../redux/store';

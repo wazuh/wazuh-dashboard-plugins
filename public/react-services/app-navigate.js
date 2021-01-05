@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import Cookies from '../utils/js-cookie';
+// import Cookies from '../utils/js-cookie';
 import store from '../redux/store';
 import {} from '../redux/actions/appStateActions';
 import { getIndexPattern } from '../components/overview/mitre/lib';

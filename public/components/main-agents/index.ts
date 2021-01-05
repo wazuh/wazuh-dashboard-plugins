@@ -1,0 +1,1 @@
+export { MainAgents } from './container/main-agents.container';

@@ -37,7 +37,7 @@ import { WazuhConfig } from '../react-services/wazuh-config';
 import { GenericRequest } from '../react-services/generic-request';
 import { WzMisc } from '../factories/misc';
 import { ApiCheck } from '../react-services/wz-api-check';
-import { AppState } from '../react-services/app-state';
+import AppState from '../react-services/app-state';
 
 const assignPreviousLocation = ($rootScope, $location) => {
   const path = $location.path();	

@@ -28,11 +28,11 @@ import {
 import { Pie } from "../../../components/d3/pie";
 import { ProgressChart } from "../../../components/d3/progress";
 import { AgentsTable } from './agents-table'
-import { WzRequest } from '../../../react-services/wz-request';
+import WzRequest from '../../../react-services/wz-request';
 import KibanaVis from '../../../kibana-integrations/kibana-vis';
 import WzReduxProvider from '../../../redux/wz-redux-provider';
 import { VisFactoryHandler } from '../../../react-services/vis-factory-handler';
-import { AppState } from '../../../react-services/app-state';
+import AppState from '../../../react-services/app-state';
 import { FilterHandler } from '../../../utils/filter-handler';
 import { TabVisualizations } from '../../../factories/tab-visualizations';
 import { WazuhConfig } from './../../../react-services/wazuh-config.js';

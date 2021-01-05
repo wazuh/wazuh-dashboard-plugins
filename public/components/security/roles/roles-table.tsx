@@ -10,7 +10,7 @@ import {
     EuiSpacer,
     EuiLoadingSpinner
 } from '@elastic/eui';
-import { WzRequest } from '../../../react-services/wz-request';
+import WzRequest from '../../../react-services/wz-request';
 import { ErrorHandler } from '../../../react-services/error-handler';
 import { WzButtonModalConfirm } from '../../common/buttons';
 import { WzAPIUtils } from '../../../react-services/wz-api-utils';

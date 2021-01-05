@@ -11,7 +11,7 @@
  */
 
 import { healthCheck } from './health-check';
-import { AppState } from '../../react-services/app-state';
+import AppState from '../../react-services/app-state';
 import { npStart } from 'ui/new_platform';
 import { ErrorHandler } from '../../react-services/error-handler';
 

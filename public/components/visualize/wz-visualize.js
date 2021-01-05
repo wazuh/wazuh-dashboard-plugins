@@ -26,7 +26,7 @@ import {
 } from '@elastic/eui';
 import WzReduxProvider from '../../redux/wz-redux-provider';
 import { WazuhConfig } from '../../react-services/wazuh-config';
-import { WzRequest } from '../../react-services/wz-request';
+import WzRequest from '../../react-services/wz-request';
 import { CommonData } from '../../services/common-data';
 import { VisHandlers } from '../../factories/vis-handlers';
 import { RawVisualizations } from '../../factories/raw-visualizations';

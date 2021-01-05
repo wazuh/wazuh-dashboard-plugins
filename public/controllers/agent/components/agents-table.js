@@ -31,8 +31,8 @@ import {
   EuiLoadingSpinner
 } from '@elastic/eui';
 import { CheckUpgrade } from './checkUpgrade';
-import { toastNotifications } from 'ui/notify';
-import { WzRequest } from '../../../react-services/wz-request';
+import { getToasts }  from '../../../kibana-services';
+import WzRequest from '../../../react-services/wz-request';
 import { ActionAgents } from '../../../react-services/action-agents';
 import { AppNavigate } from '../../../react-services/app-navigate';
 import { GroupTruncate } from '../../../components/common/util';
@@ -369,7 +369,7 @@ export class AgentsTable extends Component {
   }
 
   showToast = (color, title, text, time) => {
-    toastNotifications.add({
+    getToasts().add({
       color: color,
       title: title,
       text: text,

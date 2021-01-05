@@ -9,12 +9,13 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { WzRequest } from './wz-request';
-import { toastNotifications } from 'ui/notify';
+import WzRequest from './wz-request';
+// import { getToasts }  from '../../../kibana-services';
+import { getToasts }  from '../kibana-services';
 
 export class ActionAgents {
   static showToast = (color, title, text, time) => {
-    toastNotifications.add({
+    getToasts.add({
       color: color,
       title: title,
       text: text,

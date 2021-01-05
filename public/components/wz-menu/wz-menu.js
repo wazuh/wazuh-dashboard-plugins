@@ -24,7 +24,7 @@ import {
   EuiSelect,
   EuiSpacer
 } from '@elastic/eui';
-import { AppState } from '../../react-services/app-state';
+import AppState from '../../react-services/app-state';
 import { PatternHandler } from '../../react-services/pattern-handler';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { connect } from 'react-redux';

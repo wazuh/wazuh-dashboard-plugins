@@ -25,7 +25,7 @@ import { AgentSelectionTable } from '../../controllers/overview/components/overv
 import chrome from 'ui/chrome';
 import { getServices } from '../../../../../src/plugins/discover/public/kibana_services';
 import { WAZUH_ALERTS_PATTERN } from '../../../util/constants';
-import { AppState } from '../../react-services/app-state';
+import AppState from '../../react-services/app-state';
 
 class WzAgentSelector extends Component {
   constructor(props) {

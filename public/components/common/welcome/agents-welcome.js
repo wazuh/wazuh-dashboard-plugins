@@ -47,7 +47,7 @@ import './welcome.scss';
 import { WzDatePicker } from '../../../components/wz-date-picker/wz-date-picker';
 import KibanaVis from '../../../kibana-integrations/kibana-vis';
 import { VisFactoryHandler } from '../../../react-services/vis-factory-handler';
-import { AppState } from '../../../react-services/app-state';
+import AppState from '../../../react-services/app-state';
 import { FilterHandler } from '../../../utils/filter-handler';
 import { TabVisualizations } from '../../../factories/tab-visualizations';
 import chrome from 'ui/chrome';

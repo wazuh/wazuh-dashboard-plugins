@@ -24,8 +24,8 @@ import {
   EuiBasicTable
 } from '@elastic/eui';
 
-// import { WzRequest } from '../../../../react-services/wz-request';
-import { WzRequest } from '../../../react-services/wz-request';
+// import WzRequest from '../../../../react-services/wz-request';
+import WzRequest from '../../../react-services/wz-request';
 
 export class SelectAgent extends Component {
   constructor(props) {

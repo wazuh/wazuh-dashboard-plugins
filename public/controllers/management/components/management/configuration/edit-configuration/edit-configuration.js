@@ -50,7 +50,7 @@ import { toastNotifications } from 'ui/notify';
 
 import { connect } from 'react-redux';
 import { compose } from 'redux';
-import { AppState } from '../../../../../../react-services/app-state';
+import AppState from '../../../../../../react-services/app-state';
 import { ApiCheck } from '../../../../../../react-services/wz-api-check';
 
 class WzEditConfiguration extends Component {

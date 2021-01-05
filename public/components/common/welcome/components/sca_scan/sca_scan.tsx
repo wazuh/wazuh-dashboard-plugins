@@ -1,16 +1,3 @@
-/*
- * Wazuh app - React component information about last SCA scan.
- *
- * Copyright (C) 2015-2020 Wazuh, Inc.
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * Find more information about this on the LICENSE file.
- */
-
 import React, { Component, Fragment } from 'react';
 import {
   EuiFlexGroup,
@@ -29,10 +16,10 @@ import {
   EuiIcon
 } from '@elastic/eui';
 import moment from 'moment-timezone';
-import chrome from 'ui/chrome';
 import store from '../../../../../redux/store';
 import { updateCurrentAgentData } from '../../../../../redux/actions/appStateActions';
-import { WzRequest } from '../../../../../react-services/wz-request';
+import WzRequest from '../../../../../react-services/wz-request';
+import { getAngularModule } from '../../../../../kibana-services';
 
 export class ScaScan extends Component {
   _isMount = false;
@@ -56,7 +43,7 @@ export class ScaScan extends Component {
 
   async componentDidMount() {
     this._isMount = true;
-    const $injector = await chrome.dangerouslyGetActiveInjector();
+    const $injector = getAngularModule().$injector;
     this.router = $injector.get('$route');
     this.getLastScan(this.props.agent.id);
   }

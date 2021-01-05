@@ -29,7 +29,7 @@ import {
 } from '@elastic/eui';
 import { getServices } from '../../../../../../../../src/plugins/discover/public/kibana_services';
 import { AppNavigate } from '../../../../../react-services/app-navigate';
-import { AppState } from '../../../../../react-services/app-state';
+import AppState from '../../../../../react-services/app-state';
 import { RequirementFlyout } from '../requirement-flyout/requirement-flyout'
 import { WAZUH_ALERTS_PATTERN } from '../../../../../../util/constants';
 

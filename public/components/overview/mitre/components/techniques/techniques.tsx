@@ -33,9 +33,9 @@ import { mitreTechniques, getElasticAlerts, IFilterParams } from '../../lib'
 import { ITactic } from '../../';
 import { getServices } from '../../../../../../../../src/plugins/discover/public/kibana_services';
 import { withWindowSize } from '../../../../../components/common/hocs/withWindowSize';
-import { WzRequest } from '../../../../../react-services/wz-request';
+import WzRequest from '../../../../../react-services/wz-request';
 import {WAZUH_ALERTS_PATTERN} from '../../../../../../util/constants';
-import { AppState } from '../../../../../react-services/app-state';
+import AppState from '../../../../../react-services/app-state';
 import { WzFieldSearchDelay } from '../../../../common/search'
 
 export const Techniques = withWindowSize(class Techniques extends Component {

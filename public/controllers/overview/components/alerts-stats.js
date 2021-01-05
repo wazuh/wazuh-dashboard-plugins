@@ -20,7 +20,7 @@ import { buildPhrasesFilter, buildRangeFilter } from '../../../../../../src/plug
 import { esFilters } from '../../../../../../src/plugins/data/common';
 import { getIndexPattern } from '../../../../public/components/overview/mitre/lib';
 import { WAZUH_ALERTS_PATTERN } from '../../../../util/constants';
-import { AppState } from '../../../react-services/app-state';
+import AppState from '../../../react-services/app-state';
 
 
 class AlertsStats extends Component {

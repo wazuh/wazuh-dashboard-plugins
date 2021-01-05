@@ -70,7 +70,7 @@ import {
 } from '@elastic/eui';
 
 import { agentIsSynchronized } from './utils/wz-fetch';
-import { WzRequest } from '../../../../../react-services/wz-request';
+import WzRequest from '../../../../../react-services/wz-request';
 
 class WzConfigurationSwitch extends Component {
   constructor(props) {

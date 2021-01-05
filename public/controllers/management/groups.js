@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import { WazuhConfig } from '../../react-services/wazuh-config';
-import { WzRequest } from '../../react-services/wz-request';
+import WzRequest from '../../react-services/wz-request';
 import { ShareAgent } from '../../factories/share-agent';
 import { GroupHandler } from '../../react-services/group-handler';
 import { ErrorHandler } from '../../react-services/error-handler';

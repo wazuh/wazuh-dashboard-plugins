@@ -14,9 +14,9 @@ import { TabNames } from '../../utils/tab-names';
 import { TabDescription } from '../../../server/reporting/tab-description';
 
 import { timefilter } from 'ui/timefilter';
-import { AppState } from '../../react-services/app-state';
+import AppState from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
-import { WzRequest } from '../../react-services/wz-request';
+import WzRequest from '../../react-services/wz-request';
 import { ErrorHandler } from '../../react-services/error-handler';
 import { TabVisualizations } from '../../factories/tab-visualizations';
 import { updateCurrentTab, updateCurrentAgentData } from '../../redux/actions/appStateActions';

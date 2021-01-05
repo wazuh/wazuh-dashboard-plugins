@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { AppState } from '../../react-services/app-state';
+import AppState from '../../react-services/app-state';
 import { ErrorHandler } from '../../react-services/error-handler';
 import { WzMisc } from '../../factories/misc';
 

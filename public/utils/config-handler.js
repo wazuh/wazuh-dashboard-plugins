@@ -13,7 +13,7 @@ import js2xmlparser from 'js2xmlparser';
 import XMLBeautifier from './xml-beautifier';
 import { queryConfig } from '../services/query-config';
 import { objectWithoutProperties } from './remove-hash-key.js';
-import { WzRequest } from '../react-services/wz-request';
+import WzRequest from '../react-services/wz-request';
 import { ErrorHandler } from '../react-services/error-handler';
 
 export class ConfigurationHandler {

@@ -25,7 +25,7 @@ import {
   updatePageIndex
 } from '../../../../../redux/actions/rulesetActions';
 
-import { WzRequest } from '../../../../../react-services/wz-request';
+import WzRequest from '../../../../../react-services/wz-request';
 import { ErrorHandler } from '../../../../../react-services/error-handler';
 import exportCsv from '../../../../../react-services/wz-csv';
 import { UploadFiles } from '../../upload-files';

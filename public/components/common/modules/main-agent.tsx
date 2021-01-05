@@ -29,7 +29,7 @@ import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbA
 import store from '../../../redux/store';
 import chrome from 'ui/chrome';
 import { FilterHandler } from '../../../utils/filter-handler';
-import { AppState } from '../../../react-services/app-state';
+import AppState from '../../../react-services/app-state';
 import { ReportingService } from '../../../react-services/reporting';
 import { TabDescription } from '../../../../server/reporting/tab-description';
 import { Events, Dashboard, Loader, Settings } from '../../common/modules';

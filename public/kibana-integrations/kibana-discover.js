@@ -92,7 +92,7 @@ import {
   SEARCH_ON_PAGE_LOAD_SETTING,
   DOC_HIDE_TIME_COLUMN_SETTING,
 } from '../../../../src/plugins/discover/common/';
-import { AppState } from '../react-services/app-state';
+import AppState from '../react-services/app-state';
 
 const fetchStatuses = {
   UNINITIALIZED: 'uninitialized',

@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import { EuiLoadingSpinner, EuiDescriptionList, EuiIcon, EuiCallOut, EuiSpacer, EuiButton } from '@elastic/eui';
 import chrome from 'ui/chrome';
-import { AppState } from '../../react-services/app-state';
+import AppState from '../../react-services/app-state';
 import { PatternHandler } from '../../react-services/pattern-handler';
 import { getAngularModule } from '../../../../../src/plugins/discover/public/kibana_services';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { GenericRequest } from '../../react-services/generic-request';
 import { ApiCheck } from '../../react-services/wz-api-check';
-import { WzRequest } from '../../react-services/wz-request';
+import WzRequest from '../../react-services/wz-request';
 import { SavedObject } from '../../react-services/saved-objects';
 import { ErrorHandler } from '../../react-services/error-handler';
 import { toastNotifications } from 'ui/notify';

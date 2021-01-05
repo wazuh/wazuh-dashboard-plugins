@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { EuiPanel, EuiFlexGroup, EuiFlexItem, EuiToolTip, EuiButtonIcon, EuiTitle, EuiInMemoryTable, EuiFieldSearch } from '@elastic/eui';
-import { WzRequest } from '../../../react-services/wz-request';
+import WzRequest from '../../../react-services/wz-request';
 
 export class NodeList extends Component {
     constructor(props) {

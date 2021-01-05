@@ -19,7 +19,7 @@ import {
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
-import { WzRequest } from '../../../../../react-services/wz-request';
+import WzRequest from '../../../../../react-services/wz-request';
 
 import RulesetHandler from './utils/ruleset-handler';
 

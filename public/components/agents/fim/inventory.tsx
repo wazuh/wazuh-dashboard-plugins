@@ -36,7 +36,7 @@ import {
   FilterBar,
   RegistryTable
 } from './inventory/';
-import { WzRequest } from '../../../react-services/wz-request';
+import WzRequest from '../../../react-services/wz-request';
 import exportCsv from '../../../react-services/wz-csv';
 import { toastNotifications } from 'ui/notify';
 import { ICustomBadges } from '../../wz-search-bar/components';

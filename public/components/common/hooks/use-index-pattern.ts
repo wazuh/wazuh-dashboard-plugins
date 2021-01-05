@@ -12,7 +12,7 @@
 import { useState, useEffect} from 'react';
 //@ts-ignore
 import { getServices } from '../../../../../../src/plugins/discover/public/kibana_services';
-import { AppState } from '../../../react-services/app-state';
+import AppState from '../../../react-services/app-state';
 import { IIndexPattern } from '../../../../../../src/plugins/data/public';
 
 export const useIndexPattern = (): IIndexPattern | undefined => {

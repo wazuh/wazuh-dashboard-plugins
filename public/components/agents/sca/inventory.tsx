@@ -21,7 +21,7 @@ import {
   EuiCallOut,
   EuiPopover
 } from '@elastic/eui';
-import { WzRequest } from '../../../react-services/wz-request';
+import WzRequest from '../../../react-services/wz-request';
 import TimeService from '../../../react-services/time-service'
 import exportCsv from '../../../react-services/wz-csv';
 import { toastNotifications } from 'ui/notify';

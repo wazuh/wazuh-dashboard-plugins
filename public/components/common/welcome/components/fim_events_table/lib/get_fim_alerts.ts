@@ -14,7 +14,7 @@
 import { getIndexPattern, getElasticAlerts, IFilterParams } from '../../../../../overview/mitre/lib'
 import { buildPhraseFilter } from '../../../../../../../../../src/plugins/data/common';
 
-import { AppState } from '../../../../../../react-services/app-state'
+import AppState from '../../../../../../react-services/app-state'
 
 
 function createFilters(agentId, indexPattern) {

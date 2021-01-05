@@ -14,7 +14,7 @@ import React, { Component, Fragment } from 'react';
 import {
 } from '@elastic/eui';
 import { DevTools } from './devtools'
-import { AppState } from '../../../react-services/app-state';
+import AppState from '../../../react-services/app-state';
 
 export class MainDevTools extends Component {
   constructor(props) {

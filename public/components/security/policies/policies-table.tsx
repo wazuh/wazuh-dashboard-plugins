@@ -6,7 +6,7 @@ import {
     EuiToolTip,
     EuiButtonIcon
 } from '@elastic/eui';
-import { WzRequest } from '../../../react-services/wz-request';
+import WzRequest from '../../../react-services/wz-request';
 import { ErrorHandler } from '../../../react-services/error-handler';
 import { WzAPIUtils } from '../../../react-services/wz-api-utils';
 import { WzButtonModalConfirm } from '../../common/buttons';

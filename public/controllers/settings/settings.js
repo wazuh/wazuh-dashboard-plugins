@@ -11,7 +11,7 @@
  */
 import { TabNames } from '../../utils/tab-names';
 import { kibana } from '../../../package.json';
-import { AppState } from '../../react-services/app-state';
+import AppState from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { GenericRequest } from '../../react-services/generic-request';
 import { WzMisc } from '../../factories/misc';

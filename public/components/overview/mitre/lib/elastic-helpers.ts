@@ -9,12 +9,9 @@
  *
  * Find more information about this on the LICENSE file.
  */
-// @ts-ignore
-import { getServices } from '../../../../../../../src/plugins/discover/public/kibana_services';
-// @ts-ignore
-import { npSetup } from 'ui/new_platform';
-import { AppState } from '../../../../react-services/app-state';
-import { GenericRequest } from '../../../../react-services/generic-request';
+import { getDataPlugin, getUiSettings } from '../../../../kibana-services';
+import AppState from '../../../../react-services/app-state';
+import GenericRequest from '../../../../react-services/generic-request';
 import { Query, TimeRange, buildRangeFilter, buildEsQuery, getEsQueryConfig, Filter } from '../../../../../../../src/plugins/data/common';
 import { SearchParams, SearchResponse } from 'elasticsearch';
 import { WazuhConfig } from '../../../../react-services/wazuh-config';
@@ -31,7 +28,7 @@ interface IWzResponse extends Response {
 
 export async function getIndexPattern() {
   const idIndexPattern = AppState.getCurrentPattern();
-  const indexPattern = await getServices().indexPatterns.get(idIndexPattern);
+  const indexPattern = await getDataPlugin().indexPatterns.get(idIndexPattern);
   return indexPattern;
 }
 
@@ -95,6 +92,6 @@ function buildQuery(indexPattern, filterParams:IFilterParams) {
     undefined,
     query,
     [...filters, timeFilter],
-    getEsQueryConfig(npSetup.core.uiSettings) 
+    getEsQueryConfig(getUiSettings.core.uiSettings) 
   );
 }

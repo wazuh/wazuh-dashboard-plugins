@@ -30,7 +30,7 @@ import 'brace/mode/less';
 import 'brace/theme/github';	
 import exportCsv from '../../../../../react-services/wz-csv';
 import { toastNotifications } from 'ui/notify';
-import { WzRequest } from '../../../../../react-services/wz-request';
+import WzRequest from '../../../../../react-services/wz-request';
 import { withUserAuthorizationPrompt, withGlobalBreadcrumb } from '../../../../../components/common/hocs';
 import { compose } from 'redux';
 import { WzFieldSearch } from '../../../../../components/wz-field-search-bar/wz-field-search-bar';

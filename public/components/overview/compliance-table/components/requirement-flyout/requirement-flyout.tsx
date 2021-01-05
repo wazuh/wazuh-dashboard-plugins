@@ -28,7 +28,7 @@ import {
     EuiSpacer
 } from '@elastic/eui';
 import { Discover } from '../../../../common/modules/discover';
-import { AppState } from '../../../../../react-services/app-state';
+import AppState from '../../../../../react-services/app-state';
 import { requirementGoal } from '../../requirement-goal';
 
 

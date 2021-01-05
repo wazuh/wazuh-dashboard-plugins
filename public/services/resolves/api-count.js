@@ -18,7 +18,7 @@
  * @param {*} genericReq Wazuh module for doing generic requests to our backend.
  * @param {*} $location Angular.js library for URL and paths manipulation.
  */
-import { AppState } from '../../react-services/app-state';
+import AppState from '../../react-services/app-state';
 import { GenericRequest } from '../../react-services/generic-request';
 
 export function apiCount($q, $location) {

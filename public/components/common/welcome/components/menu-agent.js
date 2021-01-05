@@ -11,12 +11,12 @@
  */
 import React, { Component } from 'react';
 import { EuiFlexGroup, EuiFlexItem, EuiFlexGrid, EuiButtonEmpty, EuiSideNav, EuiIcon, EuiButtonIcon } from '@elastic/eui';
-import { WzRequest } from './../../../../react-services/wz-request';
+import WzRequest from './../../../../react-services/wz-request';
 import { connect } from 'react-redux';
 import store from './../../../../redux/store';
 import chrome from 'ui/chrome';
 import { updateCurrentAgentData } from '../../../../redux/actions/appStateActions';
-import { AppState } from './../../../../react-services/app-state';
+import AppState from './../../../../react-services/app-state';
 import { UnsupportedComponents } from './../../../../utils/components-os-support';
 import { toastNotifications } from 'ui/notify';
 

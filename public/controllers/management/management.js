@@ -10,9 +10,9 @@
  * Find more information about this on the LICENSE file.
  */
 import { TabNames } from '../../utils/tab-names';
-import { AppState } from '../../react-services/app-state';
+import AppState from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
-import { WzRequest } from '../../react-services/wz-request';
+import WzRequest from '../../react-services/wz-request';
 import { ErrorHandler } from '../../react-services/error-handler';
 import { ShareAgent } from '../../factories/share-agent';
 import RulesetHandler from './components/management/ruleset/utils/ruleset-handler';

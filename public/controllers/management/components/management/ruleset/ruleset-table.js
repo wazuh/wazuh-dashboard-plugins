@@ -33,7 +33,7 @@ import {
 } from '../../../../../redux/actions/rulesetActions';
 
 import RulesetColums from './utils/columns';
-import { WzRequest } from '../../../../../react-services/wz-request';
+import WzRequest from '../../../../../react-services/wz-request';
 import { filtersToObject } from '../../../../../components/wz-search-bar';
 import { withUserPermissions } from '../../../../../components/common/hocs/withUserPermissions';
 import { WzUserPermissions } from '../../../../../react-services/wz-user-permissions';

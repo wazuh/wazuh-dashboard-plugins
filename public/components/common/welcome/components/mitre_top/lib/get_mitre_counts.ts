@@ -13,7 +13,7 @@
 import { getIndexPattern, getElasticAlerts, IFilterParams } from '../../../../../overview/mitre/lib'
 import { buildExistsFilter, buildPhraseFilter  } from '../../../../../../../../../src/plugins/data/common';
 
-import { AppState } from '../../../../../../react-services/app-state'
+import AppState from '../../../../../../react-services/app-state'
 
 
 function createFilters(indexPattern, agentId, tactic: string | undefined) {

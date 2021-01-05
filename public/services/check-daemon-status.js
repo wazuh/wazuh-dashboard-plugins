@@ -1,6 +1,6 @@
 import store from '../redux/store';
 import { updateWazuhNotReadyYet } from '../redux/actions/appStateActions';
-import { WzRequest } from '../react-services/wz-request';
+import WzRequest from '../react-services/wz-request';
 
 export class CheckDaemonsStatus {
   constructor($rootScope, $timeout) {

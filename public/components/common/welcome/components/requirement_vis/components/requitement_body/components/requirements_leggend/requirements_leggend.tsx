@@ -13,7 +13,6 @@
  */
 
 // @ts-ignore
-import chrome from 'ui/chrome';
 import React from "react";
 import { EuiIcon } from "@elastic/eui";
 import { EuiListGroup } from "@elastic/eui";

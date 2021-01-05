@@ -22,7 +22,7 @@ import {
   updateIsProcessing
 } from '../../../../redux/actions/rulesetActions';
 
-import { WzRequest } from '../../../../react-services/wz-request';
+import WzRequest from '../../../../react-services/wz-request';
 
 class WzSectionSelector extends Component {
   constructor(props) {

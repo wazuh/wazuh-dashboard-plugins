@@ -32,7 +32,7 @@ import {
   EuiProgress,
   EuiCode
 } from '@elastic/eui';
-import { WzRequest } from '../../../react-services/wz-request';
+import WzRequest from '../../../react-services/wz-request';
 
 export class RegisterAgent extends Component {
   constructor(props) {

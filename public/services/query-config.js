@@ -18,7 +18,7 @@
  */
 
 import { ErrorHandler } from '../react-services/error-handler';
-import { WzRequest } from '../react-services/wz-request';
+import WzRequest from '../react-services/wz-request';
 
 export async function queryConfig(
   agentId,

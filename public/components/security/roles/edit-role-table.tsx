@@ -5,7 +5,7 @@ import {
     EuiDescriptionList,
 } from '@elastic/eui';
 import { RIGHT_ALIGNMENT } from '@elastic/eui/lib/services';
-import { WzRequest } from '../../../react-services/wz-request';
+import WzRequest from '../../../react-services/wz-request';
 import { ErrorHandler } from '../../../react-services/error-handler';
 
 

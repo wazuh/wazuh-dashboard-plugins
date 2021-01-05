@@ -15,8 +15,8 @@
 // import React, { useRef, useEffect, useState, Fragment } from 'react'
 // import { EuiIcon, EuiFlexGroup, EuiFlexItem, EuiBadge, EuiButtonEmpty, EuiToolTip, EuiScreenReaderOnly, EuiProgress, EuiCodeEditor, EuiButtonIcon, EuiSelect, EuiPopover } from '@elastic/eui';
 // import * as senseEditor from '../../../../../../src/plugins/console/public/application/models/sense_editor/';
-// import { AppState } from '../../../react-services/app-state'
-// import { WzRequest } from '../../../react-services/wz-request';
+// import AppState from '../../../react-services/app-state'
+// import WzRequest from '../../../react-services/wz-request';
 // import $ from 'jquery';
 // import queryString from 'querystring-browser';
 // import { apiRequestList } from './api-requests-list';

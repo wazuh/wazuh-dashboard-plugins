@@ -35,8 +35,8 @@ import {
   EuiToolTip,
   EuiIcon
 } from '@elastic/eui';
-import { WzRequest } from '../../../../../../../react-services/wz-request';
-import { AppState } from '../../../../../../../react-services/app-state';
+import WzRequest from '../../../../../../../react-services/wz-request';
+import AppState from '../../../../../../../react-services/app-state';
 import { AppNavigate } from '../../../../../../../react-services/app-navigate';
 import { Discover } from '../../../../../../common/modules/discover';
 

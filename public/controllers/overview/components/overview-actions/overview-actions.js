@@ -31,7 +31,7 @@ import {
 import './agents-selector.scss';
 import { AgentSelectionTable } from './agents-selection-table';
 import { WAZUH_ALERTS_PATTERN } from '../../../../../util/constants';
-import { AppState } from '../../../../react-services/app-state';
+import AppState from '../../../../react-services/app-state';
 class OverviewActions extends Component {
   constructor(props) {
     super(props);

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { EuiPanel, EuiFlexGroup, EuiButtonEmpty, EuiFlexItem, EuiText, EuiLoadingSpinner, EuiFieldSearch, EuiHorizontalRule, EuiIcon, EuiBasicTable } from "@elastic/eui";
 import { useApiRequest } from '../../../common/hooks/useApiRequest';
 import { KeyEquivalence } from '../../../../../util/csv-key-equivalence';
-import { AppState } from '../../../../react-services/app-state';
+import AppState from '../../../../react-services/app-state';
 
 
 export function SyscollectorTable({ tableParams }) {

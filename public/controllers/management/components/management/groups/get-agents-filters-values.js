@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { WzRequest } from "../../../../../react-services/wz-request";
+import WzRequest from "../../../../../react-services/wz-request";
 
 export async function getAgentFilterValues(field, value, filters = {}) {
   const filter = {

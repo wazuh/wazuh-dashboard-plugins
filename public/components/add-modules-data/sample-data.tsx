@@ -27,8 +27,8 @@ import {
 } from '@elastic/eui';
 
 import { toastNotifications } from 'ui/notify';
-import { WzRequest } from '../../react-services/wz-request';
-import { AppState } from '../../react-services/app-state';
+import WzRequest from '../../react-services/wz-request';
+import AppState from '../../react-services/app-state';
 import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../util/constants';
 
 export default class WzSampleData extends Component {

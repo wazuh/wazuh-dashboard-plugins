@@ -16,7 +16,7 @@ import {
   updateFilters,
   updateIsProcessing
 } from '../../../../../redux/actions/rulesetActions';
-import { WzRequest } from '../../../../../react-services/wz-request';
+import WzRequest from '../../../../../react-services/wz-request';
 import { WzSearchBar } from '../../../../../components/wz-search-bar';
 
 class WzRulesetSearchBar extends Component {

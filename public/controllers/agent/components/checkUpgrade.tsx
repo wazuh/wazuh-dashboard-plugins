@@ -15,7 +15,7 @@ import {
 	EuiLoadingSpinner,
 	EuiToolTip
 } from '@elastic/eui';
-import { WzRequest } from '../../../react-services/wz-request';
+import WzRequest from '../../../react-services/wz-request';
 
 export class CheckUpgrade extends Component {
 	props!: {

@@ -31,7 +31,7 @@ import { WzButtonPermissions } from '../../common/permissions/button';
 import WzReduxProvider from '../../../redux/wz-redux-provider';
 import store from '../../../redux/store';
 import { updateSelectedSettingsSection } from '../../../redux/actions/appStateActions';
-import { AppState } from '../../../react-services/app-state';
+import AppState from '../../../react-services/app-state';
 import { API_USER_STATUS_RUN_AS } from '../../../../server/lib/cache-api-user-has-run-as';
 
 export class ApiTable extends Component {

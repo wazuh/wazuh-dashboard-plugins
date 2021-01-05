@@ -11,7 +11,7 @@
  */
 
 import { GenericRequest } from "./generic-request";
-import { WzRequest } from './wz-request';
+import WzRequest from './wz-request';
 
 export class WzSecurityXpack {
   static async getUsers() {

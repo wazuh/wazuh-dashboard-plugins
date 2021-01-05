@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { WzRequest } from './wz-request';
+import WzRequest from './wz-request';
 import * as FileSaver from '../services/file-saver';
 
 /**

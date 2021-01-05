@@ -12,7 +12,7 @@ import {
   EuiSpacer
 } from '@elastic/eui';
 import { TabDescription } from '../../../../server/reporting/tab-description';
-import { AppState } from '../../../react-services/app-state';
+import AppState from '../../../react-services/app-state';
 import WzReduxProvider from '../../../redux/wz-redux-provider';
 import store from '../../../redux/store';
 import { updateSelectedSettingsSection } from '../../../redux/actions/appStateActions';

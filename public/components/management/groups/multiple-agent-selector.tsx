@@ -15,7 +15,7 @@ import {
   EuiButtonIcon, EuiBadge, EuiTitle, EuiLoadingSpinner, EuiFieldSearch, EuiKeyPadMenu, EuiKeyPadMenuItem, EuiIcon
 } from '@elastic/eui';
 import { ErrorHandler } from '../../../react-services/error-handler';
-import { WzRequest } from '../../../react-services/wz-request';
+import WzRequest from '../../../react-services/wz-request';
 import './multiple-agent-selector.scss'
 import $ from 'jquery';
 import { WzFieldSearchDelay } from '../../common/search';

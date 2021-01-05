@@ -18,7 +18,7 @@ import {
   EuiFlexGroup,
   EuiHealth
 } from '@elastic/eui';
-import { WzRequest } from '../../../react-services/wz-request';
+import WzRequest from '../../../react-services/wz-request';
 
 export class AgentInfo extends Component {
   constructor(props) {

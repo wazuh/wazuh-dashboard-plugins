@@ -11,7 +11,7 @@
  */
 import store from '../redux/store';
 import { updateWazuhNotReadyYet } from '../redux/actions/appStateActions';
-import { WzRequest } from './wz-request';
+import WzRequest from './wz-request';
 
 const delay = time => new Promise(res => setTimeout(res,time));
 let busy = false;

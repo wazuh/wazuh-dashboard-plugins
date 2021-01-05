@@ -19,9 +19,9 @@ import {
   EuiLoadingContent,
   EuiCallOut
 } from '@elastic/eui';
-import { WzRequest } from '../../../../react-services/wz-request';
+import WzRequest from '../../../../react-services/wz-request';
 import { FileDetails } from './fileDetail';
-import { AppState } from '../../../../react-services/app-state';
+import AppState from '../../../../react-services/app-state';
 
 export class FlyoutDetail extends Component {
   state: {

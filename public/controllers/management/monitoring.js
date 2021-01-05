@@ -11,9 +11,9 @@
  */
 import { FilterHandler } from '../../utils/filter-handler';
 import { timefilter } from 'ui/timefilter';
-import { AppState } from '../../react-services/app-state';
+import AppState from '../../react-services/app-state';
 import { GenericRequest } from '../../react-services/generic-request';
-import { WzRequest } from '../../react-services/wz-request';
+import WzRequest from '../../react-services/wz-request';
 import { ErrorHandler } from '../../react-services/error-handler';
 import { TabVisualizations } from '../../factories/tab-visualizations';
 import store from '../../redux/store';

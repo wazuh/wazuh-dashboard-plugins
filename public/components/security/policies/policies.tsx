@@ -21,7 +21,7 @@ import {
   EuiInMemoryTable
 } from '@elastic/eui';
 import { PoliciesTable } from './policies-table';
-import { WzRequest } from '../../../react-services/wz-request';
+import WzRequest from '../../../react-services/wz-request';
 import { WazuhSecurity } from '../../../factories/wazuh-security'
 import { ErrorHandler } from '../../../react-services/error-handler';
 import { EditPolicyFlyout } from './edit-policy';

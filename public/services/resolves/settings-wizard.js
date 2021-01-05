@@ -11,7 +11,7 @@
  */
 
 import { healthCheck } from './health-check';
-import { AppState } from '../../react-services/app-state';
+import AppState from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { ApiCheck } from '../../react-services/wz-api-check';
 import { ErrorHandler } from '../../react-services/error-handler';

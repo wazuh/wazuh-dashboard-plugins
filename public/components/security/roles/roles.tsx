@@ -17,7 +17,7 @@ import {
   EuiComboBox
 } from '@elastic/eui';
 import { RolesTable } from './roles-table';
-import { WzRequest } from '../../../react-services/wz-request'
+import WzRequest from '../../../react-services/wz-request'
 import { CreateRole } from './create-role';
 import { EditRole } from './edit-role';
 

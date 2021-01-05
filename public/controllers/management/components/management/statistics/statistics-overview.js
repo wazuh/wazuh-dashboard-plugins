@@ -37,7 +37,7 @@ import { withGuard, withGlobalBreadcrumb } from "../../../../../components/commo
 import { PromptStatisticsDisabled } from './prompt-statistics-disabled';
 import { PromptStatisticsNoIndices } from './prompt-statistics-no-indices';
 import { WazuhConfig } from "../../../../../react-services/wazuh-config";
-import { WzRequest } from '../../../../../react-services/wz-request';
+import WzRequest from '../../../../../react-services/wz-request';
 
 const wzConfig = new WazuhConfig();
 
