@@ -89,7 +89,8 @@ function FimTable({ agent }) {
         {isOpen && (
           <EuiOverlayMask
             headerZindexLocation="below"
-            onClick={() => setIsOpen(false)} >
+            onClick={() => setIsOpen(false)}
+          >
             <FlyoutDetail
             agentId={agent.id}
             closeFlyout={() => setIsOpen(false)}

@@ -64,7 +64,8 @@ export async function getWzConfig($q, genericReq, wazuhConfig) {
     'alerts.sample.prefix': WAZUH_SAMPLE_ALERT_PREFIX,
     hideManagerAlerts: false,
     'logs.level': 'info',
-    'enrollment.dns': ''
+    'enrollment.dns': '',
+    'enrollment.password': '',
   };
 
   try {

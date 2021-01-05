@@ -1,5 +1,7 @@
 import React from 'react';
 import {
+  EuiSpacer,
+  EuiToolTip,
   EuiInMemoryTable,
   EuiBadge,
   EuiFlexItem,
@@ -58,10 +60,23 @@ export const RolesMappingTable = ({ rolesEquivalences, rules, loading, editRule,
     {
       field: 'id',
       name: 'Status',
-      render: item => {
-        return WzAPIUtils.isReservedID(item) && <EuiBadge color="primary">Reserved</EuiBadge>;
+      render (item, obj){
+        if(WzAPIUtils.isReservedID(item)){
+          if( (obj.id === 1 || obj.id === 2)){
+            return(
+              <EuiFlexGroup>
+              <EuiBadge color="primary">Reserved</EuiBadge>
+                <EuiToolTip position="top" content="wui_ rules belong to wazuh-wui API user">
+                  <EuiBadge color="accent" title="" style={{ marginLeft: 10 }}>wazuh-wui</EuiBadge>
+                </EuiToolTip>
+              </EuiFlexGroup>
+            );
+          }
+          else
+            return <EuiBadge color="primary">Reserved</EuiBadge>;
+        }
       },
-      width: '150',
+      width: '300',
       sortable: false,
     },
     {

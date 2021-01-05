@@ -772,17 +772,6 @@ function discoverController(
     $scope.rows = resp.hits.hits;
     // Ensure we have "hits" and "rows" available as soon as possible
     $scope.$applyAsync();
-
-    // if we haven't counted yet, reset the counts
-    const counts = ($scope.fieldCounts = $scope.fieldCounts || {});
-
-    $scope.rows.forEach((hit) => {
-      const fields = Object.keys($scope.indexPattern.flattenHit(hit));
-      fields.forEach((fieldName) => {
-        counts[fieldName] = (counts[fieldName] || 0) + 1;
-      });
-    });
-
     $scope.fetchStatus = fetchStatuses.COMPLETE;
   }
 
