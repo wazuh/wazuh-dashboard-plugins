@@ -174,9 +174,8 @@ export class SavedObject {
    */
   static async refreshIndexPattern(pattern) {
     try {
-      const { title: patternTitle } = await getDataPlugin().indexPatterns.get(pattern);
-      const fields = await SavedObject.getIndicesFields(pattern);
-      await this.refreshFieldsOfIndexPattern(pattern, patternTitle, fields);
+      const fields = await SavedObject.getIndicesFields(pattern.title);
+      await this.refreshFieldsOfIndexPattern(pattern.id, pattern.title, fields);
 
       return;
     } catch (error) {
