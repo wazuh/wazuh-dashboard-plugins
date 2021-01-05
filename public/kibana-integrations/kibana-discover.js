@@ -29,14 +29,17 @@ import {
   setDocViewsRegistry,
   subscribeWithScope,
   tabifyAggResponse,
+  getHeaderActionMenuMounter,
 } from './discover/kibana_services';
+
+import indexTemplateLegacy from './discover/application/angular/discover_legacy.html';
 
 getAngularModule().directive('kbnDis', [
   function () {
     return {
       restrict: 'E',
       scope: {},
-      template: discoverTemplate
+      template: indexTemplateLegacy//discoverTemplate,
     };
   }
 ]);
@@ -89,6 +92,9 @@ import {
   DOC_HIDE_TIME_COLUMN_SETTING,
 } from './discover/common';
 import { AppState } from '../react-services/app-state';
+import { createFixedScroll } from './discover/application/angular/directives/fixed_scroll';
+
+import './discover/application/index.scss';
 
 const fetchStatuses = {
   UNINITIALIZED: 'uninitialized',
@@ -104,14 +110,14 @@ appDiscover.run(async () => {
     getCore(),
     getPlugins(),
     { env: { packageInfo: { branch: "7.10" } } },
-    () => {}
+    () => getAngularModule().$injector
   );
   setServices(services);
 });
 
 const wazuhApp = getAngularModule();
 
-appDiscover.directive('discoverAppW', function () {
+appDiscover.directive('discoverApp', function () {
   return {
     restrict: 'E',
     controllerAs: 'discoverApp',
@@ -155,7 +161,7 @@ function discoverController(
       getCore(),
       getPlugins(),
       { env: { packageInfo: { branch: "7.10" } } },
-      () => {}
+      () => getAngularModule().$injector
     );
     this.docViewsRegistry = new DocViewsRegistry();
     setDocViewsRegistry(this.docViewsRegistry);
@@ -190,7 +196,7 @@ function discoverController(
 
   const wazuhConfig = new WazuhConfig();
   const modulesHelper = ModulesHelper;
-
+ 
   const getTimeField = () => {
     return isDefaultType($scope.indexPattern) ? $scope.indexPattern.timeFieldName : undefined;
   };
@@ -224,11 +230,15 @@ function discoverController(
 
   // sync initial app filters from state to filterManager
   filterManager.setAppFilters(_.cloneDeep(appStateContainer.getState().filters));
+  data.query.queryString.setQuery(appStateContainer.getState().query);
 
   const stopSyncingQueryAppStateWithStateContainer = connectToQueryState(
     data.query,
     appStateContainer,
-    { filters: esFilters.FilterStateStore.APP_STATE }
+    {
+      filters: esFilters.FilterStateStore.APP_STATE,
+      query: true,
+    }
   );
 
   const appStateUnsubscribe = appStateContainer.subscribe(async (newState) => {
@@ -237,6 +247,11 @@ function discoverController(
 
     if (!_.isEqual(newStatePartial, oldStatePartial)) {
       $scope.$evalAsync(async () => {
+        if (oldStatePartial.index !== newStatePartial.index) {
+          //in case of index switch the route has currently to be reloaded, legacy
+          return;
+        }
+
         $scope.state = { ...newState };
 
         // detect changes that should trigger fetching of new data
@@ -261,8 +276,18 @@ function discoverController(
   });
 
   $scope.setIndexPattern = async (id) => {
-    await replaceUrlAppState({ index: id });
-    $route.reload();
+    const nextIndexPattern = await indexPatterns.get(id);
+    if (nextIndexPattern) {
+      const nextAppState = getSwitchIndexPatternAppState(
+        $scope.indexPattern,
+        nextIndexPattern,
+        $scope.state.columns,
+        $scope.state.sort,
+        config.get(MODIFY_COLUMNS_ON_SWITCH)
+      );
+      await replaceUrlAppState(nextAppState);
+      $route.reload();
+    }
   };
 
   // update data source when filters update
@@ -437,12 +462,7 @@ function discoverController(
   };
 
   function getStateDefaults() {
-    const query =
-      $scope.searchSource.getField('query') ||
-      getDefaultQuery(
-        localStorage.get('kibana.userQueryLanguage') ||
-        config.get(UI_SETTINGS.SEARCH_QUERY_LANGUAGE)
-      );
+    const query = $scope.searchSource.getField('query') || data.query.queryString.getDefaultQuery();
     return {
       query,
       sort: getSortArray(savedSearch.sort, $scope.indexPattern),
@@ -465,6 +485,9 @@ function discoverController(
     timefield: getTimeField(),
     savedSearch: savedSearch,
     indexPatternList: $route.current.locals.ip.list,
+    config: config,
+    fixedScroll: $scope.tabView === 'discover'? createFixedScroll($scope, $timeout) : () => {},
+    setHeaderActionMenu: () => {} //getHeaderActionMenuMounter(),
   };
 
   const shouldSearchOnPageLoad = () => {
@@ -636,6 +659,7 @@ function discoverController(
     if (!init.complete) return;
     $scope.fetchCounter++;
     $scope.fetchError = undefined;
+    $scope.minimumVisibleRows = 50;
     if (!validateTimeRange(timefilter.getTime(), toastNotifications)) {
       $scope.resultState = 'none';
       return;
@@ -666,7 +690,7 @@ function discoverController(
       });
   };
 
-  $scope.updateQuery = function ({ query }, isUpdate = true) {
+  $scope.handleRefresh = function ({ query }, isUpdate = true) {
     // Wazuh filters are not ready yet
     if (!filtersAreReady()) return;
     if (!_.isEqual(query, appStateContainer.getState().query) || isUpdate === false) {
@@ -729,7 +753,7 @@ function discoverController(
   }
 
   function onResults(resp) {
-    inspectorRequest.stats(getResponseInspectorStats($scope.searchSource, resp)).ok({ json: resp });
+    inspectorRequest.stats(getResponseInspectorStats(resp, $scope.searchSource)).ok({ json: resp });
 
     if (getTimeField()) {
       const tabifiedData = tabifyAggResponse($scope.vis.data.aggs, resp);
@@ -748,6 +772,17 @@ function discoverController(
     $scope.rows = resp.hits.hits;
     // Ensure we have "hits" and "rows" available as soon as possible
     $scope.$applyAsync();
+
+    // if we haven't counted yet, reset the counts
+    const counts = ($scope.fieldCounts = $scope.fieldCounts || {});
+
+    $scope.rows.forEach((hit) => {
+      const fields = Object.keys($scope.indexPattern.flattenHit(hit));
+      fields.forEach((fieldName) => {
+        counts[fieldName] = (counts[fieldName] || 0) + 1;
+      });
+    });
+
     $scope.fetchStatus = fetchStatuses.COMPLETE;
   }
 
@@ -856,7 +891,7 @@ function discoverController(
           config.get(SORT_DEFAULT_ORDER_SETTING)
         )
       )
-      .setField('query', $scope.state.query || null)
+      .setField('query', data.query.queryString.getQuery() || null)
       .setField('filter', filterManager.getFilters());
     //Wazuh update the visualizations
     $rootScope.$broadcast('updateVis');
@@ -1052,6 +1087,8 @@ function discoverController(
   };
 
   $scope.tabView = $location.search().tabView || 'panels';
+  $scope.showMain = $scope.tabView === 'discover';
+
   const tabListener = $rootScope.$on(
     'changeTabView',
     async (evt, parameters) => {
@@ -1059,12 +1096,14 @@ function discoverController(
       $scope.$applyAsync();
       $scope.tabView = parameters.tabView || 'panels';
       $scope.tab = parameters.tab;
+      $scope.showMain = $scope.tabView === 'discover';
+
       evt.stopPropagation();
       if ($scope.tabView === 'discover') {
         $scope.rows = false;
         $scope.fetch();
       }
-      $scope.updateQuery({
+      $scope.handleRefresh({
         query: $scope.state.query
       }, false);
       $scope.$applyAsync();
@@ -1095,5 +1134,6 @@ function discoverController(
 
   init();
   // Propagate current app state to url, then start syncing
-  //replaceUrlAppState().then(() => startStateSync());
+  replaceUrlAppState().then(() => startStateSync());
 }
+

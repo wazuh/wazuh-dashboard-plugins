@@ -52,5 +52,6 @@ export function createDiscoverLegacyDirective(reactDirective: any) {
     ['updateQuery', { watchDepth: 'reference' }],
     ['updateSavedQueryId', { watchDepth: 'reference' }],
     ['vis', { watchDepth: 'reference' }],
+    ['showMain', { watchDepth: 'reference' }],
   ]);
 }

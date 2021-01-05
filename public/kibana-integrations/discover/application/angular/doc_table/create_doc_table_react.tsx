@@ -20,7 +20,7 @@ import angular, { auto, ICompileService, IScope } from 'angular';
 import { render } from 'react-dom';
 import React, { useRef, useEffect } from 'react';
 import { getServices, IIndexPattern } from '../../../kibana_services';
-import { IndexPatternField } from '../../../../../data/common/index_patterns';
+import { IndexPatternField } from '../../../../../../../../src/plugins/data/common/index_patterns';
 export type AngularScope = IScope;
 
 export interface AngularDirective {

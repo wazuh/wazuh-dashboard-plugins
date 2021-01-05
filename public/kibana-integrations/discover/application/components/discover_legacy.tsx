@@ -45,9 +45,9 @@ import { Chart } from '../angular/helpers/point_series';
 import { AppState } from '../angular/discover_state';
 import { SavedSearch } from '../../saved_searches';
 
-import { SavedObject } from '../../../../../core/types';
-import { Vis } from '../../../../visualizations/public';
-import { TopNavMenuData } from '../../../../navigation/public';
+import { SavedObject } from '../../../../../../../src/core/types';
+import { Vis } from '../../../../../../../src/plugins/visualizations/public';
+import { TopNavMenuData } from '../../../../../../../src/plugins/navigation/public';
 
 export interface DiscoverLegacyProps {
   addColumn: (column: string) => void;
@@ -87,6 +87,7 @@ export interface DiscoverLegacyProps {
   updateQuery: (payload: { dateRange: TimeRange; query?: Query }, isUpdate?: boolean) => void;
   updateSavedQueryId: (savedQueryId?: string) => void;
   vis?: Vis;
+  showMain?: Boolean; 
 }
 
 export function DiscoverLegacy({
@@ -118,6 +119,7 @@ export function DiscoverLegacy({
   updateQuery,
   updateSavedQueryId,
   vis,
+  showMain,
 }: DiscoverLegacyProps) {
   const [isSidebarClosed, setIsSidebarClosed] = useState(false);
   const { TopNavMenu } = getServices().navigation.ui;
@@ -133,6 +135,7 @@ export function DiscoverLegacy({
     fixedScrollEl,
     opts,
   ]);
+
   const fixedScrollRef = useCallback(
     (node: HTMLElement) => {
       if (node !== null) {
@@ -169,7 +172,7 @@ export function DiscoverLegacy({
           showSearchBar={true}
           useDefaultBehaviors={true}
         />
-        <main className="container-fluid">
+        { showMain && <main className="container-fluid">
           <div className="row">
             <div
               className={`col-md-2 dscSidebar__container dscCollapsibleSidebar ${sidebarClassName}`}
@@ -313,7 +316,7 @@ export function DiscoverLegacy({
               )}
             </div>
           </div>
-        </main>
+        </main> }
       </div>
     </I18nProvider>
   );

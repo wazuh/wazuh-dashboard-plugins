@@ -26,14 +26,14 @@ import dateMath from '@elastic/datemath';
 import { i18n } from '@kbn/i18n';
 import { getState, splitState } from './discover_state';
 
-import { RequestAdapter } from '../../../../inspector/public';
+import { RequestAdapter } from '../../../../../../../src/plugins/inspector/public';
 import {
   esFilters,
   indexPatterns as indexPatternsUtils,
   connectToQueryState,
   syncQueryStateWithUrl,
 } from '../../../../../../../src/plugins/data/public';
-import { SavedObjectSaveModal, showSaveModal } from '../../../../saved_objects/public';
+import { SavedObjectSaveModal, showSaveModal } from '../../../../../../../src/plugins/saved_objects/public';
 import { getSortArray, getSortForSearchSource } from './doc_table';
 import { createFixedScroll } from './directives/fixed_scroll';
 import * as columnActions from './doc_table/actions/columns';
@@ -190,7 +190,7 @@ app.directive('discoverApp', function () {
   };
 });
 
-function discoverController($element, $route, $scope, $timeout, $window, Promise, uiCapabilities) {
+export function discoverController($element, $route, $scope, $timeout, $window, Promise, uiCapabilities) {
   const { isDefault: isDefaultType } = indexPatternsUtils;
   const subscriptions = new Subscription();
   const refetch$ = new Subject();

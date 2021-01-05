@@ -11,6 +11,3 @@
  */
 
 import './kibana-discover';
-import { getNavigationPlugin } from '../kibana-services'
-import { loadWzTopNavDirectives } from './wz-top-nav';
-loadWzTopNavDirectives(getNavigationPlugin().ui);

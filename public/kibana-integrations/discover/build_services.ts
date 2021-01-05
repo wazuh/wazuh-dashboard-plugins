@@ -44,6 +44,7 @@ import { getHistory } from './kibana_services';
 import { KibanaLegacyStart } from '../../../../../src/plugins/kibana_legacy/public';
 import { UrlForwardingStart } from '../../../../../src/plugins/url_forwarding/public';
 import { NavigationPublicPluginStart } from '../../../../../src/plugins/navigation/public';
+import { getDataPlugin, getNavigationPlugin, getVisualizationsPlugin } from '../../kibana-services';
 //import { DiscoverStartPlugins, SavedSearch } from '../../../../../src/plugins/discover/public';
 
 export interface DiscoverServices {
@@ -78,40 +79,40 @@ export async function buildServices(
   context: PluginInitializerContext,
   getEmbeddableInjector: any
 ): Promise<DiscoverServices> {
-  const services: SavedObjectKibanaServices = {
+/*   const services: SavedObjectKibanaServices = {
     savedObjectsClient: core.savedObjects.client,
     indexPatterns: plugins.data.indexPatterns,
     search: plugins.data.search,
     chrome: core.chrome,
     overlays: core.overlays,
   };
-  //const savedObjectService = createSavedSearchesLoader(services);
+  const savedObjectService = createSavedSearchesLoader(services); */
 
   return {
     addBasePath: core.http.basePath.prepend,
     capabilities: core.application.capabilities,
     chrome: core.chrome,
     core,
-    data: plugins.data,
+    data: getDataPlugin(),
     docLinks: core.docLinks,
     theme: plugins.charts.theme,
-    filterManager: plugins.data.query.filterManager,
+    filterManager: getDataPlugin().query.filterManager,
     getEmbeddableInjector,
     /* getSavedSearchById: async (id: string) => savedObjectService.get(id),
     getSavedSearchUrlById: async (id: string) => savedObjectService.urlFor(id), */
     history: getHistory,
-    indexPatterns: plugins.data.indexPatterns,
+    indexPatterns: getDataPlugin().indexPatterns,
     inspector: plugins.inspector,
     metadata: {
       branch: context.env.packageInfo.branch,
     },
-    navigation: plugins.navigation,
+    navigation: getNavigationPlugin(),
     share: plugins.share,
     kibanaLegacy: plugins.kibanaLegacy,
     urlForwarding: plugins.urlForwarding,
-    timefilter: plugins.data.query.timefilter.timefilter,
+    timefilter: getDataPlugin().query.timefilter.timefilter,
     toastNotifications: core.notifications.toasts,
     uiSettings: core.uiSettings,
-    visualizations: plugins.visualizations,
+    visualizations: getVisualizationsPlugin(),
   };
 }
