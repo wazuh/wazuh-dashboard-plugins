@@ -42,7 +42,7 @@ import { AppState } from '../react-services/app-state';
 import { getAngularModule } from '../kibana-services';
 
 const assignPreviousLocation = ($rootScope, $location) => {
-  const path = $location.path();	
+  const path = $location.path();
   const params = $location.search();
   // Save current location if we aren't performing a health-check, to later be able to come back to the same tab
   if (!path.includes('/health-check')) {
@@ -141,11 +141,12 @@ app.config(($routeProvider) => {
   })
   .when('/agents/:agent?/:tab?/:tabView?', {
     template: agentsTemplate,
-    resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
+    resolve: { enableWzMenu, nestedResolve, ip, savedSearch },
+    reloadOnSearch: false,
   })
   .when('/agents-preview/', {
     template: agentsPrevTemplate,
-    resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
+    resolve: { enableWzMenu, nestedResolve, ip, savedSearch },
   })
   .when('/manager/', {
     template: managementTemplate,
