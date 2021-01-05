@@ -135,7 +135,7 @@ export class RegisterAgent extends Component {
       let authInfo = await this.getAuthInfo();
       const needsPassword = (authInfo.auth || {}).use_password === 'yes';
       if (needsPassword) {
-        wazuhPassword = authInfo['authd.pass'] || '';
+        wazuhPassword = this.configuration["enrollment.password"] || authInfo['authd.pass'] || '';
         if (wazuhPassword) {
           hidePasswordInput = true;
         }

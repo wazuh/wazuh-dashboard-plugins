@@ -20,7 +20,9 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Error toast is showing about Elasticsearch users for environments without security [#2713](https://github.com/wazuh/wazuh-kibana-app/issues/2713)
 - Error about Handler.error in Role Mapping fixed [#2702](https://github.com/wazuh/wazuh-kibana-app/issues/2702)
 - Fixed message in reserved users actions [#2702](https://github.com/wazuh/wazuh-kibana-app/issues/2702)
+- Error 500 on Export formatted CDB list [#2692](https://github.com/wazuh/wazuh-kibana-app/pull/2692)
 - Wui rules label should have only one tooltip [#2723](https://github.com/wazuh/wazuh-kibana-app/issues/2723)
+
 ## Wazuh v4.0.3 - Kibana v7.9.1, v7.9.2, v7.9.3 - Revision 4014
 
 ### Added
@@ -75,6 +77,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Fixed
 
 - Restore the tables in the agents' reports [#2628](https://github.com/wazuh/wazuh-kibana-app/issues/2628)
+- [RBAC] Issues detected when using RBAC [#2579](https://github.com/wazuh/wazuh-kibana-app/issues/2579)
 - Changes done via a worker's API are overwritten [#2626](https://github.com/wazuh/wazuh-kibana-app/issues/2626)
 
 ### Fixed
@@ -158,6 +161,11 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ## Wazuh v3.13.2 - Kibana v7.9.1 - Revision 887
 
+### Added
+
+- Support for Wazuh v3.13.2
+
+## Wazuh v3.13.2 - Kibana v7.8.0 - Revision 887
 ### Added
 
 - Support for Wazuh v3.13.2

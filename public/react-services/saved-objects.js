@@ -176,6 +176,7 @@ export class SavedObject {
     try {
       const { title: patternTitle } = await getServices().indexPatterns.get(pattern);
       const fields = await SavedObject.getIndicesFields(pattern);
+
       await this.refreshFieldsOfIndexPattern(pattern, patternTitle, fields);
 
       return;

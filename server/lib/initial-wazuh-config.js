@@ -172,6 +172,9 @@ export const initialWazuhConfig = `---
 # Default value: ''
 #enrollment.dns: ''
 #
+# Wazuh registration password
+# Default value: ''
+#enrollment.password: ''
 #-------------------------------- API entries -----------------------------------
 #The following configuration is the default structure to define an API entry.
 #
