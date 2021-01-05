@@ -12,7 +12,7 @@
 
 import { GenericRequest } from './generic-request';
 import { KnownFields } from '../utils/known-fields'
-zz
+
 export class SavedObject {
   /**
    *
