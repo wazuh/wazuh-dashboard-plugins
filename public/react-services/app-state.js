@@ -408,7 +408,7 @@ export class AppState {
   }
 
   static checkCookies() {
-    getCookies().set("appName", "wazuh", { path: window.location.pathname });
-    return !!getCookies().get("appName")
+    getCookies().set('appName', 'wazuh', { path: window.location.pathname });
+    return !!getCookies().get('appName')
   }
 }
