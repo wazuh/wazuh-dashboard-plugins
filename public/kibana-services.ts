@@ -65,3 +65,5 @@ export function setDiscoverModule(module: any) {
 export function getDiscoverModule() {
   return discoverModule;
 }
+
+export const [getCookies, setCookies] = createGetterSetter<any>('Cookies');
