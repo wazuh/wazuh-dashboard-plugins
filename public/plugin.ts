@@ -13,6 +13,7 @@ import {
   setScopedHistory,
   setCore,
   setPlugins,
+  setCookies,
 } from './kibana-services';
 import {
   AppPluginStartDependencies,
@@ -21,6 +22,8 @@ import {
   WazuhStart,
   WazuhStartDeps,
 } from './types';
+import { Cookies } from 'react-cookie';
+import { AppState } from './react-services/app-state';
 
 const innerAngularName = 'app/wazuh';
 
@@ -42,8 +45,11 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupDep
         // Load application bundle
         const { renderApp } = await import('./application');
         // Get start services as specified in kibana.json
-        const [coreStart, depsStart] = await core.getStartServices();
+        const [coreStart, depsStart] = await core.getStartServices();        
         setHttp(core.http);
+        setCookies(new Cookies());
+        if(!AppState.checkCookies()) window.location.reload();
+        
         await this.initializeInnerAngular();
 
         params.element.classList.add('dscAppWrapper');
