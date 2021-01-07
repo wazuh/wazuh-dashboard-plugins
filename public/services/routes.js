@@ -147,6 +147,7 @@ app.config(($routeProvider) => {
   .when('/agents-preview/', {
     template: agentsPrevTemplate,
     resolve: { enableWzMenu, nestedResolve, ip, savedSearch },
+    reloadOnSearch: false,
   })
   .when('/manager/', {
     template: managementTemplate,
