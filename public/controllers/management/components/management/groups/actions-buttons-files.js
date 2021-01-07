@@ -26,12 +26,14 @@ import GroupsHandler from './utils/groups-handler';
 import { getToasts }  from '../../../../../kibana-services';
 import { ExportConfiguration } from '../../../../agent/components/export-configuration';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
+import { ReportingService } from '../../../../../react-services/reporting';
 
 class WzGroupsActionButtonsFiles extends Component {
   _isMounted = false;
 
   constructor(props) {
     super(props);
+    this.reportingService = new ReportingService();
 
     this.state = {
       generatingCsv: false,
@@ -281,12 +283,13 @@ class WzGroupsActionButtonsFiles extends Component {
     const exportPDFButton = (
       <ExportConfiguration
         exportConfiguration={enabledComponents =>
-          this.props.groupsProps.exportConfigurationProps.exportConfiguration(
-            enabledComponents,
-            this.props.state.itemDetail
+          this.reportingService.startConfigReport(
+            this.props.state.itemDetail,
+            'groupConfig',
+            enabledComponents
           )
         }
-        type={this.props.groupsProps.exportConfigurationProps.type}
+        type='group'
       />
     );
     // Export button

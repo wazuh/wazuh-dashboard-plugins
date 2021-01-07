@@ -74,21 +74,12 @@ export function WazuhReportingRoutes(router: IRouter) {
     path: '/reports/groups/{groupID}',
     validate: {
       body: schema.object({
-        // array: schema.any(),
         browserTimezone: schema.string(),
         filters: schema.maybe(schema.any()),
-        // agents: schema.maybe(schema.oneOf([schema.string(), schema.boolean()])),
         components: schema.maybe(schema.any()),
         name: schema.string(),
-        // searchBar: schema.maybe(schema.string()),
         section: schema.maybe(schema.string()),
         tab: schema.string(),
-        // tables: schema.maybe(schema.any()),
-        // time: schema.oneOf([schema.object({
-        //   from: schema.string(),
-        //   to: schema.string()
-        // }), schema.string()]),
-        // title: schema.maybe(schema.string())
       }),
       params: schema.object({
         groupID: schema.string()
@@ -108,11 +99,6 @@ export function WazuhReportingRoutes(router: IRouter) {
         name: schema.string(),
         section: schema.maybe(schema.string()),
         tab: schema.string(),
-        time: schema.oneOf([schema.object({
-          from: schema.string(),
-          to: schema.string()
-        }), schema.string()]),
-        title: schema.maybe(schema.string())
       }),
       params: schema.object({
         agentID: schema.string()
@@ -126,12 +112,16 @@ export function WazuhReportingRoutes(router: IRouter) {
     path: '/reports/agents/{agentID}/inventory',
     validate: {
       body: schema.object({
+        array: schema.any(),
         browserTimezone: schema.string(),
-        filters: schema.any(),
+        filters: schema.maybe(schema.any()),
+        agents: schema.maybe(schema.oneOf([schema.string(), schema.boolean()])),
         components: schema.maybe(schema.any()),
         name: schema.string(),
+        searchBar: schema.maybe(schema.oneOf([schema.string(), schema.boolean()])),
         section: schema.maybe(schema.string()),
         tab: schema.string(),
+        tables: schema.maybe(schema.any()),
         time: schema.oneOf([schema.object({
           from: schema.string(),
           to: schema.string()
@@ -145,8 +135,6 @@ export function WazuhReportingRoutes(router: IRouter) {
   },
     (context, request, response) => ctrl.createReportsAgentsInventory(context, request, response)
   );
-
-
 
   // Fetch specific report
   router.get({
@@ -179,12 +167,4 @@ export function WazuhReportingRoutes(router: IRouter) {
     },
     (context, request, response) => ctrl.getReports(context, request, response)
   );
-
-  // Fetch the reports list
-  router.get({
-    path: '/reports/test',
-    validate: false
-  },
-  (context, request, response) => ctrl.reportTest(context, request, response)
-);
 }

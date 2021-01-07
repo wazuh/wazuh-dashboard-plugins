@@ -2341,12 +2341,6 @@ export class WazuhReportingCtrl {
         }
       }
 
-      const sanitizedFilters = filters ? this.sanitizeKibanaFilters(filters, searchBar) : false;
-
-      if (time && sanitizedFilters) {
-        printer.addTimeRangeAndFilters(from, to, sanitizedFilters, browserTimezone);
-      };
-
       await printer.print(path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, userID, name));
 
       return response.ok({
@@ -2403,13 +2397,9 @@ export class WazuhReportingCtrl {
 
       // Add title
       printer.addContentWithNewLine({
-        text: 'Agents syscollector',
+        text: 'Inventory data report',
         style: 'h1'
       });
-
-      if (time && sanitizedFilters) {
-        printer.addTimeRangeAndFilters(from, to, sanitizedFilters, browserTimezone);
-      };
 
       // Add table with the agent info
       await this.buildAgentsTable(context, printer, [agentID], apiId);
@@ -2556,8 +2546,8 @@ export class WazuhReportingCtrl {
           'agents',
           'syscollector',
           apiId,
-          new Date(from),
-          new Date(to),
+          from,
+          to,
           sanitizedFilters + ' AND rule.groups: "vulnerability-detector"',
           indexPattern,
           agentID

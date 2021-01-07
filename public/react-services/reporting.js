@@ -27,7 +27,6 @@ export class ReportingService {
     this.vis2png = new Vis2PNG();
     this.rawVisualizations = new RawVisualizations();
     this.visHandlers = new VisHandlers();
-    this.genericReq = GenericRequest;
     this.wazuhConfig = new WazuhConfig();
   }
 
@@ -113,7 +112,8 @@ export class ReportingService {
         browserTimezone
       };
 
-      await this.genericReq.request('POST', `/reports/modules/${tab}`, data);
+      const apiEndpoint = tab === 'syscollector' ? `/reports/agents/${agents}/inventory` : `/reports/modules/${tab}`
+      await GenericRequest.request('POST', apiEndpoint, data);
 
       this.$rootScope.reportBusy = false;
       this.$rootScope.reportStatus = false;
@@ -147,20 +147,16 @@ export class ReportingService {
       const browserTimezone = moment.tz.guess(true);
 
       const data = {
-        // array: [],
         name,
         filters: [
           type === 'agentConfig' ? { agent: obj.id } : { group: obj.name }
         ],
-        // time: '',
-        // searchBar: '',
-        // tables: [],
         tab: type,
         browserTimezone,
         components
       };
       const apiEndpoint = type === 'agentConfig' ? `/reports/agents/${obj.id}` : `/reports/groups/${obj.name}`;
-      await this.genericReq.request('POST', apiEndpoint, data);
+      await GenericRequest.request('POST', apiEndpoint, data);
 
       this.$rootScope.reportBusy = false;
       this.$rootScope.reportStatus = false;

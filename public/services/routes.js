@@ -141,7 +141,8 @@ app.config(($routeProvider) => {
   })
   .when('/agents/:agent?/:tab?/:tabView?', {
     template: agentsTemplate,
-    resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
+    resolve: { enableWzMenu, nestedResolve, ip, savedSearch },
+    reloadOnSearch: false
   })
   .when('/agents-preview/', {
     template: agentsPrevTemplate,

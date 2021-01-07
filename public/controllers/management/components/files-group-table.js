@@ -25,10 +25,12 @@ import {
 } from '@elastic/eui';
 
 import { ExportConfiguration } from '../../agent/components/export-configuration';
+import { ReportingService } from '../../../react-services/reporting';
 
 export class FilesInGroupTable extends Component {
   constructor(props) {
     super(props);
+    this.reportingService = new ReportingService();
 
     this.state = {
       groupName: this.props.group.name || 'Group',
@@ -152,11 +154,13 @@ export class FilesInGroupTable extends Component {
           <EuiFlexItem grow={false}>
             <ExportConfiguration
               exportConfiguration={enabledComponents =>
-                this.props.exportConfigurationProps.exportConfiguration(
+                this.reportingService.startConfigReport(
+                  this.props.state.itemDetail,
+                  'groupConfig',
                   enabledComponents
                 )
               }
-              type={this.props.exportConfigurationProps.type}
+              type='group'
             />
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
