@@ -67,7 +67,7 @@ export const RolesMappingTable = ({ rolesEquivalences, rules, loading, editRule,
               <EuiFlexGroup>
               <EuiBadge color="primary">Reserved</EuiBadge>
                 <EuiToolTip position="top" content="wui_ rules belong to wazuh-wui API user">
-                  <EuiBadge color="accent" style={{ marginLeft: 10 }}>wazuh-wui</EuiBadge>
+                  <EuiBadge color="accent" title="" style={{ marginLeft: 10 }}>wazuh-wui</EuiBadge>
                 </EuiToolTip>
               </EuiFlexGroup>
             );

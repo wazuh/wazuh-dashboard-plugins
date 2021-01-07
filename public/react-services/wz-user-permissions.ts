@@ -205,7 +205,7 @@ const wazuhPermissions = {
   "group:read": {
     "description": "Access to one or more groups basic information (id, name, agents, etc)",
     "resources": [
-      "*:*"
+      "group:id"
     ],
     "example": {
       "actions": [
@@ -994,7 +994,7 @@ export class WzUserPermissions{
                   .join(':');
               })
               .join('&')
-              .replaceAll(':*', '')
+              .replace(/:\*/g, '')
           );
         });
       };
