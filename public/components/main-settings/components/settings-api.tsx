@@ -25,9 +25,11 @@ import {
   EuiTitle,
   EuiText,
   EuiLoadingSpinner,
+  EuiSpacer,
   EuiProgress,
   EuiIcon
 } from '@elastic/eui';
+import { AddApi } from '../../../components/settings/api/add-api'
 import { WzButtonPermissions } from '../../common/permissions/button';
 import GenericRequest from '../../../react-services/generic-request';
 import WzReduxProvider from '../../../redux/wz-redux-provider';
@@ -37,8 +39,10 @@ import { updateSelectedSettingsSection } from '../../../redux/actions/appStateAc
 import ApiCheck from '../../../react-services/wz-api-check';
 import AppState from '../../../react-services/app-state';
 import { API_USER_STATUS_RUN_AS } from '../../../../server/lib/cache-api-user-has-run-as';
+import { WzMisc } from '../../../factories/misc';
 
 
+const wzMisc = new WzMisc();
 export class ApiTable extends Component {
   constructor(props) {
     super(props);
@@ -47,7 +51,12 @@ export class ApiTable extends Component {
       apiEntries: [],
       refreshingEntries: false,
       isLoading: true,
-      currentDefault,
+      showAddNewApi: false,
+      errorsAtInit: false,
+      addingApi: false,
+      apiIsDown: false
+
+      // currentDefault,
     };
   }
 
@@ -70,7 +79,7 @@ export class ApiTable extends Component {
   }
 
   showApiIsDown() {
-    this.apiIsDown = true;
+    this.setState({ apiIsDown: true })
   }
 
   /**
@@ -92,18 +101,20 @@ export class ApiTable extends Component {
    * Shows the add API component
    */
   showAddApi() {
-    this.addingApi = true;
-    this.addApiProps.enableClose = true;
+    this.setState({
+      showAddNewApi: true
+    })
   }
 
   showAddApiWithInitialError(error) {
-    this.addApiProps.errorsAtInit = error;
-    this.setState({ apiEntries: [] })
-    this.addingApi = true;
+    this.setState({
+      errorsAtInit: error,
+      addingApi: true,
+      apiEntries: []
+    })
   }
 
   async testApi(entry, force) {
-    console.log("Apicheck", entry, force)
     return await ApiCheck.checkApi(entry, force)
   }
   /**
@@ -123,7 +134,11 @@ export class ApiTable extends Component {
         for (let idx in entries) {
           const entry = entries[idx];
           try {
-            const data = await this.testApi(entry, true); // token refresh is forced
+            const { id: id2 } = entry;
+            const tmpData = {
+              id: id2
+            };
+            const data = await this.testApi(tmpData, true); // token refresh is forced
             const clusterInfo = data.data || {};
             const id = entries[idx].id;
             entries[idx].status = 'online';
@@ -171,9 +186,7 @@ export class ApiTable extends Component {
    */
   async checkApi(api) {
     try {
-      console.log("PETA AQUI")
       const entries = this.state.apiEntries;
-      console.log("PETA AQUI")
       const idx = entries.map(e => e.id).indexOf(api.id);
       try {
         await this.checkManager(api);
@@ -222,28 +235,26 @@ export class ApiTable extends Component {
       const index = isIndex ? item : this.getApiIndex(item);
 
       // Get the Api information
-      const api = this.apiEntries[index];
-      const { username, url, port, id } = api;
+      const api = this.state.apiEntries[index];
+      const { id } = api;
       const tmpData = {
-        // username: username,
-        // url: url,
-        // port: port,
-        // cluster_info: {},
-        // insecure: 'true',
         id: id
       };
-
       // Test the connection
       const data = await ApiCheck.checkApi(tmpData, true);
       tmpData.cluster_info = data.data;
       const { cluster_info } = tmpData;
       // Updates the cluster-information in the registry
       await this.updateClusterInfoInRegistry(id, cluster_info);
-      this.apiEntries[index].cluster_info = cluster_info;
-      this.apiEntries[index].status = 'online';
-      this.apiEntries[index].allow_run_as = data.data.allow_run_as;
-      this.wzMisc.setApiIsDown(false);
-      this.apiIsDown = false;
+      const entries = this.state.apiEntries;
+      entries[index].cluster_info = cluster_info;
+      entries[index].status = 'online';
+      entries[index].allow_run_as = data.data.allow_run_as;
+      this.setState({
+        apiEntries: entries
+      })
+      wzMisc.setApiIsDown(false);
+      this.setState({ apiIsDown: false })
       !silent && ErrorHandler.info('Connection success', 'Settings');
       return;
     } catch (error) {
@@ -256,14 +267,14 @@ export class ApiTable extends Component {
   }
 
   getApiIndex(api) {
-    return this.apiEntries.map(entry => entry.id).indexOf(api.id);
+    return this.state.apiEntries.map(entry => entry.id).indexOf(api.id);
   }
   // Set default API
   async setDefault(item) {
     try {
       await this.checkManager(item, false, true);
       const index = this.getApiIndex(item);
-      const api = this.apiEntries[index];
+      const api = this.state.apiEntries[index];
       const { cluster_info, id } = api;
       const { manager, cluster, status } = cluster_info;
 
@@ -280,14 +291,13 @@ export class ApiTable extends Component {
 
       const currentApi = AppState.getCurrentAPI();
       this.currentDefault = JSON.parse(currentApi).id;
-      this.apiTableProps.currentDefault = this.currentDefault;
 
       ErrorHandler.info(`API ${manager} set as default`);
 
       this.getCurrentAPIIndex();
       const extensions = await AppState.getExtensions(id);
       if (currentApi && !extensions) {
-        const { id, extensions } = this.apiEntries[this.currentApiEntryIndex];
+        const { id, extensions } = this.state.apiEntries[this.currentApiEntryIndex];
         AppState.setExtensions(id, extensions);
       }
 
@@ -297,7 +307,84 @@ export class ApiTable extends Component {
     }
   }
 
+  closeAddApi() {
+    this.setState({
+      showAddNewApi: false
+    })
+  }
+
+  async checkApisStatus() {
+    try {
+      let numError = 0;
+      for (let idx in this.state.apiEntries) {
+        try {
+          await this.checkManager(this.state.apiEntries[idx], false, true);
+          const entries = this.state.apiEntries;
+          entries[idx].status = 'online';
+          this.setState({ apiEntries: entries });
+        } catch (error) {
+          const code = ((error || {}).data || {}).code;
+          const downReason = typeof error === 'string' ? error :
+            (error || {}).message || ((error || {}).data || {}).message || 'Wazuh is not reachable';
+          const status = code === 3099 ? 'down' : 'unknown';
+          const entries = this.state.apiEntries;
+          entries.status = { status, downReason };
+          this.setState({ apiEntries: entries });
+          numError = numError + 1;
+          if (this.state.apiEntries[idx].id === this.currentDefault) { // if the selected API is down, we remove it so a new one will selected
+            AppState.removeCurrentAPI();
+          }
+        }
+      }
+      return numError;
+    } catch (error) { }
+  }
+
+  async checkForNewApis() {
+    try {
+      this.setState({
+        errorsAtInit: false,
+        addingApi: true
+      })
+      const hosts = await this.getHosts();
+      //Tries to check if there are new APIs entries in the wazuh.yml also, checks if some of them have connection
+      if (!hosts.length)
+        throw {
+          message: 'There were not found any API entry in the wazuh.yml',
+          type: 'warning',
+          closedEnabled: false
+        };
+      const notRecheable = await this.checkApisStatus();
+      if (notRecheable) {
+        if (notRecheable >= hosts.length) {
+          this.setState({ apiIsDown: true })
+          throw {
+            message:
+              'Wazuh API not recheable, please review your configuration',
+            type: 'danger',
+            closedEnabled: true
+          };
+        }
+        throw {
+          message: `Some of the API entries are not reachable. You can still use the Wazuh APP but please, review your hosts configuration.`,
+          type: 'warning',
+          closedEnabled: true
+        };
+      }
+      return;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
   render() {
+    if (this.state.showAddNewApi) {
+
+      return <span>
+        <EuiSpacer></EuiSpacer>
+        <AddApi enableClose={true} closeAddApi={() => this.closeAddApi()} checkForNewApis={() => this.checkForNewApis()}></AddApi>
+      </span>
+    }
     if (this.state.isLoading) {
       return <EuiProgress size="xs" color="primary" />
     }
@@ -516,17 +603,3 @@ export class ApiTable extends Component {
     );
   }
 }
-
-ApiTable.propTypes = {
-  apiEntries: PropTypes.array,
-  currentDefault: PropTypes.string,
-  setDefault: PropTypes.func,
-  checkManager: PropTypes.func,
-  updateClusterInfoInRegistry: PropTypes.func,
-  getHosts: PropTypes.func,
-  testApi: PropTypes.func,
-  showAddApiWithInitialError: PropTypes.func,
-  showApiIsDown: PropTypes.func,
-  copyToClipBoard: PropTypes.func
-};
-
