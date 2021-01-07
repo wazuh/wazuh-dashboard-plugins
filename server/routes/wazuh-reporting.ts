@@ -45,7 +45,26 @@ export function WazuhReportingRoutes(router: IRouter) {
   router.post({
       path: '/reports/modules/{moduleID}',
       validate: {
-
+        body: schema.object({
+          array: schema.any(),
+          browserTimezone: schema.string(),
+          filters: schema.maybe(schema.any()),
+          agents: schema.maybe(schema.oneOf([schema.string(), schema.boolean()])),
+          components: schema.maybe(schema.any()),
+          name: schema.string(),
+          searchBar: schema.maybe(schema.string()),
+          section: schema.maybe(schema.string()),
+          tab: schema.string(),
+          tables: schema.maybe(schema.any()),
+          time: schema.oneOf([schema.object({
+            from: schema.string(),
+            to: schema.string()
+          }), schema.string()]),
+          title: schema.maybe(schema.string())
+        }),
+        params: schema.object({
+          moduleID: schema.string()
+        })
       }
     },
     (context, request, response) => ctrl.createReportsModules(context, request, response)
@@ -54,7 +73,26 @@ export function WazuhReportingRoutes(router: IRouter) {
   router.post({
     path: '/reports/groups/{groupID}',
     validate: {
-
+      body: schema.object({
+        // array: schema.any(),
+        browserTimezone: schema.string(),
+        filters: schema.maybe(schema.any()),
+        // agents: schema.maybe(schema.oneOf([schema.string(), schema.boolean()])),
+        components: schema.maybe(schema.any()),
+        name: schema.string(),
+        // searchBar: schema.maybe(schema.string()),
+        section: schema.maybe(schema.string()),
+        tab: schema.string(),
+        // tables: schema.maybe(schema.any()),
+        // time: schema.oneOf([schema.object({
+        //   from: schema.string(),
+        //   to: schema.string()
+        // }), schema.string()]),
+        // title: schema.maybe(schema.string())
+      }),
+      params: schema.object({
+        groupID: schema.string()
+      })
     }
   },
     (context, request, response) => ctrl.createReportsGroups(context, request, response)

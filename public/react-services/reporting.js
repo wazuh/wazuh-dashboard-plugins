@@ -58,7 +58,7 @@ export class ReportingService {
     return idArray;
   }
 
-  async startVis2Png(tab, isAgents = false, syscollectorFilters = null) {
+  async startVis2Png(tab, agents = false, syscollectorFilters = null) {
     try {
       if (this.vis2png.isWorking()) {
         this.showToast('danger', 'Error', 'Report in progress', 4000);
@@ -94,7 +94,7 @@ export class ReportingService {
 
       const array = await this.vis2png.checkArray(idArray);
       const name = `wazuh-${
-        isAgents ? 'agents' : 'overview'
+        agents ? 'agents' : 'overview'
       }-${tab}-${(Date.now() / 1000) | 0}.pdf`;
 
       const browserTimezone = moment.tz.guess(true);
@@ -102,18 +102,18 @@ export class ReportingService {
       const data = {
         array,
         name,
-        title: isAgents ? `Agents ${tab}` : `Overview ${tab}`,
+        title: agents ? `Agents ${tab}` : `Overview ${tab}`,
         filters: appliedFilters.filters,
         time: appliedFilters.time,
         searchBar: appliedFilters.searchBar,
         tables: appliedFilters.tables,
         tab,
-        section: isAgents ? 'agents' : 'overview',
-        isAgents,
+        section: agents ? 'agents' : 'overview',
+        agents,
         browserTimezone
       };
 
-      await this.genericReq.request('POST', '/reports', data);
+      await this.genericReq.request('POST', `/reports/modules/${tab}`, data);
 
       this.$rootScope.reportBusy = false;
       this.$rootScope.reportStatus = false;
@@ -147,20 +147,20 @@ export class ReportingService {
       const browserTimezone = moment.tz.guess(true);
 
       const data = {
-        array: [],
+        // array: [],
         name,
         filters: [
           type === 'agentConfig' ? { agent: obj.id } : { group: obj.name }
         ],
-        time: '',
-        searchBar: '',
-        tables: [],
+        // time: '',
+        // searchBar: '',
+        // tables: [],
         tab: type,
         browserTimezone,
         components
       };
-
-      await this.genericReq.request('POST', '/reports', data);
+      const apiEndpoint = type === 'agentConfig' ? `/reports/agents/${obj.id}` : `/reports/groups/${obj.name}`;
+      await this.genericReq.request('POST', apiEndpoint, data);
 
       this.$rootScope.reportBusy = false;
       this.$rootScope.reportStatus = false;
