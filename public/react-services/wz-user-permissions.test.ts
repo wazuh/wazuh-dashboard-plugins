@@ -73,6 +73,9 @@ const userClusterTest = {
     'list:path:*': 'allow',
     'node:id:*': 'allow',
   },
+  'group:read': {
+    'group:id:*': 'allow',
+  },
   rbac_mode: 'white',
 };
 
@@ -183,6 +186,23 @@ describe('Wazuh User Permissions', () => {
           userClusterTest
         );
         expect(result).toEqual(false);
+      });
+    });
+
+    describe('Should return OK for group view', () => {
+      it('Should return all permissions OK for cluster user', () => {
+        const simplePermission = [
+          {
+            action: 'group:read',
+            resource: 'group:id:*',
+          },
+        ];
+
+        const result = WzUserPermissions.checkMissingUserPermissions(
+          simplePermission,
+          userClusterTest
+        );
+        expect(result).toEqual(false); // false === all permissions OK
       });
     });
 
