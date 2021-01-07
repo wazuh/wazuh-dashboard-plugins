@@ -41,6 +41,7 @@ import { AppPluginStartDependencies } from './types';
 import { getScopedHistory, setDiscoverModule } from './kibana-services';
 import { createDiscoverLegacyDirective } from './kibana-integrations/discover/application/components/create_discover_legacy_directive';
 import { createContextErrorMessageDirective } from './kibana-integrations/discover/application/components/context_error_message';
+import { EuiIcon } from '@elastic/eui';
 
 /**
  * returns the main inner angular module, it contains all the parts of Angular Discover
@@ -93,6 +94,7 @@ export function initializeInnerAngularModule(name = 'app/wazuh', navigation: Nav
     .config(watchMultiDecorator)
     .run(registerListenEventListener)
     .directive('discoverLegacy', createDiscoverLegacyDirective)
+    .directive('icon', (reactDirective) => reactDirective(EuiIcon))
     .directive('contextErrorMessage', createContextErrorMessageDirective);
 }
 

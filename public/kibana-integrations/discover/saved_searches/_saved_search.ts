@@ -20,7 +20,7 @@ import {
   createSavedObjectClass,
   SavedObject,
   SavedObjectKibanaServices,
-} from '../../../saved_objects/public';
+} from '../../../../../../src/plugins/saved_objects/public';
 
 export function createSavedSearchClass(services: SavedObjectKibanaServices) {
   const SavedObjectClass = createSavedObjectClass(services);
