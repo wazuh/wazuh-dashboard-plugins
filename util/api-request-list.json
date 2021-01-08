@@ -6,8 +6,10 @@
         "name": "/",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.default_controller.default_info",
         "description": "Return basic information about the API",
-        "summary": "Root-endpoint info",
-        "tags": [],
+        "summary": "Get API info",
+        "tags": [
+          "API Info"
+        ],
         "query": [
           {
             "name": "pretty",
@@ -23,14 +25,14 @@
         "name": "/agents",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agents_controller.get_agents",
         "description": "Return information about all available agents or a list of them",
-        "summary": "Get agents",
+        "summary": "List agents",
         "tags": [
-          "agents"
+          "Agents"
         ],
         "query": [
           {
             "name": "agents_list",
-            "description": "List of agent IDs (separated by comma)",
+            "description": "List of agent IDs (separated by comma), all agents selected by default if not specified",
             "schema": {
               "type": "array",
               "items": {
@@ -46,7 +48,6 @@
             "description": "Filter by group of agents",
             "schema": {
               "type": "string",
-              "minLength": 1,
               "description": "Group name",
               "format": "group_names"
             }
@@ -106,7 +107,7 @@
           },
           {
             "name": "older_than",
-            "description": "Filter out agents whose time lapse from last keep alive signal is longer than specified. Time in seconds, ‘[n_days]d’, ‘[n_hours]h’, ‘[n_minutes]m’ or ‘[n_seconds]s’. For never_connected agents, uses the register date. For example, `7d`, `10s` and `10` are valid values. When no time unit is specified, seconds are used.\n",
+            "description": "Filter out agents whose time lapse from last keep alive signal is longer than specified. Time in seconds, ‘[n_days]d’, ‘[n_hours]h’, ‘[n_minutes]m’ or ‘[n_seconds]s’. For never_connected agents, uses the register date. For example, `7d`, `10s` and `10` are valid values. If no time unit is specified, seconds are used",
             "schema": {
               "type": "string",
               "format": "timeframe"
@@ -161,7 +162,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the\nbeggining\n",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
             "schema": {
               "type": "string",
               "format": "search"
@@ -169,7 +170,7 @@
           },
           {
             "name": "select",
-            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "array",
               "items": {
@@ -180,7 +181,7 @@
           },
           {
             "name": "sort",
-            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order.\nUse '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "string",
               "format": "sort"
@@ -188,7 +189,7 @@
           },
           {
             "name": "status",
-            "description": "Filter by agent status. Use commas to enter multiple statuses",
+            "description": "Filter by agent status (use commas to enter multiple statuses)",
             "schema": {
               "type": "array",
               "items": {
@@ -227,7 +228,7 @@
         "description": "Return the active configuration the agent is currently using. This can be different from the configuration present in the configuration file, if it has been modified and the agent has not been restarted yet",
         "summary": "Get active configuration",
         "tags": [
-          "agents"
+          "Agents"
         ],
         "args": [
           {
@@ -266,7 +267,7 @@
           },
           {
             "name": ":configuration",
-            "description": "<p>Selected agent's configuration to read. The configuration to read depends on the selected component. The following table shows all available combinations of component and configuration values:</p>\n<table class=\"table table-striped table-bordered\">\n<thead>\n<tr>\n<th>Component</th>\n<th>Configuration</th>\n<th>Tag</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>agent</td>\n<td>client</td>\n<td><code>&lt;client&gt;</code></td>\n</tr>\n<tr>\n<td>agent</td>\n<td>buffer</td>\n<td><code>&lt;client_buffer&gt;</code></td>\n</tr>\n<tr>\n<td>agent</td>\n<td>labels</td>\n<td><code>&lt;labels&gt;</code></td>\n</tr>\n<tr>\n<td>agent</td>\n<td>internal</td>\n<td>agent, monitord, remoted</td>\n</tr>\n<tr>\n<td>agentless</td>\n<td>agentless</td>\n<td><code>&lt;agentless&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>global</td>\n<td><code>&lt;global&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>active_response</td>\n<td><code>&lt;active-response&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>alerts</td>\n<td><code>&lt;alerts&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>command</td>\n<td><code>&lt;command&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>rules</td>\n<td><code>&lt;rule&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>decoders</td>\n<td><code>&lt;decoder&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>internal</td>\n<td>analysisd</td>\n</tr>\n<tr>\n<td>auth</td>\n<td>auth</td>\n<td><code>&lt;auth&gt;</code></td>\n</tr>\n<tr>\n<td>com</td>\n<td>active-response</td>\n<td><code>&lt;active-response&gt;</code></td>\n</tr>\n<tr>\n<td>com</td>\n<td>logging</td>\n<td><code>&lt;logging&gt;</code></td>\n</tr>\n<tr>\n<td>com</td>\n<td>internal</td>\n<td>execd</td>\n</tr>\n<tr>\n<td>com</td>\n<td>cluster</td>\n<td>cluster</td>\n</tr>\n<tr>\n<td>csyslog</td>\n<td>csyslog</td>\n<td><code>&lt;csyslog_output&gt;</code></td>\n</tr>\n<tr>\n<td>integrator</td>\n<td>integration</td>\n<td><code>&lt;integration&gt;</code></td>\n</tr>\n<tr>\n<td>logcollector</td>\n<td>localfile</td>\n<td><code>&lt;localfile&gt;</code></td>\n</tr>\n<tr>\n<td>logcollector</td>\n<td>socket</td>\n<td><code>&lt;socket&gt;</code></td>\n</tr>\n<tr>\n<td>logcollector</td>\n<td>internal</td>\n<td>logcollector</td>\n</tr>\n<tr>\n<td>mail</td>\n<td>global</td>\n<td><code>&lt;global&gt;&lt;email...&gt;</code></td>\n</tr>\n<tr>\n<td>mail</td>\n<td>alerts</td>\n<td><code>&lt;email_alerts&gt;</code></td>\n</tr>\n<tr>\n<td>mail</td>\n<td>internal</td>\n<td>maild</td>\n</tr>\n<tr>\n<td>monitor</td>\n<td>internal</td>\n<td>monitord</td>\n</tr>\n<tr>\n<td>monitor</td>\n<td>internal</td>\n<td>reports</td>\n</tr>\n<tr>\n<td>request</td>\n<td>remote</td>\n<td><code>&lt;remote&gt;</code></td>\n</tr>\n<tr>\n<td>request</td>\n<td>internal</td>\n<td>remoted</td>\n</tr>\n<tr>\n<td>syscheck</td>\n<td>syscheck</td>\n<td><code>&lt;syscheck&gt;</code></td>\n</tr>\n<tr>\n<td>syscheck</td>\n<td>rootcheck</td>\n<td><code>&lt;rootcheck&gt;</code></td>\n</tr>\n<tr>\n<td>syscheck</td>\n<td>internal</td>\n<td>syscheck, rootcheck</td>\n</tr>\n<tr>\n<td>wmodules</td>\n<td>wmodules</td>\n<td><code>&lt;wodle&gt;</code></td>\n</tr>\n</tbody>\n</table>\n",
+            "description": "<p>Selected agent's configuration to read. The configuration to read depends on the selected component.\nThe following table shows all available combinations of component and configuration values:</p>\n<table class=\"table table-striped table-bordered\">\n<thead>\n<tr>\n<th>Component</th>\n<th>Configuration</th>\n<th>Tag</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>agent</td>\n<td>client</td>\n<td><code>&lt;client&gt;</code></td>\n</tr>\n<tr>\n<td>agent</td>\n<td>buffer</td>\n<td><code>&lt;client_buffer&gt;</code></td>\n</tr>\n<tr>\n<td>agent</td>\n<td>labels</td>\n<td><code>&lt;labels&gt;</code></td>\n</tr>\n<tr>\n<td>agent</td>\n<td>internal</td>\n<td><code>&lt;agent&gt;</code>, <code>&lt;monitord&gt;</code>, <code>&lt;remoted&gt;</code></td>\n</tr>\n<tr>\n<td>agentless</td>\n<td>agentless</td>\n<td><code>&lt;agentless&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>global</td>\n<td><code>&lt;global&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>active_response</td>\n<td><code>&lt;active-response&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>alerts</td>\n<td><code>&lt;alerts&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>command</td>\n<td><code>&lt;command&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>rules</td>\n<td><code>&lt;rule&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>decoders</td>\n<td><code>&lt;decoder&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>internal</td>\n<td><code>&lt;analysisd&gt;</code></td>\n</tr>\n<tr>\n<td>auth</td>\n<td>auth</td>\n<td><code>&lt;auth&gt;</code></td>\n</tr>\n<tr>\n<td>com</td>\n<td>active-response</td>\n<td><code>&lt;active-response&gt;</code></td>\n</tr>\n<tr>\n<td>com</td>\n<td>logging</td>\n<td><code>&lt;logging&gt;</code></td>\n</tr>\n<tr>\n<td>com</td>\n<td>internal</td>\n<td><code>&lt;execd&gt;</code></td>\n</tr>\n<tr>\n<td>com</td>\n<td>cluster</td>\n<td><code>&lt;cluster&gt;</code></td>\n</tr>\n<tr>\n<td>csyslog</td>\n<td>csyslog</td>\n<td><code>&lt;csyslog_output&gt;</code></td>\n</tr>\n<tr>\n<td>integrator</td>\n<td>integration</td>\n<td><code>&lt;integration&gt;</code></td>\n</tr>\n<tr>\n<td>logcollector</td>\n<td>localfile</td>\n<td><code>&lt;localfile&gt;</code></td>\n</tr>\n<tr>\n<td>logcollector</td>\n<td>socket</td>\n<td><code>&lt;socket&gt;</code></td>\n</tr>\n<tr>\n<td>logcollector</td>\n<td>internal</td>\n<td><code>&lt;logcollector&gt;</code></td>\n</tr>\n<tr>\n<td>mail</td>\n<td>global</td>\n<td><code>&lt;global&gt;&lt;email...&gt;</code></td>\n</tr>\n<tr>\n<td>mail</td>\n<td>alerts</td>\n<td><code>&lt;email_alerts&gt;</code></td>\n</tr>\n<tr>\n<td>mail</td>\n<td>internal</td>\n<td><code>&lt;maild&gt;</code></td>\n</tr>\n<tr>\n<td>monitor</td>\n<td>internal</td>\n<td><code>&lt;monitord&gt;</code></td>\n</tr>\n<tr>\n<td>monitor</td>\n<td>internal</td>\n<td><code>&lt;reports&gt;</code></td>\n</tr>\n<tr>\n<td>request</td>\n<td>remote</td>\n<td><code>&lt;remote&gt;</code></td>\n</tr>\n<tr>\n<td>request</td>\n<td>internal</td>\n<td><code>&lt;remoted&gt;</code></td>\n</tr>\n<tr>\n<td>syscheck</td>\n<td>syscheck</td>\n<td><code>&lt;syscheck&gt;</code></td>\n</tr>\n<tr>\n<td>syscheck</td>\n<td>rootcheck</td>\n<td><code>&lt;rootcheck&gt;</code></td>\n</tr>\n<tr>\n<td>syscheck</td>\n<td>internal</td>\n<td><code>&lt;syscheck&gt;</code>, <code>&lt;rootcheck&gt;</code></td>\n</tr>\n<tr>\n<td>wmodules</td>\n<td>wmodules</td>\n<td><code>&lt;wodle&gt;</code></td>\n</tr>\n</tbody>\n</table>\n",
             "required": true,
             "schema": {
               "type": "string",
@@ -322,9 +323,9 @@
         "name": "/agents/:agent_id/group/is_sync",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agents_controller.get_sync_agent",
         "description": "Return whether the agent configuration has been synchronized with the agent or not. This can be useful to check after updating a group configuration",
-        "summary": "Get agent configuration sync status",
+        "summary": "Get configuration sync status",
         "tags": [
-          "agents"
+          "Agents"
         ],
         "args": [
           {
@@ -362,9 +363,9 @@
         "name": "/agents/:agent_id/key",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agents_controller.get_agent_key",
         "description": "Return the key of an agent",
-        "summary": "Get agent key",
+        "summary": "Get key",
         "tags": [
-          "agents"
+          "Agents"
         ],
         "args": [
           {
@@ -402,9 +403,9 @@
         "name": "/agents/:agent_id/upgrade_result",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agents_controller.get_agent_upgrade",
         "description": "Return the upgrade result after updating an agent",
-        "summary": "Get upgrade result from agent",
+        "summary": "Get upgrade result",
         "tags": [
-          "agents"
+          "Agents"
         ],
         "args": [
           {
@@ -441,10 +442,10 @@
       {
         "name": "/agents/no_group",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agents_controller.get_agent_no_group",
-        "description": "Return a list with all the available agents without group",
-        "summary": "Get all agents without group",
+        "description": "Return a list with all the available agents without an assigned group",
+        "summary": "List agents without group",
         "tags": [
-          "agents"
+          "Agents"
         ],
         "query": [
           {
@@ -485,7 +486,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the\nbeggining\n",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
             "schema": {
               "type": "string",
               "format": "search"
@@ -493,7 +494,7 @@
           },
           {
             "name": "select",
-            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "array",
               "items": {
@@ -504,7 +505,7 @@
           },
           {
             "name": "sort",
-            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order.\nUse '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "string",
               "format": "sort"
@@ -524,9 +525,9 @@
         "name": "/agents/outdated",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agents_controller.get_agent_outdated",
         "description": "Return the list of outdated agents",
-        "summary": "Get outdated agents",
+        "summary": "List outdated agents",
         "tags": [
-          "agents"
+          "Agents"
         ],
         "query": [
           {
@@ -567,7 +568,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the\nbeggining\n",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
             "schema": {
               "type": "string",
               "format": "search"
@@ -575,7 +576,7 @@
           },
           {
             "name": "sort",
-            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order.\nUse '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "string",
               "format": "sort"
@@ -595,9 +596,9 @@
         "name": "/agents/stats/distinct",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agents_controller.get_agent_fields",
         "description": "Return all the different combinations that agents have for the selected fields. It also indicates the total number of agents that have each combination",
-        "summary": "Get distinct fields in agents",
+        "summary": "List agents distinct",
         "tags": [
-          "agents"
+          "Agents"
         ],
         "query": [
           {
@@ -649,7 +650,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the\nbeggining\n",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
             "schema": {
               "type": "string",
               "format": "search"
@@ -657,7 +658,7 @@
           },
           {
             "name": "select",
-            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "array",
               "items": {
@@ -668,7 +669,7 @@
           },
           {
             "name": "sort",
-            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order.\nUse '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "string",
               "format": "sort"
@@ -688,9 +689,9 @@
         "name": "/agents/summary/os",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agents_controller.get_agent_summary_os",
         "description": "Return a summary of the OS of available agents",
-        "summary": "Get agents OS summary",
+        "summary": "Summarize agents OS",
         "tags": [
-          "agents"
+          "Agents"
         ],
         "query": [
           {
@@ -715,9 +716,9 @@
         "name": "/agents/summary/status",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agents_controller.get_agent_summary_status",
         "description": "Return a summary of the status of available agents",
-        "summary": "Get agents status summary",
+        "summary": "Summarize agents status",
         "tags": [
-          "agents"
+          "Agents"
         ],
         "query": [
           {
@@ -742,9 +743,9 @@
         "name": "/ciscat/:agent_id/results",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.ciscat_controller.get_agents_ciscat_results",
         "description": "Return the agent's ciscat results info",
-        "summary": "Get CIS-CAT results from an agent",
+        "summary": "Get results",
         "tags": [
-          "ciscat"
+          "Ciscat"
         ],
         "args": [
           {
@@ -859,7 +860,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the\nbeggining\n",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
             "schema": {
               "type": "string",
               "format": "search"
@@ -867,7 +868,7 @@
           },
           {
             "name": "select",
-            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "array",
               "items": {
@@ -878,7 +879,7 @@
           },
           {
             "name": "sort",
-            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order.\nUse '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "string",
               "format": "sort"
@@ -906,9 +907,9 @@
         "name": "/cluster/:node_id/configuration",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_configuration_node",
         "description": "Return wazuh configuration used in node {node_id}",
-        "summary": "Get a specified node's configuration",
+        "summary": "Get node config",
         "tags": [
-          "cluster"
+          "Cluster"
         ],
         "args": [
           {
@@ -992,10 +993,10 @@
       {
         "name": "/cluster/:node_id/configuration/:component/:configuration",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_node_config",
-        "description": "Return the requested configuration in JSON format",
-        "summary": "Get active configuration in node node_id",
+        "description": "Return the requested configuration in JSON format for the specified node",
+        "summary": "Get node active configuration",
         "tags": [
-          "cluster"
+          "Cluster"
         ],
         "args": [
           {
@@ -1023,7 +1024,7 @@
           },
           {
             "name": ":configuration",
-            "description": "<p>Selected agent's configuration to read. The configuration to read depends on the selected component. The following table shows all available combinations of component and configuration values:</p>\n<table class=\"table table-striped table-bordered\">\n<thead>\n<tr>\n<th>Component</th>\n<th>Configuration</th>\n<th>Tag</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>agent</td>\n<td>client</td>\n<td><code>&lt;client&gt;</code></td>\n</tr>\n<tr>\n<td>agent</td>\n<td>buffer</td>\n<td><code>&lt;client_buffer&gt;</code></td>\n</tr>\n<tr>\n<td>agent</td>\n<td>labels</td>\n<td><code>&lt;labels&gt;</code></td>\n</tr>\n<tr>\n<td>agent</td>\n<td>internal</td>\n<td>agent, monitord, remoted</td>\n</tr>\n<tr>\n<td>agentless</td>\n<td>agentless</td>\n<td><code>&lt;agentless&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>global</td>\n<td><code>&lt;global&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>active_response</td>\n<td><code>&lt;active-response&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>alerts</td>\n<td><code>&lt;alerts&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>command</td>\n<td><code>&lt;command&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>rules</td>\n<td><code>&lt;rule&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>decoders</td>\n<td><code>&lt;decoder&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>internal</td>\n<td>analysisd</td>\n</tr>\n<tr>\n<td>auth</td>\n<td>auth</td>\n<td><code>&lt;auth&gt;</code></td>\n</tr>\n<tr>\n<td>com</td>\n<td>active-response</td>\n<td><code>&lt;active-response&gt;</code></td>\n</tr>\n<tr>\n<td>com</td>\n<td>logging</td>\n<td><code>&lt;logging&gt;</code></td>\n</tr>\n<tr>\n<td>com</td>\n<td>internal</td>\n<td>execd</td>\n</tr>\n<tr>\n<td>com</td>\n<td>cluster</td>\n<td>cluster</td>\n</tr>\n<tr>\n<td>csyslog</td>\n<td>csyslog</td>\n<td><code>&lt;csyslog_output&gt;</code></td>\n</tr>\n<tr>\n<td>integrator</td>\n<td>integration</td>\n<td><code>&lt;integration&gt;</code></td>\n</tr>\n<tr>\n<td>logcollector</td>\n<td>localfile</td>\n<td><code>&lt;localfile&gt;</code></td>\n</tr>\n<tr>\n<td>logcollector</td>\n<td>socket</td>\n<td><code>&lt;socket&gt;</code></td>\n</tr>\n<tr>\n<td>logcollector</td>\n<td>internal</td>\n<td>logcollector</td>\n</tr>\n<tr>\n<td>mail</td>\n<td>global</td>\n<td><code>&lt;global&gt;&lt;email...&gt;</code></td>\n</tr>\n<tr>\n<td>mail</td>\n<td>alerts</td>\n<td><code>&lt;email_alerts&gt;</code></td>\n</tr>\n<tr>\n<td>mail</td>\n<td>internal</td>\n<td>maild</td>\n</tr>\n<tr>\n<td>monitor</td>\n<td>internal</td>\n<td>monitord</td>\n</tr>\n<tr>\n<td>monitor</td>\n<td>internal</td>\n<td>reports</td>\n</tr>\n<tr>\n<td>request</td>\n<td>remote</td>\n<td><code>&lt;remote&gt;</code></td>\n</tr>\n<tr>\n<td>request</td>\n<td>internal</td>\n<td>remoted</td>\n</tr>\n<tr>\n<td>syscheck</td>\n<td>syscheck</td>\n<td><code>&lt;syscheck&gt;</code></td>\n</tr>\n<tr>\n<td>syscheck</td>\n<td>rootcheck</td>\n<td><code>&lt;rootcheck&gt;</code></td>\n</tr>\n<tr>\n<td>syscheck</td>\n<td>internal</td>\n<td>syscheck, rootcheck</td>\n</tr>\n<tr>\n<td>wmodules</td>\n<td>wmodules</td>\n<td><code>&lt;wodle&gt;</code></td>\n</tr>\n</tbody>\n</table>\n",
+            "description": "<p>Selected agent's configuration to read. The configuration to read depends on the selected component.\nThe following table shows all available combinations of component and configuration values:</p>\n<table class=\"table table-striped table-bordered\">\n<thead>\n<tr>\n<th>Component</th>\n<th>Configuration</th>\n<th>Tag</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>agent</td>\n<td>client</td>\n<td><code>&lt;client&gt;</code></td>\n</tr>\n<tr>\n<td>agent</td>\n<td>buffer</td>\n<td><code>&lt;client_buffer&gt;</code></td>\n</tr>\n<tr>\n<td>agent</td>\n<td>labels</td>\n<td><code>&lt;labels&gt;</code></td>\n</tr>\n<tr>\n<td>agent</td>\n<td>internal</td>\n<td><code>&lt;agent&gt;</code>, <code>&lt;monitord&gt;</code>, <code>&lt;remoted&gt;</code></td>\n</tr>\n<tr>\n<td>agentless</td>\n<td>agentless</td>\n<td><code>&lt;agentless&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>global</td>\n<td><code>&lt;global&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>active_response</td>\n<td><code>&lt;active-response&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>alerts</td>\n<td><code>&lt;alerts&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>command</td>\n<td><code>&lt;command&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>rules</td>\n<td><code>&lt;rule&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>decoders</td>\n<td><code>&lt;decoder&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>internal</td>\n<td><code>&lt;analysisd&gt;</code></td>\n</tr>\n<tr>\n<td>auth</td>\n<td>auth</td>\n<td><code>&lt;auth&gt;</code></td>\n</tr>\n<tr>\n<td>com</td>\n<td>active-response</td>\n<td><code>&lt;active-response&gt;</code></td>\n</tr>\n<tr>\n<td>com</td>\n<td>logging</td>\n<td><code>&lt;logging&gt;</code></td>\n</tr>\n<tr>\n<td>com</td>\n<td>internal</td>\n<td><code>&lt;execd&gt;</code></td>\n</tr>\n<tr>\n<td>com</td>\n<td>cluster</td>\n<td><code>&lt;cluster&gt;</code></td>\n</tr>\n<tr>\n<td>csyslog</td>\n<td>csyslog</td>\n<td><code>&lt;csyslog_output&gt;</code></td>\n</tr>\n<tr>\n<td>integrator</td>\n<td>integration</td>\n<td><code>&lt;integration&gt;</code></td>\n</tr>\n<tr>\n<td>logcollector</td>\n<td>localfile</td>\n<td><code>&lt;localfile&gt;</code></td>\n</tr>\n<tr>\n<td>logcollector</td>\n<td>socket</td>\n<td><code>&lt;socket&gt;</code></td>\n</tr>\n<tr>\n<td>logcollector</td>\n<td>internal</td>\n<td><code>&lt;logcollector&gt;</code></td>\n</tr>\n<tr>\n<td>mail</td>\n<td>global</td>\n<td><code>&lt;global&gt;&lt;email...&gt;</code></td>\n</tr>\n<tr>\n<td>mail</td>\n<td>alerts</td>\n<td><code>&lt;email_alerts&gt;</code></td>\n</tr>\n<tr>\n<td>mail</td>\n<td>internal</td>\n<td><code>&lt;maild&gt;</code></td>\n</tr>\n<tr>\n<td>monitor</td>\n<td>internal</td>\n<td><code>&lt;monitord&gt;</code></td>\n</tr>\n<tr>\n<td>monitor</td>\n<td>internal</td>\n<td><code>&lt;reports&gt;</code></td>\n</tr>\n<tr>\n<td>request</td>\n<td>remote</td>\n<td><code>&lt;remote&gt;</code></td>\n</tr>\n<tr>\n<td>request</td>\n<td>internal</td>\n<td><code>&lt;remoted&gt;</code></td>\n</tr>\n<tr>\n<td>syscheck</td>\n<td>syscheck</td>\n<td><code>&lt;syscheck&gt;</code></td>\n</tr>\n<tr>\n<td>syscheck</td>\n<td>rootcheck</td>\n<td><code>&lt;rootcheck&gt;</code></td>\n</tr>\n<tr>\n<td>syscheck</td>\n<td>internal</td>\n<td><code>&lt;syscheck&gt;</code>, <code>&lt;rootcheck&gt;</code></td>\n</tr>\n<tr>\n<td>wmodules</td>\n<td>wmodules</td>\n<td><code>&lt;wodle&gt;</code></td>\n</tr>\n</tbody>\n</table>\n",
             "required": true,
             "schema": {
               "type": "string",
@@ -1087,10 +1088,10 @@
       {
         "name": "/cluster/:node_id/files",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_files_node",
-        "description": "Return file contents from any file in cluster node {node_id}",
-        "summary": "Get file contents from a specified node in the cluster",
+        "description": "Return file contents from any file in the specified node",
+        "summary": "Get node file content",
         "tags": [
-          "cluster"
+          "Cluster"
         ],
         "args": [
           {
@@ -1135,9 +1136,9 @@
         "name": "/cluster/:node_id/info",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_info_node",
         "description": "Return basic information about a specified node such as version, compilation date, installation path",
-        "summary": "Get a specified node's information",
+        "summary": "Get node info",
         "tags": [
-          "cluster"
+          "Cluster"
         ],
         "args": [
           {
@@ -1172,10 +1173,10 @@
       {
         "name": "/cluster/:node_id/logs",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_log_node",
-        "description": "Return the last 2000 wazuh log entries in node {node_id}",
-        "summary": "Get a specified node's wazuh logs",
+        "description": "Return the last 2000 wazuh log entries in the specified node",
+        "summary": "Get node logs",
         "tags": [
-          "cluster"
+          "Cluster"
         ],
         "args": [
           {
@@ -1242,7 +1243,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the\nbeggining\n",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
             "schema": {
               "type": "string",
               "format": "search"
@@ -1250,7 +1251,7 @@
           },
           {
             "name": "sort",
-            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order.\nUse '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "string",
               "format": "sort"
@@ -1309,10 +1310,10 @@
       {
         "name": "/cluster/:node_id/logs/summary",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_log_summary_node",
-        "description": "Return a summary of the last 2000 wazuh log entries in node {node_id}",
-        "summary": "Get a summary of a specified node's wazuh logs",
+        "description": "Return a summary of the last 2000 wazuh log entries in the specified node",
+        "summary": "Get node logs summary",
         "tags": [
-          "cluster"
+          "Cluster"
         ],
         "args": [
           {
@@ -1348,9 +1349,9 @@
         "name": "/cluster/:node_id/stats",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_stats_node",
         "description": "Return Wazuh statistical information in node {node_id} for the current or specified date",
-        "summary": "Get a specified node's stats",
+        "summary": "Get node stats",
         "tags": [
-          "cluster"
+          "Cluster"
         ],
         "args": [
           {
@@ -1394,9 +1395,9 @@
         "name": "/cluster/:node_id/stats/analysisd",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_stats_analysisd_node",
         "description": "Return Wazuh analysisd statistical information in node {node_id}",
-        "summary": "Get a specified node's analysisd stats",
+        "summary": "Get node stats analysisd",
         "tags": [
-          "cluster"
+          "Cluster"
         ],
         "args": [
           {
@@ -1432,9 +1433,9 @@
         "name": "/cluster/:node_id/stats/hourly",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_stats_hourly_node",
         "description": "Return Wazuh statistical information in node {node_id} per hour. Each number in the averages field represents the average of alerts per hour",
-        "summary": "Get a specified node's stats per hour",
+        "summary": "Get node stats hour",
         "tags": [
-          "cluster"
+          "Cluster"
         ],
         "args": [
           {
@@ -1470,9 +1471,9 @@
         "name": "/cluster/:node_id/stats/remoted",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_stats_remoted_node",
         "description": "Return Wazuh remoted statistical information in node {node_id}",
-        "summary": "Get a specified node's remoted stats",
+        "summary": "Get node stats remoted",
         "tags": [
-          "cluster"
+          "Cluster"
         ],
         "args": [
           {
@@ -1508,9 +1509,9 @@
         "name": "/cluster/:node_id/stats/weekly",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_stats_weekly_node",
         "description": "Return Wazuh statistical information in node {node_id} per week. Each number in the averages field represents the average of alerts per hour for that specific day",
-        "summary": "Get a specified node's stats per week",
+        "summary": "Get node stats week",
         "tags": [
-          "cluster"
+          "Cluster"
         ],
         "args": [
           {
@@ -1546,9 +1547,9 @@
         "name": "/cluster/:node_id/status",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_status_node",
         "description": "Return the status of all Wazuh daemons in node node_id",
-        "summary": "Get a specified node's status",
+        "summary": "Get node status",
         "tags": [
-          "cluster"
+          "Cluster"
         ],
         "args": [
           {
@@ -1583,15 +1584,15 @@
       {
         "name": "/cluster/api/config",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_api_config",
-        "description": "Return the API configuration of all the selected nodes in JSON format",
-        "summary": "Get the API configuration of all nodes (or a list of them)",
+        "description": "Return the API configuration of all nodes (or a list of them) in JSON format",
+        "summary": "Get nodes API config",
         "tags": [
-          "cluster"
+          "Cluster"
         ],
         "query": [
           {
             "name": "nodes_list",
-            "description": "List of node IDs (separated by comma)",
+            "description": "List of node IDs (separated by comma), all nodes selected by default if not specified",
             "schema": {
               "type": "array",
               "items": {
@@ -1621,14 +1622,14 @@
         "name": "/cluster/configuration/validation",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_conf_validation",
         "description": "Return whether the Wazuh configuration is correct or not in all cluster nodes or a list of them",
-        "summary": "Check cluster nodes Wazuh configuration",
+        "summary": "Check nodes config",
         "tags": [
-          "cluster"
+          "Cluster"
         ],
         "query": [
           {
             "name": "nodes_list",
-            "description": "List of node IDs (separated by comma)",
+            "description": "List of node IDs (separated by comma), all nodes selected by default if not specified",
             "schema": {
               "type": "array",
               "items": {
@@ -1658,14 +1659,14 @@
         "name": "/cluster/healthcheck",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_healthcheck",
         "description": "Return cluster healthcheck information for all nodes or a list of them. Such information includes last keep alive, last synchronization time and number of agents reporting on each node",
-        "summary": "Get cluster nodes healthcheck",
+        "summary": "Get nodes healthcheck",
         "tags": [
-          "cluster"
+          "Cluster"
         ],
         "query": [
           {
             "name": "nodes_list",
-            "description": "List of node IDs (separated by comma)",
+            "description": "List of node IDs (separated by comma), all nodes selected by default if not specified",
             "schema": {
               "type": "array",
               "items": {
@@ -1695,9 +1696,9 @@
         "name": "/cluster/local/config",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_config",
         "description": "Return the current node cluster configuration",
-        "summary": "Get local node cluster configuration",
+        "summary": "Get local node config",
         "tags": [
-          "cluster"
+          "Cluster"
         ],
         "query": [
           {
@@ -1722,9 +1723,9 @@
         "name": "/cluster/local/info",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_cluster_node",
         "description": "Return basic information about the cluster node receiving the request",
-        "summary": "Get information about the local node",
+        "summary": "Get local node info",
         "tags": [
-          "cluster"
+          "Cluster"
         ],
         "query": [
           {
@@ -1749,9 +1750,9 @@
         "name": "/cluster/nodes",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_cluster_nodes",
         "description": "Get information about all nodes in the cluster or a list of them",
-        "summary": "Get cluster nodes information",
+        "summary": "Get nodes info",
         "tags": [
-          "cluster"
+          "Cluster"
         ],
         "query": [
           {
@@ -1767,7 +1768,7 @@
           },
           {
             "name": "nodes_list",
-            "description": "List of node IDs (separated by comma)",
+            "description": "List of node IDs (separated by comma), all nodes selected by default if not specified",
             "schema": {
               "type": "array",
               "items": {
@@ -1802,7 +1803,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the\nbeggining\n",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
             "schema": {
               "type": "string",
               "format": "search"
@@ -1810,7 +1811,7 @@
           },
           {
             "name": "select",
-            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "array",
               "items": {
@@ -1821,7 +1822,7 @@
           },
           {
             "name": "sort",
-            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order.\nUse '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "string",
               "format": "sort"
@@ -1854,7 +1855,7 @@
         "description": "Return information about the cluster status",
         "summary": "Get cluster status",
         "tags": [
-          "cluster"
+          "Cluster"
         ],
         "query": [
           {
@@ -1879,9 +1880,9 @@
         "name": "/decoders",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.decoders_controller.get_decoders",
         "description": "Return information about all decoders included in ossec.conf. This information include decoder's route, decoder's name, decoder's file among others",
-        "summary": "Get all decoders",
+        "summary": "List decoders",
         "tags": [
-          "decoders"
+          "Decoders"
         ],
         "query": [
           {
@@ -1952,7 +1953,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the\nbeggining\n",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
             "schema": {
               "type": "string",
               "format": "search"
@@ -1960,7 +1961,7 @@
           },
           {
             "name": "select",
-            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "array",
               "items": {
@@ -1971,7 +1972,7 @@
           },
           {
             "name": "sort",
-            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order.\nUse '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "string",
               "format": "sort"
@@ -2004,9 +2005,9 @@
         "name": "/decoders/files",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.decoders_controller.get_decoders_files",
         "description": "Return information about all decoders files used in Wazuh. This information include decoder's file, decoder's route and decoder's status among others",
-        "summary": "Get all decoders files",
+        "summary": "Get files",
         "tags": [
-          "decoders"
+          "Decoders"
         ],
         "query": [
           {
@@ -2059,7 +2060,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the\nbeggining\n",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
             "schema": {
               "type": "string",
               "format": "search"
@@ -2067,7 +2068,7 @@
           },
           {
             "name": "sort",
-            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order.\nUse '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "string",
               "format": "sort"
@@ -2100,9 +2101,9 @@
         "name": "/decoders/files/:filename/download",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.decoders_controller.get_download_file",
         "description": "Download an specified decoder file",
-        "summary": "Download an specified decoder file",
+        "summary": "Download decoder",
         "tags": [
-          "decoders"
+          "Decoders"
         ],
         "args": [
           {
@@ -2138,9 +2139,9 @@
         "name": "/decoders/parents",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.decoders_controller.get_decoders_parents",
         "description": "Return information about all parent decoders. A parent decoder is a decoder used as base of other decoders",
-        "summary": "Get all parent decoders",
+        "summary": "Get parent decoders",
         "tags": [
-          "decoders"
+          "Decoders"
         ],
         "query": [
           {
@@ -2174,7 +2175,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the\nbeggining\n",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
             "schema": {
               "type": "string",
               "format": "search"
@@ -2182,7 +2183,7 @@
           },
           {
             "name": "select",
-            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "array",
               "items": {
@@ -2193,7 +2194,7 @@
           },
           {
             "name": "sort",
-            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order.\nUse '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "string",
               "format": "sort"
@@ -2213,14 +2214,14 @@
         "name": "/experimental/ciscat/results",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.experimental_controller.get_cis_cat_results",
         "description": "Return CIS-CAT results for all agents or a list of them",
-        "summary": "Get CIS-CAT results",
+        "summary": "Get agents CIS-CAT results",
         "tags": [
-          "experimental"
+          "Experimental"
         ],
         "query": [
           {
             "name": "agents_list",
-            "description": "List of agent IDs (separated by comma)",
+            "description": "List of agent IDs (separated by comma), all agents selected by default if not specified",
             "schema": {
               "type": "array",
               "items": {
@@ -2323,7 +2324,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the\nbeggining\n",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
             "schema": {
               "type": "string",
               "format": "search"
@@ -2331,7 +2332,7 @@
           },
           {
             "name": "select",
-            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "array",
               "items": {
@@ -2342,7 +2343,7 @@
           },
           {
             "name": "sort",
-            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order.\nUse '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "string",
               "format": "sort"
@@ -2370,14 +2371,14 @@
         "name": "/experimental/syscollector/hardware",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.experimental_controller.get_hardware_info",
         "description": "Return all agents (or a list of them) hardware info. This information include cpu, ram, scan info among others of all agents",
-        "summary": "Get hardware info from agents",
+        "summary": "Get agents hardware",
         "tags": [
-          "experimental"
+          "Experimental"
         ],
         "query": [
           {
             "name": "agents_list",
-            "description": "List of agent IDs (separated by comma)",
+            "description": "List of agent IDs (separated by comma), all agents selected by default if not specified",
             "schema": {
               "type": "array",
               "items": {
@@ -2470,7 +2471,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the\nbeggining\n",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
             "schema": {
               "type": "string",
               "format": "search"
@@ -2478,7 +2479,7 @@
           },
           {
             "name": "select",
-            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "array",
               "items": {
@@ -2489,7 +2490,7 @@
           },
           {
             "name": "sort",
-            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order.\nUse '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "string",
               "format": "sort"
@@ -2509,14 +2510,14 @@
         "name": "/experimental/syscollector/hotfixes",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.experimental_controller.get_hotfixes_info",
         "description": "Return all agents (or a list of them) hotfixes info",
-        "summary": "Get hotfixes info from agents",
+        "summary": "Get agents hotfixes",
         "tags": [
-          "experimental"
+          "Experimental"
         ],
         "query": [
           {
             "name": "agents_list",
-            "description": "List of agent IDs (separated by comma)",
+            "description": "List of agent IDs (separated by comma), all agents selected by default if not specified",
             "schema": {
               "type": "array",
               "items": {
@@ -2565,7 +2566,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the\nbeggining\n",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
             "schema": {
               "type": "string",
               "format": "search"
@@ -2573,7 +2574,7 @@
           },
           {
             "name": "select",
-            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "array",
               "items": {
@@ -2584,7 +2585,7 @@
           },
           {
             "name": "sort",
-            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order.\nUse '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "string",
               "format": "sort"
@@ -2604,9 +2605,9 @@
         "name": "/experimental/syscollector/netaddr",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.experimental_controller.get_network_address_info",
         "description": "Return all agents (or a list of them) IPv4 and IPv6 addresses associated to their network interfaces. This information include used IP protocol, interface, and IP address among others",
-        "summary": "Get the IPv4 and IPv6 addresses associated to network interfaces",
+        "summary": "Get agents netaddr",
         "tags": [
-          "experimental"
+          "Experimental"
         ],
         "query": [
           {
@@ -2619,7 +2620,7 @@
           },
           {
             "name": "agents_list",
-            "description": "List of agent IDs (separated by comma)",
+            "description": "List of agent IDs (separated by comma), all agents selected by default if not specified",
             "schema": {
               "type": "array",
               "items": {
@@ -2685,7 +2686,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the\nbeggining\n",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
             "schema": {
               "type": "string",
               "format": "search"
@@ -2693,7 +2694,7 @@
           },
           {
             "name": "select",
-            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "array",
               "items": {
@@ -2704,7 +2705,7 @@
           },
           {
             "name": "sort",
-            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order.\nUse '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "string",
               "format": "sort"
@@ -2724,9 +2725,9 @@
         "name": "/experimental/syscollector/netiface",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.experimental_controller.get_network_interface_info",
         "description": "Return all agents (or a list of them) network interfaces. This information includes rx, scan, tx info and some network information among other",
-        "summary": "Get all network interfaces from agents",
+        "summary": "Get agents netiface",
         "tags": [
-          "experimental"
+          "Experimental"
         ],
         "query": [
           {
@@ -2739,7 +2740,7 @@
           },
           {
             "name": "agents_list",
-            "description": "List of agent IDs (separated by comma)",
+            "description": "List of agent IDs (separated by comma), all agents selected by default if not specified",
             "schema": {
               "type": "array",
               "items": {
@@ -2834,7 +2835,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the\nbeggining\n",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
             "schema": {
               "type": "string",
               "format": "search"
@@ -2842,7 +2843,7 @@
           },
           {
             "name": "select",
-            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "array",
               "items": {
@@ -2853,7 +2854,7 @@
           },
           {
             "name": "sort",
-            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order.\nUse '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "string",
               "format": "sort"
@@ -2925,14 +2926,14 @@
         "name": "/experimental/syscollector/netproto",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.experimental_controller.get_network_protocol_info",
         "description": "Return all agents (or a list of them) routing configuration for each network interface. This information includes interface, type protocol information among other",
-        "summary": "Get network protocol info from agents",
+        "summary": "Get agents netproto",
         "tags": [
-          "experimental"
+          "Experimental"
         ],
         "query": [
           {
             "name": "agents_list",
-            "description": "List of agent IDs (separated by comma)",
+            "description": "List of agent IDs (separated by comma), all agents selected by default if not specified",
             "schema": {
               "type": "array",
               "items": {
@@ -3004,7 +3005,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the\nbeggining\n",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
             "schema": {
               "type": "string",
               "format": "search"
@@ -3012,7 +3013,7 @@
           },
           {
             "name": "select",
-            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "array",
               "items": {
@@ -3023,7 +3024,7 @@
           },
           {
             "name": "sort",
-            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order.\nUse '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "string",
               "format": "sort"
@@ -3051,14 +3052,14 @@
         "name": "/experimental/syscollector/os",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.experimental_controller.get_os_info",
         "description": "Return all agents (or a list of them) OS info. This information includes os information, architecture information among other",
-        "summary": "Get OS info from agents",
+        "summary": "Get agents OS",
         "tags": [
-          "experimental"
+          "Experimental"
         ],
         "query": [
           {
             "name": "agents_list",
-            "description": "List of agent IDs (separated by comma)",
+            "description": "List of agent IDs (separated by comma), all agents selected by default if not specified",
             "schema": {
               "type": "array",
               "items": {
@@ -3132,7 +3133,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the\nbeggining\n",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
             "schema": {
               "type": "string",
               "format": "search"
@@ -3140,7 +3141,7 @@
           },
           {
             "name": "select",
-            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "array",
               "items": {
@@ -3151,7 +3152,7 @@
           },
           {
             "name": "sort",
-            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order.\nUse '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "string",
               "format": "sort"
@@ -3179,14 +3180,14 @@
         "name": "/experimental/syscollector/packages",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.experimental_controller.get_packages_info",
         "description": "Return all agents (or a list of them) packages info. This information includes name, section, size, and priority information of all packages among other",
-        "summary": "Get packages info from agents",
+        "summary": "Get agents packages",
         "tags": [
-          "experimental"
+          "Experimental"
         ],
         "query": [
           {
             "name": "agents_list",
-            "description": "List of agent IDs (separated by comma)",
+            "description": "List of agent IDs (separated by comma), all agents selected by default if not specified",
             "schema": {
               "type": "array",
               "items": {
@@ -3207,7 +3208,7 @@
           },
           {
             "name": "format",
-            "description": "Filter by file format. For example 'deb' will output deb files.",
+            "description": "Filter by file format. For example 'deb' will output deb files",
             "schema": {
               "type": "string",
               "format": "alphanumeric"
@@ -3252,7 +3253,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the\nbeggining\n",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
             "schema": {
               "type": "string",
               "format": "search"
@@ -3260,7 +3261,7 @@
           },
           {
             "name": "select",
-            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "array",
               "items": {
@@ -3271,7 +3272,7 @@
           },
           {
             "name": "sort",
-            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order.\nUse '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "string",
               "format": "sort"
@@ -3305,14 +3306,14 @@
         "name": "/experimental/syscollector/ports",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.experimental_controller.get_ports_info",
         "description": "Return all agents (or a list of them) ports info. This information includes local IP, Remote IP, protocol information among other",
-        "summary": "Get ports info from agents",
+        "summary": "Get agents ports",
         "tags": [
-          "experimental"
+          "Experimental"
         ],
         "query": [
           {
             "name": "agents_list",
-            "description": "List of agent IDs (separated by comma)",
+            "description": "List of agent IDs (separated by comma), all agents selected by default if not specified",
             "schema": {
               "type": "array",
               "items": {
@@ -3402,7 +3403,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the\nbeggining\n",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
             "schema": {
               "type": "string",
               "format": "search"
@@ -3410,7 +3411,7 @@
           },
           {
             "name": "select",
-            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "array",
               "items": {
@@ -3421,7 +3422,7 @@
           },
           {
             "name": "sort",
-            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order.\nUse '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "string",
               "format": "sort"
@@ -3457,14 +3458,14 @@
         "name": "/experimental/syscollector/processes",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.experimental_controller.get_processes_info",
         "description": "Return all agents (or a list of them) processes info",
-        "summary": "Get processes info from agents",
+        "summary": "Get agents processes",
         "tags": [
-          "experimental"
+          "Experimental"
         ],
         "query": [
           {
             "name": "agents_list",
-            "description": "List of agent IDs (separated by comma)",
+            "description": "List of agent IDs (separated by comma), all agents selected by default if not specified",
             "schema": {
               "type": "array",
               "items": {
@@ -3594,7 +3595,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the\nbeggining\n",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
             "schema": {
               "type": "string",
               "format": "search"
@@ -3602,7 +3603,7 @@
           },
           {
             "name": "select",
-            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "array",
               "items": {
@@ -3621,7 +3622,7 @@
           },
           {
             "name": "sort",
-            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order.\nUse '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "string",
               "format": "sort"
@@ -3659,17 +3660,16 @@
         "description": "Get information about all groups or a list of them. Returns a list containing basic information about each group such as number of agents belonging to the group and the checksums of the configuration and shared files",
         "summary": "Get groups",
         "tags": [
-          "groups"
+          "Groups"
         ],
         "query": [
           {
             "name": "groups_list",
-            "description": "Array of group IDs",
+            "description": "List of group IDs (separated by comma), all groups selected by default if not specified",
             "schema": {
               "type": "array",
               "items": {
                 "type": "string",
-                "minLength": 1,
                 "description": "Group name",
                 "format": "group_names"
               }
@@ -3727,7 +3727,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the\nbeggining\n",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
             "schema": {
               "type": "string",
               "format": "search"
@@ -3735,7 +3735,7 @@
           },
           {
             "name": "sort",
-            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order.\nUse '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "string",
               "format": "sort"
@@ -3757,7 +3757,7 @@
         "description": "Return the list of agents that belong to the specified group",
         "summary": "Get agents in a group",
         "tags": [
-          "groups"
+          "Groups"
         ],
         "args": [
           {
@@ -3766,7 +3766,6 @@
             "required": true,
             "schema": {
               "type": "string",
-              "minLength": 1,
               "description": "Group name",
               "format": "group_names"
             }
@@ -3811,7 +3810,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the\nbeggining\n",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
             "schema": {
               "type": "string",
               "format": "search"
@@ -3819,7 +3818,7 @@
           },
           {
             "name": "select",
-            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "array",
               "items": {
@@ -3830,7 +3829,7 @@
           },
           {
             "name": "sort",
-            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order.\nUse '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "string",
               "format": "sort"
@@ -3838,7 +3837,7 @@
           },
           {
             "name": "status",
-            "description": "Filter by agent status. Use commas to enter multiple statuses",
+            "description": "Filter by agent status (use commas to enter multiple statuses)",
             "schema": {
               "type": "array",
               "items": {
@@ -3869,7 +3868,7 @@
         "description": "Return the group configuration defined in the `agent.conf` file",
         "summary": "Get group configuration",
         "tags": [
-          "groups"
+          "Groups"
         ],
         "args": [
           {
@@ -3878,7 +3877,6 @@
             "required": true,
             "schema": {
               "type": "string",
-              "minLength": 1,
               "description": "Group name",
               "format": "group_names"
             }
@@ -3930,7 +3928,7 @@
         "description": "Return the files placed under the group directory",
         "summary": "Get group files",
         "tags": [
-          "groups"
+          "Groups"
         ],
         "args": [
           {
@@ -3939,7 +3937,6 @@
             "required": true,
             "schema": {
               "type": "string",
-              "minLength": 1,
               "description": "Group name",
               "format": "group_names"
             }
@@ -3998,7 +3995,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the\nbeggining\n",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
             "schema": {
               "type": "string",
               "format": "search"
@@ -4006,7 +4003,7 @@
           },
           {
             "name": "sort",
-            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order.\nUse '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "string",
               "format": "sort"
@@ -4028,7 +4025,7 @@
         "description": "Return the contents of the specified group file parsed to JSON",
         "summary": "Get a file in group",
         "tags": [
-          "groups"
+          "Groups"
         ],
         "args": [
           {
@@ -4046,7 +4043,6 @@
             "required": true,
             "schema": {
               "type": "string",
-              "minLength": 1,
               "description": "Group name",
               "format": "group_names"
             }
@@ -4093,7 +4089,7 @@
         "description": "Return the contents of the specified group file parsed to XML",
         "summary": "Get a file in group",
         "tags": [
-          "groups"
+          "Groups"
         ],
         "args": [
           {
@@ -4111,7 +4107,6 @@
             "required": true,
             "schema": {
               "type": "string",
-              "minLength": 1,
               "description": "Group name",
               "format": "group_names"
             }
@@ -4156,9 +4151,9 @@
         "name": "/lists",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.lists_controller.get_lists",
         "description": "Return the contents of all CDB lists. Optionally, the result can be filtered by several criteria. See available parameters for more details",
-        "summary": "Get all CDB lists",
+        "summary": "Get CDB lists",
         "tags": [
-          "lists"
+          "Lists"
         ],
         "query": [
           {
@@ -4211,7 +4206,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the\nbeggining\n",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
             "schema": {
               "type": "string",
               "format": "search"
@@ -4219,7 +4214,7 @@
           },
           {
             "name": "select",
-            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "array",
               "items": {
@@ -4230,7 +4225,7 @@
           },
           {
             "name": "sort",
-            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order.\nUse '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "string",
               "format": "sort"
@@ -4250,9 +4245,9 @@
         "name": "/lists/files",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.lists_controller.get_lists_files",
         "description": "Return the path from all CDB lists. Use this method to know all the CDB lists and their location in the filesystem relative to Wazuh installation folder",
-        "summary": "Get paths from all CDB lists",
+        "summary": "Get CDB lists files",
         "tags": [
-          "lists"
+          "Lists"
         ],
         "query": [
           {
@@ -4305,7 +4300,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the\nbeggining\n",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
             "schema": {
               "type": "string",
               "format": "search"
@@ -4313,7 +4308,7 @@
           },
           {
             "name": "sort",
-            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order.\nUse '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "string",
               "format": "sort"
@@ -4333,9 +4328,9 @@
         "name": "/manager/api/config",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.manager_controller.get_api_config",
         "description": "Return the local API configuration in JSON format",
-        "summary": "Get local API configuration",
+        "summary": "Get API config",
         "tags": [
-          "manager"
+          "Manager"
         ],
         "query": [
           {
@@ -4362,7 +4357,7 @@
         "description": "Return wazuh configuration used",
         "summary": "Get configuration",
         "tags": [
-          "manager"
+          "Manager"
         ],
         "query": [
           {
@@ -4435,10 +4430,10 @@
       {
         "name": "/manager/configuration/:component/:configuration",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.manager_controller.get_manager_config_ondemand",
-        "description": "Return the requested configuration in JSON format",
-        "summary": "Get active configuration in manager for one component [on demand]",
+        "description": "Return the requested active configuration in JSON format",
+        "summary": "Get active configuration",
         "tags": [
-          "manager"
+          "Manager"
         ],
         "args": [
           {
@@ -4466,7 +4461,7 @@
           },
           {
             "name": ":configuration",
-            "description": "<p>Selected agent's configuration to read. The configuration to read depends on the selected component. The following table shows all available combinations of component and configuration values:</p>\n<table class=\"table table-striped table-bordered\">\n<thead>\n<tr>\n<th>Component</th>\n<th>Configuration</th>\n<th>Tag</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>agent</td>\n<td>client</td>\n<td><code>&lt;client&gt;</code></td>\n</tr>\n<tr>\n<td>agent</td>\n<td>buffer</td>\n<td><code>&lt;client_buffer&gt;</code></td>\n</tr>\n<tr>\n<td>agent</td>\n<td>labels</td>\n<td><code>&lt;labels&gt;</code></td>\n</tr>\n<tr>\n<td>agent</td>\n<td>internal</td>\n<td>agent, monitord, remoted</td>\n</tr>\n<tr>\n<td>agentless</td>\n<td>agentless</td>\n<td><code>&lt;agentless&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>global</td>\n<td><code>&lt;global&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>active_response</td>\n<td><code>&lt;active-response&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>alerts</td>\n<td><code>&lt;alerts&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>command</td>\n<td><code>&lt;command&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>rules</td>\n<td><code>&lt;rule&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>decoders</td>\n<td><code>&lt;decoder&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>internal</td>\n<td>analysisd</td>\n</tr>\n<tr>\n<td>auth</td>\n<td>auth</td>\n<td><code>&lt;auth&gt;</code></td>\n</tr>\n<tr>\n<td>com</td>\n<td>active-response</td>\n<td><code>&lt;active-response&gt;</code></td>\n</tr>\n<tr>\n<td>com</td>\n<td>logging</td>\n<td><code>&lt;logging&gt;</code></td>\n</tr>\n<tr>\n<td>com</td>\n<td>internal</td>\n<td>execd</td>\n</tr>\n<tr>\n<td>com</td>\n<td>cluster</td>\n<td>cluster</td>\n</tr>\n<tr>\n<td>csyslog</td>\n<td>csyslog</td>\n<td><code>&lt;csyslog_output&gt;</code></td>\n</tr>\n<tr>\n<td>integrator</td>\n<td>integration</td>\n<td><code>&lt;integration&gt;</code></td>\n</tr>\n<tr>\n<td>logcollector</td>\n<td>localfile</td>\n<td><code>&lt;localfile&gt;</code></td>\n</tr>\n<tr>\n<td>logcollector</td>\n<td>socket</td>\n<td><code>&lt;socket&gt;</code></td>\n</tr>\n<tr>\n<td>logcollector</td>\n<td>internal</td>\n<td>logcollector</td>\n</tr>\n<tr>\n<td>mail</td>\n<td>global</td>\n<td><code>&lt;global&gt;&lt;email...&gt;</code></td>\n</tr>\n<tr>\n<td>mail</td>\n<td>alerts</td>\n<td><code>&lt;email_alerts&gt;</code></td>\n</tr>\n<tr>\n<td>mail</td>\n<td>internal</td>\n<td>maild</td>\n</tr>\n<tr>\n<td>monitor</td>\n<td>internal</td>\n<td>monitord</td>\n</tr>\n<tr>\n<td>monitor</td>\n<td>internal</td>\n<td>reports</td>\n</tr>\n<tr>\n<td>request</td>\n<td>remote</td>\n<td><code>&lt;remote&gt;</code></td>\n</tr>\n<tr>\n<td>request</td>\n<td>internal</td>\n<td>remoted</td>\n</tr>\n<tr>\n<td>syscheck</td>\n<td>syscheck</td>\n<td><code>&lt;syscheck&gt;</code></td>\n</tr>\n<tr>\n<td>syscheck</td>\n<td>rootcheck</td>\n<td><code>&lt;rootcheck&gt;</code></td>\n</tr>\n<tr>\n<td>syscheck</td>\n<td>internal</td>\n<td>syscheck, rootcheck</td>\n</tr>\n<tr>\n<td>wmodules</td>\n<td>wmodules</td>\n<td><code>&lt;wodle&gt;</code></td>\n</tr>\n</tbody>\n</table>\n",
+            "description": "<p>Selected agent's configuration to read. The configuration to read depends on the selected component.\nThe following table shows all available combinations of component and configuration values:</p>\n<table class=\"table table-striped table-bordered\">\n<thead>\n<tr>\n<th>Component</th>\n<th>Configuration</th>\n<th>Tag</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>agent</td>\n<td>client</td>\n<td><code>&lt;client&gt;</code></td>\n</tr>\n<tr>\n<td>agent</td>\n<td>buffer</td>\n<td><code>&lt;client_buffer&gt;</code></td>\n</tr>\n<tr>\n<td>agent</td>\n<td>labels</td>\n<td><code>&lt;labels&gt;</code></td>\n</tr>\n<tr>\n<td>agent</td>\n<td>internal</td>\n<td><code>&lt;agent&gt;</code>, <code>&lt;monitord&gt;</code>, <code>&lt;remoted&gt;</code></td>\n</tr>\n<tr>\n<td>agentless</td>\n<td>agentless</td>\n<td><code>&lt;agentless&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>global</td>\n<td><code>&lt;global&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>active_response</td>\n<td><code>&lt;active-response&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>alerts</td>\n<td><code>&lt;alerts&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>command</td>\n<td><code>&lt;command&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>rules</td>\n<td><code>&lt;rule&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>decoders</td>\n<td><code>&lt;decoder&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>internal</td>\n<td><code>&lt;analysisd&gt;</code></td>\n</tr>\n<tr>\n<td>auth</td>\n<td>auth</td>\n<td><code>&lt;auth&gt;</code></td>\n</tr>\n<tr>\n<td>com</td>\n<td>active-response</td>\n<td><code>&lt;active-response&gt;</code></td>\n</tr>\n<tr>\n<td>com</td>\n<td>logging</td>\n<td><code>&lt;logging&gt;</code></td>\n</tr>\n<tr>\n<td>com</td>\n<td>internal</td>\n<td><code>&lt;execd&gt;</code></td>\n</tr>\n<tr>\n<td>com</td>\n<td>cluster</td>\n<td><code>&lt;cluster&gt;</code></td>\n</tr>\n<tr>\n<td>csyslog</td>\n<td>csyslog</td>\n<td><code>&lt;csyslog_output&gt;</code></td>\n</tr>\n<tr>\n<td>integrator</td>\n<td>integration</td>\n<td><code>&lt;integration&gt;</code></td>\n</tr>\n<tr>\n<td>logcollector</td>\n<td>localfile</td>\n<td><code>&lt;localfile&gt;</code></td>\n</tr>\n<tr>\n<td>logcollector</td>\n<td>socket</td>\n<td><code>&lt;socket&gt;</code></td>\n</tr>\n<tr>\n<td>logcollector</td>\n<td>internal</td>\n<td><code>&lt;logcollector&gt;</code></td>\n</tr>\n<tr>\n<td>mail</td>\n<td>global</td>\n<td><code>&lt;global&gt;&lt;email...&gt;</code></td>\n</tr>\n<tr>\n<td>mail</td>\n<td>alerts</td>\n<td><code>&lt;email_alerts&gt;</code></td>\n</tr>\n<tr>\n<td>mail</td>\n<td>internal</td>\n<td><code>&lt;maild&gt;</code></td>\n</tr>\n<tr>\n<td>monitor</td>\n<td>internal</td>\n<td><code>&lt;monitord&gt;</code></td>\n</tr>\n<tr>\n<td>monitor</td>\n<td>internal</td>\n<td><code>&lt;reports&gt;</code></td>\n</tr>\n<tr>\n<td>request</td>\n<td>remote</td>\n<td><code>&lt;remote&gt;</code></td>\n</tr>\n<tr>\n<td>request</td>\n<td>internal</td>\n<td><code>&lt;remoted&gt;</code></td>\n</tr>\n<tr>\n<td>syscheck</td>\n<td>syscheck</td>\n<td><code>&lt;syscheck&gt;</code></td>\n</tr>\n<tr>\n<td>syscheck</td>\n<td>rootcheck</td>\n<td><code>&lt;rootcheck&gt;</code></td>\n</tr>\n<tr>\n<td>syscheck</td>\n<td>internal</td>\n<td><code>&lt;syscheck&gt;</code>, <code>&lt;rootcheck&gt;</code></td>\n</tr>\n<tr>\n<td>wmodules</td>\n<td>wmodules</td>\n<td><code>&lt;wodle&gt;</code></td>\n</tr>\n</tbody>\n</table>\n",
             "required": true,
             "schema": {
               "type": "string",
@@ -4522,9 +4517,9 @@
         "name": "/manager/configuration/validation",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.manager_controller.get_conf_validation",
         "description": "Return whether the Wazuh configuration is correct",
-        "summary": "Check Wazuh configuration",
+        "summary": "Check config",
         "tags": [
-          "manager"
+          "Manager"
         ],
         "query": [
           {
@@ -4549,9 +4544,9 @@
         "name": "/manager/files",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.manager_controller.get_files",
         "description": "Return file contents from any file",
-        "summary": "Get file contents",
+        "summary": "Get file content",
         "tags": [
-          "manager"
+          "Manager"
         ],
         "query": [
           {
@@ -4585,9 +4580,9 @@
         "name": "/manager/info",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.manager_controller.get_info",
         "description": "Return basic information such as version, compilation date, installation path",
-        "summary": "Get Wazuh manager information",
+        "summary": "Get information",
         "tags": [
-          "manager"
+          "Manager"
         ],
         "query": [
           {
@@ -4612,9 +4607,9 @@
         "name": "/manager/logs",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.manager_controller.get_log",
         "description": "Return the last 2000 wazuh log entries",
-        "summary": "Get the wazuh manager logs",
+        "summary": "Get logs",
         "tags": [
-          "manager"
+          "Manager"
         ],
         "query": [
           {
@@ -4670,7 +4665,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the\nbeggining\n",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
             "schema": {
               "type": "string",
               "format": "search"
@@ -4678,7 +4673,7 @@
           },
           {
             "name": "sort",
-            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order.\nUse '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "string",
               "format": "sort"
@@ -4738,9 +4733,9 @@
         "name": "/manager/logs/summary",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.manager_controller.get_log_summary",
         "description": "Return a summary of the last 2000 wazuh log entries",
-        "summary": "Get a summary of the wazuh manager logs",
+        "summary": "Get logs summary",
         "tags": [
-          "manager"
+          "Manager"
         ],
         "query": [
           {
@@ -4767,7 +4762,7 @@
         "description": "Return Wazuh statistical information for the current or specified date",
         "summary": "Get stats",
         "tags": [
-          "manager"
+          "Manager"
         ],
         "query": [
           {
@@ -4800,9 +4795,9 @@
         "name": "/manager/stats/analysisd",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.manager_controller.get_stats_analysisd",
         "description": "Return Wazuh analysisd statistical information",
-        "summary": "Get analysisd stats",
+        "summary": "Get stats analysisd",
         "tags": [
-          "manager"
+          "Manager"
         ],
         "query": [
           {
@@ -4827,9 +4822,9 @@
         "name": "/manager/stats/hourly",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.manager_controller.get_stats_hourly",
         "description": "Return Wazuh statistical information per hour. Each number in the averages field represents the average of alerts per hour",
-        "summary": "Get stats by hour",
+        "summary": "Get stats hour",
         "tags": [
-          "manager"
+          "Manager"
         ],
         "query": [
           {
@@ -4854,9 +4849,9 @@
         "name": "/manager/stats/remoted",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.manager_controller.get_stats_remoted",
         "description": "Return Wazuh remoted statistical information",
-        "summary": "Get remoted stats",
+        "summary": "Get stats remoted",
         "tags": [
-          "manager"
+          "Manager"
         ],
         "query": [
           {
@@ -4881,9 +4876,9 @@
         "name": "/manager/stats/weekly",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.manager_controller.get_stats_weekly",
         "description": "Return Wazuh statistical information per week. Each number in the averages field represents the average of alerts per hour for that specific day",
-        "summary": "Get stats by week",
+        "summary": "Get stats week",
         "tags": [
-          "manager"
+          "Manager"
         ],
         "query": [
           {
@@ -4908,9 +4903,9 @@
         "name": "/manager/status",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.manager_controller.get_status",
         "description": "Return the status of all Wazuh daemons",
-        "summary": "Get the Wazuh manager status",
+        "summary": "Get status",
         "tags": [
-          "manager"
+          "Manager"
         ],
         "query": [
           {
@@ -4935,14 +4930,14 @@
         "name": "/mitre",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.mitre_controller.get_attack",
         "description": "Return the requested attacks from MITRE database",
-        "summary": "Get attacks information from MITRE database",
+        "summary": "Get MITRE attacks",
         "tags": [
-          "mitre"
+          "Mitre"
         ],
         "query": [
           {
             "name": "id",
-            "description": "MITRE attack ID.",
+            "description": "MITRE attack ID",
             "schema": {
               "type": "string",
               "format": "alphanumeric"
@@ -4971,7 +4966,7 @@
           },
           {
             "name": "phase_name",
-            "description": "Show results filtered by phase.",
+            "description": "Show results filtered by phase",
             "schema": {
               "type": "string",
               "format": "alphanumeric"
@@ -4979,7 +4974,7 @@
           },
           {
             "name": "platform_name",
-            "description": "Show results filtered by platform.",
+            "description": "Show results filtered by platform",
             "schema": {
               "type": "string",
               "format": "alphanumeric"
@@ -5002,7 +4997,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the\nbeggining\n",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
             "schema": {
               "type": "string",
               "format": "search"
@@ -5010,7 +5005,7 @@
           },
           {
             "name": "select",
-            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "array",
               "items": {
@@ -5021,7 +5016,7 @@
           },
           {
             "name": "sort",
-            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order.\nUse '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "string",
               "format": "sort"
@@ -5041,9 +5036,9 @@
         "name": "/overview/agents",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.overview_controller.get_overview_agents",
         "description": "Return a dictionary with a full agents overview",
-        "summary": "Get a full agents overview",
+        "summary": "Get agents overview",
         "tags": [
-          "overview"
+          "Overview"
         ],
         "query": [
           {
@@ -5068,9 +5063,9 @@
         "name": "/rules",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.rules_controller.get_rules",
         "description": "Return a list containing information about each rule such as file where it's defined, description, rule group, status, etc",
-        "summary": "Get information about a list of Wazuh rules",
+        "summary": "List rules",
         "tags": [
-          "rules"
+          "Rules"
         ],
         "query": [
           {
@@ -5137,7 +5132,7 @@
           },
           {
             "name": "mitre",
-            "description": "Filters by MITRE attack ID.",
+            "description": "Filters by MITRE attack ID",
             "schema": {
               "type": "string",
               "format": "alphanumeric"
@@ -5206,7 +5201,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the\nbeggining\n",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
             "schema": {
               "type": "string",
               "format": "search"
@@ -5214,7 +5209,7 @@
           },
           {
             "name": "select",
-            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "array",
               "items": {
@@ -5225,7 +5220,7 @@
           },
           {
             "name": "sort",
-            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order.\nUse '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "string",
               "format": "sort"
@@ -5246,7 +5241,7 @@
           },
           {
             "name": "tsc",
-            "description": "Filters by TSC requirement.",
+            "description": "Filters by TSC requirement",
             "schema": {
               "type": "string",
               "format": "alphanumeric"
@@ -5266,9 +5261,9 @@
         "name": "/rules/files",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.rules_controller.get_rules_files",
         "description": "Return a list containing all files used to define rules and their status",
-        "summary": "Get all files which defines rules",
+        "summary": "Get files",
         "tags": [
-          "rules"
+          "Rules"
         ],
         "query": [
           {
@@ -5321,7 +5316,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the\nbeggining\n",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
             "schema": {
               "type": "string",
               "format": "search"
@@ -5329,7 +5324,7 @@
           },
           {
             "name": "sort",
-            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order.\nUse '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "string",
               "format": "sort"
@@ -5362,9 +5357,9 @@
         "name": "/rules/files/:filename/download",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.rules_controller.get_download_file",
         "description": "Download an specified rule file",
-        "summary": "Download an specified rule file",
+        "summary": "Download rule",
         "tags": [
-          "rules"
+          "Rules"
         ],
         "args": [
           {
@@ -5400,9 +5395,9 @@
         "name": "/rules/groups",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.rules_controller.get_rules_groups",
         "description": "Return a list containing all rule groups names",
-        "summary": "Get all rule groups names",
+        "summary": "Get groups",
         "tags": [
-          "rules"
+          "Rules"
         ],
         "query": [
           {
@@ -5436,7 +5431,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the\nbeggining\n",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
             "schema": {
               "type": "string",
               "format": "search"
@@ -5444,7 +5439,7 @@
           },
           {
             "name": "sort",
-            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order.\nUse '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "string",
               "format": "sort"
@@ -5464,9 +5459,9 @@
         "name": "/rules/requirement/:requirement",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.rules_controller.get_rules_requirement",
         "description": "Return all specified requirement names defined in the Wazuh ruleset",
-        "summary": "Get all specified requirements",
+        "summary": "Get requirements",
         "tags": [
-          "rules"
+          "Rules"
         ],
         "args": [
           {
@@ -5518,7 +5513,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the\nbeggining\n",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
             "schema": {
               "type": "string",
               "format": "search"
@@ -5526,7 +5521,7 @@
           },
           {
             "name": "sort",
-            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order.\nUse '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "string",
               "format": "sort"
@@ -5546,9 +5541,9 @@
         "name": "/sca/:agent_id",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.sca_controller.get_sca_agent",
         "description": "Return the security SCA database of an agent",
-        "summary": "Get security configuration assessment (SCA) database",
+        "summary": "Get results",
         "tags": [
-          "sca"
+          "SCA"
         ],
         "args": [
           {
@@ -5624,7 +5619,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the\nbeggining\n",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
             "schema": {
               "type": "string",
               "format": "search"
@@ -5632,7 +5627,7 @@
           },
           {
             "name": "sort",
-            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order.\nUse '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "string",
               "format": "sort"
@@ -5652,9 +5647,9 @@
         "name": "/sca/:agent_id/checks/:policy_id",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.sca_controller.get_sca_checks",
         "description": "Return the policy monitoring alerts for a given policy",
-        "summary": "Get policy monitoring alerts for a given policy",
+        "summary": "Get policy checks",
         "tags": [
-          "sca"
+          "SCA"
         ],
         "args": [
           {
@@ -5810,7 +5805,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the\nbeggining\n",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
             "schema": {
               "type": "string",
               "format": "search"
@@ -5818,7 +5813,7 @@
           },
           {
             "name": "sort",
-            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order.\nUse '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "string",
               "format": "sort"
@@ -5854,9 +5849,9 @@
         "name": "/security/actions",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.get_rbac_actions",
         "description": "Get all RBAC actions, including the potential related resources and endpoints.",
-        "summary": "Get all RBAC actions",
+        "summary": "List RBAC actions",
         "tags": [
-          "security"
+          "Security"
         ],
         "query": [
           {
@@ -5880,9 +5875,9 @@
         "name": "/security/config",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.get_security_config",
         "description": "Return the security configuration in JSON format",
-        "summary": "Get current security configuration",
+        "summary": "Get security config",
         "tags": [
-          "security"
+          "Security"
         ],
         "query": [
           {
@@ -5907,9 +5902,9 @@
         "name": "/security/policies",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.get_policies",
         "description": "Get all policies in the system, including the administrator policy",
-        "summary": "Get all policies in the system",
+        "summary": "List policies",
         "tags": [
-          "security"
+          "Security"
         ],
         "query": [
           {
@@ -5955,7 +5950,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the\nbeggining\n",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
             "schema": {
               "type": "string",
               "format": "search"
@@ -5963,7 +5958,7 @@
           },
           {
             "name": "sort",
-            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order.\nUse '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "string",
               "format": "sort"
@@ -5983,9 +5978,9 @@
         "name": "/security/resources",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.get_rbac_resources",
         "description": "This method should be called to get all current defined RBAC resources.",
-        "summary": "Get RBAC resources",
+        "summary": "List RBAC resources",
         "tags": [
-          "security"
+          "Security"
         ],
         "query": [
           {
@@ -6003,6 +5998,7 @@
               "type": "string",
               "enum": [
                 "*:*",
+                "agent:group",
                 "agent:id",
                 "group:id",
                 "node:id",
@@ -6022,9 +6018,9 @@
         "name": "/security/roles",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.get_roles",
         "description": "For a specific list, indicate the ids separated by commas. Example: ?role_ids=1,2,3",
-        "summary": "Gets a list of roles or all roles in the system without specifying anything",
+        "summary": "List roles",
         "tags": [
-          "security"
+          "Security"
         ],
         "query": [
           {
@@ -6070,7 +6066,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the\nbeggining\n",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
             "schema": {
               "type": "string",
               "format": "search"
@@ -6078,7 +6074,7 @@
           },
           {
             "name": "sort",
-            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order.\nUse '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "string",
               "format": "sort"
@@ -6098,9 +6094,9 @@
         "name": "/security/rules",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.get_rules",
         "description": "Get a list of security rules from the system or all of them. These rules must be mapped with roles to obtain certain access privileges. For a specific list, indicate the ids separated by commas. Example: ?rule_ids=1,2,3",
-        "summary": "Get all security rules",
+        "summary": "List security rules",
         "tags": [
-          "security"
+          "Security"
         ],
         "query": [
           {
@@ -6140,13 +6136,13 @@
               "items": {
                 "type": "string",
                 "format": "numbers",
-                "description": "Rule ID"
+                "description": "Security rule ID"
               }
             }
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the\nbeggining\n",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
             "schema": {
               "type": "string",
               "format": "search"
@@ -6154,7 +6150,7 @@
           },
           {
             "name": "sort",
-            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order.\nUse '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "string",
               "format": "sort"
@@ -6174,9 +6170,9 @@
         "name": "/security/user/authenticate",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.login_user",
         "description": "This method should be called to get an API token. This token will expire after auth_token_exp_timeout seconds (default: 3600). This value can be changed using PUT /security/config",
-        "summary": "User/password authentication to get an access token",
+        "summary": "Login",
         "tags": [
-          "security"
+          "Security"
         ],
         "query": [
           {
@@ -6193,9 +6189,9 @@
         "name": "/security/users",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.get_users",
         "description": "Get the information of a specified user",
-        "summary": "Get user information",
+        "summary": "List users",
         "tags": [
-          "security"
+          "Security"
         ],
         "query": [
           {
@@ -6229,7 +6225,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the\nbeggining\n",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
             "schema": {
               "type": "string",
               "format": "search"
@@ -6237,7 +6233,7 @@
           },
           {
             "name": "sort",
-            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order.\nUse '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "string",
               "format": "sort"
@@ -6269,9 +6265,9 @@
         "name": "/security/users/me",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.get_user_me",
         "description": "Get the information of the current user",
-        "summary": "Get current user information",
+        "summary": "Get current user info",
         "tags": [
-          "security"
+          "Security"
         ],
         "query": [
           {
@@ -6298,7 +6294,7 @@
         "description": "Get the processed policies information for the current user",
         "summary": "Get current user processed policies",
         "tags": [
-          "security"
+          "Security"
         ],
         "query": [
           {
@@ -6315,9 +6311,9 @@
         "name": "/syscheck/:agent_id",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.syscheck_controller.get_syscheck_agent",
         "description": "Return FIM findings in the specified agent",
-        "summary": "Get File integrity monitoring scan results",
+        "summary": "Get results",
         "tags": [
-          "syscheck"
+          "Syscheck"
         ],
         "args": [
           {
@@ -6403,7 +6399,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the\nbeggining\n",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
             "schema": {
               "type": "string",
               "format": "search"
@@ -6411,7 +6407,7 @@
           },
           {
             "name": "select",
-            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "array",
               "items": {
@@ -6438,7 +6434,7 @@
           },
           {
             "name": "sort",
-            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order.\nUse '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "string",
               "format": "sort"
@@ -6477,9 +6473,9 @@
         "name": "/syscheck/:agent_id/last_scan",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.syscheck_controller.get_last_scan_agent",
         "description": "Return when the last syscheck scan started and ended. If the scan is still in progress the end date will be unknown",
-        "summary": "Get last syscheck scan dates",
+        "summary": "Get last scan datetime",
         "tags": [
-          "syscheck"
+          "Syscheck"
         ],
         "args": [
           {
@@ -6517,9 +6513,9 @@
         "name": "/syscollector/:agent_id/hardware",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.syscollector_controller.get_hardware_info",
         "description": "Return the agent's hardware info. This information include cpu, ram, scan info among others",
-        "summary": "Get hardware info",
+        "summary": "Get agent hardware",
         "tags": [
-          "syscollector"
+          "Syscollector"
         ],
         "args": [
           {
@@ -6545,7 +6541,7 @@
           },
           {
             "name": "select",
-            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "array",
               "items": {
@@ -6568,9 +6564,9 @@
         "name": "/syscollector/:agent_id/hotfixes",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.syscollector_controller.get_hotfix_info",
         "description": "Return all hotfixes installed by Microsoft(R) in Windows(R) systems (KB... fixes)",
-        "summary": "Get hotfixes",
+        "summary": "Get agent hotfixes",
         "tags": [
-          "syscollector"
+          "Syscollector"
         ],
         "args": [
           {
@@ -6631,7 +6627,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the\nbeggining\n",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
             "schema": {
               "type": "string",
               "format": "search"
@@ -6639,7 +6635,7 @@
           },
           {
             "name": "select",
-            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "array",
               "items": {
@@ -6650,7 +6646,7 @@
           },
           {
             "name": "sort",
-            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order.\nUse '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "string",
               "format": "sort"
@@ -6670,9 +6666,9 @@
         "name": "/syscollector/:agent_id/netaddr",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.syscollector_controller.get_network_address_info",
         "description": "Return the agent's network address info. This information include used IP protocol, interface, IP address  among others",
-        "summary": "Get network address info of an agent",
+        "summary": "Get agent netaddr",
         "tags": [
-          "syscollector"
+          "Syscollector"
         ],
         "args": [
           {
@@ -6766,7 +6762,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the\nbeggining\n",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
             "schema": {
               "type": "string",
               "format": "search"
@@ -6774,7 +6770,7 @@
           },
           {
             "name": "select",
-            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "array",
               "items": {
@@ -6785,7 +6781,7 @@
           },
           {
             "name": "sort",
-            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order.\nUse '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "string",
               "format": "sort"
@@ -6805,9 +6801,9 @@
         "name": "/syscollector/:agent_id/netiface",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.syscollector_controller.get_network_interface_info",
         "description": "Return the agent's network interface info. This information include rx, scan, tx info and some network information among others",
-        "summary": "Get network interface info of an agent",
+        "summary": "Get agent netiface",
         "tags": [
-          "syscollector"
+          "Syscollector"
         ],
         "args": [
           {
@@ -6922,7 +6918,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the\nbeggining\n",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
             "schema": {
               "type": "string",
               "format": "search"
@@ -6930,7 +6926,7 @@
           },
           {
             "name": "select",
-            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "array",
               "items": {
@@ -6941,7 +6937,7 @@
           },
           {
             "name": "sort",
-            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order.\nUse '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "string",
               "format": "sort"
@@ -7012,9 +7008,9 @@
         "name": "/syscollector/:agent_id/netproto",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.syscollector_controller.get_network_protocol_info",
         "description": "Return the agent's routing configuration for each network interface",
-        "summary": "Get network protocol info of an agent",
+        "summary": "Get agent netproto",
         "tags": [
-          "syscollector"
+          "Syscollector"
         ],
         "args": [
           {
@@ -7098,7 +7094,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the\nbeggining\n",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
             "schema": {
               "type": "string",
               "format": "search"
@@ -7106,7 +7102,7 @@
           },
           {
             "name": "select",
-            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "array",
               "items": {
@@ -7117,7 +7113,7 @@
           },
           {
             "name": "sort",
-            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order.\nUse '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "string",
               "format": "sort"
@@ -7145,9 +7141,9 @@
         "name": "/syscollector/:agent_id/os",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.syscollector_controller.get_os_info",
         "description": "Return the agent's OS info. This information include os information, architecture information among others of all agents",
-        "summary": "Get OS info of an agent",
+        "summary": "Get agent OS",
         "tags": [
-          "syscollector"
+          "Syscollector"
         ],
         "args": [
           {
@@ -7173,7 +7169,7 @@
           },
           {
             "name": "select",
-            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "array",
               "items": {
@@ -7196,9 +7192,9 @@
         "name": "/syscollector/:agent_id/packages",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.syscollector_controller.get_packages_info",
         "description": "Return the agent's packages info. This information include name, section, size, priority information of all packages among others",
-        "summary": "Get packages info of an agent",
+        "summary": "Get agent packages",
         "tags": [
-          "syscollector"
+          "Syscollector"
         ],
         "args": [
           {
@@ -7224,7 +7220,7 @@
           },
           {
             "name": "format",
-            "description": "Filter by file format. For example 'deb' will output deb files.",
+            "description": "Filter by file format. For example 'deb' will output deb files",
             "schema": {
               "type": "string",
               "format": "alphanumeric"
@@ -7276,7 +7272,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the\nbeggining\n",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
             "schema": {
               "type": "string",
               "format": "search"
@@ -7284,7 +7280,7 @@
           },
           {
             "name": "select",
-            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "array",
               "items": {
@@ -7295,7 +7291,7 @@
           },
           {
             "name": "sort",
-            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order.\nUse '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "string",
               "format": "sort"
@@ -7329,9 +7325,9 @@
         "name": "/syscollector/:agent_id/ports",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.syscollector_controller.get_ports_info",
         "description": "Return the agent's ports info. This information include local IP, Remote IP, protocol information among others",
-        "summary": "Get ports info of an agent",
+        "summary": "Get agent ports",
         "tags": [
-          "syscollector"
+          "Syscollector"
         ],
         "args": [
           {
@@ -7433,7 +7429,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the\nbeggining\n",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
             "schema": {
               "type": "string",
               "format": "search"
@@ -7441,7 +7437,7 @@
           },
           {
             "name": "select",
-            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "array",
               "items": {
@@ -7452,7 +7448,7 @@
           },
           {
             "name": "sort",
-            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order.\nUse '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "string",
               "format": "sort"
@@ -7488,9 +7484,9 @@
         "name": "/syscollector/:agent_id/processes",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.syscollector_controller.get_processes_info",
         "description": "Return the agent's processes info",
-        "summary": "Get processes info an agent",
+        "summary": "Get agent processes",
         "tags": [
-          "syscollector"
+          "Syscollector"
         ],
         "args": [
           {
@@ -7632,7 +7628,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the\nbeggining\n",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
             "schema": {
               "type": "string",
               "format": "search"
@@ -7640,7 +7636,7 @@
           },
           {
             "name": "select",
-            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "array",
               "items": {
@@ -7659,7 +7655,7 @@
           },
           {
             "name": "sort",
-            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order.\nUse '.' for nested fields. For example, \"{field1: field2}\" may be selected with \"field1.field2\"\n",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
               "type": "string",
               "format": "sort"
@@ -7699,15 +7695,15 @@
       {
         "name": "/active-response",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.active_response_controller.run_command",
-        "description": "Run an Active Response command on all agents",
-        "summary": "Run AR command in all agents",
+        "description": "Run an Active Response command on all agents or a list of them",
+        "summary": "Run command",
         "tags": [
-          "active-response"
+          "Active-response"
         ],
         "query": [
           {
             "name": "agents_list",
-            "description": "List of agent IDs (separated by comma)",
+            "description": "List of agent IDs (separated by comma), all agents selected by default if not specified",
             "schema": {
               "type": "array",
               "items": {
@@ -7766,9 +7762,9 @@
         "name": "/agents/:agent_id/group/:group_id",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agents_controller.put_agent_single_group",
         "description": "Assign an agent to a specified group",
-        "summary": "Assign an agent to a group",
+        "summary": "Assign agent to group",
         "tags": [
-          "agents"
+          "Agents"
         ],
         "args": [
           {
@@ -7788,7 +7784,6 @@
             "required": true,
             "schema": {
               "type": "string",
-              "minLength": 1,
               "description": "Group name",
               "format": "group_names"
             }
@@ -7824,9 +7819,9 @@
         "name": "/agents/:agent_id/restart",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agents_controller.restart_agent",
         "description": "Restart the specified agent",
-        "summary": "Restart an agent",
+        "summary": "Restart agent",
         "tags": [
-          "agents"
+          "Agents"
         ],
         "args": [
           {
@@ -7864,9 +7859,9 @@
         "name": "/agents/:agent_id/upgrade",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agents_controller.put_upgrade_agent",
         "description": "Upgrade the agent using a WPK file from online repository",
-        "summary": "Upgrade agent using online repository",
+        "summary": "Upgrade agent",
         "tags": [
-          "agents"
+          "Agents"
         ],
         "args": [
           {
@@ -7935,9 +7930,9 @@
         "name": "/agents/:agent_id/upgrade_custom",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agents_controller.put_upgrade_custom_agent",
         "description": "Upgrade the agent using a local WPK file",
-        "summary": "Upgrade agent using a custom file",
+        "summary": "Upgrade agent custom",
         "tags": [
-          "agents"
+          "Agents"
         ],
         "args": [
           {
@@ -7992,14 +7987,14 @@
         "name": "/agents/group",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agents_controller.put_multiple_agent_single_group",
         "description": "Assign all agents or a list of them to the specified group",
-        "summary": "Assign agents to a single group",
+        "summary": "Assign agents to group",
         "tags": [
-          "agents"
+          "Agents"
         ],
         "query": [
           {
             "name": "agents_list",
-            "description": "List of agent IDs (separated by comma)",
+            "description": "List of agent IDs (separated by comma), all agents selected by default if not specified",
             "schema": {
               "type": "array",
               "items": {
@@ -8023,7 +8018,6 @@
             "required": true,
             "schema": {
               "type": "string",
-              "minLength": 1,
               "description": "Group name",
               "format": "group_names"
             }
@@ -8050,9 +8044,9 @@
         "name": "/agents/group/:group_id/restart",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agents_controller.restart_agents_by_group",
         "description": "Restart all agents which belong to a given group",
-        "summary": "Restart all agents in a group",
+        "summary": "Restart agents in group",
         "tags": [
-          "agents"
+          "Agents"
         ],
         "args": [
           {
@@ -8061,7 +8055,6 @@
             "required": true,
             "schema": {
               "type": "string",
-              "minLength": 1,
               "description": "Group name",
               "format": "group_names"
             }
@@ -8090,9 +8083,9 @@
         "name": "/agents/node/:node_id/restart",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agents_controller.restart_agents_by_node",
         "description": "Restart all agents which belong to a specific given node",
-        "summary": "Restart all agents which belong to a node",
+        "summary": "Restart agents in node",
         "tags": [
-          "agents"
+          "Agents"
         ],
         "args": [
           {
@@ -8130,12 +8123,12 @@
         "description": "Restart all agents or a list of them",
         "summary": "Restart agents",
         "tags": [
-          "agents"
+          "Agents"
         ],
         "query": [
           {
             "name": "agents_list",
-            "description": "List of agent IDs (separated by comma)",
+            "description": "List of agent IDs (separated by comma), all agents selected by default if not specified",
             "schema": {
               "type": "array",
               "items": {
@@ -8167,10 +8160,10 @@
       {
         "name": "/cluster/:node_id/files",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.put_files_node",
-        "description": "Replace file contents with the data contained in the API request in a specified cluster node",
-        "summary": "Updates file contents in a specified cluster node",
+        "description": "Replace file contents with the data contained in the API request for the specified node",
+        "summary": "Update node file content",
         "tags": [
-          "cluster"
+          "Cluster"
         ],
         "args": [
           {
@@ -8222,15 +8215,15 @@
       {
         "name": "/cluster/api/config",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.put_api_config",
-        "description": "Update the API configuration of all the selected nodes with the data contained in the API request",
-        "summary": "Update the API configuration of all nodes (or a list of them)",
+        "description": "Update the API configuration of all nodes (or a list of them) with the data contained in the API request",
+        "summary": "Update nodes API config",
         "tags": [
-          "cluster"
+          "Cluster"
         ],
         "query": [
           {
             "name": "nodes_list",
-            "description": "List of node IDs (separated by comma)",
+            "description": "List of node IDs (separated by comma), all nodes selected by default if not specified",
             "schema": {
               "type": "array",
               "items": {
@@ -8270,7 +8263,7 @@
                     "type": "integer",
                     "format": "int32",
                     "minimum": 1,
-                    "example": 5
+                    "example": 50
                   },
                   "block_time": {
                     "description": "Blocking time for IPs that have exceeded {max_login_attempts}. Time counts from the first attempt",
@@ -8289,7 +8282,7 @@
                 }
               },
               "behind_proxy_server": {
-                "description": "Set this option to \"yes\" in case the API is running behind a proxy server.",
+                "description": "Set this option to 'yes' in case the API is running behind a proxy server",
                 "type": "boolean",
                 "default": false
               },
@@ -8298,7 +8291,7 @@
                 "additionalProperties": false,
                 "properties": {
                   "level": {
-                    "description": "Verbosity level of API logs.",
+                    "description": "Verbosity level of API logs",
                     "default": "info",
                     "type": "string",
                     "enum": [
@@ -8317,12 +8310,12 @@
                 "additionalProperties": false,
                 "properties": {
                   "enabled": {
-                    "description": "Enable cache.",
+                    "description": "Enable cache",
                     "type": "boolean",
                     "default": true
                   },
                   "time": {
-                    "description": "Cache expiration time in seconds.",
+                    "description": "Cache expiration time in seconds",
                     "type": "number",
                     "format": "double",
                     "minimum": 0,
@@ -8345,29 +8338,29 @@
                     "example": "*"
                   },
                   "expose_headers": {
-                    "description": "Which headers can be exposed as part of the response.",
+                    "description": "Which headers can be exposed as part of the response",
                     "type": "string",
                     "example": "*"
                   },
                   "allow_headers": {
-                    "description": "Which HTTP headers can be used during the actual request.",
+                    "description": "Which HTTP headers can be used during the actual request",
                     "type": "string",
                     "example": "*"
                   },
                   "allow_credentials": {
-                    "description": "Browsers will only expose the response to frontend JavaScript code if this is enabled.",
+                    "description": "Browsers will only expose the response to frontend JavaScript code if this is enabled",
                     "type": "boolean",
                     "default": false
                   }
                 }
               },
               "use_only_authd": {
-                "description": "Force the use of authd when adding and removing agents.",
+                "description": "Force the use of authd when adding and removing agents",
                 "type": "boolean",
                 "default": false
               },
               "experimental_features": {
-                "description": "Enable features under development.",
+                "description": "Enable features under development",
                 "type": "boolean",
                 "default": false
               }
@@ -8379,14 +8372,14 @@
         "name": "/cluster/restart",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.put_restart",
         "description": "Restart all nodes in the cluster or a list of them",
-        "summary": "Restart cluster nodes",
+        "summary": "Restart nodes",
         "tags": [
-          "cluster"
+          "Cluster"
         ],
         "query": [
           {
             "name": "nodes_list",
-            "description": "List of node IDs (separated by comma)",
+            "description": "List of node IDs (separated by comma), all nodes selected by default if not specified",
             "schema": {
               "type": "array",
               "items": {
@@ -8418,7 +8411,7 @@
         "description": "Update an specified group's configuration. This API call expects a full valid XML file with the shared configuration tags/syntax",
         "summary": "Update group configuration",
         "tags": [
-          "groups"
+          "Groups"
         ],
         "args": [
           {
@@ -8427,7 +8420,6 @@
             "required": true,
             "schema": {
               "type": "string",
-              "minLength": 1,
               "description": "Group name",
               "format": "group_names"
             }
@@ -8456,9 +8448,9 @@
         "name": "/manager/api/config",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.manager_controller.put_api_config",
         "description": "Update local API configuration with the data contained in the API request",
-        "summary": "Update local API configuration",
+        "summary": "Update API config",
         "tags": [
-          "manager"
+          "Manager"
         ],
         "query": [
           {
@@ -8493,7 +8485,7 @@
                     "type": "integer",
                     "format": "int32",
                     "minimum": 1,
-                    "example": 5
+                    "example": 50
                   },
                   "block_time": {
                     "description": "Blocking time for IPs that have exceeded {max_login_attempts}. Time counts from the first attempt",
@@ -8512,7 +8504,7 @@
                 }
               },
               "behind_proxy_server": {
-                "description": "Set this option to \"yes\" in case the API is running behind a proxy server.",
+                "description": "Set this option to 'yes' in case the API is running behind a proxy server",
                 "type": "boolean",
                 "default": false
               },
@@ -8521,7 +8513,7 @@
                 "additionalProperties": false,
                 "properties": {
                   "level": {
-                    "description": "Verbosity level of API logs.",
+                    "description": "Verbosity level of API logs",
                     "default": "info",
                     "type": "string",
                     "enum": [
@@ -8540,12 +8532,12 @@
                 "additionalProperties": false,
                 "properties": {
                   "enabled": {
-                    "description": "Enable cache.",
+                    "description": "Enable cache",
                     "type": "boolean",
                     "default": true
                   },
                   "time": {
-                    "description": "Cache expiration time in seconds.",
+                    "description": "Cache expiration time in seconds",
                     "type": "number",
                     "format": "double",
                     "minimum": 0,
@@ -8568,29 +8560,29 @@
                     "example": "*"
                   },
                   "expose_headers": {
-                    "description": "Which headers can be exposed as part of the response.",
+                    "description": "Which headers can be exposed as part of the response",
                     "type": "string",
                     "example": "*"
                   },
                   "allow_headers": {
-                    "description": "Which HTTP headers can be used during the actual request.",
+                    "description": "Which HTTP headers can be used during the actual request",
                     "type": "string",
                     "example": "*"
                   },
                   "allow_credentials": {
-                    "description": "Browsers will only expose the response to frontend JavaScript code if this is enabled.",
+                    "description": "Browsers will only expose the response to frontend JavaScript code if this is enabled",
                     "type": "boolean",
                     "default": false
                   }
                 }
               },
               "use_only_authd": {
-                "description": "Force the use of authd when adding and removing agents.",
+                "description": "Force the use of authd when adding and removing agents",
                 "type": "boolean",
                 "default": false
               },
               "experimental_features": {
-                "description": "Enable features under development.",
+                "description": "Enable features under development",
                 "type": "boolean",
                 "default": false
               }
@@ -8602,9 +8594,9 @@
         "name": "/manager/files",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.manager_controller.put_files",
         "description": "Replace file contents with the data contained in the API request",
-        "summary": "Update file contents",
+        "summary": "Update file content",
         "tags": [
-          "manager"
+          "Manager"
         ],
         "query": [
           {
@@ -8646,9 +8638,9 @@
         "name": "/manager/restart",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.manager_controller.put_restart",
         "description": "Restart the wazuh manager",
-        "summary": "Restart the wazuh manager",
+        "summary": "Restart manager",
         "tags": [
-          "manager"
+          "Manager"
         ],
         "query": [
           {
@@ -8673,9 +8665,9 @@
         "name": "/security/config",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.put_security_config",
         "description": "Update the security configuration with the data contained in the API request",
-        "summary": "Update security configuration",
+        "summary": "Update security config",
         "tags": [
-          "security"
+          "Security"
         ],
         "query": [
           {
@@ -8724,9 +8716,9 @@
         "name": "/security/policies/:policy_id",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.update_policy",
         "description": "Modify a policy, at least one property must be indicated",
-        "summary": "Modify a specified policy",
+        "summary": "Update policy",
         "tags": [
-          "security"
+          "Security"
         ],
         "args": [
           {
@@ -8764,22 +8756,24 @@
             "properties": {
               "name": {
                 "description": "Policy name",
-                "type": "string"
+                "type": "string",
+                "maxLength": 64,
+                "format": "names"
               },
               "policy": {
-                "description": "This is the definition of the new policy",
+                "description": "New policy definition",
                 "type": "object",
                 "properties": {
                   "actions": {
                     "type": "array",
-                    "description": "These are the actions that the policy performs",
+                    "description": "Actions to perform",
                     "items": {
                       "type": "string"
                     }
                   },
                   "resources": {
                     "type": "array",
-                    "description": "Resources accessed by policy",
+                    "description": "Resources to apply the actions on",
                     "items": {
                       "type": "string"
                     }
@@ -8803,9 +8797,9 @@
         "name": "/security/roles/:role_id",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.update_role",
         "description": "Modify a role, cannot modify associated policies in this endpoint, at least one property must be indicated",
-        "summary": "Modify a specified role",
+        "summary": "Update role",
         "tags": [
-          "security"
+          "Security"
         ],
         "args": [
           {
@@ -8843,7 +8837,9 @@
             "properties": {
               "name": {
                 "type": "string",
-                "description": "Role name"
+                "description": "Role name",
+                "maxLength": 64,
+                "format": "names"
               }
             }
           }
@@ -8853,9 +8849,9 @@
         "name": "/security/rules/:rule_id",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.update_rule",
         "description": "Modify a security rule by specifying its ID",
-        "summary": "Modify a security rule",
+        "summary": "Update security rule",
         "tags": [
-          "security"
+          "Security"
         ],
         "args": [
           {
@@ -8865,7 +8861,7 @@
             "schema": {
               "type": "string",
               "format": "numbers",
-              "description": "Rule ID"
+              "description": "Security rule ID"
             }
           }
         ],
@@ -8893,7 +8889,9 @@
             "properties": {
               "name": {
                 "type": "string",
-                "description": "Rule name"
+                "description": "Rule name",
+                "maxLength": 64,
+                "format": "names"
               },
               "rule": {
                 "type": "object",
@@ -8906,19 +8904,19 @@
       {
         "name": "/security/user/revoke",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.revoke_all_tokens",
-        "description": "This method should be called to revoke all JWT tokens",
-        "summary": "Revoke all active JWT tokens",
+        "description": "This method should be called to revoke all active JWT tokens",
+        "summary": "Revoke JWT tokens",
         "tags": [
-          "security"
+          "Security"
         ]
       },
       {
         "name": "/security/users/:user_id",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.update_user",
         "description": "Modify a user's password by specifying their ID",
-        "summary": "Modify a user",
+        "summary": "Update users",
         "tags": [
-          "security"
+          "Security"
         ],
         "args": [
           {
@@ -8959,8 +8957,6 @@
           {
             "name": "password",
             "type": "string",
-            "maxLength": 64,
-            "minLength": 8,
             "format": "password"
           }
         ]
@@ -8968,15 +8964,15 @@
       {
         "name": "/syscheck",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.syscheck_controller.put_syscheck",
-        "description": "Run syscheck in all agents",
-        "summary": "Run a syscheck scan in all agents",
+        "description": "Run FIM scan in all agents",
+        "summary": "Run scan",
         "tags": [
-          "syscheck"
+          "Syscheck"
         ],
         "query": [
           {
             "name": "agents_list",
-            "description": "List of agent IDs (separated by comma)",
+            "description": "List of agent IDs (separated by comma), all agents selected by default if not specified",
             "schema": {
               "type": "array",
               "items": {
@@ -9016,7 +9012,7 @@
         "description": "Add a new agent",
         "summary": "Add agent",
         "tags": [
-          "agents"
+          "Agents"
         ],
         "query": [
           {
@@ -9062,9 +9058,9 @@
         "name": "/agents/insert",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agents_controller.insert_agent",
         "description": "Add an agent specifying its name, ID and IP. If an agent with the same ID already exists, replace it using `force` parameter",
-        "summary": "Add an agent specifying all its basic properties",
+        "summary": "Add agent full",
         "tags": [
-          "agents"
+          "Agents"
         ],
         "query": [
           {
@@ -9125,14 +9121,14 @@
         "name": "/agents/insert/quick",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agents_controller.post_new_agent",
         "description": "Add a new agent with name `agent_name`. This agent will use `any` as IP",
-        "summary": "Add agent (quick method)",
+        "summary": "Add agent quick",
         "tags": [
-          "agents"
+          "Agents"
         ],
         "query": [
           {
             "name": "agent_name",
-            "description": "Agent name used when the agent was registered",
+            "description": "Agent name",
             "required": true,
             "schema": {
               "type": "string",
@@ -9164,7 +9160,7 @@
         "description": "Create a new group",
         "summary": "Create a group",
         "tags": [
-          "groups"
+          "Groups"
         ],
         "query": [
           {
@@ -9173,7 +9169,6 @@
             "required": true,
             "schema": {
               "type": "string",
-              "minLength": 1,
               "description": "Group name",
               "format": "group_names"
             }
@@ -9200,9 +9195,9 @@
         "name": "/security/policies",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.add_policy",
         "description": "Add a new policy, all fields need to be specified",
-        "summary": "Add a new policy",
+        "summary": "Add policy",
         "tags": [
-          "security"
+          "Security"
         ],
         "query": [
           {
@@ -9232,22 +9227,24 @@
             "properties": {
               "name": {
                 "description": "Policy name",
-                "type": "string"
+                "type": "string",
+                "maxLength": 64,
+                "format": "names"
               },
               "policy": {
-                "description": "This is the definition of the new policy",
+                "description": "New policy definition",
                 "type": "object",
                 "properties": {
                   "actions": {
                     "type": "array",
-                    "description": "These are the actions that the policy performs",
+                    "description": "Actions to perform",
                     "items": {
                       "type": "string"
                     }
                   },
                   "resources": {
                     "type": "array",
-                    "description": "Resources accessed by policy",
+                    "description": "Resources to apply the actions on",
                     "items": {
                       "type": "string"
                     }
@@ -9271,9 +9268,9 @@
         "name": "/security/roles",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.add_role",
         "description": "Add a new role, all fields need to be specified",
-        "summary": "Add a new role to the system",
+        "summary": "Add role",
         "tags": [
-          "security"
+          "Security"
         ],
         "query": [
           {
@@ -9302,7 +9299,9 @@
             "properties": {
               "name": {
                 "type": "string",
-                "description": "Role name"
+                "description": "Role name",
+                "maxLength": 64,
+                "format": "names"
               }
             }
           }
@@ -9312,9 +9311,9 @@
         "name": "/security/roles/:role_id/policies",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.set_role_policy",
         "description": "Create a specified relation role-policy, one role may have multiples policies",
-        "summary": "Create a relation between one role and one or more policies",
+        "summary": "Add policies to role",
         "tags": [
-          "security"
+          "Security"
         ],
         "args": [
           {
@@ -9373,9 +9372,9 @@
         "name": "/security/roles/:role_id/rules",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.set_role_rule",
         "description": "Create a specific role-rule relation. One role may have multiple security rules",
-        "summary": "Create a relation between one role and one or more security rules",
+        "summary": "Add security rules to role",
         "tags": [
-          "security"
+          "Security"
         ],
         "args": [
           {
@@ -9407,7 +9406,7 @@
               "items": {
                 "type": "string",
                 "format": "numbers",
-                "description": "Rule ID"
+                "description": "Security rule ID"
               }
             }
           },
@@ -9425,9 +9424,9 @@
         "name": "/security/rules",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.add_rule",
         "description": "Add a new security rule",
-        "summary": "Add a new security rule to the system",
+        "summary": "Add security rule",
         "tags": [
-          "security"
+          "Security"
         ],
         "query": [
           {
@@ -9457,7 +9456,9 @@
             "properties": {
               "name": {
                 "type": "string",
-                "description": "Rule name"
+                "description": "Rule name",
+                "maxLength": 64,
+                "format": "names"
               },
               "rule": {
                 "type": "object",
@@ -9471,9 +9472,9 @@
         "name": "/security/user/authenticate/run_as",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.login_user",
         "description": "This method should be called to get an API token using an authorization context body. This token will expire after auth_token_exp_timeout seconds (default: 3600). This value can be changed using PUT /security/config",
-        "summary": "Auth_context based authentication to get an access token",
+        "summary": "Login auth_context",
         "tags": [
-          "security"
+          "Security"
         ],
         "query": [
           {
@@ -9495,10 +9496,10 @@
       {
         "name": "/security/users",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.create_user",
-        "description": "Add a new user to the system through the API",
-        "summary": "Create new user",
+        "description": "Add a new API user to the system",
+        "summary": "Add user",
         "tags": [
-          "security"
+          "Security"
         ],
         "query": [
           {
@@ -9527,15 +9528,13 @@
           {
             "name": "password",
             "type": "string",
-            "maxLength": 64,
-            "minLength": 8,
             "format": "password"
           },
           {
             "name": "username",
             "type": "string",
             "minLength": 4,
-            "maxLength": 20,
+            "maxLength": 64,
             "format": "names"
           }
         ]
@@ -9544,9 +9543,9 @@
         "name": "/security/users/:user_id/roles",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.set_user_role",
         "description": "Create a specified relation role-policy, one user may have multiples roles",
-        "summary": "Create a specified relation between one user and one role",
+        "summary": "Add roles to user",
         "tags": [
-          "security"
+          "Security"
         ],
         "args": [
           {
@@ -9609,15 +9608,15 @@
       {
         "name": "/agents",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agents_controller.delete_agents",
-        "description": "Delete all agents or a list of them with optional criteria based on the status or time of the last connection",
+        "description": "Delete agents with optional criteria based on the status or time of the last connection",
         "summary": "Delete agents",
         "tags": [
-          "agents"
+          "Agents"
         ],
         "query": [
           {
             "name": "agents_list",
-            "description": "List of agent IDs (separated by comma), use the keyword 'all' to select all agents",
+            "description": "List of agent IDs (separated by comma), use the keyword `all` to select all agents",
             "required": true,
             "schema": {
               "type": "array",
@@ -9631,7 +9630,7 @@
           },
           {
             "name": "older_than",
-            "description": "Consider only agents whose last keep alive is older than the specified time frame. For never_connected agents, register date is considered instead of last keep alive. For example, `7d`, `10s` and `10` are valid values. When no time unit is specified, seconds are assumed. Default value: 7d\n",
+            "description": "Consider only agents whose last keep alive is older than the specified time frame. For never_connected agents, register date is considered instead of last keep alive. For example, `7d`, `10s` and `10` are valid values. When no time unit is specified, seconds are assumed. Use 0s to select all agents",
             "schema": {
               "type": "string",
               "format": "timeframe",
@@ -9656,7 +9655,7 @@
           },
           {
             "name": "status",
-            "description": "Filter by agent status. Use commas to enter multiple statuses",
+            "description": "Filter by agent status (use commas to enter multiple statuses)",
             "schema": {
               "type": "array",
               "items": {
@@ -9684,10 +9683,10 @@
       {
         "name": "/agents/:agent_id/group",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agents_controller.delete_single_agent_multiple_groups",
-        "description": "Remove the agent from all groups or a list of them. The agent will automatically revert to the \"default\" group if it is removed from all its assigned groups",
+        "description": "Remove the agent from all groups or a list of them. The agent will automatically revert to the default group if it is removed from all its assigned groups",
         "summary": "Remove agent from groups",
         "tags": [
-          "agents"
+          "Agents"
         ],
         "args": [
           {
@@ -9705,12 +9704,11 @@
         "query": [
           {
             "name": "groups_list",
-            "description": "Array of group IDs",
+            "description": "List of group IDs (separated by comma), all groups selected by default if not specified",
             "schema": {
               "type": "array",
               "items": {
                 "type": "string",
-                "minLength": 1,
                 "description": "Group name",
                 "format": "group_names"
               }
@@ -9738,9 +9736,9 @@
         "name": "/agents/:agent_id/group/:group_id",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agents_controller.delete_single_agent_single_group",
         "description": "Remove an agent from an specified group. If the agent has multigroups, it will preserve all previous groups except the last one",
-        "summary": "Remove an agent from a specific group",
+        "summary": "Remove agent from group",
         "tags": [
-          "agents"
+          "Agents"
         ],
         "args": [
           {
@@ -9760,7 +9758,6 @@
             "required": true,
             "schema": {
               "type": "string",
-              "minLength": 1,
               "description": "Group name",
               "format": "group_names"
             }
@@ -9789,14 +9786,14 @@
         "name": "/agents/group",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agents_controller.delete_multiple_agent_single_group",
         "description": "Remove all agents assignment or a list of them from the specified group",
-        "summary": "Remove agents assignment from a single group",
+        "summary": "Remove agents from group",
         "tags": [
-          "agents"
+          "Agents"
         ],
         "query": [
           {
             "name": "agents_list",
-            "description": "List of agent IDs (separated by comma), use the keyword 'all' to select all agents",
+            "description": "List of agent IDs (separated by comma), use the keyword `all` to select all agents",
             "required": true,
             "schema": {
               "type": "array",
@@ -9814,7 +9811,6 @@
             "required": true,
             "schema": {
               "type": "string",
-              "minLength": 1,
               "description": "Group name",
               "format": "group_names"
             }
@@ -9840,10 +9836,10 @@
       {
         "name": "/cluster/:node_id/files",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.delete_files_node",
-        "description": "Remove a specified file in the node {node-id}",
-        "summary": "Removes a file in a specified cluster node",
+        "description": "Delete a file in the specified node",
+        "summary": "Delete node file",
         "tags": [
-          "cluster"
+          "Cluster"
         ],
         "args": [
           {
@@ -9887,15 +9883,15 @@
       {
         "name": "/cluster/api/config",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.delete_api_config",
-        "description": "Replace the API configuration of all the selected nodes with the default one",
-        "summary": "Restore the default API configuration of all nodes (or a list of them)",
+        "description": "Restore the default API configuration of all nodes (or a list of them)",
+        "summary": "Restore nodes default API config",
         "tags": [
-          "cluster"
+          "Cluster"
         ],
         "query": [
           {
             "name": "nodes_list",
-            "description": "List of node IDs (separated by comma)",
+            "description": "List of node IDs (separated by comma), all nodes selected by default if not specified",
             "schema": {
               "type": "array",
               "items": {
@@ -9925,14 +9921,14 @@
         "name": "/experimental/syscheck",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.experimental_controller.clear_syscheck_database",
         "description": "Clear the syscheck database for all agents or a list of them",
-        "summary": "Clear agents syscheck database",
+        "summary": "Clear agents FIM results",
         "tags": [
-          "experimental"
+          "Experimental"
         ],
         "query": [
           {
             "name": "agents_list",
-            "description": "List of agent IDs (separated by comma), use the keyword 'all' to select all agents",
+            "description": "List of agent IDs (separated by comma), use the keyword `all` to select all agents",
             "required": true,
             "schema": {
               "type": "array",
@@ -9968,7 +9964,7 @@
         "description": "Delete all groups or a list of them",
         "summary": "Delete groups",
         "tags": [
-          "groups"
+          "Groups"
         ],
         "query": [
           {
@@ -10006,10 +10002,10 @@
       {
         "name": "/manager/api/config",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.manager_controller.delete_api_config",
-        "description": "Replace local API configuration with the original one",
-        "summary": "Restore default API configuration",
+        "description": "Restore default local API configuration",
+        "summary": "Restore default API config",
         "tags": [
-          "manager"
+          "Manager"
         ],
         "query": [
           {
@@ -10033,10 +10029,10 @@
       {
         "name": "/manager/files",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.manager_controller.delete_files",
-        "description": "Remove a specified file",
-        "summary": "Removes a file",
+        "description": "Delete a specified file",
+        "summary": "Delete file",
         "tags": [
-          "manager"
+          "Manager"
         ],
         "query": [
           {
@@ -10070,9 +10066,9 @@
         "name": "/security/config",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.delete_security_config",
         "description": "Replaces the security configuration with the original one",
-        "summary": "Restore default security configuration",
+        "summary": "Restore default security config",
         "tags": [
-          "security"
+          "Security"
         ],
         "query": [
           {
@@ -10096,10 +10092,10 @@
       {
         "name": "/security/policies",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.remove_policies",
-        "description": "Roles linked to policies are not going to be removed",
-        "summary": "Delete a list of policies or all policies in the system",
+        "description": "Delete a list of policies or all policies in the system, roles linked to policies are not going to be removed",
+        "summary": "Delete policies",
         "tags": [
-          "security"
+          "Security"
         ],
         "query": [
           {
@@ -10137,9 +10133,9 @@
         "name": "/security/roles",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.remove_roles",
         "description": "Policies linked to roles are not going to be removed",
-        "summary": "Delete a list of roles or all roles in the system",
+        "summary": "Delete roles",
         "tags": [
-          "security"
+          "Security"
         ],
         "query": [
           {
@@ -10177,9 +10173,9 @@
         "name": "/security/roles/:role_id/policies",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.remove_role_policy",
         "description": "Delete a specified relation role-policy",
-        "summary": "Delete a specified relation role-policy",
+        "summary": "Remove policies from role",
         "tags": [
-          "security"
+          "Security"
         ],
         "args": [
           {
@@ -10229,9 +10225,9 @@
         "name": "/security/roles/:role_id/rules",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.remove_role_rule",
         "description": "Delete a specific role-rule relation",
-        "summary": "Delete a specific role-rule relation",
+        "summary": "Remove security rules from role",
         "tags": [
-          "security"
+          "Security"
         ],
         "args": [
           {
@@ -10263,7 +10259,7 @@
               "items": {
                 "type": "string",
                 "format": "numbers_delete",
-                "description": "Rule ID|all"
+                "description": "Security rule ID|all"
               }
             }
           },
@@ -10280,10 +10276,10 @@
       {
         "name": "/security/rules",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.remove_rules",
-        "description": "Roles linked to rules are not going to be removed",
-        "summary": "Delete a list of security rules or all security rules in the system",
+        "description": "Delete a list of security rules or all security rules in the system, roles linked to rules are not going to be deleted",
+        "summary": "Delete security rules",
         "tags": [
-          "security"
+          "Security"
         ],
         "query": [
           {
@@ -10303,7 +10299,7 @@
               "items": {
                 "type": "string",
                 "format": "numbers_delete",
-                "description": "Rule ID|all"
+                "description": "Security rule ID|all"
               }
             }
           },
@@ -10320,19 +10316,19 @@
       {
         "name": "/security/user/authenticate",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.logout_user",
-        "description": "This method should be called to invalidate all the current user's tokens.",
+        "description": "This method should be called to invalidate all the current user's tokens",
         "summary": "Logout current user",
         "tags": [
-          "security"
+          "Security"
         ]
       },
       {
         "name": "/security/users",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.delete_users",
         "description": "Delete a list of users by specifying their IDs",
-        "summary": "Delete a list of users",
+        "summary": "Delete users",
         "tags": [
-          "security"
+          "Security"
         ],
         "query": [
           {
@@ -10370,9 +10366,9 @@
         "name": "/security/users/:user_id/roles",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.remove_user_role",
         "description": "Delete a specified relation user-roles",
-        "summary": "Delete a specified relation user-roles",
+        "summary": "Remove roles from user",
         "tags": [
-          "security"
+          "Security"
         ],
         "args": [
           {
@@ -10422,9 +10418,9 @@
         "name": "/syscheck/:agent_id",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.syscheck_controller.delete_syscheck_agent",
         "description": "Clear file integrity monitoring scan results for a specified agent",
-        "summary": "Clear FIM scan results for a specified agent",
+        "summary": "Clear results",
         "tags": [
-          "syscheck"
+          "Syscheck"
         ],
         "args": [
           {
