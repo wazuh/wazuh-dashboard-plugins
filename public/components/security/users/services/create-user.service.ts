@@ -14,10 +14,8 @@ import { CreateUser, User } from '../types/user.type';
 import { WzRequest } from '../../../../react-services/wz-request';
 import IApiResponse from '../../../../react-services/interfaces/api-response.interface';
 
-const CreateUserService = async (user: CreateUser): Promise<User> => {
-  console.log(user);
-  
-  const response = (await WzRequest.apiReq('POST', '/security/users', user)) as IApiResponse<User>;
+const CreateUserService = async (user: CreateUser): Promise<User> => { 
+  const response = (await WzRequest.apiReq('POST', '/security/users', {body: user})) as IApiResponse<User>;
   const users = ((response.data || {}).data || {}).affected_items || [{}];
   return users[0];
 };

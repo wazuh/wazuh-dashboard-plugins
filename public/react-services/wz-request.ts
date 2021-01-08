@@ -102,8 +102,6 @@ export class WzRequest {
    * @param {Object} body Request body
    */
   static async apiReq(method, path, body, shouldRetry = true): Promise<IApiResponse<any>> {
-    console.log("REQUEST!!");
-    
     try {
       if (!method || !path || !body) {
         throw new Error('Missing parameters');

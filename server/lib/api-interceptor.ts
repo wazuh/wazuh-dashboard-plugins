@@ -67,15 +67,16 @@ export const authenticate = async (apiHostID: string, authContext?: any): Promis
 
 const buildRequestOptions = async (method: string, path: string, data: any, { apiHostID, forceRefresh, token }: APIInterceptorRequestOptions) => {
   const api = await manageHosts.getHostById(apiHostID);
+  const {body, params, headers, ...rest} = data
   return {
     method: method,
     headers: {
       'content-type': 'application/json',
       Authorization: 'Bearer ' + token,
-      ...(data.headers ? data.headers : {})
+      ...(headers ? headers : {})
     },
-    data: data.body || data || {},
-    params: data.params || {},
+    data: body || rest || {},
+    params: params || {},
     url: `${api.url}:${api.port}${path}`,
   }
 }
@@ -105,7 +106,7 @@ export const requestAsCurrentUser = async (method: string, path: string, data: a
 
 const request = async (method: string, path: string, data: any, options: any): Promise<AxiosResponse> => {
   try{
-    const optionsRequest = await buildRequestOptions(method, path, data, options)
+    const optionsRequest = await buildRequestOptions(method, path, data, options);
     const response: AxiosResponse = await axios(optionsRequest);
     return response;
   }catch(error){

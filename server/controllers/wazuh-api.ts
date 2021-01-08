@@ -925,6 +925,9 @@ export class WazuhApiCtrl {
    * @returns {Object} API response or ErrorResponse
    */
   async makeRequest(context, method, path, data, id, response) {
+    console.log("makeRequest");
+    console.log(data);
+    
     const devTools = !!(data || {}).devTools;
     try {
       const api = await this.manageHosts.getHostById(id);
@@ -938,10 +941,10 @@ export class WazuhApiCtrl {
         return ErrorResponse('Could not get host credentials', 3011, 404, response);
       }
 
-      if (!data) {
+      if (!data) {        
         data = {};
       };
-
+      
       if (!data.headers) {
         data.headers = {};
       };
@@ -1015,7 +1018,12 @@ export class WazuhApiCtrl {
         }
       }
 
+      console.log("response TOKEN");      
+      console.log(method, path, data, options);      
+
       const responseToken = await context.wazuh.api.client.asCurrentUser.request(method, path, data, options);
+      console.log("responseTOKEN");
+      console.log(responseToken.data);
 
       const responseIsDown = this.checkResponseIsDown(responseToken);
       if (responseIsDown) {
@@ -1062,7 +1070,7 @@ export class WazuhApiCtrl {
       }
       const errorMsg = (error.response || {}).data || error.message
       log('wazuh-api:makeRequest', errorMsg || error);
-      if (devTools) {
+      if (devTools) {        
         return response.ok({
           body: { error: '3013', message: errorMsg || error }
         });
@@ -1088,7 +1096,6 @@ export class WazuhApiCtrl {
    * @returns {Object} api response or ErrorResponse
    */
   requestApi(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
-
     const idApi = getCookieValueByName(request.headers.cookie, 'wz-api');
     if (idApi !== request.body.id) { // if the current token belongs to a different API id, we relogin to obtain a new token
       return ErrorResponse(
@@ -1111,6 +1118,7 @@ export class WazuhApiCtrl {
       //Path doesn't start with '/'
       return ErrorResponse('Request path is not valid.', 3015, 400, response);
     } else {
+
       return this.makeRequest(
         context,
         request.body.method,
