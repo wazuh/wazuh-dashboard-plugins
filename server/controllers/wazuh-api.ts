@@ -924,10 +924,7 @@ export class WazuhApiCtrl {
    * @param {Object} response
    * @returns {Object} API response or ErrorResponse
    */
-  async makeRequest(context, method, path, data, id, response) {
-    console.log("makeRequest");
-    console.log(data);
-    
+  async makeRequest(context, method, path, data, id, response) {   
     const devTools = !!(data || {}).devTools;
     try {
       const api = await this.manageHosts.getHostById(id);
@@ -1017,14 +1014,7 @@ export class WazuhApiCtrl {
           }
         }
       }
-
-      console.log("response TOKEN");      
-      console.log(method, path, data, options);      
-
-      const responseToken = await context.wazuh.api.client.asCurrentUser.request(method, path, data, options);
-      console.log("responseTOKEN");
-      console.log(responseToken.data);
-
+      const responseToken = await context.wazuh.api.client.asCurrentUser.request(method, path, data, options);      
       const responseIsDown = this.checkResponseIsDown(responseToken);
       if (responseIsDown) {
         return ErrorResponse(
