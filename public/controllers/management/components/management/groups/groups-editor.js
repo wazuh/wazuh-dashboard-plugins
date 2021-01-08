@@ -24,7 +24,6 @@ import {
   EuiTitle,
   EuiToolTip,
   EuiButtonIcon,
-  EuiButton,
   EuiCodeEditor,
   EuiPanel,
   EuiCodeBlock
@@ -36,6 +35,10 @@ import { getToasts }  from '../../../../../kibana-services';
 import 'brace/theme/textmate';
 import { validateXML } from '../configuration/utils/xml';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
+import 'brace/theme/textmate';
+import 'brace/mode/xml';
+import 'brace/snippets/xml';
+import 'brace/ext/language_tools';
 
 class WzGroupsEditor extends Component {
   _isMounted = false;
@@ -187,16 +190,16 @@ class WzGroupsEditor extends Component {
                         <EuiCodeEditor
                           theme="textmate"
                           width="100%"
-                          height={`calc(100vh - ${(xmlError ? 195 : 175)}px)`}
+                          height={`calc(100vh - ${(xmlError ? 250 : 230)}px)`}
                           value={content}
                           onChange={newContent =>
-                            this.setState({ content: newContent })
+                            this.setState({content: newContent})
                           }
                           mode="xml"
                           wrapEnabled
                           setOptions={this.codeEditorOptions}
                           aria-label="Code Editor"
-                        ></EuiCodeEditor>
+                        />
                       )) || (
                         <EuiCodeBlock
                           language="json"
