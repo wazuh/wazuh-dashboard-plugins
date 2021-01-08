@@ -32,7 +32,6 @@ import {
 import GroupsHandler from './utils/groups-handler';
 
 import { getToasts }  from '../../../../../kibana-services';
-import 'brace/theme/textmate';
 import { validateXML } from '../configuration/utils/xml';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 import 'brace/theme/textmate';
