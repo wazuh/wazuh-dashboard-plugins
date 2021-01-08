@@ -185,6 +185,10 @@ export function jobInitializeRun(context) {
         'debug'
       );
       try {
+       const exists = await context.core.elasticsearch.client.asInternalUser.indices.exists({
+          index: WAZUH_VERSION_INDEX
+        });        
+        if (!exists.body) return;
         await context.core.elasticsearch.client.asInternalUser.indices.delete({
           index: WAZUH_VERSION_INDEX
         });

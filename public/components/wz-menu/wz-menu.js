@@ -497,7 +497,7 @@ class WzMenu extends Component {
     store.dispatch(updateCurrentAgentData({}));
     if (window.location.href.includes("/agents?")) {
       window.location.href = "#/agents-preview";
-      this.route.reload();
+      this.router.reload();
       return;
     }
     const { filterManager } = getDataPlugin().query;
