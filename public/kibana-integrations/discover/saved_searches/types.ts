@@ -17,7 +17,7 @@
  * under the License.
  */
 
-import { ISearchSource } from '../../../data/public';
+import { ISearchSource } from '../../../../../../src/plugins/data/public';
 
 export type SortOrder = [string, string];
 export interface SavedSearch {
