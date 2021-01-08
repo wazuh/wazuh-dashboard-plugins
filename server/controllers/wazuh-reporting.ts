@@ -138,16 +138,16 @@ export class WazuhReportingCtrl {
         const agentData = agentResponse.data.data.affected_items[0];
         if (agentData && agentData.status !== 'active') {
           printer.addContentWithNewLine({
-            text: `Warning. Agent is ${agent.data.affected_items[0].status.toLowerCase()}`,
+            text: `Warning. Agent is ${agentData.status.toLowerCase()}`,
             style: 'standard'
           });
         }
         await this.buildAgentsTable(context, printer, [isAgents], apiId);
 
         if (agentData && agentData.group) {
-          const agGroups = agentData.group.join(', ');
+          const agentGroups = agentData.group.join(', ');
           printer.addContentWithNewLine({
-            text: `Group${agentData.group.length > 1 ? 's' : ''}: ${agGroups}`,
+            text: `Group${agentData.group.length > 1 ? 's' : ''}: ${agentGroups}`,
             style: 'standard'
           });
         }
@@ -260,7 +260,7 @@ export class WazuhReportingCtrl {
    * @param {Object} agent agent target
    * @returns {Object} Extended information
    */
-  async extendedInformation(
+  private async extendedInformation(
     context,
     printer,
     section,
@@ -480,7 +480,7 @@ export class WazuhReportingCtrl {
             text: 'Most common rootkits found among your agents',
             style: 'h2'
           })
-          .addContentaddContentWithNewLine({
+          .addContentWithNewLine({
             text:
               'Rootkits are a set of software tools that enable an unauthorized user to gain control of a computer system without being detected.',
             style: 'standard'
@@ -791,21 +791,23 @@ export class WazuhReportingCtrl {
           `Fetching syscheck database for agent ${agent}`,
           'debug'
         );
-        const lastScan = await context.wazuh.api.client.asCurrentUser.request(
+
+        const lastScanResponse = await context.wazuh.api.client.asCurrentUser.request(
           'GET',
           `/syscheck/${agent}/last_scan`,
           {},
           {apiHostID: apiId}
         );
 
-        if (lastScan && lastScan.data) {
-          if (lastScan.data.affected_items[0].start && lastScan.data.affected_items[0].end) {
+        if (lastScanResponse && lastScanResponse.data) {
+          const lastScanData = lastScanResponse.data.data.affected_items[0];
+          if (lastScanData.start && lastScanData.end) {
             printer.addContent({
-              text: `Last file integrity monitoring scan was executed from ${lastScan.data.start} to ${lastScan.data.end}.`
+              text: `Last file integrity monitoring scan was executed from ${lastScanData.start} to ${lastScanData.end}.`
             });
-          } else if (lastScan.data.affected_items[0].start) {
+          } else if (lastScanData.start) {
             printer.addContent({
-              text: `File integrity monitoring scan is currently in progress for this agent (started on ${lastScan.data.affected_items[0].start}).`
+              text: `File integrity monitoring scan is currently in progress for this agent (started on ${lastScanData.start}).`
             });
           } else {
             printer.addContent({
@@ -827,6 +829,7 @@ export class WazuhReportingCtrl {
           filters,
           pattern
         );
+
         lastTenDeleted &&
           lastTenDeleted.length &&
           printer.addSimpleTable({
@@ -847,6 +850,7 @@ export class WazuhReportingCtrl {
           filters,
           pattern
         );
+
         lastTenModified &&
           lastTenModified.length &&
           printer.addSimpleTable({
@@ -1754,13 +1758,12 @@ export class WazuhReportingCtrl {
   async createReportsModules(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory){
     try{
       log('reporting:createReportsModules', `Report started`, 'info');
-      const { array, agents, browserTimezone, searchBar, filters, time, tables, name } = request.body;
+      const { array, agents, browserTimezone, searchBar, filters, time, tables, name, section } = request.body;
       const { moduleID } = request.params;
       const { id: apiId, pattern: indexPattern } = request.headers;
       const { from, to } = (time || {});
       // Init
       const printer = new ReportPrinter();
-      const section = 'overview';
       const {username: userID} = await context.wazuh.security.getCurrentUser(request, context);
       createDataDirectoryIfNotExists();
       createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
@@ -1769,8 +1772,9 @@ export class WazuhReportingCtrl {
 
       await this.renderHeader(context, printer, section, moduleID, agents, apiId);
 
+      
       const sanitizedFilters = filters ? this.sanitizeKibanaFilters(filters, searchBar) : false;
-
+      
       if (time && sanitizedFilters) {
         printer.addTimeRangeAndFilters(from, to, sanitizedFilters, browserTimezone);
       };
@@ -1782,8 +1786,8 @@ export class WazuhReportingCtrl {
           section,
           moduleID,
           apiId,
-          new Date(from),
-          new Date(to),
+          new Date(from).getTime(),
+          new Date(to).getTime(),
           sanitizedFilters,
           indexPattern,
           agents
@@ -1793,7 +1797,7 @@ export class WazuhReportingCtrl {
       printer.addVisualizations(array, agents, moduleID);
 
       if(tables){
-        tables.forEach(table => printer.addTables(table));
+        printer.addTables(tables);
       };
 
       await printer.print(path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, userID, name));
@@ -1819,8 +1823,8 @@ export class WazuhReportingCtrl {
   async createReportsGroups(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory){
     try{
       log('reporting:createReportsGroups', `Report started`, 'info');
-      const { array, browserTimezone, searchBar, filters, time, name, components } = request.body;
-      const { group } = request.params;
+      const { browserTimezone, searchBar, filters, time, name, components } = request.body;
+      const { groupID } = request.params;
       const { id: apiId, pattern: indexPattern } = request.headers;
       const { from, to } = (time || {});
       // Init
@@ -1846,23 +1850,24 @@ export class WazuhReportingCtrl {
         sca: 'Security configuration assessment'
       };
       printer.addContent({
-        text: `Group ${group} configuration`,
+        text: `Group ${groupID} configuration`,
         style: 'h1'
       });
       if (components['0']) {
         let configuration = {};
         try {
-          configuration = await context.wazuh.api.client.asCurrentUser.request(
+          const configurationResponse = await context.wazuh.api.client.asCurrentUser.request(
             'GET',
-            `/groups/${group}/configuration`,
+            `/groups/${groupID}/configuration`,
             {},
             {apiHostID: apiId}
           );
+          configuration = configurationResponse.data.data;
         } catch (error) {
           log('reporting:createReportsGroups', error.message || error, 'debug');
 
         };
-        if (Object.keys(configuration.data.data.affected_items[0].config).length) {
+        if (Object.keys(configuration.affected_items[0].config).length) {
           printer.addContent({
             text: 'Configurations',
             style: { fontSize: 14, color: '#000' },
@@ -1872,7 +1877,7 @@ export class WazuhReportingCtrl {
             labels: [],
             isGroupConfig: true
           };
-          for (let config of configuration.data.data.affected_items) {
+          for (let config of configuration.affected_items) {
             let filterTitle = '';
             let index = 0;
             for (let filter of Object.keys(config.filters)) {
@@ -2051,12 +2056,13 @@ export class WazuhReportingCtrl {
       if (components['1']) {
         let agentsInGroup = [];
         try {
-          agentsInGroup = await context.wazuh.api.client.asCurrentUser.request(
+          const agentsInGroupResponse = await context.wazuh.api.client.asCurrentUser.request(
             'GET',
-            `/groups/${group}/agents`,
+            `/groups/${groupID}/agents`,
             {},
             {apiHostID: apiId}
           );
+          agentsInGroup = agentsInGroupResponse.data.data.affected_items
         } catch (error) {
           log('reporting:report', error.message || error, 'debug');
         }
@@ -2064,32 +2070,11 @@ export class WazuhReportingCtrl {
           context,
           printer,
           'groupConfig',
-          group,
-          (((agentsInGroup || []).data || []).affected_items || []).map(x => x.id),
+          groupID,
+          (agentsInGroup || []).map(x => x.id),
           apiId
         );
       }
-
-      const sanitizedFilters = filters ? this.sanitizeKibanaFilters(filters, searchBar) : false;
-
-      if (time && sanitizedFilters) {
-        printer.addTimeRangeAndFilters(from, to, sanitizedFilters, browserTimezone);
-      };
-
-      if(time){
-        await this.extendedInformation(
-          context,
-          printer,
-          'groupConfig',
-          'groupConfig',
-          apiId,
-          new Date(from),
-          new Date(to),
-          sanitizedFilters,
-          indexPattern,
-          ''
-        );
-      };
 
       await printer.print(path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, userID, name));
 
@@ -2356,12 +2341,6 @@ export class WazuhReportingCtrl {
         }
       }
 
-      const sanitizedFilters = filters ? this.sanitizeKibanaFilters(filters, searchBar) : false;
-
-      if (time && sanitizedFilters) {
-        printer.addTimeRangeAndFilters(from, to, sanitizedFilters, browserTimezone);
-      };
-
       await printer.print(path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, userID, name));
 
       return response.ok({
@@ -2418,13 +2397,9 @@ export class WazuhReportingCtrl {
 
       // Add title
       printer.addContentWithNewLine({
-        text: 'Agents syscollector',
+        text: 'Inventory data report',
         style: 'h1'
       });
-
-      if (time && sanitizedFilters) {
-        printer.addTimeRangeAndFilters(from, to, sanitizedFilters, browserTimezone);
-      };
 
       // Add table with the agent info
       await this.buildAgentsTable(context, printer, [agentID], apiId);
@@ -2571,8 +2546,8 @@ export class WazuhReportingCtrl {
           'agents',
           'syscollector',
           apiId,
-          new Date(from),
-          new Date(to),
+          from,
+          to,
           sanitizedFilters + ' AND rule.groups: "vulnerability-detector"',
           indexPattern,
           agentID

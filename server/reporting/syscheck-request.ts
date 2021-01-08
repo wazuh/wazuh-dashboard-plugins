@@ -224,7 +224,7 @@ export const lastTenModifiedFiles = async (
       }
     });
 
-    const response = context.core.elasticsearch.client.asCurrentUser.search({
+    const response = await context.core.elasticsearch.client.asCurrentUser.search({
       index: pattern,
       body: base
     });
