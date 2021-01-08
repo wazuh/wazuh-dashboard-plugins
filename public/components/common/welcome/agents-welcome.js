@@ -141,7 +141,7 @@ export class AgentsWelcome extends Component {
       null,
       this.props.agent.id
     );
-    const $injector = getAngularModule();
+    const $injector = getAngularModule().$injector;
     this.router = $injector.get('$route');
     window.addEventListener('resize', this.updateWidth); //eslint-disable-line
   }

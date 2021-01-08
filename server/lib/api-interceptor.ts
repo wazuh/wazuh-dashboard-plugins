@@ -67,7 +67,7 @@ export const authenticate = async (apiHostID: string, authContext?: any): Promis
 
 const buildRequestOptions = async (method: string, path: string, data: any, { apiHostID, forceRefresh, token }: APIInterceptorRequestOptions) => {
   const api = await manageHosts.getHostById(apiHostID);
-  const {body, params, headers, ...rest} = data
+  const { body, params, headers, ...rest } = data;
   return {
     method: method,
     headers: {

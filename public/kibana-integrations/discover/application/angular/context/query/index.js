@@ -17,6 +17,6 @@
  * under the License.
  */
 
-export { QueryActionsProvider } from './actions';
+//export { QueryActionsProvider } from './actions';
 export { FAILURE_REASONS, LOADING_STATUS } from './constants';
-export { createInitialLoadingStatusState } from './state';
+//export { createInitialLoadingStatusState } from './state';

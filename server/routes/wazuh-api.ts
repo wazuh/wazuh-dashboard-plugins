@@ -79,6 +79,7 @@ export function WazuhApiRoutes(router: IRouter) {
       body: schema.object({
         id: schema.string(),
         path: schema.string(),
+        filters: schema.maybe(schema.any())
       })
     }
   },

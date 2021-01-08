@@ -17,7 +17,7 @@
  * under the License.
  */
 
-import { SavedObjectLoader, SavedObjectKibanaServices } from '../../../saved_objects/public';
+import { SavedObjectLoader, SavedObjectKibanaServices } from '../../../../../../src/plugins/saved_objects/public';
 import { createSavedSearchClass } from './_saved_search';
 
 export function createSavedSearchesLoader(services: SavedObjectKibanaServices) {
