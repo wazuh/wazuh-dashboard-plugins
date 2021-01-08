@@ -23,7 +23,6 @@ import { generateAlerts } from '../lib/generate-alerts/generate-alerts-script';
 import { WAZUH_MONITORING_PATTERN, WAZUH_ALERTS_PATTERN, WAZUH_SAMPLE_ALERT_PREFIX, WAZUH_ROLE_ADMINISTRATOR_ID, WAZUH_SAMPLE_ALERTS_INDEX_SHARDS, WAZUH_SAMPLE_ALERTS_INDEX_REPLICAS } from '../../util/constants';
 import jwtDecode from 'jwt-decode';
 import { ManageHosts } from '../lib/manage-hosts';
-import { WAZUH_SECURITY_PLUGIN_XPACK_SECURITY, WAZUH_SECURITY_PLUGIN_OPEN_DISTRO_FOR_ELASTICSEARCH } from '../../util/constants';
 import { KibanaRequest, RequestHandlerContext, KibanaResponseFactory, SavedObject, SavedObjectsFindResponse } from 'src/core/server';
 import { getCookieValueByName } from '../lib/cookie';
 import { WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS, WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_ALERTS } from '../../util/constants'
@@ -321,13 +320,11 @@ export class WazuhElasticCtrl {
    */
   async getCurrentPlatform(context: RequestHandlerContext, request: KibanaRequest<{user: string}>, response: KibanaResponseFactory) {
     try {
-      if(!!context.wazuh.plugins.security) {
-        return response.ok({body: { platform: WAZUH_SECURITY_PLUGIN_XPACK_SECURITY }});
-      }else if(context.wazuh.plugins.opendistroSecurity){
-        return response.ok({body: { platform: WAZUH_SECURITY_PLUGIN_OPEN_DISTRO_FOR_ELASTICSEARCH }});
-      } else {
-        return response.ok({body: { platform: false}});
-      }
+      return response.ok({
+        body: {
+          platform: context.wazuh.security.platform
+        }
+      });
     } catch (error) {
       log('wazuh-elastic:getCurrentPlatform', error.message || error);
       return ErrorResponse(error.message || error, 4011, 500, response);
@@ -345,12 +342,12 @@ export class WazuhElasticCtrl {
     try {
       const elasticClient = context.core.elasticsearch.client;
       const spaces = context.wazuh.plugins.spaces?.spacesService;
-      const { opendistroSecurity, searchguard } = context.wazuh.plugins;
+      const { opendistroSecurityKibana, searchguard } = context.wazuh.plugins;
       const namespace = spaces && spaces.getSpaceId(request);
 
       const config = getConfiguration();
 
-      const usingCredentials = !!opendistroSecurity || !!searchguard || await this.wzWrapper.usingCredentials(elasticClient);
+      const usingCredentials = !!opendistroSecurityKibana || !!searchguard || await this.wzWrapper.usingCredentials(elasticClient);
 
       const isXpackEnabled =
         typeof XPACK_RBAC_ENABLED !== 'undefined' &&

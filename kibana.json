@@ -14,7 +14,7 @@
     "charts",
     "savedObjects"
   ],
-  "optionalPlugins": ["security", "opendistroSecurity", "searchguard", "spaces"],
+  "optionalPlugins": ["security", "opendistroSecurityKibana", "searchguard", "spaces"],
   "requiredBundles": ["kibanaReact", "kibanaUtils"],
   "server": true,
   "ui": true
