@@ -1,10 +1,9 @@
 import { OpendistroFactory, XpackFactory, DefaultFactory } from './factories';
-import { SecurityPluginSetup } from 'x-pack/plugins/security/server';
 import { KibanaRequest, RequestHandlerContext } from 'src/core/server';
 import { PluginSetup } from '../../types'
 
 type CurrentUser = {
-  userName?: string 
+  username?: string 
   authContext: {[key:string]: any}
 }
 
@@ -13,11 +12,11 @@ export interface ISecurityFactory {
   getCurrentUser(request: KibanaRequest, context?:RequestHandlerContext): Promise<CurrentUser> 
 }
 
-export function SecurityObj({security, opendistroSecurity}:PluginSetup): ISecurityFactory {
+export function SecurityObj({security, opendistroSecurityKibana}:PluginSetup): ISecurityFactory {
   if (!!security) {
     return new XpackFactory(security);
-  } else if (!!opendistroSecurity) {
-    return new OpendistroFactory(opendistroSecurity);
+  } else if (!!opendistroSecurityKibana) {
+    return new OpendistroFactory(opendistroSecurityKibana);
   } else {
     return new DefaultFactory();
   }

@@ -48,8 +48,8 @@ export class WazuhApiCtrl {
   async getToken(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
     try {
       const { force, idHost } = request.body;
-      const { userName, authContext } = await context.wazuh.security.getCurrentUser(request, context);
-      if (!force && request.headers.cookie && userName === getCookieValueByName(request.headers.cookie, 'wz-user') && idHost === getCookieValueByName(request.headers.cookie,'wz-api')) {
+      const { username } = await context.wazuh.security.getCurrentUser(request, context);
+      if (!force && request.headers.cookie && username === getCookieValueByName(request.headers.cookie, 'wz-user') && idHost === getCookieValueByName(request.headers.cookie,'wz-api')) {
         const wzToken = getCookieValueByName(request.headers.cookie, 'wz-user');
         if (wzToken) {
           try { // if the current token is not a valid jwt token we ask for a new one
@@ -76,7 +76,7 @@ export class WazuhApiCtrl {
         headers: {
           'set-cookie': [
             `wz-token=${token};Path=/;HttpOnly`,
-            `wz-user=${userName};Path=/;HttpOnly`,
+            `wz-user=${username};Path=/;HttpOnly`,
             `wz-api=${idHost};Path=/;HttpOnly`,
           ],
         },

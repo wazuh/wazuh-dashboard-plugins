@@ -11,9 +11,11 @@
  */
 import path  from 'path';
 
-// Index patterns
+// Index patterns - Wazuh alerts
 export const WAZUH_ALERTS_PREFIX = "wazuh-alerts-";
 export const WAZUH_ALERTS_PATTERN = "wazuh-alerts-*";
+
+// Job - Wazuh monitoring
 export const WAZUH_MONITORING_PREFIX = "wazuh-monitoring-";
 export const WAZUH_MONITORING_PATTERN = "wazuh-monitoring-*";
 export const WAZUH_MONITORING_TEMPLATE_NAME = "wazuh-agent";
@@ -22,8 +24,11 @@ export const WAZUH_MONITORING_DEFAULT_CREATION = 'd';
 export const WAZUH_MONITORING_DEFAULT_ENABLED = true;
 export const WAZUH_MONITORING_DEFAULT_FREQUENCY = 900;
 export const WAZUH_MONITORING_DEFAULT_CRON_FREQ = '0 * * * * *';
+
+// Job - Wazuh initialize
 export const WAZUH_INDEX = '.wazuh';
 export const WAZUH_VERSION_INDEX = '.wazuh-version';
+export const WAZUH_KIBANA_TEMPLATE_NAME = 'wazuh-kibana';
 
 // Permissions
 export const WAZUH_ROLE_ADMINISTRATOR_ID = 1;
@@ -58,7 +63,7 @@ export const WAZUH_TIME_FILTER_DEFAULT = {
   to: 'now'
 };
 
-// Default number of shards and remplicas for indices
+// Default number of shards and replicas for indices
 export const WAZUH_INDEX_SHARDS = 2;
 export const WAZUH_INDEX_REPLICAS = 0;
 
@@ -69,14 +74,17 @@ export const WAZUH_API_RESERVED_ID_LOWER_THAN = 100;
 export const WAZUH_DATA_PATH = 'data/wazuh';
 export const WAZUH_DATA_ABSOLUTE_PATH = path.join(__dirname, '../../../', WAZUH_DATA_PATH);
 
+// Wazuh data path - config
 export const WAZUH_DATA_CONFIG_DIRECTORY_PATH = path.join(WAZUH_DATA_ABSOLUTE_PATH, 'config');
 export const WAZUH_DATA_CONFIG_APP_PATH = path.join(WAZUH_DATA_CONFIG_DIRECTORY_PATH, 'wazuh.yml');
 export const WAZUH_DATA_CONFIG_REGISTRY_PATH = path.join(WAZUH_DATA_CONFIG_DIRECTORY_PATH, 'wazuh-registry.json');
 
+// Wazuh data path - logs
 export const WAZUH_DATA_LOGS_DIRECTORY_PATH = path.join(WAZUH_DATA_ABSOLUTE_PATH, 'logs');
 export const WAZUH_DATA_LOGS_PLAIN_PATH = path.join(WAZUH_DATA_LOGS_DIRECTORY_PATH, 'wazuhapp-plain.log');
 export const WAZUH_DATA_LOGS_RAW_PATH = path.join(WAZUH_DATA_LOGS_DIRECTORY_PATH, 'wazuhapp.log');
 
+// Wazuh data path - downloads
 export const WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH = path.join(WAZUH_DATA_ABSOLUTE_PATH, 'downloads');
 export const WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH = path.join(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH, 'reports');
 

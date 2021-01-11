@@ -16,7 +16,7 @@ import { getConfiguration } from '../lib/get-configuration';
 import { totalmem } from 'os';
 import fs from 'fs';
 import { ManageHosts } from '../lib/manage-hosts';
-import { WAZUH_ALERTS_PATTERN, WAZUH_DATA_CONFIG_REGISTRY_PATH, WAZUH_INDEX, WAZUH_VERSION_INDEX } from '../../util/constants';
+import { WAZUH_ALERTS_PATTERN, WAZUH_DATA_CONFIG_REGISTRY_PATH, WAZUH_INDEX, WAZUH_VERSION_INDEX, WAZUH_KIBANA_TEMPLATE_NAME } from '../../util/constants';
 import { createDataDirectoryIfNotExists } from '../lib/filesystem';
 
 const manageHosts = new ManageHosts();
@@ -100,12 +100,11 @@ export function jobInitializeRun(context) {
    */
   const checkWazuhIndex = async () => {
     try {
-      log('initialize:checkWazuhIndex', 'Checking .wazuh index.', 'debug');
+      log('initialize:checkWazuhIndex', `Checking ${WAZUH_INDEX} index.`, 'debug');
 
       const result = await context.core.elasticsearch.client.asInternalUser.indices.exists({
         index: WAZUH_INDEX
       });
-
       if (result.body) {
         try {
           const data = await context.core.elasticsearch.client.asInternalUser.search({
@@ -116,7 +115,7 @@ export function jobInitializeRun(context) {
           await manageHosts.migrateFromIndex(apiEntries);
           log(
             'initialize:checkWazuhIndex',
-            'Index .wazuh will be removed and its content will be migrated to wazuh.yml',
+            `Index ${WAZUH_INDEX} will be removed and its content will be migrated to wazuh.yml`,
             'debug'
           );
           // Check if all APIs entries were migrated properly and delete it from the .wazuh index
@@ -194,13 +193,13 @@ export function jobInitializeRun(context) {
         });
         log(
           'initialize[checkwazuhRegistry]',
-          'Successfully deleted old .wazuh-version index.',
+          `Successfully deleted old ${WAZUH_VERSION_INDEX} index.`,
           'debug'
         );
       } catch (error) {
         log(
           'initialize[checkwazuhRegistry]',
-          'No need to delete old .wazuh-version index',
+          `No need to delete old ${WAZUH_VERSION_INDEX} index`,
           'debug'
         );
       }
@@ -268,7 +267,7 @@ export function jobInitializeRun(context) {
     }
 
     return context.core.elasticsearch.client.asInternalUser.indices.putTemplate({
-      name: 'wazuh-kibana',
+      name: WAZUH_KIBANA_TEMPLATE_NAME,
       order: 0,
       create: true,
       body: kibanaTemplate
@@ -327,7 +326,7 @@ export function jobInitializeRun(context) {
   const getTemplateByName = async () => {
     try {
       await context.core.elasticsearch.client.asInternalUser.indices.getTemplate({
-        name: 'wazuh-kibana'
+        name: WAZUH_KIBANA_TEMPLATE_NAME
       });
       log(
         'initialize:checkKibanaStatus',
@@ -345,7 +344,6 @@ export function jobInitializeRun(context) {
   // Does Kibana index exist?
   const checkKibanaStatus = async () => {
     try {
-      // TODO: get '.kibana' index from server
       const response = await context.core.elasticsearch.client.asInternalUser.indices.exists({
         index: KIBANA_INDEX
       });
@@ -356,7 +354,7 @@ export function jobInitializeRun(context) {
         // No Kibana index created...
         log(
           'initialize:checkKibanaStatus',
-          "Didn't find " + '.kibana' + ' index...',
+          `Not found ${KIBANA_INDEX} index`,
           'info'
         );
         await getTemplateByName();
@@ -370,9 +368,9 @@ export function jobInitializeRun(context) {
   // Wait until Elasticsearch js is ready
   const checkStatus = async () => {
     try {
-      // TODO: wait unti elasticsearch is ready?
+      // TODO: wait until elasticsearch is ready?
       // await server.plugins.elasticsearch.waitUntilReady();
-      return checkKibanaStatus();
+      return await checkKibanaStatus();
     } catch (error) {
       log(
         'initialize:checkStatus',

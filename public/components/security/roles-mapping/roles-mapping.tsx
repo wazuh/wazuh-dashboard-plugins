@@ -79,9 +79,9 @@ export const RolesMapping = () => {
   const initData = async () => {
     setLoadingTable(true);
     await getRules();
-    if(currentPlatform !== "elastic"){
+    if(currentPlatform){
       await getInternalUsers();
-    }
+    };
     setLoadingTable(false);
   };
 
