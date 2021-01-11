@@ -151,7 +151,8 @@ app.config(($routeProvider) => {
   })
   .when('/manager/', {
     template: managementTemplate,
-    resolve: { enableWzMenu, nestedResolve, ip, savedSearch, clearRuleId }
+    resolve: { enableWzMenu, nestedResolve, ip, savedSearch, clearRuleId },
+    reloadOnSearch: false,
   })
   .when('/manager/:tab?', {
     template: managementTemplate,
