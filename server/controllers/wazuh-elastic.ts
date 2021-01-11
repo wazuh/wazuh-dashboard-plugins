@@ -571,18 +571,18 @@ export class WazuhElasticCtrl {
               bulk_content.visualization.kibanaSavedObjectMeta.searchSourceJSON = searchSourceJSON.replace('wazuh-statistics-*', pattern_name);
             }
             if (title.startsWith('Wazuh App Statistics') && name !== '-' && name !== 'all' && visState.params.expression.includes('q=')) {
-              const expressionRegex = /q=\'\*\'/gi
+              const expressionRegex = /q='\*'/gi
               query += visState.params.expression.replace(expressionRegex, `q="nodeName:${name} AND apiName=${master_node}"`)
 
             } else if (title.startsWith('Wazuh App Statistics')) {
-              const expressionRegex = /q=\'\*\'/gi
+              const expressionRegex = /q='\*'/gi
               query += visState.params.expression.replace(expressionRegex, `q="apiName=${master_node}"`)
             } else {
               query = visState.params.expression;
             }
           }
 
-          visState.params.expression = query;
+          visState.params.expression = query.replace(/'/g, "\"");
           bulk_content.visualization.visState = JSON.stringify(visState);
         }
 
