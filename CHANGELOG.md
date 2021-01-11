@@ -12,7 +12,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Added
 
-- Improved management of index-pattern fields [#2630] (https://github.com/wazuh/wazuh-kibana-app/issues/2630)
+- Improved management of index-pattern fields [#2630](https://github.com/wazuh/wazuh-kibana-app/issues/2630)
 
 ### Fixed
 
