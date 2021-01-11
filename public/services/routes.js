@@ -164,7 +164,8 @@ app.config(($routeProvider) => {
   })
   .when('/settings', {
     template: settingsTemplate,
-    resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
+    resolve: { enableWzMenu, nestedResolve, ip, savedSearch },
+    reloadOnSearch: false
   })
   .when('/security', {
     template: securityTemplate,

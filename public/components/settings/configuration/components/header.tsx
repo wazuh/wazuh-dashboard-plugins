@@ -72,7 +72,7 @@ const SubTitle = () => {
     <EuiFlexItem >
       <EuiText color="subdued" style={{ paddingBottom: '15px' }}>
         Configuration file located at
-        /usr/share/kibana/optimize/wazuh/config/wazuh.yml
+        /usr/share/kibana/data/wazuh/config/wazuh.yml
           </EuiText>
     </EuiFlexItem>
   )
@@ -96,7 +96,7 @@ const SearchBar = ({query, setQuery}) => {
   }
   return (
     <Fragment>
-      <EuiSearchBar 
+      <EuiSearchBar
         filters={[{
           type:'field_value_selection',
           field:'category',

@@ -226,7 +226,7 @@ hosts:
             <EuiText>
               Review the settings in the{' '}
               <EuiCode>
-                /usr/share/kibana/optimize/wazuh/config/wazuh.yml
+                /usr/share/kibana/data/wazuh/config/wazuh.yml
               </EuiCode>{' '}
               file.
             </EuiText>
