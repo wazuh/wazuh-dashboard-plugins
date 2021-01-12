@@ -111,12 +111,11 @@ export class PatternHandler {
    */
   static async changePattern(selectedPattern) {
     try {
-      let prueba = AppState.getCurrentPattern();
       AppState.setCurrentPattern(selectedPattern);
       await this.refreshIndexPattern();
       return AppState.getCurrentPattern();
     } catch (error) {
-      throw new Error('Error Pattern Handler (changePattern)',error);
+      throw new Error('Error Pattern Handler (changePattern)');
     }
     return;
   }
