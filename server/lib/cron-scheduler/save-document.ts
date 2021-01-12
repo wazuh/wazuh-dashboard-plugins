@@ -31,7 +31,7 @@ export class SaveDocument {
       const createDocumentObject = this.createDocument(doc, indexCreation, mapping);
       const response = await this.esClientInternalUser.bulk(createDocumentObject);
       log(this.logPath, `Response of create new document ${JSON.stringify(response)}`, 'debug');
-      // await this.checkIndexPatternAndCreateIfNotExists(index);
+      await this.checkIndexPatternAndCreateIfNotExists(index);
     } catch (error) {
       if (error.status === 403)
         throw { error: 403, message: `Authorization Exception in the index "${index}"` }
@@ -40,13 +40,60 @@ export class SaveDocument {
       throw error;
     }
   }
+  private async checkIndexPatternAndCreateIfNotExists(index) {
+    const KIBANA_INDEX = this.context.server.config.kibana.index;
+    log(this.logPath, `Internal index of kibana: ${KIBANA_INDEX}`, 'debug');
+    const result = await this.esClientInternalUser.search({
+      index: KIBANA_INDEX,
+      type: '_doc',
+      body: {
+        query: {
+          match: {
+            _id: `index-pattern:${index}-*`
+          }
+        }
+      }
+    });
+    if (result.body.hits.total.value === 0) {
+      await this.createIndexPattern(KIBANA_INDEX, index);
+    }
+  }
+
+  private async createIndexPattern(KIBANA_INDEX: any, index: any) {
+    try {
+      const response = await this.esClientInternalUser.create({
+        index: KIBANA_INDEX,
+        type: '_doc',
+        'id': `index-pattern:${index}-*`,
+        body: {
+          type: 'index-pattern',
+          'index-pattern': {
+            title: `${index}-*`,
+            timeFieldName: 'timestamp',
+          }
+        }
+      });
+      log(
+        this.logPath,
+        `The indexPattern no exist, response of createIndexPattern: ${JSON.stringify(response)}`,
+        'debug'
+      );
+    } catch (error) {
+      this.checkDuplicateIndexPatterError(error);
+    }
+  }
+  private checkDuplicateIndexPatterError(error) {
+    const { type } = ((error || {}).body || {}).error || {};
+    if (!['version_conflict_engine_exception', 'resource_already_exists_exception'].includes(type))
+      throw error;
+  }
 
   private async checkIndexAndCreateIfNotExists(index, shards, replicas) {
     try {
-      try{
+      try {
         const exists = await this.esClientInternalUser.indices.exists({ index });
         log(this.logPath, `Index '${index}' exists? ${exists.body}`, 'debug');
-      }catch(error){
+      } catch (error) {
         log(this.logPath, `Index '${index}' exists? false`, 'debug');
         const response = await this.esClientInternalUser.indices.create({
           index,
@@ -59,7 +106,7 @@ export class SaveDocument {
             }
           }
         });
-        
+
         log(this.logPath, `Status of create a new index: ${JSON.stringify(response)}`, 'debug');
 
       }
