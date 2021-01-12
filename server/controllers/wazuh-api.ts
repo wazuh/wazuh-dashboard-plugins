@@ -924,7 +924,7 @@ export class WazuhApiCtrl {
    * @param {Object} response
    * @returns {Object} API response or ErrorResponse
    */
-  async makeRequest(context, method, path, data, id, response) {   
+  async makeRequest(context, method, path, data, id, response) {
     const devTools = !!(data || {}).devTools;
     try {
       const api = await this.manageHosts.getHostById(id);
@@ -938,10 +938,10 @@ export class WazuhApiCtrl {
         return ErrorResponse('Could not get host credentials', 3011, 404, response);
       }
 
-      if (!data) {        
+      if (!data) {
         data = {};
       };
-      
+
       if (!data.headers) {
         data.headers = {};
       };
@@ -952,17 +952,17 @@ export class WazuhApiCtrl {
 
       // Set content type application/xml if needed
       if (typeof (data || {}).body === 'string' && (data || {}).origin === 'xmleditor') {
-        data.headers.content_type = 'application/xml';
+        data.headers['content-type'] = 'application/xml';
         delete data.origin;
       }
 
       if (typeof (data || {}).body === 'string' && (data || {}).origin === 'json') {
-        data.headers.content_type = 'application/json';
+        data.headers['content-type'] = 'application/json';
         delete data.origin;
       }
 
       if (typeof (data || {}).body === 'string' && (data || {}).origin === 'raw') {
-        data.headers.content_type = 'application/octet-stream';
+        data.headers['content-type'] = 'application/octet-stream';
         delete data.origin;
       }
       const delay = (data || {}).delay || 0;
@@ -1014,7 +1014,7 @@ export class WazuhApiCtrl {
           }
         }
       }
-      const responseToken = await context.wazuh.api.client.asCurrentUser.request(method, path, data, options);      
+      const responseToken = await context.wazuh.api.client.asCurrentUser.request(method, path, data, options);
       const responseIsDown = this.checkResponseIsDown(responseToken);
       if (responseIsDown) {
         return ErrorResponse(
@@ -1060,7 +1060,7 @@ export class WazuhApiCtrl {
       }
       const errorMsg = (error.response || {}).data || error.message
       log('wazuh-api:makeRequest', errorMsg || error);
-      if (devTools) {        
+      if (devTools) {
         return response.ok({
           body: { error: '3013', message: errorMsg || error }
         });
