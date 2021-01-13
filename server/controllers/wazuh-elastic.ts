@@ -393,27 +393,6 @@ export class WazuhElasticCtrl {
     }
   }
 
-  // async checkCustomSpaceMonitoring(namespace, monitoringPattern) {
-  //   try {
-  //     const patterns = await this.wzWrapper.getAllIndexPatterns();
-  //     const exists = patterns.hits.hits.filter(
-  //       item =>
-  //         item._source['index-pattern'].title === monitoringPattern &&
-  //         item._source.namespace === namespace
-  //     );
-  //     if (!exists.length) {
-  //       const title = monitoringPattern;
-  //       const id = `${namespace}:index-pattern:${monitoringPattern}`;
-  //       await this.wzWrapper.createMonitoringIndexPattern(title, id, namespace);
-  //       return id;
-  //     } else {
-  //       return exists[0]._id;
-  //     }
-  //   } catch (error) {
-  //     return Promise.reject(error);
-  //   }
-  // }
-
   /**
    * Replaces visualizations main fields to fit a certain pattern.
    * @param {Array<Object>} app_objects Object containing raw visualizations.
@@ -451,10 +430,6 @@ export class WazuhElasticCtrl {
           const isMonitoring = defaultStr.includes('wazuh-monitoring');
           if (isMonitoring) {
             if (namespace && namespace !== 'default') {
-              // monitoringPattern = await this.checkCustomSpaceMonitoring(
-              //   namespace,
-              //   monitoringPattern
-              // );
               if (
                 monitoringPattern.includes(namespace) &&
                 monitoringPattern.includes('index-pattern:')
