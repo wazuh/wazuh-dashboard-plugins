@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-export const ExcludedIntelliSenseTriggerKeys = {
+export const ExcludedIntelliSenseTriggerKeys: {[key: string]: string} = {
   '9': 'tab',
   '13': 'enter',
   '16': 'shift',

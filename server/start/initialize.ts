@@ -179,7 +179,7 @@ export function jobInitializeRun(context) {
   const checkWazuhRegistry = async () => {
     try {
       log(
-        'initialize[checkwazuhRegistry]',
+        'initialize:checkwazuhRegistry',
         'Checking wazuh-version registry.',
         'debug'
       );
@@ -207,7 +207,7 @@ export function jobInitializeRun(context) {
 
       if (!fs.existsSync(WAZUH_DATA_CONFIG_REGISTRY_PATH)) {
         log(
-          'initialize[checkwazuhRegistry]',
+          'initialize:checkwazuhRegistry',
           'wazuh-version registry does not exist. Initializing configuration.',
           'debug'
         );
@@ -224,7 +224,7 @@ export function jobInitializeRun(context) {
         // Rebuild the registry file if revision or version fields are differents
         if (isUpgradedApp) { 
           log(
-            'initialize[checkwazuhRegistry]',
+            'initialize:checkwazuhRegistry',
             'Wazuh app revision or version changed, regenerating wazuh-version registry',
             'info'
           );

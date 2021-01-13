@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-export const ApiErrorEquivalence = {
+export const ApiErrorEquivalence: {[key: number]: string} = {
   1113: 'Invalid configuration syntax',
   1114: 'Invalid element in configuration'
 };

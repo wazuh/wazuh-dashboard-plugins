@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-export const initialWazuhConfig = `---
+export const initialWazuhConfig: string = `---
 #
 # Wazuh app - App configuration file
 # Copyright (C) 2015-2020 Wazuh, Inc.
