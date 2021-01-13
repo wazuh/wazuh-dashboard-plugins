@@ -22,7 +22,8 @@ import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 export const MainAgents = compose(withGlobalBreadcrumb([{ text: '' }, { text: 'Agents' }]))(
   () => {
      return (
-       <WzAgents></WzAgents>
+      //  <WzAgents></WzAgents>
+      <p>asdpfojnaspdiofnasp`d</p>
     );
   }
 );
