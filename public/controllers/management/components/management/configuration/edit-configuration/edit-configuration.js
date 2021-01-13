@@ -383,15 +383,15 @@ const WzEditorConfiguration = compose(
               <EuiSpacer size="s" />
               {typeof editorValue === 'string' && (
                 <WzCodeEditor
-                mode="xml"
-                value={editorValue}
-                onChange={value => onChange(value)}
-                minusHeight={
-                  wazuhNotReadyYet || infoChangesAfterRestart ? 270 : 220
-                }
-              />
+                  mode="xml"
+                  value={editorValue}
+                  onChange={value => onChange(value)}
+                  minusHeight={
+                    wazuhNotReadyYet || infoChangesAfterRestart ? 320 : 270
+                  }
+                />
               )}
-              
+
             </Fragment>
           ) : (
             <WzWazuhAPINotReachable error={this.props.errorXMLFetched} />
