@@ -62,15 +62,7 @@ export class HealthCheck extends Component {
                 let patternData = patternId ? await SavedObject.existsIndexPattern(patternId) : false;
                 if (!patternData) patternData = {};
                 patternTitle = patternData.title;
-                /* This extra check will work as long as Wazuh monitoring index ID is wazuh-monitoring-*.
-                   Currently is not possible to change that index pattern as it has always been created on our backend.
-                   This extra check checks if the index pattern exists for the current logged in user
-                   in case it doesn't exist, the index pattern is automatically created. This is necessary to make it work with Opendistro multinenancy
-                   as every index pattern is stored in its current tenant .kibana-tenant-XX index. 
-                   */
-                try {
-                    await SavedObject.existsMonitoringIndexPattern(WAZUH_MONITORING_PATTERN); //this checks if it exists, if not it automatically creates the index pattern
-                } catch (err) { }
+                
                 if (!patternData.status) {
                     const patternList = await PatternHandler.getPatternList("healthcheck");
                     if (patternList.length) {
@@ -247,6 +239,14 @@ export class HealthCheck extends Component {
         }
     }
 
+    async checkMonitoringPattern(pattern) {
+        await SavedObject.existsOrCreateIndexPattern(pattern);
+    }
+
+    async checkStatisticsPattern(indexPrefix, indexName) {
+        await SavedObject.existsOrCreateIndexPattern(`${indexPrefix}-${indexName}-*`);
+    }
+
     /**
      * On controller loads
      */
@@ -255,8 +255,10 @@ export class HealthCheck extends Component {
             const wazuhConfig = new WazuhConfig();
             const configuration = wazuhConfig.getConfig();
             checkKibanaSettings(configuration['checks.metaFields']);
-            checkKibanaSettingsTimeFilter(configuration['checks.timeFilter']);
+            checkKibanaSettingsTimeFilter(configuration['checks.timeFilter']);            
             AppState.setPatternSelector(configuration['ip.selector']);
+            this.checkMonitoringPattern(configuration['wazuh.monitoring.pattern']);
+            this.checkStatisticsPattern(configuration['cron.prefix'], configuration['cron.statistics.index.name']);
             let checks = {};
             checks.pattern = configuration['checks.pattern'];
             checks.template = configuration['checks.template'];

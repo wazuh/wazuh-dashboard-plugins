@@ -14,6 +14,7 @@ import { healthCheck } from './health-check';
 import { AppState } from '../../react-services/app-state';
 import { ErrorHandler } from '../../react-services/error-handler';
 import { getDataPlugin, getSavedObjects } from '../../kibana-services';
+import { WazuhConfig } from '../../react-services/wazuh-config';
 
 export function getIp(
   $q,
@@ -22,6 +23,20 @@ export function getIp(
   wzMisc
 ) {
   const deferred = $q.defer();
+
+  const checkWazuhPatterns = async (indexPatterns) => {
+    const wazuhConfig = new WazuhConfig();
+    const configuration = wazuhConfig.getConfig();
+    const wazuhPatterns = [
+      `${configuration['wazuh.monitoring.pattern']}`,
+      `${configuration['cron.prefix']}-${configuration['cron.statistics.index.name']}-*`
+    ];
+    return wazuhPatterns.every(pattern => {
+      return indexPatterns.find(
+        element => element.id === pattern
+      );
+    });
+  }
 
   const buildSavedObjectsClient = async () => {
     try {
@@ -37,7 +52,7 @@ export function getIp(
 
       let currentPattern = '';
 
-      if (AppState.getCurrentPattern()) {
+      if (AppState.getCurrentPattern() && await checkWazuhPatterns(savedObjects)) {
         // There's cookie for the pattern
         currentPattern = AppState.getCurrentPattern();
       } else {

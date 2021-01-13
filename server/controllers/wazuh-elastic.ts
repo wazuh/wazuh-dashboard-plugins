@@ -672,13 +672,7 @@ export class WazuhElasticCtrl {
       const name = request.body.nodes.name;
       const masterNode = request.body.nodes.master_node;
 
-      const namespace = context.wazuh.plugins.spaces?.spacesService && context.wazuh.plugins.spaces?.spacesService.getSpaceId(request);
-      // const patternDoc = context.core.elasticsearch.client.asInternalUser.get({
-      //   index: request.params.pattern
-      // });
-      const patternDoc = await context.core.savedObjects.client.get<SavedObjectsFindResponse<SavedObject>>('index-pattern', request.params.pattern);
-
-      const patternName = patternDoc.attributes.title;
+      const patternName = request.params.pattern;
 
       const raw = await this.buildClusterVisualizationsRaw(
         file,
