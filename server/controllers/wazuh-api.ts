@@ -23,23 +23,20 @@ import { KeyEquivalence } from '../../util/csv-key-equivalence';
 import { ApiErrorEquivalence } from '../../util/api-errors-equivalence';
 import apiRequestList from '../../util/api-request-list';
 import * as ApiHelper from '../lib/api-helper';
-import { Queue } from '../jobs/queue';
+import { addJobToQueue } from '../jobs/queue';
 import fs from 'fs';
 import { ManageHosts } from '../lib/manage-hosts';
 import { UpdateRegistry } from '../lib/update-registry';
-import * as ApiInterceptor from '../lib/api-interceptor';
 import jwtDecode from 'jwt-decode';
 import { KibanaRequest, RequestHandlerContext, KibanaResponseFactory } from 'src/core/server';
 import { APIUserAllowRunAs, CacheInMemoryAPIUserAllowRunAs, API_USER_STATUS_RUN_AS } from '../lib/cache-api-user-has-run-as';
 import { getCookieValueByName } from '../lib/cookie';
 
 export class WazuhApiCtrl {
-  queue: Queue
   manageHosts: ManageHosts
   updateRegistry: UpdateRegistry
 
   constructor() {
-    this.queue = Queue;
     // this.monitoringInstance = new Monitoring(server, true);
     this.manageHosts = new ManageHosts();
     this.updateRegistry = new UpdateRegistry();
@@ -200,7 +197,7 @@ export class WazuhApiCtrl {
               body: {
                 statusCode: 200,
                 data: copied,
-                idChanged: request.idChanged || null,
+                idChanged: request.body.idChanged || null,
               }
             });
           }
@@ -232,14 +229,14 @@ export class WazuhApiCtrl {
             try {
               const id = Object.keys(api)[0];
 
-              const response = await context.wazuh.api.client.asInternalUser.request(
+              const responseManagerInfo = await context.wazuh.api.client.asInternalUser.request(
                 'GET',
                 `/manager/info`,
                 {},
                 { apiHostID: id }
               );
 
-              if (this.checkResponseIsDown(response)) {
+              if (this.checkResponseIsDown(responseManagerInfo)) {
                 return ErrorResponse(
                   `ERROR3099 - ${response.data.detail || 'Wazuh not ready yet'}`,
                   3099,
@@ -247,7 +244,7 @@ export class WazuhApiCtrl {
                   response
                 );
               }
-              if (response.status === 200) {
+              if (responseManagerInfo.status === 200) {
                 request.body.id = id;
                 request.body.idChanged = id;
                 return await this.checkStoredAPI(context, request, response);
@@ -924,7 +921,7 @@ export class WazuhApiCtrl {
    * @param {Object} response
    * @returns {Object} API response or ErrorResponse
    */
-  async makeRequest(context, method, path, data, id, response) {   
+  async makeRequest(context, method, path, data, id, response) {
     const devTools = !!(data || {}).devTools;
     try {
       const api = await this.manageHosts.getHostById(id);
@@ -938,10 +935,10 @@ export class WazuhApiCtrl {
         return ErrorResponse('Could not get host credentials', 3011, 404, response);
       }
 
-      if (!data) {        
+      if (!data) {
         data = {};
       };
-      
+
       if (!data.headers) {
         data.headers = {};
       };
@@ -952,29 +949,30 @@ export class WazuhApiCtrl {
 
       // Set content type application/xml if needed
       if (typeof (data || {}).body === 'string' && (data || {}).origin === 'xmleditor') {
-        data.headers.content_type = 'application/xml';
+        data.headers['content-type'] = 'application/xml';
         delete data.origin;
       }
 
       if (typeof (data || {}).body === 'string' && (data || {}).origin === 'json') {
-        data.headers.content_type = 'application/json';
+        data.headers['content-type'] = 'application/json';
         delete data.origin;
       }
 
       if (typeof (data || {}).body === 'string' && (data || {}).origin === 'raw') {
-        data.headers.content_type = 'application/octet-stream';
+        data.headers['content-type'] = 'application/octet-stream';
         delete data.origin;
       }
       const delay = (data || {}).delay || 0;
       if (delay) {
-        const current = new Date();
-        this.queue.addJob({
-          startAt: new Date(current.getTime() + delay),
-          type: 'request',
-          method,
-          path,
-          data,
-          options,
+        addJobToQueue({
+          startAt: new Date(Date.now() + delay),
+          run: async () => {
+            try{
+              await context.wazuh.api.client.asCurrentUser.request(method, path, data, options);
+            }catch(error){
+              log('queue:delayApiRequest',`An error ocurred in the delayed request: "${method} ${path}": ${error.message || error}`);
+            };
+          }
         });
         return response.ok({
           body: { error: 0, message: 'Success' }
@@ -1014,7 +1012,7 @@ export class WazuhApiCtrl {
           }
         }
       }
-      const responseToken = await context.wazuh.api.client.asCurrentUser.request(method, path, data, options);      
+      const responseToken = await context.wazuh.api.client.asCurrentUser.request(method, path, data, options);
       const responseIsDown = this.checkResponseIsDown(responseToken);
       if (responseIsDown) {
         return ErrorResponse(
@@ -1060,7 +1058,7 @@ export class WazuhApiCtrl {
       }
       const errorMsg = (error.response || {}).data || error.message
       log('wazuh-api:makeRequest', errorMsg || error);
-      if (devTools) {        
+      if (devTools) {
         return response.ok({
           body: { error: '3013', message: errorMsg || error }
         });

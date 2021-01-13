@@ -31,6 +31,7 @@ export function WazuhElasticRoutes(router: IRouter) {
     async (context, request, response) => ctrl.getCurrentPlatform(context, request, response)
   );
 
+  // FIX: is this endpoint active?
   router.get(
     {
       path: '/elastic/index-patterns',

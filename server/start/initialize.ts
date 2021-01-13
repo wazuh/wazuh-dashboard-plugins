@@ -179,7 +179,7 @@ export function jobInitializeRun(context) {
   const checkWazuhRegistry = async () => {
     try {
       log(
-        'initialize[checkwazuhRegistry]',
+        'initialize:checkwazuhRegistry',
         'Checking wazuh-version registry.',
         'debug'
       );
@@ -187,15 +187,16 @@ export function jobInitializeRun(context) {
        const exists = await context.core.elasticsearch.client.asInternalUser.indices.exists({
           index: WAZUH_VERSION_INDEX
         });        
-        if (!exists.body) return;
-        await context.core.elasticsearch.client.asInternalUser.indices.delete({
-          index: WAZUH_VERSION_INDEX
-        });
-        log(
-          'initialize[checkwazuhRegistry]',
-          `Successfully deleted old ${WAZUH_VERSION_INDEX} index.`,
-          'debug'
-        );
+        if (exists.body){
+          await context.core.elasticsearch.client.asInternalUser.indices.delete({
+            index: WAZUH_VERSION_INDEX
+          });
+          log(
+            'initialize[checkwazuhRegistry]',
+            `Successfully deleted old ${WAZUH_VERSION_INDEX} index.`,
+            'debug'
+          );
+        };
       } catch (error) {
         log(
           'initialize[checkwazuhRegistry]',
@@ -206,7 +207,7 @@ export function jobInitializeRun(context) {
 
       if (!fs.existsSync(WAZUH_DATA_CONFIG_REGISTRY_PATH)) {
         log(
-          'initialize[checkwazuhRegistry]',
+          'initialize:checkwazuhRegistry',
           'wazuh-version registry does not exist. Initializing configuration.',
           'debug'
         );
@@ -223,7 +224,7 @@ export function jobInitializeRun(context) {
         // Rebuild the registry file if revision or version fields are differents
         if (isUpgradedApp) { 
           log(
-            'initialize[checkwazuhRegistry]',
+            'initialize:checkwazuhRegistry',
             'Wazuh app revision or version changed, regenerating wazuh-version registry',
             'info'
           );

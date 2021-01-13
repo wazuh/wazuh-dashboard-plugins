@@ -29,9 +29,10 @@ import {
 import { WazuhPluginSetup, WazuhPluginStart, PluginSetup } from './types';
 import { SecurityObj, ISecurityFactory } from './lib/security-factory';
 import { setupRoutes } from './routes';
+import { jobInitializeRun } from './start/initialize';
 import { jobMonitoringRun } from './start/monitoring';
 import { jobSchedulerRun } from './lib/cron-scheduler';
-import { jobInitializeRun } from './start/initialize';
+import { jobQueueRun } from './jobs/queue';
 import { getCookieValueByName } from './lib/cookie';
 import * as ApiInterceptor  from './lib/api-interceptor';
 import { schema, TypeOf } from '@kbn/config-schema';
@@ -111,6 +112,20 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       }
     };
 
+    const contextServer = {
+      config: globalConfiguration
+    };
+
+    // Initialize
+    jobInitializeRun({
+      core, 
+      wazuh: {
+        logger: this.logger.get('initialize'),
+        api: wazuhApiClient
+      },
+      server: contextServer
+    });
+
     // Monitoring
     jobMonitoringRun({
       core,
@@ -118,9 +133,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         logger: this.logger.get('monitoring'),
         api: wazuhApiClient
       },
-      server: {
-        config: globalConfiguration
-      }
+      server: contextServer
     });
 
     // Scheduler
@@ -130,22 +143,18 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         logger: this.logger.get('cron-scheduler'),
         api: wazuhApiClient
       },
-      server: {
-        config: globalConfiguration
-      }
+      server: contextServer
     });
 
-    // Initialize
-    jobInitializeRun({
-      core,
+    // Queue
+    jobQueueRun({
+      core, 
       wazuh: {
-        logger: this.logger.get('initialize'),
+        logger: this.logger.get('queue'),
         api: wazuhApiClient
       },
-      server: {
-        config: globalConfiguration
-      }
-    })
+      server: contextServer
+    });
     return {};
   }
 

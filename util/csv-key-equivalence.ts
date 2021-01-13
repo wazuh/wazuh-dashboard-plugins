@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-export const KeyEquivalence = {
+export const KeyEquivalence: {[key: string]: string} = {
   id: 'ID',
   timestamp: 'Timestamp',
   url: 'URL',
