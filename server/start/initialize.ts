@@ -187,15 +187,16 @@ export function jobInitializeRun(context) {
        const exists = await context.core.elasticsearch.client.asInternalUser.indices.exists({
           index: WAZUH_VERSION_INDEX
         });        
-        if (!exists.body) return;
-        await context.core.elasticsearch.client.asInternalUser.indices.delete({
-          index: WAZUH_VERSION_INDEX
-        });
-        log(
-          'initialize[checkwazuhRegistry]',
-          `Successfully deleted old ${WAZUH_VERSION_INDEX} index.`,
-          'debug'
-        );
+        if (exists.body){
+          await context.core.elasticsearch.client.asInternalUser.indices.delete({
+            index: WAZUH_VERSION_INDEX
+          });
+          log(
+            'initialize[checkwazuhRegistry]',
+            `Successfully deleted old ${WAZUH_VERSION_INDEX} index.`,
+            'debug'
+          );
+        };
       } catch (error) {
         log(
           'initialize[checkwazuhRegistry]',
