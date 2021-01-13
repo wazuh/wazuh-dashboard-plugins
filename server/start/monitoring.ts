@@ -17,7 +17,7 @@ import { parseCron } from '../lib/parse-cron';
 import { indexDate } from '../lib/index-date';
 import { buildIndexSettings } from '../lib/build-index-settings';
 import { WazuhHostsCtrl } from '../../server/controllers/wazuh-hosts';
-import { 
+import {
   WAZUH_MONITORING_PATTERN,
   WAZUH_INDEX_SHARDS,
   WAZUH_INDEX_REPLICAS,
@@ -38,7 +38,7 @@ let MONITORING_ENABLED, MONITORING_FREQUENCY, MONITORING_CRON_FREQ, MONITORING_C
 
 /**
  * Delay as promise
- * @param timeMs 
+ * @param timeMs
  */
 function delay(timeMs: number) {
   return new Promise((resolve) => {
@@ -48,9 +48,9 @@ function delay(timeMs: number) {
 
 /**
  * Get the setting value from the configuration
- * @param setting 
- * @param configuration 
- * @param defaultValue 
+ * @param setting
+ * @param configuration
+ * @param defaultValue
  */
 function getAppConfigurationSetting(setting: string, configuration: any, defaultValue: any){
   return typeof configuration[setting] !== 'undefined' ? configuration[setting] : defaultValue;
@@ -58,7 +58,7 @@ function getAppConfigurationSetting(setting: string, configuration: any, default
 
 /**
  * Set the monitoring variables
- * @param context 
+ * @param context
  */
 function initMonitoringConfiguration(context){
   try{
@@ -70,14 +70,14 @@ function initMonitoringConfiguration(context){
     MONITORING_FREQUENCY = getAppConfigurationSetting('wazuh.monitoring.frequency', appConfig, WAZUH_MONITORING_DEFAULT_FREQUENCY);
     MONITORING_CRON_FREQ = parseCron(MONITORING_FREQUENCY);
     MONITORING_CREATION = getAppConfigurationSetting('wazuh.monitoring.creation', appConfig, WAZUH_MONITORING_DEFAULT_CREATION);
-    
-    MONITORING_INDEX_PATTERN = getAppConfigurationSetting('wazuh.monitoring.creation', appConfig, WAZUH_MONITORING_PATTERN);
+
+    MONITORING_INDEX_PATTERN = getAppConfigurationSetting('wazuh.monitoring.pattern', appConfig, WAZUH_MONITORING_PATTERN);
     const lastCharIndexPattern = MONITORING_INDEX_PATTERN[MONITORING_INDEX_PATTERN.length - 1];
     if (lastCharIndexPattern !== '*') {
       MONITORING_INDEX_PATTERN += '*';
     };
     MONITORING_INDEX_PREFIX = MONITORING_INDEX_PATTERN.slice(0,MONITORING_INDEX_PATTERN.length - 1);
-    
+
     log(
       'monitoring:initMonitoringConfiguration',
       `wazuh.monitoring.enabled: ${MONITORING_ENABLED}`,
@@ -110,7 +110,7 @@ function initMonitoringConfiguration(context){
  * @param context
  */
 async function init(context) {
-  try { 
+  try {
     if (MONITORING_ENABLED) {
       await checkTemplate(context);
     };
@@ -182,10 +182,12 @@ async function insertMonitoringDataElasticsearch(context, data) {
       return;
     };
     try{
-      await context.core.elasticsearch.client.asInternalUser.indices.exists({index: monitoringIndexName});
+      const exists = await context.core.elasticsearch.client.asInternalUser.indices.exists({index: monitoringIndexName});
+      if(!exists.body){
+        await createIndex(context, monitoringIndexName);
+      }
     }catch(error){
       log('monitoring:insertMonitoringDataElasticsearch', error.message || error);
-      await createIndex(context, monitoringIndexName);
     }
     try{
       // Update the index configuration
@@ -195,7 +197,7 @@ async function insertMonitoringDataElasticsearch(context, data) {
         'wazuh.monitoring',
         WAZUH_MONITORING_DEFAULT_INDICES_SHARDS
       );
-      
+
       // To update the index settings with this client is required close the index, update the settings and open it
       // Number of shards is not dynamic so delete that setting if it's given
       delete indexConfiguration.settings.index.number_of_shards;
@@ -207,7 +209,7 @@ async function insertMonitoringDataElasticsearch(context, data) {
     }catch(error){
       log('monitoring:insertMonitoringDataElasticsearch', error.message || error);
     }
-    
+
     // Insert data to the monitoring index
     await insertDataToIndex(context, monitoringIndexName, data);
   } catch (error) {
@@ -224,9 +226,9 @@ async function insertMonitoringDataElasticsearch(context, data) {
 
 /**
  * Inserting one document per agent into Elastic. Bulk.
- * @param {*} context 
+ * @param {*} context Endpoint
  * @param {String} indexName The name for the index (e.g. daily: wazuh-monitoring-YYYY.MM.DD)
- * @param {*} data 
+ * @param {*} data
  */
 async function insertDataToIndex(context, indexName: string, data: {agents: any[], apiHost}) {
   const { agents, apiHost } = data;
@@ -237,7 +239,7 @@ async function insertDataToIndex(context, indexName: string, data: {agents: any[
         `Bulk data to index ${indexName} for ${agents.length} agents`,
         'debug'
       );
-      
+
       const bodyBulk = agents.map(agent => {
         const agentInfo = {...agent};
         agentInfo['timestamp'] = new Date(Date.now()).toISOString();
@@ -432,8 +434,8 @@ async function cronTask(context) {
 
 /**
  * Get API and agents info
- * @param context 
- * @param apiHost 
+ * @param context
+ * @param apiHost
  */
 async function getApiInfo(context, apiHost){
   try{
@@ -454,8 +456,8 @@ async function getApiInfo(context, apiHost){
 
 /**
  * Fetch all agents for the API provided
- * @param context 
- * @param apiHost 
+ * @param context
+ * @param apiHost
  */
 async function fetchAllAgentsFromApiHost(context, apiHost){
   let agents = [];
@@ -474,7 +476,7 @@ async function fetchAllAgentsFromApiHost(context, apiHost){
 
     const agentsCount = responseAgentsCount.data.data.total_affected_items;
     log('monitoring:fetchAllAgentsFromApiHost', `ApiID: ${apiHost.id}, Agent count: ${agentsCount}`, 'debug');
-    
+
     let payload = {
       offset: 0,
       limit: 500,
