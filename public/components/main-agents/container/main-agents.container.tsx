@@ -19,11 +19,10 @@ import AppState from '../../../react-services/app-state';
 import { useHistory } from 'react-router-dom';
 import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 
-export const MainAgents = compose(withGlobalBreadcrumb([{ text: '' }, { text: 'Agents' }]))(
+export const MainAgentsPreview = compose(withGlobalBreadcrumb([{ text: '' }, { text: 'Agents' }]))(
   () => {
      return (
-      //  <WzAgents></WzAgents>
-      <p>asdpfojnaspdiofnasp`d</p>
+       <WzAgents></WzAgents>
     );
   }
 );

@@ -1,1 +1,1 @@
-export { MainAgents } from './container/main-agents.container';
+export { MainAgentsPreview } from './container/main-agents.container';

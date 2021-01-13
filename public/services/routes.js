@@ -135,18 +135,18 @@ function enableWzMenu($rootScope, $location) {
 //Routes
 routes.enable();
 routes
-  // .when('/health-check', {
-  //   template: healthCheckTemplate,
-  //   resolve: { apiCount, wzConfig, ip }
-  // })
-  // .when('/agents/:agent?/:tab?/:tabView?', {
-  //   template: agentsTemplate,
-  //   resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
-  // })
-  // .when('/agents-preview/', {
-  //   template: agentsPrevTemplate,
-  //   resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
-  // })
+  .when('/health-check', {
+    template: healthCheckTemplate,
+    resolve: { apiCount, wzConfig, ip }
+  })
+  .when('/agents/:agent?/:tab?/:tabView?', {
+    template: agentsTemplate,
+    resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
+  })
+  .when('/agents-preview/', {
+    template: agentsPrevTemplate,
+    resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
+  })
   .when('/manager/', {
     template: managementTemplate,
     resolve: { enableWzMenu, nestedResolve, ip, savedSearch, clearRuleId }
@@ -187,12 +187,12 @@ routes
     template: blankScreenTemplate,
     resolve: { enableWzMenu, wzConfig }
   })
-  // .when('/', {
-  //   redirectTo: '/overview/'
-  // })
-  // .when('', {
-  //   redirectTo: '/overview/'
-  // })
-  // .otherwise({
-  //   redirectTo: '/overview'
-  // });
+  .when('/', {
+    redirectTo: '/overview/'
+  })
+  .when('', {
+    redirectTo: '/overview/'
+  })
+  .otherwise({
+    redirectTo: '/overview'
+  });
