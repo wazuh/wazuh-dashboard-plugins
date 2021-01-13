@@ -24,7 +24,7 @@ export const topLevel15 = async (context, gte, lte, filters, pattern = WAZUH_ALE
   try {
     const base = {};
 
-    Object.assign(base, Base(pattern, filters, gte, lte));
+    Object.assign(base, Base(filters, gte, lte));
 
     Object.assign(base.aggs, {
       '2': {

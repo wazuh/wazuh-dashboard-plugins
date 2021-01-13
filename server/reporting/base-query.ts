@@ -9,10 +9,8 @@
  *
  * Find more information about this on the LICENSE file.
  */
-export function Base(pattern: string, filters: any, gte: number, lte: number) {
+export function Base(filters: any, gte: number, lte: number) {
   return {
-    // index: pattern,
-    
     from: 0,
     size: 500,
     aggs: {},

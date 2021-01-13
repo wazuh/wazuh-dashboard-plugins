@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-export const defaultExt = {
+export const defaultExt: {[key: string]: boolean} = {
   pci: true,
   gdpr: true,
   hipaa: true,

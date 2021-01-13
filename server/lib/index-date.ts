@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-export function indexDate(interval: 'h' | 'd' | 'w' | 'm') {
+export function indexDate(interval: 'h' | 'd' | 'w' | 'm'): string {
   try {
     if (!interval) throw new Error('Creation interval not found');
     const d = new Date()

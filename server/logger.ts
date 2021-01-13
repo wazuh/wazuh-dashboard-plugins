@@ -11,7 +11,6 @@
  */
 import winston from 'winston';
 import fs from 'fs';
-import path from 'path';
 import { getConfiguration } from './lib/get-configuration';
 import { WAZUH_DATA_LOGS_DIRECTORY_PATH, WAZUH_DATA_LOGS_PLAIN_PATH, WAZUH_DATA_LOGS_RAW_PATH } from '../util/constants';
 import { createDataDirectoryIfNotExists } from './lib/filesystem';

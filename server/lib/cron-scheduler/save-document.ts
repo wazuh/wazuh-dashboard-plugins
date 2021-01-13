@@ -1,6 +1,6 @@
 import { BulkIndexDocumentsParams } from 'elasticsearch';
 import { getConfiguration } from '../get-configuration';
-import { log } from '../../logger.js';
+import { log } from '../../logger';
 import { indexDate } from '../index-date';
 import { WAZUH_INDEX_SHARDS, WAZUH_INDEX_REPLICAS } from '../../../util/constants'
 
