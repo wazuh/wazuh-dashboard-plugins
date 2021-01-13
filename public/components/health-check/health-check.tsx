@@ -239,12 +239,38 @@ export class HealthCheck extends Component {
         }
     }
 
-    async checkMonitoringPattern(pattern) {
-        await SavedObject.existsOrCreateIndexPattern(pattern);
-    }
-
-    async checkStatisticsPattern(indexPrefix, indexName) {
-        await SavedObject.existsOrCreateIndexPattern(`${indexPrefix}-${indexName}-*`);
+    /**
+     * This check if the pattern exist then create if not
+     * @param pattern string
+     */
+    async checkSupportPattern(pattern, itemId) {
+        let results = this.state.results;
+        let errors = this.state.errors;
+        const result = await SavedObject.existsIndexPattern(pattern);
+        if (!result.data) {
+            const toast = getToasts().addWarning(`${pattern} index pattern was not found and it will be created`)
+            const fields = await SavedObject.getIndicesFields(pattern);
+            try {
+                await SavedObject.createSavedObject(
+                    'index-pattern',
+                    pattern,
+                    {
+                    attributes: {
+                        title: pattern,
+                        timeFieldName: 'timestamp'
+                    }
+                    },
+                    fields
+                );
+                getToasts().remove(toast.id);
+                getToasts().addSuccess(`${pattern} index pattern created successfully`)
+                results[itemId].description = <span><EuiIcon type="check" color="secondary" ></EuiIcon> Ready</span>;                
+            } catch (error) {
+                getToasts().remove(toast.id);
+                errors.push(`Error trying to create ${pattern} index pattern: ${error.message}`);
+                results[itemId].description = <span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span>;
+            }
+        }
     }
 
     /**
@@ -256,9 +282,7 @@ export class HealthCheck extends Component {
             const configuration = wazuhConfig.getConfig();
             checkKibanaSettings(configuration['checks.metaFields']);
             checkKibanaSettingsTimeFilter(configuration['checks.timeFilter']);            
-            AppState.setPatternSelector(configuration['ip.selector']);
-            this.checkMonitoringPattern(configuration['wazuh.monitoring.pattern']);
-            this.checkStatisticsPattern(configuration['cron.prefix'], configuration['cron.statistics.index.name']);
+            AppState.setPatternSelector(configuration['ip.selector']);            
             let checks = {};
             checks.pattern = configuration['checks.pattern'];
             checks.template = configuration['checks.template'];
@@ -291,11 +315,26 @@ export class HealthCheck extends Component {
                     id: 4,
                     title: 'Check index pattern fields',
                     description: checks.fields ? <span><EuiLoadingSpinner size="m" /> Checking...</span> : 'Disabled'
-                }
+                },
+                {
+                    id: 5,
+                    title: 'Check Monitoring index pattern',
+                    description: <span><EuiLoadingSpinner size="m" /> Checking...</span> 
+                },
+                {
+                    id: 6,
+                    title: 'Check Statistics index pattern',
+                    description: <span><EuiLoadingSpinner size="m" /> Checking...</span> 
+                },
             );
             this.setState({ checks, results },
                 async () => {
-                    await Promise.all([this.checkPatterns(), this.checkApiConnection()]);
+                    await Promise.all([
+                        this.checkPatterns(),
+                        this.checkApiConnection(),
+                        this.checkSupportPattern(configuration['wazuh.monitoring.pattern'], 5),
+                        this.checkSupportPattern(`${configuration['cron.prefix']}-${configuration['cron.statistics.index.name']}-*`, 6),
+                    ]);
                     if (checks.fields) {
                         const i = results.map(item => item.id).indexOf(4);
                         try {
