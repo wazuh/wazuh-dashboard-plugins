@@ -337,7 +337,7 @@ async function checkKibanaStatus(context) {
 async function checkElasticsearchServer(context) {
   try {
     const data = await context.core.elasticsearch.client.asInternalUser.indices.exists({
-      index: '.kibana'
+      index: context.server.config.kibana.index
     });
 
     return data.body;
