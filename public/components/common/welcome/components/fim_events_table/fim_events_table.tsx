@@ -25,7 +25,7 @@ import {
   EuiOverlayMask
 } from '@elastic/eui'
 // @ts-ignore
-import { getServices } from '../../../../../../../../src/plugins/discover/public/kibana_services';
+import { getDataPlugin } from '../../../../../kibana-services';
 import store from '../../../../../redux/store';
 import { updateCurrentAgentData } from '../../../../../redux/actions/appStateActions';
 import { getFimAlerts } from './lib';
@@ -59,7 +59,7 @@ export function FimEventsTable({ agent, router }) {
 }
 
 export function useTimeFilter() {
-  const { timefilter, } = getServices();
+  const { timefilter, } = getDataPlugin().query.timefilter;
   const [timeFilter, setTimeFilter] = useState(timefilter.getTime());
   useEffect(() => {
     const subscription = timefilter.getTimeUpdate$().subscribe(

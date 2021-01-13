@@ -16,7 +16,7 @@ import {
   OnTimeChangeProps,
 } from '@elastic/eui';
 //@ts-ignore
-import { getServices } from '../../../../../src/plugins/discover/public/kibana_services';
+import { getDataPlugin } from '../../kibana-services';
 import { CondensedPicker } from './components';
 
 interface IDiscoverTime { from: string, to: string };
@@ -52,7 +52,7 @@ export class WzDatePicker extends Component {
 
   constructor(props) {
     super(props);
-    this.timefilter = getServices().timefilter;
+    this.timefilter = getDataPlugin().query.timefilter.timefilter;
     const { from, to } = this.timefilter.getTime();
     this.state = {
       datePicker: {

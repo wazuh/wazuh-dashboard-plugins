@@ -11,10 +11,10 @@
  */
 import { useState, useEffect } from 'react';
 //@ts-ignore
-import { getServices } from '../../../../../../src/plugins/discover/public/kibana_services';
+import { getDataPlugin } from '../../../kibana-services';
 
 export function useTimeFilter() {
-  const { timefilter, } = getServices();
+  const { timefilter } = getDataPlugin().query.timefilter;
   const [timeFilter, setTimeFilter] = useState(timefilter.getTime());
   const [timeHistory, setTimeHistory] = useState(timefilter._history);
   useEffect(() => {
