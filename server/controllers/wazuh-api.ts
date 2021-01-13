@@ -969,7 +969,9 @@ export class WazuhApiCtrl {
           run: async () => {
             try{
               await context.wazuh.api.client.asCurrentUser.request(method, path, data, options);
-            }catch(error){};
+            }catch(error){
+              log('queue:delayApiRequest',`An error ocurred in the delayed request: "${method} ${path}": ${error.message || error.}`);
+            };
           }
         });
         return response.ok({
