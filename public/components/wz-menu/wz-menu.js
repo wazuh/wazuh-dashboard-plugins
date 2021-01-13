@@ -684,10 +684,10 @@ class WzMenu extends Component {
                 </EuiBadge>
               </EuiFlexItem>
               */}
-              <EuiFlexItem>
+              <EuiFlexItem style={{ margin: "16px 16px 0 16px" }}>
                 {this.addHealthRender(currentAgent)}
               </EuiFlexItem>
-              <EuiFlexItem grow={false} style={{ margin: "8px 0 0 0" }}>
+              <EuiFlexItem grow={false} style={{ margin: "12px 0 0 0" }}>
                 <EuiToolTip position="top" content={`Open ${currentAgent.name} summary`}>
                   <EuiButtonEmpty
                     color="primary"
@@ -696,7 +696,7 @@ class WzMenu extends Component {
                   </EuiButtonEmpty>
                 </EuiToolTip>
               </EuiFlexItem>
-              <EuiFlexItem grow={false} style={{ margin: "8px 0 0 0" }}>
+              <EuiFlexItem grow={false} style={{ margin: "12px 0 0 0" }}>
                 <EuiToolTip position="top" content={"Change selected agent"}>
                   <EuiButtonEmpty
                     color="primary"
@@ -705,7 +705,7 @@ class WzMenu extends Component {
                   </EuiButtonEmpty>
                 </EuiToolTip>
               </EuiFlexItem>
-              <EuiFlexItem grow={false} style={{ margin: "8px 16px 0 0" }}>
+              <EuiFlexItem grow={false} style={{ margin: "12px 16px 0 0" }}>
                 <EuiToolTip position="top" content={"Unpin agent"}>
                   <EuiButtonEmpty
                     color="text"
