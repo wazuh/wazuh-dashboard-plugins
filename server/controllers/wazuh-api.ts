@@ -970,7 +970,7 @@ export class WazuhApiCtrl {
             try{
               await context.wazuh.api.client.asCurrentUser.request(method, path, data, options);
             }catch(error){
-              log('queue:delayApiRequest',`An error ocurred in the delayed request: "${method} ${path}": ${error.message || error.}`);
+              log('queue:delayApiRequest',`An error ocurred in the delayed request: "${method} ${path}": ${error.message || error}`);
             };
           }
         });
