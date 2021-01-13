@@ -46,9 +46,8 @@ export class SaveDocument {
       try{
         const exists = await this.esClientInternalUser.indices.exists({ index });
         log(this.logPath, `Index '${index}' exists? ${exists.body}`, 'debug');
-      }catch(error){
-        log(this.logPath, `Index '${index}' exists? false`, 'debug');
-        const response = await this.esClientInternalUser.indices.create({
+        if (!exists.body){
+          const response = await this.esClientInternalUser.indices.create({
           index,
           body: {
             settings: {
@@ -59,7 +58,9 @@ export class SaveDocument {
             }
           }
         });
-        
+        }
+      }catch(error){
+        log(this.logPath, `Index '${index}' exists? false`, 'debug');
         log(this.logPath, `Status of create a new index: ${JSON.stringify(response)}`, 'debug');
 
       }
