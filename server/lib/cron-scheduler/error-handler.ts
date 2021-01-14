@@ -1,4 +1,4 @@
-import { log } from '../../logger';
+import { log } from '../logger';
 import { getConfiguration } from '../../lib/get-configuration';
 
 const DEBUG = 'debug';

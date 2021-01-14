@@ -11,11 +11,10 @@
  */
 import fs from 'fs';
 import yml from 'js-yaml';
-import path from 'path';
-import { log } from '../logger';
+import { log } from './logger';
 import { UpdateRegistry } from './update-registry';
 import { initialWazuhConfig } from './initial-wazuh-config';
-import { WAZUH_DATA_CONFIG_APP_PATH } from '../../util/constants';
+import { WAZUH_DATA_CONFIG_APP_PATH } from '../../common/constants';
 import { createDataDirectoryIfNotExists } from '../lib/filesystem';
 
 export class ManageHosts {

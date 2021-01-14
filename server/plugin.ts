@@ -29,10 +29,7 @@ import {
 import { WazuhPluginSetup, WazuhPluginStart, PluginSetup } from './types';
 import { SecurityObj, ISecurityFactory } from './lib/security-factory';
 import { setupRoutes } from './routes';
-import { jobInitializeRun } from './start/initialize';
-import { jobMonitoringRun } from './start/monitoring';
-import { jobSchedulerRun } from './lib/cron-scheduler';
-import { jobQueueRun } from './jobs/queue';
+import { jobInitializeRun, jobMonitoringRun, jobSchedulerRun, jobQueueRun } from './start';
 import { getCookieValueByName } from './lib/cookie';
 import * as ApiInterceptor  from './lib/api-interceptor';
 import { schema, TypeOf } from '@kbn/config-schema';

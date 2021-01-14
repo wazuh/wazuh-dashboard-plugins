@@ -26,7 +26,7 @@ import {
   decodeJsonRule,
   getSelectedUsersFromRules,
 } from '../helpers/rule-editor.helper';
-import { WAZUH_SECURITY_PLUGIN_OPEN_DISTRO_FOR_ELASTICSEARCH } from '../../../../../util/constants';
+import { WAZUH_SECURITY_PLUGIN_OPEN_DISTRO_FOR_ELASTICSEARCH } from '../../../../../common/constants';
 import 'brace/mode/json';
 import 'brace/snippets/json';
 import 'brace/ext/language_tools';

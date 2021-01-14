@@ -11,7 +11,7 @@
  */
 import CodeMirror from '../../utils/codemirror/lib/codemirror';
 import jsonLint from '../../utils/codemirror/json-lint';
-import { ExcludedIntelliSenseTriggerKeys } from '../../../util/excluded-devtools-autocomplete-keys';
+import { ExcludedIntelliSenseTriggerKeys } from './excluded-devtools-autocomplete-keys';
 import queryString from 'querystring-browser';
 import $ from 'jquery';
 import * as FileSaver from '../../services/file-saver';

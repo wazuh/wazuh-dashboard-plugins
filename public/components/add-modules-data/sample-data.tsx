@@ -29,7 +29,7 @@ import {
 import { getToasts } from '../../kibana-services';
 import { WzRequest } from '../../react-services/wz-request';
 import { AppState } from '../../react-services/app-state';
-import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../util/constants';
+import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../common/constants';
 
 export default class WzSampleData extends Component {
   categories: { title: string, description: string, image: string, categorySampleAlertsIndex: string }[]

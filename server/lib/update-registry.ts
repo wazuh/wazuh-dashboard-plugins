@@ -10,8 +10,8 @@
  * Find more information about this on the LICENSE file.
  */
 import fs from 'fs';
-import { log } from '../logger';
-import { WAZUH_DATA_CONFIG_REGISTRY_PATH } from '../../util/constants';
+import { log } from './logger';
+import { WAZUH_DATA_CONFIG_REGISTRY_PATH } from '../../common/constants';
 
 export class UpdateRegistry {
   constructor() {

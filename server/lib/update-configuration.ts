@@ -10,9 +10,9 @@
  * Find more information about this on the LICENSE file.
  */
 import fs from 'fs';
-import { log } from '../logger';
+import { log } from './logger';
 import { getConfiguration } from './get-configuration';
-import { WAZUH_DATA_CONFIG_APP_PATH, WAZUH_CONFIGURATION_SETTINGS_NEED_RESTART, WAZUH_CONFIGURATION_SETTINGS_NEED_RELOAD } from '../../util/constants';
+import { WAZUH_DATA_CONFIG_APP_PATH, WAZUH_CONFIGURATION_SETTINGS_NEED_RESTART, WAZUH_CONFIGURATION_SETTINGS_NEED_RELOAD } from '../../common/constants';
 
 export class UpdateConfigurationFile {
   constructor() {

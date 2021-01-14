@@ -347,7 +347,7 @@ export const Discover = compose(
 
         const alerts = await GenericRequest.request(
           'POST',
-          `/elastic/esAlerts`,
+          `/elastic/alerts`,
           {
             index: AppState.getCurrentPattern(),
             body: newFilters

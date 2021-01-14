@@ -76,7 +76,7 @@ export async function getElasticAlerts(indexPattern, filterParams:IFilterParams,
   }
   const searchResponse: IWzResponse = await GenericRequest.request(
     'POST',
-    '/elastic/esAlerts',
+    '/elastic/alerts',
     search
   );
   return searchResponse;

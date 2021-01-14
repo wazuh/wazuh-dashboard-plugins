@@ -11,7 +11,7 @@
  */
 import fs from 'fs';
 import yml from 'js-yaml';
-import { WAZUH_DATA_CONFIG_APP_PATH, WAZUH_CONFIGURATION_CACHE_TIME } from '../../util/constants';
+import { WAZUH_DATA_CONFIG_APP_PATH, WAZUH_CONFIGURATION_CACHE_TIME } from '../../common/constants';
 
 let cachedConfiguration: any = null;
 let lastAssign: number = new Date().getTime();

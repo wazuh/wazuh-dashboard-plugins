@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { WAZUH_DATA_ABSOLUTE_PATH } from '../../util/constants';
+import { WAZUH_DATA_ABSOLUTE_PATH } from '../../common/constants';
 
 export const createDirectoryIfNotExists = (directory: string): void  => {
   if (!fs.existsSync(directory)) {

@@ -18,7 +18,7 @@ import { TabVisualizations } from '../../factories/tab-visualizations';
 import store from '../../redux/store';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
 import { ModulesHelper } from '../../components/common/modules/modules-helper';
-import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../util/constants';
+import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../common/constants';
 import { getDataPlugin } from '../../kibana-services';
 
 export function ClusterController(
