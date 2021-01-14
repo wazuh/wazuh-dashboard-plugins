@@ -52,7 +52,7 @@ const pageConfiguration = {
     margin: [40, 20, 0, 0],
     columns: [
       {
-        image: path.join(__dirname, '../../public/assets/logo.png'),
+        image: path.join(__dirname, '../../../public/assets/logo.png'),
         width: 190
       },
       {
@@ -102,23 +102,23 @@ const fonts = {
   Roboto: {
     normal: path.join(
       __dirname,
-      '../../public/utils/opensans/OpenSans-Light.ttf'
+      '../../../public/utils/opensans/OpenSans-Light.ttf'
     ),
     bold: path.join(
       __dirname,
-      '../../public/utils/opensans/OpenSans-Bold.ttf'
+      '../../../public/utils/opensans/OpenSans-Bold.ttf'
     ),
     italics: path.join(
       __dirname,
-      '../../public/utils/opensans/OpenSans-Italic.ttf'
+      '../../../public/utils/opensans/OpenSans-Italic.ttf'
     ),
     bolditalics: path.join(
       __dirname,
-      '../../public/utils/opensans/OpenSans-BoldItalic.ttf'
+      '../../../public/utils/opensans/OpenSans-BoldItalic.ttf'
     ),
     monslight: path.join(
       __dirname,
-      '../../public/utils/opensans/Montserrat-Light.ttf'
+      '../../../public/utils/opensans/Montserrat-Light.ttf'
     )
   }
 };
