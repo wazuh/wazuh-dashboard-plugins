@@ -264,11 +264,13 @@ export class HealthCheck extends Component {
                 );
                 getToasts().remove(toast.id);
                 getToasts().addSuccess(`${pattern} index pattern created successfully`)
-                results[itemId].description = <span><EuiIcon type="check" color="secondary" ></EuiIcon> Ready</span>;                
+                results[itemId].description = <span><EuiIcon type="check" color="secondary" ></EuiIcon> Ready</span>;
+                this.setState({ results });
             } catch (error) {
                 getToasts().remove(toast.id);
                 errors.push(`Error trying to create ${pattern} index pattern: ${error.message}`);
                 results[itemId].description = <span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span>;
+                this.setState({ results });
             }
         }
     }
