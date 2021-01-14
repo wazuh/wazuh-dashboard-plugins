@@ -2,6 +2,12 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.0.3 - Kibana v7.9.1, v7.9.2, v7.9.3, 7.10.0 , 7.10.1 - Revision 4016
+
+### Fixed
+
+- Fixed Wazuh menu and agent menu for Solaris agents [#2773](https://github.com/wazuh/wazuh-kibana-app/issues/2773)[#2725](https://github.com/wazuh/wazuh-kibana-app/issues/2725)
+
 ## Wazuh v4.0.3 - Kibana v7.9.1, v7.9.2, v7.9.3 - Revision 4015
 
 ### Added
