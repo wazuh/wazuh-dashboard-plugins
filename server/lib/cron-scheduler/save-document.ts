@@ -61,7 +61,7 @@ export class SaveDocument {
           log(this.logPath, `Status of create a new index: ${JSON.stringify(response)}`, 'debug');
         }
       } catch (error) {
-        log(this.logPath ,`Error creating '${index}' due to '${error || error.message}' `);
+        log(this.logPath ,`Error searching or creating '${index}' due to '${error || error.message}' `);
       }
     } catch (error) {
       this.checkDuplicateIndexError(error);
