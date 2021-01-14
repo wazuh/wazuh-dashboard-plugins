@@ -11,13 +11,12 @@
  */
 
 // Require some libraries
-import { ErrorResponse } from './error-response';
+import { ErrorResponse } from '../lib/error-response';
 import { getConfiguration } from '../lib/get-configuration';
 import { read } from 'read-last-lines';
-import path from 'path';
 import { UpdateConfigurationFile } from '../lib/update-configuration';
 import jwtDecode from 'jwt-decode';
-import { WAZUH_ROLE_ADMINISTRATOR_ID, WAZUH_DATA_LOGS_RAW_PATH } from '../../util/constants';
+import { WAZUH_ROLE_ADMINISTRATOR_ID, WAZUH_DATA_LOGS_RAW_PATH } from '../../common/constants';
 import { ManageHosts } from '../lib/manage-hosts';
 import { KibanaRequest, RequestHandlerContext, KibanaResponseFactory } from 'src/core/server';
 import { getCookieValueByName } from '../lib/cookie';
@@ -29,7 +28,7 @@ export class WazuhUtilsCtrl {
    * Constructor
    * @param {*} server
    */
-  constructor(server) {
+  constructor() {
     this.manageHosts = new ManageHosts();
   }
 

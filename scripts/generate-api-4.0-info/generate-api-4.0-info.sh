@@ -11,7 +11,7 @@ EOF
     exit 1
   fi
   echo "Generate Wazuh API 4.0 endpoints data and format to use in Wazuh app";
-  local API_LIST_PATH="../../util/api-request-list.json";
+  local API_LIST_PATH="../../lib/api-request-list.json";
   local API_ENDPOINTS_OUTPUT_DIRECTORY="endpoints";
   local API_ENDPOINTS_OUTPUT_FILE="api-4.0-endpoints.json";
   local API_ENDPOINTS_OUTPUT_PATH="$API_ENDPOINTS_OUTPUT_DIRECTORY/$API_ENDPOINTS_OUTPUT_FILE";

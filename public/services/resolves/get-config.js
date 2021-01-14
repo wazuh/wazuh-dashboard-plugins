@@ -16,7 +16,7 @@ import {
   WAZUH_INDEX_SHARDS,
   WAZUH_MONITORING_PATTERN,
   WAZUH_SAMPLE_ALERT_PREFIX
-} from "../../../util/constants";
+} from "../../../common/constants";
 
 export async function getWzConfig($q, genericReq, wazuhConfig) {
   // Remember to keep this values equal to default wazuh.yml values

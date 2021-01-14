@@ -16,6 +16,12 @@ import PropTypes from 'prop-types';
 import { EuiCodeEditor, EuiSpacer } from '@elastic/eui';
 
 import 'brace/theme/textmate';
+import 'brace/mode/xml';
+import 'brace/snippets/xml';
+import 'brace/mode/json';
+import 'brace/snippets/json';
+import 'brace/mode/javascript';
+import 'brace/snippets/javascript';
 import 'brace/ext/language_tools';
 
 class WzCodeEditor extends Component {
@@ -48,7 +54,7 @@ class WzCodeEditor extends Component {
             theme="textmate"
             mode={mode}
             width="100%"
-            height={height || `calc(100vh - ${minusHeight || 360}px)`} // Groups section has -250px
+            height={height || `calc(100vh - ${minusHeight || 400}px)`} // Groups section has -250px
             value={value}
             wrapEnabled
             tabSize={2}

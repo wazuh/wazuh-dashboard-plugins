@@ -11,7 +11,7 @@
  */
 import * as ApiInterceptor from './api-interceptor';
 import { ManageHosts } from './manage-hosts';
-import { log } from '../logger';
+import { log } from './logger';
 // Private variable to save the cache
 const _cache = {};
 

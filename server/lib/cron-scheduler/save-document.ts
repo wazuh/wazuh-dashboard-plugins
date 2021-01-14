@@ -1,8 +1,8 @@
 import { BulkIndexDocumentsParams } from 'elasticsearch';
 import { getConfiguration } from '../get-configuration';
-import { log } from '../../logger.js';
+import { log } from '../logger';
 import { indexDate } from '../index-date';
-import { WAZUH_INDEX_SHARDS, WAZUH_INDEX_REPLICAS } from '../../../util/constants'
+import { WAZUH_INDEX_SHARDS, WAZUH_INDEX_REPLICAS } from '../../../common/constants'
 
 export interface IIndexConfiguration {
   name: string
@@ -31,7 +31,6 @@ export class SaveDocument {
       const createDocumentObject = this.createDocument(doc, indexCreation, mapping);
       const response = await this.esClientInternalUser.bulk(createDocumentObject);
       log(this.logPath, `Response of create new document ${JSON.stringify(response)}`, 'debug');
-      // await this.checkIndexPatternAndCreateIfNotExists(index);
     } catch (error) {
       if (error.status === 403)
         throw { error: 403, message: `Authorization Exception in the index "${index}"` }
@@ -61,7 +60,7 @@ export class SaveDocument {
           log(this.logPath, `Status of create a new index: ${JSON.stringify(response)}`, 'debug');
         }
       } catch (error) {
-        log(this.logPath ,`Error searching or creating '${index}' due to '${error || error.message}' `);
+        log(this.logPath ,`Error searching or creating '${index}' due to '${error || error.message}' `, 'debug');
       }
     } catch (error) {
       this.checkDuplicateIndexError(error);

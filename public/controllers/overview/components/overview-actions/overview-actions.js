@@ -29,7 +29,7 @@ import {
 } from '@elastic/eui';
 import './agents-selector.scss';
 import { AgentSelectionTable } from './agents-selection-table';
-import { WAZUH_ALERTS_PATTERN } from '../../../../../util/constants';
+import { WAZUH_ALERTS_PATTERN } from '../../../../../common/constants';
 import { AppState } from '../../../../react-services/app-state';
 import { getDataPlugin } from '../../../../kibana-services';
 class OverviewActions extends Component {

@@ -12,7 +12,7 @@
 import { WazuhElasticCtrl } from '../controllers';
 import { IRouter } from 'kibana/server';
 import { schema } from '@kbn/config-schema';
-import { WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY, WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING, WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION } from '../../util/constants';
+import { WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY, WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING, WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION } from '../../common/constants';
 
 export function WazuhElasticRoutes(router: IRouter) {
   const ctrl = new WazuhElasticCtrl();
@@ -29,14 +29,6 @@ export function WazuhElasticRoutes(router: IRouter) {
       validate: false,
     },
     async (context, request, response) => ctrl.getCurrentPlatform(context, request, response)
-  );
-
-  router.get(
-    {
-      path: '/elastic/index-patterns',
-      validate: false,
-    },
-    async (context, request, response) => ctrl.getlist(context, request, response)
   );
 
   router.get(
@@ -151,12 +143,12 @@ export function WazuhElasticRoutes(router: IRouter) {
 
   router.post(
     {
-      path: '/elastic/esAlerts',
+      path: '/elastic/alerts',
       validate: {
         body: schema.any(),
       }
     },
-    async (context, request, response) => ctrl.esAlerts(context, request, response)
+    async (context, request, response) => ctrl.alerts(context, request, response)
   );
 
   router.get(
