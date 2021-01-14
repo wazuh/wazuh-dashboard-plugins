@@ -31,15 +31,6 @@ export function WazuhElasticRoutes(router: IRouter) {
     async (context, request, response) => ctrl.getCurrentPlatform(context, request, response)
   );
 
-  // FIX: is this endpoint active?
-  router.get(
-    {
-      path: '/elastic/index-patterns',
-      validate: false,
-    },
-    async (context, request, response) => ctrl.getlist(context, request, response)
-  );
-
   router.get(
     {
       path: '/elastic/visualizations/{tab}/{pattern}',
@@ -152,12 +143,12 @@ export function WazuhElasticRoutes(router: IRouter) {
 
   router.post(
     {
-      path: '/elastic/esAlerts',
+      path: '/elastic/alerts',
       validate: {
         body: schema.any(),
       }
     },
-    async (context, request, response) => ctrl.esAlerts(context, request, response)
+    async (context, request, response) => ctrl.alerts(context, request, response)
   );
 
   router.get(

@@ -326,74 +326,6 @@ export class WazuhElasticCtrl {
   }
 
   /**
-   * This get the list of index-patterns
-   * @param {Object} req
-   * @param {Object} reply
-   * @returns {Array<Object>} list of index-patterns or ErrorResponse
-   */
-  async getlist(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
-    // FIXME: remove code related to XPack?
-    try {
-      const spaces = context.wazuh.plugins.spaces && context.wazuh.plugins.spaces.spacesService;
-      // const { opendistroSecurityKibana, searchguard } = context.wazuh.plugins;
-      const namespace = spaces && spaces.getSpaceId(request);
-
-      const config = getConfiguration();
-
-      // const usingCredentials = !!opendistroSecurityKibana || !!searchguard || await this.usingCredentials(context);
-
-      // const isXpackEnabled =
-      //   typeof XPACK_RBAC_ENABLED !== 'undefined' &&
-      //   XPACK_RBAC_ENABLED &&
-      //   usingCredentials;
-
-      // const isSuperUser =
-      //   isXpackEnabled &&
-      //   request.auth &&
-      //   request.auth.credentials &&
-      //   request.auth.credentials.roles &&
-      //   request.auth.credentials.roles.includes('superuser');
-
-      const data = await context.core.savedObjects.client.find({type: 'index-pattern', namespace});
-      // Default namespace index patterns have no prefix.
-
-      if (((data || {}).saved_objects || {}).length === 0) {
-        throw new Error('There are no index patterns');
-      }
-      if (data.saved_objects) {
-        let list = this.validateIndexPattern(data.saved_objects);
-        if (
-          config &&
-          config['ip.ignore'] &&
-          Array.isArray(config['ip.ignore']) &&
-          config['ip.ignore'].length
-        ) {
-          list = list.filter(
-            item =>
-              item && item.title && !config['ip.ignore'].includes(item.title)
-          );
-        }
-
-        return response.ok({
-          body: {
-            data:
-            /*isXpackEnabled && !isSuperUser
-            ? await this.filterAllowedIndexPatternList(context, list, request)
-            :*/ list
-          }
-        })
-      }
-
-      throw new Error(
-        "The Elasticsearch request didn't fetch the expected data"
-      );
-    } catch (error) {
-      log('wazuh-elastic:getList', error.message || error);
-      return ErrorResponse(error.message || error, 4006, 500, response);
-    }
-  }
-
-  /**
    * Replaces visualizations main fields to fit a certain pattern.
    * @param {Array<Object>} app_objects Object containing raw visualizations.
    * @param {String} id Index-pattern id to use in the visualizations. Eg: 'wazuh-alerts'
@@ -870,14 +802,14 @@ export class WazuhElasticCtrl {
     }
   }
 
-  async esAlerts(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
+  async alerts(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
     try {
       const data = await context.core.elasticsearch.client.asCurrentUser.search(request.body);
       return response.ok({
         body: data.body
       });
     } catch (error) {
-      log('wazuh-elastic:esAlerts', error.message || error);
+      log('wazuh-elastic:alerts', error.message || error);
       return ErrorResponse(error.message || error, 4010, 500, response);
     }
   }
