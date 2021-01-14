@@ -31,7 +31,6 @@ export class SaveDocument {
       const createDocumentObject = this.createDocument(doc, indexCreation, mapping);
       const response = await this.esClientInternalUser.bulk(createDocumentObject);
       log(this.logPath, `Response of create new document ${JSON.stringify(response)}`, 'debug');
-      // await this.checkIndexPatternAndCreateIfNotExists(index);
     } catch (error) {
       if (error.status === 403)
         throw { error: 403, message: `Authorization Exception in the index "${index}"` }
@@ -43,10 +42,10 @@ export class SaveDocument {
 
   private async checkIndexAndCreateIfNotExists(index, shards, replicas) {
     try {
-      try{
+      try {
         const exists = await this.esClientInternalUser.indices.exists({ index });
         log(this.logPath, `Index '${index}' exists? ${exists.body}`, 'debug');
-      }catch(error){
+      } catch (error) {
         log(this.logPath, `Index '${index}' exists? false`, 'debug');
         const response = await this.esClientInternalUser.indices.create({
           index,
@@ -59,7 +58,7 @@ export class SaveDocument {
             }
           }
         });
-        
+
         log(this.logPath, `Status of create a new index: ${JSON.stringify(response)}`, 'debug');
 
       }
