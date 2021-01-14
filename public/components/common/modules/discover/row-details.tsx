@@ -368,6 +368,14 @@ export class RowDetails extends Component {
     );
   }
 
+  getValueAsString(value) {
+    try {
+      return JSON.stringify(value, null, 2);
+    } catch (error) {
+      return value.toString();
+    }
+  }
+
   getFormattedDetails(value) {
 
     if (Array.isArray(value) && value[0].type) {
@@ -382,9 +390,10 @@ export class RowDetails extends Component {
       })
       return <span>{name}: {link}</span>
     } else {
+      const _value = typeof value === 'string' ? value : this.getValueAsString(value);
       return (
         <WzTextWithTooltipTruncated position='top'>
-          {value}
+          {_value}
         </WzTextWithTooltipTruncated>
       );
     }
