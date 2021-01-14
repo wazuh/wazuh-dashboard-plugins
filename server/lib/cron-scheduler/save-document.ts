@@ -58,11 +58,10 @@ export class SaveDocument {
               }
             }
           });
+          log(this.logPath, `Status of create a new index: ${JSON.stringify(response)}`, 'debug');
         }
-        log(this.logPath, `Status of create a new index: ${JSON.stringify(response)}`, 'debug');
       } catch (error) {
-        log(this.logPath, `Index '${index}' exists? false`, 'debug');
-
+        log(this.logPath ,`Error creating '${index}' due to '${error || error.message}' `);
       }
     } catch (error) {
       this.checkDuplicateIndexError(error);
