@@ -1,6 +1,6 @@
 const chai = require('chai');
 const needle = require('needle');
-const { WAZUH_ALERTS_PATTERN } = require('../../util/constants');
+const { WAZUH_ALERTS_PATTERN } = require('../../common/constants');
 
 const kibanaServer = process.env.KIBANA_IP || 'localhost';
 

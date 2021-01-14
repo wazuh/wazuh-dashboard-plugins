@@ -22,11 +22,11 @@ import { I18nProvider } from '@kbn/i18n/react';
 import { ComplianceRequirements } from './components/requirements';
 import { ComplianceSubrequirements } from './components/subrequirements';
 import { getElasticAlerts, getIndexPattern, IFilterParams } from '../mitre/lib';
-import { pciRequirementsFile } from '../../../../server/integration-files/pci-requirements';
-import { gdprRequirementsFile } from '../../../../server/integration-files/gdpr-requirements';
-import { hipaaRequirementsFile } from '../../../../server/integration-files/hipaa-requirements';
-import { nistRequirementsFile } from '../../../../server/integration-files/nist-requirements';
-import { tscRequirementsFile } from '../../../../server/integration-files/tsc-requirements';
+import { pciRequirementsFile } from '../../../../common/compliance-requirements/pci-requirements';
+import { gdprRequirementsFile } from '../../../../common/compliance-requirements/gdpr-requirements';
+import { hipaaRequirementsFile } from '../../../../common/compliance-requirements/hipaa-requirements';
+import { nistRequirementsFile } from '../../../../common/compliance-requirements/nist-requirements';
+import { tscRequirementsFile } from '../../../../common/compliance-requirements/tsc-requirements';
 import { KbnSearchBar } from '../../kbn-search-bar';
 import { getDataPlugin } from '../../../kibana-services';
 

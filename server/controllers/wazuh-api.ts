@@ -11,19 +11,19 @@
  */
 
 // Require some libraries
-import { pciRequirementsFile } from '../integration-files/pci-requirements';
-import { gdprRequirementsFile } from '../integration-files/gdpr-requirements';
-import { hipaaRequirementsFile } from '../integration-files/hipaa-requirements';
-import { nistRequirementsFile } from '../integration-files/nist-requirements';
-import { tscRequirementsFile } from '../integration-files/tsc-requirements';
-import { ErrorResponse } from './error-response';
+import { pciRequirementsFile } from '../../common/compliance-requirements/pci-requirements';
+import { gdprRequirementsFile } from '../../common/compliance-requirements/gdpr-requirements';
+import { hipaaRequirementsFile } from '../../common/compliance-requirements/hipaa-requirements';
+import { nistRequirementsFile } from '../../common/compliance-requirements/nist-requirements';
+import { tscRequirementsFile } from '../../common/compliance-requirements/tsc-requirements';
+import { ErrorResponse } from '../lib/error-response';
 import { Parser } from 'json2csv';
-import { log } from '../logger';
-import { KeyEquivalence } from '../../util/csv-key-equivalence';
-import { ApiErrorEquivalence } from '../../util/api-errors-equivalence';
-import apiRequestList from '../../util/api-request-list';
+import { log } from '../lib/logger';
+import { KeyEquivalence } from '../../common/csv-key-equivalence';
+import { ApiErrorEquivalence } from '../lib/api-errors-equivalence';
+import apiRequestList from '../lib/api-request-list';
 import * as ApiHelper from '../lib/api-helper';
-import { addJobToQueue } from '../jobs/queue';
+import { addJobToQueue } from '../start/queue';
 import fs from 'fs';
 import { ManageHosts } from '../lib/manage-hosts';
 import { UpdateRegistry } from '../lib/update-registry';

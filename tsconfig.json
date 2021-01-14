@@ -14,7 +14,7 @@
   "include": [
     "server/**/*",
     "public/**/*",
-    "util/**/*"
+    "common/**/*"
   ],
   "exclude": [
     "public/**/*.test.ts",

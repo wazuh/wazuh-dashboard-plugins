@@ -9,8 +9,8 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { ErrorResponse } from './error-response';
-import { log } from '../logger';
+import { ErrorResponse } from '../lib/error-response';
+import { log } from '../lib/logger';
 import { getConfiguration } from '../lib/get-configuration';
 import {
   AgentsVisualizations,
@@ -19,12 +19,12 @@ import {
 } from '../integration-files/visualizations';
 
 import { generateAlerts } from '../lib/generate-alerts/generate-alerts-script';
-import { WAZUH_MONITORING_PATTERN, WAZUH_ALERTS_PATTERN, WAZUH_SAMPLE_ALERT_PREFIX, WAZUH_ROLE_ADMINISTRATOR_ID, WAZUH_SAMPLE_ALERTS_INDEX_SHARDS, WAZUH_SAMPLE_ALERTS_INDEX_REPLICAS } from '../../util/constants';
+import { WAZUH_MONITORING_PATTERN, WAZUH_SAMPLE_ALERT_PREFIX, WAZUH_ROLE_ADMINISTRATOR_ID, WAZUH_SAMPLE_ALERTS_INDEX_SHARDS, WAZUH_SAMPLE_ALERTS_INDEX_REPLICAS } from '../../common/constants';
 import jwtDecode from 'jwt-decode';
 import { ManageHosts } from '../lib/manage-hosts';
 import { KibanaRequest, RequestHandlerContext, KibanaResponseFactory, SavedObject, SavedObjectsFindResponse } from 'src/core/server';
 import { getCookieValueByName } from '../lib/cookie';
-import { WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS, WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_ALERTS } from '../../util/constants'
+import { WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS, WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_ALERTS } from '../../common/constants'
 
 export class WazuhElasticCtrl {
   wzSampleAlertsIndexPrefix: string

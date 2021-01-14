@@ -13,7 +13,7 @@
 import { knownFields } from '../integration-files/known-fields';
 import { monitoringKnownFields } from '../integration-files/monitoring-known-fields';
 import { IndexPatternsFetcher } from '../../../../src/plugins/data/server/';
-import { WAZUH_ALERTS_PATTERN, WAZUH_MONITORING_PATTERN } from '../../util/constants';
+import { WAZUH_ALERTS_PATTERN, WAZUH_MONITORING_PATTERN } from '../../common/constants';
 import { IScopedClusterClient } from 'src/core/server';
 
 export class ElasticWrapper {

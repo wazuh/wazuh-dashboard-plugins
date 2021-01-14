@@ -9,9 +9,9 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { log } from '../logger';
+import { log } from './logger';
 import cron from 'node-cron';
-import { WAZUH_MONITORING_DEFAULT_CRON_FREQ } from '../../util/constants';
+import { WAZUH_MONITORING_DEFAULT_CRON_FREQ } from '../../common/constants';
 
 export function parseCron(interval: string) {
   try {

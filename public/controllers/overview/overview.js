@@ -11,7 +11,7 @@
  */
 import { FilterHandler } from '../../utils/filter-handler';
 import { TabNames } from '../../utils/tab-names';
-import { TabDescription } from '../../../server/reporting/tab-description';
+import { WAZUH_MODULES } from '../../../common/wazuh-modules';
 
 import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
@@ -22,7 +22,7 @@ import { updateCurrentTab, updateCurrentAgentData } from '../../redux/actions/ap
 import { VisFactoryHandler } from '../../react-services/vis-factory-handler';
 import { RawVisualizations } from '../../factories/raw-visualizations';
 import store from '../../redux/store';
-import { WAZUH_ALERTS_PATTERN } from '../../../util/constants';
+import { WAZUH_ALERTS_PATTERN } from '../../../common/constants';
 import { getDataPlugin } from '../../kibana-services';
 
 export class OverviewController {
@@ -67,7 +67,7 @@ export class OverviewController {
   async $onInit() {
     this.rawVisualizations.setType("");
     this.wodlesConfiguration = false;
-    this.TabDescription = TabDescription;
+    this.TabDescription = WAZUH_MODULES;
     this.$rootScope.reportStatus = false;
 
     this.$location.search('_a', null);

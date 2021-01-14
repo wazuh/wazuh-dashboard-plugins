@@ -9,7 +9,7 @@ import { ApiCheck } from '../../react-services/wz-api-check';
 import { WzRequest } from '../../react-services/wz-request';
 import { SavedObject } from '../../react-services/saved-objects';
 import { ErrorHandler } from '../../react-services/error-handler';
-import { WAZUH_MONITORING_PATTERN } from '../../../util/constants';
+import { WAZUH_MONITORING_PATTERN } from '../../../common/constants';
 import { checkKibanaSettings, checkKibanaSettingsTimeFilter } from './lib';
 
 export class HealthCheck extends Component {

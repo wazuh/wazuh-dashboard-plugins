@@ -1,6 +1,6 @@
 
 import { IRouter } from 'kibana/server';
-import { WazuhApiCtrl } from '../controllers/wazuh-api';
+import { WazuhApiCtrl } from '../controllers';
 import { schema } from '@kbn/config-schema';
 
 export function WazuhApiRoutes(router: IRouter) {

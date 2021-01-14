@@ -26,7 +26,7 @@ import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbA
 import store from '../../../redux/store';
 import { ReportingService } from '../../../react-services/reporting';
 import { AppNavigate } from '../../../react-services/app-navigate';
-import { TabDescription } from '../../../../server/reporting/tab-description';
+import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
 import { Events, Dashboard, Loader, Settings } from '../../common/modules';
 import OverviewActions from '../../../controllers/overview/components/overview-actions/overview-actions';
 import { MainFim } from '../../agents/fim';
@@ -55,7 +55,7 @@ export class MainModuleOverview extends Component {
 
   setGlobalBreadcrumb() {
     const currentAgent = store.getState().appStateReducers.currentAgentData;
-    if (TabDescription[this.props.currentTab]) {
+    if (WAZUH_MODULES[this.props.currentTab]) {
       let breadcrumb = [
         {
           text: '',
@@ -70,7 +70,7 @@ export class MainModuleOverview extends Component {
           href: "#/overview"
         },
         {
-          text: TabDescription[this.props.section].title
+          text: WAZUH_MODULES[this.props.section].title
         },
       ];
       store.dispatch(updateGlobalBreadcrumb(breadcrumb));
@@ -104,7 +104,7 @@ export class MainModuleOverview extends Component {
               <span style={{ display: 'inline-flex' }}>
                 <EuiTitle size="s">
                   <h1>
-                    <span>&nbsp;{TabDescription[this.props.section].title}&nbsp;&nbsp;</span>
+                    <span>&nbsp;{WAZUH_MODULES[this.props.section].title}&nbsp;&nbsp;</span>
                   </h1>
                 </EuiTitle>
                 <EuiPopover
@@ -122,7 +122,7 @@ export class MainModuleOverview extends Component {
                   closePopover={() => { this.setState({ isDescPopoverOpen: false }) }}>
                   <EuiPopoverTitle>Module description</EuiPopoverTitle>
                   <div style={{ width: '400px' }}>
-                    {TabDescription[this.props.section].description}
+                    {WAZUH_MODULES[this.props.section].description}
                   </div>
                 </EuiPopover>
               </span>

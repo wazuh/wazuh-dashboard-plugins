@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import packageJSON from '../../package.json';
-import { getPath } from '../../util/get-path';
+import { getPath } from './get-path';
 import { ApiInterceptor } from './api-interceptor'
 
 export function buildOptionsObject(api) {

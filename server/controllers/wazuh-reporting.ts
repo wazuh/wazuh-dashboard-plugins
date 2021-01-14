@@ -11,28 +11,28 @@
  */
 import path from 'path';
 import fs from 'fs';
-import { TabDescription as descriptions } from '../reporting/tab-description';
+import { WAZUH_MODULES } from '../../common/wazuh-modules';
 import * as TimSort from 'timsort';
-import { ErrorResponse } from './error-response';
-import * as VulnerabilityRequest from '../reporting/vulnerability-request';
-import * as OverviewRequest from '../reporting/overview-request';
-import * as RootcheckRequest from '../reporting/rootcheck-request';
-import * as PCIRequest from '../reporting/pci-request';
-import * as GDPRRequest from '../reporting/gdpr-request';
-import * as TSCRequest from '../reporting/tsc-request';
-import * as AuditRequest from '../reporting/audit-request';
-import * as SyscheckRequest from '../reporting/syscheck-request';
+import { ErrorResponse } from '../lib/error-response';
+import * as VulnerabilityRequest from '../lib/reporting/vulnerability-request';
+import * as OverviewRequest from '../lib/reporting/overview-request';
+import * as RootcheckRequest from '../lib/reporting/rootcheck-request';
+import * as PCIRequest from '../lib/reporting/pci-request';
+import * as GDPRRequest from '../lib/reporting/gdpr-request';
+import * as TSCRequest from '../lib/reporting/tsc-request';
+import * as AuditRequest from '../lib/reporting/audit-request';
+import * as SyscheckRequest from '../lib/reporting/syscheck-request';
 import PCI from '../integration-files/pci-requirements-pdfmake';
 import GDPR from '../integration-files/gdpr-requirements-pdfmake';
 import TSC from '../integration-files/tsc-requirements-pdfmake';
-import ProcessEquivalence from '../../util/process-state-equivalence';
-import { KeyEquivalence } from '../../util/csv-key-equivalence';
-import { AgentConfiguration } from '../reporting/agent-configuration';
+import ProcessEquivalence from '../lib/process-state-equivalence';
+import { KeyEquivalence } from '../../common/csv-key-equivalence';
+import { AgentConfiguration } from '../lib/reporting/agent-configuration';
 import { KibanaRequest, RequestHandlerContext, KibanaResponseFactory } from 'src/core/server';
-import { ReportPrinter } from '../reporting/printer';
+import { ReportPrinter } from '../lib/reporting/printer';
 
-import { log } from '../logger';
-import { WAZUH_ALERTS_PATTERN, WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH, WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH } from '../../util/constants';
+import { log } from '../lib/logger';
+import { WAZUH_ALERTS_PATTERN, WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH, WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH } from '../../common/constants';
 import { createDirectoryIfNotExists, createDataDirectoryIfNotExists } from '../lib/filesystem';
 
 
@@ -93,7 +93,7 @@ export class WazuhReportingCtrl {
       if (section && typeof section === 'string') {
         if (!['agentConfig','groupConfig'].includes(section)) {
           printer.addContent({
-            text: descriptions[tab].title + ' report',
+            text: WAZUH_MODULES[tab].title + ' report',
             style: 'h1'
           });
         } else if (section === 'agentConfig') {
@@ -152,9 +152,9 @@ export class WazuhReportingCtrl {
           });
         }
       }
-      if (descriptions[tab] && descriptions[tab].description) {
+      if (WAZUH_MODULES[tab] && WAZUH_MODULES[tab].description) {
         printer.addContentWithNewLine({
-          text: descriptions[tab].description,
+          text: WAZUH_MODULES[tab].description,
           style: 'standard'
         });
       }
