@@ -12,6 +12,7 @@
     "noImplicitAny": false,
   },
   "include": [
+    "index.ts",
     "server/**/*",
     "public/**/*",
     "common/**/*"
@@ -20,6 +21,7 @@
     "public/**/*.test.ts",
     "public/**/*.test.tsx",
     "server/**/*.test.ts",
+    "common/**/*.test.ts",
     "../../src/**/*",
     "**/request.ts",
     "src/**/*"

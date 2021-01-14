@@ -7,7 +7,6 @@
     "version": "7.10.0"
   },
   "description": "Wazuh app",
-  "main": "index.js",
   "keywords": [
     "kibana",
     "wazuh",
@@ -32,7 +31,6 @@
     "kbn": "node ../../scripts/kbn",
     "es": "node ../../scripts/es",
     "start": "plugin-helpers start",
-    "prebuild": "tsc; find . -name \"*.ts*\" -type f -not -path \"./node_modules/*\" -delete",
     "build": "yarn plugin-helpers build",
     "plugin-helpers": "node ../../scripts/plugin_helpers",
     "test:ui:runner": "node ../../scripts/functional_test_runner.js",
