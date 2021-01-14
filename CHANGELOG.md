@@ -6,14 +6,15 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
-- Fixed Wazuh menu and agent menu for Solaris agents [#2773](https://github.com/wazuh/wazuh-kibana-app/issues/2773)[#2725](https://github.com/wazuh/wazuh-kibana-app/issues/2725)
+- Fixed Wazuh menu and agent menu for Solaris agents [#2773](https://github.com/wazuh/wazuh-kibana-app/issues/2773) [#2725](https://github.com/wazuh/wazuh-kibana-app/issues/2725)
+- Fixed wrong shards and replicas for statistics indices and also fixed wrong prefix for monitoring indices [#2732](https://github.com/wazuh/wazuh-kibana-app/issues/2732)
 
 ## Wazuh v4.0.3 - Kibana v7.9.1, v7.9.2, v7.9.3 - Revision 4015
 
 ### Added
 
 - Show the wui_ rules belong to wazuh-wui API user [#2702](https://github.com/wazuh/wazuh-kibana-app/issues/2702)
-- Modified agent registration adding groups and architecture [#2666](https://github.com/wazuh/wazuh-kibana-app/issues/2666)[#2652](https://github.com/wazuh/wazuh-kibana-app/issues/2652)
+- Modified agent registration adding groups and architecture [#2666](https://github.com/wazuh/wazuh-kibana-app/issues/2666) [#2652](https://github.com/wazuh/wazuh-kibana-app/issues/2652)
 
 ### Fixed
 
