@@ -2,6 +2,12 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.0.3 - Kibana v7.9.1, v7.9.2, v7.9.3, 7.10.0 , 7.10.1 - Revision 4101
+
+### Changed
+
+- Support new fields of Windows Registry at FIM inventory panel [#2679](https://github.com/wazuh/wazuh-kibana-app/issues/2679)
+
 ## Wazuh v4.0.3 - Kibana v7.9.1, v7.9.2, v7.9.3, 7.10.0 , 7.10.1 - Revision 4016
 
 ### Fixed
