@@ -369,9 +369,27 @@ export class RowDetails extends Component {
   }
 
   getValueAsString(value) {
-    try {
-      return JSON.stringify(value, null, 2);
-    } catch (error) {
+    if (value && typeof value === 'object' && value.constructor === Object) {
+      let list: any[] = [];
+      Object.keys(value).forEach((key, idx) => {
+        list.push(
+          <span key={key}>
+            {key}:&nbsp;
+            {value[key]}
+            {idx < Object.keys(value).length - 1 && ', '}
+            <br />
+          </span>
+        );
+      });
+      return (
+        <ul>
+          <li>
+            {list}
+          </li>
+        </ul>
+      );
+    } else {
+    
       return value.toString();
     }
   }
