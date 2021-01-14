@@ -78,13 +78,9 @@ export class SavedObject {
   }
 
   static async existsOrCreateIndexPattern(patternID) {
-    try {
-      await GenericRequest.request(
-        'GET',
-        `/api/saved_objects/index-pattern/${patternID}`
-      );
-
-    } catch (error) {
+     const result = await SavedObject.existsIndexPattern(patternID);
+     if (!result.data) {
+      const fields = await SavedObject.getIndicesFields(patternID);
       await this.createSavedObject(
         'index-pattern',
         patternID,
@@ -94,6 +90,7 @@ export class SavedObject {
             timeFieldName: 'timestamp'
           }
         },
+        fields
       );
     }
   }
@@ -156,8 +153,9 @@ export class SavedObject {
           attributes: {
             fields: JSON.stringify(fields),
             timeFieldName: 'timestamp',
-            title: title
-          }
+            title: title,
+            retry_on_conflict: 4,
+          },
         }
       );
       return;

@@ -9,7 +9,7 @@ import { ApiCheck } from '../../react-services/wz-api-check';
 import { WzRequest } from '../../react-services/wz-request';
 import { SavedObject } from '../../react-services/saved-objects';
 import { ErrorHandler } from '../../react-services/error-handler';
-import { WAZUH_MONITORING_PATTERN } from '../../../util/constants';
+import { WAZUH_MONITORING_PATTERN } from '../../../common/constants';
 import { checkKibanaSettings, checkKibanaSettingsTimeFilter } from './lib';
 
 export class HealthCheck extends Component {
@@ -62,15 +62,7 @@ export class HealthCheck extends Component {
                 let patternData = patternId ? await SavedObject.existsIndexPattern(patternId) : false;
                 if (!patternData) patternData = {};
                 patternTitle = patternData.title;
-                /* This extra check will work as long as Wazuh monitoring index ID is wazuh-monitoring-*.
-                   Currently is not possible to change that index pattern as it has always been created on our backend.
-                   This extra check checks if the index pattern exists for the current logged in user
-                   in case it doesn't exist, the index pattern is automatically created. This is necessary to make it work with Opendistro multinenancy
-                   as every index pattern is stored in its current tenant .kibana-tenant-XX index. 
-                   */
-                try {
-                    await SavedObject.existsMonitoringIndexPattern(WAZUH_MONITORING_PATTERN); //this checks if it exists, if not it automatically creates the index pattern
-                } catch (err) { }
+                
                 if (!patternData.status) {
                     const patternList = await PatternHandler.getPatternList("healthcheck");
                     if (patternList.length) {
@@ -248,6 +240,42 @@ export class HealthCheck extends Component {
     }
 
     /**
+     * This check if the pattern exist then create if not
+     * @param pattern string
+     */
+    async checkSupportPattern(pattern, itemId) {
+        let results = this.state.results;
+        let errors = this.state.errors;
+        const result = await SavedObject.existsIndexPattern(pattern);
+        if (!result.data) {
+            const toast = getToasts().addWarning(`${pattern} index pattern was not found and it will be created`)
+            const fields = await SavedObject.getIndicesFields(pattern);
+            try {
+                await SavedObject.createSavedObject(
+                    'index-pattern',
+                    pattern,
+                    {
+                    attributes: {
+                        title: pattern,
+                        timeFieldName: 'timestamp'
+                    }
+                    },
+                    fields
+                );
+                getToasts().remove(toast.id);
+                getToasts().addSuccess(`${pattern} index pattern created successfully`)
+                results[itemId].description = <span><EuiIcon type="check" color="secondary" ></EuiIcon> Ready</span>;
+                this.setState({ results });
+            } catch (error) {
+                getToasts().remove(toast.id);
+                errors.push(`Error trying to create ${pattern} index pattern: ${error.message}`);
+                results[itemId].description = <span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span>;
+                this.setState({ results });
+            }
+        }
+    }
+
+    /**
      * On controller loads
      */
     async load() {
@@ -255,8 +283,8 @@ export class HealthCheck extends Component {
             const wazuhConfig = new WazuhConfig();
             const configuration = wazuhConfig.getConfig();
             checkKibanaSettings(configuration['checks.metaFields']);
-            checkKibanaSettingsTimeFilter(configuration['checks.timeFilter']);
-            AppState.setPatternSelector(configuration['ip.selector']);
+            checkKibanaSettingsTimeFilter(configuration['checks.timeFilter']);            
+            AppState.setPatternSelector(configuration['ip.selector']);            
             let checks = {};
             checks.pattern = configuration['checks.pattern'];
             checks.template = configuration['checks.template'];
@@ -289,11 +317,26 @@ export class HealthCheck extends Component {
                     id: 4,
                     title: 'Check index pattern fields',
                     description: checks.fields ? <span><EuiLoadingSpinner size="m" /> Checking...</span> : 'Disabled'
-                }
+                },
+                {
+                    id: 5,
+                    title: 'Check Monitoring index pattern',
+                    description: <span><EuiLoadingSpinner size="m" /> Checking...</span> 
+                },
+                {
+                    id: 6,
+                    title: 'Check Statistics index pattern',
+                    description: <span><EuiLoadingSpinner size="m" /> Checking...</span> 
+                },
             );
             this.setState({ checks, results },
                 async () => {
-                    await Promise.all([this.checkPatterns(), this.checkApiConnection()]);
+                    await Promise.all([
+                        this.checkPatterns(),
+                        this.checkApiConnection(),
+                        this.checkSupportPattern(configuration['wazuh.monitoring.pattern'], 5),
+                        this.checkSupportPattern(`${configuration['cron.prefix']}-${configuration['cron.statistics.index.name']}-*`, 6),
+                    ]);
                     if (checks.fields) {
                         const i = results.map(item => item.id).indexOf(4);
                         try {

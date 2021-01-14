@@ -9,9 +9,8 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { ElasticWrapper } from '../lib/elastic-wrapper';
-import { ErrorResponse } from './error-response';
-import { log } from '../logger';
+import { ErrorResponse } from '../lib/error-response';
+import { log } from '../lib/logger';
 import { getConfiguration } from '../lib/get-configuration';
 import {
   AgentsVisualizations,
@@ -20,19 +19,17 @@ import {
 } from '../integration-files/visualizations';
 
 import { generateAlerts } from '../lib/generate-alerts/generate-alerts-script';
-import { WAZUH_MONITORING_PATTERN, WAZUH_ALERTS_PATTERN, WAZUH_SAMPLE_ALERT_PREFIX, WAZUH_ROLE_ADMINISTRATOR_ID, WAZUH_SAMPLE_ALERTS_INDEX_SHARDS, WAZUH_SAMPLE_ALERTS_INDEX_REPLICAS } from '../../util/constants';
+import { WAZUH_MONITORING_PATTERN, WAZUH_SAMPLE_ALERT_PREFIX, WAZUH_ROLE_ADMINISTRATOR_ID, WAZUH_SAMPLE_ALERTS_INDEX_SHARDS, WAZUH_SAMPLE_ALERTS_INDEX_REPLICAS } from '../../common/constants';
 import jwtDecode from 'jwt-decode';
 import { ManageHosts } from '../lib/manage-hosts';
 import { KibanaRequest, RequestHandlerContext, KibanaResponseFactory, SavedObject, SavedObjectsFindResponse } from 'src/core/server';
 import { getCookieValueByName } from '../lib/cookie';
-import { WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS, WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_ALERTS } from '../../util/constants'
+import { WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS, WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_ALERTS } from '../../common/constants'
 
 export class WazuhElasticCtrl {
-  wzWrapper: ElasticWrapper;
   wzSampleAlertsIndexPrefix: string
   manageHosts: ManageHosts
   constructor() {
-    this.wzWrapper = new ElasticWrapper();
     this.wzSampleAlertsIndexPrefix  = this.getSampleAlertPrefix();
     this.manageHosts = new ManageHosts();
   }
@@ -230,9 +227,6 @@ export class WazuhElasticCtrl {
 
       payload.aggs['2'].terms.field = request.params.field;
 
-      // TODO: namespace?
-      const namespace = context.wazuh.plugins.spaces?.spacesService && context.wazuh.plugins.spaces?.spacesService.getSpaceId(request);
-      // TODO: review the request
       const data = await context.core.elasticsearch.client.asCurrentUser.search({
         size: 1,
         index: request.params.pattern,
@@ -332,104 +326,6 @@ export class WazuhElasticCtrl {
   }
 
   /**
-   * This get the list of index-patterns
-   * @param {Object} req
-   * @param {Object} reply
-   * @returns {Array<Object>} list of index-patterns or ErrorResponse
-   */
-  async getlist(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
-    // FIXME: remove code related to XPack?
-    try {
-      const elasticClient = context.core.elasticsearch.client;
-      const spaces = context.wazuh.plugins.spaces?.spacesService;
-      const { opendistroSecurityKibana, searchguard } = context.wazuh.plugins;
-      const namespace = spaces && spaces.getSpaceId(request);
-
-      const config = getConfiguration();
-
-      const usingCredentials = !!opendistroSecurityKibana || !!searchguard || await this.wzWrapper.usingCredentials(elasticClient);
-
-      const isXpackEnabled =
-        typeof XPACK_RBAC_ENABLED !== 'undefined' &&
-        XPACK_RBAC_ENABLED &&
-        usingCredentials;
-
-      const isSuperUser =
-        isXpackEnabled &&
-        request.auth &&
-        request.auth.credentials &&
-        request.auth.credentials.roles &&
-        request.auth.credentials.roles.includes('superuser');
-
-      const data = await context.core.savedObjects.client.find({type: 'index-pattern'});
-      // Default namespace index patterns have no prefix.
-      // If it's a custom namespace, then filter by its name.
-      if (namespace) {
-        data.saved_objects = data.saved_objects.filter(item =>
-            namespace !== 'default'
-            ? (item.namespaces || []).includes(namespace)
-            : true
-        );
-      }
-
-      if (((data || {}).saved_objects || {}).length === 0) {
-        throw new Error('There are no index patterns');
-      }
-      if (data.saved_objects) {
-        let list = this.validateIndexPattern(data.saved_objects);
-        if (
-          config &&
-          config['ip.ignore'] &&
-          Array.isArray(config['ip.ignore']) &&
-          config['ip.ignore'].length
-        ) {
-          list = list.filter(
-            item =>
-              item && item.title && !config['ip.ignore'].includes(item.title)
-          );
-        }
-
-        return response.ok({
-          body: {
-            data:
-            isXpackEnabled && !isSuperUser
-            ? await this.filterAllowedIndexPatternList(context, list, request)
-            : list
-          }
-        })
-      }
-
-      throw new Error(
-        "The Elasticsearch request didn't fetch the expected data"
-      );
-    } catch (error) {
-      log('wazuh-elastic:getList', error.message || error);
-      return ErrorResponse(error.message || error, 4006, 500, response);
-    }
-  }
-
-  async checkCustomSpaceMonitoring(namespace, monitoringPattern) {
-    try {
-      const patterns = await this.wzWrapper.getAllIndexPatterns();
-      const exists = patterns.hits.hits.filter(
-        item =>
-          item._source['index-pattern'].title === monitoringPattern &&
-          item._source.namespace === namespace
-      );
-      if (!exists.length) {
-        const title = monitoringPattern;
-        const id = `${namespace}:index-pattern:${monitoringPattern}`;
-        await this.wzWrapper.createMonitoringIndexPattern(title, id, namespace);
-        return id;
-      } else {
-        return exists[0]._id;
-      }
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  /**
    * Replaces visualizations main fields to fit a certain pattern.
    * @param {Array<Object>} app_objects Object containing raw visualizations.
    * @param {String} id Index-pattern id to use in the visualizations. Eg: 'wazuh-alerts'
@@ -466,10 +362,6 @@ export class WazuhElasticCtrl {
           const isMonitoring = defaultStr.includes('wazuh-monitoring');
           if (isMonitoring) {
             if (namespace && namespace !== 'default') {
-              monitoringPattern = await this.checkCustomSpaceMonitoring(
-                namespace,
-                monitoringPattern
-              );
               if (
                 monitoringPattern.includes(namespace) &&
                 monitoringPattern.includes('index-pattern:')
@@ -629,7 +521,7 @@ export class WazuhElasticCtrl {
           ? OverviewVisualizations[tabSufix]
           : AgentsVisualizations[tabSufix];
       log('wazuh-elastic:createVis', `${tabPrefix}[${tabSufix}] with index pattern ${request.params.pattern}`, 'debug');
-      const namespace = context.wazuh.plugins.spaces?.spacesService && context.wazuh.plugins.spaces?.spacesService.getSpaceId(request);
+      const namespace = context.wazuh.plugins.spaces && context.wazuh.plugins.spaces.spacesService && context.wazuh.plugins.spaces.spacesService.getSpaceId(request);
       const raw = await this.buildVisualizationsRaw(
         file,
         request.params.pattern,
@@ -672,14 +564,8 @@ export class WazuhElasticCtrl {
       const name = request.body.nodes.name;
       const masterNode = request.body.nodes.master_node;
 
-      const namespace = context.wazuh.plugins.spaces?.spacesService && context.wazuh.plugins.spaces?.spacesService.getSpaceId(request);
-      // const patternDoc = context.core.elasticsearch.client.asInternalUser.get({
-      //   index: request.params.pattern
-      // });
-      const patternDoc = await context.core.savedObjects.client.get<SavedObjectsFindResponse<SavedObject>>('index-pattern', request.params.pattern);
-
-      const patternName = patternDoc.attributes.title;
-
+      const patternName = request.params.pattern;
+      
       const raw = await this.buildClusterVisualizationsRaw(
         file,
         request.params.pattern,
@@ -817,7 +703,6 @@ export class WazuhElasticCtrl {
           }
         };
 
-        // await this.wzWrapper.createIndexByName(sampleAlertsIndex, configuration);
         await context.core.elasticsearch.client.asInternalUser.indices.create({
           index: sampleAlertsIndex,
           body: configuration
@@ -911,14 +796,14 @@ export class WazuhElasticCtrl {
     }
   }
 
-  async esAlerts(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
+  async alerts(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
     try {
       const data = await context.core.elasticsearch.client.asCurrentUser.search(request.body);
       return response.ok({
         body: data.body
       });
     } catch (error) {
-      log('wazuh-elastic:esAlerts', error.message || error);
+      log('wazuh-elastic:alerts', error.message || error);
       return ErrorResponse(error.message || error, 4010, 500, response);
     }
   }
@@ -940,4 +825,15 @@ export class WazuhElasticCtrl {
       return ErrorResponse(error.message || error, 1000, 500, response);
     }
   }
+
+  async usingCredentials(context){
+    try {
+      const data = await context.core.elasticsearch.client.asInternalUser.cluster.getSettings(
+        {include_defaults: true}
+      );
+      return (((((data || {}).body || {}).defaults || {}).xpack || {}).security || {}).user !== null;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
 }

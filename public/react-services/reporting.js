@@ -112,7 +112,7 @@ export class ReportingService {
         browserTimezone
       };
 
-      const apiEndpoint = tab === 'syscollector' ? `/reports/agents/${agents}/inventory` : `/reports/modules/${tab}`
+      const apiEndpoint = tab === 'syscollector' ? `/reports/agents/${agents}/inventory` : `/reports/modules/${tab}`;
       await GenericRequest.request('POST', apiEndpoint, data);
 
       this.$rootScope.reportBusy = false;

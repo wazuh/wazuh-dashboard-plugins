@@ -1,6 +1,6 @@
 
 import { IRouter } from 'kibana/server';
-import { WazuhApiCtrl } from '../controllers/wazuh-api';
+import { WazuhApiCtrl } from '../controllers';
 import { schema } from '@kbn/config-schema';
 
 export function WazuhApiRoutes(router: IRouter) {
@@ -145,87 +145,4 @@ export function WazuhApiRoutes(router: IRouter) {
   },
     async (context, request, response) => ctrl.getSyscollector(context, request, response)
   );
-
-  //#region TODO: Remove these end point if not used
-  // Return a PCI requirement description
-  router.get({
-    path: '/api/pci/{requirement}',
-    validate: {
-      params: schema.object({
-        requirement: schema.string(),
-      })
-    }
-  },
-    async (context, request, response) => ctrl.getPciRequirement(context, request, response)
-  );
-
-  // Return a GDPR requirement description
-  router.get({
-    path: '/api/gdpr/{requirement}',
-    validate: {
-      params: schema.object({
-        requirement: schema.string()
-      })
-    }
-  },
-    async (context, request, response) => ctrl.getGdprRequirement(context, request, response)
-  );
-
-  // Return a NIST 800-53 requirement description
-  router.get({
-    path: '/api/nist/{requirement}',
-    validate: {
-      params: schema.object({
-        requirement: schema.string()
-      })
-    }
-  },
-    async (context, request, response) => ctrl.getNistRequirement(context, request, response)
-  );
-
-  // Return a TSC requirement description
-  router.get({
-    path: '/api/tsc/{requirement}',
-    validate: {
-      params: schema.object({
-        requirement: schema.string()
-      })
-    }
-  },
-    async (context, request, response) => ctrl.getTSCRequirement(context, request, response)
-  );
-
-  // Return a HIPAA requirement description
-  router.get({
-    path: '/api/hipaa/{requirement}',
-    validate: {
-      params: schema.object({
-        requirement: schema.string()
-      })
-    }
-  },
-    async (context, request, response) => ctrl.getHipaaRequirement(context, request, response)
-  );
-
-  // Force fetch data to be inserted on wazuh-monitoring indices
-  router.get({ // FIXME: Fix this endpoint if is used
-    path: '/api/monitoring',
-    validate: false,
-  },
-    async (context, request, response) => ctrl.fetchAgents(context, request, response)
-  );
-
-  // Returns unique fields from the agents such OS, agent version ...
-  router.get({ // TODO: Remove this endpoint if not used
-    path: '/api/agents-unique/{api}',
-    validate: {
-      params: schema.object({
-        api: schema.string()
-      })
-    }
-  },
-    async (context, request, response) => ctrl.getAgentsFieldsUniqueCount(context, request, response)
-  );
-
-  //#endregion
 }

@@ -11,35 +11,26 @@
  */
 
 // Require some libraries
-import { pciRequirementsFile } from '../integration-files/pci-requirements';
-import { gdprRequirementsFile } from '../integration-files/gdpr-requirements';
-import { hipaaRequirementsFile } from '../integration-files/hipaa-requirements';
-import { nistRequirementsFile } from '../integration-files/nist-requirements';
-import { tscRequirementsFile } from '../integration-files/tsc-requirements';
-import { ErrorResponse } from './error-response';
+import { ErrorResponse } from '../lib/error-response';
 import { Parser } from 'json2csv';
-import { log } from '../logger';
-import { KeyEquivalence } from '../../util/csv-key-equivalence';
-import { ApiErrorEquivalence } from '../../util/api-errors-equivalence';
-import apiRequestList from '../../util/api-request-list';
-import * as ApiHelper from '../lib/api-helper';
-import { Queue } from '../jobs/queue';
+import { log } from '../lib/logger';
+import { KeyEquivalence } from '../../common/csv-key-equivalence';
+import { ApiErrorEquivalence } from '../lib/api-errors-equivalence';
+import apiRequestList from '../lib/api-request-list';
+import { addJobToQueue } from '../start/queue';
 import fs from 'fs';
 import { ManageHosts } from '../lib/manage-hosts';
 import { UpdateRegistry } from '../lib/update-registry';
-import * as ApiInterceptor from '../lib/api-interceptor';
 import jwtDecode from 'jwt-decode';
 import { KibanaRequest, RequestHandlerContext, KibanaResponseFactory } from 'src/core/server';
 import { APIUserAllowRunAs, CacheInMemoryAPIUserAllowRunAs, API_USER_STATUS_RUN_AS } from '../lib/cache-api-user-has-run-as';
 import { getCookieValueByName } from '../lib/cookie';
 
 export class WazuhApiCtrl {
-  queue: Queue
   manageHosts: ManageHosts
   updateRegistry: UpdateRegistry
 
   constructor() {
-    this.queue = Queue;
     // this.monitoringInstance = new Monitoring(server, true);
     this.manageHosts = new ManageHosts();
     this.updateRegistry = new UpdateRegistry();
@@ -200,7 +191,7 @@ export class WazuhApiCtrl {
               body: {
                 statusCode: 200,
                 data: copied,
-                idChanged: request.idChanged || null,
+                idChanged: request.body.idChanged || null,
               }
             });
           }
@@ -232,14 +223,14 @@ export class WazuhApiCtrl {
             try {
               const id = Object.keys(api)[0];
 
-              const response = await context.wazuh.api.client.asInternalUser.request(
+              const responseManagerInfo = await context.wazuh.api.client.asInternalUser.request(
                 'GET',
                 `/manager/info`,
                 {},
                 { apiHostID: id }
               );
 
-              if (this.checkResponseIsDown(response)) {
+              if (this.checkResponseIsDown(responseManagerInfo)) {
                 return ErrorResponse(
                   `ERROR3099 - ${response.data.detail || 'Wazuh not ready yet'}`,
                   3099,
@@ -247,7 +238,7 @@ export class WazuhApiCtrl {
                   response
                 );
               }
-              if (response.status === 200) {
+              if (responseManagerInfo.status === 200) {
                 request.body.id = id;
                 request.body.idChanged = id;
                 return await this.checkStoredAPI(context, request, response);
@@ -433,171 +424,6 @@ export class WazuhApiCtrl {
     }
   }
 
-  /**
-   * This get PCI requirements
-   * @param {Object} context
-   * @param {Object} request
-   * @param {Object} response
-   * @returns {Array<Object>} requirements or ErrorResponse
-   */
-  async getPciRequirement(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
-    try {
-      let pci_description = '';
-
-      if (request.params.requirement === 'all') {
-        if (!request.headers.id) {
-          return response.ok({
-            body: pciRequirementsFile
-          });
-        }
-
-        const apiId = request.headers.id;
-        const api = await this.manageHosts.getHostById(apiId);
-
-        if (!Object.keys(api).length) {
-          log('wazuh-api:getPciRequirement', `Cannot get the credentials for the host ${apiId}`);
-          // Can not get credentials from wazuh-hosts
-          return ErrorResponse('Unexpected error getting host credentials', 3007, 400, response);
-        }
-
-        const responseRequirement = await context.wazuh.api.client.asInternalUser.request(
-          'get',
-          `/rules/requirement/pci`,
-          {},
-          { apiHostID: apiId }
-        );
-
-        if ((((responseRequirement || {}).data || {}).data || {}).affected_items) {
-          let PCIobject = {};
-          for (const item of responseRequirement.data.data.affected_items) {
-            if (typeof pciRequirementsFile[item] !== 'undefined')
-              PCIobject[item] = pciRequirementsFile[item];
-          }
-          return response.ok({
-            body: PCIobject
-          });
-        } else {
-          log(
-            'wazuh-api:getPciRequirement',
-            'An error occurred trying to parse PCI DSS requirements'
-          );
-          return ErrorResponse(
-            'An error occurred trying to parse PCI DSS requirements',
-            3009,
-            400,
-            response
-          );
-        }
-      } else {
-        if (typeof pciRequirementsFile[request.params.requirement] !== 'undefined') {
-          pci_description = pciRequirementsFile[request.params.requirement];
-        }
-
-        return response.ok({
-          body: {
-            pci: {
-              requirement: request.params.requirement,
-              description: pci_description,
-            }
-          }
-        });
-      }
-    } catch (error) {
-      log('wazuh-api:getPciRequirement', error.message || error);
-      return ErrorResponse(error.message || error, 3010, 400, response);
-    }
-  }
-
-  /**
-   * This get GDPR Requirements
-   * @param {Object} context
-   * @param {Object} request
-   * @param {Object} response
-   * @returns {Array<Object>} requirements or ErrorResponse
-   */
-  async getGdprRequirement(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
-    try {
-      let gdpr_description = '';
-
-      if (request.params.requirement === 'all') {
-        if (!request.headers.id) {
-          return response.ok({
-            body: gdprRequirementsFile
-          });
-        }
-
-        const apiId = request.headers.id;
-        const api = await this.manageHosts.getHostById(apiId);
-
-        // Checking for GDPR
-        const version = await context.wazuh.api.client.asInternalUser.request(
-          'get',
-          '//',
-          {},
-          { apiHostID: apiId }
-        );
-        const number = version.data.api_version;
-
-        const [major, minor, patch] = number.split('.');
-
-        if ((major >= 3 && minor < 2) || (major >= 3 && minor >= 2 && patch < 3)) {
-          return {};
-        }
-
-        if (!Object.keys(api).length) {
-          log('wazuh-api:getGdprRequirement', 'Unexpected error getting host credentials');
-          // Can not get credentials from wazuh-hosts
-          return ErrorResponse('Unexpected error getting host credentials', 3024, 400, response);
-        }
-
-        const responseRequirement = await context.wazuh.api.client.asInternalUser.request(
-          'get',
-          `/rules/requirement/gdpr`,
-          {},
-          { apiHostID: apiId }
-        );
-
-        if ((((responseRequirement || {}).data || {}).data || {}).affected_items) {
-          let GDPRobject = {};
-          for (const item of responseRequirement.data.data.affected_items) {
-            if (typeof gdprRequirementsFile[item] !== 'undefined')
-              GDPRobject[item] = gdprRequirementsFile[item];
-          }
-          return response.ok({
-            body: GDPRobject
-          });
-        } else {
-          log(
-            'wazuh-api:getGdprRequirement',
-            'An error occurred trying to parse GDPR requirements'
-          );
-          return ErrorResponse(
-            'An error occurred trying to parse GDPR requirements',
-            3026,
-            400,
-            response
-          );
-        }
-      } else {
-        if (typeof gdprRequirementsFile[request.params.requirement] !== 'undefined') {
-          gdpr_description = gdprRequirementsFile[request.params.requirement];
-        }
-
-        return response.ok({
-          body: {
-            gdpr: {
-              requirement: request.params.requirement,
-              description: gdpr_description,
-            },
-          }
-        });
-      }
-    } catch (error) {
-      log('wazuh-api:getGdprRequirement', error.message || error);
-      return ErrorResponse(error.message || error, 3027, 400, response);
-    }
-  }
-
   checkResponseIsDown(response) {
     if (response.status !== 200) {
       // Avoid "Error communicating with socket" like errors
@@ -610,239 +436,6 @@ export class WazuhApiCtrl {
       return isDown;
     }
     return false;
-  }
-
-  /**
-   * This get PCI requirements
-   * @param {Object} context
-   * @param {Object} request
-   * @param {Object} response
-   * @returns {Array<Object>} requirements or ErrorResponse
-   */
-  async getHipaaRequirement(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
-    try {
-      let hipaa_description = '';
-
-      if (request.params.requirement === 'all') {
-        if (!request.headers.id) {
-          return response.ok({
-            body: hipaaRequirementsFile
-          });
-        }
-
-        const apiId = request.headers.id;
-        const api = await this.manageHosts.getHostById(apiId);
-
-        if (!Object.keys(api).length) {
-          log('wazuh-api:getHipaaRequirement', 'Unexpected error getting host credentials');
-          // Can not get credentials from wazuh-hosts
-          return ErrorResponse('Unexpected error getting host credentials', 3007, 400, response);
-        }
-
-        const responseRequirement = await context.wazuh.api.client.asInternalUser.request(
-          'get',
-          `/rules/requirement/hipaa`,
-          {},
-          { apiHostID: apiId }
-        );
-
-        if ((((responseRequirement || {}).data || {}).data || {}).affected_items) {
-          let HIPAAobject = {};
-          for (const item of responseRequirement.data.data.affected_items) {
-            if (typeof hipaaRequirementsFile[item] !== 'undefined')
-              HIPAAobject[item] = hipaaRequirementsFile[item];
-          }
-          return response.ok({
-            body: HIPAAobject
-          });
-        } else {
-          log(
-            'wazuh-api:getPciRequirement',
-            'An error occurred trying to parse HIPAA requirements'
-          );
-          return ErrorResponse(
-            'An error occurred trying to parse HIPAA requirements',
-            3009,
-            400,
-            response
-          );
-        }
-      } else {
-        if (typeof hipaaRequirementsFile[request.params.requirement] !== 'undefined') {
-          hipaa_description = hipaaRequirementsFile[request.params.requirement];
-        }
-
-        return response.ok({
-          body: {
-            hipaa: {
-              requirement: request.params.requirement,
-              description: hipaa_description,
-            },
-          }
-        });
-      }
-    } catch (error) {
-      log('wazuh-api:getPciRequirement', error.message || error);
-      return ErrorResponse(error.message || error, 3010, 400, response);
-    }
-  }
-
-  /**
-   * This get NIST 800-53 requirements
-   * @param {Object} context
-   * @param {Object} request
-   * @param {Object} response
-   * @returns {Array<Object>} requirements or ErrorResponse
-   */
-  async getNistRequirement(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
-    try { // TODO: Fix this method
-      let nist_description = '';
-
-      if (request.params.requirement === 'all') {
-        if (!request.headers.id) {
-          return response.ok({
-            body: nistRequirementsFile
-          });
-        }
-
-        const apiId = request.headers.id;
-        const api = await this.manageHosts.getHostById(apiId);
-        if (!Object.keys(api).length) {
-          log('wazuh-api:getNistRequirement', 'Unexpected error getting host credentials');
-          // Can not get credentials from wazuh-hosts
-          return ErrorResponse('Unexpected error getting host credentials', 3007, 400, response);
-        }
-
-        const responseRequirement = await context.wazuh.api.client.asInternalUser.request(
-          'get',
-          `/rules/requirement/nist-800-53`,
-          {},
-          { apiHostID: apiId }
-        );
-        if ((((responseRequirement || {}).data || {}).data || {}).affected_items) {
-          let NISTobject = {};
-          for (const item of responseRequirement.data.data.affected_items) {
-            if (typeof nistRequirementsFile[item] !== 'undefined')
-              NISTobject[item] = nistRequirementsFile[item];
-          }
-          return response.ok({
-            body: NISTobject
-          });
-        } else {
-          log(
-            'wazuh-api:getNistRequirement',
-            'An error occurred trying to parse NIST 800-53 requirements'
-          );
-          return ErrorResponse(
-            'An error occurred trying to parse NIST 800-53 requirements',
-            3009,
-            400,
-            response
-          );
-        }
-      } else {
-        if (typeof nistRequirementsFile[request.params.requirement] !== 'undefined') {
-          nist_description = nistRequirementsFile[request.params.requirement];
-        }
-
-        return response.ok({
-          body: {
-            nist: {
-              requirement: request.params.requirement,
-              description: nist_description,
-            },
-          }
-        });
-      }
-    } catch (error) {
-      log('wazuh-api:getNistRequirement', error.message || error);
-      return ErrorResponse(error.message || error, 3010, 400, response);
-    }
-  }
-
-  /**
-   * This get TSC requirements
-   * @param {Object} context
-   * @param {Object} request
-   * @param {Object} response
-   * @returns {Array<Object>} requirements or ErrorResponse
-   */
-  async getTSCRequirement(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
-    try {
-      let tsc_description = '';
-
-      if (request.params.requirement === 'all') {
-        if (!request.headers.id) {
-          return response.ok({
-            body: tscRequirementsFile
-          });
-        }
-
-        const apiId = request.headers.id;
-        const api = await this.manageHosts.getHostById(apiId);
-
-        if (!Object.keys(api).length) {
-          log(
-            'wazuh-api:getTSCRequirement',
-            'Unexpected error getting host credentials'
-          );
-          // Can not get credentials from wazuh-hosts
-          return ErrorResponse(
-            'Unexpected error getting host credentials',
-            3007,
-            400,
-            response
-          );
-        }
-
-        const responseRequirement = await needle(
-          'get',
-          `${api.url}:${api.port}/rules/tsc`,
-          {},
-          ApiHelper.buildOptionsObject(api)
-        );
-
-        if ((((responseRequirement || {}).body || {}).data || {}).items) {
-          let TSCobject = {};
-          for (const item of responseRequirement.body.data.items) {
-            if (typeof tscRequirementsFile[item] !== 'undefined')
-              TSCobject[item] = tscRequirementsFile[item];
-          }
-          return response.ok({
-            body: TSCobject
-          });
-        } else {
-          log(
-            'wazuh-api:getTSCRequirement',
-            'An error occurred trying to parse TSC requirements'
-          );
-          return ErrorResponse(
-            'An error occurred trying to parse TSC requirements',
-            3009,
-            400,
-            response
-          );
-        }
-      } else {
-        if (
-          typeof tscRequirementsFile[request.params.requirement] !== 'undefined'
-        ) {
-          tsc_description = tscRequirementsFile[request.params.requirement];
-        }
-
-        return response.ok({
-          body: {
-            tsc: {
-              requirement: request.params.requirement,
-              description: tsc_description
-            }
-          }
-        });
-      }
-    } catch (error) {
-      log('wazuh-api:getTSCRequirement', error.message || error);
-      return ErrorResponse(error.message || error, 3010, 400, response);
-    }
   }
 
   /**
@@ -924,7 +517,7 @@ export class WazuhApiCtrl {
    * @param {Object} response
    * @returns {Object} API response or ErrorResponse
    */
-  async makeRequest(context, method, path, data, id, response) {   
+  async makeRequest(context, method, path, data, id, response) {
     const devTools = !!(data || {}).devTools;
     try {
       const api = await this.manageHosts.getHostById(id);
@@ -938,10 +531,10 @@ export class WazuhApiCtrl {
         return ErrorResponse('Could not get host credentials', 3011, 404, response);
       }
 
-      if (!data) {        
+      if (!data) {
         data = {};
       };
-      
+
       if (!data.headers) {
         data.headers = {};
       };
@@ -952,29 +545,30 @@ export class WazuhApiCtrl {
 
       // Set content type application/xml if needed
       if (typeof (data || {}).body === 'string' && (data || {}).origin === 'xmleditor') {
-        data.headers.content_type = 'application/xml';
+        data.headers['content-type'] = 'application/xml';
         delete data.origin;
       }
 
       if (typeof (data || {}).body === 'string' && (data || {}).origin === 'json') {
-        data.headers.content_type = 'application/json';
+        data.headers['content-type'] = 'application/json';
         delete data.origin;
       }
 
       if (typeof (data || {}).body === 'string' && (data || {}).origin === 'raw') {
-        data.headers.content_type = 'application/octet-stream';
+        data.headers['content-type'] = 'application/octet-stream';
         delete data.origin;
       }
       const delay = (data || {}).delay || 0;
       if (delay) {
-        const current = new Date();
-        this.queue.addJob({
-          startAt: new Date(current.getTime() + delay),
-          type: 'request',
-          method,
-          path,
-          data,
-          options,
+        addJobToQueue({
+          startAt: new Date(Date.now() + delay),
+          run: async () => {
+            try{
+              await context.wazuh.api.client.asCurrentUser.request(method, path, data, options);
+            }catch(error){
+              log('queue:delayApiRequest',`An error ocurred in the delayed request: "${method} ${path}": ${error.message || error}`);
+            };
+          }
         });
         return response.ok({
           body: { error: 0, message: 'Success' }
@@ -1014,7 +608,7 @@ export class WazuhApiCtrl {
           }
         }
       }
-      const responseToken = await context.wazuh.api.client.asCurrentUser.request(method, path, data, options);      
+      const responseToken = await context.wazuh.api.client.asCurrentUser.request(method, path, data, options);
       const responseIsDown = this.checkResponseIsDown(responseToken);
       if (responseIsDown) {
         return ErrorResponse(
@@ -1060,7 +654,7 @@ export class WazuhApiCtrl {
       }
       const errorMsg = (error.response || {}).data || error.message
       log('wazuh-api:makeRequest', errorMsg || error);
-      if (devTools) {        
+      if (devTools) {
         return response.ok({
           body: { error: '3013', message: errorMsg || error }
         });
@@ -1117,30 +711,6 @@ export class WazuhApiCtrl {
         request.body.id,
         response
       );
-    }
-  }
-
-  /**
-   * Fetch agent status and insert it directly on demand
-   * @param {Object} context
-   * @param {Object} request
-   * @param {Object} response
-   * @returns {Object} status obj or ErrorResponseerror.message || error
-   */
-  async fetchAgents(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
-    try {
-      const output = await this.monitoringInstance.fetchAgentsExternal();
-      return response.ok({
-        body: {
-          statusCode: 200,
-          error: '0',
-          data: '',
-          output,
-        }
-      });
-    } catch (error) {
-      log('wazuh-api:fetchAgents', error.message || error);
-      return ErrorResponse(error.message || error, 3018, 500, response);
     }
   }
 
@@ -1282,93 +852,6 @@ export class WazuhApiCtrl {
     } catch (error) {
       log('wazuh-api:csv', error.message || error);
       return ErrorResponse(error.message || error, 3034, 500, response);
-    }
-  }
-
-  /**
-   * Get the each filed unique values of agents
-   * @param {Object} ctx
-   * @param {Object} request
-   * @param {Object} response
-   * @returns {Array<Object>} unique fileds or ErrorResponse
-   */
-  async getAgentsFieldsUniqueCount(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
-    try {
-      if (!request.params || !request.params.api) throw new Error('Field api is required');
-
-      const config = await this.manageHosts.getHostById(request.params.api);
-
-      const data = await context.wazuh.api.client.asInternalUser.request(
-        'get',
-        `/overview​/agents`,
-        {},
-        { apiHostID: request.body.id }
-      );
-      const responseData = (data || {}).data || {};
-
-      const nodes = responseData.nodes;
-      const groups = responseData.groups;
-      const osPlatforms = responseData.agent_os;
-      const versions = responseData.agent_version;
-      const summary = responseData.agent_status;
-      const lastAgent = responseData.last_registered_agent;
-
-      const result = {
-        groups: [],
-        nodes: [],
-        versions: [],
-        osPlatforms: [],
-        lastAgent: {},
-        summary: {
-          agentsCountActive: 0,
-          agentsCountDisconnected: 0,
-          agentsCountNeverConnected: 0,
-          agentsCountTotal: 0,
-          agentsCoverity: 0,
-        },
-      };
-
-      if (nodes && nodes.items) {
-        result.nodes = nodes.items
-          .filter(item => !!item.node_name && item.node_name !== 'unknown')
-          .map(item => item.node_name);
-      }
-
-      if (groups && groups.items) {
-        result.groups = groups.items.map(item => item.name);
-      }
-
-      if (osPlatforms && osPlatforms.items) {
-        result.osPlatforms = osPlatforms.items
-          .filter(item => !!item.os && item.os.platform && item.os.name && item.os.version)
-          .map(item => item.os);
-      }
-
-      if (versions && versions.items) {
-        result.versions = versions.items.filter(item => !!item.version).map(item => item.version);
-      }
-
-      if (summary) {
-        Object.assign(result.summary, {
-          agentsCountActive: summary.Active,
-          agentsCountDisconnected: summary.Disconnected,
-          agentsCountNeverConnected: summary['Never connected'],
-          agentsCountTotal: summary.Total,
-          agentsCoverity:
-            summary.Total ? ((summary.Active) / (summary.Total)) * 100 : 0,
-        });
-      }
-
-      if (lastAgent) {
-        Object.assign(result.lastAgent, lastAgent);
-      }
-
-      return response.ok({
-        body: { error: 0, result }
-      });
-    } catch (error) {
-      log('wazuh-api:getAgentsFieldsUniqueCount', error.message || error);
-      return ErrorResponse(error.message || error, 3035, 500, response);
     }
   }
 

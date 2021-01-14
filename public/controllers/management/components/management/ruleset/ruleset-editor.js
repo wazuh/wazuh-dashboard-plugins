@@ -41,6 +41,10 @@ import { updateWazuhNotReadyYet } from '../../../../../redux/actions/appStateAct
 import WzRestartClusterManagerCallout from '../../../../../components/common/restart-cluster-manager-callout';
 import { validateXML } from '../configuration/utils/xml';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
+import 'brace/theme/textmate';
+import 'brace/mode/xml';
+import 'brace/snippets/xml';
+import 'brace/ext/language_tools';
 
 class WzRulesetEditor extends Component {
   _isMounted = false;
@@ -270,7 +274,7 @@ class WzRulesetEditor extends Component {
                       <EuiCodeEditor
                         theme="textmate"
                         width="100%"
-                        height={`calc(100vh - ${((showWarningRestart && !xmlError) || wazuhNotReadyYet) ? 250 : (xmlError ? (!showWarningRestart ? 195 : 270) : 175)}px)`}
+                        height={`calc(100vh - ${((showWarningRestart && !xmlError) || wazuhNotReadyYet) ? 300 : (xmlError ? (!showWarningRestart ? 245 : 350) : 230)}px)`}
                         value={content}
                         onChange={newContent =>
                           this.setState({ content: newContent })
@@ -280,7 +284,7 @@ class WzRulesetEditor extends Component {
                         wrapEnabled
                         setOptions={this.codeEditorOptions}
                         aria-label="Code Editor"
-                      ></EuiCodeEditor>
+                      />
                     </EuiFlexItem>
                   </EuiFlexGroup>
                 </EuiFlexItem>

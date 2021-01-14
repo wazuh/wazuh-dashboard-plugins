@@ -12,8 +12,8 @@
 
 import { ManageHosts } from '../lib/manage-hosts';
 import { UpdateRegistry } from '../lib/update-registry';
-import { log } from '../../server/logger';
-import { ErrorResponse } from './error-response';
+import { log } from '../lib/logger';
+import { ErrorResponse } from '../lib/error-response';
 import { APIUserAllowRunAs } from '../lib/cache-api-user-has-run-as';
 import { KibanaRequest, RequestHandlerContext, KibanaResponseFactory } from 'src/core/server';
 
