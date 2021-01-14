@@ -90,7 +90,7 @@ export class Inventory extends Component {
   async loadAgent() {
     const agentPlatform  = ((this.props.agent || {}).os || {}).platform;
     const {totalItemsFile, syscheck} = await this.getItemNumber('file');
-    const totalItemsRegistry = agentPlatform === 'windows' ? await this.getItemNumber('registry') : 0;
+    const totalItemsRegistry = agentPlatform === 'windows' ? await this.getItemNumber('registry_key') : 0;
     const isConfigured = await this.isConfigured();
     if (this._isMount){
       this.setState({ totalItemsFile, totalItemsRegistry, syscheck, isLoading: false, isConfigured });
@@ -160,12 +160,12 @@ export class Inventory extends Component {
     return filter;
   }
   
-  async getItemNumber(type: 'file' | 'registry') {
+  async getItemNumber(type: 'file' | 'registry_key') {
     const agentID = this.props.agent.id;
     const response = await WzRequest.apiReq(
       'GET',
       `/syscheck/${agentID}`,
-      { params: this.buildFilter(type) },
+      { params: this.buildFilter(type) }
     );
     if (type === 'file') {
       return {
