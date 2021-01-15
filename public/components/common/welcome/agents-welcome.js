@@ -37,7 +37,8 @@ import {
 } from '@elastic/eui';
 import { FimEventsTable, ScaScan, MitreTopTactics, RequirementVis } from './components';
 import { AgentInfo } from './agents-info';
-import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
+// import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
+import { TabDescription } from '../../../../server/reporting/tab-description';
 import store from '../../../redux/store';
 import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
 import { ActionAgents } from '../../../react-services/action-agents';
@@ -346,9 +347,9 @@ export class AgentsWelcome extends Component {
           layout="horizontal"
           icon={<EuiIcon size="xl" type={icon} color="primary" />}
           className="homSynopsis__card"
-          title={WAZUH_MODULES[tab].title}
+          title={TabDescription()[tab].title}
           onClick={() => this.props.switchTab(tab)}
-          description={WAZUH_MODULES[tab].description}
+          description={TabDescription()[tab].description}
         />
       </EuiFlexItem>
     );

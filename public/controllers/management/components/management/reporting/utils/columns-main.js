@@ -3,7 +3,7 @@ import { EuiToolTip, EuiButtonIcon } from '@elastic/eui';
 import ReportingHandler from './reporting-handler';
 import moment from 'moment-timezone';
 import { WzButtonPermissions } from '../../../../../../components/common/permissions/button';
-import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../../../../../common/constants';
+import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../../../../../util/constants';
 import { getHttp, getUiSettings } from '../../../../../../kibana-services';
 
 export default class ReportingColums {

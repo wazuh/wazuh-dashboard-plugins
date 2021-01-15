@@ -40,7 +40,7 @@ import { WzDatePicker } from '../../../components/wz-date-picker/wz-date-picker'
 import { withReduxProvider, withGlobalBreadcrumb, withUserAuthorizationPrompt } from '../../../components/common/hocs';
 import { compose } from 'redux';
 
-export default AgentsPreview = compose(
+export const AgentsPreview = compose(
   withReduxProvider,
   withGlobalBreadcrumb([{ text: '' }, { text: 'Agents' }]),
   withUserAuthorizationPrompt([{action: 'agent:read', resource: 'agent:id:*'}])

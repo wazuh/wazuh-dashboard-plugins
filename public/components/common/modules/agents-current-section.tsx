@@ -18,8 +18,9 @@ import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbA
 import { updateCurrentTab } from '../../../redux/actions/appStateActions';
 import store from '../../../redux/store';
 import { connect } from 'react-redux';
-import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
-import { getAngularModule } from '../../../kibana-services';
+import { TabDescription } from '../../../../server/reporting/tab-description';
+// import { WAZUH_MODULES } from '../../../../util/wazuh-modules';
+import { getDataPlugin } from '../../../kibana-services';
 
 class WzCurrentAgentsSection extends Component {
   constructor(props) {
@@ -29,7 +30,7 @@ class WzCurrentAgentsSection extends Component {
   }
 
   setGlobalBreadcrumb() {
-    if (WAZUH_MODULES[this.props.currentTab]) {
+    if (TabDescription[this.props.currentTab]) {
       const breadcrumb = [
         { text: '' },
         {
@@ -45,7 +46,7 @@ class WzCurrentAgentsSection extends Component {
           className: 'wz-global-breadcrumb-btn euiBreadcrumb--truncate',
           truncate: false,
         },
-        { text: WAZUH_MODULES[this.props.currentTab].title },
+        { text: TabDescription[this.props.currentTab].title },
       ];
       store.dispatch(updateGlobalBreadcrumb(breadcrumb));
     }
@@ -54,7 +55,7 @@ class WzCurrentAgentsSection extends Component {
   async componentDidMount() {
     this.setGlobalBreadcrumb();
     store.dispatch(updateCurrentTab(this.props.currentTab));
-    const $injector = getAngularModule().$injector;
+    const $injector = getDataPlugin().$injector;
     this.router = $injector.get('$route');
   }
 
@@ -74,10 +75,10 @@ class WzCurrentAgentsSection extends Component {
   render() {
     return (
       <span>
-        {this.props.currentTab && WAZUH_MODULES[this.props.currentTab] && WAZUH_MODULES[this.props.currentTab].title && (
+        {this.props.currentTab && TabDescription[this.props.currentTab] && TabDescription[this.props.currentTab].title && (
           <EuiTitle size='s'>
             <h2>
-              {WAZUH_MODULES[this.props.currentTab].title}
+              {TabDescription[this.props.currentTab].title}
             </h2>
           </EuiTitle>)}
       </span>
