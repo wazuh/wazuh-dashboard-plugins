@@ -37,6 +37,7 @@ export const MainOverview = compose(withGlobalBreadcrumb([{ text: '' }, { text: 
       });
     }, []);
 
+
     return (
       <EuiFlexGroup direction="column">
         <EuiFlexItem grow={false}>

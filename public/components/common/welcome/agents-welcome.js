@@ -37,7 +37,7 @@ import {
 } from '@elastic/eui';
 import { FimEventsTable, ScaScan, MitreTopTactics, RequirementVis } from './components';
 import { AgentInfo } from './agents-info';
-import { TabDescription } from '../../../../server/reporting/tab-description';
+import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
 import store from '../../../redux/store';
 import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
 import { ActionAgents } from '../../../react-services/action-agents';
@@ -47,13 +47,13 @@ import './welcome.scss';
 import { WzDatePicker } from '../../../components/wz-date-picker/wz-date-picker';
 import KibanaVis from '../../../kibana-integrations/kibana-vis';
 import { VisFactoryHandler } from '../../../react-services/vis-factory-handler';
-import AppState from '../../../react-services/app-state';
+import { AppState } from '../../../react-services/app-state';
 import { FilterHandler } from '../../../utils/filter-handler';
 import { TabVisualizations } from '../../../factories/tab-visualizations';
-import chrome from 'ui/chrome';
 import { updateCurrentAgentData } from '../../../redux/actions/appStateActions';
 import WzTextWithTooltipIfTruncated from '../wz-text-with-tooltip-if-truncated';
 import { UnsupportedComponents } from './../../../utils/components-os-support';
+import { getAngularModule } from '../../../kibana-services';
 
 export class AgentsWelcome extends Component {
   _isMount = false;
@@ -141,7 +141,7 @@ export class AgentsWelcome extends Component {
       null,
       this.props.agent.id
     );
-    const $injector = await chrome.dangerouslyGetActiveInjector();
+    const $injector = getAngularModule().$injector;
     this.router = $injector.get('$route');
     window.addEventListener('resize', this.updateWidth); //eslint-disable-line
   }
@@ -346,9 +346,9 @@ export class AgentsWelcome extends Component {
           layout="horizontal"
           icon={<EuiIcon size="xl" type={icon} color="primary" />}
           className="homSynopsis__card"
-          title={TabDescription[tab].title}
+          title={WAZUH_MODULES[tab].title}
           onClick={() => this.props.switchTab(tab)}
-          description={TabDescription[tab].description}
+          description={WAZUH_MODULES[tab].description}
         />
       </EuiFlexItem>
     );

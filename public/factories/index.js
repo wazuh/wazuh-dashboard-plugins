@@ -14,9 +14,9 @@ import { LoadedVisualizations } from './loaded-visualizations';
 import { DiscoverPendingUpdates } from './discover-pending-updates';
 import { VisHandlers } from './vis-handlers';
 import { Vis2PNG } from './vis2png';
-import { uiModules } from 'ui/modules';
+import { getAngularModule } from '../kibana-services';
 
-const app = uiModules.get('app/wazuh', []);
+const app = getAngularModule();
 
 app
   .service('rawVisualizations', RawVisualizations)

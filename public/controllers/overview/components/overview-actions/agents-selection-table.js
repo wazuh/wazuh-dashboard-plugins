@@ -30,11 +30,10 @@ import {
   EuiToolTip
 } from '@elastic/eui';
 
-import WzRequest from '../../../../react-services/wz-request';
+import { WzRequest } from '../../../../react-services/wz-request';
 import { LEFT_ALIGNMENT, RIGHT_ALIGNMENT, SortableProperties } from '@elastic/eui/lib/services';
 import {  updateCurrentAgentData } from '../../../../redux/actions/appStateActions';
 import  store  from '../../../../redux/store';
-import chrome from 'ui/chrome';
 import { GroupTruncate } from '../../../../components/common/util/agent-group-truncate/'
 import { WzSearchBar, filtersToObject } from '../../../../components/wz-search-bar';
 import { getAgentFilterValues } from '../../../../controllers/management/components/management/groups/get-agents-filters-values';
@@ -155,8 +154,6 @@ export class AgentSelectionTable extends Component {
 
   async componentDidMount() {
     this._isMounted = true;
-    const $injector = await chrome.dangerouslyGetActiveInjector();
-    this.router = $injector.get('$route');
     const tmpSelectedAgents = {};
     if(!store.getState().appStateReducers.currentAgentData.id){
       tmpSelectedAgents[store.getState().appStateReducers.currentAgentData.id] = true;

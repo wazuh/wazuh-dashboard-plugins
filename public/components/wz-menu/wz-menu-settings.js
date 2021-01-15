@@ -11,10 +11,10 @@
  */
 import React, { Component } from 'react';
 import { EuiFlexItem, EuiFlexGroup, EuiSideNav, EuiIcon, EuiButtonEmpty, EuiToolTip } from '@elastic/eui';
-import WzRequest from '../../react-services/wz-request';
+import { WzRequest } from '../../react-services/wz-request';
 import { connect } from 'react-redux';
 import { AppNavigate } from '../../react-services/app-navigate';
-import chrome from 'ui/chrome';
+import { getAngularModule } from '../../kibana-services';
 
 class WzMenuSettings extends Component {
   constructor(props) {
@@ -63,7 +63,7 @@ class WzMenuSettings extends Component {
     this.props.closePopover();
     AppNavigate.navigateToModule(ev, 'settings', { tab: section });
     if (this.props.currentMenuTab === 'settings') {
-      const $injector = await chrome.dangerouslyGetActiveInjector();
+      const $injector = getAngularModule().$injector;
       const router = $injector.get('$route');
       router.reload();
     }

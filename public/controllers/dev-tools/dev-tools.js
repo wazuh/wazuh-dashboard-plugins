@@ -11,18 +11,18 @@
  */
 import CodeMirror from '../../utils/codemirror/lib/codemirror';
 import jsonLint from '../../utils/codemirror/json-lint';
-import { ExcludedIntelliSenseTriggerKeys } from '../../../util/excluded-devtools-autocomplete-keys';
+import { ExcludedIntelliSenseTriggerKeys } from './excluded-devtools-autocomplete-keys';
 import queryString from 'querystring-browser';
 import $ from 'jquery';
 import * as FileSaver from '../../services/file-saver';
-import chrome from 'ui/chrome';
 import { DynamicHeight } from '../../utils/dynamic-height';
-import AppState from '../../react-services/app-state';
+import { AppState } from '../../react-services/app-state';
 import { GenericRequest } from '../../react-services/generic-request';
 import store from '../../redux/store';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
-import WzRequest from '../../react-services/wz-request';
+import { WzRequest } from '../../react-services/wz-request';
 import { ErrorHandler } from '../../react-services/error-handler';
+import { getUiSettings } from '../../kibana-services';
 
 export class DevToolsController {
   /**
@@ -42,7 +42,7 @@ export class DevToolsController {
     this.linesWithClass = [];
     this.widgets = [];
     this.multipleKeyPressed = [];
-    this.IS_DARK_THEME = chrome.getUiSettingsClient().get('theme:darkMode');
+    this.IS_DARK_THEME = getUiSettings().get('theme:darkMode');
     this.$scope = $scope;
   }
 
@@ -91,7 +91,7 @@ export class DevToolsController {
       }
     );
     // Register plugin for code mirror
-    CodeMirror.commands.autocomplete = function(cm) {
+    CodeMirror.commands.autocomplete = function (cm) {
       CodeMirror.showHint(cm, CodeMirror.hint.dictionaryHint, {
         completeSingle: false
       });
@@ -356,7 +356,7 @@ export class DevToolsController {
     this.apiInputBox.setSize('auto', '100%');
     this.apiInputBox.model = [];
     this.getAvailableMethods();
-    this.apiInputBox.on('keyup', function(cm, e) {
+    this.apiInputBox.on('keyup', function (cm, e) {
       if (!ExcludedIntelliSenseTriggerKeys[(e.keyCode || e.which).toString()]) {
         cm.execCommand('autocomplete', null, {
           completeSingle: false
@@ -367,7 +367,7 @@ export class DevToolsController {
     const currentState = AppState.getCurrentDevTools();
     if (!currentState) {
       const demoStr =
-        'GET /agents?status=active\n\n#Example comment\nGET /manager/info\n\nGET /syscollector/000/packages?search=ssh&limit=1\n\nPOST /agents\n' +
+        'GET /agents?status=active\n\n# Example comment\n\n# You can use ? after the endpoint \n# in order to get suggestions \n# for your query params\n\nGET /manager/info\n\nGET /syscollector/000/packages?search=ssh&limit=1\n\nPOST /agents\n' +
         JSON.stringify({ name: "NewAgent" }, null, 2);
 
       AppState.setCurrentDevTools(demoStr);
@@ -380,7 +380,7 @@ export class DevToolsController {
     this.highlightGroup(currentGroup);
     const self = this;
     // Register our custom Codemirror hint plugin.
-    CodeMirror.registerHelper('hint', 'dictionaryHint', function(editor) {
+    CodeMirror.registerHelper('hint', 'dictionaryHint', function (editor) {
       const model = editor.model;
       function getDictionary(line, word) {
         let hints = [];
@@ -395,66 +395,70 @@ export class DevToolsController {
         const inputHttpMethodEndpoints = (model.find(item => item.method === inputHttpMethod) || {}).endpoints || [];
         // Find the API endpoint in the request
         const apiEndpoint = inputHttpMethodEndpoints
-            .map(endpoint => ({...endpoint, splitURL: endpoint.name.split('/').filter(item => item)}))
-            .filter(endpoint => endpoint.splitURL.length === inputEndpoint.length)
-            .find(endpoint => endpoint.splitURL.reduce((accum,str,index) => accum && (str.startsWith(':') ? true : str.toLowerCase() === inputEndpoint[index]),true));
+          .map(endpoint => ({ ...endpoint, splitURL: endpoint.name.split('/').filter(item => item) }))
+          .filter(endpoint => endpoint.splitURL.length === inputEndpoint.length)
+          .find(endpoint => endpoint.splitURL.reduce((accum, str, index) => accum && (str.startsWith(':') ? true : str.toLowerCase() === inputEndpoint[index]), true));
         // Get API endpoint path hints
-        if(exp[0] && currentGroup && currentGroup.start === editorCursor.line && !word.includes('{')){
+        if (exp[0] && currentGroup && currentGroup.start === editorCursor.line && !word.includes('{')) {
           // Get hints for requests as: http_method api_path?query_params
-          if(inputHttpMethod && inputPath && inputQueryParamsStart){
+          if (inputHttpMethod && inputPath && inputQueryParamsStart) {
             // Split the query params as {key, value}[] where key=value in query param
             const inputQuery = inputQueryParams && inputQueryParams.split('&').filter(item => item).map(item => {
               const [key, value] = item.split('=');
               return { key, value };
             }) || [];
             // It is defining query param value query_param=
-            const definingQueryParamValue = inputQueryParams && inputQueryParams.includes('&') ? inputRequest.lastIndexOf('=') > inputRequest.lastIndexOf('&') : (inputRequest.lastIndexOf('=') > inputRequest.lastIndexOf('?'));
-            
-            if(!definingQueryParamValue && apiEndpoint && apiEndpoint.query){
+            const definingQueryParamValue =
+              inputQueryParams && inputQueryParams.includes('&')
+                ? inputRequest.lastIndexOf('=') > inputRequest.lastIndexOf('&')
+                : !!(inputQueryParams || '').includes('?') || (inputRequest.lastIndexOf('=') > inputRequest.lastIndexOf('?'));
+
+            if (!definingQueryParamValue && apiEndpoint && apiEndpoint.query) {
               const inputQueryPreviousEntriesKeys = inputQuery.filter(query => query.key && query.value).map(query => query.key);
               hints = apiEndpoint.query
                 .filter(query => !inputQueryPreviousEntriesKeys.includes(query.name))
                 .map(item => `${inputPath}${inputQuery
                   .filter(query => query.key && query.value)
                   .reduce((accum, query, index) => `${accum}${index > 0 ? '&' : ''}${query.key}=${query.value}`, '?')}${inputQuery.filter(query => query.key && query.value).length > 0 ? '&' : ''}${item.name}=`)
+
             };
-          }else if(inputHttpMethod){
+          } else if (inputHttpMethod) {
             // Get hints for all http method endpoint
-            if(!inputPath){
+            if (!inputPath) {
               hints = inputHttpMethodEndpoints
                 .map(endpoint => endpoint.name);
-            }else{
+            } else {
               // Get hints for requests as: http_method api_path
               hints = inputHttpMethodEndpoints
-                .map(endpoint => ({...endpoint, splitURL: endpoint.name.split('/').filter(item => item)}))
+                .map(endpoint => ({ ...endpoint, splitURL: endpoint.name.split('/').filter(item => item) }))
                 .filter(endpoint => endpoint.splitURL.reduce((accum, splitPath, index) => {
-                    if(!accum){ return accum };
-                    if(splitPath.startsWith(':') || !inputEndpoint[index] || (inputEndpoint[index] && splitPath.startsWith(inputEndpoint[index]))){
-                      return true;
-                    };
-                  }, true)
-                ).map(endpoint => endpoint.splitURL.reduce((accum, splitPath, index) => 
-                    `${accum}/${splitPath.startsWith(':') && inputEndpoint[index] || splitPath}`
+                  if (!accum) { return accum };
+                  if (splitPath.startsWith(':') || !inputEndpoint[index] || (inputEndpoint[index] && splitPath.startsWith(inputEndpoint[index]))) {
+                    return true;
+                  };
+                }, true)
+                ).map(endpoint => endpoint.splitURL.reduce((accum, splitPath, index) =>
+                  `${accum}/${splitPath.startsWith(':') && inputEndpoint[index] || splitPath}`
                   , '')
                 );
             }
           }
-        // Get API endpoint body params hints
-        } else if(currentGroup && currentGroup.requestText && currentGroup.requestTextJson && currentGroup.start < editorCursor.line && currentGroup.end > editorCursor.line){
-          const reLineStart = /^(\s*)(?:"|')(\S*)(?::)?$/; // Line starts with 
+          // Get API endpoint body params hints
+        } else if (currentGroup && currentGroup.requestText && currentGroup.requestTextJson && currentGroup.start < editorCursor.line && currentGroup.end > editorCursor.line) {
+          const reLineStart = /^(\s*)(?:"|')(\S*)(?::)?$/; // Line starts with
           const spaceLineStart = (line.match(reLineStart) || [])[1] || '';
           const inputKeyBodyParam = (line.match(reLineStart) || [])[2] || '';
 
           const renderBodyParam = (parameter, spaceLineStart) => {
             let valueBodyParam = '';
-            if(parameter.type === 'string'){
+            if (parameter.type === 'string') {
               valueBodyParam = '""'
-            }else if(parameter.type === 'array'){
+            } else if (parameter.type === 'array') {
               valueBodyParam = '[]'
-            }else if (parameter.type === 'object'){
+            } else if (parameter.type === 'object') {
               const paramPropertiesKeys = Object.keys(parameter.properties).sort();
               const lastIndex = paramPropertiesKeys.length - 1;
-              valueBodyParam = `{\n${paramPropertiesKeys.map((keyProperty, index) => `${spaceLineStart}\t${renderBodyParam({name: keyProperty,...parameter.properties[keyProperty]},spaceLineStart + '\t')}${lastIndex !== index ? ',' : ''}`).join('\n')}\n${spaceLineStart}}`
+              valueBodyParam = `{\n${paramPropertiesKeys.map((keyProperty, index) => `${spaceLineStart}\t${renderBodyParam({ name: keyProperty, ...parameter.properties[keyProperty] }, spaceLineStart + '\t')}${lastIndex !== index ? ',' : ''}`).join('\n')}\n${spaceLineStart}}`
             }
             return `"${parameter.name}": ${valueBodyParam}`;
           };
@@ -462,8 +466,8 @@ export class DevToolsController {
           const getInnerKeysBodyRequest = () => {
             let jsonBodyKeyCurrent = [];
             let jsonBodyKeyCurrentPosition = {
-              start : {line: currentGroup.start, ch: 0},
-              end: {line: currentGroup.start, ch: 0}
+              start: { line: currentGroup.start, ch: 0 },
+              end: { line: currentGroup.start, ch: 0 }
             };
             return ([...Array(currentGroup.end + 1 - currentGroup.start).keys()])
               .reduce((jsonBodyKeyCursor, lineNumberRange) => {
@@ -472,62 +476,69 @@ export class DevToolsController {
                 const openBracket = editorLineContent.indexOf('{');
                 const closeBracket = editorLineContent.indexOf('}');
                 const keyOpenBracket = (editorLineContent.match(/\s*"(\S+)"\s*:\s*\{/) || [])[1];
-                keyOpenBracket && jsonBodyKeyCurrent.push(keyOpenBracket) && (jsonBodyKeyCurrentPosition.start = {line: editorLineNumber, ch: openBracket});
+                keyOpenBracket && jsonBodyKeyCurrent.push(keyOpenBracket) && (jsonBodyKeyCurrentPosition.start = { line: editorLineNumber, ch: openBracket });
 
-                closeBracket !== -1 && (jsonBodyKeyCurrentPosition.end = {line: editorLineNumber, ch: closeBracket});
-                if(!jsonBodyKeyCursor && editorCursor.line > jsonBodyKeyCurrentPosition.start.line
-                  && editorCursor.line < jsonBodyKeyCurrentPosition.end.line){
-                    jsonBodyKeyCursor = [...jsonBodyKeyCurrent];
+                closeBracket !== -1 && (jsonBodyKeyCurrentPosition.end = { line: editorLineNumber, ch: closeBracket });
+                if (!jsonBodyKeyCursor && editorCursor.line > jsonBodyKeyCurrentPosition.start.line
+                  && editorCursor.line < jsonBodyKeyCurrentPosition.end.line) {
+                  jsonBodyKeyCursor = [...jsonBodyKeyCurrent];
                 };
                 closeBracket !== -1 && jsonBodyKeyCurrent.pop();
                 return jsonBodyKeyCursor
               }, false);
           }
           const getInnerPropertyBodyParamObject = (object, keys) => {
-            if(!keys || !keys.length){
+            if (!keys || !keys.length) {
               return object;
             }
             const key = keys.shift();
-            if(!object.properties || !object.properties[key] || object.properties[key].type !== 'object'){
+            if (!object.properties || !object.properties[key] || object.properties[key].type !== 'object') {
               return [];
             }
             return getInnerPropertyBodyParamObject(object.properties[key], keys);
           };
 
-          if(apiEndpoint && apiEndpoint.body && reLineStart.test(line)){
+          if (apiEndpoint && apiEndpoint.body && reLineStart.test(line)) {
             let inputBodyPreviousKeys;
             let paramsBody = apiEndpoint.body;
             let requestBodyCursorKeys;
-            if(apiEndpoint.body[0].type === 'object'){
+            if (apiEndpoint.body[0].type === 'object') {
               requestBodyCursorKeys = getInnerKeysBodyRequest();
               const paramInnerBody = getInnerPropertyBodyParamObject(apiEndpoint.body[0], [...requestBodyCursorKeys]);
-              paramsBody = Object.keys(paramInnerBody.properties).sort().map(keyBodyParam => ({name:keyBodyParam, ...paramInnerBody.properties[keyBodyParam]}));
+              paramsBody = Object.keys(paramInnerBody.properties).sort().map(keyBodyParam => ({ name: keyBodyParam, ...paramInnerBody.properties[keyBodyParam] }));
             };
-            try{
+            try {
               const bodySanitizedBodyParam = currentGroup.requestTextJson.replace(/(,\s*"\S*\s*)\}/g, '}');
-              inputBodyPreviousKeys = Object.keys((requestBodyCursorKeys || []).reduce((acumm, key) => acumm[key],JSON.parse(bodySanitizedBodyParam)));
-            }catch(error){
+              inputBodyPreviousKeys = Object.keys((requestBodyCursorKeys || []).reduce((acumm, key) => acumm[key], JSON.parse(bodySanitizedBodyParam)));
+            } catch (error) {
               inputBodyPreviousKeys = [];
             };
-            
+
             hints = paramsBody
-              .filter(bodyParam => !inputBodyPreviousKeys.includes(bodyParam.name) && bodyParam.name && ( inputKeyBodyParam ? bodyParam.name.includes(inputKeyBodyParam) : true))
+              .filter(bodyParam => !inputBodyPreviousKeys.includes(bodyParam.name) && bodyParam.name && (inputKeyBodyParam ? bodyParam.name.includes(inputKeyBodyParam) : true))
               .map(bodyParam => ({
                 text: renderBodyParam(bodyParam, spaceLineStart),
                 _moveCursor: ['string', 'array'].includes(bodyParam.type),
                 displayText: bodyParam.name,
                 bodyParam,
                 hint: (cm, self, data) => {
-                  editor.replaceRange(line.replace(/\S+/,'')+data.text, { line: editorCursor.line, ch: editorCursor.ch }, { line: editorCursor.line, ch: 0 });
+                  editor.replaceRange(line.replace(/\S+/, '') + data.text, { line: editorCursor.line, ch: editorCursor.ch }, { line: editorCursor.line, ch: 0 });
                   const textReplacedLine = editor.getLine(editorCursor.line);
-                  editor.setCursor({line: editorCursor.line, ch: data._moveCursor ? textReplacedLine.length - 1 : textReplacedLine.length});
+                  editor.setCursor({ line: editorCursor.line, ch: data._moveCursor ? textReplacedLine.length - 1 : textReplacedLine.length });
                 }
               }));
           };
         } else {
           hints = model.map(a => a.method);
         }
-        return hints;
+        const final_hints = hints.map(chain => {
+          let t = 0;
+          return chain = chain.replace(/\?/g, (match) => {
+            t++;
+            return t > 1 ? '' : match
+          });
+        })
+        return final_hints;
       }
 
       const cur = editor.getCursor();
@@ -542,22 +553,22 @@ export class DevToolsController {
       return {
         list: (!curWord
           ? []
-          : getDictionary(curLine, curWord).filter(function(item) {
-              const text = item.text || item;
-              return text.toUpperCase().includes(curWord.toUpperCase());
-            })
+          : getDictionary(curLine, curWord).filter(function (item) {
+            const text = item.text || item;
+            return text.toUpperCase().includes(curWord.toUpperCase());
+          })
         ).sort(),
         from: CodeMirror.Pos(cur.line, start),
         to: CodeMirror.Pos(cur.line, end)
       };
     });
     const evtDocument = this.$document[0];
-    $('.wz-dev-column-separator').mousedown(function(e) {
+    $('.wz-dev-column-separator').mousedown(function (e) {
       e.preventDefault();
       $('.wz-dev-column-separator').addClass('active');
       const leftOrigWidth = $('#wz-dev-left-column').width();
       const rightOrigWidth = $('#wz-dev-right-column').width();
-      $(evtDocument).mousemove(function(e) {
+      $(evtDocument).mousemove(function (e) {
         const leftWidth = e.pageX - 85 + 14;
         let rightWidth = leftOrigWidth - leftWidth;
         $('#wz-dev-left-column').css('width', leftWidth);
@@ -565,7 +576,7 @@ export class DevToolsController {
       });
     });
 
-    $(evtDocument).mouseup(function() {
+    $(evtDocument).mouseup(function () {
       $('.wz-dev-column-separator').removeClass('active');
       $(evtDocument).unbind('mousemove');
     });
@@ -597,10 +608,10 @@ export class DevToolsController {
       const desiredGroup = firstTime
         ? this.groups.filter(item => item.requestText)
         : this.groups.filter(
-            item =>
-              item.requestText &&
-              (item.end >= selection.line && item.start <= selection.line)
-          );
+          item =>
+            item.requestText &&
+            (item.end >= selection.line && item.start <= selection.line)
+        );
 
       // Place play button at first line from the selected group
       const cords = this.apiInputBox.cursorCoords({
@@ -626,12 +637,12 @@ export class DevToolsController {
         const inputHttpMethodEndpoints = (this.apiInputBox.model.find(item => item.method === inputHttpMethod) || {}).endpoints || [];
         // Find the API endpoint in the request
         const apiEndpoint = inputHttpMethodEndpoints
-            .map(endpoint => ({...endpoint, splitURL: endpoint.name.split('/').filter(item => item)}))
-            .filter(endpoint => endpoint.splitURL.length === inputEndpoint.length)
-            .find(endpoint => endpoint.splitURL.reduce((accum,str,index) => accum && (str.startsWith(':') ? true : str.toLowerCase() === inputEndpoint[index]),true));
-        if(apiEndpoint && apiEndpoint.documentation){
+          .map(endpoint => ({ ...endpoint, splitURL: endpoint.name.split('/').filter(item => item) }))
+          .filter(endpoint => endpoint.splitURL.length === inputEndpoint.length)
+          .find(endpoint => endpoint.splitURL.reduce((accum, str, index) => accum && (str.startsWith(':') ? true : str.toLowerCase() === inputEndpoint[index]), true));
+        if (apiEndpoint && apiEndpoint.documentation) {
           $('#wazuh_dev_tools_documentation').attr('href', apiEndpoint.documentation).show();
-        }else{
+        } else {
           $('#wazuh_dev_tools_documentation').attr('href', '').hide();
         }
       }
@@ -678,12 +689,12 @@ export class DevToolsController {
         const method = desiredGroup.requestText.startsWith('GET')
           ? 'GET'
           : desiredGroup.requestText.startsWith('POST')
-          ? 'POST'
-          : desiredGroup.requestText.startsWith('PUT')
-          ? 'PUT'
-          : desiredGroup.requestText.startsWith('DELETE')
-          ? 'DELETE'
-          : 'GET';
+            ? 'POST'
+            : desiredGroup.requestText.startsWith('PUT')
+              ? 'PUT'
+              : desiredGroup.requestText.startsWith('DELETE')
+                ? 'DELETE'
+                : 'GET';
 
         let requestCopy = desiredGroup.requestText.includes(method)
           ? desiredGroup.requestText.split(method)[1].trim()
@@ -725,12 +736,12 @@ export class DevToolsController {
         if (typeof JSONraw === 'object') JSONraw.devTools = true;
         if (!firstTime) {
           const output = await this.wzRequest.apiReq(method, path, JSONraw);
-          if(typeof output === 'string' && output.includes('3029')) {
+          if (typeof output === 'string' && output.includes('3029')) {
             this.apiOutputBox.setValue('This method is not allowed without admin mode');
           }
           else {
             this.apiOutputBox.setValue(
-              JSON.stringify((output || {}).data || {}, null, 2).replace(
+              JSON.stringify((output || {}).data || {}, null, 2).replace(
                 /\\\\/g,
                 '\\'
               )
