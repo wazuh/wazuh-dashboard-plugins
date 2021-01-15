@@ -12,7 +12,9 @@
     "kibanaLegacy",
     "uiActions",
     "charts",
-    "savedObjects"
+    "savedObjects",
+    "kibanaReact",
+    "kibanaUtils"
   ],
   "optionalPlugins": ["security", "opendistroSecurityKibana", "searchguard", "spaces"],
   "server": true,
