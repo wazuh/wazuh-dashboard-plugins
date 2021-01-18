@@ -24,6 +24,7 @@ import {
 } from './types';
 import { Cookies } from 'react-cookie';
 import { AppState } from './react-services/app-state';
+import appIcon from './assets/icon_blue.svg';
 
 const innerAngularName = 'app/wazuh';
 
@@ -36,7 +37,7 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupDep
     core.application.register({
       id: `wazuh`,
       title: 'Wazuh',
-      icon: 'plugins/wazuh/assets/icon_blue.png',
+      icon: appIcon,
       mount: async (params: AppMountParameters) => {
         if (!this.initializeInnerAngular) {
           throw Error('Wazuh plugin method initializeInnerAngular is undefined');

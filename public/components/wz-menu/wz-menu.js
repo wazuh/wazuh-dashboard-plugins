@@ -42,6 +42,7 @@ import { WzGlobalBreadcrumbWrapper } from '../common/globalBreadcrumb/globalBrea
 import { AppNavigate } from '../../react-services/app-navigate';
 import WzTextWithTooltipIfTruncated from '../../components/common/wz-text-with-tooltip-if-truncated';
 import { getDataPlugin } from '../../kibana-services';
+import appMenuLogo from '../../assets/logotype.svg';
 
 const sections = {
   'overview': 'overview',
@@ -728,7 +729,6 @@ class WzMenu extends Component {
     );
 
 
-    const logotype_url = getHttp().basePath.prepend('/plugins/wazuh/assets/logotype.svg');
     const mainButton = (
       <button className="eui" onClick={() => this.switchMenuOpened()}>
         <EuiFlexGroup
@@ -737,7 +737,7 @@ class WzMenu extends Component {
           style={{ paddingTop: 2 }}
         >
           <EuiFlexItem grow={false} style={{ marginRight: 0 }}>
-            <img src={logotype_url} className="navBarLogo" alt=""></img>
+            <img src={appMenuLogo} className="navBarLogo" alt=""></img>
           </EuiFlexItem>
           <EuiFlexItem grow={false} style={{ margin: '12px 6px' }}>
             {this.state.menuOpened && (

@@ -11,6 +11,7 @@ import { SavedObject } from '../../react-services/saved-objects';
 import { ErrorHandler } from '../../react-services/error-handler';
 import { WAZUH_MONITORING_PATTERN } from '../../../common/constants';
 import { checkKibanaSettings, checkKibanaSettingsTimeFilter } from './lib';
+import appIcon from '../../assets/icon_blue.svg';
 
 export class HealthCheck extends Component {
     checkPatternCount = 0;
@@ -372,11 +373,10 @@ export class HealthCheck extends Component {
     }
 
     render() {
-        const logo_url = getHttp().basePath.prepend('/plugins/wazuh/assets/icon_blue.svg');
         return (
             <div className="health-check">
                 <EuiLoadingSpinner className="health-check-loader" />
-                <img src={logo_url} className="health-check-logo" alt=""></img>
+                <img src={appIcon} className="health-check-logo" alt=""></img>
                 <div className="margin-top-30">
                     <EuiDescriptionList
                         textStyle="reverse"
