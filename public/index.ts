@@ -1,8 +1,8 @@
 import { PluginInitializer, PluginInitializerContext } from 'kibana/public';
 import { WazuhPlugin } from './plugin';
-import { WazuhSetup, WazuhSetupDeps, WazuhStart, WazuhStartDeps } from './types';
+import { WazuhSetup, WazuhSetupPlugins, WazuhStart, WazuhStartPlugins } from './types';
 
-export const plugin: PluginInitializer<WazuhSetup, WazuhStart, WazuhSetupDeps, WazuhStartDeps> = (
+export const plugin: PluginInitializer<WazuhSetup, WazuhStart, WazuhSetupPlugins, WazuhStartPlugins> = (
   initializerContext: PluginInitializerContext
 ) => {
   return new WazuhPlugin(initializerContext);

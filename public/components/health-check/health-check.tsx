@@ -270,8 +270,11 @@ export class HealthCheck extends Component {
                 getToasts().remove(toast.id);
                 errors.push(`Error trying to create ${pattern} index pattern: ${error.message}`);
                 results[itemId].description = <span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span>;
-                this.setState({ results });
+                this.setState({ results, errors });
             }
+        }else{
+            results[itemId].description = <span><EuiIcon type="check" color="secondary" ></EuiIcon> Ready</span>;
+            this.setState({ results });
         }
     }
 
@@ -334,6 +337,8 @@ export class HealthCheck extends Component {
                     await Promise.all([
                         this.checkPatterns(),
                         this.checkApiConnection(),
+                    ]);
+                    await Promise.all([
                         this.checkSupportPattern(configuration['wazuh.monitoring.pattern'], 5),
                         this.checkSupportPattern(`${configuration['cron.prefix']}-${configuration['cron.statistics.index.name']}-*`, 6),
                     ]);
@@ -360,7 +365,6 @@ export class HealthCheck extends Component {
                             return;
                         }, 300);
                     }
-                    return;
                 });
         } catch (error) {
             this.handleError(error);
