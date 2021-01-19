@@ -353,27 +353,6 @@ export class RegisterAgent extends Component {
     }
   };
 
-  checkMissingSYSSelection(){
-    if(!this.state.selectedOS){
-      return ['Operating system'];
-    };
-    switch (this.state.selectedOS) {
-      case 'rpm':
-        return [
-          ...(!this.state.selectedVersion ? ['OS version'] : []),
-          ...(this.state.selectedVersion && !this.state.selectedArchitecture ? ['OS architecture'] : []),
-          ...(this.state.selectedVersion && this.state.selectedArchitecture && !this.state.selectedSYS ? ['System manager'] : []),
-        ];
-      case 'deb':
-        return [
-          ...(!this.state.selectedArchitecture ? ['OS architecture'] : []),
-          ...(this.state.selectedArchitecture && !this.state.selectedSYS ? ['System manager'] : [])
-        ];
-      default:
-        return [];
-    }
-  }
-
   checkNeedSystemdOrSysV(os){
     if(os === 'rpm'){
       return true;
@@ -384,7 +363,6 @@ export class RegisterAgent extends Component {
 
   render() {
     const missingOSSelection = this.checkMissingOSSelection();
-    const missingSYSSelection = this.checkMissingSYSSelection();
     const ipInput = (
       <EuiText>
         <p>
