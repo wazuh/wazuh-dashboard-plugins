@@ -32,7 +32,7 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
   public initializeInnerAngular?: () => void;
   private innerAngularInitialized: boolean = false;
 
-  public setup(core: CoreSetup, { visualizations } : WazuhSetupPlugins): WazuhSetup {
+  public setup(core: CoreSetup, plugins: WazuhSetupPlugins): WazuhSetup {
     core.application.register({
       id: `wazuh`,
       title: 'Wazuh', 
@@ -60,7 +60,6 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
       },
 
     });
-    visualizations.hideTypes([]);
     return {};
   }
 

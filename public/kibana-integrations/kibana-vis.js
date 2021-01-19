@@ -22,9 +22,7 @@ import { TabVisualizations } from "../factories/tab-visualizations";
 import store from "../redux/store";
 import { updateMetric } from "../redux/actions/visualizationsActions";
 import { GenericRequest } from "../react-services/generic-request";
-import { Vis } from "../../../../src/plugins/visualizations/public";
 import { createSavedVisLoader } from "./visualizations/saved_visualizations";
-import { TypesService } from "../../../../src/plugins/visualizations/public";
 import {
   EuiLoadingChart,
   EuiLoadingSpinner,
@@ -66,10 +64,9 @@ class KibanaVis extends Component {
       chrome: getChrome(),
       overlays: getOverlays(),
     };
-    this.visualizationTypes = getVisualizationsPlugin();
     const servicesForVisualizations = {
       ...services,
-      ...{ visualizationTypes: this.visualizationTypes },
+      ...{ visualizationTypes: getVisualizationsPlugin() },
     };
     this.savedObjectLoaderVisualize = createSavedVisLoader(
       servicesForVisualizations
@@ -199,14 +196,6 @@ class KibanaVis extends Component {
     }
   };
 
-  getType(visType) {
-    const type = this.visualizationTypes.get(visType);
-    if (!type) {
-      throw new Error(`Invalid visualization type "${visType}"`);
-    }
-    return type;
-  }
-
   myRender = async (raw) => {
     const timefilter = getDataPlugin().query.timefilter.timefilter;
     try {
@@ -246,9 +235,7 @@ class KibanaVis extends Component {
           // Visualization doesn't need "hits"
           this.visualization.searchSource.setField('size', 0);
           const visState = await getVisualizationsPlugin().convertToSerializedVis(this.visualization);        
-          Vis.prototype.getType = (type) => this.getType(type);
-          const vis = new Vis(this.visualization.visState.type, visState);
-          await vis.setState(visState);
+          const vis = await getVisualizationsPlugin().createVis(this.visualization.visState.type, visState);
           this.visHandler = await getVisualizationsPlugin().__LEGACY.createVisEmbeddableFromObject(
             vis,
             visInput
