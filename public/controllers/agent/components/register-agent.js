@@ -128,8 +128,8 @@ export class RegisterAgent extends Component {
       udpProtocol: false
     };
     this.restartAgentCommand = {
-      rpm: this.isRPM(),
-      deb: 'update-rc.d wazuh-agent defaults 95 10\nsudo service wazuh-agent start',
+      rpm: this.systemSelector(),
+      deb: this.systemSelector(),
       macos: 'sudo /Library/Ossec/bin/ossec-control start',
     }
   }
@@ -206,15 +206,25 @@ export class RegisterAgent extends Component {
   }
 
   selectOS(os) {
-    this.setState({ selectedOS: os, selectedVersion: '', selectedArchitecture: '' });
+    this.setState({ selectedOS: os, selectedVersion: '', selectedArchitecture: '', selectedSYS: '' });
   }
 
-  isRPM(){
-    if(this.state.selectedSYS === "systemd"){
-      return 'systemctl daemon-reload\nsystemctl enable wazuh-agent\nsystemctl start wazuh-agent';
+  systemSelector(){
+    if(this.state.selectedOS === 'rpm'){
+      if(this.state.selectedSYS === 'systemd'){
+        return 'systemctl daemon-reload\nsystemctl enable wazuh-agent\nsystemctl start wazuh-agent';
+      }
+      else
+        return 'chkconfig --add wazuh-agent\nservice wazuh-agent start';
     }
-    else
-      return 'chkconfig --add wazuh-agent\nservice wazuh-agent start';
+    else if(this.state.selectedOS === 'deb'){
+      if(this.state.selectedSYS === 'systemd'){
+        return 'systemctl daemon-reload\nsystemctl enable wazuh-agent\nsystemctl start wazuh-agent';
+      }
+      else
+        return 'update-rc.d wazuh-agent defaults 95 10\nsudo service wazuh-agent start';
+    }
+    
   }
 
   selectSYS(sys){
@@ -332,11 +342,11 @@ export class RegisterAgent extends Component {
       case 'rpm':
         return [
           ...(!this.state.selectedVersion ? ['OS version'] : []),
-          ...(this.state.selectedVersion && !this.state.selectedArchitecture ? ['OS architecture'] : [])
+          ...(this.state.selectedVersion && !this.state.selectedArchitecture ? ['OS architecture'] : []),
         ];
       case 'deb':
         return [
-          ...(!this.state.selectedArchitecture ? ['OS architecture'] : [])
+          ...(!this.state.selectedArchitecture ? ['OS architecture'] : []),
         ];
       default:
         return [];
@@ -344,11 +354,24 @@ export class RegisterAgent extends Component {
   };
 
   checkMissingSYSSelection(){
-    if(!this.state.selectedSYS){
-      return [`SYS`];
+    if(!this.state.selectedOS){
+      return ['Operating system'];
+    };
+    switch (this.state.selectedOS) {
+      case 'rpm':
+        return [
+          ...(!this.state.selectedVersion ? ['OS version'] : []),
+          ...(this.state.selectedVersion && !this.state.selectedArchitecture ? ['OS architecture'] : []),
+          ...(this.state.selectedVersion && this.state.selectedArchitecture && !this.state.selectedSYS ? ['System manager'] : []),
+        ];
+      case 'deb':
+        return [
+          ...(!this.state.selectedArchitecture ? ['OS architecture'] : []),
+          ...(this.state.selectedArchitecture && !this.state.selectedSYS ? ['System manager'] : [])
+        ];
+      default:
+        return [];
     }
-    else
-      return [];
   }
 
   checkNeedSystemdOrSysV(os){
@@ -458,9 +481,9 @@ export class RegisterAgent extends Component {
           <EuiFlexGroup direction="column">
             <EuiText>
               <EuiCodeBlock style={codeBlock} language={language}>
-                {this.isRPM()}
+                {this.systemSelector()}
               </EuiCodeBlock>
-              <EuiCopy textToCopy={this.isRPM()}>
+              <EuiCopy textToCopy={this.systemSelector()}>
                 {copy => (
                   <EuiButton
                     fill
@@ -537,7 +560,7 @@ export class RegisterAgent extends Component {
             />  
           : <div>{guide}</div>
       },
-      ...((this.state.selectedOS == 'rpm') ? [{
+      ...((this.state.selectedOS == 'rpm') || (this.state.selectedOS == 'deb') ? [{
         title: 'Choose the system manager',
         children: <EuiButtonGroup
         color='primary'
@@ -547,7 +570,7 @@ export class RegisterAgent extends Component {
       />
       }] : []),
 
-      ...((this.state.selectedOS == 'rpm') ? [{
+      ...((this.state.selectedOS == 'rpm') || (this.state.selectedOS == 'deb') ? [{
         title: 'Start the agent',
         children: missingSYSSelection.length
           ? <EuiCallOut
@@ -558,7 +581,7 @@ export class RegisterAgent extends Component {
           : <div>{guideSYS}</div>
         }] : []),
 
-      ...(!missingOSSelection.length && (this.state.selectedOS !== 'rpm') && restartAgentCommand ? [
+      ...(!missingOSSelection.length && (this.state.selectedOS !== 'rpm') && (this.state.selectedOS !== 'deb') && restartAgentCommand ? [
         {
           title: 'Start the agent',
           children: (
