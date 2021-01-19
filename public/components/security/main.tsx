@@ -16,7 +16,7 @@ import { Policies } from './policies/policies';
 import { RolesMapping } from './roles-mapping/roles-mapping';
 import { withReduxProvider, withGlobalBreadcrumb, withUserAuthorizationPrompt } from '../common/hocs';
 import { compose } from 'redux';
-import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../util/constants';
+import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../common/constants';
 import { updateSecuritySection } from '../../redux/actions/securityActions';
 
 const tabs = [

@@ -509,7 +509,7 @@ export const checkCurrentSecurityPlatform = async () => {
       '/elastic/security/current-platform',
       {}
     );
-    const platform = (result.data || {}).platform || 'elastic'; 
+    const platform = (result.data || {}).platform;
 
     return platform;
   } catch (error) {

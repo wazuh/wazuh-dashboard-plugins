@@ -12,14 +12,16 @@
     "noImplicitAny": false,
   },
   "include": [
+    "index.ts",
     "server/**/*",
     "public/**/*",
-    "util/**/*"
+    "common/**/*"
   ],
   "exclude": [
     "public/**/*.test.ts",
     "public/**/*.test.tsx",
     "server/**/*.test.ts",
+    "common/**/*.test.ts",
     "../../src/**/*",
     "**/request.ts",
     "src/**/*"

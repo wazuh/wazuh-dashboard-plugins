@@ -31,7 +31,7 @@ import store from '../../../redux/store'
 import { updateSelectedSettingsSection } from '../../../redux/actions/appStateActions';
 import { withUserAuthorizationPrompt } from '../../common/hocs/withUserAuthorization'
 import { EuiSpacer } from '@elastic/eui';
-import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../../util/constants';
+import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../../common/constants';
 
 export type ISetting = {
   setting: string

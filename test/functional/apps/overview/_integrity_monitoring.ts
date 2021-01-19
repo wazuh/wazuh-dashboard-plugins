@@ -13,7 +13,7 @@
 import expect from '@kbn/expect';
 import { FtrProviderContext } from '../../../../../../test/functional/ftr_provider_context';
 import { SearchParams } from 'elasticsearch';
-import { WAZUH_ALERTS_PATTERN } from '../../../../util/constants';
+import { WAZUH_ALERTS_PATTERN } from '../../../../common/constants';
 
 export default function({getService, getPageObjects, }: FtrProviderContext) {
   const areaChart = getService('areaChart');

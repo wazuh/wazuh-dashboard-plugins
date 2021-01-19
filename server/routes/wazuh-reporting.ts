@@ -16,32 +16,6 @@ import { schema } from '@kbn/config-schema';
 export function WazuhReportingRoutes(router: IRouter) {
   const ctrl = new WazuhReportingCtrl();
 
-  // Builds a PDF report from multiple PNG images
-  router.post({
-      path: '/reports',
-      validate: {
-        body: schema.object({
-          array: schema.any(),
-          browserTimezone: schema.string(),
-          filters: schema.any(),
-          isAgents: schema.maybe(schema.string()),
-          components: schema.maybe(schema.any()),
-          name: schema.string(),
-          searchBar: schema.string(),
-          section: schema.maybe(schema.string()),
-          tab: schema.string(),
-          tables: schema.any(),
-          time: schema.oneOf([schema.object({
-            from: schema.string(),
-            to: schema.string()
-          }), schema.string()]),
-          title: schema.maybe(schema.string())
-        })
-      }
-    },
-    (context, request, response) => ctrl.report(context, request, response)
-  );
-
   router.post({
       path: '/reports/modules/{moduleID}',
       validate: {

@@ -1,6 +1,6 @@
 import { AxiosResponse } from 'axios';
 import { GenericRequest } from '../../../react-services';
-import { WAZUH_TIME_FILTER_DEFAULT } from '../../../../util/constants'
+import { WAZUH_TIME_FILTER_DEFAULT } from '../../../../common/constants'
 import { getDataPlugin } from '../../../kibana-services';
 
 type userValue<T> = { userValue: T }

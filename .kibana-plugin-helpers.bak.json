@@ -7,6 +7,6 @@
       "init.js",
       "server/**/*",
       "public/**/*",
-      "util/**/*"
+      "common/**/*"
     ]
 }

@@ -30,7 +30,7 @@ import {
 import { AppNavigate } from '../../../../../react-services/app-navigate';
 import { AppState } from '../../../../../react-services/app-state';
 import { RequirementFlyout } from '../requirement-flyout/requirement-flyout'
-import { WAZUH_ALERTS_PATTERN } from '../../../../../../util/constants';
+import { WAZUH_ALERTS_PATTERN } from '../../../../../../common/constants';
 import { getDataPlugin } from '../../../../../kibana-services';
 
 export class ComplianceSubrequirements extends Component {

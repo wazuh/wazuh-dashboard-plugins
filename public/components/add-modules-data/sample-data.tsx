@@ -14,25 +14,25 @@ import React, { Component, Fragment } from 'react';
 import { WzButtonPermissions } from '../../components/common/permissions/button';
 
 import {
-    EuiFlexItem,
-    EuiCard,
-    EuiSpacer,
-    EuiFlexGrid,
-    EuiFlexGroup,
-    EuiButton,
-    EuiButtonEmpty,
-    EuiTitle,
-    EuiToolTip,
-    EuiButtonIcon
+  EuiFlexItem,
+  EuiCard,
+  EuiSpacer,
+  EuiFlexGrid,
+  EuiFlexGroup,
+  EuiButton,
+  EuiButtonEmpty,
+  EuiTitle,
+  EuiToolTip,
+  EuiButtonIcon
 } from '@elastic/eui';
 
-import { getToasts }  from '../../kibana-services';
+import { getToasts } from '../../kibana-services';
 import { WzRequest } from '../../react-services/wz-request';
 import { AppState } from '../../react-services/app-state';
-import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../util/constants';
+import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../common/constants';
 
 export default class WzSampleData extends Component {
-  categories: {title: string, description: string, image: string, categorySampleAlertsIndex: string}[]
+  categories: { title: string, description: string, image: string, categorySampleAlertsIndex: string }[]
   generateAlertsParams: any
   state: {
     [name: string]: {
@@ -41,7 +41,7 @@ export default class WzSampleData extends Component {
       removeDataLoading: boolean
     }
   }
-  constructor(props){
+  constructor(props) {
     super(props);
     this.generateAlertsParams = {}; // extra params to add to generateAlerts function in server
     this.categories = [
@@ -73,27 +73,27 @@ export default class WzSampleData extends Component {
       }
     });
   }
-  async componentDidMount(){
+  async componentDidMount() {
     // Check if sample data for each category was added
-    try{
+    try {
       const results = await PromiseAllRecursiveObject(this.categories.reduce((accum, cur) => {
         accum[cur.categorySampleAlertsIndex] = WzRequest.genericReq('GET', `/elastic/samplealerts/${cur.categorySampleAlertsIndex}`)
         return accum
-      },{}));
-  
+      }, {}));
+
       this.setState(Object.keys(results).reduce((accum, cur) => {
         accum[cur] = {
           ...this.state[cur],
           exists: results[cur].data.exists
         }
         return accum
-      },{...this.state}));
-    }catch(error){}
+      }, { ...this.state }));
+    } catch (error) { }
 
     // Get information about cluster/manager
-    try{
+    try {
       const clusterName = AppState.getClusterInfo().cluster;
-      const managerName =  AppState.getClusterInfo().manager;
+      const managerName = AppState.getClusterInfo().manager;
       this.generateAlertsParams.manager = {
         name: managerName
       };
@@ -103,60 +103,72 @@ export default class WzSampleData extends Component {
           node: clusterName
         };
       };
-      
-    }catch(error){}
+
+    } catch (error) { }
   }
-  showToast(color: string, title: string = '', text: string = '', time: number = 3000){
+  showToast(color: string, title: string = '', text: string = '', time: number = 3000) {
     getToasts().add({
-        color: color,
-        title: title,
-        text: text,
-        toastLifeTimeMs: time,
+      color: color,
+      title: title,
+      text: text,
+      toastLifeTimeMs: time,
     });
   };
   async addSampleData(category) {
-    try{
-      this.setState({ [category.categorySampleAlertsIndex]: {
-        ...this.state[category.categorySampleAlertsIndex],
-        addDataLoading: true
-      } });
+    try {
+      this.setState({
+        [category.categorySampleAlertsIndex]: {
+          ...this.state[category.categorySampleAlertsIndex],
+          addDataLoading: true
+        }
+      });
       await WzRequest.genericReq('POST', `/elastic/samplealerts/${category.categorySampleAlertsIndex}`, { params: this.generateAlertsParams });
       this.showToast('success', `${category.title} alerts installed`, 'Date range for sample data is now-7 days ago', 5000);
-      this.setState({ [category.categorySampleAlertsIndex]: {
-        ...this.state[category.categorySampleAlertsIndex],
-        exists: true,
-        addDataLoading: false
-      } });
-    }catch(error){
+      this.setState({
+        [category.categorySampleAlertsIndex]: {
+          ...this.state[category.categorySampleAlertsIndex],
+          exists: true,
+          addDataLoading: false
+        }
+      });
+    } catch (error) {
       this.showToast('danger', 'Error', error.message || error);
-      this.setState({ [category.categorySampleAlertsIndex]: {
-        ...this.state[category.categorySampleAlertsIndex],
-        addDataLoading: false
-      } });
+      this.setState({
+        [category.categorySampleAlertsIndex]: {
+          ...this.state[category.categorySampleAlertsIndex],
+          addDataLoading: false
+        }
+      });
     }
   }
-  async removeSampleData(category){
-    try{
-      this.setState({ [category.categorySampleAlertsIndex]: {
-        ...this.state[category.categorySampleAlertsIndex],
-        removeDataLoading: true
-      } });
-      await WzRequest.genericReq('DELETE', `/elastic/samplealerts/${category.categorySampleAlertsIndex}` );
-      this.setState({ [category.categorySampleAlertsIndex]: {
-        ...this.state[category.categorySampleAlertsIndex],
-        exists: false,
-        removeDataLoading: false
-      } });
+  async removeSampleData(category) {
+    try {
+      this.setState({
+        [category.categorySampleAlertsIndex]: {
+          ...this.state[category.categorySampleAlertsIndex],
+          removeDataLoading: true
+        }
+      });
+      await WzRequest.genericReq('DELETE', `/elastic/samplealerts/${category.categorySampleAlertsIndex}`);
+      this.setState({
+        [category.categorySampleAlertsIndex]: {
+          ...this.state[category.categorySampleAlertsIndex],
+          exists: false,
+          removeDataLoading: false
+        }
+      });
       this.showToast('success', `${category.title} alerts uninstalled`);
-    }catch(error){
-      this.setState({ [category.categorySampleAlertsIndex]: {
-        ...this.state[category.categorySampleAlertsIndex],
-        removeDataLoading: false
-      } });
+    } catch (error) {
+      this.setState({
+        [category.categorySampleAlertsIndex]: {
+          ...this.state[category.categorySampleAlertsIndex],
+          removeDataLoading: false
+        }
+      });
       this.showToast('danger', 'Error', error.message || error);
     }
   }
-  renderCard(category){
+  renderCard(category) {
     const { addDataLoading, exists, removeDataLoading } = this.state[category.categorySampleAlertsIndex];
     return (
       <EuiFlexItem key={`sample-data-${category.title}`}>
@@ -170,22 +182,22 @@ export default class WzSampleData extends Component {
             <EuiFlexGroup justifyContent="flexEnd">
               <EuiFlexItem grow={false}>
                 {exists && (
-                <WzButtonPermissions
-                  color='danger'
-                  roles={[WAZUH_ROLE_ADMINISTRATOR_NAME]}
-                  onClick={() => this.removeSampleData(category)}
-                >
-                 {removeDataLoading && 'Removing data' || 'Remove data'}
-                </WzButtonPermissions>
-                ) || (
                   <WzButtonPermissions
-                    isLoading={addDataLoading}
+                    color='danger'
                     roles={[WAZUH_ROLE_ADMINISTRATOR_NAME]}
-                    onClick={() => this.addSampleData(category)}
+                    onClick={() => this.removeSampleData(category)}
                   >
-                   {addDataLoading && 'Adding data' || 'Add data'}
+                    {removeDataLoading && 'Removing data' || 'Remove data'}
                   </WzButtonPermissions>
-                )}
+                ) || (
+                    <WzButtonPermissions
+                      isLoading={addDataLoading}
+                      roles={[WAZUH_ROLE_ADMINISTRATOR_NAME]}
+                      onClick={() => this.addSampleData(category)}
+                    >
+                      {addDataLoading && 'Adding data' || 'Add data'}
+                    </WzButtonPermissions>
+                  )}
               </EuiFlexItem>
             </EuiFlexGroup>
           )}
@@ -194,7 +206,7 @@ export default class WzSampleData extends Component {
     )
   }
   render() {
-    return(
+    return (
       <EuiFlexGrid columns={3}>
         {this.categories.map(category => this.renderCard(category))}
       </EuiFlexGrid>

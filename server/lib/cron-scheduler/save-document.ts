@@ -1,8 +1,8 @@
 import { BulkIndexDocumentsParams } from 'elasticsearch';
 import { getConfiguration } from '../get-configuration';
-import { log } from '../../logger.js';
+import { log } from '../logger';
 import { indexDate } from '../index-date';
-import { WAZUH_INDEX_SHARDS, WAZUH_INDEX_REPLICAS } from '../../../util/constants'
+import { WAZUH_INDEX_SHARDS, WAZUH_INDEX_REPLICAS } from '../../../common/constants'
 
 export interface IIndexConfiguration {
   name: string
@@ -31,7 +31,6 @@ export class SaveDocument {
       const createDocumentObject = this.createDocument(doc, indexCreation, mapping);
       const response = await this.esClientInternalUser.bulk(createDocumentObject);
       log(this.logPath, `Response of create new document ${JSON.stringify(response)}`, 'debug');
-      // await this.checkIndexPatternAndCreateIfNotExists(index);
     } catch (error) {
       if (error.status === 403)
         throw { error: 403, message: `Authorization Exception in the index "${index}"` }
@@ -43,25 +42,25 @@ export class SaveDocument {
 
   private async checkIndexAndCreateIfNotExists(index, shards, replicas) {
     try {
-      try{
+      try {
         const exists = await this.esClientInternalUser.indices.exists({ index });
         log(this.logPath, `Index '${index}' exists? ${exists.body}`, 'debug');
-      }catch(error){
-        log(this.logPath, `Index '${index}' exists? false`, 'debug');
-        const response = await this.esClientInternalUser.indices.create({
-          index,
-          body: {
-            settings: {
-              index: {
-                number_of_shards: shards || WAZUH_INDEX_SHARDS,
-                number_of_replicas: replicas || WAZUH_INDEX_REPLICAS
+        if (!exists.body) {
+          const response = await this.esClientInternalUser.indices.create({
+            index,
+            body: {
+              settings: {
+                index: {
+                  number_of_shards: shards || WAZUH_INDEX_SHARDS,
+                  number_of_replicas: replicas || WAZUH_INDEX_REPLICAS
+                }
               }
             }
-          }
-        });
-        
-        log(this.logPath, `Status of create a new index: ${JSON.stringify(response)}`, 'debug');
-
+          });
+          log(this.logPath, `Status of create a new index: ${JSON.stringify(response)}`, 'debug');
+        }
+      } catch (error) {
+        log(this.logPath ,`Error searching or creating '${index}' due to '${error || error.message}' `, 'debug');
       }
     } catch (error) {
       this.checkDuplicateIndexError(error);

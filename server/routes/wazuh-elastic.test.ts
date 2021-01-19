@@ -22,21 +22,6 @@ describe('Wazuh API - /elastic/security/current-platform', () => {
   });
 });
 
-describe('Wazuh API - /elastic/index-patterns', () => {
-  test('[200] Returns an array with the index patterns', () => {
-    const options = buildAxiosOptions('get', '/elastic/index-patterns');
-    return axios(options).then(response => {
-      expect(response.status).toBe(200);
-      expect(typeof response.data).toBe('object');
-      expect(Array.isArray(response.data.data)).toBe(true);
-      response.data.data.forEach(indexPattern => {
-        expect(typeof indexPattern.id).toBe('string');
-        expect(typeof indexPattern.title).toBe('string');
-      })
-    });
-  });
-});
-
 // TODO: This test need to be defined
 // describe('Wazuh API - /elastic/visualizations/{tab}/{pattern}', () => {
 //   test('[200] Returns an array with the index patterns', () => {
@@ -286,9 +271,9 @@ describe('Wazuh API - /elastic/samplealerts/{category}', () => {
 });
 
 // TODO: This test need to be defined
-// describe('Wazuh API - /elastic/esAlerts', () => {
+// describe('Wazuh API - /elastic/alerts', () => {
 //   test('[200] Check if there an sample data index of Security category', () => {
-//     const options = buildAxiosOptions('get', '/elastic/esAlerts');
+//     const options = buildAxiosOptions('get', '/elastic/alerts');
 //     return axios(options).then(response => {
 //       expect(response.status).toBe(200);
 //       expect(typeof response.data.index).toBe('string');

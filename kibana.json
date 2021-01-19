@@ -12,10 +12,11 @@
     "kibanaLegacy",
     "uiActions",
     "charts",
-    "savedObjects"
+    "savedObjects",
+    "kibanaReact",
+    "kibanaUtils"
   ],
-  "optionalPlugins": ["security", "opendistroSecurity", "searchguard", "spaces"],
-  "requiredBundles": ["kibanaReact", "kibanaUtils"],
+  "optionalPlugins": ["security", "opendistroSecurityKibana", "searchguard", "spaces"],
   "server": true,
   "ui": true
 }

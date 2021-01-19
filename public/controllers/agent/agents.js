@@ -12,7 +12,7 @@
 import { FilterHandler } from '../../utils/filter-handler';
 import { TabNames } from '../../utils/tab-names';
 import * as FileSaver from '../../services/file-saver';
-import { TabDescription } from '../../../server/reporting/tab-description';
+import { WAZUH_MODULES } from '../../../common/wazuh-modules';
 import { UnsupportedComponents } from '../../utils/components-os-support';
 import { visualizations } from '../../templates/agents/visualizations';
 
@@ -29,7 +29,7 @@ import { ErrorHandler } from '../../react-services/error-handler';
 import { GroupHandler } from '../../react-services/group-handler';
 import store from '../../redux/store';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
-import { WAZUH_ALERTS_PATTERN } from '../../../util/constants';
+import { WAZUH_ALERTS_PATTERN } from '../../../common/constants';
 import { getDataPlugin } from '../../kibana-services';
 
 export class AgentsController {
@@ -120,7 +120,7 @@ export class AgentsController {
       this.commonData.removeTimefilter();
     }
 
-    this.$scope.TabDescription = TabDescription;
+    this.$scope.TabDescription = WAZUH_MODULES;
 
     this.$rootScope.reportStatus = false;
 
