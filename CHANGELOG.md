@@ -2,7 +2,7 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v4.0.3 - Kibana v7.9.1, v7.9.2, v7.9.3, 7.10.0 , 7.10.1 - Revision 4016
+## Wazuh v4.0.4 - Kibana 7.10.0 , 7.10.2 - Revision 4016
 
 ### Fixed
 
@@ -10,12 +10,13 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed wrong shards and replicas for statistics indices and also fixed wrong prefix for monitoring indices [#2732](https://github.com/wazuh/wazuh-kibana-app/issues/2732)
 - Report's creation dates set to 1970-01-01T00:00:00.000Z [#2772](https://github.com/wazuh/wazuh-kibana-app/issues/2772)
 
-## Wazuh v4.0.3 - Kibana v7.9.1, v7.9.2, v7.9.3 - Revision 4015
-
 ### Added
 
-- Show the wui_ rules belong to wazuh-wui API user [#2702](https://github.com/wazuh/wazuh-kibana-app/issues/2702)
+- Adapt the app to the new Kibana platform [#2475](https://github.com/wazuh/wazuh-kibana-app/issues/2475)
+- Wazuh data directory moved from `optimize` to `data` Kibana directory [#2591](https://github.com/wazuh/wazuh-kibana-app/issues/2591)
 - Modified agent registration adding groups and architecture [#2666](https://github.com/wazuh/wazuh-kibana-app/issues/2666) [#2652](https://github.com/wazuh/wazuh-kibana-app/issues/2652)
+- Each user can only view their own reports [#2686](https://github.com/wazuh/wazuh-kibana-app/issues/2686)
+- Show the wui_ rules belong to wazuh-wui API user [#2702](https://github.com/wazuh/wazuh-kibana-app/issues/2702)
 
 ### Fixed
 
@@ -30,6 +31,14 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed message in reserved users actions [#2702](https://github.com/wazuh/wazuh-kibana-app/issues/2702)
 - Error 500 on Export formatted CDB list [#2692](https://github.com/wazuh/wazuh-kibana-app/pull/2692)
 - Wui rules label should have only one tooltip [#2723](https://github.com/wazuh/wazuh-kibana-app/issues/2723)
+- Fixed Wazuh menu and agent menu for Solaris agents [#2773](https://github.com/wazuh/wazuh-kibana-app/issues/2773) [#2725](https://github.com/wazuh/wazuh-kibana-app/issues/2725)
+- Fixed wrong shards and replicas for statistics indices and also fixed wrong prefix for monitoring indices [#2732](https://github.com/wazuh/wazuh-kibana-app/issues/2732)
+
+## Wazuh v4.0.4 - Kibana v7.9.1, v7.9.3 - Revision 4015
+
+### Added
+
+- Support for Wazuh v4.0.4
 
 ## Wazuh v4.0.3 - Kibana v7.9.1, v7.9.2, v7.9.3 - Revision 4014
 
