@@ -272,6 +272,9 @@ export class HealthCheck extends Component {
                 results[itemId].description = <span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span>;
                 this.setState({ results, errors });
             }
+        }else{
+            results[itemId].description = <span><EuiIcon type="check" color="secondary" ></EuiIcon> Ready</span>;
+            this.setState({ results });
         }
     }
 
@@ -362,7 +365,6 @@ export class HealthCheck extends Component {
                             return;
                         }, 300);
                     }
-                    return;
                 });
         } catch (error) {
             this.handleError(error);
