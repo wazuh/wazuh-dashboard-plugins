@@ -11,8 +11,7 @@
  */
 
 import { GenericRequest } from './generic-request';
-import { KnownFields } from '../utils/known-fields'
-
+import { KnownFields, FieldsStatistics, FieldsMonitoring } from '../utils/known-fields'
 export class SavedObject {
   /**
    *
@@ -78,8 +77,8 @@ export class SavedObject {
   }
 
   static async existsOrCreateIndexPattern(patternID) {
-     const result = await SavedObject.existsIndexPattern(patternID);
-     if (!result.data) {
+    const result = await SavedObject.existsIndexPattern(patternID);
+    if (!result.data) {
       const fields = await SavedObject.getIndicesFields(patternID);
       await this.createSavedObject(
         'index-pattern',
@@ -214,10 +213,26 @@ export class SavedObject {
     }
   }
 
-  static getIndicesFields = async (pattern) => GenericRequest.request(
-    //we check if indices exist before creating the index pattern
-    'GET',
-    `/api/index_patterns/_fields_for_wildcard?pattern=${pattern}&meta_fields=_source&meta_fields=_id&meta_fields=_type&meta_fields=_index&meta_fields=_score`,
-    {}
-  ).then(response => response.data.fields).catch(() => KnownFields)
+  static getIndicesFields = async (pattern) =>
+    // if (pattern == 'wazuh-statistics-*'){
+    //   response.data.fields = monitoringKnownFields;
+    // }
+
+    GenericRequest.request(
+      //we check if indices exist before creating the index pattern
+      'GET',
+      `/api/index_patterns/_fields_for_wildcard?pattern=${pattern}&meta_fields=_source&meta_fields=_id&meta_fields=_type&meta_fields=_index&meta_fields=_score`,
+      {}
+    ).then(response => response.data.fields).catch(() => {
+      if (pattern === 'wazuh-monitoring-*') {
+        console.log("ENTRA AQUI", pattern)
+        return FieldsMonitoring;
+      } else if (pattern === 'wazuh-statistics-*') {
+        console.log("ENTRA AQUI", pattern)
+        return FieldsStatistics;
+      } else {
+        return KnownFields
+      }
+    })
+
 }
