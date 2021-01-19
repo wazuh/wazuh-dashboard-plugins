@@ -100,7 +100,7 @@ export const RolesMappingTable = ({ rolesEquivalences, rules, loading, editRule,
                 ErrorHandler.info('Role mapping was successfully deleted');
                 updateRules();
               } catch (err) {
-                ErrorHandler.error(err);
+                ErrorHandler.handle(err, 'Error deleting the role mapping');
               }
             }}
             modalProps={{ buttonColor: 'danger' }}
