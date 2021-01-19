@@ -213,26 +213,19 @@ export class SavedObject {
     }
   }
 
-  static getIndicesFields = async (pattern) =>
-    // if (pattern == 'wazuh-statistics-*'){
-    //   response.data.fields = monitoringKnownFields;
-    // }
-
-    GenericRequest.request(
-      //we check if indices exist before creating the index pattern
-      'GET',
-      `/api/index_patterns/_fields_for_wildcard?pattern=${pattern}&meta_fields=_source&meta_fields=_id&meta_fields=_type&meta_fields=_index&meta_fields=_score`,
-      {}
-    ).then(response => response.data.fields).catch(() => {
-      if (pattern === 'wazuh-monitoring-*') {
-        console.log("ENTRA AQUI", pattern)
-        return FieldsMonitoring;
-      } else if (pattern === 'wazuh-statistics-*') {
-        console.log("ENTRA AQUI", pattern)
-        return FieldsStatistics;
-      } else {
-        return KnownFields
-      }
-    })
+  static getIndicesFields = async (pattern) => GenericRequest.request(
+    //we check if indices exist before creating the index pattern
+    'GET',
+    `/api/index_patterns/_fields_for_wildcard?pattern=${pattern}&meta_fields=_source&meta_fields=_id&meta_fields=_type&meta_fields=_index&meta_fields=_score`,
+    {}
+  ).then(response => response.data.fields).catch(() => {
+    if (pattern === 'wazuh-monitoring-*') {
+      return FieldsMonitoring;
+    } else if (pattern === 'wazuh-statistics-*') {
+      return FieldsStatistics;
+    } else {
+      return KnownFields
+    }
+  })
 
 }
