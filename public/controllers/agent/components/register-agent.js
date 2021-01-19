@@ -97,6 +97,17 @@ const osButtons = [
   }
 ];
 
+const sysButtons = [
+  {
+    id: 'systemd',
+    label: 'Systemd'
+  },
+  {
+    id: 'sysV',
+    label: 'SysV Init'
+  }
+];
+
 export class RegisterAgent extends Component {
   constructor(props) {
     super(props);
@@ -105,6 +116,8 @@ export class RegisterAgent extends Component {
     this.state = {
       status: 'incomplete',
       selectedOS: '',
+      selectedSYS: '',
+      neededSYS: false,
       selectedArchitecture: '',
       selectedVersion: '',
       version: '',
@@ -115,8 +128,8 @@ export class RegisterAgent extends Component {
       udpProtocol: false
     };
     this.restartAgentCommand = {
-      rpm: 'sudo systemctl start wazuh-agent',
-      deb: 'sudo service wazuh-agent start',
+      rpm: this.isRPM(),
+      deb: 'update-rc.d wazuh-agent defaults 95 10\nsudo service wazuh-agent start',
       macos: 'sudo /Library/Ossec/bin/ossec-control start',
     }
   }
@@ -194,6 +207,18 @@ export class RegisterAgent extends Component {
 
   selectOS(os) {
     this.setState({ selectedOS: os, selectedVersion: '', selectedArchitecture: '' });
+  }
+
+  isRPM(){
+    if(this.state.selectedSYS === "systemd"){
+      return 'systemctl daemon-reload\nsystemctl enable wazuh-agent\nsystemctl start wazuh-agent';
+    }
+    else
+      return 'chkconfig --add wazuh-agent\nservice wazuh-agent start';
+  }
+
+  selectSYS(sys){
+    this.setState({ selectedSYS: sys });
   }
 
   setServerAddress(event) {
@@ -318,8 +343,25 @@ export class RegisterAgent extends Component {
     }
   };
 
+  checkMissingSYSSelection(){
+    if(!this.state.selectedSYS){
+      return [`SYS`];
+    }
+    else
+      return [];
+  }
+
+  checkNeedSystemdOrSysV(os){
+    if(os === 'rpm'){
+      return true;
+    }
+    else
+      return false;
+  }
+
   render() {
     const missingOSSelection = this.checkMissingOSSelection();
+    const missingSYSSelection = this.checkMissingSYSSelection();
     const ipInput = (
       <EuiText>
         <p>
@@ -409,6 +451,33 @@ export class RegisterAgent extends Component {
         )}
       </div>
     );
+
+    const guideSYS = (
+      <div>
+        {this.state.selectedSYS && this.state.selectedOS &&(
+          <EuiFlexGroup direction="column">
+            <EuiText>
+              <EuiCodeBlock style={codeBlock} language={language}>
+                {this.isRPM()}
+              </EuiCodeBlock>
+              <EuiCopy textToCopy={this.isRPM()}>
+                {copy => (
+                  <EuiButton
+                    fill
+                    iconType="copy"
+                    onClick={copy}>
+                    Copy command
+                  </EuiButton>
+                )}
+              </EuiCopy>
+            </EuiText>
+          </EuiFlexGroup>
+        )}
+      </div>
+    );
+
+    
+
     const steps = [
       {
         title: 'Choose the Operating system',
@@ -468,28 +537,52 @@ export class RegisterAgent extends Component {
             />  
           : <div>{guide}</div>
       },
-      ...(!missingOSSelection.length && restartAgentCommand ? [
+      ...((this.state.selectedOS == 'rpm') ? [{
+        title: 'Choose the system manager',
+        children: <EuiButtonGroup
+        color='primary'
+        options={sysButtons}
+        idSelected={this.state.selectedSYS}
+        onChange={sys => this.selectSYS(sys)}
+      />
+      }] : []),
+
+      ...((this.state.selectedOS == 'rpm') ? [{
+        title: 'Start the agent',
+        children: missingSYSSelection.length
+          ? <EuiCallOut
+              color="warning"
+              title={`Please select the ${missingSYSSelection.join(', ')}.`}
+              iconType="iInCircle"
+            />  
+          : <div>{guideSYS}</div>
+        }] : []),
+
+      ...(!missingOSSelection.length && (this.state.selectedOS !== 'rpm') && restartAgentCommand ? [
         {
           title: 'Start the agent',
           children: (
-            <EuiText>
-              <EuiCodeBlock style={codeBlock} language={language}>
-                {restartAgentCommand}
-              </EuiCodeBlock>
-              <EuiCopy textToCopy={restartAgentCommand}>
-                {copy => (
-                  <EuiButton
-                    fill
-                    iconType="copy"
-                    onClick={copy}>
-                    Copy command
-                  </EuiButton>
-                )}
-              </EuiCopy>
-            </EuiText>
+              <EuiFlexGroup direction="column">
+                  <EuiText>
+                    <EuiCodeBlock style={codeBlock} language={language}>
+                      {restartAgentCommand}
+                    </EuiCodeBlock>
+                    <EuiCopy textToCopy={restartAgentCommand}>
+                      {copy => (
+                        <EuiButton
+                          fill
+                          iconType="copy"
+                          onClick={copy}>
+                          Copy command
+                        </EuiButton>
+                      )}
+                    </EuiCopy>
+                  </EuiText>
+              </EuiFlexGroup>
           )
         }
       ] : [])
+
     ];
 
     return (
