@@ -66,15 +66,17 @@ class KibanaVis extends Component {
       chrome: getChrome(),
       overlays: getOverlays(),
     };
+    this.visualizationTypes = getVisualizationsPlugin();
     const servicesForVisualizations = {
       ...services,
-      ...{ visualizationTypes: new TypesService().start() },
+      ...{ visualizationTypes: this.visualizationTypes },
     };
     this.savedObjectLoaderVisualize = createSavedVisLoader(
       servicesForVisualizations
     );
     this.visID = this.props.visID;
     this.tab = this.props.tab;
+
   }
 
   showToast = (color, title, text, time) => {
@@ -197,6 +199,14 @@ class KibanaVis extends Component {
     }
   };
 
+  getType(visType) {
+    const type = this.visualizationTypes.get(visType);
+    if (!type) {
+      throw new Error(`Invalid visualization type "${visType}"`);
+    }
+    return type;
+  }
+
   myRender = async (raw) => {
     const timefilter = getDataPlugin().query.timefilter.timefilter;
     try {
@@ -235,7 +245,8 @@ class KibanaVis extends Component {
           this.visualization.searchSource.setField("source", false);
           // Visualization doesn't need "hits"
           this.visualization.searchSource.setField('size', 0);
-          const visState = await getVisualizationsPlugin().convertToSerializedVis(this.visualization);
+          const visState = await getVisualizationsPlugin().convertToSerializedVis(this.visualization);        
+          Vis.prototype.getType = (type) => this.getType(type);
           const vis = new Vis(this.visualization.visState.type, visState);
           await vis.setState(visState);
           this.visHandler = await getVisualizationsPlugin().__LEGACY.createVisEmbeddableFromObject(

@@ -18,24 +18,24 @@ import {
 import {
   AppPluginStartDependencies,
   WazuhSetup,
-  WazuhSetupDeps,
+  WazuhSetupPlugins,
   WazuhStart,
-  WazuhStartDeps,
+  WazuhStartPlugins,
 } from './types';
 import { Cookies } from 'react-cookie';
 import { AppState } from './react-services/app-state';
 
 const innerAngularName = 'app/wazuh';
 
-export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupDeps, WazuhStartDeps> {
+export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlugins, WazuhStartPlugins> {
   constructor(private readonly initializerContext: PluginInitializerContext) {}
   public initializeInnerAngular?: () => void;
   private innerAngularInitialized: boolean = false;
 
-  public setup(core: CoreSetup, plugins: WazuhSetupDeps): WazuhSetup {
+  public setup(core: CoreSetup, { visualizations } : WazuhSetupPlugins): WazuhSetup {
     core.application.register({
       id: `wazuh`,
-      title: 'Wazuh',
+      title: 'Wazuh', 
       icon: 'plugins/wazuh/assets/icon_blue.png',
       mount: async (params: AppMountParameters) => {
         if (!this.initializeInnerAngular) {
@@ -58,7 +58,9 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupDep
           unmount();
         };
       },
+
     });
+    visualizations.hideTypes([]);
     return {};
   }
 

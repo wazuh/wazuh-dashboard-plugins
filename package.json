@@ -30,7 +30,7 @@
     "kbn": "node ../../scripts/kbn",
     "es": "node ../../scripts/es",
     "start": "plugin-helpers start",
-    "build": "yarn plugin-helpers build --skip-archive;node postbuild",
+    "build": "yarn plugin-helpers build --skip-archive;yarn run postbuild",
     "plugin-helpers": "node ../../scripts/plugin_helpers",
     "test:ui:runner": "node ../../scripts/functional_test_runner.js",
     "test:server": "plugin-helpers test:server",
