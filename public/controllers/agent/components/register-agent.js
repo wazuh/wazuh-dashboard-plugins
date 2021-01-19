@@ -206,7 +206,7 @@ export class RegisterAgent extends Component {
   }
 
   selectOS(os) {
-    this.setState({ selectedOS: os, selectedVersion: '', selectedArchitecture: '', selectedSYS: '' });
+    this.setState({ selectedOS: os, selectedVersion: '', selectedArchitecture: '', selectedSYS: 'systemd' });
   }
 
   systemSelector(){
@@ -475,32 +475,6 @@ export class RegisterAgent extends Component {
       </div>
     );
 
-    const guideSYS = (
-      <div>
-        {this.state.selectedSYS && this.state.selectedOS &&(
-          <EuiFlexGroup direction="column">
-            <EuiText>
-              <EuiCodeBlock style={codeBlock} language={language}>
-                {this.systemSelector()}
-              </EuiCodeBlock>
-              <EuiCopy textToCopy={this.systemSelector()}>
-                {copy => (
-                  <EuiButton
-                    fill
-                    iconType="copy"
-                    onClick={copy}>
-                    Copy command
-                  </EuiButton>
-                )}
-              </EuiCopy>
-            </EuiText>
-          </EuiFlexGroup>
-        )}
-      </div>
-    );
-
-    
-
     const steps = [
       {
         title: 'Choose the Operating system',
@@ -561,25 +535,42 @@ export class RegisterAgent extends Component {
           : <div>{guide}</div>
       },
       ...((this.state.selectedOS == 'rpm') || (this.state.selectedOS == 'deb') ? [{
-        title: 'Choose the system manager',
-        children: <EuiButtonGroup
-        color='primary'
-        options={sysButtons}
-        idSelected={this.state.selectedSYS}
-        onChange={sys => this.selectSYS(sys)}
-      />
-      }] : []),
-
-      ...((this.state.selectedOS == 'rpm') || (this.state.selectedOS == 'deb') ? [{
         title: 'Start the agent',
-        children: missingSYSSelection.length
-          ? <EuiCallOut
-              color="warning"
-              title={`Please select the ${missingSYSSelection.join(', ')}.`}
-              iconType="iInCircle"
-            />  
-          : <div>{guideSYS}</div>
-        }] : []),
+        children: missingOSSelection.length
+        ? <EuiCallOut
+            color="warning"
+            title={`Please select the ${missingOSSelection.join(', ')}.`}
+            iconType="iInCircle"
+          />  
+        : 
+        <EuiFlexGroup direction="column">
+          <EuiFlexItem>
+            <EuiButtonGroup
+              color='primary'
+              options={sysButtons}
+              idSelected={this.state.selectedSYS}
+              onChange={sys => this.selectSYS(sys)}
+            />
+          </EuiFlexItem>
+          <EuiFlexItem>
+            <EuiText>
+              <EuiCodeBlock style={codeBlock} language={language}>
+                {this.systemSelector()}
+              </EuiCodeBlock>
+              <EuiCopy textToCopy={this.systemSelector()}>
+                {copy => (
+                  <EuiButton
+                    fill
+                    iconType="copy"
+                    onClick={copy}>
+                    Copy command
+                  </EuiButton>
+                )}
+              </EuiCopy>
+            </EuiText>
+          </EuiFlexItem>
+       </EuiFlexGroup>
+      }] : []),
 
       ...(!missingOSSelection.length && (this.state.selectedOS !== 'rpm') && (this.state.selectedOS !== 'deb') && restartAgentCommand ? [
         {
