@@ -97,8 +97,9 @@ export const WAZUH_INDEX_REPLICAS = 0;
 export const WAZUH_API_RESERVED_ID_LOWER_THAN = 100;
 
 // Wazuh data path
-export const WAZUH_DATA_PATH = 'data/wazuh';
-export const WAZUH_DATA_ABSOLUTE_PATH = path.join(__dirname, '../../../', WAZUH_DATA_PATH);
+const WAZUH_DATA_KIBANA_BASE_PATH = 'data';
+export const WAZUH_DATA_KIBANA_BASE_ABSOLUTE_PATH = path.join(__dirname, '../../../', WAZUH_DATA_KIBANA_BASE_PATH);
+export const WAZUH_DATA_ABSOLUTE_PATH = path.join(WAZUH_DATA_KIBANA_BASE_ABSOLUTE_PATH, 'wazuh');
 
 // Wazuh data path - config
 export const WAZUH_DATA_CONFIG_DIRECTORY_PATH = path.join(WAZUH_DATA_ABSOLUTE_PATH, 'config');
