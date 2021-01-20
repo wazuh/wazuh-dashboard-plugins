@@ -222,11 +222,11 @@ export class SavedObject {
     {}
   ).then(response => response.data.fields).catch(() => {
     switch (indexType) {
-      case 'monitoring':
+      case WAZUH_INDEX_TYPE_MONITORING:
         return FieldsMonitoring;
-      case 'statistics':
+      case WAZUH_INDEX_TYPE_STATISTICS:
         return FieldsStatistics;
-      case 'alerts':
+      case WAZUH_INDEX_TYPE_ALERTS:
         return KnownFields
     }
   })

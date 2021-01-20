@@ -246,7 +246,6 @@ export class HealthCheck extends Component {
   async checkSupportPattern(pattern, itemId, indexType) {
     let results = this.state.results;
     let errors = this.state.errors;
-    let selectedPattern = 'alerts';
 
     const result = await SavedObject.existsIndexPattern(pattern);
     if (!result.data) {
