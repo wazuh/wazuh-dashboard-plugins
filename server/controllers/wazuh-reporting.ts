@@ -1976,10 +1976,13 @@ export class WazuhReportingCtrl {
 
       const reports = fs.readdirSync(userReportsDirectory).map(file => {
         const stats = fs.statSync(userReportsDirectory + '/' + file);
+        // Get the file creation time (bithtime). It returns the first value that is a truthy value of next file stats: birthtime, mtime, ctime and atime.
+        // This solves some OSs can have the bithtimeMs equal to 0 and returns the date like 1970-01-01
+        const birthTimeField = ['birthtime', 'mtime', 'ctime', 'atime'].find(time => stats[`${time}Ms`]);
         return {
           name: file,
           size: stats.size,
-          date: stats.birthtime
+          date: stats[birthTimeField]
         };
       });
       log(
