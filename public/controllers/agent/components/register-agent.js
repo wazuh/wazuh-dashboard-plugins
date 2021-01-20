@@ -226,6 +226,8 @@ export class RegisterAgent extends Component {
       else
         return 'sudo update-rc.d wazuh-agent defaults 95 10\nsudo service wazuh-agent start';
     }
+    else
+      return '';
     
   }
 
