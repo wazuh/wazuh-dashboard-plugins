@@ -14,6 +14,8 @@ import { version } from '../../../../package.json';
 import { WazuhConfig } from '../../../react-services/wazuh-config';
 import {
   EuiSteps,
+  EuiTabs,
+  EuiTabbedContent,
   EuiFlexGroup,
   EuiFlexItem,
   EuiPanel,
@@ -212,17 +214,17 @@ export class RegisterAgent extends Component {
   systemSelector(){
     if(this.state.selectedOS === 'rpm'){
       if(this.state.selectedSYS === 'systemd'){
-        return 'systemctl daemon-reload\nsystemctl enable wazuh-agent\nsystemctl start wazuh-agent';
+        return 'sudo systemctl daemon-reload\nsudo systemctl enable wazuh-agent\nsudo systemctl start wazuh-agent';
       }
       else
-        return 'chkconfig --add wazuh-agent\nservice wazuh-agent start';
+        return 'sudo chkconfig --add wazuh-agent\nsudo service wazuh-agent start';
     }
     else if(this.state.selectedOS === 'deb'){
       if(this.state.selectedSYS === 'systemd'){
-        return 'systemctl daemon-reload\nsystemctl enable wazuh-agent\nsystemctl start wazuh-agent';
+        return 'sudo systemctl daemon-reload\nsudo systemctl enable wazuh-agent\nsudo systemctl start wazuh-agent';
       }
       else
-        return 'update-rc.d wazuh-agent defaults 95 10\nsudo service wazuh-agent start';
+        return 'sudo update-rc.d wazuh-agent defaults 95 10\nsudo service wazuh-agent start';
     }
     
   }
@@ -429,6 +431,10 @@ export class RegisterAgent extends Component {
     );
     const restartAgentCommand = this.restartAgentCommand[this.state.selectedOS];
 
+    const onTabClick = (selectedTab) => {
+      this.selectSYS(selectedTab.id);
+    };
+
     const guide = (
       <div>
         {this.state.selectedOS && (
@@ -452,6 +458,57 @@ export class RegisterAgent extends Component {
         )}
       </div>
     );
+
+    const tabs = [
+      {
+        id: 'systemd',
+        name: 'Systemd',
+        content: (
+          <Fragment>
+            <EuiSpacer />
+            <EuiText>
+              <EuiCodeBlock style={codeBlock} language={language}>
+                  {this.systemSelector()}
+              </EuiCodeBlock>
+              <EuiCopy textToCopy={this.systemSelector()}>
+                {copy => (
+                  <EuiButton
+                    fill
+                    iconType="copy"
+                    onClick={copy}>
+                    Copy command
+                  </EuiButton>
+                )}
+              </EuiCopy>
+            </EuiText>
+          </Fragment>
+        ),
+      },
+      {
+        id: 'sysV',
+        name: 'SysV Init',
+        content: (
+          <Fragment>
+            <EuiSpacer />
+            <EuiText>
+              <EuiCodeBlock style={codeBlock} language={language}>
+                  {this.systemSelector()}
+              </EuiCodeBlock>
+              <EuiCopy textToCopy={this.systemSelector()}>
+                {copy => (
+                  <EuiButton
+                    fill
+                    iconType="copy"
+                    onClick={copy}>
+                    Copy command
+                  </EuiButton>
+                )}
+              </EuiCopy>
+            </EuiText>
+          </Fragment>
+        ),
+      }
+    ];
 
     const steps = [
       {
@@ -521,33 +578,11 @@ export class RegisterAgent extends Component {
             iconType="iInCircle"
           />  
         : 
-        <EuiFlexGroup direction="column">
-          <EuiFlexItem>
-            <EuiButtonGroup
-              color='primary'
-              options={sysButtons}
-              idSelected={this.state.selectedSYS}
-              onChange={sys => this.selectSYS(sys)}
-            />
-          </EuiFlexItem>
-          <EuiFlexItem>
-            <EuiText>
-              <EuiCodeBlock style={codeBlock} language={language}>
-                {this.systemSelector()}
-              </EuiCodeBlock>
-              <EuiCopy textToCopy={this.systemSelector()}>
-                {copy => (
-                  <EuiButton
-                    fill
-                    iconType="copy"
-                    onClick={copy}>
-                    Copy command
-                  </EuiButton>
-                )}
-              </EuiCopy>
-            </EuiText>
-          </EuiFlexItem>
-       </EuiFlexGroup>
+        <EuiTabbedContent
+          tabs={tabs}
+          selectedTab={this.selectedSYS}
+          onTabClick={onTabClick}
+        />
       }] : []),
 
       ...(!missingOSSelection.length && (this.state.selectedOS !== 'rpm') && (this.state.selectedOS !== 'deb') && restartAgentCommand ? [
