@@ -9,7 +9,7 @@ import { ApiCheck } from '../../react-services/wz-api-check';
 import { WzRequest } from '../../react-services/wz-request';
 import { SavedObject } from '../../react-services/saved-objects';
 import { ErrorHandler } from '../../react-services/error-handler';
-import { WAZUH_MONITORING_PATTERN } from '../../../common/constants';
+import { WAZUH_INDEX_TYPE_ALERTS, WAZUH_INDEX_TYPE_STATISTICS, WAZUH_INDEX_TYPE_MONITORING } from '../../../common/constants';
 import { checkKibanaSettings, checkKibanaSettingsTimeFilter } from './lib';
 
 export class HealthCheck extends Component {
@@ -243,21 +243,15 @@ export class HealthCheck extends Component {
    * This check if the pattern exist then create if not
    * @param pattern string
    */
-  async checkSupportPattern(pattern, itemId) {
+  async checkSupportPattern(pattern, itemId, indexType) {
     let results = this.state.results;
     let errors = this.state.errors;
     let selectedPattern = 'alerts';
-    //Si el itemId es 5 significa que es monitoring y si es 6 es statistics. Esto viene dado abajo en load()
-    if (itemId === 5) {
-      selectedPattern = 'monitoring'
-    }
-    if (itemId === 6) {
-      selectedPattern = 'statistics'
-    }
+
     const result = await SavedObject.existsIndexPattern(pattern);
     if (!result.data) {
       const toast = getToasts().addWarning(`${pattern} index pattern was not found and it will be created`)
-      const fields = await SavedObject.getIndicesFields(pattern,selectedPattern);
+      const fields = await SavedObject.getIndicesFields(pattern, indexType);
       try {
         await SavedObject.createSavedObject(
           'index-pattern',
@@ -342,8 +336,8 @@ export class HealthCheck extends Component {
           await Promise.all([
             this.checkPatterns(),
             this.checkApiConnection(),
-            this.checkSupportPattern(configuration['wazuh.monitoring.pattern'], 5),
-            this.checkSupportPattern(`${configuration['cron.prefix']}-${configuration['cron.statistics.index.name']}-*`, 6),
+            this.checkSupportPattern(configuration['wazuh.monitoring.pattern'], 5, WAZUH_INDEX_TYPE_MONITORING),
+            this.checkSupportPattern(`${configuration['cron.prefix']}-${configuration['cron.statistics.index.name']}-*`, 6, WAZUH_INDEX_TYPE_STATISTICS),
           ]);
           if (checks.fields) {
             const i = results.map(item => item.id).indexOf(4);

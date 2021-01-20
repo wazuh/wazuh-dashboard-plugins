@@ -81,7 +81,7 @@ export class SavedObject {
   static async existsOrCreateIndexPattern(patternID) {
     const result = await SavedObject.existsIndexPattern(patternID);
     if (!result.data) {
-      const fields = await SavedObject.getIndicesFields(patternID,'alerts');
+      const fields = await SavedObject.getIndicesFields(patternID, 'alerts');
       await this.createSavedObject(
         'index-pattern',
         patternID,
@@ -172,7 +172,7 @@ export class SavedObject {
    */
   static async refreshIndexPattern(pattern) {
     try {
-      const fields = await SavedObject.getIndicesFields(pattern.title,'alerts');
+      const fields = await SavedObject.getIndicesFields(pattern.title, 'alerts');
       await this.refreshFieldsOfIndexPattern(pattern.id, pattern.title, fields);
 
       return;
@@ -189,7 +189,7 @@ export class SavedObject {
    */
   static async createWazuhIndexPattern(pattern) {
     try {
-      const fields = await SavedObject.getIndicesFields(pattern,'alerts');
+      const fields = await SavedObject.getIndicesFields(pattern, 'alerts');
       await this.createSavedObject(
         'index-pattern',
         pattern,
@@ -215,19 +215,19 @@ export class SavedObject {
     }
   }
 
-  static getIndicesFields = async (pattern,selectedPattern) => GenericRequest.request(
+  static getIndicesFields = async (pattern, indexType) => GenericRequest.request(
     //we check if indices exist before creating the index pattern
     'GET',
     `/api/index_patterns/_fields_for_wildcard?pattern=${pattern}&meta_fields=_source&meta_fields=_id&meta_fields=_type&meta_fields=_index&meta_fields=_score`,
     {}
   ).then(response => response.data.fields).catch(() => {
-    if (selectedPattern === 'monitoring') {
-      return FieldsMonitoring;
-    } else if (selectedPattern === 'statistics') {
-      return FieldsStatistics;
-    } else if (selectedPattern === 'alerts'){
-      return KnownFields
+    switch (indexType) {
+      case 'monitoring':
+        return FieldsMonitoring;
+      case 'statistics':
+        return FieldsStatistics;
+      case 'alerts':
+        return KnownFields
     }
   })
-
 }
