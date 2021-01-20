@@ -357,14 +357,6 @@ export class RegisterAgent extends Component {
     }
   };
 
-  checkNeedSystemdOrSysV(os){
-    if(os === 'rpm'){
-      return true;
-    }
-    else
-      return false;
-  }
-
   render() {
     const missingOSSelection = this.checkMissingOSSelection();
     const ipInput = (
