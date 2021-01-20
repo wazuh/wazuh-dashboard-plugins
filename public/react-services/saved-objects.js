@@ -81,7 +81,7 @@ export class SavedObject {
   static async existsOrCreateIndexPattern(patternID) {
     const result = await SavedObject.existsIndexPattern(patternID);
     if (!result.data) {
-      const fields = await SavedObject.getIndicesFields(patternID, 'alerts');
+      const fields = await SavedObject.getIndicesFields(patternID, WAZUH_INDEX_TYPE_ALERTS);
       await this.createSavedObject(
         'index-pattern',
         patternID,
@@ -172,7 +172,7 @@ export class SavedObject {
    */
   static async refreshIndexPattern(pattern) {
     try {
-      const fields = await SavedObject.getIndicesFields(pattern.title, 'alerts');
+      const fields = await SavedObject.getIndicesFields(pattern.title, WAZUH_INDEX_TYPE_ALERTS);
       await this.refreshFieldsOfIndexPattern(pattern.id, pattern.title, fields);
 
       return;
@@ -189,7 +189,7 @@ export class SavedObject {
    */
   static async createWazuhIndexPattern(pattern) {
     try {
-      const fields = await SavedObject.getIndicesFields(pattern, 'alerts');
+      const fields = await SavedObject.getIndicesFields(pattern, WAZUH_INDEX_TYPE_ALERTS);
       await this.createSavedObject(
         'index-pattern',
         pattern,
