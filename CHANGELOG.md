@@ -8,6 +8,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Fixed Wazuh menu and agent menu for Solaris agents [#2773](https://github.com/wazuh/wazuh-kibana-app/issues/2773) [#2725](https://github.com/wazuh/wazuh-kibana-app/issues/2725)
 - Fixed wrong shards and replicas for statistics indices and also fixed wrong prefix for monitoring indices [#2732](https://github.com/wazuh/wazuh-kibana-app/issues/2732)
+- Fixed bug that show an hour before in /security-events/dashboard [#2785](https://github.com/wazuh/wazuh-kibana-app/issues/2785) 
 
 ## Wazuh v4.0.3 - Kibana v7.9.1, v7.9.2, v7.9.3 - Revision 4015
 
