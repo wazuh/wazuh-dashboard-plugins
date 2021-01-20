@@ -206,7 +206,7 @@ export function jobInitializeRun(context) {
       }
 
       if(!fs.existsSync(WAZUH_DATA_KIBANA_BASE_ABSOLUTE_PATH)){
-        throw new Error(`The data directory is missing in the Kibana root instalation. Create the directory in ${WAZUH_DATA_KIBANA_BASE_ABSOLUTE_PATH} and give it the required permissions. (sudo mkdir ${WAZUH_DATA_KIBANA_BASE_ABSOLUTE_PATH};sudo chown -R kibana:kibana ${WAZUH_DATA_KIBANA_BASE_ABSOLUTE_PATH})`);
+        throw new Error(`The data directory is missing in the Kibana root instalation. Create the directory in ${WAZUH_DATA_KIBANA_BASE_ABSOLUTE_PATH} and give it the required permissions (sudo mkdir ${WAZUH_DATA_KIBANA_BASE_ABSOLUTE_PATH};sudo chown -R kibana:kibana ${WAZUH_DATA_KIBANA_BASE_ABSOLUTE_PATH}). After restart the Kibana service.`);
       };
 
       if (!fs.existsSync(WAZUH_DATA_CONFIG_REGISTRY_PATH)) {

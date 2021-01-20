@@ -11,9 +11,11 @@
  */
 
 import { GenericRequest } from './generic-request';
-import { KnownFields } from '../utils/known-fields'
-import { FieldsStatistics } from '../utils/statistics-fields'
-import { FieldsMonitoring } from '../utils/monitoring-fields'
+import { KnownFields } from '../utils/known-fields';
+import { FieldsStatistics } from '../utils/statistics-fields';
+import { FieldsMonitoring } from '../utils/monitoring-fields';
+import { WAZUH_INDEX_TYPE_MONITORING, WAZUH_INDEX_TYPE_STATISTICS, WAZUH_INDEX_TYPE_ALERTS} from '../../common/constants';
+
 export class SavedObject {
   /**
    *
