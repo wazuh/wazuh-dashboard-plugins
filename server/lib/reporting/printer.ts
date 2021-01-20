@@ -102,23 +102,23 @@ const fonts = {
   Roboto: {
     normal: path.join(
       __dirname,
-      '../../../public/utils/opensans/OpenSans-Light.ttf'
+      '../../../public/assets/opensans/OpenSans-Light.ttf'
     ),
     bold: path.join(
       __dirname,
-      '../../../public/utils/opensans/OpenSans-Bold.ttf'
+      '../../../public/assets/opensans/OpenSans-Bold.ttf'
     ),
     italics: path.join(
       __dirname,
-      '../../../public/utils/opensans/OpenSans-Italic.ttf'
+      '../../../public/assets/opensans/OpenSans-Italic.ttf'
     ),
     bolditalics: path.join(
       __dirname,
-      '../../../public/utils/opensans/OpenSans-BoldItalic.ttf'
+      '../../../public/assets/opensans/OpenSans-BoldItalic.ttf'
     ),
     monslight: path.join(
       __dirname,
-      '../../../public/utils/opensans/Montserrat-Light.ttf'
+      '../../../public/assets/opensans/Montserrat-Light.ttf'
     )
   }
 };

@@ -22,9 +22,7 @@ import { TabVisualizations } from "../factories/tab-visualizations";
 import store from "../redux/store";
 import { updateMetric } from "../redux/actions/visualizationsActions";
 import { GenericRequest } from "../react-services/generic-request";
-import { Vis } from "../../../../src/plugins/visualizations/public";
 import { createSavedVisLoader } from "./visualizations/saved_visualizations";
-import { TypesService } from "../../../../src/plugins/visualizations/public";
 import {
   EuiLoadingChart,
   EuiLoadingSpinner,
@@ -68,13 +66,14 @@ class KibanaVis extends Component {
     };
     const servicesForVisualizations = {
       ...services,
-      ...{ visualizationTypes: new TypesService().start() },
+      ...{ visualizationTypes: getVisualizationsPlugin() },
     };
     this.savedObjectLoaderVisualize = createSavedVisLoader(
       servicesForVisualizations
     );
     this.visID = this.props.visID;
     this.tab = this.props.tab;
+
   }
 
   showToast = (color, title, text, time) => {
@@ -235,9 +234,8 @@ class KibanaVis extends Component {
           this.visualization.searchSource.setField("source", false);
           // Visualization doesn't need "hits"
           this.visualization.searchSource.setField('size', 0);
-          const visState = await getVisualizationsPlugin().convertToSerializedVis(this.visualization);
-          const vis = new Vis(this.visualization.visState.type, visState);
-          await vis.setState(visState);
+          const visState = await getVisualizationsPlugin().convertToSerializedVis(this.visualization);        
+          const vis = await getVisualizationsPlugin().createVis(this.visualization.visState.type, visState);
           this.visHandler = await getVisualizationsPlugin().__LEGACY.createVisEmbeddableFromObject(
             vis,
             visInput

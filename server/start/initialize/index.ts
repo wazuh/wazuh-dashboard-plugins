@@ -16,7 +16,7 @@ import { getConfiguration } from '../../lib/get-configuration';
 import { totalmem } from 'os';
 import fs from 'fs';
 import { ManageHosts } from '../../lib/manage-hosts';
-import { WAZUH_ALERTS_PATTERN, WAZUH_DATA_CONFIG_REGISTRY_PATH, WAZUH_INDEX, WAZUH_VERSION_INDEX, WAZUH_KIBANA_TEMPLATE_NAME } from '../../../common/constants';
+import { WAZUH_ALERTS_PATTERN, WAZUH_DATA_CONFIG_REGISTRY_PATH, WAZUH_INDEX, WAZUH_VERSION_INDEX, WAZUH_KIBANA_TEMPLATE_NAME, WAZUH_DATA_KIBANA_BASE_ABSOLUTE_PATH } from '../../../common/constants';
 import { createDataDirectoryIfNotExists } from '../../lib/filesystem';
 
 const manageHosts = new ManageHosts();
@@ -204,6 +204,10 @@ export function jobInitializeRun(context) {
           'debug'
         );
       }
+
+      if(!fs.existsSync(WAZUH_DATA_KIBANA_BASE_ABSOLUTE_PATH)){
+        throw new Error(`The data directory is missing in the Kibana root instalation. Create the directory in ${WAZUH_DATA_KIBANA_BASE_ABSOLUTE_PATH} and give it the required permissions. (sudo mkdir ${WAZUH_DATA_KIBANA_BASE_ABSOLUTE_PATH};sudo chown -R kibana:kibana ${WAZUH_DATA_KIBANA_BASE_ABSOLUTE_PATH})`);
+      };
 
       if (!fs.existsSync(WAZUH_DATA_CONFIG_REGISTRY_PATH)) {
         log(

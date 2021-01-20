@@ -12,7 +12,8 @@
 
 import { GenericRequest } from './generic-request';
 import { KnownFields } from '../utils/known-fields'
-
+import { FieldsStatistics } from '../utils/statistics-fields'
+import { FieldsMonitoring } from '../utils/monitoring-fields'
 export class SavedObject {
   /**
    *
@@ -78,9 +79,9 @@ export class SavedObject {
   }
 
   static async existsOrCreateIndexPattern(patternID) {
-     const result = await SavedObject.existsIndexPattern(patternID);
-     if (!result.data) {
-      const fields = await SavedObject.getIndicesFields(patternID);
+    const result = await SavedObject.existsIndexPattern(patternID);
+    if (!result.data) {
+      const fields = await SavedObject.getIndicesFields(patternID, WAZUH_INDEX_TYPE_ALERTS);
       await this.createSavedObject(
         'index-pattern',
         patternID,
@@ -171,7 +172,7 @@ export class SavedObject {
    */
   static async refreshIndexPattern(pattern) {
     try {
-      const fields = await SavedObject.getIndicesFields(pattern.title);
+      const fields = await SavedObject.getIndicesFields(pattern.title, WAZUH_INDEX_TYPE_ALERTS);
       await this.refreshFieldsOfIndexPattern(pattern.id, pattern.title, fields);
 
       return;
@@ -188,7 +189,7 @@ export class SavedObject {
    */
   static async createWazuhIndexPattern(pattern) {
     try {
-      const fields = await SavedObject.getIndicesFields(pattern);
+      const fields = await SavedObject.getIndicesFields(pattern, WAZUH_INDEX_TYPE_ALERTS);
       await this.createSavedObject(
         'index-pattern',
         pattern,
@@ -214,10 +215,19 @@ export class SavedObject {
     }
   }
 
-  static getIndicesFields = async (pattern) => GenericRequest.request(
+  static getIndicesFields = async (pattern, indexType) => GenericRequest.request(
     //we check if indices exist before creating the index pattern
     'GET',
     `/api/index_patterns/_fields_for_wildcard?pattern=${pattern}&meta_fields=_source&meta_fields=_id&meta_fields=_type&meta_fields=_index&meta_fields=_score`,
     {}
-  ).then(response => response.data.fields).catch(() => KnownFields)
+  ).then(response => response.data.fields).catch(() => {
+    switch (indexType) {
+      case WAZUH_INDEX_TYPE_MONITORING:
+        return FieldsMonitoring;
+      case WAZUH_INDEX_TYPE_STATISTICS:
+        return FieldsStatistics;
+      case WAZUH_INDEX_TYPE_ALERTS:
+        return KnownFields
+    }
+  })
 }
