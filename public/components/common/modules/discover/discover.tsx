@@ -413,7 +413,7 @@ export const Discover = compose(
           width: '10%',
           sortable: true,
           render: time => {
-            return <span>{TimeService.offset(time)} </span>
+            return <span>{TimeService.offset(time)}</span>
           },
         }
       }
