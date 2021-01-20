@@ -196,7 +196,7 @@ function discoverController(
 
   const wazuhConfig = new WazuhConfig();
   const modulesHelper = ModulesHelper;
- 
+
   const getTimeField = () => {
     return isDefaultType($scope.indexPattern) ? $scope.indexPattern.timeFieldName : undefined;
   };
@@ -337,7 +337,7 @@ function discoverController(
     stopStateSync();
     stopSyncingGlobalStateWithUrl();
     stopSyncingQueryAppStateWithStateContainer();
-    //WAZUH     
+    //WAZUH
     //unlistenHistoryBasePath();
     if (tabListener) tabListener();
     delete wazuhApp.discoverScope;
@@ -631,7 +631,7 @@ function discoverController(
             );
             // Copying it to the rootScope to access it from the Wazuh App //
             $rootScope.resultState = $scope.resultState;
-            ///////////////////////////////////////////////////////////////// 
+            /////////////////////////////////////////////////////////////////
 
             prev = current;
           };
@@ -683,7 +683,7 @@ function discoverController(
       .catch((error) => {
         // If the request was aborted then no need to surface this error in the UI
         if (error instanceof Error && error.name === 'AbortError') return;
-      
+
         $scope.fetchStatus = fetchStatuses.NO_RESULTS;
         $scope.rows = [];
         data.search.showError(error);
@@ -694,7 +694,7 @@ function discoverController(
     // Wazuh filters are not ready yet
     if (!filtersAreReady()) return;
     if (!_.isEqual(query, appStateContainer.getState().query) || isUpdate === false) {
-      /// Wazuh 7.7.x  
+      /// Wazuh 7.7.x
       let q = { ...query };
       if (query && typeof query === 'object') {
         q.update_Id = new Date().getTime().toString();
@@ -770,7 +770,7 @@ function discoverController(
 
     $scope.hits = resp.hits.total;
     $scope.rows = resp.hits.hits;
-    
+
     // Ensure we have "hits" and "rows" available as soon as possible
     $scope.$applyAsync();
     // if we haven't counted yet, reset the counts
@@ -1064,6 +1064,7 @@ function discoverController(
   });
 
   $scope.loadFilters = async (wzCurrentFilters, tab) => {
+    filterManager.removeAll();
     const appState = appStateContainer.getState();
     if (!appState) {
       $timeout(100).then(() => {
