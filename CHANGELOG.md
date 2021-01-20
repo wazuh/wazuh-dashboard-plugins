@@ -4,12 +4,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ## Wazuh v4.0.4 - Kibana 7.10.0 , 7.10.2 - Revision 4016
 
-### Fixed
-
-- Fixed Wazuh menu and agent menu for Solaris agents [#2773](https://github.com/wazuh/wazuh-kibana-app/issues/2773) [#2725](https://github.com/wazuh/wazuh-kibana-app/issues/2725)
-- Fixed wrong shards and replicas for statistics indices and also fixed wrong prefix for monitoring indices [#2732](https://github.com/wazuh/wazuh-kibana-app/issues/2732)
-- Report's creation dates set to 1970-01-01T00:00:00.000Z [#2772](https://github.com/wazuh/wazuh-kibana-app/issues/2772)
-
 ### Added
 
 - Adapt the app to the new Kibana platform [#2475](https://github.com/wazuh/wazuh-kibana-app/issues/2475)
@@ -33,6 +27,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Wui rules label should have only one tooltip [#2723](https://github.com/wazuh/wazuh-kibana-app/issues/2723)
 - Fixed Wazuh menu and agent menu for Solaris agents [#2773](https://github.com/wazuh/wazuh-kibana-app/issues/2773) [#2725](https://github.com/wazuh/wazuh-kibana-app/issues/2725)
 - Fixed wrong shards and replicas for statistics indices and also fixed wrong prefix for monitoring indices [#2732](https://github.com/wazuh/wazuh-kibana-app/issues/2732)
+- Report's creation dates set to 1970-01-01T00:00:00.000Z [#2772](https://github.com/wazuh/wazuh-kibana-app/issues/2772)
+- Fixed bug for missing commands in ubuntu/debian and centos [#2786](https://github.com/wazuh/wazuh-kibana-app/issues/2786)
 
 ## Wazuh v4.0.4 - Kibana v7.9.1, v7.9.3 - Revision 4015
 
