@@ -16,6 +16,7 @@ import { log } from '../lib/logger';
 import { ErrorResponse } from '../lib/error-response';
 import { APIUserAllowRunAs } from '../lib/cache-api-user-has-run-as';
 import { KibanaRequest, RequestHandlerContext, KibanaResponseFactory } from 'src/core/server';
+import { WAZUH_DATA_KIBANA_BASE_ABSOLUTE_PATH } from '../../common/constants';
 
 export class WazuhHostsCtrl {
   constructor() {
@@ -40,6 +41,14 @@ export class WazuhHostsCtrl {
         body: result
       });
     } catch (error) {
+      if(error && error.message && ['ENOENT: no such file or directory', WAZUH_DATA_KIBANA_BASE_ABSOLUTE_PATH].every(text => error.message.includes(text))){
+        return response.badRequest({
+          body: {
+            message: `Error getting the hosts entries: The \'${WAZUH_DATA_KIBANA_BASE_ABSOLUTE_PATH}\' directory could not exist in your Kibana installation.
+            If this doesn't exist, create it and give the permissions 'sudo mkdir ${WAZUH_DATA_KIBANA_BASE_ABSOLUTE_PATH};sudo chmod -R kibana:kibana ${WAZUH_DATA_KIBANA_BASE_ABSOLUTE_PATH}'. After, restart the Kibana service.`
+          }
+        })
+      }
       log('wazuh-hosts:getHostsEntries', error.message || error);
       return ErrorResponse(error.message || error, 2001, 500, response);
     }
