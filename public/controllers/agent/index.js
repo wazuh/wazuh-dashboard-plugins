@@ -15,7 +15,9 @@ import { RegisterAgent } from './components/register-agent';
 import { ExportConfiguration } from './components/export-configuration';
 import { AgentsWelcome } from '../../components/common/welcome/agents-welcome';
 import { Mitre } from '../../components/overview'
-import { AgentsPreview } from './components/agents-preview';
+// import { AgentsPreview } from './components/agents-preview';
+
+import { AgentsPreview } from '../../components/main-agents-preview/agents-preview';
 import { AgentsTable } from './components/agents-table';
 import { MainModule } from '../../components/common/modules/main';
 import { MainSyscollector } from '../../components/agents/syscollector/main';
@@ -23,14 +25,15 @@ import { getAngularModule } from '../../kibana-services';
 
 const app = getAngularModule();
 
-app
-  .controller('agentsController', AgentsController)
-  .controller('agentsPreviewController', AgentsPreviewController)
-  .value('RegisterAgent', RegisterAgent)
-  .value('ExportConfiguration', ExportConfiguration)
-  .value('AgentsWelcome', AgentsWelcome)
-  .value('AgentsPreview', AgentsPreview)
-  .value('Mitre', Mitre)
-  .value('AgentsTable', AgentsTable)
-  .value('MainSyscollector', MainSyscollector)
-  .value('MainModule', MainModule);
+// app
+  // .controller('agentsController', AgentsController)
+  // .controller('agentsPreviewController', AgentsPreviewController)
+  app.value('RegisterAgent', RegisterAgent)
+  app.value('ExportConfiguration', ExportConfiguration)
+  app.value('AgentsWelcome', AgentsWelcome)
+  app.value('AgentsPreview', AgentsPreview)
+  app.value('Mitre', Mitre)
+  app.value('AgentsTable', AgentsTable)
+  app.value('MainSyscollector', MainSyscollector)
+  app.value('MainModule', MainModule);
+  app.value('AgentsPreview', AgentsPreview);

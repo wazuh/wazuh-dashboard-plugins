@@ -57,7 +57,8 @@ import 'angular-animate/angular-animate';
 import 'angular-material/angular-material';
 
 // Set up Wazuh app
-import './setup';
+// import './setup';
+
 
 //App imports
 import './kibana-integrations';
