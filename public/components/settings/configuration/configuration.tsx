@@ -29,6 +29,7 @@ import {
 import WzReduxProvider from '../../../redux/wz-redux-provider'
 import store from '../../../redux/store'
 import { updateSelectedSettingsSection } from '../../../redux/actions/appStateActions';
+import { WazuhConfig } from '../../../react-services/wazuh-config';
 import { withUserAuthorizationPrompt } from '../../common/hocs/withUserAuthorization'
 import { EuiSpacer } from '@elastic/eui';
 import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../../common/constants';
@@ -50,7 +51,8 @@ const WzConfigurationSettingsProvider = (props) => {
   const [updatedConfig, setUpdateConfig] = useState({});
   useEffect(() => {
     store.dispatch(updateSelectedSettingsSection('configuration'));
-    const rawConfig = props.wazuhConfig.getConfig();
+    const wazuhConfig = new WazuhConfig()
+    const rawConfig = wazuhConfig.getConfig();
     const formatedConfig = Object.keys(rawConfig).reduce<ISetting[]>((acc, conf) => [
       ...acc,
       {
@@ -72,9 +74,9 @@ const WzConfigurationSettingsProvider = (props) => {
         </EuiPageHeader>
         <Categories config={Query.execute(query.query || query, config)} updatedConfig={updatedConfig} setUpdatedConfig={setUpdateConfig} />
         <EuiSpacer size="xxl" />
-        <BottomBar 
+        <BottomBar
           updatedConfig={updatedConfig}
-          setUpdateConfig={setUpdateConfig} 
+          setUpdateConfig={setUpdateConfig}
           setLoading={setLoading}
           config={config} />
       </EuiPageBody>
