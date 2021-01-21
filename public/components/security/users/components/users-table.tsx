@@ -79,7 +79,7 @@ export const UsersTable = ({ users, editUserFlyover, rolesLoading, roles, onSave
                 ErrorHandler.info('User was successfully deleted');
                 onSave();
               } catch (err) {
-                ErrorHandler.error(err);
+                ErrorHandler.handle(err, 'Error deleting the user');
               }
             }}
             modalProps={{ buttonColor: 'danger' }}

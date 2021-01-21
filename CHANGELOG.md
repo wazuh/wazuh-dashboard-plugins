@@ -2,7 +2,7 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v4.0.3 - Kibana v7.9.1, v7.9.2, v7.9.3 - Revision 4015
+## Wazuh v4.0.4 - Kibana v7.9.1, v7.9.3 - Revision 4016
 
 ### Added
 
@@ -22,6 +22,12 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed message in reserved users actions [#2702](https://github.com/wazuh/wazuh-kibana-app/issues/2702)
 - Error 500 on Export formatted CDB list [#2692](https://github.com/wazuh/wazuh-kibana-app/pull/2692)
 - Wui rules label should have only one tooltip [#2723](https://github.com/wazuh/wazuh-kibana-app/issues/2723)
+
+## Wazuh v4.0.4 - Kibana v7.9.1, v7.9.3 - Revision 4015
+
+### Added
+
+- Support for Wazuh v4.0.4.
 
 ## Wazuh v4.0.3 - Kibana v7.9.1, v7.9.2, v7.9.3 - Revision 4014
 
