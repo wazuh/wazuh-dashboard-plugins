@@ -16,13 +16,15 @@ import { ApiIsDown } from '../../components/settings/api/api-is-down';
 import { EnableModules } from '../../components/settings/modules/modules';
 import { WzConfigurationSettings } from '../../components/settings/configuration/configuration';
 import SettingsLogs from '../../components/settings/settings-logs/logs';
-import {WzSampleDataWrapper} from '../../components/add-modules-data/WzSampleDataWrapper'
+import { AboutSettings } from '../../components/settings/settings-about/settings-about';
+import { WzSampleDataWrapper } from '../../components/add-modules-data/WzSampleDataWrapper'
 import { getAngularModule } from '../../kibana-services';
 
 const app = getAngularModule();
 app
   .controller('settingsController', SettingsController)
   .value('EnableModules', EnableModules)
+  .value('AboutSettings', AboutSettings)
   .value('WzSampleDataWrapper', WzSampleDataWrapper)
   .value('WzConfigurationSettings', WzConfigurationSettings)
   .value('SettingsLogs', SettingsLogs)

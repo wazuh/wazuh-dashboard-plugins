@@ -25,6 +25,7 @@ import {
 } from '@elastic/eui';
 
 import { TimeService } from '../../../react-services/time-service';
+import { GenericRequest } from '../../../react-services/generic-request';
 import store from '../../../redux/store';
 import { updateSelectedSettingsSection } from '../../../redux/actions/appStateActions';
 
@@ -36,6 +37,20 @@ export default class SettingsLogs extends Component {
       logs: [],
       refreshingEntries: false
     };
+  }
+  async getAppLogs() {
+    try {
+      const logs = await GenericRequest.request('GET', '/utils/logs', {});
+      return logs.data.lastLogs.map(item => JSON.parse(item));
+    } catch (error) {
+      return [
+        {
+          date: new Date(),
+          level: 'error',
+          message: 'Error when loading Wazuh app logs'
+        }
+      ];
+    }
   }
 
   updateHeight = () => {
@@ -60,7 +75,7 @@ export default class SettingsLogs extends Component {
     this.setState({
       refreshingEntries: true
     });
-    const logs = await this.props.getLogs();
+    const logs = await this.getAppLogs();
     this._isMounted && this.setState({
       refreshingEntries: false,
       logs
