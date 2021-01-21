@@ -205,7 +205,7 @@ const wazuhPermissions = {
   "group:read": {
     "description": "Access to one or more groups basic information (id, name, agents, etc)",
     "resources": [
-      "*:*"
+      "group:id"
     ],
     "example": {
       "actions": [
@@ -265,7 +265,7 @@ const wazuhPermissions = {
   "cluster:read": {
     "description": "Read Wazuh's cluster configuration",
     "resources": [
-      "node:id"
+      "node:id",
     ],
     "example": {
       "actions": [
@@ -382,7 +382,8 @@ const wazuhPermissions = {
     "description": "Read Wazuh's cluster files",
     "resources": [
       "node:id",
-      "file:path"
+      "file:path",
+      "node:id&file:path",
     ],
     "example": {
       "actions": [
@@ -402,7 +403,8 @@ const wazuhPermissions = {
     "description": "Delete Wazuh's cluster files",
     "resources": [
       "node:id",
-      "file:path"
+      "file:path",
+      "node:id&file:path",
     ],
     "example": {
       "actions": [
@@ -950,33 +952,88 @@ export class WzUserPermissions{
       }
       const actionName = typeof permission === 'string' ? permission : permission.action;
       let actionResource = (typeof permission === 'string' && wazuhPermissions[actionName].resources.length === 1) ? (wazuhPermissions[actionName].resources[0] + ':*') : permission.resource;
-      const actionResourceAll = actionResource.split(':').map((str, index) => index === 2 ? '*': str).join(':');
-      const userPartialResources = userPermissions[actionName] ? Object.keys(userPermissions[actionName]).filter(resource => !([actionResource,actionResourceAll].includes(resource)) && (resource.match(actionResource.replace('*','\\*')) || resource.match(actionResourceAll.replace('*','\\*'))) ) : undefined;
-      if(userPermissions.rbac_mode === RBAC_MODE_BLACK){
-        // API RBAC mode = 'black'
-        if(!userPermissions[actionName]){ return false };
-        return userPermissions[actionName][actionResource] ? !isAllow(userPermissions[actionName][actionResource])
-        : userPermissions[actionName][actionResourceAll] ? !isAllow(userPermissions[actionName][actionResourceAll])
-        : userPartialResources ? userPartialResources.some(resource => !isAllow(userPermissions[actionName][resource]))
-        : wazuhPermissions[actionName].resources.find(resource => resource === RESOURCE_ANY_SHORT) && userPermissions[actionName][RESOURCE_ANY] ? !isAllow(userPermissions[actionName][RESOURCE_ANY])
-        : false
-      }else{
-        // API RBAC mode = 'white'
-        if(!userPermissions[actionName]){ return true };
-        return userPermissions[actionName][actionResource] ? !isAllow(userPermissions[actionName][actionResource])
-          : userPermissions[actionName][actionResourceAll] ? !isAllow(userPermissions[actionName][actionResourceAll])
-          : userPartialResources ? userPartialResources.some(resource => !isAllow(userPermissions[actionName][resource]))
-          : wazuhPermissions[actionName].resources.find(resource => resource === RESOURCE_ANY_SHORT) && userPermissions[actionName][RESOURCE_ANY] ? !isAllow(userPermissions[actionName][RESOURCE_ANY])
-          : true
+      const actionResourceAll = actionResource
+        .split('&')
+        .map(function (str) {
+          return str
+            .split(':')
+            .map(function (str, index) {
+              return index === 2 ? '*' : str;
+            })
+            .join(':');
+        })
+        .join('&');
+
+      const userPartialResources: string[] | undefined = userPermissions[actionName]
+        ? Object.keys(userPermissions[actionName]).filter((resource) =>
+            resource.match('&')
+              ? ![actionResource, actionResourceAll].includes(resource) &&
+                (resource.match(`/${actionResource}/`) || resource.match(`/${actionResourceAll}/`))
+              : ![actionResource, actionResourceAll].includes(resource) &&
+                (resource.match(actionResource.replace('*', '\\*')) ||
+                  resource.match(actionResourceAll.replace('*', '\\*')))
+          )
+        : undefined;
+
+      if (!userPermissions[actionName]) {
+        return userPermissions.rbac_mode === RBAC_MODE_WHITE;
       }
+
+      const existInWazuhPermissions = (userResource) => {
+        return !!wazuhPermissions[actionName].resources.find(function (resource) {
+          return (
+            resource ===
+            userResource
+              .split('&')
+              .map((str) => {
+                return str
+                  .split(':')
+                  .map(function (str, index) {
+                    return index === 2 ? '*' : str;
+                  })
+                  .join(':');
+              })
+              .join('&')
+              .replace(/:\*/g, '')
+          );
+        });
+      };
+
+      const notAllowInWazuhPermissions = (userResource) => {
+        if (userResource !== RESOURCE_ANY) {
+          return existInWazuhPermissions(userResource)
+            ? !isAllow(userPermissions[actionName][userResource])
+            : true;
+        } else {
+          return !isAllow(userPermissions[actionName][userResource]);
+        }
+      };
+
+      return userPermissions[actionName][actionResource]
+        ? notAllowInWazuhPermissions(actionResource)
+        : Object.keys(userPermissions[actionName]).some((resource) => {
+            return resource.match(actionResourceAll.replace('*', '\\*')) !== null;
+          })
+        ? Object.keys(userPermissions[actionName]).some((resource) => {
+            if (resource.match(actionResourceAll.replace('*', '\\*'))) {
+              return notAllowInWazuhPermissions(resource);
+            }
+          })
+        : (userPartialResources || []).length
+        ? userPartialResources.some((resource) => !isAllow(userPermissions[actionName][resource]))
+        : wazuhPermissions[actionName].resources.find(
+            (resource) => resource === RESOURCE_ANY_SHORT
+          ) && userPermissions[actionName][RESOURCE_ANY]
+        ? !isAllow(userPermissions[actionName][RESOURCE_ANY])
+        : userPermissions.rbac_mode === RBAC_MODE_WHITE;
     });
-  
+
     return filtered.length ? filtered : false;
   }
   // Check the missing roles of the required ones that the user does not have
   static checkMissingUserRoles(requiredRoles, userRoles) {
     const rolesUserNotOwn = requiredRoles.filter(requiredRole => !userRoles.includes(requiredRole));
-    return rolesUserNotOwn.length ? rolesUserNotOwn : false; 
+    return rolesUserNotOwn.length ? rolesUserNotOwn : false;
   }
 }
 

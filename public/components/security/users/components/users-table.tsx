@@ -68,7 +68,7 @@ export const UsersTable = ({ users, editUserFlyover, rolesLoading, roles, onSave
           <WzButtonModalConfirm
             buttonType="icon"
             tooltip={{
-              content: WzAPIUtils.isReservedID(item.id) ? "Reserved users mapping can't be deleted" : 'Delete user',
+              content: WzAPIUtils.isReservedID(item.id) ? "Reserved users can't be deleted" : 'Delete user',
               position: 'left',
             }}
             isDisabled={WzAPIUtils.isReservedID(item.id)}
@@ -79,7 +79,7 @@ export const UsersTable = ({ users, editUserFlyover, rolesLoading, roles, onSave
                 ErrorHandler.info('User was successfully deleted');
                 onSave();
               } catch (err) {
-                ErrorHandler.error(err);
+                ErrorHandler.handle(err, 'Error deleting the user');
               }
             }}
             modalProps={{ buttonColor: 'danger' }}
