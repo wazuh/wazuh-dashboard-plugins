@@ -65,7 +65,8 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
 
   public async start(core: CoreStart, plugins: AppPluginStartDependencies): Promise<WazuhStart> {
     // hide security alert 
-    plugins.security_oss.insecureCluster.hideAlert(true);
+    if(plugins.security_oss)
+      plugins.security_oss.insecureCluster.hideAlert(true);
     
     // we need to register the application service at setup, but to render it
     // there are some start dependencies necessary, for this reason
