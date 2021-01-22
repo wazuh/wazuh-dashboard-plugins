@@ -93,7 +93,7 @@ export class ReportingService {
 
       const array = await this.vis2png.checkArray(idArray);
       const name = `wazuh-${
-        agents ? 'agents' : 'overview'
+        agents ?  `agent-${agents}` : 'overview'
       }-${tab}-${(Date.now() / 1000) | 0}.pdf`;
 
       const browserTimezone = moment.tz.guess(true);
