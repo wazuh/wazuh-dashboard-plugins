@@ -138,7 +138,7 @@ export class Metrics extends Component {
       filterParams["time"] = this.timefilter.getTime(); 
       filterParams["query"] = searchBarQuery; 
       filterParams["filters"] = this.filterManager.getFilters(); 
-      this.setState({filterParams, loading: true, results:{}})
+      this.setState({filterParams, loading: true});
       const newOnClick = {};
       
       const result = this.metricsList[this.props.section].map(async(item)=> {
@@ -250,7 +250,9 @@ export class Metrics extends Component {
           const key = Object.keys(item)[0]
           newResults[key] = item[key];
         });
-        this.setState({results: newResults, loading:false, buildingMetrics: false, metricsOnClicks: newOnClick})
+        this.setState({results: newResults, loading:false, buildingMetrics: false, metricsOnClicks: newOnClick});
+      }).catch(error => {
+        this.setState({loading: false, buildingMetrics: false});
       });
     
   }
