@@ -274,7 +274,7 @@ export class InventoryTable extends Component {
   render() {
     const filesTable = this.renderFilesTable();
     return (
-      <div>
+      <div className='wz-inventory'>
         {filesTable}
         {this.state.isFlyoutVisible &&
           <EuiOverlayMask
