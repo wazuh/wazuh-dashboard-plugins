@@ -27,6 +27,7 @@ import {
 import 'brace/mode/json';
 import 'brace/snippets/json';
 import 'brace/ext/language_tools';
+import "brace/ext/searchbox";
 
 
 export function DevToolsHistory({ localStorage, closeHistory, addRequest }) {
