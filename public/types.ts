@@ -25,6 +25,7 @@ export type WazuhSetupPlugins = {
   uiActions: UiActionsSetup;
   visualizations: VisualizationsSetup;
   data: DataPublicPluginSetup;
+  navigation: NavigationPublicPluginStart;
 }
 
 export type WazuhStartPlugins = AppPluginStartDependencies;
