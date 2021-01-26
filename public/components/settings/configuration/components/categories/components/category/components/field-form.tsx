@@ -24,6 +24,7 @@ import { ISetting } from '../../../../../configuration';
 import 'brace/mode/javascript';
 import 'brace/snippets/javascript';
 import 'brace/ext/language_tools';
+import "brace/ext/searchbox";
 
 interface IFieldForm {
   item: ISetting

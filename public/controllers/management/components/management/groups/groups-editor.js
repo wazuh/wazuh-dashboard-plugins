@@ -38,6 +38,7 @@ import 'brace/theme/textmate';
 import 'brace/mode/xml';
 import 'brace/snippets/xml';
 import 'brace/ext/language_tools';
+import "brace/ext/searchbox";
 
 class WzGroupsEditor extends Component {
   _isMounted = false;
