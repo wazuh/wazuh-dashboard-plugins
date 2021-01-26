@@ -35,7 +35,7 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
   public setup(core: CoreSetup, plugins: WazuhSetupPlugins): WazuhSetup {
     core.application.register({
       id: `wazuh`,
-      title: 'Wazuh', 
+      title: 'Wazuh',
       icon: 'plugins/wazuh/assets/icon_blue.png',
       mount: async (params: AppMountParameters) => {
         if (!this.initializeInnerAngular) {
@@ -45,11 +45,13 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
         // Load application bundle
         const { renderApp } = await import('./application');
         // Get start services as specified in kibana.json
-        const [coreStart, depsStart] = await core.getStartServices();        
+        const [coreStart, depsStart] = await core.getStartServices();
         setHttp(core.http);
         setCookies(new Cookies());
-        if(!AppState.checkCookies()) window.location.reload();
-        
+        if(!AppState.checkCookies() || params.history.parentHistory.action === 'PUSH') {
+          window.location.reload();
+        }
+
         await this.initializeInnerAngular();
 
         params.element.classList.add('dscAppWrapper');
@@ -64,11 +66,11 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
   }
 
   public async start(core: CoreStart, plugins: AppPluginStartDependencies): Promise<WazuhStart> {
-    // hide security alert 
+    // hide security alert
     if(plugins.securityOss) {
       plugins.securityOss.insecureCluster.hideAlert(true);
     }
-    
+
     // we need to register the application service at setup, but to render it
     // there are some start dependencies necessary, for this reason
     // initializeInnerAngular + initializeServices are assigned at start and used
