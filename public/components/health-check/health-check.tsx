@@ -9,8 +9,10 @@ import { ApiCheck } from '../../react-services/wz-api-check';
 import { WzRequest } from '../../react-services/wz-request';
 import { SavedObject } from '../../react-services/saved-objects';
 import { ErrorHandler } from '../../react-services/error-handler';
-import { WAZUH_INDEX_TYPE_ALERTS, WAZUH_INDEX_TYPE_STATISTICS, WAZUH_INDEX_TYPE_MONITORING } from '../../../common/constants';
+import { WAZUH_ERROR_DAEMONS_NOT_READY, WAZUH_INDEX_TYPE_STATISTICS, WAZUH_INDEX_TYPE_MONITORING } from '../../../common/constants';
 import { checkKibanaSettings, checkKibanaSettingsTimeFilter } from './lib';
+import store from '../../redux/store';
+import { updateWazuhNotReadyYet } from '../../redux/actions/appStateActions.js';
 
 export class HealthCheck extends Component {
   checkPatternCount = 0;
@@ -45,6 +47,12 @@ export class HealthCheck extends Component {
     errors.push(ErrorHandler.handle(error, 'Health Check', { silent: true }));
     this.setState({ errors });
   }
+
+  /**
+   * Sleep method
+   * @param time
+   */
+  delay = time => new Promise(res => setTimeout(res,time));
 
   /**
    * This validates a pattern
@@ -110,16 +118,29 @@ export class HealthCheck extends Component {
       const errors = [];
 
       if (hosts.length) {
-        for (var i = 0; i < hosts.length; i++) {
-          try {
-            const API = await ApiCheck.checkApi(hosts[i], true);
-            if (API && API.data) {
-              return hosts[i].id;
+        for (let i = 0; i < hosts.length; i++) {
+          let tries = 10;
+          while (tries--) {
+            await this.delay(5000);
+            try {
+              const API = await ApiCheck.checkApi(hosts[i], true);
+              if (API && API.data) {
+                return hosts[i].id;
+              }
+            } catch (err) {
+              if (err.includes(WAZUH_ERROR_DAEMONS_NOT_READY)) {
+                const updateNotReadyYet = updateWazuhNotReadyYet(false);
+                store.dispatch(updateNotReadyYet);
+              } else {
+                errors.push(`Could not connect to API with id: ${hosts[i].id}: ${err.message || err}`);
+              }
             }
-          } catch (err) {
-            errors.push(`Could not connect to API with id: ${hosts[i].id}: ${err.message || err}`);
           }
         }
+
+        const updateNotReadyYet = updateWazuhNotReadyYet(true);
+        store.dispatch(updateNotReadyYet);
+
         if (errors.length) {
           let err = this.state.errors;
           errors.forEach(error => err.push(error));
@@ -278,7 +299,7 @@ export class HealthCheck extends Component {
       this.setState({ results });
     }
   }
-        
+
   /**
    * On controller loads
    */
