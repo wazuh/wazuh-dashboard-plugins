@@ -13,7 +13,7 @@ export interface AppPluginStartDependencies {
   visualizations: VisualizationsStart;
   discover: DiscoverStart;
   charts: ChartsPluginStart
-  security_oss: SecurityOssPluginStart
+  securityOss: SecurityOssPluginStart
 }
 export interface AppDependencies {
   core: CoreStart;
