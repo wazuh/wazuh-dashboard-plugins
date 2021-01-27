@@ -411,19 +411,7 @@ export class Inventory extends Component {
         onClick: () => this.toggleDetails(item)
       };
     };
-    const pagination = {
-      pageIndex: this.state.pageIndex,
-      pageSize: 10,
-      totalItemCount: (this.checks || []).length,
-      pageSizeOptions: [10, 25, 50, 100]
-    };
 
-    const search = {
-      box: {
-        incremental: this.state.incremental,
-        schema: true
-      }
-    };
     const sorting = {
       sort: {
         field: 'id',
@@ -579,7 +567,7 @@ export class Inventory extends Component {
                       itemIdToExpandedRowMap={this.state.itemIdToExpandedRowMap}
                       isExpandable={true}
                       sorting={sorting}
-                      pagination={pagination}
+                      pagination={true}
                       loading={this.state.loadingPolicy}
                     />
                   </EuiFlexItem>
