@@ -24,7 +24,7 @@
 // import { DevToolsHistory } from './devToolsHistory';
 // import * as FileSaver from '../../../services/file-saver';
 // import { ErrorHandler } from '../../../react-services/error-handler';
-// import { toastNotifications } from 'ui/notify';
+// import { getToasts }  from '../../../kibana-services';
 // import _ from 'lodash';
 
 // export function DevTools({ initialTextValue }) {
@@ -353,7 +353,7 @@
 //   }
 
 //   const showToast = (color, title, text, time) => {
-//     toastNotifications.add({
+//     getToasts().add({
 //       color: color,
 //       title: title,
 //       text: text,

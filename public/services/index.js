@@ -18,11 +18,11 @@ import { ReportingService } from './reporting';
 import { VisFactoryService } from './vis-factory-handler';
 import './region-maps';
 import './order-object-by';
-import { uiModules } from 'ui/modules';
 import { ConfigHandler } from './config-handler';
 import { CheckDaemonsStatus } from './check-daemon-status';
+import { getAngularModule } from '../kibana-services';
 
-const app = uiModules.get('app/wazuh', []);
+const app = getAngularModule();
 
 app
   .service('errorHandler', ErrorHandler)

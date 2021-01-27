@@ -44,7 +44,7 @@ import WzStatusStats from './status-stats';
 import WzStatusNodeInfo from './status-node-info';
 import WzStatusAgentInfo from './status-agent-info';
 
-import { toastNotifications } from 'ui/notify';
+import { getToasts }  from '../../../../../kibana-services';
 
 import { withUserAuthorizationPrompt, withGlobalBreadcrumb } from '../../../../../components/common/hocs';
 import { compose } from 'redux';
@@ -159,13 +159,13 @@ export class WzStatusOverview extends Component {
 
       this.props.updateAgentInfo(lastAgent);
     } catch (error) {
-      ToastNotifications.error('management:status:overview.fetchData', error);
+      getToasts().error('management:status:overview.fetchData', error);
     }
     this.props.updateLoadingStatus(false);
   }
 
   showToast = (color, text, time) => {
-    toastNotifications.add({
+    getToasts().add({
       color: color,
       title: text,
       toastLifeTimeMs: time

@@ -38,7 +38,7 @@ import {
 } from './inventory/';
 import { WzRequest } from '../../../react-services/wz-request';
 import exportCsv from '../../../react-services/wz-csv';
-import { toastNotifications } from 'ui/notify';
+import { getToasts }  from '../../../kibana-services';
 import { ICustomBadges } from '../../wz-search-bar/components';
 import { filtersToObject } from '../../wz-search-bar';
 
@@ -223,7 +223,7 @@ export class Inventory extends Component {
   }
 
   showToast = (color, title, time) => {
-    toastNotifications.add({
+    getToasts().add({
       color: color,
       title: title,
       toastLifeTimeMs: time,

@@ -1,0 +1,39 @@
+<div ng-controller="clusterController" ng-if="mctrl.tab === 'monitoring'" style="padding: 16px">
+    
+    <!-- Cluster disabled or not running -->
+    <div ng-if="!authorized">
+        <react-component name="WzEmptyPromptNoPermissions" props="{permissions}"></react-component>
+    </div>
+
+    <!-- Cluster disabled or not running -->
+    <div ng-if="!isClusterEnabled || !isClusterRunning">
+        <react-component name="ClusterDisabled" props="{enabled: isClusterEnabled, running: isClusterRunning}" ></react-component>
+    </div>
+
+    <!-- Cluster enabled -->
+    <div ng-show="isClusterEnabled && isClusterRunning && authorized" class="monitoring-discover" >
+        <div ng-show="loading" style="padding: 16px">
+            <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" ></react-component>
+        </div>
+
+        <!-- Discover search bar section -->
+        <kbn-dis class='hide-filter-control' ng-show="!loading && (!showNodes || currentNode)"></kbn-dis>
+        <!-- End Discover search bar section -->
+
+        <!-- Loading status section -->
+        <div 
+            class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceAround euiFlexGroup--directionRow euiFlexGroup--responsive">
+            <div class="euiFlexItem euiFlexItem--flexGrowZero euiTextAlign euiTextAlign--center"
+                ng-show="!loading && !rendered && resultState === 'ready' && (!showNodes || (showNodes && currentNode))">
+                <span class="euiLoadingChart euiLoadingChart--large">
+                    <span class="euiLoadingChart__bar"></span>
+                    <span class="euiLoadingChart__bar"></span>
+                    <span class="euiLoadingChart__bar"></span>
+                    <span class="euiLoadingChart__bar"></span>
+                </span>
+                <div class="euiSpacer euiSpacer--m"></div>
+                <div class="percentage">{{loadingStatus}}</div>
+            </div>
+        </div>
+        <!-- End loading status section -->
+    </div>

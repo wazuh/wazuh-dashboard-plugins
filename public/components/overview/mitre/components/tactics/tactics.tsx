@@ -23,7 +23,7 @@ import {
   EuiIcon
 } from '@elastic/eui'
 import { IFilterParams, getElasticAlerts } from '../../lib';
-import { toastNotifications } from 'ui/notify';
+import { getToasts }  from '../../../../../kibana-services';
 
 export class Tactics extends Component {
   _isMount = false;
@@ -114,7 +114,7 @@ export class Tactics extends Component {
   }
 
   showToast = (color, title, text, time) => {
-    toastNotifications.add({
+    getToasts().add({
       color: color,
       title: title,
       text: text,

@@ -10,7 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import { getServices } from '../../../../../../../src/plugins/discover/public/kibana_services';
 import store from '../../../../redux/store';
 import { connect } from 'react-redux';
 import { showExploreAgentModal, updateCurrentAgentData } from '../../../../redux/actions/appStateActions';
@@ -28,10 +27,11 @@ import {
   EuiButtonEmpty,
   EuiToolTip,
 } from '@elastic/eui';
-import './agents-selector.less';
+import './agents-selector.scss';
 import { AgentSelectionTable } from './agents-selection-table';
-import { WAZUH_ALERTS_PATTERN } from '../../../../../util/constants';
+import { WAZUH_ALERTS_PATTERN } from '../../../../../common/constants';
 import { AppState } from '../../../../react-services/app-state';
+import { getDataPlugin } from '../../../../kibana-services';
 class OverviewActions extends Component {
   constructor(props) {
     super(props);
@@ -54,7 +54,7 @@ class OverviewActions extends Component {
 
   componentDidMount() {
     const agentId = store.getState().appStateReducers.currentAgentData.id;
-    const { filterManager } = getServices();
+    const { filterManager } = getDataPlugin().query;
 
     this.setState({ filterManager: filterManager }, () => {
       if (this.props.initialFilter) this.agentTableSearch([this.props.initialFilter])

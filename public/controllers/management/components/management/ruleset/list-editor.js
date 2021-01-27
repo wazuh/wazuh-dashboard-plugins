@@ -36,7 +36,7 @@ import {
 
 import RulesetHandler from './utils/ruleset-handler';
 
-import { toastNotifications } from 'ui/notify';
+import { getToasts }  from '../../../../../kibana-services';
 
 import exportCsv from '../../../../../react-services/wz-csv';
 
@@ -176,7 +176,7 @@ class WzListEditor extends Component {
   }
 
   showToast = (color, title, text, time) => {
-    toastNotifications.add({
+    getToasts().add({
       color: color,
       title: title,
       text: text,

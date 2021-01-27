@@ -24,7 +24,7 @@ import {
 } from '@elastic/eui';
 
 import { updateRefreshTime } from '../../../../../../redux/actions/configurationActions';
-import { toastNotifications } from 'ui/notify';
+import { getToasts }  from '../../../../../../kibana-services';
 import { connect } from 'react-redux';
 
 class WzWazuhAPINotReachable extends Component {
@@ -35,7 +35,7 @@ class WzWazuhAPINotReachable extends Component {
     this.props.updateRefreshTime();
   };
   addToast(toast){
-    toastNotifications.add(toast)
+    getToasts().add(toast)
   }
   componentDidMount() {
     if (this.props.error) {

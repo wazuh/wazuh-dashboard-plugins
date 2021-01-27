@@ -24,6 +24,8 @@ import { settingsListBuilder } from '../utils/builders';
 
 import helpLinks from './help-links';
 
+const renderTargetField = item => item ? item.join(', ') : 'agent';
+
 const mainSettings = [
   { field: 'logformat', label: 'Log format' },
   { field: 'file', label: 'Log location', render: renderValueOrNoValue },
@@ -57,7 +59,6 @@ const mainSettings = [
   }
 ];
 
-const renderTargetField = item => item ? item.join(', ') : 'agent';
 
 const getMainSettingsAgentOrManager = agent =>
   agent && agent.id === '000'

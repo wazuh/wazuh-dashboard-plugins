@@ -1,4 +1,4 @@
-import { uiModules } from 'ui/modules';
+/* import { uiModules } from 'ui/modules';
 import {
   setAngularModule,
   setServices
@@ -17,3 +17,4 @@ const services = buildServices(
   { env: { packageInfo: { branch: "7.9" } } }
 );
 setServices(services);
+ */

@@ -19,7 +19,7 @@ import {
 
 import { connect } from 'react-redux';
 import RulesetHandler from './utils/ruleset-handler';
-import { toastNotifications } from 'ui/notify';
+import { getToasts }  from '../../../../../kibana-services';
 
 import {
   updateIsProcessing,
@@ -359,7 +359,7 @@ class WzRulesetTable extends Component {
   }
 
   showToast = (color, title, text, time) => {
-    toastNotifications.add({
+    getToasts().add({
       color: color,
       title: title,
       text: text,

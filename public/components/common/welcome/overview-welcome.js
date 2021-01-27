@@ -29,8 +29,8 @@ import {
 import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
 import { updateCurrentTab } from '../../../redux/actions/appStateActions';
 import store from '../../../redux/store';
-import './welcome.less';
-import { TabDescription } from '../../../../server/reporting/tab-description';
+import './welcome.scss';
+import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
 
 export class OverviewWelcome extends Component {
   constructor(props) {
@@ -58,10 +58,10 @@ export class OverviewWelcome extends Component {
           layout="horizontal"
           icon={<EuiIcon size="xl" type={icon} color="primary" />}
           className="homSynopsis__card"
-          title={TabDescription[tab].title}
+          title={WAZUH_MODULES[tab].title}
           onClick={() => store.dispatch(updateCurrentTab(tab))}
           data-test-subj={`overviewWelcome${this.strtools.capitalize(tab)}`}
-          description={TabDescription[tab].description}
+          description={WAZUH_MODULES[tab].description}
         />
       </EuiFlexItem>
     );

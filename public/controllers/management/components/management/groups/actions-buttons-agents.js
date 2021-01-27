@@ -23,14 +23,16 @@ import {
 
 import exportCsv from '../../../../../react-services/wz-csv';
 import GroupsHandler from './utils/groups-handler';
-import { toastNotifications } from 'ui/notify';
+import { getToasts }  from '../../../../../kibana-services';
 import { ExportConfiguration } from '../../../../agent/components/export-configuration';
+import { ReportingService } from '../../../../../react-services/reporting';
 
 class WzGroupsActionButtonsAgents extends Component {
   _isMounted = false;
 
   constructor(props) {
     super(props);
+    this.reportingService = new ReportingService();
 
     this.state = {
       generatingCsv: false,
@@ -185,7 +187,7 @@ class WzGroupsActionButtonsAgents extends Component {
   }
 
   showToast = (color, title, text, time) => {
-    toastNotifications.add({
+    getToasts().add({
       color: color,
       title: title,
       text: text,
@@ -210,12 +212,13 @@ class WzGroupsActionButtonsAgents extends Component {
     const exportPDFButton = (
       <ExportConfiguration
         exportConfiguration={enabledComponents =>
-          this.props.groupsProps.exportConfigurationProps.exportConfiguration(
-            enabledComponents,
-            this.props.state.itemDetail
+          this.reportingService.startConfigReport(
+            this.props.state.itemDetail,
+            'groupConfig',
+            enabledComponents
           )
         }
-        type={this.props.groupsProps.exportConfigurationProps.type}
+        type='group'
       />
     );
     // Export button

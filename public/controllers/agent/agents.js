@@ -12,17 +12,16 @@
 import { FilterHandler } from '../../utils/filter-handler';
 import { TabNames } from '../../utils/tab-names';
 import * as FileSaver from '../../services/file-saver';
-import { TabDescription } from '../../../server/reporting/tab-description';
+import { WAZUH_MODULES } from '../../../common/wazuh-modules';
 import { UnsupportedComponents } from '../../utils/components-os-support';
 import { visualizations } from '../../templates/agents/visualizations';
 
 import { ConfigurationHandler } from '../../utils/config-handler';
-import { timefilter } from 'ui/timefilter';
 import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { GenericRequest } from '../../react-services/generic-request';
 import { WzRequest } from '../../react-services/wz-request';
-import { toastNotifications } from 'ui/notify';
+import { getToasts }  from '../../kibana-services';
 import { ShareAgent } from '../../factories/share-agent';
 import { TabVisualizations } from '../../factories/tab-visualizations';
 import { TimeService } from '../../react-services/time-service';
@@ -30,7 +29,8 @@ import { ErrorHandler } from '../../react-services/error-handler';
 import { GroupHandler } from '../../react-services/group-handler';
 import store from '../../redux/store';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
-import { WAZUH_ALERTS_PATTERN } from '../../../util/constants';
+import { WAZUH_ALERTS_PATTERN } from '../../../common/constants';
+import { getDataPlugin } from '../../kibana-services';
 
 export class AgentsController {
   /**
@@ -53,7 +53,7 @@ export class AgentsController {
     reportingService,
     visFactoryService,
     csvReq
-    
+
   ) {
     this.$scope = $scope;
     this.$location = $location;
@@ -116,11 +116,11 @@ export class AgentsController {
   async $onInit() {
     const savedTimefilter = this.commonData.getTimefilter();
     if (savedTimefilter) {
-      timefilter.setTime(savedTimefilter);
+      getDataPlugin().query.timefilter.timefilter.setTime(savedTimefilter);
       this.commonData.removeTimefilter();
     }
 
-    this.$scope.TabDescription = TabDescription;
+    this.$scope.TabDescription = WAZUH_MODULES;
 
     this.$rootScope.reportStatus = false;
 
@@ -480,6 +480,7 @@ export class AgentsController {
    * @param {*} force
    */
   async switchTab(tab, force = false) {
+    const timefilter = getDataPlugin().query.timefilter.timefilter;
     this.tabVisualizations.setTab(tab);
     this.$rootScope.rendered = false;
     this.$rootScope.$applyAsync();
@@ -629,7 +630,7 @@ export class AgentsController {
    */
   addMitrefilter(id) {
     const filter = `{"meta":{"index": ${AppState.getCurrentPattern() || WAZUH_ALERTS_PATTERN}},"query":{"match":{"rule.mitre.id":{"query":"${id}","type":"phrase"}}}}`;
-    this.$rootScope.$emit('addNewKibanaFilter', { 
+    this.$rootScope.$emit('addNewKibanaFilter', {
       filter: JSON.parse(filter)
     });
   }
@@ -685,7 +686,7 @@ export class AgentsController {
   }
 
   showToast = (color, title, text, time) => {
-    toastNotifications.add({
+    getToasts().add({
       color: color,
       title: title,
       text: text,

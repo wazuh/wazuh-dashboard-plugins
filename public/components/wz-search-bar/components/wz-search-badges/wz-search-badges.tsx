@@ -12,7 +12,7 @@
 import React, { } from 'react';
 import { EuiBadge } from '@elastic/eui';
 import { GroupingComponents} from '../../../common/util';
-import './wz-search-badges.less';
+import './wz-search-badges.scss';
 
 const buttonLabel = (count) => `+${count} filters`;
 

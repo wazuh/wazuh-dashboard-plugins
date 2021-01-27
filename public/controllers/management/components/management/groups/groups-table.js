@@ -21,9 +21,8 @@ import {
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 import GroupsHandler from './utils/groups-handler';
-import { toastNotifications } from 'ui/notify';
+import { getToasts }  from '../../../../../kibana-services';
 import { WzSearchBar, filtersToObject } from '../../../../../components/wz-search-bar';
-import { WzRequest } from '../../../../../react-services/wz-request';
 import { withUserPermissions } from '../../../../../components/common/hocs/withUserPermissions';
 import { WzUserPermissions } from '../../../../../react-services/wz-user-permissions';
 
@@ -65,7 +64,7 @@ class WzGroupsTable extends Component {
 
   shouldComponentUpdate(nextProps, nextState) {
     const { items, filters } = this.state;
-    const { isProcessing, showModal } = this.props.state;
+    const { isProcessing, showModal, isLoading } = this.props.state;
     if (showModal !== nextProps.state.showModal)
       return true;
     if (isProcessing !== nextProps.state.isProcessing)
@@ -73,6 +72,8 @@ class WzGroupsTable extends Component {
     if (JSON.stringify(items) !== JSON.stringify(nextState.items))
       return true;
     if (JSON.stringify(filters) !== JSON.stringify(nextState.filters))
+      return true;
+    if (isLoading !== nextProps.state.isLoading)
       return true;
     return false;
   }
@@ -95,19 +96,29 @@ class WzGroupsTable extends Component {
    * Loads the initial information
    */
   async getItems() {
-    try {
-      const rawItems = await this.groupsHandler.listGroups({ params: this.buildFilter() });
-      const { affected_items, total_affected_items } = ((rawItems || {}).data || {}).data;
-
-      this.setState({
-        items : affected_items,
-        totalItems : total_affected_items
-      });
-      this.props.state.isProcessing && this.props.updateIsProcessing(false);
-    } catch (error) {
-      this.props.state.isProcessing && this.props.updateIsProcessing(false);
-      return Promise.reject(error);
-    }
+    this.setState({items:[], totalItems: 0}, async () => {
+      try {
+        this.props.updateLoadingStatus(true);
+        const rawItems = await this.groupsHandler.listGroups({ params: this.buildFilter() });
+        const { affected_items, total_affected_items } = ((rawItems || {}).data || {}).data;
+  
+        this.setState({
+          items : affected_items,
+          totalItems : total_affected_items
+        });
+        this.props.updateLoadingStatus(false);
+        this.props.state.isProcessing && this.props.updateIsProcessing(false);
+      } catch (error) {
+        this.props.updateLoadingStatus(false);
+        this.props.state.isProcessing && this.props.updateIsProcessing(false);
+        getToasts().add({
+          color: 'danger',
+          title: 'Error getting groups',
+          text: error.message || String(error)
+        });
+        return Promise.reject(error);
+      }
+    })
   }
 
   buildFilter() {
@@ -225,7 +236,7 @@ class WzGroupsTable extends Component {
   }
 
   showToast = (color, title, text, time) => {
-    toastNotifications.add({
+    getToasts().add({
       color: color,
       title: title,
       text: text,

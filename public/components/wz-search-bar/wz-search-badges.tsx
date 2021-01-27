@@ -17,7 +17,7 @@ import { EuiBadge } from '@elastic/eui';
 import { QInterpreter, queryObject } from './lib/q-interpreter';
 import { ContextMenu } from './components/wz-search-badges';
 import { qSuggests } from '.';
-import './src/style/wz-search-badges.less'
+import './src/style/wz-search-badges.scss'
 import { EuiText } from '@elastic/eui';
 import { EuiPopover } from '@elastic/eui';
 import { EuiButtonEmpty } from '@elastic/eui';

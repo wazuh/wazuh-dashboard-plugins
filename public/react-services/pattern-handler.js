@@ -13,8 +13,7 @@ import { GenericRequest } from './generic-request';
 import { AppState } from './app-state';
 import { WzMisc } from '../factories/misc';
 import { SavedObject } from './saved-objects';
-import { npStart } from 'ui/new_platform';
-import { toastNotifications } from 'ui/notify';
+import { getDataPlugin, getToasts }  from '../kibana-services';
 import { WazuhConfig } from '../react-services/wazuh-config';
 
 export class PatternHandler {
@@ -53,7 +52,7 @@ export class PatternHandler {
           const { pattern } = wazuhConfig.getConfig();
           if (!pattern) return;
 
-          toastNotifications.add({
+          getToasts().add({
             color: 'warning',
             title:
               `No valid index patterns were found, proceeding to create default ${pattern} index pattern`,
@@ -62,7 +61,7 @@ export class PatternHandler {
 
           await SavedObject.createWazuhIndexPattern(pattern);
         } catch (err) {
-          toastNotifications.add({
+          getToasts().add({
             color: 'error',
             title: 'Error creating the index pattern.',
             text: err.message || err,
@@ -113,11 +112,7 @@ export class PatternHandler {
   static async changePattern(selectedPattern) {
     try {
       AppState.setCurrentPattern(selectedPattern);
-      await GenericRequest.request(
-        'GET',
-        `/elastic/known-fields/${selectedPattern}`,
-        {}
-      );
+      await this.refreshIndexPattern();
       return AppState.getCurrentPattern();
     } catch (error) {
       throw new Error('Error Pattern Handler (changePattern)');
@@ -132,10 +127,8 @@ export class PatternHandler {
   static async refreshIndexPattern() {
     try {
       const currentPattern = AppState.getCurrentPattern();
-      const courierData = await npStart.plugins.data.indexPatterns.get(currentPattern);
-      await SavedObject.refreshIndexPattern(currentPattern)
-      const fields = await courierData.fieldsFetcher.fetch({});
-      await courierData.initFields(fields);
+      const pattern = await getDataPlugin().indexPatterns.get(currentPattern);
+      await SavedObject.refreshIndexPattern(pattern);
     } catch (error) {
       throw new Error(error);
     }

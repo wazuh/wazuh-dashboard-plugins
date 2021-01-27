@@ -10,12 +10,8 @@
  * Find more information about this on the LICENSE file.
  */
 import { healthCheck } from './health-check';
-import { recentlyAccessed } from '../../../../../src/core/public/chrome/recently_accessed';
 import { createSavedSearchesLoader } from '../../../../../src/plugins/discover/public';
-import { npStart } from 'ui/new_platform';
-import {
-  redirectWhenMissing,
-} from '../../../../../src/plugins/discover/public/kibana_services';
+import { getToasts, getChrome, getOverlays, getDataPlugin, getSavedObjects } from '../../kibana-services';
 
 export function getSavedSearch(
   $location,
@@ -23,11 +19,11 @@ export function getSavedSearch(
   $route
 ) {
   const services = {
-    savedObjectsClient: npStart.core.savedObjects.client,
-    indexPatterns: npStart.plugins.data.indexPatterns,
-    search: npStart.plugins.data.search,
-    chrome: npStart.core.chrome,
-    overlays: npStart.core.overlays,
+    savedObjectsClient: getSavedObjects().client,
+    indexPatterns: getDataPlugin().indexPatterns,
+    search: getDataPlugin().search,
+    chrome: getChrome(),
+    overlays: getOverlays(),
   };
 
   const savedSearches = createSavedSearchesLoader(services);
@@ -45,7 +41,7 @@ export function getSavedSearch(
       .get(savedSearchId)
       .then(savedSearch => {
         if (savedSearchId) {
-          recentlyAccessed.add(
+          getChrome().recentlyAccessed.add(
             savedSearch.getFullPath(),
             savedSearch.title,
             savedSearchId
@@ -53,13 +49,21 @@ export function getSavedSearch(
         }
         return savedSearch;
       })
-      .catch(
-        redirectWhenMissing({
+      .catch(() => {
+        getToasts().addWarning({
+          title: 'Saved object is missing',
+          text: (element) => {
+            ReactDOM.render(<ErrorRenderer>{error.message}</ErrorRenderer>, element);
+            return () => ReactDOM.unmountComponentAtNode(element);
+          },
+        });
+
+        /* redirectWhenMissing({
           search: '/discover',
           'index-pattern':
             '/management/kibana/objects/savedSearches/' +
             $route.current.params.id
-        })
-      )
+        }) */
+      });
   }
 }

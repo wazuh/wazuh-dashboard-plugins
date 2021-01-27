@@ -8,7 +8,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- *  
+ *
  * Find more information about this on the LICENSE file.
  */
 
@@ -24,6 +24,10 @@ import {
     EuiFlexItem,
     EuiTitle
 } from '@elastic/eui';
+import 'brace/mode/json';
+import 'brace/snippets/json';
+import 'brace/ext/language_tools';
+import "brace/ext/searchbox";
 
 
 export function DevToolsHistory({ localStorage, closeHistory, addRequest }) {
@@ -97,7 +101,6 @@ export function DevToolsHistory({ localStorage, closeHistory, addRequest }) {
     const showOutputEditor = () => {
         return (
             <EuiCodeEditor
-                // theme="textmate"
                 width="100%"
                 height="100%"
                 value={hoverRequest ? formatReq(hoverRequest) : selectedRequest ? formatReq(selectedRequest) : "No history available"}

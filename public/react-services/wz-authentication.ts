@@ -15,8 +15,8 @@ import { AppState } from './app-state';
 import jwtDecode from 'jwt-decode';
 import store from '../redux/store';
 import { updateUserPermissions, updateUserRoles } from '../redux/actions/appStateActions';
-import { WAZUH_ROLE_ADMINISTRATOR_ID, WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../util/constants';
-import { toastNotifications } from 'ui/notify';
+import { WAZUH_ROLE_ADMINISTRATOR_ID, WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../common/constants';
+import { getToasts }  from '../kibana-services';
 
 
 export class WzAuthentication{
@@ -50,7 +50,7 @@ export class WzAuthentication{
       store.dispatch(updateUserPermissions(userPolicies));
       store.dispatch(updateUserRoles(WzAuthentication.mapUserRolesIDToAdministratorRole(jwtPayload.rbac_roles || [])));
     }catch(error){
-      toastNotifications.add({
+      getToasts().add({
         color: 'danger',
         title: 'Error getting the authorization token',
         text: error.message || error,

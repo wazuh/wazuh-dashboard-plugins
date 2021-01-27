@@ -21,6 +21,10 @@ import {
   EuiTextColor
 } from '@elastic/eui';
 import { ISetting } from '../../../../../configuration';
+import 'brace/mode/javascript';
+import 'brace/snippets/javascript';
+import 'brace/ext/language_tools';
+import "brace/ext/searchbox";
 
 interface IFieldForm {
   item: ISetting
@@ -112,7 +116,6 @@ const ArrayForm: React.FunctionComponent<IFieldForm> = (props) => {
   return (
     <EuiCodeEditor
       mode='javascript'
-      // theme='github'
       height='50px'
       width='100%'
       value={list}

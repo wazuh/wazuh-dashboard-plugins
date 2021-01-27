@@ -11,10 +11,10 @@
  */
 
 import React, { Component, Fragment } from 'react';
-import { getAngularModule } from '../../../../../../src/plugins/discover/public/kibana_services';
+import { getAngularModule } from '../../../kibana-services';
 import { EuiLoadingSpinner, EuiSpacer } from '@elastic/eui';
 
-const app = getAngularModule('app/wazuh');
+const app = getAngularModule();
 
 export class Loader extends Component {
   constructor(props) {

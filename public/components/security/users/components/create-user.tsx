@@ -142,7 +142,7 @@ export const CreateUser = ({ closeFlyout }) => {
       allow_run_as: allowRunAs,
     };
 
-    try {
+    try {             
       const user = await UsersServices.CreateUser(userData);
       await addRoles(user.id);
 

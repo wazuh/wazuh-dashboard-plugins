@@ -35,7 +35,16 @@ export class StringsTools {
   }
 
   toUpperCamelCase(str) {
-    const capitalizeStrs = str.split(' ').map(s => this.capitalize(s));
+    const capitalizeStrs = str.split(' ').map((s) => this.capitalize(s));
     return capitalizeStrs.join('');
+  }
+
+  /**
+   * Returns a version of the string with the first letter capitalized.
+   * @param str {string}
+   * @returns {string}
+   */
+  upperFirst(str = '') {
+    return str ? str.charAt(0).toUpperCase() + str.slice(1) : '';
   }
 }

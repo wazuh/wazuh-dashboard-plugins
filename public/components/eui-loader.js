@@ -9,7 +9,6 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules';
 import 'react';
 import {
   EuiIcon,
@@ -33,8 +32,9 @@ import { MultipleAgentSelector } from './management/groups/multiple-agent-select
 import { NodeList } from './management/cluster/node-list';
 import { HealthCheck } from './health-check/health-check';
 import { WzEmptyPromptNoPermissions } from './common/permissions/prompt';
+import { getAngularModule } from '../kibana-services';
 
-const app = uiModules.get('app/wazuh', ['react']);
+const app = getAngularModule();
 
 app
   .value('EuiIcon', EuiIcon)
