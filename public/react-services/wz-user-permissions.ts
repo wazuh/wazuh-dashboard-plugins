@@ -971,7 +971,7 @@ export class WzUserPermissions{
                 (resource.match(`/${actionResource}/`) || resource.match(`/${actionResourceAll}/`))
               : ![actionResource, actionResourceAll].includes(resource) &&
                 (resource.match(actionResource.replace('*', '\\*')) ||
-                  resource.match(actionResourceAll.replace('*', '\\*')))
+                  resource.match(actionResourceAll.replace('*', '\*')))
           )
         : undefined;
 

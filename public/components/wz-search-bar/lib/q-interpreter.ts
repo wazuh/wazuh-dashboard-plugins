@@ -36,7 +36,7 @@ export class QInterpreter {
       const firstConjuntion = / and | or /i.exec(query);
       const currentQ = !!firstConjuntion ? query.slice(0, firstConjuntion.index) : query;
       const descomposeQuery = currentQ && descomposeRegex.exec(currentQ);
-      const { 1: conjuntion = undefined, 2: field = '', 3: operator = undefined, 4: value = undefined } = descomposeQuery || [];
+      const { conjuntion = undefined, field = '', operator = undefined, value = undefined } = descomposeQuery.groups || [];
       const queryObj: queryObject = { conjuntion, field, operator, value }
       queries.push(queryObj)
       if (firstConjuntion) return getQueryObjects(query.slice(firstConjuntion.index + 1), queries);

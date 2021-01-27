@@ -152,7 +152,7 @@ export class OverviewController {
       this.visualizeProps["isAgent"] = agent;
       store.dispatch(updateCurrentAgentData(formattedData));
       this.$location.search('agentId', String(agent));
-      this.updateSelectedAgents(agentList);
+      this.updateSelectedAgents([formattedData.id]);
     }
   }
 
@@ -173,14 +173,14 @@ export class OverviewController {
     this.isAgent = agentList ? agentList[0] : false;
     this.$scope.isAgentText = this.isAgent && agentList.length === 1 ? ` of agent ${agentList.toString()}` : this.isAgent && agentList.length > 1 ? ` of ${agentList.length.toString()} agents` : false;
     if (agentList && agentList.length) {
-      await this.visFactoryService.buildAgentsVisualizations(
-        this.filterHandler,
-        this.tab,
-        this.tabView,
-        false,
-        (this.tabView === 'discover' || this.oldFilteredTab === this.tab)
-      );
-      this.oldFilteredTab = this.tab;
+        await this.visFactoryService.buildAgentsVisualizations(
+          this.filterHandler,
+          this.tab,
+          this.tabView,
+          agentList[0],
+          (this.tabView === 'discover' || this.oldFilteredTab === this.tab)
+        );
+        this.oldFilteredTab = this.tab;
     } else if (!agentList && this.tab !== 'welcome') {
       if (!store.getState().appStateReducers.currentAgentData.id) {
         await this.visFactoryService.buildOverviewVisualizations(

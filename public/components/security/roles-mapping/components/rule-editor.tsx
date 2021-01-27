@@ -30,6 +30,7 @@ import { WAZUH_SECURITY_PLUGIN_OPEN_DISTRO_FOR_ELASTICSEARCH } from '../../../..
 import 'brace/mode/json';
 import 'brace/snippets/json';
 import 'brace/ext/language_tools';
+import "brace/ext/searchbox";
 
 export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalUsers, currentPlatform }) => {
   const [logicalOperator, setLogicalOperator] = useState('OR');

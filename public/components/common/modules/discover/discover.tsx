@@ -51,7 +51,6 @@ import {
   buildEsQuery,
   IFieldType
 } from '../../../../../../../src/plugins/data/common';
-import '../../../../components/agents/fim/inventory/inventory.scss';
 import { getDataPlugin, getToasts, getUiSettings } from '../../../../kibana-services';
 
 const mapStateToProps = state => ({
@@ -624,7 +623,7 @@ export const Discover = compose(
     </EuiOverlayMask> : <></>;
     return (
       <div
-        className='wz-discover hide-filter-control' >
+        className='wz-discover hide-filter-control wz-inventory' >
         {!this.props.shareFilterManager && <KbnSearchBar
           indexPattern={this.indexPattern}
           filterManager={this.filterManager}

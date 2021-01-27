@@ -188,8 +188,9 @@ export const makePing = async (updateWazuhNotReadyYet, tries = 30) => {
     while (tries--) {
       await delay(2000);
       try {
-        const result = await WzRequest.apiReq('GET', '/ping', {});
-        isValid = ((result || {}).data || {}).isValid;
+        const requestDefault = await WzRequest.apiReq('GET', '/?pretty=true', {});
+
+        isValid = (requestDefault || {}).status === 200;
         if (isValid) {
           updateWazuhNotReadyYet('');
           break;
