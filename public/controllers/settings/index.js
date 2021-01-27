@@ -17,6 +17,7 @@ import { EnableModules } from '../../components/settings/modules/modules';
 import { WzConfigurationSettings } from '../../components/settings/configuration/configuration';
 import SettingsLogs from '../../components/settings/settings-logs/logs';
 import { AboutSettings } from '../../components/settings/settings-about/settings-about';
+import { MainSettingsWithReduxProvider } from '../../components/settings/settings-main';
 import { WzSampleDataWrapper } from '../../components/add-modules-data/WzSampleDataWrapper'
 import { getAngularModule } from '../../kibana-services';
 
@@ -25,6 +26,7 @@ app
   .controller('settingsController', SettingsController)
   .value('EnableModules', EnableModules)
   .value('AboutSettings', AboutSettings)
+  .value('MainSettings', MainSettingsWithReduxProvider)
   .value('WzSampleDataWrapper', WzSampleDataWrapper)
   .value('WzConfigurationSettings', WzConfigurationSettings)
   .value('SettingsLogs', SettingsLogs)

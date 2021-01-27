@@ -1,7 +1,7 @@
 /*
  * Wazuh app - React component building the API entries table.
  *
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,17 +32,30 @@ import WzReduxProvider from '../../../redux/wz-redux-provider';
 import store from '../../../redux/store';
 import { updateSelectedSettingsSection } from '../../../redux/actions/appStateActions';
 import { AppState } from '../../../react-services/app-state';
+import { WzMisc } from '../../../factories/misc';
+import { copyToClipBoard } from '../lib/utils'
 import { API_USER_STATUS_RUN_AS } from '../../../../server/lib/cache-api-user-has-run-as';
+import { GenericRequest } from '../../../react-services/generic-request';
+import { AddApi } from './add-api'
 
+const wzMisc = new WzMisc();
 export class ApiTable extends Component {
   constructor(props) {
     super(props);
 
+
     this.state = {
       apiEntries: [],
-      refreshingEntries: false
+      refreshingEntries: false,
+      isLoading: true,
+      showAddNewApi: false,
+      errorsAtInit: false,
+      addingApi: false,
+      apiIsDown: wzMisc.getApiIsDown()
     };
+
   }
+
 
   componentDidMount() {
     store.dispatch(updateSelectedSettingsSection('api'));
@@ -74,7 +87,7 @@ export class ApiTable extends Component {
           entries[idx].status = 'online';
           entries[idx].cluster_info = clusterInfo;
           //Updates the cluster info in the registry
-          await this.props.updateClusterInfoInRegistry(id, clusterInfo);
+          await this.updateClusterInfoInRegistry(id, clusterInfo);
         } catch (error) {
           numErr = numErr + 1;
           const code = ((error || {}).data || {}).code;
@@ -82,7 +95,7 @@ export class ApiTable extends Component {
             (error || {}).message || ((error || {}).data || {}).message || 'Wazuh is not reachable';
           const status = code === 3099 ? 'down' : 'unknown';
           entries[idx].status = { status, downReason };
-          if(entries[idx].id === this.props.currentDefault){ // if the selected API is down, we remove it so a new one will selected
+          if (entries[idx].id === this.props.currentDefault) { // if the selected API is down, we remove it so a new one will selected
             AppState.removeCurrentAPI();
           }
         }
@@ -121,9 +134,9 @@ export class ApiTable extends Component {
       } catch (error) {
         const code = ((error || {}).data || {}).code;
         const downReason = typeof error === 'string' ? error :
-        (error || {}).message || ((error || {}).data || {}).message || 'Wazuh is not reachable';
+          (error || {}).message || ((error || {}).data || {}).message || 'Wazuh is not reachable';
         const status = code === 3099 ? 'down' : 'unknown';
-        entries[idx].status = { status, downReason }; 
+        entries[idx].status = { status, downReason };
       }
       this.setState({
         apiEntries: entries
@@ -132,6 +145,33 @@ export class ApiTable extends Component {
       console.error('Error checking manager connection ', error);
     }
   }
+
+  showApiIsDown() {
+    this.setState({
+      apiIsDown: true
+    })
+  }
+
+  async updateClusterInfoInRegistry(id, clusterInfo) {
+    try {
+      const url = `/hosts/update-hostname/${id}`;
+      await GenericRequest.request('PUT', url, {
+        cluster_info: clusterInfo
+      });
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  showAddApiWithInitialError(error) {
+    this.setState({
+      addingApi: true,
+      apiEntries: []
+    })
+    AddApi.changeState(error)
+  }
+
+
 
   render() {
     const items = [...this.state.apiEntries];
@@ -190,24 +230,24 @@ export class ApiTable extends Component {
                     style={{ marginTop: '-12px' }}
                     iconType="questionInCircle"
                     aria-label="Info about the error"
-                    onClick={() => this.props.copyToClipBoard(item.downReason)}
+                    onClick={() => copyToClipBoard(item.downReason)}
                   />
                 </EuiToolTip>
               </span>
             ) : (
-              <span>
-                <EuiHealth color="danger">Offline</EuiHealth>
-                <EuiToolTip position="top" content={item.downReason}>
-                  <EuiButtonIcon
-                    color="primary"
-                    style={{ marginTop: '-12px' }}
-                    iconType="questionInCircle"
-                    aria-label="Info about the error"
-                    onClick={() => this.props.copyToClipBoard(item.downReason)}
-                  />
-                </EuiToolTip>
-              </span>
-            );
+                  <span>
+                    <EuiHealth color="danger">Offline</EuiHealth>
+                    <EuiToolTip position="top" content={item.downReason}>
+                      <EuiButtonIcon
+                        color="primary"
+                        style={{ marginTop: '-12px' }}
+                        iconType="questionInCircle"
+                        aria-label="Info about the error"
+                        onClick={() => copyToClipBoard(item.downReason)}
+                      />
+                    </EuiToolTip>
+                  </span>
+                );
           } else {
             return (
               <span>
@@ -234,7 +274,7 @@ export class ApiTable extends Component {
                 type='check'
               />
             </EuiToolTip>
-          
+
           ) : value === API_USER_STATUS_RUN_AS.NOT_ALLOWED ? (
             <EuiToolTip
               position='top'
@@ -245,7 +285,7 @@ export class ApiTable extends Component {
                 type='alert'
               />
             </EuiToolTip>
-          ): '';
+          ) : '';
         }
       },
       {
@@ -254,9 +294,9 @@ export class ApiTable extends Component {
           <EuiFlexGroup>
             <EuiFlexItem grow={false}>
               <WzButtonPermissions
-                buttonType='icon'        
+                buttonType='icon'
                 roles={[]}
-                tooltip={{position: 'top', content: <p>Set as default</p>}}
+                tooltip={{ position: 'top', content: <p>Set as default</p> }}
                 iconType={
                   item.id === this.props.currentDefault
                     ? 'starFilled'
@@ -309,7 +349,7 @@ export class ApiTable extends Component {
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
                 <WzButtonPermissions
-                  buttonType='empty'              
+                  buttonType='empty'
                   iconType="plusInCircle"
                   roles={[]}
                   onClick={() => this.props.showAddApi()}
@@ -355,10 +395,8 @@ ApiTable.propTypes = {
   currentDefault: PropTypes.string,
   setDefault: PropTypes.func,
   checkManager: PropTypes.func,
-  updateClusterInfoInRegistry: PropTypes.func,
   getHosts: PropTypes.func,
   testApi: PropTypes.func,
   showAddApiWithInitialError: PropTypes.func,
   showApiIsDown: PropTypes.func,
-  copyToClipBoard: PropTypes.func
 };

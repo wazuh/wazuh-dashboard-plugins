@@ -31,11 +31,18 @@ export class AddApi extends Component {
     super(props);
     this.state = {
       status: 'incomplete',
+      errorsAtinit: false,
       fetchingData: false,
       blockClose: false
     };
   }
 
+  static changeState(param){
+    this.setState({
+      errorsAtinit: param
+    })
+  }
+  
   componentDidMount() {
     this.setState({ enableClose: this.props.enableClose });
     this.checkErrorsAtInit();
