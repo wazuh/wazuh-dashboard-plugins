@@ -152,7 +152,7 @@ export class OverviewController {
       this.visualizeProps["isAgent"] = agent;
       store.dispatch(updateCurrentAgentData(formattedData));
       this.$location.search('agentId', String(agent));
-      this.updateSelectedAgents([agentList.id]);
+      this.updateSelectedAgents([formattedData.id]);
     }
   }
 
