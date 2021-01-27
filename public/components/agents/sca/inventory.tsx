@@ -174,10 +174,6 @@ export class Inventory extends Component {
     if (JSON.stringify(this.props.agent) !== JSON.stringify(prevProps.agent)) {
       this.setState({ lookingPolicy: false }, async () => await this.initialize());
     }
-    if(!_.isEqual(this.state.filters, prevState.filters)) {
-      const items = this.getItems()
-      this.setState({ items });
-    }
   }
 
   componentWillUnmount() {
@@ -273,18 +269,20 @@ export class Inventory extends Component {
   }
 
   async loadScaPolicy(policy) {
-    const filtersObject = filtersToObject(this.state.filters);
     this._isMount && this.setState({ loadingPolicy: true, itemIdToExpandedRowMap: {}, pageIndex: 0 });
     if (policy) {
       try {
-        const checks = await this.wzReq.apiReq(
+        // It query all checks whitout filters, because the filters are applied in the results
+        // due to the use of EuiInMemoryTable instead EuiTable components and do arequest with each change of filters.
+        const checksResponse = await this.wzReq.apiReq(
           'GET',
           `/sca/${this.props.agent.id}/checks/${policy.policy_id}`,
-          { params: { ...filtersObject } }
+          { }
         );
-
-        this.checks = (((checks || {}).data || {}).data || {}).affected_items || [];
-        this.buildSuggestionSearchBar(policy.policy_id, this.checks);
+        const checks = ((((checksResponse || {}).data || {}).data || {}).affected_items || [])
+          .map(item => ({...item, result: item.result || 'not applicable'}));
+        this.buildSuggestionSearchBar(policy.policy_id, checks);
+        this._isMount && this.setState({ lookingPolicy: policy, loadingPolicy: false, items: checks });
       } catch (err) {
         // We can't ensure the suggestions contains valid characters
         getToasts().add({
@@ -293,14 +291,14 @@ export class Inventory extends Component {
           text: 'The filter contains invalid characters',
           toastLifeTimeMs: 10000,
         });
-        this.setState({ lookingPolicy: policy, loadingPolicy: false })
+        this.setState({ lookingPolicy: policy, loadingPolicy: false });
       }
+    }else{
+      this._isMount && this.setState({ lookingPolicy: policy, loadingPolicy: false, items: [] });
     }
-    const items = this.getItems();
-    this._isMount && this.setState({ lookingPolicy: policy, loadingPolicy: false, items });
   }
 
-  getItems = () => !!this.checks && this.checks.filter(check =>
+  filterPolicyChecks = () => !!this.state.items && this.state.items.filter(check =>
       this.state.filters.every(filter => 
         filter.field === 'search'
         ? Object.keys(check).some(key =>  ['string', 'number'].includes(typeof check[key]) && String(check[key]).toLowerCase().includes(filter.value.toLowerCase()))
@@ -536,7 +534,7 @@ export class Inventory extends Component {
                     <EuiStat title={this.buttonStat(this.state.lookingPolicy.fail, 'result', 'failed')} description="Fail" titleColor="danger" titleSize="m" textAlign="center" />
                   </EuiFlexItem>
                   <EuiFlexItem>
-                    <EuiStat title={this.buttonStat(this.state.lookingPolicy.invalid, 'result', '')} description="Not applicable" titleColor="subdued" titleSize="m" textAlign="center" />
+                    <EuiStat title={this.buttonStat(this.state.lookingPolicy.invalid, 'result', 'not applicable')} description="Not applicable" titleColor="subdued" titleSize="m" textAlign="center" />
                   </EuiFlexItem>
                   <EuiFlexItem>
                     <EuiStat title={`${this.state.lookingPolicy.score}%`} description="Score" titleColor="accent" titleSize="m" textAlign="center" />
@@ -560,7 +558,7 @@ export class Inventory extends Component {
                 <EuiFlexGroup>
                   <EuiFlexItem>
                     <EuiInMemoryTable
-                      items={this.state.items}
+                      items={this.filterPolicyChecks()}
                       columns={this.columnsChecks}
                       rowProps={getChecksRowProps}
                       itemId="id"
