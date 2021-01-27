@@ -123,7 +123,8 @@ export function WazuhElasticRoutes(router: IRouter) {
       validate: {
         params: schema.object({
           category: schemaSampleAlertsCategories,
-        })
+        }),
+        body: schema.any()
       },
     },
     async (context, request, response) => ctrl.createSampleAlerts(context, request, response)
