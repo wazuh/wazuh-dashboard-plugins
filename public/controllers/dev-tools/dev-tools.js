@@ -201,7 +201,7 @@ export class DevToolsController {
         const tmplen = tmp.length;
         for (let j = 1; j < tmplen; ++j) {
           if (!!tmp[j] && !tmp[j].includes('#')) {
-            tmpRequestTextJson += tmp[j];
+            tmpRequestTextJson += '\n' + tmp[j];
           }
         }
 
@@ -291,6 +291,14 @@ export class DevToolsController {
         try {
           jsonLint.parse(item.requestTextJson);
         } catch (error) {
+          let errorMessage = 'Error parsing query';
+
+          //adjust the error message line number to match the line number of the editor
+          if (error.message) {
+            const regexGroups = (/(?<line>error on line )(?<number>\d+)(?<colon>:)/).exec(error.message);
+            errorMessage = error.message.replace(/(error on line )(\d+)(:)/, "$1" + (parseInt(regexGroups.groups.number) + item.start) + "$3");
+          }
+
           affectedGroups.push(item.requestText);
           const msg = this.$document[0].createElement('div');
           msg.id = new Date().getTime() / 1000;
@@ -303,7 +311,7 @@ export class DevToolsController {
               this.$document[0].createElement('span')
             );
             advice.id = new Date().getTime() / 1000;
-            advice.innerText = error.message || 'Error parsing query';
+            advice.innerText = errorMessage;
             advice.className = 'lint-block-wz';
           };
 
