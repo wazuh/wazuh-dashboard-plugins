@@ -1,4 +1,8 @@
 let ready;
+
+const documentTitle = $('title');
+documentTitle.text(documentTitle.text().replace('Wazuh - Elastic', 'Wazuh Cloud'));
+documentTitle.text(documentTitle.text().replace('Elastic', 'Wazuh Cloud'));
 let observer = new MutationObserver((mutations) => {
   mutations.forEach((mutation) => {
     if (!mutation.addedNodes) return;
@@ -11,7 +15,7 @@ let observer = new MutationObserver((mutations) => {
         var logo = $('figure > img', loginWrapper);
         logo.attr('src', '/plugins/wazuh/assets/wazuh_logo_circle.svg');
         var title = $('.euiText.euiText--medium > .euiTextAlign', loginWrapper);
-        title.text('Welcome to Wazuh');
+        title.text('Wazuh Cloud');
         var subtitle = $('.euiText.euiText--small > .euiTextAlign', loginWrapper);
         subtitle.text('The Open Source Security Platform');        
       }
