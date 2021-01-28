@@ -47,7 +47,7 @@ export const APIUserAllowRunAs = {
       };
       const response = await ApiInterceptor.requestAsInternalUser(
         'get',
-        `${api.url}:${api.port}/security/users/me`,
+        '/security/users/me',
         {},
         { apiHostID: apiId }
       );
