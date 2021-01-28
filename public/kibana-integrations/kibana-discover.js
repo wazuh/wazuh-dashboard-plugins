@@ -697,7 +697,7 @@ function discoverController(
       /// Wazuh 7.7.x
       let q = { ...query };
       if (query && typeof query === 'object') {
-        q.update_Id = new Date().getTime().toString();
+        //q.timestamp = new Date().getTime().toString();
       }
       ///
       setAppState({ query: q });
