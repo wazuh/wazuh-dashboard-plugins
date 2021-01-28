@@ -1,4 +1,4 @@
-.wz-login {
+ .wz-login {
   background: url(/plugins/wazuh/assets/wazuh_wazuh_bg.svg) !important;
   background-image: url(/plugins/wazuh/assets/wazuh_wazuh_bg.svg) !important;
   background-position-x: initial !important;
@@ -13,10 +13,11 @@
   width: 100% !important;
   height: 100% !important;
   background-size: cover !important;
-}
+} 
 
 .wz-login .login-wrapper img {
   width: 100%;
   height: 64px;
   text-align: 'center';
 }
+ 
