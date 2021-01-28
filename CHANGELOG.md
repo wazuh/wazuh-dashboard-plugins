@@ -12,6 +12,9 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Each user can only view their own reports [#2686](https://github.com/wazuh/wazuh-kibana-app/issues/2686)
 - Show the wui_ rules belong to wazuh-wui API user [#2702](https://github.com/wazuh/wazuh-kibana-app/issues/2702)
 
+### Changed
+- Replaced `wazuh` Wazuh API user by `wazuh-wui` in the default configuration [#2852](https://github.com/wazuh/wazuh-kibana-app/issues/2852)
+
 ### Fixed
 
 - Create index pattern even if there aren´t available indices [#2620](https://github.com/wazuh/wazuh-kibana-app/issues/2620)
