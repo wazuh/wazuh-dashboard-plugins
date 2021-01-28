@@ -282,8 +282,8 @@ export class ComplianceTable extends Component {
         <EuiFlexItem style={{ width: "calc(100% - 24px)" }}>
           <EuiPanel paddingSize="none">
             {!!Object.keys(complianceObject).length && this.state.filterParams.time.from !== "init" &&
-              <EuiFlexGroup>
-                <EuiFlexItem grow={false} style={{ width: "15%", minWidth: 145, maxHeight: "calc(100vh - 300px)", overflowX: "hidden" }}>
+                <EuiFlexGroup>
+                <EuiFlexItem grow={false} style={{ width: "15%", minWidth: 145, maxHeight: "calc(100vh - 320px)", overflowX: "hidden" }}>
                   <ComplianceRequirements
                     indexPattern={this.indexPattern}
                     section={this.props.section}
