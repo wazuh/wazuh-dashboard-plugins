@@ -204,7 +204,7 @@ export class ComplianceSubrequirements extends Component {
     })
     if (tacticsToRender.length) {
       return (
-        <EuiFlexGrid columns={4} gutterSize="s" style={{ maxHeight: "calc(100vh - 385px)", overflow: "overlay", overflowX: "hidden", maxWidth: "82vw", paddingRight: 10 }}>
+        <EuiFlexGrid columns={4} gutterSize="s" style={{ maxHeight: "calc(100vh - 420px)", overflow: "overlay", overflowX: "hidden", maxWidth: "82vw", paddingRight: 10 }}>
           {tacticsToRenderOrdered}
         </EuiFlexGrid>
       )
