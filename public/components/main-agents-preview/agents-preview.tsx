@@ -19,28 +19,124 @@ export const AgentsPreview = (props) => {
   const [results, setResults] = useState([]);
   const [error, setError] = useState([]);
   const [errorInit, setErrorInit] = useState(false);
+  const [api, setApi] = useState("");
+  const [isClusterEnabled, setIsClusterEnabled] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [mostActiveAgent, setMostActiveAgent] = useState({ name: '', id: '' });
+  const [prevSearch, setPrevSearch] = useState(false);
+  const [addingNewAgent, setAddingNewAgent] = useState(false);
+  const [registerAgentsProps, setRegisterAgentsProps] = useState({});
+  const [firstUrlParam, setFirstUrlParam] = useState('');
+  const [secondUrlParam, setSecondUrlParam] = useState('');
+  const [pattern, setPattern] = useState('');
+  // const [summary, setSummary] = useState(false);
+
 
   useEffect(() => {
-    getWazuhVersion()
+    setApi(JSON.parse(AppState.getCurrentAPI()).id)
+    setIsClusterEnabled(AppState.getClusterInfo() && AppState.getClusterInfo().status === 'enabled')
+    setIsLoading(true)
+    setErrorInit(false)
+
+    //functions
+    loadStatus()
+    load()
+
   }, []);
 
+  async function load() {
+    try {
+      setErrorInit(false)
+
+      const clusterInfo = AppState.getClusterInfo();
+      setFirstUrlParam(clusterInfo.status === 'enabled' ? 'cluster' : 'manager')
+      setSecondUrlParam(clusterInfo[clusterInfo.status === 'enabled' ? 'cluster' : 'manager'])
+
+      setPattern(AppState.getCurrentPattern())
+    } catch (error) {
+      setErrorInit(ErrorHandler.handle(error, '', { silent: true }))
+    }
+    setIsLoading(false)
+    // this.$scope.$applyAsync();
+  }
+
+  async function loadStatus() {
+    const summaryData = await WzRequest.apiReq('GET', '/agents/summary/status', {});
+    // setSummary(summaryData.data.data)
+    var summary = summaryData.data.data
+
+    if (summary.total === 0) {
+      addNewAgent(true)
+    }
+
+  }
+
+  function addNewAgent(flag) {
+    setAddingNewAgent(flag)
+  }
+
+  function openRegistrationDocs() {
+    this.$window.open(
+      'https://documentation.wazuh.com/current/user-manual/registering/index.html',
+      '_blank'
+    );
+  }
+
+  async function getMostActive() {
+    try {
+      const data = await WzRequest.genericReq(
+        'GET',
+        `/elastic/top/${firstUrlParam}/${secondUrlParam}/agent.name/${pattern}`
+      );
+      setMostActiveAgent({name: data.data.data})
+      const info = await this.genericReq.request(
+        'GET',
+        `/elastic/top/${firstUrlParam}/${secondUrlParam}/agent.id/${pattern}`
+      );
+      if (info.data.data === '' && this.mostActiveAgent.name !== '') {
+        this.mostActiveAgent.id = '000';
+      } else {
+        this.mostActiveAgent.id = info.data.data;
+      }
+      return this.mostActiveAgent;
+    } catch (error) { }
+  }
+
+
+  /**
+   * Returns the current API address
+   */
+  async function getCurrentApiAddress() {
+    try {
+      const result = await this.genericReq.request('GET', '/hosts/apis');
+      const entries = result.data || [];
+      const host = entries.filter(e => {
+        return e.id == this.api;
+      });
+      const url = host[0].url;
+      const numToClean = url.startsWith('https://') ? 8 : 7;
+      return url.substr(numToClean);
+    } catch (error) {
+      return false;
+    }
+  }
+
+  /**
+   * Returns the Wazuh version as x.y.z
+   */
   async function getWazuhVersion() {
     try {
       const data = await WzRequest.apiReq('GET', '//', {});
       const result = ((data || {}).data || {}).data || {};
-      console.log("RESULT");
-      console.log(result);
       return result.api_version
     } catch (error) {
-      console.log("error");
-      console.log(error);      
-      return version
+      return version;
     }
   }
 
-  return (
-    <div>
-      
-    </div>
-  )
+  // return (
+  //   <div>
+
+  //   </div>
+  // )
 }
