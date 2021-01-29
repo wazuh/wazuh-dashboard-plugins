@@ -257,7 +257,7 @@ export class SelectAgent extends Component {
 
     if (this.state.isFlyoutVisible) {
       flyout = (
-        <EuiFlyout onClose={this.closeFlyout} aria-labelledby="flyoutTitle">
+        <EuiFlyout className="wzApp" onClose={this.closeFlyout} aria-labelledby="flyoutTitle">
           <EuiFlyoutHeader hasBorder>
             <EuiTitle size="m">
               <h2 id="flyoutTitle">Select agent</h2>
