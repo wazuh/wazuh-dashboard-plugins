@@ -44,7 +44,7 @@ export function OpenSearchPanel(props) {
   } = getServices();
 
   return (
-    <EuiFlyout ownFocus onClose={props.onClose} data-test-subj="loadSearchForm">
+    <EuiFlyout className="wzApp" ownFocus onClose={props.onClose} data-test-subj="loadSearchForm">
       <EuiFlyoutHeader hasBorder>
         <EuiTitle size="m">
           <h2>

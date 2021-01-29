@@ -182,7 +182,7 @@ export const CreateUser = ({ closeFlyout }) => {
   };
 
   return (
-    <EuiFlyout onClose={() => closeFlyout()}>
+    <EuiFlyout className="wzApp" onClose={() => closeFlyout()}>
       <EuiFlyoutHeader hasBorder={false}>
         <EuiTitle size="m">
           <h2>Create new user</h2>

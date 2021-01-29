@@ -58,7 +58,7 @@ export const RolesMappingCreate = ({
   };
 
   return (
-    <EuiFlyout onClose={() => closeFlyout(false)}>
+    <EuiFlyout className="wzApp" onClose={() => closeFlyout(false)}>
       <EuiFlyoutHeader hasBorder={false}>
         <EuiTitle size="m">
           <h2>Create new role mapping &nbsp;</h2>

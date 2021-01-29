@@ -344,7 +344,7 @@ export class FlyoutTechnique extends Component {
         <EuiFlyout
           onClose={() => onChangeFlyout(false)}
           size="l"
-          className="flyout-no-overlap wz-inventory"
+          className="flyout-no-overlap wz-inventory wzApp"
           aria-labelledby="flyoutSmallTitle"
           > 
           { techniqueData &&

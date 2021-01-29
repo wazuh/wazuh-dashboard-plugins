@@ -96,7 +96,7 @@ export class FlyoutDetail extends Component {
   render() {
     const { type } = this.state;
     return (
-      <EuiFlyout onClose={() => this.props.closeFlyout()} size="l" aria-labelledby={this.state.currentFile.file} maxWidth="70%" className='wz-inventory'>
+      <EuiFlyout onClose={() => this.props.closeFlyout()} size="l" aria-labelledby={this.state.currentFile.file} maxWidth="70%" className='wz-inventory wzApp'>
         <EuiFlyoutHeader hasBorder className="flyout-header" >
           <EuiTitle size="s">
             <h2 id={this.state.currentFile.file }>{this.state.currentFile.file }</h2>
