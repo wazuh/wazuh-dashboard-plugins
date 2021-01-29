@@ -136,7 +136,7 @@
   content: '';
   width: 30px;
   height: 30px;
-  background: url(/ui/favicons/favicon-32x32.png) no-repeat;
+  background: url(/plugins/wazuh/assets/wazuh_logo_circle.svg) no-repeat;
   background-size: contain;
 }
 
