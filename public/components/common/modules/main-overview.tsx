@@ -82,7 +82,7 @@ export class MainModuleOverview extends Component {
   }
 
   async componentDidMount() {
-    const tabView = AppNavigate.getUrlParameter('tabView');
+    const tabView = AppNavigate.getUrlParameter('tabView') || 'panels';
     const tab = AppNavigate.getUrlParameter('tab');
     if(tabView && tabView !== this.props.selectView){
       if(tabView === 'panels' && tab=== 'sca' ){ // SCA initial tab is inventory
