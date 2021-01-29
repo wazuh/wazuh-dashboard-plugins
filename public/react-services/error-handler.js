@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { toastNotifications } from 'ui/notify';
+import { getToasts }  from '../kibana-services';
 import store from '../redux/store';
 import { updateWazuhNotReadyYet } from '../redux/actions/appStateActions';
 import { WzMisc } from '../factories/misc';
@@ -92,7 +92,7 @@ export class ErrorHandler {
       if (!recentlyShown) {
         message = location ? `${location}. ${message}` : message;
         history.push({ text: message, date });
-        toastNotifications.addSuccess(message);
+        getToasts().addSuccess(message);
       }
     }
   }
@@ -116,7 +116,7 @@ export class ErrorHandler {
       if (!recentlyShown) {
         message = location ? `${location}. ${message}` : message;
         history.push({ text: message, date });
-        toastNotifications.addWarning(message);
+        getToasts().addWarning(message);
       }
     }
   }
@@ -176,9 +176,9 @@ export class ErrorHandler {
           typeof text === 'string' &&
           text.toLowerCase().includes('no results'))
       ) {
-        toastNotifications.addWarning(text);
+        getToasts().addWarning(text);
       } else {
-        toastNotifications.addDanger(text);
+        getToasts().addDanger(text);
       }
     }
     return text;

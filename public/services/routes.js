@@ -11,7 +11,8 @@
  */
 
 // Require routes
-import routes from 'ui/routes';
+//import routes from 'ui/routes';
+import 'angular-route';
 
 // Functions to be executed before loading certain routes
 import {
@@ -25,22 +26,23 @@ import {
 
 // HTML templates
 import healthCheckTemplate from '../templates/health-check/health-check.html';
-import agentsTemplate from '../templates/agents/dashboards.pug';
-import agentsPrevTemplate from '../templates/agents-prev/agents-prev.pug';
-import managementTemplate from '../templates/management/management.pug';
-import overviewTemplate from '../templates/visualize/dashboards.pug';
-import settingsTemplate from '../templates/settings/settings.pug';
+import agentsTemplate from '../templates/agents/dashboards.html';
+import agentsPrevTemplate from '../templates/agents-prev/agents-prev.html';
+import managementTemplate from '../templates/management/management.html';
+import overviewTemplate from '../templates/visualize/dashboards.html';
+import settingsTemplate from '../templates/settings/settings.html';
 import securityTemplate from '../templates/security/security.html';
 import blankScreenTemplate from '../templates/error-handler/blank-screen.html';
-import toolsTemplate from '../templates/tools/tools.pug';
+import toolsTemplate from '../templates/tools/tools.html';
 import { WazuhConfig } from '../react-services/wazuh-config';
 import { GenericRequest } from '../react-services/generic-request';
 import { WzMisc } from '../factories/misc';
 import { ApiCheck } from '../react-services/wz-api-check';
 import { AppState } from '../react-services/app-state';
+import { getAngularModule } from '../kibana-services';
 
 const assignPreviousLocation = ($rootScope, $location) => {
-  const path = $location.path();	
+  const path = $location.path();
   const params = $location.search();
   // Save current location if we aren't performing a health-check, to later be able to come back to the same tab
   if (!path.includes('/health-check')) {
@@ -49,17 +51,13 @@ const assignPreviousLocation = ($rootScope, $location) => {
   }
 };
 
-function ip($q, $rootScope, $window, $location, Private, errorHandler) {
+function ip($q, $rootScope, $window, $location) {
   const wzMisc = new WzMisc();
   assignPreviousLocation($rootScope, $location);
   return getIp(
     $q,
     $window,
     $location,
-    Private,
-    AppState,
-    GenericRequest,
-    errorHandler,
     wzMisc
   );
 }
@@ -133,23 +131,28 @@ function enableWzMenu($rootScope, $location) {
 }
 
 //Routes
-routes.enable();
-routes
+const app = getAngularModule();
+
+app.config(($routeProvider) => {
+  $routeProvider
   .when('/health-check', {
     template: healthCheckTemplate,
     resolve: { apiCount, wzConfig, ip }
   })
   .when('/agents/:agent?/:tab?/:tabView?', {
     template: agentsTemplate,
-    resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
+    resolve: { enableWzMenu, nestedResolve, ip, savedSearch },
+    reloadOnSearch: false,
   })
   .when('/agents-preview/', {
     template: agentsPrevTemplate,
-    resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
+    resolve: { enableWzMenu, nestedResolve, ip, savedSearch },
+    reloadOnSearch: false,
   })
   .when('/manager/', {
     template: managementTemplate,
-    resolve: { enableWzMenu, nestedResolve, ip, savedSearch, clearRuleId }
+    resolve: { enableWzMenu, nestedResolve, ip, savedSearch, clearRuleId },
+    reloadOnSearch: false,
   })
   .when('/manager/:tab?', {
     template: managementTemplate,
@@ -157,11 +160,13 @@ routes
   })
   .when('/overview/', {
     template: overviewTemplate,
-    resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
+    resolve: { enableWzMenu, nestedResolve, ip, savedSearch },
+    reloadOnSearch: false,
   })
   .when('/settings', {
     template: settingsTemplate,
-    resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
+    resolve: { enableWzMenu, nestedResolve, ip, savedSearch },
+    reloadOnSearch: false
   })
   .when('/security', {
     template: securityTemplate,
@@ -196,3 +201,4 @@ routes
   .otherwise({
     redirectTo: '/overview'
   });
+});

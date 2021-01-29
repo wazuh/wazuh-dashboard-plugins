@@ -10,7 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 import { FilterHandler } from '../../utils/filter-handler';
-import { timefilter } from 'ui/timefilter';
 import { AppState } from '../../react-services/app-state';
 import { GenericRequest } from '../../react-services/generic-request';
 import { WzRequest } from '../../react-services/wz-request';
@@ -19,7 +18,8 @@ import { TabVisualizations } from '../../factories/tab-visualizations';
 import store from '../../redux/store';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
 import { ModulesHelper } from '../../components/common/modules/modules-helper';
-import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../util/constants';
+import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../common/constants';
+import { getDataPlugin } from '../../kibana-services';
 
 export function ClusterController(
   $scope,
@@ -34,7 +34,7 @@ export function ClusterController(
   visHandlers
 ) {
   const tabVisualizations = new TabVisualizations();
-  timefilter.setRefreshInterval({ pause: true, value: 0 });
+  getDataPlugin().query.timefilter.timefilter.setRefreshInterval({ pause: true, value: 0 });
   $scope.search = term => {
     $scope.$broadcast('wazuhSearch', { term });
   };

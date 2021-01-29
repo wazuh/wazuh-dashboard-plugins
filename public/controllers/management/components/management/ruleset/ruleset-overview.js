@@ -16,7 +16,7 @@ import { connect } from 'react-redux';
 import WzRulesetTable from './ruleset-table';
 import WzRulesetSearchBar from './ruleset-search-bar';
 import WzRulesetActionButtons from './actions-buttons';
-import './ruleset-overview.css';
+import './ruleset-overview.scss';
 import { withUserAuthorizationPrompt, withGlobalBreadcrumb } from '../../../../../components/common/hocs';
 import { compose } from 'redux';
 

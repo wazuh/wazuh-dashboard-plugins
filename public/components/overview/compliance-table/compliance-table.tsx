@@ -16,20 +16,19 @@ import {
   EuiFlexItem,
 } from '@elastic/eui';
 import { SearchBar, FilterManager } from '../../../../../../src/plugins/data/public/';
-import { KibanaContextProvider } from '../../../../../../src/plugins/kibana_react/public/context';
 
 import { I18nProvider } from '@kbn/i18n/react';
 //@ts-ignore
-import { getServices } from '../../../../../../src/plugins/discover/public/kibana_services';
 import { ComplianceRequirements } from './components/requirements';
 import { ComplianceSubrequirements } from './components/subrequirements';
 import { getElasticAlerts, getIndexPattern, IFilterParams } from '../mitre/lib';
-import { pciRequirementsFile } from '../../../../server/integration-files/pci-requirements';
-import { gdprRequirementsFile } from '../../../../server/integration-files/gdpr-requirements';
-import { hipaaRequirementsFile } from '../../../../server/integration-files/hipaa-requirements';
-import { nistRequirementsFile } from '../../../../server/integration-files/nist-requirements';
-import { tscRequirementsFile } from '../../../../server/integration-files/tsc-requirements';
+import { pciRequirementsFile } from '../../../../common/compliance-requirements/pci-requirements';
+import { gdprRequirementsFile } from '../../../../common/compliance-requirements/gdpr-requirements';
+import { hipaaRequirementsFile } from '../../../../common/compliance-requirements/hipaa-requirements';
+import { nistRequirementsFile } from '../../../../common/compliance-requirements/nist-requirements';
+import { tscRequirementsFile } from '../../../../common/compliance-requirements/tsc-requirements';
 import { KbnSearchBar } from '../../kbn-search-bar';
+import { getDataPlugin } from '../../../kibana-services';
 
 
 export class ComplianceTable extends Component {
@@ -57,9 +56,9 @@ export class ComplianceTable extends Component {
 
   constructor(props) {
     super(props);
-    this.KibanaServices = getServices();
+    this.KibanaServices = getDataPlugin().query;
     this.filterManager = this.KibanaServices.filterManager;
-    this.timefilter = this.KibanaServices.timefilter;
+    this.timefilter = this.KibanaServices.timefilter.timefilter;
     this.state = {
       selectedRequirement: "",
       flyoutOn: true,
@@ -81,8 +80,8 @@ export class ComplianceTable extends Component {
 
   async componentDidMount() {
     this._isMount = true;
-    this.filtersSubscriber = this.filterManager.updated$.subscribe(() => {
-      this.onFiltersUpdated(this.filterManager.filters)
+    this.filtersSubscriber = this.filterManager.getUpdates$().subscribe(() => {
+      this.onFiltersUpdated(this.filterManager.getFilters())
     });
     this.indexPattern = await getIndexPattern();
     this.buildComplianceObject();
@@ -283,8 +282,8 @@ export class ComplianceTable extends Component {
         <EuiFlexItem style={{ width: "calc(100% - 24px)" }}>
           <EuiPanel paddingSize="none">
             {!!Object.keys(complianceObject).length && this.state.filterParams.time.from !== "init" &&
-              <EuiFlexGroup>
-                <EuiFlexItem grow={false} style={{ width: "15%", minWidth: 145, maxHeight: "calc(100vh - 300px)", overflowX: "hidden" }}>
+                <EuiFlexGroup>
+                <EuiFlexItem grow={false} style={{ width: "15%", minWidth: 145, maxHeight: "calc(100vh - 320px)", overflowX: "hidden" }}>
                   <ComplianceRequirements
                     indexPattern={this.indexPattern}
                     section={this.props.section}

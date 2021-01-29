@@ -200,7 +200,7 @@ export default class RulesetColumns {
                     permissions={[[{action: `${((this.tableProps || {}).clusterStatus || {}).contextConfigServer}:read_file`, resource: `file:path:${item.relative_dirname}/${item.filename}`}, {action: `${((this.tableProps || {}).clusterStatus || {}).contextConfigServer}:read`, resource: `file:path:${item.relative_dirname}/${item.filename}`}, { action: 'lists:read', resource: `list:path:${item.filename}`}]]}
                     aria-label="Show content"
                     iconType="eye"
-                    tooltip={{position: 'top', content:`Edit ${item.filename} content`}}
+                    tooltip={{position: 'top', content:`View the content of ${item.filename}`}}
                     onClick={async ev => {
                       ev.stopPropagation();
                       const result = await this.rulesetHandler.getFileContent(`${item.relative_dirname}/${item.filename}`);

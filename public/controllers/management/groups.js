@@ -14,16 +14,17 @@ import { WzRequest } from '../../react-services/wz-request';
 import { ShareAgent } from '../../factories/share-agent';
 import { GroupHandler } from '../../react-services/group-handler';
 import { ErrorHandler } from '../../react-services/error-handler';
+import { ReportingService } from '../../react-services/reporting';
 
 export class GroupsController {
-  constructor($scope, $location, errorHandler, reportingService) {
+  constructor($scope, $location, errorHandler) {
     this.scope = $scope;
     this.location = $location;
     this.errorHandler = errorHandler;
     this.shareAgent = new ShareAgent();
     this.groupHandler = GroupHandler;
     this.wazuhConfig = new WazuhConfig();
-    this.reportingService = reportingService;
+    this.reportingService = new ReportingService();
   }
 
   async $onInit() {

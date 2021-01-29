@@ -9,12 +9,12 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { getDataPlugin } from '../../../kibana-services';
 import { useState, useEffect } from 'react';
 //@ts-ignore
-import { getServices } from '../../../../../../src/plugins/discover/public/kibana_services';
 
 export function useTimeFilter() {
-  const { timefilter, } = getServices();
+  const { timefilter } = getDataPlugin().query.timefilter;
   const [timeFilter, setTimeFilter] = useState(timefilter.getTime());
   const [timeHistory, setTimeHistory] = useState(timefilter._history);
   useEffect(() => {

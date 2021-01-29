@@ -29,12 +29,17 @@ import {
   EuiIcon
 } from '@elastic/eui';
 import moment from 'moment-timezone';
-import chrome from 'ui/chrome';
 import store from '../../../../../redux/store';
 import { updateCurrentAgentData } from '../../../../../redux/actions/appStateActions';
-import { WzRequest } from '../../../../../react-services/wz-request';
+import { WzRequest } from '../../../../../react-services';
+import { getAngularModule } from '../../../../../kibana-services';
+import { withReduxProvider, withUserAuthorizationPrompt } from "../../../hocs";
+import { compose } from 'redux';
 
-export class ScaScan extends Component {
+export const ScaScan = compose(
+  withReduxProvider,
+  withUserAuthorizationPrompt([{action: 'agent:read', resource: 'agent:id:*'}, {action: 'sca:read', resource: 'agent:id:*'}])
+)(class ScaScan extends Component {
   _isMount = false;
   props!: {
     [key: string]: any
@@ -56,7 +61,7 @@ export class ScaScan extends Component {
 
   async componentDidMount() {
     this._isMount = true;
-    const $injector = await chrome.dangerouslyGetActiveInjector();
+    const $injector = getAngularModule().$injector;
     this.router = $injector.get('$route');
     this.getLastScan(this.props.agent.id);
   }
@@ -237,4 +242,4 @@ export class ScaScan extends Component {
       </EuiFlexItem>
     )
   }
-}
+});

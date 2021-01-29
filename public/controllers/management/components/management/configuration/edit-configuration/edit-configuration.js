@@ -46,7 +46,7 @@ import {
   clusterReq
 } from '../utils/wz-fetch';
 import { validateXML } from '../utils/xml';
-import { toastNotifications } from 'ui/notify';
+import { getToasts }  from '../../../../../..//kibana-services';
 
 import { connect } from 'react-redux';
 import { compose } from 'redux';
@@ -67,7 +67,7 @@ class WzEditConfiguration extends Component {
     };
   }
   addToast(toast){
-    toastNotifications.add(toast);
+    getToasts().add(toast);
   }
   async editorSave() {
     try {
@@ -383,15 +383,15 @@ const WzEditorConfiguration = compose(
               <EuiSpacer size="s" />
               {typeof editorValue === 'string' && (
                 <WzCodeEditor
-                mode="xml"
-                value={editorValue}
-                onChange={value => onChange(value)}
-                minusHeight={
-                  wazuhNotReadyYet || infoChangesAfterRestart ? 270 : 220
-                }
-              />
+                  mode="xml"
+                  value={editorValue}
+                  onChange={value => onChange(value)}
+                  minusHeight={
+                    wazuhNotReadyYet || infoChangesAfterRestart ? 320 : 270
+                  }
+                />
               )}
-              
+
             </Fragment>
           ) : (
             <WzWazuhAPINotReachable error={this.props.errorXMLFetched} />

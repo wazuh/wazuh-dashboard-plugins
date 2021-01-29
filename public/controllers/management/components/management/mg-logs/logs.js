@@ -29,7 +29,7 @@ import {
 import 'brace/mode/less';	
 import 'brace/theme/github';	
 import exportCsv from '../../../../../react-services/wz-csv';
-import { toastNotifications } from 'ui/notify';
+import { getToasts }  from '../../../../../kibana-services';
 import { WzRequest } from '../../../../../react-services/wz-request';
 import { withUserAuthorizationPrompt, withGlobalBreadcrumb } from '../../../../../components/common/hocs';
 import { compose } from 'redux';
@@ -351,7 +351,7 @@ export default compose(
   }
 
   showToast = (color, title, time) => {
-    toastNotifications.add({
+    getToasts().add({
       color: color,
       title: title,
       toastLifeTimeMs: time,

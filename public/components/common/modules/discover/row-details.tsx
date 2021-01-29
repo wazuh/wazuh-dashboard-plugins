@@ -31,7 +31,7 @@ import {
   EuiBadge,
   EuiAccordion,
 } from '@elastic/eui';
-import './discover.less';
+import './discover.scss';
 import { EuiFlexItem } from '@elastic/eui';
 import { WzRequest } from '../../../../react-services/wz-request';
 import WzTextWithTooltipTruncated from '../../../../components/common/wz-text-with-tooltip-if-truncated';
@@ -368,6 +368,32 @@ export class RowDetails extends Component {
     );
   }
 
+  getValueAsString(value) {
+    if (value && typeof value === 'object' && value.constructor === Object) {
+      let list: any[] = [];
+      Object.keys(value).forEach((key, idx) => {
+        list.push(
+          <span key={key}>
+            {key}:&nbsp;
+            {value[key]}
+            {idx < Object.keys(value).length - 1 && ', '}
+            <br />
+          </span>
+        );
+      });
+      return (
+        <ul>
+          <li>
+            {list}
+          </li>
+        </ul>
+      );
+    } else {
+    
+      return value.toString();
+    }
+  }
+
   getFormattedDetails(value) {
 
     if (Array.isArray(value) && value[0].type) {
@@ -382,9 +408,10 @@ export class RowDetails extends Component {
       })
       return <span>{name}: {link}</span>
     } else {
+      const _value = typeof value === 'string' ? value : this.getValueAsString(value);
       return (
         <WzTextWithTooltipTruncated position='top'>
-          {value}
+          {_value}
         </WzTextWithTooltipTruncated>
       );
     }

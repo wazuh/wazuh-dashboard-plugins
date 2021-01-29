@@ -110,8 +110,8 @@ hosts:
     - production:
         url: https://172.16.1.2
         port: 55000
-        username: wazuh
-        password: wazuh
+        username: wazuh-wui
+        password: wazuh-wui
         run_as: false
 `;
 
@@ -226,7 +226,7 @@ hosts:
             <EuiText>
               Review the settings in the{' '}
               <EuiCode>
-                /usr/share/kibana/optimize/wazuh/config/wazuh.yml
+                /usr/share/kibana/data/wazuh/config/wazuh.yml
               </EuiCode>{' '}
               file.
             </EuiText>

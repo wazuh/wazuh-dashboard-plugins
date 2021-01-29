@@ -19,12 +19,11 @@ import {
   EuiButton,
   EuiButtonEmpty
 } from '@elastic/eui';
-import '../../common/modules/module.less';
+import '../../common/modules/module.scss';
 import { ReportingService } from '../../../react-services/reporting';
 import { AppNavigate } from '../../../react-services/app-navigate';
 import { ModulesDefaults } from './modules-defaults';
-import { getServices } from '../../../../../../src/plugins/discover/public/kibana_services';
-import { getAngularModule } from '../../../../../../src/plugins/discover/public/kibana_services';
+import { getAngularModule, getDataPlugin } from '../../../kibana-services';
 import { MainModuleAgent } from './main-agent'
 import { MainModuleOverview } from './main-overview';
 import store from '../../../redux/store';
@@ -40,7 +39,7 @@ export class MainModule extends Component {
       switchModule: false,
       showAgentInfo: false
     };
-    const app = getAngularModule('app/wazuh');
+    const app = getAngularModule();
     this.$rootScope = app.$injector.get('$rootScope');
   }
 
@@ -52,8 +51,8 @@ export class MainModule extends Component {
   }
 
   componentWillUnmount() {
-    const { filterManager } = getServices();
-    if (filterManager.filters && filterManager.filters.length) {
+    const { filterManager } = getDataPlugin().query;
+    if (filterManager.getFilters() && filterManager.getFilters().length) {
       filterManager.removeAll();
     }
   }

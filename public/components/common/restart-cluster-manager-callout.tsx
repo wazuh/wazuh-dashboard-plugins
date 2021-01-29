@@ -24,7 +24,7 @@ import {
   EuiIcon
 } from '@elastic/eui';
 
-import { toastNotifications } from 'ui/notify';
+import { getToasts }  from '../../kibana-services';
 import { updateWazuhNotReadyYet } from '../../redux/actions/appStateActions';
 import { clusterReq, restartClusterOrManager } from '../../controllers/management/components/management/configuration/utils/wz-fetch';
 import { connect } from 'react-redux';
@@ -54,7 +54,7 @@ class WzRestartClusterManagerCallout extends Component<IWzRestartClusterManagerC
     this.setState({ warningRestartModalVisible: !this.state.warningRestartModalVisible })
   }
   showToast(color, title, text = '', time = 3000){
-    toastNotifications.add({
+    getToasts().add({
       color,
       title,
       text,

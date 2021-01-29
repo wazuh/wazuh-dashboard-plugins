@@ -26,7 +26,7 @@ import {
   EuiPopover
 } from '@elastic/eui';
 
-import { toastNotifications } from 'ui/notify';
+import { getToasts }  from '../../../kibana-services';
 import { WzButtonPermissions } from '../../../components/common/permissions/button';
 export class UploadFiles extends Component {
   constructor(props) {
@@ -240,7 +240,7 @@ export class UploadFiles extends Component {
   }
 
   showToast(color, title, text, time = 3000) {
-    toastNotifications.add({
+    getToasts().add({
       color: color,
       title: title,
       text: text,

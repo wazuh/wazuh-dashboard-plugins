@@ -15,7 +15,7 @@
 import React, { Component } from 'react';
 import ManagementWelcome from './management-welcome';
 import WzReduxProvider from '../../../redux/wz-redux-provider';
-import './welcome.less';
+import './welcome.scss';
 
 export class ManagementWelcomeWrapper extends Component {
   constructor(props) {

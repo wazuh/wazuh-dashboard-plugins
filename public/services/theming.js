@@ -9,9 +9,11 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules';
+import { getAngularModule } from '../kibana-services';
 
-uiModules.get('app/wazuh', []).config(function($mdThemingProvider) {
+const app = getAngularModule();
+
+app.config(function($mdThemingProvider) {
   let kibanaWhiteBlack = {
     '50': '#ffffff',
     '100': '#ffffff',

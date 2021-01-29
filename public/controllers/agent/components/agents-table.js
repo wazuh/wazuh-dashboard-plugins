@@ -31,7 +31,7 @@ import {
   EuiLoadingSpinner
 } from '@elastic/eui';
 import { CheckUpgrade } from './checkUpgrade';
-import { toastNotifications } from 'ui/notify';
+import { getToasts }  from '../../../kibana-services';
 import { WzRequest } from '../../../react-services/wz-request';
 import { ActionAgents } from '../../../react-services/action-agents';
 import { AppNavigate } from '../../../react-services/app-navigate';
@@ -260,9 +260,9 @@ export class AgentsTable extends Component {
           position="left"
         >
           <EuiButtonIcon
-            onClick={() => ev => {
+            onClick={ev => {
               ev.stopPropagation();
-              this.props.clickAction(agent, 'discover');
+              this.props.clickAction(agent, 'default');
             }}
             iconType="eye"
             color={'primary'}
@@ -369,7 +369,7 @@ export class AgentsTable extends Component {
   }
 
   showToast = (color, title, text, time) => {
-    toastNotifications.add({
+    getToasts().add({
       color: color,
       title: title,
       text: text,
@@ -856,7 +856,10 @@ export class AgentsTable extends Component {
       };
     };
 
-    const getCellProps = item => {
+    const getCellProps = (item, column) => {
+      if(column.field=="actions"){
+        return 
+      }
       return {
         onMouseDown: (ev) => {
           AppNavigate.navigateToModule(ev, 'agents', { "tab": "welcome", "agent": item.id, }); ev.stopPropagation()

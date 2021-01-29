@@ -11,15 +11,15 @@
  */
 
 import React, { Component, Fragment } from 'react';
-import { getAngularModule } from '../../../../../../src/plugins/discover/public/kibana_services';
+import { getAngularModule, getToasts } from '../../../kibana-services';
 import { EventsSelectedFiles } from './events-selected-fields';
 import { ModulesHelper } from './modules-helper';
 import store from '../../../redux/store';
-import { toastNotifications } from 'ui/notify';
 import { EuiButton, EuiFlexGroup, EuiFlexItem, EuiOverlayMask } from '@elastic/eui';
 import { PatternHandler } from '../../../react-services/pattern-handler';
 
 import { enhanceDiscoverEventsCell } from './events-enhance-discover-fields';
+import { toMountPoint } from '../../../../../../src/plugins/kibana_react/public';
 
 export class Events extends Component {
   intervalCheckExistsDiscoverTableTime: number = 200;
@@ -44,7 +44,7 @@ export class Events extends Component {
   async componentDidMount() {
     document.body.scrollTop = 0; // For Safari
     document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
-    const app = getAngularModule('app/wazuh');
+    const app = getAngularModule();
     this.$rootScope = app.$injector.get('$rootScope');
     this.$rootScope.showModuleEvents = this.props.section;
     const scope = await ModulesHelper.getDiscoverScope();
@@ -233,10 +233,10 @@ export class Events extends Component {
   }
 
   reloadToast = () => {
-    toastNotifications.add({
+    getToasts().add({
       color: 'success',
       title: 'The index pattern was refreshed successfully.',
-      text: <EuiFlexGroup justifyContent="flexEnd" gutterSize="s">
+      text: toMountPoint(<EuiFlexGroup justifyContent="flexEnd" gutterSize="s">
         <EuiFlexItem grow={false}>
           There were some unknown fields for the current index pattern.
           You need to refresh the page to apply the changes.
@@ -244,12 +244,12 @@ export class Events extends Component {
         <EuiFlexItem grow={false}>
           <EuiButton onClick={() => window.location.reload()} size="s">Reload page</EuiButton>
         </EuiFlexItem>
-      </EuiFlexGroup>
+      </EuiFlexGroup>)
     })
   }
 
   errorToast = (error) => {
-    toastNotifications.add({
+    getToasts().add({
       color:'danger',
       title:'The index pattern could not be refreshed.',
       text: 'There are some unknown fields for the current index pattern. The index pattern fields need to be refreshed.'

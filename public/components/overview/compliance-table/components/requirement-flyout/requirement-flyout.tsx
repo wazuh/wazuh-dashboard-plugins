@@ -194,7 +194,7 @@ export class RequirementFlyout extends Component {
                 onClose={() => onChangeFlyout(false)}
                 maxWidth="60%"
                 size="l"
-                className="flyout-no-overlap"
+                className="flyout-no-overlap wz-inventory wzApp"
                 aria-labelledby="flyoutSmallTitle"
             >
                 {currentRequirement &&

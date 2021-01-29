@@ -12,7 +12,7 @@
 import React, { Component, Fragment } from 'react';
 // Eui components
 import { EuiFlexItem, EuiButtonEmpty } from '@elastic/eui';
-import { toastNotifications } from 'ui/notify';
+import { getToasts }  from '../../../../../kibana-services';
 
 import { connect } from 'react-redux';
 
@@ -51,7 +51,7 @@ class WzRulesetActionButtons extends Component {
   }
 
   showToast(title, text, color){
-    toastNotifications.add({
+    getToasts().add({
       title,
       text,
       color,

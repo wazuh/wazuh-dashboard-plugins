@@ -13,7 +13,7 @@
 import { WzRequest } from '../../../../../../react-services/wz-request';
 import { delay } from './utils';
 import { replaceIllegalXML } from './xml';
-import { toastNotifications } from 'ui/notify';
+import { getToasts }  from '../../../../../../kibana-services';
 
 /**
  * Get configuration for an agent/manager of request sections
@@ -188,8 +188,9 @@ export const makePing = async (updateWazuhNotReadyYet, tries = 30) => {
     while (tries--) {
       await delay(2000);
       try {
-        const result = await WzRequest.apiReq('GET', '/ping', {});
-        isValid = ((result || {}).data || {}).isValid;
+        const requestDefault = await WzRequest.apiReq('GET', '/?pretty=true', {});
+
+        isValid = (requestDefault || {}).status === 200;
         if (isValid) {
           updateWazuhNotReadyYet('');
           break;
@@ -509,7 +510,7 @@ export const checkCurrentSecurityPlatform = async () => {
       '/elastic/security/current-platform',
       {}
     );
-    const platform = (result.data || {}).platform || 'elastic'; 
+    const platform = (result.data || {}).platform;
 
     return platform;
   } catch (error) {
@@ -525,7 +526,7 @@ export const restartClusterOrManager = async (updateWazuhNotReadyYet) => {
     const clusterStatus = (((await clusterReq()) || {}).data || {}).data || {};
     const isCluster =
       clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
-      toastNotifications.add({
+      getToasts().add({
         color:'success',
         title:isCluster ?'Restarting cluster, it will take up to 30 seconds.': 'Manager was restarted',
         toastLifeTimeMs: 3000

@@ -297,7 +297,7 @@ export const Policies = () => {
       <EuiOverlayMask
         headerZindexLocation="below"
         onClick={() => { setIsFlyoutVisible(false) }}>
-        <EuiFlyout
+        <EuiFlyout className="wzApp"
           onClose={() => setIsFlyoutVisible(false)}>
           <EuiFlyoutHeader hasBorder={false}>
             <EuiTitle size="m">

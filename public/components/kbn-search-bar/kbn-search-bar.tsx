@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component to integrate Kibana search bar
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -9,61 +9,61 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, {} from 'react';
+
+import React from 'react';
 import { I18nProvider } from '@kbn/i18n/react';
-//@ts-ignore
-import { getServices } from '../../../../../src/plugins/discover/public/kibana_services';
-import { SearchBar, TimeRange, Query, Filter } from '../../../../../src/plugins/data/public';
+import { TimeRange, Query, Filter } from '../../../../../src/plugins/data/public';
+
 import { KibanaContextProvider } from '../../../../../src/plugins/kibana_react/public';
 import { withKibanaContext, withKibanaContextExtendsProps } from '../common/hocs';
 import { storage } from './lib';
+import { getDataPlugin, getCore } from '../../kibana-services';
 
-export interface IKbnSearchBarProps{
-  appName?: string
-  isLoading?: boolean
-  onQuerySubmit?: ((payload: {
-    dateRange: TimeRange;
-    query: Query;
-  }) => void)
-  onFiltersUpdated?: ((filters: Filter[]) => void)
+export interface IKbnSearchBarProps {
+  appName?: string;
+  isLoading?: boolean;
+  onQuerySubmit?: (payload: { dateRange: TimeRange; query: Query }) => void;
+  onFiltersUpdated?: (filters: Filter[]) => void;
 }
 
-//@ts-ignore
-const KbnSearchBar: React.FunctionComponent<IKbnSearchBarProps> = (props: IKbnSearchBarProps & withKibanaContextExtendsProps) => {
-  const KibanaServices = getServices();
+const SearchBar = getDataPlugin().ui.SearchBar;
+
+const KbnSearchBar: React.FunctionComponent<IKbnSearchBarProps> = (
+  props: IKbnSearchBarProps & withKibanaContextExtendsProps
+) => {
+  const KibanaServices = getDataPlugin();
   const { filterManager, indexPattern, timeFilter, timeHistory, query } = props;
   const data = {
-    ...KibanaServices.data,
-    query: {...KibanaServices.data.query, filterManager, },
-  }
+    ...KibanaServices,
+    query: { ...KibanaServices.query, filterManager },
+  };
   return (
-    <KibanaContextProvider services={{
-      ...KibanaServices,
-      filterManager,
-      data,
-      storage,
-      http: KibanaServices.indexPatterns.apiClient.http,
-      savedObjects: KibanaServices.indexPatterns.savedObjectsClient,
-      appName: props.appName,
-    }} >
+    <KibanaContextProvider
+      services={{
+        ...getCore(),
+        filterManager,
+        data,
+        storage,
+        appName: props.appName,
+      }}
+    >
       <I18nProvider>
         <SearchBar
           {...props}
-          //@ts-ignore
           indexPatterns={[indexPattern]}
-          filters={(filterManager && filterManager.filters) || []}
+          filters={(filterManager && filterManager.getFilters()) || []}
           dateRangeFrom={timeFilter.from}
           dateRangeTo={timeFilter.to}
           onQuerySubmit={(payload) => onQuerySubmit(payload, props)}
-          onFiltersUpdated={(filters) => onFiltersUpdate(filters, props) }
+          onFiltersUpdated={(filters) => onFiltersUpdate(filters, props)}
           query={query}
           isLoading={props.isLoading}
           timeHistory={timeHistory}
-           />
+        />
       </I18nProvider>
     </KibanaContextProvider>
   );
-}
+};
 
 const onQuerySubmit = (payload, props) => {
   const { setTimeFilter, setQuery, onQuerySubmit } = props;
@@ -71,17 +71,17 @@ const onQuerySubmit = (payload, props) => {
   setQuery(query);
   setTimeFilter(dateRange);
   onQuerySubmit && onQuerySubmit(payload);
-}
+};
 
 const onFiltersUpdate = (filters, props) => {
   const { filterManager, onFiltersUpdated } = props;
   filterManager.setFilters(filters);
   onFiltersUpdated && onFiltersUpdated(filters);
-}
+};
 
 KbnSearchBar.defaultProps = {
   appName: 'wazuh',
-}
+};
 
 const hoc = withKibanaContext(KbnSearchBar);
-export {hoc as KbnSearchBar};
+export { hoc as KbnSearchBar };

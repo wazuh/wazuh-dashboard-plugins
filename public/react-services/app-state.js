@@ -10,7 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 
-import Cookies from '../utils/js-cookie';
 import store from '../redux/store';
 import {
   updateCurrentApi,
@@ -20,7 +19,7 @@ import {
 import { GenericRequest } from '../react-services/generic-request';
 import { WazuhConfig } from './wazuh-config';
 import { CSVRequest } from '../services/csv-request';
-import { toastNotifications } from 'ui/notify';
+import { getToasts, getCookies, getAngularModule }  from '../kibana-services';
 import * as FileSaver from '../services/file-saver';
 import { WzAuthentication } from './wz-authentication';
 
@@ -106,8 +105,8 @@ export class AppState {
    **/
   static getClusterInfo() {
     try {
-      const clusterInfo = Cookies.get('clusterInfo')
-        ? decodeURI(Cookies.get('clusterInfo'))
+      const clusterInfo = getCookies().get('clusterInfo')
+        ? decodeURI(getCookies().get('clusterInfo'))
         : false;
       return clusterInfo ? JSON.parse(clusterInfo) : {};
     } catch (err) {
@@ -127,7 +126,7 @@ export class AppState {
       const exp = new Date();
       exp.setDate(exp.getDate() + 365);
       if (cluster_info) {
-        Cookies.set('clusterInfo', encodedClusterInfo, {
+        getCookies().set('clusterInfo', encodedClusterInfo, {
           expires: exp,
           path: window.location.pathname
         });
@@ -148,7 +147,7 @@ export class AppState {
       const createdAt = encodeURI(date);
       const exp = new Date();
       exp.setDate(exp.getDate() + 365);
-      Cookies.set('createdAt', createdAt, {
+      getCookies().set('createdAt', createdAt, {
         expires: exp,
         path: window.location.pathname
       });
@@ -164,8 +163,8 @@ export class AppState {
    */
   static getCreatedAt() {
     try {
-      const createdAt = Cookies.get('createdAt')
-        ? decodeURI(Cookies.get('createdAt'))
+      const createdAt = getCookies().get('createdAt')
+        ? decodeURI(getCookies().get('createdAt'))
         : false;
       return createdAt ? createdAt : false;
     } catch (err) {
@@ -180,7 +179,7 @@ export class AppState {
    */
   static getCurrentAPI() {
     try {
-      const currentAPI = Cookies.get('currentApi');
+      const currentAPI = getCookies().get('currentApi');
       return currentAPI ? decodeURI(currentAPI) : false;
     } catch (err) {
       console.log('Error get current Api');
@@ -195,7 +194,7 @@ export class AppState {
   static removeCurrentAPI() {
     const updateApiMenu = updateCurrentApi(false);
     store.dispatch(updateApiMenu);
-    return Cookies.remove('currentApi', { path: window.location.pathname });
+    return getCookies().remove('currentApi', { path: window.location.pathname });
   }
 
   /**
@@ -208,7 +207,7 @@ export class AppState {
       const exp = new Date();
       exp.setDate(exp.getDate() + 365);
       if (API) {
-        Cookies.set('currentApi', encodedApi, {
+        getCookies().set('currentApi', encodedApi, {
           expires: exp,
           path: window.location.pathname
         });
@@ -229,8 +228,8 @@ export class AppState {
    * Get 'APISelector' value
    */
   static getAPISelector() {
-    return Cookies.get('APISelector')
-      ? decodeURI(Cookies.get('APISelector')) == 'true'
+    return getCookies().get('APISelector')
+      ? decodeURI(getCookies().get('APISelector')) == 'true'
       : false;
   }
 
@@ -240,7 +239,7 @@ export class AppState {
    */
   static setAPISelector(value) {
     const encodedPattern = encodeURI(value);
-    Cookies.set('APISelector', encodedPattern, {
+    getCookies().set('APISelector', encodedPattern, {
       path: window.location.pathname
     });
   }
@@ -249,8 +248,8 @@ export class AppState {
    * Get 'patternSelector' value
    */
   static getPatternSelector() {
-    return Cookies.get('patternSelector')
-      ? decodeURI(Cookies.get('patternSelector')) == 'true'
+    return getCookies().get('patternSelector')
+      ? decodeURI(getCookies().get('patternSelector')) == 'true'
       : false;
   }
 
@@ -260,7 +259,7 @@ export class AppState {
    */
   static setPatternSelector(value) {
     const encodedPattern = encodeURI(value);
-    Cookies.set('patternSelector', encodedPattern, {
+    getCookies().set('patternSelector', encodedPattern, {
       path: window.location.pathname
     });
   }
@@ -274,7 +273,7 @@ export class AppState {
     const exp = new Date();
     exp.setDate(exp.getDate() + 365);
     if (newPattern) {
-      Cookies.set('currentPattern', encodedPattern, {
+      getCookies().set('currentPattern', encodedPattern, {
         expires: exp,
         path: window.location.pathname
       });
@@ -285,8 +284,8 @@ export class AppState {
    * Get 'currentPattern' value
    */
   static getCurrentPattern() {
-    const currentPattern = Cookies.get('currentPattern')
-      ? decodeURI(Cookies.get('currentPattern'))
+    const currentPattern = getCookies().get('currentPattern')
+      ? decodeURI(getCookies().get('currentPattern'))
       : '';
     // check if the current Cookie has the format of 3.11 and previous versions, in that case we remove the extra " " characters
     if (
@@ -297,8 +296,8 @@ export class AppState {
       const newPattern = currentPattern.substring(1, currentPattern.length - 1);
       this.setCurrentPattern(newPattern);
     }
-    return Cookies.get('currentPattern')
-      ? decodeURI(Cookies.get('currentPattern'))
+    return getCookies().get('currentPattern')
+      ? decodeURI(getCookies().get('currentPattern'))
       : '';
   }
 
@@ -306,7 +305,7 @@ export class AppState {
    * Remove 'currentPattern' value
    */
   static removeCurrentPattern() {
-    return Cookies.remove('currentPattern', { path: window.location.pathname });
+    return getCookies().remove('currentPattern', { path: window.location.pathname });
   }
 
   /**
@@ -350,8 +349,8 @@ export class AppState {
   }
 
   static setNavigation(params) {
-    const decodedNavigation = Cookies.get('navigate')
-      ? decodeURI(Cookies.get('navigate'))
+    const decodedNavigation = getCookies().get('navigate')
+      ? decodeURI(getCookies().get('navigate'))
       : false;
     var navigate = decodedNavigation ? JSON.parse(decodedNavigation) : {};
     for (var key in params) {
@@ -359,20 +358,22 @@ export class AppState {
     }
     if (navigate) {
       const encodedURI = encodeURI(JSON.stringify(navigate));
-      Cookies.set('navigate', encodedURI, { path: window.location.pathname });
+      getCookies().set('navigate', encodedURI, { 
+        path: window.location.pathname 
+      });
     }
   }
 
   static getNavigation() {
-    const decodedNavigation = Cookies.get('navigate')
-      ? decodeURI(Cookies.get('navigate'))
+    const decodedNavigation = getCookies().get('navigate')
+      ? decodeURI(getCookies().get('navigate'))
       : false;
     const navigation = decodedNavigation ? JSON.parse(decodedNavigation) : {};
     return navigation;
   }
 
   static removeNavigation() {
-    return Cookies.remove('navigate', { path: window.location.pathname });
+    return getCookies().remove('navigate', { path: window.location.pathname });
   }
 
   static setWzMenu(isVisible = true) {
@@ -384,7 +385,7 @@ export class AppState {
   static async downloadCsv(path, fileName, filters = []) {
     try {
       const csvReq = new CSVRequest();
-      toastNotifications.add({
+      getToasts().add({
         color: 'success',
         title: 'CSV',
         text: 'Your download should begin automatically...',
@@ -396,7 +397,7 @@ export class AppState {
 
       FileSaver.saveAs(blob, fileName);
     } catch (error) {
-      toastNotifications.add({
+      getToasts().add({
         color: 'success',
         title: 'CSV',
         text: 'Error generating CSV',
@@ -404,5 +405,10 @@ export class AppState {
       }); 
     }
     return;
+  }
+
+  static checkCookies() {
+    getCookies().set('appName', 'wazuh', { path: window.location.pathname });
+    return !!getCookies().get('appName')
   }
 }

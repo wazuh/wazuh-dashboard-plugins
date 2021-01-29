@@ -27,11 +27,11 @@ import {
   EuiOverlayMask,
   EuiLoadingSpinner,
 } from '@elastic/eui';
-import { getServices } from '../../../../../../../../src/plugins/discover/public/kibana_services';
 import { AppNavigate } from '../../../../../react-services/app-navigate';
 import { AppState } from '../../../../../react-services/app-state';
 import { RequirementFlyout } from '../requirement-flyout/requirement-flyout'
-import { WAZUH_ALERTS_PATTERN } from '../../../../../../util/constants';
+import { WAZUH_ALERTS_PATTERN } from '../../../../../../common/constants';
+import { getDataPlugin } from '../../../../../kibana-services';
 
 export class ComplianceSubrequirements extends Component {
   _isMount = false;
@@ -62,7 +62,7 @@ export class ComplianceSubrequirements extends Component {
   * @param filter 
   */
   addFilter(filter) {
-    const { filterManager } = getServices();
+    const { filterManager } = getDataPlugin().query;
     const matchPhrase = {};
     matchPhrase[filter.key] = filter.value;
     const newFilter = {
@@ -204,7 +204,7 @@ export class ComplianceSubrequirements extends Component {
     })
     if (tacticsToRender.length) {
       return (
-        <EuiFlexGrid columns={4} gutterSize="s" style={{ maxHeight: "calc(100vh - 385px)", overflow: "overlay", overflowX: "hidden", maxWidth: "82vw", paddingRight: 10 }}>
+        <EuiFlexGrid columns={4} gutterSize="s" style={{ maxHeight: "calc(100vh - 420px)", overflow: "overlay", overflowX: "hidden", maxWidth: "82vw", paddingRight: 10 }}>
           {tacticsToRenderOrdered}
         </EuiFlexGrid>
       )

@@ -9,10 +9,10 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules';
 import { BlankScreenController } from './blank-screen-controller';
+import { getAngularModule } from '../../kibana-services';
 
-const app = uiModules.get('app/wazuh', []);
+const app = getAngularModule();
 
 app
   .controller('blankScreenController', BlankScreenController);
