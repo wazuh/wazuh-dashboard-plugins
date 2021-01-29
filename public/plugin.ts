@@ -36,7 +36,7 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
     core.application.register({
       id: `wazuh`,
       title: 'Wazuh',
-      icon: 'plugins/wazuh/assets/icon_blue.png',
+      icon: '/plugins/wazuh/assets/icon_blue.png',
       mount: async (params: AppMountParameters) => {
         if (!this.initializeInnerAngular) {
           throw Error('Wazuh plugin method initializeInnerAngular is undefined');
@@ -60,7 +60,12 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
           unmount();
         };
       },
-
+      category: {
+        id: 'wazuh',
+        label: 'Wazuh',
+        order: 0,
+        euiIconType: '/plugins/wazuh/assets/icon_blue.png',      
+      },
     });
     return {};
   }

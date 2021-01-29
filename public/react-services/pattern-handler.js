@@ -60,6 +60,7 @@ export class PatternHandler {
           });
 
           await SavedObject.createWazuhIndexPattern(pattern);
+          getDataPlugin().indexPatterns.setDefault(pattern, true);
         } catch (err) {
           getToasts().add({
             color: 'error',
