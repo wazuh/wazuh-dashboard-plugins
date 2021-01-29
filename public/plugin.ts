@@ -14,6 +14,7 @@ import {
   setCore,
   setPlugins,
   setCookies,
+  getUiSettings
 } from './kibana-services';
 import {
   AppPluginStartDependencies,
@@ -28,22 +29,11 @@ import { AppState } from './react-services/app-state';
 const innerAngularName = 'app/wazuh';
 
 export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlugins, WazuhStartPlugins> {
-  constructor(private readonly initializerContext: PluginInitializerContext) {}
+  constructor(private readonly initializerContext: PluginInitializerContext) { }
   public initializeInnerAngular?: () => void;
   private innerAngularInitialized: boolean = false;
 
   public setup(core: CoreSetup, plugins: WazuhSetupPlugins): WazuhSetup {
-
-    //custom styles
-    const newCSS = document.createElement('link');
-    newCSS.rel = 'stylesheet';
-    newCSS.href =  core.http.basePath.prepend('/plugins/wazuh/assets/custom-style.css');
-    document.getElementsByTagName('head')[0].appendChild(newCSS);
-
-    const newJS = document.createElement('script');
-    newJS.src =  core.http.basePath.prepend('/plugins/wazuh/assets/custom-style.js');
-    document.getElementsByTagName('head')[0].appendChild(newJS);
-
 
     core.application.register({
       id: `wazuh`,
@@ -60,7 +50,7 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
         const [coreStart, depsStart] = await core.getStartServices();
         setHttp(core.http);
         setCookies(new Cookies());
-        if(!AppState.checkCookies() || params.history.parentHistory.action === 'PUSH') {
+        if (!AppState.checkCookies() || params.history.parentHistory.action === 'PUSH') {
           window.location.reload();
         }
 
@@ -79,7 +69,7 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
 
   public async start(core: CoreStart, plugins: AppPluginStartDependencies): Promise<WazuhStart> {
     // hide security alert
-    if(plugins.securityOss) {
+    if (plugins.securityOss) {
       plugins.securityOss.insecureCluster.hideAlert(true);
     }
 
@@ -115,6 +105,19 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
     setVisualizationsPlugin(plugins.visualizations);
     setSavedObjects(core.savedObjects);
     setOverlays(core.overlays);
+
+
+    //custom styles    
+    const IS_DARK_THEME = getUiSettings().get('theme:darkMode');
+    const mode = IS_DARK_THEME ? 'dark' : 'light';
+    const newCSS = document.createElement('link');
+    newCSS.rel = 'stylesheet';
+    newCSS.href = core.http.basePath.prepend(`/plugins/wazuh/assets/custom-style-${mode}.css`);
+    document.getElementsByTagName('head')[0].appendChild(newCSS);
+
+    const newJS = document.createElement('script');
+    newJS.src = core.http.basePath.prepend('/plugins/wazuh/assets/custom-style.js');
+    document.getElementsByTagName('head')[0].appendChild(newJS);
     return {};
   }
 }
