@@ -123,7 +123,7 @@ export default class WzSampleData extends Component {
         }
       });
       await WzRequest.genericReq('POST', `/elastic/samplealerts/${category.categorySampleAlertsIndex}`, { params: this.generateAlertsParams });
-      this.showToast('success', `${category.title} alerts installed`, 'Date range for sample data is now-7 days ago', 5000);
+      this.showToast('success', `${category.title} alerts added`, 'Date range for sample data is now-7 days ago', 5000);
       this.setState({
         [category.categorySampleAlertsIndex]: {
           ...this.state[category.categorySampleAlertsIndex],
@@ -157,7 +157,7 @@ export default class WzSampleData extends Component {
           removeDataLoading: false
         }
       });
-      this.showToast('success', `${category.title} alerts uninstalled`);
+      this.showToast('success', `${category.title} alerts removed`);
     } catch (error) {
       this.setState({
         [category.categorySampleAlertsIndex]: {
