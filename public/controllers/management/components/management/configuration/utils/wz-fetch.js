@@ -154,15 +154,14 @@ export const handleError = async (error, location, updateWazuhNotReadyYet) => {
 export const checkDaemons = async () => {
   try {
     const response = await WzRequest.apiReq('GET', '/manager/status', {});
-    const daemons = ((response || {}).data || {}).data || {};
+    const daemons = ((((response || {}).data || {}).data || {}).affected_items || [])[0] || {};
     const wazuhdbExists = typeof daemons['wazuh-db'] !== 'undefined';
 
     const execd = daemons['ossec-execd'] === 'running';
     const modulesd = daemons['wazuh-modulesd'] === 'running';
     const wazuhdb = wazuhdbExists ? daemons['wazuh-db'] === 'running' : true;
     const clusterStatus = (((await clusterReq()) || {}).data || {}).data || {};
-    const isCluster =
-      clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
+    const isCluster = clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
     const clusterd = isCluster ? daemons['wazuh-clusterd'] === 'running' : true;
 
     const isValid = execd && modulesd && wazuhdb && clusterd;
@@ -170,7 +169,7 @@ export const checkDaemons = async () => {
     if (isValid) {
       return { isValid };
     } else {
-      throw new Error('Wazuh not ready yet');
+      console.warn('Wazuh not ready yet');
     }
   } catch (error) {
     return Promise.reject(error);
@@ -179,6 +178,7 @@ export const checkDaemons = async () => {
 
 /**
  * Make ping to Wazuh API
+ * @param updateWazuhNotReadyYet
  * @param {number} [tries=10] Tries
  * @return {Promise}
  */
@@ -188,9 +188,7 @@ export const makePing = async (updateWazuhNotReadyYet, tries = 30) => {
     while (tries--) {
       await delay(2000);
       try {
-        const requestDefault = await WzRequest.apiReq('GET', '/?pretty=true', {});
-
-        isValid = (requestDefault || {}).status === 200;
+        isValid = await checkDaemons();
         if (isValid) {
           updateWazuhNotReadyYet('');
           break;
