@@ -4,7 +4,8 @@ import { DiscoverStart } from '../../../src/plugins/discover/public';
 import { VisualizationsSetup, VisualizationsStart } from '../../../src/plugins/visualizations/public';
 import { DataPublicPluginSetup, DataPublicPluginStart } from '../../../src/plugins/data/public';
 import { NavigationPublicPluginStart } from '../../../src/plugins/navigation/public';
-import { UiActionsSetup } from 'src/plugins/ui_actions/public';
+import { UiActionsSetup } from '../../../src/plugins/ui_actions/public';
+import { SecurityOssPluginStart } from '../../../src/plugins/security_oss/public/';
 
 export interface AppPluginStartDependencies {
   navigation: NavigationPublicPluginStart;
@@ -12,6 +13,7 @@ export interface AppPluginStartDependencies {
   visualizations: VisualizationsStart;
   discover: DiscoverStart;
   charts: ChartsPluginStart
+  securityOss: SecurityOssPluginStart
 }
 export interface AppDependencies {
   core: CoreStart;
@@ -23,6 +25,7 @@ export type WazuhSetupPlugins = {
   uiActions: UiActionsSetup;
   visualizations: VisualizationsSetup;
   data: DataPublicPluginSetup;
+  navigation: NavigationPublicPluginStart;
 }
 
 export type WazuhStartPlugins = AppPluginStartDependencies;

@@ -23,6 +23,7 @@ import {
 } from '@elastic/eui';
 import { DynamicHeight } from '../../../utils/dynamic-height';
 import 'brace/theme/textmate';
+import "brace/ext/searchbox";
 
 export class TestConfiguration extends Component {
   constructor(props) {

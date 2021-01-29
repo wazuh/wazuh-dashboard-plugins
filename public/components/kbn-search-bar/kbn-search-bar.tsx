@@ -12,7 +12,8 @@
 
 import React from 'react';
 import { I18nProvider } from '@kbn/i18n/react';
-import { SearchBar, TimeRange, Query, Filter } from '../../../../../src/plugins/data/public';
+import { TimeRange, Query, Filter } from '../../../../../src/plugins/data/public';
+
 import { KibanaContextProvider } from '../../../../../src/plugins/kibana_react/public';
 import { withKibanaContext, withKibanaContextExtendsProps } from '../common/hocs';
 import { storage } from './lib';
@@ -24,6 +25,8 @@ export interface IKbnSearchBarProps {
   onQuerySubmit?: (payload: { dateRange: TimeRange; query: Query }) => void;
   onFiltersUpdated?: (filters: Filter[]) => void;
 }
+
+const SearchBar = getDataPlugin().ui.SearchBar;
 
 const KbnSearchBar: React.FunctionComponent<IKbnSearchBarProps> = (
   props: IKbnSearchBarProps & withKibanaContextExtendsProps

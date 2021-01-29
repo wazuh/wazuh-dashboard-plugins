@@ -81,6 +81,9 @@ export const WAZUH_CONFIGURATION_SETTINGS_NEED_RESTART = [
   'wazuh.monitoring.creation',
   'wazuh.monitoring.pattern',
   'alerts.sample.prefix',
+  'cron.statistics.interval',
+  'cron.statistics.index.name',
+  'cron.statistics.index.creation',
   'cron.statistics.index.shards',
   'cron.statistics.index.replicas',
   'logs.level',
@@ -165,3 +168,6 @@ export const WAZUH_DEFAULT_APP_CONFIG = {
   'logs.level': 'info',
   'enrollment.dns': ''
 };
+
+// Wazuh errors
+export const WAZUH_ERROR_DAEMONS_NOT_READY = 'ERROR3099 - Some Wazuh daemons are not ready yet in node';

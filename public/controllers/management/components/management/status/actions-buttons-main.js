@@ -25,7 +25,9 @@ import {
   updateLoadingStatus,
   updateListDaemons,
   updateNodeInfo,
-  updateSelectedNode
+  updateSelectedNode,
+  updateStats,
+  updateAgentInfo,
 } from '../../../../../redux/actions/statusActions';
 
 import StatusHandler from './utils/status-handler';
@@ -106,12 +108,30 @@ class WzStatusActionButtons extends Component {
       this.props.updateLoadingStatus(true);
       this.props.updateSelectedNode(node);
 
+      const agentSummaryResponse = await this.statusHandler.agentsSummary();
+      const agentsCountResponse = await this.statusHandler.clusterAgentsCount();
+
+      const { active, disconnected, never_connected, total } = agentSummaryResponse.data.data;
+      this.props.updateStats({
+        agentsCount: agentsCountResponse.data.data.nodes,
+        agentsCountActive: active,
+        agentsCountDisconnected: disconnected,
+        agentsCountNeverConnected: never_connected,
+        agentsCountTotal: total,
+        agentsCoverity: total ? (active / total) * 100 : 0
+      });
+
       const daemons = await this.statusHandler.clusterNodeStatus(node);
       const listDaemons = this.objToArr(daemons.data.data.affected_items[0]);
       this.props.updateListDaemons(listDaemons);
 
       const nodeInfo = await this.statusHandler.clusterNodeInfo(node);
       this.props.updateNodeInfo(nodeInfo.data.data.affected_items[0]);
+
+      const lastAgentRaw = await this.statusHandler.lastAgentRaw();
+      const [lastAgent] = lastAgentRaw.data.data.affected_items;
+
+      this.props.updateAgentInfo(lastAgent);
 
       this.props.updateLoadingStatus(false);
     } catch (error) {
@@ -246,8 +266,9 @@ const mapDispatchToProps = dispatch => {
     updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
     updateListDaemons: listDaemons => dispatch(updateListDaemons(listDaemons)),
     updateNodeInfo: nodeInfo => dispatch(updateNodeInfo(nodeInfo)),
-    updateSelectedNode: selectedNode =>
-      dispatch(updateSelectedNode(selectedNode))
+    updateSelectedNode: selectedNode => dispatch(updateSelectedNode(selectedNode)),
+    updateStats: stats => dispatch(updateStats(stats)),
+    updateAgentInfo: agentInfo => dispatch(updateAgentInfo(agentInfo))
   };
 };
 

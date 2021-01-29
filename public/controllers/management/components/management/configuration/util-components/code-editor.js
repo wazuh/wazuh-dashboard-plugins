@@ -23,6 +23,7 @@ import 'brace/snippets/json';
 import 'brace/mode/javascript';
 import 'brace/snippets/javascript';
 import 'brace/ext/language_tools';
+import "brace/ext/searchbox";
 
 class WzCodeEditor extends Component {
   constructor(props) {

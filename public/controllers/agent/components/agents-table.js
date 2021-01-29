@@ -260,9 +260,9 @@ export class AgentsTable extends Component {
           position="left"
         >
           <EuiButtonIcon
-            onClick={() => ev => {
+            onClick={ev => {
               ev.stopPropagation();
-              this.props.clickAction(agent, 'discover');
+              this.props.clickAction(agent, 'default');
             }}
             iconType="eye"
             color={'primary'}
@@ -856,7 +856,10 @@ export class AgentsTable extends Component {
       };
     };
 
-    const getCellProps = item => {
+    const getCellProps = (item, column) => {
+      if(column.field=="actions"){
+        return 
+      }
       return {
         onMouseDown: (ev) => {
           AppNavigate.navigateToModule(ev, 'agents', { "tab": "welcome", "agent": item.id, }); ev.stopPropagation()

@@ -20,7 +20,6 @@ import {
 } from '@elastic/eui';
 import { WzRequest } from '../../../../react-services/wz-request';
 import { FlyoutDetail } from './flyout';
-import './inventory.scss';
 import { filtersToObject, IFilter } from '../../../wz-search-bar';
 
 export class InventoryTable extends Component {
@@ -274,7 +273,7 @@ export class InventoryTable extends Component {
   render() {
     const filesTable = this.renderFilesTable();
     return (
-      <div>
+      <div className='wz-inventory'>
         {filesTable}
         {this.state.isFlyoutVisible &&
           <EuiOverlayMask
