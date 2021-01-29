@@ -35,6 +35,17 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
 
   public setup(core: CoreSetup, plugins: WazuhSetupPlugins): WazuhSetup {
 
+    //custom styles
+    const newCSS = document.createElement('link');
+    newCSS.rel = 'stylesheet';
+    newCSS.href = core.http.basePath.prepend(`/plugins/wazuh/assets/custom-style-base.css`);
+    document.getElementsByTagName('head')[0].appendChild(newCSS);
+    
+    //custom script
+    const newJS = document.createElement('script');
+    newJS.src = core.http.basePath.prepend('/plugins/wazuh/assets/custom-style.js');
+    document.getElementsByTagName('head')[0].appendChild(newJS);
+
     core.application.register({
       id: `wazuh`,
       title: 'Wazuh',
@@ -115,9 +126,7 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
     newCSS.href = core.http.basePath.prepend(`/plugins/wazuh/assets/custom-style-${mode}.css`);
     document.getElementsByTagName('head')[0].appendChild(newCSS);
 
-    const newJS = document.createElement('script');
-    newJS.src = core.http.basePath.prepend('/plugins/wazuh/assets/custom-style.js');
-    document.getElementsByTagName('head')[0].appendChild(newJS);
+    
     return {};
   }
 }
