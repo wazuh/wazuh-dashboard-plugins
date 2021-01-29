@@ -1092,7 +1092,6 @@ function discoverController(
   const tabListener = $rootScope.$on(
     'changeTabView',
     async (evt, parameters) => {
-      console.log(parameters.tabView)
       $scope.resultState = 'loading';
       $scope.$applyAsync();
       $scope.tabView = parameters.tabView || 'panels';
