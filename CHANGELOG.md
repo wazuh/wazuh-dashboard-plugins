@@ -2,6 +2,44 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.0.4 - Kibana 7.10.0 , 7.10.2 - Revision 4017
+
+### Adapt for Kibana 7.10.0
+
+- Fixed filter pinned crash returning from agents [#2864](https://github.com/wazuh/wazuh-kibana-app/issues/2864)
+- Fixed style in sca and regulatory compliance tables and in wz menu [#2861](https://github.com/wazuh/wazuh-kibana-app/issues/2861)
+- Fix the settings of statistics indices creation [#2858](https://github.com/wazuh/wazuh-kibana-app/issues/2858)
+- Fix body-payload of Sample Alerts POST endpoint [#2857](https://github.com/wazuh/wazuh-kibana-app/issues/2857)
+- Fixed bug in the table on Agents->Table-> Actions->Config icon [#2853](https://github.com/wazuh/wazuh-kibana-app/issues/2853)
+- Fixed tooltip in the icon of view decoder file [#2850](https://github.com/wazuh/wazuh-kibana-app/issues/2850)
+- Fixed bug with agent filter when it is pinned [#2846](https://github.com/wazuh/wazuh-kibana-app/issues/2846)
+- Fix discovery navigation [#2845](https://github.com/wazuh/wazuh-kibana-app/issues/2845)
+- Search file editor gone [#2843](https://github.com/wazuh/wazuh-kibana-app/issues/2843)
+- Fix Agent Search Bar - Regex Query Interpreter [#2834](https://github.com/wazuh/wazuh-kibana-app/issues/2834)
+- Fixed accordion style breaking [#2833](https://github.com/wazuh/wazuh-kibana-app/issues/2833)
+- Fix metrics are not updated after a bad request in search input [#2830](https://github.com/wazuh/wazuh-kibana-app/issues/2830)
+- Solaris should not show vulnerabilities module [#2829](https://github.com/wazuh/wazuh-kibana-app/issues/2829)
+- Update agents' info in Management Status after changing cluster node selected [#2828](https://github.com/wazuh/wazuh-kibana-app/issues/2828)
+- Fix mitre framework tab crash [#2821](https://github.com/wazuh/wazuh-kibana-app/issues/2821)
+- Changed ping request to default request. Added delay and while to che… [#2820](https://github.com/wazuh/wazuh-kibana-app/issues/2820)
+- Removed kibana alert for security [#2806](https://github.com/wazuh/wazuh-kibana-app/issues/2806)
+
+
+### Fixed
+
+- Fix debug error line number to match code editor line [#2863](https://github.com/wazuh/wazuh-kibana-app/issues/2863)
+- Fixed permissions to access agents [#2838](https://github.com/wazuh/wazuh-kibana-app/issues/2838)
+- Fix searching in groups [#2825](https://github.com/wazuh/wazuh-kibana-app/issues/2825)
+- Fix the pagination in SCA ckecks table [#2815](https://github.com/wazuh/wazuh-kibana-app/issues/2815)
+- Fix the SCA table with a wrong behaviour using the refresh button [#2854](https://github.com/wazuh/wazuh-kibana-app/issues/2854)
+- Fix sca permissions [#2862](https://github.com/wazuh/wazuh-kibana-app/issues/2862)
+
+### Changed
+
+- Replaced `wazuh` Wazuh API user by `wazuh-wui` in the default configuration [#2852](https://github.com/wazuh/wazuh-kibana-app/issues/2852)
+- Add agent id to the reports name in Agent Inventory and Modules [#2817](https://github.com/wazuh/wazuh-kibana-app/issues/2817)
+
+
 ## Wazuh v4.0.4 - Kibana 7.10.0 , 7.10.2 - Revision 4016
 
 ### Added

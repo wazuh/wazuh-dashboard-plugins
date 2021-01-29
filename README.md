@@ -116,7 +116,9 @@ service kibana restart
 
 ## Upgrade
 
-Note: Since Wazuh 3.12.0 release (regardless of the Elastic Stack version) the location of the wazuh.yml has been moved from `/usr/share/kibana/plugins/wazuh/wazuh.yml` to `/usr/share/kibana/optimize/wazuh/config/wazuh.yml`.
+Note: Since Wazuh 4.0.4 release revision 4016 (regardless of the Elastic Stack version) the location of the wazuh.yml has been moved from `/usr/share/kibana/optimize/wazuh/config/wazuh.yml` to `/usr/share/kibana/data/wazuh/config/wazuh.yml`.
+
+Since Wazuh 3.12.0 release (regardless of the Elastic Stack version) the location of the wazuh.yml has been moved from `/usr/share/kibana/plugins/wazuh/wazuh.yml` to `/usr/share/kibana/data/wazuh/config/wazuh.yml`.
 
 Stop Kibana
 
@@ -131,12 +133,31 @@ systemctl stop kibana
 ```
 service kibana stop
 ```
-
-Copy the `wazuh.yml` to its new location. (Only needed for upgrades from 3.11.x)
+Ensure that the directory `/usr/share/kibana/data` exists
+If not create it:
 
 ```
-mkdir -p /usr/share/kibana/optimize/wazuh/config
+mkdir /usr/share/kibana/data
+```
+
+### From 3.11.x
+Copy the `wazuh.yml` to its new location.
+
+```
+mkdir -p /usr/share/kibana/data/wazuh/config
 cp /usr/share/kibana/plugins/wazuh/wazuh.yml /usr/share/kibana/optimize/wazuh/config/wazuh.yml
+```
+### From 4.0.4 - 4016
+Copy the `wazuh.yml` to its new location.
+
+```
+mkdir -p /usr/share/kibana/data/wazuh/config
+cp /usr/share/kibana/optimize/wazuh/config/wazuh.yml /usr/share/kibana/data/wazuh/config/wazuh.yml
+```
+
+```
+mkdir -p /usr/share/kibana/data/wazuh/config
+cp /usr/share/kibana/optimize/wazuh/config/wazuh.yml /usr/share/kibana/data/wazuh/config/wazuh.yml
 ```
 
 Remove the Wazuh app using the kibana-plugin tool
@@ -155,7 +176,7 @@ rm -rf /usr/share/kibana/optimize/bundles
 Update file permissions. This will prevent errors when generating new bundles or updating the app:
 
 ```
-chown -R kibana:kibana /usr/share/kibana/optimize
+chown -R kibana:kibana /usr/share/kibana/data
 chown -R kibana:kibana /usr/share/kibana/plugins
 ```
 
@@ -169,8 +190,8 @@ sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/4.x/ui/kiban
 Update configuration file permissions.
 
 ```
-sudo chown kibana:kibana /usr/share/kibana/optimize/wazuh/config/wazuh.yml
-sudo chmod 600 /usr/share/kibana/optimize/wazuh/config/wazuh.yml
+sudo chown kibana:kibana /usr/share/kibana/data/wazuh/config/wazuh.yml
+sudo chmod 600 /usr/share/kibana/data/wazuh/config/wazuh.yml
 ```
 
 Restart Kibana
