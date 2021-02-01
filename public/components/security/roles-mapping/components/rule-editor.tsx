@@ -26,11 +26,7 @@ import {
   decodeJsonRule,
   getSelectedUsersFromRules,
 } from '../helpers/rule-editor.helper';
-import { getToasts } from '../../../../kibana-services';
-import { GenericRequest } from '../../../../react-services/generic-request';
-import { ErrorHandler } from '../../../../react-services/error-handler';
 import { WAZUH_SECURITY_PLUGIN_OPEN_DISTRO_FOR_ELASTICSEARCH } from '../../../../../common/constants';
-import { AppState } from '../../../../react-services/app-state';
 import 'brace/mode/json';
 import 'brace/snippets/json';
 import 'brace/ext/language_tools';
@@ -125,29 +121,6 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
     setHasWrongFormat(wrongFormat);
     return { customRules, internalUsersRules, wrongFormat, logicalOperator };
   };
-
-  const showToast = (color, title, text = '', time = 3000) => {
-    getToasts().add({
-      color,
-      title,
-      text,
-      toastLifeTimeMs: time
-    });
-  }
-
-  const checkRunAsUser = async () => {
-    const currentApi = AppState.getCurrentAPI();
-    try {
-      const ApiCheck = await GenericRequest.request('POST',
-        '/api/check-api',
-        currentApi
-      );
-      return ApiCheck;
-
-    } catch (error) {
-      ErrorHandler.handle(error, 'Error checking the current API');
-    }
-  }
 
   const printRules = () => {
     const rulesList = rules.map((item, idx) => {
@@ -254,10 +227,6 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
   };
 
   const saveRule = async () => {
-    const isRunAS = await checkRunAsUser();
-    if (!isRunAS.data.allow_run_as) {
-      showToast('warning', 'These changes will not take effect until run_as is activated in /usr/share/kibana/data/wazuh/config/wazuh.yml and the Kibana service is restarted');
-    }
     if (isJsonEditor) {
       save(JSON.parse(ruleJson));
     } else {
