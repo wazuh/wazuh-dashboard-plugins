@@ -68,7 +68,7 @@ const pageConfiguration = {
     return {
       columns: [
         {
-          text: 'Copyright © 2020 Wazuh, Inc.',
+          text: 'Copyright © 2021 Wazuh, Inc.',
           color: COLORS.PRIMARY,
           margin: [40, 40, 0, 0]
         },
