@@ -2,7 +2,7 @@
 //  * Wazuh app - React component building the welcome screen of an agent.
 //  * version, OS, registration date, last keep alive.
 //  *
-//  * Copyright (C) 2015-2020 Wazuh, Inc.
+//  * Copyright (C) 2015-2021 Wazuh, Inc.
 //  *
 //  * This program is free software; you can redistribute it and/or modify
 //  * it under the terms of the GNU General Public License as published by
