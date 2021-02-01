@@ -40,14 +40,14 @@ export class FilterBar extends Component {
       ...(((this.props.agent || {}).os || {}).platform !== 'windows' ? [{type: 'q', label: 'inode', description:"Inode of the file", operators:['=','!=', '~'], values: async (value) => getFilterValues('inode', value, this.props.agent.id)}]: []),
       {type: 'q', label: 'size', description:"Size of the file in Bytes", values: async (value) => getFilterValues('size', value, this.props.agent.id)}, 
     ],
-    registry: [
-      {type: 'q', label: 'file', description:"Name of the registry", operators:['=','!=', '~'], values: async (value) => getFilterValues('file', value, this.props.agent.id, {type:'registry'})},
+    registry_key: [
+      {type: 'q', label: 'file', description:"Name of the registry", operators:['=','!=', '~'], values: async (value) => getFilterValues('file', value, this.props.agent.id, {type:'registry_key'})},
     ]
   }
 
   props!:{
     onFiltersChange(filters:IFilter[]): void
-    selectView: 'files' | 'registry'
+    selectView: 'files' | 'registry_key'
     agent: {id: string, agentPlatform: string}
     onChangeCustomBadges?(customBadges: ICustomBadges[]): void 
     customBadges?: ICustomBadges[]

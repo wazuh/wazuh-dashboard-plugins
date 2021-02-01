@@ -46,7 +46,7 @@ export class Inventory extends Component {
   _isMount = false;
   state: {
     filters: []
-    selectedTabId: 'files' | 'registry'
+    selectedTabId: 'files' | 'registry_key'
     totalItemsFile: number
     totalItemsRegistry: number
     isLoading: Boolean
@@ -117,7 +117,7 @@ export class Inventory extends Component {
     const platform = (this.props.agent.os || {}).platform || "other";
      platform  === 'windows' ? auxTabs.push(
       {
-        id: 'registry',
+        id: 'registry_key',
         name: `Windows Registry ${this.state.isLoading === true ? '' : '(' + this.state.totalItemsRegistry + ')'}`,
         disabled: false,
       },
@@ -267,7 +267,7 @@ export class Inventory extends Component {
             onFiltersChange={this.onFiltersChange} 
             onTotalItemsChange={this.onTotalItemsChange}/>
         }
-        {selectedTabId === 'registry' &&
+        {selectedTabId === 'registry_key' &&
           <RegistryTable
             {...this.props}
             filters={filters}
