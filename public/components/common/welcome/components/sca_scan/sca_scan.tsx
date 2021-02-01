@@ -1,7 +1,7 @@
 /*
  * Wazuh app - React component information about last SCA scan.
  *
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,10 +31,15 @@ import {
 import moment from 'moment-timezone';
 import store from '../../../../../redux/store';
 import { updateCurrentAgentData } from '../../../../../redux/actions/appStateActions';
-import { WzRequest } from '../../../../../react-services/wz-request';
+import { WzRequest } from '../../../../../react-services';
 import { getAngularModule } from '../../../../../kibana-services';
+import { withReduxProvider, withUserAuthorizationPrompt } from "../../../hocs";
+import { compose } from 'redux';
 
-export class ScaScan extends Component {
+export const ScaScan = compose(
+  withReduxProvider,
+  withUserAuthorizationPrompt([{action: 'agent:read', resource: 'agent:id:*'}, {action: 'sca:read', resource: 'agent:id:*'}])
+)(class ScaScan extends Component {
   _isMount = false;
   props!: {
     [key: string]: any
@@ -237,4 +242,4 @@ export class ScaScan extends Component {
       </EuiFlexItem>
     )
   }
-}
+});

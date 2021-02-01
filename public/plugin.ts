@@ -73,7 +73,12 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
           unmount();
         };
       },
-
+      category: {
+        id: 'wazuh',
+        label: 'Wazuh',
+        order: 0,
+        euiIconType: '/plugins/wazuh/assets/icon_blue.svg',      
+      },
     });
     return {};
   }

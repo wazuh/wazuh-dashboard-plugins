@@ -30,7 +30,7 @@ export class ApiRequest {
     
     const response: AxiosResponse = await ApiInterceptor.requestAsInternalUser(
       'GET',
-      `${url}:${port}/${this.request}`,
+      '/${this.request}',
       this.params,
       {apiHostID: id }
     )

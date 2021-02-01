@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Mitre alerts components
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -160,7 +160,7 @@ export class Mitre extends Component {
           <EuiFlexItem>
             <EuiPanel paddingSize="none">
                 <EuiFlexGroup >
-                  <EuiFlexItem grow={false} style={{width: "15%", minWidth: 145, height: "calc(100vh - 280px)",overflowX: "hidden"}}>
+                  <EuiFlexItem grow={false} style={{width: "15%", minWidth: 145, height: "calc(100vh - 325px)",overflowX: "hidden"}}>
                     <Tactics 
                       indexPattern={this.indexPattern}
                       onChangeSelectedTactics={this.onChangeSelectedTactics}

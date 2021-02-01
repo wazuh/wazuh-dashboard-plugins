@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Integrity monitoring components
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -82,7 +82,7 @@ export class MainModuleOverview extends Component {
   }
 
   async componentDidMount() {
-    const tabView = AppNavigate.getUrlParameter('tabView');
+    const tabView = AppNavigate.getUrlParameter('tabView') || 'panels';
     const tab = AppNavigate.getUrlParameter('tab');
     if(tabView && tabView !== this.props.selectView){
       if(tabView === 'panels' && tab=== 'sca' ){ // SCA initial tab is inventory

@@ -43,25 +43,25 @@ export class SaveDocument {
 
   private async checkIndexAndCreateIfNotExists(index, shards, replicas) {
     try {
-      try{
+      try {
         const exists = await this.esClientInternalUser.indices.exists({ index });
         log(this.logPath, `Index '${index}' exists? ${exists.body}`, 'debug');
-      }catch(error){
-        log(this.logPath, `Index '${index}' exists? false`, 'debug');
-        const response = await this.esClientInternalUser.indices.create({
-          index,
-          body: {
-            settings: {
-              index: {
-                number_of_shards: shards || WAZUH_INDEX_SHARDS,
-                number_of_replicas: replicas || WAZUH_INDEX_REPLICAS
+        if (!exists.body) {
+          const response = await this.esClientInternalUser.indices.create({
+            index,
+            body: {
+              settings: {
+                index: {
+                  number_of_shards: shards || WAZUH_INDEX_SHARDS,
+                  number_of_replicas: replicas || WAZUH_INDEX_REPLICAS
+                }
               }
             }
-          }
-        });
-        
-        log(this.logPath, `Status of create a new index: ${JSON.stringify(response)}`, 'debug');
-
+          });
+          log(this.logPath, `Status of create a new index: ${JSON.stringify(response)}`, 'debug');
+        }
+      } catch (error) {
+        log(this.logPath ,`Error searching or creating '${index}' due to '${error.message || error}'`);
       }
     } catch (error) {
       this.checkDuplicateIndexError(error);

@@ -1,7 +1,7 @@
 /*
  * Wazuh app - React component for alerts stats.
  *
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -257,7 +257,7 @@ export class SelectAgent extends Component {
 
     if (this.state.isFlyoutVisible) {
       flyout = (
-        <EuiFlyout onClose={this.closeFlyout} aria-labelledby="flyoutTitle">
+        <EuiFlyout className="wzApp" onClose={this.closeFlyout} aria-labelledby="flyoutTitle">
           <EuiFlyoutHeader hasBorder>
             <EuiTitle size="m">
               <h2 id="flyoutTitle">Select agent</h2>

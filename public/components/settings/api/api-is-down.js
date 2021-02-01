@@ -1,7 +1,7 @@
 /*
  * Wazuh app - React component for the adding an API entry form.
  *
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -110,8 +110,8 @@ hosts:
     - production:
         url: https://172.16.1.2
         port: 55000
-        username: wazuh
-        password: wazuh
+        username: wazuh-wui
+        password: wazuh-wui
         run_as: false
 `;
 

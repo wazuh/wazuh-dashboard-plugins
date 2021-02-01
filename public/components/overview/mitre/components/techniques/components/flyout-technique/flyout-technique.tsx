@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Mitre flyout components
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -344,7 +344,7 @@ export class FlyoutTechnique extends Component {
         <EuiFlyout
           onClose={() => onChangeFlyout(false)}
           size="l"
-          className="flyout-no-overlap wz-inventory"
+          className="flyout-no-overlap wz-inventory wzApp"
           aria-labelledby="flyoutSmallTitle"
           > 
           { techniqueData &&

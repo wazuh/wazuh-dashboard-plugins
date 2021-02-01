@@ -694,13 +694,13 @@ function discoverController(
     // Wazuh filters are not ready yet
     if (!filtersAreReady()) return;
     if (!_.isEqual(query, appStateContainer.getState().query) || isUpdate === false) {
-      /// Wazuh 7.7.x
-      let q = { ...query };
-      if (query && typeof query === 'object') {
-        q.update_Id = new Date().getTime().toString();
-      }
-      ///
-      setAppState({ query: q });
+       /// Wazuh 7.7.x
+       let q = { ...query };
+       if (query && typeof query === 'object') {
+         q.timestamp = new Date().getTime().toString();
+       }
+       ///
+       setAppState({ query: q });
       // WAZUH query from search bar
       discoverPendingUpdates.removeAll();
       discoverPendingUpdates.addItem($scope.state.query, filterManager.filters);

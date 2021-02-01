@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Initial basic configuration file
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 export const initialWazuhConfig: string = `---
 #
 # Wazuh app - App configuration file
-# Copyright (C) 2015-2020 Wazuh, Inc.
+# Copyright (C) 2015-2021 Wazuh, Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -207,7 +207,7 @@ hosts:
   - default:
      url: https://localhost
      port: 55000
-     username: wazuh
-     password: wazuh
+     username: wazuh-wui
+     password: wazuh-wui
      run_as: false
 `

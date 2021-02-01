@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Mitre alerts components
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -254,14 +254,14 @@ export const Techniques = withWindowSize(class Techniques extends Component {
     })
     if(this.state.isSearching || this.state.loadingAlerts || this.props.isLoading){
       return (
-        <EuiFlexItem style={{ height: "calc(100vh - 410px)", alignItems: 'center' }} >
+        <EuiFlexItem style={{ height: "calc(100vh - 450px)", alignItems: 'center' }} >
           <EuiLoadingSpinner size='xl'/>
         </EuiFlexItem>
       )
     }
     if(tacticsToRender.length){
       return (
-      <EuiFlexGrid columns={this.techniqueColumnsResponsive()} gutterSize="s" style={{ maxHeight: "calc(100vh - 385px)", overflow: "overlay", overflowX: "hidden", paddingRight: 10}}>
+      <EuiFlexGrid columns={this.techniqueColumnsResponsive()} gutterSize="s" style={{ maxHeight: "calc(100vh - 420px)", overflow: "overlay", overflowX: "hidden", paddingRight: 10}}>
         {tacticsToRenderOrdered}
       </EuiFlexGrid>
       )

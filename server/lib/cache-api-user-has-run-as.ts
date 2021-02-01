@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Service which caches the API user allow run as
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,15 +47,15 @@ export const APIUserAllowRunAs = {
       };
       const response = await ApiInterceptor.requestAsInternalUser(
         'get',
-        `${api.url}:${api.port}/security/users/me`,
+        '/security/users/me',
         {},
         { apiHostID: apiId }
       );
-      const APIUserAllowRunAs = response.data.data.affected_items[0].allow_run_as ? API_USER_STATUS_RUN_AS.ENABLED : API_USER_STATUS_RUN_AS.NOT_ALLOWED;
-      
+      const statusUserAllowRunAs = response.data.data.affected_items[0].allow_run_as ? API_USER_STATUS_RUN_AS.ENABLED : API_USER_STATUS_RUN_AS.NOT_ALLOWED;
+
       // Cache the run_as for the API user
-      CacheInMemoryAPIUserAllowRunAs.set(apiId, api.username, APIUserAllowRunAs);
-      return APIUserAllowRunAs;
+      CacheInMemoryAPIUserAllowRunAs.set(apiId, api.username, statusUserAllowRunAs);
+      return statusUserAllowRunAs;
     }catch(error){
       log('APIUserAllowRunAs:check', error.message || error);
       return API_USER_STATUS_RUN_AS.DISABLED;

@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Wazuh Constants file
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -81,6 +81,9 @@ export const WAZUH_CONFIGURATION_SETTINGS_NEED_RESTART = [
   'wazuh.monitoring.creation',
   'wazuh.monitoring.pattern',
   'alerts.sample.prefix',
+  'cron.statistics.interval',
+  'cron.statistics.index.name',
+  'cron.statistics.index.creation',
   'cron.statistics.index.shards',
   'cron.statistics.index.replicas',
   'logs.level',
