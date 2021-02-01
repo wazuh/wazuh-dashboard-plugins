@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for add sample data
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -123,7 +123,7 @@ export default class WzSampleData extends Component {
         }
       });
       await WzRequest.genericReq('POST', `/elastic/samplealerts/${category.categorySampleAlertsIndex}`, { params: this.generateAlertsParams });
-      this.showToast('success', `${category.title} alerts installed`, 'Date range for sample data is now-7 days ago', 5000);
+      this.showToast('success', `${category.title} alerts added`, 'Date range for sample data is now-7 days ago', 5000);
       this.setState({
         [category.categorySampleAlertsIndex]: {
           ...this.state[category.categorySampleAlertsIndex],
@@ -157,7 +157,7 @@ export default class WzSampleData extends Component {
           removeDataLoading: false
         }
       });
-      this.showToast('success', `${category.title} alerts uninstalled`);
+      this.showToast('success', `${category.title} alerts removed`);
     } catch (error) {
       this.setState({
         [category.categorySampleAlertsIndex]: {

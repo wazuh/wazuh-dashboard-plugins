@@ -264,7 +264,7 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
     }
 
     return (
-        <EuiFlyout
+        <EuiFlyout className="wzApp"
             onClose={() => closeFlyout(false)}>
             <EuiFlyoutHeader hasBorder={false}>
                 <EuiTitle size="m">

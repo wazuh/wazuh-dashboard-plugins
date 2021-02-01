@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Compliance flyout component
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -194,7 +194,7 @@ export class RequirementFlyout extends Component {
                 onClose={() => onChangeFlyout(false)}
                 maxWidth="60%"
                 size="l"
-                className="flyout-no-overlap wz-inventory"
+                className="flyout-no-overlap wz-inventory wzApp"
                 aria-labelledby="flyoutSmallTitle"
             >
                 {currentRequirement &&
