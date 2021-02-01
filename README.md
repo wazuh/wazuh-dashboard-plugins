@@ -93,6 +93,14 @@ This plugin for Kibana allows you to visualize and analyze Wazuh alerts stored i
 
 ## Installation
 
+Ensure that the directory `/usr/share/kibana/data` exists
+If not create it:
+
+```
+mkdir /usr/share/kibana/data
+chown -R kibana:kibana /usr/share/kibana/data
+```
+
 Install the Wazuh app plugin for Kibana
 
 ```
