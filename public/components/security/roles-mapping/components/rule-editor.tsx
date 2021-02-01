@@ -226,7 +226,7 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
     }
   };
 
-  const saveRule = async () => {
+  const saveRule = () => {
     if (isJsonEditor) {
       save(JSON.parse(ruleJson));
     } else {
