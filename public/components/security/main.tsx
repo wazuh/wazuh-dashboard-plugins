@@ -81,11 +81,10 @@ export const WzSecurity = compose(
   }
   const [allowRunAs, setAllowRunAs] = useState();
   useEffect(() => {
-    // Manejando la promesa con .then/.catch
     checkRunAsUser()
-      .then(result => setAllowRunAs(result)) // Setea la variable con el resultado de la petición
-      .catch(error => console.log('Hubo un error')) //Maneja el error como quieras hacerlo
-  }, []) // Poner [] solo hará que esto se ejecute cuando se monte el componente
+      .then(result => setAllowRunAs(result))
+      .catch(error => console.log('Hubo un error'))
+  }, [])
 
   // This allows to redirect to a Security tab if you click a Security link in menu when you're already in a Security section
   useEffect(() => {
