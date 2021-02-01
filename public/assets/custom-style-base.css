@@ -1,0 +1,168 @@
+ /* montserrat-regular - latin */
+@font-face {
+  font-family: 'Montserrat';
+  font-style: normal;
+  font-weight: 400;
+  src: url('../../fonts/montserrat-v14-latin-regular.eot'); /* IE9 Compat Modes */
+  src: local('Montserrat Regular'), local('Montserrat-Regular'),
+       url('../../fonts/montserrat-v14-latin-regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('../../fonts/montserrat-v14-latin-regular.woff2') format('woff2'), /* Super Modern Browsers */
+       url('../../fonts/montserrat-v14-latin-regular.woff') format('woff'), /* Modern Browsers */
+       url('../../fonts/montserrat-v14-latin-regular.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('../../fonts/montserrat-v14-latin-regular.svg#Montserrat') format('svg'); /* Legacy iOS */
+}
+/* montserrat-500 - latin */
+@font-face {
+  font-family: 'Montserrat';
+  font-style: normal;
+  font-weight: 500;
+  src: url('../../fonts/montserrat-v14-latin-500.eot'); /* IE9 Compat Modes */
+  src: local('Montserrat Medium'), local('Montserrat-Medium'),
+       url('../../fonts/montserrat-v14-latin-500.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('../../fonts/montserrat-v14-latin-500.woff2') format('woff2'), /* Super Modern Browsers */
+       url('../../fonts/montserrat-v14-latin-500.woff') format('woff'), /* Modern Browsers */
+       url('../../fonts/montserrat-v14-latin-500.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('../../fonts/montserrat-v14-latin-500.svg#Montserrat') format('svg'); /* Legacy iOS */
+}
+
+/* Login screen */
+.wz-login {
+  background: url(/plugins/wazuh/assets/wazuh_wazuh_bg.svg) !important;
+  background-image: url(/plugins/wazuh/assets/wazuh_wazuh_bg.svg) !important;
+  background-position-x: initial !important;
+  background-position-y: initial !important;
+  background-size: cover !important;
+  background-repeat-x: initial !important;
+  background-repeat-y: initial !important;
+  background-attachment: initial !important;
+  background-origin: initial !important;
+  background-clip: initial !important;
+  background-color: initial !important;
+  width: 100% !important;
+  height: 100% !important;
+  background-size: cover !important;
+} 
+
+.wz-login .application > div {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+}
+
+.wz-login .application .login-wrapper {
+  position: relative;
+  margin: auto;
+  width: 396px;
+  padding-left: 16px;
+  padding-right: 16px;
+  z-index: 10;
+  background-color: #fff;
+  border-radius: 4px;
+}
+
+.wz-login .application .login-wrapper .euiForm {
+  width: 100%;
+}
+
+.euiFormControlLayout--group .euiFormControlLayout__prepend.euiIcon {
+  padding: 3px 15px;
+  width: 45px;
+}
+
+.wz-login .application .euiButton--primary.euiButton--fill {
+  background-color: #00a9e5 !important;
+  border-color: #00a0e5 !important;
+}
+
+.wz-login .application .euiButton--primary:hover {
+  text-decoration: none;
+  box-shadow: none;
+  transform: none;
+}
+
+.wz-login .application .euiImage {
+  display: flex;
+  justify-content: center;
+}
+
+.wz-login .application .euiImage .euiImage__img {
+  max-width: 100%;
+  width: auto;
+  height: 160px;
+  padding: 5px;
+  margin-bottom: 15px;
+}
+
+.wz-login .application .login-wrapper > .euiText.euiText--medium {
+  font-family: 'Open Sans', sans-serif;
+  color: #0094ce;
+  font-size: 36px;
+  text-align: center;
+}
+
+.wz-login .application .login-wrapper #error.euiText.euiText--medium {
+  margin-top: 16px;
+}
+
+.wz-login .application .login-wrapper .euiText.euiText--small{
+  padding-bottom: 27px !important;
+  padding-top: 7px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 17px;
+  text-align: center;
+}
+
+/* Top bar*/
+.euiHeaderSection [aria-label*="Newsfeed menu"] {
+  display: none!important;
+}
+ 
+.chrHeaderHelpMenu__version {
+  display: none;
+}
+
+/* Loading icon once logged in */
+.appContainer__loading .euiLoadingElastic {
+  width: 32px;
+  height: 32px;
+  background: url(/plugins/wazuh/assets/wazuh_logo_circle.svg)
+}
+
+.appContainer__loading .euiLoadingElastic svg {
+  display: none;
+}
+
+.euiHeaderLogo:before {
+  content: '';
+  width: 30px;
+  height: 30px;
+  background: url(/plugins/wazuh/assets/wazuh_logo_circle.svg) no-repeat;
+  background-size: contain;
+}
+
+.euiHeaderLogo:after {
+  content: 'Wazuh';
+  color: #DFE5EF;
+  font-size: 1.25rem;
+  line-height: 2rem;
+  letter-spacing: -0.025em;
+  padding-left: 16px;
+}
+
+.euiHeaderLogo .euiHeaderLogo__text {
+  display: none;
+}
+
+.euiHeaderLogo svg {
+  display: none;
+}
+
+.euiBreadcrumbs .navBarLogo {
+  filter: none;
+  max-height: 25px;
+  max-width: 100px;
+  width: auto;
+}
+.euiBreadcrumbs button div.euiFlexItem.euiFlexItem--flexGrowZero:first-child{
+  min-width: 100px;
+}
