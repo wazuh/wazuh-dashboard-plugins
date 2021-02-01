@@ -26,7 +26,11 @@ import {
   decodeJsonRule,
   getSelectedUsersFromRules,
 } from '../helpers/rule-editor.helper';
+import { getToasts } from '../../../../kibana-services';
+import { GenericRequest } from '../../../../react-services/generic-request';
+import { ErrorHandler } from '../../../../react-services/error-handler';
 import { WAZUH_SECURITY_PLUGIN_OPEN_DISTRO_FOR_ELASTICSEARCH } from '../../../../../common/constants';
+import { AppState } from '../../../../react-services/app-state';
 import 'brace/mode/json';
 import 'brace/snippets/json';
 import 'brace/ext/language_tools';
@@ -52,7 +56,6 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
   ];
   const default_user_field = currentPlatform === WAZUH_SECURITY_PLUGIN_OPEN_DISTRO_FOR_ELASTICSEARCH ? 'user_name' : 'username';
   const default_rule = { user_field: default_user_field, searchOperation: 'FIND', value: 'wazuh' };
-
 
   useEffect(() => {
     if (initialRule) {
@@ -122,6 +125,29 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
     setHasWrongFormat(wrongFormat);
     return { customRules, internalUsersRules, wrongFormat, logicalOperator };
   };
+
+  const showToast = (color, title, text = '', time = 3000) => {
+    getToasts().add({
+      color,
+      title,
+      text,
+      toastLifeTimeMs: time
+    });
+  }
+
+  const checkRunAsUser = async () => {
+    const currentApi = AppState.getCurrentAPI();
+    try {
+      const ApiCheck = await GenericRequest.request('POST',
+        '/api/check-api',
+        currentApi
+      );
+      return ApiCheck;
+
+    } catch (error) {
+      ErrorHandler.handle(error, 'Error checking the current API');
+    }
+  }
 
   const printRules = () => {
     const rulesList = rules.map((item, idx) => {
@@ -227,7 +253,11 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
     }
   };
 
-  const saveRule = () => {
+  const saveRule = async () => {
+    const isRunAS = await checkRunAsUser();
+    if (!isRunAS.data.allow_run_as) {
+      showToast('warning', 'These changes will not take effect until run_as is activated in /usr/share/kibana/data/wazuh/config/wazuh.yml and the Kibana service is restarted');
+    }
     if (isJsonEditor) {
       save(JSON.parse(ruleJson));
     } else {
@@ -279,80 +309,80 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
                   aria-label="Code Editor"
                 />
               )) || (
-                <Fragment>
-                  <EuiTitle size="s">
-                    <h2>Map internal users</h2>
-                  </EuiTitle>
-                  <EuiFormRow
-                    label="Internal users"
-                    helpText="Assign internal users to the selected role mapping"
-                  >
-                    <EuiComboBox
-                      placeholder="Select internal users"
-                      options={internalUsersOptions}
-                      selectedOptions={selectedUsers}
-                      isLoading={isLoading}
-                      onChange={onChangeSelectedUsers}
-                      isClearable={true}
-                      data-test-subj="demoComboBox"
-                    />
-                  </EuiFormRow>
-                  <EuiSpacer />
-                  <EuiTitle size="s">
-                    <h2>Custom rules</h2>
-                  </EuiTitle>
-                  <EuiPopover
-                    ownFocus
-                    button={
-                      <EuiButtonEmpty
-                        disabled={isLoading || isReserved}
-                        onClick={onButtonClick}
-                        iconType="arrowDown"
-                        iconSide="right"
-                      >
-                        {logicalOperator === 'AND' ? 'All are true' : 'Any are true'}
-                      </EuiButtonEmpty>
-                    }
-                    isOpen={isLogicalPopoverOpen}
-                    closePopover={closeLogicalPopover}
-                    anchorPosition="downCenter"
-                  >
-                    <div>
-                      <EuiFlexGroup>
-                        <EuiFlexItem>
-                          <EuiButtonEmpty
-                            disabled={isLoading || isReserved}
-                            color="text"
-                            onClick={() => selectOperator('AND')}
-                          >
-                            {logicalOperator === 'AND' && <EuiIcon type="check" />}All are true
+                  <Fragment>
+                    <EuiTitle size="s">
+                      <h2>Map internal users</h2>
+                    </EuiTitle>
+                    <EuiFormRow
+                      label="Internal users"
+                      helpText="Assign internal users to the selected role mapping"
+                    >
+                      <EuiComboBox
+                        placeholder="Select internal users"
+                        options={internalUsersOptions}
+                        selectedOptions={selectedUsers}
+                        isLoading={isLoading}
+                        onChange={onChangeSelectedUsers}
+                        isClearable={true}
+                        data-test-subj="demoComboBox"
+                      />
+                    </EuiFormRow>
+                    <EuiSpacer />
+                    <EuiTitle size="s">
+                      <h2>Custom rules</h2>
+                    </EuiTitle>
+                    <EuiPopover
+                      ownFocus
+                      button={
+                        <EuiButtonEmpty
+                          disabled={isLoading || isReserved}
+                          onClick={onButtonClick}
+                          iconType="arrowDown"
+                          iconSide="right"
+                        >
+                          {logicalOperator === 'AND' ? 'All are true' : 'Any are true'}
+                        </EuiButtonEmpty>
+                      }
+                      isOpen={isLogicalPopoverOpen}
+                      closePopover={closeLogicalPopover}
+                      anchorPosition="downCenter"
+                    >
+                      <div>
+                        <EuiFlexGroup>
+                          <EuiFlexItem>
+                            <EuiButtonEmpty
+                              disabled={isLoading || isReserved}
+                              color="text"
+                              onClick={() => selectOperator('AND')}
+                            >
+                              {logicalOperator === 'AND' && <EuiIcon type="check" />}All are true
                           </EuiButtonEmpty>
-                        </EuiFlexItem>
-                      </EuiFlexGroup>
-                      <EuiFlexGroup>
-                        <EuiFlexItem>
-                          <EuiButtonEmpty
-                            disabled={isLoading || isReserved}
-                            color="text"
-                            onClick={() => selectOperator('OR')}
-                          >
-                            {logicalOperator === 'OR' && <EuiIcon type="check" />}Any are true
+                          </EuiFlexItem>
+                        </EuiFlexGroup>
+                        <EuiFlexGroup>
+                          <EuiFlexItem>
+                            <EuiButtonEmpty
+                              disabled={isLoading || isReserved}
+                              color="text"
+                              onClick={() => selectOperator('OR')}
+                            >
+                              {logicalOperator === 'OR' && <EuiIcon type="check" />}Any are true
                           </EuiButtonEmpty>
-                        </EuiFlexItem>
-                      </EuiFlexGroup>
-                    </div>
-                  </EuiPopover>
-                  {printRules()}
+                          </EuiFlexItem>
+                        </EuiFlexGroup>
+                      </div>
+                    </EuiPopover>
+                    {printRules()}
 
-                  <EuiButtonEmpty
-                    disabled={isLoading || isReserved}
-                    color="primary"
-                    onClick={() => addNewRule()}
-                  >
-                    Add new rule
+                    <EuiButtonEmpty
+                      disabled={isLoading || isReserved}
+                      color="primary"
+                      onClick={() => addNewRule()}
+                    >
+                      Add new rule
                   </EuiButtonEmpty>
-                </Fragment>
-              )}
+                  </Fragment>
+                )}
             </EuiPanel>
           </EuiFlexItem>
         </EuiFlexGroup>
