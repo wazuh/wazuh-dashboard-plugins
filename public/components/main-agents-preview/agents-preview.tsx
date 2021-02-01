@@ -41,10 +41,13 @@ export const AgentsPreview = (props) => {
     //functions
     loadStatus()
     load()
-
+    getMostActive()
+    getCurrentApiAddress()
+    getWazuhVersion()
+    downloadCsv([])
   }, []);
 
-  async function load() {
+  function load() {
     try {
       setErrorInit(false)
 
@@ -58,6 +61,24 @@ export const AgentsPreview = (props) => {
     }
     setIsLoading(false)
     // this.$scope.$applyAsync();
+  }
+
+  async function downloadCsv(filters) {
+    try {
+      ErrorHandler.info(
+        'Your download should begin automatically...',
+        'CSV'
+      );
+      const output = await WzRequest.csvReq('/agents', filters);
+      const blob = new Blob([output], { type: 'text/csv' }); // eslint-disable-line
+
+      FileSaver.saveAs(blob, 'agents.csv');
+
+      return;
+    } catch (error) {
+      ErrorHandler.handle(error, 'Download CSV');
+    }
+    return;
   }
 
   async function loadStatus() {
@@ -134,9 +155,9 @@ export const AgentsPreview = (props) => {
     }
   }
 
-  // return (
-  //   <div>
+  return (
+    <div>
 
-  //   </div>
-  // )
+    </div>
+  )
 }
