@@ -147,7 +147,7 @@ export class RegistryTable extends Component {
       offset: pageIndex * pageSize,
       limit: pageSize,
       sort: this.buildSortFilter(),
-      type: 'registry'
+      type: 'registry_key'
     };
 
     return filter;
@@ -242,7 +242,7 @@ export class RegistryTable extends Component {
               agentId={this.props.agent.id}
               item={this.state.syscheckItem}
               closeFlyout={() => this.closeFlyout()}
-              type='registry'
+              type='registry_key'
               view='inventory'
               {...this.props} />
           </EuiOverlayMask>

@@ -29,7 +29,7 @@ export class FlyoutDetail extends Component {
     clusterFilter: {}
     isLoading: boolean
     error: boolean
-    type: 'file' | 'registry'
+    type: 'file' | 'registry_key'
   }
 
   props!: {

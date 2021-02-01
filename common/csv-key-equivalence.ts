@@ -108,7 +108,7 @@ export const KeyEquivalence: {[key: string]: string} = {
   result: 'Result',
   directory: 'Path(s)',
   rationale: 'Rationale',
-  registry: 'Registry',
+  registry: 'Registry_key',
   date: 'Date',
   value: 'Value',
   location: 'Location',
