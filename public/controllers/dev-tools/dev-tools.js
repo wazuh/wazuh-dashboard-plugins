@@ -156,7 +156,7 @@ export class DevToolsController {
 
       const tmpgroups = [];
       const splitted = currentState
-        .split(/[\r\n]+(?=(?:GET|PUT|POST|DELETE|#|\n)\b)/gm)
+        .split(/[\r\n]+(?=(?:GET|PUT|POST|DELETE|#)\b)/gm)
         .filter(item => item.replace(/\s/g, '').length);
 
       let start = 0;
