@@ -70,7 +70,7 @@ let observer = new MutationObserver((mutations) => {
         ready = true;
         $('.content').addClass('wz-login');
         var logo = $('figure > img', loginWrapper);
-        logo.attr('src', '/plugins/wazuh/assets/wazuh_logo_circle.svg');
+        logo.attr('src', '/plugins/wazuh/assets/wazuh_logo_login.svg');
         var title = $('.euiText.euiText--medium > .euiTextAlign', loginWrapper);
         title.text('Wazuh Cloud');
         var subtitle = $('.euiText.euiText--small > .euiTextAlign', loginWrapper);
