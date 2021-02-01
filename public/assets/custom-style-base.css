@@ -159,4 +159,10 @@
 
 .euiBreadcrumbs .navBarLogo {
   filter: none;
+  max-height: 25px;
+  max-width: 100px;
+  width: auto;
+}
+.euiBreadcrumbs button div.euiFlexItem.euiFlexItem--flexGrowZero:first-child{
+  min-width: 100px;
 }
