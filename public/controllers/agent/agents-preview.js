@@ -218,6 +218,7 @@
 //       this.errorInit = false;
 
 //       const clusterInfo = AppState.getClusterInfo();
+
 //       this.firstUrlParam = clusterInfo.status === 'enabled' ? 'cluster' : 'manager';
 //       this.secondUrlParam = clusterInfo[this.firstUrlParam];
 
