@@ -49,6 +49,14 @@ const observerMainApp = new MutationObserver((mutations) => {
       wrapper.appendChild(mutation.target);
 
     }
+    /**
+     * Fix left-menu overview link
+     */
+    else if (mutation.target.nodeName == 'HEADER' &&
+      mutation.target.getAttribute('data-test-subj') === 'headerGlobalNav' &&
+      mutation.target.className == 'hide-for-sharing headerGlobalNav') {
+      $(mutation.target).find('a[href$="app/kibana_overview"]').parent().addClass('hide');
+    }
   })
 });
 
@@ -86,7 +94,7 @@ $(function () {
       attributes: false,
       characterData: false,
     });
-  } else if (document.location.pathname.indexOf('app/wazuh') != -1) {
+  } else {
     observerMainApp.observe(document.body, {
       childList: true,
       subtree: true,
