@@ -81,8 +81,8 @@ export class MultipleAgentSelector extends Component {
         params.search = searchTerm;
       }
 
-      const req = await WzRequest.apiReq('GET', '/agents', {	
-        params: params	
+      const req = await WzRequest.apiReq('GET', '/agents', {
+        params: params
       });
 
       const totalAgents = req.data.data.total_affected_items;
@@ -147,11 +147,11 @@ export class MultipleAgentSelector extends Component {
       if (searchTerm) {
         params.search = searchTerm;
       }
-      const result = await WzRequest.apiReq(	
-        'GET',	
-        `/groups/${this.props.currentGroup.name}/agents`, {	
-          params	
-        },	
+      const result = await WzRequest.apiReq(
+        'GET',
+        `/groups/${this.props.currentGroup.name}/agents`, {
+          params
+        },
       );
       this.setState({ totalSelectedAgents: result.data.data.total_affected_items })
       const mapped = result.data.data.affected_items.map(item => {
@@ -245,28 +245,28 @@ export class MultipleAgentSelector extends Component {
     try {
       this.setState({ savingChanges: true });
       if (itemsToSave.addedIds.length) {
-        const addResponse = await WzRequest.apiReq(	
-          'PUT',	
-          `/agents/group`, {	
-            params: {	
-              group_id: this.props.currentGroup.name,	
-              agents_list: itemsToSave.addedIds.toString()	
-            }	
-          }	
+        const addResponse = await WzRequest.apiReq(
+          'PUT',
+          `/agents/group`, {
+            params: {
+              group_id: this.props.currentGroup.name,
+              agents_list: itemsToSave.addedIds.toString()
+            }
+          }
         );
         if (addResponse.data.data.failed_ids) {
           failedIds.push(...addResponse.data.data.failed_ids);
         }
       }
       if (itemsToSave.deletedIds.length) {
-        const deleteResponse = await WzRequest.apiReq(	
-          'DELETE',	
-          `/agents/group`, {	
-            params: {	
-              group_id: this.props.currentGroup.name,	
-              agents_list: itemsToSave.deletedIds.toString()	
-            }	
-          }	
+        const deleteResponse = await WzRequest.apiReq(
+          'DELETE',
+          `/agents/group`, {
+            params: {
+              group_id: this.props.currentGroup.name,
+              agents_list: itemsToSave.deletedIds.toString()
+            }
+          }
         );
         if (deleteResponse.data.data.total_failed_items) {
           failedIds.push(...deleteResponse.data.data.failed_items);
@@ -278,7 +278,7 @@ export class MultipleAgentSelector extends Component {
           id: ((item || {}).error || {}).code,
           message: ((item || {}).error || {}).message,
         }));
-        
+
         this.failedErrors = this.groupBy(failedErrors, 'message') || false;
         ErrorHandler.info(
           `Group has been updated but an error has occurred with ${failedIds.length} agents`,
@@ -498,6 +498,9 @@ export class MultipleAgentSelector extends Component {
                                 size='15'
                                 multiple
                                 onChange={(e) => {
+                                  document.getElementById("wzMultipleSelectorRight").childNodes.forEach(option =>  {
+                                    option.selected = false
+                                  } )
                                   this.setState({
                                     availableItem: Array.from(e.target.selectedOptions, option => option.value),
                                     selectedElement: []
@@ -621,6 +624,9 @@ export class MultipleAgentSelector extends Component {
                                 size='15'
                                 multiple
                                 onChange={(e) => {
+                                document.getElementById("wzMultipleSelectorLeft").childNodes.forEach(option =>  {
+                                    option.selected = false
+                                  } )
                                   this.setState({
                                     selectedElement: Array.from(e.target.selectedOptions, option => option.value),
                                     availableItem: []
