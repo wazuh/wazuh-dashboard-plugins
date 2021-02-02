@@ -41,7 +41,7 @@ export class WazuhApiCtrl {
       const { force, idHost } = request.body;
       const { username } = await context.wazuh.security.getCurrentUser(request, context);
       if (!force && request.headers.cookie && username === getCookieValueByName(request.headers.cookie, 'wz-user') && idHost === getCookieValueByName(request.headers.cookie,'wz-api')) {
-        const wzToken = getCookieValueByName(request.headers.cookie, 'wz-user');
+        const wzToken = getCookieValueByName(request.headers.cookie, 'wz-token');
         if (wzToken) {
           try { // if the current token is not a valid jwt token we ask for a new one
             const decodedToken = jwtDecode(wzToken);
