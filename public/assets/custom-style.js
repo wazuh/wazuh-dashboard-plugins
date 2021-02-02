@@ -38,6 +38,7 @@ const observerMainApp = new MutationObserver((mutations) => {
       mutation.target.className == 'euiHeaderLogo') {
       const parent = mutation.target.parentNode;
       const wrapper = document.createElement('a');
+      mutation.target.setAttribute('href', '/app/wazuh');
       wrapper.setAttribute('href', '/app/wazuh');
       wrapper.addEventListener('click', function (ev) {
         ev.stopPropagation();
