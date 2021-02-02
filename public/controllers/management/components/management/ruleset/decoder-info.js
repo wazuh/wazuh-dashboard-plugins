@@ -141,6 +141,20 @@ class WzDecoderInfo extends Component {
         content = this.colorRegex(content);
       } else if (key === 'order') {
         content = this.colorOrder(content);
+      } else if (typeof details[key] === 'object'){
+        content = (
+          <ul>
+            <li>
+              {Object.keys(details[key]).map(k => (
+                <span key={k}>
+                  {k}:&nbsp;
+                  {details[key][k]}
+                  <br />
+                </span>
+              )).reduce((accum, item) => [accum, ', ', item])}
+            </li>
+          </ul>
+        )
       } else {
         content = <span className="subdued-color">{details[key]}</span>;
       }
