@@ -10,7 +10,7 @@ import { WzRequest } from '../../react-services/wz-request';
 import { SavedObject } from '../../react-services/saved-objects';
 import { ErrorHandler } from '../../react-services/error-handler';
 import { WAZUH_ERROR_DAEMONS_NOT_READY, WAZUH_INDEX_TYPE_STATISTICS, WAZUH_INDEX_TYPE_MONITORING } from '../../../common/constants';
-import { checkKibanaSettings, checkKibanaSettingsTimeFilter } from './lib';
+import { checkKibanaSettings, checkKibanaSettingsTimeFilter, checkKibanaSettingsMaxBuckets} from './lib';
 import store from '../../redux/store';
 import { updateWazuhNotReadyYet } from '../../redux/actions/appStateActions.js';
 
@@ -309,6 +309,7 @@ export class HealthCheck extends Component {
       const configuration = wazuhConfig.getConfig();
       checkKibanaSettings(configuration['checks.metaFields']);
       checkKibanaSettingsTimeFilter(configuration['checks.timeFilter']);
+      checkKibanaSettingsMaxBuckets(configuration['checks.maxBuckets']);
       AppState.setPatternSelector(configuration['ip.selector']);
       let checks = {};
       checks.pattern = configuration['checks.pattern'];
