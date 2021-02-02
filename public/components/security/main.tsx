@@ -83,7 +83,7 @@ export const WzSecurity = compose(
   useEffect(() => {
     checkRunAsUser()
       .then(result => setAllowRunAs(result))
-      .catch(error => console.log('Hubo un error'))
+      .catch(error => console.log(error,'Error checking if run_as user is enabled'))
   }, [])
 
   // This allows to redirect to a Security tab if you click a Security link in menu when you're already in a Security section
@@ -120,7 +120,7 @@ export const WzSecurity = compose(
       <EuiFlexGroup >
         <EuiFlexItem >
           <EuiSpacer></EuiSpacer>
-          <EuiCallOut  title=" The role mapping has no effect because current user has not run_as activated in the configs or is not allowed from Wazuh API. " color="warning" iconType="alert">
+          <EuiCallOut  title=" The role mapping has no effect because the Wazuh API's configurated user has not the run_as setting enabled in the configuration or is not allowed to use it. " color="warning" iconType="alert">
           </EuiCallOut>
         </EuiFlexItem >
       </EuiFlexGroup>
