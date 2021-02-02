@@ -20,9 +20,14 @@ const observerMainApp = new MutationObserver((mutations) => {
       mutation.addedNodes[0].innerHTML.indexOf('Kibana documentation') != -1 &&
       mutation.addedNodes[0].innerHTML.indexOf('Ask Elastic') != -1) {
       const $node = $(mutation.addedNodes[0]);
-      $node.find('a, div.euiSpacer.euiSpacer--xs').addClass('hide');
-      $node.find('span.euiButtonEmpty__text:contains(Kibana documentation)').text('Wazuh documentation');
-      $node.find('a[href^="https://www.elastic.co/guide/en/kibana/"]')
+      const elementsToHide = ['a[href^="https://www.elastic.co/products/kibana/ask-elastic"]',
+        'a[href="https://github.com/elastic/kibana/issues/new/choose"]',
+        'div.euiSpacer.euiSpacer--xs'
+      ];
+      $node.find(elementsToHide.join(',')).addClass('hide');
+      $spanDocumentation = $node.find('span.euiButtonEmpty__text:contains(Kibana documentation)');
+      $spanDocumentation.text('Wazuh documentation');
+      $spanDocumentation.closest('a')
         .attr('href', 'https://documentation.wazuh.com')
         .removeClass('hide')
         .next()
@@ -32,31 +37,19 @@ const observerMainApp = new MutationObserver((mutations) => {
         .removeClass('hide');
     }
     /**
-     * Fix top-left Logo home link
-     */
-    else if (mutation.target.nodeName == 'A' &&
-      mutation.target.className == 'euiHeaderLogo') {
-      const parent = mutation.target.parentNode;
-      const wrapper = document.createElement('a');
-      mutation.target.setAttribute('href', '/app/wazuh');
-      wrapper.setAttribute('href', '/app/wazuh');
-      wrapper.addEventListener('click', function (ev) {
-        ev.stopPropagation();
-        ev.preventDefault();
-        window.location.href = '/app/wazuh';
-        return
-      }, true);
-      parent.replaceChild(wrapper, mutation.target);
-      wrapper.appendChild(mutation.target);
-
-    }
-    /**
      * Fix left-menu overview link
      */
     else if (mutation.target.nodeName == 'HEADER' &&
       mutation.target.getAttribute('data-test-subj') === 'headerGlobalNav' &&
       mutation.target.className == 'hide-for-sharing headerGlobalNav') {
       $(mutation.target).find('a[href$="app/kibana_overview"]').parent().addClass('hide');
+    }
+    /**
+     * Fix top-left Logo home link
+     */
+    const homeLink = document.querySelector('#globalHeaderBars a.euiHeaderLogo[href$="/app/home"]');
+    if (homeLink) {
+      changeHomeLink(homeLink);
     }
   })
 });
@@ -83,7 +76,7 @@ let observer = new MutationObserver((mutations) => {
   });
 });
 
-$(function () {
+(function () {
   // stop watching using:
   observer.disconnect();
   observerMainApp.disconnect();
@@ -103,4 +96,26 @@ $(function () {
       characterData: false,
     });
   }
-});
+})();
+
+/**
+ * Changes the kibana home url to wazuh home url
+ * 
+ * */
+function changeHomeLink(eLink) {
+
+  const parent = eLink.parentNode;
+  const wrapper = document.createElement('a');
+  eLink.setAttribute('href', '/app/wazuh');
+  wrapper.setAttribute('href', '/app/wazuh');
+  wrapper.addEventListener('click', function (ev) {
+    ev.stopPropagation();
+    ev.preventDefault();
+    window.location.href = '/app/wazuh';
+    return
+  }, true);
+  parent.replaceChild(wrapper, eLink);
+  wrapper.appendChild(eLink);
+
+
+}
