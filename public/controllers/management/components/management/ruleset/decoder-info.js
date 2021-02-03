@@ -137,22 +137,18 @@ class WzDecoderInfo extends Component {
 
     Object.keys(details).forEach(key => {
       let content = details[key];
-      if (key === 'regex') {
-        content = this.colorRegex(content);
-      } else if (key === 'order') {
+      if (key === 'order') {
         content = this.colorOrder(content);
       } else if (typeof details[key] === 'object'){
         content = (
           <ul>
-            <li>
-              {Object.keys(details[key]).map(k => (
-                <span key={k}>
-                  {k}:&nbsp;
-                  {details[key][k]}
-                  <br />
-                </span>
-              )).reduce((accum, item) => [accum, ', ', item])}
-            </li>
+            {Object.keys(details[key]).map(k => (
+              <li key={k} style={{marginBottom: "4px"}} className="subdued-color">
+                {k}:&nbsp;
+                {details[key][k]}
+                <br />
+              </li>
+            ))}
           </ul>
         )
       } else {
@@ -257,7 +253,10 @@ class WzDecoderInfo extends Component {
                         color="primary"
                         iconSize="l"
                         iconType="arrowLeft"
-                        onClick={() => this.props.cleanInfo()}
+                        onClick={() => {
+                          window.location.href = window.location.href.replace(new RegExp('redirectRule=' + '[^&]*'), '');
+                          this.props.cleanInfo();
+                        }}
                       />
                     </EuiToolTip>
                     {name}
