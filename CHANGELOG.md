@@ -8,6 +8,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support new fields of Windows Registry at FIM inventory panel [#2679](https://github.com/wazuh/wazuh-kibana-app/issues/2679)
 
+### Fixed
+- Fixed wrong hover texts in CDB lists actions [#2929](https://github.com/wazuh/wazuh-kibana-app/pull/2929)
+
+
 ## Wazuh v4.0.4 - Kibana 7.10.0 , 7.10.2 - Revision 4016
 
 ### Added
