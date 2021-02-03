@@ -344,17 +344,10 @@ export class MultipleAgentSelector extends Component {
     return parseInt(a.key);
   };
 
-  unselectLeftRight(element) {
-    switch (element) {
-      case 'left':
-        return document.getElementById("wzMultipleSelectorLeft").childNodes.forEach(option => {
-          option.selected = false
-        })
-      case 'right':
-        return document.getElementById("wzMultipleSelectorRight").childNodes.forEach(option => {
-          option.selected = false
-        })
-    }
+  unselectElementsOfSelectByID(containerID) {
+    document.getElementById(containerID).selectedOptions.forEach(option => {
+      option.selected = false
+    });
   }
 
   async reload(element, searchTerm, start = false, addOffset = 0) {
@@ -511,7 +504,7 @@ export class MultipleAgentSelector extends Component {
                                 size='15'
                                 multiple
                                 onChange={(e) => {
-                                  this.unselectLeftRight('right')
+                                  this.unselectElementsOfSelectByID('wzMultipleSelectorRight')
                                   this.setState({
                                     availableItem: Array.from(e.target.selectedOptions, option => option.value),
                                     selectedElement: []
@@ -635,7 +628,7 @@ export class MultipleAgentSelector extends Component {
                                 size='15'
                                 multiple
                                 onChange={(e) => {
-                                  this.unselectLeftRight('left')
+                                  this.unselectElementsOfSelectByID('wzMultipleSelectorLeft')
                                   this.setState({
                                     selectedElement: Array.from(e.target.selectedOptions, option => option.value),
                                     availableItem: []
