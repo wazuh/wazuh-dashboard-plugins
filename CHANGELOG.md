@@ -2,6 +2,7 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+
 ## Wazuh v4.0.4 - Kibana 7.10.0 , 7.10.2 - Revision 4017
 
 ### Added
@@ -24,6 +25,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Solaris should not show vulnerabilities module [#2829](https://github.com/wazuh/wazuh-kibana-app/issues/2829)
 - Fix the settings of statistics indices creation [#2858](https://github.com/wazuh/wazuh-kibana-app/issues/2858)
 - Update agents' info in Management Status after changing cluster node selected [#2828](https://github.com/wazuh/wazuh-kibana-app/issues/2828)
+- Fix error when applying filter in rules from events [#2877](https://github.com/wazuh/wazuh-kibana-app/issues/2877)
+- Fix server error Invalid token specified: Cannot read property 'replace' of undefined [#2899](https://github.com/wazuh/wazuh-kibana-app/issues/2899)
 
 ### Changed
 
