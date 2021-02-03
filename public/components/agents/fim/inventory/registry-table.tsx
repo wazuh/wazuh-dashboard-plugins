@@ -37,7 +37,8 @@ export class RegistryTable extends Component {
     sortDirection: Direction
     isLoading: boolean
     currentFile: {
-      file: string
+      file: string,
+      type: string
     },
     syscheckItem: {}
   };
@@ -60,7 +61,8 @@ export class RegistryTable extends Component {
       isLoading: true,
       isFlyoutVisible: false,
       currentFile: {
-        file: ""
+        file: "",
+        type: '',
       },
       syscheckItem: {}
     }
@@ -106,7 +108,11 @@ export class RegistryTable extends Component {
     if (!redirect)
       window.location.href = window.location.href += `&file=${file}`;
     //if a flyout is opened, we close it and open a new one, so the components are correctly updated on start.
-    this.setState({ isFlyoutVisible: false }, () => this.setState({ isFlyoutVisible: true, currentFile: file, syscheckItem: item }));
+    const currentFile = {
+      file,
+      type: item.type
+    }
+    this.setState({ isFlyoutVisible: false }, () => this.setState({ isFlyoutVisible: true, currentFile, syscheckItem: item }));
   }
 
   async getSyscheck() {
@@ -147,7 +153,7 @@ export class RegistryTable extends Component {
       offset: pageIndex * pageSize,
       limit: pageSize,
       sort: this.buildSortFilter(),
-      type: 'registry_key'
+      q: 'type=registry_key,type=registry_value'
     };
 
     return filter;
@@ -242,7 +248,7 @@ export class RegistryTable extends Component {
               agentId={this.props.agent.id}
               item={this.state.syscheckItem}
               closeFlyout={() => this.closeFlyout()}
-              type='registry_key'
+              type= {this.state.currentFile.type}
               view='inventory'
               {...this.props} />
           </EuiOverlayMask>
