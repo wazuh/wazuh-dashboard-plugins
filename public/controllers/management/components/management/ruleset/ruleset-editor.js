@@ -85,6 +85,8 @@ class WzRulesetEditor extends Component {
   }
 
   componentDidMount() {
+    console.log("this.state.content");
+    console.log(this.state.content);
     this._isMounted = true;
   }
 
@@ -99,20 +101,35 @@ class WzRulesetEditor extends Component {
     }
     try {
       const { content } = this.state;
+      
       this.setState({ isSaving: true, error: false });
       const { section } = this.props.state;
+
       let saver = this.rulesetHandler.sendRuleConfiguration; // By default the saver is for rules
       if (section === 'decoders')
         saver = this.rulesetHandler.sendDecoderConfiguration;
       await saver(name, content, overwrite);
       try {
+        console.log("PRE VALIDATION---------------->");
         await validateConfigAfterSent();
+        console.log("--------------->POST VALIDATION");
       } catch (error) {
+        // if(content == "")
+        // console.log("error");
+        // console.log(error);
+        // console.log("content");
+        // console.log(content);
+
         const warning = Object.assign(error, {
           savedMessage: `File ${name} saved, but there were found several error while validating the configuration.`
         });
         this.setState({ isSaving: false });
         this.goToEdit(name);
+        
+        // console.log("warning.savedMessage");
+        // console.log(warning.savedMessage);
+        // console.log(error);
+
         this.showToast('warning', warning.savedMessage, error, 3000);
         return;
       }
@@ -155,6 +172,7 @@ class WzRulesetEditor extends Component {
    * onChange the input value in case adding new file
    */
   onChange = e => {
+    console.log(e.target.value);
     this.setState({
       inputValue: e.target.value
     });
@@ -277,8 +295,8 @@ class WzRulesetEditor extends Component {
                         width="100%"
                         height={`calc(100vh - ${((showWarningRestart && !xmlError) || wazuhNotReadyYet) ? 300 : (xmlError ? (!showWarningRestart ? 245 : 350) : 230)}px)`}
                         value={content}
-                        onChange={newContent =>
-                          this.setState({ content: newContent })
+                        onChange={newContent =>{
+                          this.setState({ content: newContent })}
                         }
                         mode="xml"
                         isReadOnly={!isEditable}
@@ -301,6 +319,7 @@ class WzRulesetEditor extends Component {
 const mapStateToProps = state => {
   return {
     state: state.rulesetReducers,
+    // fileContentSaved: state.rulesetReducers.fileContent,
     wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet
   };
 };
