@@ -150,8 +150,8 @@ export class MultipleAgentSelector extends Component {
       const result = await WzRequest.apiReq(
         'GET',
         `/groups/${this.props.currentGroup.name}/agents`, {
-          params
-        },
+        params
+      },
       );
       this.setState({ totalSelectedAgents: result.data.data.total_affected_items })
       const mapped = result.data.data.affected_items.map(item => {
@@ -248,11 +248,11 @@ export class MultipleAgentSelector extends Component {
         const addResponse = await WzRequest.apiReq(
           'PUT',
           `/agents/group`, {
-            params: {
-              group_id: this.props.currentGroup.name,
-              agents_list: itemsToSave.addedIds.toString()
-            }
+          params: {
+            group_id: this.props.currentGroup.name,
+            agents_list: itemsToSave.addedIds.toString()
           }
+        }
         );
         if (addResponse.data.data.failed_ids) {
           failedIds.push(...addResponse.data.data.failed_ids);
@@ -262,11 +262,11 @@ export class MultipleAgentSelector extends Component {
         const deleteResponse = await WzRequest.apiReq(
           'DELETE',
           `/agents/group`, {
-            params: {
-              group_id: this.props.currentGroup.name,
-              agents_list: itemsToSave.deletedIds.toString()
-            }
+          params: {
+            group_id: this.props.currentGroup.name,
+            agents_list: itemsToSave.deletedIds.toString()
           }
+        }
         );
         if (deleteResponse.data.data.total_failed_items) {
           failedIds.push(...deleteResponse.data.data.failed_items);
@@ -344,6 +344,19 @@ export class MultipleAgentSelector extends Component {
     return parseInt(a.key);
   };
 
+  unselectLeftRight(element) {
+    switch (element) {
+      case 'left':
+        return document.getElementById("wzMultipleSelectorLeft").childNodes.forEach(option => {
+          option.selected = false
+        })
+      case 'right':
+        return document.getElementById("wzMultipleSelectorRight").childNodes.forEach(option => {
+          option.selected = false
+        })
+    }
+  }
+
   async reload(element, searchTerm, start = false, addOffset = 0) {
     if (element === 'left') {
       const callbackLoadAgents = async () => {
@@ -373,7 +386,7 @@ export class MultipleAgentSelector extends Component {
             }
           }, callbackLoadAgents)
         }
-      }else{
+      } else {
         callbackLoadAgents();
       }
     } else {
@@ -484,9 +497,9 @@ export class MultipleAgentSelector extends Component {
                                   this.setState({ availableFilter: searchValue, availableItem: [] });
                                 }}
                                 onSearch={async searchValue => {
-                                  try{
+                                  try {
                                     await this.reload("left", searchValue, true);
-                                  }catch(error){}
+                                  } catch (error) { }
                                 }}
                                 isClearable={true}
                                 fullWidth={true}
@@ -498,9 +511,7 @@ export class MultipleAgentSelector extends Component {
                                 size='15'
                                 multiple
                                 onChange={(e) => {
-                                  document.getElementById("wzMultipleSelectorRight").childNodes.forEach(option =>  {
-                                    option.selected = false
-                                  } )
+                                  this.unselectLeftRight('right')
                                   this.setState({
                                     availableItem: Array.from(e.target.selectedOptions, option => option.value),
                                     selectedElement: []
@@ -624,9 +635,7 @@ export class MultipleAgentSelector extends Component {
                                 size='15'
                                 multiple
                                 onChange={(e) => {
-                                document.getElementById("wzMultipleSelectorLeft").childNodes.forEach(option =>  {
-                                    option.selected = false
-                                  } )
+                                  this.unselectLeftRight('left')
                                   this.setState({
                                     selectedElement: Array.from(e.target.selectedOptions, option => option.value),
                                     availableItem: []
