@@ -21,7 +21,7 @@ const initialState = {
   currentAgentData: {},
   showExploreAgentModal: false,
   showExploreAgentModalGlobal: false,
-  userPermissions: {},
+  userPermissions: false,
   userRoles: [],
   toastNotification: false,
   clusterStatus: {
