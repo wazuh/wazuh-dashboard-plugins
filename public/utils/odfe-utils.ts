@@ -18,14 +18,14 @@ type TAuthenticationRequiredError = {
 }
 
 const isAuthenticationRequired = (e: any): e is TAuthenticationRequiredError => {
-  const statusCode = e.statusCode && e.statusCode === 401;
+  const statusCode = e && e.statusCode && e.statusCode === 401;
   const error = e.error && e.error === 'Unauthorized';
   const message = e.message && e.message === 'Authentication required';
-  return statusCode && error && message; 
+  return statusCode && error && message;
 }
 
 export const checkOdfeSessionExpired = (error: AxiosError<TAuthenticationRequiredError>) => {
-  const { data } = (error || {}).response || {}; 
+  const { data } = (error || {}).response || {};
   if (isAuthenticationRequired(data)) {
     location.reload();
   }
