@@ -26,7 +26,7 @@ export const useUserPermissionsRequirements = (requiredPermissions) => {
   }
 
   if (!userPermissions) {
-    return requiredPermissions;
+    return [requiredPermissions, []];
   }
 
   const requiredPermissionsArray =
