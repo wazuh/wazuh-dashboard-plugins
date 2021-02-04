@@ -18,6 +18,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed access to forbidden agents information when exporting agents listt [2918](https://github.com/wazuh/wazuh-kibana-app/pull/2918)
 - Fix the decoder detail view is not displayed [#2888](https://github.com/wazuh/wazuh-kibana-app/issues/2888)
 - Fix the complex search using the Wazuh API query filter in search bars [#2930](https://github.com/wazuh/wazuh-kibana-app/issues/2930)
+- Fixed validation to check userPermissions are not ready yet [#2931](https://github.com/wazuh/wazuh-kibana-app/issues/2931)
 
 ## Wazuh v4.0.4 - Kibana 7.10.0 , 7.10.2 - Revision 4017
 
