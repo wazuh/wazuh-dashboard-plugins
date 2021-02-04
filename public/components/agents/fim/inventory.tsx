@@ -46,7 +46,7 @@ export class Inventory extends Component {
   _isMount = false;
   state: {
     filters: []
-    selectedTabId: 'files' | 'registry_key'
+    selectedTabId: 'files' | 'registry'
     totalItemsFile: number
     totalItemsRegistry: number
     isLoading: Boolean
@@ -90,7 +90,7 @@ export class Inventory extends Component {
   async loadAgent() {
     const agentPlatform  = ((this.props.agent || {}).os || {}).platform;
     const {totalItemsFile, syscheck} = await this.getItemNumber('file');
-    const totalItemsRegistry = agentPlatform === 'windows' ? await this.getItemNumber('registry_key') : 0;
+    const totalItemsRegistry = agentPlatform === 'windows' ? await this.getItemNumber('registry') : 0;
     const isConfigured = await this.isConfigured();
     if (this._isMount){
       this.setState({ totalItemsFile, totalItemsRegistry, syscheck, isLoading: false, isConfigured });
@@ -117,7 +117,7 @@ export class Inventory extends Component {
     const platform = (this.props.agent.os || {}).platform || "other";
      platform  === 'windows' ? auxTabs.push(
       {
-        id: 'registry_key',
+        id: 'registry',
         name: `Windows Registry ${this.state.isLoading === true ? '' : '(' + this.state.totalItemsRegistry + ')'}`,
         disabled: false,
       },
@@ -154,13 +154,13 @@ export class Inventory extends Component {
     const filter = {
       ...filters,
       limit: type === 'file' ? '15' : '1',
-      type,
+      ...(type === 'registry' ? {q: 'type=registry_key,type=registry_value'} : {type}),      
       ...(type === 'file' && {sort: '+file'})
     };
     return filter;
   }
   
-  async getItemNumber(type: 'file' | 'registry_key') {
+  async getItemNumber(type: 'file' | 'registry') {
     const agentID = this.props.agent.id;
     const response = await WzRequest.apiReq(
       'GET',
@@ -267,7 +267,7 @@ export class Inventory extends Component {
             onFiltersChange={this.onFiltersChange} 
             onTotalItemsChange={this.onTotalItemsChange}/>
         }
-        {selectedTabId === 'registry_key' &&
+        {selectedTabId === 'registry' &&
           <RegistryTable
             {...this.props}
             filters={filters}
