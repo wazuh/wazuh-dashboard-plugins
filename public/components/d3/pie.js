@@ -102,6 +102,7 @@ class Slice extends React.Component {
   onMouseMove(div, html, ev) {
     div
       .html(html)
+      .style('display', 'block')
       .style('left', ev.pageX + 10 + 'px')
       .style('top', ev.pageY - 15 + 'px');
   }
