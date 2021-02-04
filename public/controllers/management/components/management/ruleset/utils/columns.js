@@ -325,7 +325,7 @@ export default class RulesetColumns {
                   permissions={getEditButtonPermissions(item)}
                   aria-label="Export list"
                   iconType="exportAction"
-                  tooltip={{position: 'top', content: `Edit ${item.filename} content`}}
+                  tooltip={{position: 'top', content: `Export ${item.filename} content`}}
                   onClick={async (ev) => {
                     ev.stopPropagation();
                     await exportCsv(`/lists`, [{_isCDBList: true, name: 'filename', value: `${item.filename}`}], item.filename)
