@@ -12,6 +12,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Fixed
 
 - Fix server error Invalid token specified: Cannot read property 'replace' of undefined [#2899](https://github.com/wazuh/wazuh-kibana-app/issues/2899)
+- Fix agents table OS field sorting: Changes agents table field `os_name` to `os.name,os.version` to make it sortable. [#2939](https://github.com/wazuh/wazuh-kibana-app/pull/2939)
 
 ## Wazuh v4.0.4 - Kibana 7.10.0 , 7.10.2 - Revision 4017
 
