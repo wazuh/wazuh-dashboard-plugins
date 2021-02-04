@@ -8,6 +8,9 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support new fields of Windows Registry at FIM inventory panel [#2679](https://github.com/wazuh/wazuh-kibana-app/issues/2679)
 
+### Fixed
+
+- Fixed filters not works on modals with search bar [#2935](https://github.com/wazuh/wazuh-kibana-app/pull/2935)
 
 ## Wazuh v4.0.4 - Kibana 7.10.0 , 7.10.2 - Revision 4017
 
