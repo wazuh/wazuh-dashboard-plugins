@@ -68,6 +68,7 @@ export const WzSecurity = compose(
 
   const checkRunAsUser = async () => {
     const currentApi = AppState.getCurrentAPI();
+    console.log("HIOLOA")
     try {
       const ApiCheck = await GenericRequest.request('POST',
         '/api/check-api',
@@ -83,7 +84,7 @@ export const WzSecurity = compose(
   useEffect(() => {
     checkRunAsUser()
       .then(result => setAllowRunAs(result))
-      .catch(error => console.log(error,'Error checking if run_as user is enabled'))
+      .catch(error => console.log(error, 'Error checking if run_as user is enabled'))
   }, [])
 
   // This allows to redirect to a Security tab if you click a Security link in menu when you're already in a Security section
@@ -119,9 +120,9 @@ export const WzSecurity = compose(
     return (
       <EuiFlexGroup >
         <EuiFlexItem >
-          <EuiSpacer></EuiSpacer>
-          <EuiCallOut  title=" The role mapping has no effect because the Wazuh API's configurated user has not the run_as setting enabled in the configuration or is not allowed to use it. " color="warning" iconType="alert">
-          </EuiCallOut>
+            <EuiCallOut title=" The role mapping has no effect because the Wazuh API's configurated user has not the run_as setting enabled in the configuration or is not allowed to use it. " color="warning" iconType="alert">
+            </EuiCallOut>
+            <EuiSpacer></EuiSpacer>
         </EuiFlexItem >
       </EuiFlexGroup>
     );
@@ -133,7 +134,6 @@ export const WzSecurity = compose(
       <EuiFlexGroup>
         <EuiFlexItem>
           <EuiTabs>{renderTabs()}</EuiTabs>
-          {allowRunAs !== API_USER_STATUS_RUN_AS.ENABLED && isNotRunAs()}
           <EuiSpacer size='m'></EuiSpacer>
           {selectedTabId === 'users' &&
             <Users></Users>
@@ -145,7 +145,10 @@ export const WzSecurity = compose(
             <Policies></Policies>
           }
           {selectedTabId === 'roleMapping' &&
-            <RolesMapping></RolesMapping>
+            <>
+              {allowRunAs !== API_USER_STATUS_RUN_AS.ENABLED && isNotRunAs()}
+              <RolesMapping></RolesMapping>
+            </>
           }
         </EuiFlexItem>
       </EuiFlexGroup>
