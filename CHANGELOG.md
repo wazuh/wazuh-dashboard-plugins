@@ -19,6 +19,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fix the decoder detail view is not displayed [#2888](https://github.com/wazuh/wazuh-kibana-app/issues/2888)
 - Fix the complex search using the Wazuh API query filter in search bars [#2930](https://github.com/wazuh/wazuh-kibana-app/issues/2930)
 - Fixed validation to check userPermissions are not ready yet [#2931](https://github.com/wazuh/wazuh-kibana-app/issues/2931)
+- Fixed clear visualizations manager list when switching tabs. Fixes PDF reports filters [#2932](https://github.com/wazuh/wazuh-kibana-app/pull/2932)
 
 ## Wazuh v4.0.4 - Kibana 7.10.0 , 7.10.2 - Revision 4017
 
