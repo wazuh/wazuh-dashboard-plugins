@@ -206,7 +206,7 @@ export default class RulesetHandler {
           path: path
         }
       });
-      return ((result || {}).data || {}).contents || false;
+      return ((result || {}).data || {}).contents || '';
     } catch (error) {
       return Promise.reject(error);
     }
