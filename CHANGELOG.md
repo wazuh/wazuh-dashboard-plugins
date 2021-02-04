@@ -7,6 +7,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Fixed
 
 - Fix the decoder detail view is not displayed [#2888](https://github.com/wazuh/wazuh-kibana-app/issues/2888)
+- Allow access to Agents section with agent:group action permission [#2933](https://github.com/wazuh/wazuh-kibana-app/issues/2933)
 
 ### Changed
 
