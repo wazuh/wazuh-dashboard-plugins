@@ -108,7 +108,7 @@ export const Discover = compose(
   constructor(props) {
     super(props);
     this.KibanaServices = getDataPlugin();
-    this.filterManager = props.shareFilterManager ? this.KibanaServices.query.filterManager : new FilterManager(getUiSettings);
+    this.filterManager = props.shareFilterManager ? this.KibanaServices.query.filterManager : this.KibanaServices.query.filterManager;
     this.timefilter = this.KibanaServices.query.timefilter.timefilter;
     this.state = {
       sort: {},
