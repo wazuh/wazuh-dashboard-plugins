@@ -22,6 +22,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed clear visualizations manager list when switching tabs. Fixes PDF reports filters [#2932](https://github.com/wazuh/wazuh-kibana-app/pull/2932)
 - Fix Strange box shadow in Export popup panel in Managment > Groups [#2886](https://github.com/wazuh/wazuh-kibana-app/issues/2886)
 - Fixed wrong command on alert when data folder does not exist [#2938](https://github.com/wazuh/wazuh-kibana-app/pull/2938)
+- Fix agents table OS field sorting: Changes agents table field `os_name` to `os.name,os.version` to make it sortable. [#2939](https://github.com/wazuh/wazuh-kibana-app/pull/2939)
 
 ## Wazuh v4.0.4 - Kibana 7.10.0 , 7.10.2 - Revision 4017
 
