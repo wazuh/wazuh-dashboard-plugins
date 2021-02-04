@@ -12,6 +12,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support new fields of Windows Registry at FIM inventory panel [#2679](https://github.com/wazuh/wazuh-kibana-app/issues/2679)
 - Added on FIM Inventory Windows Registry registry_key and registry_value items from syscheck [#2908](https://github.com/wazuh/wazuh-kibana-app/issues/2908)
+- Uncheck agents afeter an actions in agentes groups [#2907](https://github.com/wazuh/wazuh-kibana-app/pull/2907)
 
 ### Fixed
 
