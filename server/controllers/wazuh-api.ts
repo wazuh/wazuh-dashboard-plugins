@@ -733,8 +733,6 @@ export class WazuhApiCtrl {
 
       const filters = Array.isArray(((request || {}).body || {}).filters) ? request.body.filters : [];
 
-      const config = await this.manageHosts.getHostById(request.body.id);
-
       let tmpPath = request.body.path;
 
       if (tmpPath && typeof tmpPath === 'string') {
@@ -756,7 +754,7 @@ export class WazuhApiCtrl {
 
       let itemsArray = [];
 
-      const output = await context.wazuh.api.client.asInternalUser.request(
+      const output = await context.wazuh.api.client.asCurrentUser.request(
         'GET',
         `/${tmpPath}`,
         { params: params },
@@ -772,7 +770,7 @@ export class WazuhApiCtrl {
         itemsArray.push(...output.data.data.affected_items);
         while (itemsArray.length < totalItems && params.offset < totalItems) {
           params.offset += params.limit;
-          const tmpData = await context.wazuh.api.client.asInternalUser.request(
+          const tmpData = await context.wazuh.api.client.asCurrentUser.request(
             'GET',
             `/${tmpPath}`,
             { params: params },
