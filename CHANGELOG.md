@@ -21,6 +21,9 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed validation to check userPermissions are not ready yet [#2931](https://github.com/wazuh/wazuh-kibana-app/issues/2931)
 - Fixed clear visualizations manager list when switching tabs. Fixes PDF reports filters [#2932](https://github.com/wazuh/wazuh-kibana-app/pull/2932)
 
+- Fix Strange box shadow in Export popup panel in Managment > Groups [#2886](https://github.com/wazuh/wazuh-kibana-app/issues/2886)
+
+
 ## Wazuh v4.0.4 - Kibana 7.10.0 , 7.10.2 - Revision 4017
 
 ### Added
