@@ -743,7 +743,7 @@ export class AgentsTable extends Component {
       {
         field: 'os_name',
         name: 'OS',
-        sortable: true,
+        sortable: false,
         width: '15%',
         truncateText: true,
         render: this.addIconPlatformRender
