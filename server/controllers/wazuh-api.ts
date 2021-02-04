@@ -63,11 +63,16 @@ export class WazuhApiCtrl {
         token = await context.wazuh.api.client.asInternalUser.authenticate(idHost);
       };
 
+      let textSecure='';
+      if(context.wazuh.server.info.protocol === 'https'){
+        textSecure = ';Secure';
+      }
+
       return response.ok({
         headers: {
           'set-cookie': [
-            `wz-token=${token};Path=/;HttpOnly`,
-            `wz-user=${username};Path=/;HttpOnly`,
+            `wz-token=${token};Path=/;HttpOnly${textSecure}`,
+            `wz-user=${username};Path=/;HttpOnly${textSecure}`,
             `wz-api=${idHost};Path=/;HttpOnly`,
           ],
         },
