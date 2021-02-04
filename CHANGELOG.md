@@ -20,9 +20,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fix the complex search using the Wazuh API query filter in search bars [#2930](https://github.com/wazuh/wazuh-kibana-app/issues/2930)
 - Fixed validation to check userPermissions are not ready yet [#2931](https://github.com/wazuh/wazuh-kibana-app/issues/2931)
 - Fixed clear visualizations manager list when switching tabs. Fixes PDF reports filters [#2932](https://github.com/wazuh/wazuh-kibana-app/pull/2932)
-
 - Fix Strange box shadow in Export popup panel in Managment > Groups [#2886](https://github.com/wazuh/wazuh-kibana-app/issues/2886)
-
+- Fixed wrong command on alert when data folder does not exist [#2938](https://github.com/wazuh/wazuh-kibana-app/pull/2938)
 
 ## Wazuh v4.0.4 - Kibana 7.10.0 , 7.10.2 - Revision 4017
 
