@@ -12,6 +12,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Fixed
 
 - Fix server error Invalid token specified: Cannot read property 'replace' of undefined [#2899](https://github.com/wazuh/wazuh-kibana-app/issues/2899)
+- Fixed wrong hover texts in CDB lists actions [#2929](https://github.com/wazuh/wazuh-kibana-app/pull/2929)
 
 ## Wazuh v4.0.4 - Kibana 7.10.0 , 7.10.2 - Revision 4017
 

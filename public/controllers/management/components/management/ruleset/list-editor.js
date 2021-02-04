@@ -486,7 +486,7 @@ class WzListEditor extends Component {
           if (this.state.editing === item.key) {
             return (
               <Fragment>
-                <EuiToolTip position="top" content={'Yes'}>
+                <EuiToolTip position="top" content={'Save'}>
                   <EuiButtonIcon
                     aria-label="Confirm value"
                     iconType="check"
@@ -496,7 +496,7 @@ class WzListEditor extends Component {
                     color="primary"
                   />
                 </EuiToolTip>
-                <EuiToolTip position="top" content={'No'}>
+                <EuiToolTip position="top" content={'Discard'}>
                   <EuiButtonIcon
                     aria-label="Cancel edition"
                     iconType="cross"
