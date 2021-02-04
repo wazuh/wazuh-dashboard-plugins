@@ -68,11 +68,13 @@ class WzRulesetEditor extends Component {
       : addingRulesetFile;
 
     this.state = {
+      restoreFileContent: false,
       isSaving: false,
       error: false,
       inputValue: '',
       showWarningRestart: false,
       content,
+      initContent: content,
       name,
       path,
     };
@@ -85,9 +87,13 @@ class WzRulesetEditor extends Component {
   }
 
   componentDidMount() {
-    console.log("this.state.content");
-    console.log(this.state.content);
     this._isMounted = true;
+  }
+
+  async componentDidUpdate(prevProps) {
+    if (this.props.restoreFileContent) {
+      this.setState({content: this.state.initContent, restoreFileContent: false})      
+    }
   }
 
   /**
@@ -110,27 +116,29 @@ class WzRulesetEditor extends Component {
         saver = this.rulesetHandler.sendDecoderConfiguration;
       await saver(name, content, overwrite);
       try {
-        console.log("PRE VALIDATION---------------->");
         await validateConfigAfterSent();
-        console.log("--------------->POST VALIDATION");
       } catch (error) {
-        // if(content == "")
-        // console.log("error");
-        // console.log(error);
-        // console.log("content");
-        // console.log(content);
-
         const warning = Object.assign(error, {
           savedMessage: `File ${name} saved, but there were found several error while validating the configuration.`
         });
         this.setState({ isSaving: false });
         this.goToEdit(name);
-        
-        // console.log("warning.savedMessage");
-        // console.log(warning.savedMessage);
-        // console.log(error);
 
         this.showToast('warning', warning.savedMessage, error, 3000);
+        this.showToast('warning', 'Restoring previous file content', "The file content can\'t be empty. The content file is restored to previous state", 30000);
+        
+        //reload previous file content 
+        this.setState({content: this.state.initContent, restoreFileContent: true})
+
+        //remove current invalid file if the file is new.
+        if(this.props.state.addingRulesetFile != false){
+          this.removeItems(name, this.state.path);
+        }
+        
+        if(this.state.content != this.state.initContent){
+          this.save(name, overwrite);
+        }
+
         return;
       }
       this.setState({ isSaving: false });
@@ -142,7 +150,7 @@ class WzRulesetEditor extends Component {
       }
       this.setState({ showWarningRestart: true});
       this.showToast('success', 'Success', textSuccess, 3000);
-    } catch (error) {
+    } catch (error) {    
       this.setState({ error, isSaving: false });
       this.showToast(
         'danger',
@@ -168,11 +176,15 @@ class WzRulesetEditor extends Component {
     this.props.updateFileContent(file);
   };
 
+  async removeItems(filename, filepath) {
+    const results = await this.rulesetHandler.deleteFile(filename ,filepath);
+    this.showToast('warning', 'File deleted', "The file content is invalid and has been deleted. \n Please, insert a valid rule data.", 30000);
+  }
+
   /**
    * onChange the input value in case adding new file
    */
   onChange = e => {
-    console.log(e.target.value);
     this.setState({
       inputValue: e.target.value
     });
@@ -186,6 +198,7 @@ class WzRulesetEditor extends Component {
     } = this.props.state;
     const { wazuhNotReadyYet } = this.props;
     const { name, content, path, showWarningRestart } = this.state;
+
     const isEditable = addingRulesetFile
       ? true
       : path !== 'ruleset/rules' && path !== 'ruleset/decoders';
