@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Integrity monitoring components
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ export class FlyoutDetail extends Component {
     clusterFilter: {}
     isLoading: boolean
     error: boolean
-    type: 'file' | 'registry'
+    type: 'file' | 'registry_key' | 'registry_value'
   }
 
   props!: {
@@ -96,7 +96,7 @@ export class FlyoutDetail extends Component {
   render() {
     const { type } = this.state;
     return (
-      <EuiFlyout onClose={() => this.props.closeFlyout()} size="l" aria-labelledby={this.state.currentFile.file} maxWidth="70%" className='wz-inventory'>
+      <EuiFlyout onClose={() => this.props.closeFlyout()} size="l" aria-labelledby={this.state.currentFile.file} maxWidth="70%" className='wz-inventory wzApp'>
         <EuiFlyoutHeader hasBorder className="flyout-header" >
           <EuiTitle size="s">
             <h2 id={this.state.currentFile.file }>{this.state.currentFile.file }</h2>
