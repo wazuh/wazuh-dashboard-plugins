@@ -4,10 +4,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ## Wazuh v4.1.0 - Kibana 7.10.0 , 7.10.2 - Revision 4101
 
-### Fixed
-
-- Fix the decoder detail view is not displayed [#2888](https://github.com/wazuh/wazuh-kibana-app/issues/2888)
-
 ### Changed
 
 - Support new fields of Windows Registry at FIM inventory panel [#2679](https://github.com/wazuh/wazuh-kibana-app/issues/2679)
@@ -20,6 +16,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fix show empty files rules and decoders: [#2923](https://github.com/wazuh/wazuh-kibana-app/issues/2923)
 - Fixed wrong hover texts in CDB lists actions [#2929](https://github.com/wazuh/wazuh-kibana-app/pull/2929)
 - Fixed access to forbidden agents information when exporting agents listt [2918](https://github.com/wazuh/wazuh-kibana-app/pull/2918)
+- Fix the decoder detail view is not displayed [#2888](https://github.com/wazuh/wazuh-kibana-app/issues/2888)
+- Fix the complex search using the Wazuh API query filter in search bars [#2930](https://github.com/wazuh/wazuh-kibana-app/issues/2930)
 
 ## Wazuh v4.0.4 - Kibana 7.10.0 , 7.10.2 - Revision 4017
 
