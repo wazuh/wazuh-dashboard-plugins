@@ -41,7 +41,7 @@ export class WazuhApiCtrl {
       const { force, idHost } = request.body;
       const { username } = await context.wazuh.security.getCurrentUser(request, context);
       if (!force && request.headers.cookie && username === getCookieValueByName(request.headers.cookie, 'wz-user') && idHost === getCookieValueByName(request.headers.cookie,'wz-api')) {
-        const wzToken = getCookieValueByName(request.headers.cookie, 'wz-user');
+        const wzToken = getCookieValueByName(request.headers.cookie, 'wz-token');
         if (wzToken) {
           try { // if the current token is not a valid jwt token we ask for a new one
             const decodedToken = jwtDecode(wzToken);
@@ -63,11 +63,16 @@ export class WazuhApiCtrl {
         token = await context.wazuh.api.client.asInternalUser.authenticate(idHost);
       };
 
+      let textSecure='';
+      if(context.wazuh.server.info.protocol === 'https'){
+        textSecure = ';Secure';
+      }
+
       return response.ok({
         headers: {
           'set-cookie': [
-            `wz-token=${token};Path=/;HttpOnly`,
-            `wz-user=${username};Path=/;HttpOnly`,
+            `wz-token=${token};Path=/;HttpOnly${textSecure}`,
+            `wz-user=${username};Path=/;HttpOnly${textSecure}`,
             `wz-api=${idHost};Path=/;HttpOnly`,
           ],
         },
