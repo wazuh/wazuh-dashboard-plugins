@@ -216,7 +216,7 @@ export class AgentsTable extends Component {
   buildSortFilter() {
     const { sortField, sortDirection } = this.state;
 
-    const field = sortField === 'os_name' ? '' : sortField;
+    const field = sortField === 'os_name' ? 'os.name,os.version' : sortField;
     const direction = sortDirection === 'asc' ? '+' : '-';
 
     return direction + field;
@@ -743,7 +743,7 @@ export class AgentsTable extends Component {
       {
         field: 'os_name',
         name: 'OS',
-        sortable: false,
+        sortable: true,
         width: '15%',
         truncateText: true,
         render: this.addIconPlatformRender
