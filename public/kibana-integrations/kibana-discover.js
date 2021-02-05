@@ -297,7 +297,12 @@ function discoverController(
       filterManager.getUpdates$(),
       {
         next: () => {
-          $scope.state.filters = filterManager.getAppFilters();
+          //Patch empty fields
+          const filters = filterManager.getAppFilters();
+          if(filters.filter(item=>item.meta.params.query==='').length)
+            filterManager.setFilters(filters.filter(item=>item.meta.params.query));
+          //end of patch empty fields
+          $scope.state.filters = filters;
           $scope.updateDataSource();
         },
       },
