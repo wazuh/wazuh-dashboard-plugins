@@ -14,6 +14,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Support new fields of Windows Registry at FIM inventory panel [#2679](https://github.com/wazuh/wazuh-kibana-app/issues/2679)
 - Added on FIM Inventory Windows Registry registry_key and registry_value items from syscheck [#2908](https://github.com/wazuh/wazuh-kibana-app/issues/2908)
 - Uncheck agents after an action in agents groups management [#2907](https://github.com/wazuh/wazuh-kibana-app/pull/2907)
+- Unsave rule files when edit or create a rule with invalid content [#2944](https://github.com/wazuh/wazuh-kibana-app/pull/2944)
 
 ### Fixed
 
@@ -32,7 +33,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Allow access to Agents section with agent:group action permission [#2933](https://github.com/wazuh/wazuh-kibana-app/issues/2933)
 - Fixed filters does not work on modals with search bar [#2935](https://github.com/wazuh/wazuh-kibana-app/pull/2935)
 - Fix wrong package name in deploy new agent [#2942](https://github.com/wazuh/wazuh-kibana-app/issues/2942)
-- Fixed number agents not show on pie onMouseEvent [#2890](https://github.com/wazuh/wazuh-kibana-app/issues/2890)
+- Fixed number of agents do not show on the pie chart tooltip in agents preview [#2890](https://github.com/wazuh/wazuh-kibana-app/issues/2890)
 
 ## Wazuh v4.0.4 - Kibana 7.10.0 , 7.10.2 - Revision 4017
 
