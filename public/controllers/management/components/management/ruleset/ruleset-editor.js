@@ -307,9 +307,6 @@ class WzRulesetEditor extends Component {
                         height={`calc(100vh - ${((showWarningRestart && !xmlError) || wazuhNotReadyYet) ? 300 : (xmlError ? (!showWarningRestart ? 245 : 350) : 230)}px)`}
                         value={content}
                         onChange={this.setNewContent(newContent)}                        
-                        // onChange={newContent =>{
-                        //   this.setState({ content: newContent })}
-                        // }
                         mode="xml"
                         isReadOnly={!isEditable}
                         wrapEnabled
