@@ -68,7 +68,6 @@ export const WzSecurity = compose(
 
   const checkRunAsUser = async () => {
     const currentApi = AppState.getCurrentAPI();
-    console.log("HIOLOA")
     try {
       const ApiCheck = await GenericRequest.request('POST',
         '/api/check-api',
@@ -80,6 +79,7 @@ export const WzSecurity = compose(
       ErrorHandler.handle(error, 'Error checking the current API');
     }
   }
+
   const [allowRunAs, setAllowRunAs] = useState();
   useEffect(() => {
     checkRunAsUser()
@@ -120,9 +120,9 @@ export const WzSecurity = compose(
     return (
       <EuiFlexGroup >
         <EuiFlexItem >
-            <EuiCallOut title=" The role mapping has no effect because the Wazuh API's configurated user has not the run_as setting enabled in the configuration or is not allowed to use it. " color="warning" iconType="alert">
-            </EuiCallOut>
-            <EuiSpacer></EuiSpacer>
+          <EuiCallOut title=" The role mapping has no effect because the Wazuh API's configurated user has not the run_as setting enabled in the configuration or is not allowed to use it. " color="warning" iconType="alert">
+          </EuiCallOut>
+          <EuiSpacer></EuiSpacer>
         </EuiFlexItem >
       </EuiFlexGroup>
     );
@@ -146,7 +146,7 @@ export const WzSecurity = compose(
           }
           {selectedTabId === 'roleMapping' &&
             <>
-              {allowRunAs !== API_USER_STATUS_RUN_AS.ENABLED && isNotRunAs()}
+              {allowRunAs !== API_USER_STATUS_RUN_AS.ENABLED && allowRunAs !== undefined && isNotRunAs()}
               <RolesMapping></RolesMapping>
             </>
           }
