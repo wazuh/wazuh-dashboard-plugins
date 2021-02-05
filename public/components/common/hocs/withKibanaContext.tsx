@@ -10,8 +10,9 @@
  * Find more information about this on the LICENSE file.
  */
 import React, {useState} from 'react';
-import { useIndexPattern, useFilterManager, useTimeFilter, useQuery } from '../hooks';
+import { useIndexPattern, useFilterManager, useTimeFilter } from '../hooks';
 import { IIndexPattern, FilterManager, Query, TimeRange } from '../../../../../../src/plugins/data/public';
+import { useQueryManager } from "../hooks/use-query";
 
 interface withKibanaContextProps {
   indexPattern?: IIndexPattern
@@ -26,7 +27,7 @@ export interface withKibanaContextExtendsProps {
   timeHistory: TimeRange[]
   setTimeFilter(timeRange:TimeRanges): void
   query: Query
-  setQuery(query:Query): void 
+  setQuery(query:Query): void
 }
 
 
@@ -34,8 +35,8 @@ export const withKibanaContext = <T extends object>(Component:React.FunctionComp
   function hoc(props:T & withKibanaContextProps ):React.FunctionComponentElement<T & withKibanaContextExtendsProps> {
     const indexPattern = props.indexPattern ? props.indexPattern : useIndexPattern();
     const filterManager = props.filterManager ? props.filterManager : useFilterManager();
-    const [query, setQuery] = props.query ? useState(props.query) : useQuery();
-    const {timeFilter, timeHistory, setTimeFilter } = useTimeFilter();
+    const [query, setQuery] = props.query ? useState(props.query) : useQueryManager();
+    const { timeFilter, timeHistory, setTimeFilter } = useTimeFilter();
     return <Component {...props}
       indexPattern={indexPattern}
       filterManager={filterManager}
