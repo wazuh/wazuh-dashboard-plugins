@@ -45,7 +45,7 @@ export class WazuhHostsCtrl {
         return response.badRequest({
           body: {
             message: `Error getting the hosts entries: The \'${WAZUH_DATA_KIBANA_BASE_ABSOLUTE_PATH}\' directory could not exist in your Kibana installation.
-            If this doesn't exist, create it and give the permissions 'sudo mkdir ${WAZUH_DATA_KIBANA_BASE_ABSOLUTE_PATH};sudo chmod -R kibana:kibana ${WAZUH_DATA_KIBANA_BASE_ABSOLUTE_PATH}'. After, restart the Kibana service.`
+            If this doesn't exist, create it and give the permissions 'sudo mkdir ${WAZUH_DATA_KIBANA_BASE_ABSOLUTE_PATH};sudo chown -R kibana:kibana ${WAZUH_DATA_KIBANA_BASE_ABSOLUTE_PATH}'. After, restart the Kibana service.`
           }
         })
       }
