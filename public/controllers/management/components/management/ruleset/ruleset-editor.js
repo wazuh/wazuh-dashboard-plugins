@@ -36,7 +36,7 @@ import {
 import RulesetHandler from './utils/ruleset-handler';
 import validateConfigAfterSent from './utils/valid-configuration';
 
-import { getToasts }  from '../../../../../kibana-services';
+import { getToasts } from '../../../../../kibana-services';
 import { updateWazuhNotReadyYet } from '../../../../../redux/actions/appStateActions';
 import WzRestartClusterManagerCallout from '../../../../../components/common/restart-cluster-manager-callout';
 import { validateXML } from '../configuration/utils/xml';
@@ -100,7 +100,7 @@ class WzRulesetEditor extends Component {
     }
     try {
       const { content } = this.state;
-      
+
       this.setState({ isSaving: true, error: false });
       const { section } = this.props.state;
 
@@ -118,19 +118,22 @@ class WzRulesetEditor extends Component {
         this.goToEdit(name);
 
         this.showToast('warning', warning.savedMessage, error, 3000);
-        this.showToast('warning', 'Restoring previous file content', "The file content can\'t be empty. The content file is restored to previous state", 30000);
-        
-        //reload previous file content 
-        this.setState({content: this.state.initContent})
+        this.showToast('warning', 'Restoring previous file content', "The file content is incorrect. The content file was restored to previous state", 30000);
+
+        // //reload previous file content 
+        // this.setState({content: this.state.initContent})       
 
         //remove current invalid file if the file is new.
-        if(this.props.state.addingRulesetFile != false){
+        if (this.props.state.addingRulesetFile != false) {
           this.removeItems(name, this.state.path);
+        } else {
+          //restore file to previous version
+          await saver(name, this.state.initContent, overwrite);
         }
-        
-        if(this.state.content != this.state.initContent){
-          this.save(name, overwrite);
-        }
+
+        // if(this.state.content != this.state.initContent){
+        //   this.save(name, overwrite);
+        // }
 
         return;
       }
@@ -141,9 +144,9 @@ class WzRulesetEditor extends Component {
       if (overwrite) {
         textSuccess = 'File successfully edited';
       }
-      this.setState({ showWarningRestart: true});
+      this.setState({ showWarningRestart: true });
       this.showToast('success', 'Success', textSuccess, 3000);
-    } catch (error) {    
+    } catch (error) {
       this.setState({ error, isSaving: false });
       this.showToast(
         'danger',
@@ -170,7 +173,7 @@ class WzRulesetEditor extends Component {
   };
 
   async removeItems(filename, filepath) {
-    const results = await this.rulesetHandler.deleteFile(filename ,filepath);
+    const results = await this.rulesetHandler.deleteFile(filename, filepath);
     this.showToast('warning', 'File deleted', "The file content is invalid and has been deleted. \n Please, insert a valid rule data.", 30000);
   }
 
@@ -181,10 +184,6 @@ class WzRulesetEditor extends Component {
     this.setState({
       inputValue: e.target.value
     });
-  };
-
-  setNewContent = newContent => {
-    this.setState({ content: newContent })}
   };
 
   render() {
@@ -208,7 +207,7 @@ class WzRulesetEditor extends Component {
     const xmlError = validateXML(content);
     const saveButton = (
       <WzButtonPermissions
-        permissions={[{action: 'manager:upload_file', resource: `file:path:etc/${section}/${nameForSaving}`}]}
+        permissions={[{ action: 'manager:upload_file', resource: `file:path:etc/${section}/${nameForSaving}` }]}
         fill
         iconType={(isEditable && xmlError) ? "alert" : "save"}
         isLoading={this.state.isSaving}
@@ -254,24 +253,24 @@ class WzRulesetEditor extends Component {
                       </EuiFlexItem>
                     </EuiFlexGroup>
                   )) || (
-                    <EuiTitle>
-                      <span style={{ fontSize: '22px' }}>
-                        <EuiToolTip
-                          position="right"
-                          content={`Back to ${section}`}
-                        >
-                          <EuiButtonIcon
-                            aria-label="Back"
-                            color="primary"
-                            iconSize="l"
-                            iconType="arrowLeft"
-                            onClick={() => this.props.cleanInfo()}
-                          />
-                        </EuiToolTip>
-                        {nameForSaving}
-                      </span>
-                    </EuiTitle>
-                  )}
+                      <EuiTitle>
+                        <span style={{ fontSize: '22px' }}>
+                          <EuiToolTip
+                            position="right"
+                            content={`Back to ${section}`}
+                          >
+                            <EuiButtonIcon
+                              aria-label="Back"
+                              color="primary"
+                              iconSize="l"
+                              iconType="arrowLeft"
+                              onClick={() => this.props.cleanInfo()}
+                            />
+                          </EuiToolTip>
+                          {nameForSaving}
+                        </span>
+                      </EuiTitle>
+                    )}
                 </EuiFlexItem>
                 <EuiFlexItem />
                 {/* This flex item is for separating between title and save button */}
@@ -283,17 +282,17 @@ class WzRulesetEditor extends Component {
               {this.state.showWarningRestart && (
                 <Fragment>
                   <WzRestartClusterManagerCallout
-                    onRestart={() => this.setState({showWarningRestart: true})}
-                    onRestarted={() => this.setState({showWarningRestart: false})}
-                    onRestartedError={() => this.setState({showWarningRestart: true})}
+                    onRestart={() => this.setState({ showWarningRestart: true })}
+                    onRestarted={() => this.setState({ showWarningRestart: false })}
+                    onRestartedError={() => this.setState({ showWarningRestart: true })}
                   />
-                  <EuiSpacer size='s'/>
+                  <EuiSpacer size='s' />
                 </Fragment>
               )}
               {xmlError && (
                 <Fragment>
                   <span style={{ color: 'red' }}> {xmlError}</span>
-                  <EuiSpacer size='s'/>
+                  <EuiSpacer size='s' />
                 </Fragment>
               )}
               <EuiFlexGroup>
@@ -305,7 +304,7 @@ class WzRulesetEditor extends Component {
                         width="100%"
                         height={`calc(100vh - ${((showWarningRestart && !xmlError) || wazuhNotReadyYet) ? 300 : (xmlError ? (!showWarningRestart ? 245 : 350) : 230)}px)`}
                         value={content}
-                        onChange={this.setNewContent(newContent)}                        
+                        onChange={newContent =>{this.setState({ content: newContent })}}
                         mode="xml"
                         isReadOnly={!isEditable}
                         wrapEnabled
