@@ -68,7 +68,6 @@ class WzRulesetEditor extends Component {
       : addingRulesetFile;
 
     this.state = {
-      restoreFileContent: false,
       isSaving: false,
       error: false,
       inputValue: '',
@@ -122,7 +121,7 @@ class WzRulesetEditor extends Component {
         this.showToast('warning', 'Restoring previous file content', "The file content can\'t be empty. The content file is restored to previous state", 30000);
         
         //reload previous file content 
-        this.setState({content: this.state.initContent, restoreFileContent: true})
+        this.setState({content: this.state.initContent})
 
         //remove current invalid file if the file is new.
         if(this.props.state.addingRulesetFile != false){
