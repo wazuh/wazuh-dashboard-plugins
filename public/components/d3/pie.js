@@ -103,6 +103,8 @@ class Slice extends React.Component {
     div
       .html(html)
       .style('display', 'block')
+      .style('z-index', 100)
+      .style('opacity', 1)
       .style('left', ev.pageX + 10 + 'px')
       .style('top', ev.pageY - 15 + 'px');
   }
