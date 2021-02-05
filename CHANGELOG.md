@@ -7,7 +7,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Changed
 
 - Support new fields of Windows Registry at FIM inventory panel [#2679](https://github.com/wazuh/wazuh-kibana-app/issues/2679)
-
+- Unsave rule files when edit or create a rule with a invalid content [#2944](https://github.com/wazuh/wazuh-kibana-app/pull/2944)
 
 ## Wazuh v4.0.4 - Kibana 7.10.0 , 7.10.2 - Revision 4017
 
