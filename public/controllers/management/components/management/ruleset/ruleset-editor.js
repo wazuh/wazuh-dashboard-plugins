@@ -90,12 +90,6 @@ class WzRulesetEditor extends Component {
     this._isMounted = true;
   }
 
-  async componentDidUpdate(prevProps) {
-    if (this.props.restoreFileContent) {
-      this.setState({content: this.state.initContent, restoreFileContent: false})      
-    }
-  }
-
   /**
    * Save the new content
    * @param {String} name
@@ -188,6 +182,10 @@ class WzRulesetEditor extends Component {
     this.setState({
       inputValue: e.target.value
     });
+  };
+
+  setNewContent = newContent => {
+    this.setState({ content: newContent })}
   };
 
   render() {
@@ -308,9 +306,10 @@ class WzRulesetEditor extends Component {
                         width="100%"
                         height={`calc(100vh - ${((showWarningRestart && !xmlError) || wazuhNotReadyYet) ? 300 : (xmlError ? (!showWarningRestart ? 245 : 350) : 230)}px)`}
                         value={content}
-                        onChange={newContent =>{
-                          this.setState({ content: newContent })}
-                        }
+                        onChange={this.setNewContent(newContent)}                        
+                        // onChange={newContent =>{
+                        //   this.setState({ content: newContent })}
+                        // }
                         mode="xml"
                         isReadOnly={!isEditable}
                         wrapEnabled
@@ -332,7 +331,6 @@ class WzRulesetEditor extends Component {
 const mapStateToProps = state => {
   return {
     state: state.rulesetReducers,
-    // fileContentSaved: state.rulesetReducers.fileContent,
     wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet
   };
 };
