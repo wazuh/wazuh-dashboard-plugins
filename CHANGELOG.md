@@ -33,6 +33,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed filters does not work on modals with search bar [#2935](https://github.com/wazuh/wazuh-kibana-app/pull/2935)
 - Fix wrong package name in deploy new agent [#2942](https://github.com/wazuh/wazuh-kibana-app/issues/2942)
 - Fixed number agents not show on pie onMouseEvent [#2890](https://github.com/wazuh/wazuh-kibana-app/issues/2890)
+- Fixed off Kibana Query Language in search bar of Controls/Inventory modules. [#2945](https://github.com/wazuh/wazuh-kibana-app/pull/2945)
 
 ## Wazuh v4.0.4 - Kibana 7.10.0 , 7.10.2 - Revision 4017
 
