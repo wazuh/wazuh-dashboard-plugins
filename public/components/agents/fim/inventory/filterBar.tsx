@@ -41,7 +41,7 @@ export class FilterBar extends Component {
       {type: 'q', label: 'size', description:"Size of the file in Bytes", values: async (value) => getFilterValues('size', value, this.props.agent.id)}, 
     ],
     registry: [
-      {type: 'q', label: 'file', description:"Name of the registry", operators:['=','!=', '~'], values: async (value) => getFilterValues('file', value, this.props.agent.id, {type:'registry'})},
+      {type: 'q', label: 'file', description:"Name of the registry_key or registry_value", operators:['=','!=', '~'], values: async (value) => getFilterValues('file', value, this.props.agent.id, {q:'type=registry_key,type=registry_value'})},
     ]
   }
 

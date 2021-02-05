@@ -154,7 +154,7 @@ export class Inventory extends Component {
     const filter = {
       ...filters,
       limit: type === 'file' ? '15' : '1',
-      type,
+      ...(type === 'registry' ? {q: 'type=registry_key,type=registry_value'} : {type}),      
       ...(type === 'file' && {sort: '+file'})
     };
     return filter;
@@ -165,7 +165,7 @@ export class Inventory extends Component {
     const response = await WzRequest.apiReq(
       'GET',
       `/syscheck/${agentID}`,
-      { params: this.buildFilter(type) },
+      { params: this.buildFilter(type) }
     );
     if (type === 'file') {
       return {
