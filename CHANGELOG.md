@@ -31,6 +31,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed diff parsed datetime between agent detail and agents table [#2940](https://github.com/wazuh/wazuh-kibana-app/pull/2940)
 - Allow access to Agents section with agent:group action permission [#2933](https://github.com/wazuh/wazuh-kibana-app/issues/2933)
 - Fixed filters does not work on modals with search bar [#2935](https://github.com/wazuh/wazuh-kibana-app/pull/2935)
+- Fix wrong package name in deploy new agent [#2942](https://github.com/wazuh/wazuh-kibana-app/issues/2942)
+
 
 ## Wazuh v4.0.4 - Kibana 7.10.0 , 7.10.2 - Revision 4017
 
