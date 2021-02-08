@@ -345,7 +345,7 @@ export class MultipleAgentSelector extends Component {
   };
 
   unselectElementsOfSelectByID(containerID) {
-    document.getElementById(containerID).selectedOptions.forEach(option => {
+    document.getElementById(containerID).options.forEach(option => {
       option.selected = false
     });
   }
