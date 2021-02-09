@@ -260,7 +260,7 @@ export class FileDetails extends Component {
 
   getDetails() {
     const { view } = this.props;
-    const columns = this.props.type === 'file' ? this.details() : this.registryDetails();
+    const columns = this.props.type === 'registry_key' || this.props.currentFile.type === 'registry_key' ? this.registryDetails() : this.details();
     const generalDetails = columns.map((item, idx) => {
       var value = this.props.currentFile[item.field] || '-';
       if (item.transformValue) {

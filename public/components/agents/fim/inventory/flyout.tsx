@@ -68,7 +68,7 @@ export class FlyoutDetail extends Component {
           }
           const data = await WzRequest.apiReq('GET', `/syscheck/${this.props.agentId}`, {
             params: {
-              q: `file=${file}`,
+              q: `file=${file};(type=file,type=registry_key)`,
             },
           });
           currentFile = ((((data || {}).data || {}).data || {}).affected_items || [])[0];
@@ -82,7 +82,7 @@ export class FlyoutDetail extends Component {
         }
         const data = await WzRequest.apiReq('GET', `/syscheck/${this.props.agentId}`, {
           params: {
-            q: `file=${file}`,
+            q: `file=${file};(type=file,type=registry_key)`,
           },
         });
         currentFile = ((((data || {}).data || {}).data || {}).affected_items || [])[0];
