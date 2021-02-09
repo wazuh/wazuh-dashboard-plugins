@@ -63,7 +63,7 @@ export class FlyoutDetail extends Component {
         const match = window.location.href.match(regex);
         if (match && match[0]) {
           let file = decodeURIComponent(match[0].split('=')[1]);
-          if (this.state.type === 'registry_key') {
+          if (file.indexOf('\\') > -1) {
             file = encodeURIComponent(file).replaceAll('%5C', '\\\\');
           }
           const data = await WzRequest.apiReq('GET', `/syscheck/${this.props.agentId}`, {
@@ -75,9 +75,9 @@ export class FlyoutDetail extends Component {
         }
       } else if (this.props.item) {
         currentFile = this.props.item;
-      } else {
+      } else {          
         let file = this.props.fileName;
-        if (this.state.type === 'registry_key') {
+        if (file.indexOf('\\') > -1) {
           file = encodeURIComponent(file).replaceAll('%5C', '\\\\');
         }
         const data = await WzRequest.apiReq('GET', `/syscheck/${this.props.agentId}`, {
