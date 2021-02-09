@@ -39,6 +39,7 @@ export class FileDetails extends Component {
   props!: {
     currentFile: {
       file: string;
+      type: string;
     };
     implicitFilters: Array<Object>;
     loadEventsWithFilters: Function;
@@ -413,7 +414,7 @@ export class FileDetails extends Component {
         >
           <div className="flyout-row details-row">{this.getDetails()}</div>
         </EuiAccordion>
-        { type === 'registry_key' && <>
+        { (type === 'registry_key' || currentFile.type === 'registry_key') && <>
         <EuiSpacer size="s" />
         <EuiAccordion
           id={fileName === undefined ? Math.random().toString() : `${fileName}_values`}
