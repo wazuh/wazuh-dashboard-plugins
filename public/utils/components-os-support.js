@@ -9,11 +9,12 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { WAZUH_AGENTS_OS_TYPE, WAZUH_MODULES_ID } from '../../common/constants';
 
 export const UnsupportedComponents = {
-  linux: [],
-  windows: ['audit', 'oscap', 'docker'],
-  darwin: ['audit', 'oscap', 'vuls', 'docker'],
-  sunos: ['vuls'],
-  other: ['audit', 'oscap', 'vuls', 'docker']
+  [WAZUH_AGENTS_OS_TYPE.LINUX]: [],
+  [WAZUH_AGENTS_OS_TYPE.WINDOWS]: [WAZUH_MODULES_ID.AUDITING, WAZUH_MODULES_ID.DOCKER, WAZUH_MODULES_ID.OPEN_SCAP],
+  [WAZUH_AGENTS_OS_TYPE.DARWIN]: [WAZUH_MODULES_ID.AUDITING, WAZUH_MODULES_ID.DOCKER, WAZUH_MODULES_ID.OPEN_SCAP, WAZUH_MODULES_ID.VULNERABILITIES],
+  [WAZUH_AGENTS_OS_TYPE.SUNOS]: [WAZUH_MODULES_ID.VULNERABILITIES],
+  [WAZUH_AGENTS_OS_TYPE.OTHERS]: [WAZUH_MODULES_ID.AUDITING, WAZUH_MODULES_ID.DOCKER, WAZUH_MODULES_ID.OPEN_SCAP, WAZUH_MODULES_ID.VULNERABILITIES]
 };
