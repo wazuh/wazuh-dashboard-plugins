@@ -190,6 +190,9 @@ export const Discover = compose(
       this.setState({ query: {...this.props.query}});
       return;
     };
+    if(!_.isEqual(this.props.shareFilterManager, this.state.searchBarFilters)){
+      this.setState({columns: this.getColumns(), searchBarFilters: this.props.shareFilterManager || []}); //initial columns
+    };
     if((!_.isEqual(this.props.shareFilterManager, prevProps.shareFilterManager))
       || (this.props.currentAgentData.id !== prevProps.currentAgentData.id)
       || (!_.isEqual(this.state.query, prevState.query))
@@ -339,7 +342,11 @@ export const Discover = compose(
   }
 
   async getAlerts() {
-    if (!this.indexPattern || this.state.isLoading) return;
+    if (!this.indexPattern) return;
+    if (this.state.isLoading){
+      this.getAlerts();
+      return;
+    }
     //compare filters so we only make a request into Elasticsearch if needed
     const newFilters = this.buildFilter();
     try {
