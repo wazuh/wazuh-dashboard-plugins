@@ -111,30 +111,29 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
     rulesTmp.splice(id, 1);
     setRules(rulesTmp);
   };
-
-  const getRulesFromJson = jsonRule => {
-
-    if(jsonRule !== '{}'){ // empty json is valid
+  
+  const getRulesFromJson = (jsonRule) => {
+    if (jsonRule !== '{}') {
+      // empty json is valid
       const { customRules, internalUsersRules, wrongFormat, logicalOperator } = decodeJsonRule(
         jsonRule,
         internalUsers
       );
       setLogicalOperator(logicalOperator);
-      setHasWrongFormat(wrongFormat);  
+      setHasWrongFormat(wrongFormat);
 
       return { customRules, internalUsersRules, wrongFormat, logicalOperator };
-    }else{     
+    } else {
       setLogicalOperator('');
-      setHasWrongFormat(false); 
+      setHasWrongFormat(false);
 
       return {
         customRules: [],
         internalUsersRules: [],
         wrongFormat: false,
-        logicalOperator: 'OR' 
-      }
+        logicalOperator: 'OR',
+      };
     }
-    
   };
   const printRules = () => {
     const rulesList = rules.map((item, idx) => {
