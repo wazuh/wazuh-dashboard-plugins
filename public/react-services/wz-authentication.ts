@@ -30,7 +30,6 @@ export class WzAuthentication{
 
       const response = await WzRequest.genericReq('POST', '/api/login', { idHost, force });
 
-      //await WzAuthentication.deleteExistentToken(idHost);
       const token = ((response || {}).data || {}).token;
       return token as string;
     }catch(error){
