@@ -2,11 +2,6 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v4.1.1 - Kibana 7.10.0 , 7.10.2 - Revision 4102
-### Added
-
-- Added vulnerabilities module for macos agents [#2969](https://github.com/wazuh/wazuh-kibana-app/pull/2969)
-
 ## Wazuh v4.1.0 - Kibana 7.10.0 , 7.10.2 - Revision 4101
 
 ### Added
@@ -20,6 +15,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added on FIM Inventory Windows Registry registry_key and registry_value items from syscheck [#2908](https://github.com/wazuh/wazuh-kibana-app/issues/2908)
 - Uncheck agents after an action in agents groups management [#2907](https://github.com/wazuh/wazuh-kibana-app/pull/2907)
 - Unsave rule files when edit or create a rule with invalid content [#2944](https://github.com/wazuh/wazuh-kibana-app/pull/2944)
+- Added vulnerabilities module for macos agents [#2969](https://github.com/wazuh/wazuh-kibana-app/pull/2969)
 
 ### Fixed
 
