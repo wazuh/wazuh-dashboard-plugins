@@ -16,7 +16,7 @@ import jwtDecode from 'jwt-decode';
 import store from '../redux/store';
 import { updateUserPermissions, updateUserRoles } from '../redux/actions/appStateActions';
 import { WAZUH_ROLE_ADMINISTRATOR_ID, WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../common/constants';
-import { getToasts }  from '../kibana-services';
+import { getToasts } from '../kibana-services';
 
 
 export class WzAuthentication{
@@ -27,7 +27,10 @@ export class WzAuthentication{
         await new Promise(r => setTimeout(r, 500));
         idHost = JSON.parse(AppState.getCurrentAPI()).id;
       }
+
       const response = await WzRequest.genericReq('POST', '/api/login', { idHost, force });
+
+      //await WzAuthentication.deleteExistentToken(idHost);
       const token = ((response || {}).data || {}).token;
       return token as string;
     }catch(error){
@@ -35,15 +38,18 @@ export class WzAuthentication{
     }
   }
   static async refresh(force = false){
-    try{
+    try {
       // Get user token
       const token: string = await WzAuthentication.login(force);
       if(!token){
+        // Remove old existent token
+        await WzAuthentication.deleteExistentToken();
         return;
       }
+
       // Decode token and get expiration time
       const jwtPayload = jwtDecode(token);
-      
+
       // Get user Policies
       const userPolicies = await WzAuthentication.getUserPolicies();
       // Dispatch actions to set permissions and roles
@@ -73,10 +79,18 @@ export class WzAuthentication{
       return Promise.reject(error);
     }
   }
+
   private static mapUserRolesIDToAdministratorRole(roles){
     return roles.map((role: number) => role === WAZUH_ROLE_ADMINISTRATOR_ID ? WAZUH_ROLE_ADMINISTRATOR_NAME : role);
   }
-  static logout(){
-    //TODO: logout
+
+  static async deleteExistentToken() {
+    try {
+      const response = await WzRequest.apiReq('DELETE','/security/user/authenticate', {});
+
+      return ((response || {}).data || {}).data || {};
+    } catch (error) {
+      throw error;
+    }
   }
 }
