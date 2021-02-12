@@ -19,6 +19,7 @@ import {
   EuiFlexGroup,
   EuiPanel,
   EuiFlexItem,
+  EuiButton,
   EuiButtonIcon,
   EuiDescriptionList,
   EuiCallOut,
@@ -34,6 +35,7 @@ import { Metrics } from '../overview/metrics/metrics';
 import { PatternHandler } from '../../react-services/pattern-handler';
 import { getToasts }  from '../../kibana-services';
 import { SecurityAlerts } from './components';
+import { toMountPoint } from '../../../../../src/plugins/kibana_react/public';
 
 const visHandler = new VisHandlers();
 
@@ -132,8 +134,7 @@ export class WzVisualize extends Component {
         this.setState({ hasRefreshedKnownFields: true, isRefreshing: true });
         await PatternHandler.refreshIndexPattern();
         this.setState({ isRefreshing: false });
-        this.showToast('success', 'The index pattern was refreshed successfully.');
-
+        this.reloadToast();
       } catch (err) {
         this.setState({ isRefreshing: false });
         this.showToast('danger', 'The index pattern could not be refreshed');
@@ -144,7 +145,21 @@ export class WzVisualize extends Component {
       await this.refreshKnownFields();
     }
   }
-
+  reloadToast = () => {
+    getToasts().add({
+      color: 'success',
+      title: 'The index pattern was refreshed successfully.',
+      text: toMountPoint(<EuiFlexGroup justifyContent="flexEnd" gutterSize="s">
+        <EuiFlexItem grow={false}>
+          There were some unknown fields for the current index pattern.
+          You need to refresh the page to apply the changes.
+        </EuiFlexItem>
+        <EuiFlexItem grow={false}>
+          <EuiButton onClick={() => window.location.reload()} size="s">Reload page</EuiButton>
+        </EuiFlexItem>
+      </EuiFlexGroup>)
+    })
+  }
   render() {
     const { visualizations } = this.state;
     const { selectedTab } = this.props;
