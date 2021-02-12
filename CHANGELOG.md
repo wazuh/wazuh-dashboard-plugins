@@ -2,6 +2,12 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.1.1 - Kibana 7.10.0 , 7.10.2 - Revision 4102
+
+### Fixed
+
+- Fix the SCA policy stats didn't refresh [#2973](https://github.com/wazuh/wazuh-kibana-app/pull/2973)
+
 ## Wazuh v4.1.0 - Kibana 7.10.0 , 7.10.2 - Revision 4101
 
 ### Added
