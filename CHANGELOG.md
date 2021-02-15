@@ -8,6 +8,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Check the max buckets by default in healthcheck and increase them [#2901](https://github.com/wazuh/wazuh-kibana-app/pull/2901)
 - Added a prompt wraning in role mapping if run_as is false or he is not allowed to use it by API [#2876](https://github.com/wazuh/wazuh-kibana-app/pull/2876)
+- Added a suitable X-Frame-Options header [#2791](https://github.com/wazuh/wazuh-kibana-app/issues/2791)
 
 ### Changed
 
@@ -36,6 +37,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed number agents not show on pie onMouseEvent [#2890](https://github.com/wazuh/wazuh-kibana-app/issues/2890)
 - Fixed off Kibana Query Language in search bar of Controls/Inventory modules. [#2945](https://github.com/wazuh/wazuh-kibana-app/pull/2945)
 - Fixed number of agents do not show on the pie chart tooltip in agents preview [#2890](https://github.com/wazuh/wazuh-kibana-app/issues/2890)
+
 
 ## Wazuh v4.0.4 - Kibana 7.10.0 , 7.10.2 - Revision 4017
 
