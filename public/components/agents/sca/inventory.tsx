@@ -22,7 +22,7 @@ import {
   EuiPopover
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
-import TimeService from '../../../react-services/time-service'
+import { TimeService } from '../../../react-services/time-service'
 import exportCsv from '../../../react-services/wz-csv';
 import { getToasts }  from '../../../kibana-services';
 import { WzSearchBar, filtersToObject } from '../../../components/wz-search-bar';
@@ -37,7 +37,6 @@ export class Inventory extends Component {
     this.policies = [];
     this.wzReq = WzRequest;
     this.suggestions = {};
-    this.timeService = TimeService;
     this.columnsPolicies = [
       {
         field: 'name',
@@ -52,7 +51,7 @@ export class Inventory extends Component {
         field: 'end_scan',
         name: 'End scan',
         dataType: 'date',
-        render: value => this.offsetTimestamp('', value)
+        render: TimeService.offset
       },
       {
         field: 'pass',
@@ -178,14 +177,6 @@ export class Inventory extends Component {
 
   componentWillUnmount() {
     this._isMount = false;
-  }
-
-  offsetTimestamp(text, time) {
-    try {
-      return text + this.timeService.offset(time);
-    } catch (error) {
-      return time !== '-' ? `${text}${time} (UTC)` : time;
-    }
   }
 
   addHealthResultRender(result) {
@@ -540,7 +531,7 @@ export class Inventory extends Component {
                     <EuiStat title={`${this.state.lookingPolicy.score}%`} description="Score" titleColor="accent" titleSize="m" textAlign="center" />
                   </EuiFlexItem>
                   <EuiFlexItem>
-                    <EuiStat title={this.state.lookingPolicy.end_scan} description="End scan" titleColor="primary" titleSize="s" textAlign="center" style={{ padding: 5 }} />
+                    <EuiStat title={TimeService.offset(this.state.lookingPolicy.end_scan)} description="End scan" titleColor="primary" titleSize="s" textAlign="center" style={{ padding: 5 }} />
                   </EuiFlexItem>
                 </EuiFlexGroup>
                 <EuiSpacer size="m" />
