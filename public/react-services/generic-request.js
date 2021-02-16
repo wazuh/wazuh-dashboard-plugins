@@ -32,7 +32,10 @@ export class GenericRequest {
       };
       const tmpUrl = getHttp().basePath.prepend(path);
 
-      requestHeaders.pattern = (await getDataPlugin().indexPatterns.get(AppState.getCurrentPattern())).title;
+      try{
+        requestHeaders.pattern = (await getDataPlugin().indexPatterns.get(AppState.getCurrentPattern())).title;
+      }catch(error){};
+
       try {
         requestHeaders.id = JSON.parse(AppState.getCurrentAPI()).id;
       } catch (error) {
