@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for Settings submenu.
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,7 +14,6 @@ import { EuiFlexItem, EuiFlexGroup, EuiSideNav, EuiIcon } from '@elastic/eui';
 import { WzRequest } from '../../react-services/wz-request';
 import { connect } from 'react-redux';
 import { AppNavigate } from '../../react-services/app-navigate';
-import chrome from 'ui/chrome';
 
 class WzMenuSecurity extends Component {
   constructor(props) {

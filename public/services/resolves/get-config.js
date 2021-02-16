@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Resolve function to parse configuration file
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@ import {
   WAZUH_INDEX_SHARDS,
   WAZUH_MONITORING_PATTERN,
   WAZUH_SAMPLE_ALERT_PREFIX
-} from "../../../util/constants";
+} from "../../../common/constants";
 
 export async function getWzConfig($q, genericReq, wazuhConfig) {
   // Remember to keep this values equal to default wazuh.yml values

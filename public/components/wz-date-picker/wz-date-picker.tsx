@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for select time and sync with kibana discover
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@ import {
   OnTimeChangeProps,
 } from '@elastic/eui';
 //@ts-ignore
-import { getServices } from '../../../../../src/plugins/discover/public/kibana_services';
 import { CondensedPicker } from './components';
+import { getDataPlugin } from '../../kibana-services';
 
 interface IDiscoverTime { from: string, to: string };
 
@@ -52,7 +52,7 @@ export class WzDatePicker extends Component {
 
   constructor(props) {
     super(props);
-    this.timefilter = getServices().timefilter;
+    this.timefilter = getDataPlugin().query.timefilter.timefilter;
     const { from, to } = this.timefilter.getTime();
     this.state = {
       datePicker: {

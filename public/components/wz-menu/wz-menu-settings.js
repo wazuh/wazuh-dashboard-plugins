@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for Settings submenu.
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,7 +14,7 @@ import { EuiFlexItem, EuiFlexGroup, EuiSideNav, EuiIcon, EuiButtonEmpty, EuiTool
 import { WzRequest } from '../../react-services/wz-request';
 import { connect } from 'react-redux';
 import { AppNavigate } from '../../react-services/app-navigate';
-import chrome from 'ui/chrome';
+import { getAngularModule } from '../../kibana-services';
 
 class WzMenuSettings extends Component {
   constructor(props) {
@@ -63,7 +63,7 @@ class WzMenuSettings extends Component {
     this.props.closePopover();
     AppNavigate.navigateToModule(ev, 'settings', { tab: section });
     if (this.props.currentMenuTab === 'settings') {
-      const $injector = await chrome.dangerouslyGetActiveInjector();
+      const $injector = getAngularModule().$injector;
       const router = $injector.get('$route');
       router.reload();
     }

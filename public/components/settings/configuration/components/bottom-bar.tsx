@@ -1,7 +1,7 @@
 /*
  * Wazuh app - React component building the configuration component.
  *
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,7 +14,7 @@
 import React, { } from 'react';
 import ConfigurationHandler from '../utils/configuration-handler';
 //@ts-ignore
-import { toastNotifications } from 'ui/notify';
+import { getToasts }  from '../../../../kibana-services';
 import { ISetting } from '../configuration'
 import {
   EuiBottomBar,
@@ -121,7 +121,7 @@ const saveSetting = async (setting, updatedConfig, config:ISetting[]) => {
 }
 
 const reloadToast = () => {
-  toastNotifications.add({
+  getToasts().add({
     color: 'success',
     title: 'This settings require you to reload the page to take effect.',
     text: <EuiFlexGroup justifyContent="flexEnd" gutterSize="s">
@@ -133,21 +133,21 @@ const reloadToast = () => {
 }
 
 const restartToast = () => {
-  toastNotifications.add({
+  getToasts().add({
     color:'warning',
     title:'You must restart Kibana for the changes to take effect',
   });
 }
 
 const successToast = () => {
-  toastNotifications.add({
+  getToasts().add({
     color:'success',
     title:'The configuration has been successfully updated',
   });
 }
 
 const errorToast = (error) => {
-  toastNotifications.add({
+  getToasts().add({
     color:'danger',
     title:`Error saving the configuration: ${error.message || error}`,
   });

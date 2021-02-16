@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Service which caches the API user allow run as
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -9,9 +9,9 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { ApiInterceptor } from './api-interceptor';
+import * as ApiInterceptor from './api-interceptor';
 import { ManageHosts } from './manage-hosts';
-import { log } from '../logger';
+import { log } from './logger';
 // Private variable to save the cache
 const _cache = {};
 
@@ -30,7 +30,6 @@ export const CacheInMemoryAPIUserAllowRunAs = {
   has: (apiID: string, username: string): boolean => _cache[apiID] && typeof _cache[apiID][username] !== 'undefined' ? true : false
 };
 
-const apiInterceptor = new ApiInterceptor();
 const manageHosts = new ManageHosts();
 
 export const APIUserAllowRunAs = {
@@ -46,17 +45,17 @@ export const APIUserAllowRunAs = {
       if(CacheInMemoryAPIUserAllowRunAs.has(apiId, api.username)){
         return CacheInMemoryAPIUserAllowRunAs.get(apiId, api.username);
       };
-      const response = await apiInterceptor.request(
+      const response = await ApiInterceptor.requestAsInternalUser(
         'get',
-        `${api.url}:${api.port}/security/users/me`,
+        '/security/users/me',
         {},
-        { idHost: apiId }
+        { apiHostID: apiId }
       );
-      const APIUserAllowRunAs = response.data.data.affected_items[0].allow_run_as ? API_USER_STATUS_RUN_AS.ENABLED : API_USER_STATUS_RUN_AS.NOT_ALLOWED;
-      
+      const statusUserAllowRunAs = response.data.data.affected_items[0].allow_run_as ? API_USER_STATUS_RUN_AS.ENABLED : API_USER_STATUS_RUN_AS.NOT_ALLOWED;
+
       // Cache the run_as for the API user
-      CacheInMemoryAPIUserAllowRunAs.set(apiId, api.username, APIUserAllowRunAs);
-      return APIUserAllowRunAs;
+      CacheInMemoryAPIUserAllowRunAs.set(apiId, api.username, statusUserAllowRunAs);
+      return statusUserAllowRunAs;
     }catch(error){
       log('APIUserAllowRunAs:check', error.message || error);
       return API_USER_STATUS_RUN_AS.DISABLED;

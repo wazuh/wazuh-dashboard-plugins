@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Mitre alerts components
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,15 +17,14 @@ import {
   EuiFlexItem,
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
-import { toastNotifications } from 'ui/notify';
 import { IFilterParams, getIndexPattern } from './lib';
 
 import {  FilterManager, Filter } from '../../../../../../src/plugins/data/public/';
 //@ts-ignore
-import { getServices } from '../../../../../../src/plugins/discover/public/kibana_services';
 import { KbnSearchBar } from '../../kbn-search-bar';
 import { TimeRange, Query } from '../../../../../../src/plugins/data/common';
 import { ModulesHelper } from '../../common/modules/modules-helper';
+import { getDataPlugin, getToasts } from '../../../kibana-services';
 
 export interface ITactic {
   [key:string]: string[]
@@ -55,9 +54,9 @@ export class Mitre extends Component {
 
   constructor(props) {
     super(props);
-    this.KibanaServices = getServices();
+    this.KibanaServices = getDataPlugin().query;
     this.filterManager = this.KibanaServices.filterManager;
-    this.timefilter = this.KibanaServices.timefilter;
+    this.timefilter = this.KibanaServices.timefilter.timefilter;
     this.state = {
       tacticsObject: {},
       selectedTactics: {},
@@ -101,7 +100,7 @@ export class Mitre extends Component {
   }
 
   showToast = (color, title, text, time) => {
-    toastNotifications.add({
+    getToasts().add({
       color: color,
       title: title,
       text: text,
@@ -161,7 +160,7 @@ export class Mitre extends Component {
           <EuiFlexItem>
             <EuiPanel paddingSize="none">
                 <EuiFlexGroup >
-                  <EuiFlexItem grow={false} style={{width: "15%", minWidth: 145, height: "calc(100vh - 280px)",overflowX: "hidden"}}>
+                  <EuiFlexItem grow={false} style={{width: "15%", minWidth: 145, height: "calc(100vh - 325px)",overflowX: "hidden"}}>
                     <Tactics 
                       indexPattern={this.indexPattern}
                       onChangeSelectedTactics={this.onChangeSelectedTactics}

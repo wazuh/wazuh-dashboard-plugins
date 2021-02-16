@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for build q queries.
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,15 +35,13 @@ import Management from './wz-menu-management';
 import MenuSettings from './wz-menu-settings';
 import MenuSecurity from './wz-menu-security';
 import Overview from './wz-menu-overview';
-import { npStart } from 'ui/new_platform';
-import { toastNotifications } from 'ui/notify';
+import { getAngularModule, getHttp, getToasts } from '../../kibana-services';
 import { GenericRequest } from '../../react-services/generic-request';
 import { ApiCheck } from '../../react-services/wz-api-check';
-import chrome from 'ui/chrome';
 import { WzGlobalBreadcrumbWrapper } from '../common/globalBreadcrumb/globalBreadcrumbWrapper';
 import { AppNavigate } from '../../react-services/app-navigate';
 import WzTextWithTooltipIfTruncated from '../../components/common/wz-text-with-tooltip-if-truncated';
-import { getServices } from '../../../../../src/plugins/discover/public/kibana_services';
+import { getDataPlugin } from '../../kibana-services';
 
 const sections = {
   'overview': 'overview',
@@ -76,12 +74,12 @@ class WzMenu extends Component {
     this.store = store;
     this.genericReq = GenericRequest;
     this.wazuhConfig = new WazuhConfig();
-    this.indexPatterns = npStart.plugins.data.indexPatterns;
+    this.indexPatterns = getDataPlugin().indexPatterns;
     this.isLoading = false;
   }
 
   async componentDidMount() {
-    const $injector = await chrome.dangerouslyGetActiveInjector();
+    const $injector = getAngularModule().$injector;
     this.router = $injector.get('$route');
     try{
       const result = await this.genericReq.request('GET', '/hosts/apis', {});
@@ -105,7 +103,7 @@ class WzMenu extends Component {
   }
 
   showToast = (color, title, text, time) => {
-    toastNotifications.add({
+    getToasts().add({
       color: color,
       title: title,
       text: text,
@@ -499,11 +497,11 @@ class WzMenu extends Component {
     store.dispatch(updateCurrentAgentData({}));
     if (window.location.href.includes("/agents?")) {
       window.location.href = "#/agents-preview";
-      this.route.reload();
+      this.router.reload();
       return;
     }
-    const { filterManager } = getServices();
-    const currentAppliedFilters = filterManager.filters;
+    const { filterManager } = getDataPlugin().query;
+    const currentAppliedFilters = filterManager.getFilters();
     const agentFilters = currentAppliedFilters.filter(x => {
       return x.meta.key === 'agent.id';
     });
@@ -686,10 +684,10 @@ class WzMenu extends Component {
                 </EuiBadge>
               </EuiFlexItem>
               */}
-              <EuiFlexItem>
+              <EuiFlexItem style={{ margin: "16px 16px 0 16px" }}>
                 {this.addHealthRender(currentAgent)}
               </EuiFlexItem>
-              <EuiFlexItem grow={false} style={{ margin: "8px 0 0 0" }}>
+              <EuiFlexItem grow={false} style={{ margin: "12px 0 0 0" }}>
                 <EuiToolTip position="top" content={`Open ${currentAgent.name} summary`}>
                   <EuiButtonEmpty
                     color="primary"
@@ -698,7 +696,7 @@ class WzMenu extends Component {
                   </EuiButtonEmpty>
                 </EuiToolTip>
               </EuiFlexItem>
-              <EuiFlexItem grow={false} style={{ margin: "8px 0 0 0" }}>
+              <EuiFlexItem grow={false} style={{ margin: "12px 0 0 0" }}>
                 <EuiToolTip position="top" content={"Change selected agent"}>
                   <EuiButtonEmpty
                     color="primary"
@@ -707,7 +705,7 @@ class WzMenu extends Component {
                   </EuiButtonEmpty>
                 </EuiToolTip>
               </EuiFlexItem>
-              <EuiFlexItem grow={false} style={{ margin: "8px 16px 0 0" }}>
+              <EuiFlexItem grow={false} style={{ margin: "12px 16px 0 0" }}>
                 <EuiToolTip position="top" content={"Unpin agent"}>
                   <EuiButtonEmpty
                     color="text"
@@ -729,7 +727,8 @@ class WzMenu extends Component {
       </div>
     );
 
-    const logotype_url = chrome.addBasePath('/plugins/wazuh/img/logotype.svg');
+
+    const logotype_url = getHttp().basePath.prepend('/plugins/wazuh/assets/logotype.svg');
     const mainButton = (
       <button className="eui" onClick={() => this.switchMenuOpened()}>
         <EuiFlexGroup

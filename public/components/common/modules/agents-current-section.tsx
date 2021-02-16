@@ -1,7 +1,7 @@
 /*
  * Wazuh app - React component for building the Overview welcome screen.
  *
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,9 +17,9 @@ import {
 import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
 import { updateCurrentTab } from '../../../redux/actions/appStateActions';
 import store from '../../../redux/store';
-import chrome from 'ui/chrome';
 import { connect } from 'react-redux';
-import { TabDescription } from '../../../../server/reporting/tab-description';
+import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
+import { getAngularModule } from '../../../kibana-services';
 
 class WzCurrentAgentsSection extends Component {
   constructor(props) {
@@ -29,7 +29,7 @@ class WzCurrentAgentsSection extends Component {
   }
 
   setGlobalBreadcrumb() {
-    if (TabDescription[this.props.currentTab]) {
+    if (WAZUH_MODULES[this.props.currentTab]) {
       const breadcrumb = [
         { text: '' },
         {
@@ -45,7 +45,7 @@ class WzCurrentAgentsSection extends Component {
           className: 'wz-global-breadcrumb-btn euiBreadcrumb--truncate',
           truncate: false,
         },
-        { text: TabDescription[this.props.currentTab].title },
+        { text: WAZUH_MODULES[this.props.currentTab].title },
       ];
       store.dispatch(updateGlobalBreadcrumb(breadcrumb));
     }
@@ -54,7 +54,7 @@ class WzCurrentAgentsSection extends Component {
   async componentDidMount() {
     this.setGlobalBreadcrumb();
     store.dispatch(updateCurrentTab(this.props.currentTab));
-    const $injector = await chrome.dangerouslyGetActiveInjector();
+    const $injector = getAngularModule().$injector;
     this.router = $injector.get('$route');
   }
 
@@ -74,10 +74,10 @@ class WzCurrentAgentsSection extends Component {
   render() {
     return (
       <span>
-        {this.props.currentTab && TabDescription[this.props.currentTab] && TabDescription[this.props.currentTab].title && (
+        {this.props.currentTab && WAZUH_MODULES[this.props.currentTab] && WAZUH_MODULES[this.props.currentTab].title && (
           <EuiTitle size='s'>
             <h2>
-              {TabDescription[this.props.currentTab].title}
+              {WAZUH_MODULES[this.props.currentTab].title}
             </h2>
           </EuiTitle>)}
       </span>

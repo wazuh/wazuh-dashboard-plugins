@@ -1,7 +1,7 @@
 /*
  * Wazuh app - React component for test a configuration.
  *
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@ import {
 } from '@elastic/eui';
 import { DynamicHeight } from '../../../utils/dynamic-height';
 import 'brace/theme/textmate';
+import "brace/ext/searchbox";
 
 export class TestConfiguration extends Component {
   constructor(props) {

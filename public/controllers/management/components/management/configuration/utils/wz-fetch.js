@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Fetch API function and utils.
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -13,13 +13,13 @@
 import { WzRequest } from '../../../../../../react-services/wz-request';
 import { delay } from './utils';
 import { replaceIllegalXML } from './xml';
-import { toastNotifications } from 'ui/notify';
+import { getToasts }  from '../../../../../../kibana-services';
 
 /**
  * Get configuration for an agent/manager of request sections
  * @param {string} [agentId=000] Agent ID
  * @param {array} sections Sections
- * @param {falsy} [node=false] Node
+ * @param {false} [node=false] Node
  */
 export const getCurrentConfig = async (
   agentId = '000',
@@ -72,7 +72,8 @@ export const getCurrentConfig = async (
         result[`${component}-${configuration}`] = await handleError(
           error,
           'Fetch configuration',
-          updateWazuhNotReadyYet
+          updateWazuhNotReadyYet,
+          node
         );
       }
     }
@@ -120,14 +121,16 @@ export const extractMessage = error => {
  *
  * @param {Error|string} error
  * @param {*} location
+ * @param updateWazuhNotReadyYet
+ * @param {boolean} isCluster
  */
-export const handleError = async (error, location, updateWazuhNotReadyYet) => {
+export const handleError = async (error, location, updateWazuhNotReadyYet, isCluster) => {
   const message = extractMessage(error);
   const messageIsString = typeof message === 'string';
   try {
     if (messageIsString && message.includes('ERROR3099')) {
       updateWazuhNotReadyYet('Wazuh not ready yet.');
-      await makePing(updateWazuhNotReadyYet);
+      await makePing(updateWazuhNotReadyYet, isCluster);
       return;
     }
 
@@ -149,28 +152,33 @@ export const handleError = async (error, location, updateWazuhNotReadyYet) => {
 
 /**
  * Check daemons status
+ * @param {boolean} isCluster
  * @returns {object|Promise}
  */
-export const checkDaemons = async () => {
+export const checkDaemons = async (isCluster) => {
   try {
     const response = await WzRequest.apiReq('GET', '/manager/status', {});
-    const daemons = ((response || {}).data || {}).data || {};
+    const daemons = ((((response || {}).data || {}).data || {}).affected_items || [])[0] || {};
     const wazuhdbExists = typeof daemons['wazuh-db'] !== 'undefined';
 
     const execd = daemons['ossec-execd'] === 'running';
     const modulesd = daemons['wazuh-modulesd'] === 'running';
     const wazuhdb = wazuhdbExists ? daemons['wazuh-db'] === 'running' : true;
-    const clusterStatus = (((await clusterReq()) || {}).data || {}).data || {};
-    const isCluster =
-      clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
-    const clusterd = isCluster ? daemons['wazuh-clusterd'] === 'running' : true;
 
-    const isValid = execd && modulesd && wazuhdb && clusterd;
+    let clusterd = true;
+    if (isCluster) {
+      const clusterStatus = (((await clusterReq()) || {}).data || {}).data || {};
+      clusterd = clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes'
+        ? daemons['wazuh-clusterd'] === 'running'
+        : false;
+    }
+
+    const isValid = execd && modulesd && wazuhdb && (isCluster ? clusterd : true);
 
     if (isValid) {
       return { isValid };
     } else {
-      throw new Error('Wazuh not ready yet');
+      console.warn('Wazuh not ready yet');
     }
   } catch (error) {
     return Promise.reject(error);
@@ -179,17 +187,18 @@ export const checkDaemons = async () => {
 
 /**
  * Make ping to Wazuh API
+ * @param updateWazuhNotReadyYet
+ * @param {boolean} isCluster
  * @param {number} [tries=10] Tries
  * @return {Promise}
  */
-export const makePing = async (updateWazuhNotReadyYet, tries = 30) => {
+export const makePing = async (updateWazuhNotReadyYet, isCluster, tries = 30) => {
   try {
     let isValid = false;
     while (tries--) {
       await delay(2000);
       try {
-        const result = await WzRequest.apiReq('GET', '/ping', {});
-        isValid = ((result || {}).data || {}).isValid;
+        isValid = await checkDaemons(isCluster);
         if (isValid) {
           updateWazuhNotReadyYet('');
           break;
@@ -255,6 +264,7 @@ export const fetchFile = async selectedNode => {
 /**
  * Restart a node or manager
  * @param {} selectedNode Cluster Node
+ * @param updateWazuhNotReadyYet
  */
 export const restartNodeSelected = async (
   selectedNode,
@@ -269,7 +279,7 @@ export const restartNodeSelected = async (
       `Restarting ${isCluster ? selectedNode : 'Manager'}, please wait.`
     ); //FIXME: if it enables/disables cluster, this will show Manager instead node name
     isCluster ? await restartNode(selectedNode) : await restartManager();
-    return await makePing(updateWazuhNotReadyYet);
+    return await makePing(updateWazuhNotReadyYet, isCluster);
   } catch (error) {
     return Promise.reject(error);
   }
@@ -509,7 +519,7 @@ export const checkCurrentSecurityPlatform = async () => {
       '/elastic/security/current-platform',
       {}
     );
-    const platform = (result.data || {}).platform || 'elastic'; 
+    const platform = (result.data || {}).platform;
 
     return platform;
   } catch (error) {
@@ -525,7 +535,7 @@ export const restartClusterOrManager = async (updateWazuhNotReadyYet) => {
     const clusterStatus = (((await clusterReq()) || {}).data || {}).data || {};
     const isCluster =
       clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
-      toastNotifications.add({
+      getToasts().add({
         color:'success',
         title:isCluster ?'Restarting cluster, it will take up to 30 seconds.': 'Manager was restarted',
         toastLifeTimeMs: 3000
@@ -536,7 +546,7 @@ export const restartClusterOrManager = async (updateWazuhNotReadyYet) => {
       `Restarting ${isCluster ? 'Cluster' : 'Manager'}, please wait.`
     );
     await delay(15000);
-    await makePing(updateWazuhNotReadyYet);
+    await makePing(updateWazuhNotReadyYet, isCluster);
     return { restarted: isCluster ? 'Cluster' : 'Manager'}
   }catch (error){
     return Promise.reject(error);

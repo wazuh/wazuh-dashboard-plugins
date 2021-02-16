@@ -1,4 +1,5 @@
-import { PluginInitializerContext } from '../../../src/core/server';
+import { PluginInitializerContext } from 'kibana/server';
+
 import { WazuhPlugin } from './plugin';
 
 //  This exports static code and TypeScript types,

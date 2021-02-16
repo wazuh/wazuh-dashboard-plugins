@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for show overview configuration.
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ import WzBadge from './util-components/badge';
 import WzClusterSelect from './util-components/configuration-cluster-selector';
 import WzRefreshClusterInfoButton from './util-components/refresh-cluster-info-button';
 import { ExportConfiguration } from '../../../../agent/components/export-configuration';
+import { ReportingService } from '../../../../../react-services/reporting';
 
 import configurationSettingsGroup from './configuration-settings';
 
@@ -64,6 +65,7 @@ const helpLinks = [
 class WzConfigurationOverview extends Component {
   constructor(props) {
     super(props);
+    this.reportingService = new ReportingService();
   }
   updateConfigurationSection(section, title, description, path) {
     this.props.updateConfigurationSection(section, title, description, path);
@@ -140,7 +142,11 @@ class WzConfigurationOverview extends Component {
                     agent={this.props.agent}
                     type="agent"
                     exportConfiguration={enabledComponents => {
-                      this.props.exportConfiguration(enabledComponents);
+                      this.reportingService.startConfigReport(
+                        this.props.agent,
+                        'agentConfig',
+                        enabledComponents
+                      );
                     }}
                   />
                 </EuiFlexItem>

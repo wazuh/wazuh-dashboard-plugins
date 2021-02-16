@@ -1,0 +1,23 @@
+{
+  "id": "wazuh",
+  "version": "4.0.4",
+  "kibanaVersion": "kibana",
+  "configPath": ["wazuh"],
+  "requiredPlugins": [
+    "navigation",
+    "data",
+    "discover",
+    "inspector",
+    "visualizations",
+    "kibanaLegacy",
+    "uiActions",
+    "charts",
+    "savedObjects",
+    "kibanaReact",
+    "kibanaUtils",
+    "securityOss"
+  ],
+  "optionalPlugins": ["security", "opendistroSecurityKibana", "searchguard", "spaces"],
+  "server": true,
+  "ui": true
+}

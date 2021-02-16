@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for show search and filter
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ export class QInterpreter {
       const firstConjuntion = / and | or /i.exec(query);
       const currentQ = !!firstConjuntion ? query.slice(0, firstConjuntion.index) : query;
       const descomposeQuery = currentQ && descomposeRegex.exec(currentQ);
-      const { 1: conjuntion = undefined, 2: field = '', 3: operator = undefined, 4: value = undefined } = descomposeQuery || [];
+      const { conjuntion = undefined, field = '', operator = undefined, value = undefined } = descomposeQuery.groups || [];
       const queryObj: queryObject = { conjuntion, field, operator, value }
       queries.push(queryObj)
       if (firstConjuntion) return getQueryObjects(query.slice(firstConjuntion.index + 1), queries);

@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Integrity monitoring table component
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -11,19 +11,15 @@
  */
 
 import React, { Component, } from 'react';
-import './discover.less';
+import './discover.scss';
 import { FilterManager, Filter } from '../../../../../../../src/plugins/data/public/'
 import { GenericRequest } from '../../../../react-services/generic-request';
 import { AppState } from '../../../../react-services/app-state';
 import { AppNavigate } from '../../../../react-services/app-navigate';
 import { RowDetails } from './row-details';
-//@ts-ignore
-import { npSetup } from 'ui/new_platform';
-//@ts-ignore
-import { getServices } from '../../../../../../../src/plugins/discover/public/kibana_services';
 import DateMatch from '@elastic/datemath';
-import { toastNotifications } from 'ui/notify';
 import { WazuhConfig } from '../../../../react-services/wazuh-config';
+import { TimeService } from '../../../../react-services/time-service';
 import { KbnSearchBar } from '../../../kbn-search-bar';
 import { FlyoutTechnique } from '../../../../components/overview/mitre/components/techniques/components/flyout-technique';
 import { withReduxProvider } from '../../../common/hocs';
@@ -55,7 +51,7 @@ import {
   buildEsQuery,
   IFieldType
 } from '../../../../../../../src/plugins/data/common';
-import '../../../../components/agents/fim/inventory/inventory.less';
+import { getDataPlugin, getToasts, getUiSettings } from '../../../../kibana-services';
 
 const mapStateToProps = state => ({
   currentAgentData: state.appStateReducers.currentAgentData
@@ -111,9 +107,9 @@ export const Discover = compose(
   }
   constructor(props) {
     super(props);
-    this.KibanaServices = getServices();
-    this.filterManager = props.shareFilterManager ? this.KibanaServices.filterManager : new FilterManager(npSetup.core.uiSettings);
-    this.timefilter = this.KibanaServices.timefilter;
+    this.KibanaServices = getDataPlugin();
+    this.filterManager = props.shareFilterManager ? this.KibanaServices.query.filterManager : new FilterManager(getUiSettings);
+    this.timefilter = this.KibanaServices.query.timefilter.timefilter;
     this.state = {
       sort: {},
       selectedTechnique: "",
@@ -162,7 +158,7 @@ export const Discover = compose(
   }
 
   showToast = (color, title, time) => {
-    toastNotifications.add({
+    getToasts().add({
       color: color,
       title: title,
       toastLifeTimeMs: time,
@@ -308,7 +304,7 @@ export const Discover = compose(
         undefined,
         query,
         [...searchBarFilters, ...extraFilters, ...shareFilterManager],
-        getEsQueryConfig(npSetup.core.uiSettings)
+        getEsQueryConfig(getUiSettings())
       );
 
     const { sortField, sortDirection } = this.state;
@@ -351,7 +347,7 @@ export const Discover = compose(
 
         const alerts = await GenericRequest.request(
           'POST',
-          `/elastic/esAlerts`,
+          `/elastic/alerts`,
           {
             index: AppState.getCurrentPattern(),
             body: newFilters
@@ -416,8 +412,7 @@ export const Discover = compose(
           width: '10%',
           sortable: true,
           render: time => {
-            const date = time.split('.')[0];
-            return <span>{date.split('T')[0]} {date.split('T')[1]}</span>
+            return <span>{TimeService.offset(time)}</span>
           },
         }
       }
@@ -628,7 +623,7 @@ export const Discover = compose(
     </EuiOverlayMask> : <></>;
     return (
       <div
-        className='wz-discover hide-filter-control' >
+        className='wz-discover hide-filter-control wz-inventory' >
         {!this.props.shareFilterManager && <KbnSearchBar
           indexPattern={this.indexPattern}
           filterManager={this.filterManager}

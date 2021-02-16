@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for registering agents.
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,11 +14,11 @@ import { EuiFlexGroup, EuiFlexItem, EuiFlexGrid, EuiButtonEmpty, EuiSideNav, Eui
 import { WzRequest } from '../../react-services/wz-request';
 import { connect } from 'react-redux';
 import store from '../../redux/store';
-import chrome from 'ui/chrome';
 import { updateCurrentTab, updateCurrentAgentData } from '../../redux/actions/appStateActions';
 import { AppState } from '../../react-services/app-state';
 import { AppNavigate } from '../../react-services/app-navigate';
 import { UnsupportedComponents } from '../../utils/components-os-support';
+import { getAngularModule } from '../../kibana-services';
 
 class WzMenuOverview extends Component {
   constructor(props) {
@@ -73,7 +73,7 @@ class WzMenuOverview extends Component {
   async componentDidMount() {
     const extensions = await AppState.getExtensions(this.currentApi);
     this.setState({ extensions });
-    const $injector = await chrome.dangerouslyGetActiveInjector();
+    const $injector = getAngularModule().$injector;
     this.router = $injector.get('$route');
   }
 

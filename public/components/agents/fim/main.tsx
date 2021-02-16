@@ -1,6 +1,6 @@
 import React from 'react';
 import { Inventory } from './index';
-import '../../common/modules/module.less';
+import '../../common/modules/module.scss';
 import { connect } from 'react-redux';
 import { PromptNoSelectedAgent } from '../prompt-no-selected-agent'; 
 import { PromptNoActiveAgent } from '../prompt-no-active-agent'; 
