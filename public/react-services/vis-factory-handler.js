@@ -1,7 +1,7 @@
  
 /*
  * Wazuh app - Vis factory handler service
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +18,9 @@ import { LoadedVisualizations } from '../factories/loaded-visualizations';
 import { TabVisualizations } from '../factories/tab-visualizations';
 import { AppState } from './app-state';
 import { GenericRequest } from './generic-request';
-import chrome from 'ui/chrome';
 import store from '../redux/store';
 import { updateVis } from '../redux/actions/visualizationsActions';
+import { getAngularModule } from '../kibana-services';
 
 export class VisFactoryHandler {
   /**
@@ -60,7 +60,7 @@ export class VisFactoryHandler {
     const rawVisualizations = new RawVisualizations();
     //if(rawVisualizations.getType() !== 'general'){
       rawVisualizations.setType('general');
-      const $injector = await chrome.dangerouslyGetActiveInjector();
+      const $injector = getAngularModule().$injector;
       const commonData = $injector.get('commonData');
   
       try {
@@ -96,7 +96,7 @@ export class VisFactoryHandler {
     const rawVisualizations = new RawVisualizations();
   //  if (rawVisualizations.getType() !== 'agents') {
       rawVisualizations.setType('agents');
-      const $injector = await chrome.dangerouslyGetActiveInjector();
+      const $injector = getAngularModule().$injector;
       const commonData = $injector.get('commonData');
 
       try {

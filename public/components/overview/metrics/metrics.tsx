@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Metrics component
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,9 +20,9 @@ import { FilterManager } from '../../../../../../src/plugins/data/public/';
 import { buildRangeFilter, buildPhrasesFilter,buildPhraseFilter, buildExistsFilter} from '../../../../../../src/plugins/data/common';
 
 //@ts-ignore
-import { getServices } from '../../../../../../src/plugins/discover/public/kibana_services';
 import { getElasticAlerts, getIndexPattern } from '../mitre/lib';
 import { ModulesHelper } from '../../common/modules/modules-helper'
+import { getDataPlugin } from '../../../kibana-services';
 
 
 
@@ -50,9 +50,9 @@ export class Metrics extends Component {
 
   constructor(props) {
     super(props);
-    this.KibanaServices = getServices();
+    this.KibanaServices = getDataPlugin().query;
     this.filterManager = this.KibanaServices.filterManager;
-    this.timefilter = this.KibanaServices.timefilter;
+    this.timefilter = this.KibanaServices.timefilter.timefilter;
     this.state = {
       resultState: "",
       results: {},
@@ -131,14 +131,14 @@ export class Metrics extends Component {
 
   buildMetric(){
     if(!this.metricsList[this.props.section] || !this._isMount) return <></>;
-    const newFilters = this.filterManager.filters;
+    const newFilters = this.filterManager.getFilters();
     const searchBarQuery = this.scope.state.query;
     const newTime = this.timefilter.getTime();
       const filterParams = {};
       filterParams["time"] = this.timefilter.getTime(); 
       filterParams["query"] = searchBarQuery; 
-      filterParams["filters"] = this.filterManager.filters; 
-      this.setState({filterParams, loading: true, results:{}})
+      filterParams["filters"] = this.filterManager.getFilters(); 
+      this.setState({filterParams, loading: true});
       const newOnClick = {};
       
       const result = this.metricsList[this.props.section].map(async(item)=> {
@@ -250,7 +250,9 @@ export class Metrics extends Component {
           const key = Object.keys(item)[0]
           newResults[key] = item[key];
         });
-        this.setState({results: newResults, loading:false, buildingMetrics: false, metricsOnClicks: newOnClick})
+        this.setState({results: newResults, loading:false, buildingMetrics: false, metricsOnClicks: newOnClick});
+      }).catch(error => {
+        this.setState({loading: false, buildingMetrics: false});
       });
     
   }

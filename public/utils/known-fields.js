@@ -40,7 +40,7 @@ export const KnownFields = [
     "name": "_type",
     "type": "string",
     "esTypes": [
-    "_type"
+      "_type"
     ],
     "searchable": true,
     "aggregatable": true,

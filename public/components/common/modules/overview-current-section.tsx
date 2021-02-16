@@ -1,7 +1,7 @@
 /*
  * Wazuh app - React component for building the Overview welcome screen.
  *
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@ import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbA
 import { updateCurrentTab } from '../../../redux/actions/appStateActions';
 import store from '../../../redux/store';
 import { connect } from 'react-redux';
-import { TabDescription } from '../../../../server/reporting/tab-description';
+import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
 import { AppNavigate } from '../../../react-services/app-navigate'
 
 class WzCurrentOverviewSection extends Component {
@@ -40,19 +40,19 @@ class WzCurrentOverviewSection extends Component {
   setGlobalBreadcrumb() {
     const currentAgent = store.getState().appStateReducers.currentAgentData;
 
-    if(TabDescription[this.props.currentTab]){
+    if(WAZUH_MODULES[this.props.currentTab]){
       const breadcrumb = currentAgent.id ? [
         { text: '' },
         { text: 'Modules', href: '/app/wazuh#/overview' },
         { agent: currentAgent },
-        { text: TabDescription[this.props.currentTab].title},
+        { text: WAZUH_MODULES[this.props.currentTab].title},
       ] :
       [
         { text: '' },
         { text: 'Modules', href: '/app/wazuh#/overview' },
         
         
-        { text: TabDescription[this.props.currentTab].title},
+        { text: WAZUH_MODULES[this.props.currentTab].title},
       ];
       store.dispatch(updateGlobalBreadcrumb(breadcrumb));
       $('#breadcrumbNoTitle').attr("title","");
@@ -80,10 +80,10 @@ class WzCurrentOverviewSection extends Component {
   render() {
     return (
       <span>
-      {/*this.props.currentTab && TabDescription[this.props.currentTab] && TabDescription[this.props.currentTab].title && (
+      {/*this.props.currentTab && WAZUH_MODULES[this.props.currentTab] && WAZUH_MODULES[this.props.currentTab].title && (
       <EuiTitle size='s'>
         <h2>
-          {TabDescription[this.props.currentTab].title}
+          {WAZUH_MODULES[this.props.currentTab].title}
        </h2>
       </EuiTitle>)*/}
         </span>

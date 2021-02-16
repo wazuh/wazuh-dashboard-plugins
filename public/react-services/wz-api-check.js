@@ -1,6 +1,6 @@
 /*
  * Wazuh app - API status check service
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -10,10 +10,10 @@
  * Find more information about this on the LICENSE file.
  */
 import { WazuhConfig } from './wazuh-config';
-import chrome from 'ui/chrome';
 import axios from 'axios';
 import { AppState } from './app-state';
 import { WzMisc } from '../factories/misc';
+import { getHttp } from '../kibana-services';
 
 export class ApiCheck {
   static async checkStored(data, idChanged = false) {
@@ -26,7 +26,7 @@ export class ApiCheck {
         payload.idChanged = data;
       }
 
-      const url = chrome.addBasePath('/api/check-stored-api');
+      const url = getHttp().basePath.prepend('/api/check-stored-api');
       const options = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'kbn-xsrf': 'kibana' },
@@ -69,7 +69,7 @@ export class ApiCheck {
     try {
       const wazuhConfig = new WazuhConfig();
       const { timeout } = wazuhConfig.getConfig();
-      const url = chrome.addBasePath('/api/check-api');
+      const url = getHttp().basePath.prepend('/api/check-api');
 
       const options = {
         method: 'POST',

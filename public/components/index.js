@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Wrap EUI components with ng-react and the Wazuh app
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -10,7 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 import './eui-loader';
-import { uiModules } from 'ui/modules';
 import { WzFilterBar } from './wz-filter-bar/wz-filter-bar';
 import { WzVisualize } from './visualize/wz-visualize';
 import { WzMenuWrapper } from '../components/wz-menu/wz-menu-wrapper';
@@ -20,8 +19,10 @@ import { ClusterDisabled } from '../components/management/cluster/cluster-disabl
 import { ClusterTimelions } from '../components/management/cluster/cluster-timelions';
 import { KibanaVisWrapper } from '../components/management/cluster/cluster-visualization';
 import { ToastNotificationsModal } from '../components/notifications/modal';
+import { getAngularModule } from '../kibana-services';
 
-const app = uiModules.get('app/wazuh', []);
+const app = getAngularModule();
+
 app.value('WzFilterBar', WzFilterBar);
 app.value('WzVisualize', WzVisualize);
 app.value('WzMenuWrapper', WzMenuWrapper);

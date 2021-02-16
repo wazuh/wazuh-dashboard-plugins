@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Agents preview controller
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -11,7 +11,6 @@
  */
 import * as FileSaver from '../../services/file-saver';
 import { DataFactory } from '../../services/data-factory';
-import { timefilter } from 'ui/timefilter';
 import { version } from '../../../package.json';
 import { clickAction } from '../../services/click-action';
 import { AppState } from '../../react-services/app-state';
@@ -21,6 +20,7 @@ import { WzRequest } from '../../react-services/wz-request';
 import { ShareAgent } from '../../factories/share-agent';
 import { TimeService } from '../../react-services/time-service';
 import { ErrorHandler } from '../../react-services/error-handler';
+import { getDataPlugin } from '../../kibana-services';
 
 export class AgentsPreviewController {
   /**
@@ -61,7 +61,7 @@ export class AgentsPreviewController {
     this.api = JSON.parse(AppState.getCurrentAPI()).id;
     const loc = this.$location.search();
     if ((loc || {}).agent && (loc || {}).agent !== '000') {
-      this.commonData.setTimefilter(timefilter.getTime());
+      this.commonData.setTimefilter( getDataPlugin().timefilter.timefilter.getTime());
       return this.showAgent({ id: loc.agent });
     }
 

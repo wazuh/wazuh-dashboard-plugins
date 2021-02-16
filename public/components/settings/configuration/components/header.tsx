@@ -1,7 +1,7 @@
 /*
  * Wazuh app - React component building the configuration component.
  *
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -72,7 +72,7 @@ const SubTitle = () => {
     <EuiFlexItem >
       <EuiText color="subdued" style={{ paddingBottom: '15px' }}>
         Configuration file located at
-        /usr/share/kibana/optimize/wazuh/config/wazuh.yml
+        /usr/share/kibana/data/wazuh/config/wazuh.yml
           </EuiText>
     </EuiFlexItem>
   )
@@ -96,7 +96,7 @@ const SearchBar = ({query, setQuery}) => {
   }
   return (
     <Fragment>
-      <EuiSearchBar 
+      <EuiSearchBar
         filters={[{
           type:'field_value_selection',
           field:'category',

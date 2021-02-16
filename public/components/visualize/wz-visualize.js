@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for Visualize.
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,9 +32,8 @@ import { VisHandlers } from '../../factories/vis-handlers';
 import { RawVisualizations } from '../../factories/raw-visualizations';
 import { Metrics } from '../overview/metrics/metrics';
 import { PatternHandler } from '../../react-services/pattern-handler';
-import { toastNotifications } from 'ui/notify';
+import { getToasts }  from '../../kibana-services';
 import { SecurityAlerts } from './components';
-import { getServices } from '../../../../../src/plugins/discover/public/kibana_services';
 
 const visHandler = new VisHandlers();
 
@@ -50,7 +49,6 @@ export class WzVisualize extends Component {
       refreshingKnownFields: [],
       refreshingIndex: true
     };
-    this.KibanaServices =  getServices();
     this.metricValues = false;
     this.rawVisualizations = new RawVisualizations();
     this.wzReq = WzRequest;
@@ -64,7 +62,7 @@ export class WzVisualize extends Component {
 
 
   showToast(color, title = '', text = '', time = 3000) {
-    toastNotifications.add({
+    getToasts().add({
       color: color,
       title: title,
       text: text,

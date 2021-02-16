@@ -24,7 +24,7 @@ import {
 import { WzRequest } from '../../../react-services/wz-request';
 import TimeService from '../../../react-services/time-service'
 import exportCsv from '../../../react-services/wz-csv';
-import { toastNotifications } from 'ui/notify';
+import { getToasts }  from '../../../kibana-services';
 import { WzSearchBar, filtersToObject } from '../../../components/wz-search-bar';
 import { RuleText, ComplianceText } from './components';
 
@@ -174,10 +174,6 @@ export class Inventory extends Component {
     if (JSON.stringify(this.props.agent) !== JSON.stringify(prevProps.agent)) {
       this.setState({ lookingPolicy: false }, async () => await this.initialize());
     }
-    if(!_.isEqual(this.state.filters, prevState.filters)) {
-      const items = this.getItems()
-      this.setState({ items });
-    }
   }
 
   componentWillUnmount() {
@@ -273,34 +269,36 @@ export class Inventory extends Component {
   }
 
   async loadScaPolicy(policy) {
-    const filtersObject = filtersToObject(this.state.filters);
     this._isMount && this.setState({ loadingPolicy: true, itemIdToExpandedRowMap: {}, pageIndex: 0 });
     if (policy) {
       try {
-        const checks = await this.wzReq.apiReq(
+        // It query all checks whitout filters, because the filters are applied in the results
+        // due to the use of EuiInMemoryTable instead EuiTable components and do arequest with each change of filters.
+        const checksResponse = await this.wzReq.apiReq(
           'GET',
           `/sca/${this.props.agent.id}/checks/${policy.policy_id}`,
-          { params: { ...filtersObject } }
+          { }
         );
-
-        this.checks = (((checks || {}).data || {}).data || {}).affected_items || [];
-        this.buildSuggestionSearchBar(policy.policy_id, this.checks);
+        const checks = ((((checksResponse || {}).data || {}).data || {}).affected_items || [])
+          .map(item => ({...item, result: item.result || 'not applicable'}));
+        this.buildSuggestionSearchBar(policy.policy_id, checks);
+        this._isMount && this.setState({ lookingPolicy: policy, loadingPolicy: false, items: checks });
       } catch (err) {
         // We can't ensure the suggestions contains valid characters
-        toastNotifications.add({
+        getToasts().add({
           color: 'danger',
           title: 'Error',
           text: 'The filter contains invalid characters',
           toastLifeTimeMs: 10000,
         });
-        this.setState({ lookingPolicy: policy, loadingPolicy: false })
+        this.setState({ lookingPolicy: policy, loadingPolicy: false });
       }
+    }else{
+      this._isMount && this.setState({ lookingPolicy: policy, loadingPolicy: false, items: [] });
     }
-    const items = this.getItems();
-    this._isMount && this.setState({ lookingPolicy: policy, loadingPolicy: false, items });
   }
 
-  getItems = () => !!this.checks && this.checks.filter(check =>
+  filterPolicyChecks = () => !!this.state.items && this.state.items.filter(check =>
       this.state.filters.every(filter => 
         filter.field === 'search'
         ? Object.keys(check).some(key =>  ['string', 'number'].includes(typeof check[key]) && String(check[key]).toLowerCase().includes(filter.value.toLowerCase()))
@@ -373,7 +371,7 @@ export class Inventory extends Component {
   };
 
   showToast = (color, title, time) => {
-    toastNotifications.add({
+    getToasts().add({
       color: color,
       title: title,
       toastLifeTimeMs: time,
@@ -411,19 +409,7 @@ export class Inventory extends Component {
         onClick: () => this.toggleDetails(item)
       };
     };
-    const pagination = {
-      pageIndex: this.state.pageIndex,
-      pageSize: 10,
-      totalItemCount: (this.checks || []).length,
-      pageSizeOptions: [10, 25, 50, 100]
-    };
 
-    const search = {
-      box: {
-        incremental: this.state.incremental,
-        schema: true
-      }
-    };
     const sorting = {
       sort: {
         field: 'id',
@@ -548,7 +534,7 @@ export class Inventory extends Component {
                     <EuiStat title={this.buttonStat(this.state.lookingPolicy.fail, 'result', 'failed')} description="Fail" titleColor="danger" titleSize="m" textAlign="center" />
                   </EuiFlexItem>
                   <EuiFlexItem>
-                    <EuiStat title={this.buttonStat(this.state.lookingPolicy.invalid, 'result', '')} description="Not applicable" titleColor="subdued" titleSize="m" textAlign="center" />
+                    <EuiStat title={this.buttonStat(this.state.lookingPolicy.invalid, 'result', 'not applicable')} description="Not applicable" titleColor="subdued" titleSize="m" textAlign="center" />
                   </EuiFlexItem>
                   <EuiFlexItem>
                     <EuiStat title={`${this.state.lookingPolicy.score}%`} description="Score" titleColor="accent" titleSize="m" textAlign="center" />
@@ -572,14 +558,14 @@ export class Inventory extends Component {
                 <EuiFlexGroup>
                   <EuiFlexItem>
                     <EuiInMemoryTable
-                      items={this.state.items}
+                      items={this.filterPolicyChecks()}
                       columns={this.columnsChecks}
                       rowProps={getChecksRowProps}
                       itemId="id"
                       itemIdToExpandedRowMap={this.state.itemIdToExpandedRowMap}
                       isExpandable={true}
                       sorting={sorting}
-                      pagination={pagination}
+                      pagination={true}
                       loading={this.state.loadingPolicy}
                     />
                   </EuiFlexItem>

@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Acntion Agents Service
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -10,11 +10,11 @@
  * Find more information about this on the LICENSE file.
  */
 import { WzRequest } from './wz-request';
-import { toastNotifications } from 'ui/notify';
+import { getToasts }  from '../kibana-services';
 
 export class ActionAgents {
   static showToast = (color, title, text, time) => {
-    toastNotifications.add({
+    getToasts().add({
       color: color,
       title: title,
       text: text,

@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for render settings with a list selector.
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -12,8 +12,6 @@
 
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
-import chrome from 'ui/chrome';
-const IS_DARK_THEME = chrome.getUiSettingsClient().get('theme:darkMode');
 
 import {
   EuiFlexGroup,
@@ -24,6 +22,9 @@ import {
 } from '@elastic/eui';
 
 import WzConfigurationSettingsGroup from './configuration-settings-group';
+import { getUiSettings } from '../../../../../../kibana-services';
+
+const IS_DARK_THEME = getUiSettings().get('theme:darkMode');
 
 class WzConfigurationSettingsListSelector extends Component {
   constructor(props) {

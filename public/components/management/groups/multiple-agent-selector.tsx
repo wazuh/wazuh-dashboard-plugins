@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Multiple agent selector component
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@ import {
 } from '@elastic/eui';
 import { ErrorHandler } from '../../../react-services/error-handler';
 import { WzRequest } from '../../../react-services/wz-request';
-import './multiple-agent-selector.less'
+import './multiple-agent-selector.scss'
 import $ from 'jquery';
 import { WzFieldSearchDelay } from '../../common/search';
 

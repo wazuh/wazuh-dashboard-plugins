@@ -20,25 +20,138 @@
 import {
   CoreSetup,
   CoreStart,
+  Logger,
   Plugin,
-} from '../../../src/core/server';
+  PluginInitializerContext,
+  SharedGlobalConfig
+} from 'kibana/server';
 
-import { WazuhPluginSetup, WazuhPluginStart } from './types';
+import { WazuhPluginSetup, WazuhPluginStart, PluginSetup } from './types';
+import { SecurityObj, ISecurityFactory } from './lib/security-factory';
+import { setupRoutes } from './routes';
+import { jobInitializeRun, jobMonitoringRun, jobSchedulerRun, jobQueueRun } from './start';
+import { getCookieValueByName } from './lib/cookie';
+import * as ApiInterceptor  from './lib/api-interceptor';
+import { schema, TypeOf } from '@kbn/config-schema';
+import type { Observable } from 'rxjs';
+import { first } from 'rxjs/operators';
 
-import { initApp } from '../init';
-
-interface LegacySetup {
-  server: any
+declare module 'kibana/server' {
+  interface RequestHandlerContext {
+    wazuh: {
+      logger: Logger,
+      plugins: PluginSetup,
+      security: ISecurityFactory
+      api: {
+        client: {
+          asInternalUser: {
+            authenticate: (apiHostID: string) => Promise<string>
+            request: (method: string, path: string, data: any, options: {apiHostID: string, forceRefresh?:boolean}) => Promise<any>
+          },
+          asCurrentUser: {
+            authenticate: (apiHostID: string) => Promise<string>
+            request: (method: string, path: string, data: any, options: {apiHostID: string, forceRefresh?:boolean}) => Promise<any>
+          }
+        }
+      }
+    };
+  }
 }
 
 export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
-  public setup(core: CoreSetup, plugins: WazuhPluginSetup, __LEGACY: LegacySetup) {
-    // Add server routes and initialize the plugin here
-    initApp(__LEGACY.server);
+  private readonly logger: Logger;
+
+  constructor(private readonly initializerContext: PluginInitializerContext) {
+    this.logger = initializerContext.logger.get();
+  }
+
+  public async setup(core: CoreSetup, plugins: PluginSetup) {
+    this.logger.debug('Wazuh-wui: Setup');
+
+    const wazuhSecurity = SecurityObj(plugins);
+
+    core.http.registerRouteHandlerContext('wazuh', (context, request) => {
+      return {
+        logger: this.logger,
+        plugins,
+        security: wazuhSecurity,
+        api: {
+          client: {
+            asInternalUser: {
+              authenticate: async (apiHostID) => await ApiInterceptor.authenticate(apiHostID),
+              request: async (method, path, data, options) => await ApiInterceptor.requestAsInternalUser(method, path, data, options),
+            },
+            asCurrentUser: {
+              authenticate: async (apiHostID) => await ApiInterceptor.authenticate(apiHostID, (await wazuhSecurity.getCurrentUser(request, context)).authContext),
+              request: async (method, path, data, options) => await ApiInterceptor.requestAsCurrentUser(method, path, data, {...options, token: getCookieValueByName(request.headers.cookie, 'wz-token')}),
+            }
+          }
+        }
+      };
+    });
+
+    // Routes
+    const router = core.http.createRouter();
+    setupRoutes(router);
+
     return {};
   }
 
-  public start(core: CoreStart) {
+  public async start(core: CoreStart) {
+    const globalConfiguration: SharedGlobalConfig = await this.initializerContext.config.legacy.globalConfig$.pipe(first()).toPromise();
+
+    const wazuhApiClient = {
+      client: {
+        asInternalUser: {
+          authenticate: async (apiHostID) => await ApiInterceptor.authenticate(apiHostID),
+          request: async (method, path, data, options) => await ApiInterceptor.requestAsInternalUser(method, path, data, options),
+        }
+      }
+    };
+
+    const contextServer = {
+      config: globalConfiguration
+    };
+
+    // Initialize
+    jobInitializeRun({
+      core, 
+      wazuh: {
+        logger: this.logger.get('initialize'),
+        api: wazuhApiClient
+      },
+      server: contextServer
+    });
+
+    // Monitoring
+    jobMonitoringRun({
+      core,
+      wazuh: {
+        logger: this.logger.get('monitoring'),
+        api: wazuhApiClient
+      },
+      server: contextServer
+    });
+
+    // Scheduler
+    jobSchedulerRun({
+      core,
+      wazuh: {
+        logger: this.logger.get('cron-scheduler'),
+        api: wazuhApiClient
+      },
+      server: contextServer
+    });
+
+    // Queue
+    jobQueueRun({
+      core, 
+      wazuh: {
+        logger: this.logger.get('queue'),
+        api: wazuhApiClient
+      },
+      server: contextServer
+    });
     return {};
   }
 

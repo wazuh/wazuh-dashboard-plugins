@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Generic request
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -11,12 +11,12 @@
  */
 
 import axios from 'axios';
-import chrome from 'ui/chrome';
 import { AppState } from './app-state';
 import { WazuhConfig } from './wazuh-config';
 import { ApiCheck } from './wz-api-check';
 import { WzMisc } from '../factories/misc';
 import { OdfeUtils } from '../utils';
+import { getHttp } from '../kibana-services';
 
 export class GenericRequest {
   static async request(method, path, payload = null) {
@@ -30,7 +30,7 @@ export class GenericRequest {
         'Content-Type': 'application/json',
         'kbn-xsrf': 'kibana'
       };
-      const tmpUrl = chrome.addBasePath(path);
+      const tmpUrl = getHttp().basePath.prepend(path);
 
       requestHeaders.pattern = AppState.getCurrentPattern();
 

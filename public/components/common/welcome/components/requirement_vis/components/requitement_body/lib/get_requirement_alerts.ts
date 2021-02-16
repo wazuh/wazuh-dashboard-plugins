@@ -2,7 +2,7 @@
  * Wazuh app - React component building the welcome screen of an agent.
  * version, OS, registration date, last keep alive.
  *
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 import { IFilterParams, getElasticAlerts, getIndexPattern } from '../../../../../../../overview/mitre/lib';
 import { getWazuhFilter } from '../../../../fim_events_table';
 import { buildPhraseFilter, buildExistsFilter } from '../../../../../../../../../../../src/plugins/data/common';
-import { toastNotifications } from 'ui/notify';
+import { getToasts }  from '../../../../../../../../kibana-services';
 
 export async function getRequirementAlerts(agentId, time, requirement) {
   const indexPattern = await getIndexPattern();
@@ -40,7 +40,7 @@ export async function getRequirementAlerts(agentId, time, requirement) {
   const response = await getElasticAlerts(indexPattern, filterParams, aggs);
   const alerts_count = ((((response || {}).data || {}).aggregations || {}).alerts_count || {}).buckets;
   if (typeof alerts_count === 'undefined') {
-    toastNotifications.add({
+    getToasts().add({
       color: 'warning',
       title: 'Error getting alerts from compliances',
       text: "Your environment may not have any index with Wazuh's alerts."

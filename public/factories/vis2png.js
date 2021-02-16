@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Fetch png from visualization div
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -11,8 +11,8 @@
  */
 
 import domtoimage from '../utils/dom-to-image';
-import { getAngularModule } from '../../../../src/plugins/discover/public/kibana_services';
-const app = getAngularModule('app/wazuh');
+import { getAngularModule } from '../kibana-services';
+const app = getAngularModule();
 
 export class Vis2PNG {
   /**

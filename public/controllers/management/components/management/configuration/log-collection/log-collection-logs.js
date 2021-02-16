@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for show configuration of log collection - logs tab.
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,8 @@ import {
 import { settingsListBuilder } from '../utils/builders';
 
 import helpLinks from './help-links';
+
+const renderTargetField = item => item ? item.join(', ') : 'agent';
 
 const mainSettings = [
   { field: 'logformat', label: 'Log format' },
@@ -57,7 +59,6 @@ const mainSettings = [
   }
 ];
 
-const renderTargetField = item => item ? item.join(', ') : 'agent';
 
 const getMainSettingsAgentOrManager = agent =>
   agent && agent.id === '000'

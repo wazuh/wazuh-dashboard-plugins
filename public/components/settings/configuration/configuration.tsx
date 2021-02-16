@@ -1,7 +1,7 @@
 /*
  * Wazuh app - React component building the configuration component.
  *
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ import store from '../../../redux/store'
 import { updateSelectedSettingsSection } from '../../../redux/actions/appStateActions';
 import { withUserAuthorizationPrompt } from '../../common/hocs/withUserAuthorization'
 import { EuiSpacer } from '@elastic/eui';
-import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../../util/constants';
+import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../../common/constants';
 
 export type ISetting = {
   setting: string

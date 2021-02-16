@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React hook for get query of Kibana searchBar
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -221,6 +221,64 @@ describe('Wazuh User Permissions', () => {
           userClusterTest
         );
         expect(result).toEqual(missingPermissionsForClusterUser);
+      });
+    });
+
+    describe('Should return all the required permissions to show Agent and Groups view', () => {
+      const requiredAgentView = [
+        {
+          action: 'agent:read',
+          resource: 'agent:id:*',
+        },
+        {
+          action: 'group:read',
+          resource: 'group:id:*',
+        },
+      ];
+      const userAgent1 = {
+        'agent:read': {
+          'agent:id:001': 'allow',
+        },
+        'group:read': {
+          'group:id:001': 'allow',
+        },
+        rbac_mode: 'white',
+      };
+      it('Should return OK for particular agent and group id', () => {
+        const result = WzUserPermissions.checkMissingUserPermissions(
+          requiredAgentView,
+          userAgent1
+        );
+        expect(result).toEqual(false);
+      });
+    });
+
+    describe('Should return all the required permissions to show Agent and Groups view', () => {
+      const requiredAgentView = [
+        {
+          action: 'agent:read',
+          resource: 'agent:id:*',
+        },
+        {
+          action: 'group:read',
+          resource: 'group:id:*',
+        },
+      ];
+      const userAgent1 = {
+        'agent:read': {
+          'agent:id:*': 'allow',
+        },
+        'group:read': {
+          'group:id:*': 'allow',
+        },
+        rbac_mode: 'white',
+      };
+      it('Should return OK for all agents and groups', () => {
+        const result = WzUserPermissions.checkMissingUserPermissions(
+          requiredAgentView,
+          userAgent1
+        );
+        expect(result).toEqual(false);
       });
     });
   });

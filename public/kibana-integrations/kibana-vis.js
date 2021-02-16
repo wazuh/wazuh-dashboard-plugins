@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for custom kibana visualizations.
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -12,7 +12,6 @@
 import React, { Component } from "react";
 
 import $ from "jquery";
-import { timefilter } from "ui/timefilter";
 import dateMath from "@elastic/datemath";
 import { DiscoverPendingUpdates } from "../factories/discover-pending-updates";
 import { connect } from "react-redux";
@@ -23,13 +22,7 @@ import { TabVisualizations } from "../factories/tab-visualizations";
 import store from "../redux/store";
 import { updateMetric } from "../redux/actions/visualizationsActions";
 import { GenericRequest } from "../react-services/generic-request";
-import { npStart } from "ui/new_platform";
-import { createSavedVisLoader } from "./saved_visualizations";
-import { TypesService } from "../../../../src/plugins/visualizations/public/vis_types";
-import { Vis } from "../../../../src/plugins/visualizations/public";
-import { convertToSerializedVis } from "../../../../src/plugins/visualizations/public/saved_visualizations/_saved_vis";
-import { toastNotifications } from "ui/notify";
-import { getAngularModule } from "../../../../src/plugins/discover/public/kibana_services";
+import { createSavedVisLoader } from "./visualizations/saved_visualizations";
 import {
   EuiLoadingChart,
   EuiLoadingSpinner,
@@ -38,6 +31,7 @@ import {
   EuiFlexItem,
   EuiFlexGroup,
 } from "@elastic/eui";
+import { getAngularModule, getToasts, getVisualizationsPlugin, getSavedObjects, getDataPlugin, getChrome, getOverlays } from '../kibana-services';
 
 class KibanaVis extends Component {
   _isMounted = false;
@@ -62,27 +56,28 @@ class KibanaVis extends Component {
     this.tabVisualizations = new TabVisualizations();
     this.state = {
       visRefreshingIndex: false,
-    };
+    };   
     const services = {
-      savedObjectsClient: npStart.core.savedObjects.client,
-      indexPatterns: npStart.plugins.data.indexPatterns,
-      search: npStart.plugins.data.search,
-      chrome: npStart.core.chrome,
-      overlays: npStart.core.overlays,
+      savedObjectsClient: getSavedObjects().client,
+      indexPatterns: getDataPlugin().indexPatterns,
+      search: getDataPlugin().search,
+      chrome: getChrome(),
+      overlays: getOverlays(),
     };
     const servicesForVisualizations = {
       ...services,
-      ...{ visualizationTypes: new TypesService().start() },
+      ...{ visualizationTypes: getVisualizationsPlugin() },
     };
     this.savedObjectLoaderVisualize = createSavedVisLoader(
       servicesForVisualizations
     );
     this.visID = this.props.visID;
     this.tab = this.props.tab;
+
   }
 
   showToast = (color, title, text, time) => {
-    toastNotifications.add({
+    getToasts().add({
       color: color,
       title: title,
       text: text,
@@ -90,26 +85,9 @@ class KibanaVis extends Component {
     });
   };
 
-  resetSavedObjectLoaderVisualize = () => {
-    const services = {
-      savedObjectsClient: npStart.core.savedObjects.client,
-      indexPatterns: npStart.plugins.data.indexPatterns,
-      search: npStart.plugins.data.search,
-      chrome: npStart.core.chrome,
-      overlays: npStart.core.overlays,
-    };
-    const servicesForVisualizations = {
-      ...services,
-      ...{ visualizationTypes: new TypesService().start() },
-    };
-    this.savedObjectLoaderVisualize = createSavedVisLoader(
-      servicesForVisualizations
-    );
-  };
-
   componentDidMount() {
     this._isMounted = true;
-    const app = getAngularModule("app/wazuh");
+    const app = getAngularModule();
     this.$rootScope = app.$injector.get("$rootScope");
   }
 
@@ -219,6 +197,7 @@ class KibanaVis extends Component {
   };
 
   myRender = async (raw) => {
+    const timefilter = getDataPlugin().query.timefilter.timefilter;
     try {
       const discoverList = this.discoverPendingUpdates.getList();
       const isAgentStatus =
@@ -250,15 +229,14 @@ class KibanaVis extends Component {
             this.visID,
             rawVis[0]
           );
-          this.visualization.searchSource = await npStart.plugins.data.search.searchSource.create();
+          this.visualization.searchSource = await getDataPlugin().search.searchSource.create();
           // Visualization doesn't need the "_source"
           this.visualization.searchSource.setField("source", false);
           // Visualization doesn't need "hits"
           this.visualization.searchSource.setField('size', 0);
-          const visState = await convertToSerializedVis(this.visualization);
-          const vis = new Vis(this.visualization.visState.type, visState);
-          await vis.setState(visState);
-          this.visHandler = await npStart.plugins.visualizations.__LEGACY.createVisEmbeddableFromObject(
+          const visState = await getVisualizationsPlugin().convertToSerializedVis(this.visualization);        
+          const vis = await getVisualizationsPlugin().createVis(this.visualization.visState.type, visState);
+          this.visHandler = await getVisualizationsPlugin().__LEGACY.createVisEmbeddableFromObject(
             vis,
             visInput
           );
@@ -304,6 +282,7 @@ class KibanaVis extends Component {
         this.renderInProgress = false;
         return this.myRender(raw);
       } else {
+        console.error(error);
       }
     }
 

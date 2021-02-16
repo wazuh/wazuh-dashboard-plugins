@@ -1,7 +1,7 @@
 /*
  * Wazuh app - React component building the API entries table.
  *
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -115,7 +115,7 @@ export default class SettingsLogs extends Component {
             <EuiFlexItem>
               <EuiText color="subdued" style={{ paddingBottom: '15px' }}>
                 Log file located at
-                /usr/share/kibana/optimize/wazuh/logs/wazuhapp.log
+                /usr/share/kibana/data/wazuh/logs/wazuhapp.log
               </EuiText>
             </EuiFlexItem>
           </EuiFlexGroup>

@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for Visualize.
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@ import {
   EuiModalHeaderTitle,
   EuiModalBody
 } from '@elastic/eui';
-import './visualize-top-menu.less';
+import './visualize-top-menu.scss';
 import WzReduxProvider from '../../redux/wz-redux-provider';
 
 export class VisualizeTopMenu extends Component {

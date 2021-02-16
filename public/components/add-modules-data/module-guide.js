@@ -1,6 +1,6 @@
 /*
 * Wazuh app - React component for show a module guide.
-* Copyright (C) 2015-2020 Wazuh, Inc.
+* Copyright (C) 2015-2021 Wazuh, Inc.
 *
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ import {
 import moduleGuides from './guides';
 import js2xmlparser from 'js2xmlparser';
 import XMLBeautifier from '../../controllers/management/components/management/configuration/utils/xml-beautifier';
-import { toastNotifications } from 'ui/notify';
+import { getToasts }  from '../../../kibana-services';
 
 const js2xmlOptionsParser = {
   format: {
@@ -161,7 +161,7 @@ class WzModuleGuide extends Component {
     });
   }
   addToast({color, title, text, time = 3000}){
-    toastNotifications.add({title, text, toastLifeTimeMs: time, color})
+    getToasts().add({title, text, toastLifeTimeMs: time, color})
   }
   transformStateElementToJSON(element, accum){
     if (!element.enabled && !element.elements) { return accum}

@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for build q queries.
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,10 +22,9 @@ import { connect } from 'react-redux';
 import { showExploreAgentModalGlobal } from '../../redux/actions/appStateActions';
 import store from '../../redux/store';
 import { AgentSelectionTable } from '../../controllers/overview/components/overview-actions/agents-selection-table';
-import chrome from 'ui/chrome';
-import { getServices } from '../../../../../src/plugins/discover/public/kibana_services';
-import { WAZUH_ALERTS_PATTERN } from '../../../util/constants';
+import { WAZUH_ALERTS_PATTERN } from '../../../common/constants';
 import { AppState } from '../../react-services/app-state';
+import { getAngularModule, getDataPlugin } from '../../kibana-services';
 
 class WzAgentSelector extends Component {
   constructor(props) {
@@ -37,7 +36,7 @@ class WzAgentSelector extends Component {
   }
 
   async componentDidMount() {
-    const $injector = await chrome.dangerouslyGetActiveInjector();
+    const $injector = getAngularModule().$injector;
     this.route = $injector.get('$route');
     this.location = $injector.get('$location');
   }
@@ -55,10 +54,10 @@ class WzAgentSelector extends Component {
     }
     this.location.search('agentId', store.getState().appStateReducers.currentAgentData.id ? String(store.getState().appStateReducers.currentAgentData.id):null);
 
-    const { filterManager } = getServices();
+    const { filterManager } = getDataPlugin().query;
     if (agentIdList && agentIdList.length) {
       if (agentIdList.length === 1) {
-        const currentAppliedFilters = filterManager.filters;
+        const currentAppliedFilters = filterManager.getFilters();
         const agentFilters = currentAppliedFilters.filter(x => {
           return x.meta.key !== 'agent.id';
         });

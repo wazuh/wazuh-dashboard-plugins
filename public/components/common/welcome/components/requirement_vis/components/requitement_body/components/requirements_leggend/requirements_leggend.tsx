@@ -2,7 +2,7 @@
  * Wazuh app - React component building the welcome screen of an agent.
  * version, OS, registration date, last keep alive.
  *
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -13,16 +13,16 @@
  */
 
 // @ts-ignore
-import chrome from 'ui/chrome';
 import React from "react";
 import { EuiIcon } from "@elastic/eui";
 import { EuiListGroup } from "@elastic/eui";
-import './requirements_leggend.less';
+import './requirements_leggend.scss';
 import rison from 'rison-node';
 import { buildPhraseFilter } from '../../../../../../../../../../../../src/plugins/data/common';
 import { getIndexPattern } from '../../../../../../../../overview/mitre/lib';
 import store from '../../../../../../../../../redux/store';
 import { updateCurrentAgentData } from '../../../../../../../../../redux/actions/appStateActions';
+import { getAngularModule } from '../../../../../../../../../kibana-services';
 
 export function Requirements_leggend({ data, colors, requirement, agent }) {
   const list = data.map((item, idx) => ({
@@ -44,23 +44,22 @@ export function Requirements_leggend({ data, colors, requirement, agent }) {
 
 const goToDashboardWithFilter = (requirement, item, agent) => {
   store.dispatch(updateCurrentAgentData(agent));
-  chrome.dangerouslyGetActiveInjector().then(injector => {
-    const route = injector.get('$route');
-    getIndexPattern().then(indexPattern => {
-      const filters = [{
-        ...buildPhraseFilter({ name: `rule.${requirement}`, type: 'text' }, item.key, indexPattern),
-        "$state": { "isImplicit": false, "store": "appState" },
-      }]
-      const _w = { filters };
-      const params = {
-        tab: tabEquivalence[requirement],
-        _w: rison.encode(_w)
-      };
-      const url = Object.entries(params).map(e => e.join('=')).join('&');
-      window.location.href = `#/overview?${url}`;
-      route.reload();
-    });
-  })
+  const $injector = getAngularModule().$injector;
+  const route = $injector.get('$route');
+  getIndexPattern().then(indexPattern => {
+    const filters = [{
+      ...buildPhraseFilter({ name: `rule.${requirement}`, type: 'text' }, item.key, indexPattern),
+      "$state": { "isImplicit": false, "store": "appState" },
+    }]
+    const _w = { filters };
+    const params = {
+      tab: tabEquivalence[requirement],
+      _w: rison.encode(_w)
+    };
+    const url = Object.entries(params).map(e => e.join('=')).join('&');
+    window.location.href = `#/overview?${url}`;
+    route.reload();
+  });  
 }
 
 const tabEquivalence = {
