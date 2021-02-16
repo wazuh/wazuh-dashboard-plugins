@@ -2,6 +2,12 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.1.1 - Kibana 7.10.0 , 7.10.2 - Revision 4102
+
+### Fixed
+
+- Support for alerts index pattern with different ID and name [#2979](https://github.com/wazuh/wazuh-kibana-app/pull/2979)
+
 ## Wazuh v4.1.0 - Kibana 7.10.0 , 7.10.2 - Revision 4101
 
 ### Added
