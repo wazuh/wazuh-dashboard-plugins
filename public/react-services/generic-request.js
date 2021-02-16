@@ -16,7 +16,7 @@ import { WazuhConfig } from './wazuh-config';
 import { ApiCheck } from './wz-api-check';
 import { WzMisc } from '../factories/misc';
 import { OdfeUtils } from '../utils';
-import { getHttp } from '../kibana-services';
+import { getHttp, getDataPlugin } from '../kibana-services';
 
 export class GenericRequest {
   static async request(method, path, payload = null) {
@@ -32,8 +32,7 @@ export class GenericRequest {
       };
       const tmpUrl = getHttp().basePath.prepend(path);
 
-      requestHeaders.pattern = AppState.getCurrentPattern();
-
+      requestHeaders.pattern = (await getDataPlugin().indexPatterns.get(AppState.getCurrentPattern())).title;
       try {
         requestHeaders.id = JSON.parse(AppState.getCurrentAPI()).id;
       } catch (error) {
