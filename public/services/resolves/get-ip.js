@@ -24,6 +24,16 @@ export function getIp(
 ) {
   const deferred = $q.defer();
 
+  const checkWazuhConfig = async (indexPatterns) => {
+    const wazuhConfig = new WazuhConfig();
+    const configuration = wazuhConfig.getConfig();
+    let indexPatternFound = indexPatterns.find((indexPattern) => indexPattern.attributes.title === configuration.pattern);
+    if(!indexPatternFound){
+      AppState.removeCurrentPattern()
+    }
+    return indexPatternFound;
+  }
+
   const checkWazuhPatterns = async (indexPatterns) => {
     const wazuhConfig = new WazuhConfig();
     const configuration = wazuhConfig.getConfig();
@@ -52,7 +62,7 @@ export function getIp(
 
       let currentPattern = '';
 
-      if (AppState.getCurrentPattern() && await checkWazuhPatterns(savedObjects)) {
+      if (AppState.getCurrentPattern() && await checkWazuhPatterns(savedObjects) && await checkWazuhConfig(savedObjects)) {
         // There's cookie for the pattern
         currentPattern = AppState.getCurrentPattern();
       } else {

@@ -13,7 +13,7 @@ import { GenericRequest } from './generic-request';
 import { AppState } from './app-state';
 import { WzMisc } from '../factories/misc';
 import { SavedObject } from './saved-objects';
-import { getDataPlugin, getToasts }  from '../kibana-services';
+import { getDataPlugin, getToasts } from '../kibana-services';
 import { WazuhConfig } from '../react-services/wazuh-config';
 
 export class PatternHandler {
@@ -45,11 +45,15 @@ export class PatternHandler {
             );
         }
       }
-      if (!patternList.length) {
+
+      const wazuhConfig = new WazuhConfig();
+      const { pattern } = wazuhConfig.getConfig();
+      let indexPatternFound = patternList.find((indexPattern) => indexPattern.title === pattern);
+
+      if (!indexPatternFound) {
         // if no valid index patterns are found we try to create the wazuh-alerts-*
         try {
-          const wazuhConfig = new WazuhConfig();
-          const { pattern } = wazuhConfig.getConfig();
+
           if (!pattern) return;
 
           getToasts().add({
