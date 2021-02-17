@@ -113,7 +113,7 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
   };
   
   const getRulesFromJson = (jsonRule) => {
-    if (jsonRule !== '{}') {
+    if (jsonRule !== '{}' && jsonRule !== '') {
       // empty json is valid
       const { customRules, internalUsersRules, wrongFormat, logicalOperator } = decodeJsonRule(
         jsonRule,
@@ -241,6 +241,10 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
 
   const saveRule = () => {
     if (isJsonEditor) {
+      // if json editor is empty
+      if (ruleJson === '') {
+        setRuleJson('{}');
+      }
       save(JSON.parse(ruleJson));
     } else {
       save(getJsonFromRule(internalUserRules, rules, logicalOperator));
