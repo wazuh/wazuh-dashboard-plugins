@@ -12,6 +12,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Fixed
 
 - Fix server error Invalid token specified: Cannot read property 'replace' of undefined [#2899](https://github.com/wazuh/wazuh-kibana-app/issues/2899)
+- Fixed forcing a non numeric filter value in a number type field [#2961](https://github.com/wazuh/wazuh-kibana-app/pull/2961)
 
 ## Wazuh v4.0.4 - Kibana 7.10.0 , 7.10.2 - Revision 4017
 
