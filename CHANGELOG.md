@@ -37,7 +37,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed number agents not show on pie onMouseEvent [#2890](https://github.com/wazuh/wazuh-kibana-app/issues/2890)
 - Fixed off Kibana Query Language in search bar of Controls/Inventory modules. [#2945](https://github.com/wazuh/wazuh-kibana-app/pull/2945)
 - Fixed number of agents do not show on the pie chart tooltip in agents preview [#2890](https://github.com/wazuh/wazuh-kibana-app/issues/2890)
-- Fix the unpin button in agent selection modal [#2949](https://github.com/wazuh/wazuh-kibana-app/issues/2949)
+- Fix the unpin button in agent selection modal [#2980](https://github.com/wazuh/wazuh-kibana-app/pull/2980)
 
 ## Wazuh v4.0.4 - Kibana 7.10.0 , 7.10.2 - Revision 4017
 
