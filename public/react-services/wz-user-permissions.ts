@@ -964,14 +964,26 @@ export class WzUserPermissions{
         })
         .join('&');
 
+      const multiplePermission = (resource: string) => {
+        return (
+          ![actionResource, actionResourceAll].includes(resource) &&
+          (resource.match(`/${actionResource}/`) || resource.match(`/${actionResourceAll}/`))
+        );
+      };
+
+      const simplePermission = (resource: string) => {
+        return (
+          ![actionResource, actionResourceAll].includes(resource) &&
+          (resource.match(actionResource.replace('*', '\\*')) ||
+            resource.match(actionResourceAll.replace('*', '\*')))
+        );
+      };
+
       const userPartialResources: string[] | undefined = userPermissions[actionName]
         ? Object.keys(userPermissions[actionName]).filter((resource) =>
             resource.match('&')
-              ? ![actionResource, actionResourceAll].includes(resource) &&
-                (resource.match(`/${actionResource}/`) || resource.match(`/${actionResourceAll}/`))
-              : ![actionResource, actionResourceAll].includes(resource) &&
-                (resource.match(actionResource.replace('*', '\\*')) ||
-                  resource.match(actionResourceAll.replace('*', '\*')))
+              ? multiplePermission(resource)
+              : simplePermission(resource)
           )
         : undefined;
 

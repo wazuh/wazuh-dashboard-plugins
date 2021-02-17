@@ -281,5 +281,41 @@ describe('Wazuh User Permissions', () => {
         expect(result).toEqual(false);
       });
     });
+
+    describe('Should return all OK to show inventory on MITRE view', () => {
+      const requiredMitreView = [
+        {
+          action: 'mitre:read',
+          resource: '*:*:*',
+        },
+        {
+          action: 'agent:read',
+          resource: 'agent:id:001',
+        },
+        {
+          action: 'syscheck:read',
+          resource: 'agent:id:001',
+        },
+      ];
+      const userMitre1 = {
+        'agent:read': {
+          'agent:id:*': 'allow',
+        },
+        'syscheck:read': {
+          'agent:id:*': 'allow',
+        },
+        'mitre:read': {
+          '*:*:*': 'allow',
+        },
+        rbac_mode: 'white',
+      };
+      it('Should return OK for the agent 001', () => {
+        const result = WzUserPermissions.checkMissingUserPermissions(
+          requiredMitreView,
+          userMitre1
+        );
+        expect(result).toEqual(false);
+      });
+    });
   });
 });
