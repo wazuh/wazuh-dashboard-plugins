@@ -240,12 +240,9 @@ export const fetchFile = async selectedNode => {
     const data = await WzRequest.apiReq(
       'GET',
       isCluster ?
-      `/cluster/${selectedNode}/files` :
-      `/manager/files`, {
-        params: {
-          path: 'etc/ossec.conf'
-        }
-      }
+      `/cluster/${selectedNode}/configuration` :
+      `/manager/configuration`, 
+      {}
     );
 
     let xml = ((data || {}).data || {}).contents || false;
@@ -389,7 +386,7 @@ export const saveNodeConfiguration = async (node, content) => {
   try {
     const result = await WzRequest.apiReq(
       'PUT',
-      `/cluster/${node}/files?path=etc/ossec.conf&overwrite=true`, {
+      `/cluster/${node}/configuration?overwrite=true`, {
         content,
         origin: 'xmleditor'
       }
@@ -410,9 +407,8 @@ export const saveFileCluster = async (text, node) => {
   try {
     await WzRequest.apiReq(
       'PUT',
-      `/cluster/${node}/files`, {
+      `/cluster/${node}/configuration`, {
         params: {
-          path: 'etc/ossec.conf',
           overwrite: true
         },
         body: xml.toString(),
@@ -434,9 +430,8 @@ export const saveFileManager = async text => {
   try {
     await WzRequest.apiReq(
       'PUT',
-      `/manager/files`, {
+      `/manager/configuracion`, {
         params: {
-          path: 'etc/ossec.conf',
           overwrite: true
         },
         body: xml.toString(),

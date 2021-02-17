@@ -21,7 +21,7 @@ import {
 import { connect } from 'react-redux';
 import { WzRequest } from '../../../../../react-services/wz-request';
 
-import RulesetHandler from './utils/ruleset-handler';
+import { RulesetHandler, RulesetResources } from './utils/ruleset-handler';
 
 import {
   updateFileContent,
@@ -54,7 +54,7 @@ class WzRuleInfo extends Component {
       mitreRuleId: "",
       mitreIds: []
     };
-    this.rulesetHandler = RulesetHandler;
+    this.rulesetHandler = new RulesetHandler(RulesetResources.RULES);
     this.columns = [
       {
         field: 'id',
@@ -117,11 +117,7 @@ class WzRuleInfo extends Component {
               <EuiLink
                 onClick={async event => {
                   event.stopPropagation();
-                  const noLocal = item.relative_dirname.startsWith('ruleset/');
-                  const result = await this.rulesetHandler.getRuleContent(
-                    value,
-                    noLocal
-                  );
+                  const result = await this.rulesetHandler.getFileContent(value);
                   const file = {
                     name: value,
                     content: result,

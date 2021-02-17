@@ -15,7 +15,7 @@ import { WazuhConfig } from '../../react-services/wazuh-config';
 import { WzRequest } from '../../react-services/wz-request';
 import { ErrorHandler } from '../../react-services/error-handler';
 import { ShareAgent } from '../../factories/share-agent';
-import RulesetHandler from './components/management/ruleset/utils/ruleset-handler';
+import { RulesetHandler, RulesetResources } from './components/management/ruleset/utils/ruleset-handler';
 
 export class ManagementController {
   /**
@@ -40,7 +40,6 @@ export class ManagementController {
     this.errorHandler = errorHandler;
     this.$interval = $interval;
     this.tab = 'welcome';
-    this.rulesetTab = 'rules';
     this.globalConfigTab = 'overview';
     this.tabNames = TabNames;
     this.wazuhManagementTabs = ['ruleset', 'groups', 'configuration'];
@@ -48,7 +47,8 @@ export class ManagementController {
     this.currentGroup = false;
     this.logtestOpened = false;
     this.uploadOpened = false;
-    this.rulesetHandler = RulesetHandler;
+    this.rulesetTab = RulesetResources.RULES;
+  
 
     this.$scope.$on('setCurrentGroup', (ev, params) => {
       this.currentGroup = (params || {}).currentGroup || false;
@@ -206,11 +206,11 @@ export class ManagementController {
       this.switchTab(this.tab);
     }
 
-    this.uploadFilesProps = {
+    /* this.uploadFilesProps = {
       msg: this.$scope.mctrl.rulesetTab,
       path: `etc/${this.$scope.mctrl.rulesetTab}`,
-      upload: (files, path) => this.uploadFiles(files, path)
-    };
+      upload: (files) => this.uploadFiles(files)
+    }; */
   }
 
   /**
@@ -340,7 +340,7 @@ export class ManagementController {
     this.rulesetTab = tab;
     this.globalRulesetTab = this.rulesetTab;
     this.managingFiles = false;
-    this.refreshUploadFileProps();
+    //this.refreshUploadFileProps();
     if (!flag) {
       this.breadCrumbBack();
     }
@@ -442,34 +442,29 @@ export class ManagementController {
     this.$scope.$applyAsync();
   }
 
-  refreshUploadFileProps() {
+  /* refreshUploadFileProps() {
     this.uploadFilesProps = {
       msg: this.rulesetTab,
       path: `etc/${this.rulesetTab}`,
-      upload: (files, path) => this.uploadFiles(files, path)
+      upload: (files) => this.uploadFiles(files)
     };
   }
-
+ */
   /**
    * Uploads the files
    * @param {Array} files
    * @param {String} path
    */
-  async uploadFiles(files, path) {
+  /*async uploadFiles(files, resource) {
     try {
       this.errors = false;
       this.results = [];
-      if (path === 'etc/rules') {
-        this.upload = this.rulesetHandler.sendRuleConfiguration;
-      } else if (path === 'etc/decoders') {
-        this.upload = this.rulesetHandler.sendDecoderConfiguration;
-      } else {
-        this.upload = this.rulesetHandler.sendCdbList;
-      }
+      const rulesetHandler = new RulesetHandler(resource);
+    
       for (let idx in files) {
         const { file, content } = files[idx];
         try {
-          await this.upload(file, content, true); // True does not overwrite the file
+          await rulesetHandler.updateFile(file, content, true); // True does not overwrite the file
           this.results.push({
             index: idx,
             uploaded: true,
@@ -493,5 +488,5 @@ export class ManagementController {
       if (Array.isArray(error) && error.length) return Promise.reject(error);
       ErrorHandler.handle('Files cannot be uploaded');
     }
-  }
+  } */
 }
