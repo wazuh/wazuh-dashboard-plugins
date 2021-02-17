@@ -1249,9 +1249,6 @@ export class WazuhReportingCtrl {
 
         };
         
-        console.log("configuration.affected_items.length");
-        console.log(configuration.affected_items.length);
-        
         if (configuration.affected_items.length>0 && Object.keys(configuration.affected_items[0].config).length) {
           printer.addContent({
             text: 'Configurations',

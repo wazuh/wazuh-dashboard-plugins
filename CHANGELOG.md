@@ -18,6 +18,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
+- Can't edit through the app empty rules and decoders files that already exist in the host [#2893](https://github.com/wazuh/wazuh-kibana-app/issues/2893)
 - Fix server error Invalid token specified: Cannot read property 'replace' of undefined [#2899](https://github.com/wazuh/wazuh-kibana-app/issues/2899)
 - Fix show empty files rules and decoders: [#2923](https://github.com/wazuh/wazuh-kibana-app/issues/2923)
 - Fixed wrong hover texts in CDB lists actions [#2929](https://github.com/wazuh/wazuh-kibana-app/pull/2929)
