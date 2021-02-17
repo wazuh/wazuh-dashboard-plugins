@@ -15,6 +15,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added on FIM Inventory Windows Registry registry_key and registry_value items from syscheck [#2908](https://github.com/wazuh/wazuh-kibana-app/issues/2908)
 - Uncheck agents after an action in agents groups management [#2907](https://github.com/wazuh/wazuh-kibana-app/pull/2907)
 - Unsave rule files when edit or create a rule with invalid content [#2944](https://github.com/wazuh/wazuh-kibana-app/pull/2944)
+- Added toast with refresh button when new fields are loaded [#2974](https://github.com/wazuh/wazuh-kibana-app/pull/2974)
 
 ### Fixed
 
@@ -36,6 +37,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed number agents not show on pie onMouseEvent [#2890](https://github.com/wazuh/wazuh-kibana-app/issues/2890)
 - Fixed off Kibana Query Language in search bar of Controls/Inventory modules. [#2945](https://github.com/wazuh/wazuh-kibana-app/pull/2945)
 - Fixed number of agents do not show on the pie chart tooltip in agents preview [#2890](https://github.com/wazuh/wazuh-kibana-app/issues/2890)
+- Fixed loading of AWS index fields even when no AWS alerts were found [#2974](https://github.com/wazuh/wazuh-kibana-app/pull/2974)
 
 ## Wazuh v4.0.4 - Kibana 7.10.0 , 7.10.2 - Revision 4017
 
