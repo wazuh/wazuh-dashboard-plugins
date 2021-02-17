@@ -2,13 +2,18 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.1.1 - Kibana 7.10.0 , 7.10.2 - Revision 4102
+
+### Added
+
+- Added a suitable X-Frame-Options header [#2791](https://github.com/wazuh/wazuh-kibana-app/issues/2791)
+
 ## Wazuh v4.1.0 - Kibana 7.10.0 , 7.10.2 - Revision 4101
 
 ### Added
 
 - Check the max buckets by default in healthcheck and increase them [#2901](https://github.com/wazuh/wazuh-kibana-app/pull/2901)
 - Added a prompt wraning in role mapping if run_as is false or he is not allowed to use it by API [#2876](https://github.com/wazuh/wazuh-kibana-app/pull/2876)
-- Added a suitable X-Frame-Options header [#2791](https://github.com/wazuh/wazuh-kibana-app/issues/2791)
 
 ### Changed
 
