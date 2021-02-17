@@ -60,6 +60,7 @@ export class WzVisualize extends Component {
     this.monitoringEnabled = !!(configuration || {})[
       'wazuh.monitoring.enabled'
     ];
+    this.newFields={};
   }
 
 
@@ -128,13 +129,17 @@ export class WzVisualize extends Component {
     this.setState({ expandedVis: this.state.expandedVis === id ? false : id });
   };
 
-  refreshKnownFields = async () => {
+  refreshKnownFields = async ( newField = null ) => {
+    if(newField && newField.name){
+      this.newFields[newField.name] = newField;
+    }
     if (!this.state.hasRefreshedKnownFields) { // Known fields are refreshed only once per dashboard loading
       try {
         this.setState({ hasRefreshedKnownFields: true, isRefreshing: true });
-        await PatternHandler.refreshIndexPattern();
+        await PatternHandler.refreshIndexPattern(this.newFields);
         this.setState({ isRefreshing: false });
         this.reloadToast();
+        this.newFields={};
       } catch (err) {
         this.setState({ isRefreshing: false });
         this.showToast('danger', 'The index pattern could not be refreshed');
