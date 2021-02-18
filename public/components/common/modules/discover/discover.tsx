@@ -198,9 +198,11 @@ export const Discover = compose(
       || (this.props.refreshAngularDiscover !== prevProps.refreshAngularDiscover)
     ){
       this.setState({ pageIndex: 0 , tsUpdated: Date.now()});
+      if(!_.isEqual(this.props.shareFilterManager, this.state.searchBarFilters)){
+        this.setState({columns: this.getColumns(), searchBarFilters: this.props.shareFilterManager || []}); //initial columns
+      }
       return;
     };
-
     if(['pageIndex', 'pageSize', 'sortField', 'sortDirection'].some(field => this.state[field] !== prevState[field]) || (this.state.tsUpdated !== prevState.tsUpdated)){
       try {
         await this.getAlerts();
