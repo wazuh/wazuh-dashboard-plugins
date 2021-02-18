@@ -17,6 +17,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fix some date fields format in FIM and SCA modules [#2975](https://github.com/wazuh/wazuh-kibana-app/pull/2975)
 - Fix a non-stop error in Manage agents when the user has no permissions [#2976](https://github.com/wazuh/wazuh-kibana-app/pull/2976)
 - Can't edit empty rules and decoders files that already exist in the manager [#2978](https://github.com/wazuh/wazuh-kibana-app/pull/2978)
+- Fix the unpin agent in the selection modal [#2980](https://github.com/wazuh/wazuh-kibana-app/pull/2980)
 
 ## Wazuh v4.1.0 - Kibana 7.10.0 , 7.10.2 - Revision 4101
 
