@@ -25,7 +25,7 @@ import { WzRequest } from '../../../react-services/wz-request';
 import { TimeService } from '../../../react-services/time-service';
 import exportCsv from '../../../react-services/wz-csv';
 import { getToasts }  from '../../../kibana-services';
-import { WzSearchBar, filtersToObject } from '../../../components/wz-search-bar';
+import { WzSearchBar } from '../../../components/wz-search-bar';
 import { RuleText, ComplianceText } from './components';
 
 export class Inventory extends Component {
@@ -35,7 +35,6 @@ export class Inventory extends Component {
     const { agent } = this.props;
     this.state = { agent, items: [], itemIdToExpandedRowMap: {}, showMoreInfo: false, loading: false, filters: [] }
     this.policies = [];
-    this.wzReq = WzRequest;
     this.suggestions = {};
     this.columnsPolicies = [
       {
@@ -158,7 +157,7 @@ export class Inventory extends Component {
     if (match && match[0]) {
       this.setState({ loading: true });
       const id = match[0].split('=')[1];
-      const policy = await this.wzReq.apiReq(
+      const policy = await WzRequest.apiReq(
         'GET',
         `/sca/${this.props.agent.id}`,
         { "q": "policy_id=" + id }
@@ -232,7 +231,7 @@ export class Inventory extends Component {
     try {
       this._isMount && this.setState({ loading: true });
       this.lookingPolicy = false;
-      const policies = await this.wzReq.apiReq(
+      const policies = await WzRequest.apiReq(
         'GET',
         `/sca/${this.props.agent.id}`,
         {}
@@ -263,17 +262,23 @@ export class Inventory extends Component {
     this._isMount && this.setState({ loadingPolicy: true, itemIdToExpandedRowMap: {}, pageIndex: 0 });
     if (policy) {
       try {
-        // It query all checks whitout filters, because the filters are applied in the results
+        const policyResponse = await WzRequest.apiReq(
+          'GET',
+          `/sca/${this.props.agent.id}`,
+          { "q": "policy_id=" + policy.policy_id }
+          );
+          const [policyData] = policyResponse.data.data.affected_items;
+        // It queries all checks without filters, because the filters are applied in the results
         // due to the use of EuiInMemoryTable instead EuiTable components and do arequest with each change of filters.
-        const checksResponse = await this.wzReq.apiReq(
+        const checksResponse = await WzRequest.apiReq(
           'GET',
           `/sca/${this.props.agent.id}/checks/${policy.policy_id}`,
           { }
         );
         const checks = ((((checksResponse || {}).data || {}).data || {}).affected_items || [])
           .map(item => ({...item, result: item.result || 'not applicable'}));
-        this.buildSuggestionSearchBar(policy.policy_id, checks);
-        this._isMount && this.setState({ lookingPolicy: policy, loadingPolicy: false, items: checks });
+        this.buildSuggestionSearchBar(policyData.policy_id, checks);
+        this._isMount && this.setState({ lookingPolicy: policyData, loadingPolicy: false, items: checks });
       } catch (err) {
         // We can't ensure the suggestions contains valid characters
         getToasts().add({

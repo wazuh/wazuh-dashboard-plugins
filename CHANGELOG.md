@@ -6,6 +6,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
+- Fix the statusCode error message [#2971](https://github.com/wazuh/wazuh-kibana-app/pull/2971)
+- Fix the SCA policy stats didn't refresh [#2973](https://github.com/wazuh/wazuh-kibana-app/pull/2973)
 - Fixed some date fields format in FIM and SCA modules [#2975](https://github.com/wazuh/wazuh-kibana-app/pull/2975)
 
 ## Wazuh v4.1.0 - Kibana 7.10.0 , 7.10.2 - Revision 4101
