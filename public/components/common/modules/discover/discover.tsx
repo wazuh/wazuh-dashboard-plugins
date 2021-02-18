@@ -108,7 +108,7 @@ export const Discover = compose(
   constructor(props) {
     super(props);
     this.KibanaServices = getDataPlugin();
-    this.filterManager = props.shareFilterManager ? this.KibanaServices.query.filterManager : new FilterManager(getUiSettings);
+    this.filterManager = props.shareFilterManager ? this.KibanaServices.query.filterManager : new FilterManager(getUiSettings());
     this.timefilter = this.KibanaServices.query.timefilter.timefilter;
     this.state = {
       sort: {},
@@ -198,9 +198,11 @@ export const Discover = compose(
       || (this.props.refreshAngularDiscover !== prevProps.refreshAngularDiscover)
     ){
       this.setState({ pageIndex: 0 , tsUpdated: Date.now()});
+      if(!_.isEqual(this.props.shareFilterManager, this.state.searchBarFilters)){
+        this.setState({columns: this.getColumns(), searchBarFilters: this.props.shareFilterManager || []}); //initial columns
+      }
       return;
     };
-
     if(['pageIndex', 'pageSize', 'sortField', 'sortDirection'].some(field => this.state[field] !== prevState[field]) || (this.state.tsUpdated !== prevState.tsUpdated)){
       try {
         await this.getAlerts();

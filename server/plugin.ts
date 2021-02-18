@@ -69,10 +69,14 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     this.logger.debug('Wazuh-wui: Setup');
 
     const wazuhSecurity = SecurityObj(plugins);
+    const serverInfo = core.http.getServerInfo();
 
     core.http.registerRouteHandlerContext('wazuh', (context, request) => {
       return {
         logger: this.logger,
+        server: {
+          info: serverInfo, 
+        },
         plugins,
         security: wazuhSecurity,
         api: {
@@ -90,6 +94,14 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       };
     });
 
+    // Add custom headers to the responses
+    core.http.registerOnPreResponse((request, response, toolkit) => {
+      const additionalHeaders = {
+        'x-frame-options': 'sameorigin',
+      };
+      return toolkit.next({ headers: additionalHeaders });
+    });
+
     // Routes
     const router = core.http.createRouter();
     setupRoutes(router);
@@ -99,7 +111,6 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
 
   public async start(core: CoreStart) {
     const globalConfiguration: SharedGlobalConfig = await this.initializerContext.config.legacy.globalConfig$.pipe(first()).toPromise();
-
     const wazuhApiClient = {
       client: {
         asInternalUser: {

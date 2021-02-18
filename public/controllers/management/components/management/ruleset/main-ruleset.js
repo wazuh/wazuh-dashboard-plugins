@@ -50,11 +50,12 @@ export default class WzRuleset extends Component {
       fileContent,
       addingRulesetFile
     } = this.state;
-    if (
+    if (!window.location.href.includes('rules?tab=rules') &&
       (!ruleInfo && !decoderInfo && !listInfo && !fileContent,
-      !addingRulesetFile)
-    )
+        !addingRulesetFile)
+    ) {
       this.store.dispatch({ type: 'RESET' });
+    }
   }
 
   render() {

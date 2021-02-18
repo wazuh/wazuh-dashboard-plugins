@@ -111,29 +111,26 @@ class WzRulesetEditor extends Component {
       try {
         await validateConfigAfterSent();
       } catch (error) {
-        const warning = Object.assign(error, {
-          savedMessage: `File ${name} saved, but there were found several error while validating the configuration.`
-        });
+        const toast = {
+          title: 'File content is incorrect.',
+          toastMessage: `The content of the file ${name} is incorrect. There were found several error while validating the configuration.`,
+          toastLifeTimeMs: 5000,
+        };
+
         this.setState({ isSaving: false });
         this.goToEdit(name);
-
-        this.showToast('warning', warning.savedMessage, error, 3000);
-        this.showToast('warning', 'Restoring previous file content', "The file content is incorrect. The content file was restored to previous state", 30000);
-
-        // //reload previous file content 
-        // this.setState({content: this.state.initContent})       
-
-        //remove current invalid file if the file is new.
+       
         if (this.props.state.addingRulesetFile != false) {
-          this.removeItems(name, this.state.path);
+          //remove current invalid file if the file is new.
+          await this.rulesetHandler.deleteFile(name, this.state.path);
+          toast.toastMessage += '\nThe new file was deleted.';
         } else {
           //restore file to previous version
           await saver(name, this.state.initContent, overwrite);
+          toast.toastMessage += '\nThe content file was restored to previous state.';
         }
 
-        // if(this.state.content != this.state.initContent){
-        //   this.save(name, overwrite);
-        // }
+        getToasts().addError({stack: error, message: toast.toastMessage}, toast);
 
         return;
       }
@@ -171,11 +168,6 @@ class WzRulesetEditor extends Component {
     const file = { name: name, content: content, path: path };
     this.props.updateFileContent(file);
   };
-
-  async removeItems(filename, filepath) {
-    const results = await this.rulesetHandler.deleteFile(filename, filepath);
-    this.showToast('warning', 'File deleted', "The file content is invalid and has been deleted. \n Please, insert a valid rule data.", 30000);
-  }
 
   /**
    * onChange the input value in case adding new file

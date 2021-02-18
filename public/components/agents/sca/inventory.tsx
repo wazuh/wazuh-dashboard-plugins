@@ -22,10 +22,10 @@ import {
   EuiPopover
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
-import TimeService from '../../../react-services/time-service'
+import { TimeService } from '../../../react-services/time-service';
 import exportCsv from '../../../react-services/wz-csv';
 import { getToasts }  from '../../../kibana-services';
-import { WzSearchBar, filtersToObject } from '../../../components/wz-search-bar';
+import { WzSearchBar } from '../../../components/wz-search-bar';
 import { RuleText, ComplianceText } from './components';
 
 export class Inventory extends Component {
@@ -35,9 +35,7 @@ export class Inventory extends Component {
     const { agent } = this.props;
     this.state = { agent, items: [], itemIdToExpandedRowMap: {}, showMoreInfo: false, loading: false, filters: [] }
     this.policies = [];
-    this.wzReq = WzRequest;
     this.suggestions = {};
-    this.timeService = TimeService;
     this.columnsPolicies = [
       {
         field: 'name',
@@ -52,7 +50,7 @@ export class Inventory extends Component {
         field: 'end_scan',
         name: 'End scan',
         dataType: 'date',
-        render: value => this.offsetTimestamp('', value)
+        render: TimeService.offset
       },
       {
         field: 'pass',
@@ -159,7 +157,7 @@ export class Inventory extends Component {
     if (match && match[0]) {
       this.setState({ loading: true });
       const id = match[0].split('=')[1];
-      const policy = await this.wzReq.apiReq(
+      const policy = await WzRequest.apiReq(
         'GET',
         `/sca/${this.props.agent.id}`,
         { "q": "policy_id=" + id }
@@ -178,14 +176,6 @@ export class Inventory extends Component {
 
   componentWillUnmount() {
     this._isMount = false;
-  }
-
-  offsetTimestamp(text, time) {
-    try {
-      return text + this.timeService.offset(time);
-    } catch (error) {
-      return time !== '-' ? `${text}${time} (UTC)` : time;
-    }
   }
 
   addHealthResultRender(result) {
@@ -229,7 +219,7 @@ export class Inventory extends Component {
       { type: 'params', label: 'result', description: 'Filter by check result', operators: ['=', '!=',], values: (value) => { return Object.keys(distinctFields["result"]).filter(item => item && item && item.toLowerCase().includes(value.toLowerCase())) } },
       { type: 'params', label: 'status', description: 'Filter by check status', operators: ['=', '!=',], values: (value) => { return Object.keys(distinctFields["status"]).filter(item => item && item.toLowerCase().includes(value.toLowerCase())) } },
       { type: 'params', label: 'rationale', description: 'Filter by check rationale', operators: ['=', '!=',], values: (value) => { return Object.keys(distinctFields["rationale"]).filter(item => item && item.toLowerCase().includes(value.toLowerCase())) } },
-      { type: 'params', label: 'registry_key', description: 'Filter by check registry', operators: ['=', '!=',], values: (value) => { return Object.keys(distinctFields["registry"] || {}).filter(item => item && item.toLowerCase().includes(value.toLowerCase())) } },
+      { type: 'params', label: 'registry', description: 'Filter by check registry', operators: ['=', '!=',], values: (value) => { return Object.keys(distinctFields["registry"] || {}).filter(item => item && item.toLowerCase().includes(value.toLowerCase())) } },
       { type: 'params', label: 'description', description: 'Filter by check description', operators: ['=', '!=',], values: (value) => { return Object.keys(distinctFields["description"]).filter(item => item && item.toLowerCase().includes(value.toLowerCase())) } },
       { type: 'params', label: 'remediation', description: 'Filter by check remediation', operators: ['=', '!=',], values: (value) => { return Object.keys(distinctFields["remediation"]).filter(item => item && item.toLowerCase().includes(value.toLowerCase())) } },
       { type: 'params', label: 'reason', description: 'Filter by check reason', operators: ['=', '!=',], values: (value) => { return Object.keys(distinctFields["reason"]).filter(item => item && item.toLowerCase().includes(value.toLowerCase())) } },
@@ -241,7 +231,7 @@ export class Inventory extends Component {
     try {
       this._isMount && this.setState({ loading: true });
       this.lookingPolicy = false;
-      const policies = await this.wzReq.apiReq(
+      const policies = await WzRequest.apiReq(
         'GET',
         `/sca/${this.props.agent.id}`,
         {}
@@ -272,17 +262,23 @@ export class Inventory extends Component {
     this._isMount && this.setState({ loadingPolicy: true, itemIdToExpandedRowMap: {}, pageIndex: 0 });
     if (policy) {
       try {
-        // It query all checks whitout filters, because the filters are applied in the results
+        const policyResponse = await WzRequest.apiReq(
+          'GET',
+          `/sca/${this.props.agent.id}`,
+          { "q": "policy_id=" + policy.policy_id }
+          );
+          const [policyData] = policyResponse.data.data.affected_items;
+        // It queries all checks without filters, because the filters are applied in the results
         // due to the use of EuiInMemoryTable instead EuiTable components and do arequest with each change of filters.
-        const checksResponse = await this.wzReq.apiReq(
+        const checksResponse = await WzRequest.apiReq(
           'GET',
           `/sca/${this.props.agent.id}/checks/${policy.policy_id}`,
           { }
         );
         const checks = ((((checksResponse || {}).data || {}).data || {}).affected_items || [])
           .map(item => ({...item, result: item.result || 'not applicable'}));
-        this.buildSuggestionSearchBar(policy.policy_id, checks);
-        this._isMount && this.setState({ lookingPolicy: policy, loadingPolicy: false, items: checks });
+        this.buildSuggestionSearchBar(policyData.policy_id, checks);
+        this._isMount && this.setState({ lookingPolicy: policyData, loadingPolicy: false, items: checks });
       } catch (err) {
         // We can't ensure the suggestions contains valid characters
         getToasts().add({
@@ -540,7 +536,7 @@ export class Inventory extends Component {
                     <EuiStat title={`${this.state.lookingPolicy.score}%`} description="Score" titleColor="accent" titleSize="m" textAlign="center" />
                   </EuiFlexItem>
                   <EuiFlexItem>
-                    <EuiStat title={this.state.lookingPolicy.end_scan} description="End scan" titleColor="primary" titleSize="s" textAlign="center" style={{ padding: 5 }} />
+                    <EuiStat title={TimeService.offset(this.state.lookingPolicy.end_scan)} description="End scan" titleColor="primary" titleSize="s" textAlign="center" style={{ padding: 5 }} />
                   </EuiFlexItem>
                 </EuiFlexGroup>
                 <EuiSpacer size="m" />

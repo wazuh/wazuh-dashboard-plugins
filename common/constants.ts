@@ -70,6 +70,9 @@ export const WAZUH_TIME_FILTER_DEFAULT = {
   to: 'now'
 };
 
+//Default max buckets set by the app
+export const WAZUH_MAX_BUCKETS_DEFAULT = 200000;
+
 // App configuration
 export const WAZUH_CONFIGURATION_CACHE_TIME = 10000 // time in ms;
 export const WAZUH_CONFIGURATION_SETTINGS_NEED_RESTART = [
@@ -130,6 +133,7 @@ export const WAZUH_DEFAULT_APP_CONFIG = {
   'checks.setup': true,
   'checks.fields': true,
   'checks.metaFields': true,
+  'checks.maxBuckets': true,
   'checks.timeFilter': true,
   'extensions.pci': true,
   'extensions.gdpr': true,

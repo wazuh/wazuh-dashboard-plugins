@@ -17,7 +17,7 @@ import {
   EuiFlyoutBody,
   EuiTitle,
   EuiLoadingContent,
-  EuiCallOut
+  EuiCallOut,
 } from '@elastic/eui';
 import { WzRequest } from '../../../../react-services/wz-request';
 import { FileDetails } from './fileDetail';
@@ -25,19 +25,19 @@ import { AppState } from '../../../../react-services/app-state';
 
 export class FlyoutDetail extends Component {
   state: {
-    currentFile: boolean | {[key:string]: string}
-    clusterFilter: {}
-    isLoading: boolean
-    error: boolean
-    type: 'file' | 'registry_key'
-  }
+    currentFile: boolean | { [key: string]: string };
+    clusterFilter: {};
+    isLoading: boolean;
+    error: boolean;
+    type: 'file' | 'registry_key';
+  };
 
   props!: {
-    fileName: string
-    agentId: string
-    view: 'inventory' | 'events' | 'extern'
-    closeFlyout(): void
-  }
+    fileName: string;
+    agentId: string;
+    view: 'inventory' | 'events' | 'extern';
+    closeFlyout(): void;
+  };
 
   constructor(props) {
     super(props);
@@ -46,82 +46,101 @@ export class FlyoutDetail extends Component {
       clusterFilter: {},
       isLoading: true,
       error: false,
-      type: 'file'
-    }
+      type: 'file',
+    };
   }
 
   async componentDidMount() {
     try {
-      const isCluster = (AppState.getClusterInfo() || {}).status === "enabled";
+      const isCluster = (AppState.getClusterInfo() || {}).status === 'enabled';
       const clusterFilter = isCluster
-        ? { "cluster.name": AppState.getClusterInfo().cluster }
-        : { "manager.name": AppState.getClusterInfo().manager };
+        ? { 'cluster.name': AppState.getClusterInfo().cluster }
+        : { 'manager.name': AppState.getClusterInfo().manager };
       this.setState({ clusterFilter });
       let currentFile;
-      if (typeof this.props.item === "boolean" && typeof this.props.fileName !== undefined) {
+      if (typeof this.props.item === 'boolean' && typeof this.props.fileName !== undefined) {
         const regex = new RegExp('file=' + '[^&]*');
         const match = window.location.href.match(regex);
         if (match && match[0]) {
-          const file = decodeURIComponent(match[0].split('=')[1]);
+          let file = decodeURIComponent(match[0].split('=')[1]);
+          if (file.indexOf('\\') > -1) {
+            file = encodeURIComponent(file).replaceAll('%5C', '\\\\');
+          }
           const data = await WzRequest.apiReq('GET', `/syscheck/${this.props.agentId}`, {
             params: {
-              q: `file=${file}`
-            }
+              q: `file=${file};(type=file,type=registry_key)`,
+            },
           });
           currentFile = ((((data || {}).data || {}).data || {}).affected_items || [])[0];
         }
-      } else if(this.props.item){
+      } else if (this.props.item) {
         currentFile = this.props.item;
-      }else{
+      } else {          
+        let file = this.props.fileName;
+        if (file.indexOf('\\') > -1) {
+          file = encodeURIComponent(file).replaceAll('%5C', '\\\\');
+        }
         const data = await WzRequest.apiReq('GET', `/syscheck/${this.props.agentId}`, {
           params: {
-            q: `file=${this.props.fileName}`
-          }
+            q: `file=${file};(type=file,type=registry_key)`,
+          },
         });
         currentFile = ((((data || {}).data || {}).data || {}).affected_items || [])[0];
       }
       if (!currentFile) {
-        throw (false);
+        throw false;
       }
       this.setState({ currentFile, type: currentFile.type, isLoading: false });
     } catch (err) {
-      this.setState({ error: `Data could not be fetched for ${this.props.fileName}`, currentFile: {file: this.props.fileName} })
+      this.setState({
+        error: `Data could not be fetched for ${this.props.fileName}`,
+        currentFile: { file: this.props.fileName },
+      });
     }
   }
 
   componentWillUnmount() {
-    window.location.href = window.location.href.replace(new RegExp("&file=" + "[^\&]*", 'g'), "");
+    window.location.href = window.location.href.replace(new RegExp('&file=' + '[^&]*', 'g'), '');
   }
 
   render() {
     const { type } = this.state;
     return (
-      <EuiFlyout onClose={() => this.props.closeFlyout()} size="l" aria-labelledby={this.state.currentFile.file} maxWidth="70%" className='wz-inventory wzApp'>
-        <EuiFlyoutHeader hasBorder className="flyout-header" >
+      <EuiFlyout
+        onClose={() => this.props.closeFlyout()}
+        size="l"
+        aria-labelledby={this.state.currentFile.file}
+        maxWidth="70%"
+        className="wz-inventory wzApp"
+      >
+        <EuiFlyoutHeader hasBorder className="flyout-header">
           <EuiTitle size="s">
-            <h2 id={this.state.currentFile.file }>{this.state.currentFile.file }</h2>
+            <h2 id={this.state.currentFile.file}>{this.state.currentFile.file}</h2>
           </EuiTitle>
         </EuiFlyoutHeader>
         {this.state.isLoading && (
-          <EuiFlyoutBody className="flyout-body" >
-            {this.state.error && (
+          <EuiFlyoutBody className="flyout-body">
+            {(this.state.error && (
               <EuiCallOut title={this.state.error} color="warning" iconType="alert" />
-            ) || (<EuiLoadingContent style={{ margin: 16 }} />)}
+            )) || <EuiLoadingContent style={{ margin: 16 }} />}
           </EuiFlyoutBody>
         )}
-        {this.state.currentFile && !this.state.isLoading &&
-          <EuiFlyoutBody className="flyout-body" >
+        {this.state.currentFile && !this.state.isLoading && (
+          <EuiFlyoutBody className="flyout-body">
             <FileDetails
               currentFile={this.state.currentFile}
               type={type}
               {...this.props}
-              implicitFilters={[{ 'rule.groups': "syscheck" },
-              { 'syscheck.path': this.state.currentFile.file },
-              { 'agent.id': this.props.agentId },
-              this.state.clusterFilter]} />
+              implicitFilters={[
+                { 'rule.groups': 'syscheck' },
+                { 'syscheck.path': this.state.currentFile.file },
+                { 'agent.id': this.props.agentId },
+                this.state.clusterFilter,
+              ]}
+            />
           </EuiFlyoutBody>
-        }
+        )}
       </EuiFlyout>
-    )
+    );
   }
 }
