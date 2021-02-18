@@ -10,6 +10,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
+- Fix Security events table is empty when switching the pinned agents [#2956](https://github.com/wazuh/wazuh-kibana-app/pull/2956)
 - Fix disabled switch visual edit button when json content is empty [#2957](https://github.com/wazuh/wazuh-kibana-app/issues/2957)
 - Fix the statusCode error message [#2971](https://github.com/wazuh/wazuh-kibana-app/pull/2971)
 - Fix the SCA policy stats didn't refresh [#2973](https://github.com/wazuh/wazuh-kibana-app/pull/2973)
