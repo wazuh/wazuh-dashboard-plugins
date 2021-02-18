@@ -66,14 +66,6 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
   }
 
   public async setup(core: CoreSetup, plugins: PluginSetup) {
-
-    core.http.registerOnPreResponse((request, response, toolkit) => {
-      const additionalHeaders = {
-        'x-frame-options': 'sameorigin',
-      };
-      return toolkit.next({ headers: additionalHeaders });
-    })
-
     this.logger.debug('Wazuh-wui: Setup');
 
     const wazuhSecurity = SecurityObj(plugins);
@@ -100,6 +92,14 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
           }
         }
       };
+    });
+
+    // Add custom headers to the responses
+    core.http.registerOnPreResponse((request, response, toolkit) => {
+      const additionalHeaders = {
+        'x-frame-options': 'sameorigin',
+      };
+      return toolkit.next({ headers: additionalHeaders });
     });
 
     // Routes
