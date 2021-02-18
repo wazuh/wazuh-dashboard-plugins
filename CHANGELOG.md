@@ -14,6 +14,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fix the statusCode error message [#2971](https://github.com/wazuh/wazuh-kibana-app/pull/2971)
 - Fix the SCA policy stats didn't refresh [#2973](https://github.com/wazuh/wazuh-kibana-app/pull/2973)
 - Fix some date fields format in FIM and SCA modules [#2975](https://github.com/wazuh/wazuh-kibana-app/pull/2975)
+- Can't edit empty rules and decoders files that already exist in the manager [#2978](https://github.com/wazuh/wazuh-kibana-app/pull/2978)
 
 ## Wazuh v4.1.0 - Kibana 7.10.0 , 7.10.2 - Revision 4101
 
@@ -32,7 +33,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
-- Can't edit through the app empty rules and decoders files that already exist in the host [#2893](https://github.com/wazuh/wazuh-kibana-app/issues/2893)
 - Fix server error Invalid token specified: Cannot read property 'replace' of undefined [#2899](https://github.com/wazuh/wazuh-kibana-app/issues/2899)
 - Fix show empty files rules and decoders: [#2923](https://github.com/wazuh/wazuh-kibana-app/issues/2923)
 - Fixed wrong hover texts in CDB lists actions [#2929](https://github.com/wazuh/wazuh-kibana-app/pull/2929)
