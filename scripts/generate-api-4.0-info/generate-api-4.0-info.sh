@@ -11,16 +11,15 @@ EOF
     exit 1
   fi
   echo "Generate Wazuh API 4.0 endpoints data and format to use in Wazuh app";
-  local API_LIST_PATH="../../lib/api-request-list.json";
-  local API_ENDPOINTS_OUTPUT_DIRECTORY="endpoints";
-  local API_ENDPOINTS_OUTPUT_FILE="api-4.0-endpoints.json";
-  local API_ENDPOINTS_OUTPUT_PATH="$API_ENDPOINTS_OUTPUT_DIRECTORY/$API_ENDPOINTS_OUTPUT_FILE";
+  local API_TMP_OUTPUT_PATH="output";
+  local API_OUTPUT_PATH="../../common/api-info";
+
   node generate-api-4.0-info.js $WAZUH_API_URL --full || exit_with_message "ERROR: the script had an error";
-  echo "Moving file to $API_LIST_PATH";
-  mv $API_ENDPOINTS_OUTPUT_PATH $API_LIST_PATH || exit_with_message "ERROR: moving the generated file";
-  echo "Removing temporal directory";
-  rm -rf $API_ENDPOINTS_OUTPUT_DIRECTORY || exit_with_message "ERROR: removing the temporal directory";
-  echo "Success generating Wazuh API 4.0 endpoints info!";
+  echo "Moving files to $API_OUTPUT_PATH";
+  mv "$API_TMP_OUTPUT_PATH"/* "$API_OUTPUT_PATH" || exit_with_message "ERROR: moving the generated files";
+  echo "Removing temporal directory $API_TMP_OUTPUT_PATH";
+  rm -rf $API_TMP_OUTPUT_PATH || exit_with_message "ERROR: removing the temporal directory";
+  echo "Success generating Wazuh API 4.0 API info!";
 }
 
 # Function to exit with a message
