@@ -527,8 +527,8 @@ export class AgentSelectionTable extends Component {
 
   unselectAgents(){
     this._isMounted && this.setState({itemIdToSelectedMap: {}});
-    this.props.removeAgentsFilter(true);      
     store.dispatch(updateCurrentAgentData({}));
+    this.props.removeAgentsFilter();      
   }
 
   getSelectedCount(){
