@@ -131,7 +131,9 @@ export class Mitre extends Component {
         });
       this._isMount && this.setState({tacticsObject, isLoading: false});
     } catch(err) {
-      this.setState({notPermissions: false});
+      if (err.match('3013 - Permission denied')) {
+        this.setState({isLoading: false, notPermissions: true});
+      }
       this.showToast(
         'danger',
         'Error',
