@@ -89,8 +89,8 @@ class WzGroupsActionButtonsAgents extends Component {
   showManageAgents() {
     const { itemDetail } = this.props.state;
 
-    this.props.updateShowAddAgents(true);
     this.props.groupsProps.showAddingAgents(true, itemDetail);
+    this.props.updateShowAddAgents(true);
   }
 
   closePopover() {
