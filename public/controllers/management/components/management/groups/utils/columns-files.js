@@ -36,10 +36,12 @@ export default class GroupsFilesColumns {
                   aria-label="See file content"
                   iconType="eye"
                   onClick={async () => {
-                    const result = await this.groupsHandler.getFileContent(
+                    let result = await this.groupsHandler.getFileContent(
                       `/groups/${itemDetail.name}/files/${item.filename}/xml`
                     );
-
+                    if (Object.keys(result).length == 0) {
+                      result = '';
+                    }
                     const isEditable = item.filename === 'agent.conf';
                     const data = !isEditable
                       ? typeof result === 'object'
@@ -109,10 +111,10 @@ export default class GroupsFilesColumns {
       var type = single
         ? 'single'
         : closing
-        ? 'closing'
-        : opening
-        ? 'opening'
-        : 'other';
+          ? 'closing'
+          : opening
+            ? 'opening'
+            : 'other';
       var fromTo = lastType + '->' + type;
       lastType = type;
       var padding = '';
