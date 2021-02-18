@@ -10,8 +10,8 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react'
-import { Tactics, Techniques } from './components'; 
-import { 
+import { Tactics, Techniques } from './components';
+import {
   EuiPanel,
   EuiFlexGroup,
   EuiFlexItem,
@@ -25,6 +25,7 @@ import { KbnSearchBar } from '../../kbn-search-bar';
 import { TimeRange, Query } from '../../../../../../src/plugins/data/common';
 import { ModulesHelper } from '../../common/modules/modules-helper';
 import { getDataPlugin, getToasts } from '../../../kibana-services';
+import { WzEmptyPromptNoPermissions } from "../../common/permissions/prompt";
 
 export interface ITactic {
   [key:string]: string[]
@@ -47,8 +48,9 @@ export class Mitre extends Component {
     tacticsObject: ITactic,
     selectedTactics: Object,
     filterParams: IFilterParams,
-    isLoading: boolean
-  } 
+    isLoading: boolean,
+    notPermissions: boolean,
+  }
 
   props: any;
 
@@ -61,6 +63,7 @@ export class Mitre extends Component {
       tacticsObject: {},
       selectedTactics: {},
       isLoading: true,
+      notPermissions: false,
       filterParams: {
         filters: this.filterManager.getFilters() || [],
         query: { language: 'kuery', query: '' },
@@ -108,9 +111,9 @@ export class Mitre extends Component {
     });
   };
 
-  async buildTacticsObject(){
-    try{
-      const data = await WzRequest.apiReq('GET', '/mitre', { 
+  async buildTacticsObject() {
+    try {
+      const data = await WzRequest.apiReq('GET', '/mitre', {
         params: {
           select: "phase_name"
         }
@@ -120,14 +123,15 @@ export class Mitre extends Component {
       result && result.forEach(item => {
           const {id, phase_name} = item;
           phase_name.forEach( (tactic) => {
-            if(!tacticsObject[tactic]){ 
+            if(!tacticsObject[tactic]){
               tacticsObject[tactic] = [];
             }
             tacticsObject[tactic].push(id);
           })
         });
       this._isMount && this.setState({tacticsObject, isLoading: false});
-    }catch(err){
+    } catch(err) {
+      this.setState({notPermissions: false});
       this.showToast(
         'danger',
         'Error',
@@ -142,7 +146,20 @@ export class Mitre extends Component {
   }
 
   render() {
-    const { isLoading } = this.state;
+    const { isLoading, notPermissions } = this.state;
+
+    if (notPermissions) {
+      return (
+        <WzEmptyPromptNoPermissions
+          permissions={[
+            { action: 'agent:read', resource: 'agent:id:*' },
+            { action: 'syscheck:read', resource: 'agent:id:*' },
+            { action: 'mitre:read', resource: '*:*:*' },
+          ]}
+        />
+      );
+    }
+
     return (
       <div>
         <EuiFlexGroup>
@@ -161,7 +178,7 @@ export class Mitre extends Component {
             <EuiPanel paddingSize="none">
                 <EuiFlexGroup >
                   <EuiFlexItem grow={false} style={{width: "15%", minWidth: 145, height: "calc(100vh - 325px)",overflowX: "hidden"}}>
-                    <Tactics 
+                    <Tactics
                       indexPattern={this.indexPattern}
                       onChangeSelectedTactics={this.onChangeSelectedTactics}
                       filters={this.state.filterParams}
@@ -172,13 +189,13 @@ export class Mitre extends Component {
                       indexPattern={this.indexPattern}
                       filters={this.state.filterParams}
                       onSelectedTabChanged={(id) => this.props.onSelectedTabChanged(id)}
-                      {...this.state} /> 
+                      {...this.state} />
                   </EuiFlexItem>
                 </EuiFlexGroup>
             </EuiPanel>
           </EuiFlexItem>
         </EuiFlexGroup>
-       
+
       </div>
     );
   }
