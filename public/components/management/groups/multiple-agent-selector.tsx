@@ -50,22 +50,27 @@ export class MultipleAgentSelector extends Component {
   async componentDidMount() {
     this.setState({ load: true });
     try {
-      while (!this.state.selectedAgents.loadedAll) {
-        await this.loadSelectedAgents();
-        this.setState({
-          selectedAgents: {
-            ...this.state.selectedAgents,
-            offset: this.state.selectedAgents.offset + 499,
-          }
-        })
-      }
+      try{
+        while (!this.state.selectedAgents.loadedAll) {
+          await this.loadSelectedAgents();
+          this.setState({
+            selectedAgents: {
+              ...this.state.selectedAgents,
+              offset: this.state.selectedAgents.offset + 499,
+            }
+          });
+        }
+      }catch(error){}
       this.firstSelectedList = [...this.state.selectedAgents.data];
       await this.loadAllAgents("", true);
       this.setState({
         load: false
       });
     } catch (error) {
-      ErrorHandler.handle(error, 'Error adding agents');
+      ErrorHandler.handle(error, 'Error loading agents');
+      this.setState({
+        load: false
+      });
     }
   }
 
@@ -188,6 +193,7 @@ export class MultipleAgentSelector extends Component {
       }
     } catch (error) {
       ErrorHandler.handle(error, 'Error fetching group agents');
+      throw error;
     }
     this.setState({
       selectedAgents: {
@@ -345,7 +351,7 @@ export class MultipleAgentSelector extends Component {
   };
 
   unselectElementsOfSelectByID(containerID) {
-    document.getElementById(containerID).selectedOptions.forEach(option => {
+    document.getElementById(containerID).options.forEach(option => {
       option.selected = false
     });
   }

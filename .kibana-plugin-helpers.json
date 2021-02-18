@@ -5,6 +5,7 @@
     "kibana.json",
     "LICENSE",
     "{common,server,target}/**/*",
-    "!*test*"
+    "!*test*",
+    "CHANGELOG.md"
   ]
 }
