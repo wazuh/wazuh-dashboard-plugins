@@ -33,11 +33,13 @@ import moment from 'moment-timezone';
 import { AppNavigate } from '../../../../react-services/app-navigate';
 import { TruncateHorizontalComponents } from '../../../common/util';
 import { getDataPlugin } from '../../../../kibana-services';
+import { RegistryValues } from './registryValues';
 
 export class FileDetails extends Component {
   props!: {
     currentFile: {
       file: string;
+      type: string;
     };
     implicitFilters: Array<Object>;
     loadEventsWithFilters: Function;
@@ -258,7 +260,7 @@ export class FileDetails extends Component {
 
   getDetails() {
     const { view } = this.props;
-    const columns = this.props.type === 'file' ? this.details() : this.registryDetails();
+    const columns = this.props.type === 'registry_key' || this.props.currentFile.type === 'registry_key' ? this.registryDetails() : this.details();
     const generalDetails = columns.map((item, idx) => {
       var value = this.props.currentFile[item.field] || '-';
       if (item.transformValue) {
@@ -396,12 +398,12 @@ export class FileDetails extends Component {
   }
 
   render() {
-    const { fileName, type, implicitFilters, view } = this.props;
+    const { fileName, type, implicitFilters, view, currentFile, agent } = this.props;
     const inspectButtonText = view === 'extern' ? 'Inspect in FIM' : 'Inspect in Events';
     return (
       <Fragment>
         <EuiAccordion
-          id={fileName === undefined ? Math.random().toString() : fileName}
+          id={fileName === undefined ? Math.random().toString() : `${fileName}_details`}
           buttonContent={
             <EuiTitle size="s">
               <h3>Details</h3>
@@ -412,9 +414,32 @@ export class FileDetails extends Component {
         >
           <div className="flyout-row details-row">{this.getDetails()}</div>
         </EuiAccordion>
+        { (type === 'registry_key' || currentFile.type === 'registry_key') && <>
         <EuiSpacer size="s" />
         <EuiAccordion
-          id={fileName === undefined ? Math.random().toString() : fileName}
+          id={fileName === undefined ? Math.random().toString() : `${fileName}_values`}
+          buttonContent={
+            <EuiTitle size="s">
+              <h3>
+                Registry values                
+              </h3>
+            </EuiTitle>
+          }
+          paddingSize="none"
+          initialIsOpen={true}
+        >
+          <EuiFlexGroup className="flyout-row">
+            <EuiFlexItem>
+              <RegistryValues 
+                currentFile={currentFile}
+                agent={agent}
+              />
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        </EuiAccordion> </>}
+        <EuiSpacer />
+        <EuiAccordion
+          id={fileName === undefined ? Math.random().toString() : `${fileName}_events`}
           className="events-accordion"
           extraAction={
             <div style={{ marginBottom: 5 }}>

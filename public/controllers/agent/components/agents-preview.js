@@ -43,7 +43,7 @@ import { compose } from 'redux';
 export const AgentsPreview = compose(
   withReduxProvider,
   withGlobalBreadcrumb([{ text: '' }, { text: 'Agents' }]),
-  withUserAuthorizationPrompt([{action: 'agent:read', resource: 'agent:id:*'}])
+  withUserAuthorizationPrompt([[{action: 'agent:read', resource: 'agent:id:*'},{action: 'agent:read', resource: 'agent:group:*'}]])
 )(class AgentsPreview extends Component {
   _isMount = false;
   constructor(props) {

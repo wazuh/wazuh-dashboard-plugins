@@ -9,6 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { getDataPlugin } from '../../../kibana-services';
 import { useState, useEffect } from 'react';
 import { ModulesHelper } from '../modules/modules-helper';
 
@@ -30,8 +31,12 @@ export function useQuery(): [{
   const updateQuery = (query) => {
     ModulesHelper.getDiscoverScope()
       .then(scope => {
-        scope.updateQuery({query});
+        scope.state.query = query;
       })
   }
   return [ query, updateQuery ];
+}
+
+export const useQueryManager = () => {
+  return useState(getDataPlugin().query.queryString.getQuery());
 }
