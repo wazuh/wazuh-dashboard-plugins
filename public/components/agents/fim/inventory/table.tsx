@@ -21,6 +21,7 @@ import {
 import { WzRequest } from '../../../../react-services/wz-request';
 import { FlyoutDetail } from './flyout';
 import { filtersToObject, IFilter } from '../../../wz-search-bar';
+import { TimeService } from '../../../../react-services/time-service';
 
 export class InventoryTable extends Component {
   state: {
@@ -180,7 +181,8 @@ export class InventoryTable extends Component {
         field: 'mtime',
         name: 'Last Modified',
         sortable: true,
-        width: '100px'
+        width: '100px',
+        render: TimeService.offset
       },
       {
         field: 'uname',
