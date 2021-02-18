@@ -1233,6 +1233,7 @@ export class WazuhReportingCtrl {
         text: `Group ${groupID} configuration`,
         style: 'h1'
       });
+      
       if (components['0']) {
         let configuration = {};
         try {
@@ -1247,7 +1248,8 @@ export class WazuhReportingCtrl {
           log('reporting:createReportsGroups', error.message || error, 'debug');
 
         };
-        if (Object.keys(configuration.affected_items[0].config).length) {
+        
+        if (configuration.affected_items.length>0 && Object.keys(configuration.affected_items[0].config).length) {
           printer.addContent({
             text: 'Configurations',
             style: { fontSize: 14, color: '#000' },
@@ -1464,7 +1466,7 @@ export class WazuhReportingCtrl {
           message: `Report ${name} was created`
         }
       })
-    }catch(error){
+    }catch(error){     
       log('reporting:createReportsGroups', error.message || error);
       return ErrorResponse(error.message || error, 5029, 500, response);
     }
