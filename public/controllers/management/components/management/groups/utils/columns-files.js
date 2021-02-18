@@ -36,7 +36,7 @@ export default class GroupsFilesColumns {
                   aria-label="See file content"
                   iconType="eye"
                   onClick={async () => {
-                    var result = await this.groupsHandler.getFileContent(
+                    let result = await this.groupsHandler.getFileContent(
                       `/groups/${itemDetail.name}/files/${item.filename}/xml`
                     );
                     if (Object.keys(result).length == 0) {
