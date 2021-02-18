@@ -153,7 +153,7 @@ export class RegistryTable extends Component {
       offset: pageIndex * pageSize,
       limit: pageSize,
       sort: this.buildSortFilter(),
-      q: 'type=registry_key,type=registry_value'
+      q: 'type=registry_key'
     };
 
     return filter;

@@ -120,7 +120,7 @@ export const WzSecurity = compose(
     return (
       <EuiFlexGroup >
         <EuiFlexItem >
-          <EuiCallOut title=" The role mapping has no effect because the Wazuh API's configurated user has not the run_as setting enabled in the configuration or is not allowed to use it. " color="warning" iconType="alert">
+          <EuiCallOut title=" The role mapping has no effect because the Wazuh API's configured user has not the run_as setting enabled in the configuration or is not allowed to use it. " color="warning" iconType="alert">
           </EuiCallOut>
           <EuiSpacer></EuiSpacer>
         </EuiFlexItem >

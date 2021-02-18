@@ -154,7 +154,7 @@ export class Inventory extends Component {
     const filter = {
       ...filters,
       limit: type === 'file' ? '15' : '1',
-      ...(type === 'registry' ? {q: 'type=registry_key,type=registry_value'} : {type}),      
+      ...(type === 'registry' ? {q: 'type=registry_key'} : {type}),      
       ...(type === 'file' && {sort: '+file'})
     };
     return filter;
