@@ -50,7 +50,7 @@ export class Inventory extends Component {
         field: 'end_scan',
         name: 'End scan',
         dataType: 'date',
-        render: value => TimeService.offset(value)
+        render: TimeService.offset
       },
       {
         field: 'pass',
@@ -177,7 +177,6 @@ export class Inventory extends Component {
   componentWillUnmount() {
     this._isMount = false;
   }
-
 
   addHealthResultRender(result) {
     const color = result => {
