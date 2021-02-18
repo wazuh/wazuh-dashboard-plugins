@@ -14,7 +14,7 @@
 import React, { } from 'react';
 import ConfigurationHandler from '../utils/configuration-handler';
 //@ts-ignore
-import { getToasts }  from '../../../../kibana-services';
+import { getToasts } from '../../../../kibana-services';
 import { ISetting } from '../configuration'
 import {
   EuiBottomBar,
@@ -30,7 +30,7 @@ import { WazuhConfig } from '../../../../react-services/wazuh-config';
 interface IBottomBarProps {
   updatedConfig: { [setting: string]: string | number | boolean | object }
   setUpdateConfig(setting: {}): void
-  setLoading(loading:boolean): void
+  setLoading(loading: boolean): void
   config: ISetting[]
 }
 
@@ -91,31 +91,32 @@ const SaveButton = ({ updatedConfig, setUpdateConfig, setLoading, config }) => (
 
 const saveSettings = async (updatedConfig: {}, setUpdateConfig: Function, setLoading: Function, config: ISetting[]) => {
   setLoading(true);
-  try{
+  try {
     await Promise.all(Object.keys(updatedConfig).map(async setting => await saveSetting(setting, updatedConfig, config)));
     successToast();
     setUpdateConfig({});
-  }catch(error){
+  } catch (error) {
     errorToast(error);
-  }finally{
+  } finally {
     setLoading(false);
   }
 }
 
-const saveSetting = async (setting, updatedConfig, config:ISetting[]) => {
-  try{
-    (config.find(item => item.setting === setting) || {value:''}).value = updatedConfig[setting];
+const saveSetting = async (setting, updatedConfig, config: ISetting[]) => {
+  try {
+    (config.find(item => item.setting === setting) || { value: '' }).value = updatedConfig[setting];
     const result = await ConfigurationHandler.editKey(setting, updatedConfig[setting]);
-    
+
     // Update the app configuration frontend-cached setting in memory with the new value
     const wzConfig = new WazuhConfig();
-    wzConfig.setConfig({...wzConfig.getConfig(), ...{[setting]: formatValueCachedConfiguration(updatedConfig[setting])}});
-    
+    wzConfig.setConfig({ ...wzConfig.getConfig(), ...{ [setting]: formatValueCachedConfiguration(updatedConfig[setting]) } });
+
     // Show restart and/or reload message in toast
     const response = result.data.data;
     response.needRestart && restartToast();
     response.needReload && reloadToast();
-  }catch(error){
+    response.needHealtCheck && executeHealtCheck();
+  } catch (error) {
     return Promise.reject(error);
   }
 }
@@ -132,27 +133,40 @@ const reloadToast = () => {
   })
 }
 
+const executeHealtCheck = () => {
+  getToasts().add({
+    color: 'warning',
+    title: 'You must execute the health check for the changes to take effect',
+    text:
+    <EuiFlexGroup alignItems = "center" gutterSize="s">
+      <EuiFlexItem grow={false} >
+        <EuiButton onClick={() => window.location.href = '#/health-check'} size="s">Execute health check</EuiButton>
+      </EuiFlexItem>
+    </EuiFlexGroup>
+  });
+}
+
 const restartToast = () => {
   getToasts().add({
-    color:'warning',
-    title:'You must restart Kibana for the changes to take effect',
+    color: 'warning',
+    title: 'You must restart Kibana for the changes to take effect',
   });
 }
 
 const successToast = () => {
   getToasts().add({
-    color:'success',
-    title:'The configuration has been successfully updated',
+    color: 'success',
+    title: 'The configuration has been successfully updated',
   });
 }
 
 const errorToast = (error) => {
   getToasts().add({
-    color:'danger',
-    title:`Error saving the configuration: ${error.message || error}`,
+    color: 'danger',
+    title: `Error saving the configuration: ${error.message || error}`,
   });
 }
 
 const formatValueCachedConfiguration = (value) => typeof value === 'string'
-    ? isNaN(Number(value)) ? value : Number(value)
-    : value;
+  ? isNaN(Number(value)) ? value : Number(value)
+  : value;

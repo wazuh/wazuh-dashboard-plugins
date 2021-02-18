@@ -100,8 +100,6 @@ export function getIp(
   };
 
   const currentParams = $location.search();
-  const targetedAgent =
-    currentParams && (currentParams.agent || currentParams.agent === '000');
   const targetedRule =
     currentParams && currentParams.tab === 'ruleset' && currentParams.ruleid;
   if (!targetedRule && healthCheck($window)) {

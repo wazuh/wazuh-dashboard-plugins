@@ -12,7 +12,7 @@
 import fs from 'fs';
 import { log } from './logger';
 import { getConfiguration } from './get-configuration';
-import { WAZUH_DATA_CONFIG_APP_PATH, WAZUH_CONFIGURATION_SETTINGS_NEED_RESTART, WAZUH_CONFIGURATION_SETTINGS_NEED_RELOAD } from '../../common/constants';
+import { WAZUH_DATA_CONFIG_APP_PATH, WAZUH_CONFIGURATION_SETTINGS_NEED_RESTART, WAZUH_CONFIGURATION_SETTINGS_NEED_RELOAD, WAZUH_CONFIGURATION_SETTINGS_NEED_HEALTH_CHECK } from '../../common/constants';
 
 export class UpdateConfigurationFile {
   constructor() {
@@ -79,7 +79,8 @@ export class UpdateConfigurationFile {
       );
       return {
         needRestart: WAZUH_CONFIGURATION_SETTINGS_NEED_RESTART.includes(key),
-        needReload: WAZUH_CONFIGURATION_SETTINGS_NEED_RELOAD.includes(key)
+        needReload: WAZUH_CONFIGURATION_SETTINGS_NEED_RELOAD.includes(key),
+        needHealtCheck: WAZUH_CONFIGURATION_SETTINGS_NEED_HEALTH_CHECK.includes(key)
       };
     } catch (error) {
       log('update-configuration:updateConfiguration', error.message || error);

@@ -76,20 +76,22 @@ export const WAZUH_MAX_BUCKETS_DEFAULT = 200000;
 // App configuration
 export const WAZUH_CONFIGURATION_CACHE_TIME = 10000 // time in ms;
 export const WAZUH_CONFIGURATION_SETTINGS_NEED_RESTART = [
-  'pattern',
   'wazuh.monitoring.enabled',
   'wazuh.monitoring.frequency',
-  'wazuh.monitoring.shards',
+  'cron.statistics.interval',
+  'logs.level',
+];
+export const WAZUH_CONFIGURATION_SETTINGS_NEED_HEALTH_CHECK = [
+  'pattern',
   'wazuh.monitoring.replicas',
   'wazuh.monitoring.creation',
   'wazuh.monitoring.pattern',
   'alerts.sample.prefix',
-  'cron.statistics.interval',
   'cron.statistics.index.name',
   'cron.statistics.index.creation',
   'cron.statistics.index.shards',
   'cron.statistics.index.replicas',
-  'logs.level',
+  'wazuh.monitoring.shards'
 ];
 export const WAZUH_CONFIGURATION_SETTINGS_NEED_RELOAD = [
   'hideManagerAlerts',
