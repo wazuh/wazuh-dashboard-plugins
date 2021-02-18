@@ -22,7 +22,7 @@ import {
   EuiPopover
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
-import { TimeService } from '../../../react-services/time-service'
+import { TimeService } from '../../../react-services/time-service';
 import exportCsv from '../../../react-services/wz-csv';
 import { getToasts }  from '../../../kibana-services';
 import { WzSearchBar, filtersToObject } from '../../../components/wz-search-bar';
