@@ -10,6 +10,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
+- An error message is displayed when changing a group's configuration although the user has the right permissions [#2955](https://github.com/wazuh/wazuh-kibana-app/pull/2955)
 - Fix Security events table is empty when switching the pinned agents [#2956](https://github.com/wazuh/wazuh-kibana-app/pull/2956)
 - Fix disabled switch visual edit button when json content is empty [#2957](https://github.com/wazuh/wazuh-kibana-app/issues/2957)
 - Fix the statusCode error message [#2971](https://github.com/wazuh/wazuh-kibana-app/pull/2971)
@@ -64,7 +65,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
-- An error message is displayed when changing a group's configuration although the user has the right permissions [#2937](https://github.com/wazuh/wazuh-kibana-app/issues/2937) 
 - Fixed Wazuh menu and agent menu for Solaris agents [#2773](https://github.com/wazuh/wazuh-kibana-app/issues/2773) [#2725](https://github.com/wazuh/wazuh-kibana-app/issues/2725)
 - Fixed wrong shards and replicas for statistics indices and also fixed wrong prefix for monitoring indices [#2732](https://github.com/wazuh/wazuh-kibana-app/issues/2732)
 - Report's creation dates set to 1970-01-01T00:00:00.000Z [#2772](https://github.com/wazuh/wazuh-kibana-app/issues/2772)
