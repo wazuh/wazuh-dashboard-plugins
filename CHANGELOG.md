@@ -4,10 +4,18 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ## Wazuh v4.1.1 - Kibana 7.10.0 , 7.10.2 - Revision 4102
 
+### Added
+
+- Added a X-Frame-Options header to the backend responses [#2977](https://github.com/wazuh/wazuh-kibana-app/pull/2977)
+
 ### Fixed
 
+- Fix disabled switch visual edit button when json content is empty [#2957](https://github.com/wazuh/wazuh-kibana-app/issues/2957)
+- Fix the statusCode error message [#2971](https://github.com/wazuh/wazuh-kibana-app/pull/2971)
+- Fix the SCA policy stats didn't refresh [#2973](https://github.com/wazuh/wazuh-kibana-app/pull/2973)
+- Fix some date fields format in FIM and SCA modules [#2975](https://github.com/wazuh/wazuh-kibana-app/pull/2975)
 - Fix a non-stop error in Manage agents when the user has no permissions [#2976](https://github.com/wazuh/wazuh-kibana-app/pull/2976)
-
+- Can't edit empty rules and decoders files that already exist in the manager [#2978](https://github.com/wazuh/wazuh-kibana-app/pull/2978)
 
 ## Wazuh v4.1.0 - Kibana 7.10.0 , 7.10.2 - Revision 4101
 
