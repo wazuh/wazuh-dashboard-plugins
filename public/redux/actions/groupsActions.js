@@ -208,3 +208,9 @@ export const updateSelectedTab = selectedTabId => {
     selectedTabId: selectedTabId
   };
 };
+
+export const updateReload = () => {
+  return {
+    type: 'GROUPS_RELOAD'
+  }
+}
