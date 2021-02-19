@@ -79,12 +79,14 @@ export class GenericRequest {
           timeout: timeout || 20000
         };
       }
+
       Object.assign(data, await axios(options));
       if (!data) {
         throw new Error(
           `Error doing a request to ${tmpUrl}, method: ${method}.`
         );
       }
+
       return data;
     } catch (err) {
       OdfeUtils.checkOdfeSessionExpired(err);

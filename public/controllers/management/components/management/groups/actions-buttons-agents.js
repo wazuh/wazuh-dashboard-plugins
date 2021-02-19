@@ -18,7 +18,8 @@ import { connect } from 'react-redux';
 import {
   updateLoadingStatus,
   updateIsProcessing,
-  updateShowAddAgents
+  updateShowAddAgents,
+  updateReload
 } from '../../../../../redux/actions/groupsActions';
 
 import exportCsv from '../../../../../react-services/wz-csv';
@@ -67,6 +68,7 @@ class WzGroupsActionButtonsAgents extends Component {
    */
   async refresh() {
     try {
+      this.props.updateReload();
       this.props.updateIsProcessing(true);
       this.onRefreshLoading();
     } catch (error) {
@@ -89,8 +91,8 @@ class WzGroupsActionButtonsAgents extends Component {
   showManageAgents() {
     const { itemDetail } = this.props.state;
 
-    this.props.updateShowAddAgents(true);
     this.props.groupsProps.showAddingAgents(true, itemDetail);
+    this.props.updateShowAddAgents(true);
   }
 
   closePopover() {
@@ -265,7 +267,8 @@ const mapDispatchToProps = dispatch => {
     updateIsProcessing: isProcessing =>
       dispatch(updateIsProcessing(isProcessing)),
     updateShowAddAgents: showAddAgents =>
-      dispatch(updateShowAddAgents(showAddAgents))
+      dispatch(updateShowAddAgents(showAddAgents)),
+    updateReload: () => dispatch(updateReload())
   };
 };
 
