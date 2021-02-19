@@ -111,12 +111,6 @@ export const AgentsPreview = compose(
       this.lastAgent = lastAgent.data.data.affected_items[0];
       this.mostActiveAgent = await this.props.tableProps.getMostActive();
 
-      console.log(this.mostActiveAgent);
-      console.log(this.mostActiveAgent);
-      console.log(this.mostActiveAgent);
-      console.log(this.mostActiveAgent);
-      console.log(this.mostActiveAgent);
-
       const osresult = await WzRequest.apiReq('GET', '/agents/summary/os', {});
       this.platforms = this.groupBy(osresult.data.data.affected_items);
       const platformsModel = [];
