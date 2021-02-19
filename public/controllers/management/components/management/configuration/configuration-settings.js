@@ -10,7 +10,8 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { shouldShowComponent } from './utils/wz-utils';
+import { hasAgentSupportModule } from '../../../../../react-services/wz-agents';
+import { WAZUH_MODULES_ID } from '../../../../../../common/constants'
 
 export default [
   {
@@ -102,7 +103,7 @@ export default [
         description:
           'Configuration assessment and automation of compliance monitoring using SCAP checks',
         goto: 'open-scap',
-        when: agent => shouldShowComponent('oscap', agent)
+        when: agent => hasAgentSupportModule(agent, WAZUH_MODULES_ID.OPEN_SCAP)
       },
       {
         name: 'CIS-CAT',
@@ -157,7 +158,7 @@ export default [
         description:
           'Monitor and collect the activity from Docker containers such as creation, running, starting, stopping or pausing events',
         goto: 'docker-listener',
-        when: agent => shouldShowComponent('docker', agent)
+        when: agent => hasAgentSupportModule(agent, WAZUH_MODULES_ID.DOCKER)
       }
     ]
   },

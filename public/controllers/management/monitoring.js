@@ -284,11 +284,12 @@ export function ClusterController(
 
       nodeList.name = $scope.configuration.name;
       nodeList.master_node = $scope.configuration.node_name;
+      const {id, title} = await getDataPlugin().indexPatterns.get(AppState.getCurrentPattern());
 
       const visData = await GenericRequest.request(
         'POST',
         `/elastic/visualizations/cluster-monitoring/${AppState.getCurrentPattern()}`,
-        { nodes: nodeList }
+        { nodes: nodeList, pattern: {id, title} }
       );
 
       rawVisualizations.assignItems(visData.data.raw);

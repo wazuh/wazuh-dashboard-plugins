@@ -39,6 +39,9 @@ import { MainFim } from '../../agents/fim';
 import { MainSca } from '../../agents/sca';
 import { MainMitre } from '../modules/main-mitre';
 import { getAngularModule } from '../../../kibana-services';
+import { withAgentSupportModule } from '../../../components/common/hocs';
+import { connect } from 'react-redux';
+import { compose } from 'redux';
 
 export class MainModuleAgent extends Component {
   props!: {
@@ -298,28 +301,7 @@ export class MainModuleAgent extends Component {
               </div>
             </div>
             {!['syscollector', 'configuration'].includes(this.props.section) &&
-              <div className='wz-module-body'>
-                {selectView === 'events' &&
-                  <Events {...this.props} />
-                }
-                {selectView === 'loader' &&
-                  <Loader {...this.props}
-                    loadSection={(section) => this.props.loadSection(section)}
-                    redirect={this.props.afterLoad}>
-                  </Loader>}
-                {selectView === 'dashboard' &&
-                  <Dashboard {...this.props} />
-                }
-                {selectView === 'settings' &&
-                  <Settings {...this.props} />
-                }
-
-                {/* ---------------------MODULES WITH CUSTOM PANELS--------------------------- */}
-                {section === 'fim' && selectView==='inventory' && <MainFim {...this.props} />}
-                {section === 'sca' && selectView==='inventory' && <MainSca {...this.props} />}
-                {section === 'mitre' && selectView==='inventory' && <MainMitre {...this.props} goToDiscover={(id) => this.props.onSelectedTabChanged(id)} />}
-                {/* -------------------------------------------------------------------------- */}
-              </div>
+              <ModuleTabViewer component={section} {...this.props}/>
             }
           </Fragment>
         }
@@ -335,3 +317,40 @@ export class MainModuleAgent extends Component {
     );
   }
 }
+
+
+
+const mapStateToProps = state => ({
+  agent: state.appStateReducers.currentAgentData
+});
+
+const ModuleTabViewer = compose(
+  connect(mapStateToProps),
+  withAgentSupportModule
+)((props) => {
+  const { section, selectView } = props;
+  return <>
+      {selectView === 'events' &&
+        <Events {...props} />
+      }
+      {selectView === 'loader' &&
+        <Loader {...props}
+          loadSection={(section) => props.loadSection(section)}
+          redirect={props.afterLoad}>
+        </Loader>}
+      {selectView === 'dashboard' &&
+        <Dashboard {...props} />
+      }
+      {selectView === 'settings' &&
+        <Settings {...props} />
+      }
+
+
+      {/* ---------------------MODULES WITH CUSTOM PANELS--------------------------- */}
+      {section === 'fim' && selectView==='inventory' && <MainFim {...props} />}
+      {section === 'sca' && selectView==='inventory' && <MainSca {...props} />}
+      {section === 'mitre' && selectView === 'inventory' && <MainMitre {...props} />}
+      {/* {['pci', 'gdpr', 'hipaa', 'nist', 'tsc'].includes(section) && selectView === 'inventory' && <ComplianceTable {...props} goToDiscover={(id) => props.onSelectedTabChanged(id)} />} */}
+      {/* -------------------------------------------------------------------------- */}
+    </>
+})
