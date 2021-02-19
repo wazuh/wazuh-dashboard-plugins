@@ -917,6 +917,46 @@ export const KnownFields = [
     "readFromDocValues": true
   },
   {
+    "name": "data.aws.log_info.s3bucket",
+    "type": "string",
+    "esTypes": [
+      "keyword"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "data.aws.source",
+    "type": "string",
+    "esTypes": [
+      "keyword"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "data.aws.accountId",
+    "type": "string",
+    "esTypes": [
+      "keyword"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "data.aws.region",
+    "type": "string",
+    "esTypes": [
+      "keyword"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
     "name": "data.command",
     "type": "string",
     "esTypes": [
