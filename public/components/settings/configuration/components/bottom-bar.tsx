@@ -137,6 +137,7 @@ const executeHealtCheck = () => {
   getToasts().add({
     color: 'warning',
     title: 'You must execute the health check for the changes to take effect',
+    toastLifeTimeMs: 5000,
     text:
     <EuiFlexGroup alignItems = "center" gutterSize="s">
       <EuiFlexItem grow={false} >
