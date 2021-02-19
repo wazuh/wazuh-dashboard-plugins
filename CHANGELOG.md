@@ -6,6 +6,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Added
 
+- Prompt to show the unsupported module for the selected agent [#2959](https://github.com/wazuh/wazuh-kibana-app/pull/2959)
 - Added a X-Frame-Options header to the backend responses [#2977](https://github.com/wazuh/wazuh-kibana-app/pull/2977)
 
 ### Fixed
@@ -13,6 +14,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - An error message is displayed when changing a group's configuration although the user has the right permissions [#2955](https://github.com/wazuh/wazuh-kibana-app/pull/2955)
 - Fix Security events table is empty when switching the pinned agents [#2956](https://github.com/wazuh/wazuh-kibana-app/pull/2956)
 - Fix disabled switch visual edit button when json content is empty [#2957](https://github.com/wazuh/wazuh-kibana-app/issues/2957)
+- Fixed main and `More` menus for unsupported agents [#2959](https://github.com/wazuh/wazuh-kibana-app/pull/2959)
 - Fixed wrong number of alerts in Security Events [#2964](https://github.com/wazuh/wazuh-kibana-app/pull/2964)
 - Fix the statusCode error message [#2971](https://github.com/wazuh/wazuh-kibana-app/pull/2971)
 - Fix the SCA policy stats didn't refresh [#2973](https://github.com/wazuh/wazuh-kibana-app/pull/2973)

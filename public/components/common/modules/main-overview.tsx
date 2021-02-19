@@ -36,6 +36,10 @@ import { MainMitre } from './main-mitre';
 import WzReduxProvider from '../../../redux/wz-redux-provider';
 import { ComplianceTable } from '../../overview/compliance-table';
 
+import { withAgentSupportModule } from '../../../components/common/hocs';
+import { connect } from 'react-redux';
+import { compose } from 'redux';
+
 export class MainModuleOverview extends Component {
   constructor(props) {
     super(props);
@@ -168,32 +172,46 @@ export class MainModuleOverview extends Component {
             </div>
           </div>
           <div className='wz-module-body'>
-            {selectView === 'events' &&
-              <Events {...this.props} />
-            }
-            {selectView === 'loader' &&
-              <Loader {...this.props}
-                loadSection={(section) => this.props.loadSection(section)}
-                redirect={this.props.afterLoad}>
-              </Loader>}
-            {selectView === 'dashboard' &&
-              <Dashboard {...this.props} />
-            }
-            {selectView === 'settings' &&
-              <Settings {...this.props} />
-            }
+            <ModuleTabViewer component={section} {...this.props}/>
           </div>
-
-
-          {/* ---------------------MODULES WITH CUSTOM PANELS--------------------------- */}
-          {section === 'fim' && selectView==='inventory' && <MainFim {...this.props} />}
-          {section === 'sca' && selectView==='inventory' && <MainSca {...this.props} />}
-          
-          {section === 'mitre' && selectView === 'inventory' && <MainMitre {...this.props} />}
-          {(section === 'pci' || section === 'gdpr' || section === 'hipaa'|| section === 'nist' || section === 'tsc' )&& selectView === 'inventory' && <ComplianceTable {...this.props} goToDiscover={(id) => this.props.onSelectedTabChanged(id)} />}
-          {/* -------------------------------------------------------------------------- */}
         </Fragment>
       </div>
     );
   }
 }
+
+const mapStateToProps = state => ({
+  agent: state.appStateReducers.currentAgentData
+});
+
+const ModuleTabViewer = compose(
+  connect(mapStateToProps),
+  withAgentSupportModule
+)((props) => {
+  const { section, selectView } = props;
+  return <>
+      {selectView === 'events' &&
+        <Events {...props} />
+      }
+      {selectView === 'loader' &&
+        <Loader {...props}
+          loadSection={(section) => props.loadSection(section)}
+          redirect={props.afterLoad}>
+        </Loader>}
+      {selectView === 'dashboard' &&
+        <Dashboard {...props} />
+      }
+      {selectView === 'settings' &&
+        <Settings {...props} />
+      }
+
+
+      {/* ---------------------MODULES WITH CUSTOM PANELS--------------------------- */}
+      {section === 'fim' && selectView==='inventory' && <MainFim {...props} />}
+      {section === 'sca' && selectView==='inventory' && <MainSca {...props} />}
+      
+      {section === 'mitre' && selectView === 'inventory' && <MainMitre {...props} />}
+      {['pci', 'gdpr', 'hipaa', 'nist', 'tsc'].includes(section) && selectView === 'inventory' && <ComplianceTable {...props} goToDiscover={(id) => props.onSelectedTabChanged(id)} />}
+      {/* -------------------------------------------------------------------------- */}
+    </>
+})
