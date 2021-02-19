@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { checkPluginVersion } from "./utils";
+import { checkPluginVersion } from './utils';
 //import 'ui/autoload/all';
 /* import 'uiExports/visTypes';
 import 'uiExports/visResponseHandlers';
@@ -69,7 +69,7 @@ import './factories';
 import { checkCurrentSecurityPlatform } from './controllers/management/components/management/configuration/utils/wz-fetch';
 import store from './redux/store';
 import { updateCurrentPlatform } from './redux/actions/appStateActions';
-import { WzAuthentication } from './react-services/wz-authentication'
+import { WzAuthentication } from './react-services/wz-authentication';
 
 import { getAngularModule } from './kibana-services';
 const app = getAngularModule();
@@ -113,4 +113,13 @@ app.run(function ($rootElement) {
       <react-component name="WzAgentSelectorWrapper" props=""></react-component>
       <react-component name="ToastNotificationsModal" props=""></react-component>
     </div>`);
+
+  // Blind deleteExistenToken on Log out component.
+  $(document).ready(function () {
+    $('.euiHeaderSectionItem__button').mouseleave('mouseleave', function () {
+      $('span:contains(Log out)').bind('click', function () {
+        WzAuthentication.deleteExistentToken();
+      });
+    });
+  });
 });

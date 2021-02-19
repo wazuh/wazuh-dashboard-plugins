@@ -30,6 +30,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Can't edit empty rules and decoders files that already exist in the manager [#2978](https://github.com/wazuh/wazuh-kibana-app/pull/2978)
 - Support for alerts index pattern with different ID and name [#2979](https://github.com/wazuh/wazuh-kibana-app/pull/2979)
 - Fix the unpin agent in the selection modal [#2980](https://github.com/wazuh/wazuh-kibana-app/pull/2980)
+- Fix properly logout of Wazuh API when logging out of the application (only for OpenDistro) [#2789](https://github.com/wazuh/wazuh-kibana-app/issues/2789)
 
 ## Wazuh v4.1.0 - Kibana 7.10.0 , 7.10.2 - Revision 4101
 
