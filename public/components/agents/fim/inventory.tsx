@@ -175,9 +175,9 @@ export class Inventory extends Component {
       return ((response.data || {}).data || {}).total_affected_items || 0;
     } catch (error) {
       if (error.match('3013 - Permission denied')) {
-        this.setState({ isLoading: false, notPermissions: true });
+        this.setState({ notPermissions: true });
       }
-
+      this.setState({ isLoading: false });
       this.showToast('danger', error, 3000);
     }
   }

@@ -18,7 +18,6 @@ import { compose } from 'redux';
 export const MainMitre = compose(
   withUserAuthorizationPrompt([
     { action: 'agent:read', resource: 'agent:id:*' },
-    { action: 'syscheck:read', resource: 'agent:id:*' },
     { action: 'mitre:read', resource: '*:*:*' },
   ])
 )(

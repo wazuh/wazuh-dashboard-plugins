@@ -132,8 +132,9 @@ export class Mitre extends Component {
       this._isMount && this.setState({tacticsObject, isLoading: false});
     } catch(err) {
       if (err.match('3013 - Permission denied')) {
-        this.setState({isLoading: false, notPermissions: true});
+        this.setState({ notPermissions: true });
       }
+      this.setState({ isLoading: false });
       this.showToast(
         'danger',
         'Error',
@@ -155,7 +156,6 @@ export class Mitre extends Component {
         <WzEmptyPromptNoPermissions
           permissions={[
             { action: 'agent:read', resource: 'agent:id:*' },
-            { action: 'syscheck:read', resource: 'agent:id:*' },
             { action: 'mitre:read', resource: '*:*:*' },
           ]}
         />
