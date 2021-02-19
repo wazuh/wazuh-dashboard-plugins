@@ -21,7 +21,7 @@ export const PromptAgentNoSupportModule = () => {
   return (
     <EuiEmptyPrompt
       iconType="watchesApp"
-      title={<h2>Agent not support the module</h2>}
+      title={<h2>Module not supported by the agent</h2>}
       actions={
         <EuiButton color="primary" fill onClick={openAgentSelector}>
           Select agent

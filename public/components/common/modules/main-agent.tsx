@@ -339,7 +339,7 @@ const ModuleTabViewer = compose(
           redirect={props.afterLoad}>
         </Loader>}
       {selectView === 'dashboard' &&
-        <><Dashboard {...props} /><div>HOLA</div></>
+        <Dashboard {...props} />
       }
       {selectView === 'settings' &&
         <Settings {...props} />
