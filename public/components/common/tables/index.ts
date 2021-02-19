@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Index of Wazuh buttons
+ * Wazuh app - Index for table components
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -10,5 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 
-export { WzButton } from './button';
-export { WzButtonModalConfirm, WzButtonPermissionsModalConfirm } from './modal-confirm';
+
+export { TableWithSearchBar } from './table-with-search-bar';
+export { TableWithSearchBarWzAPI } from './table-with-search-bar-wz-api';
