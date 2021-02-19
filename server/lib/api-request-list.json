@@ -8778,33 +8778,6 @@
         ]
       },
       {
-        "name": "/manager/restart",
-        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.manager_controller.put_restart",
-        "description": "Restart the wazuh manager",
-        "summary": "Restart manager",
-        "tags": [
-          "Manager"
-        ],
-        "query": [
-          {
-            "name": "pretty",
-            "description": "Show results in human-readable format",
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
-          },
-          {
-            "name": "wait_for_complete",
-            "description": "Disable timeout response",
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
-          }
-        ]
-      },
-      {
         "name": "/rootcheck",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.rootcheck_controller.put_rootcheck",
         "description": "Run rootcheck scan in all agents or a list of them",
@@ -8824,6 +8797,52 @@
                 "description": "Agent ID",
                 "format": "numbers"
               }
+            }
+          },
+          {
+            "name": "pretty",
+            "description": "Show results in human-readable format",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "wait_for_complete",
+            "description": "Disable timeout response",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ]
+      },
+      {
+        "name": "/rules/files/:filename",
+        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.rule_controller.put_file",
+        "description": "Upload or replace a user ruleset file content",
+        "summary": "Update rules file",
+        "tags": [
+          "Rules"
+        ],
+        "args": [
+          {
+            "name": ":filename",
+            "description": "Filename (rule or decoder) to download/upload/edit file.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[\\w\\-]+\\.xml$"
+            }
+          }
+        ],
+        "query": [
+          {
+            "name": "overwrite",
+            "description": "If set to false, an exception will be raised when updating contents of an already existing filename",
+            "schema": {
+              "type": "boolean",
+              "default": false
             }
           },
           {
