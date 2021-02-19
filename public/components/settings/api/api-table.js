@@ -228,7 +228,7 @@ export class ApiTable extends Component {
           return value === API_USER_STATUS_RUN_AS.ENABLED ? (
             <EuiToolTip
               position='top'
-              content='The configurated API user uses the authentication context.'
+              content='The configured API user uses the authentication context.'
             >
               <EuiIcon
                 type='check'
@@ -238,7 +238,7 @@ export class ApiTable extends Component {
           ) : value === API_USER_STATUS_RUN_AS.NOT_ALLOWED ? (
             <EuiToolTip
               position='top'
-              content='The configurated API user is not allowed to use run_as. Give it permissions or set run_as with false value in host the configuration.'
+              content='The configured API user is not allowed to use run_as. Give it permissions or set run_as with false value in host the configuration.'
             >
               <EuiIcon
                 color='danger'
