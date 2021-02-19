@@ -1086,53 +1086,6 @@
         ]
       },
       {
-        "name": "/cluster/:node_id/files",
-        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_files_node",
-        "description": "Return file contents from any file in the specified node",
-        "summary": "Get node file content",
-        "tags": [
-          "Cluster"
-        ],
-        "args": [
-          {
-            "name": ":node_id",
-            "description": "Cluster node name",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "names"
-            }
-          }
-        ],
-        "query": [
-          {
-            "name": "path",
-            "description": "Filepath to return file. (Relative to wazuh installation folder)",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "etc_and_ruleset_file_path"
-            }
-          },
-          {
-            "name": "pretty",
-            "description": "Show results in human-readable format",
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
-          },
-          {
-            "name": "wait_for_complete",
-            "description": "Disable timeout response",
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
-          }
-        ]
-      },
-      {
         "name": "/cluster/:node_id/info",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_info_node",
         "description": "Return basic information about a specified node such as version, compilation date, installation path",
@@ -1948,7 +1901,7 @@
             "description": "Filter by relative directory name",
             "schema": {
               "type": "string",
-              "format": "etc_and_ruleset_path"
+              "format": "get_dirnames_path"
             }
           },
           {
@@ -2055,7 +2008,7 @@
             "description": "Filter by relative directory name",
             "schema": {
               "type": "string",
-              "format": "etc_and_ruleset_path"
+              "format": "get_dirnames_path"
             }
           },
           {
@@ -2098,21 +2051,21 @@
         ]
       },
       {
-        "name": "/decoders/files/:filename/download",
-        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.decoder_controller.get_download_file",
-        "description": "Download an specified decoder file",
-        "summary": "Download decoder",
+        "name": "/decoders/files/:filename",
+        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.decoder_controller.get_file",
+        "description": "Get the content of a specified decoder file",
+        "summary": "Get decoders file content",
         "tags": [
           "Decoders"
         ],
         "args": [
           {
             "name": ":filename",
+            "description": "Filename (rule or decoder) to download/upload/edit file.",
             "required": true,
-            "description": "Filename to download",
             "schema": {
               "type": "string",
-              "format": "alphanumeric"
+              "pattern": "^[\\w\\-]+\\.xml$"
             }
           }
         ],
@@ -2123,6 +2076,14 @@
             "schema": {
               "type": "boolean",
               "default": false
+            }
+          },
+          {
+            "name": "raw",
+            "description": "Format response in plain text",
+            "required": false,
+            "schema": {
+              "type": "boolean"
             }
           },
           {
@@ -4151,7 +4112,7 @@
         "name": "/lists",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cdb_list_controller.get_lists",
         "description": "Return the contents of all CDB lists. Optionally, the result can be filtered by several criteria. See available parameters for more details",
-        "summary": "Get CDB lists",
+        "summary": "Get CDB lists info",
         "tags": [
           "Lists"
         ],
@@ -4201,7 +4162,7 @@
             "description": "Filter by relative directory name",
             "schema": {
               "type": "string",
-              "format": "etc_and_ruleset_path"
+              "format": "get_dirnames_path"
             }
           },
           {
@@ -4295,7 +4256,7 @@
             "description": "Filter by relative directory name",
             "schema": {
               "type": "string",
-              "format": "etc_and_ruleset_path"
+              "format": "get_dirnames_path"
             }
           },
           {
@@ -4312,6 +4273,52 @@
             "schema": {
               "type": "string",
               "format": "sort"
+            }
+          },
+          {
+            "name": "wait_for_complete",
+            "description": "Disable timeout response",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ]
+      },
+      {
+        "name": "/lists/files/:filename",
+        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cdb_list_controller.get_file",
+        "description": "Return the content of a CDB list file. Only the filename can be specified. It will be searched recursively if not found",
+        "summary": "Get CDB list file content",
+        "tags": [
+          "Lists"
+        ],
+        "args": [
+          {
+            "name": ":filename",
+            "description": "Filename (CDB list) to get/edit/delete.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[\\-\\w]+$"
+            }
+          }
+        ],
+        "query": [
+          {
+            "name": "pretty",
+            "description": "Show results in human-readable format",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "raw",
+            "description": "Format response in plain text",
+            "required": false,
+            "schema": {
+              "type": "boolean"
             }
           },
           {
@@ -4522,42 +4529,6 @@
           "Manager"
         ],
         "query": [
-          {
-            "name": "pretty",
-            "description": "Show results in human-readable format",
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
-          },
-          {
-            "name": "wait_for_complete",
-            "description": "Disable timeout response",
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
-          }
-        ]
-      },
-      {
-        "name": "/manager/files",
-        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.manager_controller.get_files",
-        "description": "Return file contents from any file",
-        "summary": "Get file content",
-        "tags": [
-          "Manager"
-        ],
-        "query": [
-          {
-            "name": "path",
-            "description": "Filepath to return file. (Relative to wazuh installation folder)",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "etc_and_ruleset_file_path"
-            }
-          },
           {
             "name": "pretty",
             "description": "Show results in human-readable format",
@@ -5351,7 +5322,7 @@
             "description": "Filter by relative directory name",
             "schema": {
               "type": "string",
-              "format": "etc_and_ruleset_path"
+              "format": "get_dirnames_path"
             }
           },
           {
@@ -5435,12 +5406,12 @@
         "query": [
           {
             "name": "filename",
-            "description": "Filter by filename",
+            "description": "Filter by filename of one or more rule or decoder files.",
             "schema": {
               "type": "array",
               "items": {
                 "type": "string",
-                "format": "alphanumeric"
+                "pattern": "^[\\w\\-]+\\.xml(,[\\w\\-]+\\.xml)*$"
               }
             }
           },
@@ -5478,7 +5449,7 @@
             "description": "Filter by relative directory name",
             "schema": {
               "type": "string",
-              "format": "etc_and_ruleset_path"
+              "format": "get_dirnames_path"
             }
           },
           {
@@ -5521,21 +5492,21 @@
         ]
       },
       {
-        "name": "/rules/files/:filename/download",
-        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.rule_controller.get_download_file",
-        "description": "Download an specified rule file",
-        "summary": "Download rule",
+        "name": "/rules/files/:filename",
+        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.rule_controller.get_file",
+        "description": "Get the content of a specified rule in the ruleset",
+        "summary": "Get rules file content",
         "tags": [
           "Rules"
         ],
         "args": [
           {
             "name": ":filename",
+            "description": "Filename (rule or decoder) to download/upload/edit file.",
             "required": true,
-            "description": "Filename to download",
             "schema": {
               "type": "string",
-              "format": "alphanumeric"
+              "pattern": "^[\\w\\-]+\\.xml$"
             }
           }
         ],
@@ -5546,6 +5517,14 @@
             "schema": {
               "type": "boolean",
               "default": false
+            }
+          },
+          {
+            "name": "raw",
+            "description": "Format response in plain text",
+            "required": false,
+            "schema": {
+              "type": "boolean"
             }
           },
           {
@@ -6169,9 +6148,8 @@
                 "agent:id",
                 "group:id",
                 "node:id",
-                "file:path",
                 "decoder:file",
-                "list:path",
+                "list:file",
                 "rule:file",
                 "policy:id",
                 "role:id",
@@ -6336,7 +6314,7 @@
       {
         "name": "/security/user/authenticate",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.login_user",
-        "description": "This method should be called to get an API token. This token will expire after auth_token_exp_timeout seconds (default: 3600). This value can be changed using PUT /security/config",
+        "description": "This method should be called to get an API token. This token will expire after auth_token_exp_timeout seconds (default: 900). This value can be changed using PUT /security/config",
         "summary": "Login",
         "tags": [
           "Security"
@@ -8466,7 +8444,7 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "path"
+              "format": "wazuh_path"
             }
           },
           {
@@ -8496,10 +8474,10 @@
         ]
       },
       {
-        "name": "/cluster/:node_id/files",
-        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.put_files_node",
-        "description": "Replace file contents with the data contained in the API request for the specified node",
-        "summary": "Update node file content",
+        "name": "/cluster/:node_id/configuration",
+        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.update_configuration",
+        "description": "Replace wazuh configuration for the given node with the data contained in the API request",
+        "summary": "Update node configuration",
         "tags": [
           "Cluster"
         ],
@@ -8516,23 +8494,6 @@
         ],
         "query": [
           {
-            "name": "overwrite",
-            "description": "If set to false, an exception will be raised when updating contents of an already existing filename",
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
-          },
-          {
-            "name": "path",
-            "description": "Filepath to upload/delete file. (Relative to wazuh installation folder)",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "etc_file_path"
-            }
-          },
-          {
             "name": "pretty",
             "description": "Show results in human-readable format",
             "schema": {
@@ -8546,163 +8507,6 @@
             "schema": {
               "type": "boolean",
               "default": false
-            }
-          }
-        ]
-      },
-      {
-        "name": "/cluster/api/config",
-        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.put_api_config",
-        "description": "Update the API configuration of all nodes (or a list of them) with the data contained in the API request",
-        "summary": "Update nodes API config",
-        "tags": [
-          "Cluster"
-        ],
-        "query": [
-          {
-            "name": "nodes_list",
-            "description": "List of node IDs (separated by comma), all nodes selected by default if not specified",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          },
-          {
-            "name": "pretty",
-            "description": "Show results in human-readable format",
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
-          },
-          {
-            "name": "wait_for_complete",
-            "description": "Disable timeout response",
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
-          }
-        ],
-        "body": [
-          {
-            "type": "object",
-            "minProperties": 1,
-            "additionalProperties": false,
-            "properties": {
-              "access": {
-                "description": "API Security Options",
-                "type": "object",
-                "additionalProperties": false,
-                "properties": {
-                  "max_login_attempts": {
-                    "description": "Maximum number of login attempts in {block_time} seconds",
-                    "type": "integer",
-                    "format": "int32",
-                    "minimum": 1,
-                    "example": 50
-                  },
-                  "block_time": {
-                    "description": "Blocking time for IPs that have exceeded {max_login_attempts}. Time counts from the first attempt",
-                    "type": "integer",
-                    "format": "int32",
-                    "minimum": 0,
-                    "example": 300
-                  },
-                  "max_request_per_minute": {
-                    "description": "Maximum number of requests allowed per minute",
-                    "type": "integer",
-                    "format": "int32",
-                    "minimum": 1,
-                    "example": 300
-                  }
-                }
-              },
-              "behind_proxy_server": {
-                "description": "Set this option to 'yes' in case the API is running behind a proxy server",
-                "type": "boolean",
-                "default": false
-              },
-              "logs": {
-                "type": "object",
-                "additionalProperties": false,
-                "properties": {
-                  "level": {
-                    "description": "Verbosity level of API logs",
-                    "default": "info",
-                    "type": "string",
-                    "enum": [
-                      "disabled",
-                      "info",
-                      "warning",
-                      "error",
-                      "debug",
-                      "debug2"
-                    ]
-                  }
-                }
-              },
-              "cache": {
-                "type": "object",
-                "additionalProperties": false,
-                "properties": {
-                  "enabled": {
-                    "description": "Enable cache",
-                    "type": "boolean",
-                    "default": true
-                  },
-                  "time": {
-                    "description": "Cache expiration time in seconds",
-                    "type": "number",
-                    "format": "double",
-                    "minimum": 0,
-                    "example": 0.75
-                  }
-                }
-              },
-              "cors": {
-                "type": "object",
-                "additionalProperties": false,
-                "properties": {
-                  "enabled": {
-                    "description": "Enable CORS",
-                    "type": "boolean",
-                    "default": false
-                  },
-                  "source_route": {
-                    "description": "Sources for which the resources will be available. For example 'http://client.example.org'",
-                    "type": "string",
-                    "example": "*"
-                  },
-                  "expose_headers": {
-                    "description": "Which headers can be exposed as part of the response",
-                    "type": "string",
-                    "example": "*"
-                  },
-                  "allow_headers": {
-                    "description": "Which HTTP headers can be used during the actual request",
-                    "type": "string",
-                    "example": "*"
-                  },
-                  "allow_credentials": {
-                    "description": "Browsers will only expose the response to frontend JavaScript code if this is enabled",
-                    "type": "boolean",
-                    "default": false
-                  }
-                }
-              },
-              "use_only_authd": {
-                "description": "Force the use of authd when adding and removing agents",
-                "type": "boolean",
-                "default": false
-              },
-              "experimental_features": {
-                "description": "Enable features under development",
-                "type": "boolean",
-                "default": false
-              }
             }
           }
         ]
@@ -8745,6 +8549,52 @@
         ]
       },
       {
+        "name": "/decoders/files/:filename",
+        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.decoder_controller.put_file",
+        "description": "Upload or replace a user decoder file content",
+        "summary": "Update decoders file",
+        "tags": [
+          "Decoders"
+        ],
+        "args": [
+          {
+            "name": ":filename",
+            "description": "Filename (rule or decoder) to download/upload/edit file.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[\\w\\-]+\\.xml$"
+            }
+          }
+        ],
+        "query": [
+          {
+            "name": "overwrite",
+            "description": "If set to false, an exception will be raised when updating contents of an already existing filename",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "pretty",
+            "description": "Show results in human-readable format",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "wait_for_complete",
+            "description": "Disable timeout response",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ]
+      },
+      {
         "name": "/groups/:group_id/configuration",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agent_controller.put_group_config",
         "description": "Update an specified group's configuration. This API call expects a full valid XML file with the shared configuration tags/syntax",
@@ -8765,6 +8615,52 @@
           }
         ],
         "query": [
+          {
+            "name": "pretty",
+            "description": "Show results in human-readable format",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "wait_for_complete",
+            "description": "Disable timeout response",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ]
+      },
+      {
+        "name": "/lists/files/:filename",
+        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cdb_list_controller.put_file",
+        "description": "Replace or upload a CDB list file with the data contained in the API request",
+        "summary": "Update CDB list file",
+        "tags": [
+          "Lists"
+        ],
+        "args": [
+          {
+            "name": ":filename",
+            "description": "Filename (CDB list) to get/edit/delete.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[\\-\\w]+$"
+            }
+          }
+        ],
+        "query": [
+          {
+            "name": "overwrite",
+            "description": "If set to false, an exception will be raised when updating contents of an already existing filename",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
           {
             "name": "pretty",
             "description": "Show results in human-readable format",
@@ -8839,178 +8735,14 @@
         ]
       },
       {
-        "name": "/manager/api/config",
-        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.manager_controller.put_api_config",
-        "description": "Update local API configuration with the data contained in the API request",
-        "summary": "Update API config",
+        "name": "/manager/configuration",
+        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.manager_controller.update_configuration",
+        "description": "Replace Wazuh configuration with the data contained in the API request",
+        "summary": "Update Wazuh configuration",
         "tags": [
           "Manager"
         ],
         "query": [
-          {
-            "name": "pretty",
-            "description": "Show results in human-readable format",
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
-          },
-          {
-            "name": "wait_for_complete",
-            "description": "Disable timeout response",
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
-          }
-        ],
-        "body": [
-          {
-            "type": "object",
-            "minProperties": 1,
-            "additionalProperties": false,
-            "properties": {
-              "access": {
-                "description": "API Security Options",
-                "type": "object",
-                "additionalProperties": false,
-                "properties": {
-                  "max_login_attempts": {
-                    "description": "Maximum number of login attempts in {block_time} seconds",
-                    "type": "integer",
-                    "format": "int32",
-                    "minimum": 1,
-                    "example": 50
-                  },
-                  "block_time": {
-                    "description": "Blocking time for IPs that have exceeded {max_login_attempts}. Time counts from the first attempt",
-                    "type": "integer",
-                    "format": "int32",
-                    "minimum": 0,
-                    "example": 300
-                  },
-                  "max_request_per_minute": {
-                    "description": "Maximum number of requests allowed per minute",
-                    "type": "integer",
-                    "format": "int32",
-                    "minimum": 1,
-                    "example": 300
-                  }
-                }
-              },
-              "behind_proxy_server": {
-                "description": "Set this option to 'yes' in case the API is running behind a proxy server",
-                "type": "boolean",
-                "default": false
-              },
-              "logs": {
-                "type": "object",
-                "additionalProperties": false,
-                "properties": {
-                  "level": {
-                    "description": "Verbosity level of API logs",
-                    "default": "info",
-                    "type": "string",
-                    "enum": [
-                      "disabled",
-                      "info",
-                      "warning",
-                      "error",
-                      "debug",
-                      "debug2"
-                    ]
-                  }
-                }
-              },
-              "cache": {
-                "type": "object",
-                "additionalProperties": false,
-                "properties": {
-                  "enabled": {
-                    "description": "Enable cache",
-                    "type": "boolean",
-                    "default": true
-                  },
-                  "time": {
-                    "description": "Cache expiration time in seconds",
-                    "type": "number",
-                    "format": "double",
-                    "minimum": 0,
-                    "example": 0.75
-                  }
-                }
-              },
-              "cors": {
-                "type": "object",
-                "additionalProperties": false,
-                "properties": {
-                  "enabled": {
-                    "description": "Enable CORS",
-                    "type": "boolean",
-                    "default": false
-                  },
-                  "source_route": {
-                    "description": "Sources for which the resources will be available. For example 'http://client.example.org'",
-                    "type": "string",
-                    "example": "*"
-                  },
-                  "expose_headers": {
-                    "description": "Which headers can be exposed as part of the response",
-                    "type": "string",
-                    "example": "*"
-                  },
-                  "allow_headers": {
-                    "description": "Which HTTP headers can be used during the actual request",
-                    "type": "string",
-                    "example": "*"
-                  },
-                  "allow_credentials": {
-                    "description": "Browsers will only expose the response to frontend JavaScript code if this is enabled",
-                    "type": "boolean",
-                    "default": false
-                  }
-                }
-              },
-              "use_only_authd": {
-                "description": "Force the use of authd when adding and removing agents",
-                "type": "boolean",
-                "default": false
-              },
-              "experimental_features": {
-                "description": "Enable features under development",
-                "type": "boolean",
-                "default": false
-              }
-            }
-          }
-        ]
-      },
-      {
-        "name": "/manager/files",
-        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.manager_controller.put_files",
-        "description": "Replace file contents with the data contained in the API request",
-        "summary": "Update file content",
-        "tags": [
-          "Manager"
-        ],
-        "query": [
-          {
-            "name": "overwrite",
-            "description": "If set to false, an exception will be raised when updating contents of an already existing filename",
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
-          },
-          {
-            "name": "path",
-            "description": "Filepath to upload/delete file. (Relative to wazuh installation folder)",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "etc_file_path"
-            }
-          },
           {
             "name": "pretty",
             "description": "Show results in human-readable format",
@@ -9097,6 +8829,52 @@
         ]
       },
       {
+        "name": "/rules/files/:filename",
+        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.rule_controller.put_file",
+        "description": "Upload or replace a user ruleset file content",
+        "summary": "Update rules file",
+        "tags": [
+          "Rules"
+        ],
+        "args": [
+          {
+            "name": ":filename",
+            "description": "Filename (rule or decoder) to download/upload/edit file.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[\\w\\-]+\\.xml$"
+            }
+          }
+        ],
+        "query": [
+          {
+            "name": "overwrite",
+            "description": "If set to false, an exception will be raised when updating contents of an already existing filename",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "pretty",
+            "description": "Show results in human-readable format",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "wait_for_complete",
+            "description": "Disable timeout response",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ]
+      },
+      {
         "name": "/security/config",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.put_security_config",
         "description": "Update the security configuration with the data contained in the API request",
@@ -9132,7 +8910,7 @@
                 "type": "integer",
                 "format": "int32",
                 "minimum": 30,
-                "example": 3600
+                "example": 900
               },
               "rbac_mode": {
                 "description": "RBAC mode (white/black)",
@@ -9906,7 +9684,7 @@
       {
         "name": "/security/user/authenticate/run_as",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.login_user",
-        "description": "This method should be called to get an API token using an authorization context body. This token will expire after auth_token_exp_timeout seconds (default: 3600). This value can be changed using PUT /security/config",
+        "description": "This method should be called to get an API token using an authorization context body. This token will expire after auth_token_exp_timeout seconds (default: 900). This value can be changed using PUT /security/config",
         "summary": "Login auth_context",
         "tags": [
           "Security"
@@ -10271,71 +10049,25 @@
         ]
       },
       {
-        "name": "/cluster/:node_id/files",
-        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.delete_files_node",
-        "description": "Delete a file in the specified node",
-        "summary": "Delete node file",
+        "name": "/decoders/files/:filename",
+        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.decoder_controller.delete_file",
+        "description": "Delete a specified decoder file",
+        "summary": "Delete decoders file",
         "tags": [
-          "Cluster"
+          "Decoders"
         ],
         "args": [
           {
-            "name": ":node_id",
-            "description": "Cluster node name",
+            "name": ":filename",
+            "description": "Filename (rule or decoder) to download/upload/edit file.",
             "required": true,
             "schema": {
               "type": "string",
-              "format": "names"
+              "pattern": "^[\\w\\-]+\\.xml$"
             }
           }
         ],
         "query": [
-          {
-            "name": "path",
-            "description": "Filepath to upload/delete file. (Relative to wazuh installation folder)",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "etc_file_path"
-            }
-          },
-          {
-            "name": "pretty",
-            "description": "Show results in human-readable format",
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
-          },
-          {
-            "name": "wait_for_complete",
-            "description": "Disable timeout response",
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
-          }
-        ]
-      },
-      {
-        "name": "/cluster/api/config",
-        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.delete_api_config",
-        "description": "Restore the default API configuration of all nodes (or a list of them)",
-        "summary": "Restore nodes default API config",
-        "tags": [
-          "Cluster"
-        ],
-        "query": [
-          {
-            "name": "nodes_list",
-            "description": "List of node IDs (separated by comma), all nodes selected by default if not specified",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          },
           {
             "name": "pretty",
             "description": "Show results in human-readable format",
@@ -10437,6 +10169,44 @@
         ]
       },
       {
+        "name": "/lists/files/:filename",
+        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cdb_list_controller.delete_file",
+        "description": "Delete a specified CDB list file. Only the filename can be specified. It will be searched recursively if not found",
+        "summary": "Delete CDB list file",
+        "tags": [
+          "Lists"
+        ],
+        "args": [
+          {
+            "name": ":filename",
+            "description": "Filename (CDB list) to get/edit/delete.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[\\-\\w]+$"
+            }
+          }
+        ],
+        "query": [
+          {
+            "name": "pretty",
+            "description": "Show results in human-readable format",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "wait_for_complete",
+            "description": "Disable timeout response",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ]
+      },
+      {
         "name": "/logtest/sessions/:token",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.logtest_controller.end_logtest_session",
         "description": "Delete the saved logtest session corresponding to {token}",
@@ -10456,69 +10226,6 @@
           }
         ],
         "query": [
-          {
-            "name": "pretty",
-            "description": "Show results in human-readable format",
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
-          },
-          {
-            "name": "wait_for_complete",
-            "description": "Disable timeout response",
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
-          }
-        ]
-      },
-      {
-        "name": "/manager/api/config",
-        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.manager_controller.delete_api_config",
-        "description": "Restore default local API configuration",
-        "summary": "Restore default API config",
-        "tags": [
-          "Manager"
-        ],
-        "query": [
-          {
-            "name": "pretty",
-            "description": "Show results in human-readable format",
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
-          },
-          {
-            "name": "wait_for_complete",
-            "description": "Disable timeout response",
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
-          }
-        ]
-      },
-      {
-        "name": "/manager/files",
-        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.manager_controller.delete_files",
-        "description": "Delete a specified file",
-        "summary": "Delete file",
-        "tags": [
-          "Manager"
-        ],
-        "query": [
-          {
-            "name": "path",
-            "description": "Filepath to upload/delete file. (Relative to wazuh installation folder)",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "etc_file_path"
-            }
-          },
           {
             "name": "pretty",
             "description": "Show results in human-readable format",
@@ -10559,6 +10266,44 @@
               }
             }
           },
+          {
+            "name": "pretty",
+            "description": "Show results in human-readable format",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "wait_for_complete",
+            "description": "Disable timeout response",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ]
+      },
+      {
+        "name": "/rules/files/:filename",
+        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.rule_controller.delete_file",
+        "description": "Delete a specified rule file",
+        "summary": "Delete rules file",
+        "tags": [
+          "Rules"
+        ],
+        "args": [
+          {
+            "name": ":filename",
+            "description": "Filename (rule or decoder) to download/upload/edit file.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[\\w\\-]+\\.xml$"
+            }
+          }
+        ],
+        "query": [
           {
             "name": "pretty",
             "description": "Show results in human-readable format",

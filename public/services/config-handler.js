@@ -25,7 +25,7 @@ export class ConfigHandler {
   async saveManagerConfiguration(content) {
     try {
       const result = await WzRequest.apiReq(
-        'POST',
+        'PUT',
         `/manager/configuration?overwrite=true`,
         { content, origin: 'xmleditor' }
       );

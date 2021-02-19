@@ -217,17 +217,17 @@ class WzListEditor extends Component {
   };
 
   getUpdatePermissions = (name) => {
-    return {
+    return [{
       action: `${RulesetResources.LISTS}:update`,
-      resource: `${resourceDictionary[RulesetResources.LISTS].permissionResource}:${name}`,
-    }
+      resource: resourceDictionary[RulesetResources.LISTS].permissionResource(name),
+    }];
   }
 
   getDeletePermissions = (name) => {
-    return {
+    return [{
       action: `${RulesetResources.LISTS}:delete`,
-      resource: `${resourceDictionary[RulesetResources.LISTS].permissionResource}:${name}`,
-    }
+      resource: resourceDictionary[RulesetResources.LISTS].permissionResource(name),
+    }];
   }
 
   /**

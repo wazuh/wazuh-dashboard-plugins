@@ -60,7 +60,7 @@ class WzRulesetTable extends Component {
     this.extraSectionPrefixResource = {
       rules: 'rule:file',
       decoders: 'decoder:file',
-      lists: 'list:path',
+      lists: 'list:file',
     };
     this.rulesetHandler = new RulesetHandler(this.props.state.section);
   }
@@ -79,17 +79,17 @@ class WzRulesetTable extends Component {
             rule_ids: id
           }
         });
-        const items = ((result.data || {}).data || {}).affected_items || [];
+        const items = result.affected_items || [];
         if (items.length) {
           const info = await this.rulesetHandler.getResource({
             params: {
               filename: items[0].filename
             }
           });
-          if (info) {
-            Object.assign(info, { current: parseInt(id) });
+          if (info.data) {
+            Object.assign(info.data, { current: parseInt(id) });
           } 
-          this.props.updateRuleInfo(info);
+          this.props.updateRuleInfo(info.data);
         }
         this._isMounted && this.setState({ isRedirect: false });
       }
@@ -245,7 +245,7 @@ class WzRulesetTable extends Component {
           return [
             {
               action: `${section}:read`,
-              resource: permissionResource,
+              resource: permissionResource(item.name),
             }
           ];
         };
@@ -276,11 +276,11 @@ class WzRulesetTable extends Component {
                       filename: item.filename
                     }
                   });
-                  if (result) {
-                    Object.assign(result, { current: id || name });
+                  if (result.data) {
+                    Object.assign(result.data, { current: id || name });
                   }
-                  if (section === RulesetResources.RULES) this.props.updateRuleInfo(result);
-                  if (section === RulesetResources.DECODERS) this.props.updateDecoderInfo(result);
+                  if (section === RulesetResources.RULES) this.props.updateRuleInfo(result.data);
+                  if (section === RulesetResources.DECODERS) this.props.updateDecoderInfo(result.data);
                 }
 
                 this.setState({ isLoading: false });

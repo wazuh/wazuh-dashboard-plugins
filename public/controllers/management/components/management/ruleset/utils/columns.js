@@ -6,11 +6,7 @@ import { WzButtonPermissions } from '../../../../../../components/common/permiss
 
 export default class RulesetColumns {
   constructor(tableProps) {
-    this.tableProps = tableProps;
-
-    this.getReadPermissions = (resource) => {      
-      return [{action: `${resource}:read`, resource: resourceDictionary[resource]}]
-    }
+    this.tableProps = tableProps;    
 
     this.buildColumns = () => {
       this.columns = {
@@ -83,7 +79,7 @@ export default class RulesetColumns {
               return (
                 <WzButtonPermissions
                   buttonType='link'
-                  permissions={this.getReadPermissions(RulesetResources.RULES)}
+                  permissions={getReadButtonPermissions(item)}
                   tooltip={{position:'top', content: `Show ${value} content`}}
                   onClick={async (ev) => {
                     ev.stopPropagation();
@@ -133,7 +129,7 @@ export default class RulesetColumns {
               return (
                 <WzButtonPermissions
                   buttonType='link'
-                  permissions={this.getReadPermissions(RulesetResources.DECODERS)}
+                  permissions={getReadButtonPermissions(item)}
                   tooltip={{position:'top', content: `Show ${value} content`}}
                   onClick={async (ev) => {
                     ev.stopPropagation();
@@ -200,7 +196,7 @@ export default class RulesetColumns {
                 return (
                   <WzButtonPermissions
                     buttonType='icon'
-                    permissions={this.getReadPermissions(RulesetResources.RULES)}
+                    permissions={getReadButtonPermissions(item)}
                     aria-label="Show content"
                     iconType="eye"
                     tooltip={{position: 'top', content:`View the content of ${item.filename}`}}
@@ -225,7 +221,8 @@ export default class RulesetColumns {
                       tooltip={{position: 'top', content:`Edit ${item.filename} content`}}
                       onClick={async ev => {
                         ev.stopPropagation();
-                        const result = await this.rulesetHandler.getFileContent(`${item.relative_dirname}/${item.filename}`);
+                        const rulesetHandler = new RulesetHandler(this.tableProps.state.section);
+                        const result = await rulesetHandler.getFileContent(item.filename);
                         const file = { name: item.filename, content: result, path: item.relative_dirname };
                         this.tableProps.updateFileContent(file);
                       }}
@@ -258,7 +255,7 @@ export default class RulesetColumns {
         return [
           {
             action: `${section}:read`,
-            resource: `${permissionResource}:${item.filename}`,
+            resource: permissionResource(item.filename),
           },
         ];
       };
@@ -269,9 +266,9 @@ export default class RulesetColumns {
         return [
           {
             action: `${section}:read`,
-            resource: `${permissionResource}:${item.filename}`,
+            resource: permissionResource(item.filename),
           },
-          { action: `${section}:update`, resource: `${permissionResource}:${item.filename}` },
+          { action: `${section}:update`, resource: permissionResource(item.filename) },
         ];
       };
 
@@ -281,7 +278,7 @@ export default class RulesetColumns {
         return [
           {
             action: `${section}:delete`,
-            resource: `${permissionResource}:/${item.filename}`,
+            resource: permissionResource(item.filename),
           },
         ];
       };
@@ -302,7 +299,8 @@ export default class RulesetColumns {
                   tooltip={{position: 'top', content: `Edit ${item.filename} content`}}
                   onClick={async (ev) => {
                     ev.stopPropagation();
-                    const result = await this.rulesetHandler.getCdbList(`${item.relative_dirname}/${item.filename}`);
+                    const rulesetHandler = new RulesetHandler(this.tableProps.state.section);
+                    const result = await rulesetHandler.getFileContent(item.filename);
                     const file = { name: item.filename, content: result, path: item.relative_dirname };
                     this.tableProps.updateListContent(file);
                   }}

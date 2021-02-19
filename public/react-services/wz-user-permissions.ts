@@ -293,9 +293,7 @@ const wazuhPermissions = {
       "GET /cluster/{node_id}/stats/remoted",
       "GET /cluster/{node_id}/logs",
       "GET /cluster/{node_id}/logs/summary",
-      "GET /cluster/{node_id}/files",
-      "PUT /cluster/{node_id}/files",
-      "DELETE /cluster/{node_id}/files",
+      "PUT /cluster/{node_id}/configuration",
       "PUT /cluster/restart",
       "GET /cluster/configuration/validation",
       "GET /cluster/{node_id}/configuration/{component}/{configuration}"
@@ -378,57 +376,14 @@ const wazuhPermissions = {
       "DELETE /cluster/api/config"
     ]
   },
-  "cluster:read_file": {
-    "description": "Read Wazuh's cluster files",
-    "resources": [
-      "node:id",
-      "file:path",
-      "node:id&file:path",
-    ],
-    "example": {
-      "actions": [
-        "cluster:read_file"
-      ],
-      "resources": [
-        "node:id:worker1",
-        "file:path:etc/rules/new-rules.xml"
-      ],
-      "effect": "allow"
-    },
-    "related_endpoints": [
-      "GET /cluster/{node_id}/files"
-    ]
-  },
-  "cluster:delete_file": {
-    "description": "Delete Wazuh's cluster files",
-    "resources": [
-      "node:id",
-      "file:path",
-      "node:id&file:path",
-    ],
-    "example": {
-      "actions": [
-        "cluster:delete_file"
-      ],
-      "resources": [
-        "node:id:worker1",
-        "file:path:etc/rules/new-rules.xml"
-      ],
-      "effect": "deny"
-    },
-    "related_endpoints": [
-      "PUT /cluster/{node_id}/files",
-      "DELETE /cluster/{node_id}/files"
-    ]
-  },
-  "cluster:upload_file": {
-    "description": "Upload new file to Wazuh's cluster node",
+  "cluster:update_config": {
+    "description": "Update configuration of Wazuh's cluster node",
     "resources": [
       "node:id"
     ],
     "example": {
       "actions": [
-        "cluster:upload_file"
+        "cluster:update_config"
       ],
       "resources": [
         "node:id:worker1"
@@ -436,7 +391,7 @@ const wazuhPermissions = {
       "effect": "allow"
     },
     "related_endpoints": [
-      "PUT /cluster/{node_id}/files"
+      "PUT /cluster/{node_id}/configuration"
     ]
   },
   "cluster:restart": {
@@ -460,20 +415,57 @@ const wazuhPermissions = {
   "lists:read": {
     "description": "Read lists files",
     "resources": [
-      "list:path"
+      "list:file"
     ],
     "example": {
       "actions": [
         "lists:read"
       ],
       "resources": [
-        "list:path:etc/lists/audit-keys"
+        "list:file:audit-keys"
       ],
       "effect": "deny"
     },
     "related_endpoints": [
       "GET /lists",
       "GET /lists/files"
+    ]
+  },
+  "lists:update": {
+    "description": "Update lists files",
+    "resources": [
+      "list:file",
+      "*:*"
+    ],
+    "example": {
+      "actions": [
+        "lists:update"
+      ],
+      "resources": [
+        "list:file:audit-keys"
+      ],
+      "effect": "deny"
+    },
+    "related_endpoints": [      
+      "PUT /lists/files"
+    ]
+  },
+  "lists:delete": {
+    "description": "Delete lists files",
+    "resources": [
+      "list:file"
+    ],
+    "example": {
+      "actions": [
+        "lists:delete"
+      ],
+      "resources": [
+        "list:file:audit-keys"
+      ],
+      "effect": "deny"
+    },
+    "related_endpoints": [      
+      "DELETE /lists/files"
     ]
   },
   "manager:read": {
@@ -501,59 +493,20 @@ const wazuhPermissions = {
       "GET /manager/stats/remoted",
       "GET /manager/logs",
       "GET /manager/logs/summary",
-      "GET /manager/files",
-      "PUT /manager/files",
-      "DELETE /manager/files",
+      "PUT /manager/configuration",
       "PUT /manager/restart",
       "GET /manager/configuration/validation",
       "GET /manager/configuration/{component}/{configuration}"
     ]
-  },
-  "manager:read_file": {
-    "description": "Read Wazuh manager files",
-    "resources": [
-      "file:path"
-    ],
-    "example": {
-      "actions": [
-        "manager:read_file"
-      ],
-      "resources": [
-        "file:path:etc/rules/new-rules.xml"
-      ],
-      "effect": "allow"
-    },
-    "related_endpoints": [
-      "GET /manager/files"
-    ]
-  },
-  "manager:delete_file": {
-    "description": "Delete Wazuh manager files",
-    "resources": [
-      "file:path"
-    ],
-    "example": {
-      "actions": [
-        "manager:delete_file"
-      ],
-      "resources": [
-        "file:path:etc/rules/new-rules.xml"
-      ],
-      "effect": "allow"
-    },
-    "related_endpoints": [
-      "PUT /manager/files",
-      "DELETE /manager/files"
-    ]
-  },
-  "manager:upload_file": {
-    "description": "Upload new file to Wazuh manager node",
+  },  
+  "manager:update_config": {
+    "description": "Update the configuration of Wazuh manager node",
     "resources": [
       "*:*"
     ],
     "example": {
       "actions": [
-        "manager:upload_file"
+        "manager:update_config"
       ],
       "resources": [
         "*:*:*"
@@ -561,7 +514,7 @@ const wazuhPermissions = {
       "effect": "deny"
     },
     "related_endpoints": [
-      "PUT /manager/files"
+      "PUT /manager/configuration"
     ]
   },
   "manager:read_api_config": {
@@ -659,6 +612,43 @@ const wazuhPermissions = {
       "GET /rules/files/{filename}/download"
     ]
   },
+  "rules:update": {
+    "description": "Update rules files",
+    "resources": [
+      "rule:file",
+      "*:*"
+    ],
+    "example": {
+      "actions": [
+        "rules:update"
+      ],
+      "resources": [
+        "rule:file:0610-win-ms_logs_rules.xml"
+      ],
+      "effect": "allow"
+    },
+    "related_endpoints": [
+      "PUT /rules/files"
+    ]
+  },
+  "rules:delete": {
+    "description": "Delete rules files",
+    "resources": [
+      "rule:file"
+    ],
+    "example": {
+      "actions": [
+        "rules:delete"
+      ],
+      "resources": [
+        "rule:file:0610-win-ms_logs_rules.xml"
+      ],
+      "effect": "allow"
+    },
+    "related_endpoints": [
+      "DELETE /rules/files"
+    ]
+  },  
   "sca:read": {
     "description": "Get a list of policies analyzed in the configuration assessment for a given agent",
     "resources": [
@@ -753,6 +743,43 @@ const wazuhPermissions = {
       "GET /decoders/files",
       "GET /decoders/files/{filename}/download",
       "GET /decoders/parents"
+    ]
+  },
+  "decoders:update": {
+    "description": "Update decoders files",
+    "resources": [
+      "decoder:file",
+      "*:*"   
+    ],
+    "example": {
+      "actions": [
+        "decoders:update"
+      ],
+      "resources": [
+        "decoder:file:*"
+      ],
+      "effect": "allow"
+    },
+    "related_endpoints": [
+      "PUT /decoders/files"
+    ]
+  },
+  "decoders:delete": {
+    "description": "Delete decoders files",
+    "resources": [
+      "decoder:file"
+    ],
+    "example": {
+      "actions": [
+        "decoders:delete"
+      ],
+      "resources": [
+        "decoder:file:*"
+      ],
+      "effect": "allow"
+    },
+    "related_endpoints": [
+      "DELETE /decoders/files"
     ]
   },
   "syscollector:read": {

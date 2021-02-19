@@ -81,7 +81,7 @@ class WzRulesetActionButtons extends Component {
       for (let idx in files) {
         const { file, content } = files[idx];
         try {
-          await rulesetHandler(file, content, resource !== RulesetResources.LISTS); // True does not overwrite the file
+          await rulesetHandler.updateFile(file, content, resource !== RulesetResources.LISTS); // True does not overwrite the file
           results.push({
             index: idx,
             uploaded: true,
@@ -153,7 +153,7 @@ class WzRulesetActionButtons extends Component {
       return [      
         {
           action: `${section}:read`,
-          resource: permissionResource,
+          resource: permissionResource('*'),
         }
       ];  
     };
@@ -162,12 +162,12 @@ class WzRulesetActionButtons extends Component {
       const  { permissionResource } = resourceDictionary[section];
       return [
         {
-          action: `${section}:upload`,
-          resource: permissionResource,
+          action: `${section}:update`,
+          resource: permissionResource('*'),
         },
         {
           action: `${section}:read`,
-          resource: permissionResource,
+          resource: permissionResource('*'),
         }
       ];  
     };
@@ -263,7 +263,7 @@ class WzRulesetActionButtons extends Component {
           <EuiFlexItem grow={false}>
             <UploadFiles
               clusterStatus={this.props.clusterStatus}
-              msg={section}
+              resource={section}
               path={`etc/${section}`}
               upload={uploadFile}
             />

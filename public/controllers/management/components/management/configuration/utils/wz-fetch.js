@@ -242,10 +242,14 @@ export const fetchFile = async selectedNode => {
       isCluster ?
       `/cluster/${selectedNode}/configuration` :
       `/manager/configuration`, 
-      {}
+      {
+        params: {
+          raw: true
+        }
+      }
     );
 
-    let xml = ((data || {}).data || {}).contents || false;
+    let xml = (data || {}).data || false;
 
     if (!xml) {
       throw new Error('Could not fetch configuration file');

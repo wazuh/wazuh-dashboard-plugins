@@ -206,11 +206,11 @@ export class ManagementController {
       this.switchTab(this.tab);
     }
 
-    /* this.uploadFilesProps = {
+    this.uploadFilesProps = {
       msg: this.$scope.mctrl.rulesetTab,
       path: `etc/${this.$scope.mctrl.rulesetTab}`,
-      upload: (files) => this.uploadFiles(files)
-    }; */
+      upload: (files) => this.uploadFiles(files, this.$scope.mctrl.rulesetTab)
+    };
   }
 
   /**
@@ -442,20 +442,20 @@ export class ManagementController {
     this.$scope.$applyAsync();
   }
 
-  /* refreshUploadFileProps() {
+  refreshUploadFileProps() {
     this.uploadFilesProps = {
       msg: this.rulesetTab,
       path: `etc/${this.rulesetTab}`,
-      upload: (files) => this.uploadFiles(files)
+      upload: (files) => this.uploadFiles(files, this.rulesetTab)
     };
   }
- */
+
   /**
-   * Uploads the files
+   * Uploads the filess
    * @param {Array} files
    * @param {String} path
    */
-  /*async uploadFiles(files, resource) {
+  async uploadFiles(files, resource) {
     try {
       this.errors = false;
       this.results = [];
@@ -488,5 +488,5 @@ export class ManagementController {
       if (Array.isArray(error) && error.length) return Promise.reject(error);
       ErrorHandler.handle('Files cannot be uploaded');
     }
-  } */
+  }
 }

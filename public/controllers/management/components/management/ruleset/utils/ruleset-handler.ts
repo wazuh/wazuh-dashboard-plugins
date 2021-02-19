@@ -13,15 +13,15 @@ export const RulesetResources = {
 export const resourceDictionary = {
   [RulesetResources.DECODERS]: {    
     resourcePath: '/decoders',    
-    permissionResource: 'decoder:file'
+    permissionResource: (value) => `decoder:file:${value}`
   },
   [RulesetResources.LISTS]: {    
     resourcePath: '/lists',
-    permissionResource: 'list:path'
+    permissionResource: (value) => `list:file:${value}`
   },
   [RulesetResources.RULES]: {    
     resourcePath: '/rules',
-    permissionResource: 'rule:file'
+    permissionResource: (value) => `rule:file:${value}`
   },
 };
 
@@ -32,7 +32,7 @@ export class RulesetHandler {
   }
 
   private getResourcePath = () => {
-    return `${resourceDictionary[this.resource].resourcePath}/files`;
+    return `${resourceDictionary[this.resource].resourcePath}`;
   };
 
   private getResourceFilesPath = (fileName?: string) => {
@@ -46,23 +46,12 @@ export class RulesetHandler {
   async getResource(filters = {}) {
     try {      
       const result: any = await WzRequest.apiReq('GET', this.getResourcePath(), filters);
-      return ((result || {}).data || {}).contents || '';
+      return (result || {}).data || false ;
     } catch (error) {
       return Promise.reject(error);
     }
   }
   
-  /**
-   * Get the array of any type of file Rules, Decoders, CDB lists...
-   */
-  async getFiles(filters = {}) {
-    try {
-      const result: any = await WzRequest.apiReq('GET', this.getResourceFilesPath(), filters);
-      return ((result || {}).data || {}).contents || '';
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
 
   /**
    * Get the content of any type of file Rules, Decoders, CDB lists...
@@ -70,8 +59,12 @@ export class RulesetHandler {
    */
   async getFileContent(fileName) {
     try {
-      const result: any = await WzRequest.apiReq('GET', this.getResourceFilesPath(fileName), {});
-      return ((result || {}).data || {}).contents || '';
+      const result: any = await WzRequest.apiReq('GET', this.getResourceFilesPath(fileName), {
+        params:{
+          raw: true
+        }
+      });
+      return ((result || {}).data || '');      
     } catch (error) {
       return Promise.reject(error);
     }
@@ -114,17 +107,4 @@ export class RulesetHandler {
     }
   }
 
-  /**
-   * Check if the cluster mode is enabled or not
-   * @returns {boolean}
-   */
-  async checkClusterModeEnabled() {
-    try {
-      const { running, enabled } = (await WzRequest.apiReq('GET', '/cluster/status', {})).data
-        .data as any;
-      return Boolean(running === 'yes' && enabled === 'yes');
-    } catch (error) {
-      return false;
-    }
-  }
 }

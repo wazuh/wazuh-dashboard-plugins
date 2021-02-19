@@ -182,11 +182,11 @@ class WzRulesetEditor extends Component {
       fileContent
     } = this.props.state;
     const { wazuhNotReadyYet } = this.props;
-    const { name, content, resource, showWarningRestart } = this.state;
+    const { name, content, path, showWarningRestart } = this.state;
 
     const isEditable = addingRulesetFile
       ? true
-      : resource !== RulesetResources.RULES && resource !== RulesetResources.DECODERS;
+      : path !== 'ruleset/rules' && path !== 'ruleset/decoders';
     let nameForSaving = addingRulesetFile ? this.state.inputValue : name;
     nameForSaving = nameForSaving.endsWith('.xml')
       ? nameForSaving
@@ -196,7 +196,7 @@ class WzRulesetEditor extends Component {
     const xmlError = validateXML(content);
     const saveButton = (
       <WzButtonPermissions
-        permissions={[{ action: `${section}:update`, resource: `${resourceDictionary[section].permissionResource}:${nameForSaving}` }]}
+        permissions={[{ action: `${section}:update`, resource: resourceDictionary[section].permissionResource(nameForSaving) }]}
         fill
         iconType={(isEditable && xmlError) ? "alert" : "save"}
         isLoading={this.state.isSaving}

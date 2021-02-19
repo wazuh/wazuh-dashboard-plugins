@@ -109,7 +109,9 @@ export class UploadFiles extends Component {
           }
         }, 100);
       }
-    } catch (error) {}
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   /**
@@ -253,7 +255,7 @@ export class UploadFiles extends Component {
       return [
         {
           action: `${this.props.resource}:update`,
-          resource: `${resourceDictionary[this.props.resource].permissionResource}`,
+          resource: resourceDictionary[this.props.resource].permissionResource('*'),
         },
       ];
     };
