@@ -564,11 +564,11 @@ export class WazuhElasticCtrl {
       const name = request.body.nodes.name;
       const masterNode = request.body.nodes.master_node;
 
-      const patternName = request.params.pattern;
+      const {id: patternID, title: patternName} = request.body.pattern;
       
       const raw = await this.buildClusterVisualizationsRaw(
         file,
-        request.params.pattern,
+        patternID,
         nodes,
         name,
         masterNode,
