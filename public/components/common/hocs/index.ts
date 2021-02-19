@@ -26,3 +26,5 @@ export { withReduxProvider  } from './withReduxProvider';
 export { withGuard } from './withGuard';
 
 export { withButtonOpenOnClick } from './withButtonOpenOnClick';
+
+export { withAgentSupportModule } from './withAgentSupportModule';

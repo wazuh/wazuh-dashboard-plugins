@@ -52,8 +52,8 @@ import { FilterHandler } from '../../../utils/filter-handler';
 import { TabVisualizations } from '../../../factories/tab-visualizations';
 import { updateCurrentAgentData } from '../../../redux/actions/appStateActions';
 import WzTextWithTooltipIfTruncated from '../wz-text-with-tooltip-if-truncated';
-import { UnsupportedComponents } from './../../../utils/components-os-support';
 import { getAngularModule } from '../../../kibana-services';
+import { hasAgentSupportModule } from '../../../react-services/wz-agents';
 
 export class AgentsWelcome extends Component {
   _isMount = false;
@@ -74,11 +74,6 @@ export class AgentsWelcome extends Component {
       maxModules: 6,
       widthWindow: window.innerWidth
     };
-
-    this.platform = false;
-    if (Object.keys(this.props.agent).length) {
-      this.platform = ((this.props.agent.os || {}).uname || '').includes('Linux') ? 'linux' : ((this.props.agent.os || {}).platform || false);
-    }
   }
 
   updateWidth = () => {
@@ -202,14 +197,6 @@ export class AgentsWelcome extends Component {
     this.setState({ menuAgent: menuAgent});
   }
 
-  showModuleByPlatform(menu) {
-    try {
-      return !this.platform ? false : !UnsupportedComponents[this.platform].includes(menu.id);
-    } catch (error) {
-      return !UnsupportedComponents['other'].includes(menu.id);
-    }
-  }
-
   renderModules() {
     const menuAgent = [...Object.keys(this.state.menuAgent).map((item) => { return this.state.menuAgent[item] })];
 
@@ -217,7 +204,7 @@ export class AgentsWelcome extends Component {
       <Fragment>
         {
           menuAgent.map((menuAgent, i) => {
-            if(i < this.state.maxModules && this.showModuleByPlatform(menuAgent)) {
+            if(i < this.state.maxModules && hasAgentSupportModule(this.props.agent, menuAgent.id)) {
             return (
             <EuiFlexItem key={i} grow={false} style={{ marginLeft: 0, marginTop: 7 }}>
               <EuiButtonEmpty
