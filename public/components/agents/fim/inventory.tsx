@@ -47,7 +47,6 @@ export class Inventory extends Component {
     totalItemsFile: number;
     totalItemsRegistry: number;
     isLoading: Boolean;
-    notPermissions: boolean;
     syscheck: [];
     customBadges: ICustomBadges[];
     isConfigured: Boolean;
@@ -64,7 +63,6 @@ export class Inventory extends Component {
       totalItemsFile: 0,
       totalItemsRegistry: 0,
       isLoading: true,
-      notPermissions: false,
       customBadges: [],
       isConfigured: false
     }
@@ -171,12 +169,8 @@ export class Inventory extends Component {
           syscheck: ((response.data || {}).data || {}).affected_items || [],
         };
       }
-      this.setState({ notPermissions: false });
       return ((response.data || {}).data || {}).total_affected_items || 0;
     } catch (error) {
-      if (error.match('3013 - Permission denied')) {
-        this.setState({ notPermissions: true });
-      }
       this.setState({ isLoading: false });
       this.showToast('danger', error, 3000);
     }
@@ -328,19 +322,7 @@ export class Inventory extends Component {
   }
 
   render() {
-    const { isLoading, isConfigured, notPermissions } = this.state;
-
-    if (notPermissions) {
-      return (
-        <WzEmptyPromptNoPermissions
-          permissions={[
-            { action: 'agent:read', resource: 'agent:id:*' },
-            { action: 'syscheck:read', resource: 'agent:id:*' },
-          ]}
-        />
-      );
-    }
-
+    const { isLoading, isConfigured } = this.state;
     if (isLoading) {
       return this.loadingInventory()
     }

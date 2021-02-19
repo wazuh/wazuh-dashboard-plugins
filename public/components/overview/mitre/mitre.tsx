@@ -49,7 +49,6 @@ export class Mitre extends Component {
     selectedTactics: Object,
     filterParams: IFilterParams,
     isLoading: boolean,
-    notPermissions: boolean,
   }
 
   props: any;
@@ -63,7 +62,6 @@ export class Mitre extends Component {
       tacticsObject: {},
       selectedTactics: {},
       isLoading: true,
-      notPermissions: false,
       filterParams: {
         filters: this.filterManager.getFilters() || [],
         query: { language: 'kuery', query: '' },
@@ -131,9 +129,6 @@ export class Mitre extends Component {
         });
       this._isMount && this.setState({tacticsObject, isLoading: false});
     } catch(err) {
-      if (err.match('3013 - Permission denied')) {
-        this.setState({ notPermissions: true });
-      }
       this.setState({ isLoading: false });
       this.showToast(
         'danger',
@@ -149,18 +144,7 @@ export class Mitre extends Component {
   }
 
   render() {
-    const { isLoading, notPermissions } = this.state;
-
-    if (notPermissions) {
-      return (
-        <WzEmptyPromptNoPermissions
-          permissions={[
-            { action: 'agent:read', resource: 'agent:id:*' },
-            { action: 'mitre:read', resource: '*:*:*' },
-          ]}
-        />
-      );
-    }
+    const { isLoading } = this.state;
 
     return (
       <div>
