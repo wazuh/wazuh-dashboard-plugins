@@ -221,15 +221,12 @@ export class AgentsPreviewController {
       this.firstUrlParam =
         clusterInfo.status === 'enabled' ? 'cluster' : 'manager';
       this.secondUrlParam = clusterInfo[this.firstUrlParam];
-
-      this.pattern = AppState.getCurrentPattern();
+      this.pattern = (await getDataPlugin().indexPatterns.get(AppState.getCurrentPattern())).title;
     } catch (error) {
       this.errorInit = ErrorHandler.handle(error, '', { silent: true });
     }
     this.loading = false;
     this.$scope.$applyAsync();
-
-    return;
   }
 
   addNewAgent(flag) {

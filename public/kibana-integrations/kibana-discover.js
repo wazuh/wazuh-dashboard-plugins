@@ -20,7 +20,7 @@
 import discoverTemplate from '../templates/discover/discover.html';
 import store from '../redux/store';
 import { updateVis } from '../redux/actions/visualizationsActions';
-import { getAngularModule, getCore, getDiscoverModule, getPlugins } from '../kibana-services';
+import { getAngularModule, getCore, getDiscoverModule, getPlugins, getToasts } from '../kibana-services';
 import {
   getRequestInspectorStats,
   getResponseInspectorStats,
@@ -297,7 +297,19 @@ function discoverController(
       filterManager.getUpdates$(),
       {
         next: () => {
-          $scope.state.filters = filterManager.getAppFilters();
+          //Patch empty fields
+          const filters = filterManager.getAppFilters();
+          if(filters.filter(item=>item.meta.params.query==='').length){
+            getToasts().add({
+              color: 'warning',
+              title: 'Invalid field value',
+              text: 'The filter field contains invalid value',
+              toastLifeTimeMs: 10000,
+            });
+            filterManager.setFilters(filters.filter(item=>item.meta.params.query));
+          }
+          //end of patch empty fields
+          $scope.state.filters = filters;
           $scope.updateDataSource();
         },
       },

@@ -13,8 +13,8 @@
 */
 
 // Import required packages
-const https = require('https');
 const fs = require('fs');
+const path = require('path');
 
 // Constants
 const WAZUH_API_URL = process.argv[2]; // Wazuh API url is a required argument
@@ -25,11 +25,11 @@ const reFilename = /-f ([\S]+)/;
 const reEndpointPathArgs = /\{([^}]+)\}/g; // Regular expresion to get the endpoint path arguments
 const reFormatter = /--full/
 
-const OUTPUT_ENDPOINTS_FILENAME = `${(consoleInput.match(reFilename) || [])[1] || 'api-4.0-endpoints'}.json`;
-const OUTPUT_ENDPOINTS_DIRECTORY = `./endpoints`;
-const OUTPUT_ENDPOINTS_PATH = `${OUTPUT_ENDPOINTS_DIRECTORY}/${OUTPUT_ENDPOINTS_FILENAME}`;
 const OUTPUT_MODE_FULL = consoleInput.match(reFormatter) && true;
 const WAZUH_DOCUMENTATION_API_REFERENCE_URL = 'https://documentation.wazuh.com/current/user-manual/api/reference.html'
+const OUTPUT_ENDPOINTS_FILENAME = `${(consoleInput.match(reFilename) || [])[1] || 'endpoints'}.json`;
+const OUTPUT_SECURITY_ACTIONS_FILENAME = 'security-actions.json';
+const OUTPUT_DIRECTORY = path.join(__dirname, 'output');
 
 // Define console color codes
 const CONSOLE_COLORS_CODES = {
@@ -44,7 +44,7 @@ const CONSOLE_COLORS_CODES = {
 };
 
 // Main method
-const main = async () => {
+const main = () => {
   // Check Wazuh API url argument is defined
   if(!WAZUH_API_URL){
     exitWithMessage('Wazuh API url is not defined.');
@@ -53,15 +53,26 @@ const main = async () => {
   if(!WAZUH_API_URL.startsWith('http') ){
     exitWithMessage(`Wazuh API url is not valid. It should start with "http". Example: https://172.16.1.2:55000`);
   };
+  
+  // Log the configuration:
+  console.log('--------------- Configuration ---------------');
+  console.log(`Wazuh API url: ${WAZUH_API_URL}`);
+  console.log(`Output directory: ${OUTPUT_DIRECTORY}`);
+  console.log(`Output endpoints mode: ${OUTPUT_MODE_FULL ? 'Full': 'Simple'}`);
+  console.log('----------------------------------------------')
 
+  if (!fs.existsSync(OUTPUT_DIRECTORY)){
+    fs.mkdirSync(OUTPUT_DIRECTORY);
+    logger.info(`Created ${OUTPUT_DIRECTORY} directory`);
+  };
+
+  generateAPIEndpointsInformation();
+  generateAPISecurityActionsInformation();
+}
+
+// Genearate API endpoints information
+const generateAPIEndpointsInformation = async () => {
   try{
-    // Log the configuration:
-    console.log('--------------- Configuration ---------------');
-    console.log(`Wazuh API url: ${WAZUH_API_URL}`);
-    console.log(`Output file path: ${OUTPUT_ENDPOINTS_PATH}`);
-    console.log(`Output mode: ${OUTPUT_MODE_FULL ? 'Full': 'Simple'}`);
-    console.log('----------------------------------------------')
-
     // Request to API swagger.json file
     const apiData = await request(`${WAZUH_API_URL}/openapi.json`);
     // Parse response to JSON
@@ -77,25 +88,50 @@ const main = async () => {
     }, ['GET', 'PUT', 'POST', 'DELETE'].reduce((accum, httpMethod) => ({...accum, [httpMethod]: []}), {}));
     // Map extracted endpoints to <{ method: ('GET' | 'PUT' | 'POST' | 'DELETE' | 'HEAD'), endpoints: endpoint[]}>[]
     const resultEndpoints = Object.keys(extractedEndpoints).map(httpMethod => ({method: httpMethod, endpoints: extractedEndpoints[httpMethod].sort(sortAlphabeticalByNameProp)}));
-    // Create the directory, if this doesn't exist, where the output file will be created
-    if (!fs.existsSync(OUTPUT_ENDPOINTS_DIRECTORY)){
-      fs.mkdirSync(OUTPUT_ENDPOINTS_DIRECTORY);
-      logger.info(`Created ${OUTPUT_ENDPOINTS_DIRECTORY} directory`);
-    };
+
     // Save the formatted endpoints data to a file
-    fs.writeFile(OUTPUT_ENDPOINTS_PATH, JSON.stringify(resultEndpoints, null, 2), function (error, data) {
-      if (error) {
-        return logger.error('An error appeared saving the output file:', error);
+    saveFileToOutputDir(OUTPUT_ENDPOINTS_FILENAME, JSON.stringify(resultEndpoints, null, 2));
+  }catch(error){
+    logger.error('An error appeared:', error);
+  };
+
+}
+
+// Generates security actions information
+const generateAPISecurityActionsInformation = async () => {
+  // Check Wazuh API url argument is defined
+  if(!WAZUH_API_URL){
+    exitWithMessage('Wazuh API url is not defined.');
+  };
+  // Check Wazuh API url argument is valid
+  if(!WAZUH_API_URL.startsWith('http') ){
+    exitWithMessage(`Wazuh API url is not valid. It should start with "http". Example: https://172.16.1.2:55000`);
+  };
+  const username = 'wazuh';
+  const password = 'wazuh';
+  try{
+    const authenticationResponse = await request(`${WAZUH_API_URL}/security/user/authenticate`, {
+      headers: {
+        'Authorization': 'Basic ' + Buffer.from(username + ':' + password).toString('base64')
       }
-      logger.success(`File was created! Path: ${OUTPUT_ENDPOINTS_PATH}`);
     });
+    // console.log(authenticationResponse, typeof authenticationResponse, JSON.parse(authenticationResponse), JSON.parse(authenticationResponse).data.token)
+    const { token } = JSON.parse(authenticationResponse).data;
+    const securityActionsResponse = await request(`${WAZUH_API_URL}/security/actions`, {
+      headers: {
+        'Authorization': `Bearer ${token}` 
+      }
+    });
+    const securityActions = JSON.parse(securityActionsResponse).data;
+    // Save the formatted endpoints data to a file
+    saveFileToOutputDir(OUTPUT_SECURITY_ACTIONS_FILENAME, JSON.stringify(securityActions, null, 2));
   }catch(error){
     logger.error('An error appeared:', error);
   }
 }
 
 // Utilities
-const request = apiEndpoint => {
+const request = (apiEndpoint, options = {}) => {
   let requestPackage;
   if(apiEndpoint.startsWith('http:')){
     requestPackage = require('http');
@@ -105,7 +141,7 @@ const request = apiEndpoint => {
     exitWithMessage('Endpoint should start with "http" or "https"');
   };
   return new Promise((resolve, reject) => {
-    requestPackage.get(apiEndpoint, {rejectUnauthorized: false}, (response) => {
+    requestPackage.get(apiEndpoint, {rejectUnauthorized: false, ...options}, (response) => {
       let data = '';
 
       // A chunk of data has been recieved
@@ -239,6 +275,17 @@ const exitWithMessage = message => {
 
 // Generate the endpoint documentation link
 const generateEndpointDocumentationLink = endpointData => `${WAZUH_DOCUMENTATION_API_REFERENCE_URL}#operation/${endpointData.operationId}`;
+
+// Save file
+const saveFileToOutputDir = (filename, content) => {
+  const filePath = path.join(OUTPUT_DIRECTORY, filename);
+  fs.writeFile(filePath, content, function (error, data) {
+    if (error) {
+      return logger.error(`An error appeared saving the output file "${filePath}":`, error);
+    }
+    logger.success(`File was created! Path: ${filePath}`);
+  });
+};
 
 // Run the method
 main();
