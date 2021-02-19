@@ -406,7 +406,7 @@ export class RegisterAgent extends Component {
       rpmText: `sudo ${this.optionalDeploymentVariables()}yum install ${this.optionalPackages()}`,
       debText: `curl -so wazuh-agent.deb ${this.optionalPackages()} && sudo ${this.optionalDeploymentVariables()}dpkg -i ./wazuh-agent.deb`,
       macosText: `curl -so wazuh-agent.pkg https://packages.wazuh.com/4.x/macos/wazuh-agent-${this.state.wazuhVersion
-        }-1.pkg && sudo launchctl setenv ${this.optionalDeploymentVariables()}sudo installer -pkg ./wazuh-agent.pkg -target /`,
+        }-1.pkg && sudo launchctl setenv ${this.optionalDeploymentVariables()} && sudo installer -pkg ./wazuh-agent.pkg -target /`,
       winText: `Invoke-WebRequest -Uri https://packages.wazuh.com/4.x/windows/wazuh-agent-${this.state.wazuhVersion
         }-1.msi -OutFile wazuh-agent.msi; ./wazuh-agent.msi /q ${this.optionalDeploymentVariables()}`
     };
