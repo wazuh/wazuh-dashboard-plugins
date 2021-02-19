@@ -2,6 +2,12 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.1.1 - Kibana 7.10.0 , 7.10.2 - Revision 4102
+
+### Fixed
+
+- Fixed forcing a non numeric filter value in a number type field [#2961](https://github.com/wazuh/wazuh-kibana-app/pull/2961)
+
 ## Wazuh v4.1.0 - Kibana 7.10.0 , 7.10.2 - Revision 4101
 
 ### Added
@@ -20,7 +26,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Fixed
 
 - Fix server error Invalid token specified: Cannot read property 'replace' of undefined [#2899](https://github.com/wazuh/wazuh-kibana-app/issues/2899)
-- Fixed forcing a non numeric filter value in a number type field [#2961](https://github.com/wazuh/wazuh-kibana-app/pull/2961)
 - Fix show empty files rules and decoders: [#2923](https://github.com/wazuh/wazuh-kibana-app/issues/2923)
 - Fixed wrong hover texts in CDB lists actions [#2929](https://github.com/wazuh/wazuh-kibana-app/pull/2929)
 - Fixed access to forbidden agents information when exporting agents listt [2918](https://github.com/wazuh/wazuh-kibana-app/pull/2918)
