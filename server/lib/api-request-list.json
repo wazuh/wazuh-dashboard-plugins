@@ -906,7 +906,7 @@
       {
         "name": "/cluster/:node_id/configuration",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_configuration_node",
-        "description": "Return wazuh configuration used in node {node_id}",
+        "description": "Return wazuh configuration used in node {node_id}. The 'section' and 'field' parameters will be ignored if 'raw' parameter is provided.",
         "summary": "Get node config",
         "tags": [
           "Cluster"
@@ -937,6 +937,14 @@
             "schema": {
               "type": "boolean",
               "default": false
+            }
+          },
+          {
+            "name": "raw",
+            "description": "Format response in plain text",
+            "required": false,
+            "schema": {
+              "type": "boolean"
             }
           },
           {
@@ -4361,7 +4369,7 @@
       {
         "name": "/manager/configuration",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.manager_controller.get_configuration",
-        "description": "Return wazuh configuration used",
+        "description": "Return wazuh configuration used. The 'section' and 'field' parameters will be ignored if 'raw' parameter is provided.",
         "summary": "Get configuration",
         "tags": [
           "Manager"
@@ -4381,6 +4389,14 @@
             "schema": {
               "type": "boolean",
               "default": false
+            }
+          },
+          {
+            "name": "raw",
+            "description": "Format response in plain text",
+            "required": false,
+            "schema": {
+              "type": "boolean"
             }
           },
           {

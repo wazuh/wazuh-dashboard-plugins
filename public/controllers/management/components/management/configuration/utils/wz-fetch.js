@@ -412,9 +412,6 @@ export const saveFileCluster = async (text, node) => {
     await WzRequest.apiReq(
       'PUT',
       `/cluster/${node}/configuration`, {
-        params: {
-          overwrite: true
-        },
         body: xml.toString(),
         origin: 'raw'
       }
@@ -434,10 +431,7 @@ export const saveFileManager = async text => {
   try {
     await WzRequest.apiReq(
       'PUT',
-      `/manager/configuracion`, {
-        params: {
-          overwrite: true
-        },
+      `/manager/configuration`, {
         body: xml.toString(),
         origin: 'raw'
       }

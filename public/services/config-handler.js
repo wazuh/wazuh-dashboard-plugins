@@ -26,7 +26,7 @@ export class ConfigHandler {
     try {
       const result = await WzRequest.apiReq(
         'PUT',
-        `/manager/configuration?overwrite=true`,
+        `/manager/configuration`,
         { content, origin: 'xmleditor' }
       );
       return result;
@@ -44,7 +44,7 @@ export class ConfigHandler {
     try {
       const result = await WzRequest.apiReq(
         'PUT',
-        `/cluster/${node}/configuration?overwrite=true`,
+        `/cluster/${node}/configuration`,
         { content, origin: 'xmleditor' }
       );
       return result;
