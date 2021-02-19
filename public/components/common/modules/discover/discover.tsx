@@ -346,16 +346,14 @@ export const Discover = compose(
     const newFilters = this.buildFilter();
     try {
         this.setState({ isLoading: true});
-
         const alerts = await GenericRequest.request(
           'POST',
           `/elastic/alerts`,
           {
-            index: AppState.getCurrentPattern(),
+            index: this.indexPattern.title,
             body: newFilters
           }
         );
-
         if (this._isMount) {
           this.setState({ alerts: alerts.data.hits.hits, total: alerts.data.hits.total.value, isLoading: false, requestFilters: newFilters, filters: newFilters.filters });
           this.props.updateTotalHits(alerts.data.hits.total.value);
