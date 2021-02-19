@@ -4,9 +4,25 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ## Wazuh v4.1.1 - Kibana 7.10.0 , 7.10.2 - Revision 4102
 
+### Added
+
+- Prompt to show the unsupported module for the selected agent [#2959](https://github.com/wazuh/wazuh-kibana-app/pull/2959)
+- Added a X-Frame-Options header to the backend responses [#2977](https://github.com/wazuh/wazuh-kibana-app/pull/2977)
+
 ### Fixed
 
+- An error message is displayed when changing a group's configuration although the user has the right permissions [#2955](https://github.com/wazuh/wazuh-kibana-app/pull/2955)
+- Fix Security events table is empty when switching the pinned agents [#2956](https://github.com/wazuh/wazuh-kibana-app/pull/2956)
+- Fix disabled switch visual edit button when json content is empty [#2957](https://github.com/wazuh/wazuh-kibana-app/issues/2957)
+- Fixed main and `More` menus for unsupported agents [#2959](https://github.com/wazuh/wazuh-kibana-app/pull/2959)
+- Fixed wrong number of alerts in Security Events [#2964](https://github.com/wazuh/wazuh-kibana-app/pull/2964)
 - Fixed search with strange characters of agent in Management groups [#2970](https://github.com/wazuh/wazuh-kibana-app/pull/2970)
+- Fix the statusCode error message [#2971](https://github.com/wazuh/wazuh-kibana-app/pull/2971)
+- Fix the SCA policy stats didn't refresh [#2973](https://github.com/wazuh/wazuh-kibana-app/pull/2973)
+- Fix some date fields format in FIM and SCA modules [#2975](https://github.com/wazuh/wazuh-kibana-app/pull/2975)
+- Fix a non-stop error in Manage agents when the user has no permissions [#2976](https://github.com/wazuh/wazuh-kibana-app/pull/2976)
+- Can't edit empty rules and decoders files that already exist in the manager [#2978](https://github.com/wazuh/wazuh-kibana-app/pull/2978)
+- Fix the unpin agent in the selection modal [#2980](https://github.com/wazuh/wazuh-kibana-app/pull/2980)
 
 ## Wazuh v4.1.0 - Kibana 7.10.0 , 7.10.2 - Revision 4101
 
@@ -21,6 +37,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added on FIM Inventory Windows Registry registry_key and registry_value items from syscheck [#2908](https://github.com/wazuh/wazuh-kibana-app/issues/2908)
 - Uncheck agents after an action in agents groups management [#2907](https://github.com/wazuh/wazuh-kibana-app/pull/2907)
 - Unsave rule files when edit or create a rule with invalid content [#2944](https://github.com/wazuh/wazuh-kibana-app/pull/2944)
+- Added vulnerabilities module for macos agents [#2969](https://github.com/wazuh/wazuh-kibana-app/pull/2969)
 
 ### Fixed
 

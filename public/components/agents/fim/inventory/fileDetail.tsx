@@ -34,6 +34,7 @@ import { AppNavigate } from '../../../../react-services/app-navigate';
 import { TruncateHorizontalComponents } from '../../../common/util';
 import { getDataPlugin } from '../../../../kibana-services';
 import { RegistryValues } from './registryValues';
+import { TimeService } from '../../../../react-services/time-service';
 
 export class FileDetails extends Component {
   props!: {
@@ -89,6 +90,7 @@ export class FileDetails extends Component {
         grow: 2,
         icon: 'clock',
         link: true,
+        transformValue: TimeService.offset
       },
       {
         field: 'mtime',
@@ -96,6 +98,7 @@ export class FileDetails extends Component {
         grow: 2,
         icon: 'clock',
         link: true,
+        transformValue: TimeService.offset
       },
       {
         field: 'uname',
@@ -175,6 +178,7 @@ export class FileDetails extends Component {
         name: 'Last analysis',
         grow: 2,
         icon: 'clock',
+        transformValue: TimeService.offset
       },
       {
         field: 'mtime',
