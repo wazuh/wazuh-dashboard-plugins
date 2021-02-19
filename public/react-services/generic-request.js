@@ -16,7 +16,7 @@ import { WazuhConfig } from './wazuh-config';
 import { ApiCheck } from './wz-api-check';
 import { WzMisc } from '../factories/misc';
 import { OdfeUtils } from '../utils';
-import { getHttp } from '../kibana-services';
+import { getHttp, getDataPlugin } from '../kibana-services';
 
 export class GenericRequest {
   static async request(method, path, payload = null) {
@@ -32,7 +32,9 @@ export class GenericRequest {
       };
       const tmpUrl = getHttp().basePath.prepend(path);
 
-      requestHeaders.pattern = AppState.getCurrentPattern();
+      try{
+        requestHeaders.pattern = (await getDataPlugin().indexPatterns.get(AppState.getCurrentPattern())).title;
+      }catch(error){};
 
       try {
         requestHeaders.id = JSON.parse(AppState.getCurrentAPI()).id;
@@ -77,12 +79,14 @@ export class GenericRequest {
           timeout: timeout || 20000
         };
       }
+
       Object.assign(data, await axios(options));
       if (!data) {
         throw new Error(
           `Error doing a request to ${tmpUrl}, method: ${method}.`
         );
       }
+
       return data;
     } catch (err) {
       OdfeUtils.checkOdfeSessionExpired(err);
