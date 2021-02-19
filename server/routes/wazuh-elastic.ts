@@ -82,16 +82,17 @@ export function WazuhElasticRoutes(router: IRouter) {
     async (context, request, response) => ctrl.checkPattern(context, request, response)
   );
 
-  router.get(
+  router.get(    
     {
-      path: '/elastic/top/{mode}/{cluster}/{field}/{pattern}',
+      path: '/elastic/top/{mode}/{cluster}/{field}/{pattern}/{agentsList}',
       validate: {
         params: schema.object({
           mode: schema.string(),
           cluster: schema.string(),
           field: schema.string(),
           pattern: schema.string(),
-        })
+          agentsList: schema.string(),
+        }),
       }
     },
     async (context, request, response) => ctrl.getFieldTop(context, request, response)
