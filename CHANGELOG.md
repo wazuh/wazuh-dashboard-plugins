@@ -4,8 +4,17 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ## Wazuh v4.1.1 - Kibana 7.10.0 , 7.10.2 - Revision 4102
 
+### Added
+
+- Added a X-Frame-Options header to the backend responses [#2977](https://github.com/wazuh/wazuh-kibana-app/pull/2977)
+
 ### Fixed
-- Fixed prompt permissions on Framework of Mitre and Inventory of Integrity monitoring. [#2967](https://github.com/wazuh/wazuh-kibana-app/issues/2967)
+
+- Fix disabled switch visual edit button when json content is empty [#2957](https://github.com/wazuh/wazuh-kibana-app/issues/2957)
+- Fix the statusCode error message [#2971](https://github.com/wazuh/wazuh-kibana-app/pull/2971)
+- Fix the SCA policy stats didn't refresh [#2973](https://github.com/wazuh/wazuh-kibana-app/pull/2973)
+- Fix some date fields format in FIM and SCA modules [#2975](https://github.com/wazuh/wazuh-kibana-app/pull/2975)
+- Fix prompt permissions on Framework of Mitre and Inventory of Integrity monitoring. [#2967](https://github.com/wazuh/wazuh-kibana-app/issues/2967)
 
 ## Wazuh v4.1.0 - Kibana 7.10.0 , 7.10.2 - Revision 4101
 
