@@ -16,7 +16,7 @@ import { Parser } from 'json2csv';
 import { log } from '../lib/logger';
 import { KeyEquivalence } from '../../common/csv-key-equivalence';
 import { ApiErrorEquivalence } from '../lib/api-errors-equivalence';
-import apiRequestList from '../lib/api-request-list';
+import apiRequestList from '../../common/api-info/endpoints';
 import { addJobToQueue } from '../start/queue';
 import fs from 'fs';
 import { ManageHosts } from '../lib/manage-hosts';
