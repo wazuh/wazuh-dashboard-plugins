@@ -16,6 +16,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
+- Fix login error when AWS Elasticsearch and ODFE is used [#2710](https://github.com/wazuh/wazuh-kibana-app/issues/2710)
 - An error message is displayed when changing a group's configuration although the user has the right permissions [#2955](https://github.com/wazuh/wazuh-kibana-app/pull/2955)
 - Fix Security events table is empty when switching the pinned agents [#2956](https://github.com/wazuh/wazuh-kibana-app/pull/2956)
 - Fix disabled switch visual edit button when json content is empty [#2957](https://github.com/wazuh/wazuh-kibana-app/issues/2957)
@@ -34,7 +35,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fix properly logout of Wazuh API when logging out of the application (only for OpenDistro) [#2789](https://github.com/wazuh/wazuh-kibana-app/issues/2789)
 - Fixed missing `&&` from macOS agent deployment command [#2989](https://github.com/wazuh/wazuh-kibana-app/issues/2989)
 - Fix prompt permissions on Framework of Mitre and Inventory of Integrity monitoring. [#2967](https://github.com/wazuh/wazuh-kibana-app/issues/2967)
-- Fix login error when AWS Elasticsearch and ODFE is used [#2710](https://github.com/wazuh/wazuh-kibana-app/issues/2789)
 
 ## Wazuh v4.1.0 - Kibana 7.10.0 , 7.10.2 - Revision 4101
 
