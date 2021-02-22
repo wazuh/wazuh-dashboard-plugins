@@ -27,7 +27,7 @@ import {
 
 import exportCsv from '../../../../../react-services/wz-csv';
 import { UploadFiles } from '../../upload-files';
-//import columns from './utils/columns';
+import columns from './utils/columns';
 import { resourceDictionary, RulesetHandler, RulesetResources } from './utils/ruleset-handler';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 
@@ -38,7 +38,7 @@ class WzRulesetActionButtons extends Component {
     this.state = { generatingCsv: false };
     this.exportCsv = exportCsv;
 
-    //this.columns = columns;
+    this.columns = columns;
     this.refreshTimeoutId = null;
   }
 
