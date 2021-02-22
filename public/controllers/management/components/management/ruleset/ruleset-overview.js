@@ -19,6 +19,7 @@ import WzRulesetActionButtons from './actions-buttons';
 import './ruleset-overview.scss';
 import { withUserAuthorizationPrompt, withGlobalBreadcrumb } from '../../../../../components/common/hocs';
 import { compose } from 'redux';
+import { resourceDictionary } from './utils/ruleset-handler';
 
 class WzRulesetOverview extends Component {
   sectionNames = {
@@ -79,12 +80,6 @@ const mapStateToProps = state => {
   };
 };
 
-const SectionResourceType = {
-  rules: 'file',
-  decoders: 'file',
-  lists: 'path'
-}
-
 export default compose(
   connect(
     mapStateToProps
@@ -101,5 +96,5 @@ export default compose(
       { text: sectionNames[props.state.section] }
     ];
   }),
-  withUserAuthorizationPrompt((props) => [{action: `${props.state.section}:read`, resource: `${props.state.section.slice(0,-1)}:${SectionResourceType[props.state.section]}:*`}])
+  withUserAuthorizationPrompt((props) => [{action: `${props.state.section}:read`, resource: resourceDictionary[props.state.section].permissionResource('*')}])
 )(WzRulesetOverview);

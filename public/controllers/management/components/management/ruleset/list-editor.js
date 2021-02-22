@@ -34,7 +34,7 @@ import {
   updateListContent
 } from '../../../../../redux/actions/rulesetActions';
 
-import RulesetHandler from './utils/ruleset-handler';
+import { resourceDictionary, RulesetHandler, RulesetResources } from './utils/ruleset-handler';
 
 import { getToasts }  from '../../../../../kibana-services';
 
@@ -58,10 +58,9 @@ class WzListEditor extends Component {
       newListName: '',
       showWarningRestart: false
     };
-    this.tmpListName = ""
     this.items = {};
 
-    this.rulesetHandler = RulesetHandler;
+    this.rulesetHandler = new RulesetHandler(RulesetResources.LISTS);
   }
 
   componentDidMount() {
@@ -146,10 +145,7 @@ class WzListEditor extends Component {
         return;
       }
       this.setState({ isSaving: true });
-      if(this.tmpListName){
-        addingNew = false;
-      }
-      await this.rulesetHandler.sendCdbList(name, path, raw, overwrite, addingNew);
+      await this.rulesetHandler.updateFile(name, raw, overwrite);
       if (!addingNew) {
         const file = { name: name, content: raw, path: path };
         this.props.updateListContent(file);
@@ -220,6 +216,20 @@ class WzListEditor extends Component {
     });
   };
 
+  getUpdatePermissions = (name) => {
+    return [{
+      action: `${RulesetResources.LISTS}:update`,
+      resource: resourceDictionary[RulesetResources.LISTS].permissionResource(name),
+    }];
+  }
+
+  getDeletePermissions = (name) => {
+    return [{
+      action: `${RulesetResources.LISTS}:delete`,
+      resource: resourceDictionary[RulesetResources.LISTS].permissionResource(name),
+    }];
+  }
+
   /**
    * Append a key value to this.items and after that if everything works ok re-create the array for the table
    */
@@ -260,6 +270,7 @@ class WzListEditor extends Component {
       generatingCsv: false
     });
   }
+  
 
   /**
    * Delete a item from the list
@@ -316,15 +327,7 @@ class WzListEditor extends Component {
 
     const saveButton = (
       <WzButtonPermissions
-        permissions={[
-          {
-            action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:upload_file`,
-            resource:
-              ((this.props || {}).clusterStatus || {}).contextConfigServer === 'cluster'
-                ? 'node:id:*'
-                : `file:path:${path}/${name}`,
-          },
-        ]}
+        permissions={this.getUpdatePermissions(name)}
         fill
         isDisabled={items.length === 0}
         iconType="save"
@@ -340,17 +343,7 @@ class WzListEditor extends Component {
         {!this.state.isPopoverOpen && (
           <EuiFlexItem grow={false}>
             <WzButtonPermissions
-              permissions={[
-                {
-                  action: `${
-                    ((this.props || {}).clusterStatus || {}).contextConfigServer
-                  }:upload_file`,
-                  resource:
-                    ((this.props || {}).clusterStatus || {}).contextConfigServer === 'cluster'
-                      ? 'node:id:*'
-                      : `file:path:${path}/${name}`,
-                },
-              ]}
+              permissions={this.getUpdatePermissions(name)}
               iconType="plusInCircle"
               onClick={() => this.openAddEntry()}
             >
@@ -513,17 +506,7 @@ class WzListEditor extends Component {
                   buttonType='icon'
                   aria-label="Edit content"
                   iconType="pencil"
-                  permissions={[
-                    {
-                      action: `${
-                        ((this.props || {}).clusterStatus || {}).contextConfigServer
-                      }:upload_file`,
-                      resource:
-                        ((this.props || {}).clusterStatus || {}).contextConfigServer === 'cluster'
-                          ? 'node:id:*'
-                          : `file:path:${path}/${fileName}`,
-                    },
-                  ]}
+                  permissions={this.getUpdatePermissions(fileName)}
                   tooltip={{position: 'top', content: `Edit ${item.key}`}}
                   onClick={() => {
                     this.setState({
@@ -537,17 +520,7 @@ class WzListEditor extends Component {
                   buttonType='icon'
                   aria-label="Remove content"
                   iconType="trash"
-                  permissions={[
-                    {
-                      action: `${
-                        ((this.props || {}).clusterStatus || {}).contextConfigServer
-                      }:upload_file`,
-                      resource:
-                        ((this.props || {}).clusterStatus || {}).contextConfigServer === 'cluster'
-                          ? 'node:id:*'
-                          : `file:path:${path}/${fileName}`,
-                    },
-                  ]}
+                  permissions={this.getDeletePermissions(fileName)}
                   tooltip={{position: 'top', content: `Remove ${item.key}`}}
                   onClick={() => this.deleteItem(item.key)}
                   color="danger"
