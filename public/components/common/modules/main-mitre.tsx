@@ -12,15 +12,21 @@
 
 import React, { Component } from 'react';
 import { Mitre } from '../../../components/overview/mitre/mitre';
+import { withUserAuthorizationPrompt } from '../hocs';
+import { compose } from 'redux';
 
-export class MainMitre extends Component {
-  constructor(props) {
-    super(props);
+export const MainMitre = compose(
+  withUserAuthorizationPrompt([
+    { action: 'mitre:read', resource: '*:*:*' },
+  ])
+)(
+  class MainMitre extends Component {
+    constructor(props) {
+      super(props);
+    }
+
+    render() {
+      return <Mitre {...this.props} />;
+    }
   }
-
-
-
-  render() {
-    return <Mitre {...this.props}/>;
-  }
-}
+);

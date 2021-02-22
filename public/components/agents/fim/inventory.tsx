@@ -1,4 +1,3 @@
-
 /*
  * Wazuh app - Integrity monitoring components
  * Copyright (C) 2015-2021 Wazuh, Inc.
@@ -20,10 +19,7 @@ import {
   EuiTitle,
   EuiLoadingSpinner,
   EuiEmptyPrompt,
-  EuiButton,
   EuiSpacer,
-  EuiPageBody,
-  EuiPageContent,
   EuiProgress,
   EuiFlexGroup,
   EuiFlexItem,
@@ -41,19 +37,20 @@ import exportCsv from '../../../react-services/wz-csv';
 import { getToasts }  from '../../../kibana-services';
 import { ICustomBadges } from '../../wz-search-bar/components';
 import { filtersToObject } from '../../wz-search-bar';
+import { WzEmptyPromptNoPermissions } from "../../common/permissions/prompt";
 
 export class Inventory extends Component {
   _isMount = false;
   state: {
-    filters: []
-    selectedTabId: 'files' | 'registry'
-    totalItemsFile: number
-    totalItemsRegistry: number
-    isLoading: Boolean
-    syscheck: []
-    customBadges: ICustomBadges[],
-    isConfigured: Boolean
-  }
+    filters: [];
+    selectedTabId: 'files' | 'registry';
+    totalItemsFile: number;
+    totalItemsRegistry: number;
+    isLoading: Boolean;
+    syscheck: [];
+    customBadges: ICustomBadges[];
+    isConfigured: Boolean;
+  };
 
   props: any;
 
@@ -154,26 +151,29 @@ export class Inventory extends Component {
     const filter = {
       ...filters,
       limit: type === 'file' ? '15' : '1',
-      ...(type === 'registry' ? {q: 'type=registry_key'} : {type}),      
+      ...(type === 'registry' ? {q: 'type=registry_key'} : {type}),
       ...(type === 'file' && {sort: '+file'})
     };
     return filter;
   }
-  
+
   async getItemNumber(type: 'file' | 'registry') {
-    const agentID = this.props.agent.id;
-    const response = await WzRequest.apiReq(
-      'GET',
-      `/syscheck/${agentID}`,
-      { params: this.buildFilter(type) }
-    );
-    if (type === 'file') {
-      return {
-        totalItemsFile: ((response.data || {}).data || {}).total_affected_items || 0,
-        syscheck: ((response.data || {}).data || {}).affected_items || [],
+    try {
+      const agentID = this.props.agent.id;
+      const response = await WzRequest.apiReq('GET', `/syscheck/${agentID}`, {
+        params: this.buildFilter(type),
+      });
+      if (type === 'file') {
+        return {
+          totalItemsFile: ((response.data || {}).data || {}).total_affected_items || 0,
+          syscheck: ((response.data || {}).data || {}).affected_items || [],
+        };
       }
+      return ((response.data || {}).data || {}).total_affected_items || 0;
+    } catch (error) {
+      this.setState({ isLoading: false });
+      this.showToast('danger', error, 3000);
     }
-    return ((response.data || {}).data || {}).total_affected_items || 0;
   }
 
   renderTabs() {
@@ -264,7 +264,7 @@ export class Inventory extends Component {
             filters={filters}
             items={syscheck}
             totalItems={totalItemsFile}
-            onFiltersChange={this.onFiltersChange} 
+            onFiltersChange={this.onFiltersChange}
             onTotalItemsChange={this.onTotalItemsChange}/>
         }
         {selectedTabId === 'registry' &&
@@ -336,7 +336,7 @@ export class Inventory extends Component {
           <EuiSpacer size={(((this.props.agent || {}).os || {}).platform || false) === 'windows' ? 's' : 'm'} />
           {table}
         </EuiPanel>
-      </EuiPage>) 
+      </EuiPage>)
       : this.noConfiguredMonitoring()
   }
 }
