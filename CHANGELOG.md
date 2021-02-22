@@ -31,6 +31,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Support for alerts index pattern with different ID and name [#2979](https://github.com/wazuh/wazuh-kibana-app/pull/2979)
 - Fix the unpin agent in the selection modal [#2980](https://github.com/wazuh/wazuh-kibana-app/pull/2980)
 - Fix properly logout of Wazuh API when logging out of the application (only for OpenDistro) [#2789](https://github.com/wazuh/wazuh-kibana-app/issues/2789)
+- Fixed missing `&&` from macOS agent deployment command [#2989](https://github.com/wazuh/wazuh-kibana-app/issues/2989)
 
 ## Wazuh v4.1.0 - Kibana 7.10.0 , 7.10.2 - Revision 4101
 
