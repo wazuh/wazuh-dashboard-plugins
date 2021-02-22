@@ -309,12 +309,42 @@ describe('Wazuh User Permissions', () => {
         },
         rbac_mode: 'white',
       };
+
       it('Should return OK for the agent 001', () => {
         const result = WzUserPermissions.checkMissingUserPermissions(
           requiredMitreView,
           userMitre1
         );
         expect(result).toEqual(false);
+      });
+
+      describe('Should return all the required permissions to update decoder file', () => {
+        const requiredAgentView = [
+          {
+            action: 'decoders:update',
+            resource: 'decoder:file:*',
+          },
+          {
+            action: 'decoders:read',
+            resource: 'decoder:file:*',
+          },
+        ];
+        const userAgent1 = {
+          'decoders:update': {
+            '*:*:*': 'allow',
+          },
+          'decoders:read': {
+            'decoder:file:*': 'allow',
+          },
+          rbac_mode: 'white',
+        };
+        it('Should return OK for all agents and groups', () => {
+          const result = WzUserPermissions.checkMissingUserPermissions(
+            requiredAgentView,
+            userAgent1
+          );
+          expect(result).toEqual(false);
+        });
       });
     });
   });
