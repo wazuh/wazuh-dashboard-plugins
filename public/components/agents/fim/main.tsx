@@ -14,7 +14,7 @@ const mapStateToProps = (state) => ({
 export const MainFim = compose(
   connect(mapStateToProps),
   withGuard(
-    (props) => !(props.currentAgentData && props.currentAgentData.id) && !props.agent,
+    (props) => !((props.currentAgentData && props.currentAgentData.id) && props.agent),
     () => (
       <PromptNoSelectedAgent body="You need to select an agent to see Integrity Monitoring inventory." />
     )
