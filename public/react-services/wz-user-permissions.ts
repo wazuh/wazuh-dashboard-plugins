@@ -25,12 +25,6 @@ export class WzUserPermissions{
       
       const actionName = typeof permission === 'string' ? permission : permission.action;
       let actionResource = (typeof permission === 'string' && wazuhPermissions[actionName].resources.length === 1) ? (wazuhPermissions[actionName].resources[0] + ':*') : permission.resource;
-      try{
-        actionResource
-        .split('&')
-      } catch(err){
-        console.log(actionResource)
-      }
       const actionResourceAll = actionResource
         .split('&')
         .map(function (str) {
