@@ -28,7 +28,6 @@ export const MainFim = compose(
     () => <PromptNoActiveAgent />
   ),
   withUserAuthorizationPrompt((props) => {
-    debugger
     const agentData =
       props.currentAgentData && props.currentAgentData.id ? props.currentAgentData : props.agent;
     return [
