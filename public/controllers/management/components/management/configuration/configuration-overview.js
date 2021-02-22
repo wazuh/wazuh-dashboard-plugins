@@ -121,7 +121,7 @@ class WzConfigurationOverview extends Component {
                 <EuiFlexItem>
                   <WzButtonPermissions
                     buttonType='empty'
-                    permissions={[this.props.clusterNodeSelected ? {action: 'cluster:update_config', resource: `node:id:${this.props.clusterNodeSelected}`}: {action: 'manager:update_config'}]}
+                    permissions={[{action: 'cluster:status', resource: '*:*:*'}, this.props.clusterNodeSelected ? {action: 'cluster:update_config', resource: `node:id:${this.props.clusterNodeSelected}`}: {action: 'manager:update_config', resource: "*:*:*"}]}
                     iconSide="left"
                     iconType="pencil"
                     onClick={() =>

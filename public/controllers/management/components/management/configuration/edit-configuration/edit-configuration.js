@@ -234,7 +234,7 @@ class WzEditConfiguration extends Component {
               </EuiButton>
             ) : (
               <WzButtonPermissions
-                permissions={[this.props.clusterNodeSelected ? {action: 'cluster:update_config', resource: `node:id:${this.props.clusterNodeSelected}`} : {action: 'manager:update_config'}]}
+                permissions={[this.props.clusterNodeSelected ? {action: 'cluster:update_config', resource: `node:id:${this.props.clusterNodeSelected}`} : {action: 'manager:update_config', resource: "*:*:*"}]}
                 isDisabled={saving || disableSaveRestartButtons}
                 iconType="save"
                 onClick={() => this.editorSave()}
