@@ -18,7 +18,7 @@ import {
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
-import RulesetHandler from './utils/ruleset-handler';
+import { RulesetHandler, RulesetResources, resourceDictionary } from './utils/ruleset-handler';
 import { getToasts }  from '../../../../../kibana-services';
 
 import {
@@ -60,33 +60,36 @@ class WzRulesetTable extends Component {
     this.extraSectionPrefixResource = {
       rules: 'rule:file',
       decoders: 'decoder:file',
-      lists: 'list:path',
+      lists: 'list:file',
     };
-    this.rulesetHandler = RulesetHandler;
+    this.rulesetHandler = new RulesetHandler(this.props.state.section);
   }
 
   async componentDidMount() {
     this._isMounted = true;
     this.props.updateIsProcessing(true);
-    if (this.props.state.section === 'rules') {
+    if (this.props.state.section === RulesetResources.RULES) {
       const regex = new RegExp('redirectRule=' + '[^&]*');
       const match = window.location.href.match(regex);
       if (match && match[0]) {
         this._isMounted && this.setState({ isRedirect: true });
         const id = match[0].split('=')[1];
-        const result = await WzRequest.apiReq('GET', `/rules`,
-        {
+        const result = await this.rulesetHandler.getResource({
           params: {
             rule_ids: id
           }
         });
-        const items = ((result.data || {}).data || {}).affected_items || [];
+        const items = result.affected_items || [];
         if (items.length) {
-          const info = await this.rulesetHandler.getRuleInformation(
-            items[0].filename,
-            parseInt(id)
-          );
-          this.props.updateRuleInfo(info);
+          const info = await this.rulesetHandler.getResource({
+            params: {
+              filename: items[0].filename
+            }
+          });
+          if (info.data) {
+            Object.assign(info.data, { current: parseInt(id) });
+          } 
+          this.props.updateRuleInfo(info.data);
         }
         this._isMounted && this.setState({ isRedirect: false });
       }
@@ -237,37 +240,14 @@ class WzRulesetTable extends Component {
         const { id, name } = item;
 
         const getRequiredPermissions = (item) => {
-          const permissions = [
+          const { section } = this.props.state;
+          const { permissionResource } = resourceDictionary[section];
+          return [
             {
-              action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:read_file`,
-              resource: `file:path:${item.relative_dirname}/${item.filename}`,
-            },
-            { action: 'lists:read', resource: `list:path:${item.filename}` },
-            {
-              action: `cluster:status`,
-              resource: `*:*:*`,
-            },
+              action: `${section}:read`,
+              resource: permissionResource(item.name),
+            }
           ];
-
-          if (((this.props || {}).clusterStatus || {}).contextConfigServer === 'cluster') {
-            permissions.push(
-              {
-                action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:read`,
-                resource: `node:id:*`,
-              },
-              {
-                action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:read_file`,
-                resource: `node:id:*&file:path:*`,
-              }
-            );
-          } else {
-            permissions.push({
-              action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:read`,
-              resource: `*:*:*`,
-            });
-          }
-
-          return permissions;
         };
 
         return {
@@ -281,30 +261,28 @@ class WzRulesetTable extends Component {
                 if (this.isLoading) return;
                 this.setState({ isLoading: true });
                 const { section } = this.props.state;
-                window.location.href = `${window.location.href}&redirectRule=${id}`;
-                if (section === 'rules') {
-                  const result = await this.rulesetHandler.getRuleInformation(
-                    item.filename,
-                    id
-                  );
-                  this.props.updateRuleInfo(result);
-                } else if (section === 'decoders') {
-                  const result = await this.rulesetHandler.getDecoderInformation(
-                    item.filename,
-                    name
-                  );
-                  this.props.updateDecoderInfo(result);
-                } else {
-                  const result = await this.rulesetHandler.getCdbList(
-                    `${item.relative_dirname}/${item.filename}`
-                  );
+                window.location.href = `${window.location.href}&redirectRule=${id}`;              
+                if (section === RulesetResources.LISTS) {
+                  const result = await this.rulesetHandler.getFileContent(item.filename);
                   const file = {
                     name: item.filename,
                     content: result,
                     path: item.relative_dirname,
                   };
                   this.props.updateListContent(file);
+                } else {
+                  const result = await this.rulesetHandler.getResource({
+                    params: {
+                      filename: item.filename
+                    }
+                  });
+                  if (result.data) {
+                    Object.assign(result.data, { current: id || name });
+                  }
+                  if (section === RulesetResources.RULES) this.props.updateRuleInfo(result.data);
+                  if (section === RulesetResources.DECODERS) this.props.updateDecoderInfo(result.data);
                 }
+
                 this.setState({ isLoading: false });
               }
             : undefined,
@@ -370,7 +348,7 @@ class WzRulesetTable extends Component {
   async removeItems(items) {
     this.setState({ isLoading: true });
     const results = items.map(async (item, i) => {
-      await this.rulesetHandler.deleteFile((item.filename) ? item.filename : item.name, item.relative_dirname);
+      await this.rulesetHandler.deleteFile(item.filename || item.name);
     });
 
     Promise.all(results).then(completed => {

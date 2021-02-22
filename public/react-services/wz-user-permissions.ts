@@ -21,6 +21,8 @@ export class WzUserPermissions{
         const missingOrPermissions = WzUserPermissions.checkMissingUserPermissions(permission, userPermissions);
         return Array.isArray(missingOrPermissions) ? missingOrPermissions.length === permission.length : missingOrPermissions;
       }
+
+      
       const actionName = typeof permission === 'string' ? permission : permission.action;
       let actionResource = (typeof permission === 'string' && wazuhPermissions[actionName].resources.length === 1) ? (wazuhPermissions[actionName].resources[0] + ':*') : permission.resource;
       const actionResourceAll = actionResource

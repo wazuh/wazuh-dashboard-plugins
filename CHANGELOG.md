@@ -12,6 +12,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Changed
 
 - Added toast with refresh button when new fields are loaded [#2974](https://github.com/wazuh/wazuh-kibana-app/pull/2974)
+- Migrated manager and cluster files endpoints and their corresponding RBAC [#2984](https://github.com/wazuh/wazuh-kibana-app/pull/2984)
 
 ### Fixed
 

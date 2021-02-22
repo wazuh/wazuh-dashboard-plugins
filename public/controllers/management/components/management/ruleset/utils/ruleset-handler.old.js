@@ -152,11 +152,10 @@ export default class RulesetHandler {
   /**
    * Get the content of a rule file
    * @param {String} path
-   * @param {Boolean} nolocal
    */
-  static async getRuleContent(path, nolocal = true) {
+  static async getRuleContent(file) {
     try {
-      const _path = nolocal ? `ruleset/rules/${path}` : `etc/rules/${path}`;
+      const path =  `/rules/files/${file}`;
       const result = await this.getFileContent(_path);
       return result;
     } catch (error) {
@@ -294,12 +293,10 @@ export default class RulesetHandler {
 
   static async updateCdbList(list, content, overwrite) {
     try {
-      const pathFiles = await RulesetHandler.pathSendFilesManager();
       const result = await WzRequest.apiReq(
         'PUT',
-        pathFiles, {
+        `/lists/files/${list}`, {
           params: {
-            path: `etc/lists/${list}`,
             overwrite: !overwrite
           },
           body: content.toString(),
@@ -342,23 +339,6 @@ export default class RulesetHandler {
       return Boolean(running === 'yes' && enabled === 'yes');
     }catch(error){
       return false;
-    }
-  }
-
-  /**
-   * Get the cluster or manager mode and returns the path to do the request to send the files
-   * @returns {string}
-   */
-  static async pathSendFilesManager(){
-    try{
-      const isClusterMode = await RulesetHandler.checkClusterModeEnabled();
-      if(isClusterMode){
-        const managerNodeName = (await WzRequest.apiReq('GET', '/cluster/nodes', {params: {type: 'master'}})).data.data.affected_items[0].name;
-        return `/cluster/${managerNodeName}/files`;
-      }
-      return '/manager/files';
-    }catch(error){
-      throw error;
     }
   }
 }

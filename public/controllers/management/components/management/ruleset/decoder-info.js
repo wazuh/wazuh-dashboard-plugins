@@ -18,7 +18,7 @@ import {
 
 import { connect } from 'react-redux';
 
-import RulesetHandler from './utils/ruleset-handler';
+import { RulesetHandler } from './utils/ruleset-handler';
 import { colors } from './utils/colors';
 
 import {
@@ -33,7 +33,7 @@ class WzDecoderInfo extends Component {
   constructor(props) {
     super(props);
 
-    this.rulesetHandler = RulesetHandler;
+    this.rulesetHandler = new RulesetHandler(RulesetResources.DECODERS);
     this.columns = [
       {
         field: 'name',
@@ -62,8 +62,7 @@ class WzDecoderInfo extends Component {
           return (
             <EuiToolTip position="top" content={`Show ${value} content`}>
               <EuiLink onClick={async () => {
-                const noLocal = item.relative_dirname.startsWith('ruleset/');
-                const result = await this.rulesetHandler.getDecoderContent(value, noLocal);
+                const result = await this.rulesetHandler.getFileContent(value);
                 const file = { name: value, content: result, path: item.relative_dirname };
                 this.props.updateFileContent(file);
               }

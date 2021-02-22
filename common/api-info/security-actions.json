@@ -1,17 +1,15 @@
 {
   "active-response:command": {
-    "description": "Execute active response commands in the agents",
+    "description": "Allow to execute active response commands in the agents",
     "resources": [
-      "agent:id",
-      "agent:group"
+      "agent:id"
     ],
     "example": {
       "actions": [
         "active-response:command"
       ],
       "resources": [
-        "agent:id:001",
-        "agent:group:atlantic"
+        "agent:id:001"
       ],
       "effect": "allow"
     },
@@ -20,18 +18,16 @@
     ]
   },
   "agent:delete": {
-    "description": "Delete agents",
+    "description": "Delete system's agents",
     "resources": [
-      "agent:id",
-      "agent:group"
+      "agent:id"
     ],
     "example": {
       "actions": [
         "agent:delete"
       ],
       "resources": [
-        "agent:id:010",
-        "agent:group:pacific"
+        "agent:id:010"
       ],
       "effect": "allow"
     },
@@ -40,10 +36,9 @@
     ]
   },
   "agent:read": {
-    "description": "Access agents information (id, name, group, last keep alive, etc)",
+    "description": "Access to one or more agents basic information (id, name, group, last keep alive, etc)",
     "resources": [
-      "agent:id",
-      "agent:group"
+      "agent:id"
     ],
     "example": {
       "actions": [
@@ -89,18 +84,16 @@
     ]
   },
   "agent:modify_group": {
-    "description": "Change the group of agents",
+    "description": "Change the group of specified agent",
     "resources": [
-      "agent:id",
-      "agent:group"
+      "agent:id"
     ],
     "example": {
       "actions": [
         "agent:modify_group"
       ],
       "resources": [
-        "agent:id:004",
-        "agent:group:us-east"
+        "agent:id:*"
       ],
       "effect": "allow"
     },
@@ -114,7 +107,7 @@
     ]
   },
   "group:modify_assignments": {
-    "description": "Change the agents assigned to the group",
+    "description": "Allow to change the agents assigned to the group",
     "resources": [
       "group:id"
     ],
@@ -137,10 +130,9 @@
     ]
   },
   "agent:restart": {
-    "description": "Restart agents",
+    "description": "Restart Wazuh for allowed agents",
     "resources": [
-      "agent:id",
-      "agent:group"
+      "agent:id"
     ],
     "example": {
       "actions": [
@@ -160,29 +152,27 @@
     ]
   },
   "agent:upgrade": {
-    "description": "Upgrade the version of the agents",
+    "description": "Upgrade the version of an agent",
     "resources": [
-      "agent:id",
-      "agent:group"
+      "agent:id"
     ],
     "example": {
       "actions": [
         "agent:upgrade"
       ],
       "resources": [
-        "agent:id:001",
-        "agent:group:mediterranean"
+        "agent:id:*"
       ],
       "effect": "allow"
     },
     "related_endpoints": [
-      "PUT /agents/upgrade",
-      "PUT /agents/upgrade_custom",
-      "GET /agents/upgrade_result"
+      "PUT /agents/{agent_id}/upgrade",
+      "PUT /agents/{agent_id}/upgrade_custom",
+      "GET /agents/{agent_id}/upgrade_result"
     ]
   },
   "group:delete": {
-    "description": "Delete agent groups",
+    "description": "Delete system's groups",
     "resources": [
       "group:id"
     ],
@@ -200,9 +190,9 @@
     ]
   },
   "group:read": {
-    "description": "Access agent groups information (id, name, agents, etc)",
+    "description": "Access to one or more groups basic information (id, name, agents, etc)",
     "resources": [
-      "*:*"
+      "group:id"
     ],
     "example": {
       "actions": [
@@ -224,7 +214,7 @@
     ]
   },
   "group:create": {
-    "description": "Create new agent groups",
+    "description": "Create new groups",
     "resources": [
       "*:*"
     ],
@@ -242,7 +232,7 @@
     ]
   },
   "group:update_config": {
-    "description": "Change the configuration of agent groups",
+    "description": "Change group's configuration",
     "resources": [
       "group:id"
     ],
@@ -260,7 +250,7 @@
     ]
   },
   "cluster:read": {
-    "description": "Read Wazuh's cluster nodes configuration",
+    "description": "Read Wazuh's cluster configuration",
     "resources": [
       "node:id"
     ],
@@ -290,19 +280,16 @@
       "GET /cluster/{node_id}/stats/remoted",
       "GET /cluster/{node_id}/logs",
       "GET /cluster/{node_id}/logs/summary",
-      "GET /cluster/{node_id}/files",
-      "PUT /cluster/{node_id}/files",
-      "DELETE /cluster/{node_id}/files",
+      "PUT /cluster/{node_id}/configuration",
       "PUT /cluster/restart",
       "GET /cluster/configuration/validation",
       "GET /cluster/{node_id}/configuration/{component}/{configuration}"
     ]
   },
   "ciscat:read": {
-    "description": "Access CIS-CAT results for agents",
+    "description": "Get CIS-CAT results for a list of agents",
     "resources": [
-      "agent:id",
-      "agent:group"
+      "agent:id"
     ],
     "example": {
       "actions": [
@@ -310,8 +297,7 @@
       ],
       "resources": [
         "agent:id:001",
-        "agent:id:003",
-        "agent:group:default"
+        "agent:id:003"
       ],
       "effect": "deny"
     },
@@ -321,7 +307,7 @@
     ]
   },
   "cluster:status": {
-    "description": "Check Wazuh's cluster general status",
+    "description": "Check Wazuh's cluster status",
     "resources": [
       "*:*"
     ],
@@ -339,7 +325,7 @@
     ]
   },
   "cluster:read_api_config": {
-    "description": "Check Wazuh's cluster nodes API configuration",
+    "description": "Check Wazuh's cluster API configuration",
     "resources": [
       "*:*"
     ],
@@ -357,55 +343,34 @@
       "GET /cluster/api/config"
     ]
   },
-  "cluster:read_file": {
-    "description": "Read Wazuh's cluster nodes files",
+  "cluster:update_api_config": {
+    "description": "Modify Wazuh's cluster API configuration",
     "resources": [
-      "node:id",
-      "file:path"
+      "*:*"
     ],
     "example": {
       "actions": [
-        "cluster:read_file"
+        "cluster:update_api_config"
       ],
       "resources": [
         "node:id:worker1",
-        "file:path:etc/rules/new-rules.xml"
+        "node:id:worker3"
       ],
       "effect": "allow"
     },
     "related_endpoints": [
-      "GET /cluster/{node_id}/files"
+      "PUT /cluster/api/config",
+      "DELETE /cluster/api/config"
     ]
   },
-  "cluster:delete_file": {
-    "description": "Delete Wazuh's cluster nodes files",
-    "resources": [
-      "node:id",
-      "file:path"
-    ],
-    "example": {
-      "actions": [
-        "cluster:delete_file"
-      ],
-      "resources": [
-        "node:id:worker1",
-        "file:path:etc/rules/new-rules.xml"
-      ],
-      "effect": "deny"
-    },
-    "related_endpoints": [
-      "PUT /cluster/{node_id}/files",
-      "DELETE /cluster/{node_id}/files"
-    ]
-  },
-  "cluster:upload_file": {
-    "description": "Upload files to Wazuh's cluster nodes",
+  "cluster:update_config": {
+    "description": "Update configuration of Wazuh's cluster node",
     "resources": [
       "node:id"
     ],
     "example": {
       "actions": [
-        "cluster:upload_file"
+        "cluster:update_config"
       ],
       "resources": [
         "node:id:worker1"
@@ -413,7 +378,7 @@
       "effect": "allow"
     },
     "related_endpoints": [
-      "PUT /cluster/{node_id}/files"
+      "PUT /cluster/{node_id}/configuration"
     ]
   },
   "cluster:restart": {
@@ -435,16 +400,16 @@
     ]
   },
   "lists:read": {
-    "description": "Read cdb lists files",
+    "description": "Read lists files",
     "resources": [
-      "list:path"
+      "list:file"
     ],
     "example": {
       "actions": [
         "lists:read"
       ],
       "resources": [
-        "list:path:etc/lists/audit-keys"
+        "list:file:audit-keys"
       ],
       "effect": "deny"
     },
@@ -453,23 +418,41 @@
       "GET /lists/files"
     ]
   },
-  "logtest:run": {
-    "description": "Run logtest tool or end a logtest session",
+  "lists:update": {
+    "description": "Update lists files",
     "resources": [
+      "list:file",
       "*:*"
     ],
     "example": {
       "actions": [
-        "logtest:run"
+        "lists:update"
       ],
       "resources": [
-        "*:*:*"
+        "list:file:audit-keys"
       ],
-      "effect": "allow"
+      "effect": "deny"
     },
-    "related_endpoints": [
-      "PUT /logtest",
-      "DELETE /logtest/sessions/{token}"
+    "related_endpoints": [      
+      "PUT /lists/files"
+    ]
+  },
+  "lists:delete": {
+    "description": "Delete lists files",
+    "resources": [
+      "list:file"
+    ],
+    "example": {
+      "actions": [
+        "lists:delete"
+      ],
+      "resources": [
+        "list:file:audit-keys"
+      ],
+      "effect": "deny"
+    },
+    "related_endpoints": [      
+      "DELETE /lists/files"
     ]
   },
   "manager:read": {
@@ -497,59 +480,20 @@
       "GET /manager/stats/remoted",
       "GET /manager/logs",
       "GET /manager/logs/summary",
-      "GET /manager/files",
-      "PUT /manager/files",
-      "DELETE /manager/files",
+      "PUT /manager/configuration",
       "PUT /manager/restart",
       "GET /manager/configuration/validation",
       "GET /manager/configuration/{component}/{configuration}"
     ]
-  },
-  "manager:read_file": {
-    "description": "Read Wazuh manager files",
-    "resources": [
-      "file:path"
-    ],
-    "example": {
-      "actions": [
-        "manager:read_file"
-      ],
-      "resources": [
-        "file:path:etc/rules/new-rules.xml"
-      ],
-      "effect": "allow"
-    },
-    "related_endpoints": [
-      "GET /manager/files"
-    ]
-  },
-  "manager:delete_file": {
-    "description": "Delete Wazuh manager files",
-    "resources": [
-      "file:path"
-    ],
-    "example": {
-      "actions": [
-        "manager:delete_file"
-      ],
-      "resources": [
-        "file:path:etc/rules/new-rules.xml"
-      ],
-      "effect": "allow"
-    },
-    "related_endpoints": [
-      "PUT /manager/files",
-      "DELETE /manager/files"
-    ]
-  },
-  "manager:upload_file": {
-    "description": "Upload files to Wazuh manager",
+  },  
+  "manager:update_config": {
+    "description": "Update the configuration of Wazuh manager node",
     "resources": [
       "*:*"
     ],
     "example": {
       "actions": [
-        "manager:upload_file"
+        "manager:update_config"
       ],
       "resources": [
         "*:*:*"
@@ -557,7 +501,7 @@
       "effect": "deny"
     },
     "related_endpoints": [
-      "PUT /manager/files"
+      "PUT /manager/configuration"
     ]
   },
   "manager:read_api_config": {
@@ -578,8 +522,27 @@
       "GET /manager/api/config"
     ]
   },
+  "manager:update_api_config": {
+    "description": "Modify Wazuh manager API configuration",
+    "resources": [
+      "*:*"
+    ],
+    "example": {
+      "actions": [
+        "manager:update_api_config"
+      ],
+      "resources": [
+        "*:*:*"
+      ],
+      "effect": "allow"
+    },
+    "related_endpoints": [
+      "PUT /manager/api/config",
+      "DELETE /manager/api/config"
+    ]
+  },
   "manager:restart": {
-    "description": "Restart Wazuh managers",
+    "description": "Restart Wazuh manager nodes",
     "resources": [
       "*:*"
     ],
@@ -597,7 +560,7 @@
     ]
   },
   "mitre:read": {
-    "description": "Access attacks information from MITRE database",
+    "description": "Get attacks information from MITRE database.",
     "resources": [
       "*:*"
     ],
@@ -612,64 +575,6 @@
     },
     "related_endpoints": [
       "GET /mitre"
-    ]
-  },
-  "rootcheck:clear": {
-    "description": "Clear the agents rootcheck database",
-    "resources": [
-      "agent:id",
-      "agent:group"
-    ],
-    "example": {
-      "actions": [
-        "rootcheck:clear"
-      ],
-      "resources": [
-        "agent:id:*"
-      ],
-      "effect": "deny"
-    },
-    "related_endpoints": [
-      "DELETE /rootcheck"
-    ]
-  },
-  "rootcheck:run": {
-    "description": "Run agents rootcheck scan",
-    "resources": [
-      "agent:id",
-      "agent:group"
-    ],
-    "example": {
-      "actions": [
-        "rootcheck:run"
-      ],
-      "resources": [
-        "agent:id:*"
-      ],
-      "effect": "allow"
-    },
-    "related_endpoints": [
-      "PUT /rootcheck"
-    ]
-  },
-  "rootcheck:read": {
-    "description": "Access information from agents rootcheck database",
-    "resources": [
-      "agent:id",
-      "agent:group"
-    ],
-    "example": {
-      "actions": [
-        "rootcheck:read"
-      ],
-      "resources": [
-        "agent:id:011"
-      ],
-      "effect": "allow"
-    },
-    "related_endpoints": [
-      "GET /rootcheck/{agent_id}",
-      "GET /rootcheck/{agent_id}/last_scan"
     ]
   },
   "rules:read": {
@@ -694,11 +599,47 @@
       "GET /rules/files/{filename}/download"
     ]
   },
-  "sca:read": {
-    "description": "Access agents security configuration assessment",
+  "rules:update": {
+    "description": "Update rules files",
     "resources": [
-      "agent:id",
-      "agent:group"
+      "rule:file",
+      "*:*"
+    ],
+    "example": {
+      "actions": [
+        "rules:update"
+      ],
+      "resources": [
+        "rule:file:0610-win-ms_logs_rules.xml"
+      ],
+      "effect": "allow"
+    },
+    "related_endpoints": [
+      "PUT /rules/files"
+    ]
+  },
+  "rules:delete": {
+    "description": "Delete rules files",
+    "resources": [
+      "rule:file"
+    ],
+    "example": {
+      "actions": [
+        "rules:delete"
+      ],
+      "resources": [
+        "rule:file:0610-win-ms_logs_rules.xml"
+      ],
+      "effect": "allow"
+    },
+    "related_endpoints": [
+      "DELETE /rules/files"
+    ]
+  },  
+  "sca:read": {
+    "description": "Get a list of policies analyzed in the configuration assessment for a given agent",
+    "resources": [
+      "agent:id"
     ],
     "example": {
       "actions": [
@@ -715,10 +656,9 @@
     ]
   },
   "syscheck:run": {
-    "description": "Run agents syscheck scan",
+    "description": "Run syscheck",
     "resources": [
-      "agent:id",
-      "agent:group"
+      "agent:id"
     ],
     "example": {
       "actions": [
@@ -734,18 +674,16 @@
     ]
   },
   "syscheck:read": {
-    "description": "Access information from agents syscheck database",
+    "description": "Read information from syscheck's database",
     "resources": [
-      "agent:id",
-      "agent:group"
+      "agent:id"
     ],
     "example": {
       "actions": [
         "syscheck:read"
       ],
       "resources": [
-        "agent:id:011",
-        "agent:group:us-west"
+        "agent:id:011"
       ],
       "effect": "allow"
     },
@@ -755,10 +693,9 @@
     ]
   },
   "syscheck:clear": {
-    "description": "Clear the agents syscheck database",
+    "description": "Clear the syscheck database for specified agents",
     "resources": [
-      "agent:id",
-      "agent:group"
+      "agent:id"
     ],
     "example": {
       "actions": [
@@ -795,11 +732,47 @@
       "GET /decoders/parents"
     ]
   },
-  "syscollector:read": {
-    "description": "Access agents syscollector information",
+  "decoders:update": {
+    "description": "Update decoders files",
     "resources": [
-      "agent:id",
-      "agent:group"
+      "decoder:file",
+      "*:*"   
+    ],
+    "example": {
+      "actions": [
+        "decoders:update"
+      ],
+      "resources": [
+        "decoder:file:*"
+      ],
+      "effect": "allow"
+    },
+    "related_endpoints": [
+      "PUT /decoders/files"
+    ]
+  },
+  "decoders:delete": {
+    "description": "Delete decoders files",
+    "resources": [
+      "decoder:file"
+    ],
+    "example": {
+      "actions": [
+        "decoders:delete"
+      ],
+      "resources": [
+        "decoder:file:*"
+      ],
+      "effect": "allow"
+    },
+    "related_endpoints": [
+      "DELETE /decoders/files"
+    ]
+  },
+  "syscollector:read": {
+    "description": "Get syscollector information about a specified agents",
+    "resources": [
+      "agent:id"
     ],
     "example": {
       "actions": [
@@ -832,12 +805,11 @@
     ]
   },
   "security:read": {
-    "description": "Access information about system security resources",
+    "description": "Allow read information about system's security resources",
     "resources": [
       "policy:id",
       "role:id",
-      "user:id",
-      "rule:id"
+      "user:id"
     ],
     "example": {
       "actions": [
@@ -846,94 +818,14 @@
       "resources": [
         "policy:id:*",
         "role:id:2",
-        "user:id:5",
-        "rule:id:3"
+        "user:id:5"
       ],
       "effect": "allow"
     },
     "related_endpoints": [
-      "GET /security/users",
       "GET /security/roles",
-      "GET /security/rules",
-      "GET /security/policies"
-    ]
-  },
-  "security:create_user": {
-    "description": "Create new system users",
-    "resources": [
-      "*:*"
-    ],
-    "example": {
-      "actions": [
-        "security:create_user"
-      ],
-      "resources": [
-        "*:*:*"
-      ],
-      "effect": "allow"
-    },
-    "related_endpoints": [
-      "POST /security/users"
-    ]
-  },
-  "security:delete": {
-    "description": "Delete system security resources",
-    "resources": [
-      "policy:id",
-      "role:id",
-      "user:id",
-      "rule:id"
-    ],
-    "example": {
-      "actions": [
-        "security:update"
-      ],
-      "resources": [
-        "policy:id:*",
-        "role:id:3",
-        "user:id:4",
-        "rule:id:2"
-      ],
-      "effect": "deny"
-    },
-    "related_endpoints": [
-      "DELETE /security/users",
-      "DELETE /security/roles",
-      "DELETE /security/rules",
-      "DELETE /security/policies",
-      "DELETE /security/users/{user_id}/roles",
-      "DELETE /security/roles/{role_id}/policies",
-      "DELETE /security/roles/{role_id}/rules"
-    ]
-  },
-  "security:update": {
-    "description": "Update the information of system security resources",
-    "resources": [
-      "policy:id",
-      "role:id",
-      "user:id",
-      "rule:id"
-    ],
-    "example": {
-      "actions": [
-        "security:update"
-      ],
-      "resources": [
-        "policy:id:*",
-        "role:id:4",
-        "user:id:3",
-        "rule:id:4"
-      ],
-      "effect": "deny"
-    },
-    "related_endpoints": [
-      "PUT /security/users/{user_id}",
-      "PUT /security/roles/{role_id}",
-      "PUT /security/rules/{rule_id}",
-      "PUT /security/policies/{policy_id}",
-      "POST /security/users/{user_id}/roles",
-      "POST /security/roles/{role_id}/policies",
-      "POST /security/roles/{role_id}/rules"
+      "GET /security/policies",
+      "GET /security/users"
     ]
   },
   "security:create": {
@@ -952,12 +844,81 @@
     },
     "related_endpoints": [
       "POST /security/roles",
-      "POST /security/rules",
       "POST /security/policies"
     ]
   },
+  "security:delete": {
+    "description": "Delete system's security resources",
+    "resources": [
+      "policy:id",
+      "role:id",
+      "user:id"
+    ],
+    "example": {
+      "actions": [
+        "security:update"
+      ],
+      "resources": [
+        "policy:id:*",
+        "role:id:3",
+        "user:id:4"
+      ],
+      "effect": "deny"
+    },
+    "related_endpoints": [
+      "DELETE /security/roles",
+      "DELETE /security/policies",
+      "DELETE /security/roles/{role_id}/policies",
+      "DELETE /security/users/{user_id}/roles",
+      "DELETE /security/users"
+    ]
+  },
+  "security:update": {
+    "description": "Allow update the information of system's security resources",
+    "resources": [
+      "policy:id",
+      "role:id",
+      "user:id"
+    ],
+    "example": {
+      "actions": [
+        "security:update"
+      ],
+      "resources": [
+        "policy:id:*",
+        "role:id:4",
+        "user:id:3"
+      ],
+      "effect": "deny"
+    },
+    "related_endpoints": [
+      "PUT /security/roles/{role_id}",
+      "PUT /security/policies/{policy_id}",
+      "POST /security/roles/{role_id}/policies",
+      "POST /security/users/{user_id}/roles",
+      "PUT /security/users/{user_id}"
+    ]
+  },
+  "security:create_user": {
+    "description": "Create new system user",
+    "resources": [
+      "*:*"
+    ],
+    "example": {
+      "actions": [
+        "security:create_user"
+      ],
+      "resources": [
+        "*:*:*"
+      ],
+      "effect": "allow"
+    },
+    "related_endpoints": [
+      "POST /security/users"
+    ]
+  },
   "security:read_config": {
-    "description": "Read current system security configuration",
+    "description": "Read current security configuration",
     "resources": [
       "*:*"
     ],
@@ -975,7 +936,7 @@
     ]
   },
   "security:update_config": {
-    "description": "Update current system security configuration",
+    "description": "Update current security configuration",
     "resources": [
       "*:*"
     ],
@@ -991,24 +952,6 @@
     "related_endpoints": [
       "PUT /security/config",
       "DELETE /security/config"
-    ]
-  },
-  "task:status": {
-    "description": "Access task's status information",
-    "resources": [
-      "*:*"
-    ],
-    "example": {
-      "actions": [
-        "task:status"
-      ],
-      "resources": [
-        "*:*:*"
-      ],
-      "effect": "deny"
-    },
-    "related_endpoints": [
-      "GET /tasks/status"
     ]
   }
 }
