@@ -21,8 +21,9 @@ export class WzUserPermissions{
         const missingOrPermissions = WzUserPermissions.checkMissingUserPermissions(permission, userPermissions);
         return Array.isArray(missingOrPermissions) ? missingOrPermissions.length === permission.length : missingOrPermissions;
       }
-
       
+      const isGenericResource = (permission.resource.match(':\\*') || []).index === permission.resource.length - 2
+
       const actionName = typeof permission === 'string' ? permission : permission.action;
       let actionResource = (typeof permission === 'string' && wazuhPermissions[actionName].resources.length === 1) ? (wazuhPermissions[actionName].resources[0] + ':*') : permission.resource;
       const actionResourceAll = actionResource
@@ -37,14 +38,26 @@ export class WzUserPermissions{
         })
         .join('&');
 
+      const multiplePermission = (resource: string) => {
+        return (
+          ![actionResource, actionResourceAll].includes(resource) &&
+          (resource.match(`/${actionResource}/`) || resource.match(`/${actionResourceAll}/`))
+        );
+      };
+
+      const simplePermission = (resource: string) => {
+        return (
+          ![actionResource, actionResourceAll].includes(resource) &&
+          (resource.match(actionResource.replace('*', '\\*')) ||
+            resource.match(actionResourceAll.replace('*', '\*')))
+        );
+      };
+
       const userPartialResources: string[] | undefined = userPermissions[actionName]
         ? Object.keys(userPermissions[actionName]).filter((resource) =>
             resource.match('&')
-              ? ![actionResource, actionResourceAll].includes(resource) &&
-                (resource.match(`/${actionResource}/`) || resource.match(`/${actionResourceAll}/`))
-              : ![actionResource, actionResourceAll].includes(resource) &&
-                (resource.match(actionResource.replace('*', '\\*')) ||
-                  resource.match(actionResourceAll.replace('*', '\*')))
+              ? multiplePermission(resource)
+              : simplePermission(resource)
           )
         : undefined;
 
@@ -82,6 +95,10 @@ export class WzUserPermissions{
         }
       };
 
+      const partialResourceIsAllow = (resource) => {
+        return isGenericResource ? !isAllow(userPermissions[actionName][resource]) : isAllow(userPermissions[actionName][resource]);
+      }
+
       return userPermissions[actionName][actionResource]
         ? notAllowInWazuhPermissions(actionResource)
         : Object.keys(userPermissions[actionName]).some((resource) => {
@@ -93,7 +110,7 @@ export class WzUserPermissions{
             }
           })
         : (userPartialResources || []).length
-        ? userPartialResources.some((resource) => !isAllow(userPermissions[actionName][resource]))
+        ? userPartialResources.some((resource) => partialResourceIsAllow(resource))
         : wazuhPermissions[actionName].resources.find(
             (resource) => resource === RESOURCE_ANY_SHORT
           ) && userPermissions[actionName][RESOURCE_ANY]

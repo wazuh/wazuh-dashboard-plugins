@@ -282,32 +282,69 @@ describe('Wazuh User Permissions', () => {
       });
     });
 
-    describe('Should return all the required permissions to update decoder file', () => {
-      const requiredAgentView = [
+    describe('Should return all OK to show inventory on MITRE view', () => {
+      const requiredMitreView = [
         {
-          action: 'decoders:update',
-          resource: 'decoder:file:*',
+          action: 'mitre:read',
+          resource: '*:*:*',
         },
         {
-          action: 'decoders:read',
-          resource: 'decoder:file:*',
+          action: 'agent:read',
+          resource: 'agent:id:001',
+        },
+        {
+          action: 'syscheck:read',
+          resource: 'agent:id:001',
         },
       ];
-      const userAgent1 = {
-        'decoders:update': {
-          '*:*:*': 'allow',
+      const userMitre1 = {
+        'agent:read': {
+          'agent:id:*': 'allow',
         },
-        'decoders:read': {
-          'decoder:file:*': 'allow',
+        'syscheck:read': {
+          'agent:id:*': 'allow',
+        },
+        'mitre:read': {
+          '*:*:*': 'allow',
         },
         rbac_mode: 'white',
       };
-      it('Should return OK for all agents and groups', () => {
+
+      it('Should return OK for the agent 001', () => {
         const result = WzUserPermissions.checkMissingUserPermissions(
-          requiredAgentView,
-          userAgent1
+          requiredMitreView,
+          userMitre1
         );
         expect(result).toEqual(false);
+      });
+
+      describe('Should return all the required permissions to update decoder file', () => {
+        const requiredAgentView = [
+          {
+            action: 'decoders:update',
+            resource: 'decoder:file:*',
+          },
+          {
+            action: 'decoders:read',
+            resource: 'decoder:file:*',
+          },
+        ];
+        const userAgent1 = {
+          'decoders:update': {
+            '*:*:*': 'allow',
+          },
+          'decoders:read': {
+            'decoder:file:*': 'allow',
+          },
+          rbac_mode: 'white',
+        };
+        it('Should return OK for all agents and groups', () => {
+          const result = WzUserPermissions.checkMissingUserPermissions(
+            requiredAgentView,
+            userAgent1
+          );
+          expect(result).toEqual(false);
+        });
       });
     });
   });
