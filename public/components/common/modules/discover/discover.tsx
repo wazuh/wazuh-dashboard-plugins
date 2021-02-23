@@ -181,7 +181,11 @@ export const Discover = compose(
   }
 
   async componentDidUpdate(prevProps, prevState) {
-    if (!this._isMount) { return; }
+    if (!this._isMount) { return; };
+    if(this.props.shareFilterManager && !_.isEqual(this.props.shareFilterManager, prevProps.shareFilterManager) && !_.isEqual(this.props.shareFilterManager, this.state.searchBarFilters)){
+        this.setState({searchBarFilters: this.props.shareFilterManager}); 
+        return;
+    };
     if((!prevProps.currentAgentData.id && this.props.currentAgentData.id) || (prevProps.currentAgentData.id && !this.props.currentAgentData.id)){
       this.setState({ columns: this.getColumns() }); // Updates the columns to be rendered if you change the selected agent to none or vice versa
       return;
@@ -198,9 +202,6 @@ export const Discover = compose(
       || (this.props.refreshAngularDiscover !== prevProps.refreshAngularDiscover)
     ){
       this.setState({ pageIndex: 0 , tsUpdated: Date.now()});
-      if(!_.isEqual(this.props.shareFilterManager, this.state.searchBarFilters)){
-        this.setState({columns: this.getColumns(), searchBarFilters: this.props.shareFilterManager || []}); //initial columns
-      }
       return;
     };
     if(['pageIndex', 'pageSize', 'sortField', 'sortDirection'].some(field => this.state[field] !== prevState[field]) || (this.state.tsUpdated !== prevState.tsUpdated)){
@@ -300,12 +301,11 @@ export const Discover = compose(
       $state: { store: 'appState' }
     });
 
-    const shareFilterManager = this.props.shareFilterManager || [];
     const elasticQuery =
       buildEsQuery(
         undefined,
         query,
-        [...searchBarFilters, ...extraFilters, ...shareFilterManager],
+        [...searchBarFilters, ...extraFilters],
         getEsQueryConfig(getUiSettings())
       );
 
