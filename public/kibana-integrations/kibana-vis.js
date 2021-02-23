@@ -219,13 +219,14 @@ class KibanaVis extends Component {
         query
       };
 
-      if (raw && discoverList.length) {
+      const rawVis = raw ? raw.filter((item) => item && item.id === this.visID) : []; 
+
+      if (rawVis.length && discoverList.length) {
         // There are pending updates from the discover (which is the one who owns the true app state)
 
         if (!this.visualization && !this.rendered && !this.renderInProgress) {
           // There's no visualization object -> create it with proper filters
           this.renderInProgress = true;
-          const rawVis = raw.filter((item) => item && item.id === this.visID);
           this.visualization = await this.savedObjectLoaderVisualize.get(
             this.visID,
             rawVis[0]
