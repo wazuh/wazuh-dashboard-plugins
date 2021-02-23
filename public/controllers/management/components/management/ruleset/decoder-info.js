@@ -18,7 +18,7 @@ import {
 
 import { connect } from 'react-redux';
 
-import { RulesetHandler } from './utils/ruleset-handler';
+import { RulesetHandler, RulesetResources } from './utils/ruleset-handler';
 import { colors } from './utils/colors';
 
 import {
