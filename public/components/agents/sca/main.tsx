@@ -29,7 +29,8 @@ export const MainSca = compose(
   const agentData = currentAgentData && currentAgentData.id ? currentAgentData : agent;
   return (
     <div>
-      <Inventory {...rest} agent={agentData} />
+      {agentData.status === 'never_connected' && <PromptNoSelectedAgent title= "Agent never connected" body="The agent has never been connected please select other" />}
+      {agentData.status !== 'never_connected' && <Inventory {...rest} agent={agentData} />}
     </div>
   );
 });
