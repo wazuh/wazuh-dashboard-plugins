@@ -32,8 +32,18 @@ export const RolesMapping = () => {
   const currentPlatform = useSelector((state: any) => state.appStateReducers.currentPlatform);
 
   useEffect(() => {
-    initData();
+    initData();    
   }, []);
+
+  useEffect(() => {
+    console.log("rules");
+    console.log(rules);    
+    console.log(rules.length);    
+  }, [rules]);
+  useEffect(() => {
+    console.log("internalUsers");
+    console.log(internalUsers.length);    
+  }, [internalUsers]);
 
   useEffect(() => {
     if (!rolesLoading && (roles || [])) {
@@ -146,11 +156,17 @@ export const RolesMapping = () => {
           </EuiTitle>
         </EuiPageContentHeaderSection>
         <EuiPageContentHeaderSection>
-          <div>
-            <EuiButton onClick={() => setIsCreatingRule(true)}>Create Role mapping</EuiButton>
-            {createFlyout}
-            {editFlyout}
-          </div>
+          {
+            !loadingTable
+            ?            
+            <div>
+              <EuiButton onClick={() => setIsCreatingRule(true)}>Create Role mapping</EuiButton>
+              {createFlyout}
+              {editFlyout}
+            </div>
+            :
+            null
+          }
         </EuiPageContentHeaderSection>
       </EuiPageContentHeader>
       <EuiPageContentBody>
