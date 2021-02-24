@@ -69,7 +69,7 @@ export const Discover = compose(
   };
 
   KibanaServices: { [key: string]: any };
-  filterManager: FilterManager;
+  // filterManager: FilterManager;
   state: {
     sort: object
     selectedTechnique: string,
@@ -108,7 +108,7 @@ export const Discover = compose(
   constructor(props) {
     super(props);
     this.KibanaServices = getDataPlugin();
-    this.filterManager = props.shareFilterManager ? this.KibanaServices.query.filterManager : new FilterManager(getUiSettings());
+    // this.filterManager = props.shareFilterManager;
     this.timefilter = this.KibanaServices.query.timefilter.timefilter;
     this.state = {
       sort: {},
@@ -190,8 +190,7 @@ export const Discover = compose(
       this.setState({ query: {...this.props.query}});
       return;
     };
-    if((!_.isEqual(this.props.shareFilterManager, prevProps.shareFilterManager))
-      || (this.props.currentAgentData.id !== prevProps.currentAgentData.id)
+    if((this.props.currentAgentData.id !== prevProps.currentAgentData.id)
       || (!_.isEqual(this.state.query, prevState.query))
       || (!_.isEqual(this.state.searchBarFilters, prevState.searchBarFilters))
       || (!_.isEqual(this.state.dateRange, prevState.dateRange))
@@ -532,8 +531,8 @@ export const Discover = compose(
       filters.push(formattedFilter);
     })
 
-    this.filterManager.setFilters(filters);
-    if (!this.props.shareFilterManager) this.setState({ searchBarFilters: filters });
+    this.props.shareFilterManager.setFilters(filters);
+    // if (!this.props.shareFilterManager) this.setState({ searchBarFilters: filters });
   }
 
   /**
@@ -552,8 +551,8 @@ export const Discover = compose(
       }
       filters.push(formattedFilter);
     })
-    this.filterManager.addFilters(filters);
-    if (!this.props.shareFilterManager) this.setState({ searchBarFilters: filters });
+    this.props.shareFilterManager.addFilters(filters);
+    // if (!this.props.shareFilterManager) this.setState({ searchBarFilters: filters });
 
   }
 
@@ -624,9 +623,9 @@ export const Discover = compose(
     return (
       <div
         className='wz-discover hide-filter-control wz-inventory' >
-        {!this.props.shareFilterManager && <KbnSearchBar
+        {this.props.filterManagerKbnSearchBar && <KbnSearchBar
           indexPattern={this.indexPattern}
-          filterManager={this.filterManager}
+          filterManager={this.props.filterManagerKbnSearchBar}
           onQuerySubmit={this.onQuerySubmit}
           onFiltersUpdated={this.onFiltersUpdated}
           query={query} />
