@@ -36,16 +36,6 @@ export const RolesMapping = () => {
   }, []);
 
   useEffect(() => {
-    console.log("rules");
-    console.log(rules);    
-    console.log(rules.length);    
-  }, [rules]);
-  useEffect(() => {
-    console.log("internalUsers");
-    console.log(internalUsers.length);    
-  }, [internalUsers]);
-
-  useEffect(() => {
     if (!rolesLoading && (roles || [])) {
       const _rolesObject = (roles || []).reduce(
         (rolesObj, role) => ({ ...rolesObj, [role.id]: role.name }),
