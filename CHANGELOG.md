@@ -16,6 +16,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
+- Creating a role mapping before the existing ones are loaded, the page bursts [#3001](https://github.com/wazuh/wazuh-kibana-app/issues/3001)
 - Fix login error when AWS Elasticsearch and ODFE is used [#2710](https://github.com/wazuh/wazuh-kibana-app/issues/2710)
 - An error message is displayed when changing a group's configuration although the user has the right permissions [#2955](https://github.com/wazuh/wazuh-kibana-app/pull/2955)
 - Fix Security events table is empty when switching the pinned agents [#2956](https://github.com/wazuh/wazuh-kibana-app/pull/2956)
