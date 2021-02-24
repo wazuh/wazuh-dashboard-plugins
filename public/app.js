@@ -114,10 +114,15 @@ app.run(function ($rootElement) {
       <react-component name="ToastNotificationsModal" props=""></react-component>
     </div>`);
 
-  // Blind deleteExistenToken on Log out component.
+  // Bind deleteExistentToken on Log out component.
   $(document).ready(function () {
     $('.euiHeaderSectionItem__button').mouseleave('mouseleave', function () {
+      // opendistro
       $('span:contains(Log out)').bind('click', function () {
+        WzAuthentication.deleteExistentToken();
+      });
+      // x-pack
+      $('a:contains(Log out)').bind('click', function () {
         WzAuthentication.deleteExistentToken();
       });
     });
