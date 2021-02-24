@@ -182,9 +182,7 @@ export const Discover = compose(
 
   async componentDidUpdate(prevProps, prevState) {
     if (!this._isMount) { return; }
-    if((!prevProps.currentAgentData.id && this.props.currentAgentData.id) 
-     || (prevProps.currentAgentData.id && !this.props.currentAgentData.id)
-     || prevProps.currentAgentData.id !== this.props.currentAgentData.id){
+    if((!prevProps.currentAgentData.id && this.props.currentAgentData.id) || (prevProps.currentAgentData.id && !this.props.currentAgentData.id) || prevProps.currentAgentData.id !== this.props.currentAgentData.id){
       this.setState({ columns: this.getColumns() }); // Updates the columns to be rendered if you change the selected agent to none or vice versa
       return;
     }
