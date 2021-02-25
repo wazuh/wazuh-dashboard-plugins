@@ -2,7 +2,7 @@ import React from 'react';
 import { Inventory } from './index';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
-import { PromptNoSelectedAgent } from '../prompt-no-selected-agent';
+import { PromptSelectAgent, PromptNoSelectedAgent } from '../prompts';
 import { withGuard, withUserAuthorizationPrompt } from '../../common/hocs';
 
 const mapStateToProps = (state) => ({
@@ -17,6 +17,15 @@ export const MainSca = compose(
       <PromptNoSelectedAgent body="You need to select an agent to see Security Configuration Assessment inventory." />
     )
   ),
+  withGuard(
+    ({ currentAgentData, agent }) => {
+      const agentData = currentAgentData && currentAgentData.id ? currentAgentData : agent;
+      return agentData.status === 'never_connected';
+    },
+    () => (
+      <PromptSelectAgent title="Agent never connected" body="The agent has never been connected please select other" />
+    )
+  ),
   withUserAuthorizationPrompt((props) => {
     const agentData =
       props.currentAgentData && props.currentAgentData.id ? props.currentAgentData : props.agent;
@@ -29,8 +38,7 @@ export const MainSca = compose(
   const agentData = currentAgentData && currentAgentData.id ? currentAgentData : agent;
   return (
     <div>
-      {agentData.status === 'never_connected' && <PromptNoSelectedAgent title= "Agent never connected" body="The agent has never been connected please select other" />}
-      {agentData.status !== 'never_connected' && <Inventory {...rest} agent={agentData} />}
+      <Inventory {...rest} agent={agentData} />
     </div>
   );
 });

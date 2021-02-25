@@ -2,8 +2,8 @@ import React from 'react';
 import { Inventory } from './index';
 import '../../common/modules/module.scss';
 import { connect } from 'react-redux';
-import { PromptNoSelectedAgent } from '../prompt-no-selected-agent';
-import { PromptNoActiveAgent } from '../prompt-no-active-agent';
+import { PromptNoSelectedAgent } from '../prompts';
+import { PromptNoActiveAgent } from '../prompts';
 import { compose } from 'redux';
 import { withGuard, withUserAuthorizationPrompt } from '../../common/hocs';
 
