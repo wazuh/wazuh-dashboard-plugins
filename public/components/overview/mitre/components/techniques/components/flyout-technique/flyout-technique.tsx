@@ -320,7 +320,7 @@ export class FlyoutTechnique extends Component {
             initialIsOpen={true}>
           <EuiFlexGroup className="flyout-row">
             <EuiFlexItem>
-              <Discover filterManagerKbnSearchBar={this.filterManager} shareFilterManager={[...((this.filterManager || {}).filters) || []]} initialColumns={["icon", "timestamp", 'rule.mitre.id', 'rule.mitre.tactic', 'rule.level', 'rule.id', 'rule.description']} implicitFilters={implicitFilters} initialFilters={[]} updateTotalHits={(total) => this.updateTotalHits(total)}/>
+              <Discover kbnSearchBar shareFilterManager={this.filterManager} initialColumns={["icon", "timestamp", 'rule.mitre.id', 'rule.mitre.tactic', 'rule.level', 'rule.id', 'rule.description']} implicitFilters={implicitFilters} initialFilters={[]} updateTotalHits={(total) => this.updateTotalHits(total)}/>
             </EuiFlexItem>
           </EuiFlexGroup>
         </EuiAccordion>

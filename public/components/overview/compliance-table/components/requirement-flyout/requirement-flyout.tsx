@@ -169,7 +169,7 @@ export class RequirementFlyout extends Component {
                     initialIsOpen={true}>
                     <EuiFlexGroup className="flyout-row">
                         <EuiFlexItem>
-                            <Discover filterManagerKbnSearchBar={this.filterManager} shareFilterManager={[...((this.filterManager || {}).filters) || []]} initialColumns={["icon", "timestamp", this.props.getRequirementKey(), 'rule.level', 'rule.id', 'rule.description']} implicitFilters={implicitFilters} initialFilters={[]} updateTotalHits={(total) => this.updateTotalHits(total)} />
+                            <Discover kbnSearchBar shareFilterManager={this.filterManager} initialColumns={["icon", "timestamp", this.props.getRequirementKey(), 'rule.level', 'rule.id', 'rule.description']} implicitFilters={implicitFilters} initialFilters={[]} updateTotalHits={(total) => this.updateTotalHits(total)} />
                         </EuiFlexItem>
                     </EuiFlexGroup>
                 </EuiAccordion>

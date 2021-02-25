@@ -69,7 +69,6 @@ export const Discover = compose(
   };
 
   KibanaServices: { [key: string]: any };
-  // filterManager: FilterManager;
   state: {
     sort: object
     selectedTechnique: string,
@@ -87,7 +86,6 @@ export const Discover = compose(
     query: { language: "kuery" | "lucene", query: string }
     itemIdToExpandedRowMap: any
     dateRange: TimeRange
-    searchBarFilters: []
     elasticQuery: object
     filters: []
     columns: string[]
@@ -102,13 +100,12 @@ export const Discover = compose(
     updateTotalHits: Function,
     includeFilters?: string,
     initialColumns: string[],
-    shareFilterManager: object[],
+    shareFilterManager: FilterManager,
     refreshAngularDiscover?: number
   }
   constructor(props) {
     super(props);
     this.KibanaServices = getDataPlugin();
-    // this.filterManager = props.shareFilterManager;
     this.timefilter = this.KibanaServices.query.timefilter.timefilter;
     this.state = {
       sort: {},
@@ -127,7 +124,6 @@ export const Discover = compose(
       itemIdToExpandedRowMap: {},
       dateRange: this.timefilter.getTime(),
       query: props.query || { language: "kuery", query: "" },
-      searchBarFilters: [],
       elasticQuery: {},
       filters: props.initialFilters,
       columns: [],
@@ -168,7 +164,7 @@ export const Discover = compose(
   async componentDidMount() {
     this._isMount = true;
     try {
-      this.setState({columns: this.getColumns(), searchBarFilters: this.props.shareFilterManager || []}) //initial columns
+      this.setState({columns: this.getColumns()}) //initial columns
       await this.getIndexPattern();
       await this.getAlerts();
     } catch (err) {
@@ -192,14 +188,10 @@ export const Discover = compose(
     };
     if((this.props.currentAgentData.id !== prevProps.currentAgentData.id)
       || (!_.isEqual(this.state.query, prevState.query))
-      || (!_.isEqual(this.state.searchBarFilters, prevState.searchBarFilters))
       || (!_.isEqual(this.state.dateRange, prevState.dateRange))
       || (this.props.refreshAngularDiscover !== prevProps.refreshAngularDiscover)
     ){
       this.setState({ pageIndex: 0 , tsUpdated: Date.now()});
-      if(!_.isEqual(this.props.shareFilterManager, this.state.searchBarFilters)){
-        this.setState({columns: this.getColumns(), searchBarFilters: this.props.shareFilterManager || []}); //initial columns
-      }
       return;
     };
     if(['pageIndex', 'pageSize', 'sortField', 'sortDirection'].some(field => this.state[field] !== prevState[field]) || (this.state.tsUpdated !== prevState.tsUpdated)){
@@ -261,9 +253,9 @@ export const Discover = compose(
     return result;
   }
 
-  onFiltersChange = (filters) => {
-    this.setState({ filters: this.filtersAsArray(filters) });
-  }
+  // onFiltersChange = (filters) => {
+  //   this.setState({ filters: this.filtersAsArray(filters) });
+  // }
 
   toggleDetails = item => {
     const itemIdToExpandedRowMap = { ...this.state.itemIdToExpandedRowMap };
@@ -281,7 +273,7 @@ export const Discover = compose(
 
   buildFilter() {
     const dateParse = ds => /\d+-\d+-\d+T\d+:\d+:\d+.\d+Z/.test(ds) ? DateMatch.parse(ds).toDate().getTime() : ds;
-    const { searchBarFilters } = this.state;
+    // const { searchBarFilters } = this.state;
     const { query } = this.state;
     const { hideManagerAlerts } = this.wazuhConfig.getConfig();
     const extraFilters = [];
@@ -299,12 +291,12 @@ export const Discover = compose(
       $state: { store: 'appState' }
     });
 
-    const shareFilterManager = this.props.shareFilterManager || [];
+    const filters = this.props.shareFilterManager ? this.props.shareFilterManager.filters : [];
     const elasticQuery =
       buildEsQuery(
         undefined,
         query,
-        [...searchBarFilters, ...extraFilters, ...shareFilterManager],
+        [...filters, ...extraFilters],
         getEsQueryConfig(getUiSettings())
       );
 
@@ -523,7 +515,6 @@ export const Discover = compose(
     const key = Object.keys(filter)[0];
     const value = filter[key];
     const valuesArray = Array.isArray(value) ? [...value] : [value];
-    const filters = this.state.searchBarFilters;
     valuesArray.map((item) => {
       const formattedFilter = buildPhraseFilter({ name: key, type: "string" }, item, this.indexPattern);
       formattedFilter.meta.negate = true;
@@ -531,8 +522,6 @@ export const Discover = compose(
       filters.push(formattedFilter);
     })
 
-    this.props.shareFilterManager.setFilters(filters);
-    // if (!this.props.shareFilterManager) this.setState({ searchBarFilters: filters });
   }
 
   /**
@@ -543,7 +532,6 @@ export const Discover = compose(
     const key = Object.keys(filter)[0];
     const value = filter[key];
     const valuesArray = Array.isArray(value) ? [...value] : [value];
-    const filters = []; //this.state.searchBarFilters;
     valuesArray.map((item) => {
       const formattedFilter = buildPhraseFilter({ name: key, type: "string" }, item, this.indexPattern);
       if (formattedFilter.meta.key === 'manager.name' || formattedFilter.meta.key === 'cluster.name') {
@@ -551,8 +539,6 @@ export const Discover = compose(
       }
       filters.push(formattedFilter);
     })
-    this.props.shareFilterManager.addFilters(filters);
-    // if (!this.props.shareFilterManager) this.setState({ searchBarFilters: filters });
 
   }
 
@@ -561,7 +547,7 @@ export const Discover = compose(
   }
 
   onFiltersUpdated = (filters: Filter[]) => {
-    this.setState({ searchBarFilters: filters });
+    this.setState({ pageIndex: 0 , tsUpdated: Date.now()});
   }
 
   closeMitreFlyout = () => {
@@ -623,9 +609,9 @@ export const Discover = compose(
     return (
       <div
         className='wz-discover hide-filter-control wz-inventory' >
-        {this.props.filterManagerKbnSearchBar && <KbnSearchBar
+        {this.props.kbnSearchBar && <KbnSearchBar
           indexPattern={this.indexPattern}
-          filterManager={this.props.filterManagerKbnSearchBar}
+          filterManager={this.props.shareFilterManager}
           onQuerySubmit={this.onQuerySubmit}
           onFiltersUpdated={this.onFiltersUpdated}
           query={query} />
