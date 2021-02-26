@@ -136,7 +136,7 @@ class WzGroupsEditor extends Component {
     const xmlError = validateXML(content);
     const saveButton = (
       <WzButtonPermissions
-        permissions={[{action: 'group:update_config', resource: `group:id:${groupName}`}]}
+        permissions={[{action: 'group:update_config', resource: `group:id:${groupName}`},{action: 'cluster:status', resource: '*:*:*'}]}
         fill
         iconType={(isEditable && xmlError) ? "alert" : "save"}
         isLoading={this.state.isSaving}

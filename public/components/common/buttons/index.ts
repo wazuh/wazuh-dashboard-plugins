@@ -11,4 +11,4 @@
  */
 
 export { WzButton } from './button';
-export { WzButtonModalConfirm } from './modal-confirm';
+export { WzButtonModalConfirm, WzButtonPermissionsModalConfirm } from './modal-confirm';

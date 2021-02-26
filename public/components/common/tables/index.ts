@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Module to export cluster monitoring visualizations raw content
+ * Wazuh app - Index for table components
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -9,8 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import monitoring from './monitoring';
-import statistics from './statistics';
 
-export { monitoring};
-export { statistics }
+
+export { TableWithSearchBar } from './table-with-search-bar';
+export { TableWithSearchBarWzAPI } from './table-with-search-bar-wz-api';
