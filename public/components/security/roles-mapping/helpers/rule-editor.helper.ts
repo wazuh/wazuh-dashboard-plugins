@@ -15,10 +15,7 @@ export const getJsonFromRule = (internalUserRules, rules, logicalOperator) => {
   
   if (usersRulesArray.length && rulesArray.length) {
     if(rulesArray.length == 1){
-      
-      console.log(rulesArray[0]);
-      return rulesArray[0]
-      
+      return rulesArray[0]      
     }else{
       ruleObject['OR'] = [
         {
@@ -31,9 +28,7 @@ export const getJsonFromRule = (internalUserRules, rules, logicalOperator) => {
     }
   } else {
     if(rulesArray.length == 1){
-      console.log(rulesArray[0]);
       return rulesArray[0]
-      
     }else{
       if (usersRulesArray.length) {      
         ruleObject['OR'] = usersRulesArray;
