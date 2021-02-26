@@ -23,7 +23,7 @@ export async function getAgentFilterValues(field, value, filters = {}) {
   const result = await WzRequest.apiReq(
     "GET",
     `/agents/stats/distinct`,
-    filter
+    { params: filter }
   );
   const getChild = (item, field) => {
     const subFields = field.split(".");
