@@ -11,25 +11,39 @@ export const getJsonFromRule = (internalUserRules, rules, logicalOperator) => {
     tmpRule[item.searchOperation] = {};
     tmpRule[item.searchOperation][item.user_field] = item.value;
     return tmpRule;
-  });
+  }); 
   
   if (usersRulesArray.length && rulesArray.length) {
-    ruleObject['OR'] = [
-      {
-        OR: usersRulesArray,
-      },
-      {
-        [logicalOperator]: rulesArray,
-      },
-    ];
-  } else {
-    if (usersRulesArray.length) {      
-      ruleObject['OR'] = usersRulesArray;
+    if(rulesArray.length == 1){
+      
+      console.log(rulesArray[0]);
+      return rulesArray[0]
+      
+    }else{
+      ruleObject['OR'] = [
+        {
+          OR: usersRulesArray,
+        },
+        {
+          [logicalOperator]: rulesArray,
+        },
+      ];
     }
-    if (rulesArray.length) {
-      ruleObject[logicalOperator] = rulesArray;
+  } else {
+    if(rulesArray.length == 1){
+      console.log(rulesArray[0]);
+      return rulesArray[0]
+      
+    }else{
+      if (usersRulesArray.length) {      
+        ruleObject['OR'] = usersRulesArray;
+      }
+      if (rulesArray.length) {
+        ruleObject[logicalOperator] = rulesArray;         
+      }
     }
   } 
+  
   return ruleObject;
 };
 
