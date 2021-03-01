@@ -9,13 +9,9 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import {
-  EuiBasicTable,
   EuiCallOut,
-  EuiOverlayMask,
-  EuiConfirmModal,
-  EuiSpacer
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
@@ -30,23 +26,19 @@ import {
   updateShowModal,
   updateListItemsForRemove,
   updateSortDirectionAgents,
-  updateSortFieldAgents
+  updateSortFieldAgents,
+  updateReload
 } from '../../../../../redux/actions/groupsActions';
 
-import GroupsAgentsColums from './utils/columns-agents';
-import { WzSearchBar, filtersToObject } from '../../../../../components/wz-search-bar';
 import { getAgentFilterValues } from './get-agents-filters-values';
+import { TableWithSearchBarWzAPI } from '../../../../../components/common/tables';
+import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
+import { WzButtonPermissionsModalConfirm } from '../../../../../components/common/buttons';
 
 class WzGroupAgentsTable extends Component {
   _isMounted = false;
   constructor(props) {
     super(props);
-    this.state = {
-      items: [],
-      pageSize: 10,
-      totalItems: 0,
-      filters: [],
-    };
     this.suggestions = [
       { type: 'q', label: 'status', description: 'Filter by agent connection status', operators: ['=', '!=',], values: ['active', 'disconnected', 'never_connected'] },
       { type: 'q', label: 'os.platform', description: 'Filter by OS platform', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('os.platform', value, {q: `group=${this.props.state.itemDetail.name}`})},
@@ -62,147 +54,105 @@ class WzGroupAgentsTable extends Component {
       //{ type: 'q', label: 'lastKeepAlive', description: 'Filter by last keep alive', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('lastKeepAlive', value,  {q: `group=${this.props.state.itemDetail.name}`})},
     ]
     this.groupsHandler = GroupsHandler;
-  }
 
-  async componentDidMount() {
-    await this.getItems();
-    this._isMounted = true;
-  }
-
-  async componentDidUpdate(prevProps, prevState) {
-    if (this.props.state.isProcessing && this._isMounted) {
-      await this.getItems();
-    }
-    const { filters } = this.state;
-    if (JSON.stringify(filters) !== JSON.stringify(prevState.filters)) {
-      await this.getItems();
-    }
+    this.columns = [
+      {
+        field: 'id',
+        name: 'Id',
+        align: 'left',
+        sortable: true
+      },
+      {
+        field: 'name',
+        name: 'Name',
+        align: 'left',
+        sortable: true
+      },
+      {
+        field: 'ip',
+        name: 'Ip',
+        align: 'left',
+        sortable: true
+      },
+      {
+        field: 'status',
+        name: 'Status',
+        align: 'left',
+        sortable: true
+      },
+      {
+        field: 'os.name',
+        name: 'Os name',
+        align: 'left',
+        sortable: true
+      },
+      {
+        field: 'os.version',
+        name: 'Os version',
+        align: 'left',
+        sortable: true
+      },
+      {
+        field: 'version',
+        name: 'Version',
+        align: 'left',
+        sortable: true
+      },
+      {
+        name: 'Actions',
+        align: 'left',
+        render: item => {
+          return (
+            <div>
+              <WzButtonPermissions
+                buttonType='icon'
+                permissions={[{action: 'agent:read', resource: `agent:id:${item.id}`}]}
+                tooltip={{position: 'top', content: 'Go to the agent'}}
+                aria-label="Go to the agent"
+                iconType="eye"
+                onClick={async () => {
+                  this.props.groupsProps.showAgent(item);
+                }}
+                color="primary"
+              />
+              <WzButtonPermissionsModalConfirm
+                buttonType='icon'
+                permissions={[{action: 'agent:modify_group', resource: `agent:id:${item.id}`}]}
+                tooltip={{position: 'top', content: 'Remove agent from this group'}}
+                aria-label="Remove agent from this group"
+                iconType="trash"
+                onConfirm={async () => {
+                  this.removeItems([item]);
+                }}
+                color="danger"
+                isDisabled={item.name === 'default'}
+                modalTitle={`Remove ${item.file || item.name} agent from this group?`}
+                modalProps={{
+                  buttonColor: 'danger'
+                }}
+              />
+            </div>
+          );
+        }
+      }
+    ];
   }
 
   componentWillUnmount() {
     this._isMounted = false;
   }
 
-  /**
-   * Loads the initial information
-   */
-  async getItems() {
-    try {
-      const rawItems = await this.groupsHandler.agentsGroup(
-        this.props.state.itemDetail.name,
-        { params: this.buildFilter() }
-      );
-      const { affected_items, total_affected_items } = ((rawItems || {}).data || {}).data;
-
-      this.setState({
-        items: affected_items,
-        totalItems : total_affected_items,
-        isProcessing: false,
-      });
-      this.props.state.isProcessing && this.props.updateIsProcessing(false);
-    } catch (error) {
-      this.props.state.isProcessing && this.props.updateIsProcessing(false);
-      return Promise.reject(error);
-    }
-  }
-
-  buildFilter() {
-    const { pageIndexAgents } = this.props.state;
-    const { pageSize, filters } = this.state;
-    const filter = {
-      ...filtersToObject(filters),
-      offset: pageIndexAgents * pageSize,
-      limit: pageSize,
-      sort: this.buildSortFilter()
-    };
-
-    return filter;
-  }
-
-  buildSortFilter() {
-    const { sortFieldAgents, sortDirectionAgents } = this.props.state;
-
-    const field = sortFieldAgents;
-    const direction = sortDirectionAgents === 'asc' ? '+' : '-';
-
-    return direction + field;
-  }
-
-  onTableChange = ({ page = {}, sort = {} }) => {
-    const { index: pageIndexAgents, size: pageSize } = page;
-    const { field: sortFieldAgents, direction: sortDirectionAgents } = sort;
-    this.setState({ pageSize });
-    this.props.updatePageIndexAgents(pageIndexAgents);
-    this.props.updateSortDirectionAgents(sortDirectionAgents);
-    this.props.updateSortFieldAgents(sortFieldAgents);
-    this.props.updateIsProcessing(true);
-  };
-
   render() {
-    this.groupsAgentsColumns = new GroupsAgentsColums(this.props);
-    const {
-      isLoading,
-      pageIndexAgents,
-      error,
-      sortFieldAgents,
-      sortDirectionAgents
-    } = this.props.state;
-    const { items, pageSize, totalItems, filters } = this.state;
-    const columns = this.groupsAgentsColumns.columns;
-    const message = isLoading ? null : 'No results...';
-    const pagination = {
-      pageIndex: pageIndexAgents,
-      pageSize: pageSize,
-      totalItemCount: totalItems,
-      pageSizeOptions: [10, 25, 50, 100]
-    };
-    const sorting = {
-      sort: {
-        field: sortFieldAgents,
-        direction: sortDirectionAgents
-      }
-    };
+    const { error } = this.props.state;
     if (!error) {
-      const itemList = this.props.state.itemList;
       return (
-        <Fragment>
-          <WzSearchBar
-            filters={filters}
-            suggestions={this.suggestions}
-            onFiltersChange={filters => this.setState({filters})}
-            placeholder='Filter or search agent'
+          <TableWithSearchBarWzAPI 
+            tableColumns={this.columns}
+            tableInitialSortingField='id'
+            searchBarSuggestions={this.suggestions}
+            endpoint={`/groups/${this.props.state.itemDetail.name}/agents`}
+            reload={this.props.state.reload}
           />
-          <EuiSpacer size='s'/>
-          <EuiBasicTable
-            itemId="id"
-            items={items}
-            columns={columns}
-            pagination={pagination}
-            onChange={this.onTableChange}
-            loading={isLoading}
-            sorting={sorting}
-            message={message}
-            search={{ box: { incremental: true } }}
-          />
-          {this.props.state.showModal ? (
-            <EuiOverlayMask>
-              <EuiConfirmModal
-                title={`Remove ${
-                  itemList[0].file ? itemList[0].file : itemList[0].name
-                } agent from this group?`}
-                onCancel={() => this.props.updateShowModal(false)}
-                onConfirm={() => {
-                  this.removeItems(itemList);
-                  this.props.updateShowModal(false);
-                }}
-                cancelButtonText="Cancel"
-                confirmButtonText="Remove"
-                defaultFocusedButton="cancel"
-                buttonColor="danger"
-              ></EuiConfirmModal>
-            </EuiOverlayMask>
-          ) : null}
-        </Fragment>
       );
     } else {
       return <EuiCallOut color="warning" title={error} iconType="gear" />;
@@ -230,11 +180,13 @@ class WzGroupAgentsTable extends Component {
       completed => {
         this.props.updateIsProcessing(true);
         this.props.updateLoadingStatus(false);
+        this.props.updateReload();
         this.showToast('success', 'Success', 'Deleted successfully', 3000);
       },
       error => {
         this.props.updateIsProcessing(true);
         this.props.updateLoadingStatus(false);
+        this.props.updateReload();
         this.showToast('danger', 'Error', error, 3000);
       }
     );
@@ -261,7 +213,8 @@ const mapDispatchToProps = dispatch => {
     updateSortDirectionAgents: sortDirectionAgents =>
       dispatch(updateSortDirectionAgents(sortDirectionAgents)),
     updateSortFieldAgents: sortFieldAgents =>
-      dispatch(updateSortFieldAgents(sortFieldAgents))
+      dispatch(updateSortFieldAgents(sortFieldAgents)),
+    updateReload: () => dispatch(updateReload())
   };
 };
 

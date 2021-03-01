@@ -21,6 +21,7 @@ import {
 
 import PropTypes from 'prop-types';
 import { UnsupportedComponents } from '../../../utils/components-os-support';
+import { WAZUH_AGENTS_OS_TYPE } from '../../../../common/constants';
 
 export class ExportConfiguration extends Component {
   constructor(props) {
@@ -57,7 +58,7 @@ export class ExportConfiguration extends Component {
         (x.name &&
           !(
             UnsupportedComponents[this.props.agentPlatform] ||
-            UnsupportedComponents['other']
+            UnsupportedComponents[WAZUH_AGENTS_OS_TYPE.OTHERS]
           ).includes(x.name))
       ) {
         this.options.push({ id: `${idx}`, label: x.desc || x });

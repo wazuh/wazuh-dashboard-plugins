@@ -171,7 +171,7 @@ export class ReportingService {
     } catch (error) {
       this.$rootScope.reportBusy = false;
       this.$rootScope.reportStatus = false;
-      this.showToast('danger', 'Error', error.message || error, 4000);
+      this.showToast('danger', 'Error configuring report', error.message || error, 4000);
       this.$rootScope.$applyAsync();
     }
   }

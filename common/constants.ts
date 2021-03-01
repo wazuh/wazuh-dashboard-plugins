@@ -70,6 +70,9 @@ export const WAZUH_TIME_FILTER_DEFAULT = {
   to: 'now'
 };
 
+//Default max buckets set by the app
+export const WAZUH_MAX_BUCKETS_DEFAULT = 200000;
+
 // App configuration
 export const WAZUH_CONFIGURATION_CACHE_TIME = 10000 // time in ms;
 export const WAZUH_CONFIGURATION_SETTINGS_NEED_RESTART = [
@@ -130,6 +133,7 @@ export const WAZUH_DEFAULT_APP_CONFIG = {
   'checks.setup': true,
   'checks.fields': true,
   'checks.metaFields': true,
+  'checks.maxBuckets': true,
   'checks.timeFilter': true,
   'extensions.pci': true,
   'extensions.gdpr': true,
@@ -171,3 +175,34 @@ export const WAZUH_DEFAULT_APP_CONFIG = {
 
 // Wazuh errors
 export const WAZUH_ERROR_DAEMONS_NOT_READY = 'ERROR3099 - Some Wazuh daemons are not ready yet in node';
+
+// Agents
+export enum WAZUH_AGENTS_OS_TYPE{
+  WINDOWS = 'windows',
+  LINUX = 'linux',
+  SUNOS = 'sunos',
+  DARWIN = 'darwin',
+  OTHERS = ''
+}
+
+export enum WAZUH_MODULES_ID{
+  SECURITY_EVENTS = 'general',
+  INTEGRITY_MONITORING = 'fim',
+  AMAZON_WEB_SERVICES = 'aws',
+  GOOGLE_CLOUD_PLATFORM = 'gcp',
+  POLICY_MONITORING = 'pm',
+  SECURITY_CONFIGURATION_ASSESSMENT = 'sca',
+  AUDITING = 'audit',
+  OPEN_SCAP = 'oscap',
+  VULNERABILITIES = 'vuls',
+  OSQUERY = 'osquery',
+  DOCKER = 'docker',
+  MITRE_ATTACK = 'mitre',
+  PCI_DSS = 'pci',
+  HIPAA = 'hipaa',
+  NIST_800_53 = 'nist',
+  TSC = 'tsc',
+  CIS_CAT = 'ciscat',
+  VIRUSTOTAL = 'virustotal',
+  GDPR = 'gdpr'
+}

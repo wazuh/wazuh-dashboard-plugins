@@ -15,6 +15,8 @@ import { AppState } from '../../react-services/app-state';
 import { ErrorHandler } from '../../react-services/error-handler';
 import { getDataPlugin, getSavedObjects } from '../../kibana-services';
 import { WazuhConfig } from '../../react-services/wazuh-config';
+import { GenericRequest } from '../../react-services/generic-request';
+import { getWzConfig } from './get-config';
 
 export function getIp(
   $q,
@@ -26,7 +28,7 @@ export function getIp(
 
   const checkWazuhPatterns = async (indexPatterns) => {
     const wazuhConfig = new WazuhConfig();
-    const configuration = wazuhConfig.getConfig();
+    const configuration = await getWzConfig($q, GenericRequest, wazuhConfig);
     const wazuhPatterns = [
       `${configuration['wazuh.monitoring.pattern']}`,
       `${configuration['cron.prefix']}-${configuration['cron.statistics.index.name']}-*`

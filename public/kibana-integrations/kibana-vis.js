@@ -32,6 +32,7 @@ import {
   EuiFlexGroup,
 } from "@elastic/eui";
 import { getAngularModule, getToasts, getVisualizationsPlugin, getSavedObjects, getDataPlugin, getChrome, getOverlays } from '../kibana-services';
+import { KnownFields } from "../utils/known-fields";
 
 class KibanaVis extends Component {
   _isMounted = false;
@@ -125,7 +126,7 @@ class KibanaVis extends Component {
           data.value.visData &&
           data.value.visData.rows &&
           this.props.state[this.visID] !==
-            data.value.visData.rows["0"]["col-0-1"]
+          data.value.visData.rows["0"]["col-0-1"]
         ) {
           store.dispatch(
             this.updateMetric({
@@ -146,7 +147,7 @@ class KibanaVis extends Component {
           data.value.visData.tables["0"].rows &&
           data.value.visData.tables["0"].rows["0"] &&
           this.props.state[this.visID] !==
-            data.value.visData.tables["0"].rows["0"]["col-0-2"]
+          data.value.visData.tables["0"].rows["0"]["col-0-2"]
         ) {
           store.dispatch(
             this.updateMetric({
@@ -218,13 +219,14 @@ class KibanaVis extends Component {
         query
       };
 
-      if (raw && discoverList.length) {
+      const rawVis = raw ? raw.filter((item) => item && item.id === this.visID) : []; 
+
+      if (rawVis.length && discoverList.length) {
         // There are pending updates from the discover (which is the one who owns the true app state)
 
         if (!this.visualization && !this.rendered && !this.renderInProgress) {
           // There's no visualization object -> create it with proper filters
           this.renderInProgress = true;
-          const rawVis = raw.filter((item) => item && item.id === this.visID);
           this.visualization = await this.savedObjectLoaderVisualize.get(
             this.visID,
             rawVis[0]
@@ -234,7 +236,7 @@ class KibanaVis extends Component {
           this.visualization.searchSource.setField("source", false);
           // Visualization doesn't need "hits"
           this.visualization.searchSource.setField('size', 0);
-          const visState = await getVisualizationsPlugin().convertToSerializedVis(this.visualization);        
+          const visState = await getVisualizationsPlugin().convertToSerializedVis(this.visualization);
           const vis = await getVisualizationsPlugin().createVis(this.visualization.visState.type, visState);
           this.visHandler = await getVisualizationsPlugin().__LEGACY.createVisEmbeddableFromObject(
             vis,
@@ -277,7 +279,11 @@ class KibanaVis extends Component {
           this.visualization = null;
           this.renderInProgress = false;
           this.rendered = false;
-          await this.props.refreshKnownFields();
+
+          // if there's a field name it looks for known fields structures          
+          const foundField = (match[1] && KnownFields.find(field => field.name === match[1].trim()));
+          
+          await this.props.refreshKnownFields(foundField);
         }
         this.renderInProgress = false;
         return this.myRender(raw);
@@ -292,11 +298,11 @@ class KibanaVis extends Component {
   destroyAll = () => {
     try {
       this.visualization.destroy();
-    } catch (error) {} // eslint-disable-line
+    } catch (error) { } // eslint-disable-line
     try {
       this.visHandler.destroy();
       this.visHandler = null;
-    } catch (error) {} // eslint-disable-line
+    } catch (error) { } // eslint-disable-line
   };
 
   renderComplete = async () => {
@@ -352,7 +358,7 @@ class KibanaVis extends Component {
               paddingTop: 100,
             }}
           >
-            <EuiFlexGroup style={{placeItems: 'center'}}>
+            <EuiFlexGroup style={{ placeItems: 'center' }}>
               <EuiFlexItem>
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
@@ -380,8 +386,8 @@ class KibanaVis extends Component {
             style={{
               display:
                 this.deadField &&
-                this.props.resultState !== "loading" &&
-                !this.state.visRefreshingIndex
+                  this.props.resultState !== "loading" &&
+                  !this.state.visRefreshingIndex
                   ? "block"
                   : "none",
               textAlign: "center",

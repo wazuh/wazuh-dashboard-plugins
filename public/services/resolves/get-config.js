@@ -29,6 +29,7 @@ export async function getWzConfig($q, genericReq, wazuhConfig) {
     'checks.fields': true,
     'checks.metaFields': true,
     'checks.timeFilter': true,
+    'checks.maxBuckets': true,
     'extensions.pci': true,
     'extensions.gdpr': true,
     'extensions.hipaa': true,
@@ -93,5 +94,5 @@ export async function getWzConfig($q, genericReq, wazuhConfig) {
     console.log(error.message || error); // eslint-disable-line
   }
 
-  return $q.resolve();
+  return $q.resolve(defaultConfig);
 }

@@ -228,7 +228,6 @@ export class RegisterAgent extends Component {
     }
     else
       return '';
-    
   }
 
   selectSYS(sys){
@@ -306,7 +305,7 @@ export class RegisterAgent extends Component {
       case 'centos6-x86_64':
         return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`
       case 'centos6-armhf':
-        return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.armv7h.rpm`
+        return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.armv7hl.rpm`
       default:
         return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`
     }
@@ -406,7 +405,7 @@ export class RegisterAgent extends Component {
       rpmText: `sudo ${this.optionalDeploymentVariables()}yum install ${this.optionalPackages()}`,
       debText: `curl -so wazuh-agent.deb ${this.optionalPackages()} && sudo ${this.optionalDeploymentVariables()}dpkg -i ./wazuh-agent.deb`,
       macosText: `curl -so wazuh-agent.pkg https://packages.wazuh.com/4.x/macos/wazuh-agent-${this.state.wazuhVersion
-        }-1.pkg && sudo launchctl setenv ${this.optionalDeploymentVariables()}sudo installer -pkg ./wazuh-agent.pkg -target /`,
+        }-1.pkg && sudo launchctl setenv ${this.optionalDeploymentVariables()}&& sudo installer -pkg ./wazuh-agent.pkg -target /`,
       winText: `Invoke-WebRequest -Uri https://packages.wazuh.com/4.x/windows/wazuh-agent-${this.state.wazuhVersion
         }-1.msi -OutFile wazuh-agent.msi; ./wazuh-agent.msi /q ${this.optionalDeploymentVariables()}`
     };
@@ -560,7 +559,7 @@ export class RegisterAgent extends Component {
               color="warning"
               title={`Please select the ${missingOSSelection.join(', ')}.`}
               iconType="iInCircle"
-            />  
+            />
           : <div>{guide}</div>
       },
       ...((this.state.selectedOS == 'rpm') || (this.state.selectedOS == 'deb') ? [{
@@ -570,8 +569,8 @@ export class RegisterAgent extends Component {
             color="warning"
             title={`Please select the ${missingOSSelection.join(', ')}.`}
             iconType="iInCircle"
-          />  
-        : 
+          />
+        :
         <EuiTabbedContent
           tabs={tabs}
           selectedTab={this.selectedSYS}
