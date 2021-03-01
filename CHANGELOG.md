@@ -9,6 +9,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fix SCA policy detail showing name and check results about another policy [#3007](https://github.com/wazuh/wazuh-kibana-app/pull/3007)
 - Fix pagination in SCA checks table when expand some row [#3018](https://github.com/wazuh/wazuh-kibana-app/pull/3018)
 - Fix manager is shown in suggestions in Agents section [#3025](https://github.com/wazuh/wazuh-kibana-app/pull/3025)
+- Fix disabled loading on inventory when request fail [#3016](https://github.com/wazuh/wazuh-kibana-app/issues/3016)
 
 ## Wazuh v4.1.1 - Kibana 7.10.0 , 7.10.2 - Revision 4102
 
@@ -44,7 +45,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed missing `&&` from macOS agent deployment command [#2989](https://github.com/wazuh/wazuh-kibana-app/issues/2989)
 - Fix prompt permissions on Framework of Mitre and Inventory of Integrity monitoring. [#2967](https://github.com/wazuh/wazuh-kibana-app/issues/2967)
 - Fix properly logout of Wazuh API when logging out of the application support x-pack [#2789](https://github.com/wazuh/wazuh-kibana-app/issues/2789)
-- Fix disabled loading on inventory when request fail [#3016](https://github.com/wazuh/wazuh-kibana-app/issues/3016)
 
 ## Wazuh v4.1.0 - Kibana 7.10.0 , 7.10.2 - Revision 4101
 
