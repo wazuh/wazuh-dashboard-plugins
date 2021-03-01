@@ -417,7 +417,7 @@ export const Policies = () => {
                 onClick={() => createPolicy()}
                 fill>
                 Create policy
-                                    </EuiButton>
+              </EuiButton>
             </EuiForm>
           </EuiFlyoutBody>
         </EuiFlyout>
@@ -434,6 +434,9 @@ export const Policies = () => {
           </EuiTitle>
         </EuiPageContentHeaderSection>
         <EuiPageContentHeaderSection>
+         { 
+          !loading
+          ?
           <div>
             <EuiButton
               onClick={() => setIsFlyoutVisible(true)}>
@@ -442,6 +445,9 @@ export const Policies = () => {
             {flyout}
             {editFlyout}
           </div>
+          :
+          null
+        }
         </EuiPageContentHeaderSection>
       </EuiPageContentHeader>
       <EuiPageContentBody>
