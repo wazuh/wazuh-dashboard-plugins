@@ -39,6 +39,8 @@ import { GroupTruncate } from '../../../components/common/util';
 import { WzSearchBar, filtersToObject } from '../../../components/wz-search-bar';
 import { getAgentFilterValues } from '../../../controllers/management/components/management/groups/get-agents-filters-values';
 import { WzButtonPermissions } from '../../../components/common/permissions/button';
+// import { TimeService } from '../../react-services/time-service';
+import { formatUIDate, getTimeZone } from '../../../react-services/time-service';
 
 export class AgentsTable extends Component {
   _isMount = false;
@@ -228,6 +230,9 @@ export class AgentsTable extends Component {
   }
 
   formatAgent(agent) {
+
+
+
     const checkField = field => {
       return field !== undefined ? field : '-';
     };
@@ -237,6 +242,17 @@ export class AgentsTable extends Component {
     const agentVersion =
       agent.version !== undefined ? agent.version.split(' ')[1] : '-';
     const { timeService } = this.props;
+    
+    console.log("agent.dateAdd");
+    console.log("agent.dateAdd");
+    console.log("agent.dateAdd");
+    console.log("agent.dateAdd");
+    console.log("agent.dateAdd");
+    console.log("agent.dateAdd");
+    console.log("agent.dateAdd");
+    console.log(formatUIDate(agent.dateAdd));
+    // console.log(getTimeZone());
+
     return {
       id: agent.id,
       name: agent.name,
@@ -246,6 +262,7 @@ export class AgentsTable extends Component {
       os_name: agent,
       version: agentVersion,
       dateAdd: timeService(agent.dateAdd),
+      // dateAdd: new Intl.DateTimeFormat('en-US').format(new Date(agent.dateAdd)),
       lastKeepAlive: lastKeepAlive(agent.lastKeepAlive, timeService),
       actions: agent,
       upgrading: false

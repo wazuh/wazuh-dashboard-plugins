@@ -31,3 +31,16 @@ export class TimeService {
     }
   }
 }
+
+export const formatUIDate = (date) => {
+  const dateFormat = getUiSettings().get('dateFormat');
+  const timezone = getTimeZone();
+  const momentDate = moment(date);
+  momentDate.tz(timezone);
+  return momentDate.format(dateFormat);
+}
+const getTimeZone = () => {
+  const dateFormatTZ = getUiSettings().get('dateFormat:tz');
+  const detectedTimezone = moment.tz.guess();
+  return dateFormatTZ === 'Browser' ? detectedTimezone : dateFormatTZ;
+}

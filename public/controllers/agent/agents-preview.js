@@ -20,7 +20,7 @@ import { WzRequest } from '../../react-services/wz-request';
 import { ShareAgent } from '../../factories/share-agent';
 import { TimeService } from '../../react-services/time-service';
 import { ErrorHandler } from '../../react-services/error-handler';
-import { getDataPlugin } from '../../kibana-services';
+import { getDataPlugin, getUiSettings } from '../../kibana-services';
 
 export class AgentsPreviewController {
   /**
@@ -57,6 +57,9 @@ export class AgentsPreviewController {
    * On controller loads
    */
   async $onInit() {
+    console.log(getUiSettings().defaults.dateFormat);
+    console.log(getUiSettings().defaults["dateFormat:tz"]);
+    
     this.init = true;
     this.api = JSON.parse(AppState.getCurrentAPI()).id;
     const loc = this.$location.search();

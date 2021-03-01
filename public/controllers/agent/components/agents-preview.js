@@ -38,6 +38,7 @@ import { TabVisualizations } from '../../../factories/tab-visualizations';
 import { WazuhConfig } from './../../../react-services/wazuh-config.js';
 import { WzDatePicker } from '../../../components/wz-date-picker/wz-date-picker';
 import { withReduxProvider, withGlobalBreadcrumb, withUserAuthorizationPrompt } from '../../../components/common/hocs';
+import { getUiSettings } from '../../../../public/kibana-services';
 import { compose } from 'redux';
 
 export const AgentsPreview = compose(
