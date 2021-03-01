@@ -27,13 +27,14 @@ import exportCsv from '../../../react-services/wz-csv';
 import { getToasts }  from '../../../kibana-services';
 import { WzSearchBar } from '../../../components/wz-search-bar';
 import { RuleText, ComplianceText } from './components';
+import _ from 'lodash';
 
 export class Inventory extends Component {
   _isMount = false;
   constructor(props) {
     super(props);
     const { agent } = this.props;
-    this.state = { agent, items: [], itemIdToExpandedRowMap: {}, showMoreInfo: false, loading: false, filters: [] }
+    this.state = { agent, items: [], itemIdToExpandedRowMap: {}, showMoreInfo: false, loading: false, filters: [], pageTableChecks: {pageIndex: 0} }
     this.policies = [];
     this.suggestions = {};
     this.columnsPolicies = [
@@ -169,8 +170,11 @@ export class Inventory extends Component {
   }
 
   async componentDidUpdate(prevProps, prevState) {
-    if (JSON.stringify(this.props.agent) !== JSON.stringify(prevProps.agent)) {
+    if (!_.isEqual(this.props.agent, prevProps.agent)) {
       this.setState({ lookingPolicy: false }, async () => await this.initialize());
+    };
+    if(!_.isEqual(this.state.filters, prevState.filters)){
+      this.setState({itemIdToExpandedRowMap: {}, pageTableChecks: {pageIndex: 0, pageSize: this.state.pageTableChecks.pageSize}});
     }
   }
 
@@ -259,15 +263,19 @@ export class Inventory extends Component {
   }
 
   async loadScaPolicy(policy) {
-    this._isMount && this.setState({ loadingPolicy: true, itemIdToExpandedRowMap: {}, pageIndex: 0 });
+    this._isMount && this.setState({ loadingPolicy: true, itemIdToExpandedRowMap: {}, pageTableChecks: {pageIndex: 0} });
     if (policy) {
       try {
         const policyResponse = await WzRequest.apiReq(
           'GET',
           `/sca/${this.props.agent.id}`,
-          { "q": "policy_id=" + policy.policy_id }
-          );
-          const [policyData] = policyResponse.data.data.affected_items;
+          { 
+            params: {
+              "q": "policy_id=" + policy.policy_id
+            } 
+          }
+        );
+        const [policyData] = policyResponse.data.data.affected_items;
         // It queries all checks without filters, because the filters are applied in the results
         // due to the use of EuiInMemoryTable instead EuiTable components and do arequest with each change of filters.
         const checksResponse = await WzRequest.apiReq(
@@ -307,25 +315,16 @@ export class Inventory extends Component {
   toggleDetails = item => {
     const itemIdToExpandedRowMap = { ...this.state.itemIdToExpandedRowMap };
 
-    item.complianceText = '';
-    if (item.compliance && item.compliance.length) {
-      item.compliance.forEach(x => {
-        item.complianceText += `${x.key}: ${x.value}\n`;
-      });
-    }
-    if (item.rules.length) {
-      item.rulesText = '';
-      item.rules.forEach(x => {
-        item.rulesText += `${x.rule}\n`;
-      });
-    }
-
     if (itemIdToExpandedRowMap[item.id]) {
       delete itemIdToExpandedRowMap[item.id];
     } else {
       let checks = '';
       checks += (item.rules || []).length > 1 ? 'Checks' : 'Check';
       checks += item.condition ? ` (Condition: ${item.condition})` : '';
+      const complianceText = item.compliance && item.compliance.length 
+        ? item.compliance.map(el => `${el.key}: ${el.value}`).join('\n')
+        : '';
+      const rulesText = item.rules.length ? item.rules.map(el => el.rule).join('\n') : '';
       const listItems = [
         {
           title: 'Check not applicable due to:',
@@ -349,11 +348,11 @@ export class Inventory extends Component {
         },
         {
           title: checks,
-          description: <RuleText rulesText={item.rulesText} />,
+          description: <RuleText rulesText={rulesText} />,
         },
         {
           title: 'Compliance',
-          description: <ComplianceText complianceText={item.complianceText} />
+          description: <ComplianceText complianceText={complianceText} />
         }
       ];
       const itemsToShow = listItems.filter(x => {
@@ -388,6 +387,10 @@ export class Inventory extends Component {
 
   buttonStat(text, field, value) {
     return <button onClick={() => this.setState({ filters: [{ field, value }] })}>{text}</button>
+  }
+
+  onChangeTableChecks({ page: {index: pageIndex, size: pageSize} }){
+    this.setState({ pageTableChecks: {pageIndex, pageSize} });
   }
 
   render() {
@@ -561,8 +564,9 @@ export class Inventory extends Component {
                       itemIdToExpandedRowMap={this.state.itemIdToExpandedRowMap}
                       isExpandable={true}
                       sorting={sorting}
-                      pagination={true}
+                      pagination={this.state.pageTableChecks}
                       loading={this.state.loadingPolicy}
+                      onTableChange={(change) => this.onChangeTableChecks(change)}
                     />
                   </EuiFlexItem>
                 </EuiFlexGroup>
