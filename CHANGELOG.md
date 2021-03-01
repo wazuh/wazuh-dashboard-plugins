@@ -2,6 +2,14 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.1.1 - Kibana 7.10.0 , 7.10.2 - Revision 4103
+
+### Fixed
+
+- Fix SCA policy detail showing name and check results about another policy [#3007](https://github.com/wazuh/wazuh-kibana-app/pull/3007)
+- Fix pagination in SCA checks table when expand some row [#3018](https://github.com/wazuh/wazuh-kibana-app/pull/3018)
+- Fix manager is shown in suggestions in Agents section [#3025](https://github.com/wazuh/wazuh-kibana-app/pull/3025)
+
 ## Wazuh v4.1.1 - Kibana 7.10.0 , 7.10.2 - Revision 4102
 
 ### Added
