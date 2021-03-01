@@ -155,16 +155,21 @@ export class Inventory extends Component {
     await this.initialize();
     const regex = new RegExp('redirectPolicy=' + '[^&]*');
     const match = window.location.href.match(regex);
-    if (match && match[0]) {
-      this.setState({ loading: true });
-      const id = match[0].split('=')[1];
-      const policy = await WzRequest.apiReq(
-        'GET',
-        `/sca/${this.props.agent.id}`,
-        { "q": "policy_id=" + id }
-      );
-      await this.loadScaPolicy(((((policy || {}).data || {}).data || {}).items || [])[0]);
-      window.location.href = window.location.href.replace(new RegExp('redirectPolicy=' + '[^&]*'), '');
+    try {
+      if (match && match[0]) {
+        this.setState({ loading: true });
+        const id = match[0].split('=')[1];
+        const policy = await WzRequest.apiReq(
+          'GET',
+          `/sca/${this.props.agent.id}`,
+          { "q": "policy_id=" + id }
+        );
+        await this.loadScaPolicy(((((policy || {}).data || {}).data || {}).items || [])[0]);
+        window.location.href = window.location.href.replace(new RegExp('redirectPolicy=' + '[^&]*'), '');
+        this.setState({ loading: false });
+      }
+    } catch (error) {
+      this.showToast('danger', error, 3000);
       this.setState({ loading: false });
     }
   }
@@ -258,6 +263,8 @@ export class Inventory extends Component {
       }
       this._isMount && this.setState({ data: models, loading: false });
     } catch (error) {
+      this.showToast('danger', error, 3000);
+      this.setState({ loading: false });
       this.policies = [];
     }
   }
@@ -303,7 +310,7 @@ export class Inventory extends Component {
   }
 
   filterPolicyChecks = () => !!this.state.items && this.state.items.filter(check =>
-      this.state.filters.every(filter => 
+      this.state.filters.every(filter =>
         filter.field === 'search'
         ? Object.keys(check).some(key =>  ['string', 'number'].includes(typeof check[key]) && String(check[key]).toLowerCase().includes(filter.value.toLowerCase()))
         : typeof check[filter.field] === 'string' && (filter.value === '' ? check[filter.field] === filter.value
@@ -311,7 +318,7 @@ export class Inventory extends Component {
         )
       )
     )
-  
+
   toggleDetails = item => {
     const itemIdToExpandedRowMap = { ...this.state.itemIdToExpandedRowMap };
 
