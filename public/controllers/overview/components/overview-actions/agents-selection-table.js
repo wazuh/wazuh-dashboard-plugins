@@ -242,7 +242,7 @@ export class AgentSelectionTable extends Component {
     const sortFilter = {};
     if (sortField) {
       const direction = sortDirection === 'asc' ? '+' : '-';
-      sortFilter['sort'] = direction + sortField;
+      sortFilter['sort'] = direction + (sortField === 'os'? 'os.name,os.version' : sortField);
     }
 
     return sortFilter;
@@ -527,8 +527,8 @@ export class AgentSelectionTable extends Component {
 
   unselectAgents(){
     this._isMounted && this.setState({itemIdToSelectedMap: {}});
-    this.props.removeAgentsFilter(true);      
     store.dispatch(updateCurrentAgentData({}));
+    this.props.removeAgentsFilter();      
   }
 
   getSelectedCount(){

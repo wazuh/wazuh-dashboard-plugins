@@ -50,7 +50,7 @@ export default [
     _source: {
       title: 'Severities count',
       visState:
-        '{"title":"Wazuh-App-Agents-GCP-Tag-Severities","type":"tagcloud","params":{"scale":"linear","orientation":"single","minFontSize":18,"maxFontSize":72,"showLabel":true,"metric":{"type":"vis_dimension","accessor":1,"format":{"id":"string","params":{}}},"bucket":{"type":"vis_dimension","accessor":0,"format":{"id":"terms","params":{"id":"string","otherBucketLabel":"Other","missingBucketLabel":"Missing"}}}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{"customLabel":""}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"data.gcp.severity","orderBy":"1","order":"desc","size":5,"otherBucket":true,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","customLabel":"Severities"}}]}',
+        '{"title":"Wazuh-App-Agents-GCP-Tag-Severities","type":"tagcloud","params":{"scale":"linear","orientation":"single","minFontSize":18,"maxFontSize":72,"showLabel":true,"metric":{"type":"vis_dimension","accessor":1,"format":{"id":"string","params":{}}}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{"customLabel":""}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"data.gcp.severity","orderBy":"1","order":"desc","size":5,"otherBucket":true,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","customLabel":"Severities"}}]}',
       uiStateJSON: '',
       description: '',
       version: 1,

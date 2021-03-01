@@ -363,7 +363,7 @@ input[type="search"].euiFieldSearch{
   box-shadow: none;
 }
 
-:focus:not(.wz-button):not(.input-filter-box):not(.kuiLocalSearchInput):not(.euiTextArea) {
+:focus:not(.wz-button):not(.input-filter-box):not(.kuiLocalSearchInput):not(.euiTextArea):not(.euiPanel.euiPopover__panel.euiPopover__panel-isOpen) {
   box-shadow: none !important;
 }
 
@@ -1425,10 +1425,6 @@ div.euiPopover__panel.euiPopover__panel-isOpen.euiPopover__panel--bottom.wz-menu
 
 .euiTableHeaderCellCheckbox{
   width: 32px!important;
-}
-
-.kbnTopNavMenu{
-  display: none;
 }
 
 .kbnDis-no-padding .globalQueryBar:not(:empty) {

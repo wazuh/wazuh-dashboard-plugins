@@ -15,7 +15,7 @@ export default [
     _source: {
       title: 'Most common alerts',
       visState:
-        '{"title":"Most common alerts","type":"tagcloud","params":{"scale":"linear","orientation":"single","minFontSize":10,"maxFontSize":30,"showLabel":false,"metric":{"type":"vis_dimension","accessor":1,"format":{"id":"string","params":{}}},"bucket":{"type":"vis_dimension","accessor":0,"format":{"id":"terms","params":{"id":"string","otherBucketLabel":"Other","missingBucketLabel":"Missing"}}}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"rule.hipaa","orderBy":"1","order":"desc","size":5,"otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","customLabel":"Requirement"}}]}',
+        '{"title":"Most common alerts","type":"tagcloud","params":{"scale":"linear","orientation":"single","minFontSize":10,"maxFontSize":30,"showLabel":false,"metric":{"type":"vis_dimension","accessor":1,"format":{"id":"string","params":{}}}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"rule.hipaa","orderBy":"1","order":"desc","size":5,"otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","customLabel":"Requirement"}}]}',
       uiStateJSON: '{}',
       description: '',
       version: 1,

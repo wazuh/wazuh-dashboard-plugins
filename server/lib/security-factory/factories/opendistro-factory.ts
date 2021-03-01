@@ -11,7 +11,7 @@ export class OpendistroFactory implements ISecurityFactory {
   async getCurrentUser(request: KibanaRequest, context:RequestHandlerContext) {
     try {
       const params = {
-        path: `_opendistro/_security/api/account`,
+        path: `/_opendistro/_security/api/account`,
         method: 'GET',
       };
 

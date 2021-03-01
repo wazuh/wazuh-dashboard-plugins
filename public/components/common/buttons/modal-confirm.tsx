@@ -18,8 +18,10 @@ import {
 
 import { withButtonOpenOnClick } from '../hocs';
 import { WzButton } from './button';
+import { WzButtonPermissions } from '../permissions/button';
 
 export const WzButtonOpenOnClick = withButtonOpenOnClick(WzButton);
+export const WzButtonPermissionsOpenOnClick = withButtonOpenOnClick(WzButtonPermissions);
 
 interface WzButtonModalConfirmProps{
   onConfirm: (ev) => void
@@ -29,6 +31,31 @@ interface WzButtonModalConfirmProps{
   modalCancelText?: string
   modalProps: any
   [key: string]: any
+};
+
+const renderModal = ({onConfirm, onCancel, modalTitle, modalConfirmText, modalCancelText, modalProps }) => ({close}) => {
+  const onModalConfirm = () => {
+    close();
+    onConfirm && onConfirm();
+  };
+  const onModalCancel = () => {
+    close();
+    onCancel && onCancel();
+  };
+  return (
+    <EuiOverlayMask onClick={close}>
+      <EuiConfirmModal
+        title={modalTitle}
+        onCancel={onModalCancel}
+        onConfirm={onModalConfirm}
+        cancelButtonText={modalCancelText}
+        confirmButtonText={modalConfirmText}
+        defaultFocusedButton={modalProps.defaultFocusedButton || "confirm"}
+        {...modalProps}
+        >
+      </EuiConfirmModal>
+    </EuiOverlayMask>
+  )
 };
 
 export const WzButtonModalConfirm: React.FunctionComponent<WzButtonModalConfirmProps> = ({onConfirm, onCancel, modalTitle, modalConfirmText = 'Confirm', modalCancelText = 'Cancel', modalProps = {}, ...rest }) => {
@@ -59,6 +86,15 @@ export const WzButtonModalConfirm: React.FunctionComponent<WzButtonModalConfirmP
           </EuiOverlayMask>
         )
       }}
+    />
+  )
+};
+
+export const WzButtonPermissionsModalConfirm: React.FunctionComponent<WzButtonModalConfirmProps> = ({onConfirm, onCancel, modalTitle, modalConfirmText = 'Confirm', modalCancelText = 'Cancel', modalProps = {}, ...rest }) => {
+  return (
+    <WzButtonPermissionsOpenOnClick
+      {...rest}
+      render={renderModal({onConfirm, onCancel, modalTitle, modalConfirmText, modalCancelText, modalProps })}
     />
   )
 };
