@@ -253,10 +253,6 @@ export const Discover = compose(
     return result;
   }
 
-  // onFiltersChange = (filters) => {
-  //   this.setState({ filters: this.filtersAsArray(filters) });
-  // }
-
   toggleDetails = item => {
     const itemIdToExpandedRowMap = { ...this.state.itemIdToExpandedRowMap };
     if (itemIdToExpandedRowMap[item._id]) {
@@ -273,7 +269,6 @@ export const Discover = compose(
 
   buildFilter() {
     const dateParse = ds => /\d+-\d+-\d+T\d+:\d+:\d+.\d+Z/.test(ds) ? DateMatch.parse(ds).toDate().getTime() : ds;
-    // const { searchBarFilters } = this.state;
     const { query } = this.state;
     const { hideManagerAlerts } = this.wazuhConfig.getConfig();
     const extraFilters = [];
