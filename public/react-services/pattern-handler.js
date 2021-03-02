@@ -64,6 +64,7 @@ export class PatternHandler {
           });
 
           await SavedObject.createWazuhIndexPattern(pattern);
+          getToasts().addSuccess(`${pattern} index pattern created successfully`)
           getDataPlugin().indexPatterns.setDefault(pattern, true);
         } catch (err) {
           getToasts().add({
