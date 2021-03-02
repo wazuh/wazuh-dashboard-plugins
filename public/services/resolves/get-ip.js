@@ -29,7 +29,7 @@ export function getIp(
   const checkWazuhConfig = async (indexPatterns) => {
     const wazuhConfig = new WazuhConfig();
     const configuration = wazuhConfig.getConfig();
-    let indexPatternFound = indexPatterns.find((indexPattern) => indexPattern.attributes.title === configuration.pattern);
+    const indexPatternFound = indexPatterns.find((indexPattern) => indexPattern.attributes.title === configuration.pattern);
     if(!indexPatternFound){
       AppState.removeCurrentPattern()
     }

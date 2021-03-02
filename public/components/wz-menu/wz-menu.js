@@ -146,7 +146,7 @@ class WzMenu extends Component {
         filtered = list.filter(item =>
           item.id.includes(AppState.getCurrentPattern())
         );
-        if (!filtered.length) AppState.setCurrentPattern(list[0].id);
+        if (!filtered) AppState.setCurrentPattern(list[0].id);
       }
 
       const data = filtered

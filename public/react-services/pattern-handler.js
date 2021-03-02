@@ -48,7 +48,7 @@ export class PatternHandler {
 
       const wazuhConfig = new WazuhConfig();
       const { pattern } = wazuhConfig.getConfig();
-      let indexPatternFound = patternList.find((indexPattern) => indexPattern.title === pattern);
+      const indexPatternFound = patternList.find((indexPattern) => indexPattern.title === pattern);
 
       if (!indexPatternFound) {
         // if no valid index patterns are found we try to create the wazuh-alerts-*

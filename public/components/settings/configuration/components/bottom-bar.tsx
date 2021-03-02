@@ -134,16 +134,19 @@ const reloadToast = () => {
 }
 
 const executeHealtCheck = () => {
-  getToasts().add({
+  const toast = getToasts().add({
     color: 'warning',
     title: 'You must execute the health check for the changes to take effect',
     toastLifeTimeMs: 5000,
     text:
-    <EuiFlexGroup alignItems = "center" gutterSize="s">
-      <EuiFlexItem grow={false} >
-        <EuiButton onClick={() => window.location.href = '#/health-check'} size="s">Execute health check</EuiButton>
-      </EuiFlexItem>
-    </EuiFlexGroup>
+      <EuiFlexGroup alignItems="center" gutterSize="s">
+        <EuiFlexItem grow={false} >
+          <EuiButton onClick={() => {
+            window.location.href = '#/health-check';
+            getToasts().remove(toast)
+          }} size="s">Execute health check</EuiButton>
+        </EuiFlexItem>
+      </EuiFlexGroup>
   });
 }
 
