@@ -168,10 +168,7 @@ export class AgentInfo extends Component {
 
   render() {
     const { agent } = this.props;
-
     let arrayStats;
-
-    
 
     if (this.props.isCondensed) {
       arrayStats = [
@@ -196,14 +193,19 @@ export class AgentInfo extends Component {
           description: 'Operating system',
           style: {}
         },
-        { 
-          title: this.parseDateTime(agent.dateAdd), 
-          description: 'Registration date', 
+        {
+          title: agent.node_name !== 'unknown' && agent.node_name !== '' ? agent.node_name : '-',
+          description: 'Node',
+          style: { maxWidth: 150 }
+        },
+        {
+          title: this.parseDateTime(agent.dateAdd),
+          description: 'Registration date',
           style: { maxWidth: 150 } },
-        { 
-          title: this.parseDateTime(agent.lastKeepAlive), 
-          description: 'Last keep alive', 
-          style: { maxWidth: 150 } 
+        {
+          title: this.parseDateTime(agent.lastKeepAlive),
+          description: 'Last keep alive',
+          style: { maxWidth: 150 }
         },
       ];
     }
