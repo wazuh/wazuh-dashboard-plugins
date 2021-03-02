@@ -1,4 +1,7 @@
 export const getJsonFromRule = (internalUserRules, rules, logicalOperator) => {
+  console.log("internalUserRules, rules, logicalOperator");
+  console.log(internalUserRules, rules, logicalOperator);
+  
   const ruleObject: any = {};
   const usersRulesArray = internalUserRules.map(item => {
     const tmpRule = {};
@@ -12,23 +15,30 @@ export const getJsonFromRule = (internalUserRules, rules, logicalOperator) => {
     tmpRule[item.searchOperation][item.user_field] = item.value;
     return tmpRule;
   }); 
+
+
+  console.log("usersRulesArray, rulesArray");
+  console.log(usersRulesArray, rulesArray);
   
+
   if (usersRulesArray.length && rulesArray.length) {
-    if(rulesArray.length == 1){
-      return rulesArray[0]      
-    }else{
-      ruleObject['OR'] = [
-        {
-          OR: usersRulesArray,
-        },
-        {
-          [logicalOperator]: rulesArray,
-        },
-      ];
-    }
+    ruleObject['OR'] = [
+      {
+        OR: usersRulesArray,
+      },
+      {
+        [logicalOperator]: rulesArray,
+      },
+    ];
   } else {
     if(rulesArray.length == 1){
+      console.log("-----ruleObject-----");
+      console.log(rulesArray[0]);
       return rulesArray[0]
+    }else if(usersRulesArray.length == 1){
+      console.log("-----ruleObject-----");
+      console.log(usersRulesArray[0]);
+      return usersRulesArray[0]
     }else{
       if (usersRulesArray.length) {      
         ruleObject['OR'] = usersRulesArray;
@@ -38,7 +48,11 @@ export const getJsonFromRule = (internalUserRules, rules, logicalOperator) => {
       }
     }
   } 
-  
+
+
+  console.log("-----ruleObject-----");
+  console.log(ruleObject);
+
   return ruleObject;
 };
 
