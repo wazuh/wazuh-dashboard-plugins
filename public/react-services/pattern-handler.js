@@ -59,7 +59,7 @@ export class PatternHandler {
           getToasts().add({
             color: 'warning',
             title:
-              `No valid index patterns were found, proceeding to create default ${pattern} index pattern`,
+              `No ${pattern} index pattern was found, proceeding to create it.`,
             toastLifeTimeMs: 5000
           });
 
