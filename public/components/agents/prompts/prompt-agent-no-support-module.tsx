@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Prompt when an agent doesn't support any module
+ * Wazuh app - Prompt when an agent doesn't support some module
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify

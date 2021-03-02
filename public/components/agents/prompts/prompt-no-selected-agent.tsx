@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Prompt when an agent is not selected
+ * Wazuh app - Prompt when no agent selected
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify

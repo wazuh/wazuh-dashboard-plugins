@@ -23,7 +23,7 @@ export const MainSca = compose(
       return agentData.status === 'never_connected';
     },
     () => (
-      <PromptSelectAgent title="Agent never connected" body="The agent has never been connected please select other" />
+      <PromptSelectAgent title="Agent never connected" body="The agent has never been connected please select another" />
     )
   ),
   withUserAuthorizationPrompt((props) => {
