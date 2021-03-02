@@ -194,7 +194,7 @@ export class AgentInfo extends Component {
           style: {}
         },
         {
-          title: agent.node_name !== 'unknown' && agent.node_name !== '' ? agent.node_name : '-',
+          title: agent.node_name && agent.node_name !== 'unknown' ? agent.node_name : '-',
           description: 'Node',
           style: { maxWidth: 150 }
         },

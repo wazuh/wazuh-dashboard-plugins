@@ -237,7 +237,7 @@ export class AgentsTable extends Component {
     const agentVersion =
       agent.version !== undefined ? agent.version.split(' ')[1] : '-';
     const { timeService } = this.props;
-    const node_name = agent.node_name !== 'unknown' && agent.node_name !== '' ? agent.node_name : '-';
+    const node_name = agent.node_name && agent.node_name !== 'unknown' ? agent.node_name : '-';
 
     return {
       id: agent.id,
