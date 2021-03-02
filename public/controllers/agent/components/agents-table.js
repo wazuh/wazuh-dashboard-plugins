@@ -230,28 +230,16 @@ export class AgentsTable extends Component {
   }
 
   formatAgent(agent) {
-
-
-
     const checkField = field => {
       return field !== undefined ? field : '-';
     };
     const lastKeepAlive = (date, timeService) => {
-      return date !== undefined ? timeService(date) : '-';
+      return date !== undefined ? formatUIDate(date) : '-';
+      // return date !== undefined ? timeService(date) : '-';
     };
     const agentVersion =
       agent.version !== undefined ? agent.version.split(' ')[1] : '-';
     const { timeService } = this.props;
-    
-    console.log("agent.dateAdd");
-    console.log("agent.dateAdd");
-    console.log("agent.dateAdd");
-    console.log("agent.dateAdd");
-    console.log("agent.dateAdd");
-    console.log("agent.dateAdd");
-    console.log("agent.dateAdd");
-    console.log(formatUIDate(agent.dateAdd));
-    // console.log(getTimeZone());
 
     return {
       id: agent.id,
@@ -261,7 +249,7 @@ export class AgentsTable extends Component {
       group: checkField(agent.group),
       os_name: agent,
       version: agentVersion,
-      dateAdd: timeService(agent.dateAdd),
+      dateAdd: formatUIDate(agent.dateAdd),
       // dateAdd: new Intl.DateTimeFormat('en-US').format(new Date(agent.dateAdd)),
       lastKeepAlive: lastKeepAlive(agent.lastKeepAlive, timeService),
       actions: agent,
