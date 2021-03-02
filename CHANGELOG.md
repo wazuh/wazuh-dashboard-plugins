@@ -17,6 +17,12 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fix manager is shown in suggestions in Agents section [#3025](https://github.com/wazuh/wazuh-kibana-app/pull/3025)
 - Fix disabled loading on inventory when request fail [#3016](https://github.com/wazuh/wazuh-kibana-app/issues/3016)
 
+## Wazuh v4.1.1 - Kibana 7.10.0 , 7.10.2 - Revision 4103
+
+### Fixed
+
+- Add `run_as` setting to example host configuration in Add new API view [#3021](https://github.com/wazuh/wazuh-kibana-app/pull/3021)
+
 ## Wazuh v4.1.1 - Kibana 7.10.0 , 7.10.2 - Revision 4102
 
 ### Added
