@@ -2,6 +2,12 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.1.1 - Kibana 7.10.0 , 7.10.2 - Revision 4103
+
+### Fixed
+
+- Overlay Wazuh menu when Kibana menu is opened or docked [#3038](https://github.com/wazuh/wazuh-kibana-app/pull/3038)
+
 ## Wazuh v4.1.1 - Kibana 7.10.0 , 7.10.2 - Revision 4102
 
 ### Added
