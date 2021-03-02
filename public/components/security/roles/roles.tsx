@@ -103,6 +103,9 @@ export const Roles = () => {
           </EuiTitle>
         </EuiPageContentHeaderSection>
         <EuiPageContentHeaderSection>
+        {
+          !loadingTable
+          &&
           <div>
             <EuiButton
               onClick={() => setIsFlyoutVisible(true)}>
@@ -111,6 +114,7 @@ export const Roles = () => {
             {flyout}
             {editFlyout}
           </div>
+        }
         </EuiPageContentHeaderSection>
       </EuiPageContentHeader>
       <EuiPageContentBody>
