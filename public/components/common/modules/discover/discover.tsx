@@ -87,7 +87,6 @@ export const Discover = compose(
     itemIdToExpandedRowMap: any
     dateRange: TimeRange
     elasticQuery: object
-    filters: []
     columns: string[]
     hover: string
   };
@@ -125,7 +124,6 @@ export const Discover = compose(
       dateRange: this.timefilter.getTime(),
       query: props.query || { language: "kuery", query: "" },
       elasticQuery: {},
-      filters: props.initialFilters,
       columns: [],
       hover: ""
     }
@@ -287,11 +285,13 @@ export const Discover = compose(
     });
 
     const filters = this.props.shareFilterManager ? this.props.shareFilterManager.filters : [];
+    const previousFilters = this.KibanaServices && this.KibanaServices.query.filterManager.filters ? this.KibanaServices.query.filterManager.filters : [];
+    
     const elasticQuery =
       buildEsQuery(
         undefined,
         query,
-        [...filters, ...extraFilters],
+        [...previousFilters, ...filters, ...extraFilters],
         getEsQueryConfig(getUiSettings())
       );
 
@@ -341,12 +341,12 @@ export const Discover = compose(
           }
         );
         if (this._isMount) {
-          this.setState({ alerts: alerts.data.hits.hits, total: alerts.data.hits.total.value, isLoading: false, requestFilters: newFilters, filters: newFilters.filters });
+        this.setState({ alerts: alerts.data.hits.hits, total: alerts.data.hits.total.value, isLoading: false, requestFilters: newFilters});
           this.props.updateTotalHits(alerts.data.hits.total.value);
         }
     } catch (err) {
       if (this._isMount) {
-        this.setState({ alerts: [], total: 0, isLoading: false, requestFilters: newFilters, filters: newFilters.filters });
+        this.setState({ alerts: [], total: 0, isLoading: false, requestFilters: newFilters});
         this.props.updateTotalHits(0);
       }
     }
@@ -507,6 +507,7 @@ export const Discover = compose(
   * @param filter 
   */
   addFilterOut(filter) {
+    const filterManager = this.props.shareFilterManager;
     const key = Object.keys(filter)[0];
     const value = filter[key];
     const valuesArray = Array.isArray(value) ? [...value] : [value];
@@ -514,9 +515,9 @@ export const Discover = compose(
       const formattedFilter = buildPhraseFilter({ name: key, type: "string" }, item, this.indexPattern);
       formattedFilter.meta.negate = true;
 
-      filters.push(formattedFilter);
+      filterManager.addFilters(formattedFilter);
     })
-
+    this.setState({ pageIndex: 0 , tsUpdated: Date.now()});
   }
 
   /**
@@ -524,6 +525,7 @@ export const Discover = compose(
    * @param filter 
    */
   addFilter(filter) {
+    const filterManager = this.props.shareFilterManager;
     const key = Object.keys(filter)[0];
     const value = filter[key];
     const valuesArray = Array.isArray(value) ? [...value] : [value];
@@ -532,9 +534,9 @@ export const Discover = compose(
       if (formattedFilter.meta.key === 'manager.name' || formattedFilter.meta.key === 'cluster.name') {
         formattedFilter.meta["removable"] = false;
       }
-      filters.push(formattedFilter);
+      filterManager.addFilters(formattedFilter);
     })
-
+    this.setState({ pageIndex: 0 , tsUpdated: Date.now()});
   }
 
   onQuerySubmit = (payload: { dateRange: TimeRange, query: Query | undefined }) => {
