@@ -143,7 +143,7 @@ class WzMenu extends Component {
         AppState.setCurrentPattern(list[0].id);
       } else {
         // Check if the current pattern cookie is valid
-        filtered = list.filter(item =>
+        filtered = list.find(item =>
           item.id.includes(AppState.getCurrentPattern())
         );
         if (!filtered) AppState.setCurrentPattern(list[0].id);

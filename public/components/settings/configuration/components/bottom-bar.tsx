@@ -142,8 +142,8 @@ const executeHealtCheck = () => {
       <EuiFlexGroup alignItems="center" gutterSize="s">
         <EuiFlexItem grow={false} >
           <EuiButton onClick={() => {
+            getToasts().remove(toast);
             window.location.href = '#/health-check';
-            getToasts().remove(toast)
           }} size="s">Execute health check</EuiButton>
         </EuiFlexItem>
       </EuiFlexGroup>
