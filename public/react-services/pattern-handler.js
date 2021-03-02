@@ -129,11 +129,11 @@ export class PatternHandler {
  * Refresh current pattern for the given pattern
  * @param {String} pattern
  */
-  static async refreshIndexPattern() {
+  static async refreshIndexPattern(newFields = null) {
     try {
       const currentPattern = AppState.getCurrentPattern();
       const pattern = await getDataPlugin().indexPatterns.get(currentPattern);
-      await SavedObject.refreshIndexPattern(pattern);
+      await SavedObject.refreshIndexPattern(pattern, newFields);
     } catch (error) {
       throw new Error(error);
     }

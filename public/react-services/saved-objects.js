@@ -14,7 +14,7 @@ import { GenericRequest } from './generic-request';
 import { KnownFields } from '../utils/known-fields';
 import { FieldsStatistics } from '../utils/statistics-fields';
 import { FieldsMonitoring } from '../utils/monitoring-fields';
-import { WAZUH_INDEX_TYPE_MONITORING, WAZUH_INDEX_TYPE_STATISTICS, WAZUH_INDEX_TYPE_ALERTS} from '../../common/constants';
+import { WAZUH_INDEX_TYPE_MONITORING, WAZUH_INDEX_TYPE_STATISTICS, WAZUH_INDEX_TYPE_ALERTS } from '../../common/constants';
 
 export class SavedObject {
   /**
@@ -171,10 +171,17 @@ export class SavedObject {
 
   /**
    * Refresh an index pattern
+   * Optionally force a new field
    */
-  static async refreshIndexPattern(pattern) {
+  static async refreshIndexPattern(pattern, newFields = null) {
     try {
       const fields = await SavedObject.getIndicesFields(pattern.title, WAZUH_INDEX_TYPE_ALERTS);
+
+      if(newFields && typeof newFields=="object")
+        Object.keys(newFields).forEach((fieldName) => {
+          if (this.isValidField(newFields[fieldName])) fields.push(newFields[fieldName]);
+        });
+
       await this.refreshFieldsOfIndexPattern(pattern.id, pattern.title, fields);
 
       return;
@@ -184,6 +191,20 @@ export class SavedObject {
         ? error.data.message
         : error.message || error;
     }
+  }
+
+  /**
+   * Checks the field has a proper structure
+   * @param {index-pattern-field} field 
+   */
+  static isValidField(field) {
+
+    if (field == null || typeof field != "object") return false;
+
+    const isValid = ["name", "type", "esTypes", "searchable", "aggregatable", "readFromDocValues"].reduce((ok, prop) => {
+      return ok && Object.keys(field).includes(prop);
+    }, true)
+    return isValid;
   }
 
   /**

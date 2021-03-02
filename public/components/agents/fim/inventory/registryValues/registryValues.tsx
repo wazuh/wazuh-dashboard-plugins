@@ -30,10 +30,7 @@ export const RegistryValues = (props) => {
     try {
       const values = await WzRequest.apiReq('GET', `/syscheck/${agent.id}`, {
         params: {
-          q: `type=registry_value;file=${encodeURIComponent(currentFile.file).replaceAll(
-            '%5C',
-            '\\\\'
-          )}`,
+          q: `type=registry_value;file=${currentFile.file}`,
           sort: '-date',
         },
       });

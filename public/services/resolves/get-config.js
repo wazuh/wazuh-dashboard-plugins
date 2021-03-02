@@ -94,5 +94,5 @@ export async function getWzConfig($q, genericReq, wazuhConfig) {
     console.log(error.message || error); // eslint-disable-line
   }
 
-  return $q.resolve();
+  return $q.resolve(defaultConfig);
 }
