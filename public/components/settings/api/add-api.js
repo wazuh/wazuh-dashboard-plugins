@@ -152,7 +152,7 @@ export class AddApi extends Component {
           <EuiCode>{'<api_username>'}</EuiCode> and{' '}
           <EuiCode>{'<api_password>'}</EuiCode> are the credentials to
           authenticate,{' '}
-          <EuiCode>{'<run_as>'}</EuiCode> defines if the app user permissions depends on the authentication context (<EuiCode>{'true'}</EuiCode> / <EuiCode>{'false'}</EuiCode>).
+          <EuiCode>{'<run_as>'}</EuiCode> defines if the app user's permissions depends on the authentication context (<EuiCode>{'true'}</EuiCode> / <EuiCode>{'false'}</EuiCode>).
         </EuiText>
       </div>
     );
