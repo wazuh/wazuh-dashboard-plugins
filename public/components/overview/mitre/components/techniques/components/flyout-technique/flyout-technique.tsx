@@ -39,6 +39,8 @@ import { WzRequest } from '../../../../../../../react-services/wz-request';
 import { AppState } from '../../../../../../../react-services/app-state';
 import { AppNavigate } from '../../../../../../../react-services/app-navigate';
 import { Discover } from '../../../../../../common/modules/discover';
+import { getUiSettings } from '../../../../../../../kibana-services';
+import { FilterManager } from '../../../../../../../../../../src/plugins/data/public/';
 
 export class FlyoutTechnique extends Component {
   _isMount = false;
@@ -56,6 +58,8 @@ export class FlyoutTechnique extends Component {
     currentTechnique: string
   }
 
+  filterManager: FilterManager;
+
   constructor(props) {
     super(props);
     this.state = {
@@ -64,6 +68,7 @@ export class FlyoutTechnique extends Component {
       },
       loading: false
     }
+    this.filterManager = new FilterManager(getUiSettings());
   }
 
   async componentDidMount() {
@@ -315,7 +320,7 @@ export class FlyoutTechnique extends Component {
             initialIsOpen={true}>
           <EuiFlexGroup className="flyout-row">
             <EuiFlexItem>
-              <Discover initialColumns={["icon", "timestamp", 'rule.mitre.id', 'rule.mitre.tactic', 'rule.level', 'rule.id', 'rule.description']} implicitFilters={implicitFilters} initialFilters={[]} updateTotalHits={(total) => this.updateTotalHits(total)}/>
+              <Discover kbnSearchBar shareFilterManager={this.filterManager} initialColumns={["icon", "timestamp", 'rule.mitre.id', 'rule.mitre.tactic', 'rule.level', 'rule.id', 'rule.description']} implicitFilters={implicitFilters} initialFilters={[]} updateTotalHits={(total) => this.updateTotalHits(total)}/>
             </EuiFlexItem>
           </EuiFlexGroup>
         </EuiAccordion>
