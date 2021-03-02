@@ -9,11 +9,11 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { PromptAgentNoSupportModule } from '../../agents/prompt-agent-no-support-module';
+import { PromptAgentNoSupportModule } from '../../agents/prompts';
 import { withGuard } from '../../common/hocs';
 import { hasAgentSupportModule } from '../../../react-services/wz-agents';
 
-export const withAgentSupportModule = WrappedComponent => 
+export const withAgentSupportModule = WrappedComponent =>
   withGuard(
     ({agent, component}) => Object.keys(agent).length && !hasAgentSupportModule(agent, component),
     PromptAgentNoSupportModule
