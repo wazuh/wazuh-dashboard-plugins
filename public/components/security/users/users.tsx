@@ -120,13 +120,11 @@ export const Users = () => {
         <EuiPageContentHeaderSection>
           {
             !rolesLoading
-            ?
+            &&
             <div>
               <EuiButton onClick={() => setIsCreateFlyoutVisible(true)}>Create user</EuiButton>
               {createFlyout}
             </div>
-            :
-            null
           }
         </EuiPageContentHeaderSection>
       </EuiPageContentHeader>

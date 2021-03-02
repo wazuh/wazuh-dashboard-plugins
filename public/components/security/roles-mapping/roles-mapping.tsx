@@ -148,14 +148,12 @@ export const RolesMapping = () => {
         <EuiPageContentHeaderSection>
           {
             !loadingTable
-            ?            
+            &&
             <div>
               <EuiButton onClick={() => setIsCreatingRule(true)}>Create Role mapping</EuiButton>
               {createFlyout}
               {editFlyout}
             </div>
-            :
-            null
           }
         </EuiPageContentHeaderSection>
       </EuiPageContentHeader>

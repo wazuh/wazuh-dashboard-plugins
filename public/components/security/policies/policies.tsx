@@ -436,17 +436,15 @@ export const Policies = () => {
         <EuiPageContentHeaderSection>
          { 
           !loading
-          ?
+          &&
           <div>
             <EuiButton
               onClick={() => setIsFlyoutVisible(true)}>
               Create policy
-                                </EuiButton>
+            </EuiButton>
             {flyout}
             {editFlyout}
-          </div>
-          :
-          null
+          </div>          
         }
         </EuiPageContentHeaderSection>
       </EuiPageContentHeader>
