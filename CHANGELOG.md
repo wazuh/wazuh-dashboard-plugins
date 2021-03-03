@@ -11,6 +11,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Changed
 
+- Change all dates labels to Kibana formatting time zone [#3009](https://github.com/wazuh/wazuh-kibana-app/issues/3009)
 - Added toast with refresh button when new fields are loaded [#2974](https://github.com/wazuh/wazuh-kibana-app/pull/2974)
 - Migrated manager and cluster files endpoints and their corresponding RBAC [#2984](https://github.com/wazuh/wazuh-kibana-app/pull/2984)
 
