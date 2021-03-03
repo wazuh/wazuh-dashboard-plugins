@@ -18,7 +18,7 @@ import { WazuhConfig } from '../../react-services/wazuh-config';
 import { GenericRequest } from '../../react-services/generic-request';
 import { WzRequest } from '../../react-services/wz-request';
 import { ShareAgent } from '../../factories/share-agent';
-import { TimeService } from '../../react-services/time-service';
+import { formatUIDate } from '../../react-services/time-service';
 import { ErrorHandler } from '../../react-services/error-handler';
 import { getDataPlugin, getUiSettings } from '../../kibana-services';
 
@@ -50,16 +50,13 @@ export class AgentsPreviewController {
     this.wazuhConfig = new WazuhConfig();
     this.errorInit = false;
     this.$window = $window;
-    this.timeService = TimeService;
+    this.formatUIDate = formatUIDate;
   }
 
   /**
    * On controller loads
    */
   async $onInit() {
-    console.log(getUiSettings().defaults.dateFormat);
-    console.log(getUiSettings().defaults["dateFormat:tz"]);
-    
     this.init = true;
     this.api = JSON.parse(AppState.getCurrentAPI()).id;
     const loc = this.$location.search();
@@ -146,7 +143,7 @@ export class AgentsPreviewController {
         );
         this.$scope.$applyAsync();
       },
-      timeService: date => this.timeService.offset(date),
+      formatUIDate: date => this.formatUIDate(date),
       summary: this.summary
     };
     //Load

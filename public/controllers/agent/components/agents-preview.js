@@ -330,7 +330,7 @@ export const AgentsPreview = compose(
                 addingNewAgent={this.props.tableProps.addingNewAgent}
                 downloadCsv={this.props.tableProps.downloadCsv}
                 clickAction={this.props.tableProps.clickAction}
-                timeService={this.props.tableProps.timeService}
+                formatUIDate={this.props.tableProps.formatUIDate}
                 reload={() => this.getSummary()}
               />
             </WzReduxProvider>

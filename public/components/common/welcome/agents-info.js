@@ -19,7 +19,7 @@ import {
   EuiBadge
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
-import { TimeService } from '../../../react-services/time-service';
+import { formatUIDate } from '../../../react-services/time-service';
 
 import WzTextWithTooltipIfTruncated from '../wz-text-with-tooltip-if-truncated';
 import { WzStat } from '../../wz-stat';
@@ -30,7 +30,7 @@ export class AgentInfo extends Component {
     super(props);
 
     this.state = {};
-    this.timeService = TimeService;
+    this.formatUIDate = formatUIDate;
   }
 
   async componentDidMount() {
@@ -160,7 +160,7 @@ export class AgentInfo extends Component {
 
   parseDateTime(datetime){
     try {
-      return this.timeService.offset(datetime);
+      return this.formatUIDate(datetime);
     } catch (error) {
       return datetime;
     }

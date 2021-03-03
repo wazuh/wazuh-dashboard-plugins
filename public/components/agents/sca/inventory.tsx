@@ -22,12 +22,11 @@ import {
   EuiPopover
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
-import { TimeService } from '../../../react-services/time-service';
+import { formatUIDate } from '../../../react-services/time-service';
 import exportCsv from '../../../react-services/wz-csv';
 import { getToasts }  from '../../../kibana-services';
 import { WzSearchBar } from '../../../components/wz-search-bar';
 import { RuleText, ComplianceText } from './components';
-
 export class Inventory extends Component {
   _isMount = false;
   constructor(props) {
@@ -50,7 +49,7 @@ export class Inventory extends Component {
         field: 'end_scan',
         name: 'End scan',
         dataType: 'date',
-        render: TimeService.offset
+        render: formatUIDate
       },
       {
         field: 'pass',
@@ -536,7 +535,7 @@ export class Inventory extends Component {
                     <EuiStat title={`${this.state.lookingPolicy.score}%`} description="Score" titleColor="accent" titleSize="m" textAlign="center" />
                   </EuiFlexItem>
                   <EuiFlexItem>
-                    <EuiStat title={TimeService.offset(this.state.lookingPolicy.end_scan)} description="End scan" titleColor="primary" titleSize="s" textAlign="center" style={{ padding: 5 }} />
+                    <EuiStat title={formatUIDate(this.state.lookingPolicy.end_scan)} description="End scan" titleColor="primary" titleSize="s" textAlign="center" style={{ padding: 5 }} />
                   </EuiFlexItem>
                 </EuiFlexGroup>
                 <EuiSpacer size="m" />

@@ -12,7 +12,7 @@
  */
 import React, { Component } from 'react';
 import { EuiPanel, EuiFlexGroup, EuiFlexItem, EuiTitle } from '@elastic/eui';
-
+import { formatUIDate } from '../../../../../react-services/time-service';
 import { connect } from 'react-redux';
 
 export class WzStatusNodeInfo extends Component {
@@ -61,7 +61,7 @@ export class WzStatusNodeInfo extends Component {
         <EuiFlexGroup>
           <EuiFlexItem>Compilation date</EuiFlexItem>
           <EuiFlexItem style={greyStyle}>
-            {nodeInfo.compilation_date}
+            {formatUIDate(nodeInfo.compilation_date)}
           </EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup>
