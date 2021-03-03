@@ -45,6 +45,7 @@ export const initialWazuhConfig: string = `---
 #checks.setup   : true
 #checks.metaFields: true
 #checks.timeFilter: true
+#checks.maxBuckets: true
 #
 # --------------------------------- Extensions ---------------------------------
 #
@@ -131,7 +132,7 @@ export const initialWazuhConfig: string = `---
 #
 # Customize the index name prefix of sample alerts
 # This change is not retroactive, if you change it new indexes will be created
-# It should match with a valid index template to avoid unknown fields on 
+# It should match with a valid index template to avoid unknown fields on
 # dashboards
 #alerts.sample.prefix: wazuh-alerts-4.x-
 #
@@ -191,18 +192,18 @@ export const initialWazuhConfig: string = `---
       # Username
       # API user's username
       # username: <username>
-      
+
       # Password
       # API user's password
       # password: <password>
-      
+
       # Run as
       # Define how the app user gets his/her app permissions.
       # Values:
       #   - true: use his/her authentication context. Require Wazuh API user allows run_as.
       #   - false or not defined: get same permissions of Wazuh API user.
       # run_as: <true|false>
- 
+
 hosts:
   - default:
      url: https://localhost

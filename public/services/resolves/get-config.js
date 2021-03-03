@@ -29,6 +29,7 @@ export async function getWzConfig($q, genericReq, wazuhConfig) {
     'checks.fields': true,
     'checks.metaFields': true,
     'checks.timeFilter': true,
+    'checks.maxBuckets': true,
     'extensions.pci': true,
     'extensions.gdpr': true,
     'extensions.hipaa': true,

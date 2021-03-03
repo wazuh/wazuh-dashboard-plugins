@@ -16,7 +16,7 @@ export interface IFilter {
 }
 
 function buildQFilter(oldQ, newQ) {
-  const parsedQ = newQ.replace(/ and | or /gi, parseConjuntions);
+  const parsedQ = `(${newQ})`.replace(/ and | or /gi, parseConjuntions);
   return `${!!oldQ ? `${oldQ};` : ''}${parsedQ}`;
 }
 

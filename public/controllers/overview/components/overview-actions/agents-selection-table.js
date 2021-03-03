@@ -242,7 +242,7 @@ export class AgentSelectionTable extends Component {
     const sortFilter = {};
     if (sortField) {
       const direction = sortDirection === 'asc' ? '+' : '-';
-      sortFilter['sort'] = direction + sortField;
+      sortFilter['sort'] = direction + (sortField === 'os'? 'os.name,os.version' : sortField);
     }
 
     return sortFilter;

@@ -72,7 +72,7 @@ export class WzVisualize extends Component {
 
   async componentDidMount() {
     this._isMount = true;
-    // visHandler.removeAll();
+    visHandler.removeAll();
     this.agentsStatus = false;
     if (!this.monitoringEnabled) {
       const data = await this.wzReq.apiReq('GET', '/agents/summary/status', {});
