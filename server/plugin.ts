@@ -94,6 +94,14 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       };
     });
 
+    // Add custom headers to the responses
+    core.http.registerOnPreResponse((request, response, toolkit) => {
+      const additionalHeaders = {
+        'x-frame-options': 'sameorigin',
+      };
+      return toolkit.next({ headers: additionalHeaders });
+    });
+
     // Routes
     const router = core.http.createRouter();
     setupRoutes(router);

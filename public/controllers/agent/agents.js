@@ -13,7 +13,6 @@ import { FilterHandler } from '../../utils/filter-handler';
 import { TabNames } from '../../utils/tab-names';
 import * as FileSaver from '../../services/file-saver';
 import { WAZUH_MODULES } from '../../../common/wazuh-modules';
-import { UnsupportedComponents } from '../../utils/components-os-support';
 import { visualizations } from '../../templates/agents/visualizations';
 
 import { ConfigurationHandler } from '../../utils/config-handler';
@@ -31,7 +30,7 @@ import store from '../../redux/store';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
 import { WAZUH_ALERTS_PATTERN } from '../../../common/constants';
 import { getDataPlugin } from '../../kibana-services';
-
+import { hasAgentSupportModule } from '../../react-services/wz-agents';
 export class AgentsController {
   /**
    * Class constructor
@@ -656,11 +655,7 @@ export class AgentsController {
 
       const cleanTabs = [];
       tabs.forEach(x => {
-        if (
-          (
-            UnsupportedComponents[(this.$scope.agent || {}).agentPlatform] ||
-            UnsupportedComponents['other']
-          ).includes(x.id)
+        if (!hasAgentSupportModule(this.$scope.agent, x.id)
         )
           return;
 
@@ -731,7 +726,6 @@ export class AgentsController {
   }
 
   checkStatusAgent() {
-    console.log(this.$scope.agent.status);
     if (this.$scope.agent.status !== 'Active') {
       return false;
     } else if (this.$scope.agent.status === 'Active') {
@@ -827,7 +821,6 @@ export class AgentsController {
       }
 
       await this.$scope.switchTab(this.$scope.tab, true);
-
       const groups = await WzRequest.apiReq('GET', '/groups', {});
       this.$scope.groups = groups.data.data.affected_items
         .map(item => item.name)
@@ -849,7 +842,6 @@ export class AgentsController {
           this.$scope.emptyAgent = 'Wazuh API timeout.';
         }
       }
-      ErrorHandler.handle(error, 'Agents');
       if (
         error &&
         typeof error === 'string' &&
@@ -866,20 +858,14 @@ export class AgentsController {
   }
 
   shouldShowComponent(component) {
-    return !(
-      UnsupportedComponents[this.$scope.agent.agentPlatform] ||
-      UnsupportedComponents['other']
-    ).includes(component);
+    return hasAgentSupportModule(this.$scope.agent, component)
   }
 
   cleanExtensions(extensions) {
     const result = {};
     for (const extension in extensions) {
       if (
-        !(
-          UnsupportedComponents[this.$scope.agent.agentPlatform] ||
-          UnsupportedComponents['other']
-        ).includes(extension)
+        hasAgentSupportModule(this.$scope.agent, extension)
       ) {
         result[extension] = extensions[extension];
       }

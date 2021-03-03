@@ -28,7 +28,8 @@ const initialState = {
   sortFieldFile: 'filename',
   sortFieldAgents: 'name',
   showAddAgents: false,
-  selectedTabId: 'agents'
+  selectedTabId: 'agents',
+  reload: Date.now()
 };
 
 const groupsReducers = (state = initialState, action) => {
@@ -170,6 +171,12 @@ const groupsReducers = (state = initialState, action) => {
       sortDirectionAgents: 'asc',
       selectedTabId: 'agents',
       itemDetail: false
+    };
+  }
+  if (action.type === 'GROUPS_RELOAD') {
+    return {
+      ...state,
+      reload: Date.now()
     };
   }
   if (action.type === 'RESET') {

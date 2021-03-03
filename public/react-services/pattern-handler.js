@@ -13,7 +13,7 @@ import { GenericRequest } from './generic-request';
 import { AppState } from './app-state';
 import { WzMisc } from '../factories/misc';
 import { SavedObject } from './saved-objects';
-import { getDataPlugin, getToasts }  from '../kibana-services';
+import { getDataPlugin, getToasts } from '../kibana-services';
 import { WazuhConfig } from '../react-services/wazuh-config';
 
 export class PatternHandler {
@@ -125,11 +125,11 @@ export class PatternHandler {
  * Refresh current pattern for the given pattern
  * @param {String} pattern
  */
-  static async refreshIndexPattern() {
+  static async refreshIndexPattern(newFields = null) {
     try {
       const currentPattern = AppState.getCurrentPattern();
       const pattern = await getDataPlugin().indexPatterns.get(currentPattern);
-      await SavedObject.refreshIndexPattern(pattern);
+      await SavedObject.refreshIndexPattern(pattern, newFields);
     } catch (error) {
       throw new Error(error);
     }

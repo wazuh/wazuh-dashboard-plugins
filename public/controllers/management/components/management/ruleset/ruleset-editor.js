@@ -33,7 +33,7 @@ import {
   EuiPanel
 } from '@elastic/eui';
 
-import RulesetHandler from './utils/ruleset-handler';
+import { resourceDictionary, RulesetHandler, RulesetResources } from './utils/ruleset-handler';
 import validateConfigAfterSent from './utils/valid-configuration';
 
 import { getToasts } from '../../../../../kibana-services';
@@ -46,6 +46,7 @@ import 'brace/mode/xml';
 import 'brace/snippets/xml';
 import 'brace/ext/language_tools';
 import "brace/ext/searchbox";
+
 
 class WzRulesetEditor extends Component {
   _isMounted = false;
@@ -61,7 +62,7 @@ class WzRulesetEditor extends Component {
       enableSnippets: true,
       enableLiveAutocompletion: false
     };
-    this.rulesetHandler = RulesetHandler;
+    this.rulesetHandler = new RulesetHandler(this.props.state.section);
     const { fileContent, addingRulesetFile } = this.props.state;
     const { name, content, path } = fileContent
       ? fileContent
@@ -75,7 +76,7 @@ class WzRulesetEditor extends Component {
       content,
       initContent: content,
       name,
-      path,
+      path
     };
   }
 
@@ -102,12 +103,8 @@ class WzRulesetEditor extends Component {
       const { content } = this.state;
 
       this.setState({ isSaving: true, error: false });
-      const { section } = this.props.state;
 
-      let saver = this.rulesetHandler.sendRuleConfiguration; // By default the saver is for rules
-      if (section === 'decoders')
-        saver = this.rulesetHandler.sendDecoderConfiguration;
-      await saver(name, content, overwrite);
+      await this.rulesetHandler.updateFile(name, content, overwrite);
       try {
         await validateConfigAfterSent();
       } catch (error) {
@@ -122,7 +119,7 @@ class WzRulesetEditor extends Component {
        
         if (this.props.state.addingRulesetFile != false) {
           //remove current invalid file if the file is new.
-          await this.rulesetHandler.deleteFile(name, this.state.path);
+          await this.rulesetHandler.deleteFile(name);
           toast.toastMessage += '\nThe new file was deleted.';
         } else {
           //restore file to previous version
@@ -199,7 +196,7 @@ class WzRulesetEditor extends Component {
     const xmlError = validateXML(content);
     const saveButton = (
       <WzButtonPermissions
-        permissions={[{ action: 'manager:upload_file', resource: `file:path:etc/${section}/${nameForSaving}` }]}
+        permissions={[{ action: `${section}:update`, resource: resourceDictionary[section].permissionResource(nameForSaving) }]}
         fill
         iconType={(isEditable && xmlError) ? "alert" : "save"}
         isLoading={this.state.isSaving}
