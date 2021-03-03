@@ -132,7 +132,7 @@ export class RegisterAgent extends Component {
     this.restartAgentCommand = {
       rpm: this.systemSelector(),
       deb: this.systemSelector(),
-      macos: 'sudo /Library/Ossec/bin/ossec-control start',
+      macos: 'sudo /Library/Ossec/bin/wazuh-control start',
     }
   }
 

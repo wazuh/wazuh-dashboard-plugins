@@ -65,7 +65,7 @@ export const regulatory = [{
     ],
     "description": "File added to the system.",
     "groups": [
-      "ossec",
+      "wazuh",
       "syscheck"
     ],
     "id": "554",
@@ -92,7 +92,7 @@ export const regulatory = [{
     ],
     "description": "Integrity checksum changed.",
     "groups": [
-      "ossec",
+      "wazuh",
       "syscheck"
     ],
     "id": "550",
@@ -119,7 +119,7 @@ export const regulatory = [{
     ],
     "description": "File deleted.",
     "groups": [
-      "ossec",
+      "wazuh",
       "syscheck"
     ],
     "id": "553",
