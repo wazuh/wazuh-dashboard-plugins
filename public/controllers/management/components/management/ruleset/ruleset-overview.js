@@ -17,7 +17,7 @@ import WzRulesetTable from './ruleset-table';
 import WzRulesetSearchBar from './ruleset-search-bar';
 import WzRulesetActionButtons from './actions-buttons';
 import './ruleset-overview.scss';
-import { withUserAuthorizationPrompt, withGlobalBreadcrumb } from '../../../../../components/common/hocs';
+import { withUserAuthorizationPrompt, withGlobalBreadcrumb, withUserHasLogged } from '../../../../../components/common/hocs';
 import { compose } from 'redux';
 import { resourceDictionary } from './utils/ruleset-handler';
 
@@ -96,5 +96,6 @@ export default compose(
       { text: sectionNames[props.state.section] }
     ];
   }),
+  withUserHasLogged,
   withUserAuthorizationPrompt((props) => [{action: `${props.state.section}:read`, resource: resourceDictionary[props.state.section].permissionResource('*')}])
 )(WzRulesetOverview);

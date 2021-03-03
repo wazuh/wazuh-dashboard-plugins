@@ -28,6 +28,7 @@ const initialState = {
     status: false,
     contextConfigServer: 'manager',
   },
+  userHasLogged: false,
 };
 
 const appStateReducers = (state = initialState, action) => {
@@ -131,6 +132,13 @@ const appStateReducers = (state = initialState, action) => {
     };
   }
 
+  if (action.type === 'UPDATE_USER_HAS_LOGGED') {
+    return {
+      ...state,
+      userHasLogged: action.userHasLogged,
+    };
+  }  
+  
   return state;
 };
 

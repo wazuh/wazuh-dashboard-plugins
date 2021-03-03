@@ -17,7 +17,7 @@ export { withUserPermissions, withUserPermissionsRequirements, withUserPermissio
 
 export { withUserRoles, withUserRolesRequirements, withUserRolesPrivate  } from './withUserRoles';
 
-export { withUserAuthorizationPrompt  } from './withUserAuthorization';
+export { withUserAuthorizationPrompt} from './withUserAuthorization';
 
 export { withGlobalBreadcrumb  } from './withGlobalBreadcrumb';
 
@@ -28,3 +28,5 @@ export { withGuard } from './withGuard';
 export { withButtonOpenOnClick } from './withButtonOpenOnClick';
 
 export { withAgentSupportModule } from './withAgentSupportModule';
+
+export { withUserHasLogged } from './withUserLogged';

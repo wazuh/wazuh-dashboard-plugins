@@ -169,3 +169,14 @@ export const updateClusterStatus = (clusterStatus) => {
     clusterStatus,
   };
 };
+
+/**
+ * Updates ClusterOrManagerConfiguration in the appState store
+ * @param userHasLogged
+ */
+export const updateUserHasLogged = (userHasLogged) => {
+  return {
+    type: 'UPDATE_USER_HAS_LOGGED',
+    userHasLogged,
+  };
+};

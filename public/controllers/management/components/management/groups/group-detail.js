@@ -25,7 +25,7 @@ import WzGroupsActionButtonsAgents from './actions-buttons-agents';
 import WzGroupsActionButtonsFiles from './actions-buttons-files';
 import WzGroupAgentsTable from './group-agents-table';
 import WzGroupFilesTable from './group-files-table';
-import { withUserAuthorizationPrompt } from '../../../../../components/common/hocs';
+import { withUserAuthorizationPrompt, withUserHasLogged } from '../../../../../components/common/hocs';
 import { compose } from 'redux';
 
 class WzGroupDetail extends Component {
@@ -191,5 +191,6 @@ export default compose(
     mapStateToProps,
     mapDispatchToProps
   ),
+  withUserHasLogged,
   withUserAuthorizationPrompt((props) => [{action: 'group:read', resource: `group:id:${props.state.itemDetail.name}`}]),
 )(WzGroupDetail);

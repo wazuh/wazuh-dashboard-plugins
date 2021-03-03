@@ -37,12 +37,13 @@ import { FilterHandler } from '../../../utils/filter-handler';
 import { TabVisualizations } from '../../../factories/tab-visualizations';
 import { WazuhConfig } from './../../../react-services/wazuh-config.js';
 import { WzDatePicker } from '../../../components/wz-date-picker/wz-date-picker';
-import { withReduxProvider, withGlobalBreadcrumb, withUserAuthorizationPrompt } from '../../../components/common/hocs';
+import { withReduxProvider, withGlobalBreadcrumb, withUserAuthorizationPrompt, withUserHasLogged } from '../../../components/common/hocs';
 import { compose } from 'redux';
 
 export const AgentsPreview = compose(
   withReduxProvider,
   withGlobalBreadcrumb([{ text: '' }, { text: 'Agents' }]),
+  withUserHasLogged,
   withUserAuthorizationPrompt([[{action: 'agent:read', resource: 'agent:id:*'},{action: 'agent:read', resource: 'agent:group:*'}]])
 )(class AgentsPreview extends Component {
   _isMount = false;

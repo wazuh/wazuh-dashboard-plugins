@@ -14,7 +14,7 @@ import { WzRequest } from './wz-request';
 import { AppState } from './app-state';
 import jwtDecode from 'jwt-decode';
 import store from '../redux/store';
-import { updateUserPermissions, updateUserRoles } from '../redux/actions/appStateActions';
+import { updateUserPermissions, updateUserRoles, updateUserHasLogged } from '../redux/actions/appStateActions';
 import { WAZUH_ROLE_ADMINISTRATOR_ID, WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../common/constants';
 import { getToasts } from '../kibana-services';
 
@@ -54,6 +54,7 @@ export class WzAuthentication{
       // Dispatch actions to set permissions and roles
       store.dispatch(updateUserPermissions(userPolicies));
       store.dispatch(updateUserRoles(WzAuthentication.mapUserRolesIDToAdministratorRole(jwtPayload.rbac_roles || [])));
+      store.dispatch(updateUserHasLogged(true));
     }catch(error){
       getToasts().add({
         color: 'danger',
