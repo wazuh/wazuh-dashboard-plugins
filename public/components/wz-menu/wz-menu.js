@@ -34,6 +34,7 @@ import store from '../../redux/store';
 import Management from './wz-menu-management';
 import MenuSettings from './wz-menu-settings';
 import MenuSecurity from './wz-menu-security';
+import MenuTools from './wz-menu-tools';
 import Overview from './wz-menu-overview';
 import { getAngularModule, getHttp, getToasts } from '../../kibana-services';
 import { GenericRequest } from '../../react-services/generic-request';
@@ -49,7 +50,7 @@ const sections = {
   'agents-preview': 'agents-preview',
   'agents': 'agents-preview',
   'settings': 'settings',
-  'wazuh-dev': 'wazuh-dev',
+  'tools': 'tools',
   'health-check': 'health-check',
   'security': 'security'
 };
@@ -207,12 +208,12 @@ class WzMenu extends Component {
     this.isLoading = false;
   }
 
-  changePattern = event => {
+  changePattern = (event) => {
     try {
       if (!AppState.getPatternSelector()) return;
       PatternHandler.changePattern(event.target.value);
       this.setState({ currentSelectedPattern: event.target.value });
-      if (this.state.currentMenuTab !== 'wazuh-dev') {
+      if (this.state.currentMenuTab !== 'tools') {
         this.router.reload();
       }
       this.switchMenuOpened();
@@ -343,6 +344,20 @@ class WzMenu extends Component {
     this.setState({ currentMenuTab: item });
   }
 
+  toolsPopoverToggle() {
+    if (!this.state.isToolsPopoverOpen) {
+      this.setState((state) => {
+        return {
+          isToolsPopoverOpen: true,
+          currentMenuTab: 'tools',
+          isOverviewPopoverOpen: false,
+          isManagementPopoverOpen: false,
+          isSettingsPopoverOpen: false,
+        };
+      });
+    }
+  }
+
   settingsPopoverToggle() {
     if (!this.state.isSettingsPopoverOpen) {
       this.setState(() => {
@@ -352,6 +367,7 @@ class WzMenu extends Component {
           isOverviewPopoverOpen: false,
           isManagementPopoverOpen: false,
           isSecurityPopoverOpen: false,
+          isToolsPopoverOpen: false,
         };
       });
     }
@@ -366,6 +382,7 @@ class WzMenu extends Component {
           isOverviewPopoverOpen: false,
           isManagementPopoverOpen: false,
           isSettingsPopoverOpen: false,
+          isToolsPopoverOpen: false,
         };
       });
     }
@@ -380,6 +397,7 @@ class WzMenu extends Component {
           isOverviewPopoverOpen: false,
           isSettingsPopoverOpen: false,
           isSecurityPopoverOpen: false,
+          isToolsPopoverOpen: false,
         };
       });
     }
@@ -394,9 +412,15 @@ class WzMenu extends Component {
           isManagementPopoverOpen: false,
           isSettingsPopoverOpen: false,
           isSecurityPopoverOpen: false,
+          isToolsPopoverOpen: false,
         };
       });
     }
+  }
+
+  onClickToolsButton() {
+    this.setMenuItem('tools');
+    this.toolsPopoverToggle();
   }
 
   onClickSettingsButton() {
@@ -426,14 +450,22 @@ class WzMenu extends Component {
   }
 
   closeAllPopover() {
-    this.setState({ isOverviewPopoverOpen: false, isManagementPopoverOpen: false, isSettingsPopoverOpen: false, })
+    this.setState({
+      isOverviewPopoverOpen: false,
+      isManagementPopoverOpen: false,
+      isSettingsPopoverOpen: false,
+      isToolsPopoverOpen: false,
+    });
   }
 
   isAnyPopoverOpen() {
-    return this.state.isOverviewPopoverOpen ||
+    return (
+      this.state.isOverviewPopoverOpen ||
       this.state.isManagementPopoverOpen ||
       this.state.isSettingsPopoverOpen ||
-      this.state.isSecurityPopoverOpen;
+      this.state.isSecurityPopoverOpen ||
+      this.state.isToolsPopoverOpen
+    );
   }
 
   switchMenuOpened = () => {
@@ -442,6 +474,8 @@ class WzMenu extends Component {
       this.managementPopoverToggle();
     } else if (this.state.currentMenuTab === 'overview') {
       this.overviewPopoverToggle();
+    } else if (this.state.currentMenuTab === 'tools') {
+      this.toolsPopoverToggle();
     } else if (this.state.currentMenuTab === 'settings') {
       this.settingsPopoverToggle();
     } else if (this.state.currentMenuTab === 'security') {
@@ -599,6 +633,24 @@ class WzMenu extends Component {
               <EuiIcon type="console" color="primary" size="m" />
               <span className="wz-menu-button-title ">Dev Tools</span>
             </EuiButtonEmpty>
+
+            <EuiButtonEmpty
+              className={
+                'wz-menu-button ' +
+                (this.state.currentMenuTab === "tools" && !this.isAnyPopoverOpen() || (this.state.isToolsPopoverOpen)
+                  ? 'wz-menu-active'
+                  : '')}
+              color="text"
+              onClick={this.onClickToolsButton.bind(this)}
+            >
+              <EuiIcon type="console" color="primary" size="m" />
+              <span className="wz-menu-button-title ">Tools</span>
+              <span className="flex"></span>
+              {this.state.isToolsPopoverOpen && (
+                <EuiIcon color="subdued" type="arrowRight" />
+              )}
+            </EuiButtonEmpty>
+
             <EuiSpacer size='xl'></EuiSpacer>
             <EuiButtonEmpty
               className={
@@ -672,6 +724,13 @@ class WzMenu extends Component {
               currentMenuTab={this.state.currentMenuTab}
               closePopover={() => this.setState({ menuOpened: false })}
             ></MenuSecurity>
+          )}
+
+          { this.state.isToolsPopoverOpen && (
+            <MenuTools
+              currentMenuTab={this.state.currentMenuTab}
+              closePopover={() => this.setState({ menuOpened: false })}
+            ></MenuTools>
           )}
 
           {/*this.state.hover === 'overview' */this.state.isOverviewPopoverOpen && currentAgent.id && (

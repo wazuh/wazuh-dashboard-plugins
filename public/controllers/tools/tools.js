@@ -22,12 +22,13 @@ export class ToolsController {
    * @param {*} errorHandler
    */
   constructor($scope, $window, $location, errorHandler) {
+    debugger;
     this.$scope = $scope;
     this.$window = $window;
     this.$location = $location;
     this.errorHandler = errorHandler;
 
-    this.tab = 'devTools';
+    this.tab = $location.$$search.tab;
     this.load = true;
     this.tabNames = TabNames;
   }
@@ -37,19 +38,19 @@ export class ToolsController {
    */
   async $onInit() {
     try {
-      const breadcrumb = [{ text: '' }, { text: 'Dev Tools' }];
-      store.dispatch(updateGlobalBreadcrumb(breadcrumb));
-      this.switchTab('devTools'); 
-      /*
       const location = this.$location.search();
       if (location && location.tab) {
         this.tab = location.tab;
       }
       // Set component props
-       this.setComponentProps();
-     */
-      this.load = false;
-    } catch (error) { }
+      this.setComponentProps();
+
+      this.load = false
+
+      this.switchTab(this.tab);
+      const breadcrumb = [{ text: '' }, { text: this.tab === 'devTools' ? 'Dev Console' : 'Logtest' }];
+      store.dispatch(updateGlobalBreadcrumb(breadcrumb));
+    } catch (error) {}
   }
 
   /**
@@ -58,14 +59,14 @@ export class ToolsController {
   setComponentProps() {
     let tabs = [
       { id: 'devTools', name: 'Dev Console' },
-      { id: 'logtest', name: 'Logtest' }
+      { id: 'logtest', name: 'Logtest' },
     ];
     this.toolsTabsProps = {
-      clickAction: tab => {
+      clickAction: (tab) => {
         this.switchTab(tab, true);
       },
       selectedTab: this.tab || 'devTools',
-      tabs
+      tabs,
     };
   }
 
