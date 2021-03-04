@@ -1,12 +1,14 @@
 # Change Log
 
 All notable changes to the Wazuh app project will be documented in this file.
+
 ## Wazuh v4.1.1 - Kibana 7.10.0 , 7.10.2 - Revision 4103
 
 ### Added
 
 - Refactor of some prompts [#3015](https://github.com/wazuh/wazuh-kibana-app/pull/3015)
 - Add `run_as` setting to example host configuration in Add new API view [#3021](https://github.com/wazuh/wazuh-kibana-app/pull/3021)
+- Add a message to restart cluster or manager after import a file in Rules, Decoders or CDB Lists [#3051](https://github.com/wazuh/wazuh-kibana-app/pull/3051)
 
 ### Fixed
 
