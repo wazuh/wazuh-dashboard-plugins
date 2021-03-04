@@ -30,7 +30,7 @@ export class WazuhElasticCtrl {
   wzSampleAlertsIndexPrefix: string
   manageHosts: ManageHosts
   constructor() {
-    this.wzSampleAlertsIndexPrefix  = this.getSampleAlertPrefix();
+    this.wzSampleAlertsIndexPrefix = this.getSampleAlertPrefix();
     this.manageHosts = new ManageHosts();
   }
 
@@ -38,7 +38,7 @@ export class WazuhElasticCtrl {
    * This returns the index according the category
    * @param {string} category
    */
-  buildSampleIndexByCategory (category: string): string {
+  buildSampleIndexByCategory(category: string): string {
     return `${this.wzSampleAlertsIndexPrefix}sample-${category}`;
   }
 
@@ -47,7 +47,7 @@ export class WazuhElasticCtrl {
    */
   getSampleAlertPrefix(): string {
     const config = getConfiguration();
-    return  config['alerts.sample.prefix'] || WAZUH_SAMPLE_ALERT_PREFIX;
+    return config['alerts.sample.prefix'] || WAZUH_SAMPLE_ALERT_PREFIX;
   }
 
   /**
@@ -57,7 +57,7 @@ export class WazuhElasticCtrl {
    * @param {Object} response
    * @returns {Object} template or ErrorResponse
    */
-  async getTemplate(context: RequestHandlerContext, request: KibanaRequest<{pattern: string}>, response: KibanaResponseFactory) {
+  async getTemplate(context: RequestHandlerContext, request: KibanaRequest<{ pattern: string }>, response: KibanaResponseFactory) {
     try {
       const data = await context.core.elasticsearch.client.asInternalUser.cat.templates();
 
@@ -101,8 +101,7 @@ export class WazuhElasticCtrl {
       });
       log(
         'wazuh-elastic:getTemplate',
-        `Template is valid: ${
-        isIncluded && Array.isArray(isIncluded) && isIncluded.length
+        `Template is valid: ${isIncluded && Array.isArray(isIncluded) && isIncluded.length
           ? 'yes'
           : 'no'
         }`,
@@ -110,19 +109,19 @@ export class WazuhElasticCtrl {
       );
       return isIncluded && Array.isArray(isIncluded) && isIncluded.length
         ? response.ok({
-            body: {
-              statusCode: 200,
-              status: true,
-              data: `Template found for ${request.params.pattern}`
-            }
-          })
+          body: {
+            statusCode: 200,
+            status: true,
+            data: `Template found for ${request.params.pattern}`
+          }
+        })
         : response.ok({
-            body: {
-              statusCode: 200,
-              status: false,
-              data: `No template found for ${request.params.pattern}`
-            }
-          });
+          body: {
+            statusCode: 200,
+            status: false,
+            data: `No template found for ${request.params.pattern}`
+          }
+        });
     } catch (error) {
       log('wazuh-elastic:getTemplate', error.message || error);
       return ErrorResponse(
@@ -142,9 +141,9 @@ export class WazuhElasticCtrl {
    * @param {Object} response
    * @returns {Object} status obj or ErrorResponse
    */
-  async checkPattern(context: RequestHandlerContext, request: KibanaRequest<{pattern: string}>, response: KibanaResponseFactory) {
+  async checkPattern(context: RequestHandlerContext, request: KibanaRequest<{ pattern: string }>, response: KibanaResponseFactory) {
     try {
-      const data = await context.core.savedObjects.client.find<SavedObjectsFindResponse<SavedObject>>({type: 'index-pattern'});
+      const data = await context.core.savedObjects.client.find<SavedObjectsFindResponse<SavedObject>>({ type: 'index-pattern' });
 
       const existsIndexPattern = data.saved_objects.find(
         item => item.attributes.title === request.params.pattern
@@ -185,8 +184,9 @@ export class WazuhElasticCtrl {
    * @param {Object} response
    * @returns {Array<Object>} fields or ErrorResponse
    */
-  async getFieldTop(context: RequestHandlerContext, request: KibanaRequest<{mode: string, cluster: string, field: string, pattern: string}>, response: KibanaResponseFactory) {
+  async getFieldTop(context: RequestHandlerContext, request: KibanaRequest<{ mode: string, cluster: string, field: string, pattern: string }>, response: KibanaResponseFactory) {
     try {
+    
       // Top field payload
       let payload = {
         size: 1,
@@ -199,14 +199,14 @@ export class WazuhElasticCtrl {
               }
             },
             filter: [
-              { range: { timestamp: {} } },
-              
               {
-                "terms": {
-                  "agent.id": [request.params.agentsList.split(",")]
+                range: { timestamp: {} }
+              },
+              {
+                terms: {
+                  'agent.id': request.query.agentsList.split(',')
                 }
               }
-
             ]
           }
         },
@@ -224,8 +224,8 @@ export class WazuhElasticCtrl {
       // Set up time interval, default to Last 24h
       const timeGTE = 'now-1d';
       const timeLT = 'now';
-      payload.query.bool.filter.range['timestamp']['gte'] = timeGTE;
-      payload.query.bool.filter.range['timestamp']['lt'] = timeLT;
+      payload.query.bool.filter[0].range['timestamp']['gte'] = timeGTE;
+      payload.query.bool.filter[0].range['timestamp']['lt'] = timeLT;
 
       // Set up match for default cluster name
       payload.query.bool.must.push(
@@ -234,25 +234,26 @@ export class WazuhElasticCtrl {
           : { match: { 'manager.name': request.params.cluster } }
       );
 
-      payload.aggs['2'].terms.field = request.params.field;      
+      payload.aggs['2'].terms.field = request.params.field;
+
 
       const data = await context.core.elasticsearch.client.asCurrentUser.search({
         size: 1,
         index: request.params.pattern,
         body: payload
       });
-      
+
       return data.body.hits.total.value === 0 ||
         typeof data.body.aggregations['2'].buckets[0] === 'undefined'
-          ? response.ok({
-              body: { statusCode: 200, data: '' }
-            })
-          : response.ok({
-              body: {
-                statusCode: 200,
-                data: data.body.aggregations['2'].buckets[0].key
-              }
-            });
+        ? response.ok({
+          body: { statusCode: 200, data: '' }
+        })
+        : response.ok({
+          body: {
+            statusCode: 200,
+            data: data.body.aggregations['2'].buckets[0].key
+          }
+        });
     } catch (error) {
       log('wazuh-elastic:getFieldTop', error.message || error);
       return ErrorResponse(error.message || error, 4004, 500, response);
@@ -321,7 +322,7 @@ export class WazuhElasticCtrl {
    * @param {Object} reply
    * @returns {String}
    */
-  async getCurrentPlatform(context: RequestHandlerContext, request: KibanaRequest<{user: string}>, response: KibanaResponseFactory) {
+  async getCurrentPlatform(context: RequestHandlerContext, request: KibanaRequest<{ user: string }>, response: KibanaResponseFactory) {
     try {
       return response.ok({
         body: {
@@ -509,7 +510,7 @@ export class WazuhElasticCtrl {
    * @param {Object} response
    * @returns {Object} vis obj or ErrorResponse
    */
-  async createVis(context: RequestHandlerContext, request: KibanaRequest<{pattern: string, tab: string }>, response: KibanaResponseFactory) {
+  async createVis(context: RequestHandlerContext, request: KibanaRequest<{ pattern: string, tab: string }>, response: KibanaResponseFactory) {
     try {
       if (
         (!request.params.tab.includes('overview-') &&
@@ -552,7 +553,7 @@ export class WazuhElasticCtrl {
    * @param {Object} response
    * @returns {Object} vis obj or ErrorResponse
    */
-  async createClusterVis(context: RequestHandlerContext, request: KibanaRequest<{pattern: string, tab: string }, unknown, any>, response: KibanaResponseFactory) {
+  async createClusterVis(context: RequestHandlerContext, request: KibanaRequest<{ pattern: string, tab: string }, unknown, any>, response: KibanaResponseFactory) {
     try {
       if (
         !request.params.pattern ||
@@ -574,7 +575,7 @@ export class WazuhElasticCtrl {
       const masterNode = request.body.nodes.master_node;
 
       const patternName = request.params.pattern;
-      
+
       const raw = await this.buildClusterVisualizationsRaw(
         file,
         request.params.pattern,
@@ -623,7 +624,7 @@ export class WazuhElasticCtrl {
    * @param {*} response
    * {alerts: [...]} or ErrorResponse
    */
-  async haveSampleAlertsOfCategory(context: RequestHandlerContext, request: KibanaRequest<{category: string }>, response: KibanaResponseFactory) {
+  async haveSampleAlertsOfCategory(context: RequestHandlerContext, request: KibanaRequest<{ category: string }>, response: KibanaResponseFactory) {
     try {
       const sampleAlertsIndex = this.buildSampleIndexByCategory(request.params.category);
       // Check if wazuh sample alerts index exists
@@ -658,29 +659,29 @@ export class WazuhElasticCtrl {
    * @param {*} response
    * {index: string, alerts: [...], count: number} or ErrorResponse
    */
-  async createSampleAlerts(context: RequestHandlerContext, request: KibanaRequest<{category: string }>, response: KibanaResponseFactory) {
+  async createSampleAlerts(context: RequestHandlerContext, request: KibanaRequest<{ category: string }>, response: KibanaResponseFactory) {
     const sampleAlertsIndex = this.buildSampleIndexByCategory(request.params.category);
 
     try {
       // Check if user has administrator role in token
       const token = getCookieValueByName(request.headers.cookie, 'wz-token');
-      if(!token){
+      if (!token) {
         return ErrorResponse('No token provided', 401, 401, response);
       };
       const decodedToken = jwtDecode(token);
-      if(!decodedToken){
+      if (!decodedToken) {
         return ErrorResponse('No permissions in token', 401, 401, response);
       };
-      if(!decodedToken.rbac_roles || !decodedToken.rbac_roles.includes(WAZUH_ROLE_ADMINISTRATOR_ID)){
+      if (!decodedToken.rbac_roles || !decodedToken.rbac_roles.includes(WAZUH_ROLE_ADMINISTRATOR_ID)) {
         return ErrorResponse('No administrator role', 401, 401, response);
       };
       // Check the provided token is valid
       const apiHostID = getCookieValueByName(request.headers.cookie, 'wz-api');
-      if( !apiHostID ){
+      if (!apiHostID) {
         return ErrorResponse('No API id provided', 401, 401, response);
       };
-      const responseTokenIsWorking = await context.wazuh.api.client.asCurrentUser.request('GET', `//`, {}, {apiHostID});
-      if(responseTokenIsWorking.status !== 200){
+      const responseTokenIsWorking = await context.wazuh.api.client.asCurrentUser.request('GET', `//`, {}, { apiHostID });
+      if (responseTokenIsWorking.status !== 200) {
         return ErrorResponse('Token is not valid', 500, 500, response);
       };
 
@@ -750,7 +751,7 @@ export class WazuhElasticCtrl {
    * @param {*} response
    * {result: "deleted", index: string} or ErrorResponse
    */
-  async deleteSampleAlerts(context: RequestHandlerContext, request: KibanaRequest<{category: string }>, response: KibanaResponseFactory) {
+  async deleteSampleAlerts(context: RequestHandlerContext, request: KibanaRequest<{ category: string }>, response: KibanaResponseFactory) {
     // Delete Wazuh sample alert index
 
     const sampleAlertsIndex = this.buildSampleIndexByCategory(request.params.category);
@@ -758,23 +759,23 @@ export class WazuhElasticCtrl {
     try {
       // Check if user has administrator role in token
       const token = getCookieValueByName(request.headers.cookie, 'wz-token');
-      if(!token){
+      if (!token) {
         return ErrorResponse('No token provided', 401, 401, response);
       };
       const decodedToken = jwtDecode(token);
-      if(!decodedToken){
+      if (!decodedToken) {
         return ErrorResponse('No permissions in token', 401, 401, response);
       };
-      if(!decodedToken.rbac_roles || !decodedToken.rbac_roles.includes(WAZUH_ROLE_ADMINISTRATOR_ID)){
+      if (!decodedToken.rbac_roles || !decodedToken.rbac_roles.includes(WAZUH_ROLE_ADMINISTRATOR_ID)) {
         return ErrorResponse('No administrator role', 401, 401, response);
       };
       // Check the provided token is valid
       const apiHostID = getCookieValueByName(request.headers.cookie, 'wz-api');
-      if( !apiHostID ){
+      if (!apiHostID) {
         return ErrorResponse('No API id provided', 401, 401, response);
       };
-      const responseTokenIsWorking = await context.wazuh.api.client.asCurrentUser.request('GET', `//`, {}, {apiHostID});
-      if(responseTokenIsWorking.status !== 200){
+      const responseTokenIsWorking = await context.wazuh.api.client.asCurrentUser.request('GET', `//`, {}, { apiHostID });
+      if (responseTokenIsWorking.status !== 200) {
         return ErrorResponse('Token is not valid', 500, 500, response);
       };
 
@@ -819,7 +820,7 @@ export class WazuhElasticCtrl {
 
   // Check if there are indices for Statistics
   async existStatisticsIndices(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
-    try{
+    try {
       const config = getConfiguration();
       const statisticsPattern = `${config['cron.prefix'] || 'wazuh'}-${config['cron.statistics.index.name'] || 'statistics'}*`; //TODO: replace by default as constants instead hardcoded ('wazuh' and 'statistics')
       const existIndex = await context.core.elasticsearch.client.asCurrentUser.indices.exists({
@@ -829,16 +830,16 @@ export class WazuhElasticCtrl {
       return response.ok({
         body: existIndex.body
       });
-    }catch(error){
+    } catch (error) {
       log('wazuh-elastic:existsStatisticsIndices', error.message || error);
       return ErrorResponse(error.message || error, 1000, 500, response);
     }
   }
 
-  async usingCredentials(context){
+  async usingCredentials(context) {
     try {
       const data = await context.core.elasticsearch.client.asInternalUser.cluster.getSettings(
-        {include_defaults: true}
+        { include_defaults: true }
       );
       return (((((data || {}).body || {}).defaults || {}).xpack || {}).security || {}).user !== null;
     } catch (error) {

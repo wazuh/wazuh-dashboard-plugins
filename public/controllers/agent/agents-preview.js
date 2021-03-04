@@ -193,6 +193,7 @@ export class AgentsPreviewController {
   async getMostActive() {
     //get active agents
     const agentsList = await WzRequest.apiReq('GET', `/agents`, {});
+
     var agentIds = [];
     agentsList.data.data.affected_items.map(function(agent){
       agentIds.push(agent.id)
@@ -200,20 +201,23 @@ export class AgentsPreviewController {
     try {
       const data = await this.genericReq.request(
         'GET',
-        `/elastic/top/${this.firstUrlParam}/${this.secondUrlParam}/agent.name/${this.pattern}/${agentIds.toString()}`
+        `/elastic/top/${this.firstUrlParam}/${this.secondUrlParam}/agent.name/${this.pattern}?agentsList=${agentIds.toString()}`
       );
+
       this.mostActiveAgent.name = data.data.data;
       const info = await this.genericReq.request(
         'GET',
-        `/elastic/top/${this.firstUrlParam}/${this.secondUrlParam}/agent.id/${this.pattern}/${agentIds.toString()}`,
+        `/elastic/top/${this.firstUrlParam}/${this.secondUrlParam}/agent.id/${this.pattern}?agentsList=${agentIds.toString()}`,
       );
+
       if (info.data.data === '' && this.mostActiveAgent.name !== '') {
         this.mostActiveAgent.id = '000';
       } else {
         this.mostActiveAgent.id = info.data.data;
       }
       return this.mostActiveAgent;
-    } catch (error) { }
+    } catch (error) { 
+    }
   }
 
   /**
