@@ -9,141 +9,214 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component, Fragment } from 'react';
+import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
 import { DynamicHeight } from '../../../utils/dynamic-height';
 import {
-  EuiTitle,
+  EuiBadge,
   EuiButton,
-  EuiButtonIcon,
-  EuiButtonEmpty,
-  EuiTextArea,
+  EuiCodeBlock,
+  EuiFieldText,
   EuiFlexGroup,
   EuiFlexItem,
-  EuiCodeBlock,
-  EuiSpacer,
+  EuiPage,
   EuiPanel,
-  EuiFlyoutFooter
+  EuiSelect,
+  EuiSpacer,
+  EuiTextArea,
+  EuiTitle,
 } from '@elastic/eui';
+import { WzRequest } from '../../../react-services';
+import { TimeService } from '../../../react-services/time-service';
 
-export class Logtest extends Component {
-  constructor(props) {
-    super(props);
+export const Logtest = (props) => {
+  const [value, setValue] = useState(
+    'Oct 15 21:07:56 linux-agent sshd[29205]: Invalid user blimey from 18.18.18.18 port 48928'
+  );
+  const [testing, setTesting] = useState(false);
+  const [testResult, setTestResult] = useState(false);
+  const [logTypeSelect, setLogTypeSelect] = useState('log');
+  const [logLocation, setlogLocation] = useState('logtest');
 
-    this.state = {
-      value: '',
-      testing: false
-    };
-  }
-
-  onChange = e => {
-    this.setState({
-      value: e.target.value
-    });
+  const onChange = (e) => {
+    setValue(e.target.value);
   };
 
-  test = async () => {
-    this.setState({
-      testing: true
-    });
-    const result = await this.props.clickAction(this.state.value);
-    this.setState({
-      testing: false,
-      testResult: result
-    });
-  };
-
-  dynamicHeight = () =>
-    DynamicHeight.dynamicHeightStatic(
-      '.euiCodeBlock',
-      this.props.showClose ? 70 : 100
+  const formatResult = (result) => {
+    debugger;
+    return (
+      `**Phase 1: Completed pre-decoding. \n    ` +
+      `full event:  ${result.full_log}  \n    ` +
+      `timestamp: ${(result.predecoder || '').timestamp || '-'} \n    ` +
+      `hostname: ${(result.predecoder || '').hostname || '-'} \n    ` +
+      `program_name: ${(result.predecoder || '').program_name || '-'} \n\n` +
+      `**Phase 2: Completed decoding. \n    ` +
+      `name: ${(result.decoder || '').name || '-'} \n   ` +
+      `parent: ${(result.decoder || '').parent || '-'} \n    ` +
+      `srcip: ${(result.data || '').srcip || '-'}  \n    ` +
+      `srcport: ${(result.data || '').srcport || '-'} \n    ` +
+      `srcuser: ${(result.data || '').srcuser || '-'} \n\n` +
+      `**Phase 3: Completed filtering (rules). \n    ` +
+      `id: ${(result.rule || '').id || '-'} \n    ` +
+      `level: ${(result.rule || '').level || '-'} \n    ` +
+      `description: ${(result.rule || '').description || '-'} \n    ` +
+      `groups: ${JSON.stringify((result.rule || '').groups || '-')} \n    ` +
+      `firedtimes: ${(result.rule || '').firedtimes || '-'} \n    ` +
+      `gdpr: ${JSON.stringify((result.rule || '').gdpr || '-')} \n    ` +
+      `gpg13: ${JSON.stringify((result.rule || '').gpg13 || '-')} \n    ` +
+      `hipaa: ${JSON.stringify((result.rule || '').hipaa || '-')} \n    ` +
+      `mail: ${result.rule || ''.mail || '-'} \n    ` +
+      `mitre.id: ${JSON.stringify((result.rule || '').mitre || ''.id || '-')} \n    ` +
+      `mitre.technique: ${JSON.stringify(
+        (result.rule || '').mitre || ''.technique || '-'
+      )} \n    ` +
+      `nist_800_53: ${JSON.stringify((result.rule || '').nist_800_53 || '-')} \n    ` +
+      `pci_dss: ${JSON.stringify((result.rule || '').pci_dss || '-')} \n    ` +
+      `tsc: ${JSON.stringify((result.rule || '').tsc || '-')} \n` +
+      `**Alert to be generated.`
     );
+  };
 
-  render() {
-    const codeBlock = {
-      zIndex: '100'
+  const test = async () => {
+    setTesting(true);
+    const body = {
+      log_format: 'syslog',
+      location: 'logtest',
+      event: value,
     };
 
-    const logtest = (
+    const result = await WzRequest.apiReq('PUT', '/logtest', body);
+
+    setTesting(false);
+    setTestResult(formatResult(result.data.data.output));
+    // setTestResult(JSON.stringify(result.data.data.output, null, '\t')); // plan b ?
+  };
+
+  const buildControls = () => {
+    const logsTypeOptions = [{ value: 'log', text: 'Log' }];
+
+    const onChangeLogTypeSelect = () => {
+      return (e) => setLogTypeSelect(e.target.value);
+    };
+    const onChangeLogLocation = () => {
+      return (e) => setlogLocation(e.target.value);
+    };
+
+    return (
+      <Fragment>
+        <EuiFlexItem grow={false}>
+          <EuiSelect
+            id="logsTypeOptions"
+            options={logsTypeOptions}
+            value={logTypeSelect}
+            onChange={onChangeLogTypeSelect}
+            aria-label="Logs type"
+          />
+        </EuiFlexItem>
+        <EuiFlexItem grow={false}>
+          <EuiFieldText
+            placeholder="Log location"
+            value={logLocation}
+            onChange={onChangeLogLocation}
+            aria-label="Log location"
+          />
+        </EuiFlexItem>
+
+        <EuiFlexItem grow={false}>
+          <EuiButton
+            isLoading={testing}
+            isDisabled={testing || !value}
+            iconType="play"
+            fill
+            onClick={() => {
+              test();
+            }}
+          >
+            Test
+          </EuiButton>
+        </EuiFlexItem>
+      </Fragment>
+    );
+  };
+
+  const buildLogtest = () => {
+    return (
       <Fragment>
         <EuiTextArea
           placeholder="Type one log per line..."
           fullWidth={true}
           aria-label=""
-          rows={this.props.showClose ? 10 : 4}
-          onChange={this.onChange}
+          rows={props.showClose ? 10 : 4}
+          onChange={onChange}
         />
-        <EuiSpacer size="s" />
+        <EuiSpacer size="m" />
         <EuiCodeBlock
-          style={codeBlock}
           language="json"
           fontSize="s"
-          overflowHeight={1}
-          isCopyable={this.state.testResult ? true : false}
+          style={
+            (!props.onFlyout && { height: 'calc(100vh - 400px)' }) || {
+              height: 'calc(100vh - 355px)',
+            }
+          }
+          isCopyable={!!testResult}
         >
-          {this.state.testResult || 'The test result will appear here.'}
+          {testResult || 'The test result will appear here.'}
         </EuiCodeBlock>
       </Fragment>
     );
+  };
 
-    this.dynamicHeight();
-    return (
-      <Fragment>
-        {this.props.showClose && (
-          <EuiFlexGroup gutterSize="xs">
-            <EuiTitle size="s">
-              <h2>Test your logs</h2>
-            </EuiTitle>
-            <EuiFlexItem />
-            <EuiFlexItem grow={false}>
-              <EuiButtonIcon
-                color={'text'}
-                onClick={() => this.props.close()}
-                iconType="cross"
-                aria-label="Close"
-              />
-            </EuiFlexItem>
-          </EuiFlexGroup>
-        )}
-        <EuiSpacer size="m" />
-        {(!this.props.showClose && (
-          <EuiPanel paddingSize="l">{logtest}</EuiPanel>
-        )) || <div>{logtest}</div>}
-        <EuiFlyoutFooter>
-          <EuiFlexGroup justifyContent="spaceBetween">
-            <EuiFlexItem grow={false}>
-              {this.props.showClose && (
-                <EuiButtonEmpty
-                  iconType="cross"
-                  onClick={() => this.props.close()}
-                  flush="left"
-                >
-                  Close
-                </EuiButtonEmpty>
-              )}
-            </EuiFlexItem>
-            <EuiFlexItem grow={false}>
-              <EuiButton
-                isLoading={this.state.testing}
-                isDisabled={this.state.testing || !this.state.value}
-                iconType="play"
-                fill
-                onClick={() => {
-                  this.test();
-                }}
-              >
-                Test
-              </EuiButton>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-        </EuiFlyoutFooter>
-      </Fragment>
-    );
-  }
-}
+  const dynamicHeight = () =>
+    DynamicHeight.dynamicHeightStatic('.euiCodeBlock', props.showClose ? 70 : 100);
+
+  dynamicHeight();
+  return (
+    <Fragment>
+      {(!props.onFlyout && (
+        <EuiPage>
+          <EuiPanel paddingSize="l">
+            <EuiFlexGroup>
+              <EuiFlexItem>
+                <EuiFlexGroup gutterSize="m">
+                  <Fragment>
+                    <EuiFlexItem grow={false}>
+                      <EuiTitle size="m">
+                        <h2>Test your logs</h2>
+                      </EuiTitle>
+                    </EuiFlexItem>
+                    <EuiFlexItem grow={false} style={{ padding: '10px 0' }}>
+                      <EuiBadge color="#BD271E" iconType="clock">
+                        Test session started at {TimeService.offset(new Date())}
+                      </EuiBadge>
+                    </EuiFlexItem>
+                  </Fragment>
+                  <EuiFlexItem />
+                  {buildControls()}
+                </EuiFlexGroup>
+                <EuiSpacer size="s" />
+                {buildLogtest()}
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiPanel>
+        </EuiPage>
+      )) || (
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            <EuiFlexGroup gutterSize="m">
+              <EuiFlexItem />
+              {buildControls}
+            </EuiFlexGroup>
+            <EuiSpacer size="s" />
+            {buildLogtest}
+          </EuiFlexItem>
+        </EuiFlexGroup>
+      )}
+    </Fragment>
+  );
+};
 
 Logtest.propTypes = {
-  clickAction: PropTypes.func,
   close: PropTypes.func,
-  showClose: PropTypes.bool
+  showClose: PropTypes.bool,
+  onFlyout: PropTypes.bool,
 };
