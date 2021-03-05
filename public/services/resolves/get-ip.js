@@ -42,6 +42,8 @@ export function getIp(
 
   const buildSavedObjectsClient = async () => {
     try {
+      const checkPattern = new WazuhConfig().getConfig()['checks.pattern'];
+
       const savedObjectsClient = getSavedObjects().client;
 
       const savedObjectsData = await savedObjectsClient.find({
@@ -58,7 +60,8 @@ export function getIp(
         // There's cookie for the pattern
         currentPattern = AppState.getCurrentPattern();
       } else {
-        if (!$location.path().includes('/health-check')) {
+        //If it didn't find an index pattern and it's configured to health-check it, redirects to health-check
+        if (checkPattern && !$location.path().includes('/health-check')) {
           $location.search('tab', null);
           $location.path('/health-check');
         }
