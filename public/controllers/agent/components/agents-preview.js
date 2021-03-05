@@ -97,6 +97,7 @@ export const AgentsPreview = compose(
     try {
       this.setState({ loading: true });
       const summaryData = await WzRequest.apiReq('GET', '/agents/summary/status', {});
+
       this.summary = summaryData.data.data;
       this.totalAgents = this.summary.total;
       const model = [
@@ -121,7 +122,7 @@ export const AgentsPreview = compose(
         this.setState({ platforms: platformsModel, loading: false });
     } catch (error) {}
   }
-  
+
   removeFilters(){
     this._isMount && this.setState({agentTableFilters: []})
   }
@@ -165,7 +166,7 @@ export const AgentsPreview = compose(
             </EuiFlexItem>
             {this.totalAgents > 0 && (
               <EuiFlexItem >
-                <EuiPanel betaBadgeLabel="Details">  
+                <EuiPanel betaBadgeLabel="Details">
                   <EuiFlexGroup>
                     <EuiFlexItem>
                       {this.summary && (
@@ -237,7 +238,7 @@ export const AgentsPreview = compose(
                               <EuiToolTip
                                 position='top'
                                 content='View agent details'>
-                                  <a onClick={() => 
+                                  <a onClick={() =>
                                   this.props.tableProps.showAgent(
                                     this.lastAgent
                                   )}>{this.lastAgent.name}</a>
@@ -272,7 +273,7 @@ export const AgentsPreview = compose(
                               style={{ whiteSpace: 'nowrap' }}
                               titleSize="s"
                               description="Most active agent"
-                              titleColor="primary"                              
+                              titleColor="primary"
                             />
                           </EuiFlexItem>
                         )}
@@ -286,10 +287,12 @@ export const AgentsPreview = compose(
             )}
             {this.state.showAgentsEvolutionVisualization && (
               <EuiFlexItem grow={false} className="agents-evolution-visualization" style={{ display: !this.state.loading ? 'block' : 'none', height: !this.state.loading ? '182px' : 0}}>
+                {/* pannel */}
                 <EuiPanel paddingSize="none" betaBadgeLabel="Evolution" style={{ display: this.props.resultState === 'ready' ? 'block' : 'none'}}>
                   <EuiFlexGroup>
                     <EuiFlexItem>
                     <div style={{height: this.props.resultState === 'ready' ? '180px' : 0}}>
+                      {/* graph */}
                       <WzReduxProvider>
                         <KibanaVis
                           visID={'Wazuh-App-Overview-General-Agents-status'}
@@ -299,14 +302,15 @@ export const AgentsPreview = compose(
                     </div>
                     {this.props.resultState === 'loading' &&
                       (
-                      <div style={{ display: 'block', textAlign: "center", padding: 30}}>                        
+                      <div style={{ display: 'block', textAlign: "center", padding: 30}}>
                         <EuiLoadingChart size="xl" />
                       </div>
                     ) }
-                      
+
                     </EuiFlexItem>
-                  </EuiFlexGroup>                  
+                  </EuiFlexGroup>
                 </EuiPanel>
+
                 <EuiPanel paddingSize="none" betaBadgeLabel="Evolution" style={{ height: 180,  display: this.props.resultState === 'none' ? 'block' : 'none'}}>
                   <EuiEmptyPrompt
                     className="wz-padding-21"
@@ -319,7 +323,7 @@ export const AgentsPreview = compose(
                   />
                 </EuiPanel>
               </EuiFlexItem>
-              
+
             )}
           </EuiFlexGroup>
           <EuiSpacer size="m" />

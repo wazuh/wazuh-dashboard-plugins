@@ -119,6 +119,7 @@ class KibanaVis extends Component {
     try {
       if (this.visHandler) {
         const data = await this.visHandler.handler.execution.getData();
+
         if (
           data &&
           data.value &&
@@ -197,6 +198,8 @@ class KibanaVis extends Component {
   };
 
   myRender = async (raw) => {
+    console.log("---------------------------------");
+    console.log(raw);
     const timefilter = getDataPlugin().query.timefilter.timefilter;
     try {
       const discoverList = this.discoverPendingUpdates.getList();
@@ -205,6 +208,7 @@ class KibanaVis extends Component {
       const timeFilterSeconds = this.calculateTimeFilterSeconds(
         timefilter.getTime()
       );
+
       const timeRange =
         isAgentStatus && timeFilterSeconds < 900
           ? { from: "now-15m", to: "now", mode: "quick" }
@@ -258,6 +262,7 @@ class KibanaVis extends Component {
         }
         if (this.state.visRefreshingIndex) this.setState({ visRefreshingIndex: false });
       }
+
     } catch (error) {
       if (
         ((error || {}).message || "").includes(
