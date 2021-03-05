@@ -30,9 +30,7 @@ import { WzRequest } from '../../../react-services';
 import { TimeService } from '../../../react-services/time-service';
 
 export const Logtest = (props) => {
-  const [value, setValue] = useState(
-    ''
-  );
+  const [value, setValue] = useState('');
   const [testing, setTesting] = useState(false);
   const [testResult, setTestResult] = useState(false);
   const [logTypeSelect, setLogTypeSelect] = useState('log');
