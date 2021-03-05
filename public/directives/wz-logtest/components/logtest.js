@@ -31,7 +31,7 @@ import { TimeService } from '../../../react-services/time-service';
 
 export const Logtest = (props) => {
   const [value, setValue] = useState(
-    'Oct 15 21:07:56 linux-agent sshd[29205]: Invalid user blimey from 18.18.18.18 port 48928'
+    ''
   );
   const [testing, setTesting] = useState(false);
   const [testResult, setTestResult] = useState(false);
