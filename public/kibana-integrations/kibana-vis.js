@@ -198,7 +198,6 @@ class KibanaVis extends Component {
   };
 
   myRender = async (raw) => {
-    console.log("---------------------------------");
     console.log(raw);
     const timefilter = getDataPlugin().query.timefilter.timefilter;
     try {
@@ -207,14 +206,23 @@ class KibanaVis extends Component {
         this.visID === "Wazuh-App-Overview-General-Agents-status";
       const timeFilterSeconds = this.calculateTimeFilterSeconds(
         timefilter.getTime()
-      );
+      );        
 
       const timeRange =
         isAgentStatus && timeFilterSeconds < 900
           ? { from: "now-15m", to: "now", mode: "quick" }
           : timefilter.getTime();
+
+      console.log("-----------------");
+      console.log(discoverList);
+
+      // const filters = isAgentStatus ? [] : discoverList[1] || [];
       const filters = isAgentStatus ? [] : discoverList[1] || [];
       const query = !isAgentStatus ? discoverList[0] : {};
+
+
+      console.log("filters");
+      console.log(filters);
 
       const visInput = {
         timeRange,
@@ -244,6 +252,7 @@ class KibanaVis extends Component {
             vis,
             visInput
           );
+
           await this.visHandler.render($(`[id="${this.visID}"]`)[0]);
           this.visHandler.handler.data$.subscribe(this.renderComplete());
           this.visHandlers.addItem(this.visHandler);

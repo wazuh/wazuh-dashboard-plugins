@@ -323,7 +323,6 @@ export const AgentsPreview = compose(
                   />
                 </EuiPanel>
               </EuiFlexItem>
-
             )}
           </EuiFlexGroup>
           <EuiSpacer size="m" />
