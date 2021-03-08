@@ -149,6 +149,17 @@ export const updateSelectedSettingsSection = selected_settings_section => {
 };
 
 /**
+ * Updates selectedToolsSection in the appState store
+ * @param selected_tools_section
+ */
+export const updateSelectedToolsSection = selected_tools_section => {
+  return {
+    type: 'UPDATE_SELECTED_TOOLS_SECTION',
+    selected_tools_section
+  };
+};
+
+/**
 * Updates toastNotification in the appState store
 * @param toastNotification
 */

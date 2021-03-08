@@ -50,7 +50,7 @@ const sections = {
   'agents-preview': 'agents-preview',
   'agents': 'agents-preview',
   'settings': 'settings',
-  'tools': 'tools',
+  'wazuh-dev': 'wazuh-dev',
   'health-check': 'health-check',
   'security': 'security'
 };
@@ -213,7 +213,7 @@ class WzMenu extends Component {
       if (!AppState.getPatternSelector()) return;
       PatternHandler.changePattern(event.target.value);
       this.setState({ currentSelectedPattern: event.target.value });
-      if (this.state.currentMenuTab !== 'tools') {
+      if (this.state.currentMenuTab !== 'wazuh-dev') {
         this.router.reload();
       }
       this.switchMenuOpened();
@@ -346,12 +346,13 @@ class WzMenu extends Component {
 
   toolsPopoverToggle() {
     if (!this.state.isToolsPopoverOpen) {
-      this.setState((state) => {
+      this.setState(() => {
         return {
           isToolsPopoverOpen: true,
-          currentMenuTab: 'tools',
+          currentMenuTab: 'wazuh-dev',
           isOverviewPopoverOpen: false,
           isManagementPopoverOpen: false,
+          isSecurityPopoverOpen: false,
           isSettingsPopoverOpen: false,
         };
       });
@@ -419,7 +420,7 @@ class WzMenu extends Component {
   }
 
   onClickToolsButton() {
-    this.setMenuItem('tools');
+    this.setMenuItem('wazuh-dev');
     this.toolsPopoverToggle();
   }
 
@@ -474,7 +475,7 @@ class WzMenu extends Component {
       this.managementPopoverToggle();
     } else if (this.state.currentMenuTab === 'overview') {
       this.overviewPopoverToggle();
-    } else if (this.state.currentMenuTab === 'tools') {
+    } else if (this.state.currentMenuTab === 'wazuh-dev') {
       this.toolsPopoverToggle();
     } else if (this.state.currentMenuTab === 'settings') {
       this.settingsPopoverToggle();
@@ -620,24 +621,7 @@ class WzMenu extends Component {
             <EuiButtonEmpty
               className={
                 'wz-menu-button ' +
-                (this.state.currentMenuTab === "wazuh-dev" && !this.isAnyPopoverOpen()
-                  ? 'wz-menu-active'
-                  : '')}
-              color="text"
-              href="#/wazuh-dev"
-              onClick={() => {
-                this.setMenuItem('wazuh-dev');
-                this.setState({ menuOpened: false });
-              }}
-            >
-              <EuiIcon type="console" color="primary" size="m" />
-              <span className="wz-menu-button-title ">Dev Tools</span>
-            </EuiButtonEmpty>
-
-            <EuiButtonEmpty
-              className={
-                'wz-menu-button ' +
-                (this.state.currentMenuTab === "tools" && !this.isAnyPopoverOpen() || (this.state.isToolsPopoverOpen)
+                (this.state.currentMenuTab === "wazuh-dev" && !this.isAnyPopoverOpen() || (this.state.isToolsPopoverOpen)
                   ? 'wz-menu-active'
                   : '')}
               color="text"

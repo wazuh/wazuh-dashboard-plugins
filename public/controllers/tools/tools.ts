@@ -12,6 +12,7 @@
 import { TabNames } from '../../utils/tab-names';
 import store from '../../redux/store';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
+import { updateSelectedToolsSection } from '../../redux/actions/appStateActions';
 
 export class ToolsController {
   /**
@@ -45,10 +46,13 @@ export class ToolsController {
       // Set component props
       this.setComponentProps();
 
-      this.load = false
+      this.load = false;
 
       this.switchTab(this.tab);
-      const breadcrumb = [{ text: '' }, { text: this.tab === 'devTools' ? 'Dev Console' : 'Logtest' }];
+      const breadcrumb = [
+        { text: '' },
+        { text: this.tab === 'devTools' ? 'Dev Console' : 'Logtest' },
+      ];
       store.dispatch(updateGlobalBreadcrumb(breadcrumb));
     } catch (error) {}
   }
@@ -75,6 +79,7 @@ export class ToolsController {
    * @param {Object} tab
    */
   switchTab(tab) {
+    store.dispatch(updateSelectedToolsSection(tab));
     this.tab = tab;
     this.$location.search('tab', this.tab);
   }

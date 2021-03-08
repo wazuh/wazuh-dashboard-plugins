@@ -19,7 +19,6 @@ import { DynamicHeight } from '../../utils/dynamic-height';
 import { AppState } from '../../react-services/app-state';
 import { GenericRequest } from '../../react-services/generic-request';
 import store from '../../redux/store';
-import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
 import { WzRequest } from '../../react-services/wz-request';
 import { ErrorHandler } from '../../react-services/error-handler';
 import { getUiSettings } from '../../kibana-services';

@@ -4,10 +4,10 @@
     <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" ></react-component>
   </div>
 
-  <div ng-if="!tctrl.load && tctrl.toolsTabsProps">
+  <div ng-cloak ng-if="!tctrl.load && tctrl.toolsTabsProps">
     <react-component name="Tabs" props="tctrl.toolsTabsProps" ></react-component>
   </div>
-  <div ng-if="tctrl.tab === 'devTools' && !tctrl.load">
+  <div ng-cloak ng-if="tctrl.tab === 'devTools' && !tctrl.load">
     <div
       ng-cloak
       flex="auto"
@@ -61,7 +61,7 @@
       </md-content>
     </div>
   </div>
-  <div ng-if="tctrl.tab === 'logtest' && !tctrl.load">
+  <div ng-cloak ng-if="tctrl.tab === 'logtest' && !tctrl.load">
     <react-component name="Logtest" initialTextValue="Welcome!"></react-component>
   </div>
 </div>

@@ -11,10 +11,12 @@
  */
 import { ToolsController } from './tools';
 import { getAngularModule } from '../../kibana-services';
-import { Logtest } from "../../directives/wz-logtest/components/logtest";
+import { Logtest } from '../../directives/wz-logtest/components/logtest';
+import { DevToolsController } from '../dev-tools/dev-tools';
 
 const app = getAngularModule();
 
 app
+  .controller('devToolsController', DevToolsController)
   .controller('toolsController', ToolsController)
-  .value('Logtest', Logtest)
+  .value('Logtest', Logtest);
