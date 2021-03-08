@@ -131,6 +131,11 @@
     <react-component name="MainSyscollector" props="{agent: agent}"></react-component>
   </div>
   <!-- end agents syscollector-->
+  <!-- agents stats -->
+  <div ng-if="tab === 'stats'" class="euiPageBody wz-module-body-main">
+    <react-component name="MainAgentStats" props="{agent: agent}"></react-component>
+  </div>
+  <!-- end agents stats-->
   <react-component
     class="wz-module-body-main"
     ng-if="tab === 'configuration' && agent"
