@@ -41,7 +41,6 @@ export const Logtest = (props) => {
   };
 
   const formatResult = (result) => {
-    debugger;
     return (
       `**Phase 1: Completed pre-decoding. \n    ` +
       `full event:  ${result.full_log}  \n    ` +

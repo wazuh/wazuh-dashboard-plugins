@@ -23,7 +23,6 @@ export class ToolsController {
    * @param {*} errorHandler
    */
   constructor($scope, $window, $location, errorHandler) {
-    debugger;
     this.$scope = $scope;
     this.$window = $window;
     this.$location = $location;
