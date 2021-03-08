@@ -21,10 +21,11 @@ import {
   EuiText
 } from '@elastic/eui';
 
-import { withGlobalBreadcrumb, withReduxProvider } from '../../common/hocs';
+import { withGlobalBreadcrumb, withReduxProvider, withGuard } from '../../common/hocs';
 import { compose } from 'redux';
 import { WzRequest, TimeService } from '../../../react-services';
 import { AgentStatTable } from './table';
+import { PromptNoActiveAgentWithoutSelect } from '../prompts';
 
 const tableColumns = [
   {
@@ -92,7 +93,8 @@ export const MainAgentStats = compose(
     {
       text: 'Stats'
     },
-  ])
+  ]),
+  withGuard(({agent}) => agent.status !== 'active', PromptNoActiveAgentWithoutSelect),
 )(AgentStats);
 
 function AgentStats({agent}){

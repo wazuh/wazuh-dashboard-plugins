@@ -27,12 +27,6 @@ import { getToasts } from '../../../kibana-services';
 import moment from 'moment';
 
 export function AgentStatTable({columns, title, start, end, loading, items, exportCSVFilename}){
-  let duration = '';
-  if(start && end){
-    const startDate = moment(start);
-    const endDate = moment(end);
-    duration = moment.utc(endDate.diff(startDate)).format("HH:mm:ss");
-  };
   return (
     <EuiPanel>
       <EuiFlexGroup justifyContent='spaceBetween'>
@@ -40,14 +34,7 @@ export function AgentStatTable({columns, title, start, end, loading, items, expo
           <EuiText>{title}</EuiText>
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
-          <EuiFlexGroup>
-            <EuiFlexItem grow={false}>
-              <EuiText><EuiIcon type='calendar'/> Start: {loading ? <EuiLoadingSpinner size="s" /> : (start || '-') }</EuiText>
-            </EuiFlexItem>
-            <EuiFlexItem grow={false}>
-              <EuiText><EuiIcon type='clock'/> Duration: {loading ? <EuiLoadingSpinner size="s" /> : (duration || '-') }</EuiText>
-            </EuiFlexItem>
-          </EuiFlexGroup>
+          <EuiText><EuiIcon type='calendar'/> Start: {loading ? <EuiLoadingSpinner size="s" /> : (start || '-') } - End: {loading ? <EuiLoadingSpinner size="s" /> : (end || '-') }</EuiText>
         </EuiFlexItem>
       </EuiFlexGroup>
       <EuiHorizontalRule margin="xs"/>
@@ -63,6 +50,7 @@ export function AgentStatTable({columns, title, start, end, loading, items, expo
           <EuiButtonEmpty
             onClick={() => downloadCsv(columns, items, exportCSVFilename)}
             iconType="importAction"
+            isDisabled={loading}
           >
             Download CSV
           </EuiButtonEmpty>
@@ -71,6 +59,7 @@ export function AgentStatTable({columns, title, start, end, loading, items, expo
     </EuiPanel>
   )
 }
+
 
 function downloadCsv(columns: any[], data: any[], filename: string) {
   try {
