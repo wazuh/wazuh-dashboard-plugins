@@ -1,6 +1,12 @@
 # Change Log
 
 All notable changes to the Wazuh app project will be documented in this file.
+## Wazuh v4.2.0 - Kibana 7.10.0 , 7.10.2 - Revision 4201
+
+### Fixed
+
+- Fixing bug changing master node configuration [#3062](https://github.com/wazuh/wazuh-kibana-app/pull/3062)
+
 ## Wazuh v4.1.2 - Kibana 7.10.0 , 7.10.2 - Revision 4103
 
 ### Added
