@@ -15,6 +15,7 @@ import $ from "jquery";
 import dateMath from "@elastic/datemath";
 import { DiscoverPendingUpdates } from "../factories/discover-pending-updates";
 import { connect } from "react-redux";
+import { WzRequest } from '../react-services/wz-request';
 import { LoadedVisualizations } from "../factories/loaded-visualizations";
 import { RawVisualizations } from "../factories/raw-visualizations";
 import { VisHandlers } from "../factories/vis-handlers";
@@ -244,8 +245,108 @@ class KibanaVis extends Component {
           //   }            
           // ]          
 
-      const filters = isAgentStatus ? [] : discoverList[1] || [];
+        // const filters = [
+        //   {
+        //     "meta": {
+        //       "removable": false,
+        //       "index": "wazuh-alerts-*",
+        //       "negate": false,
+        //       "disabled": false,
+        //       "alias": null,
+        //       "type": "phrase",
+        //       "key": "cluster.name",
+        //       "params": {
+        //         "query": "wazuh"
+        //       }
+        //     },
+        //     "query": {
+        //       "match": {
+        //         "cluster.name": {
+        //           "query": "wazuh",
+        //           "type": "phrase"
+        //         }
+        //       }
+        //     },
+        //     "$state": {
+        //       "store": "appState",
+        //       "isImplicit": true
+        //     }
+        //   },
+        //   {
+        //     "meta": {
+        //       "removable": false,
+        //       "index": "wazuh-alerts-*",
+        //       "negate": false,
+        //       "disabled": false,
+        //       "alias": null,
+        //       "type": "phrase",
+        //       "key": "agent.id",
+        //       "params": {
+        //         "query": "013"
+        //       }
+        //     },
+        //     "query": {
+        //       "match": {
+        //         "agent.id": {
+        //           "query": "013",
+        //           "type": "phrase"
+        //         }
+        //       }
+        //     },
+        //     "$state": {
+        //       "store": "appState",
+        //       "isImplicit": true
+        //     }
+        //   }
+        // ]
+
+      var filters = isAgentStatus ? [] : discoverList[1] || [];
       const query = !isAgentStatus ? discoverList[0] : {};
+
+
+      //add filters for agents 
+      // console.log("filters");
+      // console.log(filters);
+      // console.log(JSON.stringify(filters, null, 2));
+
+      const agentsFiltered = await this.getAllowedAgentsByUser()
+
+      //add allowed agents for user      
+      // !filters[0] ? {
+      //   "meta": {
+      //     "removable": false,
+      //     "index": "wazuh-alerts-*",
+      //     "negate": false,
+      //     "disabled": false,
+      //     "alias": null,
+      //     "type": "phrase",
+      //     "key": "cluster.name",
+      //     "params": {
+      //       "query": "wazuh"
+      //     }
+      //   },
+      //   "query": {
+      //     "match": {
+      //       "cluster.name": {
+      //         "query": "wazuh",
+      //         "type": "phrase"
+      //       }
+      //     }
+      //   },
+      //   "$state": {
+      //     "store": "appState",
+      //     "isImplicit": true
+      //   }
+      // }
+      // : null
+
+      filters[1] =; agentsFiltered
+      
+      // console.log(JSON.stringify(filters[1].query.bool.should, null, 2));
+      // console.log(filters);
+      console.log(JSON.stringify(filters, null, 2));
+      // console.log(JSON.stringify(filters[0], null, 2));
+      // console.log(JSON.stringify(filters[1], null, 2));
 
       const visInput = {
         timeRange,
@@ -325,6 +426,48 @@ class KibanaVis extends Component {
 
     return;
   };
+
+
+  getAllowedAgentsByUser = async() => {
+    const agentsList = await WzRequest.apiReq('GET', `/agents`, {});
+
+    var agentIds = [];
+    agentsList.data.data.affected_items.map(function(agent){
+      agentIds.push(agent.id)
+    })
+    
+    // agentIds.push('014')
+
+    const agentsAllowed = agentIds.map(id =>{
+      return {
+        "match_phrase": {
+          "agent.id": id
+        }
+      }
+    });
+
+    return {
+      "meta": {
+        "index": "wazuh-alerts-*",
+        "type": "phrases",
+        "key": "agent.id",
+        "value": agentIds.join(),
+        "params": agentIds,
+        "alias": null,
+        "negate": true,
+        "disabled": false
+      },
+      "query": {
+        "bool": {
+          "should": agentsAllowed,
+          "minimum_should_match": 1
+        }
+      },
+      "$state": {
+        "store": "appState"
+      }
+    }
+  }
 
   destroyAll = () => {
     try {
