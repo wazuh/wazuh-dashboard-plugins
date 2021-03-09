@@ -15,7 +15,6 @@ export async function getFilterValues(field, value, agentId, filters={}, format=
 
   const filter = {
     ...filters,
-    distinct: true,
     select: field,
     limit: 30,
   };

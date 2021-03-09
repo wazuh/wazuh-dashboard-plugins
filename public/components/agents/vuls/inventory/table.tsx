@@ -25,7 +25,7 @@ import { filtersToObject, IFilter } from '../../../wz-search-bar';
 
 export class InventoryTable extends Component {
   state: {
-    syscheck: []
+    items: []
     error?: string
     pageIndex: number
     pageSize: number
@@ -52,11 +52,11 @@ export class InventoryTable extends Component {
     super(props);
 
     this.state = {
-      syscheck: props.items,
+      items: props.items,
       pageIndex: 0,
       pageSize: 15,
       totalItems: 0,
-      sortField: 'file',
+      sortField: 'name',
       sortDirection: 'asc',
       isLoading: false,
       isFlyoutVisible: false,
@@ -68,13 +68,7 @@ export class InventoryTable extends Component {
   }
 
   async componentDidMount() {
-    const regex = new RegExp('file=' + '[^&]*');
-    const match = window.location.href.match(regex);
     this.setState({totalItems: this.props.totalItems});
-    if (match && match[0]) {
-      const file = match[0].split('=')[1];
-      this.showFlyout(decodeURIComponent(file), true);
-    }
   }
 
   closeFlyout() {
@@ -83,21 +77,18 @@ export class InventoryTable extends Component {
 
   async showFlyout(file, item, redirect = false) {
     
-    let fileData = false;
+    let itemData = false;
     if (!redirect) {
-      fileData = this.state.syscheck.filter(item => {
+      itemData = this.state.items.filter(item => {
         return item.file === file;
       })
     } else {
-      const response = await WzRequest.apiReq('GET', `/syscheck/${this.props.agent.id}`, {
-        params: { 
-          'file': file 
-        }
+      const response = await WzRequest.apiReq('GET', `/vulnerability/${this.props.agent.id}`, {
+        params: {}
       });
-      fileData = ((response.data || {}).data || {}).affected_items || [];
+      itemData = ((response.data || {}).data || {}).affected_items || [];
     }
-    if (!redirect)
-      window.location.href = window.location.href += `&file=${file}`;
+    
     //if a flyout is opened, we close it and open a new one, so the components are correctly updated on start.
     this.setState({ isFlyoutVisible: false }, () => this.setState({ isFlyoutVisible: true, currentItem: file, syscheckItem: item }));
   }
@@ -105,24 +96,24 @@ export class InventoryTable extends Component {
   async componentDidUpdate(prevProps) {
     const { filters } = this.props;
     if (JSON.stringify(filters) !== JSON.stringify(prevProps.filters)) {
-      this.setState({ pageIndex: 0, isLoading: true }, this.getSyscheck);
+      this.setState({ pageIndex: 0, isLoading: true }, this.getItems);
     }
   }
 
-  async getSyscheck() {
+  async getItems() {
     const agentID = this.props.agent.id;
     try {
-      const syscheck = await WzRequest.apiReq(
+      const items = await WzRequest.apiReq(
       'GET',
-      `/syscheck/${agentID}`,
+      `/vulnerability/${agentID}`,
       { params: this.buildFilter()},
       );
 
-      this.props.onTotalItemsChange((((syscheck || {}).data || {}).data || {}).total_affected_items);
+      this.props.onTotalItemsChange((((items || {}).data || {}).data || {}).total_affected_items);
       
       this.setState({
-        syscheck: (((syscheck || {}).data || {}).data || {}).affected_items || {},
-        totalItems: (((syscheck || {}).data || {}).data || {}).total_affected_items - 1,
+        items: (((items || {}).data || {}).data || {}).affected_items || {},
+        totalItems: (((items || {}).data || {}).data || {}).total_affected_items - 1,
         isLoading: false,
         error: undefined
       });
@@ -133,11 +124,9 @@ export class InventoryTable extends Component {
 
   buildSortFilter() {
     const { sortField, sortDirection } = this.state;
-
-    const field = (sortField === 'os_name') ? '' : sortField;
     const direction = (sortDirection === 'asc') ? '+' : '-';
 
-    return direction + field;
+    return direction + sortField;
   }
 
   buildFilter() {
@@ -147,8 +136,7 @@ export class InventoryTable extends Component {
       ...filters,
       offset: pageIndex * pageSize,
       limit: pageSize,
-      sort: this.buildSortFilter(),
-      type: 'file'
+      sort: this.buildSortFilter()
     };
     return filter;
   }
@@ -163,7 +151,7 @@ export class InventoryTable extends Component {
       sortDirection,
       isLoading: true,
     },
-      () => this.getSyscheck()
+      () => this.getItems()
     );
   };
 
@@ -209,7 +197,7 @@ export class InventoryTable extends Component {
       };
     };
 
-    const { syscheck, pageIndex, pageSize, totalItems, sortField, sortDirection, isLoading, error } = this.state;
+    const { items, pageIndex, pageSize, totalItems, sortField, sortDirection, isLoading, error } = this.state;
     const columns = this.columns();
     const pagination = {
       pageIndex: pageIndex,
@@ -228,14 +216,14 @@ export class InventoryTable extends Component {
       <EuiFlexGroup>
         <EuiFlexItem>
           <EuiBasicTable
-            items={syscheck}
+            items={items}
             error={error}
             columns={columns}
             pagination={pagination}
             onChange={this.onTableChange}
             rowProps={getRowProps}
             sorting={sorting}
-            itemId="vulnerabilitiy"
+            itemId="vulnerability"
             isExpandable={true}
             loading={isLoading}
           />

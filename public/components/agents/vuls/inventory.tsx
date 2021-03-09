@@ -38,8 +38,6 @@ import { ICustomBadges } from '../../wz-search-bar/components';
 import { filtersToObject } from '../../wz-search-bar';
 import { WzEmptyPromptNoPermissions } from "../../common/permissions/prompt";
 
-// import mockup from './vuls-mockup';
-
 export class Inventory extends Component {
   _isMount = false;
   state: {
@@ -48,7 +46,6 @@ export class Inventory extends Component {
     isLoading: Boolean;
     items: [];
     customBadges: ICustomBadges[];
-    // isConfigured: Boolean;
   };
 
   props: any;
@@ -60,8 +57,7 @@ export class Inventory extends Component {
       items: [],
       totalItems: 0,
       isLoading: true,
-      customBadges: []/*,
-      isConfigured: false*/
+      customBadges: []
     }
     this.onFiltersChange.bind(this);
   }
@@ -82,41 +78,11 @@ export class Inventory extends Component {
   }
 
   async loadAgent() {
-    // const agentPlatform  = ((this.props.agent || {}).os || {}).platform;
     const {totalItems, items} = await this.getItemNumber();
-    // const isConfigured = await this.isConfigured();
     if (this._isMount){
-      this.setState({ totalItems, items, isLoading: false/*, isConfigured*/ });
+      this.setState({ totalItems, items, isLoading: false });
     }
   }
-
-  // Do not load the localStorage filters when changing tabs
-  // componentDidUpdate(prevProps, prevState) {
-  //   const { selectedTabId } = this.state;
-  //   if (selectedTabId !== prevState.selectedTabId) {
-  //     const filters = this.getStoreFilters(this.props);
-  //     this.setState({ filters });
-  //   }
-  // }
-
-  // tabs() {
-  //   let auxTabs = [
-  //     {
-  //       id: 'vulnerabilities',
-  //       name: `Vulnerabilities ${this.state.isLoading === true ? '' : '(' + this.state.totalItemsFile + ')'}`,
-  //       disabled: false,
-  //     },
-  //   ];
-  //   // const platform = (this.props.agent.os || {}).platform || "other";
-  //   //  platform  === 'windows' ? auxTabs.push(
-  //   //   {
-  //   //     id: 'registry',
-  //   //     name: `Windows Registry ${this.state.isLoading === true ? '' : '(' + this.state.totalItemsRegistry + ')'}`,
-  //   //     disabled: false,
-  //   //   },
-  //   // ) : null;
-  //   return (auxTabs);
-  // }
 
   getStoreFilters(props) {
     const { section, selectView, agent } = props;
@@ -138,10 +104,6 @@ export class Inventory extends Component {
     this.setState({ totalItemsFile: totalItems });
   }
 
-  // onSelectedTabChanged = id => {
-  //   this.setState({ selectedTabId: id });
-  // }
-
   buildFilter() {
     const filters = filtersToObject(this.state.filters);
     const filter = {
@@ -157,7 +119,6 @@ export class Inventory extends Component {
       let response = await WzRequest.apiReq('GET', `/vulnerability/${agentID}`, {
         params: this.buildFilter(),
       });
-      // response = mockup;
       return {
         totalItems: ((response.data || {}).data || {}).total_affected_items || 0,
         items: ((response.data || {}).data || {}).affected_items || [],
@@ -169,7 +130,6 @@ export class Inventory extends Component {
   }
 
   renderTabs() {
-    // const tabs = this.tabs();
     const { isLoading } = this.state;
     
       return (
@@ -205,7 +165,6 @@ export class Inventory extends Component {
       await exportCsv(
         '/vulnerability/' + this.props.agent.id,
         [{},
-          // { name: 'type', value: 'vulnerabilities' },
           ...formatedFilters
         ],
         `vuls-vulnerabilities`
@@ -222,7 +181,6 @@ export class Inventory extends Component {
         <FilterBar
           filters={filters}
           onFiltersChange={this.onFiltersChange}
-          // selectView={selectedTabId}
           agent={this.props.agent} />
           <InventoryTable
             {...this.props}
@@ -235,24 +193,6 @@ export class Inventory extends Component {
     )
   }
 
-  // noConfigured() {
-  //   return (
-  //     <EuiEmptyPrompt
-  //       iconType="filebeatApp"
-  //       title={<h2>Vulnerabilities is not configured for this agent</h2>}
-  //       body={<Fragment>
-  //         <EuiHorizontalRule margin='s' />
-  //         <EuiLink
-  //           href='https://documentation.wazuh.com/current/user-manual/capabilities/file-integrity/index.html'
-  //           target="_blank"
-  //           style={{ textAlign: "center" }}
-  //         >
-  //           https://documentation.wazuh.com/current/user-manual/capabilities/file-integrity/index.html
-  //         </EuiLink>
-  //         <EuiHorizontalRule margin='s' />
-  //       </Fragment>}
-  //     />);
-  // }
 
   loadingInventory() {
     return <EuiPage>
@@ -264,35 +204,21 @@ export class Inventory extends Component {
     </EuiPage>;
   }
 
-  // async isConfigured() {
-  //   try {
-  //     const response = await WzRequest.apiReq(
-  //       'GET',
-  //       `/agents/${this.props.agent.id}/config/syscheck/syscheck`,
-  //       {}
-  //     );
-
-  //     return (((response.data || {}).data).syscheck || {}).disabled === 'no';
-  //   } catch (error) {
-  //     return false;
-  //   }
-  // }
 
   render() {
-    const { isLoading/*, isConfigured*/ } = this.state;
+    const { isLoading } = this.state;
     if (isLoading) {
       return this.loadingInventory()
     }
     const table = this.renderTable();
     const tabs = this.renderTabs();
 
-    return /*isConfigured ? (*/ <EuiPage>
+    return <EuiPage>
         <EuiPanel>
           {tabs}
           <EuiSpacer size={(((this.props.agent || {}).os || {}).platform || false) === 'windows' ? 's' : 'm'} />
           {table}
         </EuiPanel>
       </EuiPage>
-      //) : this.noConfigured()
   }
 }

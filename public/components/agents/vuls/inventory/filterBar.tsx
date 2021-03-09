@@ -17,13 +17,9 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
 } from '@elastic/eui';
-import moment from 'moment';
 
 export class FilterBar extends Component {
-  formatDate = (date: String) => {
-    return moment(date).format('YYYY-MM-DD');
-  }
-  // TODO: Change the type
+  
   suggestions: IWzSuggestItem[] = [
       {type: 'q', label: 'name', description:"Filter by package ID", operators:['=','!=', '~'], values: async (value) => getFilterValues('name', value, this.props.agent.id)},
       {type: 'q', label: 'cve', description:"Filter by CVE ID", operators:['=','!=', '~'], values: async (value) => getFilterValues('cve', value, this.props.agent.id)},
@@ -33,7 +29,6 @@ export class FilterBar extends Component {
 
   props!:{
     onFiltersChange(filters:IFilter[]): void
-    selectView: 'files' | 'registry'
     agent: {id: string, agentPlatform: string}
     onChangeCustomBadges?(customBadges: ICustomBadges[]): void 
     customBadges?: ICustomBadges[]
@@ -41,7 +36,7 @@ export class FilterBar extends Component {
   }
 
   render() {
-    const { onFiltersChange, selectView, filters} = this.props;
+    const { onFiltersChange, filters} = this.props;
     return (
       <EuiFlexGroup>
         <EuiFlexItem>
@@ -49,7 +44,7 @@ export class FilterBar extends Component {
             noDeleteFiltersOnUpdateSuggests
             filters={filters}
             onFiltersChange={onFiltersChange}
-            suggestions={this.suggestions[selectView]}
+            suggestions={this.suggestions}
             placeholder='Filter or search vulnerabilities' />
         </EuiFlexItem>
       </EuiFlexGroup>
