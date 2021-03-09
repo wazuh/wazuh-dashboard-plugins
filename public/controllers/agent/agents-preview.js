@@ -21,6 +21,7 @@ import { ShareAgent } from '../../factories/share-agent';
 import { TimeService } from '../../react-services/time-service';
 import { ErrorHandler } from '../../react-services/error-handler';
 import { getDataPlugin } from '../../kibana-services';
+import { getAuthorizedAgents } from '../../react-services/wz-agents';
 
 export class AgentsPreviewController {
   /**
@@ -192,12 +193,7 @@ export class AgentsPreviewController {
 
   async getMostActive() {
     //get active agents
-    const agentsList = await WzRequest.apiReq('GET', `/agents`, {});
-
-    var agentIds = [];
-    agentsList.data.data.affected_items.map(function(agent){
-      agentIds.push(agent.id)
-    })
+    const agentIds = await getAuthorizedAgents();
     try {
       const data = await this.genericReq.request(
         'GET',

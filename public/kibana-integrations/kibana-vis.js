@@ -34,6 +34,8 @@ import {
 } from "@elastic/eui";
 import { getAngularModule, getToasts, getVisualizationsPlugin, getSavedObjects, getDataPlugin, getChrome, getOverlays } from '../kibana-services';
 import { KnownFields } from "../utils/known-fields";
+import { getAuthorizedAgents } from "../react-services/wz-agents";
+import { AppState } from "../react-services/app-state";
 
 class KibanaVis extends Component {
   _isMounted = false;
@@ -199,6 +201,37 @@ class KibanaVis extends Component {
     }
   };
 
+  getUserAgentsFilters = async () => {
+    const agentsIds = await getAuthorizedAgents();
+    return  {
+      meta: {
+        index: AppState.getCurrentPattern(),
+        type: 'phrases',
+        key: 'agent.id',
+        value: agentsIds.toString(),
+        params: agentsIds,
+        alias: null,
+        negate: false,
+        disabled: false
+      },
+      query: {
+        bool: {
+          should: agentsIds.map(id => {
+            return {
+              match_phrase: {
+                'agent.id': id
+              }
+            };
+          }),
+          minimum_should_match: 1
+        }
+      },
+      $state: {
+        store: 'appState'
+      }
+    }
+  }
+
   myRender = async (raw) => {
     const timefilter = getDataPlugin().query.timefilter.timefilter;
     try {
@@ -214,140 +247,10 @@ class KibanaVis extends Component {
         isAgentStatus && timeFilterSeconds < 900
           ? { from: "now-15m", to: "now", mode: "quick" }
           : timefilter.getTime();
-
-
-          // console.log(JSON.stringify(discoverList[1], null, 2));
-          // const filters = [            
-          //   {
-          //     "meta": {
-          //       "removable": false,
-          //       "index": "wazuh-alerts-*",
-          //       "negate": false,
-          //       "disabled": false,
-          //       "alias": null,
-          //       "type": "phrase",
-          //       "key": "cluster.name",
-          //       "params": {
-          //         "query": "wazuh"
-          //       }
-          //     },
-          //     "query": {
-          //       'bool':{
-          //         'filter':[
-          //           {"match_phrase":{"cluster.name":"wazuh"}},
-          //           {"terms": { "agent.id": ['013','014'] } }
-          //         ]
-          //       }
-          //     },
-          //     "$state": {
-          //       "store": "appState",
-          //       "isImplicit": true
-          //     }
-          //   }            
-          // ]          
-
-        // const filters = [
-        //   {
-        //     "meta": {
-        //       "removable": false,
-        //       "index": "wazuh-alerts-*",
-        //       "negate": false,
-        //       "disabled": false,
-        //       "alias": null,
-        //       "type": "phrase",
-        //       "key": "cluster.name",
-        //       "params": {
-        //         "query": "wazuh"
-        //       }
-        //     },
-        //     "query": {
-        //       "match": {
-        //         "cluster.name": {
-        //           "query": "wazuh",
-        //           "type": "phrase"
-        //         }
-        //       }
-        //     },
-        //     "$state": {
-        //       "store": "appState",
-        //       "isImplicit": true
-        //     }
-        //   },
-        //   {
-        //     "meta": {
-        //       "removable": false,
-        //       "index": "wazuh-alerts-*",
-        //       "negate": false,
-        //       "disabled": false,
-        //       "alias": null,
-        //       "type": "phrase",
-        //       "key": "agent.id",
-        //       "params": {
-        //         "query": "013"
-        //       }
-        //     },
-        //     "query": {
-        //       "match": {
-        //         "agent.id": {
-        //           "query": "013",
-        //           "type": "phrase"
-        //         }
-        //       }
-        //     },
-        //     "$state": {
-        //       "store": "appState",
-        //       "isImplicit": true
-        //     }
-        //   }
-        // ]
-
-      var filters = isAgentStatus ? [] : discoverList[1] || [];
+      const filters = isAgentStatus ? [] : discoverList[1] || [];
       const query = !isAgentStatus ? discoverList[0] : {};
-
-
-      //add filters for agents 
-      // console.log("filters");
-      // console.log(filters);
-      // console.log(JSON.stringify(filters, null, 2));
-
-      const agentsFiltered = await this.getAllowedAgentsByUser()
-
-      //add allowed agents for user      
-      // !filters[0] ? {
-      //   "meta": {
-      //     "removable": false,
-      //     "index": "wazuh-alerts-*",
-      //     "negate": false,
-      //     "disabled": false,
-      //     "alias": null,
-      //     "type": "phrase",
-      //     "key": "cluster.name",
-      //     "params": {
-      //       "query": "wazuh"
-      //     }
-      //   },
-      //   "query": {
-      //     "match": {
-      //       "cluster.name": {
-      //         "query": "wazuh",
-      //         "type": "phrase"
-      //       }
-      //     }
-      //   },
-      //   "$state": {
-      //     "store": "appState",
-      //     "isImplicit": true
-      //   }
-      // }
-      // : null
-
-      filters[1] =; agentsFiltered
-      
-      // console.log(JSON.stringify(filters[1].query.bool.should, null, 2));
-      // console.log(filters);
-      console.log(JSON.stringify(filters, null, 2));
-      // console.log(JSON.stringify(filters[0], null, 2));
-      // console.log(JSON.stringify(filters[1], null, 2));
+      const agentsFilters = this.getUserAgentsFilters(filters);
+      filters.push(agentsFilters);
 
       const visInput = {
         timeRange,
@@ -432,48 +335,6 @@ class KibanaVis extends Component {
 
     return;
   };
-
-
-  getAllowedAgentsByUser = async() => {
-    const agentsList = await WzRequest.apiReq('GET', `/agents`, {});
-
-    var agentIds = [];
-    agentsList.data.data.affected_items.map(function(agent){
-      agentIds.push(agent.id)
-    })
-    
-    // agentIds.push('014')
-
-    const agentsAllowed = agentIds.map(id =>{
-      return {
-        "match_phrase": {
-          "agent.id": id
-        }
-      }
-    });
-
-    return {
-      "meta": {
-        "index": "wazuh-alerts-*",
-        "type": "phrases",
-        "key": "agent.id",
-        "value": agentIds.join(),
-        "params": agentIds,
-        "alias": null,
-        "negate": true,
-        "disabled": false
-      },
-      "query": {
-        "bool": {
-          "should": agentsAllowed,
-          "minimum_should_match": 1
-        }
-      },
-      "$state": {
-        "store": "appState"
-      }
-    }
-  }
 
   destroyAll = () => {
     try {
