@@ -31,7 +31,7 @@ export const MainVuls = compose(
       props.currentAgentData && props.currentAgentData.id ? props.currentAgentData : props.agent;
     return [
       { action: 'agent:read', resource: `agent:id:${agentData.id}` },
-      { action: 'syscheck:read', resource: `agent:id:${agentData.id}` },
+      { action: 'vulnerability:read', resource: `agent:id:${agentData.id}` },
     ];
   })
 )(function MainVuls({ currentAgentData, agent, ...rest }) {

@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Integrity monitoring components
+ * Wazuh app - Agent vulnerabilities components
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify

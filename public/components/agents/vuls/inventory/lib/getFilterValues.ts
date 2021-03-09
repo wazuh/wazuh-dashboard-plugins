@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Integrity monitoring components
+ * Wazuh app - Agent vulnerabilities components
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -22,6 +22,6 @@ export async function getFilterValues(field, value, agentId, filters={}, format=
   if (value) {
     filter['search'] = value;
   }
-  const result = await WzRequest.apiReq('GET', `/syscheck/${agentId}`, { params: filter });
+  const result = await WzRequest.apiReq('GET', `/vulnerability/${agentId}`, { params: filter });
   return (((result || {}).data || {}).data || {}).affected_items.map((item) => {return format(item[field])});
 }

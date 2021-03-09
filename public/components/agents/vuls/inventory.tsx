@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Integrity monitoring components
+ * Wazuh app - Agent vulnerabilities components
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -38,19 +38,17 @@ import { ICustomBadges } from '../../wz-search-bar/components';
 import { filtersToObject } from '../../wz-search-bar';
 import { WzEmptyPromptNoPermissions } from "../../common/permissions/prompt";
 
-import mockup from './vuls-mockup';
+// import mockup from './vuls-mockup';
 
 export class Inventory extends Component {
   _isMount = false;
   state: {
     filters: [];
-    // selectedTabId: 'files' | 'registry';
-    totalItemsFile: number;
-    totalItemsRegistry: number;
+    totalItems: number;
     isLoading: Boolean;
-    syscheck: [];
+    items: [];
     customBadges: ICustomBadges[];
-    isConfigured: Boolean;
+    // isConfigured: Boolean;
   };
 
   props: any;
@@ -59,13 +57,11 @@ export class Inventory extends Component {
     super(props);
     this.state = {
       filters: [],
-      syscheck: [],
-      // selectedTabId: 'files',
-      totalItemsFile: 0,
-      totalItemsRegistry: 0,
+      items: [],
+      totalItems: 0,
       isLoading: true,
-      customBadges: [],
-      isConfigured: false
+      customBadges: []/*,
+      isConfigured: false*/
     }
     this.onFiltersChange.bind(this);
   }
@@ -86,12 +82,11 @@ export class Inventory extends Component {
   }
 
   async loadAgent() {
-    const agentPlatform  = ((this.props.agent || {}).os || {}).platform;
-    const {totalItemsFile, syscheck} = await this.getItemNumber('file');
-    const totalItemsRegistry = agentPlatform === 'windows' ? await this.getItemNumber('registry') : 0;
-    const isConfigured = await this.isConfigured();
+    // const agentPlatform  = ((this.props.agent || {}).os || {}).platform;
+    const {totalItems, items} = await this.getItemNumber();
+    // const isConfigured = await this.isConfigured();
     if (this._isMount){
-      this.setState({ totalItemsFile, totalItemsRegistry, syscheck, isLoading: false, isConfigured });
+      this.setState({ totalItems, items, isLoading: false/*, isConfigured*/ });
     }
   }
 
@@ -159,17 +154,14 @@ export class Inventory extends Component {
   async getItemNumber() {
     try {
       const agentID = this.props.agent.id;
-      // const response = await WzRequest.apiReq('GET', `/syscheck/${agentID}`, {
-      //   params: this.buildFilter(),
-      // });
-      const response = mockup;
-      // if (type === 'file') {
-        return {
-          totalItemsFile: ((response.data || {}).data || {}).total_affected_items || 0,
-          syscheck: ((response.data || {}).data || {}).affected_items || [],
-        };
-      // }
-      // return ((response.data || {}).data || {}).total_affected_items || 0;
+      let response = await WzRequest.apiReq('GET', `/vulnerability/${agentID}`, {
+        params: this.buildFilter(),
+      });
+      // response = mockup;
+      return {
+        totalItems: ((response.data || {}).data || {}).total_affected_items || 0,
+        items: ((response.data || {}).data || {}).affected_items || [],
+      };
     } catch (error) {
       this.setState({ isLoading: false });
       this.showToast('danger', error, 3000);
@@ -211,9 +203,9 @@ export class Inventory extends Component {
       const formatedFilters = Object.keys(filtersObject).map(key => ({name: key, value: filtersObject[key]}));
       this.showToast('success', 'Your download should begin automatically...', 3000);
       await exportCsv(
-        '/syscheck/' + this.props.agent.id,
-        [
-          { name: 'type', value: 'vulnerabilities' },
+        '/vulnerability/' + this.props.agent.id,
+        [{},
+          // { name: 'type', value: 'vulnerabilities' },
           ...formatedFilters
         ],
         `vuls-vulnerabilities`
@@ -224,7 +216,7 @@ export class Inventory extends Component {
   }
 
   renderTable() {
-    const { filters, syscheck,  totalItemsFile } = this.state;
+    const { filters, items,  totalItems } = this.state;
     return (
       <div>
         <FilterBar
@@ -235,32 +227,32 @@ export class Inventory extends Component {
           <InventoryTable
             {...this.props}
             filters={filters}
-            items={syscheck}
-            totalItems={totalItemsFile}
+            items={items}
+            totalItems={totalItems}
             onFiltersChange={this.onFiltersChange}
             onTotalItemsChange={this.onTotalItemsChange}/>
       </div>
     )
   }
 
-  noConfigured() {
-    return (
-      <EuiEmptyPrompt
-        iconType="filebeatApp"
-        title={<h2>Vulnerabilities is not configured for this agent</h2>}
-        body={<Fragment>
-          <EuiHorizontalRule margin='s' />
-          <EuiLink
-            href='https://documentation.wazuh.com/current/user-manual/capabilities/file-integrity/index.html'
-            target="_blank"
-            style={{ textAlign: "center" }}
-          >
-            https://documentation.wazuh.com/current/user-manual/capabilities/file-integrity/index.html
-          </EuiLink>
-          <EuiHorizontalRule margin='s' />
-        </Fragment>}
-      />);
-  }
+  // noConfigured() {
+  //   return (
+  //     <EuiEmptyPrompt
+  //       iconType="filebeatApp"
+  //       title={<h2>Vulnerabilities is not configured for this agent</h2>}
+  //       body={<Fragment>
+  //         <EuiHorizontalRule margin='s' />
+  //         <EuiLink
+  //           href='https://documentation.wazuh.com/current/user-manual/capabilities/file-integrity/index.html'
+  //           target="_blank"
+  //           style={{ textAlign: "center" }}
+  //         >
+  //           https://documentation.wazuh.com/current/user-manual/capabilities/file-integrity/index.html
+  //         </EuiLink>
+  //         <EuiHorizontalRule margin='s' />
+  //       </Fragment>}
+  //     />);
+  // }
 
   loadingInventory() {
     return <EuiPage>
@@ -272,36 +264,35 @@ export class Inventory extends Component {
     </EuiPage>;
   }
 
-  async isConfigured() {
-    try {
-      const response = await WzRequest.apiReq(
-        'GET',
-        `/agents/${this.props.agent.id}/config/syscheck/syscheck`,
-        {}
-      );
+  // async isConfigured() {
+  //   try {
+  //     const response = await WzRequest.apiReq(
+  //       'GET',
+  //       `/agents/${this.props.agent.id}/config/syscheck/syscheck`,
+  //       {}
+  //     );
 
-      return (((response.data || {}).data).syscheck || {}).disabled === 'no';
-    } catch (error) {
-      return false;
-    }
-  }
+  //     return (((response.data || {}).data).syscheck || {}).disabled === 'no';
+  //   } catch (error) {
+  //     return false;
+  //   }
+  // }
 
   render() {
-    const { isLoading, isConfigured } = this.state;
+    const { isLoading/*, isConfigured*/ } = this.state;
     if (isLoading) {
       return this.loadingInventory()
     }
     const table = this.renderTable();
     const tabs = this.renderTabs();
 
-    return isConfigured
-      ? (<EuiPage>
+    return /*isConfigured ? (*/ <EuiPage>
         <EuiPanel>
           {tabs}
           <EuiSpacer size={(((this.props.agent || {}).os || {}).platform || false) === 'windows' ? 's' : 'm'} />
           {table}
         </EuiPanel>
-      </EuiPage>)
-      : this.noConfigured()
+      </EuiPage>
+      //) : this.noConfigured()
   }
 }

@@ -81,7 +81,7 @@
           },
           {
             "name": "name",
-            "description": "Filter by agent name",
+            "description": "Filter by name",
             "schema": {
               "type": "string",
               "format": "alphanumeric"
@@ -377,6 +377,58 @@
               "minLength": 3,
               "description": "Agent ID",
               "format": "numbers"
+            }
+          }
+        ],
+        "query": [
+          {
+            "name": "pretty",
+            "description": "Show results in human-readable format",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "wait_for_complete",
+            "description": "Disable timeout response",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ]
+      },
+      {
+        "name": "/agents/:agent_id/stats/:component",
+        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agent_controller.get_component_stats",
+        "description": "Return Wazuh's {component} statistical information from agent {agent_id}",
+        "summary": "Get agent's component stats",
+        "tags": [
+          "Agents"
+        ],
+        "args": [
+          {
+            "name": ":agent_id",
+            "description": "Agent ID. All possible values from 000 onwards",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 3,
+              "description": "Agent ID",
+              "format": "numbers"
+            }
+          },
+          {
+            "name": ":component",
+            "description": "Selected component stats",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "logcollector",
+                "agent"
+              ]
             }
           }
         ],
@@ -1224,21 +1276,20 @@
             "schema": {
               "type": "string",
               "enum": [
-                "ossec-agentlessd",
-                "ossec-analysisd",
-                "ossec-authd",
-                "ossec-csyslogd",
-                "ossec-dbd",
-                "ossec-execd",
-                "ossec-integratord",
-                "ossec-maild",
-                "ossec-monitord",
-                "ossec-logcollector",
-                "ossec-remoted",
-                "ossec-reportd",
-                "ossec-rootcheck",
-                "ossec-syscheckd",
-                "ossec-testrule",
+                "wazuh-agentlessd",
+                "wazuh-analysisd",
+                "wazuh-authd",
+                "wazuh-csyslogd",
+                "wazuh-dbd",
+                "wazuh-execd",
+                "wazuh-integratord",
+                "wazuh-maild",
+                "wazuh-monitord",
+                "wazuh-logcollector",
+                "wazuh-remoted",
+                "wazuh-reportd",
+                "wazuh-rootcheck",
+                "wazuh-syscheckd",
                 "sca",
                 "wazuh-db",
                 "wazuh-modulesd",
@@ -2742,7 +2793,7 @@
           },
           {
             "name": "name",
-            "description": "Filter by agent name",
+            "description": "Filter by name",
             "schema": {
               "type": "string",
               "format": "alphanumeric"
@@ -3196,7 +3247,7 @@
           },
           {
             "name": "name",
-            "description": "Filter by agent name",
+            "description": "Filter by name",
             "schema": {
               "type": "string",
               "format": "alphanumeric"
@@ -4672,21 +4723,20 @@
             "schema": {
               "type": "string",
               "enum": [
-                "ossec-agentlessd",
-                "ossec-analysisd",
-                "ossec-authd",
-                "ossec-csyslogd",
-                "ossec-dbd",
-                "ossec-execd",
-                "ossec-integratord",
-                "ossec-maild",
-                "ossec-monitord",
-                "ossec-logcollector",
-                "ossec-remoted",
-                "ossec-reportd",
-                "ossec-rootcheck",
-                "ossec-syscheckd",
-                "ossec-testrule",
+                "wazuh-agentlessd",
+                "wazuh-analysisd",
+                "wazuh-authd",
+                "wazuh-csyslogd",
+                "wazuh-dbd",
+                "wazuh-execd",
+                "wazuh-integratord",
+                "wazuh-maild",
+                "wazuh-monitord",
+                "wazuh-logcollector",
+                "wazuh-remoted",
+                "wazuh-reportd",
+                "wazuh-rootcheck",
+                "wazuh-syscheckd",
                 "sca",
                 "wazuh-db",
                 "wazuh-modulesd",
@@ -7038,7 +7088,7 @@
           },
           {
             "name": "name",
-            "description": "Filter by agent name",
+            "description": "Filter by name",
             "schema": {
               "type": "string",
               "format": "alphanumeric"
@@ -7428,7 +7478,7 @@
           },
           {
             "name": "name",
-            "description": "Filter by agent name",
+            "description": "Filter by name",
             "schema": {
               "type": "string",
               "format": "alphanumeric"
@@ -8014,6 +8064,133 @@
             }
           }
         ]
+      },
+      {
+        "name": "/vulnerability/:agent_id",
+        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.vulnerability_controller.get_vulnerability_agent",
+        "description": "Return the vulnerabilities of an agent",
+        "summary": "Get vulnerabilities",
+        "tags": [
+          "Vulnerability"
+        ],
+        "args": [
+          {
+            "name": ":agent_id",
+            "description": "Agent ID. All possible values from 000 onwards",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 3,
+              "description": "Agent ID",
+              "format": "numbers"
+            }
+          }
+        ],
+        "query": [
+          {
+            "name": "architecture",
+            "description": "Filter by architecture",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
+            "name": "cve",
+            "description": "Filter by CVE",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
+            "name": "limit",
+            "description": "Maximum number of elements to return",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 500,
+              "minimum": 1,
+              "maximum": 500
+            }
+          },
+          {
+            "name": "name",
+            "description": "Filter by name",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
+            "name": "offset",
+            "description": "First element to return in the collection",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0,
+              "minimum": 0
+            }
+          },
+          {
+            "name": "pretty",
+            "description": "Show results in human-readable format",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "q",
+            "description": "Query to filter results by. For example q=&quot;status=active&quot;",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "schema": {
+              "type": "string",
+              "format": "search"
+            }
+          },
+          {
+            "name": "select",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "names"
+              }
+            }
+          },
+          {
+            "name": "sort",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
+            "schema": {
+              "type": "string",
+              "format": "sort"
+            }
+          },
+          {
+            "name": "version",
+            "description": "Filter by CVE version",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric_symbols"
+            }
+          },
+          {
+            "name": "wait_for_complete",
+            "description": "Disable timeout response",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ]
       }
     ]
   },
@@ -8078,6 +8255,15 @@
                 "description": "Whether the specified command is a custom command or not",
                 "type": "boolean",
                 "default": false
+              },
+              "alert": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "description": "Alert data depending on the AR executed",
+                    "type": "object"
+                  }
+                }
               }
             },
             "required": [
@@ -9393,16 +9579,6 @@
         ],
         "query": [
           {
-            "name": "group_id",
-            "description": "Group ID. (Name of the group)",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "description": "Group name",
-              "format": "group_names"
-            }
-          },
-          {
             "name": "pretty",
             "description": "Show results in human-readable format",
             "schema": {
@@ -9417,6 +9593,14 @@
               "type": "boolean",
               "default": false
             }
+          }
+        ],
+        "body": [
+          {
+            "name": "group_id",
+            "description": "Group name",
+            "type": "string",
+            "format": "group_names"
           }
         ]
       },
