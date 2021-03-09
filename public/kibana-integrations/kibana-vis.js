@@ -198,10 +198,10 @@ class KibanaVis extends Component {
   };
 
   myRender = async (raw) => {
-    console.log(raw);
     const timefilter = getDataPlugin().query.timefilter.timefilter;
     try {
       const discoverList = this.discoverPendingUpdates.getList();
+
       const isAgentStatus =
         this.visID === "Wazuh-App-Overview-General-Agents-status";
       const timeFilterSeconds = this.calculateTimeFilterSeconds(
@@ -213,16 +213,39 @@ class KibanaVis extends Component {
           ? { from: "now-15m", to: "now", mode: "quick" }
           : timefilter.getTime();
 
-      console.log("-----------------");
-      console.log(discoverList);
 
-      // const filters = isAgentStatus ? [] : discoverList[1] || [];
+          // console.log(JSON.stringify(discoverList[1], null, 2));
+          // const filters = [            
+          //   {
+          //     "meta": {
+          //       "removable": false,
+          //       "index": "wazuh-alerts-*",
+          //       "negate": false,
+          //       "disabled": false,
+          //       "alias": null,
+          //       "type": "phrase",
+          //       "key": "cluster.name",
+          //       "params": {
+          //         "query": "wazuh"
+          //       }
+          //     },
+          //     "query": {
+          //       'bool':{
+          //         'filter':[
+          //           {"match_phrase":{"cluster.name":"wazuh"}},
+          //           {"terms": { "agent.id": ['013','014'] } }
+          //         ]
+          //       }
+          //     },
+          //     "$state": {
+          //       "store": "appState",
+          //       "isImplicit": true
+          //     }
+          //   }            
+          // ]          
+
       const filters = isAgentStatus ? [] : discoverList[1] || [];
       const query = !isAgentStatus ? discoverList[0] : {};
-
-
-      console.log("filters");
-      console.log(filters);
 
       const visInput = {
         timeRange,

@@ -21,6 +21,7 @@ export class DiscoverPendingUpdates {
     this.pendingUpdates = [];
 
     DiscoverPendingUpdates.instance = this;
+
     return this;
   }
 
