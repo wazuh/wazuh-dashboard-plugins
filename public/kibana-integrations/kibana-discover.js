@@ -299,7 +299,7 @@ function discoverController(
         next: () => {
           //Patch empty fields
           const filters = filterManager.getAppFilters();
-          if(filters.filter(item=>item.meta.params.query==='').length){
+          if(filters.filter(item=> item.meta.params && item.meta.params.query === '').length){
             getToasts().add({
               color: 'warning',
               title: 'Invalid field value',
