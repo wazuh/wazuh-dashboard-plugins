@@ -79,7 +79,6 @@ export class ToolsController {
    */
   switchTab(tab) {
     store.dispatch(updateSelectedToolsSection(tab));
-    this.tab = tab;
-    this.$location.search('tab', this.tab);
+    this.$location.search('tab', tab);
   }
 }
