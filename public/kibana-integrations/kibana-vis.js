@@ -249,7 +249,7 @@ class KibanaVis extends Component {
           : timefilter.getTime();
       const filters = isAgentStatus ? [] : discoverList[1] || [];
       const query = !isAgentStatus ? discoverList[0] : {};
-      const agentsFilters = this.getUserAgentsFilters(filters);
+      const agentsFilters = this.getUserAgentsFilters();
       filters.push(agentsFilters);
 
       const visInput = {
