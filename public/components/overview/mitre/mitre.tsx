@@ -80,10 +80,15 @@ export class Mitre extends Component {
     const query = scope.state.query;
     const { filters, time} = this.state.filterParams;
     this.setState({filterParams: {query, filters, time}})
+    this.filtersSubscriber = this.filterManager.getUpdates$().subscribe(() => {
+      this.onFiltersUpdated(this.filterManager.getFilters())
+    });
+
     await this.buildTacticsObject();
   }
 
   componentWillUnmount() {
+    this.filtersSubscriber.unsubscribe();
     this._isMount = false;
   }
 
