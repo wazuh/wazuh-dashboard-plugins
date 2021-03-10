@@ -14,9 +14,11 @@ import { WzRequest } from './wz-request';
 import { AppState } from './app-state';
 import jwtDecode from 'jwt-decode';
 import store from '../redux/store';
-import { updateUserPermissions, updateUserRoles } from '../redux/actions/appStateActions';
+import { updateUserPermissions, updateUserRoles, updateAllowedAgents } from '../redux/actions/appStateActions';
 import { WAZUH_ROLE_ADMINISTRATOR_ID, WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../common/constants';
 import { getToasts } from '../kibana-services';
+import { getAuthorizedAgents } from '../react-services/wz-agents';
+
 
 
 export class WzAuthentication{
@@ -49,11 +51,17 @@ export class WzAuthentication{
       // Decode token and get expiration time
       const jwtPayload = jwtDecode(token);
 
+      //Get allowed agents for the current user
+      const allowedAgents = await getAuthorizedAgents()
+      console.log(allowedAgents);
+      
+      store.dispatch(updateAllowedAgents(allowedAgents))
       // Get user Policies
       const userPolicies = await WzAuthentication.getUserPolicies();
       // Dispatch actions to set permissions and roles
       store.dispatch(updateUserPermissions(userPolicies));
       store.dispatch(updateUserRoles(WzAuthentication.mapUserRolesIDToAdministratorRole(jwtPayload.rbac_roles || [])));
+      return
     }catch(error){
       getToasts().add({
         color: 'danger',

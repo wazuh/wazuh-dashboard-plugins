@@ -23,6 +23,7 @@ const initialState = {
   showExploreAgentModalGlobal: false,
   userPermissions: false,
   userRoles: [],
+  allowedAgentes: [],
   toastNotification: false,
   clusterStatus: {
     status: false,
@@ -31,6 +32,13 @@ const initialState = {
 };
 
 const appStateReducers = (state = initialState, action) => {
+  if (action.type === 'GET_ALLOWED_AGENTS') {
+    return {
+      ...state,
+      allowedAgents: action.allowedAgentes
+    };
+  }
+
   if (action.type === 'UPDATE_CURRENT_API') {
     return {
       ...state,

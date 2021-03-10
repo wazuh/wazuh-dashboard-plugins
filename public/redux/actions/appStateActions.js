@@ -11,6 +11,17 @@
  */
 
 /**
+ * Updates allowedAgentes in the appState store
+ * @param GET_ALLOWED_AGENTS
+ */
+export const updateAllowedAgents = allowedAgentes => {
+  return {
+    type: 'GET_ALLOWED_AGENTS',
+    allowedAgentes: allowedAgentes
+  };
+};
+
+/**
  * Updates CurrentAPI in the appState store
  * @param currentAPI
  */

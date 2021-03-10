@@ -42,5 +42,7 @@ export async function getAuthorizedAgents() {
     return Promise.reject();
   });
 
-  return agentsList ? agentsList.data.data.affected_items.map((agent) => agent.id) : [];
+  const allowedAgents = agentsList ? agentsList.data.data.affected_items.map((agent) => agent.id) : []
+
+  return allowedAgents;
 }

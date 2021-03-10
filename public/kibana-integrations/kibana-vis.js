@@ -34,7 +34,7 @@ import {
 } from "@elastic/eui";
 import { getAngularModule, getToasts, getVisualizationsPlugin, getSavedObjects, getDataPlugin, getChrome, getOverlays } from '../kibana-services';
 import { KnownFields } from "../utils/known-fields";
-import { getAuthorizedAgents } from "../react-services/wz-agents";
+// import { getAuthorizedAgents } from "../react-services/wz-agents";
 import { AppState } from "../react-services/app-state";
 
 class KibanaVis extends Component {
@@ -201,8 +201,11 @@ class KibanaVis extends Component {
     }
   };
 
-  getUserAgentsFilters = async () => {
-    const agentsIds = await getAuthorizedAgents();
+  getUserAgentsFilters = () => {
+  // getUserAgentsFilters = async () => {
+    // const agentsIds = await getAuthorizedAgents();
+    const agentsIds = this.props.allowedAgentes
+console.log(agentsIds);
     return  {
       meta: {
         index: AppState.getCurrentPattern(),
@@ -250,6 +253,7 @@ class KibanaVis extends Component {
       const filters = isAgentStatus ? [] : discoverList[1] || [];
       const query = !isAgentStatus ? discoverList[0] : {};
       const agentsFilters = this.getUserAgentsFilters();
+      
       filters.push(agentsFilters);
 
       const visInput = {
@@ -458,6 +462,7 @@ class KibanaVis extends Component {
 const mapStateToProps = (state) => {
   return {
     state: state.visualizationsReducers,
+    allowedAgentes: state.appStateReducers.allowedAgentes
   };
 };
 

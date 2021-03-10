@@ -21,7 +21,8 @@ import { ShareAgent } from '../../factories/share-agent';
 import { TimeService } from '../../react-services/time-service';
 import { ErrorHandler } from '../../react-services/error-handler';
 import { getDataPlugin } from '../../kibana-services';
-import { getAuthorizedAgents } from '../../react-services/wz-agents';
+// import { getAuthorizedAgents } from '../../react-services/wz-agents';
+import { connect } from 'react-redux';
 
 export class AgentsPreviewController {
   /**
@@ -51,7 +52,7 @@ export class AgentsPreviewController {
     this.wazuhConfig = new WazuhConfig();
     this.errorInit = false;
     this.$window = $window;
-    this.timeService = TimeService;
+    this.timeService = TimeService;    
   }
 
   /**
@@ -193,17 +194,17 @@ export class AgentsPreviewController {
 
   async getMostActive() {
     //get active agents
-    const agentIds = await getAuthorizedAgents();
+    // const agentIds = await getAuthorizedAgents();
     try {
       const data = await this.genericReq.request(
         'GET',
-        `/elastic/top/${this.firstUrlParam}/${this.secondUrlParam}/agent.name/${this.pattern}?agentsList=${agentIds.toString()}`
+        `/elastic/top/${this.firstUrlParam}/${this.secondUrlParam}/agent.name/${this.pattern}?agentsList=${this.props.allowedAgentes.toString()}`
       );
 
       this.mostActiveAgent.name = data.data.data;
       const info = await this.genericReq.request(
         'GET',
-        `/elastic/top/${this.firstUrlParam}/${this.secondUrlParam}/agent.id/${this.pattern}?agentsList=${agentIds.toString()}`,
+        `/elastic/top/${this.firstUrlParam}/${this.secondUrlParam}/agent.id/${this.pattern}?agentsList=${this.props.allowedAgentes.toString()}`,
       );
 
       if (info.data.data === '' && this.mostActiveAgent.name !== '') {
@@ -277,3 +278,8 @@ export class AgentsPreviewController {
     }
   }
 }
+
+const mapStateToProps = state => {
+  return {allowedAgentes: state.appStateReducers.allowedAgentes}
+};
+export default connect(mapStateToProps, null)(AgentsPreviewController)
