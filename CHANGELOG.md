@@ -16,25 +16,15 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
-- Creating a role mapping before the existing ones are loaded, the page bursts [#3001](https://github.com/wazuh/wazuh-kibana-app/issues/3001)
 - Fix SCA policy detail showing name and check results about another policy [#3007](https://github.com/wazuh/wazuh-kibana-app/pull/3007)
-- Fix pagination in SCA checks table when expand some row [#3018](https://github.com/wazuh/wazuh-kibana-app/pull/3018)
-- Fix manager is shown in suggestions in Agents section [#3025](https://github.com/wazuh/wazuh-kibana-app/pull/3025)
-- Fix pinned agents don't trigger a new filtered query [#3030](https://github.com/wazuh/wazuh-kibana-app/pull/3030)
-- Fix disabled loading on inventory when request fail [#3016](https://github.com/wazuh/wazuh-kibana-app/issues/3016)
-- Fix restarting selected cluster instead of all of them [#3032](https://github.com/wazuh/wazuh-kibana-app/pull/3032)
-- Overlay Wazuh menu when Kibana menu is opened or docked [#3038](https://github.com/wazuh/wazuh-kibana-app/pull/3038)
-
-## Wazuh v4.1.1 - Kibana 7.10.0 , 7.10.2 - Revision 4103
-
-### Fixed
-
-- Fix SCA policy detail showing name and check results about another policy [#3007](https://github.com/wazuh/wazuh-kibana-app/pull/3007)
-- Fix pagination in SCA checks table when expand some row [#3018](https://github.com/wazuh/wazuh-kibana-app/pull/3018)
-- Fix manager is shown in suggestions in Agents section [#3025](https://github.com/wazuh/wazuh-kibana-app/pull/3025)
-- Fix disabled loading on inventory when request fail [#3016](https://github.com/wazuh/wazuh-kibana-app/issues/3016)
-- Fix restarting selected cluster instead of all of them [#3032](https://github.com/wazuh/wazuh-kibana-app/pull/3032)
 - Fixed that alerts table is empty when switching pinned agents [#3008](https://github.com/wazuh/wazuh-kibana-app/pull/3008)
+- Creating a role mapping before the existing ones are loaded, the page bursts [#3013](https://github.com/wazuh/wazuh-kibana-app/pull/3013)
+- Fix pagination in SCA checks table when expand some row [#3018](https://github.com/wazuh/wazuh-kibana-app/pull/3018)
+- Fix manager is shown in suggestions in Agents section [#3025](https://github.com/wazuh/wazuh-kibana-app/pull/3025)
+- Fix disabled loading on inventory when request fail [#3026](https://github.com/wazuh/wazuh-kibana-app/pull/3026)
+- Fix restarting selected cluster instead of all of them [#3032](https://github.com/wazuh/wazuh-kibana-app/pull/3032)
+- Fix pinned agents don't trigger a new filtered query [#3035](https://github.com/wazuh/wazuh-kibana-app/pull/3035)
+- Overlay Wazuh menu when Kibana menu is opened or docked [#3038](https://github.com/wazuh/wazuh-kibana-app/pull/3038)
 
 ## Wazuh v4.1.1 - Kibana 7.10.0 , 7.10.2 - Revision 4102
 
