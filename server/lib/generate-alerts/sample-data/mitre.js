@@ -13,7 +13,7 @@
 // Mitre
 export const arrayMitreRules = [
   {
-    filename: '0015-wazuh_rules.xml',
+    filename: '0015-ossec_rules.xml',
     relative_dirname: 'ruleset/rules',
     id: 504,
     level: 3,
@@ -30,7 +30,7 @@ export const arrayMitreRules = [
     description: 'Wazuh agent disconnected.',
   },
   {
-    filename: '0015-wazuh_rules.xml',
+    filename: '0015-ossec_rules.xml',
     relative_dirname: 'ruleset/rules',
     id: 505,
     level: 3,
@@ -47,7 +47,7 @@ export const arrayMitreRules = [
     description: 'wazuh agent removed.',
   },
   {
-    filename: '0015-wazuh_rules.xml',
+    filename: '0015-ossec_rules.xml',
     relative_dirname: 'ruleset/rules',
     id: 518,
     level: 9,
@@ -64,7 +64,7 @@ export const arrayMitreRules = [
     description: 'Windows Adware/Spyware application found.',
   },
   {
-    filename: '0015-wazuh_rules.xml',
+    filename: '0015-ossec_rules.xml',
     relative_dirname: 'ruleset/rules',
     id: 550,
     level: 7,
@@ -81,7 +81,7 @@ export const arrayMitreRules = [
     description: 'Integrity checksum changed.',
   },
   {
-    filename: '0015-wazuh_rules.xml',
+    filename: '0015-ossec_rules.xml',
     relative_dirname: 'ruleset/rules',
     id: 553,
     level: 7,
@@ -102,7 +102,7 @@ export const arrayMitreRules = [
     description: 'File deleted.',
   },
   {
-    filename: '0015-wazuh_rules.xml',
+    filename: '0015-ossec_rules.xml',
     relative_dirname: 'ruleset/rules',
     id: 592,
     level: 8,
@@ -119,7 +119,7 @@ export const arrayMitreRules = [
     description: 'Log file size reduced.',
   },
   {
-    filename: '0015-wazuh_rules.xml',
+    filename: '0015-ossec_rules.xml',
     relative_dirname: 'ruleset/rules',
     id: 593,
     level: 9,
@@ -136,7 +136,7 @@ export const arrayMitreRules = [
     description: 'Microsoft Event log cleared.',
   },
   {
-    filename: '0015-wazuh_rules.xml',
+    filename: '0015-ossec_rules.xml',
     relative_dirname: 'ruleset/rules',
     id: 594,
     level: 5,
@@ -153,7 +153,7 @@ export const arrayMitreRules = [
     description: 'Registry Integrity Checksum Changed',
   },
   {
-    filename: '0015-wazuh_rules.xml',
+    filename: '0015-ossec_rules.xml',
     relative_dirname: 'ruleset/rules',
     id: 597,
     level: 5,
