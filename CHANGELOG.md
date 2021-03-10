@@ -1,6 +1,14 @@
 # Change Log
 
 All notable changes to the Wazuh app project will be documented in this file.
+
+## Wazuh v4.2.0 - Kibana 7.10.0 , 7.10.2 - Revision 4201
+
+### Fixed
+
+- Fix wrong variable declaration for macOS agents [#3066](https://github.com/wazuh/wazuh-kibana-app/pull/3066)
+
+
 ## Wazuh v4.1.2 - Kibana 7.10.0 , 7.10.2 - Revision 4103
 
 ### Added
