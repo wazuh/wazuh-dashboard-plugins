@@ -32,7 +32,7 @@ export const RolesMapping = () => {
   const currentPlatform = useSelector((state: any) => state.appStateReducers.currentPlatform);
 
   useEffect(() => {
-    initData();
+    initData();    
   }, []);
 
   useEffect(() => {
@@ -146,11 +146,15 @@ export const RolesMapping = () => {
           </EuiTitle>
         </EuiPageContentHeaderSection>
         <EuiPageContentHeaderSection>
-          <div>
-            <EuiButton onClick={() => setIsCreatingRule(true)}>Create Role mapping</EuiButton>
-            {createFlyout}
-            {editFlyout}
-          </div>
+          {
+            !loadingTable
+            &&
+            <div>
+              <EuiButton onClick={() => setIsCreatingRule(true)}>Create Role mapping</EuiButton>
+              {createFlyout}
+              {editFlyout}
+            </div>
+          }
         </EuiPageContentHeaderSection>
       </EuiPageContentHeader>
       <EuiPageContentBody>

@@ -21,7 +21,7 @@ export const SecurityAlerts = () => {
 
   return (
     <Discover
-      shareFilterManager={[...((filterManager || {}).filters) || []]}
+      shareFilterManager={filterManager}
       query={query}
       initialColumns={["icon", "timestamp", 'rule.mitre.id', 'rule.mitre.tactic', 'rule.description', 'rule.level', 'rule.id']}
       implicitFilters={[]}
