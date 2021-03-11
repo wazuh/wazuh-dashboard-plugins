@@ -23,7 +23,7 @@ const initialState = {
   showExploreAgentModalGlobal: false,
   userPermissions: false,
   userRoles: [],
-  allowedAgentes: [],
+  allowedAgents: [],
   toastNotification: false,
   clusterStatus: {
     status: false,
@@ -35,7 +35,7 @@ const appStateReducers = (state = initialState, action) => {
   if (action.type === 'GET_ALLOWED_AGENTS') {
     return {
       ...state,
-      allowedAgents: action.allowedAgentes
+      allowedAgents: action.allowedAgents
     };
   }
 

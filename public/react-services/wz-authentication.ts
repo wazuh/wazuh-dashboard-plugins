@@ -52,10 +52,9 @@ export class WzAuthentication{
       const jwtPayload = jwtDecode(token);
 
       //Get allowed agents for the current user
-      const allowedAgents = await getAuthorizedAgents()
-      console.log(allowedAgents);
-      
+      const allowedAgents = await getAuthorizedAgents()      
       store.dispatch(updateAllowedAgents(allowedAgents))
+
       // Get user Policies
       const userPolicies = await WzAuthentication.getUserPolicies();
       // Dispatch actions to set permissions and roles

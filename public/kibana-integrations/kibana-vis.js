@@ -204,8 +204,11 @@ class KibanaVis extends Component {
   getUserAgentsFilters = () => {
   // getUserAgentsFilters = async () => {
     // const agentsIds = await getAuthorizedAgents();
-    const agentsIds = this.props.allowedAgentes
-console.log(agentsIds);
+    const agentsIds = this.props.allowedAgents
+
+    //check for empty agents array
+    if(agentsIds.length == 0){return {}}
+
     return  {
       meta: {
         index: AppState.getCurrentPattern(),
@@ -239,7 +242,6 @@ console.log(agentsIds);
     const timefilter = getDataPlugin().query.timefilter.timefilter;
     try {
       const discoverList = this.discoverPendingUpdates.getList();
-
       const isAgentStatus =
         this.visID === "Wazuh-App-Overview-General-Agents-status";
       const timeFilterSeconds = this.calculateTimeFilterSeconds(
@@ -254,7 +256,7 @@ console.log(agentsIds);
       const query = !isAgentStatus ? discoverList[0] : {};
       const agentsFilters = this.getUserAgentsFilters();
       
-      filters.push(agentsFilters);
+      Object.keys(agentsFilters).length !== 0 ? filters.push(agentsFilters) : null
 
       const visInput = {
         timeRange,
@@ -462,7 +464,7 @@ console.log(agentsIds);
 const mapStateToProps = (state) => {
   return {
     state: state.visualizationsReducers,
-    allowedAgentes: state.appStateReducers.allowedAgentes
+    allowedAgents: state.appStateReducers.allowedAgents
   };
 };
 

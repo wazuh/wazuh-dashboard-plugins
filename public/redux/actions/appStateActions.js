@@ -11,13 +11,13 @@
  */
 
 /**
- * Updates allowedAgentes in the appState store
+ * Updates allowedAgents in the appState store
  * @param GET_ALLOWED_AGENTS
  */
-export const updateAllowedAgents = allowedAgentes => {
+export const updateAllowedAgents = data => {
   return {
     type: 'GET_ALLOWED_AGENTS',
-    allowedAgentes: allowedAgentes
+    allowedAgents: data
   };
 };
 

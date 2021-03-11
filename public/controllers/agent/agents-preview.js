@@ -23,6 +23,7 @@ import { ErrorHandler } from '../../react-services/error-handler';
 import { getDataPlugin } from '../../kibana-services';
 // import { getAuthorizedAgents } from '../../react-services/wz-agents';
 import { connect } from 'react-redux';
+import store from '../../redux/store';
 
 export class AgentsPreviewController {
   /**
@@ -39,7 +40,7 @@ export class AgentsPreviewController {
     errorHandler,
     csvReq,
     commonData,
-    $window
+    $window,
   ) {
     this.$scope = $scope;
     this.genericReq = GenericRequest;
@@ -193,18 +194,16 @@ export class AgentsPreviewController {
   }
 
   async getMostActive() {
-    //get active agents
-    // const agentIds = await getAuthorizedAgents();
     try {
       const data = await this.genericReq.request(
         'GET',
-        `/elastic/top/${this.firstUrlParam}/${this.secondUrlParam}/agent.name/${this.pattern}?agentsList=${this.props.allowedAgentes.toString()}`
+        `/elastic/top/${this.firstUrlParam}/${this.secondUrlParam}/agent.name/${this.pattern}?agentsList=${store.getState().appStateReducers.allowedAgents.toString()}`
       );
 
       this.mostActiveAgent.name = data.data.data;
       const info = await this.genericReq.request(
         'GET',
-        `/elastic/top/${this.firstUrlParam}/${this.secondUrlParam}/agent.id/${this.pattern}?agentsList=${this.props.allowedAgentes.toString()}`,
+        `/elastic/top/${this.firstUrlParam}/${this.secondUrlParam}/agent.id/${this.pattern}?agentsList=${store.getState().appStateReducers.allowedAgents.toString()}`,
       );
 
       if (info.data.data === '' && this.mostActiveAgent.name !== '') {
@@ -280,6 +279,6 @@ export class AgentsPreviewController {
 }
 
 const mapStateToProps = state => {
-  return {allowedAgentes: state.appStateReducers.allowedAgentes}
+  return {allowedAgents: state.appStateReducers.allowedAgents}
 };
 export default connect(mapStateToProps, null)(AgentsPreviewController)
