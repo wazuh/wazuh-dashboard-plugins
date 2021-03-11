@@ -33,15 +33,15 @@ import moment from 'moment-timezone';
 import { AppNavigate } from '../../../../react-services/app-navigate';
 import { TruncateHorizontalComponents } from '../../../common/util';
 import { getDataPlugin,getUiSettings } from '../../../../kibana-services';
-// import { RegistryValues } from './registryValues';
-import { TimeService } from '../../../../react-services/time-service';
 import { FilterManager } from '../../../../../../../src/plugins/data/public/';
 
-export class FileDetails extends Component {
+export class Details extends Component {
   props!: {
-    currentFile: {
-      file: string;
-      type: string;
+    currentItem: {
+      cve: string;
+      name: string;
+      version: string;
+      architecture: string;
     };
     implicitFilters: Array<Object>;
     loadEventsWithFilters: Function;
@@ -90,139 +90,55 @@ export class FileDetails extends Component {
   details() {
     return [
       {
-        field: 'date',
-        name: 'Last analysis',
-        grow: 2,
-        icon: 'clock',
-        link: true,
-        transformValue: TimeService.offset
-      },
-      {
-        field: 'mtime',
-        name: 'Last modified',
-        grow: 2,
-        icon: 'clock',
-        link: true,
-        transformValue: TimeService.offset
-      },
-      {
-        field: 'uname',
-        name: 'User',
-        icon: 'user',
-        link: true,
-      },
-      {
-        field: 'uid',
-        name: 'User ID',
-        icon: 'user',
-        link: true,
-      },
-      {
-        field: 'gname',
-        name: 'Group',
-        icon: 'usersRolesApp',
-        onlyLinux: true,
-        link: true,
-      },
-      {
-        field: 'gid',
-        name: 'Group ID',
-        onlyLinux: true,
-        icon: 'usersRolesApp',
-        link: true,
-      },
-      {
-        field: 'perm',
-        name: 'Permissions',
-        icon: 'lock',
+        field: 'name',
+        name: 'Name',
+        icon: 'dot',
         link: false,
-        transformValue: (value) => this.renderFileDetailsPermissions(value),
       },
       {
-        field: 'size',
-        name: 'Size',
-        icon: 'nested',
-        link: true,
-        transformValue: (value) => this.renderFileDetailsSize(value),
+        field: 'cve',
+        name: 'CVE',
+        icon: 'securitySignal',
+        link: false,
       },
       {
-        field: 'inode',
-        name: 'Inode',
-        icon: 'link',
-        onlyLinux: true,
-        link: true,
+        field: 'version',
+        name: 'Version',
+        icon: 'package',
+        link: false,
       },
       {
-        field: 'md5',
-        name: 'MD5',
-        checksum: true,
-        icon: 'check',
-        link: true,
-      },
-      {
-        field: 'sha1',
-        name: 'SHA1',
-        checksum: true,
-        icon: 'check',
-        link: true,
-      },
-      {
-        field: 'sha256',
-        name: 'SHA256',
-        checksum: true,
-        icon: 'check',
-        link: true,
-      },
-    ];
-  }
-
-  registryDetails() {
-    return [
-      {
-        field: 'date',
-        name: 'Last analysis',
-        grow: 2,
-        icon: 'clock',
-        transformValue: TimeService.offset
-      },
-      {
-        field: 'mtime',
-        name: 'Last modified',
-        grow: 2,
-        icon: 'clock',
-      },
-      {
-        field: 'sha1',
-        name: 'SHA1',
-        checksum: true,
-        icon: 'check',
-      },
+        field: 'architecture',
+        name: 'Architecture',
+        icon: 'node',
+        link: false,
+      }
     ];
   }
 
   viewInEvents = (ev) => {
-    const { file } = this.props.currentFile;
+    const { cve } = this.props.currentItem;
     if (this.props.view === 'extern') {
       AppNavigate.navigateToModule(ev, 'overview', {
-        tab: 'fim',
+        tab: 'vuls',
         tabView: 'events',
-        filters: { 'syscheck.path': file },
+        filters: { 'data.vulnerability.cve': cve },
       });
     } else {
       AppNavigate.navigateToModule(
         ev,
         'overview',
-        { tab: 'fim', tabView: 'events', filters: { 'syscheck.path': file } },
+        { tab: 'vuls', tabView: 'events', filters: { 'data.vulnerability.cve': cve } },
         () => this.openEventCurrentWindow()
       );
     }
   };
 
   openEventCurrentWindow() {
-    const { file } = this.props.currentFile;
+    const { cve } = this.props.currentItem;
     const filters = [
       {
-        ...buildPhraseFilter({ name: 'syscheck.path', type: 'text' }, file, this.indexPattern),
+        ...buildPhraseFilter({ name: 'data.vulnerability.cve', type: 'text' }, cve, this.indexPattern),
         $state: { store: 'appState' },
       },
     ];
@@ -235,15 +151,10 @@ export class FileDetails extends Component {
     const { filterManager } = getDataPlugin().query;
     const _filters = filterManager.getFilters();
     if (_filters && _filters.length) {
-      const syscheckPathFilters = _filters.filter((x) => {
-        return x.meta.key === 'syscheck.path';
-      });
-      syscheckPathFilters.map((x) => {
-        filterManager.removeFilter(x);
-      });
+     
       filterManager.addFilters([filters]);
       const scope = await ModulesHelper.getDiscoverScope();
-      scope.updateQueryAndFetch({ query: null });
+      scope.updateQueryAndFetch && scope.updateQueryAndFetch({ query: null });
     } else {
       setTimeout(() => {
         this.checkFilterManager(filters);
@@ -260,7 +171,7 @@ export class FileDetails extends Component {
         'YYYY-MM-DD'
       )} AND ${field}<${value_max.format('YYYY-MM-DD')}`;
     } else {
-      newBadge.value = `${field}=${field === 'size' ? this.props.currentFile[field] : value}`;
+      newBadge.value = `${field}=${field === 'size' ? this.props.currentItem[field] : value}`;
     }
     !filters.some((item) => item.field === newBadge.field && item.value === newBadge.value) &&
       onFiltersChange([...filters, newBadge]);
@@ -269,14 +180,15 @@ export class FileDetails extends Component {
 
   getDetails() {
     const { view } = this.props;
-    const columns = this.props.type === 'registry_key' || this.props.currentFile.type === 'registry_key' ? this.registryDetails() : this.details();
+    const columns = this.details();
     const generalDetails = columns.map((item, idx) => {
-      var value = this.props.currentFile[item.field] || '-';
+      var value = this.props.currentItem[item.field] || '-';
       if (item.transformValue) {
         value = item.transformValue(value, this.props);
       }
       var link = (item.link && !['events', 'extern'].includes(view)) || false;
       const agentPlatform = ((this.props.agent || {}).os || {}).platform;
+      
       if (!item.onlyLinux || (item.onlyLinux && this.props.agent && agentPlatform !== 'windows')) {
         let className = item.checksum ? 'detail-value detail-value-checksum' : 'detail-value';
         className += item.field === 'perm' ? ' detail-value-perm' : '';
@@ -346,7 +258,7 @@ export class FileDetails extends Component {
     this.setState({ totalHits: total });
   };
 
-  renderFileDetailsPermissions(value) {
+  renderDetailsPermissions(value) {
     if (((this.props.agent || {}).os || {}).platform === 'windows' && value && value !== '-') {
       const components = value
         .split(', ')
@@ -391,28 +303,15 @@ export class FileDetails extends Component {
     return value;
   }
 
-  renderFileDetailsSize(value) {
-    if (isNaN(value)) {
-      return 0;
-    }
-    const b = 2;
-    if (0 === value) return '0 Bytes';
-    const c = 0 > b ? 0 : b,
-      d = Math.floor(Math.log(value) / Math.log(1024));
-    return (
-      parseFloat((value / Math.pow(1024, d)).toFixed(c)) +
-      ' ' +
-      ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'][d]
-    );
-  }
 
   render() {
-    const { fileName, type, implicitFilters, view, currentFile, agent } = this.props;
-    const inspectButtonText = view === 'extern' ? 'Inspect in FIM' : 'Inspect in Events';
+    const { type, implicitFilters, view, currentItem, agent } = this.props;
+    const id = `${currentItem.name}-${currentItem.cve}-${currentItem.architecture}-${currentItem.version}`;
+    const inspectButtonText = view === 'extern' ? 'Inspect in Dashboard' : 'Inspect in Events';
     return (
       <Fragment>
         <EuiAccordion
-          id={fileName === undefined ? Math.random().toString() : `${fileName}_details`}
+          id={id === undefined ? Math.random().toString() : `${id}_details`}
           buttonContent={
             <EuiTitle size="s">
               <h3>Details</h3>
@@ -423,32 +322,9 @@ export class FileDetails extends Component {
         >
           <div className="flyout-row details-row">{this.getDetails()}</div>
         </EuiAccordion>
-        { (type === 'registry_key' || currentFile.type === 'registry_key') && <>
-        <EuiSpacer size="s" />
-        <EuiAccordion
-          id={fileName === undefined ? Math.random().toString() : `${fileName}_values`}
-          buttonContent={
-            <EuiTitle size="s">
-              <h3>
-                Registry values                
-              </h3>
-            </EuiTitle>
-          }
-          paddingSize="none"
-          initialIsOpen={true}
-        >
-          <EuiFlexGroup className="flyout-row">
-            <EuiFlexItem>
-              {/* <RegistryValues 
-                currentFile={currentFile}
-                agent={agent}
-              /> */}
-            </EuiFlexItem>
-          </EuiFlexGroup>
-        </EuiAccordion> </>}
         <EuiSpacer />
         <EuiAccordion
-          id={fileName === undefined ? Math.random().toString() : `${fileName}_events`}
+          id={id === undefined ? Math.random().toString() : `${id}_events`}
           className="events-accordion"
           extraAction={
             <div style={{ marginBottom: 5 }}>
@@ -485,12 +361,12 @@ export class FileDetails extends Component {
                 initialColumns={[
                   'icon',
                   'timestamp',
-                  'syscheck.event',
+                  // 'rule.mitre.id',
                   'rule.description',
                   'rule.level',
                   'rule.id',
                 ]}
-                includeFilters="syscheck"
+                includeFilters="vulnerability"
                 implicitFilters={implicitFilters}
                 initialFilters={[]}
                 type={type}

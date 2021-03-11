@@ -19,21 +19,19 @@ import {
   EuiLoadingContent,
   EuiCallOut,
 } from '@elastic/eui';
-import { WzRequest } from '../../../../react-services/wz-request';
-import { FileDetails } from './fileDetail';
+import { Details } from './detail';
 import { AppState } from '../../../../react-services/app-state';
 
 export class FlyoutDetail extends Component {
   state: {
-    currentFile: boolean | { [key: string]: string };
+    currentItem: boolean | { [key: string]: string };
     clusterFilter: {};
     isLoading: boolean;
     error: boolean;
-    type: 'file' | 'registry_key';
   };
 
   props!: {
-    fileName: string;
+    vulName: string;
     agentId: string;
     view: 'inventory' | 'events' | 'extern';
     closeFlyout(): void;
@@ -42,11 +40,10 @@ export class FlyoutDetail extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      currentFile: false,
+      currentItem: false,
       clusterFilter: {},
       isLoading: true,
       error: false,
-      type: 'file',
     };
   }
 
@@ -57,59 +54,38 @@ export class FlyoutDetail extends Component {
         ? { 'cluster.name': AppState.getClusterInfo().cluster }
         : { 'manager.name': AppState.getClusterInfo().manager };
       this.setState({ clusterFilter });
-      let currentFile;
-      if (typeof this.props.item === 'boolean' && typeof this.props.fileName !== undefined) {
-        const regex = new RegExp('file=' + '[^&]*');
-        const match = window.location.href.match(regex);
-        if (match && match[0]) {
-          let file = decodeURIComponent(match[0].split('=')[1]);
-          const data = await WzRequest.apiReq('GET', `/syscheck/${this.props.agentId}`, {
-            params: {
-              q: `file=${file};(type=file,type=registry_key)`,
-            },
-          });
-          currentFile = ((((data || {}).data || {}).data || {}).affected_items || [])[0];
-        }
-      } else if (this.props.item) {
-        currentFile = this.props.item;
-      } else {          
-        let file = this.props.fileName;
-        const data = await WzRequest.apiReq('GET', `/syscheck/${this.props.agentId}`, {
-          params: {
-            q: `file=${file};(type=file,type=registry_key)`,
-          },
-        });
-        currentFile = ((((data || {}).data || {}).data || {}).affected_items || [])[0];
-      }
-      if (!currentFile) {
+      const currentItem = this.props.item;
+
+      if (!currentItem) {
         throw false;
       }
-      this.setState({ currentFile, type: currentFile.type, isLoading: false });
+      this.setState({ currentItem, isLoading: false });
     } catch (err) {
       this.setState({
-        error: `Data could not be fetched for ${this.props.fileName}`,
-        currentFile: { file: this.props.fileName },
+        error: `Data could not be fetched for ${this.props.vulName}`,
       });
     }
   }
 
   componentWillUnmount() {
-    window.location.href = window.location.href.replace(new RegExp('&file=' + '[^&]*', 'g'), '');
   }
 
   render() {
-    const { type } = this.state;
+    const { currentItem } = this.state;
+    const title = `${currentItem.name} ${currentItem.cve}`;
+    const id = title.replace(/ /g, '_');
+
     return (
       <EuiFlyout
         onClose={() => this.props.closeFlyout()}
         size="l"
-        aria-labelledby={this.state.currentFile.file}
+        aria-labelledby={title}
         maxWidth="70%"
         className="wz-inventory wzApp"
       >
         <EuiFlyoutHeader hasBorder className="flyout-header">
           <EuiTitle size="s">
-            <h2 id={this.state.currentFile.file}>{this.state.currentFile.file}</h2>
+            <h2 id={id}>{title}</h2>
           </EuiTitle>
         </EuiFlyoutHeader>
         {this.state.isLoading && (
@@ -119,15 +95,17 @@ export class FlyoutDetail extends Component {
             )) || <EuiLoadingContent style={{ margin: 16 }} />}
           </EuiFlyoutBody>
         )}
-        {this.state.currentFile && !this.state.isLoading && (
+        {currentItem && !this.state.isLoading && (
           <EuiFlyoutBody className="flyout-body">
-            <FileDetails
-              currentFile={this.state.currentFile}
-              type={type}
+            <Details
+              currentItem={currentItem}
               {...this.props}
               implicitFilters={[
-                { 'rule.groups': 'syscheck' },
-                { 'syscheck.path': this.state.currentFile.file },
+                { 'rule.groups': 'vulnerability-detector' },
+                { 'data.vulnerability.package.name': currentItem.name },
+                { 'data.vulnerability.cve': currentItem.cve },
+                { 'data.vulnerability.package.architecture': currentItem.architecture },
+                { 'data.vulnerability.package.version': currentItem.version },
                 { 'agent.id': this.props.agentId },
                 this.state.clusterFilter,
               ]}

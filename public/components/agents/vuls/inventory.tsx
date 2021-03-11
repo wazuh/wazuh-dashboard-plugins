@@ -10,21 +10,16 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import {
   EuiPanel,
   EuiPage,
-  EuiTabs,
-  EuiTab,
   EuiTitle,
   EuiLoadingSpinner,
-  EuiEmptyPrompt,
   EuiSpacer,
   EuiProgress,
   EuiFlexGroup,
   EuiFlexItem,
-  EuiLink,
-  EuiHorizontalRule,
   EuiButtonEmpty
 } from '@elastic/eui';
 import {
@@ -36,7 +31,6 @@ import exportCsv from '../../../react-services/wz-csv';
 import { getToasts }  from '../../../kibana-services';
 import { ICustomBadges } from '../../wz-search-bar/components';
 import { filtersToObject } from '../../wz-search-bar';
-import { WzEmptyPromptNoPermissions } from "../../common/permissions/prompt";
 
 export class Inventory extends Component {
   _isMount = false;
@@ -86,17 +80,17 @@ export class Inventory extends Component {
 
   getStoreFilters(props) {
     const { section, selectView, agent } = props;
-    const filters = JSON.parse(window.localStorage.getItem(`wazuh-${section}-${selectView}-vulnerabilities-${agent['id']}`) || '{}');
+    const filters = JSON.parse(window.localStorage.getItem(`wazuh-${section}-${selectView}-vulnerability-${agent['id']}`) || '{}');
     return filters;
   }
 
   setStoreFilters(filters) {
     const { section, selectView, agent } = this.props;
-    window.localStorage.setItem(`wazuh-${section}-${selectView}-vulnerabilities-${agent['id']}`, JSON.stringify(filters))
+    window.localStorage.setItem(`wazuh-${section}-${selectView}-vulnerability-${agent['id']}`, JSON.stringify(filters))
   }
 
   onFiltersChange = (filters) => {
-    // this.setStoreFilters(filters);
+    this.setStoreFilters(filters);
     this.setState({ filters });
   }
 
@@ -175,7 +169,7 @@ export class Inventory extends Component {
   }
 
   renderTable() {
-    const { filters, items,  totalItems } = this.state;
+    const { filters, items, totalItems } = this.state;
     return (
       <div>
         <FilterBar

@@ -21,7 +21,6 @@ import {
 import { WzRequest } from '../../../../react-services/wz-request';
 import { FlyoutDetail } from './flyout';
 import { filtersToObject, IFilter } from '../../../wz-search-bar';
-// import { TimeService } from '../../../../react-services/time-service';
 
 export class InventoryTable extends Component {
   state: {
@@ -34,10 +33,7 @@ export class InventoryTable extends Component {
     isFlyoutVisible: Boolean
     sortDirection: Direction
     isLoading: boolean
-    currentItem: {
-      vul: string
-    },
-    syscheckItem: {}
+    currentItem: {}
   };
 
   props!: {
@@ -60,10 +56,7 @@ export class InventoryTable extends Component {
       sortDirection: 'asc',
       isLoading: false,
       isFlyoutVisible: false,
-      currentItem: {
-        vul: ""
-      },
-      syscheckItem: {}
+      currentItem: {}
     }
   }
 
@@ -75,22 +68,10 @@ export class InventoryTable extends Component {
     this.setState({ isFlyoutVisible: false, currentItem: {} });
   }
 
-  async showFlyout(file, item, redirect = false) {
-    
-    let itemData = false;
-    if (!redirect) {
-      itemData = this.state.items.filter(item => {
-        return item.file === file;
-      })
-    } else {
-      const response = await WzRequest.apiReq('GET', `/vulnerability/${this.props.agent.id}`, {
-        params: {}
-      });
-      itemData = ((response.data || {}).data || {}).affected_items || [];
-    }
+  async showFlyout(item, redirect = false) {
     
     //if a flyout is opened, we close it and open a new one, so the components are correctly updated on start.
-    this.setState({ isFlyoutVisible: false }, () => this.setState({ isFlyoutVisible: true, currentItem: file, syscheckItem: item }));
+    this.setState({ isFlyoutVisible: false }, () => this.setState({ isFlyoutVisible: true, currentItem: item }));
   }
 
   async componentDidUpdate(prevProps) {
@@ -190,10 +171,10 @@ export class InventoryTable extends Component {
 
   renderTable() {
     const getRowProps = item => {
-      const { itemDetails } = item;
+      const id = `${item.name}-${item.cve}-${item.architecture}-${item.version}`;
       return {
-        'data-test-subj': `row-${itemDetails}`,
-        onClick: () => this.showFlyout(itemDetails, item),
+        'data-test-subj': `row-${id}`,
+        onClick: () => this.showFlyout(item),
       };
     };
 
@@ -242,9 +223,9 @@ export class InventoryTable extends Component {
             headerZindexLocation="below"
             onClick={() => this.closeFlyout() } >
             <FlyoutDetail
-              vulName={this.state.currentItem}
+              vulName={this.state.currentItem.cve}
               agentId={this.props.agent.id}
-              item={this.state.syscheckItem}
+              item={this.state.currentItem}
               closeFlyout={() => this.closeFlyout()}
               type='vulnerability'
               view='inventory'
