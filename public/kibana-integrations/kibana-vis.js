@@ -201,31 +201,32 @@ class KibanaVis extends Component {
     }
   };
 
-  getUserAgentsFilters = () => {
-  // getUserAgentsFilters = async () => {
-    // const agentsIds = await getAuthorizedAgents();
-    const agentsIds = this.props.allowedAgents
+  getUserAgentsFilters = (pattern = "") => {
+    const agentsIds = this.props.allowedAgents;
 
     //check for empty agents array
     if(agentsIds.length == 0){return {}}
 
+    const usedPattern = pattern ? pattern : AppState.getCurrentPattern();
+    const isMonitoringIndex = usedPattern.indexOf('monitoring') > -1;
+    const field = isMonitoringIndex ? 'id' : 'agent.id';
     return  {
       meta: {
-        index: AppState.getCurrentPattern(),
+        index: usedPattern,
         type: 'phrases',
-        key: 'agent.id',
+        key: field,
         value: agentsIds.toString(),
         params: agentsIds,
         alias: null,
         negate: false,
         disabled: false
       },
-      query: {
+      query: {        
         bool: {
           should: agentsIds.map(id => {
             return {
               match_phrase: {
-                'agent.id': id
+                [field]: id
               }
             };
           }),
@@ -254,17 +255,19 @@ class KibanaVis extends Component {
           : timefilter.getTime();
       const filters = isAgentStatus ? [] : discoverList[1] || [];
       const query = !isAgentStatus ? discoverList[0] : {};
-      const agentsFilters = this.getUserAgentsFilters();
-      
-      Object.keys(agentsFilters).length !== 0 ? filters.push(agentsFilters) : null
-
+      const rawVis = raw ? raw.filter((item) => item && item.id === this.visID) : [];
+      let vizPattern;
+      try {
+        vizPattern = JSON.parse(rawVis[0].attributes.kibanaSavedObjectMeta.searchSourceJSON).index;
+      } catch (ex) {}
+      const agentsFilters = this.getUserAgentsFilters(vizPattern);
+      Object.keys(agentsFilters).length !== 0 ? filters.push(agentsFilters) : null;
       const visInput = {
         timeRange,
         filters,
         query
       };
 
-      const rawVis = raw ? raw.filter((item) => item && item.id === this.visID) : []; 
 
       if (rawVis.length && discoverList.length) {
         // There are pending updates from the discover (which is the one who owns the true app state)
