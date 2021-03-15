@@ -1,6 +1,13 @@
 # Change Log
 
 All notable changes to the Wazuh app project will be documented in this file.
+
+## Wazuh v4.1.2 - Kibana 7.10.0 , 7.10.2 - Revision 4104
+
+### Added
+
+- Creation of index pattern after the default one is changes in Settings [#2985](https://github.com/wazuh/wazuh-kibana-app/pull/2985)
+
 ## Wazuh v4.1.2 - Kibana 7.10.0 , 7.10.2 - Revision 4103
 
 ### Added
