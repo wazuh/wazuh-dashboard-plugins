@@ -50,7 +50,7 @@ export class ToolsController {
       this.switchTab(this.tab);
       const breadcrumb = [
         { text: '' },
-        { text: this.tab === 'devTools' ? 'Dev Console' : 'Logtest' },
+        { text: this.tab === 'devTools' ? 'API Console' : 'Log Test' },
       ];
       store.dispatch(updateGlobalBreadcrumb(breadcrumb));
     } catch (error) {}
@@ -61,8 +61,8 @@ export class ToolsController {
    */
   setComponentProps() {
     let tabs = [
-      { id: 'devTools', name: 'Dev Console' },
-      { id: 'logtest', name: 'Logtest' },
+      { id: 'devTools', name: 'API Console' },
+      { id: 'logtest', name: 'Log Test' },
     ];
     this.toolsTabsProps = {
       clickAction: (tab) => {

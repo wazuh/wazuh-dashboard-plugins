@@ -13,28 +13,25 @@ import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
 import { DynamicHeight } from '../../../utils/dynamic-height';
 import {
-  EuiBadge,
   EuiButton,
   EuiCodeBlock,
-  EuiFieldText,
   EuiFlexGroup,
   EuiFlexItem,
+  EuiFlyout,
+  EuiFlyoutBody,
+  EuiFlyoutHeader,
   EuiPage,
   EuiPanel,
-  EuiSelect,
   EuiSpacer,
   EuiTextArea,
   EuiTitle,
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services';
-import { TimeService } from '../../../react-services/time-service';
 
 export const Logtest = (props) => {
   const [value, setValue] = useState('');
   const [testing, setTesting] = useState(false);
   const [testResult, setTestResult] = useState(false);
-  const [logTypeSelect, setLogTypeSelect] = useState('log');
-  const [logLocation, setlogLocation] = useState('logtest');
 
   const onChange = (e) => {
     setValue(e.target.value);
@@ -86,54 +83,6 @@ export const Logtest = (props) => {
 
     setTesting(false);
     setTestResult(formatResult(result.data.data.output));
-    // setTestResult(JSON.stringify(result.data.data.output, null, '\t')); // plan b ?
-  };
-
-  const buildControls = () => {
-    const logsTypeOptions = [{ value: 'log', text: 'Log' }];
-
-    const onChangeLogTypeSelect = () => {
-      return (e) => setLogTypeSelect(e.target.value);
-    };
-    const onChangeLogLocation = () => {
-      return (e) => setlogLocation(e.target.value);
-    };
-
-    return (
-      <Fragment>
-        <EuiFlexItem grow={false}>
-          <EuiSelect
-            id="logsTypeOptions"
-            options={logsTypeOptions}
-            value={logTypeSelect}
-            onChange={onChangeLogTypeSelect}
-            aria-label="Logs type"
-          />
-        </EuiFlexItem>
-        <EuiFlexItem grow={false}>
-          <EuiFieldText
-            placeholder="Log location"
-            value={logLocation}
-            onChange={onChangeLogLocation}
-            aria-label="Log location"
-          />
-        </EuiFlexItem>
-
-        <EuiFlexItem grow={false}>
-          <EuiButton
-            isLoading={testing}
-            isDisabled={testing || !value}
-            iconType="play"
-            fill
-            onClick={() => {
-              test();
-            }}
-          >
-            Test
-          </EuiButton>
-        </EuiFlexItem>
-      </Fragment>
-    );
   };
 
   const buildLogtest = () => {
@@ -146,6 +95,21 @@ export const Logtest = (props) => {
           rows={props.showClose ? 10 : 4}
           onChange={onChange}
         />
+        <EuiSpacer size="m" />
+        <EuiFlexItem grow={false}>
+          <EuiButton
+            style={{ maxWidth: '100px' }}
+            isLoading={testing}
+            isDisabled={testing || !value}
+            iconType="play"
+            fill
+            onClick={() => {
+              test();
+            }}
+          >
+            Test
+          </EuiButton>
+        </EuiFlexItem>
         <EuiSpacer size="m" />
         <EuiCodeBlock
           language="json"
@@ -167,6 +131,7 @@ export const Logtest = (props) => {
     DynamicHeight.dynamicHeightStatic('.euiCodeBlock', props.showClose ? 70 : 100);
 
   dynamicHeight();
+
   return (
     <Fragment>
       {(!props.onFlyout && (
@@ -178,17 +143,11 @@ export const Logtest = (props) => {
                   <Fragment>
                     <EuiFlexItem grow={false}>
                       <EuiTitle size="m">
-                        <h2>Test your logs</h2>
+                        <h2>Log Test</h2>
                       </EuiTitle>
-                    </EuiFlexItem>
-                    <EuiFlexItem grow={false} style={{ padding: '10px 0' }}>
-                      <EuiBadge color="#BD271E" iconType="clock">
-                        Test session started at {TimeService.offset(new Date())}
-                      </EuiBadge>
                     </EuiFlexItem>
                   </Fragment>
                   <EuiFlexItem />
-                  {buildControls()}
                 </EuiFlexGroup>
                 <EuiSpacer size="s" />
                 {buildLogtest()}
@@ -197,23 +156,27 @@ export const Logtest = (props) => {
           </EuiPanel>
         </EuiPage>
       )) || (
-        <EuiFlexGroup>
-          <EuiFlexItem>
+        <EuiFlyout className="wzApp" onClose={() => props.openCloseFlyout()}>
+          <EuiFlyoutHeader hasBorder={true}>
+            <EuiTitle size="m">
+              <h2>Log Test</h2>
+            </EuiTitle>
+          </EuiFlyoutHeader>
+          <EuiFlyoutBody style={{ margin: '20px' }}>
             <EuiFlexGroup gutterSize="m">
               <EuiFlexItem />
-              {buildControls}
             </EuiFlexGroup>
             <EuiSpacer size="s" />
-            {buildLogtest}
-          </EuiFlexItem>
-        </EuiFlexGroup>
+            {buildLogtest()}
+          </EuiFlyoutBody>
+        </EuiFlyout>
       )}
     </Fragment>
   );
 };
 
 Logtest.propTypes = {
-  close: PropTypes.func,
+  openCloseFlyout: PropTypes.func,
   showClose: PropTypes.bool,
   onFlyout: PropTypes.bool,
 };

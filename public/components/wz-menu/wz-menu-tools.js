@@ -34,8 +34,8 @@ class WzMenuTools extends Component {
 
   avaibleRenderSettings() {
     return [
-      this.createItem({ id: 'devTools', text: 'Dev Console' }),
-      this.createItem({ id: 'logtest', text: 'Logtest' }),
+      this.createItem({ id: 'devTools', text: 'API Console' }),
+      this.createItem({ id: 'logtest', text: 'Log Test' }),
     ]
   }
 

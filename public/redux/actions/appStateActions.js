@@ -180,3 +180,25 @@ export const updateClusterStatus = (clusterStatus) => {
     clusterStatus,
   };
 };
+
+/**
+ * Updates showFlyoutLogtest in the appState store
+ * @param showFlyout
+ */
+export const showFlyoutLogtest = (showFlyout) => {
+  return {
+    type: 'SHOW_FLYOUT_LOGTEST',
+    showFlyoutLogtest: showFlyout
+  };
+};
+
+/**
+ * Updates dockedFlyoutLogtest in the appState store
+ * @param dockedFlyout
+ */
+export const updateDockedLogtest = (dockedFlyout) => {
+  return {
+    type: 'UPDATE_DOCKED_LOGTEST',
+    dockedFlyoutLogtest: dockedFlyout
+  };
+};
