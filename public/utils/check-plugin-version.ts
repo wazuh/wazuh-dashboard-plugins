@@ -54,8 +54,8 @@ function clearBrowserInfo(appInfo: TAppInfo) {
   Object.keys(cookies).forEach((cookie) => getCookies().remove(cookie));
 
   //remove cache
-  if (caches) {    
-    caches.keys().then(function (names) {
+  if (window.caches) {    
+    window.caches.keys().then(function (names) {
       for (let name of names) caches.delete(name);
     });
   }
