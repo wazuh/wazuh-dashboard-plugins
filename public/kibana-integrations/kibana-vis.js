@@ -200,6 +200,7 @@ class KibanaVis extends Component {
       this.showToast("danger", "Error", error.message || error, 4000);
     }
   };
+  
 
   getUserAgentsFilters = (pattern = "") => {
     const agentsIds = this.props.allowedAgents;

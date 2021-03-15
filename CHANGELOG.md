@@ -41,6 +41,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed main and `More` menus for unsupported agents [#2959](https://github.com/wazuh/wazuh-kibana-app/pull/2959)
 - Fixed forcing a non numeric filter value in a number type field [#2961](https://github.com/wazuh/wazuh-kibana-app/pull/2961)
 - Fixed wrong number of alerts in Security Events [#2964](https://github.com/wazuh/wazuh-kibana-app/pull/2964)
+- The agents evolution graph shows information about unauthorized agents [#2966](https://github.com/wazuh/wazuh-kibana-app/issues/2966)
+- Fix prompt permissions on Framework of Mitre and Inventory of Integrity monitoring. [#2967](https://github.com/wazuh/wazuh-kibana-app/issues/2967)
 - Fixed search with strange characters of agent in Management groups [#2970](https://github.com/wazuh/wazuh-kibana-app/pull/2970)
 - Fix the statusCode error message [#2971](https://github.com/wazuh/wazuh-kibana-app/pull/2971)
 - Fix the SCA policy stats didn't refresh [#2973](https://github.com/wazuh/wazuh-kibana-app/pull/2973)
@@ -50,9 +52,9 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Can't edit empty rules and decoders files that already exist in the manager [#2978](https://github.com/wazuh/wazuh-kibana-app/pull/2978)
 - Support for alerts index pattern with different ID and name [#2979](https://github.com/wazuh/wazuh-kibana-app/pull/2979)
 - Fix the unpin agent in the selection modal [#2980](https://github.com/wazuh/wazuh-kibana-app/pull/2980)
+- Get most active agents without permissions [#2986](https://github.com/wazuh/wazuh-kibana-app/issues/2986)
 - Fix properly logout of Wazuh API when logging out of the application (only for OpenDistro) [#2789](https://github.com/wazuh/wazuh-kibana-app/issues/2789)
 - Fixed missing `&&` from macOS agent deployment command [#2989](https://github.com/wazuh/wazuh-kibana-app/issues/2989)
-- Fix prompt permissions on Framework of Mitre and Inventory of Integrity monitoring. [#2967](https://github.com/wazuh/wazuh-kibana-app/issues/2967)
 - Fix properly logout of Wazuh API when logging out of the application support x-pack [#2789](https://github.com/wazuh/wazuh-kibana-app/issues/2789)
 
 ## Wazuh v4.1.0 - Kibana 7.10.0 , 7.10.2 - Revision 4101
