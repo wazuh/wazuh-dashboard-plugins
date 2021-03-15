@@ -348,19 +348,35 @@ export class WazuhApiCtrl {
           );
 
           // Check the run_as for the API user and update it
-          let apiUserAllowRunAs = API_USER_STATUS_RUN_AS.DISABLED;
-          if (apiAvailable.run_as) {
-            const responseApiUserAllowRunAs = await context.wazuh.api.client.asInternalUser.request(
-              'GET',
-              `/security/users/me`,
-              {},
-              { apiHostID: request.body.id }
-            );
-            if (responseApiUserAllowRunAs.status === 200) {
-              apiUserAllowRunAs = responseApiUserAllowRunAs.data.data.affected_items[0].allow_run_as ? API_USER_STATUS_RUN_AS.ENABLED : API_USER_STATUS_RUN_AS.NOT_ALLOWED;
-            }
+          let apiUserAllowRunAs = API_USER_STATUS_RUN_AS.ALL_DISABLED;
+          // if (apiAvailable.run_as) {
+          const responseApiUserAllowRunAs = await context.wazuh.api.client.asInternalUser.request(
+            'GET',
+            `/security/users/me`,
+            {},
+            { apiHostID: request.body.id }
+          );
+          if (responseApiUserAllowRunAs.status === 200) {
+            const allow_run_as = responseApiUserAllowRunAs.data.data.affected_items[0].allow_run_as;
+
+            if (allow_run_as && apiAvailable && apiAvailable.run_as) // HOST AND INTERFACE ENABLED
+              apiUserAllowRunAs = API_USER_STATUS_RUN_AS.ENABLED;
+
+            else if (!allow_run_as && apiAvailable && apiAvailable.run_as)// HOST ENABLED AND INTERFACE DISABLED
+              apiUserAllowRunAs = API_USER_STATUS_RUN_AS.INTERFACE_DISABLED;
+
+            else if (allow_run_as && ( !apiAvailable || !apiAvailable.run_as )) // INTERFACE ENABLED AND HOST DISABLED
+              apiUserAllowRunAs = API_USER_STATUS_RUN_AS.HOST_DISABLED;
+
+            else if (!allow_run_as && ( !apiAvailable || !apiAvailable.run_as )) // HOST AND INTERFACE DISABLED
+              apiUserAllowRunAs = API_USER_STATUS_RUN_AS.ALL_DISABLED;
           }
-          CacheInMemoryAPIUserAllowRunAs.set(request.body.id, apiAvailable.username, apiUserAllowRunAs);
+          // }
+          CacheInMemoryAPIUserAllowRunAs.set(
+            request.body.id,
+            apiAvailable.username,
+            apiUserAllowRunAs
+          );
 
           if (responseCluster.status === 200) {
             log('wazuh-api:checkStoredAPI', `Wazuh API response is valid`, 'debug');
@@ -381,7 +397,7 @@ export class WazuhApiCtrl {
                     cluster: responseClusterLocal.data.data.affected_items[0].cluster,
                     status: 'enabled',
                     allow_run_as: apiUserAllowRunAs,
-                  }
+                  },
                 });
               }
             } else {
@@ -392,7 +408,7 @@ export class WazuhApiCtrl {
                   cluster: 'Disabled',
                   status: 'disabled',
                   allow_run_as: apiUserAllowRunAs,
-                }
+                },
               });
             }
           }

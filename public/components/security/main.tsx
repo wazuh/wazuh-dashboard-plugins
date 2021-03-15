@@ -117,10 +117,26 @@ export const WzSecurity = compose(
 
 
   const isNotRunAs = (allowRunAs) => {
-    const runAsWarningTxt =
-      allowRunAs === API_USER_STATUS_RUN_AS.NOT_ALLOWED
-        ? 'For the role mapping to take effect, enable run_as in /usr/share/kibana/data/wazuh/config/wazuh.yml configuration file, restart the Kibana service and clear your browser cache and cookies.'
-        : 'The role mapping has no effect because the current Wazuh API user has allow_run_as disabled.';
+    let runAsWarningTxt = '';
+    switch (allowRunAs) {
+      case API_USER_STATUS_RUN_AS.HOST_DISABLED:
+        runAsWarningTxt =
+          'For the role mapping to take effect, enable run_as in /usr/share/kibana/data/wazuh/config/wazuh.yml configuration file, restart the Kibana service and clear your browser cache and cookies.';
+        break;
+      case API_USER_STATUS_RUN_AS.INTERFACE_DISABLED:
+        runAsWarningTxt =
+          'The role mapping has no effect because the current Wazuh API user has allow_run_as disabled.';
+        break;
+      case API_USER_STATUS_RUN_AS.ALL_DISABLED:
+        runAsWarningTxt =
+          'For the role mapping to take effect, enable run_as in /usr/share/kibana/data/wazuh/config/wazuh.yml configuration file and check the current Wazuh API user has allow_run_as. Restart the Kibana service and clear your browser cache and cookies.';
+        break;
+      default:
+        runAsWarningTxt =
+          'The role mapping has no effect because the current Wazuh API user has run_as disabled.';
+        break;
+    }
+      
     return (
       <EuiFlexGroup >
         <EuiFlexItem >
@@ -150,7 +166,7 @@ export const WzSecurity = compose(
           }
           {selectedTabId === 'roleMapping' &&
             <>
-              {(allowRunAs === API_USER_STATUS_RUN_AS.DISABLED || allowRunAs === API_USER_STATUS_RUN_AS.NOT_ALLOWED) && isNotRunAs(allowRunAs)}
+              {(allowRunAs !== API_USER_STATUS_RUN_AS.ENABLED) && isNotRunAs(allowRunAs)}
               <RolesMapping></RolesMapping>
             </>
           }
