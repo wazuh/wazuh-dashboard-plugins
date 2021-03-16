@@ -166,7 +166,7 @@ export const WzSecurity = compose(
           }
           {selectedTabId === 'roleMapping' &&
             <>
-              {(allowRunAs !== API_USER_STATUS_RUN_AS.ENABLED) && isNotRunAs(allowRunAs)}
+              {(allowRunAs !== undefined && allowRunAs !== API_USER_STATUS_RUN_AS.ENABLED) && isNotRunAs(allowRunAs)}
               <RolesMapping></RolesMapping>
             </>
           }
