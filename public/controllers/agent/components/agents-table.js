@@ -753,7 +753,7 @@ export class AgentsTable extends Component {
       },
       {
         field: 'node_name',
-        name: 'Node name',
+        name: 'Cluster node',
         width: '10%',
         truncateText: true,
         sortable: true
