@@ -237,6 +237,8 @@ export class AgentsTable extends Component {
     const agentVersion =
       agent.version !== undefined ? agent.version.split(' ')[1] : '-';
     const { timeService } = this.props;
+    const node_name = agent.node_name && agent.node_name !== 'unknown' ? agent.node_name : '-';
+
     return {
       id: agent.id,
       name: agent.name,
@@ -245,6 +247,7 @@ export class AgentsTable extends Component {
       group: checkField(agent.group),
       os_name: agent,
       version: agentVersion,
+      node_name: node_name,
       dateAdd: timeService(agent.dateAdd),
       lastKeepAlive: lastKeepAlive(agent.lastKeepAlive, timeService),
       actions: agent,
@@ -749,6 +752,13 @@ export class AgentsTable extends Component {
         render: this.addIconPlatformRender
       },
       {
+        field: 'node_name',
+        name: 'Cluster node',
+        width: '10%',
+        truncateText: true,
+        sortable: true
+      },
+      {
         field: 'version',
         name: 'Version',
         width: '5%',
@@ -858,7 +868,7 @@ export class AgentsTable extends Component {
 
     const getCellProps = (item, column) => {
       if(column.field=="actions"){
-        return 
+        return
       }
       return {
         onMouseDown: (ev) => {
