@@ -171,7 +171,7 @@ export const updateClusterStatus = (clusterStatus) => {
 };
 
 /**
- * Updates ClusterOrManagerConfiguration in the appState store
+ * Updates the status of whether the user is logged in
  * @param userHasLogged
  */
 export const updateUserHasLogged = (userHasLogged) => {

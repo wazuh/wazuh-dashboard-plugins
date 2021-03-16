@@ -1,5 +1,5 @@
 /*
- * Wazuh app - React HOCs to manage user authorization requirements
+ * Wazuh app - React HOC to manage if the user is logged in
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -17,17 +17,16 @@ import { getHttp } from '../../../kibana-services';
 
 
 
-export function withUserHasLogged(WrappedComponent){
-    return (props)=>{
-        const userHasLogged = useSelector((state)=> state.appStateReducers.userHasLogged);
-        return userHasLogged?<WrappedComponent {...props}/>: 
-        <div className="withUserLogged">
-            <img src={getHttp().basePath.prepend('/plugins/wazuh/assets/icon_blue.svg')} className="withUserLogged-logo" alt=""></img>
-            <EuiSpacer size="s" />
-            <EuiText className="subdued-color">Loading ...</EuiText>
-            <EuiSpacer size="s" />
-            <EuiProgress className ="withUserLogged-loader" size="xs" color="primary" />
-        </div>
-    }
-} 
+export const withUserHasLogged = (WrappedComponent) => (props) => {
+    const userHasLogged = useSelector((state)=> state.appStateReducers.userHasLogged);
+    return userHasLogged ? <WrappedComponent {...props}/> : (
+      <div className="withUserLogged">
+        <img src={getHttp().basePath.prepend('/plugins/wazuh/assets/icon_blue.svg')} className="withUserLogged-logo" alt=""></img>
+        <EuiSpacer size="s" />
+        <EuiText className="subdued-color">Loading ...</EuiText>
+        <EuiSpacer size="s" />
+        <EuiProgress className ="withUserLogged-loader" size="xs" color="primary" />
+      </div>
+    )
+  } 
 
