@@ -25,6 +25,7 @@ import {
   EuiSpacer,
   EuiTextArea,
   EuiTitle,
+  EuiOverlayMask,
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services';
 
@@ -156,20 +157,27 @@ export const Logtest = (props) => {
           </EuiPanel>
         </EuiPage>
       )) || (
-        <EuiFlyout className="wzApp" onClose={() => props.openCloseFlyout()}>
-          <EuiFlyoutHeader hasBorder={true}>
-            <EuiTitle size="m">
-              <h2>Log Test</h2>
-            </EuiTitle>
-          </EuiFlyoutHeader>
-          <EuiFlyoutBody style={{ margin: '20px' }}>
-            <EuiFlexGroup gutterSize="m">
-              <EuiFlexItem />
-            </EuiFlexGroup>
-            <EuiSpacer size="s" />
-            {buildLogtest()}
-          </EuiFlyoutBody>
-        </EuiFlyout>
+        <EuiOverlayMask
+          headerZindexLocation="below"
+          onClick={() => {
+            props.openCloseFlyout();
+          }}
+        >
+          <EuiFlyout className="wzApp" onClose={() => props.openCloseFlyout()}>
+            <EuiFlyoutHeader hasBorder={true}>
+              <EuiTitle size="m">
+                <h2>Log Test</h2>
+              </EuiTitle>
+            </EuiFlyoutHeader>
+            <EuiFlyoutBody style={{ margin: '20px' }}>
+              <EuiFlexGroup gutterSize="m">
+                <EuiFlexItem />
+              </EuiFlexGroup>
+              <EuiSpacer size="s" />
+              {buildLogtest()}
+            </EuiFlyoutBody>
+          </EuiFlyout>
+        </EuiOverlayMask>
       )}
     </Fragment>
   );
