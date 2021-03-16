@@ -129,7 +129,7 @@ export const WzSecurity = compose(
         break;
       case API_USER_STATUS_RUN_AS.ALL_DISABLED:
         runAsWarningTxt =
-          'For the role mapping to take effect, enable run_as in /usr/share/kibana/data/wazuh/config/wazuh.yml configuration file and check the current Wazuh API user has allow_run_as. Restart the Kibana service and clear your browser cache and cookies.';
+          'For the role mapping to take effect, enable run_as in /usr/share/kibana/data/wazuh/config/wazuh.yml configuration file and set the current Wazuh API user allow_run_as to true. Restart the Kibana service and clear your browser cache and cookies.';
         break;
       default:
         runAsWarningTxt =
