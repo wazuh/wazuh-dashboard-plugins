@@ -1,6 +1,12 @@
 # Change Log
 
 All notable changes to the Wazuh app project will be documented in this file.
+## Wazuh v4.1.2 - Kibana 7.10.0 , 7.10.2 - Revision 4103
+
+### Added
+
+- Fixed The page of not having permissions appears when you update in a second [#3041](https://github.com/wazuh/wazuh-kibana-app/pull/3041)
+
 ## Wazuh v4.1.1 - Kibana 7.10.0 , 7.10.2 - Revision 4103
 
 ### Added
