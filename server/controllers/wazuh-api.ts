@@ -349,7 +349,6 @@ export class WazuhApiCtrl {
 
           // Check the run_as for the API user and update it
           let apiUserAllowRunAs = API_USER_STATUS_RUN_AS.ALL_DISABLED;
-          // if (apiAvailable.run_as) {
           const responseApiUserAllowRunAs = await context.wazuh.api.client.asInternalUser.request(
             'GET',
             `/security/users/me`,
@@ -371,7 +370,6 @@ export class WazuhApiCtrl {
             else if (!allow_run_as && ( !apiAvailable || !apiAvailable.run_as )) // HOST AND INTERFACE DISABLED
               apiUserAllowRunAs = API_USER_STATUS_RUN_AS.ALL_DISABLED;
           }
-          // }
           CacheInMemoryAPIUserAllowRunAs.set(
             request.body.id,
             apiAvailable.username,
