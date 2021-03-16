@@ -7,17 +7,17 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Added
 
 - Creation of index pattern after the default one is changes in Settings [#2985](https://github.com/wazuh/wazuh-kibana-app/pull/2985)
+- Added node name of agent list and detail [#3039](https://github.com/wazuh/wazuh-kibana-app/pull/3039)
 
 ### Fixed
 
 - Improved validation and prevention for caching bundles in client side [#3063](https://github.com/wazuh/wazuh-kibana-app/pull/3063)
 
-## Wazuh v4.1.2 - Kibana 7.10.0 , 7.10.2 - Revision 4103
 
-### Added
+## Wazuh v4.1.1 - Kibana 7.10.0 , 7.10.2 - Revision 4103
 
-- Refactor of some prompts [#3015](https://github.com/wazuh/wazuh-kibana-app/pull/3015)
 - Add `run_as` setting to example host configuration in Add new API view [#3021](https://github.com/wazuh/wazuh-kibana-app/pull/3021)
+- Refactor of some prompts [#3015](https://github.com/wazuh/wazuh-kibana-app/pull/3015)
 
 ### Fixed
 
