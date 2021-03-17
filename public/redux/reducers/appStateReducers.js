@@ -132,7 +132,7 @@ const appStateReducers = (state = initialState, action) => {
     };
   }
 
-  if (action.type === 'UPDATE_USER_HAS_LOGGED') {
+  if (action.type === 'UPDATE_WITH_USER_LOGGED') {
     return {
       ...state,
      withUserLogged: action.withUserLogged,

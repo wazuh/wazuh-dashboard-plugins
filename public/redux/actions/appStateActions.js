@@ -176,7 +176,7 @@ export const updateClusterStatus = (clusterStatus) => {
  */
 export const updateWithUserLogged = (withUserLogged) => {
   return {
-    type: 'UPDATE_USER_HAS_LOGGED',
+    type: 'UPDATE_WITH_USER_LOGGED',
    withUserLogged,
   };
 };
