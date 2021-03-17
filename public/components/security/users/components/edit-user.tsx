@@ -19,7 +19,7 @@ import {
 
 import { useApiService } from '../../../common/hooks/useApiService';
 import { Role } from '../../roles/types/role.type';
-import { UpdateUser } from '../types/user.type';
+import { UpdateUser, User } from '../types/user.type';
 import UsersServices from '../services';
 import RolesServices from '../../roles/services';
 import { ErrorHandler } from '../../../../react-services/error-handler';
@@ -121,15 +121,21 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
 
     setIsLoading(true);
 
-    const userData: UpdateUser = {
-      allow_run_as: allowRunAs,
-    };
+    const userPromises: (Promise<User> | Promise<void>)[] = [];
+    const userData: UpdateUser = {};
+    const allowRunAsData: boolean = allowRunAs;
+
+    if (allowRunAsData != currentUser.allow_run_as)
+      userPromises.push(UsersServices.UpdateAllowRunAs(currentUser.id, allowRunAsData));
 
     if (password) {
       userData.password = password;
+      userPromises.push(UsersServices.UpdateUser(currentUser.id, userData));
     }
+
+    userPromises.push(updateRoles());
     try {
-      await Promise.all([UsersServices.UpdateUser(currentUser.id, userData), updateRoles()]);
+      await Promise.all([userPromises]);
 
       ErrorHandler.info('User was successfully updated');
       closeFlyout(true);

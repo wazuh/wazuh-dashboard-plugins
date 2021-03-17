@@ -39,7 +39,6 @@ export const CreateUser = ({ closeFlyout }) => {
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [allowRunAs, setAllowRunAs] = useState<boolean>(false);
   const [formErrors, setFormErrors] = useState<any>({
     userName: '',
     password: '',
@@ -88,6 +87,7 @@ export const CreateUser = ({ closeFlyout }) => {
   const validations = {
     userName: [
       { fn: () => (userName.trim() === '' ? 'The user name is required' : '') },
+      { fn: () => (userName.trim().includes(' ')? 'The user name cannot contain spaces' : '') },
       {
         fn: () =>
           !userName.match(/^.{4,20}$/)
@@ -139,7 +139,6 @@ export const CreateUser = ({ closeFlyout }) => {
     const userData: TCreateUser = {
       username: userName,
       password: password,
-      allow_run_as: allowRunAs,
     };
 
     try {             
@@ -177,9 +176,6 @@ export const CreateUser = ({ closeFlyout }) => {
     setConfirmPassword(e.target.value);
   };
 
-  const onChangeAllowRunAs = e => {
-    setAllowRunAs(e.target.checked);
-  };
 
   return (
     <EuiFlyout className="wzApp" onClose={() => closeFlyout()}>
@@ -235,15 +231,6 @@ export const CreateUser = ({ closeFlyout }) => {
                 onChange={e => onChangeConfirmPassword(e)}
                 aria-label=""
                 isInvalid={!!formErrors.confirmPassword}
-              />
-            </EuiFormRow>
-            <EuiFormRow label="Allow run as" helpText="Set if the user is able to use run as">
-              <EuiSwitch
-                label="Allow run as"
-                showLabel={false}
-                checked={allowRunAs}
-                onChange={e => onChangeAllowRunAs(e)}
-                aria-label=""
               />
             </EuiFormRow>
           </EuiPanel>
