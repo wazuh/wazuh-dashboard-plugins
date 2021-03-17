@@ -17,9 +17,9 @@ import { getHttp } from '../../../kibana-services';
 
 
 
-export const withUserHasLogged = (WrappedComponent) => (props) => {
-    const userHasLogged = useSelector((state)=> state.appStateReducers.userHasLogged);
-    return userHasLogged ? <WrappedComponent {...props}/> : (
+export const withUserLogged = (WrappedComponent) => (props) => {
+    const withUserLogged = useSelector((state)=> state.appStateReducers.withUserLogged);
+    return withUserLogged ? <WrappedComponent {...props}/> : (
       <div className="withUserLogged">
         <img src={getHttp().basePath.prepend('/plugins/wazuh/assets/icon_blue.svg')} className="withUserLogged-logo" alt=""></img>
         <EuiSpacer size="s" />

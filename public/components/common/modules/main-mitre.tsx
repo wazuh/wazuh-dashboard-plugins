@@ -12,11 +12,11 @@
 
 import React, { Component } from 'react';
 import { Mitre } from '../../../components/overview/mitre/mitre';
-import { withUserAuthorizationPrompt, withUserHasLogged } from '../hocs';
+import { withUserAuthorizationPrompt, withUserLogged } from '../hocs';
 import { compose } from 'redux';
 
 export const MainMitre = compose(
-  withUserHasLogged,
+  withUserLogged,
   withUserAuthorizationPrompt([
     { action: 'mitre:read', resource: '*:*:*' },
   ])

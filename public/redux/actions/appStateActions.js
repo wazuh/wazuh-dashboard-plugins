@@ -172,11 +172,11 @@ export const updateClusterStatus = (clusterStatus) => {
 
 /**
  * Updates the status of whether the user is logged in
- * @param userHasLogged
+ * @paramwithUserLogged
  */
-export const updateUserHasLogged = (userHasLogged) => {
+export const updateWithUserLogged = (withUserLogged) => {
   return {
     type: 'UPDATE_USER_HAS_LOGGED',
-    userHasLogged,
+   withUserLogged,
   };
 };

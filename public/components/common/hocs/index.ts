@@ -29,4 +29,4 @@ export { withButtonOpenOnClick } from './withButtonOpenOnClick';
 
 export { withAgentSupportModule } from './withAgentSupportModule';
 
-export { withUserHasLogged } from './withUserLogged';
+export { withUserLogged } from './withUserLogged';

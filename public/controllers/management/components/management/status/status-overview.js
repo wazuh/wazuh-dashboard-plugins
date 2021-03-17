@@ -46,7 +46,7 @@ import WzStatusAgentInfo from './status-agent-info';
 
 import { getToasts }  from '../../../../../kibana-services';
 
-import { withUserAuthorizationPrompt, withGlobalBreadcrumb, withUserHasLogged } from '../../../../../components/common/hocs';
+import { withUserAuthorizationPrompt, withGlobalBreadcrumb, withUserLogged } from '../../../../../components/common/hocs';
 import { compose } from 'redux';
 import { ToastNotifications } from '../../../../../react-services/toast-notifications';
 
@@ -253,7 +253,7 @@ export default compose(
     { text: 'Management', href: '/app/wazuh#/manager' },
     { text: 'Status' }
   ]),
-  withUserHasLogged,
+  withUserLogged,
   withUserAuthorizationPrompt([{ action: 'agent:read', resource: 'agent:id:*' }, { action: 'manager:read', resource: '*:*:*' }, { action: 'cluster:read', resource: 'node:id:*' }]),
   connect(
     mapStateToProps,
