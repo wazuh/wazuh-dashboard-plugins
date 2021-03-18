@@ -51,7 +51,7 @@ export const APIUserAllowRunAs = {
         {},
         { apiHostID: apiId }
       );
-      const statusUserAllowRunAs = response.data.data.affected_items[0].allow_run_as ? API_USER_STATUS_RUN_AS.ENABLED : API_USER_STATUS_RUN_AS.INTERFACE_DISABLED;
+      const statusUserAllowRunAs = response.data.data.affected_items[0].allow_run_as ? API_USER_STATUS_RUN_AS.ENABLED : API_USER_STATUS_RUN_AS.USER_DISABLED;
 
       // Cache the run_as for the API user
       CacheInMemoryAPIUserAllowRunAs.set(apiId, api.username, statusUserAllowRunAs);
@@ -63,9 +63,9 @@ export const APIUserAllowRunAs = {
   },
   async canUse(apiId: string): Promise<number | never>{
     const ApiUserCanUseStatus = await APIUserAllowRunAs.check(apiId);
-    if(ApiUserCanUseStatus === API_USER_STATUS_RUN_AS.HOST_DISABLED){
+    if(ApiUserCanUseStatus === API_USER_STATUS_RUN_AS.USER_DISABLED){
       const api = await manageHosts.getHostById(apiId);
-      throw new Error(`API with host ID [${apiId}] misconfigured. The Wazuh API user [${api.username}] is not allowed to use [run_as]. Give it permissions or set [run_as] host setting with [false] value.`);
+      throw new Error(`API with host ID [${apiId}] misconfigured. The Wazuh API user [${api.username}] is not allowed to use [run_as]. Allow it in the user configuration or set [run_as] host setting with [false] value.`);
     }
     return ApiUserCanUseStatus;
   }
@@ -74,23 +74,23 @@ export const APIUserAllowRunAs = {
 /**
  * @example
  *   HOST = set in wazuh.yml config
- *   INTERFACE = set in user interface
+ *   USER = set in user interface
  *
  * ALL_DISABLED
- *   binary 00 = decimal 0 ---> INTERFACE 0 y HOST 0
+ *   binary 00 = decimal 0 ---> USER 0 y HOST 0
  * 
- * INTERFACE_DISABLED
- *   binary 01 = decimal 1 ---> INTERFACE 0 y HOST 1
+ * USER_DISABLED
+ *   binary 01 = decimal 1 ---> USER 0 y HOST 1
  * 
  * HOST_DISABLED
- *   binary 10 = decimal 2 ---> INTERFACE 1 y HOST 0
+ *   binary 10 = decimal 2 ---> USER 1 y HOST 0
  * 
  * ENABLED
- *   binary 11 = decimal 3 ---> INTERFACE 1 y HOST 1
+ *   binary 11 = decimal 3 ---> USER 1 y HOST 1
  */
 export enum API_USER_STATUS_RUN_AS{
-  ALL_DISABLED = 0, // Wazuh HOST and INTERFACE API user configured with run_as=false or undefined
-  INTERFACE_DISABLED = 1, // Wazuh HOST API user configured with run_as = TRUE in wazuh.yml but it has not run_as in Wazuh API
+  ALL_DISABLED = 0, // Wazuh HOST and USER API user configured with run_as=false or undefined
+  USER_DISABLED = 1, // Wazuh HOST API user configured with run_as = TRUE in wazuh.yml but it has not run_as in Wazuh API
   HOST_DISABLED = 2, // Wazuh HOST API user configured with run_as=false in wazuh.yml but it has not run_as in Wazuh API
   ENABLED = 3 // Wazuh API user configured with run_as=true and allow run_as
 }

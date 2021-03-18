@@ -358,16 +358,16 @@ export class WazuhApiCtrl {
           if (responseApiUserAllowRunAs.status === 200) {
             const allow_run_as = responseApiUserAllowRunAs.data.data.affected_items[0].allow_run_as;
 
-            if (allow_run_as && apiAvailable && apiAvailable.run_as) // HOST AND INTERFACE ENABLED
+            if (allow_run_as && apiAvailable && apiAvailable.run_as) // HOST AND USER ENABLED
               apiUserAllowRunAs = API_USER_STATUS_RUN_AS.ENABLED;
 
-            else if (!allow_run_as && apiAvailable && apiAvailable.run_as)// HOST ENABLED AND INTERFACE DISABLED
-              apiUserAllowRunAs = API_USER_STATUS_RUN_AS.INTERFACE_DISABLED;
+            else if (!allow_run_as && apiAvailable && apiAvailable.run_as)// HOST ENABLED AND USER DISABLED
+              apiUserAllowRunAs = API_USER_STATUS_RUN_AS.USER_DISABLED;
 
-            else if (allow_run_as && ( !apiAvailable || !apiAvailable.run_as )) // INTERFACE ENABLED AND HOST DISABLED
+            else if (allow_run_as && ( !apiAvailable || !apiAvailable.run_as )) // USER ENABLED AND HOST DISABLED
               apiUserAllowRunAs = API_USER_STATUS_RUN_AS.HOST_DISABLED;
 
-            else if (!allow_run_as && ( !apiAvailable || !apiAvailable.run_as )) // HOST AND INTERFACE DISABLED
+            else if (!allow_run_as && ( !apiAvailable || !apiAvailable.run_as )) // HOST AND USER DISABLED
               apiUserAllowRunAs = API_USER_STATUS_RUN_AS.ALL_DISABLED;
           }
           CacheInMemoryAPIUserAllowRunAs.set(
