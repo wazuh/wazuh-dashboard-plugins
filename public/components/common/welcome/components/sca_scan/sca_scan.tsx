@@ -34,11 +34,12 @@ import { updateCurrentAgentData } from '../../../../../redux/actions/appStateAct
 import { WzRequest } from '../../../../../react-services';
 import { formatUIDate } from '../../../../../react-services/time-service';
 import { getAngularModule } from '../../../../../kibana-services';
-import { withReduxProvider, withUserAuthorizationPrompt } from "../../../hocs";
+import { withReduxProvider, withUserAuthorizationPrompt, withUserLogged } from "../../../hocs";
 import { compose } from 'redux';
 
 export const ScaScan = compose(
   withReduxProvider,
+  withUserLogged,
   withUserAuthorizationPrompt([{action: 'agent:read', resource: 'agent:id:*'}, {action: 'sca:read', resource: 'agent:id:*'}])
 )(class ScaScan extends Component {
   _isMount = false;

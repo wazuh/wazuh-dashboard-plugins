@@ -751,6 +751,13 @@ export class AgentsTable extends Component {
         render: this.addIconPlatformRender
       },
       {
+        field: 'node_name',
+        name: 'Cluster node',
+        width: '10%',
+        truncateText: true,
+        sortable: true
+      },
+      {
         field: 'version',
         name: 'Version',
         width: '5%',
@@ -860,7 +867,7 @@ export class AgentsTable extends Component {
 
     const getCellProps = (item, column) => {
       if(column.field=="actions"){
-        return 
+        return
       }
       return {
         onMouseDown: (ev) => {

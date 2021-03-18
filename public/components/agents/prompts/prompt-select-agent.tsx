@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Prompt when an agent is not active
+ * Wazuh app - Prompt when an agent is not selected
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -13,16 +13,22 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import { EuiEmptyPrompt, EuiButton } from '@elastic/eui';
-import { showExploreAgentModal } from '../../redux/actions/appStateActions';
+import { showExploreAgentModal } from '../../../redux/actions/appStateActions';
 
-export const PromptNoActiveAgent = () => {
+type PromptSelectAgentProps = {
+  body?: string;
+  title: string;
+}
+
+export const PromptSelectAgent = ({ body, title }:PromptSelectAgentProps) => {
   const dispatch = useDispatch();
   const openAgentSelector = () => dispatch(showExploreAgentModal(true));
   return (
     <EuiEmptyPrompt
       iconType="watchesApp"
-      title={<h2>Agent is not active</h2>}
-      body={<p>This section is only available for active agents.</p>}
+      title={<h2>{title}</h2>}
+      body={body && <p>{body}</p>
+      }
       actions={
         <EuiButton color="primary" fill onClick={openAgentSelector}>
           Select agent

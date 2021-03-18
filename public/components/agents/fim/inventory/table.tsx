@@ -146,12 +146,14 @@ export class InventoryTable extends Component {
     const filter = {
       ...filters,
       formatUIDate: pageIndex * pageSize,
+      offset: pageIndex * pageSize,
       limit: pageSize,
       sort: this.buildSortFilter(),
       type: 'file'
     };
     return filter;
   }
+
 
   onTableChange = ({ page = {}, sort = {} }) => {
     const { index: pageIndex, size: pageSize } = page;

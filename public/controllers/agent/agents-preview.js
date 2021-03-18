@@ -50,7 +50,7 @@ export class AgentsPreviewController {
     this.wazuhConfig = new WazuhConfig();
     this.errorInit = false;
     this.$window = $window;
-    this.formatUIDate = formatUIDate;
+    // this.formatUIDate = formatUIDate;
   }
 
   /**
@@ -143,7 +143,8 @@ export class AgentsPreviewController {
         );
         this.$scope.$applyAsync();
       },
-      formatUIDate: date => this.formatUIDate(date),
+      // formatUIDate: date => this.formatUIDate(date),
+      formatUIDate: date => formatUIDate(date),
       summary: this.summary
     };
     //Load

@@ -30,6 +30,8 @@ import {
 import { Discover } from '../../../../common/modules/discover';
 import { AppState } from '../../../../../react-services/app-state';
 import { requirementGoal } from '../../requirement-goal';
+import { getUiSettings } from '../../../../../kibana-services';
+import { FilterManager } from '../../../../../../../../src/plugins/data/public/';
 
 
 
@@ -41,10 +43,13 @@ export class RequirementFlyout extends Component {
     props!: {
     };
 
+    filterManager: FilterManager;
+
     constructor(props) {
         super(props);
         this.state = {
         }
+        this.filterManager = new FilterManager(getUiSettings());
     }
 
     componentDidMount() {
@@ -164,7 +169,7 @@ export class RequirementFlyout extends Component {
                     initialIsOpen={true}>
                     <EuiFlexGroup className="flyout-row">
                         <EuiFlexItem>
-                            <Discover initialColumns={["icon", "timestamp", this.props.getRequirementKey(), 'rule.level', 'rule.id', 'rule.description']} implicitFilters={implicitFilters} initialFilters={[]} updateTotalHits={(total) => this.updateTotalHits(total)} />
+                            <Discover kbnSearchBar shareFilterManager={this.filterManager} initialColumns={["icon", "timestamp", this.props.getRequirementKey(), 'rule.level', 'rule.id', 'rule.description']} implicitFilters={implicitFilters} initialFilters={[]} updateTotalHits={(total) => this.updateTotalHits(total)} />
                         </EuiFlexItem>
                     </EuiFlexGroup>
                 </EuiAccordion>

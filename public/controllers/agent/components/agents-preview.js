@@ -38,7 +38,7 @@ import { TabVisualizations } from '../../../factories/tab-visualizations';
 import { WazuhConfig } from './../../../react-services/wazuh-config.js';
 import { WzDatePicker } from '../../../components/wz-date-picker/wz-date-picker';
 import { withReduxProvider, withGlobalBreadcrumb, withUserAuthorizationPrompt } from '../../../components/common/hocs';
-import { getUiSettings } from '../../../../public/kibana-services';
+import { formatUIDate } from '../../../../public/react-services/time-service';
 import { compose } from 'redux';
 
 export const AgentsPreview = compose(
@@ -330,7 +330,7 @@ export const AgentsPreview = compose(
                 addingNewAgent={this.props.tableProps.addingNewAgent}
                 downloadCsv={this.props.tableProps.downloadCsv}
                 clickAction={this.props.tableProps.clickAction}
-                formatUIDate={this.props.tableProps.formatUIDate}
+                formatUIDate={ date => formatUIDate(date)}
                 reload={() => this.getSummary()}
               />
             </WzReduxProvider>

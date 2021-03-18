@@ -101,7 +101,8 @@ export class AddApi extends Component {
      url: <api_url>
      port: <api_port>
      username: <api_username>
-     password: <api_password>`;
+     password: <api_password>
+     run_as: <run_as>`;
 
     const checkConnectionChildren = (
       <div>
@@ -150,7 +151,8 @@ export class AddApi extends Component {
           <EuiCode>{'<api_port>'}</EuiCode> is the port,{' '}
           <EuiCode>{'<api_username>'}</EuiCode> and{' '}
           <EuiCode>{'<api_password>'}</EuiCode> are the credentials to
-          authenticate.
+          authenticate,{' '}
+          <EuiCode>{'<run_as>'}</EuiCode> defines if the app user's permissions depends on the authentication context (<EuiCode>{'true'}</EuiCode> / <EuiCode>{'false'}</EuiCode>).
         </EuiText>
       </div>
     );
