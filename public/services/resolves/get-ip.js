@@ -26,6 +26,19 @@ export function getIp(
 ) {
   const deferred = $q.defer();
 
+  const checkWazuhConfig = async (indexPatterns) => {
+    const wazuhConfig = new WazuhConfig();
+    const configuration = wazuhConfig.getConfig();
+    const indexPatternFound = indexPatterns.find((indexPattern) => indexPattern.attributes.title === configuration.pattern);
+    if(!indexPatternFound){
+      AppState.removeCurrentPattern()
+    }
+    getDataPlugin().indexPatterns.setDefault(configuration.pattern, true);
+    AppState.setCurrentPattern(configuration.pattern)
+
+    return indexPatternFound;
+  }
+
   const checkWazuhPatterns = async (indexPatterns) => {
     const wazuhConfig = new WazuhConfig();
     const configuration = await getWzConfig($q, GenericRequest, wazuhConfig);
@@ -54,7 +67,7 @@ export function getIp(
 
       let currentPattern = '';
 
-      if (AppState.getCurrentPattern() && await checkWazuhPatterns(savedObjects)) {
+      if (AppState.getCurrentPattern() && await checkWazuhPatterns(savedObjects) && await checkWazuhConfig(savedObjects)) {
         // There's cookie for the pattern
         currentPattern = AppState.getCurrentPattern();
       } else {
@@ -92,8 +105,6 @@ export function getIp(
   };
 
   const currentParams = $location.search();
-  const targetedAgent =
-    currentParams && (currentParams.agent || currentParams.agent === '000');
   const targetedRule =
     currentParams && currentParams.tab === 'ruleset' && currentParams.ruleid;
   if (!targetedRule && healthCheck($window)) {

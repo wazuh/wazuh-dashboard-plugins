@@ -81,24 +81,24 @@ class WzMenu extends Component {
   async componentDidMount() {
     const $injector = getAngularModule().$injector;
     this.router = $injector.get('$route');
-    try{
+    try {
       const result = await this.genericReq.request('GET', '/hosts/apis', {});
       const APIlist = (result || {}).data || [];
-      if (APIlist.length){
+      if (APIlist.length) {
         const { id: apiId } = JSON.parse(AppState.getCurrentAPI());
         const filteredApi = APIlist.filter(api => api.id === apiId);
         const selectedApi = filteredApi[0];
-        if(selectedApi){
+        if (selectedApi) {
           const apiData = await ApiCheck.checkStored(selectedApi.id);
           //update cluster info
           const cluster_info = (((apiData || {}).data || {}).data || {})
-              .cluster_info;
+            .cluster_info;
           if (cluster_info) {
-              AppState.setClusterInfo(cluster_info);
+            AppState.setClusterInfo(cluster_info);
           }
         }
-    }
-    }catch(err){}
+      }
+    } catch (err) { }
 
   }
 
@@ -128,6 +128,44 @@ class WzMenu extends Component {
     const APIlist = (result || {}).data || [];
     if (APIlist.length) this.setState({ APIlist });
   };
+
+  loadIndexPatternsList = async () => {
+    try {
+      const list = await PatternHandler.getPatternList('api');
+      if (!list) return;
+
+      // Abort if we have disabled the pattern selector
+      if (!AppState.getPatternSelector()) return;
+
+      let filtered = false;
+      // If there is no current pattern, fetch it
+      if (!AppState.getCurrentPattern()) {
+        AppState.setCurrentPattern(list[0].id);
+      } else {
+        // Check if the current pattern cookie is valid
+        filtered = list.find(item =>
+          item.id.includes(AppState.getCurrentPattern())
+        );
+        if (!filtered) AppState.setCurrentPattern(list[0].id);
+      }
+
+      const data = filtered
+        ? filtered
+        : await this.indexPatterns.get(AppState.getCurrentPattern());
+      this.setState({ theresPattern: true, currentPattern: data.title });
+
+      // Getting the list of index patterns
+      if (list) {
+        this.setState({
+          patternList: list,
+          currentSelectedPattern: AppState.getCurrentPattern()
+        });
+      }
+    } catch (error) {
+      this.showToast('danger', 'Error', error, 4000);
+    }
+  }
+
 
   async componentDidUpdate(prevProps) {
     if (this.state.APIlist && !this.state.APIlist.length) {
@@ -313,7 +351,7 @@ class WzMenu extends Component {
           <EuiFlexItem>
             <p></p>
           </EuiFlexItem>
-          {this.props.state.wazuhNotReadyYet.includes('Restarting') && (
+          {typeof this.props.state.wazuhNotReadyYet === "string" && this.props.state.wazuhNotReadyYet.includes('Restarting') && (
             <EuiFlexItem grow={false}>
               <p>
                 {' '}
@@ -449,8 +487,12 @@ class WzMenu extends Component {
     } else {
       this.closeAllPopover()
     }
+
     this.setState({ menuOpened: !this.state.menuOpened, kibanaMenuBlockedOrOpened, hover: this.state.currentMenuTab }, async () => {
-      if (this.state.menuOpened) await this.loadApiList();
+      if (this.state.menuOpened) {
+        await this.loadApiList();
+        await this.loadIndexPatternsList();
+      };
     });
   };
 
@@ -461,13 +503,13 @@ class WzMenu extends Component {
   }
 
   formatAgentStatus = (status) => {
-    if(status === 'active'){
+    if (status === 'active') {
       return "Active";
     }
-    if(status === 'disconnected'){
+    if (status === 'disconnected') {
       return "Disconnected";
     }
-    if(status === 'never_connected'){
+    if (status === 'never_connected') {
       return "Never connected";
     }
   }

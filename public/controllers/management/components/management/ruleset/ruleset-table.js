@@ -19,7 +19,7 @@ import {
 
 import { connect } from 'react-redux';
 import { RulesetHandler, RulesetResources, resourceDictionary } from './utils/ruleset-handler';
-import { getToasts }  from '../../../../../kibana-services';
+import { getToasts } from '../../../../../kibana-services';
 
 import {
   updateIsProcessing,
@@ -74,23 +74,25 @@ class WzRulesetTable extends Component {
       if (match && match[0]) {
         this._isMounted && this.setState({ isRedirect: true });
         const id = match[0].split('=')[1];
-        const result = await this.rulesetHandler.getResource({
-          params: {
-            rule_ids: id
-          }
-        });
-        const items = result.affected_items || [];
-        if (items.length) {
-          const info = await this.rulesetHandler.getResource({
+        try {
+          const result = await this.rulesetHandler.getResource({
             params: {
-              filename: items[0].filename
+              rule_ids: id
             }
           });
-          if (info.data) {
-            Object.assign(info.data, { current: parseInt(id) });
-          } 
-          this.props.updateRuleInfo(info.data);
-        }
+          const items = result.data.affected_items || [];
+          if (items.length) {
+            const info = await this.rulesetHandler.getResource({
+              params: {
+                filename: items[0].filename
+              }
+            });
+            if (info.data) {
+              Object.assign(info.data, { current: parseInt(id) });
+            }
+            this.props.updateRuleInfo(info.data);
+          }
+        } catch (error) { }
         this._isMounted && this.setState({ isRedirect: false });
       }
     }
@@ -100,12 +102,12 @@ class WzRulesetTable extends Component {
     const { isProcessing, section, showingFiles, filters, } = this.props.state;
 
     const processingChange = prevProps.state.isProcessing !== isProcessing ||
-    (prevProps.state.isProcessing && isProcessing);
+      (prevProps.state.isProcessing && isProcessing);
     const sectionChanged = prevProps.state.section !== section;
     const showingFilesChanged =
       prevProps.state.showingFiles !== showingFiles;
     const filtersChanged = prevProps.state.filters !== filters;
-    if ((this._isMounted && processingChange && isProcessing ) || sectionChanged || filtersChanged) {
+    if ((this._isMounted && processingChange && isProcessing) || sectionChanged || filtersChanged) {
       if (sectionChanged || showingFilesChanged || filtersChanged) {
         this._isMounted && await this.setState({
           pageSize: this.state.pageSize,
@@ -142,12 +144,12 @@ class WzRulesetTable extends Component {
       return {};
     });
 
-    const { affected_items=[], total_affected_items=0 } = ((rawItems || {}).data || {}).data || {};
+    const { affected_items = [], total_affected_items = 0 } = ((rawItems || {}).data || {}).data || {};
     this.props.updateTotalItems(total_affected_items);
     this._isMounted && this.setState({
       items: affected_items,
-      totalItems : total_affected_items,
-      isLoading:false
+      totalItems: total_affected_items,
+      isLoading: false
     });
   }
 
@@ -258,33 +260,33 @@ class WzRulesetTable extends Component {
             this.props.userPermissions
           )
             ? async () => {
-                if (this.isLoading) return;
-                this.setState({ isLoading: true });
-                const { section } = this.props.state;
-                window.location.href = `${window.location.href}&redirectRule=${id}`;              
-                if (section === RulesetResources.LISTS) {
-                  const result = await this.rulesetHandler.getFileContent(item.filename);
-                  const file = {
-                    name: item.filename,
-                    content: result,
-                    path: item.relative_dirname,
-                  };
-                  this.props.updateListContent(file);
-                } else {
-                  const result = await this.rulesetHandler.getResource({
-                    params: {
-                      filename: item.filename
-                    }
-                  });
-                  if (result.data) {
-                    Object.assign(result.data, { current: id || name });
+              if (this.isLoading) return;
+              this.setState({ isLoading: true });
+              const { section } = this.props.state;
+              window.location.href = `${window.location.href}&redirectRule=${id}`;
+              if (section === RulesetResources.LISTS) {
+                const result = await this.rulesetHandler.getFileContent(item.filename);
+                const file = {
+                  name: item.filename,
+                  content: result,
+                  path: item.relative_dirname,
+                };
+                this.props.updateListContent(file);
+              } else {
+                const result = await this.rulesetHandler.getResource({
+                  params: {
+                    filename: item.filename
                   }
-                  if (section === RulesetResources.RULES) this.props.updateRuleInfo(result.data);
-                  if (section === RulesetResources.DECODERS) this.props.updateDecoderInfo(result.data);
+                });
+                if (result.data) {
+                  Object.assign(result.data, { current: id || name });
                 }
-
-                this.setState({ isLoading: false });
+                if (section === RulesetResources.RULES) this.props.updateRuleInfo(result.data);
+                if (section === RulesetResources.DECODERS) this.props.updateDecoderInfo(result.data);
               }
+
+              this.setState({ isLoading: false });
+            }
             : undefined,
         };
       };
