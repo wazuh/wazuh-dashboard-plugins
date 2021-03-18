@@ -93,10 +93,21 @@ export class MainModule extends Component {
   }
 
   async startReport() {
-    this.setState({ loadingReport: true });
-    const agent = (this.props.agent || store.getState().appStateReducers.currentAgentData || {}).id || false;
-    await this.reportingService.startVis2Png(this.props.section, agent);
-    this.setState({ loadingReport: false });
+    const defaultTextColor = $("#moduleDashboard .euiButtonEmpty__text").children().css("color");
+
+    try {
+      this.setState({ loadingReport: true });
+      $('.euiButtonEmpty__text').css('color', 'black')
+
+      const agent = (this.props.agent || store.getState().appStateReducers.currentAgentData || {}).id || false;
+      await this.reportingService.startVis2Png(this.props.section, agent);
+
+      $('.euiButtonEmpty__text').css('color', defaultTextColor)
+      this.setState({ loadingReport: false });
+    } catch (e) {
+      $('.euiButtonEmpty__text').css('color', defaultTextColor)
+      this.setState({ loadingReport: false });
+    }
   }
 
   renderReportButton() {
