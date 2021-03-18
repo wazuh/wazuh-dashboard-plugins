@@ -180,3 +180,14 @@ export const updateClusterStatus = (clusterStatus) => {
     clusterStatus,
   };
 };
+
+/**
+ * Updates the status of whether the user is logged in
+ * @param withUserLogged
+ */
+export const updateWithUserLogged = (withUserLogged) => {
+  return {
+    type: 'UPDATE_WITH_USER_LOGGED',
+   withUserLogged,
+  };
+};

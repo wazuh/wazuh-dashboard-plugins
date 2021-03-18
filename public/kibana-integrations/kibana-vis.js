@@ -34,8 +34,6 @@ import {
 } from "@elastic/eui";
 import { getAngularModule, getToasts, getVisualizationsPlugin, getSavedObjects, getDataPlugin, getChrome, getOverlays } from '../kibana-services';
 import { KnownFields } from "../utils/known-fields";
-// import { getAuthorizedAgents } from "../react-services/wz-agents";
-import { AppState } from "../react-services/app-state";
 
 class KibanaVis extends Component {
   _isMounted = false;
@@ -269,6 +267,7 @@ class KibanaVis extends Component {
         query
       };
 
+      const rawVis = raw ? raw.filter((item) => item && item.id === this.visID) : []; 
 
       if (rawVis.length && discoverList.length) {
         // There are pending updates from the discover (which is the one who owns the true app state)

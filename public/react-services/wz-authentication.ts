@@ -60,7 +60,7 @@ export class WzAuthentication{
       // Dispatch actions to set permissions and roles
       store.dispatch(updateUserPermissions(userPolicies));
       store.dispatch(updateUserRoles(WzAuthentication.mapUserRolesIDToAdministratorRole(jwtPayload.rbac_roles || [])));
-      return
+      store.dispatch(updateWithUserLogged(true));
     }catch(error){
       getToasts().add({
         color: 'danger',

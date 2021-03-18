@@ -1,8 +1,8 @@
 {
   "name": "wazuh",
   "version": "4.1.2",
-  "revision": "4103",
-  "code": "4103-0",
+  "revision": "4104",
+  "code": "4104-0",
   "kibana": {
     "version": "7.10.0"
   },
@@ -37,6 +37,7 @@
     "test:browser": "plugin-helpers test:browser",
     "test:jest": "node scripts/jest",
     "generate:api-4.0-info": "cd scripts/generate-api-4.0-info;./generate-api-4.0-info.sh;cd ../..",
+    "prebuild": "node scripts/generate-build-version",
     "postbuild": "mkdir build/kibana/wazuh/public && cp -R public/assets build/kibana/wazuh/public && cd build && zip wazuh-kibana-app.zip kibana -r && rm -rf kibana && cd .."
   },
   "dependencies": {
