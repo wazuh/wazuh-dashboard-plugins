@@ -4,6 +4,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ## Wazuh v4.2.0 - Kibana 7.10.0 , 7.10.2 - Revision 4201
 
+### Added
+
+- Added loading view while the user is logging to prevent permissions prompts [#3041](https://github.com/wazuh/wazuh-kibana-app/pull/3041)
+
 ### Fixed
 
 - Fixed unexpected behaviour in Roles mapping [#3028](https://github.com/wazuh/wazuh-kibana-app/pull/3028)
@@ -16,6 +20,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Creation of index pattern after the default one is changes in Settings [#2985](https://github.com/wazuh/wazuh-kibana-app/pull/2985)
 - Added node name of agent list and detail [#3039](https://github.com/wazuh/wazuh-kibana-app/pull/3039)
+
 
 ### Fixed
 
