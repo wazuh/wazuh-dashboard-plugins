@@ -51,7 +51,7 @@ export const APIUserAllowRunAs = {
         {},
         { apiHostID: apiId }
       );
-      const statusUserAllowRunAs = response.data.data.affected_items[0].allow_run_as ? API_USER_STATUS_RUN_AS.ENABLED : API_USER_STATUS_RUN_AS.USER_DISABLED;
+      const statusUserAllowRunAs = response.data.data.affected_items[0].allow_run_as ? API_USER_STATUS_RUN_AS.ENABLED : API_USER_STATUS_RUN_AS.USER_NOT_ALLOWED;
 
       // Cache the run_as for the API user
       CacheInMemoryAPIUserAllowRunAs.set(apiId, api.username, statusUserAllowRunAs);
@@ -63,7 +63,7 @@ export const APIUserAllowRunAs = {
   },
   async canUse(apiId: string): Promise<number | never>{
     const ApiUserCanUseStatus = await APIUserAllowRunAs.check(apiId);
-    if(ApiUserCanUseStatus === API_USER_STATUS_RUN_AS.USER_DISABLED){
+    if(ApiUserCanUseStatus === API_USER_STATUS_RUN_AS.USER_NOT_ALLOWED){
       const api = await manageHosts.getHostById(apiId);
       throw new Error(`API with host ID [${apiId}] misconfigured. The Wazuh API user [${api.username}] is not allowed to use [run_as]. Allow it in the user configuration or set [run_as] host setting with [false] value.`);
     }
@@ -79,7 +79,7 @@ export const APIUserAllowRunAs = {
  * ALL_DISABLED
  *   binary 00 = decimal 0 ---> USER 0 y HOST 0
  * 
- * USER_DISABLED
+ * USER_NOT_ALLOWED
  *   binary 01 = decimal 1 ---> USER 0 y HOST 1
  * 
  * HOST_DISABLED
@@ -90,7 +90,7 @@ export const APIUserAllowRunAs = {
  */
 export enum API_USER_STATUS_RUN_AS{
   ALL_DISABLED = 0, // Wazuh HOST and USER API user configured with run_as=false or undefined
-  USER_DISABLED = 1, // Wazuh HOST API user configured with run_as = TRUE in wazuh.yml but it has not run_as in Wazuh API
+  USER_NOT_ALLOWED = 1, // Wazuh HOST API user configured with run_as = TRUE in wazuh.yml but it has not run_as in Wazuh API
   HOST_DISABLED = 2, // Wazuh HOST API user configured with run_as=false in wazuh.yml but it has not run_as in Wazuh API
   ENABLED = 3 // Wazuh API user configured with run_as=true and allow run_as
 }

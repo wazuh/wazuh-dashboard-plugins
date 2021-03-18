@@ -362,7 +362,7 @@ export class WazuhApiCtrl {
               apiUserAllowRunAs = API_USER_STATUS_RUN_AS.ENABLED;
 
             else if (!allow_run_as && apiAvailable && apiAvailable.run_as)// HOST ENABLED AND USER DISABLED
-              apiUserAllowRunAs = API_USER_STATUS_RUN_AS.USER_DISABLED;
+              apiUserAllowRunAs = API_USER_STATUS_RUN_AS.USER_NOT_ALLOWED;
 
             else if (allow_run_as && ( !apiAvailable || !apiAvailable.run_as )) // USER ENABLED AND HOST DISABLED
               apiUserAllowRunAs = API_USER_STATUS_RUN_AS.HOST_DISABLED;
