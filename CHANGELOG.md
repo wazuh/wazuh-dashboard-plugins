@@ -2,6 +2,14 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.1.3 - Kibana 7.10.0 , 7.10.2 - Revision 4104
+
+### Added
+
+### Fixed
+
+- Rollback of invalid rule configuration file [#3084](https://github.com/wazuh/wazuh-kibana-app/pull/3084)
+
 ## Wazuh v4.1.2 - Kibana 7.10.0 , 7.10.2 - Revision 4104
 
 ### Added
@@ -9,12 +17,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Creation of index pattern after the default one is changes in Settings [#2985](https://github.com/wazuh/wazuh-kibana-app/pull/2985)
 - Added node name of agent list and detail [#3039](https://github.com/wazuh/wazuh-kibana-app/pull/3039)
 
-
 ### Fixed
 
 - Fix rule filter is no applied when you click on a rule id in other module.[#3057](https://github.com/wazuh/wazuh-kibana-app/pull/3057)
 - Improved validation and prevention for caching bundles in client side [#3063](https://github.com/wazuh/wazuh-kibana-app/pull/3063)
-- Rollback of invalid rule configuration file [#3084](https://github.com/wazuh/wazuh-kibana-app/pull/3084)
 
 ## Wazuh v4.1.1 - Kibana 7.10.0 , 7.10.2 - Revision 4103
 
