@@ -11,7 +11,8 @@ export const getJsonFromRule = (internalUserRules, rules, logicalOperator) => {
     tmpRule[item.searchOperation] = {};
     tmpRule[item.searchOperation][item.user_field] = item.value;
     return tmpRule;
-  });
+  }); 
+
   if (usersRulesArray.length && rulesArray.length) {
     ruleObject['OR'] = [
       {
@@ -22,13 +23,19 @@ export const getJsonFromRule = (internalUserRules, rules, logicalOperator) => {
       },
     ];
   } else {
-    if (usersRulesArray.length) {
-      ruleObject['OR'] = usersRulesArray;
+    if(rulesArray.length == 1){
+      return rulesArray[0]
+    }else if(usersRulesArray.length == 1){
+      return usersRulesArray[0]
+    }else{
+      if (usersRulesArray.length) {      
+        ruleObject['OR'] = usersRulesArray;
+      }
+      if (rulesArray.length) {
+        ruleObject[logicalOperator] = rulesArray;         
+      }
     }
-    if (rulesArray.length) {
-      ruleObject[logicalOperator] = rulesArray;
-    }
-  }
+  } 
   return ruleObject;
 };
 
@@ -115,10 +122,12 @@ export const decodeJsonRule = (jsonRule, internalUsers) => {
   try {
     var wrongFormat = false;
     const ruleObject = JSON.parse(jsonRule);
+    
     if (Object.keys(ruleObject).length !== 1) {
       wrongFormat = true;
     }
     var logicalOperator = Object.keys(ruleObject)[0];
+
     var rulesArray;
     if (logicalOperator === 'AND' || logicalOperator === 'OR') {
       rulesArray = ruleObject[logicalOperator];
