@@ -345,6 +345,8 @@ export const restartCluster = async () => {
  */
 export const restartNode = async node => {
   try {
+    const node_param = node && typeof node == 'string' ? `?nodes_list=${node}` : '';
+
     const validationError = await WzRequest.apiReq(
       'GET',
       `/cluster/configuration/validation`, {}
@@ -357,7 +359,7 @@ export const restartNode = async node => {
     }
     const result = await WzRequest.apiReq(
       'PUT',
-      `/cluster/restart`, {delay: 15000}
+      `/cluster/restart${node_param}`, {delay: 15000}
     );
 
     return result;
