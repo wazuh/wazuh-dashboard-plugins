@@ -57,7 +57,7 @@ export class WazuhApiCtrl {
         }
       }
       let token;
-      if (await APIUserAllowRunAs.canUse(idHost)) {
+      if (await APIUserAllowRunAs.canUse(idHost) == API_USER_STATUS_RUN_AS.ENABLED) {
         token = await context.wazuh.api.client.asCurrentUser.authenticate(idHost);
       } else {
         token = await context.wazuh.api.client.asInternalUser.authenticate(idHost);
