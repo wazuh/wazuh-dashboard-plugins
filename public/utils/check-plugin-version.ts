@@ -61,9 +61,6 @@ const deleteWazuhCookies = ([name, path]: cookie) => {
 function clearBrowserInfo(appInfo: TAppInfo) {
   wazuhCookies.forEach(deleteWazuhCookies);
   updateAppInfo(appInfo);
-
-  // delete browser cache and hard reload
-  //window.location.reload(true);
 }
 
 function updateAppInfo(appInfo: TAppInfo) {
