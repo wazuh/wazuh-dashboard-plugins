@@ -2,18 +2,27 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v4.1.2 - Kibana 7.10.0 , 7.10.2 - Revision 4104
+## Wazuh v4.1.3 - Kibana 7.10.0 , 7.10.2 - Revision 4104
 
 ### Added
 
 - Creation of index pattern after the default one is changes in Settings [#2985](https://github.com/wazuh/wazuh-kibana-app/pull/2985)
 - Added node name of agent list and detail [#3039](https://github.com/wazuh/wazuh-kibana-app/pull/3039)
+- Added loading view while the user is logging to prevent permissions prompts [#3041](https://github.com/wazuh/wazuh-kibana-app/pull/3041)
 
 ### Fixed
 
+- Fixed unexpected behaviour in Roles mapping [#3028](https://github.com/wazuh/wazuh-kibana-app/pull/3028)
+- Improve toast message when selecting a default API [#3049](https://github.com/wazuh/wazuh-kibana-app/pull/3049)
 - Fix rule filter is no applied when you click on a rule id in other module.[#3057](https://github.com/wazuh/wazuh-kibana-app/pull/3057)
+- Fixed bug changing master node configuration [#3062](https://github.com/wazuh/wazuh-kibana-app/pull/3062)
 - Improved validation and prevention for caching bundles in client side [#3063](https://github.com/wazuh/wazuh-kibana-app/pull/3063)
-- Fix somne errors in Events table, action buttons style and urls disappeared [#3086](https://github.com/wazuh/wazuh-kibana-app/pull/3086)
+- Fix some errors in Events table, action buttons style and urls disappeared [#3086](https://github.com/wazuh/wazuh-kibana-app/pull/3086)
+- Rollback of invalid rule configuration file [#3084](https://github.com/wazuh/wazuh-kibana-app/pull/3084)
+
+### Changed
+
+- Change all dates labels to Kibana formatting time zone [#3047](https://github.com/wazuh/wazuh-kibana-app/pull/3047)
 
 ## Wazuh v4.1.1 - Kibana 7.10.0 , 7.10.2 - Revision 4103
 

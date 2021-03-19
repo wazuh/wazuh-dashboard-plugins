@@ -25,7 +25,7 @@ import WzGroupsTable from './groups-table';
 import WzGroupsActionButtons from './actions-buttons-main';
 
 import { connect } from 'react-redux';
-import { withUserAuthorizationPrompt } from '../../../../../components/common/hocs'
+import { withUserAuthorizationPrompt, withUserLogged } from '../../../../../components/common/hocs'
 import { compose } from 'redux';
 
 export class WzGroupsOverview extends Component {
@@ -77,6 +77,7 @@ const mapStateToProps = state => {
 
 
 export default compose(
+  withUserLogged,
   withUserAuthorizationPrompt([{action: 'group:read', resource: 'group:id:*'}]),
   connect(
     mapStateToProps
