@@ -1,8 +1,10 @@
 {
   "id": "wazuh",
-  "version": "4.1.1",
+  "version": "4.1.2-4103",
   "kibanaVersion": "kibana",
-  "configPath": ["wazuh"],
+  "configPath": [
+    "wazuh"
+  ],
   "requiredPlugins": [
     "navigation",
     "data",
@@ -17,7 +19,12 @@
     "kibanaUtils",
     "securityOss"
   ],
-  "optionalPlugins": ["security", "opendistroSecurityKibana", "searchguard", "spaces"],
+  "optionalPlugins": [
+    "security",
+    "opendistroSecurityKibana",
+    "searchguard",
+    "spaces"
+  ],
   "server": true,
   "ui": true
 }

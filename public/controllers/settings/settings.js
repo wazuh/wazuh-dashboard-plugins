@@ -18,10 +18,10 @@ import { WzMisc } from '../../factories/misc';
 import { ApiCheck } from '../../react-services/wz-api-check';
 import { SavedObject } from '../../react-services/saved-objects';
 import { ErrorHandler } from '../../react-services/error-handler';
+import { formatUIDate } from '../../react-services/time-service';
 import store from '../../redux/store';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
 import { updateSelectedSettingsSection } from '../../redux/actions/appStateActions';
-
 export class SettingsController {
   /**
    * Class constructor
@@ -226,8 +226,9 @@ export class SettingsController {
       this.currentDefault = JSON.parse(currentApi).id;
       this.apiTableProps.currentDefault = this.currentDefault;
       this.$scope.$applyAsync();
+      const idApi = api.id;
 
-      ErrorHandler.info(`API ${manager} set as default`);
+      ErrorHandler.info(`${idApi} set as default`);
 
       this.getCurrentAPIIndex();
       const extensions = await AppState.getExtensions(id);
@@ -390,7 +391,7 @@ export class SettingsController {
       const response = data.data.data;
       this.appInfo = {
         'app-version': response['app-version'],
-        installationDate: response['installationDate'],
+        installationDate: formatUIDate(response['installationDate']),
         revision: response['revision']
       };
 

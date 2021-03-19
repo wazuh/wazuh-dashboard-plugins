@@ -32,12 +32,14 @@ import moment from 'moment-timezone';
 import store from '../../../../../redux/store';
 import { updateCurrentAgentData } from '../../../../../redux/actions/appStateActions';
 import { WzRequest } from '../../../../../react-services';
+import { formatUIDate } from '../../../../../react-services/time-service';
 import { getAngularModule } from '../../../../../kibana-services';
-import { withReduxProvider, withUserAuthorizationPrompt } from "../../../hocs";
+import { withReduxProvider, withUserAuthorizationPrompt, withUserLogged } from "../../../hocs";
 import { compose } from 'redux';
 
 export const ScaScan = compose(
   withReduxProvider,
+  withUserLogged,
   withUserAuthorizationPrompt([{action: 'agent:read', resource: 'agent:id:*'}, {action: 'sca:read', resource: 'agent:id:*'}])
 )(class ScaScan extends Component {
   _isMount = false;
@@ -172,7 +174,7 @@ export const ScaScan = compose(
         <EuiFlexGroup>
           <EuiFlexItem grow={false} style={{ marginTop: 15 }}>
             <EuiText>
-              <EuiIcon type="calendar" color={'primary'}/> Start time: {lastScan.start_scan}
+              <EuiIcon type="calendar" color={'primary'}/> Start time: {formatUIDate(lastScan.start_scan)}
             </EuiText>
           </EuiFlexItem>
           <EuiFlexItem grow={false} style={{ marginTop: 15 }}>
