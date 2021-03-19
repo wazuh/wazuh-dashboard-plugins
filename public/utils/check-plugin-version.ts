@@ -13,7 +13,7 @@ import { GenericRequest } from '../react-services/generic-request';
 import { AxiosResponse } from 'axios';
 import _ from 'lodash';
 import { version as wzVersion, revision as wzRevision} from '../../package.json';
-import { getCookies } from '../kibana-services';
+import { getCookies, getToasts } from '../kibana-services';
 
 type TAppInfo = {
   revision: string;
@@ -40,8 +40,13 @@ export const checkPluginVersion = async () => {
 
 const checkClientAppVersion = (appInfo: TAppInfo) => {
   if (appInfo['app-version'] !== wzVersion || appInfo.revision !== wzRevision) {
-    clearBrowserInfo(appInfo);
+    if( window.history.state != 'refreshed') {
+      clearBrowserInfo(appInfo);
+    } else {
+      getToasts().addDanger({title: 'Conflict with the Wazuh app version', text: 'The version of the Wazuh app in your browser does not correspond with the app version installed in Kibana.\nPlease clear your browser cache.\nIf the error persist please restart Kibana too.'})
+    }
   } else {
+    if( window.history.state != 'refreshed') window.history.replaceState('', 'wazuh');
     const storeAppInfo = localStorage.getItem('appInfo');
     !storeAppInfo && updateAppInfo(appInfo);
   }
@@ -63,6 +68,8 @@ function clearBrowserInfo(appInfo: TAppInfo) {
   //update localStorage
   updateAppInfo(appInfo);
 
+  //replace status to avoid infinite refresh
+  window.history.replaceState('refreshed', 'wazuh');
   // delete browser cache and hard reload
   window.location.reload(true);
 }

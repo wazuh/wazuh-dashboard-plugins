@@ -209,7 +209,7 @@ export class AgentsPreviewController {
       }
       return this.mostActiveAgent;
     } catch (error) { 
-      getToasts().addDanger('An error occurred while trying to get the most active agent',{ toastMessage: error.message || error });
+      getToasts().addDanger({title: 'An error occurred while trying to get the most active agent', text: error.message || error });
     }
   }
 
