@@ -62,6 +62,7 @@ export class WzAuthentication{
         text: error.message || error,
         toastLifeTimeMs: 300000
       });
+      store.dispatch(updateWithUserLogged(true));
       return Promise.reject(error);
     }
   }
