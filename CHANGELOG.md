@@ -13,7 +13,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
-- Fixed unexpected behaviour in Roles mapping [#3028](https://github.com/wazuh/wazuh-kibana-app/pull/3028)
+- Fixed unexpected behavior in Roles mapping [#3028](https://github.com/wazuh/wazuh-kibana-app/pull/3028)
 - Improve toast message when selecting a default API [#3049](https://github.com/wazuh/wazuh-kibana-app/pull/3049)
 - Fix rule filter is no applied when you click on a rule id in other module.[#3057](https://github.com/wazuh/wazuh-kibana-app/pull/3057)
 - Fixed bug changing master node configuration [#3062](https://github.com/wazuh/wazuh-kibana-app/pull/3062)
