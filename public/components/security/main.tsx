@@ -19,7 +19,7 @@ import { API_USER_STATUS_RUN_AS } from '../../../server/lib/cache-api-user-has-r
 import { AppState } from '../../react-services/app-state';
 import { ErrorHandler } from '../../react-services/error-handler';
 import { RolesMapping } from './roles-mapping/roles-mapping';
-import { withReduxProvider, withGlobalBreadcrumb, withUserAuthorizationPrompt } from '../common/hocs';
+import { withReduxProvider, withGlobalBreadcrumb, withUserAuthorizationPrompt, withUserLogged } from '../common/hocs';
 import { compose } from 'redux';
 import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../common/constants';
 import { updateSecuritySection } from '../../redux/actions/securityActions';
@@ -50,6 +50,7 @@ const tabs = [
 export const WzSecurity = compose(
   withReduxProvider,
   withGlobalBreadcrumb([{ text: '' }, { text: 'Security' }]),
+  withUserLogged,
   withUserAuthorizationPrompt(null, [WAZUH_ROLE_ADMINISTRATOR_NAME])
 )(() => {
   const dispatch = useDispatch();
@@ -116,11 +117,31 @@ export const WzSecurity = compose(
   };
 
 
-  const isNotRunAs = () => {
+  const isNotRunAs = (allowRunAs) => {
+    let runAsWarningTxt = '';
+    switch (allowRunAs) {
+      case API_USER_STATUS_RUN_AS.HOST_DISABLED:
+        runAsWarningTxt =
+          'For the role mapping to take effect, enable run_as in /usr/share/kibana/data/wazuh/config/wazuh.yml configuration file, restart the Kibana service and clear your browser cache and cookies.';
+        break;
+      case API_USER_STATUS_RUN_AS.USER_NOT_ALLOWED:
+        runAsWarningTxt =
+          'The role mapping has no effect because the current Wazuh API user has allow_run_as disabled.';
+        break;
+      case API_USER_STATUS_RUN_AS.ALL_DISABLED:
+        runAsWarningTxt =
+          'For the role mapping to take effect, enable run_as in /usr/share/kibana/data/wazuh/config/wazuh.yml configuration file and set the current Wazuh API user allow_run_as to true. Restart the Kibana service and clear your browser cache and cookies.';
+        break;
+      default:
+        runAsWarningTxt =
+          'The role mapping has no effect because the current Wazuh API user has run_as disabled.';
+        break;
+    }
+      
     return (
       <EuiFlexGroup >
         <EuiFlexItem >
-          <EuiCallOut title=" The role mapping has no effect because the Wazuh API's configured user has not the run_as setting enabled in the configuration or is not allowed to use it. " color="warning" iconType="alert">
+          <EuiCallOut title={runAsWarningTxt} color="warning" iconType="alert">
           </EuiCallOut>
           <EuiSpacer></EuiSpacer>
         </EuiFlexItem >
@@ -146,7 +167,7 @@ export const WzSecurity = compose(
           }
           {selectedTabId === 'roleMapping' &&
             <>
-              {allowRunAs !== API_USER_STATUS_RUN_AS.ENABLED && allowRunAs !== undefined && isNotRunAs()}
+              {(allowRunAs !== undefined && allowRunAs !== API_USER_STATUS_RUN_AS.ENABLED) && isNotRunAs(allowRunAs)}
               <RolesMapping></RolesMapping>
             </>
           }
