@@ -37,13 +37,13 @@ import { FilterHandler } from '../../../utils/filter-handler';
 import { TabVisualizations } from '../../../factories/tab-visualizations';
 import { WazuhConfig } from './../../../react-services/wazuh-config.js';
 import { WzDatePicker } from '../../../components/wz-date-picker/wz-date-picker';
-import { withReduxProvider, withGlobalBreadcrumb, withUserAuthorizationPrompt, withUserLogged } from '../../../components/common/hocs';
+import { withReduxProvider, withGlobalBreadcrumb, withUserAuthorizationPrompt } from '../../../components/common/hocs';
+import { formatUIDate } from '../../../../public/react-services/time-service';
 import { compose } from 'redux';
 
 export const AgentsPreview = compose(
   withReduxProvider,
   withGlobalBreadcrumb([{ text: '' }, { text: 'Agents' }]),
-  withUserLogged,
   withUserAuthorizationPrompt([[{action: 'agent:read', resource: 'agent:id:*'},{action: 'agent:read', resource: 'agent:group:*'}]])
 )(class AgentsPreview extends Component {
   _isMount = false;
@@ -330,7 +330,7 @@ export const AgentsPreview = compose(
                 addingNewAgent={this.props.tableProps.addingNewAgent}
                 downloadCsv={this.props.tableProps.downloadCsv}
                 clickAction={this.props.tableProps.clickAction}
-                timeService={this.props.tableProps.timeService}
+                formatUIDate={ date => formatUIDate(date)}
                 reload={() => this.getSummary()}
               />
             </WzReduxProvider>
