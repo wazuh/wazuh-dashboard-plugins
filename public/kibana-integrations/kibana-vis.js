@@ -258,7 +258,9 @@ class KibanaVis extends Component {
       let vizPattern;
       try {
         vizPattern = JSON.parse(rawVis[0].attributes.kibanaSavedObjectMeta.searchSourceJSON).index;
-      } catch (ex) {}
+      } catch (ex) {
+        console.warning(`kibana-vis exception: ${ex.message || ex}`);
+      }
       const agentsFilters = this.getUserAgentsFilters(vizPattern);
       Object.keys(agentsFilters).length !== 0 ? filters.push(agentsFilters) : null;
       const visInput = {
@@ -266,8 +268,6 @@ class KibanaVis extends Component {
         filters,
         query
       };
-
-      const rawVis = raw ? raw.filter((item) => item && item.id === this.visID) : []; 
 
       if (rawVis.length && discoverList.length) {
         // There are pending updates from the discover (which is the one who owns the true app state)

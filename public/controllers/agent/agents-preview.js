@@ -20,8 +20,7 @@ import { WzRequest } from '../../react-services/wz-request';
 import { ShareAgent } from '../../factories/share-agent';
 import { TimeService } from '../../react-services/time-service';
 import { ErrorHandler } from '../../react-services/error-handler';
-import { getDataPlugin } from '../../kibana-services';
-// import { getAuthorizedAgents } from '../../react-services/wz-agents';
+import { getDataPlugin, getToasts } from '../../kibana-services';
 import { connect } from 'react-redux';
 import store from '../../redux/store';
 
@@ -213,6 +212,7 @@ export class AgentsPreviewController {
       }
       return this.mostActiveAgent;
     } catch (error) { 
+      getToasts().addDanger('An error occurred while trying to get the most active agent',{ toastMessage: error.message || error });
     }
   }
 

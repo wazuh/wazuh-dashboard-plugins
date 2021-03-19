@@ -14,12 +14,10 @@ import { WzRequest } from './wz-request';
 import { AppState } from './app-state';
 import jwtDecode from 'jwt-decode';
 import store from '../redux/store';
-import { updateUserPermissions, updateUserRoles, updateAllowedAgents } from '../redux/actions/appStateActions';
+import { updateUserPermissions, updateUserRoles, updateWithUserLogged, updateAllowedAgents } from '../redux/actions/appStateActions';
 import { WAZUH_ROLE_ADMINISTRATOR_ID, WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../common/constants';
 import { getToasts } from '../kibana-services';
 import { getAuthorizedAgents } from '../react-services/wz-agents';
-
-
 
 export class WzAuthentication{
   private static async login(force=false){
@@ -68,6 +66,7 @@ export class WzAuthentication{
         text: error.message || error,
         toastLifeTimeMs: 300000
       });
+      store.dispatch(updateWithUserLogged(true));
       return Promise.reject(error);
     }
   }
