@@ -13,6 +13,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Fix rule filter is no applied when you click on a rule id in other module.[#3057](https://github.com/wazuh/wazuh-kibana-app/pull/3057)
 - Improved validation and prevention for caching bundles in client side [#3063](https://github.com/wazuh/wazuh-kibana-app/pull/3063)
+- Fix somne errors in Events table, action buttons style and urls disappeared [#3086](https://github.com/wazuh/wazuh-kibana-app/pull/3086)
 
 ## Wazuh v4.1.1 - Kibana 7.10.0 , 7.10.2 - Revision 4103
 
