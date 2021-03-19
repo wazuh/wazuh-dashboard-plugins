@@ -20,6 +20,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Improved validation and prevention for caching bundles in client side [#3063](https://github.com/wazuh/wazuh-kibana-app/pull/3063)
 - Fix some errors in Events table, action buttons style and urls disappeared [#3086](https://github.com/wazuh/wazuh-kibana-app/pull/3086)
 - Rollback of invalid rule configuration file [#3084](https://github.com/wazuh/wazuh-kibana-app/pull/3084)
+- Filter only authorized agents in Agents stats and Visualizations [#]()
 
 ### Changed
 

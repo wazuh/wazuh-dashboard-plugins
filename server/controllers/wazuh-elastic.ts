@@ -185,7 +185,7 @@ export class WazuhElasticCtrl {
    * @param {Object} response
    * @returns {Array<Object>} fields or ErrorResponse
    */
-  async getFieldTop(context: RequestHandlerContext, request: KibanaRequest<{mode: string, cluster: string, field: string, pattern: string}>, response: KibanaResponseFactory) {
+  async getFieldTop(context: RequestHandlerContext, request: KibanaRequest<{mode: string, cluster: string, field: string, pattern: string}, {agentsList: string}>, response: KibanaResponseFactory) {
     try {
       // Top field payload
       let payload = {
@@ -198,7 +198,16 @@ export class WazuhElasticCtrl {
                 'agent.id': '000'
               }
             },
-            filter: { range: { timestamp: {} } }
+            filter: [
+              {
+                range: { timestamp: {} }
+              },
+              {
+                terms: {
+                  'agent.id': request.query.agentsList.split(',')
+                }
+              }
+            ]
           }
         },
         aggs: {
@@ -215,8 +224,8 @@ export class WazuhElasticCtrl {
       // Set up time interval, default to Last 24h
       const timeGTE = 'now-1d';
       const timeLT = 'now';
-      payload.query.bool.filter.range['timestamp']['gte'] = timeGTE;
-      payload.query.bool.filter.range['timestamp']['lt'] = timeLT;
+      payload.query.bool.filter[0].range['timestamp']['gte'] = timeGTE;
+      payload.query.bool.filter[0].range['timestamp']['lt'] = timeLT;
 
       // Set up match for default cluster name
       payload.query.bool.must.push(

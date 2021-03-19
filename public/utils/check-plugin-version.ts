@@ -12,7 +12,7 @@
 import { GenericRequest } from '../react-services/generic-request';
 import { AxiosResponse } from 'axios';
 import _ from 'lodash';
-import meta from '../assets/meta.json';
+import { version as wzVersion, revision as wzRevision} from '../../package.json';
 import { getCookies } from '../kibana-services';
 
 type TAppInfo = {
@@ -39,7 +39,7 @@ export const checkPluginVersion = async () => {
 };
 
 const checkClientAppVersion = (appInfo: TAppInfo) => {
-  if (appInfo['app-version'] !== meta.version || appInfo.revision !== meta.revision) {
+  if (appInfo['app-version'] !== wzVersion || appInfo.revision !== wzRevision) {
     clearBrowserInfo(appInfo);
   } else {
     const storeAppInfo = localStorage.getItem('appInfo');
