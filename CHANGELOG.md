@@ -18,6 +18,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fix rule filter is no applied when you click on a rule id in other module.[#3057](https://github.com/wazuh/wazuh-kibana-app/pull/3057)
 - Fixed bug changing master node configuration [#3062](https://github.com/wazuh/wazuh-kibana-app/pull/3062)
 - Improved validation and prevention for caching bundles in client side [#3063](https://github.com/wazuh/wazuh-kibana-app/pull/3063)
+- Fix wrong variable declaration for macOS agents [#3066](https://github.com/wazuh/wazuh-kibana-app/pull/3066)
 - Fix some errors in Events table, action buttons style and urls disappeared [#3086](https://github.com/wazuh/wazuh-kibana-app/pull/3086)
 - Rollback of invalid rule configuration file [#3084](https://github.com/wazuh/wazuh-kibana-app/pull/3084)
 
@@ -41,6 +42,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fix restarting selected cluster instead of all of them [#3032](https://github.com/wazuh/wazuh-kibana-app/pull/3032)
 - Fix pinned agents don't trigger a new filtered query [#3035](https://github.com/wazuh/wazuh-kibana-app/pull/3035)
 - Overlay Wazuh menu when Kibana menu is opened or docked [#3038](https://github.com/wazuh/wazuh-kibana-app/pull/3038)
+- Fix visualizations in PDF Reports with Dark mode [#2983](https://github.com/wazuh/wazuh-kibana-app/pull/2983)
 
 ## Wazuh v4.1.1 - Kibana 7.10.0 , 7.10.2 - Revision 4102
 
