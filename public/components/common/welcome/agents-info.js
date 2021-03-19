@@ -30,7 +30,6 @@ export class AgentInfo extends Component {
     super(props);
 
     this.state = {};
-    this.formatUIDate = formatUIDate;
   }
 
   async componentDidMount() {
@@ -157,15 +156,6 @@ export class AgentInfo extends Component {
     return stats;
   }
 
-
-  parseDateTime(datetime){
-    try {
-      return this.formatUIDate(datetime);
-    } catch (error) {
-      return datetime;
-    }
-  }
-
   render() {
     const { agent } = this.props;
     let arrayStats;
@@ -199,11 +189,11 @@ export class AgentInfo extends Component {
           style: { maxWidth: 150 }
         },
         {
-          title: this.parseDateTime(agent.dateAdd),
+          title: formatUIDate(agent.dateAdd),
           description: 'Registration date',
           style: { maxWidth: 150 } },
         {
-          title: this.parseDateTime(agent.lastKeepAlive),
+          title: formatUIDate(agent.lastKeepAlive),
           description: 'Last keep alive',
           style: { maxWidth: 150 }
         },

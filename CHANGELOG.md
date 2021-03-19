@@ -14,6 +14,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Improve toast message when selecting a default API [#3049](https://github.com/wazuh/wazuh-kibana-app/pull/3049)
 - Fixed bug changing master node configuration [#3062](https://github.com/wazuh/wazuh-kibana-app/pull/3062)
 
+### Changed
+
+- Change all dates labels to Kibana formatting time zone [#3047](https://github.com/wazuh/wazuh-kibana-app/pull/3047)
+
 ## Wazuh v4.1.2 - Kibana 7.10.0 , 7.10.2 - Revision 4104
 
 ### Added
@@ -53,7 +57,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Changed
 
-- Change all dates labels to Kibana formatting time zone [#3009](https://github.com/wazuh/wazuh-kibana-app/issues/3009)
 - Added toast with refresh button when new fields are loaded [#2974](https://github.com/wazuh/wazuh-kibana-app/pull/2974)
 - Migrated manager and cluster files endpoints and their corresponding RBAC [#2984](https://github.com/wazuh/wazuh-kibana-app/pull/2984)
 

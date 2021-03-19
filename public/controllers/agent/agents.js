@@ -67,7 +67,6 @@ export class AgentsController {
     this.csvReq = csvReq;
     this.groupHandler = GroupHandler;
     this.wazuhConfig = new WazuhConfig();
-    this.formatUIDate = formatUIDate;
     this.genericReq = GenericRequest;
 
     // Config on-demand
@@ -902,7 +901,7 @@ export class AgentsController {
    */
   offsetTimestamp(text, time) {
     try {
-      return text + this.formatUIDate(time);
+      return text + formatUIDate(time);
     } catch (error) {
       return time !== '-' ? `${text}${time} (UTC)` : time;
     }

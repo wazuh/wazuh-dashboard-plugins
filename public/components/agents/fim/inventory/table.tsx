@@ -145,7 +145,6 @@ export class InventoryTable extends Component {
     const filters = filtersToObject(this.props.filters);
     const filter = {
       ...filters,
-      formatUIDate: pageIndex * pageSize,
       offset: pageIndex * pageSize,
       limit: pageSize,
       sort: this.buildSortFilter(),
