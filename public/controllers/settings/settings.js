@@ -228,7 +228,7 @@ export class SettingsController {
       this.$scope.$applyAsync();
       const idApi = api.id;
 
-      ErrorHandler.info(`${idApi} set as default`);
+      ErrorHandler.info(`API with id ${idApi} set as default`);
 
       this.getCurrentAPIIndex();
       const extensions = await AppState.getExtensions(id);
