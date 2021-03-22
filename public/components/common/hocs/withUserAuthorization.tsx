@@ -25,5 +25,6 @@ import { withUserLogged } from './withUserLogged'
 }
 
 export const withUserAuthorizationPrompt =  (permissions = null, roles = null) => WrappedComponent => compose(
+  withUserLogged,
   withUserAuthorizationPromptChanged(permissions,roles)
   )(WrappedComponent)
