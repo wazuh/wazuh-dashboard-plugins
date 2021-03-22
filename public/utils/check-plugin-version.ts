@@ -49,7 +49,7 @@ const checkClientAppVersion = (appInfo: TAppInfo) => {
       });
     }
   } else {
-    if(window.history.state != 'refreshed'){
+    if(window.history.state == 'refreshed'){
       window.history.replaceState('', 'wazuh');
     };
     const storeAppInfo = localStorage.getItem('appInfo');
