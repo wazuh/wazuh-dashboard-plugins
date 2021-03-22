@@ -3,7 +3,7 @@ import { Inventory } from './index';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 import { PromptSelectAgent, PromptNoSelectedAgent } from '../prompts';
-import { withGuard, withUserAuthorizationPrompt } from '../../common/hocs';
+import { withGuard, withUserAuthorizationPrompt, withUserLogged } from '../../common/hocs';
 
 const mapStateToProps = (state) => ({
   currentAgentData: state.appStateReducers.currentAgentData,
@@ -26,6 +26,7 @@ export const MainSca = compose(
       <PromptSelectAgent title="Agent never connected" body="The agent has never been connected please select another" />
     )
   ),
+  withUserLogged,
   withUserAuthorizationPrompt((props) => {
     const agentData =
       props.currentAgentData && props.currentAgentData.id ? props.currentAgentData : props.agent;
