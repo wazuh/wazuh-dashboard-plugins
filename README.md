@@ -87,7 +87,7 @@ This plugin for Kibana allows you to visualize and analyze Wazuh alerts stored i
 
 ## Requisites
 
-- Wazuh HIDS 4.1.2
+- Wazuh HIDS 4.1.3
 - Kibana 7.10.0
 - Elasticsearch 7.10.0
 
@@ -105,7 +105,7 @@ Install the Wazuh app plugin for Kibana
 
 ```
 cd /usr/share/kibana
-sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.1.2_7.10.0-1.zip
+sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.1.3_7.10.0-1.zip
 ```
 
 Restart Kibana
@@ -192,7 +192,7 @@ Install the Wazuh app
 
 ```
 cd /usr/share/kibana/
-sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.1.2_7.10.0-1.zip
+sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.1.3_7.10.0-1.zip
 ```
 
 Update configuration file permissions.
@@ -221,6 +221,8 @@ service kibana restart
  
 | Wazuh app | Kibana  | Open Distro | Package                                                                    |
 | :-------: | :----:  | :---------: | :------------------------------------------------------------------------- |
+|   4.1.3   |  7.10.2 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.1.3_7.10.2-1.zip> |
+|   4.1.3   |  7.10.0 |   1.12.0    | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.1.3_7.10.0-1.zip> |
 |   4.1.2   |  7.10.2 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.1.2_7.10.2-1.zip> |
 |   4.1.2   |  7.10.0 |   1.12.0    | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.1.2_7.10.0-1.zip> |
 |   4.1.1   |  7.10.2 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.1.1_7.10.2-1.zip> |
