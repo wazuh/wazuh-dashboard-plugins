@@ -15,7 +15,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Change all dates labels to Kibana formatting time zone [#3047](https://github.com/wazuh/wazuh-kibana-app/pull/3047)
 - Improve toast message when selecting a default API [#3049](https://github.com/wazuh/wazuh-kibana-app/pull/3049)
-- Improve validation and prevention for caching bundles on the client-side [#3091](https://github.com/wazuh/wazuh-kibana-app/pull/3091) [#3091](https://github.com/wazuh/wazuh-kibana-app/pull/3091)
+- Improve validation and prevention for caching bundles on the client-side [#3063](https://github.com/wazuh/wazuh-kibana-app/pull/3063) [#3091](https://github.com/wazuh/wazuh-kibana-app/pull/3091)
 
 ### Fixed
 
