@@ -4,7 +4,7 @@ import '../../common/modules/module.scss';
 import { connect } from 'react-redux';
 import { PromptNoSelectedAgent, PromptNoActiveAgent } from '../prompts';
 import { compose } from 'redux';
-import { withGuard, withUserAuthorizationPrompt, withUserLogged } from '../../common/hocs';
+import { withGuard, withUserAuthorizationPrompt } from '../../common/hocs';
 
 const mapStateToProps = (state) => ({
   currentAgentData: state.appStateReducers.currentAgentData,
@@ -26,7 +26,6 @@ export const MainFim = compose(
     },
     () => <PromptNoActiveAgent />
   ),
-  withUserLogged,
   withUserAuthorizationPrompt((props) => {
     const agentData =
       props.currentAgentData && props.currentAgentData.id ? props.currentAgentData : props.agent;

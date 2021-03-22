@@ -32,7 +32,7 @@ import exportCsv from '../../../../../react-services/wz-csv';
 import { getToasts }  from '../../../../../kibana-services';
 import { WzRequest } from '../../../../../react-services/wz-request';
 import { formatUIDate } from '../../../../../react-services/time-service';
-import { withUserAuthorizationPrompt, withGlobalBreadcrumb, withUserLogged } from '../../../../../components/common/hocs';
+import { withUserAuthorizationPrompt, withGlobalBreadcrumb } from '../../../../../components/common/hocs';
 import { compose } from 'redux';
 import { WzFieldSearch } from '../../../../../components/wz-field-search-bar/wz-field-search-bar';
 
@@ -42,7 +42,6 @@ export default compose(
     { text: 'Management', href: '/app/wazuh#/manager' },
     { text: 'Logs' }
   ]),
-  withUserLogged,
   withUserAuthorizationPrompt([{action: 'cluster:status', resource: '*:*:*'}, {action: 'cluster:read', resource: 'node:id:*'}])
 )
 (class WzLogs extends Component {
