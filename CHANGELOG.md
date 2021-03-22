@@ -27,7 +27,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Change all dates labels to Kibana formatting time zone [#3047](https://github.com/wazuh/wazuh-kibana-app/pull/3047)
 
-## Wazuh v4.1.1 - Kibana 7.10.0 , 7.10.2 - Revision 4103
+## Wazuh v4.1.2 - Kibana 7.10.0 , 7.10.2 - Revision 4103
 
 - Add `run_as` setting to example host configuration in Add new API view [#3021](https://github.com/wazuh/wazuh-kibana-app/pull/3021)
 - Refactor of some prompts [#3015](https://github.com/wazuh/wazuh-kibana-app/pull/3015)
