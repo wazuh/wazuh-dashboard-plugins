@@ -119,7 +119,7 @@ export class HealthCheck extends Component {
 
       if (hosts.length) {
         for (let i = 0; i < hosts.length; i++) {
-          let tries = 10;
+          let tries = 36;
           while (tries--) {
             await this.delay(5000);
             try {

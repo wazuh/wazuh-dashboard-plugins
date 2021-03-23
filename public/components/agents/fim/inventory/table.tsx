@@ -21,7 +21,7 @@ import {
 import { WzRequest } from '../../../../react-services/wz-request';
 import { FlyoutDetail } from './flyout';
 import { filtersToObject, IFilter } from '../../../wz-search-bar';
-import { TimeService } from '../../../../react-services/time-service';
+import { formatUIDate } from '../../../../react-services/time-service';
 
 export class InventoryTable extends Component {
   state: {
@@ -153,6 +153,7 @@ export class InventoryTable extends Component {
     return filter;
   }
 
+
   onTableChange = ({ page = {}, sort = {} }) => {
     const { index: pageIndex, size: pageSize } = page;
     const { field: sortField, direction: sortDirection } = sort;
@@ -182,7 +183,7 @@ export class InventoryTable extends Component {
         name: 'Last Modified',
         sortable: true,
         width: '100px',
-        render: TimeService.offset
+        render: formatUIDate
       },
       {
         field: 'uname',

@@ -19,7 +19,7 @@ import { AppNavigate } from '../../../../react-services/app-navigate';
 import { RowDetails } from './row-details';
 import DateMatch from '@elastic/datemath';
 import { WazuhConfig } from '../../../../react-services/wazuh-config';
-import { TimeService } from '../../../../react-services/time-service';
+import { formatUIDate } from '../../../../react-services/time-service';
 import { KbnSearchBar } from '../../../kbn-search-bar';
 import { FlyoutTechnique } from '../../../../components/overview/mitre/components/techniques/components/flyout-technique';
 import { withReduxProvider } from '../../../common/hocs';
@@ -401,7 +401,7 @@ export const Discover = compose(
           width: '10%',
           sortable: true,
           render: time => {
-            return <span>{TimeService.offset(time)}</span>
+            return <span>{formatUIDate(time)}</span>
           },
         }
       }

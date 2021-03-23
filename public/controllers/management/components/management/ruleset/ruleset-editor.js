@@ -122,7 +122,7 @@ class WzRulesetEditor extends Component {
           toast.toastMessage += '\nThe new file was deleted.';
         } else {
           //restore file to previous version
-          await saver(name, this.state.initContent, overwrite);
+          await this.rulesetHandler.updateFile(name, this.state.initContent, overwrite);
           toast.toastMessage += '\nThe content file was restored to previous state.';
         }
 
