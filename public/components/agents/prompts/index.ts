@@ -11,5 +11,6 @@
  */
 export { PromptAgentNoSupportModule } from './prompt-agent-no-support-module';
 export { PromptNoActiveAgent, PromptNoActiveAgentWithoutSelect } from './prompt-no-active-agent';
-export { PromptNoSelectedAgent } from './prompt-no-selected-agent'
-export { PromptSelectAgent } from './prompt-select-agent'
+export { PromptNoSelectedAgent } from './prompt-no-selected-agent';
+export { PromptSelectAgent } from './prompt-select-agent';
+export { PromptAgentFeatureVersion } from './prompt-agent-feature-version';

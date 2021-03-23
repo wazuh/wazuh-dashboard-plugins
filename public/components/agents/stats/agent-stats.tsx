@@ -21,11 +21,11 @@ import {
   EuiText
 } from '@elastic/eui';
 
-import { withGlobalBreadcrumb, withReduxProvider, withGuard } from '../../common/hocs';
+import { withGlobalBreadcrumb, withReduxProvider, withGuard, withUserAuthorizationPrompt } from '../../common/hocs';
 import { compose } from 'redux';
 import { WzRequest, TimeService } from '../../../react-services';
 import { AgentStatTable } from './table';
-import { PromptNoActiveAgentWithoutSelect } from '../prompts';
+import { PromptNoActiveAgentWithoutSelect, PromptAgentFeatureVersion } from '../prompts';
 
 const tableColumns = [
   {
@@ -94,7 +94,12 @@ export const MainAgentStats = compose(
       text: 'Stats'
     },
   ]),
+  withUserAuthorizationPrompt((agent) => [{action: 'agent:read', resource: `agent:id:${agent.id}`}]),
   withGuard(({agent}) => agent.status !== 'active', PromptNoActiveAgentWithoutSelect),
+  withGuard(({agent}) => {
+    const [major, minor, patch] = agent.version.replace('Wazuh v','').split('.').map(parseInt);
+    return !(major >= 4 && minor >= 2 && patch >= 0)
+  }, () => <PromptAgentFeatureVersion version='equal or higher version than 4.2.0'/>)
 )(AgentStats);
 
 function AgentStats({agent}){
@@ -116,49 +121,47 @@ function AgentStats({agent}){
     })()
   }, []);
   return (
-    <>
-      <EuiPage>
-        <EuiPageBody>
-          <EuiFlexGroup>
-            <EuiFlexItem>
-              <EuiPanel paddingSize="m">
-                <EuiFlexGroup>
-                  {statsAgents.map(stat => (
-                    <EuiFlexItem key={`agent-stat-${stat.field}`} grow={false}>
-                      <EuiText>{stat.title}: {loading ? <EuiLoadingSpinner size="s" /> : <strong>{dataStatAgent !== undefined ? (stat.render ? stat.render(dataStatAgent[stat.field]) : dataStatAgent?.[stat.field]) : '-'}</strong>}</EuiText>
-                    </EuiFlexItem>
-                  ))}
-                </EuiFlexGroup>
-              </EuiPanel>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-          <EuiSpacer />
-          <EuiFlexGroup>
-            <EuiFlexItem>
-              <AgentStatTable
-                columns={tableColumns}
-                loading={loading}
-                title='Global'
-                start={dataStatLogcollector?.global?.start}
-                end={dataStatLogcollector?.global?.end}
-                items={dataStatLogcollector?.global?.files}
-                exportCSVFilename={`agent-stats-${agent.id}-logcollector-global`}
-              />
-            </EuiFlexItem>
-            <EuiFlexItem>
-              <AgentStatTable
-                columns={tableColumns}
-                loading={loading}
-                title='Interval'
-                start={dataStatLogcollector?.interval?.start}
-                end={dataStatLogcollector?.interval?.end}
-                items={dataStatLogcollector?.interval?.files}
-                exportCSVFilename={`agent-stats-${agent.id}-logcollector-interval`}
-              />
-            </EuiFlexItem>
-          </EuiFlexGroup>
-        </EuiPageBody>
-      </EuiPage>
-    </>
+    <EuiPage>
+      <EuiPageBody>
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            <EuiPanel paddingSize="m">
+              <EuiFlexGroup>
+                {statsAgents.map(stat => (
+                  <EuiFlexItem key={`agent-stat-${stat.field}`} grow={false}>
+                    <EuiText>{stat.title}: {loading ? <EuiLoadingSpinner size="s" /> : <strong>{dataStatAgent !== undefined ? (stat.render ? stat.render(dataStatAgent[stat.field]) : dataStatAgent?.[stat.field]) : '-'}</strong>}</EuiText>
+                  </EuiFlexItem>
+                ))}
+              </EuiFlexGroup>
+            </EuiPanel>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+        <EuiSpacer />
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            <AgentStatTable
+              columns={tableColumns}
+              loading={loading}
+              title='Global'
+              start={dataStatLogcollector?.global?.start}
+              end={dataStatLogcollector?.global?.end}
+              items={dataStatLogcollector?.global?.files}
+              exportCSVFilename={`agent-stats-${agent.id}-logcollector-global`}
+            />
+          </EuiFlexItem>
+          <EuiFlexItem>
+            <AgentStatTable
+              columns={tableColumns}
+              loading={loading}
+              title='Interval'
+              start={dataStatLogcollector?.interval?.start}
+              end={dataStatLogcollector?.interval?.end}
+              items={dataStatLogcollector?.interval?.files}
+              exportCSVFilename={`agent-stats-${agent.id}-logcollector-interval`}
+            />
+          </EuiFlexItem>
+        </EuiFlexGroup>
+      </EuiPageBody>
+    </EuiPage>
   )
 }
