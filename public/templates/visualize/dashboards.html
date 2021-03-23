@@ -94,6 +94,7 @@
         <div ng-if='octrl.tabView === "panels"' ng-class="{'no-opacity': !moduleDiscoverReady}">
           <react-component
             ng-show="showModuleDashboard"
+            id="moduleDashboard"
             name="WzVisualize"
             props="getVisualizeProps(resultState)"
           ></react-component>
