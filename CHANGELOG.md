@@ -6,6 +6,12 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Added
 
+- Pending status suggestion for agents [#3095](https://github.com/wazuh/wazuh-kibana-app/pull/3095)
+
+## Wazuh v4.1.3 - Kibana 7.10.0 , 7.10.2 - Revision 4104
+
+### Added
+
 - Creation of index pattern after the default one is changes in Settings [#2985](https://github.com/wazuh/wazuh-kibana-app/pull/2985)
 - Added node name of agent list and detail [#3039](https://github.com/wazuh/wazuh-kibana-app/pull/3039)
 - Added loading view while the user is logging to prevent permissions prompts [#3041](https://github.com/wazuh/wazuh-kibana-app/pull/3041)
