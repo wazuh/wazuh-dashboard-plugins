@@ -64,7 +64,7 @@ export default [
     _source: {
       title: 'Wazuh App Statistics remoted tcp sessions',
       visState:
-        `{"title":"Wazuh App Statistics remoted tcp sessions","type":"timelion","params":{"expression":".es(timefield=timestamp,metric=avg:remoted.tcp_sessions, q='*').label(tcp_sessions)","interval":"5m"},"aggs":[]}`,
+        `{"title":"Wazuh App Statistics remoted tcp sessions","type":"timelion","params":{"expression":".es(timefield=timestamp,metric=sum:remoted.tcp_sessions, q='*').label(tcp_sessions),.es(timefield=timestamp,metric=avg:remoted.tcp_sessions, q='*').label(tcp_sessions_avg)","interval":"5m"},"aggs":[]}`,
       uiStateJSON: '{}',
       description: '',
       version: 1,
