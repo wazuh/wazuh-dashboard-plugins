@@ -2,13 +2,13 @@ import React, {  useState } from "react";
 import {EuiPanel, EuiFlexGroup, EuiFlexItem, EuiText, EuiLoadingSpinner, EuiIcon} from "@elastic/eui";
 import mapValues from 'lodash';
 import {useGenericRequest} from '../../../common/hooks/useGenericRequest';
-import { TimeService } from '../../../../react-services/time-service';
+import { formatUIDate } from '../../../../react-services/time-service';
 
 export function InventoryMetrics({agent}) {
     const [params, setParams] = useState({});
     const offsetTimestamp = (text, time) => {
         try {
-          return text + TimeService.offset(time);
+          return text + formatUIDate(time);
         } catch (error) {
           return time !== '-' ? `${text}${time} (UTC)` : time;
         }
