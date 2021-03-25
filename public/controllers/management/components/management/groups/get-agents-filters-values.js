@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { WzRequest } from "../../../../../react-services/wz-request";
+import { WzRequest } from '../../../../../react-services/wz-request';
 
 export async function getAgentFilterValues(field, value, filters = {}) {
   const filter = {
@@ -18,33 +18,38 @@ export async function getAgentFilterValues(field, value, filters = {}) {
     limit: 30,
   };
   if (value) {
-    filter["search"] = value;
+    // depends field
+    switch (field) {
+      case 'group':
+      case 'dateAdd':
+        filter['search'] = value;
+        break;
+      case 'id':
+        filter['q'] = filter['q'] ? `${filter['q']};${field}=${value}` : filter['q'];
+        break;
+      default:
+        filter['q'] = filter['q'] ? `${filter['q']};${field}~${value}` : filter['q'];
+    }
   }
-  const result = await WzRequest.apiReq(
-    "GET",
-    `/agents/stats/distinct`,
-    { params: filter }
-  );
+
+  const result = await WzRequest.apiReq('GET', `/agents/stats/distinct`, { params: filter });
   const getChild = (item, field) => {
-    const subFields = field.split(".");
+    const subFields = field.split('.');
     if (subFields.length < 2) {
       return item[field];
     } else {
       const currentField = subFields.shift();
       if (!item[currentField]) {
-        return "";
+        return '';
       }
-      return getChild(item[currentField], subFields.join("."));
+      return getChild(item[currentField], subFields.join('.'));
     }
   };
-  const arrayResult = (((result || {}).data || {}).data || {}).affected_items.map(
-    (item) => {
-      return getChild(item, field);
-    }
-  );
+  const arrayResult = (((result || {}).data || {}).data || {}).affected_items.map((item) => {
+    return getChild(item, field);
+  });
   return arrayResult
     .filter((item) => item && item.length)
-    .reduce((accum, item) =>
-      Array.isArray(item) ? [...accum, ...item] : [...accum, item], []) // it lets expand agent.group, which is an string[] (array of strings)
-    .filter((item, index, array) => array.indexOf(item) === index && item !== "unknown");  // return unique values
+    .reduce((accum, item) => (Array.isArray(item) ? [...accum, ...item] : [...accum, item]), []) // it lets expand agent.group, which is an string[] (array of strings)
+    .filter((item, index, array) => array.indexOf(item) === index && item !== 'unknown'); // return unique values
 }
