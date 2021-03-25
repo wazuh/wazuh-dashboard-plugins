@@ -108,7 +108,6 @@ class WzRulesetFilterBar extends Component {
    * @param {Object} filters
    */
   async fetchItems(filters) {
-    console.log("fetch items")
     try {
       const { section } = this.props.state;
       let fetcher = this.rulesetHandler.getResource;

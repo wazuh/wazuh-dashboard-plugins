@@ -199,6 +199,17 @@ export const showFlyoutLogtest = (showFlyout) => {
 export const updateDockedLogtest = (dockedFlyout) => {
   return {
     type: 'UPDATE_DOCKED_LOGTEST',
-    dockedFlyoutLogtest: dockedFlyout
+    dockedFlyoutLogtest: dockedFlyout  
+  };
+};
+
+/**
+ * Updates the status of whether the user is logged in
+ * @param withUserLogged
+ */
+export const updateWithUserLogged = (withUserLogged) => {
+  return {
+    type: 'UPDATE_WITH_USER_LOGGED',
+   withUserLogged,
   };
 };

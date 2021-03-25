@@ -352,7 +352,7 @@ class WzMenu extends Component {
           <EuiFlexItem>
             <p></p>
           </EuiFlexItem>
-          {this.props.state.wazuhNotReadyYet.includes('Restarting') && (
+          {typeof this.props.state.wazuhNotReadyYet === "string" && this.props.state.wazuhNotReadyYet.includes('Restarting') && (
             <EuiFlexItem grow={false}>
               <p>
                 {' '}

@@ -23,7 +23,7 @@ import '../../common/modules/module.scss';
 import { ReportingService } from '../../../react-services/reporting';
 import { AppNavigate } from '../../../react-services/app-navigate';
 import { ModulesDefaults } from './modules-defaults';
-import { getAngularModule, getDataPlugin } from '../../../kibana-services';
+import { getAngularModule, getDataPlugin, getUiSettings } from '../../../kibana-services';
 import { MainModuleAgent } from './main-agent'
 import { MainModuleOverview } from './main-overview';
 import store from '../../../redux/store';
@@ -92,11 +92,33 @@ export class MainModule extends Component {
     );
   }
 
-  async startReport() {
-    this.setState({ loadingReport: true });
-    const agent = (this.props.agent || store.getState().appStateReducers.currentAgentData || {}).id || false;
+
+  startVis2PngByAgent = async () => {
+    const agent =
+      (this.props.agent || store.getState().appStateReducers.currentAgentData || {}).id || false;
     await this.reportingService.startVis2Png(this.props.section, agent);
-    this.setState({ loadingReport: false });
+  };
+
+  async startReport() {
+    try {
+      this.setState({ loadingReport: true });
+      const isDarkModeTheme = getUiSettings().get('theme:darkMode');
+      if (isDarkModeTheme) {
+        const defaultTextColor = $('#moduleDashboard .euiButtonEmpty__text').children().css('color');
+        try {
+          $('.euiButtonEmpty__text').css('color', 'black');
+          await this.startVis2PngByAgent();
+          $('.euiButtonEmpty__text').css('color', defaultTextColor);
+        } catch (e) {
+          $('.euiButtonEmpty__text').css('color', defaultTextColor);
+          this.setState({ loadingReport: false });
+        }
+      } else {
+        await this.startVis2PngByAgent();
+      }
+    } finally {
+      this.setState({ loadingReport: false });
+    }
   }
 
   renderReportButton() {
