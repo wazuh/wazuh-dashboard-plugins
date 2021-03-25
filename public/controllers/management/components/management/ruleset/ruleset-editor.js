@@ -184,6 +184,7 @@ class WzRulesetEditor extends Component {
     } = this.props.state;
     const { wazuhNotReadyYet } = this.props;
     const { name, content, path, showWarningRestart } = this.state;
+    const isRules = path.includes('rules') ? 'Ruleset Test' : 'Decoders Test';
 
     const isEditable = addingRulesetFile
       ? true
@@ -209,7 +210,7 @@ class WzRulesetEditor extends Component {
           style={{ margin: '0px 8px', cursor: 'pointer' }}
           onClick={onClickOpenLogtest}
         >
-          Log Test
+          {isRules}
         </EuiButtonEmpty>
       );
     };

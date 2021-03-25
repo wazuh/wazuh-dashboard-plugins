@@ -144,7 +144,7 @@ export const Logtest = (props) => {
                   <Fragment>
                     <EuiFlexItem grow={false}>
                       <EuiTitle size="m">
-                        <h2>Log Test</h2>
+                        <h2>Ruleset Test</h2>
                       </EuiTitle>
                     </EuiFlexItem>
                   </Fragment>
@@ -166,7 +166,7 @@ export const Logtest = (props) => {
           <EuiFlyout className="wzApp" onClose={() => props.openCloseFlyout()}>
             <EuiFlyoutHeader hasBorder={true}>
               <EuiTitle size="m">
-                <h2>Log Test</h2>
+                {props.isRuleset.includes('rules') ? <h2>Ruleset Test</h2> : <h2>Decoders Test</h2>}
               </EuiTitle>
             </EuiFlyoutHeader>
             <EuiFlyoutBody style={{ margin: '20px' }}>
@@ -187,4 +187,5 @@ Logtest.propTypes = {
   openCloseFlyout: PropTypes.func,
   showClose: PropTypes.bool,
   onFlyout: PropTypes.bool,
+  isRuleset: PropTypes.string,
 };
