@@ -190,7 +190,7 @@ export const AgentConfiguration = {
           subtitle: 'Active response',
           docuLink:
             'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/active-response.html',
-          desc: 'Active threat addressing by inmmediate response',
+          desc: 'Active threat addressing by immediate response',
           config: [{ component: 'com', configuration: 'active-response' }],
           labels: [
             {

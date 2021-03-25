@@ -28,7 +28,7 @@ import {
 import store from '../../../../../redux/store';
 import { updateCurrentAgentData } from '../../../../../redux/actions/appStateActions';
 import { getFimAlerts } from './lib';
-import { TimeService } from '../../../../../react-services/time-service';
+import { formatUIDate } from '../../../../../react-services/time-service';
 import { FlyoutDetail } from '../../../../agents/fim/inventory/flyout'
 import { EuiLink } from '@elastic/eui';
 import { getDataPlugin } from '../../../../../kibana-services';
@@ -110,7 +110,7 @@ function navigateToFim(agent, router) {
 }
 
 const columns = (setFile, setIsOpen) => [
-  { field: '_source.timestamp', name: "Time", sortable: true, render: (field) => TimeService.offset(field), width: '150px' },
+  { field: '_source.timestamp', name: "Time", sortable: true, render: (field) => formatUIDate(field), width: '150px' },
   { field: '_source.syscheck.path', name: "Path", sortable: true, truncateText: true, render: (path) => renderPath(path, setFile, setIsOpen) },
   { field: '_source.syscheck.event', name: "Action", sortable: true, width: '100px' },
   { field: '_source.rule.description', name: "Rule description", sortable: true, truncateText: true },
