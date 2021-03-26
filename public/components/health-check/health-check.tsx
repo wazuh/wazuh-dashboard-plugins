@@ -82,7 +82,8 @@ export class HealthCheck extends Component {
             results[i].description = <span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span>;
           }
         } else {
-          results[i].description = <span><EuiIcon type="check" color="secondary" ></EuiIcon> Ready</span>;
+          console.log("Entro a ready2");
+          results[i].description = <span><EuiIcon type="check" color="secondary" ></EuiIcon> Ready2</span>;
         }
         this.setState({ results, errors });
       }
@@ -101,7 +102,8 @@ export class HealthCheck extends Component {
           errors.push('No template found for the selected index-pattern.');
           results[i].description = <span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span>;
         } else {
-          results[i].description = <span><EuiIcon type="check" color="secondary" ></EuiIcon> Ready</span>;
+          console.log("Entro a ready3");
+          results[i].description = <span><EuiIcon type="check" color="secondary" ></EuiIcon> Ready3</span>;
         }
         this.setState({ results, errors });
       }
@@ -152,6 +154,12 @@ export class HealthCheck extends Component {
       return Promise.reject(`Error connecting to API: ${err}`);
     }
   }
+
+test(){
+  this.load();
+  this.checkApiConnection();
+  this.goApp();
+}
 
   /**
    * This attempts to connect with API
@@ -205,11 +213,18 @@ export class HealthCheck extends Component {
           this.setState({ results, errors });
         } else if (data.data.error || data.data.data.apiIsDown) {
           errors.push(data.data.data.apiIsDown ? 'Wazuh API is down.' : `Error connecting to the API.${data.data.error && data.data.error.message ? ` ${data.data.error.message}` : ''}`);
-          results[i].description = <span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span>;
+          results[i].description = <div><span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span><EuiButton 
+          fill
+          onClick={() => this.checkApiConnection()}>
+          Check App Again
+        </EuiButton>
+        </div>;
           results[i + 1].description = <span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span>;
           this.setState({ results, errors });
         } else {
-          results[i].description = <span><EuiIcon type="check" color="secondary" ></EuiIcon> Ready</span>;
+          console.log("Entramos a ready4");
+          results[i].description = <span><EuiIcon type="check" color="secondary" ></EuiIcon> Ready4</span>;
+          console.log("Entrando linea 218");
           this.setState({ results, errors });
           if (this.state.checks.setup) {
             const versionData = await WzRequest.apiReq(
@@ -240,8 +255,32 @@ export class HealthCheck extends Component {
               results[i].description = <span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span>;
               this.setState({ results, errors });
             } else {
-              results[i].description = <span><EuiIcon type="check" color="secondary" ></EuiIcon> Ready</span>;
+              // console.log("entrando linea 248");
+              // console.log("El resultado2 es: ", results);
+              // let previousStateIsFalse = false;
+              // if(typeof results[i] == 'string')
+              //   console.log("Es un string")
+              // console.log(typeof results[i]);
+              console.log("El resultado es: ", results);
+              // if(results[i]  == '<span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span>'){
+              //   console.log("Entro en previous....");
+              //   previousStateIsFalse = true;
+              // }
+              console.log("Entramos a Ready5");
+              results[i].description = <span><EuiIcon type="check" color="secondary" ></EuiIcon> Ready5</span>;
               this.setState({ results, errors });
+              // if(previousStateIsFalse){
+              //   let checkSomeErrorYet = false;
+              //   for(let k in results){
+              //     if(results[k].description == <span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span>){
+              //       console.log("En ", k, "tenemos", results[k]);
+              //       checkSomeErrorYet = true;
+              //     }
+              //   }
+              //   if(!checkSomeErrorYet){
+              //     this.goApp();
+              //   }
+              // }
             }
           }
         }
@@ -286,7 +325,8 @@ export class HealthCheck extends Component {
         );
         getToasts().remove(toast.id);
         getToasts().addSuccess(`${pattern} index pattern created successfully`)
-        results[itemId].description = <span><EuiIcon type="check" color="secondary" ></EuiIcon> Ready</span>;
+        console.log("Entramos a Ready6");
+        results[itemId].description = <span><EuiIcon type="check" color="secondary" ></EuiIcon> Ready6</span>;
         this.setState({ results });
       } catch (error) {
         getToasts().remove(toast.id);
@@ -295,7 +335,8 @@ export class HealthCheck extends Component {
         this.setState({ results });
       }
     }else{
-      results[itemId].description = <span><EuiIcon type="check" color="secondary" ></EuiIcon> Ready</span>;
+      console.log("Entramos a Ready7");
+      results[itemId].description = <span><EuiIcon type="check" color="secondary" ></EuiIcon> Ready7</span>;
       this.setState({ results });
     }
   }
@@ -367,10 +408,11 @@ export class HealthCheck extends Component {
             const i = results.map(item => item.id).indexOf(4);
             try {
               await PatternHandler.refreshIndexPattern();
-              results[i].description = <span><EuiIcon type="check" color="secondary" ></EuiIcon> Ready</span>;
+              console.log("Entramos a Ready1");
+              results[i].description = <span><EuiIcon type="check" color="secondary" ></EuiIcon> Ready1</span>;
               this.setState({ results });
             } catch (error) {
-              results[i].description = <span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span>;
+              results[i].description = <span><EuiIcon type="alert" color="danger" ></EuiIcon> Error v3</span>;
               this.setState({ results }, () => this.handleError(error));
             }
           }
@@ -397,11 +439,23 @@ export class HealthCheck extends Component {
     window.location.href = '/app/wazuh#/settings';
   }
 
+  muestrame() {
+    console.log("this.state.errors: ", this.state.errors[0]);
+    console.log("This.State: ", this.state);
+    if(this.state.errors[0]){
+      return false;
+    }
+    else
+      return true;
+  }
+
   render() {
     const logo_url = getHttp().basePath.prepend('/plugins/wazuh/assets/icon_blue.svg');
     return (
       <div className="health-check">
-        <EuiLoadingSpinner className="health-check-loader" />
+        {this.muestrame() && (
+          <EuiLoadingSpinner className="health-check-loader" />
+        )}
         <img src={logo_url} className="health-check-logo" alt=""></img>
         <div className="margin-top-30">
           <EuiDescriptionList

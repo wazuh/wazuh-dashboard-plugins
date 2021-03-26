@@ -215,11 +215,11 @@ export class AgentsPreviewController {
   async load() {
     try {
       this.errorInit = false;
-
       const clusterInfo = AppState.getClusterInfo();
       this.firstUrlParam =
         clusterInfo.status === 'enabled' ? 'cluster' : 'manager';
       this.secondUrlParam = clusterInfo[this.firstUrlParam];
+      console.log("1º: ",clusterInfo);
       this.pattern = (await getDataPlugin().indexPatterns.get(AppState.getCurrentPattern())).title;
     } catch (error) {
       this.errorInit = ErrorHandler.handle(error, '', { silent: true });
