@@ -2,6 +2,12 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.1.3 - Kibana 7.10.0 , 7.10.2 - Revision 4105
+
+### Fixed
+
+- Fix space character missing on deployment command if UDP is configured [#3108](https://github.com/wazuh/wazuh-kibana-app/pull/3108)
+
 ## Wazuh v4.1.3 - Kibana 7.10.0 , 7.10.2 - Revision 4104
 
 ### Added
