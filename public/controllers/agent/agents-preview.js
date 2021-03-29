@@ -215,6 +215,7 @@ export class AgentsPreviewController {
   async load() {
     try {
       this.errorInit = false;
+
       const clusterInfo = AppState.getClusterInfo();
       this.firstUrlParam =
         clusterInfo.status === 'enabled' ? 'cluster' : 'manager';
