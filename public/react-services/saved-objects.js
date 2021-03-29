@@ -183,7 +183,7 @@ export class SavedObject {
         });
 
       await this.refreshFieldsOfIndexPattern(pattern.id, pattern.title, fields);
-      
+
       return;
     } catch (error) {
       console.log(error)
