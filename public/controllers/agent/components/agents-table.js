@@ -238,6 +238,7 @@ export class AgentsTable extends Component {
     const agentVersion =
     agent.version !== undefined ? agent.version.split(' ')[1] : '-';
     const { timeService } = this.props;
+    const node_name = agent.node_name && agent.node_name !== 'unknown' ? agent.node_name : '-';
     
     return {
       id: agent.id,
@@ -247,6 +248,7 @@ export class AgentsTable extends Component {
       group: checkField(agent.group),
       os_name: agent,
       version: agentVersion,
+      node_name: node_name,
       dateAdd: formatUIDate(agent.dateAdd),
       lastKeepAlive: lastKeepAlive(agent.lastKeepAlive, timeService),
       actions: agent,
