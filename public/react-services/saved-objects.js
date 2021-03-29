@@ -183,10 +183,8 @@ export class SavedObject {
         });
 
       await this.refreshFieldsOfIndexPattern(pattern.id, pattern.title, fields);
-        console.log("Paso por refreshIndexPattern");
       return;
     } catch (error) {
-      console.log(error)
       return ((error || {}).data || {}).message || false
         ? error.data.message
         : error.message || error;
@@ -252,6 +250,5 @@ export class SavedObject {
       case WAZUH_INDEX_TYPE_ALERTS:
         return KnownFields
     }
-    console.log("Paso por getIndicesFields");
   })
 }
