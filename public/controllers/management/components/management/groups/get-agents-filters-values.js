@@ -12,7 +12,6 @@
 import { WzRequest } from "../../../../../react-services/wz-request";
 
 export async function getAgentFilterValues(field, value, filters = {}) {
-  console.log("Entra: ", field, " y ", value);
   const filter = {
     ...filters,
     fields: field,

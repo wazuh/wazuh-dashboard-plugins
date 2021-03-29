@@ -183,8 +183,10 @@ export class SavedObject {
         });
 
       await this.refreshFieldsOfIndexPattern(pattern.id, pattern.title, fields);
+
       return;
     } catch (error) {
+      console.log(error)
       return ((error || {}).data || {}).message || false
         ? error.data.message
         : error.message || error;

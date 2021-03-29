@@ -320,12 +320,12 @@ export class WazuhApiCtrl {
           options
         );
       }catch(error){
-          return ErrorResponse(
-            `ERROR3099 - ${error.response?.data?.detail || 'Wazuh not ready yet'}`,
-            3099,
-            500,
-            response
-          );
+        return ErrorResponse(
+          `ERROR3099 - ${error.response?.data?.detail || 'Wazuh not ready yet'}`,
+          3099,
+          500,
+          response
+        );
       }
 
       log('wazuh-api:checkAPI', `${request.body.id} credentials are valid`, 'debug');
