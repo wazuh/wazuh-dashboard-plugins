@@ -31,6 +31,14 @@ export const WAZUH_MONITORING_DEFAULT_CRON_FREQ = '0 * * * * *';
 // Job - Wazuh statistics
 
 export const WAZUH_INDEX_TYPE_STATISTICS = "statistics";
+export const WAZUH_STATISTICS_PREFIX = "wazuh-statistics-";
+export const WAZUH_STATISTICS_PATTERN = "wazuh-statistics-*";
+export const WAZUH_STATISTICS_TEMPLATE_NAME = "wazuh-statistics";
+export const WAZUH_STATISTICS_DEFAULT_INDICES_SHARDS = 2;
+export const WAZUH_STATISTICS_DEFAULT_CREATION = 'w';
+export const WAZUH_STATISTICS_DEFAULT_ENABLED = true;
+export const WAZUH_STATISTICS_DEFAULT_FREQUENCY = 900;
+export const WAZUH_STATISTICS_DEFAULT_CRON_FREQ = '0 * * * * *';
 
 // Job - Wazuh initialize
 export const WAZUH_INDEX = '.wazuh';
