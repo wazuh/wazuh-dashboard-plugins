@@ -459,14 +459,12 @@ export class WazuhElasticCtrl {
               bulk_content.visualization.kibanaSavedObjectMeta.searchSourceJSON = searchSourceJSON.replace('wazuh-statistics-*', pattern_name);
             }
             if (title.startsWith('Wazuh App Statistics') && name !== '-' && name !== 'all' && visState.params.expression.includes('q=')) {
-              const expressionRegex = /q='\*'/gi
-              if (bulk_content.visualization.visStateByNode) {
-                const visStateByNode = JSON.parse(bulk_content.visualization.visStateByNode);
-                query += visStateByNode.params.expression.replace(expressionRegex, `q="nodeName:${name} AND apiName:${master_node}"`)
-                  .replace("NODE_NAME", name)
-              } else {
-                query += visState.params.expression.replace(expressionRegex, `q="nodeName:${name} AND apiName:${master_node}"`)
-              }
+              const expressionRegex = /q='\*'/gi;
+              const _visState = bulk_content.visualization.visStateByNode
+                ? JSON.parse(bulk_content.visualization.visStateByNode)
+                : visState;
+              query += _visState.params.expression.replace(expressionRegex, `q="nodeName:${name} AND apiName:${master_node}"`)
+                .replace("NODE_NAME", name)
             } else if (title.startsWith('Wazuh App Statistics')) {
               const expressionRegex = /q='\*'/gi
               query += visState.params.expression.replace(expressionRegex, `q="apiName:${master_node}"`)
