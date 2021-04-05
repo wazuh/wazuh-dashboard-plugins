@@ -124,13 +124,13 @@ export class Inventory extends Component {
   }
 
   renderTabs() {
-    const { isLoading } = this.state;
+    const { isLoading, totalItems } = this.state;
     
       return (
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiTitle size="s">
-              <h1>Vulnerabilities&nbsp;{isLoading === true && <EuiLoadingSpinner size="s" />}</h1>
+              <h1>Vulnerabilities&nbsp;{isLoading === true ? <EuiLoadingSpinner size="s" /> : <span>({ totalItems })</span>}</h1>
             </EuiTitle>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
