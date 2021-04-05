@@ -10,7 +10,7 @@ import { WzRequest } from '../../react-services/wz-request';
 import { SavedObject } from '../../react-services/saved-objects';
 import { ErrorHandler } from '../../react-services/error-handler';
 import { WAZUH_ERROR_DAEMONS_NOT_READY, WAZUH_INDEX_TYPE_STATISTICS, WAZUH_INDEX_TYPE_MONITORING } from '../../../common/constants';
-import { checkKibanaSettings, checkKibanaSettingsTimeFilter, checkKibanaSettingsMaxBuckets} from './lib';
+import { checkKibanaSettings, checkKibanaSettingsTimeFilter, checkKibanaSettingsMaxBuckets } from './lib';
 import store from '../../redux/store';
 import { updateWazuhNotReadyYet } from '../../redux/actions/appStateActions.js';
 
@@ -52,7 +52,7 @@ export class HealthCheck extends Component {
    * Sleep method
    * @param time
    */
-  delay = time => new Promise(res => setTimeout(res,time));
+  delay = time => new Promise(res => setTimeout(res, time));
 
   /**
    * This validates a pattern
@@ -74,8 +74,10 @@ export class HealthCheck extends Component {
         if (!patternData.status) {
           const patternList = await PatternHandler.getPatternList("healthcheck");
           if (patternList.length) {
-            const currentPattern = patternList[0].id;
-            AppState.setCurrentPattern(currentPattern);
+            const wazuhConfig = new WazuhConfig();
+            const { pattern } = wazuhConfig.getConfig();
+            const indexPatternDefault = patternList.find((indexPattern) => indexPattern.title === pattern);
+            AppState.setCurrentPattern(indexPatternDefault.id);
             return await this.checkPatterns();
           } else {
             errors.push('The selected index-pattern is not present.');
@@ -341,7 +343,7 @@ export class HealthCheck extends Component {
         results[itemId].description = <span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span>;
         this.setState({ results });
       }
-    }else{
+    } else {
       results[itemId].description = <span><EuiIcon type="check" color="secondary" ></EuiIcon> Ready</span>;
       this.setState({ results });
     }

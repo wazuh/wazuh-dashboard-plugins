@@ -286,7 +286,7 @@ export class RegisterAgent extends Component {
       ? `WAZUH_REGISTRATION_PASSWORD='${this.state.wazuhPassword}' `
       : ''
       }${this.state.udpProtocol
-        ? " WAZUH_PROTOCOL='UDP'"
+        ? "WAZUH_PROTOCOL='UDP' "
         : ''
       }${this.state.selectedGroup.length ? `WAZUH_AGENT_GROUP='${this.state.selectedGroup.map(item => item.label).join(',')}' ` : ''}`
     return deployment;
