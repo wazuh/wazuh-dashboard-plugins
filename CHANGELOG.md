@@ -6,7 +6,12 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Added
 
-- Pending status suggestion for agents [#3095](https://github.com/wazuh/wazuh-kibana-app/pull/3095)
+- Add a message to restart cluster or manager after import a file in Rules, Decoders or CDB Lists [#3051](https://github.com/wazuh/wazuh-kibana-app/pull/3051)
+- Add logtest PUT example on API Console [#3061](https://github.com/wazuh/wazuh-kibana-app/pull/3061)
+
+### Fixed
+
+- Fixed missing `pending` status suggestion for agents [#3095](https://github.com/wazuh/wazuh-kibana-app/pull/3095)
 
 ## Wazuh v4.1.3 - Kibana 7.10.0 , 7.10.2 - Revision 4104
 
@@ -167,7 +172,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed ping request to default request. Added delay and while to che… [#2820](https://github.com/wazuh/wazuh-kibana-app/issues/2820)
 - Removed kibana alert for security [#2806](https://github.com/wazuh/wazuh-kibana-app/issues/2806)
 
-## Wazuh v4.0.4 - Kibana 7.10.0 , 7.10.2 - Revision 4016
+## Wazuh v4.0.4 - Kibana v7.9.1, v7.9.3 - Revision 4016
 
 ### Added
 

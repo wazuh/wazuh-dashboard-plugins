@@ -30,7 +30,7 @@ import { clusterReq, restartClusterOrManager } from '../../controllers/managemen
 import { connect } from 'react-redux';
 
 interface IWzRestartClusterManagerCalloutProps{
-  updateWazuhNotReadyYet: () => void
+  updateWazuhNotReadyYet: (wazuhNotReadyYet) => void
   onRestarted: () => void
   onRestartedError: () => void
 };
