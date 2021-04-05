@@ -228,7 +228,6 @@ export class RegisterAgent extends Component {
     }
     else
       return '';
-
   }
 
   selectSYS(sys){

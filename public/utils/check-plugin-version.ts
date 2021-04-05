@@ -12,7 +12,7 @@
 import { GenericRequest } from '../react-services/generic-request';
 import { AxiosResponse } from 'axios';
 import _ from 'lodash';
-import { version as wzVersion, revision as wzRevision} from '../../package.json';
+import { version as appVersion, revision as appRevision} from '../../package.json';
 import { getCookies, getToasts } from '../kibana-services';
 
 type TAppInfo = {
@@ -39,14 +39,19 @@ export const checkPluginVersion = async () => {
 };
 
 const checkClientAppVersion = (appInfo: TAppInfo) => {
-  if (appInfo['app-version'] !== wzVersion || appInfo.revision !== wzRevision) {
-    if( window.history.state != 'refreshed') {
+  if (appInfo['app-version'] !== appVersion || appInfo.revision !== appRevision) {
+    if( window.history.state !== 'refreshed') {
       clearBrowserInfo(appInfo);
     } else {
-      getToasts().addDanger({title: 'Conflict with the Wazuh app version', text: 'The version of the Wazuh app in your browser does not correspond with the app version installed in Kibana.\nPlease clear your browser cache.\nIf the error persist please restart Kibana too.'})
+      getToasts().addDanger({
+        title: 'Conflict with the Wazuh app version',
+        text: 'The version of the Wazuh app in your browser does not correspond with the app version installed in Kibana.\nPlease clear your browser cache.\nIf the error persist please restart Kibana too.'
+      });
     }
   } else {
-    if( window.history.state != 'refreshed') window.history.replaceState('', 'wazuh');
+    if(window.history.state == 'refreshed'){
+      window.history.replaceState('', 'wazuh');
+    };
     const storeAppInfo = localStorage.getItem('appInfo');
     !storeAppInfo && updateAppInfo(appInfo);
   }
@@ -70,6 +75,7 @@ function clearBrowserInfo(appInfo: TAppInfo) {
 
   //replace status to avoid infinite refresh
   window.history.replaceState('refreshed', 'wazuh');
+
   // delete browser cache and hard reload
   window.location.reload(true);
 }
@@ -77,3 +83,4 @@ function clearBrowserInfo(appInfo: TAppInfo) {
 function updateAppInfo(appInfo: TAppInfo) {
   localStorage.setItem('appInfo', JSON.stringify(appInfo));
 }
+
