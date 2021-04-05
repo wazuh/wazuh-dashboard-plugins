@@ -158,7 +158,7 @@ export class Inventory extends Component {
       this.showToast('success', 'Your download should begin automatically...', 3000);
       await exportCsv(
         '/vulnerability/' + this.props.agent.id,
-        [{},
+        [
           ...formatedFilters
         ],
         `vuls-vulnerabilities`
