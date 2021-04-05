@@ -12,7 +12,6 @@
 import { TabNames } from '../../utils/tab-names';
 import store from '../../redux/store';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
-import { updateSelectedToolsSection } from '../../redux/actions/appStateActions';
 
 export class ToolsController {
   /**
@@ -28,7 +27,7 @@ export class ToolsController {
     this.$location = $location;
     this.errorHandler = errorHandler;
 
-    this.tab = $location.$$search.tab;
+    this.tab = 'devTools';
     this.load = true;
     this.tabNames = TabNames;
   }
@@ -38,22 +37,19 @@ export class ToolsController {
    */
   async $onInit() {
     try {
+      const breadcrumb = [{ text: '' }, { text: 'Dev Tools' }];
+      store.dispatch(updateGlobalBreadcrumb(breadcrumb));
+      this.switchTab('devTools'); 
+      /*
       const location = this.$location.search();
       if (location && location.tab) {
         this.tab = location.tab;
       }
       // Set component props
-      this.setComponentProps();
-
+       this.setComponentProps();
+     */
       this.load = false;
-
-      this.switchTab(this.tab);
-      const breadcrumb = [
-        { text: '' },
-        { text: this.tab === 'devTools' ? 'API Console' : 'Ruleset Test' },
-      ];
-      store.dispatch(updateGlobalBreadcrumb(breadcrumb));
-    } catch (error) {}
+    } catch (error) { }
   }
 
   /**
@@ -61,15 +57,15 @@ export class ToolsController {
    */
   setComponentProps() {
     let tabs = [
-      { id: 'devTools', name: 'API Console' },
-      { id: 'logtest', name: 'Ruleset Test' },
+      { id: 'devTools', name: 'Dev Console' },
+      { id: 'logtest', name: 'Logtest' }
     ];
     this.toolsTabsProps = {
-      clickAction: (tab) => {
+      clickAction: tab => {
         this.switchTab(tab, true);
       },
       selectedTab: this.tab || 'devTools',
-      tabs,
+      tabs
     };
   }
 
@@ -78,7 +74,7 @@ export class ToolsController {
    * @param {Object} tab
    */
   switchTab(tab) {
-    store.dispatch(updateSelectedToolsSection(tab));
-    this.$location.search('tab', tab);
+    this.tab = tab;
+    this.$location.search('tab', this.tab);
   }
 }

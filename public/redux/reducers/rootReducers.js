@@ -21,7 +21,6 @@ import appStateReducers from './appStateReducers';
 import visualizationsReducers from './visualizationsReducers';
 import globalBreadcrumbReducers from './globalBreadcrumbReducers';
 import securityReducers from './securityReducers';
-import toolsReducers from './toolsReducers';
 
 export default combineReducers({
   rulesetReducers,
@@ -33,6 +32,5 @@ export default combineReducers({
   appStateReducers,
   visualizationsReducers,
   globalBreadcrumbReducers,
-  securityReducers,
-  toolsReducers,
+  securityReducers
 });
