@@ -8,10 +8,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Add logtest PUT example on API Console [#3061](https://github.com/wazuh/wazuh-kibana-app/pull/3061)
 
-### Fixed
-
-- Fix wrong variable declaration for macOS agents [#3066](https://github.com/wazuh/wazuh-kibana-app/pull/3066)
-
 ## Wazuh v4.1.3 - Kibana 7.10.0 , 7.10.2 - Revision 4104
 
 ### Added
