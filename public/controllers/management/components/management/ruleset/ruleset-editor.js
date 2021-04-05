@@ -270,7 +270,6 @@ class WzRulesetEditor extends Component {
               {this.state.showWarningRestart && (
                 <Fragment>
                   <WzRestartClusterManagerCallout
-                    onRestart={() => this.setState({ showWarningRestart: true })}
                     onRestarted={() => this.setState({ showWarningRestart: false })}
                     onRestartedError={() => this.setState({ showWarningRestart: true })}
                   />
