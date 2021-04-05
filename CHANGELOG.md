@@ -2,6 +2,8 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+- Changed name for "TCP sessions" visualization [#3118](https://github.com/wazuh/wazuh-kibana-app/pull/3118)
+
 ## Wazuh v4.1.3 - Kibana 7.10.0 , 7.10.2 - Revision 4104
 
 ### Added
