@@ -3,6 +3,12 @@
 All notable changes to the Wazuh app project will be documented in this file.
 
 
+## Wazuh v4.1.4 - Kibana 7.10.0 , 7.10.2 - Revision 4106
+
+### Fixed
+
+- Flyout date filter also changes main date filter [#3114](https://github.com/wazuh/wazuh-kibana-app/pull/3114)
+
 ## Wazuh v4.1.4 - Kibana 7.10.0 , 7.10.2 - Revision 4105
 
 - Adapt for Wazuh 4.1.4
