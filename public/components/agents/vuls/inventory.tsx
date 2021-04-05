@@ -123,7 +123,7 @@ export class Inventory extends Component {
     }
   }
 
-  renderTabs() {
+  renderTitle() {
     const { isLoading, totalItems } = this.state;
     
       return (
@@ -134,7 +134,7 @@ export class Inventory extends Component {
             </EuiTitle>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
-            <EuiButtonEmpty iconType="importAction" onClick={() => this.downloadCsv()}>
+            <EuiButtonEmpty isDisabled={(totalItems == 0)} iconType="importAction" onClick={() => this.downloadCsv()}>
               Export formatted
             </EuiButtonEmpty>
           </EuiFlexItem>
@@ -205,11 +205,11 @@ export class Inventory extends Component {
       return this.loadingInventory()
     }
     const table = this.renderTable();
-    const tabs = this.renderTabs();
+    const title = this.renderTitle();
 
     return <EuiPage>
         <EuiPanel>
-          {tabs}
+          {title}
           <EuiSpacer size={(((this.props.agent || {}).os || {}).platform || false) === 'windows' ? 's' : 'm'} />
           {table}
         </EuiPanel>
