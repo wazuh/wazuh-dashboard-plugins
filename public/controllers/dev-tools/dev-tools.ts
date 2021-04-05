@@ -19,7 +19,6 @@ import { DynamicHeight } from '../../utils/dynamic-height';
 import { AppState } from '../../react-services/app-state';
 import { GenericRequest } from '../../react-services/generic-request';
 import store from '../../redux/store';
-import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
 import { WzRequest } from '../../react-services/wz-request';
 import { ErrorHandler } from '../../react-services/error-handler';
 import { getUiSettings } from '../../kibana-services';
@@ -57,8 +56,6 @@ export class DevToolsController {
     ) {
       AppState.setWzMenu();
     }
-    const breadcrumb = [{ text: '' }, { text: 'Dev Tools' }];
-    store.dispatch(updateGlobalBreadcrumb(breadcrumb));
     $(this.$document[0]).keydown(e => {
       if (!this.multipleKeyPressed.includes(e.which)) {
         this.multipleKeyPressed.push(e.which);
