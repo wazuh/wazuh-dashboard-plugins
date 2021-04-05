@@ -104,7 +104,7 @@ export class MainModule extends Component {
       this.setState({ loadingReport: true });
       const isDarkModeTheme = getUiSettings().get('theme:darkMode');
       if (isDarkModeTheme) {
-        const defaultTextColor = $('#moduleDashboard .euiButtonEmpty__text').children().css('color');
+        const defaultTextColor = '#DFE5EF';
         try {
           $('.euiButtonEmpty__text').css('color', 'black');
           await this.startVis2PngByAgent();

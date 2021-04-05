@@ -7,6 +7,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Added
 
 - Added Tools on wazuh menu with Dev Console and Logtest [#1434](https://github.com/wazuh/wazuh-kibana-app/pull/1434)
+- Added page size options in Security events, explore agents table [#2925](https://github.com/wazuh/wazuh-kibana-app/pull/2925)
 - Add a message to restart cluster or manager after import a file in Rules, Decoders or CDB Lists [#3051](https://github.com/wazuh/wazuh-kibana-app/pull/3051)
 - Add `logtest` PUT example on API Console [#3061](https://github.com/wazuh/wazuh-kibana-app/pull/3061)
 
@@ -20,6 +21,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Index pattern setting not used for choosing from existing patterns [#3097](https://github.com/wazuh/wazuh-kibana-app/pull/3097)
 - Fix space character missing on deployment command if UDP is configured [#3108](https://github.com/wazuh/wazuh-kibana-app/pull/3108)
 - Flyout date filter also changes main date filter [#3114](https://github.com/wazuh/wazuh-kibana-app/pull/3114)
+- Fixed name for "TCP sessions" visualization and average metric is now a sum [#3118](https://github.com/wazuh/wazuh-kibana-app/pull/3118)
 
 ## Wazuh v4.1.4 - Kibana 7.10.0 , 7.10.2 - Revision 4105
 
