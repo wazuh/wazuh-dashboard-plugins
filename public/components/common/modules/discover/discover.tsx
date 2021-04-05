@@ -122,6 +122,7 @@ export const Discover = compose(
       requestOffset: 0,
       itemIdToExpandedRowMap: {},
       dateRange: this.timefilter.getTime(),
+      dateRangeHistory: this.timefilter._history,
       query: props.query || { language: "kuery", query: "" },
       elasticQuery: {},
       columns: [],
@@ -289,7 +290,7 @@ export const Discover = compose(
 
     const filters = this.props.shareFilterManager ? this.props.shareFilterManager.filters : [];
     const previousFilters = this.KibanaServices && this.KibanaServices.query.filterManager.filters ? this.KibanaServices.query.filterManager.filters : [];
-    
+
     const elasticQuery =
       buildEsQuery(
         undefined,
@@ -303,8 +304,8 @@ export const Discover = compose(
     const range = {
       range: {
         timestamp: {
-          gte: dateParse(this.timefilter.getTime().from),
-          lte: dateParse(this.timefilter.getTime().to),
+          gte: dateParse(this.state.dateRange.from),
+          lte: dateParse(this.state.dateRange.to),
           format: 'epoch_millis'
         }
       }
@@ -408,7 +409,7 @@ export const Discover = compose(
       let width = false;
       let link = false;
       const arrayCompilance = ["rule.pci_dss", "rule.gdpr", "rule.nist_800_53", "rule.tsc", "rule.hipaa"];
-      
+
       if(item === 'agent.id') {
         link = (ev,x) => {AppNavigate.navigateToModule(ev,'agents', {"tab": "welcome", "agent": x } )};
         width = '8%';
@@ -507,7 +508,7 @@ export const Discover = compose(
 
   /**
   * Adds a new negated filter with format { "filter_key" : "filter_value" }, e.g. {"agent.id": "001"}
-  * @param filter 
+  * @param filter
   */
   addFilterOut(filter) {
     const filterManager = this.props.shareFilterManager;
@@ -525,7 +526,7 @@ export const Discover = compose(
 
   /**
    * Adds a new filter with format { "filter_key" : "filter_value" }, e.g. {"agent.id": "001"}
-   * @param filter 
+   * @param filter
    */
   addFilter(filter) {
     const filterManager = this.props.shareFilterManager;
@@ -553,7 +554,7 @@ export const Discover = compose(
   closeMitreFlyout = () => {
     this.setState({showMitreFlyout: false});
   }
-  
+
   onMitreChangeFlyout = (showMitreFlyout: boolean) => {
     this.setState({ showMitreFlyout });
   }
@@ -612,6 +613,9 @@ export const Discover = compose(
         {this.props.kbnSearchBar && <KbnSearchBar
           indexPattern={this.indexPattern}
           filterManager={this.props.shareFilterManager}
+          timeFilter={{timeFilter:this.state.dateRange,
+            timeHistory:this.state.dateRangeHistory,
+            setTimeFilter:(dateRange)=> this.setState({dateRange})}}
           onQuerySubmit={this.onQuerySubmit}
           onFiltersUpdated={this.onFiltersUpdated}
           query={query} />
