@@ -361,7 +361,6 @@ export class Details extends Component {
                 initialColumns={[
                   'icon',
                   'timestamp',
-                  // 'rule.mitre.id',
                   'rule.description',
                   'rule.level',
                   'rule.id',

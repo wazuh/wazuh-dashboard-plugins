@@ -67,9 +67,6 @@ export class FlyoutDetail extends Component {
     }
   }
 
-  componentWillUnmount() {
-  }
-
   render() {
     const { currentItem } = this.state;
     const title = `${currentItem.name} ${currentItem.cve}`;
