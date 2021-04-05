@@ -4,9 +4,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ## Wazuh v4.2.0 - Kibana 7.10.0 , 7.10.2 - Revision 4201
 
-### Added 
+### Added
 
 - Add a message to restart cluster or manager after import a file in Rules, Decoders or CDB Lists [#3051](https://github.com/wazuh/wazuh-kibana-app/pull/3051)
+- Add logtest PUT example on API Console [#3061](https://github.com/wazuh/wazuh-kibana-app/pull/3061)
 
 ## Wazuh v4.1.3 - Kibana 7.10.0 , 7.10.2 - Revision 4104
 
