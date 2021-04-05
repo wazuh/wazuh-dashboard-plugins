@@ -164,7 +164,7 @@ export const Logtest = (props) => {
           }}
         >
           <EuiFlyout className="wzApp" onClose={() => props.openCloseFlyout()}>
-            <EuiFlyoutHeader hasBorder={true}>
+            <EuiFlyoutHeader hasBorder={false}>
               <EuiTitle size="m">
                 {props.isRuleset.includes('rules') ? <h2>Ruleset Test</h2> : <h2>Decoders Test</h2>}
               </EuiTitle>
