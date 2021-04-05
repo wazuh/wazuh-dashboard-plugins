@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for reporting table.
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@ import {
 
 import { connect } from 'react-redux';
 import ReportingHandler from './utils/reporting-handler';
-import { toastNotifications } from 'ui/notify';
+import { getToasts }  from '../../../../../kibana-services';
 
 import {
   updateIsProcessing,
@@ -62,7 +62,7 @@ class WzReportingTable extends Component {
   async getItems() {
     try {
       const rawItems = await this.reportingHandler.listReports();
-      const items = ((rawItems || {}).data || {}).list || [];
+      const items = ((rawItems || {}).data || {}).reports || [];
       this.setState({
         items,
         isProcessing: false
@@ -125,7 +125,7 @@ class WzReportingTable extends Component {
   }
 
   showToast = (color, title, text, time) => {
-    toastNotifications.add({
+    getToasts().add({
       color: color,
       title: title,
       text: text,

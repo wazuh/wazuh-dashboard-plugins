@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Load all the Angular.js services.
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,11 +18,11 @@ import { ReportingService } from './reporting';
 import { VisFactoryService } from './vis-factory-handler';
 import './region-maps';
 import './order-object-by';
-import { uiModules } from 'ui/modules';
 import { ConfigHandler } from './config-handler';
 import { CheckDaemonsStatus } from './check-daemon-status';
+import { getAngularModule } from '../kibana-services';
 
-const app = uiModules.get('app/wazuh', []);
+const app = getAngularModule();
 
 app
   .service('errorHandler', ErrorHandler)

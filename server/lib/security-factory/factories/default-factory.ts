@@ -1,15 +1,12 @@
-export class DefaultFactory {
-  server;
+import { ISecurityFactory } from '../';
+import { KibanaRequest, RequestHandlerContext } from 'src/core/server';
 
-  constructor(server) {
-    this.server = server;
-  }
-
-  async getCurrentUser(req) {
-    try {
-      return { username: 'elastic'};
-    } catch (error) {
-      throw error; 
-    }
+export class DefaultFactory implements ISecurityFactory{
+  platform: string = '';
+  async getCurrentUser(request: KibanaRequest, context?:RequestHandlerContext) {
+    return { 
+      username: 'elastic',
+      authContext: {username: 'elastic',}
+    };
   }
 }

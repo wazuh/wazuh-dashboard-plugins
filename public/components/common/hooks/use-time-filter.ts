@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React hook for get Kibana time filter
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -9,12 +9,12 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { getDataPlugin } from '../../../kibana-services';
 import { useState, useEffect } from 'react';
 //@ts-ignore
-import { getServices } from '../../../../../../src/plugins/discover/public/kibana_services';
 
 export function useTimeFilter() {
-  const { timefilter, } = getServices();
+  const { timefilter } = getDataPlugin().query.timefilter;
   const [timeFilter, setTimeFilter] = useState(timefilter.getTime());
   const [timeHistory, setTimeHistory] = useState(timefilter._history);
   useEffect(() => {

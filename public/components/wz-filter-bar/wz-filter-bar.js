@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for build q queries.
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
 import React, { Component } from 'react';
 import { EuiComboBox } from '@elastic/eui';
 import PropTypes from 'prop-types';
-import './wz-filter-bar.css';
+import './wz-filter-bar.scss';
 
 export class WzFilterBar extends Component {
   constructor(props) {

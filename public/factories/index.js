@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Load all the Angular.js factories.
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,9 +14,9 @@ import { LoadedVisualizations } from './loaded-visualizations';
 import { DiscoverPendingUpdates } from './discover-pending-updates';
 import { VisHandlers } from './vis-handlers';
 import { Vis2PNG } from './vis2png';
-import { uiModules } from 'ui/modules';
+import { getAngularModule } from '../kibana-services';
 
-const app = uiModules.get('app/wazuh', []);
+const app = getAngularModule();
 
 app
   .service('rawVisualizations', RawVisualizations)

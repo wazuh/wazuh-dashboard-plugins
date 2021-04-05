@@ -1,7 +1,7 @@
 /*
  * Wazuh app - React component for building Remoted dashboard
  *
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,10 +39,15 @@ export const useBuildStatisticsVisualizations = (clusterNodeSelected, refreshVis
     });
     const buildStatisticsVisualizations = async () => {
       discoverPendingUpdates.addItem({ query: "", language: "lucene" }, []);
+      const patternIDTitle = `${indexPrefix}-${indexName}-*`;
+      const pattern = {
+        id: patternIDTitle,
+        title: patternIDTitle
+      };
       const visData = await GenericRequest.request(
         "POST",
-        `/elastic/visualizations/cluster-statistics/${indexPrefix}-${indexName}-*`,
-        { nodes: { affected_items: [{}], master_node: JSON.parse(AppState.getCurrentAPI()).id, name: clusterNodeSelected, } }
+        `/elastic/visualizations/cluster-statistics/${patternIDTitle}`,
+        { nodes: { affected_items: [{}], master_node: JSON.parse(AppState.getCurrentAPI()).id, name: clusterNodeSelected }, pattern }
       );
       await rawVisualizations.assignItems(visData.data.raw);
       store.dispatch(

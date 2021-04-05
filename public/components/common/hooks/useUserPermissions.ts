@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React hooks to manage user permission requirements
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,25 +15,35 @@ import { WzUserPermissions } from '../../../react-services/wz-user-permissions';
 
 // It retuns user permissions
 export const useUserPermissions = () => {
-  const userPermissions = useSelector(state => state.appStateReducers.userPermissions);
-  return userPermissions;
-}
+  return useSelector((state) => state.appStateReducers.userPermissions);
+};
 
 // It returns user permissions validation and user permissions
 export const useUserPermissionsRequirements = (requiredPermissions) => {
   const userPermissions = useUserPermissions();
-  if(requiredPermissions === null){
-    return [false, userPermissions]
+  if (requiredPermissions === null) {
+    return [false, userPermissions];
   }
-  const requiredPermissionsArray = typeof requiredPermissions === 'function' ? requiredPermissions() : requiredPermissions;
-  return [WzUserPermissions.checkMissingUserPermissions(requiredPermissionsArray, userPermissions), userPermissions];
-}
+
+  if (!userPermissions) {
+    return [requiredPermissions, []];
+  }
+
+  const requiredPermissionsArray =
+    typeof requiredPermissions === 'function' ? requiredPermissions() : requiredPermissions;
+  return [
+    WzUserPermissions.checkMissingUserPermissions(requiredPermissionsArray, userPermissions),
+    userPermissions,
+  ];
+};
 
 // It redirects to other URL if user permissions are not valid
 export const useUserPermissionsPrivate = (requiredPermissions, redirectURL) => {
-  const [userPermissionsValidation, userPermissions] = useUserPermissionsRequirements(requiredPermissions);
-  if(userPermissionsValidation){
+  const [userPermissionsValidation, userPermissions] = useUserPermissionsRequirements(
+    requiredPermissions
+  );
+  if (userPermissionsValidation) {
     window.location.href = redirectURL;
   }
   return [userPermissionsValidation, userPermissions];
-}
+};

@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for registering agents.
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,9 +34,9 @@ import {
   updateListContent
 } from '../../../../../redux/actions/rulesetActions';
 
-import RulesetHandler from './utils/ruleset-handler';
+import { resourceDictionary, RulesetHandler, RulesetResources } from './utils/ruleset-handler';
 
-import { toastNotifications } from 'ui/notify';
+import { getToasts }  from '../../../../../kibana-services';
 
 import exportCsv from '../../../../../react-services/wz-csv';
 
@@ -58,10 +58,9 @@ class WzListEditor extends Component {
       newListName: '',
       showWarningRestart: false
     };
-    this.tmpListName = ""
     this.items = {};
 
-    this.rulesetHandler = RulesetHandler;
+    this.rulesetHandler = new RulesetHandler(RulesetResources.LISTS);
   }
 
   componentDidMount() {
@@ -146,13 +145,9 @@ class WzListEditor extends Component {
         return;
       }
       this.setState({ isSaving: true });
-      if(this.tmpListName){
-        addingNew = false;
-      }
-      await this.rulesetHandler.sendCdbList(name, path, raw, overwrite, addingNew);
+      await this.rulesetHandler.updateFile(name, raw, overwrite);
       if (!addingNew) {
-        const result = await this.rulesetHandler.getCdbList(`${path}/${name}`);
-        const file = { name: name, content: result, path: path };
+        const file = { name: name, content: raw, path: path };
         this.props.updateListContent(file);
         this.setState({ showWarningRestart: true });
         this.showToast(
@@ -177,7 +172,7 @@ class WzListEditor extends Component {
   }
 
   showToast = (color, title, text, time) => {
-    toastNotifications.add({
+    getToasts().add({
       color: color,
       title: title,
       text: text,
@@ -221,6 +216,20 @@ class WzListEditor extends Component {
     });
   };
 
+  getUpdatePermissions = (name) => {
+    return [{
+      action: `${RulesetResources.LISTS}:update`,
+      resource: resourceDictionary[RulesetResources.LISTS].permissionResource(name),
+    }];
+  }
+
+  getDeletePermissions = (name) => {
+    return [{
+      action: `${RulesetResources.LISTS}:delete`,
+      resource: resourceDictionary[RulesetResources.LISTS].permissionResource(name),
+    }];
+  }
+
   /**
    * Append a key value to this.items and after that if everything works ok re-create the array for the table
    */
@@ -261,6 +270,7 @@ class WzListEditor extends Component {
       generatingCsv: false
     });
   }
+  
 
   /**
    * Delete a item from the list
@@ -317,7 +327,7 @@ class WzListEditor extends Component {
 
     const saveButton = (
       <WzButtonPermissions
-        permissions={[{action: 'manager:upload_file', resource: `file:path:${path}/${name}`}]}
+        permissions={this.getUpdatePermissions(name)}
         fill
         isDisabled={items.length === 0}
         iconType="save"
@@ -333,7 +343,7 @@ class WzListEditor extends Component {
         {!this.state.isPopoverOpen && (
           <EuiFlexItem grow={false}>
             <WzButtonPermissions
-              permissions={[{action: 'manager:upload_file', resource: `file:path:${path}/${name}`}]}
+              permissions={this.getUpdatePermissions(name)}
               iconType="plusInCircle"
               onClick={() => this.openAddEntry()}
             >
@@ -469,7 +479,7 @@ class WzListEditor extends Component {
           if (this.state.editing === item.key) {
             return (
               <Fragment>
-                <EuiToolTip position="top" content={'Yes'}>
+                <EuiToolTip position="top" content={'Save'}>
                   <EuiButtonIcon
                     aria-label="Confirm value"
                     iconType="check"
@@ -479,7 +489,7 @@ class WzListEditor extends Component {
                     color="primary"
                   />
                 </EuiToolTip>
-                <EuiToolTip position="top" content={'No'}>
+                <EuiToolTip position="top" content={'Discard'}>
                   <EuiButtonIcon
                     aria-label="Cancel edition"
                     iconType="cross"
@@ -496,7 +506,7 @@ class WzListEditor extends Component {
                   buttonType='icon'
                   aria-label="Edit content"
                   iconType="pencil"
-                  permissions={[{action: 'manager:upload_file', resource: `file:path:${path}/${fileName}`}]}
+                  permissions={this.getUpdatePermissions(fileName)}
                   tooltip={{position: 'top', content: `Edit ${item.key}`}}
                   onClick={() => {
                     this.setState({
@@ -510,7 +520,7 @@ class WzListEditor extends Component {
                   buttonType='icon'
                   aria-label="Remove content"
                   iconType="trash"
-                  permissions={[{action: 'manager:upload_file', resource: `file:path:${path}/${fileName}`}]}
+                  permissions={this.getDeletePermissions(fileName)}
                   tooltip={{position: 'top', content: `Remove ${item.key}`}}
                   onClick={() => this.deleteItem(item.key)}
                   color="danger"
@@ -556,12 +566,17 @@ class WzListEditor extends Component {
                         try {
                           this.setState({ generatingCsv: true });
                           await exportCsv(
-                            `/lists?path=${path}/${name}`,
+                            `/lists`,
                             [
                               {
                                 _isCDBList: true,
-                                name: 'path',
-                                value: `${path}/${name}`
+                                name: 'relative_dirname',
+                                value: path
+                              },
+                              {
+                                _isCDBList: true,
+                                name: 'filename',
+                                value: name
                               }
                             ],
                             name
@@ -588,7 +603,6 @@ class WzListEditor extends Component {
                 <Fragment>
                   <EuiSpacer size='s'/>
                   <WzRestartClusterManagerCallout
-                    onRestart={() => this.setState({showWarningRestart: true})}
                     onRestarted={() => this.setState({showWarningRestart: false})}
                     onRestartedError={() => this.setState({showWarningRestart: true})}
                   />

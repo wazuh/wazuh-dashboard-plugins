@@ -1,7 +1,7 @@
 /*
  * Wazuh app - Factory to store visualizations handlers
  *
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 
 import { WzSecurityXpack } from '../react-services/wz-security-xpack';
 import { WzSecurityOpendistro } from '../react-services/wz-security-opendistro';
-import { WAZUH_SECURITY_PLUGIN_XPACK_SECURITY, WAZUH_SECURITY_PLUGIN_OPEN_DISTRO_FOR_ELASTICSEARCH } from '../../util/constants';
+import { WAZUH_SECURITY_PLUGIN_XPACK_SECURITY, WAZUH_SECURITY_PLUGIN_OPEN_DISTRO_FOR_ELASTICSEARCH } from '../../common/constants';
 import store from '../redux/store';
 
 

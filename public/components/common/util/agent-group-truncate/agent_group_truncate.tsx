@@ -1,7 +1,7 @@
 /*
  * Wazuh app - React Component to cut text strings of several elements that exceed a certain number of length.
  *
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

@@ -1,7 +1,7 @@
 /*
  * Wazuh app - React component for building the status stats
  *
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@ import {
   EuiTitle,
   EuiIcon
 } from '@elastic/eui';
-
+import { formatUIDate } from '../../../../../react-services/time-service';
 import { connect } from 'react-redux';
 
 export class WzStatusAgentInfo extends Component {
@@ -83,7 +83,7 @@ export class WzStatusAgentInfo extends Component {
         </EuiFlexGroup>
         <EuiFlexGroup>
           <EuiFlexItem>Date add</EuiFlexItem>
-          <EuiFlexItem style={greyStyle}>{agentInfo.dateAdd}</EuiFlexItem>
+          <EuiFlexItem style={greyStyle}>{formatUIDate(agentInfo.dateAdd)}</EuiFlexItem>
         </EuiFlexGroup>
         {status !== 'never_connected' && (
           <div>
@@ -94,7 +94,7 @@ export class WzStatusAgentInfo extends Component {
             <EuiFlexGroup>
               <EuiFlexItem>Last keep alive</EuiFlexItem>
               <EuiFlexItem style={greyStyle}>
-                {agentInfo.lastKeepAlive}
+                {formatUIDate(agentInfo.lastKeepAlive)}
               </EuiFlexItem>
             </EuiFlexGroup>
             <EuiFlexGroup>

@@ -1,7 +1,7 @@
 /*
  * Wazuh app - React component for building the reports table.
  *
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,8 +26,9 @@ import {
   EuiPopover
 } from '@elastic/eui';
 
-import { toastNotifications } from 'ui/notify';
+import { getToasts }  from '../../../kibana-services';
 import { WzButtonPermissions } from '../../../components/common/permissions/button';
+import { resourceDictionary, RulesetResources } from './management/ruleset/utils/ruleset-handler';
 export class UploadFiles extends Component {
   constructor(props) {
     super(props);
@@ -82,8 +83,9 @@ export class UploadFiles extends Component {
             clearInterval(interval);
             if (files.length === this.state.files.length) {
               try {
-                await this.props.upload(files, this.props.path);
+                await this.props.upload(files, this.props.resource);
                 this.closePopover();
+                this.props.onSuccess && this.props.onSuccess(files);
                 this.showToast(
                   'success',
                   'Success',
@@ -108,7 +110,9 @@ export class UploadFiles extends Component {
           }
         }, 100);
       }
-    } catch (error) {}
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   /**
@@ -169,8 +173,8 @@ export class UploadFiles extends Component {
    * Validates the files extension
    */
   checkValidFileExtensions() {
-    const path = this.props.path;
-    if (path.includes('etc/rules') || path.includes('etc/decoders')) {
+    const resource = this.props.resource;
+    if ([RulesetResources.RULES, RulesetResources.DECODERS].includes(resource)) {
       const result = Object.keys(this.state.files).filter(item => {
         const file = this.state.files[item].name;
         return file.substr(file.length - 4) !== '.xml';
@@ -240,7 +244,7 @@ export class UploadFiles extends Component {
   }
 
   showToast(color, title, text, time = 3000) {
-    toastNotifications.add({
+    getToasts().add({
       color: color,
       title: title,
       text: text,
@@ -248,10 +252,19 @@ export class UploadFiles extends Component {
     });
   }
   render() {
+    const getPermissionsImportFiles = () => {
+      return [
+        {
+          action: `${this.props.resource}:update`,
+          resource: resourceDictionary[this.props.resource].permissionResource('*'),
+        },
+      ];
+    };
+
     const button = (
       <WzButtonPermissions
-        buttonType='empty'
-        permissions={[{action: 'manager:upload_file', resource: `file:path:/etc/${this.props.msg}`}]}
+        buttonType="empty"
+        permissions={getPermissionsImportFiles()}
         iconType="importAction"
         iconSide="left"
         onClick={() => this.onButtonClick()}
@@ -269,7 +282,7 @@ export class UploadFiles extends Component {
       >
         <div style={{ width: '300px' }}>
           <EuiTitle size="m">
-            <h1>{`Upload ${this.props.msg}`}</h1>
+            <h1>{`Upload ${this.props.resource}`}</h1>
           </EuiTitle>
           <EuiFlexItem>
             {!this.state.uploadErrors && (
@@ -277,7 +290,7 @@ export class UploadFiles extends Component {
                 id="filePicker"
                 multiple
                 compressed={false}
-                initialPromptText={`Select or drag and drop your ${this.props.msg} files here`}
+                initialPromptText={`Select or drag and drop your ${this.props.resource} files here`}
                 onChange={files => {
                   this.onChange(files);
                 }}
@@ -344,7 +357,6 @@ export class UploadFiles extends Component {
 }
 
 UploadFiles.propTypes = {
-  msg: PropTypes.string,
-  path: PropTypes.string,
+  resource: PropTypes.string,
   upload: PropTypes.func
 };

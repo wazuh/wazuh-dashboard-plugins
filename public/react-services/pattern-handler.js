@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Pattern Handler service
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -13,8 +13,7 @@ import { GenericRequest } from './generic-request';
 import { AppState } from './app-state';
 import { WzMisc } from '../factories/misc';
 import { SavedObject } from './saved-objects';
-import { npStart } from 'ui/new_platform';
-import { toastNotifications } from 'ui/notify';
+import { getDataPlugin, getToasts } from '../kibana-services';
 import { WazuhConfig } from '../react-services/wazuh-config';
 
 export class PatternHandler {
@@ -46,23 +45,29 @@ export class PatternHandler {
             );
         }
       }
-      if (!patternList.length) {
+
+      const wazuhConfig = new WazuhConfig();
+      const { pattern } = wazuhConfig.getConfig();
+      const indexPatternFound = patternList.find((indexPattern) => indexPattern.title === pattern);
+
+      if (!indexPatternFound) {
         // if no valid index patterns are found we try to create the wazuh-alerts-*
         try {
-          const wazuhConfig = new WazuhConfig();
-          const { pattern } = wazuhConfig.getConfig();
+
           if (!pattern) return;
 
-          toastNotifications.add({
+          getToasts().add({
             color: 'warning',
             title:
-              `No valid index patterns were found, proceeding to create default ${pattern} index pattern`,
+              `No ${pattern} index pattern was found, proceeding to create it.`,
             toastLifeTimeMs: 5000
           });
 
           await SavedObject.createWazuhIndexPattern(pattern);
+          getToasts().addSuccess(`${pattern} index pattern created successfully`)
+          getDataPlugin().indexPatterns.setDefault(pattern, true);
         } catch (err) {
-          toastNotifications.add({
+          getToasts().add({
             color: 'error',
             title: 'Error creating the index pattern.',
             text: err.message || err,
@@ -113,11 +118,7 @@ export class PatternHandler {
   static async changePattern(selectedPattern) {
     try {
       AppState.setCurrentPattern(selectedPattern);
-      await GenericRequest.request(
-        'GET',
-        `/elastic/known-fields/${selectedPattern}`,
-        {}
-      );
+      await this.refreshIndexPattern();
       return AppState.getCurrentPattern();
     } catch (error) {
       throw new Error('Error Pattern Handler (changePattern)');
@@ -129,13 +130,11 @@ export class PatternHandler {
  * Refresh current pattern for the given pattern
  * @param {String} pattern
  */
-  static async refreshIndexPattern() {
+  static async refreshIndexPattern(newFields = null) {
     try {
       const currentPattern = AppState.getCurrentPattern();
-      const courierData = await npStart.plugins.data.indexPatterns.get(currentPattern);
-      await SavedObject.refreshIndexPattern(currentPattern)
-      const fields = await courierData.fieldsFetcher.fetch({});
-      await courierData.initFields(fields);
+      const pattern = await getDataPlugin().indexPatterns.get(currentPattern);
+      await SavedObject.refreshIndexPattern(pattern, newFields);
     } catch (error) {
       throw new Error(error);
     }

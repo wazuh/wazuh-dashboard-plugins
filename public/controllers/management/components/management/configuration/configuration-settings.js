@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Definitions of configuration sections.
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -10,7 +10,8 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { shouldShowComponent } from './utils/wz-utils';
+import { hasAgentSupportModule } from '../../../../../react-services/wz-agents';
+import { WAZUH_MODULES_ID } from '../../../../../../common/constants'
 
 export default [
   {
@@ -102,7 +103,7 @@ export default [
         description:
           'Configuration assessment and automation of compliance monitoring using SCAP checks',
         goto: 'open-scap',
-        when: agent => shouldShowComponent('oscap', agent)
+        when: agent => hasAgentSupportModule(agent, WAZUH_MODULES_ID.OPEN_SCAP)
       },
       {
         name: 'CIS-CAT',
@@ -137,13 +138,13 @@ export default [
       },
       {
         name: 'Active Response',
-        description: 'Active threat addressing by inmmediate response',
+        description: 'Active threat addressing by immediate response',
         goto: 'active-response',
         when: 'manager'
       },
       {
         name: 'Active response',
-        description: 'Active threat addressing by inmmediate response',
+        description: 'Active threat addressing by immediate response',
         goto: 'active-response-agent',
         when: 'agent'
       },
@@ -157,7 +158,7 @@ export default [
         description:
           'Monitor and collect the activity from Docker containers such as creation, running, starting, stopping or pausing events',
         goto: 'docker-listener',
-        when: agent => shouldShowComponent('docker', agent)
+        when: agent => hasAgentSupportModule(agent, WAZUH_MODULES_ID.DOCKER)
       }
     ]
   },

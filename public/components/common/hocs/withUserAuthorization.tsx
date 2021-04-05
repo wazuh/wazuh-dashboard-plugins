@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React HOCs to manage user authorization requirements
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,11 +14,17 @@ import React from "react";
 import { useUserPermissions, useUserPermissionsRequirements, useUserPermissionsPrivate } from '../hooks/useUserPermissions';
 import { useUserRoles, useUserRolesRequirements, useUserRolesPrivate } from '../hooks/useUserRoles';
 import { WzEmptyPromptNoPermissions } from '../permissions/prompt';
-
+import { compose } from 'redux';
+import { withUserLogged } from './withUserLogged'
  //
-export const withUserAuthorizationPrompt = (permissions = null, roles = null) => WrappedComponent => props => {
+ const withUserAuthorizationPromptChanged = (permissions = null, roles = null) => WrappedComponent => props => {
   const [userPermissionRequirements, userPermissions] = useUserPermissionsRequirements(typeof permissions === 'function' ? permissions(props) : permissions);
   const [userRolesRequirements, userRoles] = useUserRolesRequirements(typeof roles === 'function' ? roles(props) : roles);
 
   return (userPermissionRequirements || userRolesRequirements) ? <WzEmptyPromptNoPermissions permissions={userPermissionRequirements} roles={userRolesRequirements} /> : <WrappedComponent {...props} />;
 }
+
+export const withUserAuthorizationPrompt =  (permissions = null, roles = null) => WrappedComponent => compose(
+  withUserLogged,
+  withUserAuthorizationPromptChanged(permissions,roles)
+  )(WrappedComponent)

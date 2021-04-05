@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React HOC to render a component depending of if it fulfills a condition or the wrapped component instead
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

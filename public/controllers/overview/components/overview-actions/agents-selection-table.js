@@ -34,7 +34,6 @@ import { WzRequest } from '../../../../react-services/wz-request';
 import { LEFT_ALIGNMENT, RIGHT_ALIGNMENT, SortableProperties } from '@elastic/eui/lib/services';
 import {  updateCurrentAgentData } from '../../../../redux/actions/appStateActions';
 import  store  from '../../../../redux/store';
-import chrome from 'ui/chrome';
 import { GroupTruncate } from '../../../../components/common/util/agent-group-truncate/'
 import { WzSearchBar, filtersToObject } from '../../../../components/wz-search-bar';
 import { getAgentFilterValues } from '../../../../controllers/management/components/management/groups/get-agents-filters-values';
@@ -129,7 +128,7 @@ export class AgentSelectionTable extends Component {
       },
     ];
     this.suggestions = [
-      { type: 'q', label: 'status', description: 'Filter by agent connection status', operators: ['=', '!=',], values: ['active', 'disconnected', 'never_connected'] },
+      { type: 'q', label: 'status', description: 'Filter by agent connection status', operators: ['=', '!=',], values: ['active', 'disconnected', 'never_connected', 'pending'] },
       { type: 'q', label: 'os.platform', description: 'Filter by OS platform', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('os.platform', value, { q: 'id!=000'})},
       { type: 'q', label: 'ip', description: 'Filter by agent IP', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('ip', value, { q: 'id!=000'})},
       { type: 'q', label: 'name', description: 'Filter by agent name', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('name', value, { q: 'id!=000'})},
@@ -155,8 +154,6 @@ export class AgentSelectionTable extends Component {
 
   async componentDidMount() {
     this._isMounted = true;
-    const $injector = await chrome.dangerouslyGetActiveInjector();
-    this.router = $injector.get('$route');
     const tmpSelectedAgents = {};
     if(!store.getState().appStateReducers.currentAgentData.id){
       tmpSelectedAgents[store.getState().appStateReducers.currentAgentData.id] = true;
@@ -245,7 +242,7 @@ export class AgentSelectionTable extends Component {
     const sortFilter = {};
     if (sortField) {
       const direction = sortDirection === 'asc' ? '+' : '-';
-      sortFilter['sort'] = direction + sortField;
+      sortFilter['sort'] = direction + (sortField === 'os'? 'os.name,os.version' : sortField);
     }
 
     return sortFilter;
@@ -530,8 +527,8 @@ export class AgentSelectionTable extends Component {
 
   unselectAgents(){
     this._isMounted && this.setState({itemIdToSelectedMap: {}});
-    this.props.removeAgentsFilter(true);      
     store.dispatch(updateCurrentAgentData({}));
+    this.props.removeAgentsFilter();
   }
 
   getSelectedCount(){
@@ -546,7 +543,7 @@ export class AgentSelectionTable extends Component {
       this.props.updateAgentSearch([agentID]);
     }catch(error){
       store.dispatch(updateCurrentAgentData({}));
-      this.props.removeAgentsFilter(true);      
+      this.props.removeAgentsFilter(true);
     }
   }
 
@@ -584,7 +581,7 @@ export class AgentSelectionTable extends Component {
     const { filters } = this.state;
     let auxFilters = filters.map( filter => filter.value.match(/group=(.*S?)/)[1] );
     if (filters.length > 0) {
-      !auxFilters.includes(group) ? 
+      !auxFilters.includes(group) ?
       this.setState({
         filters: [...filters, {field: "q", value: `group=${group}`}],
       }) : false;
@@ -603,7 +600,7 @@ export class AgentSelectionTable extends Component {
         label={'more'}
         action={'filter'}
         filterAction={this.filterGroupBadge}
-        {...this.props} /> 
+        {...this.props} />
     ) : groups
   }
 
@@ -649,7 +646,7 @@ export class AgentSelectionTable extends Component {
                     iconType="pinFilled"
                     aria-label="unpin agent"
                   />
-                </EuiToolTip> 
+                </EuiToolTip>
               </EuiFlexItem>
             </EuiFlexGroup>
             <EuiSpacer size="m" />

@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Kibana theming configuration file
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -9,9 +9,11 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules';
+import { getAngularModule } from '../kibana-services';
 
-uiModules.get('app/wazuh', []).config(function($mdThemingProvider) {
+const app = getAngularModule();
+
+app.config(function($mdThemingProvider) {
   let kibanaWhiteBlack = {
     '50': '#ffffff',
     '100': '#ffffff',

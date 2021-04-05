@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for Visualize.
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ export const SecurityAlerts = () => {
 
   return (
     <Discover
-      shareFilterManager={[...((filterManager || {}).filters) || []]}
+      shareFilterManager={filterManager}
       query={query}
       initialColumns={["icon", "timestamp", 'rule.mitre.id', 'rule.mitre.tactic', 'rule.description', 'rule.level', 'rule.id']}
       implicitFilters={[]}

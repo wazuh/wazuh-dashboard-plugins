@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for registering agents.
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@ import appStateReducers from './appStateReducers';
 import visualizationsReducers from './visualizationsReducers';
 import globalBreadcrumbReducers from './globalBreadcrumbReducers';
 import securityReducers from './securityReducers';
+import toolsReducers from './toolsReducers';
 
 export default combineReducers({
   rulesetReducers,
@@ -32,5 +33,6 @@ export default combineReducers({
   appStateReducers,
   visualizationsReducers,
   globalBreadcrumbReducers,
-  securityReducers
+  securityReducers,
+  toolsReducers,
 });

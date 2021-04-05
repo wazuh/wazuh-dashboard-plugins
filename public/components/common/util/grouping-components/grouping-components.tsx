@@ -1,7 +1,7 @@
 /*
  * Wazuh app - Component to group some components within another
  *
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@ import React, { useState } from 'react';
 import { EuiPopover, EuiButtonEmpty, EuiFlexGroup } from '@elastic/eui';
 import { useParentWidth } from './hooks';
 import { divideChildren } from './lib'
-import './grouping-components.less'
+import './grouping-components.scss'
 
 
 interface IGroupingComponents {

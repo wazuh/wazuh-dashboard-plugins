@@ -2,7 +2,7 @@
  * Wazuh app - React component for showing agent fields such as IP, ID, name,
  * version, OS, registration date, last keep alive.
  *
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@ import {
   EuiBadge
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
+import { formatUIDate } from '../../../react-services/time-service';
 
 import WzTextWithTooltipIfTruncated from '../wz-text-with-tooltip-if-truncated';
 import { WzStat } from '../../wz-stat';
@@ -29,6 +30,7 @@ export class AgentInfo extends Component {
     super(props);
 
     this.state = {};
+    this.timeService = TimeService;
   }
 
   async componentDidMount() {
@@ -155,10 +157,20 @@ export class AgentInfo extends Component {
     return stats;
   }
 
+
+  parseDateTime(datetime){
+    try {
+      return this.timeService.offset(datetime);
+    } catch (error) {
+      return datetime;
+    }
+  }
+
   render() {
     const { agent } = this.props;
-
     let arrayStats;
+
+    
 
     if (this.props.isCondensed) {
       arrayStats = [
@@ -183,8 +195,20 @@ export class AgentInfo extends Component {
           description: 'Operating system',
           style: {}
         },
-        { title: agent.dateAdd, description: 'Registration date', style: { maxWidth: 150 } },
-        { title: agent.lastKeepAlive, description: 'Last keep alive', style: { maxWidth: 150 } },
+        {
+          title: agent.node_name && agent.node_name !== 'unknown' ? agent.node_name : '-',
+          description: 'Cluster node',
+          style: { maxWidth: 150 }
+        },
+        {
+          title: formatUIDate(agent.dateAdd),
+          description: 'Registration date',
+          style: { maxWidth: 150 } },
+        {
+          title: formatUIDate(agent.lastKeepAlive),
+          description: 'Last keep alive',
+          style: { maxWidth: 150 }
+        },
       ];
     }
 

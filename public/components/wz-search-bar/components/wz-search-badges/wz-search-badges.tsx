@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for show search and filter
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
 import React, { } from 'react';
 import { EuiBadge } from '@elastic/eui';
 import { GroupingComponents} from '../../../common/util';
-import './wz-search-badges.less';
+import './wz-search-badges.scss';
 
 const buttonLabel = (count) => `+${count} filters`;
 

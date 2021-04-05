@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Service to show notifications
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -12,33 +12,33 @@
 import React, { Fragment } from 'react';
 import  store  from '../redux/store';
 import { updateToastNotificationsModal } from '../redux/actions/appStateActions';
-import { toastNotifications } from 'ui/notify';
+import { getToasts }  from '../kibana-services';
 import { EuiButton } from '@elastic/eui';
 
 export class ToastNotifications{
   static add(toast){
-    toastNotifications.add(toast);
+    getToasts().add(toast);
   }
   static success(toast){
-    ToastNotifications.add({
+    getToasts().add({
       ...toast,
       color: 'success',
     });
   }
   static warning(toast){
-    ToastNotifications.add({
+    getToasts().add({
       ...toast,
       color: 'warning',
     });
   }
   static danger(toast){
-    ToastNotifications.add({
+    getToasts().add({
       ...toast,
       color: 'danger',
     });
   }
   static error(path, error, title = 'Error unexpected'){
-    ToastNotifications.danger({
+    getToasts().danger({
       title,
       iconType: 'alert',
       text: (

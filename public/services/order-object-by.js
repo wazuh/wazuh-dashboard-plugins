@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Order object by filter module
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * Copyright (C) 2015 Fabricio Quagliariello.
  * Source code available under the MIT License.
@@ -14,9 +14,9 @@
  * Find more information about this on the LICENSE file.
  */
 'use strict';
-import { uiModules } from 'ui/modules';
+import { getAngularModule } from '../kibana-services';
 
-const app = uiModules.get('app/wazuh', []);
+const app = getAngularModule();
 
 app.filter('orderObjectBy', function() {
   return function(items, field, reverse) {

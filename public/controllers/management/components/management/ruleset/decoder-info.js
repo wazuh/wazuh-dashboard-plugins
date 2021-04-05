@@ -18,7 +18,7 @@ import {
 
 import { connect } from 'react-redux';
 
-import RulesetHandler from './utils/ruleset-handler';
+import { RulesetHandler, RulesetResources } from './utils/ruleset-handler';
 import { colors } from './utils/colors';
 
 import {
@@ -33,7 +33,7 @@ class WzDecoderInfo extends Component {
   constructor(props) {
     super(props);
 
-    this.rulesetHandler = RulesetHandler;
+    this.rulesetHandler = new RulesetHandler(RulesetResources.DECODERS);
     this.columns = [
       {
         field: 'name',
@@ -62,8 +62,7 @@ class WzDecoderInfo extends Component {
           return (
             <EuiToolTip position="top" content={`Show ${value} content`}>
               <EuiLink onClick={async () => {
-                const noLocal = item.relative_dirname.startsWith('ruleset/');
-                const result = await this.rulesetHandler.getDecoderContent(value, noLocal);
+                const result = await this.rulesetHandler.getFileContent(value);
                 const file = { name: value, content: result, path: item.relative_dirname };
                 this.props.updateFileContent(file);
               }
@@ -137,10 +136,20 @@ class WzDecoderInfo extends Component {
 
     Object.keys(details).forEach(key => {
       let content = details[key];
-      if (key === 'regex') {
-        content = this.colorRegex(content);
-      } else if (key === 'order') {
+      if (key === 'order') {
         content = this.colorOrder(content);
+      } else if (typeof details[key] === 'object'){
+        content = (
+          <ul>
+            {Object.keys(details[key]).map(k => (
+              <li key={k} style={{marginBottom: "4px"}} className="subdued-color">
+                {k}:&nbsp;
+                {details[key][k]}
+                <br />
+              </li>
+            ))}
+          </ul>
+        )
       } else {
         content = <span className="subdued-color">{details[key]}</span>;
       }
@@ -243,7 +252,10 @@ class WzDecoderInfo extends Component {
                         color="primary"
                         iconSize="l"
                         iconType="arrowLeft"
-                        onClick={() => this.props.cleanInfo()}
+                        onClick={() => {
+                          window.location.href = window.location.href.replace(new RegExp('redirectRule=' + '[^&]*'), '');
+                          this.props.cleanInfo();
+                        }}
                       />
                     </EuiToolTip>
                     {name}

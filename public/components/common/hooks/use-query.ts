@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React hook for get query of Kibana searchBar
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -9,6 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { getDataPlugin } from '../../../kibana-services';
 import { useState, useEffect } from 'react';
 import { ModulesHelper } from '../modules/modules-helper';
 
@@ -30,8 +31,12 @@ export function useQuery(): [{
   const updateQuery = (query) => {
     ModulesHelper.getDiscoverScope()
       .then(scope => {
-        scope.updateQuery({query});
+        scope.state.query = query;
       })
   }
   return [ query, updateQuery ];
+}
+
+export const useQueryManager = () => {
+  return useState(getDataPlugin().query.queryString.getQuery());
 }

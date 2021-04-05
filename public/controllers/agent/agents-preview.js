@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Agents preview controller
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -11,7 +11,6 @@
  */
 import * as FileSaver from '../../services/file-saver';
 import { DataFactory } from '../../services/data-factory';
-import { timefilter } from 'ui/timefilter';
 import { version } from '../../../package.json';
 import { clickAction } from '../../services/click-action';
 import { AppState } from '../../react-services/app-state';
@@ -19,8 +18,9 @@ import { WazuhConfig } from '../../react-services/wazuh-config';
 import { GenericRequest } from '../../react-services/generic-request';
 import { WzRequest } from '../../react-services/wz-request';
 import { ShareAgent } from '../../factories/share-agent';
-import { TimeService } from '../../react-services/time-service';
+import { formatUIDate } from '../../react-services/time-service';
 import { ErrorHandler } from '../../react-services/error-handler';
+import { getDataPlugin, getUiSettings } from '../../kibana-services';
 
 export class AgentsPreviewController {
   /**
@@ -50,7 +50,6 @@ export class AgentsPreviewController {
     this.wazuhConfig = new WazuhConfig();
     this.errorInit = false;
     this.$window = $window;
-    this.timeService = TimeService;
   }
 
   /**
@@ -61,7 +60,7 @@ export class AgentsPreviewController {
     this.api = JSON.parse(AppState.getCurrentAPI()).id;
     const loc = this.$location.search();
     if ((loc || {}).agent && (loc || {}).agent !== '000') {
-      this.commonData.setTimefilter(timefilter.getTime());
+      this.commonData.setTimefilter( getDataPlugin().timefilter.timefilter.getTime());
       return this.showAgent({ id: loc.agent });
     }
 
@@ -143,7 +142,7 @@ export class AgentsPreviewController {
         );
         this.$scope.$applyAsync();
       },
-      timeService: date => this.timeService.offset(date),
+      formatUIDate: date => formatUIDate(date),
       summary: this.summary
     };
     //Load
@@ -221,15 +220,12 @@ export class AgentsPreviewController {
       this.firstUrlParam =
         clusterInfo.status === 'enabled' ? 'cluster' : 'manager';
       this.secondUrlParam = clusterInfo[this.firstUrlParam];
-
-      this.pattern = AppState.getCurrentPattern();
+      this.pattern = (await getDataPlugin().indexPatterns.get(AppState.getCurrentPattern())).title;
     } catch (error) {
       this.errorInit = ErrorHandler.handle(error, '', { silent: true });
     }
     this.loading = false;
     this.$scope.$applyAsync();
-
-    return;
   }
 
   addNewAgent(flag) {

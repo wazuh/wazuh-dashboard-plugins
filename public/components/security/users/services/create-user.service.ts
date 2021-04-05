@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Create User Service
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,8 +14,8 @@ import { CreateUser, User } from '../types/user.type';
 import { WzRequest } from '../../../../react-services/wz-request';
 import IApiResponse from '../../../../react-services/interfaces/api-response.interface';
 
-const CreateUserService = async (user: CreateUser): Promise<User> => {
-  const response = (await WzRequest.apiReq('POST', '/security/users', user)) as IApiResponse<User>;
+const CreateUserService = async (user: CreateUser): Promise<User> => { 
+  const response = (await WzRequest.apiReq('POST', '/security/users', {body: user})) as IApiResponse<User>;
   const users = ((response.data || {}).data || {}).affected_items || [{}];
   return users[0];
 };

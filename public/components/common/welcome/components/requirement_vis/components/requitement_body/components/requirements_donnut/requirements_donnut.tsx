@@ -2,7 +2,7 @@
  * Wazuh app - React component building the welcome screen of an agent.
  * version, OS, registration date, last keep alive.
  *
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
  */
 
 import React, { useRef, useEffect } from "react";
-import * as d3 from 'd3';
+import d3 from 'd3';
 import { useChartDimensions } from './hooks';
 
 
@@ -21,11 +21,11 @@ export const RequirementsDonnut = props => {
   const pieRef: null | any = useRef();
   const cache = useRef(props.data);
   const [ref, dms] = useChartDimensions({}, pieRef);
-  const createPie = d3
+  const createPie = d3.layout
     .pie()
     .value(d => d.doc_count)
     .sort(null);
-  const createArc = d3
+  const createArc = d3.svg
     .arc()
     .innerRadius((dms.width * 0.75) / 2)
     .outerRadius(dms.width * 0.95 / 2)
@@ -41,14 +41,12 @@ export const RequirementsDonnut = props => {
 
     groupWithData.exit().remove();
 
-    const groupWithUpdate = groupWithData
+    groupWithData
       .enter()
       .append("g")
-      .attr("class", "arc");
+      .attr("class", "arc")      
 
-    const path = groupWithUpdate
-      .append("path")
-      .merge(groupWithData.select("path.arc"));
+    const path = groupWithData.append("path");
 
     const arcTween = (d, i) => {
       const interpolator = d3.interpolate(prevData[i], d);

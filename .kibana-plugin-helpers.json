@@ -1,12 +1,11 @@
 {
-    "buildSourcePatterns": [
-      "package.json",
-      "LICENSE",
-      "tsconfig.json",
-      "index.js",
-      "init.js",
-      "server/**/*",
-      "public/**/*",
-      "util/**/*"
-    ]
+  "serverSourcePatterns": [
+    "package.json",
+    "yarn.lock",
+    "kibana.json",
+    "LICENSE",
+    "{common,server,target}/**/*",
+    "!*test*",
+    "CHANGELOG.md"
+  ]
 }

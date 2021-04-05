@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Compliance flyout component
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,6 +30,8 @@ import {
 import { Discover } from '../../../../common/modules/discover';
 import { AppState } from '../../../../../react-services/app-state';
 import { requirementGoal } from '../../requirement-goal';
+import { getUiSettings } from '../../../../../kibana-services';
+import { FilterManager } from '../../../../../../../../src/plugins/data/public/';
 
 
 
@@ -41,10 +43,13 @@ export class RequirementFlyout extends Component {
     props!: {
     };
 
+    filterManager: FilterManager;
+
     constructor(props) {
         super(props);
         this.state = {
         }
+        this.filterManager = new FilterManager(getUiSettings());
     }
 
     componentDidMount() {
@@ -164,7 +169,7 @@ export class RequirementFlyout extends Component {
                     initialIsOpen={true}>
                     <EuiFlexGroup className="flyout-row">
                         <EuiFlexItem>
-                            <Discover initialColumns={["icon", "timestamp", this.props.getRequirementKey(), 'rule.level', 'rule.id', 'rule.description']} implicitFilters={implicitFilters} initialFilters={[]} updateTotalHits={(total) => this.updateTotalHits(total)} />
+                            <Discover kbnSearchBar shareFilterManager={this.filterManager} initialColumns={["icon", "timestamp", this.props.getRequirementKey(), 'rule.level', 'rule.id', 'rule.description']} implicitFilters={implicitFilters} initialFilters={[]} updateTotalHits={(total) => this.updateTotalHits(total)} />
                         </EuiFlexItem>
                     </EuiFlexGroup>
                 </EuiAccordion>
@@ -194,7 +199,7 @@ export class RequirementFlyout extends Component {
                 onClose={() => onChangeFlyout(false)}
                 maxWidth="60%"
                 size="l"
-                className="flyout-no-overlap"
+                className="flyout-no-overlap wz-inventory wzApp"
                 aria-labelledby="flyoutSmallTitle"
             >
                 {currentRequirement &&

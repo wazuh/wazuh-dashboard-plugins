@@ -62,6 +62,7 @@ typings/
 
 package-lock.json
 
+target/
 build/
 
 yarn.lock

@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Module to fetch index patterns
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -12,24 +12,50 @@
 
 import { healthCheck } from './health-check';
 import { AppState } from '../../react-services/app-state';
-import { npStart } from 'ui/new_platform';
 import { ErrorHandler } from '../../react-services/error-handler';
+import { getDataPlugin, getSavedObjects } from '../../kibana-services';
+import { WazuhConfig } from '../../react-services/wazuh-config';
+import { GenericRequest } from '../../react-services/generic-request';
+import { getWzConfig } from './get-config';
 
 export function getIp(
   $q,
   $window,
   $location,
-  Private,
-  appState,
-  genericReq,
-  errorHandler,
   wzMisc
 ) {
   const deferred = $q.defer();
 
+  const checkWazuhConfig = async (indexPatterns) => {
+    const wazuhConfig = new WazuhConfig();
+    const configuration = wazuhConfig.getConfig();
+    const indexPatternFound = indexPatterns.find((indexPattern) => indexPattern.attributes.title === configuration.pattern);
+    if(!indexPatternFound){
+      AppState.removeCurrentPattern()
+    }
+    getDataPlugin().indexPatterns.setDefault(configuration.pattern, true);
+    AppState.setCurrentPattern(configuration.pattern)
+
+    return indexPatternFound;
+  }
+
+  const checkWazuhPatterns = async (indexPatterns) => {
+    const wazuhConfig = new WazuhConfig();
+    const configuration = await getWzConfig($q, GenericRequest, wazuhConfig);
+    const wazuhPatterns = [
+      `${configuration['wazuh.monitoring.pattern']}`,
+      `${configuration['cron.prefix']}-${configuration['cron.statistics.index.name']}-*`
+    ];
+    return wazuhPatterns.every(pattern => {
+      return indexPatterns.find(
+        element => element.id === pattern
+      );
+    });
+  }
+
   const buildSavedObjectsClient = async () => {
     try {
-      const savedObjectsClient = npStart.core.savedObjects.client;
+      const savedObjectsClient = getSavedObjects().client;
 
       const savedObjectsData = await savedObjectsClient.find({
         type: 'index-pattern',
@@ -41,7 +67,7 @@ export function getIp(
 
       let currentPattern = '';
 
-      if (AppState.getCurrentPattern()) {
+      if (AppState.getCurrentPattern() && await checkWazuhPatterns(savedObjects) && await checkWazuhConfig(savedObjects)) {
         // There's cookie for the pattern
         currentPattern = AppState.getCurrentPattern();
       } else {
@@ -61,7 +87,7 @@ export function getIp(
         return;
       }
 
-      const courierData = await npStart.plugins.data.indexPatterns.get(currentPattern);
+      const courierData = await getDataPlugin().indexPatterns.get(currentPattern);
 
       deferred.resolve({
         list: onlyWazuhAlerts,
@@ -79,8 +105,6 @@ export function getIp(
   };
 
   const currentParams = $location.search();
-  const targetedAgent =
-    currentParams && (currentParams.agent || currentParams.agent === '000');
   const targetedRule =
     currentParams && currentParams.tab === 'ruleset' && currentParams.ruleid;
   if (!targetedRule && healthCheck($window)) {

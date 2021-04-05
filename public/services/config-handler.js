@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Group handler service
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,8 +25,8 @@ export class ConfigHandler {
   async saveManagerConfiguration(content) {
     try {
       const result = await WzRequest.apiReq(
-        'POST',
-        `/manager/files?path=etc/ossec.conf&overwrite=true`,
+        'PUT',
+        `/manager/configuration`,
         { content, origin: 'xmleditor' }
       );
       return result;
@@ -44,7 +44,7 @@ export class ConfigHandler {
     try {
       const result = await WzRequest.apiReq(
         'PUT',
-        `/cluster/${node}/files?path=etc/ossec.conf&overwrite=true`,
+        `/cluster/${node}/configuration`,
         { content, origin: 'xmleditor' }
       );
       return result;

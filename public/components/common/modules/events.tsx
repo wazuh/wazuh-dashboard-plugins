@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Integrity monitoring components
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -11,15 +11,15 @@
  */
 
 import React, { Component, Fragment } from 'react';
-import { getAngularModule } from '../../../../../../src/plugins/discover/public/kibana_services';
+import { getAngularModule, getToasts } from '../../../kibana-services';
 import { EventsSelectedFiles } from './events-selected-fields';
 import { ModulesHelper } from './modules-helper';
 import store from '../../../redux/store';
-import { toastNotifications } from 'ui/notify';
 import { EuiButton, EuiFlexGroup, EuiFlexItem, EuiOverlayMask } from '@elastic/eui';
 import { PatternHandler } from '../../../react-services/pattern-handler';
 
 import { enhanceDiscoverEventsCell } from './events-enhance-discover-fields';
+import { toMountPoint } from '../../../../../../src/plugins/kibana_react/public';
 
 export class Events extends Component {
   intervalCheckExistsDiscoverTableTime: number = 200;
@@ -44,7 +44,7 @@ export class Events extends Component {
   async componentDidMount() {
     document.body.scrollTop = 0; // For Safari
     document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
-    const app = getAngularModule('app/wazuh');
+    const app = getAngularModule();
     this.$rootScope = app.$injector.get('$rootScope');
     this.$rootScope.showModuleEvents = this.props.section;
     const scope = await ModulesHelper.getDiscoverScope();
@@ -64,10 +64,10 @@ export class Events extends Component {
       this.fetchWatch = scope.$watchCollection('fetchStatus',
         (fetchStatus) => {
           if (scope.fetchStatus === 'complete') {
-            setTimeout(() => { 
+            setTimeout(() => {
               ModulesHelper.cleanAvailableFields();
-              
-            
+
+
             }, 1000);
             // Check the discover table is in the DOM and enhance the initial table cells
             this.intervalCheckExistsDiscoverTable = setInterval(() => {
@@ -116,8 +116,8 @@ export class Events extends Component {
         }
       })
     });
-    const discoverTableTHead = document.querySelector('.kbn-table thead tr');
-    this.discoverTableColumnsObserver.observe(discoverTableTHead, { childList: true });
+    const discoverTableElement = document.querySelector('.kbn-table').parentElement.parentElement.parentElement;;
+    this.discoverTableColumnsObserver.observe(discoverTableElement, { childList: true });
   }
 
   enhanceDiscoverTableCurrentRows = (discoverRowsData, options, addObserverDetails = false) => {
@@ -134,7 +134,7 @@ export class Events extends Component {
           enhanceDiscoverEventsCell(header.textContent, cell.textContent, discoverRowsData[rowIndex], cell, options);
         };
       });
-      // Add observer to row details 
+      // Add observer to row details
       if (addObserverDetails){
         const rowDetails = row.nextElementSibling;
         this.enhanceDiscoverTableRowDetailsAddObserver(rowDetails, discoverRowsData, options);
@@ -153,7 +153,7 @@ export class Events extends Component {
         this.checkUnknownFields(rowDetailField);
         const fieldName = rowDetailField.childNodes[0].childNodes[1].textContent || "";
         const fieldCell = rowDetailField.parentNode.childNodes && rowDetailField.parentNode.childNodes[2].childNodes[0];
-        if(!fieldCell){ return };        
+        if(!fieldCell){ return };
         enhanceDiscoverEventsCell(fieldName, (fieldCell || {}).textContent || '', discoverRowsData[rowIndex], fieldCell, options);
       });
     };
@@ -167,13 +167,13 @@ export class Events extends Component {
   }
 
    refreshKnownFields = async () => {
-    if (!this.state.hasRefreshedKnownFields) { 
+    if (!this.state.hasRefreshedKnownFields) {
       try {
         this.setState({ hasRefreshedKnownFields: true, isRefreshing: true });
         await PatternHandler.refreshIndexPattern();
 
         this.setState({ isRefreshing: false });
-        this.reloadToast()        
+        this.reloadToast()
 
       } catch (err) {
         this.setState({ isRefreshing: false });
@@ -233,10 +233,10 @@ export class Events extends Component {
   }
 
   reloadToast = () => {
-    toastNotifications.add({
+    getToasts().add({
       color: 'success',
       title: 'The index pattern was refreshed successfully.',
-      text: <EuiFlexGroup justifyContent="flexEnd" gutterSize="s">
+      text: toMountPoint(<EuiFlexGroup justifyContent="flexEnd" gutterSize="s">
         <EuiFlexItem grow={false}>
           There were some unknown fields for the current index pattern.
           You need to refresh the page to apply the changes.
@@ -244,12 +244,12 @@ export class Events extends Component {
         <EuiFlexItem grow={false}>
           <EuiButton onClick={() => window.location.reload()} size="s">Reload page</EuiButton>
         </EuiFlexItem>
-      </EuiFlexGroup>
+      </EuiFlexGroup>)
     })
   }
 
   errorToast = (error) => {
-    toastNotifications.add({
+    getToasts().add({
       color:'danger',
       title:'The index pattern could not be refreshed.',
       text: 'There are some unknown fields for the current index pattern. The index pattern fields need to be refreshed.'

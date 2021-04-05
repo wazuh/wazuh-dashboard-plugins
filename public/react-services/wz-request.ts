@@ -1,6 +1,6 @@
 /*
  * Wazuh app - API request service
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -10,7 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 import axios from 'axios';
-import chrome from 'ui/chrome';
 import { AppState } from './app-state';
 import { ApiCheck } from './wz-api-check';
 import { WzAuthentication } from './wz-authentication';
@@ -18,6 +17,7 @@ import { WzMisc } from '../factories/misc';
 import { WazuhConfig } from './wazuh-config';
 import { OdfeUtils } from '../utils';
 import IApiResponse from './interfaces/api-response.interface';
+import { getHttp } from '../kibana-services';
 export class WzRequest {
   static wazuhConfig: any;
 
@@ -42,7 +42,7 @@ export class WzRequest {
       const configuration = this.wazuhConfig.getConfig();
       const timeout = configuration ? configuration.timeout : 20000;
 
-      const url = chrome.addBasePath(path);
+      const url = getHttp().basePath.prepend(path);
       const options = {
         method: method,
         headers: { 'Content-Type': 'application/json', 'kbn-xsrf': 'kibana' },

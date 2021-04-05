@@ -2,7 +2,7 @@
 //  * Wazuh app - React component building the welcome screen of an agent.
 //  * version, OS, registration date, last keep alive.
 //  *
-//  * Copyright (C) 2015-2020 Wazuh, Inc.
+//  * Copyright (C) 2015-2021 Wazuh, Inc.
 //  *
 //  * This program is free software; you can redistribute it and/or modify
 //  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
 // import { DevToolsHistory } from './devToolsHistory';
 // import * as FileSaver from '../../../services/file-saver';
 // import { ErrorHandler } from '../../../react-services/error-handler';
-// import { toastNotifications } from 'ui/notify';
+// import { getToasts }  from '../../../kibana-services';
 // import _ from 'lodash';
 
 // export function DevTools({ initialTextValue }) {
@@ -353,7 +353,7 @@
 //   }
 
 //   const showToast = (color, title, text, time) => {
-//     toastNotifications.add({
+//     getToasts().add({
 //       color: color,
 //       title: title,
 //       text: text,

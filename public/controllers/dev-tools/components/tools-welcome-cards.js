@@ -1,7 +1,7 @@
 /*
  * Wazuh app - React component for building the Tools sections welcome cards.
  *
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ import {
   EuiSpacer
 } from '@elastic/eui';
 
-import { TabDescription } from '../../../../server/reporting/tab-description';
+import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
 
 export class ToolsWelcomeCards extends Component {
   constructor(props) {
@@ -35,9 +35,9 @@ export class ToolsWelcomeCards extends Component {
         <EuiFlexItem grow={true} key={index}>
           <EuiCard
             icon={<EuiIcon size="xxl" type={tab.icon} />}
-            title={TabDescription[tab.id].title}
+            title={WAZUH_MODULES[tab.id].title}
             onClick={() => this.props.clickAction(tab.id)}
-            description={TabDescription[tab.id].description}
+            description={WAZUH_MODULES[tab.id].description}
             key={index}
           />
         </EuiFlexItem>

@@ -1,7 +1,7 @@
 /*
  * Wazuh app - React component for building the agents preview section.
  *
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,12 +38,13 @@ import { TabVisualizations } from '../../../factories/tab-visualizations';
 import { WazuhConfig } from './../../../react-services/wazuh-config.js';
 import { WzDatePicker } from '../../../components/wz-date-picker/wz-date-picker';
 import { withReduxProvider, withGlobalBreadcrumb, withUserAuthorizationPrompt } from '../../../components/common/hocs';
+import { formatUIDate } from '../../../../public/react-services/time-service';
 import { compose } from 'redux';
 
 export const AgentsPreview = compose(
   withReduxProvider,
   withGlobalBreadcrumb([{ text: '' }, { text: 'Agents' }]),
-  withUserAuthorizationPrompt([{action: 'agent:read', resource: 'agent:id:*'}])
+  withUserAuthorizationPrompt([[{action: 'agent:read', resource: 'agent:id:*'},{action: 'agent:read', resource: 'agent:group:*'}]])
 )(class AgentsPreview extends Component {
   _isMount = false;
   constructor(props) {
@@ -329,7 +330,7 @@ export const AgentsPreview = compose(
                 addingNewAgent={this.props.tableProps.addingNewAgent}
                 downloadCsv={this.props.tableProps.downloadCsv}
                 clickAction={this.props.tableProps.clickAction}
-                timeService={this.props.tableProps.timeService}
+                formatUIDate={ date => formatUIDate(date)}
                 reload={() => this.getSummary()}
               />
             </WzReduxProvider>

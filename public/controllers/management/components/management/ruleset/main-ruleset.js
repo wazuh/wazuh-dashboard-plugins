@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for registering agents.
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,37 +43,29 @@ export default class WzRuleset extends Component {
   componentWillUnmount() {
     this._isMount = false;
     // When the component is going to be unmounted the ruleset state is reset
-    const {
-      ruleInfo,
-      decoderInfo,
-      listInfo,
-      fileContent,
-      addingRulesetFile
-    } = this.state;
+    const { ruleInfo, decoderInfo, listInfo, fileContent, addingRulesetFile } = this.state;
     if (
-      (!ruleInfo && !decoderInfo && !listInfo && !fileContent,
-      !addingRulesetFile)
-    )
+      !window.location.href.includes('rules?tab=rules') &&
+      (!ruleInfo && !decoderInfo && !listInfo && !fileContent, !addingRulesetFile)
+    ) {
       this.store.dispatch({ type: 'RESET' });
+    }
   }
 
   render() {
-    const {
-      ruleInfo,
-      decoderInfo,
-      listInfo,
-      fileContent,
-      addingRulesetFile
-    } = this.state;
+    const { ruleInfo, decoderInfo, listInfo, fileContent, addingRulesetFile } = this.state;
 
     return (
       <WzReduxProvider>
         {(ruleInfo && <WzRuleInfo />) ||
           (decoderInfo && <WzDecoderInfo />) ||
-          (listInfo && <WzListEditor />) ||
-          ((fileContent || addingRulesetFile) && <WzRulesetEditor />) || (
-            <WzRulesetOverview />
-          )}
+          (listInfo && <WzListEditor clusterStatus={this.props.clusterStatus} />) ||
+          ((fileContent || addingRulesetFile) && (
+            <WzRulesetEditor
+              logtestProps={this.props.logtestProps}
+              clusterStatus={this.props.clusterStatus}
+            />
+          )) || <WzRulesetOverview clusterStatus={this.props.clusterStatus} />}
       </WzReduxProvider>
     );
   }

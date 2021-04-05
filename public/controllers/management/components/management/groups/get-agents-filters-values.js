@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Get agents filter value
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ export async function getAgentFilterValues(field, value, filters = {}) {
   const result = await WzRequest.apiReq(
     "GET",
     `/agents/stats/distinct`,
-    filter
+    { params: filter }
   );
   const getChild = (item, field) => {
     const subFields = field.split(".");
@@ -37,7 +37,6 @@ export async function getAgentFilterValues(field, value, filters = {}) {
       return getChild(item[currentField], subFields.join("."));
     }
   };
-
   const arrayResult = (((result || {}).data || {}).data || {}).affected_items.map(
     (item) => {
       return getChild(item, field);

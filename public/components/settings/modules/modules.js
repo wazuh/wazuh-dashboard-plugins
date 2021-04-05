@@ -11,13 +11,13 @@ import {
   EuiSwitch,
   EuiSpacer
 } from '@elastic/eui';
-import { TabDescription } from '../../../../server/reporting/tab-description';
+import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
 import { AppState } from '../../../react-services/app-state';
 import WzReduxProvider from '../../../redux/wz-redux-provider';
 import store from '../../../redux/store';
 import { updateSelectedSettingsSection } from '../../../redux/actions/appStateActions';
 import { withUserAuthorizationPrompt } from '../../common/hocs/withUserAuthorization';
-import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../../util/constants';
+import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../../common/constants';
 
 export class EnableModulesWrapper extends Component {
   constructor(props) {
@@ -122,11 +122,11 @@ export class EnableModulesWrapper extends Component {
                           &nbsp;&nbsp;
                         </span>
                       )}
-                      {TabDescription[extension.name].title}
+                      {WAZUH_MODULES[extension.name].title}
                     </span>
                   ),
                   description: (
-                    <span>{TabDescription[extension.name].description}</span>
+                    <span>{WAZUH_MODULES[extension.name].description}</span>
                   )
                 }
               ]}

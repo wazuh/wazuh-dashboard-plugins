@@ -1,6 +1,6 @@
 /*
  * Wazuh app - App State Actions
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -149,6 +149,17 @@ export const updateSelectedSettingsSection = selected_settings_section => {
 };
 
 /**
+ * Updates selectedToolsSection in the appState store
+ * @param selected_tools_section
+ */
+export const updateSelectedToolsSection = selected_tools_section => {
+  return {
+    type: 'UPDATE_SELECTED_TOOLS_SECTION',
+    selected_tools_section
+  };
+};
+
+/**
 * Updates toastNotification in the appState store
 * @param toastNotification
 */
@@ -157,4 +168,48 @@ export const updateToastNotificationsModal = toastNotification => {
     type: 'UPDATE_TOAST_NOTIFICATIONS_MODAL',
     toastNotification
   };
- };
+};
+
+/**
+ * Updates ClusterOrManagerConfiguration in the appState store
+ * @param clusterStatus
+ */
+export const updateClusterStatus = (clusterStatus) => {
+  return {
+    type: 'UPDATE_CLUSTER_STATUS',
+    clusterStatus,
+  };
+};
+
+/**
+ * Updates showFlyoutLogtest in the appState store
+ * @param showFlyout
+ */
+export const showFlyoutLogtest = (showFlyout) => {
+  return {
+    type: 'SHOW_FLYOUT_LOGTEST',
+    showFlyoutLogtest: showFlyout
+  };
+};
+
+/**
+ * Updates dockedFlyoutLogtest in the appState store
+ * @param dockedFlyout
+ */
+export const updateDockedLogtest = (dockedFlyout) => {
+  return {
+    type: 'UPDATE_DOCKED_LOGTEST',
+    dockedFlyoutLogtest: dockedFlyout  
+  };
+};
+
+/**
+ * Updates the status of whether the user is logged in
+ * @param withUserLogged
+ */
+export const updateWithUserLogged = (withUserLogged) => {
+  return {
+    type: 'UPDATE_WITH_USER_LOGGED',
+   withUserLogged,
+  };
+};

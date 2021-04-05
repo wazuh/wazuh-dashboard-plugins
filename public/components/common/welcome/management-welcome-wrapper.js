@@ -1,7 +1,7 @@
 /*
  * Wazuh app - React component for building the management welcome screen.
  *
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 import React, { Component } from 'react';
 import ManagementWelcome from './management-welcome';
 import WzReduxProvider from '../../../redux/wz-redux-provider';
-import './welcome.less';
+import './welcome.scss';
 
 export class ManagementWelcomeWrapper extends Component {
   constructor(props) {

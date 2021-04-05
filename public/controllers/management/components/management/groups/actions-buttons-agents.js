@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for registering agents.
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,19 +18,22 @@ import { connect } from 'react-redux';
 import {
   updateLoadingStatus,
   updateIsProcessing,
-  updateShowAddAgents
+  updateShowAddAgents,
+  updateReload
 } from '../../../../../redux/actions/groupsActions';
 
 import exportCsv from '../../../../../react-services/wz-csv';
 import GroupsHandler from './utils/groups-handler';
-import { toastNotifications } from 'ui/notify';
+import { getToasts }  from '../../../../../kibana-services';
 import { ExportConfiguration } from '../../../../agent/components/export-configuration';
+import { ReportingService } from '../../../../../react-services/reporting';
 
 class WzGroupsActionButtonsAgents extends Component {
   _isMounted = false;
 
   constructor(props) {
     super(props);
+    this.reportingService = new ReportingService();
 
     this.state = {
       generatingCsv: false,
@@ -65,6 +68,7 @@ class WzGroupsActionButtonsAgents extends Component {
    */
   async refresh() {
     try {
+      this.props.updateReload();
       this.props.updateIsProcessing(true);
       this.onRefreshLoading();
     } catch (error) {
@@ -87,8 +91,8 @@ class WzGroupsActionButtonsAgents extends Component {
   showManageAgents() {
     const { itemDetail } = this.props.state;
 
-    this.props.updateShowAddAgents(true);
     this.props.groupsProps.showAddingAgents(true, itemDetail);
+    this.props.updateShowAddAgents(true);
   }
 
   closePopover() {
@@ -185,7 +189,7 @@ class WzGroupsActionButtonsAgents extends Component {
   }
 
   showToast = (color, title, text, time) => {
-    toastNotifications.add({
+    getToasts().add({
       color: color,
       title: title,
       text: text,
@@ -210,12 +214,13 @@ class WzGroupsActionButtonsAgents extends Component {
     const exportPDFButton = (
       <ExportConfiguration
         exportConfiguration={enabledComponents =>
-          this.props.groupsProps.exportConfigurationProps.exportConfiguration(
-            enabledComponents,
-            this.props.state.itemDetail
+          this.reportingService.startConfigReport(
+            this.props.state.itemDetail,
+            'groupConfig',
+            enabledComponents
           )
         }
-        type={this.props.groupsProps.exportConfigurationProps.type}
+        type='group'
       />
     );
     // Export button
@@ -262,7 +267,8 @@ const mapDispatchToProps = dispatch => {
     updateIsProcessing: isProcessing =>
       dispatch(updateIsProcessing(isProcessing)),
     updateShowAddAgents: showAddAgents =>
-      dispatch(updateShowAddAgents(showAddAgents))
+      dispatch(updateShowAddAgents(showAddAgents)),
+    updateReload: () => dispatch(updateReload())
   };
 };
 

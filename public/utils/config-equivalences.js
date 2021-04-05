@@ -13,6 +13,8 @@ export const configEquivalences = {
       'Change the default value of the Kibana metaField configuration',
     'checks.timeFilter':
       'Change the default value of the Kibana timeFilter configuration',
+    'checks.maxBuckets':
+      'Change the default value of the Kibana max buckets configuration',
   'extensions.pci': 'Enable or disable the PCI DSS tab on Overview and Agents.',
   'extensions.gdpr': 'Enable or disable the GDPR tab on Overview and Agents.',
   'extensions.audit': 'Enable or disable the Audit tab on Overview and Agents.',
@@ -78,6 +80,7 @@ export const nameEquivalence = {
   'checks.fields': 'Know fields',
   'checks.metaFields': 'Remove meta fields',
   'checks.timeFilter': 'Set time filter to 24h',
+  'checks.maxBuckets': 'Set max buckets to 200000',
   timeout: 'Request timeout',
   'api.selector': 'API selector',
   'ip.selector': 'IP selector',
@@ -119,6 +122,7 @@ export const categoriesEquivalence = {
   'checks.fields': HEALTH_CHECK,
   'checks.metaFields': HEALTH_CHECK,
   'checks.timeFilter': HEALTH_CHECK,
+  'checks.maxBuckets': HEALTH_CHECK,
   timeout: GENERAL,
   'api.selector': GENERAL,
   'ip.selector': GENERAL,
@@ -159,6 +163,7 @@ export const formEquivalence = {
   'checks.fields': { type: BOOLEAN },
   'checks.metaFields': { type: BOOLEAN },
   'checks.timeFilter': { type: BOOLEAN },
+  'checks.maxBuckets': { type: BOOLEAN },
   timeout: { type: NUMBER },
   'api.selector': { type: BOOLEAN },
   'ip.selector': { type: BOOLEAN },

@@ -1,13 +1,12 @@
 import React from 'react';
 import { EuiToolTip, EuiButtonIcon, EuiLink, EuiBadge } from '@elastic/eui';
-import RulesetHandler from './ruleset-handler';
+import { resourceDictionary, RulesetHandler, RulesetResources } from './ruleset-handler';
 import exportCsv from '../../../../../../react-services/wz-csv';
 import { WzButtonPermissions } from '../../../../../../components/common/permissions/button';
 
 export default class RulesetColumns {
   constructor(tableProps) {
-    this.tableProps = tableProps;
-    this.rulesetHandler = RulesetHandler;
+    this.tableProps = tableProps;    
 
     this.buildColumns = () => {
       this.columns = {
@@ -42,7 +41,7 @@ export default class RulesetColumns {
               }
               return (
               <div>
-                {haveTooltip === false ? 
+                {haveTooltip === false ?
                 <span dangerouslySetInnerHTML={{ __html: value}} /> :
                 <EuiToolTip position="bottom" content={toolTipDescription}>
                   <span dangerouslySetInnerHTML={{ __html: value}} />
@@ -78,14 +77,14 @@ export default class RulesetColumns {
             width: '15%',
             render: (value, item) => {
               return (
-                <WzButtonPermissions 
+                <WzButtonPermissions
                   buttonType='link'
-                  permissions={[[{action: 'manager:read_file', resource: `file:path:${item.relative_dirname}/${item.filename}`}, {action: 'manager:read', resource: `file:path:${item.relative_dirname}/${item.filename}`}, { action: 'rules:read', resource: `rule:file:${item.filename}`}]]}
+                  permissions={getReadButtonPermissions(item)}
                   tooltip={{position:'top', content: `Show ${value} content`}}
                   onClick={async (ev) => {
                     ev.stopPropagation();
-                    const noLocal = item.relative_dirname.startsWith('ruleset/');
-                    const result = await this.rulesetHandler.getRuleContent(value, noLocal);
+                    const rulesetHandler = new RulesetHandler(RulesetResources.RULES);
+                    const result = await rulesetHandler.getFileContent(value);
                     const file = { name: value, content: result, path: item.relative_dirname };
                     this.tableProps.updateFileContent(file);
                   }}>
@@ -130,12 +129,12 @@ export default class RulesetColumns {
               return (
                 <WzButtonPermissions
                   buttonType='link'
-                  permissions={[[{action: 'manager:read_file', resource: `file:path:${item.relative_dirname}/${item.filename}`}, {action: 'manager:read', resource: `file:path:${item.relative_dirname}/${item.filename}`}, { action: 'decoders:read', resource: `decoder:file:${item.filename}`}]]}
+                  permissions={getReadButtonPermissions(item)}
                   tooltip={{position:'top', content: `Show ${value} content`}}
                   onClick={async (ev) => {
                     ev.stopPropagation();
-                    const noLocal = item.relative_dirname.startsWith('ruleset/');
-                    const result = await this.rulesetHandler.getDecoderContent(value, noLocal);
+                    const rulesetHandler = new RulesetHandler(RulesetResources.DECODERS);
+                    const result = await rulesetHandler.getFileContent(value);
                     const file = { name: value, content: result, path: item.relative_dirname };
                     this.tableProps.updateFileContent(file);
                   }}>
@@ -197,13 +196,14 @@ export default class RulesetColumns {
                 return (
                   <WzButtonPermissions
                     buttonType='icon'
-                    permissions={[[{action: 'manager:read_file', resource: `file:path:${item.relative_dirname}/${item.filename}`}, {action: 'manager:read', resource: `file:path:${item.relative_dirname}/${item.filename}`}, { action: 'lists:read', resource: `list:path:${item.filename}`}]]}
+                    permissions={getReadButtonPermissions(item)}
                     aria-label="Show content"
                     iconType="eye"
-                    tooltip={{position: 'top', content:`Edit ${item.filename} content`}}
+                    tooltip={{position: 'top', content:`View the content of ${item.filename}`}}
                     onClick={async ev => {
                       ev.stopPropagation();
-                      const result = await this.rulesetHandler.getFileContent(`${item.relative_dirname}/${item.filename}`);
+                      const rulesetHandler = new RulesetHandler(this.tableProps.state.section);
+                      const result = await rulesetHandler.getFileContent(item.filename);
                       const file = { name: item.filename, content: result, path: item.relative_dirname };
                       this.tableProps.updateFileContent(file);
                     }}
@@ -215,13 +215,14 @@ export default class RulesetColumns {
                   <div>
                     <WzButtonPermissions
                       buttonType='icon'
-                      permissions={[[{action: 'manager:read_file', resource: `file:path:${item.relative_dirname}/${item.filename}`}, {action: 'manager:read', resource: `file:path:${item.relative_dirname}/${item.filename}`}, { action: 'lists:read', resource: `list:path:${item.filename}`}]]}
+                      permissions={getEditButtonPermissions(item)}
                       aria-label="Edit content"
                       iconType="pencil"
                       tooltip={{position: 'top', content:`Edit ${item.filename} content`}}
                       onClick={async ev => {
                         ev.stopPropagation();
-                        const result = await this.rulesetHandler.getFileContent(`${item.relative_dirname}/${item.filename}`);
+                        const rulesetHandler = new RulesetHandler(this.tableProps.state.section);
+                        const result = await rulesetHandler.getFileContent(item.filename);
                         const file = { name: item.filename, content: result, path: item.relative_dirname };
                         this.tableProps.updateFileContent(file);
                       }}
@@ -229,8 +230,8 @@ export default class RulesetColumns {
                     />
                     <WzButtonPermissions
                       buttonType='icon'
-                      permissions={[{action: 'manager:delete_file', resource: `file:path:${item.relative_dirname}/${item.filename}`}]}
-                      aria-label="Delete content"
+                      permissions={getDeleteButtonPermissions(item)}
+                      aria-label="Delete file"
                       iconType="trash"
                       tooltip={{position: 'top', content:`Remove ${item.filename} file`}}
                       onClick={ev => {
@@ -248,6 +249,40 @@ export default class RulesetColumns {
         ]
       };
 
+      const getReadButtonPermissions = (item) => {
+        const { section } = this.tableProps.state;
+        const { permissionResource } = resourceDictionary[section];
+        return [
+          {
+            action: `${section}:read`,
+            resource: permissionResource(item.filename),
+          },
+        ];
+      };
+
+      const getEditButtonPermissions = (item) => {
+        const { section } = this.tableProps.state;
+        const { permissionResource } = resourceDictionary[section];
+        return [
+          {
+            action: `${section}:read`,
+            resource: permissionResource(item.filename),
+          },
+          { action: `${section}:update`, resource: permissionResource(item.filename) },
+        ];
+      };
+
+      const getDeleteButtonPermissions = (item) => {
+        const { section } = this.tableProps.state;
+        const { permissionResource } = resourceDictionary[section];
+        return [
+          {
+            action: `${section}:delete`,
+            resource: permissionResource(item.filename),
+          },
+        ];
+      };
+
       this.columns.lists[2] =
         {
           name: 'Actions',
@@ -258,13 +293,14 @@ export default class RulesetColumns {
               <div>
                 <WzButtonPermissions
                   buttonType='icon'
-                  permissions={[[{action: 'manager:read_file', resource: `file:path:${item.relative_dirname}/${item.filename}`}, {action: 'manager:read', resource: `file:path:${item.relative_dirname}/${item.filename}`}, { action: 'lists:read', resource: `list:path:${item.filename}`}]]}
+                  permissions={getEditButtonPermissions(item)}
                   aria-label="Edit content"
                   iconType="pencil"
                   tooltip={{position: 'top', content: `Edit ${item.filename} content`}}
                   onClick={async (ev) => {
                     ev.stopPropagation();
-                    const result = await this.rulesetHandler.getCdbList(`${item.relative_dirname}/${item.filename}`);
+                    const rulesetHandler = new RulesetHandler(this.tableProps.state.section);
+                    const result = await rulesetHandler.getFileContent(item.filename);
                     const file = { name: item.filename, content: result, path: item.relative_dirname };
                     this.tableProps.updateListContent(file);
                   }}
@@ -272,8 +308,8 @@ export default class RulesetColumns {
                 />
                 <WzButtonPermissions
                   buttonType='icon'
-                  permissions={[{action: 'manager:delete_file', resource: `file:path:${item.relative_dirname}/${item.filename}`}]}
-                  aria-label="Show content"
+                  permissions={getDeleteButtonPermissions(item)}
+                  aria-label="Delete file"
                   iconType="trash"
                   tooltip={{position: 'top', content:(defaultItems.indexOf(`${item.relative_dirname}`) === -1) ? `Delete ${item.filename}` : `The ${item.filename} list cannot be deleted`}}
                   onClick={async (ev) => {
@@ -284,23 +320,24 @@ export default class RulesetColumns {
                   color="danger"
                   isDisabled={defaultItems.indexOf(`${item.relative_dirname}`) !== -1}
                 />
-                <EuiToolTip position="top" content={`Export ${item.filename}`}>
-                  <EuiButtonIcon
-                    aria-label="Export list"
-                    iconType="exportAction"
-                    onClick={async (ev) => {
-                      ev.stopPropagation();
-                      await exportCsv(`/lists`, [{_isCDBList: true, name: 'filename', value: `${item.filename}`}], item.filename)
-                    }}
-                    color="primary"
-                  />
-                </EuiToolTip>
+                <WzButtonPermissions
+                  buttonType='icon'
+                  permissions={getReadButtonPermissions(item)}
+                  aria-label="Export list"
+                  iconType="exportAction"
+                  tooltip={{position: 'top', content: `Export ${item.filename} content`}}
+                  onClick={async (ev) => {
+                    ev.stopPropagation();
+                    await exportCsv(`/lists`, [{_isCDBList: true, name: 'filename', value: `${item.filename}`}], item.filename)
+                  }}
+                  color="primary"
+                />
               </div>
             )
           }
         }
       };
-      
+
 
     this.buildColumns();
   }

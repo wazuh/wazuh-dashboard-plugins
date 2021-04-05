@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for code editor in configuration.
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,14 @@ import PropTypes from 'prop-types';
 import { EuiCodeEditor, EuiSpacer } from '@elastic/eui';
 
 import 'brace/theme/textmate';
+import 'brace/mode/xml';
+import 'brace/snippets/xml';
+import 'brace/mode/json';
+import 'brace/snippets/json';
+import 'brace/mode/javascript';
+import 'brace/snippets/javascript';
 import 'brace/ext/language_tools';
+import "brace/ext/searchbox";
 
 class WzCodeEditor extends Component {
   constructor(props) {
@@ -48,7 +55,7 @@ class WzCodeEditor extends Component {
             theme="textmate"
             mode={mode}
             width="100%"
-            height={height || `calc(100vh - ${minusHeight || 360}px)`} // Groups section has -250px
+            height={height || `calc(100vh - ${minusHeight || 400}px)`} // Groups section has -250px
             value={value}
             wrapEnabled
             tabSize={2}

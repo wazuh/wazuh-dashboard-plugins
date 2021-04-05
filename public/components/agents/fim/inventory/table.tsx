@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Integrity monitoring table component
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,8 +20,8 @@ import {
 } from '@elastic/eui';
 import { WzRequest } from '../../../../react-services/wz-request';
 import { FlyoutDetail } from './flyout';
-import './inventory.less';
 import { filtersToObject, IFilter } from '../../../wz-search-bar';
+import { formatUIDate } from '../../../../react-services/time-service';
 
 export class InventoryTable extends Component {
   state: {
@@ -153,6 +153,7 @@ export class InventoryTable extends Component {
     return filter;
   }
 
+
   onTableChange = ({ page = {}, sort = {} }) => {
     const { index: pageIndex, size: pageSize } = page;
     const { field: sortField, direction: sortDirection } = sort;
@@ -181,7 +182,8 @@ export class InventoryTable extends Component {
         field: 'mtime',
         name: 'Last Modified',
         sortable: true,
-        width: '100px'
+        width: '100px',
+        render: formatUIDate
       },
       {
         field: 'uname',
@@ -274,7 +276,7 @@ export class InventoryTable extends Component {
   render() {
     const filesTable = this.renderFilesTable();
     return (
-      <div>
+      <div className='wz-inventory'>
         {filesTable}
         {this.state.isFlyoutVisible &&
           <EuiOverlayMask

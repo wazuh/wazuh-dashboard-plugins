@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for registering agents.
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -11,8 +11,8 @@
  */
 import React, { Component, Fragment } from 'react';
 // Eui components
-import { EuiFlexItem, EuiButtonEmpty, EuiGlobalToastList } from '@elastic/eui';
-import { toastNotifications } from 'ui/notify';
+import { EuiFlexItem, EuiButtonEmpty } from '@elastic/eui';
+import { getToasts }  from '../../../../../kibana-services';
 
 import { connect } from 'react-redux';
 
@@ -22,15 +22,13 @@ import {
   updteAddingRulesetFile,
   updateListContent,
   updateIsProcessing,
-  updatePageIndex
+  updatePageIndex,
 } from '../../../../../redux/actions/rulesetActions';
 
-import { WzRequest } from '../../../../../react-services/wz-request';
-import { ErrorHandler } from '../../../../../react-services/error-handler';
 import exportCsv from '../../../../../react-services/wz-csv';
 import { UploadFiles } from '../../upload-files';
 import columns from './utils/columns';
-import RulesetHandler from './utils/ruleset-handler';
+import { resourceDictionary, RulesetHandler, RulesetResources } from './utils/ruleset-handler';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 
 class WzRulesetActionButtons extends Component {
@@ -40,19 +38,12 @@ class WzRulesetActionButtons extends Component {
     this.state = { generatingCsv: false };
     this.exportCsv = exportCsv;
 
-    this.wzReq = WzRequest;
-    this.paths = {
-      rules: '/rules',
-      decoders: '/decoders',
-      lists: '/lists/files'
-    };
     this.columns = columns;
-    this.rulesetHandler = RulesetHandler;
     this.refreshTimeoutId = null;
   }
 
   showToast(title, text, color){
-    toastNotifications.add({
+    getToasts().add({
       title,
       text,
       color,
@@ -82,22 +73,15 @@ class WzRulesetActionButtons extends Component {
    * @param {Array} files
    * @param {String} path
    */
-  async uploadFiles(files, path) {
+  async uploadFiles(files, resource) {
     try {
       let errors = false;
       let results = [];
-      let upload;
-      if (path === 'etc/rules') {
-        upload = this.rulesetHandler.sendRuleConfiguration;
-      } else if (path === 'etc/decoders') {
-        upload = this.rulesetHandler.sendDecoderConfiguration;
-      } else {
-        upload = this.rulesetHandler.updateCdbList;
-      }
+      const rulesetHandler = new RulesetHandler(resource);    
       for (let idx in files) {
         const { file, content } = files[idx];
         try {
-          await upload(file, content, true); // True does not overwrite the file
+          await rulesetHandler.updateFile(file, content, resource !== RulesetResources.LISTS); // True does not overwrite the file
           results.push({
             index: idx,
             uploaded: true,
@@ -164,46 +148,72 @@ class WzRulesetActionButtons extends Component {
   render() {
     const { section, showingFiles } = this.props.state;
 
+    const getReadPermissionsFiles = () => {
+      const  { permissionResource } = resourceDictionary[section];
+      return [      
+        {
+          action: `${section}:read`,
+          resource: permissionResource('*'),
+        }
+      ];  
+    };
+
+    const getUpdatePermissionsFiles = () => {
+      const  { permissionResource } = resourceDictionary[section];
+      return [
+        {
+          action: `${section}:update`,
+          resource: permissionResource('*'),
+        },
+        {
+          action: `${section}:read`,
+          resource: permissionResource('*'),
+        }
+      ];  
+    };
+
     // Export button
     const exportButton = (
-      <EuiButtonEmpty
+      <WzButtonPermissions
+        buttonType="empty"
+        permissions={getReadPermissionsFiles()}
         iconType="exportAction"
+        iconSide="left"
         onClick={async () => await this.generateCsv()}
-        isLoading={this.state.generatingCsv}
       >
         Export formatted
-      </EuiButtonEmpty>
+      </WzButtonPermissions>
     );
 
     // Add new rule button
     const addNewRuleButton = (
       <WzButtonPermissions
-        permissions={[{action: 'manager:upload_file', resource: `file:path:/etc/${section}`}]}
-        buttonType='empty'
+        permissions={getUpdatePermissionsFiles()}
+        buttonType="empty"
         iconType="plusInCircle"
         onClick={() =>
           this.props.updteAddingRulesetFile({
             name: '',
             content: '<!-- Modify it at your will. -->',
-            path: `etc/${section}`
+            path: `etc/${section}`,
           })
         }
       >
         {`Add new ${section} file`}
       </WzButtonPermissions>
-    );
+    );  
 
     //Add new CDB list button
     const addNewCdbListButton = (
       <WzButtonPermissions
-        buttonType='empty'
-        permissions={[{action: 'manager:upload_file', resource: 'file:path:/etc/lists/files'}]}
+        buttonType="empty"
+        permissions={getUpdatePermissionsFiles()}
         iconType="plusInCircle"
         onClick={() =>
           this.props.updateListContent({
             name: false,
             content: '',
-            path: 'etc/lists'
+            path: 'etc/lists',
           })
         }
       >
@@ -214,8 +224,8 @@ class WzRulesetActionButtons extends Component {
     // Manage files
     const manageFiles = (
       <WzButtonPermissions
-        buttonType='empty'
-        permissions={[{action: 'manager:upload_file', resource: `file:path:/etc/${section}`}]}
+        buttonType="empty"
+        permissions={getUpdatePermissionsFiles()}
         iconType={showingFiles ? 'apmTrace' : 'folderClosed'}
         onClick={async () => await this.toggleFiles()}
       >
@@ -233,8 +243,8 @@ class WzRulesetActionButtons extends Component {
       </EuiButtonEmpty>
     );
 
-    const uploadFile = async (files, path) => {
-      await this.uploadFiles(files, path);
+    const uploadFile = async (files, resource) => {
+      await this.uploadFiles(files, resource);
       await this.refresh();
     };
 
@@ -252,9 +262,11 @@ class WzRulesetActionButtons extends Component {
         {(section === 'lists' || showingFiles) && (
           <EuiFlexItem grow={false}>
             <UploadFiles
-              msg={section}
+              clusterStatus={this.props.clusterStatus}
+              resource={section}
               path={`etc/${section}`}
               upload={uploadFile}
+              onSuccess={() => this.props.updateRestartClusterManager(true)}
             />
           </EuiFlexItem>
         )}

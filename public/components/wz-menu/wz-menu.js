@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for build q queries.
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,16 +34,15 @@ import store from '../../redux/store';
 import Management from './wz-menu-management';
 import MenuSettings from './wz-menu-settings';
 import MenuSecurity from './wz-menu-security';
+import MenuTools from './wz-menu-tools';
 import Overview from './wz-menu-overview';
-import { npStart } from 'ui/new_platform';
-import { toastNotifications } from 'ui/notify';
+import { getAngularModule, getHttp, getToasts } from '../../kibana-services';
 import { GenericRequest } from '../../react-services/generic-request';
 import { ApiCheck } from '../../react-services/wz-api-check';
-import chrome from 'ui/chrome';
 import { WzGlobalBreadcrumbWrapper } from '../common/globalBreadcrumb/globalBreadcrumbWrapper';
 import { AppNavigate } from '../../react-services/app-navigate';
 import WzTextWithTooltipIfTruncated from '../../components/common/wz-text-with-tooltip-if-truncated';
-import { getServices } from '../../../../../src/plugins/discover/public/kibana_services';
+import { getDataPlugin } from '../../kibana-services';
 
 const sections = {
   'overview': 'overview',
@@ -76,36 +75,36 @@ class WzMenu extends Component {
     this.store = store;
     this.genericReq = GenericRequest;
     this.wazuhConfig = new WazuhConfig();
-    this.indexPatterns = npStart.plugins.data.indexPatterns;
+    this.indexPatterns = getDataPlugin().indexPatterns;
     this.isLoading = false;
   }
 
   async componentDidMount() {
-    const $injector = await chrome.dangerouslyGetActiveInjector();
+    const $injector = getAngularModule().$injector;
     this.router = $injector.get('$route');
-    try{
+    try {
       const result = await this.genericReq.request('GET', '/hosts/apis', {});
       const APIlist = (result || {}).data || [];
-      if (APIlist.length){
+      if (APIlist.length) {
         const { id: apiId } = JSON.parse(AppState.getCurrentAPI());
         const filteredApi = APIlist.filter(api => api.id === apiId);
         const selectedApi = filteredApi[0];
-        if(selectedApi){
+        if (selectedApi) {
           const apiData = await ApiCheck.checkStored(selectedApi.id);
           //update cluster info
           const cluster_info = (((apiData || {}).data || {}).data || {})
-              .cluster_info;
+            .cluster_info;
           if (cluster_info) {
-              AppState.setClusterInfo(cluster_info);
+            AppState.setClusterInfo(cluster_info);
           }
         }
-    }
-    }catch(err){}
+      }
+    } catch (err) { }
 
   }
 
   showToast = (color, title, text, time) => {
-    toastNotifications.add({
+    getToasts().add({
       color: color,
       title: title,
       text: text,
@@ -130,6 +129,44 @@ class WzMenu extends Component {
     const APIlist = (result || {}).data || [];
     if (APIlist.length) this.setState({ APIlist });
   };
+
+  loadIndexPatternsList = async () => {
+    try {
+      const list = await PatternHandler.getPatternList('api');
+      if (!list) return;
+
+      // Abort if we have disabled the pattern selector
+      if (!AppState.getPatternSelector()) return;
+
+      let filtered = false;
+      // If there is no current pattern, fetch it
+      if (!AppState.getCurrentPattern()) {
+        AppState.setCurrentPattern(list[0].id);
+      } else {
+        // Check if the current pattern cookie is valid
+        filtered = list.find(item =>
+          item.id.includes(AppState.getCurrentPattern())
+        );
+        if (!filtered) AppState.setCurrentPattern(list[0].id);
+      }
+
+      const data = filtered
+        ? filtered
+        : await this.indexPatterns.get(AppState.getCurrentPattern());
+      this.setState({ theresPattern: true, currentPattern: data.title });
+
+      // Getting the list of index patterns
+      if (list) {
+        this.setState({
+          patternList: list,
+          currentSelectedPattern: AppState.getCurrentPattern()
+        });
+      }
+    } catch (error) {
+      this.showToast('danger', 'Error', error, 4000);
+    }
+  }
+
 
   async componentDidUpdate(prevProps) {
     if (this.state.APIlist && !this.state.APIlist.length) {
@@ -209,7 +246,7 @@ class WzMenu extends Component {
     this.isLoading = false;
   }
 
-  changePattern = event => {
+  changePattern = (event) => {
     try {
       if (!AppState.getPatternSelector()) return;
       PatternHandler.changePattern(event.target.value);
@@ -315,7 +352,7 @@ class WzMenu extends Component {
           <EuiFlexItem>
             <p></p>
           </EuiFlexItem>
-          {this.props.state.wazuhNotReadyYet.includes('Restarting') && (
+          {typeof this.props.state.wazuhNotReadyYet === "string" && this.props.state.wazuhNotReadyYet.includes('Restarting') && (
             <EuiFlexItem grow={false}>
               <p>
                 {' '}
@@ -345,6 +382,21 @@ class WzMenu extends Component {
     this.setState({ currentMenuTab: item });
   }
 
+  toolsPopoverToggle() {
+    if (!this.state.isToolsPopoverOpen) {
+      this.setState(() => {
+        return {
+          isToolsPopoverOpen: true,
+          currentMenuTab: 'wazuh-dev',
+          isOverviewPopoverOpen: false,
+          isManagementPopoverOpen: false,
+          isSecurityPopoverOpen: false,
+          isSettingsPopoverOpen: false,
+        };
+      });
+    }
+  }
+
   settingsPopoverToggle() {
     if (!this.state.isSettingsPopoverOpen) {
       this.setState(() => {
@@ -354,6 +406,7 @@ class WzMenu extends Component {
           isOverviewPopoverOpen: false,
           isManagementPopoverOpen: false,
           isSecurityPopoverOpen: false,
+          isToolsPopoverOpen: false,
         };
       });
     }
@@ -368,6 +421,7 @@ class WzMenu extends Component {
           isOverviewPopoverOpen: false,
           isManagementPopoverOpen: false,
           isSettingsPopoverOpen: false,
+          isToolsPopoverOpen: false,
         };
       });
     }
@@ -382,6 +436,7 @@ class WzMenu extends Component {
           isOverviewPopoverOpen: false,
           isSettingsPopoverOpen: false,
           isSecurityPopoverOpen: false,
+          isToolsPopoverOpen: false,
         };
       });
     }
@@ -396,9 +451,15 @@ class WzMenu extends Component {
           isManagementPopoverOpen: false,
           isSettingsPopoverOpen: false,
           isSecurityPopoverOpen: false,
+          isToolsPopoverOpen: false,
         };
       });
     }
+  }
+
+  onClickToolsButton() {
+    this.setMenuItem('wazuh-dev');
+    this.toolsPopoverToggle();
   }
 
   onClickSettingsButton() {
@@ -428,23 +489,32 @@ class WzMenu extends Component {
   }
 
   closeAllPopover() {
-    this.setState({ isOverviewPopoverOpen: false, isManagementPopoverOpen: false, isSettingsPopoverOpen: false, })
+    this.setState({
+      isOverviewPopoverOpen: false,
+      isManagementPopoverOpen: false,
+      isSettingsPopoverOpen: false,
+      isToolsPopoverOpen: false,
+    });
   }
 
   isAnyPopoverOpen() {
-    return this.state.isOverviewPopoverOpen ||
+    return (
+      this.state.isOverviewPopoverOpen ||
       this.state.isManagementPopoverOpen ||
       this.state.isSettingsPopoverOpen ||
-      this.state.isSecurityPopoverOpen;
+      this.state.isSecurityPopoverOpen ||
+      this.state.isToolsPopoverOpen
+    );
   }
 
   switchMenuOpened = () => {
-    const kibanaMenuBlockedClass = document.getElementsByClassName('chrHeaderWrapper--navIsLocked');
-    const kibanaMenuBlocked = (kibanaMenuBlockedClass || []).length;
+    const kibanaMenuBlockedOrOpened = document.body.classList.contains('euiBody--collapsibleNavIsDocked') || document.body.classList.contains('euiBody--collapsibleNavIsOpen');
     if (!this.state.menuOpened && this.state.currentMenuTab === 'manager') {
       this.managementPopoverToggle();
     } else if (this.state.currentMenuTab === 'overview') {
       this.overviewPopoverToggle();
+    } else if (this.state.currentMenuTab === 'wazuh-dev') {
+      this.toolsPopoverToggle();
     } else if (this.state.currentMenuTab === 'settings') {
       this.settingsPopoverToggle();
     } else if (this.state.currentMenuTab === 'security') {
@@ -452,8 +522,12 @@ class WzMenu extends Component {
     } else {
       this.closeAllPopover()
     }
-    this.setState({ menuOpened: !this.state.menuOpened, kibanaMenuBlocked, hover: this.state.currentMenuTab }, async () => {
-      if (this.state.menuOpened) await this.loadApiList();
+
+    this.setState({ menuOpened: !this.state.menuOpened, kibanaMenuBlockedOrOpened, hover: this.state.currentMenuTab }, async () => {
+      if (this.state.menuOpened) {
+        await this.loadApiList();
+        await this.loadIndexPatternsList();
+      };
     });
   };
 
@@ -464,13 +538,13 @@ class WzMenu extends Component {
   }
 
   formatAgentStatus = (status) => {
-    if(status === 'active'){
+    if (status === 'active') {
       return "Active";
     }
-    if(status === 'disconnected'){
+    if (status === 'disconnected') {
       return "Disconnected";
     }
-    if(status === 'never_connected'){
+    if (status === 'never_connected') {
       return "Never connected";
     }
   }
@@ -499,11 +573,11 @@ class WzMenu extends Component {
     store.dispatch(updateCurrentAgentData({}));
     if (window.location.href.includes("/agents?")) {
       window.location.href = "#/agents-preview";
-      this.route.reload();
+      this.router.reload();
       return;
     }
-    const { filterManager } = getServices();
-    const currentAppliedFilters = filterManager.filters;
+    const { filterManager } = getDataPlugin().query;
+    const currentAppliedFilters = filterManager.getFilters();
     const agentFilters = currentAppliedFilters.filter(x => {
       return x.meta.key === 'agent.id';
     });
@@ -589,19 +663,20 @@ class WzMenu extends Component {
             <EuiButtonEmpty
               className={
                 'wz-menu-button ' +
-                (this.state.currentMenuTab === "wazuh-dev" && !this.isAnyPopoverOpen()
+                (this.state.currentMenuTab === "wazuh-dev" && !this.isAnyPopoverOpen() || (this.state.isToolsPopoverOpen)
                   ? 'wz-menu-active'
                   : '')}
               color="text"
-              href="#/wazuh-dev"
-              onClick={() => {
-                this.setMenuItem('wazuh-dev');
-                this.setState({ menuOpened: false });
-              }}
+              onClick={this.onClickToolsButton.bind(this)}
             >
               <EuiIcon type="console" color="primary" size="m" />
-              <span className="wz-menu-button-title ">Dev Tools</span>
+              <span className="wz-menu-button-title ">Tools</span>
+              <span className="flex"></span>
+              {this.state.isToolsPopoverOpen && (
+                <EuiIcon color="subdued" type="arrowRight" />
+              )}
             </EuiButtonEmpty>
+
             <EuiSpacer size='xl'></EuiSpacer>
             <EuiButtonEmpty
               className={
@@ -677,6 +752,13 @@ class WzMenu extends Component {
             ></MenuSecurity>
           )}
 
+          { this.state.isToolsPopoverOpen && (
+            <MenuTools
+              currentMenuTab={this.state.currentMenuTab}
+              closePopover={() => this.setState({ menuOpened: false })}
+            ></MenuTools>
+          )}
+
           {/*this.state.hover === 'overview' */this.state.isOverviewPopoverOpen && currentAgent.id && (
             <EuiFlexGroup className="wz-menu-agent-info">
               {/*
@@ -686,10 +768,10 @@ class WzMenu extends Component {
                 </EuiBadge>
               </EuiFlexItem>
               */}
-              <EuiFlexItem>
+              <EuiFlexItem style={{ margin: "16px 16px 0 16px" }}>
                 {this.addHealthRender(currentAgent)}
               </EuiFlexItem>
-              <EuiFlexItem grow={false} style={{ margin: "8px 0 0 0" }}>
+              <EuiFlexItem grow={false} style={{ margin: "12px 0 0 0" }}>
                 <EuiToolTip position="top" content={`Open ${currentAgent.name} summary`}>
                   <EuiButtonEmpty
                     color="primary"
@@ -698,7 +780,7 @@ class WzMenu extends Component {
                   </EuiButtonEmpty>
                 </EuiToolTip>
               </EuiFlexItem>
-              <EuiFlexItem grow={false} style={{ margin: "8px 0 0 0" }}>
+              <EuiFlexItem grow={false} style={{ margin: "12px 0 0 0" }}>
                 <EuiToolTip position="top" content={"Change selected agent"}>
                   <EuiButtonEmpty
                     color="primary"
@@ -707,7 +789,7 @@ class WzMenu extends Component {
                   </EuiButtonEmpty>
                 </EuiToolTip>
               </EuiFlexItem>
-              <EuiFlexItem grow={false} style={{ margin: "8px 16px 0 0" }}>
+              <EuiFlexItem grow={false} style={{ margin: "12px 16px 0 0" }}>
                 <EuiToolTip position="top" content={"Unpin agent"}>
                   <EuiButtonEmpty
                     color="text"
@@ -729,7 +811,8 @@ class WzMenu extends Component {
       </div>
     );
 
-    const logotype_url = chrome.addBasePath('/plugins/wazuh/img/logotype.svg');
+
+    const logotype_url = getHttp().basePath.prepend('/plugins/wazuh/assets/logotype.svg');
     const mainButton = (
       <button className="eui" onClick={() => this.switchMenuOpened()}>
         <EuiFlexGroup
@@ -759,7 +842,7 @@ class WzMenu extends Component {
           <Fragment>
             <EuiPopover
               panelClassName={
-                this.state.kibanaMenuBlocked ?
+                this.state.kibanaMenuBlockedOrOpened ?
                   "wz-menu-popover wz-menu-popover-over" :
                   "wz-menu-popover wz-menu-popover-under"
               }
@@ -767,6 +850,8 @@ class WzMenu extends Component {
               isOpen={this.state.menuOpened}
               closePopover={() => this.setState({ menuOpened: false })}
               anchorPosition="downLeft"
+              panelPaddingSize='none'
+              hasArrow={false}
             >
               <Fragment>{menu}</Fragment>
             </EuiPopover>

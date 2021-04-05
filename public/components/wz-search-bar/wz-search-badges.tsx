@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for show search and filter
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@ import { EuiBadge } from '@elastic/eui';
 import { QInterpreter, queryObject } from './lib/q-interpreter';
 import { ContextMenu } from './components/wz-search-badges';
 import { qSuggests } from '.';
-import './src/style/wz-search-badges.less'
+import './src/style/wz-search-badges.scss'
 import { EuiText } from '@elastic/eui';
 import { EuiPopover } from '@elastic/eui';
 import { EuiButtonEmpty } from '@elastic/eui';

@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Integrity monitoring components
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,12 +19,11 @@ import {
   EuiButton,
   EuiButtonEmpty
 } from '@elastic/eui';
-import '../../common/modules/module.less';
+import '../../common/modules/module.scss';
 import { ReportingService } from '../../../react-services/reporting';
 import { AppNavigate } from '../../../react-services/app-navigate';
 import { ModulesDefaults } from './modules-defaults';
-import { getServices } from '../../../../../../src/plugins/discover/public/kibana_services';
-import { getAngularModule } from '../../../../../../src/plugins/discover/public/kibana_services';
+import { getAngularModule, getDataPlugin, getUiSettings } from '../../../kibana-services';
 import { MainModuleAgent } from './main-agent'
 import { MainModuleOverview } from './main-overview';
 import store from '../../../redux/store';
@@ -40,7 +39,7 @@ export class MainModule extends Component {
       switchModule: false,
       showAgentInfo: false
     };
-    const app = getAngularModule('app/wazuh');
+    const app = getAngularModule();
     this.$rootScope = app.$injector.get('$rootScope');
   }
 
@@ -52,8 +51,8 @@ export class MainModule extends Component {
   }
 
   componentWillUnmount() {
-    const { filterManager } = getServices();
-    if (filterManager.filters && filterManager.filters.length) {
+    const { filterManager } = getDataPlugin().query;
+    if (filterManager.getFilters() && filterManager.getFilters().length) {
       filterManager.removeAll();
     }
   }
@@ -93,11 +92,33 @@ export class MainModule extends Component {
     );
   }
 
-  async startReport() {
-    this.setState({ loadingReport: true });
-    const agent = (this.props.agent || store.getState().appStateReducers.currentAgentData || {}).id || false;
+
+  startVis2PngByAgent = async () => {
+    const agent =
+      (this.props.agent || store.getState().appStateReducers.currentAgentData || {}).id || false;
     await this.reportingService.startVis2Png(this.props.section, agent);
-    this.setState({ loadingReport: false });
+  };
+
+  async startReport() {
+    try {
+      this.setState({ loadingReport: true });
+      const isDarkModeTheme = getUiSettings().get('theme:darkMode');
+      if (isDarkModeTheme) {
+        const defaultTextColor = $('#moduleDashboard .euiButtonEmpty__text').children().css('color');
+        try {
+          $('.euiButtonEmpty__text').css('color', 'black');
+          await this.startVis2PngByAgent();
+          $('.euiButtonEmpty__text').css('color', defaultTextColor);
+        } catch (e) {
+          $('.euiButtonEmpty__text').css('color', defaultTextColor);
+          this.setState({ loadingReport: false });
+        }
+      } else {
+        await this.startVis2PngByAgent();
+      }
+    } finally {
+      this.setState({ loadingReport: false });
+    }
   }
 
   renderReportButton() {

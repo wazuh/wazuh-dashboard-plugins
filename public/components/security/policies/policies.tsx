@@ -297,7 +297,7 @@ export const Policies = () => {
       <EuiOverlayMask
         headerZindexLocation="below"
         onClick={() => { setIsFlyoutVisible(false) }}>
-        <EuiFlyout
+        <EuiFlyout className="wzApp"
           onClose={() => setIsFlyoutVisible(false)}>
           <EuiFlyoutHeader hasBorder={false}>
             <EuiTitle size="m">
@@ -417,7 +417,7 @@ export const Policies = () => {
                 onClick={() => createPolicy()}
                 fill>
                 Create policy
-                                    </EuiButton>
+              </EuiButton>
             </EuiForm>
           </EuiFlyoutBody>
         </EuiFlyout>
@@ -434,14 +434,18 @@ export const Policies = () => {
           </EuiTitle>
         </EuiPageContentHeaderSection>
         <EuiPageContentHeaderSection>
+         { 
+          !loading
+          &&
           <div>
             <EuiButton
               onClick={() => setIsFlyoutVisible(true)}>
               Create policy
-                                </EuiButton>
+            </EuiButton>
             {flyout}
             {editFlyout}
-          </div>
+          </div>          
+        }
         </EuiPageContentHeaderSection>
       </EuiPageContentHeader>
       <EuiPageContentBody>

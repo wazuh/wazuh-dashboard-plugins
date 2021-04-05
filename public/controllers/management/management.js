@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Management controller
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@ import { WazuhConfig } from '../../react-services/wazuh-config';
 import { WzRequest } from '../../react-services/wz-request';
 import { ErrorHandler } from '../../react-services/error-handler';
 import { ShareAgent } from '../../factories/share-agent';
-import RulesetHandler from './components/management/ruleset/utils/ruleset-handler';
+import { RulesetHandler, RulesetResources } from './components/management/ruleset/utils/ruleset-handler';
 
 export class ManagementController {
   /**
@@ -40,7 +40,6 @@ export class ManagementController {
     this.errorHandler = errorHandler;
     this.$interval = $interval;
     this.tab = 'welcome';
-    this.rulesetTab = 'rules';
     this.globalConfigTab = 'overview';
     this.tabNames = TabNames;
     this.wazuhManagementTabs = ['ruleset', 'groups', 'configuration'];
@@ -48,7 +47,7 @@ export class ManagementController {
     this.currentGroup = false;
     this.logtestOpened = false;
     this.uploadOpened = false;
-    this.rulesetHandler = RulesetHandler;
+    this.rulesetTab = RulesetResources.RULES;
 
     this.$scope.$on('setCurrentGroup', (ev, params) => {
       this.currentGroup = (params || {}).currentGroup || false;
@@ -165,9 +164,10 @@ export class ManagementController {
     };
 
     this.logtestProps = {
-      clickAction: log => this.testLogtest(log),
-      close: () => this.openLogtest(),
-      showClose: true
+      clickAction: (log) => log,
+      openCloseFlyout: () => this.openCloseFlyout(),
+      showClose: true,
+      onFlyout: true,
     };
 
     this.managementProps = {
@@ -183,7 +183,8 @@ export class ManagementController {
           this.$scope.$applyAsync();
         },
         wazuhNotReadyYet: () => this.$rootScope.wazuhNotReadyYet
-      }
+      },
+      logtestProps: this.logtestProps,
     };
   }
 
@@ -209,7 +210,7 @@ export class ManagementController {
     this.uploadFilesProps = {
       msg: this.$scope.mctrl.rulesetTab,
       path: `etc/${this.$scope.mctrl.rulesetTab}`,
-      upload: (files, path) => this.uploadFiles(files, path)
+      upload: (files) => this.uploadFiles(files, this.$scope.mctrl.rulesetTab)
     };
   }
 
@@ -340,7 +341,7 @@ export class ManagementController {
     this.rulesetTab = tab;
     this.globalRulesetTab = this.rulesetTab;
     this.managingFiles = false;
-    this.refreshUploadFileProps();
+    //this.refreshUploadFileProps();
     if (!flag) {
       this.breadCrumbBack();
     }
@@ -407,8 +408,9 @@ export class ManagementController {
     this.$scope.$applyAsync();
   }
 
-  openLogtest() {
+  openCloseFlyout() {
     this.logtestOpened = !this.logtestOpened;
+    this.logtestProps.isRuleset = this.tab,
     this.$scope.$applyAsync();
   }
 
@@ -419,24 +421,6 @@ export class ManagementController {
     this.$scope.$broadcast('addNewFile', { type: this.globalRulesetTab });
   }
 
-  testLogtest = async log => {
-    //return await WzRequest.apiReq('GET', '/testlog', {log});
-    const sleep = m => new Promise(r => setTimeout(r, m));
-    await sleep(1000);
-    return `**Phase 1: Completed pre-decoding.
-    full event: 'timestamp:2019-09-03T13:22:27.950+0000 rule:level:7 rule:description:python: Undocumented local_file protocol allows remote attackers to bypass protection mechanisms rule:id:23504 rule:firedtimes:33 rule:mail:false rule:groups:[vulnerability-detector] rule:gdpr:[IV_35.7.d] agent:id:000 agent:name:a205e5b2a1aa manager:{name:a205e5b2a1aa} id:1567516947.252273 cluster:name:wazuh cluster:node:master decoder:{name:json} data:{vulnerability:cve:CVE-2019-9948} data:{vulnerability:title:python: Undocumented local_file protocol allows remote attackers to bypass protection mechanisms} data:{vulnerability:severity:Medium} data:{vulnerability:published:2019-03-23T00:00:00+00:00} data:{vulnerability:state:Fixed} data:{vulnerability:cvss:{cvss3_score:7.400000}} data:{vulnerability:package:name:python} data:{vulnerability:package:version:2.7.5-80.el7_6} data:{vulnerability:package:condition:less than 2.7.5-86.el7} data:{vulnerability:advisories:RHSA-2019:2030,RHSA-2019:1700} data:{vulnerability:cwe_reference:CWE-749} data:{vulnerability:bugzilla_reference:https://bugzilla.redhat.com/show_bug.cgi?id=1695570} data:{vulnerability:reference:https://access.redhat.com/security/cve/CVE-2019-9948} location:vulnerability-detector'
-    timestamp: '(null)'
-    hostname: 'a205e5b2a1aa'
-    program_name: '(null)'
-    log: 'timestamp:2019-09-03T13:22:27.950+0000 rule:level:7 rule:description:python: Undocumented local_file protocol allows remote attackers to bypass protection mechanisms rule:id:23504 rule:firedtimes:33 rule:mail:false rule:groups:[vulnerability-detector] rule:gdpr:[IV_35.7.d] agent:id:000 agent:name:a205e5b2a1aa manager:{name:a205e5b2a1aa} id:1567516947.252273 cluster:name:wazuh cluster:node:master decoder:{name:json} data:{vulnerability:cve:CVE-2019-9948} data:{vulnerability:title:python: Undocumented local_file protocol allows remote attackers to bypass protection mechanisms} data:{vulnerability:severity:Medium} data:{vulnerability:published:2019-03-23T00:00:00+00:00} data:{vulnerability:state:Fixed} data:{vulnerability:cvss:{cvss3_score:7.400000}} data:{vulnerability:package:name:python} data:{vulnerability:package:version:2.7.5-80.el7_6} data:{vulnerability:package:condition:less than 2.7.5-86.el7} data:{vulnerability:advisories:RHSA-2019:2030,RHSA-2019:1700} data:{vulnerability:cwe_reference:CWE-749} data:{vulnerability:bugzilla_reference:https://bugzilla.redhat.com/show_bug.cgi?id=1695570} data:{vulnerability:reference:https://access.redhat.com/security/cve/CVE-2019-9948} location:vulnerability-detector'
-  **Phase 2: Completed decoding.
-    No decoder matched.
-  **Phase 3: Completed filtering (rules).
-    Rule id: '1002'
-    Level: '2'
-    Description: 'Unknown problem somewhere in the system.'`;
-  };
-
   openUploadFile() {
     this.uploadOpened = !this.uploadOpened;
     this.$scope.$applyAsync();
@@ -446,30 +430,25 @@ export class ManagementController {
     this.uploadFilesProps = {
       msg: this.rulesetTab,
       path: `etc/${this.rulesetTab}`,
-      upload: (files, path) => this.uploadFiles(files, path)
+      upload: (files) => this.uploadFiles(files, this.rulesetTab)
     };
   }
 
   /**
-   * Uploads the files
+   * Uploads the filess
    * @param {Array} files
    * @param {String} path
    */
-  async uploadFiles(files, path) {
+  async uploadFiles(files, resource) {
     try {
       this.errors = false;
       this.results = [];
-      if (path === 'etc/rules') {
-        this.upload = this.rulesetHandler.sendRuleConfiguration;
-      } else if (path === 'etc/decoders') {
-        this.upload = this.rulesetHandler.sendDecoderConfiguration;
-      } else {
-        this.upload = this.rulesetHandler.sendCdbList;
-      }
+      const rulesetHandler = new RulesetHandler(resource);
+
       for (let idx in files) {
         const { file, content } = files[idx];
         try {
-          await this.upload(file, content, true); // True does not overwrite the file
+          await rulesetHandler.updateFile(file, content, true); // True does not overwrite the file
           this.results.push({
             index: idx,
             uploaded: true,

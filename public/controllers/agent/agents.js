@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Agents controller
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -12,26 +12,25 @@
 import { FilterHandler } from '../../utils/filter-handler';
 import { TabNames } from '../../utils/tab-names';
 import * as FileSaver from '../../services/file-saver';
-import { TabDescription } from '../../../server/reporting/tab-description';
-import { UnsupportedComponents } from '../../utils/components-os-support';
+import { WAZUH_MODULES } from '../../../common/wazuh-modules';
 import { visualizations } from '../../templates/agents/visualizations';
 
 import { ConfigurationHandler } from '../../utils/config-handler';
-import { timefilter } from 'ui/timefilter';
 import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { GenericRequest } from '../../react-services/generic-request';
 import { WzRequest } from '../../react-services/wz-request';
-import { toastNotifications } from 'ui/notify';
+import { getToasts }  from '../../kibana-services';
 import { ShareAgent } from '../../factories/share-agent';
 import { TabVisualizations } from '../../factories/tab-visualizations';
-import { TimeService } from '../../react-services/time-service';
+import { formatUIDate } from '../../react-services/time-service';
 import { ErrorHandler } from '../../react-services/error-handler';
 import { GroupHandler } from '../../react-services/group-handler';
 import store from '../../redux/store';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
-import { WAZUH_ALERTS_PATTERN } from '../../../util/constants';
-
+import { WAZUH_ALERTS_PATTERN } from '../../../common/constants';
+import { getDataPlugin } from '../../kibana-services';
+import { hasAgentSupportModule } from '../../react-services/wz-agents';
 export class AgentsController {
   /**
    * Class constructor
@@ -53,7 +52,7 @@ export class AgentsController {
     reportingService,
     visFactoryService,
     csvReq
-    
+
   ) {
     this.$scope = $scope;
     this.$location = $location;
@@ -68,7 +67,6 @@ export class AgentsController {
     this.csvReq = csvReq;
     this.groupHandler = GroupHandler;
     this.wazuhConfig = new WazuhConfig();
-    this.timeService = TimeService;
     this.genericReq = GenericRequest;
 
     // Config on-demand
@@ -116,11 +114,11 @@ export class AgentsController {
   async $onInit() {
     const savedTimefilter = this.commonData.getTimefilter();
     if (savedTimefilter) {
-      timefilter.setTime(savedTimefilter);
+      getDataPlugin().query.timefilter.timefilter.setTime(savedTimefilter);
       this.commonData.removeTimefilter();
     }
 
-    this.$scope.TabDescription = TabDescription;
+    this.$scope.TabDescription = WAZUH_MODULES;
 
     this.$rootScope.reportStatus = false;
 
@@ -480,6 +478,7 @@ export class AgentsController {
    * @param {*} force
    */
   async switchTab(tab, force = false) {
+    const timefilter = getDataPlugin().query.timefilter.timefilter;
     this.tabVisualizations.setTab(tab);
     this.$rootScope.rendered = false;
     this.$rootScope.$applyAsync();
@@ -629,7 +628,7 @@ export class AgentsController {
    */
   addMitrefilter(id) {
     const filter = `{"meta":{"index": ${AppState.getCurrentPattern() || WAZUH_ALERTS_PATTERN}},"query":{"match":{"rule.mitre.id":{"query":"${id}","type":"phrase"}}}}`;
-    this.$rootScope.$emit('addNewKibanaFilter', { 
+    this.$rootScope.$emit('addNewKibanaFilter', {
       filter: JSON.parse(filter)
     });
   }
@@ -655,11 +654,7 @@ export class AgentsController {
 
       const cleanTabs = [];
       tabs.forEach(x => {
-        if (
-          (
-            UnsupportedComponents[(this.$scope.agent || {}).agentPlatform] ||
-            UnsupportedComponents['other']
-          ).includes(x.id)
+        if (!hasAgentSupportModule(this.$scope.agent, x.id)
         )
           return;
 
@@ -685,7 +680,7 @@ export class AgentsController {
   }
 
   showToast = (color, title, text, time) => {
-    toastNotifications.add({
+    getToasts().add({
       color: color,
       title: title,
       text: text,
@@ -730,7 +725,6 @@ export class AgentsController {
   }
 
   checkStatusAgent() {
-    console.log(this.$scope.agent.status);
     if (this.$scope.agent.status !== 'Active') {
       return false;
     } else if (this.$scope.agent.status === 'Active') {
@@ -826,7 +820,6 @@ export class AgentsController {
       }
 
       await this.$scope.switchTab(this.$scope.tab, true);
-
       const groups = await WzRequest.apiReq('GET', '/groups', {});
       this.$scope.groups = groups.data.data.affected_items
         .map(item => item.name)
@@ -848,7 +841,6 @@ export class AgentsController {
           this.$scope.emptyAgent = 'Wazuh API timeout.';
         }
       }
-      ErrorHandler.handle(error, 'Agents');
       if (
         error &&
         typeof error === 'string' &&
@@ -865,20 +857,14 @@ export class AgentsController {
   }
 
   shouldShowComponent(component) {
-    return !(
-      UnsupportedComponents[this.$scope.agent.agentPlatform] ||
-      UnsupportedComponents['other']
-    ).includes(component);
+    return hasAgentSupportModule(this.$scope.agent, component)
   }
 
   cleanExtensions(extensions) {
     const result = {};
     for (const extension in extensions) {
       if (
-        !(
-          UnsupportedComponents[this.$scope.agent.agentPlatform] ||
-          UnsupportedComponents['other']
-        ).includes(extension)
+        hasAgentSupportModule(this.$scope.agent, extension)
       ) {
         result[extension] = extensions[extension];
       }
@@ -915,7 +901,7 @@ export class AgentsController {
    */
   offsetTimestamp(text, time) {
     try {
-      return text + this.timeService.offset(time);
+      return text + formatUIDate(time);
     } catch (error) {
       return time !== '-' ? `${text}${time} (UTC)` : time;
     }

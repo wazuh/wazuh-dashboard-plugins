@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for show main configuration.
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,7 +15,6 @@ import WzReduxProvider from '../../../../../redux/wz-redux-provider';
 import WzConfigurationSwitch from './configuration-switch';
 import { updateGlobalBreadcrumb } from '../../../../../redux/actions/globalBreadcrumbActions';
 import store from '../../../../../redux/store';
-import chrome from 'ui/chrome';
 
 class WzConfigurationMain extends Component {
   constructor(props) {
@@ -46,8 +45,6 @@ class WzConfigurationMain extends Component {
   }
 
   async componentDidMount() {
-    const $injector = await chrome.dangerouslyGetActiveInjector();
-    this.router = $injector.get('$route');
     this.setGlobalBreadcrumb();
   }
 

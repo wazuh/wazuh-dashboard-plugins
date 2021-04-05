@@ -170,7 +170,7 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
   };
 
   return (
-    <EuiFlyout onClose={() => closeFlyout()}>
+    <EuiFlyout className="wzApp" onClose={() => closeFlyout()}>
       <EuiFlyoutHeader hasBorder={false}>
         <EuiTitle size="m">
           <h2>

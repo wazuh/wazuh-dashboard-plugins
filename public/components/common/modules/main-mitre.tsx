@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Integrity monitoring components
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -12,15 +12,21 @@
 
 import React, { Component } from 'react';
 import { Mitre } from '../../../components/overview/mitre/mitre';
+import { withUserAuthorizationPrompt } from '../hocs';
+import { compose } from 'redux';
 
-export class MainMitre extends Component {
-  constructor(props) {
-    super(props);
+export const MainMitre = compose(
+  withUserAuthorizationPrompt([
+    { action: 'mitre:read', resource: '*:*:*' },
+  ])
+)(
+  class MainMitre extends Component {
+    constructor(props) {
+      super(props);
+    }
+
+    render() {
+      return <Mitre {...this.props} />;
+    }
   }
-
-
-
-  render() {
-    return <Mitre {...this.props}/>;
-  }
-}
+);

@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for registering agents.
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,8 @@ const initialState = {
   sortFieldFile: 'filename',
   sortFieldAgents: 'name',
   showAddAgents: false,
-  selectedTabId: 'agents'
+  selectedTabId: 'agents',
+  reload: Date.now()
 };
 
 const groupsReducers = (state = initialState, action) => {
@@ -170,6 +171,12 @@ const groupsReducers = (state = initialState, action) => {
       sortDirectionAgents: 'asc',
       selectedTabId: 'agents',
       itemDetail: false
+    };
+  }
+  if (action.type === 'GROUPS_RELOAD') {
+    return {
+      ...state,
+      reload: Date.now()
     };
   }
   if (action.type === 'RESET') {

@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Module with utilities for Opendistro
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,12 +21,12 @@ const isAuthenticationRequired = (e: any): e is TAuthenticationRequiredError => 
   const statusCode = e.statusCode && e.statusCode === 401;
   const error = e.error && e.error === 'Unauthorized';
   const message = e.message && e.message === 'Authentication required';
-  return statusCode && error && message; 
+  return statusCode && error && message;
 }
 
 export const checkOdfeSessionExpired = (error: AxiosError<TAuthenticationRequiredError>) => {
-  const { data } = (error || {}).response || {}; 
-  if (isAuthenticationRequired(data)) {
+  const { data } = (error || {}).response || {};
+  if (isAuthenticationRequired(data || {})) {
     location.reload();
   }
 }

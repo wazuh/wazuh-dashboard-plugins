@@ -1,7 +1,7 @@
 /*
  * Wazuh app - React component for the adding an API entry form.
  *
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -96,12 +96,13 @@ export class AddApi extends Component {
   }
 
   render() {
-    const apiExample = `hosts:  
+    const apiExample = `hosts:
   - <id>:
      url: <api_url>
      port: <api_port>
      username: <api_username>
-     password: <api_password>`;
+     password: <api_password>
+     run_as: <run_as>`;
 
     const checkConnectionChildren = (
       <div>
@@ -138,7 +139,7 @@ export class AddApi extends Component {
       <div>
         <EuiText>
           Modify{' '}
-          <EuiCode>/usr/share/kibana/optimize/wazuh/config/wazuh.yml</EuiCode>{' '}
+          <EuiCode>/usr/share/kibana/data/wazuh/config/wazuh.yml</EuiCode>{' '}
           to set the connection information.
         </EuiText>
         <EuiSpacer />
@@ -150,7 +151,8 @@ export class AddApi extends Component {
           <EuiCode>{'<api_port>'}</EuiCode> is the port,{' '}
           <EuiCode>{'<api_username>'}</EuiCode> and{' '}
           <EuiCode>{'<api_password>'}</EuiCode> are the credentials to
-          authenticate.
+          authenticate,{' '}
+          <EuiCode>{'<run_as>'}</EuiCode> defines if the app user's permissions depends on the authentication context (<EuiCode>{'true'}</EuiCode> / <EuiCode>{'false'}</EuiCode>).
         </EuiText>
       </div>
     );

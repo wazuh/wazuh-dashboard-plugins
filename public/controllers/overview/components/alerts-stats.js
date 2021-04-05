@@ -1,7 +1,7 @@
 /*
  * Wazuh app - React component for alerts stats.
  *
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,13 +15,13 @@ import { visualizations } from '../../../components/visualize/visualizations';
 import PropTypes from 'prop-types';
 import { EuiStat, EuiFlexItem, EuiFlexGroup } from '@elastic/eui';
 import { connect } from 'react-redux';
-import { getServices } from '../../../../../../src/plugins/discover/public/kibana_services';
 import { buildPhrasesFilter, buildRangeFilter } from '../../../../../../src/plugins/data/common';
 import { esFilters } from '../../../../../../src/plugins/data/common';
 import { getIndexPattern } from '../../../../public/components/overview/mitre/lib';
-import '../../../../public/less/loader';
-import { WAZUH_ALERTS_PATTERN } from '../../../../util/constants';
+//import '../../../../public/less/loader';
+import { WAZUH_ALERTS_PATTERN } from '../../../../common/constants';
 import { AppState } from '../../../react-services/app-state';
+import { getDataPlugin } from '../../../kibana-services';
 
 
 class AlertsStats extends Component {
@@ -82,7 +82,7 @@ class AlertsStats extends Component {
   }
 
   addFilter(filter) {    
-    const { filterManager } = getServices();
+    const { filterManager } = getDataPlugin().query;
     const matchPhrase = {};
     matchPhrase[filter.key] = filter.value;
     const newFilter = {
@@ -102,7 +102,7 @@ class AlertsStats extends Component {
 
   filterLevel() {
     const { indexPattern } = this.state;
-    const { filterManager } = getServices();
+    const { filterManager } = getDataPlugin().query;
     const valuesArray = {gte: 12, lt: null};
     const filters = {
       ...buildRangeFilter({ name: "rule.level", type: "integer" }, valuesArray, indexPattern),
@@ -113,7 +113,7 @@ class AlertsStats extends Component {
 
   filterAuthenticationFailure() {
     const { indexPattern } = this.state;
-    const { filterManager } = getServices();
+    const { filterManager } = getDataPlugin().query;
     const valuesArray = ["win_authentication_failed", "authentication_failed", "authentication_failures"];
     const filters = {
       ...buildPhrasesFilter({ name: "rule.groups", type: "string" }, valuesArray, indexPattern),

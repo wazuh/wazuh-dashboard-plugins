@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React hook for get wazuh-alert index pattern
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -11,15 +11,15 @@
  */
 import { useState, useEffect} from 'react';
 //@ts-ignore
-import { getServices } from '../../../../../../src/plugins/discover/public/kibana_services';
 import { AppState } from '../../../react-services/app-state';
 import { IIndexPattern } from '../../../../../../src/plugins/data/public';
+import { getDataPlugin } from '../../../kibana-services';
 
 export const useIndexPattern = (): IIndexPattern | undefined => {
   const [indexPattern, setIndexPattern] = useState();
   useEffect(() => {
   const idIndexPattern = AppState.getCurrentPattern();
-  getServices().indexPatterns.get(idIndexPattern)
+  getDataPlugin().indexPatterns.get(idIndexPattern)
     .then(setIndexPattern);
   }, []);
   return indexPattern;

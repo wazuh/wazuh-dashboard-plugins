@@ -2,7 +2,7 @@
  * Wazuh app - React component building the welcome screen of an agent.
  * version, OS, registration date, last keep alive.
  *
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,13 +25,13 @@ import {
   EuiOverlayMask
 } from '@elastic/eui'
 // @ts-ignore
-import { getServices } from '../../../../../../../../src/plugins/discover/public/kibana_services';
 import store from '../../../../../redux/store';
 import { updateCurrentAgentData } from '../../../../../redux/actions/appStateActions';
 import { getFimAlerts } from './lib';
-import { TimeService } from '../../../../../react-services/time-service';
+import { formatUIDate } from '../../../../../react-services/time-service';
 import { FlyoutDetail } from '../../../../agents/fim/inventory/flyout'
 import { EuiLink } from '@elastic/eui';
+import { getDataPlugin } from '../../../../../kibana-services';
 
 export function FimEventsTable({ agent, router }) {
   return (
@@ -59,7 +59,7 @@ export function FimEventsTable({ agent, router }) {
 }
 
 export function useTimeFilter() {
-  const { timefilter, } = getServices();
+  const { timefilter, } = getDataPlugin().query.timefilter;
   const [timeFilter, setTimeFilter] = useState(timefilter.getTime());
   useEffect(() => {
     const subscription = timefilter.getTimeUpdate$().subscribe(
@@ -89,7 +89,8 @@ function FimTable({ agent }) {
         {isOpen && (
           <EuiOverlayMask
             headerZindexLocation="below"
-            onClick={() => setIsOpen(false)} >
+            onClick={() => setIsOpen(false)}
+          >
             <FlyoutDetail
             agentId={agent.id}
             closeFlyout={() => setIsOpen(false)}
@@ -109,7 +110,7 @@ function navigateToFim(agent, router) {
 }
 
 const columns = (setFile, setIsOpen) => [
-  { field: '_source.timestamp', name: "Time", sortable: true, render: (field) => TimeService.offset(field), width: '150px' },
+  { field: '_source.timestamp', name: "Time", sortable: true, render: (field) => formatUIDate(field), width: '150px' },
   { field: '_source.syscheck.path', name: "Path", sortable: true, truncateText: true, render: (path) => renderPath(path, setFile, setIsOpen) },
   { field: '_source.syscheck.event', name: "Action", sortable: true, width: '100px' },
   { field: '_source.rule.description', name: "Rule description", sortable: true, truncateText: true },

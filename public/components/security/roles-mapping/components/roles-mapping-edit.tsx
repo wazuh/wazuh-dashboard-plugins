@@ -82,7 +82,7 @@ export const RolesMappingEdit = ({
   };
 
   return (
-    <EuiFlyout onClose={() => closeFlyout(false)}>
+    <EuiFlyout className="wzApp" onClose={() => closeFlyout(false)}>
       <EuiFlyoutHeader hasBorder={false}>
         <EuiTitle size="m">
           <h2>

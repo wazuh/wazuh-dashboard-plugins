@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Saved Objects management service
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -11,8 +11,10 @@
  */
 
 import { GenericRequest } from './generic-request';
-import { getServices } from '../../../../src/plugins/discover/public/kibana_services';
-import { KnownFields } from '../utils/known-fields'
+import { KnownFields } from '../utils/known-fields';
+import { FieldsStatistics } from '../utils/statistics-fields';
+import { FieldsMonitoring } from '../utils/monitoring-fields';
+import { WAZUH_INDEX_TYPE_MONITORING, WAZUH_INDEX_TYPE_STATISTICS, WAZUH_INDEX_TYPE_ALERTS } from '../../common/constants';
 
 export class SavedObject {
   /**
@@ -79,13 +81,9 @@ export class SavedObject {
   }
 
   static async existsOrCreateIndexPattern(patternID) {
-    try {
-      await GenericRequest.request(
-        'GET',
-        `/api/saved_objects/index-pattern/${patternID}`
-      );
-
-    } catch (error) {
+    const result = await SavedObject.existsIndexPattern(patternID);
+    if (!result.data) {
+      const fields = await SavedObject.getIndicesFields(patternID, WAZUH_INDEX_TYPE_ALERTS);
       await this.createSavedObject(
         'index-pattern',
         patternID,
@@ -95,6 +93,7 @@ export class SavedObject {
             timeFieldName: 'timestamp'
           }
         },
+        fields
       );
     }
   }
@@ -157,8 +156,9 @@ export class SavedObject {
           attributes: {
             fields: JSON.stringify(fields),
             timeFieldName: 'timestamp',
-            title: title
-          }
+            title: title,
+            retry_on_conflict: 4,
+          },
         }
       );
       return;
@@ -171,12 +171,18 @@ export class SavedObject {
 
   /**
    * Refresh an index pattern
+   * Optionally force a new field
    */
-  static async refreshIndexPattern(pattern) {
+  static async refreshIndexPattern(pattern, newFields = null) {
     try {
-      const { title: patternTitle } = await getServices().indexPatterns.get(pattern);
-      const fields = await SavedObject.getIndicesFields(pattern);
-      await this.refreshFieldsOfIndexPattern(pattern, patternTitle, fields);
+      const fields = await SavedObject.getIndicesFields(pattern.title, WAZUH_INDEX_TYPE_ALERTS);
+
+      if(newFields && typeof newFields=="object")
+        Object.keys(newFields).forEach((fieldName) => {
+          if (this.isValidField(newFields[fieldName])) fields.push(newFields[fieldName]);
+        });
+
+      await this.refreshFieldsOfIndexPattern(pattern.id, pattern.title, fields);
 
       return;
     } catch (error) {
@@ -188,11 +194,25 @@ export class SavedObject {
   }
 
   /**
+   * Checks the field has a proper structure
+   * @param {index-pattern-field} field 
+   */
+  static isValidField(field) {
+
+    if (field == null || typeof field != "object") return false;
+
+    const isValid = ["name", "type", "esTypes", "searchable", "aggregatable", "readFromDocValues"].reduce((ok, prop) => {
+      return ok && Object.keys(field).includes(prop);
+    }, true)
+    return isValid;
+  }
+
+  /**
    * Creates the 'wazuh-alerts-*'  index pattern
    */
   static async createWazuhIndexPattern(pattern) {
     try {
-      const fields = await SavedObject.getIndicesFields(pattern);
+      const fields = await SavedObject.getIndicesFields(pattern, WAZUH_INDEX_TYPE_ALERTS);
       await this.createSavedObject(
         'index-pattern',
         pattern,
@@ -218,10 +238,19 @@ export class SavedObject {
     }
   }
 
-  static getIndicesFields = async (pattern) => GenericRequest.request(
+  static getIndicesFields = async (pattern, indexType) => GenericRequest.request(
     //we check if indices exist before creating the index pattern
     'GET',
-    `/api/index_patterns/_fields_for_wildcard?pattern=${pattern}`,
+    `/api/index_patterns/_fields_for_wildcard?pattern=${pattern}&meta_fields=_source&meta_fields=_id&meta_fields=_type&meta_fields=_index&meta_fields=_score`,
     {}
-  ).then(response => response.data.fields).catch(() => KnownFields)
+  ).then(response => response.data.fields).catch(() => {
+    switch (indexType) {
+      case WAZUH_INDEX_TYPE_MONITORING:
+        return FieldsMonitoring;
+      case WAZUH_INDEX_TYPE_STATISTICS:
+        return FieldsStatistics;
+      case WAZUH_INDEX_TYPE_ALERTS:
+        return KnownFields
+    }
+  })
 }

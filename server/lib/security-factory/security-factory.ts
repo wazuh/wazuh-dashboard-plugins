@@ -1,17 +1,23 @@
 import { OpendistroFactory, XpackFactory, DefaultFactory } from './factories';
-import { WAZUH_SECURITY_PLUGIN_XPACK_SECURITY, WAZUH_SECURITY_PLUGIN_OPEN_DISTRO_FOR_ELASTICSEARCH } from '../../../util/constants';
+import { KibanaRequest, RequestHandlerContext } from 'src/core/server';
+import { PluginSetup } from '../../types'
 
-export interface ISecurityFactory {
-  getCurrentUser(req): Promise<{ user }> 
+type CurrentUser = {
+  username?: string 
+  authContext: {[key:string]: any}
 }
 
-export function SecurityObj(platform, server) {
-  switch(platform){
-    case WAZUH_SECURITY_PLUGIN_XPACK_SECURITY:
-      return new XpackFactory(server);
-    case WAZUH_SECURITY_PLUGIN_OPEN_DISTRO_FOR_ELASTICSEARCH:
-      return new OpendistroFactory(server);
-    default:
-      return new DefaultFactory(server);
+export interface ISecurityFactory {
+  platform?: string
+  getCurrentUser(request: KibanaRequest, context?:RequestHandlerContext): Promise<CurrentUser> 
+}
+
+export function SecurityObj({security, opendistroSecurityKibana}:PluginSetup): ISecurityFactory {
+  if (!!security) {
+    return new XpackFactory(security);
+  } else if (!!opendistroSecurityKibana) {
+    return new OpendistroFactory(opendistroSecurityKibana);
+  } else {
+    return new DefaultFactory();
   }
 }

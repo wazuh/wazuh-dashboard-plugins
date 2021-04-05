@@ -1,6 +1,6 @@
 const chai = require('chai');
 const needle = require('needle');
-const { WAZUH_ALERTS_PATTERN } = require('../../util/constants');
+const { WAZUH_ALERTS_PATTERN } = require('../../common/constants');
 
 const kibanaServer = process.env.KIBANA_IP || 'localhost';
 
@@ -12,20 +12,6 @@ const headers = {
 
 describe('wazuh-elastic', () => {
   describe('Checking index patterns', () => {
-    it('GET /elastic/index-patterns', async () => {
-      const res = await needle(
-        'get',
-        `${kibanaServer}:5601/elastic/index-patterns`,
-        {},
-        headers
-      );
-      res.body.data.should.be.a('array');
-      res.body.data.length.should.be.gt(0);
-      res.body.data[0].should.be.a('object');
-      res.body.data[0].id.should.be.a('string');
-      res.body.data[0].title.should.be.a('string');
-    });
-
     it('GET /elastic/known-fields/{pattern}', async () => {
       const res = await needle(
         'get',

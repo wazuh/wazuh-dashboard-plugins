@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Overview -> general test
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 import expect from '@kbn/expect';
 import { FtrProviderContext } from '../../../../../../test/functional/ftr_provider_context';
 import { SearchParams } from 'elasticsearch';
-import { WAZUH_ALERTS_PATTERN } from '../../../../util/constants';
+import { WAZUH_ALERTS_PATTERN } from '../../../../common/constants';
 
 export default function({getService, getPageObjects, }: FtrProviderContext) {
   const areaChart = getService('areaChart');

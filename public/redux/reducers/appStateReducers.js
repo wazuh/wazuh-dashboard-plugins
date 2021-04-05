@@ -1,6 +1,6 @@
 /*
  * Wazuh app - App State Reducers
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,9 +21,14 @@ const initialState = {
   currentAgentData: {},
   showExploreAgentModal: false,
   showExploreAgentModalGlobal: false,
-  userPermissions: {},
+  userPermissions: false,
   userRoles: [],
-  toastNotification: false
+  toastNotification: false,
+  clusterStatus: {
+    status: false,
+    contextConfigServer: 'manager',
+  },
+ withUserLogged: false,
 };
 
 const appStateReducers = (state = initialState, action) => {
@@ -33,7 +38,7 @@ const appStateReducers = (state = initialState, action) => {
       currentAPI: action.currentAPI
     };
   }
-  
+
   if (action.type === 'SHOW_MENU') {
     return {
       ...state,
@@ -120,6 +125,20 @@ const appStateReducers = (state = initialState, action) => {
     };
   }
 
+  if (action.type === 'UPDATE_CLUSTER_STATUS') {
+    return {
+      ...state,
+      clusterStatus: action.clusterStatus,
+    };
+  }
+
+  if (action.type === 'UPDATE_WITH_USER_LOGGED') {
+    return {
+      ...state,
+     withUserLogged: action.withUserLogged,
+    };
+  }  
+  
   return state;
 };
 

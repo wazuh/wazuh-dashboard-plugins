@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for Visualize.
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@ import {
   EuiFlexGroup,
   EuiPanel,
   EuiFlexItem,
+  EuiButton,
   EuiButtonIcon,
   EuiDescriptionList,
   EuiCallOut,
@@ -32,9 +33,9 @@ import { VisHandlers } from '../../factories/vis-handlers';
 import { RawVisualizations } from '../../factories/raw-visualizations';
 import { Metrics } from '../overview/metrics/metrics';
 import { PatternHandler } from '../../react-services/pattern-handler';
-import { toastNotifications } from 'ui/notify';
+import { getToasts } from '../../kibana-services';
 import { SecurityAlerts } from './components';
-import { getServices } from '../../../../../src/plugins/discover/public/kibana_services';
+import { toMountPoint } from '../../../../../src/plugins/kibana_react/public';
 
 const visHandler = new VisHandlers();
 
@@ -50,7 +51,6 @@ export class WzVisualize extends Component {
       refreshingKnownFields: [],
       refreshingIndex: true
     };
-    this.KibanaServices =  getServices();
     this.metricValues = false;
     this.rawVisualizations = new RawVisualizations();
     this.wzReq = WzRequest;
@@ -60,11 +60,12 @@ export class WzVisualize extends Component {
     this.monitoringEnabled = !!(configuration || {})[
       'wazuh.monitoring.enabled'
     ];
+    this.newFields={};
   }
 
 
   showToast(color, title = '', text = '', time = 3000) {
-    toastNotifications.add({
+    getToasts().add({
       color: color,
       title: title,
       text: text,
@@ -74,7 +75,7 @@ export class WzVisualize extends Component {
 
   async componentDidMount() {
     this._isMount = true;
-    // visHandler.removeAll();
+    visHandler.removeAll();
     this.agentsStatus = false;
     if (!this.monitoringEnabled) {
       const data = await this.wzReq.apiReq('GET', '/agents/summary/status', {});
@@ -128,14 +129,17 @@ export class WzVisualize extends Component {
     this.setState({ expandedVis: this.state.expandedVis === id ? false : id });
   };
 
-  refreshKnownFields = async () => {
+  refreshKnownFields = async ( newField = null ) => {
+    if(newField && newField.name){
+      this.newFields[newField.name] = newField;
+    }
     if (!this.state.hasRefreshedKnownFields) { // Known fields are refreshed only once per dashboard loading
       try {
         this.setState({ hasRefreshedKnownFields: true, isRefreshing: true });
-        await PatternHandler.refreshIndexPattern();
+        await PatternHandler.refreshIndexPattern(this.newFields);
         this.setState({ isRefreshing: false });
-        this.showToast('success', 'The index pattern was refreshed successfully.');
-
+        this.reloadToast();
+        this.newFields={};
       } catch (err) {
         this.setState({ isRefreshing: false });
         this.showToast('danger', 'The index pattern could not be refreshed');
@@ -146,7 +150,21 @@ export class WzVisualize extends Component {
       await this.refreshKnownFields();
     }
   }
-
+  reloadToast = () => {
+    getToasts().add({
+      color: 'success',
+      title: 'The index pattern was refreshed successfully.',
+      text: toMountPoint(<EuiFlexGroup justifyContent="flexEnd" gutterSize="s">
+        <EuiFlexItem grow={false}>
+          There were some unknown fields for the current index pattern.
+          You need to refresh the page to apply the changes.
+        </EuiFlexItem>
+        <EuiFlexItem grow={false}>
+          <EuiButton onClick={() => window.location.reload()} size="s">Reload page</EuiButton>
+        </EuiFlexItem>
+      </EuiFlexGroup>)
+    })
+  }
   render() {
     const { visualizations } = this.state;
     const { selectedTab } = this.props;
@@ -252,8 +270,8 @@ export class WzVisualize extends Component {
           </div>
         )}
         <EuiFlexItem className={this.props.resultState === 'none' && 'no-opacity' || ''}>
-
-          <Metrics section={selectedTab} resultState={this.props.resultState} />
+          {this.props.resultState === 'ready' &&
+            < Metrics section={selectedTab} resultState={this.props.resultState} />}
 
           {selectedTab &&
             selectedTab !== 'welcome' &&
@@ -278,36 +296,36 @@ export class WzVisualize extends Component {
               );
             })}
         </EuiFlexItem>
-        <EuiFlexGroup style={{margin: 0}}>
+        <EuiFlexGroup style={{ margin: 0 }}>
           <EuiFlexItem>
-            {this.props.selectedTab === "general" && this.props.resultState !== "none" && 
+            {this.props.selectedTab === "general" && this.props.resultState !== "none" &&
 
-          <EuiPanel
-          paddingSize="none"
-          className={
-            this.state.expandedVis === 'security-alerts' ? 'fullscreen h-100 wz-overflow-y-auto wz-overflow-x-hidden' : 'h-100'
-          }
-        >
-          <EuiFlexItem className="h-100" style={{marginBottom: 12}}>
-            <EuiFlexGroup
-              style={{ padding: '12px 12px 0px' }}
-              className="embPanel__header"
-            >
-              <h2 className="embPanel__title wz-headline-title">
-                Security Alerts
+              <EuiPanel
+                paddingSize="none"
+                className={
+                  this.state.expandedVis === 'security-alerts' ? 'fullscreen h-100 wz-overflow-y-auto wz-overflow-x-hidden' : 'h-100'
+                }
+              >
+                <EuiFlexItem className="h-100" style={{ marginBottom: 12 }}>
+                  <EuiFlexGroup
+                    style={{ padding: '12px 12px 0px' }}
+                    className="embPanel__header"
+                  >
+                    <h2 className="embPanel__title wz-headline-title">
+                      Security Alerts
               </h2>
-              <EuiButtonIcon
-                color="text"
-                style={{ padding: '0px 6px', height: 30 }}
-                onClick={() => this.expand('security-alerts')}
-                iconType="expand"
-                aria-label="Expand"
-              />
-            </EuiFlexGroup>
-            <SecurityAlerts />
+                    <EuiButtonIcon
+                      color="text"
+                      style={{ padding: '0px 6px', height: 30 }}
+                      onClick={() => this.expand('security-alerts')}
+                      iconType="expand"
+                      aria-label="Expand"
+                    />
+                  </EuiFlexGroup>
+                  <SecurityAlerts />
 
-          </EuiFlexItem>
-        </EuiPanel>
+                </EuiFlexItem>
+              </EuiPanel>
             }
           </EuiFlexItem>
         </EuiFlexGroup>

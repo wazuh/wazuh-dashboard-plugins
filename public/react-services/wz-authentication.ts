@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Authentication service for Wazuh
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,9 +14,9 @@ import { WzRequest } from './wz-request';
 import { AppState } from './app-state';
 import jwtDecode from 'jwt-decode';
 import store from '../redux/store';
-import { updateUserPermissions, updateUserRoles } from '../redux/actions/appStateActions';
-import { WAZUH_ROLE_ADMINISTRATOR_ID, WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../util/constants';
-import { toastNotifications } from 'ui/notify';
+import { updateUserPermissions, updateUserRoles, updateWithUserLogged } from '../redux/actions/appStateActions';
+import { WAZUH_ROLE_ADMINISTRATOR_ID, WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../common/constants';
+import { getToasts } from '../kibana-services';
 
 
 export class WzAuthentication{
@@ -27,7 +27,9 @@ export class WzAuthentication{
         await new Promise(r => setTimeout(r, 500));
         idHost = JSON.parse(AppState.getCurrentAPI()).id;
       }
+
       const response = await WzRequest.genericReq('POST', '/api/login', { idHost, force });
+
       const token = ((response || {}).data || {}).token;
       return token as string;
     }catch(error){
@@ -35,27 +37,32 @@ export class WzAuthentication{
     }
   }
   static async refresh(force = false){
-    try{
+    try {
       // Get user token
       const token: string = await WzAuthentication.login(force);
       if(!token){
+        // Remove old existent token
+        await WzAuthentication.deleteExistentToken();
         return;
       }
+
       // Decode token and get expiration time
       const jwtPayload = jwtDecode(token);
-      
+
       // Get user Policies
       const userPolicies = await WzAuthentication.getUserPolicies();
       // Dispatch actions to set permissions and roles
       store.dispatch(updateUserPermissions(userPolicies));
       store.dispatch(updateUserRoles(WzAuthentication.mapUserRolesIDToAdministratorRole(jwtPayload.rbac_roles || [])));
+      store.dispatch(updateWithUserLogged(true));
     }catch(error){
-      toastNotifications.add({
+      getToasts().add({
         color: 'danger',
         title: 'Error getting the authorization token',
         text: error.message || error,
         toastLifeTimeMs: 300000
       });
+      store.dispatch(updateWithUserLogged(true));
       return Promise.reject(error);
     }
   }
@@ -73,10 +80,18 @@ export class WzAuthentication{
       return Promise.reject(error);
     }
   }
+
   private static mapUserRolesIDToAdministratorRole(roles){
     return roles.map((role: number) => role === WAZUH_ROLE_ADMINISTRATOR_ID ? WAZUH_ROLE_ADMINISTRATOR_NAME : role);
   }
-  static logout(){
-    //TODO: logout
+
+  static async deleteExistentToken() {
+    try {
+      const response = await WzRequest.apiReq('DELETE','/security/user/authenticate', {});
+
+      return ((response || {}).data || {}).data || {};
+    } catch (error) {
+      throw error;
+    }
   }
 }
