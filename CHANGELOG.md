@@ -2,7 +2,33 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-- Changed name for "TCP sessions" visualization [#3118](https://github.com/wazuh/wazuh-kibana-app/pull/3118)
+## Wazuh v4.2.0 - Kibana 7.10.0 , 7.10.2 - Revision 4201
+
+### Added
+
+- Added Tools on wazuh menu with Dev Console and Logtest [#1434](https://github.com/wazuh/wazuh-kibana-app/pull/1434)
+- Add a message to restart cluster or manager after import a file in Rules, Decoders or CDB Lists [#3051](https://github.com/wazuh/wazuh-kibana-app/pull/3051)
+- Add `logtest` PUT example on API Console [#3061](https://github.com/wazuh/wazuh-kibana-app/pull/3061)
+
+### Changed
+
+- Changed position of Top users on Integrity Monitoring Top 5 user. [#2892](https://github.com/wazuh/wazuh-kibana-app/pull/2892)
+
+### Fixed
+
+- Fixed missing `pending` status suggestion for agents [#3095](https://github.com/wazuh/wazuh-kibana-app/pull/3095)
+- Index pattern setting not used for choosing from existing patterns [#3097](https://github.com/wazuh/wazuh-kibana-app/pull/3097)
+- Fix space character missing on deployment command if UDP is configured [#3108](https://github.com/wazuh/wazuh-kibana-app/pull/3108)
+- Fixed name for "TCP sessions" visualization and average metric is now a sum [#3118](https://github.com/wazuh/wazuh-kibana-app/pull/3118)
+
+
+## Wazuh v4.1.4 - Kibana 7.10.0 , 7.10.2 - Revision 4105
+
+- Adapt for Wazuh 4.1.4
+
+## Wazuh v4.1.4 - Kibana 7.10.0 , 7.10.2 - Revision 4105
+
+- Adapt for Wazuh 4.1.4
 
 ## Wazuh v4.1.3 - Kibana 7.10.0 , 7.10.2 - Revision 4104
 
@@ -163,7 +189,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed ping request to default request. Added delay and while to che… [#2820](https://github.com/wazuh/wazuh-kibana-app/issues/2820)
 - Removed kibana alert for security [#2806](https://github.com/wazuh/wazuh-kibana-app/issues/2806)
 
-## Wazuh v4.0.4 - Kibana 7.10.0 , 7.10.2 - Revision 4016
+## Wazuh v4.0.4 - Kibana v7.9.1, v7.9.3 - Revision 4016
 
 ### Added
 

@@ -1,6 +1,11 @@
 <!-- head -->
 <div ng-cloak ng-controller="managementController as mctrl">
   <!-- Navigation section -->
+
+  <div flex="30" ng-if="mctrl.logtestOpened" class="md-padding logtest-side">
+    <react-component name="Logtest" props="mctrl.logtestProps"></react-component>
+  </div>
+
   <div
     layout="row"
     layout-align="start center"
@@ -493,7 +498,7 @@
     ng-controller="groupsPreviewController as gp"
     ng-if="mctrl.tab == 'groups'"
   >
-    <!-- TODO - 
+    <!-- TODO -
         - remove GroupsPreviewController
         - add 'Manage agents' section to the Groups component
     -->
