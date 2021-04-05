@@ -138,13 +138,13 @@ export default [
       },
       {
         name: 'Active Response',
-        description: 'Active threat addressing by inmmediate response',
+        description: 'Active threat addressing by immediate response',
         goto: 'active-response',
         when: 'manager'
       },
       {
         name: 'Active response',
-        description: 'Active threat addressing by inmmediate response',
+        description: 'Active threat addressing by immediate response',
         goto: 'active-response-agent',
         when: 'agent'
       },

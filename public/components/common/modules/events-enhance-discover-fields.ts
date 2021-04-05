@@ -104,7 +104,8 @@ export const EventsEnhanceDiscoverCell = {
     },
     currentTechnique: content
   }), {
-    contentRegex: /(\w+)/g
+    contentRegex: /(\w+)/g,
+    element: 'span'
   })
 }
 
