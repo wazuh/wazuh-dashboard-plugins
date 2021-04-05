@@ -48,7 +48,6 @@ import 'brace/ext/language_tools';
 import "brace/ext/searchbox";
 import { showFlyoutLogtest } from '../../../../../redux/actions/appStateActions';
 
-
 class WzRulesetEditor extends Component {
   _isMounted = false;
   constructor(props) {
@@ -300,7 +299,6 @@ class WzRulesetEditor extends Component {
               {this.state.showWarningRestart && (
                 <Fragment>
                   <WzRestartClusterManagerCallout
-                    onRestart={() => this.setState({ showWarningRestart: true })}
                     onRestarted={() => this.setState({ showWarningRestart: false })}
                     onRestartedError={() => this.setState({ showWarningRestart: true })}
                   />

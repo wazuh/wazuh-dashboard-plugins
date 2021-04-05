@@ -1,0 +1,12 @@
+{
+    "buildSourcePatterns": [
+      "package.json",
+      "LICENSE",
+      "tsconfig.json",
+      "index.js",
+      "init.js",
+      "server/**/*",
+      "public/**/*",
+      "common/**/*"
+    ]
+}
