@@ -31,7 +31,7 @@ import {
   EuiLoadingSpinner
 } from '@elastic/eui';
 import { CheckUpgrade } from './checkUpgrade';
-import { getToasts }  from '../../../kibana-services';
+import { getToasts } from '../../../kibana-services';
 import { WzRequest } from '../../../react-services/wz-request';
 import { ActionAgents } from '../../../react-services/action-agents';
 import { AppNavigate } from '../../../react-services/app-navigate';
@@ -59,7 +59,7 @@ export class AgentsTable extends Component {
       filters: sessionStorage.getItem('agents_preview_selected_options') ? JSON.parse(sessionStorage.getItem('agents_preview_selected_options')) : []
     };
     this.suggestions = [
-      { type: 'q', label: 'status', description: 'Filter by agent connection status', operators: ['=', '!=',], values: ['active', 'disconnected', 'never_connected'] },
+      { type: 'q', label: 'status', description: 'Filter by agent connection status', operators: ['=', '!=',], values: ['active', 'disconnected', 'never_connected', 'pending'] },
       { type: 'q', label: 'os.platform', description: 'Filter by OS platform', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('os.platform', value, { q: 'id!=000' }) },
       { type: 'q', label: 'ip', description: 'Filter by agent IP', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('ip', value, { q: 'id!=000' }) },
       { type: 'q', label: 'name', description: 'Filter by agent name', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('name', value, { q: 'id!=000' }) },
@@ -110,7 +110,7 @@ export class AgentsTable extends Component {
 
   componentWillUnmount() {
     this._isMount = false;
-    if(sessionStorage.getItem('agents_preview_selected_options')){
+    if (sessionStorage.getItem('agents_preview_selected_options')) {
       sessionStorage.removeItem('agents_preview_selected_options');
     }
   }
@@ -228,7 +228,7 @@ export class AgentsTable extends Component {
     return q === '' ? `id!=000` : `id!=000;${q}`;
   }
 
-  formatAgent(agent) {       
+  formatAgent(agent) {
     const checkField = field => {
       return field !== undefined ? field : '-';
     };
@@ -236,10 +236,10 @@ export class AgentsTable extends Component {
       return date !== undefined ? formatUIDate(date) : '-';
     };
     const agentVersion =
-    agent.version !== undefined ? agent.version.split(' ')[1] : '-';
+      agent.version !== undefined ? agent.version.split(' ')[1] : '-';
     const { timeService } = this.props;
     const node_name = agent.node_name && agent.node_name !== 'unknown' ? agent.node_name : '-';
-    
+
     return {
       id: agent.id,
       name: agent.name,
@@ -359,7 +359,7 @@ export class AgentsTable extends Component {
     const filters = this.buildFilter();
     const formatedFilters = Object.keys(filters)
       .filter(field => !['limit', 'offset', 'sort'].includes(field))
-      .map(field => ({name: field, value: filters[field]}))
+      .map(field => ({ name: field, value: filters[field] }))
     this.props.downloadCsv(formatedFilters);
   };
   formattedButton() {
@@ -868,7 +868,7 @@ export class AgentsTable extends Component {
     };
 
     const getCellProps = (item, column) => {
-      if(column.field=="actions"){
+      if (column.field == "actions") {
         return
       }
       return {
