@@ -27,10 +27,10 @@ import {
   EuiTitle,
   EuiToolTip,
   EuiButtonIcon,
-  EuiButtonEmpty,
+  EuiButton,
   EuiFieldText,
   EuiCodeEditor,
-  EuiPanel,
+  EuiPanel
 } from '@elastic/eui';
 
 import { resourceDictionary, RulesetHandler, RulesetResources } from './utils/ruleset-handler';
@@ -46,7 +46,6 @@ import 'brace/mode/xml';
 import 'brace/snippets/xml';
 import 'brace/ext/language_tools';
 import "brace/ext/searchbox";
-import { showFlyoutLogtest } from '../../../../../redux/actions/appStateActions';
 
 
 class WzRulesetEditor extends Component {
@@ -117,7 +116,7 @@ class WzRulesetEditor extends Component {
 
         this.setState({ isSaving: false });
         this.goToEdit(name);
-
+       
         if (this.props.state.addingRulesetFile != false) {
           //remove current invalid file if the file is new.
           await this.rulesetHandler.deleteFile(name);
@@ -184,7 +183,6 @@ class WzRulesetEditor extends Component {
     } = this.props.state;
     const { wazuhNotReadyYet } = this.props;
     const { name, content, path, showWarningRestart } = this.state;
-    const isRules = path.includes('rules') ? 'Ruleset Test' : 'Decoders Test';
 
     const isEditable = addingRulesetFile
       ? true
@@ -196,44 +194,17 @@ class WzRulesetEditor extends Component {
     const overwrite = fileContent ? true : false;
 
     const xmlError = validateXML(content);
-
-    const onClickOpenLogtest = () => {
-      this.props.logtestProps.openCloseFlyout();
-      this.props.showFlyoutLogtest(true);
-    }
-
-    const buildLogtestButton = () => {
-      return (
-        <EuiButtonEmpty
-          color="primary"
-          iconType="documentEdit"
-          style={{ margin: '0px 8px', cursor: 'pointer' }}
-          onClick={onClickOpenLogtest}
-        >
-          {isRules}
-        </EuiButtonEmpty>
-      );
-    };
-
-    const headerButtons = (
-      <>
-        {buildLogtestButton()}
-        <WzButtonPermissions
-          permissions={[
-            {
-              action: `${section}:update`,
-              resource: resourceDictionary[section].permissionResource(nameForSaving),
-            },
-          ]}
-          fill
-          iconType={isEditable && xmlError ? 'alert' : 'save'}
-          isLoading={this.state.isSaving}
-          isDisabled={nameForSaving.length <= 4 || (!!(isEditable && xmlError))}
-          onClick={() => this.save(nameForSaving, overwrite)}
-        >
-          {isEditable && xmlError ? 'XML format error' : 'Save'}
-        </WzButtonPermissions>
-      </>
+    const saveButton = (
+      <WzButtonPermissions
+        permissions={[{ action: `${section}:update`, resource: resourceDictionary[section].permissionResource(nameForSaving) }]}
+        fill
+        iconType={(isEditable && xmlError) ? "alert" : "save"}
+        isLoading={this.state.isSaving}
+        isDisabled={nameForSaving.length <= 4 || (isEditable && xmlError ? true : false)}
+        onClick={() => this.save(nameForSaving, overwrite)}
+      >
+        {(isEditable && xmlError) ? 'XML format error' : 'Save'}
+      </WzButtonPermissions>
     );
 
     return (
@@ -293,7 +264,7 @@ class WzRulesetEditor extends Component {
                 <EuiFlexItem />
                 {/* This flex item is for separating between title and save button */}
                 {isEditable && (
-                  <EuiFlexItem style={{ display: 'block' }} grow={false}>{headerButtons}</EuiFlexItem>
+                  <EuiFlexItem grow={false}>{saveButton}</EuiFlexItem>
                 )}
               </EuiFlexGroup>
               <EuiSpacer size="m" />
@@ -344,8 +315,7 @@ class WzRulesetEditor extends Component {
 const mapStateToProps = state => {
   return {
     state: state.rulesetReducers,
-    wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet,
-    showFlyout: state.appStateReducers.showFlyoutLogtest,
+    wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet
   };
 };
 
@@ -353,8 +323,7 @@ const mapDispatchToProps = dispatch => {
   return {
     cleanInfo: () => dispatch(cleanInfo()),
     updateFileContent: content => dispatch(updateFileContent(content)),
-    updateWazuhNotReadyYet: wazuhNotReadyYet => dispatch(updateWazuhNotReadyYet(wazuhNotReadyYet)),
-    showFlyoutLogtest: showFlyout => dispatch(showFlyoutLogtest(showFlyout)),
+    updateWazuhNotReadyYet: wazuhNotReadyYet => dispatch(updateWazuhNotReadyYet(wazuhNotReadyYet))
   };
 };
 
