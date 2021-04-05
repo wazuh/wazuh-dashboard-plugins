@@ -128,7 +128,7 @@ export class AgentSelectionTable extends Component {
       },
     ];
     this.suggestions = [
-      { type: 'q', label: 'status', description: 'Filter by agent connection status', operators: ['=', '!=',], values: ['active', 'disconnected', 'never_connected'] },
+      { type: 'q', label: 'status', description: 'Filter by agent connection status', operators: ['=', '!=',], values: ['active', 'disconnected', 'never_connected', 'pending'] },
       { type: 'q', label: 'os.platform', description: 'Filter by OS platform', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('os.platform', value, { q: 'id!=000'})},
       { type: 'q', label: 'ip', description: 'Filter by agent IP', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('ip', value, { q: 'id!=000'})},
       { type: 'q', label: 'name', description: 'Filter by agent name', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('name', value, { q: 'id!=000'})},
@@ -528,7 +528,7 @@ export class AgentSelectionTable extends Component {
   unselectAgents(){
     this._isMounted && this.setState({itemIdToSelectedMap: {}});
     store.dispatch(updateCurrentAgentData({}));
-    this.props.removeAgentsFilter();      
+    this.props.removeAgentsFilter();
   }
 
   getSelectedCount(){
@@ -543,7 +543,7 @@ export class AgentSelectionTable extends Component {
       this.props.updateAgentSearch([agentID]);
     }catch(error){
       store.dispatch(updateCurrentAgentData({}));
-      this.props.removeAgentsFilter(true);      
+      this.props.removeAgentsFilter(true);
     }
   }
 
@@ -581,7 +581,7 @@ export class AgentSelectionTable extends Component {
     const { filters } = this.state;
     let auxFilters = filters.map( filter => filter.value.match(/group=(.*S?)/)[1] );
     if (filters.length > 0) {
-      !auxFilters.includes(group) ? 
+      !auxFilters.includes(group) ?
       this.setState({
         filters: [...filters, {field: "q", value: `group=${group}`}],
       }) : false;
@@ -600,7 +600,7 @@ export class AgentSelectionTable extends Component {
         label={'more'}
         action={'filter'}
         filterAction={this.filterGroupBadge}
-        {...this.props} /> 
+        {...this.props} />
     ) : groups
   }
 
@@ -646,7 +646,7 @@ export class AgentSelectionTable extends Component {
                     iconType="pinFilled"
                     aria-label="unpin agent"
                   />
-                </EuiToolTip> 
+                </EuiToolTip>
               </EuiFlexItem>
             </EuiFlexGroup>
             <EuiSpacer size="m" />
