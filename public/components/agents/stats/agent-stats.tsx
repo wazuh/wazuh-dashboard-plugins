@@ -23,7 +23,7 @@ import {
 
 import { withGlobalBreadcrumb, withReduxProvider, withGuard, withUserAuthorizationPrompt } from '../../common/hocs';
 import { compose } from 'redux';
-import { WzRequest, TimeService } from '../../../react-services';
+import { WzRequest, formatUIDate } from '../../../react-services';
 import { AgentStatTable } from './table';
 import { PromptNoActiveAgentWithoutSelect, PromptAgentFeatureVersion } from '../prompts';
 
@@ -70,12 +70,12 @@ const statsAgents: {title: string, field: string, render?: (value) => any}[] = [
   {
     title: 'Last ack',
     field: 'last_ack',
-    render: TimeService.offset
+    render: formatUIDate
   },
   {
     title: 'Last keep alive',
     field: 'last_keepalive',
-    render: TimeService.offset
+    render: formatUIDate
   }
 ];
 
@@ -97,7 +97,7 @@ export const MainAgentStats = compose(
   withUserAuthorizationPrompt((agent) => [{action: 'agent:read', resource: `agent:id:${agent.id}`}]),
   withGuard(({agent}) => agent.status !== 'active', PromptNoActiveAgentWithoutSelect),
   withGuard(({agent}) => {
-    const [major, minor, patch] = agent.version.replace('Wazuh v','').split('.').map(parseInt);
+    const [major, minor, patch] = agent.version.replace('Wazuh v','').split('.').map(value => parseInt(value));
     return !(major >= 4 && minor >= 2 && patch >= 0)
   }, () => <PromptAgentFeatureVersion version='equal or higher version than 4.2.0'/>)
 )(AgentStats);

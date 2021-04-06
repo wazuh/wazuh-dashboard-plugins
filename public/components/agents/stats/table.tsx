@@ -24,7 +24,7 @@ import {
 } from '@elastic/eui';
 import * as FileSaver from '../../../services/file-saver';
 import { getToasts } from '../../../kibana-services';
-import moment from 'moment';
+import { formatUIDate } from '../../../react-services';
 
 export function AgentStatTable({columns, title, start, end, loading, items, exportCSVFilename}){
   return (
@@ -34,7 +34,7 @@ export function AgentStatTable({columns, title, start, end, loading, items, expo
           <EuiText>{title}</EuiText>
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
-          <EuiText><EuiIcon type='calendar'/> Start: {loading ? <EuiLoadingSpinner size="s" /> : (start || '-') } - End: {loading ? <EuiLoadingSpinner size="s" /> : (end || '-') }</EuiText>
+          <EuiText><EuiIcon type='calendar'/> Start: {loading ? <EuiLoadingSpinner size="s" /> : (start ? formatUIDate(start) : '-') } - End: {loading ? <EuiLoadingSpinner size="s" /> : (end ? formatUIDate(end) : '-') }</EuiText>
         </EuiFlexItem>
       </EuiFlexGroup>
       <EuiHorizontalRule margin="xs"/>
