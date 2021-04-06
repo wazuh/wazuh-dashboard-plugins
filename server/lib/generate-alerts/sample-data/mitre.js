@@ -26,8 +26,8 @@ export const arrayMitreRules = [
     nist_800_53: ['AU.6', 'AU.14', 'AU.5'],
     tsc: ['CC7.2', 'CC7.3', 'CC6.8'],
     mitre: { tactic: ['Defense Evasion'], id: ['T1089'], technique: ['Disabling Security Tools'] },
-    groups: ['wazuh'],
-    description: 'Wazuh agent disconnected.',
+    groups: ['ossec'],
+    description: 'Ossec agent disconnected.',
   },
   {
     filename: '0015-ossec_rules.xml',
@@ -44,7 +44,7 @@ export const arrayMitreRules = [
     tsc: ['CC7.2', 'CC7.3', 'CC6.8'],
     mitre: { tactic: ['Defense Evasion'], id: ['T1089'], technique: ['Disabling Security Tools'] },
     groups: ['ossec'],
-    description: 'ossec agent removed.',
+    description: 'Ossec agent removed.',
   },
   {
     filename: '0015-ossec_rules.xml',
