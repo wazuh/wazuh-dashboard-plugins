@@ -240,6 +240,7 @@ class KibanaVis extends Component {
     const timefilter = getDataPlugin().query.timefilter.timefilter;
     try {
       const discoverList = this.discoverPendingUpdates.getList();
+      const filterEvolutionExists = discoverList[1] ? discoverList[1].some(element => element.meta.key == 'status') : false
       const isAgentStatus =
         this.visID === "Wazuh-App-Overview-General-Agents-status";
       const timeFilterSeconds = this.calculateTimeFilterSeconds(
@@ -259,7 +260,9 @@ class KibanaVis extends Component {
       } catch (ex) {
         console.warning(`kibana-vis exception: ${ex.message || ex}`);
       }
+      const filterEvolution = filterEvolutionExists ? discoverList[1].find(element => element.meta.key == 'status') : {}
       const agentsFilters = this.getUserAgentsFilters(vizPattern);
+      Object.keys(filterEvolution).length !== 0 ? filters.push(filterEvolution) : null;
       Object.keys(agentsFilters).length !== 0 ? filters.push(agentsFilters) : null;
 
       const visInput = {
