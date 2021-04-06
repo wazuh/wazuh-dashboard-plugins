@@ -23,6 +23,7 @@ import { Role } from '../../roles/types/role.type';
 import { CreateUser as TCreateUser } from '../types/user.type';
 import UsersServices from '../services';
 import RolesServices from '../../roles/services';
+import { WzButtonPermissions } from '../../../common/permissions/button';
 import { ErrorHandler } from '../../../../react-services/error-handler';
 import { useDebouncedEffect } from '../../../common/hooks/useDebouncedEffect';
 
@@ -39,6 +40,7 @@ export const CreateUser = ({ closeFlyout }) => {
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [allowRunAs, setAllowRunAs] = useState<boolean>(false);
   const [formErrors, setFormErrors] = useState<any>({
     userName: '',
     password: '',
@@ -136,6 +138,7 @@ export const CreateUser = ({ closeFlyout }) => {
 
     setIsLoading(true);
 
+    const allowRunAsData: boolean = allowRunAs;
     const userData: TCreateUser = {
       username: userName,
       password: password,
@@ -144,6 +147,8 @@ export const CreateUser = ({ closeFlyout }) => {
     try {             
       const user = await UsersServices.CreateUser(userData);
       await addRoles(user.id);
+      if (allowRunAsData)
+        await UsersServices.UpdateAllowRunAs(user.id, allowRunAsData);
 
       ErrorHandler.info('User was successfully created');
       closeFlyout(true);
@@ -176,6 +181,9 @@ export const CreateUser = ({ closeFlyout }) => {
     setConfirmPassword(e.target.value);
   };
 
+  const onChangeAllowRunAs = e => {
+    setAllowRunAs(e.target.checked);
+  };
 
   return (
     <EuiFlyout className="wzApp" onClose={() => closeFlyout()}>
@@ -232,6 +240,17 @@ export const CreateUser = ({ closeFlyout }) => {
                 aria-label=""
                 isInvalid={!!formErrors.confirmPassword}
               />
+            </EuiFormRow>
+            <EuiFormRow label="Allow run as" helpText="Set if the user is able to use run as">
+            <WzButtonPermissions
+              buttonType="switch"
+              label="Allow run as"
+              showLabel={false}
+              checked={allowRunAs}
+              permissions={[{ action: 'security:edit_run_as', resource: '*:*:*' }]}
+              onChange={e => onChangeAllowRunAs(e)}
+              aria-label=""
+            />
             </EuiFormRow>
           </EuiPanel>
           <EuiSpacer />

@@ -22,6 +22,7 @@ import { Role } from '../../roles/types/role.type';
 import { UpdateUser, User } from '../types/user.type';
 import UsersServices from '../services';
 import RolesServices from '../../roles/services';
+import { WzButtonPermissions } from '../../../common/permissions/button';
 import { ErrorHandler } from '../../../../react-services/error-handler';
 import { WzAPIUtils } from '../../../../react-services/wz-api-utils';
 import { useDebouncedEffect } from '../../../common/hooks/useDebouncedEffect';
@@ -192,14 +193,16 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
               <h2>Run as</h2>
             </EuiTitle>
             <EuiFormRow label="" helpText="Set if the user is able to use run as">
-              <EuiSwitch
-                label="Allow"
-                showLabel={true}
-                checked={allowRunAs}
-                onChange={e => onChangeAllowRunAs(e)}
-                aria-label=""
-                disabled={WzAPIUtils.isReservedID(currentUser.id)}
-              />
+            <WzButtonPermissions
+              buttonType="switch"
+              label="Allow run as"
+              showLabel={true}
+              checked={allowRunAs}
+              permissions={[{ action: 'security:edit_run_as', resource: '*:*:*' }]}
+              onChange={e => onChangeAllowRunAs(e)}
+              aria-label=""
+              disabled={WzAPIUtils.isReservedID(currentUser.id)}
+            />
             </EuiFormRow>
           </EuiPanel>
           <EuiSpacer />
