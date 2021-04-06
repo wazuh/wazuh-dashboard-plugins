@@ -321,7 +321,7 @@ export class WazuhApiCtrl {
         );
       }catch(error){
         return ErrorResponse(
-          `ERROR3099 - ${error.response.data.detail || 'Wazuh not ready yet'}`,
+          `ERROR3099 - ${error.response?.data?.detail || 'Wazuh not ready yet'}`,
           3099,
           500,
           response
