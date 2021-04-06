@@ -92,7 +92,7 @@ export const regulatory = [{
     ],
     "description": "Integrity checksum changed.",
     "groups": [
-      "wazuh",
+      "ossec",
       "syscheck"
     ],
     "id": "550",
@@ -119,7 +119,7 @@ export const regulatory = [{
     ],
     "description": "File deleted.",
     "groups": [
-      "wazuh",
+      "ossec",
       "syscheck"
     ],
     "id": "553",
