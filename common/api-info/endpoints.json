@@ -267,7 +267,7 @@
           },
           {
             "name": ":configuration",
-            "description": "<p>Selected agent's configuration to read. The configuration to read depends on the selected component.\nThe following table shows all available combinations of component and configuration values:</p>\n<table class=\"table table-striped table-bordered\">\n<thead>\n<tr>\n<th>Component</th>\n<th>Configuration</th>\n<th>Tag</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>agent</td>\n<td>client</td>\n<td><code>&lt;client&gt;</code></td>\n</tr>\n<tr>\n<td>agent</td>\n<td>buffer</td>\n<td><code>&lt;client_buffer&gt;</code></td>\n</tr>\n<tr>\n<td>agent</td>\n<td>labels</td>\n<td><code>&lt;labels&gt;</code></td>\n</tr>\n<tr>\n<td>agent</td>\n<td>internal</td>\n<td><code>&lt;agent&gt;</code>, <code>&lt;monitord&gt;</code>, <code>&lt;remoted&gt;</code></td>\n</tr>\n<tr>\n<td>agentless</td>\n<td>agentless</td>\n<td><code>&lt;agentless&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>global</td>\n<td><code>&lt;global&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>active_response</td>\n<td><code>&lt;active-response&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>alerts</td>\n<td><code>&lt;alerts&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>command</td>\n<td><code>&lt;command&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>rules</td>\n<td><code>&lt;rule&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>decoders</td>\n<td><code>&lt;decoder&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>internal</td>\n<td><code>&lt;analysisd&gt;</code></td>\n</tr>\n<tr>\n<td>auth</td>\n<td>auth</td>\n<td><code>&lt;auth&gt;</code></td>\n</tr>\n<tr>\n<td>com</td>\n<td>active-response</td>\n<td><code>&lt;active-response&gt;</code></td>\n</tr>\n<tr>\n<td>com</td>\n<td>logging</td>\n<td><code>&lt;logging&gt;</code></td>\n</tr>\n<tr>\n<td>com</td>\n<td>internal</td>\n<td><code>&lt;execd&gt;</code></td>\n</tr>\n<tr>\n<td>com</td>\n<td>cluster</td>\n<td><code>&lt;cluster&gt;</code></td>\n</tr>\n<tr>\n<td>csyslog</td>\n<td>csyslog</td>\n<td><code>&lt;csyslog_output&gt;</code></td>\n</tr>\n<tr>\n<td>integrator</td>\n<td>integration</td>\n<td><code>&lt;integration&gt;</code></td>\n</tr>\n<tr>\n<td>logcollector</td>\n<td>localfile</td>\n<td><code>&lt;localfile&gt;</code></td>\n</tr>\n<tr>\n<td>logcollector</td>\n<td>socket</td>\n<td><code>&lt;socket&gt;</code></td>\n</tr>\n<tr>\n<td>logcollector</td>\n<td>internal</td>\n<td><code>&lt;logcollector&gt;</code></td>\n</tr>\n<tr>\n<td>mail</td>\n<td>global</td>\n<td><code>&lt;global&gt;&lt;email...&gt;</code></td>\n</tr>\n<tr>\n<td>mail</td>\n<td>alerts</td>\n<td><code>&lt;email_alerts&gt;</code></td>\n</tr>\n<tr>\n<td>mail</td>\n<td>internal</td>\n<td><code>&lt;maild&gt;</code></td>\n</tr>\n<tr>\n<td>monitor</td>\n<td>internal</td>\n<td><code>&lt;monitord&gt;</code></td>\n</tr>\n<tr>\n<td>monitor</td>\n<td>internal</td>\n<td><code>&lt;reports&gt;</code></td>\n</tr>\n<tr>\n<td>request</td>\n<td>remote</td>\n<td><code>&lt;remote&gt;</code></td>\n</tr>\n<tr>\n<td>request</td>\n<td>internal</td>\n<td><code>&lt;remoted&gt;</code></td>\n</tr>\n<tr>\n<td>syscheck</td>\n<td>syscheck</td>\n<td><code>&lt;syscheck&gt;</code></td>\n</tr>\n<tr>\n<td>syscheck</td>\n<td>rootcheck</td>\n<td><code>&lt;rootcheck&gt;</code></td>\n</tr>\n<tr>\n<td>syscheck</td>\n<td>internal</td>\n<td><code>&lt;syscheck&gt;</code>, <code>&lt;rootcheck&gt;</code></td>\n</tr>\n<tr>\n<td>wmodules</td>\n<td>wmodules</td>\n<td><code>&lt;wodle&gt;</code></td>\n</tr>\n</tbody>\n</table>\n",
+            "description": "<p>Selected agent's configuration to read. The configuration to read depends on the selected component.\nThe following table shows all available combinations of component and configuration values:</p>\n<table class=\"table table-striped table-bordered\">\n<thead>\n<tr>\n<th>Component</th>\n<th>Configuration</th>\n<th>Tag</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>agent</td>\n<td>client</td>\n<td><code>&lt;client&gt;</code></td>\n</tr>\n<tr>\n<td>agent</td>\n<td>buffer</td>\n<td><code>&lt;client_buffer&gt;</code></td>\n</tr>\n<tr>\n<td>agent</td>\n<td>labels</td>\n<td><code>&lt;labels&gt;</code></td>\n</tr>\n<tr>\n<td>agent</td>\n<td>internal</td>\n<td><code>&lt;agent&gt;</code>, <code>&lt;monitord&gt;</code>, <code>&lt;remoted&gt;</code></td>\n</tr>\n<tr>\n<td>agentless</td>\n<td>agentless</td>\n<td><code>&lt;agentless&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>global</td>\n<td><code>&lt;global&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>active_response</td>\n<td><code>&lt;active-response&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>alerts</td>\n<td><code>&lt;alerts&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>command</td>\n<td><code>&lt;command&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>rules</td>\n<td><code>&lt;rule&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>decoders</td>\n<td><code>&lt;decoder&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>internal</td>\n<td><code>&lt;analysisd&gt;</code></td>\n</tr>\n<tr>\n<td>auth</td>\n<td>auth</td>\n<td><code>&lt;auth&gt;</code></td>\n</tr>\n<tr>\n<td>com</td>\n<td>active-response</td>\n<td><code>&lt;active-response&gt;</code></td>\n</tr>\n<tr>\n<td>com</td>\n<td>logging</td>\n<td><code>&lt;logging&gt;</code></td>\n</tr>\n<tr>\n<td>com</td>\n<td>internal</td>\n<td><code>&lt;execd&gt;</code></td>\n</tr>\n<tr>\n<td>com</td>\n<td>cluster</td>\n<td><code>&lt;cluster&gt;</code></td>\n</tr>\n<tr>\n<td>csyslog</td>\n<td>csyslog</td>\n<td><code>&lt;csyslog_output&gt;</code></td>\n</tr>\n<tr>\n<td>integrator</td>\n<td>integration</td>\n<td><code>&lt;integration&gt;</code></td>\n</tr>\n<tr>\n<td>logcollector</td>\n<td>localfile</td>\n<td><code>&lt;localfile&gt;</code></td>\n</tr>\n<tr>\n<td>logcollector</td>\n<td>socket</td>\n<td><code>&lt;socket&gt;</code></td>\n</tr>\n<tr>\n<td>logcollector</td>\n<td>internal</td>\n<td><code>&lt;logcollector&gt;</code></td>\n</tr>\n<tr>\n<td>mail</td>\n<td>global</td>\n<td><code>&lt;global&gt;&lt;email...&gt;</code></td>\n</tr>\n<tr>\n<td>mail</td>\n<td>alerts</td>\n<td><code>&lt;email_alerts&gt;</code></td>\n</tr>\n<tr>\n<td>mail</td>\n<td>internal</td>\n<td><code>&lt;maild&gt;</code></td>\n</tr>\n<tr>\n<td>monitor</td>\n<td>global</td>\n<td><code>&lt;global&gt;</code></td>\n</tr>\n<tr>\n<td>monitor</td>\n<td>internal</td>\n<td><code>&lt;monitord&gt;</code></td>\n</tr>\n<tr>\n<td>monitor</td>\n<td>internal</td>\n<td><code>&lt;reports&gt;</code></td>\n</tr>\n<tr>\n<td>request</td>\n<td>global</td>\n<td><code>&lt;global&gt;</code></td>\n</tr>\n<tr>\n<td>request</td>\n<td>remote</td>\n<td><code>&lt;remote&gt;</code></td>\n</tr>\n<tr>\n<td>request</td>\n<td>internal</td>\n<td><code>&lt;remoted&gt;</code></td>\n</tr>\n<tr>\n<td>syscheck</td>\n<td>syscheck</td>\n<td><code>&lt;syscheck&gt;</code></td>\n</tr>\n<tr>\n<td>syscheck</td>\n<td>rootcheck</td>\n<td><code>&lt;rootcheck&gt;</code></td>\n</tr>\n<tr>\n<td>syscheck</td>\n<td>internal</td>\n<td><code>&lt;syscheck&gt;</code>, <code>&lt;rootcheck&gt;</code></td>\n</tr>\n<tr>\n<td>wmodules</td>\n<td>wmodules</td>\n<td><code>&lt;wodle&gt;</code></td>\n</tr>\n</tbody>\n</table>\n",
             "required": true,
             "schema": {
               "type": "string",
@@ -377,6 +377,58 @@
               "minLength": 3,
               "description": "Agent ID",
               "format": "numbers"
+            }
+          }
+        ],
+        "query": [
+          {
+            "name": "pretty",
+            "description": "Show results in human-readable format",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "wait_for_complete",
+            "description": "Disable timeout response",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ]
+      },
+      {
+        "name": "/agents/:agent_id/stats/:component",
+        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agent_controller.get_component_stats",
+        "description": "Return Wazuh's {component} statistical information from agent {agent_id}",
+        "summary": "Get agent's component stats",
+        "tags": [
+          "Agents"
+        ],
+        "args": [
+          {
+            "name": ":agent_id",
+            "description": "Agent ID. All possible values from 000 onwards",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 3,
+              "description": "Agent ID",
+              "format": "numbers"
+            }
+          },
+          {
+            "name": ":component",
+            "description": "Selected component stats",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "logcollector",
+                "agent"
+              ]
             }
           }
         ],
@@ -1032,7 +1084,7 @@
           },
           {
             "name": ":configuration",
-            "description": "<p>Selected agent's configuration to read. The configuration to read depends on the selected component.\nThe following table shows all available combinations of component and configuration values:</p>\n<table class=\"table table-striped table-bordered\">\n<thead>\n<tr>\n<th>Component</th>\n<th>Configuration</th>\n<th>Tag</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>agent</td>\n<td>client</td>\n<td><code>&lt;client&gt;</code></td>\n</tr>\n<tr>\n<td>agent</td>\n<td>buffer</td>\n<td><code>&lt;client_buffer&gt;</code></td>\n</tr>\n<tr>\n<td>agent</td>\n<td>labels</td>\n<td><code>&lt;labels&gt;</code></td>\n</tr>\n<tr>\n<td>agent</td>\n<td>internal</td>\n<td><code>&lt;agent&gt;</code>, <code>&lt;monitord&gt;</code>, <code>&lt;remoted&gt;</code></td>\n</tr>\n<tr>\n<td>agentless</td>\n<td>agentless</td>\n<td><code>&lt;agentless&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>global</td>\n<td><code>&lt;global&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>active_response</td>\n<td><code>&lt;active-response&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>alerts</td>\n<td><code>&lt;alerts&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>command</td>\n<td><code>&lt;command&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>rules</td>\n<td><code>&lt;rule&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>decoders</td>\n<td><code>&lt;decoder&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>internal</td>\n<td><code>&lt;analysisd&gt;</code></td>\n</tr>\n<tr>\n<td>auth</td>\n<td>auth</td>\n<td><code>&lt;auth&gt;</code></td>\n</tr>\n<tr>\n<td>com</td>\n<td>active-response</td>\n<td><code>&lt;active-response&gt;</code></td>\n</tr>\n<tr>\n<td>com</td>\n<td>logging</td>\n<td><code>&lt;logging&gt;</code></td>\n</tr>\n<tr>\n<td>com</td>\n<td>internal</td>\n<td><code>&lt;execd&gt;</code></td>\n</tr>\n<tr>\n<td>com</td>\n<td>cluster</td>\n<td><code>&lt;cluster&gt;</code></td>\n</tr>\n<tr>\n<td>csyslog</td>\n<td>csyslog</td>\n<td><code>&lt;csyslog_output&gt;</code></td>\n</tr>\n<tr>\n<td>integrator</td>\n<td>integration</td>\n<td><code>&lt;integration&gt;</code></td>\n</tr>\n<tr>\n<td>logcollector</td>\n<td>localfile</td>\n<td><code>&lt;localfile&gt;</code></td>\n</tr>\n<tr>\n<td>logcollector</td>\n<td>socket</td>\n<td><code>&lt;socket&gt;</code></td>\n</tr>\n<tr>\n<td>logcollector</td>\n<td>internal</td>\n<td><code>&lt;logcollector&gt;</code></td>\n</tr>\n<tr>\n<td>mail</td>\n<td>global</td>\n<td><code>&lt;global&gt;&lt;email...&gt;</code></td>\n</tr>\n<tr>\n<td>mail</td>\n<td>alerts</td>\n<td><code>&lt;email_alerts&gt;</code></td>\n</tr>\n<tr>\n<td>mail</td>\n<td>internal</td>\n<td><code>&lt;maild&gt;</code></td>\n</tr>\n<tr>\n<td>monitor</td>\n<td>internal</td>\n<td><code>&lt;monitord&gt;</code></td>\n</tr>\n<tr>\n<td>monitor</td>\n<td>internal</td>\n<td><code>&lt;reports&gt;</code></td>\n</tr>\n<tr>\n<td>request</td>\n<td>remote</td>\n<td><code>&lt;remote&gt;</code></td>\n</tr>\n<tr>\n<td>request</td>\n<td>internal</td>\n<td><code>&lt;remoted&gt;</code></td>\n</tr>\n<tr>\n<td>syscheck</td>\n<td>syscheck</td>\n<td><code>&lt;syscheck&gt;</code></td>\n</tr>\n<tr>\n<td>syscheck</td>\n<td>rootcheck</td>\n<td><code>&lt;rootcheck&gt;</code></td>\n</tr>\n<tr>\n<td>syscheck</td>\n<td>internal</td>\n<td><code>&lt;syscheck&gt;</code>, <code>&lt;rootcheck&gt;</code></td>\n</tr>\n<tr>\n<td>wmodules</td>\n<td>wmodules</td>\n<td><code>&lt;wodle&gt;</code></td>\n</tr>\n</tbody>\n</table>\n",
+            "description": "<p>Selected agent's configuration to read. The configuration to read depends on the selected component.\nThe following table shows all available combinations of component and configuration values:</p>\n<table class=\"table table-striped table-bordered\">\n<thead>\n<tr>\n<th>Component</th>\n<th>Configuration</th>\n<th>Tag</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>agent</td>\n<td>client</td>\n<td><code>&lt;client&gt;</code></td>\n</tr>\n<tr>\n<td>agent</td>\n<td>buffer</td>\n<td><code>&lt;client_buffer&gt;</code></td>\n</tr>\n<tr>\n<td>agent</td>\n<td>labels</td>\n<td><code>&lt;labels&gt;</code></td>\n</tr>\n<tr>\n<td>agent</td>\n<td>internal</td>\n<td><code>&lt;agent&gt;</code>, <code>&lt;monitord&gt;</code>, <code>&lt;remoted&gt;</code></td>\n</tr>\n<tr>\n<td>agentless</td>\n<td>agentless</td>\n<td><code>&lt;agentless&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>global</td>\n<td><code>&lt;global&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>active_response</td>\n<td><code>&lt;active-response&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>alerts</td>\n<td><code>&lt;alerts&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>command</td>\n<td><code>&lt;command&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>rules</td>\n<td><code>&lt;rule&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>decoders</td>\n<td><code>&lt;decoder&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>internal</td>\n<td><code>&lt;analysisd&gt;</code></td>\n</tr>\n<tr>\n<td>auth</td>\n<td>auth</td>\n<td><code>&lt;auth&gt;</code></td>\n</tr>\n<tr>\n<td>com</td>\n<td>active-response</td>\n<td><code>&lt;active-response&gt;</code></td>\n</tr>\n<tr>\n<td>com</td>\n<td>logging</td>\n<td><code>&lt;logging&gt;</code></td>\n</tr>\n<tr>\n<td>com</td>\n<td>internal</td>\n<td><code>&lt;execd&gt;</code></td>\n</tr>\n<tr>\n<td>com</td>\n<td>cluster</td>\n<td><code>&lt;cluster&gt;</code></td>\n</tr>\n<tr>\n<td>csyslog</td>\n<td>csyslog</td>\n<td><code>&lt;csyslog_output&gt;</code></td>\n</tr>\n<tr>\n<td>integrator</td>\n<td>integration</td>\n<td><code>&lt;integration&gt;</code></td>\n</tr>\n<tr>\n<td>logcollector</td>\n<td>localfile</td>\n<td><code>&lt;localfile&gt;</code></td>\n</tr>\n<tr>\n<td>logcollector</td>\n<td>socket</td>\n<td><code>&lt;socket&gt;</code></td>\n</tr>\n<tr>\n<td>logcollector</td>\n<td>internal</td>\n<td><code>&lt;logcollector&gt;</code></td>\n</tr>\n<tr>\n<td>mail</td>\n<td>global</td>\n<td><code>&lt;global&gt;&lt;email...&gt;</code></td>\n</tr>\n<tr>\n<td>mail</td>\n<td>alerts</td>\n<td><code>&lt;email_alerts&gt;</code></td>\n</tr>\n<tr>\n<td>mail</td>\n<td>internal</td>\n<td><code>&lt;maild&gt;</code></td>\n</tr>\n<tr>\n<td>monitor</td>\n<td>global</td>\n<td><code>&lt;global&gt;</code></td>\n</tr>\n<tr>\n<td>monitor</td>\n<td>internal</td>\n<td><code>&lt;monitord&gt;</code></td>\n</tr>\n<tr>\n<td>monitor</td>\n<td>internal</td>\n<td><code>&lt;reports&gt;</code></td>\n</tr>\n<tr>\n<td>request</td>\n<td>global</td>\n<td><code>&lt;global&gt;</code></td>\n</tr>\n<tr>\n<td>request</td>\n<td>remote</td>\n<td><code>&lt;remote&gt;</code></td>\n</tr>\n<tr>\n<td>request</td>\n<td>internal</td>\n<td><code>&lt;remoted&gt;</code></td>\n</tr>\n<tr>\n<td>syscheck</td>\n<td>syscheck</td>\n<td><code>&lt;syscheck&gt;</code></td>\n</tr>\n<tr>\n<td>syscheck</td>\n<td>rootcheck</td>\n<td><code>&lt;rootcheck&gt;</code></td>\n</tr>\n<tr>\n<td>syscheck</td>\n<td>internal</td>\n<td><code>&lt;syscheck&gt;</code>, <code>&lt;rootcheck&gt;</code></td>\n</tr>\n<tr>\n<td>wmodules</td>\n<td>wmodules</td>\n<td><code>&lt;wodle&gt;</code></td>\n</tr>\n</tbody>\n</table>\n",
             "required": true,
             "schema": {
               "type": "string",
@@ -1236,9 +1288,8 @@
                 "wazuh-logcollector",
                 "wazuh-remoted",
                 "wazuh-reportd",
-                "ossec-rootcheck",
+                "wazuh-rootcheck",
                 "wazuh-syscheckd",
-                "ossec-testrule",
                 "sca",
                 "wazuh-db",
                 "wazuh-modulesd",
@@ -4484,7 +4535,7 @@
           },
           {
             "name": ":configuration",
-            "description": "<p>Selected agent's configuration to read. The configuration to read depends on the selected component.\nThe following table shows all available combinations of component and configuration values:</p>\n<table class=\"table table-striped table-bordered\">\n<thead>\n<tr>\n<th>Component</th>\n<th>Configuration</th>\n<th>Tag</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>agent</td>\n<td>client</td>\n<td><code>&lt;client&gt;</code></td>\n</tr>\n<tr>\n<td>agent</td>\n<td>buffer</td>\n<td><code>&lt;client_buffer&gt;</code></td>\n</tr>\n<tr>\n<td>agent</td>\n<td>labels</td>\n<td><code>&lt;labels&gt;</code></td>\n</tr>\n<tr>\n<td>agent</td>\n<td>internal</td>\n<td><code>&lt;agent&gt;</code>, <code>&lt;monitord&gt;</code>, <code>&lt;remoted&gt;</code></td>\n</tr>\n<tr>\n<td>agentless</td>\n<td>agentless</td>\n<td><code>&lt;agentless&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>global</td>\n<td><code>&lt;global&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>active_response</td>\n<td><code>&lt;active-response&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>alerts</td>\n<td><code>&lt;alerts&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>command</td>\n<td><code>&lt;command&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>rules</td>\n<td><code>&lt;rule&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>decoders</td>\n<td><code>&lt;decoder&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>internal</td>\n<td><code>&lt;analysisd&gt;</code></td>\n</tr>\n<tr>\n<td>auth</td>\n<td>auth</td>\n<td><code>&lt;auth&gt;</code></td>\n</tr>\n<tr>\n<td>com</td>\n<td>active-response</td>\n<td><code>&lt;active-response&gt;</code></td>\n</tr>\n<tr>\n<td>com</td>\n<td>logging</td>\n<td><code>&lt;logging&gt;</code></td>\n</tr>\n<tr>\n<td>com</td>\n<td>internal</td>\n<td><code>&lt;execd&gt;</code></td>\n</tr>\n<tr>\n<td>com</td>\n<td>cluster</td>\n<td><code>&lt;cluster&gt;</code></td>\n</tr>\n<tr>\n<td>csyslog</td>\n<td>csyslog</td>\n<td><code>&lt;csyslog_output&gt;</code></td>\n</tr>\n<tr>\n<td>integrator</td>\n<td>integration</td>\n<td><code>&lt;integration&gt;</code></td>\n</tr>\n<tr>\n<td>logcollector</td>\n<td>localfile</td>\n<td><code>&lt;localfile&gt;</code></td>\n</tr>\n<tr>\n<td>logcollector</td>\n<td>socket</td>\n<td><code>&lt;socket&gt;</code></td>\n</tr>\n<tr>\n<td>logcollector</td>\n<td>internal</td>\n<td><code>&lt;logcollector&gt;</code></td>\n</tr>\n<tr>\n<td>mail</td>\n<td>global</td>\n<td><code>&lt;global&gt;&lt;email...&gt;</code></td>\n</tr>\n<tr>\n<td>mail</td>\n<td>alerts</td>\n<td><code>&lt;email_alerts&gt;</code></td>\n</tr>\n<tr>\n<td>mail</td>\n<td>internal</td>\n<td><code>&lt;maild&gt;</code></td>\n</tr>\n<tr>\n<td>monitor</td>\n<td>internal</td>\n<td><code>&lt;monitord&gt;</code></td>\n</tr>\n<tr>\n<td>monitor</td>\n<td>internal</td>\n<td><code>&lt;reports&gt;</code></td>\n</tr>\n<tr>\n<td>request</td>\n<td>remote</td>\n<td><code>&lt;remote&gt;</code></td>\n</tr>\n<tr>\n<td>request</td>\n<td>internal</td>\n<td><code>&lt;remoted&gt;</code></td>\n</tr>\n<tr>\n<td>syscheck</td>\n<td>syscheck</td>\n<td><code>&lt;syscheck&gt;</code></td>\n</tr>\n<tr>\n<td>syscheck</td>\n<td>rootcheck</td>\n<td><code>&lt;rootcheck&gt;</code></td>\n</tr>\n<tr>\n<td>syscheck</td>\n<td>internal</td>\n<td><code>&lt;syscheck&gt;</code>, <code>&lt;rootcheck&gt;</code></td>\n</tr>\n<tr>\n<td>wmodules</td>\n<td>wmodules</td>\n<td><code>&lt;wodle&gt;</code></td>\n</tr>\n</tbody>\n</table>\n",
+            "description": "<p>Selected agent's configuration to read. The configuration to read depends on the selected component.\nThe following table shows all available combinations of component and configuration values:</p>\n<table class=\"table table-striped table-bordered\">\n<thead>\n<tr>\n<th>Component</th>\n<th>Configuration</th>\n<th>Tag</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>agent</td>\n<td>client</td>\n<td><code>&lt;client&gt;</code></td>\n</tr>\n<tr>\n<td>agent</td>\n<td>buffer</td>\n<td><code>&lt;client_buffer&gt;</code></td>\n</tr>\n<tr>\n<td>agent</td>\n<td>labels</td>\n<td><code>&lt;labels&gt;</code></td>\n</tr>\n<tr>\n<td>agent</td>\n<td>internal</td>\n<td><code>&lt;agent&gt;</code>, <code>&lt;monitord&gt;</code>, <code>&lt;remoted&gt;</code></td>\n</tr>\n<tr>\n<td>agentless</td>\n<td>agentless</td>\n<td><code>&lt;agentless&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>global</td>\n<td><code>&lt;global&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>active_response</td>\n<td><code>&lt;active-response&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>alerts</td>\n<td><code>&lt;alerts&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>command</td>\n<td><code>&lt;command&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>rules</td>\n<td><code>&lt;rule&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>decoders</td>\n<td><code>&lt;decoder&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>internal</td>\n<td><code>&lt;analysisd&gt;</code></td>\n</tr>\n<tr>\n<td>auth</td>\n<td>auth</td>\n<td><code>&lt;auth&gt;</code></td>\n</tr>\n<tr>\n<td>com</td>\n<td>active-response</td>\n<td><code>&lt;active-response&gt;</code></td>\n</tr>\n<tr>\n<td>com</td>\n<td>logging</td>\n<td><code>&lt;logging&gt;</code></td>\n</tr>\n<tr>\n<td>com</td>\n<td>internal</td>\n<td><code>&lt;execd&gt;</code></td>\n</tr>\n<tr>\n<td>com</td>\n<td>cluster</td>\n<td><code>&lt;cluster&gt;</code></td>\n</tr>\n<tr>\n<td>csyslog</td>\n<td>csyslog</td>\n<td><code>&lt;csyslog_output&gt;</code></td>\n</tr>\n<tr>\n<td>integrator</td>\n<td>integration</td>\n<td><code>&lt;integration&gt;</code></td>\n</tr>\n<tr>\n<td>logcollector</td>\n<td>localfile</td>\n<td><code>&lt;localfile&gt;</code></td>\n</tr>\n<tr>\n<td>logcollector</td>\n<td>socket</td>\n<td><code>&lt;socket&gt;</code></td>\n</tr>\n<tr>\n<td>logcollector</td>\n<td>internal</td>\n<td><code>&lt;logcollector&gt;</code></td>\n</tr>\n<tr>\n<td>mail</td>\n<td>global</td>\n<td><code>&lt;global&gt;&lt;email...&gt;</code></td>\n</tr>\n<tr>\n<td>mail</td>\n<td>alerts</td>\n<td><code>&lt;email_alerts&gt;</code></td>\n</tr>\n<tr>\n<td>mail</td>\n<td>internal</td>\n<td><code>&lt;maild&gt;</code></td>\n</tr>\n<tr>\n<td>monitor</td>\n<td>global</td>\n<td><code>&lt;global&gt;</code></td>\n</tr>\n<tr>\n<td>monitor</td>\n<td>internal</td>\n<td><code>&lt;monitord&gt;</code></td>\n</tr>\n<tr>\n<td>monitor</td>\n<td>internal</td>\n<td><code>&lt;reports&gt;</code></td>\n</tr>\n<tr>\n<td>request</td>\n<td>global</td>\n<td><code>&lt;global&gt;</code></td>\n</tr>\n<tr>\n<td>request</td>\n<td>remote</td>\n<td><code>&lt;remote&gt;</code></td>\n</tr>\n<tr>\n<td>request</td>\n<td>internal</td>\n<td><code>&lt;remoted&gt;</code></td>\n</tr>\n<tr>\n<td>syscheck</td>\n<td>syscheck</td>\n<td><code>&lt;syscheck&gt;</code></td>\n</tr>\n<tr>\n<td>syscheck</td>\n<td>rootcheck</td>\n<td><code>&lt;rootcheck&gt;</code></td>\n</tr>\n<tr>\n<td>syscheck</td>\n<td>internal</td>\n<td><code>&lt;syscheck&gt;</code>, <code>&lt;rootcheck&gt;</code></td>\n</tr>\n<tr>\n<td>wmodules</td>\n<td>wmodules</td>\n<td><code>&lt;wodle&gt;</code></td>\n</tr>\n</tbody>\n</table>\n",
             "required": true,
             "schema": {
               "type": "string",
@@ -4684,9 +4735,8 @@
                 "wazuh-logcollector",
                 "wazuh-remoted",
                 "wazuh-reportd",
-                "ossec-rootcheck",
+                "wazuh-rootcheck",
                 "wazuh-syscheckd",
-                "ossec-testrule",
                 "sca",
                 "wazuh-db",
                 "wazuh-modulesd",
@@ -8078,6 +8128,15 @@
                 "description": "Whether the specified command is a custom command or not",
                 "type": "boolean",
                 "default": false
+              },
+              "alert": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "description": "Alert data depending on the AR executed",
+                    "type": "object"
+                  }
+                }
               }
             },
             "required": [
@@ -9271,7 +9330,7 @@
           },
           {
             "name": "ip",
-            "description": "If this is not included, the API will get the IP automatically. If you are behind a proxy, you must set the option behind_proxy_server to yes at api.yaml and make sure the proxy is setting HTTP header 'X-Forwarded-For' with origin IP address. Allowed values: IP, IP/NET, ANY",
+            "description": "If this is not included, the API will get the IP automatically. Allowed values: IP, IP/NET, ANY",
             "type": "string",
             "format": "alphanumeric"
           },
@@ -9326,7 +9385,7 @@
           },
           {
             "name": "ip",
-            "description": "If this is not included, the API will get the IP automatically. If you are behind a proxy, you must set the option behind_proxy_server to yes at api.yaml and make sure the proxy is setting HTTP header 'X-Forwarded-For' with origin IP address. Allowed values: IP, IP/NET, ANY",
+            "description": "If this is not included, the API will get the IP automatically. Allowed values: IP, IP/NET, ANY",
             "type": "string",
             "format": "alphanumeric"
           },
@@ -9393,16 +9452,6 @@
         ],
         "query": [
           {
-            "name": "group_id",
-            "description": "Group ID. (Name of the group)",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "description": "Group name",
-              "format": "group_names"
-            }
-          },
-          {
             "name": "pretty",
             "description": "Show results in human-readable format",
             "schema": {
@@ -9417,6 +9466,14 @@
               "type": "boolean",
               "default": false
             }
+          }
+        ],
+        "body": [
+          {
+            "name": "group_id",
+            "description": "Group name",
+            "type": "string",
+            "format": "group_names"
           }
         ]
       },

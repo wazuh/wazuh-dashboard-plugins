@@ -30,7 +30,6 @@ export class AgentInfo extends Component {
     super(props);
 
     this.state = {};
-    this.timeService = TimeService;
   }
 
   async componentDidMount() {
@@ -157,20 +156,9 @@ export class AgentInfo extends Component {
     return stats;
   }
 
-
-  parseDateTime(datetime){
-    try {
-      return this.timeService.offset(datetime);
-    } catch (error) {
-      return datetime;
-    }
-  }
-
   render() {
     const { agent } = this.props;
     let arrayStats;
-
-    
 
     if (this.props.isCondensed) {
       arrayStats = [

@@ -9,6 +9,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added Tools on wazuh menu with Dev Console and Logtest [#1434](https://github.com/wazuh/wazuh-kibana-app/pull/1434)
 - Added page size options in Security events, explore agents table [#2925](https://github.com/wazuh/wazuh-kibana-app/pull/2925)
 - Add a message to restart cluster or manager after import a file in Rules, Decoders or CDB Lists [#3051](https://github.com/wazuh/wazuh-kibana-app/pull/3051)
+- Added Agent Stats section [#3056](https://github.com/wazuh/wazuh-kibana-app/pull/3056)
 - Add `logtest` PUT example on API Console [#3061](https://github.com/wazuh/wazuh-kibana-app/pull/3061)
 - New buttom to check api again in health check [#3109](https://github.com/wazuh/wazuh-kibana-app/pull/3109)
 

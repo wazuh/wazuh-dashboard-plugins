@@ -232,12 +232,8 @@ export class AgentsTable extends Component {
     const checkField = field => {
       return field !== undefined ? field : '-';
     };
-    const lastKeepAlive = (date, timeService) => {
-      return date !== undefined ? formatUIDate(date) : '-';
-    };
     const agentVersion =
       agent.version !== undefined ? agent.version.split(' ')[1] : '-';
-    const { timeService } = this.props;
     const node_name = agent.node_name && agent.node_name !== 'unknown' ? agent.node_name : '-';
 
     return {
@@ -249,8 +245,8 @@ export class AgentsTable extends Component {
       os_name: agent,
       version: agentVersion,
       node_name: node_name,
-      dateAdd: formatUIDate(agent.dateAdd),
-      lastKeepAlive: lastKeepAlive(agent.lastKeepAlive, timeService),
+      dateAdd: agent.dateAdd ? formatUIDate(agent.dateAdd) : '-',
+      lastKeepAlive: agent.lastKeepAlive ? formatUIDate(agent.lastKeepAlive) : '-',
       actions: agent,
       upgrading: false
     };
