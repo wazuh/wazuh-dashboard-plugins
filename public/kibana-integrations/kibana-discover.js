@@ -95,6 +95,7 @@ import { AppState } from '../react-services/app-state';
 import { createFixedScroll } from './discover/application/angular/directives/fixed_scroll';
 
 import './discover/application/index.scss';
+import { getFilterWithAuthorizedAgents } from '../react-services/filter-authorization-agents';
 
 const fetchStatuses = {
   UNINITIALIZED: 'uninitialized',
@@ -528,6 +529,8 @@ function discoverController(
           {
             next: () => {
               $scope.filters = filterManager.filters;
+              const customFilterAllowedAgents = getFilterWithAuthorizedAgents(store.getState().appStateReducers.allowedAgents);
+              $scope.filters.push(customFilterAllowedAgents);
               // Wazuh. Hides the alerts of the '000' agent if it is in the configuration
               const buildFilters = () => {
                 const { hideManagerAlerts } = wazuhConfig.getConfig();

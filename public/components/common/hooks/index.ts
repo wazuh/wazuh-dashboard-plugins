@@ -27,3 +27,5 @@ export { useUserPermissions, useUserPermissionsRequirements, useUserPermissionsP
 export { useUserRoles, useUserRolesRequirements, useUserRolesPrivate } from './useUserRoles';
 
 export { useRefreshAngularDiscover } from './useResfreshAngularDiscover'
+
+export { useAllowedAgents } from './useAllowedAgents'
