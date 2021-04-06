@@ -24,7 +24,7 @@ import {
   EuiProgress
 } from '@elastic/eui';
 
-import { TimeService } from '../../../react-services/time-service';
+import { formatUIDate } from '../../../react-services/time-service';
 import store from '../../../redux/store';
 import { updateSelectedSettingsSection } from '../../../redux/actions/appStateActions';
 
@@ -68,9 +68,7 @@ export default class SettingsLogs extends Component {
   }
 
   formatDate(date) {
-    const ts = TimeService;
-    return ts
-      .offset(date)
+    return formatUIDate(date)
       .replace('-', '/')
       .replace('T', ' ')
       .replace('Z', '')

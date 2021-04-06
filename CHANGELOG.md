@@ -1,18 +1,67 @@
 # Change Log
 
 All notable changes to the Wazuh app project will be documented in this file.
+
 ## Wazuh v4.2.0 - Kibana 7.10.0 , 7.10.2 - Revision 4201
-
-### Changed
-
-- Rename Ossec to Wazuh [#3046](https://github.com/wazuh/wazuh-kibana-app/pull/3046)
-
-## Wazuh v4.1.2 - Kibana 7.10.0 , 7.10.2 - Revision 4103
 
 ### Added
 
-- Refactor of some prompts [#3015](https://github.com/wazuh/wazuh-kibana-app/pull/3015)
+- Added Tools on wazuh menu with Dev Console and Logtest [#1434](https://github.com/wazuh/wazuh-kibana-app/pull/1434)
+- Added page size options in Security events, explore agents table [#2925](https://github.com/wazuh/wazuh-kibana-app/pull/2925)
+- Add a message to restart cluster or manager after import a file in Rules, Decoders or CDB Lists [#3051](https://github.com/wazuh/wazuh-kibana-app/pull/3051)
+- Add `logtest` PUT example on API Console [#3061](https://github.com/wazuh/wazuh-kibana-app/pull/3061)
+- New buttom to check api again in health check [#3109](https://github.com/wazuh/wazuh-kibana-app/pull/3109)
+
+### Changed
+
+- Changed position of Top users on Integrity Monitoring Top 5 user. [#2892](https://github.com/wazuh/wazuh-kibana-app/pull/2892)
+- Rename some ossec references to Wazuh [#3046](https://github.com/wazuh/wazuh-kibana-app/pull/3046)
+
+### Fixed
+
+- Fixed missing `pending` status suggestion for agents [#3095](https://github.com/wazuh/wazuh-kibana-app/pull/3095)
+- Index pattern setting not used for choosing from existing patterns [#3097](https://github.com/wazuh/wazuh-kibana-app/pull/3097)
+- Fix space character missing on deployment command if UDP is configured [#3108](https://github.com/wazuh/wazuh-kibana-app/pull/3108)
+- Flyout date filter also changes main date filter [#3114](https://github.com/wazuh/wazuh-kibana-app/pull/3114)
+- Fixed name for "TCP sessions" visualization and average metric is now a sum [#3118](https://github.com/wazuh/wazuh-kibana-app/pull/3118)
+
+## Wazuh v4.1.4 - Kibana 7.10.0 , 7.10.2 - Revision 4105
+
+- Adapt for Wazuh 4.1.4
+
+
+## Wazuh v4.1.4 - Kibana 7.10.0 , 7.10.2 - Revision 4105
+
+- Adapt for Wazuh 4.1.4
+
+## Wazuh v4.1.3 - Kibana 7.10.0 , 7.10.2 - Revision 4104
+
+### Added
+
+- Creation of index pattern after the default one is changes in Settings [#2985](https://github.com/wazuh/wazuh-kibana-app/pull/2985)
+- Added node name of agent list and detail [#3039](https://github.com/wazuh/wazuh-kibana-app/pull/3039)
+- Added loading view while the user is logging to prevent permissions prompts [#3041](https://github.com/wazuh/wazuh-kibana-app/pull/3041)
+- Added custom message for each possible run_as setup [#3048](https://github.com/wazuh/wazuh-kibana-app/pull/3048)
+
+### Changed 
+
+- Change all dates labels to Kibana formatting time zone [#3047](https://github.com/wazuh/wazuh-kibana-app/pull/3047)
+- Improve toast message when selecting a default API [#3049](https://github.com/wazuh/wazuh-kibana-app/pull/3049)
+- Improve validation and prevention for caching bundles on the client-side [#3063](https://github.com/wazuh/wazuh-kibana-app/pull/3063) [#3091](https://github.com/wazuh/wazuh-kibana-app/pull/3091)
+
+### Fixed
+
+- Fixed unexpected behavior in Roles mapping [#3028](https://github.com/wazuh/wazuh-kibana-app/pull/3028)
+- Fixed rule filter is no applied when you click on a rule id in another module.[#3057](https://github.com/wazuh/wazuh-kibana-app/pull/3057)
+- Fixed bug changing master node configuration [#3062](https://github.com/wazuh/wazuh-kibana-app/pull/3062)
+- Fixed wrong variable declaration for macOS agents [#3066](https://github.com/wazuh/wazuh-kibana-app/pull/3066)
+- Fixed some errors in the Events table, action buttons style, and URLs disappeared [#3086](https://github.com/wazuh/wazuh-kibana-app/pull/3086)
+- Fixed Rollback of invalid rule configuration file [#3084](https://github.com/wazuh/wazuh-kibana-app/pull/3084)
+
+## Wazuh v4.1.2 - Kibana 7.10.0 , 7.10.2 - Revision 4103
+
 - Add `run_as` setting to example host configuration in Add new API view [#3021](https://github.com/wazuh/wazuh-kibana-app/pull/3021)
+- Refactor of some prompts [#3015](https://github.com/wazuh/wazuh-kibana-app/pull/3015)
 
 ### Fixed
 
@@ -25,6 +74,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fix restarting selected cluster instead of all of them [#3032](https://github.com/wazuh/wazuh-kibana-app/pull/3032)
 - Fix pinned agents don't trigger a new filtered query [#3035](https://github.com/wazuh/wazuh-kibana-app/pull/3035)
 - Overlay Wazuh menu when Kibana menu is opened or docked [#3038](https://github.com/wazuh/wazuh-kibana-app/pull/3038)
+- Fix visualizations in PDF Reports with Dark mode [#2983](https://github.com/wazuh/wazuh-kibana-app/pull/2983)
 
 ## Wazuh v4.1.1 - Kibana 7.10.0 , 7.10.2 - Revision 4102
 
@@ -143,7 +193,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed ping request to default request. Added delay and while to che… [#2820](https://github.com/wazuh/wazuh-kibana-app/issues/2820)
 - Removed kibana alert for security [#2806](https://github.com/wazuh/wazuh-kibana-app/issues/2806)
 
-## Wazuh v4.0.4 - Kibana 7.10.0 , 7.10.2 - Revision 4016
+## Wazuh v4.0.4 - Kibana v7.9.1, v7.9.3 - Revision 4016
 
 ### Added
 

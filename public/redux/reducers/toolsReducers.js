@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Module to export all the controllers
+ * Wazuh app - Tools Reducers
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -9,8 +9,18 @@
  *
  * Find more information about this on the LICENSE file.
  */
-export { WazuhElasticCtrl } from './wazuh-elastic';
-export { WazuhApiCtrl } from './wazuh-api';
-export { WazuhUtilsCtrl } from './wazuh-utils';
-export { WazuhReportingCtrl } from './wazuh-reporting';
-export { WazuhHostsCtrl } from './wazuh-hosts'
+
+const initialState = { selected_tools_section: '' };
+
+const toolsReducers = (state = initialState, action) => {
+  if (action.type === 'UPDATE_TOOLS_SECTION') {
+    return {
+      ...state,
+      selected_tools_section: action.section
+    };
+  }
+
+  return state;
+};
+
+export default toolsReducers;

@@ -57,7 +57,7 @@ class KibanaVis extends Component {
     this.tabVisualizations = new TabVisualizations();
     this.state = {
       visRefreshingIndex: false,
-    };
+    };   
     const services = {
       savedObjectsClient: getSavedObjects().client,
       indexPatterns: getDataPlugin().indexPatterns,
