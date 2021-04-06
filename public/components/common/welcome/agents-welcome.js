@@ -303,25 +303,32 @@ export class AgentsWelcome extends Component {
                   </div>
                 </EuiPopover>
               </EuiFlexItem>
-            }
-            <EuiFlexItem></EuiFlexItem>
-            <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
-              <EuiButtonEmpty
-                iconType="inspect"
-                onClick={() => this.props.switchTab('syscollector')}>
-                Inventory data
+              }
+              <EuiFlexItem></EuiFlexItem>
+              <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
+                <EuiButtonEmpty
+                  iconType="inspect"
+                  onClick={() => this.props.switchTab('syscollector')}>
+                  Inventory data
                 </EuiButtonEmpty>
-            </EuiFlexItem>
-            <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
-              <EuiButtonEmpty
-                iconType="gear"
-                onClick={() => this.props.switchTab('configuration')}>
-                Configuration
+              </EuiFlexItem>
+              <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
+                <EuiButtonEmpty
+                  iconType="stats"
+                  onClick={() => this.props.switchTab('stats')}>
+                  Stats
                 </EuiButtonEmpty>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-        </EuiFlexItem>
-      </EuiFlexGroup>
+              </EuiFlexItem>
+              <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
+                <EuiButtonEmpty
+                  iconType="gear"
+                  onClick={() => this.props.switchTab('configuration')}>
+                  Configuration
+                </EuiButtonEmpty>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiFlexItem>
+        </EuiFlexGroup>
     );
 
   }

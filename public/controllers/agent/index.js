@@ -19,6 +19,7 @@ import { AgentsPreview } from './components/agents-preview';
 import { AgentsTable } from './components/agents-table';
 import { MainModule } from '../../components/common/modules/main';
 import { MainSyscollector } from '../../components/agents/syscollector/main';
+import { MainAgentStats } from '../../components/agents/stats';
 import { getAngularModule } from '../../kibana-services';
 
 const app = getAngularModule();
@@ -33,4 +34,5 @@ app
   .value('Mitre', Mitre)
   .value('AgentsTable', AgentsTable)
   .value('MainSyscollector', MainSyscollector)
+  .value('MainAgentStats', MainAgentStats)
   .value('MainModule', MainModule);

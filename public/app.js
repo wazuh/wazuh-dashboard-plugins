@@ -10,7 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 import { checkPluginVersion } from './utils';
-
 import 'angular-sanitize';
 
 // Require CSS
@@ -105,7 +104,6 @@ app.run(function ($rootElement) {
   // Bind deleteExistentToken on Log out component.
   $(document).on('ready', function () {
     $('.euiHeaderSectionItem__button').on('mouseleave', function () {
-      console.log('onmouseleave')
       // opendistro
       $('span:contains(Log out)').on('click', function () {
         WzAuthentication.deleteExistentToken();

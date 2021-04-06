@@ -40,7 +40,7 @@ const helpLinks = [
   {
     text: 'Remote daemon reference',
     href:
-      'https://documentation.wazuh.com/current/user-manual/reference/daemons/ossec-remoted.html'
+      'https://documentation.wazuh.com/current/user-manual/reference/daemons/wazuh-remoted.html'
   },
   {
     text: 'Remote configuration reference',

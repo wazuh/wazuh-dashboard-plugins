@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { EuiLoadingSpinner, EuiDescriptionList, EuiIcon, EuiCallOut, EuiSpacer, EuiButton } from '@elastic/eui';
+import { EuiLoadingSpinner, EuiDescriptionList, EuiIcon, EuiCallOut, EuiButtonIcon, EuiSpacer, EuiButton, EuiToolTip } from '@elastic/eui';
 import { AppState } from '../../react-services/app-state';
 import { PatternHandler } from '../../react-services/pattern-handler';
 import { getAngularModule, getToasts, getHttp } from '../../kibana-services';
@@ -10,7 +10,7 @@ import { WzRequest } from '../../react-services/wz-request';
 import { SavedObject } from '../../react-services/saved-objects';
 import { ErrorHandler } from '../../react-services/error-handler';
 import { WAZUH_ERROR_DAEMONS_NOT_READY, WAZUH_INDEX_TYPE_STATISTICS, WAZUH_INDEX_TYPE_MONITORING } from '../../../common/constants';
-import { checkKibanaSettings, checkKibanaSettingsTimeFilter, checkKibanaSettingsMaxBuckets} from './lib';
+import { checkKibanaSettings, checkKibanaSettingsTimeFilter, checkKibanaSettingsMaxBuckets } from './lib';
 import store from '../../redux/store';
 import { updateWazuhNotReadyYet } from '../../redux/actions/appStateActions.js';
 
@@ -52,7 +52,7 @@ export class HealthCheck extends Component {
    * Sleep method
    * @param time
    */
-  delay = time => new Promise(res => setTimeout(res,time));
+  delay = time => new Promise(res => setTimeout(res, time));
 
   /**
    * This validates a pattern
@@ -74,8 +74,10 @@ export class HealthCheck extends Component {
         if (!patternData.status) {
           const patternList = await PatternHandler.getPatternList("healthcheck");
           if (patternList.length) {
-            const currentPattern = patternList[0].id;
-            AppState.setCurrentPattern(currentPattern);
+            const wazuhConfig = new WazuhConfig();
+            const { pattern } = wazuhConfig.getConfig();
+            const indexPatternDefault = patternList.find((indexPattern) => indexPattern.title === pattern);
+            AppState.setCurrentPattern(indexPatternDefault.id);
             return await this.checkPatterns();
           } else {
             errors.push('The selected index-pattern is not present.');
@@ -154,6 +156,26 @@ export class HealthCheck extends Component {
   }
 
   /**
+   * This attempts to reconnect with API
+   */
+  reconnectWithAPI(){
+    let results = this.state.results;
+    results[0].description = <span><EuiLoadingSpinner size="m" /> Checking...</span>;
+    results[1].description = <span><EuiLoadingSpinner size="m" /> Checking...</span>;
+    getToasts().toasts$._value.forEach(toast => {
+      if(toast.text.includes('3000'))
+        getToasts().remove(toast.id);
+    });
+    let errors = this.state.errors;
+    this.state.errors.forEach(error => {
+      if(error.includes('API'))
+        errors.pop(error);
+    });
+    this.setState({results, errors});
+    this.checkApiConnection();
+  }
+
+  /**
    * This attempts to connect with API
    */
   async checkApiConnection() {
@@ -205,8 +227,23 @@ export class HealthCheck extends Component {
           this.setState({ results, errors });
         } else if (data.data.error || data.data.data.apiIsDown) {
           errors.push(data.data.data.apiIsDown ? 'Wazuh API is down.' : `Error connecting to the API.${data.data.error && data.data.error.message ? ` ${data.data.error.message}` : ''}`);
-          results[i].description = <span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span>;
-          results[i + 1].description = <span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span>;
+          results[i].description =    <div> <span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span> 
+          { <EuiToolTip
+                  position='top'
+                  content='Try to reconnect to the API'
+          >
+             <EuiButtonIcon
+                display="base"
+                iconType="refresh"
+                isLoading
+                iconSize="l"
+                onClick={() => this.reconnectWithAPI()}
+                size="m"
+                aria-label="Next"
+              />
+          </EuiToolTip> }
+          </div>;
+          results[i + 1].description = <span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span> 
           this.setState({ results, errors });
         } else {
           results[i].description = <span><EuiIcon type="check" color="secondary" ></EuiIcon> Ready</span>;
@@ -240,8 +277,20 @@ export class HealthCheck extends Component {
               results[i].description = <span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span>;
               this.setState({ results, errors });
             } else {
-              results[i].description = <span><EuiIcon type="check" color="secondary" ></EuiIcon> Ready</span>;
-              this.setState({ results, errors });
+               let permissionToGoToTheApp = true;
+               if(!results[i].description.props.children[1].includes('Checking')){
+                 permissionToGoToTheApp = false;
+               }
+               results[i].description = <span><EuiIcon type="check" color="secondary" ></EuiIcon> Ready</span>;
+               for (let element of results){
+                 if(results[i].description.props.children[1].includes('Error')){
+                   permissionToGoToTheApp = false;
+                 }
+               }
+
+               this.setState({ results, errors });
+               if(permissionToGoToTheApp)
+                 this.goApp();
             }
           }
         }
@@ -294,7 +343,7 @@ export class HealthCheck extends Component {
         results[itemId].description = <span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span>;
         this.setState({ results });
       }
-    }else{
+    } else {
       results[itemId].description = <span><EuiIcon type="check" color="secondary" ></EuiIcon> Ready</span>;
       this.setState({ results });
     }
@@ -401,7 +450,9 @@ export class HealthCheck extends Component {
     const logo_url = getHttp().basePath.prepend('/plugins/wazuh/assets/icon_blue.svg');
     return (
       <div className="health-check">
-        <EuiLoadingSpinner className="health-check-loader" />
+        {!this.state.errors && (
+          <EuiLoadingSpinner className="health-check-loader" />
+        )}
         <img src={logo_url} className="health-check-logo" alt=""></img>
         <div className="margin-top-30">
           <EuiDescriptionList

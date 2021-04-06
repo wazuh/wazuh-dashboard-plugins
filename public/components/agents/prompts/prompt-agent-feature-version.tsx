@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Prompt when an agent is not active
+ * Wazuh app - Prompt when an agent doesn't support some module
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -11,23 +11,16 @@
  */
 
 import React from 'react';
-import { PromptSelectAgent } from './';
 import { 
   EuiEmptyPrompt
 } from '@elastic/eui'
 
-export const PromptNoActiveAgent = () => {
-  return (
-    <PromptSelectAgent title="Agent is not active" body="This section is only available for active agents."/>
-  )
-};
-
-export const PromptNoActiveAgentWithoutSelect = () => {
+export const PromptAgentFeatureVersion = ({version = ''}: {version: string}) => {
   return (
     <EuiEmptyPrompt
       iconType="watchesApp"
-      title={<h2>{`Agent is not active`}</h2>}
-      body="This section is only available for active agents."
+      title={<h2>{`Agent doesn't support this feature`}</h2>}
+      body={`This feature is only avaliable for agents with ${version}.`}
     />
   )
 };
