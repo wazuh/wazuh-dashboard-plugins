@@ -15,6 +15,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Refactor of some prompts [#3015](https://github.com/wazuh/wazuh-kibana-app/pull/3015)
 - Add `run_as` setting to example host configuration in Add new API view [#3021](https://github.com/wazuh/wazuh-kibana-app/pull/3021)
+- Adding Alerts summary table in all modules [#2990](https://github.com/wazuh/wazuh-kibana-app/pull/3127)
 
 ### Fixed
 
