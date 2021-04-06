@@ -85,6 +85,7 @@ export class UploadFiles extends Component {
               try {
                 await this.props.upload(files, this.props.resource);
                 this.closePopover();
+                this.props.onSuccess && this.props.onSuccess(files);
                 this.showToast(
                   'success',
                   'Success',
