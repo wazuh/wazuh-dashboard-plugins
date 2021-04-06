@@ -313,6 +313,13 @@ export class AgentsWelcome extends Component {
               </EuiFlexItem>
               <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
                 <EuiButtonEmpty
+                  iconType="stats"
+                  onClick={() => this.props.switchTab('stats')}>
+                  Stats
+                </EuiButtonEmpty>
+              </EuiFlexItem>
+              <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
+                <EuiButtonEmpty
                   iconType="gear"
                   onClick={() => this.props.switchTab('configuration')}>
                   Configuration

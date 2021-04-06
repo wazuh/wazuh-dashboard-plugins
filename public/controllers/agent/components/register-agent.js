@@ -132,7 +132,7 @@ export class RegisterAgent extends Component {
     this.restartAgentCommand = {
       rpm: this.systemSelector(),
       deb: this.systemSelector(),
-      macos: 'sudo /Library/Ossec/bin/ossec-control start',
+      macos: 'sudo /Library/Ossec/bin/wazuh-control start',
     }
   }
 
@@ -228,7 +228,6 @@ export class RegisterAgent extends Component {
     }
     else
       return '';
-
   }
 
   selectSYS(sys){
@@ -287,7 +286,7 @@ export class RegisterAgent extends Component {
       ? `WAZUH_REGISTRATION_PASSWORD='${this.state.wazuhPassword}' `
       : ''
       }${this.state.udpProtocol
-        ? " WAZUH_PROTOCOL='UDP'"
+        ? "WAZUH_PROTOCOL='UDP' "
         : ''
       }${this.state.selectedGroup.length ? `WAZUH_AGENT_GROUP='${this.state.selectedGroup.map(item => item.label).join(',')}' ` : ''}`
     return deployment;

@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Module to export all the controllers
+ * Wazuh app - Index Agent stats
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -9,8 +9,5 @@
  *
  * Find more information about this on the LICENSE file.
  */
-export { WazuhElasticCtrl } from './wazuh-elastic';
-export { WazuhApiCtrl } from './wazuh-api';
-export { WazuhUtilsCtrl } from './wazuh-utils';
-export { WazuhReportingCtrl } from './wazuh-reporting';
-export { WazuhHostsCtrl } from './wazuh-hosts'
+
+export { MainAgentStats } from './agent-stats';

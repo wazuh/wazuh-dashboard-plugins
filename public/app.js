@@ -10,7 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 import { checkPluginVersion } from './utils';
-
 import 'angular-sanitize';
 
 // Require CSS
