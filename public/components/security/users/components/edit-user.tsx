@@ -75,6 +75,7 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
       let _showApply =
         isValidForm(false) &&
         (allowRunAs !== currentUser.allow_run_as ||
+          password !== '' ||
           Object.values(getRolesDiff()).some(i => i.length));
 
       setShowApply(_showApply);
