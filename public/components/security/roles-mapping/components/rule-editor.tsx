@@ -83,7 +83,7 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
     setIsLogicalPopoverOpen(isLogicalPopoverOpen => !isLogicalPopoverOpen);
   const closeLogicalPopover = () => setIsLogicalPopoverOpen(false);
 
-  const selectOperator = op => {
+  const selectOperator = op => {  
     setLogicalOperator(op);
     closeLogicalPopover();
   };
@@ -119,6 +119,7 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
         jsonRule,
         internalUsers
       );
+
       setLogicalOperator(logicalOperator);
       setHasWrongFormat(wrongFormat);
 
@@ -202,8 +203,9 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
     setRules(rulesTmp);
   };
 
-  const openJsonEditor = () => {
+  const openJsonEditor = () => {  
     const ruleObject = getJsonFromRule(internalUserRules, rules, logicalOperator);
+    
     setRuleJson(JSON.stringify(ruleObject, undefined, 2));
     setIsJsonEditor(true);
   };
@@ -242,7 +244,7 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
   const saveRule = () => {
     if (isJsonEditor) {
       // if json editor is empty
-      if (ruleJson === '') {
+      if (ruleJson === '') {       
         setRuleJson('{}');
       }
       save(JSON.parse(ruleJson));

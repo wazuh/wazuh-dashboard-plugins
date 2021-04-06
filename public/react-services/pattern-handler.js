@@ -45,21 +45,26 @@ export class PatternHandler {
             );
         }
       }
-      if (!patternList.length) {
+
+      const wazuhConfig = new WazuhConfig();
+      const { pattern } = wazuhConfig.getConfig();
+      const indexPatternFound = patternList.find((indexPattern) => indexPattern.title === pattern);
+
+      if (!indexPatternFound) {
         // if no valid index patterns are found we try to create the wazuh-alerts-*
         try {
-          const wazuhConfig = new WazuhConfig();
-          const { pattern } = wazuhConfig.getConfig();
+
           if (!pattern) return;
 
           getToasts().add({
             color: 'warning',
             title:
-              `No valid index patterns were found, proceeding to create default ${pattern} index pattern`,
+              `No ${pattern} index pattern was found, proceeding to create it.`,
             toastLifeTimeMs: 5000
           });
 
           await SavedObject.createWazuhIndexPattern(pattern);
+          getToasts().addSuccess(`${pattern} index pattern created successfully`)
           getDataPlugin().indexPatterns.setDefault(pattern, true);
         } catch (err) {
           getToasts().add({

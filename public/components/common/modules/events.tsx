@@ -64,10 +64,10 @@ export class Events extends Component {
       this.fetchWatch = scope.$watchCollection('fetchStatus',
         (fetchStatus) => {
           if (scope.fetchStatus === 'complete') {
-            setTimeout(() => { 
+            setTimeout(() => {
               ModulesHelper.cleanAvailableFields();
-              
-            
+
+
             }, 1000);
             // Check the discover table is in the DOM and enhance the initial table cells
             this.intervalCheckExistsDiscoverTable = setInterval(() => {
@@ -116,8 +116,8 @@ export class Events extends Component {
         }
       })
     });
-    const discoverTableTHead = document.querySelector('.kbn-table thead tr');
-    this.discoverTableColumnsObserver.observe(discoverTableTHead, { childList: true });
+    const discoverTableElement = document.querySelector('.kbn-table').parentElement.parentElement.parentElement;;
+    this.discoverTableColumnsObserver.observe(discoverTableElement, { childList: true });
   }
 
   enhanceDiscoverTableCurrentRows = (discoverRowsData, options, addObserverDetails = false) => {
@@ -134,7 +134,7 @@ export class Events extends Component {
           enhanceDiscoverEventsCell(header.textContent, cell.textContent, discoverRowsData[rowIndex], cell, options);
         };
       });
-      // Add observer to row details 
+      // Add observer to row details
       if (addObserverDetails){
         const rowDetails = row.nextElementSibling;
         this.enhanceDiscoverTableRowDetailsAddObserver(rowDetails, discoverRowsData, options);
@@ -153,7 +153,7 @@ export class Events extends Component {
         this.checkUnknownFields(rowDetailField);
         const fieldName = rowDetailField.childNodes[0].childNodes[1].textContent || "";
         const fieldCell = rowDetailField.parentNode.childNodes && rowDetailField.parentNode.childNodes[2].childNodes[0];
-        if(!fieldCell){ return };        
+        if(!fieldCell){ return };
         enhanceDiscoverEventsCell(fieldName, (fieldCell || {}).textContent || '', discoverRowsData[rowIndex], fieldCell, options);
       });
     };
@@ -167,13 +167,13 @@ export class Events extends Component {
   }
 
    refreshKnownFields = async () => {
-    if (!this.state.hasRefreshedKnownFields) { 
+    if (!this.state.hasRefreshedKnownFields) {
       try {
         this.setState({ hasRefreshedKnownFields: true, isRefreshing: true });
         await PatternHandler.refreshIndexPattern();
 
         this.setState({ isRefreshing: false });
-        this.reloadToast()        
+        this.reloadToast()
 
       } catch (err) {
         this.setState({ isRefreshing: false });
