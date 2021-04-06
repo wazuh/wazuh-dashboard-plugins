@@ -110,6 +110,10 @@ const sysButtons = [
   }
 ];
 
+const pTextCheckConnectionStyle = {
+  marginTop: '30px',
+};
+
 export class RegisterAgent extends Component {
   constructor(props) {
     super(props);
@@ -123,6 +127,7 @@ export class RegisterAgent extends Component {
       selectedArchitecture: '',
       selectedVersion: '',
       version: '',
+      wazuhVersion: '',
       serverAddress: '',
       wazuhPassword: '',
       groups: [],
@@ -357,6 +362,8 @@ export class RegisterAgent extends Component {
   };
 
   render() {
+
+    const urlCheckConnectionDocumentation = `https://documentation.wazuh.com/${this.state.wazuhVersion.slice(0,3)}/user-manual/agents/agent-connection.html`;
     const missingOSSelection = this.checkMissingOSSelection();
     const ipInput = (
       <EuiText>
@@ -423,7 +430,6 @@ export class RegisterAgent extends Component {
       </>
     );
     const restartAgentCommand = this.restartAgentCommand[this.state.selectedOS];
-
     const onTabClick = (selectedTab) => {
       this.selectSYS(selectedTab.id);
     };
@@ -473,6 +479,7 @@ export class RegisterAgent extends Component {
                   </EuiButton>
                 )}
               </EuiCopy>
+              <p style={pTextCheckConnectionStyle}>To check if the connection with the manager was successful, follow the <a href={urlCheckConnectionDocumentation} target="_blank">documentation.</a></p>
             </EuiText>
           </Fragment>
         ),
@@ -497,6 +504,7 @@ export class RegisterAgent extends Component {
                   </EuiButton>
                 )}
               </EuiCopy>
+              <p style={pTextCheckConnectionStyle}>To check if the connection with the manager was successful, follow the <a href={urlCheckConnectionDocumentation} target="_blank">documentation.</a></p>
             </EuiText>
           </Fragment>
         ),
@@ -604,7 +612,6 @@ export class RegisterAgent extends Component {
       ] : [])
 
     ];
-
     return (
       <div>
         <EuiPage restrictWidth="1000px" style={{ background: 'transparent' }}>
