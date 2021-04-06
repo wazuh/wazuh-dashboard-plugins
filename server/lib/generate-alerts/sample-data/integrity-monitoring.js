@@ -65,7 +65,7 @@ export const regulatory = [{
     ],
     "description": "File added to the system.",
     "groups": [
-      "wazuh",
+      "ossec",
       "syscheck"
     ],
     "id": "554",
