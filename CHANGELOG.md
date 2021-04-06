@@ -16,6 +16,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Changed
 
 - Changed position of Top users on Integrity Monitoring Top 5 user. [#2892](https://github.com/wazuh/wazuh-kibana-app/pull/2892)
+- Rename some ossec references to Wazuh [#3046](https://github.com/wazuh/wazuh-kibana-app/pull/3046)
 
 ### Fixed
 
