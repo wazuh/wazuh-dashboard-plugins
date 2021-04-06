@@ -45,13 +45,18 @@ export const agentVisualizations = {
         ]
       },
       {
-        hide: true,
+        height: 360,
         vis: [
           {
             title: 'Alerts summary',
             id: 'Wazuh-App-Agents-General-Alerts-summary',
-            width: 60
-          },
+            width: 100
+          }
+        ]
+      },
+      {
+        hide: true,
+        vis: [
           {
             title: 'Groups summary',
             id: 'Wazuh-App-Agents-General-Groups-summary',
@@ -113,11 +118,12 @@ export const agentVisualizations = {
         ]
       },
       {
-        hide: true,
+        height: 360,
         vis: [
           {
             title: 'Alerts summary',
-            id: 'Wazuh-App-Agents-AWS-Alerts-summary'
+            id: 'Wazuh-App-Agents-AWS-Alerts-summary',
+            width: 100
           }
         ]
       }
@@ -166,11 +172,12 @@ export const agentVisualizations = {
         ]
       },
       {
-        hide: true,
+        height: 360,
         vis: [
           {
             title: 'Alerts summary',
-            id: 'Wazuh-App-Agents-FIM-Alerts-summary'
+            id: 'Wazuh-App-Agents-FIM-Alerts-summary',
+            width: 100
           }
         ]
       }
@@ -229,11 +236,12 @@ export const agentVisualizations = {
         ]
       },
       {
-        hide: true,
+        height: 360,
         vis: [
           {
             title: 'Alerts summary',
-            id: 'Wazuh-App-Agents-GCP-Alerts-summary'
+            id: 'Wazuh-App-Agents-GCP-Alerts-summary',
+            width: 100
           }
         ]
       }
@@ -277,11 +285,12 @@ export const agentVisualizations = {
         ]
       },
       {
-        hide: true,
+        height: 360,
         vis: [
           {
             title: 'Alerts summary',
-            id: 'Wazuh-App-Agents-PCI-Last-alerts'
+            id: 'Wazuh-App-Agents-PCI-Last-alerts',
+            width: 100
           }
         ]
       }
@@ -325,11 +334,12 @@ export const agentVisualizations = {
         ]
       },
       {
-        hide: true,
+        height: 360,
         vis: [
           {
             title: 'Alerts summary',
-            id: 'Wazuh-App-Agents-GDPR-Last-alerts'
+            id: 'Wazuh-App-Agents-GDPR-Last-alerts',
+            width: 100
           }
         ]
       }
@@ -367,11 +377,12 @@ export const agentVisualizations = {
         ]
       },
       {
-        hide: true,
+        height: 360,
         vis: [
           {
             title: 'Alerts summary',
-            id: 'Wazuh-App-Agents-NIST-Last-alerts'
+            id: 'Wazuh-App-Agents-NIST-Last-alerts',
+            width: 100
           }
         ]
       }
@@ -415,11 +426,12 @@ export const agentVisualizations = {
         ]
       },
       {
-        hide: true,
+        height: 360,
         vis: [
           {
             title: 'Alerts summary',
-            id: 'Wazuh-App-Overview-TSC-Alerts-summary'
+            id: 'Wazuh-App-Overview-TSC-Alerts-summary',
+            width: 100
           }
         ]
       }
@@ -463,11 +475,12 @@ export const agentVisualizations = {
         ]
       },
       {
-        hide: true,
+        height: 360,
         vis: [
           {
             title: 'Alerts summary',
-            id: 'Wazuh-App-Agents-HIPAA-Last-alerts'
+            id: 'Wazuh-App-Agents-HIPAA-Last-alerts',
+            width: 100
           }
         ]
       }
@@ -526,11 +539,12 @@ export const agentVisualizations = {
         ]
       },
       {
-        hide: true,
+        height: 360,
         vis: [
           {
             title: 'Alerts summary',
-            id: 'Wazuh-App-Agents-vuls-Alerts-summary'
+            id: 'Wazuh-App-Agents-vuls-Alert-summary',
+            width: 100
           }
         ]
       }
@@ -563,11 +577,12 @@ export const agentVisualizations = {
         ]
       },
       {
-        hide: true,
+        height: 360,
         vis: [
           {
             title: 'Alerts summary',
-            id: 'Wazuh-App-Agents-Virustotal-Alerts-summary'
+            id: 'Wazuh-App-Agents-Virustotal-Alerts-summary',
+            width: 100
           }
         ]
       }
@@ -606,11 +621,12 @@ export const agentVisualizations = {
         ]
       },
       {
-        hide: true,
+        height: 360,
         vis: [
           {
             title: 'Alerts summary',
-            id: 'Wazuh-App-Overview-Osquery-Alerts-summary'
+            id: 'Wazuh-App-Overview-Osquery-Alerts-summary',
+            width: 100
           }
         ]
       }
@@ -654,11 +670,12 @@ export const agentVisualizations = {
         ]
       },
       {
-        hide: true,
+        height: 360,
         vis: [
           {
             title: 'Alerts summary',
-            id: 'Wazuh-App-Agents-MITRE-Alerts-summary'
+            id: 'Wazuh-App-Agents-MITRE-Alerts-summary',
+            width: 100
           }
         ]
       }
@@ -696,11 +713,12 @@ export const agentVisualizations = {
         ]
       },
       {
-        hide: true,
+        height: 360,
         vis: [
           {
             title: 'Alerts summary',
-            id: 'Wazuh-App-Agents-Docker-Events-summary'
+            id: 'Wazuh-App-Agents-Docker-Events-summary',
+            width: 100
           }
         ]
       }
@@ -758,11 +776,12 @@ export const agentVisualizations = {
         ]
       },
       {
-        hide: true,
+        height: 360,
         vis: [
           {
             title: 'Alerts summary',
-            id: 'Wazuh-App-Agents-OSCAP-Last-alerts'
+            id: 'Wazuh-App-Agents-OSCAP-Last-alerts',
+            width: 100
           }
         ]
       }
@@ -786,11 +805,12 @@ export const agentVisualizations = {
         ]
       },
       {
-        hide: true,
+        height: 360,
         vis: [
           {
             title: 'Alerts summary',
-            id: 'Wazuh-app-Agents-CISCAT-alerts-summary'
+            id: 'Wazuh-app-Agents-CISCAT-alerts-summary',
+            width: 100
           }
         ]
       }
@@ -823,11 +843,12 @@ export const agentVisualizations = {
         ]
       },
       {
-        hide: true,
+        height: 360,
         vis: [
           {
             title: 'Alerts summary',
-            id: 'Wazuh-App-Agents-PM-Alerts-summary'
+            id: 'Wazuh-App-Agents-PM-Alerts-summary',
+            width: 100
           }
         ]
       }
@@ -865,11 +886,12 @@ export const agentVisualizations = {
         ]
       },
       {
-        hide: true,
+        height: 360,
         vis: [
           {
             title: 'Alerts summary',
-            id: 'Wazuh-App-Agents-Audit-Last-alerts'
+            id: 'Wazuh-App-Agents-Audit-Last-alerts',
+            width: 100
           }
         ]
       }
