@@ -21,7 +21,7 @@ import {
 import {
   prettyDuration
 } from '../../../../../../node_modules/@elastic/eui/lib/components/date_picker/super_date_picker/pretty_duration'
-import { TimeService } from '../../../react-services/time-service'
+import { formatUIDate } from '../../../react-services/time-service'
 
 export function CondensedPicker({ ranges, onTimeChange }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -43,7 +43,7 @@ export function CondensedPicker({ ranges, onTimeChange }) {
   const dateFormat = () => {
     const result = customRange.replace(
       /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+\d{2}:\d{2}/gi,
-      (e) => TimeService.offset(e)
+      (e) => formatUIDate(e)
     );
     return result;
   }

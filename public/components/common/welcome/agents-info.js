@@ -19,7 +19,7 @@ import {
   EuiBadge
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
-import { TimeService } from '../../../react-services/time-service';
+import { formatUIDate } from '../../../react-services/time-service';
 
 import WzTextWithTooltipIfTruncated from '../wz-text-with-tooltip-if-truncated';
 import { WzStat } from '../../wz-stat';
@@ -168,7 +168,6 @@ export class AgentInfo extends Component {
 
   render() {
     const { agent } = this.props;
-
     let arrayStats;
 
     
@@ -196,14 +195,19 @@ export class AgentInfo extends Component {
           description: 'Operating system',
           style: {}
         },
-        { 
-          title: this.parseDateTime(agent.dateAdd), 
-          description: 'Registration date', 
+        {
+          title: agent.node_name && agent.node_name !== 'unknown' ? agent.node_name : '-',
+          description: 'Cluster node',
+          style: { maxWidth: 150 }
+        },
+        {
+          title: formatUIDate(agent.dateAdd),
+          description: 'Registration date',
           style: { maxWidth: 150 } },
-        { 
-          title: this.parseDateTime(agent.lastKeepAlive), 
-          description: 'Last keep alive', 
-          style: { maxWidth: 150 } 
+        {
+          title: formatUIDate(agent.lastKeepAlive),
+          description: 'Last keep alive',
+          style: { maxWidth: 150 }
         },
       ];
     }

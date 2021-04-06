@@ -31,6 +31,7 @@ import 'brace/theme/github';
 import exportCsv from '../../../../../react-services/wz-csv';
 import { getToasts }  from '../../../../../kibana-services';
 import { WzRequest } from '../../../../../react-services/wz-request';
+import { formatUIDate } from '../../../../../react-services/time-service';
 import { withUserAuthorizationPrompt, withGlobalBreadcrumb } from '../../../../../components/common/hocs';
 import { compose } from 'redux';
 import { WzFieldSearch } from '../../../../../components/wz-field-search-bar/wz-field-search-bar';
@@ -126,7 +127,7 @@ export default compose(
     let result = '';
     logs.forEach(item => {
       result +=
-        item.timestamp +
+        formatUIDate(item.timestamp) +
         ' ' +
         item.tag +
         ' ' +
