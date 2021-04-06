@@ -524,6 +524,7 @@ export class AgentsWelcome extends Component {
         />)
     }
 
+    console.log(this.state.widthWindow);
     return (
       <div className="wz-module wz-module-welcome">
         <div className='wz-module-header-agent-wrapper'>
@@ -534,7 +535,7 @@ export class AgentsWelcome extends Component {
         <div>
           <div className='wz-module-header-nav-wrapper'>
             <div className='wz-module-header-nav'>
-              <div style={{ margin: '0 16px' }}>
+              <div style={{ margin: '0 16px', marginBottom: 100}}>
                 <EuiPanel grow paddingSize='s' className="wz-welcome-page-agent-info">
                   <AgentInfo agent={this.props.agent} isCondensed={false} hideActions={true} {...this.props}></AgentInfo>
                 </EuiPanel>
@@ -542,7 +543,7 @@ export class AgentsWelcome extends Component {
             </div>
           </div>
         </div>
-        <div className="wz-module-body">
+        <div className='wz-module-body wz-module-agents-padding-responsive'>
           <EuiPage>
             <EuiPageBody component="div">
               <EuiFlexGroup>

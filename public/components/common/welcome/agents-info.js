@@ -32,6 +32,7 @@ export class AgentInfo extends Component {
     this.state = {};
   }
 
+  
   async componentDidMount() {
     const managerVersion = await WzRequest.apiReq('GET', '//', {});
 
@@ -188,6 +189,7 @@ export class AgentInfo extends Component {
     const stats = this.buildStats(arrayStats);
 
     // window.innerWidth < 1500 ? console.log("<1500") : console.log("max")
+
     return (
       <Fragment>
         <EuiFlexGroup wrap style={{responsive: true }} className="wz-welcome-page-agent-info-details">
