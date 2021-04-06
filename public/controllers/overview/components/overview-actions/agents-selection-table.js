@@ -469,6 +469,7 @@ export class AgentSelectionTable extends Component {
       pageIndex: this.state.pageIndex,
       pageSize: this.state.itemsPerPage,
       totalItemCount: this.state.totalItems,
+      pageSizeOptions: [10, 25, 50, 100]
     };
 
     this.columns.forEach(column => {
@@ -684,7 +685,7 @@ export class AgentSelectionTable extends Component {
         <EuiTablePagination
           activePage={pagination.pageIndex}
           itemsPerPage={pagination.pageSize}
-          itemsPerPageOptions={[10]}
+          itemsPerPageOptions={pagination.pageSizeOptions}
           pageCount={pagination.pageCount}
           onChangeItemsPerPage={this.onChangeItemsPerPage}
           onChangePage={this.onChangePage}

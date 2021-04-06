@@ -26,4 +26,6 @@ export { useUserPermissions, useUserPermissionsRequirements, useUserPermissionsP
 
 export { useUserRoles, useUserRolesRequirements, useUserRolesPrivate } from './useUserRoles';
 
-export { useRefreshAngularDiscover } from './useResfreshAngularDiscover'
+export { useRefreshAngularDiscover } from './useResfreshAngularDiscover';
+
+export { useApiRequest } from './useApiRequest';
