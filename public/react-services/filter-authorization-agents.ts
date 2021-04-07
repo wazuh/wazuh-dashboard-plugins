@@ -10,12 +10,13 @@
 * Find more information about this on the LICENSE file.
 */
 import { AppState } from '../react-services/app-state';
+import { AUTHORIZED_AGENTS } from '../../common/constants';
 
-export function getFilterWithAuthorizedAgents(agentsIds) {
+export function getFilterWithAuthorizedAgents(agentsIds, pattern) {
    //check for empty agents array
   if(!agentsIds || agentsIds.length == 0){return }
 
-  const usedPattern = AppState.getCurrentPattern();
+  const usedPattern = pattern ? pattern : AppState.getCurrentPattern();
   const isMonitoringIndex = usedPattern.indexOf('monitoring') > -1;
   const field = isMonitoringIndex ? 'id' : 'agent.id';
   return  {
@@ -27,7 +28,8 @@ export function getFilterWithAuthorizedAgents(agentsIds) {
       params: agentsIds,
       alias: null,
       negate: false,
-      disabled: false
+      disabled: false,
+      controlledBy: AUTHORIZED_AGENTS,
     },
     query: {       
       bool: {
