@@ -183,21 +183,21 @@ export class HealthCheck extends Component {
     let errors = this.state.errors;
     let apiChanged = false;
     const buttonRestartApi = <div> <span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span>
-            {<EuiToolTip
-              position='top'
-              content='Try to reconnect to the API'
-            >
-              <EuiButtonIcon
-                display="base"
-                iconType="refresh"
-                isLoading
-                iconSize="l"
-                onClick={() => this.reconnectWithAPI()}
-                size="m"
-                aria-label="Next"
-              />
-            </EuiToolTip>}
-          </div>;
+      {<EuiToolTip
+        position='top'
+        content='Try to reconnect to the API'
+      >
+        <EuiButtonIcon
+          display="base"
+          iconType="refresh"
+          isLoading
+          iconSize="l"
+          onClick={() => this.reconnectWithAPI()}
+          size="m"
+          aria-label="Next"
+        />
+      </EuiToolTip>}
+    </div>;
 
     try {
       const currentApi = JSON.parse(AppState.getCurrentAPI() || '{}');
@@ -284,16 +284,15 @@ export class HealthCheck extends Component {
                 permissionToGoToTheApp = false;
               }
               results[i].description = <span><EuiIcon type="check" color="secondary" ></EuiIcon> Ready</span>;
-              for (let element of results) {
-                if (results[i].description.props.children[1].includes('Error')) {
-                  permissionToGoToTheApp = false;
-                }
+              if (results[i].description.props.children[1].includes('Error')) {
+                permissionToGoToTheApp = false;
               }
               this.setState({ results, errors });
-              if (permissionToGoToTheApp)
+              if (permissionToGoToTheApp) {
                 this.goAppOverview();
                 const updateNotReadyYet = updateWazuhNotReadyYet(false);
                 store.dispatch(updateNotReadyYet);
+              }
             }
           }
         }
