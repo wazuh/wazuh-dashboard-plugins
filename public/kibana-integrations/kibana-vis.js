@@ -34,6 +34,8 @@ import {
 } from "@elastic/eui";
 import { getAngularModule, getToasts, getVisualizationsPlugin, getSavedObjects, getDataPlugin, getChrome, getOverlays } from '../kibana-services';
 import { KnownFields } from "../utils/known-fields";
+import { concat } from 'lodash';
+import { AppState } from '../react-services/app-state';
 
 class KibanaVis extends Component {
   _isMounted = false;
@@ -253,22 +255,24 @@ class KibanaVis extends Component {
       const query = !isAgentStatus ? discoverList[0] : {};
 
       const rawVis = raw ? raw.filter((item) => item && item.id === this.visID) : [];
-      let vizPattern;
-      try {
-        vizPattern = JSON.parse(rawVis[0].attributes.kibanaSavedObjectMeta.searchSourceJSON).index;
-      } catch (ex) {
-        console.warning(`kibana-vis exception: ${ex.message || ex}`);
-      }
-      const agentsFilters = this.getUserAgentsFilters(vizPattern);
-      Object.keys(agentsFilters).length !== 0 ? filters.push(agentsFilters) : null;
-
-      const visInput = {
-        timeRange,
-        filters,
-        query
-      };
 
       if (rawVis.length && discoverList.length) {
+        let vizPattern;
+        try {
+          vizPattern = JSON.parse(rawVis[0].attributes.kibanaSavedObjectMeta.searchSourceJSON).index;
+        } catch (ex) {
+          console.warn(`kibana-vis exception: ${ex.message || ex}`);
+        }
+        const agentsFilters = this.getUserAgentsFilters(vizPattern);
+        Object.keys(agentsFilters).length ? concat(filters, [agentsFilters]) : null;
+        
+
+        const visInput = {
+          timeRange,
+          filters,
+          query
+        };
+
         // There are pending updates from the discover (which is the one who owns the true app state)
 
         if (!this.visualization && !this.rendered && !this.renderInProgress) {
@@ -293,7 +297,6 @@ class KibanaVis extends Component {
           this.visHandler.handler.data$.subscribe(this.renderComplete());
           this.visHandlers.addItem(this.visHandler);
           this.setSearchSource(discoverList);
-          Object.keys(agentsFilters).length !== 0 ? filters.pop() : null; 
         } else if (this.rendered && !this.deadField) {
           // There's a visualization object -> just update its filters
 
@@ -305,7 +308,6 @@ class KibanaVis extends Component {
           this.$rootScope.rendered = "true";
           this.visHandler.updateInput(visInput);
           this.setSearchSource(discoverList);
-          Object.keys(agentsFilters).length !== 0 ? filters.pop() : null; 
         }
         if (this.state.visRefreshingIndex) this.setState({ visRefreshingIndex: false });
       }
