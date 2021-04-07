@@ -23,7 +23,7 @@ import { WzRequest } from '../../react-services/wz-request';
 import { getToasts }  from '../../kibana-services';
 import { ShareAgent } from '../../factories/share-agent';
 import { TabVisualizations } from '../../factories/tab-visualizations';
-import { TimeService } from '../../react-services/time-service';
+import { formatUIDate } from '../../react-services/time-service';
 import { ErrorHandler } from '../../react-services/error-handler';
 import { GroupHandler } from '../../react-services/group-handler';
 import store from '../../redux/store';
@@ -67,7 +67,6 @@ export class AgentsController {
     this.csvReq = csvReq;
     this.groupHandler = GroupHandler;
     this.wazuhConfig = new WazuhConfig();
-    this.timeService = TimeService;
     this.genericReq = GenericRequest;
 
     // Config on-demand
@@ -81,7 +80,7 @@ export class AgentsController {
     this.$scope.integrations = {};
     this.$scope.selectedItem = 0;
     this.targetLocation = null;
-    this.ignoredTabs = ['syscollector', 'welcome', 'configuration'];
+    this.ignoredTabs = ['syscollector', 'welcome', 'configuration', 'stats'];
 
     this.$scope.showNewFim = true;
     this.$scope.showScaScan = false;
@@ -902,7 +901,7 @@ export class AgentsController {
    */
   offsetTimestamp(text, time) {
     try {
-      return text + this.timeService.offset(time);
+      return text + formatUIDate(time);
     } catch (error) {
       return time !== '-' ? `${text}${time} (UTC)` : time;
     }

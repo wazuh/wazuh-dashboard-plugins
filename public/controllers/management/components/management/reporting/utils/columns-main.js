@@ -5,7 +5,7 @@ import moment from 'moment-timezone';
 import { WzButtonPermissions } from '../../../../../../components/common/permissions/button';
 import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../../../../../common/constants';
 import { getHttp, getUiSettings } from '../../../../../../kibana-services';
-
+import { formatUIDate } from '../../../../../../react-services/time-service';
 export default class ReportingColums {
   constructor(tableProps) {
     this.tableProps = tableProps;
@@ -31,7 +31,7 @@ export default class ReportingColums {
         {
           field: 'date',
           name: 'Created',
-          render: value => this.offsetTimestamp(value),
+          render: value => formatUIDate(value),
           sortable: true
         }
       ];
@@ -95,18 +95,6 @@ export default class ReportingColums {
       return dateLocate.format('YYYY/MM/DD HH:mm:ss');
     } catch (error) {
       throw new Error(error);
-    }
-  }
-
-  /**
-   * Transform a give date applying the browser's offset
-   * @param {*} time
-   */
-  offsetTimestamp(time) {
-    try {
-      return this.offset(time);
-    } catch (error) {
-      return time !== '-' ? `${time} (UTC)` : time;
     }
   }
 }

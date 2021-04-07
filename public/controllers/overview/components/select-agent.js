@@ -91,8 +91,6 @@ export class SelectAgent extends Component {
       this.buildFilter()
     );
 
-    console.log(rawAgents);
-
     const formatedAgents = (
       ((rawAgents || {}).data || {}).data || {}
     ).items.map(this.formatAgent.bind(this));

@@ -10,22 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 import { checkPluginVersion } from './utils';
-//import 'ui/autoload/all';
-/* import 'uiExports/visTypes';
-import 'uiExports/visResponseHandlers';
-import 'uiExports/visRequestHandlers';
-import 'uiExports/visEditorTypes';
-import 'uiExports/savedObjectTypes';
-import 'uiExports/spyModes';
-import 'uiExports/fieldFormats';
-import 'uiExports/fieldFormatEditors';
-import 'uiExports/navbarExtensions';
-import 'uiExports/managementSections';
-import 'uiExports/devTools';
-import 'uiExports/docViews';
-import 'uiExports/embeddableFactories';
-import 'uiExports/autocompleteProviders';
-import 'uiExports/interpreter'; */
 import 'angular-sanitize';
 
 // Require CSS
@@ -104,6 +88,9 @@ app.run([
   },
 ]);
 
+/**
+ * Set trigger for logout
+ */
 app.run(function ($rootElement) {
   $rootElement.append(`
     <div>
@@ -115,14 +102,14 @@ app.run(function ($rootElement) {
     </div>`);
 
   // Bind deleteExistentToken on Log out component.
-  $(document).ready(function () {
-    $('.euiHeaderSectionItem__button').mouseleave('mouseleave', function () {
+  $(document).on('ready', function () {
+    $('.euiHeaderSectionItem__button').on('mouseleave', function () {
       // opendistro
-      $('span:contains(Log out)').bind('click', function () {
+      $('span:contains(Log out)').on('click', function () {
         WzAuthentication.deleteExistentToken();
       });
       // x-pack
-      $('a:contains(Log out)').bind('click', function () {
+      $('a:contains(Log out)').on('click', function () {
         WzAuthentication.deleteExistentToken();
       });
     });

@@ -12,9 +12,22 @@
 
 import React from 'react';
 import { PromptSelectAgent } from './';
+import { 
+  EuiEmptyPrompt
+} from '@elastic/eui'
 
 export const PromptNoActiveAgent = () => {
   return (
     <PromptSelectAgent title="Agent is not active" body="This section is only available for active agents."/>
   )
-}
+};
+
+export const PromptNoActiveAgentWithoutSelect = () => {
+  return (
+    <EuiEmptyPrompt
+      iconType="watchesApp"
+      title={<h2>{`Agent is not active`}</h2>}
+      body="This section is only available for active agents."
+    />
+  )
+};

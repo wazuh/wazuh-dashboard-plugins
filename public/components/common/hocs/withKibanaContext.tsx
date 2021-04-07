@@ -18,6 +18,7 @@ interface withKibanaContextProps {
   indexPattern?: IIndexPattern
   filterManager?: FilterManager
   query?: Query
+  timeFilter?: TimeRange
 }
 
 export interface withKibanaContextExtendsProps {
@@ -36,7 +37,7 @@ export const withKibanaContext = <T extends object>(Component:React.FunctionComp
     const indexPattern = props.indexPattern ? props.indexPattern : useIndexPattern();
     const filterManager = props.filterManager ? props.filterManager : useFilterManager();
     const [query, setQuery] = props.query ? useState(props.query) : useQueryManager();
-    const { timeFilter, timeHistory, setTimeFilter } = useTimeFilter();
+    const { timeFilter, timeHistory, setTimeFilter } = props.timeFilter ? props.timeFilter : useTimeFilter();
     return <Component {...props}
       indexPattern={indexPattern}
       filterManager={filterManager}

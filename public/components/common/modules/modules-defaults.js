@@ -70,5 +70,8 @@ export const ModulesDefaults = {
   },
   configuration: {
     notModule: true
+  },
+  stats: {
+    notModule: true
   }
 };

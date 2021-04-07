@@ -67,8 +67,8 @@ export default class WzTextWithTooltipIfTruncated extends Component<IWzTextWithT
   componentWillUnmount(){
     this.timer && clearTimeout(this.timer);
   }
-  buildContent() {
-    return (
+  buildContent() {  
+    return (      
       <span
         ref={this.reference}
         style={{
