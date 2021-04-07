@@ -19,9 +19,10 @@ import {
 
 import { useApiService } from '../../../common/hooks/useApiService';
 import { Role } from '../../roles/types/role.type';
-import { UpdateUser } from '../types/user.type';
+import { UpdateUser, User } from '../types/user.type';
 import UsersServices from '../services';
 import RolesServices from '../../roles/services';
+import { WzButtonPermissions } from '../../../common/permissions/button';
 import { ErrorHandler } from '../../../../react-services/error-handler';
 import { WzAPIUtils } from '../../../../react-services/wz-api-utils';
 import { useDebouncedEffect } from '../../../common/hooks/useDebouncedEffect';
@@ -74,6 +75,7 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
       let _showApply =
         isValidForm(false) &&
         (allowRunAs !== currentUser.allow_run_as ||
+          password !== '' ||
           Object.values(getRolesDiff()).some(i => i.length));
 
       setShowApply(_showApply);
@@ -121,15 +123,21 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
 
     setIsLoading(true);
 
-    const userData: UpdateUser = {
-      allow_run_as: allowRunAs,
-    };
+    const userPromises: (Promise<User> | Promise<void>)[] = [];
+    const userData: UpdateUser = {};
+    const allowRunAsData: boolean = allowRunAs;
+
+    if (allowRunAsData != currentUser.allow_run_as)
+      userPromises.push(UsersServices.UpdateAllowRunAs(currentUser.id, allowRunAsData));
 
     if (password) {
       userData.password = password;
+      userPromises.push(UsersServices.UpdateUser(currentUser.id, userData));
     }
+
+    userPromises.push(updateRoles());
     try {
-      await Promise.all([UsersServices.UpdateUser(currentUser.id, userData), updateRoles()]);
+      await Promise.all([userPromises]);
 
       ErrorHandler.info('User was successfully updated');
       closeFlyout(true);
@@ -186,14 +194,16 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
               <h2>Run as</h2>
             </EuiTitle>
             <EuiFormRow label="" helpText="Set if the user is able to use run as">
-              <EuiSwitch
-                label="Allow"
-                showLabel={true}
-                checked={allowRunAs}
-                onChange={e => onChangeAllowRunAs(e)}
-                aria-label=""
-                disabled={WzAPIUtils.isReservedID(currentUser.id)}
-              />
+            <WzButtonPermissions
+              buttonType="switch"
+              label="Allow run as"
+              showLabel={true}
+              checked={allowRunAs}
+              permissions={[{ action: 'security:edit_run_as', resource: '*:*:*' }]}
+              onChange={e => onChangeAllowRunAs(e)}
+              aria-label=""
+              disabled={WzAPIUtils.isReservedID(currentUser.id)}
+            />
             </EuiFormRow>
           </EuiPanel>
           <EuiSpacer />
