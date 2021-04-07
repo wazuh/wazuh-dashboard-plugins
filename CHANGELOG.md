@@ -11,6 +11,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Add a message to restart cluster or manager after import a file in Rules, Decoders or CDB Lists [#3051](https://github.com/wazuh/wazuh-kibana-app/pull/3051)
 - Add `logtest` PUT example on API Console [#3061](https://github.com/wazuh/wazuh-kibana-app/pull/3061)
 - New buttom to check api again in health check [#3109](https://github.com/wazuh/wazuh-kibana-app/pull/3109)
+- Added Link to documentation "Checking connection with Manager" in deploy new agent [#3126](https://github.com/wazuh/wazuh-kibana-app/pull/3126)
 
 ### Changed
 
