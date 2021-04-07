@@ -149,6 +149,17 @@ export const updateSelectedSettingsSection = selected_settings_section => {
 };
 
 /**
+ * Updates selectedToolsSection in the appState store
+ * @param selected_tools_section
+ */
+export const updateSelectedToolsSection = selected_tools_section => {
+  return {
+    type: 'UPDATE_SELECTED_TOOLS_SECTION',
+    selected_tools_section
+  };
+};
+
+/**
 * Updates toastNotification in the appState store
 * @param toastNotification
 */
@@ -167,5 +178,50 @@ export const updateClusterStatus = (clusterStatus) => {
   return {
     type: 'UPDATE_CLUSTER_STATUS',
     clusterStatus,
+  };
+};
+
+/**
+ * Updates showFlyoutLogtest in the appState store
+ * @param showFlyout
+ */
+export const showFlyoutLogtest = (showFlyout) => {
+  return {
+    type: 'SHOW_FLYOUT_LOGTEST',
+    showFlyoutLogtest: showFlyout
+  };
+};
+
+/**
+ * Updates dockedFlyoutLogtest in the appState store
+ * @param dockedFlyout
+ */
+export const updateDockedLogtest = (dockedFlyout) => {
+  return {
+    type: 'UPDATE_DOCKED_LOGTEST',
+    dockedFlyoutLogtest: dockedFlyout  
+  };
+};
+
+/**
+ * Updates the status of whether the user is logged in
+ * @param withUserLogged
+ */
+export const updateWithUserLogged = (withUserLogged) => {
+  return {
+    type: 'UPDATE_WITH_USER_LOGGED',
+   withUserLogged,
+  };
+};
+
+
+/**
+ * Updates allowedAgents in the appState store
+ * @param GET_ALLOWED_AGENTS
+ */
+export const updateAllowedAgents = data => {
+  return {
+    type: 'GET_ALLOWED_AGENTS',
+    allowedAgents: data
   };
 };
