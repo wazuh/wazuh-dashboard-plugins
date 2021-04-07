@@ -1,15 +1,14 @@
- /*
-* Wazuh app - Integrity monitoring table component
-* Copyright (C) 2015-2021 Wazuh, Inc.
-*
-* This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation; either version 2 of the License, or
-* (at your option) any later version.
-*
-* Find more information about this on the LICENSE file.
-*/
- 
+/*
+ * Wazuh app - Integrity monitoring table component
+ * Copyright (C) 2015-2021 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+*/ 
 import React, { Component, } from 'react';
 import './discover.scss';
 import { FilterManager, Filter } from '../../../../../../../src/plugins/data/public/'
@@ -26,7 +25,7 @@ import { withReduxProvider } from '../../../common/hocs';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 import _ from 'lodash';
- 
+
 import {
  EuiBasicTable,
  EuiLoadingContent,
@@ -291,7 +290,7 @@ export const Discover = compose(
 
     const filters = this.props.shareFilterManager ? this.props.shareFilterManager.filters : [];
     const previousFilters = this.KibanaServices && this.KibanaServices.query.filterManager.filters ? this.KibanaServices.query.filterManager.filters : [];
-   const CustomFilterWith = this.props.shareFilterManagerWithUserAuthorized;
+    const CustomFilterWith = this.props.shareFilterManagerWithUserAuthorized;
     const elasticQuery =
       buildEsQuery(
         undefined,

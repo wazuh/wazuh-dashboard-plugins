@@ -293,6 +293,7 @@ class KibanaVis extends Component {
           this.visHandler.handler.data$.subscribe(this.renderComplete());
           this.visHandlers.addItem(this.visHandler);
           this.setSearchSource(discoverList);
+          Object.keys(agentsFilters).length !== 0 ? filters.pop() : null; 
         } else if (this.rendered && !this.deadField) {
           // There's a visualization object -> just update its filters
 
@@ -304,6 +305,7 @@ class KibanaVis extends Component {
           this.$rootScope.rendered = "true";
           this.visHandler.updateInput(visInput);
           this.setSearchSource(discoverList);
+          Object.keys(agentsFilters).length !== 0 ? filters.pop() : null; 
         }
         if (this.state.visRefreshingIndex) this.setState({ visRefreshingIndex: false });
       }

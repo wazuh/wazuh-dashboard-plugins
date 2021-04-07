@@ -35,15 +35,14 @@ export function hasAgentSupportModule(agent, component){
   return !(UnsupportedComponents[agentOSType].includes(component));
 };
 
-
 export async function getAuthorizedAgents() {
-  const agentsList: IApiResponse<{id: string}> = await WzRequest.apiReq('GET', `/agents`, {})
-  .catch(error => {   
+  try{
+    const agentsList: IApiResponse<{id: string}> = await WzRequest.apiReq('GET', `/agents`, {});
+    const allowedAgents = agentsList ? agentsList.data.data.affected_items.map((agent) => agent.id) : []
+    return allowedAgents;
+  }catch(error) {   
     getToasts().addError(error, {title: `Error getting user authorized agents`} as ErrorToastOptions);
     return Promise.reject();
-  });
-
-  const allowedAgents = agentsList ? agentsList.data.data.affected_items.map((agent) => agent.id) : []
-
-  return allowedAgents;
+  };
 }
+

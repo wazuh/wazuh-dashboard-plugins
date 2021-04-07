@@ -12,9 +12,6 @@
 import React from 'react';
 import { useFilterManager, useQuery, useRefreshAngularDiscover } from '../../common/hooks';
 import { Discover } from '../../common/modules/discover';
-import { getFilterWithAuthorizedAgents } from '../../../react-services/filter-authorization-agents';
-import { useSelector } from 'react-redux';
-import { withReduxProvider } from '../../common/hocs';
 import { useAllowedAgents } from '../../common/hooks/useAllowedAgents'
  
 export const SecurityAlerts = () => {

@@ -530,7 +530,7 @@ function discoverController(
             next: () => {
               $scope.filters = filterManager.filters;
               const customFilterAllowedAgents = getFilterWithAuthorizedAgents(store.getState().appStateReducers.allowedAgents);
-              $scope.filters.push(customFilterAllowedAgents);
+              customFilterAllowedAgents && $scope.filters.push(customFilterAllowedAgents);
               // Wazuh. Hides the alerts of the '000' agent if it is in the configuration
               const buildFilters = () => {
                 const { hideManagerAlerts } = wazuhConfig.getConfig();
