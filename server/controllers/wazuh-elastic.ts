@@ -463,11 +463,11 @@ export class WazuhElasticCtrl {
               const _visState = bulk_content.visualization.visStateByNode
                 ? JSON.parse(bulk_content.visualization.visStateByNode)
                 : visState;
-              query += _visState.params.expression.replace(expressionRegex, `q="nodeName:${name} AND apiName:${master_node}"`)
+              query += _visState.params.expression.replace(expressionRegex, `q="nodeName.keyword:${name} AND apiName.keyword:${master_node}"`)
                 .replace("NODE_NAME", name)
             } else if (title.startsWith('Wazuh App Statistics')) {
               const expressionRegex = /q='\*'/gi
-              query += visState.params.expression.replace(expressionRegex, `q="apiName:${master_node}"`)
+              query += visState.params.expression.replace(expressionRegex, `q="apiName.keyword:${master_node}"`)
             } else {
               query = visState.params.expression;
             }
