@@ -29,7 +29,7 @@ import {
 import { WazuhPluginSetup, WazuhPluginStart, PluginSetup } from './types';
 import { SecurityObj, ISecurityFactory } from './lib/security-factory';
 import { setupRoutes } from './routes';
-import { jobInitializeRun, jobMonitoringRun, jobSchedulerRun, jobQueueRun, jobStatisticsRun } from './start';
+import { jobInitializeRun, jobMonitoringRun, jobSchedulerRun, jobQueueRun } from './start';
 import { getCookieValueByName } from './lib/cookie';
 import * as ApiInterceptor  from './lib/api-interceptor';
 import { schema, TypeOf } from '@kbn/config-schema';
@@ -139,16 +139,6 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       core,
       wazuh: {
         logger: this.logger.get('monitoring'),
-        api: wazuhApiClient
-      },
-      server: contextServer
-    });
-
-    // Statistic
-    jobStatisticsRun({
-      core,
-      wazuh: {
-        logger: this.logger.get('statistics'),
         api: wazuhApiClient
       },
       server: contextServer
