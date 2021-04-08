@@ -55,13 +55,13 @@ const checkKibanaStatus = async function (context) {
 
 
  /**
- * Verify wazuh-agent template
+ * Verify wazuh-statistics template
  */
 const checkTemplate = async function (context) {
   try {
     log(
       'scheduler-handler:checkTemplate',
-      'Updating the monitoring template',
+      'Updating the statistics template',
       'debug'
     );
 
@@ -88,14 +88,14 @@ const checkTemplate = async function (context) {
       statisticsTemplate.index_patterns.push(pattern);
     };
 
-    // Update the monitoring template
+    // Update the statistics template
     await context.core.elasticsearch.client.asInternalUser.indices.putTemplate({
       name: templateName,
       body: statisticsTemplate
     });
     log(
       'scheduler-handler:checkTemplate',
-      'Updated the monitoring template',
+      'Updated the statistics template',
       'debug'
     );
   } catch (error) {
