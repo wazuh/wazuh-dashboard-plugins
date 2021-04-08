@@ -99,7 +99,7 @@ export const Discover = compose(
     includeFilters?: string,
     initialColumns: string[],
     shareFilterManager: FilterManager,
-   shareFilterManagerWithUserAuthorized: FilterManager,
+    shareFilterManagerWithUserAuthorized: Filter[],
     refreshAngularDiscover?: number
   }
   constructor(props) {
@@ -288,14 +288,13 @@ export const Discover = compose(
       $state: { store: 'appState' }
     });
 
-    const filters = this.props.shareFilterManager ? this.props.shareFilterManager.filters : [];
-    const previousFilters = this.KibanaServices && this.KibanaServices.query.filterManager.filters ? this.KibanaServices.query.filterManager.filters : [];
-    const CustomFilterWith = this.props.shareFilterManagerWithUserAuthorized;
+    const filters = this.props.shareFilterManager ? this.props.shareFilterManager.getFilters() : [];
+    const previousFilters = this.KibanaServices && this.KibanaServices.query.filterManager.getFilters() || [];
     const elasticQuery =
       buildEsQuery(
         undefined,
         query,
-       [...previousFilters, ...filters, ...extraFilters, ...CustomFilterWith],
+       _.union(previousFilters, filters,extraFilters, this.props.shareFilterManagerWithUserAuthorized || []),
         getEsQueryConfig(getUiSettings())
       );
 
