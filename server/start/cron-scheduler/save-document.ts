@@ -3,7 +3,6 @@ import { getConfiguration } from '../../lib/get-configuration';
 import { log } from '../../lib/logger';
 import { indexDate } from '../../lib/index-date';
 import { WAZUH_INDEX_SHARDS, WAZUH_INDEX_REPLICAS } from '../../../common/constants'
-import { JUSTIFY_CONTENTS } from '@elastic/eui/src/components/flex/flex_group';
 
 export interface IIndexConfiguration {
   name: string

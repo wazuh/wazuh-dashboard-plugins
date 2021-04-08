@@ -12,7 +12,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added Agent Stats section [#3056](https://github.com/wazuh/wazuh-kibana-app/pull/3056)
 - Add `logtest` PUT example on API Console [#3061](https://github.com/wazuh/wazuh-kibana-app/pull/3061)
 - New buttom to check api again in health check [#3109](https://github.com/wazuh/wazuh-kibana-app/pull/3109)
-- Added `wazuh-statistics` template and a new mapping for this indices [#3111](https://github.com/wazuh/wazuh-kibana-app/pull/3111)
+- Added `wazuh-statistics` template and a new mapping for these indices [#3111](https://github.com/wazuh/wazuh-kibana-app/pull/3111)
 
 ### Changed
 
