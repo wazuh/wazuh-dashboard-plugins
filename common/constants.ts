@@ -176,7 +176,7 @@ export const WAZUH_DEFAULT_APP_CONFIG = {
 };
 
 // Wazuh errors
-export const WAZUH_ERROR_DAEMONS_NOT_READY = 'ERROR3099 - Some Wazuh daemons are not ready yet in node';
+export const WAZUH_ERROR_DAEMONS_NOT_READY = 'ERROR3099';
 
 // Agents
 export enum WAZUH_AGENTS_OS_TYPE{

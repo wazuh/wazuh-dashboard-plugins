@@ -118,22 +118,29 @@ export class HealthCheck extends Component {
       const response = await GenericRequest.request('GET', '/hosts/apis');
       const hosts = response.data;
       const errors = [];
+      const results = this.state.results;
 
       if (hosts.length) {
         for (let i = 0; i < hosts.length; i++) {
-          let tries = 36;
+          const maxTries = 5;
+          let tries = maxTries;
           while (tries--) {
-            await this.delay(5000);
+            await this.delay(3000);
             try {
               const API = await ApiCheck.checkApi(hosts[i], true);
               if (API && API.data) {
                 return hosts[i].id;
               }
             } catch (err) {
-              if (err.includes(WAZUH_ERROR_DAEMONS_NOT_READY)) {
-                const updateNotReadyYet = updateWazuhNotReadyYet(false);
-                store.dispatch(updateNotReadyYet);
+              if (tries) {
+                results[0].description = <span><EuiLoadingSpinner size="m" /> Retrying {'.'.repeat(maxTries - tries) }</span>;
+                results[1].description = <span><EuiLoadingSpinner size="m" /> Retrying {'.'.repeat(maxTries - tries) }</span>;
+                this.setState({ results });
               } else {
+                if (err.includes(WAZUH_ERROR_DAEMONS_NOT_READY)) {
+                  const updateNotReadyYet = updateWazuhNotReadyYet(false);
+                  store.dispatch(updateNotReadyYet);         
+                }
                 errors.push(`Could not connect to API with id: ${hosts[i].id}: ${err.message || err}`);
               }
             }
@@ -166,11 +173,8 @@ export class HealthCheck extends Component {
       if (toast.text.includes('3000'))
         getToasts().remove(toast.id);
     });
-    let errors = this.state.errors;
-    this.state.errors.forEach(error => {
-      if (error.includes('API'))
-        errors.pop(error);
-    });
+    
+    const errors = this.state.errors.filter((error: string) => error.indexOf('API') < 0)
     this.setState({ results, errors });
     this.checkApiConnection();
   }
