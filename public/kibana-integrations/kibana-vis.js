@@ -230,7 +230,7 @@ class KibanaVis extends Component {
 
         if (!filters.find((filter) => filter.meta.controlledBy === AUTHORIZED_AGENTS)) {
           const agentsFilters = getFilterWithAuthorizedAgents(this.props.allowedAgents, vizPattern);
-          filters = Object.keys(agentsFilters).length ? union(filters, [agentsFilters]) : filters;
+          filters = agentsFilters ? union(filters, [agentsFilters]) : filters;
         }
 
         const visInput = {

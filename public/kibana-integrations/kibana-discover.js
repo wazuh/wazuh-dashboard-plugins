@@ -528,9 +528,10 @@ function discoverController(
           searchBarChanges,
           {
             next: () => {
-              $scope.filters = filterManager.filters;
               const customFilterAllowedAgents = getFilterWithAuthorizedAgents(store.getState().appStateReducers.allowedAgents);
-              $scope.filters = customFilterAllowedAgents ? _.union($scope.filters, [customFilterAllowedAgents]) : $scope.filters;
+              filterManager.filters = customFilterAllowedAgents ? _.union(filterManager.filters, [customFilterAllowedAgents]) : filterManager.filters;
+              $scope.filters = filterManager.filters;
+
               // Wazuh. Hides the alerts of the '000' agent if it is in the configuration
               const buildFilters = () => {
                 const { hideManagerAlerts } = wazuhConfig.getConfig();
