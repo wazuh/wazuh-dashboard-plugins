@@ -34,6 +34,10 @@ import {
 } from "@elastic/eui";
 import { getAngularModule, getToasts, getVisualizationsPlugin, getSavedObjects, getDataPlugin, getChrome, getOverlays } from '../kibana-services';
 import { KnownFields } from "../utils/known-fields";
+import { union } from 'lodash';
+import { getFilterWithAuthorizedAgents } from '../react-services/filter-authorization-agents';
+import { AUTHORIZED_AGENTS } from '../../common/constants';
+
 
 class KibanaVis extends Component {
   _isMounted = false;
@@ -198,44 +202,6 @@ class KibanaVis extends Component {
     }
   };
 
-  getUserAgentsFilters = (pattern = "") => {
-    const agentsIds = this.props.allowedAgents;
-
-    //check for empty agents array
-    if(agentsIds.length == 0){return {}}
-
-    const usedPattern = pattern ? pattern : AppState.getCurrentPattern();
-    const isMonitoringIndex = usedPattern.indexOf('monitoring') > -1;
-    const field = isMonitoringIndex ? 'id' : 'agent.id';
-    return  {
-      meta: {
-        index: usedPattern,
-        type: 'phrases',
-        key: field,
-        value: agentsIds.toString(),
-        params: agentsIds,
-        alias: null,
-        negate: false,
-        disabled: false
-      },
-      query: {        
-        bool: {
-          should: agentsIds.map(id => {
-            return {
-              match_phrase: {
-                [field]: id
-              }
-            };
-          }),
-          minimum_should_match: 1
-        }
-      },
-      $state: {
-        store: 'appState'
-      }
-    }
-  }
-
   myRender = async (raw) => {
     const timefilter = getDataPlugin().query.timefilter.timefilter;
     try {
@@ -249,26 +215,30 @@ class KibanaVis extends Component {
         isAgentStatus && timeFilterSeconds < 900
           ? { from: "now-15m", to: "now", mode: "quick" }
           : timefilter.getTime();
-      const filters = isAgentStatus ? [] : discoverList[1] || [];
+      let filters = isAgentStatus ? [] : discoverList[1] || [];
       const query = !isAgentStatus ? discoverList[0] : {};
 
       const rawVis = raw ? raw.filter((item) => item && item.id === this.visID) : [];
-      let vizPattern;
-      try {
-        vizPattern = JSON.parse(rawVis[0].attributes.kibanaSavedObjectMeta.searchSourceJSON).index;
-      } catch (ex) {
-        console.warning(`kibana-vis exception: ${ex.message || ex}`);
-      }
-      const agentsFilters = this.getUserAgentsFilters(vizPattern);
-      Object.keys(agentsFilters).length !== 0 ? filters.push(agentsFilters) : null;
-
-      const visInput = {
-        timeRange,
-        filters,
-        query
-      };
 
       if (rawVis.length && discoverList.length) {
+        let vizPattern;
+        try {
+          vizPattern = JSON.parse(rawVis[0].attributes.kibanaSavedObjectMeta.searchSourceJSON).index;
+        } catch (ex) {
+          console.warn(`kibana-vis exception: ${ex.message || ex}`);
+        }
+
+        if (!filters.find((filter) => filter.meta.controlledBy === AUTHORIZED_AGENTS)) {
+          const agentsFilters = getFilterWithAuthorizedAgents(this.props.allowedAgents, vizPattern);
+          filters = agentsFilters ? union(filters, [agentsFilters]) : filters;
+        }
+
+        const visInput = {
+          timeRange,
+          filters,
+          query
+        };
+
         // There are pending updates from the discover (which is the one who owns the true app state)
 
         if (!this.visualization && !this.rendered && !this.renderInProgress) {

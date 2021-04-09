@@ -49,12 +49,18 @@ export class WzAuthentication{
       // Decode token and get expiration time
       const jwtPayload = jwtDecode(token);
 
-      //Get allowed agents for the current user
-      const allowedAgents = await getAuthorizedAgents();
-      store.dispatch(updateAllowedAgents(allowedAgents));
-
       // Get user Policies
       const userPolicies = await WzAuthentication.getUserPolicies();
+      
+      //Get allowed agents for the current user
+      let allowedAgents: any = [];
+      if (WzAuthentication.userHasAgentsPermissions(userPolicies)) {
+        allowedAgents = await getAuthorizedAgents();
+        allowedAgents = allowedAgents.length ? allowedAgents : ['-1']; // users without read:agent police should not view info about any agent
+      } 
+      store.dispatch(updateAllowedAgents(allowedAgents));
+
+      
       // Dispatch actions to set permissions and roles
       store.dispatch(updateUserPermissions(userPolicies));
       store.dispatch(updateUserRoles(WzAuthentication.mapUserRolesIDToAdministratorRole(jwtPayload.rbac_roles || [])));
@@ -97,5 +103,24 @@ export class WzAuthentication{
     } catch (error) {
       throw error;
     }
+  }
+
+  /**
+   * This function returns true only if the user has some police that need be filtered.
+   * Returns false if the user has permission for all agents.
+   * Returns true if the user has no one police for agent:read.
+   * @param policies 
+   * @returns boolean
+   */
+  static userHasAgentsPermissions(policies) {
+    const agentReadPolicies = policies['agent:read'];
+    if (agentReadPolicies) {
+      const allIds = agentReadPolicies['agent:id:*'] == 'allow';      
+      const allGroups = agentReadPolicies['agent:group:*'] == 'allow';
+      const denyAgents = Object.keys(agentReadPolicies).some(k => !k.includes('*') && agentReadPolicies[k] == 'deny');
+      return !((allIds || allGroups) && !denyAgents);
+    }
+    // users without read:agent police should not view info about any agent
+    return true;
   }
 }

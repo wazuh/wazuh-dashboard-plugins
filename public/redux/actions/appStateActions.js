@@ -217,11 +217,11 @@ export const updateWithUserLogged = (withUserLogged) => {
 
 /**
  * Updates allowedAgents in the appState store
- * @param GET_ALLOWED_AGENTS
+ * @param allowedAgents
  */
-export const updateAllowedAgents = data => {
+export const updateAllowedAgents = allowedAgents => {
   return {
     type: 'GET_ALLOWED_AGENTS',
-    allowedAgents: data
+    allowedAgents
   };
 };

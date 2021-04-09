@@ -28,4 +28,6 @@ export { useUserRoles, useUserRolesRequirements, useUserRolesPrivate } from './u
 
 export { useRefreshAngularDiscover } from './useResfreshAngularDiscover';
 
+export { useAllowedAgents } from './useAllowedAgents';
+
 export { useApiRequest } from './useApiRequest';

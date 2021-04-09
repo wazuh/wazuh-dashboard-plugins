@@ -208,3 +208,5 @@ export enum WAZUH_MODULES_ID{
   VIRUSTOTAL = 'virustotal',
   GDPR = 'gdpr'
 }
+
+export const AUTHORIZED_AGENTS = 'authorized-agents';
