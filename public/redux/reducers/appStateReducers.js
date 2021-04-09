@@ -29,6 +29,7 @@ const initialState = {
     contextConfigServer: 'manager',
   },
  withUserLogged: false,
+ allowedAgents: [],
 };
 
 const appStateReducers = (state = initialState, action) => {
@@ -138,6 +139,13 @@ const appStateReducers = (state = initialState, action) => {
      withUserLogged: action.withUserLogged,
     };
   }  
+
+  if (action.type === 'GET_ALLOWED_AGENTS') {
+    return {
+      ...state,
+      allowedAgents: action.allowedAgents
+    };
+  }
   
   return state;
 };

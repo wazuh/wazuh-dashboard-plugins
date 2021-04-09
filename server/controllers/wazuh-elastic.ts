@@ -184,7 +184,7 @@ export class WazuhElasticCtrl {
    * @param {Object} response
    * @returns {Array<Object>} fields or ErrorResponse
    */
-  async getFieldTop(context: RequestHandlerContext, request: KibanaRequest<{ mode: string, cluster: string, field: string, pattern: string }>, response: KibanaResponseFactory) {
+  async getFieldTop(context: RequestHandlerContext, request: KibanaRequest<{ mode: string, cluster: string, field: string, pattern: string }, { agentsList: string }>, response: KibanaResponseFactory) {
     try {
       // Top field payload
       let payload = {
@@ -197,7 +197,16 @@ export class WazuhElasticCtrl {
                 'agent.id': '000'
               }
             },
-            filter: { range: { timestamp: {} } }
+            filter: [
+              {
+                range: { timestamp: {} }
+              },
+              {
+                terms: {
+                  'agent.id': request.query.agentsList.split(',')
+                }
+              }
+            ]
           }
         },
         aggs: {
@@ -214,8 +223,8 @@ export class WazuhElasticCtrl {
       // Set up time interval, default to Last 24h
       const timeGTE = 'now-1d';
       const timeLT = 'now';
-      payload.query.bool.filter.range['timestamp']['gte'] = timeGTE;
-      payload.query.bool.filter.range['timestamp']['lt'] = timeLT;
+      payload.query.bool.filter[0].range['timestamp']['gte'] = timeGTE;
+      payload.query.bool.filter[0].range['timestamp']['lt'] = timeLT;
 
       // Set up match for default cluster name
       payload.query.bool.must.push(
@@ -463,11 +472,11 @@ export class WazuhElasticCtrl {
               const _visState = bulk_content.visualization.visStateByNode
                 ? JSON.parse(bulk_content.visualization.visStateByNode)
                 : visState;
-              query += _visState.params.expression.replace(expressionRegex, `q="nodeName.keyword:${name} AND apiName.keyword:${master_node}"`)
+              query += _visState.params.expression.replace('wazuh-statistics-*', pattern_name).replace(expressionRegex, `q="nodeName.keyword:${name} AND apiName.keyword:${master_node}"`)
                 .replace("NODE_NAME", name)
             } else if (title.startsWith('Wazuh App Statistics')) {
               const expressionRegex = /q='\*'/gi
-              query += visState.params.expression.replace(expressionRegex, `q="apiName.keyword:${master_node}"`)
+              query += visState.params.expression.replace('wazuh-statistics-*', pattern_name).replace(expressionRegex, `q="apiName.keyword:${master_node}"`)
             } else {
               query = visState.params.expression;
             }

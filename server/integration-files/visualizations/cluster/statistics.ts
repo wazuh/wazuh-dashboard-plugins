@@ -16,7 +16,7 @@ export default [
     _source: {
       title: 'Wazuh App Statistics remoted Recv bytes',
       visState:
-        `{"title":"Wazuh App Statistics remoted Recv bytes","type":"timelion","params":{"expression":".es(timefield=timestamp,metric=avg:remoted.recv_bytes, q='*').label(recv_bytes),.es(timefield=timestamp,metric=avg:remoted.recv_bytes, q='*').trend().label(Trend).lines(width=1.5)","interval":"5m"},"aggs":[]}`,
+        `{"title":"Wazuh App Statistics remoted Recv bytes","type":"timelion","params":{"expression":".es(index=wazuh-statistics-*, timefield=timestamp,metric=avg:remoted.recv_bytes, q='*').label(recv_bytes),.es(timefield=timestamp,metric=avg:remoted.recv_bytes, q='*').trend().label(Trend).lines(width=1.5)","interval":"5m"},"aggs":[]}`,
       uiStateJSON: '{}',
       description: '',
       version: 1,
@@ -32,7 +32,7 @@ export default [
     _source: {
       title: 'Wazuh App Statistics remoted event count',
       visState:
-        `{"title":"Wazuh App Statistics remoted Recv bytes","type":"timelion","params":{"expression":".es(timefield=timestamp,metric=avg:remoted.evt_count, q='*').label(evt_count),.es(timefield=timestamp,metric=avg:remoted.evt_count, q='*').trend().label(Trend).lines(width=1.5)","interval":"5m"},"aggs":[]}`,
+        `{"title":"Wazuh App Statistics remoted event count","type":"timelion","params":{"expression":".es(index=wazuh-statistics-*, timefield=timestamp,metric=avg:remoted.evt_count, q='*').label(evt_count),.es(timefield=timestamp,metric=avg:remoted.evt_count, q='*').trend().label(Trend).lines(width=1.5)","interval":"5m"},"aggs":[]}`,
       uiStateJSON: '{}',
       description: '',
       version: 1,
@@ -48,7 +48,7 @@ export default [
     _source: {
       title: 'Wazuh App Statistics remoted messages',
       visState:
-        `{"title":"Wazuh App Statistics remoted messages","type":"timelion","params":{"expression":".es(timefield=timestamp,metric=avg:remoted.msg_sent, q='*').label(msg_sent),.es(timefield=timestamp,metric=avg:remoted.ctrl_msg_count, q='*').label(ctrl_msg_count),.es(timefield=timestamp,metric=avg:remoted.discarded_count).label(discarded_count),.es(timefield=timestamp,metric=avg:remoted.dequeued_after_close, q='*').label(dequeued_after_close)","interval":"5m"},"aggs":[]}`,
+        `{"title":"Wazuh App Statistics remoted messages","type":"timelion","params":{"expression":".es(index=wazuh-statistics-*, timefield=timestamp,metric=avg:remoted.msg_sent, q='*').label(msg_sent),.es(timefield=timestamp,metric=avg:remoted.ctrl_msg_count, q='*').label(ctrl_msg_count),.es(timefield=timestamp,metric=avg:remoted.discarded_count).label(discarded_count),.es(timefield=timestamp,metric=avg:remoted.dequeued_after_close, q='*').label(dequeued_after_close)","interval":"5m"},"aggs":[]}`,
       uiStateJSON: '{}',
       description: '',
       version: 1,
@@ -64,7 +64,7 @@ export default [
     _source: {
       title: 'Wazuh App Statistics remoted tcp sessions',
       visState:
-        `{"title":"Wazuh App Statistics remoted tcp sessions","type":"timelion","params":{"expression":".es(timefield=timestamp,metric=sum:remoted.tcp_sessions, q='*').label(tcp_sessions)","interval":"5m"},"aggs":[]}`,
+        `{"title":"Wazuh App Statistics remoted tcp sessions","type":"timelion","params":{"expression":".es(index=wazuh-statistics-*, timefield=timestamp,metric=sum:remoted.tcp_sessions, q='*').label(tcp_sessions)","interval":"5m"},"aggs":[]}`,
       uiStateJSON: '{}',
       description: '',
       version: 1,
