@@ -102,16 +102,14 @@ app.run(function ($rootElement) {
     </div>`);
 
   // Bind deleteExistentToken on Log out component.
-  $(document).on('ready', function () {
-    $('.euiHeaderSectionItem__button').on('mouseleave', function () {
-      // opendistro
-      $('span:contains(Log out)').on('click', function () {
-        WzAuthentication.deleteExistentToken();
-      });
-      // x-pack
-      $('a:contains(Log out)').on('click', function () {
-        WzAuthentication.deleteExistentToken();
-      });
+  $('.euiHeaderSectionItem__button').on('mouseleave', function () {
+    // opendistro
+    $('span:contains(Log out)').on('click', function () {
+      WzAuthentication.deleteExistentToken();
+    });
+    // x-pack
+    $('a:contains(Log out)').on('click', function () {
+      WzAuthentication.deleteExistentToken();
     });
   });
 });

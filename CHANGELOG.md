@@ -26,6 +26,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed missing `pending` status suggestion for agents [#3095](https://github.com/wazuh/wazuh-kibana-app/pull/3095)
 - Index pattern setting not used for choosing from existing patterns [#3097](https://github.com/wazuh/wazuh-kibana-app/pull/3097)
 - Fix space character missing on deployment command if UDP is configured [#3108](https://github.com/wazuh/wazuh-kibana-app/pull/3108)
+- Fix statistics visualizations when a node is selected [#3110](https://github.com/wazuh/wazuh-kibana-app/pull/3110)
 - Flyout date filter also changes main date filter [#3114](https://github.com/wazuh/wazuh-kibana-app/pull/3114)
 - Fixed name for "TCP sessions" visualization and average metric is now a sum [#3118](https://github.com/wazuh/wazuh-kibana-app/pull/3118)
 - Filter only authorized agents in Events and Security Alerts table [#3120](https://github.com/wazuh/wazuh-kibana-app/pull/3120)
