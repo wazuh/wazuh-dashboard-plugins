@@ -187,17 +187,35 @@ export const statisticsTemplate = {
         }
       },
       "apiName" : {
-        "type" : "keyword"
+        "type" : "text",
+        "fields" : {
+          "keyword" : {
+            "type" : "keyword",
+            "ignore_above" : 256
+          }
+        }
       },
       "cluster" : {
-        "type" : "keyword"
+        "type" : "text",
+        "fields" : {
+          "keyword" : {
+            "type" : "keyword",
+            "ignore_above" : 256
+          }
+        }
+      },
+      "nodeName" : {
+        "type" : "text",
+        "fields" : {
+          "keyword" : {
+            "type" : "keyword",
+            "ignore_above" : 256
+          }
+        }
       },
       "name" : {
         "type" : "keyword"
-      },
-      "nodeName" : {
-        "type" : "keyword"
-      },
+      }, 
       "remoted" : {
         "properties" : {
           "ctrl_msg_count" : {
