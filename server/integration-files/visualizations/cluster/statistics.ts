@@ -194,6 +194,8 @@ export default [
       title: 'Wazuh App Statistics Events by Node',
       visState:
         `{"title":"Wazuh App Statistics Events by Node","type":"timelion","params":{"expression":".es(index=wazuh-statistics-*, timefield=timestamp,metric=sum:analysisd.events_processed, q='*') .label('Total'), .es(index=wazuh-statistics-*, timefield=timestamp,metric=sum:analysisd.events_processed, q='*', split=nodeName.keyword:5).label('Events processed by Node: $1','^.* > nodeName.keyword:(\\\\S+) > .*')","interval":"5m"},"aggs":[]}`,
+      visStateByNode:
+        `{"title":"Wazuh App Statistics Events by Node","type":"timelion","params":{"expression":".es(index=wazuh-statistics-*, timefield=timestamp,metric=sum:analysisd.events_processed, q='*') .label('Events processed by Node: NODE_NAME')","interval":"5m"},"aggs":[]}`,
       uiStateJSON: '{}',
       description: '',
       version: 1,
@@ -210,6 +212,8 @@ export default [
       title: 'Wazuh App Statistics Events Dropped by Node',
       visState:
         `{"title":"Wazuh App Statistics Events Dropped by Node","type":"timelion","params":{"expression":".es(index=wazuh-statistics-*, timefield=timestamp,metric=sum:analysisd.events_dropped, q='*') .label('Total'), .es(index=wazuh-statistics-*, timefield=timestamp,metric=sum:analysisd.events_dropped, q='*', split=nodeName.keyword:5).label('Events dropped by Node: $1','^.* > nodeName.keyword:(\\\\S+) > .*')","interval":"5m"},"aggs":[]}`,
+        visStateByNode:
+        `{"title":"Wazuh App Statistics Events by Node","type":"timelion","params":{"expression":".es(index=wazuh-statistics-*, timefield=timestamp,metric=sum:analysisd.events_dropped, q='*') .label('Events dropped by Node: NODE_NAME')","interval":"5m"},"aggs":[]}`,
       uiStateJSON: '{}',
       description: '',
       version: 1,
