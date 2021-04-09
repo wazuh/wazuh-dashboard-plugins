@@ -117,7 +117,7 @@ export class WzAuthentication{
     if (agentReadPolicies) {
       const allIds = agentReadPolicies['agent:id:*'] == 'allow';      
       const allGroups = agentReadPolicies['agent:group:*'] == 'allow';
-      const denyAgents = Object.keys(agentReadPolicies).filter(k => !k.includes('*') && agentReadPolicies[k] == 'deny').length;
+      const denyAgents = Object.keys(agentReadPolicies).some(k => !k.includes('*') && agentReadPolicies[k] == 'deny');
       return !((allIds || allGroups) && !denyAgents);
     }
     // users without read:agent police should not view info about any agent
