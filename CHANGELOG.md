@@ -16,6 +16,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Changed
 
 - Changed position of Top users on Integrity Monitoring Top 5 user. [#2892](https://github.com/wazuh/wazuh-kibana-app/pull/2892)
+- Changed user allow_run_as way of editing. [#3080](https://github.com/wazuh/wazuh-kibana-app/pull/3080)
 - Rename some ossec references to Wazuh [#3046](https://github.com/wazuh/wazuh-kibana-app/pull/3046)
 
 ### Fixed
@@ -27,11 +28,12 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Flyout date filter also changes main date filter [#3114](https://github.com/wazuh/wazuh-kibana-app/pull/3114)
 - Fixed name for "TCP sessions" visualization and average metric is now a sum [#3118](https://github.com/wazuh/wazuh-kibana-app/pull/3118)
 - Filter only authorized agents in Events and Security Alerts table [#3120](https://github.com/wazuh/wazuh-kibana-app/pull/3120)
+- Fixed Last keep alive label is outside the panel [#3122](https://github.com/wazuh/wazuh-kibana-app/pull/3122)
+- Fixed app redirect to Settings section after the health check [#3128](https://github.com/wazuh/wazuh-kibana-app/pull/3128)
 
 ## Wazuh v4.1.4 - Kibana 7.10.0 , 7.10.2 - Revision 4105
 
 - Adapt for Wazuh 4.1.4
-
 
 ## Wazuh v4.1.3 - Kibana 7.10.0 , 7.10.2 - Revision 4104
 

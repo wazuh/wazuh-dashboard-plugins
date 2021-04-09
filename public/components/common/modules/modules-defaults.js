@@ -35,6 +35,11 @@ export const ModulesDefaults = {
     tabs: [{ id: 'inventory', name: 'Framework' }, { id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }],
     buttons: ['reporting']
   },
+  vuls: {
+    init: 'dashboard',
+    tabs: [{ id: 'inventory', name: 'Inventory', onlyAgent: false }, { id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }],
+    buttons: ['reporting', 'settings']
+  },
   virustotal: {
     init: 'dashboard',
     tabs: [{ id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }],
