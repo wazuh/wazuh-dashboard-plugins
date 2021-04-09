@@ -21,25 +21,14 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
+- Filter only authorized agents in Agents stats and Visualizations [#3088](https://github.com/wazuh/wazuh-kibana-app/pull/3088)
 - Fixed missing `pending` status suggestion for agents [#3095](https://github.com/wazuh/wazuh-kibana-app/pull/3095)
 - Index pattern setting not used for choosing from existing patterns [#3097](https://github.com/wazuh/wazuh-kibana-app/pull/3097)
 - Fix space character missing on deployment command if UDP is configured [#3108](https://github.com/wazuh/wazuh-kibana-app/pull/3108)
 - Flyout date filter also changes main date filter [#3114](https://github.com/wazuh/wazuh-kibana-app/pull/3114)
 - Fixed name for "TCP sessions" visualization and average metric is now a sum [#3118](https://github.com/wazuh/wazuh-kibana-app/pull/3118)
 - Fixed Last keep alive label is outside the panel [#3122](https://github.com/wazuh/wazuh-kibana-app/pull/3122)
-
-## Wazuh v4.1.4 - Kibana 7.10.0 , 7.10.2 - Revision 4105
-
-- Adapt for Wazuh 4.1.4
-
-
-## Wazuh v4.1.4 - Kibana 7.10.0 , 7.10.2 - Revision 4105
-
-- Adapt for Wazuh 4.1.4
-
-### Fixed 
-
-- Filter only authorized agents in Agents stats and Visualizations [#3088](https://github.com/wazuh/wazuh-kibana-app/pull/3088)
+- Fixed app redirect to Settings section after the health check [#3128](https://github.com/wazuh/wazuh-kibana-app/pull/3128)
 
 ## Wazuh v4.1.4 - Kibana 7.10.0 , 7.10.2 - Revision 4105
 
