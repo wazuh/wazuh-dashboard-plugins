@@ -119,10 +119,10 @@ export class HealthCheck extends Component {
       const hosts = response.data;
       const errors = [];
       const results = this.state.results;
+      const maxTries = 5;
 
       if (hosts.length) {
         for (let i = 0; i < hosts.length; i++) {
-          const maxTries = 5;
           let tries = maxTries;
           while (tries--) {
             await this.delay(3000);
