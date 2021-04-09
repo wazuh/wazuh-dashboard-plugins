@@ -11,11 +11,17 @@
 */
 import { AppState } from '../react-services/app-state';
 import { AUTHORIZED_AGENTS } from '../../common/constants';
+import { WazuhConfig } from '../react-services/wazuh-config';
 
 export function getFilterWithAuthorizedAgents(agentsIds, pattern) {
    //check for empty agents array
-  if(!agentsIds || agentsIds.length == 0){return }
+  if(!agentsIds || agentsIds.length == 0) return;
 
+  const wazuhConfig = new WazuhConfig();
+  const config = wazuhConfig.getConfig();
+  const statisticsPattern = `${config['cron.prefix']}-${config['cron.statistics.index.name']}-*`
+  if(pattern == statisticsPattern) return;
+  
   const usedPattern = pattern ? pattern : AppState.getCurrentPattern();
   const isMonitoringIndex = usedPattern.indexOf('monitoring') > -1;
   const field = isMonitoringIndex ? 'id' : 'agent.id';

@@ -470,11 +470,11 @@ export class WazuhElasticCtrl {
             }
             if (title.startsWith('Wazuh App Statistics') && name !== '-' && name !== 'all' && visState.params.expression.includes('q=')) {
               const expressionRegex = /q='\*'/gi
-              query += visState.params.expression.replace(expressionRegex, `q="nodeName:${name} AND apiName=${master_node}"`)
+              query += visState.params.expression.replace('wazuh-statistics-*', pattern_name).replace(expressionRegex, `q="nodeName:${name} AND apiName=${master_node}"`)
 
             } else if (title.startsWith('Wazuh App Statistics')) {
               const expressionRegex = /q='\*'/gi
-              query += visState.params.expression.replace(expressionRegex, `q="apiName=${master_node}"`)
+              query += visState.params.expression.replace('wazuh-statistics-*', pattern_name).replace(expressionRegex, `q="apiName=${master_node}"`)
             } else {
               query = visState.params.expression;
             }
