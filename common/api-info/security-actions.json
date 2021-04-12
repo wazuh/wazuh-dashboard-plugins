@@ -652,7 +652,7 @@
   "rules:update": {
     "description": "Update or upload custom rule files",
     "resources": [
-      "**"
+      "*:*"
     ],
     "example": {
       "actions": [
