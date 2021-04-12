@@ -3,7 +3,7 @@ import { configuredJobs } from './configured-jobs';
 import { log } from '../../lib/logger';
 import { getConfiguration } from '../../lib/get-configuration';
 import cron from 'node-cron';
-import { WAZUH_STATISTICS_TEMPLATE_NAME } from '../../../common/constants';
+import { WAZUH_STATISTICS_DEFAULT_PREFIX, WAZUH_STATISTICS_DEFAULT_NAME, WAZUH_STATISTICS_TEMPLATE_NAME } from '../../../common/constants';
 import { statisticsTemplate } from '../../integration-files/statistics-template';
 
 const blueWazuh = '\u001b[34mwazuh\u001b[39m';
@@ -66,18 +66,17 @@ const checkTemplate = async function (context) {
     );
 
     const appConfig = await getConfiguration();
-    const templateName =  appConfig['cron.prefix'] && appConfig['cron.statistics.index.name'] 
-      ? `${appConfig['cron.prefix']}-${appConfig['cron.statistics.index.name']}` 
-      : WAZUH_STATISTICS_TEMPLATE_NAME;
-    const pattern = `${templateName}-*`;
+    const prefixTemplateName = appConfig['cron.prefix'] || WAZUH_STATISTICS_DEFAULT_PREFIX;
+    const statisticsIndicesTemplateName = appConfig['cron.statistics.index.name'] || WAZUH_STATISTICS_DEFAULT_NAME;
+    const pattern = `${prefixTemplateName}-${statisticsIndicesTemplateName}-*`;
 
     try {
       // Check if the template already exists
       const currentTemplate = await context.core.elasticsearch.client.asInternalUser.indices.getTemplate({
-        name: templateName
+        name: WAZUH_STATISTICS_TEMPLATE_NAME
       });
       // Copy already created index patterns
-      statisticsTemplate.index_patterns = currentTemplate.body[templateName].index_patterns;
+      statisticsTemplate.index_patterns = currentTemplate.body[WAZUH_STATISTICS_TEMPLATE_NAME].index_patterns;
     }catch (error) {
       // Init with the default index pattern
       statisticsTemplate.index_patterns = [pattern];
@@ -90,7 +89,7 @@ const checkTemplate = async function (context) {
 
     // Update the statistics template
     await context.core.elasticsearch.client.asInternalUser.indices.putTemplate({
-      name: templateName,
+      name: WAZUH_STATISTICS_TEMPLATE_NAME,
       body: statisticsTemplate
     });
     log(
