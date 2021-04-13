@@ -209,6 +209,10 @@ export class HealthCheck extends Component {
         let data;
         try {
           data = await ApiCheck.checkStored(currentApi.id);
+          // Fix when the app endpoint replies with a valid response but the API is really down
+          if(data.data.data.apiIsDown){
+            throw 'API is down'
+          };
         } catch (err) {
           try {
             const newApi = await this.trySetDefault();
