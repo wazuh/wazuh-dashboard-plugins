@@ -22,7 +22,7 @@ export class SaveDocument {
     this.esClientInternalUser = context.core.elasticsearch.client.asInternalUser;
   }
 
-  async save(doc: object[], indexConfig: IIndexConfiguration) {
+  async save(doc: object[], indexConfig: IIndexConfiguration) {    
     const { name, creation, mapping, shards, replicas } = indexConfig;
     const index = this.addIndexPrefix(name);
     const indexCreation = `${index}-${indexDate(creation)}`;
@@ -92,20 +92,31 @@ export class SaveDocument {
   }
 
   buildData(item, mapping) {
+    const getItemArray = (array, index) => {
+      return JSON.stringify(array[index || 0]);
+    };
     const getValue = (key: string, item) => {
       const keys = key.split('.');
       if (keys.length === 1) {
+        if(key.match(/\[.*\]/)){
+          return getItemArray(
+            item[key.replace(/\[.*\]/, '')], 
+            key.match(/\[(.*)\]/)[1]
+          );
+        }
         return JSON.stringify(item[key]);
       }
       return getValue(keys.slice(1).join('.'), item[keys[0]])
     }
     if (mapping) {
-      const data = mapping.replace(
-        /\${([a-z|A-Z|0-9|\.\-\_]+)}/gi,
+      let data;
+      data = mapping.replace(
+        /\${([a-z|A-Z|0-9|\.\-\_\[.*\]]+)}/gi,
         (...key) => getValue(key[1], item)
       )
       return JSON.parse(data);
     }
+    
     if (typeof item.data === 'object') {
       return item.data;
     }
