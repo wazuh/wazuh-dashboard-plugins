@@ -23,6 +23,7 @@ import { Role } from '../../roles/types/role.type';
 import { CreateUser as TCreateUser } from '../types/user.type';
 import UsersServices from '../services';
 import RolesServices from '../../roles/services';
+import { WzButtonPermissions } from '../../../common/permissions/button';
 import { ErrorHandler } from '../../../../react-services/error-handler';
 import { useDebouncedEffect } from '../../../common/hooks/useDebouncedEffect';
 
@@ -88,6 +89,7 @@ export const CreateUser = ({ closeFlyout }) => {
   const validations = {
     userName: [
       { fn: () => (userName.trim() === '' ? 'The user name is required' : '') },
+      { fn: () => (userName.trim().includes(' ')? 'The user name cannot contain spaces' : '') },
       {
         fn: () =>
           !userName.match(/^.{4,20}$/)
@@ -136,15 +138,17 @@ export const CreateUser = ({ closeFlyout }) => {
 
     setIsLoading(true);
 
+    const allowRunAsData: boolean = allowRunAs;
     const userData: TCreateUser = {
       username: userName,
       password: password,
-      allow_run_as: allowRunAs,
     };
 
     try {             
       const user = await UsersServices.CreateUser(userData);
       await addRoles(user.id);
+      if (allowRunAsData)
+        await UsersServices.UpdateAllowRunAs(user.id, allowRunAsData);
 
       ErrorHandler.info('User was successfully created');
       closeFlyout(true);
@@ -238,13 +242,15 @@ export const CreateUser = ({ closeFlyout }) => {
               />
             </EuiFormRow>
             <EuiFormRow label="Allow run as" helpText="Set if the user is able to use run as">
-              <EuiSwitch
-                label="Allow run as"
-                showLabel={false}
-                checked={allowRunAs}
-                onChange={e => onChangeAllowRunAs(e)}
-                aria-label=""
-              />
+            <WzButtonPermissions
+              buttonType="switch"
+              label="Allow run as"
+              showLabel={false}
+              checked={allowRunAs}
+              permissions={[{ action: 'security:edit_run_as', resource: '*:*:*' }]}
+              onChange={e => onChangeAllowRunAs(e)}
+              aria-label=""
+            />
             </EuiFormRow>
           </EuiPanel>
           <EuiSpacer />

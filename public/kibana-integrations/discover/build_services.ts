@@ -87,7 +87,6 @@ export async function buildServices(
     overlays: core.overlays,
   };
   const savedObjectService = createSavedSearchesLoader(services); */
-
   return {
     addBasePath: core.http.basePath.prepend,
     capabilities: core.application.capabilities,
