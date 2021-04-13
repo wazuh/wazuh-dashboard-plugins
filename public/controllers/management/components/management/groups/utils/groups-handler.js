@@ -23,7 +23,7 @@ export default class GroupsHandler {
     try {
       const result = await WzRequest.apiReq('POST', `/groups`, {
         body: {
-          name: name
+          group_id: name
         }
       });
       return result;

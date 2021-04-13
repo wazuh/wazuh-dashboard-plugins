@@ -43,6 +43,7 @@ const checkClientAppVersion = (appInfo: TAppInfo) => {
     if( window.history.state !== 'refreshed') {
       clearBrowserInfo(appInfo);
     } else {
+      console.warn(`Server version: ${appInfo['app-version']}-${appInfo.revision}, browser version: ${appVersion}-${appRevision}`)
       getToasts().addDanger({
         title: 'Conflict with the Wazuh app version',
         text: 'The version of the Wazuh app in your browser does not correspond with the app version installed in Kibana.\nPlease clear your browser cache.\nIf the error persist please restart Kibana too.'
