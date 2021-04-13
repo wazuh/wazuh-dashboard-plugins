@@ -33,8 +33,8 @@ export function getIp(
     if(!indexPatternFound){
       AppState.removeCurrentPattern()
     }
-    getDataPlugin().indexPatterns.setDefault(configuration.pattern, true);
-    AppState.setCurrentPattern(configuration.pattern)
+    getDataPlugin().indexPatterns.setDefault(indexPatternFound.id, true);
+    AppState.setCurrentPattern(indexPatternFound.id)
 
     return indexPatternFound;
   }

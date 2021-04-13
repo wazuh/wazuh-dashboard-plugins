@@ -64,4 +64,9 @@ export const FieldsStatistics = [
   { "name": "remoted.recv_bytes", "type": "number", "esTypes": ["long"], "count": 0, "scripted": false, "searchable": true, "aggregatable": true, "readFromDocValues": true },
   { "name": "remoted.tcp_sessions", "type": "number", "esTypes": ["long"], "count": 0, "scripted": false, "searchable": true, "aggregatable": true, "readFromDocValues": true },
   { "name": "remoted.total_queue_size", "type": "number", "esTypes": ["long"], "count": 0, "scripted": false, "searchable": true, "aggregatable": true, "readFromDocValues": true },
-  { "name": "timestamp", "type": "date", "esTypes": ["date"], "count": 0, "scripted": false, "searchable": true, "aggregatable": true, "readFromDocValues": true }]
+  { "name": "timestamp", "type": "date", "esTypes": ["date"], "count": 0, "scripted": false, "searchable": true, "aggregatable": true, "readFromDocValues": true },
+  { "name": "_id", "type": "string", "count": 0, "scripted": false, "searchable": true, "aggregatable": true, "readFromDocValues": false },
+  { "name": "_index", "type": "string", "count": 0, "scripted": false, "searchable": true, "aggregatable": true, "readFromDocValues": false },
+  { "name": "_score", "type": "number", "count": 0, "scripted": false, "searchable": false, "aggregatable": false, "readFromDocValues": false },
+  { "name": "_source", "type": "_source", "count": 0, "scripted": false, "searchable": false, "aggregatable": false, "readFromDocValues": false },
+  { "name": "_type", "type": "string", "count": 0, "scripted": false, "searchable": true, "aggregatable": true, "readFromDocValues": false }]

@@ -76,7 +76,6 @@ function clearBrowserInfo(appInfo: TAppInfo) {
 
   //replace status to avoid infinite refresh
   window.history.replaceState('refreshed', 'wazuh');
-
   // delete browser cache and hard reload
   window.location.reload(true);
 }

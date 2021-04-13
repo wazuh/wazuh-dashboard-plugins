@@ -118,22 +118,29 @@ export class HealthCheck extends Component {
       const response = await GenericRequest.request('GET', '/hosts/apis');
       const hosts = response.data;
       const errors = [];
+      const results = this.state.results;
+      const maxTries = 5;
 
       if (hosts.length) {
         for (let i = 0; i < hosts.length; i++) {
-          let tries = 36;
+          let tries = maxTries;
           while (tries--) {
-            await this.delay(5000);
+            await this.delay(3000);
             try {
               const API = await ApiCheck.checkApi(hosts[i], true);
               if (API && API.data) {
                 return hosts[i].id;
               }
             } catch (err) {
-              if (err.includes(WAZUH_ERROR_DAEMONS_NOT_READY)) {
-                const updateNotReadyYet = updateWazuhNotReadyYet(false);
-                store.dispatch(updateNotReadyYet);
+              if (tries) {
+                results[0].description = <span><EuiLoadingSpinner size="m" /> Retrying {'.'.repeat(maxTries - tries) }</span>;
+                results[1].description = <span><EuiLoadingSpinner size="m" /> Retrying {'.'.repeat(maxTries - tries) }</span>;
+                this.setState({ results });
               } else {
+                if (err.includes(WAZUH_ERROR_DAEMONS_NOT_READY)) {
+                  const updateNotReadyYet = updateWazuhNotReadyYet(false);
+                  store.dispatch(updateNotReadyYet);         
+                }
                 errors.push(`Could not connect to API with id: ${hosts[i].id}: ${err.message || err}`);
               }
             }
@@ -158,20 +165,17 @@ export class HealthCheck extends Component {
   /**
    * This attempts to reconnect with API
    */
-  reconnectWithAPI(){
+  reconnectWithAPI() {
     let results = this.state.results;
     results[0].description = <span><EuiLoadingSpinner size="m" /> Checking...</span>;
     results[1].description = <span><EuiLoadingSpinner size="m" /> Checking...</span>;
     getToasts().toasts$._value.forEach(toast => {
-      if(toast.text.includes('3000'))
+      if (toast.text.includes('3000'))
         getToasts().remove(toast.id);
     });
-    let errors = this.state.errors;
-    this.state.errors.forEach(error => {
-      if(error.includes('API'))
-        errors.pop(error);
-    });
-    this.setState({results, errors});
+    
+    const errors = this.state.errors.filter((error: string) => error.indexOf('API') < 0)
+    this.setState({ results, errors });
     this.checkApiConnection();
   }
 
@@ -182,12 +186,33 @@ export class HealthCheck extends Component {
     let results = this.state.results;
     let errors = this.state.errors;
     let apiChanged = false;
+    const buttonRestartApi = <div> <span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span>
+      {<EuiToolTip
+        position='top'
+        content='Try to reconnect to the API'
+      >
+        <EuiButtonIcon
+          display="base"
+          iconType="refresh"
+          isLoading
+          iconSize="l"
+          onClick={() => this.reconnectWithAPI()}
+          size="m"
+          aria-label="Next"
+        />
+      </EuiToolTip>}
+    </div>;
+
     try {
       const currentApi = JSON.parse(AppState.getCurrentAPI() || '{}');
       if (this.state.checks.api && currentApi && currentApi.id) {
         let data;
         try {
           data = await ApiCheck.checkStored(currentApi.id);
+          // Fix when the app endpoint replies with a valid response but the API is really down
+          if(data.data.data.apiIsDown){
+            throw 'API is down'
+          };
         } catch (err) {
           try {
             const newApi = await this.trySetDefault();
@@ -219,7 +244,7 @@ export class HealthCheck extends Component {
         const i = results.map(item => item.id).indexOf(0);
         if (data === 3099) {
           errors.push('Wazuh not ready yet.');
-          results[i].description = <span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span>;
+          results[i].description = <span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span>;;
           if (this.checks.setup) {
             const i = results.map(item => item.id).indexOf(1);
             results[i].description = <span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span>;
@@ -227,23 +252,8 @@ export class HealthCheck extends Component {
           this.setState({ results, errors });
         } else if (data.data.error || data.data.data.apiIsDown) {
           errors.push(data.data.data.apiIsDown ? 'Wazuh API is down.' : `Error connecting to the API.${data.data.error && data.data.error.message ? ` ${data.data.error.message}` : ''}`);
-          results[i].description =    <div> <span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span> 
-          { <EuiToolTip
-                  position='top'
-                  content='Try to reconnect to the API'
-          >
-             <EuiButtonIcon
-                display="base"
-                iconType="refresh"
-                isLoading
-                iconSize="l"
-                onClick={() => this.reconnectWithAPI()}
-                size="m"
-                aria-label="Next"
-              />
-          </EuiToolTip> }
-          </div>;
-          results[i + 1].description = <span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span> 
+          results[i].description = buttonRestartApi;
+          results[i + 1].description = <span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span>
           this.setState({ results, errors });
         } else {
           results[i].description = <span><EuiIcon type="check" color="secondary" ></EuiIcon> Ready</span>;
@@ -277,27 +287,27 @@ export class HealthCheck extends Component {
               results[i].description = <span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span>;
               this.setState({ results, errors });
             } else {
-               let permissionToGoToTheApp = true;
-               if(!results[i].description.props.children[1].includes('Checking')){
-                 permissionToGoToTheApp = false;
-               }
-               results[i].description = <span><EuiIcon type="check" color="secondary" ></EuiIcon> Ready</span>;
-               for (let element of results){
-                 if(results[i].description.props.children[1].includes('Error')){
-                   permissionToGoToTheApp = false;
-                 }
-               }
-
-               this.setState({ results, errors });
-               if(permissionToGoToTheApp)
-                 this.goApp();
+              let permissionToGoToTheApp = true;
+              if (!results[i].description.props.children[1].includes('Checking')) {
+                permissionToGoToTheApp = false;
+              }
+              results[i].description = <span><EuiIcon type="check" color="secondary" ></EuiIcon> Ready</span>;
+              if (results[i].description.props.children[1].includes('Error')) {
+                permissionToGoToTheApp = false;
+              }
+              this.setState({ results, errors });
+              if (permissionToGoToTheApp) {
+                this.goAppOverview();
+                const updateNotReadyYet = updateWazuhNotReadyYet(false);
+                store.dispatch(updateNotReadyYet);
+              }
             }
           }
         }
       }
       return;
     } catch (error) {
-      results[0].description = <span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span>;
+      results[0].description = buttonRestartApi;
       results[1].description = <span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span>;
       this.setState({ results });
       AppState.removeNavigation();
@@ -442,8 +452,12 @@ export class HealthCheck extends Component {
     }
   }
 
-  goApp() {
+  goAppSettings() {
     window.location.href = '/app/wazuh#/settings';
+  }
+
+  goAppOverview() {
+    window.location.href = '/app/wazuh#/overview';
   }
 
   render() {
@@ -478,7 +492,7 @@ export class HealthCheck extends Component {
         {!!this.state.errors.length && (
           <EuiButton
             fill
-            onClick={() => this.goApp()}>
+            onClick={() => this.goAppSettings()}>
             Go to App
           </EuiButton>
         )}
