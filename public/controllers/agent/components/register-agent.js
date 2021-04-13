@@ -111,7 +111,7 @@ const sysButtons = [
 ];
 
 const pTextCheckConnectionStyle = {
-  marginTop: '30px',
+  marginTop: '3em',
 };
 
 export class RegisterAgent extends Component {
@@ -364,6 +364,7 @@ export class RegisterAgent extends Component {
   render() {
 
     const urlCheckConnectionDocumentation = `https://documentation.wazuh.com/${this.state.wazuhVersion.slice(0,3)}/user-manual/agents/agent-connection.html`;
+    const textAndLinkToCheckConnectionDocumentation = <p style={pTextCheckConnectionStyle}>To verify the connection with the Manager, please follow this <a href={urlCheckConnectionDocumentation} target="_blank">document.</a></p>
     const missingOSSelection = this.checkMissingOSSelection();
     const ipInput = (
       <EuiText>
@@ -479,7 +480,7 @@ export class RegisterAgent extends Component {
                   </EuiButton>
                 )}
               </EuiCopy>
-              <p style={pTextCheckConnectionStyle}>To check if the connection with the manager was successful, follow the <a href={urlCheckConnectionDocumentation} target="_blank">documentation.</a></p>
+              {textAndLinkToCheckConnectionDocumentation}
             </EuiText>
           </Fragment>
         ),
@@ -504,7 +505,7 @@ export class RegisterAgent extends Component {
                   </EuiButton>
                 )}
               </EuiCopy>
-              <p style={pTextCheckConnectionStyle}>To check if the connection with the manager was successful, follow the <a href={urlCheckConnectionDocumentation} target="_blank">documentation.</a></p>
+              {textAndLinkToCheckConnectionDocumentation}
             </EuiText>
           </Fragment>
         ),
