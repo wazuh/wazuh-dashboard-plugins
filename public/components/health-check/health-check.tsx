@@ -139,7 +139,7 @@ export class HealthCheck extends Component {
               } else {
                 if (err.includes(WAZUH_ERROR_DAEMONS_NOT_READY)) {
                   const updateNotReadyYet = updateWazuhNotReadyYet(false);
-                  store.dispatch(updateNotReadyYet);         
+                  store.dispatch(updateNotReadyYet);
                 }
                 errors.push(`Could not connect to API with id: ${hosts[i].id}: ${err.message || err}`);
               }
@@ -147,7 +147,7 @@ export class HealthCheck extends Component {
           }
         }
 
-        const updateNotReadyYet = updateWazuhNotReadyYet(true);
+        const updateNotReadyYet = updateWazuhNotReadyYet(false);
         store.dispatch(updateNotReadyYet);
 
         if (errors.length) {
@@ -173,7 +173,7 @@ export class HealthCheck extends Component {
       if (toast.text.includes('3000'))
         getToasts().remove(toast.id);
     });
-    
+
     const errors = this.state.errors.filter((error: string) => error.indexOf('API') < 0)
     this.setState({ results, errors });
     this.checkApiConnection();
