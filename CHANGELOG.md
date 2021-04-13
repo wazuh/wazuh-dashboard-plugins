@@ -34,6 +34,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed Last keep alive label is outside the panel [#3122](https://github.com/wazuh/wazuh-kibana-app/pull/3122)
 - Fixed app redirect to Settings section after the health check [#3128](https://github.com/wazuh/wazuh-kibana-app/pull/3128)
 - Fix the plugin logo path in Kibana menu when use `server.basePath` setting [#3144](https://github.com/wazuh/wazuh-kibana-app/pull/3144)
+- Fixed deprecated endpoint for creat agent groups [3152](https://github.com/wazuh/wazuh-kibana-app/pull/3152)
 
 ## Wazuh v4.1.4 - Kibana 7.10.0 , 7.10.2 - Revision 4105
 
