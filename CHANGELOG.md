@@ -35,6 +35,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed app redirect to Settings section after the health check [#3128](https://github.com/wazuh/wazuh-kibana-app/pull/3128)
 - Fix the plugin logo path in Kibana menu when use `server.basePath` setting [#3144](https://github.com/wazuh/wazuh-kibana-app/pull/3144)
 - Fixed deprecated endpoint for creat agent groups [3152](https://github.com/wazuh/wazuh-kibana-app/pull/3152)
+- Fix the broken links when using `server.basePath` Kibana setting [#3161](https://github.com/wazuh/wazuh-kibana-app/pull/3161)
 
 ## Wazuh v4.1.4 - Kibana 7.10.0 , 7.10.2 - Revision 4105
 
