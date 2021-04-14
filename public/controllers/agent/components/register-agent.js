@@ -206,7 +206,7 @@ export class RegisterAgent extends Component {
         {}
       );
       const remote = ((result.data || {}).data || {}).remote || {};
-      return (remote[0] || {}).protocol !== 'tcp';
+      return (remote[0] || {}).protocol !== 'tcp' && (remote[0] || {}).protocol[0] !== 'TCP';
     } catch (error) {
       return false;
     }
@@ -292,7 +292,7 @@ export class RegisterAgent extends Component {
       : ''
       }${this.state.udpProtocol
         ? "WAZUH_PROTOCOL='UDP' "
-        : ''
+        : "WAZUH_PROTOCOL='TCP' "
       }${this.state.selectedGroup.length ? `WAZUH_AGENT_GROUP='${this.state.selectedGroup.map(item => item.label).join(',')}' ` : ''}`
     return deployment;
   }
