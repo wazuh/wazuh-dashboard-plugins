@@ -220,7 +220,13 @@
 
       <div class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--responsive">
         <!-- Overview visualization card -->
-        <div class="euiPanel euiFlexItem euiFlexItem--flexGrowZero" style="min-width: 500px">
+        <div class="euiPanel euiFlexItem euiFlexItem--flexGrowZero" style="min-width: 500px; overflow: hidden;">
+          <span class="euiLoadingChart custom-charts-bar euiLoadingChart--large euiTextAlign--center "  style="top: 50%; transform: translate(0px, -25px); position: relative;" ng-if="resultState !== 'ready' || !rendered" >
+              <span class="euiLoadingChart__bar"></span>
+              <span class="euiLoadingChart__bar"></span>
+              <span class="euiLoadingChart__bar"></span>
+              <span class="euiLoadingChart__bar"></span>
+          </span>
           <md-card-content
             class="wazuh-column"
             ng-class="{'no-opacity-overview-monitoring': resultState !== 'ready' || !rendered}"
@@ -237,7 +243,7 @@
             <span class="wz-padding-top-10 wz-text-center" ng-show="!rendered"
               >There are no results for selected time range. Try another one.</span
             >
-          </md-card-content>
+          </md-card-content> 
         </div>
         <!-- Cluster configuration card -->
         <div class="euiFlexItem">
