@@ -203,7 +203,7 @@
   "group:read": {
     "description": "Access agent groups information (id, name, agents, etc)",
     "resources": [
-      "*:*"
+      "*:*","group:id"
     ],
     "example": {
       "actions": [
@@ -652,7 +652,7 @@
   "rules:update": {
     "description": "Update or upload custom rule files",
     "resources": [
-      "rule:file"
+      "*:*"
     ],
     "example": {
       "actions": [
@@ -790,7 +790,7 @@
   "decoders:update": {
     "description": "Update or upload custom decoder files",
     "resources": [
-      "decoder:file"
+      "*:*"
     ],
     "example": {
       "actions": [

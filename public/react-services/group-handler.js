@@ -68,8 +68,8 @@ export class GroupHandler {
     try {
       const result = await WzRequest.apiReq(
         'PUT',
-        `/agents/groups/${name}`,
-        {}
+        `/agents/groups`,
+        {content: {group_id: name}}
       );
       return result;
     } catch (error) {
