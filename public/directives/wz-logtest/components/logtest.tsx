@@ -10,7 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Fragment, useState } from 'react';
-import PropTypes from 'prop-types';
 import { DynamicHeight } from '../../../utils/dynamic-height';
 import {
   EuiButton,
@@ -28,8 +27,21 @@ import {
   EuiOverlayMask,
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services';
+import { withReduxProvider, withUserAuthorizationPrompt } from '../../../components/common/hocs';
+import { compose } from 'redux';
 
-export const Logtest = (props) => {
+
+type LogstestProps = {
+  openCloseFlyout: () => {},
+  showClose: boolean,
+  onFlyout: boolean,
+  isRuleset: string,
+};
+
+export const Logtest = compose(
+  withReduxProvider,
+  withUserAuthorizationPrompt([{ action: 'logtest:run', resource: `*:*:*` }])
+)((props: LogstestProps) => {
   const [value, setValue] = useState('');
   const [testing, setTesting] = useState(false);
   const [testResult, setTestResult] = useState(false);
@@ -181,11 +193,4 @@ export const Logtest = (props) => {
       )}
     </Fragment>
   );
-};
-
-Logtest.propTypes = {
-  openCloseFlyout: PropTypes.func,
-  showClose: PropTypes.bool,
-  onFlyout: PropTypes.bool,
-  isRuleset: PropTypes.string,
-};
+});

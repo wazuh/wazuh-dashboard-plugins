@@ -203,14 +203,16 @@ class WzRulesetEditor extends Component {
 
     const buildLogtestButton = () => {
       return (
-        <EuiButtonEmpty
+        <WzButtonPermissions
+          buttonType="empty"
+          permissions={[{ action: 'logtest:run', resource: `*:*:*` }]}
           color="primary"
           iconType="documentEdit"
           style={{ margin: '0px 8px', cursor: 'pointer' }}
           onClick={onClickOpenLogtest}
         >
           {isRules}
-        </EuiButtonEmpty>
+        </WzButtonPermissions>
       );
     };
 
