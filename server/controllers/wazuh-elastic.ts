@@ -235,7 +235,7 @@ export class WazuhElasticCtrl {
               'agent.id': request.query.agentsList.split(',')
             }
           }
-      );
+        );
       payload.aggs['2'].terms.field = request.params.field;
 
       const data = await context.core.elasticsearch.client.asCurrentUser.search({
