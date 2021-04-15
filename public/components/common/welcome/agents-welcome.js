@@ -531,7 +531,6 @@ export class AgentsWelcome extends Component {
         />)
     }
 
-    console.log(this.state.widthWindow);
     return (
       <div className="wz-module wz-module-welcome">
         <div className='wz-module-header-agent-wrapper'>
