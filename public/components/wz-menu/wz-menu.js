@@ -17,6 +17,7 @@ import {
   EuiPopover,
   EuiIcon,
   EuiButtonEmpty,
+  EuiText,
   EuiCallOut,
   EuiToolTip,
   EuiLoadingSpinner,
@@ -753,7 +754,7 @@ class WzMenu extends Component {
             ></MenuSecurity>
           )}
 
-          { this.state.isToolsPopoverOpen && (
+          {this.state.isToolsPopoverOpen && (
             <MenuTools
               currentMenuTab={this.state.currentMenuTab}
               closePopover={() => this.setState({ menuOpened: false })}
@@ -841,27 +842,66 @@ class WzMenu extends Component {
       <WzReduxProvider>
         {this.state.showMenu && (
           <Fragment>
-            <EuiPopover
-              panelClassName={
-                this.state.kibanaMenuBlockedOrOpened ?
-                  "wz-menu-popover wz-menu-popover-over" :
-                  "wz-menu-popover wz-menu-popover-under"
-              }
-              button={mainButton}
-              isOpen={this.state.menuOpened}
-              closePopover={() => this.setState({ menuOpened: false })}
-              anchorPosition="downLeft"
-              panelPaddingSize='none'
-              hasArrow={false}
-            >
-              <Fragment>{menu}</Fragment>
-            </EuiPopover>
-            <WzGlobalBreadcrumbWrapper></WzGlobalBreadcrumbWrapper>
+
+
+            <EuiFlexGroup wrap alignItems="flexEnd">
+              <EuiFlexItem style={{ maxWidth: 90 }}>
+                <EuiPopover
+                  panelClassName={
+                    this.state.kibanaMenuBlockedOrOpened ?
+                      "wz-menu-popover wz-menu-popover-over" :
+                      "wz-menu-popover wz-menu-popover-under"
+                  }
+                  button={mainButton}
+                  isOpen={this.state.menuOpened}
+                  closePopover={() => this.setState({ menuOpened: false })}
+                  anchorPosition="downLeft"
+                  panelPaddingSize='none'
+                  hasArrow={false}
+                >
+                  <Fragment>{menu}</Fragment>
+                </EuiPopover>
+                <WzGlobalBreadcrumbWrapper></WzGlobalBreadcrumbWrapper>
+              </EuiFlexItem>
+
+              <EuiFlexItem style={{ maxWidth: 90 }}><EuiText grow={false}>Index pattern</EuiText></EuiFlexItem>
+              <EuiFlexItem style={{ maxWidth: 150 }}>
+                <EuiSelect
+                  id="selectIndexPattern"
+                  options={
+                    this.state.patternList.map((item) => {
+                      return { value: item.id, text: item.title }
+                    })
+                  }
+                  value={this.state.currentSelectedPattern}
+                  onChange={this.changePattern}
+                  aria-label="Index pattern selector"
+                />
+              </EuiFlexItem>
+
+              <EuiFlexItem style={{ maxWidth: 20 }}><EuiText grow={false}>API</EuiText></EuiFlexItem>
+              <EuiFlexItem style={{ maxWidth: 150 }}>
+                <EuiSelect
+                  id="selectAPI"
+                  options={
+                    this.state.APIlist.map((item) => {
+                      return { value: item.id, text: item.id }
+                    })
+                  }
+                  value={this.state.currentAPI}
+                  onChange={this.changeAPI}
+                  aria-label="API selector"
+                />
+              </EuiFlexItem>
+            </EuiFlexGroup>
+
             {this.props.state.wazuhNotReadyYet && this.buildWazuhNotReadyYet()}
           </Fragment>
         )}
       </WzReduxProvider>,
-      container[0]
+      container[0],
+
+
     );
   }
 }
