@@ -287,13 +287,16 @@ export class RegisterAgent extends Component {
   }
 
   optionalDeploymentVariables() {
-    const deployment = `WAZUH_MANAGER${this.state.selectedOS == 'macos' ? ' ' : '='}'${this.state.serverAddress}' ${this.state.selectedOS == 'win' ? `WAZUH_REGISTRATION_SERVER='${this.state.serverAddress}' ` : ''}${this.state.needsPassword
+    let deployment = `WAZUH_MANAGER='${this.state.serverAddress}' ${this.state.selectedOS == 'win' ? `WAZUH_REGISTRATION_SERVER='${this.state.serverAddress}' ` : ''}${this.state.needsPassword
       ? `WAZUH_REGISTRATION_PASSWORD='${this.state.wazuhPassword}' `
       : ''
       }${this.state.udpProtocol
         ? "WAZUH_PROTOCOL='UDP' "
-        : "WAZUH_PROTOCOL='TCP' "
+        : ""
       }${this.state.selectedGroup.length ? `WAZUH_AGENT_GROUP='${this.state.selectedGroup.map(item => item.label).join(',')}' ` : ''}`
+    if (this.state.selectedOS === 'macos') {
+      deployment = deployment.replace('=',' ')
+    }
     return deployment;
   }
 
