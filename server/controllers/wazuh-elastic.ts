@@ -234,15 +234,15 @@ export class WazuhElasticCtrl {
             terms: {
               'agent.id': request.query.agentsList.split(',')
             }
-          });
+          }
+      );
       payload.aggs['2'].terms.field = request.params.field;
 
       const data = await context.core.elasticsearch.client.asCurrentUser.search({
         size: 1,
         index: request.params.pattern,
         body: payload
-      }
-     );
+      });
 
       return data.body.hits.total.value === 0 ||
         typeof data.body.aggregations['2'].buckets[0] === 'undefined'
