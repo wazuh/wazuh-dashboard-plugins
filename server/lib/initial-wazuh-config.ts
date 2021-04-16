@@ -116,8 +116,8 @@ export const initialWazuhConfig: string = `---
 #
 # Configure wazuh-monitoring-* indices custom creation interval.
 # Values: h (hourly), d (daily), w (weekly), m (monthly)
-# Default: d
-#wazuh.monitoring.creation: d
+# Default: w
+#wazuh.monitoring.creation: w
 #
 # Default index pattern to use for Wazuh monitoring
 #wazuh.monitoring.pattern: wazuh-monitoring-*
@@ -126,7 +126,7 @@ export const initialWazuhConfig: string = `---
 #
 # Customize the index prefix of predefined jobs
 # This change is not retroactive, if you change it new indexes will be created
-# cron.prefix: test
+# cron.prefix: wazuh
 #
 # --------------------------------- wazuh-sample-alerts -------------------------
 #
