@@ -19,6 +19,7 @@ import {
   EuiButtonEmpty,
   EuiText,
   EuiCallOut,
+  EuiPageHeader,
   EuiToolTip,
   EuiLoadingSpinner,
   EuiFormRow,
@@ -840,68 +841,89 @@ class WzMenu extends Component {
     return ReactDOM.createPortal(
       <WzReduxProvider>
         {this.state.showMenu && (
-          <Fragment>
+          <EuiFlexGroup alignItems="center">
 
+            <EuiFlexItem grow={false}>
+              <EuiPopover
+                panelClassName={
+                  this.state.kibanaMenuBlockedOrOpened ?
+                    "wz-menu-popover wz-menu-popover-over" :
+                    "wz-menu-popover wz-menu-popover-under"
+                }
+                button={mainButton}
+                isOpen={this.state.menuOpened}
+                closePopover={() => this.setState({ menuOpened: false })}
+                anchorPosition="downLeft"
+                panelPaddingSize='none'
+                hasArrow={false}
+              >
+                <Fragment>{menu}</Fragment>
+              </EuiPopover>
+            </EuiFlexItem>
 
-            <EuiFlexGroup wrap alignItems="flexEnd">
-              <EuiFlexItem style={{ maxWidth: 90 }}>
-                <EuiPopover
-                  panelClassName={
-                    this.state.kibanaMenuBlockedOrOpened ?
-                      "wz-menu-popover wz-menu-popover-over" :
-                      "wz-menu-popover wz-menu-popover-under"
-                  }
-                  button={mainButton}
-                  isOpen={this.state.menuOpened}
-                  closePopover={() => this.setState({ menuOpened: false })}
-                  anchorPosition="downLeft"
-                  panelPaddingSize='none'
-                  hasArrow={false}
-                >
-                  <Fragment>{menu}</Fragment>
-                </EuiPopover>
-                <WzGlobalBreadcrumbWrapper></WzGlobalBreadcrumbWrapper>
-              </EuiFlexItem>
+            <EuiFlexItem grow={false}>
+              <WzGlobalBreadcrumbWrapper></WzGlobalBreadcrumbWrapper>
+            </EuiFlexItem>
 
-              <EuiFlexItem style={{ maxWidth: 90 }}><EuiText grow={false}>Index pattern</EuiText></EuiFlexItem>
-              <EuiFlexItem style={{ maxWidth: 150 }}>
-                <EuiSelect
-                  id="selectIndexPattern"
-                  options={
-                    this.state.patternList.map((item) => {
-                      return { value: item.id, text: item.title }
-                    })
-                  }
-                  value={this.state.currentSelectedPattern}
-                  onChange={this.changePattern}
-                  aria-label="Index pattern selector"
-                />
-              </EuiFlexItem>
+            <EuiFlexItem>
+              <></>
+            </EuiFlexItem>
 
-              <EuiFlexItem style={{ maxWidth: 20 }}><EuiText grow={false}>API</EuiText></EuiFlexItem>
-              <EuiFlexItem style={{ maxWidth: 150 }}>
-                <EuiSelect
-                  id="selectAPI"
-                  options={
-                    this.state.APIlist.map((item) => {
-                      return { value: item.id, text: item.id }
-                    })
-                  }
-                  value={this.state.currentAPI}
-                  onChange={this.changeAPI}
-                  aria-label="API selector"
-                />
-              </EuiFlexItem>
-            </EuiFlexGroup>
+            {this.state.patternList.length > 1 &&
+              <>
+                <EuiFlexItem grow={false}>
+                  <p>Index pattern</p>
+                </EuiFlexItem>
 
+                <EuiFlexItem grow={false}>
+                  <div style={{ maxWidth: 200, maxHeight: 50 }}>
+                    <EuiSelect
+                      id="selectIndexPattern"
+                      options={
+                        this.state.patternList.map((item) => {
+                          return { value: item.id, text: item.title }
+                        })
+                      }
+                      value={this.state.currentSelectedPattern}
+                      onChange={this.changePattern}
+                      aria-label="Index pattern selector"
+                    />
+                  </div>
+                </EuiFlexItem>
+
+              </>
+            }
+
+            {this.state.APIlist.length > 1 &&
+              <>
+                <EuiFlexItem grow={false}>
+                  <p>API</p>
+                </EuiFlexItem>
+
+                <EuiFlexItem grow={false}>
+                  <div style={{ maxWidth: 100 }}>
+                    <EuiSelect
+                      id="selectAPI"
+                      options={
+                        this.state.APIlist.map((item) => {
+                          return { value: item.id, text: item.id }
+                        })
+                      }
+                      value={this.state.currentAPI}
+                      onChange={this.changeAPI}
+                      aria-label="API selector"
+                    />
+                  </div>
+                </EuiFlexItem>
+
+              </>
+            }
             {this.props.state.wazuhNotReadyYet && this.buildWazuhNotReadyYet()}
-          </Fragment>
+          </EuiFlexGroup>
+
         )}
-      </WzReduxProvider>,
-      container[0],
-
-
-    );
+      </WzReduxProvider>
+      , container[0]);
   }
 }
 
