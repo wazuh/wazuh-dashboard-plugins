@@ -38,6 +38,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed the plugin logo path in Kibana menu when use `server.basePath` setting [#3144](https://github.com/wazuh/wazuh-kibana-app/pull/3144)
 - Fixed deprecated endpoint for create agent groups [3152](https://github.com/wazuh/wazuh-kibana-app/pull/3152)
 - Fixed check for TCP protocol in deploy new agent [#3163](https://github.com/wazuh/wazuh-kibana-app/pull/3163)
+- Fixed format result of request. [#3163](https://github.com/wazuh/wazuh-kibana-app/pull/3163)
 
 ## Wazuh v4.1.4 - Kibana 7.10.0 , 7.10.2 - Revision 4105
 
@@ -66,6 +67,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed wrong variable declaration for macOS agents [#3066](https://github.com/wazuh/wazuh-kibana-app/pull/3066)
 - Fixed some errors in the Events table, action buttons style, and URLs disappeared [#3086](https://github.com/wazuh/wazuh-kibana-app/pull/3086)
 - Fixed Rollback of invalid rule configuration file [#3084](https://github.com/wazuh/wazuh-kibana-app/pull/3084)
+- Fixed value to show if it doesn't exist [#3150](https://github.com/wazuh/wazuh-kibana-app/issues/3150)
 
 ## Wazuh v4.1.2 - Kibana 7.10.0 , 7.10.2 - Revision 4103
 
