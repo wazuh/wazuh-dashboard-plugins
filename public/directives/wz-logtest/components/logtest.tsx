@@ -47,7 +47,7 @@ export const Logtest = compose(
   const [testResult, setTestResult] = useState('');
 
   const onChange = (e) => {
-    setValue((e.target.value).split("\n"));
+    setValue((e.target.value).split("\n").filter(item => item));
   };
 
   const formatResult = (result) => {
@@ -106,7 +106,6 @@ export const Logtest = compose(
   };
 
   const buildLogtest = () => {
-    console.log(value)
     return (
       <Fragment>
         <EuiTextArea
@@ -121,7 +120,7 @@ export const Logtest = compose(
           <EuiButton
             style={{ maxWidth: '100px' }}
             isLoading={testing}
-            isDisabled={testing || !value}
+            isDisabled={testing || value.length === 0}
             iconType="play"
             fill
             onClick={() => {
