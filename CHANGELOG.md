@@ -67,7 +67,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed wrong variable declaration for macOS agents [#3066](https://github.com/wazuh/wazuh-kibana-app/pull/3066)
 - Fixed some errors in the Events table, action buttons style, and URLs disappeared [#3086](https://github.com/wazuh/wazuh-kibana-app/pull/3086)
 - Fixed Rollback of invalid rule configuration file [#3084](https://github.com/wazuh/wazuh-kibana-app/pull/3084)
-- Fixed value to show if it doesn't exist [#3150](https://github.com/wazuh/wazuh-kibana-app/issues/3150)
 
 ## Wazuh v4.1.2 - Kibana 7.10.0 , 7.10.2 - Revision 4103
 
