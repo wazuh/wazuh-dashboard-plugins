@@ -21,19 +21,17 @@ export const WAZUH_INDEX_SHARDS = 2;
 export const WAZUH_INDEX_REPLICAS = 0;
 
 // Job - Wazuh monitoring
-
 export const WAZUH_INDEX_TYPE_MONITORING = "monitoring";
 export const WAZUH_MONITORING_PREFIX = "wazuh-monitoring-";
 export const WAZUH_MONITORING_PATTERN = "wazuh-monitoring-*";
 export const WAZUH_MONITORING_TEMPLATE_NAME = "wazuh-agent";
 export const WAZUH_MONITORING_DEFAULT_INDICES_SHARDS = WAZUH_INDEX_SHARDS;
-export const WAZUH_MONITORING_DEFAULT_CREATION = 'd';
+export const WAZUH_MONITORING_DEFAULT_CREATION = 'w';
 export const WAZUH_MONITORING_DEFAULT_ENABLED = true;
 export const WAZUH_MONITORING_DEFAULT_FREQUENCY = 900;
 export const WAZUH_MONITORING_DEFAULT_CRON_FREQ = '0 * * * * *';
 
 // Job - Wazuh statistics
-
 export const WAZUH_INDEX_TYPE_STATISTICS = "statistics";
 export const WAZUH_STATISTICS_DEFAULT_PREFIX = "wazuh";
 export const WAZUH_STATISTICS_DEFAULT_NAME = "statistics";
