@@ -2,6 +2,12 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.2.0 - Kibana 7.10.0 , 7.10.2 - Revision 4202
+
+### Fixed
+
+- Fixing filter in reports [#3173](https://github.com/wazuh/wazuh-kibana-app/pull/3173)
+
 ## Wazuh v4.2.0 - Kibana 7.10.0 , 7.10.2 - Revision 4201
 
 ### Added
