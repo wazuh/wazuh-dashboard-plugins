@@ -58,7 +58,7 @@ export const Logtest = compose(
       `program_name: ${(result.predecoder || '').program_name || '-'} \n\n` +
       `**Phase 2: Completed decoding. \n    ` +
       `name: ${(result.decoder || '').name || '-'} \n    ` +
-      `parent: ${(result.decoder || '').parent || '-'} \n    ` +
+      `${(result.decoder || '').parent ? `parent: ${(result.decoder || '').parent} \n    ` : ''}` +
       `data: ${JSON.stringify(result.data || '-', null, 6).replace('}', '    }')} \n\n` +
       `**Phase 3: Completed filtering (rules). \n    ` +
       `id: ${(result.rule || '').id || '-'} \n    ` +
