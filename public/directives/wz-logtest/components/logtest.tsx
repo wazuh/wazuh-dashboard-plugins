@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useState, prevState } from 'react';
 import { DynamicHeight } from '../../../utils/dynamic-height';
 import {
   EuiButton,
@@ -42,12 +42,12 @@ export const Logtest = compose(
   withReduxProvider,
   withUserAuthorizationPrompt([{ action: 'logtest:run', resource: `*:*:*` }])
 )((props: LogstestProps) => {
-  const [value, setValue] = useState('');
+  const [value, setValue] = useState([]);
   const [testing, setTesting] = useState(false);
-  const [testResult, setTestResult] = useState(false);
+  const [testResult, setTestResult] = useState('');
 
   const onChange = (e) => {
-    setValue(e.target.value);
+    setValue((e.target.value).split("\n"));
   };
 
   const formatResult = (result) => {
@@ -80,25 +80,33 @@ export const Logtest = compose(
       `nist_800_53: ${JSON.stringify((result.rule || '').nist_800_53 || '-')} \n    ` +
       `pci_dss: ${JSON.stringify((result.rule || '').pci_dss || '-')} \n    ` +
       `tsc: ${JSON.stringify((result.rule || '').tsc || '-')} \n` +
-      `**Alert to be generated.`
+      `**Alert to be generated. \n\n\n`
     );
   };
 
-  const test = async () => {
+  const runAllTest = () => {
+    setTestResult('')
+    value.map((event) => {
+      test(event)
+    })
+    setTesting(false);
+  }
+
+  const test = async (event) => {
     setTesting(true);
     const body = {
       log_format: 'syslog',
       location: 'logtest',
-      event: value,
+      event: event,
     };
 
     const result = await WzRequest.apiReq('PUT', '/logtest', body);
-
-    setTesting(false);
-    setTestResult(formatResult(result.data.data.output));
+    
+    setTestResult(prevState => [...prevState, formatResult(result.data.data.output)]);
   };
 
   const buildLogtest = () => {
+    console.log(value)
     return (
       <Fragment>
         <EuiTextArea
@@ -117,7 +125,7 @@ export const Logtest = compose(
             iconType="play"
             fill
             onClick={() => {
-              test();
+              runAllTest();
             }}
           >
             Test
