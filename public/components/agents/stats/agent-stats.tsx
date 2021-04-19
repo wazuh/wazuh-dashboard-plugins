@@ -81,28 +81,39 @@ const statsAgents: {title: string, field: string, render?: (value) => any}[] = [
 
 export const MainAgentStats = compose(
   withReduxProvider,
-  withGlobalBreadcrumb(({agent}) => [
+  withGlobalBreadcrumb(({ agent }) => [
     {
-      text: ''
+      text: '',
     },
     {
       text: 'Agents',
-      href: "#/agents-preview"
+      href: '#/agents-preview',
     },
     { agent },
     {
-      text: 'Stats'
+      text: 'Stats',
     },
   ]),
-  withUserAuthorizationPrompt(({agent}) => [[
-    {action: 'agent:read', resource: `agent:id:${agent.id}`}, 
-    ...(agent.group || []).map(group => ({ action: 'agent:read', resource: `agent:group:${group}` }))
-  ]]),
-  withGuard(({agent}) => agent.status !== 'active', PromptNoActiveAgentWithoutSelect),
-  withGuard(({agent}) => {
-    const [major, minor, patch] = agent.version.replace('Wazuh v','').split('.').map(value => parseInt(value));
-    return !(major >= 4 && minor >= 2 && patch >= 0)
-  }, () => <PromptAgentFeatureVersion version='equal or higher version than 4.2.0'/>)
+  withUserAuthorizationPrompt(({ agent }) => [
+    [
+      { action: 'agent:read', resource: `agent:id:${agent.id}` },
+      ...(agent.group || []).map((group) => ({
+        action: 'agent:read',
+        resource: `agent:group:${group}`,
+      })),
+    ],
+  ]),
+  withGuard(({ agent }) => agent.status !== 'active', PromptNoActiveAgentWithoutSelect),
+  withGuard(
+    ({ agent }) => {
+      const [major, minor, patch] = agent.version
+        .replace('Wazuh v', '')
+        .split('.')
+        .map((value) => parseInt(value));
+      return !(major >= 4 && minor >= 2 && patch >= 0);
+    },
+    () => <PromptAgentFeatureVersion version="equal or higher version than 4.2.0" />
+  )
 )(AgentStats);
 
 function AgentStats({agent}){

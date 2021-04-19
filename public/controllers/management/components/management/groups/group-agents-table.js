@@ -105,9 +105,17 @@ class WzGroupAgentsTable extends Component {
           return (
             <div>
               <WzButtonPermissions
-                buttonType='icon'
-                permissions={[[{action: 'agent:read', resource: `agent:id:${item.id}`}, ...(item.group || []).map(group => ({ action: 'agent:read', resource: `agent:group:${group}` }))]]}
-                tooltip={{position: 'top', content: 'Go to the agent'}}
+                buttonType="icon"
+                permissions={[
+                  [
+                    { action: 'agent:read', resource: `agent:id:${item.id}` },
+                    ...(item.group || []).map((group) => ({
+                      action: 'agent:read',
+                      resource: `agent:group:${group}`,
+                    })),
+                  ],
+                ]}
+                tooltip={{ position: 'top', content: 'Go to the agent' }}
                 aria-label="Go to the agent"
                 iconType="eye"
                 onClick={async () => {
@@ -116,9 +124,17 @@ class WzGroupAgentsTable extends Component {
                 color="primary"
               />
               <WzButtonPermissionsModalConfirm
-                buttonType='icon'
-                permissions={[[{action: 'agent:modify_group', resource: `agent:id:${item.id}`}, ...(item.group || []).map(group => ({ action: 'agent:modify_group', resource: `agent:group:${group}` }))]]}
-                tooltip={{position: 'top', content: 'Remove agent from this group'}}
+                buttonType="icon"
+                permissions={[
+                  [
+                    { action: 'agent:modify_group', resource: `agent:id:${item.id}` },
+                    ...(item.group || []).map((group) => ({
+                      action: 'agent:modify_group',
+                      resource: `agent:group:${group}`,
+                    })),
+                  ],
+                ]}
+                tooltip={{ position: 'top', content: 'Remove agent from this group' }}
                 aria-label="Remove agent from this group"
                 iconType="trash"
                 onConfirm={async () => {
@@ -128,7 +144,7 @@ class WzGroupAgentsTable extends Component {
                 isDisabled={item.name === 'default'}
                 modalTitle={`Remove ${item.file || item.name} agent from this group?`}
                 modalProps={{
-                  buttonColor: 'danger'
+                  buttonColor: 'danger',
                 }}
               />
             </div>
