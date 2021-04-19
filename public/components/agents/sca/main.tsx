@@ -10,7 +10,16 @@ const mapStateToProps = (state) => ({
 });
 
 export const MainSca = compose(
-  withUserAuthorizationPrompt([{action: 'agent:read', resource: 'agent:id:*'}, {action: 'sca:read', resource: 'agent:id:*'}]),
+  withUserAuthorizationPrompt([
+    [
+      {action: 'agent:read', resource: 'agent:id:*'},
+      {action: 'agent:read', resource: 'agent:group:*'}
+    ],
+    [
+      {action: 'sca:read', resource: 'agent:id:*'},
+      {action: 'sca:read', resource: 'agent:group:*'}
+    ]
+  ]),
   connect(mapStateToProps),
   withGuard(
     (props) => !(props.currentAgentData && props.currentAgentData.id && props.agent),
