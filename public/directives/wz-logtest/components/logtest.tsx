@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Fragment, useState, prevState } from 'react';
+import React, { Fragment, useState } from 'react';
 import { DynamicHeight } from '../../../utils/dynamic-height';
 import {
   EuiButton,
@@ -19,23 +19,22 @@ import {
   EuiFlyout,
   EuiFlyoutBody,
   EuiFlyoutHeader,
+  EuiOverlayMask,
   EuiPage,
   EuiPanel,
   EuiSpacer,
   EuiTextArea,
   EuiTitle,
-  EuiOverlayMask,
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services';
 import { withReduxProvider, withUserAuthorizationPrompt } from '../../../components/common/hocs';
 import { compose } from 'redux';
 
-
 type LogstestProps = {
-  openCloseFlyout: () => {},
-  showClose: boolean,
-  onFlyout: boolean,
-  isRuleset: string,
+  openCloseFlyout: () => {};
+  showClose: boolean;
+  onFlyout: boolean;
+  isRuleset: string;
 };
 
 export const Logtest = compose(
@@ -47,7 +46,7 @@ export const Logtest = compose(
   const [testResult, setTestResult] = useState('');
 
   const onChange = (e) => {
-    setValue((e.target.value).split("\n").filter(item => item));
+    setValue(e.target.value.split('\n').filter((item) => item));
   };
 
   const formatResult = (result) => {
@@ -85,12 +84,12 @@ export const Logtest = compose(
   };
 
   const runAllTest = () => {
-    setTestResult('')
+    setTestResult('');
     value.map((event) => {
-      test(event)
-    })
+      test(event);
+    });
     setTesting(false);
-  }
+  };
 
   const test = async (event) => {
     setTesting(true);
@@ -101,8 +100,13 @@ export const Logtest = compose(
     };
 
     const result = await WzRequest.apiReq('PUT', '/logtest', body);
-    
-    setTestResult(prevState => [...prevState, formatResult(result.data.data.output)]);
+
+    result.data.data.alert
+      ? setTestResult((prevState) => [...prevState, formatResult(result.data.data.output)])
+      : setTestResult((prevState) => [
+          ...prevState,
+          `No result found for:  ${result.data.data.output.full_log} \n\n\n`,
+        ]);
   };
 
   const buildLogtest = () => {
