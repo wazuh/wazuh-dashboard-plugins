@@ -39,7 +39,6 @@ export const MainSca = compose(
   withUserAuthorizationPrompt((props) => {
     const agentData =
       props.currentAgentData && props.currentAgentData.id ? props.currentAgentData : props.agent;
-    console.log(agentData)
     return [
       [
         { action: 'agent:read', resource: `agent:id:${agentData.id}` },
