@@ -39,9 +39,16 @@ export const MainSca = compose(
   withUserAuthorizationPrompt((props) => {
     const agentData =
       props.currentAgentData && props.currentAgentData.id ? props.currentAgentData : props.agent;
+    console.log(agentData)
     return [
-      { action: 'agent:read', resource: `agent:id:${agentData.id}` },
-      { action: 'sca:read', resource: `agent:id:${agentData.id}` },
+      [
+        { action: 'agent:read', resource: `agent:id:${agentData.id}` },
+        ...(agentData.group || []).map(group => ({ action: 'agent:read', resource: `agent:group:${group}` }))
+      ],
+      [
+        { action: 'sca:read', resource: `agent:id:${agentData.id}` },
+        ...(agentData.group || []).map(group => ({ action: 'sca:read', resource: `agent:group:${group}` }))
+      ]
     ];
   })
 )(function MainSca({ selectView, currentAgentData, agent, ...rest }) {
