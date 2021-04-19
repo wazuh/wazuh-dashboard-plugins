@@ -30,12 +30,12 @@ export function getIp(
     const wazuhConfig = new WazuhConfig();
     const configuration = wazuhConfig.getConfig();
     const indexPatternFound = indexPatterns.find((indexPattern) => indexPattern.attributes.title === configuration.pattern);
-    if(!indexPatternFound){
-      AppState.removeCurrentPattern()
+    const currentPattern = AppState.getCurrentPattern();
+    if(!indexPatternFound && !indexPatterns.some((pattern) => pattern === currentPattern)){
+      AppState.removeCurrentPattern();
+      AppState.setCurrentPattern(indexPatternFound.id);
     }
     getDataPlugin().indexPatterns.setDefault(indexPatternFound.id, true);
-    AppState.setCurrentPattern(indexPatternFound.id)
-
     return indexPatternFound;
   }
 
