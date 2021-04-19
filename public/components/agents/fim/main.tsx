@@ -32,7 +32,7 @@ export const MainFim = compose(
     return [
       [
         { action: 'agent:read', resource: `agent:id:${agentData.id}` },
-        ...(agentData.group || {}).map(group => ({ action: 'agent:read', resource: `agent:group:${group}` }))
+        ...(agentData.group || []).map(group => ({ action: 'agent:read', resource: `agent:group:${group}` }))
       ],
       [
         { action: 'syscheck:read', resource: `agent:id:${agentData.id}` },
