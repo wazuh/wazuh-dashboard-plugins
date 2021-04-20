@@ -12,15 +12,14 @@
 
 import React, { Component } from 'react';
 import {
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiBasicTable,
   Direction,
   EuiOverlayMask,
 } from '@elastic/eui';
 import { WzRequest } from '../../../../react-services/wz-request';
 import { FlyoutDetail } from './flyout';
-import { filtersToObject, IFilter } from '../../../wz-search-bar';
+import { filtersToObject, IFilter, IWzSuggestItem } from '../../../wz-search-bar';
+import { TableWithSearchBarWzAPI } from '../../../../components/common/tables';
+import { getFilterValues } from './lib';
 
 export class InventoryTable extends Component {
   state: {
@@ -35,6 +34,13 @@ export class InventoryTable extends Component {
     isLoading: boolean
     currentItem: {}
   };
+
+  suggestions: IWzSuggestItem[] = [
+    {type: 'q', label: 'name', description:"Filter by package ID", operators:['=','!=', '~'], values: async (value) => getFilterValues('name', value, this.props.agent.id)},
+    {type: 'q', label: 'cve', description:"Filter by CVE ID", operators:['=','!=', '~'], values: async (value) => getFilterValues('cve', value, this.props.agent.id)},
+    {type: 'q', label: 'version', description:"Filter by CVE version", operators:['=','!=', '~'], values: async (value) => getFilterValues('version', value, this.props.agent.id)},
+    {type: 'q', label: 'architecture', description:"Filter by architecture", operators:['=','!=', '~'], values: async (value) => getFilterValues('architecture', value, this.props.agent.id)},
+  ]
 
   props!: {
     filters: IFilter[]
@@ -81,28 +87,6 @@ export class InventoryTable extends Component {
     }
   }
 
-  async getItems() {
-    const agentID = this.props.agent.id;
-    try {
-      const items = await WzRequest.apiReq(
-      'GET',
-      `/vulnerability/${agentID}`,
-      { params: this.buildFilter()},
-      );
-
-      this.props.onTotalItemsChange((((items || {}).data || {}).data || {}).total_affected_items);
-      
-      this.setState({
-        items: (((items || {}).data || {}).data || {}).affected_items || {},
-        totalItems: (((items || {}).data || {}).data || {}).total_affected_items - 1,
-        isLoading: false,
-        error: undefined
-      });
-    } catch (error) {
-      this.setState({error, isLoading: false})
-    }
-}
-
   buildSortFilter() {
     const { sortField, sortDirection } = this.state;
     const direction = (sortDirection === 'asc') ? '+' : '-';
@@ -121,20 +105,6 @@ export class InventoryTable extends Component {
     };
     return filter;
   }
-
-  onTableChange = ({ page = {}, sort = {} }) => {
-    const { index: pageIndex, size: pageSize } = page;
-    const { field: sortField, direction: sortDirection } = sort;
-    this.setState({
-      pageIndex,
-      pageSize,
-      sortField,
-      sortDirection,
-      isLoading: true,
-    },
-      () => this.getItems()
-    );
-  };
 
   columns() {
     let width;
@@ -194,22 +164,18 @@ export class InventoryTable extends Component {
     };
 
     return (
-      <EuiFlexGroup>
-        <EuiFlexItem>
-          <EuiBasicTable
-            items={items}
-            error={error}
-            columns={columns}
-            pagination={pagination}
-            onChange={this.onTableChange}
-            rowProps={getRowProps}
-            sorting={sorting}
-            itemId="vulnerability"
-            isExpandable={true}
-            loading={isLoading}
-          />
-        </EuiFlexItem>
-      </EuiFlexGroup>
+        <TableWithSearchBarWzAPI
+          tableColumns={columns}
+          tableInitialSortingField='name'
+          searchBarSuggestions={this.suggestions}
+          endpoint={`/vulnerability/${this.props.agent.id}`}
+          reload={isLoading}
+          isExpandable={true}
+          rowProps={getRowProps}
+          error={error}
+          filters={this.props.filters}
+          sorting={sorting}
+        />
     );
   }
 

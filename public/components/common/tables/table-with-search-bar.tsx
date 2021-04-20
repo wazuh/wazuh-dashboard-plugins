@@ -20,6 +20,7 @@ export function TableWithSearchBar({
   searchBarPlaceholder = 'Filter or search',
   searchBarProps = {},
   tableColumns,
+  rowProps,
   tablePageSizeOptions = [15, 25, 50, 100],
   tableInitialSortingDirection = 'asc',
   tableInitialSortingField = '',
@@ -96,6 +97,7 @@ export function TableWithSearchBar({
       pagination={tablePagination}
       sorting={sorting}
       onChange={tableOnChange}
+      rowProps={rowProps ? rowProps : false}
       {...tableProps}
     />
   </>

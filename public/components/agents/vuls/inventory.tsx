@@ -24,7 +24,6 @@ import {
 } from '@elastic/eui';
 import {
   InventoryTable,
-  FilterBar
 } from './inventory/';
 import { WzRequest } from '../../../react-services/wz-request';
 import exportCsv from '../../../react-services/wz-csv';
@@ -172,10 +171,6 @@ export class Inventory extends Component {
     const { filters, items, totalItems } = this.state;
     return (
       <div>
-        <FilterBar
-          filters={filters}
-          onFiltersChange={this.onFiltersChange}
-          agent={this.props.agent} />
           <InventoryTable
             {...this.props}
             filters={filters}
