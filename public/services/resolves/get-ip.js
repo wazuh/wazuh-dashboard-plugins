@@ -37,7 +37,7 @@ export function getIp(
     if (!indexPatternFound) {
       AppState.removeCurrentPattern();
     } else {
-      indexPatternFound && getDataPlugin().indexPatterns.setDefault(indexPatternFound.id, true);
+      getDataPlugin().indexPatterns.setDefault(indexPatternFound.id, true);
     }
 
     return indexPatternFound;
