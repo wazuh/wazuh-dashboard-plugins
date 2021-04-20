@@ -190,13 +190,8 @@ export class FileDetails extends Component {
         name: 'Last modified',
         grow: 2,
         icon: 'clock',
-      },
-      {
-        field: 'sha1',
-        name: 'SHA1',
-        checksum: true,
-        icon: 'check',
-      },
+        transformValue: formatUIDate
+      }
     ];
   }
 
@@ -260,7 +255,7 @@ export class FileDetails extends Component {
         'YYYY-MM-DD'
       )} AND ${field}<${value_max.format('YYYY-MM-DD')}`;
     } else {
-      newBadge.value = `${field}=${field === 'size' ? this.props.currentFile[field] : value}`;
+      newBadge.value = `${field}=${field === 'size' ? this.props.currentFile[field] : value}`;      
     }
     !filters.some((item) => item.field === newBadge.field && item.value === newBadge.value) &&
       onFiltersChange([...filters, newBadge]);
