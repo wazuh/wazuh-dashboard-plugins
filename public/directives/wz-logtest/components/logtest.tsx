@@ -52,7 +52,7 @@ export const Logtest = compose(
   const formatResult = (result) => {
     return (
       `**Phase 1: Completed pre-decoding. \n    ` +
-      `full event:  ${result.full_log}  \n    ` +
+      `full event:  ${result.full_log || '-'}  \n    ` +
       `timestamp: ${(result.predecoder || '').timestamp || '-'} \n    ` +
       `hostname: ${(result.predecoder || '').hostname || '-'} \n    ` +
       `program_name: ${(result.predecoder || '').program_name || '-'} \n\n` +
@@ -71,7 +71,7 @@ export const Logtest = compose(
       `gdpr: ${JSON.stringify((result.rule || '').gdpr || '-')} \n    ` +
       `gpg13: ${JSON.stringify((result.rule || '').gpg13 || '-')} \n    ` +
       `hipaa: ${JSON.stringify((result.rule || '').hipaa || '-')} \n    ` +
-      `mail: ${result.rule || ''.mail || '-'} \n    ` +
+      `mail: ${JSON.stringify((result.rule || '').mail || '-')} \n    ` +
       `mitre.id: ${JSON.stringify((result.rule || '').mitre || ''.id || '-')} \n    ` +
       `mitre.technique: ${JSON.stringify(
         (result.rule || '').mitre || ''.technique || '-'

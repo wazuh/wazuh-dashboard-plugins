@@ -11,6 +11,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added a reminder to restart cluster or manager after import a file in Rules, Decoders or CDB Lists [#3051](https://github.com/wazuh/wazuh-kibana-app/pull/3051)
 - Added Agent Stats section [#3056](https://github.com/wazuh/wazuh-kibana-app/pull/3056)
 - Added `logtest` PUT example on API Console [#3061](https://github.com/wazuh/wazuh-kibana-app/pull/3061)
+- Added vulnerabilities inventory that affect to an agent [#3069](https://github.com/wazuh/wazuh-kibana-app/pull/3069)
 - Added retry button to check api again in health check [#3109](https://github.com/wazuh/wazuh-kibana-app/pull/3109)
 - Added `wazuh-statistics` template and a new mapping for these indices [#3111](https://github.com/wazuh/wazuh-kibana-app/pull/3111)
 - Added link to documentation "Checking connection with Manager" in deploy new agent [#3126](https://github.com/wazuh/wazuh-kibana-app/pull/3126
@@ -37,6 +38,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed the plugin logo path in Kibana menu when use `server.basePath` setting [#3144](https://github.com/wazuh/wazuh-kibana-app/pull/3144)
 - Fixed deprecated endpoint for create agent groups [3152](https://github.com/wazuh/wazuh-kibana-app/pull/3152)
 - Fixed check for TCP protocol in deploy new agent [#3163](https://github.com/wazuh/wazuh-kibana-app/pull/3163)
+- Fixed RBAC issue with agent group permissions [#3181](https://github.com/wazuh/wazuh-kibana-app/pull/3181)
 
 ## Wazuh v4.1.4 - Kibana 7.10.0 , 7.10.2 - Revision 4105
 

@@ -94,7 +94,10 @@ export const MainAgentStats = compose(
       text: 'Stats'
     },
   ]),
-  withUserAuthorizationPrompt(({agent}) => [{action: 'agent:read', resource: `agent:id:${agent.id}`}]),
+  withUserAuthorizationPrompt(({agent}) => [[
+    {action: 'agent:read', resource: `agent:id:${agent.id}`}, 
+    ...(agent.group || []).map(group => ({ action: 'agent:read', resource: `agent:group:${group}` }))
+  ]]),
   withGuard(({agent}) => agent.status !== 'active', PromptNoActiveAgentWithoutSelect),
   withGuard(({agent}) => {
     const [major, minor, patch] = agent.version.replace('Wazuh v','').split('.').map(value => parseInt(value));
