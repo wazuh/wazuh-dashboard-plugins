@@ -83,30 +83,27 @@ export const Logtest = compose(
     );
   };
 
-  const runAllTest = () => {
+  const runAllTests = async () => {
     setTestResult('');
-    value.map((event) => {
-      test(event);
-    });
-    setTesting(false);
-  };
-
-  const test = async (event) => {
     setTesting(true);
-    const body = {
-      log_format: 'syslog',
-      location: 'logtest',
-      event: event,
-    };
-
-    const result = await WzRequest.apiReq('PUT', '/logtest', body);
-
-    result.data.data.alert
-      ? setTestResult((prevState) => [...prevState, formatResult(result.data.data.output)])
-      : setTestResult((prevState) => [
-          ...prevState,
-          `No result found for:  ${result.data.data.output.full_log} \n\n\n`,
-        ]);
+    try{
+      const responsesLogtest = await Promise.all(value.map(async event => {
+        const body = {
+          log_format: 'syslog',
+          location: 'logtest',
+          event: event,
+        };
+        return await WzRequest.apiReq('PUT', '/logtest', body);
+      }));
+      const testResults = responsesLogtest.map(response => 
+        response.data.data.alert
+          ? formatResult(response.data.data.output)
+          : `No result found for:  ${response.data.data.output.full_log} \n\n\n`
+      );
+      setTestResult(testResults);
+    }finally{
+      setTesting(false);
+    }
   };
 
   const buildLogtest = () => {
@@ -127,9 +124,7 @@ export const Logtest = compose(
             isDisabled={testing || value.length === 0}
             iconType="play"
             fill
-            onClick={() => {
-              runAllTest();
-            }}
+            onClick={runAllTests}
           >
             Test
           </EuiButton>
