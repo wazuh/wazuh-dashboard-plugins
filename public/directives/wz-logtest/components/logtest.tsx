@@ -57,7 +57,7 @@ export const Logtest = compose(
       `hostname: ${(result.predecoder || '').hostname || '-'} \n    ` +
       `program_name: ${(result.predecoder || '').program_name || '-'} \n\n` +
       `**Phase 2: Completed decoding. \n    ` +
-      `name: ${(result.decoder || '').name || '-'} \n   ` +
+      `name: ${(result.decoder || '').name || '-'} \n    ` +
       `parent: ${(result.decoder || '').parent || '-'} \n    ` +
       `srcip: ${(result.data || '').srcip || '-'}  \n    ` +
       `srcport: ${(result.data || '').srcport || '-'} \n    ` +
