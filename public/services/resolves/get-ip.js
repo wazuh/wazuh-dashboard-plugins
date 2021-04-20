@@ -30,17 +30,18 @@ export function getIp(
     // set default patter for Kibana
     const wazuhConfig = new WazuhConfig();
     const configuration = wazuhConfig.getConfig();
-    const indexPatternFound = indexPatterns.find((indexPattern) => indexPattern.attributes.title === configuration.pattern);    
-    
-    if(!indexPatternFound)
-    {
+    const indexPatternFound = indexPatterns.find(
+      (indexPattern) => indexPattern.attributes.title === configuration.pattern
+    );
+
+    if (!indexPatternFound) {
       AppState.removeCurrentPattern();
     } else {
       indexPatternFound && getDataPlugin().indexPatterns.setDefault(indexPatternFound.id, true);
     }
-    
+
     return indexPatternFound;
-  }
+  };
 
   const checkWazuhPatterns = async (indexPatterns) => {
     const wazuhConfig = new WazuhConfig();
@@ -70,7 +71,11 @@ export function getIp(
 
       const currentPattern = AppState.getCurrentPattern() || '';
 
-      if (!currentPattern || !(await checkWazuhPatterns(savedObjects)) || !(await checkWazuhConfig(savedObjects))) {
+      if (
+        !currentPattern ||
+        !(await checkWazuhPatterns(savedObjects)) ||
+        !(await checkWazuhConfig(savedObjects))
+      ) {
         if (!$location.path().includes('/health-check')) {
           $location.search('tab', null);
           $location.path('/health-check');
