@@ -19,12 +19,12 @@ import {
   EuiFlyout,
   EuiFlyoutBody,
   EuiFlyoutHeader,
+  EuiOverlayMask,
   EuiPage,
   EuiPanel,
   EuiSpacer,
   EuiTextArea,
   EuiTitle,
-  EuiOverlayMask,
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services';
 import { withReduxProvider, withUserAuthorizationPrompt } from '../../../components/common/hocs';
@@ -41,12 +41,12 @@ export const Logtest = compose(
   withReduxProvider,
   withUserAuthorizationPrompt([{ action: 'logtest:run', resource: `*:*:*` }])
 )((props: LogstestProps) => {
-  const [value, setValue] = useState('');
+  const [value, setValue] = useState([]);
   const [testing, setTesting] = useState(false);
-  const [testResult, setTestResult] = useState(false);
+  const [testResult, setTestResult] = useState('');
 
   const onChange = (e) => {
-    setValue(e.target.value);
+    setValue(e.target.value.split('\n').filter((item) => item));
   };
 
   const formatResult = (result) => {
@@ -58,8 +58,10 @@ export const Logtest = compose(
       `program_name: ${(result.predecoder || '').program_name || '-'} \n\n` +
       `**Phase 2: Completed decoding. \n    ` +
       `name: ${(result.decoder || '').name || '-'} \n    ` +
-      `${(result.decoder || '').parent ? `parent: ${(result.decoder || '').parent} \n    ` : ''}` +
-      `data: ${JSON.stringify(result.data || '-', null, 6).replace('}', '    }')} \n\n` +
+      `parent: ${(result.decoder || '').parent || '-'} \n    ` +
+      `srcip: ${(result.data || '').srcip || '-'}  \n    ` +
+      `srcport: ${(result.data || '').srcport || '-'} \n    ` +
+      `srcuser: ${(result.data || '').srcuser || '-'} \n\n` +
       `**Phase 3: Completed filtering (rules). \n    ` +
       `id: ${(result.rule || '').id || '-'} \n    ` +
       `level: ${(result.rule || '').level || '-'} \n    ` +
@@ -77,22 +79,31 @@ export const Logtest = compose(
       `nist_800_53: ${JSON.stringify((result.rule || '').nist_800_53 || '-')} \n    ` +
       `pci_dss: ${JSON.stringify((result.rule || '').pci_dss || '-')} \n    ` +
       `tsc: ${JSON.stringify((result.rule || '').tsc || '-')} \n` +
-      `**Alert to be generated.`
+      `**Alert to be generated. \n\n\n`
     );
   };
 
-  const test = async () => {
+  const runAllTests = async () => {
+    setTestResult('');
     setTesting(true);
-    const body = {
-      log_format: 'syslog',
-      location: 'logtest',
-      event: value,
-    };
-
-    const result = await WzRequest.apiReq('PUT', '/logtest', body);
-
-    setTesting(false);
-    setTestResult(formatResult(result.data.data.output));
+    try{
+      const responsesLogtest = await Promise.all(value.map(async event => {
+        const body = {
+          log_format: 'syslog',
+          location: 'logtest',
+          event: event,
+        };
+        return await WzRequest.apiReq('PUT', '/logtest', body);
+      }));
+      const testResults = responsesLogtest.map(response => 
+        response.data.data.alert
+          ? formatResult(response.data.data.output)
+          : `No result found for:  ${response.data.data.output.full_log} \n\n\n`
+      );
+      setTestResult(testResults);
+    }finally{
+      setTesting(false);
+    }
   };
 
   const buildLogtest = () => {
@@ -110,12 +121,10 @@ export const Logtest = compose(
           <EuiButton
             style={{ maxWidth: '100px' }}
             isLoading={testing}
-            isDisabled={testing || !value}
+            isDisabled={testing || value.length === 0}
             iconType="play"
             fill
-            onClick={() => {
-              test();
-            }}
+            onClick={runAllTests}
           >
             Test
           </EuiButton>

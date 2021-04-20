@@ -13,10 +13,10 @@
 const initialState = { selected_tools_section: '' };
 
 const toolsReducers = (state = initialState, action) => {
-  if (action.type === 'UPDATE_TOOLS_SECTION') {
+  if (action.type === 'UPDATE_SELECTED_TOOLS_SECTION') {
     return {
       ...state,
-      selected_tools_section: action.section
+      selected_tools_section: action.selected_tools_section
     };
   }
 
