@@ -22,14 +22,6 @@ class WzGlobalBreadcrumb extends Component {
     $('#breadcrumbNoTitle').attr("title", "");
   }
   render() {
-    const options = [
-      { value: 'option_one', text: 'Option one' },
-      { value: 'option_two', text: 'Option two' },
-      { value: 'option_three', text: 'Option three' },
-    ];
-
-
-    const container = document.getElementsByClassName('euiBreadcrumbs');
     return (
       <div>
         {!!this.props.state.breadcrumb.length && (
