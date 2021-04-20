@@ -43,9 +43,9 @@ export class PatternHandler {
 
             await SavedObject.createWazuhIndexPattern(pattern);
             getToasts().addSuccess(`${pattern} index pattern created successfully`);
+            !AppState.getCurrentPattern() && AppState.setCurrentPattern(pattern);
           } catch (err) {
-            getToasts().add({
-              color: 'error',
+            getToasts().addDanger({
               title: 'Error creating the index pattern.',
               text: err.message || err,
               toastLifeTimeMs: 3000

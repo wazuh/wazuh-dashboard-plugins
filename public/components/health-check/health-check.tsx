@@ -90,8 +90,8 @@ export class HealthCheck extends Component {
         if (!patternData.status) {
           if (patternList.length) {
             const indexPatternDefault = patternList.find((indexPattern) => indexPattern.title === defaultPattern);
-            AppState.setCurrentPattern(indexPatternDefault.id);
-            await this.delay(5000);
+            indexPatternDefault && AppState.setCurrentPattern(indexPatternDefault.id);
+            await this.delay(3000);
             return await this.checkPatterns();
           } else {
             errors.push('The selected index-pattern is not present.');
@@ -134,15 +134,18 @@ export class HealthCheck extends Component {
       const errors = [];
       const results = this.state.results;
       const maxTries = 5;
+      let apiId = '';
 
       if (hosts.length) {
         for (let i = 0; i < hosts.length; i++) {
-          for (let tries = 0; tries < 5; tries++) {
+          for (let tries = 0; tries < maxTries; tries++) {
             await this.delay(3000);
             try {
               const API = await ApiCheck.checkApi(hosts[i], true);
               if (API && API.data) {
-                return hosts[i].id;
+                apiId = hosts[i].id;
+                tries = maxTries;
+                i = hosts.length
               }
             } catch (err) {
               if (tries) {
@@ -158,6 +161,7 @@ export class HealthCheck extends Component {
               }
             }
           }
+          if (apiId) return apiId;
         }
 
         const updateNotReadyYet = updateWazuhNotReadyYet(false);
@@ -300,20 +304,10 @@ export class HealthCheck extends Component {
               results[i].description = <span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span>;
               this.setState({ results, errors });
             } else {
-              let permissionToGoToTheApp = true;
-              if (!results[i].description.props.children[1].includes('Checking')) {
-                permissionToGoToTheApp = false;
-              }
               results[i].description = <span><EuiIcon type="check" color="secondary" ></EuiIcon> Ready</span>;
-              if (results[i].description.props.children[1].includes('Error')) {
-                permissionToGoToTheApp = false;
-              }
+              const updateNotReadyYet = updateWazuhNotReadyYet(false);
+              store.dispatch(updateNotReadyYet);
               this.setState({ results, errors });
-              if (permissionToGoToTheApp) {
-                this.goAppOverview();
-                const updateNotReadyYet = updateWazuhNotReadyYet(false);
-                store.dispatch(updateNotReadyYet);
-              }
             }
           }
         }
@@ -467,10 +461,6 @@ export class HealthCheck extends Component {
 
   goAppSettings() {
     window.location.href = '/app/wazuh#/settings';
-  }
-
-  goAppOverview() {
-    window.location.href = '/app/wazuh#/overview';
   }
 
   render() {
