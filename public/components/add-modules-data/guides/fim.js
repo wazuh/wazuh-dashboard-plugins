@@ -29,7 +29,7 @@ export default {
           description: `Use this option to add or remove directories to be monitored. The directories must be comma separated.
           All files and subdirectories within the noted directories will also be monitored.
           Drive letters without directories are not valid. At a minimum the ‘.’ should be included (D:\\.).
-          This is to be set on the system to be monitored (or in the agent.conf, if appropriate).`,
+          This is to be set on the system to be monitored (or in the shared.conf, if appropriate).`,
           type: 'input',
           required: true,
           removable: true,
@@ -385,8 +385,8 @@ export default {
         },
         {
           name: 'allow_remote_prefilter_cmd',
-          description: 'Allows prefilter_cmd option apply in remote configuration (agent.conf).',
-          info: 'This option only can be activate from the agent side, in its own agent.conf.',
+          description: 'Allows prefilter_cmd option apply in remote configuration (shared.conf).',
+          info: 'This option only can be activate from the agent side, in its own shared.conf.',
           type: 'switch',
           default_value: false
         },
@@ -394,7 +394,7 @@ export default {
           name: 'prefilter_cmd',
           description: 'Run to prevent prelinking from creating false positives.',
           info: `This option may negatively impact performance as the configured command will be run for each file checked.
-          This option is ignored when defined at agent.conf if allow_remote_prefilter_cmd is set to no at agent.conf.`,
+          This option is ignored when defined at shared.conf if allow_remote_prefilter_cmd is set to no at shared.conf.`,
           type: 'input',
           placeholder: 'Command to prevent prelinking.'
         },
