@@ -56,6 +56,9 @@ export function getIp(
 
       if (
         !currentPattern ||
+        !savedObjects.find(
+          element => element.id === currentPattern
+        ) ||
         !(await checkWazuhPatterns(savedObjects))
       ) {
         if (!$location.path().includes('/health-check')) {
