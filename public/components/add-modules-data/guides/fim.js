@@ -394,7 +394,7 @@ export default {
           name: 'prefilter_cmd',
           description: 'Run to prevent prelinking from creating false positives.',
           info: `This option may negatively impact performance as the configured command will be run for each file checked.
-          This option is ignored when defined at shared.conf if allow_remote_prefilter_cmd is set to no at shared.conf.`,
+          This option is ignored when defined at shared.conf if allow_remote_prefilter_cmd is set to no at agent.conf.`,
           type: 'input',
           placeholder: 'Command to prevent prelinking.'
         },
