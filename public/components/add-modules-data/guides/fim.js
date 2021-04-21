@@ -29,7 +29,7 @@ export default {
           description: `Use this option to add or remove directories to be monitored. The directories must be comma separated.
           All files and subdirectories within the noted directories will also be monitored.
           Drive letters without directories are not valid. At a minimum the ‘.’ should be included (D:\\.).
-          This is to be set on the system to be monitored (or in the shared.conf, if appropriate).`,
+          This is to be set on the system to be monitored (or in the agent.conf, if appropriate).`,
           type: 'input',
           required: true,
           removable: true,
@@ -385,8 +385,8 @@ export default {
         },
         {
           name: 'allow_remote_prefilter_cmd',
-          description: 'Allows prefilter_cmd option apply in remote configuration (shared.conf).',
-          info: 'This option only can be activate from the agent side, in its own shared.conf.',
+          description: 'Allows prefilter_cmd option apply in remote configuration (agent.conf).',
+          info: 'This option only can be activate from the agent side, in its own agent.conf.',
           type: 'switch',
           default_value: false
         },

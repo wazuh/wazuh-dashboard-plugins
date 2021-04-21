@@ -294,7 +294,7 @@ class WzModuleGuide extends Component {
     return [
       ...configurationSteps,
       {
-        title: !invalidConfiguration ? `Edit ${this.state.agentTypeSelected == 'manager' ? 'manager.conf' : 'shared.conf'}` : 'Configuration error',
+        title: !invalidConfiguration ? `Edit ${this.state.agentTypeSelected == 'manager' ? 'manager.conf' : 'agent.conf'}` : 'Configuration error',
         children: (
           <Fragment>
             {!invalidConfiguration ? (
