@@ -30,7 +30,7 @@
     "kbn": "node ../../scripts/kbn",
     "es": "node ../../scripts/es",
     "start": "plugin-helpers start",
-    "build": "yarn plugin-helpers build --skip-archive --kibana-version=$KIBANA_VERSION",
+    "build": "yarn plugin-helpers build --kibana-version=$KIBANA_VERSION",
     "plugin-helpers": "node ../../scripts/plugin_helpers",
     "test:ui:runner": "node ../../scripts/functional_test_runner.js",
     "test:server": "plugin-helpers test:server",
