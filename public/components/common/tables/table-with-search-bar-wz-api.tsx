@@ -31,7 +31,6 @@ export function TableWithSearchBarWzAPI({endpoint, ...rest}){
       const response = await WzRequest.apiReq('GET', endpoint, { params });
 
       const { affected_items, total_affected_items } = ((response || {}).data || {}).data;
-      
       return {items: affected_items, totalItems: total_affected_items};
     } catch (error) {
       return Promise.reject(error);

@@ -18,16 +18,14 @@ import {
 import { WzRequest } from '../../../../react-services/wz-request';
 import { FlyoutDetail } from './flyout';
 import { filtersToObject, IFilter, IWzSuggestItem } from '../../../wz-search-bar';
-import { TableWithSearchBarWzAPI } from '../../../../components/common/tables';
+import { TableWithSearchBarAndCsvWzAPI } from '../../../../components/common/tables';
 import { getFilterValues } from './lib';
 
 export class InventoryTable extends Component {
   state: {
-    items: []
     error?: string
     pageIndex: number
     pageSize: number
-    totalItems: number
     sortField: string
     isFlyoutVisible: Boolean
     sortDirection: Direction
@@ -45,8 +43,6 @@ export class InventoryTable extends Component {
   props!: {
     filters: IFilter[]
     agent: any
-    items: []
-    totalItems: number,
     onTotalItemsChange: Function
   }
 
@@ -54,20 +50,14 @@ export class InventoryTable extends Component {
     super(props);
 
     this.state = {
-      items: props.items,
       pageIndex: 0,
       pageSize: 15,
-      totalItems: 0,
       sortField: 'name',
       sortDirection: 'asc',
       isLoading: false,
       isFlyoutVisible: false,
       currentItem: {}
     }
-  }
-
-  async componentDidMount() {
-    this.setState({totalItems: this.props.totalItems});
   }
 
   closeFlyout() {
@@ -83,7 +73,7 @@ export class InventoryTable extends Component {
   async componentDidUpdate(prevProps) {
     const { filters } = this.props;
     if (JSON.stringify(filters) !== JSON.stringify(prevProps.filters)) {
-      this.setState({ pageIndex: 0, isLoading: true }, this.getItems);
+      this.setState({ pageIndex: 0, isLoading: true });
     }
   }
 
@@ -135,6 +125,20 @@ export class InventoryTable extends Component {
         name: 'Architecture',
         sortable: true,
         width: '100px'
+      },
+      {
+        field: 'status',
+        name: 'Status',
+        sortable: true,
+        truncateText: true,
+        width: '100px'
+      },
+      {
+        field: 'type',
+        name: 'Type',
+        sortable: true,
+        truncateText: true,
+        width: '100px'
       }
     ]
   }
@@ -148,14 +152,8 @@ export class InventoryTable extends Component {
       };
     };
 
-    const { items, pageIndex, pageSize, totalItems, sortField, sortDirection, isLoading, error } = this.state;
+    const { sortField, sortDirection, isLoading, error } = this.state;
     const columns = this.columns();
-    const pagination = {
-      pageIndex: pageIndex,
-      pageSize: pageSize,
-      totalItemCount: totalItems,
-      pageSizeOptions: [15, 25, 50, 100],
-    }
     const sorting = {
       sort: {
         field: sortField,
@@ -164,7 +162,8 @@ export class InventoryTable extends Component {
     };
 
     return (
-        <TableWithSearchBarWzAPI
+        <TableWithSearchBarAndCsvWzAPI
+          title='Vulnerabilities'
           tableColumns={columns}
           tableInitialSortingField='name'
           searchBarSuggestions={this.suggestions}
@@ -173,7 +172,6 @@ export class InventoryTable extends Component {
           isExpandable={true}
           rowProps={getRowProps}
           error={error}
-          filters={this.props.filters}
           sorting={sorting}
         />
     );
@@ -181,6 +179,7 @@ export class InventoryTable extends Component {
 
   render() {
     const table = this.renderTable();
+
     return (
       <div className='wz-inventory'>
         {table}

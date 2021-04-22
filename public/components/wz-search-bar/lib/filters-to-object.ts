@@ -23,6 +23,7 @@ function buildQFilter(oldQ, newQ) {
 const parseConjuntions =  (arg) => ((/ and /gi.test(arg)) ? ';': ','); 
 
 export function filtersToObject(filters: IFilter[]) {
+  console.log(filters)
   return filters.reduce((acc, filter) => {
     const {field, value} = filter;
     if (field === 'q') {

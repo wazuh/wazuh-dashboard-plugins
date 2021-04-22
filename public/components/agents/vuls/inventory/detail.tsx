@@ -112,6 +112,18 @@ export class Details extends Component {
         name: 'Architecture',
         icon: 'node',
         link: false,
+      },
+      {
+        field: 'status',
+        name: 'Status',
+        icon: 'inspect',
+        link: false,
+      },
+      {
+        field: 'type',
+        name: 'Type',
+        icon: 'nested',
+        link: false,
       }
     ];
   }
