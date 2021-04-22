@@ -4,7 +4,7 @@
   "revision": "4106",
   "code": "4106-0",
   "kibana": {
-    "version": "7.10.0"
+    "version": "7.10.2"
   },
   "description": "Wazuh app",
   "keywords": [
@@ -38,7 +38,6 @@
     "test:jest": "node scripts/jest",
     "generate:api-4.0-info": "cd scripts/generate-api-4.0-info;./generate-api-4.0-info.sh;cd ../..",
     "prebuild": "node scripts/generate-build-version",
-    "postbuild": "mkdir build/kibana/wazuh/public && cp -R public/assets build/kibana/wazuh/public && cd build && zip wazuh-kibana-app.zip kibana -r && rm -rf kibana && cd .."
   },
   "dependencies": {
     "angular-animate": "1.7.8",
