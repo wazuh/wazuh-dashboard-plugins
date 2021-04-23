@@ -2,7 +2,6 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-
 ## Wazuh v4.1.5 - Kibana 7.10.0 , 7.10.2 - Revision 4106
 
 - Adapt for Wazuh 4.1.5
@@ -170,7 +169,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed ping request to default request. Added delay and while to che… [#2820](https://github.com/wazuh/wazuh-kibana-app/issues/2820)
 - Removed kibana alert for security [#2806](https://github.com/wazuh/wazuh-kibana-app/issues/2806)
 
-## Wazuh v4.0.4 - Kibana 7.10.0 , 7.10.2 - Revision 4016
+## Wazuh v4.0.4 - Kibana 7.9.1 , 7.9.3 - Revision 4016
 
 ### Added
 
