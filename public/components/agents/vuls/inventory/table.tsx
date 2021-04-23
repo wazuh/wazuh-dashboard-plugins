@@ -18,7 +18,7 @@ import {
 import { WzRequest } from '../../../../react-services/wz-request';
 import { FlyoutDetail } from './flyout';
 import { filtersToObject, IFilter, IWzSuggestItem } from '../../../wz-search-bar';
-import { TableWithSearchBarAndCsvWzAPI } from '../../../../components/common/tables';
+import { TableWithSearchBarWzAPI } from '../../../../components/common/tables';
 import { getFilterValues } from './lib';
 
 export class InventoryTable extends Component {
@@ -162,10 +162,11 @@ export class InventoryTable extends Component {
     };
 
     return (
-        <TableWithSearchBarAndCsvWzAPI
+        <TableWithSearchBarWzAPI
           title='Vulnerabilities'
           tableColumns={columns}
           tableInitialSortingField='name'
+          searchTable={true}
           searchBarSuggestions={this.suggestions}
           endpoint={`/vulnerability/${this.props.agent.id}`}
           reload={isLoading}
@@ -173,6 +174,7 @@ export class InventoryTable extends Component {
           rowProps={getRowProps}
           error={error}
           sorting={sorting}
+          downloadCsv={true}
         />
     );
   }

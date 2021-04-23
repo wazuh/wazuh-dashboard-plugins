@@ -152,6 +152,7 @@ class WzGroupAgentsTable extends Component {
             searchBarSuggestions={this.suggestions}
             endpoint={`/groups/${this.props.state.itemDetail.name}/agents`}
             reload={this.props.state.reload}
+            searchTable={true}
           />
       );
     } else {
