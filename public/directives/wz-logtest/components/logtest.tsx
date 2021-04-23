@@ -58,10 +58,8 @@ export const Logtest = compose(
       `program_name: ${(result.predecoder || '').program_name || '-'} \n\n` +
       `**Phase 2: Completed decoding. \n    ` +
       `name: ${(result.decoder || '').name || '-'} \n    ` +
-      `parent: ${(result.decoder || '').parent || '-'} \n    ` +
-      `srcip: ${(result.data || '').srcip || '-'}  \n    ` +
-      `srcport: ${(result.data || '').srcport || '-'} \n    ` +
-      `srcuser: ${(result.data || '').srcuser || '-'} \n\n` +
+      `${(result.decoder || '').parent ? `parent: ${(result.decoder || '').parent} \n    ` : ''}` +
+      `data: ${JSON.stringify(result.data || '-', null, 6).replace('}', '    }')} \n\n` +
       `**Phase 3: Completed filtering (rules). \n    ` +
       `id: ${(result.rule || '').id || '-'} \n    ` +
       `level: ${(result.rule || '').level || '-'} \n    ` +
@@ -86,22 +84,24 @@ export const Logtest = compose(
   const runAllTests = async () => {
     setTestResult('');
     setTesting(true);
-    try{
-      const responsesLogtest = await Promise.all(value.map(async event => {
-        const body = {
-          log_format: 'syslog',
-          location: 'logtest',
-          event: event,
-        };
-        return await WzRequest.apiReq('PUT', '/logtest', body);
-      }));
-      const testResults = responsesLogtest.map(response => 
+    try {
+      const responsesLogtest = await Promise.all(
+        value.map(async (event) => {
+          const body = {
+            log_format: 'syslog',
+            location: 'logtest',
+            event: event,
+          };
+          return await WzRequest.apiReq('PUT', '/logtest', body);
+        })
+      );
+      const testResults = responsesLogtest.map((response) =>
         response.data.data.alert
           ? formatResult(response.data.data.output)
           : `No result found for:  ${response.data.data.output.full_log} \n\n\n`
       );
       setTestResult(testResults);
-    }finally{
+    } finally {
       setTesting(false);
     }
   };
