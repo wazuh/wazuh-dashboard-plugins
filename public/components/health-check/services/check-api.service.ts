@@ -13,9 +13,7 @@
  */
 
 import { getToasts } from '../../../kibana-services';
-import AppState from '../../../react-services/app-state';
-import GenericRequest from '../../../react-services/generic-request';
-import ApiCheck from '../../../react-services/wz-api-check';
+import { ApiCheck, AppState, GenericRequest } from '../../../react-services';
 
 const trySetDefault = async () => {
   try {

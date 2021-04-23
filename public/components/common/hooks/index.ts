@@ -31,3 +31,5 @@ export { useRefreshAngularDiscover } from './useResfreshAngularDiscover';
 export { useAllowedAgents } from './useAllowedAgents';
 
 export { useApiRequest } from './useApiRequest';
+
+export * from './use-app-config';

@@ -1,0 +1,53 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Check result component should render a Check result screen 1`] = `
+<CheckResult
+  awaitFor={Array []}
+  check={true}
+  checksReady={Object {}}
+  handleCheckReady={[MockFunction]}
+  handleErrors={[MockFunction]}
+  isLoading={false}
+  name="test"
+  title="test chest"
+  validationService={
+    [MockFunction] {
+      "calls": Array [
+        Array [],
+      ],
+      "results": Array [
+        Object {
+          "type": "return",
+          "value": Object {
+            "errors": Array [],
+          },
+        },
+      ],
+    }
+  }
+>
+  <EuiDescriptionListTitle>
+    <dt
+      className="euiDescriptionList__title"
+    >
+      test chest
+    </dt>
+  </EuiDescriptionListTitle>
+  <EuiDescriptionListDescription>
+    <dd
+      className="euiDescriptionList__description"
+    >
+      <span>
+        <EuiLoadingSpinner
+          size="m"
+        >
+          <span
+            className="euiLoadingSpinner euiLoadingSpinner--medium"
+          />
+        </EuiLoadingSpinner>
+         Checking...
+      </span>
+    </dd>
+  </EuiDescriptionListDescription>
+</CheckResult>
+`;
