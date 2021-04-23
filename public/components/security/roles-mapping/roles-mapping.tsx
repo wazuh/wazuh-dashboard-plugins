@@ -7,6 +7,13 @@ import {
   EuiButton,
   EuiTitle,
   EuiOverlayMask,
+  EuiSpacer,
+  EuiText,
+  EuiModal,
+  EuiModalBody,
+  EuiModalFooter,
+  EuiModalHeader,
+  EuiModalHeaderTitle,
 } from '@elastic/eui';
 import { RolesMappingTable } from './components/roles-mapping-table';
 import { RolesMappingEdit } from './components/roles-mapping-edit';
@@ -30,6 +37,13 @@ export const RolesMapping = () => {
   const [rolesLoading, roles, rolesError] = useApiService<Role[]>(RolesServices.GetRoles, {});
   const [internalUsers, setInternalUsers] = useState([]);
   const currentPlatform = useSelector((state: any) => state.appStateReducers.currentPlatform);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [hasChangeCreate, setHasChangeCreate] = useState(false);
+  const [hasChangeEdit, setHasChangeEdit] = useState(false);
+  
+  const closeModal = () => setIsModalVisible(false);
+  const showModal = () => setIsModalVisible(true);
+
 
   useEffect(() => {
     initData();    
@@ -47,7 +61,7 @@ export const RolesMapping = () => {
       ErrorHandler.handle('There was an error loading roles');
     }
   }, [rolesLoading]);
-
+  
   const getInternalUsers = async () => {
     try {
       const wazuhSecurity = new WazuhSecurity();
@@ -88,20 +102,21 @@ export const RolesMapping = () => {
   const updateRoles = async () => {
     await getRules();
   };
-
+  
   let editFlyout;
   if (isEditingRule) {
     editFlyout = (
       <EuiOverlayMask
         headerZindexLocation="below"
         onClick={() => {
-          setIsEditingRule(false);
+          console.log('')
+          setIsModalVisible(hasChangeEdit);
         }}
       >
         <RolesMappingEdit
           rule={selectedRule}
-          closeFlyout={isVisible => {
-            setIsEditingRule(isVisible);
+          closeFlyout={() => {
+            setIsModalVisible(hasChangeEdit);
             initData();
           }}
           rolesEquivalences={rolesEquivalences}
@@ -109,34 +124,94 @@ export const RolesMapping = () => {
           internalUsers={internalUsers}
           onSave={async () => await updateRoles()}
           currentPlatform={currentPlatform}
+          onChangeMappingEdit={(hasChange) => setHasChangeEdit(hasChange)}
         />
-      </EuiOverlayMask>
+       </EuiOverlayMask>
     );
   }
   let createFlyout;
   if (isCreatingRule) {
+    console.log('\n Antes de onclick',hasChangeCreate);
     editFlyout = (
       <EuiOverlayMask
         headerZindexLocation="below"
         onClick={() => {
-          setIsCreatingRule(false);
+          console.log('\n 1',hasChangeCreate);
+          if (hasChangeCreate) {
+            setIsModalVisible(hasChangeCreate);
+          } else {
+            setIsCreatingRule(false);
+            initData();
+          }
         }}
       >
         <RolesMappingCreate
-          closeFlyout={isVisible => {
-            setIsCreatingRule(isVisible);
-            initData();
+          closeFlyout={() => {
+            console.log('\N2',hasChangeCreate);
+            if (hasChangeCreate) {
+              setIsModalVisible(hasChangeCreate);
+            } else {
+              console.log("ENTREA EN EL ELSE 2")
+              setIsCreatingRule(false);
+              initData();
+            }
           }}
           rolesEquivalences={rolesEquivalences}
           roles={roles}
           internalUsers={internalUsers}
           onSave={async () => await updateRoles()}
           currentPlatform={currentPlatform}
+          onChangeMappingCreate={(hasChange) => {
+            console.log("\nEl onChange de role mapping",hasChange)
+            setHasChangeCreate(hasChange);
+          }}
         />
       </EuiOverlayMask>
     );
   }
+  let modal;
+  if (isModalVisible) {
+    modal = (
+      <EuiOverlayMask>
+        <EuiModal onClose={closeModal}>
+          <EuiModalHeader>
+            <EuiModalHeaderTitle>
+              <h1>Modal title</h1>
+            </EuiModalHeaderTitle>
+          </EuiModalHeader>
 
+          <EuiModalBody>
+            If you go back the changes will disappeared. Are you sure?
+            <EuiSpacer />
+          </EuiModalBody>
+
+          <EuiModalFooter>
+            <EuiButton
+              onClick={() => {console.log("ENTRA AQUI???")
+                setIsModalVisible(false);
+                setIsCreatingRule(false);
+                setIsEditingRule(false);
+                setHasChangeCreate(false);
+                setHasChangeEdit(false);
+              }}
+              fill
+            >
+              Yes
+            </EuiButton>
+            <EuiButton
+              onClick={() => {
+                setIsModalVisible(false);
+              }}
+              fill
+            >
+              No
+            </EuiButton>
+          </EuiModalFooter>
+        </EuiModal>
+      </EuiOverlayMask>
+    );
+  }
+  console.log("antes de return",hasChangeCreate)
   return (
     <EuiPageContent>
       <EuiPageContentHeader>
@@ -150,7 +225,8 @@ export const RolesMapping = () => {
             !loadingTable
             &&
             <div>
-              <EuiButton onClick={() => setIsCreatingRule(true)}>Create Role mapping</EuiButton>
+              <EuiButton onClick={() => {setIsCreatingRule(true)}}>Create Role mapping</EuiButton>
+              {modal}
               {createFlyout}
               {editFlyout}
             </div>
@@ -165,6 +241,7 @@ export const RolesMapping = () => {
           editRule={item => {
             setSelectedRule(item);
             setIsEditingRule(true);
+            console.log('ENTRA AQUI Y NO LO SABIA')
           }}
           updateRules={async () => await updateRoles()}
         ></RolesMappingTable>

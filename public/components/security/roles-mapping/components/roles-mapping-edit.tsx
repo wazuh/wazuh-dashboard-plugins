@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   EuiTitle,
   EuiFlyout,
@@ -18,6 +18,7 @@ import { RuleEditor } from './rule-editor';
 import RulesServices from '../../rules/services';
 import RolesServices from '../../roles/services';
 import { WzAPIUtils } from '../../../../react-services/wz-api-utils';
+import _ from 'lodash';
 
 export const RolesMappingEdit = ({
   rule,
@@ -27,6 +28,7 @@ export const RolesMappingEdit = ({
   internalUsers,
   onSave,
   currentPlatform,
+  onChangeMappingEdit
 }) => {
   const getEquivalences = roles => {
     const list = roles.map(item => {
@@ -38,6 +40,8 @@ export const RolesMappingEdit = ({
   const [selectedRoles, setSelectedRoles] = useState<any[]>(getEquivalences(rule.roles));
   const [ruleName, setRuleName] = useState<string>(rule.name);
   const [isLoading, setIsLoading] = useState(false);
+  const [hasChangeMappingRules, setHasChangeMappingRules] = useState(false);
+
 
   const getRolesList = roles => {
     const list = roles.map(item => {
@@ -80,6 +84,15 @@ export const RolesMappingEdit = ({
     setIsLoading(false);
     closeFlyout(false);
   };
+  
+  useEffect(() => {
+    const initialRoles= getEquivalences(rule.roles)
+    if(rule.name != ruleName||  !_.isEqual(initialRoles,selectedRoles) || hasChangeMappingRules){
+      onChangeMappingEdit(true);
+    }else{
+      onChangeMappingEdit(false)
+    }
+  }, [selectedRoles, ruleName, hasChangeMappingRules]);
 
   return (
     <EuiFlyout className="wzApp" onClose={() => closeFlyout(false)}>
@@ -103,7 +116,7 @@ export const RolesMappingEdit = ({
               placeholder=""
               disabled={WzAPIUtils.isReservedID(rule.id)}
               value={ruleName}
-              onChange={e => setRuleName(e.target.value)}
+              onChange={(e) => setRuleName(e.target.value)}
               aria-label=""
             />
           </EuiFormRow>
@@ -118,7 +131,7 @@ export const RolesMappingEdit = ({
               options={getRolesList(roles)}
               isDisabled={WzAPIUtils.isReservedID(rule.id)}
               selectedOptions={selectedRoles}
-              onChange={roles => {
+              onChange={(roles) => {
                 setSelectedRoles(roles);
               }}
               isClearable={true}
@@ -130,12 +143,13 @@ export const RolesMappingEdit = ({
         <EuiFlexGroup style={{ padding: '0px 24px 24px 24px' }}>
           <EuiFlexItem>
             <RuleEditor
-              save={rule => editRule(rule)}
+              save={(rule) => editRule(rule)}
               initialRule={rule.rule}
               isLoading={isLoading}
               isReserved={WzAPIUtils.isReservedID(rule.id)}
               internalUsers={internalUsers}
               currentPlatform={currentPlatform}
+              onFormChange={(hasChange) => setHasChangeMappingRules(hasChange)}
             ></RuleEditor>
           </EuiFlexItem>
         </EuiFlexGroup>

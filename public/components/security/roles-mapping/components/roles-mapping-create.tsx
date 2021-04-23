@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   EuiTitle,
   EuiFlyout,
@@ -24,10 +24,14 @@ export const RolesMappingCreate = ({
   internalUsers,
   onSave,
   currentPlatform,
+  onChangeMappingCreate
 }) => {
   const [selectedRoles, setSelectedRoles] = useState<any[]>([]);
   const [ruleName, setRuleName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [hasChangeMappingRules, setHasChangeMappingRules] = useState(false);
+  const [initialSelectedRoles] = useState<any[]>([]);
+  const [initialRuleName] = useState('');
 
   const getRolesList = roles => {
     const list = roles.map(item => {
@@ -57,6 +61,14 @@ export const RolesMappingCreate = ({
     closeFlyout(false);
   };
 
+  useEffect(() => {
+    if (initialSelectedRoles.length != selectedRoles.length || initialRuleName != ruleName || hasChangeMappingRules){
+      onChangeMappingCreate(true);
+    }else{
+      onChangeMappingCreate(false);
+    }
+  }, [selectedRoles, ruleName, hasChangeMappingRules]);
+
   return (
     <EuiFlyout className="wzApp" onClose={() => closeFlyout(false)}>
       <EuiFlyoutHeader hasBorder={false}>
@@ -75,7 +87,7 @@ export const RolesMappingCreate = ({
             <EuiFieldText
               placeholder="Role name"
               value={ruleName}
-              onChange={e => setRuleName(e.target.value)}
+              onChange={(e) => setRuleName(e.target.value)}
             />
           </EuiFormRow>
           <EuiFormRow
@@ -89,7 +101,7 @@ export const RolesMappingCreate = ({
               options={getRolesList(roles)}
               isDisabled={false}
               selectedOptions={selectedRoles}
-              onChange={roles => {
+              onChange={(roles) => {
                 setSelectedRoles(roles);
               }}
               isClearable={true}
@@ -101,12 +113,14 @@ export const RolesMappingCreate = ({
         <EuiFlexGroup style={{ padding: '0px 24px 24px 24px' }}>
           <EuiFlexItem>
             <RuleEditor
-              save={rule => createRule(rule)}
+              save={(rule) => createRule(rule)}
               initialRule={false}
               isReserved={false}
               isLoading={isLoading}
               internalUsers={internalUsers}
               currentPlatform={currentPlatform}
+              onFormChange={(hasChange) => {
+                setHasChangeMappingRules(hasChange)}}
             ></RuleEditor>
           </EuiFlexItem>
         </EuiFlexGroup>
