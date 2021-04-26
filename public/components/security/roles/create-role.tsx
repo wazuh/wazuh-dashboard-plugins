@@ -17,12 +17,14 @@ import { ErrorHandler } from '../../../react-services/error-handler';
 
 
 
-export const CreateRole = ({ closeFlyout }) => {
+export const CreateRole = ({ closeFlyout, onChangeCreateRole }) => {
     const [policies, setPolicies] = useState([]);
     const [roleName, setRoleName] = useState('');
     const [roleNameError, setRoleNameError] = useState(false);
     const [selectedPolicies, setSelectedPolicies] = useState([]);
     const [selectedPoliciesError, setSelectedPoliciesError] = useState(false);
+    const [initialSelectedPolies] = useState<any[]>([]);
+    const [initialRoleName] = useState('');
 
     async function getData() {
         const policies_request = await WzRequest.apiReq(
@@ -98,6 +100,7 @@ export const CreateRole = ({ closeFlyout }) => {
 
 
     const onChangeRoleName = e => {
+        console.log(e.target.value)
         setRoleName(e.target.value);
     };
 
@@ -106,6 +109,13 @@ export const CreateRole = ({ closeFlyout }) => {
         setSelectedPolicies(selectedPolicies);
     };
 
+    useEffect(() => {
+      if (initialSelectedPolies.length != selectedPolicies.length || initialRoleName != roleName) {
+        onChangeCreateRole(true);
+      } else {
+        onChangeCreateRole(false);
+      }
+    }, [selectedPolicies, roleName]);
 
     return (
         <EuiFlyout className="wzApp"

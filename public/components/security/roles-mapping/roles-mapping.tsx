@@ -106,17 +106,17 @@ export const RolesMapping = () => {
   let editFlyout;
   if (isEditingRule) {
     editFlyout = (
-      <EuiOverlayMask
-        headerZindexLocation="below"
-        onClick={() => {
-          console.log('')
-          setIsModalVisible(hasChangeEdit);
-        }}
-      >
+      // <EuiOverlayMask
+      //   headerZindexLocation="below"
+      //   onClick={() => {
+      //     console.log('')
+      //     setIsModalVisible(hasChangeEdit);
+      //   }}
+      // >
         <RolesMappingEdit
           rule={selectedRule}
           closeFlyout={() => {
-            setIsModalVisible(hasChangeEdit);
+            // setIsModalVisible(hasChangeEdit);
             initData();
           }}
           rolesEquivalences={rolesEquivalences}
@@ -126,92 +126,76 @@ export const RolesMapping = () => {
           currentPlatform={currentPlatform}
           onChangeMappingEdit={(hasChange) => setHasChangeEdit(hasChange)}
         />
-       </EuiOverlayMask>
+      //  </EuiOverlayMask>
     );
   }
   let createFlyout;
   if (isCreatingRule) {
-    console.log('\n Antes de onclick',hasChangeCreate);
     editFlyout = (
-      <EuiOverlayMask
-        headerZindexLocation="below"
-        onClick={() => {
-          console.log('\n 1',hasChangeCreate);
-          if (hasChangeCreate) {
-            setIsModalVisible(hasChangeCreate);
-          } else {
-            setIsCreatingRule(false);
-            initData();
-          }
-        }}
-      >
+      // <EuiOverlayMask
+      //   headerZindexLocation="below"
+      //   onClick={() => {
+      //     setIsCreatingRule(false);
+      //   }}
+      // >
         <RolesMappingCreate
-          closeFlyout={() => {
-            console.log('\N2',hasChangeCreate);
-            if (hasChangeCreate) {
-              setIsModalVisible(hasChangeCreate);
-            } else {
-              console.log("ENTREA EN EL ELSE 2")
-              setIsCreatingRule(false);
-              initData();
-            }
+          closeFlyout={(isVisible) => {
+            console.log({isVisible})
+            setIsCreatingRule(isVisible);
+            initData();
           }}
           rolesEquivalences={rolesEquivalences}
           roles={roles}
           internalUsers={internalUsers}
           onSave={async () => await updateRoles()}
           currentPlatform={currentPlatform}
-          onChangeMappingCreate={(hasChange) => {
-            console.log("\nEl onChange de role mapping",hasChange)
-            setHasChangeCreate(hasChange);
-          }}
         />
-      </EuiOverlayMask>
+      // </EuiOverlayMask>
     );
   }
   let modal;
-  if (isModalVisible) {
-    modal = (
-      <EuiOverlayMask>
-        <EuiModal onClose={closeModal}>
-          <EuiModalHeader>
-            <EuiModalHeaderTitle>
-              <h1>Modal title</h1>
-            </EuiModalHeaderTitle>
-          </EuiModalHeader>
+  // if (isModalVisible) {
+  //   modal = (
+  //     <EuiOverlayMask>
+  //       <EuiModal onClose={() => setIsModalVisible(false)}>
+  //         <EuiModalHeader>
+  //           <EuiModalHeaderTitle>
+  //             <h1>Modal title</h1>
+  //           </EuiModalHeaderTitle>
+  //         </EuiModalHeader>
 
-          <EuiModalBody>
-            If you go back the changes will disappeared. Are you sure?
-            <EuiSpacer />
-          </EuiModalBody>
+  //         <EuiModalBody>
+  //           If you go back the changes will disappeared. Are you sure?
+  //           <EuiSpacer />
+  //         </EuiModalBody>
 
-          <EuiModalFooter>
-            <EuiButton
-              onClick={() => {console.log("ENTRA AQUI???")
-                setIsModalVisible(false);
-                setIsCreatingRule(false);
-                setIsEditingRule(false);
-                setHasChangeCreate(false);
-                setHasChangeEdit(false);
-              }}
-              fill
-            >
-              Yes
-            </EuiButton>
-            <EuiButton
-              onClick={() => {
-                setIsModalVisible(false);
-              }}
-              fill
-            >
-              No
-            </EuiButton>
-          </EuiModalFooter>
-        </EuiModal>
-      </EuiOverlayMask>
-    );
-  }
-  console.log("antes de return",hasChangeCreate)
+  //         <EuiModalFooter>
+  //           <EuiButton
+  //             onClick={() => {console.log("ENTRA AQUI???")
+  //               setIsModalVisible(false);
+  //               setIsCreatingRule(false);
+  //               setIsEditingRule(false);
+  //               setHasChangeCreate(false);
+  //               setHasChangeEdit(false);
+  //             }}
+  //             fill
+  //           >
+  //             Yes
+  //           </EuiButton>
+  //           <EuiButton
+  //             onClick={() => {
+  //               setIsModalVisible(false);
+  //             }}
+  //             fill
+  //           >
+  //             No
+  //           </EuiButton>
+  //         </EuiModalFooter>
+  //       </EuiModal>
+  //     </EuiOverlayMask>
+  //   );
+  // }
+  // console.log("antes de return",hasChangeCreate)
   return (
     <EuiPageContent>
       <EuiPageContentHeader>
@@ -226,7 +210,7 @@ export const RolesMapping = () => {
             &&
             <div>
               <EuiButton onClick={() => {setIsCreatingRule(true)}}>Create Role mapping</EuiButton>
-              {modal}
+              {/* {modal} */}
               {createFlyout}
               {editFlyout}
             </div>

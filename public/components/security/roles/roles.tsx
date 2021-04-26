@@ -14,6 +14,11 @@ import {
   EuiFormRow,
   EuiSpacer,
   EuiFieldText,
+  EuiModal,
+  EuiModalBody,
+  EuiModalFooter,
+  EuiModalHeader,
+  EuiModalHeaderTitle,
   EuiComboBox
 } from '@elastic/eui';
 import { RolesTable } from './roles-table';
@@ -28,6 +33,12 @@ export const Roles = () => {
   const [roles, setRoles] = useState([])
   const [policiesData, setPoliciesData] = useState([])
   const [loadingTable, setLoadingTable] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [hasChangeCreate, setHasChangeCreate] = useState(false);
+
+
+  const closeModal = () => setIsModalVisible(false);
+  const showModal = () => setIsModalVisible(true);
 
 
   async function getData() {
@@ -64,11 +75,61 @@ export const Roles = () => {
   let flyout;
   if (isFlyoutVisible) {
     flyout = (
-      <EuiOverlayMask 
+      <EuiOverlayMask
         headerZindexLocation="below"
-        onClick={() => {setIsFlyoutVisible(false) }}>
-        <CreateRole closeFlyout={closeFlyout} />
-      </EuiOverlayMask >
+        onClick={() => {
+          setIsModalVisible(hasChangeCreate);
+        }}
+      >
+        <CreateRole
+          closeFlyout={() => {
+            setIsModalVisible(hasChangeCreate);
+          }}
+          onChangeCreateRole={(hasChange) => {
+            setHasChangeCreate(hasChange);
+          }}
+        />
+      </EuiOverlayMask>
+    );
+  }
+  let modal;
+  if (isModalVisible) {
+    console.log("ENTRA MODAL")
+    modal = (
+      <EuiOverlayMask>
+        <EuiModal onClose={closeModal}>
+          <EuiModalHeader>
+            <EuiModalHeaderTitle>
+              <h1>Modal title</h1>
+            </EuiModalHeaderTitle>
+          </EuiModalHeader>
+
+          <EuiModalBody>
+            If you go back the changes will disappeared. Are you sure?
+            <EuiSpacer />
+          </EuiModalBody>
+
+          <EuiModalFooter>
+            <EuiButton
+              onClick={() => {console.log("ENTRA AQUI???")
+                setIsModalVisible(false);
+                setIsFlyoutVisible(false);
+              }}
+              fill
+            >
+              Yes
+            </EuiButton>
+            <EuiButton
+              onClick={() => {
+                setIsModalVisible(false)
+              }}
+              fill
+            >
+              No
+            </EuiButton>
+          </EuiModalFooter>
+        </EuiModal>
+      </EuiOverlayMask>
     );
   }
 
@@ -103,22 +164,24 @@ export const Roles = () => {
           </EuiTitle>
         </EuiPageContentHeaderSection>
         <EuiPageContentHeaderSection>
-        {
-          !loadingTable
-          &&
-          <div>
-            <EuiButton
-              onClick={() => setIsFlyoutVisible(true)}>
-              Create role
-                        </EuiButton>
-            {flyout}
-            {editFlyout}
-          </div>
-        }
+          {!loadingTable && (
+            <div>
+              <EuiButton onClick={() => setIsFlyoutVisible(true)}>Create role</EuiButton>
+              {flyout}
+              {editFlyout}
+              {modal}
+            </div>
+          )}
         </EuiPageContentHeaderSection>
       </EuiPageContentHeader>
       <EuiPageContentBody>
-        <RolesTable loading={loadingTable} roles={roles} policiesData={policiesData} editRole={editRole} updateRoles={getData}></RolesTable>
+        <RolesTable
+          loading={loadingTable}
+          roles={roles}
+          policiesData={policiesData}
+          editRole={editRole}
+          updateRoles={getData}
+        ></RolesTable>
       </EuiPageContentBody>
     </EuiPageContent>
   );

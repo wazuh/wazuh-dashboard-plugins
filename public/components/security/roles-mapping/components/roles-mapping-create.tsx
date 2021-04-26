@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   EuiTitle,
   EuiFlyout,
@@ -11,6 +11,13 @@ import {
   EuiFlexItem,
   EuiComboBox,
   EuiFieldText,
+  EuiOverlayMask,
+  EuiModal,
+  EuiModalBody,
+  EuiModalFooter,
+  EuiButton,
+  EuiModalHeader,
+  EuiModalHeaderTitle,
 } from '@elastic/eui';
 import { ErrorHandler } from '../../../../react-services/error-handler';
 import { RuleEditor } from './rule-editor';
@@ -24,7 +31,7 @@ export const RolesMappingCreate = ({
   internalUsers,
   onSave,
   currentPlatform,
-  onChangeMappingCreate
+  // onChangeMappingCreate
 }) => {
   const [selectedRoles, setSelectedRoles] = useState<any[]>([]);
   const [ruleName, setRuleName] = useState('');
@@ -32,8 +39,12 @@ export const RolesMappingCreate = ({
   const [hasChangeMappingRules, setHasChangeMappingRules] = useState(false);
   const [initialSelectedRoles] = useState<any[]>([]);
   const [initialRuleName] = useState('');
-
-  const getRolesList = roles => {
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
+  const [isMount, setIsMount] = useState(false);
+  const contador = useRef(0);
+  const timeStamp = Date.now();
+  const getRolesList = () => {
     const list = roles.map(item => {
       return { label: rolesEquivalences[item.id], id: item.id };
     });
@@ -62,14 +73,94 @@ export const RolesMappingCreate = ({
   };
 
   useEffect(() => {
-    if (initialSelectedRoles.length != selectedRoles.length || initialRuleName != ruleName || hasChangeMappingRules){
-      onChangeMappingCreate(true);
-    }else{
-      onChangeMappingCreate(false);
-    }
-  }, [selectedRoles, ruleName, hasChangeMappingRules]);
+    setIsMount(true)
 
+    return () => setIsMount(false)
+  },[])
+
+
+  const isChange=() => {
+    if (initialSelectedRoles.length != selectedRoles.length || initialRuleName != ruleName || hasChangeMappingRules){
+      setHasChanges(true);
+    }else{
+      setHasChanges(false);
+    }
+  };
+
+  let modal;
+  if (isModalVisible) {
+    console.log('ENTRA EN EL MODAL')
+    modal = (
+      <EuiOverlayMask>
+        <EuiModal onClose={() => setIsModalVisible(false)}>
+          <EuiModalHeader>
+            <EuiModalHeaderTitle>
+              <h1>Modal title</h1>
+            </EuiModalHeaderTitle>
+          </EuiModalHeader>
+
+          <EuiModalBody>
+            If you go back the changes will disappeared. Are you sure?
+            <EuiSpacer />
+          </EuiModalBody>
+
+          <EuiModalFooter>
+            <EuiButton
+              onClick={() => {console.log("ENTRA AQUI???")
+                setIsModalVisible(false);
+                closeFlyout(false);
+                setHasChanges(false);
+                // setHasChangeCreate(false);
+                // setHasChangeEdit(false);
+              }}
+              fill
+            >
+              Yes
+            </EuiButton>
+            <EuiButton
+              onClick={() => {
+                setIsModalVisible(false);
+                closeFlyout(false)
+              }}
+              fill
+            >
+              No
+            </EuiButton>
+          </EuiModalFooter>
+        </EuiModal>
+      </EuiOverlayMask>
+    );
+  }
+
+  // console.log("CONTADOR",contador.current)
+  const prueba = () => {
+    console.log("\n",initialSelectedRoles.length,'\n', selectedRoles.length,'\n', initialRuleName,'\n' ,ruleName, '\n', hasChangeMappingRules,'\n',timeStamp)
+  }
   return (
+    <>
+    <EuiOverlayMask
+        headerZindexLocation="below"
+        onClick={prueba}
+        //   console.log("FUERA DEL IF",initialSelectedRoles.length != selectedRoles.length || initialRuleName != ruleName || hasChangeMappingRules)
+        //   console.log("\n",initialSelectedRoles.length,'\n', selectedRoles.length,'\n', initialRuleName,'\n' ,ruleName, '\n', hasChangeMappingRules)
+        //   if (initialSelectedRoles.length != selectedRoles.length || initialRuleName != ruleName || hasChangeMappingRules){
+        //     // setIsModalVisible(true);
+        //     console.log("ENTRA EN EL IF",initialSelectedRoles.length != selectedRoles.length || initialRuleName != ruleName || hasChangeMappingRules)
+        //   }else{
+        //     console.log("ENTRA EN EL ELSE",initialSelectedRoles.length != selectedRoles.length || initialRuleName != ruleName || hasChangeMappingRules)
+        //     // closeFlyout(false);
+        //   }
+        //   // console.log('\n ENTRA AQUIasjdfasdfasd',hasChanges);
+        //   // if (hasChanges) {
+        //   //   console.log('\n ENTRA DENTRO DEL IF',hasChanges);
+        //   //   isMount && setIsModalVisible(hasChanges);
+        //   // } else {
+        //   //   console.log('\n ENTRA EN EL ELSE',hasChanges);
+        //   //   closeFlyout(true);
+        //   //   // initData();
+        //   // }
+        // }}
+      >
     <EuiFlyout className="wzApp" onClose={() => closeFlyout(false)}>
       <EuiFlyoutHeader hasBorder={false}>
         <EuiTitle size="m">
@@ -98,7 +189,7 @@ export const RolesMappingCreate = ({
           >
             <EuiComboBox
               placeholder="Select roles"
-              options={getRolesList(roles)}
+              options={getRolesList()}
               isDisabled={false}
               selectedOptions={selectedRoles}
               onChange={(roles) => {
@@ -126,5 +217,8 @@ export const RolesMappingCreate = ({
         </EuiFlexGroup>
       </EuiFlyoutBody>
     </EuiFlyout>
+    </EuiOverlayMask>
+    {modal}
+    </>
   );
 };
