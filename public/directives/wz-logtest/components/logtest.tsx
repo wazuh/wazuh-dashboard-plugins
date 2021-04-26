@@ -49,7 +49,7 @@ export const Logtest = compose(
     setValue(e.target.value.split('\n').filter((item) => item));
   };
 
-  const formatResult = (result) => {
+  const formatResult = (result, alert) => {
     return (
       `**Phase 1: Completed pre-decoding. \n    ` +
       `full event:  ${result.full_log || '-'}  \n    ` +
@@ -77,7 +77,7 @@ export const Logtest = compose(
       `nist_800_53: ${JSON.stringify((result.rule || '').nist_800_53 || '-')} \n    ` +
       `pci_dss: ${JSON.stringify((result.rule || '').pci_dss || '-')} \n    ` +
       `tsc: ${JSON.stringify((result.rule || '').tsc || '-')} \n` +
-      `**Alert to be generated. \n\n\n`
+      `${alert ? `**Alert to be generated. \n\n\n` : '\n\n'}`
     );
   };
 
@@ -96,13 +96,19 @@ export const Logtest = compose(
         })
       );
       const testResults = responsesLogtest.map((response) =>
-        response.data.data.alert
-          ? formatResult(response.data.data.output)
+        response.data.data.output.rule || ''
+          ? formatResult(response.data.data.output, response.data.data.alert)
           : `No result found for:  ${response.data.data.output.full_log} \n\n\n`
       );
       setTestResult(testResults);
     } finally {
       setTesting(false);
+    }
+  };
+
+  const handleKeyPress = async (event) => {
+    if (event.ctrlKey && event.key === 'Enter') {
+      await runAllTests();
     }
   };
 
@@ -115,6 +121,7 @@ export const Logtest = compose(
           aria-label=""
           rows={props.showClose ? 10 : 4}
           onChange={onChange}
+          onKeyPress={handleKeyPress}
         />
         <EuiSpacer size="m" />
         <EuiFlexItem grow={false}>
