@@ -97,7 +97,7 @@ export function TableWithSearchBar({
       pagination={tablePagination}
       sorting={sorting}
       onChange={tableOnChange}
-      rowProps={rowProps ? rowProps : false}
+      rowProps={rowProps}
       {...tableProps}
     />
   </>

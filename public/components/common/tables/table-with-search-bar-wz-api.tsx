@@ -29,7 +29,6 @@ export function TableWithSearchBarWzAPI({endpoint, ...rest}){
   const [filters, setFilters] = useState([]);
 
   const onSearch = useCallback(async function(filters, pagination, sorting){
-    console.log(rest.downloadCsv)
     try {
       const { pageIndex, pageSize } = pagination;
       const { field, direction } = sorting.sort;
@@ -93,4 +92,5 @@ TableWithSearchBarWzAPI.defaultProps = {
   title: null,
   downloadCsv: false,
   searchBar: false,
+  rowProps: false,
 };

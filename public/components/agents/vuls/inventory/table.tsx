@@ -15,7 +15,6 @@ import {
   Direction,
   EuiOverlayMask,
 } from '@elastic/eui';
-import { WzRequest } from '../../../../react-services/wz-request';
 import { FlyoutDetail } from './flyout';
 import { filtersToObject, IFilter, IWzSuggestItem } from '../../../wz-search-bar';
 import { TableWithSearchBarWzAPI } from '../../../../components/common/tables';
