@@ -41,7 +41,7 @@ const checks = {
     title: 'Check Wazuh API connection',
     validator: checkApiService,
     awaitFor: [],
-    canRetry: true
+    canRetry: true,
   },
   setup: {
     title: 'Check for Wazuh API version',
@@ -51,29 +51,34 @@ const checks = {
   pattern: {
     title: 'Check Elasticsearch index pattern',
     validator: checkPatternService,
-    awaitFor: []
+    awaitFor: [],
+    canRetry: true,
   },
   template: {
     title: 'Check Elasticsearch template',
     validator: checkTemplateService,
     awaitFor: ["pattern"],
+    canRetry: true,
   },
   fields: {
     title: 'Check index pattern fields',
     validator: checkFieldsService,
     awaitFor: ["pattern"],
+    canRetry: true,
   },
   patternMonitoring: {
     title: 'Check Monitoring index pattern',
     validator: (appConfig) => checkPatternSupportService(appConfig.data['wazuh.monitoring.pattern'], WAZUH_INDEX_TYPE_MONITORING),
     awaitFor: [],
-    shouldCheck: true
+    shouldCheck: true,
+    canRetry: true,
   },
   patternStatistics: {
     title: 'Check Statistics index pattern',
     validator: (appConfig) => checkPatternSupportService(`${appConfig.data['cron.prefix']}-${appConfig.data['cron.statistics.index.name']}-*`, WAZUH_INDEX_TYPE_STATISTICS),
     awaitFor: [],
-    shouldCheck: true
+    shouldCheck: true,
+    canRetry: true,
   }
 };
 
