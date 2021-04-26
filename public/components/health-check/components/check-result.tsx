@@ -21,10 +21,10 @@ import {
   EuiToolTip
 } from '@elastic/eui';
 
-type Result = 'loading' | 'ready' | 'error' | 'error_retry' | 'disabled' | 'depends_on';
+type Result = 'loading' | 'ready' | 'error' | 'error_retry' | 'disabled' | 'waiting';
 
 export function CheckResult(props) {
-  const [result, setResult] = useState<Result>('loading');
+  const [result, setResult] = useState<Result>('waiting');
   const [isCheckStarted, setIsCheckStarted] = useState<boolean>(false);
 
   useEffect(() => {
@@ -114,10 +114,10 @@ export function CheckResult(props) {
             </EuiToolTip>
           </span>
         );
-      case 'depends_on':
+      case 'waiting':
         return (
           <span>
-            Depends on...
+            Waiting...
           </span>
         );
     }
