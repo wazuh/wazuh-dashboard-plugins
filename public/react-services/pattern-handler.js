@@ -69,7 +69,6 @@ export class PatternHandler {
       console.error("getPatternList", error)
       throw new Error('Error Pattern Handler (getPatternList)');
     }
-    return;
   }
 
   /**
