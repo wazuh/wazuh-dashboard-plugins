@@ -56,7 +56,7 @@ const checkClientAppVersion = (appInfo: TAppInfo) => {
       const troubleshootingUrl = `https://documentation.wazuh.com/${appInfo['app-version'].split('.').slice(0, 2).join('.')}/user-manual/kibana-app/troubleshooting.html`;
 
       const message: ReactNode = <>
-        <p>The version of the Wazuh app in your browser <b>{appVersion}_{appRevision}</b> does not correspond with the app version installed in Kibana <b>{appInfo['app-version']}_{appInfo.revision}</b>.</p>
+        <p>The version of the Wazuh app in your browser <b>{appVersion} - {appRevision}</b> does not correspond with the app version installed in Kibana <b>{appInfo['app-version']} - {appInfo.revision}</b>.</p>
         <p>Please, clear your browser cache following these steps.</p>
         <p>If the error persists, restart Kibana as well.</p>
         <p>For more information check our troubleshooting section <a href={troubleshootingUrl} target="_blank" >here.</a></p>    
@@ -66,7 +66,7 @@ const checkClientAppVersion = (appInfo: TAppInfo) => {
         name: '',
         message,
         stack: ` Steps to clear cache:
-        
+
         1 - Open the Dev tools of your browser (Press F12).
         2 - Go to the "Network" tab.
         3 - Check the "Disable cache" option.
