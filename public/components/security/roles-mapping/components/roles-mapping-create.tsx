@@ -107,7 +107,13 @@ export const RolesMappingCreate = ({
           }
         }}
       >
-        <EuiFlyout className="wzApp" onClose={() => closeFlyout(false)}>
+        <EuiFlyout className="wzApp" onClose={() => {
+          if (hasChanges) {
+            setIsModalVisible(true);
+          } else {
+            closeFlyout(false);
+          }
+        }}>
           <EuiFlyoutHeader hasBorder={false}>
             <EuiTitle size="m">
               <h2>Create new role mapping &nbsp;</h2>

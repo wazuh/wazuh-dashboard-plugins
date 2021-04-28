@@ -133,7 +133,13 @@ export const RolesMappingEdit = ({
           }
         }}
       >
-        <EuiFlyout className="wzApp" onClose={() => closeFlyout(false)}>
+        <EuiFlyout className="wzApp" onClose={() => {
+          if (hasChanges) {
+            setIsModalVisible(true);
+          } else {
+            closeFlyout(false);
+          }
+        }}>
           <EuiFlyoutHeader hasBorder={false}>
             <EuiTitle size="m">
               <h2>
