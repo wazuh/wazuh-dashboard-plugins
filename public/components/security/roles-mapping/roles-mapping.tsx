@@ -37,13 +37,6 @@ export const RolesMapping = () => {
   const [rolesLoading, roles, rolesError] = useApiService<Role[]>(RolesServices.GetRoles, {});
   const [internalUsers, setInternalUsers] = useState([]);
   const currentPlatform = useSelector((state: any) => state.appStateReducers.currentPlatform);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [hasChangeCreate, setHasChangeCreate] = useState(false);
-  const [hasChangeEdit, setHasChangeEdit] = useState(false);
-  
-  const closeModal = () => setIsModalVisible(false);
-  const showModal = () => setIsModalVisible(true);
-
 
   useEffect(() => {
     initData();    
@@ -106,17 +99,10 @@ export const RolesMapping = () => {
   let editFlyout;
   if (isEditingRule) {
     editFlyout = (
-      // <EuiOverlayMask
-      //   headerZindexLocation="below"
-      //   onClick={() => {
-      //     console.log('')
-      //     setIsModalVisible(hasChangeEdit);
-      //   }}
-      // >
         <RolesMappingEdit
           rule={selectedRule}
-          closeFlyout={() => {
-            // setIsModalVisible(hasChangeEdit);
+          closeFlyout={(isVisible) => {
+            setIsEditingRule(isVisible);
             initData();
           }}
           rolesEquivalences={rolesEquivalences}
@@ -124,23 +110,14 @@ export const RolesMapping = () => {
           internalUsers={internalUsers}
           onSave={async () => await updateRoles()}
           currentPlatform={currentPlatform}
-          onChangeMappingEdit={(hasChange) => setHasChangeEdit(hasChange)}
         />
-      //  </EuiOverlayMask>
     );
   }
   let createFlyout;
   if (isCreatingRule) {
     editFlyout = (
-      // <EuiOverlayMask
-      //   headerZindexLocation="below"
-      //   onClick={() => {
-      //     setIsCreatingRule(false);
-      //   }}
-      // >
         <RolesMappingCreate
           closeFlyout={(isVisible) => {
-            console.log({isVisible})
             setIsCreatingRule(isVisible);
             initData();
           }}
@@ -150,52 +127,8 @@ export const RolesMapping = () => {
           onSave={async () => await updateRoles()}
           currentPlatform={currentPlatform}
         />
-      // </EuiOverlayMask>
     );
   }
-  let modal;
-  // if (isModalVisible) {
-  //   modal = (
-  //     <EuiOverlayMask>
-  //       <EuiModal onClose={() => setIsModalVisible(false)}>
-  //         <EuiModalHeader>
-  //           <EuiModalHeaderTitle>
-  //             <h1>Modal title</h1>
-  //           </EuiModalHeaderTitle>
-  //         </EuiModalHeader>
-
-  //         <EuiModalBody>
-  //           If you go back the changes will disappeared. Are you sure?
-  //           <EuiSpacer />
-  //         </EuiModalBody>
-
-  //         <EuiModalFooter>
-  //           <EuiButton
-  //             onClick={() => {console.log("ENTRA AQUI???")
-  //               setIsModalVisible(false);
-  //               setIsCreatingRule(false);
-  //               setIsEditingRule(false);
-  //               setHasChangeCreate(false);
-  //               setHasChangeEdit(false);
-  //             }}
-  //             fill
-  //           >
-  //             Yes
-  //           </EuiButton>
-  //           <EuiButton
-  //             onClick={() => {
-  //               setIsModalVisible(false);
-  //             }}
-  //             fill
-  //           >
-  //             No
-  //           </EuiButton>
-  //         </EuiModalFooter>
-  //       </EuiModal>
-  //     </EuiOverlayMask>
-  //   );
-  // }
-  // console.log("antes de return",hasChangeCreate)
   return (
     <EuiPageContent>
       <EuiPageContentHeader>
@@ -210,7 +143,6 @@ export const RolesMapping = () => {
             &&
             <div>
               <EuiButton onClick={() => {setIsCreatingRule(true)}}>Create Role mapping</EuiButton>
-              {/* {modal} */}
               {createFlyout}
               {editFlyout}
             </div>
@@ -225,7 +157,6 @@ export const RolesMapping = () => {
           editRule={item => {
             setSelectedRule(item);
             setIsEditingRule(true);
-            console.log('ENTRA AQUI Y NO LO SABIA')
           }}
           updateRules={async () => await updateRoles()}
         ></RolesMappingTable>
