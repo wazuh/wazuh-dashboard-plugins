@@ -50,7 +50,7 @@ const checkClientAppVersion = (appInfo: TAppInfo) => {
       const toastOptions: ErrorToastOptions = {
         title:  'Conflict with the Wazuh app version',
         toastLifeTimeMs: 50000,
-        toastMessage: `The version of the Wazuh app in your browser does not correspond with the app version installed in Kibana. Please, clear your browser cache following these steps. If the error persists, restart Kibana as well.`
+        toastMessage: `The version of the Wazuh app in your browser does not correspond with the app version installed in Kibana. Please, clear your browser cache. For more info check the full error.`
       };
 
       const troubleshootingUrl = `https://documentation.wazuh.com/${appInfo['app-version'].split('.').slice(0, 2).join('.')}/user-manual/kibana-app/troubleshooting.html`;
