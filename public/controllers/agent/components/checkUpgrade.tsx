@@ -45,7 +45,7 @@ export class CheckUpgrade extends Component {
 	}
 
 	checkUpgrade(agentId) {
-		WzRequest.apiReq('GET', `/agents/${agentId}/upgrade_result`, {}).then(value => {
+		WzRequest.apiReq('GET', `/agents/upgrade_result?agents_list${agentId}`, {}).then(value => {
 			if (value.status === 200) {
 				this.props.changeStatusUpdate(agentId);
 				this.props.reloadAgent();

@@ -54,6 +54,7 @@ import { updateCurrentAgentData } from '../../../redux/actions/appStateActions';
 import WzTextWithTooltipIfTruncated from '../wz-text-with-tooltip-if-truncated';
 import { getAngularModule } from '../../../kibana-services';
 import { hasAgentSupportModule } from '../../../react-services/wz-agents';
+import { WzRequest } from '../../../react-services/wz-request';
 
 export class AgentsWelcome extends Component {
   _isMount = false;
@@ -139,6 +140,10 @@ export class AgentsWelcome extends Component {
     const $injector = getAngularModule().$injector;
     this.router = $injector.get('$route');
     window.addEventListener('resize', this.updateWidth); //eslint-disable-line
+    const managerVersion = await WzRequest.apiReq('GET', '//', {});
+    this.setState({
+      managerVersion: (((managerVersion || {}).data || {}).data || {}).api_version || {}
+    });
   }
 
   updateMenuAgents() {
@@ -348,28 +353,18 @@ export class AgentsWelcome extends Component {
       </EuiFlexItem>
     );
   }
-  onClickRestartAgent = () => {
-    const { agent } = this.props;
-    ActionAgents.restartAgent(agent.id);
-  };
-
-  onClickUpgradeAgent = () => {
-    const { agent } = this.props;
-    ActionAgents.upgradeAgent(agent.id);
-  };
 
   renderUpgradeButton() {
     const { managerVersion } = this.state;
     const { agent } = this.props;
-    let outDated = ActionAgents.compareVersions(managerVersion, agent.version);
-
+    let outDated = ActionAgents.compareVersions('v'+managerVersion, agent.version);
     if (outDated === true) return;
     return (
       <EuiFlexItem grow={false}>
         <EuiButton
           color="secondary"
           iconType="sortUp"
-          onClick={this.onClickUpgradeAgent}
+          onClick={() => ActionAgents.redirectActionAgents('upgrade', 'one', this.props.agent.id)}
         >
           Upgrade
         </EuiButton>
@@ -530,7 +525,7 @@ export class AgentsWelcome extends Component {
           }
         />)
     }
-
+    
     return (
       <div className="wz-module wz-module-welcome">
         <div className='wz-module-header-agent-wrapper'>
@@ -550,6 +545,28 @@ export class AgentsWelcome extends Component {
           </div>
         </div>
         <div className='wz-module-body wz-module-agents-padding-responsive'>
+          <EuiPage>
+            <EuiFlexGroup className="wz-welcome-page-agent-info-actions">
+              {this.props.agent.status === 'active' &&
+                <EuiFlexItem grow={true} style={{ marginTop: 0 }}>
+                  <EuiFlexGroup justifyContent="flexEnd">
+                    <EuiFlexItem grow={false}>
+                      <EuiButton
+                        color="primary"
+                        iconType="refresh"
+                        onClick={() => ActionAgents.redirectActionAgents('restart', 'one', this.props.agent.id)}
+                      >
+                        Restart
+                    </EuiButton>
+                    </EuiFlexItem>
+                    {ActionAgents.compareVersions('v'+this.managerVersion, this.props.agent.version) &&
+                      {upgradeButton}
+                    }
+                  </EuiFlexGroup>
+                </EuiFlexItem>
+              }
+            </EuiFlexGroup>
+          </EuiPage> 
           <EuiPage>
             <EuiPageBody component="div">
               <EuiFlexGroup>
