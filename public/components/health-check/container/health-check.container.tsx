@@ -96,10 +96,10 @@ export const HealthCheck = withReduxProvider(function HealthCheck() {
   }, [appConfig]);
 
   useEffect(() => {
-    // Redirect to app
+    // Redirect to app when all checks are ready
     Object.keys(checks)
       .every(check => checksReady[check]) && (window.location.href = getHttp().basePath.prepend('/app/wazuh#/overview'));
-  }, [checksReady, appConfig])
+  }, [checksReady]);
 
   const handleErrors = (checkID, errors, parsed) => {
     const newErrors = parsed
