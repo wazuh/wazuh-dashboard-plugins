@@ -12,7 +12,7 @@
 import { GenericRequest } from '../react-services/generic-request';
 import { AxiosResponse } from 'axios';
 import _ from 'lodash';
-import { version as appVersion, revision as appRevision} from '../../package.json';
+import { version as appVersion, revision as appRevision } from '../../package.json';
 import { getCookies, getToasts } from '../kibana-services';
 import { ErrorToastOptions } from 'kibana/public';
 import React from 'react';
@@ -43,39 +43,55 @@ export const checkPluginVersion = async () => {
 
 const checkClientAppVersion = (appInfo: TAppInfo) => {
   if (appInfo['app-version'] !== appVersion || appInfo.revision !== appRevision) {
-    if( window.history.state !== 'refreshed') {
-      clearBrowserInfo(appInfo);
-    } else {
+    const toastOptions: ErrorToastOptions = {
+      title: 'Conflict with the Wazuh app version',
+      toastLifeTimeMs: 50000,
+      toastMessage: `The version of the Wazuh app in your browser does not correspond with the app version installed in Kibana. Please, clear your browser cache. For more info check the full error.`,
+    };
 
-      const toastOptions: ErrorToastOptions = {
-        title:  'Conflict with the Wazuh app version',
-        toastLifeTimeMs: 50000,
-        toastMessage: `The version of the Wazuh app in your browser does not correspond with the app version installed in Kibana. Please, clear your browser cache. For more info check the full error.`
-      };
+    const troubleshootingUrl = `https://documentation.wazuh.com/${appInfo['app-version']
+      .split('.')
+      .slice(0, 2)
+      .join('.')}/user-manual/kibana-app/troubleshooting.html`;
 
-      const troubleshootingUrl = `https://documentation.wazuh.com/${appInfo['app-version'].split('.').slice(0, 2).join('.')}/user-manual/kibana-app/troubleshooting.html`;
-
-      const message: ReactNode = <>
-        <p>The version of the Wazuh app in your browser <b>{appVersion} - {appRevision}</b> does not correspond with the app version installed in Kibana <b>{appInfo['app-version']} - {appInfo.revision}</b>.</p>
+    const message: ReactNode = (
+      <>
+        <p>
+          The version of the Wazuh app in your browser{' '}
+          <b>
+            {appVersion} - {appRevision}
+          </b>{' '}
+          does not correspond with the app version installed in Kibana{' '}
+          <b>
+            {appInfo['app-version']} - {appInfo.revision}
+          </b>
+          .
+        </p>
         <p>Please, clear your browser cache following these steps.</p>
         <p>If the error persists, restart Kibana as well.</p>
-        <p>For more information check our troubleshooting section <a href={troubleshootingUrl} target="_blank" >here.</a></p>    
-      </>;
+        <p>
+          For more information check our troubleshooting section{' '}
+          <a href={troubleshootingUrl} target="_blank">
+            here.
+          </a>
+        </p>
+      </>
+    );
 
-      const error: Error = {
-        name: '',
-        message,
-        stack: ` Steps to clear cache:
+    const error: Error = {
+      name: '',
+      message,
+      stack: ` Steps to clear cache:
 
-        1 - Open the Dev tools of your browser (Press F12).
-        2 - Go to the "Network" tab.
-        3 - Check the "Disable cache" option.
-        4 - Reload the page (Press F5).
+      1 - Open the Dev tools of your browser (Press F12).
+      2 - Go to the "Network" tab.
+      3 - Check the "Disable cache" option.
+      4 - Reload the page (Press F5).
 
- This message should not be displayed again.`
-      }
+This message should not be displayed again.`,
+    };
 
-      const stackSafari = ` Steps to clear cache:
+    const stackSafari = ` Steps to clear cache:
 
       1 - Select the "Safari” menu, then choose "Preferences".
       2 - Select the "Advanced” tab and check the "Show Develop menu in menu bar” option.
@@ -86,21 +102,24 @@ const checkClientAppVersion = (appInfo: TAppInfo) => {
       7 - Check the "Ignore cache when loading resources" option.
       8 - Reload the page.
 
- This message should not be displayed again.`
+This message should not be displayed again.`;
 
-      const isSafari = navigator.vendor && navigator.vendor.indexOf('Apple') > -1 &&
-        navigator.userAgent &&
-        navigator.userAgent.indexOf('CriOS') == -1 &&
-        navigator.userAgent.indexOf('FxiOS') == -1;
+    const isSafari =
+      navigator.vendor &&
+      navigator.vendor.indexOf('Apple') > -1 &&
+      navigator.userAgent &&
+      navigator.userAgent.indexOf('CriOS') == -1 &&
+      navigator.userAgent.indexOf('FxiOS') == -1;
 
-      if (isSafari) error.stack = stackSafari;
+    if (isSafari) error.stack = stackSafari;
 
-      getToasts().addError(error, toastOptions);
-    }
+    getToasts().addError(error, toastOptions);
+
+    clearBrowserInfo(appInfo);
   } else {
-    if(window.history.state == 'refreshed'){
+    if (window.history.state == 'refreshed') {
       window.history.replaceState('', 'wazuh');
-    };
+    }
     const storeAppInfo = localStorage.getItem('appInfo');
     !storeAppInfo && updateAppInfo(appInfo);
   }
@@ -113,7 +132,7 @@ function clearBrowserInfo(appInfo: TAppInfo) {
   Object.keys(cookies).forEach((cookie) => getCookies().remove(cookie));
 
   //remove cache
-  if (window.caches) {    
+  if (window.caches) {
     window.caches.keys().then(function (names) {
       for (let name of names) caches.delete(name);
     });
@@ -121,13 +140,8 @@ function clearBrowserInfo(appInfo: TAppInfo) {
 
   //update localStorage
   updateAppInfo(appInfo);
-
-  //replace status to avoid infinite refresh
-  window.history.replaceState('refreshed', 'wazuh');
-  window.location.reload(true);
 }
 
 function updateAppInfo(appInfo: TAppInfo) {
   localStorage.setItem('appInfo', JSON.stringify(appInfo));
 }
-
