@@ -16,7 +16,7 @@ import {
   setAppConfigIsLoading,
   setAppConfigHasError,
   updateAppConfig,
-} from '../redux/actions/app-config.actions';
+} from '../redux/actions/appConfigActions';
 
 
 /**
