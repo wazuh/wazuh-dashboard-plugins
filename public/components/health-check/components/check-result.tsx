@@ -30,7 +30,7 @@ export function CheckResult(props) {
   useEffect(() => {
     if (props.check && !props.isLoading && awaitForIsReady()){
       initCheck();
-    } else if (props.check === false) {
+    } else if (props.check === false && !props.checksReady[props.name]) {
       setResult('disabled');
       setAsReady();
     }

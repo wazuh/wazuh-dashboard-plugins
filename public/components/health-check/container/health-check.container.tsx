@@ -18,7 +18,7 @@ import {
   EuiDescriptionList,
   EuiSpacer,
 } from '@elastic/eui';
-import React, { Fragment, useState, useEffect } from 'react';
+import React, { Fragment, useState, useEffect, useRef } from 'react';
 import { AppState, ErrorHandler } from '../../../react-services';
 import { useAppConfig } from '../../../components/common/hooks';
 import {
@@ -86,9 +86,11 @@ export const HealthCheck = withReduxProvider(function HealthCheck() {
   const [checkErrors, setCheckErrors] = useState<{[key:string]: []}>({});
   const [checksReady, setChecksReady] = useState<{[key: string]: boolean}>({});
   const appConfig = useAppConfig();
+  const checksInitiated = useRef(false);
 
   useEffect(() => {
-    if (appConfig.isReady) {
+    if (appConfig.isReady && !checksInitiated.current) {
+      checksInitiated.current = true;
       checkKibanaSettings(appConfig.data['checks.metaFields']);
       checkKibanaSettingsTimeFilter(appConfig.data['checks.timeFilter']);
       AppState.setPatternSelector(appConfig.data['ip.selector']);
