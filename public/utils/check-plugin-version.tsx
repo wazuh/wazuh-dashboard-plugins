@@ -83,8 +83,8 @@ const checkClientAppVersion = (appInfo: TAppInfo) => {
       4 - If you don’t have the Menu Bar enabled, select the settings gear, then choose "Show Menu Bar".
       5 - Open "Develop" > "Show Web Inspector".
       6 - Go to the "Network" tab.
-      3 - Check the "Ignore cache when loading resources" option.
-      4 - Reload the page.
+      7 - Check the "Ignore cache when loading resources" option.
+      8 - Reload the page.
 
  This message should not be displayed again.`
 
