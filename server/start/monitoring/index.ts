@@ -19,7 +19,6 @@ import { buildIndexSettings } from '../../lib/build-index-settings';
 import { WazuhHostsCtrl } from '../../controllers/wazuh-hosts';
 import { 
   WAZUH_MONITORING_PATTERN,
-  WAZUH_INDEX_SHARDS,
   WAZUH_INDEX_REPLICAS,
   WAZUH_MONITORING_TEMPLATE_NAME,
   WAZUH_MONITORING_DEFAULT_INDICES_SHARDS,
@@ -280,7 +279,7 @@ async function createIndex(context, indexName: string) {
     const IndexConfiguration = {
       settings: {
         index: {
-          number_of_shards: getAppConfigurationSetting('wazuh.monitoring.shards', appConfig, WAZUH_INDEX_SHARDS),
+          number_of_shards: getAppConfigurationSetting('wazuh.monitoring.shards', appConfig, WAZUH_MONITORING_DEFAULT_INDICES_SHARDS),
           number_of_replicas: getAppConfigurationSetting('wazuh.monitoring.replicas', appConfig, WAZUH_INDEX_REPLICAS)
         }
       }
@@ -513,8 +512,10 @@ export async function jobMonitoringRun(context) {
   // Check Kibana index and if it is prepared, start the initialization of Wazuh App.
   await checkKibanaStatus(context);
   // // Run the cron job only it it's enabled
+  console.log('MONITORING_ENABLED', MONITORING_ENABLED)
   if (MONITORING_ENABLED) {
     cronTask(context);
+    console.log('MONITORING_CRON_FREQ', MONITORING_CRON_FREQ)
     cron.schedule(MONITORING_CRON_FREQ, () => cronTask(context));
   }
 }
