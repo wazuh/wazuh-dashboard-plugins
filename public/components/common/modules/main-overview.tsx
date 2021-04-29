@@ -20,6 +20,8 @@ import {
   EuiToolTip,
   EuiPopover,
   EuiBadge,
+  EuiIcon,
+  EuiText,
   EuiPopoverTitle,
 } from '@elastic/eui';
 import '../../common/modules/module.scss';
@@ -66,70 +68,47 @@ export class MainModuleOverview extends Component {
   setGlobalBreadcrumb() {
     const currentAgent = store.getState().appStateReducers.currentAgentData;
     if (WAZUH_MODULES[this.props.section]) {
-      let breadcrumb = [
+      let breadcrumb:any[] = [
         {
           text: '',
         },
         {
-          text: currentAgent.id ? (
-            <span>
-              Modules
-              <EuiBadge
-                onMouseDown={(ev) => {
-                  AppNavigate.navigateToModule(ev, 'agents', {
-                    tab: 'welcome',
-                    agent: currentAgent.id,
-                  });
-                }}
-                color={this.getBadgeColor(currentAgent.status)}
-              >
-                {currentAgent.id}
-              </EuiBadge>
-            </span>
-          ) : (
-            'Modules'
-          ),
-          href: '#/overview',
-        },
-        {
-          text: (
-            <EuiFlexGroup gutterSize="xs" alignItems="center" responsive={false}>
-              <div style={{ margin: '0.8em 0em 0em 0.2em' }}>
-                <EuiToolTip position="top">
-                  <span class="euiBreadcrumb euiBreadcrumb--last">
-                    {WAZUH_MODULES[this.props.section].title}
-                  </span>
-                </EuiToolTip>
-              </div>
-              <EuiFlexItem component="div" grow={false}>
-                <EuiPopover
-                  button={
-                    <EuiButtonIcon
-                      iconType="iInCircle"
-                      color="primary"
-                      aria-label="Open/close"
-                      onClick={() => {
-                        this.setState({ isDescPopoverOpen: !this.state.isDescPopoverOpen });
-                      }}
-                    />
-                  }
-                  anchorPosition="rightUp"
-                  isOpen={this.state.isDescPopoverOpen}
-                  closePopover={() => {
-                    this.setState({ isDescPopoverOpen: false });
-                  }}
-                >
-                  <EuiPopoverTitle>Module description</EuiPopoverTitle>
-                  <div style={{ width: '400px' }}>
-                    {WAZUH_MODULES[this.props.section].description}
-                  </div>
-                </EuiPopover>
-              </EuiFlexItem>
-            </EuiFlexGroup>
-          ),
-          truncate: false,
+          text: 'Modules',
+          href: '#/overview'
         },
       ];
+      if (currentAgent.id) {
+        breadcrumb.push( {
+          text: (
+            <a
+              style={{ margin: '0px 0px -5px 0px', height: 20 }}
+              className="euiLink euiLink--subdued euiBreadcrumb "
+              onClick={(ev) => { ev.stopPropagation(); AppNavigate.navigateToModule(ev, 'agents', { "tab": "welcome", "agent": currentAgent.id }); this.router.reload(); }}
+              id="breadcrumbNoTitle"
+            >
+              <EuiToolTip position="bottom" content={"View agent summary"} display="inlineBlock">
+                <span>{currentAgent.name}</span>
+              </EuiToolTip>
+            </a>),
+        })
+      }
+      breadcrumb.push({
+        text: (
+          <EuiFlexGroup gutterSize="xs" alignItems="center" responsive={false}>
+            <div style={{ margin: '0.8em 0em 0em 0.09em' }}>
+              <EuiToolTip position="top">
+                <div className="euiBreadcrumb euiBreadcrumb--last">
+                  {WAZUH_MODULES[this.props.section].title}
+                </div>
+              </EuiToolTip>
+            </div>
+            <EuiToolTip content={WAZUH_MODULES[this.props.section].description}>
+                <EuiIcon style={{ margin: '0px 0px 1px 5px' }} type='iInCircle' />
+              </EuiToolTip>
+          </EuiFlexGroup>
+        ),
+        truncate: false,
+      },)
       store.dispatch(updateGlobalBreadcrumb(breadcrumb));
     }
   }
