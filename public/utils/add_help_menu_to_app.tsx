@@ -12,7 +12,7 @@
 
 import React from 'react';
 import {
-  EuiButtonEmpty,
+  EuiIcon,
 } from '@elastic/eui';
 import { version } from '../../package.json';
 import { getChrome, getHttp} from '../kibana-services';
@@ -32,22 +32,22 @@ export function addHelpMenuToAppChrome(){
       {
         linkType: 'custom',
         href: `${WAZUH_LINK_DOCUMENTATION}/${appVersionMajorDotMinor}`,
-        content: <EuiButtonEmpty iconType={getHttp().basePath.prepend('/plugins/wazuh/assets/icon_blue.svg')} style={{color:'black'}}>Documentation</EuiButtonEmpty>
+        content: <span><EuiIcon type={getHttp().basePath.prepend('/plugins/wazuh/assets/icon_blue.svg')}></EuiIcon> Documentation</span>
       },
       {
         linkType: 'custom',
         href: WAZUH_LINK_SLACK,
-        content: <EuiButtonEmpty iconType='logoSlack' style={{color:'black'}}>Slack channel</EuiButtonEmpty>
+        content: <span><EuiIcon type='logoSlack'></EuiIcon> Slack channel</span>
       },
       {
         linkType: 'custom',
         href: WAZUH_LINK_GITHUB,
-        content: <EuiButtonEmpty iconType='logoGithub' style={{color:'black'}}>Projects on Github</EuiButtonEmpty>
+        content: <span><EuiIcon type='logoGithub'></EuiIcon> Projects on Github</span>
       },
       {
         linkType: 'custom',
         href: WAZUH_LINK_GOOGLE_GROUPS,
-        content: <EuiButtonEmpty iconType={getHttp().basePath.prepend('/plugins/wazuh/assets/icon_google_groups.svg')} style={{color:'black'}}>Google Group</EuiButtonEmpty>
+        content: <span><EuiIcon type={getHttp().basePath.prepend('/plugins/wazuh/assets/icon_google_groups.svg')}></EuiIcon> Google Group</span>
       }
     ]
   });
