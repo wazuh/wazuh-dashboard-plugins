@@ -53,7 +53,7 @@ export class FilterBar extends Component {
   }
 
   render() {
-    const { onFiltersChange, selectView, filters} = this.props;        
+    const { onFiltersChange, selectView, filters} = this.props;
     return (
       <EuiFlexGroup>
         <EuiFlexItem>
