@@ -30,8 +30,14 @@ export const MainVuls = compose(
     const agentData =
       props.currentAgentData && props.currentAgentData.id ? props.currentAgentData : props.agent;
     return [
-      { action: 'agent:read', resource: `agent:id:${agentData.id}` },
-      { action: 'vulnerability:read', resource: `agent:id:${agentData.id}` },
+      [
+        { action: 'agent:read', resource: `agent:id:${agentData.id}` },
+        ...(agentData.group || []).map(group => ({ action: 'agent:read', resource: `agent:group:${group}` }))
+      ],
+      [
+        { action: 'vulnerability:read', resource: `agent:id:${agentData.id}` },
+        ...(agentData.group || []).map(group => ({ action: 'vulnerability:read', resource: `agent:group:${group}` }))
+      ]
     ];
   })
 )(function MainVuls({ currentAgentData, agent, ...rest }) {

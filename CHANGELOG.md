@@ -6,7 +6,17 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Added
 
+- Wazuh help links in the Kibana help menu [#3170](https://github.com/wazuh/wazuh-kibana-app/pull/3170)
 - Redirect to group details using the `group` query param in the URL [#3184](https://github.com/wazuh/wazuh-kibana-app/pull/3184)
+
+### Changed
+
+- Remove module titles [#3160](https://github.com/wazuh/wazuh-kibana-app/pull/3160)
+
+### Fixed
+
+- Fix the broken links when using `server.basePath` Kibana setting [#3161](https://github.com/wazuh/wazuh-kibana-app/pull/3161)
+- Fixing filter in reports [#3173](https://github.com/wazuh/wazuh-kibana-app/pull/3173)
 
 ## Wazuh v4.2.0 - Kibana 7.10.2 , 7.11.2 - Revision 4201
 
@@ -20,7 +30,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added vulnerabilities inventory that affect to an agent [#3069](https://github.com/wazuh/wazuh-kibana-app/pull/3069)
 - Added retry button to check api again in health check [#3109](https://github.com/wazuh/wazuh-kibana-app/pull/3109)
 - Added `wazuh-statistics` template and a new mapping for these indices [#3111](https://github.com/wazuh/wazuh-kibana-app/pull/3111)
-- Added link to documentation "Checking connection with Manager" in deploy new agent [#3126](https://github.com/wazuh/wazuh-kibana-app/pull/3126
+- Added link to documentation "Checking connection with Manager" in deploy new agent [#3126](https://github.com/wazuh/wazuh-kibana-app/pull/3126)
 
 ### Changed
 
@@ -44,6 +54,12 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed the plugin logo path in Kibana menu when use `server.basePath` setting [#3144](https://github.com/wazuh/wazuh-kibana-app/pull/3144)
 - Fixed deprecated endpoint for create agent groups [3152](https://github.com/wazuh/wazuh-kibana-app/pull/3152)
 - Fixed check for TCP protocol in deploy new agent [#3163](https://github.com/wazuh/wazuh-kibana-app/pull/3163)
+- Fixed RBAC issue with agent group permissions [#3181](https://github.com/wazuh/wazuh-kibana-app/pull/3181)
+- Fixed change index pattern from menu doesn't work [#3187](https://github.com/wazuh/wazuh-kibana-app/pull/3187)
+
+## Wazuh v4.1.5 - Kibana 7.10.0 , 7.10.2 - Revision 4106
+
+- Adapt for Wazuh 4.1.5
 
 ## Wazuh v4.1.4 - Kibana 7.10.0 , 7.10.2 - Revision 4105
 
