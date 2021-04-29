@@ -55,7 +55,9 @@ import store from './redux/store';
 import { updateCurrentPlatform } from './redux/actions/appStateActions';
 import { WzAuthentication } from './react-services/wz-authentication';
 
-import { getAngularModule } from './kibana-services';
+import { getAngularModule} from './kibana-services';
+import { addHelpMenuToAppChrome } from './utils';
+
 const app = getAngularModule();
 
 app.config([
@@ -100,6 +102,9 @@ app.run(function ($rootElement) {
       <react-component name="WzAgentSelectorWrapper" props=""></react-component>
       <react-component name="ToastNotificationsModal" props=""></react-component>
     </div>`);
+
+  // Add plugin help links as extension to Kibana help menu
+  addHelpMenuToAppChrome();
 
   // Bind deleteExistentToken on Log out component.
   $('.euiHeaderSectionItem__button').on('mouseleave', function () {
