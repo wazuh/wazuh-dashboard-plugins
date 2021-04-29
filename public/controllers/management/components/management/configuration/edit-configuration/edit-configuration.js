@@ -100,7 +100,7 @@ class WzEditConfiguration extends Component {
               <EuiIcon type="alert" />
               &nbsp;
               <span>
-                File ossec.conf saved, but there were found several error while
+              <b>{this.props.clusterNodeSelected || 'Manager'}</b> configuration saved, but there were found several error while
                 validating the configuration.
               </span>
             </Fragment>
@@ -358,7 +358,7 @@ const WzEditorConfiguration = compose(
           {!this.props.errorXMLFetched ? (
             <Fragment>
               <EuiText>
-                Edit <span style={{ fontWeight: 'bold' }}>ossec.conf</span> of{' '}
+                Edit <span style={{ fontWeight: 'bold' }}>manager.conf</span> of{' '}
                 <span style={{ fontWeight: 'bold' }}>
                   {(existsClusterCurrentNodeSelected && clusterNodeSelected) ||
                     'Manager'}

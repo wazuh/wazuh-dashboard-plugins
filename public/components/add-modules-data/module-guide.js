@@ -221,7 +221,7 @@ class WzModuleGuide extends Component {
   }
   transformToXML() {
     const json = this.transformStateToJSON();
-    return (this.guide.wodle_name) ? 
+    return (this.guide.wodle_name) ?
     XMLBeautifier(js2xmlparser.parse('configuration', { wodle: {'@': {name: this.guide.wodle_name}, ...json}}, js2xmlOptionsParser).replace("<?xml version=\"1.0\"?>\n", "").replace("<configuration>\n", "").replace("</configuration>","").replace("    <wodle", "<wodle"))
     : XMLBeautifier(js2xmlparser.parse(this.guide.xml_tag || this.guide.id, json, js2xmlOptionsParser).replace("<?xml version=\"1.0\"?>\n", ""));
   }
@@ -235,8 +235,8 @@ class WzModuleGuide extends Component {
       collapsed: (element.attributes || element.options) ? false : undefined,
       elements: !params.ignore_repeatable && element.repeatable ? (element.repeatable_insert_first ? [this.buildConfigurationElement({...element, ...element.repeatable_insert_first_properties }, {ignore_repeatable: true})] : []) : undefined,
       show_options: element.show_options || false,
-      options: element.options && element.options.filter((option) => this.filterElementByAgent(option)).map(option => ({ 
-        ...option, 
+      options: element.options && element.options.filter((option) => this.filterElementByAgent(option)).map(option => ({
+        ...option,
         value: this.buildConfigurationElementValue(option),
         toggleable: this.buildConfigurationElementToggleable(option),
         enabled: this.buildConfigurationElementEnabled(option),
@@ -244,7 +244,7 @@ class WzModuleGuide extends Component {
         attributes: option.attributes && option.attributes.length ? option.attributes.map((optionAtribute) => this.buildConfigurationElement(optionAtribute)) : undefined
       })) || undefined,
       show_attributes: element.show_attributes || false,
-      attributes: element.attributes && element.attributes.filter((attribute) => this.filterElementByAgent(attribute)).map(attribute => ({ 
+      attributes: element.attributes && element.attributes.filter((attribute) => this.filterElementByAgent(attribute)).map(attribute => ({
         ...attribute,
         value: this.buildConfigurationElementValue(attribute),
         toggleable: this.buildConfigurationElementToggleable(attribute),
@@ -294,7 +294,7 @@ class WzModuleGuide extends Component {
     return [
       ...configurationSteps,
       {
-        title: !invalidConfiguration ? 'Edit ossec.conf' : 'Configuration error',
+        title: !invalidConfiguration ? `Edit ${this.state.agentTypeSelected == 'manager' ? 'manager.conf' : 'agent.conf'}` : 'Configuration error',
         children: (
           <Fragment>
             {!invalidConfiguration ? (
@@ -311,9 +311,9 @@ class WzModuleGuide extends Component {
                     <EuiText>When you finish of configure the module, copy above XML configuration. Go to <EuiCode>Management</EuiCode> {'>'} <EuiCode>Configuration</EuiCode> {'>'} <EuiCode>Edit configuration</EuiCode>, paste configuration, save and restart manager or node.</EuiText>
                   </Fragment>
                   ) : this.state.agentOSSelected === 'linux' ? (
-                    <EuiText>When you finish of configure the module, copy above XML configuration. Go to <EuiCode>/var/ossec/etc</EuiCode> in Linux agent, include the above configuration in <EuiCode>ossec.conf</EuiCode> and restart the agent.</EuiText>
+                    <EuiText>When you finish of configure the module, copy above XML configuration. Go to <EuiCode>/var/ossec/etc</EuiCode> in Linux agent, include the above configuration in <EuiCode>agent.conf</EuiCode> and restart the agent.</EuiText>
                     ) : (
-                      <EuiText>When you finish of configure the module, copy above XML configuration. Go to <EuiCode>C:\Program Files (x86)\ossec-agent</EuiCode> in Windows agent, include the above configuration in <EuiCode>ossec.conf</EuiCode> and restart the agent.</EuiText>
+                      <EuiText>When you finish of configure the module, copy above XML configuration. Go to <EuiCode>C:\Program Files (x86)\ossec-agent</EuiCode> in Windows agent, include the above configuration in <EuiCode>agent.conf</EuiCode> and restart the agent.</EuiText>
                 )}
                 <EuiSpacer size='s' />
                 <EuiText>The above section must be located within the top-level <EuiCode>{`<ossec_config>`}</EuiCode> tag.</EuiText>

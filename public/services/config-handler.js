@@ -19,8 +19,8 @@ export class ConfigHandler {
   }
 
   /**
-   * Send ossec.conf content for manager (single-node API call)
-   * @param {*} content XML raw content for ossec.conf file
+   * Send manager configuration (single-node API call)
+   * @param {*} content XML raw content for manager.conf file
    */
   async saveManagerConfiguration(content) {
     try {
@@ -36,9 +36,9 @@ export class ConfigHandler {
   }
 
   /**
-   * Send ossec.conf content for a cluster node
+   * Send cluster node configuration
    * @param {*} node Node name
-   * @param {*} content XML raw content for ossec.conf file
+   * @param {*} content XML raw content for manager.conf file
    */
   async saveNodeConfiguration(node, content) {
     try {
