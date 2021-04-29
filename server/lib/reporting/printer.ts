@@ -547,7 +547,9 @@ export class ReportPrinter{
       style: { fontSize: 10, color: COLORS.PRIMARY },
       margin: [0, 0, 0, 5]
     });
-    this.addContent({
+
+    /*TODO: This will be enabled by a config*/
+    /* this.addContent({
       fontSize: 8,
       table: {
         widths: ['*'],
@@ -577,7 +579,7 @@ export class ReportPrinter{
         hLineWidth: () => 0,
         vLineWidth: () => 0
       }
-    });
+    }); */
 
     this.addContent({ text: '\n' });
     log(

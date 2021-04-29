@@ -139,7 +139,7 @@ export class SavedObject {
 
       return result;
     } catch (error) {
-      return ((error || {}).data || {}).message || false
+      throw ((error || {}).data || {}).message || false
         ? error.data.message
         : error.message || error;
     }
@@ -232,7 +232,7 @@ export class SavedObject {
       );
       return;
     } catch (error) {
-      return ((error || {}).data || {}).message || false
+      throw ((error || {}).data || {}).message || false
         ? error.data.message
         : error.message || error;
     }

@@ -26,19 +26,6 @@ export function getIp(
 ) {
   const deferred = $q.defer();
 
-  const checkWazuhConfig = async (indexPatterns) => {
-    const wazuhConfig = new WazuhConfig();
-    const configuration = wazuhConfig.getConfig();
-    const indexPatternFound = indexPatterns.find((indexPattern) => indexPattern.attributes.title === configuration.pattern);
-    if(!indexPatternFound){
-      AppState.removeCurrentPattern()
-    }
-    getDataPlugin().indexPatterns.setDefault(indexPatternFound.id, true);
-    AppState.setCurrentPattern(indexPatternFound.id)
-
-    return indexPatternFound;
-  }
-
   const checkWazuhPatterns = async (indexPatterns) => {
     const wazuhConfig = new WazuhConfig();
     const configuration = await getWzConfig($q, GenericRequest, wazuhConfig);
@@ -65,12 +52,15 @@ export function getIp(
 
       const { savedObjects } = savedObjectsData;
 
-      let currentPattern = '';
+      const currentPattern = AppState.getCurrentPattern() || '';
 
-      if (AppState.getCurrentPattern() && await checkWazuhPatterns(savedObjects) && await checkWazuhConfig(savedObjects)) {
-        // There's cookie for the pattern
-        currentPattern = AppState.getCurrentPattern();
-      } else {
+      if (
+        !currentPattern ||
+        !savedObjects.find(
+          element => element.id === currentPattern
+        ) ||
+        !(await checkWazuhPatterns(savedObjects))
+      ) {
         if (!$location.path().includes('/health-check')) {
           $location.search('tab', null);
           $location.path('/health-check');
@@ -83,6 +73,7 @@ export function getIp(
 
       if (!onlyWazuhAlerts || !onlyWazuhAlerts.length) {
         // There's now selected ip
+        AppState.removeCurrentPattern();
         deferred.resolve('No ip');
         return;
       }
