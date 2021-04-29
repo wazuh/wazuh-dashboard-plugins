@@ -1840,7 +1840,7 @@
       {
         "name": "/decoders",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.decoder_controller.get_decoders",
-        "description": "Return information about all decoders included in ossec.conf. This information include decoder's route, decoder's name, decoder's file among others",
+        "description": "Return information about all decoders included in manager.conf. This information include decoder's route, decoder's name, decoder's file among others",
         "summary": "List decoders",
         "tags": [
           "Decoders"
