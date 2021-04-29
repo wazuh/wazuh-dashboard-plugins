@@ -42,7 +42,6 @@ class WzGroups extends Component {
 
   async componentDidMount() {
     this.setGlobalBreadcrumb();
-    console.log(window.location.href)
     // Check if there is a group in the URL
     const [_, group] = window.location.href.match(new RegExp('group=' + '([^&]*)')) || [];
     window.location.href = window.location.href.replace(new RegExp('group=' + '[^&]*'), '');
