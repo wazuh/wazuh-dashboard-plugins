@@ -335,7 +335,6 @@ export class AgentsTable extends Component {
   };
 
   addUpgradeStatus(agent) {
-  //console.log("Entramos en addUpgradeStatus con", agent);
     const { managerVersion } = this.state;
     return (
       <CheckUpgrade
@@ -375,9 +374,7 @@ export class AgentsTable extends Component {
 
   /* MULTISELECT TABLE */
   onSelectionChange = selectedItems => {
-    console.log("En onSelectionChange obtenemos: ", selectedItems.length);
     const { managerVersion, pageSize } = this.state;
-   // console.log("Entro en onSelectionChange", selectedItems);
     selectedItems.forEach(item => {
       if (item.version && item.version !== '-' && !ActionAgents.compareVersions('v'+managerVersion, item.version)) {
         item.outdated = true;
@@ -393,7 +390,6 @@ export class AgentsTable extends Component {
 
   renderUpgradeButton() {
     const { selectedItems } = this.state;
-  //  console.log("Upgrading es: ", selectedItems);
 
     if (
       selectedItems.length === 0 ||
@@ -434,7 +430,6 @@ export class AgentsTable extends Component {
 
   renderUpgradeButtonAll() {
     const { selectedItems, avaibleAgents, managerVersion } = this.state;
-  //  console.log("En renderUpgradeButtonAll: ", selectedItems, avaibleAgents);
     if (
       selectedItems.length > 0 &&
       avaibleAgents &&
@@ -463,7 +458,6 @@ export class AgentsTable extends Component {
   renderRestartButton() {
     const { selectedItems } = this.state;
 
-    // console.log("Al entrar en renderRestartButton, state es:  ", selectedItems.length, "y :", selectedItems);
     if (
       selectedItems.length === 0 ||
       selectedItems.filter(item => item.status === 'active').length === 0

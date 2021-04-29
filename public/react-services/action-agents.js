@@ -22,41 +22,40 @@ export class ActionAgents {
     });
   };
 
-     /**
+  /**
    * Make the action (upgrade, restart or delete) to a specific group of agents
    * @param {Object} filters
    */
-   static async getAllAgents(filters){
+  static async getAllAgents(filters){
     try{
-
       const params = filters.q ? {q: filters.q, limit: 500} : { limit: 500 };
-       const output = await WzRequest.apiReq('GET', `/agents`, {params: params});
-       const totalItems = (((output || {}).data || {}).data || {}).total_affected_items;
-       let itemsArray = [];
-       if (totalItems && output.data && output.data.data && totalItems > 500) {
-         params.offset = 0;
-         itemsArray.push(...output.data.data.affected_items);
-         while (itemsArray.length < totalItems && params.offset < totalItems) {
-           params.offset += params.limit;
-           const tmpData = await WzRequest.apiReq(
-             'GET',
-             `/agents`,
-             { params: params },
-           );
-           itemsArray.push(...tmpData.data.data.affected_items);
-         }
-         const allowedAgents = itemsArray;
-         return allowedAgents;
-       }
-       else{
-         const allowedAgents = output.data.data.affected_items;
-         return allowedAgents;
-       }
-     }catch(error) {   
-       getToasts().addError(error, {title: `Error getting user authorized agents`});
-       return Promise.reject();
-     }
-   }
+      const output = await WzRequest.apiReq('GET', `/agents`, {params: params});
+      const totalItems = (((output || {}).data || {}).data || {}).total_affected_items;
+      let itemsArray = [];
+      if (totalItems && output.data && output.data.data && totalItems > 500) {
+        params.offset = 0;
+        itemsArray.push(...output.data.data.affected_items);
+        while (itemsArray.length < totalItems && params.offset < totalItems) {
+          params.offset += params.limit;
+          const tmpData = await WzRequest.apiReq(
+            'GET',
+            `/agents`,
+            { params: params },
+          );
+          itemsArray.push(...tmpData.data.data.affected_items);
+        }
+        const allowedAgents = itemsArray;
+        return allowedAgents;
+      }
+      else{
+        const allowedAgents = output.data.data.affected_items;
+        return allowedAgents;
+      }
+    }catch(error) {   
+      getToasts().addError(error, {title: `Error getting user authorized agents`});
+      return Promise.reject();
+    }
+  }
 
   /**
    * Make a string of all agents, and do some calls according to the maximum agents permitted in this call
