@@ -200,11 +200,6 @@ export class WazuhElasticCtrl {
             filter: [
               {
                 range: { timestamp: {} }
-              },
-              {
-                terms: {
-                  'agent.id': request.query.agentsList.split(',')
-                }
               }
             ]
           }
@@ -233,6 +228,14 @@ export class WazuhElasticCtrl {
           : { match: { 'manager.name': request.params.cluster } }
       );
 
+      if(request.query.agentsList)
+        payload.query.bool.filter.push(
+          {
+            terms: {
+              'agent.id': request.query.agentsList.split(',')
+            }
+          }
+        );
       payload.aggs['2'].terms.field = request.params.field;
 
       const data = await context.core.elasticsearch.client.asCurrentUser.search({

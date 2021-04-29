@@ -219,3 +219,11 @@ export enum WAZUH_MODULES_ID{
 }
 
 export const AUTHORIZED_AGENTS = 'authorized-agents';
+
+// Wazuh links
+export const WAZUH_LINK_DOCUMENTATION = 'https://documentation.wazuh.com';
+export const WAZUH_LINK_GITHUB = 'https://github.com/wazuh';
+export const WAZUH_LINK_GOOGLE_GROUPS = 'https://groups.google.com/forum/#!forum/wazuh';
+export const WAZUH_LINK_SLACK = 'https://wazuh.com/community/join-us-on-slack';
+
+export const HEALTH_CHECK = 'health-check';

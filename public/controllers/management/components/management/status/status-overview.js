@@ -250,10 +250,17 @@ const mapDispatchToProps = dispatch => {
 export default compose(
   withGlobalBreadcrumb([
     { text: '' },
-    { text: 'Management', href: '/app/wazuh#/manager' },
+    { text: 'Management', href: '#/manager' },
     { text: 'Status' }
   ]),
-  withUserAuthorizationPrompt([{ action: 'agent:read', resource: 'agent:id:*' }, { action: 'manager:read', resource: '*:*:*' }, { action: 'cluster:read', resource: 'node:id:*' }]),
+  withUserAuthorizationPrompt([
+    [
+      { action: 'agent:read', resource: 'agent:id:*' },
+      { action: 'agent:read', resource: 'agent:group:*' }
+    ],
+    { action: 'manager:read', resource: '*:*:*' },
+    { action: 'cluster:read', resource: 'node:id:*' }
+  ]),
   connect(
     mapStateToProps,
     mapDispatchToProps
