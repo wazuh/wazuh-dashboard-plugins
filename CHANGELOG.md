@@ -11,7 +11,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Changed
 
-- Remove module titles [#3160](https://github.com/wazuh/wazuh-kibana-app/pull/3160)
+- Removed module titles [#3160](https://github.com/wazuh/wazuh-kibana-app/pull/3160)
+- Removed Sha1 field from registry key detail [#3189](https://github.com/wazuh/wazuh-kibana-app/pull/3189)
 
 ### Fixed
 
