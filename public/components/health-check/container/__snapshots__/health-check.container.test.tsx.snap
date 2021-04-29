@@ -4,9 +4,6 @@ exports[`Health Check container should render a Health check screen 1`] = `
 <div
   className="health-check"
 >
-  <EuiLoadingSpinner
-    className="health-check-loader"
-  />
   <img
     alt=""
     className="health-check-logo"
@@ -22,12 +19,14 @@ exports[`Health Check container should render a Health check screen 1`] = `
     >
       <CheckResult
         awaitFor={Array []}
+        canRetry={true}
         check={true}
         checksReady={Object {}}
+        cleanErrors={[Function]}
         handleCheckReady={[Function]}
         handleErrors={[Function]}
         isLoading={false}
-        key="0"
+        key="health_check_check_api"
         name="api"
         title="Check Wazuh API connection"
         validationService={[Function]}
@@ -40,24 +39,27 @@ exports[`Health Check container should render a Health check screen 1`] = `
         }
         check={true}
         checksReady={Object {}}
+        cleanErrors={[Function]}
         handleCheckReady={[Function]}
         handleErrors={[Function]}
         isLoading={false}
-        key="1"
+        key="health_check_check_setup"
         name="setup"
-        title="Check for Wazuh API version"
+        title="Check Wazuh API version"
         validationService={[Function]}
       />
       <CheckResult
         awaitFor={Array []}
+        canRetry={true}
         check={true}
         checksReady={Object {}}
+        cleanErrors={[Function]}
         handleCheckReady={[Function]}
         handleErrors={[Function]}
         isLoading={false}
-        key="2"
+        key="health_check_check_pattern"
         name="pattern"
-        title="Check Elasticsearch index pattern"
+        title="Check alerts index pattern"
         validationService={[Function]}
       />
       <CheckResult
@@ -66,14 +68,16 @@ exports[`Health Check container should render a Health check screen 1`] = `
             "pattern",
           ]
         }
+        canRetry={true}
         check={true}
         checksReady={Object {}}
+        cleanErrors={[Function]}
         handleCheckReady={[Function]}
         handleErrors={[Function]}
         isLoading={false}
-        key="3"
+        key="health_check_check_template"
         name="template"
-        title="Check Elasticsearch template"
+        title="Check alerts indices template"
         validationService={[Function]}
       />
       <CheckResult
@@ -82,14 +86,44 @@ exports[`Health Check container should render a Health check screen 1`] = `
             "pattern",
           ]
         }
+        canRetry={true}
         check={true}
         checksReady={Object {}}
+        cleanErrors={[Function]}
         handleCheckReady={[Function]}
         handleErrors={[Function]}
         isLoading={false}
-        key="4"
+        key="health_check_check_fields"
         name="fields"
-        title="Check index pattern fields"
+        title="Check alerts index pattern fields"
+        validationService={[Function]}
+      />
+      <CheckResult
+        awaitFor={Array []}
+        canRetry={true}
+        check={true}
+        checksReady={Object {}}
+        cleanErrors={[Function]}
+        handleCheckReady={[Function]}
+        handleErrors={[Function]}
+        isLoading={false}
+        key="health_check_check_patternMonitoring"
+        name="patternMonitoring"
+        title="Check monitoring index pattern"
+        validationService={[Function]}
+      />
+      <CheckResult
+        awaitFor={Array []}
+        canRetry={true}
+        check={true}
+        checksReady={Object {}}
+        cleanErrors={[Function]}
+        handleCheckReady={[Function]}
+        handleErrors={[Function]}
+        isLoading={false}
+        key="health_check_check_patternStatistics"
+        name="patternStatistics"
+        title="Check statistics index pattern"
         validationService={[Function]}
       />
     </EuiDescriptionList>

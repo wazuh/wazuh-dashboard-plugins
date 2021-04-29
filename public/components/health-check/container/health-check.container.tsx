@@ -82,7 +82,7 @@ const checks = {
   }
 };
 
-export const HealthCheck = withReduxProvider(function HealthCheck() {
+function HealthCheckComponent() {
   const [checkErrors, setCheckErrors] = useState<{[key:string]: []}>({});
   const [checksReady, setChecksReady] = useState<{[key: string]: boolean}>({});
   const appConfig = useAppConfig();
@@ -125,7 +125,7 @@ export const HealthCheck = withReduxProvider(function HealthCheck() {
     return Object.keys(checks).map((check, index) => {
       return (
         <CheckResult
-          key={index}          
+          key={`health_check_check_${check}`}          
           name={check}
           title={checks[check].title}
           awaitFor={checks[check].awaitFor}
@@ -178,4 +178,10 @@ export const HealthCheck = withReduxProvider(function HealthCheck() {
       ): null}
     </div>
   );
-})
+}
+
+export const HealthCheck = withReduxProvider(HealthCheckComponent);
+
+export const HealthCheckTest = HealthCheckComponent;
+
+

@@ -19,13 +19,14 @@ describe('Check result component', () => {
   const validationService = jest.fn();
   const handleErrors = jest.fn();
   const handleCheckReady = jest.fn();
+  const cleanErrors = jest.fn();
 
   test('should render a Check result screen', () => {
     validationService.mockImplementation(() => ({ errors: [] }));
     const component = mount(
       <CheckResult
         name={'test'}
-        title={'test chest'}
+        title={'Check Test'}
         awaitFor={[]}
         check={true}
         validationService={validationService}
@@ -33,6 +34,8 @@ describe('Check result component', () => {
         isLoading={false}
         handleCheckReady={handleCheckReady}
         checksReady={{}}
+        cleanErrors={cleanErrors}
+        canRetry={true}
       />
     );
 
@@ -44,7 +47,7 @@ describe('Check result component', () => {
     const component = mount(
       <CheckResult
         name={'test'}
-        title={'test chest'}
+        title={'Check Test'}
         awaitFor={[]}
         check={true}
         validationService={validationService}
@@ -52,6 +55,8 @@ describe('Check result component', () => {
         isLoading={false}
         handleCheckReady={handleCheckReady}
         checksReady={{}}
+        cleanErrors={cleanErrors}
+        canRetry={true}
       />
     );
     setImmediate(() => {
@@ -64,7 +69,7 @@ describe('Check result component', () => {
     const component = mount(
       <CheckResult
         name={'test'}
-        title={'test chest'}
+        title={'Check Test'}
         awaitFor={[]}
         check={true}
         validationService={validationService}
@@ -72,6 +77,8 @@ describe('Check result component', () => {
         isLoading={false}
         handleCheckReady={handleCheckReady}
         checksReady={{}}
+        cleanErrors={cleanErrors}
+        canRetry={true}
       />
     );
     setImmediate(() => {

@@ -14,11 +14,8 @@
 
 import React from 'react';
 import { mount, shallow } from 'enzyme';
-import { HealthCheck } from './health-check.container';
+import { HealthCheckTest } from './health-check.container';
 
-jest.mock('../../../react-services/error-handler', () => ({
-  handle: (error) => error,
-}));
 
 jest.mock('../../../components/common/hooks/use-app-config', () => ({
   useAppConfig: () => ({
@@ -45,41 +42,43 @@ jest.mock('../services', () => ({
   checkFieldsService: () => ({ errors: [] }),
   checkKibanaSettings: () => ({ errors: [] }),
   checkKibanaSettingsTimeFilter: () => ({ errors: [] }),
+  checkPatternSupportService: () => ({ errors: [] })
 }));
 
 jest.mock('../components/check-result', () => ({
   CheckResult: () => () => <></>,
 }));
 
-jest.mock('../../../react-services/app-state', () => ({
-  setPatternSelector: () => {},
+jest.mock('../../../react-services', () => ({
+  AppState: {
+    setPatternSelector: () => {},
+  },
+  ErrorHandler: {
+    handle: (error) => error
+  }
 }));
 
-jest.mock('../../../components/common/hooks/use-app-deps', () => ({
-  useAppDeps: () => ({
-    core: {
-      http: {
-        basePath: {
-          prepend: (url) => url,
-        },
-      },
-    },
+jest.mock('../../../kibana-services', () => ({
+  getHttp: () => ({
+    basePath: {
+      prepend: (str) => str
+    }
   }),
 }));
 
 describe('Health Check container', () => {
   test('should render a Health check screen', () => {
-    const component = shallow(<HealthCheck />);
+    const component = shallow(<HealthCheckTest />);
 
     expect(component).toMatchSnapshot();
   });
 
   test('should render a Health check screen with error', () => {
-    const component = mount(<HealthCheck />);
+    const component = mount(<HealthCheckTest />);
 
-    component.find('CheckResult').at(1).invoke('handleErrors')(['test']); // invoke is wrapped with act to await for setState
+    component.find('CheckResult').at(1).invoke('handleErrors')('setup',['Test error']); // invoke is wrapped with act to await for setState
 
     const callOutError = component.find('EuiCallOut');
-    expect(callOutError.text()).toBe('test');
+    expect(callOutError.text()).toBe('Test error');
   });
 });

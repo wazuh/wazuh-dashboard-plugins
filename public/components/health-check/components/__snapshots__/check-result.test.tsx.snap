@@ -3,8 +3,24 @@
 exports[`Check result component should render a Check result screen 1`] = `
 <CheckResult
   awaitFor={Array []}
+  canRetry={true}
   check={true}
   checksReady={Object {}}
+  cleanErrors={
+    [MockFunction] {
+      "calls": Array [
+        Array [
+          "test",
+        ],
+      ],
+      "results": Array [
+        Object {
+          "type": "return",
+          "value": undefined,
+        },
+      ],
+    }
+  }
   handleCheckReady={[MockFunction]}
   handleErrors={[MockFunction]}
   isLoading={false}
