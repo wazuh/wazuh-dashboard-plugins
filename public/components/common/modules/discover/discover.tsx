@@ -8,8 +8,7 @@
  * (at your option) any later version.
  *
  * Find more information about this on the LICENSE file.
- */
-
+*/ 
 import React, { Component, } from 'react';
 import './discover.scss';
 import { FilterManager, Filter } from '../../../../../../../src/plugins/data/public/'
@@ -28,38 +27,38 @@ import { compose } from 'redux';
 import _ from 'lodash';
 
 import {
-  EuiBasicTable,
-  EuiLoadingContent,
-  EuiTableSortingType,
-  EuiFlexItem,
-  EuiFlexGroup,
-  Direction,
-  EuiOverlayMask,
-  EuiSpacer,
-  EuiCallOut,
-  EuiIcon,
-  EuiButtonIcon,
-  EuiButtonEmpty,
-  EuiToolTip
+ EuiBasicTable,
+ EuiLoadingContent,
+ EuiTableSortingType,
+ EuiFlexItem,
+ EuiFlexGroup,
+ Direction,
+ EuiOverlayMask,
+ EuiSpacer,
+ EuiCallOut,
+ EuiIcon,
+ EuiButtonIcon,
+ EuiButtonEmpty,
+ EuiToolTip
 } from '@elastic/eui';
 import {
-  IIndexPattern,
-  TimeRange,
-  Query,
-  buildPhraseFilter,
-  getEsQueryConfig,
-  buildEsQuery,
-  IFieldType
+ IIndexPattern,
+ TimeRange,
+ Query,
+ buildPhraseFilter,
+ getEsQueryConfig,
+ buildEsQuery,
+ IFieldType
 } from '../../../../../../../src/plugins/data/common';
 import { getDataPlugin, getToasts, getUiSettings } from '../../../../kibana-services';
-
+ 
 const mapStateToProps = state => ({
-  currentAgentData: state.appStateReducers.currentAgentData
+ currentAgentData: state.appStateReducers.currentAgentData
 });
-
+ 
 export const Discover = compose(
-  withReduxProvider,
-  connect(mapStateToProps)
+ withReduxProvider,
+ connect(mapStateToProps)
 )(class Discover extends Component {
   _isMount!: boolean;
   timefilter: {
@@ -100,6 +99,7 @@ export const Discover = compose(
     includeFilters?: string,
     initialColumns: string[],
     shareFilterManager: FilterManager,
+    shareFilterManagerWithUserAuthorized: Filter[],
     refreshAngularDiscover?: number
   }
   constructor(props) {
@@ -288,14 +288,13 @@ export const Discover = compose(
       $state: { store: 'appState' }
     });
 
-    const filters = this.props.shareFilterManager ? this.props.shareFilterManager.filters : [];
-    const previousFilters = this.KibanaServices && this.KibanaServices.query.filterManager.filters ? this.KibanaServices.query.filterManager.filters : [];
-
+    const filters = this.props.shareFilterManager ? this.props.shareFilterManager.getFilters() : [];
+    const previousFilters = this.KibanaServices && this.KibanaServices.query.filterManager.getFilters() || [];
     const elasticQuery =
       buildEsQuery(
         undefined,
         query,
-        [...previousFilters, ...filters, ...extraFilters],
+       _.union(previousFilters, filters,extraFilters, this.props.shareFilterManagerWithUserAuthorized || []),
         getEsQueryConfig(getUiSettings())
       );
 
@@ -304,8 +303,8 @@ export const Discover = compose(
     const range = {
       range: {
         timestamp: {
-          gte: dateParse(this.state.dateRange.from),
-          lte: dateParse(this.state.dateRange.to),
+         gte: dateParse(this.state.dateRange.from),
+         lte: dateParse(this.state.dateRange.to),
           format: 'epoch_millis'
         }
       }

@@ -2,14 +2,14 @@ import React, { Component } from 'react';
 import { EuiLoadingSpinner, EuiDescriptionList, EuiIcon, EuiCallOut, EuiButtonIcon, EuiSpacer, EuiButton, EuiToolTip } from '@elastic/eui';
 import { AppState } from '../../react-services/app-state';
 import { PatternHandler } from '../../react-services/pattern-handler';
-import { getAngularModule, getToasts, getHttp } from '../../kibana-services';
+import { getAngularModule, getToasts, getHttp, getDataPlugin } from '../../kibana-services';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { GenericRequest } from '../../react-services/generic-request';
 import { ApiCheck } from '../../react-services/wz-api-check';
 import { WzRequest } from '../../react-services/wz-request';
 import { SavedObject } from '../../react-services/saved-objects';
 import { ErrorHandler } from '../../react-services/error-handler';
-import { WAZUH_ERROR_DAEMONS_NOT_READY, WAZUH_INDEX_TYPE_STATISTICS, WAZUH_INDEX_TYPE_MONITORING } from '../../../common/constants';
+import { WAZUH_ERROR_DAEMONS_NOT_READY, WAZUH_INDEX_TYPE_STATISTICS, WAZUH_INDEX_TYPE_MONITORING, HEALTH_CHECK } from '../../../common/constants';
 import { checkKibanaSettings, checkKibanaSettingsTimeFilter, checkKibanaSettingsMaxBuckets } from './lib';
 import store from '../../redux/store';
 import { updateWazuhNotReadyYet } from '../../redux/actions/appStateActions.js';
@@ -54,6 +54,13 @@ export class HealthCheck extends Component {
    */
   delay = time => new Promise(res => setTimeout(res, time));
 
+  async checkDefaultPattern(defaultPattern) {
+    if (defaultPattern) {
+      const patternData = await SavedObject.existsIndexPattern(defaultPattern);    
+      patternData.status && getDataPlugin().indexPatterns.setDefault(defaultPattern, true);
+    }
+  }
+
   /**
    * This validates a pattern
    */
@@ -61,37 +68,44 @@ export class HealthCheck extends Component {
     this.checkPatternCount++;
     if (this.checkPatternCount > 10) return Promise.reject('Error trying to check patterns.');
     try {
-      const patternId = AppState.getCurrentPattern();
       let patternTitle = '';
       let results = this.state.results;
       let errors = this.state.errors;
+      const resultIndex = this.state.results.map(item => item.id).indexOf(2);
+      const currentPattern = AppState.getCurrentPattern();
+
       if (this.state.checks.pattern) {
-        const i = this.state.results.map(item => item.id).indexOf(2);
-        let patternData = patternId ? await SavedObject.existsIndexPattern(patternId) : false;
+        //get patters or create default
+        const patternList = await PatternHandler.getPatternList(HEALTH_CHECK);
+        // check selected pattern
+        const wazuhConfig = new WazuhConfig();
+        const { pattern: defaultPattern } = wazuhConfig.getConfig();
+        await this.checkDefaultPattern(defaultPattern);
+
+        //check selected pattern
+        let patternData = currentPattern ? await SavedObject.existsIndexPattern(currentPattern) : false;
         if (!patternData) patternData = {};
         patternTitle = patternData.title;
 
         if (!patternData.status) {
-          const patternList = await PatternHandler.getPatternList("healthcheck");
           if (patternList.length) {
-            const wazuhConfig = new WazuhConfig();
-            const { pattern } = wazuhConfig.getConfig();
-            const indexPatternDefault = patternList.find((indexPattern) => indexPattern.title === pattern);
-            AppState.setCurrentPattern(indexPatternDefault.id);
+            const indexPatternDefault = patternList.find((indexPattern) => indexPattern.title === defaultPattern);
+            indexPatternDefault && AppState.setCurrentPattern(indexPatternDefault.id);
+            await this.delay(3000);
             return await this.checkPatterns();
           } else {
             errors.push('The selected index-pattern is not present.');
-            results[i].description = <span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span>;
+            results[resultIndex].description = <span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span>;
           }
         } else {
-          results[i].description = <span><EuiIcon type="check" color="secondary" ></EuiIcon> Ready</span>;
+          results[resultIndex].description = <span><EuiIcon type="check" color="secondary" ></EuiIcon> Ready</span>;
         }
         this.setState({ results, errors });
       }
 
       if (this.state.checks.template) {
         if (!patternTitle) {
-          var patternData = await SavedObject.existsIndexPattern(patternId);
+          var patternData = await SavedObject.existsIndexPattern(currentPattern);
           patternTitle = patternData.title;
         }
         const i = results.map(item => item.id).indexOf(3);
@@ -118,29 +132,39 @@ export class HealthCheck extends Component {
       const response = await GenericRequest.request('GET', '/hosts/apis');
       const hosts = response.data;
       const errors = [];
+      const results = this.state.results;
+      const maxTries = 5;
+      let apiId = '';
 
       if (hosts.length) {
         for (let i = 0; i < hosts.length; i++) {
-          let tries = 36;
-          while (tries--) {
-            await this.delay(5000);
+          for (let tries = 0; tries < maxTries; tries++) {
+            await this.delay(3000);
             try {
               const API = await ApiCheck.checkApi(hosts[i], true);
               if (API && API.data) {
-                return hosts[i].id;
+                apiId = hosts[i].id;
+                tries = maxTries;
+                i = hosts.length
               }
             } catch (err) {
-              if (err.includes(WAZUH_ERROR_DAEMONS_NOT_READY)) {
-                const updateNotReadyYet = updateWazuhNotReadyYet(false);
-                store.dispatch(updateNotReadyYet);
+              if (tries) {
+                results[0].description = <span><EuiLoadingSpinner size="m" /> Retrying {'.'.repeat(tries) }</span>;
+                results[1].description = <span><EuiLoadingSpinner size="m" /> Retrying {'.'.repeat(tries) }</span>;
+                this.setState({ results });
               } else {
+                if (err.includes(WAZUH_ERROR_DAEMONS_NOT_READY)) {
+                  const updateNotReadyYet = updateWazuhNotReadyYet(false);
+                  store.dispatch(updateNotReadyYet);
+                }
                 errors.push(`Could not connect to API with id: ${hosts[i].id}: ${err.message || err}`);
               }
             }
           }
+          if (apiId) return apiId;
         }
 
-        const updateNotReadyYet = updateWazuhNotReadyYet(true);
+        const updateNotReadyYet = updateWazuhNotReadyYet(false);
         store.dispatch(updateNotReadyYet);
 
         if (errors.length) {
@@ -158,20 +182,17 @@ export class HealthCheck extends Component {
   /**
    * This attempts to reconnect with API
    */
-  reconnectWithAPI(){
+  reconnectWithAPI() {
     let results = this.state.results;
     results[0].description = <span><EuiLoadingSpinner size="m" /> Checking...</span>;
     results[1].description = <span><EuiLoadingSpinner size="m" /> Checking...</span>;
     getToasts().toasts$._value.forEach(toast => {
-      if(toast.text.includes('3000'))
+      if (toast.text.includes('3000'))
         getToasts().remove(toast.id);
     });
-    let errors = this.state.errors;
-    this.state.errors.forEach(error => {
-      if(error.includes('API'))
-        errors.pop(error);
-    });
-    this.setState({results, errors});
+
+    const errors = this.state.errors.filter((error: string) => error.indexOf('API') < 0)
+    this.setState({ results, errors });
     this.checkApiConnection();
   }
 
@@ -182,12 +203,33 @@ export class HealthCheck extends Component {
     let results = this.state.results;
     let errors = this.state.errors;
     let apiChanged = false;
+    const buttonRestartApi = <div> <span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span>
+      {<EuiToolTip
+        position='top'
+        content='Try to reconnect to the API'
+      >
+        <EuiButtonIcon
+          display="base"
+          iconType="refresh"
+          isLoading
+          iconSize="l"
+          onClick={() => this.reconnectWithAPI()}
+          size="m"
+          aria-label="Next"
+        />
+      </EuiToolTip>}
+    </div>;
+
     try {
       const currentApi = JSON.parse(AppState.getCurrentAPI() || '{}');
       if (this.state.checks.api && currentApi && currentApi.id) {
         let data;
         try {
           data = await ApiCheck.checkStored(currentApi.id);
+          // Fix when the app endpoint replies with a valid response but the API is really down
+          if(data.data.data.apiIsDown){
+            throw 'API is down'
+          };
         } catch (err) {
           try {
             const newApi = await this.trySetDefault();
@@ -219,7 +261,7 @@ export class HealthCheck extends Component {
         const i = results.map(item => item.id).indexOf(0);
         if (data === 3099) {
           errors.push('Wazuh not ready yet.');
-          results[i].description = <span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span>;
+          results[i].description = <span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span>;;
           if (this.checks.setup) {
             const i = results.map(item => item.id).indexOf(1);
             results[i].description = <span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span>;
@@ -227,23 +269,8 @@ export class HealthCheck extends Component {
           this.setState({ results, errors });
         } else if (data.data.error || data.data.data.apiIsDown) {
           errors.push(data.data.data.apiIsDown ? 'Wazuh API is down.' : `Error connecting to the API.${data.data.error && data.data.error.message ? ` ${data.data.error.message}` : ''}`);
-          results[i].description =    <div> <span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span> 
-          { <EuiToolTip
-                  position='top'
-                  content='Try to reconnect to the API'
-          >
-             <EuiButtonIcon
-                display="base"
-                iconType="refresh"
-                isLoading
-                iconSize="l"
-                onClick={() => this.reconnectWithAPI()}
-                size="m"
-                aria-label="Next"
-              />
-          </EuiToolTip> }
-          </div>;
-          results[i + 1].description = <span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span> 
+          results[i].description = buttonRestartApi;
+          results[i + 1].description = <span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span>
           this.setState({ results, errors });
         } else {
           results[i].description = <span><EuiIcon type="check" color="secondary" ></EuiIcon> Ready</span>;
@@ -277,27 +304,17 @@ export class HealthCheck extends Component {
               results[i].description = <span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span>;
               this.setState({ results, errors });
             } else {
-               let permissionToGoToTheApp = true;
-               if(!results[i].description.props.children[1].includes('Checking')){
-                 permissionToGoToTheApp = false;
-               }
-               results[i].description = <span><EuiIcon type="check" color="secondary" ></EuiIcon> Ready</span>;
-               for (let element of results){
-                 if(results[i].description.props.children[1].includes('Error')){
-                   permissionToGoToTheApp = false;
-                 }
-               }
-
-               this.setState({ results, errors });
-               if(permissionToGoToTheApp)
-                 this.goApp();
+              results[i].description = <span><EuiIcon type="check" color="secondary" ></EuiIcon> Ready</span>;
+              const updateNotReadyYet = updateWazuhNotReadyYet(false);
+              store.dispatch(updateNotReadyYet);
+              this.setState({ results, errors });
             }
           }
         }
       }
       return;
     } catch (error) {
-      results[0].description = <span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span>;
+      results[0].description = buttonRestartApi;
       results[1].description = <span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span>;
       this.setState({ results });
       AppState.removeNavigation();
@@ -442,7 +459,7 @@ export class HealthCheck extends Component {
     }
   }
 
-  goApp() {
+  goAppSettings() {
     window.location.href = '/app/wazuh#/settings';
   }
 
@@ -478,7 +495,7 @@ export class HealthCheck extends Component {
         {!!this.state.errors.length && (
           <EuiButton
             fill
-            onClick={() => this.goApp()}>
+            onClick={() => this.goAppSettings()}>
             Go to App
           </EuiButton>
         )}

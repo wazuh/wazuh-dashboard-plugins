@@ -36,7 +36,7 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
     core.application.register({
       id: `wazuh`,
       title: 'Wazuh',
-      icon: '/plugins/wazuh/assets/icon_blue.png',
+      icon: core.http.basePath.prepend('/plugins/wazuh/assets/icon_blue.png'),
       mount: async (params: AppMountParameters) => {
         if (!this.initializeInnerAngular) {
           throw Error('Wazuh plugin method initializeInnerAngular is undefined');
@@ -48,7 +48,6 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
         const [coreStart, depsStart] = await core.getStartServices();
         setHttp(core.http);
         setCookies(new Cookies());
-        this.setCacheControl();
         if(!AppState.checkCookies() || params.history.parentHistory.action === 'PUSH') {
           window.location.reload();
         }
@@ -65,7 +64,7 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
         id: 'wazuh',
         label: 'Wazuh',
         order: 0,
-        euiIconType: '/plugins/wazuh/assets/icon_blue.png',      
+        euiIconType: core.http.basePath.prepend('/plugins/wazuh/assets/icon_blue.png'),      
       },
     });
     return {};
@@ -110,18 +109,5 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
     setSavedObjects(core.savedObjects);
     setOverlays(core.overlays);
     return {};
-  }
-
-  private setCacheControl() {    
-    const createMeta = (httpEquiv: string, content: string) => {
-      const metaEl = document.createElement('meta');
-      metaEl.httpEquiv = httpEquiv;
-      metaEl.content = content;
-      document.getElementsByTagName('head')[0].appendChild(metaEl);
-      };
-
-    createMeta('cache-control', 'no-cache');
-    createMeta('expires', '0');
-    createMeta('pragma', 'no-cache');  
   }
 }
