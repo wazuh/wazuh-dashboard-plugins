@@ -12,6 +12,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Added
 
 - Wazuh help links in the Kibana help menu [#3170](https://github.com/wazuh/wazuh-kibana-app/pull/3170)
+- Changed default `wazuh.monitoring.creation` app setting from `d` to `w` [#3174](https://github.com/wazuh/wazuh-kibana-app/pull/3174)
+- Changed default `wazuh.monitoring.shards` app setting from `2` to `1` [#3174](https://github.com/wazuh/wazuh-kibana-app/pull/3174)
 - Redirect to group details using the `group` query param in the URL [#3184](https://github.com/wazuh/wazuh-kibana-app/pull/3184)
 
 ### Changed
@@ -21,6 +23,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
+- Fixed screen flickers in Cluster visualization [#3159](https://github.com/wazuh/wazuh-kibana-app/pull/3159)
 - Fix the broken links when using `server.basePath` Kibana setting [#3161](https://github.com/wazuh/wazuh-kibana-app/pull/3161)
 - Fixing filter in reports [#3173](https://github.com/wazuh/wazuh-kibana-app/pull/3173)
 
