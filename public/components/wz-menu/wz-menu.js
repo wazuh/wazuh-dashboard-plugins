@@ -250,18 +250,30 @@ class WzMenu extends Component {
 
   changePattern = async (event) => {
     try {
-      const newPattern = event.target.value;
+      const newPattern = event.target;
       if (!AppState.getPatternSelector()) return;
-      await PatternHandler.changePattern(newPattern);
-      this.setState({ currentSelectedPattern: newPattern });
+      await PatternHandler.changePattern(newPattern.value);
+      this.setState({ currentSelectedPattern: newPattern.value });
       if (this.state.currentMenuTab !== 'wazuh-dev') {
         this.router.reload();
       }
-      this.switchMenuOpened();
+
+      if (newPattern?.id === 'selectIndexPatternBar') {
+        this.updatePatternAndApi();
+      } else {
+        this.switchMenuOpened();
+      }
     } catch (error) {
       this.showToast('danger', 'Error', error, 4000);
     }
   };
+
+  updatePatternAndApi = () => {
+    this.setState({ menuOpened: false, hover: this.state.currentMenuTab }, async () => {
+      await this.loadApiList();
+      await this.loadIndexPatternsList();
+    });
+  }
 
   /**
    * @param {String} id
@@ -281,24 +293,27 @@ class WzMenu extends Component {
 
   changeAPI = async event => {
     try {
-      const apiId = event.target.value;
+      const apiId = event.target;
       const apiEntry = this.state.APIlist.filter(item => {
-        return item.id === apiId;
+        return item.id === apiId.value;
       });
       const response = await ApiCheck.checkApi(apiEntry[0]);
       const clusterInfo = response.data || {};
       const apiData = this.state.APIlist.filter(item => {
-        return item.id === apiId;
+        return item.id === apiId.value;
       });
 
-      this.updateClusterInfoInRegistry(apiId, clusterInfo);
+      this.updateClusterInfoInRegistry(apiId.value, clusterInfo);
       apiData[0].cluster_info = clusterInfo;
 
       AppState.setClusterInfo(apiData[0].cluster_info);
       AppState.setCurrentAPI(
-        JSON.stringify({ name: apiData[0].manager, id: apiId })
+        JSON.stringify({ name: apiData[0].manager, id: apiId.value })
       );
-      this.switchMenuOpened();
+      if (apiId?.id !== 'selectAPIBar') {
+        this.switchMenuOpened();
+      }
+
       if (this.state.currentMenuTab !== 'wazuh-dev') {
         this.router.reload();
       }
@@ -527,10 +542,8 @@ class WzMenu extends Component {
     }
 
     this.setState({ menuOpened: !this.state.menuOpened, kibanaMenuBlockedOrOpened, hover: this.state.currentMenuTab }, async () => {
-      if (this.state.menuOpened) {
-        await this.loadApiList();
-        await this.loadIndexPatternsList();
-      };
+      await this.loadApiList();
+      await this.loadIndexPatternsList();
     });
   };
 
@@ -879,7 +892,7 @@ class WzMenu extends Component {
                 <EuiFlexItem grow={false}>
                   <div style={{ maxWidth: 200, maxHeight: 50 }}>
                     <EuiSelect
-                      id="selectIndexPattern"
+                      id="selectIndexPatternBar"
                       options={
                         this.state.patternList.map((item) => {
                           return { value: item.id, text: item.title }
@@ -904,7 +917,7 @@ class WzMenu extends Component {
                 <EuiFlexItem grow={false}>
                   <div style={{ maxWidth: 100 }}>
                     <EuiSelect
-                      id="selectAPI"
+                      id="selectAPIBar"
                       options={
                         this.state.APIlist.map((item) => {
                           return { value: item.id, text: item.id }
