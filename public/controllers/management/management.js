@@ -86,6 +86,7 @@ export class ManagementController {
       this.$location.search('currentList', true);
       AppState.setNavigation({ status: true });
       this.$scope.$applyAsync();
+      console.log("Hola1");
     });
 
     this.$scope.$on('removeCurrentList', () => {
@@ -120,6 +121,7 @@ export class ManagementController {
               this.blockEdition = false;
               this.isRestarting = false;
               this.$scope.$applyAsync();
+              console.log("Hola2");
             }
           },
           333,
@@ -128,17 +130,20 @@ export class ManagementController {
       }
       this.isRestarting = true;
       this.$scope.$applyAsync();
+      console.log("Hol3");
     });
 
     this.$rootScope.$on('removeBlockEdition', () => {
       this.blockEdition = false;
       this.isRestarting = false;
       this.$scope.$applyAsync();
+      console.log("Hola4");
     });
 
     this.$scope.$on('removeRestarting', () => {
       this.isRestarting = false;
       this.$scope.$applyAsync();
+      console.log("Hola5");
     });
 
     this.$rootScope.$on('performRestart', ev => {
@@ -147,6 +152,22 @@ export class ManagementController {
         ? this.restartCluster()
         : this.restartManager();
     });
+
+    this.$rootScope.timeoutIsReady;
+    this.$rootScope.$watch('resultState', () => {
+      console.log("Entro", this.$rootScope.resultState, new Date().getMilliseconds());
+      if(this.$rootScope.timeoutIsReady){
+        clearTimeout(this.$rootScope.timeoutIsReady);
+      }
+      if(this.$rootScope.resultState !== 'ready'){
+        this.$scope.isReady = false;
+        // this.$rootScope.timeoutIsReady = setTimeout(() => this.$scope.isReady = false, 0);
+      }
+      else
+      {
+        this.$scope.isReady = true;
+      }
+    })
 
     this.welcomeCardsProps = {
       switchTab: (tab, setNav) => this.switchTab(tab, setNav)
@@ -181,11 +202,14 @@ export class ManagementController {
         updateWazuhNotReadyYet: status => {
           this.$rootScope.wazuhNotReadyYet = status;
           this.$scope.$applyAsync();
+          console.log("Hola6");
         },
         wazuhNotReadyYet: () => this.$rootScope.wazuhNotReadyYet
       },
       logtestProps: this.logtestProps,
     };
+    console.log("Hola7");
+
   }
 
   /**
@@ -230,10 +254,12 @@ export class ManagementController {
       await this.configHandler.restartManager();
       this.isRestarting = false;
       this.$scope.$applyAsync();
+      console.log("Hola8");
       ErrorHandler.info('Restarting manager.');
     } catch (error) {
       this.isRestarting = false;
       this.$scope.$applyAsync();
+      console.log("Hola9");
       ErrorHandler.handle(
         error.message || error,
         'Error restarting manager'
@@ -248,12 +274,14 @@ export class ManagementController {
       await this.configHandler.restartCluster();
       this.isRestarting = false;
       this.$scope.$applyAsync();
+      console.log("Hola10");
       ErrorHandler.info(
         'Restarting cluster, it will take up to 30 seconds.'
       );
     } catch (error) {
       this.isRestarting = false;
       this.$scope.$applyAsync();
+      console.log("Hola11");
       ErrorHandler.handle(
         error.message || error,
         'Error restarting cluster'
@@ -377,12 +405,14 @@ export class ManagementController {
     }
     this.$scope.$broadcast('closeRulesetFile');
     this.$scope.$applyAsync();
+    console.log("Hola12");
   }
 
   changeNode(node) {
     this.selectedNode = node;
     this.$scope.$broadcast('configNodeChanged');
     this.$scope.$applyAsync();
+    console.log("Hola13");
   }
 
   async loadNodeList() {
@@ -406,24 +436,28 @@ export class ManagementController {
     }
     this.loadingNodes = false;
     this.$scope.$applyAsync();
+    console.log("14");
   }
 
   openCloseFlyout() {
     this.logtestOpened = !this.logtestOpened;
     this.logtestProps.isRuleset = this.tab,
     this.$scope.$applyAsync();
+    console.log("Hola15");
   }
 
   newFile() {
     this.openedFileDirect = true;
     this.switchFilesSubTab();
     this.$scope.$applyAsync();
+    console.log("Hola16");
     this.$scope.$broadcast('addNewFile', { type: this.globalRulesetTab });
   }
 
   openUploadFile() {
     this.uploadOpened = !this.uploadOpened;
     this.$scope.$applyAsync();
+    console.log("Hola17");
   }
 
   refreshUploadFileProps() {
