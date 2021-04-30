@@ -37,6 +37,8 @@ export class InventoryTable extends Component {
     {type: 'q', label: 'cve', description:"Filter by CVE ID", operators:['=','!=', '~'], values: async (value) => getFilterValues('cve', value, this.props.agent.id)},
     {type: 'q', label: 'version', description:"Filter by CVE version", operators:['=','!=', '~'], values: async (value) => getFilterValues('version', value, this.props.agent.id)},
     {type: 'q', label: 'architecture', description:"Filter by architecture", operators:['=','!=', '~'], values: async (value) => getFilterValues('architecture', value, this.props.agent.id)},
+    {type: 'q', label: 'status', description:"Filter by status", operators:['=','!=', '~'], values: async (value) => getFilterValues('status', value, this.props.agent.id)},
+    {type: 'q', label: 'type', description:"Filter by type", operators:['=','!=', '~'], values: async (value) => getFilterValues('type', value, this.props.agent.id)},
   ]
 
   props!: {
