@@ -512,7 +512,6 @@ export async function jobMonitoringRun(context) {
   // Check Kibana index and if it is prepared, start the initialization of Wazuh App.
   await checkKibanaStatus(context);
   // // Run the cron job only it it's enabled
-  console.log('MONITORING_ENABLED', MONITORING_ENABLED)
   if (MONITORING_ENABLED) {
     cronTask(context);
     console.log('MONITORING_CRON_FREQ', MONITORING_CRON_FREQ)
