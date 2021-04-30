@@ -514,7 +514,6 @@ export async function jobMonitoringRun(context) {
   // // Run the cron job only it it's enabled
   if (MONITORING_ENABLED) {
     cronTask(context);
-    console.log('MONITORING_CRON_FREQ', MONITORING_CRON_FREQ)
     cron.schedule(MONITORING_CRON_FREQ, () => cronTask(context));
   }
 }
