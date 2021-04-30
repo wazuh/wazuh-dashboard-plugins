@@ -100,19 +100,6 @@ export class InventoryTable extends Component {
     (((this.props.agent || {}).os || {}).platform || false) === 'windows' ? width = '60px' : width = '80px';
     return [
       {
-        field: 'cve',
-        name: 'CVE',
-        sortable: true,
-        truncateText: true,
-        width: `${width}`
-      },
-      {
-        field: 'name',
-        name: 'Name',
-        sortable: true,
-        width: '100px'
-      },
-      {
         field: 'version',
         name: 'Version',
         sortable: true,
@@ -122,6 +109,19 @@ export class InventoryTable extends Component {
       {
         field: 'architecture',
         name: 'Architecture',
+        sortable: true,
+        width: '100px'
+      },
+      {
+        field: 'cve',
+        name: 'CVE',
+        sortable: true,
+        truncateText: true,
+        width: `${width}`
+      },
+      {
+        field: 'name',
+        name: 'Name',
         sortable: true,
         width: '100px'
       }
