@@ -23,7 +23,7 @@ import { TableDeafult } from './table-default'
 import { WzRequest } from '../../../react-services/wz-request';
 import { ExportTableCsv }  from './components/export-table-csv';
 
-export function TableWithSearchBarWzAPI({endpoint, ...rest}){
+export function TableWzAPI({endpoint, ...rest}){
 
   const [results, setResults] = useState({items: {}, totalItems: 0});
   const [filters, setFilters] = useState([]);
@@ -88,7 +88,7 @@ export function TableWithSearchBarWzAPI({endpoint, ...rest}){
 }
 
 // Set default props
-TableWithSearchBarWzAPI.defaultProps = {
+TableWzAPI.defaultProps = {
   title: null,
   downloadCsv: false,
   searchBar: false,

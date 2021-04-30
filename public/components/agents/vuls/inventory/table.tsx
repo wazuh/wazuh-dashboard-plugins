@@ -17,7 +17,7 @@ import {
 } from '@elastic/eui';
 import { FlyoutDetail } from './flyout';
 import { filtersToObject, IFilter, IWzSuggestItem } from '../../../wz-search-bar';
-import { TableWithSearchBarWzAPI } from '../../../../components/common/tables';
+import { TableWzAPI } from '../../../../components/common/tables';
 import { getFilterValues } from './lib';
 
 export class InventoryTable extends Component {
@@ -37,8 +37,6 @@ export class InventoryTable extends Component {
     {type: 'q', label: 'cve', description:"Filter by CVE ID", operators:['=','!=', '~'], values: async (value) => getFilterValues('cve', value, this.props.agent.id)},
     {type: 'q', label: 'version', description:"Filter by CVE version", operators:['=','!=', '~'], values: async (value) => getFilterValues('version', value, this.props.agent.id)},
     {type: 'q', label: 'architecture', description:"Filter by architecture", operators:['=','!=', '~'], values: async (value) => getFilterValues('architecture', value, this.props.agent.id)},
-    {type: 'q', label: 'status', description:"Filter by status", operators:['=','!=', '~'], values: async (value) => getFilterValues('status', value, this.props.agent.id)},
-    {type: 'q', label: 'type', description:"Filter by type", operators:['=','!=', '~'], values: async (value) => getFilterValues('type', value, this.props.agent.id)},
   ]
 
   props!: {
@@ -126,20 +124,6 @@ export class InventoryTable extends Component {
         name: 'Architecture',
         sortable: true,
         width: '100px'
-      },
-      {
-        field: 'status',
-        name: 'Status',
-        sortable: true,
-        truncateText: true,
-        width: '100px'
-      },
-      {
-        field: 'type',
-        name: 'Type',
-        sortable: true,
-        truncateText: true,
-        width: '100px'
       }
     ]
   }
@@ -153,28 +137,20 @@ export class InventoryTable extends Component {
       };
     };
 
-    const { sortField, sortDirection, isLoading, error } = this.state;
+    const { error } = this.state;
     const columns = this.columns();
-    const sorting = {
-      sort: {
-        field: sortField,
-        direction: sortDirection,
-      },
-    };
-
+    const selectFields = 'select=cve,architecture,version,name'
     return (
-        <TableWithSearchBarWzAPI
+        <TableWzAPI
           title='Vulnerabilities'
           tableColumns={columns}
           tableInitialSortingField='name'
           searchTable={true}
           searchBarSuggestions={this.suggestions}
-          endpoint={`/vulnerability/${this.props.agent.id}`}
-          reload={isLoading}
+          endpoint={`/vulnerability/${this.props.agent.id}?${selectFields}`}
           isExpandable={true}
           rowProps={getRowProps}
-          error={error}
-          sorting={sorting}
+          error={error} 
           downloadCsv={true}
         />
     );
