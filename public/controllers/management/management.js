@@ -148,6 +148,20 @@ export class ManagementController {
         : this.restartManager();
     });
 
+    this.$rootScope.timeoutIsReady;
+    this.$rootScope.$watch('resultState', () => {
+      if(this.$rootScope.timeoutIsReady){
+        clearTimeout(this.$rootScope.timeoutIsReady);
+      }
+      if(this.$rootScope.resultState === 'ready'){
+        this.$scope.isReady = true;
+      }
+      else
+      {
+        this.$rootScope.timeoutIsReady = setTimeout(() => this.$scope.isReady = false, 1000);
+      }
+    })
+
     this.welcomeCardsProps = {
       switchTab: (tab, setNav) => this.switchTab(tab, setNav)
     };
@@ -186,6 +200,7 @@ export class ManagementController {
       },
       logtestProps: this.logtestProps,
     };
+
   }
 
   /**
