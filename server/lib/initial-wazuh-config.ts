@@ -111,7 +111,7 @@ export const initialWazuhConfig: string = `---
 #wazuh.monitoring.frequency: 900
 #
 # Configure wazuh-monitoring-* indices shards and replicas.
-#wazuh.monitoring.shards: 2
+#wazuh.monitoring.shards: 1
 #wazuh.monitoring.replicas: 0
 #
 # Configure wazuh-monitoring-* indices custom creation interval.
