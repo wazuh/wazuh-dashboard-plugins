@@ -283,14 +283,29 @@ export class RegisterAgent extends Component {
   }
 
   optionalDeploymentVariables() {
-    const deployment = `WAZUH_MANAGER${this.state.selectedOS == 'macos' ? ' ' : '='}'${this.state.serverAddress}' ${this.state.selectedOS == 'win' ? `WAZUH_REGISTRATION_SERVER='${this.state.serverAddress}' ` : ''}${this.state.needsPassword
-      ? `WAZUH_REGISTRATION_PASSWORD='${this.state.wazuhPassword}' `
-      : ''
-      }${this.state.udpProtocol
-        ? " WAZUH_PROTOCOL='UDP'"
-        : ''
-      }${this.state.selectedGroup.length ? `WAZUH_AGENT_GROUP='${this.state.selectedGroup.map(item => item.label).join(',')}' ` : ''}`
-    return deployment;
+    let deployment = `WAZUH_MANAGER='${this.state.serverAddress}' `;
+  
+    if (this.state.selectedOS == 'win') {
+      deployment += `WAZUH_REGISTRATION_SERVER='${this.state.serverAddress}' `;
+    }
+
+    if (true) {
+      deployment += `WAZUH_REGISTRATION_PASSWORD='${this.state.wazuhPassword}' `;
+    }
+
+    if (this.state.udpProtocol) {
+      deployment += `WAZUH_PROTOCOL='UDP' `;
+    }
+
+    if (this.state.selectedGroup.length) {
+      deployment += `WAZUH_AGENT_GROUP='${this.state.selectedGroup.map((item) => item.label).join(',')}' `;
+    }
+
+    // macos doesnt need = param
+    if (this.state.selectedOS === 'macos') {
+      return deployment.replaceAll('=', ' ');
+    }
+
   }
 
   resolveRPMPackage() {
