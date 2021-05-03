@@ -1,11 +1,6 @@
 # Change Log
 
 All notable changes to the Wazuh app project will be documented in this file.
-## Wazuh v4.2.0 - Kibana 7.10.0 , 7.10.2 - Revision 4202
-
-### Fixed
-
-- Fixed screen flickers in Cluster visualization [#3159](https://github.com/wazuh/wazuh-kibana-app/pull/3159)
 
 ## Wazuh v4.2.0 - Kibana 7.10.2 , 7.11.2 - Revision 4202
 
@@ -27,12 +22,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fix the broken links when using `server.basePath` Kibana setting [#3161](https://github.com/wazuh/wazuh-kibana-app/pull/3161)
 - Fixing filter in reports [#3173](https://github.com/wazuh/wazuh-kibana-app/pull/3173)
 
-## Wazuh v4.2.0 - Kibana 7.10.2 , 7.11.2 - Revision 4202
-
-### Changed
-
-- Changed default `wazuh.monitoring.creation` app setting from `d` to `w` [#3174](https://github.com/wazuh/wazuh-kibana-app/pull/3174)
-- Changed default `wazuh.monitoring.shards` app setting from `2` to `1` [#3174](https://github.com/wazuh/wazuh-kibana-app/pull/3174)
 
 ## Wazuh v4.2.0 - Kibana 7.10.2 , 7.11.2 - Revision 4201
 
