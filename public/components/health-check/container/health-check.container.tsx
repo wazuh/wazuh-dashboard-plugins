@@ -20,16 +20,17 @@ import {
 } from '@elastic/eui';
 import React, { Fragment, useState, useEffect, useRef } from 'react';
 import { AppState, ErrorHandler } from '../../../react-services';
-import { useAppConfig } from '../../../components/common/hooks';
+import { useAppConfig, useRootScope } from '../../../components/common/hooks';
 import {
-  checkPatternService,
-  checkTemplateService,
   checkApiService,
-  checkSetupService,
   checkFieldsService,
   checkKibanaSettings,
   checkKibanaSettingsTimeFilter,
-  checkPatternSupportService
+  checkKibanaSettingsMaxBuckets,
+  checkPatternService,
+  checkPatternSupportService,
+  checkSetupService,
+  checkTemplateService,
 } from '../services';
 import { CheckResult } from '../components/check-result';
 import { withReduxProvider } from '../../common/hocs';
@@ -87,12 +88,14 @@ function HealthCheckComponent() {
   const [checksReady, setChecksReady] = useState<{[key: string]: boolean}>({});
   const appConfig = useAppConfig();
   const checksInitiated = useRef(false);
+  const $rootScope = useRootScope();
 
   useEffect(() => {
     if (appConfig.isReady && !checksInitiated.current) {
       checksInitiated.current = true;
       checkKibanaSettings(appConfig.data['checks.metaFields']);
       checkKibanaSettingsTimeFilter(appConfig.data['checks.timeFilter']);
+      checkKibanaSettingsMaxBuckets(appConfig.data['checks.maxBuckets']);
       AppState.setPatternSelector(appConfig.data['ip.selector']);
     }
   }, [appConfig]);
@@ -100,7 +103,14 @@ function HealthCheckComponent() {
   useEffect(() => {
     // Redirect to app when all checks are ready
     Object.keys(checks)
-      .every(check => checksReady[check]) && (window.location.href = getHttp().basePath.prepend('/app/wazuh#/overview'));
+      .every(check => checksReady[check])
+    && (() => setTimeout(() => {
+          const params = $rootScope.previousParams || {};
+          const queryString = Object.keys(params).map(key => key + '=' + params[key]).join('&');
+          const url = '/app/wazuh#' + ($rootScope.previousLocation || '') + '?' + queryString;
+          window.location.href = getHttp().basePath.prepend(url);
+        }, 300)
+      )()
   }, [checksReady]);
 
   const handleErrors = (checkID, errors, parsed) => {

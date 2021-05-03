@@ -15,7 +15,7 @@
 import { PatternHandler } from '../../../react-services';
 
 export const checkFieldsService = async (): Promise<{ errors: string[] }> => {
-  let errors: string[] = [];
+  const errors: string[] = [];
   await PatternHandler.refreshIndexPattern();
 
   return { errors };

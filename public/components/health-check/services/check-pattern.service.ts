@@ -17,15 +17,13 @@ import { HEALTH_CHECK } from '../../../../common/constants';
 
 export const checkPatternService = async (appConfig): Promise<{ errors: string[] }> => {
   const patternId = AppState.getCurrentPattern();
-  let errors: string[] = [];
+  const errors: string[] = [];
   const patternList = await PatternHandler.getPatternList(HEALTH_CHECK);
 
   const existsDefaultPattern = await SavedObject.existsIndexPattern(appConfig.data['pattern']);    
   existsDefaultPattern.status && getDataPlugin().indexPatterns.setDefault(appConfig.data['pattern'], true);
 
-  let patternData = patternId ? await SavedObject.existsIndexPattern(patternId) : false;
-
-  if (!patternData) patternData = {};
+  const patternData = patternId ? (await SavedObject.existsIndexPattern(patternId)) || {} : {} ;
 
   if (!patternData.status) {
     if (patternList.length) {

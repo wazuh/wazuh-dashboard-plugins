@@ -15,7 +15,7 @@
 import { AppState, GenericRequest, WzRequest } from '../../../react-services';
 
 export const checkSetupService = async (): Promise<{ errors: string[] }> => {
-  let errors: string[] = [];
+  const errors: string[] = [];
   const currentApi = JSON.parse(AppState.getCurrentAPI() || '{}');
   if (currentApi && currentApi.id) {
     const versionData = await WzRequest.apiReq('GET', '//', {});

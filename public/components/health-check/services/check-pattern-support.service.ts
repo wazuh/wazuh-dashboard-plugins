@@ -15,7 +15,7 @@ import { SavedObject } from '../../../react-services';
 import { getToasts } from '../../../kibana-services';
 
 export const checkPatternSupportService = async (pattern: string, indexType : string): Promise<{ errors: string[] }> => {
-  let errors: string[] = [];
+  const errors: string[] = [];
   const result = await SavedObject.existsIndexPattern(pattern);
   if (!result.data) {
     const toast = getToasts().addWarning(`${pattern} index pattern was not found and it will be created`);

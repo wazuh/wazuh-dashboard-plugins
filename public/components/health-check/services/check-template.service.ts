@@ -15,11 +15,10 @@
 import { AppState, GenericRequest, SavedObject } from '../../../react-services';
 
 export const checkTemplateService = async (): Promise<{ errors: string[] }> => {
-  let errors: string[] = [];
+  const errors: string[] = [];
   const patternId = AppState.getCurrentPattern();
   let patternTitle = '';
-  let patternData = patternId ? await SavedObject.existsIndexPattern(patternId) : false;
-  if (!patternData) patternData = {};
+  const patternData = patternId ? (await SavedObject.existsIndexPattern(patternId)) || {} : {};
   patternTitle = patternData.title;
 
   const templateData = await GenericRequest.request('GET', `/elastic/template/${patternTitle}`);
