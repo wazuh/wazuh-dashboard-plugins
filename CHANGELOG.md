@@ -5,7 +5,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.2.0 - Kibana 7.10.2 , 7.11.2 - Revision 4202
 
 ### Changed
-- Refactored the Health check component [#2682](https://github.com/wazuh/wazuh-kibana-app/issues/2682)
+- Refactored the Health check component [#3197](https://github.com/wazuh/wazuh-kibana-app/pull/3197)
 
 ## Wazuh v4.2.0 - Kibana 7.10.2 , 7.11.2 - Revision 4201
 
