@@ -66,7 +66,14 @@ export class PatternHandler {
             toastLifeTimeMs: 5000
           });
 
-          await SavedObject.createWazuhIndexPattern(pattern);
+          if (!indexPatternFound.length) {
+            if (await SavedObject.getExistingIndexPattern(pattern)) {
+              await SavedObject.refreshIndexPattern(pattern);
+            } else {
+              await SavedObject.createWazuhIndexPattern(pattern);
+            }
+          }
+
           getToasts().addSuccess(`${pattern} index pattern created successfully`)
           getDataPlugin().indexPatterns.setDefault(pattern, true);
         } catch (err) {

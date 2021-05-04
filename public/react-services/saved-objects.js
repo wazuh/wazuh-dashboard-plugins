@@ -156,7 +156,7 @@ export class SavedObject {
 
       return result.data;
     } catch (error) {
-      return ((error || {}).data || {}).message || false ? error.data.message : error.message || [];
+      return ((error || {}).data || {}).message || false ? error.data.message : error.message || false;
     }
   }
 
