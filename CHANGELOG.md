@@ -4,8 +4,9 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.2.0 - Kibana 7.10.0 , 7.10.2 - Revision 4202
 
 ### Fixed
-
+Hola
 - Fixed screen flickers in Cluster visualization [#3159](https://github.com/wazuh/wazuh-kibana-app/pull/3159)
+- Fixed fields overlap in the agent summary screen [#3217](https://github.com/wazuh/wazuh-kibana-app/pull/3217)
 
 ## Wazuh v4.2.0 - Kibana 7.10.2 , 7.11.2 - Revision 4202
 
