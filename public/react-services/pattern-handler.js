@@ -32,7 +32,10 @@ export class PatternHandler {
         function getIndexPatterns() {
           return new Promise(function (resolve, reject) {
             setTimeout(async function () {
-              const patternList = await SavedObject.getListOfWazuhValidIndexPatterns(AppState.getCurrentPattern(), where);
+              const patternList = await SavedObject.getListOfWazuhValidIndexPatterns(
+                defaultPatterns,
+                where
+              );
               resolve(patternList);
             }, 500);
           });
@@ -42,70 +45,68 @@ export class PatternHandler {
         // if the index pattern doesn't exist yet, we check 5 more times with a delay of 500ms
         while (i < 5 && !patternList.length) {
           i++;
-          patternList = await getIndexPatterns()
-            .then(
-              function (result) {
-                return result;
-              }
-            );
+          patternList = await getIndexPatterns().then(function (result) {
+            return result;
+          });
         }
-      }
 
-      const indexPatternFound = patternList.find((indexPattern) => indexPattern.title === pattern);
+        const indexPatternFound = patternList.find(
+          (indexPattern) => indexPattern.title === pattern
+        );
 
-      if (!indexPatternFound) {
-        // if no valid index patterns are found we try to create the wazuh-alerts-*
-        try {
+        if (!indexPatternFound) {
+          // if no valid index patterns are found we try to create the wazuh-alerts-*
+          try {
+            if (!pattern) return;
 
-          if (!pattern) return;
+            getToasts().add({
+              color: 'warning',
+              title: `No ${pattern} index pattern was found, proceeding to create it.`,
+              toastLifeTimeMs: 5000,
+            });
 
-          getToasts().add({
-            color: 'warning',
-            title:
-              `No ${pattern} index pattern was found, proceeding to create it.`,
-            toastLifeTimeMs: 5000
-          });
-
-          if (!indexPatternFound.length) {
-            if (await SavedObject.getExistingIndexPattern(pattern)) {
-              await SavedObject.refreshIndexPattern(pattern);
-            } else {
-              await SavedObject.createWazuhIndexPattern(pattern);
+            if (!indexPatternFound.length) {
+              if (await SavedObject.getExistingIndexPattern(pattern)) {
+                await SavedObject.refreshIndexPattern(pattern);
+              } else {
+                await SavedObject.createWazuhIndexPattern(pattern);
+              }
             }
+
+            getToasts().addSuccess(`${pattern} index pattern created successfully`);
+            getDataPlugin().indexPatterns.setDefault(pattern, true);
+          } catch (err) {
+            getToasts().add({
+              color: 'error',
+              title: 'Error creating the index pattern.',
+              text: err.message || err,
+              toastLifeTimeMs: 3000,
+            });
+            AppState.removeCurrentPattern();
+
+            this.wzMisc = new WzMisc();
+            this.wzMisc.setBlankScr(
+              'Sorry but no valid index patterns were found and creation was unsuccessful'
+            );
+            if (
+              !window.location.hash.includes('#/settings') &&
+              !window.location.hash.includes('#/blank-screen')
+            ) {
+              window.location.href = '/app/wazuh#/blank-screen/';
+            }
+            return;
           }
-
-          getToasts().addSuccess(`${pattern} index pattern created successfully`)
-          getDataPlugin().indexPatterns.setDefault(pattern, true);
-        } catch (err) {
-          getToasts().add({
-            color: 'error',
-            title: 'Error creating the index pattern.',
-            text: err.message || err,
-            toastLifeTimeMs: 3000
-          });
-          AppState.removeCurrentPattern();
-
-          this.wzMisc = new WzMisc();
-          this.wzMisc.setBlankScr(
-            'Sorry but no valid index patterns were found and creation was unsuccessful'
-          );
+          // retry again with the newly created index pattern
           if (
             !window.location.hash.includes('#/settings') &&
-            !window.location.hash.includes('#/blank-screen')
+            !window.location.hash.includes('#/health-check')
           ) {
-            window.location.href = '/app/wazuh#/blank-screen/';
+            window.location.href = '/app/wazuh#/health-check/';
           }
-          return;
+          patternList = await SavedObject.getListOfWazuhValidIndexPatterns(defaultPatterns, where);
         }
-        // retry again with the newly created index pattern
-        if (
-          !window.location.hash.includes('#/settings') &&
-          !window.location.hash.includes('#/health-check')
-        ) {
-          window.location.href = '/app/wazuh#/health-check/';
-        }
-        patternList = await SavedObject.getListOfWazuhValidIndexPatterns(AppState.getCurrentPattern(), where);
       }
+
       if (AppState.getCurrentPattern() && patternList.length) {
         let filtered = patternList.filter(
           item => item.id === AppState.getCurrentPattern()
