@@ -29,11 +29,9 @@ export class SavedObject {
     try {
       const result = await GenericRequest.request(
         'GET',
-        `/api/saved_objects/_find?type=index-pattern&search_fields=title&fields=fields&per_page=9999`
+        `/api/saved_objects/_find?type=index-pattern&search_fields=title&per_page=9999`
       );
-      const indexPatterns = ((result || {}).data || {}).saved_objects || [];
-
-      return indexPatterns;
+      return ((result || {}).data || {}).saved_objects || [];
     } catch (error) {
       return ((error || {}).data || {}).message || false
         ? error.data.message
@@ -53,12 +51,13 @@ export class SavedObject {
         // list = Promise.all(defaultIndexPatterns.map(async indexPattern => {
         //   return await SavedObject.existsIndexPattern(indexPattern);
         // }))
-        list = await SavedObject.existsIndexPattern(defaultIndexPatterns);
+        list = await SavedObject.getExistingIndexPattern(defaultIndexPatterns);
       }
 
       if (!list.length) {
         list = await this.getListOfIndexPatterns();
       }
+
       const result = this.validateIndexPatterns(list);
 
       return result.map(item => {
@@ -124,20 +123,37 @@ export class SavedObject {
     try {
       const result = await GenericRequest.request(
         'GET',
-        `/api/saved_objects/index-pattern/${patternID}?search_fields=title=title&fields=fields`
+        `/api/saved_objects/index-pattern/${patternID}?search_fields=title&fields=fields`
       );
-      const title = (((result || {}).data || {}).attributes || {}).title;
-      const fields = (((result || {}).data || {}).attributes || {}).fields;
 
+      const title = (((result || {}).data || {}).attributes || {}).title;
       if (title) {
         return {
           data: 'Index pattern found',
           status: true,
           statusCode: 200,
-          title: title,
-          fields: fields
+          title: title
         };
       }
+    } catch (error) {
+      return ((error || {}).data || {}).message || false
+        ? error.data.message
+        : error.message || error;
+    }
+  }
+
+  /**
+   *
+   * Given an index pattern ID, checks if it exists
+   */
+  static async getExistingIndexPattern(patternID) {
+    try {
+      const result = await GenericRequest.request(
+        'GET',
+        `/api/saved_objects/index-pattern/${patternID}?search_fields=title&fields=fields`
+      );
+
+      return [result.data];
     } catch (error) {
       return ((error || {}).data || {}).message || false
         ? error.data.message

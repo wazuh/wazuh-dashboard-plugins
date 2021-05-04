@@ -22,7 +22,7 @@ export class PatternHandler {
    */
   static async getPatternList(where) {
     try {
-      let patternList = await SavedObject.getListOfWazuhValidIndexPatterns(AppState.getCurrentPattern(), where);
+      let patternList = await SavedObject.getListOfWazuhValidIndexPatterns(AppState.getCurrentPattern(), where); // check (AppState.getCurrentPattern() is not an array)
 
       if (where === 'healthcheck') {
         function getIndexPatterns() {
