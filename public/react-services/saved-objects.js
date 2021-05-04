@@ -46,21 +46,22 @@ export class SavedObject {
    */
   static async getListOfWazuhValidIndexPatterns(defaultIndexPatterns, where) {
     try {
-      let list = [];
+      let result = [];
       if (where === 'healthcheck') {
-        // list = Promise.all(defaultIndexPatterns.map(async indexPattern => {
-        //   return await SavedObject.existsIndexPattern(indexPattern);
-        // }))
-        list = await SavedObject.getExistingIndexPattern(defaultIndexPatterns);
+        const list = await Promise.all(
+          defaultIndexPatterns.map(
+            async (pattern) => await SavedObject.getExistingIndexPattern(pattern)
+          )
+        );
+        result = this.validateIndexPatterns(list);
       }
 
-      if (!list.length) {
-        list = await this.getListOfIndexPatterns();
+      if (!result.length) {
+        const list = await this.getListOfIndexPatterns();
+        result = this.validateIndexPatterns(list);
       }
 
-      const result = this.validateIndexPatterns(list);
-
-      return result.map(item => {
+      return result.map((item) => {
         return { id: item.id, title: item.attributes.title };
       });
     } catch (error) {
@@ -123,7 +124,7 @@ export class SavedObject {
     try {
       const result = await GenericRequest.request(
         'GET',
-        `/api/saved_objects/index-pattern/${patternID}?search_fields=title&fields=fields`
+        `/api/saved_objects/index-pattern/${patternID}?fields=title&fields=fields&per_page=9999`
       );
 
       const title = (((result || {}).data || {}).attributes || {}).title;
@@ -150,14 +151,12 @@ export class SavedObject {
     try {
       const result = await GenericRequest.request(
         'GET',
-        `/api/saved_objects/index-pattern/${patternID}?search_fields=title&fields=fields`
+        `/api/saved_objects/index-pattern/${patternID}?fields=title&fields=fields`
       );
 
-      return [result.data];
+      return result.data;
     } catch (error) {
-      return ((error || {}).data || {}).message || false
-        ? error.data.message
-        : error.message || [] ;
+      return ((error || {}).data || {}).message || false ? error.data.message : error.message || [];
     }
   }
 

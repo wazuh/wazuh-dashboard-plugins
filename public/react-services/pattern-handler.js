@@ -22,7 +22,11 @@ export class PatternHandler {
    */
   static async getPatternList(where) {
     try {
-      let patternList = await SavedObject.getListOfWazuhValidIndexPatterns(AppState.getCurrentPattern(), where); // check (AppState.getCurrentPattern() is not an array)
+      const wazuhConfig = new WazuhConfig();
+      const { pattern } = wazuhConfig.getConfig();
+
+      const defaultPatterns = [AppState.getCurrentPattern(), pattern];
+      let patternList = await SavedObject.getListOfWazuhValidIndexPatterns(defaultPatterns, where);
 
       if (where === 'healthcheck') {
         function getIndexPatterns() {
@@ -47,8 +51,6 @@ export class PatternHandler {
         }
       }
 
-      const wazuhConfig = new WazuhConfig();
-      const { pattern } = wazuhConfig.getConfig();
       const indexPatternFound = patternList.find((indexPattern) => indexPattern.title === pattern);
 
       if (!indexPatternFound) {
