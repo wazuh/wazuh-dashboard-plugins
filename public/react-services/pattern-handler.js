@@ -22,18 +22,19 @@ export class PatternHandler {
    */
   static async getPatternList(where) {
     try {
-      var patternList = await SavedObject.getListOfWazuhValidIndexPatterns();
+      let patternList = await SavedObject.getListOfWazuhValidIndexPatterns(AppState.getCurrentPattern(), where);
 
       if (where === 'healthcheck') {
         function getIndexPatterns() {
           return new Promise(function (resolve, reject) {
             setTimeout(async function () {
-              var patternList = await SavedObject.getListOfWazuhValidIndexPatterns();
+              const patternList = await SavedObject.getListOfWazuhValidIndexPatterns(AppState.getCurrentPattern(), where);
               resolve(patternList);
             }, 500);
           });
         }
-        var i = 0;
+
+        let i = 0;
         // if the index pattern doesn't exist yet, we check 5 more times with a delay of 500ms
         while (i < 5 && !patternList.length) {
           i++;
@@ -94,7 +95,7 @@ export class PatternHandler {
         ) {
           window.location.href = '/app/wazuh#/health-check/';
         }
-        patternList = await SavedObject.getListOfWazuhValidIndexPatterns();
+        patternList = await SavedObject.getListOfWazuhValidIndexPatterns(AppState.getCurrentPattern(), where);
       }
       if (AppState.getCurrentPattern() && patternList.length) {
         let filtered = patternList.filter(
