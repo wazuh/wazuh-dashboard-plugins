@@ -153,12 +153,15 @@ export class SavedObject {
     try {
       const result = await GenericRequest.request(
         'GET',
-        `/api/saved_objects/index-pattern/${patternID}?fields=title&fields=fields`
+        `/api/saved_objects/index-pattern/${patternID}?fields=title&fields=fields`,
+        null,
+        true
       );
 
       return result.data;
     } catch (error) {
-      return ((error || {}).data || {}).message || false ? error.data.message : error.message || false;
+      if (error && error.response && error.response.status == 404) return false;
+      return Promise.reject(((error || {}).data || {}).message || false ? error.data.message : error.message || `Error getting the '${patternID}' index pattern`);
     }
   }
 
