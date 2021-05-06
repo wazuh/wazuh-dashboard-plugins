@@ -76,15 +76,15 @@ export class SavedObject {
     return list.filter(item => {
       if (item.attributes && item.attributes.fields) {
         const fields = JSON.parse(item.attributes.fields);
-        const minimum = [
+        const requiredFields = [
           'timestamp',
           'rule.groups',
           'manager.name',
           'agent.id',
         ];
-        return minimum.every((field => {
-          return fields.hasOwnProperty(field);
-        }));        
+        return requiredFields.every((reqField => {
+          return fields.find(field => field.name = reqField);
+        }));
       }
       return false;
     });
