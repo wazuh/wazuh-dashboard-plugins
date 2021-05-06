@@ -76,23 +76,15 @@ export class SavedObject {
     return list.filter(item => {
       if (item.attributes && item.attributes.fields) {
         const fields = JSON.parse(item.attributes.fields);
-        const minimum = {
-          timestamp: true,
-          'rule.groups': true,
-          'manager.name': true,
-          'agent.id': true,
-        };
-        let validCount = 0;
-
-        fields.map(currentField => {
-          if (minimum[currentField.name]) {
-            validCount++;
-          }
-        });
-
-        if (validCount === 4) {
-          return true;
-        }
+        const minimum = [
+          'timestamp',
+          'rule.groups',
+          'manager.name',
+          'agent.id',
+        ];
+        return minimum.every((field => {
+          return fields.hasOwnProperty(field);
+        }));        
       }
       return false;
     });
@@ -129,6 +121,7 @@ export class SavedObject {
 
       return result.data;
     } catch (error) {
+      if (error && error.response && error.response.status == 404) return false;
       return ((error || {}).data || {}).message || false ? error.data.message : error.message || false;
     }
   }
