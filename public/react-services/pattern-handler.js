@@ -9,9 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { GenericRequest } from './generic-request';
 import { AppState } from './app-state';
-import { WzMisc } from '../factories/misc';
 import { SavedObject } from './saved-objects';
 import { getDataPlugin, getToasts, getHttp } from '../kibana-services';
 import { WazuhConfig } from '../react-services/wazuh-config';
@@ -23,17 +21,18 @@ export class PatternHandler {
    */
   static async getPatternList(origin) {
     try {
-      var patternList = await SavedObject.getListOfWazuhValidIndexPatterns();
+      const wazuhConfig = new WazuhConfig();
+      const { pattern } = wazuhConfig.getConfig();
 
-      if (origin == HEALTH_CHECK) {
-        const wazuhConfig = new WazuhConfig();
-        const { pattern } = wazuhConfig.getConfig();
+      const defaultPatterns = [AppState.getCurrentPattern(), pattern];
+      let patternList = await SavedObject.getListOfWazuhValidIndexPatterns(defaultPatterns, origin);
+
+      if (origin === HEALTH_CHECK) {
         const indexPatternFound = patternList.find((indexPattern) => indexPattern.title === pattern);
 
         if (!indexPatternFound && pattern) {
           // if no valid index patterns are found we try to create the wazuh-alerts-*
           try {
-
             getToasts().add({
               color: 'warning',
               title:
@@ -41,7 +40,14 @@ export class PatternHandler {
               toastLifeTimeMs: 5000
             });
 
-            await SavedObject.createWazuhIndexPattern(pattern);
+            if (!indexPatternFound.length) {
+              if (await SavedObject.getExistingIndexPattern(pattern)) {
+                await SavedObject.refreshIndexPattern(pattern);
+              } else {
+                await SavedObject.createWazuhIndexPattern(pattern);
+              }
+            }
+
             getToasts().addSuccess(`${pattern} index pattern created successfully`);
             !AppState.getCurrentPattern() && AppState.setCurrentPattern(pattern);
           } catch (err) {
@@ -51,11 +57,11 @@ export class PatternHandler {
               toastLifeTimeMs: 3000
             });
             AppState.removeCurrentPattern();
-            
+
             return;
           }
         }
-        patternList = await SavedObject.getListOfWazuhValidIndexPatterns();
+        patternList = await SavedObject.getListOfWazuhValidIndexPatterns(defaultPatterns, origin);
       }
       if (AppState.getCurrentPattern() && patternList.length) {
         let filtered = patternList.filter(
@@ -69,7 +75,6 @@ export class PatternHandler {
       console.error("getPatternList", error)
       throw new Error('Error Pattern Handler (getPatternList)');
     }
-    return;
   }
 
   /**
