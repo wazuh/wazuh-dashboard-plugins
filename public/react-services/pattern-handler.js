@@ -9,7 +9,6 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { GenericRequest } from './generic-request';
 import { AppState } from './app-state';
 import { WzMisc } from '../factories/misc';
 import { SavedObject } from './saved-objects';
