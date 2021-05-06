@@ -13,7 +13,7 @@ import { GenericRequest } from './generic-request';
 import { AppState } from './app-state';
 import { WzMisc } from '../factories/misc';
 import { SavedObject } from './saved-objects';
-import { getDataPlugin, getToasts } from '../kibana-services';
+import { getDataPlugin, getHttp, getToasts } from '../kibana-services';
 import { WazuhConfig } from '../react-services/wazuh-config';
 
 export class PatternHandler {
@@ -93,7 +93,7 @@ export class PatternHandler {
               !window.location.hash.includes('#/settings') &&
               !window.location.hash.includes('#/blank-screen')
             ) {
-              window.location.href = '/app/wazuh#/blank-screen/';
+              window.location.href = getHttp().basePath.prepend('/app/wazuh#/blank-screen/');
             }
             return;
           }
@@ -102,7 +102,7 @@ export class PatternHandler {
             !window.location.hash.includes('#/settings') &&
             !window.location.hash.includes('#/health-check')
           ) {
-            window.location.href = '/app/wazuh#/health-check/';
+            window.location.href = getHttp().basePath.prepend('/app/wazuh#/health-check/');
           }
           patternList = await SavedObject.getListOfWazuhValidIndexPatterns(defaultPatterns, where);
         }
