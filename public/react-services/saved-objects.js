@@ -29,7 +29,7 @@ export class SavedObject {
     try {
       const result = await GenericRequest.request(
         'GET',
-        `/api/saved_objects/_find?type=index-pattern&search_fields=title&per_page=9999`
+        `/api/saved_objects/_find?type=index-pattern&fields=title&fields=fields&per_page=9999`
       );
       return ((result || {}).data || {}).saved_objects || [];
     } catch (error) {
@@ -124,16 +124,18 @@ export class SavedObject {
     try {
       const result = await GenericRequest.request(
         'GET',
-        `/api/saved_objects/index-pattern/${patternID}?fields=title&fields=fields&per_page=9999`
+        `/api/saved_objects/index-pattern/${patternID}?fields=title&fields=fields`
       );
 
       const title = (((result || {}).data || {}).attributes || {}).title;
+      const fields = (((result || {}).data || {}).attributes || {}).fields;
       if (title) {
         return {
           data: 'Index pattern found',
           status: true,
           statusCode: 200,
-          title: title
+          title,
+          fields
         };
       }
     } catch (error) {

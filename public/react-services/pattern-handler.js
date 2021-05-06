@@ -25,7 +25,9 @@ export class PatternHandler {
       const wazuhConfig = new WazuhConfig();
       const { pattern } = wazuhConfig.getConfig();
 
-      const defaultPatterns = [AppState.getCurrentPattern(), pattern];
+      const defaultPatterns = [pattern];
+      const selectedPattern = AppState.getCurrentPattern();
+      if (selectedPattern && selectedPattern !== pattern) defaultPatterns.push(selectedPattern);
       let patternList = await SavedObject.getListOfWazuhValidIndexPatterns(defaultPatterns, where);
 
       if (where === 'healthcheck') {
@@ -65,15 +67,14 @@ export class PatternHandler {
               toastLifeTimeMs: 5000,
             });
 
-            if (!indexPatternFound.length) {
-              if (await SavedObject.getExistingIndexPattern(pattern)) {
-                await SavedObject.refreshIndexPattern(pattern);
-              } else {
-                await SavedObject.createWazuhIndexPattern(pattern);
-              }
+            if (await SavedObject.getExistingIndexPattern(pattern)) {
+              await SavedObject.refreshIndexPattern(pattern);
+              getToasts().addSuccess(`${pattern} index pattern updated successfully`);
+            } else {
+              await SavedObject.createWazuhIndexPattern(pattern);
+              getToasts().addSuccess(`${pattern} index pattern created successfully`);
             }
 
-            getToasts().addSuccess(`${pattern} index pattern created successfully`);
             getDataPlugin().indexPatterns.setDefault(pattern, true);
           } catch (err) {
             getToasts().add({
