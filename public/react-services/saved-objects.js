@@ -72,15 +72,15 @@ export class SavedObject {
   }
 
   static validateIndexPatterns(list) {
+    const requiredFields = [
+      'timestamp',
+      'rule.groups',
+      'manager.name',
+      'agent.id',
+    ];
     return list.filter(item => {
       if (item.attributes && item.attributes.fields) {
         const fields = JSON.parse(item.attributes.fields);
-        const requiredFields = [
-          'timestamp',
-          'rule.groups',
-          'manager.name',
-          'agent.id',
-        ];
         return requiredFields.every((reqField => {
           return fields.find(field => field.name = reqField);
         }));        
