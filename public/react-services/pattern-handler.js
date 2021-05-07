@@ -108,18 +108,15 @@ export class PatternHandler {
       }
 
       if (AppState.getCurrentPattern() && patternList.length) {
-        let filtered = patternList.filter(
-          item => item.id === AppState.getCurrentPattern()
-        );
+        let filtered = patternList.filter((item) => item.id === AppState.getCurrentPattern());
         if (!filtered.length) AppState.setCurrentPattern(patternList[0].id);
       }
 
       return patternList;
     } catch (error) {
-      console.error("getPatternList", error)
+      console.error('getPatternList', error);
       throw new Error('Error Pattern Handler (getPatternList)');
     }
-    return;
   }
 
   /**
@@ -134,13 +131,12 @@ export class PatternHandler {
     } catch (error) {
       throw new Error('Error Pattern Handler (changePattern)');
     }
-    return;
   }
 
   /**
- * Refresh current pattern for the given pattern
- * @param {String} pattern
- */
+   * Refresh current pattern for the given pattern
+   * @param newFields
+   */
   static async refreshIndexPattern(newFields = null) {
     try {
       const currentPattern = AppState.getCurrentPattern();
