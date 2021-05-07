@@ -306,6 +306,7 @@ export class RegisterAgent extends Component {
       return deployment.replaceAll('=', ' ');
     }
 
+    return deployment;
   }
 
   resolveRPMPackage() {
