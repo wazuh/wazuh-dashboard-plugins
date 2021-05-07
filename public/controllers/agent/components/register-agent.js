@@ -289,7 +289,7 @@ export class RegisterAgent extends Component {
       deployment += `WAZUH_REGISTRATION_SERVER='${this.state.serverAddress}' `;
     }
 
-    if (true) {
+    if (this.state.wazuhPassword) {
       deployment += `WAZUH_REGISTRATION_PASSWORD='${this.state.wazuhPassword}' `;
     }
 
