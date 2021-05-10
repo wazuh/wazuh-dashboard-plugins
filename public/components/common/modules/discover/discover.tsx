@@ -19,7 +19,7 @@ import { AppNavigate } from '../../../../react-services/app-navigate';
 import { RowDetails } from './row-details';
 import DateMatch from '@elastic/datemath';
 import { WazuhConfig } from '../../../../react-services/wazuh-config';
-import { TimeService } from '../../../../react-services/time-service';
+import { formatUIDate } from '../../../../react-services/time-service';
 import { KbnSearchBar } from '../../../kbn-search-bar';
 import { FlyoutTechnique } from '../../../../components/overview/mitre/components/techniques/components/flyout-technique';
 import { withReduxProvider } from '../../../common/hocs';
@@ -69,7 +69,6 @@ export const Discover = compose(
   };
 
   KibanaServices: { [key: string]: any };
-  filterManager: FilterManager;
   state: {
     sort: object
     selectedTechnique: string,
@@ -87,9 +86,7 @@ export const Discover = compose(
     query: { language: "kuery" | "lucene", query: string }
     itemIdToExpandedRowMap: any
     dateRange: TimeRange
-    searchBarFilters: []
     elasticQuery: object
-    filters: []
     columns: string[]
     hover: string
   };
@@ -102,13 +99,12 @@ export const Discover = compose(
     updateTotalHits: Function,
     includeFilters?: string,
     initialColumns: string[],
-    shareFilterManager: object[],
+    shareFilterManager: FilterManager,
     refreshAngularDiscover?: number
   }
   constructor(props) {
     super(props);
     this.KibanaServices = getDataPlugin();
-    this.filterManager = props.shareFilterManager ? this.KibanaServices.query.filterManager : new FilterManager(getUiSettings());
     this.timefilter = this.KibanaServices.query.timefilter.timefilter;
     this.state = {
       sort: {},
@@ -127,9 +123,7 @@ export const Discover = compose(
       itemIdToExpandedRowMap: {},
       dateRange: this.timefilter.getTime(),
       query: props.query || { language: "kuery", query: "" },
-      searchBarFilters: [],
       elasticQuery: {},
-      filters: props.initialFilters,
       columns: [],
       hover: ""
     }
@@ -168,8 +162,8 @@ export const Discover = compose(
   async componentDidMount() {
     this._isMount = true;
     try {
-      this.setState({columns: this.getColumns(), searchBarFilters: this.props.shareFilterManager || []}) //initial columns
-      await this.getIndexPattern(); 
+      this.setState({columns: this.getColumns()}) //initial columns
+      await this.getIndexPattern();
       await this.getAlerts();
     } catch (err) {
       console.log(err);
@@ -182,7 +176,7 @@ export const Discover = compose(
 
   async componentDidUpdate(prevProps, prevState) {
     if (!this._isMount) { return; }
-    if((!prevProps.currentAgentData.id && this.props.currentAgentData.id) || (prevProps.currentAgentData.id && !this.props.currentAgentData.id)){
+    if((!prevProps.currentAgentData.id && this.props.currentAgentData.id) || (prevProps.currentAgentData.id && !this.props.currentAgentData.id) || prevProps.currentAgentData.id !== this.props.currentAgentData.id){
       this.setState({ columns: this.getColumns() }); // Updates the columns to be rendered if you change the selected agent to none or vice versa
       return;
     }
@@ -190,17 +184,14 @@ export const Discover = compose(
       this.setState({ query: {...this.props.query}});
       return;
     };
-    if((!_.isEqual(this.props.shareFilterManager, prevProps.shareFilterManager))
-      || (this.props.currentAgentData.id !== prevProps.currentAgentData.id)
+    if((this.props.currentAgentData.id !== prevProps.currentAgentData.id)
       || (!_.isEqual(this.state.query, prevState.query))
-      || (!_.isEqual(this.state.searchBarFilters, prevState.searchBarFilters))
       || (!_.isEqual(this.state.dateRange, prevState.dateRange))
       || (this.props.refreshAngularDiscover !== prevProps.refreshAngularDiscover)
     ){
       this.setState({ pageIndex: 0 , tsUpdated: Date.now()});
       return;
     };
-
     if(['pageIndex', 'pageSize', 'sortField', 'sortDirection'].some(field => this.state[field] !== prevState[field]) || (this.state.tsUpdated !== prevState.tsUpdated)){
       try {
         await this.getAlerts();
@@ -260,10 +251,6 @@ export const Discover = compose(
     return result;
   }
 
-  onFiltersChange = (filters) => {
-    this.setState({ filters: this.filtersAsArray(filters) });
-  }
-
   toggleDetails = item => {
     const itemIdToExpandedRowMap = { ...this.state.itemIdToExpandedRowMap };
     if (itemIdToExpandedRowMap[item._id]) {
@@ -280,7 +267,6 @@ export const Discover = compose(
 
   buildFilter() {
     const dateParse = ds => /\d+-\d+-\d+T\d+:\d+:\d+.\d+Z/.test(ds) ? DateMatch.parse(ds).toDate().getTime() : ds;
-    const { searchBarFilters } = this.state;
     const { query } = this.state;
     const { hideManagerAlerts } = this.wazuhConfig.getConfig();
     const extraFilters = [];
@@ -298,12 +284,14 @@ export const Discover = compose(
       $state: { store: 'appState' }
     });
 
-    const shareFilterManager = this.props.shareFilterManager || [];
+    const filters = this.props.shareFilterManager ? this.props.shareFilterManager.filters : [];
+    const previousFilters = this.KibanaServices && this.KibanaServices.query.filterManager.filters ? this.KibanaServices.query.filterManager.filters : [];
+    
     const elasticQuery =
       buildEsQuery(
         undefined,
         query,
-        [...searchBarFilters, ...extraFilters, ...shareFilterManager],
+        [...previousFilters, ...filters, ...extraFilters],
         getEsQueryConfig(getUiSettings())
       );
 
@@ -344,23 +332,21 @@ export const Discover = compose(
     const newFilters = this.buildFilter();
     try {
         this.setState({ isLoading: true});
-
         const alerts = await GenericRequest.request(
           'POST',
           `/elastic/alerts`,
           {
-            index: AppState.getCurrentPattern(),
+            index: this.indexPattern.title,
             body: newFilters
           }
         );
-
         if (this._isMount) {
-          this.setState({ alerts: alerts.data.hits.hits, total: alerts.data.hits.total.value, isLoading: false, requestFilters: newFilters, filters: newFilters.filters });
+        this.setState({ alerts: alerts.data.hits.hits, total: alerts.data.hits.total.value, isLoading: false, requestFilters: newFilters});
           this.props.updateTotalHits(alerts.data.hits.total.value);
         }
     } catch (err) {
       if (this._isMount) {
-        this.setState({ alerts: [], total: 0, isLoading: false, requestFilters: newFilters, filters: newFilters.filters });
+        this.setState({ alerts: [], total: 0, isLoading: false, requestFilters: newFilters});
         this.props.updateTotalHits(0);
       }
     }
@@ -412,7 +398,7 @@ export const Discover = compose(
           width: '10%',
           sortable: true,
           render: time => {
-            return <span>{TimeService.offset(time)}</span>
+            return <span>{formatUIDate(time)}</span>
           },
         }
       }
@@ -521,19 +507,17 @@ export const Discover = compose(
   * @param filter 
   */
   addFilterOut(filter) {
+    const filterManager = this.props.shareFilterManager;
     const key = Object.keys(filter)[0];
     const value = filter[key];
     const valuesArray = Array.isArray(value) ? [...value] : [value];
-    const filters = this.state.searchBarFilters;
     valuesArray.map((item) => {
       const formattedFilter = buildPhraseFilter({ name: key, type: "string" }, item, this.indexPattern);
       formattedFilter.meta.negate = true;
 
-      filters.push(formattedFilter);
+      filterManager.addFilters(formattedFilter);
     })
-
-    this.filterManager.setFilters(filters);
-    if (!this.props.shareFilterManager) this.setState({ searchBarFilters: filters });
+    this.setState({ pageIndex: 0 , tsUpdated: Date.now()});
   }
 
   /**
@@ -541,20 +525,18 @@ export const Discover = compose(
    * @param filter 
    */
   addFilter(filter) {
+    const filterManager = this.props.shareFilterManager;
     const key = Object.keys(filter)[0];
     const value = filter[key];
     const valuesArray = Array.isArray(value) ? [...value] : [value];
-    const filters = []; //this.state.searchBarFilters;
     valuesArray.map((item) => {
       const formattedFilter = buildPhraseFilter({ name: key, type: "string" }, item, this.indexPattern);
       if (formattedFilter.meta.key === 'manager.name' || formattedFilter.meta.key === 'cluster.name') {
         formattedFilter.meta["removable"] = false;
       }
-      filters.push(formattedFilter);
+      filterManager.addFilters(formattedFilter);
     })
-    this.filterManager.addFilters(filters);
-    if (!this.props.shareFilterManager) this.setState({ searchBarFilters: filters });
-
+    this.setState({ pageIndex: 0 , tsUpdated: Date.now()});
   }
 
   onQuerySubmit = (payload: { dateRange: TimeRange, query: Query | undefined }) => {
@@ -562,7 +544,7 @@ export const Discover = compose(
   }
 
   onFiltersUpdated = (filters: Filter[]) => {
-    this.setState({ searchBarFilters: filters });
+    this.setState({ pageIndex: 0 , tsUpdated: Date.now()});
   }
 
   closeMitreFlyout = () => {
@@ -624,9 +606,9 @@ export const Discover = compose(
     return (
       <div
         className='wz-discover hide-filter-control wz-inventory' >
-        {!this.props.shareFilterManager && <KbnSearchBar
+        {this.props.kbnSearchBar && <KbnSearchBar
           indexPattern={this.indexPattern}
-          filterManager={this.filterManager}
+          filterManager={this.props.shareFilterManager}
           onQuerySubmit={this.onQuerySubmit}
           onFiltersUpdated={this.onFiltersUpdated}
           query={query} />

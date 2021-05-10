@@ -83,7 +83,7 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
     setIsLogicalPopoverOpen(isLogicalPopoverOpen => !isLogicalPopoverOpen);
   const closeLogicalPopover = () => setIsLogicalPopoverOpen(false);
 
-  const selectOperator = op => {
+  const selectOperator = op => {  
     setLogicalOperator(op);
     closeLogicalPopover();
   };
@@ -111,17 +111,31 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
     rulesTmp.splice(id, 1);
     setRules(rulesTmp);
   };
+  
+  const getRulesFromJson = (jsonRule) => {
+    if (jsonRule !== '{}' && jsonRule !== '') {
+      // empty json is valid
+      const { customRules, internalUsersRules, wrongFormat, logicalOperator } = decodeJsonRule(
+        jsonRule,
+        internalUsers
+      );
 
-  const getRulesFromJson = jsonRule => {
-    const { customRules, internalUsersRules, wrongFormat, logicalOperator } = decodeJsonRule(
-      jsonRule,
-      internalUsers
-    );
-    setLogicalOperator(logicalOperator);
-    setHasWrongFormat(wrongFormat);
-    return { customRules, internalUsersRules, wrongFormat, logicalOperator };
+      setLogicalOperator(logicalOperator);
+      setHasWrongFormat(wrongFormat);
+
+      return { customRules, internalUsersRules, wrongFormat, logicalOperator };
+    } else {
+      setLogicalOperator('');
+      setHasWrongFormat(false);
+
+      return {
+        customRules: [],
+        internalUsersRules: [],
+        wrongFormat: false,
+        logicalOperator: 'OR',
+      };
+    }
   };
-
   const printRules = () => {
     const rulesList = rules.map((item, idx) => {
       return (
@@ -189,8 +203,9 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
     setRules(rulesTmp);
   };
 
-  const openJsonEditor = () => {
+  const openJsonEditor = () => {  
     const ruleObject = getJsonFromRule(internalUserRules, rules, logicalOperator);
+    
     setRuleJson(JSON.stringify(ruleObject, undefined, 2));
     setIsJsonEditor(true);
   };
@@ -228,6 +243,10 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
 
   const saveRule = () => {
     if (isJsonEditor) {
+      // if json editor is empty
+      if (ruleJson === '') {       
+        setRuleJson('{}');
+      }
       save(JSON.parse(ruleJson));
     } else {
       save(getJsonFromRule(internalUserRules, rules, logicalOperator));

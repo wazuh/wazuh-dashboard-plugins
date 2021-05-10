@@ -11,13 +11,11 @@
  */
 import React, { Component } from 'react';
 import { EuiFlexGroup, EuiFlexItem, EuiFlexGrid, EuiButtonEmpty, EuiSideNav, EuiIcon, EuiButtonIcon } from '@elastic/eui';
-import { WzRequest } from './../../../../react-services/wz-request';
 import { connect } from 'react-redux';
-import store from './../../../../redux/store';
-import { updateCurrentAgentData } from '../../../../redux/actions/appStateActions';
-import { AppState } from './../../../../react-services/app-state';
-import { UnsupportedComponents } from './../../../../utils/components-os-support';
-import { getAngularModule, getToasts }  from '../../../../kibana-services';
+import { AppState } from '../../../../react-services/app-state';
+import { hasAgentSupportModule } from '../../../../react-services/wz-agents';
+import { getAngularModule, getToasts } from '../../../../kibana-services';
+import { WAZUH_MODULES_ID } from '../../../../../common/constants';
 
 class WzMenuAgent extends Component {
   constructor(props) {
@@ -51,33 +49,52 @@ class WzMenuAgent extends Component {
         text: 'Regulatory Compliance',
         isTitle: true
       },
-      general: { id: 'general', text: 'Security events', isPin: this.menuAgent.general ? this.menuAgent.general : false },
-      fim: { id: 'fim', text: 'Integrity monitoring', isPin: this.menuAgent.fim ? this.menuAgent.fim : false },
-      aws: { id: 'aws', text: 'Amazon AWS', isPin: this.menuAgent.aws ? this.menuAgent.aws : false },
-      gcp: { id: 'gcp', text: 'Google Cloud Platform', isPin: this.menuAgent.gcp ? this.menuAgent.gcp : false },
-      pm: { id: 'pm', text: 'Policy Monitoring', isPin: this.menuAgent.pm ? this.menuAgent.pm : false },
-      sca: { id: 'sca', text: 'Security configuration assessment', isPin: this.menuAgent.sca ? this.menuAgent.sca : false },
-      audit: { id: 'audit', text: 'System Auditing', isPin: this.menuAgent.audit ? this.menuAgent.audit : false },
-      oscap: { id: 'oscap', text: 'OpenSCAP', isPin: this.menuAgent.oscap ? this.menuAgent.oscap : false },
-      ciscat: { id: 'ciscat', text: 'CIS-CAT', isPin: this.menuAgent.oscap ? this.menuAgent.oscap : false },
-      vuls: { id: 'vuls', text: 'Vulnerabilities', isPin: this.menuAgent.vuls ? this.menuAgent.vuls : false },
-      virustotal: { id: 'virustotal', text: 'VirusTotal', isPin: this.menuAgent.virustotal ? this.menuAgent.virustotal : false },
-      osquery: { id: 'osquery', text: 'Osquery', isPin: this.menuAgent.osquery ? this.menuAgent.osquery : false },
-      docker: { id: 'docker', text: 'Docker Listener', isPin: this.menuAgent.docker ? this.menuAgent.docker : false },
-      mitre: { id: 'mitre', text: 'MITRE ATT&CK', isPin: this.menuAgent.mitre ? this.menuAgent.mitre : false },
-      pci: { id: 'pci', text: 'PCI DSS', isPin: this.menuAgent.pci ? this.menuAgent.pci : false },
-      gdpr: { id: 'gdpr', text: 'GDPR', isPin: this.menuAgent.gdpr ? this.menuAgent.gdpr : false },
-      hipaa: { id: 'hipaa', text: 'HIPAA', isPin: this.menuAgent.hipaa ? this.menuAgent.hipaa : false },
-      nist: { id: 'nist', text: 'NIST 800-53', isPin: this.menuAgent.nist ? this.menuAgent.nist : false },
-      tsc: { id: 'tsc', text: 'TSC', isPin: this.menuAgent.tsc ? this.menuAgent.tsc : false }
+      general: { id: WAZUH_MODULES_ID.SECURITY_EVENTS, text: 'Security events', isPin: this.menuAgent.general ? this.menuAgent.general : false },
+      fim: { id: WAZUH_MODULES_ID.INTEGRITY_MONITORING, text: 'Integrity monitoring', isPin: this.menuAgent.fim ? this.menuAgent.fim : false },
+      aws: { id: WAZUH_MODULES_ID.AMAZON_WEB_SERVICES, text: 'Amazon AWS', isPin: this.menuAgent.aws ? this.menuAgent.aws : false },
+      gcp: { id: WAZUH_MODULES_ID.GOOGLE_CLOUD_PLATFORM, text: 'Google Cloud Platform', isPin: this.menuAgent.gcp ? this.menuAgent.gcp : false },
+      pm: { id: WAZUH_MODULES_ID.POLICY_MONITORING, text: 'Policy Monitoring', isPin: this.menuAgent.pm ? this.menuAgent.pm : false },
+      sca: { id: WAZUH_MODULES_ID.SECURITY_CONFIGURATION_ASSESSMENT, text: 'Security configuration assessment', isPin: this.menuAgent.sca ? this.menuAgent.sca : false },
+      audit: { id: WAZUH_MODULES_ID.AUDITING, text: 'System Auditing', isPin: this.menuAgent.audit ? this.menuAgent.audit : false },
+      oscap: { id: WAZUH_MODULES_ID.OPEN_SCAP, text: 'OpenSCAP', isPin: this.menuAgent.oscap ? this.menuAgent.oscap : false },
+      ciscat: { id: WAZUH_MODULES_ID.CIS_CAT, text: 'CIS-CAT', isPin: this.menuAgent.oscap ? this.menuAgent.oscap : false },
+      vuls: { id: WAZUH_MODULES_ID.VULNERABILITIES, text: 'Vulnerabilities', isPin: this.menuAgent.vuls ? this.menuAgent.vuls : false },
+      virustotal: { id: WAZUH_MODULES_ID.VIRUSTOTAL, text: 'VirusTotal', isPin: this.menuAgent.virustotal ? this.menuAgent.virustotal : false },
+      osquery: { id: WAZUH_MODULES_ID.OSQUERY, text: 'Osquery', isPin: this.menuAgent.osquery ? this.menuAgent.osquery : false },
+      docker: { id: WAZUH_MODULES_ID.DOCKER, text: 'Docker Listener', isPin: this.menuAgent.docker ? this.menuAgent.docker : false },
+      mitre: { id: WAZUH_MODULES_ID.MITRE_ATTACK, text: 'MITRE ATT&CK', isPin: this.menuAgent.mitre ? this.menuAgent.mitre : false },
+      pci: { id: WAZUH_MODULES_ID.PCI_DSS, text: 'PCI DSS', isPin: this.menuAgent.pci ? this.menuAgent.pci : false },
+      gdpr: { id: WAZUH_MODULES_ID.GDPR, text: 'GDPR', isPin: this.menuAgent.gdpr ? this.menuAgent.gdpr : false },
+      hipaa: { id: WAZUH_MODULES_ID.HIPAA, text: 'HIPAA', isPin: this.menuAgent.hipaa ? this.menuAgent.hipaa : false },
+      nist: { id: WAZUH_MODULES_ID.NIST_800_53, text: 'NIST 800-53', isPin: this.menuAgent.nist ? this.menuAgent.nist : false },
+      tsc: { id: WAZUH_MODULES_ID.TSC, text: 'TSC', isPin: this.menuAgent.tsc ? this.menuAgent.tsc : false }
     };
 
-    this.wzReq = WzRequest;
+    this.securityInformationItems = [
+      this.agentSections.general,
+      this.agentSections.fim,
+      this.agentSections.aws,
+      this.agentSections.gcp
+    ];
+    this.auditingItems = [
+      this.agentSections.pm,
+      this.agentSections.ciscat,
+      this.agentSections.sca
+    ];
+    this.threatDetectionItems = [
+      this.agentSections.virustotal,
+      this.agentSections.osquery,
+      this.agentSections.mitre
+    ];
+    this.regulatoryComplianceItems = [
+      this.agentSections.pci,
+      this.agentSections.gdpr,
+      this.agentSections.hipaa,
+      this.agentSections.nist,
+      this.agentSections.tsc
+    ];
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    // You don't have to do this check first, but it can help prevent an unneeded render
-  }
 
   async componentDidMount() {
     const extensions = await AppState.getExtensions(this.currentApi);
@@ -88,12 +105,10 @@ class WzMenuAgent extends Component {
 
   clickMenuItem = section => {
     this.props.closePopover();
-    const currentTab = (((store || {}).getState() || {}).appStateReducers || {})
-      .currentTab;
-    if (currentTab !== section) {
+    if (this.props.currentTab !== section) {
       // do not redirect if we already are in that tab
       window.location.href = `#/overview/?tab=${section}`;
-      store.dispatch(updateCurrentAgentData(this.props.isAgent));
+      this.props.updateCurrentAgentData(this.props.isAgent);
       this.router.reload();
     }
   };
@@ -103,21 +118,15 @@ class WzMenuAgent extends Component {
   }
 
   createItems = items => {
-    let result = [];
     const keyExists = key => Object.keys(this.state.extensions).includes(key);
     const keyIsTrue = key => (this.state.extensions || [])[key];
-    items.forEach(item => {
-      if (Object.keys(this.state.extensions).length && (!keyExists(item.id) || keyIsTrue(item.id))) {
-        result.push(this.createItem(item));
-      }
-    });
-    return result;
+    return items.filter(item => 
+      hasAgentSupportModule(this.props.currentAgentData, item.id) && Object.keys(this.state.extensions).length && (!keyExists(item.id) || keyIsTrue(item.id))
+    ).map(item => this.createItem(item));
   };
 
   createItem = (item, data = {}) => {
     // NOTE: Duplicate `name` values will cause `id` collisions.
-    const currentTab = (((store || {}).getState() || {}).appStateReducers || {})
-      .currentTab;
     return {
       ...data,
       id: item.id,
@@ -165,52 +174,16 @@ class WzMenuAgent extends Component {
             </EuiFlexItem>
         }
       </EuiFlexGroup> ,
-      isSelected: currentTab === item.id
+      isSelected: this.props.currentTab === item.id
     };
   };
 
   render() {
-    let securityInformationItems = [
-      this.agentSections.general,
-      this.agentSections.fim,
-      this.agentSections.aws,
-      this.agentSections.gcp
-    ];
-    let auditingItems = [
-      this.agentSections.pm,
-      this.agentSections.ciscat,
-      this.agentSections.sca
-    ];
-    let threatDetectionItems = [
-      this.agentSections.virustotal,
-      this.agentSections.osquery,
-      this.agentSections.mitre
-    ];
-
-    const agent = store.getState().appStateReducers.currentAgentData;
-
-    let platform = false;
-
-    if (Object.keys(agent).length) {
-      platform = ((agent.os || {}).uname || '').includes('Linux') ? 'linux' : ((agent.os || {}).platform || false);
-    }
-
-    if( !platform || !UnsupportedComponents[platform].includes('audit')) {
-      auditingItems.splice(1, 0, this.agentSections.audit);
-      auditingItems.splice(2, 0, this.agentSections.oscap);
-    }
-    if(!platform || !UnsupportedComponents[platform].includes('docker')) {
-      threatDetectionItems.splice(2, 0, this.agentSections.docker);
-    }
-    if(!platform || !UnsupportedComponents[platform].includes('vuls')) {
-      threatDetectionItems.unshift(this.agentSections.vuls);
-    }
-
     const securityInformation = [
       this.createItem(this.agentSections.securityInformation, {
         disabled: true,
         icon: <EuiIcon type="managementApp" color="primary" />,
-        items: this.createItems(securityInformationItems)
+        items: this.createItems(this.securityInformationItems)
       })
     ];
 
@@ -218,7 +191,7 @@ class WzMenuAgent extends Component {
       this.createItem(this.agentSections.auditing, {
         disabled: true,
         icon: <EuiIcon type="managementApp" color="primary" />,
-        items: this.createItems(auditingItems)
+        items: this.createItems(this.auditingItems)
       })
     ];
 
@@ -226,7 +199,7 @@ class WzMenuAgent extends Component {
       this.createItem(this.agentSections.threatDetection, {
         disabled: true,
         icon: <EuiIcon type="reportingApp" color="primary" />,
-        items: this.createItems(threatDetectionItems)
+        items: this.createItems(this.threatDetectionItems)
       })
     ];
 
@@ -234,13 +207,7 @@ class WzMenuAgent extends Component {
       this.createItem(this.agentSections.regulatoryCompliance, {
         disabled: true,
         icon: <EuiIcon type="reportingApp" color="primary" />,
-        items: this.createItems([
-          this.agentSections.pci,
-          this.agentSections.gdpr,
-          this.agentSections.hipaa,
-          this.agentSections.nist,
-          this.agentSections.tsc
-        ])
+        items: this.createItems(this.regulatoryComplianceItems)
       })
     ];
 
@@ -281,7 +248,9 @@ class WzMenuAgent extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.rulesetReducers
+    state: state.rulesetReducers,
+    currentAgentData: state.appStateReducers.currentAgentData,
+    currentTab: state.appStateReducers.currentTab
   };
 };
 

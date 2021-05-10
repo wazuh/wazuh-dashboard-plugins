@@ -20,7 +20,7 @@ import {
   updateError
 } from '../../../../../redux/actions/rulesetActions';
 
-import RulesetHandler from './utils/ruleset-handler';
+import { RulesetHandler, RulesetResources } from './utils/ruleset-handler';
 
 class WzRulesetFilterBar extends Component {
   constructor(props) {
@@ -31,7 +31,7 @@ class WzRulesetFilterBar extends Component {
       selectedOptions: []
     };
 
-    this.rulesetHandler = RulesetHandler;
+    this.rulesetHandler = new RulesetHandler(this.props.state.section);
     this.availableOptions = {
       rules: [
         'nist-800-53',
@@ -110,9 +110,8 @@ class WzRulesetFilterBar extends Component {
   async fetchItems(filters) {
     try {
       const { section } = this.props.state;
-      let fetcher = this.rulesetHandler.getRules; // By default the fetcher is for rules
-      if (section === 'decoders') fetcher = this.rulesetHandler.getDecoders; // If section is decoders the fetcher changes
-      if (section === 'lists') fetcher = this.rulesetHandler.getLists; // If the sections is lists the fetcher changes too
+      let fetcher = this.rulesetHandler.getResource;
+      if (section === RulesetResources.LISTS) fetcher = this.rulesetHandler.getFiles; // If the sections is lists the fetcher changes
       this.props.updateLoadingStatus(true);
       const result = await fetcher(filters);
       this.props.updateLoadingStatus(false);

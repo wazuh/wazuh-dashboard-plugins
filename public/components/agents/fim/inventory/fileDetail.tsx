@@ -32,8 +32,10 @@ import { getIndexPattern } from '../../../overview/mitre/lib';
 import moment from 'moment-timezone';
 import { AppNavigate } from '../../../../react-services/app-navigate';
 import { TruncateHorizontalComponents } from '../../../common/util';
-import { getDataPlugin } from '../../../../kibana-services';
+import { getDataPlugin, getUiSettings } from '../../../../kibana-services';
 import { RegistryValues } from './registryValues';
+import { formatUIDate } from '../../../../react-services/time-service';
+import { FilterManager } from '../../../../../../../src/plugins/data/public/';
 
 export class FileDetails extends Component {
   props!: {
@@ -67,6 +69,8 @@ export class FileDetails extends Component {
     </svg>
   );
   indexPattern!: IIndexPattern;
+  discoverFilterManager: FilterManager;
+
   constructor(props) {
     super(props);
 
@@ -75,6 +79,8 @@ export class FileDetails extends Component {
       totalHits: 0,
     };
     this.viewInEvents.bind(this);
+
+    this.discoverFilterManager = new FilterManager(getUiSettings());
   }
 
   componentDidMount() {
@@ -89,6 +95,7 @@ export class FileDetails extends Component {
         grow: 2,
         icon: 'clock',
         link: true,
+        transformValue: formatUIDate
       },
       {
         field: 'mtime',
@@ -96,6 +103,7 @@ export class FileDetails extends Component {
         grow: 2,
         icon: 'clock',
         link: true,
+        transformValue: formatUIDate
       },
       {
         field: 'uname',
@@ -175,6 +183,7 @@ export class FileDetails extends Component {
         name: 'Last analysis',
         grow: 2,
         icon: 'clock',
+        transformValue: formatUIDate
       },
       {
         field: 'mtime',
@@ -471,6 +480,8 @@ export class FileDetails extends Component {
           <EuiFlexGroup className="flyout-row">
             <EuiFlexItem>
               <Discover
+                kbnSearchBar
+                shareFilterManager={this.discoverFilterManager}
                 initialColumns={[
                   'icon',
                   'timestamp',

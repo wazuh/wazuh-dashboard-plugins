@@ -228,7 +228,7 @@ export class RegisterAgent extends Component {
     }
     else
       return '';
-    
+
   }
 
   selectSYS(sys){
@@ -283,13 +283,29 @@ export class RegisterAgent extends Component {
   }
 
   optionalDeploymentVariables() {
-    const deployment = `WAZUH_MANAGER='${this.state.serverAddress}' ${this.state.selectedOS == 'win' ? `WAZUH_REGISTRATION_SERVER='${this.state.serverAddress}' ` : ''}${this.state.needsPassword
-      ? `WAZUH_REGISTRATION_PASSWORD='${this.state.wazuhPassword}' `
-      : ''
-      }${this.state.udpProtocol
-        ? " WAZUH_PROTOCOL='UDP'"
-        : ''
-      }${this.state.selectedGroup.length ? `WAZUH_AGENT_GROUP='${this.state.selectedGroup.map(item => item.label).join(',')}' ` : ''}`
+    let deployment = `WAZUH_MANAGER='${this.state.serverAddress}' `;
+  
+    if (this.state.selectedOS == 'win') {
+      deployment += `WAZUH_REGISTRATION_SERVER='${this.state.serverAddress}' `;
+    }
+
+    if (this.state.wazuhPassword) {
+      deployment += `WAZUH_REGISTRATION_PASSWORD='${this.state.wazuhPassword}' `;
+    }
+
+    if (this.state.udpProtocol) {
+      deployment += `WAZUH_PROTOCOL='UDP' `;
+    }
+
+    if (this.state.selectedGroup.length) {
+      deployment += `WAZUH_AGENT_GROUP='${this.state.selectedGroup.map((item) => item.label).join(',')}' `;
+    }
+
+    // macos doesnt need = param
+    if (this.state.selectedOS === 'macos') {
+      return deployment.replaceAll('=', ' ');
+    }
+
     return deployment;
   }
 
@@ -406,7 +422,7 @@ export class RegisterAgent extends Component {
       rpmText: `sudo ${this.optionalDeploymentVariables()}yum install ${this.optionalPackages()}`,
       debText: `curl -so wazuh-agent.deb ${this.optionalPackages()} && sudo ${this.optionalDeploymentVariables()}dpkg -i ./wazuh-agent.deb`,
       macosText: `curl -so wazuh-agent.pkg https://packages.wazuh.com/4.x/macos/wazuh-agent-${this.state.wazuhVersion
-        }-1.pkg && sudo launchctl setenv ${this.optionalDeploymentVariables()}sudo installer -pkg ./wazuh-agent.pkg -target /`,
+        }-1.pkg && sudo launchctl setenv ${this.optionalDeploymentVariables()}&& sudo installer -pkg ./wazuh-agent.pkg -target /`,
       winText: `Invoke-WebRequest -Uri https://packages.wazuh.com/4.x/windows/wazuh-agent-${this.state.wazuhVersion
         }-1.msi -OutFile wazuh-agent.msi; ./wazuh-agent.msi /q ${this.optionalDeploymentVariables()}`
     };
@@ -560,7 +576,7 @@ export class RegisterAgent extends Component {
               color="warning"
               title={`Please select the ${missingOSSelection.join(', ')}.`}
               iconType="iInCircle"
-            />  
+            />
           : <div>{guide}</div>
       },
       ...((this.state.selectedOS == 'rpm') || (this.state.selectedOS == 'deb') ? [{
@@ -570,8 +586,8 @@ export class RegisterAgent extends Component {
             color="warning"
             title={`Please select the ${missingOSSelection.join(', ')}.`}
             iconType="iInCircle"
-          />  
-        : 
+          />
+        :
         <EuiTabbedContent
           tabs={tabs}
           selectedTab={this.selectedSYS}

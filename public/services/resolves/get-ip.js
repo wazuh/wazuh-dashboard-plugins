@@ -15,6 +15,8 @@ import { AppState } from '../../react-services/app-state';
 import { ErrorHandler } from '../../react-services/error-handler';
 import { getDataPlugin, getSavedObjects } from '../../kibana-services';
 import { WazuhConfig } from '../../react-services/wazuh-config';
+import { GenericRequest } from '../../react-services/generic-request';
+import { getWzConfig } from './get-config';
 
 export function getIp(
   $q,
@@ -24,9 +26,22 @@ export function getIp(
 ) {
   const deferred = $q.defer();
 
-  const checkWazuhPatterns = async (indexPatterns) => {
+  const checkWazuhConfig = async (indexPatterns) => {
     const wazuhConfig = new WazuhConfig();
     const configuration = wazuhConfig.getConfig();
+    const indexPatternFound = indexPatterns.find((indexPattern) => indexPattern.attributes.title === configuration.pattern);
+    if(!indexPatternFound){
+      AppState.removeCurrentPattern()
+    }
+    getDataPlugin().indexPatterns.setDefault(configuration.pattern, true);
+    AppState.setCurrentPattern(configuration.pattern)
+
+    return indexPatternFound;
+  }
+
+  const checkWazuhPatterns = async (indexPatterns) => {
+    const wazuhConfig = new WazuhConfig();
+    const configuration = await getWzConfig($q, GenericRequest, wazuhConfig);
     const wazuhPatterns = [
       `${configuration['wazuh.monitoring.pattern']}`,
       `${configuration['cron.prefix']}-${configuration['cron.statistics.index.name']}-*`
@@ -52,7 +67,7 @@ export function getIp(
 
       let currentPattern = '';
 
-      if (AppState.getCurrentPattern() && await checkWazuhPatterns(savedObjects)) {
+      if (AppState.getCurrentPattern() && await checkWazuhPatterns(savedObjects) && await checkWazuhConfig(savedObjects)) {
         // There's cookie for the pattern
         currentPattern = AppState.getCurrentPattern();
       } else {
@@ -90,8 +105,6 @@ export function getIp(
   };
 
   const currentParams = $location.search();
-  const targetedAgent =
-    currentParams && (currentParams.agent || currentParams.agent === '000');
   const targetedRule =
     currentParams && currentParams.tab === 'ruleset' && currentParams.ruleid;
   if (!targetedRule && healthCheck($window)) {

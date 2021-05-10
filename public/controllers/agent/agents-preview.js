@@ -18,9 +18,9 @@ import { WazuhConfig } from '../../react-services/wazuh-config';
 import { GenericRequest } from '../../react-services/generic-request';
 import { WzRequest } from '../../react-services/wz-request';
 import { ShareAgent } from '../../factories/share-agent';
-import { TimeService } from '../../react-services/time-service';
+import { formatUIDate } from '../../react-services/time-service';
 import { ErrorHandler } from '../../react-services/error-handler';
-import { getDataPlugin } from '../../kibana-services';
+import { getDataPlugin, getUiSettings } from '../../kibana-services';
 
 export class AgentsPreviewController {
   /**
@@ -50,7 +50,6 @@ export class AgentsPreviewController {
     this.wazuhConfig = new WazuhConfig();
     this.errorInit = false;
     this.$window = $window;
-    this.timeService = TimeService;
   }
 
   /**
@@ -143,7 +142,7 @@ export class AgentsPreviewController {
         );
         this.$scope.$applyAsync();
       },
-      timeService: date => this.timeService.offset(date),
+      formatUIDate: date => formatUIDate(date),
       summary: this.summary
     };
     //Load
@@ -221,15 +220,12 @@ export class AgentsPreviewController {
       this.firstUrlParam =
         clusterInfo.status === 'enabled' ? 'cluster' : 'manager';
       this.secondUrlParam = clusterInfo[this.firstUrlParam];
-
-      this.pattern = AppState.getCurrentPattern();
+      this.pattern = (await getDataPlugin().indexPatterns.get(AppState.getCurrentPattern())).title;
     } catch (error) {
       this.errorInit = ErrorHandler.handle(error, '', { silent: true });
     }
     this.loading = false;
     this.$scope.$applyAsync();
-
-    return;
   }
 
   addNewAgent(flag) {

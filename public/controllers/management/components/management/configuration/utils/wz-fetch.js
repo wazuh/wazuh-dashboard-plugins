@@ -240,15 +240,16 @@ export const fetchFile = async selectedNode => {
     const data = await WzRequest.apiReq(
       'GET',
       isCluster ?
-      `/cluster/${selectedNode}/files` :
-      `/manager/files`, {
+      `/cluster/${selectedNode}/configuration` :
+      `/manager/configuration`, 
+      {
         params: {
-          path: 'etc/ossec.conf'
+          raw: true
         }
       }
     );
 
-    let xml = ((data || {}).data || {}).contents || false;
+    let xml = (data || {}).data || false;
 
     if (!xml) {
       throw new Error('Could not fetch configuration file');
@@ -344,6 +345,8 @@ export const restartCluster = async () => {
  */
 export const restartNode = async node => {
   try {
+    const node_param = node && typeof node == 'string' ? `?nodes_list=${node}` : '';
+
     const validationError = await WzRequest.apiReq(
       'GET',
       `/cluster/configuration/validation`, {}
@@ -356,7 +359,7 @@ export const restartNode = async node => {
     }
     const result = await WzRequest.apiReq(
       'PUT',
-      `/cluster/restart`, {delay: 15000}
+      `/cluster/restart${node_param}`, {delay: 15000}
     );
 
     return result;
@@ -389,7 +392,7 @@ export const saveNodeConfiguration = async (node, content) => {
   try {
     const result = await WzRequest.apiReq(
       'PUT',
-      `/cluster/${node}/files?path=etc/ossec.conf&overwrite=true`, {
+      `/cluster/${node}/configuration?overwrite=true`, {
         content,
         origin: 'xmleditor'
       }
@@ -410,11 +413,7 @@ export const saveFileCluster = async (text, node) => {
   try {
     await WzRequest.apiReq(
       'PUT',
-      `/cluster/${node}/files`, {
-        params: {
-          path: 'etc/ossec.conf',
-          overwrite: true
-        },
+      `/cluster/${node}/configuration`, {
         body: xml.toString(),
         origin: 'raw'
       }
@@ -434,11 +433,7 @@ export const saveFileManager = async text => {
   try {
     await WzRequest.apiReq(
       'PUT',
-      `/manager/files`, {
-        params: {
-          path: 'etc/ossec.conf',
-          overwrite: true
-        },
+      `/manager/configuration`, {
         body: xml.toString(),
         origin: 'raw'
       }
