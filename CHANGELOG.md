@@ -7,6 +7,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Added
 
 - Support for Kibana 7.11.2
+- Added a warning message for the `Install and enroll the agent` step of `Deploy new agent` guide [#3238](https://github.com/wazuh/wazuh-kibana-app/pull/3238)
 
 ### Fixed
 
