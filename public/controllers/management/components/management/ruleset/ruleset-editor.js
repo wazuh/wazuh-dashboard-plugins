@@ -76,8 +76,8 @@ class WzRulesetEditor extends Component {
       showWarningRestart: false,
       isModalVisible: false,
       hasChanges: false,
+      initContent: content,
       content,
-       
       name,
       path,
     };
