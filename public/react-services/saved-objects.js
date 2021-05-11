@@ -84,7 +84,7 @@ export class SavedObject {
       if (item.attributes && item.attributes.fields) {
         const fields = JSON.parse(item.attributes.fields);
         return requiredFields.every((reqField => {
-          return fields.find(field => field.name = reqField);
+          return fields.find(field => field.name == reqField);
         }));
       }
       return false;
