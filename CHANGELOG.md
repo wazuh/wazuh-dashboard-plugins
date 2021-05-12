@@ -21,6 +21,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed screen flickers in Cluster visualization [#3159](https://github.com/wazuh/wazuh-kibana-app/pull/3159)
 - Fix the broken links when using `server.basePath` Kibana setting [#3161](https://github.com/wazuh/wazuh-kibana-app/pull/3161)
 - Fixing filter in reports [#3173](https://github.com/wazuh/wazuh-kibana-app/pull/3173)
+- Add error when add sample data fails [#3241] (https://github.com/wazuh/wazuh-kibana-app/pull/3241)
 
 
 ## Wazuh v4.2.0 - Kibana 7.10.2 , 7.11.2 - Revision 4201
