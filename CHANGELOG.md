@@ -2,6 +2,27 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.2.0 - Kibana 7.10.2 , 7.11.2 - Revision 4202
+
+### Added
+
+- Wazuh help links in the Kibana help menu [#3170](https://github.com/wazuh/wazuh-kibana-app/pull/3170)
+- Changed default `wazuh.monitoring.creation` app setting from `d` to `w` [#3174](https://github.com/wazuh/wazuh-kibana-app/pull/3174)
+- Changed default `wazuh.monitoring.shards` app setting from `2` to `1` [#3174](https://github.com/wazuh/wazuh-kibana-app/pull/3174)
+- Redirect to group details using the `group` query param in the URL [#3184](https://github.com/wazuh/wazuh-kibana-app/pull/3184)
+
+### Changed
+
+- Removed module titles [#3160](https://github.com/wazuh/wazuh-kibana-app/pull/3160)
+- Removed Sha1 field from registry key detail [#3189](https://github.com/wazuh/wazuh-kibana-app/pull/3189)
+
+### Fixed
+
+- Fixed screen flickers in Cluster visualization [#3159](https://github.com/wazuh/wazuh-kibana-app/pull/3159)
+- Fix the broken links when using `server.basePath` Kibana setting [#3161](https://github.com/wazuh/wazuh-kibana-app/pull/3161)
+- Fixing filter in reports [#3173](https://github.com/wazuh/wazuh-kibana-app/pull/3173)
+
+
 ## Wazuh v4.2.0 - Kibana 7.10.2 , 7.11.2 - Revision 4201
 
 ### Added
@@ -15,7 +36,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added retry button to check api again in health check [#3109](https://github.com/wazuh/wazuh-kibana-app/pull/3109)
 - Added `wazuh-statistics` template and a new mapping for these indices [#3111](https://github.com/wazuh/wazuh-kibana-app/pull/3111)
 - Added link to documentation "Checking connection with Manager" in deploy new agent [#3126](https://github.com/wazuh/wazuh-kibana-app/pull/3126)
-- Added a warning message for the `Install and enroll the agent` step of `Deploy new agent` guide [#3238](https://github.com/wazuh/wazuh-kibana-app/pull/3238)
 
 ### Changed
 
@@ -41,7 +61,15 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed check for TCP protocol in deploy new agent [#3163](https://github.com/wazuh/wazuh-kibana-app/pull/3163)
 - Fixed RBAC issue with agent group permissions [#3181](https://github.com/wazuh/wazuh-kibana-app/pull/3181)
 - Fixed change index pattern from menu doesn't work [#3187](https://github.com/wazuh/wazuh-kibana-app/pull/3187)
-- Conflict with the creation of the index pattern when performing the Health Check [#3232](https://github.com/wazuh/wazuh-kibana-app/pull/3232)
+
+## Wazuh v4.1.5 - Kibana 7.10.0, 7.10.2, 7.11.2 - Revision 4107
+
+### Added
+- Added a warning message for the `Install and enroll the agent` step of `Deploy new agent` guide [#3238](https://github.com/wazuh/wazuh-kibana-app/pull/3238)
+- Support for Kibana 7.11.2
+
+### Fixed
+- Conflict with the creation of the index pattern when performing the Health Check [#3223](https://github.com/wazuh/wazuh-kibana-app/pull/3223)
 
 ## Wazuh v4.1.5 - Kibana 7.10.0 , 7.10.2 - Revision 4106
 

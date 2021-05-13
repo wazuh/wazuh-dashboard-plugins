@@ -190,13 +190,8 @@ export class FileDetails extends Component {
         name: 'Last modified',
         grow: 2,
         icon: 'clock',
-      },
-      {
-        field: 'sha1',
-        name: 'SHA1',
-        checksum: true,
-        icon: 'check',
-      },
+        transformValue: formatUIDate
+      }
     ];
   }
 

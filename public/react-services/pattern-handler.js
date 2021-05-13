@@ -11,7 +11,7 @@
  */
 import { AppState } from './app-state';
 import { SavedObject } from './saved-objects';
-import { getDataPlugin, getToasts } from '../kibana-services';
+import { getDataPlugin, getToasts, getHttp } from '../kibana-services';
 import { WazuhConfig } from '../react-services/wazuh-config';
 import { HEALTH_CHECK } from '../../common/constants';
 

@@ -460,7 +460,7 @@ export class HealthCheck extends Component {
   }
 
   goAppSettings() {
-    window.location.href = '/app/wazuh#/settings';
+    window.location.href = getHttp().basePath.prepend('/app/wazuh#/settings');
   }
 
   render() {
