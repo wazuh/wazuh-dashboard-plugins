@@ -59,13 +59,16 @@ class WzEditConfiguration extends Component {
     this.state = {
       xml: '',
       editorValue: '',
+      initialValue: '',
       restart: false,
       restarting: false,
       saving: false,
+      hasChanges: false,
       infoChangesAfterRestart: false,
       disableSaveRestartButtons: false
     };
   }
+  
   addToast(toast){
     getToasts().add(toast);
   }
@@ -137,11 +140,18 @@ class WzEditConfiguration extends Component {
     this.setState({ editorValue });
   }
   onDidMount(xmlFetched, errorXMLFetched) {
-    this.setState({ editorValue: xmlFetched, disableSaveRestartButtons: errorXMLFetched});
+    this.setState({ editorValue: xmlFetched, disableSaveRestartButtons: errorXMLFetched,initialValue: xmlFetched});
   }
   onLoadingConfiguration(disableSaveRestartButtons) {
     this.setState({ disableSaveRestartButtons });
   }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.editorValue !== this.state.editorValue) {
+      this.setState({ hasChanges: this.state.editorValue !== this.state.initialValue });
+    }
+  }
+
   async confirmRestart() {
     try {
       this.setState({ restarting: true, saving: true, infoChangesAfterRestart: false });
@@ -216,6 +226,7 @@ class WzEditConfiguration extends Component {
   }
   render() {
     const { restart, restarting, saving, editorValue, disableSaveRestartButtons } = this.state;
+    const initialValue = editorValue;
     const { clusterNodeSelected, agent } = this.props;
     const xmlError = editorValue && validateXML(editorValue);
     return (
@@ -223,6 +234,7 @@ class WzEditConfiguration extends Component {
         <WzConfigurationPath
           title={`${clusterNodeSelected ? 'Cluster' : 'Manager'} configuration`}
           updateConfigurationSection={this.props.updateConfigurationSection}
+          hasChanges={this.state.hasChanges}
         >
           <EuiFlexItem grow={false}>
             <WzRefreshClusterInfoButton />
