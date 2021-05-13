@@ -1,6 +1,5 @@
 /*
- * Wazuh app - React Components to some utilities.
- *
+ * Wazuh app - React hook for app configuration
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -11,7 +10,10 @@
  * Find more information about this on the LICENSE file.
  */
 
- export { AgentGroupTruncate, GroupTruncate} from './agent-group-truncate';
- export { TruncateHorizontalComponents } from './truncate-horizontal-components/truncate-horizontal-components';
- export { GroupingComponents } from './grouping-components';
- export * from './wz-overlay-mask-interface';
+import { AppRootState } from '../../../redux/types';
+import { useSelector } from 'react-redux';
+
+export const useAppConfig = () => {
+  const appConfig = useSelector((state: AppRootState) => state.appConfig);
+  return appConfig;
+}

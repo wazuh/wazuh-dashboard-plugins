@@ -10,80 +10,96 @@ import {
   EuiSpacer,
   EuiFlexGroup,
   EuiFlexItem,
-  EuiBadge,
   EuiSuperSelect,
-  EuiText,
   EuiInMemoryTable,
-  EuiFieldText,
   EuiConfirmModal,
   EuiOverlayMask,
+  EuiFieldText,
+  EuiText,
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
 import { ErrorHandler } from '../../../react-services/error-handler';
-import { WzAPIUtils } from '../../../react-services/wz-api-utils';
 import { WzOverlayMask } from '../../common/util';
-import _ from 'lodash';
 
-
-export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
-  const isReserved = WzAPIUtils.isReservedID(policy.id);
-  const [actionValue, setActionValue] = useState('');
-  const [initialActionValue] = useState('');
-  const [addedActions, setAddedActions] = useState([]);
-  const [initialAddedActions, setInitialAddedActions] = useState([]);
-  const [availableResources, setAvailableResources] = useState([]);
-  const [availableActions, setAvailableActions] = useState([]);
-  const [actions, setActions] = useState([]);
-  const [addedResources, setAddedResources] = useState([]);
-  const [initialAddedResources, setInitialAddedResources] = useState([]);
+export const CreatePolicyFlyout = ({ closeFlyout }) => {
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const [resources, setResources] = useState([]);
   const [resourceValue, setResourceValue] = useState('');
-  const [initialResourceValue] = useState('');
   const [resourceIdentifierValue, setResourceIdentifierValue] = useState('');
+  const [availableResources, setAvailableResources] = useState([]);
+  const [addedActions, setAddedActions] = useState([]);
+  const [availableActions, setAvailableActions] = useState([]);
+  const [addedResources, setAddedResources] = useState([]);
+  const [actions, setActions] = useState([]);
+  const [actionValue, setActionValue] = useState('');
+  const [policyName, setPolicyName] = useState('');
+  const [policies, setPolicies] = useState('');
+  const [loading, setLoading] = useState(false);
   const [effectValue, setEffectValue] = useState();
-  const [initialEffectValue, setInitialEffectValue] = useState();
-  const [isModalVisible, setIsModalVisible] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
 
-  useEffect(() => {
-    getData();
-    initData();
-  }, []);
-
-  useEffect(() => {
-    loadResources();
-  }, [addedActions, availableActions]);
-
-  const updatePolicy = async () => {
-    try {
-      const actions = addedActions.map((item) => item.action);
-      const resources = addedResources.map((item) => item.resource);
-      const response = await WzRequest.apiReq('PUT', `/security/policies/${policy.id}`, {
-        policy: {
-          actions: actions,
-          resources: resources,
-          effect: effectValue,
+  const actions_columns = [
+    {
+      field: 'action',
+      name: 'Actions',
+      sortable: true,
+      truncateText: true,
+    },
+    {
+      name: '',
+      actions: [
+        {
+          name: 'Remove',
+          description: 'Remove this action',
+          type: 'icon',
+          color: 'danger',
+          icon: 'trash',
+          onClick: (action) => removeAction(action),
         },
-      });
+      ],
+    },
+  ];
 
-      const data = (response.data || {}).data;
-      if (data.failed_items && data.failed_items.length) {
-        return;
-      }
-      ErrorHandler.info('Role was successfully updated with the selected policies');
-      closeFlyout();
-    } catch (error) {
-      ErrorHandler.handle(error, 'Unexpected error');
-    }
-  };
+  const resources_columns = [
+    {
+      field: 'resource',
+      name: 'Resources',
+      sortable: true,
+      truncateText: true,
+    },
+    {
+      name: '',
+      actions: [
+        {
+          name: 'Remove',
+          description: 'Remove this resource',
+          type: 'icon',
+          color: 'danger',
+          icon: 'trash',
+          onClick: (resource) => removeResource(resource),
+        },
+      ],
+    },
+  ];
+
+  const effectOptions = [
+    {
+      value: 'allow',
+      inputDisplay: 'Allow',
+    },
+    {
+      value: 'deny',
+      inputDisplay: 'Deny',
+    },
+  ];
 
   async function getData() {
     const resources_request = await WzRequest.apiReq('GET', '/security/resources', {});
     const actions_request = await WzRequest.apiReq('GET', '/security/actions', {});
-    const resources_data = ((resources_request || {}).data || {}).data || {};
+    const resources_data = ((resources_request || {}).data || []).data || {};
     setAvailableResources(resources_data);
 
-    const actions_data = ((actions_request || {}).data || {}).data || {};
+    const actions_data = ((actions_request || {}).data || []).data || {};
     setAvailableActions(actions_data);
     const actions = Object.keys(actions_data).map((x, idx) => {
       return {
@@ -119,7 +135,7 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
           <>
             <strong>{x}</strong>
             <EuiText size="s" color="subdued">
-              <p className="euiTextColor--subdued">{(availableResources[x] || {}).description}</p>
+              <p className="euiTextColor--subdued">{availableResources[x].description}</p>
             </EuiText>
           </>
         ),
@@ -128,117 +144,53 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
     setResources(resources);
   };
 
-  const initData = () => {
-    const policies = ((policy || {}).policy || {}).actions || [];
-    const initPolicies = policies.map((item) => {
-      return { action: item };
-    });
-    setAddedActions(initPolicies);
-    setInitialAddedActions(initPolicies);
-
-    const resources = ((policy || {}).policy || {}).resources || [];
-    const initResources = resources.map((item) => {
-      return { resource: item };
-    });
-    setAddedResources(initResources);
-    setInitialAddedResources(initResources);
-
-    setEffectValue(policy.policy.effect);
-    setInitialEffectValue(policy.policy.effect)
-  };
-
-  const onEffectValueChange = (value) => {
-    setEffectValue(value);
-  };
-
-  const effectOptions = [
-    {
-      value: 'allow',
-      inputDisplay: 'Allow',
-    },
-    {
-      value: 'deny',
-      inputDisplay: 'Deny',
-    },
-  ];
-
-  const onChangeActionValue = async (value) => {
-    setActionValue(value);
-  };
-
-  const addAction = () => {
-    if (!addedActions.filter((x) => x.action === actionValue).length) {
-      setAddedActions((addedActions) => [...addedActions, { action: actionValue }]);
-    }
-    setActionValue('');
-  };
-
   const removeAction = (action) => {
     setAddedActions(addedActions.filter((x) => x !== action));
   };
 
-  const actions_columns = [
-    {
-      field: 'action',
-      name: 'Actions',
-      sortable: true,
-      truncateText: true,
-    },
-    {
-      name: '',
-      actions: [
-        {
-          name: 'Remove',
-          description: 'Remove this action',
-          type: 'icon',
-          enabled: () => !isReserved,
-          color: 'danger',
-          icon: 'trash',
-          onClick: (action) => removeAction(action),
-        },
-      ],
-    },
-  ];
+  const getPolicies = async () => {
+    setLoading(true);
+    const request = await WzRequest.apiReq('GET', '/security/policies', {});
+    const policies = (((request || {}).data || {}).data || {}).affected_items || [];
+    setPolicies(policies);
+    setLoading(false);
+  };
 
-  const resources_columns = [
-    {
-      field: 'resource',
-      name: 'Resources',
-      sortable: true,
-      truncateText: true,
-    },
-    {
-      name: '',
-      actions: [
-        {
-          name: 'Remove',
-          description: 'Remove this resource',
-          type: 'icon',
-          color: 'danger',
-          enabled: () => !isReserved,
-          icon: 'trash',
-          onClick: (resource) => removeResource(resource),
-        },
-      ],
-    },
-  ];
+  const createPolicy = async () => {
+    try {
+      const result = await WzRequest.apiReq(
+        'POST',
+        '/security/policies',
 
-  const onChangeResourceValue = async (value) => {
-    setResourceValue(value);
-    setResourceIdentifierValue('');
+        {
+          name: policyName,
+          policy: {
+            actions: addedActions.map((x) => x.action),
+            resources: addedResources.map((x) => x.resource),
+            effect: effectValue,
+          },
+        }
+      );
+      const resultData = (result.data || {}).data;
+      if (resultData.failed_items && resultData.failed_items.length) {
+        return;
+      }
+      ErrorHandler.info('Policy was successfully created', '');
+      await getPolicies();
+      setPolicyName('');
+      setAddedActions([]);
+      setAddedResources([]);
+      setEffectValue(null);
+    } catch (error) {
+      ErrorHandler.handle(error, 'Error creating policy');
+      return;
+    }
+    closeFlyout();
   };
 
   const getIdentifier = () => {
     const keys = Object.keys(availableResources) || [];
     return (keys[resourceValue] || ':').split(':')[1];
-  };
-
-  const onChangeResourceIdentifierValue = async (e) => {
-    setResourceIdentifierValue(e.target.value);
-  };
-
-  const removeResource = (resource) => {
-    setAddedResources(addedResources.filter((x) => x !== resource));
   };
 
   const addResource = () => {
@@ -254,6 +206,38 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
     setResourceIdentifierValue('');
   };
 
+  const addAction = () => {
+    if (!addedActions.filter((x) => x.action === actionValue).length) {
+      setAddedActions((addedActions) => [...addedActions, { action: actionValue }]);
+    }
+    setActionValue('');
+  };
+
+  const removeResource = (resource) => {
+    setAddedResources(addedResources.filter((x) => x !== resource));
+  };
+
+  const onChangePolicyName = (e) => {
+    setPolicyName(e.target.value);
+  };
+
+  const onChangeResourceValue = async (value) => {
+    setResourceValue(value);
+    setResourceIdentifierValue('');
+  };
+
+  const onChangeActionValue = async (value) => {
+    setActionValue(value);
+  };
+
+  const onEffectValueChange = (value) => {
+    setEffectValue(value);
+  };
+
+  const onChangeResourceIdentifierValue = async (e) => {
+    setResourceIdentifierValue(e.target.value);
+  };
+
   let modal;
   if (isModalVisible) {
     modal = (
@@ -263,6 +247,7 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
           onConfirm={() => {
             setIsModalVisible(false);
             closeFlyout(false);
+            setHasChanges(false);
           }}
           onCancel={() => setIsModalVisible(false)}
           cancelButtonText="No, don't do it"
@@ -275,15 +260,26 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
       </EuiOverlayMask>
     );
   }
+
   useEffect(() => {
-    if (initialActionValue != actionValue ||  !_.isEqual(addedResources, initialAddedResources) ||  
-        !_.isEqual(addedActions, initialAddedActions) || initialResourceValue != resourceValue || 
-        initialEffectValue != effectValue) {
+    getData();
+  }, []);
+
+  useEffect(() => {
+    loadResources();
+  }, [addedActions]);
+
+  useEffect(() => {
+    getPolicies();
+  }, []);
+
+  useEffect(() => {
+    if (policyName.length || actionValue.length || addedActions.length || addedResources.length || effectValue) {
       setHasChanges(true);
     } else {
       setHasChanges(false);
     }
-  }, [actionValue, addedResources, addedActions, resourceValue, effectValue]);
+  }, [policyName, actionValue, addedActions, addedResources, effectValue]);
 
   return (
     <>
@@ -297,19 +293,19 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
           }
         }}
       >
-        <EuiFlyout className="wzApp" onClose={() => {
-          if (hasChanges) {
-            setIsModalVisible(true);
-          } else {
-            closeFlyout(false);
-          }
-        }}>
+        <EuiFlyout
+          className="wzApp"
+          onClose={() => {
+            if (hasChanges) {
+              setIsModalVisible(true);
+            } else {
+              closeFlyout(false);
+            }
+          }}
+        >
           <EuiFlyoutHeader hasBorder={false}>
             <EuiTitle size="m">
-              <h2>
-                Edit policy {policy.name}&nbsp;&nbsp;
-                {isReserved && <EuiBadge color="primary">Reserved</EuiBadge>}
-              </h2>
+              <h2>New policy</h2>
             </EuiTitle>
           </EuiFlyoutHeader>
           <EuiFlyoutBody>
@@ -317,10 +313,8 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
               <EuiFormRow label="Policy name" helpText="Introduce a name for this new policy.">
                 <EuiFieldText
                   placeholder=""
-                  disabled={isReserved}
-                  value={policy.name}
-                  readOnly={true}
-                  onChange={() => {}}
+                  value={policyName}
+                  onChange={(e) => onChangePolicyName(e)}
                   aria-label=""
                 />
               </EuiFormRow>
@@ -333,7 +327,6 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
                   >
                     <EuiSuperSelect
                       options={actions}
-                      disabled={isReserved}
                       valueOfSelected={actionValue}
                       onChange={(value) => onChangeActionValue(value)}
                       itemLayoutAlign="top"
@@ -347,7 +340,7 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
                     <EuiButton
                       onClick={() => addAction()}
                       iconType="plusInCircle"
-                      disabled={!actionValue || isReserved}
+                      disabled={!actionValue}
                     >
                       Add
                     </EuiButton>
@@ -377,7 +370,7 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
                       onChange={(value) => onChangeResourceValue(value)}
                       itemLayoutAlign="top"
                       hasDividers
-                      disabled={!addedActions.length || isReserved}
+                      disabled={!addedActions.length}
                     />
                   </EuiFormRow>
                 </EuiFlexItem>
@@ -390,7 +383,7 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
                       placeholder={getIdentifier()}
                       value={resourceIdentifierValue}
                       onChange={(e) => onChangeResourceIdentifierValue(e)}
-                      disabled={!resourceValue || isReserved}
+                      disabled={!resourceValue}
                     />
                   </EuiFormRow>
                 </EuiFlexItem>
@@ -399,7 +392,7 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
                     <EuiButton
                       onClick={() => addResource()}
                       iconType="plusInCircle"
-                      disabled={!resourceIdentifierValue || isReserved}
+                      disabled={!resourceIdentifierValue}
                     >
                       Add
                     </EuiButton>
@@ -425,8 +418,16 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
                 />
               </EuiFormRow>
               <EuiSpacer />
-              <EuiButton disabled={isReserved} onClick={updatePolicy} fill>
-                Apply
+              <EuiButton
+                disabled={
+                  !policyName || !addedActions.length || !addedResources.length || !effectValue
+                }
+                onClick={() => {
+                  createPolicy();
+                }}
+                fill
+              >
+                Create policy
               </EuiButton>
             </EuiForm>
           </EuiFlyoutBody>

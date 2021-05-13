@@ -19,7 +19,7 @@ import { OdfeUtils } from '../utils';
 import { getHttp, getDataPlugin } from '../kibana-services';
 
 export class GenericRequest {
-  static async request(method, path, payload = null) {
+  static async request(method, path, payload = null, returnError = false) {
     try {
       if (!method || !path) {
         throw new Error('Missing parameters');
@@ -104,6 +104,7 @@ export class GenericRequest {
           }
         }
       }
+      if (returnError) return Promise.reject(err);
       return (((err || {}).response || {}).data || {}).message || false
         ? Promise.reject(err.response.data.message)
         : Promise.reject(err || 'Server did not respond');
