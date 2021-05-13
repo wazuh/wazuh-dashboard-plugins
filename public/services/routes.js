@@ -137,68 +137,84 @@ app.config(($routeProvider) => {
   $routeProvider
   .when('/health-check', {
     template: healthCheckTemplate,
-    resolve: { apiCount, wzConfig, ip }
+    resolve: { apiCount, wzConfig, ip },
+    outerAngularWrapperRoute: true
   })
   .when('/agents/:agent?/:tab?/:tabView?', {
     template: agentsTemplate,
     resolve: { enableWzMenu, nestedResolve, ip, savedSearch },
     reloadOnSearch: false,
+    outerAngularWrapperRoute: true
   })
   .when('/agents-preview/', {
     template: agentsPrevTemplate,
     resolve: { enableWzMenu, nestedResolve, ip, savedSearch },
     reloadOnSearch: false,
+    outerAngularWrapperRoute: true
   })
   .when('/manager/', {
     template: managementTemplate,
     resolve: { enableWzMenu, nestedResolve, ip, savedSearch, clearRuleId },
     reloadOnSearch: false,
+    outerAngularWrapperRoute: true
   })
   .when('/manager/:tab?', {
     template: managementTemplate,
-    resolve: { enableWzMenu, nestedResolve, ip, savedSearch, clearRuleId }
+    resolve: { enableWzMenu, nestedResolve, ip, savedSearch, clearRuleId },
+    outerAngularWrapperRoute: true
   })
   .when('/overview/', {
     template: overviewTemplate,
     resolve: { enableWzMenu, nestedResolve, ip, savedSearch },
     reloadOnSearch: false,
+    outerAngularWrapperRoute: true
   })
   .when('/settings', {
     template: settingsTemplate,
     resolve: { enableWzMenu, nestedResolve, ip, savedSearch },
-    reloadOnSearch: false
+    reloadOnSearch: false,
+    outerAngularWrapperRoute: true
   })
   .when('/security', {
     template: securityTemplate,
-    resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
+    resolve: { enableWzMenu, nestedResolve, ip, savedSearch },
+    outerAngularWrapperRoute: true
   })
   .when('/visualize/create?', {
     redirectTo: function () { },
-    resolve: { wzConfig, wzKibana }
+    resolve: { wzConfig, wzKibana },
+    outerAngularWrapperRoute: true
   })
   .when('/context/:pattern?/:type?/:id?', {
     redirectTo: function () { },
-    resolve: { wzKibana }
+    resolve: { wzKibana },
+    outerAngularWrapperRoute: true
   })
   .when('/doc/:pattern?/:index?/:type?/:id?', {
     redirectTo: function () { },
-    resolve: { wzKibana }
+    resolve: { wzKibana },
+    outerAngularWrapperRoute: true
   })
   .when('/wazuh-dev', {
     template: toolsTemplate,
-    resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
+    resolve: { enableWzMenu, nestedResolve, ip, savedSearch },
+    outerAngularWrapperRoute: true
   })
   .when('/blank-screen', {
     template: blankScreenTemplate,
-    resolve: { enableWzMenu, wzConfig }
+    resolve: { enableWzMenu, wzConfig },
+    outerAngularWrapperRoute: true
   })
   .when('/', {
-    redirectTo: '/overview/'
+    redirectTo: '/overview/',
+    outerAngularWrapperRoute: true
   })
   .when('', {
-    redirectTo: '/overview/'
+    redirectTo: '/overview/',
+    outerAngularWrapperRoute: true
   })
   .otherwise({
-    redirectTo: '/overview'
+    redirectTo: '/overview',
+    outerAngularWrapperRoute: true
   });
 });

@@ -21,19 +21,17 @@ export const WAZUH_INDEX_SHARDS = 2;
 export const WAZUH_INDEX_REPLICAS = 0;
 
 // Job - Wazuh monitoring
-
 export const WAZUH_INDEX_TYPE_MONITORING = "monitoring";
 export const WAZUH_MONITORING_PREFIX = "wazuh-monitoring-";
 export const WAZUH_MONITORING_PATTERN = "wazuh-monitoring-*";
 export const WAZUH_MONITORING_TEMPLATE_NAME = "wazuh-agent";
-export const WAZUH_MONITORING_DEFAULT_INDICES_SHARDS = WAZUH_INDEX_SHARDS;
-export const WAZUH_MONITORING_DEFAULT_CREATION = 'd';
+export const WAZUH_MONITORING_DEFAULT_INDICES_SHARDS = 1;
+export const WAZUH_MONITORING_DEFAULT_CREATION = 'w';
 export const WAZUH_MONITORING_DEFAULT_ENABLED = true;
 export const WAZUH_MONITORING_DEFAULT_FREQUENCY = 900;
 export const WAZUH_MONITORING_DEFAULT_CRON_FREQ = '0 * * * * *';
 
 // Job - Wazuh statistics
-
 export const WAZUH_INDEX_TYPE_STATISTICS = "statistics";
 export const WAZUH_STATISTICS_DEFAULT_PREFIX = "wazuh";
 export const WAZUH_STATISTICS_DEFAULT_NAME = "statistics";
@@ -166,7 +164,7 @@ export const WAZUH_DEFAULT_APP_CONFIG = {
   'xpack.rbac.enabled': true,
   'wazuh.monitoring.enabled': WAZUH_MONITORING_DEFAULT_ENABLED,
   'wazuh.monitoring.frequency': WAZUH_MONITORING_DEFAULT_FREQUENCY,
-  'wazuh.monitoring.shards': WAZUH_INDEX_SHARDS,
+  'wazuh.monitoring.shards': WAZUH_MONITORING_DEFAULT_INDICES_SHARDS,
   'wazuh.monitoring.replicas': WAZUH_INDEX_REPLICAS,
   'wazuh.monitoring.creation': WAZUH_MONITORING_DEFAULT_CREATION,
   'wazuh.monitoring.pattern': WAZUH_MONITORING_PATTERN,
@@ -219,4 +217,11 @@ export enum WAZUH_MODULES_ID{
 }
 
 export const AUTHORIZED_AGENTS = 'authorized-agents';
+
+// Wazuh links
+export const WAZUH_LINK_DOCUMENTATION = 'https://documentation.wazuh.com';
+export const WAZUH_LINK_GITHUB = 'https://github.com/wazuh';
+export const WAZUH_LINK_GOOGLE_GROUPS = 'https://groups.google.com/forum/#!forum/wazuh';
+export const WAZUH_LINK_SLACK = 'https://wazuh.com/community/join-us-on-slack';
+
 export const HEALTH_CHECK = 'health-check';
