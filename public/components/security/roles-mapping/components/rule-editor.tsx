@@ -31,19 +31,25 @@ import 'brace/mode/json';
 import 'brace/snippets/json';
 import 'brace/ext/language_tools';
 import "brace/ext/searchbox";
+import _ from 'lodash';
 
-export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalUsers, currentPlatform }) => {
+export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalUsers, currentPlatform,onFormChange }) => {
   const [logicalOperator, setLogicalOperator] = useState('OR');
   const [isLogicalPopoverOpen, setIsLogicalPopoverOpen] = useState(false);
   const [isJsonEditor, setIsJsonEditor] = useState(false);
   const [ruleJson, setRuleJson] = useState('{\n\t\n}');
   const [hasWrongFormat, setHasWrongFormat] = useState(false);
   const [rules, setRules] = useState<any[]>([]);
+  const [initialRules, setInitialRules] = useState<any[]>([]);
+  const [initialInternalUserRules, setInitialInternalUserRules] = useState<any[]>([]);
   const [internalUserRules, setInternalUserRules] = useState<any[]>([]);
   const [internalUsersOptions, setInternalUsersOptions] = useState<EuiComboBoxOptionOption<any>[]>(
     []
   );
   const [selectedUsers, setSelectedUsers] = useState<EuiComboBoxOptionOption<any>[]>([]);
+  const [initialSelectedUsers, setInitialSelectedUsers] = useState<EuiComboBoxOptionOption<any>[]>([]);
+  const [initialLogicalOperator, setInitialLogicalOperator] = useState('OR');
+
   const searchOperationOptions = [
     { value: 'FIND', text: 'FIND' },
     { value: 'FIND$', text: 'FIND$' },
@@ -56,6 +62,12 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
   useEffect(() => {
     if (initialRule) {
       setStateFromRule(JSON.stringify(initialRule));
+      const rulesResult = getRulesFromJson(JSON.stringify(initialRule));
+      const _selectedUsers = getSelectedUsersFromRules(rulesResult.internalUsersRules);
+      setInitialLogicalOperator(rulesResult.logicalOperator);
+      setInitialRules(rulesResult.customRules);
+      setInitialInternalUserRules(rulesResult.internalUsersRules);
+      setInitialSelectedUsers(_selectedUsers);
     }
   }, []);
 
@@ -79,6 +91,7 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
       setIsJsonEditor(true);
     }
   };
+
   const onButtonClick = () =>
     setIsLogicalPopoverOpen(isLogicalPopoverOpen => !isLogicalPopoverOpen);
   const closeLogicalPopover = () => setIsLogicalPopoverOpen(false);
@@ -260,6 +273,19 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
     });
     setInternalUserRules(tmpInternalUsersRules);
   };
+
+  useEffect(() => {
+    if (
+      !_.isEqual(initialSelectedUsers, selectedUsers) ||
+      !_.isEqual(initialRules, rules) ||
+      !_.isEqual(initialInternalUserRules, internalUserRules)||
+      !_.isEqual(initialLogicalOperator, logicalOperator)
+    ){
+      onFormChange(true)
+    } else{
+      onFormChange(false);
+    }
+  }, [selectedUsers, rules, internalUserRules, logicalOperator]);
 
   return (
     <>
