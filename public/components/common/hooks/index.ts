@@ -10,24 +10,16 @@
  * Find more information about this on the LICENSE file.
  */
 
-export { useFilterManager } from './use-filter-manager';
-
-export { useIndexPattern } from './use-index-pattern';
-
-export { useKbnLoadingIndicator } from './use-kbn-loading-indicator';
-
-export { useQuery } from './use-query';
-
-export { useTimeFilter } from './use-time-filter';
-
-export { useWindowSize } from './useWindowSize';
-
-export { useUserPermissions, useUserPermissionsRequirements, useUserPermissionsPrivate } from './useUserPermissions';
-
-export { useUserRoles, useUserRolesRequirements, useUserRolesPrivate } from './useUserRoles';
-
-export { useRefreshAngularDiscover } from './useResfreshAngularDiscover';
-
-export { useAllowedAgents } from './useAllowedAgents';
-
-export { useApiRequest } from './useApiRequest';
+export * from './use-filter-manager';
+export * from './use-index-pattern';
+export * from './use-kbn-loading-indicator';
+export * from './use-query';
+export * from './use-time-filter';
+export * from './useWindowSize';
+export * from './useUserPermissions';
+export * from './useUserRoles';
+export * from './useResfreshAngularDiscover';
+export * from './useAllowedAgents';
+export * from './useApiRequest';
+export * from './use-app-config';
+export * from './useRootScope';
