@@ -1,8 +1,8 @@
 {
   "name": "wazuh",
   "version": "4.2.0",
-  "revision": "4201-8",
-  "code": "4201-8",
+  "revision": "4201-10",
+  "code": "4201-10",
   "kibana": {
     "version": "7.10.2"
   },
@@ -37,7 +37,7 @@
     "test:browser": "plugin-helpers test:browser",
     "test:jest": "node scripts/jest",
     "generate:api-4.0-info": "cd scripts/generate-api-4.0-info;./generate-api-4.0-info.sh;cd ../..",
-    "prebuild": "node scripts/generate-build-version"    
+    "prebuild": "node scripts/generate-build-version"
   },
   "dependencies": {
     "angular-animate": "1.7.8",

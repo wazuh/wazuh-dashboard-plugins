@@ -53,7 +53,7 @@ import './factories';
 import { checkCurrentSecurityPlatform } from './controllers/management/components/management/configuration/utils/wz-fetch';
 import store from './redux/store';
 import { updateCurrentPlatform } from './redux/actions/appStateActions';
-import { WzAuthentication } from './react-services/wz-authentication';
+import { WzAuthentication, loadAppConfig } from './react-services';
 
 import { getAngularModule} from './kibana-services';
 import { addHelpMenuToAppChrome } from './utils';
@@ -83,10 +83,13 @@ app.run([
     // Set currentSecurity platform in Redux when app starts.
     checkCurrentSecurityPlatform().then((item) => {
       store.dispatch(updateCurrentPlatform(item))
-    }).catch(() => {})
+    }).catch(() => {});
 
     // Init the process of refreshing the user's token when app start.
     checkPluginVersion().finally(WzAuthentication.refresh);
+
+    // Load the app state
+    loadAppConfig();
   },
 ]);
 
