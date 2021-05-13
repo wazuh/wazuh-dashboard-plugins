@@ -1,6 +1,6 @@
 import { AxiosResponse } from 'axios';
 import { GenericRequest } from '../../../react-services';
-import { WAZUH_METAFIELDS } from '../../../../common/constants'
+import { WAZUH_METAFIELDS_SETTINGS } from '../../../../common/constants'
 import _ from 'lodash';
 
 type userValue<T> = {userValue: T}
@@ -26,15 +26,14 @@ async function getKibanaSettings(): Promise<responseKbnSettings> {
 
 async function checkMetafieldSetting({settings}: responseKbnSettings) {
   const { metaFields } = settings;
-  const isEqual = _.isEqual(WAZUH_METAFIELDS, metaFields)
+  const isEqual = _.isEqual(WAZUH_METAFIELDS_SETTINGS, metaFields && metaFields.userValue);
   return !!metaFields && !isEqual;
 }
 
 async function updateMetaFieldsSetting(isModified:boolean) {
-  console.log("UPDATE",!isModified)
   return !isModified && await GenericRequest.request(
     'POST',
     '/api/kibana/settings',
-    {"changes":{"metaFields":["_source","_index"]}}
+    {"changes":{"metaFields":WAZUH_METAFIELDS_SETTINGS}}
   );
 }

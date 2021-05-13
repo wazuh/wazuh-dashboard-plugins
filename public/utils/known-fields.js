@@ -15,8 +15,8 @@ export const KnownFields = [
     "esTypes": [
       "_index"
     ],
-    "searchable": false,
-    "aggregatable": false,
+    "searchable": true,
+    "aggregatable": true,
     "readFromDocValues": false
   },
   {

@@ -85,7 +85,7 @@ export const WAZUH_TIME_FILTER_DEFAULT = {
 export const WAZUH_MAX_BUCKETS_DEFAULT = 200000;
 
 //Default metafields set by the app
-export const WAZUH_METAFIELDS= {"userValue":["_source","_index"]}
+export const WAZUH_METAFIELDS_SETTINGS = ["_source","_index"];
 
 // App configuration
 export const WAZUH_CONFIGURATION_CACHE_TIME = 10000 // time in ms;
