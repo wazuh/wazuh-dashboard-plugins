@@ -12,6 +12,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Redirect to group details using the `group` query param in the URL [#3184](https://github.com/wazuh/wazuh-kibana-app/pull/3184)
 - Configuration to disable Wazuh App access from X-Pack/ODFE role [#3222](https://github.com/wazuh/wazuh-kibana-app/pull/3222)
 - Added confirmation message when closing a form [#3221](https://github.com/wazuh/wazuh-kibana-app/pull/3221)
+- Improvement to hide navbar Wazuh label. [#3240](https://github.com/wazuh/wazuh-kibana-app/pull/3240)
 
 ### Changed
 
