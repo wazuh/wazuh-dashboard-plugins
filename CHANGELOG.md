@@ -18,6 +18,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed module titles [#3160](https://github.com/wazuh/wazuh-kibana-app/pull/3160)
 - Removed Sha1 field from registry key detail [#3189](https://github.com/wazuh/wazuh-kibana-app/pull/3189)
 - Refactored the Health check component [#3197](https://github.com/wazuh/wazuh-kibana-app/pull/3197)
+- Added version in package downloaded name in agent deploy command [#3210] (https://github.com/wazuh/wazuh-kibana-app/issues/3210)
 
 ### Fixed
 
