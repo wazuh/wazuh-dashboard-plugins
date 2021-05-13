@@ -1,7 +1,20 @@
+/*
+ * Wazuh app - Check Kibana max buckets setting Service
+ *
+ * Copyright (C) 2015-2021 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ *
+ */
+
 import { AxiosResponse } from 'axios';
 import { GenericRequest } from '../../../react-services';
 import { WAZUH_MAX_BUCKETS_DEFAULT } from '../../../../common/constants'
-import { getDataPlugin } from '../../../kibana-services';
 
 type userValue<T> = { userValue: T }
 type kbnSettings = {
@@ -9,7 +22,6 @@ type kbnSettings = {
   timeFilter?: userValue<string[]>,
   maxBuckets?: userValue<number>
 };
-
 
 type responseKbnSettings = { settings: kbnSettings };
 

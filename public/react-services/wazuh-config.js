@@ -10,6 +10,9 @@
  * Find more information about this on the LICENSE file.
  */
 
+import store from "../redux/store";
+import { updateAppConfig } from "../redux/actions/appConfigActions";
+
 export class WazuhConfig {
   constructor() {
     if (!!WazuhConfig.instance) {
@@ -17,7 +20,6 @@ export class WazuhConfig {
     }
     WazuhConfig.instance = this;
 
-    this.config = {};
 
     return this;
   }
@@ -27,20 +29,20 @@ export class WazuhConfig {
    * @param {Object} cfg
    */
   setConfig(cfg) {
-    this.config = { ...cfg };
+    store.dispatch(updateAppConfig({...cfg}));
   }
 
   /**
    * Get configuration
    */
   getConfig() {
-    return this.config;
+    return store.getState().appConfig.data;
   }
 
   /**
    * Returns true if debug level is enabled, otherwise it returns false.
    */
   isDebug() {
-    return ((this.config || {})['logs.level'] || false) === 'debug';
+    return ((this.getConfig() || {})['logs.level'] || false) === 'debug';
   }
 }
