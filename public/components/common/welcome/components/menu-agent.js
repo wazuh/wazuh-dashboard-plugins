@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import { EuiFlexGroup, EuiFlexItem, EuiFlexGrid, EuiButtonEmpty, EuiSideNav, EuiIcon, EuiButtonIcon } from '@elastic/eui';
+import { EuiFlexGroup, EuiFlexItem, EuiFlexGrid, EuiSideNav, EuiIcon } from '@elastic/eui';
 import { connect } from 'react-redux';
 import { AppState } from '../../../../react-services/app-state';
 import { hasAgentSupportModule } from '../../../../react-services/wz-agents';
@@ -78,10 +78,14 @@ class WzMenuAgent extends Component {
     ];
     this.auditingItems = [
       this.agentSections.pm,
+      this.agentSections.audit,
+      this.agentSections.oscap,
       this.agentSections.ciscat,
       this.agentSections.sca
     ];
     this.threatDetectionItems = [
+      this.agentSections.vuls,
+      this.agentSections.docker,
       this.agentSections.virustotal,
       this.agentSections.osquery,
       this.agentSections.mitre

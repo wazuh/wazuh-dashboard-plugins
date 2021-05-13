@@ -31,6 +31,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed fields overlap in the agent summary screen [#3217](https://github.com/wazuh/wazuh-kibana-app/pull/3217)
 - Fixed the `Visualize` button is not displaying when expanding a field in the Events sidebar [#3237](https://github.com/wazuh/wazuh-kibana-app/pull/3237)
 - Add error when add sample data fails [#3241] (https://github.com/wazuh/wazuh-kibana-app/pull/3241)
+- Fix modules are missing in the agent menu [#3244] (https://github.com/wazuh/wazuh-kibana-app/pull/3244)
 
 ## Wazuh v4.2.0 - Kibana 7.10.2 , 7.11.2 - Revision 4201
 
