@@ -35,7 +35,8 @@ import {
   EuiCallOut,
   EuiSpacer,
   EuiProgress,
-  EuiCode
+  EuiCode,
+  EuiLink
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
 
@@ -447,9 +448,13 @@ export class RegisterAgent extends Component {
       <div>
         {this.state.selectedOS && (
           <EuiText>
-            <p>
-              You can use this command to install and enroll the Wazuh agent in one or more hosts.
-            </p>
+            <p>You can use this command to install and enroll the Wazuh agent in one or more hosts.</p>
+            <EuiCallOut
+              color="warning"
+              title={<>Running this command on a host with an agent already installed upgrades the agent package without enrolling the agent. To enroll it, see the <EuiLink href="https://documentation.wazuh.com/current/user-manual/registering/index.html">Wazuh documentation</EuiLink>.</>}
+              iconType="iInCircle"
+            />
+            <EuiSpacer />
             <EuiCodeBlock style={codeBlock} language={language}>
               {this.state.wazuhPassword ? this.obfuscatePassword(text) : text}
             </EuiCodeBlock>
