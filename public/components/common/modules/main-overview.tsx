@@ -97,7 +97,7 @@ export class MainModuleOverview extends Component {
           <EuiFlexGroup gutterSize="xs" alignItems="center" responsive={false}>
             <div style={{ margin: '0.8em 0em 0em 0.09em' }}>
               <EuiToolTip position="top">
-                <div className="euiBreadcrumb euiBreadcrumb--last">
+                <div className="euiBreadcrumb euiBreadcrumb--last" title="">
                   {WAZUH_MODULES[this.props.section].title}
                 </div>
               </EuiToolTip>
