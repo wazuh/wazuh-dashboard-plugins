@@ -1067,6 +1067,7 @@ export class WazuhReportingCtrl {
   }
 
   private getConfigTables(data, section, tab, array = []) {
+    console.log(data, section, tab, array)
     log('reporting:getConfigTables', `Building configuration tables`, 'info');
     let plainData = {};
     const nestedData = [];
@@ -1144,7 +1145,6 @@ export class WazuhReportingCtrl {
     nestedData.forEach(nest => {
       this.getConfigTables(nest, section, tab + 1, array);
     });
-
     return array;
   }
 
@@ -1544,7 +1544,10 @@ export class WazuhReportingCtrl {
           `Iterate over ${config.sections.length} configuration sections`,
           'debug'
         );
+        let contador = 0;
         for (let section of config.sections) {
+          let titleOfSubsection = false;
+          contador++;
           if (
             components[idxComponent] &&
             (section.config || section.wodle)
@@ -1566,71 +1569,70 @@ export class WazuhReportingCtrl {
                     'GET',
                     `/agents/${agentID}/config/${conf.component}/${conf.configuration}`,
                     {},
-                    {apiHostID: apiId}
+                    { apiHostID: apiId }
                   );
                 } else {
                   for (let wodle of wmodulesResponse.data.data['wmodules']) {
                     if (Object.keys(wodle)[0] === conf['name']) {
                       agentConfigResponse.data = {
-                        data: wodle
+                        data: wodle,
                       };
-                    };
+                    }
                   }
                 }
 
-                const agentConfig = agentConfigResponse && agentConfigResponse.data && agentConfigResponse.data.data;
+                const agentConfig =
+                  agentConfigResponse && agentConfigResponse.data && agentConfigResponse.data.data;
                 if (!titleOfSection) {
                   printer.addContent({
                     text: config.title,
                     style: 'h1',
-                    margin: [0, 0, 0, 15]
+                    margin: [0, 0, 0, 15],
                   });
                   titleOfSection = true;
-                };
-                printer.addContent({
-                  text: section.subtitle,
-                  style: 'h4'
-                });
-                printer.addContent({
-                  text: section.desc,
-                  style: { fontSize: 12, color: '#000' },
-                  margin: [0, 0, 0, 10]
-                });
-                if (
-                  agentConfig
-                ) {
+                }
+                if (!titleOfSubsection) {
+                  printer.addContent({
+                    text: section.subtitle,
+                    style: 'h4',
+                  });
+                  printer.addContent({
+                    text: section.desc,
+                    style: { fontSize: 12, color: '#000' },
+                    margin: [0, 0, 0, 10],
+                  });
+                  titleOfSubsection = true;
+                }
+                if (agentConfig) {
                   for (let agentConfigKey of Object.keys(agentConfig)) {
                     if (Array.isArray(agentConfig[agentConfigKey])) {
                       /* LOG COLLECTOR */
                       if (conf.filterBy) {
                         let groups = [];
-                        agentConfig[agentConfigKey].forEach(obj => {
+                        agentConfig[agentConfigKey].forEach((obj) => {
                           if (!groups[obj.logformat]) {
                             groups[obj.logformat] = [];
                           }
                           groups[obj.logformat].push(obj);
                         });
-                        Object.keys(groups).forEach(group => {
+                        Object.keys(groups).forEach((group) => {
                           let saveidx = 0;
                           groups[group].forEach((x, i) => {
                             if (
-                              Object.keys(x).length >
-                              Object.keys(groups[group][saveidx]).length
+                              Object.keys(x).length > Object.keys(groups[group][saveidx]).length
                             ) {
                               saveidx = i;
                             }
                           });
-                          const columns = Object.keys(
-                            groups[group][saveidx]
-                          );
-                          const rows = groups[group].map(x => {
+                          const columns = Object.keys(groups[group][saveidx]);
+                          const rows = groups[group].map((x) => {
                             let row = [];
-                            columns.forEach(key => {
+                            columns.forEach((key) => {
                               row.push(
                                 typeof x[key] !== 'object'
                                   ? x[key]
                                   : Array.isArray(x[key])
-                                  ? x[key].map(x => {
+                                  ? x[key].map((x) => {
                                       return x + '\n';
                                     })
                                   : JSON.stringify(x[key])
@@ -1639,29 +1641,22 @@ export class WazuhReportingCtrl {
                             return row;
                           });
                           columns.forEach((col, i) => {
-                            columns[i] =
-                              col[0].toUpperCase() + col.slice(1);
+                            columns[i] = col[0].toUpperCase() + col.slice(1);
                           });
                           tables.push({
                             title: section.labels[0][group],
                             type: 'table',
                             columns,
-                            rows
+                            rows,
                           });
                         });
                       } else if (agentConfigKey.configuration !== 'socket') {
                         tables.push(
-                          ...this.getConfigTables(
-                            agentConfig[agentConfigKey],
-                            section,
-                            idx
-                          )
+                          ...this.getConfigTables(agentConfig[agentConfigKey], section, idx)
                         );
                       } else {
                         for (let _d2 of agentConfig[agentConfigKey]) {
-                          tables.push(
-                            ...this.getConfigTables(_d2, section, idx)
-                          );
+                          tables.push(...this.getConfigTables(_d2, section, idx));
                         }
                       }
                     } else {
@@ -1670,31 +1665,23 @@ export class WazuhReportingCtrl {
                         const directories = agentConfig[agentConfigKey].directories;
                         delete agentConfig[agentConfigKey].directories;
                         tables.push(
-                          ...this.getConfigTables(
-                            agentConfig[agentConfigKey],
-                            section,
-                            idx
-                          )
+                          ...this.getConfigTables(agentConfig[agentConfigKey], section, idx)
                         );
                         let diffOpts = [];
-                        Object.keys(section.opts).forEach(x => {
+                        Object.keys(section.opts).forEach((x) => {
                           diffOpts.push(x);
                         });
                         const columns = [
                           '',
-                          ...diffOpts.filter(
-                            x => x !== 'check_all' && x !== 'check_sum'
-                          )
+                          ...diffOpts.filter((x) => x !== 'check_all' && x !== 'check_sum'),
                         ];
                         let rows = [];
-                        directories.forEach(x => {
+                        directories.forEach((x) => {
                           let row = [];
                           row.push(x.dir);
-                          columns.forEach(y => {
+                          columns.forEach((y) => {
                             if (y !== '') {
-                              row.push(
-                                x.opts.indexOf(y) > -1 ? 'yes' : 'no'
-                              );
+                              row.push(x.opts.indexOf(y) > -1 ? 'yes' : 'no');
                             }
                           });
                           row.push(x.recursion_level);
@@ -1708,15 +1695,11 @@ export class WazuhReportingCtrl {
                           title: 'Monitored directories',
                           type: 'table',
                           columns,
-                          rows
+                          rows,
                         });
                       } else {
                         tables.push(
-                          ...this.getConfigTables(
-                            agentConfig[agentConfigKey],
-                            section,
-                            idx
-                          )
+                          ...this.getConfigTables(agentConfig[agentConfigKey], section, idx)
                         );
                       }
                     }
@@ -1729,10 +1712,10 @@ export class WazuhReportingCtrl {
                       {
                         text: `${section.subtitle.toLowerCase()} configuration.`,
                         link: section.docuLink,
-                        style: { fontSize: 12, color: '#1a0dab' }
-                      }
+                        style: { fontSize: 12, color: '#1a0dab' },
+                      },
                     ],
-                    margin: [0, 0, 0, 20]
+                    margin: [0, 0, 0, 20],
                   });
                 }
               } catch (error) {
