@@ -26,8 +26,7 @@ async function getKibanaSettings(): Promise<responseKbnSettings> {
 
 async function checkMetafieldSetting({settings}: responseKbnSettings) {
   const { metaFields } = settings;
-  const isEqual = _.isEqual(WAZUH_METAFIELDS_SETTINGS, metaFields && metaFields.userValue);
-  return !!metaFields && !isEqual;
+  return !!metaFields && !_.isEqual(WAZUH_METAFIELDS_SETTINGS, metaFields && metaFields.userValue);
 }
 
 async function updateMetaFieldsSetting(isModified:boolean) {
