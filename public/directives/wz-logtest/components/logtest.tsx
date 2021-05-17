@@ -81,7 +81,19 @@ export const Logtest = compose(
     );
   };
 
+  const getTokenSessionLogtest = async () => {
+    const body = {
+      log_format: 'syslog',
+      location: 'logtest',
+      event: 'test',
+    };
+    return await WzRequest.apiReq('PUT', '/logtest', body)
+    .then(res => res.data.data.token)
+    .catch(error => '') 
+  } 
+
   const runAllTests = async () => {
+    const token = await getTokenSessionLogtest()
     setTestResult('');
     setTesting(true);
     try {
@@ -91,6 +103,7 @@ export const Logtest = compose(
             log_format: 'syslog',
             location: 'logtest',
             event: event,
+            token: token
           };
           return await WzRequest.apiReq('PUT', '/logtest', body);
         })
