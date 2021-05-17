@@ -293,6 +293,7 @@ export const AgentsPreview = compose(
                         <KibanaVis
                           visID={'Wazuh-App-Overview-General-Agents-status'}
                           tab={'general'}
+                          manager={AppState.getClusterInfo().manager}
                         />
                       </WzReduxProvider>
                     </div>

@@ -215,7 +215,26 @@ class KibanaVis extends Component {
         isAgentStatus && timeFilterSeconds < 900
           ? { from: "now-15m", to: "now", mode: "quick" }
           : timefilter.getTime();
-      let filters = isAgentStatus ? [] : discoverList[1] || [];
+      let filters = isAgentStatus ? [{
+        meta: {
+          index: "wazuh-alerts-*",
+          type: 'phrases',
+          key: "manager",
+          alias: null,
+          negate: false,
+          disabled: false,
+        },
+        query: {       
+          bool: {
+            should: [{
+              match_phrase: {manager : this.props.manager}
+            }],
+          }
+        },
+        $state: {
+          store: 'appState'
+        }
+      }] : discoverList[1] || [];
       const query = !isAgentStatus ? discoverList[0] : {};
 
       const rawVis = raw ? raw.filter((item) => item && item.id === this.visID) : [];
