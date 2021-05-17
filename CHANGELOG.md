@@ -22,6 +22,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fix the broken links when using `server.basePath` Kibana setting [#3161](https://github.com/wazuh/wazuh-kibana-app/pull/3161)
 - Fixing filter in reports [#3173](https://github.com/wazuh/wazuh-kibana-app/pull/3173)
 - Fixed fields overlap in the agent summary screen [#3217](https://github.com/wazuh/wazuh-kibana-app/pull/3217)
+- Fix Ruleset Test, each request is made in a different session instead of all in the same session [#3257] (https://github.com/wazuh/wazuh-kibana-app/pull/3257)
 
 ## Wazuh v4.2.0 - Kibana 7.10.2 , 7.11.2 - Revision 4201
 
