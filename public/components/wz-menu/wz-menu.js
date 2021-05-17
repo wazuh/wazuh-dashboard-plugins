@@ -939,7 +939,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
 
     const openSelectorsButton = (
       <EuiButtonEmpty 
-        iconType="gear"
+        iconType="boxesVertical"
         iconSide="right"
         style={{ position: 'relative', right: 0 }}
         onClick={()=> this.setState({ isSelectorsPopoverOpen: true })}
@@ -995,7 +995,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
                 <EuiFlexItem grow={false}>
                   <EuiPopover
                         ownFocus
-                        anchorPosition="downRight"
+                        anchorPosition="downCenter"
                         button={openSelectorsButton}
                         isOpen={this.state.isSelectorsPopoverOpen}
                         closePopover={()=> this.setState({ isSelectorsPopoverOpen: false })}>  
