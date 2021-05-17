@@ -218,8 +218,7 @@ class KibanaVis extends Component {
       let filters = isAgentStatus ? [{
         meta: {
           index: "wazuh-alerts-*",
-          type: 'phrases',
-          key: "manager",
+          key: "manager.keyword",
           alias: null,
           negate: false,
           disabled: false,
@@ -227,7 +226,7 @@ class KibanaVis extends Component {
         query: {       
           bool: {
             should: [{
-              match_phrase: {manager : this.props.manager}
+              term: {"manager.keyword" : this.props.manager}
             }],
           }
         },
