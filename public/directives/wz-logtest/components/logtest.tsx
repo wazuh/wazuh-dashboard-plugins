@@ -85,7 +85,7 @@ export const Logtest = compose(
     const body = {
       log_format: 'syslog',
       location: 'logtest',
-      event: 'test',
+      event: 'get token logtest session',
     };
     return await WzRequest.apiReq('PUT', '/logtest', body)
     .then(res => res.data.data.token)
