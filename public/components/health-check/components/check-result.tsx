@@ -11,14 +11,16 @@
  * Find more information about this on the LICENSE file.
  *
  */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import {
   EuiButtonIcon,
   EuiDescriptionListDescription,
   EuiDescriptionListTitle,
   EuiIcon,
   EuiLoadingSpinner,
-  EuiToolTip
+  EuiToolTip,
+  EuiCodeBlock,
+  EuiButtonEmpty,
 } from '@elastic/eui';
 
 type Result = 'loading' | 'ready' | 'error' | 'error_retry' | 'disabled' | 'waiting';
@@ -26,6 +28,9 @@ type Result = 'loading' | 'ready' | 'error' | 'error_retry' | 'disabled' | 'wait
 export function CheckResult(props) {
   const [result, setResult] = useState<Result>('waiting');
   const [isCheckStarted, setIsCheckStarted] = useState<boolean>(false);
+  const [verboseInfo, setVerboseInfo] = useState<string[]>([]);
+  const [verboseIsOpen, setVerboseIsOpen] = useState<boolean>(false);
+  const [isCheckFinished, setIsCheckFinished] = useState<boolean>(false);
 
   useEffect(() => {
     if (props.check && !props.isLoading && awaitForIsReady()){
@@ -36,12 +41,21 @@ export function CheckResult(props) {
     }
   }, [props.check, props.isLoading, props.checksReady]);
 
+  useEffect(() => {
+    if (isCheckFinished){
+      const errors = verboseInfo.filter(log => log.type === 'error');
+      if(errors.length){
+        props.canRetry ? setResult('error_retry') : setResult('error');
+        props.handleErrors(props.name, errors.map(({message}) => message));
+      }else{
+        setResult('ready');
+        setAsReady();
+      }
+    }
+  }, [isCheckFinished])
+
   const setAsReady = () => {
     props.handleCheckReady(props.name, true);
-  };
-
-  const handleErrors = (errors, parsed?) => {
-    props.handleErrors(props.name, errors, parsed);
   };
 
   /**
@@ -53,24 +67,27 @@ export function CheckResult(props) {
     }))
   }
 
+  const checkLogger = useMemo(() => ({
+    _log: (message: string, type: 'info' | 'error' | 'action' ) => {
+      setVerboseInfo(state => [...state, {message, type}]);
+    },
+    info: (message: string) => checkLogger._log(message, 'info'),
+    error: (message: string) => checkLogger._log(message, 'error'),
+    action: (message: string) => checkLogger._log(message, 'action')
+  }), []);
+
   const initCheck = async () => {
     setIsCheckStarted(true);
     setResult('loading');
+    setVerboseInfo([]);
     props.cleanErrors(props.name);
+    setIsCheckFinished(false);
     try {
-      const { errors } = await props.validationService();
-      if (errors.length) {
-        handleErrors(errors);
-        setResult('error');
-        props.canRetry ? setResult('error_retry') : setResult('error');
-      } else {
-        setResult('ready');
-        setAsReady();
-      }      
+      await props.validationService(checkLogger);  
     } catch (error) {
-      handleErrors([error], true);
-      props.canRetry ? setResult('error_retry') : setResult('error');
+      checkLogger.error(error.message || error);
     }
+    setIsCheckFinished(true);
   };
 
   const renderResult = () => {
@@ -123,10 +140,50 @@ export function CheckResult(props) {
     }
   };
 
+  const switchVerboseDetails = useCallback(() => {
+    setVerboseIsOpen(state => !state);
+  },[]);
+  
+  const tooltipVerboseButton = `${verboseIsOpen ? 'Close' : 'Open'} details`;
   return (
     <>
-      <EuiDescriptionListTitle>{props.title}</EuiDescriptionListTitle>
-      <EuiDescriptionListDescription>{renderResult()}</EuiDescriptionListDescription>
+      <EuiDescriptionListTitle>
+        {props.title}
+      </EuiDescriptionListTitle>
+      <EuiDescriptionListDescription>
+        {renderResult()}
+        {' '}
+        <EuiToolTip
+          position='top'
+          content={tooltipVerboseButton}
+        >
+          <EuiButtonEmpty size='xs' onClick={switchVerboseDetails} textProps={{ style:{overflow: 'visible' }}}>
+            <EuiButtonIcon
+              ariaLabel={tooltipVerboseButton}
+              iconType={verboseIsOpen ? 'inspect' : 'inspect'}
+              color={verboseIsOpen ? 'primary' : 'subdued'}
+            />
+            {verboseInfo.filter(log => log.type === 'action').length > 0 && (
+              <EuiIcon
+                style={{position: 'relative', top: '-10px', left: '-10px'}}
+                color='accent'
+                type="dot"
+                size='s'
+              />
+            )}
+          </EuiButtonEmpty>
+        </EuiToolTip>
+      </EuiDescriptionListDescription>
+      {verboseIsOpen && verboseInfo.length > 0 && (
+        <EuiCodeBlock
+          paddingSize='s'
+          fontSize='s'
+          isCopyable
+          style={{textAlign: 'left'}}
+        >
+          {verboseInfo.map(log => `${log.type.toUpperCase()}: ${log.message}`).join('\n')}
+        </EuiCodeBlock>
+      )}
     </>
   );
 }

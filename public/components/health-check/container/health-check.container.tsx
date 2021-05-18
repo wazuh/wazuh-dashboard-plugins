@@ -19,14 +19,16 @@ import {
   EuiSpacer,
 } from '@elastic/eui';
 import React, { Fragment, useState, useEffect, useRef } from 'react';
+import {
+  EuiFlexGroup,
+  EuiFlexItem
+} from '@elastic/eui';
 import { AppState, ErrorHandler } from '../../../react-services';
 import { useAppConfig, useRootScope } from '../../../components/common/hooks';
 import {
   checkApiService,
   checkFieldsService,
   checkKibanaSettings,
-  checkKibanaSettingsTimeFilter,
-  checkKibanaSettingsMaxBuckets,
   checkPatternService,
   checkPatternSupportService,
   checkSetupService,
@@ -35,7 +37,20 @@ import {
 import { CheckResult } from '../components/check-result';
 import { withReduxProvider } from '../../common/hocs';
 import { getHttp } from '../../../kibana-services';
-import { WAZUH_INDEX_TYPE_MONITORING, WAZUH_INDEX_TYPE_STATISTICS } from '../../../../common/constants';
+import {
+  HEALTH_CHECK_REDIRECTION_TIME,
+  KIBANA_SETTING_NAME_MAX_BUCKETS,
+  KIBANA_SETTING_NAME_METAFIELDS,
+  KIBANA_SETTING_NAME_TIME_FILTER,
+  WAZUH_INDEX_TYPE_MONITORING,
+  WAZUH_INDEX_TYPE_STATISTICS,
+  WAZUH_KIBANA_SETTING_MAX_BUCKETS,
+  WAZUH_KIBANA_SETTING_METAFIELDS,
+  WAZUH_KIBANA_SETTING_TIME_FILTER,
+} from '../../../../common/constants';
+
+import { getDataPlugin } from '../../../kibana-services';
+import { CheckLogger } from '../types/check_logger';
 
 const checks = {
   api: {    
@@ -80,38 +95,65 @@ const checks = {
     awaitFor: [],
     shouldCheck: true,
     canRetry: true,
+  },
+  maxBuckets: {
+    title: `Check ${KIBANA_SETTING_NAME_MAX_BUCKETS} setting`,
+    validator: checkKibanaSettings(KIBANA_SETTING_NAME_MAX_BUCKETS, WAZUH_KIBANA_SETTING_MAX_BUCKETS),
+    awaitFor: [],
+    canRetry: true,
+  },
+  metaFields: {
+    title: `Check ${KIBANA_SETTING_NAME_METAFIELDS} setting`,
+    validator: checkKibanaSettings(KIBANA_SETTING_NAME_METAFIELDS, WAZUH_KIBANA_SETTING_METAFIELDS),
+    awaitFor: [],
+    canRetry: true,
+  },
+  timeFilter: {
+    title: `Check ${KIBANA_SETTING_NAME_TIME_FILTER} setting`,
+    validator: checkKibanaSettings(KIBANA_SETTING_NAME_TIME_FILTER, JSON.stringify(WAZUH_KIBANA_SETTING_TIME_FILTER), (checkLogger: CheckLogger, options: {defaultAppValue: any}) => {
+      getDataPlugin().query.timefilter.timefilter.setTime(WAZUH_KIBANA_SETTING_TIME_FILTER)
+        && checkLogger.action(`Timefiler set to ${JSON.stringify(options.defaultAppValue)}`);
+    }),
+    awaitFor: [],
+    canRetry: true,
   }
 };
 
 function HealthCheckComponent() {
   const [checkErrors, setCheckErrors] = useState<{[key:string]: []}>({});
   const [checksReady, setChecksReady] = useState<{[key: string]: boolean}>({});
+  const [isDebugMode, setIsDebugMode] = useState<boolean>(false);
   const appConfig = useAppConfig();
   const checksInitiated = useRef(false);
   const $rootScope = useRootScope();
 
+  const redirectionPassHealthcheck = () => {
+    const params = $rootScope.previousParams || {};
+    const queryString = Object.keys(params).map(key => key + '=' + params[key]).join('&');
+    const url = '/app/wazuh#' + ($rootScope.previousLocation || '') + '?' + queryString;
+    window.location.href = getHttp().basePath.prepend(url);
+  };
+
   useEffect(() => {
     if (appConfig.isReady && !checksInitiated.current) {
       checksInitiated.current = true;
-      checkKibanaSettings(appConfig.data['checks.metaFields']);
-      checkKibanaSettingsTimeFilter(appConfig.data['checks.timeFilter']);
-      checkKibanaSettingsMaxBuckets(appConfig.data['checks.maxBuckets']);
       AppState.setPatternSelector(appConfig.data['ip.selector']);
     }
   }, [appConfig]);
 
   useEffect(() => {
     // Redirect to app when all checks are ready
+    return;
     Object.keys(checks)
       .every(check => checksReady[check])
-    && (() => setTimeout(() => {
-          const params = $rootScope.previousParams || {};
-          const queryString = Object.keys(params).map(key => key + '=' + params[key]).join('&');
-          const url = '/app/wazuh#' + ($rootScope.previousLocation || '') + '?' + queryString;
-          window.location.href = getHttp().basePath.prepend(url);
-        }, 300)
+    && !isDebugMode && (() => setTimeout(redirectionPassHealthcheck, HEALTH_CHECK_REDIRECTION_TIME)
       )()
   }, [checksReady]);
+
+  useEffect(() => {
+    // Check if Health should not redirect automatically (Debug mode)
+    setIsDebugMode(window.location.href.includes('debug'));
+  },[]);
 
   const handleErrors = (checkID, errors, parsed) => {
     const newErrors = parsed
@@ -140,7 +182,7 @@ function HealthCheckComponent() {
           title={checks[check].title}
           awaitFor={checks[check].awaitFor}
           check={checks[check].shouldCheck || appConfig.data[`checks.${check}`]}
-          validationService={() => checks[check].validator(appConfig)}
+          validationService={checks[check].validator(appConfig)}
           handleErrors={handleErrors}
           cleanErrors={cleanErrors}
           isLoading={appConfig.isLoading}
@@ -169,23 +211,45 @@ function HealthCheckComponent() {
     ) 
   };
 
-  const logo_url = getHttp().basePath.prepend('/plugins/wazuh/assets/icon_blue.svg');
+  const logoUrl = getHttp().basePath.prepend('/plugins/wazuh/assets/icon_blue.svg');
+  const thereAreErrors = Object.keys(checkErrors).length > 0;
+
   return (
     <div className="health-check">
-      <img src={logo_url} className="health-check-logo" alt=""></img>
+      <img src={logoUrl} className="health-check-logo" alt=""></img>
       <div className="margin-top-30">
         <EuiDescriptionList textStyle="reverse" align="center" type="column">
           {renderChecks()}
         </EuiDescriptionList>
       </div>
-      <EuiSpacer size="xxl" />
-      {renderErrors()}
-      <EuiSpacer size="xxl" />
-      {Object.keys(checkErrors).length > 0 ? (
-        <EuiButton fill href={getHttp().basePath.prepend('/app/wazuh#/settings')}>
-          Go to App
-        </EuiButton>
-      ): null}
+      {thereAreErrors && (
+        <>
+          <EuiSpacer size="xl" />
+          {renderErrors()}
+        </>
+      )}
+      {(thereAreErrors || isDebugMode) && (
+        <>
+          <EuiSpacer size="xl" />
+          <EuiFlexGroup justifyContent='center'>
+            {thereAreErrors && (
+              <EuiFlexItem grow={false}>
+                <EuiButton fill href={getHttp().basePath.prepend('/app/wazuh#/settings')}>
+                  Go to Settings
+                </EuiButton>
+              </EuiFlexItem>
+            )}
+            {isDebugMode && Object.keys(checks).every(check => checksReady[check]) && (
+              <EuiFlexItem grow={false}>
+                <EuiButton fill onClick={redirectionPassHealthcheck}>
+                  Continue
+                </EuiButton>
+              </EuiFlexItem>
+            )}
+          </EuiFlexGroup>
+        </>
+      )
+      }
     </div>
   );
 }

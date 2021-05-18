@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Check Fields Service
+ * Wazuh app - Check index pattern fields service
  *
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
@@ -12,11 +12,19 @@
  *
  */
 
-import { PatternHandler } from '../../../react-services';
+import { AppState, SavedObject } from '../../../react-services';
+import { getDataPlugin } from '../../../kibana-services';
+import { CheckLogger } from '../types/check_logger';
 
-export const checkFieldsService = async (): Promise<{ errors: string[] }> => {
-  const errors: string[] = [];
-  await PatternHandler.refreshIndexPattern();
-
-  return { errors };
+export const checkFieldsService = (appInfo) => async (checkLogger: CheckLogger) => {
+  const patternId = AppState.getCurrentPattern();
+  checkLogger.info(`Index pattern id in cookie: [${patternId}]`);
+  
+  checkLogger.info(`Getting index pattern data [${patternId}]...`);
+  const pattern = await getDataPlugin().indexPatterns.get(patternId);
+  checkLogger.info(`Index pattern data found: [${pattern ? 'yes' : 'no'}]`);
+  
+  checkLogger.info(`Refreshing index pattern fields: title [${pattern.title}], id [${pattern.id}]...`);
+  await SavedObject.refreshIndexPattern(pattern, null);
+  checkLogger.action(`Refreshed index pattern fields: title [${pattern.title}], id [${pattern.id}]`);
 };
