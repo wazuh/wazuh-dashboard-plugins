@@ -1067,7 +1067,6 @@ export class WazuhReportingCtrl {
   }
 
   private getConfigTables(data, section, tab, array = []) {
-    console.log(data, section, tab, array)
     log('reporting:getConfigTables', `Building configuration tables`, 'info');
     let plainData = {};
     const nestedData = [];
@@ -1141,7 +1140,6 @@ export class WazuhReportingCtrl {
         rows
       });
     }
-
     nestedData.forEach(nest => {
       this.getConfigTables(nest, section, tab + 1, array);
     });
@@ -1662,10 +1660,13 @@ export class WazuhReportingCtrl {
                     } else {
                       /*INTEGRITY MONITORING MONITORED DIRECTORIES */
                       if (conf.matrix) {
-                        const directories = agentConfig[agentConfigKey].directories;
-                        delete agentConfig[agentConfigKey].directories;
+                        const {directories,diff,synchronization,file_limit,...rest} = agentConfig[agentConfigKey];
                         tables.push(
-                          ...this.getConfigTables(agentConfig[agentConfigKey], section, idx)
+                          ...this.getConfigTables(rest, section, idx),
+                          ...(diff && diff.disk_quota ? this.getConfigTables(diff.disk_quota, {tabs:['Disk quota']}, 0 ): []),
+                          ...(diff && diff.file_size ? this.getConfigTables(diff.file_size, {tabs:['File size']}, 0 ): []),
+                          ...(synchronization ? this.getConfigTables(synchronization, {tabs:['Synchronization']}, 0 ): []),
+                          ...(file_limit ? this.getConfigTables(file_limit, {tabs:['File limit']}, 0 ): []),
                         );
                         let diffOpts = [];
                         Object.keys(section.opts).forEach((x) => {
