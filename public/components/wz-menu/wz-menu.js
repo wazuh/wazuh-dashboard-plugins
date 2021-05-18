@@ -186,7 +186,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
     }
 
     if(this.props.windowSize){
-      this.showSelectorsInPopover = this.props.windowSize.width < 1100 ? true : false;
+      this.showSelectorsInPopover = this.props.windowSize.width < 1100;
     }
 
     if (
@@ -696,6 +696,10 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
     )
   }
 
+  switchSelectorsPopOver(){
+    this.setState({ isSelectorsPopoverOpen: !this.state.isSelectorsPopoverOpen })
+  }
+
 
   render() {
     const currentAgent = store.getState().appStateReducers.currentAgentData;
@@ -942,7 +946,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
         iconType="boxesVertical"
         iconSide="right"
         style={{ position: 'relative', right: 0 }}
-        onClick={()=> this.setState({ isSelectorsPopoverOpen: true })}
+        onClick={()=> this.switchSelectorsPopOver()}
         size="s"
         aria-label="Open selectors"></EuiButtonEmpty>
     )
@@ -998,7 +1002,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
                         anchorPosition="downCenter"
                         button={openSelectorsButton}
                         isOpen={this.state.isSelectorsPopoverOpen}
-                        closePopover={()=> this.setState({ isSelectorsPopoverOpen: false })}>  
+                        closePopover={()=> this.switchSelectorsPopOver()}>  
                           <EuiFlexGroup alignItems="center" style={{ paddingTop: 5 }}>
                           {this.getIndexPatternSelectorComponent()}
                           </EuiFlexGroup>
