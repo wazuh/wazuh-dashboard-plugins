@@ -12,7 +12,6 @@
 import { log } from '../lib/logger';
 
 export const tryCatchForIndexPermissionError = (wazuhIndex: string, logLocation?: string, context?) => (functionToTryCatch) => async () => {
-    console.log("HOAL QUE PASA NENE", logLocation);
     try {
         await functionToTryCatch();
     }
