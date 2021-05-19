@@ -30,10 +30,10 @@ import { KeyEquivalence } from '../../common/csv-key-equivalence';
 import { AgentConfiguration } from '../lib/reporting/agent-configuration';
 import { KibanaRequest, RequestHandlerContext, KibanaResponseFactory } from 'src/core/server';
 import { ReportPrinter } from '../lib/reporting/printer';
-
 import { log } from '../lib/logger';
 import { WAZUH_ALERTS_PATTERN, WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH, WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, AUTHORIZED_AGENTS } from '../../common/constants';
 import { createDirectoryIfNotExists, createDataDirectoryIfNotExists } from '../lib/filesystem';
+import moment from 'moment';
 
 
 export class WazuhReportingCtrl {
@@ -192,6 +192,7 @@ export class WazuhReportingCtrl {
    * @param {String} apiId API id
    */
   private async buildAgentsTable(context, printer: ReportPrinter, agentIDs: string[], apiId: string, multi = false) {
+    const dateFormat = await context.core.uiSettings.client.get('dateFormat');
     if (!agentIDs || !agentIDs.length) return;
     log(
       'reporting:buildAgentsTable',
@@ -236,7 +237,9 @@ export class WazuhReportingCtrl {
             agentRows.push({
               ...agent,
               manager: agent.manager || agent.manager_host,
-              os: (agent.os && agent.os.name && agent.os.version) ? `${agent.os.name} ${agent.os.version}` : ''
+              os: (agent.os && agent.os.name && agent.os.version) ? `${agent.os.name} ${agent.os.version}` : '',
+              lastKeepAlive: moment(agent.lastKeepAlive).format(dateFormat),
+              dateAdd: moment(agent.dateAdd).format(dateFormat)
             });
           } catch (error) {
             log(
