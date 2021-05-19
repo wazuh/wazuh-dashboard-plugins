@@ -16,11 +16,15 @@ export const tryCatchForIndexPermissionError = (wazuhIndex: string, logLocation?
         await functionToTryCatch();
     }
     catch (error) {
+        enum error_types{
+            SECURITY_EXCEPTION = 'security_exception',
+            RESPONSE_ERROR = 'Response Error',
+        }
         switch(error.message){
-            case 'security_exception':
+            case error_types.SECURITY_EXCEPTION:
               error.message = (((((error.meta || error.message).body || error.message).error || error.message).root_cause[0] || error.message).reason || error.message);
               break;
-            case 'Response Error':
+            case error_types.RESPONSE_ERROR:
               error.message = `Could not check if the index ${
                 wazuhIndex
               } exists due to no permissions for create, delete or check`;
