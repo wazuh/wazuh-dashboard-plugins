@@ -490,9 +490,27 @@ export class ReportPrinter{
           style: 'standard'
         }
       })
-    });
-  
-    const widths = new Array(columns.length - 1).fill('auto');
+    }); 
+
+    // 385 el width máximo inicial por columna
+    let totalLength = columns.length - 1;
+    const widthColumn = 385/totalLength;
+    let totalWidth = totalLength * widthColumn;
+    const widthCharacter = 5; //min width para un caracter
+    const widths = new Array;
+    
+    for (let step = 0; step < columns.length - 1; step++) {
+      let column_length = tableRows[0][step].text.length * widthCharacter;
+      if (column_length <= Math.round(totalWidth / totalLength)) {
+        widths.push(column_length);
+        totalWidth -= column_length;
+      } 
+      else {
+        widths.push(Math.round(totalWidth / totalLength));
+        totalWidth -= Math.round((totalWidth / totalLength));
+      }
+      totalLength--;
+    }
     widths.push('*');
   
     this.addContent({
