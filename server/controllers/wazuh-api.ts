@@ -52,10 +52,10 @@ export class WazuhApiCtrl {
               });
             }
           } catch (error) {
-              log('wazuh-api:getToken', error.message || error);
-            }
+            log('wazuh-api:getToken', error.message || error);
           }
         }
+      }
       let token;
       if (await APIUserAllowRunAs.canUse(idHost) == API_USER_STATUS_RUN_AS.ENABLED) {
         token = await context.wazuh.api.client.asCurrentUser.authenticate(idHost);
