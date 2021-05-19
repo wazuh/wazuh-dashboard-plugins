@@ -126,13 +126,45 @@ exports[`Health Check container should render a Health check screen 1`] = `
         title="Check statistics index pattern"
         validationService={[Function]}
       />
+      <CheckResult
+        awaitFor={Array []}
+        canRetry={true}
+        check={true}
+        checksReady={Object {}}
+        cleanErrors={[Function]}
+        handleCheckReady={[Function]}
+        handleErrors={[Function]}
+        isLoading={false}
+        key="health_check_check_maxBuckets"
+        name="maxBuckets"
+        title="Check timelion:max_buckets setting"
+      />
+      <CheckResult
+        awaitFor={Array []}
+        canRetry={true}
+        check={true}
+        checksReady={Object {}}
+        cleanErrors={[Function]}
+        handleCheckReady={[Function]}
+        handleErrors={[Function]}
+        isLoading={false}
+        key="health_check_check_metaFields"
+        name="metaFields"
+        title="Check metaFields setting"
+      />
+      <CheckResult
+        awaitFor={Array []}
+        canRetry={true}
+        checksReady={Object {}}
+        cleanErrors={[Function]}
+        handleCheckReady={[Function]}
+        handleErrors={[Function]}
+        isLoading={false}
+        key="health_check_check_timeFilter"
+        name="timeFilter"
+        title="Check timepicker:timeDefaults setting"
+      />
     </EuiDescriptionList>
   </div>
-  <EuiSpacer
-    size="xxl"
-  />
-  <EuiSpacer
-    size="xxl"
-  />
 </div>
 `;

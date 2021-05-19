@@ -143,7 +143,6 @@ function HealthCheckComponent() {
 
   useEffect(() => {
     // Redirect to app when all checks are ready
-    return;
     Object.keys(checks)
       .every(check => checksReady[check])
     && !isDebugMode && (() => setTimeout(redirectionPassHealthcheck, HEALTH_CHECK_REDIRECTION_TIME)

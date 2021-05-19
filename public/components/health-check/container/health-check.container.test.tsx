@@ -16,8 +16,7 @@ import React from 'react';
 import { mount, shallow } from 'enzyme';
 import { HealthCheckTest } from './health-check.container';
 
-
-jest.mock('../../../components/common/hooks/use-app-config', () => ({
+jest.mock('../../../components/common/hooks', () => ({
   useAppConfig: () => ({
     isReady: true,
     isLoading: false,
@@ -25,6 +24,7 @@ jest.mock('../../../components/common/hooks/use-app-config', () => ({
       'ip.selector': 1,
       'checks.metaFields': true,
       'checks.timerFilter': true,
+      'checks.maxBuckets': true,
       'checks.api': true,
       'checks.setup': true,
       'checks.pattern': true,
@@ -32,17 +32,17 @@ jest.mock('../../../components/common/hooks/use-app-config', () => ({
       'checks.fields': true,
     },
   }),
+  useRootScope: () => ({})
 }));
 
 jest.mock('../services', () => ({
-  checkPatternService: () => ({ errors: [] }),
-  checkTemplateService: () => ({ errors: [] }),
-  checkApiService: () => ({ errors: [] }),
-  checkSetupService: () => ({ errors: [] }),
-  checkFieldsService: () => ({ errors: [] }),
-  checkKibanaSettings: () => ({ errors: [] }),
-  checkKibanaSettingsTimeFilter: () => ({ errors: [] }),
-  checkPatternSupportService: () => ({ errors: [] })
+  checkPatternService: (appInfo) => () => undefined,
+  checkTemplateService: (appInfo) => () => undefined,
+  checkApiService: (appInfo) => () => undefined,
+  checkSetupService: (appInfo) => () => undefined,
+  checkFieldsService: (appInfo) => () => undefined,
+  checkKibanaSettings: (appInfo) => () => undefined,
+  checkPatternSupportService: (appInfo) => () => undefined
 }));
 
 jest.mock('../components/check-result', () => ({
@@ -64,6 +64,15 @@ jest.mock('../../../kibana-services', () => ({
       prepend: (str) => str
     }
   }),
+  getDataPlugin: () => ({
+    query: {
+      timefilter: {
+        timefilter: {
+          setTime: (time: number) => true
+        }
+      }
+    }
+  })
 }));
 
 describe('Health Check container', () => {

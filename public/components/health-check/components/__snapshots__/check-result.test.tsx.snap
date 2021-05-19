@@ -25,11 +25,18 @@ exports[`Check result component should render a Check result screen 1`] = `
   handleErrors={[MockFunction]}
   isLoading={false}
   name="test"
-  title="test chest"
+  title="Check Test"
   validationService={
     [MockFunction] {
       "calls": Array [
-        Array [],
+        Array [
+          Object {
+            "_log": [Function],
+            "action": [Function],
+            "error": [Function],
+            "info": [Function],
+          },
+        ],
       ],
       "results": Array [
         Object {
@@ -46,7 +53,7 @@ exports[`Check result component should render a Check result screen 1`] = `
     <dt
       className="euiDescriptionList__title"
     >
-      test chest
+      Check Test
     </dt>
   </EuiDescriptionListTitle>
   <EuiDescriptionListDescription>
@@ -63,6 +70,108 @@ exports[`Check result component should render a Check result screen 1`] = `
         </EuiLoadingSpinner>
          Checking...
       </span>
+       
+      <EuiToolTip
+        content="Open details"
+        delay="regular"
+        position="top"
+      >
+        <span
+          className="euiToolTipAnchor"
+          onKeyUp={[Function]}
+          onMouseOut={[Function]}
+          onMouseOver={[Function]}
+        >
+          <EuiButtonEmpty
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            size="xs"
+            textProps={
+              Object {
+                "style": Object {
+                  "overflow": "visible",
+                },
+              }
+            }
+          >
+            <button
+              className="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--xSmall"
+              disabled={false}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              type="button"
+            >
+              <EuiButtonContent
+                className="euiButtonEmpty__content"
+                iconSide="left"
+                textProps={
+                  Object {
+                    "className": "euiButtonEmpty__text",
+                    "style": Object {
+                      "overflow": "visible",
+                    },
+                  }
+                }
+              >
+                <span
+                  className="euiButtonContent euiButtonEmpty__content"
+                >
+                  <span
+                    className="euiButtonEmpty__text"
+                    style={
+                      Object {
+                        "overflow": "visible",
+                      }
+                    }
+                  >
+                    <EuiButtonIcon
+                      ariaLabel="Open details"
+                      color="subdued"
+                      iconType="inspect"
+                    >
+                      <button
+                        ariaLabel="Open details"
+                        className="euiButtonIcon euiButtonIcon--subdued"
+                        disabled={false}
+                        type="button"
+                      >
+                        <EuiIcon
+                          aria-hidden="true"
+                          className="euiButtonIcon__icon"
+                          size="m"
+                          type="inspect"
+                        >
+                          <EuiIconEmpty
+                            aria-hidden={true}
+                            className="euiIcon euiIcon--medium euiIcon-isLoading euiButtonIcon__icon"
+                            focusable="false"
+                            role="img"
+                            style={null}
+                          >
+                            <svg
+                              aria-hidden={true}
+                              className="euiIcon euiIcon--medium euiIcon-isLoading euiButtonIcon__icon"
+                              focusable="false"
+                              height={16}
+                              role="img"
+                              style={null}
+                              viewBox="0 0 16 16"
+                              width={16}
+                              xmlns="http://www.w3.org/2000/svg"
+                            />
+                          </EuiIconEmpty>
+                        </EuiIcon>
+                      </button>
+                    </EuiButtonIcon>
+                  </span>
+                </span>
+              </EuiButtonContent>
+            </button>
+          </EuiButtonEmpty>
+        </span>
+      </EuiToolTip>
     </dd>
   </EuiDescriptionListDescription>
 </CheckResult>

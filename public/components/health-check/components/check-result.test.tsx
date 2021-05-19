@@ -65,7 +65,7 @@ describe('Check result component', () => {
   });
 
   test('should print error', () => {
-    validationService.mockImplementation(() => ({ errors: ['error'] }));
+    validationService.mockImplementation(() => {throw 'error'});
     const component = mount(
       <CheckResult
         name={'test'}
