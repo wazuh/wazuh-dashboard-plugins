@@ -27,6 +27,7 @@ import {
   WAZUH_MONITORING_DEFAULT_ENABLED,
   WAZUH_MONITORING_DEFAULT_FREQUENCY,
 } from '../../../common/constants';
+import { tryCatchForIndexPermissionError } from '../tryCatchForIndexPermissionError'
 
 const blueWazuh = '\u001b[34mwazuh\u001b[39m';
 const monitoringErrorLogColors = [blueWazuh, 'monitoring', 'error'];
@@ -177,19 +178,16 @@ async function checkTemplate(context) {
  */
 async function insertMonitoringDataElasticsearch(context, data) {
   const monitoringIndexName = MONITORING_INDEX_PREFIX + indexDate(MONITORING_CREATION);
-  try {
     if (!MONITORING_ENABLED){
       return;
     };
-    try{
+    tryCatchForIndexPermissionError(monitoringIndexName, 'monitoring:insertMonitoringDataElasticsearch') (async() => {
       const exists = await context.core.elasticsearch.client.asInternalUser.indices.exists({index: monitoringIndexName});
       if(!exists.body){
         await createIndex(context, monitoringIndexName);
       }
-    }catch(error){
-      log('monitoring:insertMonitoringDataElasticsearch', error.message || error);
-    }
-    try{
+    });
+    tryCatchForIndexPermissionError(monitoringIndexName, 'monitoring:insertMonitoringDataElasticsearch') (async() => {
       // Update the index configuration
       const appConfig = getConfiguration();
       const indexConfiguration = buildIndexSettings(
@@ -206,22 +204,12 @@ async function insertMonitoringDataElasticsearch(context, data) {
         body: indexConfiguration
       });
 
-    }catch(error){
-      log('monitoring:insertMonitoringDataElasticsearch', error.message || error);
-    }
+    });    
 
+    tryCatchForIndexPermissionError(monitoringIndexName, 'monitoring:insertMonitoringDataElasticsearch', context) (async() => {
     // Insert data to the monitoring index
     await insertDataToIndex(context, monitoringIndexName, data);
-  } catch (error) {
-    const errorMessage = `Could not check if the index ${
-      monitoringIndexName
-    } exists due to ${error.message || error}`;
-    log(
-      'monitoring:insertMonitoringDataElasticsearch',
-      errorMessage
-    );
-    context.wazuh.logger.error(errorMessage);
-  }
+    });
 }
 
 /**

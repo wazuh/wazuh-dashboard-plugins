@@ -52,10 +52,10 @@ export class WazuhApiCtrl {
               });
             }
           } catch (error) {
-            log('wazuh-api:getToken', error.message || error);
+              log('wazuh-api:getToken', error.message || error);
+            }
           }
         }
-      }
       let token;
       if (await APIUserAllowRunAs.canUse(idHost) == API_USER_STATUS_RUN_AS.ENABLED) {
         token = await context.wazuh.api.client.asCurrentUser.authenticate(idHost);
@@ -80,7 +80,7 @@ export class WazuhApiCtrl {
       });
     } catch (error) {
       const errorMessage = ((error.response || {}).data || {}).detail || error.message || error;
-      log('wazuh-api:getToken', errorMessage);
+        log('wazuh-api:getToken', errorMessage);
       return ErrorResponse(
         `Error getting the authorization token: ${errorMessage}`,
         3000,
@@ -206,7 +206,10 @@ export class WazuhApiCtrl {
       // If we have an invalid response from the Wazuh API
       throw new Error(responseManagerInfo.data.detail || `${api.url}:${api.port} is unreachable`);
     } catch (error) {
-      log('wazuh-api:checkStoredAPI', error.message || error);
+      const isDown = (error || {}).code === 'ECONNREFUSED';
+      if (!isDown) {
+        log('wazuh-api:checkStoredAPI', error.message || error);
+      }
       if (error.code === 'EPROTO') {
         return response.ok({
           body: {
