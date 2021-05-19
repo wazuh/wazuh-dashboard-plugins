@@ -1545,10 +1545,8 @@ export class WazuhReportingCtrl {
           `Iterate over ${config.sections.length} configuration sections`,
           'debug'
         );
-        let contador = 0;
         for (let section of config.sections) {
           let titleOfSubsection = false;
-          contador++;
           if (
             components[idxComponent] &&
             (section.config || section.wodle)
