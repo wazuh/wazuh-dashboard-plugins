@@ -73,6 +73,7 @@ class WzRulesetEditor extends Component {
       isSaving: false,
       error: false,
       inputValue: '',
+      initialInputValue: '',
       showWarningRestart: false,
       isModalVisible: false,
       hasChanges: false,
@@ -96,6 +97,9 @@ class WzRulesetEditor extends Component {
   componentDidUpdate(prevProps, prevState) {
     if (prevState.content !== this.state.content) {
       this.setState({ hasChanges: this.state.content !== this.state.initContent });
+    }
+    if (prevState.inputValue !== this.state.inputValue){
+      this.setState({ hasChanges: this.state.inputValue !== this.state.initialInputValue });
     }
   }
 
@@ -277,7 +281,13 @@ class WzRulesetEditor extends Component {
                               color="primary"
                               iconSize="l"
                               iconType="arrowLeft"
-                              onClick={() => this.props.cleanInfo()}
+                              onClick={() => {
+                                if (this.state.hasChanges) {
+                                  showModal();
+                                } else {
+                                  this.props.cleanInfo();
+                                }
+                              }}
                             />
                           </EuiToolTip>
                         </EuiFlexItem>
