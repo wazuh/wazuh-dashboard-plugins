@@ -500,10 +500,10 @@ export class ReportPrinter{
     const widths = new Array;
     
     for (let step = 0; step < columns.length - 1; step++) {
-      let column_length = tableRows[0][step].text.length * widthCharacter;
-      if (column_length <= Math.round(totalWidth / totalLength)) {
-        widths.push(column_length);
-        totalWidth -= column_length;
+      let columnLength = tableRows[0][step].text.length * widthCharacter;
+      if (columnLength <= Math.round(totalWidth / totalLength)) {
+        widths.push(columnLength);
+        totalWidth -= columnLength;
       } 
       else {
         widths.push(Math.round(totalWidth / totalLength));
