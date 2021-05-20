@@ -44,6 +44,7 @@ export const Logtest = compose(
   const [value, setValue] = useState([]);
   const [testing, setTesting] = useState(false);
   const [testResult, setTestResult] = useState('');
+  const [token, setToken] = useState('');
 
   const onChange = (e) => {
     setValue(e.target.value.split('\n').filter((item) => item));
@@ -81,19 +82,7 @@ export const Logtest = compose(
     );
   };
 
-  const getTokenSessionLogtest = async () => {
-    const body = {
-      log_format: 'syslog',
-      location: 'logtest',
-      event: 'get token logtest session',
-    };
-    return await WzRequest.apiReq('PUT', '/logtest', body)
-    .then(res => res.data.data.token)
-    .catch(error => '') 
-  } 
-
   const runAllTests = async () => {
-    const token = await getTokenSessionLogtest()
     setTestResult('');
     setTesting(true);
     try {
@@ -103,11 +92,14 @@ export const Logtest = compose(
             log_format: 'syslog',
             location: 'logtest',
             event: event,
-            token: token
+            token: token,
           };
           return await WzRequest.apiReq('PUT', '/logtest', body);
         })
       );
+
+      setToken(responsesLogtest[0].data.data.token);
+
       const testResults = responsesLogtest.map((response) =>
         response.data.data.output.rule || ''
           ? formatResult(response.data.data.output, response.data.data.alert)
