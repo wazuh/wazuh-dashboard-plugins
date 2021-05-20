@@ -926,13 +926,15 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
 
 
     const openSelectorsButton = (
-      <EuiButtonEmpty 
-        iconType="boxesVertical"
-        iconSide="right"
-        style={{ position: 'relative', right: 0 }}
-        onClick={()=> this.switchSelectorsPopOver()}
-        size="s"
-        aria-label="Open selectors"></EuiButtonEmpty>
+      <EuiToolTip position="bottom" content="Show selectors">
+        <EuiButtonEmpty 
+          iconType="boxesVertical"
+          iconSide="right"
+          style={{ position: 'relative', right: 0 }}
+          onClick={()=> this.switchSelectorsPopOver()}
+          size="s"
+          aria-label="Open selectors"></EuiButtonEmpty>
+      </EuiToolTip>
     )
    
 
