@@ -492,11 +492,11 @@ export class ReportPrinter{
       })
     }); 
 
-    // 385 el width máximo inicial por columna
+    // 385 is the max inicial width per column
     let totalLength = columns.length - 1;
     const widthColumn = 385/totalLength;
     let totalWidth = totalLength * widthColumn;
-    const widthCharacter = 5; //min width para un caracter
+    const widthCharacter = 5; //min width per character
     const widths = new Array;
     
     for (let step = 0; step < columns.length - 1; step++) {
