@@ -26,14 +26,14 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Fixed
 
 - Fixed screen flickers in Cluster visualization [#3159](https://github.com/wazuh/wazuh-kibana-app/pull/3159)
-- Fix the broken links when using `server.basePath` Kibana setting [#3161](https://github.com/wazuh/wazuh-kibana-app/pull/3161)
-- Fixing filter in reports [#3173](https://github.com/wazuh/wazuh-kibana-app/pull/3173)
-- Fix typo error in Settings/Configuration [#3234](https://github.com/wazuh/wazuh-kibana-app/pull/3234)
+- Fixed the broken links when using `server.basePath` Kibana setting [#3161](https://github.com/wazuh/wazuh-kibana-app/pull/3161)
+- Fixed filter in reports [#3173](https://github.com/wazuh/wazuh-kibana-app/pull/3173)
+- Fixed typo error in Settings/Configuration [#3234](https://github.com/wazuh/wazuh-kibana-app/pull/3234)
 - Fixed fields overlap in the agent summary screen [#3217](https://github.com/wazuh/wazuh-kibana-app/pull/3217)
-- Fix Ruleset Test, each request is made in a different session instead of all in the same session [#3257] (https://github.com/wazuh/wazuh-kibana-app/pull/3257)
+- Fixed Ruleset Test, each request is made in a different session instead of all in the same session [#3257](https://github.com/wazuh/wazuh-kibana-app/pull/3257)
 - Fixed the `Visualize` button is not displaying when expanding a field in the Events sidebar [#3237](https://github.com/wazuh/wazuh-kibana-app/pull/3237)
-- Add error when add sample data fails [#3241] (https://github.com/wazuh/wazuh-kibana-app/pull/3241)
-- Fix modules are missing in the agent menu [#3244] (https://github.com/wazuh/wazuh-kibana-app/pull/3244)
+- Fixed message of error when add sample data fails [#3241](https://github.com/wazuh/wazuh-kibana-app/pull/3241)
+- Fixed modules are missing in the agent menu [#3244](https://github.com/wazuh/wazuh-kibana-app/pull/3244)
 
 ## Wazuh v4.2.0 - Kibana 7.10.2 , 7.11.2 - Revision 4201
 
