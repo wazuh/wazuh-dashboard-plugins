@@ -235,16 +235,10 @@ export function jobInitializeRun(context) {
 
   // Init function. Check for "wazuh-version" document existance.
   const init = async () => {
-    try {
-      await Promise.all([
-        checkWazuhIndex(),
-        checkWazuhRegistry()
-      ]);
-    } catch (error) {
-      log('initialize:init', error.message || error);
-      context.wazuh.logger.error(error.message || error);
-      return Promise.reject(error);
-    }
+    await Promise.all([
+      checkWazuhIndex(),
+      checkWazuhRegistry()
+    ]);
   };
 
   const createKibanaTemplate = () => {
@@ -357,10 +351,8 @@ export function jobInitializeRun(context) {
         await getTemplateByName();
       }
     } catch (error) {
-      if(error.name !== 'ResponseError'){
-        log('initialize:checkKibanaStatus', error.message || error);
-        context.wazuh.logger.error(error.message || error);
-      }
+      log('initialize:checkKibanaStatus', error.message || error);
+      context.wazuh.logger.error(error.message || error);
     }
   };
 

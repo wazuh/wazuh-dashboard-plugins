@@ -181,35 +181,47 @@ async function insertMonitoringDataElasticsearch(context, data) {
     if (!MONITORING_ENABLED){
       return;
     };
-    tryCatchForIndexPermissionError(monitoringIndexName, indexLocation) (async() => {
-      const exists = await context.core.elasticsearch.client.asInternalUser.indices.exists({index: monitoringIndexName});
-      if(!exists.body){
-        await createIndex(context, monitoringIndexName);
-      }
-    });
-    tryCatchForIndexPermissionError(monitoringIndexName, indexLocation) (async() => {
-      // Update the index configuration
-      const appConfig = getConfiguration();
-      const indexConfiguration = buildIndexSettings(
-        appConfig,
-        'wazuh.monitoring',
-        WAZUH_MONITORING_DEFAULT_INDICES_SHARDS
-      );
+    try {
+      await tryCatchForIndexPermissionError(monitoringIndexName) (async() => {
+        const exists = await context.core.elasticsearch.client.asInternalUser.indices.exists({index: monitoringIndexName});
+        if(!exists.body){
+          await createIndex(context, monitoringIndexName);
+        }
+      })();
+    }catch(error){
+      log(indexLocation, error.message || error);
+    }
+    try{
+      await tryCatchForIndexPermissionError(monitoringIndexName) (async() => {
+        // Update the index configuration
+        const appConfig = getConfiguration();
+        const indexConfiguration = buildIndexSettings(
+          appConfig,
+          'wazuh.monitoring',
+          WAZUH_MONITORING_DEFAULT_INDICES_SHARDS
+        );
 
-      // To update the index settings with this client is required close the index, update the settings and open it
-      // Number of shards is not dynamic so delete that setting if it's given
-      delete indexConfiguration.settings.index.number_of_shards;
-      await context.core.elasticsearch.client.asInternalUser.indices.putSettings({
-        index: monitoringIndexName,
-        body: indexConfiguration
-      });
+        // To update the index settings with this client is required close the index, update the settings and open it
+        // Number of shards is not dynamic so delete that setting if it's given
+        delete indexConfiguration.settings.index.number_of_shards;
+        await context.core.elasticsearch.client.asInternalUser.indices.putSettings({
+          index: monitoringIndexName,
+          body: indexConfiguration
+        });
 
-    });    
-
-    tryCatchForIndexPermissionError(monitoringIndexName, indexLocation, context) (async() => {
-    // Insert data to the monitoring index
-    await insertDataToIndex(context, monitoringIndexName, data);
-    });
+      })(); 
+    }catch(error){
+      log(indexLocation, error.message || error);
+    }
+    try {
+      await tryCatchForIndexPermissionError(monitoringIndexName) (async() => {
+      // Insert data to the monitoring index
+      await insertDataToIndex(context, monitoringIndexName, data);
+      })();
+    } catch (error) {
+      log(indexLocation, errorMessage);
+      context.wazuh.logger.error(error.message);
+    }
 }
 
 /**

@@ -11,7 +11,7 @@
  */
 import { log } from '../lib/logger';
 
-export const tryCatchForIndexPermissionError = (wazuhIndex: string, logLocation?: string, context?) => (functionToTryCatch) => async () => {
+export const tryCatchForIndexPermissionError = (wazuhIndex: string) => (functionToTryCatch) => async () => {
     try {
         await functionToTryCatch();
     }
@@ -30,15 +30,6 @@ export const tryCatchForIndexPermissionError = (wazuhIndex: string, logLocation?
               } exists due to no permissions for create, delete or check`;
               break;
         }
-        if(context){
-            context.wazuh.logger.error(error); 
-        }
-        if(logLocation){
-            log(logLocation, error.message || error);
-        }
-        else{
-            return Promise.reject(error);
-        }
-
+        return Promise.reject(error);
     }
 }

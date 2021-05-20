@@ -44,7 +44,7 @@ export class SaveDocument {
 
   private async checkIndexAndCreateIfNotExists(index, shards, replicas) {
     try {
-      tryCatchForIndexPermissionError(index, this.logPath) (async() => {
+      await tryCatchForIndexPermissionError(index) (async() => {
         const exists = await this.esClientInternalUser.indices.exists({ index });
         log(this.logPath, `Index '${index}' exists? ${exists.body}`, 'debug');
         if (!exists.body) {
@@ -61,8 +61,9 @@ export class SaveDocument {
           });
           log(this.logPath, `Status of create a new index: ${JSON.stringify(response)}`, 'debug');
         }
-      });
+      })();
     } catch (error) {
+      log(this.logPath, error.message || error);
       this.checkDuplicateIndexError(error);
     }
   }
