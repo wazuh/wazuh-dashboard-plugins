@@ -26,7 +26,7 @@ import {
   WAZUH_MONITORING_DEFAULT_ENABLED,
   WAZUH_MONITORING_DEFAULT_FREQUENCY,
 } from '../../../common/constants';
-import { tryCatchForIndexPermissionError } from '../tryCatchForIndexPermissionError'
+import { tryCatchForIndexPermissionError } from '../tryCatchForIndexPermissionError';
 
 const blueWazuh = '\u001b[34mwazuh\u001b[39m';
 const monitoringErrorLogColors = [blueWazuh, 'monitoring', 'error'];

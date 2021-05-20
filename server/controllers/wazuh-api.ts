@@ -81,7 +81,7 @@ export class WazuhApiCtrl {
       });
     } catch (error) {
       const errorMessage = ((error.response || {}).data || {}).detail || error.message || error;
-        log('wazuh-api:getToken', errorMessage);
+      log('wazuh-api:getToken', errorMessage);
       return ErrorResponse(
         `Error getting the authorization token: ${errorMessage}`,
         3000,

@@ -1,5 +1,5 @@
 /*
- * Wazuh app - React HOCs to manage the message when elastic show a Response error
+ * Wazuh app - HOF to manage the message when elastic show a Response error / security_exception
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -16,15 +16,15 @@ export const tryCatchForIndexPermissionError = (wazuhIndex: string, logLocation?
         await functionToTryCatch();
     }
     catch (error) {
-        enum error_types{
+        enum errorTypes{
             SECURITY_EXCEPTION = 'security_exception',
             RESPONSE_ERROR = 'Response Error',
         }
         switch(error.message){
-            case error_types.SECURITY_EXCEPTION:
+            case errorTypes.SECURITY_EXCEPTION:
               error.message = (((((error.meta || error.message).body || error.message).error || error.message).root_cause[0] || error.message).reason || error.message);
               break;
-            case error_types.RESPONSE_ERROR:
+            case errorTypes.RESPONSE_ERROR:
               error.message = `Could not check if the index ${
                 wazuhIndex
               } exists due to no permissions for create, delete or check`;
