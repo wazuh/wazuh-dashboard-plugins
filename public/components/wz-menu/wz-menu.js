@@ -818,22 +818,6 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
               )}
             </EuiButtonEmpty>
           </div>
-
-          {thereAreSelectors && (
-            <div className="wz-menu-selectors">
-              {AppState.getAPISelector() &&
-                this.state.currentAPI &&
-                this.state.APIlist &&
-                this.state.APIlist.length > 1 &&
-                this.buildApiSelector()}
-              {!this.state.currentAPI && <span> No API </span>}
-              {AppState.getPatternSelector() &&
-                this.state.theresPattern &&
-                this.state.patternList &&
-                this.state.patternList.length > 1 &&
-                this.buildPatternSelector()}
-            </div>
-          )}
         </div>
 
         <div className="wz-menu-right-side">
@@ -976,7 +960,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
               </EuiPopover>
             </EuiFlexItem>
 
-            <EuiFlexItem grow={false}>
+            <EuiFlexItem grow={false} style={{ 'margin-left': 0 }}>
               <WzGlobalBreadcrumbWrapper></WzGlobalBreadcrumbWrapper>
             </EuiFlexItem>
 
