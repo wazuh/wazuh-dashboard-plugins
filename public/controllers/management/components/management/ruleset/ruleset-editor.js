@@ -282,11 +282,7 @@ class WzRulesetEditor extends Component {
                               iconSize="l"
                               iconType="arrowLeft"
                               onClick={() => {
-                                if (this.state.hasChanges) {
-                                  showModal();
-                                } else {
-                                  this.props.cleanInfo();
-                                }
+                                this.state.hasChanges ? showModal() : this.props.cleanInfo();
                               }}
                             />
                           </EuiToolTip>
@@ -311,11 +307,7 @@ class WzRulesetEditor extends Component {
                               iconSize="l"
                               iconType="arrowLeft"
                               onClick={() => {
-                                if (this.state.hasChanges) {
-                                  showModal();
-                                } else {
-                                  this.props.cleanInfo();
-                                }
+                                this.state.hasChanges ? showModal() : this.props.cleanInfo();
                               }}
                             />
                           </EuiToolTip>
