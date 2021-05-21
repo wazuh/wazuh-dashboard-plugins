@@ -12,8 +12,13 @@
 
 import axios, { AxiosResponse } from 'axios';
 import { ManageHosts } from './manage-hosts';
+import https from 'https';
 
-process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
+const httpsAgent = new https.Agent({
+  rejectUnauthorized: false,  
+});
+
+const _axios = axios.create({ httpsAgent });
 
 interface APIHost{
   url: string
@@ -54,7 +59,7 @@ export const authenticate = async (apiHostID: string, authContext?: any): Promis
       ...(!!authContext ? { data: authContext } : {})
     };
 
-    const response: AxiosResponse = await axios(optionsRequest);
+    const response: AxiosResponse = await _axios(optionsRequest);
     const token: string = (((response || {}).data || {}).data || {}).token;
     if (!authContext) {
       CacheInternalUserAPIHostToken.set(apiHostID, token);
@@ -107,7 +112,7 @@ export const requestAsCurrentUser = async (method: string, path: string, data: a
 const request = async (method: string, path: string, data: any, options: any): Promise<AxiosResponse> => {
   try{
     const optionsRequest = await buildRequestOptions(method, path, data, options);
-    const response: AxiosResponse = await axios(optionsRequest);
+    const response: AxiosResponse = await _axios(optionsRequest);
     return response;
   }catch(error){
     throw error;

@@ -223,7 +223,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
         this.setState({ currentMenuTab: currentTab, hover: currentTab });
       }
       const list = await PatternHandler.getPatternList('api');
-      if (!list) return;
+      if (!list || (list && !list.length)) return;
 
       // Abort if we have disabled the pattern selector
       if (!AppState.getPatternSelector()) return;
@@ -253,7 +253,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
         });
       }
     } catch (error) {
-      this.showToast('danger', 'Error', error, 4000);
+      this.showToast('danger', 'Error', error.message || error, 4000);
     }
     this.isLoading = false;
   }
