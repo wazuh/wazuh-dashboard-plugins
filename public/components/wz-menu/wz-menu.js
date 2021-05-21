@@ -634,7 +634,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
   getApiSelectorComponent() {
     let style = { maxWidth: 100 };
     if (this.showSelectorsInPopover){
-      style = { width: '100%' };
+      style = { width: '100%', minWidth: 200 };
     }
 
     return (
@@ -666,7 +666,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
 
     let style = { maxWidth: 200, maxHeight: 50 };
     if (this.showSelectorsInPopover){
-      style = { width: '100%', maxHeight: 50 };
+      style = { width: '100%', maxHeight: 50, minWidth: 200 };
     }
 
     return(
@@ -984,19 +984,18 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
                 
                 <EuiFlexItem grow={false}>
                   <EuiPopover
-                        responsive={false}
                         ownFocus
                         anchorPosition="downCenter"
                         button={openSelectorsButton}
                         isOpen={this.state.isSelectorsPopoverOpen}
                         closePopover={()=> this.switchSelectorsPopOver()}> 
                           { this.state.patternList.length > 1 &&
-                            <EuiFlexGroup alignItems="center" style={{ paddingTop: 5 }} grow={false}>
+                            <EuiFlexGroup alignItems="center" style={{ paddingTop: 5 }}>
                               {this.getIndexPatternSelectorComponent()}
                             </EuiFlexGroup>
                           } 
                           { this.state.APIlist.length > 1 &&
-                            <EuiFlexGroup alignItems="center" style={{ paddingTop: 5 }} grow={false}>
+                            <EuiFlexGroup alignItems="center" style={{ paddingTop: 5 }} direction="row">
                               {this.getApiSelectorComponent()}
                             </EuiFlexGroup>
                           } 
