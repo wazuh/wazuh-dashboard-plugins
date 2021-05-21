@@ -303,7 +303,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
 
   changeAPI = async event => {
     try {
-      const apiId = event.target;
+      const apiId = event.target[event.target.selectedIndex];
       const apiEntry = this.state.APIlist.filter(item => {
         return item.id === apiId.value;
       });
@@ -984,18 +984,19 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
                 
                 <EuiFlexItem grow={false}>
                   <EuiPopover
+                        responsive={false}
                         ownFocus
                         anchorPosition="downCenter"
                         button={openSelectorsButton}
                         isOpen={this.state.isSelectorsPopoverOpen}
                         closePopover={()=> this.switchSelectorsPopOver()}> 
                           { this.state.patternList.length > 1 &&
-                            <EuiFlexGroup alignItems="center" style={{ paddingTop: 5 }}>
+                            <EuiFlexGroup alignItems="center" style={{ paddingTop: 5 }} grow={false}>
                               {this.getIndexPatternSelectorComponent()}
                             </EuiFlexGroup>
                           } 
                           { this.state.APIlist.length > 1 &&
-                            <EuiFlexGroup alignItems="center" style={{ paddingTop: 5 }}>
+                            <EuiFlexGroup alignItems="center" style={{ paddingTop: 5 }} grow={false}>
                               {this.getApiSelectorComponent()}
                             </EuiFlexGroup>
                           } 
