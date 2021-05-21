@@ -41,13 +41,13 @@ export const Logtest = compose(
   withReduxProvider,
   withUserAuthorizationPrompt([{ action: 'logtest:run', resource: `*:*:*` }])
 )((props: LogstestProps) => {
-  const [value, setValue] = useState([]);
+  const [events, setEvents] = useState([]);
   const [testing, setTesting] = useState(false);
   const [testResult, setTestResult] = useState('');
   const [token, setToken] = useState('');
 
   const onChange = (e) => {
-    setValue(e.target.value.split('\n').filter((item) => item));
+    setEvents(e.target.value.split('\n').filter((item) => item));
   };
 
   const formatResult = (result, alert) => {
@@ -82,30 +82,45 @@ export const Logtest = compose(
     );
   };
 
+  const putLogtest = async (body) => {
+    body.log_format = 'syslog';
+    body.location = 'logtest';
+
+    return await WzRequest.apiReq('PUT', '/logtest', body);
+  };
+
   const runAllTests = async () => {
     setTestResult('');
     setTesting(true);
+    let myToken = token;
+
     try {
-      const responsesLogtest = await Promise.all(
-        value.map(async (event) => {
-          const body = {
-            log_format: 'syslog',
-            location: 'logtest',
-            event: event,
-            token: token,
-          };
-          return await WzRequest.apiReq('PUT', '/logtest', body);
-        })
-      );
+      const tasks = events.map((event) => () => {
+        const body = {
+          event: event,
+          token: myToken,
+        };
+        return putLogtest(body);
+      });
 
-      setToken(responsesLogtest[0].data.data.token);
+      const logTestSeries = (events, results = []) => {
+        !events.length
+          ? Promise.resolve(results)
+          : events[0]().then((result) => {
+              myToken = result.data.data.token;
+              setToken(myToken);
+              logTestSeries(events.slice(1), [...results, result]);
+            });
 
-      const testResults = responsesLogtest.map((response) =>
-        response.data.data.output.rule || ''
-          ? formatResult(response.data.data.output, response.data.data.alert)
-          : `No result found for:  ${response.data.data.output.full_log} \n\n\n`
-      );
-      setTestResult(testResults);
+        const testResults = results.map((response) =>
+          response.data.data.output.rule || ''
+            ? formatResult(response.data.data.output, response.data.data.alert)
+            : `No result found for:  ${response.data.data.output.full_log} \n\n\n`
+        );
+        setTestResult(testResults);
+      };
+
+      await logTestSeries(tasks);
     } finally {
       setTesting(false);
     }
@@ -133,7 +148,7 @@ export const Logtest = compose(
           <EuiButton
             style={{ maxWidth: '100px' }}
             isLoading={testing}
-            isDisabled={testing || value.length === 0}
+            isDisabled={testing || events.length === 0}
             iconType="play"
             fill
             onClick={runAllTests}
