@@ -978,8 +978,8 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
               this.getApiSelectorComponent()  
             }
 
-
-            { this.showSelectorsInPopover &&
+            { this.showSelectorsInPopover && 
+              (this.state.patternList.length > 1 || this.state.APIlist.length > 1) &&
               <>
                 
                 <EuiFlexItem grow={false}>
@@ -988,14 +988,17 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
                         anchorPosition="downCenter"
                         button={openSelectorsButton}
                         isOpen={this.state.isSelectorsPopoverOpen}
-                        closePopover={()=> this.switchSelectorsPopOver()}>  
-                          <EuiFlexGroup alignItems="center" style={{ paddingTop: 5 }}>
-                          {this.getIndexPatternSelectorComponent()}
-                          </EuiFlexGroup>
-                          <EuiSpacer />
-                          <EuiFlexGroup alignItems="center">
-                          {this.getApiSelectorComponent()}
-                          </EuiFlexGroup>
+                        closePopover={()=> this.switchSelectorsPopOver()}> 
+                          { this.state.patternList.length > 1 &&
+                            <EuiFlexGroup alignItems="center" style={{ paddingTop: 5 }}>
+                              {this.getIndexPatternSelectorComponent()}
+                            </EuiFlexGroup>
+                          } 
+                          { this.state.APIlist.length > 1 &&
+                            <EuiFlexGroup alignItems="center" style={{ paddingTop: 5 }}>
+                              {this.getApiSelectorComponent()}
+                            </EuiFlexGroup>
+                          } 
                   </EuiPopover>
                 </EuiFlexItem>
                 
