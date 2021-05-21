@@ -93,7 +93,7 @@ export const RolesMappingEdit = ({
     modal = (
       <EuiOverlayMask>
         <EuiConfirmModal
-          title="Close flyout"
+          title="Unsubmitted changes"
           onConfirm={() => {
             setIsModalVisible(false);
             closeFlyout(false);
