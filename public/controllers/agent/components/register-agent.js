@@ -291,7 +291,7 @@ export class RegisterAgent extends Component {
 
     // macos doesnt need = param
     if (this.state.selectedOS === 'macos') {
-      return deployment.replaceAll('=', ' ');
+      return deployment.replace(/=/g, ' ');
     }
 
     return deployment;
