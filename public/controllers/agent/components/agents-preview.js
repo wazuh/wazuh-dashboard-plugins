@@ -51,6 +51,7 @@ export const AgentsPreview = compose(
     super(props);
     this.state = { data: [], loading: false, showAgentsEvolutionVisualization: false, agentTableFilters: [] };
     this.wazuhConfig = new WazuhConfig();
+    this.managers = [];
     this.agentStatusLabelToIDMap = {
       'Active': 'active',
       'Disconnected': 'disconnected',
@@ -93,7 +94,12 @@ export const AgentsPreview = compose(
       return prev;
     }, {});
   };
-
+  async getManagers() {
+    const agents = await WzRequest.apiReq('GET', '/agents', {});
+    const managers = agents.data.data.affected_items.map((agent) => agent.manager);
+    const uniqueManagers = managers.reduce((unique,manager) => unique.includes(manager) ? unique : [...unique,manager], []);
+    return uniqueManagers;
+  }
   async getSummary() {
     try {
       this.setState({ loading: true });
@@ -116,6 +122,7 @@ export const AgentsPreview = compose(
       for (let [key, value] of Object.entries(this.platforms)) {
         platformsModel.push({ id: key, label: key, value: value });
       }
+      this.managers = await this.getManagers();
       this._isMount &&
         this.setState({ platforms: platformsModel, loading: false });
     } catch (error) {}
@@ -293,7 +300,7 @@ export const AgentsPreview = compose(
                         <KibanaVis
                           visID={'Wazuh-App-Overview-General-Agents-status'}
                           tab={'general'}
-                          manager={AppState.getClusterInfo().manager}
+                          managers={this.managers}
                         />
                       </WzReduxProvider>
                     </div>
