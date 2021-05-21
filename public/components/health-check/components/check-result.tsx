@@ -11,7 +11,7 @@
  * Find more information about this on the LICENSE file.
  *
  */
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import React, { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import {
   EuiButtonIcon,
   EuiDescriptionListDescription,
@@ -23,6 +23,7 @@ import {
   EuiButtonEmpty,
 } from '@elastic/eui';
 
+
 type Result = 'loading' | 'ready' | 'error' | 'error_retry' | 'disabled' | 'waiting';
 
 export function CheckResult(props) {
@@ -31,6 +32,7 @@ export function CheckResult(props) {
   const [verboseInfo, setVerboseInfo] = useState<string[]>([]);
   const [verboseIsOpen, setVerboseIsOpen] = useState<boolean>(false);
   const [isCheckFinished, setIsCheckFinished] = useState<boolean>(false);
+  const verboseInfoWithNotificationWasOpened = useRef(false);
 
   useEffect(() => {
     if (props.check && !props.isLoading && awaitForIsReady()){
@@ -140,11 +142,17 @@ export function CheckResult(props) {
     }
   };
 
-  const switchVerboseDetails = useCallback(() => {
-    setVerboseIsOpen(state => !state);
-  },[]);
-  
   const tooltipVerboseButton = `${verboseIsOpen ? 'Close' : 'Open'} details`;
+  const checkDidSomeAction = useMemo(() => verboseInfo.some(log => log.type === 'action'), [verboseInfo]);
+  const shouldShowNotification = checkDidSomeAction && !verboseInfoWithNotificationWasOpened.current;
+  
+  const switchVerboseDetails = useCallback(() => {
+    if(checkDidSomeAction && !verboseInfoWithNotificationWasOpened.current){
+      verboseInfoWithNotificationWasOpened.current = true;
+    };
+    setVerboseIsOpen(state => !state);
+  },[checkDidSomeAction]);
+
   return (
     <>
       <EuiDescriptionListTitle>
@@ -163,7 +171,7 @@ export function CheckResult(props) {
               iconType={verboseIsOpen ? 'inspect' : 'inspect'}
               color={verboseIsOpen ? 'primary' : 'subdued'}
             />
-            {verboseInfo.filter(log => log.type === 'action').length > 0 && (
+            {shouldShowNotification && (
               <EuiIcon
                 style={{position: 'relative', top: '-10px', left: '-10px'}}
                 color='accent'
