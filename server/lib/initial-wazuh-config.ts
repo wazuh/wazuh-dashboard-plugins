@@ -30,6 +30,12 @@ export const initialWazuhConfig: string = `---
 # Also, you can check our repository:
 # https://github.com/wazuh/wazuh-kibana-app
 #
+# ------------------------------- Disable roles -------------------------------
+#
+# Defines which Elasticsearch roles disable Wazuh
+# disabled_roles: 
+#      - wazuh_disabled
+#
 # ------------------------------- Index patterns -------------------------------
 #
 # Default index pattern to use.

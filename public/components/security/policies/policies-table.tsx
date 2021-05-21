@@ -10,16 +10,20 @@ import { WzRequest } from '../../../react-services/wz-request';
 import { ErrorHandler } from '../../../react-services/error-handler';
 import { WzAPIUtils } from '../../../react-services/wz-api-utils';
 import { WzButtonModalConfirm } from '../../common/buttons';
+import { CreatePolicyFlyout } from './create-policy';
 
-export const PoliciesTable = ({policies, loading, editPolicy, updatePolicies}) => {
+export const PoliciesTable = ({policies, loading, editPolicy, createPolicy,updatePolicies}) => {
 
-    const getRowProps = item => {
-        const { id } = item;
-        return {
-          'data-test-subj': `row-${id}`,
-          onClick: () => editPolicy(item),
-        };
+    const getRowProps = (item) => {
+      const { id } = item;
+      return {
+        'data-test-subj': `row-${id}`,
+        onClick: () => {
+          editPolicy(item);
+          createPolicy(item)
+        },
       };
+    };
 
 
     const columns = [

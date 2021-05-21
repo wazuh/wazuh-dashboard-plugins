@@ -69,7 +69,7 @@ export class FlyoutDetail extends Component {
 
   render() {
     const { currentItem } = this.state;
-    const title = `${currentItem.name} ${currentItem.cve}`;
+    const title = `${currentItem.cve}`;
     const id = title.replace(/ /g, '_');
 
     return (
