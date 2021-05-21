@@ -22,6 +22,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Refactored the Health check component [#3197](https://github.com/wazuh/wazuh-kibana-app/pull/3197)
 - Added version in package downloaded name in agent deploy command [#3210](https://github.com/wazuh/wazuh-kibana-app/issues/3210)
 - Removed restriction to allow only current active agents from vulnerability inventory [#3243](https://github.com/wazuh/wazuh-kibana-app/pull/3243)
+- Move API selector and Index Pattern Selector to the header bar [#3175](https://github.com/wazuh/wazuh-kibana-app/pull/3175) 
 
 ### Fixed
 
