@@ -1061,7 +1061,7 @@ export class WazuhApiCtrl {
       const wazuhSecurity = SecurityObj(context.wazuh.plugins);
       const data = (await wazuhSecurity.getCurrentUser(request, context)).authContext;
 
-      const isWazuhDisabled = +data.roles.some((role) => disabledRoles.includes(role));
+      const isWazuhDisabled = +(data.roles || []).some((role) => disabledRoles.includes(role));
 
       return response.ok({
         body: { isWazuhDisabled }

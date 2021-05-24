@@ -1,7 +1,7 @@
 .wz-global-breadcrumb {
     font-size: 14px;
     font-family: "Inter UI";
-    padding: 0px 0px 0px 5px;
+    padding: 0px;
 }
 
 .wz-global-breadcrumb-btn{
@@ -14,11 +14,6 @@
     font-family: "Inter UI";
 }
 
-@media only screen and (max-width: 767px){
-    .wz-global-breadcrumb {
-    padding-left: 16px;
-    }
-}
 
 @media screen and (-webkit-min-device-pixel-ratio: 0) { 
     _::-webkit-full-page-media, _:future, :root , .wz-global-breadcrumb {
