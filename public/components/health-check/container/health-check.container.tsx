@@ -55,35 +55,41 @@ import { CheckLogger } from '../types/check_logger';
 const checks = {
   api: {    
     title: 'Check Wazuh API connection',
+    label: 'API connection',
     validator: checkApiService,
     awaitFor: [],
     canRetry: true,
   },
   setup: {
     title: 'Check Wazuh API version',
+    label: 'API version',
     validator: checkSetupService,
     awaitFor: ["api"],
   },
   pattern: {
     title: 'Check alerts index pattern',
+    label: 'Alerts index pattern',
     validator: checkPatternService,
     awaitFor: [],
     canRetry: true,
   },
   template: {
     title: 'Check alerts indices template',
+    label: 'Alerts indices template',
     validator: checkTemplateService,
     awaitFor: ["pattern"],
     canRetry: true,
   },
   fields: {
     title: 'Check alerts index pattern fields',
+    label: 'alerts index pattern fields',
     validator: checkFieldsService,
     awaitFor: ["pattern"],
     canRetry: true,
   },
   patternMonitoring: {
     title: 'Check monitoring index pattern',
+    label: 'Monitoring index pattern',
     validator: (appConfig) => checkPatternSupportService(appConfig.data['wazuh.monitoring.pattern'], WAZUH_INDEX_TYPE_MONITORING),
     awaitFor: [],
     shouldCheck: true,
@@ -91,6 +97,7 @@ const checks = {
   },
   patternStatistics: {
     title: 'Check statistics index pattern',
+    label: 'Statistics index pattern',
     validator: (appConfig) => checkPatternSupportService(`${appConfig.data['cron.prefix']}-${appConfig.data['cron.statistics.index.name']}-*`, WAZUH_INDEX_TYPE_STATISTICS),
     awaitFor: [],
     shouldCheck: true,
@@ -98,18 +105,21 @@ const checks = {
   },
   maxBuckets: {
     title: `Check ${KIBANA_SETTING_NAME_MAX_BUCKETS} setting`,
+    label: `${KIBANA_SETTING_NAME_MAX_BUCKETS} setting`,
     validator: checkKibanaSettings(KIBANA_SETTING_NAME_MAX_BUCKETS, WAZUH_KIBANA_SETTING_MAX_BUCKETS),
     awaitFor: [],
     canRetry: true,
   },
   metaFields: {
     title: `Check ${KIBANA_SETTING_NAME_METAFIELDS} setting`,
+    label: `${KIBANA_SETTING_NAME_METAFIELDS} setting`,
     validator: checkKibanaSettings(KIBANA_SETTING_NAME_METAFIELDS, WAZUH_KIBANA_SETTING_METAFIELDS),
     awaitFor: [],
     canRetry: true,
   },
   timeFilter: {
     title: `Check ${KIBANA_SETTING_NAME_TIME_FILTER} setting`,
+    label: `${KIBANA_SETTING_NAME_TIME_FILTER} setting`,
     validator: checkKibanaSettings(KIBANA_SETTING_NAME_TIME_FILTER, JSON.stringify(WAZUH_KIBANA_SETTING_TIME_FILTER), (checkLogger: CheckLogger, options: {defaultAppValue: any}) => {
       getDataPlugin().query.timefilter.timefilter.setTime(WAZUH_KIBANA_SETTING_TIME_FILTER)
         && checkLogger.action(`Timefiler set to ${JSON.stringify(options.defaultAppValue)}`);
@@ -198,7 +208,7 @@ function HealthCheckComponent() {
       checkErrors[checkID].map((error, index) => (
         <Fragment key={index}>
           <EuiCallOut
-            title={error}
+            title={`[${checks[checkID].label}] ${error}`}
             color="danger"
             iconType="alert"
             style={{ textAlign: 'left' }}
@@ -249,6 +259,7 @@ function HealthCheckComponent() {
         </>
       )
       }
+      <EuiSpacer size="xl" />
     </div>
   );
 }

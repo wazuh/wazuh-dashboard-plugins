@@ -34,13 +34,10 @@ const trySetDefault = async (checkLogger: CheckLogger) => {
           }
         } catch (err) {
           checkLogger.info(`Could not connect to API id [${hosts[i].id}]: ${err.message || err}`);
-          return {
-            error: `Could not connect to API id [${hosts[i].id}]: ${err.message || err}`,
-          };
+          errors.push(`Could not connect to API id [${hosts[i].id}]: ${err.message || err}`);
         }
       }
       if (errors.length) {
-        checkLogger.error('No API available to connect');
         return Promise.reject('No API available to connect');
       }
     }
@@ -85,7 +82,6 @@ export const checkApiService = (appInfo: any) => async (checkLogger: CheckLogger
       AppState.setClusterInfo(cluster_info);
       checkLogger.info(`Set cluster info in cookie`);
     }
-
     if (data === 3099) {
       checkLogger.error('Wazuh not ready yet');
     } else if (data.data.error || data.data.data.apiIsDown) {
@@ -98,7 +94,7 @@ export const checkApiService = (appInfo: any) => async (checkLogger: CheckLogger
     }
   } catch (error) {
     AppState.removeNavigation();
-    checkLogger.error('Removed [navigate] cookie');
+    checkLogger.info('Removed [navigate] cookie');
     throw error;
   }
 };

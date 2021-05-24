@@ -31,7 +31,7 @@ type responseKbnSettings = { settings: kbnSettings };
 export const checkKibanaSettings = (kibanaSettingName: string, defaultAppValue: any, callback?: (checkLogger: CheckLogger, options: {defaultAppValue: any}) => void) => (appConfig: any) => async (checkLogger: CheckLogger) => {
   checkLogger.info('Getting settings...');
   const kibanaSettingsResponse: AxiosResponse<responseKbnSettings> = await GenericRequest.request('GET', '/api/kibana/settings');
-  checkLogger.info('Got settings');
+  checkLogger.info('Got Kibana settings');
   const valueKibanaSetting = kibanaSettingsResponse.data?.settings?.[kibanaSettingName]?.userValue;
   const settingsAreDifferent = !_.isEqual(valueKibanaSetting, defaultAppValue);
   checkLogger.info(`Check Kibana setting [${kibanaSettingName}]: ${stringifySetting(valueKibanaSetting)}`);

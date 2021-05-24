@@ -88,6 +88,6 @@ describe('Health Check container', () => {
     component.find('CheckResult').at(1).invoke('handleErrors')('setup',['Test error']); // invoke is wrapped with act to await for setState
 
     const callOutError = component.find('EuiCallOut');
-    expect(callOutError.text()).toBe('Test error');
+    expect(callOutError.text()).toBe('[API version] Test error');
   });
 });

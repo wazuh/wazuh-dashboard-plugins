@@ -145,6 +145,7 @@ export function CheckResult(props) {
   const tooltipVerboseButton = `${verboseIsOpen ? 'Close' : 'Open'} details`;
   const checkDidSomeAction = useMemo(() => verboseInfo.some(log => log.type === 'action'), [verboseInfo]);
   const shouldShowNotification = checkDidSomeAction && !verboseInfoWithNotificationWasOpened.current;
+  const haveLogs = verboseInfo.length > 0;
   
   const switchVerboseDetails = useCallback(() => {
     if(checkDidSomeAction && !verboseInfoWithNotificationWasOpened.current){
@@ -152,6 +153,29 @@ export function CheckResult(props) {
     };
     setVerboseIsOpen(state => !state);
   },[checkDidSomeAction]);
+
+  const inspectLogsButton = isCheckStarted && haveLogs ? 
+    <EuiToolTip
+      position='top'
+      content={tooltipVerboseButton}
+      >
+      <EuiButtonEmpty size='xs' onClick={switchVerboseDetails} isDisabled={!haveLogs} textProps={{ style:{overflow: 'visible' }}}>
+        <EuiButtonIcon
+          ariaLabel={tooltipVerboseButton}
+          iconType='inspect'
+          color='primary'
+        />
+        {shouldShowNotification && (
+          <EuiIcon
+            style={{position: 'relative', top: '-10px', left: '-10px'}}
+            color='accent'
+            type="dot"
+            size='s'
+          />
+        )}
+      </EuiButtonEmpty>
+    </EuiToolTip>
+    : null;
 
   return (
     <>
@@ -161,26 +185,7 @@ export function CheckResult(props) {
       <EuiDescriptionListDescription>
         {renderResult()}
         {' '}
-        <EuiToolTip
-          position='top'
-          content={tooltipVerboseButton}
-        >
-          <EuiButtonEmpty size='xs' onClick={switchVerboseDetails} textProps={{ style:{overflow: 'visible' }}}>
-            <EuiButtonIcon
-              ariaLabel={tooltipVerboseButton}
-              iconType={verboseIsOpen ? 'inspect' : 'inspect'}
-              color={verboseIsOpen ? 'primary' : 'subdued'}
-            />
-            {shouldShowNotification && (
-              <EuiIcon
-                style={{position: 'relative', top: '-10px', left: '-10px'}}
-                color='accent'
-                type="dot"
-                size='s'
-              />
-            )}
-          </EuiButtonEmpty>
-        </EuiToolTip>
+        {inspectLogsButton}
       </EuiDescriptionListDescription>
       {verboseIsOpen && verboseInfo.length > 0 && (
         <EuiCodeBlock

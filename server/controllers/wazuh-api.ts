@@ -212,14 +212,14 @@ export class WazuhApiCtrl {
         return response.ok({
           body: {
             statusCode: 200,
-            data: { password: '****', apiIsDown: true },
+            data: { apiIsDown: true },
           }
         });
       } else if (error.code === 'ECONNREFUSED') {
         return response.ok({
           body: {
             statusCode: 200,
-            data: { password: '****', apiIsDown: true },
+            data: { apiIsDown: true },
           }
         });
       } else {

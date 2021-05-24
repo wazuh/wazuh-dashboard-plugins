@@ -166,5 +166,8 @@ exports[`Health Check container should render a Health check screen 1`] = `
       />
     </EuiDescriptionList>
   </div>
+  <EuiSpacer
+    size="xl"
+  />
 </div>
 `;
