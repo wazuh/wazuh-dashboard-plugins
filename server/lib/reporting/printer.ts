@@ -497,7 +497,7 @@ export class ReportPrinter{
     const widthColumn = 385/totalLength;
     let totalWidth = totalLength * widthColumn;
     const widthCharacter = 5; //min width per character
-    const widths = new Array;
+    const widths = [];
     
     for (let step = 0; step < columns.length - 1; step++) {
       let columnLength = tableRows[0][step].text.length * widthCharacter;
