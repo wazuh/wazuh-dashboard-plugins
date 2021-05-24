@@ -10,7 +10,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed default `wazuh.monitoring.creation` app setting from `d` to `w` [#3174](https://github.com/wazuh/wazuh-kibana-app/pull/3174)
 - Changed default `wazuh.monitoring.shards` app setting from `2` to `1` [#3174](https://github.com/wazuh/wazuh-kibana-app/pull/3174)
 - Redirect to group details using the `group` query param in the URL [#3184](https://github.com/wazuh/wazuh-kibana-app/pull/3184)
-- Configuration to disable Wazuh App access from X-Pack/ODFE role [#3222](https://github.com/wazuh/wazuh-kibana-app/pull/3222)
+- Configuration to disable Wazuh App access from X-Pack/ODFE role [#3222](https://github.com/wazuh/wazuh-kibana-app/pull/3222) [#3292](https://github.com/wazuh/wazuh-kibana-app/pull/3292)
 - Added confirmation message when closing a form [#3221](https://github.com/wazuh/wazuh-kibana-app/pull/3221)
 - Improvement to hide navbar Wazuh label. [#3240](https://github.com/wazuh/wazuh-kibana-app/pull/3240)
 
@@ -32,8 +32,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fix typo error in Settings/Configuration [#3234](https://github.com/wazuh/wazuh-kibana-app/pull/3234)
 - Fixed fields overlap in the agent summary screen [#3217](https://github.com/wazuh/wazuh-kibana-app/pull/3217)
 - Fixed the `Visualize` button is not displaying when expanding a field in the Events sidebar [#3237](https://github.com/wazuh/wazuh-kibana-app/pull/3237)
-- Add error when add sample data fails [#3241] (https://github.com/wazuh/wazuh-kibana-app/pull/3241)
-- Fix modules are missing in the agent menu [#3244] (https://github.com/wazuh/wazuh-kibana-app/pull/3244)
+- Add error when add sample data fails [#3241](https://github.com/wazuh/wazuh-kibana-app/pull/3241)
+- Fix modules are missing in the agent menu [#3244](https://github.com/wazuh/wazuh-kibana-app/pull/3244)
 
 ## Wazuh v4.2.0 - Kibana 7.10.2 , 7.11.2 - Revision 4201
 
