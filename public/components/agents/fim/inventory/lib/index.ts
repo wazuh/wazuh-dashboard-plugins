@@ -1,2 +1,2 @@
 export { getFilterValues } from './getFilterValues';
-export { emptyFieldHandler } from './emptyFieldHandler';
+export { emptyFieldHandler } from './empty-field-handler';

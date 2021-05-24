@@ -10,24 +10,22 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { EuiCode, EuiIcon } from '@elastic/eui'
-import React from 'react'
+import { EuiCode, EuiIcon } from '@elastic/eui';
+import React from 'react';
 
 /* This function can be used to render possibly empty fields.
 It takes a render function suitable for an EuiTable and returns another. */
-export const emptyFieldHandler = (renderFn = (value,record) => value) => {
-    return (value, record) => {
-        if (value === "" || value === undefined) {
-            return (
-                <>
-                    <EuiIcon type="iInCircle"/>
-                    <EuiCode>
-                        Empty field
-                    </EuiCode>
-                </>
-            )
-        } else {
-            return renderFn(value,record);
-        }
+export const emptyFieldHandler = (renderFn = (value, record) => value) => {
+  return (value, record) => {
+    if (value === '' || value === undefined) {
+      return (
+        <>
+          <EuiIcon type="iInCircle" />
+          <EuiCode>Empty field</EuiCode>
+        </>
+      );
+    } else {
+      return renderFn(value, record);
     }
-}
+  };
+};

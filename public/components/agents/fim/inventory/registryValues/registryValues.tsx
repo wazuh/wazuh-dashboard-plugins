@@ -15,7 +15,7 @@ import { WzRequest } from '../../../../../react-services';
 import React, { useEffect, useState } from 'react';
 import valuesMock from './values.json';
 import { DIRECTIONS } from '@elastic/eui/src/components/flex/flex_group';
-import { emptyFieldHandler } from '../lib'
+import { emptyFieldHandler } from '../lib';
 
 export const RegistryValues = (props) => {
   const [values, setValues] = useState<any[]>([]);
