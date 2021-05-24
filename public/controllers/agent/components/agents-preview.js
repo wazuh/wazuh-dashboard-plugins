@@ -293,9 +293,6 @@ export const AgentsPreview = compose(
                         <KibanaVis
                           visID={'Wazuh-App-Overview-General-Agents-status'}
                           tab={'general'}
-                          terms={AppState.getClusterInfo().status === 'enabled'
-                            ? {'cluster.name': AppState.getClusterInfo().cluster}
-                            : {'manager.keyword': AppState.getClusterInfo().manager}}
                         />
                       </WzReduxProvider>
                     </div>

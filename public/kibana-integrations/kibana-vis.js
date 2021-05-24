@@ -18,7 +18,7 @@ import { connect } from 'react-redux';
 import { LoadedVisualizations } from '../factories/loaded-visualizations';
 import { RawVisualizations } from '../factories/raw-visualizations';
 import { VisHandlers } from '../factories/vis-handlers';
-import { WzRequest } from '../react-services/wz-request';
+import { AppState } from '../react-services';
 import { TabVisualizations } from '../factories/tab-visualizations';
 import store from '../redux/store';
 import { updateMetric } from '../redux/actions/visualizationsActions';
@@ -224,7 +224,9 @@ class KibanaVis extends Component {
               },
               query: {
                 bool: {
-                  should: [{ term: this.props.terms || [] }],
+                  should: [{ term: AppState.getClusterInfo().status === 'enabled'
+                  ? {'cluster.name': AppState.getClusterInfo().cluster}
+                  : {'manager.keyword': AppState.getClusterInfo().manager} }],
                 },
               },
               $state: {
