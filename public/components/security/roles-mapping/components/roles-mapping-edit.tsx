@@ -93,7 +93,7 @@ export const RolesMappingEdit = ({
     modal = (
       <EuiOverlayMask>
         <EuiConfirmModal
-          title="Close flyout"
+          title="Unsubmitted changes"
           onConfirm={() => {
             setIsModalVisible(false);
             closeFlyout(false);
@@ -126,20 +126,15 @@ export const RolesMappingEdit = ({
       <WzOverlayMask
         headerZindexLocation="below"
         onClick={() => {
-          if (hasChanges) {
-            setIsModalVisible(true);
-          } else {
-            closeFlyout(false);
-          }
+          hasChanges ? setIsModalVisible(true) : closeFlyout(false);
         }}
       >
-        <EuiFlyout className="wzApp" onClose={() => {
-          if (hasChanges) {
-            setIsModalVisible(true);
-          } else {
-            closeFlyout(false);
-          }
-        }}>
+        <EuiFlyout
+          className="wzApp"
+          onClose={() => {
+            hasChanges ? setIsModalVisible(true) : closeFlyout(false);
+          }}
+        >
           <EuiFlyoutHeader hasBorder={false}>
             <EuiTitle size="m">
               <h2>
