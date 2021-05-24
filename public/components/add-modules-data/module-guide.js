@@ -316,7 +316,7 @@ class WzModuleGuide extends Component {
                       <EuiText>When you finish of configure the module, copy above XML configuration. Go to <EuiCode>C:\Program Files (x86)\ossec-agent</EuiCode> in Windows agent, include the above configuration in <EuiCode>agent.conf</EuiCode> and restart the agent.</EuiText>
                 )}
                 <EuiSpacer size='s' />
-                <EuiText>The above section must be located within the top-level <EuiCode>{`<ossec_config>`}</EuiCode> tag.</EuiText>
+                <EuiText>The above section must be located within the top-level <EuiCode>{`<wazuh_config>`}</EuiCode> tag.</EuiText>
               </Fragment>
               ) : (
                 <EuiText color='danger'>There is an error in the configuration, please check fields that have errors.</EuiText>

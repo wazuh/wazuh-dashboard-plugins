@@ -7,6 +7,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Changed
 
 - Rename ossec.conf for manager, agents and shares conf [#3102](https://github.com/wazuh/wazuh-kibana-app/pull/3102)
+- Configuration tags normalization to Wazuh standard [#3254](https://github.com/wazuh/wazuh-kibana-app/pull/3254)
 
 ## Wazuh v4.3.0 - Kibana 7.10.2 , 7.11.2 - Revision 4301
 
