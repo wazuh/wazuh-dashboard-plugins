@@ -44,7 +44,7 @@ export const Logtest = compose(
   const [events, setEvents] = useState([]);
   const [testing, setTesting] = useState(false);
   const [testResult, setTestResult] = useState('');
-  const [token, setToken] = useState('');
+  const [sessionToken, setSesstionToken] = useState('');
 
   const onChange = (e) => {
     setEvents(e.target.value.split('\n').filter((item) => item));
@@ -82,45 +82,31 @@ export const Logtest = compose(
     );
   };
 
-  const putLogtest = async (body) => {
-    body.log_format = 'syslog';
-    body.location = 'logtest';
-
-    return await WzRequest.apiReq('PUT', '/logtest', body);
-  };
-
   const runAllTests = async () => {
     setTestResult('');
     setTesting(true);
-    let myToken = token;
+    let token = sessionToken;
+    const responses = [];
 
     try {
-      const tasks = events.map((event) => () => {
-        const body = {
-          event: event,
-          token: myToken,
-        };
-        return putLogtest(body);
-      });
-
-      const logTestSeries = (events, results = []) => {
-        !events.length
-          ? Promise.resolve(results)
-          : events[0]().then((result) => {
-              myToken = result.data.data.token;
-              setToken(myToken);
-              logTestSeries(events.slice(1), [...results, result]);
-            });
-
-        const testResults = results.map((response) =>
-          response.data.data.output.rule || ''
-            ? formatResult(response.data.data.output, response.data.data.alert)
-            : `No result found for:  ${response.data.data.output.full_log} \n\n\n`
-        );
-        setTestResult(testResults);
+      for (let event of events) {
+        const response = await WzRequest.apiReq('PUT', '/logtest', {
+          log_format: 'syslog',
+          location: 'logtest',
+          event,
+          ...(token ? { token }: {})
+        });
+        token = response.data.data.token;
+        !sessionToken && token && setSesstionToken(token);
+        responses.push(response);
       };
-
-      await logTestSeries(tasks);
+  
+      const testResults = responses.map((response) =>
+        response.data.data.output.rule || ''
+          ? formatResult(response.data.data.output, response.data.data.alert)
+          : `No result found for: ${response.data.data.output.full_log} \n\n\n`
+      );
+      setTestResult(testResults);
     } finally {
       setTesting(false);
     }
