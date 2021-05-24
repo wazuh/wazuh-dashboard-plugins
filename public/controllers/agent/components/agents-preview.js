@@ -51,7 +51,6 @@ export const AgentsPreview = compose(
     super(props);
     this.state = { data: [], loading: false, showAgentsEvolutionVisualization: false, agentTableFilters: [] };
     this.wazuhConfig = new WazuhConfig();
-    this.managers = [];
     this.agentStatusLabelToIDMap = {
       'Active': 'active',
       'Disconnected': 'disconnected',
@@ -294,7 +293,9 @@ export const AgentsPreview = compose(
                         <KibanaVis
                           visID={'Wazuh-App-Overview-General-Agents-status'}
                           tab={'general'}
-                          cluster={AppState.getClusterInfo().cluster}
+                          terms={AppState.getClusterInfo().status === 'enabled'
+                            ? {'cluster.name': AppState.getClusterInfo().cluster}
+                            : {'manager.keyword': AppState.getClusterInfo().manager}}
                         />
                       </WzReduxProvider>
                     </div>

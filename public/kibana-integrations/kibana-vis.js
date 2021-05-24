@@ -218,14 +218,13 @@ class KibanaVis extends Component {
             {
               meta: {
                 index: 'wazuh-monitoring-*',
-                key: 'cluster.name',
                 alias: null,
                 negate: false,
                 disabled: false,
               },
               query: {
                 bool: {
-                  should: [{ term: { 'cluster.name': this.props.cluster } }],
+                  should: [{ term: this.props.terms || [] }],
                 },
               },
               $state: {
