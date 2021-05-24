@@ -225,9 +225,9 @@ class KibanaVis extends Component {
         },
         query: {       
           bool: {
-            should: this.props.managers.map((manager) => {
-              return {term: {"manager.keyword" : manager}}
-            }),
+            should: [
+              {term: {"cluster.name" : this.props.cluster}}
+            ]
           }
         },
         $state: {
