@@ -10,9 +10,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed default `wazuh.monitoring.creation` app setting from `d` to `w` [#3174](https://github.com/wazuh/wazuh-kibana-app/pull/3174)
 - Changed default `wazuh.monitoring.shards` app setting from `2` to `1` [#3174](https://github.com/wazuh/wazuh-kibana-app/pull/3174)
 - Redirect to group details using the `group` query param in the URL [#3184](https://github.com/wazuh/wazuh-kibana-app/pull/3184)
-- Configuration to disable Wazuh App access from X-Pack/ODFE role [#3222](https://github.com/wazuh/wazuh-kibana-app/pull/3222)
+- Configuration to disable Wazuh App access from X-Pack/ODFE role [#3222](https://github.com/wazuh/wazuh-kibana-app/pull/3222) [#3292](https://github.com/wazuh/wazuh-kibana-app/pull/3292)
 - Added confirmation message when closing a form [#3221](https://github.com/wazuh/wazuh-kibana-app/pull/3221)
 - Improvement to hide navbar Wazuh label. [#3240](https://github.com/wazuh/wazuh-kibana-app/pull/3240)
+- Add modal creating new rule/decoder [#3274](https://github.com/wazuh/wazuh-kibana-app/pull/3274)
 
 ### Changed
 
@@ -22,6 +23,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Refactored the Health check component [#3197](https://github.com/wazuh/wazuh-kibana-app/pull/3197)
 - Added version in package downloaded name in agent deploy command [#3210](https://github.com/wazuh/wazuh-kibana-app/issues/3210)
 - Removed restriction to allow only current active agents from vulnerability inventory [#3243](https://github.com/wazuh/wazuh-kibana-app/pull/3243)
+- Move API selector and Index Pattern Selector to the header bar [#3175](https://github.com/wazuh/wazuh-kibana-app/pull/3175) 
 
 ### Fixed
 
