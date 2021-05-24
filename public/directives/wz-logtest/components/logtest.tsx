@@ -87,6 +87,7 @@ export const Logtest = compose(
     setTesting(true);
     let token = sessionToken;
     const responses = [];
+    let gotToken = Boolean(token);
 
     try {
       for (let event of events) {
@@ -97,7 +98,8 @@ export const Logtest = compose(
           ...(token ? { token }: {})
         });
         token = response.data.data.token;
-        !sessionToken && token && setSesstionToken(token);
+        token && (gotToken = true);
+        !sessionToken && !gotToken && token && setSesstionToken(token);
         responses.push(response);
       };
   
