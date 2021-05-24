@@ -56,7 +56,7 @@ class WzConfigurationPath extends Component {
       modal = (
         <WzOverlayMask>
           <EuiConfirmModal
-            title="Close flyout"
+            title="Unsubmitted changes"
             onConfirm={() => {
               closeModal;
               updateConfigurationSection('');

@@ -259,7 +259,7 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
     modal = (
       <EuiOverlayMask>
         <EuiConfirmModal
-          title="Close flyout"
+          title="Unsubmitted changes"
           onConfirm={() => {
             setIsModalVisible(false);
             closeFlyout(false);
@@ -290,19 +290,11 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
       <WzOverlayMask
         headerZindexLocation="below"
         onClick={() => {
-          if (hasChanges) {
-            setIsModalVisible(true);
-          } else {
-            closeFlyout(false);
-          }
+          hasChanges ? setIsModalVisible(true) : closeFlyout(false);
         }}
       >
         <EuiFlyout className="wzApp" onClose={() => {
-          if (hasChanges) {
-            setIsModalVisible(true);
-          } else {
-            closeFlyout(false);
-          }
+          hasChanges ? setIsModalVisible(true) : closeFlyout(false);
         }}>
           <EuiFlyoutHeader hasBorder={false}>
             <EuiTitle size="m">
