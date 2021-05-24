@@ -98,8 +98,8 @@ export const Logtest = compose(
           ...(token ? { token }: {})
         });
         token = response.data.data.token;
-        token && (gotToken = true);
         !sessionToken && !gotToken && token && setSesstionToken(token);
+        token && (gotToken = true);
         responses.push(response);
       };
   
