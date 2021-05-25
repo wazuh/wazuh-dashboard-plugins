@@ -7,8 +7,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Added
 
 - Wazuh help links in the Kibana help menu [#3170](https://github.com/wazuh/wazuh-kibana-app/pull/3170)
-- Changed default `wazuh.monitoring.creation` app setting from `d` to `w` [#3174](https://github.com/wazuh/wazuh-kibana-app/pull/3174)
-- Changed default `wazuh.monitoring.shards` app setting from `2` to `1` [#3174](https://github.com/wazuh/wazuh-kibana-app/pull/3174)
 - Redirect to group details using the `group` query param in the URL [#3184](https://github.com/wazuh/wazuh-kibana-app/pull/3184)
 - Configuration to disable Wazuh App access from X-Pack/ODFE role [#3222](https://github.com/wazuh/wazuh-kibana-app/pull/3222) [#3292](https://github.com/wazuh/wazuh-kibana-app/pull/3292)
 - Added confirmation message when closing a form [#3221](https://github.com/wazuh/wazuh-kibana-app/pull/3221)
@@ -18,6 +16,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Changed
 
 - Removed module titles [#3160](https://github.com/wazuh/wazuh-kibana-app/pull/3160)
+- Changed default `wazuh.monitoring.creation` app setting from `d` to `w` [#3174](https://github.com/wazuh/wazuh-kibana-app/pull/3174)
+- Changed default `wazuh.monitoring.shards` app setting from `2` to `1` [#3174](https://github.com/wazuh/wazuh-kibana-app/pull/3174)
 - Removed Sha1 field from registry key detail [#3189](https://github.com/wazuh/wazuh-kibana-app/pull/3189)
 - Removed tooltip in last breadcrumb in header breadcrumb [3250](https://github.com/wazuh/wazuh-kibana-app/pull/3250)
 - Refactored the Health check component [#3197](https://github.com/wazuh/wazuh-kibana-app/pull/3197)
