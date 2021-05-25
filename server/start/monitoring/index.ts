@@ -177,7 +177,6 @@ async function checkTemplate(context) {
  */
 async function insertMonitoringDataElasticsearch(context, data) {
   const monitoringIndexName = MONITORING_INDEX_PREFIX + indexDate(MONITORING_CREATION);
-  const logLocation = 'monitoring:insertMonitoringDataElasticsearch';
     if (!MONITORING_ENABLED){
       return;
     };
@@ -186,13 +185,8 @@ async function insertMonitoringDataElasticsearch(context, data) {
         const exists = await context.core.elasticsearch.client.asInternalUser.indices.exists({index: monitoringIndexName});
         if(!exists.body){
           await createIndex(context, monitoringIndexName);
-        }
-      })();
-    }catch(error){
-      log(logLocation, error.message || error);
-    }
-    try{
-      await tryCatchForIndexPermissionError(monitoringIndexName) (async() => {
+        };
+
         // Update the index configuration
         const appConfig = getConfiguration();
         const indexConfiguration = buildIndexSettings(
@@ -209,17 +203,11 @@ async function insertMonitoringDataElasticsearch(context, data) {
           body: indexConfiguration
         });
 
-      })(); 
-    }catch(error){
-      log(logLocation, error.message || error);
-    }
-    try {
-      await tryCatchForIndexPermissionError(monitoringIndexName) (async() => {
-      // Insert data to the monitoring index
-      await insertDataToIndex(context, monitoringIndexName, data);
+        // Insert data to the monitoring index
+        await insertDataToIndex(context, monitoringIndexName, data);
       })();
-    } catch (error) {
-      log(logLocation, errorMessage);
+    }catch(error){
+      log('monitoring:insertMonitoringDataElasticsearch', error.message || error);
       context.wazuh.logger.error(error.message);
     }
 }
