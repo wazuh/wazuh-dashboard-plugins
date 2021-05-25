@@ -206,9 +206,9 @@ export function CheckResult(props) {
       <EuiDescriptionListDescription>
        <p>{renderResult()}</p>
       </EuiDescriptionListDescription>
-      {verboseIsOpen && verboseInfo.length > 0 && (
+      {verboseInfo.length > 0 && (
         <EuiCodeBlock
-          className={"wz-width-100"}
+          className={`wz-width-100 ${verboseIsOpen ? "visible" : ""}`}
           paddingSize='s'
           fontSize='s'
           isCopyable

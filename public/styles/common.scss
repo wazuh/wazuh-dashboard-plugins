@@ -1042,7 +1042,18 @@ wz-xml-file-editor {
 }
 
 .health-check .euiCodeBlock{
+  max-height: 0;
+  margin-top: 0;
+  transition: all 0.25s ease-out;
+  overflow: hidden;
+  visibility: hidden;
+  border: 0px solid #0001;
+}
+.health-check .euiCodeBlock.visible{
   border: 1px solid #0001;
+  max-height: 700px;
+  margin-top: 16px;
+  visibility: visible;
 }
 
 @keyframes rotation {
