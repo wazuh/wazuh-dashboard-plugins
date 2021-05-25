@@ -52,6 +52,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added retry button to check api again in health check [#3109](https://github.com/wazuh/wazuh-kibana-app/pull/3109)
 - Added `wazuh-statistics` template and a new mapping for these indices [#3111](https://github.com/wazuh/wazuh-kibana-app/pull/3111)
 - Added link to documentation "Checking connection with Manager" in deploy new agent [#3126](https://github.com/wazuh/wazuh-kibana-app/pull/3126)
+- Fixed Agent Evolution graph showing agents from multiple APIs [#3256](https://github.com/wazuh/wazuh-kibana-app/pull/3256)
 
 ### Changed
 
