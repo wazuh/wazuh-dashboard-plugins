@@ -19,12 +19,12 @@ export const checkTemplateService = appInfo => async (checkLogger: CheckLogger) 
   const patternId = AppState.getCurrentPattern();
   checkLogger.info(`Index pattern id in cookie: ${patternId ? `yes [${patternId}]` : 'no'}`);
 
-  checkLogger.info(`Checking the index pattern id [${patternId}] exists...`);
+  checkLogger.info(`Checking if the index pattern id [${patternId}] exists...`);
   const patternData = patternId ? (await SavedObject.existsIndexPattern(patternId)) : null;
   checkLogger.info(`Index pattern id [${patternId}] found: ${patternData.title ? `yes title [${patternData.title}]`: 'no'}`);
 
   if (patternData.title){
-    checkLogger.info(`Checking if it exists a template compatible with the index pattern title [${patternData.title}]`);
+    checkLogger.info(`Checking if exists a template compatible with the index pattern title [${patternData.title}]`);
     const templateData = await GenericRequest.request('GET', `/elastic/template/${patternData.title}`);
     checkLogger.info(`Template found for the selected index-pattern title [${patternData.title}]: ${templateData.data.status ? 'yes': 'no'}`);
     if (!templateData.data.status) {

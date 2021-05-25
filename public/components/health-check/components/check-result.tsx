@@ -96,28 +96,47 @@ export function CheckResult(props) {
     switch (result) {
       case 'loading':
         return (
-          <span>
-            <EuiLoadingSpinner size="m" /> Checking...
-          </span>
+          <>
+            <EuiToolTip
+              position='top'
+              content='Checking&hellip;'>
+              <EuiLoadingSpinner size="m" />
+            </EuiToolTip>
+            {inspectLogsButton}
+          </>
         );
       case 'disabled':
-        return <span>Disabled</span>;
+        return <>Disabled</>;
       case 'ready':
         return (
-          <span>
-            <EuiIcon type="check" color="secondary"></EuiIcon> Ready
-          </span>
+          <>
+            <EuiToolTip
+              position='top'
+              content='Ready'>
+              <EuiIcon type="check" color="secondary"></EuiIcon>
+            </EuiToolTip>
+            {inspectLogsButton}
+          </>
         );
       case 'error':
         return (
-          <span>
-            <EuiIcon type="alert" color="danger"></EuiIcon> Error
-          </span>
+          <>
+            <EuiToolTip
+              position='top'
+              content='Error'>
+              <EuiIcon type="alert" color="danger"></EuiIcon>
+            </EuiToolTip>
+            {inspectLogsButton}
+          </>
         );
       case 'error_retry':
         return (
-          <span>
-            <EuiIcon type="alert" color="danger"></EuiIcon> Error
+          <>
+            <EuiToolTip
+              position='top'
+              content='Error'>
+              <EuiIcon type="alert" color="danger"></EuiIcon>
+            </EuiToolTip>{inspectLogsButton}
             <EuiToolTip
               position='top'
               content='Retry'
@@ -131,13 +150,15 @@ export function CheckResult(props) {
                 aria-label="Next"
               />
             </EuiToolTip>
-          </span>
+          </>
         );
       case 'waiting':
         return (
-          <span>
-            Waiting...
-          </span>
+          <EuiToolTip
+          position='top'
+          content='Waiting&hellip;'>
+            <EuiIcon type="clock" color="#999999"></EuiIcon> 
+          </EuiToolTip>
         );
     }
   };
@@ -159,7 +180,7 @@ export function CheckResult(props) {
       position='top'
       content={tooltipVerboseButton}
       >
-      <EuiButtonEmpty size='xs' onClick={switchVerboseDetails} isDisabled={!haveLogs} textProps={{ style:{overflow: 'visible' }}}>
+      <EuiButtonEmpty size='xs' onClick={switchVerboseDetails} isDisabled={!haveLogs} textProps={{ style:{overflow: 'visible' , position: 'relative'}}}>
         <EuiButtonIcon
           ariaLabel={tooltipVerboseButton}
           iconType='inspect'
@@ -167,7 +188,7 @@ export function CheckResult(props) {
         />
         {shouldShowNotification && (
           <EuiIcon
-            style={{position: 'relative', top: '-10px', left: '-10px'}}
+            style={{position: 'absolute', top: '-4px', left: '14px'}}
             color='accent'
             type="dot"
             size='s'
@@ -183,12 +204,11 @@ export function CheckResult(props) {
         {props.title}
       </EuiDescriptionListTitle>
       <EuiDescriptionListDescription>
-        {renderResult()}
-        {' '}
-        {inspectLogsButton}
+       <p>{renderResult()}</p>
       </EuiDescriptionListDescription>
       {verboseIsOpen && verboseInfo.length > 0 && (
         <EuiCodeBlock
+          className={"wz-width-100"}
           paddingSize='s'
           fontSize='s'
           isCopyable

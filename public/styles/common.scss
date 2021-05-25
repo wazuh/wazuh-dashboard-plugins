@@ -1027,9 +1027,22 @@ wz-xml-file-editor {
 
 .health-check{
   padding-top: 5%;
-  width: 500px;
+  max-width: 700px;
   margin: 0 auto;
   text-align: center;
+}
+
+.health-check dl.euiDescriptionList dd{
+  white-space: nowrap;
+}
+
+.health-check dl.euiDescriptionList dd>span:first-child{
+  display: inline-block;
+  width: 26px;
+}
+
+.health-check .euiCodeBlock{
+  border: 1px solid #0001;
 }
 
 @keyframes rotation {
