@@ -35,6 +35,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed the `Visualize` button is not displaying when expanding a field in the Events sidebar [#3237](https://github.com/wazuh/wazuh-kibana-app/pull/3237)
 - Add error when add sample data fails [#3241](https://github.com/wazuh/wazuh-kibana-app/pull/3241)
 - Fix modules are missing in the agent menu [#3244](https://github.com/wazuh/wazuh-kibana-app/pull/3244)
+- Fix improving and removing WUI error logs [#3260](https://github.com/wazuh/wazuh-kibana-app/pull/3260)
 - Fix some errors of PDF reports [#3272](https://github.com/wazuh/wazuh-kibana-app/pull/3272)
 - Fix TypeError when selecting macOS agent deployment in a Safari Browser [#3289](https://github.com/wazuh/wazuh-kibana-app/pull/3289)
 
