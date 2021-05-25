@@ -177,7 +177,7 @@ async function checkTemplate(context) {
  */
 async function insertMonitoringDataElasticsearch(context, data) {
   const monitoringIndexName = MONITORING_INDEX_PREFIX + indexDate(MONITORING_CREATION);
-  const indexLocation = 'monitoring:insertMonitoringDataElasticsearch';
+  const logLocation = 'monitoring:insertMonitoringDataElasticsearch';
     if (!MONITORING_ENABLED){
       return;
     };
@@ -189,7 +189,7 @@ async function insertMonitoringDataElasticsearch(context, data) {
         }
       })();
     }catch(error){
-      log(indexLocation, error.message || error);
+      log(logLocation, error.message || error);
     }
     try{
       await tryCatchForIndexPermissionError(monitoringIndexName) (async() => {
@@ -211,7 +211,7 @@ async function insertMonitoringDataElasticsearch(context, data) {
 
       })(); 
     }catch(error){
-      log(indexLocation, error.message || error);
+      log(logLocation, error.message || error);
     }
     try {
       await tryCatchForIndexPermissionError(monitoringIndexName) (async() => {
@@ -219,7 +219,7 @@ async function insertMonitoringDataElasticsearch(context, data) {
       await insertDataToIndex(context, monitoringIndexName, data);
       })();
     } catch (error) {
-      log(indexLocation, errorMessage);
+      log(logLocation, errorMessage);
       context.wazuh.logger.error(error.message);
     }
 }
