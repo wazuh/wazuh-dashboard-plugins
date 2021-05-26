@@ -1049,11 +1049,17 @@ wz-xml-file-editor {
   visibility: hidden;
   border: 0px solid #0001;
 }
+
 .health-check .euiCodeBlock.visible{
   border: 1px solid #0001;
   max-height: 700px;
   margin-top: 16px;
   visibility: visible;
+}
+
+.wz-hover-transform-y1:hover{
+  -webkit-transform: translateY(-1px) !important;
+  transform: translateY(-1px) !important;
 }
 
 @keyframes rotation {

@@ -180,15 +180,15 @@ export function CheckResult(props) {
       position='top'
       content={tooltipVerboseButton}
       >
-      <EuiButtonEmpty size='xs' onClick={switchVerboseDetails} isDisabled={!haveLogs} textProps={{ style:{overflow: 'visible' , position: 'relative'}}}>
-        <EuiButtonIcon
-          ariaLabel={tooltipVerboseButton}
-          iconType='inspect'
+      <EuiButtonEmpty size='xs' className={"wz-hover-transform-y1"} onClick={switchVerboseDetails} isDisabled={!haveLogs} textProps={{ style:{overflow: 'visible' , position: 'relative'}}}>
+        <EuiIcon
+          aria-label={tooltipVerboseButton}
+          type='inspect'
           color='primary'
         />
         {shouldShowNotification && (
           <EuiIcon
-            style={{position: 'absolute', top: '-4px', left: '14px'}}
+            style={{position: 'absolute', top: '-3px', left: '10px'}}
             color='accent'
             type="dot"
             size='s'
