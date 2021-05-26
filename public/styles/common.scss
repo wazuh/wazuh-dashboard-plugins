@@ -808,6 +808,13 @@ md-switch.md-checked .md-thumb {
   display: block;
 }
 
+.wz-ellipsis{
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  min-width: 0;
+}
+
 /*
  * https://css-tricks.com/snippets/css/prevent-long-urls-from-breaking-out-of-container/
  * Handling long URLs on error toasts.

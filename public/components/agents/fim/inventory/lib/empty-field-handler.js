@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { EuiCode, EuiIcon } from '@elastic/eui';
+import { EuiCode, EuiIcon, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import React from 'react';
 
 /* This function can be used to render possibly empty fields.
@@ -19,10 +19,10 @@ export const emptyFieldHandler = (renderFn = (value, record) => value) => {
   return (value, record) => {
     if (value === '' || value === undefined) {
       return (
-        <>
-          <EuiIcon type="iInCircle" />
-          <EuiCode>Empty field</EuiCode>
-        </>
+        <span style={{display:"flex", minWidth:"0"}}>
+            <EuiIcon type="iInCircle" />
+            <EuiCode className="wz-ellipsis" style={{whiteSpace:"nowrap"}}>Empty field</EuiCode>
+        </span>
       );
     } else {
       return renderFn(value, record);
