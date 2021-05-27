@@ -24,7 +24,6 @@ import { FormattedMessage } from '@kbn/i18n/react';
 import { WzRequest } from '../../../../react-services/wz-request';
 import { FlyoutDetail } from './flyout';
 import { filtersToObject } from '../../../wz-search-bar';
-import { emptyFieldHandler } from './lib';
 
 export class RegistryTable extends Component {
   state: {
@@ -180,15 +179,12 @@ export class RegistryTable extends Component {
         field: 'file',
         name: 'Registry',
         sortable: true,
-        render: emptyFieldHandler(),
-        textOnly: true
       },
       {
         field: 'mtime',
         name: 'Last Modified',
         sortable: true,
         width: '200px',
-        render: emptyFieldHandler(),
       }
     ]
   }

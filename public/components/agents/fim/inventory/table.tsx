@@ -22,7 +22,6 @@ import { WzRequest } from '../../../../react-services/wz-request';
 import { FlyoutDetail } from './flyout';
 import { filtersToObject, IFilter } from '../../../wz-search-bar';
 import { formatUIDate } from '../../../../react-services/time-service';
-import { emptyFieldHandler } from './lib'
 
 export class InventoryTable extends Component {
   state: {
@@ -177,69 +176,55 @@ export class InventoryTable extends Component {
         field: 'file',
         name: 'File',
         sortable: true,
-        width: '250px',
-        render: emptyFieldHandler(),
-        textOnly: true
+        width: '250px'
       },
       {
         field: 'mtime',
         name: 'Last Modified',
         sortable: true,
         width: '100px',
-        render: emptyFieldHandler(formatUIDate)
+        render: formatUIDate
       },
       {
         field: 'uname',
         name: 'User',
         sortable: true,
         truncateText: true,
-        width: `${width}`,
-        render: emptyFieldHandler(),
-        textOnly: true
+        width: `${width}`
       },
       {
         field: 'uid',
         name: 'User ID',
         sortable: true,
         truncateText: true,
-        width: `${width}`,
-        render: emptyFieldHandler(),
-        textOnly: true
+        width: `${width}`
       },
       {
         field: 'gname',
         name: 'Group',
         sortable: true,
         truncateText: true,
-        width: `${width}`,
-        render: emptyFieldHandler(),
-        textOnly: true
+        width: `${width}`
       },
       {
         field: 'gid',
         name: 'Group ID',
         sortable: true,
         truncateText: true,
-        width: `${width}`,
-        render: emptyFieldHandler(),
-        textOnly: true
+        width: `${width}`
       },
       {
         field: 'perm',
         name: 'Permissions',
         sortable: true,
         truncateText: true,
-        width: `${width}`,
-        render: emptyFieldHandler(),
-        textOnly: true,
+        width: `${width}`
       },
       {
         field: 'size',
         name: 'Size',
         sortable: true,
-        width: `${width}`,
-        render: emptyFieldHandler(),
-        textOnly: true
+        width: `${width}`
       }
     ]
   }

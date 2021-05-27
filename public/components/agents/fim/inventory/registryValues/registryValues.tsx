@@ -47,25 +47,23 @@ export const RegistryValues = (props) => {
       field: 'date',
       name: 'Date',
       sortable: true,
-      render: emptyFieldHandler()
     },
     {
       field: 'value',
       name: 'Value name',
       sortable: true,
-      render: (item) => (emptyFieldHandler()(item.name)),
+      render: (item) => (emptyFieldHandler()(item.name || "")),
     },
     {
       field: 'value',
       name: 'Value type',
       sortable: true,
-      render: (item) => (emptyFieldHandler()(item.type)),
+      render: (item) => item.type,
     },
     {
       field: 'sha1',
       name: 'sha1',
       sortable: false,
-      render: emptyFieldHandler()
     },
   ];
 
