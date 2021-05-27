@@ -107,15 +107,15 @@ export const MainAgentStats = compose(
 
 function AgentStats({agent}){
   const [loading, setLoading] = useState();
-  const [dataStatLogcollector, setDataStatLogcollector] = useState({});
+  const [dataStatwmodulesd, setDataStatwmodulesd] = useState({});
   const [dataStatAgent, setDataStatAgent] = useState();
   useEffect(() => {
     (async function(){
       setLoading(true);
       try{
-        const responseDataStatLogcollector = await WzRequest.apiReq('GET', `/agents/${agent.id}/stats/logcollector`, {});
+        const responseDataStatwmodulesd = await WzRequest.apiReq('GET', `/agents/${agent.id}/stats/wmodulesd`, {});
         const responseDataStatAgent = await WzRequest.apiReq('GET', `/agents/${agent.id}/stats/agent`, {});
-        setDataStatLogcollector(responseDataStatLogcollector?.data?.data?.affected_items?.[0] || {});
+        setDataStatwmodulesd(responseDataStatwmodulesd?.data?.data?.affected_items?.[0] || {});
         setDataStatAgent(responseDataStatAgent?.data?.data?.affected_items?.[0] || undefined);
       }catch(error){
 
@@ -146,10 +146,10 @@ function AgentStats({agent}){
               columns={tableColumns}
               loading={loading}
               title='Global'
-              start={dataStatLogcollector?.global?.start}
-              end={dataStatLogcollector?.global?.end}
-              items={dataStatLogcollector?.global?.files}
-              exportCSVFilename={`agent-stats-${agent.id}-logcollector-global`}
+              start={dataStatwmodulesd?.global?.start}
+              end={dataStatwmodulesd?.global?.end}
+              items={dataStatwmodulesd?.global?.files}
+              exportCSVFilename={`agent-stats-${agent.id}-wmodulesd-global`}
             />
           </EuiFlexItem>
           <EuiFlexItem>
@@ -157,10 +157,10 @@ function AgentStats({agent}){
               columns={tableColumns}
               loading={loading}
               title='Interval'
-              start={dataStatLogcollector?.interval?.start}
-              end={dataStatLogcollector?.interval?.end}
-              items={dataStatLogcollector?.interval?.files}
-              exportCSVFilename={`agent-stats-${agent.id}-logcollector-interval`}
+              start={dataStatwmodulesd?.interval?.start}
+              end={dataStatwmodulesd?.interval?.end}
+              items={dataStatwmodulesd?.interval?.files}
+              exportCSVFilename={`agent-stats-${agent.id}-wmodulesd-interval`}
             />
           </EuiFlexItem>
         </EuiFlexGroup>

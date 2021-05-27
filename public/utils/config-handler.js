@@ -80,12 +80,12 @@ export class ConfigurationHandler {
         $scope.integrations = {};
       }
 
-      if (($scope.currentConfig['logcollector-localfile'] || {}).localfile) {
-        const data = $scope.currentConfig['logcollector-localfile'].localfile;
-        $scope.currentConfig['logcollector-localfile'][
+      if (($scope.currentConfig['wmodulesd-localfile'] || {}).localfile) {
+        const data = $scope.currentConfig['wmodulesd-localfile'].localfile;
+        $scope.currentConfig['wmodulesd-localfile'][
           'localfile-logs'
         ] = data.filter(item => typeof item.file !== 'undefined');
-        $scope.currentConfig['logcollector-localfile'][
+        $scope.currentConfig['wmodulesd-localfile'][
           'localfile-commands'
         ] = data.filter(item => typeof item.file === 'undefined');
 
@@ -101,10 +101,10 @@ export class ConfigurationHandler {
           }
         };
 
-        $scope.currentConfig['logcollector-localfile'][
+        $scope.currentConfig['wmodulesd-localfile'][
           'localfile-logs'
         ].forEach(sanitizeLocalfile);
-        $scope.currentConfig['logcollector-localfile'][
+        $scope.currentConfig['wmodulesd-localfile'][
           'localfile-commands'
         ].forEach(sanitizeLocalfile);
       }

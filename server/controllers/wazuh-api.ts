@@ -479,12 +479,12 @@ export class WazuhApiCtrl {
         typeof daemons['wazuh-clusterd'] !== 'undefined';
       const wazuhdbExists = typeof daemons['wazuh-db'] !== 'undefined';
 
-      const execd = daemons['wazuh-execd'] === 'running';
+      const wmodulesd = daemons['wazuh-wmodulesd'] === 'running';
       const modulesd = daemons['wazuh-modulesd'] === 'running';
       const wazuhdb = wazuhdbExists ? daemons['wazuh-db'] === 'running' : true;
       const clusterd = isCluster ? daemons['wazuh-clusterd'] === 'running' : true;
 
-      const isValid = execd && modulesd && wazuhdb && clusterd;
+      const isValid = wmodulesd && modulesd && wazuhdb && clusterd;
 
       isValid && log('wazuh-api:checkDaemons', `Wazuh is ready`, 'debug');
 

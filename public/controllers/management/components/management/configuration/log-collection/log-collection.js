@@ -28,17 +28,17 @@ class WzConfigurationLogCollection extends Component {
   render() {
     let { currentConfig, agent } = this.props;
     currentConfig =
-      currentConfig['logcollector-localfile'] &&
-      !isString(currentConfig['logcollector-localfile'])
+      currentConfig['wmodulesd-localfile'] &&
+      !isString(currentConfig['wmodulesd-localfile'])
         ? {
             ...currentConfig,
-            'logcollector-localfile': {
-              ...currentConfig['logcollector-localfile'],
+            'wmodulesd-localfile': {
+              ...currentConfig['wmodulesd-localfile'],
               'localfile-logs': currentConfig[
-                'logcollector-localfile'
+                'wmodulesd-localfile'
               ].localfile.filter(item => typeof item.file !== 'undefined'), // TODO: it needs to be defined to support localfile as `eventchannel`. These doesn't have file property.
               'localfile-commands': currentConfig[
-                'logcollector-localfile'
+                'wmodulesd-localfile'
               ].localfile.filter(item => typeof item.file === 'undefined')
             }
           }
@@ -71,8 +71,8 @@ class WzConfigurationLogCollection extends Component {
 }
 
 const sections = [
-  { component: 'logcollector', configuration: 'localfile' },
-  { component: 'logcollector', configuration: 'socket' }
+  { component: 'wmodulesd', configuration: 'localfile' },
+  { component: 'wmodulesd', configuration: 'socket' }
 ];
 
 WzConfigurationLogCollection.propTypes = {

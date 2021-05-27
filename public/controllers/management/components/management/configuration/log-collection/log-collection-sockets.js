@@ -57,27 +57,27 @@ class WzConfigurationLogCollectionSockets extends Component {
   }
   render() {
     const { currentConfig } = this.props;
-    const items = isArray(currentConfig['logcollector-socket'].target)
-      ? settingsListBuilder(currentConfig['logcollector-socket'].target, 'name')
+    const items = isArray(currentConfig['wmodulesd-socket'].target)
+      ? settingsListBuilder(currentConfig['wmodulesd-socket'].target, 'name')
       : [];
     return (
       <Fragment>
-        {currentConfig['logcollector-socket'] &&
-          isString(currentConfig['logcollector-socket']) && (
+        {currentConfig['wmodulesd-socket'] &&
+          isString(currentConfig['wmodulesd-socket']) && (
             <WzNoConfig
-              error={currentConfig['logcollector-socket']}
+              error={currentConfig['wmodulesd-socket']}
               help={helpLinks}
             />
           )}
-        {currentConfig['logcollector-socket'] &&
-        !isString(currentConfig['logcollector-socket']) &&
-        !currentConfig['logcollector-socket'].target ? (
+        {currentConfig['wmodulesd-socket'] &&
+        !isString(currentConfig['wmodulesd-socket']) &&
+        !currentConfig['wmodulesd-socket'].target ? (
           <WzNoConfig error="not-present" help={helpLinks} />
         ) : null}
-        {currentConfig['logcollector-socket'] &&
-        !isString(currentConfig['logcollector-socket']) &&
-        currentConfig['logcollector-socket'].target &&
-        currentConfig['logcollector-socket'].target.length ? (
+        {currentConfig['wmodulesd-socket'] &&
+        !isString(currentConfig['wmodulesd-socket']) &&
+        currentConfig['wmodulesd-socket'].target &&
+        currentConfig['wmodulesd-socket'].target.length ? (
           <WzConfigurationSettingsTabSelector
             title="Output sockets"
             description="Define custom outputs to send log data"

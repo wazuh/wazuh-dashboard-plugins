@@ -251,11 +251,11 @@ export const AgentConfiguration = {
             'Log analysis from text files, Windows events or syslog outputs',
           config: [
             {
-              component: 'logcollector',
+              component: 'wmodulesd',
               configuration: 'localfile',
               filterBy: 'logformat'
             },
-            { component: 'logcollector', configuration: 'socket' }
+            { component: 'wmodulesd', configuration: 'socket' }
           ],
           labels: [
             {
