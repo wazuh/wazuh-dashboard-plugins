@@ -53,13 +53,13 @@ export const RegistryValues = (props) => {
       field: 'value',
       name: 'Value name',
       sortable: true,
-      render: emptyFieldHandler((item) => item.name),
+      render: (item) => (emptyFieldHandler()(item.name)),
     },
     {
       field: 'value',
       name: 'Value type',
       sortable: true,
-      render: emptyFieldHandler((item) => item.type),
+      render: (item) => (emptyFieldHandler()(item.type)),
     },
     {
       field: 'sha1',
