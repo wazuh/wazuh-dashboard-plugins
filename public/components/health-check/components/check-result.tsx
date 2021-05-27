@@ -113,7 +113,7 @@ export function CheckResult(props) {
             <EuiToolTip
               position='top'
               content='Ready'>
-              <EuiIcon type="check" color="secondary"></EuiIcon>
+              <EuiIcon aria-label={result} type="check" color="secondary"></EuiIcon>
             </EuiToolTip>
             {inspectLogsButton}
           </>
@@ -124,7 +124,7 @@ export function CheckResult(props) {
             <EuiToolTip
               position='top'
               content='Error'>
-              <EuiIcon type="alert" color="danger"></EuiIcon>
+              <EuiIcon aria-label={result} type="alert" color="danger"></EuiIcon>
             </EuiToolTip>
             {inspectLogsButton}
           </>
@@ -135,7 +135,7 @@ export function CheckResult(props) {
             <EuiToolTip
               position='top'
               content='Error'>
-              <EuiIcon type="alert" color="danger"></EuiIcon>
+              <EuiIcon aria-label={result} type="alert" color="danger"></EuiIcon>
             </EuiToolTip>{inspectLogsButton}
             <EuiToolTip
               position='top'
@@ -157,7 +157,7 @@ export function CheckResult(props) {
           <EuiToolTip
           position='top'
           content='Waiting&hellip;'>
-            <EuiIcon type="clock" color="#999999"></EuiIcon> 
+            <EuiIcon aria-label={result} type="clock" color="#999999"></EuiIcon> 
           </EuiToolTip>
         );
     }
