@@ -182,11 +182,16 @@ function HealthCheckComponent() {
     setChecksReady(prev =>  ({...prev, [checkID]: isReady}));
   }
 
+  const logoUrl = getHttp().basePath.prepend('/plugins/wazuh/assets/icon_blue.svg');
+  const thereAreErrors = Object.keys(checkErrors).length > 0;
+
   const renderChecks = () => {
+    const showLogButton = (thereAreErrors || isDebugMode);
     return Object.keys(checks).map((check, index) => {
       return (
         <CheckResult
-          key={`health_check_check_${check}`}          
+          showLogButton={showLogButton}
+          key={`health_check_check_${check}`}
           name={check}
           title={checks[check].title}
           awaitFor={checks[check].awaitFor}
@@ -219,9 +224,6 @@ function HealthCheckComponent() {
       ))
     ) 
   };
-
-  const logoUrl = getHttp().basePath.prepend('/plugins/wazuh/assets/icon_blue.svg');
-  const thereAreErrors = Object.keys(checkErrors).length > 0;
 
   return (
     <div className="health-check">

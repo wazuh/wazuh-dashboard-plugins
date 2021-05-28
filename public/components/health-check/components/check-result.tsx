@@ -13,15 +13,12 @@
  */
 import React, { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import {
-  EuiButtonIcon,
   EuiDescriptionListDescription,
   EuiDescriptionListTitle,
-  EuiIcon,
-  EuiLoadingSpinner,
-  EuiToolTip,
   EuiCodeBlock,
-  EuiButtonEmpty,
 } from '@elastic/eui';
+import InspectLogButton from './inspect-logs-button';
+import ResultIcons from './result-icons';
 
 
 type Result = 'loading' | 'ready' | 'error' | 'error_retry' | 'disabled' | 'waiting';
@@ -85,89 +82,18 @@ export function CheckResult(props) {
     props.cleanErrors(props.name);
     setIsCheckFinished(false);
     try {
-      await props.validationService(checkLogger);  
+      await props.validationService(checkLogger);
     } catch (error) {
       checkLogger.error(error.message || error);
     }
     setIsCheckFinished(true);
   };
 
-  const renderResult = () => {
-    switch (result) {
-      case 'loading':
-        return (
-          <>
-            <EuiToolTip
-              position='top'
-              content='Checking&hellip;'>
-              <EuiLoadingSpinner size="m" />
-            </EuiToolTip>
-            {inspectLogsButton}
-          </>
-        );
-      case 'disabled':
-        return <>Disabled</>;
-      case 'ready':
-        return (
-          <>
-            <EuiToolTip
-              position='top'
-              content='Ready'>
-              <EuiIcon aria-label={result} type="check" color="secondary"></EuiIcon>
-            </EuiToolTip>
-            {inspectLogsButton}
-          </>
-        );
-      case 'error':
-        return (
-          <>
-            <EuiToolTip
-              position='top'
-              content='Error'>
-              <EuiIcon aria-label={result} type="alert" color="danger"></EuiIcon>
-            </EuiToolTip>
-            {inspectLogsButton}
-          </>
-        );
-      case 'error_retry':
-        return (
-          <>
-            <EuiToolTip
-              position='top'
-              content='Error'>
-              <EuiIcon aria-label={result} type="alert" color="danger"></EuiIcon>
-            </EuiToolTip>{inspectLogsButton}
-            <EuiToolTip
-              position='top'
-              content='Retry'
-            >
-              <EuiButtonIcon
-                display="base"
-                iconType="refresh"
-                iconSize="m"
-                onClick={initCheck}
-                size="m"
-                aria-label="Next"
-              />
-            </EuiToolTip>
-          </>
-        );
-      case 'waiting':
-        return (
-          <EuiToolTip
-          position='top'
-          content='Waiting&hellip;'>
-            <EuiIcon aria-label={result} type="clock" color="#999999"></EuiIcon> 
-          </EuiToolTip>
-        );
-    }
-  };
 
-  const tooltipVerboseButton = `${verboseIsOpen ? 'Close' : 'Open'} details`;
   const checkDidSomeAction = useMemo(() => verboseInfo.some(log => log.type === 'action'), [verboseInfo]);
   const shouldShowNotification = checkDidSomeAction && !verboseInfoWithNotificationWasOpened.current;
   const haveLogs = verboseInfo.length > 0;
-  
+
   const switchVerboseDetails = useCallback(() => {
     if(checkDidSomeAction && !verboseInfoWithNotificationWasOpened.current){
       verboseInfoWithNotificationWasOpened.current = true;
@@ -175,28 +101,7 @@ export function CheckResult(props) {
     setVerboseIsOpen(state => !state);
   },[checkDidSomeAction]);
 
-  const inspectLogsButton = isCheckStarted && haveLogs ? 
-    <EuiToolTip
-      position='top'
-      content={tooltipVerboseButton}
-      >
-      <EuiButtonEmpty size='xs' className={"wz-hover-transform-y1"} onClick={switchVerboseDetails} isDisabled={!haveLogs} textProps={{ style:{overflow: 'visible' , position: 'relative'}}}>
-        <EuiIcon
-          aria-label={tooltipVerboseButton}
-          type='inspect'
-          color='primary'
-        />
-        {shouldShowNotification && (
-          <EuiIcon
-            style={{position: 'absolute', top: '-3px', left: '10px'}}
-            color='accent'
-            type="dot"
-            size='s'
-          />
-        )}
-      </EuiButtonEmpty>
-    </EuiToolTip>
-    : null;
+  const showLogButton = (props.showLogButton && isCheckStarted && haveLogs);
 
   return (
     <>
@@ -204,7 +109,9 @@ export function CheckResult(props) {
         {props.title}
       </EuiDescriptionListTitle>
       <EuiDescriptionListDescription>
-       <p>{renderResult()}</p>
+        <p><ResultIcons result={result} initCheck={initCheck}>
+        {showLogButton ? <InspectLogButton verboseIsOpen={verboseIsOpen} haveLogs={haveLogs} switchVerboseDetails={switchVerboseDetails} shouldShowNotification={shouldShowNotification} />:<></>}
+        </ResultIcons></p>
       </EuiDescriptionListDescription>
       {verboseInfo.length > 0 && (
         <EuiCodeBlock
