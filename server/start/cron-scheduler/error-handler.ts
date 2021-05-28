@@ -18,7 +18,7 @@ export function ErrorHandler(error, serverLogger) {
     if (errorLevel === DEBUG && logsLevel !== DEBUG) return;
     serverLogger[logLevel(errorLevel)](`${JSON.stringify(error)}`);
   } catch (error) {
-    serverLogger[logLevel(errorLevel)](`Message to long to show in console output, check the log file`)
+    serverLogger[logLevel(errorLevel)](`Message too long to show in console output, check the log file`)
   }
 }
 
