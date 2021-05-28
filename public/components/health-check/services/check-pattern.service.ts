@@ -14,19 +14,19 @@
 import { CheckLogger } from '../types/check_logger';
 
 import {
-  checkAlerts,
+  checkIndexPatternObject,
   checkFieldsService,
   checkTemplateService
 } from './index';
 
-export const checkPatternService = (appConfig) => async (checkLogger: CheckLogger) =>  await checkPattern(appConfig, checkLogger);
+export const checkIndexPattern = (appConfig) => async (checkLogger: CheckLogger) =>  await checkPattern(appConfig, checkLogger);
 
 const checkPattern = async (appConfig, checkLogger: CheckLogger) =>  {
   if(!appConfig.data['check.pattern']){
     checkLogger.info('Index pattern check Disabled');
-    await checkAlerts(appConfig, checkLogger);
+    await checkIndexPatternObject(appConfig, checkLogger);
   }else{
-    await checkAlerts(appConfig, checkLogger);
+    await checkIndexPatternObject(appConfig, checkLogger);
     await checkTemplateService(appConfig);
     await checkFieldsService(appConfig); 
   }

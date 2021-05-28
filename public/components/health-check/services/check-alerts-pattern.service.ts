@@ -16,7 +16,7 @@ import { getDataPlugin } from '../../../kibana-services';
 import { HEALTH_CHECK } from '../../../../common/constants';
 import { CheckLogger } from '../types/check_logger';
 
-export const checkAlerts = async (appConfig, checkLogger: CheckLogger) => {
+export const checkIndexPatternObject = async (appConfig, checkLogger: CheckLogger) => {
   const patternId: string = AppState.getCurrentPattern();
   const defaultPatternId: string = appConfig.data['pattern'];
   const shouldCreateIndex: boolean = appConfig.data['checks.pattern'];
@@ -97,7 +97,7 @@ export const checkAlerts = async (appConfig, checkLogger: CheckLogger) => {
         checkLogger.action(`Index pattern set in cookie: [${indexPatternDefaultFound.id}]`);
       }
       checkLogger.info('Retring the check...');
-      return await checkAlerts(appConfig, checkLogger);
+      return await checkIndexPatternObject(appConfig, checkLogger);
     } else {
       checkLogger.error('The selected index-pattern is not present');
     }

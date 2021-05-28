@@ -28,7 +28,7 @@ import { useAppConfig, useRootScope } from '../../../components/common/hooks';
 import {
   checkApiService,
   checkKibanaSettings,
-  checkPatternService,
+  checkIndexPattern,
   checkPatternSupportService,
   checkSetupService,
 } from '../services';
@@ -67,7 +67,7 @@ const checks = {
   pattern: {
     title: 'Check alerts index pattern',
     label: 'Alerts index pattern',
-    validator: checkPatternService,
+    validator: checkIndexPattern,
     awaitFor: [],
     shouldCheck: true,
     canRetry: true,
