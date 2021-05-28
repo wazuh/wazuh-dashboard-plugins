@@ -32,13 +32,13 @@ export function CheckResult(props) {
   const verboseInfoWithNotificationWasOpened = useRef(false);
 
   useEffect(() => {
-    if (props.check && !props.isLoading && awaitForIsReady()){
+    if (props.shouldCheck && !props.isLoading && awaitForIsReady()){
       initCheck();
-    } else if (props.check === false && !props.checksReady[props.name]) {
+    } else if (props.shouldCheck === false && !props.checksReady[props.name]) {
       setResult('disabled');
       setAsReady();
     }
-  }, [props.check, props.isLoading, props.checksReady]);
+  }, [props.shouldCheck, props.isLoading, props.checksReady]);
 
   useEffect(() => {
     if (isCheckFinished){

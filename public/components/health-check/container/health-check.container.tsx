@@ -27,12 +27,10 @@ import { AppState, ErrorHandler } from '../../../react-services';
 import { useAppConfig, useRootScope } from '../../../components/common/hooks';
 import {
   checkApiService,
-  checkFieldsService,
   checkKibanaSettings,
   checkPatternService,
   checkPatternSupportService,
   checkSetupService,
-  checkTemplateService,
 } from '../services';
 import { CheckResult } from '../components/check-result';
 import { withReduxProvider } from '../../common/hocs';
@@ -67,31 +65,18 @@ const checks = {
     awaitFor: ["api"],
   },
   pattern: {
-    title: 'Check alerts index pattern',
-    label: 'Alerts index pattern',
+    title: 'Check index pattern',
+    label: 'Index pattern',
     validator: checkPatternService,
     awaitFor: [],
-    canRetry: true,
-  },
-  template: {
-    title: 'Check alerts indices template',
-    label: 'Alerts indices template',
-    validator: checkTemplateService,
-    awaitFor: ["pattern"],
-    canRetry: true,
-  },
-  fields: {
-    title: 'Check alerts index pattern fields',
-    label: 'alerts index pattern fields',
-    validator: checkFieldsService,
-    awaitFor: ["pattern"],
+    shouldCheck: true,
     canRetry: true,
   },
   patternMonitoring: {
     title: 'Check monitoring index pattern',
     label: 'Monitoring index pattern',
     validator: (appConfig) => checkPatternSupportService(appConfig.data['wazuh.monitoring.pattern'], WAZUH_INDEX_TYPE_MONITORING),
-    awaitFor: [],
+    awaitFor: ["pattern"],
     shouldCheck: true,
     canRetry: true,
   },
@@ -99,7 +84,7 @@ const checks = {
     title: 'Check statistics index pattern',
     label: 'Statistics index pattern',
     validator: (appConfig) => checkPatternSupportService(`${appConfig.data['cron.prefix']}-${appConfig.data['cron.statistics.index.name']}-*`, WAZUH_INDEX_TYPE_STATISTICS),
-    awaitFor: [],
+    awaitFor: ["pattern"],
     shouldCheck: true,
     canRetry: true,
   },
@@ -195,7 +180,7 @@ function HealthCheckComponent() {
           name={check}
           title={checks[check].title}
           awaitFor={checks[check].awaitFor}
-          check={checks[check].shouldCheck || appConfig.data[`checks.${check}`]}
+          shouldCheck={checks[check].shouldCheck || appConfig.data[`checks.${check}`]}
           validationService={checks[check].validator(appConfig)}
           handleErrors={handleErrors}
           cleanErrors={cleanErrors}
