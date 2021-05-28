@@ -178,7 +178,7 @@ export const Logtest = compose(
               children: 'Clearing the session means the logs execution history is removed. This affects to rules that fire an alert when similar logs are executed in a specific range of time.'
             }}
           > 
-          Clear sesion 
+          Clear session 
           </WzButtonPermissionsModalConfirm> 
         </EuiFlexItem> 
         </EuiFlexGroup>
