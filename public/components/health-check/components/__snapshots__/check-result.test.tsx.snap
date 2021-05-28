@@ -61,30 +61,35 @@ exports[`Check result component should render a Check result screen 1`] = `
       className="euiDescriptionList__description"
     >
       <p>
-        <EuiToolTip
-          content="Checking…"
-          delay="regular"
-          position="top"
+        <ResultIcons
+          initCheck={[Function]}
+          result="loading"
         >
-          <span
-            className="euiToolTipAnchor"
-            onKeyUp={[Function]}
-            onMouseOut={[Function]}
-            onMouseOver={[Function]}
+          <EuiToolTip
+            content="Checking..."
+            delay="regular"
+            position="top"
           >
-            <EuiLoadingSpinner
-              onBlur={[Function]}
-              onFocus={[Function]}
-              size="m"
+            <span
+              className="euiToolTipAnchor"
+              onKeyUp={[Function]}
+              onMouseOut={[Function]}
+              onMouseOver={[Function]}
             >
-              <span
-                className="euiLoadingSpinner euiLoadingSpinner--medium"
+              <EuiLoadingSpinner
                 onBlur={[Function]}
                 onFocus={[Function]}
-              />
-            </EuiLoadingSpinner>
-          </span>
-        </EuiToolTip>
+                size="m"
+              >
+                <span
+                  className="euiLoadingSpinner euiLoadingSpinner--medium"
+                  onBlur={[Function]}
+                  onFocus={[Function]}
+                />
+              </EuiLoadingSpinner>
+            </span>
+          </EuiToolTip>
+        </ResultIcons>
       </p>
     </dd>
   </EuiDescriptionListDescription>
