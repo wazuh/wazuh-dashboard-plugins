@@ -1,0 +1,81 @@
+/*
+ * Wazuh app - React component for showing the Mitre Att&ck intelligence.
+ *
+ * Copyright (C) 2015-2021 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
+
+import React, { useCallback, useState, useRef } from 'react';
+import {
+  EuiFlexGroup,
+  EuiFlexItem,
+} from '@elastic/eui';
+
+import { MitreAttackResources } from './mitre_attack_resources';
+import { ModuleMitreAttackIntelligenceLeftPanel } from './module_mitre_attack_intelligence_left_panel';
+import { ModuleMitreAttackIntelligenceRightPanel } from './module_mitre_attack_intelligence_right_panel';
+import { useAsyncAction } from '../../../components/common/hooks';
+import { WzRequest } from '../../../react-services';
+import { PanelSplit } from '../../../components/common/panels';
+
+export const ModuleMitreIntelligence = () => {
+  const [selectedResource, setSelectedResource] = useState(null);
+  const [searchTermAllResources, setSearchTermAllResources] = useState([]);
+  const searchTermAllResourcesUsed = useRef(false);
+  const searchTermAllResourcesAction = useAsyncAction(async () => {
+    searchTermAllResourcesUsed.current = true;
+    return (await Promise.all(
+      MitreAttackResources.map(
+        async resource => {
+          const response = await WzRequest.apiReq('GET', resource.apiEndpoint, {params: { search: searchTermAllResources }});
+          return {
+            id: resource.id,
+            name: resource.label,
+            fieldName: resource.fieldName,
+            results: response?.data?.data?.affected_items
+          }
+        }
+      )
+      )).filter(searchTermAllResourcesResponse => searchTermAllResourcesResponse.results.length)
+  }
+  , [searchTermAllResources]);
+  
+  const onSelectResource = useCallback((resourceID) => {
+    setSelectedResource(prevSelectedResource => prevSelectedResource === resourceID ? null : resourceID);
+  }, []);
+
+  const onSearchTermAllResourcesChange = useCallback((searchTerm) => {
+    setSelectedResource(null);
+    setSearchTermAllResources(searchTerm);
+  }, []);
+
+  return (
+    <EuiFlexGroup style={{ margin: '0 8px' }}>
+      <EuiFlexItem>
+        <PanelSplit 
+          side={<ModuleMitreAttackIntelligenceLeftPanel
+            onSearchTermAllResourcesChange={onSearchTermAllResourcesChange}
+            onSearchTermAllResourcesSearch={searchTermAllResourcesAction.run}
+            onSelectResource={onSelectResource}
+            selectedResource={selectedResource}
+          />}
+          sideProps={{style: {width: '15%' , minWidth: 145 /*height: "calc(100vh - 235px)",*/, overflowX: "hidden"}}}
+          content={<ModuleMitreAttackIntelligenceRightPanel
+            didSearch={searchTermAllResourcesUsed.current}
+            searchTerm={searchTermAllResources}
+            results={searchTermAllResourcesAction.data}
+            loading={searchTermAllResourcesAction.running}
+            selectedResource={selectedResource}
+          />}
+          contentProps={{style: { maxHeight: 'calc(100vh - 255px)', overflowY: 'auto', overflowX: 'hidden'}}}
+        />
+      </EuiFlexItem>
+    </EuiFlexGroup>
+  )
+}

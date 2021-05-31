@@ -1,5 +1,6 @@
 /*
- * Wazuh app - Index for table components
+ * Wazuh app - Mitre Att&ck intelligence index.
+ *
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -10,7 +11,4 @@
  * Find more information about this on the LICENSE file.
  */
 
-
-export * from './table-with-search-bar';
-export * from './table-wz-api';
-export * from './table-default';
+export * from './module_mitre_intelligence';
