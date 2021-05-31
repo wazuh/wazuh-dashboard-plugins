@@ -28,8 +28,9 @@ const initialState = {
     status: false,
     contextConfigServer: 'manager',
   },
- withUserLogged: false,
- allowedAgents: [],
+  withUserLogged: false,
+  allowedAgents: [],
+  logtestToken: '',
 };
 
 const appStateReducers = (state = initialState, action) => {
@@ -147,6 +148,13 @@ const appStateReducers = (state = initialState, action) => {
     };
   }
   
+  if (action.type === 'UPDATE_LOGTEST_TOKEN') {
+    return {
+      ...state,
+      logtestToken: action.logtestToken
+    };
+  }
+
   return state;
 };
 

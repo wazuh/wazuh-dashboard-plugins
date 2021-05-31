@@ -425,7 +425,7 @@ export class ManagementController {
 
   openCloseFlyout() {
     this.logtestOpened = !this.logtestOpened;
-    this.logtestProps.isRuleset = this.tab,
+    this.logtestProps.isRuleset = this.tab;
     this.$scope.$applyAsync();
   }
 

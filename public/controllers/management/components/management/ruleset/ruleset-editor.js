@@ -73,9 +73,9 @@ class WzRulesetEditor extends Component {
       isSaving: false,
       error: false,
       inputValue: '',
+      initialInputValue: '',
       showWarningRestart: false,
       isModalVisible: false,
-      hasChanges: false,
       initContent: content,
       content,
       name,
@@ -93,11 +93,6 @@ class WzRulesetEditor extends Component {
     this._isMounted = true;
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    if (prevState.content !== this.state.content) {
-      this.setState({ hasChanges: this.state.content !== this.state.initContent });
-    }
-  }
 
   /**
    * Save the new content
@@ -147,7 +142,11 @@ class WzRulesetEditor extends Component {
       if (overwrite) {
         textSuccess = 'File successfully edited';
       }
-      this.setState({ showWarningRestart: true });
+      this.setState({
+        showWarningRestart: true,
+        initialInputValue: this.state.inputValue,
+        initContent: content,
+      });
       this.showToast('success', 'Success', textSuccess, 3000);
     } catch (error) {
       this.setState({ error, isSaving: false });
@@ -243,7 +242,7 @@ class WzRulesetEditor extends Component {
       modal = (
         <WzOverlayMask>
           <EuiConfirmModal
-            title="Close flyout"
+            title="Unsubmitted changes"
             onConfirm={() => {
               closeModal;
               this.props.cleanInfo();
@@ -277,7 +276,16 @@ class WzRulesetEditor extends Component {
                               color="primary"
                               iconSize="l"
                               iconType="arrowLeft"
-                              onClick={() => this.props.cleanInfo()}
+                              onClick={() => {
+                                if (
+                                  this.state.content !== this.state.initContent ||
+                                  this.state.inputValue !== this.state.initialInputValue
+                                ) {
+                                  showModal();
+                                } else {
+                                  this.props.cleanInfo();
+                                }
+                              }}
                             />
                           </EuiToolTip>
                         </EuiFlexItem>
@@ -301,7 +309,10 @@ class WzRulesetEditor extends Component {
                               iconSize="l"
                               iconType="arrowLeft"
                               onClick={() => {
-                                if (this.state.hasChanges) {
+                                if (
+                                  this.state.content !== this.state.initContent ||
+                                  this.state.inputValue !== this.state.initialInputValue
+                                ) {
                                   showModal();
                                 } else {
                                   this.props.cleanInfo();

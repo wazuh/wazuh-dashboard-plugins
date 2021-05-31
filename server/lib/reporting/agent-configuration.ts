@@ -285,7 +285,7 @@ export const AgentConfiguration = {
           config: [
             { component: 'syscheck', configuration: 'syscheck', matrix: true }
           ],
-          tabs: ['General', 'Who data'],
+          tabs: ['General','Who data'],
           labels: [
             {
               disabled: 'Integrity monitoring disabled',
