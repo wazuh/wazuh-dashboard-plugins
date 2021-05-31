@@ -94,6 +94,5 @@ export async function getWzConfig($q, genericReq, wazuhConfig) {
     console.log('Error parsing wazuh.yml, using default values.'); // eslint-disable-line
     console.log(error.message || error); // eslint-disable-line
   }
-
   return $q.resolve(defaultConfig);
 }

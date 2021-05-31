@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Check Pattern Support Service
+ * Wazuh app - Check index pattern support service
  *
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
@@ -12,15 +12,24 @@
  *
  */
 import { SavedObject } from '../../../react-services';
-import { getToasts } from '../../../kibana-services';
+import { CheckLogger } from '../types/check_logger';
 
-export const checkPatternSupportService = async (pattern: string, indexType : string): Promise<{ errors: string[] }> => {
-  const errors: string[] = [];
+export const checkPatternSupportService = (pattern: string, indexType : string) => async (checkLogger: CheckLogger) => {
+  checkLogger.info(`Checking index pattern id [${pattern}] exists...`);
   const result = await SavedObject.existsIndexPattern(pattern);
+  checkLogger.info(`Exist index pattern id [${pattern}]: ${result.data ? 'yes' : 'no'}`);
+  
   if (!result.data) {
-    const toast = getToasts().addWarning(`${pattern} index pattern was not found and it will be created`);
+    checkLogger.info(`Getting indices fields for the index pattern id [${pattern}]...`);
     const fields = await SavedObject.getIndicesFields(pattern, indexType);
+    checkLogger.info(`Fields for index pattern id [${pattern}] found: ${fields.length}`);
+  
     try {
+      checkLogger.info(`Creating saved object for the index pattern with id [${pattern}].
+  title: ${pattern}
+  id: ${pattern}
+  timeFieldName: timestamp
+  fields: ${fields.length}`);
       await SavedObject.createSavedObject(
         'index-pattern',
         pattern,
@@ -32,12 +41,9 @@ export const checkPatternSupportService = async (pattern: string, indexType : st
         },
         fields
       );
-      getToasts().remove(toast.id);
-      getToasts().addSuccess(`${pattern} index pattern created successfully`);
+      checkLogger.action(`Created the saved object for the index pattern id [${pattern}]`);
     } catch (error) {
-      getToasts().remove(toast.id);
-      errors.push(`Error trying to create ${pattern} index pattern: ${error.message}`);
+      checkLogger.error(`Error creating index pattern id [${pattern}]: ${error.message || error}`);
     }
   };
-  return { errors };
 }
