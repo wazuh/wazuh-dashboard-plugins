@@ -131,23 +131,18 @@ export const AgentsPreview = compose(
   }
 
   showLastAgent() {
-    this.props.tableProps.showAgent(
-      this.lastAgent
-    )
+    this.props.tableProps.showAgent(this.lastAgent);
   }
 
   showMostActiveAgent() {
-    this.mostActiveAgent.name
-      ? this.props.tableProps.showAgent(
-      this.mostActiveAgent
-      )
-      : ''
+    this.mostActiveAgent.name ? this.props.tableProps.showAgent(this.mostActiveAgent) : '';
   }
 
-  showAgentsWithFilters(filter){
-    this._isMount && this.setState({
-      agentTableFilters: [ {field: 'q', value: `status=${filter}`} ]
-    })
+  showAgentsWithFilters(filter) {
+    this._isMount &&
+    this.setState({
+      agentTableFilters: [{ field: 'q', value: `status=${filter}` }],
+    });
   }
 
   render() {
