@@ -14,6 +14,7 @@
 import React from 'react';
 import { mount } from 'enzyme';
 import { CheckResult } from './check-result';
+import { waitFor, render } from '@testing-library/react';
 
 describe('Check result component', () => {
   const validationService = jest.fn();
@@ -42,9 +43,9 @@ describe('Check result component', () => {
     expect(component).toMatchSnapshot();
   });
 
-  test('should print ready', () => {
+  test('should print ready', async () => {
     validationService.mockImplementation(() => ({ errors: [] }));
-    const component = mount(
+    const {queryByLabelText} = render(
       <CheckResult
         name={'test'}
         title={'Check Test'}
@@ -59,14 +60,14 @@ describe('Check result component', () => {
         canRetry={true}
       />
     );
-    setImmediate(() => {
-      expect(component.find('EuiDescriptionListDescription').find('span').at(0).text().trim()).toBe('Ready');
+    await waitFor(()=>{
+      expect(queryByLabelText('ready').tagName).toEqual('svg')
     });
   });
 
-  test('should print error', () => {
-    validationService.mockImplementation(() => ({ errors: ['error'] }));
-    const component = mount(
+  test('should print error', async () => {
+    validationService.mockImplementation(() => {throw 'error'});
+      const {queryByLabelText} = render(
       <CheckResult
         name={'test'}
         title={'Check Test'}
@@ -81,8 +82,8 @@ describe('Check result component', () => {
         canRetry={true}
       />
     );
-    setImmediate(() => {
-      expect(component.find('EuiDescriptionListDescription').find('span').at(0).text().trim()).toBe('Error');
+      await waitFor(()=>{
+        expect(queryByLabelText('error_retry').tagName).toEqual('svg')
     });
   });
 });
