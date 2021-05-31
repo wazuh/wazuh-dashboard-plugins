@@ -96,7 +96,7 @@ export const checkIndexPatternObject = async (appConfig, checkLogger: CheckLogge
         AppState.setCurrentPattern(indexPatternDefaultFound.id);
         checkLogger.action(`Index pattern set in cookie: [${indexPatternDefaultFound.id}]`);
       }
-      checkLogger.info('Retring the check...');
+      checkLogger.info('Retrying the check...');
       return await checkIndexPatternObject(appConfig, checkLogger);
     } else {
       checkLogger.error('The selected index-pattern is not present');

@@ -207,7 +207,6 @@ export class WazuhApiCtrl {
       // If we have an invalid response from the Wazuh API
       throw new Error(responseManagerInfo.data.detail || `${api.url}:${api.port} is unreachable`);
     } catch (error) {
-      log('wazuh-api:checkStoredAPI', error.message || error);
       if (error.code === 'EPROTO') {
         return response.ok({
           body: {
@@ -252,8 +251,10 @@ export class WazuhApiCtrl {
             } catch (error) { } // eslint-disable-line
           }
         } catch (error) {
+          log('wazuh-api:checkStoredAPI', error.message || error);
           return ErrorResponse(error.message || error, 3020, 500, response);
         }
+        log('wazuh-api:checkStoredAPI', error.message || error);
         return ErrorResponse(error.message || error, 3002, 500, response);
       }
     }
@@ -1058,7 +1059,7 @@ export class WazuhApiCtrl {
       const wazuhSecurity = SecurityObj(context.wazuh.plugins);
       const data = (await wazuhSecurity.getCurrentUser(request, context)).authContext;
 
-      const isWazuhDisabled = +data.roles.some((role) => disabledRoles.includes(role));
+      const isWazuhDisabled = +(data.roles || []).some((role) => disabledRoles.includes(role));
 
       return response.ok({
         body: { isWazuhDisabled }
