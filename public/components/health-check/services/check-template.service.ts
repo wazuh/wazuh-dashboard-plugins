@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Check Template Service
+ * Wazuh app - Check template for alerts index pattern service
  *
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
@@ -13,17 +13,24 @@
  */
 
 import { AppState, GenericRequest, SavedObject } from '../../../react-services';
+import { CheckLogger } from '../types/check_logger';
 
-export const checkTemplateService = async (): Promise<{ errors: string[] }> => {
-  const errors: string[] = [];
+export const checkTemplateService = appInfo => async (checkLogger: CheckLogger) => {
   const patternId = AppState.getCurrentPattern();
-  let patternTitle = '';
-  const patternData = patternId ? (await SavedObject.existsIndexPattern(patternId)) || {} : {};
-  patternTitle = patternData.title;
+  checkLogger.info(`Index pattern id in cookie: ${patternId ? `yes [${patternId}]` : 'no'}`);
 
-  const templateData = await GenericRequest.request('GET', `/elastic/template/${patternTitle}`);
-  if (!templateData.data.status) {
-    errors.push(`No template found for the selected index-pattern [${patternTitle}]`);
-  }
-  return { errors };
+  checkLogger.info(`Checking if the index pattern id [${patternId}] exists...`);
+  const patternData = patternId ? (await SavedObject.existsIndexPattern(patternId)) : null;
+  checkLogger.info(`Index pattern id [${patternId}] found: ${patternData.title ? `yes title [${patternData.title}]`: 'no'}`);
+
+  if (patternData.title){
+    checkLogger.info(`Checking if exists a template compatible with the index pattern title [${patternData.title}]`);
+    const templateData = await GenericRequest.request('GET', `/elastic/template/${patternData.title}`);
+    checkLogger.info(`Template found for the selected index-pattern title [${patternData.title}]: ${templateData.data.status ? 'yes': 'no'}`);
+    if (!templateData.data.status) {
+      checkLogger.error(`No template found for the selected index-pattern title [${patternData.title}]`);
+    };
+  }else{
+    checkLogger.error(`Index pattern id [${patternId}] found: no`);
+  };
 };

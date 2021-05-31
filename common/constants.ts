@@ -75,15 +75,6 @@ export const WAZUH_SECURITY_PLUGINS = [
   WAZUH_SECURITY_PLUGIN_OPEN_DISTRO_FOR_ELASTICSEARCH
 ];
 
-// Default time filter set by the app
-export const WAZUH_TIME_FILTER_DEFAULT = {
-  from: "now-24h",
-  to: 'now'
-};
-
-//Default max buckets set by the app
-export const WAZUH_MAX_BUCKETS_DEFAULT = 200000;
-
 // App configuration
 export const WAZUH_CONFIGURATION_CACHE_TIME = 10000 // time in ms;
 export const WAZUH_CONFIGURATION_SETTINGS_NEED_RESTART = [
@@ -225,3 +216,22 @@ export const WAZUH_LINK_GOOGLE_GROUPS = 'https://groups.google.com/forum/#!forum
 export const WAZUH_LINK_SLACK = 'https://wazuh.com/community/join-us-on-slack';
 
 export const HEALTH_CHECK = 'health-check';
+
+// Health check
+export const HEALTH_CHECK_REDIRECTION_TIME = 300; //ms
+
+// Kibana settings
+// Default timeTilter set by the app
+export const WAZUH_KIBANA_SETTING_TIME_FILTER = {
+  from: "now-24h",
+  to: 'now'
+};
+export const KIBANA_SETTING_NAME_TIME_FILTER = 'timepicker:timeDefaults';
+
+// Default maxBuckets set by the app
+export const WAZUH_KIBANA_SETTING_MAX_BUCKETS = 200000;
+export const KIBANA_SETTING_NAME_MAX_BUCKETS = 'timelion:max_buckets';
+
+// Default metaFields Kibana setting set by the app
+export const WAZUH_KIBANA_SETTING_METAFIELDS = ['_source', '_index'];
+export const KIBANA_SETTING_NAME_METAFIELDS = 'metaFields';

@@ -48,6 +48,11 @@
     <react-component name="SettingsLogs" props="ctrl.settingsLogsProps"></react-component>
   </div>
   <!-- end logs -->
+  <!-- miscellaneous -->
+  <div ng-if="ctrl.tab === 'miscellaneous' && !ctrl.load">
+    <react-component name="SettingsMiscelaneous" props="{}"></react-component>
+  </div>
+  <!-- end miscellaneous -->
   <!-- about -->
   <div ng-if="ctrl.tab === 'about' && !ctrl.load">
     <div class="euiPage euiPageBody">

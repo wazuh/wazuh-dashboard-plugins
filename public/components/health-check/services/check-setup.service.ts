@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Check Setup Service
+ * Wazuh app - Check setup service
  *
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
@@ -13,19 +13,26 @@
  */
 
 import { AppState, GenericRequest, WzRequest } from '../../../react-services';
+import { CheckLogger } from '../types/check_logger';
 
-export const checkSetupService = async (): Promise<{ errors: string[] }> => {
-  const errors: string[] = [];
+export const checkSetupService = appInfo => async (checkLogger: CheckLogger) => {
   const currentApi = JSON.parse(AppState.getCurrentAPI() || '{}');
   if (currentApi && currentApi.id) {
+    checkLogger.info(`Current API in cookie: [${currentApi.id}]`);
+    checkLogger.info(`Getting API version data...`);
     const versionData = await WzRequest.apiReq('GET', '//', {});
     const apiVersion = versionData.data.data['api_version'];
+    checkLogger.info(`API version: [${apiVersion}]`);
+    checkLogger.info(`Getting the app version...`);
     const setupData = await GenericRequest.request('GET', '/api/setup');
     if (!setupData.data.data['app-version']) {
-      errors.push('Error fetching app version');
-    }
+      checkLogger.info('Error fetching app version');
+    }else{
+      checkLogger.info(`App version: [${setupData.data.data['app-version']}]`);
+    };
+
     if (!apiVersion) {
-      errors.push('Error fetching Wazuh API version');
+      checkLogger.info('Error fetching Wazuh API version');
     } else {
       const api = /v?(?<version>\d+)\.(?<minor>\d+)\.(?<path>\d+)/.exec(apiVersion);
       const appSplit = setupData.data.data['app-version'].split('.');
@@ -35,10 +42,9 @@ export const checkSetupService = async (): Promise<{ errors: string[] }> => {
         api.groups.version !== appSplit[0] ||
         api.groups.minor !== appSplit[1]
       ) {
-        errors.push('API version mismatch. Expected v' + setupData.data.data['app-version']);
+        checkLogger.error(`API and APP version mismatch. API version: ${apiVersion}. App version: ${setupData.data.data['app-version']}. At least, major and minor should match`);
       }
     }
   }
 
-  return { errors };
 };

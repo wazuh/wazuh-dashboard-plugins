@@ -25,11 +25,18 @@ exports[`Check result component should render a Check result screen 1`] = `
   handleErrors={[MockFunction]}
   isLoading={false}
   name="test"
-  title="test chest"
+  title="Check Test"
   validationService={
     [MockFunction] {
       "calls": Array [
-        Array [],
+        Array [
+          Object {
+            "_log": [Function],
+            "action": [Function],
+            "error": [Function],
+            "info": [Function],
+          },
+        ],
       ],
       "results": Array [
         Object {
@@ -46,23 +53,44 @@ exports[`Check result component should render a Check result screen 1`] = `
     <dt
       className="euiDescriptionList__title"
     >
-      test chest
+      Check Test
     </dt>
   </EuiDescriptionListTitle>
   <EuiDescriptionListDescription>
     <dd
       className="euiDescriptionList__description"
     >
-      <span>
-        <EuiLoadingSpinner
-          size="m"
+      <p>
+        <ResultIcons
+          initCheck={[Function]}
+          result="loading"
         >
-          <span
-            className="euiLoadingSpinner euiLoadingSpinner--medium"
-          />
-        </EuiLoadingSpinner>
-         Checking...
-      </span>
+          <EuiToolTip
+            content="Checking..."
+            delay="regular"
+            position="top"
+          >
+            <span
+              className="euiToolTipAnchor"
+              onKeyUp={[Function]}
+              onMouseOut={[Function]}
+              onMouseOver={[Function]}
+            >
+              <EuiLoadingSpinner
+                onBlur={[Function]}
+                onFocus={[Function]}
+                size="m"
+              >
+                <span
+                  className="euiLoadingSpinner euiLoadingSpinner--medium"
+                  onBlur={[Function]}
+                  onFocus={[Function]}
+                />
+              </EuiLoadingSpinner>
+            </span>
+          </EuiToolTip>
+        </ResultIcons>
+      </p>
     </dd>
   </EuiDescriptionListDescription>
 </CheckResult>
