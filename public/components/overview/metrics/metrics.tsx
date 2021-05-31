@@ -24,6 +24,7 @@ import { getElasticAlerts, getIndexPattern } from '../mitre/lib';
 import { ModulesHelper } from '../../common/modules/modules-helper'
 import { getDataPlugin } from '../../../kibana-services';
 import { withAllowedAgents } from '../../common/hocs/withAllowedAgents';
+import { formatUIDate } from '../../../react-services';
 
 export const Metrics = withAllowedAgents(class Metrics extends Component {
   _isMount = false;
@@ -91,7 +92,7 @@ export const Metrics = withAllowedAgents(class Metrics extends Component {
         { name: "Last scan not checked", type: "custom", filter: { phrase: "ciscat", field:"rule.groups"} , agg: { "customAggResult": { "terms": { "field": "timestamp", "order": { "_term": "desc" }, "size": 1 }, "aggs": { "aggResult": { "terms": { "field": "data.cis.notchecked" } } } } }, color: "subdued"},
         { name: "Last scan pass", type: "custom", filter: { phrase: "ciscat", field:"rule.groups"} , agg: { "customAggResult": { "terms": { "field": "timestamp", "order": { "_term": "desc" }, "size": 1 }, "aggs": { "aggResult": { "terms": { "field": "data.cis.pass" } } } } }, color: "secondary"},
         { name: "Last scan score", type: "custom", filter: { phrase: "ciscat", field:"rule.groups"} , agg: { "customAggResult": { "terms": { "field": "timestamp", "order": { "_term": "desc" }, "size": 1 }, "aggs": { "aggResult": { "terms": { "field": "data.cis.score" } } } } }},
-        { name: "Last scan date", type: "custom", filter: { phrase: "ciscat", field:"rule.groups"} , agg: { "customAggResult": { "terms": { "field": "timestamp", "order": { "_term": "desc" }, "size": 1 }, "aggs": { "aggResult": { "terms": { "field": "data.cis.timestamp" } } } } }, color: "secondary"},
+        { name: "Last scan date", type: "custom", filter: { phrase: "ciscat", field:"rule.groups"} , agg: { "customAggResult": { "terms": { "field": "timestamp", "order": { "_term": "desc" }, "size": 1 }, "aggs": { "aggResult": { "terms": { "field": "data.cis.timestamp" } } } } }, color: "secondary", transformValue:formatUIDate},
         { name: "Last scan errors", type: "custom", filter: { phrase: "ciscat", field:"rule.groups"} , agg: { "customAggResult": { "terms": { "field": "timestamp", "order": { "_term": "desc" }, "size": 1 }, "aggs": { "aggResult": { "terms": { "field": "data.cis.error" } } } } }, color: "danger"},
         { name: "Last scan fails", type: "custom", filter: { phrase: "ciscat", field:"rule.groups"} , agg: { "customAggResult": { "terms": { "field": "timestamp", "order": { "_term": "desc" }, "size": 1 }, "aggs": { "aggResult": { "terms": { "field": "data.cis.fail" } } } } }, color: "danger"},
         { name: "Last scan unknown", type: "custom", filter: { phrase: "ciscat", field:"rule.groups"} , agg: { "customAggResult": { "terms": { "field": "timestamp", "order": { "_term": "desc" }, "size": 1 }, "aggs": { "aggResult": { "terms": { "field": "data.cis.unknown" } } } } }, color: "subdued"},
@@ -288,7 +289,7 @@ export const Metrics = withAllowedAgents(class Metrics extends Component {
           <EuiFlexItem grow={count>20 ? 3 : 1} key={`${item.name}`}>
             <EuiStat
               title={this.state.metricsOnClicks[item.name] ? this.buildTitleButton(count, item.name) : 
-              <span style={{ fontSize: count > 20 ? "2rem" : "2.25rem" }}>{this.state.results[item.name]}</span>}
+              <span style={{ fontSize: count > 20 ? "2rem" : "2.25rem" }}>{item.transformValue ? item.transformValue(this.state.results[item.name]) : this.state.results[item.name]}</span>}
               description={item.name}
               titleColor={this.metricsList[section][idx].color || 'primary'}
               isLoading={this.state.loading}
