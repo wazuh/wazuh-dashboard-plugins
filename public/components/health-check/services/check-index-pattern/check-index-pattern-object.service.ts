@@ -11,12 +11,12 @@
  * Find more information about this on the LICENSE file.
  *
  */
-import { AppState, SavedObject } from '../../../react-services';
-import { getDataPlugin } from '../../../kibana-services';
-import { HEALTH_CHECK } from '../../../../common/constants';
-import { CheckLogger } from '../types/check_logger';
+import { AppState, SavedObject } from '../../../../react-services';
+import { getDataPlugin } from '../../../../kibana-services';
+import { HEALTH_CHECK } from '../../../../../common/constants';
+import { CheckLogger } from '../../types/check_logger';
 
-export const checkIndexPatternObject = async (appConfig, checkLogger: CheckLogger) => {
+export const checkIndexPatternObjectService =  async (appConfig, checkLogger: CheckLogger) => {
   const patternId: string = AppState.getCurrentPattern();
   const defaultPatternId: string = appConfig.data['pattern'];
   const shouldCreateIndex: boolean = appConfig.data['checks.pattern'];
@@ -43,7 +43,7 @@ export const checkIndexPatternObject = async (appConfig, checkLogger: CheckLogge
         checkLogger.info(`Refreshing index pattern fields [${defaultPatternId}]...`);
         await SavedObject.refreshIndexPattern(defaultPatternId);
         checkLogger.action(`Refreshed index pattern fields [${defaultPatternId}]`);
-      } else if(shouldCreateIndex){
+      } else if(shouldCreateIndex) {
         checkLogger.info(`Creating index pattern [${defaultPatternId}]...`);
         await SavedObject.createWazuhIndexPattern(defaultPatternId);
         checkLogger.action(`Created index pattern [${defaultPatternId}]`);
@@ -64,9 +64,7 @@ export const checkIndexPatternObject = async (appConfig, checkLogger: CheckLogge
 
       throw error;
     }
-  }/*else{
-    checkLogger.error(`Default Index Pattern not exist`);
-  }*/
+  }
 
   if (AppState.getCurrentPattern() && listValidIndexPatterns.length) {
     const indexPatternToSelect = listValidIndexPatterns.find(item => item.id === AppState.getCurrentPattern());
@@ -97,7 +95,7 @@ export const checkIndexPatternObject = async (appConfig, checkLogger: CheckLogge
         checkLogger.action(`Index pattern set in cookie: [${indexPatternDefaultFound.id}]`);
       }
       checkLogger.info('Retrying the check...');
-      return await checkIndexPatternObject(appConfig, checkLogger);
+      return await checkIndexPatternObjectService(appConfig, checkLogger);
     } else {
       checkLogger.error('The selected index-pattern is not present');
     }

@@ -12,10 +12,10 @@
  *
  */
 
-import { AppState, GenericRequest, SavedObject } from '../../../react-services';
-import { CheckLogger } from '../types/check_logger';
+import { AppState, GenericRequest, SavedObject } from '../../../../react-services';
+import { CheckLogger } from '../../types/check_logger';
 
-export const checkTemplateService = appInfo => async (checkLogger: CheckLogger) => {
+export const checkTemplateService = async (appConfig, checkLogger: CheckLogger) => {
   const patternId = AppState.getCurrentPattern();
   checkLogger.info(`Index pattern id in cookie: ${patternId ? `yes [${patternId}]` : 'no'}`);
 

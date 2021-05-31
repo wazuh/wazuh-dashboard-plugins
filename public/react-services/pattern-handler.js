@@ -28,12 +28,6 @@ export class PatternHandler {
       const selectedPattern = AppState.getCurrentPattern();
       if (selectedPattern && selectedPattern !== pattern) defaultPatterns.push(selectedPattern);
       let patternList = await SavedObject.getListOfWazuhValidIndexPatterns(defaultPatterns, origin);
-      if (AppState.getCurrentPattern() && patternList.length) {
-        let filtered = patternList.filter(
-          item => item.id === AppState.getCurrentPattern()
-        );
-        if (!filtered.length) AppState.setCurrentPattern(patternList[0].id);
-      }
 
       return patternList;
     } catch (error) {

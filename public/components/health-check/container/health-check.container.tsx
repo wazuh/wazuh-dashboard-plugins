@@ -28,7 +28,7 @@ import { useAppConfig, useRootScope } from '../../../components/common/hooks';
 import {
   checkApiService,
   checkKibanaSettings,
-  checkIndexPattern,
+  checkIndexPatternService,
   checkPatternSupportService,
   checkSetupService,
 } from '../services';
@@ -67,7 +67,7 @@ const checks = {
   pattern: {
     title: 'Check alerts index pattern',
     label: 'Alerts index pattern',
-    validator: checkIndexPattern,
+    validator: checkIndexPatternService,
     awaitFor: [],
     shouldCheck: true,
     canRetry: true,
@@ -107,7 +107,7 @@ const checks = {
     label: `${KIBANA_SETTING_NAME_TIME_FILTER} setting`,
     validator: checkKibanaSettings(KIBANA_SETTING_NAME_TIME_FILTER, JSON.stringify(WAZUH_KIBANA_SETTING_TIME_FILTER), (checkLogger: CheckLogger, options: {defaultAppValue: any}) => {
       getDataPlugin().query.timefilter.timefilter.setTime(WAZUH_KIBANA_SETTING_TIME_FILTER)
-        && checkLogger.action(`Timefiler set to ${JSON.stringify(options.defaultAppValue)}`);
+        && checkLogger.action(`Timefilter set to ${JSON.stringify(options.defaultAppValue)}`);
     }),
     awaitFor: [],
     canRetry: true,
