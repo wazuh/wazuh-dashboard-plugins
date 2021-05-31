@@ -60,13 +60,6 @@ export function getSavedSearch($location, $window, $route) {
               return () => ReactDOM.unmountComponentAtNode(element);
             },
           });
-
-          /* redirectWhenMissing({
-          search: '/discover',
-          'index-pattern':
-            '/management/kibana/objects/savedSearches/' +
-            $route.current.params.id
-        }) */
         });
     }
   } catch (error) {
