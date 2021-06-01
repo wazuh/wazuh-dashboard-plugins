@@ -220,3 +220,38 @@ export enum WAZUH_MODULES_ID{
 
 export const AUTHORIZED_AGENTS = 'authorized-agents';
 export const HEALTH_CHECK = 'health-check';
+
+// Health check
+export const HEALTH_CHECK_REDIRECTION_TIME = 300; //ms
+
+// Kibana settings
+// Default timeTilter set by the app
+export const WAZUH_KIBANA_SETTING_TIME_FILTER = {
+  from: "now-24h",
+  to: 'now'
+};
+export const KIBANA_SETTING_NAME_TIME_FILTER = 'timepicker:timeDefaults';
+
+// Default maxBuckets set by the app
+export const WAZUH_KIBANA_SETTING_MAX_BUCKETS = 200000;
+export const KIBANA_SETTING_NAME_MAX_BUCKETS = 'timelion:max_buckets';
+
+// Default metaFields Kibana setting set by the app
+export const WAZUH_KIBANA_SETTING_METAFIELDS = ['_source', '_index'];
+export const KIBANA_SETTING_NAME_METAFIELDS = 'metaFields';
+
+
+// Logger
+// log criticality 
+
+/*export enum LoggerCriticality { 
+  UI = 'UI',
+  BUSSINESS = 'BUSSINESS',
+  CRITICAL = 'CRITICAL'
+}*/
+// creo que queda mejor el type para el intelligence, no se en cuanto a performance cual es mejor
+export type LoggerCriticality = 'UI' | 'BUSSINESS' | 'CRITICAL';
+
+// levels
+export type LoggerLevel = 'WARNING' | 'INFO' | 'ERROR';
+

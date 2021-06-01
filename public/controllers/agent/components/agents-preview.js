@@ -40,6 +40,8 @@ import { WzDatePicker } from '../../../components/wz-date-picker/wz-date-picker'
 import { withReduxProvider, withGlobalBreadcrumb, withUserAuthorizationPrompt } from '../../../components/common/hocs';
 import { formatUIDate } from '../../../../public/react-services/time-service';
 import { compose } from 'redux';
+import { loggerService } from '../../../../common/utils/logger/logger';
+import { LoggerCriticality } from '../../../../common/constants';
 
 export const AgentsPreview = compose(
   withReduxProvider,
@@ -97,6 +99,15 @@ export const AgentsPreview = compose(
   async getSummary() {
     try {
       this.setState({ loading: true });
+
+      loggerService.error('mensaje de error', { 
+        level: 'ERROR',
+        display: false,
+        log: true,
+        error: new Error('nuevo error'),
+        criticality: 'UI'
+      });
+
       const summaryData = await WzRequest.apiReq('GET', '/agents/summary/status', {});
       this.summary = summaryData.data.data;
       this.totalAgents = this.summary.total;
