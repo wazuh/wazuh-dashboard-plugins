@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import log from 'loglevel';
 import { EuiEmptyPrompt } from '@elastic/eui';
 
-export default class WithErrorBoundary extends Component {
+export default class ErrorBoundary extends Component {
   constructor(props) {
     super(props);
     this.state = { error: null, errorInfo: null };
