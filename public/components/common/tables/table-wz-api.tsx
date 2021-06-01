@@ -48,7 +48,7 @@ export function TableWzAPI({endpoint, ...rest}){
       const { affected_items: items, total_affected_items: totalItems } = ((response || {}).data || {}).data;
       setIsLoading(false);
       setTotalItems(totalItems);
-      return { items, totalItems };
+      return { items: rest.mapResponseItem ? items.map(rest.mapResponseItem) : items, totalItems };
     } catch (error) {
       setIsLoading(false);
       setTotalItems(0);

@@ -18,7 +18,8 @@ import {
   EuiButtonEmpty,
   EuiCallOut,
   EuiProgress,
-  EuiSpacer
+  EuiSpacer,
+  EuiButton
 } from '@elastic/eui';
 
 import { withGuard } from '../../../components/common/hocs';
@@ -27,7 +28,7 @@ const LoadingProgress = () => (
   <EuiProgress color='primary' size='s'/>
 );
 
-export const ModuleMitreAttackIntelligenceAllResourcesSearchResults = withGuard(({loading}) => loading, LoadingProgress)(({ results }) => {
+export const ModuleMitreAttackIntelligenceAllResourcesSearchResults = withGuard(({loading}) => loading, LoadingProgress)(({ results, setResourceFilters }) => {
   const thereAreResults = results && results.length > 0;
   return thereAreResults
   ? results.map(item => (
@@ -35,7 +36,13 @@ export const ModuleMitreAttackIntelligenceAllResourcesSearchResults = withGuard(
       key={`module_mitre_attack_intelligence_all_resources_search_results_${item.name}`}
       style={{ textDecoration: 'none' }}
       id=''
-      buttonContent={<span>{item.name} ({item.results.length})</span>}
+      extraAction={item.loadMoreResults ? <EuiButton
+        onClick={item.loadMoreResults}
+        size='s'
+      >
+        See more results
+      </EuiButton> : undefined}
+      buttonContent={<span>{item.name} ({item.totalResults})</span>}
       paddingSize='none'
       initialIsOpen={true}
     >

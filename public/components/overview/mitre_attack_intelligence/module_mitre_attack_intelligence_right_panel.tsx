@@ -22,6 +22,7 @@ export const ModuleMitreAttackIntelligenceRightPanel = ({
   results,
   searchTerm,
   selectedResource,
+  resourceFilters
 }) => {
   return (
     <>
@@ -38,6 +39,7 @@ export const ModuleMitreAttackIntelligenceRightPanel = ({
             key={`module_mitre_intelligense_resource_${resource.id}`}
             {...resource}
             selectedResource={selectedResource}
+            resourceFilters={resourceFilters}
           />
         : null
       )}

@@ -20,7 +20,7 @@ import { withGuard } from'../../../components/common/hocs';
 import { ModuleMitreAttackIntelligenceAllResourcesWelcome } from './module_mitre_attack_intelligence_all_resources_welcome';
 import { ModuleMitreAttackIntelligenceAllResourcesSearchResults } from './module_mitre_attack_intelligence_all_resources_search_results';
 
-export const ModuleMitreAttackIntelligenceAllResources = withGuard(({didSearch}) => !didSearch, ModuleMitreAttackIntelligenceAllResourcesWelcome)(({ results, searchTerm, loading }) => {
+export const ModuleMitreAttackIntelligenceAllResources = withGuard(({didSearch}) => !didSearch, ModuleMitreAttackIntelligenceAllResourcesWelcome)(({ results, loading }) => {
   return (
     <>
       <EuiTitle><h1>Search results</h1></EuiTitle>

@@ -27,18 +27,27 @@ import { PanelSplit } from '../../../components/common/panels';
 export const ModuleMitreIntelligence = () => {
   const [selectedResource, setSelectedResource] = useState(null);
   const [searchTermAllResources, setSearchTermAllResources] = useState([]);
+  const searchTermAllResourcesLastSearch = useRef('');
+  const [resourceFilters, setResourceFilters] = useState([]);
   const searchTermAllResourcesUsed = useRef(false);
-  const searchTermAllResourcesAction = useAsyncAction(async () => {
+  const searchTermAllResourcesAction = useAsyncAction(async (searchTerm) => {
     searchTermAllResourcesUsed.current = true;
+    searchTermAllResourcesLastSearch.current = searchTerm;
+    const limitResults = 5;
     return (await Promise.all(
       MitreAttackResources.map(
         async resource => {
-          const response = await WzRequest.apiReq('GET', resource.apiEndpoint, {params: { search: searchTermAllResources }});
+          const response = await WzRequest.apiReq('GET', resource.apiEndpoint, {params: { search: searchTerm, limit: limitResults }});
           return {
             id: resource.id,
             name: resource.label,
             fieldName: resource.fieldName,
-            results: response?.data?.data?.affected_items
+            results: response?.data?.data?.affected_items,
+            totalResults: response?.data?.data?.total_affected_items,
+            loadMoreResults: response?.data?.data?.total_affected_items && response?.data?.data?.total_affected_items > limitResults && (() => {
+              setResourceFilters([{field: 'search', value: searchTermAllResourcesLastSearch.current}]);
+              setSelectedResource(resource.id);
+            })
           }
         }
       )
@@ -64,14 +73,15 @@ export const ModuleMitreIntelligence = () => {
             onSearchTermAllResourcesSearch={searchTermAllResourcesAction.run}
             onSelectResource={onSelectResource}
             selectedResource={selectedResource}
-          />}
-          sideProps={{style: {width: '15%' , minWidth: 145 /*height: "calc(100vh - 235px)",*/, overflowX: "hidden"}}}
-          content={<ModuleMitreAttackIntelligenceRightPanel
-            didSearch={searchTermAllResourcesUsed.current}
-            searchTerm={searchTermAllResources}
-            results={searchTermAllResourcesAction.data}
-            loading={searchTermAllResourcesAction.running}
-            selectedResource={selectedResource}
+            />}
+            sideProps={{style: {width: '15%' , minWidth: 145, overflowX: "hidden"}}}
+            content={<ModuleMitreAttackIntelligenceRightPanel
+              didSearch={searchTermAllResourcesUsed.current || searchTermAllResourcesAction.running}
+              searchTerm={searchTermAllResources}
+              results={searchTermAllResourcesAction.data}
+              loading={searchTermAllResourcesAction.running}
+              selectedResource={selectedResource}
+              resourceFilters={resourceFilters}
           />}
           contentProps={{style: { maxHeight: 'calc(100vh - 255px)', overflowY: 'auto', overflowX: 'hidden'}}}
         />

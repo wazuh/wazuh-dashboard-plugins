@@ -12,9 +12,6 @@
  */
 
 import React from 'react';
-import {
-  EuiSpacer
-} from '@elastic/eui';
 import { WzFieldSearchDelay } from '../../../components/common/search';
 import { MitreAttackResources } from './mitre_attack_resources';
 import { ModuleMitreAttackIntelligenceResourceButton } from './module_mitre_attack_intelligence_resource_button'
@@ -22,16 +19,17 @@ import { ModuleMitreAttackIntelligenceResourceButton } from './module_mitre_atta
 export const ModuleMitreAttackIntelligenceLeftPanel = ({onSelectResource, selectedResource, onSearchTermAllResourcesChange, onSearchTermAllResourcesSearch}) => {
   return (
     <>
-      <WzFieldSearchDelay
-        delay={1000}
-        fullWidth
-        placeholder='Search in all resources'
-        onChange={onSearchTermAllResourcesChange}
-        onSearch={onSearchTermAllResourcesSearch}
-        isClearable
-        aria-label='Search in all resources'
-      />
-      <EuiSpacer size='s'/>
+      <div style={{padding: 10}}>
+        <WzFieldSearchDelay
+          delay={1000}
+          fullWidth
+          placeholder='Search in all resources'
+          onChange={onSearchTermAllResourcesChange}
+          onSearch={onSearchTermAllResourcesSearch}
+          isClearable
+          aria-label='Search in all resources'
+        />
+      </div>
       {MitreAttackResources.map(resource => (
         <ModuleMitreAttackIntelligenceResourceButton
           key={`module_mitre_attack_intelligence_left_panel_resource_${resource.id}`}

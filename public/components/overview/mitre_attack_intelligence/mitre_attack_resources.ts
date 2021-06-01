@@ -11,216 +11,74 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { formatUIDate } from '../../../react-services';
- 
-export const MitreAttackResources = [
-  {
-    label: 'Groups',
-    id: 'groups',
+import { WzRequest } from '../../../react-services';
+
+const getMitreAttackIntelligenceSuggestions = (endpoint: string, field: string) => async (input: string) => {
+  try{
+    const response = await WzRequest.apiReq('GET', endpoint, {});
+    return response?.data?.data.affected_items
+      .map(item => ({
+        ...item,
+        ['references.external_id']: item.references.find(reference => reference.source === 'mitre-attack')?.external_id
+      }))
+      .map(item => item[field])
+      .filter(item => item.toLowerCase().includes(input.toLowerCase()))
+      .sort()
+      .slice(0,9)
+  }catch(error){
+    return [];
+  }
+};
+
+function buildResource(label: string, labelResource: string){
+  const id = label.toLowerCase();
+  const endpoint: string = `/mitre/${id}`;
+  return {
+    label: label,
+    id,
     searchBarSuggestions: [{
+        type: 'q',
+        label: 'references.external_id',
+        description: `${labelResource} ID`,
+        operators: ['=', '!='],
+        values: getMitreAttackIntelligenceSuggestions(endpoint, 'references.external_id')
+      },
+      {
       type: 'q',
-      label: 'id',
-      description: 'Tactic ID',
+      label: 'name',
+      description: `${labelResource} name`,
       operators: ['=', '!='],
-      values: () => []
+      values: getMitreAttackIntelligenceSuggestions(endpoint, 'name')
     }],
-    apiEndpoint: '/mitre/groups',
+    apiEndpoint: endpoint,
     fieldName: 'name',
     tableColumns: [
       {
+        field: 'references.external_id',
+        name: 'ID',
+        // sortable: true,
+        width: '12%'
+      },
+      {
         field: 'name',
         name: 'Name',
-        sortable: true
+        sortable: true,
+        width: '30%'
       },
       {
         field: 'description',
         name: 'Description',
         sortable: true,
         truncateText: true
-      },
-      {
-        field: 'created_time',
-        name: 'Created time',
-        sortable: true,
-        render: formatUIDate
-      },
-      {
-        field: 'modified_time',
-        name: 'Modified time',
-        sortable: true,
-        render: formatUIDate
-      }
-    ]
-  },
-  {
-    label: 'Mitigations',
-    id: 'mitigations',
-    searchBarSuggestions: [{
-      type: 'q',
-      label: 'id',
-      description: 'Tactic ID',
-      operators: ['=', '!='],
-      values: () => []
-    }],
-    apiEndpoint: '/mitre/mitigations',
-    fieldName: 'name',
-    tableColumns: [
-      {
-        field: 'name',
-        name: 'Name',
-        sortable: true
-      },
-      {
-        field: 'description',
-        name: 'Description',
-        sortable: true,
-        truncateText: true
-      },
-      {
-        field: 'created_time',
-        name: 'Created time',
-        sortable: true,
-        render: formatUIDate
-      },
-      {
-        field: 'modified_time',
-        name: 'Modified time',
-        sortable: true,
-        render: formatUIDate
-      }
-    ]
-  },
-  {
-    label: 'Software',
-    id: 'software',
-    searchBarSuggestions: [{
-      type: 'q',
-      label: 'id',
-      description: 'Tactic ID',
-      operators: ['=', '!='],
-      values: () => []
-    }],
-    apiEndpoint: '/mitre/software',
-    fieldName: 'name',
-    tableColumns: [
-      {
-        field: 'name',
-        name: 'Name',
-        sortable: true
-      },
-      {
-        field: 'description',
-        name: 'Description',
-        sortable: true,
-        truncateText: true
-      },
-      {
-        field: 'created_time',
-        name: 'Created time',
-        sortable: true,
-        render: formatUIDate
-      },
-      {
-        field: 'modified_time',
-        name: 'Modified time',
-        sortable: true,
-        render: formatUIDate
-      }
-    ]
-  },
-  {
-    label: 'Tactics',
-    id: 'tactics',
-    searchBarSuggestions: [{
-      type: 'q',
-      label: 'id',
-      description: 'Tactic ID',
-      operators: ['=', '!='],
-      values: () => []
-    }],
-    apiEndpoint: '/mitre/tactics',
-    fieldName: 'name',
-    tableColumns: [
-      {
-        field: 'name',
-        name: 'Name',
-        sortable: true
-      },
-      {
-        field: 'short_name',
-        name: 'Short name',
-        sortable: true
-      },
-      {
-        field: 'description',
-        name: 'Description',
-        sortable: true,
-        truncateText: true
-      },
-      {
-        field: 'created_time',
-        name: 'Created time',
-        sortable: true,
-        render: formatUIDate
-      },
-      {
-        field: 'modified_time',
-        name: 'Modified time',
-        sortable: true,
-        render: formatUIDate
-      }
-    ],
-    detailsProperties: [
-      {
-        label: 'ID',
-        id: 'id'
-      },
-      {
-        label: 'Name',
-        id: 'name'
-      },
-      {
-        label: 'id',
-        id: 'id'
-      },
-    ]
-  },
-  {
-    label: 'Techniques',
-    id: 'techniques',
-    searchBarSuggestions: [{
-      type: 'q',
-      label: 'id',
-      description: 'Tactic ID',
-      operators: ['=', '!='],
-      values: () => []
-    }],
-    apiEndpoint: '/mitre/techniques',
-    fieldName: 'name',
-    tableColumns: [
-      {
-        field: 'name',
-        name: 'Name',
-        sortable: true
-      },
-      {
-        field: 'description',
-        name: 'Description',
-        sortable: true,
-        truncateText: true
-      },
-      {
-        field: 'created_time',
-        name: 'Created time',
-        sortable: true,
-        render: formatUIDate
-      },
-      {
-        field: 'modified_time',
-        name: 'Modified time',
-        sortable: true,
-        render: formatUIDate
       }
     ]
   }
+};
+
+export const MitreAttackResources = [
+  buildResource('Groups', 'Group'),
+  buildResource('Mitigations', 'Mitigation'),
+  buildResource('Software', 'Software'),
+  buildResource('Tactics', 'Tactic'),
+  buildResource('Techniques', 'Technique')
 ];

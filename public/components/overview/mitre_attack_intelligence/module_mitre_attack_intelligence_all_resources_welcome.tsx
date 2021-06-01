@@ -27,7 +27,7 @@ export const ModuleMitreAttackIntelligenceAllResourcesWelcome = () => (
       <EuiSpacer />
       <EuiText color='subdued'>
         <p>{'Get information about the MITRE ATT&CK resources.'}</p>
-        <p>On the left panel, list the different resources. Click on some of them to get more information about them.</p>
+        <p>On the left panel, list the different resources. Click on some of them to get more information.</p>
       </EuiText>
     </EuiFlexItem>
   </EuiFlexGroup>

@@ -14,10 +14,7 @@
 import React, { useCallback, useState } from 'react';
 import { TableWzAPI } from '../../../components/common/tables';
 
-export const ModuleMitreAttackIntelligenceResource = ({ label, searchBarSuggestions, apiEndpoint, tableColumns, detailsProperties, initialSortingField = 'name' }) => {
-  const [filters, setFilters] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [totalItems, setTotalItems] = useState(0);
+export const ModuleMitreAttackIntelligenceResource = ({ label, searchBarSuggestions, apiEndpoint, tableColumns, detailsProperties, initialSortingField = 'name', resourceFilters }) => {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [details, setDetails] = useState(null);
 
@@ -46,6 +43,8 @@ export const ModuleMitreAttackIntelligenceResource = ({ label, searchBarSuggesti
         endpoint={apiEndpoint}
         tableProps={{rowProps}}
         tablePageSizeOptions={[10]}
+        mapResponseItem={(item) => ({...item, ['references.external_id']: item.references.find(reference => reference.source === 'mitre-attack')?.external_id})}
+        filters={resourceFilters}
       />
       {/* {details && isDetailsOpen && (
         <EuiOverlayMask
