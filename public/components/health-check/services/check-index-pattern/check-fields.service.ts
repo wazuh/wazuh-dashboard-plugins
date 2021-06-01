@@ -12,11 +12,11 @@
  *
  */
 
-import { AppState, SavedObject } from '../../../react-services';
-import { getDataPlugin } from '../../../kibana-services';
-import { CheckLogger } from '../types/check_logger';
+import { AppState, SavedObject } from '../../../../react-services';
+import { getDataPlugin } from '../../../../kibana-services';
+import { CheckLogger } from '../../types/check_logger';
 
-export const checkFieldsService = (appInfo) => async (checkLogger: CheckLogger) => {
+export const checkFieldsService = async (appConfig, checkLogger: CheckLogger) => {
   const patternId = AppState.getCurrentPattern();
   checkLogger.info(`Index pattern id in cookie: [${patternId}]`);
   

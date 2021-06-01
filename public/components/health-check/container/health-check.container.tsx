@@ -27,12 +27,10 @@ import { AppState, ErrorHandler } from '../../../react-services';
 import { useAppConfig, useRootScope } from '../../../components/common/hooks';
 import {
   checkApiService,
-  checkFieldsService,
   checkKibanaSettings,
-  checkPatternService,
+  checkIndexPatternService,
   checkPatternSupportService,
   checkSetupService,
-  checkTemplateService,
 } from '../services';
 import { CheckResult } from '../components/check-result';
 import { withReduxProvider } from '../../common/hocs';
@@ -69,22 +67,9 @@ const checks = {
   pattern: {
     title: 'Check alerts index pattern',
     label: 'Alerts index pattern',
-    validator: checkPatternService,
+    validator: checkIndexPatternService,
     awaitFor: [],
-    canRetry: true,
-  },
-  template: {
-    title: 'Check alerts indices template',
-    label: 'Alerts indices template',
-    validator: checkTemplateService,
-    awaitFor: ["pattern"],
-    canRetry: true,
-  },
-  fields: {
-    title: 'Check alerts index pattern fields',
-    label: 'alerts index pattern fields',
-    validator: checkFieldsService,
-    awaitFor: ["pattern"],
+    shouldCheck: true,
     canRetry: true,
   },
   patternMonitoring: {
@@ -122,7 +107,7 @@ const checks = {
     label: `${KIBANA_SETTING_NAME_TIME_FILTER} setting`,
     validator: checkKibanaSettings(KIBANA_SETTING_NAME_TIME_FILTER, JSON.stringify(WAZUH_KIBANA_SETTING_TIME_FILTER), (checkLogger: CheckLogger, options: {defaultAppValue: any}) => {
       getDataPlugin().query.timefilter.timefilter.setTime(WAZUH_KIBANA_SETTING_TIME_FILTER)
-        && checkLogger.action(`Timefiler set to ${JSON.stringify(options.defaultAppValue)}`);
+        && checkLogger.action(`Timefilter set to ${JSON.stringify(options.defaultAppValue)}`);
     }),
     awaitFor: [],
     canRetry: true,
@@ -195,7 +180,7 @@ function HealthCheckComponent() {
           name={check}
           title={checks[check].title}
           awaitFor={checks[check].awaitFor}
-          check={checks[check].shouldCheck || appConfig.data[`checks.${check}`]}
+          shouldCheck={checks[check].shouldCheck || appConfig.data[`checks.${check}`]}
           validationService={checks[check].validator(appConfig)}
           handleErrors={handleErrors}
           cleanErrors={cleanErrors}

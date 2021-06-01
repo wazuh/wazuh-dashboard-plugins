@@ -11,16 +11,15 @@
  * Find more information about this on the LICENSE file.
  *
  */
-import { AppState, SavedObject } from '../../../react-services';
-import { getDataPlugin } from '../../../kibana-services';
-import { HEALTH_CHECK } from '../../../../common/constants';
-import { CheckLogger } from '../types/check_logger';
+import { AppState, SavedObject } from '../../../../react-services';
+import { getDataPlugin } from '../../../../kibana-services';
+import { HEALTH_CHECK } from '../../../../../common/constants';
+import { CheckLogger } from '../../types/check_logger';
 
-export const checkPatternService = (appConfig) => async (checkLogger: CheckLogger) => await checkEventsPattern(appConfig, checkLogger);
-
-const checkEventsPattern = async (appConfig, checkLogger) => {
+export const checkIndexPatternObjectService =  async (appConfig, checkLogger: CheckLogger) => {
   const patternId: string = AppState.getCurrentPattern();
   const defaultPatternId: string = appConfig.data['pattern'];
+  const shouldCreateIndex: boolean = appConfig.data['checks.pattern'];
   checkLogger.info(`Index pattern id in cookie: ${patternId ? `yes [${patternId}]` : 'no'}`);
 
   const defaultIndexPatterns: string[] = [
@@ -37,7 +36,6 @@ const checkEventsPattern = async (appConfig, checkLogger) => {
   if (!indexPatternDefaultFound && defaultPatternId) {
     // if no valid index patterns are found we try to create the wazuh-alerts-*
     try {
-      
       checkLogger.info(`Checking if index pattern [${defaultPatternId}] exists...`);
       const existDefaultIndexPattern = await SavedObject.getExistingIndexPattern(defaultPatternId);
       checkLogger.info(`Index pattern id [${defaultPatternId}] exists: ${existDefaultIndexPattern ? 'yes' : 'no'}`);
@@ -45,10 +43,13 @@ const checkEventsPattern = async (appConfig, checkLogger) => {
         checkLogger.info(`Refreshing index pattern fields [${defaultPatternId}]...`);
         await SavedObject.refreshIndexPattern(defaultPatternId);
         checkLogger.action(`Refreshed index pattern fields [${defaultPatternId}]`);
-      } else {
+      } else if(shouldCreateIndex) {
         checkLogger.info(`Creating index pattern [${defaultPatternId}]...`);
         await SavedObject.createWazuhIndexPattern(defaultPatternId);
         checkLogger.action(`Created index pattern [${defaultPatternId}]`);
+      }else{
+        // show error
+        checkLogger.error(`Default index pattern not found`);
       }
       checkLogger.info(`Getting list of valid index patterns [${patternId}]...`);
       listValidIndexPatterns = await SavedObject.getListOfWazuhValidIndexPatterns(defaultIndexPatterns, HEALTH_CHECK);
@@ -70,7 +71,7 @@ const checkEventsPattern = async (appConfig, checkLogger) => {
     if (!indexPatternToSelect){
       AppState.setCurrentPattern(indexPatternToSelect.id);
       checkLogger.action(`Set index pattern id in cookie: [${indexPatternToSelect.id}]`);
-    };
+    }
   }
   
   checkLogger.info(`Checking the app default pattern exists: id [${defaultPatternId}]...`); 
@@ -93,8 +94,8 @@ const checkEventsPattern = async (appConfig, checkLogger) => {
         AppState.setCurrentPattern(indexPatternDefaultFound.id);
         checkLogger.action(`Index pattern set in cookie: [${indexPatternDefaultFound.id}]`);
       }
-      checkLogger.info('Retring the check...');
-      return await checkEventsPattern(appConfig, checkLogger);
+      checkLogger.info('Retrying the check...');
+      return await checkIndexPatternObjectService(appConfig, checkLogger);
     } else {
       checkLogger.error('The selected index-pattern is not present');
     }

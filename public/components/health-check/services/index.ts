@@ -13,9 +13,7 @@
  */
 
 export * from './check-api.service';
-export * from './check-fields.service';
 export * from './check-kibana-settings.service';
-export * from './check-pattern.service';
+export * from './check-index-pattern/check-index-pattern.service';
 export * from './check-pattern-support.service';
-export * from './check-template.service';
 export * from './check-setup.service';
