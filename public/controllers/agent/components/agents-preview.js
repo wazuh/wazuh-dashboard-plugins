@@ -41,7 +41,6 @@ import { withReduxProvider, withGlobalBreadcrumb, withUserAuthorizationPrompt } 
 import { formatUIDate } from '../../../../public/react-services/time-service';
 import { compose } from 'redux';
 import { loggerService } from '../../../../common/utils/logger/logger';
-import { LoggerCriticality } from '../../../../common/constants';
 
 export const AgentsPreview = compose(
   withReduxProvider,
@@ -101,6 +100,7 @@ export const AgentsPreview = compose(
       this.setState({ loading: true });
 
       loggerService.error('mensaje de error', { 
+        context: 'agents-preview-context',
         level: 'ERROR',
         display: false,
         log: true,
