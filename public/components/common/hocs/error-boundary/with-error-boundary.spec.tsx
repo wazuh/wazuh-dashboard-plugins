@@ -1,9 +1,9 @@
 import React from 'react';
 import { expect } from 'chai';
-import ErrorBoundary from './error-boundary';
+import WithErrorBoundary from './with-error-boundary';
 
 describe('Spec ErrorBoundary', function () {
   it('it exists', () => {
-    expect(ErrorBoundary).to.be.ok;
+    expect(WithErrorBoundary).to.be.ok;
   });
 });
