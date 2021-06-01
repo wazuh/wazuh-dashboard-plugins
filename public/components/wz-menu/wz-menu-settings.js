@@ -41,6 +41,7 @@ class WzMenuSettings extends Component {
       sample_data: { id: 'sample_data', text: 'Sample data' },
       configuration: { id: 'configuration', text: 'Configuration' },
       logs: { id: 'logs', text: 'Logs' },
+      miscellaneous: { id: 'miscellaneous', text: 'Miscellaneous'},
       about: { id: 'about', text: 'About' },
     };
     return (auxSettings);
@@ -54,6 +55,7 @@ class WzMenuSettings extends Component {
       this.createItem(availableSettings.sample_data),
       this.createItem(availableSettings.configuration),
       this.createItem(availableSettings.logs),
+      this.createItem(availableSettings.miscellaneous),
       this.createItem(availableSettings.about),
     ]
     return (auxItems);

@@ -40,6 +40,7 @@ import {
   getDataPlugin,
   getChrome,
   getOverlays,
+  getPlugins,
 } from '../kibana-services';
 import { KnownFields } from '../utils/known-fields';
 import { union } from 'lodash';
@@ -76,6 +77,7 @@ class KibanaVis extends Component {
       search: getDataPlugin().search,
       chrome: getChrome(),
       overlays: getOverlays(),
+      savedObjects: getPlugins().savedObjects,
     };
     const servicesForVisualizations = {
       ...services,
