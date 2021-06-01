@@ -104,13 +104,24 @@ export class MainModule extends Component {
       this.setState({ loadingReport: true });
       const isDarkModeTheme = getUiSettings().get('theme:darkMode');
       if (isDarkModeTheme) {
+
+        //Patch to fix white text in dark-mode pdf reports
         const defaultTextColor = '#DFE5EF';
+
+        //Patch to fix dark backgrounds in visualizations dark-mode pdf reports
+        const $labels = $('.euiButtonEmpty__text, .echLegendItem');
+        const $vizBackground = $('.echChartBackground');
+        const defaultVizBackground = $vizBackground.css('background-color');
+
         try {
-          $('.euiButtonEmpty__text').css('color', 'black');
+          $labels.css('color', 'black');
+          $vizBackground.css('background-color', 'transparent');
           await this.startVis2PngByAgent();
-          $('.euiButtonEmpty__text').css('color', defaultTextColor);
+          $vizBackground.css('background-color', defaultVizBackground);
+          $labels.css('color', defaultTextColor);
         } catch (e) {
-          $('.euiButtonEmpty__text').css('color', defaultTextColor);
+          $labels.css('color', defaultTextColor);
+          $vizBackground.css('background-color', defaultVizBackground);
           this.setState({ loadingReport: false });
         }
       } else {
