@@ -4,6 +4,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ## Wazuh v4.3.0 - Kibana 7.10.2 , 7.11.2 - Revision 4301
 
+### Added
+
+- Added new endpoint service to collect the frontend logs into a file [#3324](https://github.com/wazuh/wazuh-kibana-app/pull/3324)
+
 ### Changed
 
 - Changed ossec to wazuh in sample-data [#3121](https://github.com/wazuh/wazuh-kibana-app/pull/3121)
