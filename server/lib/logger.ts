@@ -68,7 +68,7 @@ const initDirectory = async () => {
     createDataDirectoryIfNotExists('logs');
     if (
       typeof wazuhlogger === 'undefined' ||
-      typeof wazuhPlainLogger === 'undefined' ||
+      typeof wazuhPlainLogger === 'undefined'
     ) {
       initLogger();
     }
