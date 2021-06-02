@@ -500,7 +500,19 @@ export class ReportPrinter{
     const widths = [];
     
     for (let step = 0; step < columns.length - 1; step++) {
-      let columnLength = tableRows[0][step].text.length * widthCharacter;
+
+      //Get the longest row value
+      const maxRowLength = tableRows.reduce((maxLength, row)=>{
+        return (row[step].text.length > maxLength ? row[step].text.length : maxLength);
+      },0);
+
+      //Get column name length
+      const headerLength = columns[step].label.length;
+
+      //Use the longest to get the column width
+      const maxLength = maxRowLength > headerLength ? maxRowLength : headerLength;
+      let columnLength = maxLength * widthCharacter;
+      
       if (columnLength <= Math.round(totalWidth / totalLength)) {
         widths.push(columnLength);
         totalWidth -= columnLength;
