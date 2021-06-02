@@ -30,5 +30,3 @@ export { withButtonOpenOnClick } from './withButtonOpenOnClick';
 export { withAgentSupportModule } from './withAgentSupportModule';
 
 export { withUserLogged } from './withUserLogged';
-
-export { withErrorBoundary } from './error-boundary/with-error-boundary';
