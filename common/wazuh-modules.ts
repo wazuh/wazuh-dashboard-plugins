@@ -97,7 +97,7 @@ export const WAZUH_MODULES = {
   },
   stats: {
     title: 'Stats',
-    description: 'Stats for agent and wmodulesd'
+    description: 'Stats for agent and logcollector'
   },
   configuration: {
     title: 'Configuration',
