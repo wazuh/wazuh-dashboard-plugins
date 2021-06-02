@@ -117,7 +117,7 @@ export const AgentsPreview = compose(
         platformsModel.push({ id: key, label: key, value: value });
       }
       this._isMount &&
-      this.setState({ platforms: platformsModel, loading: false });
+        this.setState({ platforms: platformsModel, loading: false });
     } catch (error) {}
   }
 
@@ -139,169 +139,169 @@ export const AgentsPreview = compose(
                 />
               </EuiFlexItem>
             ) || (
-              <Fragment>
-                <EuiFlexItem className="agents-status-pie" grow={false}>
-                  <EuiPanel
-                    betaBadgeLabel="Status"
-                    style={{ paddingBottom: 0, minHeight: 168, minWidth: 350 }}
-                  >
-                    <EuiFlexGroup>
-                      {this.totalAgents > 0 && (
-                        <EuiFlexItem style={{ alignItems: 'center' }}>
-                          <Pie
-                            legendAction={(status) => this._isMount && this.setState({
-                              agentTableFilters: [ {field: 'q', value: `status=${this.agentStatusLabelToID(status)}`}]
-                            })}
-                            width={300}
-                            height={150}
-                            data={this.state.data}
-                            colors={colors}
-                          />
-                        </EuiFlexItem>
+            <Fragment>
+            <EuiFlexItem className="agents-status-pie" grow={false}>
+              <EuiPanel
+                betaBadgeLabel="Status"
+                style={{ paddingBottom: 0, minHeight: 168, minWidth: 350 }}
+              >
+                <EuiFlexGroup>
+                  {this.totalAgents > 0 && (
+                    <EuiFlexItem style={{ alignItems: 'center' }}>
+                      <Pie
+                        legendAction={(status) => this._isMount && this.setState({
+                          agentTableFilters: [ {field: 'q', value: `status=${this.agentStatusLabelToID(status)}`}]
+                        })}
+                        width={300}
+                        height={150}
+                        data={this.state.data}
+                        colors={colors}
+                      />
+                    </EuiFlexItem>
+                  )}
+                </EuiFlexGroup>
+              </EuiPanel>
+            </EuiFlexItem>
+            {this.totalAgents > 0 && (
+              <EuiFlexItem >
+                <EuiPanel betaBadgeLabel="Details">
+                  <EuiFlexGroup>
+                    <EuiFlexItem>
+                      {this.summary && (
+                        <EuiFlexGroup style={{ padding: '12px 0px' }}>
+                          <EuiFlexItem>
+                              <EuiStat
+                                title={(
+                                  <EuiToolTip
+                                  position='top'
+                                  content='Show active agents'>
+                                  <a onClick={() => this._isMount && this.setState({
+                                    agentTableFilters: [ {field: 'q', value: 'status=active'} ]
+                                  })} >{this.state.data[0].value}</a>
+                                  </EuiToolTip>)}
+                                titleSize={'s'}
+                                description="Active"
+                                titleColor="secondary"
+                                style={{ whiteSpace: 'nowrap' }}
+                              />
+                            </EuiFlexItem>
+                            <EuiFlexItem>
+                              <EuiStat
+                                title={(
+                                  <EuiToolTip
+                                  position='top'
+                                  content='Show disconnected agents'>
+                                  <a onClick={() => this._isMount && this.setState({
+                                    agentTableFilters: [ {field: 'q', value: 'status=disconnected'} ]
+                                  })} >{this.state.data[1].value}</a>
+                                  </EuiToolTip>)}
+                                titleSize={'s'}
+                                description="Disconnected"
+                                titleColor="danger"
+                                style={{ whiteSpace: 'nowrap' }}
+                              />
+                            </EuiFlexItem>
+                            <EuiFlexItem>
+                              <EuiStat
+                                title={(
+                                  <EuiToolTip
+                                  position='top'
+                                  content='Show never connected agents'>
+                                  <a onClick={() => this._isMount && this.setState({
+                                    agentTableFilters: [ {field: 'q', value: 'status=never_connected'} ]
+                                  })} >{this.state.data[2].value}</a>
+                                  </EuiToolTip>)}
+                                titleSize={'s'}
+                                description="Never connected"
+                                titleColor="subdued"
+                                style={{ whiteSpace: 'nowrap' }}
+                              />
+                            </EuiFlexItem>
+                            <EuiFlexItem>
+                              <EuiStat
+                                title={`${this.agentsCoverity.toFixed(2)}%`}
+                                titleSize={'s'}
+                                description="Agents coverage"
+                                style={{ whiteSpace: 'nowrap' }}
+                              />
+                            </EuiFlexItem>
+                        </EuiFlexGroup>
                       )}
-                    </EuiFlexGroup>
-                  </EuiPanel>
-                </EuiFlexItem>
-                {this.totalAgents > 0 && (
-                  <EuiFlexItem >
-                    <EuiPanel betaBadgeLabel="Details">
-                      <EuiFlexGroup>
-                        <EuiFlexItem>
-                          {this.summary && (
-                            <EuiFlexGroup style={{ padding: '12px 0px' }}>
-                              <EuiFlexItem>
-                                <EuiStat
-                                  title={(
-                                    <EuiToolTip
-                                      position='top'
-                                      content='Show active agents'>
-                                      <a onClick={() => this._isMount && this.setState({
-                                        agentTableFilters: [ {field: 'q', value: 'status=active'} ]
-                                      })} >{this.state.data[0].value}</a>
-                                    </EuiToolTip>)}
-                                  titleSize={'s'}
-                                  description="Active"
-                                  titleColor="secondary"
-                                  style={{ whiteSpace: 'nowrap' }}
-                                />
-                              </EuiFlexItem>
-                              <EuiFlexItem>
-                                <EuiStat
-                                  title={(
-                                    <EuiToolTip
-                                      position='top'
-                                      content='Show disconnected agents'>
-                                      <a onClick={() => this._isMount && this.setState({
-                                        agentTableFilters: [ {field: 'q', value: 'status=disconnected'} ]
-                                      })} >{this.state.data[1].value}</a>
-                                    </EuiToolTip>)}
-                                  titleSize={'s'}
-                                  description="Disconnected"
-                                  titleColor="danger"
-                                  style={{ whiteSpace: 'nowrap' }}
-                                />
-                              </EuiFlexItem>
-                              <EuiFlexItem>
-                                <EuiStat
-                                  title={(
-                                    <EuiToolTip
-                                      position='top'
-                                      content='Show never connected agents'>
-                                      <a onClick={() => this._isMount && this.setState({
-                                        agentTableFilters: [ {field: 'q', value: 'status=never_connected'} ]
-                                      })} >{this.state.data[2].value}</a>
-                                    </EuiToolTip>)}
-                                  titleSize={'s'}
-                                  description="Never connected"
-                                  titleColor="subdued"
-                                  style={{ whiteSpace: 'nowrap' }}
-                                />
-                              </EuiFlexItem>
-                              <EuiFlexItem>
-                                <EuiStat
-                                  title={`${this.agentsCoverity.toFixed(2)}%`}
-                                  titleSize={'s'}
-                                  description="Agents coverage"
-                                  style={{ whiteSpace: 'nowrap' }}
-                                />
-                              </EuiFlexItem>
-                            </EuiFlexGroup>
-                          )}
-                          <EuiFlexGroup style={{ marginTop: 0 }}>
-                            {this.lastAgent && (
-                              <EuiFlexItem>
-                                <EuiStat
-                                  className="euiStatLink"
-                                  title={
-                                    <EuiToolTip
-                                      position='top'
-                                      content='View agent details'>
-                                      <a onClick={() =>
-                                        this.props.tableProps.showAgent(
-                                          this.lastAgent
-                                        )}>{this.lastAgent.name}</a>
-                                    </EuiToolTip>}
-                                  titleSize="s"
-                                  description="Last registered agent"
-                                  titleColor="primary"
-                                  style={{
-                                    paddingBottom: 12,
-                                    whiteSpace: 'nowrap'
-                                  }}
-                                />
-                              </EuiFlexItem>
-                            )}
-                            {this.mostActiveAgent && (
-                              <EuiFlexItem>
-                                <EuiStat
-                                  className={
-                                    this.mostActiveAgent.name ? 'euiStatLink' : ''
-                                  }
-                                  title={
-                                    <EuiToolTip
-                                      position='top'
-                                      content='View agent details'><a onClick={() =>
-                                      this.mostActiveAgent.name
-                                        ? this.props.tableProps.showAgent(
+                      <EuiFlexGroup style={{ marginTop: 0 }}>
+                        {this.lastAgent && (
+                          <EuiFlexItem>
+                            <EuiStat
+                              className="euiStatLink"
+                              title={
+                              <EuiToolTip
+                                position='top'
+                                content='View agent details'>
+                                  <a onClick={() =>
+                                  this.props.tableProps.showAgent(
+                                    this.lastAgent
+                                  )}>{this.lastAgent.name}</a>
+                              </EuiToolTip>}
+                              titleSize="s"
+                              description="Last registered agent"
+                              titleColor="primary"
+                              style={{
+                                paddingBottom: 12,
+                                whiteSpace: 'nowrap'
+                              }}
+                            />
+                          </EuiFlexItem>
+                        )}
+                        {this.mostActiveAgent && (
+                          <EuiFlexItem>
+                            <EuiStat
+                              className={
+                                this.mostActiveAgent.name ? 'euiStatLink' : ''
+                              }
+                              title={
+                                <EuiToolTip
+                                position='top'
+                                content='View agent details'><a onClick={() =>
+                                  this.mostActiveAgent.name
+                                    ? this.props.tableProps.showAgent(
                                         this.mostActiveAgent
-                                        )
-                                        : ''
-                                    }>{this.mostActiveAgent.name || '-'}</a>
-                                    </EuiToolTip>}
-                                  style={{ whiteSpace: 'nowrap' }}
-                                  titleSize="s"
-                                  description="Most active agent"
-                                  titleColor="primary"
-                                />
-                              </EuiFlexItem>
-                            )}
-                          </EuiFlexGroup>
-                        </EuiFlexItem>
+                                      )
+                                    : ''
+                                }>{this.mostActiveAgent.name || '-'}</a>
+                              </EuiToolTip>}
+                              style={{ whiteSpace: 'nowrap' }}
+                              titleSize="s"
+                              description="Most active agent"
+                              titleColor="primary"
+                            />
+                          </EuiFlexItem>
+                        )}
                       </EuiFlexGroup>
-                    </EuiPanel>
-                  </EuiFlexItem>
-                )}
-              </Fragment>
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
+                </EuiPanel>
+              </EuiFlexItem>
+            )}
+            </Fragment>
             )}
             {this.state.showAgentsEvolutionVisualization && (
               <EuiFlexItem grow={false} className="agents-evolution-visualization" style={{ display: !this.state.loading ? 'block' : 'none', height: !this.state.loading ? '182px' : 0}}>
                 <EuiPanel paddingSize="none" betaBadgeLabel="Evolution" style={{ display: this.props.resultState === 'ready' ? 'block' : 'none'}}>
                   <EuiFlexGroup>
                     <EuiFlexItem>
-                      <div style={{height: this.props.resultState === 'ready' ? '180px' : 0}}>
-                        <WzReduxProvider>
-                          <KibanaVis
-                            visID={'Wazuh-App-Overview-General-Agents-status'}
-                            tab={'general'}
-                          />
-                        </WzReduxProvider>
-                      </div>
-                      {this.props.resultState === 'loading' &&
+                    <div style={{height: this.props.resultState === 'ready' ? '180px' : 0}}>
+                      <WzReduxProvider>
+                        <KibanaVis
+                          visID={'Wazuh-App-Overview-General-Agents-status'}
+                          tab={'general'}
+                        />
+                      </WzReduxProvider>
+                    </div>
+                    {this.props.resultState === 'loading' &&
                       (
-                        <div style={{ display: 'block', textAlign: "center", padding: 30}}>
-                          <EuiLoadingChart size="xl" />
-                        </div>
-                      ) }
+                      <div style={{ display: 'block', textAlign: "center", padding: 30}}>
+                        <EuiLoadingChart size="xl" />
+                      </div>
+                    ) }
 
                     </EuiFlexItem>
                   </EuiFlexGroup>
@@ -322,18 +322,18 @@ export const AgentsPreview = compose(
             )}
           </EuiFlexGroup>
           <EuiSpacer size="m" />
-          <WzReduxProvider>
-            <AgentsTable
-              filters={this.state.agentTableFilters}
-              removeFilters={() => this.removeFilters()}
-              wzReq={this.props.tableProps.wzReq}
-              addingNewAgent={this.props.tableProps.addingNewAgent}
-              downloadCsv={this.props.tableProps.downloadCsv}
-              clickAction={this.props.tableProps.clickAction}
-              formatUIDate={ date => formatUIDate(date)}
-              reload={() => this.getSummary()}
-            />
-          </WzReduxProvider>
+            <WzReduxProvider>
+              <AgentsTable
+                filters={this.state.agentTableFilters}
+                removeFilters={() => this.removeFilters()}
+                wzReq={this.props.tableProps.wzReq}
+                addingNewAgent={this.props.tableProps.addingNewAgent}
+                downloadCsv={this.props.tableProps.downloadCsv}
+                clickAction={this.props.tableProps.clickAction}
+                formatUIDate={ date => formatUIDate(date)}
+                reload={() => this.getSummary()}
+              />
+            </WzReduxProvider>
         </EuiFlexItem>
       </EuiPage>
     );
