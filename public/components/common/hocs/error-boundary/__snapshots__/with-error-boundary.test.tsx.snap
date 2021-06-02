@@ -1,0 +1,325 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<ErrorBoundary> component renders correctly 1`] = `
+<ErrorBoundary>
+  <HandleError
+    errorInfo={
+      Object {
+        "componentStack": "
+    in ComponentWithError
+    in ErrorBoundary (created by WrapperComponent)
+    in WrapperComponent",
+      }
+    }
+    errorTitle={
+      [Error: Objects are not valid as a React child (found: Error: test). If you meant to render a collection of children, use an array instead.
+    in ComponentWithError
+    in ErrorBoundary (created by WrapperComponent)
+    in WrapperComponent]
+    }
+    style={null}
+  >
+    <EuiEmptyPrompt
+      body={
+        <ErrorComponent
+          errorInfo={
+            Object {
+              "componentStack": "
+    in ComponentWithError
+    in ErrorBoundary (created by WrapperComponent)
+    in WrapperComponent",
+            }
+          }
+          errorTitle={
+            [Error: Objects are not valid as a React child (found: Error: test). If you meant to render a collection of children, use an array instead.
+    in ComponentWithError
+    in ErrorBoundary (created by WrapperComponent)
+    in WrapperComponent]
+          }
+          style={null}
+        />
+      }
+      iconType="faceSad"
+      title={
+        <h2>
+          Something went wrong.
+        </h2>
+      }
+    >
+      <div
+        className="euiEmptyPrompt"
+      >
+        <EuiIcon
+          color="subdued"
+          size="xxl"
+          type="faceSad"
+        >
+          <EuiIconEmpty
+            aria-hidden={true}
+            className="euiIcon euiIcon--xxLarge euiIcon--subdued euiIcon-isLoading"
+            focusable="false"
+            role="img"
+            style={null}
+          >
+            <svg
+              aria-hidden={true}
+              className="euiIcon euiIcon--xxLarge euiIcon--subdued euiIcon-isLoading"
+              focusable="false"
+              height={16}
+              role="img"
+              style={null}
+              viewBox="0 0 16 16"
+              width={16}
+              xmlns="http://www.w3.org/2000/svg"
+            />
+          </EuiIconEmpty>
+        </EuiIcon>
+        <EuiSpacer
+          size="s"
+        >
+          <div
+            className="euiSpacer euiSpacer--s"
+          />
+        </EuiSpacer>
+        <EuiTextColor
+          color="subdued"
+        >
+          <span
+            className="euiTextColor euiTextColor--subdued"
+          >
+            <EuiTitle
+              size="m"
+            >
+              <h2
+                className="euiTitle euiTitle--medium"
+              >
+                Something went wrong.
+              </h2>
+            </EuiTitle>
+            <EuiSpacer
+              size="m"
+            >
+              <div
+                className="euiSpacer euiSpacer--m"
+              />
+            </EuiSpacer>
+            <EuiText>
+              <div
+                className="euiText euiText--medium"
+              >
+                <ErrorComponent
+                  errorInfo={
+                    Object {
+                      "componentStack": "
+    in ComponentWithError
+    in ErrorBoundary (created by WrapperComponent)
+    in WrapperComponent",
+                    }
+                  }
+                  errorTitle={
+                    [Error: Objects are not valid as a React child (found: Error: test). If you meant to render a collection of children, use an array instead.
+    in ComponentWithError
+    in ErrorBoundary (created by WrapperComponent)
+    in WrapperComponent]
+                  }
+                  style={null}
+                >
+                  <div
+                    style={
+                      Object {
+                        "borderBottom": "1px solid #777",
+                        "borderTop": "1px solid #777",
+                        "padding": "12px",
+                      }
+                    }
+                  >
+                    <details
+                      style={
+                        Object {
+                          "whiteSpace": "pre-wrap",
+                        }
+                      }
+                    >
+                      Error: Objects are not valid as a React child (found: Error: test). If you meant to render a collection of children, use an array instead.
+    in ComponentWithError
+    in ErrorBoundary (created by WrapperComponent)
+    in WrapperComponent
+                      <br />
+                      
+    in ComponentWithError
+    in ErrorBoundary (created by WrapperComponent)
+    in WrapperComponent
+                    </details>
+                  </div>
+                </ErrorComponent>
+              </div>
+            </EuiText>
+          </span>
+        </EuiTextColor>
+      </div>
+    </EuiEmptyPrompt>
+  </HandleError>
+</ErrorBoundary>
+`;
+
+exports[`<ErrorBoundary> component renders correctly and check snapshoot 1`] = `
+<ErrorBoundary>
+  <HandleError
+    errorInfo={
+      Object {
+        "componentStack": "
+    in ComponentWithError
+    in ErrorBoundary (created by WrapperComponent)
+    in WrapperComponent",
+      }
+    }
+    errorTitle={
+      [Error: Objects are not valid as a React child (found: Error: test). If you meant to render a collection of children, use an array instead.
+    in ComponentWithError
+    in ErrorBoundary (created by WrapperComponent)
+    in WrapperComponent]
+    }
+    style={null}
+  >
+    <EuiEmptyPrompt
+      body={
+        <ErrorComponent
+          errorInfo={
+            Object {
+              "componentStack": "
+    in ComponentWithError
+    in ErrorBoundary (created by WrapperComponent)
+    in WrapperComponent",
+            }
+          }
+          errorTitle={
+            [Error: Objects are not valid as a React child (found: Error: test). If you meant to render a collection of children, use an array instead.
+    in ComponentWithError
+    in ErrorBoundary (created by WrapperComponent)
+    in WrapperComponent]
+          }
+          style={null}
+        />
+      }
+      iconType="faceSad"
+      title={
+        <h2>
+          Something went wrong.
+        </h2>
+      }
+    >
+      <div
+        className="euiEmptyPrompt"
+      >
+        <EuiIcon
+          color="subdued"
+          size="xxl"
+          type="faceSad"
+        >
+          <EuiIconEmpty
+            aria-hidden={true}
+            className="euiIcon euiIcon--xxLarge euiIcon--subdued euiIcon-isLoading"
+            focusable="false"
+            role="img"
+            style={null}
+          >
+            <svg
+              aria-hidden={true}
+              className="euiIcon euiIcon--xxLarge euiIcon--subdued euiIcon-isLoading"
+              focusable="false"
+              height={16}
+              role="img"
+              style={null}
+              viewBox="0 0 16 16"
+              width={16}
+              xmlns="http://www.w3.org/2000/svg"
+            />
+          </EuiIconEmpty>
+        </EuiIcon>
+        <EuiSpacer
+          size="s"
+        >
+          <div
+            className="euiSpacer euiSpacer--s"
+          />
+        </EuiSpacer>
+        <EuiTextColor
+          color="subdued"
+        >
+          <span
+            className="euiTextColor euiTextColor--subdued"
+          >
+            <EuiTitle
+              size="m"
+            >
+              <h2
+                className="euiTitle euiTitle--medium"
+              >
+                Something went wrong.
+              </h2>
+            </EuiTitle>
+            <EuiSpacer
+              size="m"
+            >
+              <div
+                className="euiSpacer euiSpacer--m"
+              />
+            </EuiSpacer>
+            <EuiText>
+              <div
+                className="euiText euiText--medium"
+              >
+                <ErrorComponent
+                  errorInfo={
+                    Object {
+                      "componentStack": "
+    in ComponentWithError
+    in ErrorBoundary (created by WrapperComponent)
+    in WrapperComponent",
+                    }
+                  }
+                  errorTitle={
+                    [Error: Objects are not valid as a React child (found: Error: test). If you meant to render a collection of children, use an array instead.
+    in ComponentWithError
+    in ErrorBoundary (created by WrapperComponent)
+    in WrapperComponent]
+                  }
+                  style={null}
+                >
+                  <div
+                    style={
+                      Object {
+                        "borderBottom": "1px solid #777",
+                        "borderTop": "1px solid #777",
+                        "padding": "12px",
+                      }
+                    }
+                  >
+                    <details
+                      style={
+                        Object {
+                          "whiteSpace": "pre-wrap",
+                        }
+                      }
+                    >
+                      Error: Objects are not valid as a React child (found: Error: test). If you meant to render a collection of children, use an array instead.
+    in ComponentWithError
+    in ErrorBoundary (created by WrapperComponent)
+    in WrapperComponent
+                      <br />
+                      
+    in ComponentWithError
+    in ErrorBoundary (created by WrapperComponent)
+    in WrapperComponent
+                    </details>
+                  </div>
+                </ErrorComponent>
+              </div>
+            </EuiText>
+          </span>
+        </EuiTextColor>
+      </div>
+    </EuiEmptyPrompt>
+  </HandleError>
+</ErrorBoundary>
+`;
