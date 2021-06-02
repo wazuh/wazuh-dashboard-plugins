@@ -31,24 +31,11 @@ export default class ErrorBoundary extends Component {
   }
 }
 
-export const withErrorBoundary = (WrappedComponent) =>
-  class extends Component {
-    constructor(props) {
-      super(props);
-      this.state = { error: null, errorInfo: null };
-    }
-
-    componentDidCatch = (error, errorInfo) => {
-      catchFunc(error, errorInfo, this);
-    };
-
-    render() {
-      if (this.state.errorInfo) {
-        return <HandleError props={this} />;
-      }
-      return <WrappedComponent {...this.props} />;
-    }
-  };
+export const withErrorBoundary = (WrappedComponent) => (props) => (
+  <ErrorBoundary>
+    <WrappedComponent {...props} />
+  </ErrorBoundary>
+);
 
 const catchFunc = (error, errorInfo, ctx) => {
   ctx.setState({
