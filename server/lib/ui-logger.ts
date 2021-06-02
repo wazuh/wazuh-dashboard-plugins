@@ -20,8 +20,8 @@ let wazuhUiLogger : winston.Logger | undefined = undefined;
 let wazuhPlainUiLogger : winston.Logger | undefined = undefined;
 
 export interface IUIPlainLoggerSettings {
-  level: string,
-  message: string
+    level: string,
+    message: string
 }
 
 export interface IUILoggerSettings extends IUIPlainLoggerSettings {
@@ -166,6 +166,7 @@ export async function addUiLog(location: string, message: string, level: string)
           message: `${yyyymmdd()}: ${location ||
             'Unknown origin'}: ${message || 'An error occurred'}`
         }
+
         wazuhPlainUiLogger.log(plainLogData);
         
         const logData: IUILoggerSettings = {
@@ -174,6 +175,7 @@ export async function addUiLog(location: string, message: string, level: string)
           location: location || 'Unknown origin',
           message: message || 'An error occurred'
         }
+
         wazuhUiLogger.log(logData);
       }
     })

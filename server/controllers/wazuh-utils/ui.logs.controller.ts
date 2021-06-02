@@ -38,24 +38,26 @@ export class UiLogsCtrl {
           50
         );
         const spliterLog = lastLogs.split('\n');
-        return spliterLog && Array.isArray(spliterLog)
-          ? response.ok({
+        return spliterLog ? response.ok({
             body: {
               error: 0,
-              lastLogs: spliterLog.filter(
+              rawLogs: spliterLog.filter(
                 item => typeof item === 'string' && item.length
               )
             }
           })
-          : response.ok({ error: 0, lastLogs: [] });
+          : response.ok({ body: { error: 0, rawLogs: [] }});
       } catch (error) {
         return ErrorResponse(error.message || error, 3036, 500, response);
       }
     }
 
-    async updateUiLogs(context: RequestHandlerContext,request: KibanaRequest,response: KibanaResponseFactory) {
+
+
+    async createUiLogs(context: RequestHandlerContext, request: KibanaRequest,response: KibanaResponseFactory) {
       try {
-        await addUiLog(request.body.location, request.body.message, request.body.level);
+        const { location, message, level } = request.body;
+        await addUiLog(location, message, level);
         return response.ok({
           body: {
             message: 'Log has been added',
