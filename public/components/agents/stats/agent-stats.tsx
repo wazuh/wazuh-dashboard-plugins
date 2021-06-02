@@ -107,7 +107,7 @@ export const MainAgentStats = compose(
 
 function AgentStats({agent}){
   const [loading, setLoading] = useState();
-  const [dataStatwmodulesd, setDataStatwmodulesd] = useState({});
+  const [dataStatLogcollector, setDataStatLogcollector] = useState({});
   const [dataStatAgent, setDataStatAgent] = useState();
   useEffect(() => {
     (async function(){
