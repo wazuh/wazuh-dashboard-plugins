@@ -17,15 +17,16 @@ import { EuiEmptyPrompt } from '@elastic/eui';
 export default class ErrorBoundary extends Component {
   constructor(props) {
     super(props);
-    this.state = { error: null, errorInfo: null };
+    this.state = { errorTitle: null, errorInfo: null, style: null };
   }
 
-  componentDidCatch = (error, errorInfo) => catchFunc(error, errorInfo, this);
+  componentDidCatch = (errorTitle, errorInfo) => catchFunc(errorTitle, errorInfo, this);
 
   render() {
-    // @ts-ignore
-    if (this.state.errorInfo) {
-      return <HandleError props={this} />;
+    const { errorTitle, style, errorInfo }: Readonly<any> = this.state;
+
+    if (errorInfo) {
+      return <HandleError errorTitle={errorTitle} errorInfo={errorInfo} style={style} />;
     }
     return this.props.children;
   }
@@ -37,16 +38,16 @@ export const withErrorBoundary = (WrappedComponent) => (props) => (
   </ErrorBoundary>
 );
 
-const catchFunc = (error, errorInfo, ctx) => {
+const catchFunc = (errorTitle, errorInfo, ctx) => {
   ctx.setState({
-    error: error,
+    errorTitle: errorTitle,
     errorInfo: errorInfo,
   });
 
-  log.error({ error, errorInfo });
+  log.error({ errorTitle, errorInfo });
 };
 
-const ErrorComponent = (props: { ctx: any }) => {
+const ErrorComponent = (props: { errorTitle: any; errorInfo: any; style: any }) => {
   const styles = {
     error: {
       borderTop: '1px solid #777',
@@ -56,20 +57,26 @@ const ErrorComponent = (props: { ctx: any }) => {
   };
 
   return (
-    <div style={props.ctx.props.style || styles.error}>
+    <div style={props.style || styles.error}>
       <details style={{ whiteSpace: 'pre-wrap' }}>
-        {props.ctx.props.state.error && props.ctx.props.state.error.toString()}
+        {props.errorTitle && props.errorTitle.toString()}
         <br />
-        {props.ctx.props.state.errorInfo.componentStack}
+        {props.errorInfo.componentStack}
       </details>
     </div>
   );
 };
 
-const HandleError = (ctx) => (
+const HandleError = (props: { errorTitle: any; errorInfo: any; style: any }) => (
   <EuiEmptyPrompt
     iconType="faceSad"
     title={<h2>Something went wrong.</h2>}
-    body={<ErrorComponent ctx={ctx} />}
+    body={
+      <ErrorComponent
+        errorTitle={props.errorTitle}
+        errorInfo={props.errorInfo}
+        style={props.style}
+      />
+    }
   />
 );
