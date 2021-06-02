@@ -11,16 +11,15 @@
  */
 
 // Require some libraries
-import { ErrorResponse } from '../lib/error-response';
-import { getConfiguration } from '../lib/get-configuration';
+import { ErrorResponse } from '../../lib/error-response';
+import { getConfiguration } from '../../lib/get-configuration';
 import { read } from 'read-last-lines';
-import { UpdateConfigurationFile } from '../lib/update-configuration';
+import { UpdateConfigurationFile } from '../../lib/update-configuration';
 import jwtDecode from 'jwt-decode';
-import { WAZUH_ROLE_ADMINISTRATOR_ID, WAZUH_DATA_LOGS_RAW_PATH, WAZUH_FRONTEND_LOGS_RAW_PATH } from '../../common/constants';
-import { ManageHosts } from '../lib/manage-hosts';
+import { WAZUH_ROLE_ADMINISTRATOR_ID, WAZUH_DATA_LOGS_RAW_PATH } from '../../../common/constants';
+import { ManageHosts } from '../../lib/manage-hosts';
 import { KibanaRequest, RequestHandlerContext, KibanaResponseFactory } from 'src/core/server';
-import { getCookieValueByName } from '../lib/cookie';
-import { addFrontendLog } from '../lib/logger';
+import { getCookieValueByName } from '../../lib/cookie';
 
 const updateConfigurationFile = new UpdateConfigurationFile();
 
@@ -129,45 +128,4 @@ export class WazuhUtilsCtrl {
   }
 
 
-    /**
-   * Returns Wazuh frontend logs
-   * @param {Object} context 
-   * @param {Object} request
-   * @param {Object} response
-   * @returns {Array<String>} app logs or ErrorResponse
-   */
-    async getFrontendLogs(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
-      try {
-        const lastLogs = await read(
-          WAZUH_FRONTEND_LOGS_RAW_PATH,
-          50
-        );
-        const spliterLog = lastLogs.split('\n');
-        return spliterLog && Array.isArray(spliterLog)
-          ? response.ok({
-            body: {
-              error: 0,
-              lastLogs: spliterLog.filter(
-                item => typeof item === 'string' && item.length
-              )
-            }
-          })
-          : response.ok({ error: 0, lastLogs: [] });
-      } catch (error) {
-        return ErrorResponse(error.message || error, 3036, 500, response);
-      }
-    }
-
-    async updateFrontendLogs(context: RequestHandlerContext,request: KibanaRequest,response: KibanaResponseFactory) {
-      try {
-        await addFrontendLog(request.body.location, request.body.message, request.body.level);
-        return response.ok({
-          body: {
-            message: 'Log has been added',
-          },
-        });
-      } catch (error) {
-        return ErrorResponse(error.message || error, 3021, 500, response);
-      }
-    }
 }
