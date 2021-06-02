@@ -242,16 +242,9 @@ export const KIBANA_SETTING_NAME_METAFIELDS = 'metaFields';
 
 
 // Logger
-// log criticality 
-
-/*export enum LoggerCriticality { 
-  UI = 'UI',
-  BUSSINESS = 'BUSSINESS',
-  CRITICAL = 'CRITICAL'
-}*/
-// creo que queda mejor el type para el intelligence, no se en cuanto a performance cual es mejor
-export type LoggerCriticality = 'UI' | 'BUSSINESS' | 'CRITICAL';
+// log severity
+export type UILogSeverity = 'UI' | 'BUSSINESS' | 'CRITICAL';
 
 // levels
-export type LoggerLevel = 'WARNING' | 'INFO' | 'ERROR';
+export type UILogLevel = 'WARNING' | 'INFO' | 'ERROR';
 

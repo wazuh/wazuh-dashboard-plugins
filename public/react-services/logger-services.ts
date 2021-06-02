@@ -1,24 +1,25 @@
-import { getToasts } from '../../../public/kibana-services';
+import { getToasts } from '../kibana-services';
 import {
-    LoggerCriticality,
-    LoggerLevel
-} from '../../constants';
+    UILogLevel,
+    UILogSeverity
+} from '../../common/constants';
 
 export interface ILoggerOptions {
     context: string;
-    level: LoggerLevel;
-    criticality: LoggerCriticality;
-    display?: boolean; // falta setearlo por defecto en false 
-    log?: boolean; // falta setearlo por defecto en false 
+    level: UILogLevel;
+    severity: UILogSeverity;
+    display?: boolean; 
+    store?: boolean;
     error: Error;
 }
 
 /**
- 
+    Use Example
+    -----------------
     logger.error('Loans history page components fetch has failed', {
         context: 'agentService',
         level: mylogger.WARNING,
-        criticality: 'UI',
+        severity: 'UI',
         display: true,
         log: true,
         error,
@@ -58,15 +59,15 @@ class LoggerService {
      * @param options 
      */
     private launchLog(message: string, options: ILoggerOptions){
-        let display = options.display || false;
-        let log = options.log || false;
+        const display = options.display || false;
+        const log = options.store || false;
         
         if(display){
            this.showErrorToast(`${message} ${options.error}`); 
         }
 
         if(log){
-            // aca llamaria al servicio de log que guarda en el nuevo endpoint del backend
+            // if log is true then call to endpoint to save frontend logs
             console.log('log service error', message, options);
         }
 
@@ -78,8 +79,8 @@ class LoggerService {
      * @param options 
      */
     error(message: string, options: ILoggerOptions){
-        //const criticality : LoggerLevel = 'ERROR';
-        // yo eliminario el level del options y lo agregaria aca como parametro segun la funcion
+        //const level : UILogLevel = 'ERROR';
+        // i think is better to set level inside method, maybe in future.
         this.launchLog(message, options);
     }
 
@@ -89,7 +90,7 @@ class LoggerService {
      * @param options 
      */
     info(message: string, options: ILoggerOptions){
-        //const criticality : LoggerLevel = 'INFO';
+        //const level : UILogLevel = 'INFO';
         this.launchLog(message, options);
     }
 
@@ -99,7 +100,7 @@ class LoggerService {
      * @param options 
      */
     warning(message: string, options: ILoggerOptions){
-        //const criticality : LoggerLevel = 'WARNING';
+        //const level : UILogLevel = 'WARNING';
         this.launchLog(message, options);
     }
 }
