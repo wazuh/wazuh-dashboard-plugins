@@ -12,6 +12,7 @@
  */
 
 import { WzRequest } from '../../../react-services';
+import { Markdown } from '../../common/util';
 
 const getMitreAttackIntelligenceSuggestions = (endpoint: string, field: string) => async (input: string) => {
   try{
@@ -22,7 +23,7 @@ const getMitreAttackIntelligenceSuggestions = (endpoint: string, field: string) 
         ['references.external_id']: item.references.find(reference => reference.source === 'mitre-attack')?.external_id
       }))
       .map(item => item[field])
-      .filter(item => item.toLowerCase().includes(input.toLowerCase()))
+      .filter(item => item && item.toLowerCase().includes(input.toLowerCase()))
       .sort()
       .slice(0,9)
   }catch(error){
@@ -44,12 +45,20 @@ function buildResource(label: string, labelResource: string){
         values: getMitreAttackIntelligenceSuggestions(endpoint, 'references.external_id')
       },
       {
-      type: 'q',
-      label: 'name',
-      description: `${labelResource} name`,
-      operators: ['=', '!='],
-      values: getMitreAttackIntelligenceSuggestions(endpoint, 'name')
-    }],
+        type: 'q',
+        label: 'name',
+        description: `${labelResource} name`,
+        operators: ['=', '!='],
+        values: getMitreAttackIntelligenceSuggestions(endpoint, 'name')
+      }/*,
+      {
+        type: 'q',
+        label: 'description',
+        description: `${labelResource} description`,
+        operators: ['=', '!='],
+        values: getMitreAttackIntelligenceSuggestions(endpoint, 'description')
+      }*/
+    ],
     apiEndpoint: endpoint,
     fieldName: 'name',
     tableColumns: [
@@ -69,6 +78,9 @@ function buildResource(label: string, labelResource: string){
         field: 'description',
         name: 'Description',
         sortable: true,
+        render: (value) => value ? (
+          Markdown({markdown: value})
+        ) : '',
         truncateText: true
       }
     ]
