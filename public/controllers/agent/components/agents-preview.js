@@ -40,11 +40,6 @@ import { WzDatePicker } from '../../../components/wz-date-picker/wz-date-picker'
 import { withReduxProvider, withGlobalBreadcrumb, withUserAuthorizationPrompt } from '../../../components/common/hocs';
 import { formatUIDate } from '../../../../public/react-services/time-service';
 import { compose } from 'redux';
-import './agents-preview.scss'
-
-const FILTER_ACTIVE = 'active';
-const FILTER_DISCONNECTED = 'disconnected';
-const FILTER_NEVER_CONNECTED = 'never_connected';
 
 export const AgentsPreview = compose(
   withReduxProvider,
@@ -130,31 +125,16 @@ export const AgentsPreview = compose(
     this._isMount && this.setState({agentTableFilters: []})
   }
 
-  showLastAgent() {
-    this.props.tableProps.showAgent(this.lastAgent);
-  }
-
-  showMostActiveAgent() {
-    this.mostActiveAgent.name ? this.props.tableProps.showAgent(this.mostActiveAgent) : '';
-  }
-
-  showAgentsWithFilters(filter) {
-    this._isMount &&
-    this.setState({
-      agentTableFilters: [{ field: 'q', value: `status=${filter}` }],
-    });
-  }
-
   render() {
     const colors = ['#017D73', '#bd271e', '#69707D'];
     return (
-      <EuiPage className="flex-column">
+      <EuiPage>
         <EuiFlexItem >
-          <EuiFlexGroup className="agents-evolution-visualization-group mt-0">
+          <EuiFlexGroup style={{ marginTop: 0 }} className="agents-evolution-visualization-group">
             {this.state.loading && (
               <EuiFlexItem>
                 <EuiLoadingChart
-                  className="loading-chart"
+                  style={{ margin: '75px auto' }}
                   size="xl"
                 />
               </EuiFlexItem>
@@ -163,11 +143,11 @@ export const AgentsPreview = compose(
                 <EuiFlexItem className="agents-status-pie" grow={false}>
                   <EuiPanel
                     betaBadgeLabel="Status"
-                    className="eui-panel"
+                    style={{ paddingBottom: 0, minHeight: 168, minWidth: 350 }}
                   >
                     <EuiFlexGroup>
                       {this.totalAgents > 0 && (
-                        <EuiFlexItem className="align-items-center">
+                        <EuiFlexItem style={{ alignItems: 'center' }}>
                           <Pie
                             legendAction={(status) => this._isMount && this.setState({
                               agentTableFilters: [ {field: 'q', value: `status=${this.agentStatusLabelToID(status)}`}]
@@ -188,19 +168,21 @@ export const AgentsPreview = compose(
                       <EuiFlexGroup>
                         <EuiFlexItem>
                           {this.summary && (
-                            <EuiFlexGroup className="group-details">
+                            <EuiFlexGroup style={{ padding: '12px 0px' }}>
                               <EuiFlexItem>
                                 <EuiStat
                                   title={(
                                     <EuiToolTip
                                       position='top'
                                       content='Show active agents'>
-                                      <a onClick={() => this.showAgentsWithFilters(FILTER_ACTIVE)} >{this.state.data[0].value}</a>
+                                      <a onClick={() => this._isMount && this.setState({
+                                        agentTableFilters: [ {field: 'q', value: 'status=active'} ]
+                                      })} >{this.state.data[0].value}</a>
                                     </EuiToolTip>)}
                                   titleSize={'s'}
                                   description="Active"
                                   titleColor="secondary"
-                                  className="white-space-nowrap"
+                                  style={{ whiteSpace: 'nowrap' }}
                                 />
                               </EuiFlexItem>
                               <EuiFlexItem>
@@ -209,12 +191,14 @@ export const AgentsPreview = compose(
                                     <EuiToolTip
                                       position='top'
                                       content='Show disconnected agents'>
-                                      <a onClick={() => this.showAgentsWithFilters(FILTER_DISCONNECTED)} >{this.state.data[1].value}</a>
+                                      <a onClick={() => this._isMount && this.setState({
+                                        agentTableFilters: [ {field: 'q', value: 'status=disconnected'} ]
+                                      })} >{this.state.data[1].value}</a>
                                     </EuiToolTip>)}
                                   titleSize={'s'}
                                   description="Disconnected"
                                   titleColor="danger"
-                                  className="white-space-nowrap"
+                                  style={{ whiteSpace: 'nowrap' }}
                                 />
                               </EuiFlexItem>
                               <EuiFlexItem>
@@ -223,12 +207,14 @@ export const AgentsPreview = compose(
                                     <EuiToolTip
                                       position='top'
                                       content='Show never connected agents'>
-                                      <a onClick={() => this.showAgentsWithFilters(FILTER_NEVER_CONNECTED)} >{this.state.data[2].value}</a>
+                                      <a onClick={() => this._isMount && this.setState({
+                                        agentTableFilters: [ {field: 'q', value: 'status=never_connected'} ]
+                                      })} >{this.state.data[2].value}</a>
                                     </EuiToolTip>)}
                                   titleSize={'s'}
                                   description="Never connected"
                                   titleColor="subdued"
-                                  className="white-space-nowrap"
+                                  style={{ whiteSpace: 'nowrap' }}
                                 />
                               </EuiFlexItem>
                               <EuiFlexItem>
@@ -236,12 +222,12 @@ export const AgentsPreview = compose(
                                   title={`${this.agentsCoverity.toFixed(2)}%`}
                                   titleSize={'s'}
                                   description="Agents coverage"
-                                  className="white-space-nowrap"
+                                  style={{ whiteSpace: 'nowrap' }}
                                 />
                               </EuiFlexItem>
                             </EuiFlexGroup>
                           )}
-                          <EuiFlexGroup className="mt-0">
+                          <EuiFlexGroup style={{ marginTop: 0 }}>
                             {this.lastAgent && (
                               <EuiFlexItem>
                                 <EuiStat
@@ -250,12 +236,18 @@ export const AgentsPreview = compose(
                                     <EuiToolTip
                                       position='top'
                                       content='View agent details'>
-                                      <a onClick={() => this.showLastAgent()}>{this.lastAgent.name}</a>
+                                      <a onClick={() =>
+                                        this.props.tableProps.showAgent(
+                                          this.lastAgent
+                                        )}>{this.lastAgent.name}</a>
                                     </EuiToolTip>}
                                   titleSize="s"
                                   description="Last registered agent"
                                   titleColor="primary"
-                                  className="pb-12 white-space-nowrap"
+                                  style={{
+                                    paddingBottom: 12,
+                                    whiteSpace: 'nowrap'
+                                  }}
                                 />
                               </EuiFlexItem>
                             )}
@@ -268,10 +260,15 @@ export const AgentsPreview = compose(
                                   title={
                                     <EuiToolTip
                                       position='top'
-                                      content='View agent details'>
-                                      <a onClick={() => this.showMostActiveAgent()}>{this.mostActiveAgent.name || '-'}</a>
+                                      content='View agent details'><a onClick={() =>
+                                      this.mostActiveAgent.name
+                                        ? this.props.tableProps.showAgent(
+                                        this.mostActiveAgent
+                                        )
+                                        : ''
+                                    }>{this.mostActiveAgent.name || '-'}</a>
                                     </EuiToolTip>}
-                                  className="white-space-nowrap"
+                                  style={{ whiteSpace: 'nowrap' }}
                                   titleSize="s"
                                   description="Most active agent"
                                   titleColor="primary"
@@ -301,7 +298,7 @@ export const AgentsPreview = compose(
                       </div>
                       {this.props.resultState === 'loading' &&
                       (
-                        <div className="loading-chart-xl">
+                        <div style={{ display: 'block', textAlign: "center", padding: 30}}>
                           <EuiLoadingChart size="xl" />
                         </div>
                       ) }
