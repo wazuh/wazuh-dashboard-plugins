@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import log from 'loglevel';
 import { EuiEmptyPrompt } from '@elastic/eui';
-import { loggerService } from '../../../../../common/utils/logger/logger';
-
 export default class ErrorBoundary extends Component {
   constructor(props) {
     super(props);
@@ -47,13 +45,6 @@ const catchFunc = (error, errorInfo, ctx) => {
     errorInfo: errorInfo,
   });
 
-  loggerService.error('Error in HOC', {
-    level: 'ERROR',
-    criticality: 'UI',
-    log: true,
-    error: new Error('hoc error'),
-    context: 'error-boundary-context'
-  });
 };
 
 const ErrorComponent = (props: { ctx: any }) => {
