@@ -113,9 +113,9 @@ function AgentStats({agent}){
     (async function(){
       setLoading(true);
       try{
-        const responseDataStatwmodulesd = await WzRequest.apiReq('GET', `/agents/${agent.id}/stats/wmodulesd`, {});
+        const responseDataStatLogcollector = await WzRequest.apiReq('GET', `/agents/${agent.id}/stats/logcollector`, {});
         const responseDataStatAgent = await WzRequest.apiReq('GET', `/agents/${agent.id}/stats/agent`, {});
-        setDataStatwmodulesd(responseDataStatwmodulesd?.data?.data?.affected_items?.[0] || {});
+        setDataStatLogcollector(responseDataStatLogcollector?.data?.data?.affected_items?.[0] || {});
         setDataStatAgent(responseDataStatAgent?.data?.data?.affected_items?.[0] || undefined);
       }catch(error){
 
@@ -146,10 +146,10 @@ function AgentStats({agent}){
               columns={tableColumns}
               loading={loading}
               title='Global'
-              start={dataStatwmodulesd?.global?.start}
-              end={dataStatwmodulesd?.global?.end}
-              items={dataStatwmodulesd?.global?.files}
-              exportCSVFilename={`agent-stats-${agent.id}-wmodulesd-global`}
+              start={dataStatLogcollector?.global?.start}
+              end={dataStatLogcollector?.global?.end}
+              items={dataStatLogcollector?.global?.files}
+              exportCSVFilename={`agent-stats-${agent.id}-logcollector-global`}
             />
           </EuiFlexItem>
           <EuiFlexItem>
@@ -157,10 +157,10 @@ function AgentStats({agent}){
               columns={tableColumns}
               loading={loading}
               title='Interval'
-              start={dataStatwmodulesd?.interval?.start}
-              end={dataStatwmodulesd?.interval?.end}
-              items={dataStatwmodulesd?.interval?.files}
-              exportCSVFilename={`agent-stats-${agent.id}-wmodulesd-interval`}
+              start={dataStatLogcollector?.interval?.start}
+              end={dataStatLogcollector?.interval?.end}
+              items={dataStatLogcollector?.interval?.files}
+              exportCSVFilename={`agent-stats-${agent.id}-logcollector-interval`}
             />
           </EuiFlexItem>
         </EuiFlexGroup>
