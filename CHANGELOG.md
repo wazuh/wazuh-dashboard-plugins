@@ -9,6 +9,9 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed ossec to wazuh in sample-data [#3121](https://github.com/wazuh/wazuh-kibana-app/pull/3121)
 - Changed empty fields in FIM tables and `syscheck.value_name` in discovery now show an empty tag for visual clarity [#3279](https://github.com/wazuh/wazuh-kibana-app/pull/3279)
 
+### Added 
+- Added new error handler to be responsible for the error orchestration [#3327](https://github.com/wazuh/wazuh-kibana-app/pull/3327)
+
 ## Wazuh v4.2.0 - Kibana 7.10.2 , 7.11.2 - Revision 4201
 
 ### Added
