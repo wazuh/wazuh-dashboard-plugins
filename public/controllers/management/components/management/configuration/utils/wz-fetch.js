@@ -161,7 +161,7 @@ export const checkDaemons = async (isCluster) => {
     const daemons = ((((response || {}).data || {}).data || {}).affected_items || [])[0] || {};
     const wazuhdbExists = typeof daemons['wazuh-db'] !== 'undefined';
 
-    const execd = daemons['wazuh-execd'] === 'running';
+    const wmodulesd = daemons['wazuh-wmodulesd'] === 'running';
     const modulesd = daemons['wazuh-modulesd'] === 'running';
     const wazuhdb = wazuhdbExists ? daemons['wazuh-db'] === 'running' : true;
 
@@ -173,7 +173,7 @@ export const checkDaemons = async (isCluster) => {
         : false;
     }
 
-    const isValid = execd && modulesd && wazuhdb && (isCluster ? clusterd : true);
+    const isValid = wmodulesd && modulesd && wazuhdb && (isCluster ? clusterd : true);
 
     if (isValid) {
       return { isValid };

@@ -75,10 +75,10 @@ class WzConfigurationLogCollectionLogs extends Component {
   render() {
     const { currentConfig, agent } = this.props;
     const items =
-      currentConfig['logcollector-localfile'] &&
-      currentConfig['logcollector-localfile']['localfile-logs']
+      currentConfig['wmodulesd-localfile'] &&
+      currentConfig['wmodulesd-localfile']['localfile-logs']
         ? settingsListBuilder(
-            currentConfig['logcollector-localfile']['localfile-logs'],
+            currentConfig['wmodulesd-localfile']['localfile-logs'],
             [
               'file',
               'alias',
@@ -89,23 +89,23 @@ class WzConfigurationLogCollectionLogs extends Component {
         : [];
     return (
       <Fragment>
-        {currentConfig['logcollector-localfile'] &&
-          isString(currentConfig['logcollector-localfile']) && (
+        {currentConfig['wmodulesd-localfile'] &&
+          isString(currentConfig['wmodulesd-localfile']) && (
             <WzNoConfig
-              error={currentConfig['logcollector-localfile']}
+              error={currentConfig['wmodulesd-localfile']}
               help={helpLinks}
             />
           )}
-        {currentConfig['logcollector-localfile'] &&
-        !isString(currentConfig['logcollector-localfile']) &&
-        !(currentConfig['logcollector-localfile']['localfile-logs'] || [])
+        {currentConfig['wmodulesd-localfile'] &&
+        !isString(currentConfig['wmodulesd-localfile']) &&
+        !(currentConfig['wmodulesd-localfile']['localfile-logs'] || [])
           .length ? (
           <WzNoConfig error="not-present" help={helpLinks} />
         ) : null}
-        {currentConfig['logcollector-localfile'] &&
-        !isString(currentConfig['logcollector-localfile']) &&
-        currentConfig['logcollector-localfile']['localfile-logs'] &&
-        currentConfig['logcollector-localfile']['localfile-logs'].length ? (
+        {currentConfig['wmodulesd-localfile'] &&
+        !isString(currentConfig['wmodulesd-localfile']) &&
+        currentConfig['wmodulesd-localfile']['localfile-logs'] &&
+        currentConfig['wmodulesd-localfile']['localfile-logs'].length ? (
           <WzConfigurationSettingsTabSelector
             title="Logs files"
             description="List of log files that will be analyzed"

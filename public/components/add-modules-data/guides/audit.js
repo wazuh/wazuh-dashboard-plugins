@@ -98,7 +98,7 @@ export default {
         },
         {
           name: 'out_format',
-          description: 'This option allows formatting logs from Logcollector using field substitution.',
+          description: 'This option allows formatting logs from wmodulesd using field substitution.',
           info: `log:	Message from the log.
           json_escaped_log:	Message from the log, escaping JSON reserver characters.
           output:	Output from a command. Alias of log.
@@ -109,7 +109,7 @@ export default {
           hostname:	System’s host name.
           host_ip:	Host’s primary IP address.`,
           type: 'input',
-          placeholder: 'Formatting logs from Logcollector using field substitution',
+          placeholder: 'Formatting logs from wmodulesd using field substitution',
           show_attributes: true,
           attributes: [
             {
