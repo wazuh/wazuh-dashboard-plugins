@@ -16,7 +16,7 @@ import { getConfiguration } from '../lib/get-configuration';
 import { read } from 'read-last-lines';
 import { UpdateConfigurationFile } from '../lib/update-configuration';
 import jwtDecode from 'jwt-decode';
-import { WAZUH_ROLE_ADMINISTRATOR_ID, WAZUH_DATA_LOGS_RAW_PATH } from '../../common/constants';
+import { WAZUH_ROLE_ADMINISTRATOR_ID, WAZUH_DATA_LOGS_RAW_PATH, WAZUH_FRONTEND_LOGS_RAW_PATH } from '../../common/constants';
 import { ManageHosts } from '../lib/manage-hosts';
 import { KibanaRequest, RequestHandlerContext, KibanaResponseFactory } from 'src/core/server';
 import { getCookieValueByName } from '../lib/cookie';
@@ -124,6 +124,72 @@ export class WazuhUtilsCtrl {
         : response.ok({ error: 0, lastLogs: [] });
     } catch (error) {
       return ErrorResponse(error.message || error, 3036, 500, response);
+    }
+  }
+
+
+    /**
+   * Returns Wazuh frontend logs
+   * @param {Object} context 
+   * @param {Object} request
+   * @param {Object} response
+   * @returns {Array<String>} app logs or ErrorResponse
+   */
+    async getFrontendLogs(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
+      try {
+        const lastLogs = await read(
+          WAZUH_FRONTEND_LOGS_RAW_PATH,
+          50
+        );
+        const spliterLog = lastLogs.split('\n');
+        return spliterLog && Array.isArray(spliterLog)
+          ? response.ok({
+            body: {
+              error: 0,
+              lastLogs: spliterLog.filter(
+                item => typeof item === 'string' && item.length
+              )
+            }
+          })
+          : response.ok({ error: 0, lastLogs: [] });
+      } catch (error) {
+        return ErrorResponse(error.message || error, 3036, 500, response);
+      }
+    }
+
+    async updateFrontendLogs(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
+    try {
+      // Check if user has administrator role in token
+      const token = getCookieValueByName(request.headers.cookie,'wz-token');
+      if(!token){
+        return ErrorResponse('No token provided', 401, 401, response);
+      };
+      const decodedToken = jwtDecode(token);
+      if(!decodedToken){
+        return ErrorResponse('No permissions in token', 401, 401, response);
+      };
+      if(!decodedToken.rbac_roles || !decodedToken.rbac_roles.includes(WAZUH_ROLE_ADMINISTRATOR_ID)){
+        return ErrorResponse('No administrator role', 401, 401, response);
+      };response
+      // Check the provided token is valid
+      const apiHostID = getCookieValueByName(request.headers.cookie,'wz-api');
+      if( !apiHostID ){
+        return ErrorResponse('No API id provided', 401, 401, response);
+      };
+      const responseTokenIsWorking = await context.wazuh.api.client.asCurrentUser.request('GET', '//', {}, {apiHostID});
+      if(responseTokenIsWorking.status !== 200){
+        return ErrorResponse('Token is not valid', 401, 401, response);
+      };
+      const result = await updateConfigurationFile.updateConfiguration(request);
+      return response.ok({
+        body: {
+          statusCode: 200,
+          error: 0,
+          data: result
+        }
+      });
+    } catch (error) {
+      return ErrorResponse(error.message || error, 3021, 500, response);
     }
   }
 }

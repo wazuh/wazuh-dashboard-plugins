@@ -12,13 +12,14 @@
 import winston from 'winston';
 import fs from 'fs';
 import { getConfiguration } from './get-configuration';
-import { WAZUH_DATA_LOGS_DIRECTORY_PATH, WAZUH_DATA_LOGS_PLAIN_PATH, WAZUH_DATA_LOGS_RAW_PATH } from '../../common/constants';
+import { WAZUH_DATA_LOGS_DIRECTORY_PATH, WAZUH_DATA_LOGS_PLAIN_PATH, WAZUH_DATA_LOGS_RAW_PATH, WAZUH_FRONTEND_LOGS_PLAIN_PATH ,WAZUH_FRONTEND_LOGS_RAW_PATH } from '../../common/constants';
 import { createDataDirectoryIfNotExists } from './filesystem';
 
 let allowed = false;
 let wazuhlogger = undefined;
 let wazuhPlainLogger = undefined;
-
+let wazuhFrontendLogger = undefined;
+let wazuhPlainFrontendLogger = undefined;
 /**
  * Here we create the loggers
  */
@@ -41,8 +42,19 @@ const initLogger = () => {
     ]
   });
 
+  wazuhFrontendLogger = winston.createLogger({
+    level,
+    format: winston.format.json(),
+    transports: [
+      new winston.transports.File({
+        filename: WAZUH_FRONTEND_LOGS_RAW_PATH
+      })
+    ]
+  });
+
   // Prevents from exit on error related to the logger.
   wazuhlogger.exitOnError = false;
+  wazuhFrontendLogger.exitOnError = false;
 
   // Plain text logger
   wazuhPlainLogger = winston.createLogger({
@@ -51,6 +63,16 @@ const initLogger = () => {
     transports: [
       new winston.transports.File({
         filename: WAZUH_DATA_LOGS_PLAIN_PATH
+      })
+    ]
+  });
+
+  wazuhPlainFrontendLogger = winston.createLogger({
+    level,
+    format: winston.format.simple(),
+    transports: [
+      new winston.transports.File({
+        filename: WAZUH_FRONTEND_LOGS_PLAIN_PATH
       })
     ]
   });
@@ -68,7 +90,9 @@ const initDirectory = async () => {
     createDataDirectoryIfNotExists('logs');
     if (
       typeof wazuhlogger === 'undefined' ||
-      typeof wazuhPlainLogger === 'undefined'
+      typeof wazuhPlainLogger === 'undefined' ||
+      typeof wazuhFrontendLogger === 'undefined' ||
+      typeof wazuhPlainFrontendLogger === 'undefined' 
     ) {
       initLogger();
     }
@@ -125,6 +149,35 @@ const checkFiles = () => {
   }
 };
 
+/**
+ * Checks if the wazuh-frontend.log file size is greater than 100MB, if so it rotates the file.
+ */
+ const checkFrontendLogFiles = () => {
+  if (allowed) {
+    if (getFilesizeInMegaBytes(WAZUH_FRONTEND_LOGS_RAW_PATH) >= 100) {
+      fs.renameSync(
+        WAZUH_FRONTEND_LOGS_RAW_PATH,
+        `${WAZUH_DATA_LOGS_DIRECTORY_PATH}/wazuh-frontend.${new Date().getTime()}.log`
+      );
+      fs.writeFileSync(
+        WAZUH_FRONTEND_LOGS_RAW_PATH,
+        JSON.stringify({
+          date: new Date(),
+          level: 'info',
+          location: 'logger',
+          message: 'Rotated log file'
+        }) + '\n'
+      );
+    }
+    if (getFilesizeInMegaBytes(WAZUH_FRONTEND_LOGS_PLAIN_PATH) >= 100) {
+      fs.renameSync(
+        WAZUH_FRONTEND_LOGS_PLAIN_PATH,
+        `${WAZUH_DATA_LOGS_DIRECTORY_PATH}/wazuh-frontend-plain.${new Date().getTime()}.log`
+      );
+    }
+  }
+};
+
 const yyyymmdd = () => {
   const now = new Date();
   const y = now.getFullYear();
@@ -157,6 +210,34 @@ export function log(location, message, level) {
         });
         try {
           wazuhPlainLogger.log({
+            level: level || 'error',
+            message: `${yyyymmdd()}: ${location ||
+              'Unknown origin'}: ${message || 'An error occurred'}`
+          });
+        } catch (error) {} // eslint-disable-line
+      }
+    })
+    .catch(error =>
+      // eslint-disable-next-line
+      console.error(
+        `Cannot create the logs directory due to:\n${error.message || error}`
+      )
+    );
+}
+
+export function addFrontendLog(location, message, level) {
+  initDirectory()
+    .then(() => {
+      if (allowed) {
+        checkFrontendLogFiles();
+        wazuhFrontendLogger.log({
+          date: new Date(),
+          level: level || 'error',
+          location: location || 'Unknown origin',
+          message: message || 'An error occurred'
+        });
+        try {
+          wazuhPlainFrontendLogger.log({
             level: level || 'error',
             message: `${yyyymmdd()}: ${location ||
               'Unknown origin'}: ${message || 'An error occurred'}`

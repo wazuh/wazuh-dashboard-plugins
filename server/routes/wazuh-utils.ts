@@ -47,4 +47,25 @@ export function WazuhUtilsRoutes(router: IRouter) {
     },
     async (context, request, response) => ctrl.getAppLogs(context,request, response)
   );
+
+  router.get(
+    {
+      path: '/utils/logs/frontend',
+      validate: false
+    },
+    async (context, request, response) => ctrl.getFrontendLogs(context,request, response)
+  );
+
+  router.put(
+    {
+      path: '/utils/logs/frontend',
+      validate: {
+        body: schema.object({
+          level: schema.string(),
+          message: schema.string()
+        })
+      }
+    },
+    async (context, request, response) => ctrl.updateFrontendLogs(context, request, response)
+  );
 }
