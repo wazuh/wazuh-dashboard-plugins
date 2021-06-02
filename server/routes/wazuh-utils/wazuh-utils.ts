@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { WazuhUtilsCtrl } from '../controllers';
+import { WazuhUtilsCtrl } from '../../controllers';
 import { IRouter } from 'kibana/server';
 import { schema } from '@kbn/config-schema';
 
@@ -46,27 +46,5 @@ export function WazuhUtilsRoutes(router: IRouter) {
       validate: false
     },
     async (context, request, response) => ctrl.getAppLogs(context,request, response)
-  );
-
-  router.get(
-    {
-      path: '/utils/logs/frontend',
-      validate: false
-    },
-    async (context, request, response) => ctrl.getFrontendLogs(context,request, response)
-  );
-
-  router.put(
-    {
-      path: '/utils/logs/frontend',
-      validate: {
-        body: schema.object({
-          message: schema.string(),
-          level: schema.string(),
-          location: schema.string()
-        })
-      }
-    },
-    async (context, request, response) => ctrl.updateFrontendLogs(context, request, response)
   );
 }
