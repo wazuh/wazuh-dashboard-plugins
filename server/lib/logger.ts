@@ -79,6 +79,7 @@ const initLogger = () => {
 
   // Prevents from exit on error related to the logger.
   wazuhPlainLogger.exitOnError = false;
+  wazuhPlainFrontendLogger.exitOnError = false;
 };
 
 /**
@@ -225,8 +226,8 @@ export function log(location, message, level) {
     );
 }
 
-export function addFrontendLog(location, message, level) {
-  initDirectory()
+export async function addFrontendLog(location, message, level) {
+  return await initDirectory()
     .then(() => {
       if (allowed) {
         checkFrontendLogFiles();
@@ -236,19 +237,18 @@ export function addFrontendLog(location, message, level) {
           location: location || 'Unknown origin',
           message: message || 'An error occurred'
         });
-        try {
           wazuhPlainFrontendLogger.log({
             level: level || 'error',
             message: `${yyyymmdd()}: ${location ||
               'Unknown origin'}: ${message || 'An error occurred'}`
-          });
-        } catch (error) {} // eslint-disable-line
+        });
       }
     })
-    .catch(error =>
-      // eslint-disable-next-line
+    .catch(error => {
       console.error(
         `Cannot create the logs directory due to:\n${error.message || error}`
       )
+      throw(error)
+    }
     );
 }

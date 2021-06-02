@@ -61,8 +61,9 @@ export function WazuhUtilsRoutes(router: IRouter) {
       path: '/utils/logs/frontend',
       validate: {
         body: schema.object({
+          message: schema.string(),
           level: schema.string(),
-          message: schema.string()
+          location: schema.string()
         })
       }
     },

@@ -20,6 +20,7 @@ import { WAZUH_ROLE_ADMINISTRATOR_ID, WAZUH_DATA_LOGS_RAW_PATH, WAZUH_FRONTEND_L
 import { ManageHosts } from '../lib/manage-hosts';
 import { KibanaRequest, RequestHandlerContext, KibanaResponseFactory } from 'src/core/server';
 import { getCookieValueByName } from '../lib/cookie';
+import { addFrontendLog } from '../lib/logger';
 
 const updateConfigurationFile = new UpdateConfigurationFile();
 
@@ -157,39 +158,16 @@ export class WazuhUtilsCtrl {
       }
     }
 
-    async updateFrontendLogs(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
-    try {
-      // Check if user has administrator role in token
-      const token = getCookieValueByName(request.headers.cookie,'wz-token');
-      if(!token){
-        return ErrorResponse('No token provided', 401, 401, response);
-      };
-      const decodedToken = jwtDecode(token);
-      if(!decodedToken){
-        return ErrorResponse('No permissions in token', 401, 401, response);
-      };
-      if(!decodedToken.rbac_roles || !decodedToken.rbac_roles.includes(WAZUH_ROLE_ADMINISTRATOR_ID)){
-        return ErrorResponse('No administrator role', 401, 401, response);
-      };response
-      // Check the provided token is valid
-      const apiHostID = getCookieValueByName(request.headers.cookie,'wz-api');
-      if( !apiHostID ){
-        return ErrorResponse('No API id provided', 401, 401, response);
-      };
-      const responseTokenIsWorking = await context.wazuh.api.client.asCurrentUser.request('GET', '//', {}, {apiHostID});
-      if(responseTokenIsWorking.status !== 200){
-        return ErrorResponse('Token is not valid', 401, 401, response);
-      };
-      const result = await updateConfigurationFile.updateConfiguration(request);
-      return response.ok({
-        body: {
-          statusCode: 200,
-          error: 0,
-          data: result
-        }
-      });
-    } catch (error) {
-      return ErrorResponse(error.message || error, 3021, 500, response);
+    async updateFrontendLogs(context: RequestHandlerContext,request: KibanaRequest,response: KibanaResponseFactory) {
+      try {
+        await addFrontendLog(request.body.location, request.body.message, request.body.level);
+        return response.ok({
+          body: {
+            message: 'Log has been added',
+          },
+        });
+      } catch (error) {
+        return ErrorResponse(error.message || error, 3021, 500, response);
+      }
     }
-  }
 }
