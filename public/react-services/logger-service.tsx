@@ -1,5 +1,6 @@
 import { getToasts } from '../kibana-services';
 import { UILogLevel, UILogSeverity } from '../../common/constants';
+import loglevel from 'loglevel';
 
 export interface ILoggerOptions {
   context: string;
@@ -53,7 +54,7 @@ const launchLog = (message: string, options: ILoggerOptions) => {
 
   if (log) {
     // if log is true then call to endpoint to save frontend logs
-    console.log('log service error', message, options);
+    loglevel.error('log service error', message, options);
   }
 };
 
@@ -61,7 +62,7 @@ const launchLog = (message: string, options: ILoggerOptions) => {
  * @param message
  * @param options
  */
-const error = (message: string, options: ILoggerOptions) => {
+const logError = (message: string, options: ILoggerOptions) => {
   //const level : UILogLevel = 'ERROR';
   // i think is better to set level inside method, maybe in future.
   launchLog(message, options);
@@ -71,7 +72,7 @@ const error = (message: string, options: ILoggerOptions) => {
  * @param message
  * @param options
  */
-const info = (message: string, options: ILoggerOptions) => {
+const logInfo = (message: string, options: ILoggerOptions) => {
   //const level : UILogLevel = 'INFO';
   launchLog(message, options);
 };
@@ -80,13 +81,9 @@ const info = (message: string, options: ILoggerOptions) => {
  * @param message
  * @param options
  */
-const warning = (message: string, options: ILoggerOptions) => {
+const logWarning = (message: string, options: ILoggerOptions) => {
   //const level : UILogLevel = 'WARNING';
   launchLog(message, options);
 };
 
-export default {
-  error,
-  info,
-  warning,
-};
+export { logError, logInfo, logWarning };
