@@ -137,6 +137,7 @@ class WzMenuOverview extends Component {
       ...data,
       id: item.id,
       name: item.text,
+      'data-cy':`menu-modules-${item.id}-link`,
       isSelected: this.props.currentTab === item.id,
       onClick: () => { },
       onMouseDown: (ev) => this.clickMenuItem(ev, item.id)

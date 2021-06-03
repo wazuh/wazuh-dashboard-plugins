@@ -67,6 +67,7 @@ class WzMenuManagement extends Component {
       ...data,
       id: item.id,
       name: item.text,
+      'data-cy':`menu-management-${item.id}-link`,
       isSelected: this.props.state.section === item.id,
       onClick: () => { },
       onMouseDown: (ev) => this.clickMenuItem(ev, item.id)
