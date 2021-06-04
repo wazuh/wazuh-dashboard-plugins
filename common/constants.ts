@@ -185,7 +185,7 @@ export enum WAZUH_AGENTS_OS_TYPE{
   OTHERS = ''
 }
 
-export enum WAZUH_MODULES_ID{
+export enum WAZUH_MODULES_ID {
   SECURITY_EVENTS = 'general',
   INTEGRITY_MONITORING = 'fim',
   AMAZON_WEB_SERVICES = 'aws',
@@ -204,7 +204,109 @@ export enum WAZUH_MODULES_ID{
   TSC = 'tsc',
   CIS_CAT = 'ciscat',
   VIRUSTOTAL = 'virustotal',
-  GDPR = 'gdpr'
+  GDPR = 'gdpr',
+}
+
+export enum WAZUH_MODULES_CY_TEST_ID {
+  SECURITY_EVENTS = 'menu-modules-general-link',
+  INTEGRITY_MONITORING = 'menu-modules-fim-link',
+  AMAZON_WEB_SERVICES = 'menu-modules-aws-link',
+  GOOGLE_CLOUD_PLATFORM = 'menu-modules-gcp-link',
+  POLICY_MONITORING = 'menu-modules-pm-link',
+  SECURITY_CONFIGURATION_ASSESSMENT = 'menu-modules-sca-link',
+  AUDITING = 'menu-modules-audit-link',
+  OPEN_SCAP = 'menu-modules-oscap-link',
+  VULNERABILITIES = 'menu-modules-vuls-link',
+  OSQUERY = 'menu-modules-osquery-link',
+  DOCKER = 'menu-modules-docker-link',
+  MITRE_ATTACK = 'menu-modules-mitre-link',
+  PCI_DSS = 'menu-modules-pci-link',
+  HIPAA = 'menu-modules-hipaa-link',
+  NIST_800_53 = 'menu-modules-nist-link',
+  TSC = 'menu-modules-tsc-link',
+  CIS_CAT = 'menu-modules-ciscat-link',
+  VIRUSTOTAL = 'menu-modules-virustotal-link',
+  GDPR = 'menu-modules-gdpr-link',
+}
+
+export enum WAZUH_MANAGEMENT_ID {
+  MANAGEMENT = 'management',
+  ADMINISTRATION = 'administration',
+  RULESET = 'ruleset',
+  RULES = 'rules',
+  DECODERS = 'decoders',
+  CDB_LISTS = 'lists',
+  GROUPS = 'groups',
+  CONFIGURATION = 'configuration',
+  STATUS_AND_REPORTS = 'statusReports',
+  STATUS = 'status',
+  CLUSTER = 'monitoring',
+  LOGS = 'logs',
+  REPORTING = 'reporting',
+  STATISTICS = 'statistics',
+}
+
+export enum WAZUH_MANAGEMENT_CY_TEST_ID {
+  MANAGEMENT = 'menu-management-management-link',
+  ADMINISTRATION = 'menu-management-administration-link',
+  RULESET = 'menu-management-ruleset-link',
+  RULES = 'menu-management-rules-link',
+  DECODERS = 'menu-management-decoders-link',
+  CDB_LISTS = 'menu-management-lists-link',
+  GROUPS = 'menu-management-groups-link',
+  CONFIGURATION = 'menu-management-configuration-link',
+  STATUS_AND_REPORTS = 'menu-management-statusReports-link',
+  STATUS = 'menu-management-status-link',
+  CLUSTER = 'menu-management-monitoring-link',
+  LOGS = 'menu-management-logs-link',
+  REPORTING = 'menu-management-reporting-link',
+  STATISTICS = 'menu-management-statistics-link',
+}
+
+export enum WAZUH_TOOLS_ID {
+  API_CONSOLE = 'devTools',
+  RULESET_TEST = 'logtest',
+}
+
+export enum WAZUH_TOOLS_CY_TEST_ID {
+  API_CONSOLE = 'menu-tools-devTools-link',
+  RULESET_TEST = 'menu-tools-logtest-link',
+}
+
+export enum WAZUH_SECURITY_ID {
+  USERS = 'users',
+  ROLES = 'roles',
+  POLICIES = 'policies',
+  ROLES_MAPPING = 'roleMapping',
+}
+
+export enum WAZUH_SECURITY_CY_TEST_ID {
+  USERS = 'menu-security-users-link',
+  ROLES = 'menu-security-roles-link',
+  POLICIES = 'menu-security-policies-link',
+  ROLES_MAPPING = 'menu-security-roleMapping-link',
+}
+
+export enum WAZUH_SETTINGS_ID {
+  SETTINGS = 'settings',
+  API_CONFIGURATION = 'api',
+  MODULES = 'modules',
+  SAMPLE_DATA = 'sample_data',
+  CONFIGURATION = 'configuration',
+  LOGS = 'logs',
+  MISCELLANEOUS = 'miscellaneous',
+  ABOUT = 'about',
+}
+
+export enum WAZUH_SETTINGS_CY_TEST_ID {
+  SETTINGS = 'menu-settings-settings-link',
+  API_CONFIGURATION = 'menu-settings-api-link',
+  MODULES = 'menu-settings-modules-link',
+  SAMPLE_DATA = 'menu-settings-sample_data-link',
+  CONFIGURATION = 'menu-settings-configuration-link',
+  LOGS = 'menu-settings-logs-link',
+  MISCELLANEOUS = 'menu-settings-miscellaneous-link',
+  ABOUT = 'menu-settings-about-link',
 }
 
 export const AUTHORIZED_AGENTS = 'authorized-agents';

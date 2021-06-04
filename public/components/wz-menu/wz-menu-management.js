@@ -14,6 +14,7 @@ import { EuiFlexItem, EuiFlexGroup, EuiSideNav, EuiIcon, EuiButtonEmpty, EuiTool
 import { WzRequest } from '../../react-services/wz-request';
 import { connect } from 'react-redux';
 import { AppNavigate } from '../../react-services/app-navigate'
+import { WAZUH_MANAGEMENT_ID, WAZUH_MANAGEMENT_CY_TEST_ID } from '../../../common/constants';
 
 class WzMenuManagement extends Component {
   constructor(props) {
@@ -24,20 +25,76 @@ class WzMenuManagement extends Component {
     };
 
     this.managementSections = {
-      management: { id: 'management', text: 'Management' },
-      administration: { id: 'administration', text: 'Administration' },
-      ruleset: { id: 'ruleset', text: 'Ruleset' },
-      rules: { id: 'rules', text: 'Rules' },
-      decoders: { id: 'decoders', text: 'Decoders' },
-      lists: { id: 'lists', text: 'CDB lists' },
-      groups: { id: 'groups', text: 'Groups' },
-      configuration: { id: 'configuration', text: 'Configuration' },
-      statusReports: { id: 'statusReports', text: 'Status and reports' },
-      status: { id: 'status', text: 'Status' },
-      cluster: { id: 'monitoring', text: 'Cluster' },
-      logs: { id: 'logs', text: 'Logs' },
-      reporting: { id: 'reporting', text: 'Reporting' },
-      statistics: { id: 'statistics', text: 'Statistics' },
+      management: {
+        id: WAZUH_MANAGEMENT_ID.MANAGEMENT,
+        cyTestId: WAZUH_MANAGEMENT_CY_TEST_ID.MANAGEMENT,
+        text: 'Management',
+      },
+      administration: {
+        id: WAZUH_MANAGEMENT_ID.ADMINISTRATION,
+        cyTestId: WAZUH_MANAGEMENT_CY_TEST_ID.ADMINISTRATION,
+        text: 'Administration',
+      },
+      ruleset: {
+        id: WAZUH_MANAGEMENT_ID.RULESET,
+        cyTestId: WAZUH_MANAGEMENT_CY_TEST_ID.RULESET,
+        text: 'Ruleset',
+      },
+      rules: {
+        id: WAZUH_MANAGEMENT_ID.RULES,
+        cyTestId: WAZUH_MANAGEMENT_CY_TEST_ID.RULES,
+        text: 'Rules',
+      },
+      decoders: {
+        id: WAZUH_MANAGEMENT_ID.DECODERS,
+        cyTestId: WAZUH_MANAGEMENT_CY_TEST_ID.DECODERS,
+        text: 'Decoders',
+      },
+      lists: {
+        id: WAZUH_MANAGEMENT_ID.CDB_LISTS,
+        cyTestId: WAZUH_MANAGEMENT_CY_TEST_ID.CDB_LISTS,
+        text: 'CDB lists',
+      },
+      groups: {
+        id: WAZUH_MANAGEMENT_ID.GROUPS,
+        cyTestId: WAZUH_MANAGEMENT_CY_TEST_ID.GROUPS,
+        text: 'Groups',
+      },
+      configuration: {
+        id: WAZUH_MANAGEMENT_ID.CONFIGURATION,
+        cyTestId: WAZUH_MANAGEMENT_CY_TEST_ID.CONFIGURATION,
+        text: 'Configuration',
+      },
+      statusReports: {
+        id: WAZUH_MANAGEMENT_ID.STATUS_AND_REPORTS,
+        cyTestId: WAZUH_MANAGEMENT_CY_TEST_ID.STATUS_AND_REPORTS,
+        text: 'Status and reports',
+      },
+      status: {
+        id: WAZUH_MANAGEMENT_ID.STATUS,
+        cyTestId: WAZUH_MANAGEMENT_CY_TEST_ID.STATUS,
+        text: 'Status',
+      },
+      cluster: {
+        id: WAZUH_MANAGEMENT_ID.CLUSTER,
+        cyTestId: WAZUH_MANAGEMENT_CY_TEST_ID.CLUSTER,
+        text: 'Cluster',
+      },
+      logs: {
+        id: WAZUH_MANAGEMENT_ID.LOGS,
+        cyTestId: WAZUH_MANAGEMENT_CY_TEST_ID.LOGS,
+        text: 'Logs',
+      },
+      reporting: {
+        id: WAZUH_MANAGEMENT_ID.REPORTING,
+        cyTestId: WAZUH_MANAGEMENT_CY_TEST_ID.REPORTING,
+        text: 'Reporting',
+      },
+      statistics: {
+        id: WAZUH_MANAGEMENT_ID.STATISTICS,
+        cyTestId: WAZUH_MANAGEMENT_CY_TEST_ID.STATISTICS,
+        text: 'Statistics',
+      },
     };
 
     this.paths = {
@@ -67,7 +124,7 @@ class WzMenuManagement extends Component {
       ...data,
       id: item.id,
       name: item.text,
-      'data-cy':`menu-management-${item.id}-link`,
+      'data-cy': item.cyTestId,
       isSelected: this.props.state.section === item.id,
       onClick: () => { },
       onMouseDown: (ev) => this.clickMenuItem(ev, item.id)

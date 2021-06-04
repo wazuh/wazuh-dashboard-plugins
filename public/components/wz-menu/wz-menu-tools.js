@@ -14,6 +14,8 @@ import { EuiFlexItem, EuiFlexGroup, EuiSideNav, EuiIcon } from '@elastic/eui';
 import { WzRequest } from '../../react-services/wz-request';
 import { connect } from 'react-redux';
 import { AppNavigate } from '../../react-services/app-navigate';
+import { WAZUH_TOOLS_ID, WAZUH_TOOLS_CY_TEST_ID } from '../../../common/constants';
+
 
 class WzMenuTools extends Component {
   constructor(props) {
@@ -34,9 +36,17 @@ class WzMenuTools extends Component {
 
   avaibleRenderSettings() {
     return [
-      this.createItem({ id: 'devTools', text: 'API Console' }),
-      this.createItem({ id: 'logtest', text: 'Ruleset Test' }),
-    ]
+      this.createItem({
+        id: WAZUH_TOOLS_ID.API_CONSOLE,
+        cyTestId: WAZUH_TOOLS_CY_TEST_ID.API_CONSOLE,
+        text: 'API Console',
+      }),
+      this.createItem({
+        id: WAZUH_TOOLS_ID.RULESET_TEST,
+        cyTestId: WAZUH_TOOLS_CY_TEST_ID.RULESET_TEST,
+        text: 'Ruleset Test',
+      }),
+    ];
   }
 
   clickMenuItem = async (ev, section) => {
@@ -50,7 +60,7 @@ class WzMenuTools extends Component {
       ...data,
       id: item.id,
       name: item.text,
-      'data-cy':`menu-tools-${item.id}-link`,
+      'data-cy': item.cyTestId,
       isSelected: window.location.href.includes('/wazuh-dev') && this.props.state.selected_tools_section === item.id,
       onClick: () => { },
       onMouseDown: (ev) => this.clickMenuItem(ev, item.id)

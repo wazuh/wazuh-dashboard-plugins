@@ -14,6 +14,7 @@ import { EuiFlexItem, EuiFlexGroup, EuiSideNav, EuiIcon } from '@elastic/eui';
 import { WzRequest } from '../../react-services/wz-request';
 import { connect } from 'react-redux';
 import { AppNavigate } from '../../react-services/app-navigate';
+import { WAZUH_SECURITY_ID, WAZUH_SECURITY_CY_TEST_ID } from '../../../common/constants';
 
 class WzMenuSecurity extends Component {
   constructor(props) {
@@ -34,11 +35,27 @@ class WzMenuSecurity extends Component {
 
   avaibleRenderSettings() {
     return [
-      this.createItem({ id: 'users', text: 'Users' }),
-      this.createItem({ id: 'roles', text: 'Roles' }),
-      this.createItem({ id: 'policies', text: 'Policies' }),
-      this.createItem({ id: 'roleMapping', text: 'Roles mapping' }),
-    ]
+      this.createItem({
+        id: WAZUH_SECURITY_ID.USERS,
+        cyTestId: WAZUH_SECURITY_CY_TEST_ID.USERS,
+        text: 'Users',
+      }),
+      this.createItem({
+        id: WAZUH_SECURITY_ID.ROLES,
+        cyTestId: WAZUH_SECURITY_CY_TEST_ID.ROLES,
+        text: 'Roles',
+      }),
+      this.createItem({
+        id: WAZUH_SECURITY_ID.POLICIES,
+        cyTestId: WAZUH_SECURITY_CY_TEST_ID.POLICIES,
+        text: 'Policies',
+      }),
+      this.createItem({
+        id: WAZUH_SECURITY_ID.ROLES_MAPPING,
+        cyTestId: WAZUH_SECURITY_CY_TEST_ID.ROLES_MAPPING,
+        text: 'Roles mapping',
+      }),
+    ];
   }
 
   clickMenuItem = async (ev, section) => {
@@ -52,7 +69,7 @@ class WzMenuSecurity extends Component {
       ...data,
       id: item.id,
       name: item.text,
-      'data-cy':`menu-security-${item.id}-link`,
+      'data-cy': item.cyTestId,
       isSelected: window.location.href.includes('/security') && this.props.state.selected_security_section === item.id,
       onClick: () => { },
       onMouseDown: (ev) => this.clickMenuItem(ev, item.id)
