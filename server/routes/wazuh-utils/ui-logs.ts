@@ -35,6 +35,6 @@ export function UiLogsRoutes(router: IRouter) {
         })
       }
     },
-    async (context, request, response) => ctrl.createUiLogs(context, request, response)
+    async (context, request, response) => await ctrl.createUiLogs(context, request, response)
   );
 }
