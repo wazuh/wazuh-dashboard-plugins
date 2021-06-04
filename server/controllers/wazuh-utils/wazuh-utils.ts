@@ -107,6 +107,7 @@ export class WazuhUtilsCtrl {
    */
   async getAppLogs(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
     try {
+      console.log('path',WAZUH_DATA_LOGS_RAW_PATH);
       const lastLogs = await read(
         WAZUH_DATA_LOGS_RAW_PATH,
         50

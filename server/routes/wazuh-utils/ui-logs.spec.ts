@@ -20,7 +20,7 @@ describe('Wazuh API - /utils/logs/ui', () => {
       //expect(typeof response.data.data).toBe('object');
       //expect(typeof response.data.data.hosts).toBe('object');
     }).catch(error => {throw error})
-  },5000);
+  },6000);
 });
 
 describe('Wazuh API - /utils/logs/ui', () => {
@@ -35,5 +35,5 @@ describe('Wazuh API - /utils/logs/ui', () => {
     return axios(options).then(response => {
       expect(response.status).toBe(200);
     }).catch(error => {throw error})
-  },5000);
+  },6000);
 });
