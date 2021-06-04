@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Module for logging functions
+ * Wazuh app - Module for ui logging functions
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -12,21 +12,25 @@
 import winston from 'winston';
 import fs from 'fs';
 import { getConfiguration } from './get-configuration';
-import { WAZUH_DATA_LOGS_DIRECTORY_PATH, WAZUH_UI_LOGS_PLAIN_PATH ,WAZUH_UI_LOGS_RAW_PATH } from '../../common/constants';
+import {
+  WAZUH_DATA_LOGS_DIRECTORY_PATH,
+  WAZUH_UI_LOGS_PLAIN_PATH,
+  WAZUH_UI_LOGS_RAW_PATH,
+} from '../../common/constants';
 import { createDataDirectoryIfNotExists } from './filesystem';
 
 let allowed = false;
-let wazuhUiLogger : winston.Logger | undefined = undefined;
-let wazuhPlainUiLogger : winston.Logger | undefined = undefined;
+let wazuhUiLogger: winston.Logger | undefined = undefined;
+let wazuhPlainUiLogger: winston.Logger | undefined = undefined;
 
 export interface IUIPlainLoggerSettings {
-    level: string,
-    message: string
+  level: string;
+  message: string;
 }
 
 export interface IUILoggerSettings extends IUIPlainLoggerSettings {
-    date: Date,
-    location: string
+  date: Date;
+  location: string;
 }
 
 /**
@@ -40,15 +44,14 @@ export const initLogger = () => {
       ? configurationFile['logs.level']
       : 'info';
 
-
   wazuhUiLogger = winston.createLogger({
     level,
     format: winston.format.json(),
     transports: [
       new winston.transports.File({
-        filename: WAZUH_UI_LOGS_RAW_PATH
-      })
-    ]
+        filename: WAZUH_UI_LOGS_RAW_PATH,
+      }),
+    ],
   });
 
   // Prevents from exit on error related to the logger.
@@ -59,9 +62,9 @@ export const initLogger = () => {
     format: winston.format.simple(),
     transports: [
       new winston.transports.File({
-        filename: WAZUH_UI_LOGS_PLAIN_PATH
-      })
-    ]
+        filename: WAZUH_UI_LOGS_PLAIN_PATH,
+      }),
+    ],
   });
 
   // Prevents from exit on error related to the logger.
@@ -75,10 +78,7 @@ export const initDirectory = async () => {
   try {
     createDataDirectoryIfNotExists();
     createDataDirectoryIfNotExists('logs');
-    if (
-      typeof wazuhUiLogger === 'undefined' ||
-      typeof wazuhPlainUiLogger === 'undefined' 
-    ) {
+    if (typeof wazuhUiLogger === 'undefined' || typeof wazuhPlainUiLogger === 'undefined') {
       initLogger();
     }
     allowed = true;
@@ -93,7 +93,7 @@ export const initDirectory = async () => {
  * Returns given file size in MB, if the file doesn't exist returns 0
  * @param {*} filename Path to the file
  */
-const getFilesizeInMegaBytes = filename => {
+const getFilesizeInMegaBytes = (filename) => {
   if (allowed) {
     if (fs.existsSync(filename)) {
       const stats = fs.statSync(filename);
@@ -105,15 +105,14 @@ const getFilesizeInMegaBytes = filename => {
   return 0;
 };
 
-
-export const checkFileExist = filename => {
+export const checkFileExist = (filename) => {
   return fs.existsSync(filename);
-}
+};
 
 /**
  * Checks if the wazuh-frontend.log file size is greater than 100MB, if so it rotates the file.
  */
- const checkUiLogFiles = () => {
+const checkUiLogFiles = () => {
   if (allowed) {
     if (getFilesizeInMegaBytes(WAZUH_UI_LOGS_RAW_PATH) >= 100) {
       fs.renameSync(
@@ -126,7 +125,7 @@ export const checkFileExist = filename => {
           date: new Date(),
           level: 'info',
           location: 'logger',
-          message: 'Rotated log file'
+          message: 'Rotated log file',
         }) + '\n'
       );
     }
@@ -147,9 +146,7 @@ const yyyymmdd = () => {
   const seconds = now.getSeconds();
   const minutes = now.getMinutes();
   const hour = now.getHours();
-  return `${y}/${m < 10 ? '0' : ''}${m}/${
-    d < 10 ? '0' : ''
-  }${d} ${hour}:${minutes}:${seconds}`;
+  return `${y}/${m < 10 ? '0' : ''}${m}/${d < 10 ? '0' : ''}${d} ${hour}:${minutes}:${seconds}`;
 };
 
 /**
@@ -167,27 +164,25 @@ export async function addUiLog(location: string, message: string, level: string)
 
         const plainLogData: IUIPlainLoggerSettings = {
           level: level || 'error',
-          message: `${yyyymmdd()}: ${location ||
-            'Unknown origin'}: ${message || 'An error occurred'}`
-        }
+          message: `${yyyymmdd()}: ${location || 'Unknown origin'}: ${
+            message || 'An error occurred'
+          }`,
+        };
 
         wazuhPlainUiLogger.log(plainLogData);
-        
+
         const logData: IUILoggerSettings = {
           date: new Date(),
           level: level || 'error',
           location: location || 'Unknown origin',
-          message: message || 'An error occurred'
-        }
+          message: message || 'An error occurred',
+        };
 
         wazuhUiLogger.log(logData);
       }
     })
-    .catch(error => {
-      console.error(
-        `Cannot create the logs directory due to:\n${error.message || error}`
-      )
-      throw(error)
-    }
-    );
+    .catch((error) => {
+      console.error(`Cannot create the logs directory due to:\n${error.message || error}`);
+      throw error;
+    });
 }

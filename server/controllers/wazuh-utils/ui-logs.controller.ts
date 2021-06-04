@@ -24,77 +24,78 @@ export class UiLogsCtrl {
    */
   constructor() {}
 
-    /**
+  /**
    * Returns Wazuh ui logs
-   * @param {Object} context 
+   * @param {Object} context
    * @param {Object} request
    * @param {Object} response
    * @returns {Array<String>} app logs or ErrorResponse
    */
-    async getUiLogs(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
-      try {
-        return initDirectory().then( async () => {
-          if(!checkFileExist(WAZUH_UI_LOGS_RAW_PATH)){
-            return response.ok({ 
-              body: { 
-                error: 0, rawLogs: [] 
-              }
-            });
-  
-          }else{
-            let arrayLog = await this.getUiFileLogs(WAZUH_UI_LOGS_RAW_PATH);
-            return response.ok({
-              body: {
-                error: 0,
-                rawLogs: arrayLog.filter(
-                  item => typeof item === 'string' && item.length
-                )
-              }
-            });
-          }
-        });
-
-        
-      } catch (error) {
-        return ErrorResponse(error.message || error, 3036, 500, response);
-      }
+  async getUiLogs(
+    context: RequestHandlerContext,
+    request: KibanaRequest,
+    response: KibanaResponseFactory
+  ) {
+    try {
+      return initDirectory().then(async () => {
+        if (!checkFileExist(WAZUH_UI_LOGS_RAW_PATH)) {
+          return response.ok({
+            body: {
+              error: 0,
+              rawLogs: [],
+            },
+          });
+        } else {
+          let arrayLog = await this.getUiFileLogs(WAZUH_UI_LOGS_RAW_PATH);
+          return response.ok({
+            body: {
+              error: 0,
+              rawLogs: arrayLog.filter((item) => typeof item === 'string' && item.length),
+            },
+          });
+        }
+      });
+    } catch (error) {
+      return ErrorResponse(error.message || error, 3036, 500, response);
     }
+  }
 
-
-    /**
-     * Add new UI Log entry in ui logs file
-     * @param context 
-     * @param request 
-     * @param response 
-     * @returns success message or ErrorResponse
-     */
-    async createUiLogs(context: RequestHandlerContext, request: KibanaRequest,response: KibanaResponseFactory) {
-      try {
-        const { location, message, level } = request.body;
-        await addUiLog(location, message, level);
-        return response.ok({
-          body: {
-            message: 'Log has been added',
-          },
-        });
-      } catch (error) {
-        return ErrorResponse(error.message || error, 3021, 500, response);
-      }
+  /**
+   * Add new UI Log entry in ui logs file
+   * @param context
+   * @param request
+   * @param response
+   * @returns success message or ErrorResponse
+   */
+  async createUiLogs(
+    context: RequestHandlerContext,
+    request: KibanaRequest,
+    response: KibanaResponseFactory
+  ) {
+    try {
+      const { location, message, level } = request.body;
+      await addUiLog(location, message, level);
+      return response.ok({
+        body: {
+          message: 'Log has been added',
+        },
+      });
+    } catch (error) {
+      return ErrorResponse(error.message || error, 3021, 500, response);
     }
+  }
 
-    
-    /**
-     * Get UI logs from specific log file
-     * @param filepath 
-     * @returns Array
-     */
-    async getUiFileLogs(filepath){
-      try {
-        const lastLogs = await read(filepath,50);
-        return lastLogs.split('\n');
-      }catch(err){
-        throw err;
-      }
+  /**
+   * Get UI logs from specific log file
+   * @param filepath
+   * @returns Array
+   */
+  async getUiFileLogs(filepath) {
+    try {
+      const lastLogs = await read(filepath, 50);
+      return lastLogs.split('\n');
+    } catch (err) {
+      throw err;
     }
-
+  }
 }

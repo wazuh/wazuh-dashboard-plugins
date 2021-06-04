@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Module for Wazuh utils routes
+ * Wazuh app - Module for UI Logs routes
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -15,13 +15,12 @@ import { schema } from '@kbn/config-schema';
 
 export function UiLogsRoutes(router: IRouter) {
   const ctrl = new UiLogsCtrl();
-
   router.get(
     {
       path: '/utils/logs/ui',
-      validate: false
+      validate: false,
     },
-    async (context, request, response) => await ctrl.getUiLogs(context,request, response)
+    async (context, request, response) => await ctrl.getUiLogs(context, request, response)
   );
 
   router.post(
@@ -31,9 +30,9 @@ export function UiLogsRoutes(router: IRouter) {
         body: schema.object({
           message: schema.string(),
           level: schema.string(),
-          location: schema.string()
-        })
-      }
+          location: schema.string(),
+        }),
+      },
     },
     async (context, request, response) => await ctrl.createUiLogs(context, request, response)
   );
