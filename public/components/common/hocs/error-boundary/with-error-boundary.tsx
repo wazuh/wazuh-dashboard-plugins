@@ -1,5 +1,5 @@
 /*
- * Wazuh app - React HOCs to manage user authorization requirements
+ * Wazuh app - React HOCs handles rendering errors
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
