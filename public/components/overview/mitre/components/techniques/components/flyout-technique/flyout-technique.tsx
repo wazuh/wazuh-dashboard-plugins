@@ -56,6 +56,7 @@ export class FlyoutTechnique extends Component {
   props!: {
     currentTechniqueData: any
     currentTechnique: string
+    tacticsObject: any
   }
 
   filterManager: FilterManager;
@@ -118,9 +119,9 @@ export class FlyoutTechnique extends Component {
     try{
       this.setState({loading: true, techniqueData: {}});
       const { currentTechnique } = this.props;
-      const result = await WzRequest.apiReq('GET', '/mitre', {
+      const result = await WzRequest.apiReq('GET', '/mitre/techniques', {
         params: {
-          q: `id=${currentTechnique}`
+          q: `references.external_id=${currentTechnique}`
         }
       });
       const rawData = (((result || {}).data || {}).data || {}).affected_items
@@ -130,36 +131,38 @@ export class FlyoutTechnique extends Component {
     }
   }
 
-  formatTechniqueData (rawData) {
-    const { platform_name, phase_name} = rawData;
-    const { name, description, x_mitre_version: version, x_mitre_data_sources, external_references } = rawData.json;
-
-    const replaced_external_references = [];
-    let index_replaced_external_references = 0;
-    let last_citation_string = '';
-    const descriptionWithCitations = external_references.reduce((accum, reference) => {
-      return accum
-      .replace(new RegExp(`\\(Citation: ${reference.source_name}\\)`,'g'), (token) => {
-        if(last_citation_string !== token){
-          index_replaced_external_references++;
-          replaced_external_references.push({...reference, index: index_replaced_external_references});
-          last_citation_string = token;
-        }
-        return `<a style="vertical-align: super;" rel="noreferrer" class="euiLink euiLink--primary technique-reference-citation-${index_replaced_external_references}">[${String(index_replaced_external_references)}]</a>`;
-      })
-    }, description);
-    this.setState({techniqueData: { name, description: descriptionWithCitations, phase_name, platform_name, version, x_mitre_data_sources, external_references, replaced_external_references }, loading: false  })
+  findTacticName(tactics){
+    const { tacticsObject } = this.props;
+    const tacticsObj = []
+    tactics.forEach(element => {
+      const tactic = Object.keys(tacticsObject).map(tacticsKey => tacticsObject[tacticsKey]).find(obj => obj.id === element)
+      tacticsObj.push({ id:tactic.references[0].external_id, name: tactic.name})
+    });
+    return tacticsObj
   }
 
-  getArrayFormatted(arrayText) {
-    try {
-      const stringText = arrayText.toString();
-      const splitString = stringText.split(',');
-      const resultString = splitString.join(', ');
-      return resultString;
-    } catch (err) {
-      return arrayText;
-    }
+  formatTechniqueData (rawData) {
+    const { tactics, name, mitre_version } = rawData;
+    const tacticsObj = this.findTacticName(tactics)
+
+    this.setState({techniqueData: { name, mitre_version, tacticsObj }, loading: false  })
+  }
+
+  getArrayFormatted(arrObj) {
+      try {
+        arrObj.map(obj => {
+        return ( <EuiToolTip
+          position="top"
+          content={"Open " + obj.name + " details in a new page"}>
+          <EuiLink href="" external target="_blank">
+            {obj.name}
+          </EuiLink>
+        </EuiToolTip>)
+      })
+      }
+      catch{
+        return ""
+      }
   }
   
   renderHeader() {
@@ -184,6 +187,7 @@ export class FlyoutTechnique extends Component {
   renderBody() {
     const { currentTechnique } = this.props;
     const { techniqueData } = this.state;
+    console.log(techniqueData)
     const implicitFilters=[{ 'rule.mitre.id': currentTechnique}, this.clusterFilter ];
     if(this.props.implicitFilters){
       this.props.implicitFilters.forEach( item => 
@@ -212,52 +216,14 @@ export class FlyoutTechnique extends Component {
       },
       {
         title: 'Tactic',
-        description: this.getArrayFormatted(
-          techniqueData.phase_name
-        )
-      },
-      {
-        title: 'Platform',
-        description: this.getArrayFormatted(
-          techniqueData.platform_name
-        )
-      },
-      {
-        title: 'Data sources',
-        description: this.getArrayFormatted(
-          techniqueData.x_mitre_data_sources
-        )
+        description: ""
       },
       {
         title: 'Version',
-        description: techniqueData.version
-      },
-      {
-        title: 'Description',
-        description: formattedDescription
-      },
+        description: techniqueData.mitre_version
+      }
       
     ];
-    if(techniqueData && techniqueData.replaced_external_references && techniqueData.replaced_external_references.length > 0){
-      data.push({
-        title: 'References',
-        description: (
-          <EuiFlexGroup>
-            <EuiFlexItem>
-              {techniqueData.replaced_external_references.map((external_reference, external_reference_index) => (
-                <div key={`external_reference-${external_reference.index}`} id={`technique-reference-${external_reference.index}`}>
-                  <span>{external_reference.index}. </span>
-                  <EuiLink href={external_reference.url} target='_blank'>
-                    {external_reference.source_name}
-                  </EuiLink>
-                </div>
-              )
-              )}
-            </EuiFlexItem>
-          </EuiFlexGroup>
-        )
-      })
-    }
     return (
       <EuiFlyoutBody className="flyout-body" >
         <EuiAccordion
@@ -280,12 +246,6 @@ export class FlyoutTechnique extends Component {
                 <div style={{marginBottom: 30}}>
                   <EuiDescriptionList listItems={data} />
                   <EuiSpacer />
-                  <p>
-                    More info:{' '}
-                    <EuiLink href={link} target="_blank">
-                      {`MITRE ATT&CK - ${currentTechnique}`}
-                    </EuiLink>
-                  </p>
                 </div>
               )}
         </div>

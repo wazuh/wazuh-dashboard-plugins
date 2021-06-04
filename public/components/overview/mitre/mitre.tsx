@@ -120,7 +120,7 @@ export class Mitre extends Component {
       const result = (((data || {}).data || {}).data || {}).affected_items;
       const tacticsObject = {};
       result && result.forEach(item => {
-        tacticsObject[item.references[0].external_id] = item;
+        tacticsObject[item.name] = item;
       });
       this._isMount && this.setState({tacticsObject, isLoading: false});
     } catch(err) {
