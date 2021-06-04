@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Class for Wazuh-API functions
+ * Wazuh app - Class for UI Logs functions
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -13,7 +13,7 @@
 // Require some libraries
 import { ErrorResponse } from '../../lib/error-response';
 import { read } from 'read-last-lines';
-import {  WAZUH_UI_LOGS_RAW_PATH, WAZUH_UI_LOGS_PLAIN_PATH } from '../../../common/constants';
+import { WAZUH_UI_LOGS_RAW_PATH } from '../../../common/constants';
 import { KibanaRequest, RequestHandlerContext, KibanaResponseFactory } from 'src/core/server';
 import { addUiLog, initDirectory, checkFileExist } from '../../lib/ui-logger';
 
@@ -25,7 +25,7 @@ export class UiLogsCtrl {
   constructor() {}
 
     /**
-   * Returns Wazuh frontend logs
+   * Returns Wazuh ui logs
    * @param {Object} context 
    * @param {Object} request
    * @param {Object} response
@@ -61,7 +61,13 @@ export class UiLogsCtrl {
     }
 
 
-
+    /**
+     * Add new UI Log entry in ui logs file
+     * @param context 
+     * @param request 
+     * @param response 
+     * @returns success message or ErrorResponse
+     */
     async createUiLogs(context: RequestHandlerContext, request: KibanaRequest,response: KibanaResponseFactory) {
       try {
         const { location, message, level } = request.body;
@@ -76,6 +82,12 @@ export class UiLogsCtrl {
       }
     }
 
+    
+    /**
+     * Get UI logs from specific log file
+     * @param filepath 
+     * @returns Array
+     */
     async getUiFileLogs(filepath){
       try {
         const lastLogs = await read(filepath,50);
