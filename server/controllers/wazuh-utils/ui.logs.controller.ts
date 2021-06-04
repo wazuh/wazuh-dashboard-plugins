@@ -13,9 +13,9 @@
 // Require some libraries
 import { ErrorResponse } from '../../lib/error-response';
 import { read } from 'read-last-lines';
-import {  WAZUH_UI_LOGS_RAW_PATH } from '../../../common/constants';
+import {  WAZUH_UI_LOGS_RAW_PATH, WAZUH_UI_LOGS_PLAIN_PATH } from '../../../common/constants';
 import { KibanaRequest, RequestHandlerContext, KibanaResponseFactory } from 'src/core/server';
-import { addUiLog } from '../../lib/ui-logger';
+import { addUiLog, initDirectory, checkFileExist } from '../../lib/ui-logger';
 
 export class UiLogsCtrl {
   /**
@@ -33,20 +33,28 @@ export class UiLogsCtrl {
    */
     async getUiLogs(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
       try {
-        const lastLogs = await read(
-            WAZUH_UI_LOGS_RAW_PATH,
-          50
-        );
-        const spliterLog = lastLogs.split('\n');
-        return spliterLog ? response.ok({
-            body: {
-              error: 0,
-              rawLogs: spliterLog.filter(
-                item => typeof item === 'string' && item.length
-              )
-            }
-          })
-          : response.ok({ body: { error: 0, rawLogs: [] }});
+        return initDirectory().then( async () => {
+          if(!checkFileExist(WAZUH_UI_LOGS_RAW_PATH)){
+            return response.ok({ 
+              body: { 
+                error: 0, rawLogs: [] 
+              }
+            });
+  
+          }else{
+            let arrayLog = await this.getUiFileLogs(WAZUH_UI_LOGS_RAW_PATH);
+            return response.ok({
+              body: {
+                error: 0,
+                rawLogs: arrayLog.filter(
+                  item => typeof item === 'string' && item.length
+                )
+              }
+            });
+          }
+        });
+
+        
       } catch (error) {
         return ErrorResponse(error.message || error, 3036, 500, response);
       }
@@ -67,4 +75,14 @@ export class UiLogsCtrl {
         return ErrorResponse(error.message || error, 3021, 500, response);
       }
     }
+
+    async getUiFileLogs(filepath){
+      try {
+        const lastLogs = await read(filepath,50);
+        return lastLogs.split('\n');
+      }catch(err){
+        throw err;
+      }
+    }
+
 }

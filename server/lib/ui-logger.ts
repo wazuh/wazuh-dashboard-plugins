@@ -32,7 +32,7 @@ export interface IUILoggerSettings extends IUIPlainLoggerSettings {
 /**
  * Here we create the loggers
  */
-const initLogger = () => {
+export const initLogger = () => {
   const configurationFile = getConfiguration();
   const level =
     typeof (configurationFile || {})['logs.level'] !== 'undefined' &&
@@ -71,7 +71,7 @@ const initLogger = () => {
 /**
  * Checks if wazuh/logs exists. If it doesn't exist, it will be created.
  */
-const initDirectory = async () => {
+export const initDirectory = async () => {
   try {
     createDataDirectoryIfNotExists();
     createDataDirectoryIfNotExists('logs');
@@ -105,6 +105,10 @@ const getFilesizeInMegaBytes = filename => {
   return 0;
 };
 
+
+export const checkFileExist = filename => {
+  return fs.existsSync(filename);
+}
 
 /**
  * Checks if the wazuh-frontend.log file size is greater than 100MB, if so it rotates the file.

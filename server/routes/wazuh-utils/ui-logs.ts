@@ -21,7 +21,7 @@ export function UiLogsRoutes(router: IRouter) {
       path: '/utils/logs/ui',
       validate: false
     },
-    async (context, request, response) => ctrl.getUiLogs(context,request, response)
+    async (context, request, response) => await ctrl.getUiLogs(context,request, response)
   );
 
   router.post(
