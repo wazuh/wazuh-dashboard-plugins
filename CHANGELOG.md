@@ -44,6 +44,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed dark mode visualization background in pdf reports [#3315](https://github.com/wazuh/wazuh-kibana-app/pull/3315)
 - Adapt Kibana integrations to Kibana 7.11 and 7.12  [#3309](https://github.com/wazuh/wazuh-kibana-app/pull/3309)
 - Fixed error agent view does not render correctly  [#3306](https://github.com/wazuh/wazuh-kibana-app/pull/3306)
+- Fixed miscalculation in table column width in PDF reports  [#3326](https://github.com/wazuh/wazuh-kibana-app/pull/3326)
 - Normalized visData table property for 7.12 retro-compatibility  [#3323](https://github.com/wazuh/wazuh-kibana-app/pull/3323)
 
 ## Wazuh v4.2.0 - Kibana 7.10.2 , 7.11.2 - Revision 4201
