@@ -50,14 +50,14 @@ function buildResource(label: string, labelResource: string){
         description: `${labelResource} name`,
         operators: ['=', '!='],
         values: getMitreAttackIntelligenceSuggestions(endpoint, 'name')
-      }/*,
+      },
       {
         type: 'q',
         label: 'description',
         description: `${labelResource} description`,
-        operators: ['=', '!='],
-        values: getMitreAttackIntelligenceSuggestions(endpoint, 'description')
-      }*/
+        operators: ['~'],
+        values: (input) => input ? [input] : []
+      }
     ],
     apiEndpoint: endpoint,
     fieldName: 'name',
