@@ -29,7 +29,7 @@ import {
   EuiLoadingSpinner,
 } from '@elastic/eui';
 import { FlyoutTechnique } from './components/flyout-technique/';
-import { mitreTechniques, getElasticAlerts, IFilterParams } from '../../lib'
+import { getElasticAlerts, IFilterParams } from '../../lib'
 import { ITactic } from '../../';
 import { withWindowSize } from '../../../../../components/common/hocs/withWindowSize';
 import { WzRequest } from '../../../../../react-services/wz-request';
@@ -187,25 +187,16 @@ export const Techniques = withWindowSize(class Techniques extends Component {
   }
 
    buildObjTechniques(techniques){
-    const techniquesIDs = []
+    const techniquesObj = []
     techniques.forEach(element => {
       const mitreObj = this.state.mitreTechniques.filter(item => item.id === element)
       if(mitreObj.length != 0){
-        const mitreID = mitreObj[0].references.filter(item => item.source === "mitre-attack")[0].external_id
-        techniquesIDs.push(mitreID)
+        const mitreTechniqueName =  mitreObj[0].name
+        const mitreTechniqueID = mitreObj[0].references.filter(item => item.source === "mitre-attack")[0].external_id
+        mitreTechniqueID ? techniquesObj.push({ id : mitreTechniqueID, name: mitreTechniqueName}) : ''
       }
     });
-    return techniquesIDs
-  }
-
-  findTechniqueName(techniqueID){
-    let name = ""
-    this.state.mitreTechniques.map(item => {
-      if(item.references.filter(item => item.source === "mitre-attack")[0].external_id === techniqueID){
-        name = item.name
-      }
-    })
-    return name
+    return techniquesObj
   }
 
   renderFacet() {
@@ -218,18 +209,18 @@ export const Techniques = withWindowSize(class Techniques extends Component {
       .flat()
       .filter((techniqueID, index, array) => array.indexOf(techniqueID) === index);
     tacticsToRender = currentTechniques
-      .filter(techniqueID => this.state.filteredTechniques ? this.state.filteredTechniques.includes(techniqueID) : techniqueID)
+      .filter(techniqueID => this.state.filteredTechniques ? this.state.filteredTechniques.includes(techniqueID.id) : techniqueID.id)
       .map(techniqueID => {
         return {
-          id: techniqueID,
-          label: `${techniqueID} - ${this.findTechniqueName(techniqueID)}`,
-          quantity: (techniquesCount.find(item => item.key === techniqueID) || {}).doc_count || 0
+          id: techniqueID.id,
+          label: `${techniqueID.id} - ${techniqueID.name}`,
+          quantity: (techniquesCount.find(item => item.key === techniqueID.id) || {}).doc_count || 0
         }
       })
       .filter(technique => this.state.hideAlerts ? technique.quantity !== 0 : true);
 
     const tacticsToRenderOrdered = tacticsToRender.sort((a, b) => b.quantity - a.quantity).map( (item,idx) => {
-      const tooltipContent = `View details of ${this.findTechniqueName(item.id)} (${item.id})`;
+      const tooltipContent = `View details of ${item.label} (${item.id})`;
       const toolTipAnchorClass = "wz-display-inline-grid" + (this.state.hover=== item.id ? " wz-mitre-width" : " ");
       return(
         <EuiFlexItem 
@@ -252,7 +243,7 @@ export const Techniques = withWindowSize(class Techniques extends Component {
                             overflow: "hidden",
                             whiteSpace: "nowrap",
                             textOverflow: "ellipsis"}}>
-                      {item.id} - {this.findTechniqueName(item.id)}
+                      {item.label}
                     </span>
                   </EuiToolTip>
 
@@ -344,14 +335,13 @@ export const Techniques = withWindowSize(class Techniques extends Component {
     try{
       if(searchValue){
         this._isMount && this.setState({isSearching: true});
-        const response = await WzRequest.apiReq('GET', '/mitre', {
+        const response = await WzRequest.apiReq('GET', '/mitre/techniques', {
           params: {
-            select: "id",
             search: searchValue,
             limit: 500
           }
         });
-        const filteredTechniques = ((((response || {}).data || {}).data).affected_items || []).map(item => item.id);
+        const filteredTechniques = ((((response || {}).data || {}).data).affected_items || []).map(item => item.references.filter(reference => reference.source === "mitre-attack")[0].external_id);
         this._isMount && this.setState({ filteredTechniques, isSearching: false });
       }else{
         this._isMount && this.setState({ filteredTechniques: false, isSearching: false });
@@ -435,7 +425,8 @@ export const Techniques = withWindowSize(class Techniques extends Component {
               openDiscover={(e,itemId) => this.openDiscover(e,itemId)}
               onChangeFlyout={this.onChangeFlyout}
               currentTechniqueData={this.state.currentTechniqueData}
-              currentTechnique={currentTechnique} />
+              currentTechnique={currentTechnique}
+              tacticsObject={this.props.tacticsObject} />
           </EuiOverlayMask>
         } 
       </div>   
