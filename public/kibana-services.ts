@@ -16,6 +16,7 @@ import { DataPublicPluginStart } from '../../../src/plugins/data/public';
 import { VisualizationsStart } from '../../../src/plugins/visualizations/public';
 import { NavigationPublicPluginStart } from '../../../src/plugins/navigation/public';
 import { AppPluginStartDependencies } from './types';
+import { ErrorOrchestrator } from '../common/constants';
 
 export const [getCore, setCore] = createGetterSetter<CoreStart>('Core');
 export const [getPlugins, setPlugins] = createGetterSetter<AppPluginStartDependencies>('Plugins');
@@ -23,7 +24,9 @@ export const [getToasts, setToasts] = createGetterSetter<ToastsStart>('Toasts');
 export const [getHttp, setHttp] = createGetterSetter<HttpStart>('Http');
 export const [getUiSettings, setUiSettings] = createGetterSetter<IUiSettingsClient>('UiSettings');
 export const [getChrome, setChrome] = createGetterSetter<ChromeStart>('Chrome');
-export const [getScopedHistory, setScopedHistory] = createGetterSetter<ScopedHistory>('ScopedHistory');
+export const [getScopedHistory, setScopedHistory] = createGetterSetter<ScopedHistory>(
+  'ScopedHistory'
+);
 export const [getOverlays, setOverlays] = createGetterSetter<OverlayStart>('Overlays');
 export const [getSavedObjects, setSavedObjects] = createGetterSetter<SavedObjectsStart>(
   'SavedObjects'
@@ -37,6 +40,9 @@ export const [getVisualizationsPlugin, setVisualizationsPlugin] = createGetterSe
 export const [getNavigationPlugin, setNavigationPlugin] = createGetterSetter<
   NavigationPublicPluginStart
 >('NavigationPlugin');
+export const [getErrorOrchestrator, setErrorOrchestrator] = createGetterSetter<ErrorOrchestrator>(
+  'ErrorOrchestrator'
+);
 
 /**
  * set bootstrapped inner angular module
