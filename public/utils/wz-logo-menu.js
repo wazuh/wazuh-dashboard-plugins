@@ -13,7 +13,7 @@
 // Remove Kibana Wazuh name and breadcrumb
 export const changeWazuhNavLogo = () => {
   const interval = setInterval(() => {
-    const nav = $('.euiHeader > .euiBreadcrumbs  > .euiBreadcrumb');
+    const nav = $('[data-test-subj="breadcrumbs"]  > .euiBreadcrumb');
     if (nav.length) {
       clearInterval(interval);
     }
