@@ -183,6 +183,18 @@ export class FlyoutTechnique extends Component {
       </EuiFlyoutHeader>
     )
   }
+
+  renderTactics(tactics){
+    tactics.map(tactic => {
+      return ( <EuiToolTip
+        position="top"
+        content={"Open " + tactic.name + " details in a new page"}>
+        <EuiLink href="#" external target="_blank">
+          {tactic.id}
+        </EuiLink>
+      </EuiToolTip>)
+    })
+  }
   
   renderBody() {
     const { currentTechnique } = this.props;
@@ -208,15 +220,23 @@ export class FlyoutTechnique extends Component {
         title: 'ID',
         description: ( <EuiToolTip
           position="top"
-          content={"Open " + currentTechnique + " details in a new page"}>
-          <EuiLink href={link} external target="_blank">
+          content={"Open " + currentTechnique + " details in Intelligence section"}>
+          <EuiLink onClick={(e) => {this.props.openIntelligence(e,'techniques',currentTechnique);e.stopPropagation()}}>
             {currentTechnique}
           </EuiLink>
         </EuiToolTip>)
       },
       {
-        title: 'Tactic',
-        description: ""
+        title: 'Tactics',
+        description: techniqueData.tacticsObj ? techniqueData.tacticsObj.map(tactic => { return ( <><EuiToolTip
+          position="top"
+          content={"Open " + tactic.name + " details in a Intelligence section"}>
+          <EuiLink onClick={(e) => {this.props.openIntelligence(e,'tactics',tactic.id);e.stopPropagation()}}>
+            {tactic.name}
+          </EuiLink>
+        </EuiToolTip>
+        <br/>
+        </>)}) : ''
       },
       {
         title: 'Version',
@@ -245,7 +265,6 @@ export class FlyoutTechnique extends Component {
               )) || (
                 <div style={{marginBottom: 30}}>
                   <EuiDescriptionList listItems={data} />
-                  <EuiSpacer />
                 </div>
               )}
         </div>

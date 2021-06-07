@@ -37,6 +37,7 @@ import {WAZUH_ALERTS_PATTERN} from '../../../../../../common/constants';
 import { AppState } from '../../../../../react-services/app-state';
 import { WzFieldSearchDelay } from '../../../../common/search'
 import { getDataPlugin } from '../../../../../kibana-services';
+import { ModuleMitreIntelligence } from '../../../mitre_attack_intelligence'
 
 export const Techniques = withWindowSize(class Techniques extends Component {
   _isMount = false;
@@ -302,6 +303,12 @@ export const Techniques = withWindowSize(class Techniques extends Component {
     this.props.onSelectedTabChanged('dashboard');
   }
 
+  openIntelligence(e,redirectTo,itemId){
+    sessionStorage.setItem("tabRedirect", redirectTo);
+    sessionStorage.setItem("idToRedirect", itemId);
+    this.props.onSelectedTabChanged('intelligence');
+  }
+
  /** 
    * Adds a new filter with format { "filter_key" : "filter_value" }, e.g. {"agent.id": "001"}
    * @param filter 
@@ -423,6 +430,7 @@ export const Techniques = withWindowSize(class Techniques extends Component {
             <FlyoutTechnique
               openDashboard={(e,itemId) => this.openDashboard(e,itemId)}
               openDiscover={(e,itemId) => this.openDiscover(e,itemId)}
+              openIntelligence={(e,redirectTo,itemId) => this.openIntelligence(e,redirectTo,itemId)}
               onChangeFlyout={this.onChangeFlyout}
               currentTechniqueData={this.state.currentTechniqueData}
               currentTechnique={currentTechnique}
