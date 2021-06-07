@@ -20,7 +20,7 @@ const getMitreAttackIntelligenceSuggestions = (endpoint: string, field: string) 
     return response?.data?.data.affected_items
       .map(item => ({
         ...item,
-        ['references.external_id']: item.references.find(reference => reference.source === 'mitre-attack')?.external_id
+        ['references.external_id']: item?.references?.find(reference => reference.source === 'mitre-attack')?.external_id
       }))
       .map(item => item[field])
       .filter(item => item && item.toLowerCase().includes(input.toLowerCase()))
@@ -61,6 +61,7 @@ function buildResource(label: string, labelResource: string){
     ],
     apiEndpoint: endpoint,
     fieldName: 'name',
+    initialSortingField: 'name',
     tableColumns: [
       {
         field: 'references.external_id',
@@ -90,6 +91,52 @@ function buildResource(label: string, labelResource: string){
 export const MitreAttackResources = [
   buildResource('Groups', 'Group'),
   buildResource('Mitigations', 'Mitigation'),
+  {
+    label: 'References',
+    id: 'references',
+    searchBarSuggestions: [
+      {
+        type: 'q',
+        label: 'type',
+        description: `Reference type`,
+        operators: ['=', '!='],
+        values: ['group', 'mitigation', 'software', 'tactic', 'technique']
+      },
+      {
+        type: 'q',
+        label: 'description',
+        description: `Reference description`,
+        operators: ['~'],
+        values: (input) => input ? [input] : []
+      }
+    ],
+    apiEndpoint: '/mitre/references',
+    fieldName: 'type',
+    initialSortingField: 'type',
+    tableColumns: [
+      {
+        field: 'id',
+        name: 'ID',
+        sortable: true,
+        width: '12%'
+      },
+      {
+        field: 'type',
+        name: 'Type',
+        sortable: true,
+        width: '30%'
+      },
+      {
+        field: 'description',
+        name: 'Description',
+        sortable: true,
+        render: (value) => value ? (
+          Markdown({markdown: value})
+        ) : '',
+        truncateText: true
+      }
+    ]
+  },
   buildResource('Software', 'Software'),
   buildResource('Tactics', 'Tactic'),
   buildResource('Techniques', 'Technique')
