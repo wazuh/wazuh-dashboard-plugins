@@ -242,49 +242,13 @@ export const KIBANA_SETTING_NAME_METAFIELDS = 'metaFields';
 
 
 // Logger
-// log severity
-
-type WARNING = 'WARNING';
-type INFO = 'INFO';
-type ERROR = 'ERROR';
-export type UILogLevel = WARNING | INFO | ERROR;
-export const LoggerLevels = {
+export const UI_LOGGER_LEVELS = {
   WARNING: 'WARNING',
   INFO: 'INFO',
   ERROR: 'ERROR',
 };
 
-type UI = "UI";
-type BUSINESS = "BUSINESS";
-type CRITICAL = "CRITICAL";
-export type UIErrorSeverity = UI | BUSINESS | CRITICAL;
-export const UIErrorSeverities = {
-  UI: "UI",
-  BUSINESS: "BUSINESS",
-  CRITICAL: "CRITICAL",
-};
-
-export type UIError = {
-  message: string;
-  error: any;
-  title?: string;
-};
-
-export type UIErrorLog = {
-  context: string;
-  level: UILogLevel;
-  severity: UIErrorSeverity;
-  display?: boolean;
-  store?: boolean;
-  error: UIError;
-  location: string;
-};
-
-export type ErrorOrchestrator = {
-  loadErrorLog: (uiErrorLog: UIErrorLog) => void;
-};
-
-export const ToastColor = {
+export const UI_TOAST_COLOR = {
   SUCCESS: 'success',
   WARNING: 'warning',
   DANGER: 'danger',

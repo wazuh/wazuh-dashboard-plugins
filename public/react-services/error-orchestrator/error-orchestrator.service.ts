@@ -10,8 +10,8 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { ErrorOrchestrator, UIErrorLog } from '../../../common/constants';
 import { errorOrchestratorFactory } from './error-orchestrator.factory';
+import { ErrorOrchestrator, UIErrorLog } from './types';
 
 export class ErrorOrchestratorClass {
   public constructor() {}

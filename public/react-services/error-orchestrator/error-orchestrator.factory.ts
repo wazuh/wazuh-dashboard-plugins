@@ -10,18 +10,18 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { ErrorOrchestrator, UIErrorSeverities, UIErrorSeverity } from '../../../common/constants';
 import { ErrorOrchestratorUI } from './error-orchestrator-ui';
 import { ErrorOrchestratorBusiness } from './error-orchestrator-business';
 import { ErrorOrchestratorCritical } from './error-orchestrator-critical';
+import { ErrorOrchestrator, UI_ERROR_SEVERITIES, UIErrorSeverity } from './types';
 
 export const errorOrchestratorFactory = (severity: UIErrorSeverity): ErrorOrchestrator => {
   switch (severity) {
-    case UIErrorSeverities.UI:
+    case UI_ERROR_SEVERITIES.UI:
       return new ErrorOrchestratorUI();
-    case UIErrorSeverities.BUSINESS:
+    case UI_ERROR_SEVERITIES.BUSINESS:
       return new ErrorOrchestratorBusiness();
-    case UIErrorSeverities.CRITICAL:
+    case UI_ERROR_SEVERITIES.CRITICAL:
       return new ErrorOrchestratorCritical();
     default:
       break;

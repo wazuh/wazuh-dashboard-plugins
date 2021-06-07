@@ -11,7 +11,7 @@
  */
 
 import { ErrorOrchestratorBase } from './error-orchestrator-base';
-import { UIErrorLog } from '../../../common/constants';
+import { UIErrorLog } from './types';
 
 export class ErrorOrchestratorUI extends ErrorOrchestratorBase {
   public displayError(errorLog: UIErrorLog) {

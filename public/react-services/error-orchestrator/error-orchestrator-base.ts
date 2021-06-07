@@ -11,10 +11,11 @@
  */
 
 import { ErrorToastOptions } from 'kibana/public';
-import { ErrorOrchestrator, LoggerLevels, UIErrorLog } from '../../../common/constants';
+import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { getToasts } from '../../kibana-services';
 import loglevel from 'loglevel';
 import { GenericRequest } from '../../react-services/generic-request';
+import { ErrorOrchestrator, UIErrorLog } from './types';
 
 export class ErrorOrchestratorBase implements ErrorOrchestrator {
   public loadErrorLog(errorLog: UIErrorLog) {
@@ -23,20 +24,24 @@ export class ErrorOrchestratorBase implements ErrorOrchestrator {
   }
 
   public displayError(errorLog: UIErrorLog) {
-    getToasts().addError(errorLog.error.error, {
+    const toast = {
       title: errorLog.error.title,
-    } as ErrorToastOptions);
+      toastMessage: errorLog.error.message,
+      toastLifeTimeMs: 3000,
+    };
+
+    getToasts().addError(errorLog.error.error, toast as ErrorToastOptions);
   }
 
   public loglevelError(errorLog: UIErrorLog) {
     switch (errorLog.level) {
-      case LoggerLevels.INFO:
+      case UI_LOGGER_LEVELS.INFO:
         loglevel.info(errorLog.error.message, errorLog.error.error);
         break;
-      case LoggerLevels.WARNING:
+      case UI_LOGGER_LEVELS.WARNING:
         loglevel.warn(errorLog.error.message, errorLog.error.error);
         break;
-      case LoggerLevels.ERROR:
+      case UI_LOGGER_LEVELS.ERROR:
         loglevel.error(errorLog.error.message, errorLog.error.error);
         break;
       default:
@@ -45,14 +50,16 @@ export class ErrorOrchestratorBase implements ErrorOrchestrator {
   }
 
   private async storeError(errorLog: UIErrorLog) {
-    await GenericRequest.request('POST', `/utils/logs/ui`, {
-      body: {
-        message: errorLog.error.message,
-        level: errorLog.level,
-        location: errorLog.location,
-      },
-    })
-      .then(loglevel.info)
-      .catch(loglevel.error);
+    try {
+      await GenericRequest.request('POST', `/utils/logs/ui`, {
+        body: {
+          message: errorLog.error.message,
+          level: errorLog.level,
+          location: errorLog.location,
+        },
+      });
+    } catch (error) {
+      loglevel.error('Failed on request [POST /utils/logs/ui]', error);
+    }
   }
 }
