@@ -16,7 +16,7 @@ import { getConfiguration } from '../../lib/get-configuration';
 import { read } from 'read-last-lines';
 import { UpdateConfigurationFile } from '../../lib/update-configuration';
 import jwtDecode from 'jwt-decode';
-import { WAZUH_ROLE_ADMINISTRATOR_ID, WAZUH_DATA_LOGS_RAW_PATH } from '../../../common/constants';
+import { WAZUH_ROLE_ADMINISTRATOR_ID, WAZUH_DATA_LOGS_RAW_FILENAME, WAZUH_UI_LOGS_RAW_PATH } from '../../../common/constants';
 import { ManageHosts } from '../../lib/manage-hosts';
 import { KibanaRequest, RequestHandlerContext, KibanaResponseFactory } from 'src/core/server';
 import { getCookieValueByName } from '../../lib/cookie';
@@ -107,9 +107,8 @@ export class WazuhUtilsCtrl {
    */
   async getAppLogs(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
     try {
-      console.log('path',WAZUH_DATA_LOGS_RAW_PATH);
       const lastLogs = await read(
-        WAZUH_DATA_LOGS_RAW_PATH,
+        WAZUH_DATA_LOGS_RAW_FILENAME,
         50
       );
       const spliterLog = lastLogs.split('\n');
