@@ -14,7 +14,8 @@ import { EuiFlexItem, EuiFlexGroup, EuiSideNav, EuiIcon } from '@elastic/eui';
 import { WzRequest } from '../../react-services/wz-request';
 import { connect } from 'react-redux';
 import { AppNavigate } from '../../react-services/app-navigate';
-import { WAZUH_SECURITY_ID, WAZUH_SECURITY_CY_TEST_ID } from '../../../common/constants';
+import { WAZUH_MENU_SECURITY_SECTIONS_ID } from '../../../common/constants';
+import { WAZUH_MENU_SECURITY_SECTIONS_CY_TEST_ID } from '../../../common/wazu-menu/wz-menu-security.cy';
 
 class WzMenuSecurity extends Component {
   constructor(props) {
@@ -36,23 +37,23 @@ class WzMenuSecurity extends Component {
   avaibleRenderSettings() {
     return [
       this.createItem({
-        id: WAZUH_SECURITY_ID.USERS,
-        cyTestId: WAZUH_SECURITY_CY_TEST_ID.USERS,
+        id: WAZUH_MENU_SECURITY_SECTIONS_ID.USERS,
+        cyTestId: WAZUH_MENU_SECURITY_SECTIONS_CY_TEST_ID.USERS,
         text: 'Users',
       }),
       this.createItem({
-        id: WAZUH_SECURITY_ID.ROLES,
-        cyTestId: WAZUH_SECURITY_CY_TEST_ID.ROLES,
+        id: WAZUH_MENU_SECURITY_SECTIONS_ID.ROLES,
+        cyTestId: WAZUH_MENU_SECURITY_SECTIONS_CY_TEST_ID.ROLES,
         text: 'Roles',
       }),
       this.createItem({
-        id: WAZUH_SECURITY_ID.POLICIES,
-        cyTestId: WAZUH_SECURITY_CY_TEST_ID.POLICIES,
+        id: WAZUH_MENU_SECURITY_SECTIONS_ID.POLICIES,
+        cyTestId: WAZUH_MENU_SECURITY_SECTIONS_CY_TEST_ID.POLICIES,
         text: 'Policies',
       }),
       this.createItem({
-        id: WAZUH_SECURITY_ID.ROLES_MAPPING,
-        cyTestId: WAZUH_SECURITY_CY_TEST_ID.ROLES_MAPPING,
+        id: WAZUH_MENU_SECURITY_SECTIONS_ID.ROLES_MAPPING,
+        cyTestId: WAZUH_MENU_SECURITY_SECTIONS_CY_TEST_ID.ROLES_MAPPING,
         text: 'Roles mapping',
       }),
     ];

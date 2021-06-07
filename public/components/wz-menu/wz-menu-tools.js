@@ -14,8 +14,8 @@ import { EuiFlexItem, EuiFlexGroup, EuiSideNav, EuiIcon } from '@elastic/eui';
 import { WzRequest } from '../../react-services/wz-request';
 import { connect } from 'react-redux';
 import { AppNavigate } from '../../react-services/app-navigate';
-import { WAZUH_TOOLS_ID, WAZUH_TOOLS_CY_TEST_ID } from '../../../common/constants';
-
+import { WAZUH_MENU_TOOLS_SECTIONS_ID } from '../../../common/constants';
+import { WAZUH_MENU_TOOLS_SECTIONS_CY_TEST_ID } from '../../../common/wazu-menu/wz-menu-tools.cy';
 
 class WzMenuTools extends Component {
   constructor(props) {
@@ -37,13 +37,13 @@ class WzMenuTools extends Component {
   avaibleRenderSettings() {
     return [
       this.createItem({
-        id: WAZUH_TOOLS_ID.API_CONSOLE,
-        cyTestId: WAZUH_TOOLS_CY_TEST_ID.API_CONSOLE,
+        id: WAZUH_MENU_TOOLS_SECTIONS_ID.API_CONSOLE,
+        cyTestId: WAZUH_MENU_TOOLS_SECTIONS_CY_TEST_ID.API_CONSOLE,
         text: 'API Console',
       }),
       this.createItem({
-        id: WAZUH_TOOLS_ID.RULESET_TEST,
-        cyTestId: WAZUH_TOOLS_CY_TEST_ID.RULESET_TEST,
+        id: WAZUH_MENU_TOOLS_SECTIONS_ID.RULESET_TEST,
+        cyTestId: WAZUH_MENU_TOOLS_SECTIONS_CY_TEST_ID.RULESET_TEST,
         text: 'Ruleset Test',
       }),
     ];

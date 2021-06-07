@@ -18,7 +18,8 @@ import { AppState } from '../../react-services/app-state';
 import { AppNavigate } from '../../react-services/app-navigate';
 import { getAngularModule } from '../../kibana-services';
 import { hasAgentSupportModule } from '../../react-services/wz-agents';
-import { WAZUH_MODULES_ID, WAZUH_MODULES_CY_TEST_ID } from '../../../common/constants';
+import { WAZUH_MODULES_ID } from '../../../common/constants';
+import { WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID } from '../../../common/wazu-menu/wz-menu-overview.cy';
 
 class WzMenuOverview extends Component {
   constructor(props) {
@@ -44,97 +45,97 @@ class WzMenuOverview extends Component {
       },
       general: {
         id: WAZUH_MODULES_ID.SECURITY_EVENTS,
-        cyTestId: WAZUH_MODULES_CY_TEST_ID.SECURITY_EVENTS,
+        cyTestId: WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID.SECURITY_EVENTS,
         text: 'Security Events',
       },
       fim: {
         id: WAZUH_MODULES_ID.INTEGRITY_MONITORING,
-        cyTestId: WAZUH_MODULES_CY_TEST_ID.INTEGRITY_MONITORING,
+        cyTestId: WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID.INTEGRITY_MONITORING,
         text: 'Integrity Monitoring',
       },
       aws: {
         id: WAZUH_MODULES_ID.AMAZON_WEB_SERVICES,
-        cyTestId: WAZUH_MODULES_CY_TEST_ID.AMAZON_WEB_SERVICES,
+        cyTestId: WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID.AMAZON_WEB_SERVICES,
         text: 'Amazon AWS',
       },
       gcp: {
         id: WAZUH_MODULES_ID.GOOGLE_CLOUD_PLATFORM,
-        cyTestId: WAZUH_MODULES_CY_TEST_ID.GOOGLE_CLOUD_PLATFORM,
+        cyTestId: WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID.GOOGLE_CLOUD_PLATFORM,
         text: 'Google Cloud Platform',
       },
       pm: {
         id: WAZUH_MODULES_ID.POLICY_MONITORING,
-        cyTestId: WAZUH_MODULES_CY_TEST_ID.POLICY_MONITORING,
+        cyTestId: WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID.POLICY_MONITORING,
         text: 'Policy Monitoring',
       },
       sca: {
         id: WAZUH_MODULES_ID.SECURITY_CONFIGURATION_ASSESSMENT,
-        cyTestId: WAZUH_MODULES_CY_TEST_ID.SECURITY_CONFIGURATION_ASSESSMENT,
+        cyTestId: WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID.SECURITY_CONFIGURATION_ASSESSMENT,
         text: 'Security configuration assessment',
       },
       audit: {
         id: WAZUH_MODULES_ID.AUDITING,
-        cyTestId: WAZUH_MODULES_CY_TEST_ID.AUDITING,
+        cyTestId: WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID.AUDITING,
         text: 'System Auditing',
       },
       oscap: {
         id: WAZUH_MODULES_ID.OPEN_SCAP,
-        cyTestId: WAZUH_MODULES_CY_TEST_ID.OPEN_SCAP,
+        cyTestId: WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID.OPEN_SCAP,
         text: 'OpenSCAP',
       },
       ciscat: {
         id: WAZUH_MODULES_ID.CIS_CAT,
-        cyTestId: WAZUH_MODULES_CY_TEST_ID.CIS_CAT,
+        cyTestId: WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID.CIS_CAT,
         text: 'CIS-CAT',
       },
       vuls: {
         id: WAZUH_MODULES_ID.VULNERABILITIES,
-        cyTestId: WAZUH_MODULES_CY_TEST_ID.VULNERABILITIES,
+        cyTestId: WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID.VULNERABILITIES,
         text: 'Vulnerabilities',
       },
       virustotal: {
         id: WAZUH_MODULES_ID.VIRUSTOTAL,
-        cyTestId: WAZUH_MODULES_CY_TEST_ID.VIRUSTOTAL,
+        cyTestId: WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID.VIRUSTOTAL,
         text: 'VirusTotal',
       },
       osquery: {
         id: WAZUH_MODULES_ID.OSQUERY,
-        cyTestId: WAZUH_MODULES_CY_TEST_ID.OSQUERY,
+        cyTestId: WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID.OSQUERY,
         text: 'Osquery',
       },
       docker: {
         id: WAZUH_MODULES_ID.DOCKER,
-        cyTestId: WAZUH_MODULES_CY_TEST_ID.DOCKER,
+        cyTestId: WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID.DOCKER,
         text: 'Docker Listener',
       },
       mitre: {
         id: WAZUH_MODULES_ID.MITRE_ATTACK,
-        cyTestId: WAZUH_MODULES_CY_TEST_ID.MITRE_ATTACK,
+        cyTestId: WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID.MITRE_ATTACK,
         text: 'MITRE ATT&CK',
       },
       pci: {
         id: WAZUH_MODULES_ID.PCI_DSS,
-        cyTestId: WAZUH_MODULES_CY_TEST_ID.PCI_DSS,
+        cyTestId: WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID.PCI_DSS,
         text: 'PCI DSS',
       },
       gdpr: {
         id: WAZUH_MODULES_ID.GDPR,
-        cyTestId: WAZUH_MODULES_CY_TEST_ID.GDPR,
+        cyTestId: WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID.GDPR,
         text: 'GDPR',
       },
       hipaa: {
         id: WAZUH_MODULES_ID.HIPAA,
-        cyTestId: WAZUH_MODULES_CY_TEST_ID.HIPAA,
+        cyTestId: WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID.HIPAA,
         text: 'HIPAA',
       },
       nist: {
         id: WAZUH_MODULES_ID.NIST_800_53,
-        cyTestId: WAZUH_MODULES_CY_TEST_ID.NIST_800_53,
+        cyTestId: WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID.NIST_800_53,
         text: 'NIST 800-53',
       },
       tsc: {
         id: WAZUH_MODULES_ID.TSC,
-        cyTestId: WAZUH_MODULES_CY_TEST_ID.TSC,
+        cyTestId: WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID.TSC,
         text: 'TSC',
       },
     };

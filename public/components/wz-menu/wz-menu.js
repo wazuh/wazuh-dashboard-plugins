@@ -709,8 +709,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
       <div className="wz-menu-wrapper">
         <div className="wz-menu-left-side">
           <div className="wz-menu-sections" style={!thereAreSelectors ? { height: "100%" } : {}}>
-            <EuiButtonEmpty
-                data-cy='menu-modules-button'
+            <EuiButtonEmpty data-cy='menu-modules-button'
               onMouseEnter={() => { this.setState({ hover: "overview" }) }}
               className={
                 'wz-menu-button ' +
@@ -730,8 +729,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
               )}
             </EuiButtonEmpty>
 
-            <EuiButtonEmpty
-                data-cy='menu-management-button'
+            <EuiButtonEmpty data-cy='menu-management-button'
               onMouseEnter={() => { this.setState({ hover: "manager" }) }}
               className={
                 'wz-menu-button ' +
@@ -750,8 +748,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
               )}
             </EuiButtonEmpty>
 
-            <EuiButtonEmpty
-                data-cy='menu-agents-button'
+            <EuiButtonEmpty data-cy='menu-agents-button'
               className={
                 'wz-menu-button ' +
                 (this.state.currentMenuTab === "agents-preview" && !this.isAnyPopoverOpen()
@@ -768,8 +765,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
               <span className="wz-menu-button-title ">Agents</span>
             </EuiButtonEmpty>
 
-            <EuiButtonEmpty
-                data-cy='menu-tools-button'
+            <EuiButtonEmpty data-cy='menu-tools-button'
               className={
                 'wz-menu-button ' +
                 (this.state.currentMenuTab === "wazuh-dev" && !this.isAnyPopoverOpen() || (this.state.isToolsPopoverOpen)
@@ -787,8 +783,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
             </EuiButtonEmpty>
 
             <EuiSpacer size='xl'></EuiSpacer>
-            <EuiButtonEmpty
-                data-cy='menu-security-button'
+            <EuiButtonEmpty data-cy='menu-security-button'
               className={
                 'wz-menu-button ' +
                 (this.state.currentMenuTab === "security" && !this.isAnyPopoverOpen() || (this.state.isSecurityPopoverOpen)
@@ -805,8 +800,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
                 <EuiIcon color="subdued" type="arrowRight" />
               )}
             </EuiButtonEmpty>
-            <EuiButtonEmpty
-                data-cy='menu-settings-button'
+            <EuiButtonEmpty data-cy='menu-settings-button'
               className={
                 'wz-menu-button ' +
                 (this.state.currentMenuTab === "settings" && !this.isAnyPopoverOpen() || (this.state.isSettingsPopoverOpen)
