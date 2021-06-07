@@ -28,7 +28,7 @@ const LoadingProgress = () => (
   <EuiProgress color='primary' size='s'/>
 );
 
-export const ModuleMitreAttackIntelligenceAllResourcesSearchResults = withGuard(({loading}) => loading, LoadingProgress)(({ results, setResourceFilters }) => {
+export const ModuleMitreAttackIntelligenceAllResourcesSearchResults = withGuard(({loading}) => loading, LoadingProgress)(({ results, setResourceFilters, rowProps }) => {
   const thereAreResults = results && results.length > 0;
   return thereAreResults
   ? results.map(item => (
@@ -49,6 +49,7 @@ export const ModuleMitreAttackIntelligenceAllResourcesSearchResults = withGuard(
       {item.results.map((result, resultIndex) => (
         <EuiButtonEmpty
           key={`module_mitre_attack_intelligence_all_resources_search_results_${item.name}_${resultIndex}`}
+          onClick={() => rowProps(result)}
         >
           {result[item.fieldName]}
         </EuiButtonEmpty>
