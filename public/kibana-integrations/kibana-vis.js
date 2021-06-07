@@ -381,7 +381,6 @@ class KibanaVis extends Component {
   };
 
   render() {
-    const height = this.props.resultState === 'loading' ? 0 : '100%';
     return (
       this.visID && (
         <span>
@@ -438,7 +437,7 @@ class KibanaVis extends Component {
               <EuiIcon type="iInCircle" />
             </EuiToolTip>
           </div>
-          <div id={this.visID} vis-id={this.visID} style={{ height }}></div>
+          <div id={this.visID} vis-id={this.visID} style={{ display: this.props.resultState === 'loading' ? 'none' : 'block', height:"100%" }}></div>
         </span>
       )
     );
