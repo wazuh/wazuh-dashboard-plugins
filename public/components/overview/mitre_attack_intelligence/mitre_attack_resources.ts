@@ -37,12 +37,13 @@ function buildResource(label: string, labelResource: string){
   return {
     label: label,
     id,
-    searchBarSuggestions: [{
+    searchBarSuggestions: [
+      {
         type: 'q',
-        label: 'references.external_id',
-        description: `${labelResource} ID`,
-        operators: ['=', '!='],
-        values: getMitreAttackIntelligenceSuggestions(endpoint, 'references.external_id')
+        label: 'description',
+        description: `${labelResource} description`,
+        operators: ['~'],
+        values: (input) => input ? [input] : []
       },
       {
         type: 'q',
@@ -53,10 +54,10 @@ function buildResource(label: string, labelResource: string){
       },
       {
         type: 'q',
-        label: 'description',
-        description: `${labelResource} description`,
-        operators: ['~'],
-        values: (input) => input ? [input] : []
+        label: 'references.external_id',
+        description: `${labelResource} ID`,
+        operators: ['=', '!='],
+        values: getMitreAttackIntelligenceSuggestions(endpoint, 'references.external_id')
       }
     ],
     apiEndpoint: endpoint,
@@ -91,52 +92,6 @@ function buildResource(label: string, labelResource: string){
 export const MitreAttackResources = [
   buildResource('Groups', 'Group'),
   buildResource('Mitigations', 'Mitigation'),
-  {
-    label: 'References',
-    id: 'references',
-    searchBarSuggestions: [
-      {
-        type: 'q',
-        label: 'type',
-        description: `Reference type`,
-        operators: ['=', '!='],
-        values: ['group', 'mitigation', 'software', 'tactic', 'technique']
-      },
-      {
-        type: 'q',
-        label: 'description',
-        description: `Reference description`,
-        operators: ['~'],
-        values: (input) => input ? [input] : []
-      }
-    ],
-    apiEndpoint: '/mitre/references',
-    fieldName: 'type',
-    initialSortingField: 'type',
-    tableColumns: [
-      {
-        field: 'id',
-        name: 'ID',
-        sortable: true,
-        width: '12%'
-      },
-      {
-        field: 'type',
-        name: 'Type',
-        sortable: true,
-        width: '30%'
-      },
-      {
-        field: 'description',
-        name: 'Description',
-        sortable: true,
-        render: (value) => value ? (
-          Markdown({markdown: value})
-        ) : '',
-        truncateText: true
-      }
-    ]
-  },
   buildResource('Software', 'Software'),
   buildResource('Tactics', 'Tactic'),
   buildResource('Techniques', 'Technique')
