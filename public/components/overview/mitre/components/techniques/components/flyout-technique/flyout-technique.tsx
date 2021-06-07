@@ -146,23 +146,6 @@ export class FlyoutTechnique extends Component {
 
     this.setState({techniqueData: { name, mitre_version, tacticsObj }, loading: false  })
   }
-
-  getArrayFormatted(arrObj) {
-      try {
-        arrObj.map(obj => {
-        return ( <EuiToolTip
-          position="top"
-          content={"Open " + obj.name + " details in a new page"}>
-          <EuiLink href="" external target="_blank">
-            {obj.name}
-          </EuiLink>
-        </EuiToolTip>)
-      })
-      }
-      catch{
-        return ""
-      }
-  }
   
   renderHeader() {
     const { techniqueData } = this.state;

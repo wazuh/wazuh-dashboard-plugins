@@ -69,7 +69,7 @@ export const Techniques = withWindowSize(class Techniques extends Component {
       currentTechniqueData: {},
       techniquesCount: [],
       currentTechnique: '',
-      hideAlerts: true,
+      hideAlerts: false,
       actionsOpen: "",
       filteredTechniques: false,
       mitreTechniques: [],
@@ -190,11 +190,11 @@ export const Techniques = withWindowSize(class Techniques extends Component {
    buildObjTechniques(techniques){
     const techniquesObj = []
     techniques.forEach(element => {
-      const mitreObj = this.state.mitreTechniques.filter(item => item.id === element)
+      const mitreObj = this.state.mitreTechniques.filter(item => item.id === element);
       if(mitreObj.length != 0){
-        const mitreTechniqueName =  mitreObj[0].name
-        const mitreTechniqueID = mitreObj[0].references.filter(item => item.source === "mitre-attack")[0].external_id
-        mitreTechniqueID ? techniquesObj.push({ id : mitreTechniqueID, name: mitreTechniqueName}) : ''
+        const mitreTechniqueName =  mitreObj[0].name;
+        const mitreTechniqueID = mitreObj[0].references.filter(item => item.source === "mitre-attack")[0].external_id;
+        mitreTechniqueID ? techniquesObj.push({ id : mitreTechniqueID, name: mitreTechniqueName}) : '';
       }
     });
     return techniquesObj
