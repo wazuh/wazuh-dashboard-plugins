@@ -26,14 +26,10 @@ export class UiLogsCtrl {
 
   /**
    * Returns Wazuh ui logs
-   * @param {Object} context
-   * @param {Object} request
    * @param {Object} response
    * @returns {Array<String>} app logs or ErrorResponse
    */
   async getUiLogs(
-    context: RequestHandlerContext,
-    request: KibanaRequest,
     response: KibanaResponseFactory
   ) {
     try {
