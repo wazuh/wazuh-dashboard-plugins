@@ -64,7 +64,6 @@ export class UiLogsCtrl {
    * @returns success message or ErrorResponse
    */
   async createUiLogs(
-    context: RequestHandlerContext,
     request: KibanaRequest,
     response: KibanaResponseFactory
   ) {
