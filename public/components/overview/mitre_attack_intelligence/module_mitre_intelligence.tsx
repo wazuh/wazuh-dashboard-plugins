@@ -54,19 +54,20 @@ export const ModuleMitreIntelligence = () => {
       )).filter(searchTermAllResourcesResponse => searchTermAllResourcesResponse.results.length)
   }
   , [searchTermAllResources]);
-  
+
   useEffect(() => {
     const redirectTab = sessionStorage.getItem("tabRedirect")
     const idToRedirect = sessionStorage.getItem("idToRedirect")
-    if(redirectTab){
-      setResourceFilters([{field: 'search', value: idToRedirect}]);
+    if(redirectTab && idToRedirect){
       setSelectedResource(redirectTab);
+      setResourceFilters([{field: 'search', value: idToRedirect}]);
       sessionStorage.removeItem("tabRedirect")
       sessionStorage.removeItem("idToRedirect")
     }
   },[]);
 
   const onSelectResource = useCallback((resourceID) => {
+    setResourceFilters([]);
     setSelectedResource(prevSelectedResource => prevSelectedResource === resourceID ? null : resourceID);
   }, []);
 

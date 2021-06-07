@@ -133,12 +133,11 @@ export class FlyoutTechnique extends Component {
 
   findTacticName(tactics){
     const { tacticsObject } = this.props;
-    const tacticsObj = []
-    tactics.forEach(element => {
-      const tactic = Object.keys(tacticsObject).map(tacticsKey => tacticsObject[tacticsKey]).find(obj => obj.id === element)
-      tacticsObj.push({ id:tactic.references[0].external_id, name: tactic.name})
-    });
-    return tacticsObj
+    const getTactic = (element) => {
+      const tactic = Object.values(tacticsObject).find(obj => obj.id === element);
+      return { id:tactic.references[0].external_id, name: tactic.name};
+    };
+    return tactics.reduce((tacticsObj, element) => [...tacticsObj, getTactic(element)], []);
   }
 
   formatTechniqueData (rawData) {
@@ -184,22 +183,9 @@ export class FlyoutTechnique extends Component {
     )
   }
 
-  renderTactics(tactics){
-    tactics.map(tactic => {
-      return ( <EuiToolTip
-        position="top"
-        content={"Open " + tactic.name + " details in a new page"}>
-        <EuiLink href="#" external target="_blank">
-          {tactic.id}
-        </EuiLink>
-      </EuiToolTip>)
-    })
-  }
-  
   renderBody() {
     const { currentTechnique } = this.props;
     const { techniqueData } = this.state;
-    console.log(techniqueData)
     const implicitFilters=[{ 'rule.mitre.id': currentTechnique}, this.clusterFilter ];
     if(this.props.implicitFilters){
       this.props.implicitFilters.forEach( item => 

@@ -69,7 +69,7 @@ export const Techniques = withWindowSize(class Techniques extends Component {
       currentTechniqueData: {},
       techniquesCount: [],
       currentTechnique: '',
-      hideAlerts: false,
+      hideAlerts: true,
       actionsOpen: "",
       filteredTechniques: false,
       mitreTechniques: [],
