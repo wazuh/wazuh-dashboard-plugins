@@ -21,7 +21,7 @@ const getMitreAttackIntelligenceSuggestions = (endpoint: string, field: string) 
     return response?.data?.data.affected_items
       .map(item => ({
         ...item,
-        ['references.external_id']: item.references.find(reference => reference.source === 'mitre-attack')?.external_id
+        ['references.external_id']: item?.references?.find(reference => reference.source === 'mitre-attack')?.external_id
       }))
       .map(item => item[field])
       .filter(item => item && item.toLowerCase().includes(input.toLowerCase()))
@@ -62,11 +62,11 @@ function buildResource(label: string, labelResource: string){
     ],
     apiEndpoint: endpoint,
     fieldName: 'name',
+    initialSortingField: 'name',
     tableColumns: [
       {
         field: 'references.external_id',
         name: 'ID',
-        // sortable: true,
         width: '12%'
       },
       {

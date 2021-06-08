@@ -15,12 +15,11 @@ import React, { useCallback, useState } from 'react';
 import { TableWzAPI } from '../../../components/common/tables';
 import { ModuleMitreAttackIntelligenceFlyout } from './module_mitre_attack_intelligence_resource_flyout';
 
-export const ModuleMitreAttackIntelligenceResource = ({ label, searchBarSuggestions, apiEndpoint, tableColumns, initialSortingField = 'name', resourceFilters }) => {
+export const ModuleMitreAttackIntelligenceResource = ({ label, searchBarSuggestions, apiEndpoint, tableColumns, initialSortingField, resourceFilters }) => {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [details, setDetails] = useState(null);
 
   const rowProps = useCallback((item) => ({
-    // 'data-test-subj': `row-${file}`,
     onClick: () => {
       setDetails(item);
       setIsDetailsOpen(true);
@@ -44,14 +43,14 @@ export const ModuleMitreAttackIntelligenceResource = ({ label, searchBarSuggesti
         endpoint={apiEndpoint}
         tableProps={{rowProps}}
         tablePageSizeOptions={[10]}
-        mapResponseItem={(item) => ({...item, ['references.external_id']: item.references.find(reference => reference.source === 'mitre-attack')?.external_id})}
+        mapResponseItem={(item) => ({...item, ['references.external_id']: item?.references?.find(reference => reference.source === 'mitre-attack')?.external_id})}
         filters={resourceFilters}
       />
       {details && isDetailsOpen && (
         <ModuleMitreAttackIntelligenceFlyout
-        details={details}
-        closeFlyout={() => closeFlyout()}
-        tableProps={rowProps}
+          details={details}
+          closeFlyout={() => closeFlyout()}
+          tableProps={rowProps}
         />
       )}
     </> 

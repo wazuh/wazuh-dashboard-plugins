@@ -53,9 +53,9 @@ export const ModuleMitreAttackIntelligenceAllResources = withGuard(({didSearch})
 
       {details && isDetailsOpen && (
         <ModuleMitreAttackIntelligenceFlyout
-        details={details}
-        closeFlyout={() => closeFlyout()}
-        tableProps={rowPropsFlyout}
+          details={details}
+          closeFlyout={() => closeFlyout()}
+          tableProps={rowPropsFlyout}
         />
       )}
     </>
