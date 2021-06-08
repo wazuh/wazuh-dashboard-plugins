@@ -12,9 +12,30 @@
 
 import { ErrorOrchestratorBase } from './error-orchestrator-base';
 import { UIErrorLog } from './types';
+import { UI_LOGGER_LEVELS } from '../../../common/constants';
+import { getToasts } from '../../kibana-services';
+import { ErrorToastOptions } from 'kibana/public';
 
 export class ErrorOrchestratorBusiness extends ErrorOrchestratorBase {
   public displayError(errorLog: UIErrorLog) {
-    super.displayError(errorLog);
+    const toast = {
+      title: errorLog.error.title,
+      toastMessage: errorLog.error.message,
+      toastLifeTimeMs: 3000,
+    };
+
+    switch (errorLog.level) {
+      case UI_LOGGER_LEVELS.INFO:
+        getToasts().addInfo(errorLog.error.error, toast as ErrorToastOptions);
+        break;
+      case UI_LOGGER_LEVELS.WARNING:
+        getToasts().addWarning(errorLog.error.error, toast as ErrorToastOptions);
+        break;
+      case UI_LOGGER_LEVELS.ERROR:
+        getToasts().addError(errorLog.error.error, toast as ErrorToastOptions);
+        break;
+      default:
+        console.log('No error level', errorLog.error.message, errorLog.error.error);
+    }
   }
 }

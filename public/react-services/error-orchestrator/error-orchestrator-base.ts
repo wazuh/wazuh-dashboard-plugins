@@ -10,9 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { ErrorToastOptions } from 'kibana/public';
-import { UI_LOGGER_LEVELS } from '../../../common/constants';
-import { getToasts } from '../../kibana-services';
 import loglevel from 'loglevel';
 import { GenericRequest } from '../../react-services/generic-request';
 import { ErrorOrchestrator, UIErrorLog } from './types';
@@ -24,29 +21,7 @@ export class ErrorOrchestratorBase implements ErrorOrchestrator {
   }
 
   public displayError(errorLog: UIErrorLog) {
-    const toast = {
-      title: errorLog.error.title,
-      toastMessage: errorLog.error.message,
-      toastLifeTimeMs: 3000,
-    };
-
-    getToasts().addError(errorLog.error.error, toast as ErrorToastOptions);
-  }
-
-  public loglevelError(errorLog: UIErrorLog) {
-    switch (errorLog.level) {
-      case UI_LOGGER_LEVELS.INFO:
-        loglevel.info(errorLog.error.message, errorLog.error.error);
-        break;
-      case UI_LOGGER_LEVELS.WARNING:
-        loglevel.warn(errorLog.error.message, errorLog.error.error);
-        break;
-      case UI_LOGGER_LEVELS.ERROR:
-        loglevel.error(errorLog.error.message, errorLog.error.error);
-        break;
-      default:
-        console.log('No error level', errorLog.error.message, errorLog.error.error);
-    }
+    throw new Error('Should be implemented!');
   }
 
   private async storeError(errorLog: UIErrorLog) {

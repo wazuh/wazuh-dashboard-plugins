@@ -12,9 +12,12 @@
 
 import { ErrorOrchestratorBase } from './error-orchestrator-base';
 import { UIErrorLog } from './types';
+import { WzMisc } from '../../factories/misc';
 
 export class ErrorOrchestratorCritical extends ErrorOrchestratorBase {
   public displayError(errorLog: UIErrorLog) {
-    super.displayError(errorLog)
+    const wzMisc = new WzMisc();
+    wzMisc.setBlankScr(errorLog.error.message);
+    window.location.href = '#/blank-screen';
   }
 }

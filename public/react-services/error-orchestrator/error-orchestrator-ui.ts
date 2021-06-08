@@ -12,13 +12,23 @@
 
 import { ErrorOrchestratorBase } from './error-orchestrator-base';
 import { UIErrorLog } from './types';
+import { UI_LOGGER_LEVELS } from '../../../common/constants';
+import loglevel from 'loglevel';
 
 export class ErrorOrchestratorUI extends ErrorOrchestratorBase {
   public displayError(errorLog: UIErrorLog) {
-    super.displayError(errorLog);
-  }
-
-  public loglevelError(errorLog: UIErrorLog) {
-    super.loglevelError(errorLog);
+    switch (errorLog.level) {
+      case UI_LOGGER_LEVELS.INFO:
+        loglevel.info(errorLog.error.message, errorLog.error.error);
+        break;
+      case UI_LOGGER_LEVELS.WARNING:
+        loglevel.warn(errorLog.error.message, errorLog.error.error);
+        break;
+      case UI_LOGGER_LEVELS.ERROR:
+        loglevel.error(errorLog.error.message, errorLog.error.error);
+        break;
+      default:
+        console.log('No error level', errorLog.error.message, errorLog.error.error);
+    }
   }
 }
