@@ -6,14 +6,6 @@ import { createDataDirectoryIfNotExists } from './filesystem';
 
 import { WAZUH_DATA_LOGS_DIRECTORY_PATH } from '../../common/constants';
 
-/*
-interface IBaseLogger {
-    directoryPath: string;
-    plainLogsPath: string;
-    rawLogsPath: string;
-}*/
-
-
 export interface IUIPlainLoggerSettings {
     level: string;
     message: string;
