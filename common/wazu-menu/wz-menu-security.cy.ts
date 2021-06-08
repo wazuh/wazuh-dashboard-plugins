@@ -11,8 +11,8 @@
  */
 
 export enum WAZUH_MENU_SECURITY_SECTIONS_CY_TEST_ID {
-  USERS = 'menu-security-users-link',
-  ROLES = 'menu-security-roles-link',
-  POLICIES = 'menu-security-policies-link',
-  ROLES_MAPPING = 'menu-security-roleMapping-link',
+  USERS = 'menuSecurityUsersLink',
+  ROLES = 'menuSecurityRolesLink',
+  POLICIES = 'menuSecurityPoliciesLink',
+  ROLES_MAPPING = 'menuSecurityRoleMappingLink',
 }

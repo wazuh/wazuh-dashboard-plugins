@@ -11,12 +11,12 @@
  */
 
 export enum WAZUH_MENU_SETTINGS_SECTIONS_CY_TEST_ID {
-  SETTINGS = 'menu-settings-settings-link',
-  API_CONFIGURATION = 'menu-settings-api-link',
-  MODULES = 'menu-settings-modules-link',
-  SAMPLE_DATA = 'menu-settings-sample_data-link',
-  CONFIGURATION = 'menu-settings-configuration-link',
-  LOGS = 'menu-settings-logs-link',
-  MISCELLANEOUS = 'menu-settings-miscellaneous-link',
-  ABOUT = 'menu-settings-about-link',
+  SETTINGS = 'menuSettingsSettingsLink',
+  API_CONFIGURATION = 'menuSettingsApiLink',
+  MODULES = 'menuSettingsModulesLink',
+  SAMPLE_DATA = 'menuSettingsSampleDataLink',
+  CONFIGURATION = 'menuSettingsConfigurationLink',
+  LOGS = 'menuSettingsLogsLink',
+  MISCELLANEOUS = 'menuSettingsMiscellaneousLink',
+  ABOUT = 'menuSettingsAboutLink',
 }

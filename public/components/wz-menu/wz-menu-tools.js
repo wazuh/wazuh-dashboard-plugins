@@ -60,7 +60,7 @@ class WzMenuTools extends Component {
       ...data,
       id: item.id,
       name: item.text,
-      'data-cy': item.cyTestId,
+      'data-test-subj': item.cyTestId,
       isSelected: window.location.href.includes('/wazuh-dev') && this.props.state.selected_tools_section === item.id,
       onClick: () => { },
       onMouseDown: (ev) => this.clickMenuItem(ev, item.id)

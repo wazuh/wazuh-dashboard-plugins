@@ -11,6 +11,6 @@
  */
 
 export enum WAZUH_MENU_TOOLS_SECTIONS_CY_TEST_ID {
-  API_CONSOLE = 'menu-tools-devTools-link',
-  RULESET_TEST = 'menu-tools-logtest-link',
+  API_CONSOLE = 'menuToolsDevToolsLink',
+  RULESET_TEST = 'menuToolsLogtestLink',
 }
