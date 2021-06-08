@@ -28,7 +28,6 @@ import {
 import { Markdown } from '../../common/util/markdown';
 
 export const ModuleMitreAttackIntelligenceFlyout = ({details, closeFlyout, tableProps}) => {
-  console.log("Los detalles son: ", details);
   const startReference = useRef(null);
   startReference.current?.scrollIntoView();
 
