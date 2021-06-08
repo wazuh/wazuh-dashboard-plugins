@@ -30,7 +30,7 @@ export class WzBlankScreen extends Component {
               <>
                 <p>
                   <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html">
-                    Elastic Guide
+                    Elastic guide
                   </a>
                   <br />
                   <br />
