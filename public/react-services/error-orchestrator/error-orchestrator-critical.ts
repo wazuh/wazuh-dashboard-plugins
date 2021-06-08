@@ -15,6 +15,6 @@ import { UIErrorLog } from './types';
 
 export class ErrorOrchestratorCritical extends ErrorOrchestratorBase {
   public displayError(errorLog: UIErrorLog) {
-    // continue here with the integration with the error-boundary hoc/component
+    super.displayError(errorLog)
   }
 }

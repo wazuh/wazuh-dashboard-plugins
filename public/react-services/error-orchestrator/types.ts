@@ -38,7 +38,7 @@ export type UIErrorLog = {
   display?: boolean;
   store?: boolean;
   error: UIError;
-  location: string;
+  location?: string;
 };
 
 export type ErrorOrchestrator = {
