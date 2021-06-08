@@ -33,7 +33,6 @@ export const ModuleMitreAttackIntelligenceAllResources = withGuard(({didSearch})
   },[]);
 
   const rowPropsFlyout = useCallback((item) => ({
-    // 'data-test-subj': `row-${file}`,
     onClick: () => {
       setDetails(item);
       setIsDetailsOpen(true);
