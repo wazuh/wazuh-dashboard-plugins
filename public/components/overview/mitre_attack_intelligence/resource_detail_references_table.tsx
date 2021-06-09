@@ -58,6 +58,7 @@ export const ReferencesTable = ({referencesName, referencesArray, tableProps, ba
       setData(data.flat());  
     }
     catch (error){
+      setIsLoading(false);
       return Promise.reject(error);
     }
     setIsLoading(false);
@@ -90,7 +91,8 @@ export const ReferencesTable = ({referencesName, referencesArray, tableProps, ba
       className='events-accordion'
       buttonContent={referencesName.charAt(0).toUpperCase() + referencesName.slice(1)}
       paddingSize='none'
-      initialIsOpen={true}>
+      initialIsOpen={true}
+    >
       <EuiInMemoryTable
         columns={columns}
         items={data}
