@@ -35,7 +35,8 @@ import {
   EuiCallOut,
   EuiSpacer,
   EuiProgress,
-  EuiCode
+  EuiCode,
+  EuiLink
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
 
@@ -282,13 +283,29 @@ export class RegisterAgent extends Component {
   }
 
   optionalDeploymentVariables() {
-    const deployment = `WAZUH_MANAGER${this.state.selectedOS == 'macos' ? ' ' : '='}'${this.state.serverAddress}' ${this.state.selectedOS == 'win' ? `WAZUH_REGISTRATION_SERVER='${this.state.serverAddress}' ` : ''}${this.state.needsPassword
-      ? `WAZUH_REGISTRATION_PASSWORD='${this.state.wazuhPassword}' `
-      : ''
-      }${this.state.udpProtocol
-        ? " WAZUH_PROTOCOL='UDP'"
-        : ''
-      }${this.state.selectedGroup.length ? `WAZUH_AGENT_GROUP='${this.state.selectedGroup.map(item => item.label).join(',')}' ` : ''}`
+    let deployment = `WAZUH_MANAGER='${this.state.serverAddress}' `;
+  
+    if (this.state.selectedOS == 'win') {
+      deployment += `WAZUH_REGISTRATION_SERVER='${this.state.serverAddress}' `;
+    }
+
+    if (this.state.wazuhPassword) {
+      deployment += `WAZUH_REGISTRATION_PASSWORD='${this.state.wazuhPassword}' `;
+    }
+
+    if (this.state.udpProtocol) {
+      deployment += `WAZUH_PROTOCOL='UDP' `;
+    }
+
+    if (this.state.selectedGroup.length) {
+      deployment += `WAZUH_AGENT_GROUP='${this.state.selectedGroup.map((item) => item.label).join(',')}' `;
+    }
+
+    // macos doesnt need = param
+    if (this.state.selectedOS === 'macos') {
+      return deployment.replaceAll('=', ' ');
+    }
+
     return deployment;
   }
 
@@ -433,6 +450,12 @@ export class RegisterAgent extends Component {
         {this.state.selectedOS && (
           <EuiText>
             <p>You can use this command to install and enroll the Wazuh agent in one or more hosts.</p>
+            <EuiCallOut
+              color="warning"
+              title={<>Running this command on a host with an agent already installed upgrades the agent package without enrolling the agent. To enroll it, see the <EuiLink href="https://documentation.wazuh.com/current/user-manual/registering/index.html">Wazuh documentation</EuiLink>.</>}
+              iconType="iInCircle"
+            />
+            <EuiSpacer />
             <EuiCodeBlock style={codeBlock} language={language}>
               {this.state.wazuhPassword ? this.obfuscatePassword(text) : text}
             </EuiCodeBlock>
