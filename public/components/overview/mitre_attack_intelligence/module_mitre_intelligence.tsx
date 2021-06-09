@@ -56,13 +56,10 @@ export const ModuleMitreIntelligence = () => {
   , [searchTermAllResources]);
 
   useEffect(() => {
-    const redirectTab = sessionStorage.getItem("tabRedirect")
-    const idToRedirect = sessionStorage.getItem("idToRedirect")
-    if(redirectTab && idToRedirect){
+    const urlParams = new URLSearchParams(location.href);
+    const redirectTab = urlParams.get('tabRedirect');
+    if(redirectTab){
       setSelectedResource(redirectTab);
-      setResourceFilters([{field: 'search', value: idToRedirect}]);
-      sessionStorage.removeItem("tabRedirect")
-      sessionStorage.removeItem("idToRedirect")
     }
   },[]);
 

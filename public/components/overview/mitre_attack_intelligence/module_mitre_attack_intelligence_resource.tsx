@@ -11,13 +11,43 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { TableWzAPI } from '../../../components/common/tables';
 import { ModuleMitreAttackIntelligenceFlyout } from './module_mitre_attack_intelligence_resource_flyout';
+import { WzRequest } from '../../../react-services';
 
-export const ModuleMitreAttackIntelligenceResource = ({ label, searchBarSuggestions, apiEndpoint, tableColumns, initialSortingField = 'name', resourceFilters }) => {
+export const ModuleMitreAttackIntelligenceResource = ({ label, searchBarSuggestions, apiEndpoint, tableColumns, initialSortingField, resourceFilters }) => {
+
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [details, setDetails] = useState(null);
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(location.href);
+    const redirectTab = urlParams.get('tabRedirect');
+    const idToRedirect = urlParams.get("idToRedirect")
+    if(redirectTab && idToRedirect){
+      const endpoint = `/mitre/${redirectTab}?q=references.external_id=${idToRedirect}`;
+      getMitreItemToRedirect(endpoint)
+      urlParams.delete('tabRedirect')
+      urlParams.delete('idToRedirect')
+      window.history.pushState({},document.title,'#/overview/?tab=mitre')
+    }
+  },[]);
+
+
+  const getMitreItemToRedirect = (endpoint) => {
+       WzRequest.apiReq('GET', endpoint, {}).then(res => {
+        const data = res?.data?.data.affected_items
+        .map(item => ({
+          ...item,
+          ['references.external_id']: item?.references?.find(reference => reference.source === 'mitre-attack')?.external_id
+        }))
+        setIsDetailsOpen(true)
+        setDetails(data[0])
+      }).catch(err => {
+         {}
+      });
+  };
 
   const rowProps = useCallback((item) => ({
     // 'data-test-subj': `row-${file}`,
@@ -44,7 +74,7 @@ export const ModuleMitreAttackIntelligenceResource = ({ label, searchBarSuggesti
         endpoint={apiEndpoint}
         tableProps={{rowProps}}
         tablePageSizeOptions={[10]}
-        mapResponseItem={(item) => ({...item, ['references.external_id']: item.references.find(reference => reference.source === 'mitre-attack')?.external_id})}
+        mapResponseItem={(item) => ({...item, ['references.external_id']: item?.references?.find(reference => reference.source === 'mitre-attack')?.external_id})}
         filters={resourceFilters}
       />
       {details && isDetailsOpen && (
