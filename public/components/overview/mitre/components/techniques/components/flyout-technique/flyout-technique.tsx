@@ -197,15 +197,30 @@ export class FlyoutTechnique extends Component {
       },
       {
         title: 'Tactics',
-        description: techniqueData.tacticsObj ? techniqueData.tacticsObj.map(tactic => { return ( <><EuiToolTip
-          position="top"
-          content={"Open " + tactic.name + " details in a Intelligence section"}>
-          <EuiLink onClick={(e) => {this.props.openIntelligence(e,'tactics',tactic.id);e.stopPropagation()}}>
-            {tactic.name}
-          </EuiLink>
-        </EuiToolTip>
-        <br/>
-        </>)}) : ''
+        description: techniqueData.tacticsObj
+        ? techniqueData.tacticsObj.map((tactic) => {
+            return (
+              <>
+                <EuiToolTip
+                  position="top"
+                  content={
+                    "Open " + tactic.name + " details in a Intelligence section"
+                  }
+                >
+                  <EuiLink
+                    onClick={(e) => {
+                      this.props.openIntelligence(e, "tactics", tactic.id);
+                      e.stopPropagation();
+                    }}
+                  >
+                    {tactic.name}
+                  </EuiLink>
+                </EuiToolTip>
+                <br />
+              </>
+            );
+          })
+        : ""
       },
       {
         title: 'Version',

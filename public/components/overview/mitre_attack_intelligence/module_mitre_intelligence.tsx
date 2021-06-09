@@ -58,7 +58,7 @@ export const ModuleMitreIntelligence = () => {
   useEffect(() => {
     const urlParams = new URLSearchParams(location.href);
     const redirectTab = urlParams.get('tabRedirect');
-    if(redirectTab){
+    if (redirectTab) {
       setSelectedResource(redirectTab);
     }
   },[]);
