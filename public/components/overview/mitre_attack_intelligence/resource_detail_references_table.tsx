@@ -32,7 +32,7 @@ interface referencesTableType {
 }
 
 export const ReferencesTable = ({referencesName, referencesArray, tableProps, backToTop} : referencesTableType) => {
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [data, setData] = useState<any[]>([]);
   useEffect(() => {
     getValues();
@@ -52,7 +52,7 @@ export const ReferencesTable = ({referencesName, referencesArray, tableProps, ba
     // We make the call to extract the necessary information from the references tables
     try{
       const data = await Promise.all(namesConcatenated.map(async (nameConcatenated) => {
-        const queryResult = await WzRequest.apiReq('GET', `/mitre/${referencesName}?${referencesName.slice(-1) === 's' ? referencesName.substring(0, referencesName.length-1) : referencesName}_ids=${nameConcatenated}`, {});
+        const queryResult = await WzRequest.apiReq('GET', `/mitre/${referencesName}?${referencesName.replace(/s\s*$/, '')}_ids=${nameConcatenated}`, {});
         return ((((queryResult || {}).data || {}).data || {}).affected_items || []).map((item) => ({...item, ['references.external_id']: item.references.find(reference => reference.source === 'mitre-attack')?.external_id}));  
       }));
       setData(data.flat());  
