@@ -17,7 +17,7 @@ import { ErrorOrchestrator, UIErrorLog } from './types';
 export class ErrorOrchestratorBase implements ErrorOrchestrator {
   public loadErrorLog(errorLog: UIErrorLog) {
     if (errorLog.display) this.displayError(errorLog);
-    if (errorLog.store) this.storeError(errorLog).then(loglevel.info);
+    if (errorLog.store) this.storeError(errorLog);
   }
 
   public displayError(errorLog: UIErrorLog) {
