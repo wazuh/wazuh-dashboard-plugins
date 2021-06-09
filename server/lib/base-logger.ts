@@ -1,5 +1,17 @@
+/*
+ * Wazuh app - Settings controller
+ * Copyright (C) 2015-2021 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
+
 import winston from 'winston';
-import fs, { PathLike } from 'fs';
+import fs from 'fs';
 import path from 'path';
 import { getConfiguration } from './get-configuration';
 import { createDataDirectoryIfNotExists } from './filesystem';
