@@ -21,32 +21,44 @@ import {
 } from '@elastic/eui';
 import { Markdown } from '../../common/util/markdown';
 
-export const GetFlyoutSubtable = ({subtableName, subtableArray, subtableProps}) => {
+type tablePropsType = (item) => {onClick: () => void};
+type backToTopType = () => void;
+
+interface referencesTableType {
+  referencesName: string,
+  referencesArray: Array<string>,
+  tableProps: tablePropsType,
+  backToTop: backToTopType
+}
+
+export const ReferencesTable = ({referencesName, referencesArray, tableProps, backToTop} : referencesTableType) => {
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState<any[]>([]);
   useEffect(() => {
     getValues();
-  }, [subtableArray]);
+    backToTop();
+  }, [referencesArray]);
 
   const getValues = async () => {
     setIsLoading(true);
-    // We extract the ids from the subtable and count them in a string for the call that will extract the info
-    const maxLenght = 8100;
-    const namesConcatenated = subtableArray.reduce((namesArray = [''], element) => {
-      namesArray[namesArray.length -1].length >= maxLenght && namesArray.push('');
+    // We extract the ids from the references tables and count them in a string for the call that will extract the info
+    const maxLength = 8100;
+    const namesConcatenated = referencesArray.reduce((namesArray = [''], element) => {
+      namesArray[namesArray.length -1].length >= maxLength && namesArray.push('');
       namesArray[namesArray.length -1] += `${namesArray[namesArray.length -1].length > 0 ? ',' :''}${element}`;
       return namesArray;
     }, ['']);
 
-    // We make the call to extract the necessary information from the subtable
+    // We make the call to extract the necessary information from the references tables
     try{
-      namesConcatenated.forEach(async (nameConcatenated) => {
-        const data = await WzRequest.apiReq('GET', `/mitre/${subtableName}?${subtableName.slice(-1) === 's' ? subtableName.substring(0, subtableName.length-1) : subtableName}_ids=${nameConcatenated}`, {});
-        setData(((((data || {}).data || {}).data || {}).affected_items || []).map((item) => ({...item, ['references.external_id']: item.references.find(reference => reference.source === 'mitre-attack')?.external_id})));  
-      });
+      const data = await Promise.all(namesConcatenated.map(async (nameConcatenated) => {
+        const queryResult = await WzRequest.apiReq('GET', `/mitre/${referencesName}?${referencesName.slice(-1) === 's' ? referencesName.substring(0, referencesName.length-1) : referencesName}_ids=${nameConcatenated}`, {});
+        return ((((queryResult || {}).data || {}).data || {}).affected_items || []).map((item) => ({...item, ['references.external_id']: item.references.find(reference => reference.source === 'mitre-attack')?.external_id}));  
+      }));
+      setData(data.flat());  
     }
     catch (error){
-      console.log("Error in Mitre Flyout due to: ", error);
+      return Promise.reject(error);
     }
     setIsLoading(false);
   }
@@ -76,7 +88,7 @@ export const GetFlyoutSubtable = ({subtableName, subtableArray, subtableProps}) 
       style={{ textDecoration: 'none' }}
       id=''
       className='events-accordion'
-      buttonContent={subtableName.charAt(0).toUpperCase() + subtableName.slice(1)}
+      buttonContent={referencesName.charAt(0).toUpperCase() + referencesName.slice(1)}
       paddingSize='none'
       initialIsOpen={true}>
       <EuiInMemoryTable
@@ -85,7 +97,7 @@ export const GetFlyoutSubtable = ({subtableName, subtableArray, subtableProps}) 
         loading={isLoading}
         pagination={{ pageSizeOptions: [5, 10, 20] }}
         sorting={{ sort: { field: 'name', direction: SortDirection.DESC } }}
-        rowProps={subtableProps}
+        rowProps={tableProps}
       />
     </EuiAccordion>
   );

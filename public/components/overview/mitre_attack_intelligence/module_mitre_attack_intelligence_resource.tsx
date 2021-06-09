@@ -13,7 +13,7 @@
 
 import React, { useCallback, useState } from 'react';
 import { TableWzAPI } from '../../../components/common/tables';
-import { ModuleMitreAttackIntelligenceFlyout } from './module_mitre_attack_intelligence_resource_flyout';
+import { ModuleMitreAttackIntelligenceFlyout } from './resource_detail_flyout';
 
 export const ModuleMitreAttackIntelligenceResource = ({ label, searchBarSuggestions, apiEndpoint, tableColumns, initialSortingField, resourceFilters }) => {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);

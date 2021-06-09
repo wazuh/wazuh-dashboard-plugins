@@ -19,7 +19,7 @@ import {
 import { withGuard } from'../../../components/common/hocs';
 import { ModuleMitreAttackIntelligenceAllResourcesWelcome } from './module_mitre_attack_intelligence_all_resources_welcome';
 import { ModuleMitreAttackIntelligenceAllResourcesSearchResults } from './module_mitre_attack_intelligence_all_resources_search_results';
-import { ModuleMitreAttackIntelligenceFlyout } from './module_mitre_attack_intelligence_resource_flyout';
+import { ModuleMitreAttackIntelligenceFlyout } from './resource_detail_flyout';
 
 export const ModuleMitreAttackIntelligenceAllResources = withGuard(({didSearch}) => !didSearch, ModuleMitreAttackIntelligenceAllResourcesWelcome)(({ results, loading }) => {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
