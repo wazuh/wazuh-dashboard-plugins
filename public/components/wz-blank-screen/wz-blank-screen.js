@@ -34,7 +34,7 @@ export class WzBlankScreen extends Component {
                   </a>
                   <br />
                   <br />
-                  <a href="https://documentation.wazuh.com/current/installation-guide/">
+                  <a href="https://documentation.wazuh.com/current/user-manual/kibana-app/troubleshooting.html">
                     Wazuh installation guide
                   </a>
                 </p>

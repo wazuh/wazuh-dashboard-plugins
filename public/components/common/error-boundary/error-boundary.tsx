@@ -21,14 +21,16 @@ import {
   UIErrorSeverity,
   UILogLevel,
 } from '../../../react-services/error-orchestrator/types';
-import { ErrorOrchestratorClass } from '../../../react-services';
+import { ErrorOrchestratorService } from '../../../react-services';
 import { ErrorComponentPrompt } from '../error-boundary-prompt/error-boundary-prompt';
 
 export default class ErrorBoundary extends Component {
+  private logger: ErrorOrchestratorService;
   constructor(props) {
     super(props);
     this.state = { errorTitle: null, errorInfo: null, style: null };
     this.context = this.constructor.displayName || this.constructor.name || undefined;
+    this.logger = new ErrorOrchestratorService();
   }
 
   componentDidCatch = (errorTitle, errorInfo) => catchFunc(errorTitle, errorInfo, this);
@@ -63,9 +65,21 @@ const catchFunc = (errorTitle, errorInfo, ctx) => {
       },
     };
 
-    const logger = new ErrorOrchestratorClass();
-    logger.handleError(options);
+    ctx.logger.handleError(options);
   } catch (error) {
-    loglevel.error('Logger failed: ', error);
+    const optionsCatch: UIErrorLog = {
+      context: ctx.context,
+      level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+      severity: UI_ERROR_SEVERITIES.UI as UIErrorSeverity,
+      display: false,
+      store: true,
+      error: {
+        error: error,
+        message: error?.message || '',
+        title: '',
+      },
+    };
+
+    ctx.logger.handleError(optionsCatch);
   }
 };

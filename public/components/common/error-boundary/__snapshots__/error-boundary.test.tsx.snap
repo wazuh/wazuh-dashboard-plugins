@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ErrorBoundary component renders correctly and check snapshot 1`] = `
+exports[`ErrorBoundary component renders correctly to match the snapshot 1`] = `
 <ErrorBoundary>
   <ErrorComponentPrompt
     errorInfo={
@@ -11,7 +11,7 @@ exports[`ErrorBoundary component renders correctly and check snapshot 1`] = `
     in WrapperComponent",
       }
     }
-    errorTitle={[Error: I crashed!]}
+    errorTitle={[Error: I crashed! I crash very hard]}
     style={null}
   >
     <EuiEmptyPrompt
@@ -33,12 +33,16 @@ exports[`ErrorBoundary component renders correctly and check snapshot 1`] = `
               }
             }
           >
-            Error: I crashed!
+            <span>
+              Error: I crashed! I crash very hard
+            </span>
             <br />
-            
+            <span>
+              
     in ComponentWithError
     in ErrorBoundary (created by WrapperComponent)
     in WrapperComponent
+            </span>
           </details>
         </div>
       }
@@ -126,12 +130,16 @@ exports[`ErrorBoundary component renders correctly and check snapshot 1`] = `
                       }
                     }
                   >
-                    Error: I crashed!
+                    <span>
+                      Error: I crashed! I crash very hard
+                    </span>
                     <br />
-                    
+                    <span>
+                      
     in ComponentWithError
     in ErrorBoundary (created by WrapperComponent)
     in WrapperComponent
+                    </span>
                   </details>
                 </div>
               </div>

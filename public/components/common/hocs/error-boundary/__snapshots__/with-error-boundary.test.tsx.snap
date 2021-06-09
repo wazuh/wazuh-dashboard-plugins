@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`withErrorBoundary hoc implementation renders correctly and check snapshot 1`] = `
+exports[`withErrorBoundary hoc implementation renders correctly to match the snapshot 1`] = `
 <Component>
   <ErrorBoundary>
     <ErrorComponentPrompt
@@ -14,7 +14,7 @@ exports[`withErrorBoundary hoc implementation renders correctly and check snapsh
     in WrapperComponent",
         }
       }
-      errorTitle={[Error: I crashed!]}
+      errorTitle={[Error: I crashed! I crash very hard]}
       style={null}
     >
       <EuiEmptyPrompt
@@ -36,14 +36,18 @@ exports[`withErrorBoundary hoc implementation renders correctly and check snapsh
                 }
               }
             >
-              Error: I crashed!
+              <span>
+                Error: I crashed! I crash very hard
+              </span>
               <br />
-              
+              <span>
+                
     in ComponentWithError
     in Unknown
     in ErrorBoundary
     in Unknown (created by WrapperComponent)
     in WrapperComponent
+              </span>
             </details>
           </div>
         }
@@ -131,14 +135,18 @@ exports[`withErrorBoundary hoc implementation renders correctly and check snapsh
                         }
                       }
                     >
-                      Error: I crashed!
+                      <span>
+                        Error: I crashed! I crash very hard
+                      </span>
                       <br />
-                      
+                      <span>
+                        
     in ComponentWithError
     in Unknown
     in ErrorBoundary
     in Unknown (created by WrapperComponent)
     in WrapperComponent
+                      </span>
                     </details>
                   </div>
                 </div>

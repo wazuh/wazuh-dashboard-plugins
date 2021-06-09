@@ -13,7 +13,7 @@
 import { errorOrchestratorFactory } from './error-orchestrator.factory';
 import { ErrorOrchestrator, UIErrorLog } from './types';
 
-export class ErrorOrchestratorClass {
+export class ErrorOrchestratorService {
   public constructor() {}
 
   public handleError(uiErrorLog: UIErrorLog) {
