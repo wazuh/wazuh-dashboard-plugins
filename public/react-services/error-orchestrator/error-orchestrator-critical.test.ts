@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Unit test for ErrorOrchestratorBase.
+ * Wazuh app - Unit test for ErrorOrchestratorCritical.
  *
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
@@ -12,33 +12,33 @@
  *
  */
 
-import { ErrorOrchestratorBase } from './error-orchestrator-base';
 import { ErrorOrchestrator, UIErrorLog } from './types';
+import { ErrorOrchestratorCritical } from './error-orchestrator-critical';
+import { WzMisc } from '../../factories/misc';
 
-describe('Wazuh Error Orchestrator Base', () => {
+describe('Wazuh Error Orchestrator Critical', () => {
   describe('Given a valid options params ', () => {
-    it('Should be called displayError and storeError', () => {
+    it('Should be called mockSetBlankScr and redirect to BlankScreen', () => {
       const options: UIErrorLog = {
         context: 'unitTest',
         level: 'ERROR',
         severity: 'UI',
         display: true,
-        store: true,
+        store: false,
         error: {
           error: 'error name test1',
           message: 'message test1',
           title: 'title jest testing1',
         },
       };
-      const errorOrchestratorBase: ErrorOrchestrator = new ErrorOrchestratorBase();
-      const mockDisplayError = (ErrorOrchestratorBase.prototype.displayError = jest.fn());
-      const mockStoreError = jest.spyOn(ErrorOrchestratorBase.prototype as any, 'storeError');
-      mockStoreError.mockImplementation(() => {})
 
-      errorOrchestratorBase.loadErrorLog(options);
+      const mockSetBlankScr = (WzMisc.prototype.setBlankScr = jest.fn());
 
-      expect(mockDisplayError).toBeCalledTimes(1);
-      expect(mockStoreError).toBeCalledTimes(1);
+      const errorOrchestratorCritical: ErrorOrchestrator = new ErrorOrchestratorCritical();
+      errorOrchestratorCritical.loadErrorLog(options);
+
+      expect(mockSetBlankScr).toBeCalledTimes(1);
+      expect(window.location.href).toEqual('http://localhost/#/blank-screen');
     });
   });
 });
