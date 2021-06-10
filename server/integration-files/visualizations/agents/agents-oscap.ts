@@ -564,7 +564,7 @@ export default [
               show: true,
               style: {},
               scale: { type: 'linear' },
-              labels: { show: true, truncate: 100 },
+              labels: { show: true, filter: true, truncate: 100 },
               title: {},
             },
           ],

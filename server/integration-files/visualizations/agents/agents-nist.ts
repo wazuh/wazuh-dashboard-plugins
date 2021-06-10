@@ -138,7 +138,7 @@ export default [
               show: true,
               style: {},
               scale: { type: 'linear' },
-              labels: { show: true, rotate: 0, filter: false, truncate: 200 },
+              labels: { show: true, rotate: 0, filter: true, truncate: 200 },
               title: {},
             },
           ],

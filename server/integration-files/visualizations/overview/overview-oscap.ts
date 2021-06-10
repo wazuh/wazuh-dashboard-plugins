@@ -468,7 +468,7 @@ export default [
               show: true,
               style: {},
               scale: { type: 'linear' },
-              labels: { show: true, truncate: 25, rotate: 0 },
+              labels: { show: true, filter: true, truncate: 25, rotate: 0 },
               title: {},
             },
           ],
