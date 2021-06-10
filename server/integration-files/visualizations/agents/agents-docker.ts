@@ -120,6 +120,7 @@ export default [
           showMetricsAtAllLevels: false,
           sort: { columnIndex: 3, direction: 'desc' },
           showTotal: false,
+          showToolbar: true,
           totalFunc: 'sum',
         },
         aggs: [

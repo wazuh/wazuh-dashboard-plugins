@@ -45,6 +45,7 @@ export default [
           showMetricsAtAllLevels: false,
           showPartialRows: false,
           showTotal: false,
+          showToolbar: true,
           sort: { columnIndex: null, direction: null },
           totalFunc: 'sum',
         },
@@ -597,6 +598,7 @@ export default [
           showMeticsAtAllLevels: false,
           sort: { columnIndex: 3, direction: 'desc' },
           showTotal: false,
+          showToolbar: true,
           totalFunc: 'sum',
         },
         aggs: [

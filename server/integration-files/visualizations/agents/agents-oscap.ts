@@ -129,6 +129,7 @@ export default [
           showMeticsAtAllLevels: false,
           sort: { columnIndex: null, direction: null },
           showTotal: false,
+          showToolbar: true,
           totalFunc: 'sum',
         },
         aggs: [
@@ -170,6 +171,7 @@ export default [
           showMeticsAtAllLevels: false,
           sort: { columnIndex: null, direction: null },
           showTotal: false,
+          showToolbar: true,
           totalFunc: 'sum',
         },
         aggs: [
@@ -825,6 +827,7 @@ export default [
           showMeticsAtAllLevels: false,
           sort: { columnIndex: null, direction: null },
           showTotal: false,
+          showToolbar: true,
           totalFunc: 'sum',
         },
         aggs: [
@@ -894,6 +897,7 @@ export default [
           showMeticsAtAllLevels: false,
           sort: { columnIndex: 2, direction: 'desc' },
           showTotal: false,
+          showToolbar: true,
           totalFunc: 'sum',
         },
         aggs: [
