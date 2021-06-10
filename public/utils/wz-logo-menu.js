@@ -13,10 +13,10 @@
 // Remove Kibana Wazuh name and breadcrumb
 export const changeWazuhNavLogo = () => {
   const interval = setInterval(() => {
-    const nav = $('.euiHeader > .euiBreadcrumbs  > .euiBreadcrumb');
-    if (nav.length) {
+    const nav = document.querySelector('[data-test-subj="breadcrumbs"]  > .euiBreadcrumb');
+    if (nav) {
       clearInterval(interval);
+      nav.style.display = 'none';
     }
-    nav.hide();
   }, 200);
 };
