@@ -325,8 +325,6 @@ export const Techniques = withWindowSize(class Techniques extends Component {
   }
 
   openIntelligence(e,redirectTo,itemId){
-    sessionStorage.setItem("tabRedirect", redirectTo);
-    sessionStorage.setItem("idToRedirect", itemId);
     this.props.onSelectedTabChanged('intelligence');
     window.location.href = window.location+`&tabRedirect=${redirectTo}&idToRedirect=${itemId}`
   }
