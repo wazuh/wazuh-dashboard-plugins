@@ -34,7 +34,7 @@ describe('Spec UiLogsCtrl', function () {
     });
 
     it('Should 200 and return message Log has been added', async () => {
-      const result = { body: { message: 'Log has been added' } };
+      const result = { body: { error: 0, message: 'Log has been added', statusCode: 200 } };
       const mockResponse = buildMockResponse();
       jest.spyOn(readLastLines, 'read').mockReturnValue('Log has been added');
       jest.spyOn(uiLogger, 'checkFileExist').mockReturnValue(true);
