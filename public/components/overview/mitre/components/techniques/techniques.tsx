@@ -79,7 +79,7 @@ export const Techniques = withWindowSize(class Techniques extends Component {
   
   async componentDidMount(){
     this._isMount = true;
-    this.getMitreTechniques()
+    this.buildMitreTechniquesFromApi()
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -189,12 +189,9 @@ export const Techniques = withWindowSize(class Techniques extends Component {
     }
   }
 
-  async getMitreTechniques () {
-    const params = {
-      limit: 1000,
-    };
-    const data = await WzRequest.apiReq("GET", "/mitre/techniques", { params })
-    .then((res) => (((res || {}).data || {}).data || {}).affected_items)
+  async getMitreTechniques (params) {
+    return await WzRequest.apiReq("GET", "/mitre/techniques", { params: params })
+    .then((res) => res)
     .catch((err) => {
        this.showToast(
          'danger',
@@ -202,9 +199,25 @@ export const Techniques = withWindowSize(class Techniques extends Component {
          `Mitre techniques could not be fetched: ${err}`,
          3000
        );
-       return []
+      []
     });
-    this.setState({ mitreTechniques: data })
+  }
+
+  async buildMitreTechniquesFromApi () {
+    const params = { limit: 500 };
+    const output = await this.getMitreTechniques(params)
+    const totalItems = (((output || {}).data || {}).data || {}).total_affected_items;
+    let mitreTechniques = [];
+    if (totalItems && output.data && output.data.data && totalItems > 500) {
+      params.offset = 0;
+      mitreTechniques.push(...output.data.data.affected_items);
+      while (mitreTechniques.length < totalItems && params.offset < totalItems) {
+        params.offset += params.limit;
+        const tmpData = await this.getMitreTechniques(params)
+        mitreTechniques.push(...tmpData.data.data.affected_items);
+      }
+    }
+    this.setState({ mitreTechniques: mitreTechniques })
   }
 
    buildObjTechniques(techniques){
