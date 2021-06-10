@@ -36,7 +36,7 @@ import { WzRequest } from '../../../../../react-services/wz-request';
 import {WAZUH_ALERTS_PATTERN} from '../../../../../../common/constants';
 import { AppState } from '../../../../../react-services/app-state';
 import { WzFieldSearchDelay } from '../../../../common/search'
-import { getDataPlugin } from '../../../../../kibana-services';
+import { getDataPlugin, getToasts } from '../../../../../kibana-services';
 
 export const Techniques = withWindowSize(class Techniques extends Component {
   _isMount = false;
@@ -104,6 +104,15 @@ export const Techniques = withWindowSize(class Techniques extends Component {
   componentWillUnmount() {
     this._isMount = false;
   }
+
+  showToast(color: string, title: string = '', text: string = '', time: number = 3000) {
+    getToasts().add({
+      color: color,
+      title: title,
+      text: text,
+      toastLifeTimeMs: time,
+    });
+  };
 
   async getTechniquesCount() {
     try{
@@ -181,9 +190,21 @@ export const Techniques = withWindowSize(class Techniques extends Component {
   }
 
   async getMitreTechniques () {
-    const data = await WzRequest.apiReq('GET', '/mitre/techniques', {}).then(res => res).catch(err => mitreTechniques);
-    const result = (((data || {}).data || {}).data || {}).affected_items;
-    this.setState({ mitreTechniques: result })
+    const params = {
+      limit: 1000,
+    };
+    const data = await WzRequest.apiReq("GET", "/mitre/techniques", { params })
+    .then((res) => (((res || {}).data || {}).data || {}).affected_items)
+    .catch((err) => {
+       this.showToast(
+         'danger',
+         'Error',
+         `Mitre techniques could not be fetched: ${err}`,
+         3000
+       );
+       return []
+    });
+    this.setState({ mitreTechniques: data })
   }
 
    buildObjTechniques(techniques){
@@ -202,6 +223,7 @@ export const Techniques = withWindowSize(class Techniques extends Component {
   renderFacet() {
     const { tacticsObject } = this.props;
     const { techniquesCount } = this.state;
+    let hash = {};
     let tacticsToRender: Array<any> = [];
     const currentTechniques = Object.keys(tacticsObject).map(tacticsKey => ({tactic: tacticsKey, techniques: this.buildObjTechniques(tacticsObject[tacticsKey].techniques)}))
       .filter(tactic => this.props.selectedTactics[tactic.tactic])
@@ -209,12 +231,12 @@ export const Techniques = withWindowSize(class Techniques extends Component {
       .flat()
       .filter((techniqueID, index, array) => array.indexOf(techniqueID) === index);
     tacticsToRender = currentTechniques
-      .filter(techniqueID => this.state.filteredTechniques ? this.state.filteredTechniques.includes(techniqueID.id) : techniqueID.id)
-      .map(techniqueID => {
+      .filter(technique => this.state.filteredTechniques ? this.state.filteredTechniques.includes(technique.id) : technique.id && hash[technique.id] ? false : hash[technique.id] = true)
+      .map(technique => {
         return {
-          id: techniqueID.id,
-          label: `${techniqueID.id} - ${techniqueID.name}`,
-          quantity: (techniquesCount.find(item => item.key === techniqueID.id) || {}).doc_count || 0
+          id: technique.id,
+          label: `${technique.id} - ${technique.name}`,
+          quantity: (techniquesCount.find(item => item.key === technique.id) || {}).doc_count || 0
         }
       })
       .filter(technique => this.state.hideAlerts ? technique.quantity !== 0 : true);
