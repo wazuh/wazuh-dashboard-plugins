@@ -496,11 +496,13 @@ export class ReportPrinter{
     let totalLength = columns.length - 1;
     const widthColumn = 385/totalLength;
     let totalWidth = totalLength * widthColumn;
-    const widthCharacter = 5; //min width per character
-    const widths = [];
+    
+    const widths:(number)[] = [];
     
     for (let step = 0; step < columns.length - 1; step++) {
-      let columnLength = tableRows[0][step].text.length * widthCharacter;
+
+      let columnLength = this.getColumnWidth(columns[step], tableRows, step);
+      
       if (columnLength <= Math.round(totalWidth / totalLength)) {
         widths.push(columnLength);
         totalWidth -= columnLength;
@@ -615,4 +617,28 @@ export class ReportPrinter{
     document.end();
   }
 
+  /**
+   * Returns the width of a given column
+   * 
+   * @param column 
+   * @param tableRows 
+   * @param step 
+   * @returns {number}
+   */
+  getColumnWidth(column, tableRows, index){
+    const widthCharacter = 5; //min width per character
+
+    //Get the longest row value
+    const maxRowLength = tableRows.reduce((maxLength, row)=>{
+      return (row[index].text.length > maxLength ? row[index].text.length : maxLength);
+    },0);
+
+    //Get column name length
+    const headerLength = column.label.length;
+
+    //Use the longest to get the column width
+    const maxLength = maxRowLength > headerLength ? maxRowLength : headerLength;
+
+    return maxLength * widthCharacter;
+  }
 }
