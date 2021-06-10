@@ -20,7 +20,7 @@ export function UiLogsRoutes(router: IRouter) {
       path: '/utils/logs/ui',
       validate: false,
     },
-    async (context, request, response) => await ctrl.getUiLogs(context, request, response)
+    async (context, request, response) => await ctrl.getUiLogs(response)
   );
 
   router.post(
@@ -34,6 +34,6 @@ export function UiLogsRoutes(router: IRouter) {
         }),
       },
     },
-    async (context, request, response) => await ctrl.createUiLogs(context, request, response)
+    async (context, request, response) => await ctrl.createUiLogs(request, response)
   );
 }

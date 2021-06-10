@@ -14,7 +14,7 @@
 import { ErrorResponse } from '../../lib/error-response';
 import { read } from 'read-last-lines';
 import { WAZUH_UI_LOGS_RAW_FILENAME } from '../../../common/constants';
-import { KibanaRequest, RequestHandlerContext, KibanaResponseFactory } from 'src/core/server';
+import { KibanaRequest, KibanaResponseFactory } from 'src/core/server';
 import uiLogger from '../../lib/ui-logger';
 
 export class UiLogsCtrl {
@@ -29,9 +29,7 @@ export class UiLogsCtrl {
    * @param {Object} response
    * @returns {Array<String>} app logs or ErrorResponse
    */
-  async getUiLogs(
-    response: KibanaResponseFactory
-  ) {
+  async getUiLogs(response: KibanaResponseFactory) {
     try {
       return uiLogger.initDirectory().then(async () => {
         if (!uiLogger.checkFileExist(WAZUH_UI_LOGS_RAW_FILENAME)) {
@@ -58,20 +56,18 @@ export class UiLogsCtrl {
 
   /**
    * Add new UI Log entry in ui logs file
-   * @param context
    * @param request
    * @param response
    * @returns success message or ErrorResponse
    */
-  async createUiLogs(
-    request: KibanaRequest,
-    response: KibanaResponseFactory
-  ) {
+  async createUiLogs(request: KibanaRequest, response: KibanaResponseFactory) {
     try {
       const { location, message, level } = request.body;
       await uiLogger.log(location, message, level);
       return response.ok({
         body: {
+          statusCode: 200,
+          error: 0,
           message: 'Log has been added',
         },
       });

@@ -27,11 +27,9 @@ export class ErrorOrchestratorBase implements ErrorOrchestrator {
   private async storeError(errorLog: UIErrorLog) {
     try {
       await GenericRequest.request('POST', `/utils/logs/ui`, {
-        body: {
-          message: errorLog.error.message,
-          level: errorLog.level,
-          location: errorLog.location,
-        },
+        message: errorLog.error.message,
+        level: errorLog.level,
+        location: errorLog.location,
       });
     } catch (error) {
       loglevel.error('Failed on request [POST /utils/logs/ui]', error);

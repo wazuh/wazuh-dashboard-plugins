@@ -19,8 +19,10 @@ import { ErrorToastOptions } from 'kibana/public';
 export class ErrorOrchestratorBusiness extends ErrorOrchestratorBase {
   public displayError(errorLog: UIErrorLog) {
     const toast = {
+      error: errorLog.error,
       title: errorLog.error.title,
       toastMessage: errorLog.error.message,
+      message: errorLog.error.message,
       toastLifeTimeMs: 3000,
     };
 
