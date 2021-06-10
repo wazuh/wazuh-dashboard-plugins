@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Remove Wazuh name
+ * Wazuh app - Wazuh Constants file for Cypress
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -10,13 +10,9 @@
  * Find more information about this on the LICENSE file.
  */
 
-// Remove Kibana Wazuh name and breadcrumb
-export const changeWazuhNavLogo = () => {
-  const interval = setInterval(() => {
-    const nav = document.querySelector('[data-test-subj="breadcrumbs"]  > .euiBreadcrumb');
-    if (nav) {
-      clearInterval(interval);
-      nav.style.display = 'none';
-    }
-  }, 200);
-};
+export enum WAZUH_MENU_SECURITY_SECTIONS_CY_TEST_ID {
+  USERS = 'menuSecurityUsersLink',
+  ROLES = 'menuSecurityRolesLink',
+  POLICIES = 'menuSecurityPoliciesLink',
+  ROLES_MAPPING = 'menuSecurityRoleMappingLink',
+}
