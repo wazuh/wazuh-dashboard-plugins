@@ -57,10 +57,7 @@ export const ReferencesTable = ({referencesName, referencesArray, tableProps, ba
       }));
       setData(data.flat());  
     }
-    catch (error){
-      setIsLoading(false);
-      return Promise.reject(error);
-    }
+    catch (error){};
     setIsLoading(false);
   }
 
