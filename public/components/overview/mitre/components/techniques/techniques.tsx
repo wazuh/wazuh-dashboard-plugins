@@ -37,7 +37,6 @@ import {WAZUH_ALERTS_PATTERN} from '../../../../../../common/constants';
 import { AppState } from '../../../../../react-services/app-state';
 import { WzFieldSearchDelay } from '../../../../common/search'
 import { getDataPlugin } from '../../../../../kibana-services';
-import { ModuleMitreIntelligence } from '../../../mitre_attack_intelligence'
 
 export const Techniques = withWindowSize(class Techniques extends Component {
   _isMount = false;
