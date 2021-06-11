@@ -19,14 +19,14 @@ import { createDataDirectoryIfNotExists } from './filesystem';
 import { WAZUH_DATA_LOGS_DIRECTORY_PATH } from '../../common/constants';
 
 export interface IUIPlainLoggerSettings {
-    level: string;
-    message: string;
-  }
-  
-  export interface IUILoggerSettings extends IUIPlainLoggerSettings {
-    date: Date;
-    location: string;
-  }
+  level: string;
+  message: string;
+}
+
+export interface IUILoggerSettings extends IUIPlainLoggerSettings {
+  date: Date;
+  location: string;
+}
 
 export class BaseLogger {
   allowed: boolean = false;
@@ -116,8 +116,8 @@ export class BaseLogger {
 
   /**
    * Check if file exist
-   * @param filename 
-   * @returns boolean 
+   * @param filename
+   * @returns boolean
    */
   checkFileExist = (filename) => {
     return fs.existsSync(filename);
@@ -155,7 +155,6 @@ export class BaseLogger {
     }
   };
 
-
   /**
    * Get Current Date
    * @returns string
@@ -171,37 +170,35 @@ export class BaseLogger {
     return `${y}/${m < 10 ? '0' : ''}${m}/${d < 10 ? '0' : ''}${d} ${hour}:${minutes}:${seconds}`;
   };
 
+  /**
+   * Main function to add a new log
+   * @param {*} location File where the log is being thrown
+   * @param {*} message Message to show
+   * @param {*} level Optional, default is 'error'
+   */
 
-
-    /**
-     * Main function to add a new log
-     * @param {*} location File where the log is being thrown
-     * @param {*} message Message to show
-     * @param {*} level Optional, default is 'error'
-     */
-
-    async log(location: string, message: string, level: string) {
+  async log(location: string, message: string, level: string) {
     return this.initDirectory()
       .then(() => {
         if (this.allowed) {
           this.checkFiles();
-  
+
           const plainLogData: IUIPlainLoggerSettings = {
             level: level || 'error',
             message: `${this.yyyymmdd()}: ${location || 'Unknown origin'}: ${
               message || 'An error occurred'
             }`,
           };
-  
+
           this.wazuhPlainLogger.log(plainLogData);
-  
+
           const logData: IUILoggerSettings = {
             date: new Date(),
             level: level || 'error',
             location: location || 'Unknown origin',
             message: message || 'An error occurred',
           };
-  
+
           this.wazuhLogger.log(logData);
         }
       })
@@ -209,6 +206,5 @@ export class BaseLogger {
         console.error(`Cannot create the logs directory due to:\n${error.message || error}`);
         throw error;
       });
-
-    }
+  }
 }

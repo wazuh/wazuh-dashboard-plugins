@@ -20,6 +20,11 @@ export class WzBlankScreen extends Component {
   }
 
   render() {
+    const elasticGuideUrl =
+      'https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html';
+    const wazuhTroubleshootingUrl =
+      'https://documentation.wazuh.com/current/user-manual/kibana-app/troubleshooting.html';
+
     return (
       <EuiPage>
         <EuiPageContent horizontalPosition="center">
@@ -29,14 +34,10 @@ export class WzBlankScreen extends Component {
             action={
               <>
                 <p>
-                  <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html">
-                    Elastic guide
-                  </a>
+                  <a href={elasticGuideUrl}>Elastic guide</a>
                   <br />
                   <br />
-                  <a href="https://documentation.wazuh.com/current/user-manual/kibana-app/troubleshooting.html">
-                    Wazuh installation guide
-                  </a>
+                  <a href={wazuhTroubleshootingUrl}>Wazuh installation guide</a>
                 </p>
                 <EuiHorizontalRule margin="s" />
                 <p> </p>

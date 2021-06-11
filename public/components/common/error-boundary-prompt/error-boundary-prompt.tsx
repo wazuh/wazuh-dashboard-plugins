@@ -14,6 +14,7 @@
 
 import React from 'react';
 import { EuiEmptyPrompt } from '@elastic/eui';
+import './error-boundary-prompt.scss';
 
 export const ErrorComponentPrompt = (props: {
   errorTitle: any;
@@ -35,7 +36,7 @@ export const ErrorComponentPrompt = (props: {
       title={<h2>Something went wrong.</h2>}
       body={
         <div style={props.style || styles.error}>
-          <details style={{ whiteSpace: 'pre-wrap' }}>
+          <details className="wz-error-boundary__details">
             <span>{props.errorTitle && props.errorTitle.toString()}</span>
             <br />
             <span>{props.errorInfo?.componentStack || ''}</span>
