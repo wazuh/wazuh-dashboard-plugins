@@ -24,7 +24,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added version in package downloaded name in agent deploy command [#3210](https://github.com/wazuh/wazuh-kibana-app/issues/3210)
 - Removed restriction to allow only current active agents from vulnerability inventory [#3243](https://github.com/wazuh/wazuh-kibana-app/pull/3243)
 - Health check actions notifications refactored and added debug mode [#3258](https://github.com/wazuh/wazuh-kibana-app/pull/3258)
-- Improved visualizations object configuration readability [#3358](https://github.com/wazuh/wazuh-kibana-app/pull/3358)
+- Improved visualizations object configuration readability [#3355](https://github.com/wazuh/wazuh-kibana-app/pull/3355)
 
 ### Fixed
 
