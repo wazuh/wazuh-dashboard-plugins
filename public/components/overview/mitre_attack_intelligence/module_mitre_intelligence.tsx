@@ -25,12 +25,13 @@ import { WzRequest } from '../../../react-services';
 import { PanelSplit } from '../../../components/common/panels';
 
 export const ModuleMitreIntelligence = () => {
-  const [selectedResource, setSelectedResource] = useState(null);
-  const [searchTermAllResources, setSearchTermAllResources] = useState([]);
+  const [selectedResource, setSelectedResource] = useState(MitreAttackResources[0].id);
+  const [searchTermAllResources, setSearchTermAllResources] = useState('');
   const searchTermAllResourcesLastSearch = useRef('');
   const [resourceFilters, setResourceFilters] = useState([]);
   const searchTermAllResourcesUsed = useRef(false);
   const searchTermAllResourcesAction = useAsyncAction(async (searchTerm) => {
+    selectedResource !== null && setSelectedResource(null);
     searchTermAllResourcesUsed.current = true;
     searchTermAllResourcesLastSearch.current = searchTerm;
     const limitResults = 5;
@@ -56,11 +57,10 @@ export const ModuleMitreIntelligence = () => {
   , [searchTermAllResources]);
   
   const onSelectResource = useCallback((resourceID) => {
-    setSelectedResource(prevSelectedResource => prevSelectedResource === resourceID ? null : resourceID);
-  }, []);
+    setSelectedResource(prevSelectedResource => prevSelectedResource === resourceID && searchTermAllResourcesUsed.current ? null : resourceID);
+  }, [searchTermAllResourcesUsed.current]);
 
   const onSearchTermAllResourcesChange = useCallback((searchTerm) => {
-    setSelectedResource(null);
     setSearchTermAllResources(searchTerm);
   }, []);
 
@@ -76,8 +76,6 @@ export const ModuleMitreIntelligence = () => {
             />}
             sideProps={{style: {width: '15%' , minWidth: 145, overflowX: "hidden"}}}
             content={<ModuleMitreAttackIntelligenceRightPanel
-              didSearch={searchTermAllResourcesUsed.current || searchTermAllResourcesAction.running}
-              searchTerm={searchTermAllResources}
               results={searchTermAllResourcesAction.data}
               loading={searchTermAllResourcesAction.running}
               selectedResource={selectedResource}

@@ -12,12 +12,10 @@ exports[`Module Mitre Att&ck intelligence container should render a the componen
     <PanelSplit
       content={
         <ModuleMitreAttackIntelligenceRightPanel
-          didSearch={false}
           loading={false}
           resourceFilters={Array []}
           results={null}
-          searchTerm={Array []}
-          selectedResource={null}
+          selectedResource="groups"
         />
       }
       contentProps={
@@ -34,7 +32,7 @@ exports[`Module Mitre Att&ck intelligence container should render a the componen
           onSearchTermAllResourcesChange={[Function]}
           onSearchTermAllResourcesSearch={[Function]}
           onSelectResource={[Function]}
-          selectedResource={null}
+          selectedResource="groups"
         />
       }
       sideProps={
