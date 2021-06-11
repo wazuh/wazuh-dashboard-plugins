@@ -21,7 +21,6 @@ import {
   EuiStat,
   EuiLoadingChart,
   EuiSpacer,
-  EuiText,
   EuiEmptyPrompt,
   EuiToolTip
 } from '@elastic/eui';
@@ -40,8 +39,10 @@ import { WzDatePicker } from '../../../components/wz-date-picker/wz-date-picker'
 import { withReduxProvider, withGlobalBreadcrumb, withUserAuthorizationPrompt } from '../../../components/common/hocs';
 import { formatUIDate } from '../../../../public/react-services/time-service';
 import { compose } from 'redux';
+import { withErrorBoundary } from '../../../components/common/hocs'
 
 export const AgentsPreview = compose(
+  withErrorBoundary,
   withReduxProvider,
   withGlobalBreadcrumb([{ text: '' }, { text: 'Agents' }]),
   withUserAuthorizationPrompt([[{action: 'agent:read', resource: 'agent:id:*'},{action: 'agent:read', resource: 'agent:group:*'}]])

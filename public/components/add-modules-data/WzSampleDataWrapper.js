@@ -24,8 +24,9 @@ import {
 } from '@elastic/eui';
 import WzSampleData from './sample-data'
 import WzReduxProvider from '../../redux/wz-redux-provider';
-import { withUserAuthorizationPrompt } from '../../components/common/hocs/withUserAuthorization';
+import { withUserAuthorizationPrompt, withErrorBoundary, withReduxProvider } from '../../components/common/hocs';
 import store from '../../redux/store';
+import { compose } from 'redux';
 import { updateSelectedSettingsSection } from '../../redux/actions/appStateActions';
 import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../common/constants';
 
@@ -73,11 +74,8 @@ export class WzSampleDataProvider extends Component {
   }
 }
 
-const WzSampleDataWrapperWithAdministrator = withUserAuthorizationPrompt(null, [WAZUH_ROLE_ADMINISTRATOR_NAME])(WzSampleDataProvider);
-export function WzSampleDataWrapper() {
-  return (
-  <WzReduxProvider>
-    <WzSampleDataWrapperWithAdministrator />
-  </WzReduxProvider>
-  )
-}
+export const WzSampleDataWrapper = compose(
+  withErrorBoundary,
+  withReduxProvider,
+  withUserAuthorizationPrompt(null, [WAZUH_ROLE_ADMINISTRATOR_NAME])
+)(WzSampleDataProvider);

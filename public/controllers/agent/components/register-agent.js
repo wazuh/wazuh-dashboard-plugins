@@ -14,14 +14,11 @@ import { version } from '../../../../package.json';
 import { WazuhConfig } from '../../../react-services/wazuh-config';
 import {
   EuiSteps,
-  EuiTabs,
   EuiTabbedContent,
   EuiFlexGroup,
   EuiFlexItem,
   EuiPanel,
-  EuiButtonToggle,
   EuiButtonGroup,
-  EuiFormRow,
   EuiComboBox,
   EuiFieldText,
   EuiText,
@@ -38,7 +35,7 @@ import {
   EuiCode
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
-
+import { withErrorBoundary } from '../../../components/common/hocs'
 
 const architectureButtons = [
   {
@@ -114,7 +111,7 @@ const pTextCheckConnectionStyle = {
   marginTop: '3em',
 };
 
-export class RegisterAgent extends Component {
+export const RegisterAgent = withErrorBoundary (class RegisterAgent extends Component {
   constructor(props) {
     super(props);
     this.wazuhConfig = new WazuhConfig();
@@ -703,4 +700,4 @@ export class RegisterAgent extends Component {
       </div>
     );
   }
-}
+})
