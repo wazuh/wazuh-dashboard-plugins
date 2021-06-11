@@ -524,6 +524,7 @@ export class RegisterAgent extends Component {
         children: (
           <EuiButtonGroup
             color="primary"
+            legend="Choose the Operating system"
             options={osButtons}
             idSelected={this.state.selectedOS}
             onChange={(os) => this.selectOS(os)}
@@ -537,6 +538,7 @@ export class RegisterAgent extends Component {
               children: (
                 <EuiButtonGroup
                   color="primary"
+                  legend="Choose the version"
                   options={versionButtonsCentos}
                   idSelected={this.state.selectedVersion}
                   onChange={(version) => this.setVersion(version)}
@@ -552,6 +554,7 @@ export class RegisterAgent extends Component {
               children: (
                 <EuiButtonGroup
                   color="primary"
+                  legend="Choose the architecture"
                   options={this.state.architectureCentos5}
                   idSelected={this.state.selectedArchitecture}
                   onChange={(architecture) => this.setArchitecture(architecture)}
@@ -568,6 +571,7 @@ export class RegisterAgent extends Component {
               children: (
                 <EuiButtonGroup
                   color="primary"
+                  legend="Choose the architecture"
                   options={this.state.architectureButtons}
                   idSelected={this.state.selectedArchitecture}
                   onChange={(architecture) => this.setArchitecture(architecture)}
