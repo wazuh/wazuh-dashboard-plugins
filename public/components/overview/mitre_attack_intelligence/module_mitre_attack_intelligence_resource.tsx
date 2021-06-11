@@ -13,13 +13,13 @@
 
 import React, { useCallback, useState } from 'react';
 import { TableWzAPI } from '../../../components/common/tables';
+import { ModuleMitreAttackIntelligenceFlyout } from './resource_detail_flyout';
 
 export const ModuleMitreAttackIntelligenceResource = ({ label, searchBarSuggestions, apiEndpoint, tableColumns, initialSortingField, resourceFilters }) => {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [details, setDetails] = useState(null);
 
   const rowProps = useCallback((item) => ({
-    // 'data-test-subj': `row-${file}`,
     onClick: () => {
       setDetails(item);
       setIsDetailsOpen(true);
@@ -46,59 +46,13 @@ export const ModuleMitreAttackIntelligenceResource = ({ label, searchBarSuggesti
         mapResponseItem={(item) => ({...item, ['references.external_id']: item?.references?.find(reference => reference.source === 'mitre-attack')?.external_id})}
         filters={resourceFilters}
       />
-      {/* {details && isDetailsOpen && (
-        <EuiOverlayMask
-          headerZindexLocation="below"
-          onClick={closeFlyout} >
-          <EuiFlyout
-            onClose={closeFlyout}
-            size="l"
-            aria-labelledby={``}
-            // maxWidth="70%"
-            // className=""
-          >
-            <EuiFlyoutHeader hasBorder>
-              <EuiTitle size="m">
-                <h2 id="flyoutTitle">Details</h2>
-              </EuiTitle>
-            </EuiFlyoutHeader>
-            <EuiFlyoutBody>
-              <EuiFlexGroup>
-                {detailsProperties.map(detailProperty => (
-                  <EuiFlexItem grow={false} key={`module_mitre_ingelligense_resource_detail_property_${detailProperty.id}`}>
-                    <div><strong>{detailProperty.label}</strong></div>
-                    <EuiText color='subdued'>{details[detailProperty.id]}</EuiText>
-                  </EuiFlexItem>
-                ))}
-              </EuiFlexGroup>
-              <EuiFlexGroup>
-                <EuiFlexItem>
-                  <div><strong>Description</strong></div>
-                  <EuiText color='subdued'>{details.description}</EuiText>
-                </EuiFlexItem>
-              </EuiFlexGroup>
-              <EuiFlexGroup>
-                <EuiFlexItem>
-                  <EuiAccordion
-                    style={{ textDecoration: 'none' }}
-                    id=''
-                    className='events-accordion'
-                    // extraAction={<div style={{ marginBottom: 5 }}><strong>{this.state.totalHits || 0}</strong> hits</div>}
-                    buttonContent='Techniques'
-                    paddingSize='none'
-                    initialIsOpen={true}>
-                      <EuiBasicTable 
-                        items={details.techniques.map(technique => ({technique}))}
-                        columns={[{field: 'technique', name: 'Technique'}]}
-                      />
-                  </EuiAccordion>
-                </EuiFlexItem>
-              </EuiFlexGroup>
-            </EuiFlyoutBody>
-          </EuiFlyout>
-        </EuiOverlayMask>
-      )
-      } */}
+      {details && isDetailsOpen && (
+        <ModuleMitreAttackIntelligenceFlyout
+          details={details}
+          closeFlyout={() => closeFlyout()}
+          tableProps={rowProps}
+        />
+      )}
     </> 
   )
 }

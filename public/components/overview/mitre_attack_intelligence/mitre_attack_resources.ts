@@ -13,6 +13,7 @@
 
 import { WzRequest } from '../../../react-services';
 import { Markdown } from '../../common/util';
+import { formatUIDate } from '../../../react-services';
 
 const getMitreAttackIntelligenceSuggestions = (endpoint: string, field: string) => async (input: string) => {
   try{
@@ -66,7 +67,6 @@ function buildResource(label: string, labelResource: string){
       {
         field: 'references.external_id',
         name: 'ID',
-        // sortable: true,
         width: '12%'
       },
       {
@@ -84,59 +84,41 @@ function buildResource(label: string, labelResource: string){
         ) : '',
         truncateText: true
       }
-    ]
+    ],
+    mitreFlyoutHeaderProperties: [
+      {
+        label: 'ID',
+        id: 'references.external_id',
+      },
+      {
+        label: 'Name',
+        id: 'name'
+      },
+      {
+        label: 'Created Time',
+        id: 'created_time',
+        render: (value) => value ? (
+          formatUIDate(value)
+        ) : ''
+      },
+      {
+        label: 'Modified Time',
+        id: 'modified_time',
+        render: (value) => value ? (
+          formatUIDate(value)
+        ) : ''
+      },
+      {
+        label: 'Version',
+        id: 'mitre_version'
+      },
+    ],
   }
 };
 
 export const MitreAttackResources = [
   buildResource('Groups', 'Group'),
   buildResource('Mitigations', 'Mitigation'),
-  {
-    label: 'References',
-    id: 'references',
-    searchBarSuggestions: [
-      {
-        type: 'q',
-        label: 'type',
-        description: `Reference type`,
-        operators: ['=', '!='],
-        values: ['group', 'mitigation', 'software', 'tactic', 'technique']
-      },
-      {
-        type: 'q',
-        label: 'description',
-        description: `Reference description`,
-        operators: ['~'],
-        values: (input) => input ? [input] : []
-      }
-    ],
-    apiEndpoint: '/mitre/references',
-    fieldName: 'type',
-    initialSortingField: 'type',
-    tableColumns: [
-      {
-        field: 'id',
-        name: 'ID',
-        sortable: true,
-        width: '12%'
-      },
-      {
-        field: 'type',
-        name: 'Type',
-        sortable: true,
-        width: '30%'
-      },
-      {
-        field: 'description',
-        name: 'Description',
-        sortable: true,
-        render: (value) => value ? (
-          Markdown({markdown: value})
-        ) : '',
-        truncateText: true
-      }
-    ]
-  },
   buildResource('Software', 'Software'),
   buildResource('Tactics', 'Tactic'),
   buildResource('Techniques', 'Technique')
