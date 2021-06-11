@@ -47,6 +47,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed error agent view does not render correctly  [#3306](https://github.com/wazuh/wazuh-kibana-app/pull/3306)
 - Fixed miscalculation in table column width in PDF reports  [#3326](https://github.com/wazuh/wazuh-kibana-app/pull/3326)
 - Normalized visData table property for 7.12 retro-compatibility  [#3323](https://github.com/wazuh/wazuh-kibana-app/pull/3323)
+- Fixed error that caused the labels in certain visualizations to overlap [#3355](https://github.com/wazuh/wazuh-kibana-app/pull/3355)
 - Fixed Elastic UI breaking changes in 7.12 [#3345](https://github.com/wazuh/wazuh-kibana-app/pull/3345)
 - Fixed Wazuh main menu and breadcrumb render issues [#3347](https://github.com/wazuh/wazuh-kibana-app/pull/3347)
 
