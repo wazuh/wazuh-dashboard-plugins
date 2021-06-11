@@ -190,6 +190,7 @@ export const Techniques = withWindowSize(class Techniques extends Component {
   }
 
   async getMitreTechniques (params) {
+    this.setState({ isSearching: true })
     return await WzRequest.apiReq("GET", "/mitre/techniques", { params: params })
     .then((res) => res)
     .catch((err) => {
@@ -217,7 +218,7 @@ export const Techniques = withWindowSize(class Techniques extends Component {
         mitreTechniques.push(...tmpData.data.data.affected_items);
       }
     }
-    this.setState({ mitreTechniques: mitreTechniques })
+    this.setState({ mitreTechniques: mitreTechniques, isSearching: false })
   }
 
    buildObjTechniques(techniques){
@@ -253,7 +254,6 @@ export const Techniques = withWindowSize(class Techniques extends Component {
         }
       })
       .filter(technique => this.state.hideAlerts ? technique.quantity !== 0 : true);
-
     const tacticsToRenderOrdered = tacticsToRender.sort((a, b) => b.quantity - a.quantity).map( (item,idx) => {
       const tooltipContent = `View details of ${item.label} (${item.id})`;
       const toolTipAnchorClass = "wz-display-inline-grid" + (this.state.hover=== item.id ? " wz-mitre-width" : " ");
