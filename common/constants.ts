@@ -185,7 +185,7 @@ export enum WAZUH_AGENTS_OS_TYPE{
   OTHERS = ''
 }
 
-export enum WAZUH_MODULES_ID{
+export enum WAZUH_MODULES_ID {
   SECURITY_EVENTS = 'general',
   INTEGRITY_MONITORING = 'fim',
   AMAZON_WEB_SERVICES = 'aws',
@@ -204,7 +204,47 @@ export enum WAZUH_MODULES_ID{
   TSC = 'tsc',
   CIS_CAT = 'ciscat',
   VIRUSTOTAL = 'virustotal',
-  GDPR = 'gdpr'
+  GDPR = 'gdpr',
+}
+
+export enum WAZUH_MENU_MANAGEMENT_SECTIONS_ID {
+  MANAGEMENT = 'management',
+  ADMINISTRATION = 'administration',
+  RULESET = 'ruleset',
+  RULES = 'rules',
+  DECODERS = 'decoders',
+  CDB_LISTS = 'lists',
+  GROUPS = 'groups',
+  CONFIGURATION = 'configuration',
+  STATUS_AND_REPORTS = 'statusReports',
+  STATUS = 'status',
+  CLUSTER = 'monitoring',
+  LOGS = 'logs',
+  REPORTING = 'reporting',
+  STATISTICS = 'statistics',
+}
+
+export enum WAZUH_MENU_TOOLS_SECTIONS_ID {
+  API_CONSOLE = 'devTools',
+  RULESET_TEST = 'logtest',
+}
+
+export enum WAZUH_MENU_SECURITY_SECTIONS_ID {
+  USERS = 'users',
+  ROLES = 'roles',
+  POLICIES = 'policies',
+  ROLES_MAPPING = 'roleMapping',
+}
+
+export enum WAZUH_MENU_SETTINGS_SECTIONS_ID {
+  SETTINGS = 'settings',
+  API_CONFIGURATION = 'api',
+  MODULES = 'modules',
+  SAMPLE_DATA = 'sample_data',
+  CONFIGURATION = 'configuration',
+  LOGS = 'logs',
+  MISCELLANEOUS = 'miscellaneous',
+  ABOUT = 'about',
 }
 
 export const AUTHORIZED_AGENTS = 'authorized-agents';
