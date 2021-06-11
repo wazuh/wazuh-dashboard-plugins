@@ -226,9 +226,14 @@ class KibanaVis extends Component {
               },
               query: {
                 bool: {
-                  should: [{ term: AppState.getClusterInfo().status === 'enabled'
-                  ? {'cluster.name': AppState.getClusterInfo().cluster}
-                  : {'manager.keyword': AppState.getClusterInfo().manager} }],
+                  should: [
+                    {
+                      term:
+                        AppState.getClusterInfo().status === 'enabled'
+                          ? { 'cluster.name': AppState.getClusterInfo().cluster }
+                          : { 'manager.keyword': AppState.getClusterInfo().manager },
+                    },
+                  ],
                 },
               },
               $state: {
@@ -381,7 +386,7 @@ class KibanaVis extends Component {
   };
 
   render() {
-    const height = this.props.resultState === 'loading' ? 0 : '100%';
+    const isLoading = this.props.resultState === 'loading';
     return (
       this.visID && (
         <span>
@@ -404,10 +409,7 @@ class KibanaVis extends Component {
           </div>
           <div
             style={{
-              display:
-                this.props.resultState === 'loading' && !this.state.visRefreshingIndex
-                  ? 'block'
-                  : 'none',
+              display: isLoading && !this.state.visRefreshingIndex ? 'block' : 'none',
               textAlign: 'center',
               paddingTop: 100,
             }}
@@ -417,11 +419,7 @@ class KibanaVis extends Component {
           <div
             style={{
               display:
-                this.deadField &&
-                this.props.resultState !== 'loading' &&
-                !this.state.visRefreshingIndex
-                  ? 'block'
-                  : 'none',
+                this.deadField && !isLoading && !this.state.visRefreshingIndex ? 'block' : 'none',
               textAlign: 'center',
               paddingTop: 100,
             }}
@@ -438,7 +436,11 @@ class KibanaVis extends Component {
               <EuiIcon type="iInCircle" />
             </EuiToolTip>
           </div>
-          <div id={this.visID} vis-id={this.visID} style={{ height }}></div>
+          <div
+            id={this.visID}
+            vis-id={this.visID}
+            style={{ display: isLoading ? 'none' : 'block', height: '100%' }}
+          ></div>
         </span>
       )
     );
