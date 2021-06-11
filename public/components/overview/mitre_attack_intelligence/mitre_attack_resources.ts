@@ -13,6 +13,7 @@
 
 import { WzRequest } from '../../../react-services';
 import { Markdown } from '../../common/util';
+import { formatUIDate } from '../../../react-services';
 
 const getMitreAttackIntelligenceSuggestions = (endpoint: string, field: string) => async (input: string) => {
   try{
@@ -67,7 +68,6 @@ function buildResource(label: string, labelResource: string){
       {
         field: 'references.external_id',
         name: 'ID',
-        // sortable: true,
         width: '12%'
       },
       {
@@ -85,7 +85,35 @@ function buildResource(label: string, labelResource: string){
         ) : '',
         truncateText: true
       }
-    ]
+    ],
+    mitreFlyoutHeaderProperties: [
+      {
+        label: 'ID',
+        id: 'references.external_id',
+      },
+      {
+        label: 'Name',
+        id: 'name'
+      },
+      {
+        label: 'Created Time',
+        id: 'created_time',
+        render: (value) => value ? (
+          formatUIDate(value)
+        ) : ''
+      },
+      {
+        label: 'Modified Time',
+        id: 'modified_time',
+        render: (value) => value ? (
+          formatUIDate(value)
+        ) : ''
+      },
+      {
+        label: 'Version',
+        id: 'mitre_version'
+      },
+    ],
   }
 };
 
