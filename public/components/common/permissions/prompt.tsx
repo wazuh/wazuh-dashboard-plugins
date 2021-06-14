@@ -16,6 +16,7 @@ import { useUserRolesRequirements } from '../hooks/useUserRoles';
 import { EuiEmptyPrompt, EuiSpacer, EuiPanel } from '@elastic/eui';
 import { TUserPermissions, TUserPermissionsFunction, TUserRoles, TUserRolesFunction } from '../permissions/button';
 import { WzPermissionsFormatted } from './format';
+import { withErrorBoundary } from '../hocs';
 
 interface IEmptyPromptNoPermissions{
   permissions?: TUserPermissions
@@ -23,8 +24,8 @@ interface IEmptyPromptNoPermissions{
   actions?: React.ReactNode
 }
 
-export const WzEmptyPromptNoPermissions = ({permissions, roles, actions}: IEmptyPromptNoPermissions) => {
-  const prompt = (<EuiEmptyPrompt
+export const WzEmptyPromptNoPermissions = withErrorBoundary (({permissions, roles, actions}: IEmptyPromptNoPermissions) => {
+  return <EuiEmptyPrompt
     iconType="securityApp"
     title={<h2>You have no permissions</h2>}
     body={
@@ -44,12 +45,8 @@ export const WzEmptyPromptNoPermissions = ({permissions, roles, actions}: IEmpty
       </Fragment>
     }
     actions={actions}
-  />)
-  return (
-  // <EuiPanel>{prompt}</EuiPanel>
-  prompt
-  )
-}
+  />
+});
 
 interface IPromptNoPermissions{
   permissions?: TUserPermissions | TUserPermissionsFunction

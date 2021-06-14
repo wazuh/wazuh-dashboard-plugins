@@ -31,8 +31,9 @@ import { updateCurrentTab } from '../../../redux/actions/appStateActions';
 import store from '../../../redux/store';
 import './welcome.scss';
 import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
+import { withErrorBoundary } from '../hocs';
 
-export class OverviewWelcome extends Component {
+export const OverviewWelcome = withErrorBoundary (class OverviewWelcome extends Component {
   constructor(props) {
     super(props);
     this.strtools = new StringsTools();
@@ -186,4 +187,4 @@ export class OverviewWelcome extends Component {
       </Fragment>
     );
   }
-}
+})

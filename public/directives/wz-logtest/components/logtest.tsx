@@ -27,7 +27,7 @@ import {
   EuiTitle,
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services';
-import { withReduxProvider, withUserAuthorizationPrompt } from '../../../components/common/hocs';
+import { withErrorBoundary, withReduxProvider, withUserAuthorizationPrompt } from '../../../components/common/hocs';
 import { compose } from 'redux';
 
 type LogstestProps = {
@@ -38,6 +38,7 @@ type LogstestProps = {
 };
 
 export const Logtest = compose(
+  withErrorBoundary,
   withReduxProvider,
   withUserAuthorizationPrompt([{ action: 'logtest:run', resource: `*:*:*` }])
 )((props: LogstestProps) => {

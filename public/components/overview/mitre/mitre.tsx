@@ -31,7 +31,6 @@ export interface ITactic {
   [key:string]: string[]
 }
 
-
 export const Mitre = withErrorBoundary (class Mitre extends Component {
   _isMount = false;
   timefilter: {

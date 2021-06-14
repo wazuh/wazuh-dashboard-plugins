@@ -13,8 +13,9 @@ import { WAZUH_ERROR_DAEMONS_NOT_READY, WAZUH_INDEX_TYPE_STATISTICS, WAZUH_INDEX
 import { checkKibanaSettings, checkKibanaSettingsTimeFilter, checkKibanaSettingsMaxBuckets } from './lib';
 import store from '../../redux/store';
 import { updateWazuhNotReadyYet } from '../../redux/actions/appStateActions.js';
+import { withErrorBoundary } from '../common/hocs';
 
-export class HealthCheck extends Component {
+export const HealthCheck = withErrorBoundary (class HealthCheck extends Component {
   checkPatternCount = 0;
   constructor(props) {
     super(props);
@@ -502,4 +503,4 @@ export class HealthCheck extends Component {
       </div >
     );
   }
-};
+});
