@@ -21,7 +21,7 @@ import {
   EuiText
 } from '@elastic/eui';
 
-import { withGlobalBreadcrumb, withReduxProvider, withGuard, withUserAuthorizationPrompt } from '../../common/hocs';
+import { withGlobalBreadcrumb, withReduxProvider, withGuard, withUserAuthorizationPrompt, withErrorBoundary } from '../../common/hocs';
 import { compose } from 'redux';
 import { WzRequest, formatUIDate } from '../../../react-services';
 import { AgentStatTable } from './table';
@@ -80,6 +80,7 @@ const statsAgents: {title: string, field: string, render?: (value) => any}[] = [
 ];
 
 export const MainAgentStats = compose(
+  withErrorBoundary,
   withReduxProvider,
   withGlobalBreadcrumb(({agent}) => [
     {

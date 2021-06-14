@@ -13,8 +13,9 @@ import React, { Component } from 'react';
 import { EuiComboBox } from '@elastic/eui';
 import PropTypes from 'prop-types';
 import './wz-filter-bar.scss';
+import { withErrorBoundary } from '../common/hocs';
 
-export class WzFilterBar extends Component {
+export const WzFilterBar = withErrorBoundary (class WzFilterBar extends Component {
   constructor(props) {
     super(props);
     const { model, selectedOptions } = this.props;
@@ -295,7 +296,7 @@ export class WzFilterBar extends Component {
       />
     );
   }
-}
+});
 
 WzFilterBar.propTypes = {
   clickAction: PropTypes.func,

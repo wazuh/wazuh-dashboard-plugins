@@ -22,8 +22,9 @@ import {
 import PropTypes from 'prop-types';
 import { UnsupportedComponents } from '../../../utils/components-os-support';
 import { WAZUH_AGENTS_OS_TYPE } from '../../../../common/constants';
+import { withErrorBoundary } from '../../../components/common/hocs';
 
-export class ExportConfiguration extends Component {
+export const ExportConfiguration = withErrorBoundary (class ExportConfiguration extends Component {
   constructor(props) {
     super(props);
 
@@ -163,7 +164,7 @@ export class ExportConfiguration extends Component {
       </EuiPopover>
     );
   }
-}
+});
 
 ExportConfiguration.propTypes = {
   exportConfiguration: PropTypes.func,

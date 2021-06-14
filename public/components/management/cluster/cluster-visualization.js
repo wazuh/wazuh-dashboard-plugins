@@ -3,10 +3,10 @@ import KibanaVis from '../../../kibana-integrations/kibana-vis';
 import { withErrorBoundary, withReduxProvider } from '../../../components/common/hocs';
 import {compose} from 'redux'
 
-function KibanaVisClass() {
+function KibanaVisClass(props) {
   return (
     <div style={{ height: '100%' }}>
-      <KibanaVis visID={this.props.visId} tab={this.props.tab}></KibanaVis>
+      <KibanaVis visID={props.visId} tab={props.tab}></KibanaVis>
     </div>
   );
 }

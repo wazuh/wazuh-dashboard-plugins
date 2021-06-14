@@ -10,16 +10,12 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { Component } from 'react';
-import { SyscollectorInventory } from './inventory'
+import React from 'react';
+import { withErrorBoundary } from '../../common/hocs';
+import { SyscollectorInventory } from './inventory';
 
-export class MainSyscollector extends Component {
-
-  constructor(props) {
-    super(props);
-  }
-
-  render() {
-    return (<SyscollectorInventory agent={this.props.agent}></SyscollectorInventory> )
-  }
+function MainSyscollectorClass(props) {
+  return <SyscollectorInventory agent={props.agent}></SyscollectorInventory>;
 }
+
+export const MainSyscollector = withErrorBoundary (MainSyscollectorClass);

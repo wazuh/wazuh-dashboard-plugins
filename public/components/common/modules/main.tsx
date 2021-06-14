@@ -27,9 +27,10 @@ import { getAngularModule, getDataPlugin, getUiSettings } from '../../../kibana-
 import { MainModuleAgent } from './main-agent'
 import { MainModuleOverview } from './main-overview';
 import store from '../../../redux/store';
-import WzReduxProvider from '../../../redux/wz-redux-provider.js';
+import { compose } from 'redux';
+import { withReduxProvider,withErrorBoundary } from '../hocs';
 
-export class MainModule extends Component {
+export const MainModule = compose (withErrorBoundary,withReduxProvider) (class MainModule extends Component {
   constructor(props) {
     super(props);
     this.reportingService = new ReportingService();
@@ -211,13 +212,13 @@ export class MainModule extends Component {
       onSelectedTabChanged: (id) => this.onSelectedTabChanged(id)
     }
     return (
-      <WzReduxProvider>
+      <>
         {agent &&
           <MainModuleAgent {...{ ...this.props, ...mainProps }}></MainModuleAgent>
           || ((this.props.section && this.props.section !== 'welcome') &&
             <MainModuleOverview {...{ ...this.props, ...mainProps }}></MainModuleOverview>)
         }
-      </WzReduxProvider>
+      </>
     );
   }
-}
+})
