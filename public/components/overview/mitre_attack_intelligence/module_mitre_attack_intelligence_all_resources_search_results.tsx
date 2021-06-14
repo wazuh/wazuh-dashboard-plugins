@@ -28,7 +28,7 @@ const LoadingProgress = () => (
   <EuiProgress color='primary' size='s'/>
 );
 
-export const ModuleMitreAttackIntelligenceAllResourcesSearchResults = withGuard(({loading}) => loading, LoadingProgress)(({ results, setResourceFilters, rowProps }) => {
+export const ModuleMitreAttackIntelligenceAllResourcesSearchResults = withGuard(({loading}) => loading, LoadingProgress)(({ results, rowProps }) => {
   const thereAreResults = results && results.length > 0;
   return thereAreResults
   ? results.map(item => (

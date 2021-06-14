@@ -18,7 +18,6 @@ import { ModuleMitreAttackIntelligenceFlyout } from './resource_detail_flyout';
 
 
 export const ModuleMitreAttackIntelligenceResource = ({ label, searchBarSuggestions, apiEndpoint, tableColumns, initialSortingField, resourceFilters }) => {
-
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [details, setDetails] = useState(null);
 
@@ -51,7 +50,6 @@ export const ModuleMitreAttackIntelligenceResource = ({ label, searchBarSuggesti
   };
 
   const rowProps = useCallback((item) => ({
-    // 'data-test-subj': `row-${file}`,
     onClick: () => {
       setDetails(item);
       setIsDetailsOpen(true);
@@ -80,9 +78,9 @@ export const ModuleMitreAttackIntelligenceResource = ({ label, searchBarSuggesti
       />
       {details && isDetailsOpen && (
         <ModuleMitreAttackIntelligenceFlyout
-        details={details}
-        closeFlyout={() => closeFlyout()}
-        tableProps={rowProps}
+          details={details}
+          closeFlyout={() => closeFlyout()}
+          tableProps={rowProps}
         />
       )}
     </> 
