@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Module to export all the controllers
+ * Wazuh app - Module for ui logging functions
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -9,8 +9,10 @@
  *
  * Find more information about this on the LICENSE file.
  */
-export { WazuhElasticCtrl } from './wazuh-elastic';
-export { WazuhApiCtrl } from './wazuh-api';
-export { WazuhReportingCtrl } from './wazuh-reporting';
-export { WazuhHostsCtrl } from './wazuh-hosts';
-export * from './wazuh-utils';
+import { BaseLogger } from './base-logger';
+import {
+  WAZUH_UI_LOGS_PLAIN_FILENAME,
+  WAZUH_UI_LOGS_RAW_FILENAME
+} from '../../common/constants';
+
+export default new BaseLogger(WAZUH_UI_LOGS_PLAIN_FILENAME,WAZUH_UI_LOGS_RAW_FILENAME);

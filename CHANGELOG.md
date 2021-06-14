@@ -4,10 +4,18 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ## Wazuh v4.3.0 - Kibana 7.10.2 , 7.11.2 - Revision 4301
 
+### Added
+
+- Added new endpoint service to collect the frontend logs into a file [#3324](https://github.com/wazuh/wazuh-kibana-app/pull/3324)
+
 ### Changed
 
 - Changed ossec to wazuh in sample-data [#3121](https://github.com/wazuh/wazuh-kibana-app/pull/3121)
 - Changed empty fields in FIM tables and `syscheck.value_name` in discovery now show an empty tag for visual clarity [#3279](https://github.com/wazuh/wazuh-kibana-app/pull/3279)
+
+### Added 
+- Added new error handler to be responsible for the error orchestration [#3327](https://github.com/wazuh/wazuh-kibana-app/pull/3327)
+- Added `Error Boundary` HOC and Component to handle render errors. [#3321](https://github.com/wazuh/wazuh-kibana-app/pull/3321)
 
 ## Wazuh v4.2.0 - Kibana 7.10.2 , 7.11.2 - Revision 4201
 
