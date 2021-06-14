@@ -13,7 +13,7 @@ import { UiLogsCtrl } from '../../controllers';
 import { IRouter } from 'kibana/server';
 import { schema } from '@kbn/config-schema';
 
-export function UiLogsRoutes(router: IRouter) {
+export const UiLogsRoutes = (router: IRouter) => {
   const ctrl = new UiLogsCtrl();
   router.get(
     {
@@ -36,4 +36,4 @@ export function UiLogsRoutes(router: IRouter) {
     },
     async (context, request, response) => await ctrl.createUiLogs(request, response)
   );
-}
+};

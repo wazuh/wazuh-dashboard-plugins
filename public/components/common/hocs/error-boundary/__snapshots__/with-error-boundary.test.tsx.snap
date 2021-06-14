@@ -1,9 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`withErrorBoundary hoc implementation renders correctly and check snapshot 1`] = `
+exports[`withErrorBoundary hoc implementation renders correctly to match the snapshot 1`] = `
 <Component>
   <ErrorBoundary>
-    <HandleError
+    <ErrorComponentPrompt
       errorInfo={
         Object {
           "componentStack": "
@@ -14,25 +14,42 @@ exports[`withErrorBoundary hoc implementation renders correctly and check snapsh
     in WrapperComponent",
         }
       }
-      errorTitle={[Error: I crashed!]}
+      errorTitle={[Error: I crashed! I crash very hard]}
       style={null}
     >
       <EuiEmptyPrompt
+        actions={null}
         body={
-          <ErrorComponent
-            errorInfo={
+          <div
+            style={
               Object {
-                "componentStack": "
+                "borderBottom": "1px solid #777",
+                "borderTop": "1px solid #777",
+                "padding": "12px",
+              }
+            }
+          >
+            <details
+              style={
+                Object {
+                  "whiteSpace": "pre-wrap",
+                }
+              }
+            >
+              <span>
+                Error: I crashed! I crash very hard
+              </span>
+              <br />
+              <span>
+                
     in ComponentWithError
     in Unknown
     in ErrorBoundary
     in Unknown (created by WrapperComponent)
-    in WrapperComponent",
-              }
-            }
-            errorTitle={[Error: I crashed!]}
-            style={null}
-          />
+    in WrapperComponent
+              </span>
+            </details>
+          </div>
         }
         iconType="faceSad"
         title={
@@ -102,54 +119,43 @@ exports[`withErrorBoundary hoc implementation renders correctly and check snapsh
                 <div
                   className="euiText euiText--medium"
                 >
-                  <ErrorComponent
-                    errorInfo={
+                  <div
+                    style={
                       Object {
-                        "componentStack": "
-    in ComponentWithError
-    in Unknown
-    in ErrorBoundary
-    in Unknown (created by WrapperComponent)
-    in WrapperComponent",
+                        "borderBottom": "1px solid #777",
+                        "borderTop": "1px solid #777",
+                        "padding": "12px",
                       }
                     }
-                    errorTitle={[Error: I crashed!]}
-                    style={null}
                   >
-                    <div
+                    <details
                       style={
                         Object {
-                          "borderBottom": "1px solid #777",
-                          "borderTop": "1px solid #777",
-                          "padding": "12px",
+                          "whiteSpace": "pre-wrap",
                         }
                       }
                     >
-                      <details
-                        style={
-                          Object {
-                            "whiteSpace": "pre-wrap",
-                          }
-                        }
-                      >
-                        Error: I crashed!
-                        <br />
+                      <span>
+                        Error: I crashed! I crash very hard
+                      </span>
+                      <br />
+                      <span>
                         
     in ComponentWithError
     in Unknown
     in ErrorBoundary
     in Unknown (created by WrapperComponent)
     in WrapperComponent
-                      </details>
-                    </div>
-                  </ErrorComponent>
+                      </span>
+                    </details>
+                  </div>
                 </div>
               </EuiText>
             </span>
           </EuiTextColor>
         </div>
       </EuiEmptyPrompt>
-    </HandleError>
+    </ErrorComponentPrompt>
   </ErrorBoundary>
 </Component>
 `;
