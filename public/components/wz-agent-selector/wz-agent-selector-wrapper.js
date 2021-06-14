@@ -11,7 +11,6 @@
  * Find more information about this on the LICENSE file.
  *
  */
-import React from 'react';
 import WzAgentSelector from './wz-agent-selector';
 import { compose } from 'redux';
 import { withErrorBoundary, withReduxProvider } from '../common/hocs';

@@ -62,9 +62,7 @@ export class WzSampleDataProvider extends Component {
           <EuiSpacer size='xl'/>
           <EuiFlexGroup>
             <EuiFlexItem>
-              <WzReduxProvider>
-                <WzSampleData {...this.props} />  
-              </WzReduxProvider>
+              <WzSampleData {...this.props} />  
             </EuiFlexItem>
           </EuiFlexGroup>
         </EuiPageBody>

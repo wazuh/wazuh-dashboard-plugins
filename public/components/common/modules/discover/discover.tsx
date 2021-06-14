@@ -21,7 +21,7 @@ import { WazuhConfig } from '../../../../react-services/wazuh-config';
 import { formatUIDate } from '../../../../react-services/time-service';
 import { KbnSearchBar } from '../../../kbn-search-bar';
 import { FlyoutTechnique } from '../../../../components/overview/mitre/components/techniques/components/flyout-technique';
-import { withReduxProvider } from '../../../common/hocs';
+import { withErrorBoundary, withReduxProvider } from '../../../common/hocs';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 import _ from 'lodash';
@@ -57,6 +57,7 @@ const mapStateToProps = state => ({
 });
  
 export const Discover = compose(
+ withErrorBoundary,
  withReduxProvider,
  connect(mapStateToProps)
 )(class Discover extends Component {
