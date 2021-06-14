@@ -556,6 +556,7 @@ export default [
           showMeticsAtAllLevels: false,
           sort: { columnIndex: 3, direction: 'desc' },
           showTotal: false,
+          showToolbar: true,
           totalFunc: 'sum',
         },
         aggs: [

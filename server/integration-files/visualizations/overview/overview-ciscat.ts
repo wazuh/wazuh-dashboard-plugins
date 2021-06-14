@@ -24,6 +24,7 @@ export default [
           showMeticsAtAllLevels: false,
           sort: { columnIndex: 4, direction: 'desc' },
           showTotal: false,
+          showToolbar: true,
           totalFunc: 'count',
         },
         aggs: [
@@ -109,6 +110,7 @@ export default [
           showMeticsAtAllLevels: false,
           sort: { columnIndex: null, direction: null },
           showTotal: false,
+          showToolbar: true,
           totalFunc: 'sum',
         },
         aggs: [
@@ -159,6 +161,7 @@ export default [
           showMeticsAtAllLevels: false,
           sort: { columnIndex: null, direction: null },
           showTotal: false,
+          showToolbar: true,
           totalFunc: 'sum',
         },
         aggs: [
@@ -209,6 +212,7 @@ export default [
           showMeticsAtAllLevels: false,
           sort: { columnIndex: null, direction: null },
           showTotal: false,
+          showToolbar: true,
           totalFunc: 'sum',
         },
         aggs: [
@@ -259,6 +263,7 @@ export default [
           showMeticsAtAllLevels: false,
           sort: { columnIndex: null, direction: null },
           showTotal: false,
+          showToolbar: true,
           totalFunc: 'sum',
         },
         aggs: [
@@ -309,6 +314,7 @@ export default [
           showMeticsAtAllLevels: false,
           sort: { columnIndex: null, direction: null },
           showTotal: false,
+          showToolbar: true,
           totalFunc: 'sum',
         },
         aggs: [
@@ -359,6 +365,7 @@ export default [
           showMeticsAtAllLevels: false,
           sort: { columnIndex: null, direction: null },
           showTotal: false,
+          showToolbar: true,
           totalFunc: 'sum',
         },
         aggs: [
@@ -409,6 +416,7 @@ export default [
           showMeticsAtAllLevels: false,
           sort: { columnIndex: null, direction: null },
           showTotal: false,
+          showToolbar: true,
           totalFunc: 'sum',
         },
         aggs: [
@@ -459,6 +467,7 @@ export default [
           showMeticsAtAllLevels: false,
           sort: { columnIndex: null, direction: null },
           showTotal: false,
+          showToolbar: true,
           totalFunc: 'sum',
         },
         aggs: [

@@ -263,6 +263,7 @@ export default [
           showMetricsAtAllLevels: false,
           sort: { columnIndex: 3, direction: 'desc' },
           showTotal: false,
+          showToolbar: true,
           totalFunc: 'sum',
           dimensions: {
             metrics: [{ accessor: 3, format: { id: 'number' }, params: {}, aggType: 'count' }],

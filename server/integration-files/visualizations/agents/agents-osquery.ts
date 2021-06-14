@@ -24,6 +24,7 @@ export default [
           showMetricsAtAllLevels: false,
           sort: { columnIndex: 2, direction: 'desc' },
           showTotal: false,
+          showToolbar: true,
           totalFunc: 'sum',
         },
         aggs: [
@@ -597,6 +598,7 @@ export default [
           showMetricsAtAllLevels: false,
           sort: { columnIndex: 5, direction: 'desc' },
           showTotal: false,
+          showToolbar: true,
           totalFunc: 'sum',
         },
         aggs: [
