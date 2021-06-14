@@ -29,13 +29,13 @@ import {
   EuiLoadingSpinner,
 } from '@elastic/eui';
 import { FlyoutTechnique } from './components/flyout-technique/';
-import { getElasticAlerts, IFilterParams } from '../../lib'
+import { getElasticAlerts, IFilterParams } from '../../lib';
 import { ITactic } from '../../';
 import { withWindowSize } from '../../../../../components/common/hocs/withWindowSize';
 import { WzRequest } from '../../../../../react-services/wz-request';
 import {WAZUH_ALERTS_PATTERN} from '../../../../../../common/constants';
 import { AppState } from '../../../../../react-services/app-state';
-import { WzFieldSearchDelay } from '../../../../common/search'
+import { WzFieldSearchDelay } from '../../../../common/search';
 import { getDataPlugin, getToasts } from '../../../../../kibana-services';
 
 export const Techniques = withWindowSize(class Techniques extends Component {
@@ -79,7 +79,7 @@ export const Techniques = withWindowSize(class Techniques extends Component {
   
   async componentDidMount(){
     this._isMount = true;
-    this.buildMitreTechniquesFromApi()
+    await this.buildMitreTechniquesFromApi()
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -209,9 +209,9 @@ export const Techniques = withWindowSize(class Techniques extends Component {
     const output = await this.getMitreTechniques(params)
     const totalItems = (((output || {}).data || {}).data || {}).total_affected_items;
     let mitreTechniques = [];
+    mitreTechniques.push(...output.data.data.affected_items);
     if (totalItems && output.data && output.data.data && totalItems > 500) {
       params.offset = 0;
-      mitreTechniques.push(...output.data.data.affected_items);
       while (mitreTechniques.length < totalItems && params.offset < totalItems) {
         params.offset += params.limit;
         const tmpData = await this.getMitreTechniques(params)
@@ -224,10 +224,10 @@ export const Techniques = withWindowSize(class Techniques extends Component {
    buildObjTechniques(techniques){
     const techniquesObj = []
     techniques.forEach(element => {
-      const mitreObj = this.state.mitreTechniques.filter(item => item.id === element);
-      if(mitreObj.length != 0){
-        const mitreTechniqueName =  mitreObj[0].name;
-        const mitreTechniqueID = mitreObj[0].references.filter(item => item.source === "mitre-attack")[0].external_id;
+      const mitreObj = this.state.mitreTechniques.find(item => item.id === element);
+      if(mitreObj){
+        const mitreTechniqueName =  mitreObj.name;
+        const mitreTechniqueID = mitreObj.references.find(item => item.source === "mitre-attack").external_id;
         mitreTechniqueID ? techniquesObj.push({ id : mitreTechniqueID, name: mitreTechniqueName}) : '';
       }
     });

@@ -385,7 +385,7 @@ class WzRuleInfo extends Component {
         });
         return tacticsObj;
     }catch(error){
-      return []
+      return [];
     }
   }
 

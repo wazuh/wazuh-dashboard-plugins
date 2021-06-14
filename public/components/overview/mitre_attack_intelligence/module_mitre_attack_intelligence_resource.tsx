@@ -25,31 +25,33 @@ export const ModuleMitreAttackIntelligenceResource = ({ label, searchBarSuggesti
   useEffect(() => {
     const urlParams = new URLSearchParams(location.href);
     const redirectTab = urlParams.get('tabRedirect');
-    const idToRedirect = urlParams.get("idToRedirect")
+    const idToRedirect = urlParams.get("idToRedirect");
     if(redirectTab && idToRedirect){
       const endpoint = `/mitre/${redirectTab}?q=references.external_id=${idToRedirect}`;
-      getMitreItemToRedirect(endpoint)
-      urlParams.delete('tabRedirect')
-      urlParams.delete('idToRedirect')
+      getMitreItemToRedirect(endpoint);
+      urlParams.delete('tabRedirect');
+      urlParams.delete('idToRedirect');
       window.history.pushState({},document.title,'#/overview/?tab=mitre')
     }
   },[]);
 
 
-  const getMitreItemToRedirect = (endpoint) => {
-       WzRequest.apiReq('GET', endpoint, {}).then(res => {
-        const data = res?.data?.data.affected_items
-        .map(item => ({
-          ...item,
-          ['references.external_id']: item?.references?.find(reference => reference.source === 'mitre-attack')?.external_id
-        }))
-        setIsDetailsOpen(true)
-        setDetails(data[0])
-      }).catch(err => {
-         {}
-      });
+  const getMitreItemToRedirect = async (endpoint) => {
+    try {
+      const res = await WzRequest.apiReq("GET", endpoint, {});
+      const data = res?.data?.data.affected_items.map((item) => ({
+        ...item,
+        ["references.external_id"]: item?.references?.find(
+          (reference) => reference.source === "mitre-attack"
+        )?.external_id,
+      }));
+      setIsDetailsOpen(true);
+      setDetails(data[0]); 
+    } catch {
+      return {};
+    }
   };
-
+  
   const rowProps = useCallback((item) => ({
     // 'data-test-subj': `row-${file}`,
     onClick: () => {

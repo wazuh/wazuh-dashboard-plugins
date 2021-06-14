@@ -133,18 +133,16 @@ export class FlyoutTechnique extends Component {
 
   findTacticName(tactics){
     const { tacticsObject } = this.props;
-    const getTactic = (element) => {
+    return tactics.map((element) => {
       const tactic = Object.values(tacticsObject).find(obj => obj.id === element);
       return { id:tactic.references[0].external_id, name: tactic.name};
-    };
-    return tactics.reduce((tacticsObj, element) => [...tacticsObj, getTactic(element)], []);
+    });
   }
 
   formatTechniqueData (rawData) {
     const { tactics, name, mitre_version } = rawData;
     const tacticsObj = this.findTacticName(tactics)
-
-    this.setState({techniqueData: { name, mitre_version, tacticsObj }, loading: false  })
+    this.setState({techniqueData: { name, mitre_version, tacticsObj }, loading: false  });
   }
   
   renderHeader() {
