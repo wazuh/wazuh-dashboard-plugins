@@ -17,28 +17,23 @@ import { ModuleMitreAttackIntelligenceAllResources } from './module_mitre_attack
 import { ModuleMitreAttackIntelligenceResource } from './module_mitre_attack_intelligence_resource';
 
 export const ModuleMitreAttackIntelligenceRightPanel = ({
-  didSearch,
   loading,
   results,
-  searchTerm,
+  resourceFilters,
   selectedResource,
-  resourceFilters
 }) => {
   return (
     <>
       {!selectedResource && (
         <ModuleMitreAttackIntelligenceAllResources 
-          didSearch={didSearch}
-          searchTerm={searchTerm}
-          results={results}
           loading={loading}
+          results={results}
         />
       )}
       {MitreAttackResources.map(resource => resource.id === selectedResource
         ? <ModuleMitreAttackIntelligenceResource
             key={`module_mitre_intelligense_resource_${resource.id}`}
             {...resource}
-            selectedResource={selectedResource}
             resourceFilters={resourceFilters}
           />
         : null

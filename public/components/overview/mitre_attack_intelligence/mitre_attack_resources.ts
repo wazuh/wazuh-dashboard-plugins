@@ -21,7 +21,7 @@ const getMitreAttackIntelligenceSuggestions = (endpoint: string, field: string) 
     return response?.data?.data.affected_items
       .map(item => ({
         ...item,
-        ['references.external_id']: item.references.find(reference => reference.source === 'mitre-attack')?.external_id
+        ['references.external_id']: item?.references?.find(reference => reference.source === 'mitre-attack')?.external_id
       }))
       .map(item => item[field])
       .filter(item => item && item.toLowerCase().includes(input.toLowerCase()))
@@ -38,12 +38,13 @@ function buildResource(label: string, labelResource: string){
   return {
     label: label,
     id,
-    searchBarSuggestions: [{
+    searchBarSuggestions: [
+      {
         type: 'q',
-        label: 'references.external_id',
-        description: `${labelResource} ID`,
-        operators: ['=', '!='],
-        values: getMitreAttackIntelligenceSuggestions(endpoint, 'references.external_id')
+        label: 'description',
+        description: `${labelResource} description`,
+        operators: ['~'],
+        values: (input) => input ? [input] : []
       },
       {
         type: 'q',
@@ -54,19 +55,19 @@ function buildResource(label: string, labelResource: string){
       },
       {
         type: 'q',
-        label: 'description',
-        description: `${labelResource} description`,
-        operators: ['~'],
-        values: (input) => input ? [input] : []
+        label: 'references.external_id',
+        description: `${labelResource} ID`,
+        operators: ['=', '!='],
+        values: getMitreAttackIntelligenceSuggestions(endpoint, 'references.external_id')
       }
     ],
     apiEndpoint: endpoint,
     fieldName: 'name',
+    initialSortingField: 'name',
     tableColumns: [
       {
         field: 'references.external_id',
         name: 'ID',
-        // sortable: true,
         width: '12%'
       },
       {

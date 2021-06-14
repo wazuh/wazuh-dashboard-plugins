@@ -16,12 +16,10 @@ import {
   EuiTitle,
   EuiSpacer
 } from '@elastic/eui';
-import { withGuard } from'../../../components/common/hocs';
-import { ModuleMitreAttackIntelligenceAllResourcesWelcome } from './module_mitre_attack_intelligence_all_resources_welcome';
 import { ModuleMitreAttackIntelligenceAllResourcesSearchResults } from './module_mitre_attack_intelligence_all_resources_search_results';
 import { ModuleMitreAttackIntelligenceFlyout } from './resource_detail_flyout';
 
-export const ModuleMitreAttackIntelligenceAllResources = withGuard(({didSearch}) => !didSearch, ModuleMitreAttackIntelligenceAllResourcesWelcome)(({ results, loading }) => {
+export const ModuleMitreAttackIntelligenceAllResources = ({ results, loading }) => {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [details, setDetails] = useState(null);
 
@@ -52,11 +50,11 @@ export const ModuleMitreAttackIntelligenceAllResources = withGuard(({didSearch})
 
       {details && isDetailsOpen && (
         <ModuleMitreAttackIntelligenceFlyout
-        details={details}
-        closeFlyout={() => closeFlyout()}
-        tableProps={rowPropsFlyout}
+          details={details}
+          closeFlyout={() => closeFlyout()}
+          tableProps={rowPropsFlyout}
         />
       )}
     </>
   )
-});
+};
