@@ -12,22 +12,9 @@
  *
  * DELETE THIS WRAPPER WHEN WELCOME SCREEN WAS NOT BE CALLED FROM ANGULARJS
  */
-import React, { Component } from 'react';
 import ManagementWelcome from './management-welcome';
-import WzReduxProvider from '../../../redux/wz-redux-provider';
 import './welcome.scss';
+import { compose } from 'redux';
+import { withErrorBoundary, withReduxProvider } from '../hocs';
 
-export class ManagementWelcomeWrapper extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
-
-  render() {
-    return (
-      <WzReduxProvider>
-        <ManagementWelcome {...this.props} />
-      </WzReduxProvider>
-    );
-  }
-}
+export const ManagementWelcomeWrapper = compose (withErrorBoundary,withReduxProvider)(ManagementWelcome)

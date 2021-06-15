@@ -36,12 +36,13 @@ import { PatternHandler } from '../../react-services/pattern-handler';
 import { getToasts } from '../../kibana-services';
 import { SecurityAlerts } from './components';
 import { toMountPoint } from '../../../../../src/plugins/kibana_react/public';
-import { withReduxProvider } from '../common/hocs';
+import { withReduxProvider,withErrorBoundary } from '../common/hocs';
+import { compose } from 'redux';
 
 
 const visHandler = new VisHandlers();
 
-export const WzVisualize = withReduxProvider(class WzVisualize extends Component {
+export const WzVisualize = compose (withErrorBoundary,withReduxProvider) (class WzVisualize extends Component {
   _isMount = false;
   constructor(props) {
     super(props);

@@ -11,22 +11,11 @@
  * Find more information about this on the LICENSE file.
  *
  */
-import React, { Component } from 'react';
 import WzAgentSelector from './wz-agent-selector';
-import WzReduxProvider from '../../redux/wz-redux-provider';
+import { compose } from 'redux';
+import { withErrorBoundary, withReduxProvider } from '../common/hocs';
 
-
-export class WzAgentSelectorWrapper extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
-
-  render() {
-    return (
-      <WzReduxProvider>
-        <WzAgentSelector {...this.props} />
-      </WzReduxProvider>
-    );
-  }
-}
+export const WzAgentSelectorWrapper = compose(
+  withErrorBoundary,
+  withReduxProvider
+)(WzAgentSelector);

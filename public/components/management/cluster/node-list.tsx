@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import { EuiPanel, EuiFlexGroup, EuiFlexItem, EuiToolTip, EuiButtonIcon, EuiTitle, EuiInMemoryTable, EuiFieldSearch } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
+import { withErrorBoundary } from '../../common/hocs';
 
-export class NodeList extends Component {
+export const NodeList = withErrorBoundary (class NodeList extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -109,4 +110,4 @@ export class NodeList extends Component {
             </EuiPanel>
         );
     }
-};
+});

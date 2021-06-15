@@ -27,11 +27,11 @@ import {
   categoriesEquivalence,
   formEquivalence
 } from '../../../utils/config-equivalences';
-import WzReduxProvider from '../../../redux/wz-redux-provider'
 import store from '../../../redux/store'
 import { updateSelectedSettingsSection } from '../../../redux/actions/appStateActions';
-import { withUserAuthorizationPrompt } from '../../common/hocs/withUserAuthorization'
+import { withUserAuthorizationPrompt, withErrorBoundary, withReduxProvider } from '../../common/hocs'
 import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../../common/constants';
+import { compose } from 'redux';
 
 export type ISetting = {
   setting: string
@@ -81,11 +81,8 @@ const WzConfigurationSettingsProvider = (props) => {
     </EuiPage>
   );
 }
-const WzConfigurationSettingsWrapper = withUserAuthorizationPrompt(null, [WAZUH_ROLE_ADMINISTRATOR_NAME])(WzConfigurationSettingsProvider);
-export function WzConfigurationSettings(props) {
-  return(
-    <WzReduxProvider>
-      <WzConfigurationSettingsWrapper {...props}/>
-    </WzReduxProvider>
-  );
-}
+export const WzConfigurationSettings = compose (
+  withErrorBoundary,
+  withReduxProvider,
+  withUserAuthorizationPrompt(null, [WAZUH_ROLE_ADMINISTRATOR_NAME])
+)(WzConfigurationSettingsProvider);

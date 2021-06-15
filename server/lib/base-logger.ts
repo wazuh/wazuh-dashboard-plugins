@@ -182,7 +182,6 @@ export class BaseLogger {
       .then(() => {
         if (this.allowed) {
           this.checkFiles();
-
           const plainLogData: IUIPlainLoggerSettings = {
             level: level || 'error',
             message: `${this.yyyymmdd()}: ${location || 'Unknown origin'}: ${
@@ -198,7 +197,6 @@ export class BaseLogger {
             location: location || 'Unknown origin',
             message: message || 'An error occurred',
           };
-
           this.wazuhLogger.log(logData);
         }
       })
