@@ -14,26 +14,24 @@
 import React , {useState, useEffect} from 'react';
 import { WzRequest } from '../../../react-services';
 import {
-  EuiBasicTableColumn,
   EuiAccordion,
   SortDirection,
   EuiInMemoryTable,
 } from '@elastic/eui';
-import { Markdown } from '../../common/util/markdown';
 
-type tablePropsType = (item) => {onClick: () => void};
 type backToTopType = () => void;
 
 interface referencesTableType {
   referencesName: string,
   referencesArray: Array<string>,
-  tableProps: tablePropsType,
+  columns: any,
   backToTop: backToTopType
 }
 
-export const ReferencesTable = ({referencesName, referencesArray, tableProps, backToTop} : referencesTableType) => {
+export const ReferencesTable = ({referencesName, referencesArray, columns, backToTop} : referencesTableType) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [data, setData] = useState<any[]>([]);
+
   useEffect(() => {
     getValues();
     backToTop();
@@ -61,26 +59,6 @@ export const ReferencesTable = ({referencesName, referencesArray, tableProps, ba
     setIsLoading(false);
   }
 
-  const columns: EuiBasicTableColumn<any>[] = [
-    {
-      field: 'references.external_id',
-      name: 'ID',
-      sortable: true,
-    },
-    {
-      field: 'name',
-      name: 'Name',
-      sortable: true,
-    },
-    {
-      field: 'description',
-      name: 'Description',
-      sortable: true,
-      render: (item) => item ? <Markdown markdown={item} /> : '',
-      truncateText: true
-    },
-  ];
-
   return (
     <EuiAccordion
       style={{ textDecoration: 'none' }}
@@ -96,7 +74,6 @@ export const ReferencesTable = ({referencesName, referencesArray, tableProps, ba
         loading={isLoading}
         pagination={{ pageSizeOptions: [5, 10, 20] }}
         sorting={{ sort: { field: 'name', direction: SortDirection.DESC } }}
-        rowProps={tableProps}
       />
     </EuiAccordion>
   );

@@ -11,14 +11,12 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { TableWzAPI } from '../../../components/common/tables';
 import { WzRequest } from '../../../react-services';
 import { ModuleMitreAttackIntelligenceFlyout } from './resource_detail_flyout';
 
-
-export const ModuleMitreAttackIntelligenceResource = ({ label, searchBarSuggestions, apiEndpoint, tableColumns, initialSortingField, resourceFilters }) => {
-  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+export const ModuleMitreAttackIntelligenceResource = ({ label, searchBarSuggestions, apiEndpoint, tableColumnsCreator, initialSortingField, resourceFilters }) => {
   const [details, setDetails] = useState(null);
 
   useEffect(() => {
@@ -44,23 +42,16 @@ export const ModuleMitreAttackIntelligenceResource = ({ label, searchBarSuggesti
           (reference) => reference.source === "mitre-attack"
         )?.external_id,
       }));
-      setIsDetailsOpen(true);
       setDetails(data[0]); 
     } catch {
       return {};
     }
   };
   
-  const rowProps = useCallback((item) => ({
-    onClick: () => {
-      setDetails(item);
-      setIsDetailsOpen(true);
-    },
-  }), []);
+  const tableColumns = useMemo(() => tableColumnsCreator(setDetails), []);
 
   const closeFlyout = useCallback(() => {
     setDetails(null);
-    setIsDetailsOpen(false);
   },[]);
 
   return (
@@ -73,16 +64,15 @@ export const ModuleMitreAttackIntelligenceResource = ({ label, searchBarSuggesti
         searchBarPlaceholder={`Search in ${label}`}
         searchBarSuggestions={searchBarSuggestions}
         endpoint={apiEndpoint}
-        tableProps={{rowProps}}
         tablePageSizeOptions={[10]}
         mapResponseItem={(item) => ({...item, ['references.external_id']: item?.references?.find(reference => reference.source === 'mitre-attack')?.external_id})}
         filters={resourceFilters}
       />
-      {details && isDetailsOpen && (
+      {details && (
         <ModuleMitreAttackIntelligenceFlyout
           details={details}
           closeFlyout={() => closeFlyout()}
-          tableProps={rowProps}
+          onSelectResource={setDetails}
         />
       )}
     </> 

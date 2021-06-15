@@ -14,6 +14,8 @@
 import { WzRequest } from '../../../react-services';
 import { Markdown } from '../../common/util';
 import { formatUIDate } from '../../../react-services';
+import React from 'react';
+import { EuiLink } from '@elastic/eui';
 
 const getMitreAttackIntelligenceSuggestions = (endpoint: string, field: string) => async (input: string) => {
   try{
@@ -64,25 +66,25 @@ function buildResource(label: string, labelResource: string){
     apiEndpoint: endpoint,
     fieldName: 'name',
     initialSortingField: 'name',
-    tableColumns: [
+    tableColumnsCreator: (openResourceDetails) => [
       {
         field: 'references.external_id',
         name: 'ID',
-        width: '12%'
+        width: '12%',
+        render: (value, item) => <EuiLink onClick={() => openResourceDetails(item)}>{value}</EuiLink>
       },
       {
         field: 'name',
         name: 'Name',
         sortable: true,
-        width: '30%'
+        width: '30%',
+        render: (value, item) => <EuiLink onClick={() => openResourceDetails(item)}>{value}</EuiLink>
       },
       {
         field: 'description',
         name: 'Description',
         sortable: true,
-        render: (value) => value ? (
-          Markdown({markdown: value})
-        ) : '',
+        render: (value) => value ? <Markdown markdown={value} /> : '',
         truncateText: true
       }
     ],

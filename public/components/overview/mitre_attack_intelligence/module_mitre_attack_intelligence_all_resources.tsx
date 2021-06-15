@@ -20,39 +20,27 @@ import { ModuleMitreAttackIntelligenceAllResourcesSearchResults } from './module
 import { ModuleMitreAttackIntelligenceFlyout } from './resource_detail_flyout';
 
 export const ModuleMitreAttackIntelligenceAllResources = ({ results, loading }) => {
-  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [details, setDetails] = useState(null);
 
-  const  mapResponseItem = (item) => ({...item, ['references.external_id']: item.references.find(reference => reference.source === 'mitre-attack')?.external_id});
-
-  const rowProps = useCallback((item) => {
-    setDetails(mapResponseItem(item));
-    setIsDetailsOpen(true);
+  const selectResource = useCallback((item) => {
+    setDetails(({...item, ['references.external_id']: item.references.find(reference => reference.source === 'mitre-attack')?.external_id}));
   },[]);
-
-  const rowPropsFlyout = useCallback((item) => ({
-    onClick: () => {
-      setDetails(item);
-      setIsDetailsOpen(true);
-    },
-  }), []);
 
   const closeFlyout = useCallback(() => {
     setDetails(null);
-    setIsDetailsOpen(false);
   },[]);
 
   return (
     <>
       <EuiTitle><h1>Search results</h1></EuiTitle>
       <EuiSpacer />
-      <ModuleMitreAttackIntelligenceAllResourcesSearchResults results={results} loading={loading} rowProps={rowProps}/> 
+      <ModuleMitreAttackIntelligenceAllResourcesSearchResults results={results} loading={loading} onSelectResource={selectResource}/> 
 
-      {details && isDetailsOpen && (
+      {details && (
         <ModuleMitreAttackIntelligenceFlyout
           details={details}
           closeFlyout={() => closeFlyout()}
-          tableProps={rowPropsFlyout}
+          onSelectResource={setDetails}
         />
       )}
     </>
