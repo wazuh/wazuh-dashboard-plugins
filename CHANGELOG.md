@@ -6,7 +6,11 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Added
 
-- Create the detail section for Mitre Intelligence resources. [#3344](https://github.com/wazuh/wazuh-kibana-app/pull/3344)
+- Added Intelligence tab to Mitre Att&ck module [#3368](https://github.com/wazuh/wazuh-kibana-app/pull/3368) [#3344](https://github.com/wazuh/wazuh-kibana-app/pull/3344)
+
+## Changed
+
+- Adapted the Mitre tactics and techniques resources to use the API endpoints [#3346](https://github.com/wazuh/wazuh-kibana-app/pull/3346)
 
 ## Wazuh v4.2.0 - Kibana 7.10.2 , 7.11.2 - Revision 4201
 
@@ -29,7 +33,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed position of Top users on Integrity Monitoring Top 5 user. [#2892](https://github.com/wazuh/wazuh-kibana-app/pull/2892)
 - Changed user allow_run_as way of editing. [#3080](https://github.com/wazuh/wazuh-kibana-app/pull/3080)
 - Rename some ossec references to Wazuh [#3046](https://github.com/wazuh/wazuh-kibana-app/pull/3046)
-- Changed tactis and techniques resources [#3346](https://github.com/wazuh/wazuh-kibana-app/pull/3346)
 
 ### Fixed
 
