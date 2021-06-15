@@ -11,7 +11,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { useCallback, useState, useRef } from 'react';
+import React, { useCallback, useState, useRef, useEffect } from 'react';
 import {
   EuiFlexGroup,
   EuiFlexItem,
@@ -55,8 +55,17 @@ export const ModuleMitreIntelligence = () => {
       )).filter(searchTermAllResourcesResponse => searchTermAllResourcesResponse.results.length)
   }
   , [searchTermAllResources]);
-  
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(location.href);
+    const redirectTab = urlParams.get('tabRedirect');
+    if (redirectTab) {
+      setSelectedResource(redirectTab);
+    }
+  },[]);
+
   const onSelectResource = useCallback((resourceID) => {
+    setResourceFilters([]);
     setSelectedResource(prevSelectedResource => prevSelectedResource === resourceID && searchTermAllResourcesUsed.current ? null : resourceID);
   }, [searchTermAllResourcesUsed.current]);
 

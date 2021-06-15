@@ -11,14 +11,46 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { TableWzAPI } from '../../../components/common/tables';
+import { WzRequest } from '../../../react-services';
 import { ModuleMitreAttackIntelligenceFlyout } from './resource_detail_flyout';
+
 
 export const ModuleMitreAttackIntelligenceResource = ({ label, searchBarSuggestions, apiEndpoint, tableColumns, initialSortingField, resourceFilters }) => {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [details, setDetails] = useState(null);
 
+  useEffect(() => {
+    const urlParams = new URLSearchParams(location.href);
+    const redirectTab = urlParams.get('tabRedirect');
+    const idToRedirect = urlParams.get("idToRedirect");
+    if(redirectTab && idToRedirect){
+      const endpoint = `/mitre/${redirectTab}?q=references.external_id=${idToRedirect}`;
+      getMitreItemToRedirect(endpoint);
+      urlParams.delete('tabRedirect');
+      urlParams.delete('idToRedirect');
+      window.history.pushState({},document.title,'#/overview/?tab=mitre')
+    }
+  },[]);
+
+
+  const getMitreItemToRedirect = async (endpoint) => {
+    try {
+      const res = await WzRequest.apiReq("GET", endpoint, {});
+      const data = res?.data?.data.affected_items.map((item) => ({
+        ...item,
+        ["references.external_id"]: item?.references?.find(
+          (reference) => reference.source === "mitre-attack"
+        )?.external_id,
+      }));
+      setIsDetailsOpen(true);
+      setDetails(data[0]); 
+    } catch {
+      return {};
+    }
+  };
+  
   const rowProps = useCallback((item) => ({
     onClick: () => {
       setDetails(item);
