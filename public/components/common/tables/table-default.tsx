@@ -75,8 +75,7 @@ export function TableDeafult({
     totalItemCount: totalItems,
     pageSizeOptions: tablePageSizeOptions
   }
-  return <>
-    <EuiBasicTable
+  return <EuiBasicTable
       columns={tableColumns}
       items={items}
       loading={loading}
@@ -85,5 +84,4 @@ export function TableDeafult({
       onChange={tableOnChange}
       {...tableProps}
     />
-  )
 }
