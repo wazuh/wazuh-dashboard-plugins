@@ -12,4 +12,5 @@
 
 
 export { TableWithSearchBar } from './table-with-search-bar';
-export { TableWithSearchBarWzAPI } from './table-with-search-bar-wz-api';
+export { TableWzAPI } from './table-wz-api';
+export { TableDeafult } from './table-default';

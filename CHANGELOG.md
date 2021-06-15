@@ -10,6 +10,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added new error handler to be responsible for the error orchestration [#3327](https://github.com/wazuh/wazuh-kibana-app/pull/3327)
 - Added `Error Boundary` HOC and Component to handle render errors. [#3321](https://github.com/wazuh/wazuh-kibana-app/pull/3321)
 - Implemented `Error Boundary` HOC in each main react-component. [#3367](https://github.com/wazuh/wazuh-kibana-app/pull/3367)
+- Added fields status and type in vulnerabilities table [#3196] (https://github.com/wazuh/wazuh-kibana-app/pull/3196)
 
 ### Changed
 
@@ -28,7 +29,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added vulnerabilities inventory that affect to an agent [#3069](https://github.com/wazuh/wazuh-kibana-app/pull/3069)
 - Added retry button to check api again in health check [#3109](https://github.com/wazuh/wazuh-kibana-app/pull/3109)
 - Added `wazuh-statistics` template and a new mapping for these indices [#3111](https://github.com/wazuh/wazuh-kibana-app/pull/3111)
-- Added link to documentation "Checking connection with Manager" in deploy new agent [#3126](https://github.com/wazuh/wazuh-kibana-app/pull/3126)
+- Added link to documentation "Checking connection with Manager" in deploy new agent [#3126](https://github.com/wazuh/wazuh-kibana-app/pull/3126
 
 ### Changed
 

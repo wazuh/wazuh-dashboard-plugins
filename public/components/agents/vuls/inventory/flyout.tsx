@@ -71,7 +71,6 @@ export class FlyoutDetail extends Component {
     const { currentItem } = this.state;
     const title = `${currentItem.name} ${currentItem.cve}`;
     const id = title.replace(/ /g, '_');
-
     return (
       <EuiFlyout
         onClose={() => this.props.closeFlyout()}
@@ -101,6 +100,7 @@ export class FlyoutDetail extends Component {
                 { 'rule.groups': 'vulnerability-detector' },
                 { 'data.vulnerability.package.name': currentItem.name },
                 { 'data.vulnerability.cve': currentItem.cve },
+                { 'data.vulnerability.type': currentItem.type },
                 { 'data.vulnerability.package.architecture': currentItem.architecture },
                 { 'data.vulnerability.package.version': currentItem.version },
                 { 'agent.id': this.props.agentId },

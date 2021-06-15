@@ -14,31 +14,20 @@ import React, { Component } from 'react';
 import {
   EuiPanel,
   EuiPage,
-  EuiTitle,
-  EuiLoadingSpinner,
   EuiSpacer,
   EuiProgress,
   EuiFlexGroup,
   EuiFlexItem,
-  EuiButtonEmpty
 } from '@elastic/eui';
 import {
   InventoryTable,
-  FilterBar
 } from './inventory/';
-import { WzRequest } from '../../../react-services/wz-request';
-import exportCsv from '../../../react-services/wz-csv';
-import { getToasts }  from '../../../kibana-services';
 import { ICustomBadges } from '../../wz-search-bar/components';
-import { filtersToObject } from '../../wz-search-bar';
 
 export class Inventory extends Component {
   _isMount = false;
   state: {
-    filters: [];
-    totalItems: number;
     isLoading: Boolean;
-    items: [];
     customBadges: ICustomBadges[];
   };
 
@@ -47,13 +36,9 @@ export class Inventory extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      filters: [],
-      items: [],
-      totalItems: 0,
       isLoading: true,
       customBadges: []
     }
-    this.onFiltersChange.bind(this);
   }
 
   async componentDidMount() {
@@ -61,133 +46,25 @@ export class Inventory extends Component {
     await this.loadAgent();
   }
 
-  componentDidUpdate(prevProps) {
-    if (JSON.stringify(this.props.agent) !== JSON.stringify(prevProps.agent)){
-      this.setState({isLoading: true}, this.loadAgent)
-    }
-  }
-
   componentWillUnmount() {
     this._isMount = false;
   }
 
   async loadAgent() {
-    const {totalItems, items} = await this.getItemNumber();
     if (this._isMount){
-      this.setState({ totalItems, items, isLoading: false });
-    }
-  }
-
-  getStoreFilters(props) {
-    const { section, selectView, agent } = props;
-    const filters = JSON.parse(window.localStorage.getItem(`wazuh-${section}-${selectView}-vulnerability-${agent['id']}`) || '{}');
-    return filters;
-  }
-
-  setStoreFilters(filters) {
-    const { section, selectView, agent } = this.props;
-    window.localStorage.setItem(`wazuh-${section}-${selectView}-vulnerability-${agent['id']}`, JSON.stringify(filters))
-  }
-
-  onFiltersChange = (filters) => {
-    this.setStoreFilters(filters);
-    this.setState({ filters });
-  }
-
-  onTotalItemsChange = (totalItems: number) => {
-    this.setState({ totalItemsFile: totalItems });
-  }
-
-  buildFilter() {
-    const filters = filtersToObject(this.state.filters);
-    const filter = {
-      ...filters,
-      limit: '15' 
-    };
-    return filter;
-  }
-
-  async getItemNumber() {
-    try {
-      const agentID = this.props.agent.id;
-      let response = await WzRequest.apiReq('GET', `/vulnerability/${agentID}`, {
-        params: this.buildFilter(),
-      });
-      return {
-        totalItems: ((response.data || {}).data || {}).total_affected_items || 0,
-        items: ((response.data || {}).data || {}).affected_items || [],
-      };
-    } catch (error) {
-      this.setState({ isLoading: false });
-      this.showToast('danger', error, 3000);
-    }
-  }
-
-  renderTitle() {
-    const { isLoading, totalItems } = this.state;
-    
-      return (
-        <EuiFlexGroup>
-          <EuiFlexItem>
-            <EuiTitle size="s">
-              <h1>Vulnerabilities&nbsp;{isLoading === true ? <EuiLoadingSpinner size="s" /> : <span>({ totalItems })</span>}</h1>
-            </EuiTitle>
-          </EuiFlexItem>
-          <EuiFlexItem grow={false}>
-            <EuiButtonEmpty isDisabled={(totalItems == 0)} iconType="importAction" onClick={() => this.downloadCsv()}>
-              Export formatted
-            </EuiButtonEmpty>
-          </EuiFlexItem>
-        </EuiFlexGroup>
-      )
-  }
-
-  showToast = (color, title, time) => {
-    getToasts().add({
-      color: color,
-      title: title,
-      toastLifeTimeMs: time,
-    });
-  };
-
-  async downloadCsv() {
-    const { filters } = this.state;
-    try {
-      const filtersObject = filtersToObject(filters);
-      const formatedFilters = Object.keys(filtersObject).map(key => ({name: key, value: filtersObject[key]}));
-      this.showToast('success', 'Your download should begin automatically...', 3000);
-      await exportCsv(
-        '/vulnerability/' + this.props.agent.id,
-        [
-          ...formatedFilters
-        ],
-        `vuls-vulnerabilities`
-      );
-    } catch (error) {
-      this.showToast('danger', error, 3000);
+      this.setState({  isLoading: false });
     }
   }
 
   renderTable() {
-    const { filters, items, totalItems } = this.state;
     return (
       <div>
-        <FilterBar
-          filters={filters}
-          onFiltersChange={this.onFiltersChange}
-          agent={this.props.agent} />
           <InventoryTable
-            {...this.props}
-            filters={filters}
-            items={items}
-            totalItems={totalItems}
-            onFiltersChange={this.onFiltersChange}
-            onTotalItemsChange={this.onTotalItemsChange}/>
+            {...this.props}/>
       </div>
     )
   }
-
-
+  
   loadingInventory() {
     return <EuiPage>
       <EuiFlexGroup>
@@ -205,11 +82,9 @@ export class Inventory extends Component {
       return this.loadingInventory()
     }
     const table = this.renderTable();
-    const title = this.renderTitle();
 
     return <EuiPage>
         <EuiPanel>
-          {title}
           <EuiSpacer size={(((this.props.agent || {}).os || {}).platform || false) === 'windows' ? 's' : 'm'} />
           {table}
         </EuiPanel>

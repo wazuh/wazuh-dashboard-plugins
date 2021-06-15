@@ -11,14 +11,10 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { EuiBasicTable, EuiSpacer } from '@elastic/eui';
-import { WzSearchBar } from '../../wz-search-bar/'
+import { EuiBasicTable } from '@elastic/eui';
 
-export function TableWithSearchBar({
+export function TableDeafult({
   onSearch,
-  searchBarSuggestions,
-  searchBarPlaceholder = 'Filter or search',
-  searchBarProps = {},
   tableColumns,
   rowProps,
   tablePageSizeOptions = [15, 25, 50, 100],
@@ -81,15 +77,6 @@ export function TableWithSearchBar({
     pageSizeOptions: tablePageSizeOptions
   }
   return <>
-    <WzSearchBar
-      noDeleteFiltersOnUpdateSuggests
-      filters={filters}
-      onFiltersChange={setFilters}
-      suggestions={searchBarSuggestions}
-      placeholder={searchBarPlaceholder}
-      {...searchBarProps}
-    />
-    <EuiSpacer size='s'/>
     <EuiBasicTable
       columns={tableColumns}
       items={items}
@@ -97,7 +84,7 @@ export function TableWithSearchBar({
       pagination={tablePagination}
       sorting={sorting}
       onChange={tableOnChange}
-      rowProps={rowProps}
+      rowProps={rowProps ? rowProps : false}
       {...tableProps}
     />
   </>

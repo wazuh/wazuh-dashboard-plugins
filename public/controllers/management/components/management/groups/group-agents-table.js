@@ -31,7 +31,7 @@ import {
 } from '../../../../../redux/actions/groupsActions';
 
 import { getAgentFilterValues } from './get-agents-filters-values';
-import { TableWithSearchBarWzAPI } from '../../../../../components/common/tables';
+import { TableWzAPI } from '../../../../../components/common/tables';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 import { WzButtonPermissionsModalConfirm } from '../../../../../components/common/buttons';
 
@@ -146,12 +146,13 @@ class WzGroupAgentsTable extends Component {
     const { error } = this.props.state;
     if (!error) {
       return (
-          <TableWithSearchBarWzAPI
+          <TableWzAPI
             tableColumns={this.columns}
             tableInitialSortingField='id'
             searchBarSuggestions={this.suggestions}
             endpoint={`/groups/${this.props.state.itemDetail.name}/agents`}
             reload={this.props.state.reload}
+            searchTable={true}
           />
       );
     } else {
