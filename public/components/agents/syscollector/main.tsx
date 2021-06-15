@@ -14,8 +14,4 @@ import React from 'react';
 import { withErrorBoundary } from '../../common/hocs';
 import { SyscollectorInventory } from './inventory';
 
-function MainSyscollectorClass(props) {
-  return <SyscollectorInventory agent={props.agent}></SyscollectorInventory>;
-}
-
-export const MainSyscollector = withErrorBoundary (MainSyscollectorClass);
+export const MainSyscollector = withErrorBoundary(SyscollectorInventory);

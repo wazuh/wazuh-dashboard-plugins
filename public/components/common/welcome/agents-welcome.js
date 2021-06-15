@@ -327,8 +327,7 @@ export const AgentsWelcome = withErrorBoundary (class AgentsWelcome extends Comp
             </EuiFlexGroup>
           </EuiFlexItem>
         </EuiFlexGroup>
-    );withErrorBoundary
-
+    );
   }
 
   buildTabCard(tab, icon) {

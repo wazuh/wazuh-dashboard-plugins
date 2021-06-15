@@ -15,4 +15,7 @@ import WzAgentSelector from './wz-agent-selector';
 import { compose } from 'redux';
 import { withErrorBoundary, withReduxProvider } from '../common/hocs';
 
-export const WzAgentSelectorWrapper = compose (withErrorBoundary, withReduxProvider)(WzAgentSelector);
+export const WzAgentSelectorWrapper = compose(
+  withErrorBoundary,
+  withReduxProvider
+)(WzAgentSelector);
