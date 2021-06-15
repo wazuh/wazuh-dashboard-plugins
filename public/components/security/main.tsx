@@ -19,7 +19,7 @@ import { API_USER_STATUS_RUN_AS } from '../../../server/lib/cache-api-user-has-r
 import { AppState } from '../../react-services/app-state';
 import { ErrorHandler } from '../../react-services/error-handler';
 import { RolesMapping } from './roles-mapping/roles-mapping';
-import { withReduxProvider, withGlobalBreadcrumb, withUserAuthorizationPrompt } from '../common/hocs';
+import { withReduxProvider, withGlobalBreadcrumb, withUserAuthorizationPrompt, withErrorBoundary } from '../common/hocs';
 import { compose } from 'redux';
 import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../common/constants';
 import { updateSecuritySection } from '../../redux/actions/securityActions';
@@ -48,6 +48,7 @@ const tabs = [
 ];
 
 export const WzSecurity = compose(
+  withErrorBoundary,
   withReduxProvider,
   withGlobalBreadcrumb([{ text: '' }, { text: 'Security' }]),
   withUserAuthorizationPrompt(null, [WAZUH_ROLE_ADMINISTRATOR_NAME])

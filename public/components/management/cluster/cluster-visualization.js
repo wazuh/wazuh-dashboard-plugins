@@ -1,23 +1,15 @@
-import React, { Component } from 'react';
-import WzReduxProvider from '../../../redux/wz-redux-provider';
+import React from 'react';
 import KibanaVis from '../../../kibana-integrations/kibana-vis';
+import { withErrorBoundary, withReduxProvider } from '../../../components/common/hocs';
+import { compose } from 'redux';
 
-export class KibanaVisWrapper extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
-
-
-  render() {
-    return (
-      <div style={{ height: '100%' }}>
-        <WzReduxProvider>
-          <KibanaVis
-            visID={this.props.visId}
-            tab={this.props.tab}></KibanaVis>
-        </WzReduxProvider>
-      </div>
-    );
-  }
-}
+export const KibanaVisWrapper = compose(
+  withErrorBoundary,
+  withReduxProvider
+)((props) => {
+  return (
+    <div style={{ height: '100%' }}>
+      <KibanaVis visID={props.visId} tab={props.tab}></KibanaVis>
+    </div>
+  );
+});

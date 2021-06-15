@@ -11,22 +11,10 @@
  * Find more information about this on the LICENSE file.
  *
  */
-import React, { Component } from 'react';
+import React from 'react';
 import WzMenu from './wz-menu';
-import WzReduxProvider from '../../redux/wz-redux-provider';
 import './wz-menu.scss';
+import { compose } from 'redux';
+import { withErrorBoundary, withReduxProvider } from '../common/hocs';
 
-export class WzMenuWrapper extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
-
-  render() {
-    return (
-      <WzReduxProvider>
-        <WzMenu {...this.props} />
-      </WzReduxProvider>
-    );
-  }
-}
+export const WzMenuWrapper = compose (withErrorBoundary, withReduxProvider)(WzMenu);

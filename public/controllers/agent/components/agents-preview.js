@@ -21,7 +21,6 @@ import {
   EuiStat,
   EuiLoadingChart,
   EuiSpacer,
-  EuiText,
   EuiEmptyPrompt,
   EuiToolTip
 } from '@elastic/eui';
@@ -40,8 +39,10 @@ import { WzDatePicker } from '../../../components/wz-date-picker/wz-date-picker'
 import { withReduxProvider, withGlobalBreadcrumb, withUserAuthorizationPrompt } from '../../../components/common/hocs';
 import { formatUIDate } from '../../../../public/react-services/time-service';
 import { compose } from 'redux';
+import { withErrorBoundary } from '../../../components/common/hocs'
 
 export const AgentsPreview = compose(
+  withErrorBoundary,
   withReduxProvider,
   withGlobalBreadcrumb([{ text: '' }, { text: 'Agents' }]),
   withUserAuthorizationPrompt([[{action: 'agent:read', resource: 'agent:id:*'},{action: 'agent:read', resource: 'agent:group:*'}]])
@@ -120,7 +121,7 @@ export const AgentsPreview = compose(
         this.setState({ platforms: platformsModel, loading: false });
     } catch (error) {}
   }
-  
+
   removeFilters(){
     this._isMount && this.setState({agentTableFilters: []})
   }
@@ -164,7 +165,7 @@ export const AgentsPreview = compose(
             </EuiFlexItem>
             {this.totalAgents > 0 && (
               <EuiFlexItem >
-                <EuiPanel betaBadgeLabel="Details">  
+                <EuiPanel betaBadgeLabel="Details">
                   <EuiFlexGroup>
                     <EuiFlexItem>
                       {this.summary && (
@@ -236,7 +237,7 @@ export const AgentsPreview = compose(
                               <EuiToolTip
                                 position='top'
                                 content='View agent details'>
-                                  <a onClick={() => 
+                                  <a onClick={() =>
                                   this.props.tableProps.showAgent(
                                     this.lastAgent
                                   )}>{this.lastAgent.name}</a>
@@ -271,7 +272,7 @@ export const AgentsPreview = compose(
                               style={{ whiteSpace: 'nowrap' }}
                               titleSize="s"
                               description="Most active agent"
-                              titleColor="primary"                              
+                              titleColor="primary"
                             />
                           </EuiFlexItem>
                         )}
@@ -298,13 +299,13 @@ export const AgentsPreview = compose(
                     </div>
                     {this.props.resultState === 'loading' &&
                       (
-                      <div style={{ display: 'block', textAlign: "center", padding: 30}}>                        
+                      <div style={{ display: 'block', textAlign: "center", padding: 30}}>
                         <EuiLoadingChart size="xl" />
                       </div>
                     ) }
-                      
+
                     </EuiFlexItem>
-                  </EuiFlexGroup>                  
+                  </EuiFlexGroup>
                 </EuiPanel>
                 <EuiPanel paddingSize="none" betaBadgeLabel="Evolution" style={{ height: 180,  display: this.props.resultState === 'none' ? 'block' : 'none'}}>
                   <EuiEmptyPrompt
@@ -318,7 +319,7 @@ export const AgentsPreview = compose(
                   />
                 </EuiPanel>
               </EuiFlexItem>
-              
+
             )}
           </EuiFlexGroup>
           <EuiSpacer size="m" />
