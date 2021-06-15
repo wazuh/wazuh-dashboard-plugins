@@ -25,14 +25,13 @@ import { KbnSearchBar } from '../../kbn-search-bar';
 import { TimeRange, Query } from '../../../../../../src/plugins/data/common';
 import { ModulesHelper } from '../../common/modules/modules-helper';
 import { getDataPlugin, getToasts } from '../../../kibana-services';
-import { WzEmptyPromptNoPermissions } from "../../common/permissions/prompt";
+import { withErrorBoundary } from "../../common/hocs"
 
 export interface ITactic {
   [key:string]: string[]
 }
 
-
-export class Mitre extends Component {
+export const Mitre = withErrorBoundary (class Mitre extends Component {
   _isMount = false;
   timefilter: {
     getTime(): TimeRange
@@ -180,5 +179,5 @@ export class Mitre extends Component {
       </div>
     );
   }
-}
+})
 

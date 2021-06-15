@@ -25,8 +25,9 @@ import {
   EuiCallOut,
   EuiPanel
 } from '@elastic/eui';
+import { withErrorBoundary } from '../../common/hocs';
 
-export class AddApi extends Component {
+export const AddApi = withErrorBoundary (class AddApi extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -203,7 +204,7 @@ export class AddApi extends Component {
 
     return view;
   }
-}
+})
 
 AddApi.propTypes = {
   checkForNewApis: PropTypes.func,

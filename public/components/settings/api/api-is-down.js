@@ -30,8 +30,9 @@ import {
   EuiButtonIcon,
   EuiPanel
 } from '@elastic/eui';
+import { withErrorBoundary } from '../../common/hocs';
 
-export class ApiIsDown extends Component {
+export const ApiIsDown = withErrorBoundary (class ApiIsDown extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -257,7 +258,7 @@ hosts:
       </EuiFlexGroup>
     );
   }
-}
+});
 
 ApiIsDown.propTypes = {
   apiEntries: PropTypes.array,

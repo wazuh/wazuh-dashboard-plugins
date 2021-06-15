@@ -6,10 +6,17 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Added
 
+- Added new endpoint service to collect the frontend logs into a file [#3324](https://github.com/wazuh/wazuh-kibana-app/pull/3324)
+- Added new error handler to be responsible for the error orchestration [#3327](https://github.com/wazuh/wazuh-kibana-app/pull/3327)
+- Added `Error Boundary` HOC and Component to handle render errors. [#3321](https://github.com/wazuh/wazuh-kibana-app/pull/3321)
+- Implemented `Error Boundary` HOC in each main react-component. [#3367](https://github.com/wazuh/wazuh-kibana-app/pull/3367)
+- Added fields status and type in vulnerabilities table [#3196] (https://github.com/wazuh/wazuh-kibana-app/pull/3196)
 - Added Intelligence tab to Mitre Att&ck module [#3368](https://github.com/wazuh/wazuh-kibana-app/pull/3368) [#3344](https://github.com/wazuh/wazuh-kibana-app/pull/3344)
 
-## Changed
+### Changed
 
+- Changed ossec to wazuh in sample-data [#3121](https://github.com/wazuh/wazuh-kibana-app/pull/3121)
+- Changed empty fields in FIM tables and `syscheck.value_name` in discovery now show an empty tag for visual clarity [#3279](https://github.com/wazuh/wazuh-kibana-app/pull/3279)
 - Adapted the Mitre tactics and techniques resources to use the API endpoints [#3346](https://github.com/wazuh/wazuh-kibana-app/pull/3346)
 
 ## Wazuh v4.2.0 - Kibana 7.10.2 , 7.11.2 - Revision 4201
@@ -49,6 +56,12 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed the plugin logo path in Kibana menu when use `server.basePath` setting [#3144](https://github.com/wazuh/wazuh-kibana-app/pull/3144)
 - Fixed deprecated endpoint for create agent groups [3152](https://github.com/wazuh/wazuh-kibana-app/pull/3152)
 - Fixed check for TCP protocol in deploy new agent [#3163](https://github.com/wazuh/wazuh-kibana-app/pull/3163)
+- Fixed RBAC issue with agent group permissions [#3181](https://github.com/wazuh/wazuh-kibana-app/pull/3181)
+- Fixed change index pattern from menu doesn't work [#3187](https://github.com/wazuh/wazuh-kibana-app/pull/3187)
+
+## Wazuh v4.1.5 - Kibana 7.10.0 , 7.10.2 - Revision 4106
+
+- Adapt for Wazuh 4.1.5
 
 ## Wazuh v4.1.4 - Kibana 7.10.0 , 7.10.2 - Revision 4105
 

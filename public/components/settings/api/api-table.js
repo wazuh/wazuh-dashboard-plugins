@@ -28,13 +28,15 @@ import {
   EuiIcon
 } from '@elastic/eui';
 import { WzButtonPermissions } from '../../common/permissions/button';
-import WzReduxProvider from '../../../redux/wz-redux-provider';
 import store from '../../../redux/store';
 import { updateSelectedSettingsSection } from '../../../redux/actions/appStateActions';
 import { AppState } from '../../../react-services/app-state';
 import { API_USER_STATUS_RUN_AS } from '../../../../server/lib/cache-api-user-has-run-as';
+import { withErrorBoundary, withReduxProvider } from '../../common/hocs';
+import { compose } from 'redux'
 
-export class ApiTable extends Component {
+
+export const ApiTable = compose(withErrorBoundary, withReduxProvider)(class ApiTable extends Component {
   constructor(props) {
     super(props);
 
@@ -295,7 +297,6 @@ export class ApiTable extends Component {
 
     return (
       <EuiPage>
-        <WzReduxProvider>
           <EuiPanel paddingSize="l">
             <EuiFlexGroup>
               <EuiFlexItem>
@@ -344,11 +345,10 @@ export class ApiTable extends Component {
               loading={this.state.refreshingEntries}
             />
           </EuiPanel>
-        </WzReduxProvider>
       </EuiPage>
     );
   }
-}
+});
 
 ApiTable.propTypes = {
   apiEntries: PropTypes.array,

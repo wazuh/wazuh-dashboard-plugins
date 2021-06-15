@@ -26,8 +26,9 @@ import {
 
 // import { WzRequest } from '../../../../react-services/wz-request';
 import { WzRequest } from '../../../react-services/wz-request';
+import { withErrorBoundary } from '../../../components/common/hocs';
 
-export class SelectAgent extends Component {
+export const SelectAgent = withErrorBoundary (class SelectAgent extends Component {
   constructor(props) {
     super(props);
 
@@ -274,7 +275,7 @@ export class SelectAgent extends Component {
       </div>
     );
   }
-}
+});
 
 SelectAgent.propTypes = {
   items: PropTypes.array

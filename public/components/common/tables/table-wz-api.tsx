@@ -35,7 +35,6 @@ export function TableWzAPI({endpoint, ...rest}){
       const { field, direction } = sorting.sort;
       setIsLoading(true);
       setFilters(filters);
-
       const params = {
         ...filtersToObject(filters),
         offset: pageIndex * pageSize,

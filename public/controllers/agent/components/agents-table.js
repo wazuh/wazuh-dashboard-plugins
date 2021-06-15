@@ -40,8 +40,9 @@ import { WzSearchBar, filtersToObject } from '../../../components/wz-search-bar'
 import { getAgentFilterValues } from '../../../controllers/management/components/management/groups/get-agents-filters-values';
 import { WzButtonPermissions } from '../../../components/common/permissions/button';
 import { formatUIDate } from '../../../react-services/time-service';
+import { withErrorBoundary } from '../../../components/common/hocs'
 
-export class AgentsTable extends Component {
+export const AgentsTable = withErrorBoundary (class AgentsTable extends Component {
   _isMount = false;
   constructor(props) {
     super(props);
@@ -1024,7 +1025,7 @@ export class AgentsTable extends Component {
       </div>
     );
   }
-}
+});
 
 AgentsTable.propTypes = {
   wzReq: PropTypes.func,

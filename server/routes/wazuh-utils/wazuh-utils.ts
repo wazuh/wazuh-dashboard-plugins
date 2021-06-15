@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { WazuhUtilsCtrl } from '../controllers';
+import { WazuhUtilsCtrl } from '../../controllers';
 import { IRouter } from 'kibana/server';
 import { schema } from '@kbn/config-schema';
 

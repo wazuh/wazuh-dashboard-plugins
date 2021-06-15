@@ -74,9 +74,8 @@ export function TableDeafult({
     ...pagination,
     totalItemCount: totalItems,
     pageSizeOptions: tablePageSizeOptions
-  };
-
-  return (
+  }
+  return <>
     <EuiBasicTable
       columns={tableColumns}
       items={items}
