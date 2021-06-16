@@ -76,6 +76,7 @@ export default compose(
         realTime: false,
       };
       this.ITEM_STYLE = { width: '300px' };
+      this.logger = new ErrorOrchestratorService();
     }
 
     updateHeight = () => {
@@ -131,8 +132,7 @@ export default compose(
           },
         };
 
-        const logger = new ErrorOrchestratorService();
-        logger.handleError(options);
+        this.logger.handleError(options);
       }
     }
 
@@ -227,8 +227,7 @@ export default compose(
           },
         };
 
-        const logger = new ErrorOrchestratorService();
-        logger.handleError(options);
+        this.logger.handleError(options);
       }
     }
 
@@ -310,8 +309,7 @@ export default compose(
           },
         };
 
-        const logger = new ErrorOrchestratorService();
-        logger.handleError(options);
+        this.logger.handleError(options);
       }
     }
 
@@ -412,8 +410,7 @@ export default compose(
           },
         };
 
-        const logger = new ErrorOrchestratorService();
-        logger.handleError(options);
+        this.logger.handleError(options);
       }
     };
 
