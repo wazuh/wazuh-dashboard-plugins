@@ -214,7 +214,7 @@ export default compose(
         this.setState({ logsList: result, offset: 0 });
       } catch (error) {
         const options = {
-          context: error?.context || 'WzLogs',
+          context: error?.context || 'setFullLogs',
           level: UI_LOGGER_LEVELS.ERROR,
           severity: UI_ERROR_SEVERITIES.BUSINESS,
           display: true,
@@ -297,7 +297,7 @@ export default compose(
         }
       } catch (error) {
         const options = {
-          context: error?.context || 'WzLogs',
+          context: error?.context || 'getNodeList',
           level: UI_LOGGER_LEVELS.ERROR,
           severity: UI_ERROR_SEVERITIES.BUSINESS,
           display: true,
@@ -399,7 +399,7 @@ export default compose(
         );
       } catch (error) {
         const options = {
-          context: error?.context || 'WzLogs',
+          context: error?.context || 'exportFormatted',
           level: UI_LOGGER_LEVELS.ERROR,
           severity: UI_ERROR_SEVERITIES.BUSINESS,
           display: true,
