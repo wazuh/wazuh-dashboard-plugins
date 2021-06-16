@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Module Mitre Att&ck intelligence container should render a the component 1`] = `
+exports[`Module Mitre Att&ck intelligence container should render the component 1`] = `
 <EuiFlexGroup
   style={
     Object {

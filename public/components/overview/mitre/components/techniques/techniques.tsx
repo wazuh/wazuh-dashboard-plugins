@@ -79,7 +79,7 @@ export const Techniques = withWindowSize(class Techniques extends Component {
   
   async componentDidMount(){
     this._isMount = true;
-    await this.buildMitreTechniquesFromApi()
+    await this.buildMitreTechniquesFromApi();
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -190,39 +190,42 @@ export const Techniques = withWindowSize(class Techniques extends Component {
   }
 
   async getMitreTechniques (params) {
-    this.setState({ isSearching: true })
-    return await WzRequest.apiReq("GET", "/mitre/techniques", { params: params })
-    .then((res) => res)
-    .catch((err) => {
-       this.showToast(
-         'danger',
-         'Error',
-         `Mitre techniques could not be fetched: ${err}`,
-         3000
-       );
-      []
-    });
+    try{
+      return await WzRequest.apiReq("GET", "/mitre/techniques", { params });
+    }catch(error){
+      this.showToast(
+        'danger',
+        'Error',
+        `Mitre techniques could not be fetched: ${error}`,
+        3000
+      );
+      return [];
+    }
   }
 
   async buildMitreTechniquesFromApi () {
-    const params = { limit: 500 };
-    const output = await this.getMitreTechniques(params)
+    const limitResults = 500;
+    const params = { limit: limitResults };
+    this.setState({ isSearching: true });
+    const output = await this.getMitreTechniques(params);
     const totalItems = (((output || {}).data || {}).data || {}).total_affected_items;
     let mitreTechniques = [];
     mitreTechniques.push(...output.data.data.affected_items);
-    if (totalItems && output.data && output.data.data && totalItems > 500) {
-      params.offset = 0;
-      while (mitreTechniques.length < totalItems && params.offset < totalItems) {
-        params.offset += params.limit;
-        const tmpData = await this.getMitreTechniques(params)
-        mitreTechniques.push(...tmpData.data.data.affected_items);
-      }
+    if (totalItems && output.data && output.data.data && totalItems > limitResults) {
+      const extraResults = await Promise.all(
+        Array(Math.ceil(totalItems/params.limit))
+          .map(async (_,index) => {
+            const response = await this.getMitreTechniques({...params, offset: limitResults * (1+index)});
+            return response.data.data.affected_items;
+          })
+      );
+      mitreTechniques.push(...extraResults.flat());
     }
-    this.setState({ mitreTechniques: mitreTechniques, isSearching: false })
+    this.setState({ mitreTechniques: mitreTechniques, isSearching: false });
   }
 
    buildObjTechniques(techniques){
-    const techniquesObj = []
+    const techniquesObj = [];
     techniques.forEach(element => {
       const mitreObj = this.state.mitreTechniques.find(item => item.id === element);
       if(mitreObj){
@@ -231,7 +234,7 @@ export const Techniques = withWindowSize(class Techniques extends Component {
         mitreTechniqueID ? techniquesObj.push({ id : mitreTechniqueID, name: mitreTechniqueName}) : '';
       }
     });
-    return techniquesObj
+    return techniquesObj;
   }
 
   renderFacet() {

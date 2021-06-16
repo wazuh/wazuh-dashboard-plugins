@@ -31,7 +31,7 @@ const getMitreAttackIntelligenceSuggestions = (endpoint: string, field: string) 
       .slice(0,9)
   }catch(error){
     return [];
-  }
+  };
 };
 
 function buildResource(label: string, labelResource: string){

@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Markdown container should render the component 1`] = `
+<div
+  className="wz-markdown-margin wz-markdown-wrapper"
+  dangerouslySetInnerHTML={
+    Object {
+      "__html": "<p>Example text</p>
+",
+    }
+  }
+/>
+`;

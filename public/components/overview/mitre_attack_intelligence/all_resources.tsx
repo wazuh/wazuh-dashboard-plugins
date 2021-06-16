@@ -16,7 +16,7 @@ import {
   EuiTitle,
   EuiSpacer
 } from '@elastic/eui';
-import { ModuleMitreAttackIntelligenceAllResourcesSearchResults } from './module_mitre_attack_intelligence_all_resources_search_results';
+import { ModuleMitreAttackIntelligenceAllResourcesSearchResults } from './all_resources_search_results';
 import { ModuleMitreAttackIntelligenceFlyout } from './resource_detail_flyout';
 
 export const ModuleMitreAttackIntelligenceAllResources = ({ results, loading }) => {

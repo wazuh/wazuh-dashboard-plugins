@@ -12,7 +12,7 @@
  */
 
 import React, { useRef, Fragment } from 'react';
-import { MitreAttackResources } from './mitre_attack_resources';
+import { MitreAttackResources } from './resources';
 import { ReferencesTable } from './resource_detail_references_table';
 
 import {
@@ -26,7 +26,7 @@ import {
   EuiFlexItem,
   EuiSpacer,
 } from '@elastic/eui';
-import { Markdown } from '../../common/util/markdown';
+import { Markdown } from '../../common/util';
 
 interface DetailFlyoutType {
   details: any,
@@ -100,4 +100,3 @@ export const ModuleMitreAttackIntelligenceFlyout = ({details, closeFlyout, onSel
     </EuiOverlayMask>
   )
 };
-

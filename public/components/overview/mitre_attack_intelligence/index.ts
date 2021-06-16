@@ -11,4 +11,4 @@
  * Find more information about this on the LICENSE file.
  */
 
-export * from './module_mitre_intelligence';
+export * from './intelligence';

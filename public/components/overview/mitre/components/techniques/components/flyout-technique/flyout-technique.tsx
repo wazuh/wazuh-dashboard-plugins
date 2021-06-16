@@ -177,7 +177,7 @@ export class FlyoutTechnique extends Component {
     const formattedDescription = techniqueData.description 
       ? (
         <div
-          className="wz-markdown-margin wz-markdown-wapper"
+          className="wz-markdown-margin wz-markdown-wrapper"
           dangerouslySetInnerHTML={{__html: md.render(techniqueData.description)}}>
         </div>
       )
@@ -187,7 +187,7 @@ export class FlyoutTechnique extends Component {
         title: 'ID',
         description: ( <EuiToolTip
           position="top"
-          content={"Open " + currentTechnique + " details in Intelligence section"}>
+          content={`Open ${currentTechnique} details in the Intelligence section`}>
           <EuiLink onClick={(e) => {this.props.openIntelligence(e,'techniques',currentTechnique);e.stopPropagation()}}>
             {currentTechnique}
           </EuiLink>
@@ -201,9 +201,7 @@ export class FlyoutTechnique extends Component {
               <>
                 <EuiToolTip
                   position="top"
-                  content={
-                    "Open " + tactic.name + " details in a Intelligence section"
-                  }
+                  content={`Open ${tactic.name} details in the Intelligence section`}
                 >
                   <EuiLink
                     onClick={(e) => {
@@ -281,7 +279,15 @@ export class FlyoutTechnique extends Component {
             initialIsOpen={true}>
           <EuiFlexGroup className="flyout-row">
             <EuiFlexItem>
-              <Discover kbnSearchBar shareFilterManager={this.filterManager} initialColumns={["icon", "timestamp", 'rule.mitre.id', 'rule.mitre.tactic', 'rule.level', 'rule.id', 'rule.description']} implicitFilters={implicitFilters} initialFilters={[]} updateTotalHits={(total) => this.updateTotalHits(total)} openIntelligence={(e,redirectTo,itemId) => this.props.openIntelligence(e,redirectTo,itemId)}/>
+              <Discover
+                kbnSearchBar
+                shareFilterManager={this.filterManager}
+                initialColumns={["icon", "timestamp", 'rule.mitre.id', 'rule.mitre.tactic', 'rule.level', 'rule.id', 'rule.description']}
+                implicitFilters={implicitFilters}
+                initialFilters={[]}
+                updateTotalHits={(total) => this.updateTotalHits(total)}
+                openIntelligence={(e,redirectTo,itemId) => this.props.openIntelligence(e,redirectTo,itemId)}
+              />
             </EuiFlexItem>
           </EuiFlexGroup>
         </EuiAccordion>
@@ -297,8 +303,8 @@ export class FlyoutTechnique extends Component {
   renderLoading(){
     return (
     <EuiFlyoutBody>
-          <EuiLoadingContent lines={2} />
-          <EuiLoadingContent lines={3} />
+      <EuiLoadingContent lines={2} />
+      <EuiLoadingContent lines={3} />
     </EuiFlyoutBody>
     )
   }

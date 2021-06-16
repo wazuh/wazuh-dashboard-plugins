@@ -26,7 +26,7 @@ interface referencesTableType {
   referencesArray: Array<string>,
   columns: any,
   backToTop: backToTopType
-}
+};
 
 export const ReferencesTable = ({referencesName, referencesArray, columns, backToTop} : referencesTableType) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -57,7 +57,7 @@ export const ReferencesTable = ({referencesName, referencesArray, columns, backT
     }
     catch (error){};
     setIsLoading(false);
-  }
+  };
 
   return (
     <EuiAccordion
@@ -77,5 +77,4 @@ export const ReferencesTable = ({referencesName, referencesArray, columns, backT
       />
     </EuiAccordion>
   );
-}
-
+};

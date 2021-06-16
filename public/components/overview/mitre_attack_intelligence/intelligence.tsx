@@ -17,14 +17,14 @@ import {
   EuiFlexItem,
 } from '@elastic/eui';
 
-import { MitreAttackResources } from './mitre_attack_resources';
-import { ModuleMitreAttackIntelligenceLeftPanel } from './module_mitre_attack_intelligence_left_panel';
-import { ModuleMitreAttackIntelligenceRightPanel } from './module_mitre_attack_intelligence_right_panel';
-import { useAsyncAction } from '../../../components/common/hooks';
+import { MitreAttackResources } from './resources';
+import { ModuleMitreAttackIntelligenceLeftPanel } from './intelligence_left_panel';
+import { ModuleMitreAttackIntelligenceRightPanel } from './intelligence_right_panel';
+import { useAsyncAction } from '../../common/hooks';
 import { WzRequest } from '../../../react-services';
-import { PanelSplit } from '../../../components/common/panels';
+import { PanelSplit } from '../../common/panels';
 
-export const ModuleMitreIntelligence = () => {
+export const ModuleMitreAttackIntelligence = () => {
   const [selectedResource, setSelectedResource] = useState(MitreAttackResources[0].id);
   const [searchTermAllResources, setSearchTermAllResources] = useState('');
   const searchTermAllResourcesLastSearch = useRef('');
@@ -95,4 +95,4 @@ export const ModuleMitreIntelligence = () => {
       </EuiFlexItem>
     </EuiFlexGroup>
   )
-}
+};

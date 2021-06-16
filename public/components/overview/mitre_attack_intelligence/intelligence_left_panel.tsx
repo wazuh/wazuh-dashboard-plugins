@@ -13,8 +13,8 @@
 
 import React from 'react';
 import { WzFieldSearchDelay } from '../../../components/common/search';
-import { MitreAttackResources } from './mitre_attack_resources';
-import { ModuleMitreAttackIntelligenceResourceButton } from './module_mitre_attack_intelligence_resource_button'
+import { MitreAttackResources } from './resources';
+import { ModuleMitreAttackIntelligenceResourceButton } from './resource_button'
 
 export const ModuleMitreAttackIntelligenceLeftPanel = ({onSelectResource, selectedResource, onSearchTermAllResourcesChange, onSearchTermAllResourcesSearch}) => {
   return (
@@ -42,5 +42,3 @@ export const ModuleMitreAttackIntelligenceLeftPanel = ({onSelectResource, select
     </>
   )
 };
-
-

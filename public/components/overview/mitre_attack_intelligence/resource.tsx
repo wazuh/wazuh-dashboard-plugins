@@ -16,7 +16,14 @@ import { TableWzAPI } from '../../../components/common/tables';
 import { WzRequest } from '../../../react-services';
 import { ModuleMitreAttackIntelligenceFlyout } from './resource_detail_flyout';
 
-export const ModuleMitreAttackIntelligenceResource = ({ label, searchBarSuggestions, apiEndpoint, tableColumnsCreator, initialSortingField, resourceFilters }) => {
+export const ModuleMitreAttackIntelligenceResource = ({
+  label,
+  searchBarSuggestions,
+  apiEndpoint,
+  tableColumnsCreator,
+  initialSortingField,
+  resourceFilters
+}) => {
   const [details, setDetails] = useState(null);
 
   useEffect(() => {
@@ -77,4 +84,4 @@ export const ModuleMitreAttackIntelligenceResource = ({ label, searchBarSuggesti
       )}
     </> 
   )
-}
+};

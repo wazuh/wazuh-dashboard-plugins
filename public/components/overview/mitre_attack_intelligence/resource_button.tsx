@@ -12,7 +12,7 @@
  */
 
 import React from 'react';
-import './module_mitre_attack_intelligence_resource_button.scss';
+import './resource_button.scss';
 
 export const ModuleMitreAttackIntelligenceResourceButton = ({children, isSelected = false, className = '', ...rest }) => {
   return (

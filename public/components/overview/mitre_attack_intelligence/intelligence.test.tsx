@@ -14,8 +14,8 @@
  */
 
 import React from 'react';
-import { mount, shallow } from 'enzyme';
-import { ModuleMitreIntelligence } from './module_mitre_intelligence';
+import { shallow } from 'enzyme';
+import { ModuleMitreAttackIntelligence } from './intelligence';
 
 jest.mock('../../../react-services', () => ({ 
   WzRequest: () => ({
@@ -32,18 +32,9 @@ jest.mock('../../../react-services', () => ({
 }));
 
 describe('Module Mitre Att&ck intelligence container', () => {
-  test('should render a the component', () => {
-    const component = shallow(<ModuleMitreIntelligence />);
+  test('should render the component', () => {
+    const component = shallow(<ModuleMitreAttackIntelligence />);
 
     expect(component).toMatchSnapshot();
   });
-
-  // test('should render a Health check screen with error', () => {
-  //   const component = mount(<HealthCheckTest />);
-
-  //   component.find('CheckResult').at(1).invoke('handleErrors')('setup',['Test error']); // invoke is wrapped with act to await for setState
-
-  //   const callOutError = component.find('EuiCallOut');
-  //   expect(callOutError.text()).toBe('Test error');
-  // });
 });
