@@ -152,7 +152,6 @@ export default compose(
         }
         this.setState({ daemonsList });
       } catch (error) {
-        error.message = 'Error obtaining daemons list.';
         throw error;
       }
     }
@@ -200,7 +199,6 @@ export default compose(
         totalItems = ((tmpResult || {}).data.data || {}).total_affected_items;
         result = this.parseLogsToText(resultItems) || '';
       } catch (error) {
-        error.message = 'Error obtaining logs';
         throw error;
       }
 
