@@ -1,4 +1,3 @@
-import { ErrorOrchestratorService } from './react-services';
 import {
   ChromeStart,
   CoreStart,
@@ -40,9 +39,6 @@ export const [getVisualizationsPlugin, setVisualizationsPlugin] = createGetterSe
 export const [getNavigationPlugin, setNavigationPlugin] = createGetterSetter<
   NavigationPublicPluginStart
 >('NavigationPlugin');
-export const [getErrorOrchestrator, setErrorOrchestrator] = createGetterSetter<
-  ErrorOrchestratorService
->('ErrorOrchestratorService');
 
 /**
  * set bootstrapped inner angular module

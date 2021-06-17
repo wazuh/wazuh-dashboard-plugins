@@ -14,7 +14,6 @@ import {
   setCore,
   setPlugins,
   setCookies,
-  setErrorOrchestrator,
 } from './kibana-services';
 import {
   AppPluginStartDependencies,
@@ -25,7 +24,8 @@ import {
 } from './types';
 import { Cookies } from 'react-cookie';
 import { AppState } from './react-services/app-state';
-import { ErrorOrchestratorService } from './react-services';
+import { setErrorOrchestrator } from './react-services';
+import { ErrorOrchestratorService } from './react-services/error-orchestrator/error-orchestrator.service';
 
 const innerAngularName = 'app/wazuh';
 
