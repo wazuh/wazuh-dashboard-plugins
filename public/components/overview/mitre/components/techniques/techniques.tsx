@@ -213,7 +213,7 @@ export const Techniques = withWindowSize(class Techniques extends Component {
     mitreTechniques.push(...output.data.data.affected_items);
     if (totalItems && output.data && output.data.data && totalItems > limitResults) {
       const extraResults = await Promise.all(
-        Array(Math.ceil(totalItems/params.limit))
+        Array(Math.ceil((totalItems-params.limit)/params.limit)).fill()
           .map(async (_,index) => {
             const response = await this.getMitreTechniques({...params, offset: limitResults * (1+index)});
             return response.data.data.affected_items;
