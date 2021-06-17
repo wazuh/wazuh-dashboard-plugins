@@ -32,7 +32,7 @@ export const ModulesDefaults = {
   },
   mitre: {
     init: 'dashboard',
-    tabs: [{ id: 'inventory', name: 'Framework' }, { id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }],
+    tabs: [{id: 'intelligence', name: 'Intelligence'}, { id: 'inventory', name: 'Framework' }, { id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }],
     buttons: ['reporting']
   },
   vuls: {

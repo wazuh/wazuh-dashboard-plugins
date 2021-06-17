@@ -25,14 +25,16 @@ import { ExportTableCsv }  from './components/export-table-csv';
 
 export function TableWzAPI({endpoint, ...rest}){
 
-  const [results, setResults] = useState({items: {}, totalItems: 0});
+  const [totalItems, setTotalItems] = useState(0);
   const [filters, setFilters] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const onSearch = useCallback(async function(filters, pagination, sorting){
     try {
       const { pageIndex, pageSize } = pagination;
       const { field, direction } = sorting.sort;
-      setFilters(filters)
+      setIsLoading(true);
+      setFilters(filters);
       const params = {
         ...filtersToObject(filters),
         offset: pageIndex * pageSize,
@@ -42,31 +44,31 @@ export function TableWzAPI({endpoint, ...rest}){
 
       const response = await WzRequest.apiReq('GET', endpoint, { params });
 
-      const { affected_items, total_affected_items } = ((response || {}).data || {}).data;
-      const results = {items: affected_items, totalItems: total_affected_items}
-      setResults(results)
-      return results;
+      const { affected_items: items, total_affected_items: totalItems } = ((response || {}).data || {}).data;
+      setIsLoading(false);
+      setTotalItems(totalItems);
+      return { items: rest.mapResponseItem ? items.map(rest.mapResponseItem) : items, totalItems };
     } catch (error) {
+      setIsLoading(false);
+      setTotalItems(0);
       return Promise.reject(error);
-    }
+    };
   },[]);
 
-  const renderTableHeader = () => {
-      return (
-        <EuiFlexGroup>
-          <EuiFlexItem>
-            {rest.title ? <EuiTitle size="s">
-              <h1>{rest.title}&nbsp; {rest.reload === true ? <EuiLoadingSpinner size="s" /> : <span>({ results.totalItems })</span>}</h1>
-            </EuiTitle> : ''}
-          </EuiFlexItem>
-          {rest.downloadCsv ? <ExportTableCsv endpoint={endpoint} totalItems={results.totalItems} filters={filters} title={rest.title}/> : ''}
-        </EuiFlexGroup>
-      )
-  }
+  const header = (
+    <EuiFlexGroup>
+      <EuiFlexItem>
+        {rest.title && (
+          <EuiTitle size="s">
+            <h1>{rest.title} {isLoading ? <EuiLoadingSpinner size="s" /> : <span>({ totalItems })</span>}</h1>
+          </EuiTitle>
+        )}
+      </EuiFlexItem>
+      {rest.downloadCsv && <ExportTableCsv endpoint={endpoint} totalItems={totalItems} filters={filters} title={rest.title}/>}
+    </EuiFlexGroup>
+  )
 
-  const renderTable = () => {
-    return (
-      rest.searchTable ?
+  const table = rest.searchTable ?  
       <TableWithSearchBar
         onSearch={onSearch}
         {...rest}
@@ -75,22 +77,17 @@ export function TableWzAPI({endpoint, ...rest}){
         onSearch={onSearch}
         {...rest}
       />
-    )
-  }
-
-  const header = renderTableHeader();
-  const table = renderTable();
   
-  return <>
-  {header}
-  {table}
-  </>
+  return (
+  <>
+    {header}
+    {table}
+  </>)
 }
 
 // Set default props
 TableWzAPI.defaultProps = {
   title: null,
   downloadCsv: false,
-  searchBar: false,
-  rowProps: false,
+  searchBar: false
 };

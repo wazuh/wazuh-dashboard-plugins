@@ -115,22 +115,12 @@ export const Mitre = withErrorBoundary (class Mitre extends Component {
 
   async buildTacticsObject() {
     try {
-      const data = await WzRequest.apiReq('GET', '/mitre', {
-        params: {
-          select: "phase_name"
-        }
-      });
+      const data = await WzRequest.apiReq('GET', '/mitre/tactics', {});
       const result = (((data || {}).data || {}).data || {}).affected_items;
       const tacticsObject = {};
       result && result.forEach(item => {
-          const {id, phase_name} = item;
-          phase_name.forEach( (tactic) => {
-            if(!tacticsObject[tactic]){
-              tacticsObject[tactic] = [];
-            }
-            tacticsObject[tactic].push(id);
-          })
-        });
+        tacticsObject[item.name] = item;
+      });
       this._isMount && this.setState({tacticsObject, isLoading: false});
     } catch(err) {
       this.setState({ isLoading: false });

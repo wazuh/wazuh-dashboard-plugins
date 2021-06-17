@@ -371,6 +371,23 @@ class WzRuleInfo extends Component {
     );
   }
 
+  async getTacticsNames(tactics){
+    try{
+        let tacticsObj = []
+        const data = await WzRequest.apiReq('GET', '/mitre/tactics', { 
+          params: {
+            tactic_ids: tactics.toString()
+          }
+        })
+        const formattedData = (((((data || {}).data).data || {}).affected_items || []) || {});
+        formattedData && formattedData.forEach(item => {
+          tacticsObj.push(item.name);
+        });
+        return tacticsObj;
+    }catch(error){
+      return [];
+    }
+  }
 
   async addMitreInformation(compliance, currentRuleId){
     try{
@@ -378,16 +395,16 @@ class WzRuleInfo extends Component {
       const mitreName = [];
       const mitreIds = [];
       const mitreTactics = await Promise.all(compliance.map(async (i) => {
-        const data = await WzRequest.apiReq('GET', '/mitre', { 
+        const data = await WzRequest.apiReq('GET', '/mitre/techniques', { 
           params: {
-            q: `id=${i}`
+            q: `references.external_id=${i}`
           }
         });
         const formattedData = (((((data || {}).data).data || {}).affected_items || [])[0] || {});
-        const techniques = formattedData.phase_name || [];
-        mitreName.push(formattedData.json.name);
+        const tactics = this.getTacticsNames(formattedData.tactics) || [];
+        mitreName.push(formattedData.name);
         mitreIds.push(i);
-        return techniques;
+        return tactics;
       }));
       if(mitreTactics.length){
         let removeDuplicates = (arr) => arr.filter((v,i) => arr.indexOf(v) === i)

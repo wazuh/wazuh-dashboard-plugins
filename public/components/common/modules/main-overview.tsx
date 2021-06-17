@@ -41,6 +41,8 @@ import { withAgentSupportModule } from '../../../components/common/hocs';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 
+import { ModuleMitreAttackIntelligence } from '../../overview/mitre_attack_intelligence';
+
 export class MainModuleOverview extends Component {
   constructor(props) {
     super(props);
@@ -214,7 +216,10 @@ const ModuleTabViewer = compose(
       {section === 'vuls' && selectView==='inventory' && <MainVuls {...props} />}
 
       {section === 'mitre' && selectView === 'inventory' && <MainMitre {...props} />}
-      {['pci', 'gdpr', 'hipaa', 'nist', 'tsc'].includes(section) && selectView === 'inventory' && <ComplianceTable {...props} goToDiscover={(id) => props.onSelectedTabChanged(id)} />}
+      {section === 'mitre' && selectView === 'intelligence' && <ModuleMitreAttackIntelligence {...props} />}
+      {['pci', 'gdpr', 'hipaa', 'nist', 'tsc'].includes(section) && selectView === 'inventory' && (
+        <ComplianceTable {...props} goToDiscover={(id) => props.onSelectedTabChanged(id)} />
+      )}
       {/* -------------------------------------------------------------------------- */}
     </>
 })
