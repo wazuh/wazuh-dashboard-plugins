@@ -1,5 +1,6 @@
 /*
- * Wazuh app - Mitre alerts components
+ * Wazuh app - Mitre Att&ck intelligence index.
+ *
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -9,3 +10,5 @@
  *
  * Find more information about this on the LICENSE file.
  */
+
+export * from './intelligence';

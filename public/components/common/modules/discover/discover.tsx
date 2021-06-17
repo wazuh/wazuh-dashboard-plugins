@@ -97,6 +97,7 @@ export const Discover = compose(
     query?: { language: "kuery" | "lucene", query: string }
     type?: any,
     updateTotalHits: Function,
+    openIntelligence: Function,
     includeFilters?: string,
     initialColumns: string[],
     shareFilterManager: FilterManager,
@@ -431,7 +432,7 @@ export const Discover = compose(
         width = '15%';
       }
       if (item === 'rule.mitre.id') {
-        link = (ev, x) => { this.setState({ showMitreFlyout: true, selectedTechnique: x }) };
+        link = (ev, x, e) => this.props.openIntelligence(e,'techniques',x);
       }
       if(arrayCompilance.indexOf(item) !== -1) {
         width = '30%';

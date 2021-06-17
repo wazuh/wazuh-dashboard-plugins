@@ -25,14 +25,15 @@ export function TableWithSearchBar({
   tableInitialSortingDirection = 'asc',
   tableInitialSortingField = '',
   tableProps = {},
-  reload
+  reload,
+  ...rest
 })
   {
 
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState([]);
   const [totalItems, setTotalItems] = useState(0);
-  const [filters, setFilters] = useState([]);
+  const [filters, setFilters] = useState(rest.filters || []);
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: tablePageSizeOptions[0]
@@ -74,6 +75,10 @@ export function TableWithSearchBar({
       setLoading(false);
     })()
   }, [filters, pagination, sorting, reload]);
+
+  useEffect(() => {
+    setFilters(rest.filters || [])
+  }, [rest.filters]);
 
   const tablePagination = {
     ...pagination,

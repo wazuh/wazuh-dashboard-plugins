@@ -42,6 +42,7 @@ import { getAngularModule } from '../../../kibana-services';
 import { withAgentSupportModule } from '../../../components/common/hocs';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
+import { ModuleMitreAttackIntelligence } from '../../overview/mitre_attack_intelligence';
 
 export class MainModuleAgent extends Component {
   props!: {
@@ -350,6 +351,7 @@ const ModuleTabViewer = compose(
       {section === 'fim' && selectView==='inventory' && <MainFim {...props} />}
       {section === 'sca' && selectView==='inventory' && <MainSca {...props} />}
       {section === 'mitre' && selectView === 'inventory' && <MainMitre {...props} />}
+      {section === 'mitre' && selectView === 'intelligence' && <ModuleMitreAttackIntelligence {...props} />}
       {/* {['pci', 'gdpr', 'hipaa', 'nist', 'tsc'].includes(section) && selectView === 'inventory' && <ComplianceTable {...props} goToDiscover={(id) => props.onSelectedTabChanged(id)} />} */}
       {/* -------------------------------------------------------------------------- */}
     </>
