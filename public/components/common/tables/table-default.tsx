@@ -16,7 +16,6 @@ import { EuiBasicTable } from '@elastic/eui';
 export function TableDeafult({
   onSearch,
   tableColumns,
-  rowProps,
   tablePageSizeOptions = [15, 25, 50, 100],
   tableInitialSortingDirection = 'asc',
   tableInitialSortingField = '',
@@ -76,16 +75,13 @@ export function TableDeafult({
     totalItemCount: totalItems,
     pageSizeOptions: tablePageSizeOptions
   }
-  return <>
-    <EuiBasicTable
+  return <EuiBasicTable
       columns={tableColumns}
       items={items}
       loading={loading}
       pagination={tablePagination}
       sorting={sorting}
       onChange={tableOnChange}
-      rowProps={rowProps ? rowProps : false}
       {...tableProps}
     />
-  </>
 }
