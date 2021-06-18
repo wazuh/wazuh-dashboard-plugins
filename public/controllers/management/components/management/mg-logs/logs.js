@@ -214,7 +214,6 @@ export default compose(
           context: errorContext,
           level: UI_LOGGER_LEVELS.ERROR,
           severity: UI_ERROR_SEVERITIES.BUSINESS,
-          display: true,
           store: true,
           error: {
             error: error,
