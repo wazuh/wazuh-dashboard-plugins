@@ -16,7 +16,15 @@ import { ErrorOrchestrator, UIErrorLog } from './types';
 export class ErrorOrchestratorService {
   public constructor() {}
 
-  public handleError(uiErrorLog: UIErrorLog) {
+  static handleError({
+    context,
+    level,
+    severity,
+    display = true,
+    store = false,
+    error,
+  }: UIErrorLog) {
+    const uiErrorLog = { context, level, severity, display, store, error };
     const errorOrchestrator: ErrorOrchestrator = errorOrchestratorFactory(uiErrorLog.severity);
     errorOrchestrator.loadErrorLog(uiErrorLog);
   }
