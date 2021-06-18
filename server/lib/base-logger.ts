@@ -36,8 +36,8 @@ export class BaseLogger {
   RAW_LOGS_PATH: string = '';
 
   constructor(plainLogsPath: string, rawLogsPath: string) {
-    this.PLAIN_LOGS_PATH = path.join(WAZUH_DATA_LOGS_DIRECTORY_PATH, plainLogsPath);
-    this.RAW_LOGS_PATH = path.join(WAZUH_DATA_LOGS_DIRECTORY_PATH, rawLogsPath);
+    this.PLAIN_LOGS_PATH = plainLogsPath;
+    this.RAW_LOGS_PATH = rawLogsPath;
   }
 
   /**

@@ -34,7 +34,7 @@ export class ErrorOrchestratorBase implements ErrorOrchestrator {
       await GenericRequest.request('POST', `/utils/logs/ui`, {
         message: errorLog.error.message,
         level: winstonLevel,
-        location: errorLog.location,
+        location: errorLog.context || errorLog.error.error.stack,
       });
     } catch (error) {
       loglevel.error('Failed on request [POST /utils/logs/ui]', error);
