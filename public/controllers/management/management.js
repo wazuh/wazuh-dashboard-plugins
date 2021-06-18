@@ -48,7 +48,6 @@ export class ManagementController {
     this.logtestOpened = false;
     this.uploadOpened = false;
     this.rulesetTab = RulesetResources.RULES;
-    this.logger = new ErrorOrchestratorService();
 
     this.$scope.$on('setCurrentGroup', (ev, params) => {
       this.currentGroup = (params || {}).currentGroup || false;
@@ -214,20 +213,16 @@ export class ManagementController {
       };
     } catch (error) {
       const errorOptions = {
-        context: '$onInit',
-        location: 'ManagementController',
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
-        display: true,
-        store: true,
         error: {
           error: error,
-          message: error?.message,
+          message: error?.message || '',
           title: 'Error restarting cluster',
         },
       };
 
-      this.logger.handleError(errorOptions);
+      ErrorOrchestratorService().handleError(errorOptions);
     }
   }
 
@@ -253,12 +248,8 @@ export class ManagementController {
       this.$scope.$applyAsync();
 
       const errorOptions = {
-        context: 'restartManager',
-        location: 'ManagementController',
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
-        display: true,
-        store: true,
         error: {
           error: error,
           message: error?.message || '',
@@ -266,7 +257,7 @@ export class ManagementController {
         },
       };
 
-      this.logger.handleError(errorOptions);
+      ErrorOrchestratorService().handleError(errorOptions);
     }
   }
 
@@ -282,20 +273,16 @@ export class ManagementController {
       this.isRestarting = false;
       this.$scope.$applyAsync();
       const errorOptions = {
-        context: 'restartCluster',
-        location: 'ManagementController',
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
-        display: true,
-        store: true,
         error: {
           error: error,
-          message: error?.message,
+          message: error?.message || '',
           title: 'Error restarting cluster',
         },
       };
 
-      this.logger.handleError(errorOptions);
+      ErrorOrchestratorService().handleError(errorOptions);
     }
   }
 
@@ -437,20 +424,16 @@ export class ManagementController {
       }
     } catch (error) {
       const errorOptions = {
-        context: 'loadNodeList',
-        location: 'ManagementController',
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
-        display: true,
-        store: true,
         error: {
           error: error,
-          message: error?.message,
+          message: error?.message || '',
           title: error?.name,
         },
       };
 
-      this.logger.handleError(errorOptions);
+      ErrorOrchestratorService().handleError(errorOptions);
     }
     this.loadingNodes = false;
     this.$scope.$applyAsync();
@@ -519,20 +502,16 @@ export class ManagementController {
       if (Array.isArray(error) && error.length) throw error;
 
       const errorOptions = {
-        context: 'uploadFiles',
-        location: 'ManagementController',
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
-        display: true,
-        store: true,
         error: {
           error: error,
           message: error?.message || '',
-          title: 'Files cannot be uploaded',
+          title: 'Files cannot be loaded',
         },
       };
 
-      this.logger.handleError(errorOptions);
+      ErrorOrchestratorService().handleError(errorOptions);
     }
   }
 }
