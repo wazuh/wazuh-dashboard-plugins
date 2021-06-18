@@ -225,3 +225,14 @@ export const updateAllowedAgents = allowedAgents => {
     allowedAgents
   };
 };
+
+/**
+ * Updates logtestToken in the appState store
+ * @param logtestToken
+ */
+export const updateLogtestToken = (logtestToken) => {
+  return {
+    type: 'UPDATE_LOGTEST_TOKEN',
+    logtestToken: logtestToken
+  };
+};

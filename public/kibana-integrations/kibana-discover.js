@@ -30,6 +30,7 @@ import {
   subscribeWithScope,
   tabifyAggResponse,
   getHeaderActionMenuMounter,
+  setUiActions
 } from './discover/kibana_services';
 
 import indexTemplateLegacy from './discover/application/angular/discover_legacy.html';
@@ -114,6 +115,7 @@ appDiscover.run(async () => {
     () => getAngularModule().$injector
   );
   setServices(services);
+  setUiActions(getPlugins().uiActions);
 });
 
 const wazuhApp = getAngularModule();
