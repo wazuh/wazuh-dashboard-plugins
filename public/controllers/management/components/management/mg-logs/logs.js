@@ -40,7 +40,9 @@ import { compose } from 'redux';
 import { WzFieldSearch } from '../../../../../components/wz-field-search-bar/wz-field-search-bar';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
-import { ErrorOrchestratorService } from '../../../../../react-services';
+import { getErrorOrchestrator } from '../../../../../react-services';
+
+const errorContext = 'WzLogs';
 
 export default compose(
   withGlobalBreadcrumb([
@@ -76,7 +78,6 @@ export default compose(
         realTime: false,
       };
       this.ITEM_STYLE = { width: '300px' };
-      this.logger = new ErrorOrchestratorService();
     }
 
     updateHeight = () => {
@@ -119,12 +120,10 @@ export default compose(
         });
 
         const options = {
-          context: error?.context || 'WzLogs',
+          context: errorContext,
           level: UI_LOGGER_LEVELS.ERROR,
-          severity: UI_ERROR_SEVERITIES.BUSINESS,
-          display: true,
+          severity: UI_ERROR_SEVERITIES.CRITICAL,
           store: true,
-          location: 'WzLogs',
           error: {
             error: error,
             message: error.message || error,
@@ -132,7 +131,7 @@ export default compose(
           },
         };
 
-        this.logger.handleError(options);
+        getErrorOrchestrator().handleError(options);
       }
     }
 
@@ -152,7 +151,7 @@ export default compose(
         }
         this.setState({ daemonsList });
       } catch (error) {
-        throw error;
+        throw new Error(error);
       }
     }
 
@@ -199,7 +198,7 @@ export default compose(
         totalItems = ((tmpResult || {}).data.data || {}).total_affected_items;
         result = this.parseLogsToText(resultItems) || '';
       } catch (error) {
-        throw error;
+        throw new Error(error);
       }
 
       this.setState({ totalItems });
@@ -212,12 +211,11 @@ export default compose(
         this.setState({ logsList: result, offset: 0 });
       } catch (error) {
         const options = {
-          context: error?.context || 'setFullLogs',
+          context: errorContext,
           level: UI_LOGGER_LEVELS.ERROR,
           severity: UI_ERROR_SEVERITIES.BUSINESS,
           display: true,
           store: true,
-          location: 'WzLogs',
           error: {
             error: error,
             message: error.message || error,
@@ -225,7 +223,7 @@ export default compose(
           },
         };
 
-        this.logger.handleError(options);
+        getErrorOrchestrator().handleError(options);
       }
     }
 
@@ -258,8 +256,7 @@ export default compose(
 
         return { nodeList: '', logsPath: '/manager/logs', selectedNode: '' };
       } catch (error) {
-        error.context = 'getLogsPath';
-        throw error;
+        throw new Error(error);
       }
     }
 
@@ -294,12 +291,10 @@ export default compose(
         }
       } catch (error) {
         const options = {
-          context: error?.context || 'getNodeList',
+          context: errorContext,
           level: UI_LOGGER_LEVELS.ERROR,
           severity: UI_ERROR_SEVERITIES.BUSINESS,
-          display: true,
           store: true,
-          location: 'WzLogs',
           error: {
             error: error,
             message: 'Error obtaining list of nodes.',
@@ -307,7 +302,7 @@ export default compose(
           },
         };
 
-        this.logger.handleError(options);
+        getErrorOrchestrator().handleError(options);
       }
     }
 
@@ -395,12 +390,10 @@ export default compose(
         );
       } catch (error) {
         const options = {
-          context: error?.context || 'exportFormatted',
+          context: errorContext,
           level: UI_LOGGER_LEVELS.ERROR,
           severity: UI_ERROR_SEVERITIES.BUSINESS,
-          display: true,
           store: true,
-          location: 'WzLogs',
           error: {
             error: error,
             message: error.message,
@@ -408,7 +401,7 @@ export default compose(
           },
         };
 
-        this.logger.handleError(options);
+        getErrorOrchestrator().handleError(options);
       }
     };
 
