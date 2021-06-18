@@ -1,22 +1,21 @@
-let angularModule: any = null;
-let discoverModule: any = null;
-
 import {
   ChromeStart,
+  CoreStart,
   HttpStart,
   IUiSettingsClient,
-  ToastsStart,
-  SavedObjectsStart,
   OverlayStart,
+  SavedObjectsStart,
   ScopedHistory,
-  CoreStart,
+  ToastsStart,
 } from 'kibana/public';
 import { createGetterSetter } from '../../../src/plugins/kibana_utils/common';
 import { DataPublicPluginStart } from '../../../src/plugins/data/public';
 import { VisualizationsStart } from '../../../src/plugins/visualizations/public';
 import { NavigationPublicPluginStart } from '../../../src/plugins/navigation/public';
 import { AppPluginStartDependencies } from './types';
-import { ErrorOrchestrator } from '../common/constants';
+
+let angularModule: any = null;
+let discoverModule: any = null;
 
 export const [getCore, setCore] = createGetterSetter<CoreStart>('Core');
 export const [getPlugins, setPlugins] = createGetterSetter<AppPluginStartDependencies>('Plugins');
@@ -40,9 +39,6 @@ export const [getVisualizationsPlugin, setVisualizationsPlugin] = createGetterSe
 export const [getNavigationPlugin, setNavigationPlugin] = createGetterSetter<
   NavigationPublicPluginStart
 >('NavigationPlugin');
-export const [getErrorOrchestrator, setErrorOrchestrator] = createGetterSetter<ErrorOrchestrator>(
-  'ErrorOrchestrator'
-);
 
 /**
  * set bootstrapped inner angular module

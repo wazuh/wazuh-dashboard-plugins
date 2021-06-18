@@ -13,7 +13,6 @@
  */
 
 import React, { Component } from 'react';
-import loglevel from 'loglevel';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import {
   UI_ERROR_SEVERITIES,
@@ -21,16 +20,14 @@ import {
   UIErrorSeverity,
   UILogLevel,
 } from '../../../react-services/error-orchestrator/types';
-import { ErrorOrchestratorService } from '../../../react-services';
 import { ErrorComponentPrompt } from '../error-boundary-prompt/error-boundary-prompt';
+import { getErrorOrchestrator } from '../../../react-services';
 
 export default class ErrorBoundary extends Component {
-  private logger: ErrorOrchestratorService;
   constructor(props) {
     super(props);
     this.state = { errorTitle: null, errorInfo: null, style: null };
     this.context = this.constructor.displayName || this.constructor.name || undefined;
-    this.logger = new ErrorOrchestratorService();
   }
 
   componentDidCatch = (errorTitle, errorInfo) => catchFunc(errorTitle, errorInfo, this);
@@ -65,7 +62,7 @@ const catchFunc = (errorTitle, errorInfo, ctx) => {
       },
     };
 
-    ctx.logger.handleError(options);
+    getErrorOrchestrator().handleError(options);
   } catch (error) {
     const optionsCatch: UIErrorLog = {
       context: ctx.context,
@@ -80,6 +77,6 @@ const catchFunc = (errorTitle, errorInfo, ctx) => {
       },
     };
 
-    ctx.logger.handleError(optionsCatch);
+    getErrorOrchestrator().handleError(optionsCatch);
   }
 };

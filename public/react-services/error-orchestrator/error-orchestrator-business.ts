@@ -21,7 +21,6 @@ export class ErrorOrchestratorBusiness extends ErrorOrchestratorBase {
     const toast = {
       error: errorLog.error,
       title: errorLog.error.title,
-      toastMessage: errorLog.error.message,
       message: errorLog.error.message,
       toastLifeTimeMs: 3000,
     };
@@ -34,7 +33,8 @@ export class ErrorOrchestratorBusiness extends ErrorOrchestratorBase {
         getToasts().addWarning(errorLog.error.error, toast as ErrorToastOptions);
         break;
       case UI_LOGGER_LEVELS.ERROR:
-        getToasts().addError(errorLog.error.error, toast as ErrorToastOptions);
+        const toastError = { ...toast, toastMessage: errorLog.error.message };
+        getToasts().addError(errorLog.error.error, toastError as ErrorToastOptions);
         break;
       default:
         console.log('No error level', errorLog.error.message, errorLog.error.error);
