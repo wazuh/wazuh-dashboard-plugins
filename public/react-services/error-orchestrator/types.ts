@@ -32,13 +32,12 @@ export type UIError = {
 };
 
 export type UIErrorLog = {
-  context: string;
+  context?: string;
   level: UILogLevel;
   severity: UIErrorSeverity;
   display?: boolean;
   store?: boolean;
   error: UIError;
-  location?: string;
 };
 
 export type ErrorOrchestrator = {
