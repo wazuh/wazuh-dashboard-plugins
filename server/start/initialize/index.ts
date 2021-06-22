@@ -18,6 +18,7 @@ import fs from 'fs';
 import { ManageHosts } from '../../lib/manage-hosts';
 import { WAZUH_ALERTS_PATTERN, WAZUH_DATA_CONFIG_REGISTRY_PATH, WAZUH_INDEX, WAZUH_VERSION_INDEX, WAZUH_KIBANA_TEMPLATE_NAME, WAZUH_DATA_KIBANA_BASE_ABSOLUTE_PATH } from '../../../common/constants';
 import { createDataDirectoryIfNotExists } from '../../lib/filesystem';
+import { tryCatchForIndexPermissionError } from '../tryCatchForIndexPermissionError';
 
 const manageHosts = new ManageHosts();
 
@@ -98,39 +99,30 @@ export function jobInitializeRun(context) {
   /**
    * Checks if the .wazuh index exist in order to migrate to wazuh.yml
    */
-  const checkWazuhIndex = async () => {
-    try {
-      log('initialize:checkWazuhIndex', `Checking ${WAZUH_INDEX} index.`, 'debug');
-
-      const result = await context.core.elasticsearch.client.asInternalUser.indices.exists({
+  const checkWazuhIndex = tryCatchForIndexPermissionError(WAZUH_INDEX)( async () => {
+    log('initialize:checkWazuhIndex', `Checking ${WAZUH_INDEX} index.`, 'debug');
+    const result = await context.core.elasticsearch.client.asInternalUser.indices.exists({
+      index: WAZUH_INDEX
+    });
+    if (result.body) {
+      const data = await context.core.elasticsearch.client.asInternalUser.search({
+        index: WAZUH_INDEX,
+        size: 100
+      });
+      const apiEntries = (((data || {}).body || {}).hits || {}).hits || [];
+      await manageHosts.migrateFromIndex(apiEntries);
+      log(
+        'initialize:checkWazuhIndex',
+        `Index ${WAZUH_INDEX} will be removed and its content will be migrated to wazuh.yml`,
+        'debug'
+      );
+      // Check if all APIs entries were migrated properly and delete it from the .wazuh index
+      await checkProperlyMigrate();
+      await context.core.elasticsearch.client.asInternalUser.indices.delete({
         index: WAZUH_INDEX
       });
-      if (result.body) {
-        try {
-          const data = await context.core.elasticsearch.client.asInternalUser.search({
-            index: WAZUH_INDEX,
-            size: 100
-          });
-          const apiEntries = (((data || {}).body || {}).hits || {}).hits || [];
-          await manageHosts.migrateFromIndex(apiEntries);
-          log(
-            'initialize:checkWazuhIndex',
-            `Index ${WAZUH_INDEX} will be removed and its content will be migrated to wazuh.yml`,
-            'debug'
-          );
-          // Check if all APIs entries were migrated properly and delete it from the .wazuh index
-          await checkProperlyMigrate();
-          await context.core.elasticsearch.client.asInternalUser.indices.delete({
-            index: WAZUH_INDEX
-          });
-        } catch (error) {
-          throw new Error(error);
-        }
-      }
-    } catch (error) {
-      return Promise.reject(error);
     }
-  };
+  });
 
   /**
    * Checks if the API entries were properly migrated
@@ -243,16 +235,10 @@ export function jobInitializeRun(context) {
 
   // Init function. Check for "wazuh-version" document existance.
   const init = async () => {
-    try {
-      await Promise.all([
-        checkWazuhIndex(),
-        checkWazuhRegistry()
-      ]);
-    } catch (error) {
-      log('initialize:init', error.message || error);
-      context.wazuh.logger.error(error.message || error);
-      return Promise.reject(error);
-    }
+    await Promise.all([
+      checkWazuhIndex(),
+      checkWazuhRegistry()
+    ]);
   };
 
   const createKibanaTemplate = () => {

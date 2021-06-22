@@ -47,8 +47,8 @@ const errorContext = 'WzLogs';
 export default compose(
   withGlobalBreadcrumb([
     { text: '' },
-    { text: 'Management', href: '/app/wazuh#/manager' },
-    { text: 'Logs' },
+    { text: 'Management', href: '#/manager' },
+    { text: 'Logs' }
   ]),
   withUserAuthorizationPrompt([
     { action: 'cluster:status', resource: '*:*:*' },

@@ -182,7 +182,6 @@ export class ComplianceRequirements extends Component {
               button={(<EuiButtonIcon iconType="gear" onClick={() => this.onGearButtonClick()}></EuiButtonIcon>)}
               isOpen={this.state.isPopoverOpen}
               panelPaddingSize="none"
-              withTitle
               closePopover={() => this.closePopover()}>
                 <EuiContextMenu initialPanelId={0} panels={panels} />
            </EuiPopover>
