@@ -1,0 +1,97 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Check result component should render a Check result screen 1`] = `
+<CheckResult
+  awaitFor={Array []}
+  canRetry={true}
+  check={true}
+  checksReady={Object {}}
+  cleanErrors={
+    [MockFunction] {
+      "calls": Array [
+        Array [
+          "test",
+        ],
+      ],
+      "results": Array [
+        Object {
+          "type": "return",
+          "value": undefined,
+        },
+      ],
+    }
+  }
+  handleCheckReady={[MockFunction]}
+  handleErrors={[MockFunction]}
+  isLoading={false}
+  name="test"
+  title="Check Test"
+  validationService={
+    [MockFunction] {
+      "calls": Array [
+        Array [
+          Object {
+            "_log": [Function],
+            "action": [Function],
+            "error": [Function],
+            "info": [Function],
+          },
+        ],
+      ],
+      "results": Array [
+        Object {
+          "type": "return",
+          "value": Object {
+            "errors": Array [],
+          },
+        },
+      ],
+    }
+  }
+>
+  <EuiDescriptionListTitle>
+    <dt
+      className="euiDescriptionList__title"
+    >
+      Check Test
+    </dt>
+  </EuiDescriptionListTitle>
+  <EuiDescriptionListDescription>
+    <dd
+      className="euiDescriptionList__description"
+    >
+      <p>
+        <ResultIcons
+          initCheck={[Function]}
+          result="loading"
+        >
+          <EuiToolTip
+            content="Checking..."
+            delay="regular"
+            position="top"
+          >
+            <span
+              className="euiToolTipAnchor"
+              onKeyUp={[Function]}
+              onMouseOut={[Function]}
+              onMouseOver={[Function]}
+            >
+              <EuiLoadingSpinner
+                onBlur={[Function]}
+                onFocus={[Function]}
+                size="m"
+              >
+                <span
+                  className="euiLoadingSpinner euiLoadingSpinner--medium"
+                  onBlur={[Function]}
+                  onFocus={[Function]}
+                />
+              </EuiLoadingSpinner>
+            </span>
+          </EuiToolTip>
+        </ResultIcons>
+      </p>
+    </dd>
+  </EuiDescriptionListDescription>
+</CheckResult>
+`;

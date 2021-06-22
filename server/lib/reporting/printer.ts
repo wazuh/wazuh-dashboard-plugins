@@ -490,9 +490,29 @@ export class ReportPrinter{
           style: 'standard'
         }
       })
-    });
-  
-    const widths = new Array(columns.length - 1).fill('auto');
+    }); 
+
+    // 385 is the max initial width per column
+    let totalLength = columns.length - 1;
+    const widthColumn = 385/totalLength;
+    let totalWidth = totalLength * widthColumn;
+    
+    const widths:(number)[] = [];
+    
+    for (let step = 0; step < columns.length - 1; step++) {
+
+      let columnLength = this.getColumnWidth(columns[step], tableRows, step);
+      
+      if (columnLength <= Math.round(totalWidth / totalLength)) {
+        widths.push(columnLength);
+        totalWidth -= columnLength;
+      } 
+      else {
+        widths.push(Math.round(totalWidth / totalLength));
+        totalWidth -= Math.round((totalWidth / totalLength));
+      }
+      totalLength--;
+    }
     widths.push('*');
   
     this.addContent({
@@ -597,4 +617,28 @@ export class ReportPrinter{
     document.end();
   }
 
+  /**
+   * Returns the width of a given column
+   * 
+   * @param column 
+   * @param tableRows 
+   * @param step 
+   * @returns {number}
+   */
+  getColumnWidth(column, tableRows, index){
+    const widthCharacter = 5; //min width per character
+
+    //Get the longest row value
+    const maxRowLength = tableRows.reduce((maxLength, row)=>{
+      return (row[index].text.length > maxLength ? row[index].text.length : maxLength);
+    },0);
+
+    //Get column name length
+    const headerLength = column.label.length;
+
+    //Use the longest to get the column width
+    const maxLength = maxRowLength > headerLength ? maxRowLength : headerLength;
+
+    return maxLength * widthCharacter;
+  }
 }

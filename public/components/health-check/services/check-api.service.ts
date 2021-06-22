@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Check Api Service
+ * Wazuh app - Check APIs service
  *
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
@@ -13,88 +13,88 @@
  */
 
 import { getToasts } from '../../../kibana-services';
-import AppState from '../../../react-services/app-state';
-import GenericRequest from '../../../react-services/generic-request';
-import ApiCheck from '../../../react-services/wz-api-check';
+import { ApiCheck, AppState, GenericRequest } from '../../../react-services';
+import { CheckLogger } from '../types/check_logger';
 
-const trySetDefault = async () => {
+const trySetDefault = async (checkLogger: CheckLogger) => {
   try {
+    checkLogger.info(`Getting API hosts...`);
     const response = await GenericRequest.request('GET', '/hosts/apis');
+    checkLogger.info(`API hosts found: ${response.data.length}`);
     const hosts = response.data;
     const errors = [];
 
     if (hosts.length) {
       for (var i = 0; i < hosts.length; i++) {
         try {
+          checkLogger.info(`Checking API host id [${hosts[i].id}]...`);
           const API = await ApiCheck.checkApi(hosts[i], true);
           if (API && API.data) {
             return hosts[i].id;
           }
         } catch (err) {
-          return {
-            error: `Could not connect to API with id: ${hosts[i].id}: ${err.message || err}`,
-          };
+          checkLogger.info(`Could not connect to API id [${hosts[i].id}]: ${err.message || err}`);
+          errors.push(`Could not connect to API id [${hosts[i].id}]: ${err.message || err}`);
         }
       }
       if (errors.length) {
-        return Promise.reject('No API available to connect.');
+        return Promise.reject('No API available to connect');
       }
     }
-  } catch (err) {
-    return Promise.reject(`Error connecting to API: ${err}`);
+  } catch (error) {
+    checkLogger.error(`Error connecting to API: ${error}`);
+    return Promise.reject(`Error connecting to API: ${error}`);
   }
 };
 
-export const checkApiService = async (): Promise<{ errors: string[] }> => {
-  let errors: string[] = [];
+export const checkApiService = (appInfo: any) => async (checkLogger: CheckLogger) => {
   let apiChanged = false;
   try {
     const currentApi = JSON.parse(AppState.getCurrentAPI() || '{}');
-
+    checkLogger.info(`Current API id [${currentApi.id}]`);
+    checkLogger.info(`Checking current API id [${currentApi.id}]...`);
     const data = await ApiCheck.checkStored(currentApi.id).catch(async (err) => {
-      const newApi = await trySetDefault();
+      checkLogger.info(`Current API id [${currentApi.id}] has some problem: ${err.message || err}`);
+      const newApi = await trySetDefault(checkLogger);
       if (newApi.error) {
         return { error: newApi.error };
       }
       apiChanged = true;
+      checkLogger.info(`API host id [${newApi}] available`);
       return await ApiCheck.checkStored(newApi, true);
     });
 
     if (apiChanged) {
+      const api = ((data || {}).data || {}).data || {};
+      const name = (api.cluster_info || {}).manager || false;
+      AppState.setCurrentAPI(JSON.stringify({ name: name, id: api.id }));
+      checkLogger.info(`Set current API in cookie: id [${api.id}], name [${api.name}]`);
       getToasts().add({
         color: 'warning',
         title: 'Selected Wazuh API has been updated',
         text: '',
         toastLifeTimeMs: 3000,
       });
-      const api = ((data || {}).data || {}).data || {};
-      const name = (api.cluster_info || {}).manager || false;
-      AppState.setCurrentAPI(JSON.stringify({ name: name, id: api.id }));
     }
     //update cluster info
     const cluster_info = (((data || {}).data || {}).data || {}).cluster_info;
     if (cluster_info) {
       AppState.setClusterInfo(cluster_info);
+      checkLogger.info(`Set cluster info in cookie`);
     }
-
     if (data === 3099) {
-      errors.push('Wazuh not ready yet.');
+      checkLogger.error('Wazuh not ready yet');
     } else if (data.data.error || data.data.data.apiIsDown) {
-      errors.push(
-        data.data.data.apiIsDown
-          ? 'Wazuh API is down.'
-          : `Error connecting to the API.${
-              data.data.error && data.data.error.message ? ` ${data.data.error.message}` : ''
-            }`
-      );
+      const errorMessage = data.data.data.apiIsDown
+      ? 'Wazuh API is down'
+      : `Error connecting to the API: ${
+          data.data.error && data.data.error.message ? ` ${data.data.error.message}` : ''
+        }`;
+      checkLogger.error(errorMessage);
     }
-    return { errors };
   } catch (error) {
     AppState.removeNavigation();
-    if (error && error.data && error.data.code && error.data.code === 3002) {
-      return { errors };
-    } else {
-      throw error;
-    }
+    checkLogger.info('Removed [navigate] cookie');
+    throw error;
   }
 };

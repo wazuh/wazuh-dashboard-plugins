@@ -24,6 +24,7 @@ import { FormattedMessage } from '@kbn/i18n/react';
 import { WzRequest } from '../../../../react-services/wz-request';
 import { FlyoutDetail } from './flyout';
 import { filtersToObject } from '../../../wz-search-bar';
+import { formatUIDate } from '../../../../react-services/time-service';
 
 export class RegistryTable extends Component {
   state: {
@@ -185,6 +186,7 @@ export class RegistryTable extends Component {
         name: 'Last Modified',
         sortable: true,
         width: '200px',
+        render: formatUIDate,
       }
     ]
   }

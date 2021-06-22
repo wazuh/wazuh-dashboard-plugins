@@ -26,7 +26,7 @@ export default compose(
     if (props.agent.id === '000') {
       breadcrumb = [
         { text: '' },
-        { text: 'Management', href: '/app/wazuh#/manager' },
+        { text: 'Management', href: '#/manager' },
         { text: 'Configuration' },
       ];
     } else {

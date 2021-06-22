@@ -148,7 +148,7 @@ export class UpdateRegistry {
   async updateAPIExtensions(id, extensions) {
     try {
       const content = await this.readContent();
-      content.hosts[id].extensions = extensions;
+      if(content.hosts[id]) content.hosts[id].extensions = extensions;
       await this.writeContent(content);
       log(
         'update-registry:updateAPIExtensions',
