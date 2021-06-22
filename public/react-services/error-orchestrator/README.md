@@ -43,18 +43,9 @@ The `options` object may contain:
 - `store: boolean` (default false) - Used to stored by request [POST] on our logs (wazuh-ui-plain.log).
 - `error: Error` - error caught, message and title to show on UI o store on logs.
 
-## Contribute
-
-If you want to contribute to our project please don't hesitate to send a pull request. You can also join our users [mailing list](https://groups.google.com/d/forum/wazuh), by sending an email to [wazuh+subscribe@googlegroups.com](mailto:wazuh+subscribe@googlegroups.com), to ask questions and participate in discussions.
-
 ## Software and libraries used
 
-- [Elastic](https://elastic.co)
-- [Elastic UI framework](https://elastic.github.io/eui)
 - [loglevel](https://github.com/pimterry/loglevel)
-- [Jest](https://jestjs.io/)
-- [Node.js](https://nodejs.org)
-- [NPM](https://npmjs.com)
 
 ## Copyright & License
 
