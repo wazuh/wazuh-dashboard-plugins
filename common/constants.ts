@@ -150,21 +150,25 @@ export const WAZUH_DATA_CONFIG_REGISTRY_PATH = path.join(
 
 // Wazuh data path - logs
 export const WAZUH_DATA_LOGS_DIRECTORY_PATH = path.join(WAZUH_DATA_ABSOLUTE_PATH, 'logs');
-export const WAZUH_DATA_LOGS_PLAIN_FILENAME = path.join(
+export const WAZUH_DATA_LOGS_PLAIN_FILENAME = 'wazuhapp-plain.log';
+export const WAZUH_DATA_LOGS_PLAIN_PATH = path.join(
   WAZUH_DATA_LOGS_DIRECTORY_PATH,
-  'wazuhapp-plain.log'
+  WAZUH_DATA_LOGS_PLAIN_FILENAME
 );
-export const WAZUH_DATA_LOGS_RAW_FILENAME = path.join(
+export const WAZUH_DATA_LOGS_RAW_FILENAME = 'wazuhapp.log';
+export const WAZUH_DATA_LOGS_RAW_PATH = path.join(
   WAZUH_DATA_LOGS_DIRECTORY_PATH,
-  'wazuhapp.log'
+  WAZUH_DATA_LOGS_RAW_FILENAME
 );
 
 // Wazuh data path - UI logs
-export const WAZUH_UI_LOGS_PLAIN_FILENAME = path.join(
+export const WAZUH_UI_LOGS_PLAIN_FILENAME = 'wazuh-ui-plain.log';
+export const WAZUH_UI_LOGS_RAW_FILENAME = 'wazuh-ui.log';
+export const WAZUH_UI_LOGS_PLAIN_PATH = path.join(
   WAZUH_DATA_LOGS_DIRECTORY_PATH,
-  'wazuh-ui-plain.log'
+  WAZUH_UI_LOGS_PLAIN_FILENAME
 );
-export const WAZUH_UI_LOGS_RAW_FILENAME = path.join(WAZUH_DATA_LOGS_DIRECTORY_PATH, 'wazuh-ui.log');
+export const WAZUH_UI_LOGS_RAW_PATH = path.join(WAZUH_DATA_LOGS_DIRECTORY_PATH, WAZUH_UI_LOGS_RAW_FILENAME);
 
 // Wazuh data path - downloads
 export const WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH = path.join(WAZUH_DATA_ABSOLUTE_PATH, 'downloads');

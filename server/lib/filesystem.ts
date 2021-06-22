@@ -8,6 +8,20 @@ export const createDirectoryIfNotExists = (directory: string): void  => {
   };
 };
 
+export const createLogFileIfNotExists = (filePath : string): void => {
+  if (!fs.existsSync(filePath)) {
+    fs.writeFileSync(
+      filePath,
+      JSON.stringify({
+        date: new Date(),
+        level: 'info',
+        location: 'logger',
+        message: 'Log file creation',
+      }) + '\n'
+    );
+  };
+};
+
 export const createDataDirectoryIfNotExists = (directory?: string) => {
   const absoluteRoute = directory ? path.join(WAZUH_DATA_ABSOLUTE_PATH, directory) : WAZUH_DATA_ABSOLUTE_PATH;
   if (!fs.existsSync(absoluteRoute)) {

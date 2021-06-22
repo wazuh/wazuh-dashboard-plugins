@@ -1,5 +1,5 @@
 import { UiLogsCtrl } from './ui-logs.controller';
-import { WAZUH_UI_LOGS_RAW_FILENAME } from '../../../common/constants';
+import { WAZUH_UI_LOGS_RAW_PATH } from '../../../common/constants';
 import uiLogger from '../../lib/ui-logger';
 
 const readLastLines = require('read-last-lines');
@@ -56,7 +56,7 @@ describe('Spec UiLogsCtrl', function () {
 
     it('Should return a Array logs', async () => {
       const controller = new UiLogsCtrl();
-      let res = await controller.getUiFileLogs(WAZUH_UI_LOGS_RAW_FILENAME);
+      let res = await controller.getUiFileLogs(WAZUH_UI_LOGS_RAW_PATH);
 
       expect(Array.isArray(res)).toBe(true);
     });
