@@ -1,10 +1,3 @@
-import { ErrorOrchestratorService } from './error-orchestrator/error-orchestrator.service';
-import { createGetterSetter } from '../utils/create-getter-setter';
-
-export const [getErrorOrchestrator, setErrorOrchestrator] = createGetterSetter<
-  ErrorOrchestratorService
->('ErrorOrchestratorService');
-
 export * from './action-agents';
 export * from './app-navigate';
 export * from './app-state';
