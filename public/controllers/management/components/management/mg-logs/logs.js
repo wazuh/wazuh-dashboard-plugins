@@ -40,7 +40,7 @@ import { compose } from 'redux';
 import { WzFieldSearch } from '../../../../../components/wz-field-search-bar/wz-field-search-bar';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
-import { getErrorOrchestrator } from '../../../../../react-services';
+import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 
 const errorContext = 'WzLogs';
 
