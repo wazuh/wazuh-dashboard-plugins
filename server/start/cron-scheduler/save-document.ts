@@ -3,6 +3,7 @@ import { getConfiguration } from '../../lib/get-configuration';
 import { log } from '../../lib/logger';
 import { indexDate } from '../../lib/index-date';
 import { WAZUH_INDEX_SHARDS, WAZUH_INDEX_REPLICAS } from '../../../common/constants'
+import { tryCatchForIndexPermissionError } from '../tryCatchForIndexPermissionError'
 
 export interface IIndexConfiguration {
   name: string
@@ -43,7 +44,7 @@ export class SaveDocument {
 
   private async checkIndexAndCreateIfNotExists(index, shards, replicas) {
     try {
-      try {
+      await tryCatchForIndexPermissionError(index) (async() => {
         const exists = await this.esClientInternalUser.indices.exists({ index });
         log(this.logPath, `Index '${index}' exists? ${exists.body}`, 'debug');
         if (!exists.body) {
@@ -60,10 +61,9 @@ export class SaveDocument {
           });
           log(this.logPath, `Status of create a new index: ${JSON.stringify(response)}`, 'debug');
         }
-      } catch (error) {
-        log(this.logPath ,`Error searching or creating '${index}' due to '${error.message || error}'`);
-      }
+      })();
     } catch (error) {
+      log(this.logPath, error.message || error);
       this.checkDuplicateIndexError(error);
     }
   }

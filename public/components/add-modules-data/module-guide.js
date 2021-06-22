@@ -758,6 +758,7 @@ class WzModuleGuide extends Component {
             <EuiFlexItem grow={false}>
               <EuiButtonGroup
                 color='primary'
+                legend='Agent type'
                 options={agentTypeButtons}
                 idSelected={this.state.agentTypeSelected}
                 onChange={this.onChangeAgentTypeSelected}

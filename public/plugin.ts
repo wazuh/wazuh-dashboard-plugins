@@ -1,4 +1,5 @@
-import { AppMountParameters, CoreSetup, CoreStart, Plugin, PluginInitializerContext } from 'kibana/public';
+import { BehaviorSubject } from 'rxjs';
+import { AppMountParameters, CoreSetup, CoreStart, AppUpdater, Plugin, PluginInitializerContext } from 'kibana/public';
 import {
   setDataPlugin,
   setHttp,
@@ -24,7 +25,7 @@ import {
 } from './types';
 import { Cookies } from 'react-cookie';
 import { AppState } from './react-services/app-state';
-import { setErrorOrchestrator } from './react-services';
+import { setErrorOrchestrator } from './react-services/common-services';
 import { ErrorOrchestratorService } from './react-services/error-orchestrator/error-orchestrator.service';
 
 const innerAngularName = 'app/wazuh';
@@ -33,7 +34,8 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
   constructor(private readonly initializerContext: PluginInitializerContext) {}
   public initializeInnerAngular?: () => void;
   private innerAngularInitialized: boolean = false;
-
+  private stateUpdater = new BehaviorSubject<AppUpdater>(() => ({}));
+  
   public setup(core: CoreSetup, plugins: WazuhSetupPlugins): WazuhSetup {
     core.application.register({
       id: `wazuh`,
@@ -48,6 +50,7 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
         const { renderApp } = await import('./application');
         // Get start services as specified in kibana.json
         const [coreStart, depsStart] = await core.getStartServices();
+        setErrorOrchestrator(ErrorOrchestratorService);
         setHttp(core.http);
         setCookies(new Cookies());
         if(!AppState.checkCookies() || params.history.parentHistory.action === 'PUSH') {
@@ -56,8 +59,17 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
 
         await this.initializeInnerAngular();
 
+        //Check is user has Wazuh disabled
+        const response = await core.http.get(`/api/check-wazuh`);
+
         params.element.classList.add('dscAppWrapper');
         const unmount = await renderApp(innerAngularName, params.element);
+
+        //Update if user has Wazuh disabled
+        this.stateUpdater.next(() => {
+          if(response.isWazuhDisabled) unmount();
+          return { status: response.isWazuhDisabled }
+        })
         return () => {
           unmount();
         };
@@ -68,6 +80,7 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
         order: 0,
         euiIconType: core.http.basePath.prepend('/plugins/wazuh/assets/icon_blue.png'),
       },
+      updater$: this.stateUpdater
     });
     return {};
   }
@@ -110,7 +123,6 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
     setVisualizationsPlugin(plugins.visualizations);
     setSavedObjects(core.savedObjects);
     setOverlays(core.overlays);
-    setErrorOrchestrator(ErrorOrchestratorService);
     return {};
   }
 }

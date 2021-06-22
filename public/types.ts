@@ -6,6 +6,7 @@ import { DataPublicPluginSetup, DataPublicPluginStart } from '../../../src/plugi
 import { NavigationPublicPluginStart } from '../../../src/plugins/navigation/public';
 import { UiActionsSetup } from '../../../src/plugins/ui_actions/public';
 import { SecurityOssPluginStart } from '../../../src/plugins/security_oss/public/';
+import { SavedObjectsStart } from '../../../src/plugins/saved_objects/public';
 
 export interface AppPluginStartDependencies {
   navigation: NavigationPublicPluginStart;
@@ -13,7 +14,8 @@ export interface AppPluginStartDependencies {
   visualizations: VisualizationsStart;
   discover: DiscoverStart;
   charts: ChartsPluginStart
-  securityOss: SecurityOssPluginStart
+  securityOss: SecurityOssPluginStart,
+  savedObjects: SavedObjectsStart
 }
 export interface AppDependencies {
   core: CoreStart;

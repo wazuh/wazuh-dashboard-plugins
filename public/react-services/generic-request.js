@@ -19,7 +19,7 @@ import { OdfeUtils } from '../utils';
 import { getHttp, getDataPlugin } from '../kibana-services';
 
 export class GenericRequest {
-  static async request(method, path, payload = null) {
+  static async request(method, path, payload = null, returnError = false) {
     try {
       if (!method || !path) {
         throw new Error('Missing parameters');
@@ -100,10 +100,11 @@ export class GenericRequest {
           wzMisc.setApiIsDown(true);
 
           if (!window.location.hash.includes('#/settings')) {
-            window.location.href = '/app/wazuh#/health-check';
+            window.location.href = getHttp().basePath.prepend('/app/wazuh#/health-check');
           }
         }
       }
+      if (returnError) return Promise.reject(err);
       return (((err || {}).response || {}).data || {}).message || false
         ? Promise.reject(err.response.data.message)
         : Promise.reject(err || 'Server did not respond');

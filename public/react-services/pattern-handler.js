@@ -9,11 +9,9 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { GenericRequest } from './generic-request';
 import { AppState } from './app-state';
-import { WzMisc } from '../factories/misc';
 import { SavedObject } from './saved-objects';
-import { getDataPlugin, getToasts } from '../kibana-services';
+import { getDataPlugin, getToasts, getHttp } from '../kibana-services';
 import { WazuhConfig } from '../react-services/wazuh-config';
 import { HEALTH_CHECK } from '../../common/constants';
 
@@ -23,53 +21,19 @@ export class PatternHandler {
    */
   static async getPatternList(origin) {
     try {
-      var patternList = await SavedObject.getListOfWazuhValidIndexPatterns();
+      const wazuhConfig = new WazuhConfig();
+      const { pattern } = wazuhConfig.getConfig();
 
-      if (origin == HEALTH_CHECK) {
-        const wazuhConfig = new WazuhConfig();
-        const { pattern } = wazuhConfig.getConfig();
-        const indexPatternFound = patternList.find((indexPattern) => indexPattern.title === pattern);
-
-        if (!indexPatternFound && pattern) {
-          // if no valid index patterns are found we try to create the wazuh-alerts-*
-          try {
-
-            getToasts().add({
-              color: 'warning',
-              title:
-                `No ${pattern} index pattern was found, proceeding to create it.`,
-              toastLifeTimeMs: 5000
-            });
-
-            await SavedObject.createWazuhIndexPattern(pattern);
-            getToasts().addSuccess(`${pattern} index pattern created successfully`);
-            !AppState.getCurrentPattern() && AppState.setCurrentPattern(pattern);
-          } catch (err) {
-            getToasts().addDanger({
-              title: 'Error creating the index pattern.',
-              text: err.message || err,
-              toastLifeTimeMs: 3000
-            });
-            AppState.removeCurrentPattern();
-
-            return;
-          }
-        }
-        patternList = await SavedObject.getListOfWazuhValidIndexPatterns();
-      }
-      if (AppState.getCurrentPattern() && patternList.length) {
-        let filtered = patternList.filter(
-          item => item.id === AppState.getCurrentPattern()
-        );
-        if (!filtered.length) AppState.setCurrentPattern(patternList[0].id);
-      }
+      const defaultPatterns = [pattern];
+      const selectedPattern = AppState.getCurrentPattern();
+      if (selectedPattern && selectedPattern !== pattern) defaultPatterns.push(selectedPattern);
+      let patternList = await SavedObject.getListOfWazuhValidIndexPatterns(defaultPatterns, origin);
 
       return patternList;
     } catch (error) {
       console.error("getPatternList", error)
       throw new Error('Error Pattern Handler (getPatternList)');
     }
-    return;
   }
 
   /**
