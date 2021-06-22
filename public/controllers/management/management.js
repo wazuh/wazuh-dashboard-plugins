@@ -22,7 +22,7 @@ import {
 
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../common/constants';
-import { ErrorOrchestratorService } from '../../react-services';
+import { ErrorOrchestratorService } from '../../react-services/common-services';
 
 export class ManagementController {
   /**
@@ -444,7 +444,7 @@ export class ManagementController {
         error: {
           error: error,
           message: error?.message || '',
-          title: error?.name,
+          title: 'Error loading node list'
         },
       };
 
