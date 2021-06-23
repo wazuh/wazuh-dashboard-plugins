@@ -20,6 +20,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed empty fields in FIM tables and `syscheck.value_name` in discovery now show an empty tag for visual clarity [#3279](https://github.com/wazuh/wazuh-kibana-app/pull/3279)
 - Adapted the Mitre tactics and techniques resources to use the API endpoints [#3346](https://github.com/wazuh/wazuh-kibana-app/pull/3346)
 
+### Fixed
+
+- Fixed creation of log files [#3384](https://github.com/wazuh/wazuh-kibana-app/pull/3384) 
+
 ## Wazuh v4.2.1 - Kibana 7.10.2 , 7.11.2 - Revision 4202
 
 ### Added

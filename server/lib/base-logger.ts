@@ -14,9 +14,9 @@ import winston from 'winston';
 import fs from 'fs';
 import path from 'path';
 import { getConfiguration } from './get-configuration';
-import { createDataDirectoryIfNotExists } from './filesystem';
+import { createDataDirectoryIfNotExists, createLogFileIfNotExists } from './filesystem';
 
-import { WAZUH_DATA_LOGS_DIRECTORY_PATH } from '../../common/constants';
+import { WAZUH_DATA_LOGS_DIRECTORY_PATH, MAX_MB_LOG_FILES } from '../../common/constants';
 
 export interface IUIPlainLoggerSettings {
   level: string;
@@ -33,11 +33,15 @@ export class BaseLogger {
   wazuhLogger: winston.Logger | undefined = undefined;
   wazuhPlainLogger: winston.Logger | undefined = undefined;
   PLAIN_LOGS_PATH: string = '';
+  PLAIN_LOGS_FILE_NAME: string = '';
   RAW_LOGS_PATH: string = '';
+  RAW_LOGS_FILE_NAME: string = '';
 
-  constructor(plainLogsPath: string, rawLogsPath: string) {
-    this.PLAIN_LOGS_PATH = plainLogsPath;
-    this.RAW_LOGS_PATH = rawLogsPath;
+  constructor(plainLogsFile: string, rawLogsFile: string) {
+    this.PLAIN_LOGS_PATH = path.join(WAZUH_DATA_LOGS_DIRECTORY_PATH, plainLogsFile);
+    this.RAW_LOGS_PATH = path.join(WAZUH_DATA_LOGS_DIRECTORY_PATH, rawLogsFile);
+    this.PLAIN_LOGS_FILE_NAME = plainLogsFile;
+    this.RAW_LOGS_FILE_NAME = rawLogsFile;
   }
 
   /**
@@ -123,35 +127,40 @@ export class BaseLogger {
     return fs.existsSync(filename);
   };
 
+  rotateFiles = (file: string, pathFile: string, log?: string) => {
+    if (this.getFilesizeInMegaBytes(pathFile) >= MAX_MB_LOG_FILES) {
+      const fileExtension = path.extname(file);
+      const fileName = path.basename(file, fileExtension);
+      fs.renameSync(
+        pathFile,
+        `${WAZUH_DATA_LOGS_DIRECTORY_PATH}/${fileName}-${new Date().getTime()}${fileExtension}`
+      );
+      if (log) {
+        fs.writeFileSync(pathFile, log + '\n');
+      }
+    }
+  };
+
   /**
    * Checks if the wazuhapp.log file size is greater than 100MB, if so it rotates the file.
    */
   private checkFiles = () => {
+    createLogFileIfNotExists(this.RAW_LOGS_PATH);
+    createLogFileIfNotExists(this.PLAIN_LOGS_PATH);
     if (this.allowed) {
       // check raw log file
-      if (this.getFilesizeInMegaBytes(this.RAW_LOGS_PATH) >= 100) {
-        fs.renameSync(
-          this.RAW_LOGS_PATH,
-          `${WAZUH_DATA_LOGS_DIRECTORY_PATH}/wazuhapp.${new Date().getTime()}.log`
-        );
-        fs.writeFileSync(
-          this.RAW_LOGS_PATH,
-          JSON.stringify({
-            date: new Date(),
-            level: 'info',
-            location: 'logger',
-            message: 'Rotated log file',
-          }) + '\n'
-        );
-      }
-
+      this.rotateFiles(
+        this.RAW_LOGS_FILE_NAME,
+        this.RAW_LOGS_PATH,
+        JSON.stringify({
+          date: new Date(),
+          level: 'info',
+          location: 'logger',
+          message: 'Rotated log file',
+        })
+      );
       // check log file
-      if (this.getFilesizeInMegaBytes(this.PLAIN_LOGS_PATH) >= 100) {
-        fs.renameSync(
-          this.PLAIN_LOGS_PATH,
-          `${WAZUH_DATA_LOGS_DIRECTORY_PATH}/wazuhapp-plain.${new Date().getTime()}.log`
-        );
-      }
+      this.rotateFiles(this.PLAIN_LOGS_FILE_NAME, this.PLAIN_LOGS_PATH);
     }
   };
 
