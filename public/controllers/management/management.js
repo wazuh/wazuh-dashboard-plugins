@@ -22,7 +22,7 @@ import {
 
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../common/constants';
-import { ErrorOrchestratorService } from '../../react-services/common-services';
+import { getErrorOrchestrator } from '../../react-services/common-services';
 
 export class ManagementController {
   /**
@@ -237,7 +237,7 @@ export class ManagementController {
         },
       };
 
-      ErrorOrchestratorService().handleError(errorOptions);
+      getErrorOrchestrator().handleError(errorOptions);
     }
   }
 
@@ -272,7 +272,7 @@ export class ManagementController {
         },
       };
 
-      ErrorOrchestratorService().handleError(errorOptions);
+      getErrorOrchestrator().handleError(errorOptions);
     }
   }
 
@@ -297,7 +297,7 @@ export class ManagementController {
         },
       };
 
-      ErrorOrchestratorService().handleError(errorOptions);
+      getErrorOrchestrator().handleError(errorOptions);
     }
   }
 
@@ -448,7 +448,7 @@ export class ManagementController {
         },
       };
 
-      ErrorOrchestratorService().handleError(errorOptions);
+      getErrorOrchestrator().handleError(errorOptions);
     }
     this.loadingNodes = false;
     this.$scope.$applyAsync();
@@ -527,7 +527,7 @@ export class ManagementController {
         },
       };
 
-      ErrorOrchestratorService().handleError(errorOptions);
+      getErrorOrchestrator().handleError(errorOptions);
     }
   }
 }
