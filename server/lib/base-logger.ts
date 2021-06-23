@@ -127,6 +127,20 @@ export class BaseLogger {
     return fs.existsSync(filename);
   };
 
+  rotateFiles = (file: string, pathFile: string, log?: string) => {
+    if (this.getFilesizeInMegaBytes(pathFile) >= MAX_MB_LOG_FILES) {
+      const fileExtension = path.extname(file);
+      const fileName = path.basename(file, fileExtension);
+      fs.renameSync(
+        pathFile,
+        `${WAZUH_DATA_LOGS_DIRECTORY_PATH}/${fileName}-${new Date().getTime()}${fileExtension}`
+      );
+      if (log) {
+        fs.writeFileSync(pathFile, log + '\n');
+      }
+    }
+  };
+
   /**
    * Checks if the wazuhapp.log file size is greater than 100MB, if so it rotates the file.
    */
@@ -135,29 +149,18 @@ export class BaseLogger {
     createLogFileIfNotExists(this.PLAIN_LOGS_PATH);
     if (this.allowed) {
       // check raw log file
-      if (this.getFilesizeInMegaBytes(this.RAW_LOGS_PATH) >= MAX_MB_LOG_FILES) {
-        fs.renameSync(
-          this.RAW_LOGS_PATH,
-          `${WAZUH_DATA_LOGS_DIRECTORY_PATH}/${new Date().getTime()}${this.RAW_LOGS_FILE_NAME}`
-        );
-        fs.writeFileSync(
-          this.RAW_LOGS_PATH,
-          JSON.stringify({
-            date: new Date(),
-            level: 'info',
-            location: 'logger',
-            message: 'Rotated log file',
-          }) + '\n'
-        );
-      }
-
+      this.rotateFiles(
+        this.RAW_LOGS_FILE_NAME,
+        this.RAW_LOGS_PATH,
+        JSON.stringify({
+          date: new Date(),
+          level: 'info',
+          location: 'logger',
+          message: 'Rotated log file',
+        })
+      );
       // check log file
-      if (this.getFilesizeInMegaBytes(this.PLAIN_LOGS_PATH) >= MAX_MB_LOG_FILES) {
-        fs.renameSync(
-          this.PLAIN_LOGS_PATH,
-          `${WAZUH_DATA_LOGS_DIRECTORY_PATH}/${new Date().getTime()}${this.PLAIN_LOGS_FILE_NAME}`
-        );
-      }
+      this.rotateFiles(this.PLAIN_LOGS_FILE_NAME, this.PLAIN_LOGS_PATH);
     }
   };
 
