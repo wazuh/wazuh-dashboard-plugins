@@ -16,7 +16,7 @@ import path from 'path';
 import { getConfiguration } from './get-configuration';
 import { createDataDirectoryIfNotExists, createLogFileIfNotExists } from './filesystem';
 
-import { WAZUH_DATA_LOGS_DIRECTORY_PATH } from '../../common/constants';
+import { WAZUH_DATA_LOGS_DIRECTORY_PATH, MAX_MB_LOG_FILES } from '../../common/constants';
 
 export interface IUIPlainLoggerSettings {
   level: string;
@@ -135,7 +135,7 @@ export class BaseLogger {
     createLogFileIfNotExists(this.PLAIN_LOGS_PATH);
     if (this.allowed) {
       // check raw log file
-      if (this.getFilesizeInMegaBytes(this.RAW_LOGS_PATH) >= 100) {
+      if (this.getFilesizeInMegaBytes(this.RAW_LOGS_PATH) >= MAX_MB_LOG_FILES) {
         fs.renameSync(
           this.RAW_LOGS_PATH,
           `${WAZUH_DATA_LOGS_DIRECTORY_PATH}/${new Date().getTime()}${this.RAW_LOGS_FILE_NAME}`
@@ -152,7 +152,7 @@ export class BaseLogger {
       }
 
       // check log file
-      if (this.getFilesizeInMegaBytes(this.PLAIN_LOGS_PATH) >= 100) {
+      if (this.getFilesizeInMegaBytes(this.PLAIN_LOGS_PATH) >= MAX_MB_LOG_FILES) {
         fs.renameSync(
           this.PLAIN_LOGS_PATH,
           `${WAZUH_DATA_LOGS_DIRECTORY_PATH}/${new Date().getTime()}${this.PLAIN_LOGS_FILE_NAME}`

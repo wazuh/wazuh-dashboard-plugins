@@ -149,6 +149,7 @@ export const WAZUH_DATA_CONFIG_REGISTRY_PATH = path.join(
 );
 
 // Wazuh data path - logs
+export const MAX_MB_LOG_FILES = 100;
 export const WAZUH_DATA_LOGS_DIRECTORY_PATH = path.join(WAZUH_DATA_ABSOLUTE_PATH, 'logs');
 export const WAZUH_DATA_LOGS_PLAIN_FILENAME = 'wazuhapp-plain.log';
 export const WAZUH_DATA_LOGS_PLAIN_PATH = path.join(
