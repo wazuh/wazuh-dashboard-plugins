@@ -25,6 +25,7 @@ import {
   EuiToolTip,
   EuiButtonIcon,
   EuiCodeEditor,
+  EuiConfirmModal,
   EuiPanel,
   EuiCodeBlock
 } from '@elastic/eui';
@@ -34,6 +35,7 @@ import GroupsHandler from './utils/groups-handler';
 import { getToasts }  from '../../../../../kibana-services';
 import { validateXML } from '../configuration/utils/xml';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
+import { WzOverlayMask } from '../../../../../components/common/util';
 import 'brace/theme/textmate';
 import 'brace/mode/xml';
 import 'brace/snippets/xml';
@@ -48,7 +50,7 @@ class WzGroupsEditor extends Component {
       fontSize: '14px',
       enableBasicAutocompletion: true,
       enableSnippets: true,
-      enableLiveAutocompletion: true
+      enableLiveAutocompletion: true,
     };
     this.groupsHandler = GroupsHandler;
     const { fileContent } = this.props.state;
@@ -60,8 +62,11 @@ class WzGroupsEditor extends Component {
       isSaving: false,
       content,
       name,
+      isModalVisible: false,
+      hasChanges: false,
       isEditable,
-      groupName: groupName
+      initContent: content,
+      groupName: groupName,
     };
   }
 
@@ -69,6 +74,12 @@ class WzGroupsEditor extends Component {
     this.height = window.innerHeight - 275; //eslint-disable-line
     this.forceUpdate();
   };
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.content !== this.state.content) {
+      this.setState({ hasChanges: this.state.content !== this.state.initContent });
+    }
+  }
 
   componentWillUnmount() {
     // When the component is going to be unmounted its info is clear
@@ -88,7 +99,6 @@ class WzGroupsEditor extends Component {
    * @param {String} name
    */
   async save(name) {
-
     if (!this._isMounted) {
       return;
     }
@@ -101,7 +111,7 @@ class WzGroupsEditor extends Component {
         await validateConfigAfterSent();
       } catch (error) {
         const warning = Object.assign(error, {
-          savedMessage: `File ${name} saved, but there were found several error while validating the configuration.`
+          savedMessage: `File ${name} saved, but there were found several error while validating the configuration.`,
         });
         this.setState({ isSaving: false });
         this.showToast('warning', warning.savedMessage, error, 3000);
@@ -112,12 +122,7 @@ class WzGroupsEditor extends Component {
       this.showToast('success', 'Success', textSuccess, 3000);
     } catch (error) {
       this.setState({ error, isSaving: false });
-      this.showToast(
-        'danger',
-        'Error',
-        'Error saving group configuration: ' + error,
-        3000
-      );
+      this.showToast('danger', 'Error', 'Error saving group configuration: ' + error, 3000);
     }
   }
 
@@ -126,7 +131,7 @@ class WzGroupsEditor extends Component {
       color: color,
       title: title,
       text: text,
-      toastLifeTimeMs: time
+      toastLifeTimeMs: time,
     });
   };
 
@@ -136,88 +141,121 @@ class WzGroupsEditor extends Component {
     const xmlError = validateXML(content);
     const saveButton = (
       <WzButtonPermissions
-        permissions={[{action: 'group:update_config', resource: `group:id:${groupName}`},{action: 'cluster:status', resource: '*:*:*'}]}
+        permissions={[
+          { action: 'group:update_config', resource: `group:id:${groupName}` },
+          { action: 'cluster:status', resource: '*:*:*' },
+        ]}
         fill
-        iconType={(isEditable && xmlError) ? "alert" : "save"}
+        iconType={isEditable && xmlError ? 'alert' : 'save'}
         isLoading={this.state.isSaving}
         isDisabled={name.length <= 4 || (isEditable && xmlError ? true : false)}
         onClick={() => this.save(name)}
       >
-        {(isEditable && xmlError) ? 'XML format error' : 'Save'}
+        {isEditable && xmlError ? 'XML format error' : 'Save'}
       </WzButtonPermissions>
     );
 
+    const closeModal = () => this.setState({ isModalVisible: false });
+    const showModal = () => this.setState({ isModalVisible: true });
+
+    let modal;
+    if (this.state.isModalVisible) {
+      modal = (
+        <WzOverlayMask>
+          <EuiConfirmModal
+            title="Unsubmitted changes"
+            onConfirm={() => {
+              closeModal;
+              this.props.cleanFileContent();
+            }}
+            onCancel={closeModal}
+            cancelButtonText="No, don't do it"
+            confirmButtonText="Yes, do it"
+          >
+            <p style={{ textAlign: 'center' }}>
+              There are unsaved changes. Are you sure you want to proceed?
+            </p>
+          </EuiConfirmModal>
+        </WzOverlayMask>
+      );
+    }
     return (
-      <EuiPage style={{ background: 'transparent' }}>
-        <EuiPanel>
-          <EuiFlexGroup>
-            <EuiFlexItem>
-              {/* File name and back button */}
-              <EuiFlexGroup>
-                <EuiFlexItem>
-                  <EuiTitle>
-                    <span style={{ fontSize: '22px' }}>
-                      <EuiToolTip position="right" content={`Back to groups`}>
-                        <EuiButtonIcon
-                          aria-label="Back"
-                          color="primary"
-                          iconSize="l"
-                          iconType="arrowLeft"
-                          onClick={() => this.props.cleanFileContent()}
-                        />
-                      </EuiToolTip>
-                      {name} <span style={{ color: 'grey'}}>of</span> {groupName} <span style={{ color: 'grey'}}>group</span>
-                    </span>
-                  </EuiTitle>
-                </EuiFlexItem>
-                <EuiFlexItem />
-                {isEditable && (
-                  <EuiFlexItem grow={false}>{saveButton}</EuiFlexItem>
+      <>
+        <EuiPage style={{ background: 'transparent' }}>
+          <EuiPanel>
+            <EuiFlexGroup>
+              <EuiFlexItem>
+                {/* File name and back button */}
+                <EuiFlexGroup>
+                  <EuiFlexItem>
+                    <EuiTitle>
+                      <span style={{ fontSize: '22px' }}>
+                        <EuiToolTip position="right" content={`Back to groups`}>
+                          <EuiButtonIcon
+                            aria-label="Back"
+                            color="primary"
+                            iconSize="l"
+                            iconType="arrowLeft"
+                            onClick={() => {
+                              if (this.state.hasChanges) {
+                                showModal();
+                              } else {
+                                this.props.cleanFileContent();
+                              }
+                            }}
+                          />
+                        </EuiToolTip>
+                        {name} <span style={{ color: 'grey' }}>of</span> {groupName}{' '}
+                        <span style={{ color: 'grey' }}>group</span>
+                      </span>
+                    </EuiTitle>
+                  </EuiFlexItem>
+                  <EuiFlexItem />
+                  {isEditable && <EuiFlexItem grow={false}>{saveButton}</EuiFlexItem>}
+                </EuiFlexGroup>
+                <EuiSpacer size="m" />
+                {xmlError && (
+                  <Fragment>
+                    <span style={{ color: 'red' }}> {xmlError}</span>
+                    <EuiSpacer size='s' />
+                  </Fragment>
                 )}
-              </EuiFlexGroup>
-              <EuiSpacer size="m" />
-              {xmlError && (
-                <Fragment>
-                  <span style={{ color: 'red' }}> {xmlError}</span>
-                  <EuiSpacer size='s'/>
-                </Fragment>
-              )}
-              <EuiFlexGroup>
-                <EuiFlexItem>
-                  <EuiFlexGroup>
-                    <EuiFlexItem className="codeEditorWrapper">
-                      {(isEditable && (
-                        <EuiCodeEditor
-                          theme="textmate"
-                          width="100%"
-                          height={`calc(100vh - ${(xmlError ? 250 : 230)}px)`}
-                          value={content}
-                          onChange={newContent =>
-                            this.setState({content: newContent})
-                          }
-                          mode="xml"
-                          wrapEnabled
-                          setOptions={this.codeEditorOptions}
-                          aria-label="Code Editor"
-                        />
-                      )) || (
-                        <EuiCodeBlock
-                          language="json"
-                          fontSize="m"
-                          paddingSize="m"
-                          overflowHeight={this.height}
-                        >
-                          {content}
-                        </EuiCodeBlock>
-                      )}
-                    </EuiFlexItem>
-                  </EuiFlexGroup>
-                </EuiFlexItem>
-              </EuiFlexGroup>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-        </EuiPanel>
-      </EuiPage>
+                <EuiFlexGroup>
+                  <EuiFlexItem>
+                    <EuiFlexGroup>
+                      <EuiFlexItem className="codeEditorWrapper">
+                        {(isEditable && (
+                          <EuiCodeEditor
+                            theme="textmate"
+                            width="100%"
+                            height={`calc(100vh - ${(xmlError ? 250 : 230)}px)`}
+                            value={content}
+                            onChange={(newContent) => this.setState({ content: newContent })}
+                            mode="xml"
+                            wrapEnabled
+                            setOptions={this.codeEditorOptions}
+                            aria-label="Code Editor"
+                          />
+                        )) || (
+                          <EuiCodeBlock
+                            language="json"
+                            fontSize="m"
+                            paddingSize="m"
+                            overflowHeight={this.height}
+                          >
+                            {content}
+                          </EuiCodeBlock>
+                        )}
+                      </EuiFlexItem>
+                    </EuiFlexGroup>
+                  </EuiFlexItem>
+                </EuiFlexGroup>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiPanel>
+        </EuiPage>
+        {modal}
+      </>
     );
   }
 }

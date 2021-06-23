@@ -15,3 +15,4 @@
  export { TruncateHorizontalComponents } from './truncate-horizontal-components/truncate-horizontal-components';
  export { GroupingComponents } from './grouping-components';
  export * from './markdown/markdown';
+ export * from './wz-overlay-mask-interface';

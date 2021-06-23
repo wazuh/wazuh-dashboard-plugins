@@ -19,7 +19,6 @@ import { buildIndexSettings } from '../../lib/build-index-settings';
 import { WazuhHostsCtrl } from '../../controllers/wazuh-hosts';
 import { 
   WAZUH_MONITORING_PATTERN,
-  WAZUH_INDEX_SHARDS,
   WAZUH_INDEX_REPLICAS,
   WAZUH_MONITORING_TEMPLATE_NAME,
   WAZUH_MONITORING_DEFAULT_INDICES_SHARDS,
@@ -27,6 +26,7 @@ import {
   WAZUH_MONITORING_DEFAULT_ENABLED,
   WAZUH_MONITORING_DEFAULT_FREQUENCY,
 } from '../../../common/constants';
+import { tryCatchForIndexPermissionError } from '../tryCatchForIndexPermissionError';
 
 const blueWazuh = '\u001b[34mwazuh\u001b[39m';
 const monitoringErrorLogColors = [blueWazuh, 'monitoring', 'error'];
@@ -177,51 +177,39 @@ async function checkTemplate(context) {
  */
 async function insertMonitoringDataElasticsearch(context, data) {
   const monitoringIndexName = MONITORING_INDEX_PREFIX + indexDate(MONITORING_CREATION);
-  try {
     if (!MONITORING_ENABLED){
       return;
     };
-    try{
-      const exists = await context.core.elasticsearch.client.asInternalUser.indices.exists({index: monitoringIndexName});
-      if(!exists.body){
-        await createIndex(context, monitoringIndexName);
-      }
+    try {
+      await tryCatchForIndexPermissionError(monitoringIndexName) (async() => {
+        const exists = await context.core.elasticsearch.client.asInternalUser.indices.exists({index: monitoringIndexName});
+        if(!exists.body){
+          await createIndex(context, monitoringIndexName);
+        };
+
+        // Update the index configuration
+        const appConfig = getConfiguration();
+        const indexConfiguration = buildIndexSettings(
+          appConfig,
+          'wazuh.monitoring',
+          WAZUH_MONITORING_DEFAULT_INDICES_SHARDS
+        );
+
+        // To update the index settings with this client is required close the index, update the settings and open it
+        // Number of shards is not dynamic so delete that setting if it's given
+        delete indexConfiguration.settings.index.number_of_shards;
+        await context.core.elasticsearch.client.asInternalUser.indices.putSettings({
+          index: monitoringIndexName,
+          body: indexConfiguration
+        });
+
+        // Insert data to the monitoring index
+        await insertDataToIndex(context, monitoringIndexName, data);
+      })();
     }catch(error){
       log('monitoring:insertMonitoringDataElasticsearch', error.message || error);
+      context.wazuh.logger.error(error.message);
     }
-    try{
-      // Update the index configuration
-      const appConfig = getConfiguration();
-      const indexConfiguration = buildIndexSettings(
-        appConfig,
-        'wazuh.monitoring',
-        WAZUH_MONITORING_DEFAULT_INDICES_SHARDS
-      );
-
-      // To update the index settings with this client is required close the index, update the settings and open it
-      // Number of shards is not dynamic so delete that setting if it's given
-      delete indexConfiguration.settings.index.number_of_shards;
-      await context.core.elasticsearch.client.asInternalUser.indices.putSettings({
-        index: monitoringIndexName,
-        body: indexConfiguration
-      });
-
-    }catch(error){
-      log('monitoring:insertMonitoringDataElasticsearch', error.message || error);
-    }
-
-    // Insert data to the monitoring index
-    await insertDataToIndex(context, monitoringIndexName, data);
-  } catch (error) {
-    const errorMessage = `Could not check if the index ${
-      monitoringIndexName
-    } exists due to ${error.message || error}`;
-    log(
-      'monitoring:insertMonitoringDataElasticsearch',
-      errorMessage
-    );
-    context.wazuh.logger.error(errorMessage);
-  }
 }
 
 /**
@@ -280,7 +268,7 @@ async function createIndex(context, indexName: string) {
     const IndexConfiguration = {
       settings: {
         index: {
-          number_of_shards: getAppConfigurationSetting('wazuh.monitoring.shards', appConfig, WAZUH_INDEX_SHARDS),
+          number_of_shards: getAppConfigurationSetting('wazuh.monitoring.shards', appConfig, WAZUH_MONITORING_DEFAULT_INDICES_SHARDS),
           number_of_replicas: getAppConfigurationSetting('wazuh.monitoring.replicas', appConfig, WAZUH_INDEX_REPLICAS)
         }
       }

@@ -12,9 +12,13 @@
 
 import React from 'react';
 import ErrorBoundary from '../../error-boundary/error-boundary';
+import { getDisplayName } from '../utils/utils';
 
-export const withErrorBoundary = (WrappedComponent) => (props) => (
-  <ErrorBoundary>
-    <WrappedComponent {...props} />
-  </ErrorBoundary>
-);
+export const withErrorBoundary = (WrappedComponent) => (props) => {
+  WrappedComponent.displayName = `withErrorBoundary(${getDisplayName(WrappedComponent)})`;
+  return (
+    <ErrorBoundary>
+      <WrappedComponent {...props} />
+    </ErrorBoundary>
+  );
+};

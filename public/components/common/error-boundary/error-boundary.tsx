@@ -21,7 +21,7 @@ import {
   UILogLevel,
 } from '../../../react-services/error-orchestrator/types';
 import { ErrorComponentPrompt } from '../error-boundary-prompt/error-boundary-prompt';
-import { getErrorOrchestrator } from '../../../react-services';
+import { getErrorOrchestrator } from '../../../react-services/common-services';
 
 export default class ErrorBoundary extends Component {
   constructor(props) {
