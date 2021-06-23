@@ -23,6 +23,11 @@ import { withReduxProvider, withGlobalBreadcrumb, withUserAuthorizationPrompt, w
 import { compose } from 'redux';
 import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../common/constants';
 import { updateSecuritySection } from '../../redux/actions/securityActions';
+import { UI_LOGGER_LEVELS } from '../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../react-services/common-services';
+
+const errorContext = 'WzSecurity';
 
 const tabs = [
   {
@@ -77,7 +82,7 @@ export const WzSecurity = compose(
       return ApiCheck.data.allow_run_as;
 
     } catch (error) {
-      ErrorHandler.handle(error, 'Error checking the current API');
+      throw new Error(error)
     }
   }
 
@@ -85,7 +90,20 @@ export const WzSecurity = compose(
   useEffect(() => {
     checkRunAsUser()
       .then(result => setAllowRunAs(result))
-      .catch(error => console.log(error, 'Error checking if run_as user is enabled'))
+      .catch(error => {
+        const options = {
+          context: errorContext,
+          level: UI_LOGGER_LEVELS.ERROR,
+          severity: UI_ERROR_SEVERITIES.BUSINESS,
+          store: true,
+          error: {
+            error: error,
+            message: error.message || error,
+            title: error.name || error,
+          },
+        };
+        getErrorOrchestrator().handleError(options);
+      })
   }, [])
 
   // This allows to redirect to a Security tab if you click a Security link in menu when you're already in a Security section
