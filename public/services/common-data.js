@@ -146,7 +146,8 @@ export class CommonData {
         virustotal: { group: 'virustotal' },
         osquery: { group: 'osquery' },
         sca: { group: 'sca' },
-        docker: { group: 'docker' }
+        docker: { group: 'docker' },
+        github: { group: 'github' }
       };
 
       const filters = [];
@@ -159,7 +160,6 @@ export class CommonData {
           isCluster
         )
       );
-
       if (tab !== 'general' && tab !== 'welcome') {
         if (tab === 'pci') {
           this.removeDuplicateExists('rule.pci_dss');

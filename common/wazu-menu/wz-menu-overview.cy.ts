@@ -30,4 +30,5 @@ export enum WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID {
   CIS_CAT = 'menuModulesCiscatLink',
   VIRUSTOTAL = 'menuModulesVirustotalLink',
   GDPR = 'menuModulesGdprLink',
+  GITHUB = 'menuModulesGitHubLink'
 }

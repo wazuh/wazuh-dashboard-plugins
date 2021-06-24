@@ -67,14 +67,16 @@ class WzMenuAgent extends Component {
       gdpr: { id: WAZUH_MODULES_ID.GDPR, text: 'GDPR', isPin: this.menuAgent.gdpr ? this.menuAgent.gdpr : false },
       hipaa: { id: WAZUH_MODULES_ID.HIPAA, text: 'HIPAA', isPin: this.menuAgent.hipaa ? this.menuAgent.hipaa : false },
       nist: { id: WAZUH_MODULES_ID.NIST_800_53, text: 'NIST 800-53', isPin: this.menuAgent.nist ? this.menuAgent.nist : false },
-      tsc: { id: WAZUH_MODULES_ID.TSC, text: 'TSC', isPin: this.menuAgent.tsc ? this.menuAgent.tsc : false }
+      tsc: { id: WAZUH_MODULES_ID.TSC, text: 'TSC', isPin: this.menuAgent.tsc ? this.menuAgent.tsc : false },
+      github: { id: WAZUH_MODULES_ID.GITHUB, text: 'GitHub', isPin: this.menuAgent.github ? this.menuAgent.github : false },
     };
 
     this.securityInformationItems = [
       this.agentSections.general,
       this.agentSections.fim,
       this.agentSections.aws,
-      this.agentSections.gcp
+      this.agentSections.gcp,
+      this.agentSections.github
     ];
     this.auditingItems = [
       this.agentSections.pm,

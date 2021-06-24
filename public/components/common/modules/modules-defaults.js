@@ -70,6 +70,11 @@ export const ModulesDefaults = {
     tabs: [{ id: 'inventory', name: 'Controls' }, { id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }],
     buttons: ['reporting']
   },
+  github: {
+    init: 'dashboard',
+    tabs: [{ id: 'inventory', name: 'Audit logs' }, { id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }],
+    buttons: ['reporting']
+  },
   syscollector: {
     notModule: true
   },

@@ -98,6 +98,8 @@ export const OverviewWelcome = withErrorBoundary (class OverviewWelcome extends 
                         this.buildTabCard('aws', 'logoAWSMono')}
                       {this.props.extensions.gcp &&
                         this.buildTabCard('gcp', 'logoGCPMono')}
+                      {this.props.extensions.github &&
+                        this.buildTabCard('github', 'logoGithub')}
                     </EuiFlexGrid>
                   </EuiPanel>
                 </EuiFlexItem>

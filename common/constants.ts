@@ -256,7 +256,8 @@ export enum WAZUH_MODULES_ID {
   CIS_CAT = 'ciscat',
   VIRUSTOTAL = 'virustotal',
   GDPR = 'gdpr',
-}
+  GITHUB = 'github'
+};
 
 export enum WAZUH_MENU_MANAGEMENT_SECTIONS_ID {
   MANAGEMENT = 'management',
@@ -273,19 +274,19 @@ export enum WAZUH_MENU_MANAGEMENT_SECTIONS_ID {
   LOGS = 'logs',
   REPORTING = 'reporting',
   STATISTICS = 'statistics',
-}
+};
 
 export enum WAZUH_MENU_TOOLS_SECTIONS_ID {
   API_CONSOLE = 'devTools',
   RULESET_TEST = 'logtest',
-}
+};
 
 export enum WAZUH_MENU_SECURITY_SECTIONS_ID {
   USERS = 'users',
   ROLES = 'roles',
   POLICIES = 'policies',
   ROLES_MAPPING = 'roleMapping',
-}
+};
 
 export enum WAZUH_MENU_SETTINGS_SECTIONS_ID {
   SETTINGS = 'settings',
@@ -296,7 +297,7 @@ export enum WAZUH_MENU_SETTINGS_SECTIONS_ID {
   LOGS = 'logs',
   MISCELLANEOUS = 'miscellaneous',
   ABOUT = 'about',
-}
+};
 
 export const AUTHORIZED_AGENTS = 'authorized-agents';
 
