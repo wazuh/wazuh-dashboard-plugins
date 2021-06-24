@@ -70,6 +70,7 @@ export const WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS = {
     { apache: true, alerts: 2000 },
     { web: true },
     { windows: { service_control_manager: true }, alerts: 1000 },
+    { github: true}
   ],
   [WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING]: [
     { rootcheck: true },
