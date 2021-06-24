@@ -27,6 +27,7 @@ import {
 import { formatUIDate } from '../../../react-services/time-service';
 import store from '../../../redux/store';
 import { updateSelectedSettingsSection } from '../../../redux/actions/appStateActions';
+import { JsxEmit } from 'typescript';
 
 export default class SettingsLogs extends Component {
   constructor(props) {
@@ -75,6 +76,11 @@ export default class SettingsLogs extends Component {
       .split('.')[0];
   }
 
+  getMessage(log) {
+    const data = log.data || log.message;
+    return typeof data === 'object' ? JSON.stringify(data.message || data) : data.toString();
+  } 
+
   render() {
     let text = '';
     (this.state.logs || []).forEach(x => {
@@ -84,7 +90,7 @@ export default class SettingsLogs extends Component {
           '  ' +
           x.level.toUpperCase() +
           '  ' +
-          x.message +
+          this.getMessage(x) +
           '\n');
     });
     return (
