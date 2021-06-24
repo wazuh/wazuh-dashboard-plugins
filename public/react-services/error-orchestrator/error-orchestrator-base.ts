@@ -26,9 +26,9 @@ export class ErrorOrchestratorBase implements ErrorOrchestrator {
 
   private async storeError(errorLog: UIErrorLog) {
     try {
-      let winstonLevel =  errorLog.level.toLowerCase();
-      if(errorLog.level === 'WARNING'){
-          winstonLevel = 'warn';
+      let winstonLevel = errorLog.level.toLowerCase();
+      if (errorLog.level === 'WARNING') {
+        winstonLevel = 'warn';
       }
 
       await GenericRequest.request('POST', `/utils/logs/ui`, {
