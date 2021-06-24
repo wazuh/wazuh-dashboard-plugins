@@ -78,7 +78,7 @@ export default class SettingsLogs extends Component {
 
   getMessage(log) {
     const data = log.data || log.message;
-    return typeof data === 'object' ? JSON.stringify(data.message || data) : data.toString();
+    return typeof data === 'object' ? data.message || JSON.stringify(data) : data.toString();
   } 
 
   render() {
