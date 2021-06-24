@@ -199,7 +199,6 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
         },
       };
       getErrorOrchestrator().handleError(options);
-      return;
     }
     closeFlyout();
   };
