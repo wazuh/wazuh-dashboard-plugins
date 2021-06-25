@@ -58,6 +58,11 @@ class WzMenuOverview extends Component {
         cyTestId: WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID.AMAZON_WEB_SERVICES,
         text: 'Amazon AWS',
       },
+      office: {
+        id: WAZUH_MODULES_ID.OFFICE_365,
+        cyTestId: WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID.OFFICE_365,
+        text: 'Office 365',
+      },
       gcp: {
         id: WAZUH_MODULES_ID.GOOGLE_CLOUD_PLATFORM,
         cyTestId: WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID.GOOGLE_CLOUD_PLATFORM,
@@ -143,6 +148,7 @@ class WzMenuOverview extends Component {
     this.securityInformationItems = [
       this.overviewSections.general,
       this.overviewSections.fim,
+      this.overviewSections.office,
       this.overviewSections.aws,
       this.overviewSections.gcp
     ];
