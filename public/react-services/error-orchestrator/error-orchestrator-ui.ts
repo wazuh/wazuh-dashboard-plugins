@@ -17,10 +17,10 @@ import loglevel from 'loglevel';
 
 export class ErrorOrchestratorUI extends ErrorOrchestratorBase {
   public loadErrorLog(errorLog: UIErrorLog) {
-    if (errorLog.display || errorLog.level === UI_LOGGER_LEVELS.ERROR) {
-      this.displayError(errorLog);
-    }
-    if (errorLog.store) super.storeError(errorLog);
+    super.loadErrorLog({
+      ...errorLog,
+      display: errorLog.level === UI_LOGGER_LEVELS.ERROR || errorLog.display,
+    });
   }
 
   public displayError(errorLog: UIErrorLog) {
