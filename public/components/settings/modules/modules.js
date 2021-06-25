@@ -38,6 +38,7 @@ export class EnableModulesWrapper extends Component {
             modules: [
               { name: 'general', default: true, agent: false },
               { name: 'fim', default: true, agent: false },
+              { name: 'office', default: false, agent: false },
               { name: 'aws', default: false, agent: false },
               { name: 'gcp', default: false, agent: false }
             ]
