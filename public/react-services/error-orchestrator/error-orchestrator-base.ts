@@ -32,13 +32,17 @@ export class ErrorOrchestratorBase implements ErrorOrchestrator {
   }
 
   private async storeError(errorLog: UIErrorLog) {
+    const getLocation = () => {
+      return errorLog?.context || errorLog.error?.error?.stack instanceof String || 'No context';
+    }
+
     try {
       const winstonLevel = winstonLevelDict[errorLog.level.toLowerCase()] || 'error';
 
       await GenericRequest.request('POST', `/utils/logs/ui`, {
-        message: errorLog.error.message,
+        message: errorLog?.error?.message || 'No message',
         level: winstonLevel,
-        location: errorLog.context || errorLog.error.error.stack,
+        location: getLocation(),
       });
     } catch (error) {
       loglevel.error('Failed on request [POST /utils/logs/ui]', error);
