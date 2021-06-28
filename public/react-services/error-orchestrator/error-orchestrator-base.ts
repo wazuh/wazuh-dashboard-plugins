@@ -13,6 +13,13 @@
 import loglevel from 'loglevel';
 import { GenericRequest } from '../../react-services/generic-request';
 import { ErrorOrchestrator, UIErrorLog } from './types';
+import { UI_LOGGER_LEVELS } from '../../../common/constants';
+
+const winstonLevelDict = {
+  [UI_LOGGER_LEVELS.ERROR]: 'error',
+  [UI_LOGGER_LEVELS.WARNING]: 'warn',
+  [UI_LOGGER_LEVELS.INFO]: 'info',
+};
 
 export class ErrorOrchestratorBase implements ErrorOrchestrator {
   public loadErrorLog(errorLog: UIErrorLog) {
@@ -26,10 +33,7 @@ export class ErrorOrchestratorBase implements ErrorOrchestrator {
 
   private async storeError(errorLog: UIErrorLog) {
     try {
-      let winstonLevel =  errorLog.level.toLowerCase();
-      if(errorLog.level === 'WARNING'){
-          winstonLevel = 'warn';
-      }
+      const winstonLevel = winstonLevelDict[errorLog.level.toLowerCase()] || 'error';
 
       await GenericRequest.request('POST', `/utils/logs/ui`, {
         message: errorLog.error.message,

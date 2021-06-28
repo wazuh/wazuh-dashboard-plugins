@@ -16,6 +16,13 @@ import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import loglevel from 'loglevel';
 
 export class ErrorOrchestratorUI extends ErrorOrchestratorBase {
+  public loadErrorLog(errorLog: UIErrorLog) {
+    super.loadErrorLog({
+      ...errorLog,
+      display: errorLog.level === UI_LOGGER_LEVELS.ERROR || errorLog.display,
+    });
+  }
+
   public displayError(errorLog: UIErrorLog) {
     switch (errorLog.level) {
       case UI_LOGGER_LEVELS.INFO:
