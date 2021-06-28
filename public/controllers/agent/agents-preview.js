@@ -21,8 +21,12 @@ import { ShareAgent } from '../../factories/share-agent';
 import { formatUIDate } from '../../react-services/time-service';
 import { ErrorHandler } from '../../react-services/error-handler';
 import { getDataPlugin, getToasts } from '../../kibana-services';
-import { connect } from 'react-redux';
 import store from '../../redux/store';
+import { UI_LOGGER_LEVELS } from '../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../react-services/common-services';
+
+const errorContext = 'AgentsPreviewController';
 
 export class AgentsPreviewController {
   /**
@@ -32,15 +36,7 @@ export class AgentsPreviewController {
    * @param {Object} errorHandler
    * @param {Object} csvReq
    */
-  constructor(
-    $scope,
-    $location,
-    $route,
-    errorHandler,
-    csvReq,
-    commonData,
-    $window
-  ) {
+  constructor($scope, $location, $route, errorHandler, csvReq, commonData, $window) {
     this.$scope = $scope;
     this.genericReq = GenericRequest;
     this.$location = $location;
@@ -62,14 +58,11 @@ export class AgentsPreviewController {
     this.api = JSON.parse(AppState.getCurrentAPI()).id;
     const loc = this.$location.search();
     if ((loc || {}).agent && (loc || {}).agent !== '000') {
-      this.commonData.setTimefilter( getDataPlugin().timefilter.timefilter.getTime());
+      this.commonData.setTimefilter(getDataPlugin().timefilter.timefilter.getTime());
       return this.showAgent({ id: loc.agent });
     }
 
-    this.isClusterEnabled =
-      AppState.getClusterInfo() &&
-      AppState.getClusterInfo().status === 'enabled';
-
+    this.isClusterEnabled = AppState.getClusterInfo() && AppState.getClusterInfo().status === 'enabled';
     this.loading = true;
     this.osPlatforms = [];
     this.versions = [];
@@ -77,7 +70,7 @@ export class AgentsPreviewController {
     this.nodes = [];
     this.mostActiveAgent = {
       name: '',
-      id: ''
+      id: '',
     };
     this.prevSearch = false;
 
@@ -95,16 +88,14 @@ export class AgentsPreviewController {
     } else {
       this.hasAgents = true;
     }
-
     // Watcher for URL params
     this.$scope.$watch('submenuNavItem', () => {
       this.$location.search('tab', this.submenuNavItem);
     });
 
-    this.$scope.$on('wazuhFetched', evt => {
+    this.$scope.$on('wazuhFetched', (evt) => {
       evt.stopPropagation();
     });
-
     this.registerAgentsProps = {
       addNewAgent: flag => this.addNewAgent(flag),
       hasAgents: this.hasAgents,
@@ -126,7 +117,7 @@ export class AgentsPreviewController {
         this.downloadCsv(filters);
         this.$scope.$applyAsync();
       },
-      showAgent: agent => {
+      showAgent: (agent) => {
         this.showAgent(agent);
         this.$scope.$applyAsync();
       },
@@ -134,18 +125,11 @@ export class AgentsPreviewController {
         return await this.getMostActive();
       },
       clickAction: (item, openAction = false) => {
-        clickAction(
-          item,
-          openAction,
-          instance,
-          this.shareAgent,
-          this.$location,
-          this.$scope
-        );
+        clickAction(item, openAction, instance, this.shareAgent, this.$location, this.$scope);
         this.$scope.$applyAsync();
       },
-      formatUIDate: date => formatUIDate(date),
-      summary: this.summary
+      formatUIDate: (date) => formatUIDate(date),
+      summary: this.summary,
     };
     //Load
     this.load();
@@ -175,10 +159,7 @@ export class AgentsPreviewController {
    */
   async downloadCsv(filters) {
     try {
-      ErrorHandler.info(
-        'Your download should begin automatically...',
-        'CSV'
-      );
+      ErrorHandler.info('Your download should begin automatically...', 'CSV');
       const output = await this.csvReq.fetch('/agents', this.api, filters);
       const blob = new Blob([output], { type: 'text/csv' }); // eslint-disable-line
 
@@ -186,7 +167,17 @@ export class AgentsPreviewController {
 
       return;
     } catch (error) {
-      ErrorHandler.handle(error, 'Download CSV');
+      const options = {
+        context: errorContext,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `Error exporting CSV: ${error.message || error}`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
     return;
   }
@@ -195,12 +186,16 @@ export class AgentsPreviewController {
     try {
       const data = await this.genericReq.request(
         'GET',
-        `/elastic/top/${this.firstUrlParam}/${this.secondUrlParam}/agent.name/${this.pattern}?agentsList=${store.getState().appStateReducers.allowedAgents.toString()}`
+        `/elastic/top/${this.firstUrlParam}/${this.secondUrlParam}/agent.name/${
+          this.pattern
+        }?agentsList=${store.getState().appStateReducers.allowedAgents.toString()}`
       );
       this.mostActiveAgent.name = data.data.data;
       const info = await this.genericReq.request(
         'GET',
-        `/elastic/top/${this.firstUrlParam}/${this.secondUrlParam}/agent.id/${this.pattern}?agentsList=${store.getState().appStateReducers.allowedAgents.toString()}`
+        `/elastic/top/${this.firstUrlParam}/${this.secondUrlParam}/agent.id/${
+          this.pattern
+        }?agentsList=${store.getState().appStateReducers.allowedAgents.toString()}`
       );
       if (info.data.data === '' && this.mostActiveAgent.name !== '') {
         this.mostActiveAgent.id = '000';
@@ -208,8 +203,21 @@ export class AgentsPreviewController {
         this.mostActiveAgent.id = info.data.data;
       }
       return this.mostActiveAgent;
-    } catch (error) { 
-      getToasts().addDanger({title: 'An error occurred while trying to get the most active agent', text: error.message || error });
+    } catch (error) {
+      const options = {
+        context: errorContext,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        store: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `An error occurred while trying to get the most active agent: ${
+            error.message || error
+          }`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   }
 
@@ -219,13 +227,23 @@ export class AgentsPreviewController {
   async load() {
     try {
       this.errorInit = false;
-
       const clusterInfo = AppState.getClusterInfo();
-      this.firstUrlParam =
-        clusterInfo.status === 'enabled' ? 'cluster' : 'manager';
+      this.firstUrlParam = clusterInfo.status === 'enabled' ? 'cluster' : 'manager';
       this.secondUrlParam = clusterInfo[this.firstUrlParam];
       this.pattern = (await getDataPlugin().indexPatterns.get(AppState.getCurrentPattern())).title;
     } catch (error) {
+      const options = {
+        context: errorContext,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.CRITICAL,
+        store: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.message || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
       this.errorInit = ErrorHandler.handle(error, '', { silent: true });
     }
     this.loading = false;
@@ -250,14 +268,24 @@ export class AgentsPreviewController {
     try {
       const result = await this.genericReq.request('GET', '/hosts/apis');
       const entries = result.data || [];
-      const host = entries.filter(e => {
+      const host = entries.filter((e) => {
         return e.id == this.api;
       });
       const url = host[0].url;
       const numToClean = url.startsWith('https://') ? 8 : 7;
       return url.substr(numToClean);
     } catch (error) {
-      return false;
+      const options = {
+        context: errorContext,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.UI,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `Could not get the Wazuh API address: ${error.message || error}`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   }
 
@@ -268,8 +296,19 @@ export class AgentsPreviewController {
     try {
       const data = await WzRequest.apiReq('GET', '//', {});
       const result = ((data || {}).data || {}).data || {};
-      return result.api_version
+      return result.api_version;
     } catch (error) {
+      const options = {
+        context: errorContext,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `Could not get the Wazuh version: ${error.message || error}`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
       return version;
     }
   }
