@@ -51,6 +51,11 @@ import { showFlyoutLogtest } from '../../../../../redux/actions/appStateActions'
 import { WzOverlayMask } from '../../../../../components/common/util';
 import _ from 'lodash';
 
+import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
+import { getErrorOrchestrator } from '../../../../../react-services/common-services';
+const errorContext = 'WzRulesetEditor';
+
 class WzRulesetEditor extends Component {
   _isMounted = false;
   constructor(props) {
@@ -112,27 +117,33 @@ class WzRulesetEditor extends Component {
       try {
         await validateConfigAfterSent();
       } catch (error) {
-        const toast = {
-          title: 'File content is incorrect.',
-          toastMessage: `The content of the file ${name} is incorrect. There were found several error while validating the configuration.`,
-          toastLifeTimeMs: 5000,
+        const options = {
+          context: errorContext,
+          level: UI_LOGGER_LEVELS.ERROR,
+          severity: UI_ERROR_SEVERITIES.BUSINESS,
+          error: {
+            error: error,
+            message:`The content of the file ${name} is incorrect. There were found several error while validating the configuration: ${error.message || error}`,
+            title: `Error file content is incorrect: ${error.message || error}`,
+          },
         };
-
+        getErrorOrchestrator().handleError(options);
         this.setState({ isSaving: false });
         this.goToEdit(name);
+
+        let toastMessage;
 
         if (this.props.state.addingRulesetFile != false) {
           //remove current invalid file if the file is new.
           await this.rulesetHandler.deleteFile(name);
-          toast.toastMessage += '\nThe new file was deleted.';
+          toastMessage = 'The new file was deleted.';
         } else {
           //restore file to previous version
           await this.rulesetHandler.updateFile(name, this.state.initContent, overwrite);
-          toast.toastMessage += '\nThe content file was restored to previous state.';
+          toastMessage = 'The content file was restored to previous state.';
         }
 
-        getToasts().addError({ stack: error, message: toast.toastMessage }, toast);
-
+        this.showToast('success', 'Success', toastMessage, 3000);
         return;
       }
       this.setState({ isSaving: false });
@@ -150,7 +161,17 @@ class WzRulesetEditor extends Component {
       this.showToast('success', 'Success', textSuccess, 3000);
     } catch (error) {
       this.setState({ error, isSaving: false });
-      this.showToast('danger', 'Error', 'Error saving file: ' + error, 3000);
+      const options = {
+        context: errorContext,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `Error saving file: ${error.message || error}`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   }
 

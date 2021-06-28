@@ -38,6 +38,10 @@ import { filtersToObject } from '../../../../../components/wz-search-bar';
 import { withUserPermissions } from '../../../../../components/common/hocs/withUserPermissions';
 import { WzUserPermissions } from '../../../../../react-services/wz-user-permissions';
 import { compose } from 'redux';
+import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
+import { getErrorOrchestrator } from '../../../../../react-services/common-services';
+const errorContext = 'WzRulesetTable';
 
 class WzRulesetTable extends Component {
   _isMounted = false;
@@ -92,7 +96,19 @@ class WzRulesetTable extends Component {
             }
             this.props.updateRuleInfo(info.data);
           }
-        } catch (error) { }
+        } catch (error) { 
+          const options = {
+            context: errorContext,
+            level: UI_LOGGER_LEVELS.ERROR,
+            severity: UI_ERROR_SEVERITIES.BUSINESS,
+            error: {
+              error: error,
+              message: error.message || error,
+              title: `Error getting resources: ${error.message || error}`,
+            },
+          };
+          getErrorOrchestrator().handleError(options);
+        }
         this._isMounted && this.setState({ isRedirect: false });
       }
     }
@@ -107,20 +123,36 @@ class WzRulesetTable extends Component {
     const showingFilesChanged =
       prevProps.state.showingFiles !== showingFiles;
     const filtersChanged = prevProps.state.filters !== filters;
-    if ((this._isMounted && processingChange && isProcessing) || sectionChanged || filtersChanged) {
-      if (sectionChanged || showingFilesChanged || filtersChanged) {
-        this._isMounted && await this.setState({
-          pageSize: this.state.pageSize,
-          pageIndex: 0,
-          sortDirection: null,
-          sortField: null
-        });
+    
+    try {
+      if ((this._isMounted && processingChange && isProcessing) || sectionChanged || filtersChanged) {
+        if (sectionChanged || showingFilesChanged || filtersChanged) {
+          this._isMounted && await this.setState({
+            pageSize: this.state.pageSize,
+            pageIndex: 0,
+            sortDirection: null,
+            sortField: null
+          });
+        }
+        this._isMounted && this.setState({ isLoading: true });
+        this.props.updateIsProcessing(false);
+        await this.getItems();
       }
-      this._isMounted && this.setState({ isLoading: true });
-      this.props.updateIsProcessing(false);
 
-      await this.getItems();
+    }catch(error){
+      const options = {
+        context: errorContext,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `Error getting items: ${error.message || error}`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
+
   }
 
   componentWillUnmount() {
@@ -140,8 +172,8 @@ class WzRulesetTable extends Component {
       `${this.paths[this.props.request]}${showingFiles ? '/files' : ''}`,
       { params: this.buildFilter() },
     ).catch((error) => {
-      console.warn(`Error when get the items of ${section}: `, error);
-      return {};
+      error.message = `Error when get the items of ${section}`;
+      throw error;
     });
 
     const { affected_items = [], total_affected_items = 0 } = ((rawItems || {}).data || {}).data || {};
@@ -154,18 +186,24 @@ class WzRulesetTable extends Component {
   }
 
   async setDefaultItems() {
-    const requestDefaultItems = await this.wzReq(
-      'GET',
-      '/manager/configuration',
-      {
-        wait_for_complete: false,
-        section: 'ruleset',
-        field: 'list'
-      }
-    );
 
-    const defaultItems = ((requestDefaultItems || {}).data || {}).data;
-    this.props.updateDefaultItems(defaultItems);
+    try{
+      const requestDefaultItems = await this.wzReq(
+        'GET',
+        '/manager/configuration',
+        {
+          wait_for_complete: false,
+          section: 'ruleset',
+          field: 'list'
+        }
+      );
+
+      const defaultItems = ((requestDefaultItems || {}).data || {}).data;
+      this.props.updateDefaultItems(defaultItems);
+    }catch(error){
+      throw error;
+    }
+    
   }
 
   buildFilter() {
@@ -205,6 +243,8 @@ class WzRulesetTable extends Component {
     const columns = showingFiles ? rulesetColums.files : rulesetColums[section];
     return columns;
   }
+
+
 
   render() {
     const { error } = this.props.state;
@@ -252,6 +292,49 @@ class WzRulesetTable extends Component {
           ];
         };
 
+        const updateInfo = async () => {
+          if (this.isLoading) return;
+          this.setState({ isLoading: true });
+          const { section } = this.props.state;
+          window.location.href = `${window.location.href}&redirectRule=${id}`;
+          try{
+            if (section === RulesetResources.LISTS) {
+              const result = await this.rulesetHandler.getFileContent(item.filename);
+              const file = {
+                name: item.filename,
+                content: result,
+                path: item.relative_dirname,
+              };
+              this.props.updateListContent(file);
+            } else {
+              const result = await this.rulesetHandler.getResource({
+                params: {
+                  filename: item.filename
+                }
+              });
+              if (result.data) {
+                Object.assign(result.data, { current: id || name });
+              }
+              if (section === RulesetResources.RULES) this.props.updateRuleInfo(result.data);
+              if (section === RulesetResources.DECODERS) this.props.updateDecoderInfo(result.data);
+            }  
+          }catch(error){
+            const options = {
+              context: errorContext,
+              level: UI_LOGGER_LEVELS.ERROR,
+              severity: UI_ERROR_SEVERITIES.BUSINESS,
+              error: {
+                error: error,
+                message: error.message || error,
+                title: `Error updating info: ${error.message || error}`,
+              },
+            };
+            getErrorOrchestrator().handleError(options);
+            this.setState({ isLoading: false });
+          }
+          this.setState({ isLoading: false });
+        }
+
         return {
           'data-test-subj': `row-${id || name}`,
           className: 'customRowClass',
@@ -259,35 +342,7 @@ class WzRulesetTable extends Component {
             getRequiredPermissions(item),
             this.props.userPermissions
           )
-            ? async () => {
-              if (this.isLoading) return;
-              this.setState({ isLoading: true });
-              const { section } = this.props.state;
-              window.location.href = `${window.location.href}&redirectRule=${id}`;
-              if (section === RulesetResources.LISTS) {
-                const result = await this.rulesetHandler.getFileContent(item.filename);
-                const file = {
-                  name: item.filename,
-                  content: result,
-                  path: item.relative_dirname,
-                };
-                this.props.updateListContent(file);
-              } else {
-                const result = await this.rulesetHandler.getResource({
-                  params: {
-                    filename: item.filename
-                  }
-                });
-                if (result.data) {
-                  Object.assign(result.data, { current: id || name });
-                }
-                if (section === RulesetResources.RULES) this.props.updateRuleInfo(result.data);
-                if (section === RulesetResources.DECODERS) this.props.updateDecoderInfo(result.data);
-              }
-
-              this.setState({ isLoading: false });
-            }
-            : undefined,
+          ? updateInfo : undefined,
         };
       };
 
@@ -348,15 +403,31 @@ class WzRulesetTable extends Component {
   };
 
   async removeItems(items) {
-    this.setState({ isLoading: true });
-    const results = items.map(async (item, i) => {
-      await this.rulesetHandler.deleteFile(item.filename || item.name);
-    });
 
-    Promise.all(results).then(completed => {
-      this.props.updateIsProcessing(true);
-      this.showToast('success', 'Success', 'Deleted successfully', 3000);
-    });
+    try {
+      this.setState({ isLoading: true });
+      const results = items.map(async (item, i) => {
+        await this.rulesetHandler.deleteFile(item.filename || item.name);
+      });
+
+      Promise.all(results).then(completed => {
+        this.props.updateIsProcessing(true);
+        this.showToast('success', 'Success', 'Deleted successfully', 3000);
+      });
+    }catch(error){
+      const options = {
+        context: errorContext,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `Error deleting item: ${error.message || error}`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+    }
+    
   }
 }
 

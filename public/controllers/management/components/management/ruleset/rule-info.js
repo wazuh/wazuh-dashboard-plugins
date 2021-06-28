@@ -117,13 +117,18 @@ class WzRuleInfo extends Component {
               <EuiLink
                 onClick={async event => {
                   event.stopPropagation();
-                  const result = await this.rulesetHandler.getFileContent(value);
-                  const file = {
-                    name: value,
-                    content: result,
-                    path: item.relative_dirname
-                  };
-                  this.props.updateFileContent(file);
+                  try{
+                    const result = await this.rulesetHandler.getFileContent(value);
+                    const file = {
+                      name: value,
+                      content: result,
+                      path: item.relative_dirname
+                    };
+                    this.props.updateFileContent(file);
+                  }catch(error){
+                    // orchestrator ui
+                  }
+                  
                 }}
               >
                 {value}
