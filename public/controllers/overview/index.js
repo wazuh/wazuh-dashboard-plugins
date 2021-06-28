@@ -18,8 +18,17 @@ import { Stats } from './components/stats';
 import { SelectAgent } from './components/select-agent';
 import { RequirementCard } from './components/requirement-card';
 import { getAngularModule } from '../../kibana-services';
+import WzManagement from '../management/components/management/management-provider';
 
 const app = getAngularModule();
+
+OverviewWelcome.displayName = 'OverviewWelcome';
+WzCurrentOverviewSectionWrapper.displayName = 'WzCurrentOverviewSectionWrapper';
+WzCurrentAgentsSectionWrapper.displayName = 'WzCurrentAgentsSectionWrapper';
+Stats.displayName = 'StatsOverview';
+Mitre.displayName = 'Mitre';
+SelectAgent.displayName = 'SelectAgent';
+RequirementCard.displayName = 'RequirementCard';
 
 app
   .controller('overviewController', OverviewController)

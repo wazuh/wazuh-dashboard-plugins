@@ -22,9 +22,12 @@ import { updateCurrentTab, updateCurrentAgentData } from '../../redux/actions/ap
 import { VisFactoryHandler } from '../../react-services/vis-factory-handler';
 import { RawVisualizations } from '../../factories/raw-visualizations';
 import store from '../../redux/store';
-import { WAZUH_ALERTS_PATTERN } from '../../../common/constants';
+import { UI_LOGGER_LEVELS, WAZUH_ALERTS_PATTERN } from '../../../common/constants';
 import { getDataPlugin } from '../../kibana-services';
+import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../react-services/common-services';
 
+const errorContext = 'OverviewController';
 export class OverviewController {
   /**
    * Class constructor
@@ -221,11 +224,21 @@ export class OverviewController {
       }
       this.tabView = subtab;
     } catch (error) {
-      ErrorHandler.handle(error.message || error);
+      const options = {
+        context: errorContext,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+
+      getErrorOrchestrator().handleError(options);
     }
     this.agentsSelectionProps.subtab = subtab;
     this.$scope.$applyAsync();
-    return;
   }
 
   /**
@@ -260,8 +273,6 @@ export class OverviewController {
         await this.getSummary();
       }
 
-
-
       if (this.tab === newTab && !force) return;
 
       // Restore force value if we come from md-nav action
@@ -277,10 +288,20 @@ export class OverviewController {
       }
       this.overviewModuleReady = true;
     } catch (error) {
-      ErrorHandler.handle(error.message || error);
+      const options = {
+        context: errorContext,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+
+      getErrorOrchestrator().handleError(options);
     }
     this.$scope.$applyAsync();
-    return;
   }
 
   /**
@@ -311,7 +332,6 @@ export class OverviewController {
       } else {
         throw new Error('Error fetching /agents/summary from Wazuh API');
       }
-      return;
     } catch (error) {
       return Promise.reject(error);
     }
@@ -326,7 +346,6 @@ export class OverviewController {
 
       this.wzMonitoringEnabled = !!configuration['wazuh.monitoring.enabled'];
 
-      return;
     } catch (error) {
       this.wzMonitoringEnabled = true;
       return Promise.reject(error);
@@ -360,9 +379,19 @@ export class OverviewController {
 
       });
     } catch (error) {
-      ErrorHandler.handle(error.message || error);
+      const options = {
+        context: errorContext,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+
+      getErrorOrchestrator().handleError(options);
     }
     this.$scope.$applyAsync();
-    return;
   }
 }
