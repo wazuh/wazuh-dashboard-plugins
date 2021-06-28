@@ -48,6 +48,8 @@ export class ManagementController {
     this.logtestOpened = false;
     this.uploadOpened = false;
     this.rulesetTab = RulesetResources.RULES;
+    this.context = 'ManagementController';
+
 
     this.$scope.$on('setCurrentGroup', (ev, params) => {
       this.currentGroup = (params || {}).currentGroup || false;
@@ -230,6 +232,7 @@ export class ManagementController {
       const errorOptions = {
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
+        context: this.context,
         error: {
           error: error,
           message: error?.message || '',
@@ -265,6 +268,7 @@ export class ManagementController {
       const errorOptions = {
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
+        context: this.context,
         error: {
           error: error,
           message: error?.message || '',
@@ -290,6 +294,7 @@ export class ManagementController {
       const errorOptions = {
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
+        context: this.context,
         error: {
           error: error,
           message: error?.message || '',
@@ -441,6 +446,7 @@ export class ManagementController {
       const errorOptions = {
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
+        context: this.context,
         error: {
           error: error,
           message: error?.message || '',
@@ -520,6 +526,7 @@ export class ManagementController {
       const errorOptions = {
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
+        context: this.context,
         error: {
           error: error,
           message: error?.message || '',
