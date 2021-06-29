@@ -122,7 +122,6 @@ class WzRulesetActionButtons extends Component {
       if (errors) throw results;
       return;
     } catch (error) {
-      if (Array.isArray(error) && error.length) throw error;
       throw error;
     }
   }
