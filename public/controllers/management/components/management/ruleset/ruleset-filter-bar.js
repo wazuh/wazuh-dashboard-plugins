@@ -106,7 +106,7 @@ class WzRulesetFilterBar extends Component {
       const options = {
         context: errorContext,
         level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        severity: UI_ERROR_SEVERITIES.UI,
         error: {
           error: error,
           message: error.message || error,
@@ -161,11 +161,11 @@ class WzRulesetFilterBar extends Component {
       const options = {
         context: errorContext,
         level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        severity: UI_ERROR_SEVERITIES.UI,
         error: {
           error: error,
-          message: error.message || error,
-          title: `Error cleaning current options: ${error.message || error}`,
+          message: `Error cleaning current options: ${error.message || error}`,
+          title: error.name || error,
         },
       };
       getErrorOrchestrator().handleError(options);

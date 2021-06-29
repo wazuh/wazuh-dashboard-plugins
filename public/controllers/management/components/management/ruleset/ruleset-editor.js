@@ -149,16 +149,22 @@ class WzRulesetEditor extends Component {
       this.setState({ isSaving: false });
       this.goToEdit(name);
 
-      let textSuccess = 'New file successfully created';
-      if (overwrite) {
-        textSuccess = 'File successfully edited';
+      let errorMessage = `The content of the file ${name} is incorrect. There were found several error while validating the configuration: ${error.message || error}`;
+      if (this.props.state.addingRulesetFile != false) {
+        //remove current invalid file if the file is new.
+        await this.rulesetHandler.deleteFile(name);
+        errorMessage += '\nThe new file was deleted.';
+      } else {
+        //restore file to previous version
+        await this.rulesetHandler.updateFile(name, this.state.initContent, overwrite);
+        errorMessage += '\nThe content file was restored to previous state.';
       }
       this.setState({
         showWarningRestart: true,
         initialInputValue: this.state.inputValue,
         initContent: content,
       });
-      this.showToast('success', 'Success', textSuccess, 3000);
+
     } catch (error) {
       this.setState({ error, isSaving: false });
       const options = {
@@ -167,8 +173,8 @@ class WzRulesetEditor extends Component {
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         error: {
           error: error,
-          message: error.message || error,
-          title: `Error saving file: ${error.message || error}`,
+          message: errorMessage,
+          title: error.name || error,
         },
       };
       getErrorOrchestrator().handleError(options);

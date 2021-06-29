@@ -78,8 +78,8 @@ class WzRulesetActionButtons extends Component {
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         error: {
           error: error,
-          message: error.message || error,
-          title: `Error generating CSV: ${error.message || error}`,
+          message: `Error generating CSV: ${error.message || error}`,
+          title: error.name || error,
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -140,6 +140,18 @@ class WzRulesetActionButtons extends Component {
       this.props.updateLoadingStatus(false);
     } catch (error) {
       // throw o no
+      const options = {
+        context: errorContext,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        store: false,
+        error: {
+          error: error,
+          message: `Error generating CSV: ${error.message || error}`,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   }
 
@@ -151,7 +163,7 @@ class WzRulesetActionButtons extends Component {
       this.props.updateIsProcessing(true);
       // this.onRefreshLoading();
     } catch (error) {
-      return Promise.reject(error);
+      throw error;
     }
   }
 
@@ -266,15 +278,14 @@ class WzRulesetActionButtons extends Component {
         await this.uploadFiles(files, resource);
         await this.refresh();
       } catch (error) {
-        // no se si throw or orchestrator
         const options = {
           context: errorContext,
           level: UI_LOGGER_LEVELS.ERROR,
           severity: UI_ERROR_SEVERITIES.BUSINESS,
           error: {
             error: error,
-            message: error.message || error,
-            title: `Error files cannot be uploaded: ${error.message || error}`,
+            message: `Error files cannot be uploaded: ${error.message || error}`,
+            title: error.name || error,
           },
         };
         getErrorOrchestrator().handleError(options);

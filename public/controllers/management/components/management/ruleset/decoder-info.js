@@ -39,6 +39,27 @@ class WzDecoderInfo extends Component {
     super(props);
 
     this.rulesetHandler = new RulesetHandler(RulesetResources.DECODERS);
+
+    const handleFileClick = async () => {
+      try {
+        const result = await this.rulesetHandler.getFileContent(value);
+        const file = { name: value, content: result, path: item.relative_dirname };
+        this.props.updateFileContent(file);
+      } catch (error) {
+        const options = {
+          context: errorContext,
+          level: UI_LOGGER_LEVELS.ERROR,
+          severity: UI_ERROR_SEVERITIES.BUSINESS,
+          error: {
+            error: error,
+            message: `Error updating file content: ${error.message || error}`,
+            title: error.name || error,
+          },
+        };
+        getErrorOrchestrator().handleError(options);
+      }
+    };
+
     this.columns = [
       {
         field: 'name',
@@ -66,29 +87,7 @@ class WzDecoderInfo extends Component {
         render: (value, item) => {
           return (
             <EuiToolTip position="top" content={`Show ${value} content`}>
-              <EuiLink
-                onClick={async () => {
-                  try {
-                    const result = await this.rulesetHandler.getFileContent(value);
-                    const file = { name: value, content: result, path: item.relative_dirname };
-                    this.props.updateFileContent(file);
-                  } catch (error) {
-                    const options = {
-                      context: errorContext,
-                      level: UI_LOGGER_LEVELS.ERROR,
-                      severity: UI_ERROR_SEVERITIES.BUSINESS,
-                      error: {
-                        error: error,
-                        message: error.message || error,
-                        title: `Error updating file content: ${error.message || error}`,
-                      },
-                    };
-                    getErrorOrchestrator().handleError(options);
-                  }
-                }}
-              >
-                {value}
-              </EuiLink>
+              <EuiLink onClick={async () => this.handleFileClick()}>{value}</EuiLink>
             </EuiToolTip>
           );
         },
