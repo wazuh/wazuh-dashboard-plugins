@@ -244,7 +244,6 @@ export class AgentsPreviewController {
         },
       };
       getErrorOrchestrator().handleError(options);
-      this.errorInit = ErrorHandler.handle(error, '', { silent: true });
     }
     this.loading = false;
     this.$scope.$applyAsync();
