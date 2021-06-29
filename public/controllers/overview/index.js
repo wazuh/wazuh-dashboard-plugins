@@ -18,7 +18,6 @@ import { Stats } from './components/stats';
 import { SelectAgent } from './components/select-agent';
 import { RequirementCard } from './components/requirement-card';
 import { getAngularModule } from '../../kibana-services';
-import WzManagement from '../management/components/management/management-provider';
 
 const app = getAngularModule();
 
