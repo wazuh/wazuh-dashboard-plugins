@@ -138,7 +138,6 @@ class WzRulesetActionButtons extends Component {
       this.props.updatePageIndex(0);
       this.props.updateLoadingStatus(false);
     } catch (error) {
-      // throw o no
       const options = {
         context: errorContext,
         level: UI_LOGGER_LEVELS.ERROR,
