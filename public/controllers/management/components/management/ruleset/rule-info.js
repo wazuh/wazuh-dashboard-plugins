@@ -140,7 +140,7 @@ class WzRuleInfo extends Component {
         render: (value, item) => {
           return (
             <EuiToolTip position="top" content={`Show ${value} content`}>
-              <EuiLink onClick={async (event) => this.handleFileClick(event)}>{value}</EuiLink>
+              <EuiLink onClick={async (event) => handleFileClick(event)}>{value}</EuiLink>
             </EuiToolTip>
           );
         },
@@ -194,7 +194,19 @@ class WzRuleInfo extends Component {
           badgeList.push(buildBadge(field));
         }
       }
-    } catch (error) {}
+    } catch (error) {
+      const options = {
+        context: errorContext,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.UI,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        }
+      };
+      getErrorOrchestrator().handleError(options);
+    }
 
     return <div>{badgeList}</div>;
   }
@@ -420,6 +432,17 @@ class WzRuleInfo extends Component {
       }
     } catch (error) {
       this.setState({ mitreLoading: false });
+      const options = {
+        context: errorContext,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   }
 

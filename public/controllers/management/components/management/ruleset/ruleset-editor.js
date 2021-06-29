@@ -123,7 +123,7 @@ class WzRulesetEditor extends Component {
           severity: UI_ERROR_SEVERITIES.BUSINESS,
           error: {
             error: error,
-            message:`The content of the file ${name} is incorrect. There were found several error while validating the configuration: ${error.message || error}`,
+            message:`The content of the file ${name} is incorrect. There were found several errors while validating the configuration: ${error.message || error}`,
             title: `Error file content is incorrect: ${error.message || error}`,
           },
         };
@@ -149,7 +149,7 @@ class WzRulesetEditor extends Component {
       this.setState({ isSaving: false });
       this.goToEdit(name);
 
-      let errorMessage = `The content of the file ${name} is incorrect. There were found several error while validating the configuration: ${error.message || error}`;
+      let errorMessage = `The content of the file ${name} is incorrect. There were found several errors while validating the configuration: ${error.message || error}`;
       if (this.props.state.addingRulesetFile != false) {
         //remove current invalid file if the file is new.
         await this.rulesetHandler.deleteFile(name);

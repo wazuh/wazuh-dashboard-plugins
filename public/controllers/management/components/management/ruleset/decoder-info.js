@@ -87,7 +87,7 @@ class WzDecoderInfo extends Component {
         render: (value, item) => {
           return (
             <EuiToolTip position="top" content={`Show ${value} content`}>
-              <EuiLink onClick={async () => this.handleFileClick()}>{value}</EuiLink>
+              <EuiLink onClick={async () => handleFileClick()}>{value}</EuiLink>
             </EuiToolTip>
           );
         },
