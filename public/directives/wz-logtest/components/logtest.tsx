@@ -25,6 +25,7 @@ import {
   EuiSpacer,
   EuiTextArea,
   EuiTitle,
+  EuiOutsideClickDetector,
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services';
 import { withErrorBoundary, withReduxProvider, withUserAuthorizationPrompt } from '../../../components/common/hocs';
@@ -229,26 +230,25 @@ export const Logtest = compose(
           </EuiPanel>
         </EuiPage>
       )) || (
-        <EuiOverlayMask
-          headerZindexLocation="below"
-          onClick={() => {
+        <EuiOverlayMask headerZindexLocation="below">
+          <EuiOutsideClickDetector onOutsideClick={() => {
             props.openCloseFlyout();
-          }}
-        >
-          <EuiFlyout className="wzApp" onClose={() => props.openCloseFlyout()}>
-            <EuiFlyoutHeader hasBorder={false}>
-              <EuiTitle size="m">
-                {props.isRuleset.includes('rules') ? <h2>Ruleset Test</h2> : <h2>Decoders Test</h2>}
-              </EuiTitle>
-            </EuiFlyoutHeader>
-            <EuiFlyoutBody style={{ margin: '20px' }}>
-              <EuiFlexGroup gutterSize="m">
-                <EuiFlexItem />
-              </EuiFlexGroup>
-              <EuiSpacer size="s" />
-              {buildLogtest()}
-            </EuiFlyoutBody>
-          </EuiFlyout>
+          }}>
+            <EuiFlyout className="wzApp" onClose={() => props.openCloseFlyout()}>
+              <EuiFlyoutHeader hasBorder={false}>
+                <EuiTitle size="m">
+                  {props.isRuleset.includes('rules') ? <h2>Ruleset Test</h2> : <h2>Decoders Test</h2>}
+                </EuiTitle>
+              </EuiFlyoutHeader>
+              <EuiFlyoutBody style={{ margin: '20px' }}>
+                <EuiFlexGroup gutterSize="m">
+                  <EuiFlexItem />
+                </EuiFlexGroup>
+                <EuiSpacer size="s" />
+                {buildLogtest()}
+              </EuiFlyoutBody>
+            </EuiFlyout>
+          </EuiOutsideClickDetector>
         </EuiOverlayMask>
       )}
     </Fragment>
