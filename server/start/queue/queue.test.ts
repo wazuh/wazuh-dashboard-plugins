@@ -1,6 +1,8 @@
 // To launch this file
 // yarn test:jest --testEnvironment node --verbose server/jobs/queue.test
-import { addJobToQueue, queue, jobQueueRun } from './queue';
+
+
+import { addJobToQueue, jobQueueRun, queue } from './index';
 
 jest.setTimeout(60000); // Set jest timeout to 60000ms to allow the job is run and removed from queue
 

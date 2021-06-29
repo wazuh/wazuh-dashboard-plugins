@@ -7,8 +7,8 @@ exports[`withErrorBoundary hoc implementation renders correctly to match the sna
       errorInfo={
         Object {
           "componentStack": "
-    in ComponentWithError
-    in Unknown
+    in ComponentWithError (created by withErrorBoundary(UnknownComponent))
+    in withErrorBoundary(UnknownComponent)
     in ErrorBoundary
     in Unknown (created by WrapperComponent)
     in WrapperComponent",
@@ -30,11 +30,7 @@ exports[`withErrorBoundary hoc implementation renders correctly to match the sna
             }
           >
             <details
-              style={
-                Object {
-                  "whiteSpace": "pre-wrap",
-                }
-              }
+              className="wz-error-boundary__details"
             >
               <span>
                 Error: I crashed! I crash very hard
@@ -42,8 +38,8 @@ exports[`withErrorBoundary hoc implementation renders correctly to match the sna
               <br />
               <span>
                 
-    in ComponentWithError
-    in Unknown
+    in ComponentWithError (created by withErrorBoundary(UnknownComponent))
+    in withErrorBoundary(UnknownComponent)
     in ErrorBoundary
     in Unknown (created by WrapperComponent)
     in WrapperComponent
@@ -129,11 +125,7 @@ exports[`withErrorBoundary hoc implementation renders correctly to match the sna
                     }
                   >
                     <details
-                      style={
-                        Object {
-                          "whiteSpace": "pre-wrap",
-                        }
-                      }
+                      className="wz-error-boundary__details"
                     >
                       <span>
                         Error: I crashed! I crash very hard
@@ -141,8 +133,8 @@ exports[`withErrorBoundary hoc implementation renders correctly to match the sna
                       <br />
                       <span>
                         
-    in ComponentWithError
-    in Unknown
+    in ComponentWithError (created by withErrorBoundary(UnknownComponent))
+    in withErrorBoundary(UnknownComponent)
     in ErrorBoundary
     in Unknown (created by WrapperComponent)
     in WrapperComponent
