@@ -48,7 +48,7 @@ jobs:
         fi
         
      - name: Step 02 - Download Project wazuh-app-environments 
-       if: ${{ env.RUN_TEST }}
+       if: ${{ env.RUN_TEST == 'true' }}
        uses: actions/checkout@v2
        with:
         repository: frankeros/wazuh-app-environments
@@ -56,7 +56,7 @@ jobs:
         path: wazuh-app-environments
         token: ${{ secrets.ENV_TEMPLATES_TOKEN }}
      - name: Step 03 - Configuring templates docker environment
-       if: ${{ env.RUN_TEST }}
+       if: ${{ env.RUN_TEST == 'true'}}
        run: |
         cd $GITHUB_WORKSPACE/wazuh-app-environments/
         mkdir packages
@@ -67,19 +67,19 @@ jobs:
         sed -i -e "s/ELASTIC_VERSION=.*/ELASTIC_VERSION=${{ env.ELASTIC_VERSION }}/g" ./.env
         cat .env
      - name: Step 04 - Starting containers
-       if: ${{ env.RUN_TEST }}
+       if: ${{ env.RUN_TEST == 'true'}}
        run: |
         cd ${{ env.PATH_TEMPLATE_BASIC_CLUSTER_AGENT }}
         sudo docker-compose up -d
      - name: Step 05 - Download Project wazuh-packages 
-       if: ${{ env.RUN_TEST }}
+       if: ${{ env.RUN_TEST == 'true' }}
        uses: actions/checkout@v2
        with:
         repository: wazuh/wazuh-packages
         ref: '4.2'
         path: wazuh-packages
      - name: Step 06 - Building package
-       if: ${{ env.RUN_TEST }}
+       if: ${{ env.RUN_TEST == 'true' }}
        run: |
         cd $GITHUB_WORKSPACE/wazuh-packages/wazuhapp
         echo fixing command...
@@ -87,7 +87,7 @@ jobs:
         echo run command...
         ./generate_wazuh_app.sh -b ${{ env.WAZUH_HEAD_BRANCH }} -s $GITHUB_WORKSPACE/wazuh-app-environments/packages -r 1
      - name: Step 07 - Installing package
-       if: ${{ env.RUN_TEST }}
+       if: ${{ env.RUN_TEST == 'true' }}
        run: |
         cd $GITHUB_WORKSPACE/wazuh-app-environments/packages/
         PACKAGE_NAME=`ls *.zip`
@@ -97,27 +97,27 @@ jobs:
         echo CONTINUES AFTER 20 SECONDS ...
         sleep 20s
      - name: Step 08 - Configuring ip container into wazuh.yml
-       if: ${{ env.RUN_TEST }}
+       if: ${{ env.RUN_TEST == 'true' }}
        run: |
         IP_CONTAINER_MANAGER=$(docker exec es_basic-wz_cluster-agent_wazuh-manager-master_1 hostname -i)
         docker exec es_basic-wz_cluster-agent_kibana_1 cat ./data/wazuh/config/wazuh.yml
         docker exec es_basic-wz_cluster-agent_kibana_1 sed -i -e "s/url: https:\/\/localhost/url: https:\/\/$IP_CONTAINER_MANAGER/g" ./data/wazuh/config/wazuh.yml
         docker exec es_basic-wz_cluster-agent_kibana_1 cat ./data/wazuh/config/wazuh.yml
      - name: Step 09 - Download Project wazuh-qa 
-       if: ${{ env.RUN_TEST }}
+       if: ${{ env.RUN_TEST == 'true' }}
        uses: actions/checkout@v2
        with:
         repository: wazuh/wazuh-qa
         ref: 'feature/frontend'
         path: wazuh-qa
      - name: Step 10 - Install Cypress Project Dependencies
-       if: ${{ env.RUN_TEST }}
+       if: ${{ env.RUN_TEST == 'true' }}
        run: |
         cd $GITHUB_WORKSPACE/wazuh-qa/tests/frontend/test_kibana_app/
         npm install
         npm run cy:install
      - name: Step 11 - Run Cypress tests
-       if: ${{ env.RUN_TEST }}
+       if: ${{ env.RUN_TEST == 'true' }}
        run: |
          cd $GITHUB_WORKSPACE/wazuh-qa/tests/frontend/test_kibana_app/
          npm run cypress:run-headless
