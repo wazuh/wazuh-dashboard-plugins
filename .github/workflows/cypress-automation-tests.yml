@@ -28,7 +28,6 @@ jobs:
         echo Base Branch: ${{ github.base_ref }}
         echo Head Branch: ${{ github.head_ref }}
         echo Run Test TRUE
-      
         echo "RUN_TEST=true" >> $GITHUB_ENV
         
         echo "WAZUH_HEAD_BRANCH=${{ github.head_ref }}" >> $GITHUB_ENV
