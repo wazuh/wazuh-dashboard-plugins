@@ -21,6 +21,16 @@ import {WzSampleDataWrapper} from '../../components/add-modules-data/WzSampleDat
 import { getAngularModule } from '../../kibana-services';
 
 const app = getAngularModule();
+
+EnableModules.displayName = 'EnableModules';
+WzSampleDataWrapper.displayName = 'WzSampleDataWrapper';
+WzConfigurationSettings.displayName = 'WzConfigurationSettings';
+SettingsLogs.displayName = 'SettingsLogs';
+SettingsMiscellaneous.displayName = 'SettingsMiscellaneous';
+ApiTable.displayName = 'ApiTable';
+AddApi.displayName = 'AddApi';
+ApiIsDown.displayName = 'ApiIsDown';
+
 app
   .controller('settingsController', SettingsController)
   .value('EnableModules', EnableModules)

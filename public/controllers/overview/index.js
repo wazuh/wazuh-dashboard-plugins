@@ -21,6 +21,14 @@ import { getAngularModule } from '../../kibana-services';
 
 const app = getAngularModule();
 
+OverviewWelcome.displayName = 'OverviewWelcome';
+WzCurrentOverviewSectionWrapper.displayName = 'WzCurrentOverviewSectionWrapper';
+WzCurrentAgentsSectionWrapper.displayName = 'WzCurrentAgentsSectionWrapper';
+Stats.displayName = 'StatsOverview';
+Mitre.displayName = 'Mitre';
+SelectAgent.displayName = 'SelectAgent';
+RequirementCard.displayName = 'RequirementCard';
+
 app
   .controller('overviewController', OverviewController)
   .value('OverviewWelcome', OverviewWelcome)
