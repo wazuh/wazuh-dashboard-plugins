@@ -16,6 +16,10 @@ import { ErrorOrchestrator, UIErrorLog } from './types';
 export class ErrorOrchestratorService {
   public constructor() {}
 
+  /**
+   * HandlerError static method
+   * @param {UIErrorLog} uiErrorLog
+   */
   static handleError({
     context,
     level,

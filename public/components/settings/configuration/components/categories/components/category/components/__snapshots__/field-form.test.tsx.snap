@@ -1,0 +1,67 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FieldForm component renders correctly to match the snapshot 1`] = `
+<FieldForm
+  item={
+    Object {
+      "category": "string",
+      "description": "string",
+      "form": Object {
+        "params": Object {},
+        "type": "text",
+      },
+      "name": "string",
+      "setting": "string",
+      "value": "boolean",
+    }
+  }
+  setUpdatedConfig={[MockFunction]}
+  updatedConfig={Object {}}
+>
+  <TextForm
+    item={
+      Object {
+        "category": "string",
+        "description": "string",
+        "form": Object {
+          "params": Object {},
+          "type": "text",
+        },
+        "name": "string",
+        "setting": "string",
+        "value": "boolean",
+      }
+    }
+    setUpdatedConfig={[MockFunction]}
+    updatedConfig={Object {}}
+  >
+    <EuiFieldText
+      fullWidth={true}
+      onChange={[Function]}
+      value="boolean"
+    >
+      <EuiFormControlLayout
+        fullWidth={true}
+      >
+        <div
+          className="euiFormControlLayout euiFormControlLayout--fullWidth"
+        >
+          <div
+            className="euiFormControlLayout__childrenWrapper"
+          >
+            <EuiValidatableControl>
+              <input
+                className="euiFieldText euiFieldText--fullWidth"
+                onChange={[Function]}
+                type="text"
+                value="boolean"
+              />
+            </EuiValidatableControl>
+            <EuiFormControlLayoutIcons />
+          </div>
+        </div>
+      </EuiFormControlLayout>
+    </EuiFieldText>
+  </TextForm>
+</FieldForm>
+`;
