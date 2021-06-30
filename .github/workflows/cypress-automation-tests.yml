@@ -49,7 +49,7 @@ jobs:
         fi
         
      - name: Step 02 - Download Project wazuh-app-environments 
-       if: ${{ env.RUN_TEST == true }}
+       if: ${{ env.RUN_TEST }}
        uses: actions/checkout@v2
        with:
         repository: frankeros/wazuh-app-environments
