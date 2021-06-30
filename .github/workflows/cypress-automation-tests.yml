@@ -22,7 +22,6 @@ jobs:
        env:
         SHOULD_TEST: ${{ contains(github.event.pull_request.body, 'SHOULD_TEST=TRUE') }}
        run: |
-        
         if ${SHOULD_TEST} == true; then
         
         echo Base Branch: ${{ github.base_ref }}
