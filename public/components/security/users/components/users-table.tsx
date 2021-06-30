@@ -16,14 +16,35 @@ import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
 
-const errorContext = 'UsersTable';
-
 export const UsersTable = ({ users, editUserFlyover, rolesLoading, roles, onSave }) => {
   const getRowProps = item => {
     const { id } = item;
     return {
       'data-test-subj': `row-${id}`,
       onClick: () => editUserFlyover(item),
+    };
+  };
+
+  const onConfirmDeleteUser = (item) => {
+    return async () => {
+      try {
+        await UsersServices.DeleteUsers([item.id]);
+        ErrorHandler.info('User was successfully deleted');
+        onSave();
+      } catch (error) {
+        const options = {
+          context: `${UsersTable.name}.onConfirmDeleteUser`,
+          level: UI_LOGGER_LEVELS.ERROR,
+          severity: UI_ERROR_SEVERITIES.BUSINESS,
+          store: true,
+          error: {
+            error: error,
+            message: error.message || error,
+            title: error.name || error,
+          },
+        };
+        getErrorOrchestrator().handleError(options);
+      }
     };
   };
 
@@ -78,26 +99,7 @@ export const UsersTable = ({ users, editUserFlyover, rolesLoading, roles, onSave
             }}
             isDisabled={WzAPIUtils.isReservedID(item.id)}
             modalTitle={`Do you want to delete ${item.username} user?`}
-            onConfirm={async () => {
-              try {
-                await UsersServices.DeleteUsers([item.id]);
-                ErrorHandler.info('User was successfully deleted');
-                onSave();
-              } catch (error) {
-                const options = {
-                  context: errorContext,
-                  level: UI_LOGGER_LEVELS.ERROR,
-                  severity: UI_ERROR_SEVERITIES.BUSINESS,
-                  store: true,
-                  error: {
-                    error: error,
-                    message: error.message || error,
-                    title: error.name || error,
-                  },
-                };
-                getErrorOrchestrator().handleError(options);
-              }
-            }}
+            onConfirm={onConfirmDeleteUser(item)}
             modalProps={{ buttonColor: 'danger' }}
             iconType="trash"
             color="danger"

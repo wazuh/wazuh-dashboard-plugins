@@ -95,7 +95,7 @@ export const WzSecurity = compose(
       fetchAllowRunAs();
     } catch (error) {
       const options = {
-        context: 'errorContext',
+        context: `${WzSecurity.name}.fetchAllowRunAs`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         store: true,

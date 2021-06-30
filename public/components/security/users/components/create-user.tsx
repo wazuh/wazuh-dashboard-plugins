@@ -31,8 +31,6 @@ import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
 
-const errorContext = 'CreateUser';
-
 export const CreateUser = ({ closeFlyout }) => {
   const [selectedRoles, setSelectedRole] = useState<any>([]);
   const [rolesLoading, roles, rolesError] = useApiService<Role[]>(RolesServices.GetRoles, {});
@@ -164,7 +162,7 @@ export const CreateUser = ({ closeFlyout }) => {
       closeFlyout(true);
     } catch (error) {
       const options = {
-        context: errorContext,
+        context: `${CreateUser.name}.editUser`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         store: true,
