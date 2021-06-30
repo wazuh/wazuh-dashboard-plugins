@@ -79,7 +79,6 @@ export class InventoryTable extends Component {
     const regex = new RegExp('file=' + '[^&]*');
     const match = window.location.href.match(regex);
     this.setState({totalItems: this.props.totalItems});
-    debugger
     if (match && match[0]) {
       const file = match[0].split('=')[1];
       this.showFlyout(decodeURIComponent(file), true);
