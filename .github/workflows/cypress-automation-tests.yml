@@ -20,10 +20,10 @@ jobs:
     steps:
      - name: Step 01 - Set up environment variables
        env:
-        SOULD_TEST: ${{ contains(github.event.pull_request.body, 'SHOULD_TEST=TRUE') }}
+        SHOULD_TEST: ${{ contains(github.event.pull_request.body, 'SHOULD_TEST=TRUE') }}
        run: |
         
-        if ${SOULD_TEST} == true; then
+        if ${SHOULD_TEST} == true; then
         
         echo Base Branch: ${{ github.base_ref }}
         echo Head Branch: ${{ github.head_ref }}
