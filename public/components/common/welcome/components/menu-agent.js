@@ -16,6 +16,7 @@ import { AppState } from '../../../../react-services/app-state';
 import { hasAgentSupportModule } from '../../../../react-services/wz-agents';
 import { getAngularModule, getToasts } from '../../../../kibana-services';
 import { WAZUH_MODULES_ID } from '../../../../../common/constants';
+import { updateCurrentAgentData } from '../../../../redux/actions/appStateActions';
 
 class WzMenuAgent extends Component {
   constructor(props) {
@@ -260,7 +261,11 @@ const mapStateToProps = state => {
   };
 };
 
+const mapDispatchToProps = dispatch => ({
+  updateCurrentAgentData: (agentData) => dispatch(updateCurrentAgentData(agentData))
+});
+
 export default connect(
   mapStateToProps,
-  null
+  mapDispatchToProps
 )(WzMenuAgent);
