@@ -15,7 +15,7 @@ export function ErrorHandler(error, serverLogger) {
   log('Cron-scheduler', error, errorLevel === ERROR ? INFO : errorLevel);
   try {
     if (errorLevel === DEBUG && logsLevel !== DEBUG) return;
-    serverLogger[logLevel(errorLevel)](`${error instanceof Error? error.toString() : JSON.stringify(error)}`);
+    serverLogger[logLevel(errorLevel)](`${error instanceof Error ? error.toString() : JSON.stringify(error)}`);
   } catch (error) {
     serverLogger[logLevel(errorLevel)](`Message too long to show in console output, check the log file`)
   }

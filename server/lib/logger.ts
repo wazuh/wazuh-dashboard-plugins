@@ -144,7 +144,7 @@ const yyyymmdd = () => {
  * @returns the data parsed 
  */
 const parseData = (data: any) => {
-  let parsedData = data instanceof Error? { 
+  let parsedData = data instanceof Error ? { 
     message: data.message,
     stack: data.stack
   } : data;

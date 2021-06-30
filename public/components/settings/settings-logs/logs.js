@@ -27,7 +27,6 @@ import {
 import { formatUIDate } from '../../../react-services/time-service';
 import store from '../../../redux/store';
 import { updateSelectedSettingsSection } from '../../../redux/actions/appStateActions';
-import { JsxEmit } from 'typescript';
 
 export default class SettingsLogs extends Component {
   constructor(props) {
