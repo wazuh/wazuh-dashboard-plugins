@@ -29,7 +29,7 @@ jobs:
         echo Head Branch: ${{ github.head_ref }}
         echo Run Test TRUE
       
-        echo "RUN_TEST=$(true)" >> $GITHUB_ENV
+        echo "RUN_TEST=true" >> $GITHUB_ENV
         
         echo "WAZUH_HEAD_BRANCH=${{ github.head_ref }}" >> $GITHUB_ENV
         echo "${{ github.event.pull_request.body }}" > pull_request.body.txt
@@ -44,12 +44,12 @@ jobs:
         else
         
         echo Run Test FALSE
-        echo "RUN_TEST=$(false)" >> $GITHUB_ENV
+        echo "RUN_TEST=false" >> $GITHUB_ENV
         
         fi
         
      - name: Step 02 - Download Project wazuh-app-environments 
-       if: ${{ env.RUN_TEST }}
+       if: ${{ env.RUN_TEST == true }}
        uses: actions/checkout@v2
        with:
         repository: frankeros/wazuh-app-environments
