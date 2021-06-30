@@ -28,7 +28,6 @@ import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 
-const errorContext = 'SelectAgent';
 export const SelectAgent = withErrorBoundary (class SelectAgent extends Component {
   constructor(props) {
     super(props);
@@ -99,7 +98,7 @@ export const SelectAgent = withErrorBoundary (class SelectAgent extends Componen
       });
     } catch (error) {
       const options = {
-        context: errorContext,
+        context: `${SelectAgent.name}.getItems`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         error: {

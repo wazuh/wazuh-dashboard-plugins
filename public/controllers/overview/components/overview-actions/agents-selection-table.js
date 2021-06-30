@@ -36,7 +36,6 @@ const checkField = field => {
   return field !== undefined ? field : '-';
 };
 
-const errorContext = 'AgentSelectionTable';
 export class AgentSelectionTable extends Component {
   constructor(props) {
     super(props);
@@ -169,7 +168,7 @@ export class AgentSelectionTable extends Component {
       return splitString.join(', ');
     } catch (error) {
       const options = {
-        context: errorContext,
+        context: `${AgentSelectionTable.name}.getArrayFormatted`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.UI,
         error: {
@@ -204,7 +203,7 @@ export class AgentSelectionTable extends Component {
     } catch (error) {
       this._isMounted && this.setState({ isLoading: false });
       const options = {
-        context: errorContext,
+        context: `${AgentSelectionTable.name}.getItems`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         error: {
@@ -550,7 +549,7 @@ export class AgentSelectionTable extends Component {
       store.dispatch(updateCurrentAgentData({}));
       this.props.removeAgentsFilter(true);
       const options = {
-        context: errorContext,
+        context: `${AgentSelectionTable.name}.selectAgentAndApply`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         error: {

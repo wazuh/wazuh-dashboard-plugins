@@ -27,7 +27,6 @@ import { getDataPlugin } from '../../kibana-services';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
 
-const errorContext = 'OverviewController';
 export class OverviewController {
   /**
    * Class constructor
@@ -225,7 +224,7 @@ export class OverviewController {
       this.tabView = subtab;
     } catch (error) {
       const options = {
-        context: errorContext,
+        context: `${OverviewController.name}.switchSubtab`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         error: {
@@ -289,7 +288,7 @@ export class OverviewController {
       this.overviewModuleReady = true;
     } catch (error) {
       const options = {
-        context: errorContext,
+        context: `${OverviewController.name}.switchTab`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         error: {
@@ -376,11 +375,10 @@ export class OverviewController {
         for (var i in rows) {
           this.$scope.attacksCount[rows[i]['col-0-2']] = rows[i]['col-1-1'];
         }
-
       });
     } catch (error) {
       const options = {
-        context: errorContext,
+        context: `${OverviewController.name}.init`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         error: {
