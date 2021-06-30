@@ -46,7 +46,6 @@ jobs:
         echo "RUN_TEST=false" >> $GITHUB_ENV
         
         fi
-        
      - name: Step 02 - Download Project wazuh-app-environments 
        if: ${{ env.RUN_TEST == 'true' }}
        uses: actions/checkout@v2
