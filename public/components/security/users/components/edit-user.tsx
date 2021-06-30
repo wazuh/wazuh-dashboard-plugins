@@ -29,6 +29,9 @@ import { WzAPIUtils } from '../../../../react-services/wz-api-utils';
 import { useDebouncedEffect } from '../../../common/hooks/useDebouncedEffect';
 import { WzOverlayMask } from '../../../common/util'
 import _ from 'lodash';
+import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../../../react-services/common-services';
 
 export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
   const userRolesFormatted =
@@ -148,7 +151,18 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
       ErrorHandler.info('User was successfully updated');
       closeFlyout(true);
     } catch (error) {
-      ErrorHandler.handle(error, 'There was an error');
+      const options = {
+        context: `${EditUser.name}.editUser`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        store: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
       setIsLoading(false);
     }
   };
@@ -208,7 +222,7 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
 
   useEffect(() => {
     if (
-      initialPassword != password || initialPassword != confirmPassword || 
+      initialPassword != password || initialPassword != confirmPassword ||
       !_.isEqual(userRolesFormatted, selectedRoles) || allowRunAs
     ) {
       setHasChanges(true);
