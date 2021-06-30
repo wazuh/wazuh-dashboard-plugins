@@ -25,8 +25,16 @@ import {
   EuiButton
 } from '@elastic/eui';
 import { WazuhConfig } from '../../../../react-services/wazuh-config';
+import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
+import {
+  UI_ERROR_SEVERITIES,
+  UIErrorLog,
+  UIErrorSeverity,
+  UILogLevel,
+} from '../../../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../../../react-services/common-services';
 
-
+const errorContext = 'BottomBar'
 interface IBottomBarProps {
   updatedConfig: { [setting: string]: string | number | boolean | object }
   setUpdateConfig(setting: {}): void
@@ -96,7 +104,19 @@ const saveSettings = async (updatedConfig: {}, setUpdateConfig: Function, setLoa
     successToast();
     setUpdateConfig({});
   } catch (error) {
-    errorToast(error);
+    const options: UIErrorLog = {
+      context: errorContext,
+      level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+      severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
+      store: true,
+      error: {
+        error: error,
+        message: error.message || error,
+        title: `Error saving the configuration: ${error.message || error}`,
+      },
+    };
+
+    getErrorOrchestrator().handleError(options);
   } finally {
     setLoading(false);
   }
@@ -161,13 +181,6 @@ const successToast = () => {
   getToasts().add({
     color: 'success',
     title: 'The configuration has been successfully updated',
-  });
-}
-
-const errorToast = (error) => {
-  getToasts().add({
-    color: 'danger',
-    title: `Error saving the configuration: ${error.message || error}`,
   });
 }
 
