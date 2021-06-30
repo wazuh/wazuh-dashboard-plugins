@@ -79,6 +79,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed export to csv button in dashboards tables [#3358](https://github.com/wazuh/wazuh-kibana-app/pull/3358)
 - Fixed Elastic UI breaking changes in 7.12 [#3345](https://github.com/wazuh/wazuh-kibana-app/pull/3345)
 - Fixed Wazuh main menu and breadcrumb render issues [#3347](https://github.com/wazuh/wazuh-kibana-app/pull/3347)
+- Fixed generation of huge logs from backend errors [#3397](https://github.com/wazuh/wazuh-kibana-app/pull/3397)
 
 ## Wazuh v4.2.0 - Kibana 7.10.2 , 7.11.2 - Revision 4201
 
