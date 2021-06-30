@@ -123,6 +123,7 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
     setVisualizationsPlugin(plugins.visualizations);
     setSavedObjects(core.savedObjects);
     setOverlays(core.overlays);
+    setErrorOrchestrator(ErrorOrchestratorService);
     return {};
   }
 }
