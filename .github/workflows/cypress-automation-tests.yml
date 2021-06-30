@@ -73,7 +73,7 @@ jobs:
         cd ${{ env.PATH_TEMPLATE_BASIC_CLUSTER_AGENT }}
         sudo docker-compose up -d
      - name: Step 05 - Download Project wazuh-packages 
-       if: ${{ env.RUN_TEST }}
+       if: ${{ env.RUN_TEST == true }}
        uses: actions/checkout@v2
        with:
         repository: wazuh/wazuh-packages
@@ -105,7 +105,7 @@ jobs:
         docker exec es_basic-wz_cluster-agent_kibana_1 sed -i -e "s/url: https:\/\/localhost/url: https:\/\/$IP_CONTAINER_MANAGER/g" ./data/wazuh/config/wazuh.yml
         docker exec es_basic-wz_cluster-agent_kibana_1 cat ./data/wazuh/config/wazuh.yml
      - name: Step 09 - Download Project wazuh-qa 
-       if: ${{ env.RUN_TEST }}
+       if: ${{ env.RUN_TEST == true }}
        uses: actions/checkout@v2
        with:
         repository: wazuh/wazuh-qa
