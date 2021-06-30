@@ -31,7 +31,6 @@ jobs:
         
         echo "RUN_TEST=true" >> $GITHUB_ENV
         echo "WAZUH_HEAD_BRANCH=${{ github.head_ref }}" >> $GITHUB_ENV
-        
         echo "${{ github.event.pull_request.body }}" > pull_request.body.txt
         
         echo "WAZUH_MANAGER_IMAGE=$(grep 'WAZUH_MANAGER_IMAGE=*' ./pull_request.body.txt | cut -d '=' -f2)" >> $GITHUB_ENV
