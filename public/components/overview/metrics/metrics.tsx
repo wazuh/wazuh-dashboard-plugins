@@ -101,6 +101,11 @@ export const Metrics = withAllowedAgents(class Metrics extends Component {
         { name: "Last scan score", type: "custom", filter: { phrase: "oscap-report", field:"rule.groups"} , agg: { "customAggResult": { "terms": { "field": "timestamp", "order": { "_term": "desc" }, "size": 1 }, "aggs": { "aggResult": { "terms": { "field": "data.oscap.scan.score" } } } }}},
         { name: "Highest scan score", type: "custom", filter: { phrase: "oscap-report", field:"rule.groups"} , agg: { "customAggResult": { "terms": { "field": "data.oscap.scan.score", "order": { "_term": "desc" }, "size": 1 }, "aggs": { "aggResult": { "terms": { "field": "data.oscap.scan.score" } } } }}, color: "secondary"},
         { name: "Lowest scan score", type: "custom", filter: { phrase: "oscap-report", field:"rule.groups"} , agg: { "customAggResult": { "terms": { "field": "data.oscap.scan.score", "order": { "_term": "asc" }, "size": 1 }, "aggs": { "aggResult": { "terms": { "field": "data.oscap.scan.score" } } } }}, color: "danger"},
+      ],
+      github: [
+        { name: "Organizations", type: "unique-count",  field: "data.github.org"},
+        { name: "Repositories", type: "unique-count",  field: "data.github.repo", color: "secondary"},
+        { name: "Actors", type: "unique-count",  field: "data.github.actor", color: "danger"},
       ]
     }
   }

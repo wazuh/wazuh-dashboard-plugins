@@ -874,5 +874,48 @@ export const agentVisualizations = {
         ]
       }
     ]
-  }
+  },
+  github: {
+    rows: [
+      {
+        height: 360,
+        vis: [
+          {
+            title: 'Alerts evolution by organization',
+            id: 'Wazuh-App-Overview-GitHub-Alerts-Evolution-By-Organization',
+            width: 60
+          },
+          {
+            title: 'Top 5 organizations by alerts',
+            id: 'Wazuh-App-Overview-GitHub-Top-5-Organizations-By-Alerts',
+            width: 40
+          }
+        ]
+      },
+      {
+        height: 360,
+        vis: [
+          {
+            title: 'Top alerts by action type and organization',
+            id: 'Wazuh-App-Overview-GitHub-Alert-Action-Type-By-Organization',
+            width: 40
+          },
+          {
+            title: 'Users with more alerts',
+            id: 'Wazuh-App-Overview-GitHub-Users-With-More-Alerts',
+            width: 60
+          }
+        ]
+      },
+      {
+        hide: true,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Overview-GitHub-Alert-Summary',
+          }
+        ]
+      }
+    ]
+  },
 };

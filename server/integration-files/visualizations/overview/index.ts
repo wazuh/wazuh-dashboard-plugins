@@ -27,6 +27,7 @@ import vuls from './overview-vuls';
 import mitre from './overview-mitre';
 import osquery from './overview-osquery';
 import docker from './overview-docker';
+import github from './overview-github';
 
 export {
   audit,
@@ -46,5 +47,6 @@ export {
   vuls,
   mitre,
   osquery,
-  docker
+  docker,
+  github
 };
