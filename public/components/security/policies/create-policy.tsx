@@ -20,6 +20,11 @@ import {
 import { WzRequest } from '../../../react-services/wz-request';
 import { ErrorHandler } from '../../../react-services/error-handler';
 import { WzOverlayMask } from '../../common/util';
+import { UI_LOGGER_LEVELS } from '../../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../../react-services/common-services';
+
+const errorContext = 'CreatePolicyFlyout';
 
 export const CreatePolicyFlyout = ({ closeFlyout }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -182,8 +187,18 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
       setAddedResources([]);
       setEffectValue(null);
     } catch (error) {
-      ErrorHandler.handle(error, 'Error creating policy');
-      return;
+      const options = {
+        context: errorContext,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        store: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
     closeFlyout();
   };
