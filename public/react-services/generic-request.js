@@ -17,7 +17,6 @@ import { ApiCheck } from './wz-api-check';
 import { WzMisc } from '../factories/misc';
 import { OdfeUtils } from '../utils';
 import { getHttp, getDataPlugin } from '../kibana-services';
-import { error } from '../../../../src/plugins/expressions';
 
 export class GenericRequest {
   static async request(method, path, payload = null, returnError = false) {
