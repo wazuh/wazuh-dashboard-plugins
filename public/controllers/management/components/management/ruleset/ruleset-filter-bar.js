@@ -24,7 +24,6 @@ import { RulesetHandler, RulesetResources } from './utils/ruleset-handler';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
-const errorContext = 'WzRulesetFilterBar';
 
 class WzRulesetFilterBar extends Component {
   constructor(props) {
@@ -104,7 +103,7 @@ class WzRulesetFilterBar extends Component {
       if (Object.keys(filters).length) await this.fetchItems(filters);
     } catch (error) {
       const options = {
-        context: errorContext,
+        context: `${WzRulesetFilterBar.name}.buildSelectedOptions`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.UI,
         error: {
@@ -159,7 +158,7 @@ class WzRulesetFilterBar extends Component {
       await this.fetchItems(currentOptions);
     } catch (error) {
       const options = {
-        context: errorContext,
+        context: `${WzRulesetFilterBar.name}.cleanCurrentOption`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.UI,
         error: {

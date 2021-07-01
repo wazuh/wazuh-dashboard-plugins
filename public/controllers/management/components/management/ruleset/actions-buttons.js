@@ -34,7 +34,6 @@ import { connect } from 'react-redux';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
-const errorContext = 'WzRulesetActionButtons';
 
 class WzRulesetActionButtons extends Component {
   constructor(props) {
@@ -73,7 +72,7 @@ class WzRulesetActionButtons extends Component {
       );
     } catch (error) {
       const options = {
-        context: errorContext,
+        context: `${WzRulesetActionButtons.name}.generateCsv`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         error: {
@@ -139,7 +138,7 @@ class WzRulesetActionButtons extends Component {
       this.props.updateLoadingStatus(false);
     } catch (error) {
       const options = {
-        context: errorContext,
+        context: `${WzRulesetActionButtons.name}.toggleFiles`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         store: false,
@@ -277,7 +276,7 @@ class WzRulesetActionButtons extends Component {
         await this.refresh();
       } catch (error) {
         const options = {
-          context: errorContext,
+          context: `${WzRulesetActionButtons.name}.uploadFile`,
           level: UI_LOGGER_LEVELS.ERROR,
           severity: UI_ERROR_SEVERITIES.BUSINESS,
           error: {

@@ -26,7 +26,6 @@ import { WzRequest } from '../../../../react-services/wz-request';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
-const errorContext = 'WzSectionSelector';
 
 class WzSectionSelector extends Component {
   constructor(props) {
@@ -81,7 +80,7 @@ class WzSectionSelector extends Component {
       this.fetchData(section);
     }catch (error){
       const options = {
-        context: errorContext,
+        context: `${WzSectionSelector.name}.onChange`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         error: {

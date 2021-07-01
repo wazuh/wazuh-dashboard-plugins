@@ -54,7 +54,6 @@ import _ from 'lodash';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
-const errorContext = 'WzRulesetEditor';
 
 class WzRulesetEditor extends Component {
   _isMounted = false;
@@ -118,7 +117,7 @@ class WzRulesetEditor extends Component {
         await validateConfigAfterSent();
       } catch (error) {
         const options = {
-          context: errorContext,
+          context: `${WzRulesetEditor.name}.save`,
           level: UI_LOGGER_LEVELS.ERROR,
           severity: UI_ERROR_SEVERITIES.BUSINESS,
           error: {
@@ -168,7 +167,7 @@ class WzRulesetEditor extends Component {
     } catch (error) {
       this.setState({ error, isSaving: false });
       const options = {
-        context: errorContext,
+        context: `${WzRulesetEditor.name}.save`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         error: {

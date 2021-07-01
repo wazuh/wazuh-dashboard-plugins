@@ -36,8 +36,6 @@ import { compose } from 'redux';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
-const errorContext = 'WzRulesetTable';
-
 class WzRulesetTable extends Component {
   _isMounted = false;
   constructor(props) {
@@ -93,7 +91,7 @@ class WzRulesetTable extends Component {
           }
         } catch (error) {
           const options = {
-            context: errorContext,
+            context: `${WzRulesetTable.name}.componentDidMount`,
             level: UI_LOGGER_LEVELS.ERROR,
             severity: UI_ERROR_SEVERITIES.BUSINESS,
             error: {
@@ -140,7 +138,7 @@ class WzRulesetTable extends Component {
       }
     } catch (error) {
       const options = {
-        context: errorContext,
+        context: `${WzRulesetTable.name}.componentDidUpdate`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         error: {
@@ -312,7 +310,7 @@ class WzRulesetTable extends Component {
             }
           } catch (error) {
             const options = {
-              context: errorContext,
+              context: `${WzRulesetTable.name}.updateInfo`,
               level: UI_LOGGER_LEVELS.ERROR,
               severity: UI_ERROR_SEVERITIES.BUSINESS,
               error: {
@@ -404,7 +402,7 @@ class WzRulesetTable extends Component {
       });
     } catch (error) {
       const options = {
-        context: errorContext,
+        context: `${WzRulesetTable.name}.removeItems`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         error: {

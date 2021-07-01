@@ -32,7 +32,6 @@ import {
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
-const errorContext = 'WzDecoderInfo';
 
 class WzDecoderInfo extends Component {
   constructor(props) {
@@ -47,7 +46,7 @@ class WzDecoderInfo extends Component {
         this.props.updateFileContent(file);
       } catch (error) {
         const options = {
-          context: errorContext,
+          context: `${WzDecoderInfo.name}.handleFileClick`,
           level: UI_LOGGER_LEVELS.ERROR,
           severity: UI_ERROR_SEVERITIES.BUSINESS,
           error: {

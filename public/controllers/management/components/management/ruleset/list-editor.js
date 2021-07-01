@@ -44,7 +44,6 @@ import { WzButtonPermissions } from '../../../../../components/common/permission
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
-const errorContext = 'WzListEditor';
 class WzListEditor extends Component {
   constructor(props) {
     super(props);
@@ -149,7 +148,7 @@ class WzListEditor extends Component {
       }
     } catch (error) {
       const options = {
-        context: errorContext,
+        context: `${WzListEditor.name}.saveList`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         error: {
@@ -537,6 +536,42 @@ class WzListEditor extends Component {
     const addingNew = name === false || !name;
     const listName = this.state.newListName || name;
 
+    const exportCsv = async () => {
+      try {
+        this.setState({ generatingCsv: true });
+        await exportCsv(
+          `/lists`,
+          [
+            {
+              _isCDBList: true,
+              name: 'relative_dirname',
+              value: path,
+            },
+            {
+              _isCDBList: true,
+              name: 'filename',
+              value: name,
+            },
+          ],
+          name
+        );
+        this.setState({ generatingCsv: false });
+      } catch (error) {
+        const options = {
+          context: `${WzListEditor.name}.exportCsv`,
+          level: UI_LOGGER_LEVELS.ERROR,
+          severity: UI_ERROR_SEVERITIES.BUSINESS,
+          error: {
+            error: error,
+            message: error.message || error,
+            title: `Error generating csv: ${error.message || error}`,
+          },
+        };
+        getErrorOrchestrator().handleError(options);
+        this.setState({ generatingCsv: false });
+      }
+    }
+
     return (
       <EuiPage style={{ background: 'transparent' }}>
         <EuiPanel>
@@ -555,41 +590,7 @@ class WzListEditor extends Component {
                       iconType="exportAction"
                       isDisabled={this.state.generatingCsv}
                       isLoading={this.state.generatingCsv}
-                      onClick={async () => {
-                        try {
-                          this.setState({ generatingCsv: true });
-                          await exportCsv(
-                            `/lists`,
-                            [
-                              {
-                                _isCDBList: true,
-                                name: 'relative_dirname',
-                                value: path,
-                              },
-                              {
-                                _isCDBList: true,
-                                name: 'filename',
-                                value: name,
-                              },
-                            ],
-                            name
-                          );
-                          this.setState({ generatingCsv: false });
-                        } catch (error) {
-                          const options = {
-                            context: errorContext,
-                            level: UI_LOGGER_LEVELS.ERROR,
-                            severity: UI_ERROR_SEVERITIES.BUSINESS,
-                            error: {
-                              error: error,
-                              message: error.message || error,
-                              title: `Error generating csv: ${error.message || error}`,
-                            },
-                          };
-                          getErrorOrchestrator().handleError(options);
-                          this.setState({ generatingCsv: false });
-                        }
-                      }}
+                      onClick={async () => exportCsv()}
                     >
                       Export formatted
                     </EuiButtonEmpty>
