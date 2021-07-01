@@ -14,6 +14,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added Intelligence tab to Mitre Att&ck module [#3368](https://github.com/wazuh/wazuh-kibana-app/pull/3368) [#3344](https://github.com/wazuh/wazuh-kibana-app/pull/3344)
 - Added try catch strategy with ErrorOrchestrator service on User section [#3390](https://github.com/wazuh/wazuh-kibana-app/pull/3390)
 - Added try catch strategy with ErrorOrchestrator service on WzLogs and documentation for ErrorOrchestrator [#3373](https://github.com/wazuh/wazuh-kibana-app/pull/3373)
+- Added try catch strategy with ErrorOrchestrator service on Management > Ruleset [#3410](https://github.com/wazuh/wazuh-kibana-app/pull/3410)
 - Added try catch strategy with ErrorOrchestrator service on Overview [#3408](https://github.com/wazuh/wazuh-kibana-app/pull/3408)
 - Added try catch strategy with ErrorOrchestrator service on ManagementController [#3374](https://github.com/wazuh/wazuh-kibana-app/pull/3374)
 

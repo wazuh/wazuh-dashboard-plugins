@@ -43,7 +43,7 @@ const validateConfigAfterSent = async (node = false) => {
     }
     return true;
   } catch (error) {
-    return Promise.reject(error);
+    throw error;
   }
 };
 
