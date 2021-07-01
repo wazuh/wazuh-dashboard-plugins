@@ -38,7 +38,9 @@ import { PromptStatisticsDisabled } from './prompt-statistics-disabled';
 import { PromptStatisticsNoIndices } from './prompt-statistics-no-indices';
 import { WazuhConfig } from "../../../../../react-services/wazuh-config";
 import { WzRequest } from '../../../../../react-services/wz-request';
-
+import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
+import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 const wzConfig = new WazuhConfig();
 
 export class WzStatisticsOverview extends Component {
@@ -90,6 +92,18 @@ export class WzStatisticsOverview extends Component {
         clusterNodes: [],
         clusterNodeSelected: 'all',
       });
+
+      const options = {
+        context: `${WzStatisticsOverview.name}.componentDidMount`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   }
 
