@@ -1,5 +1,5 @@
 /*
- * Wazuh app - React test for Stats component.
+ * Wazuh app - React test for Ruleset component.
  *
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
