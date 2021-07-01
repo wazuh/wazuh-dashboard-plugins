@@ -203,7 +203,7 @@ export class BaseLogger {
           url: config.url,
           method: config.method,
           data: config.data,
-          params: config.data,
+          params: config.params,
         },
       };
     }
