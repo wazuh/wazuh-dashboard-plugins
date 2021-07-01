@@ -27,7 +27,6 @@ import ReportingColums from './utils/columns-main';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
-const errorContext = 'WzReportingTable';
 
 class WzReportingTable extends Component {
   _isMounted = false;
@@ -53,7 +52,7 @@ class WzReportingTable extends Component {
       }
     } catch (error) {
       const options = {
-        context: errorContext,
+        context: `${WzReportingTable.name}.componentDidUpdate`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         error: {
@@ -101,7 +100,7 @@ class WzReportingTable extends Component {
         this.props.updateShowModal(false);
       }catch(error){
         const options = {
-          context: errorContext,
+          context: `${WzReportingTable.name}.deleteReport`,
           level: UI_LOGGER_LEVELS.ERROR,
           severity: UI_ERROR_SEVERITIES.BUSINESS,
           error: {
