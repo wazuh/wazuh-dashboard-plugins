@@ -40,6 +40,7 @@ import * as Vulnerability from './sample-data/vulnerabilities';
 import * as SSH from './sample-data/ssh';
 import * as Apache from './sample-data/apache';
 import * as Web from './sample-data/web';
+import * as Office from './sample-data/office';
 
 //Alert
 const alertIDMax = 6000;
@@ -59,6 +60,7 @@ const ruleMaxLevel = 14;
  * @param {any} params - params to configure the alert
  * @param {boolean} params.aws - if true, set aws fields
  * @param {boolean} params.audit - if true, set System Auditing fields
+ * @param {boolean} params.office - if true, set office fields
  * @param {boolean} params.ciscat - if true, set CIS-CAT fields
  * @param {boolean} params.gcp - if true, set GCP fields
  * @param {boolean} params.docker - if true, set Docker fields
@@ -308,6 +310,51 @@ function generateAlert(params) {
     }
     alert.input = { type: 'log' };
     alert.GeoLocation = randomArrayItem(GeoLocation);
+  }
+
+  if (params.office) {
+    const beforeDate = new Date(new Date(alert.timestamp) - 3 * 24 * 60 * 60 * 1000);
+    const IntraID = randomArrayItem(Office.arrayUuidOffice);
+    const InterID = randomArrayItem(Office.arrayUuidOffice);
+    const OrgID = randomArrayItem(Office.arrayUuidOffice);
+    const objID = randomArrayItem(Office.arrayUuidOffice);
+    const userID = randomArrayItem(Office.arrayUuidOffice);
+    const appID = randomArrayItem(Office.arrayUuidOffice);
+
+    alert.rule = randomArrayItem(Office.arrayRulesOffice);
+    alert.decoder = randomArrayItem(Office.arrayDecoderOffice);
+    alert.GeoLocation = randomArrayItem(GeoLocation);
+    alert.data.integration = "Office365";
+    alert.location = Office.arrayLocationOffice;
+    alert.data.office365 = {
+      CreationTime: formatDate(beforeDate, 'Y-M-DTh:m:s.lZ'),
+      Id: IntraID,
+      Operation: "UserLoggedIn",
+      OrganizationId: OrgID,
+      RecordType: "15",
+      ResultStatus: "Success",
+      UserKey: userID,
+      UserType: "0",
+      Version: "1",
+      Workload: "AzureActiveDirectory",
+      ClientIP: "77.231.182.17",
+      ObjectId: objID,
+      UserId: "testing.account@wazuh.com",
+      AzureActiveDirectoryEventType: "1",
+      ExtendedProperties: Office.arrayExtendedPropertiesOffice,
+      ModifiedProperties: [],
+      Actor: Office.arrayActorOffice,
+      ActorContextId: OrgID,
+      ActorIpAddress: "77.231.182.17",
+      InterSystemsId: InterID,
+      IntraSystemId: IntraID,
+      Target: Office.arrayTargetOffice,
+      TargetContextId: OrgID,
+      ApplicationId: appID,
+      DeviceProperties: Office.arrayDevicePropertiesOffice,
+      ErrorNumber: "0",
+      Subscription: "Audit.AzureActiveDirectory"
+    }
   }
 
   if (params.gcp) {
