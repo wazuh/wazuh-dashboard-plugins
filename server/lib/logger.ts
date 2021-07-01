@@ -158,7 +158,7 @@ const parseData = (data: any) => {
         url: config.url,
         method: config.method,
         data: config.data,
-        params: config.data,
+        params: config.params,
       }
     };
   }
