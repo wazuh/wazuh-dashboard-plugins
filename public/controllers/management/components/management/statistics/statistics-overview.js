@@ -87,7 +87,7 @@ export class WzStatisticsOverview extends Component {
         clusterNodes: nodes,
         clusterNodeSelected: nodes[0].value,
       });
-    } catch (err) {
+    } catch (error) {
       this.setState({
         clusterNodes: [],
         clusterNodeSelected: 'all',
