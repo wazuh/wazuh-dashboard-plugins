@@ -31,7 +31,7 @@ export class PatternHandler {
 
       return patternList;
     } catch (error) {
-      console.error('getPatternList', error);
+      console.error("getPatternList", error);
       throw new Error('Error Pattern Handler (getPatternList)');
     }
   }
@@ -48,12 +48,13 @@ export class PatternHandler {
     } catch (error) {
       throw new Error('Error Pattern Handler (changePattern)');
     }
+    return;
   }
 
   /**
-   * Refresh current pattern for the given pattern
-   * @param newFields
-   */
+  * Refresh current pattern for the given pattern
+  * @param {String} pattern
+  */
   static async refreshIndexPattern(newFields = null) {
     try {
       const currentPattern = AppState.getCurrentPattern();
