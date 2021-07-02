@@ -75,11 +75,6 @@ export const WAZUH_MODULES = {
     description:
       'Security events related to your Amazon AWS services, collected directly via AWS API.'
   },
-  office: {
-    title: 'Office 365',
-    description:
-      'Security events related to your Office 365 services.'
-  },
   gcp: {
     title: 'Google Cloud Platform',
     description:

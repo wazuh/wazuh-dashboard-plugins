@@ -51,7 +51,6 @@ class WzMenuAgent extends Component {
       },
       general: { id: WAZUH_MODULES_ID.SECURITY_EVENTS, text: 'Security events', isPin: this.menuAgent.general ? this.menuAgent.general : false },
       fim: { id: WAZUH_MODULES_ID.INTEGRITY_MONITORING, text: 'Integrity monitoring', isPin: this.menuAgent.fim ? this.menuAgent.fim : false },
-      office: { id: WAZUH_MODULES_ID.OFFICE_365, text: 'Office 365', isPin: this.menuAgent.office ? this.menuAgent.office : false },
       aws: { id: WAZUH_MODULES_ID.AMAZON_WEB_SERVICES, text: 'Amazon AWS', isPin: this.menuAgent.aws ? this.menuAgent.aws : false },
       gcp: { id: WAZUH_MODULES_ID.GOOGLE_CLOUD_PLATFORM, text: 'Google Cloud Platform', isPin: this.menuAgent.gcp ? this.menuAgent.gcp : false },
       pm: { id: WAZUH_MODULES_ID.POLICY_MONITORING, text: 'Policy Monitoring', isPin: this.menuAgent.pm ? this.menuAgent.pm : false },
@@ -74,7 +73,6 @@ class WzMenuAgent extends Component {
     this.securityInformationItems = [
       this.agentSections.general,
       this.agentSections.fim,
-      this.agentSections.office,
       this.agentSections.aws,
       this.agentSections.gcp
     ];
