@@ -28,13 +28,20 @@ import {
   EuiIcon
 } from '@elastic/eui';
 import { WzButtonPermissions } from '../../common/permissions/button';
-import WzReduxProvider from '../../../redux/wz-redux-provider';
 import store from '../../../redux/store';
 import { updateSelectedSettingsSection } from '../../../redux/actions/appStateActions';
 import { AppState } from '../../../react-services/app-state';
 import { API_USER_STATUS_RUN_AS } from '../../../../server/lib/cache-api-user-has-run-as';
+import { withErrorBoundary, withReduxProvider } from '../../common/hocs';
+import { compose } from 'redux'
+import {
+  UI_ERROR_SEVERITIES,
+} from '../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../../common/constants';
+import { getErrorOrchestrator } from '../../../react-services/common-services';
 
-export class ApiTable extends Component {
+const errorContext = 'ApiTable';
+export const ApiTable = compose(withErrorBoundary, withReduxProvider)(class ApiTable extends Component {
   constructor(props) {
     super(props);
 
@@ -120,16 +127,34 @@ export class ApiTable extends Component {
         entries[idx].status = 'online';
       } catch (error) {
         const code = ((error || {}).data || {}).code;
-        const downReason = typeof error === 'string' ? error :
-        (error || {}).message || ((error || {}).data || {}).message || 'Wazuh is not reachable';
+        const downReason =
+          typeof error === 'string'
+            ? error
+            : (error || {}).message ||
+              ((error || {}).data || {}).message ||
+              'Wazuh is not reachable';
         const status = code === 3099 ? 'down' : 'unknown';
-        entries[idx].status = { status, downReason }; 
+        entries[idx].status = { status, downReason };
+        throw error;
+      } finally {
+        this.setState({
+          apiEntries: entries,
+        });
       }
-      this.setState({
-        apiEntries: entries
-      });
     } catch (error) {
-      console.error('Error checking manager connection ', error);
+      const options = {
+        context: errorContext,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        store: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `Error checking manager connection: ${error.message || error}`,
+        },
+      };
+
+      getErrorOrchestrator().handleError(options);
     }
   }
 
@@ -234,7 +259,7 @@ export class ApiTable extends Component {
                 type='check'
               />
             </EuiToolTip>
-          
+
           ) : value === API_USER_STATUS_RUN_AS.USER_NOT_ALLOWED ? (
             <EuiToolTip
               position='top'
@@ -254,7 +279,7 @@ export class ApiTable extends Component {
           <EuiFlexGroup>
             <EuiFlexItem grow={false}>
               <WzButtonPermissions
-                buttonType='icon'        
+                buttonType='icon'
                 roles={[]}
                 tooltip={{position: 'top', content: <p>Set as default</p>}}
                 iconType={
@@ -295,7 +320,6 @@ export class ApiTable extends Component {
 
     return (
       <EuiPage>
-        <WzReduxProvider>
           <EuiPanel paddingSize="l">
             <EuiFlexGroup>
               <EuiFlexItem>
@@ -309,7 +333,7 @@ export class ApiTable extends Component {
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
                 <WzButtonPermissions
-                  buttonType='empty'              
+                  buttonType='empty'
                   iconType="plusInCircle"
                   roles={[]}
                   onClick={() => this.props.showAddApi()}
@@ -344,11 +368,10 @@ export class ApiTable extends Component {
               loading={this.state.refreshingEntries}
             />
           </EuiPanel>
-        </WzReduxProvider>
       </EuiPage>
     );
   }
-}
+});
 
 ApiTable.propTypes = {
   apiEntries: PropTypes.array,

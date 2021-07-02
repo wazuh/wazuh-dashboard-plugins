@@ -15,6 +15,8 @@ import { WzRequest } from '../../../../../react-services';
 import React, { useEffect, useState } from 'react';
 import valuesMock from './values.json';
 import { DIRECTIONS } from '@elastic/eui/src/components/flex/flex_group';
+import { emptyFieldHandler } from '../lib';
+import { formatUIDate } from '../../../../../react-services/time-service';
 
 export const RegistryValues = (props) => {
   const [values, setValues] = useState<any[]>([]);
@@ -46,12 +48,13 @@ export const RegistryValues = (props) => {
       field: 'date',
       name: 'Date',
       sortable: true,
+      render: formatUIDate
     },
     {
       field: 'value',
       name: 'Value name',
       sortable: true,
-      render: (item) => item.name,
+      render: (item) => (emptyFieldHandler()(item.name || "")),
     },
     {
       field: 'value',

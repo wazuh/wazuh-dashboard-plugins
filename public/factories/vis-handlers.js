@@ -66,20 +66,29 @@ export class VisHandlers {
       item => (((item || {}).vis || {}).type || {}).name === 'table'
     );
     for (let i = 0; i < tables.length; i++) {
+      let tablesData = [];
       const columns = [];
       const title =
         tables[i].vis.title ||
         'Table';
       const item = await tables[i].handler.execution.getData();
-      for (const table of item.value.visData.tables) {
+
+      //Normalize visData tables structure for 7.12 retro-compatibility
+      if(item.value.visData.tables?.length)
+        tablesData = item.value.visData.tables;
+      else if(item.value.visData.table)
+        tablesData.push(item.value.visData.table);
+
+      for (const table of tablesData) {
         columns.push(...table.columns.map(t => t.name));
       }
 
+
       tables[i] = !!(
-        ((((item || {}).value || {}).visData || {}).tables || [])[0] || {}
+        tablesData[0] || {}
       ).rows
         ? {
-            rows: item.value.visData.tables[0].rows.map(x => {
+            rows: tablesData[0].rows.map(x => {
               return Object.values(x);
             }),
             title,

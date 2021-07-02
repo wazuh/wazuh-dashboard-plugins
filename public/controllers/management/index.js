@@ -20,6 +20,10 @@ import { getAngularModule } from '../../kibana-services';
 
 const app = getAngularModule();
 
+WzManagement.displayName = 'WzManagement';
+ManagementWelcomeWrapper.displayName = 'ManagementWelcomeWrapper';
+WzManagementConfiguration.displayName = 'WzManagementConfiguration';
+
 app
   .controller('managementController', ManagementController)
   .controller('groupsPreviewController', GroupsController)

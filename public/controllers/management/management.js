@@ -15,7 +15,14 @@ import { WazuhConfig } from '../../react-services/wazuh-config';
 import { WzRequest } from '../../react-services/wz-request';
 import { ErrorHandler } from '../../react-services/error-handler';
 import { ShareAgent } from '../../factories/share-agent';
-import { RulesetHandler, RulesetResources } from './components/management/ruleset/utils/ruleset-handler';
+import {
+  RulesetHandler,
+  RulesetResources,
+} from './components/management/ruleset/utils/ruleset-handler';
+
+import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../common/constants';
+import { getErrorOrchestrator } from '../../react-services/common-services';
 
 export class ManagementController {
   /**
@@ -23,14 +30,7 @@ export class ManagementController {
    * @param {*} $scope
    * @param {*} $location
    */
-  constructor(
-    $scope,
-    $rootScope,
-    $location,
-    configHandler,
-    errorHandler,
-    $interval
-  ) {
+  constructor($scope, $rootScope, $location, configHandler, errorHandler, $interval) {
     this.$scope = $scope;
     this.$rootScope = $rootScope;
     this.$location = $location;
@@ -48,7 +48,8 @@ export class ManagementController {
     this.logtestOpened = false;
     this.uploadOpened = false;
     this.rulesetTab = RulesetResources.RULES;
-  
+    this.context = 'ManagementController';
+
 
     this.$scope.$on('setCurrentGroup', (ev, params) => {
       this.currentGroup = (params || {}).currentGroup || false;
@@ -106,7 +107,7 @@ export class ManagementController {
     this.$scope.$on('viewFileOnly', (ev, params) => {
       $scope.$broadcast('viewFileOnlyTable', {
         file: params.item,
-        path: params.path
+        path: params.path,
       });
     });
 
@@ -142,75 +143,105 @@ export class ManagementController {
       this.$scope.$applyAsync();
     });
 
-    this.$rootScope.$on('performRestart', ev => {
+    this.$rootScope.$on('performRestart', (ev) => {
       ev.stopPropagation();
-      this.clusterInfo.status === 'enabled'
-        ? this.restartCluster()
-        : this.restartManager();
+      this.clusterInfo.status === 'enabled' ? this.restartCluster() : this.restartManager();
     });
 
+    this.$rootScope.timeoutIsReady;
+    this.$rootScope.$watch('resultState', () => {
+      if(this.$rootScope.timeoutIsReady){
+        clearTimeout(this.$rootScope.timeoutIsReady);
+      }
+      if(this.$rootScope.resultState === 'ready'){
+        this.$scope.isReady = true;
+      }
+      else
+      {
+        this.$rootScope.timeoutIsReady = setTimeout(() => this.$scope.isReady = false, 1000);
+      }
+    })
+
     this.welcomeCardsProps = {
-      switchTab: (tab, setNav) => this.switchTab(tab, setNav)
+      switchTab: (tab, setNav) => this.switchTab(tab, setNav),
     };
 
     this.managementTabsProps = {
-      clickAction: tab => this.switchTab(tab, true),
+      clickAction: (tab) => this.switchTab(tab, true),
       selectedTab: this.tab,
       tabs: [
         { id: 'status', name: 'Status' },
         { id: 'logs', name: 'Logs' },
         { id: 'monitoring', name: 'Cluster' },
-        { id: 'reporting', name: 'Reporting' }
-      ]
+        { id: 'reporting', name: 'Reporting' },
+      ],
     };
 
     this.logtestProps = {
-      clickAction: log => this.testLogtest(log),
-      close: () => this.openLogtest(),
-      showClose: true
+      clickAction: (log) => log,
+      openCloseFlyout: () => this.openCloseFlyout(),
+      showClose: true,
+      onFlyout: true,
     };
 
     this.managementProps = {
-      switchTab: section => this.switchTab(section, true),
+      switchTab: (section) => this.switchTab(section, true),
       section: '',
       groupsProps: {},
       configurationProps: {
         agent: {
-          id: '000'
+          id: '000',
         }, // TODO: get dynamically the agent?
-        updateWazuhNotReadyYet: status => {
+        updateWazuhNotReadyYet: (status) => {
           this.$rootScope.wazuhNotReadyYet = status;
           this.$scope.$applyAsync();
         },
-        wazuhNotReadyYet: () => this.$rootScope.wazuhNotReadyYet
-      }
+        wazuhNotReadyYet: () => this.$rootScope.wazuhNotReadyYet,
+      },
+      logtestProps: this.logtestProps,
     };
+
   }
 
   /**
    * When controller loads
    */
   $onInit() {
-    this.clusterInfo = AppState.getClusterInfo();
+    try {
+      this.clusterInfo = AppState.getClusterInfo();
 
-    if (this.shareAgent.getAgent() && this.shareAgent.getSelectedGroup()) {
-      this.tab = 'groups';
-      this.switchTab(this.tab);
-      return;
+      if (this.shareAgent.getAgent() && this.shareAgent.getSelectedGroup()) {
+        this.tab = 'groups';
+        this.switchTab(this.tab);
+        return;
+      }
+
+      const location = this.$location.search();
+
+      if (location && location.tab) {
+        this.tab = location.tab;
+        this.switchTab(this.tab);
+      }
+
+      this.uploadFilesProps = {
+        msg: this.$scope.mctrl.rulesetTab,
+        path: `etc/${this.$scope.mctrl.rulesetTab}`,
+        upload: (files) => this.uploadFiles(files, this.$scope.mctrl.rulesetTab),
+      };
+    } catch (error) {
+      const errorOptions = {
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        context: this.context,
+        error: {
+          error: error,
+          message: error?.message || '',
+          title: 'Error restarting cluster',
+        },
+      };
+
+      getErrorOrchestrator().handleError(errorOptions);
     }
-
-    const location = this.$location.search();
-
-    if (location && location.tab) {
-      this.tab = location.tab;
-      this.switchTab(this.tab);
-    }
-
-    this.uploadFilesProps = {
-      msg: this.$scope.mctrl.rulesetTab,
-      path: `etc/${this.$scope.mctrl.rulesetTab}`,
-      upload: (files) => this.uploadFiles(files, this.$scope.mctrl.rulesetTab)
-    };
   }
 
   /**
@@ -233,10 +264,19 @@ export class ManagementController {
     } catch (error) {
       this.isRestarting = false;
       this.$scope.$applyAsync();
-      ErrorHandler.handle(
-        error.message || error,
-        'Error restarting manager'
-      );
+
+      const errorOptions = {
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        context: this.context,
+        error: {
+          error: error,
+          message: error?.message || '',
+          title: 'Error restarting manager',
+        },
+      };
+
+      getErrorOrchestrator().handleError(errorOptions);
     }
   }
 
@@ -247,16 +287,22 @@ export class ManagementController {
       await this.configHandler.restartCluster();
       this.isRestarting = false;
       this.$scope.$applyAsync();
-      ErrorHandler.info(
-        'Restarting cluster, it will take up to 30 seconds.'
-      );
+      ErrorHandler.info('Restarting cluster, it will take up to 30 seconds.');
     } catch (error) {
       this.isRestarting = false;
       this.$scope.$applyAsync();
-      ErrorHandler.handle(
-        error.message || error,
-        'Error restarting cluster'
-      );
+      const errorOptions = {
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        context: this.context,
+        error: {
+          error: error,
+          message: error?.message || '',
+          title: 'Error restarting cluster',
+        },
+      };
+
+      getErrorOrchestrator().handleError(errorOptions);
     }
   }
 
@@ -271,7 +317,7 @@ export class ManagementController {
     this.$location.search('editSubTab', tab);
     this.$scope.$broadcast('configurationIsReloaded', {
       globalConfigTab: this.globalConfigTab,
-      reloadConfigSubTab: true
+      reloadConfigSubTab: true,
     });
   }
 
@@ -325,8 +371,7 @@ export class ManagementController {
       this.currentList = false;
       this.managementTabsProps.selectedTab = this.tab;
     }
-    this.managementProps.section =
-      this.tab === 'ruleset' ? this.rulesetTab : this.tab;
+    this.managementProps.section = this.tab === 'ruleset' ? this.rulesetTab : this.tab;
     this.$location.search('tab', this.tab);
     this.loadNodeList();
   }
@@ -391,24 +436,33 @@ export class ManagementController {
       const clusterEnabled = clusterInfo.status === 'enabled';
       if (clusterEnabled) {
         const response = await WzRequest.apiReq('GET', '/cluster/nodes', {});
-        const nodeList =
-          (((response || {}).data || {}).data || {}).items || false;
+        const nodeList = (((response || {}).data || {}).data || {}).items || false;
         if (Array.isArray(nodeList) && nodeList.length) {
-          this.nodeList = nodeList.map(item => item.name).reverse();
-          this.selectedNode = nodeList.filter(
-            item => item.type === 'master'
-          )[0].name;
+          this.nodeList = nodeList.map((item) => item.name).reverse();
+          this.selectedNode = nodeList.filter((item) => item.type === 'master')[0].name;
         }
       }
     } catch (error) {
-      console.log(error.message || error); // eslint-disable-line
+      const errorOptions = {
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        context: this.context,
+        error: {
+          error: error,
+          message: error?.message || '',
+          title: 'Error loading node list'
+        },
+      };
+
+      getErrorOrchestrator().handleError(errorOptions);
     }
     this.loadingNodes = false;
     this.$scope.$applyAsync();
   }
 
-  openLogtest() {
+  openCloseFlyout() {
     this.logtestOpened = !this.logtestOpened;
+    this.logtestProps.isRuleset = this.tab;
     this.$scope.$applyAsync();
   }
 
@@ -419,24 +473,6 @@ export class ManagementController {
     this.$scope.$broadcast('addNewFile', { type: this.globalRulesetTab });
   }
 
-  testLogtest = async log => {
-    //return await WzRequest.apiReq('GET', '/testlog', {log});
-    const sleep = m => new Promise(r => setTimeout(r, m));
-    await sleep(1000);
-    return `**Phase 1: Completed pre-decoding.
-    full event: 'timestamp:2019-09-03T13:22:27.950+0000 rule:level:7 rule:description:python: Undocumented local_file protocol allows remote attackers to bypass protection mechanisms rule:id:23504 rule:firedtimes:33 rule:mail:false rule:groups:[vulnerability-detector] rule:gdpr:[IV_35.7.d] agent:id:000 agent:name:a205e5b2a1aa manager:{name:a205e5b2a1aa} id:1567516947.252273 cluster:name:wazuh cluster:node:master decoder:{name:json} data:{vulnerability:cve:CVE-2019-9948} data:{vulnerability:title:python: Undocumented local_file protocol allows remote attackers to bypass protection mechanisms} data:{vulnerability:severity:Medium} data:{vulnerability:published:2019-03-23T00:00:00+00:00} data:{vulnerability:state:Fixed} data:{vulnerability:cvss:{cvss3_score:7.400000}} data:{vulnerability:package:name:python} data:{vulnerability:package:version:2.7.5-80.el7_6} data:{vulnerability:package:condition:less than 2.7.5-86.el7} data:{vulnerability:advisories:RHSA-2019:2030,RHSA-2019:1700} data:{vulnerability:cwe_reference:CWE-749} data:{vulnerability:bugzilla_reference:https://bugzilla.redhat.com/show_bug.cgi?id=1695570} data:{vulnerability:reference:https://access.redhat.com/security/cve/CVE-2019-9948} location:vulnerability-detector'
-    timestamp: '(null)'
-    hostname: 'a205e5b2a1aa'
-    program_name: '(null)'
-    log: 'timestamp:2019-09-03T13:22:27.950+0000 rule:level:7 rule:description:python: Undocumented local_file protocol allows remote attackers to bypass protection mechanisms rule:id:23504 rule:firedtimes:33 rule:mail:false rule:groups:[vulnerability-detector] rule:gdpr:[IV_35.7.d] agent:id:000 agent:name:a205e5b2a1aa manager:{name:a205e5b2a1aa} id:1567516947.252273 cluster:name:wazuh cluster:node:master decoder:{name:json} data:{vulnerability:cve:CVE-2019-9948} data:{vulnerability:title:python: Undocumented local_file protocol allows remote attackers to bypass protection mechanisms} data:{vulnerability:severity:Medium} data:{vulnerability:published:2019-03-23T00:00:00+00:00} data:{vulnerability:state:Fixed} data:{vulnerability:cvss:{cvss3_score:7.400000}} data:{vulnerability:package:name:python} data:{vulnerability:package:version:2.7.5-80.el7_6} data:{vulnerability:package:condition:less than 2.7.5-86.el7} data:{vulnerability:advisories:RHSA-2019:2030,RHSA-2019:1700} data:{vulnerability:cwe_reference:CWE-749} data:{vulnerability:bugzilla_reference:https://bugzilla.redhat.com/show_bug.cgi?id=1695570} data:{vulnerability:reference:https://access.redhat.com/security/cve/CVE-2019-9948} location:vulnerability-detector'
-  **Phase 2: Completed decoding.
-    No decoder matched.
-  **Phase 3: Completed filtering (rules).
-    Rule id: '1002'
-    Level: '2'
-    Description: 'Unknown problem somewhere in the system.'`;
-  };
-
   openUploadFile() {
     this.uploadOpened = !this.uploadOpened;
     this.$scope.$applyAsync();
@@ -446,7 +482,7 @@ export class ManagementController {
     this.uploadFilesProps = {
       msg: this.rulesetTab,
       path: `etc/${this.rulesetTab}`,
-      upload: (files) => this.uploadFiles(files, this.rulesetTab)
+      upload: (files) => this.uploadFiles(files, this.rulesetTab),
     };
   }
 
@@ -460,7 +496,7 @@ export class ManagementController {
       this.errors = false;
       this.results = [];
       const rulesetHandler = new RulesetHandler(resource);
-    
+
       for (let idx in files) {
         const { file, content } = files[idx];
         try {
@@ -469,7 +505,7 @@ export class ManagementController {
             index: idx,
             uploaded: true,
             file: file,
-            error: 0
+            error: 0,
           });
         } catch (error) {
           this.errors = true;
@@ -477,7 +513,7 @@ export class ManagementController {
             index: idx,
             uploaded: false,
             file: file,
-            error: error
+            error: error,
           });
         }
       }
@@ -485,8 +521,20 @@ export class ManagementController {
       ErrorHandler.info('Upload successful');
       return;
     } catch (error) {
-      if (Array.isArray(error) && error.length) return Promise.reject(error);
-      ErrorHandler.handle('Files cannot be uploaded');
+      if (Array.isArray(error) && error.length) throw error;
+
+      const errorOptions = {
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        context: this.context,
+        error: {
+          error: error,
+          message: error?.message || '',
+          title: 'Files cannot be loaded',
+        },
+      };
+
+      getErrorOrchestrator().handleError(errorOptions);
     }
   }
 }

@@ -24,6 +24,7 @@ import {
 } from '../../../../../redux/actions/groupsActions';
 import { connect } from 'react-redux';
 import { updateGlobalBreadcrumb } from '../../../../../redux/actions/globalBreadcrumbActions';
+import { WzRequest } from '../../../../../react-services/wz-request';
 
 class WzGroups extends Component {
   constructor(props) {
@@ -33,14 +34,25 @@ class WzGroups extends Component {
   setGlobalBreadcrumb() {
     const breadcrumb = [
       { text: '' },
-      { text: 'Management', href: '/app/wazuh#/manager' },
+      { text: 'Management', href: '#/manager' },
       { text: 'Groups' }
     ];
     store.dispatch(updateGlobalBreadcrumb(breadcrumb));
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     this.setGlobalBreadcrumb();
+    // Check if there is a group in the URL
+    const [_, group] = window.location.href.match(new RegExp('group=' + '([^&]*)')) || [];
+    window.location.href = window.location.href.replace(new RegExp('group=' + '[^&]*'), '');
+    if(group){
+      try{
+        // Try if the group can be accesed
+        const responseGroup = await WzRequest.apiReq('GET', '/groups', {params: {groups_list: group}});
+        const dataGroup = responseGroup?.data?.data?.affected_items?.[0];
+        this.props.updateGroupDetail(dataGroup);
+      }catch(error){};
+    };
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
@@ -87,7 +99,8 @@ const mapDispatchToProps = dispatch => {
   return {
     resetGroup: () => dispatch(resetGroup()),
     updateShowAddAgents: showAddAgents =>
-      dispatch(updateShowAddAgents(showAddAgents))
+      dispatch(updateShowAddAgents(showAddAgents)),
+    updateGroupDetail: groupDetail => dispatch(updateGroupDetail(groupDetail))
   };
 };
 export default connect(

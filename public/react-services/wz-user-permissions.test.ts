@@ -1,5 +1,5 @@
 /*
- * Wazuh app - React hook for get query of Kibana searchBar
+ * Wazuh app - React test for wz-user-permissions
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -14,11 +14,11 @@ import { WzUserPermissions } from './wz-user-permissions';
 
 const requiredPermissionsCluster = [
   {
-    action: 'cluster:delete_file',
+    action: 'list:delete',
     resource: 'file:path:etc/lists/security-eventchannel',
   },
   {
-    action: `cluster:read_file`,
+    action: `list:read`,
     resource: `node:id:*&file:path:*`,
   },
 ];
@@ -99,11 +99,11 @@ const userManagerTest = [
 
 const missingPermissionsForClusterUser = [
   {
-    action: 'cluster:delete_file',
+    action: 'list:delete',
     resource: 'file:path:etc/lists/security-eventchannel',
   },
   {
-    action: 'cluster:read_file',
+    action: 'list:read',
     resource: 'node:id:*&file:path:*',
   },
 ];

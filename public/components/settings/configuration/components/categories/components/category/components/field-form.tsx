@@ -25,7 +25,15 @@ import 'brace/mode/javascript';
 import 'brace/snippets/javascript';
 import 'brace/ext/language_tools';
 import "brace/ext/searchbox";
+import {
+  UI_ERROR_SEVERITIES,
+  UIErrorLog, UIErrorSeverity,
+  UILogLevel,
+} from '../../../../../../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../../../../../../../common/constants';
+import { getErrorOrchestrator } from '../../../../../../../../react-services/common-services';
 
+const errorContext = 'FieldForm';
 interface IFieldForm {
   item: ISetting
   updatedConfig: { [field: string]: string | number | boolean | [] }
@@ -110,7 +118,18 @@ const ArrayForm: React.FunctionComponent<IFieldForm> = (props) => {
       const parsed = JSON.parse(list);
       onChange(parsed, props);
     } catch (error) {
-      console.log(error);
+      const options: UIErrorLog = {
+        context: errorContext,
+        level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+        severity: UI_ERROR_SEVERITIES.UI as UIErrorSeverity,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.message || error,
+        },
+      };
+
+      getErrorOrchestrator().handleError(options);
     }
   }
   return (

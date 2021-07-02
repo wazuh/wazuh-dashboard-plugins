@@ -10,7 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 import { checkPluginVersion } from './utils';
-
 import 'angular-sanitize';
 
 // Require CSS
@@ -54,9 +53,11 @@ import './factories';
 import { checkCurrentSecurityPlatform } from './controllers/management/components/management/configuration/utils/wz-fetch';
 import store from './redux/store';
 import { updateCurrentPlatform } from './redux/actions/appStateActions';
-import { WzAuthentication } from './react-services/wz-authentication';
+import { WzAuthentication, loadAppConfig } from './react-services';
 
-import { getAngularModule } from './kibana-services';
+import { getAngularModule} from './kibana-services';
+import { addHelpMenuToAppChrome } from './utils';
+
 const app = getAngularModule();
 
 app.config([
@@ -82,10 +83,13 @@ app.run([
     // Set currentSecurity platform in Redux when app starts.
     checkCurrentSecurityPlatform().then((item) => {
       store.dispatch(updateCurrentPlatform(item))
-    }).catch(() => {})
+    }).catch(() => {});
 
     // Init the process of refreshing the user's token when app start.
     checkPluginVersion().finally(WzAuthentication.refresh);
+
+    // Load the app state
+    loadAppConfig();
   },
 ]);
 
@@ -102,18 +106,18 @@ app.run(function ($rootElement) {
       <react-component name="ToastNotificationsModal" props=""></react-component>
     </div>`);
 
+  // Add plugin help links as extension to Kibana help menu
+  addHelpMenuToAppChrome();
+
   // Bind deleteExistentToken on Log out component.
-  $(document).on('ready', function () {
-    $('.euiHeaderSectionItem__button').on('mouseleave', function () {
-      console.log('onmouseleave')
-      // opendistro
-      $('span:contains(Log out)').on('click', function () {
-        WzAuthentication.deleteExistentToken();
-      });
-      // x-pack
-      $('a:contains(Log out)').on('click', function () {
-        WzAuthentication.deleteExistentToken();
-      });
+  $('.euiHeaderSectionItem__button').on('mouseleave', function () {
+    // opendistro
+    $('span:contains(Log out)').on('click', function () {
+      WzAuthentication.deleteExistentToken();
+    });
+    // x-pack
+    $('a:contains(Log out)').on('click', function () {
+      WzAuthentication.deleteExistentToken();
     });
   });
 });

@@ -29,14 +29,14 @@ import {
   EuiLoadingSpinner,
 } from '@elastic/eui';
 import { FlyoutTechnique } from './components/flyout-technique/';
-import { mitreTechniques, getElasticAlerts, IFilterParams } from '../../lib'
+import { getElasticAlerts, IFilterParams } from '../../lib';
 import { ITactic } from '../../';
 import { withWindowSize } from '../../../../../components/common/hocs/withWindowSize';
 import { WzRequest } from '../../../../../react-services/wz-request';
 import {WAZUH_ALERTS_PATTERN} from '../../../../../../common/constants';
 import { AppState } from '../../../../../react-services/app-state';
-import { WzFieldSearchDelay } from '../../../../common/search'
-import { getDataPlugin } from '../../../../../kibana-services';
+import { WzFieldSearchDelay } from '../../../../common/search';
+import { getDataPlugin, getToasts } from '../../../../../kibana-services';
 
 export const Techniques = withWindowSize(class Techniques extends Component {
   _isMount = false;
@@ -56,6 +56,7 @@ export const Techniques = withWindowSize(class Techniques extends Component {
     hideAlerts: boolean,
     actionsOpen: string,
     filteredTechniques: boolean | [string]
+    mitreTechniques: [],
     isSearching: boolean
   }
 
@@ -70,6 +71,7 @@ export const Techniques = withWindowSize(class Techniques extends Component {
       hideAlerts: false,
       actionsOpen: "",
       filteredTechniques: false,
+      mitreTechniques: [],
       isSearching: false
     }
     this.onChangeFlyout.bind(this);
@@ -77,6 +79,7 @@ export const Techniques = withWindowSize(class Techniques extends Component {
   
   async componentDidMount(){
     this._isMount = true;
+    await this.buildMitreTechniquesFromApi();
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -101,6 +104,15 @@ export const Techniques = withWindowSize(class Techniques extends Component {
   componentWillUnmount() {
     this._isMount = false;
   }
+
+  showToast(color: string, title: string = '', text: string = '', time: number = 3000) {
+    getToasts().add({
+      color: color,
+      title: title,
+      text: text,
+      toastLifeTimeMs: time,
+    });
+  };
 
   async getTechniquesCount() {
     try{
@@ -177,29 +189,76 @@ export const Techniques = withWindowSize(class Techniques extends Component {
     }
   }
 
+  async getMitreTechniques (params) {
+    try{
+      return await WzRequest.apiReq("GET", "/mitre/techniques", { params });
+    }catch(error){
+      this.showToast(
+        'danger',
+        'Error',
+        `Mitre techniques could not be fetched: ${error}`,
+        3000
+      );
+      return [];
+    }
+  }
+
+  async buildMitreTechniquesFromApi () {
+    const limitResults = 500;
+    const params = { limit: limitResults };
+    this.setState({ isSearching: true });
+    const output = await this.getMitreTechniques(params);
+    const totalItems = (((output || {}).data || {}).data || {}).total_affected_items;
+    let mitreTechniques = [];
+    mitreTechniques.push(...output.data.data.affected_items);
+    if (totalItems && output.data && output.data.data && totalItems > limitResults) {
+      const extraResults = await Promise.all(
+        Array(Math.ceil((totalItems-params.limit)/params.limit)).fill()
+          .map(async (_,index) => {
+            const response = await this.getMitreTechniques({...params, offset: limitResults * (1+index)});
+            return response.data.data.affected_items;
+          })
+      );
+      mitreTechniques.push(...extraResults.flat());
+    }
+    this.setState({ mitreTechniques: mitreTechniques, isSearching: false });
+  }
+
+   buildObjTechniques(techniques){
+    const techniquesObj = [];
+    techniques.forEach(element => {
+      const mitreObj = this.state.mitreTechniques.find(item => item.id === element);
+      if(mitreObj){
+        const mitreTechniqueName =  mitreObj.name;
+        const mitreTechniqueID = mitreObj.references.find(item => item.source === "mitre-attack").external_id;
+        mitreTechniqueID ? techniquesObj.push({ id : mitreTechniqueID, name: mitreTechniqueName}) : '';
+      }
+    });
+    return techniquesObj;
+  }
+
   renderFacet() {
     const { tacticsObject } = this.props;
     const { techniquesCount } = this.state;
+    let hash = {};
     let tacticsToRender: Array<any> = [];
-    const currentTechniques = Object.keys(tacticsObject).map(tacticsKey => ({tactic: tacticsKey, techniques: tacticsObject[tacticsKey]}))
+    const currentTechniques = Object.keys(tacticsObject).map(tacticsKey => ({tactic: tacticsKey, techniques: this.buildObjTechniques(tacticsObject[tacticsKey].techniques)}))
       .filter(tactic => this.props.selectedTactics[tactic.tactic])
       .map(tactic => tactic.techniques)
       .flat()
       .filter((techniqueID, index, array) => array.indexOf(techniqueID) === index);
-    
     tacticsToRender = currentTechniques
-      .filter(techniqueID => this.state.filteredTechniques ? this.state.filteredTechniques.includes(techniqueID) : techniqueID)
-      .map(techniqueID => {
+      .filter(technique => this.state.filteredTechniques ? this.state.filteredTechniques.includes(technique.id) : technique.id && hash[technique.id] ? false : hash[technique.id] = true)
+      .map(technique => {
         return {
-          id: techniqueID,
-          label: `${techniqueID} - ${mitreTechniques[techniqueID].name}`,
-          quantity: (techniquesCount.find(item => item.key === techniqueID) || {}).doc_count || 0
+          id: technique.id,
+          label: `${technique.id} - ${technique.name}`,
+          quantity: (techniquesCount.find(item => item.key === technique.id) || {}).doc_count || 0
         }
       })
       .filter(technique => this.state.hideAlerts ? technique.quantity !== 0 : true);
-
     const tacticsToRenderOrdered = tacticsToRender.sort((a, b) => b.quantity - a.quantity).map( (item,idx) => {
-      const tooltipContent = `View details of ${mitreTechniques[item.id].name} (${item.id})`;
+      const tooltipContent = `View details of ${item.label} (${item.id})`;
       const toolTipAnchorClass = "wz-display-inline-grid" + (this.state.hover=== item.id ? " wz-mitre-width" : " ");
       return(
         <EuiFlexItem 
@@ -222,7 +281,7 @@ export const Techniques = withWindowSize(class Techniques extends Component {
                             overflow: "hidden",
                             whiteSpace: "nowrap",
                             textOverflow: "ellipsis"}}>
-                      {item.id} - {mitreTechniques[item.id].name}
+                      {item.label}
                     </span>
                   </EuiToolTip>
 
@@ -244,7 +303,6 @@ export const Techniques = withWindowSize(class Techniques extends Component {
             closePopover={() => this.closeActionsMenu()}
             panelPaddingSize="none"
             style={{width: "100%"}}
-            withTitle
             anchorPosition="downLeft">
             <EuiContextMenu initialPanelId={0} panels={this.buildPanel(item.id)} />
           </EuiPopover>
@@ -281,6 +339,11 @@ export const Techniques = withWindowSize(class Techniques extends Component {
     this.props.onSelectedTabChanged('dashboard');
   }
 
+  openIntelligence(e,redirectTo,itemId){
+    this.props.onSelectedTabChanged('intelligence');
+    window.location.href = window.location+`&tabRedirect=${redirectTo}&idToRedirect=${itemId}`
+  }
+
  /** 
    * Adds a new filter with format { "filter_key" : "filter_value" }, e.g. {"agent.id": "001"}
    * @param filter 
@@ -314,14 +377,13 @@ export const Techniques = withWindowSize(class Techniques extends Component {
     try{
       if(searchValue){
         this._isMount && this.setState({isSearching: true});
-        const response = await WzRequest.apiReq('GET', '/mitre', {
+        const response = await WzRequest.apiReq('GET', '/mitre/techniques', {
           params: {
-            select: "id",
             search: searchValue,
             limit: 500
           }
         });
-        const filteredTechniques = ((((response || {}).data || {}).data).affected_items || []).map(item => item.id);
+        const filteredTechniques = ((((response || {}).data || {}).data).affected_items || []).map(item => item.references.filter(reference => reference.source === "mitre-attack")[0].external_id);
         this._isMount && this.setState({ filteredTechniques, isSearching: false });
       }else{
         this._isMount && this.setState({ filteredTechniques: false, isSearching: false });
@@ -403,9 +465,11 @@ export const Techniques = withWindowSize(class Techniques extends Component {
             <FlyoutTechnique
               openDashboard={(e,itemId) => this.openDashboard(e,itemId)}
               openDiscover={(e,itemId) => this.openDiscover(e,itemId)}
+              openIntelligence={(e,redirectTo,itemId) => this.openIntelligence(e,redirectTo,itemId)}
               onChangeFlyout={this.onChangeFlyout}
               currentTechniqueData={this.state.currentTechniqueData}
-              currentTechnique={currentTechnique} />
+              currentTechnique={currentTechnique}
+              tacticsObject={this.props.tacticsObject} />
           </EuiOverlayMask>
         } 
       </div>   

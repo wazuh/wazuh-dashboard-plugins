@@ -25,13 +25,14 @@ import jwtDecode from 'jwt-decode';
 import { KibanaRequest, RequestHandlerContext, KibanaResponseFactory } from 'src/core/server';
 import { APIUserAllowRunAs, CacheInMemoryAPIUserAllowRunAs, API_USER_STATUS_RUN_AS } from '../lib/cache-api-user-has-run-as';
 import { getCookieValueByName } from '../lib/cookie';
+import { SecurityObj } from '../lib/security-factory';
+import { getConfiguration } from '../lib/get-configuration';
 
 export class WazuhApiCtrl {
   manageHosts: ManageHosts
   updateRegistry: UpdateRegistry
 
   constructor() {
-    // this.monitoringInstance = new Monitoring(server, true);
     this.manageHosts = new ManageHosts();
     this.updateRegistry = new UpdateRegistry();
   }
@@ -206,19 +207,18 @@ export class WazuhApiCtrl {
       // If we have an invalid response from the Wazuh API
       throw new Error(responseManagerInfo.data.detail || `${api.url}:${api.port} is unreachable`);
     } catch (error) {
-      log('wazuh-api:checkStoredAPI', error.message || error);
       if (error.code === 'EPROTO') {
         return response.ok({
           body: {
             statusCode: 200,
-            data: { password: '****', apiIsDown: true },
+            data: { apiIsDown: true },
           }
         });
       } else if (error.code === 'ECONNREFUSED') {
         return response.ok({
           body: {
             statusCode: 200,
-            data: { password: '****', apiIsDown: true },
+            data: { apiIsDown: true },
           }
         });
       } else {
@@ -251,8 +251,10 @@ export class WazuhApiCtrl {
             } catch (error) { } // eslint-disable-line
           }
         } catch (error) {
+          log('wazuh-api:checkStoredAPI', error.message || error);
           return ErrorResponse(error.message || error, 3020, 500, response);
         }
+        log('wazuh-api:checkStoredAPI', error.message || error);
         return ErrorResponse(error.message || error, 3002, 500, response);
       }
     }
@@ -321,7 +323,7 @@ export class WazuhApiCtrl {
         );
       }catch(error){
         return ErrorResponse(
-          `ERROR3099 - ${error.response.data.detail || 'Wazuh not ready yet'}`,
+          `ERROR3099 - ${error.response?.data?.detail || 'Wazuh not ready yet'}`,
           3099,
           500,
           response
@@ -479,7 +481,7 @@ export class WazuhApiCtrl {
         typeof daemons['wazuh-clusterd'] !== 'undefined';
       const wazuhdbExists = typeof daemons['wazuh-db'] !== 'undefined';
 
-      const execd = daemons['ossec-execd'] === 'running';
+      const execd = daemons['wazuh-execd'] === 'running';
       const modulesd = daemons['wazuh-modulesd'] === 'running';
       const wazuhdb = wazuhdbExists ? daemons['wazuh-db'] === 'running' : true;
       const clusterd = isCluster ? daemons['wazuh-clusterd'] === 'running' : true;
@@ -1042,5 +1044,30 @@ export class WazuhApiCtrl {
       log('wazuh-api:getSyscollector', error.message || error);
       return ErrorResponse(error.message || error, 3035, 500, response);
     }
+  }
+  /**
+   * Check if user assigned roles disable Wazuh Plugin
+   * @param context 
+   * @param request 
+   * @param response 
+   * @returns {object} Returns { isWazuhDisabled: boolean parsed integer } 
+   */
+  async isWazuhDisabled(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
+    try {
+      
+      const disabledRoles = ( await getConfiguration() )['disabled_roles'] || [];
+      const wazuhSecurity = SecurityObj(context.wazuh.plugins);
+      const data = (await wazuhSecurity.getCurrentUser(request, context)).authContext;
+
+      const isWazuhDisabled = +(data.roles || []).some((role) => disabledRoles.includes(role));
+
+      return response.ok({
+        body: { isWazuhDisabled }
+      });
+    } catch (error) {
+      log('wazuh-api:isWazuhDisabled', error.message || error);
+      return ErrorResponse(error.message || error, 3035, 500, response);
+    }
+    
   }
 }

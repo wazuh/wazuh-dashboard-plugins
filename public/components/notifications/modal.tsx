@@ -27,9 +27,10 @@ import {
 
 import { useSelector, useDispatch } from 'react-redux';
 import { updateToastNotificationsModal } from '../../redux/actions/appStateActions';
-import { withReduxProvider } from '../common/hocs'
+import { withReduxProvider, withErrorBoundary } from '../common/hocs';
+import { compose } from 'redux';
 
-export const ToastNotificationsModal = withReduxProvider(() => {
+export const ToastNotificationsModal = compose (withErrorBoundary, withReduxProvider)(() => {
   const [isOpen, setIsOpen] = useState(false);
   const toastNotification = useSelector(state => state.appStateReducers.toastNotification);
   const dispatch = useDispatch();

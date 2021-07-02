@@ -1,15 +1,12 @@
-let angularModule: any = null;
-let discoverModule: any = null;
-
 import {
   ChromeStart,
+  CoreStart,
   HttpStart,
   IUiSettingsClient,
-  ToastsStart,
-  SavedObjectsStart,
   OverlayStart,
+  SavedObjectsStart,
   ScopedHistory,
-  CoreStart,
+  ToastsStart,
 } from 'kibana/public';
 import { createGetterSetter } from '../../../src/plugins/kibana_utils/common';
 import { DataPublicPluginStart } from '../../../src/plugins/data/public';
@@ -17,13 +14,18 @@ import { VisualizationsStart } from '../../../src/plugins/visualizations/public'
 import { NavigationPublicPluginStart } from '../../../src/plugins/navigation/public';
 import { AppPluginStartDependencies } from './types';
 
+let angularModule: any = null;
+let discoverModule: any = null;
+
 export const [getCore, setCore] = createGetterSetter<CoreStart>('Core');
 export const [getPlugins, setPlugins] = createGetterSetter<AppPluginStartDependencies>('Plugins');
 export const [getToasts, setToasts] = createGetterSetter<ToastsStart>('Toasts');
 export const [getHttp, setHttp] = createGetterSetter<HttpStart>('Http');
 export const [getUiSettings, setUiSettings] = createGetterSetter<IUiSettingsClient>('UiSettings');
 export const [getChrome, setChrome] = createGetterSetter<ChromeStart>('Chrome');
-export const [getScopedHistory, setScopedHistory] = createGetterSetter<ScopedHistory>('ScopedHistory');
+export const [getScopedHistory, setScopedHistory] = createGetterSetter<ScopedHistory>(
+  'ScopedHistory'
+);
 export const [getOverlays, setOverlays] = createGetterSetter<OverlayStart>('Overlays');
 export const [getSavedObjects, setSavedObjects] = createGetterSetter<SavedObjectsStart>(
   'SavedObjects'

@@ -22,9 +22,7 @@ export default class GroupsHandler {
   static async saveGroup(name) {
     try {
       const result = await WzRequest.apiReq('POST', `/groups`, {
-        params: {
-          group_id: name
-        }
+        group_id: name
       });
       return result;
     } catch (error) {

@@ -16,7 +16,7 @@
 
 /* Customize the App icon style */
 
-/* .euiCollapsibleNav .euiCollapsibleNavGroup .euiListGroupItem__button .euiIcon {  
+/* .euiCollapsibleNav .euiCollapsibleNavGroup .euiListGroupItem__button .euiIcon {
   height: 24px;
   width: 24px;
   filter: brightness(0) saturate(100%) invert(24%) sepia(97%) saturate(1757%) hue-rotate(186deg) brightness(94%) contrast(101%);
@@ -808,6 +808,13 @@ md-switch.md-checked .md-thumb {
   display: block;
 }
 
+.wz-ellipsis{
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
 /*
  * https://css-tricks.com/snippets/css/prevent-long-urls-from-breaking-out-of-container/
  * Handling long URLs on error toasts.
@@ -1027,9 +1034,38 @@ wz-xml-file-editor {
 
 .health-check{
   padding-top: 5%;
-  width: 500px;
+  max-width: 700px;
   margin: 0 auto;
   text-align: center;
+}
+
+.health-check dl.euiDescriptionList dd{
+  white-space: nowrap;
+}
+
+.health-check dl.euiDescriptionList dd>span:first-child{
+  display: inline-block;
+  width: 26px;
+}
+
+.health-check .euiCodeBlock{
+  max-height: 0;
+  margin-top: 0;
+  transition: all 0.25s ease-out;
+  overflow: hidden;
+  border: 0px solid #0001;
+}
+
+.health-check .euiCodeBlock.visible{
+  border: 1px solid #0001;
+  max-height: 700px;
+  margin-top: 16px;
+  visibility: visible;
+}
+
+.wz-hover-transform-y1:hover{
+  -webkit-transform: translateY(-1px) !important;
+  transform: translateY(-1px) !important;
 }
 
 @keyframes rotation {
@@ -1217,7 +1253,7 @@ wz-xml-file-editor {
   background: white !important;
 }
 
-.list-element-ok { 
+.list-element-ok {
   color: green !important;
 }
 
@@ -1227,10 +1263,7 @@ wz-xml-file-editor {
 
 .logtest-side{
   height: calc(100vh - 95px);
-  border-left: 1px solid #e1e2e3;
-  box-shadow: -2px 0px 2px -1px rgba(152, 162, 179, 0.3);
   margin-top: -50px;
-  background: #fff;
   z-index: 10;
   position : fixed;
   right: 0;
@@ -1473,7 +1506,7 @@ div.euiPopover__panel.euiPopover__panel-isOpen.euiPopover__panel--bottom.wz-menu
   max-width: 60vw;
 }
 
-.wz-markdown-wapper code {
+.wz-markdown-wrapper code {
   color: #1c2226;
   background-color: #e6e6e6;
   border-radius: 3px;
@@ -1486,10 +1519,10 @@ div.euiPopover__panel.euiPopover__panel-isOpen.euiPopover__panel--bottom.wz-menu
 }
 
 /* Change custom discover size */
-.wz-discover > .globalQueryBar > 
-.kbnQueryBar--withDatePicker > 
+.wz-discover > .globalQueryBar >
+.kbnQueryBar--withDatePicker >
 .euiFlexItem.euiFlexItem--flexGrowZero >
-.euiFlexGroup > 
+.euiFlexGroup >
 .euiFlexItem.kbnQueryBar__datePickerWrapper {
   max-width: 300px;
 }
@@ -1500,15 +1533,15 @@ div.euiPopover__panel.euiPopover__panel-isOpen.euiPopover__panel--bottom.wz-menu
   }
 
   /* Change custom discover size */
-  .wz-discover > .globalQueryBar > 
+  .wz-discover > .globalQueryBar >
   .euiFlexGroup.kbnQueryBar.kbnQueryBar--withDatePicker {
     flex-wrap: wrap;
     margin-left: 0;
     margin-right: 0;
   }
 
-  .wz-discover > .globalQueryBar > 
-  .euiFlexGroup.kbnQueryBar.kbnQueryBar--withDatePicker > 
+  .wz-discover > .globalQueryBar >
+  .euiFlexGroup.kbnQueryBar.kbnQueryBar--withDatePicker >
   .euiFlexItem {
     width: 100% !important;
     -ms-flex-preferred-size: 100% !important;
@@ -1518,25 +1551,25 @@ div.euiPopover__panel.euiPopover__panel-isOpen.euiPopover__panel--bottom.wz-menu
     margin-bottom: 16px !important;
   }
 
-  .wz-discover > .globalQueryBar > 
+  .wz-discover > .globalQueryBar >
   .kbnQueryBar--withDatePicker > :first-child {
     order: 1;
     margin-top: -8px;
   }
 
-  .wz-discover > .globalQueryBar > 
-  .kbnQueryBar--withDatePicker > 
+  .wz-discover > .globalQueryBar >
+  .kbnQueryBar--withDatePicker >
   .euiFlexItem.euiFlexItem--flexGrowZero >
-  .euiFlexGroup > 
+  .euiFlexGroup >
   .euiFlexItem.kbnQueryBar__datePickerWrapper >
   .euiFlexGroup {
     width: 100%;
   }
 
-  .wz-discover > .globalQueryBar > 
-  .kbnQueryBar--withDatePicker > 
+  .wz-discover > .globalQueryBar >
+  .kbnQueryBar--withDatePicker >
   .euiFlexItem.euiFlexItem--flexGrowZero >
-  .euiFlexGroup > 
+  .euiFlexGroup >
   .euiFlexItem.kbnQueryBar__datePickerWrapper {
     flex-grow: 1!important;
     max-width: none;
@@ -1657,14 +1690,14 @@ iframe.width-changed {
   padding-bottom: 5px;
 }
 
-@media only screen and (max-width: 1200px) { 
+@media only screen and (max-width: 1200px) {
  .wideElementsDevTools {
     display: none;
   }
   /* .selectDevTools {
     display: inline;
   } */
-} 
+}
 .module-table .euiFacetButton__text {
   max-height: 40px;
 }
@@ -1695,4 +1728,12 @@ iframe.width-changed {
 .withUserLogged-loader{
   width: 20px;
   margin: 0 auto;
+}
+
+.custom-charts-bar span.euiLoadingChart__bar{
+  width: 15px;
+}
+
+.wz-width-100{
+  width: 100%;
 }

@@ -22,15 +22,20 @@ import {
   EuiSpacer,
   EuiTitle,
   EuiText,
+  EuiConfirmModal,
   EuiIcon
 } from '@elastic/eui';
 
 import WzBadge from '../util-components/badge';
 import WzClusterSelect from './configuration-cluster-selector';
+import { WzOverlayMask } from '../../../../../../components/common/util';
 
 class WzConfigurationPath extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      isModalVisible: false,
+    };
   }
   render() {
     const {
@@ -39,8 +44,34 @@ class WzConfigurationPath extends Component {
       icon,
       updateConfigurationSection,
       badge,
+      hasChanges,
       children
     } = this.props;
+
+    const closeModal = () => this.setState({ isModalVisible: false });
+    const showModal = () => this.setState({ isModalVisible: true });
+
+    let modal;
+    if (this.state.isModalVisible) {
+      modal = (
+        <WzOverlayMask>
+          <EuiConfirmModal
+            title="Unsubmitted changes"
+            onConfirm={() => {
+              closeModal;
+              updateConfigurationSection('');
+            }}
+            onCancel={closeModal}
+            cancelButtonText="No, don't do it"
+            confirmButtonText="Yes, do it"
+          >
+            <p style={{ textAlign: 'center' }}>
+              There are unsaved changes. Are you sure you want to proceed?
+            </p>
+          </EuiConfirmModal>
+        </WzOverlayMask>
+      );
+    }
     return (
       <Fragment>
         <EuiSpacer size="s" />
@@ -53,7 +84,13 @@ class WzConfigurationPath extends Component {
                     style={{ padding: 0 }}
                     iconType="arrowLeft"
                     iconSize="l"
-                    onClick={() => updateConfigurationSection('')}
+                    onClick={() => {
+                      if (hasChanges) {
+                        showModal();
+                      } else {
+                        updateConfigurationSection('');
+                      }
+                    }}
                     aria-label="back to configuration"
                   />
                 </EuiToolTip>
@@ -83,6 +120,7 @@ class WzConfigurationPath extends Component {
           )}
         </EuiFlexGroup>
         <EuiSpacer size="l" />
+        {modal}
       </Fragment>
     );
   }
@@ -93,6 +131,7 @@ WzConfigurationPath.propTypes = {
   description: PropTypes.string,
   icon: PropTypes.string,
   updateConfigurationSection: PropTypes.func,
+  hasChanges: PropTypes.bool,
   badge: PropTypes.bool
 };
 

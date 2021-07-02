@@ -48,7 +48,8 @@ export default {
     'target/',
   ],
   testMatch: [
-    '**/*.test.{js,ts,tsx}'
+    '**/*.test.{js,ts,tsx}',
+    '**/*{js,ts,tsx}'
   ],
   transform: {
     '^.+\\.js$': `${kbnDir}/src/dev/jest/babel_transform.js`,

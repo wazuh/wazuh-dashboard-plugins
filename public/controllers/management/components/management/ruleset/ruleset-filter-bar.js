@@ -21,6 +21,9 @@ import {
 } from '../../../../../redux/actions/rulesetActions';
 
 import { RulesetHandler, RulesetResources } from './utils/ruleset-handler';
+import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
+import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 
 class WzRulesetFilterBar extends Component {
   constructor(props) {
@@ -52,7 +55,7 @@ class WzRulesetFilterBar extends Component {
   }
 
   componentDidMount() {
-    this.buildSelectedOptions(this.props.state.filters); // If there are any filter in the redux store it will be restored when the component was mounted
+      this.buildSelectedOptions(this.props.state.filters); // If there are any filter in the redux store it will be restored when the component was mounted
   }
 
   isValid = value => {
@@ -99,7 +102,17 @@ class WzRulesetFilterBar extends Component {
       //const result = await this.wzReq.apiReq('GET', this.paths[section], {})
       if (Object.keys(filters).length) await this.fetchItems(filters);
     } catch (error) {
-      console.error('error building selected options ', error);
+      const options = {
+        context: `${WzRulesetFilterBar.name}.buildSelectedOptions`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.UI,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `Error building selected options: ${error.message || error}`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   }
 
@@ -117,7 +130,7 @@ class WzRulesetFilterBar extends Component {
       this.props.updateLoadingStatus(false);
     } catch (error) {
       this.props.updateError(error);
-      return Promise.reject(error);
+      throw error;
     }
   }
 
@@ -144,7 +157,17 @@ class WzRulesetFilterBar extends Component {
       this.props.updateFilters(currentOptions);
       await this.fetchItems(currentOptions);
     } catch (error) {
-      console.error('error cleaning current options ', error);
+      const options = {
+        context: `${WzRulesetFilterBar.name}.cleanCurrentOption`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.UI,
+        error: {
+          error: error,
+          message: `Error cleaning current options: ${error.message || error}`,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   }
 

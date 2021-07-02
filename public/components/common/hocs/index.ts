@@ -9,24 +9,15 @@
  *
  * Find more information about this on the LICENSE file.
  */
-export { withWindowSize } from './withWindowSize';
-
-export { withKibanaContext, withKibanaContextExtendsProps } from './withKibanaContext';
-
-export { withUserPermissions, withUserPermissionsRequirements, withUserPermissionsPrivate  } from './withUserPermissions';
-
-export { withUserRoles, withUserRolesRequirements, withUserRolesPrivate  } from './withUserRoles';
-
-export { withUserAuthorizationPrompt} from './withUserAuthorization';
-
-export { withGlobalBreadcrumb  } from './withGlobalBreadcrumb';
-
-export { withReduxProvider  } from './withReduxProvider';
-
-export { withGuard } from './withGuard';
-
-export { withButtonOpenOnClick } from './withButtonOpenOnClick';
-
-export { withAgentSupportModule } from './withAgentSupportModule';
-
-export { withUserLogged } from './withUserLogged';
+export * from './withWindowSize';
+export * from './withKibanaContext';
+export * from './withUserPermissions';
+export * from './withUserRoles';
+export * from './withUserAuthorization';
+export * from './withGlobalBreadcrumb';
+export * from './withReduxProvider';
+export * from './withGuard';
+export * from './withButtonOpenOnClick';
+export * from './withAgentSupportModule';
+export * from './withUserLogged';
+export * from './error-boundary/with-error-boundary';

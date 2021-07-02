@@ -53,22 +53,13 @@ export const Roles = () => {
     getData();
   }, []);
 
-
-
-  const closeFlyout = async () => {
-    setIsFlyoutVisible(false);
-    await getData();
-  };
-
-
   let flyout;
   if (isFlyoutVisible) {
     flyout = (
-      <EuiOverlayMask 
-        headerZindexLocation="below"
-        onClick={() => {setIsFlyoutVisible(false) }}>
-        <CreateRole closeFlyout={closeFlyout} />
-      </EuiOverlayMask >
+        <CreateRole closeFlyout={async (isVisible) => {
+          setIsFlyoutVisible(isVisible);
+          await getData();
+        }} />
     );
   }
 
@@ -77,20 +68,14 @@ export const Roles = () => {
     setIsEditFlyoutVisible(true);
   }
 
-
-  const closeEditingFlyout = async () => {
-    setIsEditFlyoutVisible(false);
-    await getData();
-  };
-
   let editFlyout;
   if (isEditFlyoutVisible) {
     editFlyout = (
-      <EuiOverlayMask 
-        headerZindexLocation="below"
-        onClick={async () => {await closeEditingFlyout(); }}>
-        <EditRole role={editingRole} closeFlyout={closeEditingFlyout} />
-      </EuiOverlayMask >
+        <EditRole role={editingRole} 
+        closeFlyout={async (isVisible) => {
+          setIsEditFlyoutVisible(isVisible);
+          await getData();
+        }} />
     );
   }
 

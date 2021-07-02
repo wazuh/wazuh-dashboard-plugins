@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import { EuiBreadcrumbs, EuiToolTip } from '@elastic/eui';
+import { EuiBreadcrumbs, EuiToolTip, EuiSelect } from '@elastic/eui';
 import { connect } from 'react-redux';
 import './globalBreadcrumb.scss';
 import { AppNavigate } from '../../../react-services/app-navigate';
@@ -22,11 +22,9 @@ class WzGlobalBreadcrumb extends Component {
     $('#breadcrumbNoTitle').attr("title", "");
   }
   render() {
-    const container = document.getElementsByClassName('euiBreadcrumbs');
     return (
       <div>
         {!!this.props.state.breadcrumb.length && (
-          ReactDOM.createPortal(
             <EuiBreadcrumbs
               className='wz-global-breadcrumb'
               responsive={false}
@@ -46,8 +44,7 @@ class WzGlobalBreadcrumb extends Component {
                   </a>)
               } : breadcrumb)}
               aria-label="Wazuh global breadcrumbs"
-            />,
-            container[0])
+            />
         )}
       </div>
     )

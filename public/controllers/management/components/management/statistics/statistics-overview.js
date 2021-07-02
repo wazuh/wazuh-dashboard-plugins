@@ -237,7 +237,7 @@ export class WzStatisticsOverview extends Component {
 export default compose(
   withGlobalBreadcrumb([
     { text: '' },
-    { text: 'Management', href: '/app/wazuh#/manager' },
+    { text: 'Management', href: '#/manager' },
     { text: 'Statistics' }
   ]),
   withGuard(props => {

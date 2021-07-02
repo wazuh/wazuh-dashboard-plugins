@@ -29,6 +29,7 @@ export const TabNames = {
   virustotal: 'VirusTotal',
   configuration: 'Configuration',
   syscollector: 'Inventory data',
+  stats: 'Stats',
   api: 'API configuration',
   extensions: 'Extensions',
   pattern: 'Index pattern',

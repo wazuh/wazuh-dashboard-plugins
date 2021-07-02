@@ -25,14 +25,13 @@ import { KbnSearchBar } from '../../kbn-search-bar';
 import { TimeRange, Query } from '../../../../../../src/plugins/data/common';
 import { ModulesHelper } from '../../common/modules/modules-helper';
 import { getDataPlugin, getToasts } from '../../../kibana-services';
-import { WzEmptyPromptNoPermissions } from "../../common/permissions/prompt";
+import { withErrorBoundary } from "../../common/hocs"
 
 export interface ITactic {
   [key:string]: string[]
 }
 
-
-export class Mitre extends Component {
+export const Mitre = withErrorBoundary (class Mitre extends Component {
   _isMount = false;
   timefilter: {
     getTime(): TimeRange
@@ -116,22 +115,12 @@ export class Mitre extends Component {
 
   async buildTacticsObject() {
     try {
-      const data = await WzRequest.apiReq('GET', '/mitre', {
-        params: {
-          select: "phase_name"
-        }
-      });
+      const data = await WzRequest.apiReq('GET', '/mitre/tactics', {});
       const result = (((data || {}).data || {}).data || {}).affected_items;
       const tacticsObject = {};
       result && result.forEach(item => {
-          const {id, phase_name} = item;
-          phase_name.forEach( (tactic) => {
-            if(!tacticsObject[tactic]){
-              tacticsObject[tactic] = [];
-            }
-            tacticsObject[tactic].push(id);
-          })
-        });
+        tacticsObject[item.name] = item;
+      });
       this._isMount && this.setState({tacticsObject, isLoading: false});
     } catch(err) {
       this.setState({ isLoading: false });
@@ -190,5 +179,5 @@ export class Mitre extends Component {
       </div>
     );
   }
-}
+})
 

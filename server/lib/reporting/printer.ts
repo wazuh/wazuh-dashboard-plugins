@@ -490,9 +490,29 @@ export class ReportPrinter{
           style: 'standard'
         }
       })
-    });
-  
-    const widths = new Array(columns.length - 1).fill('auto');
+    }); 
+
+    // 385 is the max initial width per column
+    let totalLength = columns.length - 1;
+    const widthColumn = 385/totalLength;
+    let totalWidth = totalLength * widthColumn;
+    
+    const widths:(number)[] = [];
+    
+    for (let step = 0; step < columns.length - 1; step++) {
+
+      let columnLength = this.getColumnWidth(columns[step], tableRows, step);
+      
+      if (columnLength <= Math.round(totalWidth / totalLength)) {
+        widths.push(columnLength);
+        totalWidth -= columnLength;
+      } 
+      else {
+        widths.push(Math.round(totalWidth / totalLength));
+        totalWidth -= Math.round((totalWidth / totalLength));
+      }
+      totalLength--;
+    }
     widths.push('*');
   
     this.addContent({
@@ -527,11 +547,98 @@ export class ReportPrinter{
     return this.addContent(title).addNewLine();
   }
 
+  addAgentsFilters(agents){
+    log(
+      'reporting:addAgentsFilters',
+      `Started to render the authorized agents filters`,
+      'info'
+    );
+    log(
+      'reporting:addAgentsFilters',
+      `agents: ${agents}`,
+      'debug'
+    );
+    
+    this.addNewLine();
+    
+    this.addContent({
+      text:
+        'NOTE: This report only includes the authorized agents of the user who generated the report',
+      style: { fontSize: 10, color: COLORS.PRIMARY },
+      margin: [0, 0, 0, 5]
+    });
+
+    /*TODO: This will be enabled by a config*/
+    /* this.addContent({
+      fontSize: 8,
+      table: {
+        widths: ['*'],
+        body: [
+          [
+            {
+              columns: [
+                {
+                  svg: filterIconRaw,
+                  width: 10,
+                  height: 10,
+                  margin: [40, 6, 0, 0]
+                },
+                {
+                  text: `Agent IDs: ${agents}` || '-',
+                  margin: [43, 0, 0, 0],
+                  style: { fontSize: 8, color: '#333' }
+                }
+              ]
+            }
+          ]
+        ]
+      },
+      margin: [-40, 0, -40, 0],
+      layout: {
+        fillColor: () => null,
+        hLineWidth: () => 0,
+        vLineWidth: () => 0
+      }
+    }); */
+
+    this.addContent({ text: '\n' });
+    log(
+      'reporting:addAgentsFilters',
+      'Time range and filters rendered',
+      'debug'
+    );
+  }
+
   async print(path: string){
     const document = this._printer.createPdfKitDocument({...pageConfiguration, content: this._content});
     await document.pipe(
       fs.createWriteStream(path)
     );
     document.end();
+  }
+
+  /**
+   * Returns the width of a given column
+   * 
+   * @param column 
+   * @param tableRows 
+   * @param step 
+   * @returns {number}
+   */
+  getColumnWidth(column, tableRows, index){
+    const widthCharacter = 5; //min width per character
+
+    //Get the longest row value
+    const maxRowLength = tableRows.reduce((maxLength, row)=>{
+      return (row[index].text.length > maxLength ? row[index].text.length : maxLength);
+    },0);
+
+    //Get column name length
+    const headerLength = column.label.length;
+
+    //Use the longest to get the column width
+    const maxLength = maxRowLength > headerLength ? maxRowLength : headerLength;
+
+    return maxLength * widthCharacter;
   }
 }

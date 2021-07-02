@@ -73,10 +73,8 @@ export class AppState {
           return extensions;
         }
       }
-    } catch (err) {
-      console.log('Error get extensions');
-      console.log(err);
-      throw err;
+    } catch (error) {
+      throw error;
     }
   };
 
@@ -181,10 +179,8 @@ export class AppState {
     try {
       const currentAPI = getCookies().get('currentApi');
       return currentAPI ? decodeURI(currentAPI) : false;
-    } catch (err) {
-      console.log('Error get current Api');
-      console.log(err);
-      throw err;
+    } catch (error) {
+      throw error;
     }
   }
 
@@ -358,8 +354,8 @@ export class AppState {
     }
     if (navigate) {
       const encodedURI = encodeURI(JSON.stringify(navigate));
-      getCookies().set('navigate', encodedURI, { 
-        path: window.location.pathname 
+      getCookies().set('navigate', encodedURI, {
+        path: window.location.pathname
       });
     }
   }
@@ -402,7 +398,7 @@ export class AppState {
         title: 'CSV',
         text: 'Error generating CSV',
         toastLifeTimeMs: 4000,
-      }); 
+      });
     }
     return;
   }

@@ -90,7 +90,7 @@ export const nameEquivalence = {
   'wazuh.monitoring.frequency': 'Frequency',
   'wazuh.monitoring.shards': 'Index shards',
   'wazuh.monitoring.replicas': 'Index replicas',
-  'wazuh.monitoring.creation': 'Interval creation',
+  'wazuh.monitoring.creation': 'Index creation',
   'wazuh.monitoring.pattern': 'Index pattern',
   hideManagerAlerts: 'Hide manager alerts',
   'logs.level': 'Log level',

@@ -12,7 +12,6 @@
  */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-
 import {
   EuiFlyout,
   EuiFlyoutBody,
@@ -23,11 +22,13 @@ import {
   EuiFlexItem,
   EuiBasicTable
 } from '@elastic/eui';
-
-// import { WzRequest } from '../../../../react-services/wz-request';
 import { WzRequest } from '../../../react-services/wz-request';
+import { withErrorBoundary } from '../../../components/common/hocs';
+import { UI_LOGGER_LEVELS } from '../../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../../react-services/common-services';
 
-export class SelectAgent extends Component {
+export const SelectAgent = withErrorBoundary (class SelectAgent extends Component {
   constructor(props) {
     super(props);
 
@@ -85,21 +86,34 @@ export class SelectAgent extends Component {
   }
 
   async getItems() {
-    const rawAgents = await WzRequest.apiReq(
-      'GET',
-      '/agents',
-      this.buildFilter()
-    );
+    try {
+      const rawAgents = await WzRequest.apiReq('GET', '/agents', this.buildFilter());
+      const formattedAgents = (((rawAgents || {}).data || {}).data || {}).items.map(
+        this.formatAgent.bind(this)
+      );
 
-    const formatedAgents = (
-      ((rawAgents || {}).data || {}).data || {}
-    ).items.map(this.formatAgent.bind(this));
-    this.setState({
-      agents: formatedAgents,
-      totalItems: (((rawAgents || {}).data || {}).data || {}).totalItems,
-      isProcessing: false,
-      isLoading: false
-    });
+      this.setState({
+        agents: formattedAgents,
+        totalItems: (((rawAgents || {}).data || {}).data || {}).totalItems,
+      });
+    } catch (error) {
+      const options = {
+        context: `${SelectAgent.name}.getItems`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+    } finally {
+      this.setState({
+        isProcessing: false,
+        isLoading: false,
+      });
+    }
   }
 
   buildSortFilter() {
@@ -274,7 +288,7 @@ export class SelectAgent extends Component {
       </div>
     );
   }
-}
+});
 
 SelectAgent.propTypes = {
   items: PropTypes.array

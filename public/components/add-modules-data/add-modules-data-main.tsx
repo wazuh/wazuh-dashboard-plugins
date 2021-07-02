@@ -99,7 +99,7 @@ export default class WzAddModulesData extends Component<IPropsWzAddModulesData, 
 	setGlobalBreadcrumb() {
     const breadcrumb = [
 			{ text: '' },
-			{ text: 'Management', href: '/app/wazuh#/manager' },
+			{ text: 'Management', href: '#/manager' },
 			{ text: 'Sample data' }
 		];
     store.dispatch(updateGlobalBreadcrumb(breadcrumb));

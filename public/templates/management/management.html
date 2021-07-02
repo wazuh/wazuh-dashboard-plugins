@@ -1,6 +1,11 @@
 <!-- head -->
 <div ng-cloak ng-controller="managementController as mctrl">
   <!-- Navigation section -->
+
+  <div flex="30" ng-if="mctrl.logtestOpened" class="md-padding logtest-side">
+    <react-component name="Logtest" props="mctrl.logtestProps"></react-component>
+  </div>
+
   <div
     layout="row"
     layout-align="start center"
@@ -215,14 +220,20 @@
 
       <div class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--responsive">
         <!-- Overview visualization card -->
-        <div class="euiPanel euiFlexItem euiFlexItem--flexGrowZero" style="min-width: 500px">
+        <div class="euiPanel euiFlexItem euiFlexItem--flexGrowZero" style="min-width: 500px; overflow: hidden;">
+           <span class="euiLoadingChart custom-charts-bar euiLoadingChart--large euiTextAlign--center "  style="top: 50%; transform: translate(0px, -25px); position: relative;" ng-if="!isReady || !rendered" >
+              <span class="euiLoadingChart__bar"></span>
+              <span class="euiLoadingChart__bar"></span>
+              <span class="euiLoadingChart__bar"></span>
+              <span class="euiLoadingChart__bar"></span>
+          </span> 
           <md-card-content
             class="wazuh-column"
-            ng-class="{'no-opacity-overview-monitoring': resultState !== 'ready' || !rendered}"
+            ng-class="{'no-opacity-overview-monitoring': !isReady || !rendered }"
           >
             <span
               class="embPanel__header embPanel__title embPanel__dragger layout-row wz-headline-title"
-              >Top 5 nodes</span
+              >Top 5 nodes </span
             >
             <react-component
               style="height: 100%"
@@ -493,7 +504,7 @@
     ng-controller="groupsPreviewController as gp"
     ng-if="mctrl.tab == 'groups'"
   >
-    <!-- TODO - 
+    <!-- TODO -
         - remove GroupsPreviewController
         - add 'Manage agents' section to the Groups component
     -->

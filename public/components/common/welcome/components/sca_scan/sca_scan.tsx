@@ -39,7 +39,16 @@ import { compose } from 'redux';
 
 export const ScaScan = compose(
   withReduxProvider,
-  withUserAuthorizationPrompt([{action: 'agent:read', resource: 'agent:id:*'}, {action: 'sca:read', resource: 'agent:id:*'}])
+  withUserAuthorizationPrompt([
+    [
+      {action: 'agent:read', resource: 'agent:id:*'},
+      {action: 'agent:read', resource: 'agent:group:*'}
+    ],
+    [
+      {action: 'sca:read', resource: 'agent:id:*'},
+      {action: 'sca:read', resource: 'agent:group:*'}
+    ]
+  ])
 )(class ScaScan extends Component {
   _isMount = false;
   props!: {

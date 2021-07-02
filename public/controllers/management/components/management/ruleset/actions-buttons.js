@@ -12,9 +12,7 @@
 import React, { Component, Fragment } from 'react';
 // Eui components
 import { EuiFlexItem, EuiButtonEmpty } from '@elastic/eui';
-import { getToasts }  from '../../../../../kibana-services';
-
-import { connect } from 'react-redux';
+import { getToasts } from '../../../../../kibana-services';
 
 import {
   toggleShowFiles,
@@ -31,6 +29,12 @@ import columns from './utils/columns';
 import { resourceDictionary, RulesetHandler, RulesetResources } from './utils/ruleset-handler';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 
+import { connect } from 'react-redux';
+
+import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
+import { getErrorOrchestrator } from '../../../../../react-services/common-services';
+
 class WzRulesetActionButtons extends Component {
   constructor(props) {
     super(props);
@@ -42,12 +46,12 @@ class WzRulesetActionButtons extends Component {
     this.refreshTimeoutId = null;
   }
 
-  showToast(title, text, color){
+  showToast(title, text, color) {
     getToasts().add({
       title,
       text,
       color,
-      toastLifeTimeMs: 3000
+      toastLifeTimeMs: 3000,
     });
   }
   /**
@@ -57,13 +61,29 @@ class WzRulesetActionButtons extends Component {
     try {
       this.setState({ generatingCsv: true });
       const { section, filters } = this.props.state; //TODO get filters from the search bar from the REDUX store
-      const mapFilters = filters.map(filter => ({
+      const mapFilters = filters.map((filter) => ({
         name: filter.field,
-        value: filter.value
+        value: filter.value,
       })); // adapt to shape used in /api/csv file: server/controllers/wazuh-api.js
-      await this.exportCsv(`/${section}${this.props.state.showingFiles ? '/files' : ''}`, mapFilters, section);
+      await this.exportCsv(
+        `/${section}${this.props.state.showingFiles ? '/files' : ''}`,
+        mapFilters,
+        section
+      );
     } catch (error) {
-      this.showToast('Error exporting as CSV', error.message || error, 'danger');
+      const options = {
+        context: `${WzRulesetActionButtons.name}.generateCsv`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: `Error generating CSV: ${error.message || error}`,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+
+      this.setState({ generatingCsv: false });
     }
     this.setState({ generatingCsv: false });
   }
@@ -77,7 +97,7 @@ class WzRulesetActionButtons extends Component {
     try {
       let errors = false;
       let results = [];
-      const rulesetHandler = new RulesetHandler(resource);    
+      const rulesetHandler = new RulesetHandler(resource);
       for (let idx in files) {
         const { file, content } = files[idx];
         try {
@@ -86,7 +106,7 @@ class WzRulesetActionButtons extends Component {
             index: idx,
             uploaded: true,
             file: file,
-            error: 0
+            error: 0,
           });
         } catch (error) {
           errors = true;
@@ -94,17 +114,14 @@ class WzRulesetActionButtons extends Component {
             index: idx,
             uploaded: false,
             file: file,
-            error: error
+            error: error,
           });
         }
       }
       if (errors) throw results;
-      //ErrorHandler.info('Upload successful');
       return;
     } catch (error) {
-      if (Array.isArray(error) && error.length) return Promise.reject(error);
-      //TODO handle the erros
-      //ErrorHandler.handle('Files cannot be uploaded');
+      throw error;
     }
   }
 
@@ -119,7 +136,20 @@ class WzRulesetActionButtons extends Component {
       this.props.updateIsProcessing(true);
       this.props.updatePageIndex(0);
       this.props.updateLoadingStatus(false);
-    } catch (error) {};
+    } catch (error) {
+      const options = {
+        context: `${WzRulesetActionButtons.name}.toggleFiles`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        store: false,
+        error: {
+          error: error,
+          message: `Error generating CSV: ${error.message || error}`,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+    }
   }
 
   /**
@@ -130,7 +160,7 @@ class WzRulesetActionButtons extends Component {
       this.props.updateIsProcessing(true);
       // this.onRefreshLoading();
     } catch (error) {
-      return Promise.reject(error);
+      throw error;
     }
   }
 
@@ -149,17 +179,17 @@ class WzRulesetActionButtons extends Component {
     const { section, showingFiles } = this.props.state;
 
     const getReadPermissionsFiles = () => {
-      const  { permissionResource } = resourceDictionary[section];
-      return [      
+      const { permissionResource } = resourceDictionary[section];
+      return [
         {
           action: `${section}:read`,
           resource: permissionResource('*'),
-        }
-      ];  
+        },
+      ];
     };
 
     const getUpdatePermissionsFiles = () => {
-      const  { permissionResource } = resourceDictionary[section];
+      const { permissionResource } = resourceDictionary[section];
       return [
         {
           action: `${section}:update`,
@@ -168,8 +198,8 @@ class WzRulesetActionButtons extends Component {
         {
           action: `${section}:read`,
           resource: permissionResource('*'),
-        }
-      ];  
+        },
+      ];
     };
 
     // Export button
@@ -201,7 +231,7 @@ class WzRulesetActionButtons extends Component {
       >
         {`Add new ${section} file`}
       </WzButtonPermissions>
-    );  
+    );
 
     //Add new CDB list button
     const addNewCdbListButton = (
@@ -235,30 +265,35 @@ class WzRulesetActionButtons extends Component {
 
     // Refresh
     const refresh = (
-      <EuiButtonEmpty
-        iconType="refresh"
-        onClick={async () => await this.refresh()}
-      >
+      <EuiButtonEmpty iconType="refresh" onClick={async () => await this.refresh()}>
         Refresh
       </EuiButtonEmpty>
     );
 
     const uploadFile = async (files, resource) => {
-      await this.uploadFiles(files, resource);
-      await this.refresh();
+      try {
+        await this.uploadFiles(files, resource);
+        await this.refresh();
+      } catch (error) {
+        const options = {
+          context: `${WzRulesetActionButtons.name}.uploadFile`,
+          level: UI_LOGGER_LEVELS.ERROR,
+          severity: UI_ERROR_SEVERITIES.BUSINESS,
+          error: {
+            error: error,
+            message: `Error files cannot be uploaded: ${error.message || error}`,
+            title: error.name || error,
+          },
+        };
+        getErrorOrchestrator().handleError(options);
+      }
     };
 
     return (
       <Fragment>
-        {section !== 'lists' && (
-          <EuiFlexItem grow={false}>{manageFiles}</EuiFlexItem>
-        )}
-        {section !== 'lists' && (
-          <EuiFlexItem grow={false}>{addNewRuleButton}</EuiFlexItem>
-        )}
-        {section === 'lists' && (
-          <EuiFlexItem grow={false}>{addNewCdbListButton}</EuiFlexItem>
-        )}
+        {section !== 'lists' && <EuiFlexItem grow={false}>{manageFiles}</EuiFlexItem>}
+        {section !== 'lists' && <EuiFlexItem grow={false}>{addNewRuleButton}</EuiFlexItem>}
+        {section === 'lists' && <EuiFlexItem grow={false}>{addNewCdbListButton}</EuiFlexItem>}
         {(section === 'lists' || showingFiles) && (
           <EuiFlexItem grow={false}>
             <UploadFiles
@@ -266,6 +301,7 @@ class WzRulesetActionButtons extends Component {
               resource={section}
               path={`etc/${section}`}
               upload={uploadFile}
+              onSuccess={() => this.props.updateRestartClusterManager(true)}
             />
           </EuiFlexItem>
         )}
@@ -276,26 +312,21 @@ class WzRulesetActionButtons extends Component {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
-    state: state.rulesetReducers
+    state: state.rulesetReducers,
   };
 };
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch) => {
   return {
-    toggleShowFiles: status => dispatch(toggleShowFiles(status)),
-    updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
-    updteAddingRulesetFile: content =>
-      dispatch(updteAddingRulesetFile(content)),
-    updateListContent: content => dispatch(updateListContent(content)),
-    updateIsProcessing: isProcessing =>
-      dispatch(updateIsProcessing(isProcessing)),
-    updatePageIndex: pageIndex => dispatch(updatePageIndex(pageIndex))
+    toggleShowFiles: (status) => dispatch(toggleShowFiles(status)),
+    updateLoadingStatus: (status) => dispatch(updateLoadingStatus(status)),
+    updteAddingRulesetFile: (content) => dispatch(updteAddingRulesetFile(content)),
+    updateListContent: (content) => dispatch(updateListContent(content)),
+    updateIsProcessing: (isProcessing) => dispatch(updateIsProcessing(isProcessing)),
+    updatePageIndex: (pageIndex) => dispatch(updatePageIndex(pageIndex)),
   };
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WzRulesetActionButtons);
+export default connect(mapStateToProps, mapDispatchToProps)(WzRulesetActionButtons);

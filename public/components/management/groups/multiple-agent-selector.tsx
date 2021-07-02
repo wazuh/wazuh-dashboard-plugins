@@ -19,8 +19,9 @@ import { WzRequest } from '../../../react-services/wz-request';
 import './multiple-agent-selector.scss'
 import $ from 'jquery';
 import { WzFieldSearchDelay } from '../../common/search';
+import { withErrorBoundary } from '../../common/hocs';
 
-export class MultipleAgentSelector extends Component {
+export const MultipleAgentSelector = withErrorBoundary (class MultipleAgentSelector extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -672,4 +673,4 @@ export class MultipleAgentSelector extends Component {
       </EuiPage >
     );
   }
-};
+});

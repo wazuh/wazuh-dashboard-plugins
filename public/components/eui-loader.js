@@ -30,9 +30,10 @@ import {
 import { Tabs } from './common/tabs/tabs';
 import { MultipleAgentSelector } from './management/groups/multiple-agent-selector';
 import { NodeList } from './management/cluster/node-list';
-import { HealthCheck } from './health-check/health-check';
+import { HealthCheck } from './health-check';
 import { WzEmptyPromptNoPermissions } from './common/permissions/prompt';
 import { getAngularModule } from '../kibana-services';
+import { Logtest } from '../directives/wz-logtest/components/logtest';
 
 const app = getAngularModule();
 
@@ -57,3 +58,4 @@ app
   .value('NodeList', NodeList)
   .value('HealthCheck', HealthCheck)
   .value('WzEmptyPromptNoPermissions', WzEmptyPromptNoPermissions)
+  .value('Logtest', Logtest)

@@ -7,7 +7,8 @@ import {
   EuiPage,
   EuiText,
   EuiTitle,
-  EuiLoadingSpinner
+  EuiLoadingSpinner,
+  EuiSpacer
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
@@ -18,6 +19,7 @@ import WzRulesetSearchBar from './ruleset-search-bar';
 import WzRulesetActionButtons from './actions-buttons';
 import './ruleset-overview.scss';
 import { withUserAuthorizationPrompt, withGlobalBreadcrumb } from '../../../../../components/common/hocs';
+import WzRestartClusterManagerCallout from '../../../../../components/common/restart-cluster-manager-callout';
 import { compose } from 'redux';
 import { resourceDictionary } from './utils/ruleset-handler';
 
@@ -31,8 +33,13 @@ class WzRulesetOverview extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      totalItems: 0
+      totalItems: 0,
+      showWarningRestart: false
     }
+  }
+
+  updateRestartManagers(showWarningRestart){
+    this.setState({ showWarningRestart });
   }
 
   render() {
@@ -49,7 +56,7 @@ class WzRulesetOverview extends Component {
               </EuiTitle>
             </EuiFlexItem>
             <EuiFlexItem></EuiFlexItem>
-            <WzRulesetActionButtons clusterStatus={this.props.clusterStatus} />
+            <WzRulesetActionButtons clusterStatus={this.props.clusterStatus} updateRestartClusterManager={(showWarningRestart) => this.updateRestartManagers(showWarningRestart)}/>
           </EuiFlexGroup>
           <EuiFlexGroup>
             <EuiFlexItem>
@@ -58,6 +65,16 @@ class WzRulesetOverview extends Component {
               </EuiText>
             </EuiFlexItem>
           </EuiFlexGroup>
+          {this.state.showWarningRestart && (
+            <>
+              <EuiSpacer size='s' />
+              <WzRestartClusterManagerCallout
+                onRestarted={() => this.updateRestartManagers(false)}
+                onRestartedError={() => this.updateRestartManagers(true)}
+              />
+              <EuiSpacer size='s' />
+            </>
+          )}
           <WzRulesetSearchBar />
           <EuiFlexGroup>
             <EuiFlexItem>
@@ -92,7 +109,7 @@ export default compose(
     }
     return [
       { text: '' },
-      { text: 'Management', href: '/app/wazuh#/manager' },
+      { text: 'Management', href: '#/manager' },
       { text: sectionNames[props.state.section] }
     ];
   }),

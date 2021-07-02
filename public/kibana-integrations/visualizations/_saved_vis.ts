@@ -24,16 +24,13 @@
  *
  * NOTE: It's a type of SavedObject, but specific to visualizations.
  */
-import {
-  createSavedObjectClass,
-  SavedObject,
-  SavedObjectKibanaServices,
-} from '../../../../../src/plugins/saved_objects/public';
+import { SavedObject } from '../../../../../src/plugins/saved_objects/public';
 // @ts-ignore
 import { extractReferences, injectReferences } from './saved_visualization_references';
 import { IIndexPattern } from '../../../../../src/plugins/data/public';
 import { ISavedVis, SerializedVis, updateOldState } from '../../../../../src/plugins/visualizations/public';
 import { createSavedSearchesLoader } from '../../../../../src/plugins/discover/public';
+import { getPlugins } from '../../kibana-services';
 
 export const convertToSerializedVis = (savedVis: ISavedVis): SerializedVis => {
   const { id, title, description, visState, uiStateJSON, searchSourceFields } = savedVis;
@@ -72,11 +69,10 @@ export const convertFromSerializedVis = (vis: SerializedVis): ISavedVis => {
   };
 };
 
-export function createSavedVisClass(services: SavedObjectKibanaServices) {
-  const SavedObjectClass = createSavedObjectClass(services);
+export function createSavedVisClass(services) {  
   const savedSearch = createSavedSearchesLoader(services);
 
-  class SavedVis extends SavedObjectClass {
+  class SavedVis extends getPlugins().savedObjects.SavedObjectClass {
     public static type: string = 'visualization';
     public static mapping: Record<string, string> = {
       title: 'text',

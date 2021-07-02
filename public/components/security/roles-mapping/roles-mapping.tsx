@@ -7,6 +7,13 @@ import {
   EuiButton,
   EuiTitle,
   EuiOverlayMask,
+  EuiSpacer,
+  EuiText,
+  EuiModal,
+  EuiModalBody,
+  EuiModalFooter,
+  EuiModalHeader,
+  EuiModalHeaderTitle,
 } from '@elastic/eui';
 import { RolesMappingTable } from './components/roles-mapping-table';
 import { RolesMappingEdit } from './components/roles-mapping-edit';
@@ -19,6 +26,11 @@ import { Role } from '../roles/types/role.type';
 import RolesServices from '../roles/services';
 import RulesServices from '../rules/services';
 import { useSelector } from 'react-redux';
+import { UI_LOGGER_LEVELS } from '../../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../../react-services/common-services';
+
+const errorContext = 'RolesMapping';
 
 export const RolesMapping = () => {
   const [isEditingRule, setIsEditingRule] = useState(false);
@@ -47,7 +59,7 @@ export const RolesMapping = () => {
       ErrorHandler.handle('There was an error loading roles');
     }
   }, [rolesLoading]);
-
+  
   const getInternalUsers = async () => {
     try {
       const wazuhSecurity = new WazuhSecurity();
@@ -63,7 +75,18 @@ export const RolesMapping = () => {
       }).sort((a, b) => (a.user > b.user) ? 1 : (a.user < b.user) ? -1 : 0);      
       setInternalUsers(_users);
     } catch (error) {
-      ErrorHandler.handle('There was an error loading internal users');
+      const options = {
+        context: errorContext,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        store: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   };
 
@@ -72,7 +95,18 @@ export const RolesMapping = () => {
       const _rules = await RulesServices.GetRules();
       setRules(_rules);
     } catch (error) {
-      ErrorHandler.handle('There was an error loading rules');
+      const options = {
+        context: errorContext,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        store: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   };
 
@@ -88,19 +122,13 @@ export const RolesMapping = () => {
   const updateRoles = async () => {
     await getRules();
   };
-
+  
   let editFlyout;
   if (isEditingRule) {
     editFlyout = (
-      <EuiOverlayMask
-        headerZindexLocation="below"
-        onClick={() => {
-          setIsEditingRule(false);
-        }}
-      >
         <RolesMappingEdit
           rule={selectedRule}
-          closeFlyout={isVisible => {
+          closeFlyout={(isVisible) => {
             setIsEditingRule(isVisible);
             initData();
           }}
@@ -110,20 +138,13 @@ export const RolesMapping = () => {
           onSave={async () => await updateRoles()}
           currentPlatform={currentPlatform}
         />
-      </EuiOverlayMask>
     );
   }
   let createFlyout;
   if (isCreatingRule) {
     editFlyout = (
-      <EuiOverlayMask
-        headerZindexLocation="below"
-        onClick={() => {
-          setIsCreatingRule(false);
-        }}
-      >
         <RolesMappingCreate
-          closeFlyout={isVisible => {
+          closeFlyout={(isVisible) => {
             setIsCreatingRule(isVisible);
             initData();
           }}
@@ -133,10 +154,8 @@ export const RolesMapping = () => {
           onSave={async () => await updateRoles()}
           currentPlatform={currentPlatform}
         />
-      </EuiOverlayMask>
     );
   }
-
   return (
     <EuiPageContent>
       <EuiPageContentHeader>
@@ -150,7 +169,7 @@ export const RolesMapping = () => {
             !loadingTable
             &&
             <div>
-              <EuiButton onClick={() => setIsCreatingRule(true)}>Create Role mapping</EuiButton>
+              <EuiButton onClick={() => {setIsCreatingRule(true)}}>Create Role mapping</EuiButton>
               {createFlyout}
               {editFlyout}
             </div>

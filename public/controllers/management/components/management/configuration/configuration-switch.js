@@ -415,7 +415,12 @@ const mapDispatchToProps = dispatch => ({
 });
 
 export default compose(
-  withUserAuthorizationPrompt((props) => [props.agent.id === '000' ? {action: 'manager:read', resource: '*:*:*'} : {action: 'agent:read', resource: `agent:id:${props.agent.id}`}]), //TODO: this need cluster:read permission but manager/cluster is managed in WzConfigurationSwitch component
+  withUserAuthorizationPrompt((props) => [props.agent.id === '000' ? 
+  {action: 'manager:read', resource: '*:*:*'} : 
+  [
+    {action: 'agent:read', resource: `agent:id:${props.agent.id}`},
+    ...(props.agent.group || []).map(group => ({ action: 'agent:read', resource: `agent:group:${group}` }))
+  ]]), //TODO: this need cluster:read permission but manager/cluster is managed in WzConfigurationSwitch component
   withRenderIfOrWrapped((props) => props.agent.status === 'never_connected', WzAgentNeverConnectedPrompt),
   connect(
     mapStateToProps,
