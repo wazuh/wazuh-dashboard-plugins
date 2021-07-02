@@ -129,7 +129,6 @@ jobs:
         subject: Github Actions job result
         to: matias.moreno@wazuh.com
         from: Cypress Automation Test # <user@example.com>
-        secure: true
         body: Build job of ${{github.repository}} completed successfully!
 
      #- name: Step 12 - Copy test execution videos and screenshots
