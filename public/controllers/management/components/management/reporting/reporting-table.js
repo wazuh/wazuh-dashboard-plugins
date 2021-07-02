@@ -98,7 +98,7 @@ class WzReportingTable extends Component {
       try {
         this.deleteReport(itemList);
         this.props.updateShowModal(false);
-      }catch(error){
+      } catch (error) {
         const options = {
           context: `${WzReportingTable.name}.deleteReport`,
           level: UI_LOGGER_LEVELS.ERROR,
@@ -111,7 +111,6 @@ class WzReportingTable extends Component {
         };
         getErrorOrchestrator().handleError(options);
       }
-      
     };
 
     const sorting = {
@@ -168,11 +167,9 @@ class WzReportingTable extends Component {
       const results = items.map(async (item, i) => {
         await this.reportingHandler.deleteReport(item.name);
       });
-
-      Promise.all(results).then((completed) => {
-        this.props.updateIsProcessing(true);
-        this.showToast('success', 'Success', 'Deleted successfully', 3000);
-      });
+      await Promise.all(results);
+      this.props.updateIsProcessing(true);
+      this.showToast('success', 'Success', 'Deleted successfully', 3000);
     } catch (error) {
       throw error;
     }

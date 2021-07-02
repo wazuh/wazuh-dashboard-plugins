@@ -20,7 +20,6 @@ import { updateIsProcessing } from '../../../../../../redux/actions/reportingAct
 import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
-const errorContext = 'WzReportingActionButtons';
 
 class WzReportingActionButtons extends Component {
   _isMounted = false;
@@ -47,7 +46,7 @@ class WzReportingActionButtons extends Component {
       this.props.updateIsProcessing(true);
     } catch (error) {
       const options = {
-        context: errorContext,
+        context: `${WzReportingActionButtons.name}.refresh`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.UI,
         error: {
