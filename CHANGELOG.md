@@ -25,6 +25,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Adapted the Mitre tactics and techniques resources to use the API endpoints [#3346](https://github.com/wazuh/wazuh-kibana-app/pull/3346)
 - Refactored all try catch strategy on Settings section [#3392](https://github.com/wazuh/wazuh-kibana-app/pull/3392)
 - Refactored all try catch strategy on Controller/Agent section [#3398](https://github.com/wazuh/wazuh-kibana-app/issues/3398)
+- Refactored all try catch value of context for ErrorOrchestrator service. [#3432](https://github.com/wazuh/wazuh-kibana-app/issues/3432)
 
 ### Fixed
 
