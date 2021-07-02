@@ -105,7 +105,7 @@ class WzReportingTable extends Component {
           severity: UI_ERROR_SEVERITIES.BUSINESS,
           error: {
             error: error,
-            message: ` Error deleting report: ${error.message || error}`,
+            message: `Error deleting report: ${error.message || error}`,
             title: error.name || error,
           },
         };
