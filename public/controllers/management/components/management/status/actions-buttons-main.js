@@ -34,6 +34,10 @@ import StatusHandler from './utils/status-handler';
 import { getToasts }  from '../../../../../kibana-services';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 
+import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
+import { getErrorOrchestrator } from '../../../../../react-services/common-services';
+
 class WzStatusActionButtons extends Component {
   _isMounted = false;
 
@@ -73,7 +77,17 @@ class WzStatusActionButtons extends Component {
       );
     } catch (error) {
       this.setState({ isRestarting: false });
-      this.showToast('danger', `Error restarting cluster: ${error.message || error}`, 3000);
+      const options = {
+        context: `${WzStatusActionButtons.name}.restartCluster`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: `Error restarting cluster: ${error.message || error}`,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   }
 
@@ -88,7 +102,17 @@ class WzStatusActionButtons extends Component {
       this.showToast('success', 'Restarting manager.', 3000);
     } catch (error) {
       this.setState({ isRestarting: false });
-      this.showToast('danger', `Error restarting manager: ${error.message || error}`, 3000);
+      const options = {
+        context: `${WzStatusActionButtons.name}.restartManager`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: `Error restarting manager: ${error.message || error}`,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   }
 
@@ -136,9 +160,18 @@ class WzStatusActionButtons extends Component {
       this.props.updateLoadingStatus(false);
     } catch (error) {
       this.props.updateLoadingStatus(false);
-      this.showToast('danger', `Node ${node} is down`, 3000);
+      const options = {
+        context: `${WzStatusActionButtons.name}.changeNode`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: `Node ${node} is down: ${error.message || error}`,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
-
     return;
   };
 

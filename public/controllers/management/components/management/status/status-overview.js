@@ -48,7 +48,10 @@ import { getToasts }  from '../../../../../kibana-services';
 
 import { withUserAuthorizationPrompt, withGlobalBreadcrumb } from '../../../../../components/common/hocs';
 import { compose } from 'redux';
-import { ToastNotifications } from '../../../../../react-services/toast-notifications';
+
+import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
+import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 
 export class WzStatusOverview extends Component {
   _isMounted = false;
@@ -159,7 +162,18 @@ export class WzStatusOverview extends Component {
 
       this.props.updateAgentInfo(lastAgent);
     } catch (error) {
-      getToasts().error('management:status:overview.fetchData', error);
+      const options = {
+        context: `${WzStatusOverview.name}.fetchData`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: `management:status:overview.fetchData ${error.message || error}`,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+
     }
     this.props.updateLoadingStatus(false);
   }
