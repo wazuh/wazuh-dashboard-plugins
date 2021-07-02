@@ -389,24 +389,37 @@ export class RegisterAgent extends Component {
       </EuiText>
     );
 
-    const groupInput = (
-      <EuiText>
-        <p>
-          Select one or more existing groups
-        </p>
-        <EuiComboBox
-          placeholder="Select group"
-          options={this.state.groups}
-          selectedOptions={this.state.selectedGroup}
-          onChange={group => {
-            this.setGroupName(group);
-          }}
-          isDisabled={!this.state.groups.length}
-          isClearable={true}
-          data-test-subj="demoComboBox"
-        />
-      </EuiText>
-    );
+    const groupInput = 
+      (
+        <>
+          {!this.state.groups.length &&(
+            <>
+              <EuiCallOut
+                color="warning"
+                title={<> This section could not be configured because you do not have permission to read groups. </>}
+                iconType="iInCircle"
+              />
+              <EuiSpacer />
+            </>
+            )}
+            <EuiText>
+              <p>
+                Select one or more existing groups
+              </p>
+              <EuiComboBox
+                placeholder={!this.state.groups.length ? "Default" : "Select group"}
+                options={this.state.groups}
+                selectedOptions={this.state.selectedGroup}
+                onChange={group => {
+                  this.setGroupName(group);
+                }}
+                isDisabled={!this.state.groups.length}
+                isClearable={true}
+                data-test-subj="demoComboBox"
+              />
+            </EuiText>
+        </>
+      );
 
     const passwordInput = (
       <EuiFieldText
@@ -448,7 +461,14 @@ export class RegisterAgent extends Component {
 
     const guide = (
       <div>
-        {this.state.selectedOS && (
+        {(!this.state.needsPassword && this.state.wazuhPassword=== "") ? (
+          <EuiCallOut
+            color="warning"
+            title={<> This section could not be displayed because you do not have permission to get access to the manager password. </>}
+            iconType="iInCircle"
+          />
+        ) :
+        this.state.selectedOS && (
           <EuiText>
             <p>You can use this command to install and enroll the Wazuh agent in one or more hosts.</p>
             <EuiCallOut
