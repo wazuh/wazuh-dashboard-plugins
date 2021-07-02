@@ -37,7 +37,6 @@ import {
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 
-const errorContext = 'ApiIsDown'
 export const ApiIsDown = withErrorBoundary (class ApiIsDown extends Component {
   constructor(props) {
     super(props);
@@ -110,7 +109,7 @@ export const ApiIsDown = withErrorBoundary (class ApiIsDown extends Component {
       }
 
       const options = {
-        context: errorContext,
+        context: `${ApiIsDown.name}.checkConnection`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.UI,
         store: true,

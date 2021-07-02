@@ -26,8 +26,6 @@ import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
 
-const errorContext = 'AgentsPreviewController';
-
 export class AgentsPreviewController {
   /**
    * Class constructor
@@ -168,7 +166,7 @@ export class AgentsPreviewController {
       return;
     } catch (error) {
       const options = {
-        context: errorContext,
+        context: `${AgentsPreviewController.name}.downloadCsv`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         error: {
@@ -179,7 +177,6 @@ export class AgentsPreviewController {
       };
       getErrorOrchestrator().handleError(options);
     }
-    return;
   }
 
   async getMostActive() {
@@ -205,7 +202,7 @@ export class AgentsPreviewController {
       return this.mostActiveAgent;
     } catch (error) {
       const options = {
-        context: errorContext,
+        context: `${AgentsPreviewController.name}.getMostActive`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         store: true,
@@ -233,7 +230,7 @@ export class AgentsPreviewController {
       this.pattern = (await getDataPlugin().indexPatterns.get(AppState.getCurrentPattern())).title;
     } catch (error) {
       const options = {
-        context: errorContext,
+        context: `${AgentsPreviewController.name}.load`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.CRITICAL,
         store: true,
@@ -275,7 +272,7 @@ export class AgentsPreviewController {
       return url.substr(numToClean);
     } catch (error) {
       const options = {
-        context: errorContext,
+        context: `${AgentsPreviewController.name}.getCurrentApiAddress`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.UI,
         error: {
@@ -298,7 +295,7 @@ export class AgentsPreviewController {
       return result.api_version;
     } catch (error) {
       const options = {
-        context: errorContext,
+        context: `${AgentsPreviewController.name}.getWazuhVersion`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         error: {

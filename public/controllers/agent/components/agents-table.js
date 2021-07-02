@@ -45,8 +45,6 @@ import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 
-const errorContext = 'AgentsTable';
-
 export const AgentsTable = withErrorBoundary(
   class AgentsTable extends Component {
     _isMount = false;
@@ -244,7 +242,7 @@ export const AgentsTable = withErrorBoundary(
           });
       } catch (error) {
         const options = {
-          context: errorContext,
+          context: `${AgentsTable.name}.getItems`,
           level: UI_LOGGER_LEVELS.ERROR,
           severity: UI_ERROR_SEVERITIES.BUSINESS,
           store: true,
@@ -714,7 +712,7 @@ export const AgentsTable = withErrorBoundary(
           : this.showToast('warning', `Failed to delete selected agents`, '', 5000);
       } catch (error) {
         const options = {
-          context: errorContext,
+          context: `${AgentsTable.name}.onClickPurge`,
           level: UI_LOGGER_LEVELS.ERROR,
           severity: UI_ERROR_SEVERITIES.BUSINESS,
           store: true,
@@ -749,7 +747,7 @@ export const AgentsTable = withErrorBoundary(
           : this.showToast('warning', `Failed to delete all agents`, '', 5000);
       } catch (error) {
         const options = {
-          context: errorContext,
+          context: `${AgentsTable.name}.onClickPurgeAll`,
           level: UI_LOGGER_LEVELS.ERROR,
           severity: UI_ERROR_SEVERITIES.BUSINESS,
           store: true,
