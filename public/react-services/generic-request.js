@@ -37,14 +37,13 @@ export class GenericRequest {
           await getDataPlugin().indexPatterns.get(AppState.getCurrentPattern())
         ).title;
       } catch (error) {
-        throw new Error('Error obtaining the current index patten', error);
+        throw new Error(`Error obtaining the current Index pattern: ${error}`);
       }
 
       try {
         requestHeaders.id = JSON.parse(AppState.getCurrentAPI()).id;
       } catch (error) {
-        // Intended
-        throw new Error('Error obtaining the current API', error);
+        //Intended
       }
       var options = {};
 
@@ -105,7 +104,7 @@ export class GenericRequest {
           if (!window.location.hash.includes('#/settings')) {
             window.location.href = getHttp().basePath.prepend('/app/wazuh#/health-check');
           }
-          throw new Error('Current API is down', err);
+          throw new Error(`Current API is down: ${err}`);
         }
       }
       if (returnError) return Promise.reject(err);
