@@ -110,15 +110,28 @@ jobs:
         path: wazuh-qa
      - name: Step 10 - Install Cypress Project Dependencies
        if: ${{ env.RUN_TEST == 'true' }}
-       run: |
-        cd $GITHUB_WORKSPACE/wazuh-qa/tests/frontend/test_kibana_app/
-        npm install
-        npm run cy:install
-     - name: Step 11 - Run Cypress tests
-       if: ${{ env.RUN_TEST == 'true' }}
-       run: |
-         cd $GITHUB_WORKSPACE/wazuh-qa/tests/frontend/test_kibana_app/
-         npm run cypress:run-headless
+       uses: cypress-io/github-action@v2
+       with:
+          project: $GITHUB_WORKSPACE/wazuh-qa/tests/frontend/test_kibana_app/
+          browser: chrome
+          headless: true
+
+     #- name: Step 11 - Run Cypress tests
+     #  if: ${{ env.RUN_TEST == 'true' }}
+     #  run: |
+     #    cd $GITHUB_WORKSPACE/wazuh-qa/tests/frontend/test_kibana_app/
+     #    npm run cypress:run-headless
+     #- name: Step 10 - Install Cypress Project Dependencies
+     #  if: ${{ env.RUN_TEST == 'true' }}
+     #  run: |
+     #   cd $GITHUB_WORKSPACE/wazuh-qa/tests/frontend/test_kibana_app/
+     #   npm install
+     #   npm run cy:install
+     #- name: Step 11 - Run Cypress tests
+     #  if: ${{ env.RUN_TEST == 'true' }}
+     #  run: |
+     #    cd $GITHUB_WORKSPACE/wazuh-qa/tests/frontend/test_kibana_app/
+     #    npm run cypress:run-headless         
      #  continue-on-error: true
      #- name: Step 12 - Copy test execution videos and screenshots
      #  run: |
