@@ -112,7 +112,7 @@ jobs:
        if: ${{ env.RUN_TEST == 'true' }}
        uses: cypress-io/github-action@v2
        with:
-          project: $GITHUB_WORKSPACE/wazuh-qa/tests/frontend/test_kibana_app/
+          working-directory: $GITHUB_WORKSPACE/wazuh-qa/tests/frontend/test_kibana_app/
           browser: chrome
           headless: true
 
