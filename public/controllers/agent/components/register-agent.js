@@ -137,6 +137,7 @@ export const RegisterAgent = withErrorBoundary(
         groups: [],
         selectedGroup: [],
         udpProtocol: false,
+        gotErrorRegistrationServiceInfo: false
       };
       this.restartAgentCommand = {
         rpm: this.systemSelector(),
@@ -171,9 +172,6 @@ export const RegisterAgent = withErrorBoundary(
           serverAddress,
           needsPassword,
           hidePasswordInput,
-          versionButtonsCentos,
-          architectureButtons,
-          architectureCentos5,
           wazuhPassword,
           udpProtocol,
           wazuhVersion,
@@ -206,6 +204,7 @@ export const RegisterAgent = withErrorBoundary(
         const result = await WzRequest.apiReq('GET', '/agents/000/config/auth/auth', {});
         return (result.data || {}).data || {};
       } catch (error) {
+        this.setState({ gotErrorRegistrationServiceInfo: true });
         throw new Error(error);
       }
     }
@@ -411,7 +410,7 @@ export const RegisterAgent = withErrorBoundary(
           <>
             <EuiCallOut
               color="warning"
-              title={<> This section could not be configured because you do not have permission to read groups. </>}
+              title='This section could not be configured because you do not have permission to read groups.'
               iconType="iInCircle"
             />
             <EuiSpacer />
@@ -483,12 +482,20 @@ export const RegisterAgent = withErrorBoundary(
         this.selectSYS(selectedTab.id);
       };
 
+      const calloutErrorRegistrationServiceInfo = this.state.gotErrorRegistrationServiceInfo ? (
+        <EuiCallOut
+          color="danger"
+          title='This section could not be displayed because you do not have permission to get access to the registration service.'
+          iconType="iInCircle"
+        />
+      ) : null;
+
       const guide = (
         <div>
-          {(!this.state.needsPassword && this.state.wazuhPassword=== "") ? (
+          {(this.state.gotErrorRegistrationServiceInfo) ? (
             <EuiCallOut
-              color="warning"
-              title={<> This section could not be displayed because you do not have permission to get access to the registration service. </>}
+              color="danger"
+              title='This section could not be displayed because you do not have permission to get access to the registration service.'
               iconType="iInCircle"
             />
           ) :
@@ -612,7 +619,7 @@ export const RegisterAgent = withErrorBoundary(
                   <EuiButtonGroup
                     color="primary"
                     legend="Choose the architecture"
-                    options={this.state.architectureCentos5}
+                    options={architectureCentos5}
                     idSelected={this.state.selectedArchitecture}
                     onChange={(architecture) => this.setArchitecture(architecture)}
                   />
@@ -629,7 +636,7 @@ export const RegisterAgent = withErrorBoundary(
                   <EuiButtonGroup
                     color="primary"
                     legend="Choose the architecture"
-                    options={this.state.architectureButtons}
+                    options={architectureButtons}
                     idSelected={this.state.selectedArchitecture}
                     onChange={(architecture) => this.setArchitecture(architecture)}
                   />
@@ -655,7 +662,9 @@ export const RegisterAgent = withErrorBoundary(
         },
         {
           title: 'Install and enroll the agent',
-          children: missingOSSelection.length ? (
+          children: this.state.gotErrorRegistrationServiceInfo ? 
+            calloutErrorRegistrationServiceInfo
+          : missingOSSelection.length ? (
             <EuiCallOut
               color="warning"
               title={`Please select the ${missingOSSelection.join(', ')}.`}
@@ -669,7 +678,9 @@ export const RegisterAgent = withErrorBoundary(
           ? [
               {
                 title: 'Start the agent',
-                children: missingOSSelection.length ? (
+                children: this.state.gotErrorRegistrationServiceInfo ? 
+                  calloutErrorRegistrationServiceInfo
+                : missingOSSelection.length ? (
                   <EuiCallOut
                     color="warning"
                     title={`Please select the ${missingOSSelection.join(', ')}.`}
@@ -693,7 +704,9 @@ export const RegisterAgent = withErrorBoundary(
           ? [
               {
                 title: 'Start the agent',
-                children: (
+                children: this.state.gotErrorRegistrationServiceInfo ? 
+                  calloutErrorRegistrationServiceInfo 
+                : (
                   <EuiFlexGroup direction="column">
                     <EuiText>
                       <EuiCodeBlock style={codeBlock} language={language}>
