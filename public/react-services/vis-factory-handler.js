@@ -84,7 +84,7 @@ export class VisFactoryHandler {
       const options = {
         context: `${VisFactoryHandler.name}.buildOverviewVisualizations`,
         level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.UI,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
         store: true,
         error: {
           error: error,
@@ -130,7 +130,7 @@ export class VisFactoryHandler {
       const options = {
         context: `${VisFactoryHandler.name}.buildAgentsVisualizations`,
         level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.UI,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
         store: true,
         display: true,
         error: {
