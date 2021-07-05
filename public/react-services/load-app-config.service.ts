@@ -17,7 +17,9 @@ import {
   setAppConfigHasError,
   updateAppConfig,
 } from '../redux/actions/appConfigActions';
-
+import { UI_LOGGER_LEVELS } from '../../common/constants';
+import { UI_ERROR_SEVERITIES } from './error-orchestrator/types';
+import { getErrorOrchestrator } from './common-services';
 
 /**
  * Retunrs the wazuh app config
@@ -32,10 +34,20 @@ export const loadAppConfig = async () => {
     }
 
     const ymlContent = config.data.data;
-    store.dispatch(updateAppConfig(ymlContent))
+    store.dispatch(updateAppConfig(ymlContent));
   } catch (error) {
     store.dispatch(setAppConfigHasError());
-    console.error('Error parsing wazuh.yml, using default values.'); // eslint-disable-line
-    console.error(error.message || error); // eslint-disable-line
+    const options = {
+      context: `${ActionAgents.name}.upgradeAgent`,
+      level: UI_LOGGER_LEVELS.ERROR,
+      severity: UI_ERROR_SEVERITIES.BUSINESS,
+      store: true,
+      error: {
+        error: error,
+        message: error.message || error,
+        title: `Error parsing wazuh.yml, using default values.`,
+      },
+    };
+    getErrorOrchestrator().handleError(options);
   }
 };

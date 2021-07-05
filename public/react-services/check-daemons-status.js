@@ -40,6 +40,7 @@ export class CheckDaemonsStatus {
       }
     } catch (error) {
       store.dispatch(updateWazuhNotReadyYet('Wazuh could not be recovered.'));
+      throw error;
     }
     busy = false;
   }

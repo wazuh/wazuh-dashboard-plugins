@@ -21,6 +21,9 @@ import { GenericRequest } from './generic-request';
 import store from '../redux/store';
 import { updateVis } from '../redux/actions/visualizationsActions';
 import { getAngularModule } from '../kibana-services';
+import { UI_LOGGER_LEVELS } from '../../common/constants';
+import { UI_ERROR_SEVERITIES } from './error-orchestrator/types';
+import { getErrorOrchestrator } from './common-services';
 
 export class VisFactoryHandler {
   /**
@@ -79,7 +82,18 @@ export class VisFactoryHandler {
         store.dispatch(updateVis({ update: true, raw: rawVisualizations.getList() }));
         return;
       } catch (error) {
-        return Promise.reject(error);
+        const options = {
+          context: `${VisFactoryHandler.name}.buildOverviewVisualizations`,
+          level: UI_LOGGER_LEVELS.ERROR,
+          severity: UI_ERROR_SEVERITIES.CRITICAL,
+          store: true,
+          error: {
+            error: error,
+            message: error.message || error,
+            title: error.name || error,
+          },
+        };
+        getErrorOrchestrator().handleError(options);
       }
     //}
   }
@@ -114,7 +128,18 @@ export class VisFactoryHandler {
         store.dispatch(updateVis({ update: true }));
         return;
       } catch (error) {
-        return Promise.reject(error);
+        const options = {
+          context: `${VisFactoryHandler.name}.buildAgentsVisualizations`,
+          level: UI_LOGGER_LEVELS.ERROR,
+          severity: UI_ERROR_SEVERITIES.CRITICAL,
+          store: true,
+          error: {
+            error: error,
+            message: error.message || error,
+            title: error.name || error,
+          },
+        };
+        getErrorOrchestrator().handleError(options);
       }
     }
 //  }
