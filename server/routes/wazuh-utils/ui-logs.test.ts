@@ -13,7 +13,7 @@ const buildAxiosOptions = (method: string, path: string, data: any = {}, headers
 
 describe.skip('Wazuh UI Logs', () => {
   describe('Wazuh API - /utils/logs/ui', () => {
-    test('[200] Get UI Logs', () => {
+    it('[200] Get UI Logs', () => {
       const options = buildAxiosOptions('get', '/utils/logs/ui');
       return axios(options)
         .then((response) => {
@@ -26,7 +26,7 @@ describe.skip('Wazuh UI Logs', () => {
   });
 
   describe('Wazuh API - /utils/logs/ui', () => {
-    test('[200] Create UI Logs', () => {
+    it('[200] Create UI Logs', () => {
       const options = buildAxiosOptions('post', '/utils/logs/ui', {
         message: 'Message test',
         level: 'error',

@@ -63,6 +63,7 @@
   "devDependencies": {
     "@types/node-cron": "^2.0.3",
     "eslint-plugin-async-await": "^0.0.0",
+    "redux-mock-store": "^1.5.4",
     "tslint": "^5.11.0",
     "typescript-eslint-parser": "^18.0.0"
   }
