@@ -23,8 +23,6 @@ import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
 
-const errorContext = 'RolesMappingCreate';
-
 export const RolesMappingCreate = ({
   closeFlyout,
   rolesEquivalences,
@@ -64,7 +62,7 @@ export const RolesMappingCreate = ({
       ErrorHandler.info('Role mapping was successfully created');
     } catch (error) {
       const options = {
-        context: errorContext,
+        context: `${RolesMappingCreate.name}.createRule`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         store: true,
