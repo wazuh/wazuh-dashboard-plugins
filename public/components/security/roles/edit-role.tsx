@@ -25,10 +25,7 @@ import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 
-const errorContext = 'EditRole';
-
 const reservedRoles = ['administrator', 'readonly', 'users_admin', 'agents_readonly', 'agents_admin', 'cluster_readonly', 'cluster_admin'];
-
 
 export const EditRole = ({ role, closeFlyout }) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -106,7 +103,7 @@ export const EditRole = ({ role, closeFlyout }) => {
       await update();
     } catch (error) {
       const options = {
-        context: errorContext,
+        context: `${EditRole.name}.addPolicy`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         store: true,

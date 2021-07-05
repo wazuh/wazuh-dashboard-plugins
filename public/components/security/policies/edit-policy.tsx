@@ -27,8 +27,6 @@ import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import _ from 'lodash';
 
-const errorContext = 'EditPolicyFlyout';
-
 export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
   const isReserved = WzAPIUtils.isReservedID(policy.id);
   const [actionValue, setActionValue] = useState('');
@@ -78,7 +76,7 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
       closeFlyout();
     } catch (error) {
       const options = {
-        context: errorContext,
+        context: `${EditPolicyFlyout.name}.updatePolicy`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         store: true,
@@ -291,8 +289,8 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
     );
   }
   useEffect(() => {
-    if (initialActionValue != actionValue ||  !_.isEqual(addedResources, initialAddedResources) ||  
-        !_.isEqual(addedActions, initialAddedActions) || initialResourceValue != resourceValue || 
+    if (initialActionValue != actionValue ||  !_.isEqual(addedResources, initialAddedResources) ||
+        !_.isEqual(addedActions, initialAddedActions) || initialResourceValue != resourceValue ||
         initialEffectValue != effectValue) {
       setHasChanges(true);
     } else {
