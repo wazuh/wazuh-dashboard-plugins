@@ -76,6 +76,11 @@ class SettingsLogs extends Component {
       .split('.')[0];
   }
 
+  getMessage(log) {
+    const data = log.data || log.message;
+    return typeof data === 'object' ? data.message || JSON.stringify(data) : data.toString();
+  } 
+
   render() {
     let text = '';
     (this.state.logs || []).forEach(x => {
@@ -85,7 +90,7 @@ class SettingsLogs extends Component {
           '  ' +
           x.level.toUpperCase() +
           '  ' +
-          x.message +
+          this.getMessage(x) +
           '\n');
     });
     return (
