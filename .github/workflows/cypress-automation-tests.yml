@@ -120,16 +120,6 @@ jobs:
          cd $GITHUB_WORKSPACE/wazuh-qa/tests/frontend/test_kibana_app/
          npm run cypress:run-headless         
        continue-on-error: true
-     - name: Send mail
-     # if: failure()
-       uses: dawidd6/action-send-mail@v3
-       with:
-        server_address: smtp.gmail.com
-        server_port: 465
-        subject: Github Actions job result
-        to: matias.moreno@wazuh.com
-        from: Cypress Automation Test # <user@example.com>
-        body: Build job of ${{github.repository}} completed successfully!
 
      #- name: Step 12 - Copy test execution videos and screenshots
      #  run: |
