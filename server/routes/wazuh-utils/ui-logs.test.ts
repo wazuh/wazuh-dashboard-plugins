@@ -11,32 +11,34 @@ const buildAxiosOptions = (method: string, path: string, data: any = {}, headers
   };
 };
 
-describe('Wazuh API - /utils/logs/ui', () => {
-  test('[200] Get UI Logs', () => {
-    const options = buildAxiosOptions('get', '/utils/logs/ui');
-    return axios(options)
-      .then((response) => {
-        expect(response.status).toBe(200);
-      })
-      .catch((error) => {
-        throw error;
-      });
-  }, 6000);
-});
+describe.skip('Wazuh UI Logs', () => {
+  describe('Wazuh API - /utils/logs/ui', () => {
+    test('[200] Get UI Logs', () => {
+      const options = buildAxiosOptions('get', '/utils/logs/ui');
+      return axios(options)
+        .then((response) => {
+          expect(response.status).toBe(200);
+        })
+        .catch((error) => {
+          throw error;
+        });
+    }, 6000);
+  });
 
-describe('Wazuh API - /utils/logs/ui', () => {
-  test('[200] Create UI Logs', () => {
-    const options = buildAxiosOptions('post', '/utils/logs/ui', {
-      message: 'Message test',
-      level: 'error',
-      location: 'Location',
-    });
-    return axios(options)
-      .then((response) => {
-        expect(response.status).toBe(200);
-      })
-      .catch((error) => {
-        throw error;
+  describe('Wazuh API - /utils/logs/ui', () => {
+    test('[200] Create UI Logs', () => {
+      const options = buildAxiosOptions('post', '/utils/logs/ui', {
+        message: 'Message test',
+        level: 'error',
+        location: 'Location',
       });
-  }, 6000);
+      return axios(options)
+        .then((response) => {
+          expect(response.status).toBe(200);
+        })
+        .catch((error) => {
+          throw error;
+        });
+    }, 6000);
+  });
 });
