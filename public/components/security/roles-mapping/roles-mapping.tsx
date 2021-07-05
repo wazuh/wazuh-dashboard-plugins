@@ -30,8 +30,6 @@ import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 
-const errorContext = 'RolesMapping';
-
 export const RolesMapping = () => {
   const [isEditingRule, setIsEditingRule] = useState(false);
   const [isCreatingRule, setIsCreatingRule] = useState(false);
@@ -44,7 +42,7 @@ export const RolesMapping = () => {
   const currentPlatform = useSelector((state: any) => state.appStateReducers.currentPlatform);
 
   useEffect(() => {
-    initData();    
+    initData();
   }, []);
 
   useEffect(() => {
@@ -59,24 +57,26 @@ export const RolesMapping = () => {
       ErrorHandler.handle('There was an error loading roles');
     }
   }, [rolesLoading]);
-  
+
   const getInternalUsers = async () => {
     try {
       const wazuhSecurity = new WazuhSecurity();
       const users = await wazuhSecurity.security.getUsers();
-      const _users = users.map((item, idx) => {
-        return {
-          id: idx,
-          user: item.username,
-          roles: [],
-          full_name: item.full_name,
-          email: item.email,
-        };
-      }).sort((a, b) => (a.user > b.user) ? 1 : (a.user < b.user) ? -1 : 0);      
+      const _users = users
+        .map((item, idx) => {
+          return {
+            id: idx,
+            user: item.username,
+            roles: [],
+            full_name: item.full_name,
+            email: item.email,
+          };
+        })
+        .sort((a, b) => (a.user > b.user ? 1 : a.user < b.user ? -1 : 0));
       setInternalUsers(_users);
     } catch (error) {
       const options = {
-        context: errorContext,
+        context: `${RolesMapping.name}.getInternalUsers`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         store: true,
@@ -96,7 +96,7 @@ export const RolesMapping = () => {
       setRules(_rules);
     } catch (error) {
       const options = {
-        context: errorContext,
+        context: `${RolesMapping.name}.getRules`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         store: true,
@@ -122,7 +122,7 @@ export const RolesMapping = () => {
   const updateRoles = async () => {
     await getRules();
   };
-  
+
   let editFlyout;
   if (isEditingRule) {
     editFlyout = (
