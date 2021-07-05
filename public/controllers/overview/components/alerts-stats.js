@@ -13,12 +13,10 @@
 import React, { Component } from 'react';
 import { visualizations } from '../../../components/visualize/visualizations';
 import PropTypes from 'prop-types';
-import { EuiStat, EuiFlexItem, EuiFlexGroup } from '@elastic/eui';
+import { EuiFlexGroup, EuiFlexItem, EuiStat } from '@elastic/eui';
 import { connect } from 'react-redux';
 import { buildPhrasesFilter, buildRangeFilter } from '../../../../../../src/plugins/data/common';
-import { esFilters } from '../../../../../../src/plugins/data/common';
 import { getIndexPattern } from '../../../../public/components/overview/mitre/lib';
-//import '../../../../public/less/loader';
 import { WAZUH_ALERTS_PATTERN } from '../../../../common/constants';
 import { AppState } from '../../../react-services/app-state';
 import { getDataPlugin } from '../../../kibana-services';
@@ -81,7 +79,7 @@ class AlertsStats extends Component {
     return stats;
   }
 
-  addFilter(filter) {    
+  addFilter(filter) {
     const { filterManager } = getDataPlugin().query;
     const matchPhrase = {};
     matchPhrase[filter.key] = filter.value;

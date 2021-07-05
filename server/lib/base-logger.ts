@@ -20,7 +20,8 @@ import { WAZUH_DATA_LOGS_DIRECTORY_PATH, MAX_MB_LOG_FILES } from '../../common/c
 
 export interface IUIPlainLoggerSettings {
   level: string;
-  message: string;
+  message?: string;
+  data?: any;
 }
 
 export interface IUILoggerSettings extends IUIPlainLoggerSettings {
@@ -180,13 +181,46 @@ export class BaseLogger {
   };
 
   /**
+   * This function filter some known interfaces to avoid log hug objects
+   * @param data string | object
+   * @returns the data parsed
+   */
+  private parseData = (data: any) => {
+    let parsedData =
+      data instanceof Error
+        ? {
+            message: data.message,
+            stack: data.stack,
+          }
+        : data;
+
+    // when error is AxiosError, it extends from Error
+    if (data.isAxiosError) {
+      const { config } = data;
+      parsedData = {
+        ...parsedData,
+        config: {
+          url: config.url,
+          method: config.method,
+          data: config.data,
+          params: config.params,
+        },
+      };
+    }
+
+    if (typeof parsedData === 'object') parsedData.toString = () => JSON.stringify(parsedData);
+
+    return parsedData;
+  };
+
+  /**
    * Main function to add a new log
    * @param {*} location File where the log is being thrown
-   * @param {*} message Message to show
+   * @param {*} data Message or object to log
    * @param {*} level Optional, default is 'error'
    */
-
-  async log(location: string, message: string, level: string) {
+   async log(location: string, data: any, level: string) {
+    const parsedData = this.parseData(data);
     return this.initDirectory()
       .then(() => {
         if (this.allowed) {
@@ -194,7 +228,7 @@ export class BaseLogger {
           const plainLogData: IUIPlainLoggerSettings = {
             level: level || 'error',
             message: `${this.yyyymmdd()}: ${location || 'Unknown origin'}: ${
-              message || 'An error occurred'
+              parsedData.toString() || 'An error occurred'
             }`,
           };
 
@@ -204,8 +238,14 @@ export class BaseLogger {
             date: new Date(),
             level: level || 'error',
             location: location || 'Unknown origin',
-            message: message || 'An error occurred',
+            data: parsedData || 'An error occurred',
           };
+
+          if (typeof data == 'string') {
+            logData.message = parsedData;
+            delete logData.data;
+          }
+
           this.wazuhLogger.log(logData);
         }
       })
