@@ -1,4 +1,3 @@
- 
 /*
  * Wazuh app - Vis factory handler service
  * Copyright (C) 2015-2021 Wazuh, Inc.
@@ -62,40 +61,40 @@ export class VisFactoryHandler {
   static async buildOverviewVisualizations(filterHandler, tab, subtab, fromDiscover = false) {
     const rawVisualizations = new RawVisualizations();
     //if(rawVisualizations.getType() !== 'general'){
-      rawVisualizations.setType('general');
-      const $injector = getAngularModule().$injector;
-      const commonData = $injector.get('commonData');
-  
-      try {
-        const currentPattern = AppState.getCurrentPattern();
-        const data =
-          tab !== 'sca'
-            ? await GenericRequest.request(
-                'GET',
-                `/elastic/visualizations/overview-${tab}/${currentPattern}`
-              )
-            : false;
-        data && rawVisualizations.assignItems(data.data.raw);
-        if(!fromDiscover){
-          commonData.assignFilters(filterHandler, tab);
-        }
-        store.dispatch(updateVis({ update: true, raw: rawVisualizations.getList() }));
-        return;
-      } catch (error) {
-        const options = {
-          context: `${VisFactoryHandler.name}.buildOverviewVisualizations`,
-          level: UI_LOGGER_LEVELS.ERROR,
-          severity: UI_ERROR_SEVERITIES.CRITICAL,
-          store: true,
-          error: {
-            error: error,
-            message: error.message || error,
-            title: error.name || error,
-          },
-        };
-        getErrorOrchestrator().handleError(options);
+    rawVisualizations.setType('general');
+    const $injector = getAngularModule().$injector;
+    const commonData = $injector.get('commonData');
+
+    try {
+      const currentPattern = AppState.getCurrentPattern();
+      const data =
+        tab !== 'sca'
+          ? await GenericRequest.request(
+              'GET',
+              `/elastic/visualizations/overview-${tab}/${currentPattern}`
+            )
+          : false;
+      data && rawVisualizations.assignItems(data.data.raw);
+      if (!fromDiscover) {
+        commonData.assignFilters(filterHandler, tab);
       }
-    //}
+      store.dispatch(updateVis({ update: true, raw: rawVisualizations.getList() }));
+      return;
+    } catch (error) {
+      const options = {
+        context: `${VisFactoryHandler.name}.buildOverviewVisualizations`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.UI,
+        store: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+      throw error;
+    }
   }
 
   /**
@@ -106,41 +105,42 @@ export class VisFactoryHandler {
    * @param {*} localChange
    * @param {*} id
    */
-  static async buildAgentsVisualizations(filterHandler, tab, subtab, id, fromDiscover = false){
+  static async buildAgentsVisualizations(filterHandler, tab, subtab, id, fromDiscover = false) {
     const rawVisualizations = new RawVisualizations();
-  //  if (rawVisualizations.getType() !== 'agents') {
-      rawVisualizations.setType('agents');
-      const $injector = getAngularModule().$injector;
-      const commonData = $injector.get('commonData');
+    //  if (rawVisualizations.getType() !== 'agents') {
+    rawVisualizations.setType('agents');
+    const $injector = getAngularModule().$injector;
+    const commonData = $injector.get('commonData');
 
-      try {
-        const data =
-          tab !== 'sca'
-            ? await GenericRequest.request(
-                'GET',
-                `/elastic/visualizations/agents-${tab}/${AppState.getCurrentPattern()}`
-              )
-            : false;
-        data && rawVisualizations.assignItems(data.data.raw);
-        if(!fromDiscover){
-          commonData.assignFilters(filterHandler, tab, id);
-        }
-        store.dispatch(updateVis({ update: true }));
-        return;
-      } catch (error) {
-        const options = {
-          context: `${VisFactoryHandler.name}.buildAgentsVisualizations`,
-          level: UI_LOGGER_LEVELS.ERROR,
-          severity: UI_ERROR_SEVERITIES.CRITICAL,
-          store: true,
-          error: {
-            error: error,
-            message: error.message || error,
-            title: error.name || error,
-          },
-        };
-        getErrorOrchestrator().handleError(options);
+    try {
+      const data =
+        tab !== 'sca'
+          ? await GenericRequest.request(
+              'GET',
+              `/elastic/visualizations/agents-${tab}/${AppState.getCurrentPattern()}`
+            )
+          : false;
+      data && rawVisualizations.assignItems(data.data.raw);
+      if (!fromDiscover) {
+        commonData.assignFilters(filterHandler, tab, id);
       }
+      store.dispatch(updateVis({ update: true }));
+      return;
+    } catch (error) {
+      const options = {
+        context: `${VisFactoryHandler.name}.buildAgentsVisualizations`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.UI,
+        store: true,
+        display: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+      throw error;
     }
-//  }
+  }
 }

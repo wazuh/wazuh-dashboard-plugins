@@ -209,7 +209,6 @@ export class SavedObject {
 
       return;
     } catch (error) {
-      console.log(error);
       return ((error || {}).data || {}).message || false
         ? error.data.message
         : error.message || error;

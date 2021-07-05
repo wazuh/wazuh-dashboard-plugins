@@ -34,7 +34,6 @@ export class ActionAgents {
       await WzRequest.apiReq('PUT', `/agents/${agentId}/upgrade`, {
         force: 1,
       });
-      console.log('Upgrading');
       this.showToast('success', 'Upgrading agent...', '', 5000);
     } catch (error) {
       const options = {
@@ -61,7 +60,7 @@ export class ActionAgents {
       (item) => item.outdated && item.status !== 'Disconnected'
     )) {
       try {
-        WzRequest.apiReq('PUT', `/agents/${item.id}/upgrade`, '1');
+        await WzRequest.apiReq('PUT', `/agents/${item.id}/upgrade`, '1');
         this.showToast('success', 'Upgrading selected agents...', '', 5000);
       } catch (error) {
         const options = {
