@@ -1,5 +1,5 @@
 /*
- * Wazuh app - React test for Reporting component.
+ * Wazuh app - React test for Group-Main component.
  *
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
@@ -12,9 +12,10 @@
  *
  */
 import React from 'react';
-import { mount } from 'enzyme';
+import { shallow } from 'enzyme';
 import WzGroups from './groups-main';
-import { Provider } from 'react-redux'
+import { Provider } from 'react-redux';
+import configureMockStore from 'redux-mock-store';
 
 jest.mock('../../../../../kibana-services', () => ({
   getAngularModule: jest.fn(),
@@ -24,15 +25,52 @@ jest.mock('../../../../../kibana-services', () => ({
     },
   }),
 }));
-const ReduxProvider = ({ children, reduxStore }) => (
-  <Provider store={reduxStore}>{children}</Provider>
-)//prueba
 
+const mockProps = {
+  section: 'groups',
+  groupsProps: {
+    items: [
+      {
+        name: 'default',
+        count: 1,
+        mergedSum: '2c45c95db2954d2c7d0ea533f09e81a5',
+        configSum: 'ab73af41699f13fdd81903b5f23d8d00',
+      },
+    ],
+    closeAddingAgents: false,
+    exportConfigurationProps: {
+      type: 'group',
+    },
+    selectedGroup: false,
+  },
+  configurationProps: {
+    agent: {
+      id: '000',
+    },
+  },
+  logtestProps: {
+    showClose: true,
+    onFlyout: true,
+  },
+  state: {
+    section: '',
+  },
+  clusterStatus: {
+    status: true,
+    contextConfigServer: 'cluster',
+  },
+};
+const mockStore = configureMockStore();
+const store = mockStore({});
 
-
-describe('Reporting component', () => {
+describe('Group main component', () => {
   it('renders correctly to match the snapshot', () => {
-    const wrapper = mount(<WzGroups />);
+    const wrapper = shallow(
+      <Provider store={store}>
+        <WzGroups {...mockProps} />
+      </Provider>
+    );
+
     expect(wrapper).toMatchSnapshot();
   });
 });
