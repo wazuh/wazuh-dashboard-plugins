@@ -119,7 +119,7 @@ jobs:
        run: |
          cd $GITHUB_WORKSPACE/wazuh-qa/tests/frontend/test_kibana_app/
          npm run cypress:run-headless         
-       continue-on-error: true
+     #  continue-on-error: true
 
      #- name: Step 12 - Copy test execution videos and screenshots
      #  run: |
