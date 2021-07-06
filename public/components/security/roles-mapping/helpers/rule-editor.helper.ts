@@ -123,7 +123,6 @@ const getFormatedRules = (rulesArray, internalUsers) => {
 };
 
 export const decodeJsonRule = (jsonRule, internalUsers) => {
-  const errorContext = 'decodeJsonRule';
   try {
     var wrongFormat = false;
     const ruleObject = JSON.parse(jsonRule);
@@ -150,7 +149,7 @@ export const decodeJsonRule = (jsonRule, internalUsers) => {
     };
   } catch (error) {
     const options = {
-      context: errorContext,
+      context: decodeJsonRule.name,
       level: UI_LOGGER_LEVELS.ERROR,
       severity: UI_ERROR_SEVERITIES.BUSINESS,
       store: true,
