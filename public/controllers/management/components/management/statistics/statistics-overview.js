@@ -267,7 +267,20 @@ export default compose(
           setLoading(true);
           const data = await WzRequest.genericReq('GET', '/elastic/statistics');
           setExistStatisticsIndices(data.data);
-        }catch(error){}
+        }catch(error){
+          setLoading(false);
+          const options = {
+            context: `${WzStatisticsOverview.name}.fetchData`,
+            level: UI_LOGGER_LEVELS.ERROR,
+            severity: UI_ERROR_SEVERITIES.BUSINESS,
+            error: {
+              error: error,
+              message: error.message || error,
+              title: `${error.name}: Error when fetching data`
+            },
+          };
+          getErrorOrchestrator().handleError(options);
+        }
         setLoading(false);
       };
   
