@@ -124,7 +124,7 @@ jobs:
        if: failure()
        uses: trymbill/cypress-slack-video-upload-action@v1.3.0
        with:
-        workdir: $GITHUB_WORKSPACE/wazuh-qa/tests/frontend/test_kibana_app/cypress
+        workdir: wazuh-qa/tests/frontend/test_kibana_app/cypress
         token: ${{ secrets.ACTIONS_SLACK_TOKEN }}
         channels: 'daily-app-team'
         message-text: 'Cypress tests failed! They have been placed in this thread, good luck.'
