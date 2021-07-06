@@ -11,16 +11,14 @@
  */
 
 import React from 'react';
-import { 
-  EuiEmptyPrompt
-} from '@elastic/eui'
+import { EuiEmptyPrompt } from '@elastic/eui';
 
-export const PromptAgentFeatureVersion = ({version = ''}: {version: string}) => {
+export const PromptAgentFeatureVersion = ({ version = '' }: { version: string }) => {
   return (
     <EuiEmptyPrompt
       iconType="watchesApp"
       title={<h2>{`Agent doesn't support this feature`}</h2>}
       body={`This feature is only avaliable for agents with ${version}.`}
     />
-  )
+  );
 };

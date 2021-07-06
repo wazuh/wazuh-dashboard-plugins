@@ -48,7 +48,7 @@ export class RulesetHandler {
       const result: any = await WzRequest.apiReq('GET', this.getResourcePath(), filters);
       return (result || {}).data || false ;
     } catch (error) {
-      return Promise.reject(error);
+      throw error
     }
   }
   
@@ -66,7 +66,7 @@ export class RulesetHandler {
       });
       return ((result || {}).data || '');      
     } catch (error) {
-      return Promise.reject(error);
+      throw error;
     }
   }
 
@@ -87,7 +87,7 @@ export class RulesetHandler {
       });
       return result;
     } catch (error) {
-      return Promise.reject(error);
+      throw error;
     }
   }
   
@@ -103,7 +103,7 @@ export class RulesetHandler {
       const result = await WzRequest.apiReq('DELETE', fullPath, {});
       return result;
     } catch (error) {
-      return Promise.reject(error);
+      throw error;
     }
   }
 

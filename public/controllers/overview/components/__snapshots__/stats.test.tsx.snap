@@ -1,0 +1,356 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Stats component renders correctly to match the snapshot 1`] = `
+<Component>
+  <ErrorBoundary>
+    <withErrorBoundary(Stats)>
+      <EuiPage>
+        <div
+          className="euiPage"
+        >
+          <EuiFlexGroup>
+            <div
+              className="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+            >
+              <EuiFlexItem>
+                <div
+                  className="euiFlexItem"
+                />
+              </EuiFlexItem>
+              <EuiFlexItem>
+                <div
+                  className="euiFlexItem"
+                >
+                  <EuiStat
+                    description="Total agents"
+                    textAlign="center"
+                    title={
+                      <EuiToolTip
+                        content="Go to all agents"
+                        delay="regular"
+                        position="top"
+                      >
+                        <span
+                          className="statWithLink"
+                          onClick={[Function]}
+                          style={
+                            Object {
+                              "cursor": "pointer",
+                            }
+                          }
+                        />
+                      </EuiToolTip>
+                    }
+                    titleColor="primary"
+                  >
+                    <div
+                      className="euiStat euiStat--centerAligned"
+                    >
+                      <EuiText
+                        className="euiStat__description"
+                        size="s"
+                      >
+                        <div
+                          className="euiText euiText--small euiStat__description"
+                        >
+                          <p
+                            aria-hidden={true}
+                          >
+                            Total agents
+                          </p>
+                        </div>
+                      </EuiText>
+                      <EuiTitle
+                        className="euiStat__title euiStat__title--primary"
+                        size="l"
+                      >
+                        <p
+                          aria-hidden={true}
+                          className="euiTitle euiTitle--large euiStat__title euiStat__title--primary"
+                        >
+                          <EuiToolTip
+                            content="Go to all agents"
+                            delay="regular"
+                            position="top"
+                          >
+                            <span
+                              className="euiToolTipAnchor"
+                              onKeyUp={[Function]}
+                              onMouseOut={[Function]}
+                              onMouseOver={[Function]}
+                            >
+                              <span
+                                className="statWithLink"
+                                onBlur={[Function]}
+                                onClick={[Function]}
+                                onFocus={[Function]}
+                                style={
+                                  Object {
+                                    "cursor": "pointer",
+                                  }
+                                }
+                              />
+                            </span>
+                          </EuiToolTip>
+                        </p>
+                      </EuiTitle>
+                    </div>
+                  </EuiStat>
+                </div>
+              </EuiFlexItem>
+              <EuiFlexItem>
+                <div
+                  className="euiFlexItem"
+                >
+                  <EuiStat
+                    description="Active agents"
+                    textAlign="center"
+                    title={
+                      <EuiToolTip
+                        content="Go to active agents"
+                        delay="regular"
+                        position="top"
+                      >
+                        <span
+                          className="statWithLink"
+                          onClick={[Function]}
+                          style={
+                            Object {
+                              "cursor": "pointer",
+                            }
+                          }
+                        />
+                      </EuiToolTip>
+                    }
+                    titleColor="secondary"
+                  >
+                    <div
+                      className="euiStat euiStat--centerAligned"
+                    >
+                      <EuiText
+                        className="euiStat__description"
+                        size="s"
+                      >
+                        <div
+                          className="euiText euiText--small euiStat__description"
+                        >
+                          <p
+                            aria-hidden={true}
+                          >
+                            Active agents
+                          </p>
+                        </div>
+                      </EuiText>
+                      <EuiTitle
+                        className="euiStat__title euiStat__title--secondary"
+                        size="l"
+                      >
+                        <p
+                          aria-hidden={true}
+                          className="euiTitle euiTitle--large euiStat__title euiStat__title--secondary"
+                        >
+                          <EuiToolTip
+                            content="Go to active agents"
+                            delay="regular"
+                            position="top"
+                          >
+                            <span
+                              className="euiToolTipAnchor"
+                              onKeyUp={[Function]}
+                              onMouseOut={[Function]}
+                              onMouseOver={[Function]}
+                            >
+                              <span
+                                className="statWithLink"
+                                onBlur={[Function]}
+                                onClick={[Function]}
+                                onFocus={[Function]}
+                                style={
+                                  Object {
+                                    "cursor": "pointer",
+                                  }
+                                }
+                              />
+                            </span>
+                          </EuiToolTip>
+                        </p>
+                      </EuiTitle>
+                    </div>
+                  </EuiStat>
+                </div>
+              </EuiFlexItem>
+              <EuiFlexItem>
+                <div
+                  className="euiFlexItem"
+                >
+                  <EuiStat
+                    description="Disconnected agents"
+                    textAlign="center"
+                    title={
+                      <EuiToolTip
+                        content="Go to disconnected agents"
+                        delay="regular"
+                        position="top"
+                      >
+                        <span
+                          className="statWithLink"
+                          onClick={[Function]}
+                          style={
+                            Object {
+                              "cursor": "pointer",
+                            }
+                          }
+                        />
+                      </EuiToolTip>
+                    }
+                    titleColor="danger"
+                  >
+                    <div
+                      className="euiStat euiStat--centerAligned"
+                    >
+                      <EuiText
+                        className="euiStat__description"
+                        size="s"
+                      >
+                        <div
+                          className="euiText euiText--small euiStat__description"
+                        >
+                          <p
+                            aria-hidden={true}
+                          >
+                            Disconnected agents
+                          </p>
+                        </div>
+                      </EuiText>
+                      <EuiTitle
+                        className="euiStat__title euiStat__title--danger"
+                        size="l"
+                      >
+                        <p
+                          aria-hidden={true}
+                          className="euiTitle euiTitle--large euiStat__title euiStat__title--danger"
+                        >
+                          <EuiToolTip
+                            content="Go to disconnected agents"
+                            delay="regular"
+                            position="top"
+                          >
+                            <span
+                              className="euiToolTipAnchor"
+                              onKeyUp={[Function]}
+                              onMouseOut={[Function]}
+                              onMouseOver={[Function]}
+                            >
+                              <span
+                                className="statWithLink"
+                                onBlur={[Function]}
+                                onClick={[Function]}
+                                onFocus={[Function]}
+                                style={
+                                  Object {
+                                    "cursor": "pointer",
+                                  }
+                                }
+                              />
+                            </span>
+                          </EuiToolTip>
+                        </p>
+                      </EuiTitle>
+                    </div>
+                  </EuiStat>
+                </div>
+              </EuiFlexItem>
+              <EuiFlexItem>
+                <div
+                  className="euiFlexItem"
+                >
+                  <EuiStat
+                    description="Never connected agents"
+                    textAlign="center"
+                    title={
+                      <EuiToolTip
+                        content="Go to never connected agents"
+                        delay="regular"
+                        position="top"
+                      >
+                        <span
+                          className="statWithLink"
+                          onClick={[Function]}
+                          style={
+                            Object {
+                              "cursor": "pointer",
+                            }
+                          }
+                        />
+                      </EuiToolTip>
+                    }
+                    titleColor="subdued"
+                  >
+                    <div
+                      className="euiStat euiStat--centerAligned"
+                    >
+                      <EuiText
+                        className="euiStat__description"
+                        size="s"
+                      >
+                        <div
+                          className="euiText euiText--small euiStat__description"
+                        >
+                          <p
+                            aria-hidden={true}
+                          >
+                            Never connected agents
+                          </p>
+                        </div>
+                      </EuiText>
+                      <EuiTitle
+                        className="euiStat__title euiStat__title--subdued"
+                        size="l"
+                      >
+                        <p
+                          aria-hidden={true}
+                          className="euiTitle euiTitle--large euiStat__title euiStat__title--subdued"
+                        >
+                          <EuiToolTip
+                            content="Go to never connected agents"
+                            delay="regular"
+                            position="top"
+                          >
+                            <span
+                              className="euiToolTipAnchor"
+                              onKeyUp={[Function]}
+                              onMouseOut={[Function]}
+                              onMouseOver={[Function]}
+                            >
+                              <span
+                                className="statWithLink"
+                                onBlur={[Function]}
+                                onClick={[Function]}
+                                onFocus={[Function]}
+                                style={
+                                  Object {
+                                    "cursor": "pointer",
+                                  }
+                                }
+                              />
+                            </span>
+                          </EuiToolTip>
+                        </p>
+                      </EuiTitle>
+                    </div>
+                  </EuiStat>
+                </div>
+              </EuiFlexItem>
+              <EuiFlexItem>
+                <div
+                  className="euiFlexItem"
+                />
+              </EuiFlexItem>
+            </div>
+          </EuiFlexGroup>
+        </div>
+      </EuiPage>
+    </withErrorBoundary(Stats)>
+  </ErrorBoundary>
+</Component>
+`;

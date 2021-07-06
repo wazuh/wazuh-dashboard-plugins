@@ -1,5 +1,6 @@
 /*
- * Wazuh app - Prompt when an agent doesn't support some module
+ * Wazuh app - React test for Stats component.
+ *
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -8,11 +9,17 @@
  * (at your option) any later version.
  *
  * Find more information about this on the LICENSE file.
+ *
  */
 
 import React from 'react';
-import { PromptSelectAgent } from './';
+import { mount } from 'enzyme';
+import { Stats } from './stats';
 
-export const PromptAgentNoSupportModule = () => {
-  return <PromptSelectAgent title="Module not supported by the agent" />;
-};
+describe('Stats component', () => {
+  it('renders correctly to match the snapshot', () => {
+    const wrapper = mount(<Stats />);
+
+    expect(wrapper).toMatchSnapshot();
+  });
+});

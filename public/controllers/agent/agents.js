@@ -35,7 +35,6 @@ import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
 
-const errorContext = 'AgentsController';
 export class AgentsController {
   /**
    * Class constructor
@@ -230,7 +229,7 @@ export class AgentsController {
         this.$scope.restartingAgent = false;
       } catch (error) {
         const options = {
-          context: errorContext,
+          context: `${AgentsController.name}.restartAgent`,
           level: UI_LOGGER_LEVELS.ERROR,
           severity: UI_ERROR_SEVERITIES.BUSINESS,
           store: true,
@@ -251,7 +250,7 @@ export class AgentsController {
       this.$scope.getAgent();
     } catch (error) {
       const options = {
-        context: errorContext,
+        context: `${AgentsController.name}.$onInit`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         store: true,
@@ -283,7 +282,7 @@ export class AgentsController {
         }
       } catch (error) {
         const options = {
-          context: errorContext,
+          context: `${AgentsController.name}.switchConfigTab`,
           level: UI_LOGGER_LEVELS.ERROR,
           severity: UI_ERROR_SEVERITIES.BUSINESS,
           store: true,
@@ -412,7 +411,7 @@ export class AgentsController {
         this.$scope.$applyAsync();
       } catch (error) {
         const options = {
-          context: errorContext,
+          context: `${AgentsController.name}.confirmAddGroup`,
           level: UI_LOGGER_LEVELS.ERROR,
           severity: UI_ERROR_SEVERITIES.BUSINESS,
           store: true,
@@ -577,7 +576,7 @@ export class AgentsController {
       this.$scope.$applyAsync();
     } catch (error) {
       const options = {
-        context: errorContext,
+        context: `${AgentsController.name}.switchTab`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.CRITICAL,
         store: true,
@@ -694,7 +693,7 @@ export class AgentsController {
       this.showToast('success', 'The agent is being upgrade.', '', 5000);
     } catch (error) {
       const options = {
-        context: errorContext,
+        context: `${AgentsController.name}.onClickUpgrade`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         store: true,
@@ -714,7 +713,7 @@ export class AgentsController {
       this.showToast('success', 'Agent restarted.', '', 5000);
     } catch (error) {
       const options = {
-        context: errorContext,
+        context: `${AgentsController.name}.onClickRestart`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         store: true,
@@ -892,7 +891,7 @@ export class AgentsController {
       return text + formatUIDate(time);
     } catch (error) {
       const options = {
-        context: errorContext,
+        context: `${AgentsController.name}.offsetTimestamp`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         store: false,
@@ -974,7 +973,7 @@ export class AgentsController {
       );
     } catch (error) {
       const options = {
-        context: errorContext,
+        context: `${AgentsController.name}.launchRootcheckScan`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         store: true,
@@ -986,7 +985,6 @@ export class AgentsController {
       };
       getErrorOrchestrator().handleError(options);
     }
-    return;
   }
 
   async launchSyscheckScan() {
@@ -1003,7 +1001,7 @@ export class AgentsController {
       ErrorHandler.info(`FIM scan launched successfully on agent ${this.$scope.agent.id}`, '');
     } catch (error) {
       const options = {
-        context: errorContext,
+        context: `${AgentsController.name}.launchSyscheckScan`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         store: true,
@@ -1015,7 +1013,6 @@ export class AgentsController {
       };
       getErrorOrchestrator().handleError(options);
     }
-    return;
   }
 
   falseAllExpand() {
