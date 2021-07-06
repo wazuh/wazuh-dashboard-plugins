@@ -121,8 +121,6 @@ export const Logtest = compose(
         }
       );
       setTestResult(testResults);
-    }catch (error) {
-      console.error(error);
     } finally {
       setTesting(false);
     }
