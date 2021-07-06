@@ -168,12 +168,11 @@ export class WzStatusOverview extends Component {
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         error: {
           error: error,
-          message: `management:status:overview.fetchData ${error.message || error}`,
-          title: error.name || error,
+          message: error.message || error,
+          title: `${error.name}: management:status:overview`
         },
       };
       getErrorOrchestrator().handleError(options);
-
     }
     this.props.updateLoadingStatus(false);
   }

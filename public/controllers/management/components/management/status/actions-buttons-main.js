@@ -83,8 +83,8 @@ class WzStatusActionButtons extends Component {
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         error: {
           error: error,
-          message: `Error restarting cluster: ${error.message || error}`,
-          title: error.name || error,
+          message: error.message || error,
+          title: `${error.name}: Error restarting cluster`,
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -108,8 +108,8 @@ class WzStatusActionButtons extends Component {
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         error: {
           error: error,
-          message: `Error restarting manager: ${error.message || error}`,
-          title: error.name || error,
+          message: error.message || error,
+          title: `${error.name}: Error restarting manager`,
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -166,8 +166,8 @@ class WzStatusActionButtons extends Component {
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         error: {
           error: error,
-          message: `Node ${node} is down: ${error.message || error}`,
-          title: error.name || error,
+          message: error.message || error,
+          title: `${error.name}: Node ${node} is down`
         },
       };
       getErrorOrchestrator().handleError(options);
