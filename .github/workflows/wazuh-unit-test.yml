@@ -18,10 +18,13 @@ jobs:
     steps:
       - name: Step 01 - Download Project wazuh-app
         uses: actions/checkout@v2
-      - name: Step 02 - Install dependencies
+      - name: Step 02 - Setup node version
+        uses: actions/setup-node@v2
+        with:
+          node-version: '10.23.1'
+      - name: Step 03 - Install dependencies
         run: |
-          nvm use
           npm install
-      - name: Step 03 - Run unit test
+      - name: Step 04 - Run Unit Test
         run: |
           npm run test:jest
