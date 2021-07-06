@@ -120,7 +120,14 @@ jobs:
          cd $GITHUB_WORKSPACE/wazuh-qa/tests/frontend/test_kibana_app/
          npm run cypress:run-headless         
      #  continue-on-error: true
-
+     - name: 'Upload screenshots and videos to Slack'
+       if: failure()
+       uses: trymbill/cypress-slack-video-upload-action@v1.3.0
+       with:
+        workdir: $GITHUB_WORKSPACE/wazuh-qa/tests/frontend/test_kibana_app/cypress
+        token: ${{ secrets.ACTIONS_SLACK_TOKEN }}
+        channels: 'daily-app-team'
+        message-text: 'Cypress tests failed! They have been placed in this thread, good luck.'
      #- name: Step 12 - Copy test execution videos and screenshots
      #  run: |
      #     mkdir -p public/videos
