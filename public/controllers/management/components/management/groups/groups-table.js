@@ -29,7 +29,6 @@ import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 
-const errorContext = 'WzGroupsTable';
 
 import {
   updateLoadingStatus,
@@ -112,7 +111,7 @@ class WzGroupsTable extends Component {
         this.props.updateLoadingStatus(false);
         this.props.state.isProcessing && this.props.updateIsProcessing(false);
         const options = {
-          context: errorContext,
+          context: `${WzGroupsTable.name}.getItems`,
           level: UI_LOGGER_LEVELS.ERROR,
           severity: UI_ERROR_SEVERITIES.CRITICAL,
           store: true,

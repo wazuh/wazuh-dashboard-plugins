@@ -30,7 +30,6 @@ import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 
-const errorContext = 'WzGroupFilesTable';
 
 class WzGroupFilesTable extends Component {
   _isMounted = false;
@@ -90,7 +89,7 @@ class WzGroupFilesTable extends Component {
     } catch (error) {
       this.props.state.isProcessing && this.props.updateIsProcessing(false);
       const options = {
-        context: errorContext,
+        context: `${WzGroupFilesTable.name}.getItems`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.CRITICAL,
         store: true,

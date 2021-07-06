@@ -15,7 +15,6 @@ import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
 
-const errorContext = 'GroupsHandler';
 export default class GroupsHandler {
   /**
    * Save a new group
@@ -46,7 +45,7 @@ export default class GroupsHandler {
       return result;
     } catch (error) {
       const options = {
-        context: errorContext,
+        context: `${GroupsHandler.name}.deleteGroup`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         store: true,
@@ -84,7 +83,7 @@ export default class GroupsHandler {
       return result;
     } catch (error) {
       const options = {
-        context: errorContext,
+        context: `${GroupsHandler.name}.agentsGroup`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         store: true,
@@ -134,7 +133,7 @@ export default class GroupsHandler {
       return (result || {}).data || false;
     } catch (error) {
       const options = {
-        context: errorContext,
+        context: `${GroupsHandler.name}.getFileContent`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         store: true,

@@ -37,7 +37,6 @@ import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 
-const errorContext = 'WzGroupsActionButtons';
 
 class WzGroupsActionButtons extends Component {
   _isMounted = false;
@@ -78,7 +77,7 @@ class WzGroupsActionButtons extends Component {
       this.onRefreshLoading();
     } catch (error) {
       const options = {
-        context: errorContext,
+        context: `${WzGroupsActionButtons.name}.refresh`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         store: true,
@@ -153,7 +152,7 @@ class WzGroupsActionButtons extends Component {
       }, 150);
     } catch (error) {
       const options = {
-        context: errorContext,
+        context: `${WzGroupsActionButtons.name}.bindEnterToInput`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         store: true,
@@ -201,7 +200,7 @@ class WzGroupsActionButtons extends Component {
       );
     } catch (error) {
       const options = {
-        context: errorContext,
+        context: `${WzGroupsActionButtons.name}.generateCsv`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         store: true,

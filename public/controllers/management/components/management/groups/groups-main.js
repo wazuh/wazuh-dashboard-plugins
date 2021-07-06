@@ -29,7 +29,6 @@ import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 
-const errorContext = 'WzGroups';
 
 class WzGroups extends Component {
   constructor(props) {
@@ -58,7 +57,7 @@ class WzGroups extends Component {
         this.props.updateGroupDetail(dataGroup);
       }catch(error){
         const options = {
-          context: errorContext,
+          context: `${WzGroups.name}.componentDidMount`,
           level: UI_LOGGER_LEVELS.ERROR,
           severity: UI_ERROR_SEVERITIES.CRITICAL,
           store: true,

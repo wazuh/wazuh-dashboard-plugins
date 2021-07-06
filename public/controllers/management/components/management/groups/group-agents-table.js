@@ -36,7 +36,6 @@ import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 
-const errorContext = 'WzGroupAgentsTable';
 
 class WzGroupAgentsTable extends Component {
   _isMounted = false;
@@ -283,7 +282,7 @@ class WzGroupAgentsTable extends Component {
       this.showToast('success', 'Success', 'Deleted successfully', 3000);
     } catch (error) {
       const options = {
-        context: errorContext,
+        context: `${WzGroupAgentsTable.name}.removeItems`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         store: true,
