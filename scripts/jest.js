@@ -13,7 +13,6 @@
 const path = require('path');
 
 process.argv.push('--config', path.resolve(__dirname, '../jest.config.ts'));
-require('../../../src/setup_node_env');
 
 const jest = require('../node_modules/jest');
 jest.run(process.argv.slice(2));
