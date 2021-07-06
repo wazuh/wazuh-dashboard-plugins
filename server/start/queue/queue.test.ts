@@ -5,7 +5,7 @@ import { addJobToQueue, jobQueueRun, queue } from './index';
 
 jest.setTimeout(60000); // Set jest timeout to 60000ms to allow the job is run and removed from queue
 
-describe('Queue jobs', () => {
+describe.skip('Queue jobs', () => {
   it('Add job to queue', () => {
     addJobToQueue({
       startAt: new Date(new Date().getTime() + 15000),
