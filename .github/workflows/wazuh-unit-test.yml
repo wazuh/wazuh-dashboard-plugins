@@ -32,4 +32,6 @@ jobs:
         with:
           coverage-comment: true
           test-command: "npm run test:jest"
+      - name: Step 05 - Publish Unit Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v1.18
 
