@@ -79,7 +79,7 @@ class WzGroupsActionButtonsFiles extends Component {
         error: {
           error: error,
           message: error.message || error,
-          title: error.message || error,
+          title: error.name || error,
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -221,7 +221,7 @@ class WzGroupsActionButtonsFiles extends Component {
         error: {
           error: error,
           message: error.message || error,
-          title: error.message || error,
+          title: error.name || error,
         },
       };
       getErrorOrchestrator().handleError(options);
