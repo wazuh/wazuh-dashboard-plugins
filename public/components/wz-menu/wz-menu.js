@@ -270,8 +270,6 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
 
       if (newPattern?.id === 'selectIndexPatternBar') {
         this.updatePatternAndApi();
-      } else {
-        this.switchMenuOpened();
       }
     } catch (error) {
       this.showToast('danger', 'Error', error, 4000);
@@ -320,9 +318,6 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
       AppState.setCurrentAPI(
         JSON.stringify({ name: apiData[0].manager, id: apiId.value })
       );
-      if (apiId?.id !== 'selectAPIBar') {
-        this.switchMenuOpened();
-      }
 
       if (this.state.currentMenuTab !== 'wazuh-dev') {
         this.router.reload();
