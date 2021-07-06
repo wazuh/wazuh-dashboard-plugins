@@ -45,7 +45,6 @@ import { getErrorOrchestrator } from '../../react-services/common-services';
 
 const visHandler = new VisHandlers();
 
-const errorContext = 'WzVisualize';
 export const WzVisualize = compose (withErrorBoundary,withReduxProvider) (class WzVisualize extends Component {
   _isMount = false;
   constructor(props) {
@@ -110,7 +109,7 @@ export const WzVisualize = compose (withErrorBoundary,withReduxProvider) (class 
       this._isMount && this.setState({ thereAreSampleAlerts });
     } catch (error) {
       const options = {
-        context: errorContext,
+        context: `${WzVisualize.name}.componentDidMount`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.UI,
         error: {
@@ -119,7 +118,6 @@ export const WzVisualize = compose (withErrorBoundary,withReduxProvider) (class 
           title: error.name || error,
         },
       };
-
       getErrorOrchestrator().handleError(options);
     }
   }
@@ -154,7 +152,7 @@ export const WzVisualize = compose (withErrorBoundary,withReduxProvider) (class 
       } catch (error) {
         this.setState({ isRefreshing: false });
         const options = {
-          context: errorContext,
+          context: `${WzVisualize.name}.refreshKnownFields`,
           level: UI_LOGGER_LEVELS.ERROR,
           severity: UI_ERROR_SEVERITIES.BUSINESS,
           error: {
