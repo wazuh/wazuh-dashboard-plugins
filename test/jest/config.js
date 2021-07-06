@@ -42,6 +42,7 @@ export default {
     'json',
     'ts',
     'tsx',
+    'html'
   ],
   modulePathIgnorePatterns: [
     '__fixtures__/',
@@ -54,6 +55,7 @@ export default {
   transform: {
     '^.+\\.js$': `${kbnDir}/src/dev/jest/babel_transform.js`,
     '^.+\\.tsx?$': `${kbnDir}/src/dev/jest/babel_transform.js`,
+    '^.+\\.html?$': `${kbnDir}/src/dev/jest/babel_transform.js`,
   },
   transformIgnorePatterns: [
     '[/\\\\]node_modules[/\\\\].+\\.js$',
