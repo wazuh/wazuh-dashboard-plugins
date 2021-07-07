@@ -45,7 +45,11 @@ jobs:
         run: |
           cd kibana/plugins/wazuh-kibana-app/
           yarn install
-      - name: Step 07 - Run Unit Test
+      - name: Step 07 - Setup node for Jest
+        uses: actions/setup-node@v2
+        with:
+          node-version: '10.23.1'
+      - name: Step 08 - Run Unit Test
         run: |
           cd kibana/plugins/wazuh-kibana-app/
           npm run test:jest
