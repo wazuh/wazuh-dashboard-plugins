@@ -56,6 +56,8 @@ export const Logtest = compose(
   };
 
   const formatResult = (result, alert) => {
+    console.log(result);
+    
     let returnedDataFormatted =`**Phase 1: Completed pre-decoding. \n    ` +
     `full event:  ${result.full_log || '-'}  \n    ` +
     `timestamp: ${(result.predecoder || '').timestamp || '-'} \n    ` +
@@ -64,11 +66,11 @@ export const Logtest = compose(
     `**Phase 2: Completed decoding. \n    ` +
     `name: ${(result.decoder || '').name || '-'} \n    ` +
     `${(result.decoder || '').parent ? `parent: ${(result.decoder || '').parent} \n    ` : ''}` +
-    `data: ${JSON.stringify(result.data || '-', null, 6).replace('}', '    }')} \n\n` +
-    `**Phase 3: Completed filtering (rules). \n    ` ;
+    `data: ${JSON.stringify(result.data || '-', null, 6).replace('}', '    }')} \n\n` ;
     
-      result.rule && (
-        returnedDataFormatted += `id: ${(result.rule || '').id || '-'} \n    ` +
+    result.rule && (
+        returnedDataFormatted += `**Phase 3: Completed filtering (rules). \n    ` +
+        `id: ${(result.rule || '').id || '-'} \n    ` +
         `level: ${(result.rule || '').level || '-'} \n    ` +
         `description: ${(result.rule || '').description || '-'} \n    ` +
         `groups: ${JSON.stringify((result.rule || '').groups || '-')} \n    ` +
@@ -84,7 +86,7 @@ export const Logtest = compose(
         `tsc: ${JSON.stringify((result.rule || '').tsc || '-')} \n` 
       );
 
-      returnedDataFormatted += `${alert ? `**Alert to be generated. \n\n\n` : '\n\n'}`
+      returnedDataFormatted += `${alert ? `**Alert to be generated. \n\n\n` : '\n\n'}`      
     return (
       returnedDataFormatted
     );
@@ -112,14 +114,11 @@ export const Logtest = compose(
         responses.push(response);
       };
       const testResults = responses.map((response) => {
-        console.log();
-        
-          // response.data.data.output.rule || '' 
-          response.data.data.output || '' 
-            ? formatResult(response.data.data.output, response.data.data.alert)
-            : `No result found for: ${response.data.data.output.full_log} \n\n\n`
-        }
-      );
+        return response.data.data.output || '' 
+        ? formatResult(response.data.data.output, response.data.data.alert)
+        : `No result found for: ${response.data.data.output.full_log} \n\n\n`
+      }
+      );      
       setTestResult(testResults);
     } finally {
       setTesting(false);
