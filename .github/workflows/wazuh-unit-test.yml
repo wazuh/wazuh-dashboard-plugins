@@ -42,8 +42,8 @@ jobs:
           node-version: '12.22.3'
       - name: Step 05 - Install dependencies of wazuh
         run: |
-          ls
-          cd $GITHUB_WORKSPACE/kibana/plugins/wazuh-kibana-app/
+          ls kibana/plugins
+          cd kibana/plugins/wazuh-kibana-app/
           yarn install
       - name: Step 06 - Run Unit Test
         uses: artiomtr/jest-coverage-report-action@v2.0-rc.1
