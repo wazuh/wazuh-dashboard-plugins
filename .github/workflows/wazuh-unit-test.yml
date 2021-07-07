@@ -26,15 +26,9 @@ jobs:
         run: |
           yarn install
       - name: Step 04 - Run Unit Test
-        uses: mattallty/jest-github-action@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          coverage-comment: true
-          test-command: 'yarn run test:jest wz-user-permissions.test.ts'
-      - name: Step 05 - Publish Unit Test Results
         uses: artiomtr/jest-coverage-report-action@v2.0-rc.1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          threshold: 0 # value in percents
-
+          package-manager: yarn
+          test-script: 'yarn run test:jest wz-user-permissions.test.ts'
+          threshold: 0.9 # value in percents'
