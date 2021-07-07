@@ -28,9 +28,13 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Refactored all try catch strategy on Controller/Agent section [#3398](https://github.com/wazuh/wazuh-kibana-app/issues/3398)
 - Refactored all try catch value of context for ErrorOrchestrator service. [#3432](https://github.com/wazuh/wazuh-kibana-app/issues/3432)
 <<<<<<< HEAD
+<<<<<<< HEAD
 - Refactored all try catch strategy on Controller/Groups section [#3415](https://github.com/wazuh/wazuh-kibana-app/issues/3415)
 =======
 >>>>>>> Changed all context value of all try-catch implementations (#3432)
+=======
+- Refactored all try catch strategy on Controller/Groups section [#3415](https://github.com/wazuh/wazuh-kibana-app/issues/3415)
+>>>>>>> Implement try catch strategy in Groups (#3415)
 
 ### Fixed
 
