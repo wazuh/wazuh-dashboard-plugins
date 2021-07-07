@@ -14,6 +14,7 @@ import React, { Component } from 'react';
 import {
   Direction,
   EuiOverlayMask,
+  EuiOutsideClickDetector,
 } from '@elastic/eui';
 import { FlyoutDetail } from './flyout';
 import { filtersToObject, IFilter, IWzSuggestItem } from '../../../wz-search-bar';
@@ -163,18 +164,18 @@ export class InventoryTable extends Component {
       <div className='wz-inventory'>
         {table}
         {this.state.isFlyoutVisible &&
-          <EuiOverlayMask
-            headerZindexLocation="below"
-            onClick={() => this.closeFlyout() } >
-            <FlyoutDetail
-              vulName={this.state.currentItem.cve}
-              agentId={this.props.agent.id}
-              item={this.state.currentItem}
-              closeFlyout={() => this.closeFlyout()}
-              type='vulnerability'
-              view='inventory'
-              showViewInEvents={true}
-              {...this.props} />
+          <EuiOverlayMask headerZindexLocation="below">
+            <EuiOutsideClickDetector onOutsideClick={() => { this.closeFlyout() }}>
+              <FlyoutDetail
+                vulName={this.state.currentItem.cve}
+                agentId={this.props.agent.id}
+                item={this.state.currentItem}
+                closeFlyout={() => this.closeFlyout()}
+                type='vulnerability'
+                view='inventory'
+                showViewInEvents={true}
+                {...this.props} />
+            </EuiOutsideClickDetector>
           </EuiOverlayMask>
         }
       </div>

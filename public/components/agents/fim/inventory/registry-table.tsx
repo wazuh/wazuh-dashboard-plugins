@@ -17,6 +17,7 @@ import {
   EuiFlexItem,
   EuiBasicTable,
   EuiOverlayMask,
+  EuiOutsideClickDetector,
   Direction
 } from '@elastic/eui';
 import { i18n } from '@kbn/i18n';
@@ -241,18 +242,17 @@ export class RegistryTable extends Component {
       <div>
         {registryTable}
         {this.state.isFlyoutVisible && (
-          <EuiOverlayMask
-            headerZindexLocation="below"
-            onClick={() => this.closeFlyout()}
-          >
-            <FlyoutDetail
-              fileName={this.state.currentFile.file}
-              agentId={this.props.agent.id}
-              item={this.state.syscheckItem}
-              closeFlyout={() => this.closeFlyout()}
-              type= {this.state.currentFile.type}
-              view='inventory'
-              {...this.props} />
+          <EuiOverlayMask headerZindexLocation="below">
+            <EuiOutsideClickDetector onOutsideClick={() => { this.closeFlyout() }}>
+              <FlyoutDetail
+                fileName={this.state.currentFile.file}
+                agentId={this.props.agent.id}
+                item={this.state.syscheckItem}
+                closeFlyout={() => this.closeFlyout()}
+                type={this.state.currentFile.type}
+                view='inventory'
+                {...this.props} />
+            </EuiOutsideClickDetector>
           </EuiOverlayMask>
         )}
       </div>

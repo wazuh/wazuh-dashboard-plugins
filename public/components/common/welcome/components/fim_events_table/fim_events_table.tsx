@@ -22,7 +22,8 @@ import {
   EuiButtonIcon,
   EuiFlexGroup,
   EuiToolTip,
-  EuiOverlayMask
+  EuiOverlayMask,
+  EuiOutsideClickDetector,
 } from '@elastic/eui'
 // @ts-ignore
 import store from '../../../../../redux/store';
@@ -87,16 +88,15 @@ function FimTable({ agent }) {
         itemId="fim-alerts"
         noItemsMessage="No recent events" />
         {isOpen && (
-          <EuiOverlayMask
-            headerZindexLocation="below"
-            onClick={() => setIsOpen(false)}
-          >
-            <FlyoutDetail
-            agentId={agent.id}
-            closeFlyout={() => setIsOpen(false)}
-            fileName={file}
-            view='extern'
-            {...{agent}} />
+          <EuiOverlayMask headerZindexLocation="below">
+            <EuiOutsideClickDetector onOutsideClick={() => setIsOpen(false)}>
+              <FlyoutDetail
+                agentId={agent.id}
+                closeFlyout={() => setIsOpen(false)}
+                fileName={file}
+                view='extern'
+                {...{ agent }} />
+            </EuiOutsideClickDetector>
           </EuiOverlayMask>
         )}
     </Fragment>

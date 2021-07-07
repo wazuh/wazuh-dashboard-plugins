@@ -14,6 +14,7 @@ import {
     EuiBadge,
     EuiComboBox,
     EuiOverlayMask,
+    EuiOutsideClickDetector,
     EuiConfirmModal
 } from '@elastic/eui';
 
@@ -134,82 +135,68 @@ export const EditRole = ({ role, closeFlyout }) => {
     );
   }
 
-  return (
-    <>
-      <WzOverlayMask
-        headerZindexLocation="below"
-        onClick={() => {
-          if (initialSelectedPolicies.length != selectedPolicies.length) {
-            setIsModalVisible(true);
-          } else {
-            closeFlyout(false);
-          }
-        }}
-      >
-        <EuiFlyout
-          className="wzApp"
-          onClose={() => {
-            if (initialSelectedPolicies.length != selectedPolicies.length) {
-              setIsModalVisible(true);
-            } else {
-              closeFlyout(false);
-            }
-          }}
-        >
-          <EuiFlyoutHeader hasBorder={false}>
-            <EuiTitle size="m">
-              <h2>
-                Edit {role.name} role &nbsp;
-                {isReserved && <EuiBadge color="primary">Reserved</EuiBadge>}
-              </h2>
-            </EuiTitle>
-          </EuiFlyoutHeader>
-          <EuiFlyoutBody>
-            <EuiForm component="form" style={{ padding: 24 }}>
-              <EuiFlexGroup>
-                <EuiFlexItem grow={true}>
-                  <EuiFormRow
-                    label="Policies"
-                    isInvalid={selectedPoliciesError}
-                    error={'At least one policy must be selected.'}
-                    helpText="Assign policies to the role."
-                  >
-                    <EuiComboBox
-                      placeholder="Select policies"
-                      options={policies}
-                      isDisabled={isReserved}
-                      selectedOptions={selectedPolicies}
-                      onChange={onChangePolicies}
-                      isClearable={true}
-                      data-test-subj="demoComboBox"
-                    />
-                  </EuiFormRow>
-                </EuiFlexItem>
-                <EuiFlexItem grow={true}>
-                  <EuiButton
-                    style={{ marginTop: 20, maxWidth: 45 }}
-                    isDisabled={isReserved}
-                    fill
-                    onClick={addPolicy}
-                  >
-                    Add policy
-                  </EuiButton>
-                </EuiFlexItem>
-              </EuiFlexGroup>
+  const onClose = () => { (initialSelectedPolicies.length != selectedPolicies.length) ? setIsModalVisible(true) : closeFlyout(false) };
 
-              <EuiSpacer />
-            </EuiForm>
-            <div style={{ margin: 20 }}>
-              <EditRolesTable
-                policies={assignedPolicies}
-                role={currentRole}
-                onChange={update}
-                isDisabled={isReserved}
-                loading={isLoading}
-              />
-            </div>
-          </EuiFlyoutBody>
-        </EuiFlyout>
+  return (    
+    <>
+      <WzOverlayMask headerZindexLocation="below">
+        <EuiOutsideClickDetector onOutsideClick={onClose}>
+          <EuiFlyout className="wzApp" onClose={onClose} >
+            <EuiFlyoutHeader hasBorder={false}>
+              <EuiTitle size="m">
+                <h2>
+                  Edit {role.name} role &nbsp;
+                {isReserved && <EuiBadge color="primary">Reserved</EuiBadge>}
+                </h2>
+              </EuiTitle>
+            </EuiFlyoutHeader>
+            <EuiFlyoutBody>
+              <EuiForm component="form" style={{ padding: 24 }}>
+                <EuiFlexGroup>
+                  <EuiFlexItem grow={true}>
+                    <EuiFormRow
+                      label="Policies"
+                      isInvalid={selectedPoliciesError}
+                      error={'At least one policy must be selected.'}
+                      helpText="Assign policies to the role."
+                    >
+                      <EuiComboBox
+                        placeholder="Select policies"
+                        options={policies}
+                        isDisabled={isReserved}
+                        selectedOptions={selectedPolicies}
+                        onChange={onChangePolicies}
+                        isClearable={true}
+                        data-test-subj="demoComboBox"
+                      />
+                    </EuiFormRow>
+                  </EuiFlexItem>
+                  <EuiFlexItem grow={true}>
+                    <EuiButton
+                      style={{ marginTop: 20, maxWidth: 45 }}
+                      isDisabled={isReserved}
+                      fill
+                      onClick={addPolicy}
+                    >
+                      Add policy
+                  </EuiButton>
+                  </EuiFlexItem>
+                </EuiFlexGroup>
+
+                <EuiSpacer />
+              </EuiForm>
+              <div style={{ margin: 20 }}>
+                <EditRolesTable
+                  policies={assignedPolicies}
+                  role={currentRole}
+                  onChange={update}
+                  isDisabled={isReserved}
+                  loading={isLoading}
+                />
+              </div>
+            </EuiFlyoutBody>
+          </EuiFlyout>
+        </EuiOutsideClickDetector>
       </WzOverlayMask>
       {modal}
     </>
