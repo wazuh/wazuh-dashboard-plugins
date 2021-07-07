@@ -24,14 +24,16 @@ jobs:
           node-version: '10.23.1'
       - name: Step 03 - Install dependencies
         run: |
-          npm install
+          yarn install
       - name: Step 04 - Run Unit Test
         uses: mattallty/jest-github-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           coverage-comment: true
-          test-command: "npm run test:jest"
+          test-command: "yarn run test:jest"
       - name: Step 05 - Publish Unit Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v1.18
-
+      - uses: artiomtr/jest-coverage-report-action@v2.0-rc.1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          threshold: 0.1 # value in percents

@@ -14,5 +14,7 @@ module.exports = {
   presets: [
     ['@babel/preset-env', { targets: { node: 'current' }, useBuiltIns: false, corejs: false }],
     '@babel/preset-typescript',
+    '@babel/preset-react',
   ],
+  plugins: ['@babel/plugin-syntax-jsx'],
 };
