@@ -52,6 +52,7 @@ jobs:
       - name: Step 08 - Run Unit Test
         uses: artiomtr/jest-coverage-report-action@v2.0-rc.1
         with:
+          path: kibana/plugins/wazuh-kibana-app
           github-token: ${{ secrets.GITHUB_TOKEN }}
           threshold: 0.9 # value in percents'
-          test-script: cd kibana/plugins/wazuh-kibana-app/ && npm run test:jest --silent --testLocationInResults --coverage --json --outputFile=report.json
+          test-script: npm run test:jest --silent --testLocationInResults --coverage --json --outputFile=report.json
