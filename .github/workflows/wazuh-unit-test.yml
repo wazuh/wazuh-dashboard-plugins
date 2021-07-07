@@ -33,7 +33,7 @@ jobs:
           coverage-comment: true
           test-command: 'yarn run test:jest'
       - name: Step 05 - Publish Unit Test Results
-      - uses: artiomtr/jest-coverage-report-action@v2.0-rc.1
+        uses: artiomtr/jest-coverage-report-action@v2.0-rc.1
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           threshold: 0 # value in percents
