@@ -120,7 +120,7 @@ jobs:
          cd $GITHUB_WORKSPACE/wazuh-qa/tests/frontend/test_kibana_app/
          npm run cypress:run-headless         
      #  continue-on-error: true
-     - name: 'Upload screenshots and videos to Slack'
+     - name: Step 12 - Upload Screenshots And Videos To Slack
        if: failure()
        uses: trymbill/cypress-slack-video-upload-action@v1.3.0
        with:
