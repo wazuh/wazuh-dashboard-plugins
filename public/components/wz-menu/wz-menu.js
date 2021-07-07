@@ -627,7 +627,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
   }
 
   getApiSelectorComponent() {
-    let style = { maxWidth: 100 };
+    let style = { minWidth: 'max-content' };
     if (this.showSelectorsInPopover){
       style = { width: '100%', minWidth: 200 };
     }
