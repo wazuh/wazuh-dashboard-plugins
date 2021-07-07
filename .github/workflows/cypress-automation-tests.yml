@@ -127,4 +127,4 @@ jobs:
         workdir: wazuh-qa/tests/frontend/test_kibana_app/cypress
         token: ${{ secrets.ACTIONS_SLACK_TOKEN }}
         channels: 'daily-app-team'
-        message-text: ${{ format('Workflow "{0}" job test triggered by {1} is FAILED for {2} - {3}', github.workflow, github.event_name, github.base_ref,  github.head_ref }}
+        message-text: ${{ format('Workflow "{0}" job test triggered by {1} is FAILED for {2} - {3}', github.workflow, github.event_name, github.base_ref, github.head_ref }}
