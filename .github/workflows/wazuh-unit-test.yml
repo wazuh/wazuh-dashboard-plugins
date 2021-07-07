@@ -30,5 +30,4 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           package-manager: yarn
-          test-script: 'yarn run jest --silent --testLocationInResults --coverage --json --outputFile=\"report.json\" wz-user-permissions.test.ts'
           threshold: 0.9 # value in percents'
