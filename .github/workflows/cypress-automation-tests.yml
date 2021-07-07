@@ -127,22 +127,4 @@ jobs:
         workdir: wazuh-qa/tests/frontend/test_kibana_app/cypress
         token: ${{ secrets.ACTIONS_SLACK_TOKEN }}
         channels: 'daily-app-team'
-        message-text: 'Cypress tests failed! They have been placed in this thread, good luck.'
-     #- name: Step 12 - Copy test execution videos and screenshots
-     #  run: |
-     #     mkdir -p public/videos
-     #     mkdir -p public/screenshots
-     #     cp -r $GITHUB_WORKSPACE/wazuh-qa/tests/frontend/test_kibana_app/cypress/report/video $GITHUB_WORKSPACE/public/videos
-     #     cp -r $GITHUB_WORKSPACE/wazuh-qa/tests/frontend/test_kibana_app/cypress/report/screenshots $GITHUB_WORKSPACE/public/screenshots
-     #- name: Step 13 - Merge test reports
-     #  run: |
-     #   cd $GITHUB_WORKSPACE/wazuh-qa/tests/frontend/test_kibana_app/
-     #   npm run merge
-     #- name: Step 14 - Generate HTML report
-     #  run: |
-     #   cd $GITHUB_WORKSPACE/wazuh-qa/tests/frontend/test_kibana_app/
-     #   npm run generate_mochawesome_report
-     #- name: Step 15 - Deploy report page to GitHub Page
-     #  uses: peaceiris/actions-gh-pages@v3
-     #  with:
-     #     github_token: ${{ secrets.GITHUB_TOKEN }}
+        message-text: ${{ format('Workflow "{0}" job test triggered by {1} is FAILED for {2} - {3}', github.workflow, github.event_name, github.base_ref,  github.head_ref }}
