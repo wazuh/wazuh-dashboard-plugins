@@ -35,13 +35,14 @@ jobs:
       - name: Step 04 - Download Project wazuh-app
         uses: actions/checkout@v2
         with:
-          path: $GITHUB_WORKSPACE/kibana/plugins/
+          path: $GITHUB_WORKSPACE/kibana/plugins/wazuh-kibana-app/
       - name: Step 02 - Setup node version for wazuh app
         uses: actions/setup-node@v2
         with:
           node-version: '12.22.3'
       - name: Step 05 - Install dependencies of wazuh
         run: |
+          ls
           cd $GITHUB_WORKSPACE/kibana/plugins/wazuh-kibana-app/
           yarn install
       - name: Step 06 - Run Unit Test
