@@ -43,13 +43,14 @@ jobs:
           node-version: '12.22.3'
       - name: Step 06 - Install dependencies of wazuh
         run: |
-          ls kibana/plugins
-          ls kibana/plugins/wazuh-kibana-app
           cd kibana/plugins/wazuh-kibana-app/
           yarn install
       - name: Step 07 - Run Unit Test
-        uses: artiomtr/jest-coverage-report-action@v2.0-rc.1
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          package-manager: yarn
-          threshold: 0.9 # value in percents'
+        run: |
+          cd kibana/plugins/wazuh-kibana-app/
+          npm run test:jest
+#        uses: artiomtr/jest-coverage-report-action@v2.0-rc.1
+#        with:
+#          github-token: ${{ secrets.GITHUB_TOKEN }}
+#          package-manager: yarn
+#          threshold: 0.9 # value in percents'

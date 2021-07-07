@@ -31,6 +31,8 @@ export default {
   coverageDirectory: `${kbnDir}/target/jest-coverage`,
   coverageReporters: [
     'html',
+    'text-summary',
+    'json'
   ],
   globals: {
     'ts-jest': {
@@ -49,7 +51,6 @@ export default {
   ],
   testMatch: [
     '**/*.test.{js,ts,tsx}',
-    '**/*{js,ts,tsx}'
   ],
   transform: {
     '^.+\\.js$': `${kbnDir}/src/dev/jest/babel_transform.js`,
