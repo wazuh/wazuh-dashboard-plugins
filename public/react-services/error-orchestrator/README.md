@@ -5,7 +5,7 @@ This is a client side orchestrator error service.
 ## Example import
 
 ```tsx
-import { createGetterSetter } from '../utils/create-getter-setter';
+import { getErrorOrchestrator } from '../react-services/common-services';
 ```
 
 ## Example usage
@@ -18,7 +18,7 @@ try {
   throw new Error('Some error here...');
 } catch (error) {
   const options: UIErrorLog = {
-    context: 'contextError',
+    context: `${MyClass.name}.myMethodName`,
     level: UI_LOGGER_LEVELS.WARNING,
     severity: UI_ERROR_SEVERITIES.BUSINESS,
     display: true,

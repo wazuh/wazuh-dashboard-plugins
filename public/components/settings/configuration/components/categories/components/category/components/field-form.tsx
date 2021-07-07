@@ -33,7 +33,6 @@ import {
 import { UI_LOGGER_LEVELS } from '../../../../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../../../../react-services/common-services';
 
-const errorContext = 'FieldForm';
 interface IFieldForm {
   item: ISetting
   updatedConfig: { [field: string]: string | number | boolean | [] }
@@ -110,16 +109,18 @@ const IntervalForm: React.FunctionComponent<IFieldForm> = (props) => {
 
 const ArrayForm: React.FunctionComponent<IFieldForm> = (props) => {
   const [list, setList] = useState(JSON.stringify(getValue(props)));
+
   useEffect(() => {
     setList(JSON.stringify(getValue(props)))
   }, [props.updatedConfig])
+
   const checkErrors = () => {
     try {
       const parsed = JSON.parse(list);
       onChange(parsed, props);
     } catch (error) {
       const options: UIErrorLog = {
-        context: errorContext,
+        context: `${FieldForm.name}.checkErrors`,
         level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
         severity: UI_ERROR_SEVERITIES.UI as UIErrorSeverity,
         error: {
