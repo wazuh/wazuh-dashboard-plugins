@@ -9,10 +9,15 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added new endpoint service to collect the frontend logs into a file [#3324](https://github.com/wazuh/wazuh-kibana-app/pull/3324)
 - Added new error handler to be responsible for the error orchestration [#3327](https://github.com/wazuh/wazuh-kibana-app/pull/3327)
 - Added `Error Boundary` HOC and Component to handle render errors. [#3321](https://github.com/wazuh/wazuh-kibana-app/pull/3321)
-- Implemented `Error Boundary` HOC in each main react-component. [#3367](https://github.com/wazuh/wazuh-kibana-app/pull/3367)
+- Added implementation of `Error Boundary` HOC in each main react-component. [#3367](https://github.com/wazuh/wazuh-kibana-app/pull/3367)
 - Added fields status and type in vulnerabilities table [#3196](https://github.com/wazuh/wazuh-kibana-app/pull/3196)
 - Added Intelligence tab to Mitre Att&ck module [#3368](https://github.com/wazuh/wazuh-kibana-app/pull/3368) [#3344](https://github.com/wazuh/wazuh-kibana-app/pull/3344)
+- Added try catch strategy with ErrorOrchestrator service on User section [#3390](https://github.com/wazuh/wazuh-kibana-app/pull/3390)
 - Added try catch strategy with ErrorOrchestrator service on WzLogs and documentation for ErrorOrchestrator [#3373](https://github.com/wazuh/wazuh-kibana-app/pull/3373)
+- Added try catch strategy with ErrorOrchestrator service on Management > Ruleset [#3410](https://github.com/wazuh/wazuh-kibana-app/pull/3410)
+- Added try catch strategy with ErrorOrchestrator service on Overview [#3408](https://github.com/wazuh/wazuh-kibana-app/pull/3408)
+- Added try catch strategy with ErrorOrchestrator service on ManagementController [#3374](https://github.com/wazuh/wazuh-kibana-app/pull/3374)
+- Added try catch strategy with ErrorOrchestrator service on FIM & SCA sections [#3417](https://github.com/wazuh/wazuh-kibana-app/pull/3417)
 
 ### Changed
 
@@ -21,6 +26,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Adapted the Mitre tactics and techniques resources to use the API endpoints [#3346](https://github.com/wazuh/wazuh-kibana-app/pull/3346)
 - Refactored all try catch strategy on Settings section [#3392](https://github.com/wazuh/wazuh-kibana-app/pull/3392)
 - Refactored all try catch strategy on Controller/Agent section [#3398](https://github.com/wazuh/wazuh-kibana-app/issues/3398)
+- Refactored all try catch value of context for ErrorOrchestrator service. [#3432](https://github.com/wazuh/wazuh-kibana-app/issues/3432)
+- Refactored all try catch strategy on Controller/Groups section [#3415](https://github.com/wazuh/wazuh-kibana-app/issues/3415)
 
 ### Fixed
 
@@ -76,6 +83,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed export to csv button in dashboards tables [#3358](https://github.com/wazuh/wazuh-kibana-app/pull/3358)
 - Fixed Elastic UI breaking changes in 7.12 [#3345](https://github.com/wazuh/wazuh-kibana-app/pull/3345)
 - Fixed Wazuh main menu and breadcrumb render issues [#3347](https://github.com/wazuh/wazuh-kibana-app/pull/3347)
+- Fixed generation of huge logs from backend errors [#3397](https://github.com/wazuh/wazuh-kibana-app/pull/3397)
 
 ## Wazuh v4.2.0 - Kibana 7.10.2 , 7.11.2 - Revision 4201
 

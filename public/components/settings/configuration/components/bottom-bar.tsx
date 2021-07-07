@@ -34,7 +34,6 @@ import {
 } from '../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
 
-const errorContext = 'BottomBar'
 interface IBottomBarProps {
   updatedConfig: { [setting: string]: string | number | boolean | object }
   setUpdateConfig(setting: {}): void
@@ -105,7 +104,7 @@ const saveSettings = async (updatedConfig: {}, setUpdateConfig: Function, setLoa
     setUpdateConfig({});
   } catch (error) {
     const options: UIErrorLog = {
-      context: errorContext,
+      context: `${BottomBar.name}.saveSettings`,
       level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
       severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
       store: true,
