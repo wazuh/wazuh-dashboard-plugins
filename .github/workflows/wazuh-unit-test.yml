@@ -16,16 +16,35 @@ jobs:
     name: Run setup environment wazuh app
     runs-on: ubuntu-18.04
     steps:
-      - name: Step 01 - Download Project wazuh-app
+      - name: Step 01 - Download Project kibana
         uses: actions/checkout@v2
-      - name: Step 02 - Setup node version
+        with:
+          repository: elastic/kibana
+          ref: 'v7.10.2'
+          path: kibana
+      - name: Step 02 - Setup node for kibana app
+        uses: actions/setup-node@v2
+        with:
+          node-version: '10.23.1'
+      - name: Step 03 - Install dependencies
+        uses: actions/setup-node@v2
+        run: |
+          cd $GITHUB_WORKSPACE/kibana/
+          yarn set version 1.21.1
+          yarn install
+      - name: Step 04 - Download Project wazuh-app
+        uses: actions/checkout@v2
+        with:
+          path: cd $GITHUB_WORKSPACE/kibana/plugins/
+      - name: Step 02 - Setup node version for wazuh app
         uses: actions/setup-node@v2
         with:
           node-version: '12.22.3'
-      - name: Step 03 - Install dependencies
+      - name: Step 05 - Install dependencies
         run: |
+          cd $GITHUB_WORKSPACE/kibana/plugins/wazuh-kibana-app/
           yarn install
-      - name: Step 04 - Run Unit Test
+      - name: Step 06 - Run Unit Test
         uses: artiomtr/jest-coverage-report-action@v2.0-rc.1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
