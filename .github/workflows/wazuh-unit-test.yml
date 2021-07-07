@@ -31,7 +31,7 @@ jobs:
           echo Kibana: $GITHUB_WORKSPACE
           cd kibana
           yarn set version 1.21.1
-          yarn install
+          yarn kbn bootstrap
           mkdir plugins/wazuh-kibana-app
       - name: Step 04 - Download Project wazuh-app
         uses: actions/checkout@v2
