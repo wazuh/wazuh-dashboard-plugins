@@ -56,8 +56,6 @@ export const Logtest = compose(
   };
 
   const formatResult = (result, alert) => {
-    console.log(result);
-    
     let returnedDataFormatted =`**Phase 1: Completed pre-decoding. \n    ` +
     `full event:  ${result.full_log || '-'}  \n    ` +
     `timestamp: ${(result.predecoder || '').timestamp || '-'} \n    ` +
