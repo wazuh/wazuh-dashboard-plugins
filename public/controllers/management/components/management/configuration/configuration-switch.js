@@ -71,6 +71,9 @@ import {
 
 import { agentIsSynchronized } from './utils/wz-fetch';
 import { WzRequest } from '../../../../../react-services/wz-request';
+import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 
 class WzConfigurationSwitch extends Component {
   constructor(props) {
@@ -99,12 +102,8 @@ class WzConfigurationSwitch extends Component {
   async componentDidMount() {
     // If agent, check if is synchronized or not
     if (this.props.agent.id !== '000') {
-      try {
-        const agentSynchronized = await agentIsSynchronized(this.props.agent);
-        this.setState({ agentSynchronized });
-      } catch (error) {
-        // do nothing
-      }
+      const agentSynchronized = await agentIsSynchronized(this.props.agent);
+      this.setState({ agentSynchronized });
     } else {
       try {
         // try if it is a cluster
@@ -126,19 +125,39 @@ class WzConfigurationSwitch extends Component {
         // do nothing if it isn't a cluster
         this.props.updateClusterNodes(false);
         this.props.updateClusterNodeSelected(false);
+        const options = {
+          context: `${WzConfigurationSwitch.name}.componentDidMount`,
+          level: UI_LOGGER_LEVELS.ERROR,
+          severity: UI_ERROR_SEVERITIES.BUSINESS,
+          error: {
+            error: error,
+            message: error.message || error,
+            title: error.name || error
+          },
+        };
+        getErrorOrchestrator().handleError(options);
       }
       // If manager/cluster require agent platform info to filter sections in overview. It isn't coming from props for Management/Configuration
       try{
         this.setState({ loadingOverview: true });
-        
         const masterNodeInfo = await WzRequest.apiReq('GET', '/agents', { params: { q: 'id=000'}});
-
         this.setState({
           masterNodeInfo: masterNodeInfo.data.affected_items[0]
         });
         this.setState({ loadingOverview: false });
       }catch(error){
         this.setState({ loadingOverview: false });
+        const options = {
+          context: `${WzConfigurationSwitch.name}.componentDidMount`,
+          level: UI_LOGGER_LEVELS.ERROR,
+          severity: UI_ERROR_SEVERITIES.BUSINESS,
+          error: {
+            error: error,
+            message: error.message || error,
+            title: error.name || error
+          },
+        };
+        getErrorOrchestrator().handleError(options);
       }
     }
   }
