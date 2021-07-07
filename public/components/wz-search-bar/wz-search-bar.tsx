@@ -11,48 +11,59 @@
  */
 import React, { useEffect, useState } from 'react';
 import { EuiSuggest } from '../eui-suggest';
-import { EuiFlexGroup, EuiFlexItem, } from '@elastic/eui';
+import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import { qSuggests } from './lib/q-handler';
 import { apiSuggests } from './lib/api-handler';
 import { WzSearchButtons, filterButton } from './wz-search-buttons';
 import { WzSearchBadges } from './components';
 import { SuggestHandler } from './lib';
 import { IFilter } from './';
+import { UI_LOGGER_LEVELS } from '../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../react-services/common-services';
 
 export interface suggestItem {
-  type: {iconType: string, color: string }
-  label: string
-  description?: string
+  type: { iconType: string; color: string };
+  label: string;
+  description?: string;
 }
 
 export interface IWzSuggestItem extends apiSuggests, qSuggests {
-  type: 'q' | 'params'
+  type: 'q' | 'params';
 }
 
 export interface IWzSearchBarProps {
-  suggestions: IWzSuggestItem[]
-  buttonOptions?: filterButton[]
-  searchDisable?: boolean
-  noDeleteFiltersOnUpdateSuggests?: boolean
-  placeholder?: string
-  filters: IFilter[]
-  onFiltersChange(filters:{}[]): void
+  suggestions: IWzSuggestItem[];
+  buttonOptions?: filterButton[];
+  searchDisable?: boolean;
+  noDeleteFiltersOnUpdateSuggests?: boolean;
+  placeholder?: string;
+  filters: IFilter[];
+  onFiltersChange(filters: {}[]): void;
 }
 
 export function WzSearchBar(props: IWzSearchBarProps) {
   const [inputRef, setInputRef] = useState();
   const [inputValue, setInputValue] = useState('');
   const [isOpen, setIsOpen] = useState(false);
-  const [suggestsItems, handler, status, isInvalid] = useSuggestHandler(props, inputValue, setInputValue, inputRef, setIsOpen);
+  const [suggestsItems, handler, status, isInvalid] = useSuggestHandler(
+    props,
+    inputValue,
+    setInputValue,
+    inputRef,
+    setIsOpen
+  );
   return (
     <EuiFlexGroup>
       <EuiFlexItem>
         <EuiSuggest
           status={status}
           inputRef={setInputRef}
-          prepend={<WzSearchBadges filters={props.filters} onFiltersChange={props.onFiltersChange} />}
+          prepend={
+            <WzSearchBadges filters={props.filters} onFiltersChange={props.onFiltersChange} />
+          }
           value={inputValue}
-          onKeyPress={event => handler && handler.onKeyPress(inputValue, event)}
+          onKeyPress={(event) => handler && handler.onKeyPress(inputValue, event)}
           onItemClick={(item) => handler && handler.onItemClick(item, inputValue)}
           isPopoverOpen={isOpen}
           onClosePopover={() => setIsOpen(false)}
@@ -60,41 +71,84 @@ export function WzSearchBar(props: IWzSearchBarProps) {
           suggestions={suggestsItems}
           onInputChange={setInputValue}
           isInvalid={isInvalid}
-          placeholder={props.placeholder} />
+          placeholder={props.placeholder}
+        />
       </EuiFlexItem>
-      {!!props.buttonOptions &&
+      {!!props.buttonOptions && (
         <EuiFlexItem grow={false}>
-          <WzSearchButtons filters={props.filters} options={props.buttonOptions} onChange={(filters) => props.onFiltersChange(filters)}  />
+          <WzSearchButtons
+            filters={props.filters}
+            options={props.buttonOptions}
+            onChange={(filters) => props.onFiltersChange(filters)}
+          />
         </EuiFlexItem>
-      }
+      )}
     </EuiFlexGroup>
-  )
+  );
 }
 
-function useSuggestHandler(props: IWzSearchBarProps, inputValue, setInputValue, inputRef, setIsOpen):
-[suggestItem[], SuggestHandler | undefined, string, boolean] {
+function useSuggestHandler(
+  props: IWzSearchBarProps,
+  inputValue,
+  setInputValue,
+  inputRef,
+  setIsOpen
+): [suggestItem[], SuggestHandler | undefined, string, boolean] {
   const [handler, setHandler] = useState<undefined | SuggestHandler>();
   const [suggestsItems, setSuggestItems] = useState<suggestItem[]>([]);
-  const [status, setStatus] = useState<'unchanged'|'loading'>('unchanged');
+  const [status, setStatus] = useState<'unchanged' | 'loading'>('unchanged');
   const [isInvalid, setInvalid] = useState(false);
-  
+
   useEffect(() => {
-    setHandler(new SuggestHandler({...props, status, setStatus, setInvalid, setIsOpen}, setInputValue))
+    setHandler(
+      new SuggestHandler({ ...props, status, setStatus, setInvalid, setIsOpen }, setInputValue)
+    );
     !props.noDeleteFiltersOnUpdateSuggests && props.onFiltersChange([]);
   }, [props.suggestions]);
 
-  useEffect(() => {handler && (handler.inputRef = inputRef)}, [inputRef])
+  useEffect(() => {
+    handler && (handler.inputRef = inputRef);
+  }, [inputRef]);
 
   useEffect(() => {
-    handler && handler.buildSuggestItems(inputValue)
-      .then(setSuggestItems)
-      .catch((e)=>{e !== 'New request in progress' && console.log(e)});
+    if (handler) {
+      try {
+        async () => {
+          let suggestItems = await handler.buildSuggestItems(inputValue);
+          setSuggestItems(suggestItems);
+        };
+      } catch (error) {
+        if (error !== 'New request in progress') {
+          const options = {
+            context: `${WzSearchBar.name}.useEffect`,
+            level: UI_LOGGER_LEVELS.ERROR,
+            severity: UI_ERROR_SEVERITIES.CRITICAL,
+            store: true,
+            error: {
+              error: error,
+              message: error.message || error,
+              title: error.name || error,
+            },
+          };
+          getErrorOrchestrator().handleError(options);
+        }
+      }
+    }
+  }, [inputValue, handler]);
+
+  useEffect(() => {
+    handler &&
+      handler
+        .buildSuggestItems(inputValue)
+        .then(setSuggestItems)
+        .catch((e) => {
+          e !== 'New request in progress' && console.log(e);
+        });
   }, [inputValue, handler]);
 
   useEffect(() => {
     handler && (handler.filters = props.filters);
-  }, [props.filters])
+  }, [props.filters]);
 
   return [suggestsItems, handler, status, isInvalid];
 }
-

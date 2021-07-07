@@ -14,6 +14,9 @@ import { EuiComboBox } from '@elastic/eui';
 import PropTypes from 'prop-types';
 import './wz-filter-bar.scss';
 import { withErrorBoundary } from '../common/hocs';
+import { UI_LOGGER_LEVELS } from '../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../react-services/common-services'
 
 export const WzFilterBar = withErrorBoundary (class WzFilterBar extends Component {
   constructor(props) {
@@ -278,7 +281,21 @@ export const WzFilterBar = withErrorBoundary (class WzFilterBar extends Componen
         search: queryObj.search,
         selectedOptions: selectedOptions
       });
-    } catch (error) {} // eslint-disable-line
+    } catch (error) {
+      const options = {
+        context: `${WzFilterBar.name}.buildQuery`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        store: true,
+        display: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+    } // eslint-disable-line
   };
 
   render() {

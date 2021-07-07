@@ -13,6 +13,9 @@
 import { BaseHandler, IWzSuggestItem, QInterpreter } from './';
 import { suggestItem, IWzSearchBarProps } from '../wz-search-bar';
 import { queryObject } from './q-interpreter';
+import { UI_LOGGER_LEVELS } from '../../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../../react-services/common-services';
 
 interface ISuggestHandlerProps extends IWzSearchBarProps {
   setStatus: Function
@@ -108,7 +111,17 @@ export class SuggestHandler extends BaseHandler {
         return {suggestions};
       }
     } catch (error) {
-      return {error}
+      const options = {
+        context: `${SuggestHandler.name}.checkQuery`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
     throw "New request in progress";
   }
