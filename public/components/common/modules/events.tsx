@@ -15,7 +15,7 @@ import { getAngularModule, getToasts } from '../../../kibana-services';
 import { EventsSelectedFiles } from './events-selected-fields';
 import { ModulesHelper } from './modules-helper';
 import store from '../../../redux/store';
-import { EuiButton, EuiFlexGroup, EuiFlexItem, EuiOverlayMask } from '@elastic/eui';
+import { EuiButton, EuiFlexGroup, EuiFlexItem, EuiOverlayMask, EuiOutsideClickDetector } from '@elastic/eui';
 import { PatternHandler } from '../../../react-services/pattern-handler';
 
 import { enhanceDiscoverEventsCell } from './events-enhance-discover-fields';
@@ -263,14 +263,14 @@ export class Events extends Component {
       <Fragment>
         {flyout && (
           <EuiOverlayMask
-            headerZindexLocation="below"
-            // @ts-ignore
-            onClick={() => { this.closeFlyout() }} >
-            <FlyoutComponent
-              closeFlyout={this.closeFlyout}
-              {...this.state.flyout.props}
-              {...this.props}
-            />
+            headerZindexLocation="below">
+            <EuiOutsideClickDetector onOutsideClick={() => { this.closeFlyout() }}>
+              <FlyoutComponent
+                closeFlyout={this.closeFlyout}
+                {...this.state.flyout.props}
+                {...this.props}
+              />
+            </EuiOutsideClickDetector>
           </EuiOverlayMask>
         )}
       </Fragment>
