@@ -50,6 +50,7 @@ jobs:
         with:
           node-version: '10.23.1'
       - name: Step 08 - Run Unit Test
+        uses: actions/checkout@v1
         uses: artiomtr/jest-coverage-report-action@v2.0-rc.1
         with:
           package-manager: yarn
