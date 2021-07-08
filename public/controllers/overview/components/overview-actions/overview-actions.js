@@ -24,7 +24,6 @@ import {
   EuiModalBody,
   EuiModalHeader,
   EuiModalHeaderTitle,
-  EuiOverlayMask,
   EuiToolTip,
 } from '@elastic/eui';
 import './agents-selector.scss';
