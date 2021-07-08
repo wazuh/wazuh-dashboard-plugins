@@ -118,7 +118,7 @@ export const RolesMappingCreate = ({
 
   return (
     <>
-      <WzOverlayMask headerZindexLocation="below">
+      <EuiOverlayMask headerZindexLocation="below">
         <EuiOutsideClickDetector onOutsideClick={onClose}>
           <EuiFlyout className="wzApp" onClose={onClose}>
             <EuiFlyoutHeader hasBorder={false}>
@@ -178,7 +178,7 @@ export const RolesMappingCreate = ({
             </EuiFlyoutBody>
           </EuiFlyout>
         </EuiOutsideClickDetector>
-      </WzOverlayMask>
+      </EuiOverlayMask>
       {modal}
     </>
   );

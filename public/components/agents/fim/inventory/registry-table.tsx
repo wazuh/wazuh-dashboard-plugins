@@ -263,15 +263,17 @@ export class RegistryTable extends Component {
         {registryTable}
         {this.state.isFlyoutVisible && (
           <EuiOverlayMask headerZindexLocation="below">
-            <EuiOutsideClickDetector onOutsideClick={() => { this.closeFlyout() }}>
-              <FlyoutDetail
-                fileName={this.state.currentFile.file}
-                agentId={this.props.agent.id}
-                item={this.state.syscheckItem}
-                closeFlyout={() => this.closeFlyout()}
-                type={this.state.currentFile.type}
-                view='inventory'
-                {...this.props} />
+            <EuiOutsideClickDetector onOutsideClick={() => this.closeFlyout()}>
+              <div>{/* EuiOutsideClickDetector needs a static first child */}
+                <FlyoutDetail
+                  fileName={this.state.currentFile.file}
+                  agentId={this.props.agent.id}
+                  item={this.state.syscheckItem}
+                  closeFlyout={() => this.closeFlyout()}
+                  type={this.state.currentFile.type}
+                  view='inventory'
+                  {...this.props} />
+              </div>
             </EuiOutsideClickDetector>
           </EuiOverlayMask>
         )}

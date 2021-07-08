@@ -461,14 +461,16 @@ export const Techniques = withWindowSize(class Techniques extends Component {
         { isFlyoutVisible &&
           <EuiOverlayMask headerZindexLocation="below">
             <EuiOutsideClickDetector onOutsideClick={() => this.onChangeFlyout(false)}>
-              <FlyoutTechnique
-                openDashboard={(e, itemId) => this.openDashboard(e, itemId)}
-                openDiscover={(e, itemId) => this.openDiscover(e, itemId)}
-                openIntelligence={(e, redirectTo, itemId) => this.openIntelligence(e, redirectTo, itemId)}
-                onChangeFlyout={this.onChangeFlyout}
-                currentTechniqueData={this.state.currentTechniqueData}
-                currentTechnique={currentTechnique}
-                tacticsObject={this.props.tacticsObject} />
+              <div>{/* EuiOutsideClickDetector needs a static first child */}
+                <FlyoutTechnique
+                  openDashboard={(e, itemId) => this.openDashboard(e, itemId)}
+                  openDiscover={(e, itemId) => this.openDiscover(e, itemId)}
+                  openIntelligence={(e, redirectTo, itemId) => this.openIntelligence(e, redirectTo, itemId)}
+                  onChangeFlyout={this.onChangeFlyout}
+                  currentTechniqueData={this.state.currentTechniqueData}
+                  currentTechnique={currentTechnique}
+                  tacticsObject={this.props.tacticsObject} />
+              </div>
             </EuiOutsideClickDetector>
           </EuiOverlayMask>
         } 
