@@ -55,17 +55,8 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: '10.23.1'
-      - name: PRUEBA
-        run: |
-          ls -la ./kibana/plugins/wazuh-kibana-app
-#      - name: Step 08 - Run unit test
-#        uses: artiomtr/jest-coverage-report-action@v2.0-rc.1
-#        with:
-#          working-directory: ./kibana/plugins/wazuh-kibana-app
-#          threshold: 0.9 # value in percents'
-#          test-script: yarn run test:jest --silent --testLocationInResults --coverage --json --outputFile=report.json
 
-      - name: Step 07 - Run Tests & Collect Coverage
+      - name: Step 08 - Run Tests & Collect Coverage
         run: |
           cd ./kibana/plugins/wazuh-kibana-app
           yarn run test:jest --silent --ci --testLocationInResults --colors --coverage --json --outputFile=report.json
@@ -78,12 +69,3 @@ jobs:
 #          skip-step: all
 #          annotations: failed-tests
 #          threshold: 0.9 # value in percents'
-
-      - name: Step 100 - Run Unit Test
-        uses: artiomtr/jest-coverage-report-action@v2.0-rc.1
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          package-manager: yarn
-          threshold: 0.9 # value in percents'
-          skip-step: all
-          annotations: failed-tests
