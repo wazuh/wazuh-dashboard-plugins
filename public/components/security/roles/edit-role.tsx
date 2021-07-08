@@ -137,7 +137,7 @@ export const EditRole = ({ role, closeFlyout }) => {
 
   const onClose = () => { (initialSelectedPolicies.length != selectedPolicies.length) ? setIsModalVisible(true) : closeFlyout(false) };
 
-  return (    
+  return (
     <>
       <WzOverlayMask headerZindexLocation="below">
         <EuiOutsideClickDetector onOutsideClick={onClose}>
