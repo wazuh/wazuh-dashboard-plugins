@@ -27,7 +27,7 @@ import {
   EuiTitle,
   EuiToolTip,
   EuiButtonIcon,
-  EuiButtonEmpty,
+  EuiOverlayMask,
   EuiFieldText,
   EuiConfirmModal,
   EuiCodeEditor,
@@ -48,7 +48,6 @@ import 'brace/snippets/xml';
 import 'brace/ext/language_tools';
 import "brace/ext/searchbox";
 import { showFlyoutLogtest } from '../../../../../redux/actions/appStateActions';
-import { WzOverlayMask } from '../../../../../components/common/util';
 import _ from 'lodash';
 
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
