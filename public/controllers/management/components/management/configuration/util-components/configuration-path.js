@@ -23,12 +23,12 @@ import {
   EuiTitle,
   EuiText,
   EuiConfirmModal,
-  EuiIcon
+  EuiIcon,
+  EuiOverlayMask
 } from '@elastic/eui';
 
 import WzBadge from '../util-components/badge';
 import WzClusterSelect from './configuration-cluster-selector';
-import { WzOverlayMask } from '../../../../../../components/common/util';
 
 class WzConfigurationPath extends Component {
   constructor(props) {
