@@ -59,12 +59,12 @@ jobs:
       - name: Step 08 - Run Tests & Collect Coverage
         run: |
           cd ./kibana/plugins/wazuh-kibana-app
-          echo ls -la ./kibana/plugins/wazuh-kibana-app
+          ls -la ./kibana/plugins/wazuh-kibana-app
           yarn run test:jest --silent --ci --testLocationInResults --colors --coverage --json --outputFile=report.json
 
       - name: Step 09 - Comment coverage
-        uses: artiomtr/jest-coverage-report-action@v2.0-rc.2
+        uses: artiomtr/jest-coverage-report-action@v2.0-rc.1
         with:
-          working-directory: ./kibana/plugins/wazuh-kibana-app
+          working-directory: ./kibana/plugins/wazuh-kibana-app/
           github-token: ${{ secrets.GITHUB_TOKEN }}
           skip-step: all
