@@ -191,7 +191,7 @@ export const AgentsPreview = compose(
                 </EuiFlexItem>
               )) || (
                 <Fragment>
-                  <EuiFlexItem className="agents-status-pie" grow={false}>
+                  <EuiFlexItem className="agents-status-pie" grow={2}>
                     <EuiPanel betaBadgeLabel="Status" className="eui-panel">
                       <EuiFlexGroup>
                         {this.totalAgents > 0 && (
@@ -219,7 +219,7 @@ export const AgentsPreview = compose(
                     </EuiPanel>
                   </EuiFlexItem>
                   {this.totalAgents > 0 && (
-                    <EuiFlexItem>
+                    <EuiFlexItem grow={4}>
                       <EuiPanel betaBadgeLabel="Details">
                         <EuiFlexGroup>
                           <EuiFlexItem>
@@ -340,7 +340,7 @@ export const AgentsPreview = compose(
               )}
               {this.state.showAgentsEvolutionVisualization && (
                 <EuiFlexItem
-                  grow={false}
+                  grow={6}
                   className="agents-evolution-visualization"
                   style={{
                     display: !this.state.loading ? 'block' : 'none',
