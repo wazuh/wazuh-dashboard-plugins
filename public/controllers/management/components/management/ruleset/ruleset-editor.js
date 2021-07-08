@@ -255,7 +255,7 @@ class WzRulesetEditor extends Component {
     let modal;
     if (this.state.isModalVisible) {
       modal = (
-        <WzOverlayMask>
+        <EuiOverlayMask>
           <EuiConfirmModal
             title="Unsubmitted changes"
             onConfirm={() => {
@@ -270,7 +270,7 @@ class WzRulesetEditor extends Component {
               There are unsaved changes. Are you sure you want to proceed?
             </p>
           </EuiConfirmModal>
-        </WzOverlayMask>
+        </EuiOverlayMask>
       );
     }
     return (

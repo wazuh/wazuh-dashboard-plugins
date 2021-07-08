@@ -265,11 +265,13 @@ export class Events extends Component {
           <EuiOverlayMask
             headerZindexLocation="below">
             <EuiOutsideClickDetector onOutsideClick={() => { this.closeFlyout() }}>
-              <FlyoutComponent
-                closeFlyout={this.closeFlyout}
-                {...this.state.flyout.props}
-                {...this.props}
-              />
+              <div>{/* EuiOutsideClickDetector needs a static first child */}
+                <FlyoutComponent
+                  closeFlyout={this.closeFlyout}
+                  {...this.state.flyout.props}
+                  {...this.props}
+                />
+              </div>
             </EuiOutsideClickDetector>
           </EuiOverlayMask>
         )}

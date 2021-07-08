@@ -90,12 +90,14 @@ function FimTable({ agent }) {
         {isOpen && (
           <EuiOverlayMask headerZindexLocation="below">
             <EuiOutsideClickDetector onOutsideClick={() => setIsOpen(false)}>
-              <FlyoutDetail
-                agentId={agent.id}
-                closeFlyout={() => setIsOpen(false)}
-                fileName={file}
-                view='extern'
-                {...{ agent }} />
+              <div>{/* EuiOutsideClickDetector needs a static first child */}
+                <FlyoutDetail
+                  agentId={agent.id}
+                  closeFlyout={() => setIsOpen(false)}
+                  fileName={file}
+                  view='extern'
+                  {...{ agent }} />
+              </div>
             </EuiOutsideClickDetector>
           </EuiOverlayMask>
         )}

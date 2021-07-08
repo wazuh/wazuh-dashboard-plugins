@@ -281,14 +281,16 @@ export class ComplianceSubrequirements extends Component {
         {this.state.flyoutOn &&
           <EuiOverlayMask headerZindexLocation="below">
             <EuiOutsideClickDetector onOutsideClick={() => this.closeFlyout()}>
-              <RequirementFlyout
-                currentRequirement={this.state.selectedRequirement}
-                onChangeFlyout={this.onChangeFlyout}
-                description={this.props.descriptions[this.state.selectedRequirement]}
-                getRequirementKey={() => { return this.getRequirementKey() }}
-                openDashboard={(e, itemId) => this.openDashboard(e, itemId)}
-                openDiscover={(e, itemId) => this.openDiscover(e, itemId)}
-              />
+              <div>{/* EuiOutsideClickDetector needs a static first child */}
+                <RequirementFlyout
+                  currentRequirement={this.state.selectedRequirement}
+                  onChangeFlyout={this.onChangeFlyout}
+                  description={this.props.descriptions[this.state.selectedRequirement]}
+                  getRequirementKey={() => { return this.getRequirementKey() }}
+                  openDashboard={(e, itemId) => this.openDashboard(e, itemId)}
+                  openDiscover={(e, itemId) => this.openDiscover(e, itemId)}
+                />
+              </div>
             </EuiOutsideClickDetector>
           </EuiOverlayMask>}
       </div>
