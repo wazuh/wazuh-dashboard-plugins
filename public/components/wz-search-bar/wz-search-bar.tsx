@@ -112,38 +112,27 @@ function useSuggestHandler(
 
   useEffect(() => {
     if (handler) {
-      try {
-        async () => {
-          let suggestItems = await handler.buildSuggestItems(inputValue);
-          setSuggestItems(suggestItems);
-        };
-      } catch (error) {
-        if (error !== 'New request in progress') {
-          const options = {
-            context: `${WzSearchBar.name}.useEffect`,
-            level: UI_LOGGER_LEVELS.ERROR,
-            severity: UI_ERROR_SEVERITIES.CRITICAL,
-            store: true,
-            error: {
-              error: error,
-              message: error.message || error,
-              title: error.name || error,
-            },
-          };
-          getErrorOrchestrator().handleError(options);
+      (async () => {
+        try {
+          setSuggestItems(await handler.buildSuggestItems(inputValue));
+        } catch (error) {
+          if (error !== 'New request in progress') {
+            const options = {
+              context: `${useSuggestHandler.name}.useEffect`,
+              level: UI_LOGGER_LEVELS.ERROR,
+              severity: UI_ERROR_SEVERITIES.CRITICAL,
+              store: true,
+              error: {
+                error: error,
+                message: error.message || error,
+                title: error.name || error,
+              },
+            };
+            getErrorOrchestrator().handleError(options);
+          }
         }
-      }
+      })();
     }
-  }, [inputValue, handler]);
-
-  useEffect(() => {
-    handler &&
-      handler
-        .buildSuggestItems(inputValue)
-        .then(setSuggestItems)
-        .catch((e) => {
-          e !== 'New request in progress' && console.log(e);
-        });
   }, [inputValue, handler]);
 
   useEffect(() => {
