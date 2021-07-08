@@ -59,7 +59,7 @@ jobs:
       - name: Step 08 - Run Tests & Collect Coverage
         run: |
           cd ./kibana/plugins/wazuh-kibana-app
-          ls -la ./kibana/plugins/wazuh-kibana-app
+          ls -la
           echo $GITHUB_WORKSPACE/kibana/plugins/wazuh-kibana-app/
           yarn run test:jest --silent --ci --testLocationInResults --colors --coverage --json --outputFile=report.json
 
