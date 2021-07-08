@@ -15,8 +15,8 @@ import { connect } from 'react-redux';
 import { AppState } from '../../../../react-services/app-state';
 import { hasAgentSupportModule } from '../../../../react-services/wz-agents';
 import { getAngularModule, getToasts } from '../../../../kibana-services';
-import { WAZUH_MODULES_ID } from '../../../../../common/constants';
 import { updateCurrentAgentData } from '../../../../redux/actions/appStateActions';
+import { getAgentSections } from './agent-sections';
 
 class WzMenuAgent extends Component {
   constructor(props) {
@@ -31,123 +31,7 @@ class WzMenuAgent extends Component {
       ? JSON.parse(window.localStorage.getItem('menuAgent'))
       : {};
 
-    this.agentSections = {
-      securityInformation: {
-        id: 'securityInformation',
-        text: 'Security information management',
-        isTitle: true,
-      },
-      auditing: {
-        id: 'auditing',
-        text: 'Auditing and Policy Monitoring',
-        isTitle: true,
-      },
-      threatDetection: {
-        id: 'threatDetection',
-        text: 'Threat detection and response',
-        isTitle: true,
-      },
-      regulatoryCompliance: {
-        id: 'regulatoryCompliance',
-        text: 'Regulatory Compliance',
-        isTitle: true,
-      },
-      general: {
-        id: WAZUH_MODULES_ID.SECURITY_EVENTS,
-        text: 'Security events',
-        isPin: this.menuAgent.general ? this.menuAgent.general : false,
-      },
-      fim: {
-        id: WAZUH_MODULES_ID.INTEGRITY_MONITORING,
-        text: 'Integrity monitoring',
-        isPin: this.menuAgent.fim ? this.menuAgent.fim : false,
-      },
-      aws: {
-        id: WAZUH_MODULES_ID.AMAZON_WEB_SERVICES,
-        text: 'Amazon AWS',
-        isPin: this.menuAgent.aws ? this.menuAgent.aws : false,
-      },
-      gcp: {
-        id: WAZUH_MODULES_ID.GOOGLE_CLOUD_PLATFORM,
-        text: 'Google Cloud Platform',
-        isPin: this.menuAgent.gcp ? this.menuAgent.gcp : false,
-      },
-      pm: {
-        id: WAZUH_MODULES_ID.POLICY_MONITORING,
-        text: 'Policy Monitoring',
-        isPin: this.menuAgent.pm ? this.menuAgent.pm : false,
-      },
-      sca: {
-        id: WAZUH_MODULES_ID.SECURITY_CONFIGURATION_ASSESSMENT,
-        text: 'Security configuration assessment',
-        isPin: this.menuAgent.sca ? this.menuAgent.sca : false,
-      },
-      audit: {
-        id: WAZUH_MODULES_ID.AUDITING,
-        text: 'System Auditing',
-        isPin: this.menuAgent.audit ? this.menuAgent.audit : false,
-      },
-      oscap: {
-        id: WAZUH_MODULES_ID.OPEN_SCAP,
-        text: 'OpenSCAP',
-        isPin: this.menuAgent.oscap ? this.menuAgent.oscap : false,
-      },
-      ciscat: {
-        id: WAZUH_MODULES_ID.CIS_CAT,
-        text: 'CIS-CAT',
-        isPin: this.menuAgent.oscap ? this.menuAgent.oscap : false,
-      },
-      vuls: {
-        id: WAZUH_MODULES_ID.VULNERABILITIES,
-        text: 'Vulnerabilities',
-        isPin: this.menuAgent.vuls ? this.menuAgent.vuls : false,
-      },
-      virustotal: {
-        id: WAZUH_MODULES_ID.VIRUSTOTAL,
-        text: 'VirusTotal',
-        isPin: this.menuAgent.virustotal ? this.menuAgent.virustotal : false,
-      },
-      osquery: {
-        id: WAZUH_MODULES_ID.OSQUERY,
-        text: 'Osquery',
-        isPin: this.menuAgent.osquery ? this.menuAgent.osquery : false,
-      },
-      docker: {
-        id: WAZUH_MODULES_ID.DOCKER,
-        text: 'Docker Listener',
-        isPin: this.menuAgent.docker ? this.menuAgent.docker : false,
-      },
-      mitre: {
-        id: WAZUH_MODULES_ID.MITRE_ATTACK,
-        text: 'MITRE ATT&CK',
-        isPin: this.menuAgent.mitre ? this.menuAgent.mitre : false,
-      },
-      pci: {
-        id: WAZUH_MODULES_ID.PCI_DSS,
-        text: 'PCI DSS',
-        isPin: this.menuAgent.pci ? this.menuAgent.pci : false,
-      },
-      gdpr: {
-        id: WAZUH_MODULES_ID.GDPR,
-        text: 'GDPR',
-        isPin: this.menuAgent.gdpr ? this.menuAgent.gdpr : false,
-      },
-      hipaa: {
-        id: WAZUH_MODULES_ID.HIPAA,
-        text: 'HIPAA',
-        isPin: this.menuAgent.hipaa ? this.menuAgent.hipaa : false,
-      },
-      nist: {
-        id: WAZUH_MODULES_ID.NIST_800_53,
-        text: 'NIST 800-53',
-        isPin: this.menuAgent.nist ? this.menuAgent.nist : false,
-      },
-      tsc: {
-        id: WAZUH_MODULES_ID.TSC,
-        text: 'TSC',
-        isPin: this.menuAgent.tsc ? this.menuAgent.tsc : false,
-      },
-    };
+    this.agentSections = getAgentSections(this.menuAgent)
 
     this.securityInformationItems = [
       this.agentSections.general,
