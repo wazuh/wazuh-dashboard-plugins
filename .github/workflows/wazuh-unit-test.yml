@@ -49,9 +49,7 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: '10.23.1'
-      - name: Step 08 - Checkout jest coverage
-        uses: actions/checkout@v2
-      - name: Step 09 - Run Unit Test
+      - name: Step 08 - Run Unit Test
         uses: artiomtr/jest-coverage-report-action@v2.0-rc.1
         with:
           package-manager: yarn
