@@ -85,3 +85,5 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           package-manager: yarn
           threshold: 0.9 # value in percents'
+          skip-step: all
+          annotations: failed-tests
