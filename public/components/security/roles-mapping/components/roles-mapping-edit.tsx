@@ -21,7 +21,6 @@ import { RuleEditor } from './rule-editor';
 import RulesServices from '../../rules/services';
 import RolesServices from '../../roles/services';
 import { WzAPIUtils } from '../../../../react-services/wz-api-utils';
-import { WzOverlayMask } from '../../../common/util'
 import _ from 'lodash';
 import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
