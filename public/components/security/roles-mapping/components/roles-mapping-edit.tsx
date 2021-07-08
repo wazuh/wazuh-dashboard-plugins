@@ -140,7 +140,7 @@ export const RolesMappingEdit = ({
 
   return (
     <>
-      <WzOverlayMask headerZindexLocation="below">
+      <EuiOverlayMask headerZindexLocation="below">
         <EuiOutsideClickDetector onOutsideClick={onClose}>
           <EuiFlyout className="wzApp" onClose={onClose}>
             <EuiFlyoutHeader hasBorder={false}>
@@ -203,7 +203,7 @@ export const RolesMappingEdit = ({
             </EuiFlyoutBody>
           </EuiFlyout>
         </EuiOutsideClickDetector>
-      </WzOverlayMask>
+      </EuiOverlayMask>
       {modal}
     </>
   );

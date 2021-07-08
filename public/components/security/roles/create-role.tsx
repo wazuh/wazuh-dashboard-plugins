@@ -135,7 +135,7 @@ export const CreateRole = ({ closeFlyout }) => {
 
   return (
     <>
-      <WzOverlayMask headerZindexLocation="below">
+      <EuiOverlayMask headerZindexLocation="below">
         <EuiOutsideClickDetector onOutsideClick={onClose}>
           <EuiFlyout className="wzApp" onClose={onClose}>
             <EuiFlyoutHeader hasBorder={false}>
@@ -181,7 +181,7 @@ export const CreateRole = ({ closeFlyout }) => {
             </EuiFlyoutBody>
           </EuiFlyout>
         </EuiOutsideClickDetector>
-      </WzOverlayMask>
+      </EuiOverlayMask>
       {modal}
     </>
   );

@@ -165,16 +165,18 @@ export class InventoryTable extends Component {
         {table}
         {this.state.isFlyoutVisible &&
           <EuiOverlayMask headerZindexLocation="below">
-            <EuiOutsideClickDetector onOutsideClick={() => { this.closeFlyout() }}>
-              <FlyoutDetail
-                vulName={this.state.currentItem.cve}
-                agentId={this.props.agent.id}
-                item={this.state.currentItem}
-                closeFlyout={() => this.closeFlyout()}
-                type='vulnerability'
-                view='inventory'
-                showViewInEvents={true}
-                {...this.props} />
+            <EuiOutsideClickDetector onOutsideClick={() => this.closeFlyout()}>
+              <div>{/* EuiOutsideClickDetector needs a static first child */}
+                <FlyoutDetail
+                  vulName={this.state.currentItem.cve}
+                  agentId={this.props.agent.id}
+                  item={this.state.currentItem}
+                  closeFlyout={() => this.closeFlyout()}
+                  type='vulnerability'
+                  view='inventory'
+                  showViewInEvents={true}
+                  {...this.props} />
+              </div>
             </EuiOutsideClickDetector>
           </EuiOverlayMask>
         }
