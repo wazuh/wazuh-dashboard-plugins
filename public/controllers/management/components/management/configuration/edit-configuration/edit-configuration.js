@@ -104,7 +104,7 @@ class WzEditConfiguration extends Component {
       if (error.details) {
         errorMessage = `File ossec.conf saved, but there were found several error while validating the configuration. ${error.details}`;
       } else {
-        errorMessage = 'Error saving configuratio';
+        errorMessage = 'Error saving configuration';
       }
       this.setState({ saving: false, infoChangesAfterRestart: false });
       const options = {

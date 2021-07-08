@@ -102,8 +102,22 @@ class WzConfigurationSwitch extends Component {
   async componentDidMount() {
     // If agent, check if is synchronized or not
     if (this.props.agent.id !== '000') {
-      const agentSynchronized = await agentIsSynchronized(this.props.agent);
-      this.setState({ agentSynchronized });
+      try {
+        const agentSynchronized = await agentIsSynchronized(this.props.agent);
+        this.setState({ agentSynchronized });
+      }catch(error){
+        const options = {
+          context: `${WzConfigurationSwitch.name}.componentDidMount`,
+          level: UI_LOGGER_LEVELS.ERROR,
+          severity: UI_ERROR_SEVERITIES.BUSINESS,
+          error: {
+            error: error,
+            message: error.message || error,
+            title: error.name || error
+          },
+        };
+        getErrorOrchestrator().handleError(options);
+      }
     } else {
       try {
         // try if it is a cluster

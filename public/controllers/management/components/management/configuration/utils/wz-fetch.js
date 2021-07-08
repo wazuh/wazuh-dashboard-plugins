@@ -212,7 +212,7 @@ export const makePing = async (updateWazuhNotReadyYet, isCluster, tries = 30) =>
     }
     return Promise.resolve('Wazuh is ready');
   } catch (error) {
-    throw new error('Wazuh could not be recovered.');
+    throw new Error('Wazuh could not be recovered.');
   }
 };
 
