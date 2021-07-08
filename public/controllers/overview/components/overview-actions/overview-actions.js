@@ -13,19 +13,18 @@ import React, { Component } from 'react';
 import store from '../../../../redux/store';
 import { connect } from 'react-redux';
 import { showExploreAgentModal, updateCurrentAgentData } from '../../../../redux/actions/appStateActions';
-
-
 import {
-  EuiFlexItem,
+  EuiButtonEmpty,
   EuiButtonIcon,
+  EuiFlexItem,
   EuiIcon,
   EuiOverlayMask,
   EuiOutsideClickDetector,
   EuiModal,
+  EuiModalBody,
   EuiModalHeader,
   EuiModalHeaderTitle,
-  EuiModalBody,
-  EuiButtonEmpty,
+  EuiOverlayMask,
   EuiToolTip,
 } from '@elastic/eui';
 import './agents-selector.scss';
@@ -33,6 +32,7 @@ import { AgentSelectionTable } from './agents-selection-table';
 import { WAZUH_ALERTS_PATTERN } from '../../../../../common/constants';
 import { AppState } from '../../../../react-services/app-state';
 import { getDataPlugin } from '../../../../kibana-services';
+
 class OverviewActions extends Component {
   constructor(props) {
     super(props);

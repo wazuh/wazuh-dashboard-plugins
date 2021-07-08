@@ -21,10 +21,12 @@ import {
 import { WzRequest } from '../../../react-services/wz-request';
 import { ErrorHandler } from '../../../react-services/error-handler';
 import { EditRolesTable } from './edit-role-table';
-import { WzOverlayMask } from '../../common/util'
+import { WzOverlayMask } from '../../common/util';
+import { UI_LOGGER_LEVELS } from '../../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../../react-services/common-services';
 
 const reservedRoles = ['administrator', 'readonly', 'users_admin', 'agents_readonly', 'agents_admin', 'cluster_readonly', 'cluster_admin'];
-
 
 export const EditRole = ({ role, closeFlyout }) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -64,7 +66,7 @@ export const EditRole = ({ role, closeFlyout }) => {
       setAssignedPolicies(selectedPoliciesCopy);
       setPolicies(filteredPolicies);
     } catch (error) {
-      ErrorHandler.handle(error, 'Error');
+      throw new Error(error);
     }
     setIsLoading(false);
   }
@@ -101,7 +103,18 @@ export const EditRole = ({ role, closeFlyout }) => {
       setSelectedPolicies([]);
       await update();
     } catch (error) {
-      ErrorHandler.handle(error, 'There was an error');
+      const options = {
+        context: `${EditRole.name}.addPolicy`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        store: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   };
 

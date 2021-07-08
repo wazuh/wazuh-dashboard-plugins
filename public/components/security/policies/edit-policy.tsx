@@ -23,8 +23,10 @@ import { WzRequest } from '../../../react-services/wz-request';
 import { ErrorHandler } from '../../../react-services/error-handler';
 import { WzAPIUtils } from '../../../react-services/wz-api-utils';
 import { WzOverlayMask } from '../../common/util';
+import { UI_LOGGER_LEVELS } from '../../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../../react-services/common-services';
 import _ from 'lodash';
-
 
 export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
   const isReserved = WzAPIUtils.isReservedID(policy.id);
@@ -74,7 +76,18 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
       ErrorHandler.info('Role was successfully updated with the selected policies');
       closeFlyout();
     } catch (error) {
-      ErrorHandler.handle(error, 'Unexpected error');
+      const options = {
+        context: `${EditPolicyFlyout.name}.updatePolicy`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        store: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   };
 
@@ -277,8 +290,8 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
     );
   }
   useEffect(() => {
-    if (initialActionValue != actionValue ||  !_.isEqual(addedResources, initialAddedResources) ||  
-        !_.isEqual(addedActions, initialAddedActions) || initialResourceValue != resourceValue || 
+    if (initialActionValue != actionValue ||  !_.isEqual(addedResources, initialAddedResources) ||
+        !_.isEqual(addedActions, initialAddedActions) || initialResourceValue != resourceValue ||
         initialEffectValue != effectValue) {
       setHasChanges(true);
     } else {

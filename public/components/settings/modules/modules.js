@@ -25,8 +25,6 @@ import { compose } from 'redux';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 
-const errorContext = 'EnableModulesWrapper';
-
 export class EnableModulesWrapper extends Component {
   constructor(props) {
     try {
@@ -78,7 +76,7 @@ export class EnableModulesWrapper extends Component {
       };
     } catch (error) {
       const options = {
-        context: errorContext,
+        context: `${EnableModulesWrapper.name}.constructor`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.CRITICAL,
         store: true,
@@ -100,7 +98,7 @@ export class EnableModulesWrapper extends Component {
       this.setState({ extensions });
     } catch (error) {
       const options = {
-        context: errorContext,
+        context: `${EnableModulesWrapper.name}.componentDidMount`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         error: {
