@@ -10,9 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 import { WzRequest } from './wz-request';
-import { UI_LOGGER_LEVELS } from '../../common/constants';
-import { UI_ERROR_SEVERITIES } from './error-orchestrator/types';
-import { getErrorOrchestrator } from './common-services';
 
 export class GroupHandler {
   static async removeGroup(group) {
@@ -20,18 +17,7 @@ export class GroupHandler {
       const result = await WzRequest.apiReq('DELETE', `/agents/groups/${group}`, {});
       return result;
     } catch (error) {
-      const options = {
-        context: `${GroupHandler.name}.removeGroup`,
-        level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.BUSINESS,
-        store: true,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: `Error removing selected group`,
-        },
-      };
-      getErrorOrchestrator().handleError(options);
+      throw error; //TODO remove 
     }
   }
 
@@ -40,18 +26,7 @@ export class GroupHandler {
       const result = await WzRequest.apiReq('DELETE', `/agents/${agentId}/group/${group}`, {});
       return result;
     } catch (error) {
-      const options = {
-        context: `${GroupHandler.name}.removeAgentFromGroup`,
-        level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.BUSINESS,
-        store: true,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: `Error removing selected agent`,
-        },
-      };
-      getErrorOrchestrator().handleError(options);
+      throw error; //TODO remove
     }
   }
 
@@ -72,18 +47,7 @@ export class GroupHandler {
       });
       return result;
     } catch (error) {
-      const options = {
-        context: `${GroupHandler.name}.sendConfiguration`,
-        level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.BUSINESS,
-        store: true,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: `Error sending configuration to selected group`,
-        },
-      };
-      getErrorOrchestrator().handleError(options);
+      throw error //TODO remove
     }
   }
 
