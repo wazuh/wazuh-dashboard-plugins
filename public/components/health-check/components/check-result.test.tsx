@@ -14,7 +14,7 @@
 import React from 'react';
 import { mount } from 'enzyme';
 import { CheckResult } from './check-result';
-import { waitFor, render } from '@testing-library/react';
+import { act } from 'react-dom/test-utils';
 
 describe('Check result component', () => {
   const validationService = jest.fn();
@@ -22,7 +22,14 @@ describe('Check result component', () => {
   const handleCheckReady = jest.fn();
   const cleanErrors = jest.fn();
 
-  test('should render a Check result screen', () => {
+  const awaitForMyComponent = async (wrapper: any) => {
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      wrapper.update();
+    });
+  };
+
+  it('should render a Check result screen', async () => {
     validationService.mockImplementation(() => ({ errors: [] }));
     const component = mount(
       <CheckResult
@@ -43,14 +50,14 @@ describe('Check result component', () => {
     expect(component).toMatchSnapshot();
   });
 
-  test('should print ready', async () => {
+  it('should print ready', async () => {
     validationService.mockImplementation(() => ({ errors: [] }));
-    const {queryByLabelText} = render(
+    const wrapper = await mount(
       <CheckResult
         name={'test'}
         title={'Check Test'}
         awaitFor={[]}
-        check={true}
+        shouldCheck={true}
         validationService={validationService}
         handleErrors={handleErrors}
         isLoading={false}
@@ -60,19 +67,23 @@ describe('Check result component', () => {
         canRetry={true}
       />
     );
-    await waitFor(()=>{
-      expect(queryByLabelText('ready').tagName).toEqual('svg')
-    });
+
+    await awaitForMyComponent(wrapper);
+
+    expect(wrapper.find('ResultIcons').exists()).toBeTruthy();
+    expect(wrapper.find('ResultIcons').prop('result')).toBe('ready');
   });
 
-  test('should print error', async () => {
-    validationService.mockImplementation(() => {throw 'error'});
-      const {queryByLabelText} = render(
+  it('should print error_retry', async () => {
+    validationService.mockImplementation(() => {
+      throw 'error_retry';
+    });
+    const wrapper = await mount(
       <CheckResult
         name={'test'}
         title={'Check Test'}
         awaitFor={[]}
-        check={true}
+        shouldCheck={true}
         validationService={validationService}
         handleErrors={handleErrors}
         isLoading={false}
@@ -82,8 +93,34 @@ describe('Check result component', () => {
         canRetry={true}
       />
     );
-      await waitFor(()=>{
-        expect(queryByLabelText('error_retry').tagName).toEqual('svg')
+
+    await awaitForMyComponent(wrapper);
+
+    expect(wrapper.find('ResultIcons').exists()).toBeTruthy();
+    expect(wrapper.find('ResultIcons').prop('result')).toBe('error_retry');
+  });
+
+  it('should print error', async () => {
+    validationService.mockImplementation(() => {
+      throw 'error';
     });
+    const wrapper = await mount(
+      <CheckResult
+        name={'test'}
+        title={'Check Test'}
+        awaitFor={[]}
+        shouldCheck={true}
+        validationService={validationService}
+        handleErrors={handleErrors}
+        isLoading={false}
+        handleCheckReady={handleCheckReady}
+        checksReady={{}}
+        cleanErrors={cleanErrors}
+        canRetry={false}
+      />
+    );
+
+    expect(wrapper.find('ResultIcons').exists()).toBeTruthy();
+    expect(wrapper.find('ResultIcons').prop('result')).toBe('error');
   });
 });
