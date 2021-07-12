@@ -278,8 +278,6 @@ export const WzFilterBar = withErrorBoundary(
           context: `${WzFilterBar.name}.buildQuery`,
           level: UI_LOGGER_LEVELS.ERROR,
           severity: UI_ERROR_SEVERITIES.BUSINESS,
-          store: true,
-          display: true,
           error: {
             error: error,
             message: error.message || error,

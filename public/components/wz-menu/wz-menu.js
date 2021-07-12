@@ -306,7 +306,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
         context: `${WzMenu.name}.changePattern`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
-        store: true,
+        store: false,
         display: true,
         error: {
           error: error,
@@ -372,8 +372,6 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
         context: `${WzMenu.name}.changePattern`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
-        store: true,
-        display: true,
         error: {
           error: error,
           message: error.message || error,
