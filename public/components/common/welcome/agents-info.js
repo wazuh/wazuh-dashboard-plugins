@@ -32,6 +32,7 @@ export class AgentInfo extends Component {
     this.state = {};
   }
 
+  
   async componentDidMount() {
     const managerVersion = await WzRequest.apiReq('GET', '//', {});
 
@@ -59,7 +60,7 @@ export class AgentInfo extends Component {
   }
 
 
-  addTextPlatformRender(agent) {
+  addTextPlatformRender(agent, style) {
     const checkField = field => {
       return field !== undefined ? field : '-';
     };
@@ -72,7 +73,7 @@ export class AgentInfo extends Component {
     const osName = os_name === '- -' ? '-' : os_name;
 
     return (
-      <WzTextWithTooltipIfTruncated position='bottom' elementStyle={{ maxWidth: "250px", fontSize: 12 }}>
+      <WzTextWithTooltipIfTruncated position='bottom' elementStyle={{ maxWidth: style.maxWidth, fontSize: 12 }}>
         {this.getPlatformIcon(this.props.agent)}
         {' '}{osName}
       </WzTextWithTooltipIfTruncated>
@@ -86,10 +87,10 @@ export class AgentInfo extends Component {
     else if (status.toLowerCase() === 'never connected') { return hex ? '#98A2B3' : 'subdued'; }
   }
 
-  addHealthRender(agent) {
+  addHealthRender(agent, style) {
     // this was rendered with a EuiHealth, but EuiHealth has a div wrapper, and this section is rendered  within a <p> tag. <div> tags aren't allowed within <p> tags.
     return (
-      <span className="euiFlexGroup euiFlexGroup--gutterExtraSmall euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow" style={{ fontSize: '12px' }}>
+      <span className="euiFlexGroup euiFlexGroup--gutterExtraSmall euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow" style={{ maxWidth:style.maxWidth, fontSize: '12px' }}>
         <span className="euiFlexItem euiFlexItem--flexGrowZero">
           <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" className={`euiIcon euiIcon--medium euiIcon--${this.color(this.props.agent.status)}`} focusable="false" role="img" aria-hidden="true">
             <circle cx="8" cy="8" r="4"></circle>
@@ -119,7 +120,7 @@ export class AgentInfo extends Component {
     )
   }
 
-  buildStats(items) {
+  buildStats(items) {    
     const checkField = field => {
       return field !== undefined || field ? field : '-';
     };
@@ -136,13 +137,13 @@ export class AgentInfo extends Component {
                   label={'more'}
                   action={'redirect'}
                   agent={this.props.agent}
-                  {...this.props}/>
+                  {...this.props} />
               ) : item.description === 'Operating system' ? (
-                this.addTextPlatformRender(this.props.agent)
+                this.addTextPlatformRender(this.props.agent, item.style)
               ) : item.description === 'Status' ? (
-                this.addHealthRender(this.props.agent)
+                this.addHealthRender(this.props.agent, item.style)
               ) : (
-                <WzTextWithTooltipIfTruncated position='bottom' elementStyle={{ maxWidth: "250px", fontSize: 12 }}>
+                <WzTextWithTooltipIfTruncated position='bottom' elementStyle={{ maxWidth: item.style.maxWidth, fontSize: 12 }}>
                   {checkField(item.title)}
                 </WzTextWithTooltipIfTruncated>
               )
@@ -173,38 +174,25 @@ export class AgentInfo extends Component {
       ];
     } else {
       arrayStats = [
-        { title: agent.id, description: 'ID', style: { maxWidth: 100 } },
-        { title: agent.status, description: 'Status', style: { maxWidth: 150 } },
-        { title: agent.ip, description: 'IP', style: { maxWidth: 100 } },
-        { title: agent.version, description: 'Version', style: { maxWidth: 150 } },
-        { title: agent.group, description: 'Groups' },
-        {
-          title: agent.name,
-          description: 'Operating system',
-          style: {}
-        },
-        {
-          title: agent.node_name && agent.node_name !== 'unknown' ? agent.node_name : '-',
-          description: 'Cluster node',
-          style: { maxWidth: 150 }
-        },
-        {
-          title: formatUIDate(agent.dateAdd),
-          description: 'Registration date',
-          style: { maxWidth: 150 } },
-        {
-          title: formatUIDate(agent.lastKeepAlive),
-          description: 'Last keep alive',
-          style: { maxWidth: 150 }
-        },
+        { title: agent.id, description: 'ID', style: { minWidth: 30 } },
+        { title: agent.status, description: 'Status', style: { minWidth: 130 } },
+        { title: agent.ip, description: 'IP', style: { minWidth: 80 } },
+        { title: agent.version, description: 'Version', style: { minWidth: 100 } },
+        { title: agent.group, description: 'Groups', style: { minWidth: 150 } },
+        { title: agent.name, description: 'Operating system', style: { minWidth: 150 } },
+        { title: agent.node_name && agent.node_name !== 'unknown' ? agent.node_name : '-', description: 'Cluster node', style: { minWidth: 120 } },
+        { title: formatUIDate(agent.dateAdd), description: 'Registration date', style: { minWidth: 180 } },
+        { title: formatUIDate(agent.lastKeepAlive), description: 'Last keep alive', style: { minWidth: 180 } },
       ];
     }
 
     const stats = this.buildStats(arrayStats);
 
+    // window.innerWidth < 1500 ? console.log("<1500") : console.log("max")
+
     return (
       <Fragment>
-        <EuiFlexGroup className="wz-welcome-page-agent-info-details">
+        <EuiFlexGroup wrap style={{responsive: true }} className="wz-welcome-page-agent-info-details">
           {stats}
         </EuiFlexGroup>
       </Fragment>

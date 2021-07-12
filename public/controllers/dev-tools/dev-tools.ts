@@ -19,7 +19,6 @@ import { DynamicHeight } from '../../utils/dynamic-height';
 import { AppState } from '../../react-services/app-state';
 import { GenericRequest } from '../../react-services/generic-request';
 import store from '../../redux/store';
-import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
 import { WzRequest } from '../../react-services/wz-request';
 import { ErrorHandler } from '../../react-services/error-handler';
 import { getUiSettings } from '../../kibana-services';
@@ -57,8 +56,6 @@ export class DevToolsController {
     ) {
       AppState.setWzMenu();
     }
-    const breadcrumb = [{ text: '' }, { text: 'Dev Tools' }];
-    store.dispatch(updateGlobalBreadcrumb(breadcrumb));
     $(this.$document[0]).keydown(e => {
       if (!this.multipleKeyPressed.includes(e.which)) {
         this.multipleKeyPressed.push(e.which);
@@ -368,7 +365,17 @@ export class DevToolsController {
     if (!currentState) {
       const demoStr =
         'GET /agents?status=active\n\n# Example comment\n\n# You can use ? after the endpoint \n# in order to get suggestions \n# for your query params\n\nGET /manager/info\n\nGET /syscollector/000/packages?search=ssh&limit=1\n\nPOST /agents\n' +
-        JSON.stringify({ name: "NewAgent" }, null, 2);
+        JSON.stringify({ name: 'NewAgent' }, null, 2) +
+        '\n\nPUT /logtest\n' +
+        JSON.stringify(
+          {
+            log_format: 'syslog',
+            location: 'logtest',
+            event: 'Jul 06 22:00:22 linux-agent sshd[29205]: Invalid user blimey from 1.3.1.3 port 48928',
+          },
+          null,
+          2
+        );
 
       AppState.setCurrentDevTools(demoStr);
       this.apiInputBox.getDoc().setValue(demoStr);

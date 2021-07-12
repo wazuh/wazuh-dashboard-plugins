@@ -527,6 +527,68 @@ export class ReportPrinter{
     return this.addContent(title).addNewLine();
   }
 
+  addAgentsFilters(agents){
+    log(
+      'reporting:addAgentsFilters',
+      `Started to render the authorized agents filters`,
+      'info'
+    );
+    log(
+      'reporting:addAgentsFilters',
+      `agents: ${agents}`,
+      'debug'
+    );
+    
+    this.addNewLine();
+    
+    this.addContent({
+      text:
+        'NOTE: This report only includes the authorized agents of the user who generated the report',
+      style: { fontSize: 10, color: COLORS.PRIMARY },
+      margin: [0, 0, 0, 5]
+    });
+
+    /*TODO: This will be enabled by a config*/
+    /* this.addContent({
+      fontSize: 8,
+      table: {
+        widths: ['*'],
+        body: [
+          [
+            {
+              columns: [
+                {
+                  svg: filterIconRaw,
+                  width: 10,
+                  height: 10,
+                  margin: [40, 6, 0, 0]
+                },
+                {
+                  text: `Agent IDs: ${agents}` || '-',
+                  margin: [43, 0, 0, 0],
+                  style: { fontSize: 8, color: '#333' }
+                }
+              ]
+            }
+          ]
+        ]
+      },
+      margin: [-40, 0, -40, 0],
+      layout: {
+        fillColor: () => null,
+        hLineWidth: () => 0,
+        vLineWidth: () => 0
+      }
+    }); */
+
+    this.addContent({ text: '\n' });
+    log(
+      'reporting:addAgentsFilters',
+      'Time range and filters rendered',
+      'debug'
+    );
+  }
+
   async print(path: string){
     const document = this._printer.createPdfKitDocument({...pageConfiguration, content: this._content});
     await document.pipe(
@@ -534,4 +596,5 @@ export class ReportPrinter{
     );
     document.end();
   }
+
 }

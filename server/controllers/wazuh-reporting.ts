@@ -32,7 +32,7 @@ import { KibanaRequest, RequestHandlerContext, KibanaResponseFactory } from 'src
 import { ReportPrinter } from '../lib/reporting/printer';
 
 import { log } from '../lib/logger';
-import { WAZUH_ALERTS_PATTERN, WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH, WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH } from '../../common/constants';
+import { WAZUH_ALERTS_PATTERN, WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH, WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, AUTHORIZED_AGENTS } from '../../common/constants';
 import { createDirectoryIfNotExists, createDataDirectoryIfNotExists } from '../lib/filesystem';
 
 
@@ -44,7 +44,7 @@ export class WazuhReportingCtrl {
    * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
    * @param {String} searchBar search term
    */
-  private sanitizeKibanaFilters(filters: any, searchBar?: string): string {
+  private sanitizeKibanaFilters(filters: any, searchBar?: string): [string, string] {
     log('reporting:sanitizeKibanaFilters', `Started to sanitize filters`, 'info');
     log(
       'reporting:sanitizeKibanaFilters',
@@ -53,7 +53,19 @@ export class WazuhReportingCtrl {
     );
     let str = '';
 
+    const agentsFilter: any = [];
+
+    //separate agents filter
+    filters = filters.filter((filter) => {
+      if (filter.meta.controlledBy === AUTHORIZED_AGENTS) {
+        agentsFilter.push(filter);
+        return false;
+      }
+      return filter;
+    });
+
     const len = filters.length;
+
     for (let i = 0; i < len; i++) {
       const { negate, key, value, params, type } = filters[i].meta;
       str += `${negate ? 'NOT ' : ''}`;
@@ -71,8 +83,12 @@ export class WazuhReportingCtrl {
     if (searchBar) {
       str += ' AND ' + searchBar;
     }
-    log('reporting:sanitizeKibanaFilters', `str: ${str}`, 'debug');
-    return str;
+
+    const agentsFilterStr = agentsFilter.map((filter) => filter.meta.value).join(',');
+
+    log('reporting:sanitizeKibanaFilters', `str: ${str}, agentsFilterStr: ${agentsFilterStr}`, 'debug');
+
+    return [str, agentsFilterStr];
   }
 
   /**
@@ -1153,7 +1169,7 @@ export class WazuhReportingCtrl {
       await this.renderHeader(context, printer, section, moduleID, agents, apiId);
 
       
-      const sanitizedFilters = filters ? this.sanitizeKibanaFilters(filters, searchBar) : false;
+      const [sanitizedFilters, agentsFilter] = filters ? this.sanitizeKibanaFilters(filters, searchBar) : [false, false];
       
       if (time && sanitizedFilters) {
         printer.addTimeRangeAndFilters(from, to, sanitizedFilters, browserTimezone);
@@ -1180,7 +1196,13 @@ export class WazuhReportingCtrl {
         printer.addTables(tables);
       };
 
-      await printer.print(path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, userID, name));
+      //add authorized agents
+      if (agentsFilter) {
+        printer.addAgentsFilters(agentsFilter);
+      }
+
+
+      await printer.print(path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, userID, name));      
 
       return response.ok({
         body: {

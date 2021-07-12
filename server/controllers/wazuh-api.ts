@@ -321,7 +321,7 @@ export class WazuhApiCtrl {
         );
       }catch(error){
         return ErrorResponse(
-          `ERROR3099 - ${error.response.data.detail || 'Wazuh not ready yet'}`,
+          `ERROR3099 - ${error.response?.data?.detail || 'Wazuh not ready yet'}`,
           3099,
           500,
           response
@@ -479,7 +479,7 @@ export class WazuhApiCtrl {
         typeof daemons['wazuh-clusterd'] !== 'undefined';
       const wazuhdbExists = typeof daemons['wazuh-db'] !== 'undefined';
 
-      const execd = daemons['ossec-execd'] === 'running';
+      const execd = daemons['wazuh-execd'] === 'running';
       const modulesd = daemons['wazuh-modulesd'] === 'running';
       const wazuhdb = wazuhdbExists ? daemons['wazuh-db'] === 'running' : true;
       const clusterd = isCluster ? daemons['wazuh-clusterd'] === 'running' : true;

@@ -15,6 +15,7 @@ import { useUserPermissionsRequirements } from '../hooks/useUserPermissions';
 import { useUserRolesRequirements } from '../hooks/useUserRoles';
 
 import {
+  EuiSwitch,
   EuiButton,
   EuiButtonEmpty,
   EuiButtonIcon,
@@ -34,7 +35,7 @@ export type TUserRolesFunction = (props : any) => TUserRoles;
 interface IWzButtonPermissionsProps{
   permissions?: TUserPermissions | TUserPermissionsFunction
   roles?: TUserRoles | TUserRolesFunction
-  buttonType?: 'default' | 'empty' | 'icon' | 'link'
+  buttonType?: 'default' | 'empty' | 'icon' | 'link' | 'switch'
   tooltip?: any
   rest?: any
 };
@@ -47,11 +48,17 @@ export const WzButtonPermissions = ({permissions = null, roles = null, buttonTyp
     : buttonType === 'empty' ? EuiButtonEmpty 
     : buttonType === 'icon' ? EuiButtonIcon 
     : buttonType === 'link' ? EuiLink 
+    : buttonType === 'switch' ? EuiSwitch 
     : null
-  const disabled = Boolean(userRolesRequirements || userPermissionRequirements || rest.isDisabled);
-  const disabledProp = buttonType !== 'link' ? { isDisabled: disabled } : { disabled };
+  const disabled = Boolean(userRolesRequirements || userPermissionRequirements || rest.isDisabled || rest.disabled);
+  const disabledProp = !['link', 'switch'].includes(buttonType) ? { isDisabled: disabled } : { disabled };
+  const onClick = disabled || !rest.onClick ? undefined : rest.onClick;
+  const onChange = disabled || !rest.onChange ? undefined : rest.onChange;
+  const customProps = { ...rest, onChange, onClick };
 
-  const button = <Button {...rest} {...disabledProp} onClick={(disabled || !rest.onClick) ? undefined : rest.onClick}/>
+  if (buttonType == 'switch') delete customProps.onClick;
+
+  const button = <Button {...customProps} {...disabledProp} />;
   
   const buttonTextRequirements = (userRolesRequirements || userPermissionRequirements) && (
     <Fragment>

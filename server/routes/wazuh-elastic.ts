@@ -91,6 +91,9 @@ export function WazuhElasticRoutes(router: IRouter) {
           cluster: schema.string(),
           field: schema.string(),
           pattern: schema.string(),
+        }),
+        query: schema.object({
+          agentsList: schema.string(),
         })
       }
     },

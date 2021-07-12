@@ -156,7 +156,6 @@ export class ReportingService {
         components
       };
       const apiEndpoint = type === 'agentConfig' ? `/reports/agents/${obj.id}` : `/reports/groups/${obj.name}`;
-
       await GenericRequest.request('POST', apiEndpoint, data);
 
       this.$rootScope.reportBusy = false;

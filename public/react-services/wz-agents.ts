@@ -9,8 +9,12 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { ErrorToastOptions } from 'kibana/public';
 import { WAZUH_AGENTS_OS_TYPE } from '../../common/constants';
+import { getToasts } from '../kibana-services';
 import { UnsupportedComponents } from '../utils/components-os-support';
+import IApiResponse from './interfaces/api-response.interface';
+import { WzRequest } from './wz-request';
 
 export function getAgentOSType(agent){
   if(agent?.os?.uname?.toLowerCase().includes(WAZUH_AGENTS_OS_TYPE.LINUX)){
@@ -30,3 +34,35 @@ export function hasAgentSupportModule(agent, component){
   const agentOSType = getAgentOSType(agent);
   return !(UnsupportedComponents[agentOSType].includes(component));
 };
+
+export async function getAuthorizedAgents() {
+  try{
+    const params = { limit: 500 };
+    const output: IApiResponse<{id: string}> = await WzRequest.apiReq('GET', `/agents`, {});
+    const totalItems = (((output || {}).data || {}).data || {}).total_affected_items;
+    let itemsArray = [];
+    if (totalItems && output.data && output.data.data && totalItems > 500) {
+      params.offset = 0;
+      itemsArray.push(...output.data.data.affected_items);
+      while (itemsArray.length < totalItems && params.offset < totalItems) {
+        params.offset += params.limit;
+        const tmpData: IApiResponse<{id: string}> = await WzRequest.apiReq(
+          'GET',
+          `/agents`,
+          { params: params },
+        );
+        itemsArray.push(...tmpData.data.data.affected_items);
+      }
+      const allowedAgents = itemsArray ? itemsArray.map((agent) => agent.id) : [];
+      return allowedAgents;
+    }
+    else{
+      const allowedAgents = output ? output.data.data.affected_items.map((agent) => agent.id) : []
+      return allowedAgents;
+    }
+  }catch(error) {   
+    getToasts().addError(error, {title: `Error getting user authorized agents`} as ErrorToastOptions);
+    return Promise.reject();
+  };
+}
+

@@ -16,7 +16,7 @@
 
 /* Customize the App icon style */
 
-/* .euiCollapsibleNav .euiCollapsibleNavGroup .euiListGroupItem__button .euiIcon {  
+/* .euiCollapsibleNav .euiCollapsibleNavGroup .euiListGroupItem__button .euiIcon {
   height: 24px;
   width: 24px;
   filter: brightness(0) saturate(100%) invert(24%) sepia(97%) saturate(1757%) hue-rotate(186deg) brightness(94%) contrast(101%);
@@ -1217,7 +1217,7 @@ wz-xml-file-editor {
   background: white !important;
 }
 
-.list-element-ok { 
+.list-element-ok {
   color: green !important;
 }
 
@@ -1227,10 +1227,7 @@ wz-xml-file-editor {
 
 .logtest-side{
   height: calc(100vh - 95px);
-  border-left: 1px solid #e1e2e3;
-  box-shadow: -2px 0px 2px -1px rgba(152, 162, 179, 0.3);
   margin-top: -50px;
-  background: #fff;
   z-index: 10;
   position : fixed;
   right: 0;
@@ -1486,10 +1483,10 @@ div.euiPopover__panel.euiPopover__panel-isOpen.euiPopover__panel--bottom.wz-menu
 }
 
 /* Change custom discover size */
-.wz-discover > .globalQueryBar > 
-.kbnQueryBar--withDatePicker > 
+.wz-discover > .globalQueryBar >
+.kbnQueryBar--withDatePicker >
 .euiFlexItem.euiFlexItem--flexGrowZero >
-.euiFlexGroup > 
+.euiFlexGroup >
 .euiFlexItem.kbnQueryBar__datePickerWrapper {
   max-width: 300px;
 }
@@ -1500,15 +1497,15 @@ div.euiPopover__panel.euiPopover__panel-isOpen.euiPopover__panel--bottom.wz-menu
   }
 
   /* Change custom discover size */
-  .wz-discover > .globalQueryBar > 
+  .wz-discover > .globalQueryBar >
   .euiFlexGroup.kbnQueryBar.kbnQueryBar--withDatePicker {
     flex-wrap: wrap;
     margin-left: 0;
     margin-right: 0;
   }
 
-  .wz-discover > .globalQueryBar > 
-  .euiFlexGroup.kbnQueryBar.kbnQueryBar--withDatePicker > 
+  .wz-discover > .globalQueryBar >
+  .euiFlexGroup.kbnQueryBar.kbnQueryBar--withDatePicker >
   .euiFlexItem {
     width: 100% !important;
     -ms-flex-preferred-size: 100% !important;
@@ -1518,25 +1515,25 @@ div.euiPopover__panel.euiPopover__panel-isOpen.euiPopover__panel--bottom.wz-menu
     margin-bottom: 16px !important;
   }
 
-  .wz-discover > .globalQueryBar > 
+  .wz-discover > .globalQueryBar >
   .kbnQueryBar--withDatePicker > :first-child {
     order: 1;
     margin-top: -8px;
   }
 
-  .wz-discover > .globalQueryBar > 
-  .kbnQueryBar--withDatePicker > 
+  .wz-discover > .globalQueryBar >
+  .kbnQueryBar--withDatePicker >
   .euiFlexItem.euiFlexItem--flexGrowZero >
-  .euiFlexGroup > 
+  .euiFlexGroup >
   .euiFlexItem.kbnQueryBar__datePickerWrapper >
   .euiFlexGroup {
     width: 100%;
   }
 
-  .wz-discover > .globalQueryBar > 
-  .kbnQueryBar--withDatePicker > 
+  .wz-discover > .globalQueryBar >
+  .kbnQueryBar--withDatePicker >
   .euiFlexItem.euiFlexItem--flexGrowZero >
-  .euiFlexGroup > 
+  .euiFlexGroup >
   .euiFlexItem.kbnQueryBar__datePickerWrapper {
     flex-grow: 1!important;
     max-width: none;
@@ -1657,14 +1654,14 @@ iframe.width-changed {
   padding-bottom: 5px;
 }
 
-@media only screen and (max-width: 1200px) { 
+@media only screen and (max-width: 1200px) {
  .wideElementsDevTools {
     display: none;
   }
   /* .selectDevTools {
     display: inline;
   } */
-} 
+}
 .module-table .euiFacetButton__text {
   max-height: 40px;
 }
