@@ -68,5 +68,5 @@ jobs:
         uses: AthleticNet/comment-test-coverage@1.1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          path: $GITHUB_WORKSPACE/kibana/plugins/wazuh-kibana-app/report.json
+          path: ./kibana/plugins/wazuh-kibana-app/report.json
           title: Jest Test Coverage
