@@ -18,6 +18,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added try catch strategy with ErrorOrchestrator service on Overview [#3408](https://github.com/wazuh/wazuh-kibana-app/pull/3408)
 - Added try catch strategy with ErrorOrchestrator service on ManagementController [#3374](https://github.com/wazuh/wazuh-kibana-app/pull/3374)
 - Added try catch strategy with ErrorOrchestrator service on FIM & SCA sections [#3417](https://github.com/wazuh/wazuh-kibana-app/pull/3417)
+- Fixed issue where configuration still asked you to save changes before exiting even after saving [#3460](https://github.com/wazuh/wazuh-kibana-app/pull/3460)
 
 ### Changed
 
