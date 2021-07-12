@@ -77,7 +77,7 @@ function useSuggestHandler(props: IWzSearchBarProps, inputValue, setInputValue, 
   const [suggestsItems, setSuggestItems] = useState<suggestItem[]>([]);
   const [status, setStatus] = useState<'unchanged'|'loading'>('unchanged');
   const [isInvalid, setInvalid] = useState(false);
-  
+
   useEffect(() => {
     setHandler(new SuggestHandler({...props, status, setStatus, setInvalid, setIsOpen}, setInputValue))
     !props.noDeleteFiltersOnUpdateSuggests && props.onFiltersChange([]);

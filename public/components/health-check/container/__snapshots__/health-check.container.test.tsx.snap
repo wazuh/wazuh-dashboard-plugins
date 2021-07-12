@@ -20,7 +20,6 @@ exports[`Health Check container should render a Health check screen 1`] = `
       <CheckResult
         awaitFor={Array []}
         canRetry={true}
-        check={true}
         checksReady={Object {}}
         cleanErrors={[Function]}
         handleCheckReady={[Function]}
@@ -28,6 +27,7 @@ exports[`Health Check container should render a Health check screen 1`] = `
         isLoading={false}
         key="health_check_check_api"
         name="api"
+        shouldCheck={true}
         showLogButton={false}
         title="Check Wazuh API connection"
         validationService={[Function]}
@@ -38,7 +38,6 @@ exports[`Health Check container should render a Health check screen 1`] = `
             "api",
           ]
         }
-        check={true}
         checksReady={Object {}}
         cleanErrors={[Function]}
         handleCheckReady={[Function]}
@@ -46,6 +45,7 @@ exports[`Health Check container should render a Health check screen 1`] = `
         isLoading={false}
         key="health_check_check_setup"
         name="setup"
+        shouldCheck={true}
         showLogButton={false}
         title="Check Wazuh API version"
         validationService={[Function]}
@@ -53,7 +53,6 @@ exports[`Health Check container should render a Health check screen 1`] = `
       <CheckResult
         awaitFor={Array []}
         canRetry={true}
-        check={true}
         checksReady={Object {}}
         cleanErrors={[Function]}
         handleCheckReady={[Function]}
@@ -61,52 +60,14 @@ exports[`Health Check container should render a Health check screen 1`] = `
         isLoading={false}
         key="health_check_check_pattern"
         name="pattern"
+        shouldCheck={true}
         showLogButton={false}
         title="Check alerts index pattern"
         validationService={[Function]}
       />
       <CheckResult
-        awaitFor={
-          Array [
-            "pattern",
-          ]
-        }
-        canRetry={true}
-        check={true}
-        checksReady={Object {}}
-        cleanErrors={[Function]}
-        handleCheckReady={[Function]}
-        handleErrors={[Function]}
-        isLoading={false}
-        key="health_check_check_template"
-        name="template"
-        showLogButton={false}
-        title="Check alerts indices template"
-        validationService={[Function]}
-      />
-      <CheckResult
-        awaitFor={
-          Array [
-            "pattern",
-          ]
-        }
-        canRetry={true}
-        check={true}
-        checksReady={Object {}}
-        cleanErrors={[Function]}
-        handleCheckReady={[Function]}
-        handleErrors={[Function]}
-        isLoading={false}
-        key="health_check_check_fields"
-        name="fields"
-        showLogButton={false}
-        title="Check alerts index pattern fields"
-        validationService={[Function]}
-      />
-      <CheckResult
         awaitFor={Array []}
         canRetry={true}
-        check={true}
         checksReady={Object {}}
         cleanErrors={[Function]}
         handleCheckReady={[Function]}
@@ -114,6 +75,7 @@ exports[`Health Check container should render a Health check screen 1`] = `
         isLoading={false}
         key="health_check_check_patternMonitoring"
         name="patternMonitoring"
+        shouldCheck={true}
         showLogButton={false}
         title="Check monitoring index pattern"
         validationService={[Function]}
@@ -121,7 +83,6 @@ exports[`Health Check container should render a Health check screen 1`] = `
       <CheckResult
         awaitFor={Array []}
         canRetry={true}
-        check={true}
         checksReady={Object {}}
         cleanErrors={[Function]}
         handleCheckReady={[Function]}
@@ -129,6 +90,7 @@ exports[`Health Check container should render a Health check screen 1`] = `
         isLoading={false}
         key="health_check_check_patternStatistics"
         name="patternStatistics"
+        shouldCheck={true}
         showLogButton={false}
         title="Check statistics index pattern"
         validationService={[Function]}
@@ -136,7 +98,6 @@ exports[`Health Check container should render a Health check screen 1`] = `
       <CheckResult
         awaitFor={Array []}
         canRetry={true}
-        check={true}
         checksReady={Object {}}
         cleanErrors={[Function]}
         handleCheckReady={[Function]}
@@ -144,13 +105,13 @@ exports[`Health Check container should render a Health check screen 1`] = `
         isLoading={false}
         key="health_check_check_maxBuckets"
         name="maxBuckets"
+        shouldCheck={true}
         showLogButton={false}
         title="Check timelion:max_buckets setting"
       />
       <CheckResult
         awaitFor={Array []}
         canRetry={true}
-        check={true}
         checksReady={Object {}}
         cleanErrors={[Function]}
         handleCheckReady={[Function]}
@@ -158,6 +119,7 @@ exports[`Health Check container should render a Health check screen 1`] = `
         isLoading={false}
         key="health_check_check_metaFields"
         name="metaFields"
+        shouldCheck={true}
         showLogButton={false}
         title="Check metaFields setting"
       />
