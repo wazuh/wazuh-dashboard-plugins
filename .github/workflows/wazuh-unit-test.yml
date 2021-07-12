@@ -65,7 +65,7 @@ jobs:
           yarn run test:jest --silent --ci --testLocationInResults --colors --coverage --json --outputFile=report.json
 
       - name: Step 09 - Comment Test Coverage
-        uses: AthleticNet/comment-test-coverage@1.1
+        uses: AthleticNet/comment-test-coverage@1.2.2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           path: ./kibana/plugins/wazuh-kibana-app/report.json
