@@ -62,11 +62,11 @@ jobs:
           cd ./kibana/plugins/wazuh-kibana-app
           ls -la
           echo $GITHUB_WORKSPACE/kibana/plugins/wazuh-kibana-app/
-          yarn run test:jest --silent --ci --testLocationInResults --colors --coverage --json --outputFile=report.json
+          yarn run test:jest --colors
 
       - name: Step 09 - Comment Test Coverage
         uses: AthleticNet/comment-test-coverage@1.2.2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          path: ./kibana/plugins/wazuh-kibana-app/report.json
+          path: ./kibana/plugins/wazuh-kibana-app/target/test-coverage/coverage-summary.json
           title: Jest Test Coverage

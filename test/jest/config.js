@@ -31,7 +31,7 @@ export default {
   coverageReporters: [
     'html',
     'text-summary',
-    'json'
+    'json-summary'
   ],
   globals: {
     'ts-jest': {
