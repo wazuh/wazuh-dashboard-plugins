@@ -41,6 +41,7 @@ import { compose } from 'redux';
 import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
+import { SampleData } from './components';
 
 
 const visHandler = new VisHandlers();
@@ -52,7 +53,6 @@ export const WzVisualize = compose (withErrorBoundary,withReduxProvider) (class 
     this.state = {
       visualizations: !!props.isAgent ? agentVisualizations : visualizations,
       expandedVis: false,
-      thereAreSampleAlerts: false,
       hasRefreshedKnownFields: false,
       refreshingKnownFields: [],
       refreshingIndex: true
@@ -100,25 +100,6 @@ export const WzVisualize = compose (withErrorBoundary,withReduxProvider) (class 
           },
         ];
       }
-    }
-
-    // Check if there is sample alerts installed
-    try {
-      const thereAreSampleAlerts = (await WzRequest.genericReq('GET', '/elastic/samplealerts', {}))
-        .data.sampleAlertsInstalled;
-      this._isMount && this.setState({ thereAreSampleAlerts });
-    } catch (error) {
-      const options = {
-        context: `${WzVisualize.name}.componentDidMount`,
-        level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.UI,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: error.name || error,
-        },
-      };
-      getErrorOrchestrator().handleError(options);
     }
   }
 
@@ -275,11 +256,8 @@ export const WzVisualize = compose (withErrorBoundary,withReduxProvider) (class 
     return (
       <Fragment>
         {/* Sample alerts Callout */}
-        {this.state.thereAreSampleAlerts && this.props.resultState === 'ready' && (
-          <EuiCallOut title='This dashboard contains sample data' color='warning' iconType='alert' style={{ margin: '0 8px 16px 8px' }}>
-            <p>The data displayed may contain sample alerts. Go <EuiLink href='#/settings?tab=sample_data' aria-label='go to configure sample data'>here</EuiLink> to configure the sample data.
-            </p>
-          </EuiCallOut>
+        {this.props.resultState === 'ready' && (
+          <SampleData context={`${WzVisualize.name}-sample-data`} />
         )}
 
         {this.props.resultState === 'none' && (
