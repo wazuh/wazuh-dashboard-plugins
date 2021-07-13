@@ -17,8 +17,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added try catch strategy with ErrorOrchestrator service on Management > Ruleset [#3410](https://github.com/wazuh/wazuh-kibana-app/pull/3410)
 - Added try catch strategy with ErrorOrchestrator service on Overview [#3408](https://github.com/wazuh/wazuh-kibana-app/pull/3408)
 - Added try catch strategy with ErrorOrchestrator service on ManagementController [#3374](https://github.com/wazuh/wazuh-kibana-app/pull/3374)
+- Added try catch strategy with ErrorOrchestrator service on Management > Reporting [#3427](https://github.com/wazuh/wazuh-kibana-app/pull/3427)
 - Added try catch strategy with ErrorOrchestrator service on FIM & SCA sections [#3417](https://github.com/wazuh/wazuh-kibana-app/pull/3417)
 - Added try-catch strategy in Wz files [#3448](https://github.com/wazuh/wazuh-kibana-app/pull/3448)
+- Added try catch strategy with ErrorOrchestrator service on Components > Overview [#3442](https://github.com/wazuh/wazuh-kibana-app/pull/3442)
 
 ### Changed
 
@@ -28,6 +30,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Refactored all try catch strategy on Settings section [#3392](https://github.com/wazuh/wazuh-kibana-app/pull/3392)
 - Refactored all try catch strategy on Controller/Agent section [#3398](https://github.com/wazuh/wazuh-kibana-app/issues/3398)
 - Refactored all try catch value of context for ErrorOrchestrator service. [#3432](https://github.com/wazuh/wazuh-kibana-app/issues/3432)
+- Refactored all try catch strategy on Controller/Groups section [#3415](https://github.com/wazuh/wazuh-kibana-app/issues/3415)
 
 ### Fixed
 
