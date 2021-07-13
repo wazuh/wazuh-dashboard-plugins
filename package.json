@@ -62,6 +62,7 @@
     "winston": "3.0.0"
   },
   "devDependencies": {
+    "redux-mock-store": "^1.5.4",
     "@types/node-cron": "^2.0.3",
     "eslint-plugin-async-await": "^0.0.0",
     "tslint": "^5.11.0",
