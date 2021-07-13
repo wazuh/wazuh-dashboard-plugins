@@ -456,7 +456,7 @@ export class DevToolsController {
           const spaceLineStart = (line.match(reLineStart) || [])[1] || '';
           const inputKeyBodyParam = (line.match(reLineStart) || [])[2] || '';
 
-          const renderBodyParam = (parameter, spaceLineStart) => {
+          const renderBodyParam = (parameter, spaceLineStart) => {           
             let valueBodyParam = '';
             if (parameter.type === 'string') {
               valueBodyParam = '""'
@@ -727,7 +727,7 @@ export class DevToolsController {
           : '/';
 
         let JSONraw = {};
-        try {
+        try {          
           JSONraw = JSON.parse(paramsInline || desiredGroup.requestTextJson);
         } catch (error) {
           JSONraw = {};
@@ -743,6 +743,7 @@ export class DevToolsController {
         if (typeof JSONraw === 'object') JSONraw.devTools = true;
         if (!firstTime) {
           const output = await this.wzRequest.apiReq(method, path, JSONraw);
+                    
           if (typeof output === 'string' && output.includes('3029')) {
             this.apiOutputBox.setValue('This method is not allowed without admin mode');
           }

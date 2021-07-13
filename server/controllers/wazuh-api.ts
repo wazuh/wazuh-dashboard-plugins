@@ -522,7 +522,7 @@ export class WazuhApiCtrl {
   shouldKeepArrayAsIt(method, path) {
     // Methods that we must respect a do not transform them
     const isAgentsRestart = method === 'POST' && path === '/agents/restart';
-    const isActiveResponse = method === 'PUT' && path.startsWith('/active-response/');
+    const isActiveResponse = method === 'PUT' && path.startsWith('/active-response');
     const isAddingAgentsToGroup = method === 'POST' && path.startsWith('/agents/group/');
 
     // Returns true only if one of the above conditions is true
@@ -539,6 +539,7 @@ export class WazuhApiCtrl {
    * @returns {Object} API response or ErrorResponse
    */
   async makeRequest(context, method, path, data, id, response) {
+    
     const devTools = !!(data || {}).devTools;
     try {
       const api = await this.manageHosts.getHostById(id);
@@ -629,6 +630,9 @@ export class WazuhApiCtrl {
           }
         }
       }
+
+      console.log(method, path, data, options);
+      
       const responseToken = await context.wazuh.api.client.asCurrentUser.request(method, path, data, options);
       const responseIsDown = this.checkResponseIsDown(responseToken);
       if (responseIsDown) {
@@ -701,6 +705,7 @@ export class WazuhApiCtrl {
    * @returns {Object} api response or ErrorResponse
    */
   requestApi(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
+
     const idApi = getCookieValueByName(request.headers.cookie, 'wz-api');
     if (idApi !== request.body.id) { // if the current token belongs to a different API id, we relogin to obtain a new token
       return ErrorResponse(
