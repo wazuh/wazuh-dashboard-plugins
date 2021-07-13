@@ -16,6 +16,9 @@ import { Markdown } from '../../common/util';
 import { formatUIDate } from '../../../react-services';
 import React from 'react';
 import { EuiLink } from '@elastic/eui';
+import { UI_LOGGER_LEVELS } from '../../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../../react-services/common-services';
 
 const getMitreAttackIntelligenceSuggestions = (endpoint: string, field: string) => async (input: string) => {
   try{
@@ -30,6 +33,19 @@ const getMitreAttackIntelligenceSuggestions = (endpoint: string, field: string) 
       .sort()
       .slice(0,9)
   }catch(error){
+    const options = {
+      context: `${ModuleMitreAttackIntelligenceResource.name}.getMitreItemToRedirect`,
+      level: UI_LOGGER_LEVELS.ERROR,
+      severity: UI_ERROR_SEVERITIES.BUSINESS,
+      store: true,
+      display: true,
+      error: {
+        error: error,
+        message: error.message || error,
+        title: `Error getting suggestions`,
+      },
+    };
+    getErrorOrchestrator().handleError(options);
     return [];
   };
 };
