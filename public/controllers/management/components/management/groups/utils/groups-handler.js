@@ -10,9 +10,10 @@
  * Find more information about this on the LICENSE file.
  */
 
-import {
-  WzRequest
-} from '../../../../../../react-services/wz-request';
+import { WzRequest } from '../../../../../../react-services/wz-request';
+import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
 
 export default class GroupsHandler {
   /**
@@ -22,11 +23,11 @@ export default class GroupsHandler {
   static async saveGroup(name) {
     try {
       const result = await WzRequest.apiReq('POST', `/groups`, {
-        group_id: name
+        group_id: name,
       });
       return result;
     } catch (error) {
-      return Promise.reject(error);
+      throw new Error(error);
     }
   }
 
@@ -38,12 +39,23 @@ export default class GroupsHandler {
     try {
       const result = await WzRequest.apiReq('DELETE', `/groups`, {
         params: {
-          groups_list: name
-        }
+          groups_list: name,
+        },
       });
       return result;
     } catch (error) {
-      return Promise.reject(error);
+      const options = {
+        context: `${GroupsHandler.name}.deleteGroup`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        store: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `Error deleting the group: ${error.message || error}`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   }
 
@@ -54,14 +66,10 @@ export default class GroupsHandler {
    */
   static async deleteAgent(agentId, groupId) {
     try {
-      const result = await WzRequest.apiReq(
-        'DELETE',
-        `/agents/${agentId}/group/${groupId}`,
-        {}
-      );
+      const result = await WzRequest.apiReq('DELETE', `/agents/${agentId}/group/${groupId}`, {});
       return result;
     } catch (error) {
-      return Promise.reject(error);
+      throw new Error(error);
     }
   }
 
@@ -74,7 +82,18 @@ export default class GroupsHandler {
       const result = await WzRequest.apiReq('GET', `/groups/${name}/agents`, filters);
       return result;
     } catch (error) {
-      return Promise.reject(error);
+      const options = {
+        context: `${GroupsHandler.name}.agentsGroup`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        store: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `Error obtaining the agents of the group: ${error.message || error}`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   }
 
@@ -87,7 +106,7 @@ export default class GroupsHandler {
       const result = await WzRequest.apiReq('GET', `/groups/${name}/files`, filters);
       return result;
     } catch (error) {
-      return Promise.reject(error);
+      throw new Error(error);
     }
   }
 
@@ -100,7 +119,7 @@ export default class GroupsHandler {
       const result = await WzRequest.apiReq('GET', '/groups', filters);
       return result;
     } catch (error) {
-      return Promise.reject(error);
+      throw new Error(error);
     }
   }
 
@@ -111,9 +130,20 @@ export default class GroupsHandler {
   static async getFileContent(path) {
     try {
       const result = await WzRequest.apiReq('GET', path, {});
-      return ((result || {}).data) || false;
+      return (result || {}).data || false;
     } catch (error) {
-      return Promise.reject(error);
+      const options = {
+        context: `${GroupsHandler.name}.getFileContent`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        store: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `Error obtaining the content of groups files: ${error.message || error}`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   }
 
@@ -127,11 +157,11 @@ export default class GroupsHandler {
     try {
       const result = await WzRequest.apiReq('PUT', `/groups/${groupId}/configuration`, {
         body: content,
-        origin: 'xmleditor'
+        origin: 'xmleditor',
       });
       return result;
     } catch (error) {
-      return Promise.reject(error);
+      throw new Error(error);
     }
   }
 }

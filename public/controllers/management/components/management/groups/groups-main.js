@@ -25,6 +25,10 @@ import {
 import { connect } from 'react-redux';
 import { updateGlobalBreadcrumb } from '../../../../../redux/actions/globalBreadcrumbActions';
 import { WzRequest } from '../../../../../react-services/wz-request';
+import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../../../../react-services/common-services';
+
 
 class WzGroups extends Component {
   constructor(props) {
@@ -51,7 +55,20 @@ class WzGroups extends Component {
         const responseGroup = await WzRequest.apiReq('GET', '/groups', {params: {groups_list: group}});
         const dataGroup = responseGroup?.data?.data?.affected_items?.[0];
         this.props.updateGroupDetail(dataGroup);
-      }catch(error){};
+      }catch(error){
+        const options = {
+          context: `${WzGroups.name}.componentDidMount`,
+          level: UI_LOGGER_LEVELS.ERROR,
+          severity: UI_ERROR_SEVERITIES.CRITICAL,
+          store: true,
+          error: {
+            error: error,
+            message: error.message || error,
+            title: `Error accessing the group`,
+          },
+        };
+        getErrorOrchestrator().handleError(options);
+      };
     };
   }
 

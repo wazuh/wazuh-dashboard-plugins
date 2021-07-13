@@ -36,7 +36,7 @@ jest.mock('../../kibana-services', () => ({
   }),
 }));
 
-describe('Wazuh Error Orchestrator Business', () => {
+describe.skip('Wazuh Error Orchestrator Business', () => {
   describe('Given a valid options params for display toast INFO', () => {
     it('Should be called toast and addInfo', () => {
       const toast = {
