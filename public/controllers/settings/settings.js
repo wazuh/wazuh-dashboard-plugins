@@ -22,6 +22,10 @@ import { formatUIDate } from '../../react-services/time-service';
 import store from '../../redux/store';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
 import { updateSelectedSettingsSection } from '../../redux/actions/appStateActions';
+import { UI_LOGGER_LEVELS } from '../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../react-services/common-services';
+
 export class SettingsController {
   /**
    * Class constructor
@@ -79,7 +83,17 @@ export class SettingsController {
 
       await this.getAppInfo();
     } catch (error) {
-      ErrorHandler.handle('Cannot initialize Settings');
+      const options = {
+        context: `${SettingsController.name}.$onInit`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `${error.name}: Cannot initialize Settings`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   }
 
@@ -188,18 +202,35 @@ export class SettingsController {
           this.apiEntries[idx].status = 'online';
         } catch (error) {
           const code = ((error || {}).data || {}).code;
-          const downReason = typeof error === 'string' ? error :
-            (error || {}).message || ((error || {}).data || {}).message || 'Wazuh is not reachable';
+          const downReason =
+            typeof error === 'string'
+              ? error
+              : (error || {}).message ||
+                ((error || {}).data || {}).message ||
+                'Wazuh is not reachable';
           const status = code === 3099 ? 'down' : 'unknown';
           this.apiEntries[idx].status = { status, downReason };
           numError = numError + 1;
-          if(this.apiEntries[idx].id === this.currentDefault){ // if the selected API is down, we remove it so a new one will selected
+          if (this.apiEntries[idx].id === this.currentDefault) {
+            // if the selected API is down, we remove it so a new one will selected
             AppState.removeCurrentAPI();
           }
         }
       }
       return numError;
-    } catch (error) {}
+    } catch (error) {
+      const options = {
+        context: `${SettingsController.name}.checkApisStatus`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+    }
   }
 
   // Set default API
@@ -241,16 +272,24 @@ export class SettingsController {
       this.$scope.$applyAsync();
       return this.currentDefault;
     } catch (error) {
-      ErrorHandler.handle(error);
+      const options = {
+        context: `${SettingsController.name}.setDefault`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   }
 
   // Get settings function
   async getSettings() {
     try {
-      const patternList = await SavedObject.getListOfWazuhValidIndexPatterns();
-
-      this.indexPatterns = patternList;
+      this.indexPatterns = await SavedObject.getListOfWazuhValidIndexPatterns();
 
       if (!this.indexPatterns.length) {
         this.wzMisc.setBlankScr('Sorry but no valid index patterns were found');
@@ -286,7 +325,17 @@ export class SettingsController {
 
       this.$scope.$applyAsync();
     } catch (error) {
-      ErrorHandler.handle('Error getting API entries', 'Settings');
+      const options = {
+        context: `${SettingsController.name}.getSettings`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `${error.name}: Error getting API entries`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
     // Every time that the API entries are required in the settings the registry will be checked in order to remove orphan host entries
     await this.genericReq.request('POST', '/hosts/remove-orphan-entries', {
@@ -342,12 +391,21 @@ export class SettingsController {
       this.apiIsDown = false;
       !silent && ErrorHandler.info('Connection success', 'Settings');
       this.$scope.$applyAsync();
-      return;
     } catch (error) {
       this.load = false;
       this.$scope.$applyAsync();
       if (!silent) {
-        ErrorHandler.handle(error);
+        const options = {
+          context: `${SettingsController.name}.checkManager`,
+          level: UI_LOGGER_LEVELS.ERROR,
+          severity: UI_ERROR_SEVERITIES.BUSINESS,
+          error: {
+            error: error,
+            message: error.message || error,
+            title: error.name || error,
+          },
+        };
+        getErrorOrchestrator().handleError(options);
       }
       return Promise.reject(error);
     }
@@ -373,6 +431,18 @@ export class SettingsController {
       this.$scope.$applyAsync();
       return logs.data.lastLogs.map(item => JSON.parse(item));
     } catch (error) {
+      const options = {
+        context: `${SettingsController.name}.getAppLogs`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+
       return [
         {
           date: new Date(),
@@ -416,12 +486,18 @@ export class SettingsController {
       this.$scope.$applyAsync();
     } catch (error) {
       AppState.removeNavigation();
-      ErrorHandler.handle(
-        error,
-        'Settings'
-      );
+      const options = {
+        context: `${SettingsController.name}.getAppInfo`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
-    return;
   }
 
   /**
@@ -463,8 +539,18 @@ export class SettingsController {
           closedEnabled: true
         };
       }
-      return;
     } catch (error) {
+      const options = {
+        context: `${SettingsController.name}.checkForNewApis`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.UI,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
       return Promise.reject(error);
     }
   }
@@ -545,6 +631,17 @@ export class SettingsController {
       return this.apiEntries;
     } catch (error) {
       this.showAddApiWithInitialError(error);
+      const options = {
+        context: `${SettingsController.name}.refreshApiEntries`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.UI,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
       return Promise.reject(error);
     }
   }
