@@ -53,6 +53,10 @@ import { compose } from 'redux';
 import { AppState } from '../../../../../../react-services/app-state';
 import { ApiCheck } from '../../../../../../react-services/wz-api-check';
 
+import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
+
 class WzEditConfiguration extends Component {
   constructor(props) {
     super(props);
@@ -96,42 +100,45 @@ class WzEditConfiguration extends Component {
         color: 'success'
       });
     } catch (error) {
+      let errorMessage;
       if (error.details) {
-        this.addToast({
-          title: (
-            <Fragment>
-              <EuiIcon type="alert" />
-              &nbsp;
-              <span>
-                File ossec.conf saved, but there were found several error while
-                validating the configuration.
-              </span>
-            </Fragment>
-          ),
-          color: 'warning',
-          text: error.details
-        });
+        errorMessage = `File ossec.conf saved, but there were found several error while validating the configuration. ${error.details}`;
       } else {
-        this.addToast({
-          title: (
-            <Fragment>
-              <EuiIcon type="alert" />
-              &nbsp;
-              <span>Error saving configuration</span>
-            </Fragment>
-          ),
-          color: 'danger',
-          text: typeof error === 'string' ? error : error.message
-        });
+        errorMessage = 'Error saving configuration';
       }
       this.setState({ saving: false, infoChangesAfterRestart: false });
+      const options = {
+        context: `${WzEditConfiguration.name}.editorSave`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: errorMessage || error,
+          title: `${error.name}: Mitre alerts could not be fetched`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   }
   editorCancel() {
     this.props.updateConfigurationSection('');
   }
   refresh() {
-    this.checkIfClusterOrManager();
+    try {
+      this.checkIfClusterOrManager();
+    }catch(error){
+      const options = {
+        context: `${WzEditConfiguration.name}.refresh`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+    } 
   }
   toggleRestart() {
     this.setState({ restart: !this.state.restart });
@@ -180,6 +187,17 @@ class WzEditConfiguration extends Component {
     } catch (error) {
       this.props.updateWazuhNotReadyYet('');
       this.setState({ restart: false, saving: false, restarting: false });
+      const options = {
+        context: `${WzEditConfiguration.name}.confirmRestart`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   }
 
@@ -222,6 +240,7 @@ class WzEditConfiguration extends Component {
         'edit-configuration',
         'Manager configuration'
       );
+      throw error;
     }
   }
   render() {
@@ -344,6 +363,7 @@ const WzEditorConfiguration = compose(
   )
 )(
   class WzEditorConfiguration extends Component {
+
     constructor(props) {
       super(props);
     }
@@ -413,3 +433,5 @@ const WzEditorConfiguration = compose(
     }
   }
 );
+
+
