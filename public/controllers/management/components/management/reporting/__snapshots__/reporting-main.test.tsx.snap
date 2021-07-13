@@ -616,13 +616,13 @@ exports[`Reporting component renders correctly to match the snapshot 1`] = `
                                           </div>
                                         </EuiTableHeaderMobile>
                                         <EuiTable
-                                          id="__table_bd685711-da9b-11eb-80ce-ff701c08216e"
+                                          id="__table_91370161-e3e1-11eb-97e4-6fde5957ff75"
                                           responsive={true}
                                           tableLayout="fixed"
                                         >
                                           <table
                                             className="euiTable euiTable--responsive"
-                                            id="__table_bd685711-da9b-11eb-80ce-ff701c08216e"
+                                            id="__table_91370161-e3e1-11eb-97e4-6fde5957ff75"
                                             tabIndex={-1}
                                           >
                                             <EuiScreenReaderOnly>
