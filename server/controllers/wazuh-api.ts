@@ -631,8 +631,6 @@ export class WazuhApiCtrl {
         }
       }
 
-      console.log(method, path, data, options);
-      
       const responseToken = await context.wazuh.api.client.asCurrentUser.request(method, path, data, options);
       const responseIsDown = this.checkResponseIsDown(responseToken);
       if (responseIsDown) {
