@@ -57,7 +57,6 @@
     "react-codemirror": "^1.0.0",
     "react-cookie": "^4.0.3",
     "read-last-lines": "^1.7.2",
-    "redux-mock-store": "^1.5.4",
     "timsort": "^0.3.0",
     "winston": "3.0.0"
   },
