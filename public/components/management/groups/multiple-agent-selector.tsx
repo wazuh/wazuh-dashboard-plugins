@@ -253,8 +253,7 @@ export const MultipleAgentSelector = withErrorBoundary (class MultipleAgentSelec
       }
       return result.length ? result : false;
     } catch (error) {
-      
-      throw error && false;
+      return false;
     }
   }
 
