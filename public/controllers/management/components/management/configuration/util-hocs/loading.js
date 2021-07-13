@@ -13,6 +13,9 @@
 import React, { Component, Fragment } from 'react';
 
 import WzLoading from '../util-components/loading';
+import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
 
 const withLoading = (
   load,
@@ -36,6 +39,17 @@ const withLoading = (
         this.setState({ isLoading: false, error: false, wrappedProps });
       } catch (error) {
         this.setState({ isLoading: false, error, wrappedProps: undefined });
+        const options = {
+          context: `${WithLoading.name}.componentDidMount`,
+          level: UI_LOGGER_LEVELS.ERROR,
+          severity: UI_ERROR_SEVERITIES.BUSINESS,
+          error: {
+            error: error,
+            message: error.message || error,
+            title: error.name || error
+          },
+        };
+        getErrorOrchestrator().handleError(options);
       }
     }
     async componentDidUpdate(prevProps){
@@ -47,6 +61,17 @@ const withLoading = (
           this.setState({ isLoading: false, wrappedProps });
         } catch (error) {
           this.setState({ isLoading: false, error, wrappedProps: undefined });
+          const options = {
+            context: `${WithLoading.name}.componentDidUpdate`,
+            level: UI_LOGGER_LEVELS.ERROR,
+            severity: UI_ERROR_SEVERITIES.BUSINESS,
+            error: {
+              error: error,
+              message: error.message || error,
+              title: error.name || error
+            },
+          };
+          getErrorOrchestrator().handleError(options);
         }
       }
     }
