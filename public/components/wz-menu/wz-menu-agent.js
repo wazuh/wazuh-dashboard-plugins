@@ -10,7 +10,18 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component, Fragment } from 'react';
-import { EuiFlexGroup, EuiFlexItem, EuiFlexGrid, EuiButtonEmpty, EuiSideNav, EuiIcon, EuiHorizontalRule, EuiPanel, EuiButton, EuiSpacer } from '@elastic/eui';
+import {
+  EuiButton,
+  EuiButtonEmpty,
+  EuiFlexGrid,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiHorizontalRule,
+  EuiIcon,
+  EuiPanel,
+  EuiSideNav,
+  EuiSpacer,
+} from '@elastic/eui';
 import { WzRequest } from '../../react-services/wz-request';
 import { connect } from 'react-redux';
 import { updateCurrentAgentData } from '../../redux/actions/appStateActions';
@@ -18,7 +29,9 @@ import { AppState } from '../../react-services/app-state';
 import { hasAgentSupportModule } from '../../react-services/wz-agents';
 import { AgentInfo } from './../common/welcome/agents-info';
 import { getAngularModule } from '../../kibana-services';
-import { WAZUH_MODULES_ID } from '../../../common/constants';
+import { UI_LOGGER_LEVELS, WAZUH_MODULES_ID } from '../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../react-services/common-services';
 
 class WzMenuAgent extends Component {
   constructor(props) {
@@ -108,9 +121,19 @@ class WzMenuAgent extends Component {
 
   async getAgentData(agentId) {
     try {
-      const result = await WzRequest.apiReq('GET', '/agents/' + agentId, {});
-      return result;
+      return await WzRequest.apiReq('GET', '/agents/' + agentId, {});
     } catch (error) {
+      const options = {
+        context: `${WzMenuAgent.name}.getAgentData`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
       return Promise.reject(error);
     }
   }
@@ -131,7 +154,7 @@ class WzMenuAgent extends Component {
   createItems = items => {
     const keyExists = key => Object.keys(this.state.extensions).includes(key);
     const keyIsTrue = key => (this.state.extensions || [])[key];
-    return items.filter(item => 
+    return items.filter(item =>
       (Object.keys(this.props.currentAgentData).length ? hasAgentSupportModule(this.props.currentAgentData, item.id) : true) && Object.keys(this.state.extensions).length && (!keyExists(item.id) || keyIsTrue(item.id))
     ).map(item => this.createItem(item));
   };

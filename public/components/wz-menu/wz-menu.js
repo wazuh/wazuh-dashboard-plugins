@@ -46,6 +46,9 @@ import { AppNavigate } from '../../react-services/app-navigate';
 import WzTextWithTooltipIfTruncated from '../../components/common/wz-text-with-tooltip-if-truncated';
 import { getDataPlugin } from '../../kibana-services';
 import { withWindowSize } from '../../components/common/hocs/withWindowSize';
+import { UI_LOGGER_LEVELS } from '../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../react-services/common-services';
 
 
 const sections = {
@@ -103,8 +106,19 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
           }
         }
       }
-    } catch (err) { }
-
+    } catch (error) {
+      const options = {
+        context: `${WzMenu.name}.componentDidMount`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+    }
   }
 
   showToast = (color, title, text, time) => {
@@ -167,7 +181,17 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
         });
       }
     } catch (error) {
-      this.showToast('danger', 'Error', error, 4000);
+      const options = {
+        context: `${WzMenu.name}.loadIndexPatternsList`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   }
 
@@ -180,7 +204,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
     const { id: apiId } = JSON.parse(AppState.getCurrentAPI());
     const { currentAPI } = this.state;
     const currentTab = this.getCurrentTab();
-    
+
     if (currentTab !== this.state.currentMenuTab) {
       this.setState({ currentMenuTab: currentTab });
     }
@@ -253,7 +277,17 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
         });
       }
     } catch (error) {
-      this.showToast('danger', 'Error', error.message || error, 4000);
+      const options = {
+        context: `${WzMenu.name}.load`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
     this.isLoading = false;
   }
@@ -274,7 +308,17 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
         this.switchMenuOpened();
       }
     } catch (error) {
-      this.showToast('danger', 'Error', error, 4000);
+      const options = {
+        context: `${WzMenu.name}.changePattern`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   };
 
@@ -291,14 +335,10 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
    * Updates the wazuh registry of an specific api id
    */
   updateClusterInfoInRegistry = async (id, clusterInfo) => {
-    try {
-      const url = `/hosts/update-hostname/${id}`;
-      await this.genericReq.request('PUT', url, {
-        cluster_info: clusterInfo
-      });
-    } catch (error) {
-      return Promise.reject(error);
-    }
+    const url = `/hosts/update-hostname/${id}`;
+    await this.genericReq.request('PUT', url, {
+      cluster_info: clusterInfo,
+    });
   };
 
   changeAPI = async event => {
@@ -313,7 +353,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
         return item.id === apiId.value;
       });
 
-      this.updateClusterInfoInRegistry(apiId.value, clusterInfo);
+      await this.updateClusterInfoInRegistry(apiId.value, clusterInfo);
       apiData[0].cluster_info = clusterInfo;
 
       AppState.setClusterInfo(apiData[0].cluster_info);
@@ -328,7 +368,17 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
         this.router.reload();
       }
     } catch (error) {
-      this.showToast('danger', 'Error', error, 4000);
+      const options = {
+        context: `${WzMenu.name}.changeAPI`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   };
 
@@ -704,7 +754,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
   render() {
     const currentAgent = store.getState().appStateReducers.currentAgentData;
     const thereAreSelectors = this.thereAreSelectors();
-    
+
     const menu = (
       <div className="wz-menu-wrapper">
         <div className="wz-menu-left-side">
@@ -927,7 +977,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
 
     const openSelectorsButton = (
       <EuiToolTip position="bottom" content="Show selectors">
-        <EuiButtonEmpty 
+        <EuiButtonEmpty
           iconType="boxesVertical"
           iconSide="right"
           style={{ position: 'relative', right: 0 }}
@@ -936,7 +986,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
           aria-label="Open selectors"></EuiButtonEmpty>
       </EuiToolTip>
     )
-   
+
 
     const container = document.getElementsByClassName('euiBreadcrumbs');
     return ReactDOM.createPortal(
@@ -974,34 +1024,34 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
               this.getIndexPatternSelectorComponent()
             }
 
-            { !this.showSelectorsInPopover && this.state.APIlist.length > 1 &&  
-              this.getApiSelectorComponent()  
+            { !this.showSelectorsInPopover && this.state.APIlist.length > 1 &&
+              this.getApiSelectorComponent()
             }
 
-            { this.showSelectorsInPopover && 
+            { this.showSelectorsInPopover &&
               (this.state.patternList.length > 1 || this.state.APIlist.length > 1) &&
               <>
-                
+
                 <EuiFlexItem grow={false}>
                   <EuiPopover
                         ownFocus
                         anchorPosition="downCenter"
                         button={openSelectorsButton}
                         isOpen={this.state.isSelectorsPopoverOpen}
-                        closePopover={()=> this.switchSelectorsPopOver()}> 
+                        closePopover={()=> this.switchSelectorsPopOver()}>
                           { this.state.patternList.length > 1 &&
                             <EuiFlexGroup alignItems="center" style={{ paddingTop: 5 }}>
                               {this.getIndexPatternSelectorComponent()}
                             </EuiFlexGroup>
-                          } 
+                          }
                           { this.state.APIlist.length > 1 &&
                             <EuiFlexGroup alignItems="center" style={{ paddingTop: 5 }} direction="row">
                               {this.getApiSelectorComponent()}
                             </EuiFlexGroup>
-                          } 
+                          }
                   </EuiPopover>
                 </EuiFlexItem>
-                
+
               </>
 
             }
