@@ -37,7 +37,6 @@ jobs:
         run: |
           cd kibana
           yarn set version ${{ env.YARN_1-21-1 }}
-#          yarn kbn bootstrap
           mkdir plugins/wazuh-kibana-app
 
       - name: Step 04 - Download Project wazuh-app
