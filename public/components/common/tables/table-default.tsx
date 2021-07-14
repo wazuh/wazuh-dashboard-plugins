@@ -12,6 +12,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { EuiBasicTable } from '@elastic/eui';
+import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../../common/constants';
+import { getErrorOrchestrator } from '../../../react-services/common-services';
 
 export function TableDeafult({
   onSearch,
@@ -65,6 +68,17 @@ export function TableDeafult({
       }catch(error){
         setItems([]);
         setTotalItems(0);
+        const options = {
+          context: `${TableDeafult.name}.useEffect`,
+          level: UI_LOGGER_LEVELS.ERROR,
+          severity: UI_ERROR_SEVERITIES.BUSINESS,
+          error: {
+            error: error,
+            message: error.message || error,
+            title: `${error.name}: Error fetching items`,
+          },
+        };
+        getErrorOrchestrator().handleError(options);
       }
       setLoading(false);
     })()

@@ -22,6 +22,9 @@ import { TableWithSearchBar } from './table-with-search-bar';
 import { TableDeafult } from './table-default'
 import { WzRequest } from '../../../react-services/wz-request';
 import { ExportTableCsv }  from './components/export-table-csv';
+import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../../common/constants';
+import { getErrorOrchestrator } from '../../../react-services/common-services';
 
 export function TableWzAPI({endpoint, ...rest}){
 
@@ -51,7 +54,17 @@ export function TableWzAPI({endpoint, ...rest}){
     } catch (error) {
       setIsLoading(false);
       setTotalItems(0);
-      return Promise.reject(error);
+      const options = {
+        context: `${TableWithSearchBar.name}.useEffect`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `${error.name}: Error searching items`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     };
   },[]);
 
