@@ -38,7 +38,7 @@ export const loadAppConfig = async () => {
   } catch (error) {
     store.dispatch(setAppConfigHasError());
     const options = {
-      context: `${ActionAgents.name}.upgradeAgent`,
+      context: 'loadAppConfig',
       level: UI_LOGGER_LEVELS.ERROR,
       severity: UI_ERROR_SEVERITIES.BUSINESS,
       store: true,

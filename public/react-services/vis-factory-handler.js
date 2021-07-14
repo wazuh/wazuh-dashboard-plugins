@@ -79,13 +79,11 @@ export class VisFactoryHandler {
         commonData.assignFilters(filterHandler, tab);
       }
       store.dispatch(updateVis({ update: true, raw: rawVisualizations.getList() }));
-      return;
     } catch (error) {
       const options = {
         context: `${VisFactoryHandler.name}.buildOverviewVisualizations`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
-        store: true,
         error: {
           error: error,
           message: error.message || error,
@@ -125,14 +123,11 @@ export class VisFactoryHandler {
         commonData.assignFilters(filterHandler, tab, id);
       }
       store.dispatch(updateVis({ update: true }));
-      return;
     } catch (error) {
       const options = {
         context: `${VisFactoryHandler.name}.buildAgentsVisualizations`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
-        store: true,
-        display: true,
         error: {
           error: error,
           message: error.message || error,

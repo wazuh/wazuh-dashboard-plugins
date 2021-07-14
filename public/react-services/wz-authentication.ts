@@ -20,9 +20,11 @@ import {
   updateWithUserLogged,
   updateAllowedAgents,
 } from '../redux/actions/appStateActions';
-import { WAZUH_ROLE_ADMINISTRATOR_ID, WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../common/constants';
+import { UI_LOGGER_LEVELS, WAZUH_ROLE_ADMINISTRATOR_ID, WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../common/constants';
 import { getToasts } from '../kibana-services';
 import { getAuthorizedAgents } from '../react-services/wz-agents';
+import { UI_ERROR_SEVERITIES, UIErrorLog, UIErrorSeverity, UILogLevel } from './error-orchestrator/types';
+import { getErrorOrchestrator } from './common-services';
 
 export class WzAuthentication {
   private static async login(force = false) {
@@ -74,12 +76,17 @@ export class WzAuthentication {
       );
       store.dispatch(updateWithUserLogged(true));
     } catch (error) {
-      getToasts().add({
-        color: 'danger',
-        title: 'Error getting the authorization token',
-        text: error.message || error,
-        toastLifeTimeMs: 300000,
-      });
+      const options: UIErrorLog = {
+        context: `${WzAuthentication.name}.refresh`,
+        level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+        severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `${error.name}: Error getting the authorization token`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
       store.dispatch(updateWithUserLogged(true));
       return Promise.reject(error);
     }
