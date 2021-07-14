@@ -228,7 +228,6 @@ export class Events extends Component {
         context: `${Events.name}.hideCreateCustomLabel`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
-        store: true,
         error: {
           error: error,
           message: error.message || error,
