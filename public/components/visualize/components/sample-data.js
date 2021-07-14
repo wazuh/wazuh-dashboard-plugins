@@ -12,18 +12,18 @@
 import { EuiCallOut, EuiLink } from '@elastic/eui';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { WzRequest } from '../../../react-services';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 
 export const SampleData = ({ context = 'sample-data', ...props }) => {
   const [isSampleData, setIsSampleData] = useState(false);
 
-  useEffect(async () => {
+  const usesSampleData = async () => {
     try {
-      const thereAreSampleAlerts = (await WzRequest.genericReq('GET', '/elastic/samplealerts', {}))
-        .data.sampleAlertsInstalled;
-      setIsSampleData(thereAreSampleAlerts);
+      const result = (await WzRequest.genericReq('GET', '/elastic/samplealerts', {})).data
+        .sampleAlertsInstalled;
+      setIsSampleData(result);
     } catch (error) {
       const options = {
         context,
@@ -37,6 +37,9 @@ export const SampleData = ({ context = 'sample-data', ...props }) => {
       };
       getErrorOrchestrator().handleError(options);
     }
+  };
+  useEffect(() => {
+    usesSampleData();
   }, [
     setIsSampleData,
     context,
@@ -56,7 +59,7 @@ export const SampleData = ({ context = 'sample-data', ...props }) => {
         {...props}
       >
         <p>
-          The data displayed may contain sample alerts. Go ººººº
+          The data displayed may contain sample alerts. Go
           <EuiLink href="#/settings?tab=sample_data" aria-label="go to configure sample data">
             here
           </EuiLink>{' '}
