@@ -65,12 +65,12 @@ jobs:
 #          cd ./kibana/plugins/wazuh-kibana-app
 #          yarn run test:jest --colors wz-authentication.test.ts
 
-      - name: Step 09 - Comment Test Coverage
-        uses: AthleticNet/comment-test-coverage@1.2.2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          path: ./kibana/plugins/wazuh-kibana-app/coverage-summary.json
-          title: Jest Test Coverage
+#      - name: Step 09 - Comment Test Coverage
+#        uses: AthleticNet/comment-test-coverage@1.2.2
+#        with:
+#          token: ${{ secrets.GITHUB_TOKEN }}
+#          path: ./kibana/plugins/wazuh-kibana-app/coverage-summary.json
+#          title: Jest Test Coverage
 
       - name: Step DE PRUEBA
         uses: artiomtr/jest-coverage-report-action@v2.0-rc.2
