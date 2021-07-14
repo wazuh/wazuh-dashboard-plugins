@@ -72,7 +72,7 @@ export const MultipleAgentSelector = withErrorBoundary (class MultipleAgentSelec
       });
     } catch (error) {
       const options = {
-        context: `${MultipleAgentSelector.name}.reload`,
+        context: `${MultipleAgentSelector.name}.componentDidMount`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         error: {
@@ -152,7 +152,7 @@ export const MultipleAgentSelector = withErrorBoundary (class MultipleAgentSelec
         }
       }
     } catch (error) {
-      throw error;
+      throw new Error('Error fetching all available agents');
     }
   }
 
@@ -205,7 +205,7 @@ export const MultipleAgentSelector = withErrorBoundary (class MultipleAgentSelec
         })
       }
     } catch (error) {
-      throw error;
+      throw new Error('Error fetching group agents');
     }
     this.setState({
       selectedAgents: {
@@ -311,13 +311,13 @@ export const MultipleAgentSelector = withErrorBoundary (class MultipleAgentSelec
     } catch (error) {
       this.setState({ savingChanges: false });
       const options = {
-        context: `${MultipleAgentSelector.name}.reload`,
+        context: `${MultipleAgentSelector.name}.saveAddAgents`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         error: {
           error: error,
           message: error.message || error,
-          title: 'Error applying changes',
+          title: `${error.name}: Error applying changes`,
         },
       };
       getErrorOrchestrator().handleError(options);
