@@ -21,13 +21,13 @@ jobs:
       YARN_1-21-1: '1.21.1'
       KIBANA_TAG: 'v7.10.2'
     steps:
-#      - name: Step 01 - Download Project kibana
-#        uses: actions/checkout@v2
-#        with:
-#          repository: elastic/kibana
-#          ref: ${{ env.KIBANA_TAG }}
-#          path: kibana
-#
+      - name: Step 01 - Download Project kibana
+        uses: actions/checkout@v2
+        with:
+          repository: elastic/kibana
+          ref: ${{ env.KIBANA_TAG }}
+          path: kibana
+
 #      - name: Step 02 - Setup node for kibana app
 #        uses: actions/setup-node@v2
 #        with:
@@ -40,10 +40,10 @@ jobs:
 #          yarn kbn bootstrap
 #          mkdir plugins/wazuh-kibana-app
 #
-#      - name: Step 04 - Download Project wazuh-app
-#        uses: actions/checkout@v2
-#        with:
-#          path: kibana/plugins/wazuh-kibana-app
+      - name: Step 04 - Download Project wazuh-app
+        uses: actions/checkout@v2
+        with:
+          path: kibana/plugins/wazuh-kibana-app
 #
 #      - name: Step 05 - Setup node version for wazuh app
 #        uses: actions/setup-node@v2
