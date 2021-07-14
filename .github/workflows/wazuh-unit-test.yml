@@ -21,12 +21,12 @@ jobs:
       YARN_1-21-1: '1.21.1'
       KIBANA_TAG: 'v7.10.2'
     steps:
-      - name: Step 01 - Download Project kibana
-        uses: actions/checkout@v2
-        with:
-          repository: elastic/kibana
-          ref: ${{ env.KIBANA_TAG }}
-          path: kibana
+#      - name: Step 01 - Download Project kibana
+#        uses: actions/checkout@v2
+#        with:
+#          repository: elastic/kibana
+#          ref: ${{ env.KIBANA_TAG }}
+#          path: kibana
 
       - name: Step 02 - Setup node for kibana app
         uses: actions/setup-node@v2
@@ -35,8 +35,10 @@ jobs:
 
       - name: Step 03 - Install dependencies of kibana
         run: |
+          mkdir kibana
           cd kibana
-          yarn set version ${{ env.YARN_1-21-1 }}
+          mkdir plugins
+#          yarn set version ${{ env.YARN_1-21-1 }}
           mkdir plugins/wazuh-kibana-app
 
       - name: Step 04 - Download Project wazuh-app
@@ -75,5 +77,4 @@ jobs:
         uses: artiomtr/jest-coverage-report-action@v2.0-rc.2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          working-directory: ./kibana/plugins/wazuh-kibana-app/
           skip-step: all
