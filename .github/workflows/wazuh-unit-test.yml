@@ -70,7 +70,7 @@ jobs:
 #          path: ./kibana/plugins/wazuh-kibana-app/coverage-summary.json
 #          title: Jest Test Coverage
 
-      - name: Step DE PRUEBA
+      - name: Step DE PRUEBA 1
         uses: artiomtr/jest-coverage-report-action@v2.0-rc.2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
