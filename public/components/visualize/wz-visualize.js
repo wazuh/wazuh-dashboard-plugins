@@ -257,7 +257,7 @@ export const WzVisualize = compose (withErrorBoundary,withReduxProvider) (class 
       <Fragment>
         {/* Sample alerts Callout */}
         {this.props.resultState === 'ready' && (
-          <SampleData context={`${WzVisualize.name}-sample-data`} />
+          <SampleData/>
         )}
 
         {this.props.resultState === 'none' && (

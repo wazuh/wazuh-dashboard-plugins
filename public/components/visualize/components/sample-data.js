@@ -1,5 +1,5 @@
 /*
- * Wazuh app - React component for Visualize.
+ * Wazuh app - React component for Visualize - Sample Data.
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -16,7 +16,7 @@ import React, { useState, useEffect } from 'react';
 import { WzRequest } from '../../../react-services';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 
-export const SampleData = ({ context = 'sample-data', ...props }) => {
+export const SampleData = ({...props }) => {
   const [isSampleData, setIsSampleData] = useState(false);
 
   const usesSampleData = async () => {
@@ -26,7 +26,7 @@ export const SampleData = ({ context = 'sample-data', ...props }) => {
       setIsSampleData(result);
     } catch (error) {
       const options = {
-        context,
+        context: `${SampleData.name}.usesSampleData`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.UI,
         error: {
@@ -41,8 +41,8 @@ export const SampleData = ({ context = 'sample-data', ...props }) => {
   useEffect(() => {
     usesSampleData();
   }, [
+    SampleData,
     setIsSampleData,
-    context,
     UI_ERROR_SEVERITIES,
     UI_LOGGER_LEVELS,
     getErrorOrchestrator,
