@@ -78,4 +78,3 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           working-directory: ./kibana/plugins/wazuh-kibana-app/coverage/
-          skip-step: all
