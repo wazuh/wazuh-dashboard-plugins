@@ -35,11 +35,11 @@ jobs:
 
       - name: Step 03 - Install dependencies of kibana
         run: |
-          mkdir kibana
+          mkdir -m 777 kibana
           cd kibana
-          mkdir plugins
+          mkdir -m 777 plugins
           yarn set version ${{ env.YARN_1-21-1 }}
-          mkdir plugins/wazuh-kibana-app
+          mkdir -m 777 plugins/wazuh-kibana-app
 
       - name: Step 04 - Download Project wazuh-app
         uses: actions/checkout@v2
@@ -77,5 +77,5 @@ jobs:
         uses: artiomtr/jest-coverage-report-action@v2.0-rc.2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          package-manager: yarn
+          working-directory: ./kibana/plugins/wazuh-kibana-app/coverage/
           skip-step: all
