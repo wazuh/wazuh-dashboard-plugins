@@ -7,9 +7,6 @@ on:
   push:
     branches:
       - 'disable'
-  pull_request:
-    branches:
-      - '4.3-7.10'
 
 jobs:
   setup-wazuh-app:
