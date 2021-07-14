@@ -30,8 +30,9 @@ export default {
   coverageDirectory: `./target/test-coverage`,
   coverageReporters: [
     'html',
+    'text',
     'text-summary',
-    'json-summary'
+    'json-summary',
   ],
   globals: {
     'ts-jest': {
