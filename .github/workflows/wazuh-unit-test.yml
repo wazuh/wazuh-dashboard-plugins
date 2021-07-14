@@ -63,7 +63,7 @@ jobs:
       - name: Step 08 - Run Tests & Collect Coverage
         run: |
           cd ./kibana/plugins/wazuh-kibana-app
-          yarn run test:jest --colors
+          yarn run test:jest --colors wz-authentication.test.ts
 
       - name: Step 09 - Comment Test Coverage
         uses: AthleticNet/comment-test-coverage@1.2.2
@@ -71,3 +71,10 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           path: ./kibana/plugins/wazuh-kibana-app/target/test-coverage/coverage-summary.json
           title: Jest Test Coverage
+
+      - name: Step DE PRUEBA
+        uses: artiomtr/jest-coverage-report-action@v2.0-rc.2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          working-directory: ./kibana/plugins/wazuh-kibana-app/target/test-coverage/
+          skip-step: all
