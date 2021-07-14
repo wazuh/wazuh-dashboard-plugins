@@ -41,6 +41,9 @@ import { AppNavigate } from '../../../../../../../react-services/app-navigate';
 import { Discover } from '../../../../../../common/modules/discover';
 import { getUiSettings } from '../../../../../../../kibana-services';
 import { FilterManager } from '../../../../../../../../../../src/plugins/data/public/';
+import { UI_LOGGER_LEVELS } from '../../../../../../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../../../../../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../../../../../../react-services/common-services';
 
 export class FlyoutTechnique extends Component {
   _isMount = false;
@@ -126,7 +129,20 @@ export class FlyoutTechnique extends Component {
       });
       const rawData = (((result || {}).data || {}).data || {}).affected_items
       !!rawData && this.formatTechniqueData(rawData[0]);
-    }catch(err){
+    }catch(error){
+      const options = {
+        context: `${FlyoutTechnique.name}.getTechniqueData`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        store: true,
+        display: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `Error obtaining the requested technique`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
       this.setState({loading: false});
     }
   }
