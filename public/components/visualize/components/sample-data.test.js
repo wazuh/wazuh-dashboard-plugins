@@ -1,3 +1,14 @@
+/*
+ * Wazuh app - Testing suite for Visualize - Sample Data.
+ * Copyright (C) 2015-2021 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
 import { SampleData } from './sample-data';
 import { WzRequest } from '../../../react-services';
 import { mount } from 'enzyme';
@@ -21,6 +32,7 @@ describe('Check sample data component', () => {
     const wrapper = await mount(<SampleData />);
     await awaitForMyComponent(wrapper);
     expect(wrapper.find('EuiCallOut').exists());
+    expect(wrapper.find('EuiCallOut').props().title).toEqual("This dashboard contains sample data");
   });
 
   it('should not render if there is no sample data', async () => {
@@ -31,19 +43,18 @@ describe('Check sample data component', () => {
   });
 
   it('should call the orchestrator upon error', async () => {
-    const context = 'testComponent';
     const error = {
       message: 'This is a test',
       name: 'This should not be the thing',
     };
     const mockOptions = {
-      context,
+      context: `${SampleData.name}.usesSampleData`,
       level: UI_LOGGER_LEVELS.ERROR,
       severity: UI_ERROR_SEVERITIES.UI,
       error: {
         error: error,
-        message: error.message || error,
-        title: error.name || error,
+        message: error.message,
+        title: error.name,
       },
     };
     getErrorOrchestrator.mockImplementation(() => {
@@ -54,7 +65,7 @@ describe('Check sample data component', () => {
       };
     });
     WzRequest.genericReq.mockRejectedValue(error);
-    const wrapper = await mount(<SampleData context={context} />);
+    const wrapper = await mount(<SampleData />);
     await awaitForMyComponent(wrapper);
   });
 });
