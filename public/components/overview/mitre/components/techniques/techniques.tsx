@@ -100,7 +100,8 @@ export const Techniques = withWindowSize(
       const { isLoading, tacticsObject, filters } = this.props;
       if (
         JSON.stringify(prevProps.tacticsObject) !== JSON.stringify(tacticsObject) ||
-        isLoading !== prevProps.isLoading
+        isLoading !== prevProps.isLoading ||
+        JSON.stringify(prevProps.filterParams) !== JSON.stringify(this.props.filterParams)
       )
         this.getTechniquesCount();
     }
