@@ -33,26 +33,25 @@ import {
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 
-export function AgentStatTable({columns, title, start, end, loading, items, exportCSVFilename}){
+export function AgentStatTable({ columns, title, start, end, loading, items, exportCSVFilename }) {
   return (
     <EuiPanel>
-      <EuiFlexGroup justifyContent='spaceBetween'>
+      <EuiFlexGroup justifyContent="spaceBetween">
         <EuiFlexItem grow={false}>
           <EuiText>{title}</EuiText>
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
-          <EuiText><EuiIcon type='calendar'/> Start: {loading ? <EuiLoadingSpinner size="s" /> : (start ? formatUIDate(start) : '-') } - End: {loading ? <EuiLoadingSpinner size="s" /> : (end ? formatUIDate(end) : '-') }</EuiText>
+          <EuiText>
+            <EuiIcon type="calendar" /> Start:{' '}
+            {loading ? <EuiLoadingSpinner size="s" /> : start ? formatUIDate(start) : '-'} - End:{' '}
+            {loading ? <EuiLoadingSpinner size="s" /> : end ? formatUIDate(end) : '-'}
+          </EuiText>
         </EuiFlexItem>
       </EuiFlexGroup>
-      <EuiHorizontalRule margin="xs"/>
-      <EuiInMemoryTable
-        columns={columns}
-        items={items || []}
-        loading={loading}
-        pagination={true}
-      />
-      <EuiSpacer size='xs'/>
-      <EuiFlexGroup justifyContent='flexEnd'>
+      <EuiHorizontalRule margin="xs" />
+      <EuiInMemoryTable columns={columns} items={items || []} loading={loading} pagination={true} />
+      <EuiSpacer size="xs" />
+      <EuiFlexGroup justifyContent="flexEnd">
         <EuiFlexItem grow={false}>
           <EuiButtonEmpty
             onClick={() => downloadCsv(columns, items, exportCSVFilename)}
@@ -64,7 +63,7 @@ export function AgentStatTable({columns, title, start, end, loading, items, expo
         </EuiFlexItem>
       </EuiFlexGroup>
     </EuiPanel>
-  )
+  );
 }
 
 function downloadCsv(columns: any[], data: any[], filename: string) {
