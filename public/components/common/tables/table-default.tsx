@@ -16,7 +16,7 @@ import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 
-export function TableDeafult({
+export function TableDefault({
   onSearch,
   tableColumns,
   tablePageSizeOptions = [15, 25, 50, 100],
@@ -69,7 +69,7 @@ export function TableDeafult({
         setItems([]);
         setTotalItems(0);
         const options = {
-          context: `${TableDeafult.name}.useEffect`,
+          context: `${TableDefault.name}.useEffect`,
           level: UI_LOGGER_LEVELS.ERROR,
           severity: UI_ERROR_SEVERITIES.BUSINESS,
           error: {

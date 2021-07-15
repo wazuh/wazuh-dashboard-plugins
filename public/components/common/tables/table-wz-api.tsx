@@ -19,7 +19,7 @@ import {
 } from '@elastic/eui';
 import { filtersToObject } from '../../wz-search-bar';
 import { TableWithSearchBar } from './table-with-search-bar';
-import { TableDeafult } from './table-default'
+import { TableDefault } from './table-default'
 import { WzRequest } from '../../../react-services/wz-request';
 import { ExportTableCsv }  from './components/export-table-csv';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
@@ -86,7 +86,7 @@ export function TableWzAPI({endpoint, ...rest}){
         onSearch={onSearch}
         {...rest}
       /> :
-      <TableDeafult
+      <TableDefault
         onSearch={onSearch}
         {...rest}
       />
