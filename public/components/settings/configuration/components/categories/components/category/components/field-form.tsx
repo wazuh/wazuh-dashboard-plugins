@@ -107,7 +107,7 @@ const IntervalForm: React.FunctionComponent<IFieldForm> = (props) => {
   );
 }
 
-const ArrayForm: React.FunctionComponent<IFieldForm> = (props) => {
+const ArrayForm: React.FunctionComponent<IFieldForm> = (props) => { 
   const [list, setList] = useState(JSON.stringify(getValue(props)));
 
   useEffect(() => {
@@ -153,11 +153,13 @@ const getValue = ({ item, updatedConfig }: IFieldForm) => typeof updatedConfig[i
   : item.value;
 
 const onChange = (value: string | number | boolean | [], props: IFieldForm) => {
-  const { updatedConfig, setUpdatedConfig, item } = props;
-  setUpdatedConfig({
-    ...updatedConfig,
-    [item.setting]: value,
-  })
+  if(JSON.stringify(props.item.value) != JSON.stringify(value)){
+    const { updatedConfig, setUpdatedConfig, item } = props;
+    setUpdatedConfig({
+      ...updatedConfig,
+      [item.setting]: value,
+    })
+  }
 }
 
 const deleteChange = (props: IFieldForm) => {

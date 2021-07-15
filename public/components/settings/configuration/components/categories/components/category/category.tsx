@@ -34,6 +34,7 @@ interface ICategoryProps {
 }
 
 export const Category: React.FunctionComponent<ICategoryProps> = ({ name, items, updatedConfig, setUpdatedConfig }) => {
+  
   return (
     <EuiFlexItem>
       <EuiPanel paddingSize="l">

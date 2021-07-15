@@ -22,6 +22,7 @@ interface ICategoriesProps {
 }
 
 export const Categories:React.FunctionComponent<ICategoriesProps> = ({ config, updatedConfig, setUpdatedConfig }) => {
+  
   const categories: {[category:string]: ISetting[]} = config.reduce((acc, conf) => {
     if (!conf.category) return acc;
     return {
