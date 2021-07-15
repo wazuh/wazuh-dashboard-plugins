@@ -25,6 +25,7 @@ import pm from './overview-pm';
 import virustotal from './overview-virustotal';
 import vuls from './overview-vuls';
 import mitre from './overview-mitre';
+import office from './overview-office';
 import osquery from './overview-osquery';
 import docker from './overview-docker';
 
@@ -45,6 +46,7 @@ export {
   virustotal,
   vuls,
   mitre,
+  office,
   osquery,
   docker
 };

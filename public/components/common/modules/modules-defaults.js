@@ -30,6 +30,11 @@ export const ModulesDefaults = {
     tabs: [{ id: 'inventory', name: 'Inventory' }, { id: 'events', name: 'Events' }],
     buttons: ['settings']
   },
+  office: {
+    init: 'dashboard',
+    tabs: [{ id: 'inventory', name: 'Panel' }, { id: 'dashboard', name: 'Dashboards' }, { id: 'events', name: 'Events' }],
+    buttons: ['reporting']
+  },
   mitre: {
     init: 'dashboard',
     tabs: [{id: 'intelligence', name: 'Intelligence'}, { id: 'inventory', name: 'Framework' }, { id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }],
