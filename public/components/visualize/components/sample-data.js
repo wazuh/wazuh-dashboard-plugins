@@ -16,7 +16,7 @@ import React, { useState, useEffect } from 'react';
 import { WzRequest } from '../../../react-services';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 
-export const SampleData = ({...props }) => {
+export const SampleData = ({ ...props }) => {
   const [isSampleData, setIsSampleData] = useState(false);
 
   const usesSampleData = async () => {
@@ -59,11 +59,11 @@ export const SampleData = ({...props }) => {
         {...props}
       >
         <p>
-          The data displayed may contain sample alerts. Go
+          {'The data displayed may contain sample alerts. Go '}
           <EuiLink href="#/settings?tab=sample_data" aria-label="go to configure sample data">
-            here
-          </EuiLink>{' '}
-          to configure the sample data.
+            {'here '}
+          </EuiLink>
+          {'to configure the sample data.'}
         </p>
       </EuiCallOut>
     );
