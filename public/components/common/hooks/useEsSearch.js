@@ -1,48 +1,29 @@
 import { useState, useEffect } from 'react';
 import { getDataPlugin } from '../../../kibana-services';
-import { useQuery, useIndexPattern } from '../hooks';
-import { AppState } from '../../../react-services/app-state';
+import { useQuery, useIndexPattern, useFilterManager } from '../hooks';
 import _ from 'lodash';
 
 const useEsSearch = (preAppliedQuery = {}, preAppliedAggs = {}, size = 10) => {
   const data = getDataPlugin();
   const indexPattern = useIndexPattern();
-  const [query] = useQuery();
-  const [esQuery, setEsQuery] = useState({});
-  const [isLoading, setIsLoading] = useState(true);
-  const [searchResults, setSearchResults] = useState({});
+  const filterManager = useFilterManager();
+  const [esResults, setEsResults] = useState({})
+  useEffect(()=>{
+    search()
+      .then((result)=>{
+        setEsResults(result)
+      })
+  },[indexPattern])
 
-  useEffect(() => {
-    getEsQuery().then((result) => {
-      if (!_.isEqual(result, query)) {
-        setEsQuery(result);
-      }
-    });
-  }, [query]);
-  const getEsQuery = async () => {
-    const esQuery = await data.query.getEsQuery(indexPattern);
-    return esQuery;
-  };
-
-  //useEffect(() => {
-  //  setIsLoading(true);
-  //  search()
-  //    .then((result) => {
-  //      if(!_.isEqual(result,searchResults)){
-  //        setSearchResults(result);
-  //      }
-  //    })
-  //    .finally(() => {
-  //      setIsLoading(false);
-  //    });
-  //}, [esQuery, preAppliedQuery, preAppliedAggs, size, indexPattern]);
   const search = async () => {
-    console.log("SEARCHING")
     if (indexPattern) {
+      const esQuery = await data.query.getEsQuery(indexPattern);
       const searchSource = await data.search.searchSource.create();
       const combined = _.merge({ ...preAppliedQuery }, { ...esQuery } || {});
-      const results = searchSource
+
+      const results = await searchSource
         .setParent(undefined)
+        .setField('filter', combined.bool.filter)
         .setField('query', combined)
         .setField('aggs', preAppliedAggs)
         .setField('size', size)
@@ -54,9 +35,7 @@ const useEsSearch = (preAppliedQuery = {}, preAppliedAggs = {}, size = 10) => {
     }
   };
   return {
-    searchResults,
-    isLoading,
-    search,
+    esResults
   };
 };
 
