@@ -25,6 +25,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added try catch strategy with ErrorOrchestrator service on Syscollector/Vuls/Stats sections [#3462](https://github.com/wazuh/wazuh-kibana-app/pull/3462)
 - Added try-catch strategy in Configuration section [#3451](https://github.com/wazuh/wazuh-kibana-app/pull/3451)
 - Added try catch strategy with ErrorOrchestrator service on Components > Overview [#3442](https://github.com/wazuh/wazuh-kibana-app/pull/3442)
+- Added try catch strategy with ErrorOrchestrator service on Components > Add Modules Data [#3472](https://github.com/wazuh/wazuh-kibana-app/pull/3472)
 - Added try catch strategy with ErrorOrchestrator service on Management > Status  [#3434](https://github.com/wazuh/wazuh-kibana-app/pull/3434)
 
 ### Changed
