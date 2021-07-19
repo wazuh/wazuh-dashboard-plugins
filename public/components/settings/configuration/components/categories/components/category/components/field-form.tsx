@@ -153,7 +153,7 @@ const getValue = ({ item, updatedConfig }: IFieldForm) => typeof updatedConfig[i
   : item.value;
 
 const onChange = (value: string | number | boolean | [], props: IFieldForm) => {
-  if(JSON.stringify(props.item.value) != JSON.stringify(value)){
+  if(JSON.stringify(props.item.value) !== JSON.stringify(value)){
     const { updatedConfig, setUpdatedConfig, item } = props;
     setUpdatedConfig({
       ...updatedConfig,
