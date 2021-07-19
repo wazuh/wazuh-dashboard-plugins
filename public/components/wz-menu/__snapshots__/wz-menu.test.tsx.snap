@@ -1,0 +1,12 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`WzMenu tests should render a WzMenu 1`] = `
+<WzMenu
+  windowSize={
+    Object {
+      "height": 768,
+      "width": 1024,
+    }
+  }
+/>
+`;
