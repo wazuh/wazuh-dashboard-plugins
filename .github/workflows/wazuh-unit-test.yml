@@ -9,7 +9,7 @@ on:
       - 'disable'
   pull_request:
     branches:
-      - '*'
+      - '4.3-7.10'
 
 jobs:
   setup-wazuh-app:
@@ -21,12 +21,12 @@ jobs:
       YARN_1-21-1: '1.21.1'
       KIBANA_TAG: 'v7.10.2'
     steps:
-#      - name: Step 01 - Download Project kibana
-#        uses: actions/checkout@v2
-#        with:
-#          repository: elastic/kibana
-#          ref: ${{ env.KIBANA_TAG }}
-#          path: kibana
+      - name: Step 01 - Download Project kibana
+        uses: actions/checkout@v2
+        with:
+          repository: elastic/kibana
+          ref: ${{ env.KIBANA_TAG }}
+          path: kibana
 
       - name: Step 02 - Setup node for kibana app
         uses: actions/setup-node@v2
@@ -35,46 +35,38 @@ jobs:
 
       - name: Step 03 - Install dependencies of kibana
         run: |
-          mkdir -m 777 kibana
           cd kibana
-          mkdir -m 777 plugins
           yarn set version ${{ env.YARN_1-21-1 }}
-          mkdir -m 777 plugins/wazuh-kibana-app
+          yarn kbn bootstrap
+          mkdir plugins/wazuh-kibana-app
 
       - name: Step 04 - Download Project wazuh-app
         uses: actions/checkout@v2
         with:
           path: kibana/plugins/wazuh-kibana-app
-#
-#      - name: Step 05 - Setup node version for wazuh app
-#        uses: actions/setup-node@v2
-#        with:
-#          node-version: ${{ env.NODE_12-22-3 }}
 
-#      - name: Step 06 - Install dependencies of wazuh
-#        run: |
-#          cd kibana/plugins/wazuh-kibana-app/
-#          yarn install
-
-#      - name: Step 07 - Setup node for Jest
-#        uses: actions/setup-node@v2
-#        with:
-#          node-version: ${{ env.NODE_10-23-1 }}
-
-#      - name: Step 08 - Run Tests & Collect Coverage
-#        run: |
-#          cd ./kibana/plugins/wazuh-kibana-app
-#          yarn run test:jest --colors wz-authentication.test.ts
-
-#      - name: Step 09 - Comment Test Coverage
-#        uses: AthleticNet/comment-test-coverage@1.2.2
-#        with:
-#          token: ${{ secrets.GITHUB_TOKEN }}
-#          path: ./kibana/plugins/wazuh-kibana-app/coverage-summary.json
-#          title: Jest Test Coverage
-
-      - name: Step DE PRUEBA 1
-        uses: artiomtr/jest-coverage-report-action@v2.0-rc.2
+      - name: Step 05 - Setup node version for wazuh app
+        uses: actions/setup-node@v2
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          working-directory: ./kibana/plugins/wazuh-kibana-app/coverage/
+          node-version: ${{ env.NODE_12-22-3 }}
+
+      - name: Step 06 - Install dependencies of wazuh
+        run: |
+          cd kibana/plugins/wazuh-kibana-app/
+          yarn install
+
+      - name: Step 07 - Setup node for Jest
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.NODE_10-23-1 }}
+
+      - name: Step 08 - Run Tests & Collect Coverage
+        run: |
+          cd ./kibana/plugins/wazuh-kibana-app
+          yarn run test:jest --color --silent --ci --coverage --coverageReporters="text" --coverageReporters="text-summary" --testLocationInResults --json --outputFile="../../../report.json"
+
+      - name: Step 09 - Comment Test Coverage
+          uses: artiomtr/jest-coverage-report-action@v2.0-rc.2
+          with:
+            github-token: ${{ secrets.GITHUB_TOKEN }}
+            skip-step: all
