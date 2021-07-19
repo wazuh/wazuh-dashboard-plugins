@@ -13,10 +13,10 @@ import { getDataPlugin } from '../../../../kibana-services';
 import { KbnSearchBar } from '../../../kbn-search-bar';
 import { TimeRange, Query } from '../../../../../../../src/plugins/data/common';
 import { MockupTables } from './mockup-tables';
-import { WzRequest } from '../../../../react-services/wz-request';
 
 
-export const MainPanel = ({ sidePanelChildren, moduleStatsList = [], ...props }) => {
+
+export const MainPanel = ({ sidePanelChildren, visualizations = [], ...props }) => {
 
     const KibanaServices = getDataPlugin().query;
     const filterManager = KibanaServices.filterManager;
@@ -53,12 +53,12 @@ export const MainPanel = ({ sidePanelChildren, moduleStatsList = [], ...props })
                 </ModuleSidePanel >
                 }
                 <EuiPageBody>
-                    <ModuleBody>
+                    <ModuleBody visualizations={visualizations}>
                         <KbnSearchBar
                             onQuerySubmit={onQuerySubmit}
                             onFiltersUpdated={onFiltersUpdated}
                             isLoading={isLoading} />
-                        <MockupTables />
+                        
                     </ModuleBody>
                 </EuiPageBody>
             </EuiFlexItem>

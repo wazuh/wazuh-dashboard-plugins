@@ -66,7 +66,7 @@ export default [
     _type: 'visualization',
   },
   {
-    _id: 'Wazuh-App-Overview-MITRE-Alerts-Evolution',
+    _id: 'Wazuh-App-Overview-OFFICE-Alerts-Evolution',
     _source: {
       title: 'Mitre alerts evolution',
       visState: JSON.stringify({
@@ -199,7 +199,7 @@ export default [
     _type: 'visualization',
   },
   {
-    _id: 'Wazuh-App-Overview-MITRE-Attacks-By-Agent',
+    _id: 'Wazuh-App-Overview-OFFICE-Attacks-By-Agent',
     _source: {
       title: 'Mitre techniques by agent',
       visState: JSON.stringify({
@@ -266,7 +266,7 @@ export default [
     _type: 'visualization',
   },
   {
-    _id: 'Wazuh-App-Overview-MITRE-Attacks-By-Technique',
+    _id: 'Wazuh-App-Overview-OFFICE-Attacks-By-Technique',
     _source: {
       title: 'Attacks by technique',
       visState: JSON.stringify({
