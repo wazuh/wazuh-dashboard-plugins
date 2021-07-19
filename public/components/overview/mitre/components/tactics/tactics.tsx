@@ -66,7 +66,8 @@ export class Tactics extends Component {
   initTactics() {
     const tacticsIds = Object.keys(this.props.tacticsObject);
     const selectedTactics = {};
-    tacticsIds.forEach( (item,id) => {
+
+    tacticsIds.forEach((item, id) => {
       selectedTactics[item] = true;
     });
 
