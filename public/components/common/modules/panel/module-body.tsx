@@ -3,7 +3,7 @@ import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import WzReduxProvider from '../../../../redux/wz-redux-provider';
 
 
-export const ModuleBody = ({ rows = [], ...props }) => {
+export const ModuleBody = ({ toggleDrilldown, rows = [], ...props }) => {
 
   return <>
     <WzReduxProvider>
@@ -14,7 +14,9 @@ export const ModuleBody = ({ rows = [], ...props }) => {
           }}>{
               row.columns.map((column, key) => {
                 const growthFactor = Math.max((column.width ? parseInt(column.width / 10) : 1), 1);
-                const visProps = { ...(column.props || {}) };
+                const drilldownHandler = column.enableToggleDrilldown ? toggleDrilldown : undefined;
+                const visProps = { ...(column.props || {}), toggleDrilldown: drilldownHandler };
+
                 return <EuiFlexItem key={key} grow={growthFactor}>
                   <column.component {...visProps} />
                 </EuiFlexItem>

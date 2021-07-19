@@ -1,8 +1,26 @@
 import KibanaVis from '../../../../kibana-integrations/kibana-vis';
+import { MockupTables } from '../mockup-tables';
 
 
 export const MainViewConfig = {
     rows: [
+        {
+            height: 300,
+            columns: [
+                {
+                    width: 50,
+                    component: MockupTables,
+                    enableToggleDrilldown: true,
+                    props: { visID: 'Wazuh-App-Overview-OFFICE', tab: 'office' }
+                },
+                {
+                    width: 50,
+                    component: MockupTables,
+                    enableToggleDrilldown: true,
+                    props: { visID: 'Wazuh-App-Overview-OFFICE-Alerts-Evolution', tab: 'office' }
+                },
+            ]
+        },
         {
             height: 300,
             columns: [

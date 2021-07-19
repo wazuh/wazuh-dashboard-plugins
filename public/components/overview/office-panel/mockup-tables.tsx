@@ -1,36 +1,9 @@
 import React from 'react';
-import {  EuiFlexGroup, EuiFlexItem, EuiBasicTable, EuiPanel, EuiTitle, Random } from '@elastic/eui';
+import { EuiFlexGroup, EuiFlexItem, EuiBasicTable, EuiPanel, EuiTitle, Random } from '@elastic/eui';
 
-export const MockupTables = () => {
-    const tables = [
-        {
-            title: 'Tenants',
-            minWidth: '400px',
-            columns: [
-                {
-                    field: 'tenant',
-                    name: 'Tenant',
-                },
-                {
-                    field: 'count',
-                    name: 'Count',
-                },
-            ],
-        },
-        {
-            title: 'Subscriptions',
-            minWidth: '400px',
-            columns: [
-                {
-                    field: 'subscription',
-                    name: 'Subscription',
-                },
-                {
-                    field: 'count',
-                    name: 'count',
-                },
-            ],
-        },
+export const MockupTables = ({ toggleDrilldown, ...props }) => {
+    const random = new Random();
+    const tables = [        
         {
             title: 'Events',
             minWidth: '750px',
@@ -39,18 +12,18 @@ export const MockupTables = () => {
                 {
                     field: 'rule',
                     name: 'Description',
-                    render: (rule) => rule.description,
+                    render: (rule) => (<span onClick={toggleDrilldown}>{rule.description}</span>),
                 },
                 {
                     field: 'rule',
                     name: 'Level',
-                    render: (rule) => rule.level,
+                    render: (rule) => (<span onClick={toggleDrilldown}>{rule.level}</span>),
                 },
             ],
         },
     ];
     const generateItems = () => {
-        const random = new Random();
+
         const rules = [
             {
                 level: 1,
@@ -85,16 +58,13 @@ export const MockupTables = () => {
         </EuiPanel>
     }
     const renderTables = (items, tables) => {
-        const rendered = tables.map((table, key) => {
-            return (
-                <EuiFlexItem style={{ minWidth: table.minWidth, width: table.width || '' }} key={key}>
-                    <TitlePanel title={table.title}>
-                        <EuiBasicTable items={items} columns={table.columns} />
-                    </TitlePanel>
-                </EuiFlexItem>
-            );
-        });
-        return rendered;
+        const table = tables[0];
+        return <EuiFlexItem style={{ minWidth: table.minWidth, width: table.width || '' }}>
+            <TitlePanel title={table.title}>
+                <EuiBasicTable items={items} columns={table.columns} />
+            </TitlePanel>
+        </EuiFlexItem>
+
     };
 
 

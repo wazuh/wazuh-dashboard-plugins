@@ -16,72 +16,70 @@ import { AppState } from './app-state';
 import { UI_LOGGER_LEVELS } from '../../common/constants';
 
 export const queryConfig = async (agentId, sections, node = false) => {
-    try {
-        if (
-          !agentId ||
-          typeof agentId !== 'string' ||
-          !sections ||
-          !sections.length ||
-          typeof sections !== 'object' ||
-          !Array.isArray(sections)
-        ) {
-          throw new Error('Invalid parameters');
-        }
-    
-        const result = {};
-        sections.forEach((section) => { (async () => {
-          const { component, configuration } = section;
-          if (
-            !component ||
-            typeof component !== 'string' ||
-            !configuration ||
-            typeof configuration !== 'string'
-          ) {
-            throw new Error('Invalid section');
-          }
-          try {
-            const url = node
-              ? `/cluster/${node}/configuration/${component}/${configuration}`
-              : !node 
-              && agentId === '000'
-                ? `/manager/configuration/${component}/${configuration}`
-                : `/agents/${agentId}/configuration/${component}/${configuration}`;
-    
-            const partialResult = await WzRequest.apiReq('GET', url, {});
-            result[`${component}-${configuration}`] = partialResult.data.data;
-            return result;
-          } catch (error) {
-            const options = {
-                context: `${AppState.name}.queryConfig`,
-                level: UI_LOGGER_LEVELS.ERROR,
-                severity: UI_ERROR_SEVERITIES.BUSINESS,
-                store: true,
-                display: false,
-                error: {
-                error: error,
-                message: error.message || error,
-                title: `Fetch Configuration`,
-                },
-            };
-            getErrorOrchestrator().handleError(options);
-          }
-        })();
-    });
-        return result;
+  try {
+    if (
+      !agentId ||
+      typeof agentId !== 'string' ||
+      !sections ||
+      !sections.length ||
+      typeof sections !== 'object' ||
+      !Array.isArray(sections)
+    ) {
+      throw new Error('Invalid parameters');
+    }
+
+    const result = {};
+    for (const section in sections) {
+      const { component, configuration } = section;
+      if (
+        !component ||
+        typeof component !== 'string' ||
+        !configuration ||
+        typeof configuration !== 'string'
+      ) {
+        throw new Error('Invalid section');
+      }
+      try {
+        const url = node
+          ? `/cluster/${node}/configuration/${component}/${configuration}`
+          : !node
+            && agentId === '000'
+            ? `/manager/configuration/${component}/${configuration}`
+            : `/agents/${agentId}/configuration/${component}/${configuration}`;
+
+        const partialResult = await WzRequest.apiReq('GET', url, {});
+        result[`${component}-${configuration}`] = partialResult.data.data;
       } catch (error) {
         const options = {
-            context: `${AppState.name}.queryConfig`,
-            level: UI_LOGGER_LEVELS.ERROR,
-            severity: UI_ERROR_SEVERITIES.BUSINESS,
-            store: true,
-            display: false,
-            error: {
+          context: `${AppState.name}.queryConfig`,
+          level: UI_LOGGER_LEVELS.ERROR,
+          severity: UI_ERROR_SEVERITIES.BUSINESS,
+          store: true,
+          display: false,
+          error: {
             error: error,
             message: error.message || error,
-            title: `Error getting the query config`,
-            },
+            title: `Fetch Configuration`,
+          },
         };
-
         getErrorOrchestrator().handleError(options);
+      }
     }
+    return result;
+  } catch (error) {
+    const options = {
+      context: `${AppState.name}.queryConfig`,
+      level: UI_LOGGER_LEVELS.ERROR,
+      severity: UI_ERROR_SEVERITIES.BUSINESS,
+      store: true,
+      display: false,
+      error: {
+        error: error,
+        message: error.message || error,
+        title: `Error getting the query config`,
+      },
+    };
+
+    getErrorOrchestrator().handleError(options);
+  }
 }

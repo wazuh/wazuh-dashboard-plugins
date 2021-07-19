@@ -15,14 +15,11 @@ import React, { useEffect, useState } from 'react';
 import { MainPanel } from '../../../components/common/modules/panel';
 import { withErrorBoundary } from '../../common/hocs';
 import { ModuleStats } from './module-stats';
-import { WzRequest } from '../../../react-services/wz-request';
 import { queryConfig } from '../../../react-services/query-config';
-import { getCurrentConfig } from '../../../controllers/management/components/management/configuration/utils/wz-fetch';
 import { DrilldownConfig, MainViewConfig } from './config/';
 
 export const OfficePanel = withErrorBoundary(({ ...props }) => {
 
-    const extraFilters = [];
     const [moduleStatsList, setModuleStatsList] = useState([]);
     useEffect(() => {
         (async () => {
