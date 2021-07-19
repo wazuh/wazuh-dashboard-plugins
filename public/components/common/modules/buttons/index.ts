@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Integrity monitoring components
+ * Wazuh app - Module buttons components
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -10,6 +10,4 @@
  * Find more information about this on the LICENSE file.
  */
 
-export * from './dashboard';
-export * from './events';
-export * from './modules-helper.js';
+export * from './generate_report';

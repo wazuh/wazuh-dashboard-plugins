@@ -26,27 +26,20 @@ import {
 } from '@elastic/eui';
 import '../../common/modules/module.scss';
 import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
+
 import store from '../../../redux/store';
 import { ReportingService } from '../../../react-services/reporting';
 import { AppNavigate } from '../../../react-services/app-navigate';
 import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
-import { Events, Dashboard, Loader, Settings } from '../../common/modules';
-import OverviewActions from '../../../controllers/overview/components/overview-actions/overview-actions';
-import { MainFim } from '../../agents/fim';
 
-import { MainVuls } from '../../agents/vuls';
-import { MainSca } from '../../agents/sca';
-import { MainMitre } from './main-mitre';
-import WzReduxProvider from '../../../redux/wz-redux-provider';
-import { ComplianceTable } from '../../overview/compliance-table';
-
-import { withAgentSupportModule } from '../../../components/common/hocs';
 import { connect } from 'react-redux';
-import { compose } from 'redux';
+import { getDataPlugin } from '../../../kibana-services';
 
-import { ModuleMitreAttackIntelligence } from '../../overview/mitre_attack_intelligence';
+const mapStateToProps = (state) => ({
+  agent: state.appStateReducers.currentAgentData,
+});
 
-export class MainModuleOverview extends Component {
+export const MainModuleOverview = connect(mapStateToProps)(class MainModuleOverview extends Component {
   constructor(props) {
     super(props);
     this.reportingService = new ReportingService();
@@ -132,10 +125,13 @@ export class MainModuleOverview extends Component {
     }
 
     this.setGlobalBreadcrumb();
+    const { filterManager } = getDataPlugin().query;
+    this.filterManager = filterManager;
   }
 
   render() {
     const { section, selectView } = this.props;
+    const ModuleTabView = this.props.tabs.find(tab => tab.id === selectView);
     return (
       <div className={this.state.showAgentInfo ? 'wz-module wz-module-showing-agent' : 'wz-module'}>
         <Fragment>
@@ -145,58 +141,18 @@ export class MainModuleOverview extends Component {
                 <EuiFlexGroup>
                   {this.props.renderTabs()}
                   <EuiFlexItem grow={false} style={{ marginTop: 6, marginRight: 5 }}>
-                    <WzReduxProvider>
-                      <OverviewActions {...{ ...this.props, ...this.props.agentsSelectionProps }} />
-                    </WzReduxProvider>
+                    <EuiFlexGroup>
+                      {ModuleTabView && ModuleTabView.buttons && ModuleTabView.buttons.map((ModuleViewButton, index) => 
+                        typeof ModuleViewButton !== 'string' ? <EuiFlexItem key={`module_button_${index}`}><ModuleViewButton {...{ ...this.props, ...this.props.agentsSelectionProps }} moduleID={section}/></EuiFlexItem> : null)}
+                    </EuiFlexGroup>
                   </EuiFlexItem>
-                  {selectView === 'dashboard' && this.props.renderReportButton()}
-                  {(this.props.buttons || []).includes('dashboard') &&
-                    this.props.renderDashboardButton()}
                 </EuiFlexGroup>
               </div>
             )}
           </div>
-          <ModuleTabViewer component={section} {...this.props} />
+          {ModuleTabView && ModuleTabView.component && <ModuleTabView.component {...this.props} moduleID={section}/> }
         </Fragment>
       </div>
     );
   }
-}
-
-const mapStateToProps = (state) => ({
-  agent: state.appStateReducers.currentAgentData,
-});
-
-const ModuleTabViewer = compose(
-  connect(mapStateToProps),
-  withAgentSupportModule
-)((props) => {
-  const { section, selectView } = props;
-  return (
-    <>
-      {selectView === 'events' && <Events {...props} />}
-      {selectView === 'loader' && (
-        <Loader
-          {...props}
-          loadSection={(section) => props.loadSection(section)}
-          redirect={props.afterLoad}
-        ></Loader>
-      )}
-      {selectView === 'dashboard' && <Dashboard {...props} />}
-      {selectView === 'settings' && <Settings {...props} />}
-
-      {/* ---------------------MODULES WITH CUSTOM PANELS--------------------------- */}
-      {section === 'fim' && selectView === 'inventory' && <MainFim {...props} />}
-      {section === 'sca' && selectView === 'inventory' && <MainSca {...props} />}
-
-      {section === 'vuls' && selectView === 'inventory' && <MainVuls {...props} />}
-
-      {section === 'mitre' && selectView === 'inventory' && <MainMitre {...props} />}
-      {section === 'mitre' && selectView === 'intelligence' && <ModuleMitreAttackIntelligence {...props} />}
-      {['pci', 'gdpr', 'hipaa', 'nist', 'tsc'].includes(section) && selectView === 'inventory' && (
-        <ComplianceTable {...props} goToDiscover={(id) => props.onSelectedTabChanged(id)} />
-      )}
-      {/* -------------------------------------------------------------------------- */}
-    </>
-  );
-});
+})

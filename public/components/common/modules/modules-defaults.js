@@ -9,66 +9,99 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { Dashboard } from './dashboard';
+import { Events } from './events';
+import { MainFim } from '../../agents/fim';
+import { MainSca } from '../../agents/sca';
+import { MainVuls } from '../../agents/vuls';
+import { MainMitre } from './main-mitre';
+import { ModuleMitreAttackIntelligence } from '../../overview/mitre_attack_intelligence';
+import { ComplianceTable } from '../../overview/compliance-table';
+import ButtonModuleExploreAgent from '../../../controllers/overview/components/overview-actions/overview-actions';
+import { ButtonModuleGenerateReport } from '../modules/buttons';
+
+const DashboardTab = { id: 'dashboard', name: 'Dashboard', buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport], component: Dashboard};
+const EventsTab = { id: 'events', name: 'Events', buttons: [ButtonModuleExploreAgent], component: Events };
+const RegulatoryComplianceTabs = [{ id: 'inventory', name: 'Controls', buttons: [ButtonModuleExploreAgent], component: ComplianceTable }, DashboardTab, EventsTab];
+
 export const ModulesDefaults = {
   general: {
     init: 'dashboard',
-    tabs: [{ id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }],
-    buttons: ['reporting']
+    tabs: [DashboardTab, EventsTab]
   },
   fim: {
     init: 'dashboard',
-    tabs: [{ id: 'inventory', name: 'Inventory', onlyAgent: false }, { id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }],
-    buttons: ['reporting', 'settings']
+    tabs: [{ id: 'inventory', name: 'Inventory', onlyAgent: false, buttons: [ButtonModuleExploreAgent], component: MainFim }, DashboardTab, EventsTab],
+  },
+  aws: {
+    init: 'dashboard',
+    tabs: [DashboardTab, EventsTab]
   },
   gcp: {
     init: 'dashboard',
-    tabs: [{ id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }],
-    buttons: ['reporting']
+    tabs: [DashboardTab, EventsTab],
+  },
+  pm: {
+    init: 'dashboard',
+    tabs: [DashboardTab, EventsTab],
+  },
+  audit: {
+    init: 'dashboard',
+    tabs: [DashboardTab, EventsTab],
   },
   sca: {
     init: 'inventory',
-    tabs: [{ id: 'inventory', name: 'Inventory' }, { id: 'events', name: 'Events' }],
+    tabs: [{ id: 'inventory', name: 'Inventory', buttons: [ButtonModuleExploreAgent], component: MainSca }, EventsTab],
+    buttons: ['settings']
+  },
+  ciscat: {
+    init: 'dashboard',
+    tabs: [DashboardTab, EventsTab],
+  },
+  vuls: {
+    init: 'dashboard',
+    tabs: [{ id: 'inventory', name: 'Inventory', onlyAgent: false, buttons: [ButtonModuleExploreAgent], component: MainVuls }, DashboardTab, EventsTab],
     buttons: ['settings']
   },
   mitre: {
     init: 'dashboard',
-    tabs: [{id: 'intelligence', name: 'Intelligence'}, { id: 'inventory', name: 'Framework' }, { id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }],
-    buttons: ['reporting']
-  },
-  vuls: {
-    init: 'dashboard',
-    tabs: [{ id: 'inventory', name: 'Inventory', onlyAgent: false }, { id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }],
-    buttons: ['reporting', 'settings']
+    tabs: [{ id: 'intelligence', name: 'Intelligence', component: ModuleMitreAttackIntelligence }, { id: 'inventory', name: 'Framework', buttons: [ButtonModuleExploreAgent], component: MainMitre }, DashboardTab, EventsTab]
   },
   virustotal: {
     init: 'dashboard',
-    tabs: [{ id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }],
-    buttons: ['reporting']
+    tabs: [DashboardTab, EventsTab]
   },
   pci: {
     init: 'dashboard',
-    tabs: [{ id: 'inventory', name: 'Controls' }, { id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }],
-    buttons: ['reporting']
+    tabs: RegulatoryComplianceTabs
+  },
+  osquery: {
+    init: 'dashboard',
+    tabs: [DashboardTab, EventsTab],
+  },
+  oscap: {
+    init: 'dashboard',
+    tabs: [DashboardTab, EventsTab],
+  },
+  pci: {
+    init: 'dashboard',
+    tabs: [DashboardTab, EventsTab],
   },
   hipaa: {
     init: 'dashboard',
-    tabs: [{ id: 'inventory', name: 'Controls' }, { id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }],
-    buttons: ['reporting']
+    tabs: RegulatoryComplianceTabs
   },
   nist: {
     init: 'dashboard',
-    tabs: [{ id: 'inventory', name: 'Controls' }, { id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }],
-    buttons: ['reporting']
+    tabs: RegulatoryComplianceTabs
   },
   gdpr: {
     init: 'dashboard',
-    tabs: [{ id: 'inventory', name: 'Controls' }, { id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }],
-    buttons: ['reporting']
+    tabs: RegulatoryComplianceTabs
   },
   tsc: {
     init: 'dashboard',
-    tabs: [{ id: 'inventory', name: 'Controls' }, { id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }],
-    buttons: ['reporting']
+    tabs: RegulatoryComplianceTabs
   },
   syscollector: {
     notModule: true

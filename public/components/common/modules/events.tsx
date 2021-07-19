@@ -20,8 +20,13 @@ import { PatternHandler } from '../../../react-services/pattern-handler';
 
 import { enhanceDiscoverEventsCell } from './events-enhance-discover-fields';
 import { toMountPoint } from '../../../../../../src/plugins/kibana_react/public';
+import { withAgentSupportModule, withModuleTabLoader } from '../hocs';
+import { compose } from 'redux';
 
-export class Events extends Component {
+export const Events = compose(
+  withAgentSupportModule,
+  withModuleTabLoader
+)(class Events extends Component {
   intervalCheckExistsDiscoverTableTime: number = 200;
   isMount: boolean;
   state: {
@@ -276,4 +281,4 @@ export class Events extends Component {
       </Fragment>
     )
   }
-}
+})

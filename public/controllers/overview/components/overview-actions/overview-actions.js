@@ -168,43 +168,41 @@ class OverviewActions extends Component {
     }
     const agent = store.getState().appStateReducers.currentAgentData;
     return (
-      <div>
-        <EuiFlexItem>
-          {!this.state.isAgent && (
-            <EuiToolTip position='bottom' content='Select an agent to explore its modules' >
+      <>
+        {!this.state.isAgent && (
+          <EuiToolTip position='bottom' content='Select an agent to explore its modules' >
+            <EuiButtonEmpty
+              isLoading={this.state.loadingReport}
+              color='primary'
+              onClick={() => this.showAgentModal()}>
+              <EuiIcon type="watchesApp" color="primary" style={{ marginBottom: 3 }} />&nbsp; Explore agent
+          </EuiButtonEmpty>
+          </EuiToolTip>
+        )}
+        {this.state.isAgent && (
+          <div style={{ display: "inline-flex" }}>
+            <EuiToolTip position='bottom' content='Change agent selected' >
               <EuiButtonEmpty
+                style={{background: 'rgba(0, 107, 180, 0.1)'}}
                 isLoading={this.state.loadingReport}
-                color='primary'
                 onClick={() => this.showAgentModal()}>
-                <EuiIcon type="watchesApp" color="primary" style={{ marginBottom: 3 }} />&nbsp; Explore agent
-            </EuiButtonEmpty>
+                {agent.name} ({agent.id})
+                </EuiButtonEmpty>
             </EuiToolTip>
-          )}
-          {this.state.isAgent && (
-            <div style={{ display: "inline-flex" }}>
-              <EuiToolTip position='bottom' content='Change agent selected' >
-                <EuiButtonEmpty
-                  style={{background: 'rgba(0, 107, 180, 0.1)'}}
-                  isLoading={this.state.loadingReport}
-                  onClick={() => this.showAgentModal()}>
-                  {agent.name} ({agent.id})
-                  </EuiButtonEmpty>
-              </EuiToolTip>
-              <EuiToolTip position='bottom' content='Unpin agent'>
-                <EuiButtonIcon
-                  className="wz-unpin-agent"
-                  iconType='pinFilled'
-                  onClick={() => {
-                    store.dispatch(updateCurrentAgentData({}));
-                    this.removeAgentsFilter();
-                  }}
-                  aria-label='Unpin agent' />
-              </EuiToolTip>
-            </div>
-          )}
-        </EuiFlexItem>
+            <EuiToolTip position='bottom' content='Unpin agent'>
+              <EuiButtonIcon
+                className="wz-unpin-agent"
+                iconType='pinFilled'
+                onClick={() => {
+                  store.dispatch(updateCurrentAgentData({}));
+                  this.removeAgentsFilter();
+                }}
+                aria-label='Unpin agent' />
+            </EuiToolTip>
+          </div>
+        )}
         {modal}
-      </div>
+      </>
     );
   }
 }

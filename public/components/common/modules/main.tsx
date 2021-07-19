@@ -21,7 +21,6 @@ import {
 } from '@elastic/eui';
 import '../../common/modules/module.scss';
 import { ReportingService } from '../../../react-services/reporting';
-import { AppNavigate } from '../../../react-services/app-navigate';
 import { ModulesDefaults } from './modules-defaults';
 import { getAngularModule, getDataPlugin, getUiSettings } from '../../../kibana-services';
 import { MainModuleAgent } from './main-agent'
@@ -46,17 +45,10 @@ export const MainModule = compose(
       };
       const app = getAngularModule();
       this.$rootScope = app.$injector.get('$rootScope');
-    }
-
-    async componentDidMount() {
       if (!(ModulesDefaults[this.props.section] || {}).notModule) {
         this.tabs = (ModulesDefaults[this.props.section] || {}).tabs || [
           { id: 'dashboard', name: 'Dashboard' },
           { id: 'events', name: 'Events' },
-        ];
-        this.buttons = (ModulesDefaults[this.props.section] || {}).buttons || [
-          'reporting',
-          'settings',
         ];
       }
     }
@@ -104,103 +96,6 @@ export const MainModule = compose(
       );
     }
 
-    startVis2PngByAgent = async () => {
-      const agent =
-        (this.props.agent || store.getState().appStateReducers.currentAgentData || {}).id || false;
-      await this.reportingService.startVis2Png(this.props.section, agent);
-    };
-
-    async startReport() {
-      try {
-        this.setState({ loadingReport: true });
-        const isDarkModeTheme = getUiSettings().get('theme:darkMode');
-        if (isDarkModeTheme) {
-  
-          //Patch to fix white text in dark-mode pdf reports
-          const defaultTextColor = '#DFE5EF';
-  
-          //Patch to fix dark backgrounds in visualizations dark-mode pdf reports
-          const $labels = $('.euiButtonEmpty__text, .echLegendItem');
-          const $vizBackground = $('.echChartBackground');
-          const defaultVizBackground = $vizBackground.css('background-color');
-  
-          try {
-            $labels.css('color', 'black');
-            $vizBackground.css('background-color', 'transparent');
-            await this.startVis2PngByAgent();
-            $vizBackground.css('background-color', defaultVizBackground);
-            $labels.css('color', defaultTextColor);
-          } catch (e) {
-            $labels.css('color', defaultTextColor);
-            $vizBackground.css('background-color', defaultVizBackground);
-            this.setState({ loadingReport: false });
-          }
-        } else {
-          await this.startVis2PngByAgent();
-        }
-      } finally {
-        this.setState({ loadingReport: false });
-      }
-    }
-
-    renderReportButton() {
-      return (
-        (this.props.disabledReport && (
-          <EuiFlexItem grow={false} style={{ marginRight: 4, marginTop: 6 }}>
-            <EuiToolTip position="top" content="No results match for this search criteria.">
-              <EuiButtonEmpty
-                iconType="document"
-                isLoading={this.state.loadingReport}
-                isDisabled={true}
-                onClick={async () => this.startReport()}
-              >
-                Generate report
-              </EuiButtonEmpty>
-            </EuiToolTip>
-          </EuiFlexItem>
-        )) || (
-          <EuiFlexItem grow={false} style={{ marginRight: 4, marginTop: 6 }}>
-            <EuiButtonEmpty
-              iconType="document"
-              isLoading={this.state.loadingReport}
-              onClick={async () => this.startReport()}
-            >
-              Generate report
-            </EuiButtonEmpty>
-          </EuiFlexItem>
-        )
-      );
-    }
-
-    renderDashboardButton() {
-      const href = `#/overview?tab=${this.props.section}&agentId=${this.props.agent.id}`;
-      return (
-        <EuiFlexItem grow={false} style={{ marginLeft: 0, marginTop: 6, marginBottom: 18 }}>
-          <EuiButton
-            fill={this.state.selectView === 'dashboard'}
-            iconType="visLine"
-            onClick={() => this.onSelectedTabChanged('dashboard')}
-          >
-            Dashboard
-          </EuiButton>
-        </EuiFlexItem>
-      );
-    }
-
-    renderSettingsButton() {
-      return (
-        <EuiFlexItem grow={false} style={{ marginRight: 4, marginTop: 6 }}>
-          <EuiButtonEmpty
-            fill={this.state.selectView === 'settings'}
-            iconType="wrench"
-            onClick={() => this.onSelectedTabChanged('settings')}
-          >
-            Configuration
-          </EuiButtonEmpty>
-        </EuiFlexItem>
-      );
-    }
-
     loadSection(id) {
       this.setState({ selectView: id });
     }
@@ -217,8 +112,7 @@ export const MainModule = compose(
             new RegExp('tabView=' + '[^&]*'),
             `tabView=${id === 'events' ? 'discover' : id === 'inventory' ? 'inventory' : 'panels'}`
           );
-          this.afterLoad = id;
-          this.loadSection('loader');
+          this.loadSection(id === 'panels' ? 'dashboard' : id === 'discover' ? 'events' : id);
         } else {
           this.loadSection(id === 'panels' ? 'dashboard' : id === 'discover' ? 'events' : id);
         }
@@ -230,13 +124,8 @@ export const MainModule = compose(
       const { selectView } = this.state;
       const mainProps = {
         selectView,
-        afterLoad: this.afterLoad,
-        buttons: this.buttons,
         tabs: this.tabs,
         renderTabs: () => this.renderTabs(),
-        renderReportButton: () => this.renderReportButton(),
-        renderDashboardButton: () => this.renderDashboardButton(),
-        renderSettingsButton: () => this.renderSettingsButton(),
         loadSection: (id) => this.loadSection(id),
         onSelectedTabChanged: (id) => this.onSelectedTabChanged(id),
       };
