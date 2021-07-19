@@ -10,24 +10,23 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import {
-  EuiInMemoryTable,
-  EuiCallOut,
-  EuiOverlayMask,
-  EuiConfirmModal
-} from '@elastic/eui';
+import { EuiInMemoryTable, EuiCallOut, EuiOverlayMask, EuiConfirmModal } from '@elastic/eui';
 
 import { connect } from 'react-redux';
 import ReportingHandler from './utils/reporting-handler';
-import { getToasts }  from '../../../../../kibana-services';
+import { getToasts } from '../../../../../kibana-services';
 
 import {
   updateIsProcessing,
   updateShowModal,
-  updateListItemsForRemove
+  updateListItemsForRemove,
 } from '../../../../../redux/actions/reportingActions';
 
 import ReportingColums from './utils/columns-main';
+
+import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
+import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 
 class WzReportingTable extends Component {
   _isMounted = false;
@@ -35,7 +34,7 @@ class WzReportingTable extends Component {
     super(props);
     this.state = {
       items: [],
-      isLoading: false
+      isLoading: false,
     };
 
     this.reportingHandler = ReportingHandler;
@@ -47,8 +46,22 @@ class WzReportingTable extends Component {
   }
 
   async componentDidUpdate() {
-    if (this.props.state.isProcessing && this._isMounted) {
-      await this.getItems();
+    try {
+      if (this.props.state.isProcessing && this._isMounted) {
+        await this.getItems();
+      }
+    } catch (error) {
+      const options = {
+        context: `${WzReportingTable.name}.componentDidUpdate`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   }
 
@@ -65,12 +78,12 @@ class WzReportingTable extends Component {
       const items = ((rawItems || {}).data || {}).reports || [];
       this.setState({
         items,
-        isProcessing: false
+        isProcessing: false,
       });
       this.props.updateIsProcessing(false);
     } catch (error) {
       this.props.updateIsProcessing(false);
-      return Promise.reject(error);
+      throw error;
     }
   }
 
@@ -81,11 +94,30 @@ class WzReportingTable extends Component {
     const columns = this.reportingColumns.columns;
     const message = isLoading ? null : 'No results...';
 
+    const deleteReport = (itemList) => {
+      try {
+        this.deleteReport(itemList);
+        this.props.updateShowModal(false);
+      } catch (error) {
+        const options = {
+          context: `${WzReportingTable.name}.deleteReport`,
+          level: UI_LOGGER_LEVELS.ERROR,
+          severity: UI_ERROR_SEVERITIES.BUSINESS,
+          error: {
+            error: error,
+            message: error.message || error,
+            title: `${error.name}: Error deleting report`,
+          },
+        };
+        getErrorOrchestrator().handleError(options);
+      }
+    };
+
     const sorting = {
       sort: {
         field: 'date',
-        direction: 'desc'
-      }
+        direction: 'desc',
+      },
     };
 
     if (!error) {
@@ -106,10 +138,7 @@ class WzReportingTable extends Component {
               <EuiConfirmModal
                 title={`Delete report?`}
                 onCancel={() => this.props.updateShowModal(false)}
-                onConfirm={() => {
-                  this.deleteReport(itemList);
-                  this.props.updateShowModal(false);
-                }}
+                onConfirm={() => deleteReport(itemList)}
                 cancelButtonText="Cancel"
                 confirmButtonText="Delete"
                 defaultFocusedButton="cancel"
@@ -129,39 +158,36 @@ class WzReportingTable extends Component {
       color: color,
       title: title,
       text: text,
-      toastLifeTimeMs: time
+      toastLifeTimeMs: time,
     });
   };
 
   async deleteReport(items) {
-    const results = items.map(async (item, i) => {
-      await this.reportingHandler.deleteReport(item.name);
-    });
-
-    Promise.all(results).then(completed => {
+    try {
+      const results = items.map(async (item, i) => {
+        await this.reportingHandler.deleteReport(item.name);
+      });
+      await Promise.all(results);
       this.props.updateIsProcessing(true);
       this.showToast('success', 'Success', 'Deleted successfully', 3000);
-    });
+    } catch (error) {
+      throw error;
+    }
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
-    state: state.reportingReducers
+    state: state.reportingReducers,
   };
 };
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch) => {
   return {
-    updateIsProcessing: isProcessing =>
-      dispatch(updateIsProcessing(isProcessing)),
-    updateShowModal: showModal => dispatch(updateShowModal(showModal)),
-    updateListItemsForRemove: itemList =>
-      dispatch(updateListItemsForRemove(itemList))
+    updateIsProcessing: (isProcessing) => dispatch(updateIsProcessing(isProcessing)),
+    updateShowModal: (showModal) => dispatch(updateShowModal(showModal)),
+    updateListItemsForRemove: (itemList) => dispatch(updateListItemsForRemove(itemList)),
   };
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WzReportingTable);
+export default connect(mapStateToProps, mapDispatchToProps)(WzReportingTable);

@@ -12,12 +12,8 @@ export default {
     `${kbnDir}/node_modules`
   ],
   collectCoverageFrom: [
-    `${kbnDir}/packages/kbn-ui-framework/src/components/**/*.js`,
-    `${kbnDir}/!packages/kbn-ui-framework/src/components/index.js`,
-    `${kbnDir}/!packages/kbn-ui-framework/src/components/**/*/index.js`,
-    `${kbnDir}/packages/kbn-ui-framework/src/services/**/*.js`,
-    `${kbnDir}/!packages/kbn-ui-framework/src/services/index.js`,
-    `${kbnDir}/!packages/kbn-ui-framework/src/services/**/*/index.js`,
+    "**/*.{js,jsx,ts,tsx}",
+    "./!**/node_modules/**",
   ],
   moduleNameMapper: {
     '^ui/(.*)': `${kbnDir}/src/ui/public/$1`,
@@ -28,9 +24,12 @@ export default {
     `${kbnDir}/src/dev/jest/setup/babel_polyfill.js`,
     `${kbnDir}/src/dev/jest/setup/enzyme.js`,
   ],
-  coverageDirectory: `${kbnDir}/target/jest-coverage`,
+  collectCoverage: true,
+  coverageDirectory: `./target/test-coverage`,
   coverageReporters: [
     'html',
+    'text-summary',
+    'json-summary'
   ],
   globals: {
     'ts-jest': {
@@ -42,6 +41,7 @@ export default {
     'json',
     'ts',
     'tsx',
+    'html'
   ],
   modulePathIgnorePatterns: [
     '__fixtures__/',
@@ -49,11 +49,11 @@ export default {
   ],
   testMatch: [
     '**/*.test.{js,ts,tsx}',
-    '**/*{js,ts,tsx}'
   ],
   transform: {
     '^.+\\.js$': `${kbnDir}/src/dev/jest/babel_transform.js`,
     '^.+\\.tsx?$': `${kbnDir}/src/dev/jest/babel_transform.js`,
+    '^.+\\.html?$': `${kbnDir}/src/dev/jest/babel_transform.js`,
   },
   transformIgnorePatterns: [
     '[/\\\\]node_modules[/\\\\].+\\.js$',

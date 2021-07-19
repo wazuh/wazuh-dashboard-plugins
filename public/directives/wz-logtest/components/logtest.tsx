@@ -25,13 +25,22 @@ import {
   EuiSpacer,
   EuiTextArea,
   EuiTitle,
+  EuiOutsideClickDetector,
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services';
 import { withErrorBoundary, withReduxProvider, withUserAuthorizationPrompt } from '../../../components/common/hocs';
 import { compose } from 'redux';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { updateLogtestToken } from '../../../redux/actions/appStateActions';
 import { WzButtonPermissionsModalConfirm } from '../../../components/common/buttons';
+import {
+  UI_ERROR_SEVERITIES,
+  UIErrorLog,
+  UIErrorSeverity,
+  UILogLevel,
+} from '../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../../common/constants';
+import { getErrorOrchestrator } from '../../../react-services/common-services';
 
 type LogstestProps = {
   openCloseFlyout: () => {};
@@ -103,7 +112,7 @@ export const Logtest = compose(
           log_format: 'syslog',
           location: 'logtest',
           event,
-          ...(token ? { token } : {})
+          ...(token ? { token } : {}),
         });
         
         token = response.data.data.token;
@@ -115,8 +124,7 @@ export const Logtest = compose(
         return response.data.data.output || '' 
         ? formatResult(response.data.data.output, response.data.data.alert)
         : `No result found for: ${response.data.data.output.full_log} \n\n\n`
-      }
-      );      
+      });
       setTestResult(testResults);
     } finally {
       setTesting(false);
@@ -131,14 +139,23 @@ export const Logtest = compose(
 
   const deleteToken = async () => {
     try {
-      const response = await WzRequest.apiReq('DELETE', `/logtest/sessions/${sessionToken}`, {});
+      await WzRequest.apiReq('DELETE', `/logtest/sessions/${sessionToken}`, {});
       dispatch(updateLogtestToken(''));
       setTestResult('');
+    } catch (error) {
+      const options: UIErrorLog = {
+        context: `${Logtest.name}.deleteToken`,
+        level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+        severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
+        error: {
+          error: error,
+          message: `Error trying to delete logtest token due to: ${error.message || error}`,
+          title: error.name,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
-    catch (error) {
-      this.showToast('danger', 'Error', `Error trying to delete logtest token due to: ${error.message || error}`);
-    }
-  }
+  };
 
   const buildLogtest = () => {
     return (
@@ -180,7 +197,8 @@ export const Logtest = compose(
               modalTitle={`Do you want to clear current session?`}
               modalProps={{
                 buttonColor: 'danger',
-                children: 'Clearing the session means the logs execution history is removed. This affects to rules that fire an alert when similar logs are executed in a specific range of time.'
+                children:
+                  'Clearing the session means the logs execution history is removed. This affects to rules that fire an alert when similar logs are executed in a specific range of time.',
               }}
             >
               Clear session
@@ -233,12 +251,10 @@ export const Logtest = compose(
           </EuiPanel>
         </EuiPage>
       )) || (
-          <EuiOverlayMask
-            headerZindexLocation="below"
-            onClick={() => {
-              props.openCloseFlyout();
-            }}
-          >
+        <EuiOverlayMask headerZindexLocation="below">
+          <EuiOutsideClickDetector onOutsideClick={() => {
+            props.openCloseFlyout();
+          }}>
             <EuiFlyout className="wzApp" onClose={() => props.openCloseFlyout()}>
               <EuiFlyoutHeader hasBorder={false}>
                 <EuiTitle size="m">
@@ -253,8 +269,9 @@ export const Logtest = compose(
                 {buildLogtest()}
               </EuiFlyoutBody>
             </EuiFlyout>
-          </EuiOverlayMask>
-        )}
+          </EuiOutsideClickDetector>
+        </EuiOverlayMask>
+      )}
     </Fragment>
   );
 });
