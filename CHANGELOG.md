@@ -41,6 +41,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Fixed creation of log files [#3384](https://github.com/wazuh/wazuh-kibana-app/pull/3384) 
 - Fix size api selector when name is too long [#3445](https://github.com/wazuh/wazuh-kibana-app/pull/3445)
+- Fix CDB list view not working with IPv6 [#3488](https://github.com/wazuh/wazuh-kibana-app/pull/3488)
 
 ## Wazuh v4.2.1 - Kibana 7.10.2 , 7.11.2 - Revision 4202
 
