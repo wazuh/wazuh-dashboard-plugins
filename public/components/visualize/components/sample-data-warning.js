@@ -16,32 +16,31 @@ import React, { useState, useEffect } from 'react';
 import { WzRequest } from '../../../react-services';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 
-export const SampleData = ({ ...props }) => {
+export const SampleDataWarning = ({ ...props }) => {
   const [isSampleData, setIsSampleData] = useState(false);
 
-  const usesSampleData = async () => {
-    try {
-      const result = (await WzRequest.genericReq('GET', '/elastic/samplealerts', {})).data
-        .sampleAlertsInstalled;
-      setIsSampleData(result);
-    } catch (error) {
-      const options = {
-        context: `${SampleData.name}.usesSampleData`,
-        level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.UI,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: error.name || error,
-        },
-      };
-      getErrorOrchestrator().handleError(options);
-    }
-  };
   useEffect(() => {
-    usesSampleData();
+    (async () => {
+      try {
+        const result = (await WzRequest.genericReq('GET', '/elastic/samplealerts', {})).data
+          .sampleAlertsInstalled;
+        setIsSampleData(result);
+      } catch (error) {
+        const options = {
+          context: `${SampleDataWarning.name}.usesSampleData`,
+          level: UI_LOGGER_LEVELS.ERROR,
+          severity: UI_ERROR_SEVERITIES.UI,
+          error: {
+            error: error,
+            message: error.message || error,
+            title: error.name || error,
+          },
+        };
+        getErrorOrchestrator().handleError(options);
+      }
+    })();
   }, [
-    SampleData,
+    SampleDataWarning,
     setIsSampleData,
     UI_ERROR_SEVERITIES,
     UI_LOGGER_LEVELS,

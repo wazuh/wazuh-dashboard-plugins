@@ -11,4 +11,4 @@
  */
 
 export { SecurityAlerts } from './security-alerts';
-export { SampleData } from './sample-data';
+export { SampleDataWarning } from './sample-data-warning';

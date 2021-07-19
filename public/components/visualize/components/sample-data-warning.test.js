@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { SampleData } from './sample-data';
+import { SampleDataWarning } from './sample-data-warning';
 import { WzRequest } from '../../../react-services';
 import { mount } from 'enzyme';
 import { act } from 'react-dom/test-utils';
@@ -29,7 +29,7 @@ jest.mock('../../../react-services/common-services');
 describe('Check sample data component', () => {
   it('should render if there is sample data', async () => {
     WzRequest.genericReq.mockResolvedValue({ data: { sampleAlertsInstalled: true } });
-    const wrapper = await mount(<SampleData />);
+    const wrapper = await mount(<SampleDataWarning />);
     await awaitForMyComponent(wrapper);
     expect(wrapper.find('EuiCallOut').exists());
     expect(wrapper.find('EuiCallOut').props().title).toEqual("This dashboard contains sample data");
@@ -37,7 +37,7 @@ describe('Check sample data component', () => {
 
   it('should not render if there is no sample data', async () => {
     WzRequest.genericReq.mockResolvedValue({ data: { sampleAlertsInstalled: false } });
-    const wrapper = await mount(<SampleData />);
+    const wrapper = await mount(<SampleDataWarning />);
     await awaitForMyComponent(wrapper);
     expect(wrapper.contains('EuiCallOut')).toBe(false);
   });
@@ -48,7 +48,7 @@ describe('Check sample data component', () => {
       name: 'This should not be the thing',
     };
     const mockOptions = {
-      context: `${SampleData.name}.usesSampleData`,
+      context: `${SampleDataWarning.name}.usesSampleData`,
       level: UI_LOGGER_LEVELS.ERROR,
       severity: UI_ERROR_SEVERITIES.UI,
       error: {
@@ -65,7 +65,7 @@ describe('Check sample data component', () => {
       };
     });
     WzRequest.genericReq.mockRejectedValue(error);
-    const wrapper = await mount(<SampleData />);
+    const wrapper = await mount(<SampleDataWarning />);
     await awaitForMyComponent(wrapper);
   });
 });
