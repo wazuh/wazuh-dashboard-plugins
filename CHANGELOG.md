@@ -38,7 +38,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Fixed
 
 - Fixed creation of log files [#3384](https://github.com/wazuh/wazuh-kibana-app/pull/3384) 
-
+- Fixed the check that shows if there are any changes on configuration settings [#3482](https://github.com/wazuh/wazuh-kibana-app/pull/3482) 
 ## Wazuh v4.2.1 - Kibana 7.10.2 , 7.11.2 - Revision 4202
 
 ### Added
