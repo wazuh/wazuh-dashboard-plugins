@@ -25,6 +25,7 @@ import {
   EuiContextMenu,
   EuiIcon,
   EuiOverlayMask,
+  EuiOutsideClickDetector,
   EuiCallOut,
   EuiLoadingSpinner,
 } from '@elastic/eui';
@@ -567,8 +568,21 @@ export const Techniques = withWindowSize(
               />
             </EuiOverlayMask>
           )}
-        </div>
-      );
-    }
-  }
-);
+        { isFlyoutVisible &&
+          <EuiOverlayMask headerZindexLocation="below">
+            <EuiOutsideClickDetector onOutsideClick={() => this.onChangeFlyout(false)}>
+              <FlyoutTechnique
+                openDashboard={(e, itemId) => this.openDashboard(e, itemId)}
+                openDiscover={(e, itemId) => this.openDiscover(e, itemId)}
+                openIntelligence={(e, redirectTo, itemId) => this.openIntelligence(e, redirectTo, itemId)}
+                onChangeFlyout={this.onChangeFlyout}
+                currentTechniqueData={this.state.currentTechniqueData}
+                currentTechnique={currentTechnique}
+                tacticsObject={this.props.tacticsObject} />
+            </EuiOutsideClickDetector>
+          </EuiOverlayMask>
+        } 
+      </div>   
+		)
+	}
+})

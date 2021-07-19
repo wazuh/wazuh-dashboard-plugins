@@ -25,6 +25,7 @@ import {
   EuiText,
   EuiIcon,
   EuiOverlayMask,
+  EuiOutsideClickDetector,
   EuiLoadingSpinner,
 } from '@elastic/eui';
 import { AppNavigate } from '../../../../../react-services/app-navigate';
@@ -278,17 +279,17 @@ export class ComplianceSubrequirements extends Component {
         </div>
 
         {this.state.flyoutOn &&
-          <EuiOverlayMask 
-            headerZindexLocation="below"
-            onClick={() => this.closeFlyout() } >
-            <RequirementFlyout
-              currentRequirement={this.state.selectedRequirement}
-              onChangeFlyout={this.onChangeFlyout}
-              description={this.props.descriptions[this.state.selectedRequirement]}
-              getRequirementKey={() => { return this.getRequirementKey() }}
-              openDashboard={(e, itemId) => this.openDashboard(e, itemId)}
-              openDiscover={(e, itemId) => this.openDiscover(e, itemId)}
-            />
+          <EuiOverlayMask headerZindexLocation="below">
+            <EuiOutsideClickDetector onOutsideClick={() => this.closeFlyout()}>
+              <RequirementFlyout
+                currentRequirement={this.state.selectedRequirement}
+                onChangeFlyout={this.onChangeFlyout}
+                description={this.props.descriptions[this.state.selectedRequirement]}
+                getRequirementKey={() => { return this.getRequirementKey() }}
+                openDashboard={(e, itemId) => this.openDashboard(e, itemId)}
+                openDiscover={(e, itemId) => this.openDiscover(e, itemId)}
+              />
+            </EuiOutsideClickDetector>
           </EuiOverlayMask>}
       </div>
     )

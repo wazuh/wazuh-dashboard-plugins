@@ -34,6 +34,7 @@ import {
  EuiFlexGroup,
  Direction,
  EuiOverlayMask,
+ EuiOutsideClickDetector,
  EuiSpacer,
  EuiCallOut,
  EuiIcon,
@@ -598,15 +599,14 @@ export const Discover = compose(
       pageSizeOptions: [10, 25, 50],
     };
     const noResultsText = `No results match for this search criteria`;
-    let flyout = this.state.showMitreFlyout ? <EuiOverlayMask
-      headerZindexLocation="below"
-      onClick={this.closeMitreFlyout} >
-      <FlyoutTechnique
-        openDashboard={(e, itemId) => this.openDashboard(e, itemId)}
-        openDiscover={(e, itemId) => this.openDiscover(e, itemId)}
-        onChangeFlyout={this.onMitreChangeFlyout}
-        currentTechnique={this.state.selectedTechnique} />
-
+    let flyout = this.state.showMitreFlyout ? <EuiOverlayMask headerZindexLocation="below">
+      <EuiOutsideClickDetector onOutsideClick={this.closeMitreFlyout}>
+        <FlyoutTechnique
+          openDashboard={(e, itemId) => this.openDashboard(e, itemId)}
+          openDiscover={(e, itemId) => this.openDiscover(e, itemId)}
+          onChangeFlyout={this.onMitreChangeFlyout}
+          currentTechnique={this.state.selectedTechnique} />
+      </EuiOutsideClickDetector>
     </EuiOverlayMask> : <></>;
     return (
       <div

@@ -20,6 +20,7 @@ import {
   EuiButtonIcon,
   EuiLoadingChart,
   EuiOverlayMask,
+  EuiOutsideClickDetector,
   EuiEmptyPrompt,
 } from '@elastic/eui';
 import { FlyoutTechnique } from '../../../../../components/overview/mitre/components/techniques/components/flyout-technique';
@@ -245,16 +246,16 @@ export class MitreTopTactics extends Component {
         {!selectedTactic || alertsCount.length === 0 ? tacticsTop : tecniquesTop}
         {alertsCount.length === 0 && emptyPrompt}
         {flyoutOn &&
-        <EuiOverlayMask 
-          headerZindexLocation="below"
-          onClick={() => this.closeFlyout() } >
-          <FlyoutTechnique 
-            openDashboard={(e,itemId) => this.openDashboard(e,itemId)}
-            openDiscover={(e,itemId) => this.openDiscover(e,itemId)}
-            implicitFilters={[ {"agent.id": this.props.agentId} ] }
-            agentId={this.props.agentId}
-            onChangeFlyout={this.onChangeFlyout}
-            currentTechnique={selectedTechnique} />
+        <EuiOverlayMask headerZindexLocation="below">
+          <EuiOutsideClickDetector onOutsideClick={() => this.closeFlyout()}>
+            <FlyoutTechnique
+              openDashboard={(e, itemId) => this.openDashboard(e, itemId)}
+              openDiscover={(e, itemId) => this.openDiscover(e, itemId)}
+              implicitFilters={[{ "agent.id": this.props.agentId }]}
+              agentId={this.props.agentId}
+              onChangeFlyout={this.onChangeFlyout}
+              currentTechnique={selectedTechnique} />
+          </EuiOutsideClickDetector>
         </EuiOverlayMask>}
       </Fragment>
     )

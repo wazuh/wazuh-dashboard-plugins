@@ -17,6 +17,7 @@ import {
   EuiBasicTable,
   Direction,
   EuiOverlayMask,
+  EuiOutsideClickDetector,
 } from '@elastic/eui';
 import { WzRequest } from '../../../../react-services/wz-request';
 import { FlyoutDetail } from './flyout';
@@ -298,18 +299,18 @@ export class InventoryTable extends Component {
       <div className='wz-inventory'>
         {filesTable}
         {this.state.isFlyoutVisible &&
-          <EuiOverlayMask
-            headerZindexLocation="below"
-            onClick={() => this.closeFlyout() } >
-            <FlyoutDetail
-              fileName={this.state.currentFile}
-              agentId={this.props.agent.id}
-              item={this.state.syscheckItem}
-              closeFlyout={() => this.closeFlyout()}
-              type='file'
-              view='inventory'
-              showViewInEvents={true}
-              {...this.props} />
+          <EuiOverlayMask headerZindexLocation="below">
+            <EuiOutsideClickDetector onOutsideClick={() => { this.closeFlyout() }}>
+              <FlyoutDetail
+                fileName={this.state.currentFile}
+                agentId={this.props.agent.id}
+                item={this.state.syscheckItem}
+                closeFlyout={() => this.closeFlyout()}
+                type='file'
+                view='inventory'
+                showViewInEvents={true}
+                {...this.props} />
+            </EuiOutsideClickDetector>
           </EuiOverlayMask>
         }
       </div>
