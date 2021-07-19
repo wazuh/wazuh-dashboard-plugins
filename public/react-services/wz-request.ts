@@ -49,16 +49,13 @@ export class WzRequest {
         url: url,
         data: payload,
         timeout: customTimeout || timeout,
-      };     
-
-      console.log(options);
-      
+      };
 
       const data = await axios(options);
       if (data['error']) {
         throw new Error(data['error']);
       }
-      
+
       return Promise.resolve(data);
     } catch (error) {
       OdfeUtils.checkOdfeSessionExpired(error);
