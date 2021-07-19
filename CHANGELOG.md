@@ -22,9 +22,11 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added try catch strategy with ErrorOrchestrator service on ManagementController [#3374](https://github.com/wazuh/wazuh-kibana-app/pull/3374)
 - Added try catch strategy with ErrorOrchestrator service on Management > Reporting [#3427](https://github.com/wazuh/wazuh-kibana-app/pull/3427)
 - Added try catch strategy with ErrorOrchestrator service on FIM & SCA sections [#3417](https://github.com/wazuh/wazuh-kibana-app/pull/3417)
+- Added try catch strategy with ErrorOrchestrator service on Syscollector/Vuls/Stats sections [#3462](https://github.com/wazuh/wazuh-kibana-app/pull/3462)
 - Added try-catch strategy in Configuration section [#3451](https://github.com/wazuh/wazuh-kibana-app/pull/3451)
 - Added try catch strategy with ErrorOrchestrator service on Components > Overview [#3442](https://github.com/wazuh/wazuh-kibana-app/pull/3442)
 - Added try catch strategy with ErrorOrchestrator service on Components > Add Modules Data [#3472](https://github.com/wazuh/wazuh-kibana-app/pull/3472)
+- Added try catch strategy with ErrorOrchestrator service on Management > Status  [#3434](https://github.com/wazuh/wazuh-kibana-app/pull/3434)
 
 ### Changed
 
@@ -39,6 +41,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Fixed
 
 - Fixed creation of log files [#3384](https://github.com/wazuh/wazuh-kibana-app/pull/3384) 
+- Fix size api selector when name is too long [#3445](https://github.com/wazuh/wazuh-kibana-app/pull/3445)
 
 ## Wazuh v4.2.1 - Kibana 7.10.2 , 7.11.2 - Revision 4202
 
