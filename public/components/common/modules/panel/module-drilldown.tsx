@@ -3,7 +3,7 @@ import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import WzReduxProvider from '../../../../redux/wz-redux-provider';
 
 
-export const ModuleBody = ({ rows = [], ...props }) => {
+export const ModuleDrilldown = ({ rows = [], ...props }) => {
 
   return <>
     <WzReduxProvider>

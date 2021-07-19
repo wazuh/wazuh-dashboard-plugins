@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
     EuiFlexGroup,
     EuiFlexItem,
@@ -6,7 +6,7 @@ import {
     EuiPageSideBar,
     EuiPageBody,
 } from '@elastic/eui';
-import { ModuleSidePanel,  ModuleBody } from './';
+import { ModuleSidePanel, ModuleBody, ModuleDrilldown } from './';
 import { FilterManager, Filter } from '../../../../../../../src/plugins/data/public/';
 //@ts-ignore
 import { getDataPlugin } from '../../../../kibana-services';
@@ -16,7 +16,7 @@ import { MockupTables } from './mockup-tables';
 
 
 
-export const MainPanel = ({ sidePanelChildren, visualizations = [], ...props }) => {
+export const MainPanel = ({ sidePanelChildren, moduleConfig = {}, drilldownConfig = {}, ...props }) => {
 
     const KibanaServices = getDataPlugin().query;
     const filterManager = KibanaServices.filterManager;
@@ -53,13 +53,14 @@ export const MainPanel = ({ sidePanelChildren, visualizations = [], ...props }) 
                 </ModuleSidePanel >
                 }
                 <EuiPageBody>
-                    <ModuleBody visualizations={visualizations}>
+                    {<ModuleBody {...moduleConfig}>
                         <KbnSearchBar
                             onQuerySubmit={onQuerySubmit}
                             onFiltersUpdated={onFiltersUpdated}
                             isLoading={isLoading} />
-                        
-                    </ModuleBody>
+
+                    </ModuleBody>}
+                    {drilldownConfig && <ModuleDrilldown {...drilldownConfig} />}
                 </EuiPageBody>
             </EuiFlexItem>
         </EuiFlexGroup>

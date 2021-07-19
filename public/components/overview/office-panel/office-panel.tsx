@@ -17,9 +17,8 @@ import { withErrorBoundary } from '../../common/hocs';
 import { ModuleStats } from './module-stats';
 import { WzRequest } from '../../../react-services/wz-request';
 import { queryConfig } from '../../../services/query-config';
-import { getCurrentConfig } from '../../../controllers/management/components/management/configuration/utils/wz-fetch';
-// import { getCurrentConfig } from '../../../react-services';
-import moduleVisualizations from './module-config';
+// import { queryConfig } from '../../../react-services/query-config';
+import { DrilldownConfig, MainViewConfig } from './config/';
 
 export const OfficePanel = withErrorBoundary(({ ...props }) => {
 
@@ -28,12 +27,6 @@ export const OfficePanel = withErrorBoundary(({ ...props }) => {
     useEffect(() => {
         (async () => {
             try {
-                // const testResult = await getCurrentConfig(
-                //     '000',
-                //     [{ component: 'wmodules', configuration: 'wmodules' }],
-                //     props.clusterNodeSelected,
-                //     props.updateWazuhNotReadyYet
-                //   );
                 const modulesConfig = await queryConfig(
                     '000',
                     [{ component: 'wmodules', configuration: 'wmodules' }],
@@ -52,7 +45,7 @@ export const OfficePanel = withErrorBoundary(({ ...props }) => {
         )();
     }, [])
     return (
-        <MainPanel visualizations={moduleVisualizations}
+        <MainPanel moduleConfig={MainViewConfig} drillDownConfig={DrilldownConfig}
             sidePanelChildren={<ModuleStats listItems={moduleStatsList} />} />
     )
 });
