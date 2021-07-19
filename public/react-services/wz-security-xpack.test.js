@@ -1,5 +1,4 @@
 import { WzSecurityXpack } from './wz-security-xpack';
-
 jest.mock('./generic-request', () => ({
   GenericRequest: {
     request: (method, path) => {
@@ -39,22 +38,7 @@ jest.mock('./wz-request', () => ({
     },
   },
 }));
-describe('Wazuh Internal Users', () => {
-  it('Should return the X-Pack internal users', async () => {
-    const users = await WzSecurityXpack.getUsers();
-    const expected_result = {
-      username: 'wazuh_system',
-      roles: ['kibana_system', 'wazuh'],
-      full_name: 'wazuh',
-      email: '',
-      metadata: {},
-      enabled: true,
-    };
-    expect(users).toEqual(expected_result);
-  });
-});
-
-describe('Wazuh Internal Users', () => {
+describe('Wazuh Internal Users with X-Pack', () => {
   it('Should create a X-Pack policy', async () => {
     const users = await WzSecurityXpack.createPolicy();
     const expected_result = {
@@ -69,10 +53,9 @@ describe('Wazuh Internal Users', () => {
     };
     expect(users).toEqual(expected_result);
   });
-});
-describe('Wazuh Internal Users', () => {
-  it('Should create,edit and delete a X-Pack user', async () => {
+  it('Should create,edit and delete a X-Pack user and also gets all the X-pack internal users', async () => {
     const createUser = await WzSecurityXpack.createUser();
+    const users = await WzSecurityXpack.getUsers();
     const editUser = await WzSecurityXpack.editUser();
     const deleteUser = await WzSecurityXpack.deleteUser();
     const expected_result = {
@@ -86,5 +69,6 @@ describe('Wazuh Internal Users', () => {
     expect(createUser).toEqual(expected_result);
     expect(editUser).toEqual(expected_result);
     expect(deleteUser).toEqual(expected_result);
+    expect(users).toEqual(expected_result);
   });
 });
