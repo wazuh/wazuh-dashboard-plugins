@@ -16,8 +16,8 @@ import { MainPanel } from '../../../components/common/modules/panel';
 import { withErrorBoundary } from '../../common/hocs';
 import { ModuleStats } from './module-stats';
 import { WzRequest } from '../../../react-services/wz-request';
-import { queryConfig } from '../../../services/query-config';
-// import { queryConfig } from '../../../react-services/query-config';
+import { queryConfig } from '../../../react-services/query-config';
+import { getCurrentConfig } from '../../../controllers/management/components/management/configuration/utils/wz-fetch';
 import { DrilldownConfig, MainViewConfig } from './config/';
 
 export const OfficePanel = withErrorBoundary(({ ...props }) => {
@@ -29,8 +29,7 @@ export const OfficePanel = withErrorBoundary(({ ...props }) => {
             try {
                 const modulesConfig = await queryConfig(
                     '000',
-                    [{ component: 'wmodules', configuration: 'wmodules' }],
-                    WzRequest.apiReq
+                    [{ component: 'wmodules', configuration: 'wmodules' }]
                 );
                 const config = Object.entries(modulesConfig["wmodules-wmodules"].affected_items[0].wmodules
                     .filter((module) => { return Object.keys(module)[0] == 'sca' })[0]['sca']).map((configProp) => {
