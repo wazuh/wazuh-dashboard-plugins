@@ -93,7 +93,7 @@ class WzListEditor extends Component {
     const items = {};
     const lines = content.split('\n');
     lines.forEach((line) => {
-      const split = line.split(':');
+      const split = line.startsWith('"') ? line.split('":') : line.split(':');
       const key = split[0];
       const value = split[1] || '';
       if (key) items[key] = value; // Prevent add empty keys
