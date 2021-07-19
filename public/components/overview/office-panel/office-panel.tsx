@@ -37,8 +37,7 @@ export const OfficePanel = withErrorBoundary(({ ...props }) => {
                 //   );
                 const modulesConfig = await queryConfig(
                     '000',
-                    [{ component: 'wmodules', configuration: 'wmodules' }],
-                    WzRequest.apiReq
+                    [{ component: 'wmodules', configuration: 'wmodules' }]
                 );
                 const config = Object.entries(modulesConfig["wmodules-wmodules"].affected_items[0].wmodules
                     .filter((module) => { return Object.keys(module)[0] == 'sca' })[0]['sca']).map((configProp) => {

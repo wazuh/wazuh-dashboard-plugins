@@ -13,6 +13,7 @@
 import { WzRequest } from './wz-request';
 import { getErrorOrchestrator } from './common-services';
 import { AppState } from './app-state';
+import { UI_LOGGER_LEVELS } from '../../common/constants';
 
 export const queryConfig = async (agentId, sections, node = false) => {
     try {
@@ -28,7 +29,7 @@ export const queryConfig = async (agentId, sections, node = false) => {
         }
     
         const result = {};
-        sections.forEach((section) => { async () => {
+        sections.forEach((section) => { (async () => {
           const { component, configuration } = section;
           if (
             !component ||
@@ -48,6 +49,7 @@ export const queryConfig = async (agentId, sections, node = false) => {
     
             const partialResult = await WzRequest.apiReq('GET', url, {});
             result[`${component}-${configuration}`] = partialResult.data.data;
+            return result;
           } catch (error) {
             const options = {
                 context: `${AppState.name}.queryConfig`,
@@ -63,7 +65,8 @@ export const queryConfig = async (agentId, sections, node = false) => {
             };
             getErrorOrchestrator().handleError(options);
           }
-        }});
+        })();
+    });
         return result;
       } catch (error) {
         const options = {
