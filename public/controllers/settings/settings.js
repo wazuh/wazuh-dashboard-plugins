@@ -87,6 +87,7 @@ export class SettingsController {
         context: `${SettingsController.name}.$onInit`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
+        store: true,
         error: {
           error: error,
           message: error.message || error,
