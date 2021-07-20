@@ -805,4 +805,4 @@ export const Discover = compose(
         {flyout}
       </div>);
   }
-);
+});
