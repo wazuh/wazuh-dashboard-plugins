@@ -30,6 +30,7 @@ All notable changes to the Wazuh app project will be documented in this file.
   [#3415](https://github.com/wazuh/wazuh-kibana-app/pull/3415) 
   [#3469](https://github.com/wazuh/wazuh-kibana-app/pull/3469) 
   [#3448](https://github.com/wazuh/wazuh-kibana-app/pull/3448)
+  [#3465](https://github.com/wazuh/wazuh-kibana-app/pull/3465)
   
 - Added fields status and type in vulnerabilities table [#3196](https://github.com/wazuh/wazuh-kibana-app/pull/3196)
 - Added Intelligence tab to Mitre Att&ck module [#3368](https://github.com/wazuh/wazuh-kibana-app/pull/3368) [#3344](https://github.com/wazuh/wazuh-kibana-app/pull/3344)
@@ -40,11 +41,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed ossec to wazuh in sample-data [#3121](https://github.com/wazuh/wazuh-kibana-app/pull/3121)
 - Changed empty fields in FIM tables and `syscheck.value_name` in discovery now show an empty tag for visual clarity [#3279](https://github.com/wazuh/wazuh-kibana-app/pull/3279)
 - Adapted the Mitre tactics and techniques resources to use the API endpoints [#3346](https://github.com/wazuh/wazuh-kibana-app/pull/3346)
-- Refactored all try catch strategy on Settings section [#3392](https://github.com/wazuh/wazuh-kibana-app/pull/3392)
-- Refactored all try catch strategy on Controller/Agent section [#3404](https://github.com/wazuh/wazuh-kibana-app/pull/3404)
-- Refactored all try catch value of context for ErrorOrchestrator service. [#3432](https://github.com/wazuh/wazuh-kibana-app/pull/3432)
-- Refactored all try catch strategy on Controller/Groups section [#3415](https://github.com/wazuh/wazuh-kibana-app/pull/3415)
-- Refactored all try catch strategy in Common/Modules and Management/Groups [#3465](https://github.com/wazuh/wazuh-kibana-app/pull/3465)
 
 ### Fixed
 
