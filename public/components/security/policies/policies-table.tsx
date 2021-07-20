@@ -8,14 +8,13 @@ import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 
-export const PoliciesTable = ({ policies, loading, editPolicy, createPolicy, updatePolicies }) => {
+export const PoliciesTable = ({ policies, loading, editPolicy, updatePolicies }) => {
   const getRowProps = (item) => {
     const { id } = item;
     return {
       'data-test-subj': `row-${id}`,
       onClick: () => {
         editPolicy(item);
-        createPolicy(item);
       },
     };
   };
