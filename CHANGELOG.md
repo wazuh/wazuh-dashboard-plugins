@@ -38,6 +38,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Refactored all try catch strategy on Controller/Agent section [#3398](https://github.com/wazuh/wazuh-kibana-app/issues/3398)
 - Refactored all try catch value of context for ErrorOrchestrator service. [#3432](https://github.com/wazuh/wazuh-kibana-app/issues/3432)
 - Refactored all try catch strategy on Controller/Groups section [#3415](https://github.com/wazuh/wazuh-kibana-app/issues/3415)
+- Testing logs using the Ruletest Test don't display the rule information if not matching a rule. [#3446](https://github.com/wazuh/wazuh-kibana-app/pull/3446)
 
 ### Fixed
 
