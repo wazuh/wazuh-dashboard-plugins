@@ -39,10 +39,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed ossec to wazuh in sample-data [#3121](https://github.com/wazuh/wazuh-kibana-app/pull/3121)
 - Changed empty fields in FIM tables and `syscheck.value_name` in discovery now show an empty tag for visual clarity [#3279](https://github.com/wazuh/wazuh-kibana-app/pull/3279)
 - Adapted the Mitre tactics and techniques resources to use the API endpoints [#3346](https://github.com/wazuh/wazuh-kibana-app/pull/3346)
-- Refactored all try catch strategy on Settings section 
-- Refactored all try catch strategy on Controller/Agent section 
-- Refactored all try catch value of context for ErrorOrchestrator service. 
-- Refactored all try catch strategy on Controller/Groups section 
 
 ### Fixed
 
