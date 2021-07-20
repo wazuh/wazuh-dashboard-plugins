@@ -8,6 +8,7 @@ import {
     EuiForm,
     EuiFieldText,
     EuiOverlayMask,
+    EuiOutsideClickDetector,
     EuiFormRow,
     EuiSpacer,
     EuiComboBox,
@@ -16,7 +17,6 @@ import {
 
 import { WzRequest } from '../../../react-services/wz-request';
 import { ErrorHandler } from '../../../react-services/error-handler';
-import { WzOverlayMask } from '../../common/util'
 
 
 
@@ -130,60 +130,57 @@ export const CreateRole = ({ closeFlyout }) => {
     }
   }, [selectedPolicies, roleName]);
 
+  const onClose = () => { hasChanges ? setIsModalVisible(true) : closeFlyout(false) };
+
   return (
     <>
-      <WzOverlayMask
-        headerZindexLocation="below"
-        onClick={() => {
-          hasChanges ? setIsModalVisible(true) : closeFlyout(false);
-        }}
-      >
-        <EuiFlyout className="wzApp" onClose={() => {
-          hasChanges ? setIsModalVisible(true) : closeFlyout(false);
-        }}>
-          <EuiFlyoutHeader hasBorder={false}>
-            <EuiTitle size="m">
-              <h2>New role</h2>
-            </EuiTitle>
-          </EuiFlyoutHeader>
-          <EuiFlyoutBody>
-            <EuiForm component="form" style={{ padding: 24 }}>
-              <EuiFormRow
-                label="Role name"
-                isInvalid={roleNameError}
-                error={'Please provide a role name'}
-                helpText="Introduce a name for this new role."
-              >
-                <EuiFieldText
-                  placeholder=""
-                  value={roleName}
-                  onChange={(e) => onChangeRoleName(e)}
-                  aria-label=""
-                />
-              </EuiFormRow>
-              <EuiFormRow
-                label="Policies"
-                isInvalid={selectedPoliciesError}
-                error={'At least one policy must be selected.'}
-                helpText="Assign policies to the role."
-              >
-                <EuiComboBox
-                  placeholder="Select policies"
-                  options={policies}
-                  selectedOptions={selectedPolicies}
-                  onChange={onChangePolicies}
-                  isClearable={true}
-                  data-test-subj="demoComboBox"
-                />
-              </EuiFormRow>
-              <EuiSpacer />
-              <EuiButton fill onClick={createUser}>
-                Create role
+      <EuiOverlayMask headerZindexLocation="below">
+        <EuiOutsideClickDetector onOutsideClick={onClose}>
+          <EuiFlyout className="wzApp" onClose={onClose}>
+            <EuiFlyoutHeader hasBorder={false}>
+              <EuiTitle size="m">
+                <h2>New role</h2>
+              </EuiTitle>
+            </EuiFlyoutHeader>
+            <EuiFlyoutBody>
+              <EuiForm component="form" style={{ padding: 24 }}>
+                <EuiFormRow
+                  label="Role name"
+                  isInvalid={roleNameError}
+                  error={'Please provide a role name'}
+                  helpText="Introduce a name for this new role."
+                >
+                  <EuiFieldText
+                    placeholder=""
+                    value={roleName}
+                    onChange={(e) => onChangeRoleName(e)}
+                    aria-label=""
+                  />
+                </EuiFormRow>
+                <EuiFormRow
+                  label="Policies"
+                  isInvalid={selectedPoliciesError}
+                  error={'At least one policy must be selected.'}
+                  helpText="Assign policies to the role."
+                >
+                  <EuiComboBox
+                    placeholder="Select policies"
+                    options={policies}
+                    selectedOptions={selectedPolicies}
+                    onChange={onChangePolicies}
+                    isClearable={true}
+                    data-test-subj="demoComboBox"
+                  />
+                </EuiFormRow>
+                <EuiSpacer />
+                <EuiButton fill onClick={createUser}>
+                  Create role
               </EuiButton>
-            </EuiForm>
-          </EuiFlyoutBody>
-        </EuiFlyout>
-      </WzOverlayMask>
+              </EuiForm>
+            </EuiFlyoutBody>
+          </EuiFlyout>
+        </EuiOutsideClickDetector>
+      </EuiOverlayMask>
       {modal}
     </>
   );

@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { useState, useEffect } from 'react';
-import { 
+import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiLoadingSpinner,
@@ -26,6 +26,14 @@ import { compose } from 'redux';
 import { WzRequest, formatUIDate } from '../../../react-services';
 import { AgentStatTable } from './table';
 import { PromptNoActiveAgentWithoutSelect, PromptAgentFeatureVersion } from '../prompts';
+import {
+  UIErrorLog,
+  UI_ERROR_SEVERITIES,
+  UILogLevel,
+  UIErrorSeverity,
+} from '../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../../common/constants';
+import { getErrorOrchestrator } from '../../../react-services/common-services';
 
 const tableColumns = [
   {
@@ -96,7 +104,7 @@ export const MainAgentStats = compose(
     },
   ]),
   withUserAuthorizationPrompt(({agent}) => [[
-    {action: 'agent:read', resource: `agent:id:${agent.id}`}, 
+    {action: 'agent:read', resource: `agent:id:${agent.id}`},
     ...(agent.group || []).map(group => ({ action: 'agent:read', resource: `agent:group:${group}` }))
   ]]),
   withGuard(({agent}) => agent.status !== 'active', PromptNoActiveAgentWithoutSelect),
@@ -118,10 +126,21 @@ function AgentStats({agent}){
         const responseDataStatAgent = await WzRequest.apiReq('GET', `/agents/${agent.id}/stats/agent`, {});
         setDataStatLogcollector(responseDataStatLogcollector?.data?.data?.affected_items?.[0] || {});
         setDataStatAgent(responseDataStatAgent?.data?.data?.affected_items?.[0] || undefined);
-      }catch(error){
-
+      } catch(error) {
+        const options: UIErrorLog = {
+          context: `${AgentStats.name}.useEffect`,
+          level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+          severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
+          error: {
+            error: error,
+            message: error.message || error,
+            title: error.name || error,
+          },
+        };
+        getErrorOrchestrator().handleError(options);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     })()
   }, []);
   return (

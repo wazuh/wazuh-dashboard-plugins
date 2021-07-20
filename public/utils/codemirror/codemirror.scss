@@ -390,3 +390,8 @@ span.CodeMirror-selectedtext { background: none; }
 .dev-tools-max-height {	
   height: auto;	
 } 
+
+/* Fix the overflow code over the line numbers */
+.CodeMirror pre{
+  z-index: 0;
+}
