@@ -43,6 +43,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Fixed creation of log files [#3384](https://github.com/wazuh/wazuh-kibana-app/pull/3384) 
 - Fixed rules and decoders test flyout clickout event [#3412](https://github.com/wazuh/wazuh-kibana-app/pull/3412)
+- Don't open the main menu when changing the seleted API or index pattern [#3440](https://github.com/wazuh/wazuh-kibana-app/pull/3440)
 - Fix size api selector when name is too long [#3445](https://github.com/wazuh/wazuh-kibana-app/pull/3445)
 - Fixed the code overflows over the line numbers in the API Console editor [#3439](https://github.com/wazuh/wazuh-kibana-app/pull/3439)
 
