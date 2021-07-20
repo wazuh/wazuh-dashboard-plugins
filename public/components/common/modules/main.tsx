@@ -29,6 +29,9 @@ import { MainModuleOverview } from './main-overview';
 import store from '../../../redux/store';
 import { compose } from 'redux';
 import { withReduxProvider,withErrorBoundary } from '../hocs';
+import { UI_LOGGER_LEVELS } from '../../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../../react-services/common-services';
 
 export const MainModule = compose(
   withErrorBoundary,
@@ -130,9 +133,20 @@ export const MainModule = compose(
             await this.startVis2PngByAgent();
             $vizBackground.css('background-color', defaultVizBackground);
             $labels.css('color', defaultTextColor);
-          } catch (e) {
+          } catch (error) {
             $labels.css('color', defaultTextColor);
             $vizBackground.css('background-color', defaultVizBackground);
+            const options = {
+              context: `${MainModule.name}.startReport`,
+              level: UI_LOGGER_LEVELS.ERROR,
+              severity: UI_ERROR_SEVERITIES.BUSINESS,
+              error: {
+                error: error,
+                message: error.message || error,
+                title: 'Error generating the report',
+              },
+            };
+            getErrorOrchestrator().handleError(options);
             this.setState({ loadingReport: false });
           }
         } else {
