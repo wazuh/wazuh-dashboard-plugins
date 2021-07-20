@@ -3,6 +3,11 @@ import { withErrorBoundary } from './with-error-boundary';
 import { mount } from 'enzyme';
 
 jest.mock('loglevel');
+jest.mock('../../../../react-services/common-services', () => ({
+  getErrorOrchestrator: () => ({
+    handleError: (options) => {},
+  }),
+}));
 
 describe('withErrorBoundary hoc implementation', () => {
   const ComponentWithError = () => {

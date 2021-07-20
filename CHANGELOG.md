@@ -12,12 +12,22 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added implementation of `Error Boundary` HOC in each main react-component. [#3367](https://github.com/wazuh/wazuh-kibana-app/pull/3367)
 - Added fields status and type in vulnerabilities table [#3196](https://github.com/wazuh/wazuh-kibana-app/pull/3196)
 - Added Intelligence tab to Mitre Att&ck module [#3368](https://github.com/wazuh/wazuh-kibana-app/pull/3368) [#3344](https://github.com/wazuh/wazuh-kibana-app/pull/3344)
+- Added try catch strategy with ErrorOrchestrator service on ManagementController [#3374](https://github.com/wazuh/wazuh-kibana-app/pull/3374)
 - Added try catch strategy with ErrorOrchestrator service on User section [#3390](https://github.com/wazuh/wazuh-kibana-app/pull/3390)
 - Added try catch strategy with ErrorOrchestrator service on WzLogs and documentation for ErrorOrchestrator [#3373](https://github.com/wazuh/wazuh-kibana-app/pull/3373)
+- Added try catch strategy with ErrorOrchestrator service on ManagementController [#3374](https://github.com/wazuh/wazuh-kibana-app/pull/3374)
 - Added try catch strategy with ErrorOrchestrator service on Management > Ruleset [#3410](https://github.com/wazuh/wazuh-kibana-app/pull/3410)
 - Added try catch strategy with ErrorOrchestrator service on Overview [#3408](https://github.com/wazuh/wazuh-kibana-app/pull/3408)
+- Added try catch strategy with ErrorOrchestrator service on Management > Statistics [#3429](https://github.com/wazuh/wazuh-kibana-app/pull/3429)
 - Added try catch strategy with ErrorOrchestrator service on ManagementController [#3374](https://github.com/wazuh/wazuh-kibana-app/pull/3374)
+- Added try catch strategy with ErrorOrchestrator service on Management > Reporting [#3427](https://github.com/wazuh/wazuh-kibana-app/pull/3427)
 - Added try catch strategy with ErrorOrchestrator service on FIM & SCA sections [#3417](https://github.com/wazuh/wazuh-kibana-app/pull/3417)
+- Fixed issue where configuration still asked you to save changes before exiting even after saving [#3460](https://github.com/wazuh/wazuh-kibana-app/pull/3460)
+- Added try catch strategy with ErrorOrchestrator service on Syscollector/Vuls/Stats sections [#3462](https://github.com/wazuh/wazuh-kibana-app/pull/3462)
+- Added try-catch strategy in Configuration section [#3451](https://github.com/wazuh/wazuh-kibana-app/pull/3451)
+- Added try catch strategy with ErrorOrchestrator service on Components > Overview [#3442](https://github.com/wazuh/wazuh-kibana-app/pull/3442)
+- Added try catch strategy with ErrorOrchestrator service on Components > Add Modules Data [#3472](https://github.com/wazuh/wazuh-kibana-app/pull/3472)
+- Added try catch strategy with ErrorOrchestrator service on Management > Status  [#3434](https://github.com/wazuh/wazuh-kibana-app/pull/3434)
 
 ### Changed
 
@@ -27,11 +37,15 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Refactored all try catch strategy on Settings section [#3392](https://github.com/wazuh/wazuh-kibana-app/pull/3392)
 - Refactored all try catch strategy on Controller/Agent section [#3398](https://github.com/wazuh/wazuh-kibana-app/issues/3398)
 - Refactored all try catch value of context for ErrorOrchestrator service. [#3432](https://github.com/wazuh/wazuh-kibana-app/issues/3432)
+- Refactored all try catch strategy on Controller/Groups section [#3415](https://github.com/wazuh/wazuh-kibana-app/issues/3415)
 
 ### Fixed
 
-- Fixed creation of log files [#3384](https://github.com/wazuh/wazuh-kibana-app/pull/3384)
+- Fixed creation of log files [#3384](https://github.com/wazuh/wazuh-kibana-app/pull/3384) 
+- Fixed rules and decoders test flyout clickout event [#3412](https://github.com/wazuh/wazuh-kibana-app/pull/3412)
 - Don't open the main menu when changing the seleted API or index pattern [#3440](https://github.com/wazuh/wazuh-kibana-app/pull/3440)
+- Fix size api selector when name is too long [#3445](https://github.com/wazuh/wazuh-kibana-app/pull/3445)
+- Fixed the code overflows over the line numbers in the API Console editor [#3439](https://github.com/wazuh/wazuh-kibana-app/pull/3439)
 
 ## Wazuh v4.2.1 - Kibana 7.10.2 , 7.11.2 - Revision 4202
 
