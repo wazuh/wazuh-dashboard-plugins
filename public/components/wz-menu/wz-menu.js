@@ -298,8 +298,6 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
 
       if (newPattern?.id === 'selectIndexPatternBar') {
         this.updatePatternAndApi();
-      } else {
-        this.switchMenuOpened();
       }
     } catch (error) {
       const options = {
@@ -360,9 +358,6 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
       AppState.setCurrentAPI(
         JSON.stringify({ name: apiData[0].manager, id: apiId.value })
       );
-      if (apiId?.id !== 'selectAPIBar') {
-        this.switchMenuOpened();
-      }
 
       if (this.state.currentMenuTab !== 'wazuh-dev') {
         this.router.reload();
@@ -682,7 +677,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
   }
 
   getApiSelectorComponent() {
-    let style = { maxWidth: 100 };
+    let style = { minWidth: 100, textOverflow: 'ellipsis' };
     if (this.showSelectorsInPopover){
       style = { width: '100%', minWidth: 200 };
     }

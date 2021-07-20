@@ -12,9 +12,7 @@ export default {
     `${kbnDir}/node_modules`
   ],
   collectCoverageFrom: [
-    "./common/**/*.{js,jsx,ts,tsx}",
-    "./public/**/*.{js,jsx,ts,tsx}",
-    "./server/**/*.{js,jsx,ts,tsx}",
+    "**/*.{js,jsx,ts,tsx}",
     "./!**/node_modules/**",
   ],
   moduleNameMapper: {
