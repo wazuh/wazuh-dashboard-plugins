@@ -22,10 +22,9 @@ import {
 import '../../common/modules/module.scss';
 import { ReportingService } from '../../../react-services/reporting';
 import { ModulesDefaults } from './modules-defaults';
-import { getAngularModule, getDataPlugin, getUiSettings } from '../../../kibana-services';
+import { getAngularModule, getDataPlugin } from '../../../kibana-services';
 import { MainModuleAgent } from './main-agent'
 import { MainModuleOverview } from './main-overview';
-import store from '../../../redux/store';
 import { compose } from 'redux';
 import { withReduxProvider,withErrorBoundary } from '../hocs';
 
@@ -50,6 +49,7 @@ export const MainModule = compose(
           { id: 'dashboard', name: 'Dashboard' },
           { id: 'events', name: 'Events' },
         ];
+        this.module = ModulesDefaults[this.props.section];
       }
     }
 
@@ -58,17 +58,6 @@ export const MainModule = compose(
       if (filterManager.getFilters() && filterManager.getFilters().length) {
         filterManager.removeAll();
       }
-    }
-
-    canBeInit(tab) {
-      //checks if the init table can be set
-      let canInit = false;
-      this.tabs.forEach((element) => {
-        if (element.id === tab && (!element.onlyAgent || (element.onlyAgent && this.props.agent))) {
-          canInit = true;
-        }
-      });
-      return canInit;
     }
 
     renderTabs(agent = false) {
@@ -125,6 +114,7 @@ export const MainModule = compose(
       const mainProps = {
         selectView,
         tabs: this.tabs,
+        module: this.module,
         renderTabs: () => this.renderTabs(),
         loadSection: (id) => this.loadSection(id),
         onSelectedTabChanged: (id) => this.onSelectedTabChanged(id),

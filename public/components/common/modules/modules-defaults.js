@@ -27,81 +27,105 @@ const RegulatoryComplianceTabs = [{ id: 'inventory', name: 'Controls', buttons: 
 export const ModulesDefaults = {
   general: {
     init: 'dashboard',
-    tabs: [DashboardTab, EventsTab]
+    tabs: [DashboardTab, EventsTab],
+    availableFor: ['manager','agent']
   },
   fim: {
     init: 'dashboard',
-    tabs: [{ id: 'inventory', name: 'Inventory', onlyAgent: false, buttons: [ButtonModuleExploreAgent], component: MainFim }, DashboardTab, EventsTab],
+    tabs: [{ id: 'inventory', name: 'Inventory', buttons: [ButtonModuleExploreAgent], component: MainFim }, DashboardTab, EventsTab],
+    availableFor: ['manager','agent']
   },
   aws: {
     init: 'dashboard',
-    tabs: [DashboardTab, EventsTab]
+    tabs: [DashboardTab, EventsTab],
+    availableFor: ['manager','agent'],
   },
   gcp: {
     init: 'dashboard',
     tabs: [DashboardTab, EventsTab],
+    availableFor: ['manager','agent']
   },
   pm: {
     init: 'dashboard',
     tabs: [DashboardTab, EventsTab],
+    availableFor: ['manager','agent']
   },
   audit: {
     init: 'dashboard',
     tabs: [DashboardTab, EventsTab],
+    availableFor: ['manager','agent']
   },
   sca: {
     init: 'inventory',
     tabs: [{ id: 'inventory', name: 'Inventory', buttons: [ButtonModuleExploreAgent], component: MainSca }, EventsTab],
-    buttons: ['settings']
+    buttons: ['settings'],
+    availableFor: ['manager','agent']
   },
   ciscat: {
     init: 'dashboard',
     tabs: [DashboardTab, EventsTab],
+    availableFor: ['manager','agent']
   },
   vuls: {
     init: 'dashboard',
-    tabs: [{ id: 'inventory', name: 'Inventory', onlyAgent: false, buttons: [ButtonModuleExploreAgent], component: MainVuls }, DashboardTab, EventsTab],
-    buttons: ['settings']
+    tabs: [{ id: 'inventory', name: 'Inventory', buttons: [ButtonModuleExploreAgent], component: MainVuls }, DashboardTab, EventsTab],
+    buttons: ['settings'],
+    availableFor: ['manager','agent']
   },
   mitre: {
     init: 'dashboard',
-    tabs: [{ id: 'intelligence', name: 'Intelligence', component: ModuleMitreAttackIntelligence }, { id: 'inventory', name: 'Framework', buttons: [ButtonModuleExploreAgent], component: MainMitre }, DashboardTab, EventsTab]
+    tabs: [{ id: 'intelligence', name: 'Intelligence', component: ModuleMitreAttackIntelligence }, { id: 'inventory', name: 'Framework', buttons: [ButtonModuleExploreAgent], component: MainMitre }, DashboardTab, EventsTab],
+    availableFor: ['manager','agent']
   },
   virustotal: {
     init: 'dashboard',
-    tabs: [DashboardTab, EventsTab]
+    tabs: [DashboardTab, EventsTab],
+    availableFor: ['manager','agent']
+  },
+  docker: {
+    init: 'dashboard',
+    tabs: [DashboardTab, EventsTab],
+    availableFor: ['manager','agent']
   },
   pci: {
     init: 'dashboard',
-    tabs: RegulatoryComplianceTabs
+    tabs: RegulatoryComplianceTabs,
+    availableFor: ['manager','agent']
   },
   osquery: {
     init: 'dashboard',
     tabs: [DashboardTab, EventsTab],
+    availableFor: ['manager','agent']
   },
   oscap: {
     init: 'dashboard',
     tabs: [DashboardTab, EventsTab],
+    availableFor: ['manager','agent']
   },
   pci: {
     init: 'dashboard',
     tabs: [DashboardTab, EventsTab],
+    availableFor: ['manager','agent']
   },
   hipaa: {
     init: 'dashboard',
-    tabs: RegulatoryComplianceTabs
+    tabs: RegulatoryComplianceTabs,
+    availableFor: ['manager','agent']
   },
   nist: {
     init: 'dashboard',
-    tabs: RegulatoryComplianceTabs
+    tabs: RegulatoryComplianceTabs,
+    availableFor: ['manager','agent']
   },
   gdpr: {
     init: 'dashboard',
-    tabs: RegulatoryComplianceTabs
+    tabs: RegulatoryComplianceTabs,
+    availableFor: ['manager','agent']
   },
   tsc: {
     init: 'dashboard',
-    tabs: RegulatoryComplianceTabs
+    tabs: RegulatoryComplianceTabs,
+    availableFor: ['manager','agent']
   },
   syscollector: {
     notModule: true

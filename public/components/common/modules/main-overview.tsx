@@ -134,24 +134,22 @@ export const MainModuleOverview = connect(mapStateToProps)(class MainModuleOverv
     const ModuleTabView = this.props.tabs.find(tab => tab.id === selectView);
     return (
       <div className={this.state.showAgentInfo ? 'wz-module wz-module-showing-agent' : 'wz-module'}>
-        <Fragment>
-          <div className={this.props.tabs && this.props.tabs.length && 'wz-module-header-nav'}>
-            {this.props.tabs && this.props.tabs.length && (
-              <div className="wz-welcome-page-agent-tabs">
-                <EuiFlexGroup>
-                  {this.props.renderTabs()}
-                  <EuiFlexItem grow={false} style={{ marginTop: 6, marginRight: 5 }}>
-                    <EuiFlexGroup>
-                      {ModuleTabView && ModuleTabView.buttons && ModuleTabView.buttons.map((ModuleViewButton, index) => 
-                        typeof ModuleViewButton !== 'string' ? <EuiFlexItem key={`module_button_${index}`}><ModuleViewButton {...{ ...this.props, ...this.props.agentsSelectionProps }} moduleID={section}/></EuiFlexItem> : null)}
-                    </EuiFlexGroup>
-                  </EuiFlexItem>
-                </EuiFlexGroup>
-              </div>
-            )}
-          </div>
-          {ModuleTabView && ModuleTabView.component && <ModuleTabView.component {...this.props} moduleID={section}/> }
-        </Fragment>
+        <div className={this.props.tabs && this.props.tabs.length && 'wz-module-header-nav'}>
+          {this.props.tabs && this.props.tabs.length && (
+            <div className="wz-welcome-page-agent-tabs">
+              <EuiFlexGroup>
+                {this.props.renderTabs()}
+                <EuiFlexItem grow={false} style={{ marginTop: 6, marginRight: 5 }}>
+                  <EuiFlexGroup>
+                    {ModuleTabView && ModuleTabView.buttons && ModuleTabView.buttons.map((ModuleViewButton, index) => 
+                      typeof ModuleViewButton !== 'string' ? <EuiFlexItem key={`module_button_${index}`}><ModuleViewButton {...{ ...this.props, ...this.props.agentsSelectionProps }} moduleID={section} /></EuiFlexItem> : null)}
+                  </EuiFlexGroup>
+                </EuiFlexItem>
+              </EuiFlexGroup>
+            </div>
+          )}
+        </div>
+        {ModuleTabView && ModuleTabView.component && <ModuleTabView.component {...this.props} moduleID={section}/> }
       </div>
     );
   }
