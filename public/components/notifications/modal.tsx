@@ -22,6 +22,7 @@ import {
   EuiModalFooter,
   EuiButton,
   EuiOverlayMask,
+  EuiOutsideClickDetector,
   EuiCopy
 } from '@elastic/eui';
 
@@ -59,28 +60,30 @@ export const ToastNotificationsModal = compose (withErrorBoundary, withReduxProv
   ${errorStack}
   \`\`\``
   return (
-    <EuiOverlayMask  onClick={() => closeModal()}>
-      <EuiModal onClose={closeModal}>
-        <EuiModalHeader>
-          <EuiModalHeaderTitle>{toastNotification.title}</EuiModalHeaderTitle>
-        </EuiModalHeader>
-        <EuiModalBody>
-          <EuiCallOut size="s" color="danger" iconType="alert" title={calloutTitle}/>
-          {errorStack && (
-            <Fragment>
-              <EuiSpacer size="s" />
-              <EuiCodeBlock /*isCopyable={true}*/ paddingSize="s">
-                {errorStack}
-              </EuiCodeBlock>
-            </Fragment>
-          )}
-        </EuiModalBody>
-        <EuiModalFooter>
-          <EuiCopy textToCopy={copyMessage}>
-            {copy => <EuiButton fill onClick={copy}>Copy error</EuiButton>}
-          </EuiCopy>
-        </EuiModalFooter>
-      </EuiModal>
+    <EuiOverlayMask>
+      <EuiOutsideClickDetector onOutsideClick={() => closeModal()}>
+        <EuiModal onClose={closeModal}>
+          <EuiModalHeader>
+            <EuiModalHeaderTitle>{toastNotification.title}</EuiModalHeaderTitle>
+          </EuiModalHeader>
+          <EuiModalBody>
+            <EuiCallOut size="s" color="danger" iconType="alert" title={calloutTitle} />
+            {errorStack && (
+              <Fragment>
+                <EuiSpacer size="s" />
+                <EuiCodeBlock /*isCopyable={true}*/ paddingSize="s">
+                  {errorStack}
+                </EuiCodeBlock>
+              </Fragment>
+            )}
+          </EuiModalBody>
+          <EuiModalFooter>
+            <EuiCopy textToCopy={copyMessage}>
+              {copy => <EuiButton fill onClick={copy}>Copy error</EuiButton>}
+            </EuiCopy>
+          </EuiModalFooter>
+        </EuiModal>
+      </EuiOutsideClickDetector>
     </EuiOverlayMask>
   )
 })

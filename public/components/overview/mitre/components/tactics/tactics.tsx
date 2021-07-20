@@ -66,22 +66,7 @@ export class Tactics extends Component {
   initTactics() {
     const tacticsIds = Object.keys(this.props.tacticsObject);
     const selectedTactics = {};
-    /*let isMax = {};
-     tacticsIds.forEach( (item,id) => {
-       if(buckets.length){ 
-         const max_doc = buckets[0].doc_count;
-         if(!Object.keys(isMax).length){
-           buckets.forEach( bucket => {
-            if(bucket.doc_count === max_doc){
-              isMax[bucket.key] = true;
-            }
-           })
-         }
-        selectedTactics[item] =  isMax[item] ? true : false; //if results are found, only the first tactic is selected
-       }else{
-        selectedTactics[item] = true;
-       }
-    });*/
+
     tacticsIds.forEach((item, id) => {
       selectedTactics[item] = true;
     });
