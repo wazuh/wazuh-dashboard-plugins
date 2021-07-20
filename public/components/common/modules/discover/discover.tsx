@@ -30,19 +30,20 @@ import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrat
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
 
 import {
-  EuiBasicTable,
-  EuiLoadingContent,
-  EuiTableSortingType,
-  EuiFlexItem,
-  EuiFlexGroup,
-  Direction,
-  EuiOverlayMask,
-  EuiSpacer,
-  EuiCallOut,
-  EuiIcon,
-  EuiButtonIcon,
-  EuiButtonEmpty,
-  EuiToolTip,
+ EuiBasicTable,
+ EuiLoadingContent,
+ EuiTableSortingType,
+ EuiFlexItem,
+ EuiFlexGroup,
+ Direction,
+ EuiOverlayMask,
+ EuiOutsideClickDetector,
+ EuiSpacer,
+ EuiCallOut,
+ EuiIcon,
+ EuiButtonIcon,
+ EuiButtonEmpty,
+ EuiToolTip
 } from '@elastic/eui';
 import {
   IIndexPattern,
@@ -737,78 +738,71 @@ export const Discover = compose(
 
       const columns = this.columns();
 
-      const sorting: EuiTableSortingType<{}> = {
-        sort: {
-          //@ts-ignore
-          field: this.state.sortField,
-          direction: this.state.sortDirection,
-        },
-      };
-      const pagination = {
-        pageIndex: this.state.pageIndex,
-        pageSize: this.state.pageSize,
-        totalItemCount: this.state.total > 10000 ? 10000 : this.state.total,
-        pageSizeOptions: [10, 25, 50],
-      };
-      const noResultsText = `No results match for this search criteria`;
-      let flyout = this.state.showMitreFlyout ? (
-        <EuiOverlayMask headerZindexLocation="below" onClick={this.closeMitreFlyout}>
+    const sorting: EuiTableSortingType<{}> = {
+      sort: {
+        //@ts-ignore
+        field: this.state.sortField,
+        direction: this.state.sortDirection,
+      }
+    };
+    const pagination = {
+      pageIndex: this.state.pageIndex,
+      pageSize: this.state.pageSize,
+      totalItemCount: this.state.total > 10000 ? 10000 : this.state.total,
+      pageSizeOptions: [10, 25, 50],
+    };
+    const noResultsText = `No results match for this search criteria`;
+    let flyout = this.state.showMitreFlyout ? <EuiOverlayMask headerZindexLocation="below">
+      <EuiOutsideClickDetector onOutsideClick={this.closeMitreFlyout}>
+        <div>{/* EuiOutsideClickDetector needs a static first child */}
           <FlyoutTechnique
             openDashboard={(e, itemId) => this.openDashboard(e, itemId)}
             openDiscover={(e, itemId) => this.openDiscover(e, itemId)}
             onChangeFlyout={this.onMitreChangeFlyout}
-            currentTechnique={this.state.selectedTechnique}
-          />
-        </EuiOverlayMask>
-      ) : (
-        <></>
-      );
-      return (
-        <div className="wz-discover hide-filter-control wz-inventory">
-          {this.props.kbnSearchBar && (
-            <KbnSearchBar
-              indexPattern={this.indexPattern}
-              filterManager={this.props.shareFilterManager}
-              timeFilter={{
-                timeFilter: this.state.dateRange,
-                timeHistory: this.state.dateRangeHistory,
-                setTimeFilter: (dateRange) => this.setState({ dateRange }),
-              }}
-              onQuerySubmit={this.onQuerySubmit}
-              onFiltersUpdated={this.onFiltersUpdated}
-              query={query}
-            />
-          )}
-          {total ? (
-            <EuiFlexGroup>
-              <EuiFlexItem>
-                {this.state.alerts.length && (
-                  <EuiBasicTable
-                    items={this.state.alerts.map((alert) => ({ ...alert._source, _id: alert._id }))}
-                    className="module-discover-table"
-                    itemId="_id"
-                    itemIdToExpandedRowMap={itemIdToExpandedRowMap}
-                    isExpandable={true}
-                    columns={columns}
-                    rowProps={getRowProps}
-                    pagination={pagination}
-                    sorting={sorting}
-                    onChange={this.onTableChange}
-                  />
-                )}
-              </EuiFlexItem>
-            </EuiFlexGroup>
-          ) : (
-            <EuiFlexGroup>
-              <EuiFlexItem>
-                <EuiSpacer size="s" />
-                <EuiCallOut title={noResultsText} color="warning" iconType="alert" />
-              </EuiFlexItem>
-            </EuiFlexGroup>
-          )}
-          {flyout}
+            currentTechnique={this.state.selectedTechnique} />
         </div>
-      );
-    }
+      </EuiOutsideClickDetector>
+    </EuiOverlayMask> : <></>;
+    return (
+      <div
+        className='wz-discover hide-filter-control wz-inventory' >
+        {this.props.kbnSearchBar && <KbnSearchBar
+          indexPattern={this.indexPattern}
+          filterManager={this.props.shareFilterManager}
+          timeFilter={{timeFilter:this.state.dateRange,
+            timeHistory:this.state.dateRangeHistory,
+            setTimeFilter:(dateRange)=> this.setState({dateRange})}}
+          onQuerySubmit={this.onQuerySubmit}
+          onFiltersUpdated={this.onFiltersUpdated}
+          query={query} />
+        }
+        {total
+          ? <EuiFlexGroup>
+            <EuiFlexItem>
+              {this.state.alerts.length && (
+                <EuiBasicTable
+                  items={this.state.alerts.map(alert => ({...alert._source, _id: alert._id}))}
+                  className="module-discover-table"
+                  itemId="_id"
+                  itemIdToExpandedRowMap={itemIdToExpandedRowMap}
+                  isExpandable={true}
+                  columns={columns}
+                  rowProps={getRowProps}
+                  pagination={pagination}
+                  sorting={sorting}
+                  onChange={this.onTableChange}
+                />
+              )}
+            </EuiFlexItem>
+          </EuiFlexGroup>
+          : <EuiFlexGroup>
+            <EuiFlexItem>
+              <EuiSpacer size="s" />
+              <EuiCallOut title={noResultsText} color="warning" iconType="alert" />
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        }
+        {flyout}
+      </div>);
   }
 );
