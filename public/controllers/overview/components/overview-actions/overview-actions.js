@@ -13,13 +13,13 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { showExploreAgentModal, updateCurrentAgentData } from '../../../../redux/actions/appStateActions';
 import {
-
+  EuiOverlayMask,
+  EuiOutsideClickDetector,
   EuiModal,
   EuiModalBody,
   EuiModalHeader,
   EuiModalHeaderTitle,
-  EuiOverlayMask,
-  EuiPopover
+  EuiPopover,
 } from '@elastic/eui';
 import { WzButton } from '../../../../components/common/buttons';
 import './agents-selector.scss';
@@ -141,24 +141,26 @@ class OverviewActions extends Component {
 
     if (this.state.isAgentModalVisible || this.props.state.showExploreAgentModal) {
       modal = (
-        <EuiOverlayMask onClick={() => this.closeAgentModal()}>
-          <EuiModal
-            className="wz-select-agent-modal"
-            onClose={() => this.closeAgentModal()}
-            initialFocus="[name=popswitch]"
-          >
-            <EuiModalHeader>
-              <EuiModalHeaderTitle>Explore agent</EuiModalHeaderTitle>
-            </EuiModalHeader>
+        <EuiOverlayMask>
+          <EuiOutsideClickDetector onOutsideClick={() => this.closeAgentModal()}>
+            <EuiModal
+              className="wz-select-agent-modal"
+              onClose={() => this.closeAgentModal()}
+              initialFocus="[name=popswitch]"
+            >
+              <EuiModalHeader>
+                <EuiModalHeaderTitle>Explore agent</EuiModalHeaderTitle>
+              </EuiModalHeader>
 
-            <EuiModalBody>
-              <AgentSelectionTable
-                updateAgentSearch={(agentsIdList) => this.agentTableSearch(agentsIdList)}
-                removeAgentsFilter={(shouldUpdate) => this.removeAgentsFilter(shouldUpdate)}
-                selectedAgents={this.getSelectedAgents()}
-              />
-            </EuiModalBody>
-          </EuiModal>
+              <EuiModalBody>
+                <AgentSelectionTable
+                  updateAgentSearch={agentsIdList => this.agentTableSearch(agentsIdList)}
+                  removeAgentsFilter={(shouldUpdate) => this.removeAgentsFilter(shouldUpdate)}
+                  selectedAgents={this.getSelectedAgents()}
+                ></AgentSelectionTable>
+              </EuiModalBody>
+            </EuiModal>
+          </EuiOutsideClickDetector>
         </EuiOverlayMask>
       );
     }
@@ -212,37 +214,6 @@ class OverviewActions extends Component {
 
           ) || buttonUnpinAgent
         )}
-        {/* {!this.state.isAgent && (
-          <EuiToolTip position='bottom' content='Select an agent to explore its modules' >
-            <EuiButtonEmpty
-              isLoading={this.state.loadingReport}
-              color='primary'
-              onClick={() => this.showAgentModal()}>
-              <EuiIcon type="watchesApp" color="primary" style={{ marginBottom: 3 }} />&nbsp; Explore agent
-          </EuiButtonEmpty>
-          </EuiToolTip>
-        )}
-        {this.state.isAgent && (
-          <div style={{ display: "inline-flex" }}>
-            <EuiToolTip position='bottom' content='Change agent selected' >
-              <EuiButtonEmpty
-                style={{background: 'rgba(0, 107, 180, 0.1)'}}
-                isLoading={this.state.loadingReport}
-                isDisabled={true}
-                onClick={() => this.showAgentModal()}>
-                {agent.name} ({agent.id})
-                </EuiButtonEmpty>
-            </EuiToolTip>
-            <EuiToolTip position='bottom' content='Unpin agent'>
-              <EuiPopover
-                button={}
-                isOpen={Boolean(agent)}
-                closePopover={()=> {}}>
-                  This module is not supported for agents. Remove the pinned agent.
-              </EuiPopover>
-            </EuiToolTip> */}
-          {/* </div>
-        )} */}
         {modal}
       </div>
     );

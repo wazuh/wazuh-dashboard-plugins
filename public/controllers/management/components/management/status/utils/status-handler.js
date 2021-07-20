@@ -21,7 +21,7 @@ export default class StatusHandler {
       const result = await WzRequest.apiReq('GET', `/agents/summary/status`, {});
       return result;
     } catch (error) {
-      return Promise.reject(error);
+      throw error;
     }
   }
 
@@ -33,7 +33,7 @@ export default class StatusHandler {
       const result = await WzRequest.apiReq('GET', `/cluster/status`, {});
       return result;
     } catch (error) {
-      return Promise.reject(error);
+      throw error;
     }
   }
 
@@ -45,7 +45,7 @@ export default class StatusHandler {
       const result = await WzRequest.apiReq('GET', `/cluster/nodes`, {});
       return result;
     } catch (error) {
-      return Promise.reject(error);
+      throw error;
     }
   }
 
@@ -61,7 +61,7 @@ export default class StatusHandler {
       );
       return result;
     } catch (error) {
-      return Promise.reject(error);
+      throw error;
     }
   }
 
@@ -77,7 +77,7 @@ export default class StatusHandler {
       );
       return result;
     } catch (error) {
-      return Promise.reject(error);
+      throw error;
     }
   }
 
@@ -93,7 +93,7 @@ export default class StatusHandler {
       );
       return result;
     } catch (error) {
-      return Promise.reject(error);
+      throw error;
     }
   }
 
@@ -105,7 +105,7 @@ export default class StatusHandler {
       const result = await WzRequest.apiReq('GET', `/manager/info`, {});
       return result;
     } catch (error) {
-      return Promise.reject(error);
+      throw error;
     }
   }
 
@@ -117,7 +117,7 @@ export default class StatusHandler {
       const result = await WzRequest.apiReq('GET', `/manager/status`, {});
       return result;
     } catch (error) {
-      return Promise.reject(error);
+      throw error;
     }
   }
 
@@ -135,7 +135,7 @@ export default class StatusHandler {
       });
       return result;
     } catch (error) {
-      return Promise.reject(error);
+      throw error;
     }
   }
 
@@ -159,7 +159,7 @@ export default class StatusHandler {
       await WzRequest.apiReq('PUT', `/cluster/restart`, { delay: 15000 });
       return { data: { data: 'Restarting cluster' } };
     } catch (error) {
-      return Promise.reject(error);
+      throw error;
     }
   }
 
@@ -184,7 +184,7 @@ export default class StatusHandler {
       const result = await WzRequest.apiReq('PUT', `/manager/restart`, {});
       return result;
     } catch (error) {
-      return Promise.reject(error);
+      throw error;
     }
   }
 }
