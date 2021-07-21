@@ -28,6 +28,7 @@ import {
   EuiConfirmModal,
   EuiPanel,
   EuiCodeBlock,
+  EuiOverlayMask
 } from '@elastic/eui';
 
 import GroupsHandler from './utils/groups-handler';
@@ -35,7 +36,6 @@ import GroupsHandler from './utils/groups-handler';
 import { getToasts } from '../../../../../kibana-services';
 import { validateXML } from '../configuration/utils/xml';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
-import { WzOverlayMask } from '../../../../../components/common/util';
 import 'brace/theme/textmate';
 import 'brace/mode/xml';
 import 'brace/snippets/xml';
@@ -174,7 +174,7 @@ class WzGroupsEditor extends Component {
     let modal;
     if (this.state.isModalVisible) {
       modal = (
-        <WzOverlayMask>
+        <EuiOverlayMask>
           <EuiConfirmModal
             title="Unsubmitted changes"
             onConfirm={() => {
@@ -189,7 +189,7 @@ class WzGroupsEditor extends Component {
               There are unsaved changes. Are you sure you want to proceed?
             </p>
           </EuiConfirmModal>
-        </WzOverlayMask>
+        </EuiOverlayMask>
       );
     }
     return (
