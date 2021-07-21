@@ -48,7 +48,6 @@ export class ManagementController {
     this.logtestOpened = false;
     this.uploadOpened = false;
     this.rulesetTab = RulesetResources.RULES;
-    this.context = 'ManagementController';
 
 
     this.$scope.$on('setCurrentGroup', (ev, params) => {
@@ -232,7 +231,7 @@ export class ManagementController {
       const errorOptions = {
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
-        context: this.context,
+        context: `${ManagementController.name}.$onInit`,
         error: {
           error: error,
           message: error?.message || '',
@@ -268,7 +267,7 @@ export class ManagementController {
       const errorOptions = {
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
-        context: this.context,
+        context: `${ManagementController.name}.restartManager`,
         error: {
           error: error,
           message: error?.message || '',
@@ -294,7 +293,7 @@ export class ManagementController {
       const errorOptions = {
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
-        context: this.context,
+        context: `${ManagementController.name}.restartCluster`,
         error: {
           error: error,
           message: error?.message || '',
@@ -446,7 +445,7 @@ export class ManagementController {
       const errorOptions = {
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
-        context: this.context,
+        context: `${ManagementController.name}.loadNodeList`,
         error: {
           error: error,
           message: error?.message || '',
@@ -519,14 +518,13 @@ export class ManagementController {
       }
       if (this.errors) throw this.results;
       ErrorHandler.info('Upload successful');
-      return;
     } catch (error) {
       if (Array.isArray(error) && error.length) throw error;
 
       const errorOptions = {
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
-        context: this.context,
+        context: `${ManagementController.name}.uploadFiles`,
         error: {
           error: error,
           message: error?.message || '',

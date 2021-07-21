@@ -27,7 +27,7 @@ import {
   EuiTitle,
   EuiToolTip,
   EuiButtonIcon,
-  EuiButtonEmpty,
+  EuiOverlayMask,
   EuiFieldText,
   EuiConfirmModal,
   EuiCodeEditor,
@@ -48,7 +48,6 @@ import 'brace/snippets/xml';
 import 'brace/ext/language_tools';
 import "brace/ext/searchbox";
 import { showFlyoutLogtest } from '../../../../../redux/actions/appStateActions';
-import { WzOverlayMask } from '../../../../../components/common/util';
 import _ from 'lodash';
 
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
@@ -147,17 +146,6 @@ class WzRulesetEditor extends Component {
       }
       this.setState({ isSaving: false });
       this.goToEdit(name);
-
-      let errorMessage = `The content of the file ${name} is incorrect. There were found several errors while validating the configuration: ${error.message || error}`;
-      if (this.props.state.addingRulesetFile != false) {
-        //remove current invalid file if the file is new.
-        await this.rulesetHandler.deleteFile(name);
-        errorMessage += '\nThe new file was deleted.';
-      } else {
-        //restore file to previous version
-        await this.rulesetHandler.updateFile(name, this.state.initContent, overwrite);
-        errorMessage += '\nThe content file was restored to previous state.';
-      }
       this.setState({
         showWarningRestart: true,
         initialInputValue: this.state.inputValue,
@@ -266,7 +254,7 @@ class WzRulesetEditor extends Component {
     let modal;
     if (this.state.isModalVisible) {
       modal = (
-        <WzOverlayMask>
+        <EuiOverlayMask>
           <EuiConfirmModal
             title="Unsubmitted changes"
             onConfirm={() => {
@@ -281,7 +269,7 @@ class WzRulesetEditor extends Component {
               There are unsaved changes. Are you sure you want to proceed?
             </p>
           </EuiConfirmModal>
-        </WzOverlayMask>
+        </EuiOverlayMask>
       );
     }
     return (

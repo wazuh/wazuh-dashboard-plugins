@@ -13,6 +13,9 @@
 import { AppState } from '../../react-services/app-state';
 import { ErrorHandler } from '../../react-services/error-handler';
 import { WzMisc } from '../../factories/misc';
+import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../common/constants';
+import { getErrorOrchestrator } from '../../react-services/common-services';
 
 export class BlankScreenController {
   /**
@@ -39,7 +42,20 @@ export class BlankScreenController {
       let parsed = null;
       try {
         parsed = ErrorHandler.handle(catchedError, '',  { silent: true });
-      } catch (error) {} // eslint-disable-line
+      } catch (error) {
+        const options = {
+          context: `${BlankScreenController.name}.$onInit`,
+          level: UI_LOGGER_LEVELS.ERROR,
+          severity: UI_ERROR_SEVERITIES.UI,
+          error: {
+            error: error,
+            message: error.message || error,
+            title: error.name,
+          },
+        };
+        getErrorOrchestrator().handleError(options);
+      }
+
       this.errorToShow = parsed || catchedError;
       this.$scope.$applyAsync();
       this.wzMisc.setBlankScr(false);
