@@ -152,8 +152,9 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
 
   loadIndexPatternsList = async () => {
     try {
-      const list = await PatternHandler.getPatternList('api');
+      let list = await PatternHandler.getPatternList('api');
       if (!list) return;
+      this.props?.appConfig?.data?.['ip.ignore']?.length && (list = list.filter(indexPattern => !this.props?.appConfig?.data?.['ip.ignore'].includes(indexPattern.title)));
 
       // Abort if we have disabled the pattern selector
       if (!AppState.getPatternSelector()) return;
@@ -222,7 +223,9 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
         this.setState({ currentAPI: this.props.state.currentAPI });
       }
     }
-
+    if(!_.isEqual(prevProps?.appConfig?.data?.['ip.ignore'], this.props?.appConfig?.data?.['ip.ignore'])){
+      this.loadIndexPatternsList();
+    }
   }
 
   async load() {
@@ -238,8 +241,9 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
       if (currentTab !== this.state.currentMenuTab) {
         this.setState({ currentMenuTab: currentTab, hover: currentTab });
       }
-      const list = await PatternHandler.getPatternList('api');
+      let list = await PatternHandler.getPatternList('api');
       if (!list || (list && !list.length)) return;
+      this.props?.appConfig?.data?.['ip.ignore']?.length && (list = list.filter(indexPattern => !this.props?.appConfig?.data?.['ip.ignore'].includes(indexPattern.title)));
 
       // Abort if we have disabled the pattern selector
       if (!AppState.getPatternSelector()) return;
@@ -1061,7 +1065,8 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.appStateReducers
+    state: state.appStateReducers,
+    appConfig: state.appConfig
   };
 };
 
