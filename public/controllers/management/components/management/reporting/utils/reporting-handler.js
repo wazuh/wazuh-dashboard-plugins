@@ -22,7 +22,7 @@ export default class ReportingHandler {
       const result = await WzRequest.genericReq('GET', '/reports', {});
       return result;
     } catch (error) {
-      return Promise.reject(error);
+      throw error;
     }
   }
 
@@ -39,7 +39,7 @@ export default class ReportingHandler {
       );
       return result;
     } catch (error) {
-      return Promise.reject(error);
+      throw error;
     }
   }
 }

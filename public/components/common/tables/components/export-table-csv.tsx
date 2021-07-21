@@ -18,6 +18,9 @@ import {
 import { filtersToObject } from '../../../wz-search-bar/';
 import exportCsv from '../../../../react-services/wz-csv';
 import { getToasts }  from '../../../../kibana-services';
+import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
+import { getErrorOrchestrator } from '../../../../react-services/common-services';
 
 export function ExportTableCsv({endpoint,totalItems,filters,title}){
 
@@ -42,7 +45,17 @@ export function ExportTableCsv({endpoint,totalItems,filters,title}){
         `vuls-${(title).toLowerCase()}`
       );
     } catch (error) {
-      showToast('danger', error, 3000);
+      const options = {
+        context: `${ExportTableCsv.name}.downloadCsv`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `${error.name}: Error downloading csv`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   }
   
