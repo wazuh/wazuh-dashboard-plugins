@@ -7,7 +7,7 @@ import _ from 'lodash';
 You can find more info on how to use the preAppliedAggs object at https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-terms-aggregation.html
 You can find more info on how to construct a filter object at https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html
 */
-const useEsSearch = ({ preAppliedFilters = {}, preAppliedAggs = {}, size = 10 }) => {
+const useEsSearch = ({ preAppliedFilters = [], preAppliedAggs = {}, size = 10 }) => {
   const data = getDataPlugin();
   const indexPattern = useIndexPattern();
   const filterManager = useFilterManager();
