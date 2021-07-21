@@ -52,6 +52,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed the code overflows over the line numbers in the API Console editor [#3439](https://github.com/wazuh/wazuh-kibana-app/pull/3439)
 - Fixed creation of log files [#3384](https://github.com/wazuh/wazuh-kibana-app/pull/3384)
 - Don't open the main menu when changing the seleted API or index pattern [#3440](https://github.com/wazuh/wazuh-kibana-app/pull/3440)
+- Remove not used `redirectRule` query param when clicking the row table on CDB Lists/Decoders [#3438](https://github.com/wazuh/wazuh-kibana-app/pull/3438)
 
 ## Wazuh v4.2.1 - Kibana 7.10.2 , 7.11.2 - Revision 4202
 
