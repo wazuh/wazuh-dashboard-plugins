@@ -1,0 +1,448 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AgentStatTable component Renders correctly to match the snapshot 1`] = `
+<AgentStatTable
+  columns={
+    Array [
+      Object {
+        "field": "location",
+        "name": "Location",
+        "sortable": true,
+      },
+      Object {
+        "field": "events",
+        "name": "Events",
+        "sortable": true,
+      },
+      Object {
+        "field": "bytes",
+        "name": "Bytes",
+        "sortable": true,
+      },
+    ]
+  }
+  end=""
+  exportCSVFilename="agent-stats-10101-logcollector-global"
+  items={Array []}
+  loading={false}
+  start=""
+  title="Test"
+>
+  <EuiPanel>
+    <div
+      className="euiPanel euiPanel--paddingMedium"
+    >
+      <EuiFlexGroup
+        justifyContent="spaceBetween"
+      >
+        <div
+          className="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceBetween euiFlexGroup--directionRow euiFlexGroup--responsive"
+        >
+          <EuiFlexItem
+            grow={false}
+          >
+            <div
+              className="euiFlexItem euiFlexItem--flexGrowZero"
+            >
+              <EuiText>
+                <div
+                  className="euiText euiText--medium"
+                >
+                  Test
+                </div>
+              </EuiText>
+            </div>
+          </EuiFlexItem>
+          <EuiFlexItem
+            grow={false}
+          >
+            <div
+              className="euiFlexItem euiFlexItem--flexGrowZero"
+            >
+              <EuiText>
+                <div
+                  className="euiText euiText--medium"
+                >
+                  <EuiIcon
+                    type="calendar"
+                  >
+                    <EuiIconEmpty
+                      aria-hidden={true}
+                      className="euiIcon euiIcon--medium euiIcon-isLoading"
+                      focusable="false"
+                      role="img"
+                      style={null}
+                    >
+                      <svg
+                        aria-hidden={true}
+                        className="euiIcon euiIcon--medium euiIcon-isLoading"
+                        focusable="false"
+                        height={16}
+                        role="img"
+                        style={null}
+                        viewBox="0 0 16 16"
+                        width={16}
+                        xmlns="http://www.w3.org/2000/svg"
+                      />
+                    </EuiIconEmpty>
+                  </EuiIcon>
+                   Start:
+                   
+                  -
+                   - End:
+                   
+                  -
+                </div>
+              </EuiText>
+            </div>
+          </EuiFlexItem>
+        </div>
+      </EuiFlexGroup>
+      <EuiHorizontalRule
+        margin="xs"
+      >
+        <hr
+          className="euiHorizontalRule euiHorizontalRule--full euiHorizontalRule--marginXSmall"
+        />
+      </EuiHorizontalRule>
+      <EuiInMemoryTable
+        columns={
+          Array [
+            Object {
+              "field": "location",
+              "name": "Location",
+              "sortable": true,
+            },
+            Object {
+              "field": "events",
+              "name": "Events",
+              "sortable": true,
+            },
+            Object {
+              "field": "bytes",
+              "name": "Bytes",
+              "sortable": true,
+            },
+          ]
+        }
+        items={Array []}
+        loading={false}
+        pagination={true}
+        responsive={true}
+        tableLayout="fixed"
+      >
+        <EuiBasicTable
+          columns={
+            Array [
+              Object {
+                "field": "location",
+                "name": "Location",
+                "sortable": true,
+              },
+              Object {
+                "field": "events",
+                "name": "Events",
+                "sortable": true,
+              },
+              Object {
+                "field": "bytes",
+                "name": "Bytes",
+                "sortable": true,
+              },
+            ]
+          }
+          items={Array []}
+          loading={false}
+          noItemsMessage="No items found"
+          onChange={[Function]}
+          pagination={
+            Object {
+              "hidePerPageOptions": undefined,
+              "pageIndex": 0,
+              "pageSize": 10,
+              "pageSizeOptions": Array [
+                10,
+                25,
+                50,
+              ],
+              "totalItemCount": 0,
+            }
+          }
+          responsive={true}
+          tableLayout="fixed"
+        >
+          <div
+            className="euiBasicTable"
+          >
+            <div>
+              <EuiTableHeaderMobile>
+                <div
+                  className="euiTableHeaderMobile"
+                >
+                  <EuiFlexGroup
+                    alignItems="baseline"
+                    justifyContent="spaceBetween"
+                    responsive={false}
+                  >
+                    <div
+                      className="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsBaseline euiFlexGroup--justifyContentSpaceBetween euiFlexGroup--directionRow"
+                    >
+                      <EuiFlexItem
+                        grow={false}
+                      >
+                        <div
+                          className="euiFlexItem euiFlexItem--flexGrowZero"
+                        />
+                      </EuiFlexItem>
+                      <EuiFlexItem
+                        grow={false}
+                      >
+                        <div
+                          className="euiFlexItem euiFlexItem--flexGrowZero"
+                        />
+                      </EuiFlexItem>
+                    </div>
+                  </EuiFlexGroup>
+                </div>
+              </EuiTableHeaderMobile>
+              <EuiTable
+                id="htmlId"
+                responsive={true}
+                tableLayout="fixed"
+              >
+                <table
+                  className="euiTable euiTable--responsive"
+                  id="htmlId"
+                  tabIndex={-1}
+                >
+                  <EuiScreenReaderOnly>
+                    <caption
+                      className="euiScreenReaderOnly euiTableCaption"
+                    >
+                      <EuiDelayRender
+                        delay={500}
+                      />
+                    </caption>
+                  </EuiScreenReaderOnly>
+                  <EuiTableHeader>
+                    <thead>
+                      <tr>
+                        <EuiTableHeaderCell
+                          align="left"
+                          data-test-subj="tableHeaderCell_location_0"
+                          key="_data_h_location_0"
+                        >
+                          <th
+                            className="euiTableHeaderCell"
+                            data-test-subj="tableHeaderCell_location_0"
+                            role="columnheader"
+                            scope="col"
+                            style={
+                              Object {
+                                "width": undefined,
+                              }
+                            }
+                          >
+                            <div
+                              className="euiTableCellContent"
+                            >
+                              <EuiInnerText>
+                                <span
+                                  className="euiTableCellContent__text"
+                                  title="Location"
+                                >
+                                  Location
+                                </span>
+                              </EuiInnerText>
+                            </div>
+                          </th>
+                        </EuiTableHeaderCell>
+                        <EuiTableHeaderCell
+                          align="left"
+                          data-test-subj="tableHeaderCell_events_1"
+                          key="_data_h_events_1"
+                        >
+                          <th
+                            className="euiTableHeaderCell"
+                            data-test-subj="tableHeaderCell_events_1"
+                            role="columnheader"
+                            scope="col"
+                            style={
+                              Object {
+                                "width": undefined,
+                              }
+                            }
+                          >
+                            <div
+                              className="euiTableCellContent"
+                            >
+                              <EuiInnerText>
+                                <span
+                                  className="euiTableCellContent__text"
+                                  title="Events"
+                                >
+                                  Events
+                                </span>
+                              </EuiInnerText>
+                            </div>
+                          </th>
+                        </EuiTableHeaderCell>
+                        <EuiTableHeaderCell
+                          align="left"
+                          data-test-subj="tableHeaderCell_bytes_2"
+                          key="_data_h_bytes_2"
+                        >
+                          <th
+                            className="euiTableHeaderCell"
+                            data-test-subj="tableHeaderCell_bytes_2"
+                            role="columnheader"
+                            scope="col"
+                            style={
+                              Object {
+                                "width": undefined,
+                              }
+                            }
+                          >
+                            <div
+                              className="euiTableCellContent"
+                            >
+                              <EuiInnerText>
+                                <span
+                                  className="euiTableCellContent__text"
+                                  title="Bytes"
+                                >
+                                  Bytes
+                                </span>
+                              </EuiInnerText>
+                            </div>
+                          </th>
+                        </EuiTableHeaderCell>
+                      </tr>
+                    </thead>
+                  </EuiTableHeader>
+                  <EuiTableBody>
+                    <tbody>
+                      <EuiTableRow>
+                        <tr
+                          className="euiTableRow"
+                        >
+                          <EuiTableRowCell
+                            align="center"
+                            colSpan={3}
+                            isMobileFullWidth={true}
+                          >
+                            <td
+                              className="euiTableRowCell euiTableRowCell--isMobileFullWidth"
+                              colSpan={3}
+                              style={
+                                Object {
+                                  "width": undefined,
+                                }
+                              }
+                            >
+                              <div
+                                className="euiTableCellContent euiTableCellContent--alignCenter"
+                              >
+                                <span
+                                  className="euiTableCellContent__text"
+                                >
+                                  No items found
+                                </span>
+                              </div>
+                            </td>
+                          </EuiTableRowCell>
+                        </tr>
+                      </EuiTableRow>
+                    </tbody>
+                  </EuiTableBody>
+                </table>
+              </EuiTable>
+            </div>
+          </div>
+        </EuiBasicTable>
+      </EuiInMemoryTable>
+      <EuiSpacer
+        size="xs"
+      >
+        <div
+          className="euiSpacer euiSpacer--xs"
+        />
+      </EuiSpacer>
+      <EuiFlexGroup
+        justifyContent="flexEnd"
+      >
+        <div
+          className="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentFlexEnd euiFlexGroup--directionRow euiFlexGroup--responsive"
+        >
+          <EuiFlexItem
+            grow={false}
+          >
+            <div
+              className="euiFlexItem euiFlexItem--flexGrowZero"
+            >
+              <EuiButtonEmpty
+                iconType="importAction"
+                isDisabled={false}
+                onClick={[Function]}
+              >
+                <button
+                  className="euiButtonEmpty euiButtonEmpty--primary"
+                  disabled={false}
+                  onClick={[Function]}
+                  type="button"
+                >
+                  <EuiButtonContent
+                    className="euiButtonEmpty__content"
+                    iconSide="left"
+                    iconType="importAction"
+                    textProps={
+                      Object {
+                        "className": "euiButtonEmpty__text",
+                      }
+                    }
+                  >
+                    <span
+                      className="euiButtonContent euiButtonEmpty__content"
+                    >
+                      <EuiIcon
+                        className="euiButtonContent__icon"
+                        size="m"
+                        type="importAction"
+                      >
+                        <EuiIconEmpty
+                          aria-hidden={true}
+                          className="euiIcon euiIcon--medium euiIcon-isLoading euiButtonContent__icon"
+                          focusable="false"
+                          role="img"
+                          style={null}
+                        >
+                          <svg
+                            aria-hidden={true}
+                            className="euiIcon euiIcon--medium euiIcon-isLoading euiButtonContent__icon"
+                            focusable="false"
+                            height={16}
+                            role="img"
+                            style={null}
+                            viewBox="0 0 16 16"
+                            width={16}
+                            xmlns="http://www.w3.org/2000/svg"
+                          />
+                        </EuiIconEmpty>
+                      </EuiIcon>
+                      <span
+                        className="euiButtonEmpty__text"
+                      >
+                        Download CSV
+                      </span>
+                    </span>
+                  </EuiButtonContent>
+                </button>
+              </EuiButtonEmpty>
+            </div>
+          </EuiFlexItem>
+        </div>
+      </EuiFlexGroup>
+    </div>
+  </EuiPanel>
+</AgentStatTable>
+`;

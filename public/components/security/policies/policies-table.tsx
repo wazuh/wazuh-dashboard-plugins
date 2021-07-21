@@ -8,19 +8,47 @@ import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 
-const errorContext = 'PoliciesTable';
-
-export const PoliciesTable = ({ policies, loading, editPolicy, createPolicy, updatePolicies }) => {
+export const PoliciesTable = ({ policies, loading, editPolicy, updatePolicies }) => {
   const getRowProps = (item) => {
     const { id } = item;
     return {
       'data-test-subj': `row-${id}`,
       onClick: () => {
         editPolicy(item);
-        createPolicy(item);
       },
     };
   };
+
+  const confirmDeletePolicy = (item) => {
+    return async () => {
+      try {
+        const response = await WzRequest.apiReq('DELETE', `/security/policies/`, {
+          params: {
+            policy_ids: item.id,
+          },
+        });
+        const data = (response.data || {}).data;
+        if (data.failed_items && data.failed_items.length) {
+          return;
+        }
+        ErrorHandler.info('Policy was successfully deleted');
+        await updatePolicies();
+      } catch (error) {
+        const options = {
+          context: `${PoliciesTable.name}.confirmDeletePolicy`,
+          level: UI_LOGGER_LEVELS.ERROR,
+          severity: UI_ERROR_SEVERITIES.BUSINESS,
+          store: true,
+          error: {
+            error: error,
+            message: error.message || error,
+            title: error.name || error,
+          },
+        };
+        getErrorOrchestrator().handleError(options);
+      }
+    };
+  }
 
   const columns = [
     {
@@ -82,34 +110,7 @@ export const PoliciesTable = ({ policies, loading, editPolicy, createPolicy, upd
             }}
             isDisabled={WzAPIUtils.isReservedID(item.id)}
             modalTitle={`Do you want to delete the ${item.name} policy?`}
-            onConfirm={async () => {
-              try {
-                const response = await WzRequest.apiReq('DELETE', `/security/policies/`, {
-                  params: {
-                    policy_ids: item.id,
-                  },
-                });
-                const data = (response.data || {}).data;
-                if (data.failed_items && data.failed_items.length) {
-                  return;
-                }
-                ErrorHandler.info('Policy was successfully deleted');
-                await updatePolicies();
-              } catch (error) {
-                const options = {
-                  context: errorContext,
-                  level: UI_LOGGER_LEVELS.ERROR,
-                  severity: UI_ERROR_SEVERITIES.BUSINESS,
-                  store: true,
-                  error: {
-                    error: error,
-                    message: error.message || error,
-                    title: error.name || error,
-                  },
-                };
-                getErrorOrchestrator().handleError(options);
-              }
-            }}
+            onConfirm={confirmDeletePolicy(item)}
             modalProps={{ buttonColor: 'danger' }}
             iconType="trash"
             color="danger"

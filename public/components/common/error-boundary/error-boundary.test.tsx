@@ -17,6 +17,11 @@ import { mount } from 'enzyme';
 import ErrorBoundary from './error-boundary';
 
 jest.mock('loglevel');
+jest.mock('../../../react-services/common-services', () => ({
+  getErrorOrchestrator: () => ({
+    handleError: (options) => {},
+  }),
+}));
 
 describe('ErrorBoundary component', () => {
   const ComponentWithError = () => {

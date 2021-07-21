@@ -40,7 +40,6 @@ import {
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 
-const errorContext = 'ApiTable';
 export const ApiTable = compose(withErrorBoundary, withReduxProvider)(class ApiTable extends Component {
   constructor(props) {
     super(props);
@@ -143,7 +142,7 @@ export const ApiTable = compose(withErrorBoundary, withReduxProvider)(class ApiT
       }
     } catch (error) {
       const options = {
-        context: errorContext,
+        context: `${ApiTable.name}.checkApi`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         store: true,

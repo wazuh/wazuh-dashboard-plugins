@@ -7,29 +7,50 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Added
 
 - Added new endpoint service to collect the frontend logs into a file [#3324](https://github.com/wazuh/wazuh-kibana-app/pull/3324)
-- Added new error handler to be responsible for the error orchestration [#3327](https://github.com/wazuh/wazuh-kibana-app/pull/3327)
-- Added `Error Boundary` HOC and Component to handle render errors. [#3321](https://github.com/wazuh/wazuh-kibana-app/pull/3321)
-- Added implementation of `Error Boundary` HOC in each main react-component. [#3367](https://github.com/wazuh/wazuh-kibana-app/pull/3367)
+- Improved the frontend handle errors strategy: UI, Toasts, console log and log in file 
+  [#3327](https://github.com/wazuh/wazuh-kibana-app/pull/3327) 
+  [#3321](https://github.com/wazuh/wazuh-kibana-app/pull/3321) 
+  [#3367](https://github.com/wazuh/wazuh-kibana-app/pull/3367) 
+  [#3374](https://github.com/wazuh/wazuh-kibana-app/pull/3374) 
+  [#3390](https://github.com/wazuh/wazuh-kibana-app/pull/3390)  
+  [#3410](https://github.com/wazuh/wazuh-kibana-app/pull/3410) 
+  [#3408](https://github.com/wazuh/wazuh-kibana-app/pull/3408) 
+  [#3429](https://github.com/wazuh/wazuh-kibana-app/pull/3429) 
+  [#3427](https://github.com/wazuh/wazuh-kibana-app/pull/3427) 
+  [#3417](https://github.com/wazuh/wazuh-kibana-app/pull/3417) 
+  [#3462](https://github.com/wazuh/wazuh-kibana-app/pull/3462) 
+  [#3451](https://github.com/wazuh/wazuh-kibana-app/pull/3451) 
+  [#3442](https://github.com/wazuh/wazuh-kibana-app/pull/3442)
+  [#3480](https://github.com/wazuh/wazuh-kibana-app/pull/3480) 
+  [#3472](https://github.com/wazuh/wazuh-kibana-app/pull/3472) 
+  [#3434](https://github.com/wazuh/wazuh-kibana-app/pull/3434) 
+  [#3392](https://github.com/wazuh/wazuh-kibana-app/pull/3392)
+  [#3404](https://github.com/wazuh/wazuh-kibana-app/pull/3404) 
+  [#3432](https://github.com/wazuh/wazuh-kibana-app/pull/3432) 
+  [#3415](https://github.com/wazuh/wazuh-kibana-app/pull/3415) 
+  [#3469](https://github.com/wazuh/wazuh-kibana-app/pull/3469) 
+  [#3448](https://github.com/wazuh/wazuh-kibana-app/pull/3448)
+  [#3465](https://github.com/wazuh/wazuh-kibana-app/pull/3465)
+  [#3464](https://github.com/wazuh/wazuh-kibana-app/pull/3464)
+  
 - Added fields status and type in vulnerabilities table [#3196](https://github.com/wazuh/wazuh-kibana-app/pull/3196)
 - Added Intelligence tab to Mitre Att&ck module [#3368](https://github.com/wazuh/wazuh-kibana-app/pull/3368) [#3344](https://github.com/wazuh/wazuh-kibana-app/pull/3344)
-- Added try catch strategy with ErrorOrchestrator service on User section [#3390](https://github.com/wazuh/wazuh-kibana-app/pull/3390)
-- Added try catch strategy with ErrorOrchestrator service on WzLogs and documentation for ErrorOrchestrator [#3373](https://github.com/wazuh/wazuh-kibana-app/pull/3373)
-- Added try catch strategy with ErrorOrchestrator service on Management > Ruleset [#3410](https://github.com/wazuh/wazuh-kibana-app/pull/3410)
-- Added try catch strategy with ErrorOrchestrator service on Overview [#3408](https://github.com/wazuh/wazuh-kibana-app/pull/3408)
-- Added try catch strategy with ErrorOrchestrator service on ManagementController [#3374](https://github.com/wazuh/wazuh-kibana-app/pull/3374)
-- Added try catch strategy with ErrorOrchestrator service on FIM & SCA sections [#3417](https://github.com/wazuh/wazuh-kibana-app/pull/3417)
+- Fixed issue where configuration still asked you to save changes before exiting even after saving [#3460](https://github.com/wazuh/wazuh-kibana-app/pull/3460)
 
 ### Changed
 
 - Changed ossec to wazuh in sample-data [#3121](https://github.com/wazuh/wazuh-kibana-app/pull/3121)
 - Changed empty fields in FIM tables and `syscheck.value_name` in discovery now show an empty tag for visual clarity [#3279](https://github.com/wazuh/wazuh-kibana-app/pull/3279)
 - Adapted the Mitre tactics and techniques resources to use the API endpoints [#3346](https://github.com/wazuh/wazuh-kibana-app/pull/3346)
-- Refactored all try catch strategy on Settings section [#3392](https://github.com/wazuh/wazuh-kibana-app/pull/3392)
-- Refactored all try catch strategy on Controller/Agent section [#3398](https://github.com/wazuh/wazuh-kibana-app/issues/3398)
 
 ### Fixed
 
-- Fixed creation of log files [#3384](https://github.com/wazuh/wazuh-kibana-app/pull/3384)
+- Fixed creation of log files [#3384](https://github.com/wazuh/wazuh-kibana-app/pull/3384) 
+- Fixed error when edit a rule or decoder [#3456](https://github.com/wazuh/wazuh-kibana-app/pull/3456)
+- Fixed rules and decoders test flyout clickout event [#3412](https://github.com/wazuh/wazuh-kibana-app/pull/3412)
+- Don't open the main menu when changing the seleted API or index pattern [#3440](https://github.com/wazuh/wazuh-kibana-app/pull/3440)
+- Fix size api selector when name is too long [#3445](https://github.com/wazuh/wazuh-kibana-app/pull/3445)
+- Fixed the code overflows over the line numbers in the API Console editor [#3439](https://github.com/wazuh/wazuh-kibana-app/pull/3439)
 - Remove not used `redirectRule` query param when clicking the row table on CDB Lists/Decoders [#3438](https://github.com/wazuh/wazuh-kibana-app/pull/3438)
 
 ## Wazuh v4.2.1 - Kibana 7.10.2 , 7.11.2 - Revision 4202

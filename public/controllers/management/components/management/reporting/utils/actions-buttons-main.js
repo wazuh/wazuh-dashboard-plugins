@@ -17,6 +17,10 @@ import { connect } from 'react-redux';
 
 import { updateIsProcessing } from '../../../../../../redux/actions/reportingActions';
 
+import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
+import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
+
 class WzReportingActionButtons extends Component {
   _isMounted = false;
 
@@ -41,7 +45,17 @@ class WzReportingActionButtons extends Component {
     try {
       this.props.updateIsProcessing(true);
     } catch (error) {
-      return Promise.reject(error);
+      const options = {
+        context: `${WzReportingActionButtons.name}.refresh`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.UI,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   }
 
