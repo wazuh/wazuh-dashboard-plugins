@@ -91,31 +91,17 @@ export const Users = () => {
   }
   if (isEditFlyoutVisible) {
     editFlyout = (
-      <EuiOverlayMask
-        headerZindexLocation="below"
-        onClick={() => {
-          setIsEditFlyoutVisible(false);
-        }}
-      >
         <EditUser
           currentUser={editingUser}
           closeFlyout={closeEditFlyout}
           rolesObject={rolesObject}
         />
-      </EuiOverlayMask>
     );
   }
 
   if (isCreateFlyoutVisible) {
     createFlyout = (
-      <EuiOverlayMask
-        headerZindexLocation="below"
-        onClick={() => {
-          setIsCreateFlyoutVisible(false);
-        }}
-      >
         <CreateUser closeFlyout={closeCreateFlyout} />
-      </EuiOverlayMask>
     );
   }
 

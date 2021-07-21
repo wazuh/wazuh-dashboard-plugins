@@ -46,6 +46,9 @@ import { AppNavigate } from '../../react-services/app-navigate';
 import WzTextWithTooltipIfTruncated from '../../components/common/wz-text-with-tooltip-if-truncated';
 import { getDataPlugin } from '../../kibana-services';
 import { withWindowSize } from '../../components/common/hocs/withWindowSize';
+import { UI_LOGGER_LEVELS } from '../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../react-services/common-services'
 
 
 const sections = {
@@ -103,8 +106,21 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
           }
         }
       }
-    } catch (err) { }
-
+    } catch (error) { 
+      const options = {
+        context: `${WzMenu.name}.componentDidMount`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.CRITICAL,
+        store: true,
+        display: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+    }
   }
 
   showToast = (color, title, text, time) => {
@@ -168,7 +184,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
         });
       }
     } catch (error) {
-      this.showToast('danger', 'Error', error, 4000);
+      throw error;
     }
   }
 
@@ -257,7 +273,19 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
         });
       }
     } catch (error) {
-      this.showToast('danger', 'Error', error.message || error, 4000);
+      const options = {
+        context: `${WzMenu.name}.load`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        store: true,
+        display: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
     this.isLoading = false;
   }
@@ -274,11 +302,21 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
 
       if (newPattern?.id === 'selectIndexPatternBar') {
         this.updatePatternAndApi();
-      } else {
-        this.switchMenuOpened();
       }
     } catch (error) {
-      this.showToast('danger', 'Error', error, 4000);
+      const options = {
+        context: `${WzMenu.name}.changePattern`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        store: false,
+        display: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `Error changing the Index Pattern`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   };
 
@@ -324,15 +362,22 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
       AppState.setCurrentAPI(
         JSON.stringify({ name: apiData[0].manager, id: apiId.value })
       );
-      if (apiId?.id !== 'selectAPIBar') {
-        this.switchMenuOpened();
-      }
 
       if (this.state.currentMenuTab !== 'wazuh-dev') {
         this.router.reload();
       }
     } catch (error) {
-      this.showToast('danger', 'Error', error, 4000);
+      const options = {
+        context: `${WzMenu.name}.changePattern`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `Error changing the selected API`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   };
 
@@ -636,7 +681,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
   }
 
   getApiSelectorComponent() {
-    let style = { maxWidth: 100 };
+    let style = { minWidth: 100, textOverflow: 'ellipsis' };
     if (this.showSelectorsInPopover){
       style = { width: '100%', minWidth: 200 };
     }
