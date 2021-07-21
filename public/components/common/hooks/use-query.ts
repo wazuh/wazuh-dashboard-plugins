@@ -28,7 +28,6 @@ export function useQuery(): [
       setQuery(scope.state.query);
       subscription = scope.$watchCollection('fetchStatus', () => {
         if (!_.isEqual(query, scope.state.query)) {
-          console.log("QUERY CHANGED")
           setQuery(scope.state.query);
         }
       });
