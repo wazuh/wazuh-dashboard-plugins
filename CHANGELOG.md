@@ -32,10 +32,9 @@ All notable changes to the Wazuh app project will be documented in this file.
   [#3448](https://github.com/wazuh/wazuh-kibana-app/pull/3448)
   [#3465](https://github.com/wazuh/wazuh-kibana-app/pull/3465)
   [#3464](https://github.com/wazuh/wazuh-kibana-app/pull/3464)
-  
+  [#3478](https://github.com/wazuh/wazuh-kibana-app/pull/3478)
 - Added fields status and type in vulnerabilities table [#3196](https://github.com/wazuh/wazuh-kibana-app/pull/3196)
 - Added Intelligence tab to Mitre Att&ck module [#3368](https://github.com/wazuh/wazuh-kibana-app/pull/3368) [#3344](https://github.com/wazuh/wazuh-kibana-app/pull/3344)
-- Fixed issue where configuration still asked you to save changes before exiting even after saving [#3460](https://github.com/wazuh/wazuh-kibana-app/pull/3460)
 
 ### Changed
 
