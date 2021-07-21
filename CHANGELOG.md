@@ -46,12 +46,12 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Fixed creation of log files [#3384](https://github.com/wazuh/wazuh-kibana-app/pull/3384) 
 - Fixed rules and decoders test flyout clickout event [#3412](https://github.com/wazuh/wazuh-kibana-app/pull/3412)
-- Fix size api selector when name is too long [#3445](https://github.com/wazuh/wazuh-kibana-app/pull/3445)
-- Fixed the check that shows if there are any changes on configuration settings [#3482](https://github.com/wazuh/wazuh-kibana-app/pull/3482) 
-- Fixed the code overflows over the line numbers in the API Console editor [#3439](https://github.com/wazuh/wazuh-kibana-app/pull/3439)
-- Fixed creation of log files [#3384](https://github.com/wazuh/wazuh-kibana-app/pull/3384)
-- Don't open the main menu when changing the seleted API or index pattern [#3440](https://github.com/wazuh/wazuh-kibana-app/pull/3440)
+- Notify when you are registering an agent without permissions [#3430](https://github.com/wazuh/wazuh-kibana-app/pull/3430)
 - Remove not used `redirectRule` query param when clicking the row table on CDB Lists/Decoders [#3438](https://github.com/wazuh/wazuh-kibana-app/pull/3438)
+- Fixed the code overflows over the line numbers in the API Console editor [#3439](https://github.com/wazuh/wazuh-kibana-app/pull/3439)
+- Don't open the main menu when changing the seleted API or index pattern [#3440](https://github.com/wazuh/wazuh-kibana-app/pull/3440)
+- Fix size api selector when name is too long [#3445](https://github.com/wazuh/wazuh-kibana-app/pull/3445)
+- Fixed error when edit a rule or decoder [#3456](https://github.com/wazuh/wazuh-kibana-app/pull/3456)
 
 ## Wazuh v4.2.1 - Kibana 7.10.2 , 7.11.2 - Revision 4202
 
