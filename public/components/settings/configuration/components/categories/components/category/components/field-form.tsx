@@ -32,6 +32,7 @@ import {
 } from '../../../../../../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../../../../react-services/common-services';
+import _ from 'lodash';
 
 interface IFieldForm {
   item: ISetting
@@ -107,12 +108,12 @@ const IntervalForm: React.FunctionComponent<IFieldForm> = (props) => {
   );
 }
 
-const ArrayForm: React.FunctionComponent<IFieldForm> = (props) => { 
+const ArrayForm: React.FunctionComponent<IFieldForm> = (props) => {
   const [list, setList] = useState(JSON.stringify(getValue(props)));
 
   useEffect(() => {
-    setList(JSON.stringify(getValue(props)))
-  }, [props.updatedConfig])
+    checkErrors();
+  }, [list]);
 
   const checkErrors = () => {
     try {
@@ -140,7 +141,7 @@ const ArrayForm: React.FunctionComponent<IFieldForm> = (props) => {
       width='100%'
       value={list}
       onChange={setList}
-      onBlur={checkErrors} />
+   />
   );
 }
 
@@ -153,12 +154,14 @@ const getValue = ({ item, updatedConfig }: IFieldForm) => typeof updatedConfig[i
   : item.value;
 
 const onChange = (value: string | number | boolean | [], props: IFieldForm) => {
-  if(JSON.stringify(props.item.value) !== JSON.stringify(value)){
-    const { updatedConfig, setUpdatedConfig, item } = props;
+  const { updatedConfig, setUpdatedConfig, item } = props;
+  if(!_.isEqual(item.value,value)){
     setUpdatedConfig({
       ...updatedConfig,
       [item.setting]: value,
     })
+  }else{
+    deleteChange(props);
   }
 }
 
