@@ -146,17 +146,6 @@ class WzRulesetEditor extends Component {
       }
       this.setState({ isSaving: false });
       this.goToEdit(name);
-
-      let errorMessage = `The content of the file ${name} is incorrect. There were found several errors while validating the configuration: ${error.message || error}`;
-      if (this.props.state.addingRulesetFile != false) {
-        //remove current invalid file if the file is new.
-        await this.rulesetHandler.deleteFile(name);
-        errorMessage += '\nThe new file was deleted.';
-      } else {
-        //restore file to previous version
-        await this.rulesetHandler.updateFile(name, this.state.initContent, overwrite);
-        errorMessage += '\nThe content file was restored to previous state.';
-      }
       this.setState({
         showWarningRestart: true,
         initialInputValue: this.state.inputValue,
