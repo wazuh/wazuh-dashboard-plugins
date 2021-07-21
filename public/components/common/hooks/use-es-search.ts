@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getDataPlugin } from '../../../kibana-services';
-import { useQuery, useIndexPattern, useFilterManager } from '../hooks';
+import { useQuery, useIndexPattern, useFilterManager } from '.';
 import _ from 'lodash';
 
 /*
