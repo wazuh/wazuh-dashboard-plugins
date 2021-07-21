@@ -79,7 +79,7 @@ export const getCurrentConfig = async (
     }
     return result;
   } catch (error) {
-    return Promise.reject(error);
+    throw error;
   }
 };
 
@@ -146,7 +146,7 @@ export const handleError = async (error, location, updateWazuhNotReadyYet, isClu
 
     return text;
   } catch (error) {
-    console.error(error);
+    throw error;
   }
 };
 
@@ -181,7 +181,7 @@ export const checkDaemons = async (isCluster) => {
       console.warn('Wazuh not ready yet');
     }
   } catch (error) {
-    return Promise.reject(error);
+    throw error;
   }
 };
 
@@ -212,7 +212,7 @@ export const makePing = async (updateWazuhNotReadyYet, isCluster, tries = 30) =>
     }
     return Promise.resolve('Wazuh is ready');
   } catch (error) {
-    return Promise.reject('Wazuh could not be recovered.');
+    throw new Error('Wazuh could not be recovered.');
   }
 };
 
@@ -258,7 +258,7 @@ export const fetchFile = async selectedNode => {
     xml = xml.replace(/..xml.+\?>/, '');
     return xml;
   } catch (error) {
-    return Promise.reject(error);
+    throw error;
   }
 };
 
@@ -282,7 +282,7 @@ export const restartNodeSelected = async (
     isCluster ? await restartNode(selectedNode) : await restartManager();
     return await makePing(updateWazuhNotReadyYet, isCluster);
   } catch (error) {
-    return Promise.reject(error);
+    throw error;
   }
 };
 
@@ -304,7 +304,7 @@ export const restartManager = async () => {
     const result = await WzRequest.apiReq('PUT', `/manager/restart`, {});
     return result;
   } catch (error) {
-    return Promise.reject(error);
+    throw error;
   }
 };
 
@@ -335,7 +335,7 @@ export const restartCluster = async () => {
       }
     };
   } catch (error) {
-    return Promise.reject(error);
+    throw error;
   }
 };
 
@@ -364,7 +364,7 @@ export const restartNode = async node => {
 
     return result;
   } catch (error) {
-    return Promise.reject(error);
+    throw error;
   }
 };
 
@@ -379,7 +379,7 @@ export const saveConfiguration = async (selectedNode, xml) => {
       await saveFileManager(xml);
     }
   } catch (error) {
-    return Promise.reject(error.message || error);
+    throw error;
   }
 };
 
@@ -399,7 +399,7 @@ export const saveNodeConfiguration = async (node, content) => {
     );
     return result;
   } catch (error) {
-    return Promise.reject(error);
+    throw error;
   }
 };
 
@@ -420,7 +420,7 @@ export const saveFileCluster = async (text, node) => {
     );
     await validateAfterSent(node);
   } catch (error) {
-    return Promise.reject(error);
+    throw error;
   }
 };
 
@@ -440,7 +440,7 @@ export const saveFileManager = async text => {
     );
     await validateAfterSent(false);
   } catch (error) {
-    return Promise.reject(error);
+    throw error;
   }
 };
 
@@ -479,7 +479,7 @@ export const validateAfterSent = async (node = false) => {
     }
     return true;
   } catch (error) {
-    return Promise.reject(error);
+    throw error;
   }
 };
 
@@ -499,7 +499,7 @@ export const clusterNodes = async () => {
     const result = await WzRequest.apiReq('GET', `/cluster/nodes`, {});
     return result;
   } catch (error) {
-    return Promise.reject(error);
+    throw error;
   }
 };
 
@@ -518,7 +518,7 @@ export const checkCurrentSecurityPlatform = async () => {
 
     return platform;
   } catch (error) {
-    return Promise.reject(error);
+    throw error;
   }
 };
 
@@ -544,6 +544,6 @@ export const restartClusterOrManager = async (updateWazuhNotReadyYet) => {
     await makePing(updateWazuhNotReadyYet, isCluster);
     return { restarted: isCluster ? 'Cluster' : 'Manager'}
   }catch (error){
-    return Promise.reject(error);
+    throw error;
   };
 };

@@ -27,7 +27,7 @@ import {
   EuiTitle,
   EuiToolTip,
   EuiButtonIcon,
-  EuiButtonEmpty,
+  EuiOverlayMask,
   EuiFieldText,
   EuiConfirmModal,
   EuiCodeEditor,
@@ -48,7 +48,6 @@ import 'brace/snippets/xml';
 import 'brace/ext/language_tools';
 import "brace/ext/searchbox";
 import { showFlyoutLogtest } from '../../../../../redux/actions/appStateActions';
-import { WzOverlayMask } from '../../../../../components/common/util';
 import _ from 'lodash';
 
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
@@ -255,7 +254,7 @@ class WzRulesetEditor extends Component {
     let modal;
     if (this.state.isModalVisible) {
       modal = (
-        <WzOverlayMask>
+        <EuiOverlayMask>
           <EuiConfirmModal
             title="Unsubmitted changes"
             onConfirm={() => {
@@ -270,7 +269,7 @@ class WzRulesetEditor extends Component {
               There are unsaved changes. Are you sure you want to proceed?
             </p>
           </EuiConfirmModal>
-        </WzOverlayMask>
+        </EuiOverlayMask>
       );
     }
     return (
