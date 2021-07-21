@@ -13,5 +13,3 @@
 
 export { MainPanel } from './main-panel';
 export { ModuleSidePanel } from './module-side-panel';
-export { ModuleBody } from './module-body';
-export { ModuleDrilldown } from './module-drilldown';

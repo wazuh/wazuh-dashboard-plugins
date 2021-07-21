@@ -1,9 +1,9 @@
 import { EuiDescriptionList, EuiFlexItem, EuiFlexGroup, EuiTitle } from '@elastic/eui';
-import moduleLogo from '../../../assets/office365.svg';
+import moduleLogo from '../../../../assets/office365.svg';
 import React from 'react';
 
 
-export const ModuleStats = ({ listItems = [] }) => {
+export const OfficeStats = ({ listItems = [] }) => {
     const logoStyle = { width: 30 };
     return (
         <EuiFlexGroup direction={'column'} alignItems={'flexStart'}>

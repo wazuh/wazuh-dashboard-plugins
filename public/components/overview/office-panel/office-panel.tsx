@@ -12,11 +12,11 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { MainPanel } from '../../../components/common/modules/panel';
+import { MainPanel } from '../../common/modules/panel';
 import { withErrorBoundary } from '../../common/hocs';
-import { ModuleStats } from './module-stats';
+import { OfficeStats } from './views';
 import { queryConfig } from '../../../react-services/query-config';
-import { DrilldownConfig, MainViewConfig } from './config/';
+import { ModuleConfig } from './config';
 
 export const OfficePanel = withErrorBoundary(({ ...props }) => {
 
@@ -41,7 +41,7 @@ export const OfficePanel = withErrorBoundary(({ ...props }) => {
         )();
     }, [])
     return (
-        <MainPanel moduleConfig={MainViewConfig} drillDownConfig={DrilldownConfig}
-            sidePanelChildren={<ModuleStats listItems={moduleStatsList} />} />
+        <MainPanel moduleConfig={ModuleConfig} tab={'office'}
+            sidePanelChildren={<OfficeStats listItems={moduleStatsList} />} />
     )
 });
