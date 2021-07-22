@@ -5,7 +5,7 @@ import KibanaVis from '../../../../kibana-integrations/kibana-vis';
 export const DrilldownConfig = {
   rows: [
     {
-      height: 110,
+      height: 130,
       columns: [
         {
           width: 50,

@@ -1,3 +1,4 @@
+import { EuiPanel } from '@elastic/eui';
 import React from 'react';
 import KibanaVis from '../../../../kibana-integrations/kibana-vis';
 
@@ -5,7 +6,7 @@ import KibanaVis from '../../../../kibana-integrations/kibana-vis';
 export const MainViewConfig = {
   rows: [
     {
-      height: 110,
+      height: 150,
       columns: [
         {
           width: 50,
