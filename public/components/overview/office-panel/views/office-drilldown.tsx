@@ -1,12 +1,19 @@
 import React from 'react';
-import { EuiFlexGroup, EuiFlexItem, EuiButtonEmpty } from '@elastic/eui';
+import { EuiFlexGroup, EuiFlexItem, EuiButtonEmpty, EuiTitle } from '@elastic/eui';
+import { SecurityAlerts } from '../../../visualize/components';
 
 export const OfficeDrilldown = ({ changeView, rows = [], ...props }) => {
 
   return <>
     <EuiFlexGroup>
       <EuiFlexItem grow={false}>
-        <div><EuiButtonEmpty onClick={()=>changeView()} iconType={"sortLeft"}>Go Back</EuiButtonEmpty></div>
+        <div><EuiButtonEmpty onClick={()=>changeView()} iconType={"sortLeft"}></EuiButtonEmpty></div>
+      </EuiFlexItem>
+      <EuiFlexItem grow={false}>
+        <EuiTitle size="s">
+          <h3>User Activity</h3>
+        </EuiTitle>
+        <p>wazuh@wazuh.com</p>
       </EuiFlexItem>
     </EuiFlexGroup>
     {
@@ -26,5 +33,8 @@ export const OfficeDrilldown = ({ changeView, rows = [], ...props }) => {
         </EuiFlexGroup>
       })
     }
+    <EuiFlexGroup>
+      <SecurityAlerts />
+    </EuiFlexGroup> 
   </>
 }
