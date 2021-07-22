@@ -23,8 +23,7 @@ export const SecurityAlerts = ({initialColumns = ["icon", "timestamp", 'rule.mit
  const customFilterWithAllowedAgents = [];
  const {allowedAgents, filterAllowedAgents} = useAllowedAgents();
  filterAllowedAgents && customFilterWithAllowedAgents.push(filterAllowedAgents);
- //Sacar esta linea antes del commit final, solo para mostrar security events sin alertas de office
- filterManager.setFilters(filterManager.getFilters[1])
+
  return (
    <Discover
      shareFilterManager={filterManager}
