@@ -24,7 +24,7 @@ export const MainPanel = ({ sidePanelChildren, tab = 'general', moduleConfig = {
   const filterManager = KibanaServices.filterManager;
   const timefilter = KibanaServices.timefilter.timefilter;
 
-  const [isLoading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [filterParams, setFilterParams] = useState({
     filters: filterManager.getFilters() || [],
     query: { language: 'kuery', query: '' },
@@ -48,15 +48,15 @@ export const MainPanel = ({ sidePanelChildren, tab = 'general', moduleConfig = {
   const onQuerySubmit = (payload: { dateRange: TimeRange, query: Query }) => {
     const { query, dateRange } = payload;
     const filters = { query, time: dateRange, filters: filterParams.filters };
-    setLoading(true);
+    setIsLoading(true);
     setFilterParams(filters);
-
+    setIsLoading(false);
   }
 
   const onFiltersUpdated = (filters: Filter[]) => {
     const { query, time } = filterParams;
     const updatedFilterParams = { query, time, filters };
-    setLoading(true);
+    setIsLoading(true);
     setFilterParams(updatedFilterParams);
   }
 
@@ -71,9 +71,8 @@ export const MainPanel = ({ sidePanelChildren, tab = 'general', moduleConfig = {
    * @returns React.Component
    */
   const ModuleContent = useCallback(() => {
-
     const View = moduleConfig[viewId].component;
-    return <WzReduxProvider><View changeView={toggleView} /></WzReduxProvider>
+    return <WzReduxProvider><View changeView={toggleView}/></WzReduxProvider>
   }, [viewId])
 
   return (
