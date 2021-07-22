@@ -83,10 +83,6 @@ export const MainPanel = ({ sidePanelChildren, tab = 'general', moduleConfig = {
         </ModuleSidePanel >
         }
         <EuiPageBody>
-          <KbnSearchBar
-            onQuerySubmit={onQuerySubmit}
-            onFiltersUpdated={onFiltersUpdated}
-            isLoading={isLoading} />
           <ModuleContent />
         </EuiPageBody>
       </EuiFlexItem>

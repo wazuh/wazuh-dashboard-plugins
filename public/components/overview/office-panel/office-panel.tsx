@@ -14,6 +14,8 @@
 import React, { useEffect, useState } from 'react';
 import { MainPanel } from '../../common/modules/panel';
 import { withErrorBoundary } from '../../common/hocs';
+import { CustomSearchBar } from '../../common/custom-search-bar';
+import { filtersValues } from './search-bar-config';
 import { OfficeStats } from './views';
 import { queryConfig } from '../../../react-services/query-config';
 import { ModuleConfig } from './config';
@@ -41,7 +43,10 @@ export const OfficePanel = withErrorBoundary(() => {
         )();
     }, [])
     return (
+        <>
+        <CustomSearchBar filtersValues={filtersValues}/>
         <MainPanel moduleConfig={ModuleConfig} tab={'office'}
             sidePanelChildren={<OfficeStats listItems={moduleStatsList} />} />
+        </>
     )
 });
