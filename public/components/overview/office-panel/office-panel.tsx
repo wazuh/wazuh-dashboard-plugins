@@ -18,7 +18,7 @@ import { OfficeStats } from './views';
 import { queryConfig } from '../../../react-services/query-config';
 import { ModuleConfig } from './config';
 
-export const OfficePanel = withErrorBoundary(({ ...props }) => {
+export const OfficePanel = withErrorBoundary(() => {
 
     const [moduleStatsList, setModuleStatsList] = useState([]);
     useEffect(() => {

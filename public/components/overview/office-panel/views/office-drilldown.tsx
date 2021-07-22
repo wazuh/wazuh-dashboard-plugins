@@ -26,7 +26,7 @@ export const OfficeDrilldown = ({ changeView, rows = [], ...props }) => {
               const growthFactor = Math.max((column.width ? parseInt(column.width / 10) : 1), 1);
                 
                 return <EuiFlexItem key={key} grow={growthFactor}>
-                  <column.component onRowClick={()=>changeView('main')}/>
+                  <div style={{ height: '100%' }}><column.component onRowClick={()=>changeView('main')}/></div>
                 </EuiFlexItem>
             })
           }

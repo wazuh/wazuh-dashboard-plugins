@@ -5,7 +5,7 @@ import KibanaVis from '../../../../kibana-integrations/kibana-vis';
 export const DrilldownConfig = {
   rows: [
     {
-      height: 300,
+      height: 110,
       columns: [
         {
           width: 50,
@@ -13,7 +13,7 @@ export const DrilldownConfig = {
         },
         {
           width: 50,
-          component: (props) => <KibanaVis visID='Wazuh-App-Overview-Office-Alerts-Evolution' tab='office' {...props} />
+          component: (props) => <KibanaVis visID='Wazuh-App-Overview-Office-Authentication-success' tab='office' {...props} />
         },
       ]
     },
@@ -22,11 +22,11 @@ export const DrilldownConfig = {
       columns: [
         {
           width: 70,
-          component: (props) => <KibanaVis visID='Wazuh-App-Overview-Office-Attacks-By-Agent' tab='office' {...props} />
+          component: (props) => <KibanaVis visID='Wazuh-App-Overview-Office-Agents-status' tab='office' {...props} />
         },
         {
           width: 30,
-          component: (props) => <KibanaVis visID='Wazuh-App-Overview-Office-Attacks-By-Technique' tab='office' {...props} />
+          component: (props) => <KibanaVis visID='Wazuh-App-Overview-Office-Alert-level-evolution' tab='office' {...props} />
         },
       ]
     },

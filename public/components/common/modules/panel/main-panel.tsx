@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
   EuiFlexGroup,
   EuiFlexItem,
@@ -16,7 +16,7 @@ import { FilterHandler } from '../../../../utils/filter-handler';
 import { TabVisualizations } from '../../../../factories/tab-visualizations';
 
 
-export const MainPanel = ({ sidePanelChildren, tab='general', moduleConfig = {}, ...props }) => {
+export const MainPanel = ({ sidePanelChildren, tab = 'general', moduleConfig = {}, ...props }) => {
 
   const [viewId, setViewId] = useState('main');
 
@@ -61,7 +61,8 @@ export const MainPanel = ({ sidePanelChildren, tab='general', moduleConfig = {},
   }
 
   const toggleView = (id = 'main') => {
-    setViewId(id);
+    if (id != viewId)
+      setViewId(id);
   }
 
   /**
@@ -69,11 +70,11 @@ export const MainPanel = ({ sidePanelChildren, tab='general', moduleConfig = {},
    * @param props 
    * @returns React.Component
    */
-  const ModuleContent = () => {
+  const ModuleContent = useCallback(() => {
 
     const View = moduleConfig[viewId].component;
     return <WzReduxProvider><View changeView={toggleView} /></WzReduxProvider>
-  }
+  }, [viewId])
 
   return (
     <EuiFlexGroup style={{ margin: '0 8px' }}>

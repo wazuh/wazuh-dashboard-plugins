@@ -2,10 +2,10 @@ import React from 'react';
 import KibanaVis from '../../../../kibana-integrations/kibana-vis';
 
 
-export const MainViewConfig = {  
+export const MainViewConfig = {
   rows: [
     {
-      height: 300,
+      height: 110,
       columns: [
         {
           width: 50,
@@ -13,9 +13,31 @@ export const MainViewConfig = {
         },
         {
           width: 50,
-          component: (props) => <KibanaVis visID='Wazuh-App-Overview-Office-Metric-alerts' tab='office' {...props} />
+          component: (props) => <KibanaVis visID='Wazuh-App-Overview-Office-Alerts-Top-Mitre' tab='office' {...props} />
         },
       ]
-    }
+    },
+    {
+      height: 300,
+      columns: [
+        {
+          width: 50,
+          component: (props) => <KibanaVis visID='Wazuh-App-Overview-Office-Alert-level-evolution' tab='office' {...props} />
+        },
+        {
+          width: 50,
+          component: (props) => <KibanaVis visID='Wazuh-App-Overview-Office-Top-5-agents-Evolution' tab='office' {...props} />
+        },
+      ]
+    },
+    {
+      height: 300,
+      columns: [
+        {
+          width: 50,
+          component: (props) => <KibanaVis visID='Wazuh-App-Overview-Office-Alerts-summary' tab='office' {...props} />
+        },
+      ]
+    },
   ]
 };
