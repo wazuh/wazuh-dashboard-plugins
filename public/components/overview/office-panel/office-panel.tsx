@@ -15,38 +15,40 @@ import React, { useEffect, useState } from 'react';
 import { MainPanel } from '../../common/modules/panel';
 import { withErrorBoundary } from '../../common/hocs';
 import { CustomSearchBar } from '../../common/custom-search-bar';
-import { filtersValues } from './search-bar-config';
 import { OfficeStats } from './views';
 import { queryConfig } from '../../../react-services/query-config';
-import { ModuleConfig } from './config';
+import { ModuleConfig, filtersValues } from './config';
 
 export const OfficePanel = withErrorBoundary(() => {
 
-    const [moduleStatsList, setModuleStatsList] = useState([]);
-    useEffect(() => {
-        (async () => {
-            try {
-                const modulesConfig = await queryConfig(
-                    '000',
-                    [{ component: 'wmodules', configuration: 'wmodules' }]
-                );
-                const config = Object.entries(modulesConfig["wmodules-wmodules"].affected_items[0].wmodules
-                    .filter((module) => { return Object.keys(module)[0] == 'sca' })[0]['sca']).map((configProp) => {
-                        const description = Array.isArray(configProp[1]) ? configProp[1].join(', ') : configProp[1];
-                        return { title: configProp[0], description }
-                    })
-                setModuleStatsList(config);
-            } catch (error) {
-                setModuleStatsList([{ title: 'Module Unavailable', description: '' }]);
-            }
-        }
-        )();
-    }, [])
-    return (
-        <>
-        <CustomSearchBar filtersValues={filtersValues}/>
-        <MainPanel moduleConfig={ModuleConfig} tab={'office'}
-            sidePanelChildren={<OfficeStats listItems={moduleStatsList} />} />
-        </>
-    )
+  const [moduleStatsList, setModuleStatsList] = useState([]);
+
+  /** Get Office 365 Side Panel Module info **/
+  useEffect(() => {
+    (async () => {
+      try {
+        const modulesConfig = await queryConfig(
+          '000',
+          [{ component: 'wmodules', configuration: 'wmodules' }]
+        );
+        const config = Object.entries(modulesConfig["wmodules-wmodules"].affected_items[0].wmodules
+          .filter((module) => { return Object.keys(module)[0] == 'sca' })[0]['sca']).map((configProp) => { //<-- change module name
+            const description = Array.isArray(configProp[1]) ? configProp[1].join(', ') : configProp[1];
+            return { title: configProp[0], description }
+          })
+        setModuleStatsList(config);
+      } catch (error) {
+        setModuleStatsList([{ title: 'Module Unavailable', description: '' }]);
+      }
+    }
+    )();
+  }, [])
+
+  return (
+    <>
+      <CustomSearchBar filtersValues={filtersValues} />
+      <MainPanel moduleConfig={ModuleConfig} tab={'office'}
+        sidePanelChildren={<OfficeStats listItems={moduleStatsList} />} />
+    </>
+  )
 });

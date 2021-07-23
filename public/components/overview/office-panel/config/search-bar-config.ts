@@ -26,6 +26,33 @@ export const filtersValues = [
             }
         ]
     },
+    {   
+        type: 'combobox',
+        key: 'agent.name',
+        values:[
+            {
+                key:'agent.name',
+                label: 'Amazon',
+                
+            },
+            {
+                key:'agent.name',
+                label: 'Centos',
+            },
+            {
+                key:'agent.name',
+                label: '003',
+            },
+            {
+                key:'agent.name',
+                label: '004',
+            },
+            {
+                key:'agent.name',
+                label: '006',
+            }
+        ]
+    },
     {
         type: 'combobox',
         key: 'cluster.name',

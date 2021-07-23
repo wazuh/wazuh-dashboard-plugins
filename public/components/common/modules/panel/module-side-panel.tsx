@@ -1,4 +1,4 @@
-import { EuiCollapsibleNav, EuiButtonEmpty, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
+import { EuiCollapsibleNav, EuiButtonEmpty } from '@elastic/eui';
 import React, { useState } from 'react';
 import './module-side-panel.scss';
 
@@ -20,7 +20,7 @@ export const ModuleSidePanel = ({ navIsDocked = false, children, ...props }) => 
       <div>
         <EuiButtonEmpty style={{ float: 'right' }} onClick={() => setNavIsOpen(!navIsOpen)} iconType={'cross'}>
         </EuiButtonEmpty>
-        <div style={{ padding: 16 }}>
+        <div className={'wz-padding-16'}>
           {children}
         </div>
       </div>

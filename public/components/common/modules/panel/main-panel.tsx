@@ -20,18 +20,6 @@ export const MainPanel = ({ sidePanelChildren, tab = 'general', moduleConfig = {
 
   const [viewId, setViewId] = useState('main');
 
-  const KibanaServices = getDataPlugin().query;
-  const filterManager = KibanaServices.filterManager;
-  const timefilter = KibanaServices.timefilter.timefilter;
-
-  const [isLoading, setIsLoading] = useState(false);
-  const [filterParams, setFilterParams] = useState({
-    filters: filterManager.getFilters() || [],
-    query: { language: 'kuery', query: '' },
-    time: timefilter.getTime(),
-  });
-
-
   useEffect(() => {
     (async () => {
       const tabVisualizations = new TabVisualizations();
@@ -45,20 +33,6 @@ export const MainPanel = ({ sidePanelChildren, tab = 'general', moduleConfig = {
     })()
   }, [viewId])
 
-  const onQuerySubmit = (payload: { dateRange: TimeRange, query: Query }) => {
-    const { query, dateRange } = payload;
-    const filters = { query, time: dateRange, filters: filterParams.filters };
-    setIsLoading(true);
-    setFilterParams(filters);
-    setIsLoading(false);
-  }
-
-  const onFiltersUpdated = (filters: Filter[]) => {
-    const { query, time } = filterParams;
-    const updatedFilterParams = { query, time, filters };
-    setIsLoading(true);
-    setFilterParams(updatedFilterParams);
-  }
 
   const toggleView = (id = 'main') => {
     if (id != viewId)
