@@ -123,7 +123,7 @@ export const officeRules = {
       id: '91533',
       mail: false,
       firedtimes: 3,
-      groups: ['ExchangeAdmin', 'hipaa_164.312.b', 'pci_dss_10.2.2', 'pci_dss_10.6.1'],
+      groups: ['office365', 'ExchangeAdmin', 'hipaa_164.312.b', 'pci_dss_10.2.2', 'pci_dss_10.6.1'],
     },
   },
   2: {
@@ -140,7 +140,7 @@ export const officeRules = {
       id: '91534',
       mail: false,
       firedtimes: 3,
-      groups: ['ExchangeItem', 'hipaa_164.312.b', 'pci_dss_10.6.2'],
+      groups: ['office365', 'ExchangeItem', 'hipaa_164.312.b', 'pci_dss_10.6.2'],
     },
   },
   4: {
@@ -156,7 +156,7 @@ export const officeRules = {
       id: '91536',
       mail: false,
       firedtimes: 3,
-      groups: ['SharePoint', 'hipaa_164.312.b', 'pci_dss_10.6.2'],
+      groups: ['office365', 'SharePoint', 'hipaa_164.312.b', 'pci_dss_10.6.2'],
     },
   },
   6: {
@@ -173,6 +173,7 @@ export const officeRules = {
       mail: false,
       firedtimes: 3,
       groups: [
+        'office365',
         'SharePointFileOperation',
         'hipaa_164.312.b',
         'hipaa_164.312.c.1',
@@ -194,7 +195,7 @@ export const officeRules = {
       id: '91539',
       mail: false,
       firedtimes: 3,
-      groups: ['AzureActiveDirectory', 'hipaa_164.312.b', 'pci_dss_10.6.2'],
+      groups: ['office365', 'AzureActiveDirectory', 'hipaa_164.312.b', 'pci_dss_10.6.2'],
     },
   },
   14: {
@@ -210,7 +211,7 @@ export const officeRules = {
       id: '91544',
       mail: false,
       firedtimes: 3,
-      groups: ['SharePoint', 'hipaa_164.312.b', 'pci_dss_10.6.2'],
+      groups: ['office365', 'SharePoint', 'hipaa_164.312.b', 'pci_dss_10.6.2'],
     },
   },
   15: {
@@ -227,6 +228,7 @@ export const officeRules = {
       mail: false,
       firedtimes: 3,
       groups: [
+        'office365',
         'AzureActiveDirectoryStsLogon',
         'hipaa_164.312.a.2.I,hipaa_164.312.b',
         'hipaa_164.312.d',
@@ -249,6 +251,7 @@ export const officeRules = {
       mail: false,
       firedtimes: 3,
       groups: [
+        'office365',
         'SecurityComplianceCenterEOPCmdlet',
         'hipaa_164.312.b',
         'pci_dss_10.2.2',
@@ -269,7 +272,7 @@ export const officeRules = {
       id: '91564',
       mail: false,
       firedtimes: 3,
-      groups: ['SharePointListOperation', 'hipaa_164.312.b', 'pci_dss_10.6.2'],
+      groups: ['office365', 'SharePointListOperation', 'hipaa_164.312.b', 'pci_dss_10.6.2'],
     },
   },
   52: {
@@ -285,7 +288,7 @@ export const officeRules = {
       id: '91580',
       mail: false,
       firedtimes: 4,
-      groups: ['DataInsightsRestApiAudit', 'hipaa_164.312.b', 'pci_dss_10.6.2'],
+      groups: ['office365', 'DataInsightsRestApiAudit', 'hipaa_164.312.b', 'pci_dss_10.6.2'],
     },
   },
 };
