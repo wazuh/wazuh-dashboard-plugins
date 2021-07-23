@@ -33,9 +33,8 @@ export const CustomSearchBar = ({ ...props }) => {
     const [customFilters, setCustomFilters] = useState(props.filtersValues)
     const [avancedFiltersState, setAvancedFiltersState] = useState(false);
     const [selectedOptions, setSelectedOptions] = useState([]);
-    const [defaultFilters, setDefaultFilters] = useState(filterManager.getFilters());
 
-        
+    const [defaultFilters, setDefaultFilters] = useState(filterManager.getFilters());
 
     const onQuerySubmit = (payload: { dateRange: TimeRange, query: Query }) => {
         const { query, dateRange } = payload;
@@ -48,18 +47,20 @@ export const CustomSearchBar = ({ ...props }) => {
     const onFiltersUpdated = (filters: Filter[]) => {
         const { query, time } = filterParams;
         const updatedFilterParams = { query, time, filters };
-        refreshCustomFilters(filters)
         setLoading(true);
+        refreshCustomSelectedFilter()
         setFilterParams(updatedFilterParams);
     }
 
-    const refreshCustomFilters = (filters) => {
+    const getCustomFilters = (filters) => {
         const deleteDefaultFilters = []
         filters.forEach(filter => {
                 if(!defaultFilters.some(item => item.meta.key === filter.meta.key)){
                    deleteDefaultFilters.push(filter)
                 }
          })
+
+         return deleteDefaultFilters
     }
 
     const changeSwitch = () => {
@@ -90,7 +91,7 @@ export const CustomSearchBar = ({ ...props }) => {
         return { meta, $state, query };
     };
 
-    const setFilters = async (values) => {
+    const setKibanaFilters = async (values) => {
         const indexPattern =  await getIndexPattern()
         const newFilters = []
         if(!values.length){
@@ -107,18 +108,36 @@ export const CustomSearchBar = ({ ...props }) => {
         }   
     }
 
-    const onChange = (values) => {
-        setFilters(values)
-        setSelectedOptions(values);
+    const refreshCustomSelectedFilter = () => {
+        const filters = filterManager.getFilters()
+        const customFilters = getCustomFilters(filters)
+        const filtersUpdated = []
+        customFilters.forEach(item => {
+            const filterObj = {
+                key: item.meta.key,
+                label: item.meta.params.query,
+            }
+            filtersUpdated.push(filterObj)
+
+        })
+        setSelectedOptions(filtersUpdated)
+        console.log(customFilters)
+       
     };
+
+    const onChange = async(values) => {
+        await setKibanaFilters(values)
+        refreshCustomSelectedFilter();
+    };
+
 
     const getComponent = (item) => {
         var types = {
             'default': <></>,
             'combobox': <EuiComboBox
-                        placeholder={"Select "+item.values[0].key+" or create options"}
+                        placeholder={"Select "+item.key}
                         options={item.values}
-                        selectedOptions={selectedOptions || []}
+                        selectedOptions={selectedOptions}
                         onChange={onChange}
                         isClearable={true}
                     />
@@ -128,11 +147,11 @@ export const CustomSearchBar = ({ ...props }) => {
 
     return (
         <>
-        <EuiFlexGroup alignItems='center'>
+        <EuiFlexGroup alignItems='center' style={{ margin: '0 8px' }}>
             {
                 avancedFiltersState === false ?
-                customFilters.map((item) => (
-                    <EuiFlexItem grow={2}>
+                customFilters.map((item,key) => (
+                    <EuiFlexItem grow={2} key={key}>
                         {getComponent(item)}             
                     </EuiFlexItem>
                 ))
@@ -149,8 +168,8 @@ export const CustomSearchBar = ({ ...props }) => {
             />
             </EuiFlexItem>
         </EuiFlexGroup>
-        <EuiFlexGroup justifyContent='flexEnd'>
-            <EuiFlexItem grow={false} style={{ paddingTop: '10px' }}>
+        <EuiFlexGroup justifyContent='flexEnd' style={{ margin: '0 20px' }}>
+            <EuiFlexItem grow={false}>
                 <EuiSwitch
                 label="Advanced filters"
                 checked={avancedFiltersState}
@@ -158,7 +177,6 @@ export const CustomSearchBar = ({ ...props }) => {
                 />
             </EuiFlexItem>
         </EuiFlexGroup>
-        <EuiSpacer />
     </>
     )
 };

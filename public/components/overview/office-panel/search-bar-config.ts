@@ -28,15 +28,15 @@ export const filtersValues = [
     },
     {
         type: 'combobox',
-        key: 'cluster.name',
+        key: 'agent.ip',
         values:[
             {
-                key:'cluster.name',
-                label: 'wazuh',
+                key:'agent.ip',
+                label: '24.273.97.14',
             },
             {
-                key:'cluster.name',
-                label: 'test',
+                key:'agent.ip',
+                label: '197.17.1.4',
             },
         ]
     }
