@@ -150,7 +150,7 @@ export const CustomSearchBar = ({ ...props }) => {
         <EuiFlexGroup alignItems='center' style={{ margin: '0 8px' }}>
             {
                 avancedFiltersState === false ?
-                customFilters.map((item,key) => (
+                customFilters.map((item, key) => (
                     <EuiFlexItem grow={2} key={key}>
                         {getComponent(item)}             
                     </EuiFlexItem>

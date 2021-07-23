@@ -1,5 +1,5 @@
 import React from 'react';
-import { EuiFlexGroup, EuiFlexItem, EuiPanel } from '@elastic/eui';
+import { EuiFlexGroup} from '@elastic/eui';
 
 export const OfficeBody = ({ changeView, rows = [] }) => {
 
@@ -12,10 +12,7 @@ export const OfficeBody = ({ changeView, rows = [] }) => {
           {
             row.columns.map((column, key) => {
               const growthFactor = Math.max((column.width ? parseInt(column.width / 10) : 1), 1);
-
-              return <EuiFlexItem key={key} grow={growthFactor}>
-                <EuiPanel paddingSize={'s'} ><div style={{ height: '100%' }}><column.component onRowClick={() => changeView('drilldown')} /></div></EuiPanel>
-              </EuiFlexItem>
+              return <column.component width={growthFactor} key={key} onRowClick={() => changeView('drilldown')} />
             })
           }
         </EuiFlexGroup>

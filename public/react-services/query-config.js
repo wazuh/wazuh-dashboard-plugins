@@ -14,6 +14,7 @@ import { WzRequest } from './wz-request';
 import { getErrorOrchestrator } from './common-services';
 import { AppState } from './app-state';
 import { UI_LOGGER_LEVELS } from '../../common/constants';
+import { UI_ERROR_SEVERITIES } from './error-orchestrator/types';
 
 export const queryConfig = async (agentId, sections, node = false) => {
   try {
@@ -29,7 +30,7 @@ export const queryConfig = async (agentId, sections, node = false) => {
     }
 
     const result = {};
-    for (const section in sections) {
+    await Promise.all(sections.map(async(section)=> {
       const { component, configuration } = section;
       if (
         !component ||
@@ -64,7 +65,7 @@ export const queryConfig = async (agentId, sections, node = false) => {
         };
         getErrorOrchestrator().handleError(options);
       }
-    }
+    }));
     return result;
   } catch (error) {
     const options = {

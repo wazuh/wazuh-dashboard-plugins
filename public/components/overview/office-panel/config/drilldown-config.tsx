@@ -1,19 +1,19 @@
 import React from 'react';
-import KibanaVis from '../../../../kibana-integrations/kibana-vis';
+import { VisCard } from '../components/vis-card';
 
 
 export const DrilldownConfig = {
   rows: [
     {
-      height: 130,
+      height: 230,
       columns: [
         {
           width: 50,
-          component: (props) => <KibanaVis visID='Wazuh-App-Overview-Office-Metric-alerts' tab='office' {...props} />
+          component: (props) => <VisCard id='Wazuh-App-Overview-Office-Metric-alerts' tab='office' {...props} />
         },
         {
           width: 50,
-          component: (props) => <KibanaVis visID='Wazuh-App-Overview-Office-Authentication-success' tab='office' {...props} />
+          component: (props) => <VisCard id='Wazuh-App-Overview-Office-Authentication-success' tab='office' {...props} />
         },
       ]
     },
@@ -22,11 +22,11 @@ export const DrilldownConfig = {
       columns: [
         {
           width: 70,
-          component: (props) => <KibanaVis visID='Wazuh-App-Overview-Office-Agents-status' tab='office' {...props} />
+          component: (props) => <VisCard id='Wazuh-App-Overview-Office-Agents-status' tab='office' {...props} />
         },
         {
           width: 30,
-          component: (props) => <KibanaVis visID='Wazuh-App-Overview-Office-Alert-level-evolution' tab='office' {...props} />
+          component: (props) => <VisCard id='Wazuh-App-Overview-Office-Alert-level-evolution' tab='office' {...props} />
         },
       ]
     },
