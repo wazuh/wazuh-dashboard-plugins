@@ -14,6 +14,7 @@ const useEsSearch = ({ preAppliedFilters = [], preAppliedAggs = {}, size = 10 })
   const filterManager = useFilterManager();
   const [esResults, setEsResults] = useState({});
   const [managedFilters, setManagedFilters] = useState<Filter[] | []>([]);
+  const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(0);
   const [query] = useQuery();
@@ -22,6 +23,10 @@ const useEsSearch = ({ preAppliedFilters = [], preAppliedAggs = {}, size = 10 })
     search()
       .then((result) => {
         setEsResults(result);
+        setError(null);
+      })
+      .catch((error)=>{
+        setError(error);
       })
       .finally(() => {
         setIsLoading(false);
@@ -66,7 +71,7 @@ const useEsSearch = ({ preAppliedFilters = [], preAppliedAggs = {}, size = 10 })
     setPage(page - 1 < 0 ? 0 : page - 1);
   };
 
-  return {esResults, isLoading, setPage, nextPage, prevPage};
+  return {esResults, isLoading, error, setPage, nextPage, prevPage};
 };
 
 export { useEsSearch };
