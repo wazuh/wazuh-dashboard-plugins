@@ -1,12 +1,11 @@
-import { EuiPanel } from '@elastic/eui';
 import React from 'react';
-import KibanaVis from '../../../../kibana-integrations/kibana-vis';
+import { VisCard } from '../components/vis-card';
 
 
 export const MainViewConfig = {
   rows: [
     {
-      height: 150,
+      height: 200,
       columns: [
         {
           width: 50,
@@ -14,7 +13,7 @@ export const MainViewConfig = {
         },
         {
           width: 50,
-          component: (props) => <KibanaVis visID='Wazuh-App-Overview-Office-Alerts-Top-Mitre' tab='office' {...props} />
+          component: (props) => <VisCard id='Wazuh-App-Overview-Office-Alerts-Top-Mitre' tab='office' title='' {...props} />
         },
       ]
     },
@@ -23,11 +22,11 @@ export const MainViewConfig = {
       columns: [
         {
           width: 50,
-          component: (props) => <KibanaVis visID='Wazuh-App-Overview-Office-Alert-level-evolution' tab='office' {...props} />
+          component: (props) => <VisCard id='Wazuh-App-Overview-Office-Alert-level-evolution' tab='office' {...props} />
         },
         {
           width: 50,
-          component: (props) => <KibanaVis visID='Wazuh-App-Overview-Office-Top-5-agents-Evolution' tab='office' {...props} />
+          component: (props) => <VisCard id='Wazuh-App-Overview-Office-Top-5-agents-Evolution' tab='office' {...props} />
         },
       ]
     },
@@ -36,7 +35,7 @@ export const MainViewConfig = {
       columns: [
         {
           width: 50,
-          component: (props) => <KibanaVis visID='Wazuh-App-Overview-Office-Alerts-summary' tab='office' {...props} />
+          component: (props) => <VisCard id='Wazuh-App-Overview-Office-Alerts-summary' tab='office' {...props} />
         },
       ]
     },

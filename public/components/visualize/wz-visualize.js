@@ -23,8 +23,7 @@ import {
   EuiButtonIcon,
   EuiDescriptionList,
   EuiCallOut,
-  EuiLink,
-  EuiButtonGroup 
+  EuiLink
 } from '@elastic/eui';
 import WzReduxProvider from '../../redux/wz-redux-provider';
 import { WazuhConfig } from '../../react-services/wazuh-config';
@@ -34,7 +33,7 @@ import { VisHandlers } from '../../factories/vis-handlers';
 import { RawVisualizations } from '../../factories/raw-visualizations';
 import { Metrics } from '../overview/metrics/metrics';
 import { PatternHandler } from '../../react-services/pattern-handler';
-import { getToasts, getAngularModule, getDataPlugin } from '../../kibana-services';
+import { getToasts } from '../../kibana-services';
 import { SecurityAlerts } from './components';
 import { toMountPoint } from '../../../../../src/plugins/kibana_react/public';
 import { withReduxProvider,withErrorBoundary } from '../common/hocs';
@@ -42,9 +41,6 @@ import { compose } from 'redux';
 import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
-import { AppState } from '../../react-services/';
-import { buildPhraseFilter } from '../../../../../src/plugins/data/common';
-import { getIndexPattern } from '../overview/mitre/lib';
 
 
 const visHandler = new VisHandlers();
@@ -59,8 +55,7 @@ export const WzVisualize = compose (withErrorBoundary,withReduxProvider) (class 
       thereAreSampleAlerts: false,
       hasRefreshedKnownFields: false,
       refreshingKnownFields: [],
-      refreshingIndex: true,
-      dashboard: 'main'
+      refreshingIndex: true
     };
     this.metricValues = false;
     this.rawVisualizations = new RawVisualizations();
@@ -78,8 +73,6 @@ export const WzVisualize = compose (withErrorBoundary,withReduxProvider) (class 
     this._isMount = true;
     visHandler.removeAll();
     this.agentsStatus = false;
-    const app = getAngularModule();
-    this.$rootScope = app.$injector.get('$rootScope');
     if (!this.monitoringEnabled) {
       const data = await this.wzReq.apiReq('GET', '/agents/summary/status', {});
       const result = ((data || {}).data || {}).data || false;
@@ -129,29 +122,12 @@ export const WzVisualize = compose (withErrorBoundary,withReduxProvider) (class 
     }
   }
 
-  async componentDidUpdate(prevProps, prevState) {
+  async componentDidUpdate(prevProps) {
     if (prevProps.isAgent !== this.props.isAgent) {
       this._isMount &&
         this.setState({ visualizations: !!this.props.isAgent ? agentVisualizations : visualizations });
       typeof prevProps.isAgent !== 'undefined' && visHandler.removeAll();
     }
-
-    // if(prevState.dashboard !== this.state.dashboard){
-    //   console.log(prevState.dashboard, this.state.dashboard);
-    //   this.$rootScope.showModuleDashboard = this.props.selectedTab;
-    //   await ModulesHelper.getDiscoverScope();
-    //   if (this._isMount) {
-    //     this.$rootScope.moduleDiscoverReady = true;
-    //     this.$rootScope.$applyAsync();
-    //   }
-    //   VisFactoryHandler.clearAll();
-    //   await VisFactoryHandler.buildOverviewVisualizations(
-    //     new FilterHandler(AppState.getCurrentPattern()),
-    //     this.props.selectedTab,
-    //     'dashboard',
-    //     false
-    //   );
-    // }
   }
 
   componentWillUnmount() {
@@ -298,66 +274,6 @@ export const WzVisualize = compose (withErrorBoundary,withReduxProvider) (class 
 
     return (
       <Fragment>
-        {this.props.selectedTab === 'office' && (
-          <EuiFlexGroup justifyContent='flexEnd' gutterSize='s'style={{ margin: '0 8px 16px 8px' }}>
-            <EuiFlexItem grow={false}>
-              <EuiButtonGroup
-                legend="This is a basic group"
-                options={['Main','AzureAD', 'Exchange', 'Sharepoint'].map(office365Dashboard => ({id: office365Dashboard.toLowerCase(), label: office365Dashboard}))}
-                idSelected={this.state.dashboard}
-                onChange={(id) => {
-                  this.setState({dashboard: id});
-                  // getDataPlugin().query.filterManager.
-
-                  getIndexPattern().then(indexPattern => {
-                    // const filter = {
-                    //   ...buildPhraseFilter({ name: 'syscheck.path', type: 'text' }, id, indexPattern/*AppState.getCurrentPattern()*/),
-                    //   $state: { store: 'appState', isImplicit: true },
-                    // };
-                    // delete filter.meta.removable
-                    // filter.query = {
-                    //   "match": {
-                    //     'syscheck.path': {
-                    //       query: id,
-                    //       type: 'phrase'
-                    //     }
-                    //   }
-                    // }
-
-                    const filter = id !== 'main' ? [{
-                      "meta": {
-                        "alias": null,
-                        "disabled": false,
-                        "key": "syscheck.path",
-                        "negate": false,
-                        "params": { "query": id },
-                        "type": "phrase",
-                        "index": AppState.getCurrentPattern() || WAZUH_ALERTS_PATTERN,
-                        "controlledBy": "wazuh"
-                      },
-                      "query": {
-                        "match": {
-                          'syscheck.path': {
-                            query: id,
-                            type: 'phrase'
-                          }
-                        }
-                      },
-                      "$state": { "store": "appState", "isImplicit": true},
-                    }] : [];
-                    
-                    const filters = getDataPlugin().query.filterManager.getFilters()
-                      .filter(filter => filter.meta.controlledBy !== 'wazuh')
-                    // getDataPlugin().query.filterManager.addFilters([filter]);
-                    getDataPlugin().query.filterManager.setFilters([...filters, ...filter]);
-                  })
-                }}
-                color="primary"
-              />
-            </EuiFlexItem>
-          </EuiFlexGroup>
-        )}
-        
         {/* Sample alerts Callout */}
         {this.state.thereAreSampleAlerts && this.props.resultState === 'ready' && (
           <EuiCallOut title='This dashboard contains sample data' color='warning' iconType='alert' style={{ margin: '0 8px 16px 8px' }}>
@@ -379,30 +295,25 @@ export const WzVisualize = compose (withErrorBoundary,withReduxProvider) (class 
           {selectedTab &&
             selectedTab !== 'welcome' &&
             visualizations[selectedTab] &&
-            Object.keys(visualizations).filter(visualization => visualization.startsWith(selectedTab)).map(visualization => {
-              console.log(visualization, this.state.dashboard, (this.state.dashboard !== 'main' && `${selectedTab}_${this.state.dashboard}`.toLowerCase() === visualization) || this.state.dashboard === 'main' && selectedTab === visualization)
-              return visualizations[visualization].rows.map((row, i) => {
-                return (
-                  <EuiFlexGroup
-                    key={i}
-                    style={{
-                      display: (row.hide || (this.state.dashboard !== 'main' && `${selectedTab}_${this.state.dashboard}`.toLowerCase() !== visualization) || (this.state.dashboard === 'main' && selectedTab !== visualization) ) && 'none',
-                      height: row.height || 0 + 'px',
-                      margin: 0,
-                      maxWidth: '100%'
-                    }}
-                    data-id={visualization}
-                  >
-                    {row.vis.map((vis, n) => {
-                      return !vis.hasRows
-                        ? renderVisualizations(vis)
-                        : renderVisualizationRow(vis.rows, vis.width, n);
-                    })}
-                  </EuiFlexGroup>
-                );
-              });
-            }
-            )}
+            visualizations[selectedTab].rows.map((row, i) => {
+              return (
+                <EuiFlexGroup
+                  key={i}
+                  style={{
+                    display: row.hide && 'none',
+                    height: row.height || 0 + 'px',
+                    margin: 0,
+                    maxWidth: '100%'
+                  }}
+                >
+                  {row.vis.map((vis, n) => {
+                    return !vis.hasRows
+                      ? renderVisualizations(vis)
+                      : renderVisualizationRow(vis.rows, vis.width, n);
+                  })}
+                </EuiFlexGroup>
+              );
+            })}
         </EuiFlexItem>
         <EuiFlexGroup style={{ margin: 0 }}>
           <EuiFlexItem>
