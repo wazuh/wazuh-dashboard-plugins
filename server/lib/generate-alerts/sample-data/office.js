@@ -1,5 +1,5 @@
 /*
- * Wazuh app - AWS sample data
+ * Wazuh app - Office365 sample data
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
