@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { getDataPlugin } from '../../../kibana-services';
 import { useQuery, useIndexPattern, useFilterManager } from '.';
 import _ from 'lodash';
+import { Filter, IndexPattern } from 'src/plugins/data/public';
 
 /*
 You can find more info on how to use the preAppliedAggs object at https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-terms-aggregation.html
@@ -12,13 +13,19 @@ const useEsSearch = ({ preAppliedFilters = [], preAppliedAggs = {}, size = 10 })
   const indexPattern = useIndexPattern();
   const filterManager = useFilterManager();
   const [esResults, setEsResults] = useState({});
-  const [managedFilters, setManagedFilters] = useState([]);
+  const [managedFilters, setManagedFilters] = useState<Filter[] | []>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(0);
   const [query] = useQuery();
   useEffect(() => {
-    search().then((result) => {
-      setEsResults(result);
-    });
+    setIsLoading(true);
+    search()
+      .then((result) => {
+        setEsResults(result);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   }, [indexPattern, query, managedFilters, page]);
   useEffect(() => {
     let filterSubscriber = filterManager.getUpdates$().subscribe(() => {
@@ -30,21 +37,21 @@ const useEsSearch = ({ preAppliedFilters = [], preAppliedAggs = {}, size = 10 })
         filterSubscriber.unsubscribe();
       };
     });
-  });
+  }, []);
 
   const search = async () => {
     if (indexPattern) {
-      const esQuery = await data.query.getEsQuery(indexPattern);
+      const esQuery = await data.query.getEsQuery(indexPattern as IndexPattern);
       const searchSource = await data.search.searchSource.create();
       const combined = [...esQuery.bool.filter, ...preAppliedFilters, ...managedFilters];
       const results = await searchSource
         .setParent(undefined)
         .setField('filter', combined)
-        .setField('query', esQuery)
+        .setField('query', query)
         .setField('aggs', preAppliedAggs)
         .setField('size', size)
         .setField('from', page * size)
-        .setField('index', indexPattern)
+        .setField('index', indexPattern as IndexPattern)
         .fetch();
       return results;
     } else {
@@ -59,12 +66,7 @@ const useEsSearch = ({ preAppliedFilters = [], preAppliedAggs = {}, size = 10 })
     setPage(page - 1 < 0 ? 0 : page - 1);
   };
 
-  return {
-    esResults,
-    setPage,
-    nextPage,
-    prevPage,
-  };
+  return {esResults, isLoading, setPage, nextPage, prevPage};
 };
 
 export { useEsSearch };

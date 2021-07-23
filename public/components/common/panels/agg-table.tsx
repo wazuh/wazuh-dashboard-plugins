@@ -1,4 +1,4 @@
-import { EuiBasicTable, EuiPanel, EuiTitle } from '@elastic/eui';
+import { EuiBasicTable, EuiPanel, EuiTitle, EuiBasicTableColumn } from '@elastic/eui';
 import { useEsSearch } from '../hooks';
 import React from 'react';
 
@@ -20,9 +20,9 @@ export const AggTable = ({
       },
     },
   };
-  const { esResults } = useEsSearch({ preAppliedAggs });
+  const  {esResults, isLoading}  = useEsSearch({ preAppliedAggs });
   const buckets = ((esResults.aggregations || {}).buckets || {}).buckets || [];
-  const columns = [
+  const columns:EuiBasicTableColumn<any>[] = [
     {
       field: 'key',
       name: aggLabel,
@@ -48,7 +48,7 @@ export const AggTable = ({
       <EuiTitle {...titleProps}>
         <h2>{tableTitle}</h2>
       </EuiTitle>
-      <EuiBasicTable items={buckets} columns={columns} rowProps={getRowProps} />
+      <EuiBasicTable items={buckets} columns={columns} rowProps={getRowProps} loading={isLoading} />
     </EuiPanel>
   );
 };
