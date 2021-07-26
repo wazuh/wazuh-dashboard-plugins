@@ -114,31 +114,6 @@ export const visualizations = {
   office: {
     rows: [
       {
-        height: 160,
-        vis: [
-          {
-            // title: 'Max Rule Level',
-            id: 'Wazuh-App-Overview-Office-Metric-Max-Rule-Level',
-            width: 25
-          },
-          {
-            // title: 'Malware Alerts',
-            id: 'Wazuh-App-Overview-Office-Metric-Malware-Alerts',
-            width: 25
-          },
-          {
-            // title: 'Suspicious Downloads',
-            id: 'Wazuh-App-Overview-Office-Metric-Suspicious-Downloads',
-            width: 25
-          },
-          {
-            // title: 'Full Access Permissions',
-            id: 'Wazuh-App-Overview-Office-Metric-FullAccess-Permissions',
-            width: 25
-          }
-        ]
-      },
-      {
         height: 320,
         vis: [
           {

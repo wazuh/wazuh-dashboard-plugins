@@ -101,7 +101,13 @@ export const Metrics = withAllowedAgents(class Metrics extends Component {
         { name: "Last scan score", type: "custom", filter: { phrase: "oscap-report", field:"rule.groups"} , agg: { "customAggResult": { "terms": { "field": "timestamp", "order": { "_term": "desc" }, "size": 1 }, "aggs": { "aggResult": { "terms": { "field": "data.oscap.scan.score" } } } }}},
         { name: "Highest scan score", type: "custom", filter: { phrase: "oscap-report", field:"rule.groups"} , agg: { "customAggResult": { "terms": { "field": "data.oscap.scan.score", "order": { "_term": "desc" }, "size": 1 }, "aggs": { "aggResult": { "terms": { "field": "data.oscap.scan.score" } } } }}, color: "secondary"},
         { name: "Lowest scan score", type: "custom", filter: { phrase: "oscap-report", field:"rule.groups"} , agg: { "customAggResult": { "terms": { "field": "data.oscap.scan.score", "order": { "_term": "asc" }, "size": 1 }, "aggs": { "aggResult": { "terms": { "field": "data.oscap.scan.score" } } } }}, color: "danger"},
-      ]
+      ],
+      office: [
+        { name: "Max Rule Level", type: "custom", filter: { phrase: "office365", field:"rule.groups"} , agg: { "customAggResult": { "terms": { "field": "timestamp", "order": { "_term": "desc" }, "size": 1 }, "aggs": { "aggResult": { "terms": { "field": "rule.level" } } } }}},
+        { name: "Suspicious Downloads", type: "phrase", value: "91724", field: "rule.id", color: "danger"}, 
+        { name: "Full Access Permissions", type: "phrase", value: "91725", field: "rule.id"},
+        { name: "Phishing and Malware", type: "phrases", values: ["91556", "91575", "91700"], field: "rule.id",color: "danger"},
+      ],
     }
   }
 
