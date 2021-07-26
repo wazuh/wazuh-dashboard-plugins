@@ -13,20 +13,23 @@
 import { BaseHandler, IWzSuggestItem, QInterpreter } from './';
 import { suggestItem, IWzSearchBarProps } from '../wz-search-bar';
 import { queryObject } from './q-interpreter';
+import { UI_LOGGER_LEVELS } from '../../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../../react-services/common-services';
 
 interface ISuggestHandlerProps extends IWzSearchBarProps {
-  setStatus: Function
-  setIsOpen: Function
-  setInvalid: Function
+  setStatus: Function;
+  setIsOpen: Function;
+  setInvalid: Function;
 }
 export class SuggestHandler extends BaseHandler {
   suggestItems: IWzSuggestItem[];
   inputStage: 'field' | 'operator' | 'value' | 'conjuntion';
   searchType: 'search' | 'q' | 'params';
-  filters: { field: string, value: string | number }[];
+  filters: { field: string; value: string | number }[];
   props: ISuggestHandlerProps;
   setInputValue: Function;
-  inputRef!: HTMLElement
+  inputRef!: HTMLElement;
   lastCall: number;
   status: 'unchanged' | 'loading' = 'unchanged';
   operators = {
@@ -36,7 +39,7 @@ export class SuggestHandler extends BaseHandler {
     '<': 'Smaller',
     '~': 'Like',
     ':': 'Equals',
-  }
+  };
 
   constructor(props, setInputValue) {
     super();
@@ -49,16 +52,14 @@ export class SuggestHandler extends BaseHandler {
     this.lastCall = 0;
   }
 
-  combine = (...args) => (input) => args.reduceRight((acc, arg) => acc = arg(acc), input)
+  combine = (...args) => (input) => args.reduceRight((acc, arg) => (acc = arg(acc)), input);
 
-  someItem = (queryElement, key) => this.suggestItems.some(item => item[key] === queryElement);
-  findItem = (queryElement, key) => this.suggestItems.find(item => item[key] === queryElement);
+  someItem = (queryElement, key) => this.suggestItems.some((item) => item[key] === queryElement);
+  findItem = (queryElement, key) => this.suggestItems.find((item) => item[key] === queryElement);
 
   checkType = (input: string) => {
-    const operator = /:|=|!=|~|<|>/.exec(input)
-    this.searchType = operator
-      ? operator[0] === ':' ? 'params' : 'q'
-      : 'search'
+    const operator = /:|=|!=|~|<|>/.exec(input);
+    this.searchType = operator ? (operator[0] === ':' ? 'params' : 'q') : 'search';
     return input;
   };
 
@@ -66,10 +67,10 @@ export class SuggestHandler extends BaseHandler {
     const { searchType } = this;
     if (searchType === 'search') {
       this.inputStage = 'field';
-      return { field: input }
+      return { field: input };
     } else if (searchType === 'params') {
       this.inputStage = 'value';
-      const { 0: field, 1: value, 2: operator=':' } = input.split(':');
+      const { 0: field, 1: value, 2: operator = ':' } = input.split(':');
       return { field, value, operator };
     } else if (searchType === 'q') {
       const qInterpreter = new QInterpreter(input);
@@ -84,95 +85,122 @@ export class SuggestHandler extends BaseHandler {
       return { conjuntion, field, operator, value };
     }
     return input;
-  }
+  };
 
   checkQuery = async (query: queryObject) => {
     try {
-      
       const { inputStage, lastCall, searchType } = this;
       const { field = '', value = '', operator } = query;
-      if ((operator && !this.someItem(field, 'label'))) throw {error: 'Invalid field', message: `The field '${field}' is not valid`};
+      if (operator && !this.someItem(field, 'label'))
+        throw { error: 'Invalid field', message: `The field '${field}' is not valid` };
       //@ts-ignore
-      if (operator && ((searchType === 'params' && operator !== ':') || (searchType === 'q' && operator === ':')))
-        throw {error: 'Invalid operator', message: `The operator '${operator}' is not valid`};
+      if (
+        operator &&
+        ((searchType === 'params' && operator !== ':') || (searchType === 'q' && operator === ':'))
+      )
+        throw { error: 'Invalid operator', message: `The operator '${operator}' is not valid` };
       const suggestions = [
         ...this.buildSuggestSearch(field),
         ...(value && inputStage === 'value' ? this.buildSuggestApply() : []),
         ...(value && inputStage === 'value' ? this.buildSuggestConjuntions(field) : []),
-        ...((this.someItem(field, 'label') && inputStage !== 'value') ? this.buildSuggestOperator(field) : []),
+        ...(this.someItem(field, 'label') && inputStage !== 'value'
+          ? this.buildSuggestOperator(field)
+          : []),
         ...(inputStage === 'field' ? this.buildSuggestFields(field) : []),
-        ...(inputStage === 'value' ? await this.buildSuggestValues(field, value) : [])
-      ]
+        ...(inputStage === 'value' ? await this.buildSuggestValues(field, value) : []),
+      ];
       if (lastCall === this.lastCall) {
         this.lastCall++;
-        return {suggestions};
+        return { suggestions };
       }
     } catch (error) {
-      return {error}
+      const options = {
+        context: `${SuggestHandler.name}.checkQuery`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+      return { error };
     }
-    throw "New request in progress";
-  }
+    throw 'New request in progress';
+  };
 
-  checkErrors = async (promise)=> {
-    const {suggestions=[], error} = await promise;
+  checkErrors = async (promise) => {
+    const { suggestions = [], error } = await promise;
     if (!error) return suggestions;
-    return [{
-      label: error.error,
-      type: { iconType: 'alert', color: 'tint2' },
-      ...(!!error.message && {description: error.message})
-    }]
-  }
+    return [
+      {
+        label: error.error,
+        type: { iconType: 'alert', color: 'tint2' },
+        ...(!!error.message && { description: error.message }),
+      },
+    ];
+  };
 
-  public buildSuggestItems = this.combine(this.checkErrors, this.checkQuery, this.checkStage, this.checkType);
+  public buildSuggestItems = this.combine(
+    this.checkErrors,
+    this.checkQuery,
+    this.checkStage,
+    this.checkType
+  );
 
   buildSuggestSearch(inputValue): suggestItem[] {
     const { searchDisable } = this.props;
     if (!searchDisable && this.searchType === 'search') {
-      return [{
-        label: inputValue,
-        type: { iconType: 'search', color: 'tint8' },
-        description: 'Search',
-      }]
+      return [
+        {
+          label: inputValue,
+          type: { iconType: 'search', color: 'tint8' },
+          description: 'Search',
+        },
+      ];
     }
-    return []
+    return [];
   }
 
   buildSuggestApply(): suggestItem[] {
-    return [{
-      label: 'Apply filter',
-      type: { iconType: 'kqlFunction', color: 'tint5' },
-      description: 'Click here or press "Enter" to apply the filter',
-    }]
+    return [
+      {
+        label: 'Apply filter',
+        type: { iconType: 'kqlFunction', color: 'tint5' },
+        description: 'Click here or press "Enter" to apply the filter',
+      },
+    ];
   }
 
   buildSuggestFields(inputValue: string) {
     return this.suggestItems
-      .filter(item => item.label.includes(inputValue))
+      .filter((item) => item.label.includes(inputValue))
       .map(this.mapSuggestFields);
   }
 
   buildSuggestOperator(inputValue: string) {
     const { operators } = this;
-    const operatorSuggest = op => ({
+    const operatorSuggest = (op) => ({
       label: op,
       description: operators[op],
-      type: { iconType: 'kqlOperand', color: 'tint1' }
-    })
+      type: { iconType: 'kqlOperand', color: 'tint1' },
+    });
     const item = this.findItem(inputValue, 'label');
     if (item && item.type === 'params') {
       return [operatorSuggest(':')];
     } else {
-      const ops = (item || {}).operators || Object.keys(operators)
-      return ops
-        .filter(op => op !== ':').map(operatorSuggest)
+      const ops = (item || {}).operators || Object.keys(operators);
+      return ops.filter((op) => op !== ':').map(operatorSuggest);
     }
   }
 
   async buildSuggestValues(field: string, value: string) {
     const item = this.findItem(field, 'label');
-    const rawSuggestions: string[] = (item && typeof item.values === 'function')
-      ? await this.getFunctionValues(item, value)
-      : (item || {}).values;
+    const rawSuggestions: string[] =
+      item && typeof item.values === 'function'
+        ? await this.getFunctionValues(item, value)
+        : (item || {}).values;
     const suggestions = rawSuggestions.map(this.buildSuggestValue);
     return suggestions;
   }
@@ -180,33 +208,33 @@ export class SuggestHandler extends BaseHandler {
   buildSuggestConjuntions(inputValue: string): suggestItem[] {
     if (this.searchType !== 'q') return [];
     const suggestions = [
-      { 'label': 'AND ', 'description': 'Requires `both arguments` to be true' },
-      { 'label': 'OR ', 'description': 'Requires `one or more arguments` to be true' }
+      { label: 'AND ', description: 'Requires `both arguments` to be true' },
+      { label: 'OR ', description: 'Requires `one or more arguments` to be true' },
     ].map((item) => {
       return {
         type: { iconType: 'kqlSelector', color: 'tint3' },
         label: item.label,
-        description: item.description
-      }
-    })
+        description: item.description,
+      };
+    });
     return suggestions;
   }
 
   async getFunctionValues(item, value) {
     const { setStatus } = this.props;
-    this.status = 'loading'
+    this.status = 'loading';
     setStatus('loading');
-    const values = await item.values(value)
-    this.status = 'unchanged'
+    const values = await item.values(value);
+    this.status = 'unchanged';
     setStatus('unchanged');
     return values;
   }
 
   createParamFilter(field, value) {
-    const filters = [...this.filters.map(filter => ({...filter}))]; // "Clone" the filter elements to new objects
-    const idx = filters.findIndex(filter => filter.field === field);
+    const filters = [...this.filters.map((filter) => ({ ...filter }))]; // "Clone" the filter elements to new objects
+    const idx = filters.findIndex((filter) => filter.field === field);
     idx !== -1
-      ? filters[idx].value = value // This change in filters produces a bug in ReactJS method componentDidUpdate if you try to modify the filter objects because prevState/prevPros and nextState/nextProps are same object and not cloning filter elements before the change of filter property
+      ? (filters[idx].value = value) // This change in filters produces a bug in ReactJS method componentDidUpdate if you try to modify the filter objects because prevState/prevPros and nextState/nextProps are same object and not cloning filter elements before the change of filter property
       : filters.push({ field: field, value });
     this.props.onFiltersChange(filters);
     this.setInputValue('');
@@ -216,12 +244,9 @@ export class SuggestHandler extends BaseHandler {
 
   createQFilter(inputValue) {
     const qInterpreter = new QInterpreter(inputValue);
-    if (qInterpreter.queryObjects.some(q => !q.value)) return;
+    if (qInterpreter.queryObjects.some((q) => !q.value)) return;
     const value = qInterpreter.toString();
-    const filters = [
-      ...this.filters,
-      { field: 'q', value }
-    ];
+    const filters = [...this.filters, { field: 'q', value }];
     this.props.onFiltersChange(filters);
     this.setInputValue('');
     this.props.setIsOpen(false);
@@ -235,7 +260,9 @@ export class SuggestHandler extends BaseHandler {
         inputValue && this.createParamFilter('search', item.label);
         return;
       case 'kqlField':
-        this.searchType = (this.suggestItems.find(e => e.label === item.label) || { type: 'params' }).type;
+        this.searchType = (
+          this.suggestItems.find((e) => e.label === item.label) || { type: 'params' }
+        ).type;
         if (this.searchType === 'params') {
           this.setInputValue(`${item.label}:`);
         } else {

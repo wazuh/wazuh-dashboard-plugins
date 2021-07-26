@@ -13,6 +13,14 @@ import { TabNames } from '../../utils/tab-names';
 import store from '../../redux/store';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
 import { updateSelectedToolsSection } from '../../redux/actions/appStateActions';
+import {
+  UI_ERROR_SEVERITIES,
+  UIErrorLog,
+  UIErrorSeverity,
+  UILogLevel,
+} from '../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../common/constants';
+import { getErrorOrchestrator } from '../../react-services/common-services';
 
 export class ToolsController {
   /**
@@ -53,7 +61,19 @@ export class ToolsController {
         { text: this.tab === 'devTools' ? 'API Console' : 'Ruleset Test' },
       ];
       store.dispatch(updateGlobalBreadcrumb(breadcrumb));
-    } catch (error) {}
+    } catch (error) {
+      const options: UIErrorLog = {
+        context: `${ToolsController.name}.$onInit`,
+        level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+        severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+    }
   }
 
   /**

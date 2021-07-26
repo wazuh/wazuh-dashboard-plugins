@@ -22,6 +22,9 @@ import { CSVRequest } from '../services/csv-request';
 import { getToasts, getCookies, getAngularModule }  from '../kibana-services';
 import * as FileSaver from '../services/file-saver';
 import { WzAuthentication } from './wz-authentication';
+import { UI_ERROR_SEVERITIES, UIErrorLog, UIErrorSeverity, UILogLevel } from './error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../common/constants';
+import { getErrorOrchestrator } from './common-services';
 
 export class AppState {
 
@@ -74,6 +77,17 @@ export class AppState {
         }
       }
     } catch (error) {
+      const options = {
+        context: `${AppState.name}.getExtensions`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.UI,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
       throw error;
     }
   };
@@ -91,10 +105,19 @@ export class AppState {
       });
       const updateExtension = updateExtensions(id,extensions);
       store.dispatch(updateExtension);
-    } catch (err) {
-      console.log('Error set extensions');
-      console.log(err);
-      throw err;
+    } catch (error) {
+      const options = {
+        context: `${AppState.name}.setExtensions`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.UI,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `${error.name}: Error set extensions`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+      throw error;
     }
   };
 
@@ -107,10 +130,19 @@ export class AppState {
         ? decodeURI(getCookies().get('clusterInfo'))
         : false;
       return clusterInfo ? JSON.parse(clusterInfo) : {};
-    } catch (err) {
-      console.log('Error get cluster info');
-      console.log(err);
-      throw err;
+    } catch (error) {
+      const options = {
+        context: `${AppState.name}.getClusterInfo`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.UI,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `${error.name}: Error get cluster info`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+      throw error;
     }
   }
 
@@ -129,10 +161,19 @@ export class AppState {
           path: window.location.pathname
         });
       }
-    } catch (err) {
-      console.log('Error set cluster info');
-      console.log(err);
-      throw err;
+    } catch (error) {
+      const options = {
+        context: `${AppState.name}.setClusterInfo`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.UI,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `${error.name}: Error set cluster info`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+      throw error;
     }
   }
 
@@ -149,10 +190,19 @@ export class AppState {
         expires: exp,
         path: window.location.pathname
       });
-    } catch (err) {
-      console.log('Error set createdAt date');
-      console.log(err);
-      throw err;
+    } catch (error) {
+      const options = {
+        context: `${AppState.name}.setCreatedAt`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.UI,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `${error.name}: Error set createdAt date`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+      throw error;
     }
   }
 
@@ -165,10 +215,19 @@ export class AppState {
         ? decodeURI(getCookies().get('createdAt'))
         : false;
       return createdAt ? createdAt : false;
-    } catch (err) {
-      console.log('Error get createdAt date');
-      console.log(err);
-      throw err;
+    } catch (error) {
+      const options = {
+        context: `${AppState.name}.getCreatedAt`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.UI,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `${error.name}: Error get createdAt date`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+      throw error;
     }
   }
 
@@ -211,12 +270,23 @@ export class AppState {
           const updateApiMenu = updateCurrentApi(JSON.parse(API).id);
           store.dispatch(updateApiMenu);
           WzAuthentication.refresh();
-        } catch (err) {}
+        } catch (error) {
+          throw error;
+        }
       }
-    } catch (err) {
-      console.log('Error set current API');
-      console.log(err);
-      throw err;
+    } catch (error) {
+      const options = {
+        context: `${AppState.name}.setCurrentAPI`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.UI,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `${error.name}: Error set current API`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+      throw error;
     }
   }
 
@@ -393,14 +463,18 @@ export class AppState {
 
       FileSaver.saveAs(blob, fileName);
     } catch (error) {
-      getToasts().add({
-        color: 'success',
-        title: 'CSV',
-        text: 'Error generating CSV',
-        toastLifeTimeMs: 4000,
-      });
+      const options = {
+        context: `${AppState.name}.downloadCsv`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `${error.name}: Error generating CSV`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
-    return;
   }
 
   static checkCookies() {

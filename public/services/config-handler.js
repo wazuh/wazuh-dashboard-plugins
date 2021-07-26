@@ -59,7 +59,7 @@ export class ConfigHandler {
       this.$rootScope.$broadcast('removeRestarting', {});
     } catch (error) {
       this.$rootScope.$broadcast('removeRestarting', {});
-      ErrorHandler.handle(error, 'Error restarting cluster');
+      throw new Error('Error restarting cluster');
     }
   }
 

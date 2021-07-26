@@ -17,8 +17,11 @@ import { GenericRequest } from '../react-services/generic-request';
 import { Vis2PNG } from '../factories/vis2png';
 import { RawVisualizations } from '../factories/raw-visualizations';
 import { VisHandlers } from '../factories/vis-handlers';
-import { getToasts }  from '../kibana-services';
+import { getToasts } from '../kibana-services';
 import { getAngularModule } from '../kibana-services';
+import { UI_LOGGER_LEVELS } from '../../common/constants';
+import { UI_ERROR_SEVERITIES } from './error-orchestrator/types';
+import { getErrorOrchestrator } from './common-services';
 const app = getAngularModule();
 
 export class ReportingService {
@@ -35,7 +38,7 @@ export class ReportingService {
       color: color,
       title: title,
       text: text,
-      toastLifeTimeMs: time
+      toastLifeTimeMs: time,
     });
   };
 
@@ -45,11 +48,9 @@ export class ReportingService {
   }
 
   removeAgentStatusVis(idArray) {
-    const monitoringEnabled = this.wazuhConfig.getConfig()[
-      'wazuh.monitoring.enabled'
-    ];
+    const monitoringEnabled = this.wazuhConfig.getConfig()['wazuh.monitoring.enabled'];
     if (!monitoringEnabled) {
-      const visArray = idArray.filter(vis => {
+      const visArray = idArray.filter((vis) => {
         return vis !== 'Wazuh-App-Overview-General-Agents-status';
       });
       return visArray;
@@ -69,17 +70,13 @@ export class ReportingService {
 
       this.vis2png.clear();
 
-      const rawVisualizations = this.rawVisualizations
-        .getList()
-        .filter(this.removeTableVis);
+      const rawVisualizations = this.rawVisualizations.getList().filter(this.removeTableVis);
 
       let idArray = [];
       if (tab === 'general') {
-        idArray = this.removeAgentStatusVis(
-          rawVisualizations.map(item => item.id)
-        );
+        idArray = this.removeAgentStatusVis(rawVisualizations.map((item) => item.id));
       } else {
-        idArray = rawVisualizations.map(item => item.id);
+        idArray = rawVisualizations.map((item) => item.id);
       }
 
       for (const item of idArray) {
@@ -87,14 +84,12 @@ export class ReportingService {
         this.vis2png.assignHTMLItem(item, tmpHTMLElement);
       }
 
-      const appliedFilters = await this.visHandlers.getAppliedFilters(
-        syscollectorFilters
-      );
+      const appliedFilters = await this.visHandlers.getAppliedFilters(syscollectorFilters);
 
       const array = await this.vis2png.checkArray(idArray);
-      const name = `wazuh-${
-        agents ?  `agent-${agents}` : 'overview'
-      }-${tab}-${(Date.now() / 1000) | 0}.pdf`;
+      const name = `wazuh-${agents ? `agent-${agents}` : 'overview'}-${tab}-${
+        (Date.now() / 1000) | 0
+      }.pdf`;
 
       const browserTimezone = moment.tz.guess(true);
 
@@ -109,10 +104,11 @@ export class ReportingService {
         tab,
         section: agents ? 'agents' : 'overview',
         agents,
-        browserTimezone
+        browserTimezone,
       };
 
-      const apiEndpoint = tab === 'syscollector' ? `/reports/agents/${agents}/inventory` : `/reports/modules/${tab}`;
+      const apiEndpoint =
+        tab === 'syscollector' ? `/reports/agents/${agents}/inventory` : `/reports/modules/${tab}`;
       await GenericRequest.request('POST', apiEndpoint, data);
 
       this.$rootScope.reportBusy = false;
@@ -128,7 +124,18 @@ export class ReportingService {
     } catch (error) {
       this.$rootScope.reportBusy = false;
       this.$rootScope.reportStatus = false;
-      this.showToast('danger', 'Error', error.message || error, 4000);
+      const options = {
+        context: `${ReportingService.name}.startVis2Png`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        store: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `Error creating the report`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   }
 
@@ -138,24 +145,20 @@ export class ReportingService {
       this.$rootScope.reportStatus = 'Generating PDF document...';
       this.$rootScope.$applyAsync();
 
-      const docType =
-        type === 'agentConfig'
-          ? `wazuh-agent-${obj.id}`
-          : `wazuh-group-${obj.name}`;
+      const docType = type === 'agentConfig' ? `wazuh-agent-${obj.id}` : `wazuh-group-${obj.name}`;
 
       const name = `${docType}-configuration-${(Date.now() / 1000) | 0}.pdf`;
       const browserTimezone = moment.tz.guess(true);
 
       const data = {
         name,
-        filters: [
-          type === 'agentConfig' ? { agent: obj.id } : { group: obj.name }
-        ],
+        filters: [type === 'agentConfig' ? { agent: obj.id } : { group: obj.name }],
         tab: type,
         browserTimezone,
-        components
+        components,
       };
-      const apiEndpoint = type === 'agentConfig' ? `/reports/agents/${obj.id}` : `/reports/groups/${obj.name}`;
+      const apiEndpoint =
+        type === 'agentConfig' ? `/reports/agents/${obj.id}` : `/reports/groups/${obj.name}`;
       await GenericRequest.request('POST', apiEndpoint, data);
 
       this.$rootScope.reportBusy = false;
@@ -171,8 +174,19 @@ export class ReportingService {
     } catch (error) {
       this.$rootScope.reportBusy = false;
       this.$rootScope.reportStatus = false;
-      this.showToast('danger', 'Error configuring report', error.message || error, 4000);
+      const options = {
+        context: `${ReportingService.name}.startConfigReport`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        store: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `Error configuring report`,
+        },
+      };
       this.$rootScope.$applyAsync();
+      getErrorOrchestrator().handleError(options);
     }
   }
 }
