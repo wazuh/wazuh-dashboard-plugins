@@ -5,7 +5,7 @@ import { VisCard } from '../components/vis-card';
 export const MainViewConfig = {
   rows: [
     {
-      height: 200,
+      height: 300,
       columns: [
         {
           width: 50,
@@ -13,7 +13,7 @@ export const MainViewConfig = {
         },
         {
           width: 50,
-          component: (props) => <VisCard id='Wazuh-App-Overview-Office-Alerts-Top-Mitre' tab='office' title='' {...props} />
+          component: (props) => <VisCard id='Wazuh-App-Overview-Office-User-By-Operation-Result' tab='office' title='' {...props} />
         },
       ]
     },
@@ -22,11 +22,11 @@ export const MainViewConfig = {
       columns: [
         {
           width: 50,
-          component: (props) => <VisCard id='Wazuh-App-Overview-Office-Alert-level-evolution' tab='office' {...props} />
+          component: (props) => <VisCard id='Wazuh-App-Overview-Office-IPs-By-User-Table' tab='office' {...props} />
         },
         {
           width: 50,
-          component: (props) => <VisCard id='Wazuh-App-Overview-Office-Top-5-agents-Evolution' tab='office' {...props} />
+          component: (props) => <VisCard id='Wazuh-App-Overview-Office-Rule-Level-Histogram' tab='office' {...props} />
         },
       ]
     },

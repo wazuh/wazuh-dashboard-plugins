@@ -8,12 +8,16 @@ export const DrilldownConfig = {
       height: 230,
       columns: [
         {
-          width: 50,
-          component: (props) => <VisCard id='Wazuh-App-Overview-Office-Metric-alerts' tab='office' {...props} />
+          width: 30,
+          component: (props) => <VisCard id='Wazuh-App-Overview-Office-Metric-Stats' tab='office' {...props} />
         },
         {
-          width: 50,
-          component: (props) => <VisCard id='Wazuh-App-Overview-Office-Authentication-success' tab='office' {...props} />
+          width: 30,
+          component: (props) => <VisCard id='Wazuh-App-Overview-Office-Top-Events-Pie' tab='office' {...props} />
+        },
+        {
+          width: 40,
+          component: (props) => <VisCard id='Wazuh-App-Overview-Office-IPs-By-User-Table' tab='office' {...props} />
         },
       ]
     },
@@ -21,12 +25,8 @@ export const DrilldownConfig = {
       height: 300,
       columns: [
         {
-          width: 70,
-          component: (props) => <VisCard id='Wazuh-App-Overview-Office-Agents-status' tab='office' {...props} />
-        },
-        {
-          width: 30,
-          component: (props) => <VisCard id='Wazuh-App-Overview-Office-Alert-level-evolution' tab='office' {...props} />
+          width: 100,
+          component: (props) => <VisCard id='Wazuh-App-Overview-Office-Alerts-Evolution-By-User' tab='office' {...props} />
         },
       ]
     },

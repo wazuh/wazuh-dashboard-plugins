@@ -5,10 +5,6 @@ import {
   EuiPageBody,
 } from '@elastic/eui';
 import { ModuleSidePanel } from './';
-import { FilterManager, Filter } from '../../../../../../../src/plugins/data/public/';
-import { getDataPlugin } from '../../../../kibana-services';
-import { KbnSearchBar } from '../../../kbn-search-bar';
-import { TimeRange, Query } from '../../../../../../../src/plugins/data/common';
 import WzReduxProvider from '../../../../redux/wz-redux-provider';
 import { VisFactoryHandler } from '../../../../react-services/vis-factory-handler';
 import { AppState } from '../../../../react-services/app-state';

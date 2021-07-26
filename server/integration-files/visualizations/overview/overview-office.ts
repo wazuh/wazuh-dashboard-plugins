@@ -111,7 +111,7 @@ export default [
     _type: 'visualization',
   },
   {
-    _id: 'Wazuh-App-Overview-Office-Metric-alerts',
+    _id: 'Wazuh-App-Overview-Office-Metric-Alerts',
     _source: {
       title: 'Metric alerts',
       visState: JSON.stringify({
@@ -161,7 +161,289 @@ export default [
     _type: 'visualization',
   },
   {
-    _id: 'Wazuh-App-Overview-Office-Level-12-alerts',
+    _id: 'Wazuh-App-Overview-Office-Metric-Max-Rule-Level',
+    _source: {
+      title: 'Max Rule Level',
+      visState: JSON.stringify({
+        "title": "Max Rule Level",
+        "type": "metric",
+        "aggs": [
+          {
+            "id": "1",
+            "enabled": true,
+            "type": "max",
+            "params": {
+              "field": "rule.level",
+              "customLabel": "Max Rule Level"
+            },
+            "schema": "metric"
+          }
+        ],
+        "params": {
+          "addTooltip": true,
+          "addLegend": false,
+          "type": "metric",
+          "metric": {
+            "percentageMode": false,
+            "useRanges": false,
+            "colorSchema": "Green to Red",
+            "metricColorMode": "Labels",
+            "colorsRange": [
+              {
+                "from": 0,
+                "to": 7
+              },
+              {
+                "from": 7,
+                "to": 10
+              },
+              {
+                "from": 10,
+                "to": 20
+              }
+            ],
+            "labels": {
+              "show": true
+            },
+            "invertColors": false,
+            "style": {
+              "bgFill": "#000",
+              "bgColor": false,
+              "labelColor": false,
+              "subText": "",
+              "fontSize": 26
+            }
+          }
+        }
+      }),
+      uiStateJSON: JSON.stringify({ vis: { defaultColors: { '0 - 100': 'rgb(0,104,55)' } } }),
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-alerts","filter":[],"query":{"query":"","language":"lucene"}}',
+      },
+    },
+    _type: 'visualization',
+  },
+  {
+    _id: 'Wazuh-App-Overview-Office-Metric-Suspicious-Downloads',
+    _source: {
+      title: 'Suspicious Downloads',
+      visState: JSON.stringify({
+        "title": "Suspicious Downloads Count",
+        "type": "metric",
+        "aggs": [
+          {
+            "id": "1",
+            "enabled": true,
+            "type": "count",
+            "params": {},
+            "schema": "metric"
+          },
+          {
+            "id": "2",
+            "enabled": true,
+            "type": "filters",
+            "params": {
+              "filters": [
+                {
+                  "input": {
+                    "query": "rule.id: \"91724\"",
+                    "language": "kuery"
+                  },
+                  "label": "Suspicious Downloads"
+                }
+              ]
+            },
+            "schema": "group"
+          }
+        ],
+        "params": {
+          "addTooltip": true,
+          "addLegend": false,
+          "type": "metric",
+          "metric": {
+            "percentageMode": false,
+            "useRanges": false,
+            "colorSchema": "Green to Red",
+            "metricColorMode": "Labels",
+            "colorsRange": [
+              {
+                "from": 0,
+                "to": 1
+              }
+            ],
+            "labels": {
+              "show": true
+            },
+            "invertColors": false,
+            "style": {
+              "bgFill": "#000",
+              "bgColor": false,
+              "labelColor": false,
+              "subText": "",
+              "fontSize": 26
+            }
+          }
+        }
+      }),
+      uiStateJSON: JSON.stringify({ vis: { defaultColors: { '0 - 100': 'rgb(0,104,55)' } } }),
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-alerts","filter":[],"query":{"query":"","language":"lucene"}}',
+      },
+    },
+    _type: 'visualization',
+  },
+  {
+    _id: 'Wazuh-App-Overview-Office-Metric-Malware-Alerts',
+    _source: {
+      title: 'Malware Alerts',
+      visState: JSON.stringify({
+        "title": "Malware Alerts Count",
+        "type": "metric",
+        "aggs": [
+          {
+            "id": "1",
+            "enabled": true,
+            "type": "count",
+            "params": {},
+            "schema": "metric"
+          },
+          {
+            "id": "2",
+            "enabled": true,
+            "type": "filters",
+            "params": {
+              "filters": [
+                {
+                  "input": {
+                    "query": "rule.id: \"91556\" or rule.id: \"91575\" or rule.id: \"91700\" ",
+                    "language": "kuery"
+                  },
+                  "label": "Malware Alerts"
+                }
+              ]
+            },
+            "schema": "group"
+          }
+        ],
+        "params": {
+          "addTooltip": true,
+          "addLegend": false,
+          "type": "metric",
+          "metric": {
+            "percentageMode": false,
+            "useRanges": false,
+            "colorSchema": "Green to Red",
+            "metricColorMode": "None",
+            "colorsRange": [
+              {
+                "from": 0,
+                "to": 10000
+              }
+            ],
+            "labels": {
+              "show": true
+            },
+            "invertColors": false,
+            "style": {
+              "bgFill": "#000",
+              "bgColor": false,
+              "labelColor": false,
+              "subText": "",
+              "fontSize": 26
+            }
+          }
+        }
+      }),
+      uiStateJSON: JSON.stringify({ vis: { defaultColors: { '0 - 100': 'rgb(0,104,55)' } } }),
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-alerts","filter":[],"query":{"query":"","language":"lucene"}}',
+      },
+    },
+    _type: 'visualization',
+  },
+  {
+    _id: 'Wazuh-App-Overview-Office-Metric-FullAccess-Permissions',
+    _source: {
+      title: 'Full Access Permissions',
+      visState: JSON.stringify({
+        "title": "Full Access Permission Count",
+        "type": "metric",
+        "aggs": [
+          {
+            "id": "1",
+            "enabled": true,
+            "type": "count",
+            "params": {},
+            "schema": "metric"
+          },
+          {
+            "id": "2",
+            "enabled": true,
+            "type": "filters",
+            "params": {
+              "filters": [
+                {
+                  "input": {
+                    "query": "rule.id: \"91725\"",
+                    "language": "kuery"
+                  },
+                  "label": "Full Access Permissions"
+                }
+              ]
+            },
+            "schema": "group"
+          }
+        ],
+        "params": {
+          "addTooltip": true,
+          "addLegend": false,
+          "type": "metric",
+          "metric": {
+            "percentageMode": false,
+            "useRanges": false,
+            "colorSchema": "Green to Red",
+            "metricColorMode": "None",
+            "colorsRange": [
+              {
+                "from": 0,
+                "to": 10000
+              }
+            ],
+            "labels": {
+              "show": true
+            },
+            "invertColors": false,
+            "style": {
+              "bgFill": "#000",
+              "bgColor": false,
+              "labelColor": false,
+              "subText": "",
+              "fontSize": 26
+            }
+          }
+        }
+      }),
+      uiStateJSON: JSON.stringify({ vis: { defaultColors: { '0 - 100': 'rgb(0,104,55)' } } }),
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-alerts","filter":[],"query":{"query":"","language":"lucene"}}',
+      },
+    },
+    _type: 'visualization',
+  },
+  {
+    _id: 'Wazuh-App-Overview-Office-Level-12-Alerts',
     _source: {
       title: 'Level 12 alerts',
       visState: JSON.stringify({
@@ -414,7 +696,7 @@ export default [
     _type: 'visualization',
   },
   {
-    _id: 'Wazuh-App-Overview-Office-Alert-level-evolution',
+    _id: 'Wazuh-App-Overview-Office-Alert-Level-Evolution',
     _source: {
       title: 'Alert level evolution',
       visState: JSON.stringify({
@@ -517,207 +799,6 @@ export default [
     _type: 'visualization',
   },
   {
-    _id: 'Wazuh-App-Overview-Office-Alerts-Top-Mitre',
-    _source: {
-      title: 'Alerts',
-      visState: JSON.stringify({
-        type: 'pie',
-        aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
-          {
-            id: '2',
-            enabled: true,
-            type: 'terms',
-            schema: 'segment',
-            params: {
-              field: 'rule.mitre.technique',
-              orderBy: '1',
-              order: 'desc',
-              size: 20,
-              otherBucket: false,
-              otherBucketLabel: 'Other',
-              missingBucket: false,
-              missingBucketLabel: 'Missing',
-            },
-          },
-        ],
-        params: {
-          type: 'pie',
-          addTooltip: true,
-          addLegend: true,
-          legendPosition: 'right',
-          isDonut: true,
-          labels: { show: false, values: true, last_level: true, truncate: 100 },
-        },
-        title: 'mitre top',
-      }),
-      uiStateJSON: '{}',
-      description: '',
-      version: 1,
-      kibanaSavedObjectMeta: {
-        searchSourceJSON: JSON.stringify({
-          index: 'wazuh-alerts',
-          filter: [],
-          query: { query: '', language: 'lucene' },
-        }),
-      },
-    },
-    _type: 'visualization',
-  },
-  {
-    _id: 'Wazuh-App-Overview-Office-Top-5-agents',
-    _source: {
-      title: 'Top 5 agents',
-      visState: JSON.stringify({
-        title: 'Top 5 agents',
-        type: 'pie',
-        params: {
-          type: 'pie',
-          addTooltip: true,
-          addLegend: true,
-          legendPosition: 'right',
-          isDonut: true,
-          labels: { show: false, values: true, last_level: true, truncate: 100 },
-        },
-        aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
-          {
-            id: '2',
-            enabled: true,
-            type: 'terms',
-            schema: 'segment',
-            params: {
-              field: 'agent.name',
-              size: 5,
-              order: 'desc',
-              orderBy: '1',
-              otherBucket: false,
-              otherBucketLabel: 'Other',
-              missingBucket: false,
-              missingBucketLabel: 'Missing',
-            },
-          },
-        ],
-      }),
-      uiStateJSON: JSON.stringify({ vis: { legendOpen: true } }),
-      description: '',
-      version: 1,
-      kibanaSavedObjectMeta: {
-        searchSourceJSON: JSON.stringify({
-          index: 'wazuh-alerts',
-          filter: [],
-          query: { query: '', language: 'lucene' },
-        }),
-      },
-    },
-    _type: 'visualization',
-  },
-  {
-    _id: 'Wazuh-App-Overview-Office-Top-5-agents-Evolution',
-    _source: {
-      title: 'Top 5 rule groups',
-      visState: JSON.stringify({
-        type: 'histogram',
-        aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
-          {
-            id: '2',
-            enabled: true,
-            type: 'date_histogram',
-            schema: 'segment',
-            params: {
-              field: 'timestamp',
-              timeRange: { from: '2020-07-19T16:18:13.637Z', to: '2020-07-28T13:58:33.357Z' },
-              useNormalizedEsInterval: true,
-              scaleMetricValues: false,
-              interval: 'auto',
-              drop_partials: false,
-              min_doc_count: 1,
-              extended_bounds: {},
-            },
-          },
-          {
-            id: '3',
-            enabled: true,
-            type: 'terms',
-            schema: 'group',
-            params: {
-              field: 'agent.name',
-              orderBy: '1',
-              order: 'desc',
-              size: 5,
-              otherBucket: false,
-              otherBucketLabel: 'Other',
-              missingBucket: false,
-              missingBucketLabel: 'Missing',
-            },
-          },
-        ],
-        params: {
-          type: 'area',
-          grid: { categoryLines: false },
-          categoryAxes: [
-            {
-              id: 'CategoryAxis-1',
-              type: 'category',
-              position: 'bottom',
-              show: true,
-              style: {},
-              scale: { type: 'linear' },
-              labels: { show: true, filter: true, truncate: 100 },
-              title: {},
-            },
-          ],
-          valueAxes: [
-            {
-              id: 'ValueAxis-1',
-              name: 'LeftAxis-1',
-              type: 'value',
-              position: 'left',
-              show: true,
-              style: {},
-              scale: { type: 'linear', mode: 'normal' },
-              labels: { show: true, rotate: 0, filter: false, truncate: 100 },
-              title: { text: 'Count' },
-            },
-          ],
-          seriesParams: [
-            {
-              show: true,
-              type: 'histogram',
-              mode: 'stacked',
-              data: { label: 'Count', id: '1' },
-              drawLinesBetweenPoints: true,
-              lineWidth: 2,
-              showCircles: true,
-              interpolate: 'linear',
-              valueAxis: 'ValueAxis-1',
-            },
-          ],
-          addTooltip: true,
-          addLegend: true,
-          legendPosition: 'right',
-          times: [],
-          addTimeMarker: false,
-          thresholdLine: { show: false, value: 10, width: 1, style: 'full', color: '#E7664C' },
-          labels: {},
-        },
-        title: 'top 5 agents evolution',
-      }),
-      uiStateJSON: JSON.stringify({ vis: { legendOpen: true } }),
-      description: '',
-      version: 1,
-      kibanaSavedObjectMeta: {
-        searchSourceJSON: JSON.stringify({
-          index: 'wazuh-alerts',
-          filter: [],
-          query: { query: '', language: 'lucene' },
-        }),
-      },
-    },
-    _type: 'visualization',
-  },
-  {
     _id: 'Wazuh-App-Overview-Office-Alerts-summary',
     _type: 'visualization',
     _source: {
@@ -804,101 +885,12 @@ export default [
     },
   },
   {
-    _id: 'Wazuh-App-Overview-Office-Alerts-evolution-Top-5-agents',
-    _type: 'visualization',
-    _source: {
-      title: 'Alerts evolution Top 5 agents',
-      visState: JSON.stringify({
-        title: 'Alerts evolution Top 5 agents',
-        type: 'histogram',
-        params: {
-          type: 'histogram',
-          grid: { categoryLines: false, style: { color: '#eee' } },
-          categoryAxes: [
-            {
-              id: 'CategoryAxis-1',
-              type: 'category',
-              position: 'bottom',
-              show: true,
-              style: {},
-              scale: { type: 'linear' },
-              labels: { show: true, filter: true, truncate: 100 },
-              title: {},
-            },
-          ],
-          valueAxes: [
-            {
-              id: 'ValueAxis-1',
-              name: 'LeftAxis-1',
-              type: 'value',
-              position: 'left',
-              show: true,
-              style: {},
-              scale: { type: 'linear', mode: 'normal' },
-              labels: { show: true, rotate: 0, filter: false, truncate: 100 },
-              title: { text: 'Count' },
-            },
-          ],
-          seriesParams: [
-            {
-              show: 'true',
-              type: 'histogram',
-              mode: 'stacked',
-              data: { label: 'Count', id: '1' },
-              valueAxis: 'ValueAxis-1',
-              drawLinesBetweenPoints: true,
-              showCircles: true,
-            },
-          ],
-          addTooltip: true,
-          addLegend: true,
-          legendPosition: 'right',
-          times: [],
-          addTimeMarker: false,
-        },
-        aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
-          {
-            id: '3',
-            enabled: true,
-            type: 'terms',
-            schema: 'group',
-            params: { field: 'agent.name', size: 5, order: 'desc', orderBy: '1' },
-          },
-          {
-            id: '2',
-            enabled: true,
-            type: 'date_histogram',
-            schema: 'segment',
-            params: {
-              field: 'timestamp',
-              interval: 'auto',
-              customInterval: '2h',
-              min_doc_count: 1,
-              extended_bounds: {},
-            },
-          },
-        ],
-      }),
-      uiStateJSON: '{}',
-      description: '',
-      version: 1,
-      kibanaSavedObjectMeta: {
-        searchSourceJSON: JSON.stringify({
-          index: 'wazuh-alerts',
-          filter: [],
-          query: { query: '', language: 'lucene' },
-        }),
-      },
-    },
-  },
-  {
-    _id: 'Wazuh-App-Overview-Office-Drilldown 1-1',
+    _id: 'Wazuh-App-Overview-Office-Metric-Stats',
     _type: 'visualization',
     _source: {
       title: 'Stats',
       visState: JSON.stringify({
-        title: 'Drilldown 1-1',
+        title: 'Metric Stats',
         type: 'metric',
         aggs: [
           {
@@ -967,12 +959,12 @@ export default [
     },
   },
   {
-    _id: 'Wazuh-App-Overview-Office-Drilldown 1-3',
+    _id: 'Wazuh-App-Overview-Office-IPs-By-User-Table',
     _type: 'visualization',
     _source: {
       title: 'Registered IPs for User',
       visState: JSON.stringify({
-        title: 'Drilldown Office 1-3',
+        title: 'Registered IPs for User',
         type: 'table',
         aggs: [
           {
@@ -1060,7 +1052,7 @@ export default [
     },
   },
   {
-    _id: 'Wazuh-App-Overview-Office-Drilldown 1-2',
+    _id: 'Wazuh-App-Overview-Office-Top-Events-Pie',
     _type: 'visualization',
     _source: {
       title: 'Top Events',
@@ -1136,12 +1128,12 @@ export default [
     },
   },
   {
-    _id: 'Wazuh-App-Overview-Office-Drilldown 2',
+    _id: 'Wazuh-App-Overview-Office-Alerts-Evolution-By-User',
     _type: 'visualization',
     _source: {
       title: 'Alerts evolution over time',
       visState: JSON.stringify({
-        title: 'Drilldown Office 2',
+        title: 'Alerts evolution over time',
         type: 'line',
         aggs: [
           {
@@ -1277,7 +1269,7 @@ export default [
     },
   },
   {
-    _id: 'User-by-operation-result',
+    _id: 'Wazuh-App-Overview-Office-User-By-Operation-Result',
     _type: 'visualization',
     _source: {
       title: 'User by Operation result',
@@ -1339,12 +1331,13 @@ export default [
               otherBucketLabel: 'Other',
               missingBucket: false,
               missingBucketLabel: 'Missing',
+              customLabel: 'Result Status',
             },
             schema: 'bucket',
           },
         ],
         params: {
-          perPage: 10,
+          perPage: 5,
           showPartialRows: false,
           showMetricsAtAllLevels: false,
           sort: {
@@ -1369,7 +1362,83 @@ export default [
     },
   },
   {
-    _id: 'Severity-by-user',
+    _id: 'Wazuh-App-Overview-Office-Rule-Description-Level-Table',
+    _type: 'visualization',
+    _source: {
+      title: 'Rule Description by Level',
+      visState: JSON.stringify({
+        "title": "Rule Description Level Table",
+        "type": "table",
+        "aggs": [
+          {
+            "id": "1",
+            "enabled": true,
+            "type": "count",
+            "params": {},
+            "schema": "metric"
+          },
+          {
+            "id": "2",
+            "enabled": true,
+            "type": "terms",
+            "params": {
+              "field": "rule.description",
+              "orderBy": "1",
+              "order": "desc",
+              "size": 500,
+              "otherBucket": false,
+              "otherBucketLabel": "Other",
+              "missingBucket": false,
+              "missingBucketLabel": "Missing",
+              "customLabel": "Rule Description"
+            },
+            "schema": "bucket"
+          },
+          {
+            "id": "3",
+            "enabled": true,
+            "type": "terms",
+            "params": {
+              "field": "rule.level",
+              "orderBy": "1",
+              "order": "desc",
+              "size": 20,
+              "otherBucket": false,
+              "otherBucketLabel": "Other",
+              "missingBucket": false,
+              "missingBucketLabel": "Missing",
+              "customLabel": "Rule Level"
+            },
+            "schema": "bucket"
+          }
+        ],
+        "params": {
+          "perPage": 5,
+          "showPartialRows": false,
+          "showMetricsAtAllLevels": false,
+          "sort": {
+            "columnIndex": null,
+            "direction": null
+          },
+          "showTotal": false,
+          "totalFunc": "sum",
+          "percentageCol": ""
+        }
+      }),
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON: JSON.stringify({
+          index: 'wazuh-alerts',
+          filter: [],
+          query: { query: '', language: 'lucene' },
+        }),
+      },
+    },
+  },
+  {
+    _id: 'Wazuh-App-Overview-Office-Severity-By-User-Histogram',
     _type: 'visualization',
     _source: {
       title: 'Severity by user',
@@ -1493,7 +1562,7 @@ export default [
     },
   },
   {
-    _id: 'Rule-Level-Histogram',
+    _id: 'Wazuh-App-Overview-Office-Rule-Level-Histogram',
     _type: 'visualization',
     _source: {
       title: 'Rule level histrogram',
@@ -1635,134 +1704,10 @@ export default [
     },
   },
   {
-    _id: 'IPs-by-user',
+    _id: 'Wazuh-App-Overview-Office-IPs-By-User-Barchart',
     _type: 'visualization',
     _source: {
       title: 'IPs by user',
-      visState: JSON.stringify({
-        title: 'IPs by user',
-        type: 'histogram',
-        aggs: [
-          {
-            id: '1',
-            enabled: true,
-            type: 'count',
-            params: {},
-            schema: 'metric',
-          },
-          {
-            id: '2',
-            enabled: true,
-            type: 'terms',
-            params: {
-              field: 'rule.level',
-              orderBy: '_key',
-              order: 'desc',
-              size: 10,
-              otherBucket: false,
-              otherBucketLabel: 'Other',
-              missingBucket: false,
-              missingBucketLabel: 'Missing',
-              customLabel: 'Severity',
-            },
-            schema: 'segment',
-          },
-        ],
-        params: {
-          type: 'histogram',
-          grid: {
-            categoryLines: false,
-          },
-          categoryAxes: [
-            {
-              id: 'CategoryAxis-1',
-              type: 'category',
-              position: 'bottom',
-              show: true,
-              style: {},
-              scale: {
-                type: 'linear',
-              },
-              labels: {
-                show: true,
-                filter: true,
-                truncate: 100,
-              },
-              title: {},
-            },
-          ],
-          valueAxes: [
-            {
-              id: 'ValueAxis-1',
-              name: 'LeftAxis-1',
-              type: 'value',
-              position: 'left',
-              show: true,
-              style: {},
-              scale: {
-                type: 'linear',
-                mode: 'normal',
-              },
-              labels: {
-                show: true,
-                rotate: 0,
-                filter: false,
-                truncate: 100,
-              },
-              title: {
-                text: 'Count',
-              },
-            },
-          ],
-          seriesParams: [
-            {
-              show: true,
-              type: 'histogram',
-              mode: 'stacked',
-              data: {
-                label: 'Count',
-                id: '1',
-              },
-              valueAxis: 'ValueAxis-1',
-              drawLinesBetweenPoints: true,
-              lineWidth: 2,
-              showCircles: true,
-            },
-          ],
-          addTooltip: true,
-          addLegend: true,
-          legendPosition: 'right',
-          times: [],
-          addTimeMarker: false,
-          labels: {
-            show: false,
-          },
-          thresholdLine: {
-            show: false,
-            value: 10,
-            width: 1,
-            style: 'full',
-            color: '#E7664C',
-          },
-        },
-      }),
-      uiStateJSON: '{}',
-      description: '',
-      version: 1,
-      kibanaSavedObjectMeta: {
-        searchSourceJSON: JSON.stringify({
-          index: 'wazuh-alerts',
-          filter: [],
-          query: { query: '', language: 'lucene' },
-        }),
-      },
-    },
-  },
-  {
-    _id: 'Severity-by-user',
-    _type: 'visualization',
-    _source: {
-      title: 'Severity by user',
       visState: JSON.stringify({
         title: 'IPs by User',
         type: 'horizontal_bar',
@@ -1779,7 +1724,7 @@ export default [
             enabled: true,
             type: 'terms',
             params: {
-              field: 'agent.ip',
+              field: 'data.office365.ClientIP',
               orderBy: '1',
               order: 'desc',
               size: 5,
@@ -1898,7 +1843,286 @@ export default [
     },
   },
   {
-    _id: 'Wazuh-App-Overview-Office-geo',
+    _id: 'Wazuh-App-Overview-Office-Severity-By-User-Barchart',
+    _type: 'visualization',
+    _source: {
+      title: 'Severity by user',
+      visState: JSON.stringify({
+        "title": "Severity By User Barchart",
+        "type": "histogram",
+        "aggs": [
+          {
+            "id": "1",
+            "enabled": true,
+            "type": "count",
+            "params": {},
+            "schema": "metric"
+          },
+          {
+            "id": "2",
+            "enabled": true,
+            "type": "terms",
+            "params": {
+              "field": "rule.level",
+              "orderBy": "1",
+              "order": "desc",
+              "size": 5,
+              "otherBucket": true,
+              "otherBucketLabel": "Other",
+              "missingBucket": false,
+              "missingBucketLabel": "Missing"
+            },
+            "schema": "segment"
+          },
+          {
+            "id": "3",
+            "enabled": true,
+            "type": "terms",
+            "params": {
+              "field": "data.office365.UserId",
+              "orderBy": "1",
+              "order": "desc",
+              "size": 20,
+              "otherBucket": false,
+              "otherBucketLabel": "Other",
+              "missingBucket": false,
+              "missingBucketLabel": "Missing"
+            },
+            "schema": "group"
+          }
+        ],
+        "params": {
+          "type": "histogram",
+          "grid": {
+            "categoryLines": false
+          },
+          "categoryAxes": [
+            {
+              "id": "CategoryAxis-1",
+              "type": "category",
+              "position": "bottom",
+              "show": true,
+              "style": {},
+              "scale": {
+                "type": "linear"
+              },
+              "labels": {
+                "show": true,
+                "filter": true,
+                "truncate": 100
+              },
+              "title": {}
+            }
+          ],
+          "valueAxes": [
+            {
+              "id": "ValueAxis-1",
+              "name": "LeftAxis-1",
+              "type": "value",
+              "position": "left",
+              "show": true,
+              "style": {},
+              "scale": {
+                "type": "linear",
+                "mode": "normal"
+              },
+              "labels": {
+                "show": true,
+                "rotate": 0,
+                "filter": false,
+                "truncate": 100
+              },
+              "title": {
+                "text": "Count"
+              }
+            }
+          ],
+          "seriesParams": [
+            {
+              "show": true,
+              "type": "histogram",
+              "mode": "stacked",
+              "data": {
+                "label": "Count",
+                "id": "1"
+              },
+              "valueAxis": "ValueAxis-1",
+              "drawLinesBetweenPoints": true,
+              "lineWidth": 2,
+              "showCircles": true
+            }
+          ],
+          "addTooltip": true,
+          "addLegend": true,
+          "legendPosition": "right",
+          "times": [],
+          "addTimeMarker": false,
+          "labels": {
+            "show": false
+          },
+          "thresholdLine": {
+            "show": false,
+            "value": 10,
+            "width": 1,
+            "style": "full",
+            "color": "#E7664C"
+          }
+        }
+      }),
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON: JSON.stringify({
+          index: 'wazuh-alerts',
+          filter: [],
+          query: { query: '', language: 'lucene' },
+        }),
+      },
+    },
+  },
+  {
+    _id: 'Wazuh-App-Overview-Office-Top-Users-By-Subscription-Barchart',
+    _type: 'visualization',
+    _source: {
+      title: 'Top User By Subscription',
+      visState: JSON.stringify({
+        "title": "Top User By Subscription",
+        "type": "histogram",
+        "aggs": [
+          {
+            "id": "1",
+            "enabled": true,
+            "type": "count",
+            "params": {},
+            "schema": "metric"
+          },
+          {
+            "id": "2",
+            "enabled": true,
+            "type": "terms",
+            "params": {
+              "field": "data.office365.UserId",
+              "orderBy": "1",
+              "order": "desc",
+              "size": 5,
+              "otherBucket": false,
+              "otherBucketLabel": "Other",
+              "missingBucket": false,
+              "missingBucketLabel": "Missing"
+            },
+            "schema": "segment"
+          },
+          {
+            "id": "3",
+            "enabled": true,
+            "type": "terms",
+            "params": {
+              "field": "data.office365.Subscription",
+              "orderBy": "1",
+              "order": "desc",
+              "size": 5,
+              "otherBucket": false,
+              "otherBucketLabel": "Other",
+              "missingBucket": false,
+              "missingBucketLabel": "Missing"
+            },
+            "schema": "group"
+          }
+        ],
+        "params": {
+          "type": "histogram",
+          "grid": {
+            "categoryLines": false
+          },
+          "categoryAxes": [
+            {
+              "id": "CategoryAxis-1",
+              "type": "category",
+              "position": "bottom",
+              "show": true,
+              "style": {},
+              "scale": {
+                "type": "linear"
+              },
+              "labels": {
+                "show": true,
+                "filter": true,
+                "truncate": 100,
+                "rotate": 0
+              },
+              "title": {}
+            }
+          ],
+          "valueAxes": [
+            {
+              "id": "ValueAxis-1",
+              "name": "LeftAxis-1",
+              "type": "value",
+              "position": "left",
+              "show": true,
+              "style": {},
+              "scale": {
+                "type": "linear",
+                "mode": "normal"
+              },
+              "labels": {
+                "show": true,
+                "rotate": 0,
+                "filter": false,
+                "truncate": 100
+              },
+              "title": {
+                "text": "Count"
+              }
+            }
+          ],
+          "seriesParams": [
+            {
+              "show": true,
+              "type": "histogram",
+              "mode": "stacked",
+              "data": {
+                "label": "Count",
+                "id": "1"
+              },
+              "valueAxis": "ValueAxis-1",
+              "drawLinesBetweenPoints": true,
+              "lineWidth": 2,
+              "showCircles": true
+            }
+          ],
+          "addTooltip": true,
+          "addLegend": true,
+          "legendPosition": "right",
+          "times": [],
+          "addTimeMarker": false,
+          "labels": {
+            "show": false
+          },
+          "thresholdLine": {
+            "show": false,
+            "value": 10,
+            "width": 1,
+            "style": "full",
+            "color": "#E7664C"
+          }
+        }
+      }),
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON: JSON.stringify({
+          index: 'wazuh-alerts',
+          filter: [],
+          query: { query: '', language: 'lucene' },
+        }),
+      },
+    },
+  },
+  {
+    _id: 'Wazuh-App-Overview-Office-Location',
     _type: 'visualization',
     _source: {
       title: 'Geolocation map',
