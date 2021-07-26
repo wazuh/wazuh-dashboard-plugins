@@ -25,7 +25,7 @@ export const MainPanel = ({ sidePanelChildren, tab = 'general', moduleConfig = {
         [tab]: moduleConfig[viewId].length(),
       });
       const filterHandler = new FilterHandler(AppState.getCurrentPattern());
-      await VisFactoryHandler.buildOverviewVisualizations(filterHandler, tab, null);
+      await VisFactoryHandler.buildOverviewVisualizations(filterHandler, tab, null, true);
     })()
   }, [viewId])
 

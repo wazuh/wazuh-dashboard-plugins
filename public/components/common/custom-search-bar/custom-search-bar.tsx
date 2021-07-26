@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 
 import { getIndexPattern } from '../../overview/mitre/lib'
 import { Filter } from '../../../../../../src/plugins/data/public/';
@@ -16,6 +16,7 @@ import {
 import { getDataPlugin } from '../../../kibana-services';
 import { KbnSearchBar } from '../../kbn-search-bar';
 import { TimeRange, Query } from '../../../../../../src/plugins/data/common';
+import { ModulesHelper } from '../modules/modules-helper';
 
 
 
@@ -25,13 +26,13 @@ export const CustomSearchBar = ({ ...props }) => {
     const filterManager = KibanaServices.filterManager;
     const timefilter = KibanaServices.timefilter.timefilter;
     const [filterParams, setFilterParams] = useState({
-        filters: filterManager.getFilters() || [],
+        filters: filterManager.getFilters().map(({meta: {removable, ...restMeta}, ...rest}) => ({...rest,meta: restMeta})) || [],
         query: { language: 'kuery', query: '' },
         time: timefilter.getTime(),
     });
     const [isLoading, setLoading] = useState(false);
     const [customFilters, setCustomFilters] = useState(props.filtersValues)
-    const [avancedFiltersState, setAvancedFiltersState] = useState(false);
+    const [avancedFiltersState, setAvancedFiltersState] = useState(true);
     const [selectedOptions, setSelectedOptions] = useState([]);
 
     const [defaultFilters, setDefaultFilters] = useState(filterManager.getFilters());
@@ -64,8 +65,14 @@ export const CustomSearchBar = ({ ...props }) => {
     }
 
     const changeSwitch = () => {
-        avancedFiltersState ? setAvancedFiltersState(false) : setAvancedFiltersState(true);
+        setAvancedFiltersState(state => !state);
     }
+
+    useEffect(() => {
+        if(avancedFiltersState){
+            setTimeout(() => ModulesHelper.hideCloseButtons(), 10);
+        };
+    }, [avancedFiltersState]);
 
     const buildCustomFilter = (isPinned: boolean, index?: any, querySearch?:any, key?:any): Filter => {
         const meta: FilterMeta = {
@@ -145,6 +152,7 @@ export const CustomSearchBar = ({ ...props }) => {
         return types[item.type] || types['default'];
     }
 
+    
     return (
         <>
         <EuiFlexGroup alignItems='center' style={{ margin: '0 8px' }}>
