@@ -1,4 +1,3 @@
-  
 /*
  * Wazuh app - ModuleMitreAttackIntelligence Component - Test
  *
@@ -17,22 +16,22 @@ import React from 'react';
 import { shallow } from 'enzyme';
 import { ModuleMitreAttackIntelligence } from './intelligence';
 
-jest.mock('../../../react-services', () => ({ 
+jest.mock('../../../react-services', () => ({
   WzRequest: () => ({
     apiReq: (method: string, path: string, params: any) => {
       return {
         data: {
           data: {
-            affected_items: []
-          }
-        }
-      }
-    }
-  })
+            affected_items: [],
+          },
+        },
+      };
+    },
+  }),
 }));
 
 describe('Module Mitre Att&ck intelligence container', () => {
-  test('should render the component', () => {
+  it('should render the component', () => {
     const component = shallow(<ModuleMitreAttackIntelligence />);
 
     expect(component).toMatchSnapshot();

@@ -6,48 +6,13 @@ exports[`Check result component should render a Check result screen 1`] = `
   canRetry={true}
   check={true}
   checksReady={Object {}}
-  cleanErrors={
-    [MockFunction] {
-      "calls": Array [
-        Array [
-          "test",
-        ],
-      ],
-      "results": Array [
-        Object {
-          "type": "return",
-          "value": undefined,
-        },
-      ],
-    }
-  }
+  cleanErrors={[MockFunction]}
   handleCheckReady={[MockFunction]}
   handleErrors={[MockFunction]}
   isLoading={false}
   name="test"
   title="Check Test"
-  validationService={
-    [MockFunction] {
-      "calls": Array [
-        Array [
-          Object {
-            "_log": [Function],
-            "action": [Function],
-            "error": [Function],
-            "info": [Function],
-          },
-        ],
-      ],
-      "results": Array [
-        Object {
-          "type": "return",
-          "value": Object {
-            "errors": Array [],
-          },
-        },
-      ],
-    }
-  }
+  validationService={[MockFunction]}
 >
   <EuiDescriptionListTitle>
     <dt
@@ -63,10 +28,10 @@ exports[`Check result component should render a Check result screen 1`] = `
       <p>
         <ResultIcons
           initCheck={[Function]}
-          result="loading"
+          result="waiting"
         >
           <EuiToolTip
-            content="Checking..."
+            content="On hold..."
             delay="regular"
             position="top"
           >
@@ -76,17 +41,47 @@ exports[`Check result component should render a Check result screen 1`] = `
               onMouseOut={[Function]}
               onMouseOver={[Function]}
             >
-              <EuiLoadingSpinner
+              <EuiIcon
+                aria-label="waiting"
+                color="#999999"
                 onBlur={[Function]}
                 onFocus={[Function]}
-                size="m"
+                type="clock"
               >
-                <span
-                  className="euiLoadingSpinner euiLoadingSpinner--medium"
+                <EuiIconEmpty
+                  aria-hidden={true}
+                  aria-label="waiting"
+                  className="euiIcon euiIcon--medium euiIcon-isLoading"
+                  focusable="false"
                   onBlur={[Function]}
                   onFocus={[Function]}
-                />
-              </EuiLoadingSpinner>
+                  role="img"
+                  style={
+                    Object {
+                      "fill": "#999999",
+                    }
+                  }
+                >
+                  <svg
+                    aria-hidden={true}
+                    aria-label="waiting"
+                    className="euiIcon euiIcon--medium euiIcon-isLoading"
+                    focusable="false"
+                    height={16}
+                    onBlur={[Function]}
+                    onFocus={[Function]}
+                    role="img"
+                    style={
+                      Object {
+                        "fill": "#999999",
+                      }
+                    }
+                    viewBox="0 0 16 16"
+                    width={16}
+                    xmlns="http://www.w3.org/2000/svg"
+                  />
+                </EuiIconEmpty>
+              </EuiIcon>
             </span>
           </EuiToolTip>
         </ResultIcons>

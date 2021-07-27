@@ -28,5 +28,6 @@ export async function checkTimestamp(genericReq, $location, wzMisc) {
     wzMisc.setBlankScr(error.message || error);
     $location.search('tab', null);
     $location.path('/blank-screen');
+    throw error;
   }
 }
