@@ -24,6 +24,7 @@ import {
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { Dispatch } from 'x-pack/node_modules/@types/react';
+import { SearchResponse } from 'src/core/server';
 
 /*
 You can find more info on how to use the preAppliedAggs object at
@@ -31,11 +32,8 @@ You can find more info on how to use the preAppliedAggs object at
 You can find more info on how to construct a filter object at https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html
 */
 
-interface IEsResults {
-  aggregations: { buckets: [buckets: any] };
-}
 interface IUseEsSearch {
-  esResults: IEsResults;
+  esResults: SearchResponse;
   isLoading: boolean;
   error: Error | undefined;
   setPage: Dispatch<SetStateAction<number>>;
@@ -48,11 +46,9 @@ const useEsSearch = ({ preAppliedFilters = [], preAppliedAggs = {}, size = 10 })
   const indexPattern = useIndexPattern();
   const filterManager = useFilterManager();
   const [query] = useQuery();
-  const [esResults, setEsResults] = useState<IEsResults>({
-    aggregations: { buckets: [{}] },
-  });
+  const [esResults, setEsResults] = useState<SearchResponse>({} as SearchResponse);
   const [managedFilters, setManagedFilters] = useState<Filter[] | []>([]);
-  const [error, setError] = useState<Error>();
+  const [error, setError] = useState<Error>({} as Error);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [page, setPage] = useState<number>(0);
 
@@ -92,11 +88,12 @@ const useEsSearch = ({ preAppliedFilters = [], preAppliedAggs = {}, size = 10 })
     });
   }, []);
 
-  const search = async (): Promise<IEsResults> => {
+  const search = async (): Promise<SearchResponse> => {
     if (indexPattern) {
       const esQuery = await data.query.getEsQuery(indexPattern as IndexPattern);
       const searchSource = await data.search.searchSource.create();
       const combined = [...esQuery.bool.filter, ...preAppliedFilters, ...managedFilters];
+
       return await searchSource
         .setParent(undefined)
         .setField('filter', combined)
@@ -107,7 +104,7 @@ const useEsSearch = ({ preAppliedFilters = [], preAppliedAggs = {}, size = 10 })
         .setField('index', indexPattern as IndexPattern)
         .fetch();
     } else {
-      return { aggregations: { buckets: [null] } };
+      return {} as SearchResponse;
     }
   };
 
