@@ -46,6 +46,7 @@ import { compose } from 'redux';
 
 import { ModuleMitreAttackIntelligence } from '../../overview/mitre_attack_intelligence';
 import { OfficePanel } from '../../overview/office-panel';
+import { GitHubPanel } from '../../overview/github-panel';
 
 export class MainModuleOverview extends Component {
   constructor(props) {
@@ -191,6 +192,8 @@ const ModuleTabViewer = compose(
       {section === 'sca' && selectView === 'inventory' && <MainSca {...props} />}
       {section === 'vuls' && selectView === 'inventory' && <MainVuls {...props} />}
       {section === 'office' && selectView === 'inventory' && <OfficePanel {...props} />}
+      {section === 'github' && selectView === 'inventory' && <GitHubPanel {...props} />}
+
 
       {section === 'mitre' && selectView === 'inventory' && <MainMitre {...props} />}
       {section === 'mitre' && selectView === 'intelligence' && <ModuleMitreAttackIntelligence {...props} />}
