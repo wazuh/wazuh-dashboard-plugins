@@ -10,7 +10,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Improved the frontend handle errors strategy: UI, Toasts, console log and log in file 
   [#3327](https://github.com/wazuh/wazuh-kibana-app/pull/3327) 
   [#3321](https://github.com/wazuh/wazuh-kibana-app/pull/3321) 
-  [#3367](https://github.com/wazuh/wazuh-kibana-app/pull/3367) 
+  [#3367](https://github.com/wazuh/wazuh-kibana-app/pull/3367)
+  [#3373](https://github.com/wazuh/wazuh-kibana-app/pull/3373)
   [#3374](https://github.com/wazuh/wazuh-kibana-app/pull/3374) 
   [#3390](https://github.com/wazuh/wazuh-kibana-app/pull/3390)  
   [#3410](https://github.com/wazuh/wazuh-kibana-app/pull/3410) 
@@ -42,6 +43,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added try catch strategy with ErrorOrchestrator service on ManagementController [#3374](https://github.com/wazuh/wazuh-kibana-app/pull/3374)
 - Added try catch strategy with ErrorOrchestrator service on FIM & SCA sections [#3417](https://github.com/wazuh/wazuh-kibana-app/pull/3417)
 - Added sample data for office365 events [#3424](https://github.com/wazuh/wazuh-kibana-app/pull/3424)
+- Created a separate component to check for sample data [#3475](https://github.com/wazuh/wazuh-kibana-app/pull/3475)
 
 ### Changed
 
