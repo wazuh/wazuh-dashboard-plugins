@@ -50,7 +50,7 @@ const catchFunc = (errorTitle, errorInfo, ctx) => {
     });
 
     const options: UIErrorLog = {
-      context: ctx.context,
+      context: errorInfo.componentStack,
       level: UI_LOGGER_LEVELS.WARNING as UILogLevel,
       severity: UI_ERROR_SEVERITIES.UI as UIErrorSeverity,
       display: false,

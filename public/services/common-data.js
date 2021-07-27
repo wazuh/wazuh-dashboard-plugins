@@ -143,6 +143,7 @@ export class CommonData {
         tsc: { group: 'tsc' },
         aws: { group: 'amazon' },
         gcp: { group: 'gcp' },
+        office: { group: 'office365' },
         virustotal: { group: 'virustotal' },
         osquery: { group: 'osquery' },
         sca: { group: 'sca' },

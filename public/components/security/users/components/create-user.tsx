@@ -26,7 +26,10 @@ import RolesServices from '../../roles/services';
 import { WzButtonPermissions } from '../../../common/permissions/button';
 import { ErrorHandler } from '../../../../react-services/error-handler';
 import { useDebouncedEffect } from '../../../common/hooks/useDebouncedEffect';
-import { WzOverlayMask } from '../../../common/util'
+import { WzOverlayMask } from '../../../common/util';
+import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../../../react-services/common-services';
 
 export const CreateUser = ({ closeFlyout }) => {
   const [selectedRoles, setSelectedRole] = useState<any>([]);
@@ -158,7 +161,18 @@ export const CreateUser = ({ closeFlyout }) => {
       ErrorHandler.info('User was successfully created');
       closeFlyout(true);
     } catch (error) {
-      ErrorHandler.handle(error, 'There was an error');
+      const options = {
+        context: `${CreateUser.name}.editUser`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        store: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
       setIsLoading(false);
     }
   };

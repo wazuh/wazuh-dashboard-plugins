@@ -14,7 +14,7 @@ import { useFilterManager, useQuery, useRefreshAngularDiscover } from '../../com
 import { Discover } from '../../common/modules/discover';
 import { useAllowedAgents } from '../../common/hooks/useAllowedAgents'
  
-export const SecurityAlerts = () => {
+export const SecurityAlerts = ({initialColumns = ["icon", "timestamp", 'rule.mitre.id', 'rule.mitre.tactic', 'rule.description', 'rule.level', 'rule.id']}) => {
  const [query] = useQuery();
  const filterManager = useFilterManager();
  const copyOfFilterManager = filterManager
@@ -23,12 +23,13 @@ export const SecurityAlerts = () => {
  const customFilterWithAllowedAgents = [];
  const {allowedAgents, filterAllowedAgents} = useAllowedAgents();
  filterAllowedAgents && customFilterWithAllowedAgents.push(filterAllowedAgents);
+
  return (
    <Discover
      shareFilterManager={filterManager}
      shareFilterManagerWithUserAuthorized={customFilterWithAllowedAgents}
      query={query}
-     initialColumns={["icon", "timestamp", 'rule.mitre.id', 'rule.mitre.tactic', 'rule.description', 'rule.level', 'rule.id']}
+     initialColumns={initialColumns}
      implicitFilters={[]}
      initialFilters={[]}
      updateTotalHits={(total) => { }}

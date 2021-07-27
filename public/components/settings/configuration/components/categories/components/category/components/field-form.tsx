@@ -25,6 +25,13 @@ import 'brace/mode/javascript';
 import 'brace/snippets/javascript';
 import 'brace/ext/language_tools';
 import "brace/ext/searchbox";
+import {
+  UI_ERROR_SEVERITIES,
+  UIErrorLog, UIErrorSeverity,
+  UILogLevel,
+} from '../../../../../../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../../../../../../../common/constants';
+import { getErrorOrchestrator } from '../../../../../../../../react-services/common-services';
 
 interface IFieldForm {
   item: ISetting
@@ -102,15 +109,28 @@ const IntervalForm: React.FunctionComponent<IFieldForm> = (props) => {
 
 const ArrayForm: React.FunctionComponent<IFieldForm> = (props) => {
   const [list, setList] = useState(JSON.stringify(getValue(props)));
+
   useEffect(() => {
     setList(JSON.stringify(getValue(props)))
   }, [props.updatedConfig])
+
   const checkErrors = () => {
     try {
       const parsed = JSON.parse(list);
       onChange(parsed, props);
     } catch (error) {
-      console.log(error);
+      const options: UIErrorLog = {
+        context: `${FieldForm.name}.checkErrors`,
+        level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+        severity: UI_ERROR_SEVERITIES.UI as UIErrorSeverity,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.message || error,
+        },
+      };
+
+      getErrorOrchestrator().handleError(options);
     }
   }
   return (

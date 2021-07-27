@@ -106,7 +106,13 @@ export const Metrics = withAllowedAgents(class Metrics extends Component {
         { name: "Organizations", type: "unique-count",  field: "data.github.org"},
         { name: "Repositories", type: "unique-count",  field: "data.github.repo", color: "secondary"},
         { name: "Actors", type: "unique-count",  field: "data.github.actor", color: "danger"},
-      ]
+      ],
+      office: [
+        { name: "Max Rule Level", type: "custom", filter: { phrase: "office365", field:"rule.groups"} , agg: { "customAggResult": { "terms": { "field": "timestamp", "order": { "_term": "desc" }, "size": 1 }, "aggs": { "aggResult": { "terms": { "field": "rule.level" } } } }}},
+        { name: "Suspicious Downloads", type: "phrase", value: "91724", field: "rule.id", color: "danger"}, 
+        { name: "Full Access Permissions", type: "phrase", value: "91725", field: "rule.id"},
+        { name: "Phishing and Malware", type: "phrases", values: ["91556", "91575", "91700"], field: "rule.id",color: "danger"},
+      ],
     }
   }
 

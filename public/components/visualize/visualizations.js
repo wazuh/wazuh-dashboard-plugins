@@ -111,6 +111,68 @@ export const visualizations = {
       }
     ]
   },
+  office: {
+    rows: [
+      {
+        height: 320,
+        vis: [
+          {
+            title: 'Events by severity over time',
+            id: 'Wazuh-App-Overview-Office-Rule-Level-Histogram',
+            width: 40
+          },
+          {
+            title: 'IP by Users',
+            id: 'Wazuh-App-Overview-Office-IPs-By-User-Barchart',
+            width: 30
+          },
+          {
+            title: 'Top Users By Subscription',
+            id: 'Wazuh-App-Overview-Office-Top-Users-By-Subscription-Barchart',
+            width: 30
+          },
+        ]
+      },
+      {
+        height: 350,
+        vis: [
+          {
+            title: 'Users by Operation Result',
+            id: 'Wazuh-App-Overview-Office-User-By-Operation-Result',
+            width: 35
+          },
+          {
+            title: 'Severity by User',
+            id: 'Wazuh-App-Overview-Office-Severity-By-User-Barchart',
+            width: 30
+          },
+          {
+            title: 'Rule Description by Level',
+            id: 'Wazuh-App-Overview-Office-Rule-Description-Level-Table',
+            width: 35
+          },
+        ]
+      },
+      {
+        height: 570,
+        vis: [
+          {
+            title: 'Geolocation map',
+            id: 'Wazuh-App-Overview-Office-Location'
+          }
+        ]
+      },
+      {
+        hide: true,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Overview-Office-Alerts-summary'
+          }
+        ]
+      }
+    ]
+  },
   aws: {
     rows: [
       {

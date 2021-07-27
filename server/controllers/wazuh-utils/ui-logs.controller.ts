@@ -13,7 +13,7 @@
 // Require some libraries
 import { ErrorResponse } from '../../lib/error-response';
 import { read } from 'read-last-lines';
-import { WAZUH_UI_LOGS_RAW_FILENAME } from '../../../common/constants';
+import { WAZUH_UI_LOGS_RAW_PATH } from '../../../common/constants';
 import { KibanaRequest, KibanaResponseFactory } from 'src/core/server';
 import uiLogger from '../../lib/ui-logger';
 
@@ -32,7 +32,7 @@ export class UiLogsCtrl {
   async getUiLogs(response: KibanaResponseFactory) {
     try {
       return uiLogger.initDirectory().then(async () => {
-        if (!uiLogger.checkFileExist(WAZUH_UI_LOGS_RAW_FILENAME)) {
+        if (!uiLogger.checkFileExist(WAZUH_UI_LOGS_RAW_PATH)) {
           return response.ok({
             body: {
               error: 0,
@@ -40,7 +40,7 @@ export class UiLogsCtrl {
             },
           });
         } else {
-          let arrayLog = await this.getUiFileLogs(WAZUH_UI_LOGS_RAW_FILENAME);
+          let arrayLog = await this.getUiFileLogs(WAZUH_UI_LOGS_RAW_PATH);
           return response.ok({
             body: {
               error: 0,

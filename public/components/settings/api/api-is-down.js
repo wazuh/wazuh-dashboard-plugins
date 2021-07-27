@@ -31,6 +31,11 @@ import {
   EuiPanel
 } from '@elastic/eui';
 import { withErrorBoundary } from '../../common/hocs';
+import {
+  UI_ERROR_SEVERITIES,
+} from '../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../../common/constants';
+import { getErrorOrchestrator } from '../../../react-services/common-services';
 
 export const ApiIsDown = withErrorBoundary (class ApiIsDown extends Component {
   constructor(props) {
@@ -102,6 +107,20 @@ export const ApiIsDown = withErrorBoundary (class ApiIsDown extends Component {
       ) {
         this.setState({ error: error.data.message, status: 'danger' });
       }
+
+      const options = {
+        context: `${ApiIsDown.name}.checkConnection`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.UI,
+        store: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.message || error,
+        },
+      };
+
+      getErrorOrchestrator().handleError(options);
     }
   }
 

@@ -1,80 +1,117 @@
 import React, { Component } from 'react';
 import {
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiPanel,
-  EuiPage,
-  EuiDescriptionList,
-  EuiTitle,
   EuiBadge,
   EuiBetaBadge,
+  EuiDescriptionList,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiPage,
+  EuiPanel,
+  EuiSpacer,
   EuiSwitch,
-  EuiSpacer
+  EuiTitle,
 } from '@elastic/eui';
 import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
 import { AppState } from '../../../react-services/app-state';
-import WzReduxProvider from '../../../redux/wz-redux-provider';
 import store from '../../../redux/store';
 import { updateSelectedSettingsSection } from '../../../redux/actions/appStateActions';
-import { withUserAuthorizationPrompt, withErrorBoundary, withReduxProvider } from '../../common/hocs';
-import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../../common/constants';
-import { compose } from 'redux'
+import {
+  withErrorBoundary,
+  withReduxProvider,
+  withUserAuthorizationPrompt,
+} from '../../common/hocs';
+import { UI_LOGGER_LEVELS, WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../../common/constants';
+import { compose } from 'redux';
+import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../../react-services/common-services';
 
 export class EnableModulesWrapper extends Component {
   constructor(props) {
-    super(props);
-    this.currentApi = JSON.parse(AppState.getCurrentAPI()).id;
-    this.state = {
-      extensions: [],
-      groups: [
-        {
-          title: 'Security Information Management',
-          modules: [
-            { name: 'general', default: true, agent: false },
-            { name: 'fim', default: true, agent: false },
-            { name: 'aws', default: false, agent: false },
-            { name: 'gcp', default: false, agent: false },
-            { name: 'github', default: false, agent: false }
-          ]
+    try {
+      super(props);
+      this.currentApi = JSON.parse(AppState.getCurrentAPI(true)).id;
+      this.state = {
+        extensions: [],
+        groups: [
+          {
+            title: 'Security Information Management',
+            modules: [
+              { name: 'general', default: true, agent: false },
+              { name: 'fim', default: true, agent: false },
+              { name: 'office', default: false, agent: false },
+              { name: 'aws', default: false, agent: false },
+              { name: 'gcp', default: false, agent: false },
+              { name: 'github', default: false, agent: false }
+            ]
+          },
+          {
+            title: 'Auditing and Policy Monitoring',
+            modules: [
+              { name: 'pm', default: true, agent: false },
+              { name: 'sca', default: true, agent: false },
+              { name: 'audit', default: true, agent: false },
+              { name: 'oscap', default: false, agent: false },
+              { name: 'ciscat', default: false, agent: false }
+            ]
+          },
+          {
+            title: 'Threat Detection and Response',
+            modules: [
+              { name: 'vuls', default: true, agent: false },
+              { name: 'mitre', default: true, agent: false },
+              { name: 'virustotal', default: false, agent: false },
+              { name: 'osquery', default: false, agent: false },
+              { name: 'docker', default: false, agent: false },
+            ]
+          },
+          {
+            title: 'Regulatory Compliance',
+            modules: [
+              { name: 'pci', default: true, agent: false },
+              { name: 'nist', default: true, agent: false },
+              { name: 'gdpr', default: false, agent: false },
+              { name: 'hipaa', default: false, agent: false },
+              { name: 'tsc', default: false, agent: false }
+            ]
+          }
+        ]
+      };
+    } catch (error) {
+      const options = {
+        context: `${EnableModulesWrapper.name}.constructor`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.CRITICAL,
+        store: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
         },
-        {
-          title: 'Auditing and Policy Monitoring',
-          modules: [
-            { name: 'pm', default: true, agent: false },
-            { name: 'sca', default: true, agent: false },
-            { name: 'audit', default: true, agent: false },
-            { name: 'oscap', default: false, agent: false },
-            { name: 'ciscat', default: false, agent: false }
-          ]
-        },
-        {
-          title: 'Threat Detection and Response',
-          modules: [
-            { name: 'vuls', default: true, agent: false },
-            { name: 'mitre', default: true, agent: false },
-            { name: 'virustotal', default: false, agent: false },
-            { name: 'osquery', default: false, agent: false },
-            { name: 'docker', default: false, agent: false },
-          ]
-        },
-        {
-          title: 'Regulatory Compliance',
-          modules: [
-            { name: 'pci', default: true, agent: false },
-            { name: 'nist', default: true, agent: false },
-            { name: 'gdpr', default: false, agent: false },
-            { name: 'hipaa', default: false, agent: false },
-            { name: 'tsc', default: false, agent: false }
-          ]
-        }
-      ]
-    };
+      };
+
+      getErrorOrchestrator().handleError(options);
+    }
   }
 
   async componentDidMount() {
-    store.dispatch(updateSelectedSettingsSection('modules'));
-    const extensions = await AppState.getExtensions(this.currentApi);
-    this.setState({ extensions });
+    try {
+      store.dispatch(updateSelectedSettingsSection('modules'));
+      const extensions = await AppState.getExtensions(this.currentApi);
+      this.setState({ extensions });
+    } catch (error) {
+      const options = {
+        context: `${EnableModulesWrapper.name}.componentDidMount`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+
+      getErrorOrchestrator().handleError(options);
+    }
   }
 
   toggleExtension(extension) {
@@ -83,7 +120,19 @@ export class EnableModulesWrapper extends Component {
     this.setState({ extensions });
     try {
       this.currentApi && AppState.setExtensions(this.currentApi, extensions);
-    } catch (error) {} //eslint-disable-line
+    } catch (error) {
+      const options = {
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+
+      getErrorOrchestrator().handleError(options);
+    }
   }
 
   buildModuleGroup(extensions) {

@@ -64,6 +64,7 @@ export const WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS = {
   [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY]: [
     { syscheck: true },
     { aws: true },
+    { office: true },
     { gcp: true },
     { authentication: true },
     { ssh: true },
@@ -148,22 +149,27 @@ export const WAZUH_DATA_CONFIG_REGISTRY_PATH = path.join(
 );
 
 // Wazuh data path - logs
+export const MAX_MB_LOG_FILES = 100;
 export const WAZUH_DATA_LOGS_DIRECTORY_PATH = path.join(WAZUH_DATA_ABSOLUTE_PATH, 'logs');
-export const WAZUH_DATA_LOGS_PLAIN_FILENAME = path.join(
+export const WAZUH_DATA_LOGS_PLAIN_FILENAME = 'wazuhapp-plain.log';
+export const WAZUH_DATA_LOGS_PLAIN_PATH = path.join(
   WAZUH_DATA_LOGS_DIRECTORY_PATH,
-  'wazuhapp-plain.log'
+  WAZUH_DATA_LOGS_PLAIN_FILENAME
 );
-export const WAZUH_DATA_LOGS_RAW_FILENAME = path.join(
+export const WAZUH_DATA_LOGS_RAW_FILENAME = 'wazuhapp.log';
+export const WAZUH_DATA_LOGS_RAW_PATH = path.join(
   WAZUH_DATA_LOGS_DIRECTORY_PATH,
-  'wazuhapp.log'
+  WAZUH_DATA_LOGS_RAW_FILENAME
 );
 
 // Wazuh data path - UI logs
-export const WAZUH_UI_LOGS_PLAIN_FILENAME = path.join(
+export const WAZUH_UI_LOGS_PLAIN_FILENAME = 'wazuh-ui-plain.log';
+export const WAZUH_UI_LOGS_RAW_FILENAME = 'wazuh-ui.log';
+export const WAZUH_UI_LOGS_PLAIN_PATH = path.join(
   WAZUH_DATA_LOGS_DIRECTORY_PATH,
-  'wazuh-ui-plain.log'
+  WAZUH_UI_LOGS_PLAIN_FILENAME
 );
-export const WAZUH_UI_LOGS_RAW_FILENAME = path.join(WAZUH_DATA_LOGS_DIRECTORY_PATH, 'wazuh-ui.log');
+export const WAZUH_UI_LOGS_RAW_PATH = path.join(WAZUH_DATA_LOGS_DIRECTORY_PATH, WAZUH_UI_LOGS_RAW_FILENAME);
 
 // Wazuh data path - downloads
 export const WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH = path.join(WAZUH_DATA_ABSOLUTE_PATH, 'downloads');
@@ -195,6 +201,7 @@ export const WAZUH_DEFAULT_APP_CONFIG = {
   'extensions.oscap': false,
   'extensions.ciscat': false,
   'extensions.aws': false,
+  'extensions.office': false,
   'extensions.gcp': false,
   'extensions.virustotal': false,
   'extensions.osquery': false,
@@ -240,6 +247,7 @@ export enum WAZUH_MODULES_ID {
   SECURITY_EVENTS = 'general',
   INTEGRITY_MONITORING = 'fim',
   AMAZON_WEB_SERVICES = 'aws',
+  OFFICE_365 = 'office',
   GOOGLE_CLOUD_PLATFORM = 'gcp',
   POLICY_MONITORING = 'pm',
   SECURITY_CONFIGURATION_ASSESSMENT = 'sca',
