@@ -20,7 +20,7 @@ export const AggTable = ({
       },
     },
   };
-  const  {esResults, isLoading}  = useEsSearch({ preAppliedAggs });
+  const  {esResults, isLoading, error}  = useEsSearch({ preAppliedAggs });
   const buckets = ((esResults.aggregations || {}).buckets || {}).buckets || [];
   const columns:EuiBasicTableColumn<any>[] = [
     {
@@ -43,12 +43,13 @@ export const AggTable = ({
       },
     };
   };
+
   return (
     <EuiPanel data-test-subj={`${aggTerm}-aggTable`} {...panelProps}>
       <EuiTitle {...titleProps}>
         <h2>{tableTitle}</h2>
       </EuiTitle>
-      <EuiBasicTable items={buckets} columns={columns} rowProps={getRowProps} loading={isLoading} />
+      <EuiBasicTable items={buckets} columns={columns} rowProps={getRowProps} loading={isLoading} error={error ? error.message : undefined} />
     </EuiPanel>
   );
 };
