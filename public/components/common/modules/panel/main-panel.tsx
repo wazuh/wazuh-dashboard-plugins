@@ -4,11 +4,7 @@ import {
   EuiFlexItem,
   EuiPageBody,
 } from '@elastic/eui';
-import { ModuleSidePanel } from './';
-import { FilterManager, Filter } from '../../../../../../../src/plugins/data/public/';
-import { getDataPlugin } from '../../../../kibana-services';
-import { KbnSearchBar } from '../../../kbn-search-bar';
-import { TimeRange, Query } from '../../../../../../../src/plugins/data/common';
+import { ModuleSidePanel } from './components/';
 import WzReduxProvider from '../../../../redux/wz-redux-provider';
 import { VisFactoryHandler } from '../../../../react-services/vis-factory-handler';
 import { AppState } from '../../../../react-services/app-state';
@@ -29,7 +25,7 @@ export const MainPanel = ({ sidePanelChildren, tab = 'general', moduleConfig = {
         [tab]: moduleConfig[viewId].length(),
       });
       const filterHandler = new FilterHandler(AppState.getCurrentPattern());
-      await VisFactoryHandler.buildOverviewVisualizations(filterHandler, tab, null);
+      await VisFactoryHandler.buildOverviewVisualizations(filterHandler, tab, null, true);
     })()
   }, [viewId])
 
