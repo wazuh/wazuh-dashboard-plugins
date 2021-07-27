@@ -1741,3 +1741,13 @@ iframe.width-changed {
 .wz-width-100{
   width: 100%;
 }
+
+/* Custom Searchbar styles */
+
+.filters-custom-combobox .euiBadge__iconButton{
+  display: none;
+}
+
+.application .filters-search-bar .globalQueryBar, .app-container .filters-search-bar .globalQueryBar{
+  padding: 0 !important;
+}

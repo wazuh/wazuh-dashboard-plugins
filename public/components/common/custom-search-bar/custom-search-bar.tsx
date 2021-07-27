@@ -39,9 +39,19 @@ export const CustomSearchBar = ({ ...props }) => {
     const [isLoading, setLoading] = useState(false);
     const [customFilters, setCustomFilters] = useState(props.filtersValues)
     const [currentSelectName, setCurrentSelectName] = useState('');
-    const [avancedFiltersState, setAvancedFiltersState] = useState(true);
-    const [selectedOptions, setSelectedOptions] = useState([]);
+    const [avancedFiltersState, setAvancedFiltersState] = useState(false);
+    const [selectedOptions, setSelectedOptions] = useState(defaultSelectedOptions);
 
+    useEffect(() => {
+        let filterSubscriber = filterManager.getUpdates$().subscribe(() => {
+          const newFilters = filterManager.getFilters();
+          onFiltersUpdated(newFilters)
+          return () => {
+            filterSubscriber.unsubscribe();
+          };
+        });
+    }, []);
+      
     const onQuerySubmit = (payload: { dateRange: TimeRange, query: Query }) => {
         const { query, dateRange } = payload;
         const filters = { query, time: dateRange, filters: filterParams.filters };
@@ -141,7 +151,8 @@ export const CustomSearchBar = ({ ...props }) => {
         var types = {
             'default': <></>,
             'combobox': <EuiComboBox
-                        placeholder={"Select "+item.key}
+                        className={'filters-custom-combobox'}
+                        placeholder={'Select '+item.key}
                         options={item.values}
                         selectedOptions={selectedOptions[item.key] || []}
                         onChange={onChange}
@@ -168,7 +179,7 @@ export const CustomSearchBar = ({ ...props }) => {
             } 
             <EuiFlexItem>
             <KbnSearchBar
-                showFilterBar={avancedFiltersState}
+                showFilterBar={false}
                 showQueryInput={avancedFiltersState}
                 onQuerySubmit={onQuerySubmit}
                 onFiltersUpdated={onFiltersUpdated}
@@ -177,6 +188,15 @@ export const CustomSearchBar = ({ ...props }) => {
             </EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup justifyContent='flexEnd' style={{ margin: '0 20px' }}>
+            <EuiFlexItem className={'filters-search-bar'} style={{ margin: '0px' }}>
+                <KbnSearchBar
+                    showDatePicker={false}
+                    showQueryInput={false}
+                    onQuerySubmit={onQuerySubmit}
+                    onFiltersUpdated={onFiltersUpdated}
+                    isLoading={isLoading} 
+                />
+            </EuiFlexItem>
             <EuiFlexItem grow={false}>
                 <EuiSwitch
                 label="Advanced filters"
