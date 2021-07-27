@@ -8,13 +8,18 @@ import { ModuleSidePanel } from './components/';
 import WzReduxProvider from '../../../../redux/wz-redux-provider';
 import { VisFactoryHandler } from '../../../../react-services/vis-factory-handler';
 import { AppState } from '../../../../react-services/app-state';
+import { useFilterManager } from '../../hooks';
 import { FilterHandler } from '../../../../utils/filter-handler';
 import { TabVisualizations } from '../../../../factories/tab-visualizations';
+import { Filter } from '../../../../../../../src/plugins/data/public/';
+import { FilterMeta, FilterState, FilterStateStore } from '../../../../../../../src/plugins/data/common';
 
 
 export const MainPanel = ({ sidePanelChildren, tab = 'general', moduleConfig = {}, ...props }) => {
 
   const [viewId, setViewId] = useState('main');
+  const [selectedFilter, setSelectedFilter] = useState({ field: '', value: '' });
+  const filterManager = useFilterManager();
 
   useEffect(() => {
     (async () => {
@@ -29,10 +34,59 @@ export const MainPanel = ({ sidePanelChildren, tab = 'general', moduleConfig = {
     })()
   }, [viewId])
 
+  /**
+   * When a filter is toggled applies de selection
+   */
+  useEffect(() => {
+    const appliedFilters = filterManager.getAppFilters();
+
+    const filters = appliedFilters.filter((filter) => {
+      return filter.meta.key != selectedFilter.field;
+    });
+    if (selectedFilter.value) {
+      const customFilter = buildCustomFilter(selectedFilter);
+      filters.push(customFilter);
+    }
+    filterManager.setFilters(filters);
+  }, [selectedFilter])
+
+
+  /**
+   * Builds selected filter structure
+   * @param value 
+   * @param field 
+   */
+  const buildCustomFilter = ({ field, value }): Filter => {
+    const meta: FilterMeta = {
+      disabled: false,
+      negate: false,
+      key: field,
+      params: { query: value },
+      alias: null,
+      type: "phrase",
+      index: AppState.getCurrentPattern(),
+    };
+    const $state: FilterState = {
+      store: FilterStateStore.APP_STATE,
+    };
+    const query = {
+      match_phrase: {
+        [field]: {
+          query: value
+        }
+      }
+    }
+
+    return { meta, $state, query };
+  }
 
   const toggleView = (id = 'main') => {
     if (id != viewId)
       setViewId(id);
+  }
+
+  const toggleFilter = (field = '', value = '') => {
+    setSelectedFilter({ field, value });
   }
 
   /**
@@ -42,7 +96,7 @@ export const MainPanel = ({ sidePanelChildren, tab = 'general', moduleConfig = {
    */
   const ModuleContent = useCallback(() => {
     const View = moduleConfig[viewId].component;
-    return <WzReduxProvider><View changeView={toggleView}/></WzReduxProvider>
+    return <WzReduxProvider><View selectedFilter={selectedFilter} toggleFilter={toggleFilter} changeView={toggleView} /></WzReduxProvider>
   }, [viewId])
 
   return (
