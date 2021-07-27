@@ -1,5 +1,8 @@
 export const configEquivalences = {
   pattern: 'Default index pattern to use on the app.',
+  'customization.logo.app':'Define the path to the app logo',
+  'customization.logo.sidebar':'Define the path to the sidebar logo',
+  'customization.logo.healthcheck':'Define the path to the health-check logo',
   'checks.pattern':
     'Enable or disable the index pattern health check when opening the app.',
   'checks.template':
@@ -73,6 +76,9 @@ export const configEquivalences = {
 
 export const nameEquivalence = {
   pattern: 'Index pattern',
+  'customization.logo.app': 'Logo App',
+  'customization.logo.sidebar': 'Logo Sidebar',
+  'customization.logo.healthcheck': 'Logo Health Check',
   'checks.pattern': 'Index pattern',
   'checks.template': 'Index template',
   'checks.api': 'API connection',
@@ -109,12 +115,16 @@ export const nameEquivalence = {
 const HEALTH_CHECK = 'Health Check';
 const GENERAL = 'General';
 const SECURITY = 'Security';
-const MONITORING = 'Monitoring'
-const STATISTICS = 'Statistics'
-export const categoriesNames = [HEALTH_CHECK, GENERAL, SECURITY, MONITORING, STATISTICS,];
+const MONITORING = 'Monitoring';
+const STATISTICS = 'Statistics';
+const CUSTOMIZATION = 'Logo Customization';
+export const categoriesNames = [HEALTH_CHECK, GENERAL, SECURITY, MONITORING, STATISTICS, CUSTOMIZATION];
 
 export const categoriesEquivalence = {
   pattern: GENERAL,
+  'customization.logo.app':CUSTOMIZATION,
+  'customization.logo.sidebar':CUSTOMIZATION,
+  'customization.logo.healthcheck':CUSTOMIZATION,
   'checks.pattern': HEALTH_CHECK,
   'checks.template': HEALTH_CHECK,
   'checks.api': HEALTH_CHECK,
@@ -156,6 +166,9 @@ const INTERVAL = 'interval'
 
 export const formEquivalence = {
   pattern: { type: TEXT },
+  'customization.logo.app': { type: TEXT },
+  'customization.logo.sidebar': { type: TEXT },
+  'customization.logo.healthcheck': { type: TEXT },
   'checks.pattern': { type: BOOLEAN },
   'checks.template': { type: BOOLEAN },
   'checks.api': { type: BOOLEAN },
