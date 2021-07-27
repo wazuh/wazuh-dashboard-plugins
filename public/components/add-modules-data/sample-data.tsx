@@ -50,8 +50,7 @@ export default class WzSampleData extends Component {
     this.categories = [
       {
         title: 'Sample security information',
-        description:
-          'Sample data, visualizations and dashboards for security information (integrity monitoring, Amazon AWS services, Google Cloud Platform, authorization, ssh, web).',
+        description: 'Sample data, visualizations and dashboards for security information (integrity monitoring, Amazon AWS services, Office 365, Google Cloud Platform, authorization, ssh, web).',
         image: '',
         categorySampleAlertsIndex: 'security',
       },
