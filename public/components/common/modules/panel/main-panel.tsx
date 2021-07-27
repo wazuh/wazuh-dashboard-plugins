@@ -4,7 +4,7 @@ import {
   EuiFlexItem,
   EuiPageBody,
 } from '@elastic/eui';
-import { ModuleSidePanel } from './';
+import { ModuleSidePanel } from './components/';
 import WzReduxProvider from '../../../../redux/wz-redux-provider';
 import { VisFactoryHandler } from '../../../../react-services/vis-factory-handler';
 import { AppState } from '../../../../react-services/app-state';

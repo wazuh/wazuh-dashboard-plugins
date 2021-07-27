@@ -1,5 +1,5 @@
 import { EuiBasicTable, EuiPanel, EuiTitle, EuiBasicTableColumn } from '@elastic/eui';
-import { useEsSearch } from '../hooks';
+import { useEsSearch } from '../../../hooks';
 import React from 'react';
 
 export const AggTable = ({

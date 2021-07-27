@@ -12,4 +12,4 @@
 
 
 export { MainPanel } from './main-panel';
-export { ModuleSidePanel } from './module-side-panel';
+export * from './components/';
