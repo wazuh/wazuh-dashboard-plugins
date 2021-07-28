@@ -5,7 +5,8 @@ export const OfficeBody = ({ changeView, toggleFilter, rows = [] }) => {
 
   const rowClickHandler = (field, value) => {
     toggleFilter(field, value);
-    changeView('drilldown');
+
+    changeView(field);
   }
 
   return <VisConfigLayout rows={rows} rowClickHandler={rowClickHandler}/>

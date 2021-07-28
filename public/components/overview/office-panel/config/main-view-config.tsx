@@ -1,5 +1,7 @@
 import React from 'react';
 import { VisCard, AggTable } from '../../../common/modules/panel/';
+import { EuiFlexItem, EuiPanel } from '@elastic/eui';
+import { SecurityAlerts } from '../../../visualize/components';
 
 export const MainViewConfig = {
   rows: [
@@ -10,7 +12,7 @@ export const MainViewConfig = {
           width: 50,
           component: (props) => (
             <AggTable
-              tableTitle={'Users'}
+              tableTitle={''}
               aggTerm={'data.office365.UserId'}
               aggLabel={'User'}
               maxRows={'7'} 
@@ -18,7 +20,13 @@ export const MainViewConfig = {
         },
         {
           width: 50,
-          component: (props) => <VisCard id='Wazuh-App-Overview-Office-User-By-Operation-Result' tab='office' title='' {...props} />
+          component: (props) => (
+            <AggTable
+              tableTitle={''}
+              aggTerm={'data.office365.ClientIP'}
+              aggLabel={'Client IP'}
+              maxRows={'7'} 
+              onRowClick={(field, value) => props.onRowClick(field, value)} />)
         },
       ]
     },
@@ -26,21 +34,8 @@ export const MainViewConfig = {
       height: 300,
       columns: [
         {
-          width: 50,
-          component: (props) => <VisCard id='Wazuh-App-Overview-Office-IPs-By-User-Table' tab='office' {...props} />
-        },
-        {
-          width: 50,
-          component: (props) => <VisCard id='Wazuh-App-Overview-Office-Rule-Level-Histogram' tab='office' {...props} />
-        },
-      ]
-    },
-    {
-      height: 300,
-      columns: [
-        {
-          width: 50,
-          component: (props) => <VisCard id='Wazuh-App-Overview-Office-Alerts-summary' tab='office' {...props} />
+          width: 100,
+          component: () => <EuiFlexItem><EuiPanel paddingSize={'s'} ><SecurityAlerts /></EuiPanel></EuiFlexItem>
         },
       ]
     },
