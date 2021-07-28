@@ -17,55 +17,13 @@ export const filtersValues = [
   {
     type: 'combobox',
     key: 'agent.id',
-    values: [
-      {
-        value: 'agent.id',
-        label: '001',
-      },
-      {
-        value: 'agent.id',
-        label: '002',
-      },
-      {
-        value: 'agent.id',
-        label: '003',
-      },
-      {
-        value: 'agent.id',
-        label: '004',
-      },
-      {
-        value: 'agent.id',
-        label: '006',
-      },
-    ],
   },
   {
     type: 'combobox',
     key: 'agent.name',
-    values: [
-      {
-        value: 'agent.name',
-        label: 'Amazon',
-      },
-      {
-        value: 'agent.name',
-        label: 'Centos',
-      }
-    ],
   },
   {
     type: 'combobox',
     key: 'agent.ip',
-    values: [
-      {
-        value: 'agent.ip',
-        label: '24.273.97.14',
-      },
-      {
-        value: 'agent.ip',
-        label: '197.17.1.4',
-      },
-    ],
-  },
+  }
 ];
