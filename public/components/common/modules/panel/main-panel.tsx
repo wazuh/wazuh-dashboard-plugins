@@ -38,17 +38,22 @@ export const MainPanel = ({ sidePanelChildren, tab = 'general', moduleConfig = {
   /**
    * When a filter is toggled applies de selection
    */
-  useEffect(() => {
+  const applyFilter = (clearOnly = false) => {
     const appliedFilters = filterManager.getAppFilters();
-
     const filters = appliedFilters.filter((filter) => {
       return filter.meta.key != selectedFilter.field;
     });
-    if (selectedFilter.value) {
+    if (!clearOnly && selectedFilter.value) {
       const customFilter = buildCustomFilter(selectedFilter);
       filters.push(customFilter);
     }
     filterManager.setFilters(filters);
+  }
+
+  useEffect(() => {
+    applyFilter();
+
+    return () => applyFilter(true);
   }, [selectedFilter])
 
 
@@ -69,11 +74,13 @@ export const MainPanel = ({ sidePanelChildren, tab = 'general', moduleConfig = {
     };
     const $state: FilterState = {
       store: FilterStateStore.APP_STATE,
+      isImplicit: true
     };
     const query = {
-      match_phrase: {
+      match: {
         [field]: {
-          query: value
+          query: value,
+          type: 'phrase'
         }
       }
     }
