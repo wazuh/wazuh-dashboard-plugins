@@ -25,7 +25,10 @@ import { KbnSearchBar } from '../../kbn-search-bar';
 import { TimeRange, Query } from '../../../../../../src/plugins/data/common';
 import { ModulesHelper } from '../../common/modules/modules-helper';
 import { getDataPlugin, getToasts } from '../../../kibana-services';
-import { withErrorBoundary } from "../../common/hocs"
+import { withErrorBoundary } from "../../common/hocs";
+import { UI_LOGGER_LEVELS } from '../../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../../react-services/common-services';
 
 export interface ITactic {
   [key:string]: string[]
@@ -122,14 +125,21 @@ export const Mitre = withErrorBoundary (class Mitre extends Component {
         tacticsObject[item.name] = item;
       });
       this._isMount && this.setState({tacticsObject, isLoading: false});
-    } catch(err) {
+    } catch(error) {
       this.setState({ isLoading: false });
-      this.showToast(
-        'danger',
-        'Error',
-        `Mitre data could not be fetched: ${err}`,
-        3000
-      );
+      const options = {
+        context: `${Mitre.name}.buildTacticsObject`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        store: true,
+        display: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `Mitre data could not be fetched`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   }
 
