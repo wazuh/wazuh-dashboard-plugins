@@ -29,7 +29,7 @@ export interface IValueSuggestiions {
   setQuery: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export const useValueSuggestions = (filterField: string, type: 'string' | 'boolean' = 'string') => {
+export const useValueSuggestions = (filterField: string, type: 'string' | 'boolean' = 'string') : IValueSuggestiions => {
   const [suggestedValues, setSuggestedValues] = useState<string[] | boolean[]>([]);
   const [query, setQuery] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
