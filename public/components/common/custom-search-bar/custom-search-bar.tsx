@@ -69,11 +69,6 @@ export const CustomSearchBar = ({ filtersValues, ...props }) => {
         setAvancedFiltersState(state => !state);
     }
 
-    useEffect(() => {
-        if(avancedFiltersState){
-            setTimeout(() => ModulesHelper.hideCloseButtons(), 10);
-        };
-    }, [avancedFiltersState]);
 
     const buildCustomFilter = (isPinned: boolean, index?: any, querySearch?:any, key?:any): Filter => {
         const meta: FilterMeta = {
