@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { EuiFlexGroup, EuiFlexItem, EuiPanel, EuiTitle, EuiButtonIcon } from '@elastic/eui';
-import { RawVisualizations } from '../../../../factories/raw-visualizations';
-import KibanaVis from '../../../../kibana-integrations/kibana-vis';
+import { RawVisualizations } from '../../../../../factories/raw-visualizations';
+import KibanaVis from '../../../../../kibana-integrations/kibana-vis';
 
 export const VisCard = ({ changeView = () => { }, id, width, tab, ...props }) => {
 

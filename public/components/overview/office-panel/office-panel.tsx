@@ -32,7 +32,7 @@ export const OfficePanel = withErrorBoundary(() => {
           [{ component: 'wmodules', configuration: 'wmodules' }]
         );
         const config = Object.entries(modulesConfig["wmodules-wmodules"].affected_items[0].wmodules
-          .filter((module) => { return Object.keys(module)[0] == 'sca' })[0]['sca']).map((configProp) => { //<-- change module name
+          .filter((module) => { return Object.keys(module)[0] == 'office365' })[0]['office365']).map((configProp) => {
             const description = Array.isArray(configProp[1]) ? configProp[1].join(', ') : configProp[1];
             return { title: configProp[0], description }
           })
