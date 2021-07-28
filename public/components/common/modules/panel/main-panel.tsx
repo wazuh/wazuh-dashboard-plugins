@@ -13,6 +13,7 @@ import { FilterHandler } from '../../../../utils/filter-handler';
 import { TabVisualizations } from '../../../../factories/tab-visualizations';
 import { Filter } from '../../../../../../../src/plugins/data/public/';
 import { FilterMeta, FilterState, FilterStateStore } from '../../../../../../../src/plugins/data/common';
+import { SampleDataWarning } from '../../../visualize/components';
 
 
 export const MainPanel = ({ sidePanelChildren, tab = 'general', moduleConfig = {}, ...props }) => {
@@ -107,6 +108,7 @@ export const MainPanel = ({ sidePanelChildren, tab = 'general', moduleConfig = {
         </ModuleSidePanel >
         }
         <EuiPageBody>
+          <SampleDataWarning />
           <ModuleContent />
         </EuiPageBody>
       </EuiFlexItem>
