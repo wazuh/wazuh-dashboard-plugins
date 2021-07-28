@@ -19,23 +19,23 @@ export const filtersValues = [
     key: 'agent.id',
     values: [
       {
-        key: 'agent.id',
+        value: 'agent.id',
         label: '001',
       },
       {
-        key: 'agent.id',
+        value: 'agent.id',
         label: '002',
       },
       {
-        key: 'agent.id',
+        value: 'agent.id',
         label: '003',
       },
       {
-        key: 'agent.id',
+        value: 'agent.id',
         label: '004',
       },
       {
-        key: 'agent.id',
+        value: 'agent.id',
         label: '006',
       },
     ],
@@ -45,11 +45,11 @@ export const filtersValues = [
     key: 'agent.name',
     values: [
       {
-        key: 'agent.name',
+        value: 'agent.name',
         label: 'Amazon',
       },
       {
-        key: 'agent.name',
+        value: 'agent.name',
         label: 'Centos',
       }
     ],
@@ -59,11 +59,11 @@ export const filtersValues = [
     key: 'agent.ip',
     values: [
       {
-        key: 'agent.ip',
+        value: 'agent.ip',
         label: '24.273.97.14',
       },
       {
-        key: 'agent.ip',
+        value: 'agent.ip',
         label: '197.17.1.4',
       },
     ],

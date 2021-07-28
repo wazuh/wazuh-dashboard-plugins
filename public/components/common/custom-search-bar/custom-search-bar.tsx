@@ -16,8 +16,9 @@ import { getDataPlugin } from '../../../kibana-services';
 import { KbnSearchBar } from '../../kbn-search-bar';
 import { TimeRange, Query } from '../../../../../../src/plugins/data/common';
 import { ModulesHelper } from '../modules/modules-helper';
+import { useValueSuggestions } from '../hooks/use-value-suggestions'
 
-export const CustomSearchBar = ({ ...props }) => {
+export const CustomSearchBar = ({ filtersValues, ...props }) => {
 
     const KibanaServices = getDataPlugin().query;
     const filterManager = KibanaServices.filterManager;
@@ -37,8 +38,6 @@ export const CustomSearchBar = ({ ...props }) => {
         return array
     }
     const [isLoading, setLoading] = useState(false);
-    const [customFilters, setCustomFilters] = useState(props.filtersValues)
-    const [currentSelectName, setCurrentSelectName] = useState('');
     const [avancedFiltersState, setAvancedFiltersState] = useState(false);
     const [selectedOptions, setSelectedOptions] = useState(defaultSelectedOptions);
 
@@ -103,21 +102,14 @@ export const CustomSearchBar = ({ ...props }) => {
     const setKibanaFilters = (values) => {
         setLoading(true)
         const newFilters = []
-        if(!values.length){          
-                const currentFilters = filterManager.getFilters().filter(item => item.meta.key != currentSelectName)
-                filterManager.removeAll()
-                filterManager.addFilters(currentFilters)
-                
-        }else{
-            const currentFilters = filterManager.getFilters().filter(item => item.meta.key != values[0].key)
-            filterManager.removeAll()
-            filterManager.addFilters(currentFilters)
-            values.forEach(element => {
-                const customFilter = buildCustomFilter(false,indexPattern.title,element.label,element.key)
-                newFilters.push(customFilter);
-            });
-            filterManager.addFilters(newFilters)
-        } 
+        const currentFilters = filterManager.getFilters().filter(item => item.meta.key != values[0].value)
+        filterManager.removeAll()
+        filterManager.addFilters(currentFilters)
+        values.forEach(element => {
+            const customFilter = buildCustomFilter(false,indexPattern.title,element.label,element.value)
+            newFilters.push(customFilter);
+        });
+        filterManager.addFilters(newFilters)
     }
 
     const refreshCustomSelectedFilter = () => {
@@ -125,16 +117,16 @@ export const CustomSearchBar = ({ ...props }) => {
         const filters = filterManager.getFilters()
         const filterCustom = filters.map(item => {
                 return  {
-                    key: item.meta.key,
+                    value: item.meta.key,
                     label: item.meta.params.query,
                 }
-        }).filter(element => Object.keys(selectedOptions).includes(element.key))
+        }).filter(element => Object.keys(selectedOptions).includes(element.value))
 
         if(filterCustom.length != 0){
             filterCustom.forEach(item => {
                 setSelectedOptions(prevState => ({
                         ...prevState,
-                        [item.key]: [...prevState[item.key],item],
+                        [item.value]: [...prevState[item.value],item],
                 }));
     
             })
@@ -153,23 +145,21 @@ export const CustomSearchBar = ({ ...props }) => {
             'combobox': <EuiComboBox
                         className={'filters-custom-combobox'}
                         placeholder={'Select '+item.key}
-                        options={item.values}
+                        options={}
                         selectedOptions={selectedOptions[item.key] || []}
                         onChange={onChange}
-                        onClick={() => setCurrentSelectName(item.key)}
                         isClearable={false}
                     />
         };
         return types[item.type] || types['default'];
     }
 
-    
     return (
         <>
         <EuiFlexGroup alignItems='center' style={{ margin: '0 8px' }}>
             {
                 avancedFiltersState === false ?
-                customFilters.map((item, key) => (
+                filtersValues.map((item, key) => (
                     <EuiFlexItem grow={2} key={key}>
                             {getComponent(item)}           
                     </EuiFlexItem>
