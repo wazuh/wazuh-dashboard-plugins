@@ -1,9 +1,9 @@
 import React from 'react';
-import { VisCard } from '../../../common/modules/panel/';
+import { VisCard } from '../../../common/modules/panel';
 import { EuiFlexItem, EuiPanel } from '@elastic/eui';
 import { SecurityAlerts } from '../../../visualize/components';
 
-export const DrilldownConfig = {
+export const DrilldownUserConfig = {
   rows: [
     {
       height: 230,

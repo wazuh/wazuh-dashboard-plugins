@@ -3,7 +3,7 @@ import { EuiFlexGroup, EuiFlexItem, EuiButtonEmpty, EuiTitle } from '@elastic/eu
 import { VisConfigLayout } from '../../../common/modules/panel/components';
 
 
-export const OfficeDrilldown = ({ changeView, toggleFilter, rows = [], selectedFilter = { field: '', value: '' } }) => {
+export const OfficeDrilldown = ({ title = '', changeView, toggleFilter, rows = [], selectedFilter = { field: '', value: '' } }) => {
 
   const rowClickHandler = () => {
     toggleFilter(selectedFilter.field);
@@ -17,7 +17,7 @@ export const OfficeDrilldown = ({ changeView, toggleFilter, rows = [], selectedF
       </EuiFlexItem>
       <EuiFlexItem grow={false}>
         <EuiTitle size="s">
-          <h3>User Activity</h3>
+          <h3>{title}</h3>
         </EuiTitle>
         <p>{selectedFilter.value}</p>
       </EuiFlexItem>
