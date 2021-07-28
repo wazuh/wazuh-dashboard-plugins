@@ -1056,13 +1056,14 @@ export class WazuhApiCtrl {
     try {
       
       const disabledRoles = ( await getConfiguration() )['disabled_roles'] || [];
+      const logoSidebar = ( await getConfiguration() )['customization.logo.sidebar'] || [];
       const wazuhSecurity = SecurityObj(context.wazuh.plugins);
       const data = (await wazuhSecurity.getCurrentUser(request, context)).authContext;
 
       const isWazuhDisabled = +(data.roles || []).some((role) => disabledRoles.includes(role));
 
       return response.ok({
-        body: { isWazuhDisabled }
+        body: { isWazuhDisabled, logoSidebar }
       });
     } catch (error) {
       log('wazuh-api:isWazuhDisabled', error.message || error);
