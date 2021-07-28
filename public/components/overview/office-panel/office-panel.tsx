@@ -15,7 +15,12 @@ import React, { useEffect, useState } from 'react';
 import { MainPanel } from '../../common/modules/panel';
 import { withErrorBoundary } from '../../common/hocs';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
-import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
+import {
+  UI_ERROR_SEVERITIES,
+  UIErrorLog,
+  UIErrorSeverity,
+  UILogLevel,
+} from '../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { CustomSearchBar } from '../../common/custom-search-bar';
 import { OfficeStats } from './views';
@@ -23,32 +28,33 @@ import { queryConfig } from '../../../react-services/query-config';
 import { ModuleConfig, filtersValues } from './config';
 
 export const OfficePanel = withErrorBoundary(() => {
-
   const [moduleStatsList, setModuleStatsList] = useState([]);
 
   /** Get Office 365 Side Panel Module info **/
   const getModuleConfig = async () => {
-    const modulesConfig = await queryConfig(
-      '000',
-      [{ component: 'wmodules', configuration: 'wmodules' }]
-    );
-    const config = Object.entries(modulesConfig["wmodules-wmodules"].affected_items[0].wmodules
-      .filter((module) => { return Object.keys(module)[0] == 'office365' })[0]['office365']).map((configProp) => {
-        const description = Array.isArray(configProp[1]) ? configProp[1].join(', ') : configProp[1];
-        return { title: configProp[0], description }
-      })
+    const modulesConfig = await queryConfig('000', [
+      { component: 'wmodules', configuration: 'wmodules' },
+    ]);
+    const config = Object.entries(
+      modulesConfig['wmodules-wmodules'].affected_items[0].wmodules.filter((module) => {
+        return Object.keys(module)[0] == 'office365';
+      })[0]['office365']
+    ).map((configProp) => {
+      const description = Array.isArray(configProp[1]) ? configProp[1].join(', ') : configProp[1];
+      return { title: configProp[0], description };
+    });
     setModuleStatsList(config);
-  }
+  };
 
   useEffect(() => {
     (async () => {
       try {
         await getModuleConfig();
       } catch (error) {
-        const options = {
+        const options: UIErrorLog = {
           context: `${OfficePanel.name}.getModuleConfig`,
-          level: UI_LOGGER_LEVELS.ERROR,
-          severity: UI_ERROR_SEVERITIES.BUSINESS,
+          level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+          severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
           error: {
             error: error,
             message: error.message || error,
@@ -58,15 +64,17 @@ export const OfficePanel = withErrorBoundary(() => {
         getErrorOrchestrator().handleError(options);
         setModuleStatsList([{ title: 'Module Unavailable', description: '' }]);
       }
-    }
-    )();
-  }, [])
+    })();
+  }, []);
 
   return (
     <>
       <CustomSearchBar filtersValues={filtersValues} />
-      <MainPanel moduleConfig={ModuleConfig} tab={'office'}
-        sidePanelChildren={<OfficeStats listItems={moduleStatsList} />} />
+      <MainPanel
+        moduleConfig={ModuleConfig}
+        tab={'office'}
+        sidePanelChildren={<OfficeStats listItems={moduleStatsList} />}
+      />
     </>
-  )
+  );
 });
