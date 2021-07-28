@@ -7,7 +7,7 @@ export const VisConfigLayout = ({ rowClickHandler, rows = [] }) => {
     {
       rows.map((row, key) => {
         return <EuiFlexGroup key={key} className={'wz-margin-0'} style={{
-          height: row.height || (150 + 'px')
+          height: row.height || ('unset')
         }}>
           {
             row.columns.map((column, key) => {

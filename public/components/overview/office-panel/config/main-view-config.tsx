@@ -6,7 +6,7 @@ import { SecurityAlerts } from '../../../visualize/components';
 export const MainViewConfig = {
   rows: [
     {
-      height: 300,
+      // height: 300,
       columns: [
         {
           width: 50,
