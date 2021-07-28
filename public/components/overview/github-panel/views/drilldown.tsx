@@ -14,7 +14,7 @@ import React from 'react';
 import { EuiFlexGroup, EuiFlexItem, EuiButtonEmpty, EuiTitle } from '@elastic/eui';
 import { VisConfigLayout } from '../../../common/modules/panel';
 
-export const Drilldown = ({ changeView, rows = [], toggleFilter, selectedFilter = { field: '', value: '' }, ...props }) => {
+export const Drilldown = ({ changeView, title='', rows = [], toggleFilter, selectedFilter = { field: '', value: '' }, ...props }) => {
 
   const rowClickHandler = () => {
     toggleFilter(selectedFilter.field);
@@ -28,7 +28,7 @@ export const Drilldown = ({ changeView, rows = [], toggleFilter, selectedFilter 
       </EuiFlexItem>
       <EuiFlexItem grow={false}>
         <EuiTitle size='s'>
-          <h3>User Activity</h3>
+          <h3>{title}</h3>
         </EuiTitle>
         <p>{selectedFilter.value}</p>
       </EuiFlexItem>
