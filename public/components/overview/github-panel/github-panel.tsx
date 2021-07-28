@@ -15,7 +15,7 @@ import React, { useEffect, useState } from 'react';
 import { MainPanel } from '../../common/modules/panel';
 import { withErrorBoundary } from '../../common/hocs';
 import { CustomSearchBar } from '../../common/custom-search-bar';
-import { OfficeStats } from './views';
+import { Stats } from './views';
 import { queryConfig } from '../../../react-services/query-config';
 import { ModuleConfig, filtersValues } from './config';
 
@@ -47,8 +47,8 @@ export const GitHubPanel = withErrorBoundary(() => {
   return (
     <>
       <CustomSearchBar filtersValues={filtersValues} />
-      <MainPanel moduleConfig={ModuleConfig} tab={'office'}
-        sidePanelChildren={<OfficeStats listItems={moduleStatsList} />} />
+      <MainPanel moduleConfig={ModuleConfig} tab={'github'}
+        sidePanelChildren={<Stats listItems={moduleStatsList} />} />
     </>
   )
 });
