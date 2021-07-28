@@ -15,13 +15,8 @@ import { connect } from 'react-redux';
 import { AppState } from '../../../../react-services/app-state';
 import { hasAgentSupportModule } from '../../../../react-services/wz-agents';
 import { getAngularModule, getToasts } from '../../../../kibana-services';
-<<<<<<< HEAD
-import { WAZUH_MODULES_ID } from '../../../../../common/constants';
-import { updateCurrentAgentData } from '../../../../redux/actions/appStateActions';
-=======
 import { updateCurrentAgentData } from '../../../../redux/actions/appStateActions';
 import { getAgentSections } from './agent-sections';
->>>>>>> 0cedbe8079cc25ed1f2c961eab5b152c20a358ab
 
 class WzMenuAgent extends Component {
   constructor(props) {
@@ -227,19 +222,8 @@ const mapStateToProps = (state) => {
   };
 };
 
-<<<<<<< HEAD
-const mapDispatchToProps = dispatch => ({
-  updateCurrentAgentData: (agentData) => dispatch(updateCurrentAgentData(agentData))
-});
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WzMenuAgent);
-=======
 const mapDispatchToProps = (dispatch) => ({
   updateCurrentAgentData: (agentData) => dispatch(updateCurrentAgentData(agentData)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(WzMenuAgent);
->>>>>>> 0cedbe8079cc25ed1f2c961eab5b152c20a358ab
