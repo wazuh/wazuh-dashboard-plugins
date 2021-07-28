@@ -24,13 +24,13 @@ import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 
 export interface IValueSuggestiions {
-  filterOptions: string[] | boolean[];
+  suggestedValues: string[] | boolean[];
   isLoading: boolean;
   setQuery: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export const useValueSuggestions = (filterField: string, type: 'string' | 'boolean' = 'string') => {
-  const [filterOptions, setFilterOptions] = useState<string[] | boolean[]>([]);
+  const [suggestedValues, setSuggestedValues] = useState<string[] | boolean[]>([]);
   const [query, setQuery] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
   const data = getDataPlugin();
@@ -46,7 +46,7 @@ export const useValueSuggestions = (filterField: string, type: 'string' | 'boole
           aggregatable: true,
         } as IFieldType;
         try {
-          setFilterOptions(
+          setSuggestedValues(
             await data.autocomplete.getValueSuggestions({
               query,
               indexPattern: indexPattern as IIndexPattern,
@@ -72,5 +72,5 @@ export const useValueSuggestions = (filterField: string, type: 'string' | 'boole
     }
   }, [indexPattern, query, filterField, type]);
 
-  return { filterOptions, isLoading, setQuery };
+  return { suggestedValues, isLoading, setQuery };
 };

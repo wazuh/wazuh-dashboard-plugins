@@ -24,4 +24,4 @@ export * from './useApiRequest';
 export * from './use-app-config';
 export * from './useRootScope';
 export * from './use_async_action';
-export { useValueSuggestions } from './use-value-suggestions';
+export { useValueSuggestions, IValueSuggestiions } from './use-value-suggestions';
