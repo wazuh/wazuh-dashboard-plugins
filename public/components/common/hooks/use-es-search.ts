@@ -13,8 +13,7 @@
 import { SetStateAction, useEffect, useState } from 'react';
 import { getDataPlugin } from '../../../kibana-services';
 import { useFilterManager, useIndexPattern, useQuery } from '.';
-import _ from 'lodash';
-import { Filter, IndexPattern } from 'src/plugins/data/public';
+import { IndexPattern } from 'src/plugins/data/public';
 import {
   UI_ERROR_SEVERITIES,
   UIErrorLog,
@@ -44,10 +43,9 @@ interface IUseEsSearch {
 const useEsSearch = ({ preAppliedFilters = [], preAppliedAggs = {}, size = 10 }): IUseEsSearch => {
   const data = getDataPlugin();
   const indexPattern = useIndexPattern();
-  const filterManager = useFilterManager();
+  const {filters} = useFilterManager();
   const [query] = useQuery();
   const [esResults, setEsResults] = useState<SearchResponse>({} as SearchResponse);
-  const [managedFilters, setManagedFilters] = useState<Filter[] | []>([]);
   const [error, setError] = useState<Error>({} as Error);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [page, setPage] = useState<number>(0);
@@ -74,25 +72,13 @@ const useEsSearch = ({ preAppliedFilters = [], preAppliedAggs = {}, size = 10 })
         setIsLoading(false);
       }
     })();
-  }, [indexPattern, query, managedFilters, page]);
-
-  useEffect(() => {
-    let filterSubscriber = filterManager.getUpdates$().subscribe(() => {
-      const newFilters = filterManager.getFilters();
-      if (!_.isEqual(managedFilters, newFilters)) {
-        setManagedFilters(newFilters);
-      }
-      return () => {
-        filterSubscriber.unsubscribe();
-      };
-    });
-  }, []);
+  }, [indexPattern, query, filters, page]);
 
   const search = async (): Promise<SearchResponse> => {
     if (indexPattern) {
       const esQuery = await data.query.getEsQuery(indexPattern as IndexPattern);
       const searchSource = await data.search.searchSource.create();
-      const combined = [...esQuery.bool.filter, ...preAppliedFilters, ...managedFilters];
+      const combined = [...esQuery.bool.filter, ...preAppliedFilters, ...filters];
 
       return await searchSource
         .setParent(undefined)
