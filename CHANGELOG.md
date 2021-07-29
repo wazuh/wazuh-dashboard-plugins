@@ -12,6 +12,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added confirmation message when closing a form [#3221](https://github.com/wazuh/wazuh-kibana-app/pull/3221)
 - Improvement to hide navbar Wazuh label. [#3240](https://github.com/wazuh/wazuh-kibana-app/pull/3240)
 - Add modal creating new rule/decoder [#3274](https://github.com/wazuh/wazuh-kibana-app/pull/3274)
+- New functionality to change app logos [#3503](https://github.com/wazuh/wazuh-kibana-app/pull/3503)
 
 ### Changed
 
