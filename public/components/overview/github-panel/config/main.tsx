@@ -54,7 +54,7 @@ export const MainViewConfig = {
             <EuiFlexItem grow={props.width}>
               <AggTable
                 tableTitle='Repositories'
-                aggTerm='data.github.repo'
+                aggTerm='data.github.repository'
                 aggLabel='Respository'
                 maxRows={5} 
                 onRowClick={props.onRowClick} />
