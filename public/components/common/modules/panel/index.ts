@@ -10,6 +10,5 @@
  * Find more information about this on the LICENSE file.
  */
 
-
 export { MainPanel } from './main-panel';
 export * from './components/';

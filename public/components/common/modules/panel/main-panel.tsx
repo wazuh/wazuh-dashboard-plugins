@@ -1,9 +1,17 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import {
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiPageBody,
-} from '@elastic/eui';
+/*
+ * Wazuh app - React components MainPanel
+ * Copyright (C) 2015-2021 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
+
+import React, { useCallback, useEffect, useState } from 'react';
+import { EuiFlexGroup, EuiFlexItem, EuiPageBody } from '@elastic/eui';
 import { ModuleSidePanel } from './components/';
 import WzReduxProvider from '../../../../redux/wz-redux-provider';
 import { VisFactoryHandler } from '../../../../react-services/vis-factory-handler';
@@ -12,28 +20,56 @@ import { useFilterManager } from '../../hooks';
 import { FilterHandler } from '../../../../utils/filter-handler';
 import { TabVisualizations } from '../../../../factories/tab-visualizations';
 import { Filter } from '../../../../../../../src/plugins/data/public/';
-import { FilterMeta, FilterState, FilterStateStore } from '../../../../../../../src/plugins/data/common';
+import {
+  FilterMeta,
+  FilterState,
+  FilterStateStore,
+} from '../../../../../../../src/plugins/data/common';
 import { SampleDataWarning } from '../../../visualize/components';
-
+import {
+  UI_ERROR_SEVERITIES,
+  UIErrorLog,
+  UIErrorSeverity,
+  UILogLevel,
+} from '../../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
+import { getErrorOrchestrator } from '../../../../react-services/common-services';
 
 export const MainPanel = ({ sidePanelChildren, tab = 'general', moduleConfig = {}, ...props }) => {
-
   const [viewId, setViewId] = useState('main');
   const [selectedFilter, setSelectedFilter] = useState({ field: '', value: '' });
   const filterManager = useFilterManager();
 
+  const buildOverviewVisualization = async () => {
+    const tabVisualizations = new TabVisualizations();
+    tabVisualizations.removeAll();
+    tabVisualizations.setTab(tab);
+    tabVisualizations.assign({
+      [tab]: moduleConfig[viewId].length(),
+    });
+    const filterHandler = new FilterHandler(AppState.getCurrentPattern());
+    await VisFactoryHandler.buildOverviewVisualizations(filterHandler, tab, null, true);
+  };
+
   useEffect(() => {
     (async () => {
-      const tabVisualizations = new TabVisualizations();
-      tabVisualizations.removeAll();
-      tabVisualizations.setTab(tab);
-      tabVisualizations.assign({
-        [tab]: moduleConfig[viewId].length(),
-      });
-      const filterHandler = new FilterHandler(AppState.getCurrentPattern());
-      await VisFactoryHandler.buildOverviewVisualizations(filterHandler, tab, null, true);
-    })()
-  }, [viewId])
+      try {
+        await buildOverviewVisualization();
+      } catch (error) {
+        const options: UIErrorLog = {
+          context: `${MainPanel.name}.buildOverviewVisualization`,
+          level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+          severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
+          error: {
+            error: error,
+            message: error.message || error,
+            title: error.name || error,
+          },
+        };
+        getErrorOrchestrator().handleError(options);
+      }
+    })();
+  }, [viewId]);
 
   /**
    * When a filter is toggled applies de selection
@@ -48,19 +84,18 @@ export const MainPanel = ({ sidePanelChildren, tab = 'general', moduleConfig = {
       filters.push(customFilter);
     }
     filterManager.setFilters(filters);
-  }
+  };
 
   useEffect(() => {
     applyFilter();
 
     return () => applyFilter(true);
-  }, [selectedFilter])
-
+  }, [selectedFilter]);
 
   /**
    * Builds selected filter structure
-   * @param value 
-   * @param field 
+   * @param value
+   * @param field
    */
   const buildCustomFilter = ({ field, value }): Filter => {
     const meta: FilterMeta = {
@@ -69,51 +104,51 @@ export const MainPanel = ({ sidePanelChildren, tab = 'general', moduleConfig = {
       key: field,
       params: { query: value },
       alias: null,
-      type: "phrase",
+      type: 'phrase',
       index: AppState.getCurrentPattern(),
     };
     const $state: FilterState = {
       store: FilterStateStore.APP_STATE,
-      isImplicit: true
+      isImplicit: true,
     };
     const query = {
       match: {
         [field]: {
           query: value,
-          type: 'phrase'
-        }
-      }
-    }
+          type: 'phrase',
+        },
+      },
+    };
 
     return { meta, $state, query };
-  }
+  };
 
   const toggleView = (id = 'main') => {
-    if (id != viewId)
-      setViewId(id);
-  }
+    if (id != viewId) setViewId(id);
+  };
 
   const toggleFilter = (field = '', value = '') => {
     setSelectedFilter({ field, value });
-  }
+  };
 
   /**
    * Builds active view
-   * @param props 
+   * @param props
    * @returns React.Component
    */
   const ModuleContent = useCallback(() => {
     const View = moduleConfig[viewId].component;
-    return <WzReduxProvider><View selectedFilter={selectedFilter} toggleFilter={toggleFilter} changeView={toggleView} /></WzReduxProvider>
-  }, [viewId])
+    return (
+      <WzReduxProvider>
+        <View selectedFilter={selectedFilter} toggleFilter={toggleFilter} changeView={toggleView} />
+      </WzReduxProvider>
+    );
+  }, [viewId]);
 
   return (
     <EuiFlexGroup style={{ margin: '0 8px' }}>
       <EuiFlexItem>
-        {sidePanelChildren && <ModuleSidePanel>
-          {sidePanelChildren}
-        </ModuleSidePanel >
-        }
+        {sidePanelChildren && <ModuleSidePanel>{sidePanelChildren}</ModuleSidePanel>}
         <EuiPageBody>
           <SampleDataWarning />
           <ModuleContent />
@@ -122,4 +157,3 @@ export const MainPanel = ({ sidePanelChildren, tab = 'general', moduleConfig = {
     </EuiFlexGroup>
   );
 };
-

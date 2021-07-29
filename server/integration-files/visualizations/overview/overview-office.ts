@@ -1052,6 +1052,192 @@ export default [
     },
   },
   {
+    _id: 'Wazuh-App-Overview-Office-User-Operation-Level-Table',
+    _type: 'visualization',
+    _source: {
+      title: 'User Operations',
+      visState: JSON.stringify({
+        "title": "User Operation Level",
+        "type": "table",
+        "aggs": [
+          {
+            "id": "1",
+            "enabled": true,
+            "type": "count",
+            "params": {},
+            "schema": "metric"
+          },
+          {
+            "id": "2",
+            "enabled": true,
+            "type": "terms",
+            "params": {
+              "field": "data.office365.UserId",
+              "orderBy": "1",
+              "order": "desc",
+              "size": 500,
+              "otherBucket": true,
+              "otherBucketLabel": "Others",
+              "missingBucket": false,
+              "missingBucketLabel": "Missing",
+              "customLabel": "Users"
+            },
+            "schema": "bucket"
+          },
+          {
+            "id": "3",
+            "enabled": true,
+            "type": "terms",
+            "params": {
+              "field": "data.office365.Operation",
+              "orderBy": "1",
+              "order": "desc",
+              "size": 100,
+              "otherBucket": false,
+              "otherBucketLabel": "Other",
+              "missingBucket": false,
+              "missingBucketLabel": "Missing",
+              "customLabel": "Operation"
+            },
+            "schema": "bucket"
+          },
+          {
+            "id": "4",
+            "enabled": true,
+            "type": "terms",
+            "params": {
+              "field": "rule.level",
+              "orderBy": "1",
+              "order": "desc",
+              "size": 20,
+              "otherBucket": false,
+              "otherBucketLabel": "Other",
+              "missingBucket": false,
+              "missingBucketLabel": "Missing",
+              "customLabel": "Rule level"
+            },
+            "schema": "bucket"
+          }
+        ],
+        "params": {
+          "perPage": 5,
+          "showPartialRows": false,
+          "showMetricsAtAllLevels": false,
+          "sort": {
+            "columnIndex": null,
+            "direction": null
+          },
+          "showTotal": false,
+          "totalFunc": "sum",
+          "percentageCol": ""
+        }
+      }),
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON: JSON.stringify({
+          index: 'wazuh-alerts',
+          filter: [],
+          query: { query: '', language: 'lucene' },
+        }),
+      },
+    },
+  },
+  {
+    _id: 'Wazuh-App-Overview-Office-Client-IP-Operation-Level-Table',
+    _type: 'visualization',
+    _source: {
+      title: 'Client IP Operations',
+      visState: JSON.stringify({
+        "title": "Client IP Operation Level",
+        "type": "table",
+        "aggs": [
+          {
+            "id": "1",
+            "enabled": true,
+            "type": "count",
+            "params": {},
+            "schema": "metric"
+          },
+          {
+            "id": "2",
+            "enabled": true,
+            "type": "terms",
+            "params": {
+              "field": "data.office365.ClientIP",
+              "orderBy": "1",
+              "order": "desc",
+              "size": 500,
+              "otherBucket": true,
+              "otherBucketLabel": "Others",
+              "missingBucket": false,
+              "missingBucketLabel": "Missing",
+              "customLabel": "Client IP"
+            },
+            "schema": "bucket"
+          },
+          {
+            "id": "3",
+            "enabled": true,
+            "type": "terms",
+            "params": {
+              "field": "data.office365.Operation",
+              "orderBy": "1",
+              "order": "desc",
+              "size": 100,
+              "otherBucket": false,
+              "otherBucketLabel": "Other",
+              "missingBucket": false,
+              "missingBucketLabel": "Missing",
+              "customLabel": "Operation"
+            },
+            "schema": "bucket"
+          },
+          {
+            "id": "4",
+            "enabled": true,
+            "type": "terms",
+            "params": {
+              "field": "rule.level",
+              "orderBy": "1",
+              "order": "desc",
+              "size": 20,
+              "otherBucket": false,
+              "otherBucketLabel": "Other",
+              "missingBucket": false,
+              "missingBucketLabel": "Missing",
+              "customLabel": "Rule level"
+            },
+            "schema": "bucket"
+          }
+        ],
+        "params": {
+          "perPage": 5,
+          "showPartialRows": false,
+          "showMetricsAtAllLevels": false,
+          "sort": {
+            "columnIndex": null,
+            "direction": null
+          },
+          "showTotal": false,
+          "totalFunc": "sum",
+          "percentageCol": ""
+        }
+      }),
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON: JSON.stringify({
+          index: 'wazuh-alerts',
+          filter: [],
+          query: { query: '', language: 'lucene' },
+        }),
+      },
+    },
+  },
+  {
     _id: 'Wazuh-App-Overview-Office-Top-Events-Pie',
     _type: 'visualization',
     _source: {
