@@ -36,6 +36,7 @@ class WzMenuAgent extends Component {
     this.securityInformationItems = [
       this.agentSections.general,
       this.agentSections.fim,
+      this.agentSections.office,
       this.agentSections.aws,
       this.agentSections.gcp,
     ];
