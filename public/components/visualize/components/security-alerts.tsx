@@ -16,7 +16,7 @@ import { useAllowedAgents } from '../../common/hooks/useAllowedAgents'
  
 export const SecurityAlerts = ({initialColumns = ["icon", "timestamp", 'rule.mitre.id', 'rule.mitre.tactic', 'rule.description', 'rule.level', 'rule.id']}) => {
  const [query] = useQuery();
- const {filterManager} = useFilterManager();
+ const filterManager = useFilterManager();
  const copyOfFilterManager = filterManager
  const refreshAngularDiscover = useRefreshAngularDiscover();
  

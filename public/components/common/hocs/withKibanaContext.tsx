@@ -35,7 +35,7 @@ export interface withKibanaContextExtendsProps {
 export const withKibanaContext = <T extends object>(Component:React.FunctionComponent<T>) => {
   function hoc(props:T & withKibanaContextProps ):React.FunctionComponentElement<T & withKibanaContextExtendsProps> {
     const indexPattern = props.indexPattern ? props.indexPattern : useIndexPattern();
-    const filterManager = props.filterManager ? props.filterManager : useFilterManager().filterManager;
+    const filterManager = props.filterManager ? props.filterManager : useFilterManager();
     const [query, setQuery] = props.query ? useState(props.query) : useQueryManager();
     const { timeFilter, timeHistory, setTimeFilter } = props.timeFilter ? props.timeFilter : useTimeFilter();
     return <Component {...props}
