@@ -24,8 +24,8 @@ export const useFilterManager = () => {
       if (!_.isEqual(filters, newFilters)) {
         setFilters(newFilters);
       }
-      return unsubscribe;
     });
+    return unsubscribe;
   }, []);
   return { filterManager, filters };
 };
