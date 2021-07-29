@@ -21,8 +21,8 @@ export const OfficeStats = ({ listItems = [] }) => {
   return (
     <EuiFlexGroup direction={'column'} alignItems={'flexStart'}>
       <EuiFlexItem>
-        <EuiFlexGroup justifyContent={'center'}>
-          <EuiFlexItem >
+        <EuiFlexGroup>
+          <EuiFlexItem className={'wz-justify-center'}>
             <img alt="moduleLogo" src={moduleLogo} style={logoStyle} />
           </EuiFlexItem>
           <EuiFlexItem>
