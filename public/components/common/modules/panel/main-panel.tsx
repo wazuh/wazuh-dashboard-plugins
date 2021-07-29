@@ -38,7 +38,7 @@ import { getErrorOrchestrator } from '../../../../react-services/common-services
 export const MainPanel = ({ sidePanelChildren, tab = 'general', moduleConfig = {}, ...props }) => {
   const [viewId, setViewId] = useState('main');
   const [selectedFilter, setSelectedFilter] = useState({ field: '', value: '' });
-  const filterManager = useFilterManager();
+  const {filterManager} = useFilterManager();
 
   const buildOverviewVisualization = async () => {
     const tabVisualizations = new TabVisualizations();
