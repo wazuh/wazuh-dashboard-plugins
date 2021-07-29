@@ -167,7 +167,7 @@ function HealthCheckComponent() {
     setChecksReady(prev =>  ({...prev, [checkID]: isReady}));
   }
 
-  const logoUrl = appConfig.data['customization.logo.healthcheck'];
+  const logoUrl = `/plugins/wazuh/assets/${appConfig.data['customization.logo.healthcheck']}`
   const thereAreErrors = Object.keys(checkErrors).length > 0;
 
   const renderChecks = () => {

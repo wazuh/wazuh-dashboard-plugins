@@ -172,9 +172,9 @@ export const WAZUH_DEFAULT_APP_CONFIG = {
   hideManagerAlerts: false,
   'logs.level': 'info',
   'enrollment.dns': '',
-  'customization.logo.app':'/plugins/wazuh/assets/logotype.svg',
-  'customization.logo.sidebar':'/plugins/wazuh/assets/icon_blue.png',
-  'customization.logo.healthcheck':'/plugins/wazuh/assets/icon_blue.svg'
+  'customization.logo.app':'logotype.svg',
+  'customization.logo.sidebar':'icon_blue.png',
+  'customization.logo.healthcheck':'icon_blue.svg'
 };
 
 // Wazuh errors

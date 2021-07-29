@@ -164,6 +164,17 @@ export const initialWazuhConfig: string = `---
 #cron.statistics.shards: 2
 #cron.statistics.replicas: 0
 #
+# ------------------------------ wazuh-logo-customization -------------------------------
+#
+#Define the name of the app logo saved in the path /plugins/wazuh/assets/
+#customization.logo.app: logotype.svg
+#
+#Define the name of the sideba logo saved in the path /plugins/wazuh/assets/
+#customization.logo.sidebar: icon_blue.png
+#
+#Define the name of the health-check logo saved in the path /plugins/wazuh/assets/
+#customization.logo.healthcheck: icon_blue.svg
+#
 # ---------------------------- Hide manager alerts ------------------------------
 # Hide the alerts of the manager in all dashboards and discover
 #hideManagerAlerts: false

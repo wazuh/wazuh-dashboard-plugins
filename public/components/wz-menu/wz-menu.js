@@ -907,7 +907,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
           style={{ paddingTop: 2 }}
         >
           <EuiFlexItem grow={false} style={{ marginRight: 0 }}>
-            <img src={this.wazuhConfig.getConfig()['customization.logo.app']} className="navBarLogo" alt=""></img>
+            <img src={`/plugins/wazuh/assets/${this.wazuhConfig.getConfig()['customization.logo.app']}`} className="navBarLogo" alt=""></img>
           </EuiFlexItem>
           <EuiFlexItem grow={false} style={{ margin: '12px 6px' }}>
             {this.state.menuOpened && (

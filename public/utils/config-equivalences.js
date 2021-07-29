@@ -1,8 +1,8 @@
 export const configEquivalences = {
   pattern: 'Default index pattern to use on the app.',
-  'customization.logo.app':'Define the path to the app logo',
-  'customization.logo.sidebar':'Define the path to the sidebar logo',
-  'customization.logo.healthcheck':'Define the path to the health-check logo',
+  'customization.logo.app':'Define the name of the app logo saved in the path /plugins/wazuh/assets/',
+  'customization.logo.sidebar':'Define the name of the sidebar logo saved in the path /plugins/wazuh/assets/',
+  'customization.logo.healthcheck':'Define the name of the health-check logo saved in the path /plugins/wazuh/assets/',
   'checks.pattern':
     'Enable or disable the index pattern health check when opening the app.',
   'checks.template':
