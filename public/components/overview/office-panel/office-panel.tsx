@@ -62,7 +62,7 @@ export const OfficePanel = withErrorBoundary(() => {
           },
         };
         getErrorOrchestrator().handleError(options);
-        setModuleStatsList([{ title: 'Module Unavailable', description: '' }]);
+        setModuleStatsList([]);
       }
     })();
   }, []);
