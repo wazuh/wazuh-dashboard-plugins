@@ -110,6 +110,12 @@ export default [
         description:
           'Configuration assessment using CIS scanner and SCAP checks',
         goto: 'cis-cat'
+      },
+      {
+        name: 'GitHub',
+        description:
+          'Detect threats targeting GitHub organizations',
+        goto: 'github'
       }
     ]
   },
