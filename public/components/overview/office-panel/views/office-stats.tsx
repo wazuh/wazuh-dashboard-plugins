@@ -11,9 +11,10 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { EuiDescriptionList, EuiFlexItem, EuiFlexGroup, EuiTitle } from '@elastic/eui';
+import { EuiDescriptionList, EuiFlexItem, EuiFlexGroup, EuiTitle, EuiCallOut } from '@elastic/eui';
 import moduleLogo from '../../../../assets/office365.svg';
 import React from 'react';
+import './office-stats.scss';
 
 export const OfficeStats = ({ listItems = [] }) => {
   const logoStyle = { width: 30 };
@@ -21,18 +22,28 @@ export const OfficeStats = ({ listItems = [] }) => {
     <EuiFlexGroup direction={'column'} alignItems={'flexStart'}>
       <EuiFlexItem>
         <EuiFlexGroup>
-          <EuiFlexItem>
+          <EuiFlexItem className={'wz-justify-center'}>
             <img alt="moduleLogo" src={moduleLogo} style={logoStyle} />
           </EuiFlexItem>
           <EuiFlexItem>
+            <EuiTitle size={'s'}>
+              <h4 className={'office-stats-title'}>Office 365</h4>
+            </EuiTitle>
             <EuiTitle size={'xs'}>
-              <h4>Office 365</h4>
+              <h5 className={'office-stats-subtitle'}>Module configuration</h5>
             </EuiTitle>
           </EuiFlexItem>
         </EuiFlexGroup>
       </EuiFlexItem>
       <EuiFlexItem>
-        <EuiDescriptionList listItems={listItems} compressed />
+        {
+          listItems.length ? (
+            <EuiDescriptionList listItems={listItems} compressed />) : (
+            <EuiCallOut className={'office-stats-callout-warning'}
+              title="Module configuration unavailable"
+              color="warning"
+              iconType="warning" />)
+        }
       </EuiFlexItem>
     </EuiFlexGroup>
   );

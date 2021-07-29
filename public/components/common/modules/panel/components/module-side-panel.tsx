@@ -35,7 +35,7 @@ export const ModuleSidePanel = ({ navIsDocked = false, children, ...props }) => 
     >
       <div>
         <EuiButtonEmpty
-          style={{ float: 'right' }}
+          style={{ position: 'absolute', right: 0 }}
           onClick={() => setNavIsOpen(!navIsOpen)}
           iconType={'cross'}
         />

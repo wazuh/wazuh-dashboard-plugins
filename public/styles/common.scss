@@ -1751,3 +1751,13 @@ iframe.width-changed {
 .application .filters-search-bar .globalQueryBar, .app-container .filters-search-bar .globalQueryBar{
   padding: 0 !important;
 }
+
+@media only screen and (max-width: 960px){
+  .custom-kbn-search-bar .euiSuperUpdateButton .euiSuperUpdateButton__text {
+    display: none;
+  }
+
+  .custom-kbn-search-bar .euiSuperUpdateButton {
+    min-width: 0;
+  }
+}

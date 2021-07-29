@@ -10,12 +10,12 @@ export const Combobox = ({ item, ...props }) => {
 
     const { suggestedValues, isLoading, setQuery } = useValueSuggestions(item.key)
 
-    const comboOptions = suggestedValues.map((value,key) => ({ key:key, label:value, value:item.key}))
+    const comboOptions = suggestedValues.map((value,key) => ({ key:key, label:value, value:item.key})).sort((a, b) => a.label - b.label)
 
     return (
         <EuiComboBox
             data-test-subj={`combobox-${item.key}`}
-            placeholder={`Select ${item.key}`}
+            placeholder={item.key}
             className={'filters-custom-combobox'}
             options={comboOptions}
             isClearable={false}

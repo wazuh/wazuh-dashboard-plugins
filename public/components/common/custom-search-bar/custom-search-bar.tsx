@@ -7,7 +7,6 @@ import { FilterMeta, FilterState, FilterStateStore } from '../../../../../../src
 import {
     EuiFlexGroup,
     EuiFlexItem,
-    EuiComboBox,
     EuiSwitch,
 } from '@elastic/eui';
 
@@ -15,7 +14,6 @@ import {
 import { getDataPlugin } from '../../../kibana-services';
 import { KbnSearchBar } from '../../kbn-search-bar';
 import { TimeRange, Query } from '../../../../../../src/plugins/data/common';
-import { ModulesHelper } from '../modules/modules-helper';
 import { Combobox } from './components'
 
 export const CustomSearchBar = ({ filtersValues, ...props }) => {
@@ -94,7 +92,7 @@ export const CustomSearchBar = ({ filtersValues, ...props }) => {
         return { meta, $state, query };
     };
 
-    const setKibanaFilters = (values) => {
+    const setKibanaFilters = (values: any[]) => {
         setLoading(true)
         const newFilters = []
         const currentFilters = filterManager.getFilters().filter(item => item.meta.key != values[0].value)
@@ -129,12 +127,12 @@ export const CustomSearchBar = ({ filtersValues, ...props }) => {
         setLoading(false)
     };
 
-    const onChange = (values) => {
+    const onChange = (values: any[]) => {
         setKibanaFilters(values)
         refreshCustomSelectedFilter();
     };
 
-    const getComponent = (item) => {
+    const getComponent = (item: any) => {
         var types = {
             'default': <></>,
             'combobox': <Combobox
@@ -148,11 +146,11 @@ export const CustomSearchBar = ({ filtersValues, ...props }) => {
 
     return (
         <>
-            <EuiFlexGroup alignItems='center' style={{ margin: '0 8px' }}>
+            <EuiFlexGroup className='custom-kbn-search-bar' alignItems='center' style={{ margin: '0 8px' }}>
                 {
                     avancedFiltersState === false ?
                         filtersValues.map((item, key) => (
-                            <EuiFlexItem grow={2} key={key}>
+                            <EuiFlexItem key={key}>
                                 {getComponent(item)}
                             </EuiFlexItem>
                         ))
