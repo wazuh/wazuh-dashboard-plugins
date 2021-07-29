@@ -13,7 +13,13 @@
 
 import React from 'react';
 import { OfficeBody, OfficeDrilldown } from '../views';
-import { MainViewConfig, DrilldownUserConfig, DrilldownIPConfig } from './';
+import { MainViewConfig } from './';
+import { drilldownConfig } from './drilldown-ip-config';
+
+const drilldownUserConfig = drilldownConfig('Wazuh-App-Overview-Office-User-Operation-Level-Table');
+const drilldownIPConfig = drilldownConfig(
+  'Wazuh-App-Overview-Office-Client-IP-Operation-Level-Table'
+);
 
 export const ModuleConfig = {
   main: {
@@ -21,15 +27,15 @@ export const ModuleConfig = {
     component: (props) => <OfficeBody {...{ ...MainViewConfig, ...props }} />,
   },
   'data.office365.UserId': {
-    length: () => DrilldownUserConfig.rows.reduce((total, row) => total + row.columns.length, 0),
+    length: () => drilldownUserConfig.rows.reduce((total, row) => total + row.columns.length, 0),
     component: (props) => (
-      <OfficeDrilldown title={'User Activity'} {...{ ...DrilldownUserConfig, ...props }} />
+      <OfficeDrilldown title={'User Activity'} {...{ ...drilldownUserConfig, ...props }} />
     ),
   },
   'data.office365.ClientIP': {
-    length: () => DrilldownIPConfig.rows.reduce((total, row) => total + row.columns.length, 0),
+    length: () => drilldownIPConfig.rows.reduce((total, row) => total + row.columns.length, 0),
     component: (props) => (
-      <OfficeDrilldown title={'Client IP'} {...{ ...DrilldownIPConfig, ...props }} />
+      <OfficeDrilldown title={'Client IP'} {...{ ...drilldownIPConfig, ...props }} />
     ),
   },
 };
