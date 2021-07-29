@@ -11,8 +11,23 @@
  */
 import { getDataPlugin } from '../../../kibana-services';
 import { useState, useEffect, useMemo } from 'react';
+import { Filter } from 'src/plugins/data/public';
+import _ from 'lodash';
 
 export const useFilterManager = () => {
   const filterManager = useMemo(() => getDataPlugin().query.filterManager, []);
-  return { filterManager };
+  const [filters, setFilters] = useState<Filter[]>([])
+
+  useEffect(() => {
+    let filterSubscriber = filterManager.getUpdates$().subscribe(() => {
+      const newFilters = filterManager.getFilters();
+      if (!_.isEqual(filters, newFilters)) {
+        setFilters(newFilters);
+      }
+      return () => {
+        filterSubscriber.unsubscribe();
+      };
+    });
+  }, []);
+  return { filterManager, filters };
 };
