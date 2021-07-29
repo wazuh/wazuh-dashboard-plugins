@@ -16,17 +16,15 @@ import _ from 'lodash';
 
 export const useFilterManager = () => {
   const filterManager = useMemo(() => getDataPlugin().query.filterManager, []);
-  const [filters, setFilters] = useState<Filter[]>([])
+  const [filters, setFilters] = useState<Filter[]>([]);
 
   useEffect(() => {
-    let filterSubscriber = filterManager.getUpdates$().subscribe(() => {
+    const { unsubscribe } = filterManager.getUpdates$().subscribe(() => {
       const newFilters = filterManager.getFilters();
       if (!_.isEqual(filters, newFilters)) {
         setFilters(newFilters);
       }
-      return () => {
-        filterSubscriber.unsubscribe();
-      };
+      return unsubscribe;
     });
   }, []);
   return { filterManager, filters };
