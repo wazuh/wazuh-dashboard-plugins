@@ -19,7 +19,7 @@ import { SecurityAlerts } from '../../../visualize/components';
 export const DrilldownUserConfig = {
   rows: [
     {
-      height: 230,
+      height: 400,
       columns: [
         {
           width: 30,
@@ -36,7 +36,7 @@ export const DrilldownUserConfig = {
         {
           width: 40,
           component: (props) => (
-            <VisCard id="Wazuh-App-Overview-Office-IPs-By-User-Table" tab="office" {...props} />
+            <VisCard id="Wazuh-App-Overview-Office-Client-IP-Operation-Level-Table" tab="office" {...props} />
           ),
         },
       ],
