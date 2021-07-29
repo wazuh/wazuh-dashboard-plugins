@@ -11,7 +11,7 @@ You can find more info on how to construct a filter object at https://www.elasti
 const useEsSearch = ({ preAppliedFilters = [], preAppliedAggs = {}, size = 10 }) => {
   const data = getDataPlugin();
   const indexPattern = useIndexPattern();
-  const filterManager = useFilterManager();
+  const {filterManager} = useFilterManager();
   const [esResults, setEsResults] = useState({});
   const [managedFilters, setManagedFilters] = useState<Filter[] | []>([]);
   const [error, setError] = useState(null);
