@@ -110,12 +110,6 @@ export default [
         description:
           'Configuration assessment using CIS scanner and SCAP checks',
         goto: 'cis-cat'
-      },
-      {
-        name: 'GitHub',
-        description:
-          'Detect threats targeting GitHub organizations',
-        goto: 'github'
       }
     ]
   },
@@ -213,6 +207,12 @@ export default [
         name: 'Google Cloud Pub/Sub',
         description: 'Configuration options of the Google Cloud Pub/Sub module',
         goto: 'gcp-pubsub'
+      },
+      {
+        name: 'GitHub',
+        description:
+          'Detect threats targeting GitHub organizations',
+        goto: 'github'
       }
     ]
   }
