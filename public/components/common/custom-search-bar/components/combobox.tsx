@@ -15,7 +15,7 @@ export const Combobox = ({ item, ...props }) => {
     return (
         <EuiComboBox
             data-test-subj={`combobox-${item.key}`}
-            placeholder={`Select ${item.key}`}
+            placeholder={item.key}
             className={'filters-custom-combobox'}
             options={comboOptions}
             isClearable={false}

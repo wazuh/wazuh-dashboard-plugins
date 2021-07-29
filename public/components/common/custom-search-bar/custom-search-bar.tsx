@@ -146,11 +146,11 @@ export const CustomSearchBar = ({ filtersValues, ...props }) => {
 
     return (
         <>
-            <EuiFlexGroup alignItems='center' style={{ margin: '0 8px' }}>
+            <EuiFlexGroup className='custom-kbn-search-bar' alignItems='center' style={{ margin: '0 8px' }}>
                 {
                     avancedFiltersState === false ?
                         filtersValues.map((item, key) => (
-                            <EuiFlexItem grow={2} key={key}>
+                            <EuiFlexItem key={key}>
                                 {getComponent(item)}
                             </EuiFlexItem>
                         ))
