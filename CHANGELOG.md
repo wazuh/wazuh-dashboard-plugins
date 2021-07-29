@@ -44,6 +44,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added try catch strategy with ErrorOrchestrator service on FIM & SCA sections [#3417](https://github.com/wazuh/wazuh-kibana-app/pull/3417)
 - Added sample data for office365 events [#3424](https://github.com/wazuh/wazuh-kibana-app/pull/3424)
 - Created a separate component to check for sample data [#3475](https://github.com/wazuh/wazuh-kibana-app/pull/3475)
+- Added a new hook for getting value suggestions [#3506](https://github.com/wazuh/wazuh-kibana-app/pull/3506)
 
 ### Changed
 
