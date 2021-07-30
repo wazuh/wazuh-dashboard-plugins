@@ -52,7 +52,15 @@ export const DrilldownConfigOrganization = {
       columns: [
         {
           width: 100,
-          component: () => <EuiFlexItem><EuiPanel paddingSize={'s'} ><SecurityAlerts /></EuiPanel></EuiFlexItem>
+          component: () => (
+            <EuiFlexItem>
+              <EuiPanel paddingSize={'s'}>
+                <SecurityAlerts 
+                  initialColumns={["icon", "timestamp", 'rule.description', 'data.github.repo', 'data.github.actor', 'data.github.action', 'rule.level', 'rule.id']}
+                />
+              </EuiPanel>
+            </EuiFlexItem>
+          )
         },
       ]
     },

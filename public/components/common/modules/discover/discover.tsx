@@ -151,6 +151,10 @@ export const Discover = compose(
         'rule.nist_800_53': 'NIST 800-53',
         'rule.tsc': 'TSC',
         'rule.hipaa': 'HIPAA',
+        'data.github.action': 'Action',
+        'data.github.actor': 'Actor',
+        'data.github.org': 'Organization',
+        'data.github.repo': 'Repository'
       };
 
       this.hideCreateCustomLabel.bind(this);
