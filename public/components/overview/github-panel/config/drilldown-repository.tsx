@@ -49,7 +49,6 @@ export const DrilldownConfigRepository = {
       ]
     },
     {
-      height: 800,
       columns: [
         {
           width: 100,

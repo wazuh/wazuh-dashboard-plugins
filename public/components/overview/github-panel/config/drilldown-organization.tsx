@@ -49,7 +49,6 @@ export const DrilldownConfigOrganization = {
       ]
     },
     {
-      height: 800,
       columns: [
         {
           width: 100,

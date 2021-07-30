@@ -49,7 +49,6 @@ export const DrilldownConfigAction = {
       ]
     },
     {
-      height: 800,
       columns: [
         {
           width: 100,
