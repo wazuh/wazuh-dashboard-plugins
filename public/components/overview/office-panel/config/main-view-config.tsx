@@ -13,15 +13,14 @@
 
 import React from 'react';
 import { AggTable } from '../../../common/modules/panel/';
-import { EuiFlexItem, EuiPanel } from '@elastic/eui';
-import { SecurityAlerts } from '../../../visualize/components';
+import { EuiFlexItem } from '@elastic/eui';
 
 export const MainViewConfig = {
   rows: [
     {
       columns: [
         {
-          width: 33,
+          width: 50,
           component: (props) => (
             <EuiFlexItem grow={props.grow}>
               <AggTable
@@ -35,7 +34,7 @@ export const MainViewConfig = {
           ),
         },
         {
-          width: 33,
+          width: 50,
           component: (props) => (
             <EuiFlexItem grow={props.grow}>
               <AggTable
@@ -48,8 +47,12 @@ export const MainViewConfig = {
             </EuiFlexItem>
           ),
         },
+      ],
+    },
+    {
+      columns: [
         {
-          width: 33,
+          width: 50,
           component: (props) => (
             <EuiFlexItem grow={props.grow}>
               <AggTable
@@ -62,18 +65,17 @@ export const MainViewConfig = {
             </EuiFlexItem>
           ),
         },
-      ],
-    },
-    {
-      height: 300,
-      columns: [
         {
-          width: 100,
-          component: () => (
-            <EuiFlexItem>
-              <EuiPanel paddingSize={'s'}>
-                <SecurityAlerts />
-              </EuiPanel>
+          width: 50,
+          component: (props) => (
+            <EuiFlexItem grow={props.grow}>
+              <AggTable
+                tableTitle={'Subscriptions'}
+                aggTerm={'data.office365.Subscription'}
+                aggLabel={'Subscriptions'}
+                maxRows={'5'}
+                onRowClick={(field, value) => props.onRowClick(field, value)}
+              />
             </EuiFlexItem>
           ),
         },
