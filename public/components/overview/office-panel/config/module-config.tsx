@@ -15,7 +15,9 @@ import React from 'react';
 import { OfficeBody, OfficeDrilldown } from '../views';
 import { MainViewConfig, drilldownIPConfig, drilldownUserConfig } from './';
 
-
+/**
+ * The length method has to count Kibana Visualizations for TabVisualizations class
+ */
 export const ModuleConfig = {
   main: {
     length: () => MainViewConfig.rows.reduce((total, row) => total + row.columns.length, 0),

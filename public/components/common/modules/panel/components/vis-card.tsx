@@ -25,15 +25,14 @@ export const VisCard = ({ changeView = () => {}, id, width, tab, ...props }) => 
     return rawVis.length && rawVis[0]?.attributes?.title;
   })();
 
-  const toggleExpand = (id) => {
-    setExpandedVis(expandedVis === id ? false : id);
+  const toggleExpand = () => {
+    setExpandedVis(!expandedVis);
   };
 
   return (
     <>
-      {' '}
       <EuiFlexItem grow={width}>
-        <EuiPanel paddingSize={'s'} className={expandedVis === id ? 'fullscreen h-100' : 'h-100'}>
+        <EuiPanel paddingSize={'s'} className={expandedVis ? 'fullscreen h-100' : 'h-100'}>
           <EuiFlexGroup direction={'column'} className={'h-100'}>
             <EuiFlexItem grow={false}>
               <EuiFlexGroup justifyContent="spaceBetween">
@@ -48,7 +47,7 @@ export const VisCard = ({ changeView = () => {}, id, width, tab, ...props }) => 
                   <EuiButtonIcon
                     color="text"
                     style={{ padding: '0px 6px', height: 30 }}
-                    onClick={() => toggleExpand(id)}
+                    onClick={() => toggleExpand()}
                     iconType="expand"
                     aria-label="Expand"
                   />
@@ -60,7 +59,6 @@ export const VisCard = ({ changeView = () => {}, id, width, tab, ...props }) => 
                 <KibanaVis
                   visID={id}
                   tab={tab}
-                  onRowClick={() => changeView('drilldown')}
                   {...props}
                 />
               </div>
