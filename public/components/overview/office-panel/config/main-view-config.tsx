@@ -21,7 +21,7 @@ export const MainViewConfig = {
     {
       columns: [
         {
-          width: 50,
+          width: 33,
           component: (props) => (
             <EuiFlexItem grow={props.grow}>
               <AggTable
@@ -35,7 +35,21 @@ export const MainViewConfig = {
           ),
         },
         {
-          width: 50,
+          width: 33,
+          component: (props) => (
+            <EuiFlexItem grow={props.grow}>
+              <AggTable
+                tableTitle={'Rules'}
+                aggTerm={'rule.description'}
+                aggLabel={'Rule'}
+                maxRows={'5'}
+                onRowClick={(field, value) => props.onRowClick(field, value)}
+              />
+            </EuiFlexItem>
+          ),
+        },
+        {
+          width: 33,
           component: (props) => (
             <EuiFlexItem grow={props.grow}>
               <AggTable

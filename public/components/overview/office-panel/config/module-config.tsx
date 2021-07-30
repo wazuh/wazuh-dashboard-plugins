@@ -38,4 +38,10 @@ export const ModuleConfig = {
       <OfficeDrilldown title={'Client IP'} {...{ ...drilldownIPConfig, ...props }} />
     ),
   },
+  'rule.description': {
+    length: () => drilldownIPConfig.rows.reduce((total, row) => total + row.columns.length, 0),
+    component: (props) => (
+      <OfficeDrilldown title={'Rule Description'} {...{ ...drilldownIPConfig, ...props }} />
+    ),
+  },
 };
