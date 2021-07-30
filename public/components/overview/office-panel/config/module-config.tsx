@@ -13,13 +13,8 @@
 
 import React from 'react';
 import { OfficeBody, OfficeDrilldown } from '../views';
-import { MainViewConfig } from './';
-import { drilldownConfig } from './drilldown-ip-config';
+import { MainViewConfig, drilldownIPConfig, drilldownUserConfig } from './';
 
-const drilldownUserConfig = drilldownConfig('Wazuh-App-Overview-Office-User-Operation-Level-Table');
-const drilldownIPConfig = drilldownConfig(
-  'Wazuh-App-Overview-Office-Client-IP-Operation-Level-Table'
-);
 
 export const ModuleConfig = {
   main: {
@@ -38,10 +33,5 @@ export const ModuleConfig = {
       <OfficeDrilldown title={'Client IP'} {...{ ...drilldownIPConfig, ...props }} />
     ),
   },
-  'rule.description': {
-    length: () => drilldownIPConfig.rows.reduce((total, row) => total + row.columns.length, 0),
-    component: (props) => (
-      <OfficeDrilldown title={'Rule Description'} {...{ ...drilldownIPConfig, ...props }} />
-    ),
-  },
+  
 };

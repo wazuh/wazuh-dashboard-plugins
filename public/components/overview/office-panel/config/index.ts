@@ -11,7 +11,8 @@
  * Find more information about this on the LICENSE file.
  */
 
-export { drilldownConfig } from './drilldown-ip-config';
+export { drilldownIPConfig } from './drilldown-ip-config';
+export { drilldownUserConfig } from './drilldown-user-config';
 export { MainViewConfig } from './main-view-config';
 export { ModuleConfig } from './module-config';
 export { filtersValues } from './search-bar-config';

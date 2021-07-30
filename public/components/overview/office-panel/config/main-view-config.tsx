@@ -38,41 +38,9 @@ export const MainViewConfig = {
           component: (props) => (
             <EuiFlexItem grow={props.grow}>
               <AggTable
-                tableTitle={'Rules'}
-                aggTerm={'rule.description'}
-                aggLabel={'Rule'}
-                maxRows={'5'}
-                onRowClick={(field, value) => props.onRowClick(field, value)}
-              />
-            </EuiFlexItem>
-          ),
-        },
-      ],
-    },
-    {
-      columns: [
-        {
-          width: 50,
-          component: (props) => (
-            <EuiFlexItem grow={props.grow}>
-              <AggTable
                 tableTitle={'Client IP'}
                 aggTerm={'data.office365.ClientIP'}
                 aggLabel={'Client IP'}
-                maxRows={'5'}
-                onRowClick={(field, value) => props.onRowClick(field, value)}
-              />
-            </EuiFlexItem>
-          ),
-        },
-        {
-          width: 50,
-          component: (props) => (
-            <EuiFlexItem grow={props.grow}>
-              <AggTable
-                tableTitle={'Subscriptions'}
-                aggTerm={'data.office365.Subscription'}
-                aggLabel={'Subscriptions'}
                 maxRows={'5'}
                 onRowClick={(field, value) => props.onRowClick(field, value)}
               />
