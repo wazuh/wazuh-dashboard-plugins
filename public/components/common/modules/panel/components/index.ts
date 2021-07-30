@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Office 365 Panel index.
+ * Wazuh app - Index panel components.
  *
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
@@ -11,4 +11,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-export * from './office-panel';
+export { ModuleSidePanel } from './module-side-panel';
+export { AggTable } from './agg-table';
+export { VisCard } from './vis-card';
+export { VisConfigLayout } from './vis-config-layout';

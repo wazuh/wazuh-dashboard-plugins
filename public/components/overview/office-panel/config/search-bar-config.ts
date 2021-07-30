@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Office 365 Panel index.
+ * Wazuh app - Office 365 Custom Search Bar Config.
  *
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
@@ -11,4 +11,17 @@
  * Find more information about this on the LICENSE file.
  */
 
-export * from './office-panel';
+export const filtersValues: { type: string; key: string }[] = [
+  {
+    type: 'combobox',
+    key: 'agent.id',
+  },
+  {
+    type: 'combobox',
+    key: 'agent.name',
+  },
+  {
+    type: 'combobox',
+    key: 'agent.ip',
+  },
+];

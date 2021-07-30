@@ -1,6 +1,5 @@
 /*
- * Wazuh app - Office 365 Panel index.
- *
+ * Wazuh app - React component to integrate Custom search bar
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -11,4 +10,4 @@
  * Find more information about this on the LICENSE file.
  */
 
-export * from './office-panel';
+export  { Combobox } from './combobox';

@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Office 365 Panel index.
+ * Wazuh app - Office 365 Config index.
  *
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
@@ -11,4 +11,8 @@
  * Find more information about this on the LICENSE file.
  */
 
-export * from './office-panel';
+export { drilldownIPConfig } from './drilldown-ip-config';
+export { drilldownUserConfig } from './drilldown-user-config';
+export { MainViewConfig } from './main-view-config';
+export { ModuleConfig } from './module-config';
+export { filtersValues } from './search-bar-config';

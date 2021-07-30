@@ -45,5 +45,12 @@ export function useQuery(): [
 }
 
 export const useQueryManager = () => {
-  return useState(getDataPlugin().query.queryString.getQuery());
-};
+  const [query, setQuery] = useState(getDataPlugin().query.queryString.getQuery());
+  useEffect(() => {
+    const subscriber = getDataPlugin().query.queryString.getUpdates$().subscribe((q) => {
+      setQuery(q);
+    });
+    return () => subscriber.unsubscribe();
+  },[]);
+  return [query, getDataPlugin().query.queryString.setQuery];
+}

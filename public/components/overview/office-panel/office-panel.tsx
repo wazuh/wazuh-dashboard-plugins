@@ -11,55 +11,70 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { useState } from 'react';
-
-import { MainPanel } from '../../../components/common/modules/panel';
-import { FilterManager, Filter } from '../../../../../../src/plugins/data/public/';
-//@ts-ignore
-import { getDataPlugin } from '../../../kibana-services';
-import { KbnSearchBar } from '../../kbn-search-bar';
-import { TimeRange, Query } from '../../../../../../src/plugins/data/common';
+import React, { useEffect, useState } from 'react';
+import { MainPanel } from '../../common/modules/panel';
 import { withErrorBoundary } from '../../common/hocs';
-import { MockupTables } from './mockup-tables';
-import { ModuleStats } from './module-stats';
+import { getErrorOrchestrator } from '../../../react-services/common-services';
+import {
+  UI_ERROR_SEVERITIES,
+  UIErrorLog,
+  UIErrorSeverity,
+  UILogLevel,
+} from '../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../../common/constants';
+import { CustomSearchBar } from '../../common/custom-search-bar';
+import { OfficeStats } from './views';
+import { queryConfig } from '../../../react-services/query-config';
+import { ModuleConfig, filtersValues } from './config';
 
-export const OfficePanel = withErrorBoundary(({ ...props }) => {
+export const OfficePanel = withErrorBoundary(() => {
+  const [moduleStatsList, setModuleStatsList] = useState([]);
 
-    const KibanaServices = getDataPlugin().query;
-    const filterManager = KibanaServices.filterManager;
-    const timefilter = KibanaServices.timefilter.timefilter;
-
-    const [moduleStatsList, setModuleStatsList] = useState([]);
-    const [filterParams, setFilterParams] = useState({
-        filters: filterManager.getFilters() || [],
-        query: { language: 'kuery', query: '' },
-        time: timefilter.getTime(),
+  /** Get Office 365 Side Panel Module info **/
+  const getModuleConfig = async () => {
+    const modulesConfig = await queryConfig('000', [
+      { component: 'wmodules', configuration: 'wmodules' },
+    ]);
+    const config = Object.entries(
+      modulesConfig['wmodules-wmodules'].affected_items[0].wmodules.filter((module) => {
+        return Object.keys(module)[0] == 'office365';
+      })[0]['office365']
+    ).map((configProp) => {
+      const description = Array.isArray(configProp[1]) ? configProp[1].join(', ') : configProp[1];
+      return { title: configProp[0], description };
     });
-    const [isLoading, setLoading] = useState(false);
+    setModuleStatsList(config);
+  };
 
+  useEffect(() => {
+    (async () => {
+      try {
+        await getModuleConfig();
+      } catch (error) {
+        const options: UIErrorLog = {
+          context: `${OfficePanel.name}.getModuleConfig`,
+          level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+          severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
+          error: {
+            error: error,
+            message: error.message || error,
+            title: 'Module Unavailable',
+          },
+        };
+        getErrorOrchestrator().handleError(options);
+        setModuleStatsList([]);
+      }
+    })();
+  }, []);
 
-    const onQuerySubmit = (payload: { dateRange: TimeRange, query: Query }) => {
-        const { query, dateRange } = payload;
-        const filters = { query, time: dateRange, filters: filterParams.filters };
-        setLoading(true);
-        setFilterParams(filters);
-
-    }
-
-    const onFiltersUpdated = (filters: Filter[]) => {
-        const { query, time } = filterParams;
-        const updatedFilterParams = { query, time, filters };
-        setLoading(true);
-        setFilterParams(updatedFilterParams);
-    }
-
-    return (
-        <MainPanel sidePanelChildren={<ModuleStats listItems={moduleStatsList} />}>
-            <KbnSearchBar
-                onQuerySubmit={onQuerySubmit}
-                onFiltersUpdated={onFiltersUpdated}
-                isLoading={isLoading} />
-            <MockupTables />
-        </MainPanel>
-    )
+  return (
+    <>
+      <CustomSearchBar filtersValues={filtersValues} />
+      <MainPanel
+        moduleConfig={ModuleConfig}
+        tab={'office'}
+        sidePanelChildren={<OfficeStats listItems={moduleStatsList} />}
+      />
+    </>
+  );
 });

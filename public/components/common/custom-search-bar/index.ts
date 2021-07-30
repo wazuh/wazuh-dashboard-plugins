@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Panel components
+ * Wazuh app - React component to integrate Custom search bar
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -10,7 +10,4 @@
  * Find more information about this on the LICENSE file.
  */
 
-
-export { MainPanel } from './main-panel';
-export { ModuleSidePanel } from './module-side-panel';
-export { ModuleBody } from './module-body';
+export { CustomSearchBar } from './custom-search-bar';
