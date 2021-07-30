@@ -12,7 +12,6 @@
  */
 
 export { drilldownIPConfig } from './drilldown-ip-config';
-export { drilldownUserConfig } from './drilldown-user-config';
 export { MainViewConfig } from './main-view-config';
 export { ModuleConfig } from './module-config';
 export { filtersValues } from './search-bar-config';

@@ -35,7 +35,6 @@ export const CustomSearchBar = ({ filtersValues, ...props }) => {
 
         return array
     }
-    const [isLoading, setLoading] = useState(false);
     const [avancedFiltersState, setAvancedFiltersState] = useState(false);
     const [selectedOptions, setSelectedOptions] = useState(defaultSelectedOptions);
 
@@ -51,15 +50,18 @@ export const CustomSearchBar = ({ filtersValues, ...props }) => {
 
     const onQuerySubmit = (payload: { dateRange: TimeRange, query: Query }) => {
         const { query, dateRange } = payload;
-        const filters = { query, time: dateRange, filters: filterParams.filters };
-        setFilterParams(filters);
-
+        setFilterParams(prevState => ({
+            ...prevState,
+            time: dateRange,
+            query: query,
+        }));
     }
 
     const onFiltersUpdated = (filters: Filter[]) => {
-        const { query, time } = filterParams;
-        const updatedFilterParams = { query, time, filters };
-        setFilterParams(updatedFilterParams);
+        setFilterParams(prevState => ({
+            ...prevState,
+            filters: filters
+        }));
         refreshCustomSelectedFilter()
     }
 
@@ -93,7 +95,6 @@ export const CustomSearchBar = ({ filtersValues, ...props }) => {
     };
 
     const setKibanaFilters = (values: any[]) => {
-        setLoading(true)
         const newFilters = []
         const currentFilters = filterManager.getFilters().filter(item => item.meta.key != values[0].value)
         filterManager.removeAll()
@@ -124,7 +125,6 @@ export const CustomSearchBar = ({ filtersValues, ...props }) => {
 
             })
         }
-        setLoading(false)
     };
 
     const onChange = (values: any[]) => {
@@ -163,7 +163,6 @@ export const CustomSearchBar = ({ filtersValues, ...props }) => {
                         showQueryInput={avancedFiltersState}
                         onQuerySubmit={onQuerySubmit}
                         onFiltersUpdated={onFiltersUpdated}
-                        isLoading={isLoading}
                     />
                 </EuiFlexItem>
             </EuiFlexGroup>
@@ -174,7 +173,6 @@ export const CustomSearchBar = ({ filtersValues, ...props }) => {
                         showQueryInput={false}
                         onQuerySubmit={onQuerySubmit}
                         onFiltersUpdated={onFiltersUpdated}
-                        isLoading={isLoading}
                     />
                 </EuiFlexItem>
                 <EuiFlexItem grow={false}>
