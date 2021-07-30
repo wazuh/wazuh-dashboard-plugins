@@ -175,6 +175,10 @@ export const initialWazuhConfig: string = `---
 #Define the name of the health-check logo saved in the path /plugins/wazuh/assets/
 #customization.logo.healthcheck: icon_blue.svg
 #
+#
+#Define the name of the reports logo (.png) saved in the path /plugins/wazuh/assets/
+#customization.logo.reports: logo.png
+#
 # ---------------------------- Hide manager alerts ------------------------------
 # Hide the alerts of the manager in all dashboards and discover
 #hideManagerAlerts: false

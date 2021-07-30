@@ -3,6 +3,7 @@ export const configEquivalences = {
   'customization.logo.app':'Define the name of the app logo saved in the path /plugins/wazuh/assets/',
   'customization.logo.sidebar':'Define the name of the sidebar logo saved in the path /plugins/wazuh/assets/',
   'customization.logo.healthcheck':'Define the name of the health-check logo saved in the path /plugins/wazuh/assets/',
+  'customization.logo.reports':'Define the name of the reports logo (.png) saved in the path /plugins/wazuh/assets/',
   'checks.pattern':
     'Enable or disable the index pattern health check when opening the app.',
   'checks.template':
@@ -79,6 +80,7 @@ export const nameEquivalence = {
   'customization.logo.app': 'Logo App',
   'customization.logo.sidebar': 'Logo Sidebar',
   'customization.logo.healthcheck': 'Logo Health Check',
+  'customization.logo.reports': 'Logo Reports',
   'checks.pattern': 'Index pattern',
   'checks.template': 'Index template',
   'checks.api': 'API connection',
@@ -125,6 +127,7 @@ export const categoriesEquivalence = {
   'customization.logo.app':CUSTOMIZATION,
   'customization.logo.sidebar':CUSTOMIZATION,
   'customization.logo.healthcheck':CUSTOMIZATION,
+  'customization.logo.reports':CUSTOMIZATION,
   'checks.pattern': HEALTH_CHECK,
   'checks.template': HEALTH_CHECK,
   'checks.api': HEALTH_CHECK,
@@ -169,6 +172,7 @@ export const formEquivalence = {
   'customization.logo.app': { type: TEXT },
   'customization.logo.sidebar': { type: TEXT },
   'customization.logo.healthcheck': { type: TEXT },
+  'customization.logo.reports': { type: TEXT },
   'checks.pattern': { type: BOOLEAN },
   'checks.template': { type: BOOLEAN },
   'checks.api': { type: BOOLEAN },
