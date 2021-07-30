@@ -2,6 +2,7 @@
   border-radius: 0 5px 5px 0;
   background: #ffffffab;
   border: 1px solid #006bb459;
+  border-left: 0;
   box-shadow: 1px 1px 3px -1px #000;
   position: fixed;
   left: 0;
@@ -10,4 +11,7 @@
   width: 26px;
   padding-left: 6px;
   height: 55px;
+}
+body.euiBody--collapsibleNavIsDocked .sidepanel-infoBtnStyle {
+  left: 320px;
 }

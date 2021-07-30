@@ -38,7 +38,7 @@ export const OfficeStats = ({ listItems = [] }) => {
       <EuiFlexItem>
         {
           listItems.length ? (
-            <EuiDescriptionList listItems={listItems} compressed />) : (
+            <EuiDescriptionList className={'office-description-list'} listItems={listItems} compressed />) : (
             <EuiCallOut className={'office-stats-callout-warning'}
               title="Module configuration unavailable"
               color="warning"

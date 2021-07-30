@@ -19,30 +19,33 @@ import { SecurityAlerts } from '../../../visualize/components';
 export const MainViewConfig = {
   rows: [
     {
-      // height: 300,
       columns: [
         {
           width: 50,
           component: (props) => (
-            <AggTable
-              tableTitle={''}
-              aggTerm={'data.office365.UserId'}
-              aggLabel={'User'}
-              maxRows={'7'}
-              onRowClick={(field, value) => props.onRowClick(field, value)}
-            />
+            <EuiFlexItem grow={props.grow}>
+              <AggTable
+                tableTitle={'Users'}
+                aggTerm={'data.office365.UserId'}
+                aggLabel={'User'}
+                maxRows={'5'}
+                onRowClick={(field, value) => props.onRowClick(field, value)}
+              />
+            </EuiFlexItem>
           ),
         },
         {
           width: 50,
           component: (props) => (
-            <AggTable
-              tableTitle={''}
-              aggTerm={'data.office365.ClientIP'}
-              aggLabel={'Client IP'}
-              maxRows={'7'}
-              onRowClick={(field, value) => props.onRowClick(field, value)}
-            />
+            <EuiFlexItem grow={props.grow}>
+              <AggTable
+                tableTitle={'Client IP'}
+                aggTerm={'data.office365.ClientIP'}
+                aggLabel={'Client IP'}
+                maxRows={'5'}
+                onRowClick={(field, value) => props.onRowClick(field, value)}
+              />
+            </EuiFlexItem>
           ),
         },
       ],

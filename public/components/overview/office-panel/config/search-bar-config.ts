@@ -13,7 +13,7 @@
  *   permissions and limitations under the License.
  */
 
-export const filtersValues = [
+export const filtersValues: { type: string; key: string }[] = [
   {
     type: 'combobox',
     key: 'agent.id',
@@ -25,5 +25,5 @@ export const filtersValues = [
   {
     type: 'combobox',
     key: 'agent.ip',
-  }
+  },
 ];
