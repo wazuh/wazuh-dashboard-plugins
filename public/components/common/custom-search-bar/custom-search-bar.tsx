@@ -13,20 +13,13 @@ import {
 //@ts-ignore
 import { getDataPlugin } from '../../../kibana-services';
 import { KbnSearchBar } from '../../kbn-search-bar';
-import { TimeRange, Query } from '../../../../../../src/plugins/data/common';
 import { Combobox } from './components'
 
 export const CustomSearchBar = ({ filtersValues, ...props }) => {
 
     const KibanaServices = getDataPlugin().query;
     const filterManager = KibanaServices.filterManager;
-    const timefilter = KibanaServices.timefilter.timefilter;
     const indexPattern = getIndexPattern();
-    const [filterParams, setFilterParams] = useState({
-        filters: filterManager.getFilters().map(({ meta: { removable, ...restMeta }, ...rest }) => ({ ...rest, meta: restMeta })) || [],
-        query: { language: 'kuery', query: '' },
-        time: timefilter.getTime(),
-    });
     const defaultSelectedOptions = () => {
         const array = []
         filtersValues.forEach(item => {
@@ -40,28 +33,14 @@ export const CustomSearchBar = ({ filtersValues, ...props }) => {
 
     useEffect(() => {
         let filterSubscriber = filterManager.getUpdates$().subscribe(() => {
-            const newFilters = filterManager.getFilters();
-            onFiltersUpdated(newFilters)
+            onFiltersUpdated()
             return () => {
                 filterSubscriber.unsubscribe();
             };
         });
     }, []);
 
-    const onQuerySubmit = (payload: { dateRange: TimeRange, query: Query }) => {
-        const { query, dateRange } = payload;
-        setFilterParams(prevState => ({
-            ...prevState,
-            time: dateRange,
-            query: query,
-        }));
-    }
-
-    const onFiltersUpdated = (filters: Filter[]) => {
-        setFilterParams(prevState => ({
-            ...prevState,
-            filters: filters
-        }));
+    const onFiltersUpdated = () => {
         refreshCustomSelectedFilter()
     }
 
@@ -161,7 +140,6 @@ export const CustomSearchBar = ({ filtersValues, ...props }) => {
                     <KbnSearchBar
                         showFilterBar={false}
                         showQueryInput={avancedFiltersState}
-                        onQuerySubmit={onQuerySubmit}
                         onFiltersUpdated={onFiltersUpdated}
                     />
                 </EuiFlexItem>
@@ -171,7 +149,6 @@ export const CustomSearchBar = ({ filtersValues, ...props }) => {
                     <KbnSearchBar
                         showDatePicker={false}
                         showQueryInput={false}
-                        onQuerySubmit={onQuerySubmit}
                         onFiltersUpdated={onFiltersUpdated}
                     />
                 </EuiFlexItem>
