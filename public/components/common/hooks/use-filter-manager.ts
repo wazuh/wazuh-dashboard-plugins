@@ -19,13 +19,15 @@ export const useFilterManager = () => {
   const [filters, setFilters] = useState<Filter[]>([]);
 
   useEffect(() => {
-    const { unsubscribe } = filterManager.getUpdates$().subscribe(() => {
+    const subscription = filterManager.getUpdates$().subscribe(() => {
       const newFilters = filterManager.getFilters();
       if (!_.isEqual(filters, newFilters)) {
         setFilters(newFilters);
       }
     });
-    return unsubscribe;
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
   return { filterManager, filters };
 };
