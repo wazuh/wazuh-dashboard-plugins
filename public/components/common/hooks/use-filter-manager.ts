@@ -10,10 +10,9 @@
  * Find more information about this on the LICENSE file.
  */
 import { getDataPlugin } from '../../../kibana-services';
-import { useState, useEffect} from 'react';
-
+import { useState, useEffect, useMemo } from 'react';
 
 export const useFilterManager = () => {
-    const [filterManager, setFilterManager] = useState(getDataPlugin().query.filterManager);
-    return filterManager;
-}
+  const filterManager = useMemo(() => getDataPlugin().query.filterManager, []);
+  return { filterManager };
+};

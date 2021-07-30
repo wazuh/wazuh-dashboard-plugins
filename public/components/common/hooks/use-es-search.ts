@@ -44,7 +44,7 @@ interface IUseEsSearch {
 const useEsSearch = ({ preAppliedFilters = [], preAppliedAggs = {}, size = 10 }): IUseEsSearch => {
   const data = getDataPlugin();
   const indexPattern = useIndexPattern();
-  const filterManager = useFilterManager();
+  const {filterManager} = useFilterManager();
   const [query] = useQuery();
   const [esResults, setEsResults] = useState<SearchResponse>({} as SearchResponse);
   const [managedFilters, setManagedFilters] = useState<Filter[] | []>([]);
