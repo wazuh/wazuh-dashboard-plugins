@@ -33,7 +33,7 @@ const sections = [{ component: 'wmodules', configuration: 'wmodules' }];
 
 export const WzConfigurationOffice365: React.FunctionComponent<IWzConfigOffice365> = withWzConfig(
   sections
-)(({ currentConfig, updateBadge, ...rest }) => {
+)(({ currentConfig, updateBadge, ...props }) => {
   const wodleConfiguration = useMemo(() => wodleBuilder(currentConfig, OFFICE_365), [
     currentConfig,
   ]);
@@ -53,21 +53,21 @@ export const WzConfigurationOffice365: React.FunctionComponent<IWzConfigOffice36
         <GeneralTabWrapped
           wodleConfiguration={wodleConfiguration}
           currentConfig={currentConfig}
-          {...rest}
+          {...props}
         />
       </WzTabSelectorTab>
       <WzTabSelectorTab label="Api Auth">
         <ApiAuthTabWrapped
           wodleConfiguration={wodleConfiguration}
           currentConfig={currentConfig}
-          {...rest}
+          {...props}
         />
       </WzTabSelectorTab>
       <WzTabSelectorTab label="Subscriptions">
         <SubscriptionTabWrapped
           wodleConfiguration={wodleConfiguration}
           currentConfig={currentConfig}
-          {...rest}
+          {...props}
         />
       </WzTabSelectorTab>
     </WzTabSelector>

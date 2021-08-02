@@ -18,7 +18,7 @@ export const HELP_LINKS = [
     href: 'https://documentation.wazuh.com/current/office365/index.html',
   },
   {
-    text: 'Configuration options of the Office 365 module reference',
+    text: 'Configuration options for the Office 365 module',
     href:
       'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/office-365.html',
   },

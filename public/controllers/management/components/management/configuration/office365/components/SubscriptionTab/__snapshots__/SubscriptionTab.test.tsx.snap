@@ -65,12 +65,12 @@ exports[`SubscriptionTab component renders correctly to match the snapshot 1`] =
         },
         Object {
           "href": "https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/office-365.html",
-          "text": "Configuration options of the Office 365 module reference",
+          "text": "Configuration options for the Office 365 module",
         },
       ]
     }
     minusHeight={260}
-    title="List of subscriptions"
+    title="Subscriptions list"
   >
     <WzConfigurationSettingsHeader
       help={
@@ -81,13 +81,13 @@ exports[`SubscriptionTab component renders correctly to match the snapshot 1`] =
           },
           Object {
             "href": "https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/office-365.html",
-            "text": "Configuration options of the Office 365 module reference",
+            "text": "Configuration options for the Office 365 module",
           },
         ]
       }
       json={[Function]}
       settings={[Function]}
-      title="List of subscriptions"
+      title="Subscriptions list"
       viewSelected=""
       xml={[Function]}
     >
@@ -107,7 +107,7 @@ exports[`SubscriptionTab component renders correctly to match the snapshot 1`] =
                 <h2
                   className="euiTitle euiTitle--small"
                 >
-                  List of subscriptions
+                  Subscriptions list
                 </h2>
               </EuiTitle>
             </div>
@@ -243,7 +243,7 @@ exports[`SubscriptionTab component renders correctly to match the snapshot 1`] =
                           },
                           Object {
                             "href": "https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/office-365.html",
-                            "text": "Configuration options of the Office 365 module reference",
+                            "text": "Configuration options for the Office 365 module",
                           },
                         ]
                       }
@@ -447,13 +447,13 @@ exports[`SubscriptionTab component renders correctly to match the snapshot 1`] =
                 </div>
               </EuiTableHeaderMobile>
               <EuiTable
-                id="__table_45cd9dc1-f3b7-11eb-a3bd-df5b4b424cb0"
+                id="__table_23ff43c1-f3d4-11eb-bdee-2dceba245eef"
                 responsive={true}
                 tableLayout="fixed"
               >
                 <table
                   className="euiTable euiTable--responsive"
-                  id="__table_45cd9dc1-f3b7-11eb-a3bd-df5b4b424cb0"
+                  id="__table_23ff43c1-f3d4-11eb-bdee-2dceba245eef"
                   tabIndex={-1}
                 >
                   <EuiScreenReaderOnly>

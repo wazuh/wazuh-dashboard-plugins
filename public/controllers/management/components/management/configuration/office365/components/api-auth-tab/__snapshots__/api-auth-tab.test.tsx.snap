@@ -65,7 +65,7 @@ exports[`ApiAuthTab component renders correctly to match the snapshot 1`] = `
         },
         Object {
           "href": "https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/office-365.html",
-          "text": "Configuration options of the Office 365 module reference",
+          "text": "Configuration options for the Office 365 module",
         },
       ]
     }
@@ -81,7 +81,7 @@ exports[`ApiAuthTab component renders correctly to match the snapshot 1`] = `
           },
           Object {
             "href": "https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/office-365.html",
-            "text": "Configuration options of the Office 365 module reference",
+            "text": "Configuration options for the Office 365 module",
           },
         ]
       }
@@ -243,7 +243,7 @@ exports[`ApiAuthTab component renders correctly to match the snapshot 1`] = `
                           },
                           Object {
                             "href": "https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/office-365.html",
-                            "text": "Configuration options of the Office 365 module reference",
+                            "text": "Configuration options for the Office 365 module",
                           },
                         ]
                       }
