@@ -1,5 +1,5 @@
 /*
- * Wazuh app - React Test component SubscriptionTab
+ * Wazuh app - React Test component WzConfigurationOffice365
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -19,7 +19,7 @@ import configureMockStore from 'redux-mock-store';
 const mockStore = configureMockStore();
 const store = mockStore({});
 
-describe('SubscriptionTab component', () => {
+describe('WzConfigurationOffice365 component', () => {
   it('renders correctly to match the snapshot', () => {
     const agent = { id: '000' };
 
