@@ -29,6 +29,7 @@ import {
 } from '../../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
+import { WzRequest } from '../../../../react-services/wz-request';
 
 export class FlyoutDetail extends Component {
   state: {
@@ -55,6 +56,11 @@ export class FlyoutDetail extends Component {
     };
   }
 
+  async getLastScan(){
+    const response = await WzRequest.apiReq('GET', `/vulnerability/${this.props.agentId}/last_scan`, {});
+    return ((response.data || {}).data || {}).affected_items[0] || {}; 
+  }
+
   async componentDidMount() {
     try {
       const isCluster = (AppState.getClusterInfo() || {}).status === 'enabled';
@@ -62,11 +68,15 @@ export class FlyoutDetail extends Component {
         ? { 'cluster.name': AppState.getClusterInfo().cluster }
         : { 'manager.name': AppState.getClusterInfo().manager };
       this.setState({ clusterFilter });
-      const currentItem = this.props.item;
+      let currentItem = this.props.item;
 
       if (!currentItem) {
         throw false;
       }
+
+      let lastScan = await this.getLastScan();
+      currentItem = { ...currentItem, ...lastScan};
+      
       this.setState({ currentItem, isLoading: false });
     } catch (error) {
       const options: UIErrorLog = {
@@ -88,10 +98,14 @@ export class FlyoutDetail extends Component {
     }
   }
 
+
+
+
   render() {
     const { currentItem } = this.state;
     const title = `${currentItem.cve}`;
     const id = title.replace(/ /g, '_');
+    
     return (
       <EuiFlyout
         onClose={() => this.props.closeFlyout()}
@@ -121,7 +135,6 @@ export class FlyoutDetail extends Component {
                 { 'rule.groups': 'vulnerability-detector' },
                 { 'data.vulnerability.package.name': currentItem.name },
                 { 'data.vulnerability.cve': currentItem.cve },
-                { 'data.vulnerability.type': currentItem.type },
                 { 'data.vulnerability.package.architecture': currentItem.architecture },
                 { 'data.vulnerability.package.version': currentItem.version },
                 { 'agent.id': this.props.agentId },

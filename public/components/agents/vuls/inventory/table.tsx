@@ -20,6 +20,7 @@ import { FlyoutDetail } from './flyout';
 import { filtersToObject, IFilter, IWzSuggestItem } from '../../../wz-search-bar';
 import { TableWzAPI } from '../../../../components/common/tables';
 import { getFilterValues } from './lib';
+import { formatUIDate } from '../../../../react-services/time-service';
 
 export class InventoryTable extends Component {
   state: {
@@ -38,6 +39,10 @@ export class InventoryTable extends Component {
     {type: 'q', label: 'cve', description:"Filter by CVE ID", operators:['=','!=', '~'], values: async (value) => getFilterValues('cve', value, this.props.agent.id)},
     {type: 'q', label: 'version', description:"Filter by CVE version", operators:['=','!=', '~'], values: async (value) => getFilterValues('version', value, this.props.agent.id)},
     {type: 'q', label: 'architecture', description:"Filter by architecture", operators:['=','!=', '~'], values: async (value) => getFilterValues('architecture', value, this.props.agent.id)},
+    {type: 'q', label: 'severity', description:"Filter by Severity", operators:['=','!=', '~'], values: async (value) => getFilterValues('severity', value, this.props.agent.id)},
+    {type: 'q', label: 'cvss2_score', description:"Filter by CVSS2", operators:['=','!=', '~'], values: async (value) => getFilterValues('cvss2_score', value, this.props.agent.id)},
+    {type: 'q', label: 'cvss3_score', description:"Filter by CVSS3", operators:['=','!=', '~'], values: async (value) => getFilterValues('cvss3_score', value, this.props.agent.id)},
+    {type: 'q', label: 'detection_time', description:"Filter by Detection Time", operators:['=','!=', '~'], values: async (value) => getFilterValues('detection_time', value, this.props.agent.id)}
   ]
 
   props!: {
@@ -125,13 +130,38 @@ export class InventoryTable extends Component {
         name: 'Name',
         sortable: true,
         width: '100px'
+      },
+      {
+        field: 'severity',
+        name: 'Severity',
+        sortable: true,
+        width: `${width}`
+      },
+      {
+        field: 'cvss2_score',
+        name: 'CVSS2',
+        sortable: true,
+        width: `${width}`
+      },
+      {
+        field: 'cvss3_score',
+        name: 'CVSS3',
+        sortable: true,
+        width: `${width}`
+      },
+      {
+        field: 'detection_time',
+        name: 'Detection Time',
+        sortable: true,
+        width: `100px`,
+        render: formatUIDate
       }
     ]
   }
 
   renderTable() {
     const getRowProps = item => {
-      const id = `${item.name}-${item.cve}-${item.architecture}-${item.version}`;
+      const id = `${item.name}-${item.cve}-${item.architecture}-${item.version}-${item.severity}-${item.cvss2_score}-${item.cvss3_score}-${item.detection_time}`;
       return {
         'data-test-subj': `row-${id}`,
         onClick: () => this.showFlyout(item),
@@ -140,7 +170,7 @@ export class InventoryTable extends Component {
 
     const { error } = this.state;
     const columns = this.columns();
-    const selectFields = 'select=cve,architecture,version,name'
+    const selectFields = 'select=cve,architecture,version,name,severity,cvss2_score,cvss3_score,detection_time'
     return (
         <TableWzAPI
           title='Vulnerabilities'
@@ -159,7 +189,6 @@ export class InventoryTable extends Component {
 
   render() {
     const table = this.renderTable();
-
     return (
       <div className='wz-inventory'>
         {table}
