@@ -328,7 +328,7 @@ function generateAlert(params) {
     alert.location = Office.arrayLocationOffice;
     alert.data.office365 = {
       CreationTime: formatDate(beforeDate, 'Y-M-DTh:m:s.lZ'),
-      Id: IntraID,
+      Id: '000',
       Operation: "UserLoggedIn",
       OrganizationId: OrgID,
       RecordType: "15",
