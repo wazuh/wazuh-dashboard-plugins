@@ -207,6 +207,12 @@ export default [
         name: 'Google Cloud Pub/Sub',
         description: 'Configuration options of the Google Cloud Pub/Sub module',
         goto: 'gcp-pubsub'
+      },
+      {
+        name: 'Office 365',
+        description:
+          'Configuration options of the Office 365 module',
+        goto: 'office365'
       }
     ]
   }
