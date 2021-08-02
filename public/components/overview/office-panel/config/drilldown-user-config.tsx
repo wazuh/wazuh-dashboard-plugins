@@ -1,6 +1,6 @@
 'use strict';
 /*
- * Wazuh app - Office 365 Drilldown IP field Config.
+ * Wazuh app - Office 365 Drilldown UserId field Config.
  *
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
@@ -17,7 +17,7 @@ import { VisCard } from '../../../common/modules/panel';
 import { EuiFlexItem, EuiPanel } from '@elastic/eui';
 import { SecurityAlerts } from '../../../visualize/components';
 
-export const drilldownIPConfig = {
+export const drilldownUserConfig = {
   rows: [
     {
       height: 400,
@@ -38,7 +38,7 @@ export const drilldownIPConfig = {
           width: 40,
           component: (props) => (
             <VisCard
-              id={'Wazuh-App-Overview-Office-User-Operation-Level-Table'}
+              id={'Wazuh-App-Overview-Office-Client-IP-Operation-Level-Table'}
               tab="office"
               {...props}
             />

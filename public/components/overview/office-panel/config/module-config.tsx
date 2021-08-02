@@ -13,14 +13,11 @@
 
 import React from 'react';
 import { OfficeBody, OfficeDrilldown } from '../views';
-import { MainViewConfig } from './';
-import { drilldownConfig } from './drilldown-ip-config';
+import { MainViewConfig, drilldownIPConfig, drilldownUserConfig } from './';
 
-const drilldownUserConfig = drilldownConfig('Wazuh-App-Overview-Office-User-Operation-Level-Table');
-const drilldownIPConfig = drilldownConfig(
-  'Wazuh-App-Overview-Office-Client-IP-Operation-Level-Table'
-);
-
+/**
+ * The length method has to count Kibana Visualizations for TabVisualizations class
+ */
 export const ModuleConfig = {
   main: {
     length: () => MainViewConfig.rows.reduce((total, row) => total + row.columns.length, 0),
@@ -38,4 +35,5 @@ export const ModuleConfig = {
       <OfficeDrilldown title={'Client IP'} {...{ ...drilldownIPConfig, ...props }} />
     ),
   },
+  
 };

@@ -10,10 +10,24 @@
  * Find more information about this on the LICENSE file.
  */
 import { getDataPlugin } from '../../../kibana-services';
-import { useState, useEffect} from 'react';
-
+import { useState, useEffect, useMemo } from 'react';
+import { Filter } from 'src/plugins/data/public';
+import _ from 'lodash';
 
 export const useFilterManager = () => {
-    const [filterManager, setFilterManager] = useState(getDataPlugin().query.filterManager);
-    return filterManager;
-}
+  const filterManager = useMemo(() => getDataPlugin().query.filterManager, []);
+  const [filters, setFilters] = useState<Filter[]>([]);
+
+  useEffect(() => {
+    const subscription = filterManager.getUpdates$().subscribe(() => {
+      const newFilters = filterManager.getFilters();
+      if (!_.isEqual(filters, newFilters)) {
+        setFilters(newFilters);
+      }
+    });
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+  return { filterManager, filters };
+};

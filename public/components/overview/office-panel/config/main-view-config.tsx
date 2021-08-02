@@ -13,8 +13,7 @@
 
 import React from 'react';
 import { AggTable } from '../../../common/modules/panel/';
-import { EuiFlexItem, EuiPanel } from '@elastic/eui';
-import { SecurityAlerts } from '../../../visualize/components';
+import { EuiFlexItem } from '@elastic/eui';
 
 export const MainViewConfig = {
   rows: [
@@ -45,21 +44,6 @@ export const MainViewConfig = {
                 maxRows={'5'}
                 onRowClick={(field, value) => props.onRowClick(field, value)}
               />
-            </EuiFlexItem>
-          ),
-        },
-      ],
-    },
-    {
-      height: 300,
-      columns: [
-        {
-          width: 100,
-          component: () => (
-            <EuiFlexItem>
-              <EuiPanel paddingSize={'s'}>
-                <SecurityAlerts />
-              </EuiPanel>
             </EuiFlexItem>
           ),
         },
