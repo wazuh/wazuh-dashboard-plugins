@@ -24,8 +24,6 @@ import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 
-const errorContext = 'CreatePolicyFlyout';
-
 export const CreatePolicyFlyout = ({ closeFlyout }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [resources, setResources] = useState([]);
@@ -188,7 +186,7 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
       setEffectValue(null);
     } catch (error) {
       const options = {
-        context: errorContext,
+        context: `${CreatePolicyFlyout.name}.createPolicy`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         store: true,

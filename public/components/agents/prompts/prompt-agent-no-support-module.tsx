@@ -11,10 +11,8 @@
  */
 
 import React from 'react';
-import {PromptSelectAgent} from './'
+import { PromptSelectAgent } from './';
 
 export const PromptAgentNoSupportModule = () => {
-  return (
-    <PromptSelectAgent title="Module not supported by the agent" />
-  )
-}
+  return <PromptSelectAgent title="Module not supported by the agent" />;
+};

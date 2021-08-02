@@ -48,8 +48,6 @@ import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 
-const errorContext = 'AgentsPreview';
-
 const FILTER_ACTIVE = 'active';
 const FILTER_DISCONNECTED = 'disconnected';
 const FILTER_NEVER_CONNECTED = 'never_connected';
@@ -148,7 +146,7 @@ export const AgentsPreview = compose(
         this._isMount && this.setState({ platforms: platformsModel, loading: false });
       } catch (error) {
         const options = {
-          context: errorContext,
+          context: `${AgentsPreview.name}.getSummary`,
           level: UI_LOGGER_LEVELS.ERROR,
           severity: UI_ERROR_SEVERITIES.BUSINESS,
           store: true,

@@ -315,46 +315,33 @@ function generateAlert(params) {
   if (params.office) {
     const beforeDate = new Date(new Date(alert.timestamp) - 3 * 24 * 60 * 60 * 1000);
     const IntraID = randomArrayItem(Office.arrayUuidOffice);
-    const InterID = randomArrayItem(Office.arrayUuidOffice);
     const OrgID = randomArrayItem(Office.arrayUuidOffice);
     const objID = randomArrayItem(Office.arrayUuidOffice);
-    const userID = randomArrayItem(Office.arrayUuidOffice);
-    const appID = randomArrayItem(Office.arrayUuidOffice);
+    const userKey = randomArrayItem(Office.arrayUuidOffice);
+    const userID = randomArrayItem(Office.arrayUserId);
+    const userType = randomArrayItem([0, 2, 4]);
+    const resultStatus = randomArrayItem(['Succeeded', 'PartiallySucceeded', 'Failed']);
+    const log = randomArrayItem(Office.arrayLogs);
+    const ruleData = Office.officeRules[log.RecordType];
 
-    alert.rule = randomArrayItem(Office.arrayRulesOffice);
+    alert.rule = ruleData.rule;
     alert.decoder = randomArrayItem(Office.arrayDecoderOffice);
     alert.GeoLocation = randomArrayItem(GeoLocation);
-    alert.data.integration = "Office365";
+    alert.data.integration = 'Office365';
     alert.location = Office.arrayLocationOffice;
     alert.data.office365 = {
+      ...log,
+      ...ruleData.data.office365,
+      Id: '000',
       CreationTime: formatDate(beforeDate, 'Y-M-DTh:m:s.lZ'),
-      Id: IntraID,
-      Operation: "UserLoggedIn",
       OrganizationId: OrgID,
-      RecordType: "15",
-      ResultStatus: "Success",
-      UserKey: userID,
-      UserType: "0",
-      Version: "1",
-      Workload: "AzureActiveDirectory",
-      ClientIP: "77.231.182.17",
+      UserType: userType,
+      UserKey: userKey,
+      ResultStatus: resultStatus,
       ObjectId: objID,
-      UserId: "testing.account@wazuh.com",
-      AzureActiveDirectoryEventType: "1",
-      ExtendedProperties: Office.arrayExtendedPropertiesOffice,
-      ModifiedProperties: [],
-      Actor: Office.arrayActorOffice,
-      ActorContextId: OrgID,
-      ActorIpAddress: "77.231.182.17",
-      InterSystemsId: InterID,
-      IntraSystemId: IntraID,
-      Target: Office.arrayTargetOffice,
-      TargetContextId: OrgID,
-      ApplicationId: appID,
-      DeviceProperties: Office.arrayDevicePropertiesOffice,
-      ErrorNumber: "0",
-      Subscription: "Audit.AzureActiveDirectory"
-    }
+      UserId: userID,
+      ClientIP: randomArrayItem(Office.arrayIp),
+    };
   }
 
   if (params.gcp) {
@@ -1042,17 +1029,17 @@ const dayNames = {
 function formatDate(date, format) {
   // It could use "moment" library to format strings too
   const tokens = {
-    D: d => formatterNumber(d.getDate(), 2), // 01-31
-    A: d => dayNames.long[d.getDay()], // 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'
-    E: d => dayNames.short[d.getDay()], // 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'
-    M: d => formatterNumber(d.getMonth() + 1, 2), // 01-12
-    J: d => monthNames.long[d.getMonth()], // 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
-    N: d => monthNames.short[d.getMonth()], // 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-    Y: d => d.getFullYear(), // 2020
-    h: d => formatterNumber(d.getHours(), 2), // 00-23
-    m: d => formatterNumber(d.getMinutes(), 2), // 00-59
-    s: d => formatterNumber(d.getSeconds(), 2), // 00-59
-    l: d => formatterNumber(d.getMilliseconds(), 3), // 000-999
+    D: (d) => formatterNumber(d.getDate(), 2), // 01-31
+    A: (d) => dayNames.long[d.getDay()], // 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'
+    E: (d) => dayNames.short[d.getDay()], // 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'
+    M: (d) => formatterNumber(d.getMonth() + 1, 2), // 01-12
+    J: (d) => monthNames.long[d.getMonth()], // 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
+    N: (d) => monthNames.short[d.getMonth()], // 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    Y: (d) => d.getFullYear(), // 2020
+    h: (d) => formatterNumber(d.getHours(), 2), // 00-23
+    m: (d) => formatterNumber(d.getMinutes(), 2), // 00-59
+    s: (d) => formatterNumber(d.getSeconds(), 2), // 00-59
+    l: (d) => formatterNumber(d.getMilliseconds(), 3), // 000-999
   };
 
   return format.split('').reduce((accum, token) => {

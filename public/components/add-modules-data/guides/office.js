@@ -1,5 +1,5 @@
 /*
-* Wazuh app - Amazon Web Services interactive extension guide
+* Wazuh app - Office365 interactive extension guide
 * Copyright (C) 2015-2021 Wazuh, Inc.
 *
 * This program is free software; you can redistribute it and/or modify
