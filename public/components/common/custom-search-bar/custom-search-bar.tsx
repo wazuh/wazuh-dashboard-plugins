@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useLayoutEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
-import { getIndexPattern } from '../../overview/mitre/lib'
+import { getIndexPattern } from '../../overview/mitre/lib';
 import { Filter } from '../../../../../../src/plugins/data/public/';
 import { FilterMeta, FilterState, FilterStateStore } from '../../../../../../src/plugins/data/common';
+import { AppState } from '../../../react-services/app-state';
 
 import {
     EuiFlexGroup,
@@ -13,7 +14,7 @@ import {
 //@ts-ignore
 import { getDataPlugin } from '../../../kibana-services';
 import { KbnSearchBar } from '../../kbn-search-bar';
-import { Combobox } from './components'
+import { Combobox } from './components';
 
 export const CustomSearchBar = ({ filtersValues, ...props }) => {
 
@@ -49,24 +50,34 @@ export const CustomSearchBar = ({ filtersValues, ...props }) => {
     }
 
 
-    const buildCustomFilter = (isPinned: boolean, index?: any, querySearch?: any, key?: any): Filter => {
+    const buildCustomFilter = (isPinned: boolean, values?: any): Filter => {
+        const newFilters = []
+        values.forEach(element => {
+            const filter = {
+                match_phrase: {
+                    [element.value]: element.label
+                }
+            }
+            newFilters.push(filter);
+        });
+        const params = values.map(item => item.label)
         const meta: FilterMeta = {
             disabled: false,
             negate: false,
-            key: key,
-            params: { query: querySearch },
+            key: values[0].value,
+            params: params,
             alias: null,
-            type: "phrase",
-            index,
+            type: "phrases",
+            value: params.join(","),
+            index: AppState.getCurrentPattern(),
         };
         const $state: FilterState = {
             store: isPinned ? FilterStateStore.GLOBAL_STATE : FilterStateStore.APP_STATE,
         };
         const query = {
-            match_phrase: {
-                [key]: {
-                    query: querySearch
-                }
+            bool: {
+                minimum_should_match: 1,
+                should: newFilters
             }
         }
 
@@ -74,26 +85,22 @@ export const CustomSearchBar = ({ filtersValues, ...props }) => {
     };
 
     const setKibanaFilters = (values: any[]) => {
-        const newFilters = []
         const currentFilters = filterManager.getFilters().filter(item => item.meta.key != values[0].value)
         filterManager.removeAll()
         filterManager.addFilters(currentFilters)
-        values.forEach(element => {
-            const customFilter = buildCustomFilter(false, indexPattern.title, element.label, element.value)
-            newFilters.push(customFilter);
-        });
-        filterManager.addFilters(newFilters)
+        const customFilter = buildCustomFilter(false, values)
+        filterManager.addFilters(customFilter)
     }
 
     const refreshCustomSelectedFilter = () => {
         setSelectedOptions(defaultSelectedOptions)
-        const filters = filterManager.getFilters()
-        const filterCustom = filters.map(item => {
-            return {
-                value: item.meta.key,
-                label: item.meta.params.query,
-            }
-        }).filter(element => Object.keys(selectedOptions).includes(element.value))
+        const filterCustom = []
+        const filters = filterManager.getFilters().filter(item => item.meta.type === 'phrases' || Object.keys(selectedOptions).includes(item.meta.key)).map(element => ({ params: element.meta.params, key: element.meta.key })) || [];
+        filters.forEach(item => {
+            item.params.forEach(element => {
+                filterCustom.push({ label: element, value: item.key })
+            })
+        })
 
         if (filterCustom.length != 0) {
             filterCustom.forEach(item => {
