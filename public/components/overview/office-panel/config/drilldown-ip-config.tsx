@@ -62,14 +62,21 @@ export const drilldownIPConfig = {
       ],
     },
     {
-      height: 300,
       columns: [
         {
           width: 100,
           component: () => (
             <EuiFlexItem>
               <EuiPanel paddingSize={'s'}>
-                <SecurityAlerts />
+                <SecurityAlerts
+                  initialColumns={[
+                    'icon',
+                    'timestamp',
+                    'data.office365.UserId',
+                    'rule.description',
+                    'data.office365.Operation',
+                  ]}
+                />
               </EuiPanel>
             </EuiFlexItem>
           ),

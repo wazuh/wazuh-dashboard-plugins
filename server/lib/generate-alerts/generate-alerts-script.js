@@ -313,6 +313,11 @@ function generateAlert(params) {
   }
 
   if (params.office) {
+
+    if (params.manager && params.manager.name) {
+      alert.agent.name = params.manager.name;
+    };
+
     const beforeDate = new Date(new Date(alert.timestamp) - 3 * 24 * 60 * 60 * 1000);
     const IntraID = randomArrayItem(Office.arrayUuidOffice);
     const OrgID = randomArrayItem(Office.arrayUuidOffice);
@@ -324,6 +329,7 @@ function generateAlert(params) {
     const log = randomArrayItem(Office.arrayLogs);
     const ruleData = Office.officeRules[log.RecordType];
 
+    alert.agent.id = '000'
     alert.rule = ruleData.rule;
     alert.decoder = randomArrayItem(Office.arrayDecoderOffice);
     alert.GeoLocation = randomArrayItem(GeoLocation);
