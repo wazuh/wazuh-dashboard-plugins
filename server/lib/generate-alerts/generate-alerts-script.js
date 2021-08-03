@@ -125,6 +125,12 @@ function generateAlert(params) {
     }
   }
 
+  if (params.agent) {
+    if (params.agent.name) {
+      alert.agent.name = params.agent.name;
+    }
+  }
+
   if (params.cluster) {
     if (params.cluster.name) {
       alert.cluster.name = params.cluster.name;
@@ -324,8 +330,9 @@ function generateAlert(params) {
     const log = randomArrayItem(Office.arrayLogs);
     const ruleData = Office.officeRules[log.RecordType];
 
-    alert.agent.id = '000'
-    alert.agent.name = 'master'
+
+    // alert.agent.id = '000'
+    // alert.agent.name = 'master'
     alert.rule = ruleData.rule;
     alert.decoder = randomArrayItem(Office.arrayDecoderOffice);
     alert.GeoLocation = randomArrayItem(GeoLocation);
