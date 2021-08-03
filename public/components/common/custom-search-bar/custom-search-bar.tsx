@@ -20,7 +20,6 @@ export const CustomSearchBar = ({ filtersValues, ...props }) => {
 
     const KibanaServices = getDataPlugin().query;
     const filterManager = KibanaServices.filterManager;
-    const indexPattern = getIndexPattern();
     const defaultSelectedOptions = () => {
         const array = []
         filtersValues.forEach(item => {
@@ -51,15 +50,13 @@ export const CustomSearchBar = ({ filtersValues, ...props }) => {
 
 
     const buildCustomFilter = (isPinned: boolean, values?: any): Filter => {
-        const newFilters = []
-        values.forEach(element => {
-            const filter = {
-                match_phrase: {
-                    [element.value]: element.label
-                }
+        const newFilters = values.map(element => ({
+            match_phrase: {
+              [element.value]: {
+                query: element.label
+              }
             }
-            newFilters.push(filter);
-        });
+        }));
         const params = values.map(item => item.label)
         const meta: FilterMeta = {
             disabled: false,
@@ -94,13 +91,11 @@ export const CustomSearchBar = ({ filtersValues, ...props }) => {
 
     const refreshCustomSelectedFilter = () => {
         setSelectedOptions(defaultSelectedOptions)
-        const filterCustom = []
         const filters = filterManager.getFilters().filter(item => item.meta.type === 'phrases' || Object.keys(selectedOptions).includes(item.meta.key)).map(element => ({ params: element.meta.params, key: element.meta.key })) || [];
-        filters.forEach(item => {
-            item.params.forEach(element => {
-                filterCustom.push({ label: element, value: item.key })
-            })
-        })
+        const getFilterCustom = (item) => {
+             return item.params.map(element => ({ label: element, value: item.key }))
+        }
+        const filterCustom = filters.map((item) => getFilterCustom(item))[0] || []
 
         if (filterCustom.length != 0) {
             filterCustom.forEach(item => {
