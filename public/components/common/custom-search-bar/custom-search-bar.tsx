@@ -112,15 +112,15 @@ export const CustomSearchBar = ({ filtersValues, ...props }) => {
     };
 
     const getComponent = (item: any) => {
-        var types = {
-            'default': <></>,
-            'combobox': <Combobox
-                item={item}
-                selectedOptions={selectedOptions[item.key] || []}
-                onChange={onChange}
-            />
-        };
-        return types[item.type] || types['default'];
+      const types = {
+        'default': <></>,
+        'combobox': <Combobox
+          item={item}
+          selectedOptions={selectedOptions[item.key] || []}
+          onChange={onChange}
+        />,
+      };
+      return types[item.type] || types['default'];
     }
 
     return (

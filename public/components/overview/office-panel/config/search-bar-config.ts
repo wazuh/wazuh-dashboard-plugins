@@ -11,17 +11,36 @@
  * Find more information about this on the LICENSE file.
  */
 
-export const filtersValues: { type: string; key: string }[] = [
+export const filtersValues: {
+  type: string;
+  key: string;
+  placeholder: string;
+  optionTitle?: boolean;
+}[] = [
   {
     type: 'combobox',
-    key: 'agent.id',
+    key: 'data.office365.Actor.ID',
+    placeholder: 'Actor ID',
   },
   {
     type: 'combobox',
-    key: 'agent.name',
+    key: 'data.office365.Subscription',
+    placeholder: 'Subscription',
   },
   {
     type: 'combobox',
-    key: 'agent.ip',
+    key: 'data.office365.UserType',
+    placeholder: 'UserType',
+    optionTitle: true,
+  },
+  {
+    type: 'combobox',
+    key: 'data.office365.ResultStatus',
+    placeholder: 'ResultStatus',
+  },
+  {
+    type: 'combobox',
+    key: 'data.office365.ClientIP',
+    placeholder: 'Client IP',
   },
 ];

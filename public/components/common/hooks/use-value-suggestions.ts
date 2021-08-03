@@ -9,18 +9,17 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { getDataPlugin } from '../../../kibana-services';
 import { useIndexPattern } from '.';
 import { IFieldType, IIndexPattern } from 'src/plugins/data/public';
-import React from 'react';
 import {
   UI_ERROR_SEVERITIES,
   UIErrorLog,
   UIErrorSeverity,
   UILogLevel,
 } from '../../../react-services/error-orchestrator/types';
-import { UI_LOGGER_LEVELS } from '../../../../common/constants';
+import { OFFICE_365_USER_TYPE, UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 
 export interface IValueSuggestiions {
@@ -29,12 +28,27 @@ export interface IValueSuggestiions {
   setQuery: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export const useValueSuggestions = (filterField: string, type: 'string' | 'boolean' = 'string') : IValueSuggestiions => {
+export const useValueSuggestions = (
+  filterField: string,
+  type: 'string' | 'boolean' = 'string'
+): IValueSuggestiions => {
   const [suggestedValues, setSuggestedValues] = useState<string[] | boolean[]>([]);
   const [query, setQuery] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
   const data = getDataPlugin();
   const indexPattern = useIndexPattern();
+
+  const getValueSuggestions = async (field) => {
+    if (field.name === 'data.office365.UserType') {
+      return OFFICE_365_USER_TYPE;
+    }
+
+    return await data.autocomplete.getValueSuggestions({
+      query,
+      indexPattern: indexPattern as IIndexPattern,
+      field,
+    });
+  };
 
   useEffect(() => {
     if (indexPattern) {
@@ -46,16 +60,10 @@ export const useValueSuggestions = (filterField: string, type: 'string' | 'boole
           aggregatable: true,
         } as IFieldType;
         try {
-          setSuggestedValues(
-            await data.autocomplete.getValueSuggestions({
-              query,
-              indexPattern: indexPattern as IIndexPattern,
-              field,
-            })
-          );
+          setSuggestedValues(await getValueSuggestions(field));
         } catch (error) {
           const options: UIErrorLog = {
-            context: `${useValueSuggestions.name}.valueSuggestions`,
+            context: `${useValueSuggestions.name}.getValueSuggestions`,
             level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
             severity: UI_ERROR_SEVERITIES.UI as UIErrorSeverity,
             error: {
