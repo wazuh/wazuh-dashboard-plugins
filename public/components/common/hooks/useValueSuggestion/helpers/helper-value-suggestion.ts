@@ -13,7 +13,7 @@
 /** UserTypes Office365 module filter
  *  https://docs.microsoft.com/en-us/office/office-365-management-api/office-365-management-activity-api-schema#user-type
  */
-const OFFICE_365_USER_TYPE = [
+const OFFICE_365_USER_TYPE: string[] = [
   'Regular',
   'Reserved',
   'Admin',
@@ -27,7 +27,7 @@ const OFFICE_365_USER_TYPE = [
 
 const DATA_OFFICE_365_USER_TYPE = 'data.office365.UserType';
 
-export const getCustomValueSuggestion = (field) => {
+export const getCustomValueSuggestion = (field: { name: string }): string[] => {
   switch (field.name) {
     case DATA_OFFICE_365_USER_TYPE:
       return OFFICE_365_USER_TYPE;
