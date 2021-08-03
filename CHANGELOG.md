@@ -45,7 +45,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added sample data for office365 events [#3424](https://github.com/wazuh/wazuh-kibana-app/pull/3424)
 - Created a separate component to check for sample data [#3475](https://github.com/wazuh/wazuh-kibana-app/pull/3475)
 - Added a new hook for getting value suggestions [#3506](https://github.com/wazuh/wazuh-kibana-app/pull/3506)
-- Added base Module Panel view with Office365 setup [3518](https://github.com/wazuh/wazuh-kibana-app/pull/3518)
+- Added base Module Panel view with Office365 setup [#3518](https://github.com/wazuh/wazuh-kibana-app/pull/3518)
+- Two new aggregations tables, for rules and operations, to office365 module [#3511] https://github.com/wazuh/wazuh-kibana-app/pull/3526
 
 ### Changed
 

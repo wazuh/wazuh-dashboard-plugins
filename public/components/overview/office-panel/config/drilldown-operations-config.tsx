@@ -21,20 +21,14 @@ export const drilldownOperationsConfig = {
     {
       height: 400,
       columns: [
-        {
-          width: 30,
-          component: (props) => (
-            <VisCard id="Wazuh-App-Overview-Office-Metric-Stats" tab="office" {...props} />
-          ),
-        },
-        {
-          width: 30,
+                {
+          width: 40,
           component: (props) => (
             <VisCard id="Wazuh-App-Overview-Office-Top-Users" tab="office" {...props} />
           ),
         },
         {
-          width: 40,
+          width: 60,
           component: (props) => (
             <VisCard id="Wazuh-App-Overview-Office-Country-Tag-Cloud" tab="office" {...props} />
           ),
