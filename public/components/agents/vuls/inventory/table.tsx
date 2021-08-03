@@ -139,13 +139,13 @@ export class InventoryTable extends Component {
       },
       {
         field: 'cvss2_score',
-        name: 'CVSS2',
+        name: 'CVSS2 Score',
         sortable: true,
         width: `${width}`
       },
       {
         field: 'cvss3_score',
-        name: 'CVSS3',
+        name: 'CVSS3 Score',
         sortable: true,
         width: `${width}`
       },

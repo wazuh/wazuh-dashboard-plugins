@@ -56,9 +56,13 @@ export class FlyoutDetail extends Component {
     };
   }
 
-  async getLastScan(){
-    const response = await WzRequest.apiReq('GET', `/vulnerability/${this.props.agentId}/last_scan`, {});
-    return ((response.data || {}).data || {}).affected_items[0] || {}; 
+  async getLastScan() {
+    const response = await WzRequest.apiReq(
+      'GET',
+      `/vulnerability/${this.props.agentId}/last_scan`,
+      {}
+    );
+    return ((response.data || {}).data || {}).affected_items[0] || {};
   }
 
   async componentDidMount() {
@@ -68,15 +72,15 @@ export class FlyoutDetail extends Component {
         ? { 'cluster.name': AppState.getClusterInfo().cluster }
         : { 'manager.name': AppState.getClusterInfo().manager };
       this.setState({ clusterFilter });
-      let currentItem = this.props.item;
+      const currentItem = this.props.item;
 
       if (!currentItem) {
         throw false;
       }
 
-      let lastScan = await this.getLastScan();
-      currentItem = { ...currentItem, ...lastScan};
-      
+      const lastScan = await this.getLastScan();
+      Object.assign(currentItem, { ...lastScan });
+
       this.setState({ currentItem, isLoading: false });
     } catch (error) {
       const options: UIErrorLog = {
@@ -98,14 +102,11 @@ export class FlyoutDetail extends Component {
     }
   }
 
-
-
-
   render() {
     const { currentItem } = this.state;
     const title = `${currentItem.cve}`;
     const id = title.replace(/ /g, '_');
-    
+
     return (
       <EuiFlyout
         onClose={() => this.props.closeFlyout()}
