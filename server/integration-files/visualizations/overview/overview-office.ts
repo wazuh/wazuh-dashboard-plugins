@@ -165,56 +165,56 @@ export default [
     _source: {
       title: 'Max Rule Level',
       visState: JSON.stringify({
-        "title": "Max Rule Level",
-        "type": "metric",
-        "aggs": [
+        title: 'Max Rule Level',
+        type: 'metric',
+        aggs: [
           {
-            "id": "1",
-            "enabled": true,
-            "type": "max",
-            "params": {
-              "field": "rule.level",
-              "customLabel": "Max Rule Level"
+            id: '1',
+            enabled: true,
+            type: 'max',
+            params: {
+              field: 'rule.level',
+              customLabel: 'Max Rule Level',
             },
-            "schema": "metric"
-          }
+            schema: 'metric',
+          },
         ],
-        "params": {
-          "addTooltip": true,
-          "addLegend": false,
-          "type": "metric",
-          "metric": {
-            "percentageMode": false,
-            "useRanges": false,
-            "colorSchema": "Green to Red",
-            "metricColorMode": "Labels",
-            "colorsRange": [
+        params: {
+          addTooltip: true,
+          addLegend: false,
+          type: 'metric',
+          metric: {
+            percentageMode: false,
+            useRanges: false,
+            colorSchema: 'Green to Red',
+            metricColorMode: 'Labels',
+            colorsRange: [
               {
-                "from": 0,
-                "to": 7
+                from: 0,
+                to: 7,
               },
               {
-                "from": 7,
-                "to": 10
+                from: 7,
+                to: 10,
               },
               {
-                "from": 10,
-                "to": 20
-              }
+                from: 10,
+                to: 20,
+              },
             ],
-            "labels": {
-              "show": true
+            labels: {
+              show: true,
             },
-            "invertColors": false,
-            "style": {
-              "bgFill": "#000",
-              "bgColor": false,
-              "labelColor": false,
-              "subText": "",
-              "fontSize": 26
-            }
-          }
-        }
+            invertColors: false,
+            style: {
+              bgFill: '#000',
+              bgColor: false,
+              labelColor: false,
+              subText: '',
+              fontSize: 26,
+            },
+          },
+        },
       }),
       uiStateJSON: JSON.stringify({ vis: { defaultColors: { '0 - 100': 'rgb(0,104,55)' } } }),
       description: '',
@@ -231,62 +231,62 @@ export default [
     _source: {
       title: 'Suspicious Downloads',
       visState: JSON.stringify({
-        "title": "Suspicious Downloads Count",
-        "type": "metric",
-        "aggs": [
+        title: 'Suspicious Downloads Count',
+        type: 'metric',
+        aggs: [
           {
-            "id": "1",
-            "enabled": true,
-            "type": "count",
-            "params": {},
-            "schema": "metric"
+            id: '1',
+            enabled: true,
+            type: 'count',
+            params: {},
+            schema: 'metric',
           },
           {
-            "id": "2",
-            "enabled": true,
-            "type": "filters",
-            "params": {
-              "filters": [
+            id: '2',
+            enabled: true,
+            type: 'filters',
+            params: {
+              filters: [
                 {
-                  "input": {
-                    "query": "rule.id: \"91724\"",
-                    "language": "kuery"
+                  input: {
+                    query: 'rule.id: "91724"',
+                    language: 'kuery',
                   },
-                  "label": "Suspicious Downloads"
-                }
-              ]
+                  label: 'Suspicious Downloads',
+                },
+              ],
             },
-            "schema": "group"
-          }
+            schema: 'group',
+          },
         ],
-        "params": {
-          "addTooltip": true,
-          "addLegend": false,
-          "type": "metric",
-          "metric": {
-            "percentageMode": false,
-            "useRanges": false,
-            "colorSchema": "Green to Red",
-            "metricColorMode": "Labels",
-            "colorsRange": [
+        params: {
+          addTooltip: true,
+          addLegend: false,
+          type: 'metric',
+          metric: {
+            percentageMode: false,
+            useRanges: false,
+            colorSchema: 'Green to Red',
+            metricColorMode: 'Labels',
+            colorsRange: [
               {
-                "from": 0,
-                "to": 1
-              }
+                from: 0,
+                to: 1,
+              },
             ],
-            "labels": {
-              "show": true
+            labels: {
+              show: true,
             },
-            "invertColors": false,
-            "style": {
-              "bgFill": "#000",
-              "bgColor": false,
-              "labelColor": false,
-              "subText": "",
-              "fontSize": 26
-            }
-          }
-        }
+            invertColors: false,
+            style: {
+              bgFill: '#000',
+              bgColor: false,
+              labelColor: false,
+              subText: '',
+              fontSize: 26,
+            },
+          },
+        },
       }),
       uiStateJSON: JSON.stringify({ vis: { defaultColors: { '0 - 100': 'rgb(0,104,55)' } } }),
       description: '',
@@ -303,62 +303,62 @@ export default [
     _source: {
       title: 'Malware Alerts',
       visState: JSON.stringify({
-        "title": "Malware Alerts Count",
-        "type": "metric",
-        "aggs": [
+        title: 'Malware Alerts Count',
+        type: 'metric',
+        aggs: [
           {
-            "id": "1",
-            "enabled": true,
-            "type": "count",
-            "params": {},
-            "schema": "metric"
+            id: '1',
+            enabled: true,
+            type: 'count',
+            params: {},
+            schema: 'metric',
           },
           {
-            "id": "2",
-            "enabled": true,
-            "type": "filters",
-            "params": {
-              "filters": [
+            id: '2',
+            enabled: true,
+            type: 'filters',
+            params: {
+              filters: [
                 {
-                  "input": {
-                    "query": "rule.id: \"91556\" or rule.id: \"91575\" or rule.id: \"91700\" ",
-                    "language": "kuery"
+                  input: {
+                    query: 'rule.id: "91556" or rule.id: "91575" or rule.id: "91700" ',
+                    language: 'kuery',
                   },
-                  "label": "Malware Alerts"
-                }
-              ]
+                  label: 'Malware Alerts',
+                },
+              ],
             },
-            "schema": "group"
-          }
+            schema: 'group',
+          },
         ],
-        "params": {
-          "addTooltip": true,
-          "addLegend": false,
-          "type": "metric",
-          "metric": {
-            "percentageMode": false,
-            "useRanges": false,
-            "colorSchema": "Green to Red",
-            "metricColorMode": "None",
-            "colorsRange": [
+        params: {
+          addTooltip: true,
+          addLegend: false,
+          type: 'metric',
+          metric: {
+            percentageMode: false,
+            useRanges: false,
+            colorSchema: 'Green to Red',
+            metricColorMode: 'None',
+            colorsRange: [
               {
-                "from": 0,
-                "to": 10000
-              }
+                from: 0,
+                to: 10000,
+              },
             ],
-            "labels": {
-              "show": true
+            labels: {
+              show: true,
             },
-            "invertColors": false,
-            "style": {
-              "bgFill": "#000",
-              "bgColor": false,
-              "labelColor": false,
-              "subText": "",
-              "fontSize": 26
-            }
-          }
-        }
+            invertColors: false,
+            style: {
+              bgFill: '#000',
+              bgColor: false,
+              labelColor: false,
+              subText: '',
+              fontSize: 26,
+            },
+          },
+        },
       }),
       uiStateJSON: JSON.stringify({ vis: { defaultColors: { '0 - 100': 'rgb(0,104,55)' } } }),
       description: '',
@@ -375,62 +375,62 @@ export default [
     _source: {
       title: 'Full Access Permissions',
       visState: JSON.stringify({
-        "title": "Full Access Permission Count",
-        "type": "metric",
-        "aggs": [
+        title: 'Full Access Permission Count',
+        type: 'metric',
+        aggs: [
           {
-            "id": "1",
-            "enabled": true,
-            "type": "count",
-            "params": {},
-            "schema": "metric"
+            id: '1',
+            enabled: true,
+            type: 'count',
+            params: {},
+            schema: 'metric',
           },
           {
-            "id": "2",
-            "enabled": true,
-            "type": "filters",
-            "params": {
-              "filters": [
+            id: '2',
+            enabled: true,
+            type: 'filters',
+            params: {
+              filters: [
                 {
-                  "input": {
-                    "query": "rule.id: \"91725\"",
-                    "language": "kuery"
+                  input: {
+                    query: 'rule.id: "91725"',
+                    language: 'kuery',
                   },
-                  "label": "Full Access Permissions"
-                }
-              ]
+                  label: 'Full Access Permissions',
+                },
+              ],
             },
-            "schema": "group"
-          }
+            schema: 'group',
+          },
         ],
-        "params": {
-          "addTooltip": true,
-          "addLegend": false,
-          "type": "metric",
-          "metric": {
-            "percentageMode": false,
-            "useRanges": false,
-            "colorSchema": "Green to Red",
-            "metricColorMode": "None",
-            "colorsRange": [
+        params: {
+          addTooltip: true,
+          addLegend: false,
+          type: 'metric',
+          metric: {
+            percentageMode: false,
+            useRanges: false,
+            colorSchema: 'Green to Red',
+            metricColorMode: 'None',
+            colorsRange: [
               {
-                "from": 0,
-                "to": 10000
-              }
+                from: 0,
+                to: 10000,
+              },
             ],
-            "labels": {
-              "show": true
+            labels: {
+              show: true,
             },
-            "invertColors": false,
-            "style": {
-              "bgFill": "#000",
-              "bgColor": false,
-              "labelColor": false,
-              "subText": "",
-              "fontSize": 26
-            }
-          }
-        }
+            invertColors: false,
+            style: {
+              bgFill: '#000',
+              bgColor: false,
+              labelColor: false,
+              subText: '',
+              fontSize: 26,
+            },
+          },
+        },
       }),
       uiStateJSON: JSON.stringify({ vis: { defaultColors: { '0 - 100': 'rgb(0,104,55)' } } }),
       description: '',
@@ -1057,80 +1057,80 @@ export default [
     _source: {
       title: 'User Operations',
       visState: JSON.stringify({
-        "title": "User Operation Level",
-        "type": "table",
-        "aggs": [
+        title: 'User Operation Level',
+        type: 'table',
+        aggs: [
           {
-            "id": "1",
-            "enabled": true,
-            "type": "count",
-            "params": {},
-            "schema": "metric"
+            id: '1',
+            enabled: true,
+            type: 'count',
+            params: {},
+            schema: 'metric',
           },
           {
-            "id": "2",
-            "enabled": true,
-            "type": "terms",
-            "params": {
-              "field": "data.office365.UserId",
-              "orderBy": "1",
-              "order": "desc",
-              "size": 500,
-              "otherBucket": true,
-              "otherBucketLabel": "Others",
-              "missingBucket": false,
-              "missingBucketLabel": "Missing",
-              "customLabel": "Users"
+            id: '2',
+            enabled: true,
+            type: 'terms',
+            params: {
+              field: 'data.office365.UserId',
+              orderBy: '1',
+              order: 'desc',
+              size: 500,
+              otherBucket: true,
+              otherBucketLabel: 'Others',
+              missingBucket: false,
+              missingBucketLabel: 'Missing',
+              customLabel: 'Users',
             },
-            "schema": "bucket"
+            schema: 'bucket',
           },
           {
-            "id": "3",
-            "enabled": true,
-            "type": "terms",
-            "params": {
-              "field": "data.office365.Operation",
-              "orderBy": "1",
-              "order": "desc",
-              "size": 100,
-              "otherBucket": false,
-              "otherBucketLabel": "Other",
-              "missingBucket": false,
-              "missingBucketLabel": "Missing",
-              "customLabel": "Operation"
+            id: '3',
+            enabled: true,
+            type: 'terms',
+            params: {
+              field: 'data.office365.Operation',
+              orderBy: '1',
+              order: 'desc',
+              size: 100,
+              otherBucket: false,
+              otherBucketLabel: 'Other',
+              missingBucket: false,
+              missingBucketLabel: 'Missing',
+              customLabel: 'Operation',
             },
-            "schema": "bucket"
+            schema: 'bucket',
           },
           {
-            "id": "4",
-            "enabled": true,
-            "type": "terms",
-            "params": {
-              "field": "rule.level",
-              "orderBy": "1",
-              "order": "desc",
-              "size": 20,
-              "otherBucket": false,
-              "otherBucketLabel": "Other",
-              "missingBucket": false,
-              "missingBucketLabel": "Missing",
-              "customLabel": "Rule level"
+            id: '4',
+            enabled: true,
+            type: 'terms',
+            params: {
+              field: 'rule.level',
+              orderBy: '1',
+              order: 'desc',
+              size: 20,
+              otherBucket: false,
+              otherBucketLabel: 'Other',
+              missingBucket: false,
+              missingBucketLabel: 'Missing',
+              customLabel: 'Rule level',
             },
-            "schema": "bucket"
-          }
+            schema: 'bucket',
+          },
         ],
-        "params": {
-          "perPage": 5,
-          "showPartialRows": false,
-          "showMetricsAtAllLevels": false,
-          "sort": {
-            "columnIndex": null,
-            "direction": null
+        params: {
+          perPage: 5,
+          showPartialRows: false,
+          showMetricsAtAllLevels: false,
+          sort: {
+            columnIndex: null,
+            direction: null,
           },
-          "showTotal": false,
-          "totalFunc": "sum",
-          "percentageCol": ""
-        }
+          showTotal: false,
+          totalFunc: 'sum',
+          percentageCol: '',
+        },
       }),
       uiStateJSON: '{}',
       description: '',
@@ -1150,80 +1150,80 @@ export default [
     _source: {
       title: 'Client IP Operations',
       visState: JSON.stringify({
-        "title": "Client IP Operation Level",
-        "type": "table",
-        "aggs": [
+        title: 'Client IP Operation Level',
+        type: 'table',
+        aggs: [
           {
-            "id": "1",
-            "enabled": true,
-            "type": "count",
-            "params": {},
-            "schema": "metric"
+            id: '1',
+            enabled: true,
+            type: 'count',
+            params: {},
+            schema: 'metric',
           },
           {
-            "id": "2",
-            "enabled": true,
-            "type": "terms",
-            "params": {
-              "field": "data.office365.ClientIP",
-              "orderBy": "1",
-              "order": "desc",
-              "size": 500,
-              "otherBucket": true,
-              "otherBucketLabel": "Others",
-              "missingBucket": false,
-              "missingBucketLabel": "Missing",
-              "customLabel": "Client IP"
+            id: '2',
+            enabled: true,
+            type: 'terms',
+            params: {
+              field: 'data.office365.ClientIP',
+              orderBy: '1',
+              order: 'desc',
+              size: 500,
+              otherBucket: true,
+              otherBucketLabel: 'Others',
+              missingBucket: false,
+              missingBucketLabel: 'Missing',
+              customLabel: 'Client IP',
             },
-            "schema": "bucket"
+            schema: 'bucket',
           },
           {
-            "id": "3",
-            "enabled": true,
-            "type": "terms",
-            "params": {
-              "field": "data.office365.Operation",
-              "orderBy": "1",
-              "order": "desc",
-              "size": 100,
-              "otherBucket": false,
-              "otherBucketLabel": "Other",
-              "missingBucket": false,
-              "missingBucketLabel": "Missing",
-              "customLabel": "Operation"
+            id: '3',
+            enabled: true,
+            type: 'terms',
+            params: {
+              field: 'data.office365.Operation',
+              orderBy: '1',
+              order: 'desc',
+              size: 100,
+              otherBucket: false,
+              otherBucketLabel: 'Other',
+              missingBucket: false,
+              missingBucketLabel: 'Missing',
+              customLabel: 'Operation',
             },
-            "schema": "bucket"
+            schema: 'bucket',
           },
           {
-            "id": "4",
-            "enabled": true,
-            "type": "terms",
-            "params": {
-              "field": "rule.level",
-              "orderBy": "1",
-              "order": "desc",
-              "size": 20,
-              "otherBucket": false,
-              "otherBucketLabel": "Other",
-              "missingBucket": false,
-              "missingBucketLabel": "Missing",
-              "customLabel": "Rule level"
+            id: '4',
+            enabled: true,
+            type: 'terms',
+            params: {
+              field: 'rule.level',
+              orderBy: '1',
+              order: 'desc',
+              size: 20,
+              otherBucket: false,
+              otherBucketLabel: 'Other',
+              missingBucket: false,
+              missingBucketLabel: 'Missing',
+              customLabel: 'Rule level',
             },
-            "schema": "bucket"
-          }
+            schema: 'bucket',
+          },
         ],
-        "params": {
-          "perPage": 5,
-          "showPartialRows": false,
-          "showMetricsAtAllLevels": false,
-          "sort": {
-            "columnIndex": null,
-            "direction": null
+        params: {
+          perPage: 5,
+          showPartialRows: false,
+          showMetricsAtAllLevels: false,
+          sort: {
+            columnIndex: null,
+            direction: null,
           },
-          "showTotal": false,
-          "totalFunc": "sum",
-          "percentageCol": ""
-        }
+          showTotal: false,
+          totalFunc: 'sum',
+          percentageCol: '',
+        },
       }),
       uiStateJSON: '{}',
       description: '',
@@ -1553,63 +1553,63 @@ export default [
     _source: {
       title: 'Rule Description by Level',
       visState: JSON.stringify({
-        "title": "Rule Description Level Table",
-        "type": "table",
-        "aggs": [
+        title: 'Rule Description Level Table',
+        type: 'table',
+        aggs: [
           {
-            "id": "1",
-            "enabled": true,
-            "type": "count",
-            "params": {},
-            "schema": "metric"
+            id: '1',
+            enabled: true,
+            type: 'count',
+            params: {},
+            schema: 'metric',
           },
           {
-            "id": "2",
-            "enabled": true,
-            "type": "terms",
-            "params": {
-              "field": "rule.description",
-              "orderBy": "1",
-              "order": "desc",
-              "size": 500,
-              "otherBucket": false,
-              "otherBucketLabel": "Other",
-              "missingBucket": false,
-              "missingBucketLabel": "Missing",
-              "customLabel": "Rule Description"
+            id: '2',
+            enabled: true,
+            type: 'terms',
+            params: {
+              field: 'rule.description',
+              orderBy: '1',
+              order: 'desc',
+              size: 500,
+              otherBucket: false,
+              otherBucketLabel: 'Other',
+              missingBucket: false,
+              missingBucketLabel: 'Missing',
+              customLabel: 'Rule Description',
             },
-            "schema": "bucket"
+            schema: 'bucket',
           },
           {
-            "id": "3",
-            "enabled": true,
-            "type": "terms",
-            "params": {
-              "field": "rule.level",
-              "orderBy": "1",
-              "order": "desc",
-              "size": 20,
-              "otherBucket": false,
-              "otherBucketLabel": "Other",
-              "missingBucket": false,
-              "missingBucketLabel": "Missing",
-              "customLabel": "Rule Level"
+            id: '3',
+            enabled: true,
+            type: 'terms',
+            params: {
+              field: 'rule.level',
+              orderBy: '1',
+              order: 'desc',
+              size: 20,
+              otherBucket: false,
+              otherBucketLabel: 'Other',
+              missingBucket: false,
+              missingBucketLabel: 'Missing',
+              customLabel: 'Rule Level',
             },
-            "schema": "bucket"
-          }
+            schema: 'bucket',
+          },
         ],
-        "params": {
-          "perPage": 5,
-          "showPartialRows": false,
-          "showMetricsAtAllLevels": false,
-          "sort": {
-            "columnIndex": null,
-            "direction": null
+        params: {
+          perPage: 5,
+          showPartialRows: false,
+          showMetricsAtAllLevels: false,
+          sort: {
+            columnIndex: null,
+            direction: null,
           },
-          "showTotal": false,
-          "totalFunc": "sum",
-          "percentageCol": ""
-        }
+          showTotal: false,
+          totalFunc: 'sum',
+          percentageCol: '',
+        },
       }),
       uiStateJSON: '{}',
       description: '',
@@ -2034,126 +2034,126 @@ export default [
     _source: {
       title: 'Severity by user',
       visState: JSON.stringify({
-        "title": "Severity By User Barchart",
-        "type": "histogram",
-        "aggs": [
+        title: 'Severity By User Barchart',
+        type: 'histogram',
+        aggs: [
           {
-            "id": "1",
-            "enabled": true,
-            "type": "count",
-            "params": {},
-            "schema": "metric"
+            id: '1',
+            enabled: true,
+            type: 'count',
+            params: {},
+            schema: 'metric',
           },
           {
-            "id": "2",
-            "enabled": true,
-            "type": "terms",
-            "params": {
-              "field": "rule.level",
-              "orderBy": "1",
-              "order": "desc",
-              "size": 5,
-              "otherBucket": true,
-              "otherBucketLabel": "Other",
-              "missingBucket": false,
-              "missingBucketLabel": "Missing"
+            id: '2',
+            enabled: true,
+            type: 'terms',
+            params: {
+              field: 'rule.level',
+              orderBy: '1',
+              order: 'desc',
+              size: 5,
+              otherBucket: true,
+              otherBucketLabel: 'Other',
+              missingBucket: false,
+              missingBucketLabel: 'Missing',
             },
-            "schema": "segment"
+            schema: 'segment',
           },
           {
-            "id": "3",
-            "enabled": true,
-            "type": "terms",
-            "params": {
-              "field": "data.office365.UserId",
-              "orderBy": "1",
-              "order": "desc",
-              "size": 20,
-              "otherBucket": false,
-              "otherBucketLabel": "Other",
-              "missingBucket": false,
-              "missingBucketLabel": "Missing"
+            id: '3',
+            enabled: true,
+            type: 'terms',
+            params: {
+              field: 'data.office365.UserId',
+              orderBy: '1',
+              order: 'desc',
+              size: 20,
+              otherBucket: false,
+              otherBucketLabel: 'Other',
+              missingBucket: false,
+              missingBucketLabel: 'Missing',
             },
-            "schema": "group"
-          }
+            schema: 'group',
+          },
         ],
-        "params": {
-          "type": "histogram",
-          "grid": {
-            "categoryLines": false
+        params: {
+          type: 'histogram',
+          grid: {
+            categoryLines: false,
           },
-          "categoryAxes": [
+          categoryAxes: [
             {
-              "id": "CategoryAxis-1",
-              "type": "category",
-              "position": "bottom",
-              "show": true,
-              "style": {},
-              "scale": {
-                "type": "linear"
+              id: 'CategoryAxis-1',
+              type: 'category',
+              position: 'bottom',
+              show: true,
+              style: {},
+              scale: {
+                type: 'linear',
               },
-              "labels": {
-                "show": true,
-                "filter": true,
-                "truncate": 100
+              labels: {
+                show: true,
+                filter: true,
+                truncate: 100,
               },
-              "title": {}
-            }
+              title: {},
+            },
           ],
-          "valueAxes": [
+          valueAxes: [
             {
-              "id": "ValueAxis-1",
-              "name": "LeftAxis-1",
-              "type": "value",
-              "position": "left",
-              "show": true,
-              "style": {},
-              "scale": {
-                "type": "linear",
-                "mode": "normal"
+              id: 'ValueAxis-1',
+              name: 'LeftAxis-1',
+              type: 'value',
+              position: 'left',
+              show: true,
+              style: {},
+              scale: {
+                type: 'linear',
+                mode: 'normal',
               },
-              "labels": {
-                "show": true,
-                "rotate": 0,
-                "filter": false,
-                "truncate": 100
+              labels: {
+                show: true,
+                rotate: 0,
+                filter: false,
+                truncate: 100,
               },
-              "title": {
-                "text": "Count"
-              }
-            }
+              title: {
+                text: 'Count',
+              },
+            },
           ],
-          "seriesParams": [
+          seriesParams: [
             {
-              "show": true,
-              "type": "histogram",
-              "mode": "stacked",
-              "data": {
-                "label": "Count",
-                "id": "1"
+              show: true,
+              type: 'histogram',
+              mode: 'stacked',
+              data: {
+                label: 'Count',
+                id: '1',
               },
-              "valueAxis": "ValueAxis-1",
-              "drawLinesBetweenPoints": true,
-              "lineWidth": 2,
-              "showCircles": true
-            }
+              valueAxis: 'ValueAxis-1',
+              drawLinesBetweenPoints: true,
+              lineWidth: 2,
+              showCircles: true,
+            },
           ],
-          "addTooltip": true,
-          "addLegend": true,
-          "legendPosition": "right",
-          "times": [],
-          "addTimeMarker": false,
-          "labels": {
-            "show": false
+          addTooltip: true,
+          addLegend: true,
+          legendPosition: 'right',
+          times: [],
+          addTimeMarker: false,
+          labels: {
+            show: false,
           },
-          "thresholdLine": {
-            "show": false,
-            "value": 10,
-            "width": 1,
-            "style": "full",
-            "color": "#E7664C"
-          }
-        }
+          thresholdLine: {
+            show: false,
+            value: 10,
+            width: 1,
+            style: 'full',
+            color: '#E7664C',
+          },
+        },
       }),
       uiStateJSON: '{}',
       description: '',
@@ -2173,127 +2173,127 @@ export default [
     _source: {
       title: 'Top User By Subscription',
       visState: JSON.stringify({
-        "title": "Top User By Subscription",
-        "type": "histogram",
-        "aggs": [
+        title: 'Top User By Subscription',
+        type: 'histogram',
+        aggs: [
           {
-            "id": "1",
-            "enabled": true,
-            "type": "count",
-            "params": {},
-            "schema": "metric"
+            id: '1',
+            enabled: true,
+            type: 'count',
+            params: {},
+            schema: 'metric',
           },
           {
-            "id": "2",
-            "enabled": true,
-            "type": "terms",
-            "params": {
-              "field": "data.office365.UserId",
-              "orderBy": "1",
-              "order": "desc",
-              "size": 5,
-              "otherBucket": false,
-              "otherBucketLabel": "Other",
-              "missingBucket": false,
-              "missingBucketLabel": "Missing"
+            id: '2',
+            enabled: true,
+            type: 'terms',
+            params: {
+              field: 'data.office365.UserId',
+              orderBy: '1',
+              order: 'desc',
+              size: 5,
+              otherBucket: false,
+              otherBucketLabel: 'Other',
+              missingBucket: false,
+              missingBucketLabel: 'Missing',
             },
-            "schema": "segment"
+            schema: 'segment',
           },
           {
-            "id": "3",
-            "enabled": true,
-            "type": "terms",
-            "params": {
-              "field": "data.office365.Subscription",
-              "orderBy": "1",
-              "order": "desc",
-              "size": 5,
-              "otherBucket": false,
-              "otherBucketLabel": "Other",
-              "missingBucket": false,
-              "missingBucketLabel": "Missing"
+            id: '3',
+            enabled: true,
+            type: 'terms',
+            params: {
+              field: 'data.office365.Subscription',
+              orderBy: '1',
+              order: 'desc',
+              size: 5,
+              otherBucket: false,
+              otherBucketLabel: 'Other',
+              missingBucket: false,
+              missingBucketLabel: 'Missing',
             },
-            "schema": "group"
-          }
+            schema: 'group',
+          },
         ],
-        "params": {
-          "type": "histogram",
-          "grid": {
-            "categoryLines": false
+        params: {
+          type: 'histogram',
+          grid: {
+            categoryLines: false,
           },
-          "categoryAxes": [
+          categoryAxes: [
             {
-              "id": "CategoryAxis-1",
-              "type": "category",
-              "position": "bottom",
-              "show": true,
-              "style": {},
-              "scale": {
-                "type": "linear"
+              id: 'CategoryAxis-1',
+              type: 'category',
+              position: 'bottom',
+              show: true,
+              style: {},
+              scale: {
+                type: 'linear',
               },
-              "labels": {
-                "show": true,
-                "filter": true,
-                "truncate": 100,
-                "rotate": 0
+              labels: {
+                show: true,
+                filter: true,
+                truncate: 100,
+                rotate: 0,
               },
-              "title": {}
-            }
+              title: {},
+            },
           ],
-          "valueAxes": [
+          valueAxes: [
             {
-              "id": "ValueAxis-1",
-              "name": "LeftAxis-1",
-              "type": "value",
-              "position": "left",
-              "show": true,
-              "style": {},
-              "scale": {
-                "type": "linear",
-                "mode": "normal"
+              id: 'ValueAxis-1',
+              name: 'LeftAxis-1',
+              type: 'value',
+              position: 'left',
+              show: true,
+              style: {},
+              scale: {
+                type: 'linear',
+                mode: 'normal',
               },
-              "labels": {
-                "show": true,
-                "rotate": 0,
-                "filter": false,
-                "truncate": 100
+              labels: {
+                show: true,
+                rotate: 0,
+                filter: false,
+                truncate: 100,
               },
-              "title": {
-                "text": "Count"
-              }
-            }
+              title: {
+                text: 'Count',
+              },
+            },
           ],
-          "seriesParams": [
+          seriesParams: [
             {
-              "show": true,
-              "type": "histogram",
-              "mode": "stacked",
-              "data": {
-                "label": "Count",
-                "id": "1"
+              show: true,
+              type: 'histogram',
+              mode: 'stacked',
+              data: {
+                label: 'Count',
+                id: '1',
               },
-              "valueAxis": "ValueAxis-1",
-              "drawLinesBetweenPoints": true,
-              "lineWidth": 2,
-              "showCircles": true
-            }
+              valueAxis: 'ValueAxis-1',
+              drawLinesBetweenPoints: true,
+              lineWidth: 2,
+              showCircles: true,
+            },
           ],
-          "addTooltip": true,
-          "addLegend": true,
-          "legendPosition": "right",
-          "times": [],
-          "addTimeMarker": false,
-          "labels": {
-            "show": false
+          addTooltip: true,
+          addLegend: true,
+          legendPosition: 'right',
+          times: [],
+          addTimeMarker: false,
+          labels: {
+            show: false,
           },
-          "thresholdLine": {
-            "show": false,
-            "value": 10,
-            "width": 1,
-            "style": "full",
-            "color": "#E7664C"
-          }
-        }
+          thresholdLine: {
+            show: false,
+            value: 10,
+            width: 1,
+            style: 'full',
+            color: '#E7664C',
+          },
+        },
       }),
       uiStateJSON: '{}',
       description: '',
@@ -2371,6 +2371,323 @@ export default [
           index: 'wazuh-alerts',
           query: { query: '', language: 'lucene' },
           filter: [],
+        }),
+      },
+    },
+  },
+  {
+    _id: 'Wazuh-App-Overview-Office-Country-Tag-Cloud',
+    _type: 'visualization',
+    _source: {
+      title: 'Country of origin',
+      visState: JSON.stringify({
+        title: 'Country tag cloud',
+        type: 'tagcloud',
+        aggs: [
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            params: {},
+            schema: 'metric',
+          },
+          {
+            id: '2',
+            enabled: true,
+            type: 'terms',
+            params: {
+              field: 'GeoLocation.country_name',
+              orderBy: '1',
+              order: 'desc',
+              size: 5,
+              otherBucket: false,
+              otherBucketLabel: 'Other',
+              missingBucket: false,
+              missingBucketLabel: 'Missing',
+            },
+            schema: 'segment',
+          },
+        ],
+        params: {
+          scale: 'linear',
+          orientation: 'right angled',
+          minFontSize: 18,
+          maxFontSize: 72,
+          showLabel: false,
+        },
+      }),
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON: JSON.stringify({
+          index: 'wazuh-alerts',
+          filter: [],
+          query: { query: '', language: 'lucene' },
+        }),
+      },
+    },
+  },
+  {
+    _id: 'Wazuh-App-Overview-Office-Alerts-Evolution-By-UserID',
+    _type: 'visualization',
+    _source: {
+      title: 'Alerts by user',
+      visState: JSON.stringify({
+        title: 'Alerts evolution over time',
+        type: 'line',
+        aggs: [
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            params: {
+              customLabel: 'Alerts',
+            },
+            schema: 'metric',
+          },
+          {
+            id: '2',
+            enabled: true,
+            type: 'date_histogram',
+            params: {
+              field: 'timestamp',
+              timeRange: {
+                from: 'now-1w',
+                to: 'now',
+              },
+              useNormalizedEsInterval: true,
+              scaleMetricValues: false,
+              interval: 'auto',
+              drop_partials: false,
+              min_doc_count: 1,
+              extended_bounds: {},
+            },
+            schema: 'segment',
+          },
+          {
+            id: '3',
+            enabled: true,
+            type: 'terms',
+            params: {
+              field: 'data.office365.UserId',
+              orderBy: '1',
+              order: 'desc',
+              size: 5,
+              otherBucket: false,
+              otherBucketLabel: 'Other',
+              missingBucket: false,
+              missingBucketLabel: 'Missing',
+              customLabel: 'User ID',
+            },
+            schema: 'group',
+          },
+        ],
+        params: {
+          type: 'line',
+          grid: {
+            categoryLines: false,
+          },
+          categoryAxes: [
+            {
+              id: 'CategoryAxis-1',
+              type: 'category',
+              position: 'bottom',
+              show: true,
+              style: {},
+              scale: {
+                type: 'linear',
+              },
+              labels: {
+                show: true,
+                filter: true,
+                truncate: 100,
+              },
+              title: {},
+            },
+          ],
+          valueAxes: [
+            {
+              id: 'ValueAxis-1',
+              name: 'LeftAxis-1',
+              type: 'value',
+              position: 'left',
+              show: true,
+              style: {},
+              scale: {
+                type: 'linear',
+                mode: 'normal',
+              },
+              labels: {
+                show: true,
+                rotate: 0,
+                filter: false,
+                truncate: 100,
+              },
+              title: {
+                text: 'Alerts',
+              },
+            },
+          ],
+          seriesParams: [
+            {
+              show: true,
+              type: 'line',
+              mode: 'normal',
+              data: {
+                label: 'Alerts',
+                id: '1',
+              },
+              valueAxis: 'ValueAxis-1',
+              drawLinesBetweenPoints: true,
+              lineWidth: 2,
+              interpolate: 'linear',
+              showCircles: true,
+            },
+          ],
+          addTooltip: true,
+          addLegend: true,
+          legendPosition: 'right',
+          times: [],
+          addTimeMarker: false,
+          labels: {},
+          thresholdLine: {
+            show: false,
+            value: 10,
+            width: 1,
+            style: 'full',
+            color: '#E7664C',
+          },
+          row: true,
+        },
+      }),
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON: JSON.stringify({
+          index: 'wazuh-alerts',
+          filter: [],
+          query: { query: '', language: 'lucene' },
+        }),
+      },
+    },
+  },
+  {
+    _id: 'Wazuh-App-Overview-Office-Top-Users',
+    _type: 'visualization',
+    _source: {
+      title: 'Top Office Users',
+      visState: JSON.stringify({
+        title: 'Alerts by user',
+        type: 'pie',
+        aggs: [
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            params: {},
+            schema: 'metric',
+          },
+          {
+            id: '2',
+            enabled: true,
+            type: 'terms',
+            params: {
+              field: 'data.office365.UserId',
+              orderBy: '1',
+              order: 'desc',
+              size: 5,
+              otherBucket: false,
+              otherBucketLabel: 'Other',
+              missingBucket: false,
+              missingBucketLabel: 'Missing',
+            },
+            schema: 'segment',
+          },
+        ],
+        params: {
+          type: 'pie',
+          addTooltip: true,
+          addLegend: true,
+          legendPosition: 'right',
+          isDonut: true,
+          labels: {
+            show: false,
+            values: true,
+            last_level: true,
+            truncate: 100,
+          },
+        },
+      }),
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON: JSON.stringify({
+          index: 'wazuh-alerts',
+          filter: [],
+          query: { query: '', language: 'lucene' },
+        }),
+      },
+    },
+  },
+  {
+    _id: 'Wazuh-App-Overview-Office-Top-Operations',
+    _type: 'visualization',
+    _source: {
+      title: 'Top Operations',
+      visState: JSON.stringify({
+        title: 'Top Operations',
+        type: 'pie',
+        aggs: [
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            params: {},
+            schema: 'metric',
+          },
+          {
+            id: '2',
+            enabled: true,
+            type: 'terms',
+            params: {
+              field: 'data.office365.Operation',
+              orderBy: '1',
+              order: 'desc',
+              size: 5,
+              otherBucket: false,
+              otherBucketLabel: 'Other',
+              missingBucket: false,
+              missingBucketLabel: 'Missing',
+              customLabel: 'Operation',
+            },
+            schema: 'segment',
+          },
+        ],
+        params: {
+          type: 'pie',
+          addTooltip: true,
+          addLegend: true,
+          legendPosition: 'right',
+          isDonut: true,
+          labels: {
+            show: false,
+            values: true,
+            last_level: true,
+            truncate: 100,
+          },
+        },
+      }),
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON: JSON.stringify({
+          index: 'wazuh-alerts',
+          filter: [],
+          query: { query: '', language: 'lucene' },
         }),
       },
     },
