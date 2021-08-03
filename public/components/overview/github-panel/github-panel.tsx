@@ -23,26 +23,6 @@ export const GitHubPanel = withErrorBoundary(() => {
 
   const [moduleStatsList, setModuleStatsList] = useState([]);
 
-  /** Get Office 365 Side Panel Module info **/
-  useEffect(() => {
-    (async () => {
-      try {
-        const modulesConfig = await queryConfig(
-          '000',
-          [{ component: 'wmodules', configuration: 'wmodules' }]
-        );
-        const config = Object.entries(modulesConfig["wmodules-wmodules"].affected_items[0].wmodules
-          .filter((module) => { return Object.keys(module)[0] == 'sca' })[0]['sca']).map((configProp) => { //<-- change module name
-            const description = Array.isArray(configProp[1]) ? configProp[1].join(', ') : configProp[1];
-            return { title: configProp[0], description }
-          })
-        setModuleStatsList(config);
-      } catch (error) {
-        setModuleStatsList([{ title: 'Module Unavailable', description: '' }]);
-      }
-    }
-    )();
-  }, [])
 
   return (
     <>
