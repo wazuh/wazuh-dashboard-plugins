@@ -15,6 +15,7 @@ import { EuiFlexGroup, EuiFlexItem, EuiSwitch } from '@elastic/eui';
 import { getDataPlugin } from '../../../kibana-services';
 import { KbnSearchBar } from '../../kbn-search-bar';
 import { Combobox } from './components';
+import { element } from 'angular';
 
 export const CustomSearchBar = ({ filtersValues, ...props }) => {
   const KibanaServices = getDataPlugin().query;
@@ -99,17 +100,20 @@ export const CustomSearchBar = ({ filtersValues, ...props }) => {
             item.meta.type === 'phrases' || Object.keys(selectedOptions).includes(item.meta.key)
         )
         .map((element) => ({ params: element.meta.params, key: element.meta.key })) || [];
+   
     const getFilterCustom = (item) => {
       return item.params.map((element) => ({ label: element, value: item.key }));
     };
-    const filterCustom = filters.map((item) => getFilterCustom(item))[0] || [];
-
+    const filterCustom = filters.map((item) => getFilterCustom(item)) || [];
+    console.log(filters,filters.map((item) => getFilterCustom(item)))
     if (filterCustom.length != 0) {
       filterCustom.forEach((item) => {
-        setSelectedOptions((prevState) => ({
-          ...prevState,
-          [item.value]: [...prevState[item.value], item],
-        }));
+        item.forEach(element =>{
+            setSelectedOptions((prevState) => ({
+                ...prevState,
+                [element.value]: [...prevState[element.value], element],
+              }));
+        })
       });
     }
   };
