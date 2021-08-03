@@ -26,7 +26,7 @@ export const GeneralTab = ({ agent, wodleConfiguration }: GeneralTableProps) => 
     { field: 'enabled', label: 'Enabled', render: renderValueYesThenEnabled },
     {
       field: 'only_future_events',
-      label: 'Collect events generated since Wazuh agent was started',
+      label: 'Collect events generated since Wazuh is initialized',
     },
     { field: 'interval', label: 'Interval between Office 365 wodle executions in seconds' },
     { field: 'curl_max_size', label: 'Maximum size allowed for the Office 365 API response' },

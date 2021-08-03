@@ -447,13 +447,13 @@ exports[`SubscriptionTab component renders correctly to match the snapshot 1`] =
                 </div>
               </EuiTableHeaderMobile>
               <EuiTable
-                id="__table_23ff43c1-f3d4-11eb-bdee-2dceba245eef"
+                id="htmlId"
                 responsive={true}
                 tableLayout="fixed"
               >
                 <table
                   className="euiTable euiTable--responsive"
-                  id="__table_23ff43c1-f3d4-11eb-bdee-2dceba245eef"
+                  id="htmlId"
                   tabIndex={-1}
                 >
                   <EuiScreenReaderOnly>

@@ -14,6 +14,13 @@ import React from 'react';
 import { SubscriptionTab } from './SubscriptionTab';
 import { mount } from 'enzyme';
 
+jest.mock(
+  '../../../../../../../../../../../../kibana/node_modules/@elastic/eui/lib/services/accessibility/html_id_generator',
+  () => ({
+    htmlIdGenerator: () => () => 'htmlId',
+  })
+);
+
 describe('SubscriptionTab component', () => {
   it('renders correctly to match the snapshot', () => {
     const wodleConfiguration = {

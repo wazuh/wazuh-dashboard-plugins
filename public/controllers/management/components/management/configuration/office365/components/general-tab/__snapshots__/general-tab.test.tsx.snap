@@ -432,7 +432,7 @@ exports[`GeneralTab component renders correctly to match the snapshot 1`] = `
               },
               Object {
                 "field": "only_future_events",
-                "label": "Collect events generated since Wazuh agent was started",
+                "label": "Collect events generated since Wazuh is initialized",
               },
               Object {
                 "field": "interval",
@@ -586,9 +586,9 @@ exports[`GeneralTab component renders correctly to match the snapshot 1`] = `
                     </EuiSpacer>
                   </WzConfigurationSetting>
                   <WzConfigurationSetting
-                    key="-Collect events generated since Wazuh agent was started-undefined-1"
-                    keyItem="-Collect events generated since Wazuh agent was started-undefined-1"
-                    label="Collect events generated since Wazuh agent was started"
+                    key="-Collect events generated since Wazuh is initialized-undefined-1"
+                    keyItem="-Collect events generated since Wazuh is initialized-undefined-1"
+                    label="Collect events generated since Wazuh is initialized"
                     value="yes"
                   >
                     <div
@@ -615,7 +615,7 @@ exports[`GeneralTab component renders correctly to match the snapshot 1`] = `
                           <div
                             className="euiTextAlign euiTextAlign--right"
                           >
-                            Collect events generated since Wazuh agent was started
+                            Collect events generated since Wazuh is initialized
                           </div>
                         </EuiTextAlign>
                       </div>
