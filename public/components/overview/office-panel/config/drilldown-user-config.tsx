@@ -69,14 +69,14 @@ export const drilldownUserConfig = {
           component: () => (
             <EuiFlexItem>
               <EuiPanel paddingSize={'s'}>
-                <SecurityAlerts 
-                initialColumns={[
-                  'icon',
-                  'timestamp',
-                  'data.office365.ClientIP',
-                  'rule.description',
-                  'data.office365.Operation',
-                ]}
+                <SecurityAlerts
+                  initialColumns={[
+                    'icon',
+                    'timestamp',
+                    'data.office365.ClientIP',
+                    'rule.description',
+                    'data.office365.Operation',
+                  ]}
                 />
               </EuiPanel>
             </EuiFlexItem>

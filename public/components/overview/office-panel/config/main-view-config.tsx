@@ -80,7 +80,7 @@ export const MainViewConfig = {
             </EuiFlexItem>
           ),
         },
-      ]
+      ],
     },
   ],
 };

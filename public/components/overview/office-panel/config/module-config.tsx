@@ -13,7 +13,13 @@
 
 import React from 'react';
 import { OfficeBody, OfficeDrilldown } from '../views';
-import { MainViewConfig, drilldownIPConfig, drilldownUserConfig, drilldownOperationsConfig, drilldownRulesConfig } from './';
+import {
+  MainViewConfig,
+  drilldownIPConfig,
+  drilldownUserConfig,
+  drilldownOperationsConfig,
+  drilldownRulesConfig,
+} from './';
 
 /**
  * The length method has to count Kibana Visualizations for TabVisualizations class
@@ -36,16 +42,17 @@ export const ModuleConfig = {
     ),
   },
   'data.office365.Operation': {
-    length: () => drilldownOperationsConfig.rows.reduce((total, row) => total + row.columns.length, 0),
+    length: () =>
+      drilldownOperationsConfig.rows.reduce((total, row) => total + row.columns.length, 0),
     component: (props) => (
       <OfficeDrilldown title={'Operation'} {...{ ...drilldownOperationsConfig, ...props }} />
     ),
   },
   'rule.description': {
-    length: () => drilldownOperationsConfig.rows.reduce((total, row) => total + row.columns.length, 0),
+    length: () =>
+      drilldownRulesConfig.rows.reduce((total, row) => total + row.columns.length, 0),
     component: (props) => (
       <OfficeDrilldown title={'Rule'} {...{ ...drilldownRulesConfig, ...props }} />
     ),
-  }
-  
+  },
 };

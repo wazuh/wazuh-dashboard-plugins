@@ -69,7 +69,7 @@ export const drilldownRulesConfig = {
                     'timestamp',
                     'data.office365.UserId',
                     'data.office365.ClientIP',
-                    'data.office365.Operation'
+                    'data.office365.Operation',
                   ]}
                 />
               </EuiPanel>

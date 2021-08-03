@@ -21,7 +21,7 @@ export const drilldownOperationsConfig = {
     {
       height: 400,
       columns: [
-                {
+        {
           width: 40,
           component: (props) => (
             <VisCard id="Wazuh-App-Overview-Office-Top-Users" tab="office" {...props} />
