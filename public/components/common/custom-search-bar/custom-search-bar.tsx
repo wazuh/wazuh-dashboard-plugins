@@ -112,22 +112,22 @@ export const CustomSearchBar = ({ filtersValues, ...props }) => {
     };
 
     const getComponent = (item: any) => {
-      const types = {
-        'default': <></>,
-        'combobox': <Combobox
+      const types: {[key: string]: object} = {
+        default: <></>,
+        combobox: <Combobox
           item={item}
           selectedOptions={selectedOptions[item.key] || []}
           onChange={onChange}
         />,
       };
-      return types[item.type] || types['default'];
+      return types[item.type] || types.default;
     }
 
     return (
         <>
             <EuiFlexGroup className='custom-kbn-search-bar' alignItems='center' style={{ margin: '0 8px' }}>
                 {
-                    avancedFiltersState === false ?
+                    !avancedFiltersState ?
                         filtersValues.map((item, key) => (
                             <EuiFlexItem key={key}>
                                 {getComponent(item)}
