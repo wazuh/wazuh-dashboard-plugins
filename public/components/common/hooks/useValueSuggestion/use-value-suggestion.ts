@@ -9,29 +9,31 @@
  *
  * Find more information about this on the LICENSE file.
  */
+
 import React, { useEffect, useState } from 'react';
-import { getDataPlugin } from '../../../kibana-services';
-import { useIndexPattern } from '.';
+import { getDataPlugin } from '../../../../kibana-services';
+import { useIndexPattern } from '../../hooks';
 import { IFieldType, IIndexPattern } from 'src/plugins/data/public';
 import {
   UI_ERROR_SEVERITIES,
   UIErrorLog,
   UIErrorSeverity,
   UILogLevel,
-} from '../../../react-services/error-orchestrator/types';
-import { OFFICE_365_USER_TYPE, UI_LOGGER_LEVELS } from '../../../../common/constants';
-import { getErrorOrchestrator } from '../../../react-services/common-services';
+} from '../../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
+import { getErrorOrchestrator } from '../../../../react-services/common-services';
+import { getCustomValueSuggestion } from './helpers/helper-value-suggestion';
 
-export interface IValueSuggestiions {
+export interface IValueSuggestion {
   suggestedValues: string[] | boolean[];
   isLoading: boolean;
   setQuery: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export const useValueSuggestions = (
+export const useValueSuggestion = (
   filterField: string,
   type: 'string' | 'boolean' = 'string'
-): IValueSuggestiions => {
+): IValueSuggestion => {
   const [suggestedValues, setSuggestedValues] = useState<string[] | boolean[]>([]);
   const [query, setQuery] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
@@ -39,15 +41,17 @@ export const useValueSuggestions = (
   const indexPattern = useIndexPattern();
 
   const getValueSuggestions = async (field) => {
-    if (field.name === 'data.office365.UserType') {
-      return OFFICE_365_USER_TYPE;
-    }
-
-    return await data.autocomplete.getValueSuggestions({
+    const result = await data.autocomplete.getValueSuggestions({
       query,
       indexPattern: indexPattern as IIndexPattern,
       field,
     });
+
+    if (!result.length) {
+      return getCustomValueSuggestion(field);
+    }
+
+    return result;
   };
 
   useEffect(() => {
@@ -63,7 +67,7 @@ export const useValueSuggestions = (
           setSuggestedValues(await getValueSuggestions(field));
         } catch (error) {
           const options: UIErrorLog = {
-            context: `${useValueSuggestions.name}.getValueSuggestions`,
+            context: `${useValueSuggestion.name}.getValueSuggestions`,
             level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
             severity: UI_ERROR_SEVERITIES.UI as UIErrorSeverity,
             error: {

@@ -347,16 +347,3 @@ export const UI_TOAST_COLOR = {
   DANGER: 'danger',
 };
 
-// User types Office365 module filter
-export const OFFICE_365_USER_TYPE = [
-  'Regular',
-  'Reserved',
-  'Admin',
-  'DcAdmin',
-  'System',
-  'Application',
-  'ServicePrincipal',
-  'CustomPolicy',
-  'SystemPolicy',
-];
-

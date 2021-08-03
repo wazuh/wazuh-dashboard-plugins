@@ -12,10 +12,10 @@
 
 import React, { useEffect, useState } from 'react';
 import { EuiComboBox } from '@elastic/eui';
-import { useValueSuggestions } from '../../hooks';
+import { IValueSuggestion, useValueSuggestion } from '../../hooks';
 
 export const Combobox = ({ item, ...props }) => {
-  const { suggestedValues, isLoading, setQuery } = useValueSuggestions(item.key);
+  const { suggestedValues, isLoading, setQuery }: IValueSuggestion = useValueSuggestion(item.key);
   const [comboOptions, setComboOptions] = useState<{ key: any; label: any; value: any }[]>();
 
   const setOptionTitle = (value, key) => {
