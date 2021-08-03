@@ -62,7 +62,6 @@ export const drilldownIPConfig = {
       ],
     },
     {
-      height: 300,
       columns: [
         {
           width: 100,

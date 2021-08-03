@@ -62,7 +62,6 @@ export const drilldownUserConfig = {
       ],
     },
     {
-      height: 300,
       columns: [
         {
           width: 100,
