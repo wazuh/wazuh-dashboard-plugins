@@ -25,13 +25,16 @@ const OFFICE_365_USER_TYPE: string[] = [
   'SystemPolicy',
 ];
 
-const DATA_OFFICE_365_USER_TYPE = 'data.office365.UserType';
+/** UserTypes Office365 module filter
+ * https://docs.microsoft.com/en-us/office/office-365-management-api/office-365-management-activity-api-schema#auditlogscope
+ */
+const OFFICE_365_AUDIT_LOG_SCOPE: string[] = ['Online', 'Onprem'];
+
+const dataFields = {
+  'data.office365.UserType': OFFICE_365_USER_TYPE,
+  'data.office365.AuditLogScope': OFFICE_365_AUDIT_LOG_SCOPE,
+};
 
 export const getCustomValueSuggestion = (field: { name: string }): string[] => {
-  switch (field.name) {
-    case DATA_OFFICE_365_USER_TYPE:
-      return OFFICE_365_USER_TYPE;
-    default:
-      return [];
-  }
+  return dataFields[field.name] || [];
 };
