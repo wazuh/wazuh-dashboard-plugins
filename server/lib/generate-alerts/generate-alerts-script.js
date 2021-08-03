@@ -324,6 +324,8 @@ function generateAlert(params) {
     const log = randomArrayItem(Office.arrayLogs);
     const ruleData = Office.officeRules[log.RecordType];
 
+    alert.agent.id = '000'
+    alert.agent.name = 'master'
     alert.rule = ruleData.rule;
     alert.decoder = randomArrayItem(Office.arrayDecoderOffice);
     alert.GeoLocation = randomArrayItem(GeoLocation);
@@ -332,7 +334,7 @@ function generateAlert(params) {
     alert.data.office365 = {
       ...log,
       ...ruleData.data.office365,
-      Id: '000',
+      Id: IntraID,
       CreationTime: formatDate(beforeDate, 'Y-M-DTh:m:s.lZ'),
       OrganizationId: OrgID,
       UserType: userType,
