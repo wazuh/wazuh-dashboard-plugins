@@ -19,6 +19,7 @@ export function useAsyncAction(action, dependencies = []){
   const run = useCallback(async (...params) => {
     try{
       setRunning(true);
+      setError(null);
       const data = await action(...params);
       setData(data);
     }catch(error){
