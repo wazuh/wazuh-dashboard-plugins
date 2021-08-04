@@ -11,7 +11,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { EuiBasicTable, EuiPanel, EuiTitle, EuiBasicTableColumn } from '@elastic/eui';
+import { EuiPanel, EuiTitle, EuiBasicTableColumn, EuiInMemoryTable } from '@elastic/eui';
 import { useEsSearch } from '../../../hooks';
 import React from 'react';
 
@@ -56,18 +56,25 @@ export const AggTable = ({
       },
     };
   };
-
+  const sorting = {
+    sort: {
+      field: 'doc_count',
+      direction: 'desc',
+    },
+  };
   return (
     <EuiPanel data-test-subj={`${aggTerm}-aggTable`} {...panelProps}>
       <EuiTitle {...titleProps}>
         <h2>{tableTitle}</h2>
       </EuiTitle>
-      <EuiBasicTable
-        items={buckets}
+      <EuiInMemoryTable
         columns={columns}
-        rowProps={getRowProps}
+        items={buckets}
         loading={isLoading}
+        rowProps={getRowProps}
         error={error ? error.message : undefined}
+        pagination={{ pageSizeOptions: [5, 10, 20] }}
+        sorting={sorting}
       />
     </EuiPanel>
   );

@@ -28,7 +28,7 @@ export const MainViewConfig = {
                 tableTitle='Actors'
                 aggTerm='data.github.actor'
                 aggLabel='Actor'
-                maxRows={5} 
+                maxRows={100} 
                 onRowClick={props.onRowClick} />
             </EuiFlexItem>)
         },
