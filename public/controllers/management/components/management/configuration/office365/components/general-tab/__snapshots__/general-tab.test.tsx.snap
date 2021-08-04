@@ -436,7 +436,7 @@ exports[`GeneralTab component renders correctly to match the snapshot 1`] = `
               },
               Object {
                 "field": "interval",
-                "label": "Interval between Office 365 wodle executions in seconds",
+                "label": "Interval between Office 365 wodle executions: s(seconds), m(minutes), h(hours), d(days)",
               },
               Object {
                 "field": "curl_max_size",
@@ -664,9 +664,9 @@ exports[`GeneralTab component renders correctly to match the snapshot 1`] = `
                     </EuiSpacer>
                   </WzConfigurationSetting>
                   <WzConfigurationSetting
-                    key="-Interval between Office 365 wodle executions in seconds-undefined-2"
-                    keyItem="-Interval between Office 365 wodle executions in seconds-undefined-2"
-                    label="Interval between Office 365 wodle executions in seconds"
+                    key="-Interval between Office 365 wodle executions: s(seconds), m(minutes), h(hours), d(days)-undefined-2"
+                    keyItem="-Interval between Office 365 wodle executions: s(seconds), m(minutes), h(hours), d(days)-undefined-2"
+                    label="Interval between Office 365 wodle executions: s(seconds), m(minutes), h(hours), d(days)"
                     value={600}
                   >
                     <div
@@ -693,7 +693,7 @@ exports[`GeneralTab component renders correctly to match the snapshot 1`] = `
                           <div
                             className="euiTextAlign euiTextAlign--right"
                           >
-                            Interval between Office 365 wodle executions in seconds
+                            Interval between Office 365 wodle executions: s(seconds), m(minutes), h(hours), d(days)
                           </div>
                         </EuiTextAlign>
                       </div>

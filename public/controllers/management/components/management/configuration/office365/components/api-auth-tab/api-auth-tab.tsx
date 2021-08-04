@@ -25,11 +25,12 @@ export const ApiAuthTab = ({ agent, wodleConfiguration }: ApiAuthProps) => {
     { field: 'tenant_id', label: 'Tenant Id' },
     { field: 'client_id', label: 'Client Id' },
     { field: 'client_secret', label: 'Client Secret' },
+    { field: 'client_secret_path', label: 'Client Secret Path' },
   ];
 
   return (
     <WzConfigurationSettingsTabSelector
-      title="List of Api Auth"
+      title="Credential for the authentication with the API"
       currentConfig={wodleConfiguration}
       minusHeight={agent.id === '000' ? 260 : 320}
       helpLinks={HELP_LINKS}

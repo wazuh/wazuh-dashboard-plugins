@@ -70,7 +70,7 @@ exports[`ApiAuthTab component renders correctly to match the snapshot 1`] = `
       ]
     }
     minusHeight={260}
-    title="List of Api Auth"
+    title="Credential for the authentication with the API"
   >
     <WzConfigurationSettingsHeader
       help={
@@ -87,7 +87,7 @@ exports[`ApiAuthTab component renders correctly to match the snapshot 1`] = `
       }
       json={[Function]}
       settings={[Function]}
-      title="List of Api Auth"
+      title="Credential for the authentication with the API"
       viewSelected=""
       xml={[Function]}
     >
@@ -107,7 +107,7 @@ exports[`ApiAuthTab component renders correctly to match the snapshot 1`] = `
                 <h2
                   className="euiTitle euiTitle--small"
                 >
-                  List of Api Auth
+                  Credential for the authentication with the API
                 </h2>
               </EuiTitle>
             </div>
@@ -401,6 +401,10 @@ exports[`ApiAuthTab component renders correctly to match the snapshot 1`] = `
               Object {
                 "field": "client_secret",
                 "label": "Client Secret",
+              },
+              Object {
+                "field": "client_secret_path",
+                "label": "Client Secret Path",
               },
             ]
           }
@@ -701,6 +705,11 @@ exports[`ApiAuthTab component renders correctly to match the snapshot 1`] = `
                       />
                     </EuiSpacer>
                   </WzConfigurationSetting>
+                  <WzConfigurationSetting
+                    key="-Client Secret Path-undefined-3"
+                    keyItem="-Client Secret Path-undefined-3"
+                    label="Client Secret Path"
+                  />
                 </div>
               </EuiFlexItem>
             </div>

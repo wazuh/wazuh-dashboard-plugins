@@ -86,14 +86,6 @@ const tabWrapper = compose(
   )
 );
 
-const GeneralTabWrapped = tabWrapper(({ agent, wodleConfiguration }) => {
-  return <GeneralTab wodleConfiguration={wodleConfiguration} agent={agent} />;
-});
-
-const ApiAuthTabWrapped = tabWrapper(({ agent, wodleConfiguration }) => {
-  return <ApiAuthTab wodleConfiguration={wodleConfiguration} agent={agent} />;
-});
-
-const SubscriptionTabWrapped = tabWrapper(({ agent, wodleConfiguration }) => {
-  return <SubscriptionTab wodleConfiguration={wodleConfiguration} agent={agent} />;
-});
+const GeneralTabWrapped = tabWrapper(GeneralTab);
+const ApiAuthTabWrapped = tabWrapper(ApiAuthTab);
+const SubscriptionTabWrapped = tabWrapper(SubscriptionTab);
