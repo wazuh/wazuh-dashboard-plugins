@@ -60,17 +60,40 @@ jobs:
         with:
           node-version: ${{ env.NODE_10-23-1 }}
 
+#      - name: Step 08 - Run Tests & Collect Coverage
+#        run: |
+#          echo “PATH_WAZUH-APP=$GITHUB_WORKSPACE/kibana/plugins/wazuh-kibana-app/” >> $GITHUB_ENV
+#          cd ./kibana/plugins/wazuh-kibana-app
+#          ls -la
+#          echo $GITHUB_WORKSPACE/kibana/plugins/wazuh-kibana-app/
+#          yarn run test:jest --silent --ci --testLocationInResults --colors --coverage --json --outputFile=report.json
+#
+#      - name: Step 09 - Comment coverage
+#        uses: artiomtr/jest-coverage-report-action@v2.0-rc.1
+#        with:
+#          working-directory: /home/runner/work/wazuh-kibana-app/wazuh-kibana-app/kibana/plugins/wazuh-kibana-app/
+#          github-token: ${{ secrets.GITHUB_TOKEN }}
+#          skip-step: all
       - name: Step 08 - Run Tests & Collect Coverage
         run: |
-          echo “PATH_WAZUH-APP=$GITHUB_WORKSPACE/kibana/plugins/wazuh-kibana-app/” >> $GITHUB_ENV
           cd ./kibana/plugins/wazuh-kibana-app
-          ls -la
-          echo $GITHUB_WORKSPACE/kibana/plugins/wazuh-kibana-app/
-          yarn run test:jest --silent --ci --testLocationInResults --colors --coverage --json --outputFile=report.json
+          yarn run test:jest --colors
 
-      - name: Step 09 - Comment coverage
-        uses: artiomtr/jest-coverage-report-action@v2.0-rc.1
+      - name: Step 09 - Comment Test Coverage
+        uses: AthleticNet/comment-test-coverage@1.2.2
         with:
-          working-directory: /home/runner/work/wazuh-kibana-app/wazuh-kibana-app/kibana/plugins/wazuh-kibana-app/
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          skip-step: all
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: ./kibana/plugins/wazuh-kibana-app/target/test-coverage/coverage-summary.json
+          title: Global Test Coverage
+
+      - name: Step 10 - Run Tests & Collect Coverage only changed files
+        run: |
+          cd ./kibana/plugins/wazuh-kibana-app
+          yarn run test:jest --changedSince='4.3-7.10' --colors
+
+      - name: Step 11 - Comment Test Coverage only changed files
+        uses: AthleticNet/comment-test-coverage@1.2.2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: ./kibana/plugins/wazuh-kibana-app/target/test-coverage/coverage-summary.json
+          title: Brach Test Coverage

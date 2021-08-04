@@ -1,5 +1,5 @@
 /*
- * Wazuh app - React component for catch and handles rendering errors.
+ * Wazuh app - React component for catch and handles rendering errors
  *
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
