@@ -71,6 +71,6 @@ jobs:
       - name: Step 09 - Comment coverage
         uses: artiomtr/jest-coverage-report-action@v2.0-rc.1
         with:
-          working-directory: kibana/plugins/wazuh-kibana-app/
+          working-directory: /home/runner/work/wazuh-kibana-app/wazuh-kibana-app/kibana/plugins/wazuh-kibana-app/
           github-token: ${{ secrets.GITHUB_TOKEN }}
           skip-step: all
