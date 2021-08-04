@@ -105,7 +105,6 @@ export const CustomSearchBar = ({ filtersValues, ...props }) => {
       return item.params.map((element) => ({ label: element, value: item.key }));
     };
     const filterCustom = filters.map((item) => getFilterCustom(item)) || [];
-    console.log(filters,filters.map((item) => getFilterCustom(item)))
     if (filterCustom.length != 0) {
       filterCustom.forEach((item) => {
         item.forEach(element =>{
