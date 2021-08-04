@@ -95,7 +95,7 @@ export class FileDetails extends Component {
         grow: 2,
         icon: 'clock',
         link: true,
-        transformValue: formatUIDate
+        transformValue: formatUIDate,
       },
       {
         field: 'mtime',
@@ -103,7 +103,7 @@ export class FileDetails extends Component {
         grow: 2,
         icon: 'clock',
         link: true,
-        transformValue: formatUIDate
+        transformValue: formatUIDate,
       },
       {
         field: 'uname',
@@ -183,15 +183,15 @@ export class FileDetails extends Component {
         name: 'Last analysis',
         grow: 2,
         icon: 'clock',
-        transformValue: formatUIDate
+        transformValue: formatUIDate,
       },
       {
         field: 'mtime',
         name: 'Last modified',
         grow: 2,
         icon: 'clock',
-        transformValue: formatUIDate
-      }
+        transformValue: formatUIDate,
+      },
     ];
   }
 
@@ -264,7 +264,10 @@ export class FileDetails extends Component {
 
   getDetails() {
     const { view } = this.props;
-    const columns = this.props.type === 'registry_key' || this.props.currentFile.type === 'registry_key' ? this.registryDetails() : this.details();
+    const columns =
+      this.props.type === 'registry_key' || this.props.currentFile.type === 'registry_key'
+        ? this.registryDetails()
+        : this.details();
     const generalDetails = columns.map((item, idx) => {
       var value = this.props.currentFile[item.field] || '-';
       if (item.transformValue) {
@@ -418,29 +421,27 @@ export class FileDetails extends Component {
         >
           <div className="flyout-row details-row">{this.getDetails()}</div>
         </EuiAccordion>
-        { (type === 'registry_key' || currentFile.type === 'registry_key') && <>
-        <EuiSpacer size="s" />
-        <EuiAccordion
-          id={fileName === undefined ? Math.random().toString() : `${fileName}_values`}
-          buttonContent={
-            <EuiTitle size="s">
-              <h3>
-                Registry values                
-              </h3>
-            </EuiTitle>
-          }
-          paddingSize="none"
-          initialIsOpen={true}
-        >
-          <EuiFlexGroup className="flyout-row">
-            <EuiFlexItem>
-              <RegistryValues 
-                currentFile={currentFile}
-                agent={agent}
-              />
-            </EuiFlexItem>
-          </EuiFlexGroup>
-        </EuiAccordion> </>}
+        {(type === 'registry_key' || currentFile.type === 'registry_key') && (
+          <>
+            <EuiSpacer size="s" />
+            <EuiAccordion
+              id={fileName === undefined ? Math.random().toString() : `${fileName}_values`}
+              buttonContent={
+                <EuiTitle size="s">
+                  <h3>Registry values</h3>
+                </EuiTitle>
+              }
+              paddingSize="none"
+              initialIsOpen={true}
+            >
+              <EuiFlexGroup className="flyout-row">
+                <EuiFlexItem>
+                  <RegistryValues currentFile={currentFile} agent={agent} />
+                </EuiFlexItem>
+              </EuiFlexGroup>
+            </EuiAccordion>{' '}
+          </>
+        )}
         <EuiSpacer />
         <EuiAccordion
           id={fileName === undefined ? Math.random().toString() : `${fileName}_events`}
