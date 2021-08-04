@@ -60,6 +60,11 @@ const mapStateToProps = (state) => ({
   currentAgentData: state.appStateReducers.currentAgentData,
 });
 
+interface ColumnDefinition {
+  field: string;
+  label?: string;
+}
+
 export const Discover = compose(
   withErrorBoundary,
   withReduxProvider,
@@ -104,7 +109,8 @@ export const Discover = compose(
       updateTotalHits: Function;
       openIntelligence: Function;
       includeFilters?: string;
-      initialColumns: string[];
+      initialColumns: ColumnDefinition[];
+      initialAgentColumns?: ColumnDefinition[];
       shareFilterManager: FilterManager;
       shareFilterManagerWithUserAuthorized: Filter[];
       refreshAngularDiscover?: number;
@@ -137,21 +143,6 @@ export const Discover = compose(
       };
 
       this.wazuhConfig = new WazuhConfig();
-      this.nameEquivalences = {
-        'agent.id': 'Agent',
-        'agent.name': 'Agent name',
-        'syscheck.event': 'Action',
-        'rule.id': 'Rule ID',
-        'rule.description': 'Description',
-        'rule.level': 'Level',
-        'rule.mitre.id': 'Technique(s)',
-        'rule.mitre.tactic': 'Tactic(s)',
-        'rule.pci_dss': 'PCI DSS',
-        'rule.gdpr': 'GDPR',
-        'rule.nist_800_53': 'NIST 800-53',
-        'rule.tsc': 'TSC',
-        'rule.hipaa': 'HIPAA',
-      };
 
       this.hideCreateCustomLabel.bind(this);
       this.onQuerySubmit.bind(this);
@@ -249,16 +240,23 @@ export const Discover = compose(
       }
     }
 
-    getColumns() {
+    getInnitialDefinitions() {
       if (this.props.currentAgentData.id) {
-        return this.props.initialColumns.filter(
-          (column) => !['agent.id', 'agent.name'].includes(column)
-        );
+        return this.props.initialAgentColumns || this.props.initialColumns;
       } else {
-        const columns = [...this.props.initialColumns];
-        columns.splice(2, 0, 'agent.id');
-        columns.splice(3, 0, 'agent.name');
-        return columns;
+        return this.props.initialColumns;
+      }
+    }
+    getColumns() {
+      //Extract array of terms from object
+      return this.getInnitialDefinitions().map((column) => column.field);
+    }
+    getLabel(field) {
+      const innitialLabels = this.getInnitialDefinitions().filter((value) => value.field === field);
+      if (innitialLabels.length) {
+        return innitialLabels[0].label || field;
+      } else {
+        return field;
       }
     }
 
@@ -548,7 +546,7 @@ export const Discover = compose(
               }}
               style={{ display: 'inline-flex' }}
             >
-              {this.nameEquivalences[item] || item}{' '}
+              {this.getLabel(item)}{' '}
               {this.state.hover === item && (
                 <EuiToolTip position="top" content={`Remove column`}>
                   <EuiButtonIcon

@@ -360,7 +360,22 @@ export class Details extends Component {
               <Discover
                 kbnSearchBar
                 shareFilterManager={this.discoverFilterManager}
-                initialColumns={['icon', 'timestamp', 'rule.description', 'rule.level', 'rule.id']}
+                initialColumns={[
+                  { field: 'icon' },
+                  { field: 'timestamp' },
+                  { field: 'agent.id', label: 'Agent' },
+                  { field: 'agent.name', label: 'Agent name' },
+                  { field: 'rule.description', label: 'Description' },
+                  { field: 'rule.level', label: 'Level' },
+                  { field: 'rule.id', label: 'Rule ID' },
+                ]}
+                initialAgentColumns={[
+                  { field: 'icon' },
+                  { field: 'timestamp' },
+                  { field: 'rule.description', label: 'Description' },
+                  { field: 'rule.level', label: 'Level' },
+                  { field: 'rule.id', label: 'Rule ID' },
+                ]}
                 includeFilters="vulnerability"
                 implicitFilters={implicitFilters}
                 initialFilters={[]}

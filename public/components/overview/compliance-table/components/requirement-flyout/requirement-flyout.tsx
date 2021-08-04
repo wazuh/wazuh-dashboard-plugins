@@ -193,12 +193,22 @@ export class RequirementFlyout extends Component {
                 kbnSearchBar
                 shareFilterManager={this.filterManager}
                 initialColumns={[
-                  'icon',
-                  'timestamp',
-                  this.props.getRequirementKey(),
-                  'rule.level',
-                  'rule.id',
-                  'rule.description',
+                  { field: 'icon' },
+                  { field: 'timestamp' },
+                  { field: 'agent.id', label: 'Agent' },
+                  { field: 'agent.name', label: 'Agent name' },
+                  { field: this.props.getRequirementKey() },
+                  { field: 'rule.description', label: 'Description' },
+                  { field: 'rule.level', label: 'Level' },
+                  { field: 'rule.id', label: 'Rule ID' },
+                ]}
+                initialAgentColumns={[
+                  { field: 'icon' },
+                  { field: 'timestamp' },
+                  { field: this.props.getRequirementKey() },
+                  { field: 'rule.description', label: 'Description' },
+                  { field: 'rule.level', label: 'Level' },
+                  { field: 'rule.id', label: 'Rule ID' },
                 ]}
                 implicitFilters={implicitFilters}
                 initialFilters={[]}

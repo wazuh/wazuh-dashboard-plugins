@@ -16,22 +16,33 @@ import { useAllowedAgents } from '../../common/hooks/useAllowedAgents';
 
 export const SecurityAlerts = ({
   initialColumns = [
-    'icon',
-    'timestamp',
-    'rule.mitre.id',
-    'rule.mitre.tactic',
-    'rule.description',
-    'rule.level',
-    'rule.id',
+    { field: 'icon' },
+    { field: 'timestamp' },
+    { field: 'agent.id', label: 'Agent' },
+    { field: 'agent.name', label: 'Agent name' },
+    { field: 'rule.mitre.id', label: 'Technique(s)' },
+    { field: 'rule.mitre.tactic', label: 'Tactic(s)' },
+    { field: 'rule.description', label: 'Description' },
+    { field: 'rule.level', label: 'Level' },
+    { field: 'rule.id', label: 'Rule ID' },
   ],
+  initialAgentColumns = [
+    { field: 'icon' },
+    { field: 'timestamp' },
+    { field: 'rule.mitre.id', label: 'Technique(s)' },
+    { field: 'rule.mitre.tactic', label: 'Tactic(s)' },
+    { field: 'rule.description', label: 'Description' },
+    { field: 'rule.level', label: 'Level' },
+    { field: 'rule.id', label: 'Rule ID' },
+  ],
+  useAgentColumns = true,
 }) => {
   const [query] = useQuery();
   const { filterManager } = useFilterManager();
-  const copyOfFilterManager = filterManager;
   const refreshAngularDiscover = useRefreshAngularDiscover();
 
   const customFilterWithAllowedAgents = [];
-  const { allowedAgents, filterAllowedAgents } = useAllowedAgents();
+  const { filterAllowedAgents } = useAllowedAgents();
   filterAllowedAgents && customFilterWithAllowedAgents.push(filterAllowedAgents);
 
   return (
@@ -40,6 +51,7 @@ export const SecurityAlerts = ({
       shareFilterManagerWithUserAuthorized={customFilterWithAllowedAgents}
       query={query}
       initialColumns={initialColumns}
+      initialAgentColumns={useAgentColumns ? initialAgentColumns : undefined}
       implicitFilters={[]}
       initialFilters={[]}
       updateTotalHits={(total) => {}}

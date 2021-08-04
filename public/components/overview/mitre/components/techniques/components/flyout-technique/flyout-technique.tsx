@@ -339,13 +339,24 @@ export class FlyoutTechnique extends Component {
                 kbnSearchBar
                 shareFilterManager={this.filterManager}
                 initialColumns={[
-                  'icon',
-                  'timestamp',
-                  'rule.mitre.id',
-                  'rule.mitre.tactic',
-                  'rule.level',
-                  'rule.id',
-                  'rule.description',
+                  { field: 'icon' },
+                  { field: 'timestamp' },
+                  { field: 'agent.id', label: 'Agent' },
+                  { field: 'agent.name', label: 'Agent Name' },
+                  { field: 'rule.mitre.id', label: 'Technique(s)' },
+                  { field: 'rule.mitre.tactic', label: 'Tactic(s)' },
+                  { field: 'rule.level', label: 'Level' },
+                  { field: 'rule.id', label: 'Rule ID' },
+                  { field: 'rule.description', label: 'Description' },
+                ]}
+                initialAgentColumns={[
+                  { field: 'icon' },
+                  { field: 'timestamp' },
+                  { field: 'rule.mitre.id', label: 'Technique(s)' },
+                  { field: 'rule.mitre.tactic', label: 'Tactic(s)' },
+                  { field: 'rule.level', label: 'Level' },
+                  { field: 'rule.id', label: 'Rule ID' },
+                  { field: 'rule.description', label: 'Description' },
                 ]}
                 implicitFilters={implicitFilters}
                 initialFilters={[]}

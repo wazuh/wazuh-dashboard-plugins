@@ -479,12 +479,22 @@ export class FileDetails extends Component {
                 kbnSearchBar
                 shareFilterManager={this.discoverFilterManager}
                 initialColumns={[
-                  'icon',
-                  'timestamp',
-                  'syscheck.event',
-                  'rule.description',
-                  'rule.level',
-                  'rule.id',
+                  { field: 'icon' },
+                  { field: 'timestamp' },
+                  { field: 'agent.id', label: 'Agent' },
+                  { field: 'agent.name', label: 'Agent name' },
+                  { field: 'syscheck.event', label: 'Action' },
+                  { field: 'rule.description', label: 'Description' },
+                  { field: 'rule.level', label: 'Level' },
+                  { field: 'rule.id', label: 'Rule ID' },
+                ]}
+                initialAgentColumns={[
+                  { field: 'icon' },
+                  { field: 'timestamp' },
+                  { field: 'syscheck.event', label: 'Action' },
+                  { field: 'rule.description', label: 'Description' },
+                  { field: 'rule.level', label: 'Level' },
+                  { field: 'rule.id', label: 'Rule ID' },
                 ]}
                 includeFilters="syscheck"
                 implicitFilters={implicitFilters}
