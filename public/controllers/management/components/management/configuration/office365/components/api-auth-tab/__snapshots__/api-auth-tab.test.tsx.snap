@@ -12,9 +12,9 @@ exports[`ApiAuthTab component renders correctly to match the snapshot 1`] = `
       "office365": Object {
         "api_auth": Array [
           Object {
-            "client_id": "your_client_id_test",
-            "client_secret": "your_secret_test",
-            "tenant_id": "your_tenant_id_test",
+            "client_id": "your_client_id_test_2",
+            "client_secret": "your_secret_test_\\"",
+            "tenant_id": "your_tenant_id_test_2",
           },
         ],
         "curl_max_size": 1024,
@@ -38,9 +38,9 @@ exports[`ApiAuthTab component renders correctly to match the snapshot 1`] = `
         "office365": Object {
           "api_auth": Array [
             Object {
-              "client_id": "your_client_id_test",
-              "client_secret": "your_secret_test",
-              "tenant_id": "your_tenant_id_test",
+              "client_id": "your_client_id_test_2",
+              "client_secret": "your_secret_test_\\"",
+              "tenant_id": "your_tenant_id_test_2",
             },
           ],
           "curl_max_size": 1024,
@@ -383,9 +383,9 @@ exports[`ApiAuthTab component renders correctly to match the snapshot 1`] = `
         <WzSettingsGroup
           config={
             Object {
-              "client_id": "your_client_id_test",
-              "client_secret": "your_secret_test",
-              "tenant_id": "your_tenant_id_test",
+              "client_id": "your_client_id_test_2",
+              "client_secret": "your_secret_test_\\"",
+              "tenant_id": "your_tenant_id_test_2",
             }
           }
           items={
@@ -475,7 +475,7 @@ exports[`ApiAuthTab component renders correctly to match the snapshot 1`] = `
                     key="-Tenant Id-undefined-0"
                     keyItem="-Tenant Id-undefined-0"
                     label="Tenant Id"
-                    value="your_tenant_id_test"
+                    value="your_tenant_id_test_2"
                   >
                     <div
                       style={
@@ -514,7 +514,7 @@ exports[`ApiAuthTab component renders correctly to match the snapshot 1`] = `
                       >
                         <EuiFieldText
                           readOnly={true}
-                          value="your_tenant_id_test"
+                          value="your_tenant_id_test_2"
                         >
                           <EuiFormControlLayout
                             fullWidth={false}
@@ -531,7 +531,7 @@ exports[`ApiAuthTab component renders correctly to match the snapshot 1`] = `
                                     className="euiFieldText"
                                     readOnly={true}
                                     type="text"
-                                    value="your_tenant_id_test"
+                                    value="your_tenant_id_test_2"
                                   />
                                 </EuiValidatableControl>
                                 <EuiFormControlLayoutIcons />
@@ -553,7 +553,7 @@ exports[`ApiAuthTab component renders correctly to match the snapshot 1`] = `
                     key="-Client Id-undefined-1"
                     keyItem="-Client Id-undefined-1"
                     label="Client Id"
-                    value="your_client_id_test"
+                    value="your_client_id_test_2"
                   >
                     <div
                       style={
@@ -592,7 +592,7 @@ exports[`ApiAuthTab component renders correctly to match the snapshot 1`] = `
                       >
                         <EuiFieldText
                           readOnly={true}
-                          value="your_client_id_test"
+                          value="your_client_id_test_2"
                         >
                           <EuiFormControlLayout
                             fullWidth={false}
@@ -609,7 +609,7 @@ exports[`ApiAuthTab component renders correctly to match the snapshot 1`] = `
                                     className="euiFieldText"
                                     readOnly={true}
                                     type="text"
-                                    value="your_client_id_test"
+                                    value="your_client_id_test_2"
                                   />
                                 </EuiValidatableControl>
                                 <EuiFormControlLayoutIcons />
@@ -631,7 +631,7 @@ exports[`ApiAuthTab component renders correctly to match the snapshot 1`] = `
                     key="-Client Secret-undefined-2"
                     keyItem="-Client Secret-undefined-2"
                     label="Client Secret"
-                    value="your_secret_test"
+                    value="your_secret_test_\\""
                   >
                     <div
                       style={
@@ -670,7 +670,7 @@ exports[`ApiAuthTab component renders correctly to match the snapshot 1`] = `
                       >
                         <EuiFieldText
                           readOnly={true}
-                          value="your_secret_test"
+                          value="your_secret_test_\\""
                         >
                           <EuiFormControlLayout
                             fullWidth={false}
@@ -687,7 +687,7 @@ exports[`ApiAuthTab component renders correctly to match the snapshot 1`] = `
                                     className="euiFieldText"
                                     readOnly={true}
                                     type="text"
-                                    value="your_secret_test"
+                                    value="your_secret_test_\\""
                                   />
                                 </EuiValidatableControl>
                                 <EuiFormControlLayoutIcons />

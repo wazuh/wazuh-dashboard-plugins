@@ -35,10 +35,9 @@ export const ApiAuthTab = ({ agent, wodleConfiguration }: ApiAuthProps) => {
       minusHeight={agent.id === '000' ? 260 : 320}
       helpLinks={HELP_LINKS}
     >
-      <WzConfigurationSettingsGroup
-        config={wodleConfiguration[OFFICE_365].api_auth[0]}
-        items={columns}
-      />
+      {wodleConfiguration[OFFICE_365].api_auth.map((api_auth) => (
+        <WzConfigurationSettingsGroup config={api_auth} items={columns} />
+      ))}
     </WzConfigurationSettingsTabSelector>
   );
 };

@@ -24,9 +24,16 @@ describe('ApiAuthTab component', () => {
         curl_max_size: 1024,
         api_auth: [
           {
-            tenant_id: 'your_tenant_id_test',
-            client_id: 'your_client_id_test',
-            client_secret: 'your_secret_test',
+            tenant_id: 'your_tenant_id_test_1',
+            client_id: 'your_client_id_test_1',
+            client_secret: 'your_secret_test_1',
+          },
+        ],
+        api_auth: [
+          {
+            tenant_id: 'your_tenant_id_test_2',
+            client_id: 'your_client_id_test_2',
+            client_secret: 'your_secret_test_"',
           },
         ],
         subscriptions: [
