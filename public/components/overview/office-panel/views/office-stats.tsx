@@ -16,7 +16,7 @@ import moduleLogo from '../../../../assets/office365.svg';
 import React from 'react';
 import './office-stats.scss';
 
-export const OfficeStats = ({ listItems = [] }) => {
+export const OfficeStats = ({ listItems = [] } : { listItems: any[]}) => {
   const logoStyle = { width: 30 };
   return (
     <EuiFlexGroup direction={'column'} alignItems={'flexStart'}>

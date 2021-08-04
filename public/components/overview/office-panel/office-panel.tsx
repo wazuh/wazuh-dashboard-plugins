@@ -28,7 +28,7 @@ import { queryConfig } from '../../../react-services/query-config';
 import { ModuleConfig, filtersValues } from './config';
 
 export const OfficePanel = withErrorBoundary(() => {
-  const [moduleStatsList, setModuleStatsList] = useState([]);
+  const [moduleStatsList, setModuleStatsList] = useState<object[]>([]);
 
   /** Get Office 365 Side Panel Module info **/
   const getModuleConfig = async () => {

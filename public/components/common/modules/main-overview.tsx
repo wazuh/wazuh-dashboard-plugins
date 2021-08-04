@@ -11,18 +11,11 @@
  */
 
 import React, { Component, Fragment } from 'react';
-import ReactDOM from 'react-dom';
 import {
   EuiFlexGroup,
   EuiFlexItem,
-  EuiButtonIcon,
-  EuiTitle,
   EuiToolTip,
-  EuiPopover,
-  EuiBadge,
-  EuiIcon,
-  EuiText,
-  EuiPopoverTitle,
+  EuiIcon
 } from '@elastic/eui';
 import '../../common/modules/module.scss';
 import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
@@ -33,7 +26,6 @@ import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
 import { Events, Dashboard, Loader, Settings } from '../../common/modules';
 import OverviewActions from '../../../controllers/overview/components/overview-actions/overview-actions';
 import { MainFim } from '../../agents/fim';
-
 import { MainVuls } from '../../agents/vuls';
 import { MainSca } from '../../agents/sca';
 import { MainMitre } from './main-mitre';
@@ -47,7 +39,32 @@ import { compose } from 'redux';
 import { ModuleMitreAttackIntelligence } from '../../overview/mitre_attack_intelligence';
 import { OfficePanel } from '../../overview/office-panel';
 
-export class MainModuleOverview extends Component {
+
+interface iProps {
+  section: string;
+  selectView: string;
+  tabs: any;
+  buttons: string[];
+  agentsSelectionProps: object;
+  onSelectedTabChanged(value: string): void;
+  renderTabs(): void;
+  renderReportButton(): void;
+  renderDashboardButton(): void;
+}
+
+interface iState {
+  selectView: boolean;
+  loadingReport: boolean;
+  isDescPopoverOpen: boolean;
+  showAgentInfo?: boolean;
+}
+
+
+export class MainModuleOverview extends Component<iProps,iState> {
+
+  reportingService: any;
+  router: any;
+
   constructor(props) {
     super(props);
     this.reportingService = new ReportingService();
@@ -89,7 +106,7 @@ export class MainModuleOverview extends Component {
               onClick={(ev) => { ev.stopPropagation(); AppNavigate.navigateToModule(ev, 'agents', { "tab": "welcome", "agent": currentAgent.id }); this.router.reload(); }}
               id="breadcrumbNoTitle"
             >
-              <EuiToolTip position="bottom" content={"View agent summary"} display="inlineBlock">
+              <EuiToolTip position="bottom" content={"View agent summary"}>
                 <span>{currentAgent.name}</span>
               </EuiToolTip>
             </a>),
@@ -163,6 +180,8 @@ export class MainModuleOverview extends Component {
     );
   }
 }
+
+
 
 const mapStateToProps = (state) => ({
   agent: state.appStateReducers.currentAgentData,

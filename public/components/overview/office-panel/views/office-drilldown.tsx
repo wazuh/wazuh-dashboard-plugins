@@ -15,13 +15,25 @@ import React from 'react';
 import { EuiButtonEmpty, EuiFlexGroup, EuiFlexItem, EuiTitle } from '@elastic/eui';
 import { VisConfigLayout } from '../../../common/modules/panel/components';
 
+type iOfficeDrilldown = {
+  title: string;
+  changeView(field: string): void;
+  toggleFilter(field: string): void;
+  rows: [];
+  selectedFilter: {
+    field: string;
+    value: string;
+  };
+}
+
 export const OfficeDrilldown = ({
   title = '',
   changeView,
   toggleFilter,
   rows = [],
   selectedFilter = { field: '', value: '' },
-}) => {
+}: iOfficeDrilldown) => {
+
   const rowClickHandler = () => {
     toggleFilter(selectedFilter.field);
     changeView('main');
