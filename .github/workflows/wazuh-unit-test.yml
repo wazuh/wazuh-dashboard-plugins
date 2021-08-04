@@ -44,6 +44,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           path: kibana/plugins/wazuh-kibana-app
+          ref: '4.3-7.10'
 
       - name: Step 05 - Setup node version for wazuh app
         uses: actions/setup-node@v2
@@ -86,12 +87,8 @@ jobs:
           path: ./kibana/plugins/wazuh-kibana-app/target/test-coverage/coverage-summary.json
           title: Global Test Coverage
 
-#      - name: Step 10 - Run Tests & Collect Coverage only changed files
-      - uses: actions/checkout@v2
+      - name: Step 10 - Run Tests & Collect Coverage only changed files
         run: |
-          git fetch --no-tags --depth=1 origin 4.3-7.10
-          git checkout -b 4.3-7.10
-          git checkout ${{ github.event.pull_request.head.sha }}
           cd ./kibana/plugins/wazuh-kibana-app
           yarn run test:jest --changedSince="remotes/origin/4.3-7.10" --colors
 
