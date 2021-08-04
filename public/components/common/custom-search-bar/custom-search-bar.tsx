@@ -27,21 +27,20 @@ export const CustomSearchBar = ({ filtersValues, ...props }) => {
   };
   const [avancedFiltersState, setAvancedFiltersState] = useState(false);
   const [selectedOptions, setSelectedOptions] = useState(defaultSelectedOptions);
-  const [values, setValues] = useState([]); 
-  const [selectReference, setSelectReference] = useState('')
+  const [values, setValues] = useState([]);
+  const [selectReference, setSelectReference] = useState('');
   const prevValues = usePrevious(values);
 
   useEffect(() => {
-      if(prevValues != values){
-        setKibanaFilters(values,selectReference);
-        refreshCustomSelectedFilter();
-      }
-  }, [values,selectReference]);
+    if (prevValues != values) {
+      setKibanaFilters(values, selectReference);
+      refreshCustomSelectedFilter();
+    }
+  }, [values, selectReference]);
 
   useEffect(() => {
     onFiltersUpdated();
   }, [filters]);
-
 
   const onFiltersUpdated = () => {
     refreshCustomSelectedFilter();
@@ -84,15 +83,15 @@ export const CustomSearchBar = ({ filtersValues, ...props }) => {
   };
 
   const setKibanaFilters = (values: any[], selectReference: String) => {
-      const currentFilters = filterManager
+    const currentFilters = filterManager
       .getFilters()
       .filter((item) => item.meta.key != selectReference);
-      filterManager.removeAll();
-      filterManager.addFilters(currentFilters);
-      if(values.length != 0){
-        const customFilter = buildCustomFilter(false, values);
-        filterManager.addFilters(customFilter);
-      }
+    filterManager.removeAll();
+    filterManager.addFilters(currentFilters);
+    if (values.length != 0) {
+      const customFilter = buildCustomFilter(false, values);
+      filterManager.addFilters(customFilter);
+    }
   };
 
   const refreshCustomSelectedFilter = () => {
@@ -105,25 +104,25 @@ export const CustomSearchBar = ({ filtersValues, ...props }) => {
             item.meta.type === 'phrases' && Object.keys(selectedOptions).includes(item.meta.key)
         )
         .map((element) => ({ params: element.meta.params, key: element.meta.key })) || [];
-  
+
     const getFilterCustom = (item) => {
       return item.params.map((element) => ({ label: element, value: item.key }));
     };
     const filterCustom = filters.map((item) => getFilterCustom(item)) || [];
     if (filterCustom.length != 0) {
       filterCustom.forEach((item) => {
-        item.forEach(element =>{
-            setSelectedOptions((prevState) => ({
-                ...prevState,
-                [element.value]: [...prevState[element.value], element],
-              }));
-        })
+        item.forEach((element) => {
+          setSelectedOptions((prevState) => ({
+            ...prevState,
+            [element.value]: [...prevState[element.value], element],
+          }));
+        });
       });
     }
   };
 
   const onChange = (values: any[]) => {
-    setValues(values)
+    setValues(values);
   };
 
   const getComponent = (item: any) => {
