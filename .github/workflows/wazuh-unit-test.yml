@@ -86,7 +86,7 @@ jobs:
           path: ./kibana/plugins/wazuh-kibana-app/target/test-coverage/coverage-summary.json
           title: Global Test Coverage
 
-      - name: Step 10 - Run Tests & Collect Coverage only changed files
+#      - name: Step 10 - Run Tests & Collect Coverage only changed files
       - uses: actions/checkout@v2
         run: |
           git fetch --no-tags --depth=1 origin 4.3-7.10
