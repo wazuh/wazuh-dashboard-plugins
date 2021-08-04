@@ -1056,7 +1056,7 @@ export class WazuhApiCtrl {
     try {
       
       const disabledRoles = ( await getConfiguration() )['disabled_roles'] || [];
-      const logoSidebar = ( await getConfiguration() )['customization.logo.sidebar'] || [];
+      const logoSidebar = ( await getConfiguration() )['customization.logo.sidebar'] || 'icon_blue.png';
       const wazuhSecurity = SecurityObj(context.wazuh.plugins);
       const data = (await wazuhSecurity.getCurrentUser(request, context)).authContext;
 

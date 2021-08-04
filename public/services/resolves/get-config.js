@@ -69,7 +69,7 @@ export async function getWzConfig($q, genericReq, wazuhConfig) {
     'enrollment.dns': '',
     'enrollment.password': '',
     'customization.logo.app':'logotype.svg',
-    'customization.logo.sidebar':'icon_blue.svg',
+    'customization.logo.sidebar':'icon_blue.png',
     'customization.logo.healthcheck':'icon_blue.svg',
     'customization.logo.reports':'logo.png'
   };

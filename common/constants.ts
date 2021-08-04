@@ -173,7 +173,7 @@ export const WAZUH_DEFAULT_APP_CONFIG = {
   'logs.level': 'info',
   'enrollment.dns': '',
   'customization.logo.app':'logotype.svg',
-  'customization.logo.sidebar':'icon_blue.svg',
+  'customization.logo.sidebar':'icon_blue.png',
   'customization.logo.healthcheck':'icon_blue.svg',
   'customization.logo.reports':'logo.png'
 };
