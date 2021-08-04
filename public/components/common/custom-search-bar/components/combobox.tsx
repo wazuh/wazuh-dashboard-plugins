@@ -18,7 +18,6 @@ export const Combobox = ({ item, ...props }) => {
             placeholder={item.key}
             className={'filters-custom-combobox'}
             options={comboOptions}
-            isClearable={false}
             isLoading={isLoading}
             onSearchChange={(searchValue) => { setQuery(searchValue) }}
             {...props}
