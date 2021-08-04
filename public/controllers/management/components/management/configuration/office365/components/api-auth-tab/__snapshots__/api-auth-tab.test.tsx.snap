@@ -13,7 +13,7 @@ exports[`ApiAuthTab component renders correctly to match the snapshot 1`] = `
         "api_auth": Array [
           Object {
             "client_id": "your_client_id_test_2",
-            "client_secret": "your_secret_test_\\"",
+            "client_secret": "your_secret_test_2",
             "tenant_id": "your_tenant_id_test_2",
           },
         ],
@@ -39,7 +39,7 @@ exports[`ApiAuthTab component renders correctly to match the snapshot 1`] = `
           "api_auth": Array [
             Object {
               "client_id": "your_client_id_test_2",
-              "client_secret": "your_secret_test_\\"",
+              "client_secret": "your_secret_test_2",
               "tenant_id": "your_tenant_id_test_2",
             },
           ],
@@ -384,7 +384,7 @@ exports[`ApiAuthTab component renders correctly to match the snapshot 1`] = `
           config={
             Object {
               "client_id": "your_client_id_test_2",
-              "client_secret": "your_secret_test_\\"",
+              "client_secret": "your_secret_test_2",
               "tenant_id": "your_tenant_id_test_2",
             }
           }
@@ -631,7 +631,7 @@ exports[`ApiAuthTab component renders correctly to match the snapshot 1`] = `
                     key="-Client Secret-undefined-2"
                     keyItem="-Client Secret-undefined-2"
                     label="Client Secret"
-                    value="your_secret_test_\\""
+                    value="your_secret_test_2"
                   >
                     <div
                       style={
@@ -670,7 +670,7 @@ exports[`ApiAuthTab component renders correctly to match the snapshot 1`] = `
                       >
                         <EuiFieldText
                           readOnly={true}
-                          value="your_secret_test_\\""
+                          value="your_secret_test_2"
                         >
                           <EuiFormControlLayout
                             fullWidth={false}
@@ -687,7 +687,7 @@ exports[`ApiAuthTab component renders correctly to match the snapshot 1`] = `
                                     className="euiFieldText"
                                     readOnly={true}
                                     type="text"
-                                    value="your_secret_test_\\""
+                                    value="your_secret_test_2"
                                   />
                                 </EuiValidatableControl>
                                 <EuiFormControlLayoutIcons />

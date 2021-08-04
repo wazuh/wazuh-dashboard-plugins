@@ -33,7 +33,7 @@ describe('ApiAuthTab component', () => {
           {
             tenant_id: 'your_tenant_id_test_2',
             client_id: 'your_client_id_test_2',
-            client_secret: 'your_secret_test_"',
+            client_secret: 'your_secret_test_2',
           },
         ],
         subscriptions: [
