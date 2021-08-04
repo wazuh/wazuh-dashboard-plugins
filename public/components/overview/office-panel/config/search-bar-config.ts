@@ -11,11 +11,14 @@
  * Find more information about this on the LICENSE file.
  */
 
+import { getCustomValueSuggestion } from './helpers/helper-value-suggestion';
+
 export const filtersValues: {
   type: string;
   key: string;
   placeholder: string;
-  optionTitle?: boolean;
+  filterByKey?: boolean;
+  options?: string[];
 }[] = [
   {
     type: 'combobox',
@@ -30,13 +33,14 @@ export const filtersValues: {
   {
     type: 'combobox',
     key: 'data.office365.UserType',
-    placeholder: 'UserType',
-    optionTitle: true,
+    placeholder: 'User Type',
+    filterByKey: true,
+    options: getCustomValueSuggestion('data.office365.UserType'),
   },
   {
     type: 'combobox',
     key: 'data.office365.ResultStatus',
-    placeholder: 'ResultStatus',
+    placeholder: 'Result Status',
   },
   {
     type: 'combobox',

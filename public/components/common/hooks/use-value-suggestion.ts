@@ -11,18 +11,17 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { getDataPlugin } from '../../../../kibana-services';
-import { useIndexPattern } from '../../hooks';
+import { getDataPlugin } from '../../../kibana-services';
+import { useIndexPattern } from '../hooks';
 import { IFieldType, IIndexPattern } from 'src/plugins/data/public';
 import {
   UI_ERROR_SEVERITIES,
   UIErrorLog,
   UIErrorSeverity,
   UILogLevel,
-} from '../../../../react-services/error-orchestrator/types';
-import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
-import { getErrorOrchestrator } from '../../../../react-services/common-services';
-import { getCustomValueSuggestion } from './helpers/helper-value-suggestion';
+} from '../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../../common/constants';
+import { getErrorOrchestrator } from '../../../react-services/common-services';
 
 export interface IValueSuggestion {
   suggestedValues: string[] | boolean[];
@@ -32,6 +31,7 @@ export interface IValueSuggestion {
 
 export const useValueSuggestion = (
   filterField: string,
+  options?: string[],
   type: 'string' | 'boolean' = 'string'
 ): IValueSuggestion => {
   const [suggestedValues, setSuggestedValues] = useState<string[] | boolean[]>([]);
@@ -41,17 +41,14 @@ export const useValueSuggestion = (
   const indexPattern = useIndexPattern();
 
   const getValueSuggestions = async (field) => {
-    const result = await data.autocomplete.getValueSuggestions({
-      query,
-      indexPattern: indexPattern as IIndexPattern,
-      field,
-    });
-
-    if (!result.length) {
-      return getCustomValueSuggestion(field);
-    }
-
-    return result;
+    return (
+      options ??
+      (await data.autocomplete.getValueSuggestions({
+        query,
+        indexPattern: indexPattern as IIndexPattern,
+        field,
+      }))
+    );
   };
 
   useEffect(() => {

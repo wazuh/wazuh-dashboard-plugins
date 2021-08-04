@@ -1,19 +1,11 @@
-import React, { useState, useEffect, useLayoutEffect } from 'react';
-
-import { getIndexPattern } from '../../overview/mitre/lib'
+import React, { useEffect, useState } from 'react';
+import { getIndexPattern } from '../../overview/mitre/lib';
 import { Filter } from '../../../../../../src/plugins/data/public/';
 import { FilterMeta, FilterState, FilterStateStore } from '../../../../../../src/plugins/data/common';
-
-import {
-    EuiFlexGroup,
-    EuiFlexItem,
-    EuiSwitch,
-} from '@elastic/eui';
-
-//@ts-ignore
+import { EuiFlexGroup, EuiFlexItem, EuiSwitch } from '@elastic/eui';
 import { getDataPlugin } from '../../../kibana-services';
 import { KbnSearchBar } from '../../kbn-search-bar';
-import { Combobox } from './components'
+import { Combobox } from './components';
 
 export const CustomSearchBar = ({ filtersValues, ...props }) => {
 
@@ -73,17 +65,24 @@ export const CustomSearchBar = ({ filtersValues, ...props }) => {
         return { meta, $state, query };
     };
 
-    const setKibanaFilters = (values: any[]) => {
-        const newFilters = []
-        const currentFilters = filterManager.getFilters().filter(item => item.meta.key != values[0].value)
-        filterManager.removeAll()
-        filterManager.addFilters(currentFilters)
-        values.forEach(element => {
-            const customFilter = buildCustomFilter(false, indexPattern.title, element.label, element.value)
-            newFilters.push(customFilter);
-        });
-        filterManager.addFilters(newFilters)
-    }
+  const setKibanaFilters = (values: any[]) => {
+    const newFilters = [];
+    const currentFilters = filterManager
+      .getFilters()
+      .filter((item) => item.meta.key != values[0].value);
+    filterManager.removeAll();
+    filterManager.addFilters(currentFilters);
+    values.forEach((element) => {
+      const customFilter = buildCustomFilter(
+        false,
+        indexPattern.title,
+        element?.filterByKey ? element.key.toString() : element.label,
+        element.value
+      );
+      newFilters.push(customFilter);
+    });
+    filterManager.addFilters(newFilters);
+  };
 
     const refreshCustomSelectedFilter = () => {
         setSelectedOptions(defaultSelectedOptions)
@@ -107,18 +106,20 @@ export const CustomSearchBar = ({ filtersValues, ...props }) => {
     };
 
     const onChange = (values: any[]) => {
-        setKibanaFilters(values)
-        refreshCustomSelectedFilter();
+      setKibanaFilters(values)
+      refreshCustomSelectedFilter();
     };
 
     const getComponent = (item: any) => {
-      const types: {[key: string]: object} = {
+      const types: { [key: string]: object } = {
         default: <></>,
-        combobox: <Combobox
-          item={item}
-          selectedOptions={selectedOptions[item.key] || []}
-          onChange={onChange}
-        />,
+        combobox: (
+          <Combobox
+            item={item}
+            selectedOptions={selectedOptions[item.key] || []}
+            onChange={onChange}
+          />
+        ),
       };
       return types[item.type] || types.default;
     }

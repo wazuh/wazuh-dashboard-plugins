@@ -15,20 +15,11 @@ import { EuiComboBox } from '@elastic/eui';
 import { IValueSuggestion, useValueSuggestion } from '../../hooks';
 
 export const Combobox = ({ item, ...props }) => {
-  const { suggestedValues, isLoading, setQuery }: IValueSuggestion = useValueSuggestion(item.key);
+  const { suggestedValues, isLoading, setQuery }: IValueSuggestion = useValueSuggestion(
+    item.key,
+    item?.options
+  );
   const [comboOptions, setComboOptions] = useState<{ key: any; label: any; value: any }[]>();
-
-  const setOptionTitle = (value, key) => {
-    return item?.optionTitle
-      ? [
-          {
-            key: key,
-            label: key.toString(),
-            value: item.key,
-          },
-        ]
-      : null;
-  };
 
   useEffect(() => {
     if (!isLoading) {
@@ -38,7 +29,7 @@ export const Combobox = ({ item, ...props }) => {
             key: key,
             label: value,
             value: item.key,
-            options: setOptionTitle(value, key),
+            filterByKey: item.filterByKey,
           }))
           .sort((a, b) => a.label - b.label)
       );
