@@ -89,7 +89,7 @@ jobs:
       - name: Step 10 - Run Tests & Collect Coverage only changed files
         run: |
           cd ./kibana/plugins/wazuh-kibana-app
-          yarn run test:jest --changedSince='4.3-7.10' --colors
+          yarn run test:jest --changedSince=4.3-7.10 --colors
 
       - name: Step 11 - Comment Test Coverage only changed files
         uses: AthleticNet/comment-test-coverage@1.2.2
