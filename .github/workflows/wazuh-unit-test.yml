@@ -87,6 +87,7 @@ jobs:
           title: Global Test Coverage
 
       - name: Step 10 - Run Tests & Collect Coverage only changed files
+      - uses: actions/checkout@v2
         run: |
           git fetch --no-tags --depth=1 origin 4.3-7.10
           git checkout -b 4.3-7.10
