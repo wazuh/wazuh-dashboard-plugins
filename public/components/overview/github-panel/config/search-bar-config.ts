@@ -24,7 +24,7 @@ export const filtersValues = [
   },
   {
     type: 'combobox',
-    key: 'data.github.repository',
+    key: 'data.github.repo',
   },
   {
     type: 'combobox',
