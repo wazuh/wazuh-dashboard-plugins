@@ -18,7 +18,6 @@ jobs:
     env:
       NODE_10-23-1: '10.23.1'
       NODE_12-22-3: '12.22.3'
-      NODE_14-17-4: '14.17.4'
       YARN_1-21-1: '1.21.1'
       KIBANA_TAG: 'v7.10.2'
     steps:
@@ -59,7 +58,7 @@ jobs:
       - name: Step 07 - Setup node for Jest
         uses: actions/setup-node@v2
         with:
-          node-version: ${{ env.NODE_14-17-4 }}
+          node-version: ${{ env.NODE_10-23-1 }}
 
       - name: Step 08 - Collect & comment coverage
         uses: artiomtr/jest-coverage-report-action@v2.0-rc.3
