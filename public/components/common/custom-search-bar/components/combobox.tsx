@@ -14,7 +14,7 @@ import React, { useEffect, useState } from 'react';
 import { EuiComboBox } from '@elastic/eui';
 import { IValueSuggestion, useValueSuggestion } from '../../hooks';
 
-export const Combobox = ({ item, ...props }) => {
+export const Combobox = ({ item, onChange, selectedOptions }) => {
   const { suggestedValues, isLoading, setQuery }: IValueSuggestion = useValueSuggestion(
     item.key,
     item?.options
@@ -36,7 +36,7 @@ export const Combobox = ({ item, ...props }) => {
     }
   }, [suggestedValues, isLoading, setQuery]);
 
-  const onChange = (selectedOptions) => {
+  const onSearch = (selectedOptions) => {
     setQuery(selectedOptions);
   };
 
@@ -48,8 +48,9 @@ export const Combobox = ({ item, ...props }) => {
       options={comboOptions}
       isClearable={false}
       isLoading={isLoading}
-      onSearchChange={onChange}
-      {...props}
+      onSearchChange={onSearch}
+      onChange={onChange}
+      selectedOptions={selectedOptions}
     />
   );
 };

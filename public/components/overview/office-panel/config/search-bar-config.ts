@@ -31,7 +31,7 @@ export const filtersValues: {
     placeholder: 'Subscription',
   },
   {
-    type: 'combobox',
+    type: 'multiSelect',
     key: 'data.office365.UserType',
     placeholder: 'User Type',
     filterByKey: true,
