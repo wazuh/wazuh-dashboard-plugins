@@ -18,6 +18,8 @@ import {
   EuiButtonIcon,
   EuiFlexItem,
   EuiIcon,
+  EuiOverlayMask,
+  EuiOutsideClickDetector,
   EuiModal,
   EuiModalBody,
   EuiModalHeader,
@@ -144,24 +146,26 @@ class OverviewActions extends Component {
 
     if (this.state.isAgentModalVisible || this.props.state.showExploreAgentModal) {
       modal = (
-        <EuiOverlayMask onClick={() => this.closeAgentModal()}>
-          <EuiModal
-            className="wz-select-agent-modal"
-            onClose={() => this.closeAgentModal()}
-            initialFocus="[name=popswitch]"
-          >
-            <EuiModalHeader>
-              <EuiModalHeaderTitle>Explore agent</EuiModalHeaderTitle>
-            </EuiModalHeader>
+        <EuiOverlayMask>
+          <EuiOutsideClickDetector onOutsideClick={() => this.closeAgentModal()}>
+            <EuiModal
+              className="wz-select-agent-modal"
+              onClose={() => this.closeAgentModal()}
+              initialFocus="[name=popswitch]"
+            >
+              <EuiModalHeader>
+                <EuiModalHeaderTitle>Explore agent</EuiModalHeaderTitle>
+              </EuiModalHeader>
 
-            <EuiModalBody>
-              <AgentSelectionTable
-                updateAgentSearch={(agentsIdList) => this.agentTableSearch(agentsIdList)}
-                removeAgentsFilter={(shouldUpdate) => this.removeAgentsFilter(shouldUpdate)}
-                selectedAgents={this.getSelectedAgents()}
-              />
-            </EuiModalBody>
-          </EuiModal>
+              <EuiModalBody>
+                <AgentSelectionTable
+                  updateAgentSearch={agentsIdList => this.agentTableSearch(agentsIdList)}
+                  removeAgentsFilter={(shouldUpdate) => this.removeAgentsFilter(shouldUpdate)}
+                  selectedAgents={this.getSelectedAgents()}
+                ></AgentSelectionTable>
+              </EuiModalBody>
+            </EuiModal>
+          </EuiOutsideClickDetector>
         </EuiOverlayMask>
       );
     }
