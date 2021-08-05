@@ -12,20 +12,23 @@
 
 import React, { useEffect, useState } from 'react';
 import {
+  EuiFieldSearch,
+  EuiFilterButton,
+  EuiFilterGroup,
+  EuiFilterSelectItem,
+  EuiIcon,
+  EuiLoadingChart,
   EuiPopover,
   EuiPopoverTitle,
-  EuiFieldSearch,
-  EuiFilterSelectItem,
-  EuiLoadingChart,
   EuiSpacer,
-  EuiIcon,
-  EuiFilterGroup,
-  EuiFilterButton,
   FilterChecked,
 } from '@elastic/eui';
 import { IValueSuggestion, useValueSuggestion } from '../../hooks';
 
-export const MultiSelect = ({ item, onChange, selectedOptions }) => {
+const ON = 'on';
+const OFF = 'off';
+
+export const MultiSelect = ({ item, onChange, selectedOptions, onRemove }) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const { suggestedValues, isLoading, setQuery }: IValueSuggestion = useValueSuggestion(
     item.key,
@@ -45,7 +48,7 @@ export const MultiSelect = ({ item, onChange, selectedOptions }) => {
             label: value,
             value: item.key,
             filterByKey: item.filterByKey,
-            checked: 'off' as FilterChecked,
+            checked: OFF as FilterChecked,
           }))
           .sort((a, b) => a.label - b.label)
       );
@@ -53,25 +56,27 @@ export const MultiSelect = ({ item, onChange, selectedOptions }) => {
   }, [suggestedValues, isLoading, setQuery]);
 
   useEffect(() => {
-    // TODO this doesn't work when selected options change from out side 
-    /* items.forEach((item) => {
-      item.checked = selectedOptions.find((element) =>
-        Object.keys(selectedOptions).includes(element.value)
-      )
-        ? 'on'
-        : 'off';
-    }); */
+    items.forEach((item) => {
+      item.checked = selectedOptions.find((element) => item.key.toString() === element.label)
+        ? ON
+        : OFF;
+    });
+    setActiveFilters(selectedOptions.length);
   }, [selectedOptions]);
 
   const toggleFilter = (item) => {
-    item.checked = item.checked === 'on' ? 'off' : 'on';
+    item.checked = item.checked === ON ? OFF : ON;
     updateFilters();
   };
 
   const updateFilters = () => {
-    const selectedItems = items.filter((item) => item.checked === 'on');
+    const selectedItems = items.filter((item) => item.checked === ON);
     setActiveFilters(selectedItems.length);
-    onChange(selectedItems);
+    if (selectedItems.length) {
+      onChange(selectedItems);
+    } else {
+      onRemove(item.key);
+    }
   };
 
   const onSearch = (selectedOptions) => {
@@ -92,7 +97,7 @@ export const MultiSelect = ({ item, onChange, selectedOptions }) => {
       iconType="arrowDown"
       onClick={onButtonClick}
       isSelected={isPopoverOpen}
-      numFilters={suggestedValues.length}
+      numFilters={selectedOptions.length}
       hasActiveFilters={activeFilters > 0}
       numActiveFilters={activeFilters}
     >
@@ -120,7 +125,7 @@ export const MultiSelect = ({ item, onChange, selectedOptions }) => {
               checked={item.checked}
               key={item.key}
               onClick={() => toggleFilter(item)}
-              showIcons={item.checked === 'on'}
+              showIcons={item.checked === ON}
             >
               {item.label}
             </EuiFilterSelectItem>

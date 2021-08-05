@@ -118,6 +118,15 @@ export const CustomSearchBar = ({ filtersValues, ...props }) => {
     refreshCustomSelectedFilter();
   };
 
+  const onRemove = (filter) => {
+    const currentFilters = filterManager
+      .getFilters()
+      .filter((item) => item.meta.key != filter);
+    filterManager.removeAll();
+    filterManager.addFilters(currentFilters);
+    refreshCustomSelectedFilter();
+  }
+
   const getComponent = (item: any) => {
     const types: { [key: string]: object } = {
       default: <></>,
@@ -133,6 +142,7 @@ export const CustomSearchBar = ({ filtersValues, ...props }) => {
           item={item}
           selectedOptions={selectedOptions[item.key] || []}
           onChange={onChange}
+          onRemove={onRemove}
         />
       ),
     };
