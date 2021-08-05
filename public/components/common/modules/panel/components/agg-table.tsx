@@ -62,6 +62,10 @@ export const AggTable = ({
       direction: 'desc',
     },
   };
+  const pagination = {
+    hidePerPageOptions: true,
+    pageSize: 10,
+  };
   return (
     <EuiPanel data-test-subj={`${aggTerm}-aggTable`} {...panelProps}>
       <EuiTitle {...titleProps}>
@@ -73,7 +77,7 @@ export const AggTable = ({
         loading={isLoading}
         rowProps={getRowProps}
         error={error ? error.message : undefined}
-        pagination={{ pageSizeOptions: [5, 10, 20] }}
+        pagination={pagination}
         sorting={sorting}
       />
     </EuiPanel>

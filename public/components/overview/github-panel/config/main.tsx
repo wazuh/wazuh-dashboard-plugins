@@ -16,6 +16,7 @@ import {
   EuiFlexItem 
 } from '@elastic/eui';
 
+const maxRows = 100;
 export const MainViewConfig = {
   rows: [
     {
@@ -28,7 +29,7 @@ export const MainViewConfig = {
                 tableTitle='Actors'
                 aggTerm='data.github.actor'
                 aggLabel='Actor'
-                maxRows={100} 
+                maxRows={maxRows} 
                 onRowClick={props.onRowClick} />
             </EuiFlexItem>)
         },
@@ -40,7 +41,7 @@ export const MainViewConfig = {
                 tableTitle='Organizations'
                 aggTerm='data.github.org'
                 aggLabel='Organization'
-                maxRows={5} 
+                maxRows={maxRows} 
                 onRowClick={props.onRowClick} />
             </EuiFlexItem>)
         }
@@ -56,7 +57,7 @@ export const MainViewConfig = {
                 tableTitle='Repositories'
                 aggTerm='data.github.repo'
                 aggLabel='Repository'
-                maxRows={5} 
+                maxRows={maxRows} 
                 onRowClick={props.onRowClick} />
             </EuiFlexItem>)
         },
@@ -68,7 +69,7 @@ export const MainViewConfig = {
                 tableTitle='Actions'
                 aggTerm='data.github.action'
                 aggLabel='Action'
-                maxRows={5} 
+                maxRows={maxRows} 
                 onRowClick={props.onRowClick} />
             </EuiFlexItem>)
         } 
