@@ -15,6 +15,17 @@ import { EuiBasicTable, EuiPanel, EuiTitle, EuiBasicTableColumn } from '@elastic
 import { useEsSearch } from '../../../hooks';
 import React from 'react';
 
+interface IAggTable {
+  onRowClick(field: string, value: string): void;
+  aggTerm: string;
+  aggLabel: string;
+  maxRows: number;
+  tableTitle: string;
+  panelProps?: any;
+  titleProps?: any;
+} 
+
+
 export const AggTable = ({
   onRowClick = (field, value) => {},
   aggTerm,
@@ -23,7 +34,7 @@ export const AggTable = ({
   tableTitle,
   panelProps,
   titleProps,
-}) => {
+}: IAggTable) => {
   const preAppliedAggs = {
     buckets: {
       terms: {

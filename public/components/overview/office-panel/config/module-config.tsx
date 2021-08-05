@@ -21,10 +21,17 @@ import {
   drilldownRulesConfig,
 } from './';
 
+interface IModuleConfig {
+  [key: string]: {
+    length(): void;
+    component: React.ElementType;
+  };
+}
+
 /**
  * The length method has to count Kibana Visualizations for TabVisualizations class
  */
-export const ModuleConfig = {
+export const ModuleConfig: IModuleConfig = {
   main: {
     length: () => MainViewConfig.rows.reduce((total, row) => total + row.columns.length, 0),
     component: (props) => <OfficeBody {...{ ...MainViewConfig, ...props }} />,
@@ -49,8 +56,7 @@ export const ModuleConfig = {
     ),
   },
   'rule.description': {
-    length: () =>
-      drilldownRulesConfig.rows.reduce((total, row) => total + row.columns.length, 0),
+    length: () => drilldownRulesConfig.rows.reduce((total, row) => total + row.columns.length, 0),
     component: (props) => (
       <OfficeDrilldown title={'Rule'} {...{ ...drilldownRulesConfig, ...props }} />
     ),
