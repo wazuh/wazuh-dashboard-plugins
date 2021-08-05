@@ -67,12 +67,12 @@ jobs:
           ls -la
           echo $GITHUB_WORKSPACE/kibana/plugins/wazuh-kibana-app/
           yarn run test:jest --silent --ci --testLocationInResults --colors --coverage --json --outputFile=report.json
-#          cd ../../..
+          cd ../../..
 
       - name: Step 09 - Comment coverage
         uses: artiomtr/jest-coverage-report-action@v2.0-rc.1
         with:
-#          working-directory: ./kibana/plugins/wazuh-kibana-app/
+          working-directory: ./kibana/plugins/wazuh-kibana-app/
           github-token: ${{ secrets.GITHUB_TOKEN }}
           skip-step: all
 
