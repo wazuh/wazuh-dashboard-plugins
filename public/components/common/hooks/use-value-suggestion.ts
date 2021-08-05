@@ -40,15 +40,18 @@ export const useValueSuggestion = (
   const data = getDataPlugin();
   const indexPattern = useIndexPattern();
 
+  const getOptions = (): string[] => {
+    return options?.filter((element) => element.toLowerCase().includes(query.toLowerCase())) || [];
+  };
+
   const getValueSuggestions = async (field) => {
-    return (
-      options ??
-      (await data.autocomplete.getValueSuggestions({
-        query,
-        indexPattern: indexPattern as IIndexPattern,
-        field,
-      }))
-    );
+    return options
+      ? getOptions()
+      : await data.autocomplete.getValueSuggestions({
+          query,
+          indexPattern: indexPattern as IIndexPattern,
+          field,
+        });
   };
 
   useEffect(() => {

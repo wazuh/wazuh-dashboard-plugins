@@ -29,7 +29,7 @@ const ON = 'on';
 const OFF = 'off';
 
 export const MultiSelect = ({ item, onChange, selectedOptions, onRemove }) => {
-  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const [isPopoverOpen, setIsPopoverOpen] = useState<boolean>(false);
   const { suggestedValues, isLoading, setQuery }: IValueSuggestion = useValueSuggestion(
     item.key,
     item?.options
@@ -80,8 +80,7 @@ export const MultiSelect = ({ item, onChange, selectedOptions, onRemove }) => {
   };
 
   const onSearch = (selectedOptions) => {
-    // TODO this doesn't work
-    setQuery(selectedOptions);
+    setQuery(selectedOptions.target.value);
   };
 
   const onButtonClick = () => {
@@ -117,7 +116,7 @@ export const MultiSelect = ({ item, onChange, selectedOptions, onRemove }) => {
         withTitle
       >
         <EuiPopoverTitle>
-          <EuiFieldSearch onSearch={onSearch} />
+          <EuiFieldSearch onChange={onSearch} />
         </EuiPopoverTitle>
         <div className="euiFilterSelect__items">
           {items.map((item) => (
