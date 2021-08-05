@@ -59,12 +59,13 @@ export const drilldownOperationsConfig = {
               <EuiPanel paddingSize={'s'}>
                 <SecurityAlerts
                   initialColumns={[
-                    'icon',
-                    'timestamp',
-                    'data.office365.UserId',
-                    'data.office365.ClientIP',
-                    'rule.description',
+                    { field: 'icon' },
+                    { field: 'timestamp' },
+                    { field: 'data.office365.UserId', label: 'User ID' },
+                    { field: 'data.office365.ClientIP', label: 'Client IP' },
+                    { field: 'rule.description', label: 'Description' },
                   ]}
+                  useAgentColumns={false}
                 />
               </EuiPanel>
             </EuiFlexItem>
