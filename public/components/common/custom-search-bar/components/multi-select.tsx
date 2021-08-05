@@ -54,13 +54,13 @@ export const MultiSelect = ({ item, onChange, selectedOptions }) => {
 
   useEffect(() => {
     // TODO this doesn't work when selected options change from out side 
-    items.forEach((item) => {
+    /* items.forEach((item) => {
       item.checked = selectedOptions.find((element) =>
         Object.keys(selectedOptions).includes(element.value)
       )
         ? 'on'
         : 'off';
-    });
+    }); */
   }, [selectedOptions]);
 
   const toggleFilter = (item) => {
@@ -134,7 +134,7 @@ export const MultiSelect = ({ item, onChange, selectedOptions }) => {
               </div>
             </div>
           )}
-          {activeFilters && (
+          {suggestedValues.length === 0 && (
             <div className="euiFilterSelect__note">
               <div className="euiFilterSelect__noteContent">
                 <EuiIcon type="minusInCircle" />
