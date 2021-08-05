@@ -29,14 +29,11 @@ export const CustomSearchBar = ({ filtersValues, ...props }) => {
   const [selectedOptions, setSelectedOptions] = useState(defaultSelectedOptions);
   const [values, setValues] = useState([]);
   const [selectReference, setSelectReference] = useState('');
-  const prevValues = usePrevious(values);
 
   useEffect(() => {
-    if (prevValues != values) {
       setKibanaFilters(values, selectReference);
       refreshCustomSelectedFilter();
-    }
-  }, [values, selectReference]);
+  }, [values]);
 
   useEffect(() => {
     onFiltersUpdated();
