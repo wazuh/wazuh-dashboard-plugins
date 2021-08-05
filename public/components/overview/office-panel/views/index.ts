@@ -1,3 +1,3 @@
-export { OfficeStats } from './office-stats';
-export { OfficeBody } from './office-body';
-export { OfficeDrilldown } from './office-drilldown';
+export * from './office-stats';
+export * from './office-body';
+export * from './office-drilldown';
