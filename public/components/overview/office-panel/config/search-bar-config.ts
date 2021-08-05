@@ -21,12 +21,12 @@ export const filtersValues: {
   options?: string[];
 }[] = [
   {
-    type: 'combobox',
+    type: 'multiSelect',
     key: 'data.office365.Actor.ID',
     placeholder: 'Actor ID',
   },
   {
-    type: 'combobox',
+    type: 'multiSelect',
     key: 'data.office365.Subscription',
     placeholder: 'Subscription',
   },
@@ -38,12 +38,12 @@ export const filtersValues: {
     options: getCustomValueSuggestion('data.office365.UserType'),
   },
   {
-    type: 'combobox',
+    type: 'multiSelect',
     key: 'data.office365.ResultStatus',
     placeholder: 'Result Status',
   },
   {
-    type: 'combobox',
+    type: 'multiSelect',
     key: 'data.office365.ClientIP',
     placeholder: 'Client IP',
   },
