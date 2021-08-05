@@ -16,7 +16,7 @@ import _ from 'lodash';
 
 export const useFilterManager = () => {
   const filterManager = useMemo(() => getDataPlugin().query.filterManager, []);
-  const [filters, setFilters] = useState<Filter[]>([]);
+  const [filters, setFilters] = useState<Filter[]>(filterManager.getFilters());
 
   useEffect(() => {
     const subscription = filterManager.getUpdates$().subscribe(() => {
