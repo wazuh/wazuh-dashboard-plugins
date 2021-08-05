@@ -15,8 +15,9 @@ import React from 'react';
 import { VisCard } from '../../../common/modules/panel';
 import { EuiFlexItem, EuiPanel } from '@elastic/eui';
 import { SecurityAlerts } from '../../../visualize/components';
+import { IOfficeConfig } from './types';
 
-export const drilldownOperationsConfig = {
+export const drilldownOperationsConfig: IOfficeConfig = {
   rows: [
     {
       height: 400,

@@ -14,9 +14,9 @@
 import React from 'react';
 import { AggTable } from '../../../common/modules/panel/';
 import { EuiFlexItem } from '@elastic/eui';
-import { SecurityAlerts } from '../../../visualize/components';
+import { IOfficeConfig } from './types';
 
-export const MainViewConfig = {
+export const MainViewConfig: IOfficeConfig = {
   rows: [
     {
       columns: [
