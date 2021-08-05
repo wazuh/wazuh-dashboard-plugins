@@ -40,7 +40,7 @@ import { ModuleMitreAttackIntelligence } from '../../overview/mitre_attack_intel
 import { OfficePanel } from '../../overview/office-panel';
 
 
-interface iProps {
+interface IProps {
   section: string;
   selectView: string;
   tabs: any;
@@ -52,7 +52,7 @@ interface iProps {
   renderDashboardButton(): void;
 }
 
-interface iState {
+interface IState {
   selectView: boolean;
   loadingReport: boolean;
   isDescPopoverOpen: boolean;
@@ -60,7 +60,7 @@ interface iState {
 }
 
 
-export class MainModuleOverview extends Component<iProps,iState> {
+export class MainModuleOverview extends Component<IProps,IState> {
 
   reportingService: any;
   router: any;

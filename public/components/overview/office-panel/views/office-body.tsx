@@ -14,13 +14,13 @@
 import React from 'react';
 import { VisConfigLayout } from '../../../common/modules/panel';
 
-interface iOfficeBody {
+interface IOfficeBody {
   changeView(field: string): void;
   toggleFilter(field: string, value: string): void;
   rows: [];
 }
 
-export const iOfficeBody = ({ changeView, toggleFilter, rows = [] }: iOfficeBody) => {
+export const OfficeBody = ({ changeView, toggleFilter, rows = [] }: IOfficeBody) => {
   const rowClickHandler = (field: string, value: string) => {
     toggleFilter(field, value);
 

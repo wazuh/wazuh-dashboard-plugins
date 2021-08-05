@@ -15,7 +15,7 @@ import React from 'react';
 import { EuiButtonEmpty, EuiFlexGroup, EuiFlexItem, EuiTitle } from '@elastic/eui';
 import { VisConfigLayout } from '../../../common/modules/panel/components';
 
-type iOfficeDrilldown = {
+type IOfficeDrilldown = {
   title: string;
   changeView(field: string): void;
   toggleFilter(field: string): void;
@@ -32,7 +32,7 @@ export const OfficeDrilldown = ({
   toggleFilter,
   rows = [],
   selectedFilter = { field: '', value: '' },
-}: iOfficeDrilldown) => {
+}: IOfficeDrilldown) => {
 
   const rowClickHandler = () => {
     toggleFilter(selectedFilter.field);
