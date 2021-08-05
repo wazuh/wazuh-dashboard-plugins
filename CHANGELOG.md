@@ -46,6 +46,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Created a separate component to check for sample data [#3475](https://github.com/wazuh/wazuh-kibana-app/pull/3475)
 - Added a new hook for getting value suggestions [#3506](https://github.com/wazuh/wazuh-kibana-app/pull/3506)
 - Added base Module Panel view with Office365 setup [3518](https://github.com/wazuh/wazuh-kibana-app/pull/3518)
+- Added dinamic simple filters and adding simple GitHub filters fields [3531](https://github.com/wazuh/wazuh-kibana-app/pull/3531)
 - Adding pagination in GitHub Drilldown tables [3534](https://github.com/wazuh/wazuh-kibana-app/pull/3534)
 
 ### Changed

@@ -12,7 +12,7 @@
 import { useState, useEffect } from 'react';
 import { getDataPlugin } from '../../../kibana-services';
 import { useIndexPattern } from '.';
-import { IFieldType, IIndexPattern } from 'src/plugins/data/public';
+import { IFieldType, IIndexPattern, Filter } from 'src/plugins/data/public';
 import React from 'react';
 import {
   UI_ERROR_SEVERITIES,
@@ -22,6 +22,7 @@ import {
 } from '../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
+import { useFilterManager } from '.';
 
 export interface IValueSuggestiions {
   suggestedValues: string[] | boolean[];
@@ -29,14 +30,35 @@ export interface IValueSuggestiions {
   setQuery: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export const useValueSuggestions = (filterField: string, type: 'string' | 'boolean' = 'string') : IValueSuggestiions => {
+export const useValueSuggestions = (
+  filterField: string,
+  type: 'string' | 'boolean' = 'string'
+): IValueSuggestiions => {
   const [suggestedValues, setSuggestedValues] = useState<string[] | boolean[]>([]);
   const [query, setQuery] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
   const data = getDataPlugin();
   const indexPattern = useIndexPattern();
+  const { filters } = useFilterManager();
 
   useEffect(() => {
+    const boolFilter = filters
+      .filter(
+        (managedFilter) =>
+          managedFilter &&
+          managedFilter.query &&
+          managedFilter.query.match &&
+          Object.keys(managedFilter.query.match)[0] !== filterField
+      )
+      .map((managedFilter) => {
+        return {
+          term: {
+            [Object.keys(managedFilter.query.match)[0]]:
+              managedFilter.query.match[Object.keys(managedFilter.query.match)[0]].query,
+          },
+        };
+      });
+
     if (indexPattern) {
       setIsLoading(true);
       (async () => {
@@ -51,6 +73,7 @@ export const useValueSuggestions = (filterField: string, type: 'string' | 'boole
               query,
               indexPattern: indexPattern as IIndexPattern,
               field,
+              boolFilter,
             })
           );
         } catch (error) {
@@ -70,7 +93,7 @@ export const useValueSuggestions = (filterField: string, type: 'string' | 'boole
         }
       })();
     }
-  }, [indexPattern, query, filterField, type]);
+  }, [indexPattern, query, filterField, type, filters]);
 
   return { suggestedValues, isLoading, setQuery };
 };
