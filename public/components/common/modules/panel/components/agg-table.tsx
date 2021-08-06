@@ -13,7 +13,7 @@
 
 import { EuiPanel, EuiTitle, EuiBasicTableColumn, EuiInMemoryTable } from '@elastic/eui';
 import { useEsSearch } from '../../../hooks';
-import React from 'react';
+import React, { useState } from 'react';
 
 export const AggTable = ({
   onRowClick = (field, value) => {},
@@ -24,27 +24,30 @@ export const AggTable = ({
   panelProps,
   titleProps,
 }) => {
+  const [order, setOrder] = useState({ _key: 'desc' });
   const preAppliedAggs = {
     buckets: {
       terms: {
         field: aggTerm,
         size: maxRows,
-        order: { _count: 'desc' },
+        order,
       },
     },
   };
   const { esResults, isLoading, error } = useEsSearch({ preAppliedAggs });
-  const buckets = ((esResults.aggregations || {}).buckets || {}).buckets || [];
+  let buckets = ((esResults.aggregations || {}).buckets || {}).buckets || [];
   const columns: EuiBasicTableColumn<any>[] = [
     {
       field: 'key',
       name: aggLabel,
+      sortable: true,
     },
     {
       field: 'doc_count',
       name: 'Count',
       isExpander: false,
       align: 'right',
+      sortable: true,
     },
   ];
   const getRowProps = (item) => {
@@ -56,15 +59,21 @@ export const AggTable = ({
       },
     };
   };
+  const pagination = {
+    hidePerPageOptions: true,
+    pageSize: 10,
+  };
   const sorting = {
     sort: {
       field: 'doc_count',
       direction: 'desc',
     },
   };
-  const pagination = {
-    hidePerPageOptions: true,
-    pageSize: 10,
+  const onTableChange = ({ sort = {} }) => {
+    if (sort.field) {
+      const field = { key: '_key', doc_count: '_count' }[sort.field];
+      setOrder({ [field]: sort.direction });
+    }
   };
   return (
     <EuiPanel data-test-subj={`${aggTerm}-aggTable`} {...panelProps}>
@@ -78,6 +87,7 @@ export const AggTable = ({
         rowProps={getRowProps}
         error={error ? error.message : undefined}
         pagination={pagination}
+        onTableChange={onTableChange}
         sorting={sorting}
       />
     </EuiPanel>
