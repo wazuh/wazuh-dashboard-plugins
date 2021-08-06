@@ -73,7 +73,7 @@ jobs:
         uses: AthleticNet/comment-test-coverage@1.2.2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          path: ./kibana/plugins/wazuh-kibana-app/target/test-coverage/coverage-summary.json
+          path: /kibana/plugins/wazuh-kibana-app/target/test-coverage/coverage-summary.json
           title: Global Test Coverage
 
       - name: Step 10 - Run Tests & Collect Coverage only changed files
@@ -85,5 +85,5 @@ jobs:
         uses: AthleticNet/comment-test-coverage@1.2.2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          path: ./kibana/plugins/wazuh-kibana-app/target/test-coverage/coverage-summary.json
+          path: /kibana/plugins/wazuh-kibana-app/target/test-coverage/coverage-summary.json
           title: Brach Test Coverage
