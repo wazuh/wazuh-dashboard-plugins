@@ -11,11 +11,10 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { EuiDescriptionList, EuiPanel } from '@elastic/eui';
-import moduleLogo from '../../../../assets/office365.svg';
 import React from 'react';
-import './office-stats.scss';
+import { EuiDescriptionList, EuiPanel } from '@elastic/eui';
 import { PanelModuleConfiguration } from '../../../common/modules/panel';
+import moduleLogo from '../../../../assets/office365.svg';
 
 const settings = [
   { field: 'enabled', label: 'Enabled'},

@@ -11,12 +11,12 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, FunctionalComponent } from 'react';
 import { EuiDescriptionList, EuiFlexItem, EuiFlexGroup, EuiTitle, EuiCallOut, EuiIcon, EuiSpacer, EuiProgress, EuiAccordion, EuiText } from '@elastic/eui';
 import { WzRequest } from '../../../../../react-services';
 import { connect } from 'react-redux';
-import { useAsyncAction } from '../../../../common/hooks';
-import { withGuard } from '../../../../common/hocs';
+import { useAsyncAction } from '../../../hooks';
+import { withGuard } from '../../../hocs';
 import { compose } from 'redux';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 import {
@@ -26,6 +26,7 @@ import {
   UILogLevel,
 } from '../../../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
+import './module_configuration.scss';
 
 const mapStateToProps = state => ({
   agent: state.appStateReducers.currentAgentData
@@ -46,7 +47,7 @@ const renderEntityTitle = (entity: string, name: string) => {
   return `${entity}${name ? ` - ${name}` : ''}`;
 };
 
-export const PanelModuleConfiguration = connect(mapStateToProps)(
+export const PanelModuleConfiguration : FunctionalComponent<{h: string}> = connect(mapStateToProps)(
 ({ agent, configurationAPIPartialPath, mapResponseConfiguration, moduleTitle, moduleIconType = '', settings }) => {
 
   const asyncAction = useAsyncAction((async () => {
@@ -93,7 +94,7 @@ export const PanelModuleConfiguration = connect(mapStateToProps)(
   useEffect(() => {
     asyncAction.run();
   },[asyncAction.run]);
-  console.log('asyncAction.data',asyncAction.data)
+
   return (
     <>
       <EuiFlexGroup>
@@ -102,10 +103,10 @@ export const PanelModuleConfiguration = connect(mapStateToProps)(
         </EuiFlexItem>
         <EuiFlexItem>
           <EuiTitle size='s'>
-            <h4 className='office-stats-title'>{moduleTitle}</h4>
+            <h4 className='module-panel-configuration-title'>{moduleTitle}</h4>
           </EuiTitle>
           <EuiTitle size='xs'>
-            <h5 className='office-stats-subtitle'>Module configuration</h5>
+            <h5 className='module-panel-configuration-subtitle'>Module configuration</h5>
           </EuiTitle>
         </EuiFlexItem>
       </EuiFlexGroup>
@@ -164,7 +165,7 @@ const Configuration = ({ configuration, settings }) => {
   return (
     <div>
       <EuiDescriptionList
-        className='office-description-list'
+        className='module-panel-configuration-list'
         listItems={listItems}
         compressed
       />
