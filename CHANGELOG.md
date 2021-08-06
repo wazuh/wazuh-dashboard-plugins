@@ -53,6 +53,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed empty fields in FIM tables and `syscheck.value_name` in discovery now show an empty tag for visual clarity [#3279](https://github.com/wazuh/wazuh-kibana-app/pull/3279)
 - Adapted the Mitre tactics and techniques resources to use the API endpoints [#3346](https://github.com/wazuh/wazuh-kibana-app/pull/3346)
 - Moved the filterManager subscription to the hook useFilterManager [#3517](https://github.com/wazuh/wazuh-kibana-app/pull/3517)
+- Change filter from is to is one of in custom searchbar [#3529](https://github.com/wazuh/wazuh-kibana-app/pull/3529)
 
 ### Fixed
 
