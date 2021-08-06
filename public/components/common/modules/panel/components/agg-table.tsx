@@ -24,7 +24,7 @@ export const AggTable = ({
   panelProps,
   titleProps,
 }) => {
-  const [order, setOrder] = useState({ _key: 'desc' });
+  const [order, setOrder] = useState({ _count: 'desc' });
   const preAppliedAggs = {
     buckets: {
       terms: {
@@ -35,7 +35,7 @@ export const AggTable = ({
     },
   };
   const { esResults, isLoading, error } = useEsSearch({ preAppliedAggs });
-  let buckets = ((esResults.aggregations || {}).buckets || {}).buckets || [];
+  const buckets = ((esResults.aggregations || {}).buckets || {}).buckets || [];
   const columns: EuiBasicTableColumn<any>[] = [
     {
       field: 'key',
