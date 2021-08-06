@@ -82,16 +82,20 @@ export class ReportingService {
         idArray = rawVisualizations.map(item => item.id);
       }
 
+      const visualizationIDList = [];
       for (const item of idArray) {
         const tmpHTMLElement = $(`#${item}`);
-        this.vis2png.assignHTMLItem(item, tmpHTMLElement);
+        if(tmpHTMLElement[0]){
+          this.vis2png.assignHTMLItem(item, tmpHTMLElement);
+          visualizationIDList.push(item);
+        }
       }
 
       const appliedFilters = await this.visHandlers.getAppliedFilters(
         syscollectorFilters
       );
 
-      const array = await this.vis2png.checkArray(idArray);
+      const array = await this.vis2png.checkArray(visualizationIDList);
       const name = `wazuh-${
         agents ?  `agent-${agents}` : 'overview'
       }-${tab}-${(Date.now() / 1000) | 0}.pdf`;
