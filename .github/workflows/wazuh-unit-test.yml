@@ -72,12 +72,20 @@ jobs:
           path: ./kibana/plugins/wazuh-kibana-app/target/test-coverage/coverage-summary.json
           title: App Coverage
 
-      - name: Step 10 - Run Tests & Collect Coverage of branch
+      - name: Step 10 - Fetch 4.3-7.10
+        uses: actions/checkout@v2
+        with:
+          ref: 4.3-7.10
+      - name: Fetch master branch
+        run: |
+          git fetch origin 4.3-7.10
+
+      - name: Step 11 - Run Tests & Collect Coverage of branch
         run: |
           cd ./kibana/plugins/wazuh-kibana-app
           yarn run test:jest --changedSince="refs/heads/4.3-7.10" --colors
 
-      - name: Step 11 - Comment Test Coverage of branch
+      - name: Step 12 - Comment Test Coverage of branch
         uses: AthleticNet/comment-test-coverage@1.2.2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
