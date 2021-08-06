@@ -76,16 +76,17 @@ jobs:
         uses: actions/checkout@v2
         with:
           ref: 4.3-7.10
-      - name: Fetch master branch
+
+      - name: Step 11 - Fetch 4.3-7.10  branch
         run: |
           git fetch origin 4.3-7.10
 
-      - name: Step 11 - Run Tests & Collect Coverage of branch
+      - name: Step 12 - Run Tests & Collect Coverage of branch
         run: |
-          cd ./kibana/plugins/wazuh-kibana-app
+          ls
           yarn run test:jest --changedSince="refs/heads/4.3-7.10" --colors
 
-      - name: Step 12 - Comment Test Coverage of branch
+      - name: Step 13 - Comment Test Coverage of branch
         uses: AthleticNet/comment-test-coverage@1.2.2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
