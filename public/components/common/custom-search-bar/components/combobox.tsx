@@ -34,7 +34,7 @@ export const Combobox = ({ item, onChange, selectedOptions }) => {
           .sort((a, b) => a.label - b.label)
       );
     }
-  }, [suggestedValues, isLoading, setQuery]);
+  }, [suggestedValues, isLoading]);
 
   const onSearch = (selectedOptions) => {
     setQuery(selectedOptions);

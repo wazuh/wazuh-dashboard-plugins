@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { getIndexPattern } from '../../overview/mitre/lib';
 import { Filter } from '../../../../../../src/plugins/data/public/';
 import {
   FilterMeta,
@@ -7,14 +6,13 @@ import {
   FilterStateStore,
 } from '../../../../../../src/plugins/data/common';
 import { EuiFlexGroup, EuiFlexItem, EuiSwitch } from '@elastic/eui';
-import { getDataPlugin } from '../../../kibana-services';
 import { KbnSearchBar } from '../../kbn-search-bar';
 import { Combobox, MultiSelect } from './components';
+import { useFilterManager, useIndexPattern } from '../hooks';
 
-export const CustomSearchBar = ({ filtersValues, ...props }) => {
-  const KibanaServices = getDataPlugin().query;
-  const filterManager = KibanaServices.filterManager;
-  const indexPattern = getIndexPattern();
+export const CustomSearchBar = ({ filtersValues }) => {
+  const { filterManager, filters } = useFilterManager();
+  const indexPattern = useIndexPattern();
   const defaultSelectedOptions = () => {
     const array = [];
     filtersValues.forEach((item) => {
@@ -27,13 +25,8 @@ export const CustomSearchBar = ({ filtersValues, ...props }) => {
   const [selectedOptions, setSelectedOptions] = useState(defaultSelectedOptions);
 
   useEffect(() => {
-    let filterSubscriber = filterManager.getUpdates$().subscribe(() => {
-      onFiltersUpdated();
-      return () => {
-        filterSubscriber.unsubscribe();
-      };
-    });
-  }, []);
+    refreshCustomSelectedFilter();
+  }, [filterManager, filters, indexPattern]);
 
   const onFiltersUpdated = () => {
     refreshCustomSelectedFilter();
@@ -93,8 +86,8 @@ export const CustomSearchBar = ({ filtersValues, ...props }) => {
 
   const refreshCustomSelectedFilter = () => {
     setSelectedOptions(defaultSelectedOptions);
-    const filters = filterManager.getFilters();
-    const filterCustom = filters
+    const filterCustom = filterManager
+      .getFilters()
       .map((item) => {
         return {
           value: item.meta.key,
@@ -119,13 +112,11 @@ export const CustomSearchBar = ({ filtersValues, ...props }) => {
   };
 
   const onRemove = (filter) => {
-    const currentFilters = filterManager
-      .getFilters()
-      .filter((item) => item.meta.key != filter);
+    const currentFilters = filterManager.getFilters().filter((item) => item.meta.key != filter);
     filterManager.removeAll();
     filterManager.addFilters(currentFilters);
     refreshCustomSelectedFilter();
-  }
+  };
 
   const getComponent = (item: any) => {
     const types: { [key: string]: object } = {

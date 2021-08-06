@@ -53,12 +53,15 @@ export const MultiSelect = ({ item, onChange, selectedOptions, onRemove }) => {
           .sort((a, b) => a.label - b.label)
       );
     }
-  }, [suggestedValues, isLoading, setQuery]);
+  }, [suggestedValues, isLoading]);
 
   useEffect(() => {
-    items.forEach((item) => {
-      item.checked = selectedOptions.find((element) => element.label === filterBy(item)) ? ON : OFF;
-    });
+    setItems(
+      items.map((item) => ({
+        ...item,
+        checked: selectedOptions.find((element) => element.label === filterBy(item)) ? ON : OFF,
+      }))
+    );
     setActiveFilters(selectedOptions.length);
   }, [selectedOptions]);
 
