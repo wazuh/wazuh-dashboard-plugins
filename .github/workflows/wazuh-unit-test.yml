@@ -35,7 +35,6 @@ jobs:
 
       - name: Step 03 - Install dependencies of kibana
         run: |
-          git fetch origin 4.3-7.10
           cd kibana
           yarn set version ${{ env.YARN_1-21-1 }}
           yarn kbn bootstrap
@@ -75,8 +74,8 @@ jobs:
 
       - name: Step 10 - Run Tests & Collect Coverage of branch
         run: |
-          ls
-          yarn run test:jest --changedSince="refs/heads/4.3-7.10" --colors
+          cd ./kibana/plugins/wazuh-kibana-app
+          yarn run test:jest --onlyChanged --colors
 
       - name: Step 11 - Comment Test Coverage of branch
         uses: AthleticNet/comment-test-coverage@1.2.2
