@@ -64,20 +64,17 @@ jobs:
         run: |
           cd ./kibana/plugins/wazuh-kibana-app
           yarn run test:jest --colors
+          mv ./target/test-coverage/coverage-summary.json ./target/test-coverage/coverage-global.json
+          yarn run test:jest --onlyChanged --colors
 
       - name: Step 09 - Comment Test Coverage
         uses: AthleticNet/comment-test-coverage@1.2.2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          path: ./kibana/plugins/wazuh-kibana-app/target/test-coverage/coverage-summary.json
+          path: ./kibana/plugins/wazuh-kibana-app/target/test-coverage/coverage-global.json
           title: App Coverage
 
-      - name: Step 10 - Run Tests & Collect Coverage of branch
-        run: |
-          cd ./kibana/plugins/wazuh-kibana-app
-          yarn run test:jest --onlyChanged --colors
-
-      - name: Step 11 - Comment Test Coverage of branch
+      - name: Step 10 - Comment Test Coverage of branch
         uses: AthleticNet/comment-test-coverage@1.2.2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
