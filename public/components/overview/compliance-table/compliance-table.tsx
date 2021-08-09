@@ -13,7 +13,6 @@ import React, { Component } from 'react';
 import { EuiPanel, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import { SearchBar, FilterManager } from '../../../../../../src/plugins/data/public/';
 
-import { I18nProvider } from '@kbn/i18n/react';
 //@ts-ignore
 import { ComplianceRequirements } from './components/requirements';
 import { ComplianceSubrequirements } from './components/subrequirements';
@@ -28,8 +27,9 @@ import { getDataPlugin } from '../../../kibana-services';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
+import { withAgentSupportModule } from '../../common/hocs';
 
-export class ComplianceTable extends Component {
+export const ComplianceTable = withAgentSupportModule(class ComplianceTable extends Component {
   _isMount = false;
   timefilter: {
     getTime(): any;
@@ -331,4 +331,4 @@ export class ComplianceTable extends Component {
       </div>
     );
   }
-}
+})
