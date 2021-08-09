@@ -14,6 +14,16 @@ import React from 'react';
 import { ApiAuthTab } from './api-auth-tab';
 import { mount } from 'enzyme';
 
+jest.mock('../../../../../../../../kibana-services', () => ({
+  getUiSettings: () => ({
+    get: (uiSetting: string) => {
+      if (uiSetting === 'theme:darkMode') {
+        return false
+      }
+    }
+  })
+}));
+
 describe('ApiAuthTab component', () => {
   it('renders correctly to match the snapshot', () => {
     const wodleConfiguration = {
@@ -28,8 +38,6 @@ describe('ApiAuthTab component', () => {
             client_id: 'your_client_id_test_1',
             client_secret: 'your_secret_test_1',
           },
-        ],
-        api_auth: [
           {
             tenant_id: 'your_tenant_id_test_2',
             client_id: 'your_client_id_test_2',

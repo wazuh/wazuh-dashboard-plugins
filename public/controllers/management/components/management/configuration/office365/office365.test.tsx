@@ -16,6 +16,16 @@ import { WzConfigurationOffice365 } from './office365';
 import { Provider } from 'react-redux';
 import configureMockStore from 'redux-mock-store';
 
+jest.mock('../../../../../../kibana-services', () => ({
+  getUiSettings: () => ({
+    get: (uiSetting: string) => {
+      if (uiSetting === 'theme:darkMode') {
+        return false
+      }
+    }
+  })
+}));
+
 const mockStore = configureMockStore();
 const store = mockStore({});
 
