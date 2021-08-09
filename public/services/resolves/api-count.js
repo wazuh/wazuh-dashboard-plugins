@@ -21,23 +21,21 @@
 import { AppState } from '../../react-services/app-state';
 import { GenericRequest } from '../../react-services/generic-request';
 
-export function apiCount($q, $location) {
+export async function apiCount($q, $location) {
   const deferred = $q.defer();
-  GenericRequest.request('GET', '/hosts/apis')
-    .then(async data => {
-      if (!data || !data.data || !data.data.length)
-        throw new Error('No API entries found');
-      if (!AppState.getCurrentAPI()) {
-        await tryToSetDefault(data.data, AppState);
-      }
-      deferred.resolve();
-    })
-    .catch(() => {
-      $location.search('_a', null);
-      $location.search('tab', 'api');
-      $location.path('/settings');
-      deferred.resolve();
-    });
+  try {
+    const apis = await GenericRequest.request('GET', '/hosts/apis');
+    if (!apis || !apis.data || !apis.data.length) throw new Error('No API entries found');
+    if (!AppState.getCurrentAPI()) {
+      await tryToSetDefault(data.data, AppState);
+    }
+    deferred.resolve();
+  } catch (error) {
+    $location.search('_a', null);
+    $location.search('tab', 'api');
+    $location.path('/settings');
+    deferred.resolve();
+  }
   return deferred.promise;
 }
 
@@ -50,7 +48,7 @@ function tryToSetDefault(apis, AppState) {
         AppState.setCurrentAPI(
           JSON.stringify({
             name: api.cluster_info.manager,
-            id: api.id
+            id: api.id,
           })
         );
         break;

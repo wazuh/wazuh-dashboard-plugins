@@ -17,11 +17,13 @@ import { ModulesHelper } from './modules-helper';
 import store from '../../../redux/store';
 import { EuiButton, EuiFlexGroup, EuiFlexItem, EuiOverlayMask, EuiOutsideClickDetector } from '@elastic/eui';
 import { PatternHandler } from '../../../react-services/pattern-handler';
-
 import { enhanceDiscoverEventsCell } from './events-enhance-discover-fields';
 import { toMountPoint } from '../../../../../../src/plugins/kibana_react/public';
 import { withAgentSupportModule, withModuleTabLoader } from '../hocs';
 import { compose } from 'redux';
+import { UI_LOGGER_LEVELS } from '../../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../../react-services/common-services';
 
 export const Events = compose(
   withAgentSupportModule,
@@ -180,9 +182,9 @@ export const Events = compose(
         this.setState({ isRefreshing: false });
         this.reloadToast()
 
-      } catch (err) {
+      } catch (error) {
         this.setState({ isRefreshing: false });
-        this.errorToast(err);
+        throw error;
       }
     } else if (this.state.isRefreshing) {
       await new Promise(r => setTimeout(r, 150));
@@ -226,7 +228,19 @@ export const Events = compose(
         // It is a details table row
         this.enhanceDiscoverTableRowDetailsAddObserver(mutationElement, discoverRowsData, options);
       }
-    }catch(error){};
+    }catch(error){
+      const options = {
+        context: `${Events.name}.hideCreateCustomLabel`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+    };
   }
 
   setFlyout = (flyout) => {
