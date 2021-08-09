@@ -1,4 +1,3 @@
-
 /*
  * Wazuh app - Panel - Module configuration component
  * Copyright (C) 2015-2021 Wazuh, Inc.

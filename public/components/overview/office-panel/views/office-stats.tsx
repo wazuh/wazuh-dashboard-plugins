@@ -28,7 +28,7 @@ const settings = [
         {title: 'Client ID', description: v.client_id},
         {title: 'Client secret', description: v.client_secret},
         {title: 'Path file of client secret', description: v.client_secret_path},
-      ].filter(item => item.description !== undefined)}/>
+      ].filter(item => typeof item.description !== 'undefined')}/>
     </EuiPanel>
   )},
   { field: 'subscriptions', label: 'Subscriptions', render: (value) => value
