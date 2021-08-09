@@ -13,7 +13,7 @@
 
 import { EuiPanel, EuiTitle, EuiBasicTableColumn, EuiInMemoryTable } from '@elastic/eui';
 import { useEsSearch } from '../../../hooks';
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 
 export const AggTable = ({
   onRowClick = (field, value) => {},
@@ -25,15 +25,18 @@ export const AggTable = ({
   titleProps,
 }) => {
   const [order, setOrder] = useState({ _count: 'desc' });
-  const preAppliedAggs = {
-    buckets: {
-      terms: {
-        field: aggTerm,
-        size: maxRows,
-        order,
+  const preAppliedAggs = useMemo(() => {
+    return {
+      buckets: {
+        terms: {
+          field: aggTerm,
+          size: maxRows,
+          order,
+        },
       },
-    },
-  };
+    };
+  }, [order, aggTerm, maxRows]);
+
   const { esResults, isLoading, error } = useEsSearch({ preAppliedAggs });
   const buckets = ((esResults.aggregations || {}).buckets || {}).buckets || [];
   const columns: EuiBasicTableColumn<any>[] = [
