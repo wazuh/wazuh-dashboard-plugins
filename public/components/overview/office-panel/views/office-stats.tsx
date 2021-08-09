@@ -36,7 +36,7 @@ const settings = [
   }
 ];
 
-const mapWModuleConfigurationToRenderProperties = (wmodules: {[key: string]: any}[], wmoduleID: string, entity: string, name = '') => {
+const mapWModuleConfigurationToRenderProperties = (wmodules: {[key: string]: any}[], wmoduleID: string, entity: string, name: string = '') => {
   const configuration = wmodules.find(wmodule => Object.keys(wmodule)[0] === wmoduleID);
   return configuration 
     ? {entity, name, configuration: configuration[Object.keys(configuration)[0]]}
