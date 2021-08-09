@@ -53,6 +53,7 @@ const mapStateToProps = (state) => ({
 export const MainModuleOverview = connect(mapStateToProps)(class MainModuleOverview extends Component<IProps,IState> {
   reportingService: any;
   router: any;
+  filterManager: any;
   
   constructor(props) {
     super(props);
