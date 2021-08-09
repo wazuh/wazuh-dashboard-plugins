@@ -54,6 +54,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Adapted the Mitre tactics and techniques resources to use the API endpoints [#3346](https://github.com/wazuh/wazuh-kibana-app/pull/3346)
 - Moved the filterManager subscription to the hook useFilterManager [#3517](https://github.com/wazuh/wazuh-kibana-app/pull/3517)
 - Change filter from is to is one of in custom searchbar [#3529](https://github.com/wazuh/wazuh-kibana-app/pull/3529)
+- Refactored as module tabs and buttons are rendered [#3494](https://github.com/wazuh/wazuh-kibana-app/pull/3494)
 
 ### Fixed
 
