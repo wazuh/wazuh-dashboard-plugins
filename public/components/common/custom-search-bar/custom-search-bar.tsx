@@ -13,7 +13,7 @@ import { EuiFlexGroup, EuiFlexItem, EuiSwitch } from '@elastic/eui';
 //@ts-ignore
 import { KbnSearchBar } from '../../kbn-search-bar';
 import { Combobox } from './components';
-import { useFilterManager, usePrevious } from '../hooks';
+import { useFilterManager } from '../hooks';
 
 export const CustomSearchBar = ({ filtersValues, ...props }) => {
   const { filterManager, filters } = useFilterManager();
