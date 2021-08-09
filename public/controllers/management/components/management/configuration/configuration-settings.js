@@ -212,7 +212,8 @@ export default [
         name: 'Office 365',
         description:
           'Configuration options of the Office 365 module',
-        goto: 'office365'
+        goto: 'office365',
+        when: 'manager'
       }
     ]
   }

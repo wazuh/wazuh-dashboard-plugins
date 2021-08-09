@@ -56,7 +56,7 @@ export const WzConfigurationOffice365: React.FunctionComponent<IWzConfigOffice36
           {...props}
         />
       </WzTabSelectorTab>
-      <WzTabSelectorTab label="Api Auth">
+      <WzTabSelectorTab label="Credentials">
         <ApiAuthTabWrapped
           wodleConfiguration={wodleConfiguration}
           currentConfig={currentConfig}

@@ -10,9 +10,10 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import WzConfigurationSettingsTabSelector from '../../../util-components/configuration-settings-tab-selector';
-import WzConfigurationSettingsGroup from '../../../util-components/configuration-settings-group';
+import WzConfigurationSettingsListSelector from '../../../util-components/configuration-settings-list-selector';
+import { settingsListBuilder } from '../../../utils/builders';
 import { HELP_LINKS, OFFICE_365 } from '../../constants';
 
 export type ApiAuthProps = {
@@ -20,24 +21,31 @@ export type ApiAuthProps = {
   wodleConfiguration: any;
 };
 
+const columns = [
+  { field: 'tenant_id', label: 'Tenant Id' },
+  { field: 'client_id', label: 'Client Id' },
+  { field: 'client_secret', label: 'Client Secret' },
+  { field: 'client_secret_path', label: 'Client Secret Path' },
+];
+
 export const ApiAuthTab = ({ agent, wodleConfiguration }: ApiAuthProps) => {
-  const columns = [
-    { field: 'tenant_id', label: 'Tenant Id' },
-    { field: 'client_id', label: 'Client Id' },
-    { field: 'client_secret', label: 'Client Secret' },
-    { field: 'client_secret_path', label: 'Client Secret Path' },
-  ];
+  
+  const credentials = useMemo(() => settingsListBuilder(
+    wodleConfiguration[OFFICE_365].api_auth,
+    'tenant_id'
+  ), [wodleConfiguration]);
 
   return (
     <WzConfigurationSettingsTabSelector
-      title="Credential for the authentication with the API"
+      title="Credentials for the authentication with the API"
       currentConfig={wodleConfiguration}
       minusHeight={agent.id === '000' ? 260 : 320}
       helpLinks={HELP_LINKS}
     >
-      {wodleConfiguration[OFFICE_365].api_auth.map((api_auth) => (
-        <WzConfigurationSettingsGroup config={api_auth} items={columns} />
-      ))}
+      <WzConfigurationSettingsListSelector
+        items={credentials}
+        settings={columns}
+      />
     </WzConfigurationSettingsTabSelector>
   );
 };
