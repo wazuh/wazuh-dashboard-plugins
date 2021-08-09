@@ -72,7 +72,7 @@ const useEsSearch = ({ preAppliedFilters = [], preAppliedAggs = {}, size = 10 })
         setIsLoading(false);
       }
     })();
-  }, [indexPattern, query, filters, page]);
+  }, [indexPattern, query, filters, page, preAppliedAggs]);
 
   const search = async (): Promise<SearchResponse> => {
     if (indexPattern) {

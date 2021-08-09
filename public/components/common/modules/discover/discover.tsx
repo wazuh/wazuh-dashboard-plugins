@@ -30,20 +30,20 @@ import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrat
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
 
 import {
- EuiBasicTable,
- EuiLoadingContent,
- EuiTableSortingType,
- EuiFlexItem,
- EuiFlexGroup,
- Direction,
- EuiOverlayMask,
- EuiOutsideClickDetector,
- EuiSpacer,
- EuiCallOut,
- EuiIcon,
- EuiButtonIcon,
- EuiButtonEmpty,
- EuiToolTip
+  EuiBasicTable,
+  EuiLoadingContent,
+  EuiTableSortingType,
+  EuiFlexItem,
+  EuiFlexGroup,
+  Direction,
+  EuiOverlayMask,
+  EuiOutsideClickDetector,
+  EuiSpacer,
+  EuiCallOut,
+  EuiIcon,
+  EuiButtonIcon,
+  EuiButtonEmpty,
+  EuiToolTip,
 } from '@elastic/eui';
 import {
   IIndexPattern,
@@ -59,6 +59,11 @@ import { getDataPlugin, getToasts, getUiSettings } from '../../../../kibana-serv
 const mapStateToProps = (state) => ({
   currentAgentData: state.appStateReducers.currentAgentData,
 });
+
+interface ColumnDefinition {
+  field: string;
+  label?: string;
+}
 
 export const Discover = compose(
   withErrorBoundary,
@@ -104,7 +109,8 @@ export const Discover = compose(
       updateTotalHits: Function;
       openIntelligence: Function;
       includeFilters?: string;
-      initialColumns: string[];
+      initialColumns: ColumnDefinition[];
+      initialAgentColumns?: ColumnDefinition[];
       shareFilterManager: FilterManager;
       shareFilterManagerWithUserAuthorized: Filter[];
       refreshAngularDiscover?: number;
@@ -137,21 +143,6 @@ export const Discover = compose(
       };
 
       this.wazuhConfig = new WazuhConfig();
-      this.nameEquivalences = {
-        'agent.id': 'Agent',
-        'agent.name': 'Agent name',
-        'syscheck.event': 'Action',
-        'rule.id': 'Rule ID',
-        'rule.description': 'Description',
-        'rule.level': 'Level',
-        'rule.mitre.id': 'Technique(s)',
-        'rule.mitre.tactic': 'Tactic(s)',
-        'rule.pci_dss': 'PCI DSS',
-        'rule.gdpr': 'GDPR',
-        'rule.nist_800_53': 'NIST 800-53',
-        'rule.tsc': 'TSC',
-        'rule.hipaa': 'HIPAA',
-      };
 
       this.hideCreateCustomLabel.bind(this);
       this.onQuerySubmit.bind(this);
@@ -249,16 +240,23 @@ export const Discover = compose(
       }
     }
 
-    getColumns() {
+    getInnitialDefinitions() {
       if (this.props.currentAgentData.id) {
-        return this.props.initialColumns.filter(
-          (column) => !['agent.id', 'agent.name'].includes(column)
-        );
+        return this.props.initialAgentColumns || this.props.initialColumns;
       } else {
-        const columns = [...this.props.initialColumns];
-        columns.splice(2, 0, 'agent.id');
-        columns.splice(3, 0, 'agent.name');
-        return columns;
+        return this.props.initialColumns;
+      }
+    }
+    getColumns() {
+      //Extract array of terms from object
+      return this.getInnitialDefinitions().map((column) => column.field);
+    }
+    getLabel(field) {
+      const innitialLabels = this.getInnitialDefinitions().filter((value) => value.field === field);
+      if (innitialLabels.length) {
+        return innitialLabels[0].label || field;
+      } else {
+        return field;
       }
     }
 
@@ -548,7 +546,7 @@ export const Discover = compose(
               }}
               style={{ display: 'inline-flex' }}
             >
-              {this.nameEquivalences[item] || item}{' '}
+              {this.getLabel(item)}{' '}
               {this.state.hover === item && (
                 <EuiToolTip position="top" content={`Remove column`}>
                   <EuiButtonIcon
@@ -738,71 +736,83 @@ export const Discover = compose(
 
       const columns = this.columns();
 
-    const sorting: EuiTableSortingType<{}> = {
-      sort: {
-        //@ts-ignore
-        field: this.state.sortField,
-        direction: this.state.sortDirection,
-      }
-    };
-    const pagination = {
-      pageIndex: this.state.pageIndex,
-      pageSize: this.state.pageSize,
-      totalItemCount: this.state.total > 10000 ? 10000 : this.state.total,
-      pageSizeOptions: [10, 25, 50],
-    };
-    const noResultsText = `No results match for this search criteria`;
-    let flyout = this.state.showMitreFlyout ? <EuiOverlayMask headerZindexLocation="below">
-      <EuiOutsideClickDetector onOutsideClick={this.closeMitreFlyout}>
-        <div>{/* EuiOutsideClickDetector needs a static first child */}
-          <FlyoutTechnique
-            openDashboard={(e, itemId) => this.openDashboard(e, itemId)}
-            openDiscover={(e, itemId) => this.openDiscover(e, itemId)}
-            onChangeFlyout={this.onMitreChangeFlyout}
-            currentTechnique={this.state.selectedTechnique} />
+      const sorting: EuiTableSortingType<{}> = {
+        sort: {
+          //@ts-ignore
+          field: this.state.sortField,
+          direction: this.state.sortDirection,
+        },
+      };
+      const pagination = {
+        pageIndex: this.state.pageIndex,
+        pageSize: this.state.pageSize,
+        totalItemCount: this.state.total > 10000 ? 10000 : this.state.total,
+        pageSizeOptions: [10, 25, 50],
+      };
+      const noResultsText = `No results match for this search criteria`;
+      let flyout = this.state.showMitreFlyout ? (
+        <EuiOverlayMask headerZindexLocation="below">
+          <EuiOutsideClickDetector onOutsideClick={this.closeMitreFlyout}>
+            <div>
+              {/* EuiOutsideClickDetector needs a static first child */}
+              <FlyoutTechnique
+                openDashboard={(e, itemId) => this.openDashboard(e, itemId)}
+                openDiscover={(e, itemId) => this.openDiscover(e, itemId)}
+                onChangeFlyout={this.onMitreChangeFlyout}
+                currentTechnique={this.state.selectedTechnique}
+              />
+            </div>
+          </EuiOutsideClickDetector>
+        </EuiOverlayMask>
+      ) : (
+        <></>
+      );
+      return (
+        <div className="wz-discover hide-filter-control wz-inventory">
+          {this.props.kbnSearchBar && (
+            <KbnSearchBar
+              indexPattern={this.indexPattern}
+              filterManager={this.props.shareFilterManager}
+              timeFilter={{
+                timeFilter: this.state.dateRange,
+                timeHistory: this.state.dateRangeHistory,
+                setTimeFilter: (dateRange) => this.setState({ dateRange }),
+              }}
+              onQuerySubmit={this.onQuerySubmit}
+              onFiltersUpdated={this.onFiltersUpdated}
+              query={query}
+            />
+          )}
+          {total ? (
+            <EuiFlexGroup>
+              <EuiFlexItem>
+                {this.state.alerts.length && (
+                  <EuiBasicTable
+                    items={this.state.alerts.map((alert) => ({ ...alert._source, _id: alert._id }))}
+                    className="module-discover-table"
+                    itemId="_id"
+                    itemIdToExpandedRowMap={itemIdToExpandedRowMap}
+                    isExpandable={true}
+                    columns={columns}
+                    rowProps={getRowProps}
+                    pagination={pagination}
+                    sorting={sorting}
+                    onChange={this.onTableChange}
+                  />
+                )}
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          ) : (
+            <EuiFlexGroup>
+              <EuiFlexItem>
+                <EuiSpacer size="s" />
+                <EuiCallOut title={noResultsText} color="warning" iconType="alert" />
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          )}
+          {flyout}
         </div>
-      </EuiOutsideClickDetector>
-    </EuiOverlayMask> : <></>;
-    return (
-      <div
-        className='wz-discover hide-filter-control wz-inventory' >
-        {this.props.kbnSearchBar && <KbnSearchBar
-          indexPattern={this.indexPattern}
-          filterManager={this.props.shareFilterManager}
-          timeFilter={{timeFilter:this.state.dateRange,
-            timeHistory:this.state.dateRangeHistory,
-            setTimeFilter:(dateRange)=> this.setState({dateRange})}}
-          onQuerySubmit={this.onQuerySubmit}
-          onFiltersUpdated={this.onFiltersUpdated}
-          query={query} />
-        }
-        {total
-          ? <EuiFlexGroup>
-            <EuiFlexItem>
-              {this.state.alerts.length && (
-                <EuiBasicTable
-                  items={this.state.alerts.map(alert => ({...alert._source, _id: alert._id}))}
-                  className="module-discover-table"
-                  itemId="_id"
-                  itemIdToExpandedRowMap={itemIdToExpandedRowMap}
-                  isExpandable={true}
-                  columns={columns}
-                  rowProps={getRowProps}
-                  pagination={pagination}
-                  sorting={sorting}
-                  onChange={this.onTableChange}
-                />
-              )}
-            </EuiFlexItem>
-          </EuiFlexGroup>
-          : <EuiFlexGroup>
-            <EuiFlexItem>
-              <EuiSpacer size="s" />
-              <EuiCallOut title={noResultsText} color="warning" iconType="alert" />
-            </EuiFlexItem>
-          </EuiFlexGroup>
-        }
-        {flyout}
-      </div>);
+      );
+    }
   }
-});
+);

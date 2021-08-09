@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Index for agent prompts components
+ * Wazuh app - Module buttons components
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -9,9 +9,5 @@
  *
  * Find more information about this on the LICENSE file.
  */
-export * from './prompt-agent-no-support-module';
-export * from './prompt-no-active-agent';
-export * from './prompt-no-selected-agent';
-export * from './prompt-select-agent';
-export * from './prompt-agent-feature-version';
-export * from './prompt_module_not_for_agent';
+
+export * from './generate_report';
