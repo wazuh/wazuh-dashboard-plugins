@@ -42,6 +42,8 @@ import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 
+const MITRE_ATTACK = 'mitre-attack'
+
 export const Techniques = withWindowSize(
   class Techniques extends Component {
     _isMount = false;
@@ -252,9 +254,10 @@ export const Techniques = withWindowSize(
         const mitreObj = this.state.mitreTechniques.find((item) => item.id === element);
         if (mitreObj) {
           const mitreTechniqueName = mitreObj.name;
-          const mitreTechniqueID = mitreObj.references.find(
-            (item) => item.source === 'mitre-attack'
-          ).external_id;
+          const mitreTechniqueID =
+            mitreObj.source === MITRE_ATTACK
+              ? mitreObj.external_id
+              : mitreObj.references.find((item) => item.source === MITRE_ATTACK).external_id;
           mitreTechniqueID
             ? techniquesObj.push({ id: mitreTechniqueID, name: mitreTechniqueName })
             : '';
@@ -462,7 +465,7 @@ export const Techniques = withWindowSize(
           });
           const filteredTechniques = (((response || {}).data || {}).data.affected_items || []).map(
             (item) =>
-              item.references.filter((reference) => reference.source === 'mitre-attack')[0]
+              item.references.filter((reference) => reference.source === MITRE_ATTACK)[0]
                 .external_id
           );
           this._isMount && this.setState({ filteredTechniques, isSearching: false });
