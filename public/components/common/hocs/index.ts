@@ -21,3 +21,4 @@ export * from './withButtonOpenOnClick';
 export * from './withAgentSupportModule';
 export * from './withUserLogged';
 export * from './error-boundary/with-error-boundary';
+export * from './with_module_tab_loader';
