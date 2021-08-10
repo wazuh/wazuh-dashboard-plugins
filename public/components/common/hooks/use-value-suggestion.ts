@@ -22,7 +22,6 @@ import {
 } from '../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
-import { useFilterManager } from '.';
 
 export interface IValueSuggestion {
   suggestedValues: string[] | boolean[];
@@ -40,7 +39,7 @@ export const useValueSuggestion = (
   const [isLoading, setIsLoading] = useState(true);
   const data = getDataPlugin();
   const indexPattern = useIndexPattern();
-  const { filters } = useFilterManager();
+  //const { filters } = useFilterManager();
 
   const getOptions = (): string[] => {
     return options?.filter((element) => element.toLowerCase().includes(query.toLowerCase())) || [];
@@ -57,23 +56,6 @@ export const useValueSuggestion = (
   };
 
   useEffect(() => {
-    const boolFilter = filters
-      .filter(
-        (managedFilter) =>
-          managedFilter &&
-          managedFilter.query &&
-          managedFilter.query.match &&
-          Object.keys(managedFilter.query.match)[0] !== filterField
-      )
-      .map((managedFilter) => {
-        return {
-          term: {
-            [Object.keys(managedFilter.query.match)[0]]:
-              managedFilter.query.match[Object.keys(managedFilter.query.match)[0]].query,
-          },
-        };
-      });
-
     if (indexPattern) {
       setIsLoading(true);
       (async () => {
@@ -101,7 +83,7 @@ export const useValueSuggestion = (
         }
       })();
     }
-  }, [indexPattern, query, filterField, type, filters]);
+  }, [indexPattern, query, filterField, type]);
 
   return { suggestedValues, isLoading, setQuery };
 };
