@@ -74,6 +74,7 @@ import { WzRequest } from '../../../../../react-services/wz-request';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
+import { WzConfigurationOffice365 } from './office365/office365';
 
 class WzConfigurationSwitch extends Component {
   constructor(props) {
@@ -156,7 +157,7 @@ class WzConfigurationSwitch extends Component {
         this.setState({ loadingOverview: true });
         const masterNodeInfo = await WzRequest.apiReq('GET', '/agents', { params: { q: 'id=000'}});
         this.setState({
-          masterNodeInfo: masterNodeInfo.data.affected_items[0]
+          masterNodeInfo: masterNodeInfo.data.data.affected_items[0]
         });
         this.setState({ loadingOverview: false });
       }catch(error){
@@ -426,6 +427,14 @@ class WzConfigurationSwitch extends Component {
                   updateConfigurationSection={this.updateConfigurationSection}
                 />
               </WzViewSelectorSwitch>
+              <WzViewSelectorSwitch view="office365">
+                <WzConfigurationOffice365
+                  clusterNodeSelected={this.props.clusterNodeSelected}
+                  agent={agent}
+                  updateBadge={this.updateBadge}
+                  updateConfigurationSection={this.updateConfigurationSection}
+                />
+              </WzViewSelectorSwitch>
             </WzViewSelector>
           )}
         </EuiPanel>
@@ -448,8 +457,8 @@ const mapDispatchToProps = dispatch => ({
 });
 
 export default compose(
-  withUserAuthorizationPrompt((props) => [props.agent.id === '000' ? 
-  {action: 'manager:read', resource: '*:*:*'} : 
+  withUserAuthorizationPrompt((props) => [props.agent.id === '000' ?
+  {action: 'manager:read', resource: '*:*:*'} :
   [
     {action: 'agent:read', resource: `agent:id:${props.agent.id}`},
     ...(props.agent.group || []).map(group => ({ action: 'agent:read', resource: `agent:group:${group}` }))
