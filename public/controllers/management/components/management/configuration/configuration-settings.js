@@ -213,6 +213,13 @@ export default [
         description:
           'Detect threats targeting GitHub organizations',
         goto: 'github'
+      },
+      {
+        name: 'Office 365',
+        description:
+          'Configuration options of the Office 365 module',
+        goto: 'office365',
+        when: 'manager'
       }
     ]
   }
