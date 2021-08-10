@@ -162,14 +162,12 @@ export const Discover = compose(
     async componentDidMount() {
       this._isMount = true;
       try {
-        this.timeSubscription = this.timefilter
-          .getTimeUpdate$()
-          .subscribe(() => {
-            this.setState({
-              dateRange: this.timefilter.getTime(),
-              dateRangeHistory: this.timefilter._history,
-            });
+        this.timeSubscription = this.timefilter.getTimeUpdate$().subscribe(() => {
+          this.setState({
+            dateRange: this.timefilter.getTime(),
+            dateRangeHistory: this.timefilter._history,
           });
+        });
         this.setState({ columns: this.getColumns() }); //initial columns
         await this.getIndexPattern();
         await this.getAlerts();
