@@ -15,7 +15,6 @@ import { VisCard } from '../../../common/modules/panel/';
 import { EuiFlexGroup, EuiFlexItem, EuiPanel } from '@elastic/eui';
 import { SecurityAlerts } from '../../../visualize/components';
 
-
 export const DrilldownConfigAction = {
   rows: [
     {
@@ -23,30 +22,40 @@ export const DrilldownConfigAction = {
       columns: [
         {
           width: 30,
-          component: (props) => <VisCard id='Wazuh-App-Overview-GitHub-Top-Ten-Actors' tab='github' {...props} />
+          component: (props) => (
+            <VisCard id="Wazuh-App-Overview-GitHub-Top-Ten-Actors" tab="github" {...props} />
+          ),
         },
         {
           width: 30,
-          component: (props) => <VisCard id='Wazuh-App-Overview-GitHub-Top-Ten-Repositories' tab='github' {...props} />
+          component: (props) => (
+            <VisCard id="Wazuh-App-Overview-GitHub-Top-Ten-Repositories" tab="github" {...props} />
+          ),
         },
         {
           width: 30,
-          component: (props) => <VisCard id='Wazuh-App-Overview-GitHub-Top-Ten-Organizations' tab='github' {...props} />
+          component: (props) => (
+            <VisCard id="Wazuh-App-Overview-GitHub-Top-Ten-Organizations" tab="github" {...props} />
+          ),
         },
-      ]
+      ],
     },
     {
       height: 300,
       columns: [
         {
           width: 50,
-          component: (props) => <VisCard id='Wazuh-App-Overview-GitHub-Countries' tab='github' {...props} />
+          component: (props) => (
+            <VisCard id="Wazuh-App-Overview-GitHub-Countries" tab="github" {...props} />
+          ),
         },
         {
           width: 50,
-          component: (props) => <VisCard id='Wazuh-App-Overview-GitHub-Alert-Level-Evolution' tab='github' {...props} />
+          component: (props) => (
+            <VisCard id="Wazuh-App-Overview-GitHub-Alert-Level-Evolution" tab="github" {...props} />
+          ),
         },
-      ]
+      ],
     },
     {
       columns: [
@@ -55,14 +64,23 @@ export const DrilldownConfigAction = {
           component: () => (
             <EuiFlexItem>
               <EuiPanel paddingSize={'s'}>
-                <SecurityAlerts 
-                  initialColumns={["icon", "timestamp", 'rule.description', 'data.github.org', 'data.github.repo', 'data.github.actor', 'rule.level', 'rule.id']}
+                <SecurityAlerts
+                  initialColumns={[
+                    { field: 'icon' },
+                    { field: 'timestamp' },
+                    { field: 'rule.description' },
+                    { field: 'data.github.org', label: 'Organization' },
+                    { field: 'data.github.repo', label: 'Repository' },
+                    { field: 'data.github.actor', label: 'Actor' },
+                    { field: 'rule.level' },
+                    { field: 'rule.id' },
+                  ]}
                 />
               </EuiPanel>
             </EuiFlexItem>
-          )
+          ),
         },
-      ]
+      ],
     },
-  ]
+  ],
 };
