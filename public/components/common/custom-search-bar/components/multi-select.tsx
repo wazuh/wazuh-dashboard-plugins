@@ -71,14 +71,14 @@ export const MultiSelect = ({ item, onChange, selectedOptions, onRemove }) => {
 
   const toggleFilter = (item) => {
     item.checked = item.checked === ON ? OFF : ON;
-    updateFilters();
+    updateFilters(item.value);
   };
 
-  const updateFilters = () => {
+  const updateFilters = (id) => {
     const selectedItems = items.filter((item) => item.checked === ON);
     setActiveFilters(selectedItems.length);
     if (selectedItems.length) {
-      onChange(selectedItems);
+      onChange(selectedItems,id);
     } else {
       onRemove(item.key);
     }

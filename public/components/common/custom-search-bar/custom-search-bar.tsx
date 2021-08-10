@@ -12,7 +12,7 @@ import { EuiFlexGroup, EuiFlexItem, EuiSwitch } from '@elastic/eui';
 
 //@ts-ignore
 import { KbnSearchBar } from '../../kbn-search-bar';
-import { Combobox, MultiSelect } from './components';
+import { MultiSelect } from './components';
 import { useFilterManager, useIndexPattern } from '../hooks';
 
 export const CustomSearchBar = ({ filtersValues, ...props }) => {
@@ -28,7 +28,7 @@ export const CustomSearchBar = ({ filtersValues, ...props }) => {
   };
   const [avancedFiltersState, setAvancedFiltersState] = useState(false);
   const [selectedOptions, setSelectedOptions] = useState(defaultSelectedOptions);
-  const [values, setValues] = useState([]);
+  const [values, setValues] = useState(Array);
   const [selectReference, setSelectReference] = useState('');
 
   useEffect(() => {
@@ -52,11 +52,11 @@ export const CustomSearchBar = ({ filtersValues, ...props }) => {
     const newFilters = values.map((element) => ({
       match_phrase: {
         [element.value]: {
-          query: element.label,
+          query: element.filterByKey ? element.key : element.label,
         },
       },
     }));
-    const params = values.map((item) => item.label);
+    const params = values.map((item) => item.filterByKey ? item.key : item.label);
     const meta: FilterMeta = {
       disabled: false,
       negate: false,
@@ -119,7 +119,8 @@ export const CustomSearchBar = ({ filtersValues, ...props }) => {
     }
   };
 
-  const onChange = (values: any[]) => {
+  const onChange = (values: any[], id: string) => {
+    setSelectReference(id)
     setValues(values);
   };
 
@@ -133,13 +134,6 @@ export const CustomSearchBar = ({ filtersValues, ...props }) => {
   const getComponent = (item: any) => {
     const types: { [key: string]: object } = {
       default: <></>,
-      combobox: (
-        <Combobox
-          item={item}
-          selectedOptions={selectedOptions[item.key] || []}
-          onChange={onChange}
-        />
-      ),
       multiSelect: (
         <MultiSelect
           item={item}

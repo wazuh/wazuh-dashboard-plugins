@@ -22,11 +22,6 @@ export const filtersValues: {
 }[] = [
   {
     type: 'multiSelect',
-    key: 'data.office365.Actor.ID',
-    placeholder: 'Actor ID',
-  },
-  {
-    type: 'multiSelect',
     key: 'data.office365.Subscription',
     placeholder: 'Subscription',
   },
