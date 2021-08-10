@@ -21,20 +21,21 @@ export type GeneralTableProps = {
   wodleConfiguration: any;
 };
 
+const mainSettings = [
+  { field: 'enabled', label: 'Service status', render: renderValueYesThenEnabled },
+  {
+    field: 'only_future_events',
+    label: 'Collect events generated since Wazuh is initialized',
+  },
+  {
+    field: 'interval',
+    label:
+      'Interval between Office 365 wodle executions in seconds',
+  },
+  { field: 'curl_max_size', label: 'Maximum size allowed for the Office 365 API response' },
+];
+
 export const GeneralTab = ({ agent, wodleConfiguration }: GeneralTableProps) => {
-  const mainSettings = [
-    { field: 'enabled', label: 'Enabled', render: renderValueYesThenEnabled },
-    {
-      field: 'only_future_events',
-      label: 'Collect events generated since Wazuh is initialized',
-    },
-    {
-      field: 'interval',
-      label:
-        'Interval between Office 365 wodle executions in seconds',
-    },
-    { field: 'curl_max_size', label: 'Maximum size allowed for the Office 365 API response' },
-  ];
 
   return (
     <WzConfigurationSettingsTabSelector
