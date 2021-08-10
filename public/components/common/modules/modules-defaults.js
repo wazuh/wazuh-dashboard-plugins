@@ -66,7 +66,6 @@ export const ModulesDefaults = {
   office: {
     init: 'dashboard',
     tabs: [
-      // { id: 'inventory', name: 'Panel', buttons: [ButtonModuleExploreAgent],  component: OfficePanel }, 
       { id: 'inventory', name: 'Panel', buttons: [ButtonModuleExploreAgent],  component: withModuleNotForAgent(OfficePanel)}, 
       { id: 'dashboard', name: 'Dashboard', buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport], component: withModuleNotForAgent(Dashboard)}, 
     EventsTab],
