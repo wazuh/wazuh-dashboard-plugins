@@ -31,7 +31,7 @@ const settings = [
         {title: 'Path file of client secret', description: v.client_secret_path},
       ].filter(item => typeof item.description !== 'undefined')}/>
     </EuiPanel>
-  )},
+  ).reduce((prev, cur) => [prev, <div style={{marginTop: '8px'}} /> , cur], [])},
   { field: 'subscriptions', label: 'Subscriptions', render: (value) => value
     .map(v => <EuiDescriptionList key={`module_configuration_subscriptions_${v}`}>{v}</EuiDescriptionList>)
   }
