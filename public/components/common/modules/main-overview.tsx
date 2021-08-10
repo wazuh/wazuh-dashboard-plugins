@@ -146,7 +146,7 @@ export const MainModuleOverview = connect(mapStateToProps)(class MainModuleOverv
 
   render() {
     const { section, selectView } = this.props;
-    const ModuleTabView = this.props.tabs.find(tab => tab.id === selectView);
+    const ModuleTabView = (this.props.tabs ||[]).find(tab => tab.id === selectView);
     return (
       <div className={this.state.showAgentInfo ? 'wz-module wz-module-showing-agent' : 'wz-module'}>
         <div className={this.props.tabs && this.props.tabs.length && 'wz-module-header-nav'}>
