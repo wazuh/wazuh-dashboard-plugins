@@ -39,7 +39,7 @@ export const ApiAuthTab = ({ agent, wodleConfiguration }: ApiAuthProps) => {
     <WzConfigurationSettingsTabSelector
       title="Credentials for the authentication with the API"
       currentConfig={wodleConfiguration}
-      minusHeight={agent.id === '000' ? 260 : 320}
+      minusHeight={agent.id === '000' ? 370 : 320}
       helpLinks={HELP_LINKS}
     >
       <WzConfigurationSettingsListSelector
