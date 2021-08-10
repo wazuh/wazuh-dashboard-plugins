@@ -15,19 +15,23 @@
 
 export const filtersValues = [
   {
-    type: 'combobox',
+    type: 'multiSelect',
     key: 'data.github.actor',
+    placeholder: 'Actor',
   },
   {
-    type: 'combobox',
+    type: 'multiSelect',
     key: 'data.github.org',
+    placeholder: 'Organization',
   },
   {
-    type: 'combobox',
+    type: 'multiSelect',
     key: 'data.github.repo',
+    placeholder: 'Repository',
   },
   {
-    type: 'combobox',
+    type: 'multiSelect',
     key: 'data.github.action',
+    placeholder: 'Action',
   },
 ];
