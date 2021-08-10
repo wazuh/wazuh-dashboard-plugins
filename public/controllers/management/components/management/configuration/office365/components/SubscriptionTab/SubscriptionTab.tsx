@@ -27,7 +27,7 @@ export const SubscriptionTab = ({ agent, wodleConfiguration }: SubscriptionTabPr
     <WzConfigurationSettingsTabSelector
       title="Subscriptions list"
       currentConfig={wodleConfiguration}
-      minusHeight={agent.id === '000' ? 260 : 320}
+      minusHeight={agent.id === '000' ? 370 : 320}
       helpLinks={HELP_LINKS}
     >
       <EuiBasicTable

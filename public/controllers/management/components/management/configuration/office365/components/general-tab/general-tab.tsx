@@ -41,7 +41,7 @@ export const GeneralTab = ({ agent, wodleConfiguration }: GeneralTableProps) => 
       title="Main settings"
       description="Configuration for the Office 365 module"
       currentConfig={wodleConfiguration}
-      minusHeight={agent.id === '000' ? 260 : 320}
+      minusHeight={agent.id === '000' ? 370 : 320}
       helpLinks={HELP_LINKS}
     >
       <WzConfigurationSettingsGroup config={wodleConfiguration[OFFICE_365]} items={mainSettings} />
