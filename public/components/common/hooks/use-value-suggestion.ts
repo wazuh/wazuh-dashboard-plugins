@@ -9,11 +9,11 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { useState, useEffect } from 'react';
+
+import React, { useEffect, useState } from 'react';
 import { getDataPlugin } from '../../../kibana-services';
-import { useIndexPattern } from '.';
+import { useIndexPattern } from '../hooks';
 import { IFieldType, IIndexPattern } from 'src/plugins/data/public';
-import React from 'react';
 import {
   UI_ERROR_SEVERITIES,
   UIErrorLog,
@@ -23,18 +23,36 @@ import {
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 
-export interface IValueSuggestiions {
+export interface IValueSuggestion {
   suggestedValues: string[] | boolean[];
   isLoading: boolean;
   setQuery: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export const useValueSuggestions = (filterField: string, type: 'string' | 'boolean' = 'string') : IValueSuggestiions => {
+export const useValueSuggestion = (
+  filterField: string,
+  options?: string[],
+  type: 'string' | 'boolean' = 'string'
+): IValueSuggestion => {
   const [suggestedValues, setSuggestedValues] = useState<string[] | boolean[]>([]);
   const [query, setQuery] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
   const data = getDataPlugin();
   const indexPattern = useIndexPattern();
+
+  const getOptions = (): string[] => {
+    return options?.filter((element) => element.toLowerCase().includes(query.toLowerCase())) || [];
+  };
+
+  const getValueSuggestions = async (field) => {
+    return options
+      ? getOptions()
+      : await data.autocomplete.getValueSuggestions({
+          query,
+          indexPattern: indexPattern as IIndexPattern,
+          field,
+        });
+  };
 
   useEffect(() => {
     if (indexPattern) {
@@ -46,16 +64,10 @@ export const useValueSuggestions = (filterField: string, type: 'string' | 'boole
           aggregatable: true,
         } as IFieldType;
         try {
-          setSuggestedValues(
-            await data.autocomplete.getValueSuggestions({
-              query,
-              indexPattern: indexPattern as IIndexPattern,
-              field,
-            })
-          );
+          setSuggestedValues(await getValueSuggestions(field));
         } catch (error) {
           const options: UIErrorLog = {
-            context: `${useValueSuggestions.name}.valueSuggestions`,
+            context: `${useValueSuggestion.name}.getValueSuggestions`,
             level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
             severity: UI_ERROR_SEVERITIES.UI as UIErrorSeverity,
             error: {

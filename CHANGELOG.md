@@ -47,6 +47,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added a new hook for getting value suggestions [#3506](https://github.com/wazuh/wazuh-kibana-app/pull/3506)
 - Added configuration viewer for Module Office365 on Management > Configuration [3524](https://github.com/wazuh/wazuh-kibana-app/pull/3524)
 - Added base Module Panel view with Office365 setup [#3518](https://github.com/wazuh/wazuh-kibana-app/pull/3518)
+- Added specifics and custom filters for Office365 search bar [#3533](https://github.com/wazuh/wazuh-kibana-app/pull/3533)
 - Adding Pagination and filter to drilldown tables at Office pannel [#3544](https://github.com/wazuh/wazuh-kibana-app/issues/3544).
 
 ### Changed

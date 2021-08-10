@@ -25,4 +25,4 @@ export * from './use-app-config';
 export * from './useRootScope';
 export * from './use_async_action';
 export { useEsSearch } from './use-es-search';
-export { useValueSuggestions, IValueSuggestiions } from './use-value-suggestions';
+export { useValueSuggestion, IValueSuggestion } from './use-value-suggestion';

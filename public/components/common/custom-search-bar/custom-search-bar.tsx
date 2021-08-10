@@ -1,22 +1,23 @@
 import React, { useState, useEffect } from 'react';
-
 import { Filter } from '../../../../../../src/plugins/data/public/';
 import {
   FilterMeta,
   FilterState,
   FilterStateStore,
 } from '../../../../../../src/plugins/data/common';
+
 import { AppState } from '../../../react-services/app-state';
 
 import { EuiFlexGroup, EuiFlexItem, EuiSwitch } from '@elastic/eui';
 
 //@ts-ignore
 import { KbnSearchBar } from '../../kbn-search-bar';
-import { Combobox } from './components';
-import { useFilterManager } from '../hooks';
+import { MultiSelect } from './components';
+import { useFilterManager, useIndexPattern } from '../hooks';
 
 export const CustomSearchBar = ({ filtersValues, ...props }) => {
   const { filterManager, filters } = useFilterManager();
+  const indexPattern = useIndexPattern();
   const defaultSelectedOptions = () => {
     const array = [];
     filtersValues.forEach((item) => {
@@ -27,7 +28,7 @@ export const CustomSearchBar = ({ filtersValues, ...props }) => {
   };
   const [avancedFiltersState, setAvancedFiltersState] = useState(false);
   const [selectedOptions, setSelectedOptions] = useState(defaultSelectedOptions);
-  const [values, setValues] = useState([]);
+  const [values, setValues] = useState(Array);
   const [selectReference, setSelectReference] = useState('');
 
   useEffect(() => {
@@ -51,11 +52,11 @@ export const CustomSearchBar = ({ filtersValues, ...props }) => {
     const newFilters = values.map((element) => ({
       match_phrase: {
         [element.value]: {
-          query: element.label,
+          query: element.filterByKey ? element.key : element.label,
         },
       },
     }));
-    const params = values.map((item) => item.label);
+    const params = values.map((item) => item.filterByKey ? item.key : item.label);
     const meta: FilterMeta = {
       disabled: false,
       negate: false,
@@ -118,24 +119,31 @@ export const CustomSearchBar = ({ filtersValues, ...props }) => {
     }
   };
 
-  const onChange = (values: any[]) => {
+  const onChange = (values: any[], id: string) => {
+    setSelectReference(id)
     setValues(values);
   };
 
+  const onRemove = (filter) => {
+    const currentFilters = filterManager.getFilters().filter((item) => item.meta.key != filter);
+    filterManager.removeAll();
+    filterManager.addFilters(currentFilters);
+    refreshCustomSelectedFilter();
+  };
+
   const getComponent = (item: any) => {
-    const types = {
+    const types: { [key: string]: object } = {
       default: <></>,
-      combobox: (
-        <Combobox
-          id={item.key}
+      multiSelect: (
+        <MultiSelect
           item={item}
           selectedOptions={selectedOptions[item.key] || []}
           onChange={onChange}
-          onClick={() => setSelectReference(item.key)}
+          onRemove={onRemove}
         />
       ),
     };
-    return types[item.type] || types['default'];
+    return types[item.type] || types.default;
   };
 
   return (
@@ -145,7 +153,7 @@ export const CustomSearchBar = ({ filtersValues, ...props }) => {
         alignItems="center"
         style={{ margin: '0 8px' }}
       >
-        {avancedFiltersState === false
+        {!avancedFiltersState
           ? filtersValues.map((item, key) => (
               <EuiFlexItem key={key}>{getComponent(item)}</EuiFlexItem>
             ))

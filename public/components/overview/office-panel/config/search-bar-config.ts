@@ -11,17 +11,35 @@
  * Find more information about this on the LICENSE file.
  */
 
-export const filtersValues: { type: string; key: string }[] = [
+import { getCustomValueSuggestion } from './helpers/helper-value-suggestion';
+
+export const filtersValues: {
+  type: string;
+  key: string;
+  placeholder: string;
+  filterByKey?: boolean;
+  options?: string[];
+}[] = [
   {
-    type: 'combobox',
-    key: 'agent.id',
+    type: 'multiSelect',
+    key: 'data.office365.Subscription',
+    placeholder: 'Subscription',
   },
   {
-    type: 'combobox',
-    key: 'agent.name',
+    type: 'multiSelect',
+    key: 'data.office365.UserType',
+    placeholder: 'User Type',
+    filterByKey: true,
+    options: getCustomValueSuggestion('data.office365.UserType'),
   },
   {
-    type: 'combobox',
-    key: 'agent.ip',
+    type: 'multiSelect',
+    key: 'data.office365.ResultStatus',
+    placeholder: 'Result Status',
+  },
+  {
+    type: 'multiSelect',
+    key: 'data.office365.ClientIP',
+    placeholder: 'Client IP',
   },
 ];
