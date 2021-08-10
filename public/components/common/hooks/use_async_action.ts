@@ -20,6 +20,7 @@ export function useAsyncAction(action, dependencies = []){
     try{
       setRunning(true);
       setError(null);
+      setData(null);
       const data = await action(...params);
       setData(data);
     }catch(error){

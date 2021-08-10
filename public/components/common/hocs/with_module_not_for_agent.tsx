@@ -1,5 +1,5 @@
 /*
- * Wazuh app - React HOC to show a prompt when an agent doesn't support any module
+ * Wazuh app - React HOC to show a prompt when a module is not available for agents and let to unpin the agent
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -9,20 +9,21 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { PromptAgentNoSupportModule } from '../../agents/prompts';
-import { withGuard } from '../../common/hocs';
-import { hasAgentSupportModule } from '../../../react-services/wz-agents';
+
+import React from 'react';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
+import { withGuard } from './withGuard';
+import { PromptModuleNotForAgent } from '../../agents/prompts';
 
 const mapStateToProps = (state) => ({
   agent: state.appStateReducers.currentAgentData,
 });
 
-export const withAgentSupportModule = WrappedComponent => compose(
+export const withModuleNotForAgent = WrappedComponent => compose(
   connect(mapStateToProps),
   withGuard(
-    ({agent, moduleID}) => Object.keys(agent).length && !hasAgentSupportModule(agent, moduleID),
-    PromptAgentNoSupportModule
+    ({agent}) => agent?.id,
+    (props) => <PromptModuleNotForAgent title='Module not avaliable for agents' body='Remove the pinned agent.' {...props}/>
   )
-)(WrappedComponent)
+)(WrappedComponent);

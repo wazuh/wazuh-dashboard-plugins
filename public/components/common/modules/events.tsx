@@ -19,11 +19,16 @@ import { EuiButton, EuiFlexGroup, EuiFlexItem, EuiOverlayMask, EuiOutsideClickDe
 import { PatternHandler } from '../../../react-services/pattern-handler';
 import { enhanceDiscoverEventsCell } from './events-enhance-discover-fields';
 import { toMountPoint } from '../../../../../../src/plugins/kibana_react/public';
+import { withAgentSupportModule, withModuleTabLoader } from '../hocs';
+import { compose } from 'redux';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 
-export class Events extends Component {
+export const Events = compose(
+  withAgentSupportModule,
+  withModuleTabLoader
+)(class Events extends Component {
   intervalCheckExistsDiscoverTableTime: number = 200;
   isMount: boolean;
   state: {
@@ -292,4 +297,4 @@ export class Events extends Component {
       </Fragment>
     )
   }
-}
+})

@@ -1,6 +1,5 @@
 /*
- * Wazuh app - Index panel components.
- *
+ * Wazuh app - Module buttons components
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -11,8 +10,4 @@
  * Find more information about this on the LICENSE file.
  */
 
-export { ModuleSidePanel } from './module-side-panel';
-export { AggTable } from './agg-table';
-export { VisCard } from './vis-card';
-export { VisConfigLayout } from './vis-config-layout';
-export * from './module_configuration';
+export * from './generate_report';

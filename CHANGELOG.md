@@ -45,8 +45,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added sample data for office365 events [#3424](https://github.com/wazuh/wazuh-kibana-app/pull/3424)
 - Created a separate component to check for sample data [#3475](https://github.com/wazuh/wazuh-kibana-app/pull/3475)
 - Added a new hook for getting value suggestions [#3506](https://github.com/wazuh/wazuh-kibana-app/pull/3506)
-- Added base Module Panel view with Office365 setup [3518](https://github.com/wazuh/wazuh-kibana-app/pull/3518)
 - Added dinamic simple filters and adding simple GitHub filters fields [3531](https://github.com/wazuh/wazuh-kibana-app/pull/3531)
+- Adding Pagination and filter to drilldown tables at Office pannel [#3544](https://github.com/wazuh/wazuh-kibana-app/issues/3544)
 
 ### Changed
 
@@ -54,6 +54,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed empty fields in FIM tables and `syscheck.value_name` in discovery now show an empty tag for visual clarity [#3279](https://github.com/wazuh/wazuh-kibana-app/pull/3279)
 - Adapted the Mitre tactics and techniques resources to use the API endpoints [#3346](https://github.com/wazuh/wazuh-kibana-app/pull/3346)
 - Moved the filterManager subscription to the hook useFilterManager [#3517](https://github.com/wazuh/wazuh-kibana-app/pull/3517)
+- Change filter from is to is one of in custom searchbar [#3529](https://github.com/wazuh/wazuh-kibana-app/pull/3529)
+- Refactored as module tabs and buttons are rendered [#3494](https://github.com/wazuh/wazuh-kibana-app/pull/3494)
 
 ### Fixed
 

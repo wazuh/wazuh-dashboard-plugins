@@ -1,24 +1,22 @@
-import React, { useState, useEffect, useLayoutEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
-import { getIndexPattern } from '../../overview/mitre/lib';
 import { Filter } from '../../../../../../src/plugins/data/public/';
 import {
   FilterMeta,
   FilterState,
   FilterStateStore,
 } from '../../../../../../src/plugins/data/common';
+import { AppState } from '../../../react-services/app-state';
 
 import { EuiFlexGroup, EuiFlexItem, EuiSwitch } from '@elastic/eui';
 
 //@ts-ignore
-import { getDataPlugin } from '../../../kibana-services';
 import { KbnSearchBar } from '../../kbn-search-bar';
 import { Combobox } from './components';
 import { useFilterManager } from '../hooks';
 
 export const CustomSearchBar = ({ filtersValues, ...props }) => {
-  const { filterManager } = useFilterManager();
-  const indexPattern = getIndexPattern();
+  const { filterManager, filters } = useFilterManager();
   const defaultSelectedOptions = () => {
     const array = [];
     filtersValues.forEach((item) => {
@@ -29,6 +27,17 @@ export const CustomSearchBar = ({ filtersValues, ...props }) => {
   };
   const [avancedFiltersState, setAvancedFiltersState] = useState(false);
   const [selectedOptions, setSelectedOptions] = useState(defaultSelectedOptions);
+  const [values, setValues] = useState([]);
+  const [selectReference, setSelectReference] = useState('');
+
+  useEffect(() => {
+      setKibanaFilters(values, selectReference);
+      refreshCustomSelectedFilter();
+  }, [values]);
+
+  useEffect(() => {
+    onFiltersUpdated();
+  }, [filters]);
 
   const onFiltersUpdated = () => {
     refreshCustomSelectedFilter();
@@ -38,90 +47,91 @@ export const CustomSearchBar = ({ filtersValues, ...props }) => {
     setAvancedFiltersState((state) => !state);
   };
 
-  const buildCustomFilter = (
-    isPinned: boolean,
-    index?: any,
-    querySearch?: any,
-    key?: any
-  ): Filter => {
+  const buildCustomFilter = (isPinned: boolean, values?: any): Filter => {
+    const newFilters = values.map((element) => ({
+      match_phrase: {
+        [element.value]: {
+          query: element.label,
+        },
+      },
+    }));
+    const params = values.map((item) => item.label);
     const meta: FilterMeta = {
       disabled: false,
       negate: false,
-      key: key,
-      params: { query: querySearch },
+      key: values[0].value,
+      params: params,
       alias: null,
-      type: 'phrase',
-      index,
+      type: 'phrases',
+      value: params.join(','),
+      index: AppState.getCurrentPattern(),
     };
     const $state: FilterState = {
       store: isPinned ? FilterStateStore.GLOBAL_STATE : FilterStateStore.APP_STATE,
     };
     const query = {
-      match: {
-        [key]: {
-          query: querySearch,
-          type: 'phrase',
-        },
+      bool: {
+        minimum_should_match: 1,
+        should: newFilters,
       },
     };
 
     return { meta, $state, query };
   };
 
-  const setKibanaFilters = (values: any[]) => {
-    const newFilters = [];
+  const setKibanaFilters = (values: any[], selectReference: String) => {
     const currentFilters = filterManager
       .getFilters()
-      .filter((item) => item.meta.key != values[0].value);
+      .filter((item) => item.meta.key != selectReference);
     filterManager.removeAll();
     filterManager.addFilters(currentFilters);
-    values.forEach((element) => {
-      const customFilter = buildCustomFilter(
-        false,
-        indexPattern.title,
-        element.label,
-        element.value
-      );
-      newFilters.push(customFilter);
-    });
-    filterManager.addFilters(newFilters);
+    if (values.length != 0) {
+      const customFilter = buildCustomFilter(false, values);
+      filterManager.addFilters(customFilter);
+    }
   };
 
   const refreshCustomSelectedFilter = () => {
     setSelectedOptions(defaultSelectedOptions);
-    const filters = filterManager.getFilters();
-    const filterCustom = filters
-      .map((item) => {
-        return {
-          value: item.meta.key,
-          label: item.meta.params.query,
-        };
-      })
-      .filter((element) => Object.keys(selectedOptions).includes(element.value));
+    const filters =
+      filterManager
+        .getFilters()
+        .filter(
+          (item) =>
+            item.meta.type === 'phrases' && Object.keys(selectedOptions).includes(item.meta.key)
+        )
+        .map((element) => ({ params: element.meta.params, key: element.meta.key })) || [];
 
+    const getFilterCustom = (item) => {
+      return item.params.map((element) => ({ label: element, value: item.key }));
+    };
+    const filterCustom = filters.map((item) => getFilterCustom(item)) || [];
     if (filterCustom.length != 0) {
       filterCustom.forEach((item) => {
-        setSelectedOptions((prevState) => ({
-          ...prevState,
-          [item.value]: [...prevState[item.value], item],
-        }));
+        item.forEach((element) => {
+          setSelectedOptions((prevState) => ({
+            ...prevState,
+            [element.value]: [...prevState[element.value], element],
+          }));
+        });
       });
     }
   };
 
   const onChange = (values: any[]) => {
-    setKibanaFilters(values);
-    refreshCustomSelectedFilter();
+    setValues(values);
   };
 
   const getComponent = (item: any) => {
-    var types = {
+    const types = {
       default: <></>,
       combobox: (
         <Combobox
+          id={item.key}
           item={item}
           selectedOptions={selectedOptions[item.key] || []}
           onChange={onChange}
+          onClick={() => setSelectReference(item.key)}
         />
       ),
     };

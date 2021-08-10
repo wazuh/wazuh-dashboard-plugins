@@ -4,13 +4,14 @@ import '../../common/modules/module.scss';
 import { connect } from 'react-redux';
 import { PromptNoSelectedAgent, PromptNoActiveAgent } from '../prompts';
 import { compose } from 'redux';
-import { withGuard, withUserAuthorizationPrompt } from '../../common/hocs';
+import { withGuard, withUserAuthorizationPrompt, withAgentSupportModule } from '../../common/hocs';
 
 const mapStateToProps = (state) => ({
   currentAgentData: state.appStateReducers.currentAgentData,
 });
 
 export const MainVuls = compose(
+  withAgentSupportModule,
   connect(mapStateToProps),
   withGuard(
     (props) => !((props.currentAgentData && props.currentAgentData.id) && props.agent),
