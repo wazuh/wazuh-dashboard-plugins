@@ -119,6 +119,7 @@ export const Discover = compose(
       super(props);
       this.KibanaServices = getDataPlugin();
       this.timefilter = this.KibanaServices.query.timefilter.timefilter;
+      this.timeSubscription = null;
       this.state = {
         sort: {},
         selectedTechnique: '',
@@ -161,6 +162,14 @@ export const Discover = compose(
     async componentDidMount() {
       this._isMount = true;
       try {
+        this.timeSubscription = this.timefilter
+          .getTimeUpdate$()
+          .subscribe(() => {
+            this.setState({
+              dateRange: this.timefilter.getTime(),
+              dateRangeHistory: this.timefilter._history,
+            });
+          });
         this.setState({ columns: this.getColumns() }); //initial columns
         await this.getIndexPattern();
         await this.getAlerts();
@@ -182,6 +191,7 @@ export const Discover = compose(
 
     componentWillUnmount() {
       this._isMount = false;
+      this.timeSubscription && this.timeSubscription.unsubscribe();
     }
 
     async componentDidUpdate(prevProps, prevState) {
