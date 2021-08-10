@@ -156,7 +156,7 @@ class WzConfigurationSwitch extends Component {
         this.setState({ loadingOverview: true });
         const masterNodeInfo = await WzRequest.apiReq('GET', '/agents', { params: { q: 'id=000'}});
         this.setState({
-          masterNodeInfo: masterNodeInfo.data.affected_items[0]
+          masterNodeInfo: masterNodeInfo.data.data.affected_items[0]
         });
         this.setState({ loadingOverview: false });
       }catch(error){
