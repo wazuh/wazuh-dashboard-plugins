@@ -172,12 +172,9 @@ export class OverviewController {
       this.initialFilter = false;
       this.agentsSelectionProps.initialFilter = false;
     }
-    if (!agentList) {
-      this.isAgent = agentList ? agentList[0] : false;
-      this.$scope.isAgentText = this.isAgent && agentList?.length === 1 ?
-        ` of agent ${agentList.toString()}` : this.isAgent && agentList?.length > 1 ? ` of ${agentList?.length.toString()} agents`
-          : false;
-      if (agentList && agentList.length) {
+    this.isAgent = agentList && agentList.length ? agentList[0] : false;
+    this.$scope.isAgentText = this.isAgent && agentList.length === 1 ? ` of agent ${agentList.toString()}` : this.isAgent && agentList.length > 1 ? ` of ${agentList.length.toString()} agents` : false;
+    if (agentList && agentList.length) {
         await this.visFactoryService.buildAgentsVisualizations(
           this.filterHandler,
           this.tab,
@@ -186,22 +183,22 @@ export class OverviewController {
           (this.tabView === 'discover' || this.oldFilteredTab === this.tab)
         );
         this.oldFilteredTab = this.tab;
-      } else if (!agentList && this.tab !== 'welcome') {
-        if (!store.getState().appStateReducers.currentAgentData.id) {
-          await this.visFactoryService.buildOverviewVisualizations(
-            this.filterHandler,
-            this.tab,
-            this.tabView,
-            (this.tabView === 'discover' || this.oldFilteredTab === this.tab)
-          );
-          this.oldFilteredTab = this.tab;
-        }
+    } else if (!agentList && this.tab !== 'welcome') {
+      if (!store.getState().appStateReducers.currentAgentData.id) {
+        await this.visFactoryService.buildOverviewVisualizations(
+          this.filterHandler,
+          this.tab,
+          this.tabView,
+          (this.tabView === 'discover' || this.oldFilteredTab === this.tab)
+        );
+        this.oldFilteredTab = this.tab;
       }
-      setTimeout(() => { this.$location.search('agentId', store.getState().appStateReducers.currentAgentData.id ? String(store.getState().appStateReducers.currentAgentData.id) : null) }, 1);
-
-      this.visualizeProps["isAgent"] = agentList ? agentList[0] : false;
-      this.$rootScope.$applyAsync();
     }
+    setTimeout(() => { this.$location.search('agentId', store.getState().appStateReducers.currentAgentData.id ? String(store.getState().appStateReducers.currentAgentData.id) : null) }, 1);
+
+    this.visualizeProps["isAgent"] = agentList ? agentList[0] : false;
+    this.$rootScope.$applyAsync();
+
   }
 
   // Switch subtab
