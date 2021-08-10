@@ -44,11 +44,6 @@ export const getAgentSections = (menuAgent) => {
       text: 'Integrity monitoring',
       isPin: menuAgent.fim ? menuAgent.fim : false,
     },
-    office: { 
-      id: WAZUH_MODULES_ID.OFFICE_365, 
-      text: 'Office 365', 
-      isPin: menuAgent.office ? menuAgent.office : false 
-    },
     aws: {
       id: WAZUH_MODULES_ID.AMAZON_WEB_SERVICES,
       text: 'Amazon AWS',

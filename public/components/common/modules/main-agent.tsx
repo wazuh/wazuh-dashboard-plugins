@@ -242,7 +242,7 @@ export class MainModuleAgent extends Component {
   render() {
     const { agent, section, selectView } = this.props;
     const title = this.renderTitle();
-    const ModuleTabView = this.props.tabs.find(tab => tab.id === selectView);
+    const ModuleTabView = (this.props.tabs || []).find(tab => tab.id === selectView);
     return (
       <div className={this.state.showAgentInfo ? 'wz-module wz-module-showing-agent' : 'wz-module'}>
         <div className='wz-module-header-agent-wrapper'>

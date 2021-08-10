@@ -348,3 +348,4 @@ export const UI_TOAST_COLOR = {
   WARNING: 'warning',
   DANGER: 'danger',
 };
+

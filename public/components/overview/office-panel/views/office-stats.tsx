@@ -15,9 +15,10 @@ import React from 'react';
 import { EuiDescriptionList, EuiPanel } from '@elastic/eui';
 import { PanelModuleConfiguration } from '../../../common/modules/panel';
 import moduleLogo from '../../../../assets/office365.svg';
+import { renderValueYesThenEnabled } from '../../../../controllers/management/components/management/configuration/utils/utils';
 
 const settings = [
-  { field: 'enabled', label: 'Enabled'},
+  { field: 'enabled', label: 'Service status', render: renderValueYesThenEnabled },
   { field: 'only_future_events', label: 'Collect events generated since Wazuh agent was started'},
   { field: 'curl_max_size', label: 'Maximum size allowed for the Office 365 API response'},
   { field: 'interval', label: 'Interval between Office 365 wodle executions in seconds'},
@@ -30,7 +31,7 @@ const settings = [
         {title: 'Path file of client secret', description: v.client_secret_path},
       ].filter(item => typeof item.description !== 'undefined')}/>
     </EuiPanel>
-  )},
+  ).reduce((prev, cur) => [prev, <div style={{marginTop: '8px'}} /> , cur], [])},
   { field: 'subscriptions', label: 'Subscriptions', render: (value) => value
     .map(v => <EuiDescriptionList key={`module_configuration_subscriptions_${v}`}>{v}</EuiDescriptionList>)
   }
