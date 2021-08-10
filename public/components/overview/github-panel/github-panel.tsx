@@ -11,24 +11,19 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { MainPanel } from '../../common/modules/panel';
 import { withErrorBoundary } from '../../common/hocs';
 import { CustomSearchBar } from '../../common/custom-search-bar';
-import { Stats } from './views';
-import { queryConfig } from '../../../react-services/query-config';
+import { ModuleConfiguration } from './views';
 import { ModuleConfig, filtersValues } from './config';
 
 export const GitHubPanel = withErrorBoundary(() => {
-
-  const [moduleStatsList, setModuleStatsList] = useState([]);
-
-
   return (
     <>
       <CustomSearchBar filtersValues={filtersValues} />
       <MainPanel moduleConfig={ModuleConfig} tab={'github'}
-        sidePanelChildren={<Stats listItems={moduleStatsList} />} />
+        sidePanelChildren={<ModuleConfiguration />} />
     </>
   )
 });

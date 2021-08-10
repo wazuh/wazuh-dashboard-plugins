@@ -15,19 +15,20 @@ import { EuiBasicTable } from '@elastic/eui';
 import { compose } from 'redux';
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
+import WzConfigurationSettingsListSelector from '../util-components/configuration-settings-list-selector';
 import WzTabSelector, {
   WzTabSelectorTab
 } from '../util-components/tab-selector';
 import WzNoConfig from '../util-components/no-config';
 import { isString, renderValueYesThenEnabled } from '../utils/utils';
-import { wodleBuilder } from '../utils/builders';
+import { wodleBuilder, settingsListBuilder } from '../utils/builders';
 import { withGuard } from '../../../../../../components/common/hocs';
 import withWzConfig from '../util-hocs/wz-config';
 
 const sections = [{ component: 'wmodules', configuration: 'wmodules' }];
 
 const mainSettings = [
-  { field: 'enabled', label: 'Enabled', render: renderValueYesThenEnabled },
+  { field: 'enabled', label: 'Service status', render: renderValueYesThenEnabled },
   { field: 'only_future_events', label: 'Collect events generated since Wazuh agent was started' },
   { field: 'time_delay', label: 'Time in seconds that each scan will monitor until that delay backwards' },
   { field: 'curl_max_size', label: 'Maximum size allowed for the GitHub API response' },
@@ -36,7 +37,8 @@ const mainSettings = [
 ];
 
 const columns = [
-  { field: 'org_name', name: 'Name' }
+  { field: 'org_name', label: 'Organization' },
+  { field: 'api_token', label: 'Token' }
 ];
 
 const helpLinks = [
@@ -65,8 +67,8 @@ export const WzConfigurationGitHub = withWzConfig(sections)(({currentConfig, upd
       <WzTabSelectorTab label="General">
         <GeneralTab wodleConfiguration={wodleConfiguration} currentConfig={currentConfig} {...rest}/>
       </WzTabSelectorTab>
-      <WzTabSelectorTab label="Organizations">
-        <OrganizationsTab wodleConfiguration={wodleConfiguration} currentConfig={currentConfig} {...rest}/>
+      <WzTabSelectorTab label="Credentials">
+        <CredentialsTab wodleConfiguration={wodleConfiguration} currentConfig={currentConfig} {...rest}/>
       </WzTabSelectorTab>
     </WzTabSelector>
   )
@@ -83,7 +85,7 @@ const GeneralTab = tabWrapper(({agent, wodleConfiguration}) => (
     title="Main settings"
     description="Configuration for the GitHub module"
     currentConfig={wodleConfiguration}
-    minusHeight={agent.id === '000' ? 260 : 320}
+    minusHeight={agent.id === '000' ? 370 : 420} //TODO: Review the minusHeight for the agent case
     helpLinks={helpLinks}
   >
     <WzConfigurationSettingsGroup
@@ -93,16 +95,24 @@ const GeneralTab = tabWrapper(({agent, wodleConfiguration}) => (
   </WzConfigurationSettingsTabSelector>
 ));
 
-const OrganizationsTab = tabWrapper(({agent, wodleConfiguration}) => (
-  <WzConfigurationSettingsTabSelector
-    title="List of organizations to auditing"
-    currentConfig={wodleConfiguration}
-    minusHeight={agent.id === '000' ? 260 : 320}
-    helpLinks={helpLinks}
-  >
-    <EuiBasicTable
-      columns={columns}
-      items={wodleConfiguration['github'].api_auth}
-    />
-  </WzConfigurationSettingsTabSelector>
-));
+
+
+const CredentialsTab = tabWrapper(({agent, wodleConfiguration}) => {
+  const credentials = useMemo(() => settingsListBuilder(
+    wodleConfiguration['github'].api_auth,
+    'org_name'
+  ), [wodleConfiguration]);
+  return (
+    <WzConfigurationSettingsTabSelector
+      title="List of organizations to auditing"
+      currentConfig={wodleConfiguration}
+      minusHeight={agent.id === '000' ? 370 : 420} //TODO: Review the minusHeight for the agent case
+      helpLinks={helpLinks}
+    >
+      <WzConfigurationSettingsListSelector
+        items={credentials}
+        settings={columns}
+      />
+    </WzConfigurationSettingsTabSelector>
+  )  
+});

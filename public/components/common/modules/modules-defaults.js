@@ -19,7 +19,8 @@ import { ModuleMitreAttackIntelligence } from '../../overview/mitre_attack_intel
 import { ComplianceTable } from '../../overview/compliance-table';
 import ButtonModuleExploreAgent from '../../../controllers/overview/components/overview-actions/overview-actions';
 import { ButtonModuleGenerateReport } from '../modules/buttons';
-import { OfficePanel } from '../../overview/office-panel'
+import { OfficePanel } from '../../overview/office-panel';
+import { GitHubPanel } from '../../overview/github-panel';
 
 const DashboardTab = { id: 'dashboard', name: 'Dashboard', buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport], component: Dashboard};
 const EventsTab = { id: 'events', name: 'Events', buttons: [ButtonModuleExploreAgent], component: Events };
@@ -62,11 +63,15 @@ export const ModulesDefaults = {
     buttons: ['settings'],
     availableFor: ['manager','agent']
   },
-
   office: {
     init: 'dashboard',
     tabs: [{ id: 'inventory', name: 'Panel', buttons: [ButtonModuleExploreAgent],  component: OfficePanel }, DashboardTab, EventsTab],
     availableFor: ['manager']
+  },
+  github: {
+    init: 'dashboard',
+    tabs: [{ id: 'inventory', name: 'Panel', buttons: [ButtonModuleExploreAgent],  component: GitHubPanel }, DashboardTab, EventsTab],
+    availableFor: ['manager', 'agent']
   },
   ciscat: {
     init: 'dashboard',
@@ -133,11 +138,6 @@ export const ModulesDefaults = {
     init: 'dashboard',
     tabs: RegulatoryComplianceTabs,
     availableFor: ['manager','agent']
-  },
-  github: {
-    init: 'dashboard',
-    tabs: [{ id: 'inventory', name: 'Panel' }, { id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }],
-    buttons: ['reporting']
   },
   syscollector: {
     notModule: true
