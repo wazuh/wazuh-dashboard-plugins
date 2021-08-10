@@ -432,7 +432,7 @@ export class AgentsController {
   }
 
   // Switch subtab
-  async switchSubtab(subtab, force = false, onlyAgent = false) {
+  async switchSubtab(subtab, force = false, onlyAgent = false) {    
     try {
       if (this.$scope.tabView === subtab && !force) return;
       this.tabVisualizations.clearDeadVis();

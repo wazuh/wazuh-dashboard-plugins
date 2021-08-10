@@ -20,6 +20,7 @@ import { ComplianceTable } from '../../overview/compliance-table';
 import ButtonModuleExploreAgent from '../../../controllers/overview/components/overview-actions/overview-actions';
 import { ButtonModuleGenerateReport } from '../modules/buttons';
 import { OfficePanel } from '../../overview/office-panel'
+import { withModuleNotForAgent } from '../hocs'
 
 const DashboardTab = { id: 'dashboard', name: 'Dashboard', buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport], component: Dashboard};
 const EventsTab = { id: 'events', name: 'Events', buttons: [ButtonModuleExploreAgent], component: Events };
@@ -62,10 +63,15 @@ export const ModulesDefaults = {
     buttons: ['settings'],
     availableFor: ['manager','agent']
   },
+  
+  
+  // const DashboardTab = { id: 'dashboard', name: 'Dashboard', buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport], component: Dashboard};
 
   office: {
     init: 'dashboard',
-    tabs: [{ id: 'inventory', name: 'Panel', buttons: [ButtonModuleExploreAgent],  component: OfficePanel }, DashboardTab, EventsTab],
+    tabs: [{ id: 'inventory', name: 'Panel', buttons: [ButtonModuleExploreAgent],  component: OfficePanel }, 
+    { id: 'dashboard', name: 'Dashboard', buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport], component: withModuleNotForAgent(Dashboard)}, 
+    EventsTab],
     availableFor: ['manager']
   },
   ciscat: {

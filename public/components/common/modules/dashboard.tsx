@@ -28,6 +28,8 @@ export const Dashboard = compose(
   }
 
   async componentDidMount() {
+    console.log('checkpoint');
+    
     this._isMount = true;
     document.body.scrollTop = 0; // For Safari
     document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera

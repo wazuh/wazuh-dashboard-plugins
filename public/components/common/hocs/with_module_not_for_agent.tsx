@@ -24,6 +24,6 @@ export const withModuleNotForAgent = WrappedComponent => compose(
   connect(mapStateToProps),
   withGuard(
     ({agent}) => agent?.id,
-    (props) => <PromptModuleNotForAgent title='Module not avaliable for agents' body='Remove the pinned agent.' {...props}/>
+    (props) => <PromptModuleNotForAgent title='Module not available for agents' body='Remove the pinned agent.' {...props}/>
   )
 )(WrappedComponent);
