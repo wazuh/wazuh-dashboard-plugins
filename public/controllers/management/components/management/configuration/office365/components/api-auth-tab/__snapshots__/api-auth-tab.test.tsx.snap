@@ -79,7 +79,7 @@ exports[`ApiAuthTab component renders correctly to match the snapshot 1`] = `
         },
       ]
     }
-    minusHeight={260}
+    minusHeight={370}
     title="Credentials for the authentication with the API"
   >
     <WzConfigurationSettingsHeader

@@ -37,9 +37,4 @@ export const filtersValues: {
     key: 'data.office365.ResultStatus',
     placeholder: 'Result Status',
   },
-  {
-    type: 'multiSelect',
-    key: 'data.office365.ClientIP',
-    placeholder: 'Client IP',
-  },
 ];

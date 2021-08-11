@@ -69,7 +69,7 @@ exports[`SubscriptionTab component renders correctly to match the snapshot 1`] =
         },
       ]
     }
-    minusHeight={260}
+    minusHeight={370}
     title="Subscriptions list"
   >
     <WzConfigurationSettingsHeader

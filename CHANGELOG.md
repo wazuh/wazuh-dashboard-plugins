@@ -54,10 +54,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Change filter from is to is one of in custom searchbar [#3529](https://github.com/wazuh/wazuh-kibana-app/pull/3529)
 - Refactored as module tabs and buttons are rendered [#3494](https://github.com/wazuh/wazuh-kibana-app/pull/3494)
 - Added time subscription to Discover component [#3549](https://github.com/wazuh/wazuh-kibana-app/pull/3549)
-- Refactored all try catch strategy on Settings section [#3392](https://github.com/wazuh/wazuh-kibana-app/pull/3392)
-- Refactored all try catch strategy on Controller/Agent section [#3404](https://github.com/wazuh/wazuh-kibana-app/pull/3404)
-- Refactored all try catch value of context for ErrorOrchestrator service. [#3432](https://github.com/wazuh/wazuh-kibana-app/pull/3432)
-- Refactored all try catch strategy on Controller/Groups section [#3415](https://github.com/wazuh/wazuh-kibana-app/pull/3415)
 - Refactored as module tabs and buttons are rendered [#3494](https://github.com/wazuh/wazuh-kibana-app/pull/3494)
 
 ### Fixed

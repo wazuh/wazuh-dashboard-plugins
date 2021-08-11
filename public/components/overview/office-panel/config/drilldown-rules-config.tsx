@@ -67,9 +67,12 @@ export const drilldownRulesConfig = {
                   initialColumns={[
                     { field: 'icon' },
                     { field: 'timestamp' },
+                    { field: 'rule.description', label: 'Description' },
                     { field: 'data.office365.UserId', label: 'User ID' },
                     { field: 'data.office365.ClientIP', label: 'Client IP' },
                     { field: 'data.office365.Operation', label: 'Operation' },
+                    { field: 'rule.level', label: 'Level' },
+                    { field: 'rule.id', label: 'Rule ID' },
                   ]}
                   useAgentColumns={false}
                 />
