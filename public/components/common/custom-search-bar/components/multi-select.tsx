@@ -59,15 +59,11 @@ export const MultiSelect = ({ item, onChange, selectedOptions, onRemove }) => {
     setItems(
       items.map((item) => ({
         ...item,
-        checked: selectedOptions.find((element) => element.label === filterBy(item)) ? ON : OFF,
+        checked: selectedOptions.find((element) => element.label === item.label) ? ON : OFF,
       }))
     );
     setActiveFilters(selectedOptions.length);
   }, [selectedOptions]);
-
-  const filterBy = (item) => {
-    return item.filterByKey ? item.key.toString() : item.label;
-  };
 
   const toggleFilter = (item) => {
     item.checked = item.checked === ON ? OFF : ON;
