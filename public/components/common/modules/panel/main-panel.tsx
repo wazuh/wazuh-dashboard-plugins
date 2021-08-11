@@ -88,7 +88,7 @@ export const MainPanel = ({ sidePanelChildren, tab = 'general', moduleConfig = {
 
   useEffect(() => {
     applyFilter();
-
+    sessionStorage.setItem('filterDrillDownValue', JSON.stringify(selectedFilter));
     return () => applyFilter(true);
   }, [selectedFilter]);
 
@@ -102,9 +102,10 @@ export const MainPanel = ({ sidePanelChildren, tab = 'general', moduleConfig = {
       disabled: false,
       negate: false,
       key: field,
-      params: { query: value },
+      params: [value],
       alias: null,
-      type: 'phrase',
+      type: 'phrases',
+      value: value,
       index: AppState.getCurrentPattern(),
     };
     const $state: FilterState = {
@@ -112,11 +113,16 @@ export const MainPanel = ({ sidePanelChildren, tab = 'general', moduleConfig = {
       isImplicit: true,
     };
     const query = {
-      match: {
-        [field]: {
-          query: value,
-          type: 'phrase',
-        },
+      bool: {
+        minimum_should_match: 1,
+        should: [{
+          match_phrase: {
+            [field]: {
+              query: value,
+            },
+          },
+        }
+        ]
       },
     };
 

@@ -18,7 +18,7 @@ import { getCustomValueSuggestion } from '../../../components/overview/office-pa
 
 export const CustomSearchBar = ({ filtersValues, ...props }) => {
   const { filterManager, filters } = useFilterManager();
-  const indexPattern = useIndexPattern();
+  const filterDrillDownValue = sessionStorage.getItem('filterDrillDownValue')
   const defaultSelectedOptions = () => {
     const array = [];
     filtersValues.forEach((item) => {
@@ -41,6 +41,11 @@ export const CustomSearchBar = ({ filtersValues, ...props }) => {
     onFiltersUpdated();
   }, [filters]);
 
+  
+  const checkSelectDrillDownValue = (key) => {
+    const objSelectedValue = JSON.parse(filterDrillDownValue)
+    return objSelectedValue.field === key && objSelectedValue.value != '' ? true : false
+  }
   const onFiltersUpdated = () => {
     refreshCustomSelectedFilter();
   };
@@ -145,6 +150,7 @@ export const CustomSearchBar = ({ filtersValues, ...props }) => {
           selectedOptions={selectedOptions[item.key] || []}
           onChange={onChange}
           onRemove={onRemove}
+          isDisable={checkSelectDrillDownValue(item.key)}
         />
       ),
     };
