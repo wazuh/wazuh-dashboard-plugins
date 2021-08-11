@@ -38,7 +38,6 @@ export const MultiSelect = ({ item, onChange, selectedOptions, onRemove, isDisab
     { key: any; label: any; value: any; checked: FilterChecked }[]
   >([]);
   const [activeFilters, setActiveFilters] = useState<number>(0);
-  const disableStyles = {pointerEvents: isDisabled ? "none" : "all"}
 
   useEffect(() => {
     if (!isLoading) {
@@ -102,6 +101,7 @@ export const MultiSelect = ({ item, onChange, selectedOptions, onRemove, isDisab
       numFilters={selectedOptions.length}
       hasActiveFilters={activeFilters > 0}
       numActiveFilters={activeFilters}
+      isDisabled={isDisabled}
     >
       {item.placeholder}
     </EuiFilterButton>
@@ -117,7 +117,6 @@ export const MultiSelect = ({ item, onChange, selectedOptions, onRemove, isDisab
         closePopover={closePopover}
         panelPaddingSize="none"
         withTitle
-        style={disableStyles}
       >
         <EuiPopoverTitle>
           <EuiFieldSearch onChange={onSearch} />
