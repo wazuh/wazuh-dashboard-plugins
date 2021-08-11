@@ -28,7 +28,7 @@ import { IValueSuggestion, useValueSuggestion } from '../../hooks';
 const ON = 'on';
 const OFF = 'off';
 
-export const MultiSelect = ({ item, onChange, selectedOptions, onRemove }) => {
+export const MultiSelect = ({ item, onChange, selectedOptions, onRemove, isDisabled }) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState<boolean>(false);
   const { suggestedValues, isLoading, setQuery }: IValueSuggestion = useValueSuggestion(
     item.key,
@@ -101,6 +101,7 @@ export const MultiSelect = ({ item, onChange, selectedOptions, onRemove }) => {
       numFilters={selectedOptions.length}
       hasActiveFilters={activeFilters > 0}
       numActiveFilters={activeFilters}
+      isDisabled={isDisabled}
     >
       {item.placeholder}
     </EuiFilterButton>
