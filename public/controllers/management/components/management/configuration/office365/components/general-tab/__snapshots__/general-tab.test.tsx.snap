@@ -70,7 +70,7 @@ exports[`GeneralTab component renders correctly to match the snapshot 1`] = `
         },
       ]
     }
-    minusHeight={260}
+    minusHeight={370}
     title="Main settings"
   >
     <WzConfigurationSettingsHeader
@@ -427,7 +427,7 @@ exports[`GeneralTab component renders correctly to match the snapshot 1`] = `
             Array [
               Object {
                 "field": "enabled",
-                "label": "Enabled",
+                "label": "Service status",
                 "render": [Function],
               },
               Object {
@@ -508,9 +508,9 @@ exports[`GeneralTab component renders correctly to match the snapshot 1`] = `
                   className="euiFlexItem"
                 >
                   <WzConfigurationSetting
-                    key="-Enabled-undefined-0"
-                    keyItem="-Enabled-undefined-0"
-                    label="Enabled"
+                    key="-Service status-undefined-0"
+                    keyItem="-Service status-undefined-0"
+                    label="Service status"
                     value="enabled"
                   >
                     <div
@@ -537,7 +537,7 @@ exports[`GeneralTab component renders correctly to match the snapshot 1`] = `
                           <div
                             className="euiTextAlign euiTextAlign--right"
                           >
-                            Enabled
+                            Service status
                           </div>
                         </EuiTextAlign>
                       </div>
