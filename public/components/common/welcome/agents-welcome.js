@@ -128,15 +128,15 @@ export const AgentsWelcome = withErrorBoundary (class AgentsWelcome extends Comp
       welcome: 8
     });
     const filterHandler = new FilterHandler(AppState.getCurrentPattern());
+    const $injector = getAngularModule().$injector;
+    this.router = $injector.get('$route');
+    window.addEventListener('resize', this.updateWidth); //eslint-disable-line
     await VisFactoryHandler.buildAgentsVisualizations(
       filterHandler,
       'welcome',
       null,
       this.props.agent.id
     );
-    const $injector = getAngularModule().$injector;
-    this.router = $injector.get('$route');
-    window.addEventListener('resize', this.updateWidth); //eslint-disable-line
   }
 
   updateMenuAgents() {

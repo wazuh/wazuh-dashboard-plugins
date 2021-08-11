@@ -11,7 +11,10 @@
  */
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { showExploreAgentModal, updateCurrentAgentData } from '../../../../redux/actions/appStateActions';
+import {
+  showExploreAgentModal,
+  updateCurrentAgentData,
+} from '../../../../redux/actions/appStateActions';
 import {
   EuiOverlayMask,
   EuiOutsideClickDetector,
@@ -39,30 +42,28 @@ class OverviewActions extends Component {
   }
 
   async removeAgentsFilter(shouldUpdate = true) {
-
     await this.props.setAgent(false);
     const currentAppliedFilters = this.state.filterManager.filters;
-    const agentFilters = currentAppliedFilters.filter(x => {
+    const agentFilters = currentAppliedFilters.filter((x) => {
       return x.meta.key !== 'agent.id';
     });
     this.state.filterManager.setFilters(agentFilters);
   }
 
   componentDidMount() {
-
     const { filterManager } = getDataPlugin().query;
 
     this.setState({ filterManager: filterManager }, () => {
-      if (this.props.initialFilter) this.agentTableSearch([this.props.initialFilter])
-      if (this.props.agent.id) this.agentTableSearch([this.props.agent.id])
+      if (this.props.initialFilter) this.agentTableSearch([this.props.initialFilter]);
+      if (this.props.agent.id) this.agentTableSearch([this.props.agent.id]);
     });
   }
 
-  componentDidUpdate(){
-    if(this.state.isAgent && !this.props.agent.id){
-      this.setState({isAgent: false})
-    }else if(this.props.agent.id && this.state.isAgent !== this.props.agent.id){
-      this.setState({isAgent: this.props.agent.id})
+  componentDidUpdate() {
+    if (this.state.isAgent && !this.props.agent.id) {
+      this.setState({ isAgent: false });
+    } else if (this.props.agent.id && this.state.isAgent !== this.props.agent.id) {
+      this.setState({ isAgent: this.props.agent.id });
     }
   }
 
@@ -98,28 +99,28 @@ class OverviewActions extends Component {
     if (agentIdList && agentIdList.length) {
       if (agentIdList.length === 1) {
         const currentAppliedFilters = this.state.filterManager.filters;
-        const agentFilters = currentAppliedFilters.filter(x => {
+        const agentFilters = currentAppliedFilters.filter((x) => {
           return x.meta.key !== 'agent.id';
         });
         const filter = {
-          "meta": {
-            "alias": null,
-            "disabled": false,
-            "key": "agent.id",
-            "negate": false,
-            "params": { "query": agentIdList[0] },
-            "type": "phrase",
-            "index": AppState.getCurrentPattern() || WAZUH_ALERTS_PATTERN
+          meta: {
+            alias: null,
+            disabled: false,
+            key: 'agent.id',
+            negate: false,
+            params: { query: agentIdList[0] },
+            type: 'phrase',
+            index: AppState.getCurrentPattern() || WAZUH_ALERTS_PATTERN,
           },
-          "query": {
-            "match": {
+          query: {
+            match: {
               'agent.id': {
                 query: agentIdList[0],
-                type: 'phrase'
-              }
-            }
+                type: 'phrase',
+              },
+            },
           },
-          "$state": { "store": "appState", "isImplicit": true},
+          $state: { store: 'appState', isImplicit: true },
         };
         agentFilters.push(filter);
         this.state.filterManager.setFilters(agentFilters);
@@ -132,7 +133,12 @@ class OverviewActions extends Component {
 
   getSelectedAgents() {
     let selectedAgentsObject = {};
-    for (var i = 0; this.state.isAgent && this.state.isAgent.length && i < this.state.isAgent.length; ++i) selectedAgentsObject[this.state.isAgent[i]] = true;
+    for (
+      var i = 0;
+      this.state.isAgent && this.state.isAgent.length && i < this.state.isAgent.length;
+      ++i
+    )
+      selectedAgentsObject[this.state.isAgent[i]] = true;
     return selectedAgentsObject;
   }
 
@@ -154,7 +160,7 @@ class OverviewActions extends Component {
 
               <EuiModalBody>
                 <AgentSelectionTable
-                  updateAgentSearch={agentsIdList => this.agentTableSearch(agentsIdList)}
+                  updateAgentSearch={(agentsIdList) => this.agentTableSearch(agentsIdList)}
                   removeAgentsFilter={(shouldUpdate) => this.removeAgentsFilter(shouldUpdate)}
                   selectedAgents={this.getSelectedAgents()}
                 ></AgentSelectionTable>
@@ -165,71 +171,70 @@ class OverviewActions extends Component {
       );
     }
 
-    const thereAgentSelected = (this.props.agent || {}).id
+    const thereAgentSelected = (this.props.agent || {}).id;
 
-    const avaliableForAgent = this.props.module.availableFor && this.props.module.availableFor.includes('agent');
+    const avaliableForAgent =
+      this.props.module.availableFor && this.props.module.availableFor.includes('agent');
 
     let buttonUnpinAgent, buttonExploreAgent;
-    if(thereAgentSelected){
+    if (thereAgentSelected) {
       buttonUnpinAgent = (
         <WzButton
-          buttonType='icon'
+          buttonType="icon"
           className="wz-unpin-agent"
-          iconType='pinFilled'
+          iconType="pinFilled"
           onClick={() => {
             this.props.updateCurrentAgentData({});
             this.removeAgentsFilter();
           }}
-          tooltip={{position: 'bottom', content: 'Unpin agent'}}
-          aria-label='Unpin agent'
+          tooltip={{ position: 'bottom', content: 'Unpin agent' }}
+          aria-label="Unpin agent"
         />
       );
-    };
+    }
 
     buttonExploreAgent = (
       <WzButton
-        buttonType='empty'
+        buttonType="empty"
         isLoading={this.state.loadingReport}
-        color='primary'
+        color="primary"
         isDisabled={!avaliableForAgent}
-        tooltip={{position: 'bottom', content: !avaliableForAgent ?  'This module is not supported for agents.' : (thereAgentSelected ? 'Change agent selected' : 'Select an agent to explore its modules') }}
-        style={thereAgentSelected ? {background: 'rgba(0, 107, 180, 0.1)'} : undefined}
-        iconType='watchesApp'
-        onClick={() => this.showAgentModal()}>
-          {thereAgentSelected ? `${this.props.agent.name} (${this.props.agent.id})` : 'Explore agent'}
+        tooltip={{
+          position: 'bottom',
+          content: !avaliableForAgent
+            ? 'This module is not supported for agents.'
+            : thereAgentSelected
+            ? 'Change agent selected'
+            : 'Select an agent to explore its modules',
+        }}
+        style={thereAgentSelected ? { background: 'rgba(0, 107, 180, 0.1)' } : undefined}
+        iconType="watchesApp"
+        onClick={() => this.showAgentModal()}
+      >
+        {thereAgentSelected ? `${this.props.agent.name} (${this.props.agent.id})` : 'Explore agent'}
       </WzButton>
-    )
-    
-    return (
-      <div style={{ display: "inline-flex" }}>
-        {buttonExploreAgent}
-        {thereAgentSelected && (
-          !avaliableForAgent && (
-            <EuiPopover
-              button={buttonUnpinAgent}
-              isOpen={thereAgentSelected}
-              closePopover={()=> {}}>
-                This module is not supported for agents. Remove the pinned agent.
-            </EuiPopover>
+    );
 
-          ) || buttonUnpinAgent
-        )}
+    return (
+      <div style={{ display: 'inline-flex' }}>
+        {buttonExploreAgent}
+        {thereAgentSelected && buttonUnpinAgent}
         {modal}
       </div>
     );
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
     state: state.appStateReducers,
-    agent: state.appStateReducers.currentAgentData
+    agent: state.appStateReducers.currentAgentData,
   };
 };
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
   updateCurrentAgentData: (agent) => dispatch(updateCurrentAgentData(agent)),
-  showExploreAgentModal: (data) => dispatch(showExploreAgentModal(data))
+  showExploreAgentModal: (data) => dispatch(showExploreAgentModal(data)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(OverviewActions);
