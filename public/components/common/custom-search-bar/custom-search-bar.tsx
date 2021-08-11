@@ -14,6 +14,7 @@ import { EuiFlexGroup, EuiFlexItem, EuiSwitch } from '@elastic/eui';
 import { KbnSearchBar } from '../../kbn-search-bar';
 import { MultiSelect } from './components';
 import { useFilterManager, useIndexPattern } from '../hooks';
+import { getCustomValueSuggestion } from '../../../components/overview/office-panel/config/helpers/helper-value-suggestion';
 
 export const CustomSearchBar = ({ filtersValues, ...props }) => {
   const { filterManager, filters } = useFilterManager();
@@ -56,7 +57,7 @@ export const CustomSearchBar = ({ filtersValues, ...props }) => {
         },
       },
     }));
-    const params = values.map((item) => item.filterByKey ? item.key : item.label);
+    const params = values.map((item) => item.filterByKey ? item.key.toString() : item.label);
     const meta: FilterMeta = {
       disabled: false,
       negate: false,
@@ -104,8 +105,12 @@ export const CustomSearchBar = ({ filtersValues, ...props }) => {
         .map((element) => ({ params: element.meta.params, key: element.meta.key })) || [];
 
     const getFilterCustom = (item) => {
-      return item.params.map((element) => ({ label: element, value: item.key }));
+      return item.params.map((element) => ({ checked: 'on', label: item.key === 'data.office365.UserType' ? getLabelUserType(element) : element, value: item.key, key: element, filterByKey: item.key === 'data.office365.UserType' ? true : false}));
     };
+    const getLabelUserType = (element) => {
+      const userTypeOptions = getCustomValueSuggestion('data.office365.UserType')
+      return userTypeOptions.find((item,index) =>  index.toString() === element)
+    }
     const filterCustom = filters.map((item) => getFilterCustom(item)) || [];
     if (filterCustom.length != 0) {
       filterCustom.forEach((item) => {
