@@ -26,15 +26,15 @@ type PromptSelectAgentProps = {
 
 export const PromptModuleNotForAgent = ({ body, title, agentsSelectionProps }: PromptSelectAgentProps) => {
   const dispatch = useDispatch();
-  const filterManager = useFilterManager();
+  const { filterManager, filters } = useFilterManager();
 
   const unpinAgent = async () => {
     dispatch(updateCurrentAgentData({}));
     await agentsSelectionProps.setAgent(false);
-    const filters = filterManager.filters.filter(x => {
+    const moduleFilters = filters.filter(x => {
       return x.meta.key !== 'agent.id';
     });
-    filterManager.setFilters(filters);
+    filterManager.setFilters(moduleFilters);
   };
 
   return (
