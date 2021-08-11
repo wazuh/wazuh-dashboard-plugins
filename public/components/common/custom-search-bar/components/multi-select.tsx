@@ -28,7 +28,7 @@ import { IValueSuggestion, useValueSuggestion } from '../../hooks';
 const ON = 'on';
 const OFF = 'off';
 
-export const MultiSelect = ({ item, onChange, selectedOptions, onRemove, isDisable }) => {
+export const MultiSelect = ({ item, onChange, selectedOptions, onRemove, isDisabled }) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState<boolean>(false);
   const { suggestedValues, isLoading, setQuery }: IValueSuggestion = useValueSuggestion(
     item.key,
@@ -38,7 +38,7 @@ export const MultiSelect = ({ item, onChange, selectedOptions, onRemove, isDisab
     { key: any; label: any; value: any; checked: FilterChecked }[]
   >([]);
   const [activeFilters, setActiveFilters] = useState<number>(0);
-  const disableStyles = {pointerEvents: isDisable ? "none" : "all"}
+  const disableStyles = {pointerEvents: isDisabled ? "none" : "all"}
 
   useEffect(() => {
     if (!isLoading) {

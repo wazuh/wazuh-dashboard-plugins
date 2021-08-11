@@ -35,7 +35,7 @@ import {
 import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
 
-export const MainPanel = ({ sidePanelChildren, tab = 'general', moduleConfig = {}, ...props }) => {
+export const MainPanel = ({ sidePanelChildren, tab = 'general', moduleConfig = {}, filterDrillDownValue = (value) => {}, ...props }) => {
   const [viewId, setViewId] = useState('main');
   const [selectedFilter, setSelectedFilter] = useState({ field: '', value: '' });
   const {filterManager} = useFilterManager();
@@ -88,7 +88,7 @@ export const MainPanel = ({ sidePanelChildren, tab = 'general', moduleConfig = {
 
   useEffect(() => {
     applyFilter();
-    sessionStorage.setItem('filterDrillDownValue', JSON.stringify(selectedFilter));
+    filterDrillDownValue(selectedFilter)
     return () => applyFilter(true);
   }, [selectedFilter]);
 
