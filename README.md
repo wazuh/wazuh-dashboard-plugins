@@ -21,6 +21,7 @@ This plugin for Kibana allows you to visualize and analyze Wazuh alerts stored i
         - Integrity monitoring: Alerts related to file changes, including permissions, content, ownership and attributes.
         - Amazon AWS: Security events related to your Amazon AWS services, collected directly via AWS API.
         - Office 365: Security events related to your Office 365 services.
+        - GitHub: Security events related to your GitHub organizations, collected via GitHub audit logs API.
         - Google Cloud Platform: Security events related to your Google Cloud Platform services, collected directly via GCP API.
     - Auditing and Policy Monitoring
         - Policy monitoring: Verify that your systems are configured according to your security policies baseline.

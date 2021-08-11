@@ -126,7 +126,7 @@ export const WAZUH_MODULES = {
   github: {
     title: 'GitHub',
     description:
-      'Monitoring events from audit logs that helps detect threats targeting your GitHub organizations.'
+      'Monitoring events from audit logs of your GitHub organizations.'
   },
   devTools: {
     title: 'API console',
