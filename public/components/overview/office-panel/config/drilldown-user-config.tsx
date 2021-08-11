@@ -75,6 +75,9 @@ export const drilldownUserConfig = {
                     { field: 'data.office365.ClientIP', label: 'Client IP' },
                     { field: 'rule.description', label: 'Description' },
                     { field: 'data.office365.Operation', label: 'Operation' },
+                    { field: 'rule.description', label: 'Description' },
+                    { field: 'rule.level', label: 'Level' },
+                    { field: 'rule.id', label: 'Rule ID' },
                   ]}
                   useAgentColumns={false}
                 />
