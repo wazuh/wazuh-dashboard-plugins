@@ -10,4 +10,4 @@
  * Find more information about this on the LICENSE file.
  */
 
-export  { Combobox } from './combobox';
+export { MultiSelect } from './multi-select';

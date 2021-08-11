@@ -9,11 +9,11 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { useState, useEffect } from 'react';
+
+import React, { useEffect, useState } from 'react';
 import { getDataPlugin } from '../../../kibana-services';
-import { useIndexPattern } from '.';
-import { IFieldType, IIndexPattern, Filter } from 'src/plugins/data/public';
-import React from 'react';
+import { useIndexPattern } from '../hooks';
+import { IFieldType, IIndexPattern } from 'src/plugins/data/public';
 import {
   UI_ERROR_SEVERITIES,
   UIErrorLog,
@@ -22,43 +22,40 @@ import {
 } from '../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
-import { useFilterManager } from '.';
 
-export interface IValueSuggestiions {
+export interface IValueSuggestion {
   suggestedValues: string[] | boolean[];
   isLoading: boolean;
   setQuery: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export const useValueSuggestions = (
+export const useValueSuggestion = (
   filterField: string,
+  options?: string[],
   type: 'string' | 'boolean' = 'string'
-): IValueSuggestiions => {
+): IValueSuggestion => {
   const [suggestedValues, setSuggestedValues] = useState<string[] | boolean[]>([]);
   const [query, setQuery] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
   const data = getDataPlugin();
   const indexPattern = useIndexPattern();
-  const { filters } = useFilterManager();
+  //const { filters } = useFilterManager();
+
+  const getOptions = (): string[] => {
+    return options?.filter((element) => element.toLowerCase().includes(query.toLowerCase())) || [];
+  };
+
+  const getValueSuggestions = async (field) => {
+    return options
+      ? getOptions()
+      : await data.autocomplete.getValueSuggestions({
+          query,
+          indexPattern: indexPattern as IIndexPattern,
+          field,
+        });
+  };
 
   useEffect(() => {
-    const boolFilter = filters
-      .filter(
-        (managedFilter) =>
-          managedFilter &&
-          managedFilter.query &&
-          managedFilter.query.match &&
-          Object.keys(managedFilter.query.match)[0] !== filterField
-      )
-      .map((managedFilter) => {
-        return {
-          term: {
-            [Object.keys(managedFilter.query.match)[0]]:
-              managedFilter.query.match[Object.keys(managedFilter.query.match)[0]].query,
-          },
-        };
-      });
-
     if (indexPattern) {
       setIsLoading(true);
       (async () => {
@@ -68,17 +65,10 @@ export const useValueSuggestions = (
           aggregatable: true,
         } as IFieldType;
         try {
-          setSuggestedValues(
-            await data.autocomplete.getValueSuggestions({
-              query,
-              indexPattern: indexPattern as IIndexPattern,
-              field,
-              boolFilter,
-            })
-          );
+          setSuggestedValues(await getValueSuggestions(field));
         } catch (error) {
           const options: UIErrorLog = {
-            context: `${useValueSuggestions.name}.valueSuggestions`,
+            context: `${useValueSuggestion.name}.getValueSuggestions`,
             level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
             severity: UI_ERROR_SEVERITIES.UI as UIErrorSeverity,
             error: {
@@ -93,7 +83,7 @@ export const useValueSuggestions = (
         }
       })();
     }
-  }, [indexPattern, query, filterField, type, filters]);
+  }, [indexPattern, query, filterField, type]);
 
   return { suggestedValues, isLoading, setQuery };
 };
