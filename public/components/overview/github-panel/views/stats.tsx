@@ -16,7 +16,6 @@ import { EuiDescriptionList, EuiPanel } from '@elastic/eui';
 import { PanelModuleConfiguration } from '../../../common/modules/panel';
 import { renderValueNoThenEnabled } from '../../../../controllers/management/components/management/configuration/utils/utils';
 
-
 const settings = [
   { field: 'enabled', label: 'Service status', render: renderValueNoThenEnabled },
   { field: 'only_future_events', label: 'Collect events generated since Wazuh agent was started'},
@@ -31,7 +30,7 @@ const settings = [
         {title: 'Token', description: v.api_token}
       ].filter(item => typeof item.description !== 'undefined')}/>
     </EuiPanel>
-  )}
+  ).reduce((prev, cur) => [prev, <div key={`padding-len-${prev.length}`} style={{marginTop: '8px'}} /> , cur], [])}
 ];
 
 const mapWModuleConfigurationToRenderProperties = (wmodules: {[key: string]: any}[], wmoduleID: string, entity: string, name: string = '') => {
