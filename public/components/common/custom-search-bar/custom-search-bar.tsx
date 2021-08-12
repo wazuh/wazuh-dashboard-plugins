@@ -13,12 +13,11 @@ import { EuiFlexGroup, EuiFlexItem, EuiSwitch } from '@elastic/eui';
 //@ts-ignore
 import { KbnSearchBar } from '../../kbn-search-bar';
 import { MultiSelect } from './components';
-import { useFilterManager, useIndexPattern } from '../hooks';
+import { useFilterManager } from '../hooks';
 import { getCustomValueSuggestion } from '../../../components/overview/office-panel/config/helpers/helper-value-suggestion';
 
-export const CustomSearchBar = ({ filtersValues, ...props }) => {
+export const CustomSearchBar = ({ filtersValues, filterDrillDownValue = { field: '', value: '' }, ...props }) => {
   const { filterManager, filters } = useFilterManager();
-  const indexPattern = useIndexPattern();
   const defaultSelectedOptions = () => {
     const array = [];
     filtersValues.forEach((item) => {
@@ -41,6 +40,10 @@ export const CustomSearchBar = ({ filtersValues, ...props }) => {
     onFiltersUpdated();
   }, [filters]);
 
+  
+  const checkSelectDrillDownValue = (key) => {
+    return filterDrillDownValue.field === key && filterDrillDownValue.value != '' ? true : false
+  }
   const onFiltersUpdated = () => {
     refreshCustomSelectedFilter();
   };
@@ -145,6 +148,7 @@ export const CustomSearchBar = ({ filtersValues, ...props }) => {
           selectedOptions={selectedOptions[item.key] || []}
           onChange={onChange}
           onRemove={onRemove}
+          isDisabled={checkSelectDrillDownValue(item.key)}
         />
       ),
     };
