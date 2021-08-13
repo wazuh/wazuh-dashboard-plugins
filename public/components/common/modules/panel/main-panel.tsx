@@ -76,7 +76,7 @@ export const MainPanel = ({ sidePanelChildren, tab = 'general', moduleConfig = {
    */
   const applyFilter = (clearOnly = false) => {
     const newFilters = [
-      ...filters.filter((filter) => filter.meta.key !== selectedFilter.field),
+      ...filters.filter((filter) => filter.meta.key !== selectedFilter.field || filter.$state?.store == "globalState"),
       ...(!clearOnly && selectedFilter.value ? [buildCustomFilter(selectedFilter)] : [])
     ];
     filterManager.setFilters(newFilters);
