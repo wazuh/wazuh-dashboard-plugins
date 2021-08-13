@@ -75,7 +75,7 @@ export const MainPanel = ({ sidePanelChildren, tab = 'general', moduleConfig = {
    * When a filter is toggled applies de selection
    */
   const applyFilter = (clearOnly = false) => {
-    const appliedFilters = filterManager.getAppFilters();
+    const appliedFilters = filterManager.getFilters();
     const filters = appliedFilters.filter((filter) => {
       return filter.meta.key != selectedFilter.field;
     });
