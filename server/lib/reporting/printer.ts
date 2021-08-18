@@ -9,12 +9,13 @@ import {
 } from '../../integration-files/visualizations';
 import { log } from '../logger';
 import * as TimSort from 'timsort';
+import { getConfiguration } from '../get-configuration';
 
 const COLORS = {
   PRIMARY: '#00a9e5'
 };
 
-const pageConfiguration = {
+const pageConfiguration = (nameLogo) => ({
   styles: {
     h1: {
       fontSize: 22,
@@ -52,7 +53,7 @@ const pageConfiguration = {
     margin: [40, 20, 0, 0],
     columns: [
       {
-        image: path.join(__dirname, '../../../public/assets/logo.png'),
+        image: path.join(__dirname, `../../../public/assets/${nameLogo}`),
         width: 190
       },
       {
@@ -96,7 +97,7 @@ const pageConfiguration = {
     }
     return false;
   }
-};
+});
 
 const fonts = {
   Roboto: {
@@ -609,10 +610,12 @@ export class ReportPrinter{
     );
   }
 
-  async print(path: string){
-    const document = this._printer.createPdfKitDocument({...pageConfiguration, content: this._content});
+  async print(reportPath: string){
+    const nameLogo = ( await getConfiguration() )['customization.logo.reports'] || 'logo.png'
+
+    const document = this._printer.createPdfKitDocument({...pageConfiguration(nameLogo), content: this._content});
     await document.pipe(
-      fs.createWriteStream(path)
+      fs.createWriteStream(reportPath)
     );
     document.end();
   }

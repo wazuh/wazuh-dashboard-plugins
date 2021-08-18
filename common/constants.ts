@@ -97,6 +97,7 @@ export const WAZUH_CONFIGURATION_SETTINGS_NEED_HEALTH_CHECK = [
 ];
 export const WAZUH_CONFIGURATION_SETTINGS_NEED_RELOAD = [
   'hideManagerAlerts',
+  'customization.logo.sidebar'
 ];
 
 // Reserved ids for Users/Role mapping
@@ -170,7 +171,11 @@ export const WAZUH_DEFAULT_APP_CONFIG = {
   'alerts.sample.prefix': WAZUH_SAMPLE_ALERT_PREFIX,
   hideManagerAlerts: false,
   'logs.level': 'info',
-  'enrollment.dns': ''
+  'enrollment.dns': '',
+  'customization.logo.app':'logotype.svg',
+  'customization.logo.sidebar':'icon_blue.png',
+  'customization.logo.healthcheck':'icon_blue.svg',
+  'customization.logo.reports':'logo.png'
 };
 
 // Wazuh errors
