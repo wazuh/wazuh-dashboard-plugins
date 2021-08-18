@@ -1912,8 +1912,8 @@ export class WazuhReportingCtrl {
           table: {
             title: 'Windows updates',
             columns: [{id: 'hotfix', label: 'Update code'}]
-          },
-        },
+          }
+        }
       ];
 
       const requestInventory = async (agentRequestInventory) => {
