@@ -36,7 +36,7 @@ interface BoolFilter {
 
 export const useValueSuggestion = (
   filterField: string,
-  filterDrillDownValue: BoolFilter,
+  boolFilterValue: BoolFilter,
   options?: string[],
   type: 'string' | 'boolean' = 'string'
 ): IValueSuggestion => {
@@ -52,11 +52,11 @@ export const useValueSuggestion = (
 
   const getValueSuggestions = async (field) => {
     const boolFilter =
-      filterDrillDownValue && filterDrillDownValue.value !== ""
+      boolFilterValue && boolFilterValue.value !== ""
         ? [
             {
               term: {
-                [filterDrillDownValue.field]: `${filterDrillDownValue.value}`,
+                [boolFilterValue.field]: `${boolFilterValue.value}`,
               },
             },
           ]
@@ -99,7 +99,7 @@ export const useValueSuggestion = (
         }
       })();
     }
-  }, [indexPattern, query, filterField, type, filterDrillDownValue]);
+  }, [indexPattern, query, filterField, type, boolFilterValue]);
 
   return { suggestedValues, isLoading, setQuery };
 };
