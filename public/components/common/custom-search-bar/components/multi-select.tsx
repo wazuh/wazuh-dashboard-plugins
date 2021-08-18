@@ -28,11 +28,12 @@ import { IValueSuggestion, useValueSuggestion } from '../../hooks';
 const ON = 'on';
 const OFF = 'off';
 
-export const MultiSelect = ({ item, onChange, selectedOptions, onRemove, isDisabled }) => {
+export const MultiSelect = ({ item, onChange, selectedOptions, onRemove, isDisabled, filterDrillDownValue }) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState<boolean>(false);
   const { suggestedValues, isLoading, setQuery }: IValueSuggestion = useValueSuggestion(
     item.key,
-    item?.options
+    filterDrillDownValue,
+    item?.options,
   );
   const [items, setItems] = useState<
     { key: any; label: any; value: any; checked: FilterChecked }[]

@@ -31,6 +31,7 @@ export interface IValueSuggestion {
 
 export const useValueSuggestion = (
   filterField: string,
+  filterDrillDownValue,
   options?: string[],
   type: 'string' | 'boolean' = 'string'
 ): IValueSuggestion => {
@@ -39,19 +40,29 @@ export const useValueSuggestion = (
   const [isLoading, setIsLoading] = useState(true);
   const data = getDataPlugin();
   const indexPattern = useIndexPattern();
-  //const { filters } = useFilterManager();
 
   const getOptions = (): string[] => {
     return options?.filter((element) => element.toLowerCase().includes(query.toLowerCase())) || [];
   };
 
   const getValueSuggestions = async (field) => {
+    const boolFilter =
+      filterDrillDownValue && filterDrillDownValue.value !== ""
+        ? [
+            {
+              term: {
+                [filterDrillDownValue.field]: `${filterDrillDownValue.value}`,
+              },
+            },
+          ]
+        : [];
     return options
       ? getOptions()
       : await data.autocomplete.getValueSuggestions({
           query,
           indexPattern: indexPattern as IIndexPattern,
           field,
+          boolFilter: boolFilter,
         });
   };
 
@@ -83,7 +94,7 @@ export const useValueSuggestion = (
         }
       })();
     }
-  }, [indexPattern, query, filterField, type]);
+  }, [indexPattern, query, filterField, type, filterDrillDownValue]);
 
   return { suggestedValues, isLoading, setQuery };
 };
