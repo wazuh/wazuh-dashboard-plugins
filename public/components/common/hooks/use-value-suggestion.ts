@@ -29,9 +29,14 @@ export interface IValueSuggestion {
   setQuery: React.Dispatch<React.SetStateAction<string>>;
 }
 
+interface BoolFilter {
+  field:string;
+  value:string;
+}
+
 export const useValueSuggestion = (
   filterField: string,
-  filterDrillDownValue,
+  filterDrillDownValue: BoolFilter,
   options?: string[],
   type: 'string' | 'boolean' = 'string'
 ): IValueSuggestion => {
