@@ -1906,14 +1906,14 @@ export class WazuhReportingCtrl {
             ]
           }
         },
-        {
+        agentOs === 'windows' && {
           endpoint: `/syscollector/${agentID}/hotfixes`,
           loggerMessage: `Fetching hotfixes for agent ${agentID}`,
           table: {
             title: 'Windows updates',
             columns: [{id: 'hotfix', label: 'Update code'}]
-          }
-        }
+          },
+        },
       ];
 
       const requestInventory = async (agentRequestInventory) => {
