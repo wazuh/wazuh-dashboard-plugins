@@ -38,6 +38,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed the plugin logo path in Kibana menu when use `server.basePath` setting [#3144](https://github.com/wazuh/wazuh-kibana-app/pull/3144)
 - Fixed deprecated endpoint for create agent groups [3152](https://github.com/wazuh/wazuh-kibana-app/pull/3152)
 - Fixed check for TCP protocol in deploy new agent [#3163](https://github.com/wazuh/wazuh-kibana-app/pull/3163)
+- Fixed windows update section in Linux Inventory PDF [#3569](https://github.com/wazuh/wazuh-kibana-app/pull/3569)
 
 ## Wazuh v4.1.4 - Kibana 7.10.0 , 7.10.2 - Revision 4105
 
