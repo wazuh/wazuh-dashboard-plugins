@@ -44,6 +44,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added base Module Panel view with Office365 setup [#3518](https://github.com/wazuh/wazuh-kibana-app/pull/3518)
 - Added specifics and custom filters for Office365 search bar [#3533](https://github.com/wazuh/wazuh-kibana-app/pull/3533)
 - Adding Pagination and filter to drilldown tables at Office pannel [#3544](https://github.com/wazuh/wazuh-kibana-app/issues/3544).
+- Simple filters change between panel and drilldown panel [#3568](https://github.com/wazuh/wazuh-kibana-app/issues/3568).
 
 ### Changed
 
