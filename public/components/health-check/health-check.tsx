@@ -2,14 +2,14 @@ import React, { Component } from 'react';
 import { EuiLoadingSpinner, EuiDescriptionList, EuiIcon, EuiCallOut, EuiButtonIcon, EuiSpacer, EuiButton, EuiToolTip } from '@elastic/eui';
 import { AppState } from '../../react-services/app-state';
 import { PatternHandler } from '../../react-services/pattern-handler';
-import { getAngularModule, getToasts, getHttp } from '../../kibana-services';
+import { getAngularModule, getToasts, getHttp, getDataPlugin } from '../../kibana-services';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { GenericRequest } from '../../react-services/generic-request';
 import { ApiCheck } from '../../react-services/wz-api-check';
 import { WzRequest } from '../../react-services/wz-request';
 import { SavedObject } from '../../react-services/saved-objects';
 import { ErrorHandler } from '../../react-services/error-handler';
-import { WAZUH_ERROR_DAEMONS_NOT_READY, WAZUH_INDEX_TYPE_STATISTICS, WAZUH_INDEX_TYPE_MONITORING } from '../../../common/constants';
+import { WAZUH_ERROR_DAEMONS_NOT_READY, WAZUH_INDEX_TYPE_STATISTICS, WAZUH_INDEX_TYPE_MONITORING, HEALTH_CHECK } from '../../../common/constants';
 import { checkKibanaSettings, checkKibanaSettingsTimeFilter, checkKibanaSettingsMaxBuckets } from './lib';
 import store from '../../redux/store';
 import { updateWazuhNotReadyYet } from '../../redux/actions/appStateActions.js';
@@ -54,6 +54,13 @@ export class HealthCheck extends Component {
    */
   delay = time => new Promise(res => setTimeout(res, time));
 
+  async checkDefaultPattern(defaultPattern) {
+    if (defaultPattern) {
+      const patternData = await SavedObject.existsIndexPattern(defaultPattern);    
+      patternData.status && getDataPlugin().indexPatterns.setDefault(defaultPattern, true);
+    }
+  }
+
   /**
    * This validates a pattern
    */
@@ -61,37 +68,44 @@ export class HealthCheck extends Component {
     this.checkPatternCount++;
     if (this.checkPatternCount > 10) return Promise.reject('Error trying to check patterns.');
     try {
-      const patternId = AppState.getCurrentPattern();
       let patternTitle = '';
       let results = this.state.results;
       let errors = this.state.errors;
+      const resultIndex = this.state.results.map(item => item.id).indexOf(2);
+      const currentPattern = AppState.getCurrentPattern();
+
       if (this.state.checks.pattern) {
-        const i = this.state.results.map(item => item.id).indexOf(2);
-        let patternData = patternId ? await SavedObject.existsIndexPattern(patternId) : false;
+        //get patters or create default
+        const patternList = await PatternHandler.getPatternList(HEALTH_CHECK);
+        // check selected pattern
+        const wazuhConfig = new WazuhConfig();
+        const { pattern: defaultPattern } = wazuhConfig.getConfig();
+        await this.checkDefaultPattern(defaultPattern);
+
+        //check selected pattern
+        let patternData = currentPattern ? await SavedObject.existsIndexPattern(currentPattern) : false;
         if (!patternData) patternData = {};
         patternTitle = patternData.title;
 
         if (!patternData.status) {
-          const patternList = await PatternHandler.getPatternList("healthcheck");
           if (patternList.length) {
-            const wazuhConfig = new WazuhConfig();
-            const { pattern } = wazuhConfig.getConfig();
-            const indexPatternDefault = patternList.find((indexPattern) => indexPattern.title === pattern);
-            AppState.setCurrentPattern(indexPatternDefault.id);
+            const indexPatternDefault = patternList.find((indexPattern) => indexPattern.title === defaultPattern);
+            indexPatternDefault && AppState.setCurrentPattern(indexPatternDefault.id);
+            await this.delay(3000);
             return await this.checkPatterns();
           } else {
             errors.push('The selected index-pattern is not present.');
-            results[i].description = <span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span>;
+            results[resultIndex].description = <span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span>;
           }
         } else {
-          results[i].description = <span><EuiIcon type="check" color="secondary" ></EuiIcon> Ready</span>;
+          results[resultIndex].description = <span><EuiIcon type="check" color="secondary" ></EuiIcon> Ready</span>;
         }
         this.setState({ results, errors });
       }
 
       if (this.state.checks.template) {
         if (!patternTitle) {
-          var patternData = await SavedObject.existsIndexPattern(patternId);
+          var patternData = await SavedObject.existsIndexPattern(currentPattern);
           patternTitle = patternData.title;
         }
         const i = results.map(item => item.id).indexOf(3);
@@ -120,21 +134,23 @@ export class HealthCheck extends Component {
       const errors = [];
       const results = this.state.results;
       const maxTries = 5;
+      let apiId = '';
 
       if (hosts.length) {
         for (let i = 0; i < hosts.length; i++) {
-          let tries = maxTries;
-          while (tries--) {
+          for (let tries = 0; tries < maxTries; tries++) {
             await this.delay(3000);
             try {
               const API = await ApiCheck.checkApi(hosts[i], true);
               if (API && API.data) {
-                return hosts[i].id;
+                apiId = hosts[i].id;
+                tries = maxTries;
+                i = hosts.length
               }
             } catch (err) {
               if (tries) {
-                results[0].description = <span><EuiLoadingSpinner size="m" /> Retrying {'.'.repeat(maxTries - tries) }</span>;
-                results[1].description = <span><EuiLoadingSpinner size="m" /> Retrying {'.'.repeat(maxTries - tries) }</span>;
+                results[0].description = <span><EuiLoadingSpinner size="m" /> Retrying {'.'.repeat(tries) }</span>;
+                results[1].description = <span><EuiLoadingSpinner size="m" /> Retrying {'.'.repeat(tries) }</span>;
                 this.setState({ results });
               } else {
                 if (err.includes(WAZUH_ERROR_DAEMONS_NOT_READY)) {
@@ -145,6 +161,7 @@ export class HealthCheck extends Component {
               }
             }
           }
+          if (apiId) return apiId;
         }
 
         const updateNotReadyYet = updateWazuhNotReadyYet(false);
@@ -287,20 +304,10 @@ export class HealthCheck extends Component {
               results[i].description = <span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span>;
               this.setState({ results, errors });
             } else {
-              let permissionToGoToTheApp = true;
-              if (!results[i].description.props.children[1].includes('Checking')) {
-                permissionToGoToTheApp = false;
-              }
               results[i].description = <span><EuiIcon type="check" color="secondary" ></EuiIcon> Ready</span>;
-              if (results[i].description.props.children[1].includes('Error')) {
-                permissionToGoToTheApp = false;
-              }
+              const updateNotReadyYet = updateWazuhNotReadyYet(false);
+              store.dispatch(updateNotReadyYet);
               this.setState({ results, errors });
-              if (permissionToGoToTheApp) {
-                this.goAppOverview();
-                const updateNotReadyYet = updateWazuhNotReadyYet(false);
-                store.dispatch(updateNotReadyYet);
-              }
             }
           }
         }
@@ -454,10 +461,6 @@ export class HealthCheck extends Component {
 
   goAppSettings() {
     window.location.href = '/app/wazuh#/settings';
-  }
-
-  goAppOverview() {
-    window.location.href = '/app/wazuh#/overview';
   }
 
   render() {

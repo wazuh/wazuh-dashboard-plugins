@@ -10,11 +10,16 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { GenericRequest } from './generic-request';
-import { KnownFields } from '../utils/known-fields';
-import { FieldsStatistics } from '../utils/statistics-fields';
-import { FieldsMonitoring } from '../utils/monitoring-fields';
-import { WAZUH_INDEX_TYPE_MONITORING, WAZUH_INDEX_TYPE_STATISTICS, WAZUH_INDEX_TYPE_ALERTS } from '../../common/constants';
+import {GenericRequest} from './generic-request';
+import {KnownFields} from '../utils/known-fields';
+import {FieldsStatistics} from '../utils/statistics-fields';
+import {FieldsMonitoring} from '../utils/monitoring-fields';
+import {
+  HEALTH_CHECK,
+  WAZUH_INDEX_TYPE_ALERTS,
+  WAZUH_INDEX_TYPE_MONITORING,
+  WAZUH_INDEX_TYPE_STATISTICS
+} from '../../common/constants';
 
 export class SavedObject {
   /**
@@ -25,11 +30,9 @@ export class SavedObject {
     try {
       const result = await GenericRequest.request(
         'GET',
-        `/api/saved_objects/_find?type=index-pattern&search_fields=title`
+        `/api/saved_objects/_find?type=index-pattern&fields=title&fields=fields&per_page=9999`
       );
-      const indexPatterns = ((result || {}).data || {}).saved_objects || [];
-
-      return indexPatterns;
+      return ((result || {}).data || {}).saved_objects || [];
     } catch (error) {
       return ((error || {}).data || {}).message || false
         ? error.data.message
@@ -42,42 +45,50 @@ export class SavedObject {
    * Returns the full list of index patterns that are valid
    * An index is valid if its fields contain at least these 4 fields: 'timestamp', 'rule.groups', 'agent.id' and 'manager.name'
    */
-  static async getListOfWazuhValidIndexPatterns() {
+  static async getListOfWazuhValidIndexPatterns(defaultIndexPatterns, where) {
     try {
-      const list = await this.getListOfIndexPatterns();
-      const result = list.filter(item => {
-        if (item.attributes && item.attributes.fields) {
-          const fields = JSON.parse(item.attributes.fields);
-          const minimum = {
-            timestamp: true,
-            'rule.groups': true,
-            'manager.name': true,
-            'agent.id': true
-          };
-          let validCount = 0;
+      let result = [];
+      if (where === HEALTH_CHECK) {
+        const list = await Promise.all(
+          defaultIndexPatterns.map(
+            async (pattern) => await SavedObject.getExistingIndexPattern(pattern)
+          )
+        );
+        result = this.validateIndexPatterns(list);
+      }
 
-          fields.map(currentField => {
-            if (minimum[currentField.name]) {
-              validCount++;
-            }
-          });
+      if (!result.length) {
+        const list = await this.getListOfIndexPatterns();
+        result = this.validateIndexPatterns(list);
+      }
 
-          if (validCount === 4) {
-            return true;
-          }
-        }
-        return false;
-      });
-
-      const validIndexPatterns = result.map(item => {
+      return result.map((item) => {
         return { id: item.id, title: item.attributes.title };
       });
-      return validIndexPatterns;
     } catch (error) {
       return ((error || {}).data || {}).message || false
         ? error.data.message
         : error.message || error;
     }
+  }
+
+  static validateIndexPatterns(list) {
+    const requiredFields = [
+      'timestamp',
+      'rule.groups',
+      'manager.name',
+      'agent.id',
+    ];
+
+    return list.filter(item => {
+      if (item.attributes && item.attributes.fields) {
+        const fields = JSON.parse(item.attributes.fields);
+        return requiredFields.every((reqField => {
+          return fields.find(field => field.name === reqField);
+        }));        
+      }
+      return false;
+    });
   }
 
   static async existsOrCreateIndexPattern(patternID) {
@@ -98,6 +109,23 @@ export class SavedObject {
     }
   }
 
+  /**
+   *
+   * Given an index pattern ID, checks if it exists
+   */
+  static async getExistingIndexPattern(patternID) {
+    try {
+      const result = await GenericRequest.request(
+        'GET',
+        `/api/saved_objects/index-pattern/${patternID}?fields=title&fields=fields`
+      );
+
+      return result.data;
+    } catch (error) {
+      if (error && error.response && error.response.status == 404) return false;
+      return ((error || {}).data || {}).message || false ? error.data.message : error.message || false;
+    }
+  }
 
   /**
    *
@@ -107,16 +135,18 @@ export class SavedObject {
     try {
       const result = await GenericRequest.request(
         'GET',
-        `/api/saved_objects/index-pattern/${patternID}`
+        `/api/saved_objects/index-pattern/${patternID}?fields=title&fields=fields`
       );
 
       const title = (((result || {}).data || {}).attributes || {}).title;
+      const fields = (((result || {}).data || {}).attributes || {}).fields;
       if (title) {
         return {
           data: 'Index pattern found',
           status: true,
           statusCode: 200,
-          title: title
+          title,
+          fields
         };
       }
     } catch (error) {
@@ -139,7 +169,7 @@ export class SavedObject {
 
       return result;
     } catch (error) {
-      return ((error || {}).data || {}).message || false
+      throw ((error || {}).data || {}).message || false
         ? error.data.message
         : error.message || error;
     }
@@ -195,7 +225,7 @@ export class SavedObject {
 
   /**
    * Checks the field has a proper structure
-   * @param {index-pattern-field} field 
+   * @param {index-pattern-field} field
    */
   static isValidField(field) {
 
@@ -232,7 +262,7 @@ export class SavedObject {
       );
       return;
     } catch (error) {
-      return ((error || {}).data || {}).message || false
+      throw ((error || {}).data || {}).message || false
         ? error.data.message
         : error.message || error;
     }

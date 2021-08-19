@@ -219,3 +219,4 @@ export enum WAZUH_MODULES_ID{
 }
 
 export const AUTHORIZED_AGENTS = 'authorized-agents';
+export const HEALTH_CHECK = 'health-check';
