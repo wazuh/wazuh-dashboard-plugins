@@ -30,13 +30,16 @@ export interface IValueSuggestion {
 }
 
 interface BoolFilter {
-  field:string;
-  value:string;
+  field: string;
+  value: string;
 }
 
 export const useValueSuggestion = (
   filterField: string,
-  boolFilterValue: BoolFilter,
+  boolFilterValue: BoolFilter = {
+    field: '',
+    value: '',
+  },
   options?: string[],
   type: 'string' | 'boolean' = 'string'
 ): IValueSuggestion => {
@@ -52,7 +55,7 @@ export const useValueSuggestion = (
 
   const getValueSuggestions = async (field) => {
     const boolFilter =
-      boolFilterValue && boolFilterValue.value !== ""
+      boolFilterValue.value !== ''
         ? [
             {
               term: {
