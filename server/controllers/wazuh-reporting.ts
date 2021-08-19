@@ -1875,7 +1875,7 @@ export class WazuhReportingCtrl {
             ],
           },
         },
-        agentOs === 'windows' && {
+        {
           endpoint: `/syscollector/${agentID}/hotfixes`,
           loggerMessage: `Fetching hotfixes for agent ${agentID}`,
           table: {
