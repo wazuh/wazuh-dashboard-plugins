@@ -1875,15 +1875,17 @@ export class WazuhReportingCtrl {
             ],
           },
         },
-        {
+      ];
+
+      agentOs === 'windows' &&
+        agentRequestsInventory.push({
           endpoint: `/syscollector/${agentID}/hotfixes`,
           loggerMessage: `Fetching hotfixes for agent ${agentID}`,
           table: {
             title: 'Windows updates',
             columns: [{ id: 'hotfix', label: 'Update code' }],
           },
-        },
-      ];
+        });
 
       const requestInventory = async (agentRequestInventory) => {
         try {
@@ -1934,14 +1936,7 @@ export class WazuhReportingCtrl {
       }
 
       // Add inventory tables
-      (
-        await Promise.all(
-          (agentOs !== 'windows'
-            ? agentRequestsInventory.filter((key) => key.table.title !== 'Windows updates')
-            : agentRequestsInventory
-          ).map(requestInventory)
-        )
-      )
+      (await Promise.all(agentRequestsInventory.map(requestInventory)))
         .filter((table) => table)
         .forEach((table) => printer.addSimpleTable(table));
 
