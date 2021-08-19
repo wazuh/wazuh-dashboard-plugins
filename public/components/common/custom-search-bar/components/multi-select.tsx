@@ -49,7 +49,7 @@ export const MultiSelect = ({ item, onChange, selectedOptions, onRemove, isDisab
             label: value,
             value: item.key,
             filterByKey: item.filterByKey,
-            checked: OFF as FilterChecked,
+            checked: selectedOptions.find((element) => element.label === value) ? ON as FilterChecked: OFF as FilterChecked,
           }))
           .sort((a, b) => a.label - b.label)
       );
