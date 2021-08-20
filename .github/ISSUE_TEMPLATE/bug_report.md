@@ -6,9 +6,9 @@ labels: bug
 assignees: ''
 ---
 
-| Wazuh | Elastic | Rev | Security |
-| ----- | ------- | --- | -------- |
-| 3.x   | 6.x     | 444 | Basic, ODFE, Xpack |
+| Wazuh | Elastic | Rev  | Security |
+| ----- | ------- | ---- | -------- |
+| 4.x   | 7.x     | 4xxx | Basic, ODFE, Xpack |
 
 | Browser |
 | ------- |
