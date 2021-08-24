@@ -4,7 +4,7 @@
   "revision": "4201-11",
   "code": "4201-11",
   "kibana": {
-    "version": "7.10.0"
+    "version": "7.10.2"
   },
   "description": "Wazuh app",
   "keywords": [
@@ -30,15 +30,14 @@
     "kbn": "node ../../scripts/kbn",
     "es": "node ../../scripts/es",
     "start": "plugin-helpers start",
-    "build": "yarn plugin-helpers build --skip-archive --kibana-version=$KIBANA_VERSION",
+    "build": "yarn plugin-helpers build --kibana-version=$KIBANA_VERSION",
     "plugin-helpers": "node ../../scripts/plugin_helpers",
     "test:ui:runner": "node ../../scripts/functional_test_runner.js",
     "test:server": "plugin-helpers test:server",
     "test:browser": "plugin-helpers test:browser",
     "test:jest": "node scripts/jest",
     "generate:api-4.0-info": "cd scripts/generate-api-4.0-info;./generate-api-4.0-info.sh;cd ../..",
-    "prebuild": "node scripts/generate-build-version",
-    "postbuild": "mkdir build/kibana/wazuh/public && cp -R public/assets build/kibana/wazuh/public && cd build && zip wazuh-kibana-app.zip kibana -r && rm -rf kibana && cd .." 
+    "prebuild": "node scripts/generate-build-version"
   },
   "dependencies": {
     "angular-animate": "1.7.8",
