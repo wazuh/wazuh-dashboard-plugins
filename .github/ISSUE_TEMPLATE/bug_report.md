@@ -6,19 +6,30 @@ labels: bug
 assignees: ''
 ---
 
-| Wazuh | Elastic | Rev |
-| ----- | ------- | --- |
-| 3.x   | 6.x     | 444 |
+| Wazuh | Elastic | Rev  | Security |
+| ----- | ------- | ---- | -------- |
+| 4.x   | 7.x     | 4xxx | Basic, ODFE, Xpack |
+
+| Browser |
+| ------- |
+| Chrome, Firefox, Safari, etc|
 
 **Description**
 Short description of your issue.
 
-**Steps to reproduce**
+**Preconditions**
+1. 
 
-1. Go to '...'
+**Steps to reproduce**
+1. Navigate to '...'
 2. Click on '....'
 3. Scroll down to '....'
-4. See error
+
+**Expected Result**
+1. 
+
+**Actual Result**
+1. 
 
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
