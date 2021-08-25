@@ -223,7 +223,8 @@ service kibana restart
 | :-------: | :----:  | :---------: | :------------------------------------------------------------------------- |
 |   4.2.0   |  7.11.2 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.0_7.11.2-1.zip> |
 |   4.2.0   |  7.10.2 |   1.13.2    | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.0_7.10.2-1.zip> |
-|   4.1.5   |  7.10.2 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.1.5_7.10.2-1.zip> |
+|   4.1.5   |  7.11.2 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.1.5_7.11.2-1.zip> |
+|   4.1.5   |  7.10.2 |   1.13.0    | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.1.5_7.10.2-1.zip> |
 |   4.1.5   |  7.10.0 |   1.12.0    | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.1.5_7.10.0-1.zip> |
 |   4.1.4   |  7.10.2 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.1.4_7.10.2-1.zip> |
 |   4.1.4   |  7.10.0 |   1.12.0    | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.1.4_7.10.0-1.zip> |

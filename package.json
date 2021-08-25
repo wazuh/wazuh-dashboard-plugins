@@ -4,7 +4,7 @@
   "revision": "4202-1",
   "code": "4202-1",
   "kibana": {
-    "version": "7.10.2"
+    "version": "7.10.0"
   },
   "description": "Wazuh app",
   "keywords": [

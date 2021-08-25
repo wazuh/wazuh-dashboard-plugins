@@ -79,7 +79,6 @@ export class SavedObject {
       'manager.name',
       'agent.id',
     ];
-
     return list.filter(item => {
       if (item.attributes && item.attributes.fields) {
         const fields = JSON.parse(item.attributes.fields);
@@ -153,6 +152,26 @@ export class SavedObject {
       return ((error || {}).data || {}).message || false
         ? error.data.message
         : error.message || error;
+    }
+  }
+
+  /**
+   *
+   * Given an index pattern ID, checks if it exists
+   */
+  static async getExistingIndexPattern(patternID) {
+    try {
+      const result = await GenericRequest.request(
+        'GET',
+        `/api/saved_objects/index-pattern/${patternID}?fields=title&fields=fields`,
+        null,
+        true
+      );
+
+      return result.data;
+    } catch (error) {
+      if (error && error.response && error.response.status == 404) return false;
+      return Promise.reject(((error || {}).data || {}).message || false ? error.data.message : error.message || `Error getting the '${patternID}' index pattern`);
     }
   }
 

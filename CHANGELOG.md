@@ -45,6 +45,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fix error in how the SCA check's checks are displayed [#](https://github.com/wazuh/wazuh-kibana-app/pull/3297)
 - Fixed message of error when add sample data fails [#3241](https://github.com/wazuh/wazuh-kibana-app/pull/3241)
 - Fixed modules are missing in the agent menu [#3244](https://github.com/wazuh/wazuh-kibana-app/pull/3244)
+- Fixed Alerts Summary of modules for reports [#3303](https://github.com/wazuh/wazuh-kibana-app/pull/3303)
 - Fixed dark mode visualization background in pdf reports [#3315](https://github.com/wazuh/wazuh-kibana-app/pull/3315)
 - Adapt Kibana integrations to Kibana 7.11 and 7.12  [#3309](https://github.com/wazuh/wazuh-kibana-app/pull/3309)
 - Fixed error agent view does not render correctly  [#3306](https://github.com/wazuh/wazuh-kibana-app/pull/3306)
@@ -96,7 +97,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed check for TCP protocol in deploy new agent [#3163](https://github.com/wazuh/wazuh-kibana-app/pull/3163)
 - Fixed RBAC issue with agent group permissions [#3181](https://github.com/wazuh/wazuh-kibana-app/pull/3181)
 - Fixed change index pattern from menu doesn't work [#3187](https://github.com/wazuh/wazuh-kibana-app/pull/3187)
-- Fixed Alerts Summary of modules for reports [#3303](https://github.com/wazuh/wazuh-kibana-app/pull/3303)
+- Conflict with the creation of the index pattern when performing the Health Check [#3232](https://github.com/wazuh/wazuh-kibana-app/pull/3232)
+- Added Disabled index pattern checks in Health Check [#3311](https://github.com/wazuh/wazuh-kibana-app/pull/3311)
+- Fixed windows update section in Linux Inventory PDF [#3569](https://github.com/wazuh/wazuh-kibana-app/pull/3569)
+- Improving and removing unnecessary error logs [#3574](https://github.com/wazuh/wazuh-kibana-app/pull/3574)
 
 ## Wazuh v4.1.5 - Kibana 7.10.0 , 7.10.2, 7.11.2 - Revision 4108
 
@@ -115,7 +119,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Conflict with the creation of the index pattern when performing the Health Check [#3223](https://github.com/wazuh/wazuh-kibana-app/pull/3223)
 - Fixing mac os agents add command [#3207](https://github.com/wazuh/wazuh-kibana-app/pull/3207)
-
 ## Wazuh v4.1.5 - Kibana 7.10.0 , 7.10.2 - Revision 4106
 
 - Adapt for Wazuh 4.1.5
@@ -283,7 +286,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed ping request to default request. Added delay and while to che… [#2820](https://github.com/wazuh/wazuh-kibana-app/issues/2820)
 - Removed kibana alert for security [#2806](https://github.com/wazuh/wazuh-kibana-app/issues/2806)
 
-## Wazuh v4.0.4 - Kibana v7.9.1, v7.9.3 - Revision 4016
+## Wazuh v4.0.4 - Kibana 7.10.0 , 7.10.2 - Revision 4016
 
 ### Added
 

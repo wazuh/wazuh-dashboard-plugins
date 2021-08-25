@@ -272,7 +272,6 @@ export class RegisterAgent extends Component {
 
   optionalDeploymentVariables() {
     let deployment = `WAZUH_MANAGER='${this.state.serverAddress}' `;
-
     if (this.state.selectedOS == 'win') {
       deployment += `WAZUH_REGISTRATION_SERVER='${this.state.serverAddress}' `;
     }
