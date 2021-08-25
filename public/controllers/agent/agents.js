@@ -80,7 +80,7 @@ export class AgentsController {
     this.$scope.integrations = {};
     this.$scope.selectedItem = 0;
     this.targetLocation = null;
-    this.ignoredTabs = ['syscollector', 'welcome', 'configuration'];
+    this.ignoredTabs = ['syscollector', 'welcome', 'configuration', 'stats'];
 
     this.$scope.showNewFim = true;
     this.$scope.showScaScan = false;

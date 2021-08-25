@@ -1,8 +1,8 @@
 {
   "name": "wazuh",
-  "version": "4.1.5",
-  "revision": "4108",
-  "code": "4108-0",
+  "version": "4.2.0",
+  "revision": "4201-11",
+  "code": "4201-11",
   "kibana": {
     "version": "7.10.0"
   },
@@ -12,7 +12,7 @@
     "wazuh",
     "ossec"
   ],
-  "node_build": "8.14.0",
+  "node_build": "10.23.1",
   "author": "Wazuh, Inc",
   "license": "GPL-2.0",
   "repository": {
@@ -30,15 +30,14 @@
     "kbn": "node ../../scripts/kbn",
     "es": "node ../../scripts/es",
     "start": "plugin-helpers start",
-    "build": "yarn plugin-helpers build --skip-archive --kibana-version=$KIBANA_VERSION",
+    "build": "yarn plugin-helpers build --kibana-version=$KIBANA_VERSION",
     "plugin-helpers": "node ../../scripts/plugin_helpers",
     "test:ui:runner": "node ../../scripts/functional_test_runner.js",
     "test:server": "plugin-helpers test:server",
     "test:browser": "plugin-helpers test:browser",
     "test:jest": "node scripts/jest",
     "generate:api-4.0-info": "cd scripts/generate-api-4.0-info;./generate-api-4.0-info.sh;cd ../..",
-    "prebuild": "node scripts/generate-build-version",
-    "postbuild": "mkdir build/kibana/wazuh/public && cp -R public/assets build/kibana/wazuh/public && cd build && zip wazuh-kibana-app.zip kibana -r && rm -rf kibana && cd .."
+    "prebuild": "node scripts/generate-build-version"
   },
   "dependencies": {
     "angular-animate": "1.7.8",

@@ -18,6 +18,7 @@ import { connect } from "react-redux";
 import { LoadedVisualizations } from "../factories/loaded-visualizations";
 import { RawVisualizations } from "../factories/raw-visualizations";
 import { VisHandlers } from "../factories/vis-handlers";
+import { WzRequest } from '../react-services/wz-request';
 import { TabVisualizations } from "../factories/tab-visualizations";
 import store from "../redux/store";
 import { updateMetric } from "../redux/actions/visualizationsActions";
@@ -33,6 +34,10 @@ import {
 } from "@elastic/eui";
 import { getAngularModule, getToasts, getVisualizationsPlugin, getSavedObjects, getDataPlugin, getChrome, getOverlays } from '../kibana-services';
 import { KnownFields } from "../utils/known-fields";
+import { union } from 'lodash';
+import { getFilterWithAuthorizedAgents } from '../react-services/filter-authorization-agents';
+import { AUTHORIZED_AGENTS } from '../../common/constants';
+
 
 class KibanaVis extends Component {
   _isMounted = false;
@@ -210,18 +215,30 @@ class KibanaVis extends Component {
         isAgentStatus && timeFilterSeconds < 900
           ? { from: "now-15m", to: "now", mode: "quick" }
           : timefilter.getTime();
-      const filters = isAgentStatus ? [] : discoverList[1] || [];
+      let filters = isAgentStatus ? [] : discoverList[1] || [];
       const query = !isAgentStatus ? discoverList[0] : {};
 
-      const visInput = {
-        timeRange,
-        filters,
-        query
-      };
-
-      const rawVis = raw ? raw.filter((item) => item && item.id === this.visID) : []; 
+      const rawVis = raw ? raw.filter((item) => item && item.id === this.visID) : [];
 
       if (rawVis.length && discoverList.length) {
+        let vizPattern;
+        try {
+          vizPattern = JSON.parse(rawVis[0].attributes.kibanaSavedObjectMeta.searchSourceJSON).index;
+        } catch (ex) {
+          console.warn(`kibana-vis exception: ${ex.message || ex}`);
+        }
+
+        if (!filters.find((filter) => filter.meta.controlledBy === AUTHORIZED_AGENTS)) {
+          const agentsFilters = getFilterWithAuthorizedAgents(this.props.allowedAgents, vizPattern);
+          filters = agentsFilters ? union(filters, [agentsFilters]) : filters;
+        }
+
+        const visInput = {
+          timeRange,
+          filters,
+          query
+        };
+
         // There are pending updates from the discover (which is the one who owns the true app state)
 
         if (!this.visualization && !this.rendered && !this.renderInProgress) {
@@ -417,6 +434,7 @@ class KibanaVis extends Component {
 const mapStateToProps = (state) => {
   return {
     state: state.visualizationsReducers,
+    allowedAgents: state.appStateReducers.allowedAgents
   };
 };
 

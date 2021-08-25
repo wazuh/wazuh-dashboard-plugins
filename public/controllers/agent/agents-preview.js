@@ -20,7 +20,9 @@ import { WzRequest } from '../../react-services/wz-request';
 import { ShareAgent } from '../../factories/share-agent';
 import { formatUIDate } from '../../react-services/time-service';
 import { ErrorHandler } from '../../react-services/error-handler';
-import { getDataPlugin, getUiSettings } from '../../kibana-services';
+import { getDataPlugin, getToasts } from '../../kibana-services';
+import { connect } from 'react-redux';
+import store from '../../redux/store';
 
 export class AgentsPreviewController {
   /**
@@ -193,12 +195,12 @@ export class AgentsPreviewController {
     try {
       const data = await this.genericReq.request(
         'GET',
-        `/elastic/top/${this.firstUrlParam}/${this.secondUrlParam}/agent.name/${this.pattern}`
+        `/elastic/top/${this.firstUrlParam}/${this.secondUrlParam}/agent.name/${this.pattern}?agentsList=${store.getState().appStateReducers.allowedAgents.toString()}`
       );
       this.mostActiveAgent.name = data.data.data;
       const info = await this.genericReq.request(
         'GET',
-        `/elastic/top/${this.firstUrlParam}/${this.secondUrlParam}/agent.id/${this.pattern}`
+        `/elastic/top/${this.firstUrlParam}/${this.secondUrlParam}/agent.id/${this.pattern}?agentsList=${store.getState().appStateReducers.allowedAgents.toString()}`
       );
       if (info.data.data === '' && this.mostActiveAgent.name !== '') {
         this.mostActiveAgent.id = '000';
@@ -206,7 +208,9 @@ export class AgentsPreviewController {
         this.mostActiveAgent.id = info.data.data;
       }
       return this.mostActiveAgent;
-    } catch (error) { }
+    } catch (error) { 
+      getToasts().addDanger({title: 'An error occurred while trying to get the most active agent', text: error.message || error });
+    }
   }
 
   /**

@@ -16,13 +16,17 @@ export const WAZUH_INDEX_TYPE_ALERTS = "alerts";
 export const WAZUH_ALERTS_PREFIX = "wazuh-alerts-";
 export const WAZUH_ALERTS_PATTERN = "wazuh-alerts-*";
 
+// Default number of shards and replicas for indices
+export const WAZUH_INDEX_SHARDS = 2;
+export const WAZUH_INDEX_REPLICAS = 0;
+
 // Job - Wazuh monitoring
 
 export const WAZUH_INDEX_TYPE_MONITORING = "monitoring";
 export const WAZUH_MONITORING_PREFIX = "wazuh-monitoring-";
 export const WAZUH_MONITORING_PATTERN = "wazuh-monitoring-*";
 export const WAZUH_MONITORING_TEMPLATE_NAME = "wazuh-agent";
-export const WAZUH_MONITORING_DEFAULT_INDICES_SHARDS = 2;
+export const WAZUH_MONITORING_DEFAULT_INDICES_SHARDS = WAZUH_INDEX_SHARDS;
 export const WAZUH_MONITORING_DEFAULT_CREATION = 'd';
 export const WAZUH_MONITORING_DEFAULT_ENABLED = true;
 export const WAZUH_MONITORING_DEFAULT_FREQUENCY = 900;
@@ -31,6 +35,15 @@ export const WAZUH_MONITORING_DEFAULT_CRON_FREQ = '0 * * * * *';
 // Job - Wazuh statistics
 
 export const WAZUH_INDEX_TYPE_STATISTICS = "statistics";
+export const WAZUH_STATISTICS_DEFAULT_PREFIX = "wazuh";
+export const WAZUH_STATISTICS_DEFAULT_NAME = "statistics";
+export const WAZUH_STATISTICS_PATTERN = `${WAZUH_STATISTICS_DEFAULT_PREFIX}-${WAZUH_STATISTICS_DEFAULT_NAME}-*`;
+export const WAZUH_STATISTICS_TEMPLATE_NAME = `${WAZUH_STATISTICS_DEFAULT_PREFIX}-${WAZUH_STATISTICS_DEFAULT_NAME}`;
+export const WAZUH_STATISTICS_DEFAULT_INDICES_SHARDS = WAZUH_INDEX_SHARDS;
+export const WAZUH_STATISTICS_DEFAULT_CREATION = 'w';
+export const WAZUH_STATISTICS_DEFAULT_STATUS = true;
+export const WAZUH_STATISTICS_DEFAULT_FREQUENCY = 900;
+export const WAZUH_STATISTICS_DEFAULT_CRON_FREQ = '0 */5 * * * *';
 
 // Job - Wazuh initialize
 export const WAZUH_INDEX = '.wazuh';
@@ -97,10 +110,6 @@ export const WAZUH_CONFIGURATION_SETTINGS_NEED_RELOAD = [
   'hideManagerAlerts',
 ];
 
-// Default number of shards and replicas for indices
-export const WAZUH_INDEX_SHARDS = 2;
-export const WAZUH_INDEX_REPLICAS = 0;
-
 // Reserved ids for Users/Role mapping
 export const WAZUH_API_RESERVED_ID_LOWER_THAN = 100;
 
@@ -155,18 +164,18 @@ export const WAZUH_DEFAULT_APP_CONFIG = {
   'ip.selector': true,
   'ip.ignore': [],
   'xpack.rbac.enabled': true,
-  'wazuh.monitoring.enabled': true,
-  'wazuh.monitoring.frequency': 900,
+  'wazuh.monitoring.enabled': WAZUH_MONITORING_DEFAULT_ENABLED,
+  'wazuh.monitoring.frequency': WAZUH_MONITORING_DEFAULT_FREQUENCY,
   'wazuh.monitoring.shards': WAZUH_INDEX_SHARDS,
   'wazuh.monitoring.replicas': WAZUH_INDEX_REPLICAS,
-  'wazuh.monitoring.creation': 'd',
+  'wazuh.monitoring.creation': WAZUH_MONITORING_DEFAULT_CREATION,
   'wazuh.monitoring.pattern': WAZUH_MONITORING_PATTERN,
-  'cron.prefix': 'wazuh',
-  'cron.statistics.status': true,
+  'cron.prefix': WAZUH_STATISTICS_DEFAULT_PREFIX,
+  'cron.statistics.status': WAZUH_STATISTICS_DEFAULT_STATUS,
   'cron.statistics.apis': [],
-  'cron.statistics.interval': '0 */5 * * * *',
-  'cron.statistics.index.name': 'statistics',
-  'cron.statistics.index.creation': 'w',
+  'cron.statistics.interval': WAZUH_STATISTICS_DEFAULT_CRON_FREQ,
+  'cron.statistics.index.name': WAZUH_STATISTICS_DEFAULT_NAME,
+  'cron.statistics.index.creation': WAZUH_STATISTICS_DEFAULT_CREATION,
   'cron.statistics.index.shards': WAZUH_INDEX_SHARDS,
   'cron.statistics.index.replicas': WAZUH_INDEX_REPLICAS,
   'alerts.sample.prefix': WAZUH_SAMPLE_ALERT_PREFIX,
@@ -176,7 +185,7 @@ export const WAZUH_DEFAULT_APP_CONFIG = {
 };
 
 // Wazuh errors
-export const WAZUH_ERROR_DAEMONS_NOT_READY = 'ERROR3099 - Some Wazuh daemons are not ready yet in node';
+export const WAZUH_ERROR_DAEMONS_NOT_READY = 'ERROR3099';
 
 // Agents
 export enum WAZUH_AGENTS_OS_TYPE{
@@ -208,3 +217,6 @@ export enum WAZUH_MODULES_ID{
   VIRUSTOTAL = 'virustotal',
   GDPR = 'gdpr'
 }
+
+export const AUTHORIZED_AGENTS = 'authorized-agents';
+export const HEALTH_CHECK = 'health-check';

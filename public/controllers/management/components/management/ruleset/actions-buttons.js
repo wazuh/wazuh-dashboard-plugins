@@ -266,6 +266,7 @@ class WzRulesetActionButtons extends Component {
               resource={section}
               path={`etc/${section}`}
               upload={uploadFile}
+              onSuccess={() => this.props.updateRestartClusterManager(true)}
             />
           </EuiFlexItem>
         )}

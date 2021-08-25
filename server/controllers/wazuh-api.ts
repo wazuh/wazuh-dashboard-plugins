@@ -206,7 +206,6 @@ export class WazuhApiCtrl {
       // If we have an invalid response from the Wazuh API
       throw new Error(responseManagerInfo.data.detail || `${api.url}:${api.port} is unreachable`);
     } catch (error) {
-      log('wazuh-api:checkStoredAPI', error.message || error);
       if (error.code === 'EPROTO') {
         return response.ok({
           body: {
@@ -251,8 +250,10 @@ export class WazuhApiCtrl {
             } catch (error) { } // eslint-disable-line
           }
         } catch (error) {
+          log('wazuh-api:checkStoredAPI', error.message || error);
           return ErrorResponse(error.message || error, 3020, 500, response);
         }
+        log('wazuh-api:checkStoredAPI', error.message || error);
         return ErrorResponse(error.message || error, 3002, 500, response);
       }
     }
@@ -321,7 +322,7 @@ export class WazuhApiCtrl {
         );
       }catch(error){
         return ErrorResponse(
-          `ERROR3099 - ${error.response.data.detail || 'Wazuh not ready yet'}`,
+          `ERROR3099 - ${error.response?.data?.detail || 'Wazuh not ready yet'}`,
           3099,
           500,
           response
@@ -479,7 +480,7 @@ export class WazuhApiCtrl {
         typeof daemons['wazuh-clusterd'] !== 'undefined';
       const wazuhdbExists = typeof daemons['wazuh-db'] !== 'undefined';
 
-      const execd = daemons['ossec-execd'] === 'running';
+      const execd = daemons['wazuh-execd'] === 'running';
       const modulesd = daemons['wazuh-modulesd'] === 'running';
       const wazuhdb = wazuhdbExists ? daemons['wazuh-db'] === 'running' : true;
       const clusterd = isCluster ? daemons['wazuh-clusterd'] === 'running' : true;

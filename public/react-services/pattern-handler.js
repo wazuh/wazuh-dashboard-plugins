@@ -10,16 +10,16 @@
  * Find more information about this on the LICENSE file.
  */
 import { AppState } from './app-state';
-import { WzMisc } from '../factories/misc';
 import { SavedObject } from './saved-objects';
 import { getDataPlugin, getHttp, getToasts } from '../kibana-services';
 import { WazuhConfig } from '../react-services/wazuh-config';
+import { HEALTH_CHECK } from '../../common/constants';
 
 export class PatternHandler {
   /**
    * Get the available pattern list
    */
-  static async getPatternList(where) {
+  static async getPatternList(origin) {
     try {
       const wazuhConfig = new WazuhConfig();
       const { pattern } = wazuhConfig.getConfig();
@@ -27,43 +27,19 @@ export class PatternHandler {
       const defaultPatterns = [pattern];
       const selectedPattern = AppState.getCurrentPattern();
       if (selectedPattern && selectedPattern !== pattern) defaultPatterns.push(selectedPattern);
-      let patternList = await SavedObject.getListOfWazuhValidIndexPatterns(defaultPatterns, where);
+      let patternList = await SavedObject.getListOfWazuhValidIndexPatterns(defaultPatterns, origin);
 
-      if (where === 'healthcheck') {
-        function getIndexPatterns() {
-          return new Promise(function (resolve, reject) {
-            setTimeout(async function () {
-              const patternList = await SavedObject.getListOfWazuhValidIndexPatterns(
-                defaultPatterns,
-                where
-              );
-              resolve(patternList);
-            }, 500);
-          });
-        }
+      if (origin === HEALTH_CHECK) {
+        const indexPatternFound = patternList.find((indexPattern) => indexPattern.title === pattern);
 
-        let i = 0;
-        // if the index pattern doesn't exist yet, we check 5 more times with a delay of 500ms
-        while (i < 5 && !patternList.length) {
-          i++;
-          patternList = await getIndexPatterns().then(function (result) {
-            return result;
-          });
-        }
-
-        const indexPatternFound = patternList.find(
-          (indexPattern) => indexPattern.title === pattern
-        );
-
-        if (!indexPatternFound) {
+        if (!indexPatternFound && pattern) {
           // if no valid index patterns are found we try to create the wazuh-alerts-*
           try {
-            if (!pattern) return;
-
             getToasts().add({
               color: 'warning',
-              title: `No ${pattern} index pattern was found, proceeding to create it.`,
-              toastLifeTimeMs: 5000,
+              title:
+                `No ${pattern} index pattern was found, proceeding to create it.`,
+              toastLifeTimeMs: 5000
             });
 
             if (await SavedObject.getExistingIndexPattern(pattern)) {
@@ -74,36 +50,18 @@ export class PatternHandler {
               getToasts().addSuccess(`${pattern} index pattern created successfully`);
             }
 
-            getDataPlugin().indexPatterns.setDefault(pattern, true);
+            patternList = await SavedObject.getListOfWazuhValidIndexPatterns(defaultPatterns, origin);
+            !AppState.getCurrentPattern() && AppState.setCurrentPattern(pattern);
           } catch (err) {
-            getToasts().add({
-              color: 'error',
+            getToasts().addDanger({
               title: 'Error creating the index pattern.',
               text: err.message || err,
-              toastLifeTimeMs: 3000,
+              toastLifeTimeMs: 3000
             });
             AppState.removeCurrentPattern();
 
-            this.wzMisc = new WzMisc();
-            this.wzMisc.setBlankScr(
-              'Sorry but no valid index patterns were found and creation was unsuccessful'
-            );
-            if (
-              !window.location.hash.includes('#/settings') &&
-              !window.location.hash.includes('#/blank-screen')
-            ) {
-              window.location.href = getHttp().basePath.prepend('/app/wazuh#/blank-screen/');
-            }
             return;
           }
-          // retry again with the newly created index pattern
-          if (
-            !window.location.hash.includes('#/settings') &&
-            !window.location.hash.includes('#/health-check')
-          ) {
-            window.location.href = getHttp().basePath.prepend('/app/wazuh#/health-check/');
-          }
-          patternList = await SavedObject.getListOfWazuhValidIndexPatterns(defaultPatterns, where);
         }
       }
 

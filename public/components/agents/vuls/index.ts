@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Load the Dev Tools controller.
+ * Wazuh app - Agent vulnerabilities components
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -9,10 +9,6 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { DevToolsController } from './dev-tools';
-import { getAngularModule } from '../../kibana-services';
 
-const app = getAngularModule();
-
-app
-.controller('devToolsController', DevToolsController);	
+export { MainVuls } from './main';
+export { Inventory } from './inventory';

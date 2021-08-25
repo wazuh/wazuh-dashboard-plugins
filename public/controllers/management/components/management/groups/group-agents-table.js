@@ -40,7 +40,7 @@ class WzGroupAgentsTable extends Component {
   constructor(props) {
     super(props);
     this.suggestions = [
-      { type: 'q', label: 'status', description: 'Filter by agent connection status', operators: ['=', '!=',], values: ['active', 'disconnected', 'never_connected'] },
+      { type: 'q', label: 'status', description: 'Filter by agent connection status', operators: ['=', '!=',], values: ['active', 'disconnected', 'never_connected', 'pending'] },
       { type: 'q', label: 'os.platform', description: 'Filter by OS platform', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('os.platform', value, {q: `group=${this.props.state.itemDetail.name}`})},
       { type: 'q', label: 'ip', description: 'Filter by agent IP', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('ip', value,  {q: `group=${this.props.state.itemDetail.name}`})},
       { type: 'q', label: 'name', description: 'Filter by agent name', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('name', value,  {q: `group=${this.props.state.itemDetail.name}`})},
@@ -106,7 +106,7 @@ class WzGroupAgentsTable extends Component {
             <div>
               <WzButtonPermissions
                 buttonType='icon'
-                permissions={[{action: 'agent:read', resource: `agent:id:${item.id}`}]}
+                permissions={[[{action: 'agent:read', resource: `agent:id:${item.id}`}, ...(item.group || []).map(group => ({ action: 'agent:read', resource: `agent:group:${group}` }))]]}
                 tooltip={{position: 'top', content: 'Go to the agent'}}
                 aria-label="Go to the agent"
                 iconType="eye"
@@ -117,7 +117,7 @@ class WzGroupAgentsTable extends Component {
               />
               <WzButtonPermissionsModalConfirm
                 buttonType='icon'
-                permissions={[{action: 'agent:modify_group', resource: `agent:id:${item.id}`}]}
+                permissions={[[{action: 'agent:modify_group', resource: `agent:id:${item.id}`}, ...(item.group || []).map(group => ({ action: 'agent:modify_group', resource: `agent:group:${group}` }))]]}
                 tooltip={{position: 'top', content: 'Remove agent from this group'}}
                 aria-label="Remove agent from this group"
                 iconType="trash"
@@ -146,7 +146,7 @@ class WzGroupAgentsTable extends Component {
     const { error } = this.props.state;
     if (!error) {
       return (
-          <TableWithSearchBarWzAPI 
+          <TableWithSearchBarWzAPI
             tableColumns={this.columns}
             tableInitialSortingField='id'
             searchBarSuggestions={this.suggestions}

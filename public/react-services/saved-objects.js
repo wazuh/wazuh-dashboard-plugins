@@ -10,14 +10,15 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { GenericRequest } from './generic-request';
-import { KnownFields } from '../utils/known-fields';
-import { FieldsStatistics } from '../utils/statistics-fields';
-import { FieldsMonitoring } from '../utils/monitoring-fields';
+import {GenericRequest} from './generic-request';
+import {KnownFields} from '../utils/known-fields';
+import {FieldsStatistics} from '../utils/statistics-fields';
+import {FieldsMonitoring} from '../utils/monitoring-fields';
 import {
+  HEALTH_CHECK,
   WAZUH_INDEX_TYPE_ALERTS,
   WAZUH_INDEX_TYPE_MONITORING,
-  WAZUH_INDEX_TYPE_STATISTICS,
+  WAZUH_INDEX_TYPE_STATISTICS
 } from '../../common/constants';
 
 export class SavedObject {
@@ -47,7 +48,7 @@ export class SavedObject {
   static async getListOfWazuhValidIndexPatterns(defaultIndexPatterns, where) {
     try {
       let result = [];
-      if (where === 'healthcheck') {
+      if (where === HEALTH_CHECK) {
         const list = await Promise.all(
           defaultIndexPatterns.map(
             async (pattern) => await SavedObject.getExistingIndexPattern(pattern)
@@ -107,6 +108,23 @@ export class SavedObject {
     }
   }
 
+  /**
+   *
+   * Given an index pattern ID, checks if it exists
+   */
+  static async getExistingIndexPattern(patternID) {
+    try {
+      const result = await GenericRequest.request(
+        'GET',
+        `/api/saved_objects/index-pattern/${patternID}?fields=title&fields=fields`
+      );
+
+      return result.data;
+    } catch (error) {
+      if (error && error.response && error.response.status == 404) return false;
+      return ((error || {}).data || {}).message || false ? error.data.message : error.message || false;
+    }
+  }
 
   /**
    *
@@ -170,7 +188,7 @@ export class SavedObject {
 
       return result;
     } catch (error) {
-      return ((error || {}).data || {}).message || false
+      throw ((error || {}).data || {}).message || false
         ? error.data.message
         : error.message || error;
     }
@@ -263,7 +281,7 @@ export class SavedObject {
       );
       return;
     } catch (error) {
-      return ((error || {}).data || {}).message || false
+      throw ((error || {}).data || {}).message || false
         ? error.data.message
         : error.message || error;
     }

@@ -32,9 +32,13 @@ import { KibanaRequest, RequestHandlerContext, KibanaResponseFactory } from 'src
 import { ReportPrinter } from '../lib/reporting/printer';
 
 import { log } from '../lib/logger';
-import { WAZUH_ALERTS_PATTERN, WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH, WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH } from '../../common/constants';
+import {
+  WAZUH_ALERTS_PATTERN,
+  WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH,
+  WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH,
+  AUTHORIZED_AGENTS,
+} from '../../common/constants';
 import { createDirectoryIfNotExists, createDataDirectoryIfNotExists } from '../lib/filesystem';
-
 
 export class WazuhReportingCtrl {
   constructor() {}
@@ -44,7 +48,7 @@ export class WazuhReportingCtrl {
    * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
    * @param {String} searchBar search term
    */
-  private sanitizeKibanaFilters(filters: any, searchBar?: string): string {
+  private sanitizeKibanaFilters(filters: any, searchBar?: string): [string, string] {
     log('reporting:sanitizeKibanaFilters', `Started to sanitize filters`, 'info');
     log(
       'reporting:sanitizeKibanaFilters',
@@ -53,17 +57,25 @@ export class WazuhReportingCtrl {
     );
     let str = '';
 
+    const agentsFilter: any = [];
+
+    //separate agents filter
+    filters = filters.filter((filter) => {
+      if (filter.meta.controlledBy === AUTHORIZED_AGENTS) {
+        agentsFilter.push(filter);
+        return false;
+      }
+      return filter;
+    });
+
     const len = filters.length;
+
     for (let i = 0; i < len; i++) {
       const { negate, key, value, params, type } = filters[i].meta;
       str += `${negate ? 'NOT ' : ''}`;
       str += `${key}: `;
       str += `${
-        type === 'range'
-          ? `${params.gte}-${params.lt}`
-          : !!value
-          ? value
-          : (params || {}).query
+        type === 'range' ? `${params.gte}-${params.lt}` : !!value ? value : (params || {}).query
       }`;
       str += `${i === len - 1 ? '' : ' AND '}`;
     }
@@ -71,8 +83,16 @@ export class WazuhReportingCtrl {
     if (searchBar) {
       str += ' AND ' + searchBar;
     }
-    log('reporting:sanitizeKibanaFilters', `str: ${str}`, 'debug');
-    return str;
+
+    const agentsFilterStr = agentsFilter.map((filter) => filter.meta.value).join(',');
+
+    log(
+      'reporting:sanitizeKibanaFilters',
+      `str: ${str}, agentsFilterStr: ${agentsFilterStr}`,
+      'debug'
+    );
+
+    return [str, agentsFilterStr];
   }
 
   /**
@@ -91,27 +111,27 @@ export class WazuhReportingCtrl {
         'debug'
       );
       if (section && typeof section === 'string') {
-        if (!['agentConfig','groupConfig'].includes(section)) {
+        if (!['agentConfig', 'groupConfig'].includes(section)) {
           printer.addContent({
             text: WAZUH_MODULES[tab].title + ' report',
-            style: 'h1'
+            style: 'h1',
           });
         } else if (section === 'agentConfig') {
           printer.addContent({
             text: `Agent ${isAgents} configuration`,
-            style: 'h1'
+            style: 'h1',
           });
         } else if (section === 'groupConfig') {
           printer.addContent({
             text: 'Agents in group',
             style: { fontSize: 14, color: '#000' },
-            margin: [0, 20, 0, 0]
+            margin: [0, 20, 0, 0],
           });
           if (section === 'groupConfig' && !Object.keys(isAgents).length) {
             printer.addContent({
               text: 'There are still no agents in this group.',
               style: { fontSize: 12, color: '#000' },
-              margin: [0, 10, 0, 0]
+              margin: [0, 10, 0, 0],
             });
           }
         }
@@ -132,14 +152,14 @@ export class WazuhReportingCtrl {
         const agentResponse = await context.wazuh.api.client.asCurrentUser.request(
           'GET',
           `/agents`,
-          { params: { agents_list: isAgents }},
-          {apiHostID: apiId}
+          { params: { agents_list: isAgents } },
+          { apiHostID: apiId }
         );
         const agentData = agentResponse.data.data.affected_items[0];
         if (agentData && agentData.status !== 'active') {
           printer.addContentWithNewLine({
             text: `Warning. Agent is ${agentData.status.toLowerCase()}`,
-            style: 'standard'
+            style: 'standard',
           });
         }
         await this.buildAgentsTable(context, printer, [isAgents], apiId);
@@ -148,14 +168,14 @@ export class WazuhReportingCtrl {
           const agentGroups = agentData.group.join(', ');
           printer.addContentWithNewLine({
             text: `Group${agentData.group.length > 1 ? 's' : ''}: ${agentGroups}`,
-            style: 'standard'
+            style: 'standard',
           });
         }
       }
       if (WAZUH_MODULES[tab] && WAZUH_MODULES[tab].description) {
         printer.addContentWithNewLine({
           text: WAZUH_MODULES[tab].description,
-          style: 'standard'
+          style: 'standard',
         });
       }
 
@@ -171,52 +191,62 @@ export class WazuhReportingCtrl {
    * @param {Array<Strings>} ids ids of agents
    * @param {String} apiId API id
    */
-  private async buildAgentsTable(context, printer: ReportPrinter, agentIDs: string[], apiId: string, multi = false) {
+  private async buildAgentsTable(
+    context,
+    printer: ReportPrinter,
+    agentIDs: string[],
+    apiId: string,
+    multi = false
+  ) {
     if (!agentIDs || !agentIDs.length) return;
-    log(
-      'reporting:buildAgentsTable',
-      `${agentIDs.length} agents for API ${apiId}`,
-      'info'
-    );
+    log('reporting:buildAgentsTable', `${agentIDs.length} agents for API ${apiId}`, 'info');
     try {
       let agentRows = [];
       if (multi) {
-        try{
+        try {
           const agentsResponse = await context.wazuh.api.client.asCurrentUser.request(
             'GET',
             `/groups/${multi}/agents`,
             {},
-            {apiHostID: apiId}
+            { apiHostID: apiId }
           );
-          const agentsData = agentsResponse && agentsResponse.data && agentsResponse.data.data && agentsResponse.data.data.affected_items;
-          agentRows = (agentsData || []).map(agent => ({
+          const agentsData =
+            agentsResponse &&
+            agentsResponse.data &&
+            agentsResponse.data.data &&
+            agentsResponse.data.data.affected_items;
+          agentRows = (agentsData || []).map((agent) => ({
             ...agent,
             manager: agent.manager || agent.manager_host,
-            os: (agent.os && agent.os.name && agent.os.version) ? `${agent.os.name} ${agent.os.version}` : ''
+            os:
+              agent.os && agent.os.name && agent.os.version
+                ? `${agent.os.name} ${agent.os.version}`
+                : '',
           }));
-
-        }catch(error){
+        } catch (error) {
           log(
             'reporting:buildAgentsTable',
             `Skip agent due to: ${error.message || error}`,
             'debug'
           );
         }
-
       } else {
         for (const agentID of agentIDs) {
           try {
             const agentResponse = await context.wazuh.api.client.asCurrentUser.request(
               'GET',
               `/agents`,
-              {params: {q:`id=${agentID}`}},
-              {apiHostID: apiId}
+              { params: { q: `id=${agentID}` } },
+              { apiHostID: apiId }
             );
             const [agent] = agentResponse.data.data.affected_items;
             agentRows.push({
               ...agent,
               manager: agent.manager || agent.manager_host,
-              os: (agent.os && agent.os.name && agent.os.version) ? `${agent.os.name} ${agent.os.version}` : ''
+              os:
+                agent.os && agent.os.name && agent.os.version
+                  ? `${agent.os.name} ${agent.os.version}`
+                  : '',
             });
           } catch (error) {
             log(
@@ -229,16 +259,16 @@ export class WazuhReportingCtrl {
       }
       printer.addSimpleTable({
         columns: [
-          {id: 'id', label: 'ID'},
-          {id: 'name', label: 'Name'},
-          {id: 'ip', label: 'IP'},
-          {id: 'version', label: 'Version'},
-          {id: 'manager', label: 'Manager'},
-          {id: 'os', label: 'OS'},
-          {id: 'dateAdd', label: 'Registration date'},
-          {id: 'lastKeepAlive', label: 'Last keep alive'},
+          { id: 'id', label: 'ID' },
+          { id: 'name', label: 'Name' },
+          { id: 'ip', label: 'IP' },
+          { id: 'version', label: 'Version' },
+          { id: 'manager', label: 'Manager' },
+          { id: 'os', label: 'OS' },
+          { id: 'dateAdd', label: 'Registration date' },
+          { id: 'lastKeepAlive', label: 'Last keep alive' },
         ],
-        items: agentRows
+        items: agentRows,
       });
     } catch (error) {
       log('reporting:buildAgentsTable', error.message || error);
@@ -279,16 +309,14 @@ export class WazuhReportingCtrl {
         'info'
       );
       if (section === 'agents' && !agent) {
-        throw new Error(
-          'Reporting for specific agent needs an agent ID in order to work properly'
-        );
+        throw new Error('Reporting for specific agent needs an agent ID in order to work properly');
       }
 
       const agents = await context.wazuh.api.client.asCurrentUser.request(
         'GET',
         '/agents',
-        { params: {limit: 1 }},
-        {apiHostID: apiId}
+        { params: { limit: 1 } },
+        { apiHostID: apiId }
       );
 
       const totalAgents = agents.data.data.total_affected_items;
@@ -301,27 +329,29 @@ export class WazuhReportingCtrl {
         );
         const vulnerabilitiesLevels = ['Low', 'Medium', 'High', 'Critical'];
 
-        const vulnerabilitiesResponsesCount = (await Promise.all(vulnerabilitiesLevels.map(async vulnerabilitiesLevel => {
-          try{
-            const count = await VulnerabilityRequest.uniqueSeverityCount(
-              context,
-              from,
-              to,
-              vulnerabilitiesLevel,
-              filters,
-              pattern
-            );
-            return count
-              ? `${count} of ${totalAgents} agents have ${vulnerabilitiesLevel.toLocaleLowerCase()} vulnerabilities.`
-              : undefined;
-          }catch(error){
-
-          };
-        }))).filter(vulnerabilitiesResponse => vulnerabilitiesResponse);
+        const vulnerabilitiesResponsesCount = (
+          await Promise.all(
+            vulnerabilitiesLevels.map(async (vulnerabilitiesLevel) => {
+              try {
+                const count = await VulnerabilityRequest.uniqueSeverityCount(
+                  context,
+                  from,
+                  to,
+                  vulnerabilitiesLevel,
+                  filters,
+                  pattern
+                );
+                return count
+                  ? `${count} of ${totalAgents} agents have ${vulnerabilitiesLevel.toLocaleLowerCase()} vulnerabilities.`
+                  : undefined;
+              } catch (error) {}
+            })
+          )
+        ).filter((vulnerabilitiesResponse) => vulnerabilitiesResponse);
 
         printer.addList({
           title: { text: 'Summary', style: 'h2' },
-          list: vulnerabilitiesResponsesCount
+          list: vulnerabilitiesResponsesCount,
         });
 
         log(
@@ -369,7 +399,7 @@ export class WazuhReportingCtrl {
         if (criticalRank && criticalRank.length) {
           printer.addContentWithNewLine({
             text: 'Top 3 agents with critical severity vulnerabilities',
-            style: 'h3'
+            style: 'h3',
           });
           await this.buildAgentsTable(context, printer, criticalRank, apiId);
           printer.addNewLine();
@@ -378,7 +408,7 @@ export class WazuhReportingCtrl {
         if (highRank && highRank.length) {
           printer.addContentWithNewLine({
             text: 'Top 3 agents with high severity vulnerabilities',
-            style: 'h3'
+            style: 'h3',
           });
           await this.buildAgentsTable(context, printer, highRank, apiId);
           printer.addNewLine();
@@ -387,7 +417,7 @@ export class WazuhReportingCtrl {
         if (mediumRank && mediumRank.length) {
           printer.addContentWithNewLine({
             text: 'Top 3 agents with medium severity vulnerabilities',
-            style: 'h3'
+            style: 'h3',
           });
           await this.buildAgentsTable(context, printer, mediumRank, apiId);
           printer.addNewLine();
@@ -396,7 +426,7 @@ export class WazuhReportingCtrl {
         if (lowRank && lowRank.length) {
           printer.addContentWithNewLine({
             text: 'Top 3 agents with low severity vulnerabilities',
-            style: 'h3'
+            style: 'h3',
           });
           await this.buildAgentsTable(context, printer, lowRank, apiId);
           printer.addNewLine();
@@ -407,13 +437,7 @@ export class WazuhReportingCtrl {
           'Fetching overview vulnerability detector top 3 CVEs',
           'debug'
         );
-        const cveRank = await VulnerabilityRequest.topCVECount(
-          context,
-          from,
-          to,
-          filters,
-          pattern
-        );
+        const cveRank = await VulnerabilityRequest.topCVECount(context, from, to, filters, pattern);
         log(
           'reporting:extendedInformation',
           'Adding overview vulnerability detector top 3 CVEs',
@@ -422,47 +446,32 @@ export class WazuhReportingCtrl {
         if (cveRank && cveRank.length) {
           printer.addSimpleTable({
             title: { text: 'Top 3 CVE', style: 'h2' },
-            columns: [{id: 'top', label: 'Top'}, {id: 'cve', label: 'CVE'}],
-            items: cveRank.map(item => ({ top: cveRank.indexOf(item) + 1, cve: item }))
+            columns: [
+              { id: 'top', label: 'Top' },
+              { id: 'cve', label: 'CVE' },
+            ],
+            items: cveRank.map((item) => ({ top: cveRank.indexOf(item) + 1, cve: item })),
           });
         }
       }
 
       if (section === 'overview' && tab === 'general') {
-        log(
-          'reporting:extendedInformation',
-          'Fetching top 3 agents with level 15 alerts',
-          'debug'
-        );
+        log('reporting:extendedInformation', 'Fetching top 3 agents with level 15 alerts', 'debug');
 
-        const level15Rank = await OverviewRequest.topLevel15(
-          context,
-          from,
-          to,
-          filters,
-          pattern
-        );
+        const level15Rank = await OverviewRequest.topLevel15(context, from, to, filters, pattern);
 
-        log(
-          'reporting:extendedInformation',
-          'Adding top 3 agents with level 15 alerts',
-          'debug'
-        );
+        log('reporting:extendedInformation', 'Adding top 3 agents with level 15 alerts', 'debug');
         if (level15Rank.length) {
           printer.addContent({
             text: 'Top 3 agents with level 15 alerts',
-            style: 'h2'
+            style: 'h2',
           });
           await this.buildAgentsTable(context, printer, level15Rank, apiId);
         }
       }
 
       if (section === 'overview' && tab === 'pm') {
-        log(
-          'reporting:extendedInformation',
-          'Fetching most common rootkits',
-          'debug'
-        );
+        log('reporting:extendedInformation', 'Fetching most common rootkits', 'debug');
         const top5RootkitsRank = await RootcheckRequest.top5RootkitsDetected(
           context,
           from,
@@ -470,27 +479,27 @@ export class WazuhReportingCtrl {
           filters,
           pattern
         );
-        log(
-          'reporting:extendedInformation',
-          'Adding most common rootkits',
-          'debug'
-        );
+        log('reporting:extendedInformation', 'Adding most common rootkits', 'debug');
         if (top5RootkitsRank && top5RootkitsRank.length) {
-          printer.addContentWithNewLine({
-            text: 'Most common rootkits found among your agents',
-            style: 'h2'
-          })
-          .addContentWithNewLine({
-            text:
-              'Rootkits are a set of software tools that enable an unauthorized user to gain control of a computer system without being detected.',
-            style: 'standard'
-          })
-          .addSimpleTable({
-            items: top5RootkitsRank.map(item => {
-              return { top: top5RootkitsRank.indexOf(item) + 1, name: item };
-            }),
-            columns: [{id: 'top', label: 'Top'}, {id: 'name', label: 'Rootkit'}]
-          });
+          printer
+            .addContentWithNewLine({
+              text: 'Most common rootkits found among your agents',
+              style: 'h2',
+            })
+            .addContentWithNewLine({
+              text:
+                'Rootkits are a set of software tools that enable an unauthorized user to gain control of a computer system without being detected.',
+              style: 'standard',
+            })
+            .addSimpleTable({
+              items: top5RootkitsRank.map((item) => {
+                return { top: top5RootkitsRank.indexOf(item) + 1, name: item };
+              }),
+              columns: [
+                { id: 'top', label: 'Top' },
+                { id: 'name', label: 'Rootkit' },
+              ],
+            });
         }
         log('reporting:extendedInformation', 'Fetching hidden pids', 'debug');
         const hiddenPids = await RootcheckRequest.agentsWithHiddenPids(
@@ -503,12 +512,12 @@ export class WazuhReportingCtrl {
         hiddenPids &&
           printer.addContent({
             text: `${hiddenPids} of ${totalAgents} agents have hidden processes`,
-            style: 'h3'
+            style: 'h3',
           });
         !hiddenPids &&
           printer.addContentWithNewLine({
             text: `No agents have hidden processes`,
-            style: 'h3'
+            style: 'h3',
           });
 
         const hiddenPorts = await RootcheckRequest.agentsWithHiddenPorts(
@@ -521,22 +530,18 @@ export class WazuhReportingCtrl {
         hiddenPorts &&
           printer.addContent({
             text: `${hiddenPorts} of ${totalAgents} agents have hidden ports`,
-            style: 'h3'
+            style: 'h3',
           });
         !hiddenPorts &&
           printer.addContent({
             text: `No agents have hidden ports`,
-            style: 'h3'
+            style: 'h3',
           });
-          printer.addNewLine();
+        printer.addNewLine();
       }
 
       if (['overview', 'agents'].includes(section) && tab === 'pci') {
-        log(
-          'reporting:extendedInformation',
-          'Fetching top PCI DSS requirements',
-          'debug'
-        );
+        log('reporting:extendedInformation', 'Fetching top PCI DSS requirements', 'debug');
         const topPciRequirements = await PCIRequest.topPCIRequirements(
           context,
           from,
@@ -546,7 +551,7 @@ export class WazuhReportingCtrl {
         );
         printer.addContentWithNewLine({
           text: 'Most common PCI DSS requirements alerts found',
-          style: 'h2'
+          style: 'h2',
         });
         for (const item of topPciRequirements) {
           const rules = await PCIRequest.getRulesByRequirement(
@@ -561,28 +566,25 @@ export class WazuhReportingCtrl {
 
           if (PCI[item]) {
             const content =
-              typeof PCI[item] === 'string'
-                ? { text: PCI[item], style: 'standard' }
-                : PCI[item];
-                printer.addContentWithNewLine(content);
+              typeof PCI[item] === 'string' ? { text: PCI[item], style: 'standard' } : PCI[item];
+            printer.addContentWithNewLine(content);
           }
 
           rules &&
             rules.length &&
             printer.addSimpleTable({
-              columns: [{id: 'ruleId', label: 'Rule ID'}, {id: 'ruleDescription', label: 'Description'}],
+              columns: [
+                { id: 'ruleId', label: 'Rule ID' },
+                { id: 'ruleDescription', label: 'Description' },
+              ],
               items: rules,
-              title: `Top rules for ${item} requirement`
+              title: `Top rules for ${item} requirement`,
             });
         }
       }
 
       if (['overview', 'agents'].includes(section) && tab === 'tsc') {
-        log(
-          'reporting:extendedInformation',
-          'Fetching top TSC requirements',
-          'debug'
-        );
+        log('reporting:extendedInformation', 'Fetching top TSC requirements', 'debug');
         const topTSCRequirements = await TSCRequest.topTSCRequirements(
           context,
           from,
@@ -592,7 +594,7 @@ export class WazuhReportingCtrl {
         );
         printer.addContentWithNewLine({
           text: 'Most common TSC requirements alerts found',
-          style: 'h2'
+          style: 'h2',
         });
         for (const item of topTSCRequirements) {
           const rules = await TSCRequest.getRulesByRequirement(
@@ -607,28 +609,25 @@ export class WazuhReportingCtrl {
 
           if (TSC[item]) {
             const content =
-              typeof TSC[item] === 'string'
-                ? { text: TSC[item], style: 'standard' }
-                : TSC[item];
-              printer.addContentWithNewLine(content)
+              typeof TSC[item] === 'string' ? { text: TSC[item], style: 'standard' } : TSC[item];
+            printer.addContentWithNewLine(content);
           }
 
           rules &&
             rules.length &&
             printer.addSimpleTable({
-              columns: [{id: 'ruleId', label: 'Rule ID'}, {id: 'ruleDescription', label: 'Description'}],
+              columns: [
+                { id: 'ruleId', label: 'Rule ID' },
+                { id: 'ruleDescription', label: 'Description' },
+              ],
               items: rules,
-              title: `Top rules for ${item} requirement`
+              title: `Top rules for ${item} requirement`,
             });
         }
       }
 
       if (['overview', 'agents'].includes(section) && tab === 'gdpr') {
-        log(
-          'reporting:extendedInformation',
-          'Fetching top GDPR requirements',
-          'debug'
-        );
+        log('reporting:extendedInformation', 'Fetching top GDPR requirements', 'debug');
         const topGdprRequirements = await GDPRRequest.topGDPRRequirements(
           context,
           from,
@@ -638,7 +637,7 @@ export class WazuhReportingCtrl {
         );
         printer.addContentWithNewLine({
           text: 'Most common GDPR requirements alerts found',
-          style: 'h2'
+          style: 'h2',
         });
         for (const item of topGdprRequirements) {
           const rules = await GDPRRequest.getRulesByRequirement(
@@ -653,18 +652,19 @@ export class WazuhReportingCtrl {
 
           if (GDPR && GDPR[item]) {
             const content =
-              typeof GDPR[item] === 'string'
-                ? { text: GDPR[item], style: 'standard' }
-                : GDPR[item];
-            printer.addContentWithNewLine(content)
+              typeof GDPR[item] === 'string' ? { text: GDPR[item], style: 'standard' } : GDPR[item];
+            printer.addContentWithNewLine(content);
           }
 
           rules &&
             rules.length &&
             printer.addSimpleTable({
-              columns: [{id: 'ruleId', label: 'Rule ID'}, {id: 'ruleDescription', label: 'Description'}],
+              columns: [
+                { id: 'ruleId', label: 'Rule ID' },
+                { id: 'ruleDescription', label: 'Description' },
+              ],
               items: rules,
-              title: `Top rules for ${item} requirement`
+              title: `Top rules for ${item} requirement`,
             });
         }
         printer.addNewLine();
@@ -686,7 +686,7 @@ export class WazuhReportingCtrl {
         if (auditAgentsNonSuccess && auditAgentsNonSuccess.length) {
           printer.addContent({
             text: 'Agents with high number of failed sudo commands',
-            style: 'h2'
+            style: 'h2',
           });
           await this.buildAgentsTable(context, printer, auditAgentsNonSuccess, apiId);
         }
@@ -699,76 +699,61 @@ export class WazuhReportingCtrl {
         );
         if (auditAgentsFailedSyscall && auditAgentsFailedSyscall.length) {
           printer.addSimpleTable({
-            columns: [{id: 'agent', label: 'Agent ID'}, {id: 'syscall_id', label: 'Syscall ID'}, {id: 'syscall_syscall', label: 'Syscall'}],
-            items: auditAgentsFailedSyscall.map(item => ({ agent: item.agent, syscall_id: item.syscall.id, syscall_syscall: item.syscall.syscall})),
+            columns: [
+              { id: 'agent', label: 'Agent ID' },
+              { id: 'syscall_id', label: 'Syscall ID' },
+              { id: 'syscall_syscall', label: 'Syscall' },
+            ],
+            items: auditAgentsFailedSyscall.map((item) => ({
+              agent: item.agent,
+              syscall_id: item.syscall.id,
+              syscall_syscall: item.syscall.syscall,
+            })),
             title: {
               text: 'Most common failing syscalls',
-              style: 'h2'
-            }
+              style: 'h2',
+            },
           });
         }
       }
 
       if (section === 'overview' && tab === 'fim') {
-        log(
-          'reporting:extendedInformation',
-          'Fetching top 3 rules for FIM',
-          'debug'
-        );
-        const rules = await SyscheckRequest.top3Rules(
-          context,
-          from,
-          to,
-          filters,
-          pattern
-        );
+        log('reporting:extendedInformation', 'Fetching top 3 rules for FIM', 'debug');
+        const rules = await SyscheckRequest.top3Rules(context, from, to, filters, pattern);
 
         if (rules && rules.length) {
-          printer
-            .addContentWithNewLine({ text: 'Top 3 FIM rules', style: 'h2' })
-            .addSimpleTable({
-              columns: [{id: 'ruleId', label: 'Rule ID'}, {id: 'ruleDescription', label: 'Description'}],
-              items: rules,
-              title: {
-                text: 'Top 3 rules that are generating most alerts.',
-                style: 'standard'
-              }
-            });
+          printer.addContentWithNewLine({ text: 'Top 3 FIM rules', style: 'h2' }).addSimpleTable({
+            columns: [
+              { id: 'ruleId', label: 'Rule ID' },
+              { id: 'ruleDescription', label: 'Description' },
+            ],
+            items: rules,
+            title: {
+              text: 'Top 3 rules that are generating most alerts.',
+              style: 'standard',
+            },
+          });
         }
 
-        log(
-          'reporting:extendedInformation',
-          'Fetching top 3 agents for FIM',
-          'debug'
-        );
-        const agents = await SyscheckRequest.top3agents(
-          context,
-          from,
-          to,
-          filters,
-          pattern
-        );
+        log('reporting:extendedInformation', 'Fetching top 3 agents for FIM', 'debug');
+        const agents = await SyscheckRequest.top3agents(context, from, to, filters, pattern);
 
         if (agents && agents.length) {
           printer.addContentWithNewLine({
             text: 'Agents with suspicious FIM activity',
-            style: 'h2'
+            style: 'h2',
           });
           printer.addContentWithNewLine({
             text:
               'Top 3 agents that have most FIM alerts from level 7 to level 15. Take care about them.',
-            style: 'standard'
-          })
+            style: 'standard',
+          });
           await this.buildAgentsTable(context, printer, agents, apiId);
         }
       }
 
       if (section === 'agents' && tab === 'audit') {
-        log(
-          'reporting:extendedInformation',
-          `Fetching most common failed syscalls`,
-          'debug'
-        );
+        log('reporting:extendedInformation', `Fetching most common failed syscalls`, 'debug');
         const auditFailedSyscall = await AuditRequest.getTopFailedSyscalls(
           context,
           from,
@@ -779,9 +764,12 @@ export class WazuhReportingCtrl {
         auditFailedSyscall &&
           auditFailedSyscall.length &&
           printer.addSimpleTable({
-            columns: [{id: 'id', label: 'id'}, {id: 'syscall', label: 'Syscall'}],
+            columns: [
+              { id: 'id', label: 'id' },
+              { id: 'syscall', label: 'Syscall' },
+            ],
             items: auditFailedSyscall,
-            title: 'Most common failing syscalls'
+            title: 'Most common failing syscalls',
           });
       }
 
@@ -796,32 +784,28 @@ export class WazuhReportingCtrl {
           'GET',
           `/syscheck/${agent}/last_scan`,
           {},
-          {apiHostID: apiId}
+          { apiHostID: apiId }
         );
 
         if (lastScanResponse && lastScanResponse.data) {
           const lastScanData = lastScanResponse.data.data.affected_items[0];
           if (lastScanData.start && lastScanData.end) {
             printer.addContent({
-              text: `Last file integrity monitoring scan was executed from ${lastScanData.start} to ${lastScanData.end}.`
+              text: `Last file integrity monitoring scan was executed from ${lastScanData.start} to ${lastScanData.end}.`,
             });
           } else if (lastScanData.start) {
             printer.addContent({
-              text: `File integrity monitoring scan is currently in progress for this agent (started on ${lastScanData.start}).`
+              text: `File integrity monitoring scan is currently in progress for this agent (started on ${lastScanData.start}).`,
             });
           } else {
             printer.addContent({
-              text: `File integrity monitoring scan is currently in progress for this agent.`
+              text: `File integrity monitoring scan is currently in progress for this agent.`,
             });
           }
           printer.addNewLine();
         }
 
-        log(
-          'reporting:extendedInformation',
-          `Fetching last 10 deleted files for FIM`,
-          'debug'
-        );
+        log('reporting:extendedInformation', `Fetching last 10 deleted files for FIM`, 'debug');
         const lastTenDeleted = await SyscheckRequest.lastTenDeletedFiles(
           context,
           from,
@@ -833,16 +817,15 @@ export class WazuhReportingCtrl {
         lastTenDeleted &&
           lastTenDeleted.length &&
           printer.addSimpleTable({
-            columns: [{id: 'path', label: 'Path'}, {id: 'date', label: 'Date'}],
+            columns: [
+              { id: 'path', label: 'Path' },
+              { id: 'date', label: 'Date' },
+            ],
             items: lastTenDeleted,
-            title: 'Last 10 deleted files'
+            title: 'Last 10 deleted files',
           });
 
-        log(
-          'reporting:extendedInformation',
-          `Fetching last 10 modified files`,
-          'debug'
-        );
+        log('reporting:extendedInformation', `Fetching last 10 modified files`, 'debug');
         const lastTenModified = await SyscheckRequest.lastTenModifiedFiles(
           context,
           from,
@@ -854,9 +837,12 @@ export class WazuhReportingCtrl {
         lastTenModified &&
           lastTenModified.length &&
           printer.addSimpleTable({
-            columns: [{id: 'path', label: 'Path'}, {id: 'date', label: 'Date'}],
+            columns: [
+              { id: 'path', label: 'Path' },
+              { id: 'date', label: 'Date' },
+            ],
             items: lastTenModified,
-            title: 'Last 10 modified files'
+            title: 'Last 10 modified files',
           });
       }
 
@@ -873,11 +859,13 @@ export class WazuhReportingCtrl {
             list: {
               title: { text: 'Hardware information', style: 'h2' },
             },
-            mapResponse: hardware => ([
+            mapResponse: (hardware) => [
               hardware.cpu && hardware.cpu.cores && `${hardware.cpu.cores} cores`,
               hardware.cpu && hardware.cpu.name,
-              hardware.ram && hardware.ram.total && `${Number(hardware.ram.total / 1024 / 1024).toFixed(2)}GB RAM`,
-            ])
+              hardware.ram &&
+                hardware.ram.total &&
+                `${Number(hardware.ram.total / 1024 / 1024).toFixed(2)}GB RAM`,
+            ],
           },
           {
             endpoint: `/syscollector/${agent}/os`,
@@ -885,79 +873,90 @@ export class WazuhReportingCtrl {
             list: {
               title: { text: 'OS information', style: 'h2' },
             },
-            mapResponse: osData => ([
+            mapResponse: (osData) => [
               osData.sysname,
               osData.version,
               osData.architecture,
               osData.release,
-              osData.os && osData.os.name && osData.os.version && `${osData.os.name} ${osData.os.version}`,
-            ])
-          }
+              osData.os &&
+                osData.os.name &&
+                osData.os.version &&
+                `${osData.os.name} ${osData.os.version}`,
+            ],
+          },
         ];
 
-        const syscollectorLists = await Promise.all(requestsSyscollectorLists.map(async requestSyscollector => {
-          try{
-            log(
-              'reporting:extendedInformation',
-              requestSyscollector.loggerMessage,
-              'debug'
-            );
-            const responseSyscollector = await context.wazuh.api.client.asCurrentUser.request(
-              'GET',
-              requestSyscollector.endpoint,
-              {},
-              {apiHostID: apiId}
-            );
-            const [data] = responseSyscollector && responseSyscollector.data && responseSyscollector.data.data && responseSyscollector.data.data.affected_items || [];
-            if(data){
-              return {
-                ...requestSyscollector.list,
-                list: requestSyscollector.mapResponse(data)
+        const syscollectorLists = await Promise.all(
+          requestsSyscollectorLists.map(async (requestSyscollector) => {
+            try {
+              log('reporting:extendedInformation', requestSyscollector.loggerMessage, 'debug');
+              const responseSyscollector = await context.wazuh.api.client.asCurrentUser.request(
+                'GET',
+                requestSyscollector.endpoint,
+                {},
+                { apiHostID: apiId }
+              );
+              const [data] =
+                (responseSyscollector &&
+                  responseSyscollector.data &&
+                  responseSyscollector.data.data &&
+                  responseSyscollector.data.data.affected_items) ||
+                [];
+              if (data) {
+                return {
+                  ...requestSyscollector.list,
+                  list: requestSyscollector.mapResponse(data),
+                };
               }
-            };
-          }catch(error){
-            log(
-              'reporting:extendedInformation',
-              error.message || error
-            );
-          }
-        }));
+            } catch (error) {
+              log('reporting:extendedInformation', error.message || error);
+            }
+          })
+        );
 
-        if(syscollectorLists){
-          syscollectorLists.filter(syscollectorList => syscollectorList).forEach(syscollectorList => printer.addList(syscollectorList))
-        };
+        if (syscollectorLists) {
+          syscollectorLists
+            .filter((syscollectorList) => syscollectorList)
+            .forEach((syscollectorList) => printer.addList(syscollectorList));
+        }
 
         const vulnerabilitiesRequests = ['Critical', 'High'];
 
-        const vulnerabilitiesResponsesItems = (await Promise.all(vulnerabilitiesRequests.map(async vulnerabilitiesLevel => {
-          try{
-            log(
-              'reporting:extendedInformation',
-              `Fetching top ${vulnerabilitiesLevel} packages`,
-              'debug'
-            );
+        const vulnerabilitiesResponsesItems = (
+          await Promise.all(
+            vulnerabilitiesRequests.map(async (vulnerabilitiesLevel) => {
+              try {
+                log(
+                  'reporting:extendedInformation',
+                  `Fetching top ${vulnerabilitiesLevel} packages`,
+                  'debug'
+                );
 
-            return await VulnerabilityRequest.topPackages(
-              context,
-              from,
-              to,
-              vulnerabilitiesLevel,
-              filters,
-              pattern
-            )
-          }catch(error){
-            log(
-              'reporting:extendedInformation',
-              error.message || error
-            );
-          }
-        }))).filter(vulnerabilitiesResponse => vulnerabilitiesResponse).flat();
+                return await VulnerabilityRequest.topPackages(
+                  context,
+                  from,
+                  to,
+                  vulnerabilitiesLevel,
+                  filters,
+                  pattern
+                );
+              } catch (error) {
+                log('reporting:extendedInformation', error.message || error);
+              }
+            })
+          )
+        )
+          .filter((vulnerabilitiesResponse) => vulnerabilitiesResponse)
+          .flat();
 
         if (vulnerabilitiesResponsesItems && vulnerabilitiesResponsesItems.length) {
           printer.addSimpleTable({
-            title: {text: 'Vulnerable packages found (last 24 hours)', style: 'h2'},
-            columns: [{id: 'package', label: 'Package'}, {id: 'severity', label: 'Severity'}],
-            items: vulnerabilitiesResponsesItems
+            title: { text: 'Vulnerable packages found (last 24 hours)', style: 'h2' },
+            columns: [
+              { id: 'package', label: 'Package' },
+              { id: 'severity', label: 'Severity' },
+            ],
+            items: vulnerabilitiesResponsesItems,
           });
         }
       }
@@ -976,17 +975,17 @@ export class WazuhReportingCtrl {
           printer.addContentWithNewLine({
             text:
               'These vulnerabilties are critical, please review your agent. Click on each link to read more about each found vulnerability.',
-            style: 'standard'
+            style: 'standard',
           });
           const customul = [];
           for (const critical of topCriticalPackages) {
             customul.push({ text: critical.package, style: 'standard' });
             customul.push({
-              ul: critical.references.map(item => ({
-                text: item.substring(0,80) + '...',
+              ul: critical.references.map((item) => ({
+                text: item.substring(0, 80) + '...',
                 link: item,
                 color: '#1EA5C8',
-              }))
+              })),
             });
           }
           printer.addContentWithNewLine({ ul: customul });
@@ -1003,18 +1002,17 @@ export class WazuhReportingCtrl {
         if (topHighPackages && topHighPackages.length) {
           printer.addContentWithNewLine({ text: 'High severity', style: 'h2' });
           printer.addContentWithNewLine({
-            text:
-              'Click on each link to read more about each found vulnerability.',
-            style: 'standard'
+            text: 'Click on each link to read more about each found vulnerability.',
+            style: 'standard',
           });
           const customul = [];
           for (const critical of topHighPackages) {
             customul.push({ text: critical.package, style: 'standard' });
             customul.push({
-              ul: critical.references.map(item => ({
+              ul: critical.references.map((item) => ({
                 text: item,
-                color: '#1EA5C8'
-              }))
+                color: '#1EA5C8',
+              })),
             });
           }
           customul && customul.length && printer.addContent({ ul: customul });
@@ -1038,10 +1036,7 @@ export class WazuhReportingCtrl {
           if (typeof x === 'object') data[prop][idx] = JSON.stringify(x);
         });
       }
-      result.push([
-        (labels || {})[prop] || KeyEquivalence[prop] || prop,
-        data[prop] || '-'
-      ]);
+      result.push([(labels || {})[prop] || KeyEquivalence[prop] || prop, data[prop] || '-']);
     }
     return result;
   }
@@ -1062,14 +1057,11 @@ export class WazuhReportingCtrl {
         ) {
           plainData[key] =
             Array.isArray(data[key]) && typeof data[key][0] !== 'object'
-              ? data[key].map(x => {
+              ? data[key].map((x) => {
                   return typeof x === 'object' ? JSON.stringify(x) : x + '\n';
                 })
               : data[key];
-        } else if (
-          Array.isArray(data[key]) &&
-          typeof data[key][0] === 'object'
-        ) {
+        } else if (Array.isArray(data[key]) && typeof data[key][0] === 'object') {
           tableData[key] = data[key];
         } else {
           if (section.isGroupConfig && ['pack', 'content'].includes(key)) {
@@ -1087,7 +1079,7 @@ export class WazuhReportingCtrl {
           (section.isGroupConfig ? ((section.labels || [])[0] || [])[tab] : ''),
       columns: ['', ''],
       type: 'config',
-      rows: this.getConfigRows(plainData, (section.labels || [])[0])
+      rows: this.getConfigRows(plainData, (section.labels || [])[0]),
     });
     for (let key in tableData) {
       const columns = Object.keys(tableData[key][0]);
@@ -1095,14 +1087,14 @@ export class WazuhReportingCtrl {
         columns[i] = col[0].toUpperCase() + col.slice(1);
       });
 
-      const rows = tableData[key].map(x => {
+      const rows = tableData[key].map((x) => {
         let row = [];
         for (let key in x) {
           row.push(
             typeof x[key] !== 'object'
               ? x[key]
               : Array.isArray(x[key])
-              ? x[key].map(x => {
+              ? x[key].map((x) => {
                   return x + '\n';
                 })
               : JSON.stringify(x[key])
@@ -1117,11 +1109,11 @@ export class WazuhReportingCtrl {
         title: ((section.labels || [])[0] || [])[key] || '',
         type: 'table',
         columns,
-        rows
+        rows,
       });
     }
 
-    nestedData.forEach(nest => {
+    nestedData.forEach((nest) => {
       this.getConfigTables(nest, section, tab + 1, array);
     });
 
@@ -1135,16 +1127,30 @@ export class WazuhReportingCtrl {
    * @param {Object} response
    * @returns {*} reports list or ErrorResponse
    */
-  async createReportsModules(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory){
-    try{
+  async createReportsModules(
+    context: RequestHandlerContext,
+    request: KibanaRequest,
+    response: KibanaResponseFactory
+  ) {
+    try {
       log('reporting:createReportsModules', `Report started`, 'info');
-      const { array, agents, browserTimezone, searchBar, filters, time, tables, name, section } = request.body;
+      const {
+        array,
+        agents,
+        browserTimezone,
+        searchBar,
+        filters,
+        time,
+        tables,
+        name,
+        section,
+      } = request.body;
       const { moduleID } = request.params;
       const { id: apiId, pattern: indexPattern } = request.headers;
-      const { from, to } = (time || {});
+      const { from, to } = time || {};
       // Init
       const printer = new ReportPrinter();
-      const {username: userID} = await context.wazuh.security.getCurrentUser(request, context);
+      const { username: userID } = await context.wazuh.security.getCurrentUser(request, context);
       createDataDirectoryIfNotExists();
       createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
       createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH);
@@ -1152,14 +1158,15 @@ export class WazuhReportingCtrl {
 
       await this.renderHeader(context, printer, section, moduleID, agents, apiId);
 
-      
-      const sanitizedFilters = filters ? this.sanitizeKibanaFilters(filters, searchBar) : false;
-      
+      const [sanitizedFilters, agentsFilter] = filters
+        ? this.sanitizeKibanaFilters(filters, searchBar)
+        : [false, false];
+
       if (time && sanitizedFilters) {
         printer.addTimeRangeAndFilters(from, to, sanitizedFilters, browserTimezone);
-      };
+      }
 
-      if(time){
+      if (time) {
         await this.extendedInformation(
           context,
           printer,
@@ -1172,26 +1179,31 @@ export class WazuhReportingCtrl {
           indexPattern,
           agents
         );
-      };
+      }
 
       printer.addVisualizations(array, agents, moduleID);
 
-      if(tables){
+      if (tables) {
         printer.addTables(tables);
-      };
+      }
+
+      //add authorized agents
+      if (agentsFilter) {
+        printer.addAgentsFilters(agentsFilter);
+      }
 
       await printer.print(path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, userID, name));
 
       return response.ok({
         body: {
           success: true,
-          message: `Report ${name} was created`
-        }
-      })
-    }catch(error){
+          message: `Report ${name} was created`,
+        },
+      });
+    } catch (error) {
       return ErrorResponse(error.message || error, 5029, 500, response);
     }
-  };
+  }
 
   /**
    * Create a report for the groups
@@ -1200,17 +1212,21 @@ export class WazuhReportingCtrl {
    * @param {Object} response
    * @returns {*} reports list or ErrorResponse
    */
-  async createReportsGroups(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory){
-    try{
+  async createReportsGroups(
+    context: RequestHandlerContext,
+    request: KibanaRequest,
+    response: KibanaResponseFactory
+  ) {
+    try {
       log('reporting:createReportsGroups', `Report started`, 'info');
       const { browserTimezone, searchBar, filters, time, name, components } = request.body;
       const { groupID } = request.params;
       const { id: apiId, pattern: indexPattern } = request.headers;
-      const { from, to } = (time || {});
+      const { from, to } = time || {};
       // Init
       const printer = new ReportPrinter();
 
-      const {username: userID} = await context.wazuh.security.getCurrentUser(request, context);
+      const { username: userID } = await context.wazuh.security.getCurrentUser(request, context);
       createDataDirectoryIfNotExists();
       createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
       createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH);
@@ -1227,13 +1243,13 @@ export class WazuhReportingCtrl {
         syscollector: 'Syscollector',
         rootcheck: 'Rootcheck',
         labels: 'Labels',
-        sca: 'Security configuration assessment'
+        sca: 'Security configuration assessment',
       };
       printer.addContent({
         text: `Group ${groupID} configuration`,
-        style: 'h1'
+        style: 'h1',
       });
-      
+
       if (components['0']) {
         let configuration = {};
         try {
@@ -1241,31 +1257,31 @@ export class WazuhReportingCtrl {
             'GET',
             `/groups/${groupID}/configuration`,
             {},
-            {apiHostID: apiId}
+            { apiHostID: apiId }
           );
           configuration = configurationResponse.data.data;
         } catch (error) {
           log('reporting:createReportsGroups', error.message || error, 'debug');
+        }
 
-        };
-        
-        if (configuration.affected_items.length>0 && Object.keys(configuration.affected_items[0].config).length) {
+        if (
+          configuration.affected_items.length > 0 &&
+          Object.keys(configuration.affected_items[0].config).length
+        ) {
           printer.addContent({
             text: 'Configurations',
             style: { fontSize: 14, color: '#000' },
-            margin: [0, 10, 0, 15]
+            margin: [0, 10, 0, 15],
           });
           const section = {
             labels: [],
-            isGroupConfig: true
+            isGroupConfig: true,
           };
           for (let config of configuration.affected_items) {
             let filterTitle = '';
             let index = 0;
             for (let filter of Object.keys(config.filters)) {
-              filterTitle = filterTitle.concat(
-                `${filter}: ${config.filters[filter]}`
-              );
+              filterTitle = filterTitle.concat(`${filter}: ${config.filters[filter]}`);
               if (index < Object.keys(config.filters).length - 1) {
                 filterTitle = filterTitle.concat(' | ');
               }
@@ -1274,7 +1290,7 @@ export class WazuhReportingCtrl {
             printer.addContent({
               text: filterTitle,
               style: 'h4',
-              margin: [0, 0, 0, 10]
+              margin: [0, 0, 0, 10],
             });
             let idx = 0;
             section.tabs = [];
@@ -1303,31 +1319,28 @@ export class WazuhReportingCtrl {
                 /* LOG COLLECTOR */
                 if (_d === 'localfile') {
                   let groups = [];
-                  config.config[_d].forEach(obj => {
+                  config.config[_d].forEach((obj) => {
                     if (!groups[obj.logformat]) {
                       groups[obj.logformat] = [];
                     }
                     groups[obj.logformat].push(obj);
                   });
-                  Object.keys(groups).forEach(group => {
+                  Object.keys(groups).forEach((group) => {
                     let saveidx = 0;
                     groups[group].forEach((x, i) => {
-                      if (
-                        Object.keys(x).length >
-                        Object.keys(groups[group][saveidx]).length
-                      ) {
+                      if (Object.keys(x).length > Object.keys(groups[group][saveidx]).length) {
                         saveidx = i;
                       }
                     });
                     const columns = Object.keys(groups[group][saveidx]);
-                    const rows = groups[group].map(x => {
+                    const rows = groups[group].map((x) => {
                       let row = [];
-                      columns.forEach(key => {
+                      columns.forEach((key) => {
                         row.push(
                           typeof x[key] !== 'object'
                             ? x[key]
                             : Array.isArray(x[key])
-                            ? x[key].map(x => {
+                            ? x[key].map((x) => {
                                 return x + '\n';
                               })
                             : JSON.stringify(x[key])
@@ -1342,7 +1355,7 @@ export class WazuhReportingCtrl {
                       title: 'Local files',
                       type: 'table',
                       columns,
-                      rows
+                      rows,
                     });
                   });
                 } else if (_d === 'labels') {
@@ -1351,9 +1364,9 @@ export class WazuhReportingCtrl {
                   if (!columns.includes('hidden')) {
                     columns.push('hidden');
                   }
-                  const rows = obj.map(x => {
+                  const rows = obj.map((x) => {
                     let row = [];
-                    columns.forEach(key => {
+                    columns.forEach((key) => {
                       row.push(x[key]);
                     });
                     return row;
@@ -1365,7 +1378,7 @@ export class WazuhReportingCtrl {
                     title: 'Labels',
                     type: 'table',
                     columns,
-                    rows
+                    rows,
                   });
                 } else {
                   for (let _d2 of config.config[_d]) {
@@ -1377,24 +1390,20 @@ export class WazuhReportingCtrl {
                 if (config.config[_d].directories) {
                   const directories = config.config[_d].directories;
                   delete config.config[_d].directories;
-                  tables.push(
-                    ...this.getConfigTables(config.config[_d], section, idx)
-                  );
+                  tables.push(...this.getConfigTables(config.config[_d], section, idx));
                   let diffOpts = [];
-                  Object.keys(section.opts).forEach(x => {
+                  Object.keys(section.opts).forEach((x) => {
                     diffOpts.push(x);
                   });
                   const columns = [
                     '',
-                    ...diffOpts.filter(
-                      x => x !== 'check_all' && x !== 'check_sum'
-                    )
+                    ...diffOpts.filter((x) => x !== 'check_all' && x !== 'check_sum'),
                   ];
                   let rows = [];
-                  directories.forEach(x => {
+                  directories.forEach((x) => {
                     let row = [];
                     row.push(x.path);
-                    columns.forEach(y => {
+                    columns.forEach((y) => {
                       if (y !== '') {
                         y = y !== 'check_whodata' ? y : 'whodata';
                         row.push(x[y] ? x[y] : 'no');
@@ -1411,12 +1420,10 @@ export class WazuhReportingCtrl {
                     title: 'Monitored directories',
                     type: 'table',
                     columns,
-                    rows
+                    rows,
                   });
                 } else {
-                  tables.push(
-                    ...this.getConfigTables(config.config[_d], section, idx)
-                  );
+                  tables.push(...this.getConfigTables(config.config[_d], section, idx));
                 }
               }
               for (const table of tables) {
@@ -1431,7 +1438,7 @@ export class WazuhReportingCtrl {
           printer.addContent({
             text: 'A configuration for this group has not yet been set up.',
             style: { fontSize: 12, color: '#000' },
-            margin: [0, 10, 0, 15]
+            margin: [0, 10, 0, 15],
           });
         }
       }
@@ -1442,9 +1449,9 @@ export class WazuhReportingCtrl {
             'GET',
             `/groups/${groupID}/agents`,
             {},
-            {apiHostID: apiId}
+            { apiHostID: apiId }
           );
-          agentsInGroup = agentsInGroupResponse.data.data.affected_items
+          agentsInGroup = agentsInGroupResponse.data.data.affected_items;
         } catch (error) {
           log('reporting:report', error.message || error, 'debug');
         }
@@ -1453,7 +1460,7 @@ export class WazuhReportingCtrl {
           printer,
           'groupConfig',
           groupID,
-          (agentsInGroup || []).map(x => x.id),
+          (agentsInGroup || []).map((x) => x.id),
           apiId
         );
       }
@@ -1463,14 +1470,14 @@ export class WazuhReportingCtrl {
       return response.ok({
         body: {
           success: true,
-          message: `Report ${name} was created`
-        }
-      })
-    }catch(error){     
+          message: `Report ${name} was created`,
+        },
+      });
+    } catch (error) {
       log('reporting:createReportsGroups', error.message || error);
       return ErrorResponse(error.message || error, 5029, 500, response);
     }
-  };
+  }
 
   /**
    * Create a report for the agents
@@ -1479,17 +1486,21 @@ export class WazuhReportingCtrl {
    * @param {Object} response
    * @returns {*} reports list or ErrorResponse
    */
-  async createReportsAgents(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory){
-    try{
+  async createReportsAgents(
+    context: RequestHandlerContext,
+    request: KibanaRequest,
+    response: KibanaResponseFactory
+  ) {
+    try {
       log('reporting:createReportsAgents', `Report started`, 'info');
       const { browserTimezone, searchBar, filters, time, name, components } = request.body;
       const { agentID } = request.params;
       const { id: apiId } = request.headers;
-      const { from, to } = (time || {});
+      const { from, to } = time || {};
 
       const printer = new ReportPrinter();
 
-      const {username: userID} = await context.wazuh.security.getCurrentUser(request, context);
+      const { username: userID } = await context.wazuh.security.getCurrentUser(request, context);
       createDataDirectoryIfNotExists();
       createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
       createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH);
@@ -1502,7 +1513,7 @@ export class WazuhReportingCtrl {
           'GET',
           `/agents/${agentID}/config/wmodules/wmodules`,
           {},
-          {apiHostID: apiId}
+          { apiHostID: apiId }
         );
       } catch (error) {
         log('reporting:report', error.message || error, 'debug');
@@ -1519,14 +1530,9 @@ export class WazuhReportingCtrl {
           'debug'
         );
         for (let section of config.sections) {
-          if (
-            components[idxComponent] &&
-            (section.config || section.wodle)
-          ) {
+          if (components[idxComponent] && (section.config || section.wodle)) {
             let idx = 0;
-            const configs = (section.config || []).concat(
-              section.wodle || []
-            );
+            const configs = (section.config || []).concat(section.wodle || []);
             log(
               'reporting:createReportsAgents',
               `Iterate over ${configs.length} configuration blocks`,
@@ -1540,71 +1546,67 @@ export class WazuhReportingCtrl {
                     'GET',
                     `/agents/${agentID}/config/${conf.component}/${conf.configuration}`,
                     {},
-                    {apiHostID: apiId}
+                    { apiHostID: apiId }
                   );
                 } else {
                   for (let wodle of wmodulesResponse.data.data['wmodules']) {
                     if (Object.keys(wodle)[0] === conf['name']) {
                       agentConfigResponse.data = {
-                        data: wodle
+                        data: wodle,
                       };
-                    };
+                    }
                   }
                 }
 
-                const agentConfig = agentConfigResponse && agentConfigResponse.data && agentConfigResponse.data.data;
+                const agentConfig =
+                  agentConfigResponse && agentConfigResponse.data && agentConfigResponse.data.data;
                 if (!titleOfSection) {
                   printer.addContent({
                     text: config.title,
                     style: 'h1',
-                    margin: [0, 0, 0, 15]
+                    margin: [0, 0, 0, 15],
                   });
                   titleOfSection = true;
-                };
+                }
                 printer.addContent({
                   text: section.subtitle,
-                  style: 'h4'
+                  style: 'h4',
                 });
                 printer.addContent({
                   text: section.desc,
                   style: { fontSize: 12, color: '#000' },
-                  margin: [0, 0, 0, 10]
+                  margin: [0, 0, 0, 10],
                 });
-                if (
-                  agentConfig
-                ) {
+                if (agentConfig) {
                   for (let agentConfigKey of Object.keys(agentConfig)) {
                     if (Array.isArray(agentConfig[agentConfigKey])) {
                       /* LOG COLLECTOR */
                       if (conf.filterBy) {
                         let groups = [];
-                        agentConfig[agentConfigKey].forEach(obj => {
+                        agentConfig[agentConfigKey].forEach((obj) => {
                           if (!groups[obj.logformat]) {
                             groups[obj.logformat] = [];
                           }
                           groups[obj.logformat].push(obj);
                         });
-                        Object.keys(groups).forEach(group => {
+                        Object.keys(groups).forEach((group) => {
                           let saveidx = 0;
                           groups[group].forEach((x, i) => {
                             if (
-                              Object.keys(x).length >
-                              Object.keys(groups[group][saveidx]).length
+                              Object.keys(x).length > Object.keys(groups[group][saveidx]).length
                             ) {
                               saveidx = i;
                             }
                           });
-                          const columns = Object.keys(
-                            groups[group][saveidx]
-                          );
-                          const rows = groups[group].map(x => {
+                          const columns = Object.keys(groups[group][saveidx]);
+                          const rows = groups[group].map((x) => {
                             let row = [];
-                            columns.forEach(key => {
+                            columns.forEach((key) => {
                               row.push(
                                 typeof x[key] !== 'object'
                                   ? x[key]
                                   : Array.isArray(x[key])
-                                  ? x[key].map(x => {
+                                  ? x[key].map((x) => {
                                       return x + '\n';
                                     })
                                   : JSON.stringify(x[key])
@@ -1613,29 +1615,22 @@ export class WazuhReportingCtrl {
                             return row;
                           });
                           columns.forEach((col, i) => {
-                            columns[i] =
-                              col[0].toUpperCase() + col.slice(1);
+                            columns[i] = col[0].toUpperCase() + col.slice(1);
                           });
                           tables.push({
                             title: section.labels[0][group],
                             type: 'table',
                             columns,
-                            rows
+                            rows,
                           });
                         });
                       } else if (agentConfigKey.configuration !== 'socket') {
                         tables.push(
-                          ...this.getConfigTables(
-                            agentConfig[agentConfigKey],
-                            section,
-                            idx
-                          )
+                          ...this.getConfigTables(agentConfig[agentConfigKey], section, idx)
                         );
                       } else {
                         for (let _d2 of agentConfig[agentConfigKey]) {
-                          tables.push(
-                            ...this.getConfigTables(_d2, section, idx)
-                          );
+                          tables.push(...this.getConfigTables(_d2, section, idx));
                         }
                       }
                     } else {
@@ -1644,31 +1639,23 @@ export class WazuhReportingCtrl {
                         const directories = agentConfig[agentConfigKey].directories;
                         delete agentConfig[agentConfigKey].directories;
                         tables.push(
-                          ...this.getConfigTables(
-                            agentConfig[agentConfigKey],
-                            section,
-                            idx
-                          )
+                          ...this.getConfigTables(agentConfig[agentConfigKey], section, idx)
                         );
                         let diffOpts = [];
-                        Object.keys(section.opts).forEach(x => {
+                        Object.keys(section.opts).forEach((x) => {
                           diffOpts.push(x);
                         });
                         const columns = [
                           '',
-                          ...diffOpts.filter(
-                            x => x !== 'check_all' && x !== 'check_sum'
-                          )
+                          ...diffOpts.filter((x) => x !== 'check_all' && x !== 'check_sum'),
                         ];
                         let rows = [];
-                        directories.forEach(x => {
+                        directories.forEach((x) => {
                           let row = [];
                           row.push(x.dir);
-                          columns.forEach(y => {
+                          columns.forEach((y) => {
                             if (y !== '') {
-                              row.push(
-                                x.opts.indexOf(y) > -1 ? 'yes' : 'no'
-                              );
+                              row.push(x.opts.indexOf(y) > -1 ? 'yes' : 'no');
                             }
                           });
                           row.push(x.recursion_level);
@@ -1682,15 +1669,11 @@ export class WazuhReportingCtrl {
                           title: 'Monitored directories',
                           type: 'table',
                           columns,
-                          rows
+                          rows,
                         });
                       } else {
                         tables.push(
-                          ...this.getConfigTables(
-                            agentConfig[agentConfigKey],
-                            section,
-                            idx
-                          )
+                          ...this.getConfigTables(agentConfig[agentConfigKey], section, idx)
                         );
                       }
                     }
@@ -1703,10 +1686,10 @@ export class WazuhReportingCtrl {
                       {
                         text: `${section.subtitle.toLowerCase()} configuration.`,
                         link: section.docuLink,
-                        style: { fontSize: 12, color: '#1a0dab' }
-                      }
+                        style: { fontSize: 12, color: '#1a0dab' },
+                      },
                     ],
-                    margin: [0, 0, 0, 20]
+                    margin: [0, 0, 0, 20],
                   });
                 }
               } catch (error) {
@@ -1728,14 +1711,14 @@ export class WazuhReportingCtrl {
       return response.ok({
         body: {
           success: true,
-          message: `Report ${name} was created`
-        }
-      })
-    }catch(error){
+          message: `Report ${name} was created`,
+        },
+      });
+    } catch (error) {
       log('reporting:createReportsAgents', error.message || error);
       return ErrorResponse(error.message || error, 5029, 500, response);
     }
-  };
+  }
 
   /**
    * Create a report for the agents
@@ -1744,17 +1727,21 @@ export class WazuhReportingCtrl {
    * @param {Object} response
    * @returns {*} reports list or ErrorResponse
    */
-  async createReportsAgentsInventory(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory){
-    try{
+  async createReportsAgentsInventory(
+    context: RequestHandlerContext,
+    request: KibanaRequest,
+    response: KibanaResponseFactory
+  ) {
+    try {
       log('reporting:createReportsAgentsInventory', `Report started`, 'info');
       const { browserTimezone, searchBar, filters, time, name } = request.body;
       const { agentID } = request.params;
       const { id: apiId, pattern: indexPattern } = request.headers;
-      const { from, to } = (time || {});
+      const { from, to } = time || {};
       // Init
       const printer = new ReportPrinter();
 
-      const {username: userID} = await context.wazuh.security.getCurrentUser(request, context);
+      const { username: userID } = await context.wazuh.security.getCurrentUser(request, context);
       createDataDirectoryIfNotExists();
       createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
       createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH);
@@ -1769,8 +1756,8 @@ export class WazuhReportingCtrl {
         const agentResponse = await context.wazuh.api.client.asCurrentUser.request(
           'GET',
           '/agents',
-          {params: {q: `id=${agentID}`}},
-          {apiHostID: apiId}
+          { params: { q: `id=${agentID}` } },
+          { apiHostID: apiId }
         );
         agentOs = agentResponse.data.data.affected_items[0].os.platform;
       } catch (error) {
@@ -1780,7 +1767,7 @@ export class WazuhReportingCtrl {
       // Add title
       printer.addContentWithNewLine({
         text: 'Inventory data report',
-        style: 'h1'
+        style: 'h1',
       });
 
       // Add table with the agent info
@@ -1793,21 +1780,22 @@ export class WazuhReportingCtrl {
           loggerMessage: `Fetching packages for agent ${agentID}`,
           table: {
             title: 'Packages',
-            columns: agentOs === 'windows'
-              ? [
-                  {id: 'name', label: 'Name'},
-                  {id: 'architecture', label: 'Architecture'},
-                  {id: 'version', label: 'Version'},
-                  {id: 'vendor', label: 'Vendor'}
-                ]
-              : [
-                  {id: 'name', label: 'Name'},
-                  {id: 'architecture', label: 'Architecture'},
-                  {id: 'version', label: 'Version'},
-                  {id: 'vendor', label: 'Vendor'},
-                  {id: 'description', label: 'Description'}
-                ],
-          }
+            columns:
+              agentOs === 'windows'
+                ? [
+                    { id: 'name', label: 'Name' },
+                    { id: 'architecture', label: 'Architecture' },
+                    { id: 'version', label: 'Version' },
+                    { id: 'vendor', label: 'Vendor' },
+                  ]
+                : [
+                    { id: 'name', label: 'Name' },
+                    { id: 'architecture', label: 'Architecture' },
+                    { id: 'version', label: 'Version' },
+                    { id: 'vendor', label: 'Vendor' },
+                    { id: 'description', label: 'Description' },
+                  ],
+          },
         },
         {
           endpoint: `/syscollector/${agentID}/processes`,
@@ -1817,21 +1805,20 @@ export class WazuhReportingCtrl {
             columns:
               agentOs === 'windows'
                 ? [
-                    {id: 'name', label: 'Name'},
-                    {id: 'cmd', label: 'CMD'},
-                    {id: 'priority', label: 'Priority'},
-                    {id: 'nlwp', label: 'NLWP'}
+                    { id: 'name', label: 'Name' },
+                    { id: 'cmd', label: 'CMD' },
+                    { id: 'priority', label: 'Priority' },
+                    { id: 'nlwp', label: 'NLWP' },
                   ]
                 : [
-                    {id: 'name', label: 'Name'},
-                    {id: 'euser', label: 'Effective user'},
-                    {id: 'nice', label: 'Priority'},
-                    {id: 'state', label: 'State'}
-                  ]
+                    { id: 'name', label: 'Name' },
+                    { id: 'euser', label: 'Effective user' },
+                    { id: 'nice', label: 'Priority' },
+                    { id: 'state', label: 'State' },
+                  ],
           },
-          mapResponseItems: (item) => agentOs === 'windows'
-            ? item
-            : {...item, state: ProcessEquivalence[item.state]}
+          mapResponseItems: (item) =>
+            agentOs === 'windows' ? item : { ...item, state: ProcessEquivalence[item.state] },
         },
         {
           endpoint: `/syscollector/${agentID}/ports`,
@@ -1841,20 +1828,24 @@ export class WazuhReportingCtrl {
             columns:
               agentOs === 'windows'
                 ? [
-                    {id: 'local_ip', label: 'Local IP'},
-                    {id: 'local_port', label: 'Local port'},
-                    {id: 'process', label: 'Process'},
-                    {id: 'state', label: 'State'},
-                    {id: 'protocol', label: 'Protocol'}
+                    { id: 'local_ip', label: 'Local IP' },
+                    { id: 'local_port', label: 'Local port' },
+                    { id: 'process', label: 'Process' },
+                    { id: 'state', label: 'State' },
+                    { id: 'protocol', label: 'Protocol' },
                   ]
                 : [
-                    {id: 'local_ip', label: 'Local IP'},
-                    {id: 'local_port', label: 'Local port'},
-                    {id: 'state', label: 'State'},
-                    {id: 'protocol', label: 'Protocol'}
-                  ]
+                    { id: 'local_ip', label: 'Local IP' },
+                    { id: 'local_port', label: 'Local port' },
+                    { id: 'state', label: 'State' },
+                    { id: 'protocol', label: 'Protocol' },
+                  ],
           },
-          mapResponseItems: (item) => ({...item, local_ip: item.local.ip, local_port: item.local.port})
+          mapResponseItems: (item) => ({
+            ...item,
+            local_ip: item.local.ip,
+            local_port: item.local.port,
+          }),
         },
         {
           endpoint: `/syscollector/${agentID}/netiface`,
@@ -1862,13 +1853,13 @@ export class WazuhReportingCtrl {
           table: {
             title: 'Network interfaces',
             columns: [
-              {id: 'name', label: 'Name'},
-              {id: 'mac', label: 'Mac'},
-              {id: 'state', label: 'State'},
-              {id: 'mtu', label: 'MTU'},
-              {id: 'type', label: 'Type'}
-            ]
-          }
+              { id: 'name', label: 'Name' },
+              { id: 'mac', label: 'Mac' },
+              { id: 'state', label: 'State' },
+              { id: 'mtu', label: 'MTU' },
+              { id: 'type', label: 'Type' },
+            ],
+          },
         },
         {
           endpoint: `/syscollector/${agentID}/netaddr`,
@@ -1876,26 +1867,28 @@ export class WazuhReportingCtrl {
           table: {
             title: 'Network settings',
             columns: [
-              {id: 'iface', label: 'Interface'},
-              {id: 'address', label: 'address'},
-              {id: 'netmask', label: 'Netmask'},
-              {id: 'proto', label: 'Protocol'},
-              {id: 'broadcast', label: 'Broadcast'}
-            ]
-          }
+              { id: 'iface', label: 'Interface' },
+              { id: 'address', label: 'address' },
+              { id: 'netmask', label: 'Netmask' },
+              { id: 'proto', label: 'Protocol' },
+              { id: 'broadcast', label: 'Broadcast' },
+            ],
+          },
         },
-        {
+      ];
+
+      agentOs === 'windows' &&
+        agentRequestsInventory.push({
           endpoint: `/syscollector/${agentID}/hotfixes`,
           loggerMessage: `Fetching hotfixes for agent ${agentID}`,
           table: {
             title: 'Windows updates',
-            columns: [{id: 'hotfix', label: 'Update code'}]
-          }
-        }
-      ];
+            columns: [{ id: 'hotfix', label: 'Update code' }],
+          },
+        });
 
       const requestInventory = async (agentRequestInventory) => {
-        try{
+        try {
           log(
             'reporting:createReportsAgentsInventory',
             agentRequestInventory.loggerMessage,
@@ -1906,20 +1899,26 @@ export class WazuhReportingCtrl {
             'GET',
             agentRequestInventory.endpoint,
             {},
-            {apiHostID: apiId}
+            { apiHostID: apiId }
           );
 
-          const inventory = inventoryResponse && inventoryResponse.data && inventoryResponse.data.data && inventoryResponse.data.data.affected_items;
-          if(inventory){
+          const inventory =
+            inventoryResponse &&
+            inventoryResponse.data &&
+            inventoryResponse.data.data &&
+            inventoryResponse.data.data.affected_items;
+          if (inventory) {
             return {
               ...agentRequestInventory.table,
-              items: agentRequestInventory.mapResponseItems ? inventory.map(agentRequestInventory.mapResponseItems) : inventory
+              items: agentRequestInventory.mapResponseItems
+                ? inventory.map(agentRequestInventory.mapResponseItems)
+                : inventory,
             };
-          };
-        }catch(error){
+          }
+        } catch (error) {
           log('reporting:createReportsAgentsInventory', error.message || error, 'debug');
-        };
-      }
+        }
+      };
 
       if (time) {
         await this.extendedInformation(
@@ -1934,11 +1933,12 @@ export class WazuhReportingCtrl {
           indexPattern,
           agentID
         );
-      };
+      }
 
       // Add inventory tables
       (await Promise.all(agentRequestsInventory.map(requestInventory)))
-        .filter(table => table).forEach(table => printer.addSimpleTable(table));
+        .filter((table) => table)
+        .forEach((table) => printer.addSimpleTable(table));
 
       // Print the document
       await printer.print(path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, userID, name));
@@ -1946,14 +1946,14 @@ export class WazuhReportingCtrl {
       return response.ok({
         body: {
           success: true,
-          message: `Report ${name} was created`
-        }
-      })
-    }catch(error){
+          message: `Report ${name} was created`,
+        },
+      });
+    } catch (error) {
       log('reporting:createReportsAgents', error.message || error);
       return ErrorResponse(error.message || error, 5029, 500, response);
     }
-  };
+  }
 
   /**
    * Fetch the reports list
@@ -1962,10 +1962,14 @@ export class WazuhReportingCtrl {
    * @param {Object} response
    * @returns {Array<Object>} reports list or ErrorResponse
    */
-  async getReports(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
+  async getReports(
+    context: RequestHandlerContext,
+    request: KibanaRequest,
+    response: KibanaResponseFactory
+  ) {
     try {
       log('reporting:getReports', `Fetching created reports`, 'info');
-      const {username: userID} = await context.wazuh.security.getCurrentUser(request, context);
+      const { username: userID } = await context.wazuh.security.getCurrentUser(request, context);
       createDataDirectoryIfNotExists();
       createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
       createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH);
@@ -1973,29 +1977,26 @@ export class WazuhReportingCtrl {
       createDirectoryIfNotExists(userReportsDirectory);
       log('reporting:getReports', `Directory: ${userReportsDirectory}`, 'debug');
 
-      const sortReportsByDate = (a, b) =>
-        a.date < b.date ? 1 : a.date > b.date ? -1 : 0;
+      const sortReportsByDate = (a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0);
 
-      const reports = fs.readdirSync(userReportsDirectory).map(file => {
+      const reports = fs.readdirSync(userReportsDirectory).map((file) => {
         const stats = fs.statSync(userReportsDirectory + '/' + file);
         // Get the file creation time (bithtime). It returns the first value that is a truthy value of next file stats: birthtime, mtime, ctime and atime.
         // This solves some OSs can have the bithtimeMs equal to 0 and returns the date like 1970-01-01
-        const birthTimeField = ['birthtime', 'mtime', 'ctime', 'atime'].find(time => stats[`${time}Ms`]);
+        const birthTimeField = ['birthtime', 'mtime', 'ctime', 'atime'].find(
+          (time) => stats[`${time}Ms`]
+        );
         return {
           name: file,
           size: stats.size,
-          date: stats[birthTimeField]
+          date: stats[birthTimeField],
         };
       });
-      log(
-        'reporting:getReports',
-        `Using TimSort for sorting ${reports.length} items`,
-        'debug'
-      );
+      log('reporting:getReports', `Using TimSort for sorting ${reports.length} items`, 'debug');
       TimSort.sort(reports, sortReportsByDate);
       log('reporting:getReports', `Total reports: ${reports.length}`, 'debug');
       return response.ok({
-        body: { reports }
+        body: { reports },
       });
     } catch (error) {
       log('reporting:getReports', error.message || error);
@@ -2010,14 +2011,20 @@ export class WazuhReportingCtrl {
    * @param {Object} response
    * @returns {Object} report or ErrorResponse
    */
-  async getReportByName(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
+  async getReportByName(
+    context: RequestHandlerContext,
+    request: KibanaRequest,
+    response: KibanaResponseFactory
+  ) {
     try {
       log('reporting:getReportByName', `Getting ${request.params.name} report`, 'debug');
-      const {username: userID} = await context.wazuh.security.getCurrentUser(request, context);
-      const reportFileBuffer = fs.readFileSync(path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, userID, request.params.name ));
+      const { username: userID } = await context.wazuh.security.getCurrentUser(request, context);
+      const reportFileBuffer = fs.readFileSync(
+        path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, userID, request.params.name)
+      );
       return response.ok({
         headers: { 'Content-Type': 'application/pdf' },
-        body: reportFileBuffer
+        body: reportFileBuffer,
       });
     } catch (error) {
       log('reporting:getReportByName', error.message || error);
@@ -2032,16 +2039,20 @@ export class WazuhReportingCtrl {
    * @param {Object} response
    * @returns {Object} status obj or ErrorResponse
    */
-  async deleteReportByName(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
+  async deleteReportByName(
+    context: RequestHandlerContext,
+    request: KibanaRequest,
+    response: KibanaResponseFactory
+  ) {
     try {
       log('reporting:deleteReportByName', `Deleting ${request.params.name} report`, 'debug');
-      const {username: userID} = await context.wazuh.security.getCurrentUser(request, context);
+      const { username: userID } = await context.wazuh.security.getCurrentUser(request, context);
       fs.unlinkSync(
         path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, userID, request.params.name)
       );
       log('reporting:deleteReportByName', `${request.params.name} report was deleted`, 'info');
       return response.ok({
-        body: { error: 0 }
+        body: { error: 0 },
       });
     } catch (error) {
       log('reporting:deleteReportByName', error.message || error);

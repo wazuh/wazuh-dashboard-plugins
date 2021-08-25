@@ -2,6 +2,50 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.2.0 - Kibana 7.10.2 , 7.11.2 - Revision 4201
+
+### Added
+
+- Added `Ruleset Test` section under Tools menu, and on Edit Rules/Decoders as a tool. [#1434](https://github.com/wazuh/wazuh-kibana-app/pull/1434)
+- Added page size options in Security events, explore agents table [#2925](https://github.com/wazuh/wazuh-kibana-app/pull/2925)
+- Added a reminder to restart cluster or manager after import a file in Rules, Decoders or CDB Lists [#3051](https://github.com/wazuh/wazuh-kibana-app/pull/3051)
+- Added Agent Stats section [#3056](https://github.com/wazuh/wazuh-kibana-app/pull/3056)
+- Added `logtest` PUT example on API Console [#3061](https://github.com/wazuh/wazuh-kibana-app/pull/3061)
+- Added vulnerabilities inventory that affect to an agent [#3069](https://github.com/wazuh/wazuh-kibana-app/pull/3069)
+- Added retry button to check api again in health check [#3109](https://github.com/wazuh/wazuh-kibana-app/pull/3109)
+- Added `wazuh-statistics` template and a new mapping for these indices [#3111](https://github.com/wazuh/wazuh-kibana-app/pull/3111)
+- Added link to documentation "Checking connection with Manager" in deploy new agent [#3126](https://github.com/wazuh/wazuh-kibana-app/pull/3126)
+- Added a warning message for the `Install and enroll the agent` step of `Deploy new agent` guide [#3238](https://github.com/wazuh/wazuh-kibana-app/pull/3238)
+
+### Changed
+
+- Moved Dev Tools inside of Tools menu as Api Console.  [#1434](https://github.com/wazuh/wazuh-kibana-app/pull/1434)
+- Changed position of Top users on Integrity Monitoring Top 5 user. [#2892](https://github.com/wazuh/wazuh-kibana-app/pull/2892)
+- Changed user allow_run_as way of editing. [#3080](https://github.com/wazuh/wazuh-kibana-app/pull/3080)
+- Rename some ossec references to Wazuh [#3046](https://github.com/wazuh/wazuh-kibana-app/pull/3046)
+
+### Fixed
+
+- Filter only authorized agents in Agents stats and Visualizations [#3088](https://github.com/wazuh/wazuh-kibana-app/pull/3088)
+- Fixed missing `pending` status suggestion for agents [#3095](https://github.com/wazuh/wazuh-kibana-app/pull/3095)
+- Index pattern setting not used for choosing from existing patterns [#3097](https://github.com/wazuh/wazuh-kibana-app/pull/3097)
+- Fixed space character missing on deployment command if UDP is configured [#3108](https://github.com/wazuh/wazuh-kibana-app/pull/3108)
+- Fixed statistics visualizations when a node is selected [#3110](https://github.com/wazuh/wazuh-kibana-app/pull/3110)
+- Fixed Flyout date filter also changes main date filter [#3114](https://github.com/wazuh/wazuh-kibana-app/pull/3114)
+- Fixed name for "TCP sessions" visualization and average metric is now a sum [#3118](https://github.com/wazuh/wazuh-kibana-app/pull/3118)
+- Filter only authorized agents in Events and Security Alerts table [#3120](https://github.com/wazuh/wazuh-kibana-app/pull/3120)
+- Fixed Last keep alive label is outside the panel [#3122](https://github.com/wazuh/wazuh-kibana-app/pull/3122)
+- Fixed app redirect to Settings section after the health check [#3128](https://github.com/wazuh/wazuh-kibana-app/pull/3128)
+- Fixed the plugin logo path in Kibana menu when use `server.basePath` setting [#3144](https://github.com/wazuh/wazuh-kibana-app/pull/3144)
+- Fixed deprecated endpoint for create agent groups [3152](https://github.com/wazuh/wazuh-kibana-app/pull/3152)
+- Fixed check for TCP protocol in deploy new agent [#3163](https://github.com/wazuh/wazuh-kibana-app/pull/3163)
+- Fixed RBAC issue with agent group permissions [#3181](https://github.com/wazuh/wazuh-kibana-app/pull/3181)
+- Fixed change index pattern from menu doesn't work [#3187](https://github.com/wazuh/wazuh-kibana-app/pull/3187)
+- Conflict with the creation of the index pattern when performing the Health Check [#3232](https://github.com/wazuh/wazuh-kibana-app/pull/3232)
+- Added Disabled index pattern checks in Health Check [#3311](https://github.com/wazuh/wazuh-kibana-app/pull/3311)
+- Fixed windows update section in Linux Inventory PDF [#3569](https://github.com/wazuh/wazuh-kibana-app/pull/3569)
+- Improving and removing unnecessary error logs [#3574](https://github.com/wazuh/wazuh-kibana-app/pull/3574)
+
 ## Wazuh v4.1.5 - Kibana 7.10.0 , 7.10.2, 7.11.2 - Revision 4108
 
 ### Fixed
@@ -19,7 +63,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Conflict with the creation of the index pattern when performing the Health Check [#3223](https://github.com/wazuh/wazuh-kibana-app/pull/3223)
 - Fixing mac os agents add command [#3207](https://github.com/wazuh/wazuh-kibana-app/pull/3207)
-
 ## Wazuh v4.1.5 - Kibana 7.10.0 , 7.10.2 - Revision 4106
 
 - Adapt for Wazuh 4.1.5
