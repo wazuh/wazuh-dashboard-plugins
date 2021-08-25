@@ -111,6 +111,10 @@ const sysButtons = [
   }
 ];
 
+const pTextCheckConnectionStyle = {
+  marginTop: '3em',
+};
+
 export class RegisterAgent extends Component {
   constructor(props) {
     super(props);
@@ -124,17 +128,18 @@ export class RegisterAgent extends Component {
       selectedArchitecture: '',
       selectedVersion: '',
       version: '',
+      wazuhVersion: '',
       serverAddress: '',
       wazuhPassword: '',
       groups: [],
       selectedGroup: [],
-      udpProtocol: false
+      udpProtocol: false,
     };
     this.restartAgentCommand = {
       rpm: this.systemSelector(),
       deb: this.systemSelector(),
-      macos: 'sudo /Library/Ossec/bin/ossec-control start',
-    }
+      macos: 'sudo /Library/Ossec/bin/wazuh-control start',
+    };
   }
 
   async componentDidMount() {
@@ -144,19 +149,18 @@ export class RegisterAgent extends Component {
       let serverAddress = false;
       let wazuhPassword = '';
       let hidePasswordInput = false;
-      serverAddress = this.configuration["enrollment.dns"] || false;
+      serverAddress = this.configuration['enrollment.dns'] || false;
       if (!serverAddress) {
         serverAddress = await this.props.getCurrentApiAddress();
       }
       let authInfo = await this.getAuthInfo();
       const needsPassword = (authInfo.auth || {}).use_password === 'yes';
       if (needsPassword) {
-        wazuhPassword = this.configuration["enrollment.password"] || authInfo['authd.pass'] || '';
+        wazuhPassword = this.configuration['enrollment.password'] || authInfo['authd.pass'] || '';
         if (wazuhPassword) {
           hidePasswordInput = true;
         }
       }
-
 
       const udpProtocol = await this.getRemoteInfo();
       const groups = await this.getGroups();
@@ -171,23 +175,19 @@ export class RegisterAgent extends Component {
         udpProtocol,
         wazuhVersion,
         groups,
-        loading: false
+        loading: false,
       });
     } catch (error) {
       this.setState({
         wazuhVersion: version,
-        loading: false
+        loading: false,
       });
     }
   }
 
   async getAuthInfo() {
     try {
-      const result = await WzRequest.apiReq(
-        'GET',
-        '/agents/000/config/auth/auth',
-        {}
-      );
+      const result = await WzRequest.apiReq('GET', '/agents/000/config/auth/auth', {});
       return (result.data || {}).data || {};
     } catch (error) {
       return false;
@@ -196,42 +196,36 @@ export class RegisterAgent extends Component {
 
   async getRemoteInfo() {
     try {
-      const result = await WzRequest.apiReq(
-        'GET',
-        '/agents/000/config/request/remote',
-        {}
-      );
+      const result = await WzRequest.apiReq('GET', '/agents/000/config/request/remote', {});
       const remote = ((result.data || {}).data || {}).remote || {};
-      return (remote[0] || {}).protocol !== 'tcp';
+      return (remote[0] || {}).protocol !== 'tcp' && (remote[0] || {}).protocol[0] !== 'TCP';
     } catch (error) {
       return false;
     }
   }
 
   selectOS(os) {
-    this.setState({ selectedOS: os, selectedVersion: '', selectedArchitecture: '', selectedSYS: 'systemd' });
+    this.setState({
+      selectedOS: os,
+      selectedVersion: '',
+      selectedArchitecture: '',
+      selectedSYS: 'systemd',
+    });
   }
 
-  systemSelector(){
-    if(this.state.selectedOS === 'rpm'){
-      if(this.state.selectedSYS === 'systemd'){
+  systemSelector() {
+    if (this.state.selectedOS === 'rpm') {
+      if (this.state.selectedSYS === 'systemd') {
         return 'sudo systemctl daemon-reload\nsudo systemctl enable wazuh-agent\nsudo systemctl start wazuh-agent';
-      }
-      else
-        return 'sudo chkconfig --add wazuh-agent\nsudo service wazuh-agent start';
-    }
-    else if(this.state.selectedOS === 'deb'){
-      if(this.state.selectedSYS === 'systemd'){
+      } else return 'sudo chkconfig --add wazuh-agent\nsudo service wazuh-agent start';
+    } else if (this.state.selectedOS === 'deb') {
+      if (this.state.selectedSYS === 'systemd') {
         return 'sudo systemctl daemon-reload\nsudo systemctl enable wazuh-agent\nsudo systemctl start wazuh-agent';
-      }
-      else
-        return 'sudo update-rc.d wazuh-agent defaults 95 10\nsudo service wazuh-agent start';
-    }
-    else
-      return '';
+      } else return 'sudo update-rc.d wazuh-agent defaults 95 10\nsudo service wazuh-agent start';
+    } else return '';
   }
 
-  selectSYS(sys){
+  selectSYS(sys) {
     this.setState({ selectedSYS: sys });
   }
 
@@ -261,7 +255,7 @@ export class RegisterAgent extends Component {
     const match = regex.exec(text);
     const password = match[1];
     if (password) {
-      [...password].forEach(() => obfuscate += '*')
+      [...password].forEach(() => (obfuscate += '*'));
       text = text.replace(password, obfuscate);
     }
     return text;
@@ -269,14 +263,8 @@ export class RegisterAgent extends Component {
 
   async getGroups() {
     try {
-      const result = await WzRequest.apiReq(
-        'GET',
-        '/groups',
-        {}
-      );
-      return result.data.data.affected_items.map(item =>
-        ({ label: item.name, id: item.name })
-      )
+      const result = await WzRequest.apiReq('GET', '/groups', {});
+      return result.data.data.affected_items.map((item) => ({ label: item.name, id: item.name }));
     } catch (error) {
       return [];
     }
@@ -284,12 +272,11 @@ export class RegisterAgent extends Component {
 
   optionalDeploymentVariables() {
     let deployment = `WAZUH_MANAGER='${this.state.serverAddress}' `;
-  
     if (this.state.selectedOS == 'win') {
       deployment += `WAZUH_REGISTRATION_SERVER='${this.state.serverAddress}' `;
     }
 
-    if (this.state.wazuhPassword) {
+    if (this.state.needsPassword) {
       deployment += `WAZUH_REGISTRATION_PASSWORD='${this.state.wazuhPassword}' `;
     }
 
@@ -309,37 +296,38 @@ export class RegisterAgent extends Component {
     return deployment;
   }
 
+
   resolveRPMPackage() {
     switch (`${this.state.selectedVersion}-${this.state.selectedArchitecture}`) {
       case 'centos5-i386':
-        return `https://packages.wazuh.com/4.x/yum5/i386/wazuh-agent-${this.state.wazuhVersion}-1.el5.i386.rpm`
+        return `https://packages.wazuh.com/4.x/yum5/i386/wazuh-agent-${this.state.wazuhVersion}-1.el5.i386.rpm`;
       case 'centos5-x86_64':
-        return `https://packages.wazuh.com/4.x/yum5/x86_64/wazuh-agent-${this.state.wazuhVersion}-1.el5.x86_64.rpm`
+        return `https://packages.wazuh.com/4.x/yum5/x86_64/wazuh-agent-${this.state.wazuhVersion}-1.el5.x86_64.rpm`;
       case 'centos6-i386':
-        return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.i386.rpm`
+        return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.i386.rpm`;
       case 'centos6-aarch64':
-        return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.aarch64.rpm`
+        return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.aarch64.rpm`;
       case 'centos6-x86_64':
-        return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`
+        return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`;
       case 'centos6-armhf':
-        return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.armv7hl.rpm`
+        return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.armv7hl.rpm`;
       default:
-        return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`
+        return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`;
     }
   }
 
   resolveDEBPackage() {
     switch (`${this.state.selectedArchitecture}`) {
       case 'i386':
-        return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}-1_i386.deb`
+        return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}-1_i386.deb`;
       case 'aarch64':
-        return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}-1_arm64.deb`
+        return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}-1_arm64.deb`;
       case 'armhf':
-        return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}-1_armhf.deb`
+        return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}-1_armhf.deb`;
       case 'x86_64':
-        return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}-1_amd64.deb`
+        return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}-1_amd64.deb`;
       default:
-        return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}-1_amd64.deb`
+        return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}-1_amd64.deb`;
     }
   }
 
@@ -354,50 +342,59 @@ export class RegisterAgent extends Component {
     }
   }
 
-  checkMissingOSSelection(){
-    if(!this.state.selectedOS){
+  checkMissingOSSelection() {
+    if (!this.state.selectedOS) {
       return ['Operating system'];
-    };
+    }
     switch (this.state.selectedOS) {
       case 'rpm':
         return [
           ...(!this.state.selectedVersion ? ['OS version'] : []),
-          ...(this.state.selectedVersion && !this.state.selectedArchitecture ? ['OS architecture'] : []),
+          ...(this.state.selectedVersion && !this.state.selectedArchitecture
+            ? ['OS architecture']
+            : []),
         ];
       case 'deb':
-        return [
-          ...(!this.state.selectedArchitecture ? ['OS architecture'] : []),
-        ];
+        return [...(!this.state.selectedArchitecture ? ['OS architecture'] : [])];
       default:
         return [];
     }
-  };
+  }
 
   render() {
+    const appVersionMajorDotMinor = this.state.wazuhVersion.split('.').slice(0, 2).join('.'); 
+    const urlCheckConnectionDocumentation = `https://documentation.wazuh.com/${appVersionMajorDotMinor}/user-manual/agents/agent-connection.html`;
+    const textAndLinkToCheckConnectionDocumentation = (
+      <p style={pTextCheckConnectionStyle}>
+        To verify the connection with the Manager, please follow this{' '}
+        <a href={urlCheckConnectionDocumentation} target="_blank">
+          document.
+        </a>
+      </p>
+    );
     const missingOSSelection = this.checkMissingOSSelection();
     const ipInput = (
       <EuiText>
         <p>
-          You can predefine the Wazuh server address with the <EuiCode>enrollment.dns</EuiCode> Wazuh app setting.
+          You can predefine the Wazuh server address with the <EuiCode>enrollment.dns</EuiCode>{' '}
+          Wazuh app setting.
         </p>
         <EuiFieldText
           placeholder="Server address"
           value={this.state.serverAddress}
-          onChange={event => this.setServerAddress(event)}
+          onChange={(event) => this.setServerAddress(event)}
         />
       </EuiText>
     );
 
     const groupInput = (
       <EuiText>
-        <p>
-          Select one or more existing groups
-        </p>
+        <p>Select one or more existing groups</p>
         <EuiComboBox
           placeholder="Select group"
           options={this.state.groups}
           selectedOptions={this.state.selectedGroup}
-          onChange={group => {
+          onChange={(group) => {
             this.setGroupName(group);
           }}
           isDisabled={!this.state.groups.length}
@@ -411,20 +408,22 @@ export class RegisterAgent extends Component {
       <EuiFieldText
         placeholder="Wazuh password"
         value={this.state.wazuhPassword}
-        onChange={event => this.setWazuhPassword(event)}
+        onChange={(event) => this.setWazuhPassword(event)}
       />
     );
 
     const codeBlock = {
-      zIndex: '100'
+      zIndex: '100',
     };
     const customTexts = {
       rpmText: `sudo ${this.optionalDeploymentVariables()}yum install ${this.optionalPackages()}`,
       debText: `curl -so wazuh-agent.deb ${this.optionalPackages()} && sudo ${this.optionalDeploymentVariables()}dpkg -i ./wazuh-agent.deb`,
-      macosText: `curl -so wazuh-agent.pkg https://packages.wazuh.com/4.x/macos/wazuh-agent-${this.state.wazuhVersion
-        }-1.pkg && sudo launchctl setenv ${this.optionalDeploymentVariables()}&& sudo installer -pkg ./wazuh-agent.pkg -target /`,
-      winText: `Invoke-WebRequest -Uri https://packages.wazuh.com/4.x/windows/wazuh-agent-${this.state.wazuhVersion
-        }-1.msi -OutFile wazuh-agent.msi; ./wazuh-agent.msi /q ${this.optionalDeploymentVariables()}`
+      macosText: `curl -so wazuh-agent.pkg https://packages.wazuh.com/4.x/macos/wazuh-agent-${
+        this.state.wazuhVersion
+      }-1.pkg && sudo launchctl setenv ${this.optionalDeploymentVariables()}&& sudo installer -pkg ./wazuh-agent.pkg -target /`,
+      winText: `Invoke-WebRequest -Uri https://packages.wazuh.com/4.x/windows/wazuh-agent-${
+        this.state.wazuhVersion
+      }-1.msi -OutFile wazuh-agent.msi; ./wazuh-agent.msi /q ${this.optionalDeploymentVariables()}`,
     };
 
     const field = `${this.state.selectedOS}Text`;
@@ -440,7 +439,6 @@ export class RegisterAgent extends Component {
       </>
     );
     const restartAgentCommand = this.restartAgentCommand[this.state.selectedOS];
-
     const onTabClick = (selectedTab) => {
       this.selectSYS(selectedTab.id);
     };
@@ -461,11 +459,8 @@ export class RegisterAgent extends Component {
             </EuiCodeBlock>
             {windowsAdvice}
             <EuiCopy textToCopy={text}>
-              {copy => (
-                <EuiButton
-                  fill
-                  iconType="copy"
-                  onClick={copy}>
+              {(copy) => (
+                <EuiButton fill iconType="copy" onClick={copy}>
                   Copy command
                 </EuiButton>
               )}
@@ -484,18 +479,16 @@ export class RegisterAgent extends Component {
             <EuiSpacer />
             <EuiText>
               <EuiCodeBlock style={codeBlock} language={language}>
-                  {this.systemSelector()}
+                {this.systemSelector()}
               </EuiCodeBlock>
               <EuiCopy textToCopy={this.systemSelector()}>
-                {copy => (
-                  <EuiButton
-                    fill
-                    iconType="copy"
-                    onClick={copy}>
+                {(copy) => (
+                  <EuiButton fill iconType="copy" onClick={copy}>
                     Copy command
                   </EuiButton>
                 )}
               </EuiCopy>
+              {textAndLinkToCheckConnectionDocumentation}
             </EuiText>
           </Fragment>
         ),
@@ -508,126 +501,156 @@ export class RegisterAgent extends Component {
             <EuiSpacer />
             <EuiText>
               <EuiCodeBlock style={codeBlock} language={language}>
-                  {this.systemSelector()}
+                {this.systemSelector()}
               </EuiCodeBlock>
               <EuiCopy textToCopy={this.systemSelector()}>
-                {copy => (
-                  <EuiButton
-                    fill
-                    iconType="copy"
-                    onClick={copy}>
+                {(copy) => (
+                  <EuiButton fill iconType="copy" onClick={copy}>
                     Copy command
                   </EuiButton>
                 )}
               </EuiCopy>
+              {textAndLinkToCheckConnectionDocumentation}
             </EuiText>
           </Fragment>
         ),
-      }
+      },
     ];
 
     const steps = [
       {
         title: 'Choose the Operating system',
-        children: <EuiButtonGroup
-          color='primary'
-          options={osButtons}
-          idSelected={this.state.selectedOS}
-          onChange={os => this.selectOS(os)}
-        />
+        children: (
+          <EuiButtonGroup
+            color="primary"
+            options={osButtons}
+            idSelected={this.state.selectedOS}
+            onChange={(os) => this.selectOS(os)}
+          />
+        ),
       },
-      ...((this.state.selectedOS == 'rpm') ? [{
-        title: 'Choose the version',
-        children: <EuiButtonGroup
-          color='primary'
-          options={versionButtonsCentos}
-          idSelected={this.state.selectedVersion}
-          onChange={version => this.setVersion(version)}
-        />
-      }] : []),
-      ...((this.state.selectedOS == 'rpm' && this.state.selectedVersion == 'centos5') ? [{
-        title: 'Choose the architecture',
-        children: <EuiButtonGroup
-          color='primary'
-          options={this.state.architectureCentos5}
-          idSelected={this.state.selectedArchitecture}
-          onChange={architecture => this.setArchitecture(architecture)}
-        />
-      }] : []),
-      ...((this.state.selectedOS == 'deb' || (this.state.selectedOS == 'rpm' && this.state.selectedVersion == 'centos6')) ? [{
-        title: 'Choose the architecture',
-        children: <EuiButtonGroup
-          color='primary'
-          options={this.state.architectureButtons}
-          idSelected={this.state.selectedArchitecture}
-          onChange={architecture => this.setArchitecture(architecture)}
-        />
-      }] : []),
+      ...(this.state.selectedOS == 'rpm'
+        ? [
+            {
+              title: 'Choose the version',
+              children: (
+                <EuiButtonGroup
+                  color="primary"
+                  options={versionButtonsCentos}
+                  idSelected={this.state.selectedVersion}
+                  onChange={(version) => this.setVersion(version)}
+                />
+              ),
+            },
+          ]
+        : []),
+      ...(this.state.selectedOS == 'rpm' && this.state.selectedVersion == 'centos5'
+        ? [
+            {
+              title: 'Choose the architecture',
+              children: (
+                <EuiButtonGroup
+                  color="primary"
+                  options={this.state.architectureCentos5}
+                  idSelected={this.state.selectedArchitecture}
+                  onChange={(architecture) => this.setArchitecture(architecture)}
+                />
+              ),
+            },
+          ]
+        : []),
+      ...(this.state.selectedOS == 'deb' ||
+      (this.state.selectedOS == 'rpm' && this.state.selectedVersion == 'centos6')
+        ? [
+            {
+              title: 'Choose the architecture',
+              children: (
+                <EuiButtonGroup
+                  color="primary"
+                  options={this.state.architectureButtons}
+                  idSelected={this.state.selectedArchitecture}
+                  onChange={(architecture) => this.setArchitecture(architecture)}
+                />
+              ),
+            },
+          ]
+        : []),
       {
         title: 'Wazuh server address',
-        children: <Fragment>{ipInput}</Fragment>
+        children: <Fragment>{ipInput}</Fragment>,
       },
-      ...(!(!this.state.needsPassword || this.state.hidePasswordInput) ? [{
-        title: 'Wazuh password',
-        children: <Fragment>{passwordInput}</Fragment>
-      }] : []),
+      ...(!(!this.state.needsPassword || this.state.hidePasswordInput)
+        ? [
+            {
+              title: 'Wazuh password',
+              children: <Fragment>{passwordInput}</Fragment>,
+            },
+          ]
+        : []),
       {
         title: 'Assign the agent to a group',
-        children: <Fragment>{groupInput}</Fragment>
+        children: <Fragment>{groupInput}</Fragment>,
       },
       {
         title: 'Install and enroll the agent',
-        children: missingOSSelection.length
-          ? <EuiCallOut
-              color="warning"
-              title={`Please select the ${missingOSSelection.join(', ')}.`}
-              iconType="iInCircle"
-            />
-          : <div>{guide}</div>
-      },
-      ...((this.state.selectedOS == 'rpm') || (this.state.selectedOS == 'deb') ? [{
-        title: 'Start the agent',
-        children: missingOSSelection.length
-        ? <EuiCallOut
+        children: missingOSSelection.length ? (
+          <EuiCallOut
             color="warning"
             title={`Please select the ${missingOSSelection.join(', ')}.`}
             iconType="iInCircle"
           />
-        :
-        <EuiTabbedContent
-          tabs={tabs}
-          selectedTab={this.selectedSYS}
-          onTabClick={onTabClick}
-        />
-      }] : []),
+        ) : (
+          <div>{guide}</div>
+        ),
+      },
+      ...(this.state.selectedOS == 'rpm' || this.state.selectedOS == 'deb'
+        ? [
+            {
+              title: 'Start the agent',
+              children: missingOSSelection.length ? (
+                <EuiCallOut
+                  color="warning"
+                  title={`Please select the ${missingOSSelection.join(', ')}.`}
+                  iconType="iInCircle"
+                />
+              ) : (
+                <EuiTabbedContent
+                  tabs={tabs}
+                  selectedTab={this.selectedSYS}
+                  onTabClick={onTabClick}
+                />
+              ),
+            },
+          ]
+        : []),
 
-      ...(!missingOSSelection.length && (this.state.selectedOS !== 'rpm') && (this.state.selectedOS !== 'deb') && restartAgentCommand ? [
-        {
-          title: 'Start the agent',
-          children: (
-              <EuiFlexGroup direction="column">
+      ...(!missingOSSelection.length &&
+      this.state.selectedOS !== 'rpm' &&
+      this.state.selectedOS !== 'deb' &&
+      restartAgentCommand
+        ? [
+            {
+              title: 'Start the agent',
+              children: (
+                <EuiFlexGroup direction="column">
                   <EuiText>
                     <EuiCodeBlock style={codeBlock} language={language}>
                       {restartAgentCommand}
                     </EuiCodeBlock>
                     <EuiCopy textToCopy={restartAgentCommand}>
-                      {copy => (
-                        <EuiButton
-                          fill
-                          iconType="copy"
-                          onClick={copy}>
+                      {(copy) => (
+                        <EuiButton fill iconType="copy" onClick={copy}>
                           Copy command
                         </EuiButton>
                       )}
                     </EuiCopy>
                   </EuiText>
-              </EuiFlexGroup>
-          )
-        }
-      ] : [])
-
+                </EuiFlexGroup>
+              ),
+            },
+          ]
+        : []),
     ];
-
     return (
       <div>
         <EuiPage restrictWidth="1000px" style={{ background: 'transparent' }}>

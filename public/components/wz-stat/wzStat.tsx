@@ -80,18 +80,19 @@ export interface EuiStatProps {
 }
 
 export const WzStat: FunctionComponent<
-  CommonProps & Omit<HTMLAttributes<HTMLDivElement>, 'title'> & EuiStatProps > = ({
-  children,
-  className,
-  description,
-  isLoading = false,
-  reverse = false,
-  textAlign = 'left',
-  title,
-  titleColor = 'default',
-  titleSize = 'l',
-  ...rest
-}) => {
+  CommonProps & Omit<HTMLAttributes<HTMLDivElement>, 'title'> & EuiStatProps> = ({
+    title,
+    description,
+    titleSize = 'l',
+    children,
+    className,
+    isLoading = false,
+    reverse = false,
+    textAlign = 'left',
+    titleColor = 'default',
+    ...rest
+  }) => {
+
     const classes = classNames(
       'euiStat',
       textAlignToClassNameMap[textAlign],
@@ -117,12 +118,12 @@ export const WzStat: FunctionComponent<
         <span aria-hidden="true">{isLoading ? '--' : title}</span>
       </EuiTitle>
     ) : (
-        <EuiTitle size={titleSize} className={titleClasses}>
-          <span aria-hidden="true" style={{ color: `${titleColor}` }}>
-            {isLoading ? '--' : title}
-          </span>
-        </EuiTitle>
-      );
+      <EuiTitle size={titleSize} className={titleClasses}>
+        <span aria-hidden="true" style={{ color: `${titleColor}` }}>
+          {isLoading ? '--' : title}
+        </span>
+      </EuiTitle>
+    );
 
     const screenReader = (
       <EuiScreenReaderOnly>
@@ -130,10 +131,10 @@ export const WzStat: FunctionComponent<
           {isLoading ? (
             <span token="euiStat.loadingText" default="Statistic is loading" />
           ) : (
-              <Fragment>
-                {reverse ? `${title} ${description}` : `${description} ${title}`}
-              </Fragment>
-            )}
+            <Fragment>
+              {reverse ? `${title} ${description}` : `${description} ${title}`}
+            </Fragment>
+          )}
         </span>
       </EuiScreenReaderOnly>
     );

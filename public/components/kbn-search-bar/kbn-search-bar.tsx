@@ -18,6 +18,7 @@ import { KibanaContextProvider } from '../../../../../src/plugins/kibana_react/p
 import { withKibanaContext, withKibanaContextExtendsProps } from '../common/hocs';
 import { storage } from './lib';
 import { getDataPlugin, getCore } from '../../kibana-services';
+import { AUTHORIZED_AGENTS } from '../../../common/constants';
 
 export interface IKbnSearchBarProps {
   appName?: string;
@@ -37,6 +38,12 @@ const KbnSearchBar: React.FunctionComponent<IKbnSearchBarProps> = (
     ...KibanaServices,
     query: { ...KibanaServices.query, filterManager },
   };
+
+  const getFilters = () => {
+    const filters = filterManager ? filterManager.getFilters() : [];
+    return filters.filter(filter => filter.meta.controlledBy !== AUTHORIZED_AGENTS);
+  }
+
   return (
     <KibanaContextProvider
       services={{
@@ -51,7 +58,7 @@ const KbnSearchBar: React.FunctionComponent<IKbnSearchBarProps> = (
         <SearchBar
           {...props}
           indexPatterns={[indexPattern]}
-          filters={(filterManager && filterManager.getFilters()) || []}
+          filters={getFilters()}
           dateRangeFrom={timeFilter.from}
           dateRangeTo={timeFilter.to}
           onQuerySubmit={(payload) => onQuerySubmit(payload, props)}
@@ -75,7 +82,12 @@ const onQuerySubmit = (payload, props) => {
 
 const onFiltersUpdate = (filters, props) => {
   const { filterManager, onFiltersUpdated } = props;
-  filterManager.setFilters(filters);
+
+  //add agents filters
+  const currentFilters = filterManager ? filterManager.getFilters() : [];
+  const agentsFilters = currentFilters.filter(filter => filter.meta.controlledBy === AUTHORIZED_AGENTS);
+
+  filterManager.setFilters([...filters, ...agentsFilters]);
   onFiltersUpdated && onFiltersUpdated(filters);
 };
 

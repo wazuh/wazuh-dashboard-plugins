@@ -7,7 +7,6 @@ export type User = {
 
 export type UpdateUser = {
   password?: string;
-  allow_run_as: boolean;
 };
 
 export type CreateUser = UpdateUser & {

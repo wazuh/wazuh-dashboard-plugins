@@ -95,6 +95,10 @@ export const WAZUH_MODULES = {
     description:
       'Applications, network configuration, open ports and processes running on your monitored systems.'
   },
+  stats: {
+    title: 'Stats',
+    description: 'Stats for agent and logcollector'
+  },
   configuration: {
     title: 'Configuration',
     description:

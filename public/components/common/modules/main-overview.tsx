@@ -31,6 +31,7 @@ import { Events, Dashboard, Loader, Settings } from '../../common/modules';
 import OverviewActions from '../../../controllers/overview/components/overview-actions/overview-actions';
 import { MainFim } from '../../agents/fim';
 
+import { MainVuls } from '../../agents/vuls';
 import { MainSca } from '../../agents/sca';
 import { MainMitre } from './main-mitre';
 import WzReduxProvider from '../../../redux/wz-redux-provider';
@@ -210,6 +211,8 @@ const ModuleTabViewer = compose(
       {section === 'fim' && selectView==='inventory' && <MainFim {...props} />}
       {section === 'sca' && selectView==='inventory' && <MainSca {...props} />}
       
+      {section === 'vuls' && selectView==='inventory' && <MainVuls {...props} />}
+
       {section === 'mitre' && selectView === 'inventory' && <MainMitre {...props} />}
       {['pci', 'gdpr', 'hipaa', 'nist', 'tsc'].includes(section) && selectView === 'inventory' && <ComplianceTable {...props} goToDiscover={(id) => props.onSelectedTabChanged(id)} />}
       {/* -------------------------------------------------------------------------- */}

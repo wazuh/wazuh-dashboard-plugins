@@ -23,10 +23,9 @@ import { buildRangeFilter, buildPhrasesFilter,buildPhraseFilter, buildExistsFilt
 import { getElasticAlerts, getIndexPattern } from '../mitre/lib';
 import { ModulesHelper } from '../../common/modules/modules-helper'
 import { getDataPlugin } from '../../../kibana-services';
+import { withAllowedAgents } from '../../common/hocs/withAllowedAgents';
 
-
-
-export class Metrics extends Component {
+export const Metrics = withAllowedAgents(class Metrics extends Component {
   _isMount = false;
   timefilter: {
     getTime(): any
@@ -137,7 +136,8 @@ export class Metrics extends Component {
       const filterParams = {};
       filterParams["time"] = this.timefilter.getTime(); 
       filterParams["query"] = searchBarQuery; 
-      filterParams["filters"] = this.filterManager.getFilters(); 
+      filterParams["filters"] = this.filterManager.getFilters();
+      this.props.filterAllowedAgents && filterParams["filters"].push(this.props.filterAllowedAgents);
       this.setState({filterParams, loading: true});
       const newOnClick = {};
       
@@ -310,5 +310,5 @@ export class Metrics extends Component {
         </EuiFlexGroup>
     )
   }
-}
+})
 
