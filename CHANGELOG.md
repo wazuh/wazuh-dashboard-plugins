@@ -42,6 +42,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed RBAC issue with agent group permissions [#3181](https://github.com/wazuh/wazuh-kibana-app/pull/3181)
 - Fixed change index pattern from menu doesn't work [#3187](https://github.com/wazuh/wazuh-kibana-app/pull/3187)
 - Conflict with the creation of the index pattern when performing the Health Check [#3232](https://github.com/wazuh/wazuh-kibana-app/pull/3232)
+- Added Disabled index pattern checks in Health Check [#3311](https://github.com/wazuh/wazuh-kibana-app/pull/3311)
+- Fixed windows update section in Linux Inventory PDF [#3569](https://github.com/wazuh/wazuh-kibana-app/pull/3569)
+- Improving and removing unnecessary error logs [#3574](https://github.com/wazuh/wazuh-kibana-app/pull/3574)
+
 
 ## Wazuh v4.1.5 - Kibana 7.10.0 , 7.10.2, 7.11.2 - Revision 4108
 
