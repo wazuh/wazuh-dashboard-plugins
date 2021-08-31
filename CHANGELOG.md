@@ -13,6 +13,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Improvement to hide navbar Wazuh label. [#3240](https://github.com/wazuh/wazuh-kibana-app/pull/3240)
 - Add modal creating new rule/decoder [#3274](https://github.com/wazuh/wazuh-kibana-app/pull/3274)
 - New functionality to change app logos [#3503](https://github.com/wazuh/wazuh-kibana-app/pull/3503)
+- Added link to the upgrade guide when the Wazuh API version and the Wazuh App version mismatch [#3592](https://github.com/wazuh/wazuh-kibana-app/pull/3592)
 
 ### Changed
 
@@ -135,7 +136,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added node name of agent list and detail [#3039](https://github.com/wazuh/wazuh-kibana-app/pull/3039)
 - Added loading view while the user is logging to prevent permissions prompts [#3041](https://github.com/wazuh/wazuh-kibana-app/pull/3041)
 - Added custom message for each possible run_as setup [#3048](https://github.com/wazuh/wazuh-kibana-app/pull/3048)
-- Added link to the upgrade guide when the Wazuh API version and the Wazuh App version mismatch [#3592](https://github.com/wazuh/wazuh-kibana-app/pull/3592).
 
 ### Changed 
 
