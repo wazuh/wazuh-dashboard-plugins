@@ -199,7 +199,7 @@ function HealthCheckComponent() {
       checkErrors[checkID].map((error, index) => (
         <Fragment key={index}>
           <EuiCallOut
-            title={`[${checks[checkID].label}] ${error}`}
+            title={(<>{`[${checks[checkID].label}]`} <span dangerouslySetInnerHTML={{__html: error}}></span></>)}
             color="danger"
             iconType="alert"
             style={{ textAlign: 'left' }}
