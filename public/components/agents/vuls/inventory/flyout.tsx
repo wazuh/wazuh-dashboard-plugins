@@ -82,9 +82,9 @@ export class FlyoutDetail extends Component {
       { 'rule.groups': 'vulnerability-detector' },
       { 'agent.id': this.props.agentId },
       this.state.clusterFilter,
-      ...Object.keys(currentItem)
+      ...Object.keys(filterMap)
         .map((key) => {
-          if (filterMap[key] && currentItem[key] != '') {
+          if (currentItem[key] && currentItem[key] != '') {
             return { [filterMap[key]]: currentItem[key] };
           }
         })
