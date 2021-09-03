@@ -50,8 +50,7 @@ export const MultiSelect = ({ item, onChange, selectedOptions, onRemove, isDisab
             value: item.key,
             filterByKey: item.filterByKey,
             checked: selectedOptions.find((element) => element.label === value) ? ON as FilterChecked: OFF as FilterChecked,
-          }))
-          .sort((a, b) => a.label - b.label)
+          })).sort((a, b) => (a.label < b.label ? 1 : -1)).sort((a, b) => (a.checked < b.checked ? 1 : -1))
       );
     }
   }, [suggestedValues, isLoading]);
@@ -60,8 +59,8 @@ export const MultiSelect = ({ item, onChange, selectedOptions, onRemove, isDisab
     setItems(
       items.map((item) => ({
         ...item,
-        checked: selectedOptions.find((element) => element.label === item.label) ? ON : OFF,
-      }))
+        checked: selectedOptions.find((element) => element.label === item.label) ? ON as FilterChecked: OFF as FilterChecked,
+      })).sort((a, b) => (a.label < b.label ? 1 : -1)).sort((a, b) => (a.checked < b.checked ? 1 : -1))
     );
     setActiveFilters(selectedOptions.length);
   }, [selectedOptions]);
