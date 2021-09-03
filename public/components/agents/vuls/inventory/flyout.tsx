@@ -84,7 +84,7 @@ export class FlyoutDetail extends Component {
       this.state.clusterFilter,
       ...Object.keys(filterMap)
         .map((key) => {
-          if (currentItem[key] && currentItem[key] != '') {
+          if (currentItem[key]) {
             return { [filterMap[key]]: currentItem[key] };
           }
         })
