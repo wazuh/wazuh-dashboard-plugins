@@ -11,7 +11,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React from 'react';
+import React, {useState} from 'react';
 import { MainPanel } from '../../common/modules/panel';
 import { withErrorBoundary } from '../../common/hocs';
 import { CustomSearchBar } from '../../common/custom-search-bar';
@@ -19,10 +19,15 @@ import { ModuleConfiguration } from './views';
 import { ModuleConfig, filtersValues } from './config';
 
 export const GitHubPanel = withErrorBoundary(() => {
+  const [drillDownValue, setDrillDownValue] = useState({ field: '', value: '' });
+  const filterDrillDownValue = (value) => {
+    setDrillDownValue(value)
+  }
   return (
     <>
-      <CustomSearchBar filtersValues={filtersValues} />
+      <CustomSearchBar filtersValues={filtersValues} filterDrillDownValue={drillDownValue}/>
       <MainPanel moduleConfig={ModuleConfig} tab={'github'}
+        filterDrillDownValue={filterDrillDownValue}
         sidePanelChildren={<ModuleConfiguration />} />
     </>
   )

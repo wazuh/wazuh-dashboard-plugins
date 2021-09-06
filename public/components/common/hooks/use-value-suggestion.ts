@@ -29,8 +29,17 @@ export interface IValueSuggestion {
   setQuery: React.Dispatch<React.SetStateAction<string>>;
 }
 
+interface BoolFilter {
+  field: string;
+  value: string;
+}
+
 export const useValueSuggestion = (
   filterField: string,
+  boolFilterValue: BoolFilter = {
+    field: '',
+    value: '',
+  },
   options?: string[],
   type: 'string' | 'boolean' = 'string'
 ): IValueSuggestion => {
@@ -39,19 +48,29 @@ export const useValueSuggestion = (
   const [isLoading, setIsLoading] = useState(true);
   const data = getDataPlugin();
   const indexPattern = useIndexPattern();
-  //const { filters } = useFilterManager();
 
   const getOptions = (): string[] => {
     return options?.filter((element) => element.toLowerCase().includes(query.toLowerCase())) || [];
   };
 
   const getValueSuggestions = async (field) => {
+    const boolFilter =
+      boolFilterValue.value !== ''
+        ? [
+            {
+              term: {
+                [boolFilterValue.field]: `${boolFilterValue.value}`,
+              },
+            },
+          ]
+        : [];
     return options
       ? getOptions()
       : await data.autocomplete.getValueSuggestions({
           query,
           indexPattern: indexPattern as IIndexPattern,
           field,
+          boolFilter: boolFilter,
         });
   };
 
@@ -83,7 +102,7 @@ export const useValueSuggestion = (
         }
       })();
     }
-  }, [indexPattern, query, filterField, type]);
+  }, [indexPattern, query, filterField, type, boolFilterValue]);
 
   return { suggestedValues, isLoading, setQuery };
 };
