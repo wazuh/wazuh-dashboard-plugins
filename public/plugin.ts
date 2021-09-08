@@ -67,8 +67,18 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
 
         //Update if user has Wazuh disabled
         this.stateUpdater.next(() => {
-          if(response.isWazuhDisabled) unmount();
-          return { status: response.isWazuhDisabled }
+          if (response.isWazuhDisabled) {
+            unmount();
+          }
+
+          return {
+            status: response.isWazuhDisabled,
+            category: {
+              id: 'wazuh',
+              label: 'Wazuh',
+              order: 0,
+              euiIconType: core.http.basePath.prepend( `/plugins/wazuh/assets/${response.logoSidebar}`),
+            }}
         })
         return () => {
           unmount();
