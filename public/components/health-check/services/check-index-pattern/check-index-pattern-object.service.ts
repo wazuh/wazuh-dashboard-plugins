@@ -15,46 +15,54 @@ import { AppState, SavedObject } from '../../../../react-services';
 import { getDataPlugin } from '../../../../kibana-services';
 import { HEALTH_CHECK } from '../../../../../common/constants';
 import { CheckLogger } from '../../types/check_logger';
+import { PatternHandler } from '../../../../react-services/pattern-handler';
 
-export const checkIndexPatternObjectService =  async (appConfig, checkLogger: CheckLogger) => {
+export const checkIndexPatternObjectService = async (appConfig, checkLogger: CheckLogger) => {
   const patternId: string = AppState.getCurrentPattern();
   const defaultPatternId: string = appConfig.data['pattern'];
   const shouldCreateIndex: boolean = appConfig.data['checks.pattern'];
   checkLogger.info(`Index pattern id in cookie: ${patternId ? `yes [${patternId}]` : 'no'}`);
-
   const defaultIndexPatterns: string[] = [
     defaultPatternId,
-    ...(patternId && patternId !== defaultPatternId ? [patternId] : [])
+    ...(patternId && patternId !== defaultPatternId ? [patternId] : []),
   ];
   checkLogger.info(`Getting list of valid index patterns...`);
-  let listValidIndexPatterns = await SavedObject.getListOfWazuhValidIndexPatterns(defaultIndexPatterns, HEALTH_CHECK);
+  let listValidIndexPatterns = await PatternHandler.getPatternList(HEALTH_CHECK);
   checkLogger.info(`Valid index patterns found: ${listValidIndexPatterns.length || 0}`);
 
-  const indexPatternDefaultFound = listValidIndexPatterns.find((indexPattern) => indexPattern.title === defaultPatternId);
-  checkLogger.info(`Found default index pattern with title [${defaultPatternId}]: ${indexPatternDefaultFound ? 'yes' : 'no'}`);
+  const indexPatternDefaultFound = listValidIndexPatterns.find(
+    (indexPattern) => indexPattern.title === defaultPatternId
+  );
+  checkLogger.info(
+    `Found default index pattern with title [${defaultPatternId}]: ${
+      indexPatternDefaultFound ? 'yes' : 'no'
+    }`
+  );
 
   if (!indexPatternDefaultFound && defaultPatternId) {
     // if no valid index patterns are found we try to create the wazuh-alerts-*
     try {
       checkLogger.info(`Checking if index pattern [${defaultPatternId}] exists...`);
       const existDefaultIndexPattern = await SavedObject.getExistingIndexPattern(defaultPatternId);
-      checkLogger.info(`Index pattern id [${defaultPatternId}] exists: ${existDefaultIndexPattern ? 'yes' : 'no'}`);
+      checkLogger.info(
+        `Index pattern id [${defaultPatternId}] exists: ${existDefaultIndexPattern ? 'yes' : 'no'}`
+      );
       if (existDefaultIndexPattern) {
         checkLogger.info(`Refreshing index pattern fields [${defaultPatternId}]...`);
         await SavedObject.refreshIndexPattern(defaultPatternId);
         checkLogger.action(`Refreshed index pattern fields [${defaultPatternId}]`);
-      } else if(shouldCreateIndex) {
+      } else if (shouldCreateIndex) {
         checkLogger.info(`Creating index pattern [${defaultPatternId}]...`);
         await SavedObject.createWazuhIndexPattern(defaultPatternId);
         checkLogger.action(`Created index pattern [${defaultPatternId}]`);
-      }else{
+      } else {
         // show error
         checkLogger.error(`Default index pattern not found`);
       }
       checkLogger.info(`Getting list of valid index patterns [${patternId}]...`);
-      listValidIndexPatterns = await SavedObject.getListOfWazuhValidIndexPatterns(defaultIndexPatterns, HEALTH_CHECK);
+      listValidIndexPatterns = await PatternHandler.getPatternList(HEALTH_CHECK);
       checkLogger.info(`Valid index patterns found: ${listValidIndexPatterns.length || 0}`);
-      if(!AppState.getCurrentPattern()){
+      if (!AppState.getCurrentPattern()) {
         AppState.setCurrentPattern(defaultPatternId);
         checkLogger.info(`Index pattern set in cookie: [${defaultPatternId}]`);
       }
@@ -67,30 +75,43 @@ export const checkIndexPatternObjectService =  async (appConfig, checkLogger: Ch
   }
 
   if (AppState.getCurrentPattern() && listValidIndexPatterns.length) {
-    const indexPatternToSelect = listValidIndexPatterns.find(item => item.id === AppState.getCurrentPattern());
-    if (!indexPatternToSelect){
+    const indexPatternToSelect = listValidIndexPatterns.find(
+      (item) => item.id === AppState.getCurrentPattern()
+    );
+    if (!indexPatternToSelect) {
       AppState.setCurrentPattern(indexPatternToSelect.id);
       checkLogger.action(`Set index pattern id in cookie: [${indexPatternToSelect.id}]`);
     }
   }
-  
-  checkLogger.info(`Checking the app default pattern exists: id [${defaultPatternId}]...`); 
+
+  checkLogger.info(`Checking the app default pattern exists: id [${defaultPatternId}]...`);
   const existsDefaultPattern = await SavedObject.existsIndexPattern(defaultPatternId);
-  checkLogger.info(`Default pattern with id [${defaultPatternId}] exists: ${existsDefaultPattern.status ? 'yes' : 'no'}`); 
-  
-  existsDefaultPattern.status
-    && getDataPlugin().indexPatterns.setDefault(defaultPatternId, true)
-    && checkLogger.action(`Default pattern id [${defaultPatternId}] set as default index pattern`);
+  checkLogger.info(
+    `Default pattern with id [${defaultPatternId}] exists: ${
+      existsDefaultPattern.status ? 'yes' : 'no'
+    }`
+  );
+
+  existsDefaultPattern.status &&
+    getDataPlugin().indexPatterns.setDefault(defaultPatternId, true) &&
+    checkLogger.action(`Default pattern id [${defaultPatternId}] set as default index pattern`);
 
   patternId && checkLogger.info(`Checking the index pattern id [${patternId}] exists...`);
-  const patternData = patternId ? (await SavedObject.existsIndexPattern(patternId)) || {} : {} ;
-  patternId && checkLogger.info(`Index pattern id exists [${patternId}]: ${patternData.status ? 'yes': 'no'}`);
+  const patternData = patternId ? (await SavedObject.existsIndexPattern(patternId)) || {} : {};
+  patternId &&
+    checkLogger.info(
+      `Index pattern id exists [${patternId}]: ${patternData.status ? 'yes' : 'no'}`
+    );
 
   if (!patternData.status) {
     if (listValidIndexPatterns.length) {
-      const indexPatternDefaultFound = listValidIndexPatterns.find((indexPattern) => indexPattern.title === defaultPatternId);
-      checkLogger.info(`Index pattern id exists [${defaultPatternId}]: ${indexPatternDefaultFound ? 'yes': 'no'}`);
-      if(indexPatternDefaultFound){
+      const indexPatternDefaultFound = listValidIndexPatterns.find(
+        (indexPattern) => indexPattern.title === defaultPatternId
+      );
+      checkLogger.info(
+        `Index pattern id exists [${defaultPatternId}]: ${indexPatternDefaultFound ? 'yes' : 'no'}`
+      );
+      if (indexPatternDefaultFound) {
         AppState.setCurrentPattern(indexPatternDefaultFound.id);
         checkLogger.action(`Index pattern set in cookie: [${indexPatternDefaultFound.id}]`);
       }
