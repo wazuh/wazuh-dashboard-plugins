@@ -74,13 +74,11 @@ export const WzMenu = withWindowSize(
         showSelector: false,
         theresPattern: false,
         currentPattern: '',
-        patternList: [],
         currentSelectedPattern: '',
         isManagementPopoverOpen: false,
         isOverviewPopoverOpen: false,
       };
-      this.store = store;
-      this.genericReq = GenericRequest;
+      this.patternList = this.props.state.indexPatterns;
       this.wazuhConfig = new WazuhConfig();
       this.indexPatterns = getDataPlugin().indexPatterns;
       this.isLoading = false;
@@ -90,7 +88,7 @@ export const WzMenu = withWindowSize(
       const $injector = getAngularModule().$injector;
       this.router = $injector.get('$route');
       try {
-        const result = await this.genericReq.request('GET', '/hosts/apis', {});
+        const result = await GenericRequest.request('GET', '/hosts/apis', {});
         const APIlist = (result || {}).data || [];
         if (APIlist.length) {
           const { id: apiId } = JSON.parse(AppState.getCurrentAPI());
@@ -130,7 +128,7 @@ export const WzMenu = withWindowSize(
     }
 
     loadApiList = async () => {
-      const result = await this.genericReq.request('GET', '/hosts/apis', {});
+      const result = await GenericRequest.request('GET', '/hosts/apis', {});
       const APIlist = (result || {}).data || [];
       if (APIlist.length) this.setState({ APIlist });
     };
@@ -161,7 +159,6 @@ export const WzMenu = withWindowSize(
         // Getting the list of index patterns
         if (list) {
           this.setState({
-            patternList: list,
             currentSelectedPattern: AppState.getCurrentPattern(),
           });
         }
@@ -171,6 +168,7 @@ export const WzMenu = withWindowSize(
     };
 
     async componentDidUpdate(prevProps) {
+      this.patternList = this.props.state.indexPatterns;
       if (this.state.APIlist && !this.state.APIlist.length) {
         this.loadApiList();
       }
@@ -243,7 +241,6 @@ export const WzMenu = withWindowSize(
         // Getting the list of index patterns
         if (list) {
           this.setState({
-            patternList: list,
             currentSelectedPattern: AppState.getCurrentPattern(),
           });
         }
@@ -288,7 +285,7 @@ export const WzMenu = withWindowSize(
     updateClusterInfoInRegistry = async (id, clusterInfo) => {
       try {
         const url = `/hosts/update-hostname/${id}`;
-        await this.genericReq.request('PUT', url, {
+        await GenericRequest.request('PUT', url, {
           cluster_info: clusterInfo,
         });
       } catch (error) {
@@ -330,7 +327,7 @@ export const WzMenu = withWindowSize(
         <EuiFormRow label="Selected index pattern">
           <EuiSelect
             id="selectIndexPattern"
-            options={this.state.patternList.map((item) => {
+            options={this.patternList.map((item) => {
               return { value: item.id, text: item.title };
             })}
             value={this.state.currentSelectedPattern}
@@ -651,8 +648,8 @@ export const WzMenu = withWindowSize(
         !this.state.currentAPI ||
         (AppState.getPatternSelector() &&
           this.state.theresPattern &&
-          this.state.patternList &&
-          this.state.patternList.length > 1)
+          this.patternList &&
+          this.patternList.length > 1)
       );
     }
 
@@ -702,7 +699,7 @@ export const WzMenu = withWindowSize(
               <EuiSelect
                 id="selectIndexPatternBar"
                 fullWidth={true}
-                options={this.state.patternList.map((item) => {
+                options={this.patternList.map((item) => {
                   return { value: item.id, text: item.title };
                 })}
                 value={this.state.currentSelectedPattern}
@@ -1023,7 +1020,7 @@ export const WzMenu = withWindowSize(
               </EuiFlexItem>
 
               {!this.showSelectorsInPopover &&
-                this.state.patternList.length > 1 &&
+                this.patternList.length > 1 &&
                 this.getIndexPatternSelectorComponent()}
 
               {!this.showSelectorsInPopover &&
@@ -1031,7 +1028,7 @@ export const WzMenu = withWindowSize(
                 this.getApiSelectorComponent()}
 
               {this.showSelectorsInPopover &&
-                (this.state.patternList.length > 1 || this.state.APIlist.length > 1) && (
+                (this.patternList.length > 1 || this.state.APIlist.length > 1) && (
                   <>
                     <EuiFlexItem grow={false}>
                       <EuiPopover
@@ -1041,7 +1038,7 @@ export const WzMenu = withWindowSize(
                         isOpen={this.state.isSelectorsPopoverOpen}
                         closePopover={() => this.switchSelectorsPopOver()}
                       >
-                        {this.state.patternList.length > 1 && (
+                        {this.patternList.length > 1 && (
                           <EuiFlexGroup alignItems="center" style={{ paddingTop: 5 }}>
                             {this.getIndexPatternSelectorComponent()}
                           </EuiFlexGroup>
