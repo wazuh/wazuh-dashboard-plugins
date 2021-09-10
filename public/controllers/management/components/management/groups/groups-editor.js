@@ -28,6 +28,7 @@ import {
   EuiConfirmModal,
   EuiPanel,
   EuiCodeBlock,
+  EuiOverlayMask
 } from '@elastic/eui';
 
 import GroupsHandler from './utils/groups-handler';
@@ -174,7 +175,7 @@ class WzGroupsEditor extends Component {
     let modal;
     if (this.state.isModalVisible) {
       modal = (
-        <WzOverlayMask>
+        <EuiOverlayMask>
           <EuiConfirmModal
             title="Unsubmitted changes"
             onConfirm={() => {
@@ -189,7 +190,7 @@ class WzGroupsEditor extends Component {
               There are unsaved changes. Are you sure you want to proceed?
             </p>
           </EuiConfirmModal>
-        </WzOverlayMask>
+        </EuiOverlayMask>
       );
     }
     return (

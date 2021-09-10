@@ -34,7 +34,7 @@ export class FilterBar extends Component {
             {
               type: 'q',
               label: 'perm',
-              description: 'Permisions of the file',
+              description: 'Permissions of the file',
               operators: ['=', '!=', '~'],
               values: async (value) => getFilterValues('perm', value, this.props.agent.id),
             },
