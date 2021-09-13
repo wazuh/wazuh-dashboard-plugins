@@ -17,19 +17,17 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
 } from '@elastic/eui';
-import moment from 'moment';
+import { formatUIDate } from '../../../../react-services/time-service';
 
 export class FilterBar extends Component {
-  formatDate = (date: String) => {
-    return moment(date).format('YYYY-MM-DD');
-  }
+
   // TODO: Change the type
   suggestions: {[key:string]: IWzSuggestItem[]} = {
     files: [
       {type: 'q', label: 'file', description:"Name of the file", operators:['=','!=', '~'], values: async (value) => getFilterValues('file', value, this.props.agent.id, {type:'file'})},
       ...(((this.props.agent || {}).os || {}).platform !== 'windows' ? [{type: 'q', label: 'perm', description:"Permisions of the file", operators:['=','!=', '~'], values: async (value) => getFilterValues('perm', value, this.props.agent.id)}]: []),
-      {type: 'q', label: 'mtime', description:"Date the file was modified", operators:['=','!=', '>', '<'], values: async (value) => getFilterValues('mtime', value, this.props.agent.id,{}, this.formatDate)},
-      {type: 'q', label: 'date', description:"Date of registration of the event", operators:['=','!=', '>', '<'], values: async (value) => getFilterValues('date', value, this.props.agent.id, {}, this.formatDate)},
+      {type: 'q', label: 'mtime', description:"Date the file was modified", operators:['=','!=', '>', '<'], values: async (value) => getFilterValues('mtime', value, this.props.agent.id,{}, formatUIDate)},
+      {type: 'q', label: 'date', description:"Date of registration of the event", operators:['=','!=', '>', '<'], values: async (value) => getFilterValues('date', value, this.props.agent.id, {}, formatUIDate)},
       {type: 'q', label: 'uname', description:"Owner of the file", operators:['=','!=', '~'], values: async (value) => getFilterValues('uname', value, this.props.agent.id)},
       {type: 'q', label: 'uid', description:"Id of the onwner file", operators:['=','!=', '~'], values: async (value) => getFilterValues('uid', value, this.props.agent.id)},
       ...(((this.props.agent || {}).os || {}).platform !== 'windows' ? [{type: 'q', label: 'gname', description:"Name of the group owner file", operators:['=','!=', '~'], values: async (value) => getFilterValues('gname', value, this.props.agent.id)}]: []),

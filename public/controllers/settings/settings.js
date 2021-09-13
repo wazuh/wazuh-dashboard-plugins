@@ -126,6 +126,7 @@ export class SettingsController {
       { id: 'sample_data', name: 'Sample data' },
       { id: 'configuration', name: 'Configuration' },
       { id: 'logs', name: 'Logs' },
+      { id: 'miscellaneous', name: 'Miscellaneous'},
       { id: 'about', name: 'About' }
     ];
     this.settingsTabsProps = {

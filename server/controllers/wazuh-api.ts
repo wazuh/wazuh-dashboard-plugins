@@ -25,13 +25,14 @@ import jwtDecode from 'jwt-decode';
 import { KibanaRequest, RequestHandlerContext, KibanaResponseFactory } from 'src/core/server';
 import { APIUserAllowRunAs, CacheInMemoryAPIUserAllowRunAs, API_USER_STATUS_RUN_AS } from '../lib/cache-api-user-has-run-as';
 import { getCookieValueByName } from '../lib/cookie';
+import { SecurityObj } from '../lib/security-factory';
+import { getConfiguration } from '../lib/get-configuration';
 
 export class WazuhApiCtrl {
   manageHosts: ManageHosts
   updateRegistry: UpdateRegistry
 
   constructor() {
-    // this.monitoringInstance = new Monitoring(server, true);
     this.manageHosts = new ManageHosts();
     this.updateRegistry = new UpdateRegistry();
   }
@@ -210,14 +211,14 @@ export class WazuhApiCtrl {
         return response.ok({
           body: {
             statusCode: 200,
-            data: { password: '****', apiIsDown: true },
+            data: { apiIsDown: true },
           }
         });
       } else if (error.code === 'ECONNREFUSED') {
         return response.ok({
           body: {
             statusCode: 200,
-            data: { password: '****', apiIsDown: true },
+            data: { apiIsDown: true },
           }
         });
       } else {
@@ -1043,5 +1044,31 @@ export class WazuhApiCtrl {
       log('wazuh-api:getSyscollector', error.message || error);
       return ErrorResponse(error.message || error, 3035, 500, response);
     }
+  }
+  /**
+   * Check if user assigned roles disable Wazuh Plugin
+   * @param context 
+   * @param request 
+   * @param response 
+   * @returns {object} Returns { isWazuhDisabled: boolean parsed integer } 
+   */
+  async isWazuhDisabled(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
+    try {
+      
+      const disabledRoles = ( await getConfiguration() )['disabled_roles'] || [];
+      const logoSidebar = ( await getConfiguration() )['customization.logo.sidebar'] || 'icon_blue.png';
+      const wazuhSecurity = SecurityObj(context.wazuh.plugins);
+      const data = (await wazuhSecurity.getCurrentUser(request, context)).authContext;
+
+      const isWazuhDisabled = +(data.roles || []).some((role) => disabledRoles.includes(role));
+
+      return response.ok({
+        body: { isWazuhDisabled, logoSidebar }
+      });
+    } catch (error) {
+      log('wazuh-api:isWazuhDisabled', error.message || error);
+      return ErrorResponse(error.message || error, 3035, 500, response);
+    }
+    
   }
 }

@@ -139,29 +139,65 @@ const yyyymmdd = () => {
 };
 
 /**
+ * This function filter some known interfaces to avoid log hug objects
+ * @param data string | object
+ * @returns the data parsed 
+ */
+const parseData = (data: any) => {
+  let parsedData = data instanceof Error ? { 
+    message: data.message,
+    stack: data.stack
+  } : data;
+
+  // when error is AxiosError, it extends from Error
+  if (data.isAxiosError) {
+    const { config } = data;
+    parsedData = {
+      ...parsedData,
+      config: {
+        url: config.url,
+        method: config.method,
+        data: config.data,
+        params: config.params,
+      }
+    };
+  }
+
+  if (typeof parsedData === 'object')
+    parsedData.toString = () => JSON.stringify(parsedData);
+
+  return parsedData;
+}
+
+/**
  * Main function to add a new log
  * @param {*} location File where the log is being thrown
  * @param {*} message Message to show
  * @param {*} level Optional, default is 'error'
  */
-export function log(location, message, level) {
+export function log(location, data, level) {
+  const parsedData = parseData(data);  
   initDirectory()
     .then(() => {
       if (allowed) {
         checkFiles();
-        wazuhlogger.log({
+        const options: any = {
           date: new Date(),
           level: level || 'error',
           location: location || 'Unknown origin',
-          message: message || 'An error occurred'
+          data: parsedData
+        };
+        if (typeof data == 'string') {
+          options.message = parsedData;
+          delete options.data;
+        }
+        wazuhlogger.log(options);
+        
+        wazuhPlainLogger.log({
+          level: level || 'error',
+          message: `${yyyymmdd()}: ${location ||
+            'Unknown origin'}: ${parsedData.toString() || 'An error occurred'}`
         });
-        try {
-          wazuhPlainLogger.log({
-            level: level || 'error',
-            message: `${yyyymmdd()}: ${location ||
-              'Unknown origin'}: ${message || 'An error occurred'}`
-          });
-        } catch (error) {} // eslint-disable-line
       }
     })
     .catch(error =>

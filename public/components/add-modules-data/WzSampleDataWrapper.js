@@ -49,16 +49,12 @@ export class WzSampleDataProvider extends Component {
               <EuiTitle>
                 <h2>Sample data</h2>
               </EuiTitle>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-          <EuiFlexGroup>
-            <EuiFlexItem>
-              <EuiText color="subdued" style={{marginTop: 15}}>
-              Add sample data to modules.
+              <EuiText color="subdued">
+                Add sample data with events to the modules
               </EuiText>
             </EuiFlexItem>
           </EuiFlexGroup>
-          <EuiSpacer size='xl'/>
+          <EuiSpacer />
           <EuiFlexGroup>
             <EuiFlexItem>
               <WzReduxProvider>

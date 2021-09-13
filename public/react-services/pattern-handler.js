@@ -11,7 +11,7 @@
  */
 import { AppState } from './app-state';
 import { SavedObject } from './saved-objects';
-import { getDataPlugin, getHttp, getToasts } from '../kibana-services';
+import { getDataPlugin, getToasts, getHttp } from '../kibana-services';
 import { WazuhConfig } from '../react-services/wazuh-config';
 import { HEALTH_CHECK } from '../../common/constants';
 
@@ -28,47 +28,6 @@ export class PatternHandler {
       const selectedPattern = AppState.getCurrentPattern();
       if (selectedPattern && selectedPattern !== pattern) defaultPatterns.push(selectedPattern);
       let patternList = await SavedObject.getListOfWazuhValidIndexPatterns(defaultPatterns, origin);
-
-      if (origin === HEALTH_CHECK) {
-        const indexPatternFound = patternList.find((indexPattern) => indexPattern.title === pattern);
-
-        if (!indexPatternFound && pattern) {
-          // if no valid index patterns are found we try to create the wazuh-alerts-*
-          try {
-            getToasts().add({
-              color: 'warning',
-              title:
-                `No ${pattern} index pattern was found, proceeding to create it.`,
-              toastLifeTimeMs: 5000
-            });
-
-            if (await SavedObject.getExistingIndexPattern(pattern)) {
-              await SavedObject.refreshIndexPattern(pattern);
-              getToasts().addSuccess(`${pattern} index pattern updated successfully`);
-            } else {
-              await SavedObject.createWazuhIndexPattern(pattern);
-              getToasts().addSuccess(`${pattern} index pattern created successfully`);
-            }
-
-            patternList = await SavedObject.getListOfWazuhValidIndexPatterns(defaultPatterns, origin);
-            !AppState.getCurrentPattern() && AppState.setCurrentPattern(pattern);
-          } catch (err) {
-            getToasts().addDanger({
-              title: 'Error creating the index pattern.',
-              text: err.message || err,
-              toastLifeTimeMs: 3000
-            });
-            AppState.removeCurrentPattern();
-
-            return;
-          }
-        }
-      }
-
-      if (AppState.getCurrentPattern() && patternList.length) {
-        let filtered = patternList.filter((item) => item.id === AppState.getCurrentPattern());
-        if (!filtered.length) AppState.setCurrentPattern(patternList[0].id);
-      }
 
       return patternList;
     } catch (error) {

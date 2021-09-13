@@ -195,7 +195,6 @@ export class ComplianceSubrequirements extends Component {
             closePopover={() => { }}
             panelPaddingSize="none"
             style={{ width: "100%" }}
-            withTitle
             anchorPosition="downLeft">xxx
           </EuiPopover>
         </EuiFlexItem>

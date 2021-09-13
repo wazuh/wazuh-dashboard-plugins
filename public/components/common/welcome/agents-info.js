@@ -73,7 +73,7 @@ export class AgentInfo extends Component {
     const osName = os_name === '- -' ? '-' : os_name;
 
     return (
-      <WzTextWithTooltipIfTruncated position='bottom' elementStyle={{ maxWidth: style.maxWidth, fontSize: 12 }}>
+      <WzTextWithTooltipIfTruncated position='bottom' tooltipProps={{ anchorClassName: 'wz-width-100'}} elementStyle={{ maxWidth: style.maxWidth, fontSize: 12 }}>
         {this.getPlatformIcon(this.props.agent)}
         {' '}{osName}
       </WzTextWithTooltipIfTruncated>
@@ -125,6 +125,8 @@ export class AgentInfo extends Component {
       return field !== undefined || field ? field : '-';
     };
     const stats = items.map(item => {
+      // We add tooltipProps, so that the ClusterNode and Operating System fields occupy their space and do not exceed this, overlapping with the one on the right
+      const tooltipProps = item.description === 'Cluster node' ? { anchorClassName: 'wz-width-100'} : {};
       return (
         <EuiFlexItem key={item.description} style={item.style || null}>
           <WzStat
@@ -143,7 +145,7 @@ export class AgentInfo extends Component {
               ) : item.description === 'Status' ? (
                 this.addHealthRender(this.props.agent, item.style)
               ) : (
-                <WzTextWithTooltipIfTruncated position='bottom' elementStyle={{ maxWidth: item.style.maxWidth, fontSize: 12 }}>
+                <WzTextWithTooltipIfTruncated position='bottom' tooltipProps={tooltipProps} elementStyle={{ maxWidth: item.style.maxWidth, fontSize: 12 }}>
                   {checkField(item.title)}
                 </WzTextWithTooltipIfTruncated>
               )

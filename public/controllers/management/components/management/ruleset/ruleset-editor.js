@@ -29,6 +29,7 @@ import {
   EuiButtonIcon,
   EuiButtonEmpty,
   EuiFieldText,
+  EuiConfirmModal,
   EuiCodeEditor,
   EuiPanel,
 } from '@elastic/eui';
@@ -47,6 +48,8 @@ import 'brace/snippets/xml';
 import 'brace/ext/language_tools';
 import "brace/ext/searchbox";
 import { showFlyoutLogtest } from '../../../../../redux/actions/appStateActions';
+import { WzOverlayMask } from '../../../../../components/common/util';
+import _ from 'lodash';
 
 class WzRulesetEditor extends Component {
   _isMounted = false;
@@ -60,23 +63,23 @@ class WzRulesetEditor extends Component {
       animatedScroll: true,
       enableBasicAutocompletion: true,
       enableSnippets: true,
-      enableLiveAutocompletion: false
+      enableLiveAutocompletion: false,
     };
     this.rulesetHandler = new RulesetHandler(this.props.state.section);
     const { fileContent, addingRulesetFile } = this.props.state;
-    const { name, content, path } = fileContent
-      ? fileContent
-      : addingRulesetFile;
+    const { name, content, path } = fileContent ? fileContent : addingRulesetFile;
 
     this.state = {
       isSaving: false,
       error: false,
       inputValue: '',
+      initialInputValue: '',
       showWarningRestart: false,
-      content,
+      isModalVisible: false,
       initContent: content,
+      content,
       name,
-      path
+      path,
     };
   }
 
@@ -89,6 +92,7 @@ class WzRulesetEditor extends Component {
   componentDidMount() {
     this._isMounted = true;
   }
+
 
   /**
    * Save the new content
@@ -127,7 +131,7 @@ class WzRulesetEditor extends Component {
           toast.toastMessage += '\nThe content file was restored to previous state.';
         }
 
-        getToasts().addError({stack: error, message: toast.toastMessage}, toast);
+        getToasts().addError({ stack: error, message: toast.toastMessage }, toast);
 
         return;
       }
@@ -138,16 +142,15 @@ class WzRulesetEditor extends Component {
       if (overwrite) {
         textSuccess = 'File successfully edited';
       }
-      this.setState({ showWarningRestart: true });
+      this.setState({
+        showWarningRestart: true,
+        initialInputValue: this.state.inputValue,
+        initContent: content,
+      });
       this.showToast('success', 'Success', textSuccess, 3000);
     } catch (error) {
       this.setState({ error, isSaving: false });
-      this.showToast(
-        'danger',
-        'Error',
-        'Error saving file: ' + error,
-        3000
-      );
+      this.showToast('danger', 'Error', 'Error saving file: ' + error, 3000);
     }
   }
 
@@ -156,11 +159,11 @@ class WzRulesetEditor extends Component {
       color: color,
       title: title,
       text: text,
-      toastLifeTimeMs: time
+      toastLifeTimeMs: time,
     });
   };
 
-  goToEdit = name => {
+  goToEdit = (name) => {
     const { content, path } = this.state;
     const file = { name: name, content: content, path: path };
     this.props.updateFileContent(file);
@@ -169,18 +172,14 @@ class WzRulesetEditor extends Component {
   /**
    * onChange the input value in case adding new file
    */
-  onChange = e => {
+  onChange = (e) => {
     this.setState({
-      inputValue: e.target.value
+      inputValue: e.target.value,
     });
   };
 
   render() {
-    const {
-      section,
-      addingRulesetFile,
-      fileContent
-    } = this.props.state;
+    const { section, addingRulesetFile, fileContent } = this.props.state;
     const { wazuhNotReadyYet } = this.props;
     const { name, content, path, showWarningRestart } = this.state;
     const isRules = path.includes('rules') ? 'Ruleset Test' : 'Decoders Test';
@@ -189,9 +188,7 @@ class WzRulesetEditor extends Component {
       ? true
       : path !== 'ruleset/rules' && path !== 'ruleset/decoders';
     let nameForSaving = addingRulesetFile ? this.state.inputValue : name;
-    nameForSaving = nameForSaving.endsWith('.xml')
-      ? nameForSaving
-      : `${nameForSaving}.xml`;
+    nameForSaving = nameForSaving.endsWith('.xml') ? nameForSaving : `${nameForSaving}.xml`;
     const overwrite = fileContent ? true : false;
 
     const xmlError = validateXML(content);
@@ -199,7 +196,7 @@ class WzRulesetEditor extends Component {
     const onClickOpenLogtest = () => {
       this.props.logtestProps.openCloseFlyout();
       this.props.showFlyoutLogtest(true);
-    }
+    };
 
     const buildLogtestButton = () => {
       return (
@@ -229,7 +226,7 @@ class WzRulesetEditor extends Component {
           fill
           iconType={isEditable && xmlError ? 'alert' : 'save'}
           isLoading={this.state.isSaving}
-          isDisabled={nameForSaving.length <= 4 || (!!(isEditable && xmlError))}
+          isDisabled={nameForSaving.length <= 4 || !!(isEditable && xmlError)}
           onClick={() => this.save(nameForSaving, overwrite)}
         >
           {isEditable && xmlError ? 'XML format error' : 'Save'}
@@ -237,106 +234,157 @@ class WzRulesetEditor extends Component {
       </>
     );
 
+    const closeModal = () => this.setState({ isModalVisible: false });
+    const showModal = () => this.setState({ isModalVisible: true });
+
+    let modal;
+    if (this.state.isModalVisible) {
+      modal = (
+        <WzOverlayMask>
+          <EuiConfirmModal
+            title="Unsubmitted changes"
+            onConfirm={() => {
+              closeModal;
+              this.props.cleanInfo();
+            }}
+            onCancel={closeModal}
+            cancelButtonText="No, don't do it"
+            confirmButtonText="Yes, do it"
+          >
+            <p style={{ textAlign: 'center' }}>
+              There are unsaved changes. Are you sure you want to proceed?
+            </p>
+          </EuiConfirmModal>
+        </WzOverlayMask>
+      );
+    }
     return (
-      <EuiPage style={{ background: 'transparent' }}>
-        <EuiPanel>
-          <EuiFlexGroup>
-            <EuiFlexItem>
-              {/* File name and back button */}
-              <EuiFlexGroup>
-                <EuiFlexItem>
-                  {(!fileContent && (
-                    <EuiFlexGroup>
-                      <EuiFlexItem grow={false}>
-                        <EuiToolTip
-                          position="right"
-                          content={`Back to ${section}`}
-                        >
-                          <EuiButtonIcon
-                            aria-label="Back"
-                            color="primary"
-                            iconSize="l"
-                            iconType="arrowLeft"
-                            onClick={() => this.props.cleanInfo()}
-                          />
-                        </EuiToolTip>
-                      </EuiFlexItem>
-                      <EuiFlexItem>
-                        <EuiFieldText
-                          style={{ width: '300px' }}
-                          placeholder={`Type your new ${section} file name here`}
-                          value={this.state.inputValue}
-                          onChange={this.onChange}
-                          aria-label="aria-label to prevent react warning"
-                        />
-                      </EuiFlexItem>
-                    </EuiFlexGroup>
-                  )) || (
-                      <EuiTitle>
-                        <span style={{ fontSize: '22px' }}>
-                          <EuiToolTip
-                            position="right"
-                            content={`Back to ${section}`}
-                          >
+      <>
+        <EuiPage style={{ background: 'transparent' }}>
+          <EuiPanel>
+            <EuiFlexGroup>
+              <EuiFlexItem>
+                {/* File name and back button */}
+                <EuiFlexGroup>
+                  <EuiFlexItem>
+                    {(!fileContent && (
+                      <EuiFlexGroup>
+                        <EuiFlexItem grow={false}>
+                          <EuiToolTip position="right" content={`Back to ${section}`}>
                             <EuiButtonIcon
                               aria-label="Back"
                               color="primary"
                               iconSize="l"
                               iconType="arrowLeft"
-                              onClick={() => this.props.cleanInfo()}
+                              onClick={() => {
+                                if (
+                                  this.state.content !== this.state.initContent ||
+                                  this.state.inputValue !== this.state.initialInputValue
+                                ) {
+                                  showModal();
+                                } else {
+                                  this.props.cleanInfo();
+                                }
+                              }}
+                            />
+                          </EuiToolTip>
+                        </EuiFlexItem>
+                        <EuiFlexItem>
+                          <EuiFieldText
+                            style={{ width: '300px' }}
+                            placeholder={`Type your new ${section} file name here`}
+                            value={this.state.inputValue}
+                            onChange={this.onChange}
+                            aria-label="aria-label to prevent react warning"
+                          />
+                        </EuiFlexItem>
+                      </EuiFlexGroup>
+                    )) || (
+                      <EuiTitle>
+                        <span style={{ fontSize: '22px' }}>
+                          <EuiToolTip position="right" content={`Back to ${section}`}>
+                            <EuiButtonIcon
+                              aria-label="Back"
+                              color="primary"
+                              iconSize="l"
+                              iconType="arrowLeft"
+                              onClick={() => {
+                                if (
+                                  this.state.content !== this.state.initContent ||
+                                  this.state.inputValue !== this.state.initialInputValue
+                                ) {
+                                  showModal();
+                                } else {
+                                  this.props.cleanInfo();
+                                }
+                              }}
                             />
                           </EuiToolTip>
                           {nameForSaving}
                         </span>
                       </EuiTitle>
                     )}
-                </EuiFlexItem>
-                <EuiFlexItem />
-                {/* This flex item is for separating between title and save button */}
-                {isEditable && (
-                  <EuiFlexItem style={{ display: 'block' }} grow={false}>{headerButtons}</EuiFlexItem>
-                )}
-              </EuiFlexGroup>
-              <EuiSpacer size="m" />
-              {this.state.showWarningRestart && (
-                <Fragment>
-                  <WzRestartClusterManagerCallout
-                    onRestarted={() => this.setState({ showWarningRestart: false })}
-                    onRestartedError={() => this.setState({ showWarningRestart: true })}
-                  />
-                  <EuiSpacer size='s' />
-                </Fragment>
-              )}
-              {xmlError && (
-                <Fragment>
-                  <span style={{ color: 'red' }}> {xmlError}</span>
-                  <EuiSpacer size='s' />
-                </Fragment>
-              )}
-              <EuiFlexGroup>
-                <EuiFlexItem>
-                  <EuiFlexGroup>
-                    <EuiFlexItem className="codeEditorWrapper">
-                      <EuiCodeEditor
-                        theme="textmate"
-                        width="100%"
-                        height={`calc(100vh - ${((showWarningRestart && !xmlError) || wazuhNotReadyYet) ? 300 : (xmlError ? (!showWarningRestart ? 245 : 350) : 230)}px)`}
-                        value={content}
-                        onChange={newContent =>{this.setState({ content: newContent })}}
-                        mode="xml"
-                        isReadOnly={!isEditable}
-                        wrapEnabled
-                        setOptions={this.codeEditorOptions}
-                        aria-label="Code Editor"
-                      />
+                  </EuiFlexItem>
+                  <EuiFlexItem />
+                  {/* This flex item is for separating between title and save button */}
+                  {isEditable && (
+                    <EuiFlexItem style={{ display: 'block' }} grow={false}>
+                      {headerButtons}
                     </EuiFlexItem>
-                  </EuiFlexGroup>
-                </EuiFlexItem>
-              </EuiFlexGroup>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-        </EuiPanel>
-      </EuiPage>
+                  )}
+                </EuiFlexGroup>
+                <EuiSpacer size="m" />
+                {this.state.showWarningRestart && (
+                  <Fragment>
+                    <WzRestartClusterManagerCallout
+                      onRestarted={() => this.setState({ showWarningRestart: false })}
+                      onRestartedError={() => this.setState({ showWarningRestart: true })}
+                    />
+                    <EuiSpacer size="s" />
+                  </Fragment>
+                )}
+                {xmlError && (
+                  <Fragment>
+                    <span style={{ color: 'red' }}> {xmlError}</span>
+                    <EuiSpacer size="s" />
+                  </Fragment>
+                )}
+                <EuiFlexGroup>
+                  <EuiFlexItem>
+                    <EuiFlexGroup>
+                      <EuiFlexItem className="codeEditorWrapper">
+                        <EuiCodeEditor
+                          theme="textmate"
+                          width="100%"
+                          height={`calc(100vh - ${
+                            (showWarningRestart && !xmlError) || wazuhNotReadyYet
+                              ? 300
+                              : xmlError
+                              ? !showWarningRestart
+                                ? 245
+                                : 350
+                              : 230
+                          }px)`}
+                          value={content}
+                          onChange={(newContent) => {
+                            this.setState({ content: newContent });
+                          }}
+                          mode="xml"
+                          isReadOnly={!isEditable}
+                          wrapEnabled
+                          setOptions={this.codeEditorOptions}
+                          aria-label="Code Editor"
+                        />
+                      </EuiFlexItem>
+                    </EuiFlexGroup>
+                  </EuiFlexItem>
+                </EuiFlexGroup>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiPanel>
+        </EuiPage>
+        {modal}
+      </>
     );
   }
 }

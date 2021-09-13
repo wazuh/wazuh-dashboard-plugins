@@ -18,14 +18,6 @@ export const MainVuls = compose(
       <PromptNoSelectedAgent body="You need to select an agent to see it's vulnerabilities." />
     )
   ),
-  withGuard(
-    (props) => {
-      const agentData =
-        props.currentAgentData && props.currentAgentData.id ? props.currentAgentData : props.agent;
-      return agentData.status !== 'active';
-    },
-    () => <PromptNoActiveAgent />
-  ),
   withUserAuthorizationPrompt((props) => {
     const agentData =
       props.currentAgentData && props.currentAgentData.id ? props.currentAgentData : props.agent;

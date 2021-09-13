@@ -1,4 +1,5 @@
-import { AppMountParameters, CoreSetup, CoreStart, Plugin, PluginInitializerContext } from 'kibana/public';
+import { BehaviorSubject } from 'rxjs';
+import { AppMountParameters, CoreSetup, CoreStart, AppUpdater, Plugin, PluginInitializerContext } from 'kibana/public';
 import {
   setDataPlugin,
   setHttp,
@@ -32,7 +33,8 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
   constructor(private readonly initializerContext: PluginInitializerContext) { }
   public initializeInnerAngular?: () => void;
   private innerAngularInitialized: boolean = false;
-
+  private stateUpdater = new BehaviorSubject<AppUpdater>(() => ({}));
+  
   public setup(core: CoreSetup, plugins: WazuhSetupPlugins): WazuhSetup {
 
     //custom styles
@@ -67,8 +69,27 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
 
         await this.initializeInnerAngular();
 
+        //Check is user has Wazuh disabled
+        const response = await core.http.get(`/api/check-wazuh`);
+
         params.element.classList.add('dscAppWrapper');
         const unmount = await renderApp(innerAngularName, params.element);
+
+        //Update if user has Wazuh disabled
+        this.stateUpdater.next(() => {
+          if (response.isWazuhDisabled) {
+            unmount();
+          }
+
+          return {
+            status: response.isWazuhDisabled,
+            category: {
+              id: 'wazuh',
+              label: 'Wazuh',
+              order: 0,
+              euiIconType: core.http.basePath.prepend( `/plugins/wazuh/assets/${response.logoSidebar}`),
+            }}
+        })
         return () => {
           unmount();
         };
@@ -79,6 +100,7 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
         order: 0,
         euiIconType: core.http.basePath.prepend('/plugins/wazuh/assets/icon_blue.png'),      
       },
+      updater$: this.stateUpdater
     });
     return {};
   }

@@ -109,7 +109,7 @@ export default compose(
     }
     return [
       { text: '' },
-      { text: 'Management', href: '/app/wazuh#/manager' },
+      { text: 'Management', href: '#/manager' },
       { text: sectionNames[props.state.section] }
     ];
   }),

@@ -11,59 +11,58 @@
  */
 import { healthCheck } from './health-check';
 import { createSavedSearchesLoader } from '../../../../../src/plugins/discover/public';
-import { getToasts, getChrome, getOverlays, getDataPlugin, getSavedObjects } from '../../kibana-services';
+import {
+  getToasts,
+  getChrome,
+  getOverlays,
+  getDataPlugin,
+  getSavedObjects,
+  getPlugins,
+} from '../../kibana-services';
 
-export function getSavedSearch(
-  $location,
-  $window,
-  $route
-) {
-  const services = {
-    savedObjectsClient: getSavedObjects().client,
-    indexPatterns: getDataPlugin().indexPatterns,
-    search: getDataPlugin().search,
-    chrome: getChrome(),
-    overlays: getOverlays(),
-  };
+export function getSavedSearch($location, $window, $route) {
+  try {
+    const services = {
+      savedObjectsClient: getSavedObjects().client,
+      indexPatterns: getDataPlugin().indexPatterns,
+      search: getDataPlugin().search,
+      chrome: getChrome(),
+      overlays: getOverlays(),
+      savedObjects: getPlugins().savedObjects, //for kibana ^7.11
+    };
 
-  const savedSearches = createSavedSearchesLoader(services);
-  const currentParams = $location.search();
-  const targetedAgent =
-    currentParams && (currentParams.agent || currentParams.agent === '000');
-  const targetedRule =
-    currentParams && currentParams.tab === 'ruleset' && currentParams.ruleid;
-  if (!targetedAgent && !targetedRule && healthCheck($window)) {
-    $location.path('/health-check');
-    return Promise.reject();
-  } else {
-    const savedSearchId = $route.current.params.id;
-    return savedSearches
-      .get(savedSearchId)
-      .then(savedSearch => {
-        if (savedSearchId) {
-          getChrome().recentlyAccessed.add(
-            savedSearch.getFullPath(),
-            savedSearch.title,
-            savedSearchId
-          );
-        }
-        return savedSearch;
-      })
-      .catch(() => {
-        getToasts().addWarning({
-          title: 'Saved object is missing',
-          text: (element) => {
-            ReactDOM.render(<ErrorRenderer>{error.message}</ErrorRenderer>, element);
-            return () => ReactDOM.unmountComponentAtNode(element);
-          },
+    const savedSearches = createSavedSearchesLoader(services);
+    const currentParams = $location.search();
+    const targetedAgent = currentParams && (currentParams.agent || currentParams.agent === '000');
+    const targetedRule = currentParams && currentParams.tab === 'ruleset' && currentParams.ruleid;
+    if (!targetedAgent && !targetedRule && healthCheck($window)) {
+      $location.path('/health-check');
+      return Promise.reject();
+    } else {
+      const savedSearchId = $route.current.params.id;
+      return savedSearches
+        .get(savedSearchId)
+        .then((savedSearch) => {
+          if (savedSearchId) {
+            getChrome().recentlyAccessed.add(
+              savedSearch.getFullPath(),
+              savedSearch.title,
+              savedSearchId
+            );
+          }
+          return savedSearch;
+        })
+        .catch(() => {
+          getToasts().addWarning({
+            title: 'Saved object is missing',
+            text: (element) => {
+              ReactDOM.render(<ErrorRenderer>{error.message}</ErrorRenderer>, element);
+              return () => ReactDOM.unmountComponentAtNode(element);
+            },
+          });
         });
-
-        /* redirectWhenMissing({
-          search: '/discover',
-          'index-pattern':
-            '/management/kibana/objects/savedSearches/' +
-            $route.current.params.id
-        }) */
-      });
+    }
+  } catch (error) {
+    console.error(error);
   }
 }

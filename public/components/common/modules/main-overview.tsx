@@ -17,9 +17,12 @@ import {
   EuiFlexItem,
   EuiButtonIcon,
   EuiTitle,
+  EuiToolTip,
   EuiPopover,
   EuiBadge,
-  EuiPopoverTitle
+  EuiIcon,
+  EuiText,
+  EuiPopoverTitle,
 } from '@elastic/eui';
 import '../../common/modules/module.scss';
 import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
@@ -52,32 +55,60 @@ export class MainModuleOverview extends Component {
     };
   }
 
-  getBadgeColor(agentStatus){
-    if (agentStatus.toLowerCase() === 'active') { return 'secondary'; }
-    else if (agentStatus.toLowerCase() === 'disconnected') { return '#BD271E'; }
-    else if (agentStatus.toLowerCase() === 'never connected') { return 'default'; }
+  getBadgeColor(agentStatus) {
+    if (agentStatus.toLowerCase() === 'active') {
+      return 'secondary';
+    } else if (agentStatus.toLowerCase() === 'disconnected') {
+      return '#BD271E';
+    } else if (agentStatus.toLowerCase() === 'never connected') {
+      return 'default';
+    }
   }
 
   setGlobalBreadcrumb() {
     const currentAgent = store.getState().appStateReducers.currentAgentData;
-    if (WAZUH_MODULES[this.props.currentTab]) {
-      let breadcrumb = [
+    if (WAZUH_MODULES[this.props.section]) {
+      let breadcrumb:any[] = [
         {
           text: '',
         },
         {
-          text: currentAgent.id ? (<span>Modules
-            <EuiBadge
-            onMouseDown={(ev) =>  {AppNavigate.navigateToModule(ev, 'agents', {"tab": "welcome", "agent": currentAgent.id  } )}}
-            color={this.getBadgeColor(currentAgent.status)}>
-          {currentAgent.id}
-        </EuiBadge></span> ) : 'Modules',
-          href: "#/overview"
-        },
-        {
-          text: WAZUH_MODULES[this.props.section].title
+          text: 'Modules',
+          href: '#/overview'
         },
       ];
+      if (currentAgent.id) {
+        breadcrumb.push( {
+          text: (
+            <a
+              style={{ margin: '0px 0px -5px 0px', height: 20 }}
+              className="euiLink euiLink--subdued euiBreadcrumb "
+              onClick={(ev) => { ev.stopPropagation(); AppNavigate.navigateToModule(ev, 'agents', { "tab": "welcome", "agent": currentAgent.id }); this.router.reload(); }}
+              id="breadcrumbNoTitle"
+            >
+              <EuiToolTip position="bottom" content={"View agent summary"} display="inlineBlock">
+                <span>{currentAgent.name}</span>
+              </EuiToolTip>
+            </a>),
+        })
+      }
+      breadcrumb.push({
+        text: (
+          <EuiFlexGroup gutterSize="xs" alignItems="center" responsive={false}>
+            <div style={{ margin: '0.8em 0em 0em 0.09em' }}>
+              <EuiToolTip position="top">
+                <div className="euiBreadcrumb euiBreadcrumb--last" title="">
+                  {WAZUH_MODULES[this.props.section].title}
+                </div>
+              </EuiToolTip>
+            </div>
+            <EuiToolTip content={WAZUH_MODULES[this.props.section].description}>
+                <EuiIcon style={{ margin: '0px 0px 1px 5px' }} type='iInCircle' />
+              </EuiToolTip>
+          </EuiFlexGroup>
+        ),
+        truncate: false,
+      },)
       store.dispatch(updateGlobalBreadcrumb(breadcrumb));
     }
   }
@@ -89,100 +120,49 @@ export class MainModuleOverview extends Component {
   async componentDidMount() {
     const tabView = AppNavigate.getUrlParameter('tabView') || 'panels';
     const tab = AppNavigate.getUrlParameter('tab');
-    if(tabView && tabView !== this.props.selectView){
-      if(tabView === 'panels' && tab=== 'sca' ){ // SCA initial tab is inventory
+    if (tabView && tabView !== this.props.selectView) {
+      if (tabView === 'panels' && tab === 'sca') {
+        // SCA initial tab is inventory
         this.props.onSelectedTabChanged('inventory');
-      }else{
+      } else {
         this.props.onSelectedTabChanged(tabView);
       }
     }
-    
-    this.setGlobalBreadcrumb();
-  }
 
-  renderTitle() {
-    return (
-      <EuiFlexGroup>
-        <EuiFlexItem className="wz-module-header-agent-title">
-          <EuiFlexGroup>
-            <EuiFlexItem grow={false}>
-              <span style={{ display: 'inline-flex' }}>
-                <EuiTitle size="s">
-                  <h1>
-                    <span>&nbsp;{WAZUH_MODULES[this.props.section].title}&nbsp;&nbsp;</span>
-                  </h1>
-                </EuiTitle>
-                <EuiPopover
-                  button={
-                    <EuiButtonIcon
-                      iconType="iInCircle"
-                      style={{marginTop: 3}}
-                      color='primary'
-                      aria-label='Open/close'
-                      onClick={() => { this.setState({ isDescPopoverOpen: !this.state.isDescPopoverOpen }) }}
-                    />
-                  }
-                  anchorPosition="rightUp"
-                  isOpen={this.state.isDescPopoverOpen}
-                  closePopover={() => { this.setState({ isDescPopoverOpen: false }) }}>
-                  <EuiPopoverTitle>Module description</EuiPopoverTitle>
-                  <div style={{ width: '400px' }}>
-                    {WAZUH_MODULES[this.props.section].description}
-                  </div>
-                </EuiPopover>
-              </span>
-            </EuiFlexItem>
-            <EuiFlexItem />
-          </EuiFlexGroup>
-        </EuiFlexItem>
-      </EuiFlexGroup>
-    );
+    this.setGlobalBreadcrumb();
   }
 
   render() {
     const { section, selectView } = this.props;
-    const title = this.renderTitle();
     return (
       <div className={this.state.showAgentInfo ? 'wz-module wz-module-showing-agent' : 'wz-module'}>
-        <div className='wz-module-header-agent-wrapper'>
-          <div className='wz-module-header-agent'>
-            {title}
-          </div>
-        </div>
         <Fragment>
-          <div className='wz-module-header-nav-wrapper'>
-            <div className={this.props.tabs && this.props.tabs.length && 'wz-module-header-nav'}>
-              {(this.props.tabs && this.props.tabs.length) &&
-                <div className="wz-welcome-page-agent-tabs">
-                  <EuiFlexGroup>
-                    {this.props.renderTabs()}
-                    <EuiFlexItem grow={false} style={{ marginTop: 6, marginRight: 5 }}>
-                      <WzReduxProvider>
-                        <OverviewActions {...{ ...this.props, ...this.props.agentsSelectionProps }} />
-                      </WzReduxProvider>
-                    </EuiFlexItem>
-                    {(selectView === 'dashboard') &&
-                      this.props.renderReportButton()
-                    }
-                    {(this.props.buttons || []).includes('dashboard') &&
-                      this.props.renderDashboardButton()
-                    }
-                  </EuiFlexGroup>
-                </div>
-              }
-            </div>
+          <div className={this.props.tabs && this.props.tabs.length && 'wz-module-header-nav'}>
+            {this.props.tabs && this.props.tabs.length && (
+              <div className="wz-welcome-page-agent-tabs">
+                <EuiFlexGroup>
+                  {this.props.renderTabs()}
+                  <EuiFlexItem grow={false} style={{ marginTop: 6, marginRight: 5 }}>
+                    <WzReduxProvider>
+                      <OverviewActions {...{ ...this.props, ...this.props.agentsSelectionProps }} />
+                    </WzReduxProvider>
+                  </EuiFlexItem>
+                  {selectView === 'dashboard' && this.props.renderReportButton()}
+                  {(this.props.buttons || []).includes('dashboard') &&
+                    this.props.renderDashboardButton()}
+                </EuiFlexGroup>
+              </div>
+            )}
           </div>
-          <div className='wz-module-body'>
-            <ModuleTabViewer component={section} {...this.props}/>
-          </div>
+          <ModuleTabViewer component={section} {...this.props} />
         </Fragment>
       </div>
     );
   }
 }
 
-const mapStateToProps = state => ({
-  agent: state.appStateReducers.currentAgentData
+const mapStateToProps = (state) => ({
+  agent: state.appStateReducers.currentAgentData,
 });
 
 const ModuleTabViewer = compose(
@@ -190,31 +170,30 @@ const ModuleTabViewer = compose(
   withAgentSupportModule
 )((props) => {
   const { section, selectView } = props;
-  return <>
-      {selectView === 'events' &&
-        <Events {...props} />
-      }
-      {selectView === 'loader' &&
-        <Loader {...props}
+  return (
+    <>
+      {selectView === 'events' && <Events {...props} />}
+      {selectView === 'loader' && (
+        <Loader
+          {...props}
           loadSection={(section) => props.loadSection(section)}
-          redirect={props.afterLoad}>
-        </Loader>}
-      {selectView === 'dashboard' &&
-        <Dashboard {...props} />
-      }
-      {selectView === 'settings' &&
-        <Settings {...props} />
-      }
-
+          redirect={props.afterLoad}
+        ></Loader>
+      )}
+      {selectView === 'dashboard' && <Dashboard {...props} />}
+      {selectView === 'settings' && <Settings {...props} />}
 
       {/* ---------------------MODULES WITH CUSTOM PANELS--------------------------- */}
-      {section === 'fim' && selectView==='inventory' && <MainFim {...props} />}
-      {section === 'sca' && selectView==='inventory' && <MainSca {...props} />}
-      
-      {section === 'vuls' && selectView==='inventory' && <MainVuls {...props} />}
+      {section === 'fim' && selectView === 'inventory' && <MainFim {...props} />}
+      {section === 'sca' && selectView === 'inventory' && <MainSca {...props} />}
+
+      {section === 'vuls' && selectView === 'inventory' && <MainVuls {...props} />}
 
       {section === 'mitre' && selectView === 'inventory' && <MainMitre {...props} />}
-      {['pci', 'gdpr', 'hipaa', 'nist', 'tsc'].includes(section) && selectView === 'inventory' && <ComplianceTable {...props} goToDiscover={(id) => props.onSelectedTabChanged(id)} />}
+      {['pci', 'gdpr', 'hipaa', 'nist', 'tsc'].includes(section) && selectView === 'inventory' && (
+        <ComplianceTable {...props} goToDiscover={(id) => props.onSelectedTabChanged(id)} />
+      )}
       {/* -------------------------------------------------------------------------- */}
     </>
-})
+  );
+});

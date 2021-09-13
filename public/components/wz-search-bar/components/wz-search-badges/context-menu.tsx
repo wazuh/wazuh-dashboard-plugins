@@ -192,22 +192,26 @@ async function updateSuggestsValues(suggest: any, value: any, setSuggetsValues: 
 }
 
 function EditFilterOperator(operator, setOperator) {
+  const operatorSelectOptions = [
+    { value: '=', inputDisplay: 'is' },
+    { value: '!=', inputDisplay: 'is not' },
+    { value: '<', inputDisplay: 'less than' },
+    { value: '>', inputDisplay: 'greater than' },
+    { value: '~', inputDisplay: 'like' },
+  ];
+
   return <EuiFormRow label="Operator">
-    <EuiSuperSelect options={[
-      { value: '=', inputDisplay: 'is' },
-      { value: '!=', inputDisplay: 'is not' },
-      { value: '<', inputDisplay: 'less than' },
-      { value: '>', inputDisplay: 'greater than' },
-      { value: '~', inputDisplay: 'like' },
-    ]} valueOfSelected={operator} onChange={setOperator} />
+    <EuiSuperSelect options={operatorSelectOptions} valueOfSelected={operator} onChange={setOperator} />
   </EuiFormRow>;
 }
 
 function EditFilterConjuntion(conjuntion: string, setConjuntion): React.ReactNode {
+  const conjuntionOptions = [
+    { id: `conjuntion-AND`, label: "AND" },
+    { id: `conjuntion-OR`, label: "OR" },
+  ];
+
   return <EuiFormRow label="Conjuntion">
-    <EuiButtonGroup options={[
-      { id: `conjuntion-AND`, label: "AND" },
-      { id: `conjuntion-OR`, label: "OR" },
-    ]} idSelected={`conjuntion-${conjuntion.trim()}`} onChange={() => setConjuntion(/and/gi.test(conjuntion) ? ' OR ' : ' AND ')} />
+    <EuiButtonGroup legend="Conjunction" options={conjuntionOptions} idSelected={`conjuntion-${conjuntion.trim()}`} onChange={() => setConjuntion(/and/gi.test(conjuntion) ? ' OR ' : ' AND ')} />
   </EuiFormRow>;
 }
