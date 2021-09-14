@@ -771,7 +771,6 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
     this.setState({ isSelectorsPopoverOpen: !this.state.isSelectorsPopoverOpen })
   }
 
-
   render() {
     const currentAgent = store.getState().appStateReducers.currentAgentData;
     const thereAreSelectors = this.thereAreSelectors();
@@ -971,8 +970,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
       </div>
     );
 
-
-    const logotype_url = getHttp().basePath.prepend('/plugins/wazuh/assets/logotype.svg');
+    const logotype_url = getHttp().basePath.prepend(`/plugins/wazuh/assets/${this.wazuhConfig.getConfig()['customization.logo.app']}`);
     const mainButton = (
       <button data-test-subj='menuWazuhButton' className="eui" onClick={() => this.switchMenuOpened()}>
         <EuiFlexGroup

@@ -96,15 +96,6 @@ export const WAZUH_SECURITY_PLUGINS = [
   WAZUH_SECURITY_PLUGIN_OPEN_DISTRO_FOR_ELASTICSEARCH,
 ];
 
-// Default time filter set by the app
-export const WAZUH_TIME_FILTER_DEFAULT = {
-  from: 'now-24h',
-  to: 'now',
-};
-
-//Default max buckets set by the app
-export const WAZUH_MAX_BUCKETS_DEFAULT = 200000;
-
 // App configuration
 export const WAZUH_CONFIGURATION_CACHE_TIME = 10000; // time in ms;
 export const WAZUH_CONFIGURATION_SETTINGS_NEED_RESTART = [
@@ -125,7 +116,10 @@ export const WAZUH_CONFIGURATION_SETTINGS_NEED_HEALTH_CHECK = [
   'cron.statistics.index.replicas',
   'wazuh.monitoring.shards',
 ];
-export const WAZUH_CONFIGURATION_SETTINGS_NEED_RELOAD = ['hideManagerAlerts'];
+export const WAZUH_CONFIGURATION_SETTINGS_NEED_RELOAD = [
+  'hideManagerAlerts',
+  'customization.logo.sidebar'
+];
 
 // Reserved ids for Users/Role mapping
 export const WAZUH_API_RESERVED_ID_LOWER_THAN = 100;
@@ -228,6 +222,10 @@ export const WAZUH_DEFAULT_APP_CONFIG = {
   hideManagerAlerts: false,
   'logs.level': 'info',
   'enrollment.dns': '',
+  'customization.logo.app':'logotype.svg',
+  'customization.logo.sidebar':'icon_blue.png',
+  'customization.logo.healthcheck':'icon_blue.svg',
+  'customization.logo.reports':'logo.png'
 };
 
 // Wazuh errors

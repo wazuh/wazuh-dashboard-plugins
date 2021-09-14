@@ -25,6 +25,7 @@ import {
   EuiToolTip,
 } from '@elastic/eui';
 import { Pie } from '../../../components/d3/pie';
+import { ProgressChart } from '../../../components/d3/progress';
 import { AgentsTable } from './agents-table';
 import { WzRequest } from '../../../react-services/wz-request';
 import KibanaVis from '../../../kibana-integrations/kibana-vis';
