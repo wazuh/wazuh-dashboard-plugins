@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component } from 'react';
+import React, { Component, useEffect, useState  } from 'react';
 import {
   EuiPage, EuiPanel, EuiFlexGroup, EuiFlexItem, EuiProgress, EuiSpacer, EuiButton,
   EuiButtonIcon, EuiBadge, EuiTitle, EuiLoadingSpinner, EuiFieldSearch, EuiKeyPadMenu, EuiKeyPadMenuItem, EuiIcon
@@ -23,11 +23,14 @@ import { withErrorBoundary } from '../../common/hocs';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
+import { Logtest } from '../../../directives/wz-logtest/components/logtest';
 
-export const MultipleAgentSelector = withErrorBoundary (class MultipleAgentSelector extends Component {
+export const MultipleAgentSelector = withErrorBoundary(class MultipleAgentSelector extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      previousAvailableAgents: {},
+      previousSelectedAgents: {},
       availableAgents: {
         loaded: false,
         data: [],
@@ -43,18 +46,20 @@ export const MultipleAgentSelector = withErrorBoundary (class MultipleAgentSelec
       availableItem: [],
       selectedElement: [],
       selectedFilter: '',
+      availableFilter: '',
       currentAdding: 0,
       currentDeleting: 0,
       moreThan500: false,
       load: false,
-      savingChanges: false
+      savingChanges: false,
+      initState: true,
     };
   }
 
-  async componentDidMount() {
+  async componentDidMount() {    
     this.setState({ load: true });
     try {
-      try{
+      try {
         while (!this.state.selectedAgents.loadedAll) {
           await this.loadSelectedAgents();
           this.setState({
@@ -64,7 +69,7 @@ export const MultipleAgentSelector = withErrorBoundary (class MultipleAgentSelec
             }
           });
         }
-      }catch(error){}
+      } catch (error) { }
       this.firstSelectedList = [...this.state.selectedAgents.data];
       await this.loadAllAgents("", true);
       this.setState({
@@ -82,8 +87,8 @@ export const MultipleAgentSelector = withErrorBoundary (class MultipleAgentSelec
         },
       };
       getErrorOrchestrator().handleError(options);
-      this.setState({ load: false});
-      
+      this.setState({ load: false });
+
     }
   }
 
@@ -150,7 +155,7 @@ export const MultipleAgentSelector = withErrorBoundary (class MultipleAgentSelec
           })
           await this.loadAllAgents(searchTerm);
         }
-      }
+      }      
     } catch (error) {
       throw new Error('Error fetching all available agents');
     }
@@ -261,7 +266,7 @@ export const MultipleAgentSelector = withErrorBoundary (class MultipleAgentSelec
     const itemsToSave = this.getItemsToSave();
     const failedIds = [];
     try {
-      this.setState({ savingChanges: true });
+      this.setState({ savingChanges: true, initState: false });
       if (itemsToSave.addedIds.length) {
         const addResponse = await WzRequest.apiReq(
           'PUT',
@@ -272,10 +277,12 @@ export const MultipleAgentSelector = withErrorBoundary (class MultipleAgentSelec
           }
         }
         );
+
         if (addResponse.data.data.failed_ids) {
           failedIds.push(...addResponse.data.data.failed_ids);
         }
       }
+
       if (itemsToSave.deletedIds.length) {
         const deleteResponse = await WzRequest.apiReq(
           'DELETE',
@@ -306,10 +313,27 @@ export const MultipleAgentSelector = withErrorBoundary (class MultipleAgentSelec
       } else {
         ErrorHandler.info('Group has been updated');
       }
-      this.setState({ savingChanges: false });
+
       this.props.cancelButton();
     } catch (error) {
-      this.setState({ savingChanges: false });
+      this.setState({ savingChanges: false, initState: true });
+      
+      //get all agents
+      let allAgents = [...this.state.availableAgents.data, ...this.state.selectedAgents.data]
+
+      //move agents to their previous position
+      allAgents.forEach(agent => {
+        if(itemsToSave.addedIds.includes(agent.key)){
+          this.moveItem(JSON.stringify(agent), this.state.selectedAgents.data, this.state.availableAgents.data, "a");
+        }else if(itemsToSave.deletedIds.includes(agent.key)){
+          this.moveItem(JSON.stringify(agent), this.state.availableAgents.data, this.state.selectedAgents.data, "r");
+        }      
+      });
+      
+      //relaod agent columns
+      this.reload("right")
+      this.reload("left")
+      
       const options = {
         context: `${MultipleAgentSelector.name}.saveAddAgents`,
         level: UI_LOGGER_LEVELS.ERROR,
@@ -320,6 +344,7 @@ export const MultipleAgentSelector = withErrorBoundary (class MultipleAgentSelec
           title: `${error.name}: Error applying changes`,
         },
       };
+      
       getErrorOrchestrator().handleError(options);
     }
     return;
@@ -498,13 +523,13 @@ export const MultipleAgentSelector = withErrorBoundary (class MultipleAgentSelec
                         {!this.state.moreThan500 && (
                           <EuiButton fill onClick={() => this.saveAddAgents()}
                             isLoading={this.state.savingChanges}
-                            isDisabled={this.state.currentDeleting === 0 && this.state.currentAdding === 0}>
+                            isDisabled={this.state.initState || (this.state.currentDeleting === 0 && this.state.currentAdding === 0)}>
                             Apply changes
                           </EuiButton>
                         )}
                         {this.state.moreThan500 && (
                           <span className='error-msg'><i className="fa fa-exclamation-triangle"></i>
-                          &nbsp;Changes cannot be applied with more than 500 additions or removals
+                            &nbsp;Changes cannot be applied with more than 500 additions or removals
                           </span>
                         )}
                       </EuiFlexItem>
@@ -520,7 +545,6 @@ export const MultipleAgentSelector = withErrorBoundary (class MultipleAgentSelec
                                     <h4>Available agents</h4>
                                   </EuiTitle>
                                 </EuiFlexItem>
-                                {/*{!this.state.selectedAgents.loadedAll && ( */}
                                 <EuiFlexItem grow={false}>
                                   <EuiButtonIcon
                                     aria-label="Back"
@@ -559,8 +583,9 @@ export const MultipleAgentSelector = withErrorBoundary (class MultipleAgentSelec
                                 className='wzMultipleSelectorSelect'
                                 onDoubleClick={() => {
                                   this.moveItem(this.state.availableItem, this.state.availableAgents.data, this.state.selectedAgents.data, "a");
-                                  this.setState({ availableItem: [] });
+                                  this.setState({ availableItem: [], initState: false });
                                 }}>
+
                                 {this.state.availableAgents.data.sort(this.sort).map((item, index) => (
                                   <option
                                     key={index}
@@ -586,7 +611,7 @@ export const MultipleAgentSelector = withErrorBoundary (class MultipleAgentSelec
                                     >
                                       {' '}
                                       <EuiIcon type="refresh" /> &nbsp; Click here to load more agents
-                                  </p>
+                                    </p>
                                   </>
                                 )) ||
                                 (this.state.loadingAvailableAgents && (
@@ -595,7 +620,7 @@ export const MultipleAgentSelector = withErrorBoundary (class MultipleAgentSelec
                                     <p className="wz-load-extra">
                                       {' '}
                                       <EuiLoadingSpinner size="m" /> &nbsp; Loading...
-                                  </p>
+                                    </p>
                                   </>
                                 ))}
                             </EuiPanel>
@@ -605,7 +630,7 @@ export const MultipleAgentSelector = withErrorBoundary (class MultipleAgentSelec
                               label="Add all items"
                               onClick={() => {
                                 this.moveAll(this.state.availableAgents.data, this.state.selectedAgents.data, "a");
-                                this.setState({ availableItem: [], availableFilter: '' },
+                                this.setState({ availableItem: [], availableFilter: '', initState: false },
                                   () => { this.reload("left", this.state.availableFilter, true) });
                               }}
                               isDisabled={this.state.availableAgents.data.length === 0 || this.state.availableAgents.data.length > 500}
@@ -616,7 +641,7 @@ export const MultipleAgentSelector = withErrorBoundary (class MultipleAgentSelec
                               label="Add selected items"
                               onClick={() => {
                                 this.moveItem(this.state.availableItem, this.state.availableAgents.data, this.state.selectedAgents.data, "a");
-                                this.setState({ availableItem: [], availableFilter: '' });
+                                this.setState({ availableItem: [], availableFilter: '', initState: false });
                               }}
                               isDisabled={!this.state.availableItem.length || this.state.availableItem.length > 500}
                             >
@@ -626,7 +651,7 @@ export const MultipleAgentSelector = withErrorBoundary (class MultipleAgentSelec
                               label="Remove selected items"
                               onClick={() => {
                                 this.moveItem(this.state.selectedElement, this.state.selectedAgents.data, this.state.availableAgents.data, "r");
-                                this.setState({ selectedFilter: "", selectedElement: [] });
+                                this.setState({ selectedFilter: "", selectedElement: [], initState: false });
                               }}
                               isDisabled={!this.state.selectedElement.length || this.state.selectedElement.length > 500}
                             >
@@ -636,7 +661,7 @@ export const MultipleAgentSelector = withErrorBoundary (class MultipleAgentSelec
                               label="Remove all items"
                               onClick={() => {
                                 this.moveAll(this.state.selectedAgents.data, this.state.availableAgents.data, "r");
-                                this.setState({ selectedElement: [], selectedFilter: "" },
+                                this.setState({ selectedElement: [], selectedFilter: "", initState: false },
                                   () => { this.reload("right") });
                               }}
                               isDisabled={this.state.selectedAgents.data.length === 0 || this.state.selectedAgents.data.length > 500}
@@ -683,7 +708,7 @@ export const MultipleAgentSelector = withErrorBoundary (class MultipleAgentSelec
                                 className='wzMultipleSelectorSelect'
                                 onDoubleClick={(e) => {
                                   this.moveItem(this.state.selectedElement, this.state.selectedAgents.data, this.state.availableAgents.data, "r");
-                                  this.setState({ selectedElement: [] });
+                                  this.setState({ selectedElement: [], initState: false });
                                 }}>
                                 {this.state.selectedAgents.data
                                   .filter(x => !this.state.selectedFilter || x.key.includes(this.state.selectedFilter) || x.value.includes(this.state.selectedFilter))
@@ -696,6 +721,7 @@ export const MultipleAgentSelector = withErrorBoundary (class MultipleAgentSelec
                                       value={JSON.stringify(item)}>{`${item.key} - ${item.value}`}
                                     </option>
                                   ))}
+
                               </select>
                             </EuiPanel>
                           </div>
