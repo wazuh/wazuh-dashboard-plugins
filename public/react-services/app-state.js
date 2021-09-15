@@ -234,11 +234,6 @@ export class AppState {
   }
 
   /**
-   * Set a new value to the 'patternSelector' cookie
-   * @param {*} value
-   */
-
-  /**
    * Get 'patternSelector' value
    */
   static getPatternSelector() {
