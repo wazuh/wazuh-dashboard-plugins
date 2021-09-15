@@ -37,8 +37,6 @@ export const configEquivalences = {
     'Enable or disable the Docker listener tab on Overview and Agents.',
   timeout:
     'Defines the maximum time the app will wait for an API response when making requests to it.',
-  'api.selector':
-    'Defines if the user is allowed to change the selected API directly from the top menu bar.',
   'ip.selector':
     'Defines if the user is allowed to change the selected index pattern directly from the top menu bar.',
   'ip.ignore':
@@ -90,7 +88,6 @@ export const nameEquivalence = {
   'checks.timeFilter': 'Set time filter to 24h',
   'checks.maxBuckets': 'Set max buckets to 200000',
   timeout: 'Request timeout',
-  'api.selector': 'API selector',
   'ip.selector': 'IP selector',
   'ip.ignore': 'IP ignore',
   'xpack.rbac.enabled': 'X-Pack RBAC',
@@ -137,7 +134,6 @@ export const categoriesEquivalence = {
   'checks.timeFilter': HEALTH_CHECK,
   'checks.maxBuckets': HEALTH_CHECK,
   timeout: GENERAL,
-  'api.selector': GENERAL,
   'ip.selector': GENERAL,
   'ip.ignore': GENERAL,
   'wazuh.monitoring.enabled': MONITORING,
@@ -182,7 +178,6 @@ export const formEquivalence = {
   'checks.timeFilter': { type: BOOLEAN },
   'checks.maxBuckets': { type: BOOLEAN },
   timeout: { type: NUMBER },
-  'api.selector': { type: BOOLEAN },
   'ip.selector': { type: BOOLEAN },
   'ip.ignore': { type: ARRAY },
   'xpack.rbac.enabled': { type: BOOLEAN },
