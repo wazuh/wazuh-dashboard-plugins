@@ -237,12 +237,6 @@ export class AppState {
    * Set a new value to the 'patternSelector' cookie
    * @param {*} value
    */
-  static setAPISelector(value) {
-    const encodedPattern = encodeURI(value);
-    getCookies().set('APISelector', encodedPattern, {
-      path: window.location.pathname
-    });
-  }
 
   /**
    * Get 'patternSelector' value
