@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component, useEffect, useState  } from 'react';
+import React, { Component, useEffect, useState } from 'react';
 import {
   EuiPage, EuiPanel, EuiFlexGroup, EuiFlexItem, EuiProgress, EuiSpacer, EuiButton,
   EuiButtonIcon, EuiBadge, EuiTitle, EuiLoadingSpinner, EuiFieldSearch, EuiKeyPadMenu, EuiKeyPadMenuItem, EuiIcon
@@ -56,7 +56,7 @@ export const MultipleAgentSelector = withErrorBoundary(class MultipleAgentSelect
     };
   }
 
-  async componentDidMount() {    
+  async componentDidMount() {
     this.setState({ load: true });
     try {
       try {
@@ -155,7 +155,7 @@ export const MultipleAgentSelector = withErrorBoundary(class MultipleAgentSelect
           })
           await this.loadAllAgents(searchTerm);
         }
-      }      
+      }
     } catch (error) {
       throw new Error('Error fetching all available agents');
     }
@@ -317,23 +317,25 @@ export const MultipleAgentSelector = withErrorBoundary(class MultipleAgentSelect
       this.props.cancelButton();
     } catch (error) {
       this.setState({ savingChanges: false, initState: true });
-      
+
       //get all agents
       let allAgents = [...this.state.availableAgents.data, ...this.state.selectedAgents.data]
 
       //move agents to their previous position
       allAgents.forEach(agent => {
-        if(itemsToSave.addedIds.includes(agent.key)){
+        if (itemsToSave.addedIds.includes(agent.key)) {
           this.moveItem(JSON.stringify(agent), this.state.selectedAgents.data, this.state.availableAgents.data, "a");
-        }else if(itemsToSave.deletedIds.includes(agent.key)){
+        } else if (itemsToSave.deletedIds.includes(agent.key)) {
           this.moveItem(JSON.stringify(agent), this.state.availableAgents.data, this.state.selectedAgents.data, "r");
-        }      
+        }
       });
-      
+
+      this.checkLimit();
+
       //relaod agent columns
       this.reload("right")
       this.reload("left")
-      
+
       const options = {
         context: `${MultipleAgentSelector.name}.saveAddAgents`,
         level: UI_LOGGER_LEVELS.ERROR,
@@ -344,7 +346,7 @@ export const MultipleAgentSelector = withErrorBoundary(class MultipleAgentSelect
           title: `${error.name}: Error applying changes`,
         },
       };
-      
+
       getErrorOrchestrator().handleError(options);
     }
     return;
