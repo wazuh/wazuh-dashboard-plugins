@@ -316,7 +316,8 @@ export const MultipleAgentSelector = withErrorBoundary(class MultipleAgentSelect
 
       this.props.cancelButton();
     } catch (error) {
-      this.setState({ savingChanges: false, initState: true });
+
+      this.setState({ savingChanges: false, initState: true });     
 
       //get all agents
       let allAgents = [...this.state.availableAgents.data, ...this.state.selectedAgents.data]
@@ -335,6 +336,17 @@ export const MultipleAgentSelector = withErrorBoundary(class MultipleAgentSelect
       //relaod agent columns
       this.reload("right")
       this.reload("left")
+
+      //delete nodes selected
+      const deleteResponse = await WzRequest.apiReq(
+        'DELETE',
+        `/agents/group`, {
+        params: {
+          group_id: this.props.currentGroup.name,
+          agents_list: itemsToSave.addedIds.toString()
+        }
+      }
+      );
 
       const options = {
         context: `${MultipleAgentSelector.name}.saveAddAgents`,
