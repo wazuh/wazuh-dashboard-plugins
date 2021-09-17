@@ -25,6 +25,8 @@ export class ErrorOrchestratorBusiness extends ErrorOrchestratorBase {
       toastLifeTimeMs: 3000,
     };
 
+    console.log(toast);
+
     switch (errorLog.level) {
       case UI_LOGGER_LEVELS.INFO:
         getToasts().addInfo(errorLog.error.error, toast as ErrorToastOptions);
