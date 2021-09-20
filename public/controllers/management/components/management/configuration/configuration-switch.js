@@ -15,7 +15,7 @@ import React, { Component, Fragment } from 'react';
 import WzConfigurationOverview from './configuration-overview';
 import {
   WzConfigurationGlobalConfigurationManager,
-  WzConfigurationGlobalConfigurationAgent
+  WzConfigurationGlobalConfigurationAgent,
 } from './global-configuration/global-configuration';
 import WzConfigurationEditConfiguration from './edit-configuration/edit-configuration';
 import WzConfigurationRegistrationService from './registration-service/registration-service';
@@ -42,9 +42,7 @@ import WzConfigurationIntegrityAgentless from './agentless/agentless';
 import WzConfigurationIntegrityAmazonS3 from './aws-s3/aws-s3';
 import WzConfigurationAzureLogs from './azure-logs/azure-logs';
 import WzConfigurationGoogleCloudPubSub from './google-cloud-pub-sub/google-cloud-pub-sub';
-import WzViewSelector, {
-  WzViewSelectorSwitch
-} from './util-components/view-selector';
+import WzViewSelector, { WzViewSelectorSwitch } from './util-components/view-selector';
 import WzLoading from './util-components/loading';
 import { withRenderIfOrWrapped } from './util-hocs/render-if';
 import { WzAgentNeverConnectedPrompt } from './configuration-no-agent';
@@ -61,13 +59,7 @@ import {
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 
-import {
-  EuiPage,
-  EuiPanel,
-  EuiSpacer,
-  EuiButtonEmpty,
-  EuiFlexItem
-} from '@elastic/eui';
+import { EuiPage, EuiPanel, EuiSpacer, EuiButtonEmpty, EuiFlexItem } from '@elastic/eui';
 
 import { agentIsSynchronized } from './utils/wz-fetch';
 import { WzRequest } from '../../../../../react-services/wz-request';
@@ -83,7 +75,7 @@ class WzConfigurationSwitch extends Component {
       viewProps: {},
       agentSynchronized: undefined,
       masterNodeInfo: undefined,
-      loadingOverview: this.props.agent.id === '000'
+      loadingOverview: this.props.agent.id === '000',
     };
   }
   componentWillUnmount() {
@@ -93,10 +85,10 @@ class WzConfigurationSwitch extends Component {
   updateConfigurationSection = (view, title, description) => {
     this.setState({ view, viewProps: { title: title, description } });
   };
-  updateBadge = badgeStatus => {
+  updateBadge = (badgeStatus) => {
     // default value false?
     this.setState({
-      viewProps: { ...this.state.viewProps, badge: badgeStatus }
+      viewProps: { ...this.state.viewProps, badge: badgeStatus },
     });
   };
   async componentDidMount() {
@@ -105,15 +97,15 @@ class WzConfigurationSwitch extends Component {
       try {
         const agentSynchronized = await agentIsSynchronized(this.props.agent);
         this.setState({ agentSynchronized });
-      }catch(error){
+      } catch (error) {
         const options = {
           context: `${WzConfigurationSwitch.name}.componentDidMount`,
           level: UI_LOGGER_LEVELS.ERROR,
           severity: UI_ERROR_SEVERITIES.BUSINESS,
           error: {
             error: error,
-            message: error.message || error,
-            title: error.name || error
+            message: error.message || error,
+            title: error.name || error,
           },
         };
         getErrorOrchestrator().handleError(options);
@@ -122,15 +114,18 @@ class WzConfigurationSwitch extends Component {
       try {
         // try if it is a cluster
         const clusterStatus = await clusterReq();
-        if(clusterStatus.data.data.enabled === 'yes' && clusterStatus.data.data.running === 'yes'){
+        if (
+          clusterStatus.data.data.enabled === 'yes' &&
+          clusterStatus.data.data.running === 'yes'
+        ) {
           const nodes = await clusterNodes();
           // set cluster nodes in Redux Store
           this.props.updateClusterNodes(nodes.data.data.affected_items);
           // set cluster node selected in Redux Store
           this.props.updateClusterNodeSelected(
-            nodes.data.data.affected_items.find(node => node.type === 'master').name
+            nodes.data.data.affected_items.find((node) => node.type === 'master').name
           );
-        }else{
+        } else {
           // do nothing if it isn't a cluster
           this.props.updateClusterNodes(false);
           this.props.updateClusterNodeSelected(false);
@@ -145,21 +140,23 @@ class WzConfigurationSwitch extends Component {
           severity: UI_ERROR_SEVERITIES.BUSINESS,
           error: {
             error: error,
-            message: error.message || error,
-            title: error.name || error
+            message: error.message || error,
+            title: error.name || error,
           },
         };
         getErrorOrchestrator().handleError(options);
       }
       // If manager/cluster require agent platform info to filter sections in overview. It isn't coming from props for Management/Configuration
-      try{
+      try {
         this.setState({ loadingOverview: true });
-        const masterNodeInfo = await WzRequest.apiReq('GET', '/agents', { params: { q: 'id=000'}});
+        const masterNodeInfo = await WzRequest.apiReq('GET', '/agents', {
+          params: { q: 'id=000' },
+        });
         this.setState({
-          masterNodeInfo: masterNodeInfo.data.affected_items[0]
+          masterNodeInfo: masterNodeInfo.data.affected_items[0],
         });
         this.setState({ loadingOverview: false });
-      }catch(error){
+      } catch (error) {
         this.setState({ loadingOverview: false });
         const options = {
           context: `${WzConfigurationSwitch.name}.componentDidMount`,
@@ -167,8 +164,8 @@ class WzConfigurationSwitch extends Component {
           severity: UI_ERROR_SEVERITIES.BUSINESS,
           error: {
             error: error,
-            message: error.message || error,
-            title: error.name || error
+            message: error.message || error,
+            title: error.name || error,
           },
         };
         getErrorOrchestrator().handleError(options);
@@ -180,7 +177,7 @@ class WzConfigurationSwitch extends Component {
       view,
       viewProps: { title, description, badge },
       agentSynchronized,
-      masterNodeInfo
+      masterNodeInfo,
     } = this.state;
     const { agent, goGroups } = this.props; // TODO: goGroups and exportConfiguration is used for Manager and depends of AngularJS
     return (
@@ -190,10 +187,7 @@ class WzConfigurationSwitch extends Component {
             <Fragment>
               <span>Groups:</span>
               {agent.group.map((group, key) => (
-                <EuiButtonEmpty
-                  key={`agent-group-${key}`}
-                  onClick={() => goGroups(agent, key)}
-                >
+                <EuiButtonEmpty key={`agent-group-${key}`} onClick={() => goGroups(agent, key)}>
                   {group}
                 </EuiButtonEmpty>
               ))}
@@ -214,14 +208,15 @@ class WzConfigurationSwitch extends Component {
               )}
             </WzConfigurationPath>
           )}
-          {view === '' && ((!this.state.loadingOverview && (
-            <WzConfigurationOverview
-              agent={masterNodeInfo || agent}
-              agentSynchronized={agentSynchronized}
-              exportConfiguration={this.props.exportConfiguration}
-              updateConfigurationSection={this.updateConfigurationSection}
-            />
-          )) || <WzLoading />)}
+          {view === '' &&
+            ((!this.state.loadingOverview && (
+              <WzConfigurationOverview
+                agent={masterNodeInfo || agent}
+                agentSynchronized={agentSynchronized}
+                exportConfiguration={this.props.exportConfiguration}
+                updateConfigurationSection={this.updateConfigurationSection}
+              />
+            )) || <WzLoading />)}
           {view === 'edit-configuration' && (
             <WzConfigurationEditConfiguration
               clusterNodeSelected={this.props.clusterNodeSelected}
@@ -434,28 +429,33 @@ class WzConfigurationSwitch extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   clusterNodes: state.configurationReducers.clusterNodes,
   clusterNodeSelected: state.configurationReducers.clusterNodeSelected,
-  wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet
+  wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet,
 });
 
-const mapDispatchToProps = dispatch => ({
-  updateClusterNodes: clusterNodes =>
-    dispatch(updateClusterNodes(clusterNodes)),
-  updateClusterNodeSelected: clusterNodeSelected =>
-    dispatch(updateClusterNodeSelected(clusterNodeSelected))
+const mapDispatchToProps = (dispatch) => ({
+  updateClusterNodes: (clusterNodes) => dispatch(updateClusterNodes(clusterNodes)),
+  updateClusterNodeSelected: (clusterNodeSelected) =>
+    dispatch(updateClusterNodeSelected(clusterNodeSelected)),
 });
 
 export default compose(
-  withUserAuthorizationPrompt((props) => [props.agent.id === '000' ? 
-  {action: 'manager:read', resource: '*:*:*'} : 
-  [
-    {action: 'agent:read', resource: `agent:id:${props.agent.id}`},
-    ...(props.agent.group || []).map(group => ({ action: 'agent:read', resource: `agent:group:${group}` }))
-  ]]), //TODO: this need cluster:read permission but manager/cluster is managed in WzConfigurationSwitch component
-  withRenderIfOrWrapped((props) => props.agent.status === 'never_connected', WzAgentNeverConnectedPrompt),
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-))(WzConfigurationSwitch);
+  withUserAuthorizationPrompt((props) => [
+    props.agent.id === '000'
+      ? { action: 'manager:read', resource: '*:*:*' }
+      : [
+          { action: 'agent:read', resource: `agent:id:${props.agent.id}` },
+          ...(props.agent.group || []).map((group) => ({
+            action: 'agent:read',
+            resource: `agent:group:${group}`,
+          })),
+        ],
+  ]), //TODO: this need cluster:read permission but manager/cluster is managed in WzConfigurationSwitch component
+  withRenderIfOrWrapped(
+    (props) => props.agent.status === 'never_connected',
+    WzAgentNeverConnectedPrompt
+  ),
+  connect(mapStateToProps, mapDispatchToProps)
+)(WzConfigurationSwitch);

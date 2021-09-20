@@ -363,7 +363,7 @@ export const MultipleAgentSelector = withErrorBoundary(
             },
           });
         } catch (e) {
-          console.log(e);
+          console.error(e);
         }
 
         const options = {
@@ -371,9 +371,12 @@ export const MultipleAgentSelector = withErrorBoundary(
           level: UI_LOGGER_LEVELS.ERROR,
           severity: UI_ERROR_SEVERITIES.BUSINESS,
           error: {
-            error: error,
+            error: {
+              message: error,
+              stack: error,
+            },
             message: error.message || error,
-            title: `${error.name}: Error applying changes`,
+            title: error.name,
           },
         };
 
