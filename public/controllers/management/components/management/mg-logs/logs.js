@@ -149,8 +149,8 @@ export default compose(
     if (this.state.selectedDaemon !== 'all')
       result['tag'] = this.state.selectedDaemon;
     if (this.state.appliedSearch) result['search'] = this.state.appliedSearch;
-    if (this.state.descendingSort) result['sort'] = '+timestamp';
-    else result['sort'] = '-timestamp';
+    if (this.state.descendingSort) result['sort'] = '-timestamp';
+    else result['sort'] = '+timestamp';
 
     return result;
   }
