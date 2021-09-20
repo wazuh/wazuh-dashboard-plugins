@@ -58,6 +58,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed Wazuh main menu and breadcrumb render issues [#3347](https://github.com/wazuh/wazuh-kibana-app/pull/3347)
 - Fixed generation of huge logs from backend errors [#3397](https://github.com/wazuh/wazuh-kibana-app/pull/3397)
 - Fixed vulnerabilities flyout not showing alerts if the vulnerability had a field missing [#3593](https://github.com/wazuh/wazuh-kibana-app/pull/3593)
+- Fixed order logs properly in Management/Logs [#3609](https://github.com/wazuh/wazuh-kibana-app/pull/3609)
 
 ## Wazuh v4.2.1 - Kibana 7.10.2 , 7.11.2 - Revision 4202
 
