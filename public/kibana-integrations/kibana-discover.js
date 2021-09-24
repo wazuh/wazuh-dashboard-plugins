@@ -461,7 +461,7 @@ function discoverController(
     searchSource.setField('aggs', null);
     searchSource.setField('size', null);
 
-    const body = await searchSource.getSearchRequestBody();
+    const body = searchSource.getSearchRequestBody();
     return {
       searchRequest: {
         index: searchSource.getField('index').title,
@@ -804,18 +804,17 @@ function discoverController(
   }
 
   function logInspectorRequest() {
-    inspectorAdapters.requests.reset();
-    const title = i18n.translate('discover.inspectorRequestDataTitle', {
-      defaultMessage: 'data',
-    });
-    const description = i18n.translate('discover.inspectorRequestDescription', {
-      defaultMessage: 'This request queries Elasticsearch to fetch the data for the search.',
-    });
-    inspectorRequest = inspectorAdapters.requests.start(title, { description });
-    inspectorRequest.stats(getRequestInspectorStats($scope.searchSource));
-    $scope.searchSource.getSearchRequestBody().then((body) => {
+      inspectorAdapters.requests.reset();
+      const title = i18n.translate('discover.inspectorRequestDataTitle', {
+        defaultMessage: 'data',
+      });
+      const description = i18n.translate('discover.inspectorRequestDescription', {
+        defaultMessage: 'This request queries Elasticsearch to fetch the data for the search.',
+      });
+      inspectorRequest = inspectorAdapters.requests.start(title, { description });
+      inspectorRequest.stats(getRequestInspectorStats($scope.searchSource));
+      const body = $scope.searchSource.getSearchRequestBody();
       inspectorRequest.json(body);
-    });
   }
 
   $scope.updateTime = function () {
@@ -990,27 +989,33 @@ function discoverController(
       },
     ];
 
-    $scope.vis = await visualizations.createVis('histogram', {
-      title: savedSearch.title,
-      params: {
-        addLegend: false,
-        addTimeMarker: true,
-      },
-      data: {
-        aggs: visStateAggs,
-        searchSource: $scope.searchSource.getSerializedFields(),
-      },
-    });
-
-    $scope.searchSource.onRequestStart((searchSource, options) => {
-      if (!$scope.vis) return;
-      return $scope.vis.data.aggs.onSearchRequestStart(searchSource, options);
-    });
-
-    $scope.searchSource.setField('aggs', function () {
-      if (!$scope.vis) return;
-      return $scope.vis.data.aggs.toDsl();
-    });
+    try{
+      
+      $scope.vis = await visualizations.createVis('histogram', {
+        title: savedSearch.title,
+        params: {
+          addLegend: false,
+          addTimeMarker: true,
+        },
+        data: {
+          aggs: visStateAggs,
+          searchSource: $scope.searchSource.getSerializedFields(),
+        },
+      });
+  
+      $scope.searchSource.onRequestStart((searchSource, options) => {
+        if (!$scope.vis) return;
+        return $scope.vis.data.aggs.onSearchRequestStart(searchSource, options);
+      });
+  
+      $scope.searchSource.setField('aggs', function () {
+        if (!$scope.vis) return;
+        return $scope.vis.data.aggs.toDsl();
+      });
+    }catch(error){
+      console.log('error setup vis', error);
+    }
+    
   }
 
   function getIndexPatternWarning(index) {

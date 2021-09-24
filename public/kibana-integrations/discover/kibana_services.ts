@@ -26,6 +26,12 @@ import { createGetterSetter } from '../../../../../src/plugins/kibana_utils/publ
 import { search } from '../../../../../src/plugins/data/public';
 import { DocViewsRegistry } from './application/doc_views/doc_views_registry';
 
+import { i18n } from '@kbn/i18n';
+import type { estypes } from '@elastic/elasticsearch';
+import type { ISearchSource } from 'src/plugins/data/public';
+import type { RequestStatistics } from 'src/plugins/inspector/common';
+
+
 let angularModule: any = null;
 let services: DiscoverServices | null = null;
 let uiActions: UiActionsStart;
@@ -92,7 +98,10 @@ export const [getScopedHistory, setScopedHistory] = createGetterSetter<ScopedHis
   'scopedHistory'
 );
 
-export const { getRequestInspectorStats, getResponseInspectorStats, tabifyAggResponse } = search;
+
+
+export const { getResponseInspectorStats, tabifyAggResponse } = search;
+
 export { unhashUrl, redirectWhenMissing } from '../../../../../src/plugins/kibana_utils/public';
 export { formatMsg, formatStack, subscribeWithScope } from '../../../../../src/plugins/kibana_legacy/public';
 
@@ -107,3 +116,33 @@ export {
   EsQuerySortValue,
   SortDirection,
 } from '../../../../../src/plugins/data/public';
+
+
+export function getRequestInspectorStats(searchSource: ISearchSource) {
+  const stats: RequestStatistics = {};
+  const index = searchSource.getField('index');
+
+  if (index) {
+    stats.indexPattern = {
+      label: i18n.translate('data.search.searchSource.indexPatternLabel', {
+        defaultMessage: 'Index pattern',
+      }),
+      value: index.title,
+      description: i18n.translate('data.search.searchSource.indexPatternDescription', {
+        defaultMessage: 'The index pattern that connected to the Elasticsearch indices.',
+      }),
+    };
+    stats.indexPatternId = {
+      label: i18n.translate('data.search.searchSource.indexPatternIdLabel', {
+        defaultMessage: 'Index pattern ID',
+      }),
+      value: index.id!,
+      description: i18n.translate('data.search.searchSource.indexPatternIdDescription', {
+        defaultMessage: 'The ID in the {kibanaIndexPattern} index.',
+        values: { kibanaIndexPattern: '.kibana' },
+      }),
+    };
+  }
+
+  return stats;
+}
