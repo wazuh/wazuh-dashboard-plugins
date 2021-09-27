@@ -990,7 +990,6 @@ function discoverController(
     ];
 
     try{
-      
       $scope.vis = await visualizations.createVis('histogram', {
         title: savedSearch.title,
         params: {
@@ -1013,7 +1012,6 @@ function discoverController(
         return $scope.vis.data.aggs.toDsl();
       });
     }catch(error){
-      console.log('error setup vis', error);
     }
     
   }

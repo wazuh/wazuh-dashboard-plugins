@@ -31,7 +31,6 @@ import type { estypes } from '@elastic/elasticsearch';
 import type { ISearchSource } from 'src/plugins/data/public';
 import type { RequestStatistics } from 'src/plugins/inspector/common';
 
-
 let angularModule: any = null;
 let services: DiscoverServices | null = null;
 let uiActions: UiActionsStart;
@@ -98,10 +97,7 @@ export const [getScopedHistory, setScopedHistory] = createGetterSetter<ScopedHis
   'scopedHistory'
 );
 
-
-
 export const { getResponseInspectorStats, tabifyAggResponse } = search;
-
 export { unhashUrl, redirectWhenMissing } from '../../../../../src/plugins/kibana_utils/public';
 export { formatMsg, formatStack, subscribeWithScope } from '../../../../../src/plugins/kibana_legacy/public';
 
@@ -116,7 +112,6 @@ export {
   EsQuerySortValue,
   SortDirection,
 } from '../../../../../src/plugins/data/public';
-
 
 export function getRequestInspectorStats(searchSource: ISearchSource) {
   const stats: RequestStatistics = {};
@@ -145,4 +140,4 @@ export function getRequestInspectorStats(searchSource: ISearchSource) {
   }
 
   return stats;
-}
+} 
