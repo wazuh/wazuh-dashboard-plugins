@@ -461,7 +461,7 @@ function discoverController(
     searchSource.setField('aggs', null);
     searchSource.setField('size', null);
 
-    const body = await searchSource.getSearchRequestBody();
+    const body = searchSource.getSearchRequestBody();
     return {
       searchRequest: {
         index: searchSource.getField('index').title,
@@ -813,9 +813,8 @@ function discoverController(
     });
     inspectorRequest = inspectorAdapters.requests.start(title, { description });
     inspectorRequest.stats(getRequestInspectorStats($scope.searchSource));
-    $scope.searchSource.getSearchRequestBody().then((body) => {
-      inspectorRequest.json(body);
-    });
+    const body = $scope.searchSource.getSearchRequestBody();
+    inspectorRequest.json(body);
   }
 
   $scope.updateTime = function () {
