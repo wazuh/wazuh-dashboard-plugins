@@ -111,6 +111,8 @@ app.run(function ($rootElement) {
   // Add plugin help links as extension to Kibana help menu
   addHelpMenuToAppChrome();
 
+  const urlToLogout = window.location.origin + '/logout';
+
   // Bind deleteExistentToken on Log out component.
   $('.euiHeaderSectionItem__button').on('mouseleave', function () {
     // opendistro
@@ -118,8 +120,13 @@ app.run(function ($rootElement) {
       WzAuthentication.deleteExistentToken();
     });
     // x-pack
-    $('a:contains(Log out)').on('click', function () {
-      WzAuthentication.deleteExistentToken();
+    $('a:contains(Log out)').on('click', function (event) {
+      // Override href's behaviour and navigate programatically
+      // to '/logout' once the token has been deleted.
+      event.preventDefault();
+      WzAuthentication.deleteExistentToken().then(() => {
+        window.location.replace(urlToLogout);
+      });
     });
   });
 });

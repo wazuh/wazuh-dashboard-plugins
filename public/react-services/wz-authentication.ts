@@ -24,7 +24,15 @@ import { WAZUH_ROLE_ADMINISTRATOR_ID, WAZUH_ROLE_ADMINISTRATOR_NAME } from '../.
 import { getToasts } from '../kibana-services';
 import { getAuthorizedAgents } from '../react-services/wz-agents';
 
+/**
+ * Wazuh user authentication class
+ */
 export class WzAuthentication {
+  /**
+   *
+   * @param force
+   * @returns
+   */
   private static async login(force = false) {
     try {
       var idHost = JSON.parse(AppState.getCurrentAPI()).id;
@@ -41,6 +49,12 @@ export class WzAuthentication {
       return Promise.reject(error);
     }
   }
+
+  /**
+   *
+   * @param force
+   * @returns
+   */
   static async refresh(force = false) {
     try {
       // Get user token
@@ -84,6 +98,11 @@ export class WzAuthentication {
       return Promise.reject(error);
     }
   }
+
+  /**
+   *
+   * @returns
+   */
   private static async getUserPolicies() {
     try {
       var idHost = JSON.parse(AppState.getCurrentAPI()).id;
@@ -99,19 +118,28 @@ export class WzAuthentication {
     }
   }
 
+  /**
+   *
+   * @param roles
+   * @returns
+   */
   private static mapUserRolesIDToAdministratorRole(roles) {
     return roles.map((role: number) =>
       role === WAZUH_ROLE_ADMINISTRATOR_ID ? WAZUH_ROLE_ADMINISTRATOR_NAME : role
     );
   }
 
+  /**
+   * Sends a request to the Wazuh's API to delete the user's token.
+   * @returns Object
+   */
   static async deleteExistentToken() {
     try {
       const response = await WzRequest.apiReq('DELETE', '/security/user/authenticate', {});
 
       return ((response || {}).data || {}).data || {};
     } catch (error) {
-      throw error;
+      return Promise.reject(error);
     }
   }
 
