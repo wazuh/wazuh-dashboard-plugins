@@ -32,6 +32,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
+- A bug where the user's auth token was not deprecated on logout has been fixed [#3638](https://github.com/wazuh/wazuh-kibana-app/pull/3638)
 - Fixed screen flickers in Cluster visualization [#3159](https://github.com/wazuh/wazuh-kibana-app/pull/3159)
 - Fixed the broken links when using `server.basePath` Kibana setting [#3161](https://github.com/wazuh/wazuh-kibana-app/pull/3161)
 - Fixed filter in reports [#3173](https://github.com/wazuh/wazuh-kibana-app/pull/3173)
