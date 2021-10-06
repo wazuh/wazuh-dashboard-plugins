@@ -110,3 +110,12 @@
 kbn-dis doc-table .kbnDocViewer__warning {
     display: none;
 }
+
+/* Custom Breadcrumb styles*/
+.header__breadcrumbsWithExtensionContainer .euiHeaderBreadcrumbs {
+    flex-grow: 1;
+    margin-right: 12px;
+}
+.header__breadcrumbsWithExtensionContainer .header__breadcrumbsAppendExtension {
+    flex-grow: 0;
+}

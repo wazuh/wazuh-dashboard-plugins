@@ -4,7 +4,6 @@ import { getConfiguration } from '../../lib/get-configuration';
 const DEBUG = 'debug';
 const INFO = 'info';
 const ERROR = 'error';
-const COLOR = '\u001b[34mwazuh\u001b[39m';
 
 function logLevel(level: string){
   return level === DEBUG ? INFO : level;
@@ -16,9 +15,9 @@ export function ErrorHandler(error, serverLogger) {
   log('Cron-scheduler', error, errorLevel === ERROR ? INFO : errorLevel);
   try {
     if (errorLevel === DEBUG && logsLevel !== DEBUG) return;
-    serverLogger[logLevel(errorLevel)](`${JSON.stringify(error)}`);
+    serverLogger[logLevel(errorLevel)](`${error instanceof Error ? error.toString() : JSON.stringify(error)}`);
   } catch (error) {
-    serverLogger[logLevel(errorLevel)](`Message to long to show in console output, check the log file`)
+    serverLogger[logLevel(errorLevel)](`Message too long to show in console output, check the log file`)
   }
 }
 

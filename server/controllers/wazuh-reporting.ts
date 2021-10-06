@@ -30,7 +30,6 @@ import { KeyEquivalence } from '../../common/csv-key-equivalence';
 import { AgentConfiguration } from '../lib/reporting/agent-configuration';
 import { KibanaRequest, RequestHandlerContext, KibanaResponseFactory } from 'src/core/server';
 import { ReportPrinter } from '../lib/reporting/printer';
-
 import { log } from '../lib/logger';
 import {
   WAZUH_ALERTS_PATTERN,
@@ -39,6 +38,7 @@ import {
   AUTHORIZED_AGENTS,
 } from '../../common/constants';
 import { createDirectoryIfNotExists, createDataDirectoryIfNotExists } from '../lib/filesystem';
+import moment from 'moment';
 
 export class WazuhReportingCtrl {
   constructor() {}
@@ -75,7 +75,15 @@ export class WazuhReportingCtrl {
       str += `${negate ? 'NOT ' : ''}`;
       str += `${key}: `;
       str += `${
-        type === 'range' ? `${params.gte}-${params.lt}` : !!value ? value : (params || {}).query
+        type === 'range'
+          ? `${params.gte}-${params.lt}`
+          : type === 'phrases' 
+            ? '(' + params.join(" OR ") + ')' 
+            : type === 'exists' 
+              ? '*'
+              : !!value
+          ? value
+          : (params || {}).query
       }`;
       str += `${i === len - 1 ? '' : ' AND '}`;
     }
@@ -191,13 +199,8 @@ export class WazuhReportingCtrl {
    * @param {Array<Strings>} ids ids of agents
    * @param {String} apiId API id
    */
-  private async buildAgentsTable(
-    context,
-    printer: ReportPrinter,
-    agentIDs: string[],
-    apiId: string,
-    multi = false
-  ) {
+  private async buildAgentsTable(context, printer: ReportPrinter, agentIDs: string[], apiId: string, multi = false) {
+    const dateFormat = await context.core.uiSettings.client.get('dateFormat');
     if (!agentIDs || !agentIDs.length) return;
     log('reporting:buildAgentsTable', `${agentIDs.length} agents for API ${apiId}`, 'info');
     try {
@@ -243,10 +246,9 @@ export class WazuhReportingCtrl {
             agentRows.push({
               ...agent,
               manager: agent.manager || agent.manager_host,
-              os:
-                agent.os && agent.os.name && agent.os.version
-                  ? `${agent.os.name} ${agent.os.version}`
-                  : '',
+              os: (agent.os && agent.os.name && agent.os.version) ? `${agent.os.name} ${agent.os.version}` : '',
+              lastKeepAlive: moment(agent.lastKeepAlive).format(dateFormat),
+              dateAdd: moment(agent.dateAdd).format(dateFormat)
             });
           } catch (error) {
             log(
@@ -1112,11 +1114,9 @@ export class WazuhReportingCtrl {
         rows,
       });
     }
-
-    nestedData.forEach((nest) => {
+    nestedData.forEach(nest => {
       this.getConfigTables(nest, section, tab + 1, array);
     });
-
     return array;
   }
 
@@ -1530,7 +1530,11 @@ export class WazuhReportingCtrl {
           'debug'
         );
         for (let section of config.sections) {
-          if (components[idxComponent] && (section.config || section.wodle)) {
+          let titleOfSubsection = false;
+          if (
+            components[idxComponent] &&
+            (section.config || section.wodle)
+          ) {
             let idx = 0;
             const configs = (section.config || []).concat(section.wodle || []);
             log(
@@ -1568,15 +1572,18 @@ export class WazuhReportingCtrl {
                   });
                   titleOfSection = true;
                 }
-                printer.addContent({
-                  text: section.subtitle,
-                  style: 'h4',
-                });
-                printer.addContent({
-                  text: section.desc,
-                  style: { fontSize: 12, color: '#000' },
-                  margin: [0, 0, 0, 10],
-                });
+                if (!titleOfSubsection) {
+                  printer.addContent({
+                    text: section.subtitle,
+                    style: 'h4',
+                  });
+                  printer.addContent({
+                    text: section.desc,
+                    style: { fontSize: 12, color: '#000' },
+                    margin: [0, 0, 0, 10],
+                  });
+                  titleOfSubsection = true;
+                }
                 if (agentConfig) {
                   for (let agentConfigKey of Object.keys(agentConfig)) {
                     if (Array.isArray(agentConfig[agentConfigKey])) {
@@ -1636,10 +1643,13 @@ export class WazuhReportingCtrl {
                     } else {
                       /*INTEGRITY MONITORING MONITORED DIRECTORIES */
                       if (conf.matrix) {
-                        const directories = agentConfig[agentConfigKey].directories;
-                        delete agentConfig[agentConfigKey].directories;
+                        const {directories,diff,synchronization,file_limit,...rest} = agentConfig[agentConfigKey];
                         tables.push(
-                          ...this.getConfigTables(agentConfig[agentConfigKey], section, idx)
+                          ...this.getConfigTables(rest, section, idx),
+                          ...(diff && diff.disk_quota ? this.getConfigTables(diff.disk_quota, {tabs:['Disk quota']}, 0 ): []),
+                          ...(diff && diff.file_size ? this.getConfigTables(diff.file_size, {tabs:['File size']}, 0 ): []),
+                          ...(synchronization ? this.getConfigTables(synchronization, {tabs:['Synchronization']}, 0 ): []),
+                          ...(file_limit ? this.getConfigTables(file_limit, {tabs:['File limit']}, 0 ): []),
                         );
                         let diffOpts = [];
                         Object.keys(section.opts).forEach((x) => {

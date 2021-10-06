@@ -1027,9 +1027,38 @@ wz-xml-file-editor {
 
 .health-check{
   padding-top: 5%;
-  width: 500px;
+  max-width: 700px;
   margin: 0 auto;
   text-align: center;
+}
+
+.health-check dl.euiDescriptionList dd{
+  white-space: nowrap;
+}
+
+.health-check dl.euiDescriptionList dd>span:first-child{
+  display: inline-block;
+  width: 26px;
+}
+
+.health-check .euiCodeBlock{
+  max-height: 0;
+  margin-top: 0;
+  transition: all 0.25s ease-out;
+  overflow: hidden;
+  border: 0px solid #0001;
+}
+
+.health-check .euiCodeBlock.visible{
+  border: 1px solid #0001;
+  max-height: 700px;
+  margin-top: 16px;
+  visibility: visible;
+}
+
+.wz-hover-transform-y1:hover{
+  -webkit-transform: translateY(-1px) !important;
+  transform: translateY(-1px) !important;
 }
 
 @keyframes rotation {
@@ -1052,7 +1081,6 @@ wz-xml-file-editor {
   height: 80px;
   margin-bottom: 20px;
   z-index: 1;
-  filter: brightness(0) saturate(100%) invert(24%) sepia(97%) saturate(1757%) hue-rotate(186deg) brightness(94%) contrast(101%);
   margin-left: -100px;
 }
 
@@ -1692,4 +1720,12 @@ iframe.width-changed {
 .withUserLogged-loader{
   width: 20px;
   margin: 0 auto;
+}
+
+.custom-charts-bar span.euiLoadingChart__bar{
+  width: 15px;
+}
+
+.wz-width-100{
+  width: 100%;
 }

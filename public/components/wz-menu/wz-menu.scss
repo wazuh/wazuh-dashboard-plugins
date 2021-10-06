@@ -68,12 +68,7 @@ wz-menu {
     background: #fafbfd;
 }
 
-.wz-menu-selectors {
-    margin-left: -16px;
-    margin-right: -16px;
-    padding: 16px;
-    border-top: 1px solid #d3dae6;
-}
+
 
 .wz-menu-right-side{
     padding: 0;
@@ -82,7 +77,6 @@ wz-menu {
 
 .navBarLogo {
     width: 100px;
-    filter: brightness(0) saturate(100%) invert(24%) sepia(97%) saturate(1757%) hue-rotate(186deg) brightness(94%) contrast(101%);
   }
 
 .wz-menu-popover{
@@ -143,10 +137,6 @@ wz-menu {
         overflow-y: auto;
         max-height: 320px;
         margin-right: -16px;
-    }
-    .wz-menu-selectors {
-        width: 97vw;
-        display: inline-flex;
     }
     .euiFormRow + .euiFormRow {
         margin-left: 16px;
@@ -235,12 +225,6 @@ wz-menu {
 .wz-menu-select-option {
     color: #373a42;
     background-color: #FFF;
-}
-
-.wz-menu-selectors-api{
-    overflow: hidden;
-    max-width: 168px;
-    text-overflow: ellipsis;
 }
 
 .euiHeader {

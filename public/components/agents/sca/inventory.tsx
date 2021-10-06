@@ -355,7 +355,7 @@ export class Inventory extends Component {
         },
         {
           title: checks,
-          description: <RuleText rulesText={rulesText} />,
+          description: <RuleText rules={item.rules.length ? item.rules : []} />,
         },
         {
           title: 'Compliance',

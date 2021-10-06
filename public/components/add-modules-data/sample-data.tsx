@@ -132,7 +132,7 @@ export default class WzSampleData extends Component {
         }
       });
     } catch (error) {
-      this.showToast('danger', 'Error', error.message || error);
+      this.showToast('danger', 'Error', `Error trying to add sample data: ${error.message || error}`);
       this.setState({
         [category.categorySampleAlertsIndex]: {
           ...this.state[category.categorySampleAlertsIndex],
@@ -165,7 +165,7 @@ export default class WzSampleData extends Component {
           removeDataLoading: false
         }
       });
-      this.showToast('danger', 'Error', error.message || error);
+      this.showToast('danger', 'Error', `Error trying to delete sample data: ${error.message || error}`);
     }
   }
   renderCard(category) {

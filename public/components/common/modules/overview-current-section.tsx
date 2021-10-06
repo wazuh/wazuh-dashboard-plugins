@@ -21,7 +21,7 @@ import { updateCurrentTab } from '../../../redux/actions/appStateActions';
 import store from '../../../redux/store';
 import { connect } from 'react-redux';
 import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
-import { AppNavigate } from '../../../react-services/app-navigate'
+import { AppNavigate } from '../../../react-services/app-navigate';
 
 class WzCurrentOverviewSection extends Component {
   constructor(props) {
@@ -43,13 +43,13 @@ class WzCurrentOverviewSection extends Component {
     if(WAZUH_MODULES[this.props.currentTab]){
       const breadcrumb = currentAgent.id ? [
         { text: '' },
-        { text: 'Modules', href: '/app/wazuh#/overview' },
+        { text: 'Modules', href: '#/overview' },
         { agent: currentAgent },
         { text: WAZUH_MODULES[this.props.currentTab].title},
       ] :
       [
         { text: '' },
-        { text: 'Modules', href: '/app/wazuh#/overview' },
+        { text: 'Modules', href: '#/overview' },
         
         
         { text: WAZUH_MODULES[this.props.currentTab].title},

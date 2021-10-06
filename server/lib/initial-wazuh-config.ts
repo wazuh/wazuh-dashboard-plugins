@@ -30,6 +30,12 @@ export const initialWazuhConfig: string = `---
 # Also, you can check our repository:
 # https://github.com/wazuh/wazuh-kibana-app
 #
+# ------------------------------- Disable roles -------------------------------
+#
+# Defines which Elasticsearch roles disable Wazuh
+# disabled_roles: 
+#      - wazuh_disabled
+#
 # ------------------------------- Index patterns -------------------------------
 #
 # Default index pattern to use.
@@ -111,13 +117,13 @@ export const initialWazuhConfig: string = `---
 #wazuh.monitoring.frequency: 900
 #
 # Configure wazuh-monitoring-* indices shards and replicas.
-#wazuh.monitoring.shards: 2
+#wazuh.monitoring.shards: 1
 #wazuh.monitoring.replicas: 0
 #
 # Configure wazuh-monitoring-* indices custom creation interval.
 # Values: h (hourly), d (daily), w (weekly), m (monthly)
-# Default: d
-#wazuh.monitoring.creation: d
+# Default: w
+#wazuh.monitoring.creation: w
 #
 # Default index pattern to use for Wazuh monitoring
 #wazuh.monitoring.pattern: wazuh-monitoring-*
@@ -126,7 +132,7 @@ export const initialWazuhConfig: string = `---
 #
 # Customize the index prefix of predefined jobs
 # This change is not retroactive, if you change it new indexes will be created
-# cron.prefix: test
+# cron.prefix: wazuh
 #
 # --------------------------------- wazuh-sample-alerts -------------------------
 #
@@ -157,6 +163,21 @@ export const initialWazuhConfig: string = `---
 # Configure statistics indices shards and replicas.
 #cron.statistics.shards: 2
 #cron.statistics.replicas: 0
+#
+# ------------------------------ wazuh-logo-customization -------------------------------
+#
+#Define the name of the app logo saved in the path /plugins/wazuh/assets/
+#customization.logo.app: logotype.svg
+#
+#Define the name of the sideba logo saved in the path /plugins/wazuh/assets/
+#customization.logo.sidebar: icon_blue.png
+#
+#Define the name of the health-check logo saved in the path /plugins/wazuh/assets/
+#customization.logo.healthcheck: icon_blue.svg
+#
+#
+#Define the name of the reports logo (.png) saved in the path /plugins/wazuh/assets/
+#customization.logo.reports: logo.png
 #
 # ---------------------------- Hide manager alerts ------------------------------
 # Hide the alerts of the manager in all dashboards and discover

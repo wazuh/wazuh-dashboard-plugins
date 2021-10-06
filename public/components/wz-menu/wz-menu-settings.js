@@ -15,6 +15,8 @@ import { WzRequest } from '../../react-services/wz-request';
 import { connect } from 'react-redux';
 import { AppNavigate } from '../../react-services/app-navigate';
 import { getAngularModule } from '../../kibana-services';
+import { WAZUH_MENU_SETTINGS_SECTIONS_ID } from '../../../common/constants';
+import { WAZUH_MENU_SETTINGS_SECTIONS_CY_TEST_ID } from '../../../common/wazu-menu/wz-menu-settings.cy';
 
 class WzMenuSettings extends Component {
   constructor(props) {
@@ -35,13 +37,45 @@ class WzMenuSettings extends Component {
 
   availableSettings() {
     let auxSettings = {
-      settings: { id: 'settings', text: 'Settings' },
-      api: { id: 'api', text: 'API configuration' },
-      modules: { id: 'modules', text: 'Modules' },
-      sample_data: { id: 'sample_data', text: 'Sample data' },
-      configuration: { id: 'configuration', text: 'Configuration' },
-      logs: { id: 'logs', text: 'Logs' },
-      about: { id: 'about', text: 'About' },
+      settings: {
+        id: WAZUH_MENU_SETTINGS_SECTIONS_ID.SETTINGS,
+        cyTestId: WAZUH_MENU_SETTINGS_SECTIONS_CY_TEST_ID.SETTINGS,
+        text: 'Settings',
+      },
+      api: {
+        id: WAZUH_MENU_SETTINGS_SECTIONS_ID.API_CONFIGURATION,
+        cyTestId: WAZUH_MENU_SETTINGS_SECTIONS_CY_TEST_ID.API_CONFIGURATION,
+        text: 'API configuration',
+      },
+      modules: {
+        id: WAZUH_MENU_SETTINGS_SECTIONS_ID.MODULES,
+        cyTestId: WAZUH_MENU_SETTINGS_SECTIONS_CY_TEST_ID.MODULES,
+        text: 'Modules',
+      },
+      sample_data: {
+        id: WAZUH_MENU_SETTINGS_SECTIONS_ID.SAMPLE_DATA,
+        cyTestId: WAZUH_MENU_SETTINGS_SECTIONS_CY_TEST_ID.SAMPLE_DATA,
+        text: 'Sample data',
+      },
+      configuration: {
+        id: WAZUH_MENU_SETTINGS_SECTIONS_ID.CONFIGURATION,
+        cyTestId: WAZUH_MENU_SETTINGS_SECTIONS_CY_TEST_ID.CONFIGURATION,
+        text: 'Configuration',
+      },
+      logs: {
+        id: WAZUH_MENU_SETTINGS_SECTIONS_ID.LOGS,
+        cyTestId: WAZUH_MENU_SETTINGS_SECTIONS_CY_TEST_ID.LOGS,
+        text: 'Logs' },
+      miscellaneous: {
+        id: WAZUH_MENU_SETTINGS_SECTIONS_ID.MISCELLANEOUS,
+        cyTestId: WAZUH_MENU_SETTINGS_SECTIONS_CY_TEST_ID.MISCELLANEOUS,
+        text: 'Miscellaneous',
+      },
+      about: {
+        id: WAZUH_MENU_SETTINGS_SECTIONS_ID.ABOUT,
+        cyTestId: WAZUH_MENU_SETTINGS_SECTIONS_CY_TEST_ID.ABOUT,
+        text: 'About',
+      },
     };
     return (auxSettings);
   }
@@ -54,6 +88,7 @@ class WzMenuSettings extends Component {
       this.createItem(availableSettings.sample_data),
       this.createItem(availableSettings.configuration),
       this.createItem(availableSettings.logs),
+      this.createItem(availableSettings.miscellaneous),
       this.createItem(availableSettings.about),
     ]
     return (auxItems);
@@ -75,6 +110,7 @@ class WzMenuSettings extends Component {
       ...data,
       id: item.id,
       name: item.text,
+      'data-test-subj': item.cyTestId,
       isSelected: window.location.href.includes('/settings') && this.props.state.selected_settings_section === item.id,
       onClick: () => { },
       onMouseDown: (ev) => this.clickMenuItem(ev, item.id)

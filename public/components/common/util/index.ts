@@ -14,3 +14,4 @@
  export { AgentGroupTruncate, GroupTruncate} from './agent-group-truncate';
  export { TruncateHorizontalComponents } from './truncate-horizontal-components/truncate-horizontal-components';
  export { GroupingComponents } from './grouping-components';
+ export * from './wz-overlay-mask-interface';

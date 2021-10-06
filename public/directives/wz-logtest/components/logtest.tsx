@@ -29,6 +29,9 @@ import {
 import { WzRequest } from '../../../react-services';
 import { withReduxProvider, withUserAuthorizationPrompt } from '../../../components/common/hocs';
 import { compose } from 'redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { updateLogtestToken } from '../../../redux/actions/appStateActions';
+import { WzButtonPermissionsModalConfirm } from '../../../components/common/buttons';
 
 type LogstestProps = {
   openCloseFlyout: () => {};
@@ -41,12 +44,14 @@ export const Logtest = compose(
   withReduxProvider,
   withUserAuthorizationPrompt([{ action: 'logtest:run', resource: `*:*:*` }])
 )((props: LogstestProps) => {
-  const [value, setValue] = useState([]);
+  const [events, setEvents] = useState([]);
   const [testing, setTesting] = useState(false);
   const [testResult, setTestResult] = useState('');
+  const dispatch = useDispatch();
+  const sessionToken = useSelector((state)=> state.appStateReducers.logtestToken);
 
   const onChange = (e) => {
-    setValue(e.target.value.split('\n').filter((item) => item));
+    setEvents(e.target.value.split('\n').filter((item) => item));
   };
 
   const formatResult = (result, alert) => {
@@ -84,21 +89,28 @@ export const Logtest = compose(
   const runAllTests = async () => {
     setTestResult('');
     setTesting(true);
+    let token = sessionToken;
+    const responses = [];
+    let gotToken = Boolean(token);
+
     try {
-      const responsesLogtest = await Promise.all(
-        value.map(async (event) => {
-          const body = {
-            log_format: 'syslog',
-            location: 'logtest',
-            event: event,
-          };
-          return await WzRequest.apiReq('PUT', '/logtest', body);
-        })
-      );
-      const testResults = responsesLogtest.map((response) =>
+      for (let event of events) {
+        const response = await WzRequest.apiReq('PUT', '/logtest', {
+          log_format: 'syslog',
+          location: 'logtest',
+          event,
+          ...(token ? { token }: {})
+        });
+        token = response.data.data.token;
+        !sessionToken && !gotToken && token && dispatch(updateLogtestToken(token));
+        token && (gotToken = true);
+        responses.push(response);
+      };
+  
+      const testResults = responses.map((response) =>
         response.data.data.output.rule || ''
           ? formatResult(response.data.data.output, response.data.data.alert)
-          : `No result found for:  ${response.data.data.output.full_log} \n\n\n`
+          : `No result found for: ${response.data.data.output.full_log} \n\n\n`
       );
       setTestResult(testResults);
     } finally {
@@ -112,6 +124,17 @@ export const Logtest = compose(
     }
   };
 
+  const deleteToken = async() =>{
+    try {
+      const response = await WzRequest.apiReq('DELETE', `/logtest/sessions/${sessionToken}`, {});
+      dispatch(updateLogtestToken(''));
+      setTestResult('');
+    }
+    catch(error) {
+      this.showToast('danger', 'Error', `Error trying to delete logtest token due to: ${error.message || error}`);
+    }    
+  }
+
   const buildLogtest = () => {
     return (
       <Fragment>
@@ -124,11 +147,12 @@ export const Logtest = compose(
           onKeyPress={handleKeyPress}
         />
         <EuiSpacer size="m" />
+        <EuiFlexGroup justifyContent="spaceBetween">
         <EuiFlexItem grow={false}>
           <EuiButton
             style={{ maxWidth: '100px' }}
             isLoading={testing}
-            isDisabled={testing || value.length === 0}
+            isDisabled={testing || events.length === 0}
             iconType="play"
             fill
             onClick={runAllTests}
@@ -136,6 +160,28 @@ export const Logtest = compose(
             Test
           </EuiButton>
         </EuiFlexItem>
+        <EuiFlexItem grow={false}>
+          <WzButtonPermissionsModalConfirm
+            style={{ maxWidth: '150px' }}
+            tooltip={{position: 'top', content: 'Clear current session'}}
+            fill
+            isDisabled={sessionToken === '' ? true : false}
+            aria-label="Clear current session"
+            iconType="broom"
+            onConfirm={async () => {
+              deleteToken();
+            }}
+            color="danger"
+            modalTitle={`Do you want to clear current session?`}
+            modalProps={{
+              buttonColor: 'danger',
+              children: 'Clearing the session means the logs execution history is removed. This affects to rules that fire an alert when similar logs are executed in a specific range of time.'
+            }}
+          > 
+          Clear session 
+          </WzButtonPermissionsModalConfirm> 
+        </EuiFlexItem> 
+        </EuiFlexGroup>
         <EuiSpacer size="m" />
         <EuiCodeBlock
           language="json"

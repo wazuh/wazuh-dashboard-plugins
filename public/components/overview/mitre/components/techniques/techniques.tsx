@@ -244,7 +244,6 @@ export const Techniques = withWindowSize(class Techniques extends Component {
             closePopover={() => this.closeActionsMenu()}
             panelPaddingSize="none"
             style={{width: "100%"}}
-            withTitle
             anchorPosition="downLeft">
             <EuiContextMenu initialPanelId={0} panels={this.buildPanel(item.id)} />
           </EuiPopover>

@@ -14,6 +14,7 @@ import {
   WAZUH_ALERTS_PATTERN,
   WAZUH_INDEX_REPLICAS,
   WAZUH_INDEX_SHARDS,
+  WAZUH_MONITORING_DEFAULT_INDICES_SHARDS,
   WAZUH_MONITORING_PATTERN,
   WAZUH_SAMPLE_ALERT_PREFIX
 } from "../../../common/constants";
@@ -50,9 +51,9 @@ export async function getWzConfig($q, genericReq, wazuhConfig) {
     'xpack.rbac.enabled': true,
     'wazuh.monitoring.enabled': true,
     'wazuh.monitoring.frequency': 900,
-    'wazuh.monitoring.shards': WAZUH_INDEX_SHARDS,
+    'wazuh.monitoring.shards': WAZUH_MONITORING_DEFAULT_INDICES_SHARDS,
     'wazuh.monitoring.replicas': WAZUH_INDEX_REPLICAS,
-    'wazuh.monitoring.creation': 'd',
+    'wazuh.monitoring.creation': 'w',
     'wazuh.monitoring.pattern': WAZUH_MONITORING_PATTERN,
     'cron.prefix': 'wazuh',
     'cron.statistics.status': true,
@@ -67,6 +68,10 @@ export async function getWzConfig($q, genericReq, wazuhConfig) {
     'logs.level': 'info',
     'enrollment.dns': '',
     'enrollment.password': '',
+    'customization.logo.app':'logotype.svg',
+    'customization.logo.sidebar':'icon_blue.png',
+    'customization.logo.healthcheck':'icon_blue.svg',
+    'customization.logo.reports':'logo.png'
   };
 
   try {
@@ -93,6 +98,5 @@ export async function getWzConfig($q, genericReq, wazuhConfig) {
     console.log('Error parsing wazuh.yml, using default values.'); // eslint-disable-line
     console.log(error.message || error); // eslint-disable-line
   }
-
   return $q.resolve(defaultConfig);
 }

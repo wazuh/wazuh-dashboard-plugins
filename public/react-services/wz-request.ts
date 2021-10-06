@@ -65,11 +65,10 @@ export class WzRequest {
         } catch (error) {
           const wzMisc = new WzMisc();
           wzMisc.setApiIsDown(true);
-
           if (!window.location.hash.includes('#/settings')) {
-            window.location.href = '/app/wazuh#/health-check';
+            window.location.href = getHttp().basePath.prepend('/app/wazuh#/health-check');
           }
-          return;
+          throw new Error(error);
         }
       }
       const errorMessage =

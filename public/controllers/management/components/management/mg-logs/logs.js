@@ -39,7 +39,7 @@ import { WzFieldSearch } from '../../../../../components/wz-field-search-bar/wz-
 export default compose(
   withGlobalBreadcrumb([
     { text: '' },
-    { text: 'Management', href: '/app/wazuh#/manager' },
+    { text: 'Management', href: '#/manager' },
     { text: 'Logs' }
   ]),
   withUserAuthorizationPrompt([{action: 'cluster:status', resource: '*:*:*'}, {action: 'cluster:read', resource: 'node:id:*'}])
