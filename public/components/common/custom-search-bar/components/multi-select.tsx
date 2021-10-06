@@ -28,45 +28,93 @@ import { IValueSuggestion, useValueSuggestion } from '../../hooks';
 const ON = 'on';
 const OFF = 'off';
 
-export const MultiSelect = ({ item, onChange, selectedOptions, onRemove, isDisabled, filterDrillDownValue }) => {
+interface Item {
+  key: any;
+  label: string;
+  value: any;
+  checked: FilterChecked;
+}
+
+export const MultiSelect = ({
+  item,
+  onChange,
+  selectedOptions,
+  onRemove,
+  isDisabled,
+  filterDrillDownValue,
+}) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState<boolean>(false);
   const { suggestedValues, isLoading, setQuery }: IValueSuggestion = useValueSuggestion(
     item.key,
     filterDrillDownValue,
-    item?.options,
+    item?.options
   );
-  const [items, setItems] = useState<
-    { key: any; label: any; value: any; checked: FilterChecked }[]
-  >([]);
+  const [items, setItems] = useState<Item[]>([]);
   const [activeFilters, setActiveFilters] = useState<number>(0);
+
+  const addCheckedOptions = () => {
+    selectedOptions.map((value) => {
+      if (ON === value.checked && suggestedValues.indexOf(value.label) === -1) {
+        suggestedValues.push(value.label);
+      }
+    });
+  };
+
+  const sortByLabel = (items) => {
+    return items.sort((a, b) => (a.label < b.label ? 1 : -1));
+  };
+
+  const sortByChecked = (items) => {
+    return items.sort((a, b) => (a.checked < b.checked ? 1 : -1));
+  };
+
+  const buildSuggestedValues = () => {
+    const result = suggestedValues.map((value, key) => ({
+      key: key,
+      label: value,
+      value: item.key,
+      filterByKey: item.filterByKey,
+      checked: selectedOptions.find((element) => element.label === value)
+        ? (ON as FilterChecked)
+        : (OFF as FilterChecked),
+    }));
+
+    return sortByChecked(sortByLabel(result));
+  };
 
   useEffect(() => {
     if (!isLoading) {
-      setItems(
-        suggestedValues
-          .map((value, key) => ({
-            key: key,
-            label: value,
-            value: item.key,
-            filterByKey: item.filterByKey,
-            checked: selectedOptions.find((element) => element.label === value) ? ON as FilterChecked: OFF as FilterChecked,
-          })).sort((a, b) => (a.label < b.label ? 1 : -1)).sort((a, b) => (a.checked < b.checked ? 1 : -1))
-      );
+      addCheckedOptions();
+      setItems(buildSuggestedValues());
     }
   }, [suggestedValues, isLoading]);
 
+  const setSelectedKey = (item: Item) => {
+    return parseInt(item.label.match(/(?<=\[).+?(?=\])/g) || item.key);
+  };
+
+  const buildSelectedOptions = () => {
+    const result = items.map((item) => ({
+      ...item,
+      checked: selectedOptions.find((element) => element.label === item.label)
+        ? (ON as FilterChecked)
+        : (OFF as FilterChecked),
+      key: setSelectedKey(item),
+    }));
+
+    return sortByChecked(sortByLabel(result));
+  };
+
   useEffect(() => {
-    setItems(
-      items.map((item) => ({
-        ...item,
-        checked: selectedOptions.find((element) => element.label === item.label) ? ON as FilterChecked: OFF as FilterChecked,
-      })).sort((a, b) => (a.label < b.label ? 1 : -1)).sort((a, b) => (a.checked < b.checked ? 1 : -1))
-    );
+    addCheckedOptions();
+    setItems(buildSelectedOptions());
     setActiveFilters(selectedOptions.length);
   }, [selectedOptions]);
 
-  const toggleFilter = (item) => {
+  const toggleFilter = (item: Item) => {
+    items.map((item) => (item.key = setSelectedKey(item)));
     item.checked = item.checked === ON ? OFF : ON;
+    item.key = setSelectedKey(item);
     updateFilters(item.value);
   };
 
@@ -74,7 +122,7 @@ export const MultiSelect = ({ item, onChange, selectedOptions, onRemove, isDisab
     const selectedItems = items.filter((item) => item.checked === ON);
     setActiveFilters(selectedItems.length);
     if (selectedItems.length) {
-      onChange(selectedItems,id);
+      onChange(selectedItems, id);
     } else {
       onRemove(item.key);
     }
