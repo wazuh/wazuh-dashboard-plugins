@@ -124,9 +124,13 @@ app.run(function ($rootElement) {
       // Override href's behaviour and navigate programatically
       // to '/logout' once the token has been deleted.
       event.preventDefault();
-      WzAuthentication.deleteExistentToken().then(() => {
-        window.location.replace(urlToLogout);
-      });
+      WzAuthentication.deleteExistentToken()
+        .catch((err) => {
+          console.error('[ERROR] - User token could not be deprecated - ', err);
+        })
+        .finally(() => {
+          window.location.replace(urlToLogout);
+        });
     });
   });
 });
