@@ -29,9 +29,10 @@ import { getAuthorizedAgents } from '../react-services/wz-agents';
  */
 export class WzAuthentication {
   /**
+   * Requests and returns an user token to the API.
    *
-   * @param force
-   * @returns
+   * @param {boolean} force
+   * @returns {string} token as string or Promise.reject error
    */
   private static async login(force = false) {
     try {
@@ -51,9 +52,10 @@ export class WzAuthentication {
   }
 
   /**
+   * Refreshes the user's token
    *
-   * @param force
-   * @returns
+   * @param {boolean} force
+   * @returns {void} nothing or Promise.reject error
    */
   static async refresh(force = false) {
     try {
@@ -75,7 +77,8 @@ export class WzAuthentication {
       let allowedAgents: any = [];
       if (WzAuthentication.userHasAgentsPermissions(userPolicies)) {
         allowedAgents = await getAuthorizedAgents();
-        allowedAgents = allowedAgents.length ? allowedAgents : ['-1']; // users without read:agent police should not view info about any agent
+        // users without read:agent police should not view info about any agent
+        allowedAgents = allowedAgents.length ? allowedAgents : ['-1'];
       }
       store.dispatch(updateAllowedAgents(allowedAgents));
 
@@ -87,7 +90,7 @@ export class WzAuthentication {
         )
       );
       store.dispatch(updateWithUserLogged(true));
-    } catch (error) {
+    } catch (error: any) {
       getToasts().add({
         color: 'danger',
         title: 'Error getting the authorization token',
@@ -100,8 +103,9 @@ export class WzAuthentication {
   }
 
   /**
+   * Get current user's policies
    *
-   * @returns
+   * @returns {Object} user's policies or Promise.reject error
    */
   private static async getUserPolicies() {
     try {
@@ -119,9 +123,10 @@ export class WzAuthentication {
   }
 
   /**
+   * Map the current user to admin roles
    *
-   * @param roles
-   * @returns
+   * @param {Object} roles
+   * @returns {Object} modified roles.
    */
   private static mapUserRolesIDToAdministratorRole(roles) {
     return roles.map((role: number) =>
@@ -131,7 +136,8 @@ export class WzAuthentication {
 
   /**
    * Sends a request to the Wazuh's API to delete the user's token.
-   * @returns Object
+   *
+   * @returns {Object}
    */
   static async deleteExistentToken() {
     try {
@@ -147,6 +153,7 @@ export class WzAuthentication {
    * This function returns true only if the user has some police that need be filtered.
    * Returns false if the user has permission for all agents.
    * Returns true if the user has no one police for agent:read.
+   *
    * @param policies
    * @returns boolean
    */
