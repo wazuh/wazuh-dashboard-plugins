@@ -60,7 +60,13 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed error when edit a rule or decoder [#3456](https://github.com/wazuh/wazuh-kibana-app/pull/3456)
 - Fixed index pattern selector doesn't display the ignored index patterns [#3458](https://github.com/wazuh/wazuh-kibana-app/pull/3458)
 
-## Wazuh v4.2.2 - Kibana 7.10.2 , 7.12.2 - Revision 4203
+## Wazuh v4.2.3 - Kibana 7.10.2 , 7.12.1 - Revision 4204
+
+### Added
+
+- Support for Wazuh 4.2.3
+
+## Wazuh v4.2.2 - Kibana 7.10.2 , 7.12.1 - Revision 4203
 
 ### Added
 
