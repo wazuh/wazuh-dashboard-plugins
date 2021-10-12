@@ -24,6 +24,7 @@ import {
   FilterChecked,
 } from '@elastic/eui';
 import { IValueSuggestion, useValueSuggestion } from '../../hooks';
+import _ from 'lodash';
 
 const ON = 'on';
 const OFF = 'off';
@@ -60,12 +61,12 @@ export const MultiSelect = ({
     });
   };
 
-  const sortByLabel = (items) => {
-    return items.sort((a, b) => (a.label < b.label ? 1 : -1));
+  const orderByLabel = (items) => {
+    return _.orderBy(items, 'label', 'asc');
   };
 
-  const sortByChecked = (items) => {
-    return items.sort((a, b) => (a.checked < b.checked ? 1 : -1));
+  const orderByChecked = (items) => {
+    return _.orderBy(items, 'checked', 'desc');
   };
 
   const buildSuggestedValues = () => {
@@ -79,7 +80,7 @@ export const MultiSelect = ({
         : (OFF as FilterChecked),
     }));
 
-    return sortByChecked(sortByLabel(result));
+    return orderByChecked(orderByLabel(result));
   };
 
   useEffect(() => {
@@ -102,7 +103,7 @@ export const MultiSelect = ({
       key: setSelectedKey(item),
     }));
 
-    return sortByChecked(sortByLabel(result));
+    return orderByChecked(orderByLabel(result));
   };
 
   useEffect(() => {
