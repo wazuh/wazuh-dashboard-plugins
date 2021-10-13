@@ -23,6 +23,7 @@ import {
   EuiStat,
   EuiToolTip,
   EuiBadge,
+  EuiCodeBlock,
 } from '@elastic/eui';
 import { Discover } from '../../../common/modules/discover';
 import { ModulesHelper } from '../../../common/modules/modules-helper';
@@ -132,13 +133,6 @@ export class FileDetails extends Component {
         link: true,
       },
       {
-        field: 'perm',
-        name: 'Permissions',
-        icon: 'lock',
-        link: false,
-        transformValue: (value) => this.renderFileDetailsPermissions(value),
-      },
-      {
         field: 'size',
         name: 'Size',
         icon: 'nested',
@@ -172,6 +166,13 @@ export class FileDetails extends Component {
         checksum: true,
         icon: 'check',
         link: true,
+      },
+      {
+        field: 'perm',
+        name: 'Permissions',
+        icon: 'lock',
+        link: false,
+        transformValue: (value) => this.renderFileDetailsPermissions(value),
       },
     ];
   }
@@ -329,11 +330,10 @@ export class FileDetails extends Component {
         );
       }
     });
-
     return (
       <div>
         <EuiFlexGrid columns={3}> {generalDetails} </EuiFlexGrid>
-      </div>
+      </div>        
     );
   }
 
@@ -344,43 +344,14 @@ export class FileDetails extends Component {
   renderFileDetailsPermissions(value) {
     if (((this.props.agent || {}).os || {}).platform === 'windows' && value && value !== '-') {
       const components = value
-        .split(', ')
-        .map((userNameAndPermissionsFullString) => {
-          const [_, username, userPermissionsString] = userNameAndPermissionsFullString.match(
-            /(\S+) \(allowed\): (\S+)/
-          );
-          const permissions = userPermissionsString.split('|').sort();
-          return { username, permissions };
-        })
-        .sort((a, b) => {
-          if (a.username > b.username) {
-            return 1;
-          } else if (a.username < b.username) {
-            return -1;
-          } else {
-            return 0;
-          }
-        })
-        .map(({ username, permissions }) => {
-          return (
-            <EuiToolTip
-              key={`permissions-windows-user-${username}`}
-              content={permissions.join(', ')}
-              title={`${username} permissions`}
-            >
-              <EuiBadge color="hollow" title={null} style={{ margin: '2px 2px' }}>
-                {username}
-              </EuiBadge>
-            </EuiToolTip>
-          );
-        });
       return (
-        <TruncateHorizontalComponents
-          components={components}
-          labelButtonHideComponents={(count) => `+${count} users`}
-          buttonProps={{ size: 'xs' }}
-          componentsWidthPercentage={0.85}
-        />
+        <EuiAccordion
+          id={Math.random().toString() }
+          paddingSize="none"
+          initialIsOpen={false}
+        >
+          <EuiCodeBlock language="json" paddingSize="l">{JSON.stringify(components, null, 2)}</EuiCodeBlock> 
+        </EuiAccordion>
       );
     }
     return value;
