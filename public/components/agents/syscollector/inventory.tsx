@@ -51,7 +51,9 @@ export function SyscollectorInventory({ agent }) {
     soPlatform = 'windows';
   } else if ((agent.os || {}).platform === 'darwin') {
     soPlatform = 'apple';
-  }
+  } else if ((agent.os || {}).platform === 'freebsd') {
+    soPlatform = 'freebsd';
+  } 
 
   const netifaceColumns = [
     { id: 'name' },
