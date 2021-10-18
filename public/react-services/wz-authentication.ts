@@ -26,7 +26,16 @@ import { getAuthorizedAgents } from '../react-services/wz-agents';
 import { UI_ERROR_SEVERITIES, UIErrorLog, UIErrorSeverity, UILogLevel } from './error-orchestrator/types';
 import { getErrorOrchestrator } from './common-services';
 
+/**
+ * Wazuh user authentication class
+ */
 export class WzAuthentication {
+  /**
+   * Requests and returns an user token to the API.
+   *
+   * @param {boolean} force
+   * @returns {string} token as string or Promise.reject error
+   */
   private static async login(force = false) {
     try {
       var idHost = JSON.parse(AppState.getCurrentAPI()).id;
@@ -40,9 +49,16 @@ export class WzAuthentication {
       const token = ((response || {}).data || {}).token;
       return token as string;
     } catch (error) {
-      throw error;
+      return Promise.reject(error);
     }
   }
+
+  /**
+   * Refreshes the user's token
+   *
+   * @param {boolean} force
+   * @returns {void} nothing or Promise.reject error
+   */
   static async refresh(force = false) {
     try {
       // Get user token
@@ -63,7 +79,8 @@ export class WzAuthentication {
       let allowedAgents: any = [];
       if (WzAuthentication.userHasAgentsPermissions(userPolicies)) {
         allowedAgents = await getAuthorizedAgents();
-        allowedAgents = allowedAgents.length ? allowedAgents : ['-1']; // users without read:agent police should not view info about any agent
+        // users without read:agent police should not view info about any agent
+        allowedAgents = allowedAgents.length ? allowedAgents : ['-1'];
       }
       store.dispatch(updateAllowedAgents(allowedAgents));
 
@@ -91,6 +108,12 @@ export class WzAuthentication {
       return Promise.reject(error);
     }
   }
+
+  /**
+   * Get current user's policies
+   *
+   * @returns {Object} user's policies or Promise.reject error
+   */
   private static async getUserPolicies() {
     try {
       var idHost = JSON.parse(AppState.getCurrentAPI()).id;
@@ -102,23 +125,34 @@ export class WzAuthentication {
       const policies = ((response || {}).data || {}).data || {};
       return policies;
     } catch (error) {
-      throw error;
+      return Promise.reject(error);
     }
   }
 
+  /**
+   * Map the current user to admin roles
+   *
+   * @param {Object} roles
+   * @returns {Object} modified roles.
+   */
   private static mapUserRolesIDToAdministratorRole(roles) {
     return roles.map((role: number) =>
       role === WAZUH_ROLE_ADMINISTRATOR_ID ? WAZUH_ROLE_ADMINISTRATOR_NAME : role
     );
   }
 
+  /**
+   * Sends a request to the Wazuh's API to delete the user's token.
+   *
+   * @returns {Object}
+   */
   static async deleteExistentToken() {
     try {
       const response = await WzRequest.apiReq('DELETE', '/security/user/authenticate', {});
 
       return ((response || {}).data || {}).data || {};
     } catch (error) {
-      throw error;
+      return Promise.reject(error);
     }
   }
 
@@ -126,6 +160,7 @@ export class WzAuthentication {
    * This function returns true only if the user has some police that need be filtered.
    * Returns false if the user has permission for all agents.
    * Returns true if the user has no one police for agent:read.
+   *
    * @param policies
    * @returns boolean
    */
