@@ -221,6 +221,9 @@ service kibana restart
  
 | Wazuh app | Kibana  | Open Distro | Package                                                                    |
 | :-------: | :----:  | :---------: | :------------------------------------------------------------------------- |
+|   4.2.4   |  7.12.1 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.4_7.12.1-1.zip> |
+|   4.2.4   |  7.11.2 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.4_7.11.2-1.zip> |
+|   4.2.4   |  7.10.2 |   1.13.2    | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.4_7.10.2-1.zip> |
 |   4.2.3   |  7.12.1 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.3_7.12.1-1.zip> |
 |   4.2.3   |  7.11.2 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.3_7.11.2-1.zip> |
 |   4.2.3   |  7.10.2 |   1.13.2    | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.3_7.10.2-1.zip> |
