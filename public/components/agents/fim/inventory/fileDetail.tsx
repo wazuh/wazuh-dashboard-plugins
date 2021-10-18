@@ -331,7 +331,7 @@ export class FileDetails extends Component {
       }
     });
     return (
-      <div>
+      <div>      
         <EuiFlexGrid columns={3}> {generalDetails} </EuiFlexGrid>
       </div>        
     );
@@ -343,14 +343,11 @@ export class FileDetails extends Component {
 
   renderFileDetailsPermissions(value) {
     if (((this.props.agent || {}).os || {}).platform === 'windows' && value && value !== '-') {
-      const components = value
       return (
-        <EuiAccordion
-          id={Math.random().toString() }
-          paddingSize="none"
-          initialIsOpen={false}
-        >
-          <EuiCodeBlock language="json" paddingSize="l">{JSON.stringify(components, null, 2)}</EuiCodeBlock> 
+        <EuiAccordion id={Math.random().toString()} paddingSize="none" initialIsOpen={false}>
+          <EuiCodeBlock language="json" paddingSize="l">
+            {JSON.stringify(value, null, 2)}
+          </EuiCodeBlock>
         </EuiAccordion>
       );
     }
