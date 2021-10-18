@@ -10,6 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 
-
-export { TableWithSearchBar } from './table-with-search-bar';
-export { TableWithSearchBarWzAPI } from './table-with-search-bar-wz-api';
+export * from './table-with-search-bar';
+export * from './table-wz-api';
+export * from './table-default';

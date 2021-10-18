@@ -47,7 +47,7 @@ export const rootkitsData = {
     "mail": false,
     "level": 7,
     "description": "Host-based anomaly detection event (rootcheck).",
-    "groups": ["ossec","rootcheck"],
+    "groups": ["wazuh","rootcheck"],
     "id": "510",
     "gdpr": ["IV_35.7.d"]
   },
@@ -74,7 +74,7 @@ export const trojansData = {
     "mail": false,
     "level": 7,
     "description": "Host-based anomaly detection event (rootcheck).",
-    "groups": ["ossec","rootcheck"],
+    "groups": ["wazuh","rootcheck"],
     "id": "510",
     "gdpr": ["IV_35.7.d"]
   },

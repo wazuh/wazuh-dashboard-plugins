@@ -17,6 +17,7 @@ import {
   EuiFlexItem,
   EuiBasicTable,
   EuiOverlayMask,
+  EuiOutsideClickDetector,
   Direction
 } from '@elastic/eui';
 import { i18n } from '@kbn/i18n';
@@ -25,6 +26,14 @@ import { WzRequest } from '../../../../react-services/wz-request';
 import { FlyoutDetail } from './flyout';
 import { filtersToObject } from '../../../wz-search-bar';
 import { formatUIDate } from '../../../../react-services/time-service';
+import {
+  UI_ERROR_SEVERITIES,
+  UIErrorLog,
+  UIErrorSeverity,
+  UILogLevel,
+} from '../../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
+import { getErrorOrchestrator } from '../../../../react-services/common-services';
 
 export class RegistryTable extends Component {
   state: {
@@ -133,6 +142,18 @@ export class RegistryTable extends Component {
       });
     } catch (error) {
       this.setState({ error, isLoading: false })
+
+      const options: UIErrorLog = {
+        context: `${RegistryTable.name}.getSyscheck`,
+        level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+        severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   }
 
@@ -241,18 +262,19 @@ export class RegistryTable extends Component {
       <div>
         {registryTable}
         {this.state.isFlyoutVisible && (
-          <EuiOverlayMask
-            headerZindexLocation="below"
-            onClick={() => this.closeFlyout()}
-          >
-            <FlyoutDetail
-              fileName={this.state.currentFile.file}
-              agentId={this.props.agent.id}
-              item={this.state.syscheckItem}
-              closeFlyout={() => this.closeFlyout()}
-              type= {this.state.currentFile.type}
-              view='inventory'
-              {...this.props} />
+          <EuiOverlayMask headerZindexLocation="below">
+            <EuiOutsideClickDetector onOutsideClick={() => this.closeFlyout()}>
+              <div>{/* EuiOutsideClickDetector needs a static first child */}
+                <FlyoutDetail
+                  fileName={this.state.currentFile.file}
+                  agentId={this.props.agent.id}
+                  item={this.state.syscheckItem}
+                  closeFlyout={() => this.closeFlyout()}
+                  type={this.state.currentFile.type}
+                  view='inventory'
+                  {...this.props} />
+              </div>
+            </EuiOutsideClickDetector>
           </EuiOverlayMask>
         )}
       </div>

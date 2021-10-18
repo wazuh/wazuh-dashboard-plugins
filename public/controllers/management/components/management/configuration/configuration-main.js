@@ -10,51 +10,37 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { Component } from 'react';
-import WzReduxProvider from '../../../../../redux/wz-redux-provider';
 import WzConfigurationSwitch from './configuration-switch';
-import { updateGlobalBreadcrumb } from '../../../../../redux/actions/globalBreadcrumbActions';
-import store from '../../../../../redux/store';
+import {
+  withErrorBoundary,
+  withGlobalBreadcrumb,
+  withReduxProvider,
+} from '../../../../../components/common/hocs';
+import { compose } from 'redux'
 
-class WzConfigurationMain extends Component {
-  constructor(props) {
-    super(props);
-  }
-
-  setGlobalBreadcrumb() {
+export default compose(
+  withErrorBoundary,
+  withReduxProvider,
+  withGlobalBreadcrumb((props) => {
     let breadcrumb = false;
-    if (this.props.agent.id === '000') {
+    if (props.agent.id === '000') {
       breadcrumb = [
         { text: '' },
         { text: 'Management', href: '#/manager' },
-        { text: 'Configuration' }
+        { text: 'Configuration' },
       ];
     } else {
       breadcrumb = [
         { text: '' },
         {
           text: 'Agents',
-          href: '#/agents-preview'
+          href: '#/agents-preview',
         },
-        { agent: this.props.agent },
-        { text: 'Configuration' }
+        { agent: props.agent },
+        { text: 'Configuration' },
       ];
     }
-    store.dispatch(updateGlobalBreadcrumb(breadcrumb));
-    $('#breadcrumbNoTitle').attr("title","");
-  }
-
-  async componentDidMount() {
-    this.setGlobalBreadcrumb();
-  }
-
-  render() {
-    return (
-      <WzReduxProvider>
-        <WzConfigurationSwitch {...this.props} />
-      </WzReduxProvider>
-    );
-  }
-}
-
-export default WzConfigurationMain;
+    $('#breadcrumbNoTitle').attr('title', '');
+    return breadcrumb;
+  })
+)(WzConfigurationSwitch);

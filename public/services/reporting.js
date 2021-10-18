@@ -17,13 +17,7 @@ import { GenericRequest } from '../react-services/generic-request';
 import { ErrorHandler } from '../react-services/error-handler';
 
 export class ReportingService {
-  constructor(
-    $rootScope,
-    vis2png,
-    rawVisualizations,
-    visHandlers,
-    errorHandler
-  ) {
+  constructor($rootScope, vis2png, rawVisualizations, visHandlers, errorHandler) {
     this.$rootScope = $rootScope;
     this.vis2png = vis2png;
     this.rawVisualizations = rawVisualizations;
@@ -38,11 +32,9 @@ export class ReportingService {
   }
 
   removeAgentStatusVis(idArray) {
-    const monitoringEnabled = this.wazuhConfig.getConfig()[
-      'wazuh.monitoring.enabled'
-    ];
+    const monitoringEnabled = this.wazuhConfig.getConfig()['wazuh.monitoring.enabled'];
     if (!monitoringEnabled) {
-      const visArray = idArray.filter(vis => {
+      const visArray = idArray.filter((vis) => {
         return vis !== 'Wazuh-App-Overview-General-Agents-status';
       });
       return visArray;
@@ -62,17 +54,13 @@ export class ReportingService {
 
       this.vis2png.clear();
 
-      const rawVisualizations = this.rawVisualizations
-        .getList()
-        .filter(this.removeTableVis);
+      const rawVisualizations = this.rawVisualizations.getList().filter(this.removeTableVis);
 
       let idArray = [];
       if (tab === 'general') {
-        idArray = this.removeAgentStatusVis(
-          rawVisualizations.map(item => item.id)
-        );
+        idArray = this.removeAgentStatusVis(rawVisualizations.map((item) => item.id));
       } else {
-        idArray = rawVisualizations.map(item => item.id);
+        idArray = rawVisualizations.map((item) => item.id);
       }
 
       for (const item of idArray) {
@@ -80,14 +68,12 @@ export class ReportingService {
         this.vis2png.assignHTMLItem(item, tmpHTMLElement);
       }
 
-      const appliedFilters = await this.visHandlers.getAppliedFilters(
-        syscollectorFilters
-      );
+      const appliedFilters = await this.visHandlers.getAppliedFilters(syscollectorFilters);
 
       const array = await this.vis2png.checkArray(idArray);
-      const name = `wazuh-${
-        isAgents ? 'agents' : 'overview'
-      }-${tab}-${(Date.now() / 1000) | 0}.pdf`;
+      const name = `wazuh-${isAgents ? 'agents' : 'overview'}-${tab}-${
+        (Date.now() / 1000) | 0
+      }.pdf`;
 
       const browserTimezone = moment.tz.guess(true);
 
@@ -102,7 +88,7 @@ export class ReportingService {
         tab,
         section: isAgents ? 'agents' : 'overview',
         isAgents,
-        browserTimezone
+        browserTimezone,
       };
 
       await this.genericReq.request('POST', '/reports', data);
@@ -110,16 +96,13 @@ export class ReportingService {
       this.$rootScope.reportBusy = false;
       this.$rootScope.reportStatus = false;
       this.$rootScope.$applyAsync();
-      ErrorHandler.info(
-        'Success. Go to Wazuh > Management > Reporting',
-        'Reporting'
-      );
+      ErrorHandler.info('Success. Go to Wazuh > Management > Reporting', 'Reporting');
 
       return;
     } catch (error) {
       this.$rootScope.reportBusy = false;
       this.$rootScope.reportStatus = false;
-      ErrorHandler.handle(error.message || error);
+      throw error;
     }
   }
 
@@ -129,10 +112,7 @@ export class ReportingService {
       this.$rootScope.reportStatus = 'Generating PDF document...';
       this.$rootScope.$applyAsync();
 
-      const docType =
-        type === 'agentConfig'
-          ? `wazuh-agent-${obj.id}`
-          : `wazuh-group-${obj.name}`;
+      const docType = type === 'agentConfig' ? `wazuh-agent-${obj.id}` : `wazuh-group-${obj.name}`;
 
       const name = `${docType}-configuration-${(Date.now() / 1000) | 0}.pdf`;
       const browserTimezone = moment.tz.guess(true);
@@ -140,15 +120,13 @@ export class ReportingService {
       const data = {
         array: [],
         name,
-        filters: [
-          type === 'agentConfig' ? { agent: obj.id } : { group: obj.name }
-        ],
+        filters: [type === 'agentConfig' ? { agent: obj.id } : { group: obj.name }],
         time: '',
         searchBar: '',
         tables: [],
         tab: type,
         browserTimezone,
-        components
+        components,
       };
 
       await this.genericReq.request('POST', '/reports', data);
@@ -156,17 +134,14 @@ export class ReportingService {
       this.$rootScope.reportBusy = false;
       this.$rootScope.reportStatus = false;
       this.$rootScope.$applyAsync();
-      ErrorHandler.info(
-        'Success. Go to Wazuh > Management > Reporting',
-        'Reporting'
-      );
+      ErrorHandler.info('Success. Go to Wazuh > Management > Reporting', 'Reporting');
 
       return;
     } catch (error) {
       this.$rootScope.reportBusy = false;
       this.$rootScope.reportStatus = false;
-      ErrorHandler.handle(error.message || error);
       this.$rootScope.$applyAsync();
+      throw error;
     }
   }
 }

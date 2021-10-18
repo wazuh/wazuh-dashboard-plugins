@@ -1,0 +1,829 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Table With Search Bar component renders correctly to match the snapshot 1`] = `
+<TableWithSearchBar
+  onSearch={[Function]}
+  reload={[Function]}
+  rowProps={[Function]}
+  searchBarSuggestions={Array []}
+  tableColumns={
+    Array [
+      Object {
+        "field": "version",
+        "name": "Version",
+        "sortable": true,
+        "truncateText": true,
+      },
+      Object {
+        "field": "architecture",
+        "name": "Architecture",
+        "sortable": true,
+      },
+      Object {
+        "field": "cve",
+        "name": "CVE",
+        "sortable": true,
+        "truncateText": true,
+      },
+      Object {
+        "field": "name",
+        "name": "Name",
+        "sortable": true,
+      },
+    ]
+  }
+  tableInitialSortingDirection="asc"
+  tableInitialSortingField=""
+  tablePageSizeOptions={
+    Array [
+      15,
+      25,
+      50,
+      100,
+    ]
+  }
+  tableProps={Object {}}
+>
+  <WzSearchBar
+    filters={Array []}
+    noDeleteFiltersOnUpdateSuggests={true}
+    onFiltersChange={[Function]}
+    placeholder="Filter or search"
+    suggestions={Array []}
+  >
+    <EuiFlexGroup>
+      <div
+        className="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+      >
+        <EuiFlexItem>
+          <div
+            className="euiFlexItem"
+          >
+            <EuiSuggest
+              inputRef={[Function]}
+              isInvalid={false}
+              isPopoverOpen={false}
+              onClosePopover={[Function]}
+              onInputChange={[Function]}
+              onItemClick={[Function]}
+              onKeyPress={[Function]}
+              onPopoverFocus={[Function]}
+              placeholder="Filter or search"
+              prepend={
+                <WzSearchBadges
+                  filters={Array []}
+                  onFiltersChange={[Function]}
+                />
+              }
+              status="unchanged"
+              suggestions={Array []}
+              value=""
+            >
+              <div
+                onChange={[Function]}
+              >
+                <EuiSuggestInput
+                  inputRef={[Function]}
+                  isInvalid={false}
+                  isPopoverOpen={false}
+                  onClosePopover={[Function]}
+                  onKeyPress={[Function]}
+                  onPopoverFocus={[Function]}
+                  placeholder="Filter or search"
+                  prepend={
+                    <WzSearchBadges
+                      filters={Array []}
+                      onFiltersChange={[Function]}
+                    />
+                  }
+                  sendValue={[Function]}
+                  status="unchanged"
+                  suggestions={Array []}
+                  value=""
+                >
+                  <div
+                    className="euiSuggestInput"
+                  >
+                    <EuiInputPopover
+                      anchorPosition="downLeft"
+                      attachToAnchor={true}
+                      closePopover={[Function]}
+                      display="block"
+                      fullWidth={true}
+                      id="popover"
+                      input={
+                        <EuiFieldText
+                          append={Array []}
+                          fullWidth={true}
+                          inputRef={[Function]}
+                          isInvalid={false}
+                          isLoading={false}
+                          onChange={[Function]}
+                          onFocus={[Function]}
+                          onKeyPress={[Function]}
+                          placeholder="Filter or search"
+                          prepend={
+                            <WzSearchBadges
+                              filters={Array []}
+                              onFiltersChange={[Function]}
+                            />
+                          }
+                          value=""
+                        />
+                      }
+                      isOpen={false}
+                      panelPaddingSize="none"
+                    >
+                      <EuiPopover
+                        anchorPosition="downLeft"
+                        attachToAnchor={true}
+                        button={
+                          <EuiResizeObserver
+                            onResize={[Function]}
+                          >
+                            [Function]
+                          </EuiResizeObserver>
+                        }
+                        buttonRef={[Function]}
+                        className="euiInputPopover euiInputPopover--fullWidth"
+                        closePopover={[Function]}
+                        display="block"
+                        hasArrow={true}
+                        id="popover"
+                        isOpen={false}
+                        ownFocus={false}
+                        panelPaddingSize="none"
+                        panelRef={[Function]}
+                      >
+                        <EuiOutsideClickDetector
+                          isDisabled={true}
+                          onOutsideClick={[Function]}
+                        >
+                          <div
+                            className="euiPopover euiPopover--anchorDownLeft euiPopover--displayBlock euiInputPopover euiInputPopover--fullWidth"
+                            id="popover"
+                            onKeyDown={[Function]}
+                            onMouseDown={[Function]}
+                            onMouseUp={[Function]}
+                            onTouchEnd={[Function]}
+                            onTouchStart={[Function]}
+                          >
+                            <div
+                              className="euiPopover__anchor"
+                            >
+                              <EuiResizeObserver
+                                onResize={[Function]}
+                              >
+                                <div>
+                                  <EuiFieldText
+                                    append={Array []}
+                                    fullWidth={true}
+                                    inputRef={[Function]}
+                                    isInvalid={false}
+                                    isLoading={false}
+                                    onChange={[Function]}
+                                    onFocus={[Function]}
+                                    onKeyPress={[Function]}
+                                    placeholder="Filter or search"
+                                    prepend={
+                                      <WzSearchBadges
+                                        filters={Array []}
+                                        onFiltersChange={[Function]}
+                                      />
+                                    }
+                                    value=""
+                                  >
+                                    <EuiFormControlLayout
+                                      append={Array []}
+                                      fullWidth={true}
+                                      isLoading={false}
+                                      prepend={
+                                        <WzSearchBadges
+                                          filters={Array []}
+                                          onFiltersChange={[Function]}
+                                        />
+                                      }
+                                    >
+                                      <div
+                                        className="euiFormControlLayout euiFormControlLayout--fullWidth euiFormControlLayout--group"
+                                      >
+                                        <WzSearchBadges
+                                          className="euiFormControlLayout__prepend"
+                                          filters={Array []}
+                                          key="0/.0"
+                                          onFiltersChange={[Function]}
+                                        >
+                                          <div
+                                            style={
+                                              Object {
+                                                "display": "flex",
+                                              }
+                                            }
+                                          />
+                                        </WzSearchBadges>
+                                        <div
+                                          className="euiFormControlLayout__childrenWrapper"
+                                        >
+                                          <EuiValidatableControl
+                                            isInvalid={false}
+                                          >
+                                            <input
+                                              className="euiFieldText euiFieldText--fullWidth euiFieldText--inGroup"
+                                              onChange={[Function]}
+                                              onFocus={[Function]}
+                                              onKeyPress={[Function]}
+                                              placeholder="Filter or search"
+                                              type="text"
+                                              value=""
+                                            />
+                                          </EuiValidatableControl>
+                                          <EuiFormControlLayoutIcons
+                                            isLoading={false}
+                                          />
+                                        </div>
+                                      </div>
+                                    </EuiFormControlLayout>
+                                  </EuiFieldText>
+                                </div>
+                              </EuiResizeObserver>
+                            </div>
+                          </div>
+                        </EuiOutsideClickDetector>
+                      </EuiPopover>
+                    </EuiInputPopover>
+                  </div>
+                </EuiSuggestInput>
+              </div>
+            </EuiSuggest>
+          </div>
+        </EuiFlexItem>
+      </div>
+    </EuiFlexGroup>
+  </WzSearchBar>
+  <EuiSpacer
+    size="s"
+  >
+    <div
+      className="euiSpacer euiSpacer--s"
+    />
+  </EuiSpacer>
+  <EuiBasicTable
+    columns={
+      Array [
+        Object {
+          "field": "version",
+          "name": "Version",
+          "sortable": true,
+          "truncateText": true,
+        },
+        Object {
+          "field": "architecture",
+          "name": "Architecture",
+          "sortable": true,
+        },
+        Object {
+          "field": "cve",
+          "name": "CVE",
+          "sortable": true,
+          "truncateText": true,
+        },
+        Object {
+          "field": "name",
+          "name": "Name",
+          "sortable": true,
+        },
+      ]
+    }
+    items={Array []}
+    loading={true}
+    noItemsMessage="No items found"
+    onChange={[Function]}
+    pagination={
+      Object {
+        "pageIndex": 0,
+        "pageSize": 15,
+        "pageSizeOptions": Array [
+          15,
+          25,
+          50,
+          100,
+        ],
+        "totalItemCount": 0,
+      }
+    }
+    responsive={true}
+    rowProps={[Function]}
+    sorting={
+      Object {
+        "sort": Object {
+          "direction": "asc",
+          "field": "",
+        },
+      }
+    }
+    tableLayout="fixed"
+  >
+    <div
+      className="euiBasicTable euiBasicTable-loading"
+    >
+      <div>
+        <EuiTableHeaderMobile>
+          <div
+            className="euiTableHeaderMobile"
+          >
+            <EuiFlexGroup
+              alignItems="baseline"
+              justifyContent="spaceBetween"
+              responsive={false}
+            >
+              <div
+                className="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsBaseline euiFlexGroup--justifyContentSpaceBetween euiFlexGroup--directionRow"
+              >
+                <EuiFlexItem
+                  grow={false}
+                >
+                  <div
+                    className="euiFlexItem euiFlexItem--flexGrowZero"
+                  />
+                </EuiFlexItem>
+                <EuiFlexItem
+                  grow={false}
+                >
+                  <div
+                    className="euiFlexItem euiFlexItem--flexGrowZero"
+                  >
+                    <EuiTableSortMobile
+                      items={
+                        Array [
+                          Object {
+                            "isSortAscending": undefined,
+                            "isSorted": false,
+                            "key": "_data_s_version_0",
+                            "name": "Version",
+                            "onSort": [Function],
+                          },
+                          Object {
+                            "isSortAscending": undefined,
+                            "isSorted": false,
+                            "key": "_data_s_architecture_1",
+                            "name": "Architecture",
+                            "onSort": [Function],
+                          },
+                          Object {
+                            "isSortAscending": undefined,
+                            "isSorted": false,
+                            "key": "_data_s_cve_2",
+                            "name": "CVE",
+                            "onSort": [Function],
+                          },
+                          Object {
+                            "isSortAscending": undefined,
+                            "isSorted": false,
+                            "key": "_data_s_name_3",
+                            "name": "Name",
+                            "onSort": [Function],
+                          },
+                        ]
+                      }
+                    >
+                      <div
+                        className="euiTableSortMobile"
+                      >
+                        <EuiPopover
+                          anchorPosition="downRight"
+                          button={
+                            <EuiButtonEmpty
+                              flush="right"
+                              iconSide="right"
+                              iconType="arrowDown"
+                              onClick={[Function]}
+                              size="xs"
+                            >
+                              <EuiI18n
+                                default="Sorting"
+                                token="euiTableSortMobile.sorting"
+                              />
+                            </EuiButtonEmpty>
+                          }
+                          closePopover={[Function]}
+                          display="inlineBlock"
+                          hasArrow={true}
+                          isOpen={false}
+                          ownFocus={true}
+                          panelPaddingSize="none"
+                        >
+                          <EuiOutsideClickDetector
+                            isDisabled={true}
+                            onOutsideClick={[Function]}
+                          >
+                            <div
+                              className="euiPopover euiPopover--anchorDownRight"
+                              onKeyDown={[Function]}
+                              onMouseDown={[Function]}
+                              onMouseUp={[Function]}
+                              onTouchEnd={[Function]}
+                              onTouchStart={[Function]}
+                            >
+                              <div
+                                className="euiPopover__anchor"
+                              >
+                                <EuiButtonEmpty
+                                  flush="right"
+                                  iconSide="right"
+                                  iconType="arrowDown"
+                                  onClick={[Function]}
+                                  size="xs"
+                                >
+                                  <button
+                                    className="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--xSmall euiButtonEmpty--flushRight"
+                                    disabled={false}
+                                    onClick={[Function]}
+                                    type="button"
+                                  >
+                                    <EuiButtonContent
+                                      className="euiButtonEmpty__content"
+                                      iconSide="right"
+                                      iconType="arrowDown"
+                                      textProps={
+                                        Object {
+                                          "className": "euiButtonEmpty__text",
+                                        }
+                                      }
+                                    >
+                                      <span
+                                        className="euiButtonContent euiButtonContent--iconRight euiButtonEmpty__content"
+                                      >
+                                        <EuiIcon
+                                          className="euiButtonContent__icon"
+                                          size="m"
+                                          type="arrowDown"
+                                        >
+                                          <EuiIconEmpty
+                                            aria-hidden={true}
+                                            className="euiIcon euiIcon--medium euiIcon-isLoading euiButtonContent__icon"
+                                            focusable="false"
+                                            role="img"
+                                            style={null}
+                                          >
+                                            <svg
+                                              aria-hidden={true}
+                                              className="euiIcon euiIcon--medium euiIcon-isLoading euiButtonContent__icon"
+                                              focusable="false"
+                                              height={16}
+                                              role="img"
+                                              style={null}
+                                              viewBox="0 0 16 16"
+                                              width={16}
+                                              xmlns="http://www.w3.org/2000/svg"
+                                            />
+                                          </EuiIconEmpty>
+                                        </EuiIcon>
+                                        <span
+                                          className="euiButtonEmpty__text"
+                                        >
+                                          <EuiI18n
+                                            default="Sorting"
+                                            token="euiTableSortMobile.sorting"
+                                          >
+                                            Sorting
+                                          </EuiI18n>
+                                        </span>
+                                      </span>
+                                    </EuiButtonContent>
+                                  </button>
+                                </EuiButtonEmpty>
+                              </div>
+                            </div>
+                          </EuiOutsideClickDetector>
+                        </EuiPopover>
+                      </div>
+                    </EuiTableSortMobile>
+                  </div>
+                </EuiFlexItem>
+              </div>
+            </EuiFlexGroup>
+          </div>
+        </EuiTableHeaderMobile>
+        <EuiTable
+          id="htmlId"
+          responsive={true}
+          tableLayout="fixed"
+        >
+          <table
+            className="euiTable euiTable--responsive"
+            id="htmlId"
+            tabIndex={-1}
+          >
+            <EuiScreenReaderOnly>
+              <caption
+                className="euiScreenReaderOnly euiTableCaption"
+              >
+                <EuiDelayRender
+                  delay={500}
+                />
+              </caption>
+            </EuiScreenReaderOnly>
+            <EuiTableHeader>
+              <thead>
+                <tr>
+                  <EuiTableHeaderCell
+                    align="left"
+                    data-test-subj="tableHeaderCell_version_0"
+                    isSorted={false}
+                    key="_data_h_version_0"
+                    onSort={[Function]}
+                  >
+                    <th
+                      aria-live="polite"
+                      aria-sort="none"
+                      className="euiTableHeaderCell"
+                      data-test-subj="tableHeaderCell_version_0"
+                      role="columnheader"
+                      scope="col"
+                      style={
+                        Object {
+                          "width": undefined,
+                        }
+                      }
+                    >
+                      <button
+                        className="euiTableHeaderButton"
+                        data-test-subj="tableHeaderSortButton"
+                        onClick={[Function]}
+                        type="button"
+                      >
+                        <span
+                          className="euiTableCellContent"
+                        >
+                          <EuiInnerText>
+                            <EuiI18n
+                              default="{innerText}; Sorted in {ariaSortValue} order"
+                              token="euiTableHeaderCell.titleTextWithSort"
+                              values={
+                                Object {
+                                  "ariaSortValue": "none",
+                                  "innerText": "Version",
+                                }
+                              }
+                            >
+                              <span
+                                className="euiTableCellContent__text"
+                                title="Version"
+                              >
+                                Version
+                              </span>
+                            </EuiI18n>
+                          </EuiInnerText>
+                          <EuiScreenReaderOnly>
+                            <span
+                              className="euiScreenReaderOnly"
+                            >
+                              <EuiI18n
+                                default="Click to sort in ascending order"
+                                token="euiTableHeaderCell.clickForAscending"
+                              >
+                                Click to sort in ascending order
+                              </EuiI18n>
+                            </span>
+                          </EuiScreenReaderOnly>
+                        </span>
+                      </button>
+                    </th>
+                  </EuiTableHeaderCell>
+                  <EuiTableHeaderCell
+                    align="left"
+                    data-test-subj="tableHeaderCell_architecture_1"
+                    isSorted={false}
+                    key="_data_h_architecture_1"
+                    onSort={[Function]}
+                  >
+                    <th
+                      aria-live="polite"
+                      aria-sort="none"
+                      className="euiTableHeaderCell"
+                      data-test-subj="tableHeaderCell_architecture_1"
+                      role="columnheader"
+                      scope="col"
+                      style={
+                        Object {
+                          "width": undefined,
+                        }
+                      }
+                    >
+                      <button
+                        className="euiTableHeaderButton"
+                        data-test-subj="tableHeaderSortButton"
+                        onClick={[Function]}
+                        type="button"
+                      >
+                        <span
+                          className="euiTableCellContent"
+                        >
+                          <EuiInnerText>
+                            <EuiI18n
+                              default="{innerText}; Sorted in {ariaSortValue} order"
+                              token="euiTableHeaderCell.titleTextWithSort"
+                              values={
+                                Object {
+                                  "ariaSortValue": "none",
+                                  "innerText": "Architecture",
+                                }
+                              }
+                            >
+                              <span
+                                className="euiTableCellContent__text"
+                                title="Architecture"
+                              >
+                                Architecture
+                              </span>
+                            </EuiI18n>
+                          </EuiInnerText>
+                          <EuiScreenReaderOnly>
+                            <span
+                              className="euiScreenReaderOnly"
+                            >
+                              <EuiI18n
+                                default="Click to sort in ascending order"
+                                token="euiTableHeaderCell.clickForAscending"
+                              >
+                                Click to sort in ascending order
+                              </EuiI18n>
+                            </span>
+                          </EuiScreenReaderOnly>
+                        </span>
+                      </button>
+                    </th>
+                  </EuiTableHeaderCell>
+                  <EuiTableHeaderCell
+                    align="left"
+                    data-test-subj="tableHeaderCell_cve_2"
+                    isSorted={false}
+                    key="_data_h_cve_2"
+                    onSort={[Function]}
+                  >
+                    <th
+                      aria-live="polite"
+                      aria-sort="none"
+                      className="euiTableHeaderCell"
+                      data-test-subj="tableHeaderCell_cve_2"
+                      role="columnheader"
+                      scope="col"
+                      style={
+                        Object {
+                          "width": undefined,
+                        }
+                      }
+                    >
+                      <button
+                        className="euiTableHeaderButton"
+                        data-test-subj="tableHeaderSortButton"
+                        onClick={[Function]}
+                        type="button"
+                      >
+                        <span
+                          className="euiTableCellContent"
+                        >
+                          <EuiInnerText>
+                            <EuiI18n
+                              default="{innerText}; Sorted in {ariaSortValue} order"
+                              token="euiTableHeaderCell.titleTextWithSort"
+                              values={
+                                Object {
+                                  "ariaSortValue": "none",
+                                  "innerText": "CVE",
+                                }
+                              }
+                            >
+                              <span
+                                className="euiTableCellContent__text"
+                                title="CVE"
+                              >
+                                CVE
+                              </span>
+                            </EuiI18n>
+                          </EuiInnerText>
+                          <EuiScreenReaderOnly>
+                            <span
+                              className="euiScreenReaderOnly"
+                            >
+                              <EuiI18n
+                                default="Click to sort in ascending order"
+                                token="euiTableHeaderCell.clickForAscending"
+                              >
+                                Click to sort in ascending order
+                              </EuiI18n>
+                            </span>
+                          </EuiScreenReaderOnly>
+                        </span>
+                      </button>
+                    </th>
+                  </EuiTableHeaderCell>
+                  <EuiTableHeaderCell
+                    align="left"
+                    data-test-subj="tableHeaderCell_name_3"
+                    isSorted={false}
+                    key="_data_h_name_3"
+                    onSort={[Function]}
+                  >
+                    <th
+                      aria-live="polite"
+                      aria-sort="none"
+                      className="euiTableHeaderCell"
+                      data-test-subj="tableHeaderCell_name_3"
+                      role="columnheader"
+                      scope="col"
+                      style={
+                        Object {
+                          "width": undefined,
+                        }
+                      }
+                    >
+                      <button
+                        className="euiTableHeaderButton"
+                        data-test-subj="tableHeaderSortButton"
+                        onClick={[Function]}
+                        type="button"
+                      >
+                        <span
+                          className="euiTableCellContent"
+                        >
+                          <EuiInnerText>
+                            <EuiI18n
+                              default="{innerText}; Sorted in {ariaSortValue} order"
+                              token="euiTableHeaderCell.titleTextWithSort"
+                              values={
+                                Object {
+                                  "ariaSortValue": "none",
+                                  "innerText": "Name",
+                                }
+                              }
+                            >
+                              <span
+                                className="euiTableCellContent__text"
+                                title="Name"
+                              >
+                                Name
+                              </span>
+                            </EuiI18n>
+                          </EuiInnerText>
+                          <EuiScreenReaderOnly>
+                            <span
+                              className="euiScreenReaderOnly"
+                            >
+                              <EuiI18n
+                                default="Click to sort in ascending order"
+                                token="euiTableHeaderCell.clickForAscending"
+                              >
+                                Click to sort in ascending order
+                              </EuiI18n>
+                            </span>
+                          </EuiScreenReaderOnly>
+                        </span>
+                      </button>
+                    </th>
+                  </EuiTableHeaderCell>
+                </tr>
+              </thead>
+            </EuiTableHeader>
+            <EuiTableBody>
+              <tbody>
+                <EuiTableRow>
+                  <tr
+                    className="euiTableRow"
+                  >
+                    <EuiTableRowCell
+                      align="center"
+                      colSpan={4}
+                      isMobileFullWidth={true}
+                    >
+                      <td
+                        className="euiTableRowCell euiTableRowCell--isMobileFullWidth"
+                        colSpan={4}
+                        style={
+                          Object {
+                            "width": undefined,
+                          }
+                        }
+                      >
+                        <div
+                          className="euiTableCellContent euiTableCellContent--alignCenter"
+                        >
+                          <span
+                            className="euiTableCellContent__text"
+                          >
+                            No items found
+                          </span>
+                        </div>
+                      </td>
+                    </EuiTableRowCell>
+                  </tr>
+                </EuiTableRow>
+              </tbody>
+            </EuiTableBody>
+          </table>
+        </EuiTable>
+      </div>
+    </div>
+  </EuiBasicTable>
+</TableWithSearchBar>
+`;

@@ -25,14 +25,16 @@ import { KbnSearchBar } from '../../kbn-search-bar';
 import { TimeRange, Query } from '../../../../../../src/plugins/data/common';
 import { ModulesHelper } from '../../common/modules/modules-helper';
 import { getDataPlugin, getToasts } from '../../../kibana-services';
-import { WzEmptyPromptNoPermissions } from "../../common/permissions/prompt";
+import { withErrorBoundary } from "../../common/hocs";
+import { UI_LOGGER_LEVELS } from '../../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../../react-services/common-services';
 
 export interface ITactic {
   [key:string]: string[]
 }
 
-
-export class Mitre extends Component {
+export const Mitre = withErrorBoundary (class Mitre extends Component {
   _isMount = false;
   timefilter: {
     getTime(): TimeRange
@@ -116,31 +118,28 @@ export class Mitre extends Component {
 
   async buildTacticsObject() {
     try {
-      const data = await WzRequest.apiReq('GET', '/mitre', {
-        params: {
-          select: "phase_name"
-        }
-      });
+      const data = await WzRequest.apiReq('GET', '/mitre/tactics', {});
       const result = (((data || {}).data || {}).data || {}).affected_items;
       const tacticsObject = {};
       result && result.forEach(item => {
-          const {id, phase_name} = item;
-          phase_name.forEach( (tactic) => {
-            if(!tacticsObject[tactic]){
-              tacticsObject[tactic] = [];
-            }
-            tacticsObject[tactic].push(id);
-          })
-        });
+        tacticsObject[item.name] = item;
+      });
       this._isMount && this.setState({tacticsObject, isLoading: false});
-    } catch(err) {
+    } catch(error) {
       this.setState({ isLoading: false });
-      this.showToast(
-        'danger',
-        'Error',
-        `Mitre data could not be fetched: ${err}`,
-        3000
-      );
+      const options = {
+        context: `${Mitre.name}.buildTacticsObject`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        store: true,
+        display: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `Mitre data could not be fetched`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   }
 
@@ -190,5 +189,5 @@ export class Mitre extends Component {
       </div>
     );
   }
-}
+})
 

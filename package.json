@@ -1,8 +1,8 @@
 {
   "name": "wazuh",
-  "version": "4.2.2",
-  "revision": "4203-1",
-  "code": "4203-1",
+  "version": "4.3.0",
+  "revision": "4301-0",
+  "code": "4301-0",
   "kibana": {
     "version": "7.10.2"
   },
@@ -48,6 +48,7 @@
     "js2xmlparser": "^3.0.0",
     "json2csv": "^4.1.2",
     "jwt-decode": "^2.2.0",
+    "loglevel": "^1.7.1",
     "needle": "^2.0.1",
     "node-cron": "^1.1.2",
     "pdfmake": "0.1.65",
@@ -60,6 +61,7 @@
     "winston": "3.0.0"
   },
   "devDependencies": {
+    "redux-mock-store": "^1.5.4",
     "@types/node-cron": "^2.0.3",
     "eslint-plugin-async-await": "^0.0.0",
     "tslint": "^5.11.0",

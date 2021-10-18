@@ -19,10 +19,18 @@ import { API_USER_STATUS_RUN_AS } from '../../../server/lib/cache-api-user-has-r
 import { AppState } from '../../react-services/app-state';
 import { ErrorHandler } from '../../react-services/error-handler';
 import { RolesMapping } from './roles-mapping/roles-mapping';
-import { withReduxProvider, withGlobalBreadcrumb, withUserAuthorizationPrompt } from '../common/hocs';
+import {
+  withReduxProvider,
+  withGlobalBreadcrumb,
+  withUserAuthorizationPrompt,
+  withErrorBoundary,
+} from '../common/hocs';
 import { compose } from 'redux';
 import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../common/constants';
 import { updateSecuritySection } from '../../redux/actions/securityActions';
+import { UI_LOGGER_LEVELS } from '../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../react-services/common-services';
 
 const tabs = [
   {
@@ -48,6 +56,7 @@ const tabs = [
 ];
 
 export const WzSecurity = compose(
+  withErrorBoundary,
   withReduxProvider,
   withGlobalBreadcrumb([{ text: '' }, { text: 'Security' }]),
   withUserAuthorizationPrompt(null, [WAZUH_ROLE_ADMINISTRATOR_NAME])
@@ -55,49 +64,60 @@ export const WzSecurity = compose(
   const dispatch = useDispatch();
 
   // Get the initial tab when the component is initiated
-  const securityTabRegExp = new RegExp(`tab=(${tabs.map(tab => tab.id).join('|')})`);
+  const securityTabRegExp = new RegExp(`tab=(${tabs.map((tab) => tab.id).join('|')})`);
   const tab = window.location.href.match(securityTabRegExp);
 
-  const [selectedTabId, setSelectedTabId] = useState(tab && tab[1] || 'users');
-
+  const [selectedTabId, setSelectedTabId] = useState((tab && tab[1]) || 'users');
 
   const listenerLocationChanged = () => {
     const tab = window.location.href.match(securityTabRegExp);
-    setSelectedTabId(tab && tab[1] || 'users')
-  }
+    setSelectedTabId((tab && tab[1]) || 'users');
+  };
 
   const checkRunAsUser = async () => {
     const currentApi = AppState.getCurrentAPI();
     try {
-      const ApiCheck = await GenericRequest.request('POST',
-        '/api/check-api',
-        currentApi
-      );
+      const ApiCheck = await GenericRequest.request('POST', '/api/check-api', currentApi);
       return ApiCheck.data.allow_run_as;
-
     } catch (error) {
-      ErrorHandler.handle(error, 'Error checking the current API');
+      throw new Error(error);
     }
-  }
+  };
 
   const [allowRunAs, setAllowRunAs] = useState();
   useEffect(() => {
-    checkRunAsUser()
-      .then(result => setAllowRunAs(result))
-      .catch(error => console.log(error, 'Error checking if run_as user is enabled'))
-  }, [])
+    try {
+      const fetchAllowRunAs = async () => {
+        setAllowRunAs(await checkRunAsUser());
+      };
+      fetchAllowRunAs();
+    } catch (error) {
+      const options = {
+        context: `${WzSecurity.name}.fetchAllowRunAs`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        store: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+    }
+  }, []);
 
   // This allows to redirect to a Security tab if you click a Security link in menu when you're already in a Security section
   useEffect(() => {
-    window.addEventListener('popstate', listenerLocationChanged)
+    window.addEventListener('popstate', listenerLocationChanged);
     return () => window.removeEventListener('popstate', listenerLocationChanged);
   });
 
   useEffect(() => {
     dispatch(updateSecuritySection(selectedTabId));
-  })
+  });
 
-  const onSelectedTabChanged = id => {
+  const onSelectedTabChanged = (id) => {
     window.location.href = window.location.href.replace(`tab=${selectedTabId}`, `tab=${id}`);
     setSelectedTabId(id);
   };
@@ -109,12 +129,12 @@ export const WzSecurity = compose(
         onClick={() => onSelectedTabChanged(tab.id)}
         isSelected={tab.id === selectedTabId}
         disabled={tab.disabled}
-        key={index}>
+        key={index}
+      >
         {tab.name}
       </EuiTab>
     ));
   };
-
 
   const isNotRunAs = (allowRunAs) => {
     let runAsWarningTxt = '';
@@ -136,40 +156,34 @@ export const WzSecurity = compose(
           'The role mapping has no effect because the current Wazuh API user has run_as disabled.';
         break;
     }
-      
+
     return (
-      <EuiFlexGroup >
-        <EuiFlexItem >
-          <EuiCallOut title={runAsWarningTxt} color="warning" iconType="alert">
-          </EuiCallOut>
+      <EuiFlexGroup>
+        <EuiFlexItem>
+          <EuiCallOut title={runAsWarningTxt} color="warning" iconType="alert"></EuiCallOut>
           <EuiSpacer></EuiSpacer>
-        </EuiFlexItem >
+        </EuiFlexItem>
       </EuiFlexGroup>
     );
-  }
-
+  };
 
   return (
     <EuiPage>
       <EuiFlexGroup>
         <EuiFlexItem>
           <EuiTabs>{renderTabs()}</EuiTabs>
-          <EuiSpacer size='m'></EuiSpacer>
-          {selectedTabId === 'users' &&
-            <Users></Users>
-          }
-          {selectedTabId === 'roles' &&
-            <Roles></Roles>
-          }
-          {selectedTabId === 'policies' &&
-            <Policies></Policies>
-          }
-          {selectedTabId === 'roleMapping' &&
+          <EuiSpacer size="m"></EuiSpacer>
+          {selectedTabId === 'users' && <Users></Users>}
+          {selectedTabId === 'roles' && <Roles></Roles>}
+          {selectedTabId === 'policies' && <Policies></Policies>}
+          {selectedTabId === 'roleMapping' && (
             <>
-              {(allowRunAs !== undefined && allowRunAs !== API_USER_STATUS_RUN_AS.ENABLED) && isNotRunAs(allowRunAs)}
+              {allowRunAs !== undefined &&
+                allowRunAs !== API_USER_STATUS_RUN_AS.ENABLED &&
+                isNotRunAs(allowRunAs)}
               <RolesMapping></RolesMapping>
             </>
-          }
+          )}
         </EuiFlexItem>
       </EuiFlexGroup>
     </EuiPage>

@@ -21,6 +21,14 @@ import {
 } from '@elastic/eui';
 import { Details } from './detail';
 import { AppState } from '../../../../react-services/app-state';
+import {
+  UI_ERROR_SEVERITIES,
+  UIErrorLog,
+  UIErrorSeverity,
+  UILogLevel,
+} from '../../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
+import { getErrorOrchestrator } from '../../../../react-services/common-services';
 
 export class FlyoutDetail extends Component {
   state: {
@@ -60,10 +68,23 @@ export class FlyoutDetail extends Component {
         throw false;
       }
       this.setState({ currentItem, isLoading: false });
-    } catch (err) {
+    } catch (error) {
+      const options: UIErrorLog = {
+        context: `${FlyoutDetail.name}.componentDidMount`,
+        level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+        severity: UI_ERROR_SEVERITIES.UI as UIErrorSeverity,
+        error: {
+          error: error,
+          message: `Data could not be fetched for ${this.props.vulName}`,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
       this.setState({
         error: `Data could not be fetched for ${this.props.vulName}`,
       });
+    } finally {
+      this.setState({ isLoading: false });
     }
   }
 
@@ -77,6 +98,7 @@ export class FlyoutDetail extends Component {
       cve: 'data.vulnerability.cve',
       architecture: 'data.vulnerability.package.architecture',
       version: 'data.vulnerability.package.version',
+      type: 'data.vulnerability.type',
     };
     const implicitFilters = [
       { 'rule.groups': 'vulnerability-detector' },

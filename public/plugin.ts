@@ -25,6 +25,8 @@ import {
 } from './types';
 import { Cookies } from 'react-cookie';
 import { AppState } from './react-services/app-state';
+import { setErrorOrchestrator } from './react-services/common-services';
+import { ErrorOrchestratorService } from './react-services/error-orchestrator/error-orchestrator.service';
 
 const innerAngularName = 'app/wazuh';
 
@@ -48,6 +50,7 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
         const { renderApp } = await import('./application');
         // Get start services as specified in kibana.json
         const [coreStart, depsStart] = await core.getStartServices();
+        setErrorOrchestrator(ErrorOrchestratorService);
         setHttp(core.http);
         setCookies(new Cookies());
         if(!AppState.checkCookies() || params.history.parentHistory.action === 'PUSH') {
@@ -85,7 +88,7 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
         id: 'wazuh',
         label: 'Wazuh',
         order: 0,
-        euiIconType: core.http.basePath.prepend('/plugins/wazuh/assets/icon_blue.png'),      
+        euiIconType: core.http.basePath.prepend('/plugins/wazuh/assets/icon_blue.png'),
       },
       updater$: this.stateUpdater
     });
@@ -130,6 +133,7 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
     setVisualizationsPlugin(plugins.visualizations);
     setSavedObjects(core.savedObjects);
     setOverlays(core.overlays);
+    setErrorOrchestrator(ErrorOrchestratorService);
     return {};
   }
 }

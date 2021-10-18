@@ -14,7 +14,5 @@ import React from 'react';
 import { PromptSelectAgent } from './';
 
 export const PromptNoSelectedAgent = ({ body }) => {
-  return (
-    <PromptSelectAgent body={body} title="No agent is selected" />
-  )
-}
+  return <PromptSelectAgent body={body} title="No agent is selected" />;
+};

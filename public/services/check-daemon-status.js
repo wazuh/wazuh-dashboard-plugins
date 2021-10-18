@@ -46,6 +46,7 @@ export class CheckDaemonsStatus {
 
       this.$rootScope.wazuhNotReadyYet = 'Wazuh could not be recovered.';
       this.$rootScope.$applyAsync();
+      throw error;
     }
 
     this.busy = false;

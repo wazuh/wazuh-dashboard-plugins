@@ -33,7 +33,7 @@ import {
   checkSetupService,
 } from '../services';
 import { CheckResult } from '../components/check-result';
-import { withReduxProvider } from '../../common/hocs';
+import { withErrorBoundary, withReduxProvider } from '../../common/hocs';
 import { getHttp } from '../../../kibana-services';
 import {
   HEALTH_CHECK_REDIRECTION_TIME,
@@ -49,6 +49,7 @@ import {
 
 import { getDataPlugin } from '../../../kibana-services';
 import { CheckLogger } from '../types/check_logger';
+import { compose } from 'redux';
 
 const checks = {
   api: {    
@@ -252,7 +253,7 @@ function HealthCheckComponent() {
   );
 }
 
-export const HealthCheck = withReduxProvider(HealthCheckComponent);
+export const HealthCheck = compose (withErrorBoundary,withReduxProvider) (HealthCheckComponent);
 
 export const HealthCheckTest = HealthCheckComponent;
 

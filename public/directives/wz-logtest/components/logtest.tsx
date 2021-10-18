@@ -25,13 +25,22 @@ import {
   EuiSpacer,
   EuiTextArea,
   EuiTitle,
+  EuiOutsideClickDetector,
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services';
-import { withReduxProvider, withUserAuthorizationPrompt } from '../../../components/common/hocs';
+import { withErrorBoundary, withReduxProvider, withUserAuthorizationPrompt } from '../../../components/common/hocs';
 import { compose } from 'redux';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { updateLogtestToken } from '../../../redux/actions/appStateActions';
 import { WzButtonPermissionsModalConfirm } from '../../../components/common/buttons';
+import {
+  UI_ERROR_SEVERITIES,
+  UIErrorLog,
+  UIErrorSeverity,
+  UILogLevel,
+} from '../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../../common/constants';
+import { getErrorOrchestrator } from '../../../react-services/common-services';
 
 type LogstestProps = {
   openCloseFlyout: () => {};
@@ -41,6 +50,7 @@ type LogstestProps = {
 };
 
 export const Logtest = compose(
+  withErrorBoundary,
   withReduxProvider,
   withUserAuthorizationPrompt([{ action: 'logtest:run', resource: `*:*:*` }])
 )((props: LogstestProps) => {
@@ -48,7 +58,7 @@ export const Logtest = compose(
   const [testing, setTesting] = useState(false);
   const [testResult, setTestResult] = useState('');
   const dispatch = useDispatch();
-  const sessionToken = useSelector((state)=> state.appStateReducers.logtestToken);
+  const sessionToken = useSelector((state) => state.appStateReducers.logtestToken);
 
   const onChange = (e) => {
     setEvents(e.target.value.split('\n').filter((item) => item));
@@ -99,14 +109,14 @@ export const Logtest = compose(
           log_format: 'syslog',
           location: 'logtest',
           event,
-          ...(token ? { token }: {})
+          ...(token ? { token } : {}),
         });
         token = response.data.data.token;
         !sessionToken && !gotToken && token && dispatch(updateLogtestToken(token));
         token && (gotToken = true);
         responses.push(response);
-      };
-  
+      }
+
       const testResults = responses.map((response) =>
         response.data.data.output.rule || ''
           ? formatResult(response.data.data.output, response.data.data.alert)
@@ -124,16 +134,25 @@ export const Logtest = compose(
     }
   };
 
-  const deleteToken = async() =>{
+  const deleteToken = async () => {
     try {
-      const response = await WzRequest.apiReq('DELETE', `/logtest/sessions/${sessionToken}`, {});
+      await WzRequest.apiReq('DELETE', `/logtest/sessions/${sessionToken}`, {});
       dispatch(updateLogtestToken(''));
       setTestResult('');
+    } catch (error) {
+      const options: UIErrorLog = {
+        context: `${Logtest.name}.deleteToken`,
+        level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+        severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
+        error: {
+          error: error,
+          message: `Error trying to delete logtest token due to: ${error.message || error}`,
+          title: error.name,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
-    catch(error) {
-      this.showToast('danger', 'Error', `Error trying to delete logtest token due to: ${error.message || error}`);
-    }    
-  }
+  };
 
   const buildLogtest = () => {
     return (
@@ -148,39 +167,40 @@ export const Logtest = compose(
         />
         <EuiSpacer size="m" />
         <EuiFlexGroup justifyContent="spaceBetween">
-        <EuiFlexItem grow={false}>
-          <EuiButton
-            style={{ maxWidth: '100px' }}
-            isLoading={testing}
-            isDisabled={testing || events.length === 0}
-            iconType="play"
-            fill
-            onClick={runAllTests}
-          >
-            Test
-          </EuiButton>
-        </EuiFlexItem>
-        <EuiFlexItem grow={false}>
-          <WzButtonPermissionsModalConfirm
-            style={{ maxWidth: '150px' }}
-            tooltip={{position: 'top', content: 'Clear current session'}}
-            fill
-            isDisabled={sessionToken === '' ? true : false}
-            aria-label="Clear current session"
-            iconType="broom"
-            onConfirm={async () => {
-              deleteToken();
-            }}
-            color="danger"
-            modalTitle={`Do you want to clear current session?`}
-            modalProps={{
-              buttonColor: 'danger',
-              children: 'Clearing the session means the logs execution history is removed. This affects to rules that fire an alert when similar logs are executed in a specific range of time.'
-            }}
-          > 
-          Clear session 
-          </WzButtonPermissionsModalConfirm> 
-        </EuiFlexItem> 
+          <EuiFlexItem grow={false}>
+            <EuiButton
+              style={{ maxWidth: '100px' }}
+              isLoading={testing}
+              isDisabled={testing || events.length === 0}
+              iconType="play"
+              fill
+              onClick={runAllTests}
+            >
+              Test
+            </EuiButton>
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <WzButtonPermissionsModalConfirm
+              style={{ maxWidth: '150px' }}
+              tooltip={{ position: 'top', content: 'Clear current session' }}
+              fill
+              isDisabled={sessionToken === '' ? true : false}
+              aria-label="Clear current session"
+              iconType="broom"
+              onConfirm={async () => {
+                deleteToken();
+              }}
+              color="danger"
+              modalTitle={`Do you want to clear current session?`}
+              modalProps={{
+                buttonColor: 'danger',
+                children:
+                  'Clearing the session means the logs execution history is removed. This affects to rules that fire an alert when similar logs are executed in a specific range of time.',
+              }}
+            >
+              Clear session
+            </WzButtonPermissionsModalConfirm>
+          </EuiFlexItem>
         </EuiFlexGroup>
         <EuiSpacer size="m" />
         <EuiCodeBlock
@@ -228,26 +248,25 @@ export const Logtest = compose(
           </EuiPanel>
         </EuiPage>
       )) || (
-        <EuiOverlayMask
-          headerZindexLocation="below"
-          onClick={() => {
+        <EuiOverlayMask headerZindexLocation="below">
+          <EuiOutsideClickDetector onOutsideClick={() => {
             props.openCloseFlyout();
-          }}
-        >
-          <EuiFlyout className="wzApp" onClose={() => props.openCloseFlyout()}>
-            <EuiFlyoutHeader hasBorder={false}>
-              <EuiTitle size="m">
-                {props.isRuleset.includes('rules') ? <h2>Ruleset Test</h2> : <h2>Decoders Test</h2>}
-              </EuiTitle>
-            </EuiFlyoutHeader>
-            <EuiFlyoutBody style={{ margin: '20px' }}>
-              <EuiFlexGroup gutterSize="m">
-                <EuiFlexItem />
-              </EuiFlexGroup>
-              <EuiSpacer size="s" />
-              {buildLogtest()}
-            </EuiFlyoutBody>
-          </EuiFlyout>
+          }}>
+            <EuiFlyout className="wzApp" onClose={() => props.openCloseFlyout()}>
+              <EuiFlyoutHeader hasBorder={false}>
+                <EuiTitle size="m">
+                  {props.isRuleset.includes('rules') ? <h2>Ruleset Test</h2> : <h2>Decoders Test</h2>}
+                </EuiTitle>
+              </EuiFlyoutHeader>
+              <EuiFlyoutBody style={{ margin: '20px' }}>
+                <EuiFlexGroup gutterSize="m">
+                  <EuiFlexItem />
+                </EuiFlexGroup>
+                <EuiSpacer size="s" />
+                {buildLogtest()}
+              </EuiFlyoutBody>
+            </EuiFlyout>
+          </EuiOutsideClickDetector>
         </EuiOverlayMask>
       )}
     </Fragment>

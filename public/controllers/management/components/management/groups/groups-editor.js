@@ -27,12 +27,13 @@ import {
   EuiCodeEditor,
   EuiConfirmModal,
   EuiPanel,
-  EuiCodeBlock
+  EuiCodeBlock,
+  EuiOverlayMask
 } from '@elastic/eui';
 
 import GroupsHandler from './utils/groups-handler';
 
-import { getToasts }  from '../../../../../kibana-services';
+import { getToasts } from '../../../../../kibana-services';
 import { validateXML } from '../configuration/utils/xml';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 import { WzOverlayMask } from '../../../../../components/common/util';
@@ -40,7 +41,11 @@ import 'brace/theme/textmate';
 import 'brace/mode/xml';
 import 'brace/snippets/xml';
 import 'brace/ext/language_tools';
-import "brace/ext/searchbox";
+import 'brace/ext/searchbox';
+import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../../../../react-services/common-services';
+
 
 class WzGroupsEditor extends Component {
   _isMounted = false;
@@ -110,19 +115,28 @@ class WzGroupsEditor extends Component {
       try {
         await validateConfigAfterSent();
       } catch (error) {
-        const warning = Object.assign(error, {
-          savedMessage: `File ${name} saved, but there were found several error while validating the configuration.`,
-        });
         this.setState({ isSaving: false });
-        this.showToast('warning', warning.savedMessage, error, 3000);
-        return;
+        throw new Error(
+          (error.title = `File ${name} saved, but there were found several error while validating the configuration.`)
+        );
       }
       this.setState({ isSaving: false });
       const textSuccess = 'File successfully edited';
       this.showToast('success', 'Success', textSuccess, 3000);
     } catch (error) {
+      const options = {
+        context: `${WzGroupsEditor.name}.save`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.CRITICAL,
+        store: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.title || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
       this.setState({ error, isSaving: false });
-      this.showToast('danger', 'Error', 'Error saving group configuration: ' + error, 3000);
     }
   }
 
@@ -161,7 +175,7 @@ class WzGroupsEditor extends Component {
     let modal;
     if (this.state.isModalVisible) {
       modal = (
-        <WzOverlayMask>
+        <EuiOverlayMask>
           <EuiConfirmModal
             title="Unsubmitted changes"
             onConfirm={() => {
@@ -176,7 +190,7 @@ class WzGroupsEditor extends Component {
               There are unsaved changes. Are you sure you want to proceed?
             </p>
           </EuiConfirmModal>
-        </WzOverlayMask>
+        </EuiOverlayMask>
       );
     }
     return (
@@ -217,7 +231,7 @@ class WzGroupsEditor extends Component {
                 {xmlError && (
                   <Fragment>
                     <span style={{ color: 'red' }}> {xmlError}</span>
-                    <EuiSpacer size='s' />
+                    <EuiSpacer size="s" />
                   </Fragment>
                 )}
                 <EuiFlexGroup>
@@ -228,7 +242,7 @@ class WzGroupsEditor extends Component {
                           <EuiCodeEditor
                             theme="textmate"
                             width="100%"
-                            height={`calc(100vh - ${(xmlError ? 250 : 230)}px)`}
+                            height={`calc(100vh - ${xmlError ? 250 : 230}px)`}
                             value={content}
                             onChange={(newContent) => this.setState({ content: newContent })}
                             mode="xml"
@@ -260,19 +274,16 @@ class WzGroupsEditor extends Component {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
-    state: state.groupsReducers
+    state: state.groupsReducers,
   };
 };
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch) => {
   return {
-    cleanFileContent: () => dispatch(cleanFileContent())
+    cleanFileContent: () => dispatch(cleanFileContent()),
   };
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WzGroupsEditor);
+export default connect(mapStateToProps, mapDispatchToProps)(WzGroupsEditor);
