@@ -59,6 +59,7 @@ export const MultipleAgentSelector = withErrorBoundary(
         },
         availableItem: [],
         selectedElement: [],
+        firstSelectedList: [],
         selectedFilter: '',
         availableFilter: '',
         currentAdding: 0,
@@ -72,23 +73,21 @@ export const MultipleAgentSelector = withErrorBoundary(
 
     async componentDidMount() {
       this.setState({ load: true });
+
       try {
-        try {
-          while (!this.state.selectedAgents.loadedAll) {
-            await this.loadSelectedAgents();
-            this.setState({
-              selectedAgents: {
-                ...this.state.selectedAgents,
-                offset: this.state.selectedAgents.offset + 499,
-              },
-            });
-          }
-        } catch (error) {}
+        while (!this.state.selectedAgents.loadedAll) {
+          await this.loadSelectedAgents();
+          this.setState({
+            selectedAgents: {
+              ...this.state.selectedAgents,
+              offset: this.state.selectedAgents.offset + 499,
+            },
+          });
+        }
         this.firstSelectedList = [...this.state.selectedAgents.data];
         await this.loadAllAgents('', true);
-        this.setState({
-          load: false,
-        });
+
+        this.setState({ load: false });
       } catch (error) {
         const options = {
           context: `${MultipleAgentSelector.name}.componentDidMount`,
@@ -103,6 +102,38 @@ export const MultipleAgentSelector = withErrorBoundary(
         getErrorOrchestrator().handleError(options);
         this.setState({ load: false });
       }
+
+      // try {
+      //   try {
+      //     while (!this.state.selectedAgents.loadedAll) {
+      //       await this.loadSelectedAgents();
+      //       this.setState({
+      //         selectedAgents: {
+      //           ...this.state.selectedAgents,
+      //           offset: this.state.selectedAgents.offset + 499,
+      //         },
+      //       });
+      //     }
+      //   } catch (error) {}
+      //   this.firstSelectedList = [...this.state.selectedAgents.data];
+      //   await this.loadAllAgents('', true);
+      //   this.setState({
+      //     load: false,
+      //   });
+      // } catch (error) {
+      //   const options = {
+      //     context: `${MultipleAgentSelector.name}.componentDidMount`,
+      //     level: UI_LOGGER_LEVELS.ERROR,
+      //     severity: UI_ERROR_SEVERITIES.BUSINESS,
+      //     error: {
+      //       error: error,
+      //       message: error.message || error,
+      //       title: 'Error loading agents',
+      //     },
+      //   };
+      //   getErrorOrchestrator().handleError(options);
+      //   this.setState({ load: false });
+      // }
     }
 
     async loadAllAgents(searchTerm, start) {
@@ -282,28 +313,21 @@ export const MultipleAgentSelector = withErrorBoundary(
       try {
         this.setState({ savingChanges: true, initState: false });
         if (itemsToSave.addedIds.length) {
-          const addResponse = await WzRequest.apiReq('PUT', `/agents/group`, {
+          await WzRequest.apiReq('PUT', `/agents/group`, {
             params: {
               group_id: this.props.currentGroup.name,
               agents_list: itemsToSave.addedIds.toString(),
             },
           });
-
-          if (addResponse.data.data.failed_ids) {
-            failedIds.push(...addResponse.data.data.failed_ids);
-          }
         }
 
         if (itemsToSave.deletedIds.length) {
-          const deleteResponse = await WzRequest.apiReq('DELETE', `/agents/group`, {
+          await WzRequest.apiReq('DELETE', `/agents/group`, {
             params: {
               group_id: this.props.currentGroup.name,
               agents_list: itemsToSave.deletedIds.toString(),
             },
           });
-          if (deleteResponse.data.data.total_failed_items) {
-            failedIds.push(...deleteResponse.data.data.failed_items);
-          }
         }
 
         if (failedIds.length) {
@@ -353,18 +377,6 @@ export const MultipleAgentSelector = withErrorBoundary(
         //relaod agent columns
         this.reload('right');
         this.reload('left');
-
-        try {
-          //delete nodes selected
-          await WzRequest.apiReq('DELETE', `/agents/group`, {
-            params: {
-              group_id: this.props.currentGroup.name,
-              agents_list: itemsToSave.addedIds.toString(),
-            },
-          });
-        } catch (e) {
-          console.error(e);
-        }
 
         const options = {
           context: `${MultipleAgentSelector.name}.saveAddAgents`,
