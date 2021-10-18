@@ -2,6 +2,12 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+### Wazuh 4.2.4 - Kibana 7.10.2, 7.11.2, 7.12.1 - Revision 4205
+
+### Fixed 
+
+- Fixed a bug where the user's auth token was not deprecated on logout [#3638](https://github.com/wazuh/wazuh-kibana-app/pull/3638)
+
 ## Wazuh v4.2.2 - Kibana 7.10.2 , 7.12.1 - Revision 4203
 
 ### Added
@@ -32,7 +38,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
-- Fixed a bug where the user's auth token was not deprecated on logout [#3638](https://github.com/wazuh/wazuh-kibana-app/pull/3638)
 - Fixed screen flickers in Cluster visualization [#3159](https://github.com/wazuh/wazuh-kibana-app/pull/3159)
 - Fixed the broken links when using `server.basePath` Kibana setting [#3161](https://github.com/wazuh/wazuh-kibana-app/pull/3161)
 - Fixed filter in reports [#3173](https://github.com/wazuh/wazuh-kibana-app/pull/3173)
