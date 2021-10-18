@@ -12,32 +12,35 @@
 
 import React, { Component, Fragment } from 'react';
 import {
-  EuiPanel,
-  EuiPage,
-  EuiTabs,
-  EuiTab,
-  EuiTitle,
-  EuiLoadingSpinner,
+  EuiButtonEmpty,
   EuiEmptyPrompt,
-  EuiSpacer,
-  EuiProgress,
   EuiFlexGroup,
   EuiFlexItem,
-  EuiLink,
   EuiHorizontalRule,
-  EuiButtonEmpty
+  EuiLink,
+  EuiLoadingSpinner,
+  EuiPage,
+  EuiPanel,
+  EuiProgress,
+  EuiSpacer,
+  EuiTab,
+  EuiTabs,
+  EuiTitle,
 } from '@elastic/eui';
-import {
-  InventoryTable,
-  FilterBar,
-  RegistryTable
-} from './inventory/';
+import { FilterBar, InventoryTable, RegistryTable } from './inventory/';
 import { WzRequest } from '../../../react-services/wz-request';
 import exportCsv from '../../../react-services/wz-csv';
-import { getToasts }  from '../../../kibana-services';
+import { getToasts } from '../../../kibana-services';
 import { ICustomBadges } from '../../wz-search-bar/components';
 import { filtersToObject } from '../../wz-search-bar';
-import { WzEmptyPromptNoPermissions } from "../../common/permissions/prompt";
+import { UI_LOGGER_LEVELS } from '../../../../common/constants';
+import {
+  UI_ERROR_SEVERITIES,
+  UIErrorLog,
+  UIErrorSeverity,
+  UILogLevel,
+} from '../../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../../react-services/common-services';
 
 export class Inventory extends Component {
   _isMount = false;
@@ -172,7 +175,18 @@ export class Inventory extends Component {
       return ((response.data || {}).data || {}).total_affected_items || 0;
     } catch (error) {
       this.setState({ isLoading: false });
-      this.showToast('danger', error, 3000);
+
+      const options: UIErrorLog = {
+        context: `${Inventory.name}.getItemNumber`,
+        level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+        severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   }
 
@@ -245,7 +259,17 @@ export class Inventory extends Component {
         `fim-${this.state.selectedTabId}`
       );
     } catch (error) {
-      this.showToast('danger', error, 3000);
+      const options: UIErrorLog = {
+        context: `${Inventory.name}.downloadCsv`,
+        level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+        severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   }
 
@@ -317,6 +341,17 @@ export class Inventory extends Component {
 
       return (((response.data || {}).data).syscheck || {}).disabled === 'no';
     } catch (error) {
+      const options: UIErrorLog = {
+        context: `${Inventory.name}.isConfigured`,
+        level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+        severity: UI_ERROR_SEVERITIES.UI as UIErrorSeverity,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
       return false;
     }
   }

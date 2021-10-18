@@ -4964,20 +4964,23 @@
         ]
       },
       {
-        "name": "/mitre",
-        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.mitre_controller.get_attack",
-        "description": "Return the requested attacks from MITRE database",
-        "summary": "Get MITRE attacks",
+        "name": "/mitre/groups",
+        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.mitre_controller.get_groups",
+        "description": "Return the groups from MITRE database",
+        "summary": "Get MITRE groups",
         "tags": [
-          "Mitre"
+          "MITRE"
         ],
         "query": [
           {
-            "name": "id",
-            "description": "MITRE attack ID",
+            "name": "group_ids",
+            "description": "List of MITRE's group IDs (separated by comma)",
             "schema": {
-              "type": "string",
-              "format": "alphanumeric"
+              "type": "array",
+              "items": {
+                "type": "string",
+                "description": "MITRE group ID"
+              }
             }
           },
           {
@@ -4999,22 +5002,6 @@
               "format": "int32",
               "default": 0,
               "minimum": 0
-            }
-          },
-          {
-            "name": "phase_name",
-            "description": "Show results filtered by phase",
-            "schema": {
-              "type": "string",
-              "format": "alphanumeric"
-            }
-          },
-          {
-            "name": "platform_name",
-            "description": "Show results filtered by platform",
-            "schema": {
-              "type": "string",
-              "format": "alphanumeric"
             }
           },
           {
@@ -5057,6 +5044,498 @@
             "schema": {
               "type": "string",
               "format": "sort"
+            }
+          },
+          {
+            "name": "wait_for_complete",
+            "description": "Disable timeout response",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ]
+      },
+      {
+        "name": "/mitre/metadata",
+        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.mitre_controller.get_metadata",
+        "description": "Return the metadata from MITRE database",
+        "summary": "Get MITRE metadata",
+        "tags": [
+          "MITRE"
+        ],
+        "query": [
+          {
+            "name": "pretty",
+            "description": "Show results in human-readable format",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "wait_for_complete",
+            "description": "Disable timeout response",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ]
+      },
+      {
+        "name": "/mitre/mitigations",
+        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.mitre_controller.get_mitigations",
+        "description": "Return the mitigations from MITRE database",
+        "summary": "Get MITRE mitigations",
+        "tags": [
+          "MITRE"
+        ],
+        "query": [
+          {
+            "name": "limit",
+            "description": "Maximum number of elements to return",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 500,
+              "minimum": 1,
+              "maximum": 500
+            }
+          },
+          {
+            "name": "mitigation_ids",
+            "description": "List of MITRE's mitigations IDs (separated by comma)",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "description": "MITRE mitigation ID"
+              }
+            }
+          },
+          {
+            "name": "offset",
+            "description": "First element to return in the collection",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0,
+              "minimum": 0
+            }
+          },
+          {
+            "name": "pretty",
+            "description": "Show results in human-readable format",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "q",
+            "description": "Query to filter results by. For example q=&quot;status=active&quot;",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "schema": {
+              "type": "string",
+              "format": "search"
+            }
+          },
+          {
+            "name": "select",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "names"
+              }
+            }
+          },
+          {
+            "name": "sort",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
+            "schema": {
+              "type": "string",
+              "format": "sort"
+            }
+          },
+          {
+            "name": "wait_for_complete",
+            "description": "Disable timeout response",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ]
+      },
+      {
+        "name": "/mitre/references",
+        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.mitre_controller.get_references",
+        "description": "Return the references from MITRE database",
+        "summary": "Get MITRE references",
+        "tags": [
+          "MITRE"
+        ],
+        "query": [
+          {
+            "name": "limit",
+            "description": "Maximum number of elements to return",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 500,
+              "minimum": 1,
+              "maximum": 500
+            }
+          },
+          {
+            "name": "offset",
+            "description": "First element to return in the collection",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0,
+              "minimum": 0
+            }
+          },
+          {
+            "name": "pretty",
+            "description": "Show results in human-readable format",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "q",
+            "description": "Query to filter results by. For example q=&quot;status=active&quot;",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "reference_ids",
+            "description": "List of MITRE's references IDs (separated by comma)",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "description": "MITRE Reference ID"
+              }
+            }
+          },
+          {
+            "name": "search",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "schema": {
+              "type": "string",
+              "format": "search"
+            }
+          },
+          {
+            "name": "select",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "names"
+              }
+            }
+          },
+          {
+            "name": "sort",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
+            "schema": {
+              "type": "string",
+              "format": "sort"
+            }
+          },
+          {
+            "name": "wait_for_complete",
+            "description": "Disable timeout response",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ]
+      },
+      {
+        "name": "/mitre/software",
+        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.mitre_controller.get_software",
+        "description": "Return the software from MITRE database",
+        "summary": "Get MITRE software",
+        "tags": [
+          "MITRE"
+        ],
+        "query": [
+          {
+            "name": "limit",
+            "description": "Maximum number of elements to return",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 500,
+              "minimum": 1,
+              "maximum": 500
+            }
+          },
+          {
+            "name": "offset",
+            "description": "First element to return in the collection",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0,
+              "minimum": 0
+            }
+          },
+          {
+            "name": "pretty",
+            "description": "Show results in human-readable format",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "q",
+            "description": "Query to filter results by. For example q=&quot;status=active&quot;",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "schema": {
+              "type": "string",
+              "format": "search"
+            }
+          },
+          {
+            "name": "select",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "names"
+              }
+            }
+          },
+          {
+            "name": "software_ids",
+            "description": "List of MITRE's software IDs (separated by comma)",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "description": "MITRE software ID"
+              }
+            }
+          },
+          {
+            "name": "sort",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
+            "schema": {
+              "type": "string",
+              "format": "sort"
+            }
+          },
+          {
+            "name": "wait_for_complete",
+            "description": "Disable timeout response",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ]
+      },
+      {
+        "name": "/mitre/tactics",
+        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.mitre_controller.get_tactics",
+        "description": "Return the tactics from MITRE database",
+        "summary": "Get MITRE tactics",
+        "tags": [
+          "MITRE"
+        ],
+        "query": [
+          {
+            "name": "limit",
+            "description": "Maximum number of elements to return",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 500,
+              "minimum": 1,
+              "maximum": 500
+            }
+          },
+          {
+            "name": "offset",
+            "description": "First element to return in the collection",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0,
+              "minimum": 0
+            }
+          },
+          {
+            "name": "pretty",
+            "description": "Show results in human-readable format",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "q",
+            "description": "Query to filter results by. For example q=&quot;status=active&quot;",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "schema": {
+              "type": "string",
+              "format": "search"
+            }
+          },
+          {
+            "name": "select",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "names"
+              }
+            }
+          },
+          {
+            "name": "sort",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
+            "schema": {
+              "type": "string",
+              "format": "sort"
+            }
+          },
+          {
+            "name": "tactic_ids",
+            "description": "List of MITRE's tactics IDs (separated by comma)",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "description": "MITRE tactic ID"
+              }
+            }
+          },
+          {
+            "name": "wait_for_complete",
+            "description": "Disable timeout response",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ]
+      },
+      {
+        "name": "/mitre/techniques",
+        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.mitre_controller.get_techniques",
+        "description": "Return the techniques from MITRE database",
+        "summary": "Get MITRE techniques",
+        "tags": [
+          "MITRE"
+        ],
+        "query": [
+          {
+            "name": "limit",
+            "description": "Maximum number of elements to return",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 500,
+              "minimum": 1,
+              "maximum": 500
+            }
+          },
+          {
+            "name": "offset",
+            "description": "First element to return in the collection",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0,
+              "minimum": 0
+            }
+          },
+          {
+            "name": "pretty",
+            "description": "Show results in human-readable format",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "q",
+            "description": "Query to filter results by. For example q=&quot;status=active&quot;",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "schema": {
+              "type": "string",
+              "format": "search"
+            }
+          },
+          {
+            "name": "select",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "names"
+              }
+            }
+          },
+          {
+            "name": "sort",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
+            "schema": {
+              "type": "string",
+              "format": "sort"
+            }
+          },
+          {
+            "name": "technique_ids",
+            "description": "List of MITRE's techniques IDs (separated by comma)",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "description": "MITRE technique ID"
+              }
             }
           },
           {
@@ -5336,7 +5815,7 @@
           },
           {
             "name": "mitre",
-            "description": "Filters by MITRE attack ID",
+            "description": "Filters by MITRE technique ID",
             "schema": {
               "type": "string",
               "format": "alphanumeric"
@@ -5891,7 +6370,7 @@
             "description": "Filter by command",
             "schema": {
               "type": "string",
-              "format": "alphanumeric"
+              "format": "symbols_alphanumeric_param"
             }
           },
           {
@@ -6169,6 +6648,17 @@
             }
           },
           {
+            "name": "select",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "names"
+              }
+            }
+          },
+          {
             "name": "sort",
             "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
@@ -6284,6 +6774,17 @@
             }
           },
           {
+            "name": "select",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "names"
+              }
+            }
+          },
+          {
             "name": "sort",
             "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
@@ -6357,6 +6858,17 @@
             "schema": {
               "type": "string",
               "format": "search"
+            }
+          },
+          {
+            "name": "select",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "names"
+              }
             }
           },
           {
@@ -6440,6 +6952,17 @@
             "schema": {
               "type": "string",
               "format": "search"
+            }
+          },
+          {
+            "name": "select",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "names"
+              }
             }
           },
           {
@@ -7953,7 +8476,7 @@
             "description": "Filter by command",
             "schema": {
               "type": "string",
-              "format": "alphanumeric"
+              "format": "symbols_alphanumeric_param"
             }
           },
           {
@@ -8493,6 +9016,46 @@
           }
         ],
         "query": [
+          {
+            "name": "pretty",
+            "description": "Show results in human-readable format",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "wait_for_complete",
+            "description": "Disable timeout response",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ]
+      },
+      {
+        "name": "/agents/reconnect",
+        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agent_controller.reconnect_agents",
+        "description": "Force reconnect all agents or a list of them",
+        "summary": "Force reconnect agents",
+        "tags": [
+          "Agents"
+        ],
+        "query": [
+          {
+            "name": "agents_list",
+            "description": "List of agent IDs (separated by comma), all agents selected by default if not specified",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 3,
+                "description": "Agent ID",
+                "format": "numbers"
+              }
+            }
+          },
           {
             "name": "pretty",
             "description": "Show results in human-readable format",

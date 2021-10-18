@@ -808,6 +808,13 @@ md-switch.md-checked .md-thumb {
   display: block;
 }
 
+.wz-ellipsis{
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
 /*
  * https://css-tricks.com/snippets/css/prevent-long-urls-from-breaking-out-of-container/
  * Handling long URLs on error toasts.
@@ -1498,7 +1505,7 @@ div.euiPopover__panel.euiPopover__panel-isOpen.euiPopover__panel--bottom.wz-menu
   max-width: 60vw;
 }
 
-.wz-markdown-wapper code {
+.wz-markdown-wrapper code {
   color: #1c2226;
   background-color: #e6e6e6;
   border-radius: 3px;

@@ -36,12 +36,16 @@ import { PatternHandler } from '../../react-services/pattern-handler';
 import { getToasts } from '../../kibana-services';
 import { SecurityAlerts } from './components';
 import { toMountPoint } from '../../../../../src/plugins/kibana_react/public';
-import { withReduxProvider } from '../common/hocs';
+import { withReduxProvider,withErrorBoundary } from '../common/hocs';
+import { compose } from 'redux';
+import { UI_LOGGER_LEVELS } from '../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../react-services/common-services';
 
 
 const visHandler = new VisHandlers();
 
-export const WzVisualize = withReduxProvider(class WzVisualize extends Component {
+export const WzVisualize = compose (withErrorBoundary,withReduxProvider) (class WzVisualize extends Component {
   _isMount = false;
   constructor(props) {
     super(props);
@@ -64,16 +68,6 @@ export const WzVisualize = withReduxProvider(class WzVisualize extends Component
     ];
     this.newFields={};
   }
-
-
-  showToast(color, title = '', text = '', time = 3000) {
-    getToasts().add({
-      color: color,
-      title: title,
-      text: text,
-      toastLifeTimeMs: time,
-    });
-  };
 
   async componentDidMount() {
     this._isMount = true;
@@ -110,9 +104,22 @@ export const WzVisualize = withReduxProvider(class WzVisualize extends Component
 
     // Check if there is sample alerts installed
     try {
-      const thereAreSampleAlerts = (await WzRequest.genericReq('GET', '/elastic/samplealerts', {})).data.sampleAlertsInstalled;
+      const thereAreSampleAlerts = (await WzRequest.genericReq('GET', '/elastic/samplealerts', {}))
+        .data.sampleAlertsInstalled;
       this._isMount && this.setState({ thereAreSampleAlerts });
-    } catch (error) { }
+    } catch (error) {
+      const options = {
+        context: `${WzVisualize.name}.componentDidMount`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.UI,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+    }
   }
 
   async componentDidUpdate(prevProps) {
@@ -142,10 +149,20 @@ export const WzVisualize = withReduxProvider(class WzVisualize extends Component
         this.setState({ isRefreshing: false });
         this.reloadToast();
         this.newFields={};
-      } catch (err) {
+      } catch (error) {
         this.setState({ isRefreshing: false });
-        this.showToast('danger', 'The index pattern could not be refreshed');
+        const options = {
+          context: `${WzVisualize.name}.refreshKnownFields`,
+          level: UI_LOGGER_LEVELS.ERROR,
+          severity: UI_ERROR_SEVERITIES.BUSINESS,
+          error: {
+            error: error,
+            message: 'The index pattern could not be refreshed' || error.message || error,
+            title: error.name || error,
+          },
+        };
 
+        getErrorOrchestrator().handleError(options);
       }
     } else if (this.state.isRefreshing) {
       await new Promise(r => setTimeout(r, 150));

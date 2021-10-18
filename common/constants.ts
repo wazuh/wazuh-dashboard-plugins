@@ -9,12 +9,12 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import path  from 'path';
+import path from 'path';
 
 // Index patterns - Wazuh alerts
-export const WAZUH_INDEX_TYPE_ALERTS = "alerts";
-export const WAZUH_ALERTS_PREFIX = "wazuh-alerts-";
-export const WAZUH_ALERTS_PATTERN = "wazuh-alerts-*";
+export const WAZUH_INDEX_TYPE_ALERTS = 'alerts';
+export const WAZUH_ALERTS_PREFIX = 'wazuh-alerts-';
+export const WAZUH_ALERTS_PATTERN = 'wazuh-alerts-*';
 
 // Default number of shards and replicas for indices
 export const WAZUH_INDEX_SHARDS = 2;
@@ -53,17 +53,37 @@ export const WAZUH_ROLE_ADMINISTRATOR_ID = 1;
 export const WAZUH_ROLE_ADMINISTRATOR_NAME = 'administrator';
 
 // Sample data
-export const WAZUH_SAMPLE_ALERT_PREFIX = "wazuh-alerts-4.x-";
+export const WAZUH_SAMPLE_ALERT_PREFIX = 'wazuh-alerts-4.x-';
 export const WAZUH_SAMPLE_ALERTS_INDEX_SHARDS = 1;
 export const WAZUH_SAMPLE_ALERTS_INDEX_REPLICAS = 0;
-export const WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY = "security";
-export const WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING = "auditing-policy-monitoring";
-export const WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION = "threat-detection";
+export const WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY = 'security';
+export const WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING = 'auditing-policy-monitoring';
+export const WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION = 'threat-detection';
 export const WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_ALERTS = 3000;
 export const WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS = {
-  [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY]: [{ syscheck: true }, { aws: true }, { gcp: true }, { authentication: true }, { ssh: true }, { apache: true, alerts: 2000 }, { web: true }, { windows: { service_control_manager: true }, alerts: 1000 }],
-  [WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING]: [{ rootcheck: true }, { audit: true }, { openscap: true }, { ciscat: true }],
-  [WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION]: [{ vulnerabilities: true }, { virustotal: true }, { osquery: true }, { docker: true }, { mitre: true }]
+  [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY]: [
+    { syscheck: true },
+    { aws: true },
+    { gcp: true },
+    { authentication: true },
+    { ssh: true },
+    { apache: true, alerts: 2000 },
+    { web: true },
+    { windows: { service_control_manager: true }, alerts: 1000 },
+  ],
+  [WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING]: [
+    { rootcheck: true },
+    { audit: true },
+    { openscap: true },
+    { ciscat: true },
+  ],
+  [WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION]: [
+    { vulnerabilities: true },
+    { virustotal: true },
+    { osquery: true },
+    { docker: true },
+    { mitre: true },
+  ],
 };
 
 // Security
@@ -72,11 +92,11 @@ export const WAZUH_SECURITY_PLUGIN_OPEN_DISTRO_FOR_ELASTICSEARCH = 'Open Distro 
 
 export const WAZUH_SECURITY_PLUGINS = [
   WAZUH_SECURITY_PLUGIN_XPACK_SECURITY,
-  WAZUH_SECURITY_PLUGIN_OPEN_DISTRO_FOR_ELASTICSEARCH
+  WAZUH_SECURITY_PLUGIN_OPEN_DISTRO_FOR_ELASTICSEARCH,
 ];
 
 // App configuration
-export const WAZUH_CONFIGURATION_CACHE_TIME = 10000 // time in ms;
+export const WAZUH_CONFIGURATION_CACHE_TIME = 10000; // time in ms;
 export const WAZUH_CONFIGURATION_SETTINGS_NEED_RESTART = [
   'wazuh.monitoring.enabled',
   'wazuh.monitoring.frequency',
@@ -93,7 +113,7 @@ export const WAZUH_CONFIGURATION_SETTINGS_NEED_HEALTH_CHECK = [
   'cron.statistics.index.creation',
   'cron.statistics.index.shards',
   'cron.statistics.index.replicas',
-  'wazuh.monitoring.shards'
+  'wazuh.monitoring.shards',
 ];
 export const WAZUH_CONFIGURATION_SETTINGS_NEED_RELOAD = [
   'hideManagerAlerts',
@@ -105,22 +125,50 @@ export const WAZUH_API_RESERVED_ID_LOWER_THAN = 100;
 
 // Wazuh data path
 const WAZUH_DATA_KIBANA_BASE_PATH = 'data';
-export const WAZUH_DATA_KIBANA_BASE_ABSOLUTE_PATH = path.join(__dirname, '../../../', WAZUH_DATA_KIBANA_BASE_PATH);
+export const WAZUH_DATA_KIBANA_BASE_ABSOLUTE_PATH = path.join(
+  __dirname,
+  '../../../',
+  WAZUH_DATA_KIBANA_BASE_PATH
+);
 export const WAZUH_DATA_ABSOLUTE_PATH = path.join(WAZUH_DATA_KIBANA_BASE_ABSOLUTE_PATH, 'wazuh');
 
 // Wazuh data path - config
 export const WAZUH_DATA_CONFIG_DIRECTORY_PATH = path.join(WAZUH_DATA_ABSOLUTE_PATH, 'config');
 export const WAZUH_DATA_CONFIG_APP_PATH = path.join(WAZUH_DATA_CONFIG_DIRECTORY_PATH, 'wazuh.yml');
-export const WAZUH_DATA_CONFIG_REGISTRY_PATH = path.join(WAZUH_DATA_CONFIG_DIRECTORY_PATH, 'wazuh-registry.json');
+export const WAZUH_DATA_CONFIG_REGISTRY_PATH = path.join(
+  WAZUH_DATA_CONFIG_DIRECTORY_PATH,
+  'wazuh-registry.json'
+);
 
 // Wazuh data path - logs
+export const MAX_MB_LOG_FILES = 100;
 export const WAZUH_DATA_LOGS_DIRECTORY_PATH = path.join(WAZUH_DATA_ABSOLUTE_PATH, 'logs');
-export const WAZUH_DATA_LOGS_PLAIN_PATH = path.join(WAZUH_DATA_LOGS_DIRECTORY_PATH, 'wazuhapp-plain.log');
-export const WAZUH_DATA_LOGS_RAW_PATH = path.join(WAZUH_DATA_LOGS_DIRECTORY_PATH, 'wazuhapp.log');
+export const WAZUH_DATA_LOGS_PLAIN_FILENAME = 'wazuhapp-plain.log';
+export const WAZUH_DATA_LOGS_PLAIN_PATH = path.join(
+  WAZUH_DATA_LOGS_DIRECTORY_PATH,
+  WAZUH_DATA_LOGS_PLAIN_FILENAME
+);
+export const WAZUH_DATA_LOGS_RAW_FILENAME = 'wazuhapp.log';
+export const WAZUH_DATA_LOGS_RAW_PATH = path.join(
+  WAZUH_DATA_LOGS_DIRECTORY_PATH,
+  WAZUH_DATA_LOGS_RAW_FILENAME
+);
+
+// Wazuh data path - UI logs
+export const WAZUH_UI_LOGS_PLAIN_FILENAME = 'wazuh-ui-plain.log';
+export const WAZUH_UI_LOGS_RAW_FILENAME = 'wazuh-ui.log';
+export const WAZUH_UI_LOGS_PLAIN_PATH = path.join(
+  WAZUH_DATA_LOGS_DIRECTORY_PATH,
+  WAZUH_UI_LOGS_PLAIN_FILENAME
+);
+export const WAZUH_UI_LOGS_RAW_PATH = path.join(WAZUH_DATA_LOGS_DIRECTORY_PATH, WAZUH_UI_LOGS_RAW_FILENAME);
 
 // Wazuh data path - downloads
 export const WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH = path.join(WAZUH_DATA_ABSOLUTE_PATH, 'downloads');
-export const WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH = path.join(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH, 'reports');
+export const WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH = path.join(
+  WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH,
+  'reports'
+);
 
 // Queue
 export const WAZUH_QUEUE_CRON_FREQ = '*/15 * * * * *'; // Every 15 seconds
@@ -182,12 +230,12 @@ export const WAZUH_DEFAULT_APP_CONFIG = {
 export const WAZUH_ERROR_DAEMONS_NOT_READY = 'ERROR3099';
 
 // Agents
-export enum WAZUH_AGENTS_OS_TYPE{
+export enum WAZUH_AGENTS_OS_TYPE {
   WINDOWS = 'windows',
   LINUX = 'linux',
   SUNOS = 'sunos',
   DARWIN = 'darwin',
-  OTHERS = ''
+  OTHERS = '',
 }
 
 export enum WAZUH_MODULES_ID {
@@ -266,10 +314,10 @@ export const HEALTH_CHECK = 'health-check';
 export const HEALTH_CHECK_REDIRECTION_TIME = 300; //ms
 
 // Kibana settings
-// Default timeTilter set by the app
+// Default timeFilter set by the app
 export const WAZUH_KIBANA_SETTING_TIME_FILTER = {
-  from: "now-24h",
-  to: 'now'
+  from: 'now-24h',
+  to: 'now',
 };
 export const KIBANA_SETTING_NAME_TIME_FILTER = 'timepicker:timeDefaults';
 
@@ -280,3 +328,16 @@ export const KIBANA_SETTING_NAME_MAX_BUCKETS = 'timelion:max_buckets';
 // Default metaFields Kibana setting set by the app
 export const WAZUH_KIBANA_SETTING_METAFIELDS = ['_source', '_index'];
 export const KIBANA_SETTING_NAME_METAFIELDS = 'metaFields';
+
+// Logger
+export const UI_LOGGER_LEVELS = {
+  WARNING: 'WARNING',
+  INFO: 'INFO',
+  ERROR: 'ERROR',
+};
+
+export const UI_TOAST_COLOR = {
+  SUCCESS: 'success',
+  WARNING: 'warning',
+  DANGER: 'danger',
+};

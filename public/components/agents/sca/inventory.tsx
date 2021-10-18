@@ -1,3 +1,15 @@
+/*
+ * Wazuh app - Iventory component
+ * Copyright (C) 2015-2021 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
+
 import React, { Component, Fragment } from 'react';
 import { Pie } from "../../d3/pie";
 import {
@@ -28,6 +40,14 @@ import { getToasts }  from '../../../kibana-services';
 import { WzSearchBar } from '../../../components/wz-search-bar';
 import { RuleText, ComplianceText } from './components';
 import _ from 'lodash';
+import {
+  UI_ERROR_SEVERITIES,
+  UIErrorLog,
+  UIErrorSeverity,
+  UILogLevel,
+} from '../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../../common/constants';
+import { getErrorOrchestrator } from '../../../react-services/common-services';
 
 export class Inventory extends Component {
   _isMount = false;
@@ -169,8 +189,19 @@ export class Inventory extends Component {
         this.setState({ loading: false });
       }
     } catch (error) {
-      this.showToast('danger', error, 3000);
       this.setState({ loading: false });
+
+      const options: UIErrorLog = {
+        context: `${Inventory.name}.componentDidMount`,
+        level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+        severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   }
 
@@ -263,48 +294,67 @@ export class Inventory extends Component {
       }
       this._isMount && this.setState({ data: models, loading: false });
     } catch (error) {
-      this.showToast('danger', error, 3000);
       this.setState({ loading: false });
       this.policies = [];
+
+      const options: UIErrorLog = {
+        context: `${Inventory.name}.initialize`,
+        level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+        severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   }
 
   async loadScaPolicy(policy) {
-    this._isMount && this.setState({ loadingPolicy: true, itemIdToExpandedRowMap: {}, pageTableChecks: {pageIndex: 0} });
+    this._isMount &&
+      this.setState({
+        loadingPolicy: true,
+        itemIdToExpandedRowMap: {},
+        pageTableChecks: { pageIndex: 0 },
+      });
     if (policy) {
       try {
-        const policyResponse = await WzRequest.apiReq(
-          'GET',
-          `/sca/${this.props.agent.id}`,
-          { 
-            params: {
-              "q": "policy_id=" + policy.policy_id
-            } 
-          }
-        );
+        const policyResponse = await WzRequest.apiReq('GET', `/sca/${this.props.agent.id}`, {
+          params: {
+            q: 'policy_id=' + policy.policy_id,
+          },
+        });
         const [policyData] = policyResponse.data.data.affected_items;
         // It queries all checks without filters, because the filters are applied in the results
         // due to the use of EuiInMemoryTable instead EuiTable components and do arequest with each change of filters.
         const checksResponse = await WzRequest.apiReq(
           'GET',
           `/sca/${this.props.agent.id}/checks/${policy.policy_id}`,
-          { }
+          {}
         );
-        const checks = ((((checksResponse || {}).data || {}).data || {}).affected_items || [])
-          .map(item => ({...item, result: item.result || 'not applicable'}));
+        const checks = (
+          (((checksResponse || {}).data || {}).data || {}).affected_items || []
+        ).map((item) => ({ ...item, result: item.result || 'not applicable' }));
         this.buildSuggestionSearchBar(policyData.policy_id, checks);
-        this._isMount && this.setState({ lookingPolicy: policyData, loadingPolicy: false, items: checks });
-      } catch (err) {
-        // We can't ensure the suggestions contains valid characters
-        getToasts().add({
-          color: 'danger',
-          title: 'Error',
-          text: 'The filter contains invalid characters',
-          toastLifeTimeMs: 10000,
-        });
+        this._isMount &&
+          this.setState({ lookingPolicy: policyData, loadingPolicy: false, items: checks });
+      } catch (error) {
         this.setState({ lookingPolicy: policy, loadingPolicy: false });
+
+        const options: UIErrorLog = {
+          context: `${Inventory.name}.loadScaPolicy`,
+          level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+          severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
+          error: {
+            error: error,
+            message: `The filter contains invalid characters` || error.message,
+            title: error.name,
+          },
+        };
+        getErrorOrchestrator().handleError(options);
       }
-    }else{
+    } else {
       this._isMount && this.setState({ lookingPolicy: policy, loadingPolicy: false, items: [] });
     }
   }
@@ -328,7 +378,7 @@ export class Inventory extends Component {
       let checks = '';
       checks += (item.rules || []).length > 1 ? 'Checks' : 'Check';
       checks += item.condition ? ` (Condition: ${item.condition})` : '';
-      const complianceText = item.compliance && item.compliance.length 
+      const complianceText = item.compliance && item.compliance.length
         ? item.compliance.map(el => `${el.key}: ${el.value}`).join('\n')
         : '';
       const rulesText = item.rules.length ? item.rules.map(el => el.rule).join('\n') : '';
@@ -388,7 +438,17 @@ export class Inventory extends Component {
         this.state.lookingPolicy.policy_id
       );
     } catch (error) {
-      this.showToast('danger', error, 3000);
+      const options: UIErrorLog = {
+        context: `${Inventory.name}.downloadCsv`,
+        level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+        severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   }
 

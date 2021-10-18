@@ -1,0 +1,50 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Module Mitre Att&ck intelligence container should render the component 1`] = `
+<EuiFlexGroup
+  style={
+    Object {
+      "margin": "0 8px",
+    }
+  }
+>
+  <EuiFlexItem>
+    <PanelSplit
+      content={
+        <ModuleMitreAttackIntelligenceRightPanel
+          loading={false}
+          resourceFilters={Array []}
+          results={null}
+          selectedResource="groups"
+        />
+      }
+      contentProps={
+        Object {
+          "style": Object {
+            "maxHeight": "calc(100vh - 255px)",
+            "overflowX": "hidden",
+            "overflowY": "auto",
+          },
+        }
+      }
+      side={
+        <ModuleMitreAttackIntelligenceLeftPanel
+          onSearchTermAllResourcesChange={[Function]}
+          onSearchTermAllResourcesSearch={[Function]}
+          onSelectResource={[Function]}
+          selectedResource="groups"
+        />
+      }
+      sideProps={
+        Object {
+          "style": Object {
+            "minWidth": 145,
+            "overflowX": "hidden",
+            "width": "15%",
+          },
+        }
+      }
+    />
+  </EuiFlexItem>
+</EuiFlexGroup>
+`;

@@ -13,6 +13,9 @@ import { ErrorHandler } from '../../../../react-services/error-handler';
 import { WzButtonModalConfirm } from '../../../common/buttons';
 import { WzAPIUtils } from '../../../../react-services/wz-api-utils';
 import RulesServices from '../../rules/services';
+import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../../../react-services/common-services';
 
 export const RolesMappingTable = ({ rolesEquivalences, rules, loading, editRule, updateRules }) => {
   const getRowProps = item => {
@@ -22,6 +25,29 @@ export const RolesMappingTable = ({ rolesEquivalences, rules, loading, editRule,
       onClick: () => editRule(item),
     };
   };
+
+  const onDeleteRoleMapping = (item) => {
+    return async () => {
+      try {
+        await RulesServices.DeleteRules([item.id]);
+        ErrorHandler.info('Role mapping was successfully deleted');
+        updateRules();
+      } catch (error) {
+        const options = {
+          context: `${RolesMappingTable.name}.onDeleteRoleMapping`,
+          level: UI_LOGGER_LEVELS.ERROR,
+          severity: UI_ERROR_SEVERITIES.BUSINESS,
+          store: true,
+          error: {
+            error: error,
+            message: error.message || error,
+            title: error.name || error,
+          },
+        };
+        getErrorOrchestrator().handleError(options);
+      }
+    };
+  }
 
   const columns: EuiBasicTableColumn<any>[] = [
     {
@@ -94,15 +120,7 @@ export const RolesMappingTable = ({ rolesEquivalences, rules, loading, editRule,
             }}
             isDisabled={WzAPIUtils.isReservedID(item.id)}
             modalTitle={`Do you want to delete the ${item.name} role mapping?`}
-            onConfirm={async () => {
-              try {
-                await RulesServices.DeleteRules([item.id]);
-                ErrorHandler.info('Role mapping was successfully deleted');
-                updateRules();
-              } catch (err) {
-                ErrorHandler.handle(err, 'Error deleting the role mapping');
-              }
-            }}
+            onConfirm={onDeleteRoleMapping(item)}
             modalProps={{ buttonColor: 'danger' }}
             iconType="trash"
             color="danger"
