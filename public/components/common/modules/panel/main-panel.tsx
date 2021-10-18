@@ -38,7 +38,7 @@ import { getErrorOrchestrator } from '../../../../react-services/common-services
 export const MainPanel = ({ sidePanelChildren, tab = 'general', moduleConfig = {}, filterDrillDownValue = (value) => {}, ...props }) => {
   const [viewId, setViewId] = useState('main');
   const [selectedFilter, setSelectedFilter] = useState({ field: '', value: '' });
-  const {filterManager} = useFilterManager();
+  const { filterManager, filters } = useFilterManager();
 
   const buildOverviewVisualization = async () => {
     const tabVisualizations = new TabVisualizations();
@@ -75,15 +75,11 @@ export const MainPanel = ({ sidePanelChildren, tab = 'general', moduleConfig = {
    * When a filter is toggled applies de selection
    */
   const applyFilter = (clearOnly = false) => {
-    const appliedFilters = filterManager.getAppFilters();
-    const filters = appliedFilters.filter((filter) => {
-      return filter.meta.key != selectedFilter.field;
-    });
-    if (!clearOnly && selectedFilter.value) {
-      const customFilter = buildCustomFilter(selectedFilter);
-      filters.push(customFilter);
-    }
-    filterManager.setFilters(filters);
+    const newFilters = [
+      ...filters.filter((filter) => filter.meta.key !== selectedFilter.field || filter.$state?.store == "globalState"),
+      ...(!clearOnly && selectedFilter.value ? [buildCustomFilter(selectedFilter)] : [])
+    ];
+    filterManager.setFilters(newFilters);
   };
 
   useEffect(() => {
