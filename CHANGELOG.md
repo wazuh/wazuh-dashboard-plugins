@@ -46,7 +46,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Refactored all try catch value of context for ErrorOrchestrator service. [#3432](https://github.com/wazuh/wazuh-kibana-app/pull/3432)
 - Refactored all try catch strategy on Controller/Groups section [#3415](https://github.com/wazuh/wazuh-kibana-app/pull/3415)
 - Refactored as module tabs and buttons are rendered [#3494](https://github.com/wazuh/wazuh-kibana-app/pull/3494)
-- change format permissions in FIM inventory [#3649](https://github.com/wazuh/wazuh-kibana-app/pull/3649)
+- Changed format permissions in FIM inventory [#3649](https://github.com/wazuh/wazuh-kibana-app/pull/3649)
 
 ### Fixed
 
