@@ -50,6 +50,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Fixed
 
 - Fixed creation of log files [#3384](https://github.com/wazuh/wazuh-kibana-app/pull/3384) 
+- Fixed double fetching alerts count when pinnin/unpinning the agent in Mitre Att&ck/Framework [#3484](https://github.com/wazuh/wazuh-kibana-app/pull/3484)
 - Fixed rules and decoders test flyout clickout event [#3412](https://github.com/wazuh/wazuh-kibana-app/pull/3412)
 - Notify when you are registering an agent without permissions [#3430](https://github.com/wazuh/wazuh-kibana-app/pull/3430)
 - Remove not used `redirectRule` query param when clicking the row table on CDB Lists/Decoders [#3438](https://github.com/wazuh/wazuh-kibana-app/pull/3438)
