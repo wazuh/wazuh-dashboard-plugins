@@ -331,9 +331,9 @@ export class FileDetails extends Component {
       }
     });
     return (
-      <div>      
+      <div>
         <EuiFlexGrid columns={3}> {generalDetails} </EuiFlexGrid>
-      </div>        
+      </div>
     );
   }
 
