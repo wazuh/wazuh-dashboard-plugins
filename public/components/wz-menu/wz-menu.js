@@ -92,8 +92,7 @@ export const WzMenu = withWindowSize(
         const APIlist = (result || {}).data || [];
         if (APIlist.length) {
           const { id: apiId } = JSON.parse(AppState.getCurrentAPI());
-          const filteredApi = APIlist.filter((api) => api.id === apiId);
-          const selectedApi = filteredApi[0];
+          const selectedApi = APIlist.find((api) => api.id === apiId);
           if (selectedApi) {
             const apiData = await ApiCheck.checkStored(selectedApi.id);
             //update cluster info
