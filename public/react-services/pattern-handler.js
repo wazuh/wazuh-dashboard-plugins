@@ -14,6 +14,9 @@ import { SavedObject } from './saved-objects';
 import { getDataPlugin, getToasts, getHttp } from '../kibana-services';
 import { WazuhConfig } from '../react-services/wazuh-config';
 import { HEALTH_CHECK } from '../../common/constants';
+import store from '../redux/store';
+import { updateIndexPatterns } from '../redux/actions/appStateActions';
+import _ from 'lodash';
 
 export class PatternHandler {
   /**
@@ -29,6 +32,9 @@ export class PatternHandler {
       if (selectedPattern && selectedPattern !== pattern) defaultPatterns.push(selectedPattern);
       let patternList = await SavedObject.getListOfWazuhValidIndexPatterns(defaultPatterns, origin);
 
+      if (!_.isEqual(patternList, store.getState().appStateReducers.indexPatterns)) {
+        store.dispatch(updateIndexPatterns(patternList));
+      }
       return patternList;
     } catch (error) {
       console.error('getPatternList', error);
