@@ -26,7 +26,7 @@ import lightEuiTheme from '@elastic/eui/dist/eui_theme_light.json';
 import darkEuiTheme from '@elastic/eui/dist/eui_theme_dark.json';
 
 import {
-  AnnotationDomainTypes,
+  AnnotationDomainType,
   Axis,
   Chart,
   HistogramBarSeries,
@@ -315,7 +315,7 @@ export class DiscoverHistogram extends Component<DiscoverHistogramProps, Discove
         />
         <LineAnnotation
           id="line-annotation"
-          domainType={AnnotationDomainTypes.XDomain}
+          domainType={AnnotationDomainType.XDomain}
           dataValues={lineAnnotationData}
           hideTooltips={true}
           style={lineAnnotationStyle}
