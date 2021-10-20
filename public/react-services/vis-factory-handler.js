@@ -101,7 +101,7 @@ export class VisFactoryHandler {
 
     try {
       const data =
-        (!['sca', 'office'].some(moduleID => tab !== moduleID))
+        (!['sca', 'office'].includes(tab))
           ? await GenericRequest.request(
               'GET',
               `/elastic/visualizations/agents-${tab}/${AppState.getCurrentPattern()}`
