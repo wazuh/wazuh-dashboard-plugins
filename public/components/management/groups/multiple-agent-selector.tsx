@@ -351,7 +351,7 @@ export const MultipleAgentSelector = withErrorBoundary(
                 group_id: this.props.currentGroup.name,
                 agents_list: itemsToSave.addedIds.toString(),
               },
-            });
+            }).catch(() => {});
           } else if (itemsToSave.deletedIds.includes(agent.key)) {
             this.moveItem(
               JSON.stringify(agent),
@@ -364,7 +364,7 @@ export const MultipleAgentSelector = withErrorBoundary(
                 group_id: this.props.currentGroup.name,
                 agents_list: itemsToSave.deletedIds.toString(),
               },
-            });
+            }).catch(() => {});
           }
         });
 
@@ -373,57 +373,6 @@ export const MultipleAgentSelector = withErrorBoundary(
         //relaod agent columns
         this.reload('right');
         this.reload('left');
-
-        // //move agents to their previous position
-        // allAgents.forEach(async (agent) => {
-        //   this.moveItem(
-        //     JSON.stringify(agent),
-        //     this.state.availableAgents.data,
-        //     this.state.selectedAgents.data,
-        //     'r'
-        //   );
-        //   this.moveItem(
-        //     JSON.stringify(agent),
-        //     this.state.selectedAgents.data,
-        //     this.state.availableAgents.data,
-        //     'a'
-        //   );
-
-        //   this.checkLimit();
-
-        //   //relaod agent columns
-        //   this.reload('right');
-        //   this.reload('left');
-        // });
-
-        // allAgents.forEach(async (agent) => {
-        //   if (itemsToSave.addedIds.includes(agent.key)) {
-        //     try {
-        //       await WzRequest.apiReq('DELETE', `/agents/group`, {
-        //         params: {
-        //           group_id: this.props.currentGroup.name,
-        //           agents_list: itemsToSave.addedIds.toString(),
-        //         },
-        //       });
-        //     } catch (e) {
-        //       console.error('Error unhandle promise test');
-        //       console.error(e);
-        //     }
-        //   }
-        //   if (itemsToSave.deletedIds.includes(agent.key)) {
-        //     try {
-        //       await WzRequest.apiReq('PUT', `/agents/group`, {
-        //         params: {
-        //           group_id: this.props.currentGroup.name,
-        //           agents_list: itemsToSave.deletedIds.toString(),
-        //         },
-        //       });
-        //     } catch (e) {
-        //       console.error('Error unhandle promise test');
-        //       console.error(e);
-        //     }
-        //   }
-        // });
 
         const options = {
           context: `${MultipleAgentSelector.name}.saveAddAgents`,
