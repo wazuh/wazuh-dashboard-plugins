@@ -67,6 +67,15 @@ let observer = new MutationObserver((mutations) => {
         if (title.text().trim() === "") {
           const subtitle = $('.euiText.euiText--small', loginWrapper);
           subtitle.addClass("wz-banner");
+          const subtitleText = $('.euiText.euiText--small > .euiTextAlign', loginWrapper);
+          const tempText = subtitleText.text().trim();
+          subtitleText.html(`
+            <span>${tempText}</span>
+            <img 
+              src="/plugins/wazuh/assets/new_logo_white.svg" 
+              class="subtitle-logo"            
+            ">
+          `);
         }
       }
     } catch (error) {

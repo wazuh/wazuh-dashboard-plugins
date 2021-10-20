@@ -121,6 +121,20 @@
   right: 0px;
 }
 
+.wz-login .application .login-wrapper .euiText.euiText--small.wz-banner > .euiTextAlign {
+  display: flex;
+  align-items: center;
+  color: #fff;
+}
+
+.wz-login .application .login-wrapper .euiText.euiText--small.wz-banner > .euiTextAlign > img {
+  width: auto;
+  height: 16px;
+  float: right;
+  margin-bottom: 0px;
+  margin-left: 4px;
+}
+
 /* Top bar*/
 .euiHeaderSection [aria-label*="Newsfeed menu"] {
   display: none!important;
