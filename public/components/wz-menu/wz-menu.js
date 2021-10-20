@@ -48,7 +48,7 @@ import { getDataPlugin } from '../../kibana-services';
 import { withWindowSize } from '../../components/common/hocs/withWindowSize';
 import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
-import { getErrorOrchestrator } from '../../react-services/common-services'
+import { getErrorOrchestrator } from '../../react-services/common-services';
 
 
 const sections = {
@@ -651,6 +651,28 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
     )
   }
 
+  async removeSelectedAgent() {
+    store.dispatch(updateCurrentAgentData({}));
+    if (window.location.href.includes("/agents?")) {
+      window.location.href = "#/agents-preview";
+      this.router.reload();
+      return;
+    }
+    await getAngularModule().$injector.get('$rootScope')._setAgent(false);
+    const { filterManager } = getDataPlugin().query;
+    const currentAppliedFilters = filterManager.getFilters();
+    const newFilters = currentAppliedFilters.filter(x => {
+      return x.meta.key !== 'agent.id';
+    });
+    filterManager.setFilters(newFilters);
+  }
+
+  getBadgeColor(agentStatus) {
+    if (agentStatus.toLowerCase() === 'active') { return 'secondary'; }
+    else if (agentStatus.toLowerCase() === 'disconnected') { return '#BD271E'; }
+    else if (agentStatus.toLowerCase() === 'never connected') { return 'default'; }
+  }
+  
   removeSelectedAgent() {
     store.dispatch(updateCurrentAgentData({}));
     if (window.location.href.includes("/agents?")) {

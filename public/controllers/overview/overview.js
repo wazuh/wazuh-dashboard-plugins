@@ -156,6 +156,9 @@ export class OverviewController {
       this.$location.search('agentId', String(agent));
       this.updateSelectedAgents([formattedData.id]);
     }
+    // Bind a method to be accesible through the $rootScope. This is used by WzMenu which is not receiving
+    !this.$rootScope._setAgent && (this.$rootScope._setAgent = this.updateSelectedAgents.bind(this));
+    this.$rootScope.$applyAsync();
   }
 
   /**
