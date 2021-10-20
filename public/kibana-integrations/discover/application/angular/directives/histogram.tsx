@@ -26,7 +26,6 @@ import lightEuiTheme from '@elastic/eui/dist/eui_theme_light.json';
 import darkEuiTheme from '@elastic/eui/dist/eui_theme_dark.json';
 
 import {
-  AnnotationDomainType,
   Axis,
   Chart,
   HistogramBarSeries,
@@ -49,7 +48,6 @@ import { EuiChartThemeType } from '@elastic/eui/dist/eui_charts_theme';
 import { Subscription, combineLatest } from 'rxjs';
 import { getServices } from '../../../kibana_services';
 import { Chart as IChart } from '../helpers/point_series';
-
 export interface DiscoverHistogramProps {
   chartData: IChart;
   timefilterUpdateHandler: (ranges: { from: number; to: number }) => void;
@@ -315,7 +313,7 @@ export class DiscoverHistogram extends Component<DiscoverHistogramProps, Discove
         />
         <LineAnnotation
           id="line-annotation"
-          domainType={AnnotationDomainType.XDomain}
+          domainType="xDomain"
           dataValues={lineAnnotationData}
           hideTooltips={true}
           style={lineAnnotationStyle}
