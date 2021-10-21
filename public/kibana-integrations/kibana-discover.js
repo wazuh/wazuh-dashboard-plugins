@@ -813,9 +813,8 @@ function discoverController(
     });
     inspectorRequest = inspectorAdapters.requests.start(title, { description });
     inspectorRequest.stats(getRequestInspectorStats($scope.searchSource));
-    $scope.searchSource.getSearchRequestBody().then((body) => {
-      inspectorRequest.json(body);
-    });
+    const body = await $scope.searchSource.getSearchRequestBody();
+    inspectorRequest.json(body);
   }
 
   $scope.updateTime = function () {

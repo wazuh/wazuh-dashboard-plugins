@@ -1,6 +1,16 @@
 # Change Log
 
 All notable changes to the Wazuh app project will be documented in this file.
+## Wazuh v4.2.4 - Kibana 7.10.2 , 7.12.1, 7.13.4, 7.14.2 - Revision 4206
+
+### Added
+
+- Support for Kibana 7.13.4
+- Support for Kibana 7.14.2
+
+### Fixed
+
+- Fixed compatibility wazuh 4.2 - kibana 7.13.4 [#3653](https://github.com/wazuh/wazuh-kibana-app/pull/3653)
 
 ## Wazuh v4.2.4 - Kibana 7.10.2, 7.11.2, 7.12.1 - Revision 4205
 
