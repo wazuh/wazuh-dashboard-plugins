@@ -153,7 +153,7 @@ class WzMenuAgent extends Component {
         name: this.agentSections.securityInformation.text,
         id: this.agentSections.securityInformation.id,
         disabled: true,
-        icon: <EuiIcon type="managementApp" color="primary" />,
+        icon: <EuiIcon type="managementApp" color="#256BD1" />,
         items: this.createItems(this.securityInformationItems)
       }
     ];
@@ -163,7 +163,7 @@ class WzMenuAgent extends Component {
         name: this.agentSections.auditing.text,
         id: this.agentSections.auditing.id,
         disabled: true,
-        icon: <EuiIcon type="managementApp" color="primary" />,
+        icon: <EuiIcon type="managementApp" color="#256BD1" />,
         items: this.createItems(this.auditingItems)
       }
     ];
@@ -173,7 +173,7 @@ class WzMenuAgent extends Component {
         name: this.agentSections.threatDetection.text,
         id: this.agentSections.threatDetection.id,
         disabled: true,
-        icon: <EuiIcon type="reportingApp" color="primary" />,
+        icon: <EuiIcon type="reportingApp" color="#256BD1" />,
         items: this.createItems(this.threatDetectionItems)
       }
     ];
@@ -183,7 +183,7 @@ class WzMenuAgent extends Component {
         name: this.agentSections.regulatoryCompliance.text,
         id: this.agentSections.regulatoryCompliance.id,
         disabled: true,
-        icon: <EuiIcon type="reportingApp" color="primary" />,
+        icon: <EuiIcon type="reportingApp" color="#256BD1" />,
         items: this.createItems(this.regulatoryComplianceItems)
       }
     ];
