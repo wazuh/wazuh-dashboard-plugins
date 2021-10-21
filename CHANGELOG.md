@@ -1,13 +1,33 @@
 # Change Log
 
 All notable changes to the Wazuh app project will be documented in this file.
-## Wazuh v4.2.2 - Kibana 7.10.2 , 7.12.1, 7.13.4, 7.14.2 - Revision 4204
+## Wazuh v4.2.4 - Kibana 7.10.2 , 7.12.1, 7.13.4, 7.14.2 - Revision 4206
 
 ### Added
 
-### Changed
+- Support for Kibana 7.13.4
+- Support for Kibana 7.14.2
+
 ### Fixed
+
 - Fixed compatibility wazuh 4.2 - kibana 7.13.4 [#3653](https://github.com/wazuh/wazuh-kibana-app/pull/3653)
+
+## Wazuh v4.2.4 - Kibana 7.10.2, 7.11.2, 7.12.1 - Revision 4205
+
+### Added
+
+- Support for Wazuh 4.2.4
+
+### Fixed 
+
+- Fixed a bug where the user's auth token was not deprecated on logout [#3638](https://github.com/wazuh/wazuh-kibana-app/pull/3638)
+
+## Wazuh v4.2.3 - Kibana 7.10.2, 7.11.2, 7.12.1 - Revision 4204
+
+### Added
+
+- Support for Wazuh 4.2.3
+
 ## Wazuh v4.2.2 - Kibana 7.10.2 , 7.12.1 - Revision 4203
 
 ### Added
