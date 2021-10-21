@@ -363,7 +363,7 @@ export class RegisterAgent extends Component {
   }
 
   getHighlightCodeLanguage(selectedSO){
-    if( selectedSO === 'win'){
+    if(selectedSO.toLowerCase() === 'win'){
       const iKibanaVersion = parseFloat(this.state.kibanaVersion.split('.').slice(0, 2).join('.'),2);
       return iKibanaVersion < 7.14 ? 'ps' : 'powershell';
     }else{
