@@ -104,12 +104,35 @@
   margin-top: 16px;
 }
 
-.wz-login .application .login-wrapper .euiText.euiText--small{
-  padding-bottom: 27px !important;
-  padding-top: 7px;
+.wz-login .application .login-wrapper .euiText.euiText--small {
   font-family: 'Montserrat', sans-serif;
   font-size: 17px;
   text-align: center;
+}
+
+.wz-login .application .login-wrapper .euiText.euiText--small:not(.wz-banner) {
+  padding-bottom: 27px !important;
+  padding-top: 7px;
+}
+
+.wz-login .application .login-wrapper .euiText.euiText--small.wz-banner {
+  position: absolute;
+  bottom: -25px;
+  right: 0px;
+}
+
+.wz-login .application .login-wrapper .euiText.euiText--small.wz-banner > .euiTextAlign {
+  display: flex;
+  align-items: center;
+  color: #fff;
+}
+
+.wz-login .application .login-wrapper .euiText.euiText--small.wz-banner > .euiTextAlign > img {
+  width: auto;
+  height: 16px;
+  float: right;
+  margin-bottom: 0px;
+  margin-left: 4px;
 }
 
 /* Top bar*/

@@ -58,17 +58,25 @@ let observer = new MutationObserver((mutations) => {
   mutations.forEach((mutation) => {
     if (!mutation.addedNodes || !mutation.addedNodes.length) return;
 
-    var loginWrapper = $('.login-wrapper');
+    const loginWrapper = $('.login-wrapper');
     try {
       if (loginWrapper.length && !ready) {
         ready = true;
         $('.content').addClass('wz-login');
-        var logo = $('figure > img', loginWrapper);
-        logo.attr('src', '/plugins/wazuh/assets/wazuh_logo_login.svg');
-        var title = $('.euiText.euiText--medium > .euiTextAlign', loginWrapper);
-        title.text('Wazuh Cloud');
-        var subtitle = $('.euiText.euiText--small > .euiTextAlign', loginWrapper);
-        subtitle.text('The Open Source Security Platform');
+        const title = $('.euiText.euiText--medium > .euiTextAlign', loginWrapper);
+        if (title.text().trim() === "") {
+          const subtitle = $('.euiText.euiText--small', loginWrapper);
+          subtitle.addClass("wz-banner");
+          const subtitleText = $('.euiText.euiText--small > .euiTextAlign', loginWrapper);
+          const trimmedText = subtitleText.text().trim();
+          subtitleText.html(`
+            <span>${trimmedText}</span>
+            <img 
+              src="/plugins/wazuh/assets/new_logo_white.svg" 
+              class="subtitle-logo"            
+            ">
+          `);
+        }
       }
     } catch (error) {
       console.log(error);
