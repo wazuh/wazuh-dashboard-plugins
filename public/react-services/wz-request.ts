@@ -51,7 +51,7 @@ export class WzRequest {
         timeout: customTimeout || timeout,
       };
       const data = await axios(options);
-      
+
       if (data['error']) {
         throw new Error(data['error']);
       }
@@ -117,9 +117,10 @@ export class WzRequest {
         const failed_ids =
           ((((response.data || {}).data || {}).failed_items || [])[0] || {}).id || {};
         const message = (response.data || {}).message || 'Unexpected error';
+
         return Promise.reject(
           `${message} (${error.code}) - ${error.message} ${
-            failed_ids && failed_ids.length > 1 ? ` Affected ids: ${failed_ids} ` : ''
+            failed_ids && failed_ids.length >= 1 ? ` Affected ids: ${failed_ids} ` : ''
           }`
         );
       }

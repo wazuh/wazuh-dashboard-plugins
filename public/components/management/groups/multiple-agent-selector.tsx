@@ -330,16 +330,22 @@ export const MultipleAgentSelector = withErrorBoundary(
           });
         }
 
+        this.setState({ savingChanges: false, initState: true });
         ErrorHandler.info('Group has been updated');
       } catch (error) {
+        //get affected agents
+        let AffectedIds = error.split('Affected ids: ').pop().trim().split(',');
+
         this.setState({ savingChanges: false, initState: true });
 
         //get all agents
-        let allAgents = [...this.state.availableAgents.data, ...this.state.selectedAgents.data];
+        // let allAgents = [...this.state.availableAgents.data, ...this.state.selectedAgents.data];
+
+        console.log(itemsToSave);
 
         //move agents to their previous position
-        allAgents.forEach(async (agent) => {
-          if (itemsToSave.addedIds.includes(agent.key)) {
+        AffectedIds.forEach(async (agent) => {
+          if (itemsToSave.addedIds.includes(agent)) {
             this.moveItem(
               JSON.stringify(agent),
               this.state.selectedAgents.data,
@@ -352,7 +358,7 @@ export const MultipleAgentSelector = withErrorBoundary(
                 agents_list: itemsToSave.addedIds.toString(),
               },
             }).catch(() => {});
-          } else if (itemsToSave.deletedIds.includes(agent.key)) {
+          } else if (itemsToSave.deletedIds.includes(agent)) {
             this.moveItem(
               JSON.stringify(agent),
               this.state.availableAgents.data,
