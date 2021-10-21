@@ -668,9 +668,17 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
   }
 
   getBadgeColor(agentStatus) {
-    if (agentStatus.toLowerCase() === 'active') { return 'secondary'; }
-    else if (agentStatus.toLowerCase() === 'disconnected') { return '#BD271E'; }
-    else if (agentStatus.toLowerCase() === 'never connected') { return 'default'; }
+    switch(agentStatus.toLowerCase()) { 
+      case 'active': { 
+        return 'secondary';
+      } 
+      case 'disconnected': { 
+        return '#BD271E' 
+      } 
+      case 'never connected': { 
+        return 'default';
+      } 
+    } 
   }
   
   removeSelectedAgent() {
