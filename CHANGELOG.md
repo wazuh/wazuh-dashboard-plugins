@@ -1,6 +1,7 @@
 # Change Log
 
 All notable changes to the Wazuh app project will be documented in this file.
+
 ## Wazuh v4.2.4 - Kibana 7.10.2 , 7.12.1, 7.13.4, 7.14.2 - Revision 4206
 
 ### Added
@@ -11,6 +12,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Fixed
 
 - Fixed compatibility wazuh 4.2 - kibana 7.13.4 [#3653](https://github.com/wazuh/wazuh-kibana-app/pull/3653)
+- Fixed interative register windows agent screen error [#3654](https://github.com/wazuh/wazuh-kibana-app/pull/3654)
 
 ## Wazuh v4.2.4 - Kibana 7.10.2, 7.11.2, 7.12.1 - Revision 4205
 
@@ -27,12 +29,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Added
 
 - Support for Wazuh 4.2.3
-
-## Wazuh v4.2.4 - Kibana 7.10.2 , 7.12.1, 7.13.4, 7.14.2 - Revision 4206
-
-### Fixed
-- Fixed interative register windows agent screen error [#3654](https://github.com/wazuh/wazuh-kibana-app/pull/3654)
-
 
 ## Wazuh v4.2.2 - Kibana 7.10.2 , 7.12.1 - Revision 4203
 
