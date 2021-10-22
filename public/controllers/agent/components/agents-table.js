@@ -162,7 +162,7 @@ export const AgentsTable = withErrorBoundary(
     }
 
     async UNSAFE_componentWillMount() {
-      const managerVersion = await WzRequest.apiReq('GET', '//', {});
+      const managerVersion = await WzRequest.apiReq('GET', '/ ', {});
       const totalAgent = await WzRequest.apiReq('GET', '/agents', {});
       const agentActive = await WzRequest.apiReq('GET', '/agents', {
         params: {
