@@ -71,6 +71,23 @@ export const MultipleAgentSelector = withErrorBoundary(
       };
     }
 
+    clearAgents() {
+      this.setState({
+        availableAgents: {
+          loaded: false,
+          data: [],
+          offset: 0,
+          loadedAll: false,
+        },
+        selectedAgents: {
+          loaded: false,
+          data: [],
+          offset: 0,
+          loadedAll: false,
+        },
+      });
+    }
+
     async componentDidMount() {
       this.setState({ load: true });
 
@@ -102,38 +119,6 @@ export const MultipleAgentSelector = withErrorBoundary(
         getErrorOrchestrator().handleError(options);
         this.setState({ load: false });
       }
-
-      // try {
-      //   try {
-      //     while (!this.state.selectedAgents.loadedAll) {
-      //       await this.loadSelectedAgents();
-      //       this.setState({
-      //         selectedAgents: {
-      //           ...this.state.selectedAgents,
-      //           offset: this.state.selectedAgents.offset + 499,
-      //         },
-      //       });
-      //     }
-      //   } catch (error) {}
-      //   this.firstSelectedList = [...this.state.selectedAgents.data];
-      //   await this.loadAllAgents('', true);
-      //   this.setState({
-      //     load: false,
-      //   });
-      // } catch (error) {
-      //   const options = {
-      //     context: `${MultipleAgentSelector.name}.componentDidMount`,
-      //     level: UI_LOGGER_LEVELS.ERROR,
-      //     severity: UI_ERROR_SEVERITIES.BUSINESS,
-      //     error: {
-      //       error: error,
-      //       message: error.message || error,
-      //       title: 'Error loading agents',
-      //     },
-      //   };
-      //   getErrorOrchestrator().handleError(options);
-      //   this.setState({ load: false });
-      // }
     }
 
     async loadAllAgents(searchTerm, start) {
@@ -333,52 +318,10 @@ export const MultipleAgentSelector = withErrorBoundary(
         this.setState({ savingChanges: false, initState: true });
         ErrorHandler.info('Group has been updated');
       } catch (error) {
-        //get affected agents
-        let AffectedIds = error.split('Affected ids: ').pop().trim().split(',');
-
         this.setState({ savingChanges: false, initState: true });
 
-        //get all agents
-        // let allAgents = [...this.state.availableAgents.data, ...this.state.selectedAgents.data];
-
-        console.log(itemsToSave);
-
-        //move agents to their previous position
-        AffectedIds.forEach(async (agent) => {
-          if (itemsToSave.addedIds.includes(agent)) {
-            this.moveItem(
-              JSON.stringify(agent),
-              this.state.selectedAgents.data,
-              this.state.availableAgents.data,
-              'a'
-            );
-            await WzRequest.apiReq('DELETE', `/agents/group`, {
-              params: {
-                group_id: this.props.currentGroup.name,
-                agents_list: itemsToSave.addedIds.toString(),
-              },
-            }).catch(() => {});
-          } else if (itemsToSave.deletedIds.includes(agent)) {
-            this.moveItem(
-              JSON.stringify(agent),
-              this.state.availableAgents.data,
-              this.state.selectedAgents.data,
-              'r'
-            );
-            await WzRequest.apiReq('PUT', `/agents/group`, {
-              params: {
-                group_id: this.props.currentGroup.name,
-                agents_list: itemsToSave.deletedIds.toString(),
-              },
-            }).catch(() => {});
-          }
-        });
-
-        this.checkLimit();
-
-        //relaod agent columns
-        this.reload('right');
-        this.reload('left');
+        this.clearAgents();
+        await this.componentDidMount();
 
         const options = {
           context: `${MultipleAgentSelector.name}.saveAddAgents`,

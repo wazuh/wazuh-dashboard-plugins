@@ -120,7 +120,7 @@ export class WzRequest {
 
         return Promise.reject(
           `${message} (${error.code}) - ${error.message} ${
-            failed_ids && failed_ids.length >= 1 ? ` Affected ids: ${failed_ids} ` : ''
+            failed_ids && failed_ids.length > 1 ? ` Affected ids: ${failed_ids} ` : ''
           }`
         );
       }
