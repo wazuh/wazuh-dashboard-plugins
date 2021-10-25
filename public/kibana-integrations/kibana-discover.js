@@ -803,7 +803,7 @@ function discoverController(
     $scope.fetchStatus = fetchStatuses.COMPLETE;
   }
 
-  function logInspectorRequest() {
+  async function logInspectorRequest() {
     inspectorAdapters.requests.reset();
     const title = i18n.translate('discover.inspectorRequestDataTitle', {
       defaultMessage: 'data',
