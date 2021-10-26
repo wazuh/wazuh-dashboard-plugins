@@ -29,7 +29,7 @@ import { SavedObject } from '../../../../../src/plugins/saved_objects/public';
 import { extractReferences, injectReferences } from './saved_visualization_references';
 import { IIndexPattern } from '../../../../../src/plugins/data/public';
 import { ISavedVis, SerializedVis, updateOldState } from '../../../../../src/plugins/visualizations/public';
-import { createSavedSearchesLoader } from '../../../../../src/plugins/discover/public';
+import { createSavedSearchesLoader } from '../discover/saved_searches';
 import { getPlugins } from '../../kibana-services';
 
 export const convertToSerializedVis = (savedVis: ISavedVis): SerializedVis => {
