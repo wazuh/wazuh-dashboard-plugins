@@ -56,7 +56,7 @@ export class OverviewWelcome extends Component {
         <EuiCard
           size="xs"
           layout="horizontal"
-          icon={<EuiIcon size="xl" type={icon} color="#256BD1" />}
+          icon={<EuiIcon size="xl" type={icon} color="#5297FA" />}
           className="homSynopsis__card"
           title={WAZUH_MODULES[tab].title}
           onClick={() => store.dispatch(updateCurrentTab(tab))}
