@@ -28,11 +28,11 @@ import { SavedObject } from '../../../../../src/plugins/saved_objects/public';
 // @ts-ignore
 import { extractReferences, injectReferences } from './saved_visualization_references';
 import { IIndexPattern } from '../../../../../src/plugins/data/public';
-import { ISavedVis, SerializedVis, updateOldState } from '../../../../../src/plugins/visualizations/public';
+import { updateOldState } from './vis_update_state';
 import { createSavedSearchesLoader } from '../discover/saved_searches';
 import { getPlugins } from '../../kibana-services';
 
-export const convertToSerializedVis = (savedVis: ISavedVis): SerializedVis => {
+export const convertToSerializedVis = (savedVis) => {
   const { id, title, description, visState, uiStateJSON, searchSourceFields } = savedVis;
 
   const aggs = searchSourceFields && searchSourceFields.index ? visState.aggs || [] : visState.aggs;
@@ -52,7 +52,7 @@ export const convertToSerializedVis = (savedVis: ISavedVis): SerializedVis => {
   };
 };
 
-export const convertFromSerializedVis = (vis: SerializedVis): ISavedVis => {
+export const convertFromSerializedVis = (vis) => {
   return {
     id: vis.id,
     title: vis.title,
@@ -107,7 +107,7 @@ export function createSavedVisClass(services) {
           version: 1,
         },
         afterESResp: async (savedObject: SavedObject) => {
-          const savedVis = (savedObject as any) as ISavedVis;          
+          const savedVis = (savedObject as any);          
           savedVis.visState = await updateOldState(savedVis.visState);
           if (savedVis.searchSourceFields?.index) {
             await services.indexPatterns.get(savedVis.searchSourceFields.index as any);
