@@ -45,6 +45,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Health check actions notifications refactored and added debug mode [#3258](https://github.com/wazuh/wazuh-kibana-app/pull/3258)
 - Improved visualizations object configuration readability [#3355](https://github.com/wazuh/wazuh-kibana-app/pull/3355)
 - Changed the way kibana-vis hides the visualization while loading, this should prevent errors caused by having a 0 height visualization [#3349](https://github.com/wazuh/wazuh-kibana-app/pull/3349)
+- Changed colors and images [#3666](https://github.com/wazuh/wazuh-kibana-app/pull/3666)
 
 ### Fixed
 
