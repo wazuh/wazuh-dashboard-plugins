@@ -680,29 +680,6 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
       } 
     } 
   }
-  
-  removeSelectedAgent() {
-    store.dispatch(updateCurrentAgentData({}));
-    if (window.location.href.includes("/agents?")) {
-      window.location.href = "#/agents-preview";
-      this.router.reload();
-      return;
-    }
-    const { filterManager } = getDataPlugin().query;
-    const currentAppliedFilters = filterManager.getFilters();
-    const agentFilters = currentAppliedFilters.filter(x => {
-      return x.meta.key === 'agent.id';
-    });
-    agentFilters.map(x => {
-      filterManager.removeFilter(x);
-    });
-  }
-
-  getBadgeColor(agentStatus) {
-    if (agentStatus.toLowerCase() === 'active') { return 'secondary'; }
-    else if (agentStatus.toLowerCase() === 'disconnected') { return '#BD271E'; }
-    else if (agentStatus.toLowerCase() === 'never connected') { return 'default'; }
-  }
 
   thereAreSelectors() {
     return ((AppState.getAPISelector() && this.state.currentAPI && this.state.APIlist && this.state.APIlist.length > 1)
