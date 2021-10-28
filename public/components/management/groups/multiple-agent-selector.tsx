@@ -317,6 +317,8 @@ export const MultipleAgentSelector = withErrorBoundary(
 
         this.setState({ savingChanges: false, initState: true });
         ErrorHandler.info('Group has been updated');
+        this.clearAgents();
+        await this.componentDidMount();
       } catch (error) {
         this.setState({ savingChanges: false, initState: true });
 
