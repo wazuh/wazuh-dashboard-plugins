@@ -1,17 +1,21 @@
+nav.euiBreadcrumbs.wz-global-breadcrumb span.euiBreadcrumb[title=""]:first-child{
+    display: none;
+}
+
 .wz-global-breadcrumb {
     font-size: 14px;
-    font-family: "Inter UI";
+    // font-family: "Inter UI";
     padding: 0px;
 }
 
 .wz-global-breadcrumb-btn{
     max-width: unset!important;
-    height: 20px;
+    // height: 20px;
 }
 
 .wz-global-breadcrumb-btn{
-    height: 20px;
-    font-family: "Inter UI";
+    // height: 20px;
+    // font-family: "Inter UI";
 }
 
 

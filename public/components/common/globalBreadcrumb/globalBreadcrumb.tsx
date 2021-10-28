@@ -34,7 +34,7 @@ class WzGlobalBreadcrumb extends Component {
                 text: (
                   <a
                     style={{ margin: '0px 0px -5px 0px', height: 20 }}
-                    className="euiLink euiLink--subdued euiBreadcrumb "
+                    className="euiLink euiLink--subdued "
                     onClick={(ev) => { ev.stopPropagation(); AppNavigate.navigateToModule(ev, 'agents', { "tab": "welcome", "agent": breadcrumb.agent.id }); this.router.reload(); }}
                     id="breadcrumbNoTitle"
                   >

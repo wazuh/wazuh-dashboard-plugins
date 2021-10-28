@@ -82,7 +82,7 @@ export class MainModuleOverview extends Component {
           text: (
             <a
               style={{ margin: '0px 0px -5px 0px', height: 20 }}
-              className="euiLink euiLink--subdued euiBreadcrumb "
+              className="euiLink euiLink--subdued  "
               onClick={(ev) => { ev.stopPropagation(); AppNavigate.navigateToModule(ev, 'agents', { "tab": "welcome", "agent": currentAgent.id }); this.router.reload(); }}
               id="breadcrumbNoTitle"
             >
@@ -94,14 +94,14 @@ export class MainModuleOverview extends Component {
       }
       breadcrumb.push({
         text: (
-          <EuiFlexGroup gutterSize="xs" alignItems="center" responsive={false}>
-            <div style={{ margin: '0.8em 0em 0em 0.09em' }}>
+          <EuiFlexGroup gutterSize="none" alignItems="center" responsive={false}>
+            {/* <div style={{ margin: '0.8em 0em 0em 0.09em' }}> */}
               <EuiToolTip position="top">
-                <div className="euiBreadcrumb euiBreadcrumb--last" title="">
+                <>
                   {WAZUH_MODULES[this.props.section].title}
-                </div>
+                </>
               </EuiToolTip>
-            </div>
+            {/* </div> */}
             <EuiToolTip content={WAZUH_MODULES[this.props.section].description}>
                 <EuiIcon style={{ margin: '0px 0px 1px 5px' }} type='iInCircle' />
               </EuiToolTip>
