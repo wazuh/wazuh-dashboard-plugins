@@ -2,22 +2,21 @@ nav.euiBreadcrumbs.wz-global-breadcrumb span.euiBreadcrumb[title=""]:first-child
     display: none;
 }
 
+.euiBreadcrumbs--truncate .wz-global-breadcrumb .euiBreadcrumb:not(.euiBreadcrumb--collapsed) span.euiToolTipAnchor{
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: text-bottom;
+}
+
 .wz-global-breadcrumb {
     font-size: 14px;
-    // font-family: "Inter UI";
     padding: 0px;
 }
 
 .wz-global-breadcrumb-btn{
     max-width: unset!important;
-    // height: 20px;
 }
-
-.wz-global-breadcrumb-btn{
-    // height: 20px;
-    // font-family: "Inter UI";
-}
-
 
 @media screen and (-webkit-min-device-pixel-ratio: 0) { 
     _::-webkit-full-page-media, _:future, :root , .wz-global-breadcrumb {
