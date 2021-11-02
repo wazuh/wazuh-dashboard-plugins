@@ -23,7 +23,8 @@ import {
   EuiSpacer,
   EuiText,
   EuiEmptyPrompt,
-  EuiToolTip
+  EuiToolTip,
+  EuiCard
 } from '@elastic/eui';
 import { Pie } from "../../../components/d3/pie";
 import { ProgressChart } from "../../../components/d3/progress";
