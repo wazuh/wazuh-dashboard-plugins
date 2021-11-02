@@ -124,7 +124,7 @@ export class FlyoutTechnique extends Component {
       const { currentTechnique } = this.props;
       const result = await WzRequest.apiReq('GET', '/mitre/techniques', {
         params: {
-          q: `references.external_id=${currentTechnique}`
+          q: `external_id=${currentTechnique}`
         }
       });
       const rawData = (((result || {}).data || {}).data || {}).affected_items
@@ -151,7 +151,7 @@ export class FlyoutTechnique extends Component {
     const { tacticsObject } = this.props;
     return tactics.map((element) => {
       const tactic = Object.values(tacticsObject).find(obj => obj.id === element);
-      return { id:tactic.references[0].external_id, name: tactic.name};
+      return { id:tactic.external_id, name: tactic.name};
     });
   }
 
