@@ -117,7 +117,7 @@ class WzGroupsEditor extends Component {
         this.showToast('warning', warning.savedMessage, error, 3000);
         return;
       }
-      this.setState({ isSaving: false });
+      this.setState({ isSaving: false, hasChanges: false });
       const textSuccess = 'File successfully edited';
       this.showToast('success', 'Success', textSuccess, 3000);
     } catch (error) {
