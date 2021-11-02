@@ -12,7 +12,7 @@ import * as TimSort from 'timsort';
 import { getConfiguration } from '../get-configuration';
 
 const COLORS = {
-  PRIMARY: '#00a9e5'
+  PRIMARY: '#256BD1'
 };
 
 const pageConfiguration = (nameLogo) => ({
