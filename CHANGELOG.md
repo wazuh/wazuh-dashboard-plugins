@@ -15,6 +15,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed interative register windows agent screen error [#3654](https://github.com/wazuh/wazuh-kibana-app/pull/3654)
 - Fixed breadcrumbs style compatibility for Kibana 7.14.2 [#3668](https://github.com/wazuh/wazuh-kibana-app/pull/3668)
 - Fixed Wazuh token is not removed after logout in Kibana 7.13 [#3670](https://github.com/wazuh/wazuh-kibana-app/pull/3670)
+- Fixing EuiPannels in Overview Sections and disabled text in WzMenu [#3674](https://github.com/wazuh/wazuh-kibana-app/pull/3674)
 
 ## Wazuh v4.2.4 - Kibana 7.10.2, 7.11.2, 7.12.1 - Revision 4205
 
