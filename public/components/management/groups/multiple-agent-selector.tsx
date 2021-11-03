@@ -68,11 +68,17 @@ export const MultipleAgentSelector = withErrorBoundary(
         load: false,
         savingChanges: false,
         initState: true,
+        typedClasses: {
+          a: 'wzMultipleSelectorAdding',
+          r: 'wzMultipleSelectorRemoving',
+        },
       };
     }
 
     clearAgents() {
       this.setState({
+        currentAdding: 0,
+        currentDeleting: 0,
         availableAgents: {
           loaded: false,
           data: [],
@@ -294,7 +300,6 @@ export const MultipleAgentSelector = withErrorBoundary(
 
     async saveAddAgents() {
       const itemsToSave = this.getItemsToSave();
-      // const failedIds = [];
       try {
         this.setState({ savingChanges: true, initState: false });
         if (itemsToSave.addedIds.length) {
@@ -616,13 +621,7 @@ export const MultipleAgentSelector = withErrorBoundary(
                                     .map((item, index) => (
                                       <option
                                         key={index}
-                                        className={
-                                          item.type === 'a'
-                                            ? 'wzMultipleSelectorAdding'
-                                            : item.type === 'r'
-                                            ? 'wzMultipleSelectorRemoving'
-                                            : ''
-                                        }
+                                        className={this.state.typedClasses[item.type]}
                                         value={JSON.stringify(item)}
                                       >
                                         {`${item.key} - ${item.value}`}
@@ -832,13 +831,7 @@ export const MultipleAgentSelector = withErrorBoundary(
                                     .map((item, index) => (
                                       <option
                                         key={index}
-                                        className={
-                                          item.type === 'a'
-                                            ? 'wzMultipleSelectorAdding'
-                                            : item.type === 'r'
-                                            ? 'wzMultipleSelectorRemoving'
-                                            : ''
-                                        }
+                                        className={this.state.typedClasses[item.type]}
                                         value={JSON.stringify(item)}
                                       >
                                         {`${item.key} - ${item.value}`}
