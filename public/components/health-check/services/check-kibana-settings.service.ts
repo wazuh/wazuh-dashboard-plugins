@@ -12,37 +12,38 @@
  *
  */
 
-import { AxiosResponse } from 'axios';
-import { GenericRequest } from '../../../react-services';
 import { CheckLogger } from '../types/check_logger';
 import _ from 'lodash';
-
-type userValue<T> = { userValue: T };
-
-type kbnSettings = {
-  buildNum: userValue<number>;
-  maxBuckets?: userValue<number>;
-  metaFields?: userValue<string[]>;
-  timeFilter?: userValue<string[]>;
-};
-
-type responseKbnSettings = { settings: kbnSettings };
+import { getUiSettings } from '../../../kibana-services';
 
 export const checkKibanaSettings = (kibanaSettingName: string, defaultAppValue: any, callback?: (checkLogger: CheckLogger, options: {defaultAppValue: any}) => void) => (appConfig: any) => async (checkLogger: CheckLogger) => {
   checkLogger.info('Getting settings...');
-  const kibanaSettingsResponse: AxiosResponse<responseKbnSettings> = await GenericRequest.request('GET', '/api/kibana/settings');
-  checkLogger.info('Got Kibana settings');
-  const valueKibanaSetting = kibanaSettingsResponse.data?.settings?.[kibanaSettingName]?.userValue;
-  const settingsAreDifferent = !_.isEqual(valueKibanaSetting, defaultAppValue);
+  const valueKibanaSetting = getUiSettings().get(kibanaSettingName);
+  const settingsAreDifferent = !_.isEqual(
+    typeof defaultAppValue === 'string' ? stringifySetting(valueKibanaSetting) : valueKibanaSetting,
+    defaultAppValue
+  );
   checkLogger.info(`Check Kibana setting [${kibanaSettingName}]: ${stringifySetting(valueKibanaSetting)}`);
   checkLogger.info(`App setting [${kibanaSettingName}]: ${stringifySetting(defaultAppValue)}`);
   checkLogger.info(`Settings mismatch [${kibanaSettingName}]: ${settingsAreDifferent ? 'yes' : 'no'}`);
-  if ( !valueKibanaSetting && settingsAreDifferent ){
+  if ( !valueKibanaSetting || settingsAreDifferent ){
     checkLogger.info(`Updating [${kibanaSettingName}] setting...`);
-    await GenericRequest.request('POST', '/api/kibana/settings', { changes: { [kibanaSettingName]: defaultAppValue } });
+    await updateSetting(kibanaSettingName, defaultAppValue);
     checkLogger.action(`Updated [${kibanaSettingName}] setting to: ${stringifySetting(defaultAppValue)}`);
     callback && callback(checkLogger,{ defaultAppValue });
   }
+}
+
+async function updateSetting(kibanaSettingName, defaultAppValue, retries = 3) {
+  return await getUiSettings()
+    .set(kibanaSettingName, null)
+    .catch(async (error) => {
+      if (retries > 0) {
+        console.log("retry", retries)
+        return await updateSetting(kibanaSettingName, defaultAppValue, --retries);
+      }
+      throw error;
+    });
 }
 
 function stringifySetting(setting: any){
