@@ -45,7 +45,6 @@ export async function getWzConfig($q, genericReq, wazuhConfig) {
     'extensions.osquery': false,
     'extensions.docker': false,
     timeout: 20000,
-    'api.selector': true,
     'ip.selector': true,
     'ip.ignore': [],
     'xpack.rbac.enabled': true,
