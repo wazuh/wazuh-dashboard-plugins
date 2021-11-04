@@ -11,13 +11,14 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
-- Fixed compatibility wazuh 4.2 - kibana 7.13.4 [#3653](https://github.com/wazuh/wazuh-kibana-app/pull/3653)
+- Fixed compatibility Wazuh 4.2 - Kibana 7.13.4 [#3653](https://github.com/wazuh/wazuh-kibana-app/pull/3653)
 - Fixed interative register windows agent screen error [#3654](https://github.com/wazuh/wazuh-kibana-app/pull/3654)
 - Fixed breadcrumbs style compatibility for Kibana 7.14.2 [#3668](https://github.com/wazuh/wazuh-kibana-app/pull/3668)
 - Fixed Wazuh token is not removed after logout in Kibana 7.13 [#3670](https://github.com/wazuh/wazuh-kibana-app/pull/3670)
 - Fixed Group Configuration and Management configuration error after trying to going back after you save [#3672](https://github.com/wazuh/wazuh-kibana-app/pull/3672)
-- Fixing EuiPannels in Overview Sections and disabled text in WzMenu [#3674](https://github.com/wazuh/wazuh-kibana-app/pull/3674)
+- Fixing EuiPanels in Overview Sections and disabled text in WzMenu [#3674](https://github.com/wazuh/wazuh-kibana-app/pull/3674)
 - Fixing double flyout clicking in a policy [#3676](https://github.com/wazuh/wazuh-kibana-app/pull/3676)
+- Fixed compatibility to get the valid index patterns and refresh fields for Kibana 7.10.2-7.13.4 [3681](https://github.com/wazuh/wazuh-kibana-app/pull/3681)
 
 ## Wazuh v4.2.4 - Kibana 7.10.2, 7.11.2, 7.12.1 - Revision 4205
 
