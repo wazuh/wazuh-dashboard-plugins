@@ -44,7 +44,7 @@ export class PatternHandler {
   static async changePattern(selectedPattern) {
     try {
       AppState.setCurrentPattern(selectedPattern);
-      if(satisfyKibanaVersion('<=7.10.2')){
+      if(satisfyKibanaVersion('<7.11')){
         await this.refreshIndexPattern();
       };
       return AppState.getCurrentPattern();

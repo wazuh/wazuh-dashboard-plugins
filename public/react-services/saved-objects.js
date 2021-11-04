@@ -36,9 +36,9 @@ export class SavedObject {
       let indexPatterns = ((savedObjects || {}).data || {}).saved_objects || [];
 
       let indexPatternsFields;
-      if(satisfyKibanaVersion('<=7.10.2')){
+      if(satisfyKibanaVersion('<7.11')){
         indexPatternsFields = indexPatterns.map(indexPattern => JSON.parse(indexPattern.attributes.fields));
-      }else if(satisfyKibanaVersion('>7.10.2')){
+      }else if(satisfyKibanaVersion('>=7.11')){
         indexPatternsFields = await Promise.all(indexPatterns.map(async indexPattern => {
           try{
             const {data: {fields}} = await GenericRequest.request(
@@ -111,7 +111,7 @@ export class SavedObject {
     const result = await SavedObject.existsIndexPattern(patternID);
     if (!result.data) {
       let fields = '';
-      if(satisfyKibanaVersion('<=7.10.2')){
+      if(satisfyKibanaVersion('<7.11')){
         fields = await SavedObject.getIndicesFields(patternID, WAZUH_INDEX_TYPE_ALERTS);
       };
       await this.createSavedObject(
@@ -171,9 +171,9 @@ export class SavedObject {
         true
       );
       let indexPatternFields;
-      if(satisfyKibanaVersion('<=7.10.2')){
+      if(satisfyKibanaVersion('<7.11')){
         indexPatternFields = JSON.parse(indexPatternData.data.attributes.fields);
-      }else if(satisfyKibanaVersion('>7.10.2')){
+      }else if(satisfyKibanaVersion('>=7.11')){
         try{
           const {data: {fields}} = await GenericRequest.request(
             'GET',
@@ -200,7 +200,7 @@ export class SavedObject {
         params
       );
 
-      if(satisfyKibanaVersion('<=7.10.2')){
+      if(satisfyKibanaVersion('<7.11')){
         if (type === 'index-pattern'){
           await this.refreshFieldsOfIndexPattern(id, params.attributes.title, fields);
         }
@@ -281,7 +281,7 @@ export class SavedObject {
   static async createWazuhIndexPattern(pattern) {
     try {
       let fields = '';
-      if(satisfyKibanaVersion('<=7.10.2')){
+      if(satisfyKibanaVersion('<7.11')){
         fields = await SavedObject.getIndicesFields(pattern, WAZUH_INDEX_TYPE_ALERTS);
       };
       await this.createSavedObject(

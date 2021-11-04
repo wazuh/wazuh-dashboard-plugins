@@ -171,7 +171,7 @@ export class Events extends Component {
     if (!this.state.hasRefreshedKnownFields) {
       try {
         this.setState({ hasRefreshedKnownFields: true, isRefreshing: true });
-        if(satisfyKibanaVersion('<=7.10.2')){
+        if(satisfyKibanaVersion('<7.11')){
           await PatternHandler.refreshIndexPattern();
         };
         this.setState({ isRefreshing: false });
@@ -236,7 +236,7 @@ export class Events extends Component {
 
   reloadToast = () => {
     const toastLifeTimeMs = 300000;
-    if(satisfyKibanaVersion('<=7.10.2')){
+    if(satisfyKibanaVersion('<7.11')){
       getToasts().add({
         color: 'success',
         title: 'The index pattern was refreshed successfully.',
@@ -251,7 +251,7 @@ export class Events extends Component {
         </EuiFlexGroup>),
         toastLifeTimeMs
       });
-    }else if(satisfyKibanaVersion('>7.10.2')){
+    }else if(satisfyKibanaVersion('>=7.11')){
       getToasts().add({
         color: 'warning',
         title: 'Found unknown fields in the index pattern.',

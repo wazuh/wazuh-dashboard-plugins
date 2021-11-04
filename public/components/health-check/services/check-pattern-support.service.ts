@@ -22,7 +22,7 @@ export const checkPatternSupportService = (pattern: string, indexType : string) 
   
   if (!result.data) {
     let fields;
-    if(satisfyKibanaVersion('<=7.10.2')){
+    if(satisfyKibanaVersion('<7.11')){
       checkLogger.info(`Getting indices fields for the index pattern id [${pattern}]...`);
       fields = await SavedObject.getIndicesFields(pattern, indexType);
       checkLogger.info(`Fields for index pattern id [${pattern}] found: ${fields.length}`);

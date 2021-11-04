@@ -41,7 +41,7 @@ export const checkIndexPatternObjectService =  async (appConfig, checkLogger: Ch
       const existDefaultIndexPattern = await SavedObject.getExistingIndexPattern(defaultPatternId);
       checkLogger.info(`Index pattern id [${defaultPatternId}] exists: ${existDefaultIndexPattern ? 'yes' : 'no'}`);
       if (existDefaultIndexPattern) {
-        if(satisfyKibanaVersion('<=7.10.2')){
+        if(satisfyKibanaVersion('<7.11')){
           checkLogger.info(`Refreshing index pattern fields [${defaultPatternId}]...`);
           await SavedObject.refreshIndexPattern(defaultPatternId);
           checkLogger.action(`Refreshed index pattern fields [${defaultPatternId}]`);

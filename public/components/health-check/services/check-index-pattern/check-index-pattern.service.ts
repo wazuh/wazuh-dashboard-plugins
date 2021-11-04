@@ -26,7 +26,7 @@ const checkPattern = async (appConfig, checkLogger: CheckLogger) =>  {
   }else{
     await checkIndexPatternObjectService(appConfig, checkLogger);
     await checkTemplateService(appConfig, checkLogger);
-    if(satisfyKibanaVersion('<=7.10.2')){
+    if(satisfyKibanaVersion('<7.11')){
       await checkFieldsService(appConfig, checkLogger);
     };
   }
