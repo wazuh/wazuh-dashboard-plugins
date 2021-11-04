@@ -15,6 +15,7 @@ import { AppState, SavedObject } from '../../../../react-services';
 import { getDataPlugin } from '../../../../kibana-services';
 import { HEALTH_CHECK } from '../../../../../common/constants';
 import { CheckLogger } from '../../types/check_logger';
+import { satisfyKibanaVersion } from '../../../../../common/semver';
 
 export const checkIndexPatternObjectService =  async (appConfig, checkLogger: CheckLogger) => {
   const patternId: string = AppState.getCurrentPattern();
@@ -40,9 +41,11 @@ export const checkIndexPatternObjectService =  async (appConfig, checkLogger: Ch
       const existDefaultIndexPattern = await SavedObject.getExistingIndexPattern(defaultPatternId);
       checkLogger.info(`Index pattern id [${defaultPatternId}] exists: ${existDefaultIndexPattern ? 'yes' : 'no'}`);
       if (existDefaultIndexPattern) {
-        checkLogger.info(`Refreshing index pattern fields [${defaultPatternId}]...`);
-        await SavedObject.refreshIndexPattern(defaultPatternId);
-        checkLogger.action(`Refreshed index pattern fields [${defaultPatternId}]`);
+        if(satisfyKibanaVersion('<=7.10.2')){
+          checkLogger.info(`Refreshing index pattern fields [${defaultPatternId}]...`);
+          await SavedObject.refreshIndexPattern(defaultPatternId);
+          checkLogger.action(`Refreshed index pattern fields [${defaultPatternId}]`);
+        };
       } else if(shouldCreateIndex) {
         checkLogger.info(`Creating index pattern [${defaultPatternId}]...`);
         await SavedObject.createWazuhIndexPattern(defaultPatternId);

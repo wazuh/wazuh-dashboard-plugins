@@ -13,6 +13,7 @@
  */
 import { SavedObject } from '../../../react-services';
 import { CheckLogger } from '../types/check_logger';
+import { satisfyKibanaVersion } from '../../../../common/semver';
 
 export const checkPatternSupportService = (pattern: string, indexType : string) => async (checkLogger: CheckLogger) => {
   checkLogger.info(`Checking index pattern id [${pattern}] exists...`);
@@ -20,16 +21,19 @@ export const checkPatternSupportService = (pattern: string, indexType : string) 
   checkLogger.info(`Exist index pattern id [${pattern}]: ${result.data ? 'yes' : 'no'}`);
   
   if (!result.data) {
-    checkLogger.info(`Getting indices fields for the index pattern id [${pattern}]...`);
-    const fields = await SavedObject.getIndicesFields(pattern, indexType);
-    checkLogger.info(`Fields for index pattern id [${pattern}] found: ${fields.length}`);
+    let fields;
+    if(satisfyKibanaVersion('<=7.10.2')){
+      checkLogger.info(`Getting indices fields for the index pattern id [${pattern}]...`);
+      fields = await SavedObject.getIndicesFields(pattern, indexType);
+      checkLogger.info(`Fields for index pattern id [${pattern}] found: ${fields.length}`);
+    };
   
     try {
       checkLogger.info(`Creating saved object for the index pattern with id [${pattern}].
   title: ${pattern}
   id: ${pattern}
   timeFieldName: timestamp
-  fields: ${fields.length}`);
+  ${fields ? `fields: ${fields.length}`: ''}`);
       await SavedObject.createSavedObject(
         'index-pattern',
         pattern,
