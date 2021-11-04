@@ -286,7 +286,7 @@ class WzRulesetTable extends Component {
           if (this.isLoading) return;
           this.setState({ isLoading: true });
           const { section } = this.props.state;
-          window.location.href = `${window.location.href}&redirectRule=${id}`;
+          section === RulesetResources.RULES && (window.location.href = `${window.location.href}&redirectRule=${id}`);
           try {
             if (section === RulesetResources.LISTS) {
               const result = await this.rulesetHandler.getFileContent(item.filename);

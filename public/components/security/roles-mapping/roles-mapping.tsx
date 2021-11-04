@@ -57,7 +57,7 @@ export const RolesMapping = () => {
       ErrorHandler.handle('There was an error loading roles');
     }
   }, [rolesLoading]);
-
+  
   const getInternalUsers = async () => {
     try {
       const wazuhSecurity = new WazuhSecurity();
@@ -122,7 +122,7 @@ export const RolesMapping = () => {
   const updateRoles = async () => {
     await getRules();
   };
-
+  
   let editFlyout;
   if (isEditingRule) {
     editFlyout = (

@@ -36,6 +36,7 @@ import GroupsHandler from './utils/groups-handler';
 import { getToasts } from '../../../../../kibana-services';
 import { validateXML } from '../configuration/utils/xml';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
+import { WzOverlayMask } from '../../../../../components/common/util';
 import 'brace/theme/textmate';
 import 'brace/mode/xml';
 import 'brace/snippets/xml';
