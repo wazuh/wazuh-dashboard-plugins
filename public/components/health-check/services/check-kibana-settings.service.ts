@@ -39,7 +39,6 @@ async function updateSetting(kibanaSettingName, defaultAppValue, retries = 3) {
     .set(kibanaSettingName, null)
     .catch(async (error) => {
       if (retries > 0) {
-        console.log("retry", retries)
         return await updateSetting(kibanaSettingName, defaultAppValue, --retries);
       }
       throw error;
