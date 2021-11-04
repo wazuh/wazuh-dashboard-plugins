@@ -10,21 +10,18 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import store from '../../../../redux/store';
 import { connect } from 'react-redux';
 import { showExploreAgentModal, updateCurrentAgentData } from '../../../../redux/actions/appStateActions';
 import {
-  EuiButtonEmpty,
-  EuiButtonIcon,
-  EuiFlexItem,
-  EuiIcon,
+  EuiOverlayMask,
+  EuiOutsideClickDetector,
   EuiModal,
   EuiModalBody,
   EuiModalHeader,
   EuiModalHeaderTitle,
-  EuiOverlayMask,
-  EuiToolTip,
+  EuiPopover,
 } from '@elastic/eui';
+import { WzButton } from '../../../../components/common/buttons';
 import './agents-selector.scss';
 import { AgentSelectionTable } from './agents-selection-table';
 import { WAZUH_ALERTS_PATTERN } from '../../../../../common/constants';
@@ -52,21 +49,20 @@ class OverviewActions extends Component {
   }
 
   componentDidMount() {
-    const agentId = store.getState().appStateReducers.currentAgentData.id;
+
     const { filterManager } = getDataPlugin().query;
 
     this.setState({ filterManager: filterManager }, () => {
       if (this.props.initialFilter) this.agentTableSearch([this.props.initialFilter])
-      if (agentId) this.agentTableSearch([agentId])
+      if (this.props.agent.id) this.agentTableSearch([this.props.agent.id])
     });
   }
 
   componentDidUpdate(){
-    const agent = store.getState().appStateReducers.currentAgentData;
-    if(this.state.isAgent && !agent.id){
+    if(this.state.isAgent && !this.props.agent.id){
       this.setState({isAgent: false})
-    }else if(agent.id && this.state.isAgent !== agent.id){
-      this.setState({isAgent: agent.id})
+    }else if(this.props.agent.id && this.state.isAgent !== this.props.agent.id){
+      this.setState({isAgent: this.props.agent.id})
     }
   }
 
@@ -85,7 +81,7 @@ class OverviewActions extends Component {
 
   closeAgentModal() {
     this.setState({ isAgentModalVisible: false });
-    store.dispatch(showExploreAgentModal(false));
+    this.props.showExploreAgentModal(false);
   }
 
   showAgentModal() {
@@ -145,64 +141,79 @@ class OverviewActions extends Component {
 
     if (this.state.isAgentModalVisible || this.props.state.showExploreAgentModal) {
       modal = (
-        <EuiOverlayMask onClick={() => this.closeAgentModal()}>
-          <EuiModal
-            className="wz-select-agent-modal"
-            onClose={() => this.closeAgentModal()}
-            initialFocus="[name=popswitch]"
-          >
-            <EuiModalHeader>
-              <EuiModalHeaderTitle>Explore agent</EuiModalHeaderTitle>
-            </EuiModalHeader>
+        <EuiOverlayMask>
+          <EuiOutsideClickDetector onOutsideClick={() => this.closeAgentModal()}>
+            <EuiModal
+              className="wz-select-agent-modal"
+              onClose={() => this.closeAgentModal()}
+              initialFocus="[name=popswitch]"
+            >
+              <EuiModalHeader>
+                <EuiModalHeaderTitle>Explore agent</EuiModalHeaderTitle>
+              </EuiModalHeader>
 
-            <EuiModalBody>
-              <AgentSelectionTable
-                updateAgentSearch={(agentsIdList) => this.agentTableSearch(agentsIdList)}
-                removeAgentsFilter={(shouldUpdate) => this.removeAgentsFilter(shouldUpdate)}
-                selectedAgents={this.getSelectedAgents()}
-              />
-            </EuiModalBody>
-          </EuiModal>
+              <EuiModalBody>
+                <AgentSelectionTable
+                  updateAgentSearch={agentsIdList => this.agentTableSearch(agentsIdList)}
+                  removeAgentsFilter={(shouldUpdate) => this.removeAgentsFilter(shouldUpdate)}
+                  selectedAgents={this.getSelectedAgents()}
+                ></AgentSelectionTable>
+              </EuiModalBody>
+            </EuiModal>
+          </EuiOutsideClickDetector>
         </EuiOverlayMask>
       );
     }
-    const agent = store.getState().appStateReducers.currentAgentData;
+
+    const thereAgentSelected = (this.props.agent || {}).id
+
+    const avaliableForAgent = this.props.module.availableFor && this.props.module.availableFor.includes('agent');
+
+    let buttonUnpinAgent, buttonExploreAgent;
+    if(thereAgentSelected){
+      buttonUnpinAgent = (
+        <WzButton
+          buttonType='icon'
+          className="wz-unpin-agent"
+          iconType='pinFilled'
+          onClick={() => {
+            this.props.updateCurrentAgentData({});
+            this.removeAgentsFilter();
+          }}
+          tooltip={{position: 'bottom', content: 'Unpin agent'}}
+          aria-label='Unpin agent'
+        />
+      );
+    };
+
+    buttonExploreAgent = (
+      <WzButton
+        buttonType='empty'
+        isLoading={this.state.loadingReport}
+        color='primary'
+        isDisabled={!avaliableForAgent}
+        tooltip={{position: 'bottom', content: !avaliableForAgent ?  'This module is not supported for agents.' : (thereAgentSelected ? 'Change agent selected' : 'Select an agent to explore its modules') }}
+        style={thereAgentSelected ? {background: 'rgba(0, 107, 180, 0.1)'} : undefined}
+        iconType='watchesApp'
+        onClick={() => this.showAgentModal()}>
+          {thereAgentSelected ? `${this.props.agent.name} (${this.props.agent.id})` : 'Explore agent'}
+      </WzButton>
+    )
+    
     return (
-      <div>
-        <EuiFlexItem>
-          {!this.state.isAgent && (
-            <EuiToolTip position='bottom' content='Select an agent to explore its modules' >
-              <EuiButtonEmpty
-                isLoading={this.state.loadingReport}
-                color='primary'
-                onClick={() => this.showAgentModal()}>
-                <EuiIcon type="watchesApp" color="primary" style={{ marginBottom: 3 }} />&nbsp; Explore agent
-            </EuiButtonEmpty>
-            </EuiToolTip>
-          )}
-          {this.state.isAgent && (
-            <div style={{ display: "inline-flex" }}>
-              <EuiToolTip position='bottom' content='Change agent selected' >
-                <EuiButtonEmpty
-                  style={{background: 'rgba(0, 107, 180, 0.1)'}}
-                  isLoading={this.state.loadingReport}
-                  onClick={() => this.showAgentModal()}>
-                  {agent.name} ({agent.id})
-                  </EuiButtonEmpty>
-              </EuiToolTip>
-              <EuiToolTip position='bottom' content='Unpin agent'>
-                <EuiButtonIcon
-                  className="wz-unpin-agent"
-                  iconType='pinFilled'
-                  onClick={() => {
-                    store.dispatch(updateCurrentAgentData({}));
-                    this.removeAgentsFilter();
-                  }}
-                  aria-label='Unpin agent' />
-              </EuiToolTip>
-            </div>
-          )}
-        </EuiFlexItem>
+      <div style={{ display: "inline-flex" }}>
+        {buttonExploreAgent}
+        {thereAgentSelected && (
+          !avaliableForAgent && (
+            <EuiPopover
+              button={buttonUnpinAgent}
+              isOpen={thereAgentSelected}
+              closePopover={()=> {}}>
+                This module is not supported for agents. Remove the pinned agent.
+            </EuiPopover>
+
+          ) || buttonUnpinAgent
+        )}
         {modal}
       </div>
     );
@@ -212,7 +223,13 @@ class OverviewActions extends Component {
 const mapStateToProps = state => {
   return {
     state: state.appStateReducers,
+    agent: state.appStateReducers.currentAgentData
   };
 };
 
-export default connect(mapStateToProps, null)(OverviewActions);
+const mapDispatchToProps = dispatch => ({
+  updateCurrentAgentData: (agent) => dispatch(updateCurrentAgentData(agent)),
+  showExploreAgentModal: (data) => dispatch(showExploreAgentModal(data))
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(OverviewActions);

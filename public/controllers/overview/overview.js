@@ -180,7 +180,7 @@ export class OverviewController {
           this.tab,
           this.tabView,
           agentList[0],
-          (this.tabView === 'discover' || this.oldFilteredTab === this.tab)
+          (this.tabView === 'discover' || this.oldFilteredTab === this.tab || this.tabView === 'inventory')
         );
         this.oldFilteredTab = this.tab;
     } else if (!agentList && this.tab !== 'welcome') {
@@ -189,7 +189,7 @@ export class OverviewController {
           this.filterHandler,
           this.tab,
           this.tabView,
-          (this.tabView === 'discover' || this.oldFilteredTab === this.tab)
+          (this.tabView === 'discover' || this.oldFilteredTab === this.tab || this.tabView === 'inventory')
         );
         this.oldFilteredTab = this.tab;
       }

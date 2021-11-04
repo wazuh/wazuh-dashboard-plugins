@@ -25,6 +25,7 @@ import {
   EuiContextMenu,
   EuiIcon,
   EuiOverlayMask,
+  EuiOutsideClickDetector,
   EuiCallOut,
   EuiLoadingSpinner,
 } from '@elastic/eui';
@@ -40,6 +41,8 @@ import { getDataPlugin, getToasts } from '../../../../../kibana-services';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
+
+const MITRE_ATTACK = 'mitre-attack'
 
 export const Techniques = withWindowSize(
   class Techniques extends Component {
@@ -100,7 +103,8 @@ export const Techniques = withWindowSize(
       const { isLoading, tacticsObject, filters } = this.props;
       if (
         JSON.stringify(prevProps.tacticsObject) !== JSON.stringify(tacticsObject) ||
-        isLoading !== prevProps.isLoading
+        isLoading !== prevProps.isLoading ||
+        JSON.stringify(prevProps.filterParams) !== JSON.stringify(this.props.filterParams)
       )
         this.getTechniquesCount();
     }
@@ -251,9 +255,10 @@ export const Techniques = withWindowSize(
         const mitreObj = this.state.mitreTechniques.find((item) => item.id === element);
         if (mitreObj) {
           const mitreTechniqueName = mitreObj.name;
-          const mitreTechniqueID = mitreObj.references.find(
-            (item) => item.source === 'mitre-attack'
-          ).external_id;
+          const mitreTechniqueID =
+            mitreObj.source === MITRE_ATTACK
+              ? mitreObj.external_id
+              : mitreObj.references.find((item) => item.source === MITRE_ATTACK).external_id;
           mitreTechniqueID
             ? techniquesObj.push({ id: mitreTechniqueID, name: mitreTechniqueName })
             : '';
@@ -461,7 +466,7 @@ export const Techniques = withWindowSize(
           });
           const filteredTechniques = (((response || {}).data || {}).data.affected_items || []).map(
             (item) =>
-              item.references.filter((reference) => reference.source === 'mitre-attack')[0]
+              item.references.filter((reference) => reference.source === MITRE_ATTACK)[0]
                 .external_id
           );
           this._isMount && this.setState({ filteredTechniques, isSearching: false });
@@ -548,25 +553,22 @@ export const Techniques = withWindowSize(
           <EuiSpacer size="s" />
 
           <div>{this.renderFacet()}</div>
-          {isFlyoutVisible && (
-            <EuiOverlayMask
-              headerZindexLocation="below"
-              // @ts-ignore
-              onClick={() => this.onChangeFlyout(false)}
-            >
-              <FlyoutTechnique
-                openDashboard={(e, itemId) => this.openDashboard(e, itemId)}
-                openDiscover={(e, itemId) => this.openDiscover(e, itemId)}
-                openIntelligence={(e, redirectTo, itemId) =>
-                  this.openIntelligence(e, redirectTo, itemId)
-                }
-                onChangeFlyout={this.onChangeFlyout}
-                currentTechniqueData={this.state.currentTechniqueData}
-                currentTechnique={currentTechnique}
-                tacticsObject={this.props.tacticsObject}
-              />
+          { isFlyoutVisible &&
+            <EuiOverlayMask headerZindexLocation="below">
+              <EuiOutsideClickDetector onOutsideClick={() => this.onChangeFlyout(false)}>
+                <div>{/* EuiOutsideClickDetector needs a static first child */}
+                  <FlyoutTechnique
+                    openDashboard={(e, itemId) => this.openDashboard(e, itemId)}
+                    openDiscover={(e, itemId) => this.openDiscover(e, itemId)}
+                    openIntelligence={(e, redirectTo, itemId) => this.openIntelligence(e, redirectTo, itemId)}
+                    onChangeFlyout={this.onChangeFlyout}
+                    currentTechniqueData={this.state.currentTechniqueData}
+                    currentTechnique={currentTechnique}
+                    tacticsObject={this.props.tacticsObject} />
+                </div>
+              </EuiOutsideClickDetector>
             </EuiOverlayMask>
-          )}
+          }
         </div>
       );
     }

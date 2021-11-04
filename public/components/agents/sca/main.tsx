@@ -15,13 +15,14 @@ import { Inventory } from './index';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 import { PromptSelectAgent, PromptNoSelectedAgent } from '../prompts';
-import { withGuard, withUserAuthorizationPrompt } from '../../common/hocs';
+import { withGuard, withUserAuthorizationPrompt, withAgentSupportModule } from '../../common/hocs';
 
 const mapStateToProps = (state) => ({
   currentAgentData: state.appStateReducers.currentAgentData,
 });
 
 export const MainSca = compose(
+  withAgentSupportModule,
   withUserAuthorizationPrompt([
     [
       {action: 'agent:read', resource: 'agent:id:*'},

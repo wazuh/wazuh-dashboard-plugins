@@ -36,9 +36,7 @@ class WzNoConfig extends Component {
           <EuiFlexItem>
             <div style={{ textAlign: 'center' }}>
               <EuiIcon type="help" style={{ marginRight: '4px' }} />
-              {(error === 'not-present' && (
                 <span>Configuration not available</span>
-              )) || <span>Error fetching configuration</span>}
               {help && <WzHelpButtonPopover links={help} />}
               <EuiHorizontalRule margin="s" />
               {(error === 'not-present' && (
@@ -46,7 +44,7 @@ class WzNoConfig extends Component {
               )) || (
                 <span>
                   There was a problem while fetching the configuration for this
-                  section.
+                  section. It may be a server problem or the configuration doesn't exist.
                 </span>
               )}
               <EuiSpacer size="s" />

@@ -16,6 +16,7 @@ import { DevToolsController } from '../dev-tools/dev-tools';
 
 const app = getAngularModule();
 
+Logtest.displayName = 'Logtest';
 app
   .controller('devToolsController', DevToolsController)
   .controller('toolsController', ToolsController)
