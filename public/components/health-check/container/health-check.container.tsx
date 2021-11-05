@@ -168,7 +168,8 @@ function HealthCheckComponent() {
     setChecksReady(prev =>  ({...prev, [checkID]: isReady}));
   }
 
-  const logoUrl = getHttp().basePath.prepend('/plugins/wazuh/assets/icon_blue.svg');
+
+  const logoUrl = getHttp().basePath.prepend(`/plugins/wazuh/assets/${appConfig.data['customization.logo.healthcheck']}`);
   const thereAreErrors = Object.keys(checkErrors).length > 0;
 
   const renderChecks = () => {
@@ -199,7 +200,7 @@ function HealthCheckComponent() {
       checkErrors[checkID].map((error, index) => (
         <Fragment key={index}>
           <EuiCallOut
-            title={`[${checks[checkID].label}] ${error}`}
+            title={(<>{`[${checks[checkID].label}]`} <span dangerouslySetInnerHTML={{__html: error}}></span></>)}
             color="danger"
             iconType="alert"
             style={{ textAlign: 'left' }}

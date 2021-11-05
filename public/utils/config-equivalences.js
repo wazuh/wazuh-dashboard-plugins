@@ -1,5 +1,9 @@
 export const configEquivalences = {
   pattern: 'Default index pattern to use on the app.',
+  'customization.logo.app':'Define the name of the app logo saved in the path /plugins/wazuh/assets/',
+  'customization.logo.sidebar':'Define the name of the sidebar logo saved in the path /plugins/wazuh/assets/',
+  'customization.logo.healthcheck':'Define the name of the health-check logo saved in the path /plugins/wazuh/assets/',
+  'customization.logo.reports':'Define the name of the reports logo (.png) saved in the path /plugins/wazuh/assets/',
   'checks.pattern':
     'Enable or disable the index pattern health check when opening the app.',
   'checks.template':
@@ -33,8 +37,6 @@ export const configEquivalences = {
     'Enable or disable the Docker listener tab on Overview and Agents.',
   timeout:
     'Defines the maximum time the app will wait for an API response when making requests to it.',
-  'api.selector':
-    'Defines if the user is allowed to change the selected API directly from the top menu bar.',
   'ip.selector':
     'Defines if the user is allowed to change the selected index pattern directly from the top menu bar.',
   'ip.ignore':
@@ -73,6 +75,10 @@ export const configEquivalences = {
 
 export const nameEquivalence = {
   pattern: 'Index pattern',
+  'customization.logo.app': 'Logo App',
+  'customization.logo.sidebar': 'Logo Sidebar',
+  'customization.logo.healthcheck': 'Logo Health Check',
+  'customization.logo.reports': 'Logo Reports',
   'checks.pattern': 'Index pattern',
   'checks.template': 'Index template',
   'checks.api': 'API connection',
@@ -82,7 +88,6 @@ export const nameEquivalence = {
   'checks.timeFilter': 'Set time filter to 24h',
   'checks.maxBuckets': 'Set max buckets to 200000',
   timeout: 'Request timeout',
-  'api.selector': 'API selector',
   'ip.selector': 'IP selector',
   'ip.ignore': 'IP ignore',
   'xpack.rbac.enabled': 'X-Pack RBAC',
@@ -109,12 +114,17 @@ export const nameEquivalence = {
 const HEALTH_CHECK = 'Health Check';
 const GENERAL = 'General';
 const SECURITY = 'Security';
-const MONITORING = 'Monitoring'
-const STATISTICS = 'Statistics'
-export const categoriesNames = [HEALTH_CHECK, GENERAL, SECURITY, MONITORING, STATISTICS,];
+const MONITORING = 'Monitoring';
+const STATISTICS = 'Statistics';
+const CUSTOMIZATION = 'Logo Customization';
+export const categoriesNames = [HEALTH_CHECK, GENERAL, SECURITY, MONITORING, STATISTICS, CUSTOMIZATION];
 
 export const categoriesEquivalence = {
   pattern: GENERAL,
+  'customization.logo.app':CUSTOMIZATION,
+  'customization.logo.sidebar':CUSTOMIZATION,
+  'customization.logo.healthcheck':CUSTOMIZATION,
+  'customization.logo.reports':CUSTOMIZATION,
   'checks.pattern': HEALTH_CHECK,
   'checks.template': HEALTH_CHECK,
   'checks.api': HEALTH_CHECK,
@@ -124,7 +134,6 @@ export const categoriesEquivalence = {
   'checks.timeFilter': HEALTH_CHECK,
   'checks.maxBuckets': HEALTH_CHECK,
   timeout: GENERAL,
-  'api.selector': GENERAL,
   'ip.selector': GENERAL,
   'ip.ignore': GENERAL,
   'wazuh.monitoring.enabled': MONITORING,
@@ -156,6 +165,10 @@ const INTERVAL = 'interval'
 
 export const formEquivalence = {
   pattern: { type: TEXT },
+  'customization.logo.app': { type: TEXT },
+  'customization.logo.sidebar': { type: TEXT },
+  'customization.logo.healthcheck': { type: TEXT },
+  'customization.logo.reports': { type: TEXT },
   'checks.pattern': { type: BOOLEAN },
   'checks.template': { type: BOOLEAN },
   'checks.api': { type: BOOLEAN },
@@ -165,7 +178,6 @@ export const formEquivalence = {
   'checks.timeFilter': { type: BOOLEAN },
   'checks.maxBuckets': { type: BOOLEAN },
   timeout: { type: NUMBER },
-  'api.selector': { type: BOOLEAN },
   'ip.selector': { type: BOOLEAN },
   'ip.ignore': { type: ARRAY },
   'xpack.rbac.enabled': { type: BOOLEAN },
