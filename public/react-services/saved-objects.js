@@ -200,10 +200,8 @@ export class SavedObject {
         params
       );
 
-      if(satisfyKibanaVersion('<7.11')){
-        if (type === 'index-pattern'){
-          await this.refreshFieldsOfIndexPattern(id, params.attributes.title, fields);
-        }
+      if(satisfyKibanaVersion('<7.11') && type === 'index-pattern'){
+        await this.refreshFieldsOfIndexPattern(id, params.attributes.title, fields);
       };
 
       return result;
@@ -280,10 +278,7 @@ export class SavedObject {
    */
   static async createWazuhIndexPattern(pattern) {
     try {
-      let fields = '';
-      if(satisfyKibanaVersion('<7.11')){
-        fields = await SavedObject.getIndicesFields(pattern, WAZUH_INDEX_TYPE_ALERTS);
-      };
+      const fields = satisfyKibanaVersion('<7.11') ? await SavedObject.getIndicesFields(pattern, WAZUH_INDEX_TYPE_ALERTS) : '';
       await this.createSavedObject(
         'index-pattern',
         pattern,
