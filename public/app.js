@@ -116,7 +116,7 @@ app.run(function ($rootElement) {
   // Bind deleteExistentToken on Log out component.
   $('.euiHeaderSectionItem__button').on('mouseleave', function () {
     // opendistro
-    $('span:contains(Log out)').on('click', function () {
+    $('button:contains(Log out)').on('click', function () {
       WzAuthentication.deleteExistentToken();
     });
     // x-pack
