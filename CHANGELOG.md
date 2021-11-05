@@ -59,6 +59,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fix size api selector when name is too long [#3445](https://github.com/wazuh/wazuh-kibana-app/pull/3445)
 - Fixed error when edit a rule or decoder [#3456](https://github.com/wazuh/wazuh-kibana-app/pull/3456)
 - Fixed index pattern selector doesn't display the ignored index patterns [#3458](https://github.com/wazuh/wazuh-kibana-app/pull/3458)
+- Fixed not showing packages details in agent inventory for a freeBSD agent SO [#3651](https://github.com/wazuh/wazuh-kibana-app/pull/3651)
 
 ## Wazuh v4.2.3 - Kibana 7.10.2 , 7.12.1 - Revision 4204
 
