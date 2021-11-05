@@ -461,7 +461,6 @@ export class AgentsController {
         });
       }
       this.$scope.tabView = subtab;
-      return;
     } catch (error) {
       throw new Error(error);
     }

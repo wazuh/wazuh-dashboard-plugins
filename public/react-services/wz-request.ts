@@ -106,11 +106,12 @@ export class WzRequest {
     try {
       if (!method || !path || !body) {
         throw new Error('Missing parameters');
-      }
+      }      
       const id = JSON.parse(AppState.getCurrentAPI()).id;
       const requestData = { method, path, body, id };
       const response = await this.genericReq('POST', '/api/request', requestData);
       const hasFailed = (((response || {}).data || {}).data || {}).total_failed_items || 0;
+
       if (hasFailed) {
         const error =
           ((((response.data || {}).data || {}).failed_items || [])[0] || {}).error || {};

@@ -20,6 +20,9 @@ import './multiple-agent-selector.scss'
 import $ from 'jquery';
 import { WzFieldSearchDelay } from '../../common/search';
 import { withErrorBoundary } from '../../common/hocs';
+import { UI_LOGGER_LEVELS } from '../../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../../react-services/common-services';
 
 export const MultipleAgentSelector = withErrorBoundary (class MultipleAgentSelector extends Component {
   constructor(props) {
@@ -68,10 +71,19 @@ export const MultipleAgentSelector = withErrorBoundary (class MultipleAgentSelec
         load: false
       });
     } catch (error) {
-      ErrorHandler.handle(error, 'Error loading agents');
-      this.setState({
-        load: false
-      });
+      const options = {
+        context: `${MultipleAgentSelector.name}.componentDidMount`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: 'Error loading agents',
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+      this.setState({ load: false});
+      
     }
   }
 
@@ -140,7 +152,7 @@ export const MultipleAgentSelector = withErrorBoundary (class MultipleAgentSelec
         }
       }
     } catch (error) {
-      ErrorHandler.handle(error, 'Error fetching all available agents');
+      throw new Error('Error fetching all available agents');
     }
   }
 
@@ -193,8 +205,7 @@ export const MultipleAgentSelector = withErrorBoundary (class MultipleAgentSelec
         })
       }
     } catch (error) {
-      ErrorHandler.handle(error, 'Error fetching group agents');
-      throw error;
+      throw new Error('Error fetching group agents');
     }
     this.setState({
       selectedAgents: {
@@ -297,9 +308,19 @@ export const MultipleAgentSelector = withErrorBoundary (class MultipleAgentSelec
       }
       this.setState({ savingChanges: false });
       this.props.cancelButton();
-    } catch (err) {
+    } catch (error) {
       this.setState({ savingChanges: false });
-      ErrorHandler.handle(err, 'Error applying changes');
+      const options = {
+        context: `${MultipleAgentSelector.name}.saveAddAgents`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `${error.name}: Error applying changes`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
     return;
   }
@@ -363,7 +384,17 @@ export const MultipleAgentSelector = withErrorBoundary (class MultipleAgentSelec
         try {
           await this.loadAllAgents(searchTerm, start);
         } catch (error) {
-          ErrorHandler.handle(error, 'Error fetching all available agents');
+          const options = {
+            context: `${MultipleAgentSelector.name}.reload`,
+            level: UI_LOGGER_LEVELS.ERROR,
+            severity: UI_ERROR_SEVERITIES.BUSINESS,
+            error: {
+              error: error,
+              message: error.message || error,
+              title: 'Error fetching all available agents',
+            },
+          };
+          getErrorOrchestrator().handleError(options);
         };
       };
       if (!this.state.availableAgents.loadedAll) {
@@ -401,7 +432,17 @@ export const MultipleAgentSelector = withErrorBoundary (class MultipleAgentSelec
         try {
           await this.loadSelectedAgents(searchTerm);
         } catch (error) {
-          ErrorHandler.handle(error, 'Error fetching all selected agents');
+          const options = {
+            context: `${MultipleAgentSelector.name}.reload`,
+            level: UI_LOGGER_LEVELS.ERROR,
+            severity: UI_ERROR_SEVERITIES.BUSINESS,
+            error: {
+              error: error,
+              message: error.message || error,
+              title: 'Error fetching group agents',
+            },
+          };
+          getErrorOrchestrator().handleError(options);
         }
       }
     }
@@ -497,9 +538,7 @@ export const MultipleAgentSelector = withErrorBoundary (class MultipleAgentSelec
                                   this.setState({ availableFilter: searchValue, availableItem: [] });
                                 }}
                                 onSearch={async searchValue => {
-                                  try {
-                                    await this.reload("left", searchValue, true);
-                                  } catch (error) { }
+                                  await this.reload("left", searchValue, true);
                                 }}
                                 isClearable={true}
                                 fullWidth={true}

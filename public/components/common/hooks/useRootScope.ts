@@ -9,14 +9,14 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { getAngularModule } from '../../../kibana-services';
 
 export function useRootScope(){
-  const refRootScope = useRef();
+  const [refRootScope,setRefRootScope] = useState();
   useEffect(() => {
     const app = getAngularModule();
-    refRootScope.current = app.$injector.get('$rootScope');
+    setRefRootScope(app.$injector.get('$rootScope'));
   },[]);
-  return refRootScope.current;
+  return refRootScope;
 };
