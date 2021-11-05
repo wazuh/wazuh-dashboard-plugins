@@ -6,6 +6,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Added
 
+- Added ability to filter the results fo the `Network Ports` table in the `Inventory data` section [#3639](https://github.com/wazuh/wazuh-kibana-app/pull/3639)
 - Added new endpoint service to collect the frontend logs into a file [#3324](https://github.com/wazuh/wazuh-kibana-app/pull/3324)
 - Improved the frontend handle errors strategy: UI, Toasts, console log and log in file 
   [#3327](https://github.com/wazuh/wazuh-kibana-app/pull/3327) 
