@@ -209,7 +209,7 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
   useEffect(() => {
     if (
       initialPassword != password || initialPassword != confirmPassword || 
-      !_.isEqual(userRolesFormatted, selectedRoles) || allowRunAs
+      !_.isEqual(userRolesFormatted, selectedRoles) || allowRunAs !== currentUser.allow_run_as
     ) {
       setHasChanges(true);
     } else {
