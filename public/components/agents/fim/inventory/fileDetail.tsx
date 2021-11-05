@@ -276,6 +276,7 @@ export class FileDetails extends Component {
       if (!item.onlyLinux || (item.onlyLinux && this.props.agent && agentPlatform !== 'windows')) {
         let className = item.checksum ? 'detail-value detail-value-checksum' : 'detail-value';
         className += item.field === 'perm' ? ' detail-value-perm' : '';
+        className += ' wz-width-100';
         return (
           <EuiFlexItem key={idx}>
             <EuiStat
@@ -320,7 +321,7 @@ export class FileDetails extends Component {
                   ) : (
                     this.userSvg
                   )}
-                  <span className="detail-title">{item.name}</span>
+                  {item.name === 'Permissions' &&  agentPlatform === 'windows' ? '' : <span className="detail-title">{item.name}</span> }
                 </span>
               }
               textAlign="left"
@@ -344,7 +345,27 @@ export class FileDetails extends Component {
   renderFileDetailsPermissions(value) {
     if (((this.props.agent || {}).os || {}).platform === 'windows' && value && value !== '-') {
       return (
-        <EuiAccordion id={Math.random().toString()} paddingSize="none" initialIsOpen={false}>
+        <EuiAccordion 
+          id={Math.random().toString()}
+          paddingSize="none" 
+          initialIsOpen={false} 
+          arrowDisplay="none"
+          buttonContent={
+          <EuiTitle size="s">
+            <h3>
+              Permissions
+                  <span style={{ marginLeft: 16 }}>
+                    <EuiToolTip position="top" content="Show">
+                      <EuiIcon
+                        className="euiButtonIcon euiButtonIcon--primary"
+                        type="inspect"
+                        aria-label="show"
+                      />
+                    </EuiToolTip>
+                  </span>
+            </h3>
+          </EuiTitle>
+        }>
           <EuiCodeBlock language="json" paddingSize="l">
             {JSON.stringify(value, null, 2)}
           </EuiCodeBlock>
