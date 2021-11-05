@@ -6,6 +6,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Added
 
+- Added ability to filter the results fo the `Network Ports` table in the `Inventory data` section [#3639](https://github.com/wazuh/wazuh-kibana-app/pull/3639)
 - Added new endpoint service to collect the frontend logs into a file [#3324](https://github.com/wazuh/wazuh-kibana-app/pull/3324)
 - Improved the frontend handle errors strategy: UI, Toasts, console log and log in file 
   [#3327](https://github.com/wazuh/wazuh-kibana-app/pull/3327) 
@@ -46,10 +47,12 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Refactored all try catch value of context for ErrorOrchestrator service. [#3432](https://github.com/wazuh/wazuh-kibana-app/pull/3432)
 - Refactored all try catch strategy on Controller/Groups section [#3415](https://github.com/wazuh/wazuh-kibana-app/pull/3415)
 - Refactored as module tabs and buttons are rendered [#3494](https://github.com/wazuh/wazuh-kibana-app/pull/3494)
+- Testing logs using the Ruletest Test don't display the rule information if not matching a rule. [#3446](https://github.com/wazuh/wazuh-kibana-app/pull/3446)
 
 ### Fixed
 
 - Fixed creation of log files [#3384](https://github.com/wazuh/wazuh-kibana-app/pull/3384) 
+- Fixed double fetching alerts count when pinnin/unpinning the agent in Mitre Att&ck/Framework [#3484](https://github.com/wazuh/wazuh-kibana-app/pull/3484)
 - Fixed rules and decoders test flyout clickout event [#3412](https://github.com/wazuh/wazuh-kibana-app/pull/3412)
 - Notify when you are registering an agent without permissions [#3430](https://github.com/wazuh/wazuh-kibana-app/pull/3430)
 - Remove not used `redirectRule` query param when clicking the row table on CDB Lists/Decoders [#3438](https://github.com/wazuh/wazuh-kibana-app/pull/3438)
@@ -59,9 +62,23 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fix size api selector when name is too long [#3445](https://github.com/wazuh/wazuh-kibana-app/pull/3445)
 - Fixed error when edit a rule or decoder [#3456](https://github.com/wazuh/wazuh-kibana-app/pull/3456)
 - Fixed index pattern selector doesn't display the ignored index patterns [#3458](https://github.com/wazuh/wazuh-kibana-app/pull/3458)
+- Fixed order logs properly in Management/Logs [#3609](https://github.com/wazuh/wazuh-kibana-app/pull/3609)
+- Fix CDB list view not working with IPv6 [#3488](https://github.com/wazuh/wazuh-kibana-app/pull/3488)
+- Fixed the bad requests using Console tool to `PUT /active-response` API endpoint [#3466](https://github.com/wazuh/wazuh-kibana-app/pull/3466)
+- Fixed group agent management table does not update on error [#3605](https://github.com/wazuh/wazuh-kibana-app/pull/3605)
 - Fixed not showing packages details in agent inventory for a freeBSD agent SO [#3651](https://github.com/wazuh/wazuh-kibana-app/pull/3651)
 
-## Wazuh v4.2.3 - Kibana 7.10.2 , 7.12.1 - Revision 4204
+## Wazuh v4.2.4 - Kibana 7.10.2, 7.11.2, 7.12.1 - Revision 4205
+
+### Added
+
+- Support for Wazuh 4.2.4
+
+### Fixed 
+
+- Fixed a bug where the user's auth token was not deprecated on logout [#3638](https://github.com/wazuh/wazuh-kibana-app/pull/3638)
+
+## Wazuh v4.2.3 - Kibana 7.10.2, 7.11.2, 7.12.1 - Revision 4204
 
 ### Added
 
@@ -123,6 +140,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed Wazuh main menu and breadcrumb render issues [#3347](https://github.com/wazuh/wazuh-kibana-app/pull/3347)
 - Fixed generation of huge logs from backend errors [#3397](https://github.com/wazuh/wazuh-kibana-app/pull/3397)
 - Fixed vulnerabilities flyout not showing alerts if the vulnerability had a field missing [#3593](https://github.com/wazuh/wazuh-kibana-app/pull/3593)
+- Removed api selector toggle from settings menu since it performed no useful function [#3604](https://github.com/wazuh/wazuh-kibana-app/pull/3604)
 
 ## Wazuh v4.2.1 - Kibana 7.10.2 , 7.11.2 - Revision 4202
 

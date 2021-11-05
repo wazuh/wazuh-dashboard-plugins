@@ -103,7 +103,8 @@ export const Techniques = withWindowSize(
       const { isLoading, tacticsObject, filters } = this.props;
       if (
         JSON.stringify(prevProps.tacticsObject) !== JSON.stringify(tacticsObject) ||
-        isLoading !== prevProps.isLoading
+        isLoading !== prevProps.isLoading ||
+        JSON.stringify(prevProps.filterParams) !== JSON.stringify(this.props.filterParams)
       )
         this.getTechniquesCount();
     }
@@ -552,6 +553,7 @@ export const Techniques = withWindowSize(
           <EuiSpacer size="s" />
 
           <div>{this.renderFacet()}</div>
+
           { isFlyoutVisible &&
             <EuiOverlayMask headerZindexLocation="below">
               <EuiOutsideClickDetector onOutsideClick={() => this.onChangeFlyout(false)}>

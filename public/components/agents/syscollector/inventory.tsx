@@ -105,7 +105,7 @@ export function SyscollectorInventory({ agent }) {
               title: 'Network ports',
               columns: portsColumns[soPlatform],
               icon: 'inputOutput',
-              searchBar: false,
+              searchBar: true,
               exportFormatted: false,
             }}
           />
