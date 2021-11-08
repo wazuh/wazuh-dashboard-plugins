@@ -18,6 +18,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed Group Configuration and Management configuration error after trying to going back after you save [#3672](https://github.com/wazuh/wazuh-kibana-app/pull/3672)
 - Fixing EuiPanels in Overview Sections and disabled text in WzMenu [#3674](https://github.com/wazuh/wazuh-kibana-app/pull/3674)
 - Fixing double flyout clicking in a policy [#3676](https://github.com/wazuh/wazuh-kibana-app/pull/3676)
+- Fixed error conflict setting kibana settings from the health check [#3678](https://github.com/wazuh/wazuh-kibana-app/pull/3678)
 - Fixed compatibility to get the valid index patterns and refresh fields for Kibana 7.10.2-7.13.4 [3681](https://github.com/wazuh/wazuh-kibana-app/pull/3681)
 
 ## Wazuh v4.2.4 - Kibana 7.10.2, 7.11.2, 7.12.1 - Revision 4205
