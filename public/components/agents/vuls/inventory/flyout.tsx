@@ -92,6 +92,27 @@ export class FlyoutDetail extends Component {
     const { currentItem } = this.state;
     const title = `${currentItem.cve}`;
     const id = title.replace(/ /g, '_');
+
+    const filterMap = {
+      name: 'data.vulnerability.package.name',
+      cve: 'data.vulnerability.cve',
+      architecture: 'data.vulnerability.package.architecture',
+      version: 'data.vulnerability.package.version',
+      type: 'data.vulnerability.type',
+    };
+    const implicitFilters = [
+      { 'rule.groups': 'vulnerability-detector' },
+      { 'agent.id': this.props.agentId },
+      this.state.clusterFilter,
+      ...Object.keys(filterMap)
+        .map((key) => {
+          if (currentItem[key]) {
+            return { [filterMap[key]]: currentItem[key] };
+          }
+        })
+        .filter((item) => item),
+    ];
+
     return (
       <EuiFlyout
         onClose={() => this.props.closeFlyout()}
@@ -114,20 +135,7 @@ export class FlyoutDetail extends Component {
         )}
         {currentItem && !this.state.isLoading && (
           <EuiFlyoutBody className="flyout-body">
-            <Details
-              currentItem={currentItem}
-              {...this.props}
-              implicitFilters={[
-                { 'rule.groups': 'vulnerability-detector' },
-                { 'data.vulnerability.package.name': currentItem.name },
-                { 'data.vulnerability.cve': currentItem.cve },
-                { 'data.vulnerability.type': currentItem.type },
-                { 'data.vulnerability.package.architecture': currentItem.architecture },
-                { 'data.vulnerability.package.version': currentItem.version },
-                { 'agent.id': this.props.agentId },
-                this.state.clusterFilter,
-              ]}
-            />
+            <Details currentItem={currentItem} {...this.props} implicitFilters={implicitFilters} />
           </EuiFlyoutBody>
         )}
       </EuiFlyout>

@@ -45,7 +45,6 @@ export async function getWzConfig($q, genericReq, wazuhConfig) {
     'extensions.osquery': false,
     'extensions.docker': false,
     timeout: 20000,
-    'api.selector': true,
     'ip.selector': true,
     'ip.ignore': [],
     'xpack.rbac.enabled': true,
@@ -68,6 +67,10 @@ export async function getWzConfig($q, genericReq, wazuhConfig) {
     'logs.level': 'info',
     'enrollment.dns': '',
     'enrollment.password': '',
+    'customization.logo.app':'logotype.svg',
+    'customization.logo.sidebar':'icon_blue.png',
+    'customization.logo.healthcheck':'icon_blue.svg',
+    'customization.logo.reports':'logo.png'
   };
 
   try {

@@ -19,9 +19,6 @@ export default class ConfigurationHandler {
    */
   static async editKey(key, value) {
     try {
-      if (key === 'api.selector') {
-        AppState.setAPISelector(value);
-      }
       if (key === 'ip.selector') {
         AppState.setPatternSelector(value);
       }
