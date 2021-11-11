@@ -196,6 +196,7 @@ export const WAZUH_DEFAULT_APP_CONFIG = {
   'extensions.ciscat': false,
   'extensions.aws': false,
   'extensions.office': false,
+  'extensions.github': false,
   'extensions.gcp': false,
   'extensions.virustotal': false,
   'extensions.osquery': false,
