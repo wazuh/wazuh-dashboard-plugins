@@ -55,7 +55,7 @@ import store from './redux/store';
 import { updateCurrentPlatform } from './redux/actions/appStateActions';
 import { WzAuthentication, loadAppConfig } from './react-services';
 
-import { getAngularModule} from './kibana-services';
+import { getAngularModule } from './kibana-services';
 import { addHelpMenuToAppChrome } from './utils';
 
 const app = getAngularModule();
@@ -81,9 +81,11 @@ app.run([
     app.$injector = _$injector;
 
     // Set currentSecurity platform in Redux when app starts.
-    checkCurrentSecurityPlatform().then((item) => {
-      store.dispatch(updateCurrentPlatform(item))
-    }).catch(() => {});
+    checkCurrentSecurityPlatform()
+      .then((item) => {
+        store.dispatch(updateCurrentPlatform(item));
+      })
+      .catch(() => {});
 
     // Init the process of refreshing the user's token when app start.
     checkPluginVersion().finally(WzAuthentication.refresh);
@@ -109,15 +111,26 @@ app.run(function ($rootElement) {
   // Add plugin help links as extension to Kibana help menu
   addHelpMenuToAppChrome();
 
+  const urlToLogout = window.location.origin + '/logout';
+
   // Bind deleteExistentToken on Log out component.
   $('.euiHeaderSectionItem__button').on('mouseleave', function () {
     // opendistro
-    $('span:contains(Log out)').on('click', function () {
+    $('button:contains(Log out)').on('click', function () {
       WzAuthentication.deleteExistentToken();
     });
     // x-pack
-    $('a:contains(Log out)').on('click', function () {
-      WzAuthentication.deleteExistentToken();
+    $('a:contains(Log out)').on('click', function (event) {
+      // Override href's behaviour and navigate programatically
+      // to '/logout' once the token has been deleted.
+      event.preventDefault();
+      WzAuthentication.deleteExistentToken()
+        .catch((err) => {
+          console.error('[ERROR] - User token could not be deprecated - ', err);
+        })
+        .finally(() => {
+          window.location.replace(urlToLogout);
+        });
     });
   });
 });

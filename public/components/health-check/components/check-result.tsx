@@ -53,18 +53,6 @@ export function CheckResult(props) {
     }
   }, [isCheckFinished])
 
-  useEffect(() => {
-    if (isCheckFinished){
-      const errors = verboseInfo.filter(log => log.type === 'error');
-      if(errors.length){
-        props.canRetry ? setResult('error_retry') : setResult('error');
-        props.handleErrors(props.name, errors.map(({message}) => message));
-      }else{
-        setResult('ready');
-        setAsReady();
-      }
-    }
-  }, [isCheckFinished])
 
   const setAsReady = () => {
     props.handleCheckReady(props.name, true);
