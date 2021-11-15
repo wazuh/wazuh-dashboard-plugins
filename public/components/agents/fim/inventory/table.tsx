@@ -234,13 +234,6 @@ export class InventoryTable extends Component {
         width: `${width}`
       },
       {
-        field: 'perm',
-        name: 'Permissions',
-        sortable: true,
-        truncateText: true,
-        width: `${width}`
-      },
-      {
         field: 'size',
         name: 'Size',
         sortable: true,

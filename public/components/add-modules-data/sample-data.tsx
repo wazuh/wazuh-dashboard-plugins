@@ -13,12 +13,7 @@
 import React, { Component, Fragment } from 'react';
 import { WzButtonPermissions } from '../../components/common/permissions/button';
 
-import {
-  EuiFlexItem,
-  EuiCard,
-  EuiFlexGrid,
-  EuiFlexGroup,
-} from '@elastic/eui';
+import { EuiFlexItem, EuiCard, EuiFlexGrid, EuiFlexGroup } from '@elastic/eui';
 
 import { getToasts } from '../../kibana-services';
 import { WzRequest } from '../../react-services/wz-request';
@@ -50,8 +45,7 @@ export default class WzSampleData extends Component {
     this.categories = [
       {
         title: 'Sample security information',
-        description:
-          'Sample data, visualizations and dashboards for security information (integrity monitoring, Amazon AWS services, Google Cloud Platform, authorization, ssh, web).',
+        description: 'Sample data, visualizations and dashboards for security information (integrity monitoring, Amazon AWS services, Office 365, Google Cloud Platform, GitHub, authorization, ssh, web).',
         image: '',
         categorySampleAlertsIndex: 'security',
       },
@@ -234,9 +228,8 @@ export default class WzSampleData extends Component {
     }
   }
   renderCard(category) {
-    const { addDataLoading, exists, removeDataLoading } = this.state[
-      category.categorySampleAlertsIndex
-    ];
+    const { addDataLoading, exists, removeDataLoading } =
+      this.state[category.categorySampleAlertsIndex];
     return (
       <EuiFlexItem key={`sample-data-${category.title}`}>
         <EuiCard

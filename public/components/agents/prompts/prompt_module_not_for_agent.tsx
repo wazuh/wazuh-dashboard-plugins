@@ -19,22 +19,22 @@ import { useFilterManager } from '../../common/hooks';
 type PromptSelectAgentProps = {
   body?: string;
   title: string;
-  agentSelectionProps: {
+  agentsSelectionProps: {
     setAgent: (agent: boolean) => void
   }
 };
 
-export const PromptModuleNotForAgent = ({ body, title, ...agentSelectionProps }: PromptSelectAgentProps) => {
+export const PromptModuleNotForAgent = ({ body, title, agentsSelectionProps }: PromptSelectAgentProps) => {
   const dispatch = useDispatch();
-  const filterManager = useFilterManager();
+  const { filterManager, filters } = useFilterManager();
 
   const unpinAgent = async () => {
     dispatch(updateCurrentAgentData({}));
-    await agentSelectionProps.setAgent(false);
-    const filters = filterManager.filters.filter(x => {
+    await agentsSelectionProps.setAgent(false);
+    const moduleFilters = filters.filter(x => {
       return x.meta.key !== 'agent.id';
     });
-    filterManager.setFilters(filters);
+    filterManager.setFilters(moduleFilters);
   };
 
   return (

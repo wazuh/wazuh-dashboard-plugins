@@ -102,7 +102,7 @@ export class VisFactoryService {
   async buildAgentsVisualizations(filterHandler, tab, subtab, id) {
     try {
       const data =
-        tab !== 'sca'
+        (!['sca', 'office'].some(moduleID => tab !== moduleID))
           ? await this.genericReq.request(
               'GET',
               `/elastic/visualizations/agents-${tab}/${AppState.getCurrentPattern()}`

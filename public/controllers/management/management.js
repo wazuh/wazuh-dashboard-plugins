@@ -49,7 +49,6 @@ export class ManagementController {
     this.uploadOpened = false;
     this.rulesetTab = RulesetResources.RULES;
 
-
     this.$scope.$on('setCurrentGroup', (ev, params) => {
       this.currentGroup = (params || {}).currentGroup || false;
     });
@@ -149,17 +148,15 @@ export class ManagementController {
 
     this.$rootScope.timeoutIsReady;
     this.$rootScope.$watch('resultState', () => {
-      if(this.$rootScope.timeoutIsReady){
+      if (this.$rootScope.timeoutIsReady) {
         clearTimeout(this.$rootScope.timeoutIsReady);
       }
-      if(this.$rootScope.resultState === 'ready'){
+      if (this.$rootScope.resultState === 'ready') {
         this.$scope.isReady = true;
+      } else {
+        this.$rootScope.timeoutIsReady = setTimeout(() => (this.$scope.isReady = false), 1000);
       }
-      else
-      {
-        this.$rootScope.timeoutIsReady = setTimeout(() => this.$scope.isReady = false, 1000);
-      }
-    })
+    });
 
     this.welcomeCardsProps = {
       switchTab: (tab, setNav) => this.switchTab(tab, setNav),
@@ -199,7 +196,6 @@ export class ManagementController {
       },
       logtestProps: this.logtestProps,
     };
-
   }
 
   /**
@@ -449,7 +445,7 @@ export class ManagementController {
         error: {
           error: error,
           message: error?.message || '',
-          title: 'Error loading node list'
+          title: 'Error loading node list',
         },
       };
 
