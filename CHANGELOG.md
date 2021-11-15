@@ -36,6 +36,7 @@ All notable changes to the Wazuh app project will be documented in this file.
   [#3478](https://github.com/wazuh/wazuh-kibana-app/pull/3478)
 - Added fields status and type in vulnerabilities table [#3196](https://github.com/wazuh/wazuh-kibana-app/pull/3196)
 - Added Intelligence tab to Mitre Att&ck module [#3368](https://github.com/wazuh/wazuh-kibana-app/pull/3368) [#3344](https://github.com/wazuh/wazuh-kibana-app/pull/3344)
+- Added new fields in Inventory table and Flyout Details [#3525](https://github.com/wazuh/wazuh-kibana-app/pull/3525)
 
 ### Changed
 
