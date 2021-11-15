@@ -75,6 +75,11 @@ export const WAZUH_MODULES = {
     description:
       'Security events related to your Amazon AWS services, collected directly via AWS API.'
   },
+  office: {
+    title: 'Office 365',
+    description:
+      'Security events related to your Office 365 services.'
+  },
   gcp: {
     title: 'Google Cloud Platform',
     description:
@@ -117,6 +122,11 @@ export const WAZUH_MODULES = {
     title: 'Docker listener',
     description:
       'Monitor and collect the activity from Docker containers such as creation, running, starting, stopping or pausing events.'
+  },
+  github: {
+    title: 'GitHub',
+    description:
+      'Monitoring events from audit logs of your GitHub organizations.'
   },
   devTools: {
     title: 'API console',

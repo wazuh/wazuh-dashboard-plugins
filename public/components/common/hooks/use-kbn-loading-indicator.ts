@@ -26,12 +26,13 @@ export const useKbnLoadingIndicator = (): [
 
   useEffect(() => {
     getHttp().addLoadingCountSource(loadingCount$);
-    getHttp()
+    const { unsubscribe } = getHttp() 
       .getLoadingCount$()
       .subscribe((count) => {
         setVisible(count);
         !count && setFlag(false);
       });
+    return unsubscribe;
   }, []);
 
   useEffect(() => {

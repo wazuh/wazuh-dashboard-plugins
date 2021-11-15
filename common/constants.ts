@@ -64,12 +64,14 @@ export const WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS = {
   [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY]: [
     { syscheck: true },
     { aws: true },
+    { office: true },
     { gcp: true },
     { authentication: true },
     { ssh: true },
     { apache: true, alerts: 2000 },
     { web: true },
     { windows: { service_control_manager: true }, alerts: 1000 },
+    { github: true }
   ],
   [WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING]: [
     { rootcheck: true },
@@ -193,12 +195,13 @@ export const WAZUH_DEFAULT_APP_CONFIG = {
   'extensions.oscap': false,
   'extensions.ciscat': false,
   'extensions.aws': false,
+  'extensions.office': false,
+  'extensions.github': false,
   'extensions.gcp': false,
   'extensions.virustotal': false,
   'extensions.osquery': false,
   'extensions.docker': false,
   timeout: 20000,
-  'api.selector': true,
   'ip.selector': true,
   'ip.ignore': [],
   'xpack.rbac.enabled': true,
@@ -242,6 +245,7 @@ export enum WAZUH_MODULES_ID {
   SECURITY_EVENTS = 'general',
   INTEGRITY_MONITORING = 'fim',
   AMAZON_WEB_SERVICES = 'aws',
+  OFFICE_365 = 'office',
   GOOGLE_CLOUD_PLATFORM = 'gcp',
   POLICY_MONITORING = 'pm',
   SECURITY_CONFIGURATION_ASSESSMENT = 'sca',
@@ -258,7 +262,8 @@ export enum WAZUH_MODULES_ID {
   CIS_CAT = 'ciscat',
   VIRUSTOTAL = 'virustotal',
   GDPR = 'gdpr',
-}
+  GITHUB = 'github'
+};
 
 export enum WAZUH_MENU_MANAGEMENT_SECTIONS_ID {
   MANAGEMENT = 'management',
@@ -275,19 +280,19 @@ export enum WAZUH_MENU_MANAGEMENT_SECTIONS_ID {
   LOGS = 'logs',
   REPORTING = 'reporting',
   STATISTICS = 'statistics',
-}
+};
 
 export enum WAZUH_MENU_TOOLS_SECTIONS_ID {
   API_CONSOLE = 'devTools',
   RULESET_TEST = 'logtest',
-}
+};
 
 export enum WAZUH_MENU_SECURITY_SECTIONS_ID {
   USERS = 'users',
   ROLES = 'roles',
   POLICIES = 'policies',
   ROLES_MAPPING = 'roleMapping',
-}
+};
 
 export enum WAZUH_MENU_SETTINGS_SECTIONS_ID {
   SETTINGS = 'settings',
@@ -298,7 +303,7 @@ export enum WAZUH_MENU_SETTINGS_SECTIONS_ID {
   LOGS = 'logs',
   MISCELLANEOUS = 'miscellaneous',
   ABOUT = 'about',
-}
+};
 
 export const AUTHORIZED_AGENTS = 'authorized-agents';
 
@@ -341,3 +346,4 @@ export const UI_TOAST_COLOR = {
   WARNING: 'warning',
   DANGER: 'danger',
 };
+

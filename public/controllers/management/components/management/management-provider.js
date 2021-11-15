@@ -3,7 +3,4 @@ import { withErrorBoundary, withReduxProvider } from '../../../../components/com
 // Redux
 import WzManagementMain from '../management/management-main';
 
-export default compose(
-  withErrorBoundary,
-  withReduxProvider
-)(WzManagementMain);
+export default compose(withErrorBoundary, withReduxProvider)(WzManagementMain);

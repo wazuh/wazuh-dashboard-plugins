@@ -553,6 +553,7 @@ export const Techniques = withWindowSize(
           <EuiSpacer size="s" />
 
           <div>{this.renderFacet()}</div>
+
           { isFlyoutVisible &&
             <EuiOverlayMask headerZindexLocation="below">
               <EuiOutsideClickDetector onOutsideClick={() => this.onChangeFlyout(false)}>

@@ -534,6 +534,9 @@ export class WazuhElasticCtrl {
         tabPrefix === 'overview'
           ? OverviewVisualizations[tabSufix]
           : AgentsVisualizations[tabSufix];
+      if (!file) {
+        return response.notFound({body:{message: `Visualizations not found for ${request.params.tab}`}});
+      }
       log('wazuh-elastic:createVis', `${tabPrefix}[${tabSufix}] with index pattern ${request.params.pattern}`, 'debug');
       const namespace = context.wazuh.plugins.spaces && context.wazuh.plugins.spaces.spacesService && context.wazuh.plugins.spaces.spacesService.getSpaceId(request);
       const raw = await this.buildVisualizationsRaw(
