@@ -11,7 +11,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Improved the frontend handle errors strategy: UI, Toasts, console log and log in file 
   [#3327](https://github.com/wazuh/wazuh-kibana-app/pull/3327) 
   [#3321](https://github.com/wazuh/wazuh-kibana-app/pull/3321) 
-  [#3367](https://github.com/wazuh/wazuh-kibana-app/pull/3367) 
+  [#3367](https://github.com/wazuh/wazuh-kibana-app/pull/3367)
+  [#3373](https://github.com/wazuh/wazuh-kibana-app/pull/3373)
   [#3374](https://github.com/wazuh/wazuh-kibana-app/pull/3374) 
   [#3390](https://github.com/wazuh/wazuh-kibana-app/pull/3390)  
   [#3410](https://github.com/wazuh/wazuh-kibana-app/pull/3410) 
@@ -36,6 +37,15 @@ All notable changes to the Wazuh app project will be documented in this file.
   [#3478](https://github.com/wazuh/wazuh-kibana-app/pull/3478)
 - Added fields status and type in vulnerabilities table [#3196](https://github.com/wazuh/wazuh-kibana-app/pull/3196)
 - Added Intelligence tab to Mitre Att&ck module [#3368](https://github.com/wazuh/wazuh-kibana-app/pull/3368) [#3344](https://github.com/wazuh/wazuh-kibana-app/pull/3344)
+- Added sample data for office365 events [#3424](https://github.com/wazuh/wazuh-kibana-app/pull/3424)
+- Created a separate component to check for sample data [#3475](https://github.com/wazuh/wazuh-kibana-app/pull/3475)
+- Added a new hook for getting value suggestions [#3506](https://github.com/wazuh/wazuh-kibana-app/pull/3506)
+- Added dinamic simple filters and adding simple GitHub filters fields [3531](https://github.com/wazuh/wazuh-kibana-app/pull/3531)
+- Added configuration viewer for Module Office365 on Management > Configuration [#3524](https://github.com/wazuh/wazuh-kibana-app/pull/3524)
+- Added base Module Panel view with Office365 setup [#3518](https://github.com/wazuh/wazuh-kibana-app/pull/3518)
+- Added specifics and custom filters for Office365 search bar [#3533](https://github.com/wazuh/wazuh-kibana-app/pull/3533)
+- Adding Pagination and filter to drilldown tables at Office pannel [#3544](https://github.com/wazuh/wazuh-kibana-app/pull/3544).
+- Simple filters change between panel and drilldown panel [#3568](https://github.com/wazuh/wazuh-kibana-app/pull/3568).
 - Added new fields in Inventory table and Flyout Details [#3525](https://github.com/wazuh/wazuh-kibana-app/pull/3525)
 
 ### Changed
@@ -43,10 +53,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed ossec to wazuh in sample-data [#3121](https://github.com/wazuh/wazuh-kibana-app/pull/3121)
 - Changed empty fields in FIM tables and `syscheck.value_name` in discovery now show an empty tag for visual clarity [#3279](https://github.com/wazuh/wazuh-kibana-app/pull/3279)
 - Adapted the Mitre tactics and techniques resources to use the API endpoints [#3346](https://github.com/wazuh/wazuh-kibana-app/pull/3346)
-- Refactored all try catch strategy on Settings section [#3392](https://github.com/wazuh/wazuh-kibana-app/pull/3392)
-- Refactored all try catch strategy on Controller/Agent section [#3404](https://github.com/wazuh/wazuh-kibana-app/pull/3404)
-- Refactored all try catch value of context for ErrorOrchestrator service. [#3432](https://github.com/wazuh/wazuh-kibana-app/pull/3432)
-- Refactored all try catch strategy on Controller/Groups section [#3415](https://github.com/wazuh/wazuh-kibana-app/pull/3415)
+- Moved the filterManager subscription to the hook useFilterManager [#3517](https://github.com/wazuh/wazuh-kibana-app/pull/3517)
+- Change filter from is to is one of in custom searchbar [#3529](https://github.com/wazuh/wazuh-kibana-app/pull/3529)
+- Refactored as module tabs and buttons are rendered [#3494](https://github.com/wazuh/wazuh-kibana-app/pull/3494)
+- Added time subscription to Discover component [#3549](https://github.com/wazuh/wazuh-kibana-app/pull/3549)
 - Refactored as module tabs and buttons are rendered [#3494](https://github.com/wazuh/wazuh-kibana-app/pull/3494)
 - Testing logs using the Ruletest Test don't display the rule information if not matching a rule. [#3446](https://github.com/wazuh/wazuh-kibana-app/pull/3446)
 - Changed format permissions in FIM inventory [#3649](https://github.com/wazuh/wazuh-kibana-app/pull/3649)
@@ -55,6 +65,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Fixed creation of log files [#3384](https://github.com/wazuh/wazuh-kibana-app/pull/3384) 
 - Fixed double fetching alerts count when pinnin/unpinning the agent in Mitre Att&ck/Framework [#3484](https://github.com/wazuh/wazuh-kibana-app/pull/3484)
+- Query config refactor [#3490](https://github.com/wazuh/wazuh-kibana-app/pull/3490)
 - Fixed rules and decoders test flyout clickout event [#3412](https://github.com/wazuh/wazuh-kibana-app/pull/3412)
 - Notify when you are registering an agent without permissions [#3430](https://github.com/wazuh/wazuh-kibana-app/pull/3430)
 - Remove not used `redirectRule` query param when clicking the row table on CDB Lists/Decoders [#3438](https://github.com/wazuh/wazuh-kibana-app/pull/3438)

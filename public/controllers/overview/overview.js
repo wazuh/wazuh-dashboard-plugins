@@ -168,37 +168,51 @@ export class OverviewController {
   }
 
   async updateSelectedAgents(agentList) {
-    if (this.initialFilter) {
-      this.initialFilter = false;
-      this.agentsSelectionProps.initialFilter = false;
-    }
-    this.isAgent = agentList ? agentList[0] : false;
-    this.$scope.isAgentText = this.isAgent && agentList.length === 1 ? ` of agent ${agentList.toString()}` : this.isAgent && agentList.length > 1 ? ` of ${agentList.length.toString()} agents` : false;
-    if (agentList && agentList.length) {
-        await this.visFactoryService.buildAgentsVisualizations(
-          this.filterHandler,
-          this.tab,
-          this.tabView,
-          agentList[0],
-          (this.tabView === 'discover' || this.oldFilteredTab === this.tab || this.tabView === 'inventory')
-        );
-        this.oldFilteredTab = this.tab;
-    } else if (!agentList && this.tab !== 'welcome') {
-      if (!store.getState().appStateReducers.currentAgentData.id) {
-        await this.visFactoryService.buildOverviewVisualizations(
-          this.filterHandler,
-          this.tab,
-          this.tabView,
-          (this.tabView === 'discover' || this.oldFilteredTab === this.tab || this.tabView === 'inventory')
-        );
-        this.oldFilteredTab = this.tab;
+    try{
+      if (this.initialFilter) {
+        this.initialFilter = false;
+        this.agentsSelectionProps.initialFilter = false;
       }
+      this.isAgent = agentList && agentList.length ? agentList[0] : false;
+      this.$scope.isAgentText = this.isAgent && agentList.length === 1 ? ` of agent ${agentList.toString()}` : this.isAgent && agentList.length > 1 ? ` of ${agentList.length.toString()} agents` : false;
+      if (agentList && agentList.length) {
+          await this.visFactoryService.buildAgentsVisualizations(
+            this.filterHandler,
+            this.tab,
+            this.tabView,
+            agentList[0],
+            (this.tabView === 'discover' || this.oldFilteredTab === this.tab)
+          );
+          this.oldFilteredTab = this.tab;
+      } else if (!agentList && this.tab !== 'welcome') {
+        if (!store.getState().appStateReducers.currentAgentData.id) {
+          await this.visFactoryService.buildOverviewVisualizations(
+            this.filterHandler,
+            this.tab,
+            this.tabView,
+            (this.tabView === 'discover' || this.oldFilteredTab === this.tab)
+          );
+          this.oldFilteredTab = this.tab;
+        }
+      };
+      setTimeout(() => { this.$location.search('agentId', store.getState().appStateReducers.currentAgentData.id ? String(store.getState().appStateReducers.currentAgentData.id) : null) }, 1);
+  
+      this.visualizeProps["isAgent"] = agentList ? agentList[0] : false;
+      this.$rootScope.$applyAsync();
+    }catch(error){
+      const options = {
+        context: `${OverviewController.name}.updateSelectedAgents`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+      throw error;
     }
-    setTimeout(() => { this.$location.search('agentId', store.getState().appStateReducers.currentAgentData.id ? String(store.getState().appStateReducers.currentAgentData.id) : null) }, 1);
-
-    this.visualizeProps["isAgent"] = agentList ? agentList[0] : false;
-    this.$rootScope.$applyAsync();
-
   }
 
   // Switch subtab

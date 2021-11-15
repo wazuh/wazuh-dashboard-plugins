@@ -42,7 +42,10 @@ import WzConfigurationIntegrityAgentless from './agentless/agentless';
 import WzConfigurationIntegrityAmazonS3 from './aws-s3/aws-s3';
 import WzConfigurationAzureLogs from './azure-logs/azure-logs';
 import WzConfigurationGoogleCloudPubSub from './google-cloud-pub-sub/google-cloud-pub-sub';
-import WzViewSelector, { WzViewSelectorSwitch } from './util-components/view-selector';
+import { WzConfigurationGitHub } from './github/github';
+import WzViewSelector, {
+  WzViewSelectorSwitch
+} from './util-components/view-selector';
 import WzLoading from './util-components/loading';
 import { withRenderIfOrWrapped } from './util-hocs/render-if';
 import { WzAgentNeverConnectedPrompt } from './configuration-no-agent';
@@ -66,6 +69,7 @@ import { WzRequest } from '../../../../../react-services/wz-request';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
+import { WzConfigurationOffice365 } from './office365/office365';
 
 class WzConfigurationSwitch extends Component {
   constructor(props) {
@@ -153,7 +157,7 @@ class WzConfigurationSwitch extends Component {
           params: { q: 'id=000' },
         });
         this.setState({
-          masterNodeInfo: masterNodeInfo.data.affected_items[0],
+          masterNodeInfo: masterNodeInfo.data.data.affected_items[0]
         });
         this.setState({ loadingOverview: false });
       } catch (error) {
@@ -421,6 +425,22 @@ class WzConfigurationSwitch extends Component {
                   updateConfigurationSection={this.updateConfigurationSection}
                 />
               </WzViewSelectorSwitch>
+              <WzViewSelectorSwitch view="github">
+                <WzConfigurationGitHub
+                  clusterNodeSelected={this.props.clusterNodeSelected}
+                  agent={agent}
+                  updateBadge={this.updateBadge}
+                  updateConfigurationSection={this.updateConfigurationSection}
+                />
+              </WzViewSelectorSwitch>
+              <WzViewSelectorSwitch view="office365">
+                <WzConfigurationOffice365
+                  clusterNodeSelected={this.props.clusterNodeSelected}
+                  agent={agent}
+                  updateBadge={this.updateBadge}
+                  updateConfigurationSection={this.updateConfigurationSection}
+                />
+              </WzViewSelectorSwitch>
             </WzViewSelector>
           )}
         </EuiPanel>
@@ -442,20 +462,14 @@ const mapDispatchToProps = (dispatch) => ({
 });
 
 export default compose(
-  withUserAuthorizationPrompt((props) => [
-    props.agent.id === '000'
-      ? { action: 'manager:read', resource: '*:*:*' }
-      : [
-          { action: 'agent:read', resource: `agent:id:${props.agent.id}` },
-          ...(props.agent.group || []).map((group) => ({
-            action: 'agent:read',
-            resource: `agent:group:${group}`,
-          })),
-        ],
-  ]), //TODO: this need cluster:read permission but manager/cluster is managed in WzConfigurationSwitch component
-  withRenderIfOrWrapped(
-    (props) => props.agent.status === 'never_connected',
-    WzAgentNeverConnectedPrompt
-  ),
-  connect(mapStateToProps, mapDispatchToProps)
-)(WzConfigurationSwitch);
+  withUserAuthorizationPrompt((props) => [props.agent.id === '000' ?
+  {action: 'manager:read', resource: '*:*:*'} :
+  [
+    {action: 'agent:read', resource: `agent:id:${props.agent.id}`},
+    ...(props.agent.group || []).map(group => ({ action: 'agent:read', resource: `agent:group:${group}` }))
+  ]]), //TODO: this need cluster:read permission but manager/cluster is managed in WzConfigurationSwitch component
+  withRenderIfOrWrapped((props) => props.agent.status === 'never_connected', WzAgentNeverConnectedPrompt),
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+))(WzConfigurationSwitch);

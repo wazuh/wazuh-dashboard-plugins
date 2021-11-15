@@ -54,6 +54,11 @@ export const getAgentSections = (menuAgent) => {
       text: 'Google Cloud Platform',
       isPin: menuAgent.gcp ? menuAgent.gcp : false,
     },
+    github: {
+      id: WAZUH_MODULES_ID.GITHUB,
+      text: 'GitHub',
+      isPin: menuAgent.github ? this.menuAgent.github : false
+    },
     pm: {
       id: WAZUH_MODULES_ID.POLICY_MONITORING,
       text: 'Policy Monitoring',

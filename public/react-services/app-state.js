@@ -57,21 +57,12 @@ export class AppState {
           const wazuhConfig = new WazuhConfig();
           const config = wazuhConfig.getConfig();
           if(!Object.keys(config).length) return;
-          const extensions = {
-            audit: config['extensions.audit'],
-            pci: config['extensions.pci'],
-            gdpr: config['extensions.gdpr'],
-            hipaa: config['extensions.hipaa'],
-            nist: config['extensions.nist'],
-            tsc: config['extensions.tsc'],
-            oscap: config['extensions.oscap'],
-            ciscat: config['extensions.ciscat'],
-            aws: config['extensions.aws'],
-            gcp: config['extensions.gcp'],
-            virustotal: config['extensions.virustotal'],
-            osquery: config['extensions.osquery'],
-            docker: config['extensions.docker']
-          };
+          const extensions = Object.keys(config)
+          .filter(key => key.split('.')[0] == 'extensions')
+          .reduce((extensions, key) => {
+            extensions[key.split('.')[1]] = config[key];
+            return extensions;
+          }, {});
           AppState.setExtensions(id, extensions);
           return extensions;
         }
