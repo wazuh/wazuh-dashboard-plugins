@@ -80,17 +80,6 @@ export class VisFactoryHandler {
       }
       store.dispatch(updateVis({ update: true, raw: rawVisualizations.getList() }));
     } catch (error) {
-      const options = {
-        context: `${VisFactoryHandler.name}.buildOverviewVisualizations`,
-        level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.BUSINESS,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: error.name || error,
-        },
-      };
-      getErrorOrchestrator().handleError(options);
       throw error;
     }
   }
@@ -112,7 +101,7 @@ export class VisFactoryHandler {
 
     try {
       const data =
-        tab !== 'sca'
+        (!['sca', 'office'].some(moduleID => tab !== moduleID))
           ? await GenericRequest.request(
               'GET',
               `/elastic/visualizations/agents-${tab}/${AppState.getCurrentPattern()}`
@@ -124,17 +113,6 @@ export class VisFactoryHandler {
       }
       store.dispatch(updateVis({ update: true }));
     } catch (error) {
-      const options = {
-        context: `${VisFactoryHandler.name}.buildAgentsVisualizations`,
-        level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.BUSINESS,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: error.name || error,
-        },
-      };
-      getErrorOrchestrator().handleError(options);
       throw error;
     }
   }
