@@ -5,7 +5,8 @@ const windowsColumns = [
   { id: 'vm_size' },
   { id: 'priority' },
   { id: 'nlwp' },
-  { id: 'cmd', width: '30%' }];
+  { id: 'cmd', width: '30%' },
+];
 const linuxColumns = [
   { id: 'name', width: '10%' },
   { id: 'euser' },
@@ -13,12 +14,12 @@ const linuxColumns = [
   { id: 'pid' },
   { id: 'ppid' },
   { id: 'cmd', width: '15%' },
-  { id: 'argvs', width: "15%" },
+  { id: 'argvs', width: '15%' },
   { id: 'vm_size' },
   { id: 'size' },
   { id: 'session' },
   { id: 'nice' },
-  { id: 'state', width: "15%" }
+  { id: 'state', width: '15%' },
 ];
 const macColumns = [
   { id: 'name', width: '10%' },
@@ -27,11 +28,12 @@ const macColumns = [
   { id: 'ppid' },
   { id: 'vm_size' },
   { id: 'nice' },
-  { id: 'state', width: "15%" }
+  { id: 'state', width: '15%' },
 ];
 
 export const processColumns = {
-  'windows': windowsColumns,
-  'linux': linuxColumns,
-  'apple': macColumns
-}
+  windows: windowsColumns,
+  linux: linuxColumns,
+  apple: macColumns,
+  freebsd: linuxColumns,
+};
