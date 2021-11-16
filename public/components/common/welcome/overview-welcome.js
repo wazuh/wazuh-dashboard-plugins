@@ -34,7 +34,7 @@ import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
 import { withErrorBoundary } from '../hocs';
 import office_logo from '../../../assets/office365.svg';
 
-export const OverviewWelcome = withErrorBoundary (class OverviewWelcome extends Component {
+export const OverviewWelcome = withErrorBoundary(class OverviewWelcome extends Component {
   constructor(props) {
     super(props);
     this.strtools = new StringsTools();
@@ -71,13 +71,15 @@ export const OverviewWelcome = withErrorBoundary (class OverviewWelcome extends 
 
   addAgent() {
     return (
-      <EuiFlexGroup >
-        <EuiFlexItem >
-          <EuiCallOut  style={{height:"65%"}} title="No agents were added to this manager. " color="warning" iconType="alert">
-            <EuiButtonEmpty style={{margin: "-58px 286px"}}  href='#/agents-preview?'>Add agent</EuiButtonEmpty>
-          </EuiCallOut>
-        </EuiFlexItem >
-      </EuiFlexGroup>
+      <>
+        <EuiFlexGroup >
+          <EuiFlexItem >
+            <EuiCallOut title={<>No agents were added to this manager.  <EuiButtonEmpty href='#/agents-preview?'>Add agent</EuiButtonEmpty></>} color="warning" iconType="alert">
+            </EuiCallOut>
+          </EuiFlexItem >
+        </EuiFlexGroup>
+        <EuiSpacer size="xl" />
+      </>
     );
   }
 
