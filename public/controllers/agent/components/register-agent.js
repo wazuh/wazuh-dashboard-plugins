@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component, Fragment } from 'react';
-import { version } from '../../../../package.json';
+import { version, kibana } from '../../../../package.json';
 import { WazuhConfig } from '../../../react-services/wazuh-config';
 import {
   EuiSteps,
@@ -115,34 +115,33 @@ const pTextCheckConnectionStyle = {
   marginTop: '3em',
 };
 
-export const RegisterAgent = withErrorBoundary(
-  class RegisterAgent extends Component {
-    constructor(props) {
-      super(props);
-      this.wazuhConfig = new WazuhConfig();
-      this.configuration = this.wazuhConfig.getConfig();
-      this.state = {
-        status: 'incomplete',
-        selectedOS: '',
-        selectedSYS: '',
-        neededSYS: false,
-        selectedArchitecture: '',
-        selectedVersion: '',
-        version: '',
-        wazuhVersion: '',
-        serverAddress: '',
-        wazuhPassword: '',
-        groups: [],
-        selectedGroup: [],
-        udpProtocol: false,
-        gotErrorRegistrationServiceInfo: false
-      };
-      this.restartAgentCommand = {
-        rpm: this.systemSelector(),
-        deb: this.systemSelector(),
-        macos: 'sudo /Library/Ossec/bin/wazuh-control start',
-      };
-    }
+export class RegisterAgent extends Component {
+  constructor(props) {
+    super(props);
+    this.wazuhConfig = new WazuhConfig();
+    this.configuration = this.wazuhConfig.getConfig();
+    this.state = {
+      status: 'incomplete',
+      selectedOS: '',
+      selectedSYS: '',
+      neededSYS: false,
+      selectedArchitecture: '',
+      selectedVersion: '',
+      kibanaVersion: (kibana || {}).version || false,
+      version: '',
+      wazuhVersion: '',
+      serverAddress: '',
+      wazuhPassword: '',
+      groups: [],
+      selectedGroup: [],
+      udpProtocol: false,
+    };
+    this.restartAgentCommand = {
+      rpm: this.systemSelector(),
+      deb: this.systemSelector(),
+      macos: 'sudo /Library/Ossec/bin/wazuh-control start',
+    };
+  }
 
     async componentDidMount() {
       try {
@@ -379,17 +378,26 @@ export const RegisterAgent = withErrorBoundary(
       }
     }
 
-    render() {
-      const appVersionMajorDotMinor = this.state.wazuhVersion.split('.').slice(0, 2).join('.');
-      const urlCheckConnectionDocumentation = `https://documentation.wazuh.com/${appVersionMajorDotMinor}/user-manual/agents/agent-connection.html`;
-      const textAndLinkToCheckConnectionDocumentation = (
-        <p style={pTextCheckConnectionStyle}>
-          To verify the connection with the Manager, please follow this{' '}
-          <a href={urlCheckConnectionDocumentation} target="_blank">
-            document.
-          </a>
-        </p>
-      );
+  getHighlightCodeLanguage(selectedSO){
+    if(selectedSO.toLowerCase() === 'win'){
+      const iKibanaVersion = parseFloat(this.state.kibanaVersion.split('.').slice(0, 2).join('.'),2);
+      return iKibanaVersion < 7.14 ? 'ps' : 'powershell';
+    }else{
+      return 'bash';
+    }
+  }
+
+  render() {
+    const appVersionMajorDotMinor = this.state.wazuhVersion.split('.').slice(0, 2).join('.'); 
+    const urlCheckConnectionDocumentation = `https://documentation.wazuh.com/${appVersionMajorDotMinor}/user-manual/agents/agent-connection.html`;
+    const textAndLinkToCheckConnectionDocumentation = (
+      <p style={pTextCheckConnectionStyle}>
+        To verify the connection with the Manager, please follow this{' '}
+        <a href={urlCheckConnectionDocumentation} target="_blank">
+          document.
+        </a>
+      </p>
+    );
       const missingOSSelection = this.checkMissingOSSelection();
       const ipInput = (
         <EuiText>
@@ -468,7 +476,7 @@ export const RegisterAgent = withErrorBoundary(
 
       const field = `${this.state.selectedOS}Text`;
       const text = customTexts[field];
-      const language = this.state.selectedOS === 'win' ? 'ps' : 'bash';
+      const language = this.getHighlightCodeLanguage(this.state.selectedOS);
       const windowsAdvice = this.state.selectedOS === 'win' && (
         <>
           <EuiCallOut
@@ -784,4 +792,3 @@ export const RegisterAgent = withErrorBoundary(
       );
     }
   }
-);

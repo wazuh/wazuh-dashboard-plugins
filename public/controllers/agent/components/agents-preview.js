@@ -23,6 +23,7 @@ import {
   EuiSpacer,
   EuiEmptyPrompt,
   EuiToolTip,
+  EuiCard,
 } from '@elastic/eui';
 import { Pie } from '../../../components/d3/pie';
 import { ProgressChart } from '../../../components/d3/progress';
@@ -193,7 +194,7 @@ export const AgentsPreview = compose(
               )) || (
                 <Fragment>
                   <EuiFlexItem className="agents-status-pie" grow={false}>
-                    <EuiPanel betaBadgeLabel="Status" className="eui-panel">
+                    <EuiCard title description betaBadgeLabel="Status" className="eui-panel">
                       <EuiFlexGroup>
                         {this.totalAgents > 0 && (
                           <EuiFlexItem className="align-items-center">
@@ -217,11 +218,11 @@ export const AgentsPreview = compose(
                           </EuiFlexItem>
                         )}
                       </EuiFlexGroup>
-                    </EuiPanel>
+                    </EuiCard>
                   </EuiFlexItem>
                   {this.totalAgents > 0 && (
                     <EuiFlexItem>
-                      <EuiPanel betaBadgeLabel="Details">
+                      <EuiCard title description betaBadgeLabel="Details">
                         <EuiFlexGroup>
                           <EuiFlexItem>
                             {this.summary && (
@@ -334,7 +335,7 @@ export const AgentsPreview = compose(
                             </EuiFlexGroup>
                           </EuiFlexItem>
                         </EuiFlexGroup>
-                      </EuiPanel>
+                      </EuiCard>
                     </EuiFlexItem>
                   )}
                 </Fragment>
@@ -348,7 +349,9 @@ export const AgentsPreview = compose(
                     height: !this.state.loading ? '182px' : 0,
                   }}
                 >
-                  <EuiPanel
+                  <EuiCard
+                    title
+                    description
                     paddingSize="none"
                     betaBadgeLabel="Evolution"
                     style={{ display: this.props.resultState === 'ready' ? 'block' : 'none' }}
@@ -370,8 +373,10 @@ export const AgentsPreview = compose(
                         )}
                       </EuiFlexItem>
                     </EuiFlexGroup>
-                  </EuiPanel>
-                  <EuiPanel
+                  </EuiCard>
+                  <EuiCard
+                    title
+                    description
                     paddingSize="none"
                     betaBadgeLabel="Evolution"
                     style={{
@@ -386,7 +391,7 @@ export const AgentsPreview = compose(
                       title={<h3>No results found in the selected time range</h3>}
                       actions={<WzDatePicker condensed={true} onTimeChange={() => {}} />}
                     />
-                  </EuiPanel>
+                  </EuiCard>
                 </EuiFlexItem>
               )}
             </EuiFlexGroup>
