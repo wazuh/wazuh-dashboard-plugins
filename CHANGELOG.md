@@ -81,6 +81,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed group agent management table does not update on error [#3605](https://github.com/wazuh/wazuh-kibana-app/pull/3605)
 - Fixed not showing packages details in agent inventory for a freeBSD agent SO [#3651](https://github.com/wazuh/wazuh-kibana-app/pull/3651)
 - Fixed wazuh token deleted twice [#3652](https://github.com/wazuh/wazuh-kibana-app/pull/3652)
+- Fixed compatibility wazuh 4.3 - kibana 7.13.4 [#3685](https://github.com/wazuh/wazuh-kibana-app/pull/3685)
 
 ## Wazuh v4.2.4 - Kibana 7.10.2 , 7.12.1, 7.13.4, 7.14.2 - Revision 4206
 
