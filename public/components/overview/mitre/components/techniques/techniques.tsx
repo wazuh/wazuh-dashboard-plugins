@@ -461,7 +461,6 @@ export const Techniques = withWindowSize(
           const response = await WzRequest.apiReq('GET', '/mitre/techniques', {
             params: {
               search: searchValue,
-              limit: 500,
             },
           });
           const filteredTechniques = (((response || {}).data || {}).data.affected_items || []).map(
