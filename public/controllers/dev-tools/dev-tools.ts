@@ -334,18 +334,6 @@ export class DevToolsController {
               noHScroll: true
             })
           });
-
-          const options: UIErrorLog = {
-            context: `${DevToolsController.name}.checkJsonParseError`,
-            level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
-            severity: UI_ERROR_SEVERITIES.UI as UIErrorSeverity,
-            error: {
-              error: error,
-              message: error.message || error,
-              title: `${error.name}: Error parsing query`,
-            },
-          };
-          getErrorOrchestrator().handleError(options);
         }
       }
     }
@@ -499,7 +487,7 @@ export class DevToolsController {
           const spaceLineStart = (line.match(reLineStart) || [])[1] || '';
           const inputKeyBodyParam = (line.match(reLineStart) || [])[2] || '';
 
-          const renderBodyParam = (parameter, spaceLineStart) => {           
+          const renderBodyParam = (parameter, spaceLineStart) => {
             let valueBodyParam = '';
             if (parameter.type === 'string') {
               valueBodyParam = '""'
@@ -675,10 +663,18 @@ export class DevToolsController {
         );
 
       // Place play button at first line from the selected group
-      const cords = this.apiInputBox.cursorCoords({
-        line: desiredGroup[0].start,
-        ch: 0
-      });
+      let cords;
+      try {
+        cords = this.apiInputBox.cursorCoords({
+          line: desiredGroup[0].start,
+          ch: 0
+        });
+      } catch {
+        $('#play_button').hide();
+        $('#wazuh_dev_tools_documentation').hide();
+        return null;
+      }
+
       if (!$('#play_button').is(':visible')) $('#play_button').show();
       if (!$('#wazuh_dev_tools_documentation').is(':visible')) $('#wazuh_dev_tools_documentation').show();
       const currentPlayButton = $('#play_button').offset();
@@ -713,7 +709,7 @@ export class DevToolsController {
       $('#wazuh_dev_tools_documentation').hide();
       const options: UIErrorLog = {
         context: `${DevToolsController.name}.calculateWhichGroup`,
-        level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+        level: UI_LOGGER_LEVELS.WARNING as UILogLevel,
         severity: UI_ERROR_SEVERITIES.UI as UIErrorSeverity,
         error: {
           error: error,
@@ -793,21 +789,10 @@ export class DevToolsController {
           : '/';
 
         let JSONraw = {};
-        try {          
+        try {
           JSONraw = JSON.parse(paramsInline || desiredGroup.requestTextJson);
         } catch (error) {
           JSONraw = {};
-          const options: UIErrorLog = {
-            context: `${DevToolsController.name}.send`,
-            level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
-            severity: UI_ERROR_SEVERITIES.UI as UIErrorSeverity,
-            error: {
-              error: error,
-              message: error.message || error,
-              title: error.name,
-            },
-          };
-          getErrorOrchestrator().handleError(options);
         }
 
         if (typeof extra.pretty !== 'undefined') delete extra.pretty;
@@ -820,7 +805,7 @@ export class DevToolsController {
         if (typeof JSONraw === 'object') JSONraw.devTools = true;
         if (!firstTime) {
           const output = await this.wzRequest.apiReq(method, path, JSONraw);
-                    
+
           if (typeof output === 'string' && output.includes('3029')) {
             this.apiOutputBox.setValue('This method is not allowed without admin mode');
           }
