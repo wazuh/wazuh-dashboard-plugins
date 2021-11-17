@@ -82,6 +82,19 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed not showing packages details in agent inventory for a freeBSD agent SO [#3651](https://github.com/wazuh/wazuh-kibana-app/pull/3651)
 - Fixed wazuh token deleted twice [#3652](https://github.com/wazuh/wazuh-kibana-app/pull/3652)
 - Fixed handler of error on dev-tools [#3687](https://github.com/wazuh/wazuh-kibana-app/pull/3687)
+- Fixed compatibility wazuh 4.3 - kibana 7.13.4 [#3685](https://github.com/wazuh/wazuh-kibana-app/pull/3685)
+
+## Wazuh v4.2.4 - Kibana 7.10.2 , 7.12.1, 7.13.4, 7.14.2 - Revision 4206
+
+### Added
+
+- Support for Kibana 7.13.4
+- Support for Kibana 7.14.2
+
+### Fixed
+
+- Fixed compatibility wazuh 4.2 - kibana 7.13.4 [#3653](https://github.com/wazuh/wazuh-kibana-app/pull/3653)
+- Fixed interative register windows agent screen error [#3654](https://github.com/wazuh/wazuh-kibana-app/pull/3654)
 
 ## Wazuh v4.2.4 - Kibana 7.10.2, 7.11.2, 7.12.1 - Revision 4205
 
