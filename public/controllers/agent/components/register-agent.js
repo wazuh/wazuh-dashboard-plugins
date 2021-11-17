@@ -115,33 +115,35 @@ const pTextCheckConnectionStyle = {
   marginTop: '3em',
 };
 
-export class RegisterAgent extends Component {
-  constructor(props) {
-    super(props);
-    this.wazuhConfig = new WazuhConfig();
-    this.configuration = this.wazuhConfig.getConfig();
-    this.state = {
-      status: 'incomplete',
-      selectedOS: '',
-      selectedSYS: '',
-      neededSYS: false,
-      selectedArchitecture: '',
-      selectedVersion: '',
-      kibanaVersion: (kibana || {}).version || false,
-      version: '',
-      wazuhVersion: '',
-      serverAddress: '',
-      wazuhPassword: '',
-      groups: [],
-      selectedGroup: [],
-      udpProtocol: false,
-    };
-    this.restartAgentCommand = {
-      rpm: this.systemSelector(),
-      deb: this.systemSelector(),
-      macos: 'sudo /Library/Ossec/bin/wazuh-control start',
-    };
-  }
+export const RegisterAgent = withErrorBoundary(
+
+  class RegisterAgent extends Component {
+    constructor(props) {
+      super(props);
+      this.wazuhConfig = new WazuhConfig();
+      this.configuration = this.wazuhConfig.getConfig();
+      this.state = {
+        status: 'incomplete',
+        selectedOS: '',
+        selectedSYS: '',
+        neededSYS: false,
+        selectedArchitecture: '',
+        selectedVersion: '',
+        kibanaVersion: (kibana || {}).version || false,
+        version: '',
+        wazuhVersion: '',
+        serverAddress: '',
+        wazuhPassword: '',
+        groups: [],
+        selectedGroup: [],
+        udpProtocol: false,
+      };
+      this.restartAgentCommand = {
+        rpm: this.systemSelector(),
+        deb: this.systemSelector(),
+        macos: 'sudo /Library/Ossec/bin/wazuh-control start',
+      };
+    }
 
     async componentDidMount() {
       try {
@@ -378,26 +380,26 @@ export class RegisterAgent extends Component {
       }
     }
 
-  getHighlightCodeLanguage(selectedSO){
-    if(selectedSO.toLowerCase() === 'win'){
-      const iKibanaVersion = parseFloat(this.state.kibanaVersion.split('.').slice(0, 2).join('.'),2);
-      return iKibanaVersion < 7.14 ? 'ps' : 'powershell';
-    }else{
-      return 'bash';
+    getHighlightCodeLanguage(selectedSO) {
+      if (selectedSO.toLowerCase() === 'win') {
+        const iKibanaVersion = parseFloat(this.state.kibanaVersion.split('.').slice(0, 2).join('.'), 2);
+        return iKibanaVersion < 7.14 ? 'ps' : 'powershell';
+      } else {
+        return 'bash';
+      }
     }
-  }
 
-  render() {
-    const appVersionMajorDotMinor = this.state.wazuhVersion.split('.').slice(0, 2).join('.'); 
-    const urlCheckConnectionDocumentation = `https://documentation.wazuh.com/${appVersionMajorDotMinor}/user-manual/agents/agent-connection.html`;
-    const textAndLinkToCheckConnectionDocumentation = (
-      <p style={pTextCheckConnectionStyle}>
-        To verify the connection with the Manager, please follow this{' '}
-        <a href={urlCheckConnectionDocumentation} target="_blank">
-          document.
-        </a>
-      </p>
-    );
+    render() {
+      const appVersionMajorDotMinor = this.state.wazuhVersion.split('.').slice(0, 2).join('.');
+      const urlCheckConnectionDocumentation = `https://documentation.wazuh.com/${appVersionMajorDotMinor}/user-manual/agents/agent-connection.html`;
+      const textAndLinkToCheckConnectionDocumentation = (
+        <p style={pTextCheckConnectionStyle}>
+          To verify the connection with the Manager, please follow this{' '}
+          <a href={urlCheckConnectionDocumentation} target="_blank">
+            document.
+          </a>
+        </p>
+      );
       const missingOSSelection = this.checkMissingOSSelection();
       const ipInput = (
         <EuiText>
@@ -415,30 +417,30 @@ export class RegisterAgent extends Component {
 
       const groupInput = (
         <>
-        {!this.state.groups.length &&(
-          <>
-            <EuiCallOut
-              color="warning"
-              title='This section could not be configured because you do not have permission to read groups.'
-              iconType="iInCircle"
+          {!this.state.groups.length && (
+            <>
+              <EuiCallOut
+                color="warning"
+                title='This section could not be configured because you do not have permission to read groups.'
+                iconType="iInCircle"
+              />
+              <EuiSpacer />
+            </>
+          )}
+          <EuiText>
+            <p>Select one or more existing groups</p>
+            <EuiComboBox
+              placeholder={!this.state.groups.length ? "Default" : "Select group"}
+              options={this.state.groups}
+              selectedOptions={this.state.selectedGroup}
+              onChange={(group) => {
+                this.setGroupName(group);
+              }}
+              isDisabled={!this.state.groups.length}
+              isClearable={true}
+              data-test-subj="demoComboBox"
             />
-            <EuiSpacer />
-          </>
-        )}
-        <EuiText>
-          <p>Select one or more existing groups</p>
-          <EuiComboBox
-            placeholder={!this.state.groups.length ? "Default" : "Select group"}
-            options={this.state.groups}
-            selectedOptions={this.state.selectedGroup}
-            onChange={(group) => {
-              this.setGroupName(group);
-            }}
-            isDisabled={!this.state.groups.length}
-            isClearable={true}
-            data-test-subj="demoComboBox"
-          />
-        </EuiText>
+          </EuiText>
         </>
       );
 
@@ -455,23 +457,16 @@ export class RegisterAgent extends Component {
       };
       const customTexts = {
         rpmText: `sudo ${this.optionalDeploymentVariables()}yum install ${this.optionalPackages()}`,
-        debText: `curl -so wazuh-agent-${
-          this.state.wazuhVersion
-        }.deb ${this.optionalPackages()} && sudo ${this.optionalDeploymentVariables()}dpkg -i ./wazuh-agent-${
-          this.state.wazuhVersion
-        }.deb`,
-        macosText: `curl -so wazuh-agent-${
-          this.state.wazuhVersion
-        }.pkg https://packages.wazuh.com/4.x/macos/wazuh-agent-${
-          this.state.wazuhVersion
-        }-1.pkg && sudo launchctl setenv ${this.optionalDeploymentVariables()}&& sudo installer -pkg ./wazuh-agent-${
-          this.state.wazuhVersion
-        }.pkg -target /`,
-        winText: `Invoke-WebRequest -Uri https://packages.wazuh.com/4.x/windows/wazuh-agent-${
-          this.state.wazuhVersion
-        }-1.msi -OutFile wazuh-agent-${this.state.wazuhVersion}.msi; ./wazuh-agent-${
-          this.state.wazuhVersion
-        }.msi /q ${this.optionalDeploymentVariables()}`,
+        debText: `curl -so wazuh-agent-${this.state.wazuhVersion
+          }.deb ${this.optionalPackages()} && sudo ${this.optionalDeploymentVariables()}dpkg -i ./wazuh-agent-${this.state.wazuhVersion
+          }.deb`,
+        macosText: `curl -so wazuh-agent-${this.state.wazuhVersion
+          }.pkg https://packages.wazuh.com/4.x/macos/wazuh-agent-${this.state.wazuhVersion
+          }-1.pkg && sudo launchctl setenv ${this.optionalDeploymentVariables()}&& sudo installer -pkg ./wazuh-agent-${this.state.wazuhVersion
+          }.pkg -target /`,
+        winText: `Invoke-WebRequest -Uri https://packages.wazuh.com/4.x/windows/wazuh-agent-${this.state.wazuhVersion
+          }-1.msi -OutFile wazuh-agent-${this.state.wazuhVersion}.msi; ./wazuh-agent-${this.state.wazuhVersion
+          }.msi /q ${this.optionalDeploymentVariables()}`,
       };
 
       const field = `${this.state.selectedOS}Text`;
@@ -508,39 +503,39 @@ export class RegisterAgent extends Component {
               iconType="iInCircle"
             />
           ) :
-          this.state.selectedOS && (
-            <EuiText>
-              <p>
-                You can use this command to install and enroll the Wazuh agent in one or more hosts.
-              </p>
-              <EuiCallOut
-                color="warning"
-                title={
-                  <>
-                    Running this command on a host with an agent already installed upgrades the
-                    agent package without enrolling the agent. To enroll it, see the{' '}
-                    <EuiLink href="https://documentation.wazuh.com/current/user-manual/registering/index.html">
-                      Wazuh documentation
-                    </EuiLink>
-                    .
-                  </>
-                }
-                iconType="iInCircle"
-              />
-              <EuiSpacer />
-              <EuiCodeBlock style={codeBlock} language={language}>
-                {this.state.wazuhPassword ? this.obfuscatePassword(text) : text}
-              </EuiCodeBlock>
-              {windowsAdvice}
-              <EuiCopy textToCopy={text}>
-                {(copy) => (
-                  <EuiButton fill iconType="copy" onClick={copy}>
-                    Copy command
-                  </EuiButton>
-                )}
-              </EuiCopy>
-            </EuiText>
-          )}
+            this.state.selectedOS && (
+              <EuiText>
+                <p>
+                  You can use this command to install and enroll the Wazuh agent in one or more hosts.
+                </p>
+                <EuiCallOut
+                  color="warning"
+                  title={
+                    <>
+                      Running this command on a host with an agent already installed upgrades the
+                      agent package without enrolling the agent. To enroll it, see the{' '}
+                      <EuiLink href="https://documentation.wazuh.com/current/user-manual/registering/index.html">
+                        Wazuh documentation
+                      </EuiLink>
+                      .
+                    </>
+                  }
+                  iconType="iInCircle"
+                />
+                <EuiSpacer />
+                <EuiCodeBlock style={codeBlock} language={language}>
+                  {this.state.wazuhPassword ? this.obfuscatePassword(text) : text}
+                </EuiCodeBlock>
+                {windowsAdvice}
+                <EuiCopy textToCopy={text}>
+                  {(copy) => (
+                    <EuiButton fill iconType="copy" onClick={copy}>
+                      Copy command
+                    </EuiButton>
+                  )}
+                </EuiCopy>
+              </EuiText>
+            )}
         </div>
       );
 
@@ -606,52 +601,52 @@ export class RegisterAgent extends Component {
         },
         ...(this.state.selectedOS == 'rpm'
           ? [
-              {
-                title: 'Choose the version',
-                children: (
-                  <EuiButtonGroup
-                    color="primary"
-                    legend="Choose the version"
-                    options={versionButtonsCentos}
-                    idSelected={this.state.selectedVersion}
-                    onChange={(version) => this.setVersion(version)}
-                  />
-                ),
-              },
-            ]
+            {
+              title: 'Choose the version',
+              children: (
+                <EuiButtonGroup
+                  color="primary"
+                  legend="Choose the version"
+                  options={versionButtonsCentos}
+                  idSelected={this.state.selectedVersion}
+                  onChange={(version) => this.setVersion(version)}
+                />
+              ),
+            },
+          ]
           : []),
         ...(this.state.selectedOS == 'rpm' && this.state.selectedVersion == 'centos5'
           ? [
-              {
-                title: 'Choose the architecture',
-                children: (
-                  <EuiButtonGroup
-                    color="primary"
-                    legend="Choose the architecture"
-                    options={architectureCentos5}
-                    idSelected={this.state.selectedArchitecture}
-                    onChange={(architecture) => this.setArchitecture(architecture)}
-                  />
-                ),
-              },
-            ]
+            {
+              title: 'Choose the architecture',
+              children: (
+                <EuiButtonGroup
+                  color="primary"
+                  legend="Choose the architecture"
+                  options={architectureCentos5}
+                  idSelected={this.state.selectedArchitecture}
+                  onChange={(architecture) => this.setArchitecture(architecture)}
+                />
+              ),
+            },
+          ]
           : []),
         ...(this.state.selectedOS == 'deb' ||
-        (this.state.selectedOS == 'rpm' && this.state.selectedVersion == 'centos6')
+          (this.state.selectedOS == 'rpm' && this.state.selectedVersion == 'centos6')
           ? [
-              {
-                title: 'Choose the architecture',
-                children: (
-                  <EuiButtonGroup
-                    color="primary"
-                    legend="Choose the architecture"
-                    options={architectureButtons}
-                    idSelected={this.state.selectedArchitecture}
-                    onChange={(architecture) => this.setArchitecture(architecture)}
-                  />
-                ),
-              },
-            ]
+            {
+              title: 'Choose the architecture',
+              children: (
+                <EuiButtonGroup
+                  color="primary"
+                  legend="Choose the architecture"
+                  options={architectureButtons}
+                  idSelected={this.state.selectedArchitecture}
+                  onChange={(architecture) => this.setArchitecture(architecture)}
+                />
+              ),
+            },
+          ]
           : []),
         {
           title: 'Wazuh server address',
@@ -659,11 +654,11 @@ export class RegisterAgent extends Component {
         },
         ...(!(!this.state.needsPassword || this.state.hidePasswordInput)
           ? [
-              {
-                title: 'Wazuh password',
-                children: <Fragment>{passwordInput}</Fragment>,
-              },
-            ]
+            {
+              title: 'Wazuh password',
+              children: <Fragment>{passwordInput}</Fragment>,
+            },
+          ]
           : []),
         {
           title: 'Assign the agent to a group',
@@ -671,24 +666,24 @@ export class RegisterAgent extends Component {
         },
         {
           title: 'Install and enroll the agent',
-          children: this.state.gotErrorRegistrationServiceInfo ? 
+          children: this.state.gotErrorRegistrationServiceInfo ?
             calloutErrorRegistrationServiceInfo
-          : missingOSSelection.length ? (
-            <EuiCallOut
-              color="warning"
-              title={`Please select the ${missingOSSelection.join(', ')}.`}
-              iconType="iInCircle"
-            />
-          ) : (
-            <div>{guide}</div>
-          ),
+            : missingOSSelection.length ? (
+              <EuiCallOut
+                color="warning"
+                title={`Please select the ${missingOSSelection.join(', ')}.`}
+                iconType="iInCircle"
+              />
+            ) : (
+              <div>{guide}</div>
+            ),
         },
         ...(this.state.selectedOS == 'rpm' || this.state.selectedOS == 'deb'
           ? [
-              {
-                title: 'Start the agent',
-                children: this.state.gotErrorRegistrationServiceInfo ? 
-                  calloutErrorRegistrationServiceInfo
+            {
+              title: 'Start the agent',
+              children: this.state.gotErrorRegistrationServiceInfo ?
+                calloutErrorRegistrationServiceInfo
                 : missingOSSelection.length ? (
                   <EuiCallOut
                     color="warning"
@@ -702,19 +697,19 @@ export class RegisterAgent extends Component {
                     onTabClick={onTabClick}
                   />
                 ),
-              },
-            ]
+            },
+          ]
           : []),
 
         ...(!missingOSSelection.length &&
-        this.state.selectedOS !== 'rpm' &&
-        this.state.selectedOS !== 'deb' &&
-        restartAgentCommand
+          this.state.selectedOS !== 'rpm' &&
+          this.state.selectedOS !== 'deb' &&
+          restartAgentCommand
           ? [
-              {
-                title: 'Start the agent',
-                children: this.state.gotErrorRegistrationServiceInfo ? 
-                  calloutErrorRegistrationServiceInfo 
+            {
+              title: 'Start the agent',
+              children: this.state.gotErrorRegistrationServiceInfo ?
+                calloutErrorRegistrationServiceInfo
                 : (
                   <EuiFlexGroup direction="column">
                     <EuiText>
@@ -731,8 +726,8 @@ export class RegisterAgent extends Component {
                     </EuiText>
                   </EuiFlexGroup>
                 ),
-              },
-            ]
+            },
+          ]
           : []),
       ];
       return (
@@ -792,3 +787,4 @@ export class RegisterAgent extends Component {
       );
     }
   }
+);
