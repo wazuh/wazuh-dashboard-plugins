@@ -394,7 +394,7 @@ export class FileDetails extends Component {
   }
 
   render() {
-    const { fileName, type, implicitFilters, view, currentFile, agent } = this.props;
+    const { fileName, type, implicitFilters, view, currentFile, agent, agentId } = this.props;
     const inspectButtonText = view === 'extern' ? 'Inspect in FIM' : 'Inspect in Events';
     return (
       <Fragment>
@@ -428,7 +428,7 @@ export class FileDetails extends Component {
                   <RegistryValues 
                     currentFile={currentFile} 
                     agent={agent} 
-                    agentId={implicitFilters[2]['agent.id']} 
+                    agentId={agentId} 
                   />
                 </EuiFlexItem>
               </EuiFlexGroup>
