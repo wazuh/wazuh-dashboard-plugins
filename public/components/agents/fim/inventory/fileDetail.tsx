@@ -425,7 +425,11 @@ export class FileDetails extends Component {
             >
               <EuiFlexGroup className="flyout-row">
                 <EuiFlexItem>
-                  <RegistryValues currentFile={currentFile} agent={agent} />
+                  <RegistryValues 
+                    currentFile={currentFile} 
+                    agent={agent} 
+                    agentId={implicitFilters[2]['agent.id']} 
+                  />
                 </EuiFlexItem>
               </EuiFlexGroup>
             </EuiAccordion>{' '}
