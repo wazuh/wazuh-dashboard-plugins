@@ -467,7 +467,7 @@ export const AgentsTable = withErrorBoundary(
           </EuiButtonEmpty>
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
-          <EuiToolTip content="Filter columns table" position="left">
+          <EuiToolTip content="Select columns table" position="left">
             <EuiButtonEmpty>
               <EuiIcon type="managementApp" color="primary" onClick={this.openColumnsFilter}/>
             </EuiButtonEmpty>
