@@ -88,7 +88,7 @@ export class OverviewWelcome extends Component {
               {this.props.agentsCountTotal == 0 && this.addAgent()}
               <EuiFlexGroup>
                 <EuiFlexItem>
-                  <EuiPanel betaBadgeLabel="Security Information Management">
+                  <EuiCard title description betaBadgeLabel="Security Information Management">
                     <EuiSpacer size="s" />
                     <EuiFlexGrid columns={2}>
                       {this.buildTabCard('general', 'dashboardApp')}
@@ -98,10 +98,10 @@ export class OverviewWelcome extends Component {
                       {this.props.extensions.gcp &&
                         this.buildTabCard('gcp', 'logoGCPMono')}
                     </EuiFlexGrid>
-                  </EuiPanel>
+                  </EuiCard>
                 </EuiFlexItem>
                 <EuiFlexItem>
-                  <EuiPanel betaBadgeLabel="Auditing and Policy Monitoring">
+                  <EuiCard title description betaBadgeLabel="Auditing and Policy Monitoring">
                     <EuiSpacer size="s" />
                     <EuiFlexGrid columns={2}>
                       {this.buildTabCard('pm', 'advancedSettingsApp')}
@@ -113,14 +113,14 @@ export class OverviewWelcome extends Component {
                         this.buildTabCard('ciscat', 'auditbeatApp')}
                       {this.buildTabCard('sca', 'securityAnalyticsApp')}
                     </EuiFlexGrid>
-                  </EuiPanel>
+                  </EuiCard>
                 </EuiFlexItem>
               </EuiFlexGroup>
 
               <EuiSpacer size="xl" />
               <EuiFlexGroup>
                 <EuiFlexItem>
-                  <EuiPanel betaBadgeLabel="Threat Detection and Response">
+                  <EuiCard title description betaBadgeLabel="Threat Detection and Response">
                     <EuiSpacer size="s" />
                     <EuiFlexGrid columns={2}>
                       {this.buildTabCard('vuls', 'securityApp')}
@@ -133,11 +133,11 @@ export class OverviewWelcome extends Component {
                       {this.buildTabCard('mitre', 'spacesApp')}
                       {/* TODO- Change "spacesApp" icon*/}
                     </EuiFlexGrid>
-                  </EuiPanel>
+                  </EuiCard>
                 </EuiFlexItem>
 
                 <EuiFlexItem>
-                  <EuiPanel betaBadgeLabel="Regulatory Compliance">
+                  <EuiCard title description betaBadgeLabel="Regulatory Compliance">
                     <EuiSpacer size="s" />
                     {!this.props.extensions.pci &&
                       !this.props.extensions.gdpr &&
@@ -177,7 +177,7 @@ export class OverviewWelcome extends Component {
                             this.buildTabCard('hipaa', 'emsApp')}
                         </EuiFlexGrid>
                       )}
-                  </EuiPanel>
+                  </EuiCard>
                 </EuiFlexItem>
               </EuiFlexGroup>
             </EuiFlexItem>
