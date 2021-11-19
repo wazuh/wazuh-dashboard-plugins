@@ -29,6 +29,8 @@ import {
   EuiOverlayMask,
   EuiConfirmModal,
   EuiLoadingSpinner,
+  EuiCheckboxGroup,
+  EuiIcon,
 } from '@elastic/eui';
 import { CheckUpgrade } from './checkUpgrade';
 import { getToasts } from '../../../kibana-services';
@@ -61,6 +63,7 @@ export const AgentsTable = withErrorBoundary(
         selectedItems: [],
         allSelected: false,
         purgeModal: false,
+        isFilterColumnOpen: false,
         filters: sessionStorage.getItem('agents_preview_selected_options')
           ? JSON.parse(sessionStorage.getItem('agents_preview_selected_options'))
           : [],
@@ -449,13 +452,28 @@ export const AgentsTable = withErrorBoundary(
         .map((field) => ({ name: field, value: filters[field] }));
       this.props.downloadCsv(formatedFilters);
     };
+
+    openColumnsFilter = () =>{
+      this.setState({
+        isFilterColumnOpen: !this.state.isFilterColumnOpen,
+      });
+    }
     formattedButton() {
       return (
+        <>
         <EuiFlexItem grow={false}>
           <EuiButtonEmpty iconType="importAction" onClick={this.downloadCsv}>
             Export formatted
           </EuiButtonEmpty>
         </EuiFlexItem>
+        <EuiFlexItem grow={false}>
+          <EuiToolTip content="Filter columns table" position="left">
+            <EuiButtonEmpty>
+              <EuiIcon type="managementApp" color="primary" onClick={this.openColumnsFilter}/>
+            </EuiButtonEmpty>
+          </EuiToolTip>
+        </EuiFlexItem>
+        </>
       );
     }
 
@@ -765,88 +783,110 @@ export const AgentsTable = withErrorBoundary(
     };
 
     columns() {
-      return [
-        {
-          field: 'id',
-          name: 'ID',
-          sortable: true,
-          width: '6%',
-        },
-        {
-          field: 'name',
-          name: 'Name',
-          sortable: true,
-          width: '15%',
-          truncateText: true,
-        },
-        {
-          field: 'ip',
-          name: 'IP',
-          width: '10%',
-          truncateText: true,
-          sortable: true,
-        },
-        {
-          field: 'group',
-          name: 'Group(s)',
-          width: '20%',
-          truncateText: true,
-          sortable: true,
-          render: (groups) => (groups !== '-' ? this.renderGroups(groups) : '-'),
-        },
-        {
-          field: 'os_name',
-          name: 'OS',
-          sortable: true,
-          width: '15%',
-          truncateText: true,
-          render: this.addIconPlatformRender,
-        },
-        {
-          field: 'node_name',
-          name: 'Cluster node',
-          width: '10%',
-          truncateText: true,
-          sortable: true,
-        },
-        {
-          field: 'version',
-          name: 'Version',
-          width: '5%',
-          truncateText: true,
-          sortable: true,
-          /* render: (version, agent) => this.addUpgradeStatus(version, agent), */
-        },
-        {
-          field: 'dateAdd',
-          name: 'Registration date',
-          width: '10%',
-          truncateText: true,
-          sortable: true,
-        },
-        {
-          field: 'lastKeepAlive',
-          name: 'Last keep alive',
-          width: '10%',
-          truncateText: true,
-          sortable: true,
-        },
-        {
-          field: 'status',
-          name: 'Status',
-          truncateText: true,
-          sortable: true,
-          width: '15%',
-          render: this.addHealthStatusRender,
-        },
-        {
-          align: 'right',
-          width: '5%',
-          field: 'actions',
-          name: 'Actions',
-          render: (agent) => this.actionButtonsRender(agent),
-        },
-      ];
+      const selectedColumns = window.localStorage.getItem('columns')
+        const defaultColumns = [
+          {
+            field: 'id',
+            name: 'ID',
+            sortable: true,
+            width: '6%',
+          },
+          {
+            field: 'name',
+            name: 'Name',
+            sortable: true,
+            width: '15%',
+            truncateText: true,
+          },
+          {
+            field: 'ip',
+            name: 'IP',
+            width: '10%',
+            truncateText: true,
+            sortable: true,
+          },
+          {
+            field: 'group',
+            name: 'Group(s)',
+            width: '20%',
+            truncateText: true,
+            sortable: true,
+            render: (groups) => (groups !== '-' ? this.renderGroups(groups) : '-'),
+          },
+          {
+            field: 'os_name',
+            name: 'OS',
+            sortable: true,
+            width: '15%',
+            truncateText: true,
+            render: this.addIconPlatformRender,
+          },
+          {
+            field: 'node_name',
+            name: 'Cluster node',
+            width: '10%',
+            truncateText: true,
+            sortable: true,
+          },
+          {
+            field: 'version',
+            name: 'Version',
+            width: '5%',
+            truncateText: true,
+            sortable: true,
+            /* render: (version, agent) => this.addUpgradeStatus(version, agent), */
+          },
+          {
+            field: 'dateAdd',
+            name: 'Registration date',
+            width: '10%',
+            truncateText: true,
+            sortable: true,
+          },
+          {
+            field: 'lastKeepAlive',
+            name: 'Last keep alive',
+            width: '10%',
+            truncateText: true,
+            sortable: true,
+          },
+          {
+            field: 'status',
+            name: 'Status',
+            truncateText: true,
+            sortable: true,
+            width: '15%',
+            render: this.addHealthStatusRender,
+          },
+          {
+            align: 'right',
+            width: '5%',
+            field: 'actions',
+            name: 'Actions',
+            render: (agent) => this.actionButtonsRender(agent),
+          },
+        ];
+
+        if(selectedColumns){
+          const newSelectedColumns = []
+          JSON.parse(selectedColumns).forEach(item =>{
+            if(item.show){
+              const column = defaultColumns.find(column => column.field === item.field)
+              newSelectedColumns.push(column)
+            }
+          })
+          return newSelectedColumns
+        }else{
+          const fieldColumns = defaultColumns.map(item => { 
+            return {
+              field:item.field,
+              name: item.name,
+              show: true
+            }
+          })
+          window.localStorage.setItem('columns', JSON.stringify(fieldColumns))
+          return defaultColumns
+        }
     }
 
     headRender() {
@@ -901,6 +941,42 @@ export const AgentsTable = withErrorBoundary(
           </EuiFlexItem>
         </EuiFlexGroup>
       );
+    }
+
+    selectColumnsRender(){
+      const columnsSelected = JSON.parse(window.localStorage.getItem('columns')) || []
+      const onChange = optionId => {
+        let item = columnsSelected.find(item=> item.field === optionId);
+        item.show = !item.show
+        window.localStorage.setItem('columns',JSON.stringify(columnsSelected));
+        this.forceUpdate();
+      };
+
+      const options = () => {
+        return columnsSelected.map(item =>{
+          return {
+            id: item.field,
+            label: item.name,
+            checked: item.show
+          }
+        })
+      }
+
+      return (
+        this.state.isFilterColumnOpen ?
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            <EuiCheckboxGroup
+              options={options()}
+              onChange={onChange}
+              className="columnsSelectedCheckboxs"
+              idToSelectedMap={{}}
+            />
+          </EuiFlexItem>
+        </EuiFlexGroup>
+        : 
+        ''
+      )
     }
 
     tableRender() {
@@ -1011,6 +1087,7 @@ export const AgentsTable = withErrorBoundary(
       const { allSelected, purgeModal, selectedItems, loadingAllItem } = this.state;
       const title = this.headRender();
       const filter = this.filterBarRender();
+      const selectColumnsRender = this.selectColumnsRender();
       const upgradeButton = this.renderUpgradeButton();
       const restartButton = this.renderRestartButton();
       const purgeButton = this.renderPurgeButton();
@@ -1020,7 +1097,6 @@ export const AgentsTable = withErrorBoundary(
       const table = this.tableRender();
       const callOut = this.callOutRender();
       let renderPurgeModal, loadItems, barButtons;
-
       if (purgeModal) {
         renderPurgeModal = (
           <EuiOverlayMask>
@@ -1068,6 +1144,7 @@ export const AgentsTable = withErrorBoundary(
             {loadItems}
             {selectedItems.length > 0 && barButtons}
             {callOut}
+            {selectColumnsRender}
             {table}
             {renderPurgeModal}
           </EuiPanel>
