@@ -183,7 +183,7 @@ export const Policies = () => {
         </EuiPageContentHeaderSection>
       </EuiPageContentHeader>
       <EuiPageContentBody>
-        <PoliciesTable loading={loading} policies={policies} editPolicy={editPolicy} createPolicy={createPolicy} updatePolicies={getPolicies}></PoliciesTable>
+        <PoliciesTable loading={loading} policies={policies} editPolicy={editPolicy} updatePolicies={getPolicies}></PoliciesTable>
       </EuiPageContentBody>
     </EuiPageContent>
   );
