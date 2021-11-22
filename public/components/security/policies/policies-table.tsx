@@ -10,9 +10,8 @@ import { WzRequest } from '../../../react-services/wz-request';
 import { ErrorHandler } from '../../../react-services/error-handler';
 import { WzAPIUtils } from '../../../react-services/wz-api-utils';
 import { WzButtonModalConfirm } from '../../common/buttons';
-import { CreatePolicyFlyout } from './create-policy';
 
-export const PoliciesTable = ({policies, loading, editPolicy, createPolicy,updatePolicies}) => {
+export const PoliciesTable = ({policies, loading, editPolicy, updatePolicies}) => {
 
     const getRowProps = (item) => {
       const { id } = item;
@@ -20,7 +19,6 @@ export const PoliciesTable = ({policies, loading, editPolicy, createPolicy,updat
         'data-test-subj': `row-${id}`,
         onClick: () => {
           editPolicy(item);
-          createPolicy(item)
         },
       };
     };
