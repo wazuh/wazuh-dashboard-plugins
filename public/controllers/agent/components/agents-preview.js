@@ -254,43 +254,6 @@ export const AgentsPreview = compose(
             )}
             </Fragment>
             )}
-            {this.state.showAgentsEvolutionVisualization && (
-              <EuiFlexItem grow={false} className="agents-evolution-visualization" style={{ display: !this.state.loading ? 'block' : 'none', height: !this.state.loading ? '182px' : 0}}>
-                <EuiCard title description  paddingSize="none" betaBadgeLabel="Evolution" style={{ display: this.props.resultState === 'ready' ? 'block' : 'none'}}>
-                  <EuiFlexGroup>
-                    <EuiFlexItem>
-                    <div style={{height: this.props.resultState === 'ready' ? '180px' : 0}}>
-                      <WzReduxProvider>
-                        <KibanaVis
-                          visID={'Wazuh-App-Overview-General-Agents-status'}
-                          tab={'general'}
-                        />
-                      </WzReduxProvider>
-                    </div>
-                    {this.props.resultState === 'loading' &&
-                      (
-                      <div className="loading-chart-xl">
-                        <EuiLoadingChart size="xl" />
-                      </div>
-                    ) }
-
-                    </EuiFlexItem>
-                  </EuiFlexGroup>
-                </EuiCard>
-                <EuiCard title description  paddingSize="none" betaBadgeLabel="Evolution" style={{ height: 180,  display: this.props.resultState === 'none' ? 'block' : 'none'}}>
-                  <EuiEmptyPrompt
-                    className="wz-padding-21"
-                    iconType="alert"
-                    titleSize="xs"
-                    title={<h3>No results found in the selected time range</h3>}
-                    actions={
-                      <WzDatePicker condensed={true} onTimeChange={() => { }} />
-                    }
-                  />
-                </EuiCard>
-              </EuiFlexItem>
-
-            )}
           </EuiFlexGroup>
           <EuiSpacer size="m" />
             <WzReduxProvider>
