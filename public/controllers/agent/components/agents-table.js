@@ -453,26 +453,27 @@ export const AgentsTable = withErrorBoundary(
       this.props.downloadCsv(formatedFilters);
     };
 
-    openColumnsFilter = () =>{
+    openColumnsFilter = () => {
       this.setState({
         isFilterColumnOpen: !this.state.isFilterColumnOpen,
       });
-    }
+    };
+
     formattedButton() {
       return (
         <>
-        <EuiFlexItem grow={false}>
-          <EuiButtonEmpty iconType="importAction" onClick={this.downloadCsv}>
-            Export formatted
-          </EuiButtonEmpty>
-        </EuiFlexItem>
-        <EuiFlexItem grow={false}>
-          <EuiToolTip content="Select columns table" position="left">
-            <EuiButtonEmpty>
-              <EuiIcon type="managementApp" color="primary" onClick={this.openColumnsFilter}/>
+          <EuiFlexItem grow={false}>
+            <EuiButtonEmpty iconType="importAction" onClick={this.downloadCsv}>
+              Export formatted
             </EuiButtonEmpty>
-          </EuiToolTip>
-        </EuiFlexItem>
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiToolTip content="Select columns table" position="left">
+              <EuiButtonEmpty onClick={this.openColumnsFilter}>
+                <EuiIcon type="managementApp" color="primary" />
+              </EuiButtonEmpty>
+            </EuiToolTip>
+          </EuiFlexItem>
         </>
       );
     }
@@ -674,6 +675,14 @@ export const AgentsTable = withErrorBoundary(
       }
     }
 
+    getTableColumnsSelected() {
+      return JSON.parse(window.localStorage.getItem('columnsSelectedTableAgent')) || [];
+    }
+
+    setTableColumnsSelected(data) {
+      window.localStorage.setItem('columnsSelectedTableAgent', JSON.stringify(data));
+    }
+
     setUpgradingState(agentID) {
       const { agents } = this.state;
       agents.forEach((element) => {
@@ -783,110 +792,110 @@ export const AgentsTable = withErrorBoundary(
     };
 
     columns() {
-      const selectedColumns = window.localStorage.getItem('columns')
-        const defaultColumns = [
-          {
-            field: 'id',
-            name: 'ID',
-            sortable: true,
-            width: '6%',
-          },
-          {
-            field: 'name',
-            name: 'Name',
-            sortable: true,
-            width: '15%',
-            truncateText: true,
-          },
-          {
-            field: 'ip',
-            name: 'IP',
-            width: '10%',
-            truncateText: true,
-            sortable: true,
-          },
-          {
-            field: 'group',
-            name: 'Group(s)',
-            width: '20%',
-            truncateText: true,
-            sortable: true,
-            render: (groups) => (groups !== '-' ? this.renderGroups(groups) : '-'),
-          },
-          {
-            field: 'os_name',
-            name: 'OS',
-            sortable: true,
-            width: '15%',
-            truncateText: true,
-            render: this.addIconPlatformRender,
-          },
-          {
-            field: 'node_name',
-            name: 'Cluster node',
-            width: '10%',
-            truncateText: true,
-            sortable: true,
-          },
-          {
-            field: 'version',
-            name: 'Version',
-            width: '5%',
-            truncateText: true,
-            sortable: true,
-            /* render: (version, agent) => this.addUpgradeStatus(version, agent), */
-          },
-          {
-            field: 'dateAdd',
-            name: 'Registration date',
-            width: '10%',
-            truncateText: true,
-            sortable: true,
-          },
-          {
-            field: 'lastKeepAlive',
-            name: 'Last keep alive',
-            width: '10%',
-            truncateText: true,
-            sortable: true,
-          },
-          {
-            field: 'status',
-            name: 'Status',
-            truncateText: true,
-            sortable: true,
-            width: '15%',
-            render: this.addHealthStatusRender,
-          },
-          {
-            align: 'right',
-            width: '5%',
-            field: 'actions',
-            name: 'Actions',
-            render: (agent) => this.actionButtonsRender(agent),
-          },
-        ];
+      const selectedColumns = this.getTableColumnsSelected();
+      const defaultColumns = [
+        {
+          field: 'id',
+          name: 'ID',
+          sortable: true,
+          width: '6%',
+        },
+        {
+          field: 'name',
+          name: 'Name',
+          sortable: true,
+          width: '15%',
+          truncateText: true,
+        },
+        {
+          field: 'ip',
+          name: 'IP',
+          width: '10%',
+          truncateText: true,
+          sortable: true,
+        },
+        {
+          field: 'group',
+          name: 'Group(s)',
+          width: '20%',
+          truncateText: true,
+          sortable: true,
+          render: (groups) => (groups !== '-' ? this.renderGroups(groups) : '-'),
+        },
+        {
+          field: 'os_name',
+          name: 'OS',
+          sortable: true,
+          width: '15%',
+          truncateText: true,
+          render: this.addIconPlatformRender,
+        },
+        {
+          field: 'node_name',
+          name: 'Cluster node',
+          width: '10%',
+          truncateText: true,
+          sortable: true,
+        },
+        {
+          field: 'version',
+          name: 'Version',
+          width: '5%',
+          truncateText: true,
+          sortable: true,
+          /* render: (version, agent) => this.addUpgradeStatus(version, agent), */
+        },
+        {
+          field: 'dateAdd',
+          name: 'Registration date',
+          width: '10%',
+          truncateText: true,
+          sortable: true,
+        },
+        {
+          field: 'lastKeepAlive',
+          name: 'Last keep alive',
+          width: '10%',
+          truncateText: true,
+          sortable: true,
+        },
+        {
+          field: 'status',
+          name: 'Status',
+          truncateText: true,
+          sortable: true,
+          width: '15%',
+          render: this.addHealthStatusRender,
+        },
+        {
+          align: 'right',
+          width: '5%',
+          field: 'actions',
+          name: 'Actions',
+          render: (agent) => this.actionButtonsRender(agent),
+        },
+      ];
 
-        if(selectedColumns){
-          const newSelectedColumns = []
-          JSON.parse(selectedColumns).forEach(item =>{
-            if(item.show){
-              const column = defaultColumns.find(column => column.field === item.field)
-              newSelectedColumns.push(column)
-            }
-          })
-          return newSelectedColumns
-        }else{
-          const fieldColumns = defaultColumns.map(item => { 
-            return {
-              field:item.field,
-              name: item.name,
-              show: true
-            }
-          })
-          window.localStorage.setItem('columns', JSON.stringify(fieldColumns))
-          return defaultColumns
-        }
+      if (selectedColumns.length != 0) {
+        const newSelectedColumns = [];
+        selectedColumns.forEach((item) => {
+          if (item.show) {
+            const column = defaultColumns.find((column) => column.field === item.field);
+            newSelectedColumns.push(column);
+          }
+        });
+        return newSelectedColumns;
+      } else {
+        const fieldColumns = defaultColumns.map((item) => {
+          return {
+            field: item.field,
+            name: item.name,
+            show: true,
+          };
+        });
+        this.setTableColumnsSelected(fieldColumns);
+        return defaultColumns;
+      }
     }
 
     headRender() {
@@ -943,27 +952,27 @@ export const AgentsTable = withErrorBoundary(
       );
     }
 
-    selectColumnsRender(){
-      const columnsSelected = JSON.parse(window.localStorage.getItem('columns')) || []
-      const onChange = optionId => {
-        let item = columnsSelected.find(item=> item.field === optionId);
-        item.show = !item.show
-        window.localStorage.setItem('columns',JSON.stringify(columnsSelected));
+    selectColumnsRender() {
+      const columnsSelected = this.getTableColumnsSelected();
+
+      const onChange = (optionId) => {
+        let item = columnsSelected.find((item) => item.field === optionId);
+        item.show = !item.show;
+        this.setTableColumnsSelected(columnsSelected);
         this.forceUpdate();
       };
 
       const options = () => {
-        return columnsSelected.map(item =>{
+        return columnsSelected.map((item) => {
           return {
             id: item.field,
             label: item.name,
-            checked: item.show
-          }
-        })
-      }
+            checked: item.show,
+          };
+        });
+      };
 
-      return (
-        this.state.isFilterColumnOpen ?
+      return this.state.isFilterColumnOpen ? (
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiCheckboxGroup
@@ -974,9 +983,9 @@ export const AgentsTable = withErrorBoundary(
             />
           </EuiFlexItem>
         </EuiFlexGroup>
-        : 
+      ) : (
         ''
-      )
+      );
     }
 
     tableRender() {
