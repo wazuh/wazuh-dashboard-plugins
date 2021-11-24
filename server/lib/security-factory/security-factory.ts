@@ -20,15 +20,18 @@ export async function SecurityObj(
     path: `/_security/user`,
     method: 'GET',
   };
-
-  try {
-    const responseCurl = await context.core.elasticsearch.client.asInternalUser.transport.request(
-      params
-    );
-  } catch (error) {
+  if (!!security) {
+    try {
+      const responseCurl = await context.core.elasticsearch.client.asInternalUser.transport.request(
+        params
+      );
+      return new XpackFactory(security);
+    } catch (error) {
+      return new DefaultFactory();
+    }
+  } else {
     return !!opendistroSecurityKibana
       ? new OpendistroFactory(opendistroSecurityKibana)
       : new DefaultFactory();
   }
-  return new XpackFactory(security);
 }
