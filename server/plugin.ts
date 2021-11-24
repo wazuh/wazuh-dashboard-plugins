@@ -68,10 +68,12 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
   public async setup(core: CoreSetup, plugins: PluginSetup) {
     this.logger.debug('Wazuh-wui: Setup');
 
-    const wazuhSecurity = SecurityObj(plugins);
+
     const serverInfo = core.http.getServerInfo();
 
-    core.http.registerRouteHandlerContext('wazuh', (context, request) => {
+    let wazuhSecurity;
+    core.http.registerRouteHandlerContext('wazuh', async(context, request) => {
+      !wazuhSecurity && (wazuhSecurity = await SecurityObj(plugins, context));
       return {
         logger: this.logger,
         server: {
