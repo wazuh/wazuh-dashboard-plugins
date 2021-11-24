@@ -86,7 +86,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed breadcrumbs style compatibility for Kibana 7.14.2 [#3688](https://github.com/wazuh/wazuh-kibana-app/pull/3688)
 - Fixed error that shows we're using X-Pack when we have Basic [#3692](https://github.com/wazuh/wazuh-kibana-app/pull/3692)
 
-
 ## Wazuh v4.2.4 - Kibana 7.10.2 , 7.12.1, 7.13.4, 7.14.2 - Revision 4206
 
 ### Added
