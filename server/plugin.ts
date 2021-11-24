@@ -68,7 +68,6 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
   public async setup(core: CoreSetup, plugins: PluginSetup) {
     this.logger.debug('Wazuh-wui: Setup');
 
-
     const serverInfo = core.http.getServerInfo();
 
     let wazuhSecurity;
