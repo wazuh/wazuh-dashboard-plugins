@@ -20,7 +20,7 @@ import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { GenericRequest } from '../../react-services/generic-request';
 import { WzRequest } from '../../react-services/wz-request';
-import { getToasts }  from '../../kibana-services';
+import { getToasts } from '../../kibana-services';
 import { ShareAgent } from '../../factories/share-agent';
 import { TabVisualizations } from '../../factories/tab-visualizations';
 import { formatUIDate } from '../../react-services/time-service';
@@ -31,6 +31,10 @@ import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActi
 import { WAZUH_ALERTS_PATTERN } from '../../../common/constants';
 import { getDataPlugin } from '../../kibana-services';
 import { hasAgentSupportModule } from '../../react-services/wz-agents';
+import { UI_LOGGER_LEVELS } from '../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../react-services/common-services';
+
 export class AgentsController {
   /**
    * Class constructor
@@ -52,7 +56,6 @@ export class AgentsController {
     reportingService,
     visFactoryService,
     csvReq
-
   ) {
     this.$scope = $scope;
     this.$location = $location;
@@ -71,9 +74,7 @@ export class AgentsController {
 
     // Config on-demand
     this.$scope.isArray = Array.isArray;
-    this.configurationHandler = new ConfigurationHandler(
-      errorHandler
-    );
+    this.configurationHandler = new ConfigurationHandler(errorHandler);
     this.$scope.currentConfig = null;
     this.$scope.configurationTab = '';
     this.$scope.configurationSubTab = '';
@@ -104,7 +105,7 @@ export class AgentsController {
       false,
       false,
       false,
-      false
+      false,
     ];
   }
 
@@ -141,8 +142,7 @@ export class AgentsController {
       this.$scope.tab = this.commonData.checkTabLocation();
     }
     this.tabHistory = [];
-    if (!this.ignoredTabs.includes(this.$scope.tab))
-      this.tabHistory.push(this.$scope.tab);
+    if (!this.ignoredTabs.includes(this.$scope.tab)) this.tabHistory.push(this.$scope.tab);
 
     // Tab names
     this.$scope.tabNames = TabNames;
@@ -154,28 +154,21 @@ export class AgentsController {
      * @param {Object} item
      * @param {Array<Object>} array
      */
-    this.$scope.inArray = (item, array) =>
-      item && Array.isArray(array) && array.includes(item);
+    this.$scope.inArray = (item, array) => item && Array.isArray(array) && array.includes(item);
 
-    this.$scope.switchSubtab = async (
-      subtab,
-      force = false,
-      onlyAgent = false
-    ) => this.switchSubtab(subtab, force, onlyAgent);
+    this.$scope.switchSubtab = async (subtab, force = false, onlyAgent = false) =>
+      this.switchSubtab(subtab, force, onlyAgent);
 
     this.changeAgent = false;
 
     this.$scope.switchTab = (tab, force = false) => this.switchTab(tab, force);
 
-    this.$scope.getAgentStatusClass = agentStatus =>
-      agentStatus === 'active' ? 'teal' : 'red';
+    this.$scope.getAgentStatusClass = (agentStatus) => (agentStatus === 'active' ? 'teal' : 'red');
 
-    this.$scope.formatAgentStatus = agentStatus => {
-      return ['active', 'disconnected'].includes(agentStatus) ?
-        agentStatus :
-        'never connected';
+    this.$scope.formatAgentStatus = (agentStatus) => {
+      return ['active', 'disconnected'].includes(agentStatus) ? agentStatus : 'never connected';
     };
-    this.$scope.getAgent = async newAgentId => this.getAgent(newAgentId);
+    this.$scope.getAgent = async (newAgentId) => this.getAgent(newAgentId);
     this.$scope.goGroups = (agent, group) => this.goGroups(agent, group);
     this.$scope.downloadCsv = async (path, fileName, filters = []) =>
       this.downloadCsv(path, fileName, filters);
@@ -183,19 +176,19 @@ export class AgentsController {
     this.$scope.search = (term, specificPath) =>
       this.$scope.$broadcast('wazuhSearch', {
         term,
-        specificPath
+        specificPath,
       });
 
     this.$scope.searchSyscheckFile = (term, specificFilter) =>
       this.$scope.$broadcast('wazuhSearch', {
         term,
-        specificFilter
+        specificFilter,
       });
 
     this.$scope.searchRootcheck = (term, specificFilter) =>
       this.$scope.$broadcast('wazuhSearch', {
         term,
-        specificFilter
+        specificFilter,
       });
 
     this.$scope.launchRootcheckScan = () => this.launchRootcheckScan();
@@ -203,8 +196,7 @@ export class AgentsController {
 
     this.$scope.startVis2Png = () => this.startVis2Png();
 
-    this.$scope.shouldShowComponent = component =>
-      this.shouldShowComponent(component);
+    this.$scope.shouldShowComponent = (component) => this.shouldShowComponent(component);
 
     this.$scope.$on('$destroy', () => {
       this.visFactoryService.clearAll();
@@ -217,27 +209,16 @@ export class AgentsController {
       this.$location.path('/manager/groups');
     };
 
-    this.$scope.exportConfiguration = enabledComponents => {
-      this.reportingService.startConfigReport(
-        this.$scope.agent,
-        'agentConfig',
-        enabledComponents
-      );
+    this.$scope.exportConfiguration = (enabledComponents) => {
+      this.reportingService.startConfigReport(this.$scope.agent, 'agentConfig', enabledComponents);
     };
 
-    this.$scope.restartAgent = async agent => {
+    this.$scope.restartAgent = async (agent) => {
       this.$scope.restartingAgent = true;
       try {
-        const data = await WzRequest.apiReq(
-          'PUT',
-          `/agents/${agent.id}/restart`,
-          {}
-        );
+        const data = await WzRequest.apiReq('PUT', `/agents/${agent.id}/restart`, {});
         const result = ((data || {}).data || {}).data || false;
-        const failed =
-          result &&
-          Array.isArray(result.failed_items) &&
-          result.failed_items.length;
+        const failed = result && Array.isArray(result.failed_items) && result.failed_items.length;
         if (failed) {
           throw new Error(result.failed_items[0].detail);
         } else if (result) {
@@ -247,7 +228,18 @@ export class AgentsController {
         }
         this.$scope.restartingAgent = false;
       } catch (error) {
-        ErrorHandler.handle(error);
+        const options = {
+          context: `${AgentsController.name}.restartAgent`,
+          level: UI_LOGGER_LEVELS.ERROR,
+          severity: UI_ERROR_SEVERITIES.BUSINESS,
+          store: true,
+          error: {
+            error: error,
+            message: error.message || error,
+            title: `Error restarting the agent: ${error.message || error}`,
+          },
+        };
+        getErrorOrchestrator().handleError(options);
         this.$scope.restartingAgent = false;
       }
       this.$scope.$applyAsync();
@@ -256,41 +248,51 @@ export class AgentsController {
     //Load
     try {
       this.$scope.getAgent();
-    } catch (e) {
-      ErrorHandler.handle(
-        'Unexpected exception loading controller',
-        'Agents'
-      );
+    } catch (error) {
+      const options = {
+        context: `${AgentsController.name}.$onInit`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        store: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `Error getting the agent: ${error.message || error}`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
 
     // Config on demand
     this.$scope.getXML = () => this.configurationHandler.getXML(this.$scope);
     this.$scope.getJSON = () => this.configurationHandler.getJSON(this.$scope);
-    this.$scope.isString = item => typeof item === 'string';
-    this.$scope.hasSize = obj =>
-      obj && typeof obj === 'object' && Object.keys(obj).length;
-    this.$scope.offsetTimestamp = (text, time) =>
-      this.offsetTimestamp(text, time);
-    this.$scope.switchConfigTab = (
-      configurationTab,
-      sections,
-      navigate = true
-    ) => {
+    this.$scope.isString = (item) => typeof item === 'string';
+    this.$scope.hasSize = (obj) => obj && typeof obj === 'object' && Object.keys(obj).length;
+    this.$scope.offsetTimestamp = (text, time) => this.offsetTimestamp(text, time);
+    this.$scope.switchConfigTab = (configurationTab, sections, navigate = true) => {
       this.$scope.navigate = navigate;
       try {
         this.$scope.configSubTab = JSON.stringify({
           configurationTab: configurationTab,
-          sections: sections
+          sections: sections,
         });
         if (!this.$location.search().configSubTab) {
-          AppState.setSessionStorageItem(
-            'configSubTab',
-            this.$scope.configSubTab
-          );
+          AppState.setSessionStorageItem('configSubTab', this.$scope.configSubTab);
           this.$location.search('configSubTab', true);
         }
       } catch (error) {
-        ErrorHandler.handle(error, 'Set configuration path');
+        const options = {
+          context: `${AgentsController.name}.switchConfigTab`,
+          level: UI_LOGGER_LEVELS.ERROR,
+          severity: UI_ERROR_SEVERITIES.BUSINESS,
+          store: true,
+          error: {
+            error: error,
+            message: error.message || error,
+            title: `${error.message || error} Set configuration path`,
+          },
+        };
+        getErrorOrchestrator().handleError(options);
       }
       this.configurationHandler.switchConfigTab(
         configurationTab,
@@ -306,21 +308,14 @@ export class AgentsController {
       if (!this.$location.search().configWodle) {
         this.$location.search('configWodle', this.$scope.configWodle);
       }
-      this.configurationHandler.switchWodle(
-        wodleName,
-        this.$scope,
-        this.$scope.agent.id
-      );
+      this.configurationHandler.switchWodle(wodleName, this.$scope, this.$scope.agent.id);
     };
 
     this.$scope.switchConfigurationTab = (configurationTab, navigate) => {
       // Check if configuration is synced
       this.checkSync();
       this.$scope.navigate = navigate;
-      this.configurationHandler.switchConfigurationTab(
-        configurationTab,
-        this.$scope
-      );
+      this.configurationHandler.switchConfigurationTab(configurationTab, this.$scope);
       if (!this.$scope.navigate) {
         const configSubTab = this.$location.search().configSubTab;
         if (configSubTab) {
@@ -333,7 +328,7 @@ export class AgentsController {
               false
             );
           } catch (error) {
-            ErrorHandler.handle(error, 'Get configuration path');
+            throw new Error(error);
           }
         } else {
           const configWodle = this.$location.search().configWodle;
@@ -347,11 +342,8 @@ export class AgentsController {
         this.$location.search('configWodle', null);
       }
     };
-    this.$scope.switchConfigurationSubTab = configurationSubTab => {
-      this.configurationHandler.switchConfigurationSubTab(
-        configurationSubTab,
-        this.$scope
-      );
+    this.$scope.switchConfigurationSubTab = (configurationSubTab) => {
+      this.configurationHandler.switchConfigurationSubTab(configurationSubTab, this.$scope);
       if (configurationSubTab === 'pm-sca') {
         this.$scope.currentConfig.sca = this.configurationHandler.parseWodle(
           this.$scope.currentConfig,
@@ -359,8 +351,8 @@ export class AgentsController {
         );
       }
     };
-    this.$scope.updateSelectedItem = i => (this.$scope.selectedItem = i);
-    this.$scope.getIntegration = list =>
+    this.$scope.updateSelectedItem = (i) => (this.$scope.selectedItem = i);
+    this.$scope.getIntegration = (list) =>
       this.configurationHandler.getIntegration(list, this.$scope);
 
     this.$scope.switchScaScan = () => {
@@ -368,7 +360,7 @@ export class AgentsController {
       if (!this.$scope.showScaScan) {
         this.$scope.$emit('changeTabView', {
           tabView: this.$scope.tabView,
-          tab: this.$scope.tab
+          tab: this.$scope.tab,
         });
       }
       this.$scope.$applyAsync();
@@ -387,51 +379,55 @@ export class AgentsController {
       this.switchGroupEdit();
     };
 
-    this.$scope.showConfirmAddGroup = group => {
-      this.$scope.addingGroupToAgent = this.$scope.addingGroupToAgent
-        ? false
-        : group;
+    this.$scope.showConfirmAddGroup = (group) => {
+      this.$scope.addingGroupToAgent = this.$scope.addingGroupToAgent ? false : group;
     };
 
     this.$scope.cancelAddGroup = () => (this.$scope.addingGroupToAgent = false);
 
-    this.$scope.loadScaChecks = policy =>
+    this.$scope.loadScaChecks = (policy) =>
       (this.$scope.lookingSca = {
         ...policy,
-        id: policy.policy_id
+        id: policy.policy_id,
       });
 
     this.$scope.closeScaChecks = () => (this.$scope.lookingSca = false);
 
-    this.$scope.confirmAddGroup = group => {
-      this.groupHandler
-        .addAgentToGroup(group, this.$scope.agent.id)
-        .then(() => WzRequest.apiReq('GET', `/agents`, {
+    this.$scope.confirmAddGroup = async (group) => {
+      try {
+        await this.groupHandler.addAgentToGroup(group, this.$scope.agent.id);
+        const response = await WzRequest.apiReq('GET', `/agents`, {
           params: {
             agents_list: this.$scope.agent.id,
-          }
-        }))
-        .then(agent => {
-          this.$scope.agent.group = agent.data.data.affected_items[0].group;
-          this.$scope.groups = this.$scope.groups.filter(
-            item => !agent.data.data.affected_items[0].group.includes(item)
-          );
-          this.$scope.addingGroupToAgent = false;
-          this.$scope.editGroup = false;
-          ErrorHandler.info(`Group ${group} has been added.`);
-          this.$scope.$applyAsync();
-        })
-        .catch(error => {
-          this.$scope.editGroup = false;
-          this.$scope.addingGroupToAgent = false;
-          ErrorHandler.handle(
-            error.message || error,
-            'Error adding group to agent'
-          );
+          },
         });
+        this.$scope.agent.group = response.data.data.affected_items[0].group;
+        this.$scope.groups = this.$scope.groups.filter(
+          (item) => !responseP.data.data.affected_items[0].group.includes(item)
+        );
+        this.$scope.addingGroupToAgent = false;
+        this.$scope.editGroup = false;
+        ErrorHandler.info(`Group ${group} has been added.`);
+        this.$scope.$applyAsync();
+      } catch (error) {
+        const options = {
+          context: `${AgentsController.name}.confirmAddGroup`,
+          level: UI_LOGGER_LEVELS.ERROR,
+          severity: UI_ERROR_SEVERITIES.BUSINESS,
+          store: true,
+          error: {
+            error: error,
+            message: error.message || error,
+            title: `Error adding group: ${error.message || error}`,
+          },
+        };
+        getErrorOrchestrator().handleError(options);
+        this.$scope.editGroup = false;
+        this.$scope.addingGroupToAgent = false;
+      }
     };
 
-    this.$scope.expand = i => this.expand(i);
+    this.$scope.expand = (i) => this.expand(i);
     this.setTabs();
   }
 
@@ -461,14 +457,12 @@ export class AgentsController {
       } else {
         this.$scope.$emit('changeTabView', {
           tabView: subtab,
-          tab: this.$scope.tab
+          tab: this.$scope.tab,
         });
       }
       this.$scope.tabView = subtab;
-      return;
     } catch (error) {
-      ErrorHandler.handle(error, 'Agents');
-      return;
+      throw new Error(error);
     }
   }
 
@@ -487,46 +481,46 @@ export class AgentsController {
       this.commonData.setRefreshInterval(timefilter.getRefreshInterval());
       timefilter.setRefreshInterval({
         pause: true,
-        value: 0
+        value: 0,
       });
     } else if (this.ignoredTabs.includes(this.$scope.tab)) {
       timefilter.setRefreshInterval(this.commonData.getRefreshInterval());
     }
-    if(tab === 'syscollector'){ // TODO: Migrate syscollector to React
+    if (tab === 'syscollector') {
+      // TODO: Migrate syscollector to React
       let breadcrumb = [
-          {
-            text: '',
-          },
-          {
-            text: 'Agents',
-            href: "#/agents-preview"
-          },
-          { agent: this.$scope.agent },
-          {
-            text: 'Inventory Data',
-            className: 'wz-global-breadcrumb-popover'
-          },
-        ];
+        {
+          text: '',
+        },
+        {
+          text: 'Agents',
+          href: '#/agents-preview',
+        },
+        { agent: this.$scope.agent },
+        {
+          text: 'Inventory Data',
+          className: 'wz-global-breadcrumb-popover',
+        },
+      ];
       store.dispatch(updateGlobalBreadcrumb(breadcrumb));
-      $('#breadcrumbNoTitle').attr("title","");
+      $('#breadcrumbNoTitle').attr('title', '');
     }
 
     // Update agent status
     if (!force && ((this.$scope || {}).agent || false)) {
       try {
-        const agentInfo = await WzRequest.apiReq(
-          'GET',
-          `/agents`, {
-            params: {
-              agents_list: this.$scope.agent.id,
-              select: 'status'
-            }
-          }
-        );
+        const agentInfo = await WzRequest.apiReq('GET', `/agents`, {
+          params: {
+            agents_list: this.$scope.agent.id,
+            select: 'status',
+          },
+        });
         this.$scope.agent.status =
           (((((agentInfo || {}).data || {}).data || {}).affected_items || [])[0] || {}).status ||
           this.$scope.agent.status;
-      } catch (error) { } // eslint-disable-line
+      } catch (error) {
+        throw new Error(error);
+      }
     }
 
     try {
@@ -535,15 +529,17 @@ export class AgentsController {
         //remove to component
         this.$scope.scaProps = {
           agent: this.$scope.agent,
-          loadScaChecks: policy => this.$scope.loadScaChecks(policy),
-          downloadCsv: (path, name) => this.downloadCsv(path, name)
+          loadScaChecks: (policy) => this.$scope.loadScaChecks(policy),
+          downloadCsv: (path, name) => this.downloadCsv(path, name),
         };
       }
 
       if (tab === 'syscollector')
         try {
           await this.loadSyscollector(this.$scope.agent.id);
-        } catch (error) { } // eslint-disable-line
+        } catch (error) {
+          throw new Error(error);
+        }
       if (tab === 'configuration') {
         this.$scope.switchConfigurationTab('welcome');
       } else {
@@ -551,8 +547,7 @@ export class AgentsController {
       }
 
       if (!this.ignoredTabs.includes(tab)) this.tabHistory.push(tab);
-      if (this.tabHistory.length > 2)
-        this.tabHistory = this.tabHistory.slice(-2);
+      if (this.tabHistory.length > 2) this.tabHistory = this.tabHistory.slice(-2);
 
       if (this.$scope.tab === tab && !force) {
         this.$scope.$applyAsync();
@@ -563,37 +558,40 @@ export class AgentsController {
       const sameTab = this.$scope.tab === tab;
       this.$location.search('tab', tab);
       const preserveDiscover =
-        this.tabHistory.length === 2 &&
-        this.tabHistory[0] === this.tabHistory[1] &&
-        !force;
+        this.tabHistory.length === 2 && this.tabHistory[0] === this.tabHistory[1] && !force;
       this.$scope.tab = tab;
 
       const targetSubTab =
-        this.targetLocation && typeof this.targetLocation === 'object' ?
-        this.targetLocation.subTab :
-        'panels';
+        this.targetLocation && typeof this.targetLocation === 'object'
+          ? this.targetLocation.subTab
+          : 'panels';
 
       if (!this.ignoredTabs.includes(this.$scope.tab)) {
-        this.$scope.switchSubtab(
-          targetSubTab,
-          true,
-          onlyAgent,
-          sameTab,
-          preserveDiscover
-        );
+        this.$scope.switchSubtab(targetSubTab, true, onlyAgent, sameTab, preserveDiscover);
       }
 
       this.shareAgent.deleteTargetLocation();
       this.targetLocation = null;
       this.$scope.$applyAsync();
     } catch (error) {
-      return Promise.reject(error);
+      const options = {
+        context: `${AgentsController.name}.switchTab`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.CRITICAL,
+        store: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.message || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
 
     this.$scope.configurationTabsProps = {};
-    this.$scope.buildProps = tabs => {
+    this.$scope.buildProps = (tabs) => {
       const cleanTabs = [];
-      tabs.forEach(x => {
+      tabs.forEach((x) => {
         if (
           this.$scope.configurationTab === 'integrity-monitoring' &&
           x.id === 'fim-whodata' &&
@@ -604,18 +602,15 @@ export class AgentsController {
 
         cleanTabs.push({
           id: x.id,
-          name: x.name
+          name: x.name,
         });
       });
       this.$scope.configurationTabsProps = {
-        clickAction: tab => {
+        clickAction: (tab) => {
           this.$scope.switchConfigurationSubTab(tab);
         },
-        selectedTab:
-          this.$scope.configurationSubTab || (tabs && tabs.length)
-            ? tabs[0].id
-            : '',
-        tabs: cleanTabs
+        selectedTab: this.$scope.configurationSubTab || (tabs && tabs.length) ? tabs[0].id : '',
+        tabs: cleanTabs,
       };
     };
 
@@ -627,9 +622,11 @@ export class AgentsController {
    * @param {*} id
    */
   addMitrefilter(id) {
-    const filter = `{"meta":{"index": ${AppState.getCurrentPattern() || WAZUH_ALERTS_PATTERN}},"query":{"match":{"rule.mitre.id":{"query":"${id}","type":"phrase"}}}}`;
+    const filter = `{"meta":{"index": ${
+      AppState.getCurrentPattern() || WAZUH_ALERTS_PATTERN
+    }},"query":{"match":{"rule.mitre.id":{"query":"${id}","type":"phrase"}}}}`;
     this.$rootScope.$emit('addNewKibanaFilter', {
-      filter: JSON.parse(filter)
+      filter: JSON.parse(filter),
     });
   }
 
@@ -639,10 +636,7 @@ export class AgentsController {
   setTabs() {
     this.$scope.agentsTabsProps = false;
     if (this.$scope.agent) {
-      this.currentPanel = this.commonData.getCurrentPanel(
-        this.$scope.tab,
-        true
-      );
+      this.currentPanel = this.commonData.getCurrentPanel(this.$scope.tab, true);
 
       if (!this.currentPanel) return;
 
@@ -653,27 +647,23 @@ export class AgentsController {
       );
 
       const cleanTabs = [];
-      tabs.forEach(x => {
-        if (!hasAgentSupportModule(this.$scope.agent, x.id)
-        )
-          return;
+      tabs.forEach((x) => {
+        if (!hasAgentSupportModule(this.$scope.agent, x.id)) return;
 
         cleanTabs.push({
           id: x.id,
-          name: x.name
+          name: x.name,
         });
       });
 
       this.$scope.agentsTabsProps = {
-        clickAction: tab => {
+        clickAction: (tab) => {
           this.switchTab(tab, true);
         },
         selectedTab:
           this.$scope.tab ||
-          (this.currentPanel && this.currentPanel.length
-            ? this.currentPanel[0]
-            : ''),
-        tabs: cleanTabs
+          (this.currentPanel && this.currentPanel.length ? this.currentPanel[0] : ''),
+        tabs: cleanTabs,
       };
       this.$scope.$applyAsync();
     }
@@ -684,43 +674,55 @@ export class AgentsController {
       color: color,
       title: title,
       text: text,
-      toastLifeTimeMs: time
+      toastLifeTimeMs: time,
     });
   };
 
   goDiscover() {
     this.targetLocation = {
       tab: 'general',
-      subTab: 'discover'
+      subTab: 'discover',
     };
     return this.switchTab('general');
   }
 
-  onClickUpgrade() {
+  async onClickUpgrade() {
     try {
-      WzRequest.apiReq('PUT', `/agents/${this.$scope.agent.id}/upgrade`, {})
-        .then(() => {
-          this.showToast('success', 'The agent is being upgrade.', '', 5000);
-        })
-        .catch(() => {
-          this.showToast('warning', 'This agent is already upgrade.', '', 5000);
-        });
+      await WzRequest.apiReq('PUT', `/agents/${this.$scope.agent.id}/upgrade`, {});
+      this.showToast('success', 'The agent is being upgrade.', '', 5000);
     } catch (error) {
-      console.log(error);
+      const options = {
+        context: `${AgentsController.name}.onClickUpgrade`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        store: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `Error upgrading the agent: ${error.message || error}`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   }
 
-  onClickRestart() {
+  async onClickRestart() {
     try {
-      WzRequest.apiReq('PUT', `/agents/${this.$scope.agent.id}/restart`, {})
-        .then(() => {
-          this.showToast('success', 'Agent restarted.', '', 5000);
-        })
-        .catch(() => {
-          this.showToast('warning', 'Error restarting agent.', '', 5000);
-        });
+      await WzRequest.apiReq('PUT', `/agents/${this.$scope.agent.id}/restart`, {});
+      this.showToast('success', 'Agent restarted.', '', 5000);
     } catch (error) {
-      console.log(error);
+      const options = {
+        context: `${AgentsController.name}.onClickRestart`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        store: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `Error restarting the agent: ${error.message || error}`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   }
 
@@ -756,7 +758,8 @@ export class AgentsController {
   async checkSync() {
     const isSync = await WzRequest.apiReq(
       'GET',
-      `/agents/${this.$scope.agent.id}/group/is_sync`, {}
+      `/agents/${this.$scope.agent.id}/group/is_sync`,
+      {}
     );
     this.$scope.isSynchronized =
       (((((isSync || {}).data || {}).data || {}).affected_items || [])[0] || {}).synced || false;
@@ -769,15 +772,11 @@ export class AgentsController {
    */
   async loadSyscollector(id) {
     try {
-      const syscollectorData = await this.genericReq.request(
-        'GET',
-        `/api/syscollector/${id}`
-      );
+      const syscollectorData = await this.genericReq.request('GET', `/api/syscollector/${id}`);
       this.$scope.syscollector = (syscollectorData || {}).data || {};
-
       return;
     } catch (error) {
-      return Promise.reject(error);
+      throw new Error(error);
     }
   }
 
@@ -799,7 +798,7 @@ export class AgentsController {
       const data = await WzRequest.apiReq('GET', `/agents`, {
         params: {
           agents_list: id,
-        }
+        },
       });
 
       const agentInfo = ((((data || {}).data || {}).data || {}).affected_items || [])[0] || false;
@@ -808,12 +807,9 @@ export class AgentsController {
 
       if (!this.$scope.agent) return;
       if (agentInfo && this.$scope.agent.os) {
-        this.$scope.agentOS =
-          this.$scope.agent.os.name + ' ' + this.$scope.agent.os.version;
+        this.$scope.agentOS = this.$scope.agent.os.name + ' ' + this.$scope.agent.os.version;
         const isLinux = this.$scope.agent.os.uname.includes('Linux');
-        this.$scope.agent.agentPlatform = isLinux
-          ? 'linux'
-          : this.$scope.agent.os.platform;
+        this.$scope.agent.agentPlatform = isLinux ? 'linux' : this.$scope.agent.os.platform;
       } else {
         this.$scope.agentOS = '-';
         this.$scope.agent.agentPlatform = false;
@@ -822,16 +818,13 @@ export class AgentsController {
       await this.$scope.switchTab(this.$scope.tab, true);
       const groups = await WzRequest.apiReq('GET', '/groups', {});
       this.$scope.groups = groups.data.data.affected_items
-        .map(item => item.name)
-        .filter(
-          item =>
-            this.$scope.agent.group && !this.$scope.agent.group.includes(item)
-        );
+        .map((item) => item.name)
+        .filter((item) => this.$scope.agent.group && !this.$scope.agent.group.includes(item));
 
       this.loadWelcomeCardsProps();
       this.$scope.getWelcomeCardsProps = (resultState) => {
-        return {...this.$scope.welcomeCardsProps, resultState }
-      }
+        return { ...this.$scope.welcomeCardsProps, resultState };
+      };
       this.$scope.load = false;
       this.$scope.$applyAsync();
       return;
@@ -841,31 +834,24 @@ export class AgentsController {
           this.$scope.emptyAgent = 'Wazuh API timeout.';
         }
       }
-      if (
-        error &&
-        typeof error === 'string' &&
-        error.includes('Agent does not exist')
-      ) {
+      if (error && typeof error === 'string' && error.includes('Agent does not exist')) {
         this.$location.search('agent', null);
         this.$location.path('/agents-preview');
       }
+      this.$scope.load = false;
+      this.$scope.$applyAsync();
+      throw new Error(error);
     }
-
-    this.$scope.load = false;
-    this.$scope.$applyAsync();
-    return;
   }
 
   shouldShowComponent(component) {
-    return hasAgentSupportModule(this.$scope.agent, component)
+    return hasAgentSupportModule(this.$scope.agent, component);
   }
 
   cleanExtensions(extensions) {
     const result = {};
     for (const extension in extensions) {
-      if (
-        hasAgentSupportModule(this.$scope.agent, extension)
-      ) {
+      if (hasAgentSupportModule(this.$scope.agent, extension)) {
         result[extension] = extensions[extension];
       }
     }
@@ -877,7 +863,7 @@ export class AgentsController {
    */
   loadWelcomeCardsProps() {
     this.$scope.welcomeCardsProps = {
-      switchTab: tab => this.switchTab(tab),
+      switchTab: (tab) => this.switchTab(tab),
       extensions: this.cleanExtensions(this.$scope.extensions),
       agent: this.$scope.agent,
       api: AppState.getCurrentAPI(),
@@ -885,7 +871,7 @@ export class AgentsController {
       setExtensions: (api, extensions) => {
         AppState.setExtensions(api, extensions);
         this.$scope.extensions = extensions;
-      }
+      },
     };
   }
 
@@ -903,6 +889,18 @@ export class AgentsController {
     try {
       return text + formatUIDate(time);
     } catch (error) {
+      const options = {
+        context: `${AgentsController.name}.offsetTimestamp`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        store: false,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.message || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
       return time !== '-' ? `${text}${time} (UTC)` : time;
     }
   }
@@ -914,7 +912,7 @@ export class AgentsController {
    */
   goGroups(agent, group) {
     AppState.setNavigation({
-      status: true
+      status: true,
     });
     this.visFactoryService.clearAll();
     this.shareAgent.setAgent(agent, group);
@@ -931,19 +929,15 @@ export class AgentsController {
    */
   async downloadCsv(path, fileName, filters = []) {
     try {
-      ErrorHandler.info(
-        'Your download should begin automatically...',
-        'CSV'
-      );
+      ErrorHandler.info('Your download should begin automatically...', 'CSV');
       const currentApi = JSON.parse(AppState.getCurrentAPI()).id;
       const output = await this.csvReq.fetch(path, currentApi, filters);
       const blob = new Blob([output], {
-        type: 'text/csv'
+        type: 'text/csv',
       }); // eslint-disable-line
-
       FileSaver.saveAs(blob, fileName);
     } catch (error) {
-      ErrorHandler.handle(error, 'Download CSV');
+      throw new Error(error);
     }
     return;
   }
@@ -957,9 +951,7 @@ export class AgentsController {
       syscollectorFilters.push(
         this.filterHandler.managerQuery(AppState.getClusterInfo().cluster, true)
       );
-      syscollectorFilters.push(
-        this.filterHandler.agentQuery(this.$scope.agent.id)
-      );
+      syscollectorFilters.push(this.filterHandler.agentQuery(this.$scope.agent.id));
     }
     this.reportingService.startVis2Png(
       this.$scope.tab,
@@ -974,17 +966,24 @@ export class AgentsController {
       if (!isActive) {
         throw new Error('Agent is not active');
       }
-      await WzRequest.apiReq(
-        'PUT',
-        `/rootcheck/${this.$scope.agent.id}`,
-        {}
-      );
+      await WzRequest.apiReq('PUT', `/rootcheck/${this.$scope.agent.id}`, {});
       ErrorHandler.info(
-        `Policy monitoring scan launched successfully on agent ${this.$scope.agent.id}`);
+        `Policy monitoring scan launched successfully on agent ${this.$scope.agent.id}`
+      );
     } catch (error) {
-      ErrorHandler.handle(error);
+      const options = {
+        context: `${AgentsController.name}.launchRootcheckScan`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        store: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: ` Policy monitoring scan failed on agent ${this.$scope.agent.id} due to: ${error.message || error}`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
-    return;
   }
 
   async launchSyscheckScan() {
@@ -995,17 +994,24 @@ export class AgentsController {
       }
       await WzRequest.apiReq('PUT', `/syscheck`, {
         params: {
-          agents_list: this.$scope.agent.id
-        }
+          agents_list: this.$scope.agent.id,
+        },
       });
-      ErrorHandler.info(
-        `FIM scan launched successfully on agent ${this.$scope.agent.id}`,
-        ''
-      );
+      ErrorHandler.info(`FIM scan launched successfully on agent ${this.$scope.agent.id}`, '');
     } catch (error) {
-      ErrorHandler.handle(error);
+      const options = {
+        context: `${AgentsController.name}.launchSyscheckScan`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        store: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: ` FIM scan failed on agent ${this.$scope.agent.id} due to: ${error.message || error}`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
-    return;
   }
 
   falseAllExpand() {
@@ -1025,7 +1031,7 @@ export class AgentsController {
       false,
       false,
       false,
-      false
+      false,
     ];
   }
 

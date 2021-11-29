@@ -19,8 +19,9 @@ import {
   EuiFlexItem,
   EuiFlexGroup
 } from '@elastic/eui';
+import { withErrorBoundary } from '../../../components/common/hocs';
 
-export class RequirementCard extends Component {
+export const RequirementCard = withErrorBoundary (class RequirementCard extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -171,7 +172,7 @@ export class RequirementCard extends Component {
       </EuiFlexGroup>
     );
   }
-}
+});
 
 RequirementCard.propTypes = {
   items: PropTypes.array,

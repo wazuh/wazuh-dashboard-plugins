@@ -35,7 +35,7 @@ import withLoading from '../util-hocs/loading';
 import { updateWazuhNotReadyYet } from '../../../../../../redux/actions/appStateActions';
 import {
   updateClusterNodes,
-  updateClusterNodeSelected
+  updateClusterNodeSelected,
 } from '../../../../../../redux/actions/configurationActions';
 import {
   fetchFile,
@@ -43,15 +43,19 @@ import {
   saveFileManager,
   saveFileCluster,
   clusterNodes,
-  clusterReq
+  clusterReq,
 } from '../utils/wz-fetch';
 import { validateXML } from '../utils/xml';
-import { getToasts }  from '../../../../../..//kibana-services';
+import { getToasts } from '../../../../../..//kibana-services';
 
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 import { AppState } from '../../../../../../react-services/app-state';
 import { ApiCheck } from '../../../../../../react-services/wz-api-check';
+
+import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
 
 class WzEditConfiguration extends Component {
   constructor(props) {
@@ -65,21 +69,18 @@ class WzEditConfiguration extends Component {
       saving: false,
       hasChanges: false,
       infoChangesAfterRestart: false,
-      disableSaveRestartButtons: false
+      disableSaveRestartButtons: false,
     };
   }
-  
-  addToast(toast){
+
+  addToast(toast) {
     getToasts().add(toast);
   }
   async editorSave() {
     try {
       this.setState({ saving: true });
       this.props.clusterNodeSelected
-        ? await saveFileCluster(
-            this.state.editorValue,
-            this.props.clusterNodeSelected
-          )
+        ? await saveFileCluster(this.state.editorValue, this.props.clusterNodeSelected)
         : await saveFileManager(this.state.editorValue);
       this.setState({ saving: false, infoChangesAfterRestart: true, hasChanges: false });
       this.addToast({
@@ -88,50 +89,52 @@ class WzEditConfiguration extends Component {
             <EuiIcon type="check" />
             &nbsp;
             <span>
-              <b>{this.props.clusterNodeSelected || 'Manager'}</b> configuration
-              has been updated
+              <b>{this.props.clusterNodeSelected || 'Manager'}</b> configuration has been updated
             </span>
           </Fragment>
         ),
-        color: 'success'
+        color: 'success',
       });
     } catch (error) {
+      let errorMessage;
       if (error.details) {
-        this.addToast({
-          title: (
-            <Fragment>
-              <EuiIcon type="alert" />
-              &nbsp;
-              <span>
-                File ossec.conf saved, but there were found several error while
-                validating the configuration.
-              </span>
-            </Fragment>
-          ),
-          color: 'warning',
-          text: error.details
-        });
+        errorMessage = `File ossec.conf saved, but there were found several error while validating the configuration. ${error.details}`;
       } else {
-        this.addToast({
-          title: (
-            <Fragment>
-              <EuiIcon type="alert" />
-              &nbsp;
-              <span>Error saving configuration</span>
-            </Fragment>
-          ),
-          color: 'danger',
-          text: typeof error === 'string' ? error : error.message
-        });
+        errorMessage = 'Error saving configuration';
       }
       this.setState({ saving: false, infoChangesAfterRestart: false });
+      const options = {
+        context: `${WzEditConfiguration.name}.editorSave`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: errorMessage || error,
+          title: `${error.name}: Mitre alerts could not be fetched`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   }
   editorCancel() {
     this.props.updateConfigurationSection('');
   }
   refresh() {
-    this.checkIfClusterOrManager();
+    try {
+      this.checkIfClusterOrManager();
+    }catch(error){
+      const options = {
+        context: `${WzEditConfiguration.name}.refresh`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+    } 
   }
   toggleRestart() {
     this.setState({ restart: !this.state.restart });
@@ -140,7 +143,11 @@ class WzEditConfiguration extends Component {
     this.setState({ editorValue });
   }
   onDidMount(xmlFetched, errorXMLFetched) {
-    this.setState({ editorValue: xmlFetched, disableSaveRestartButtons: errorXMLFetched,initialValue: xmlFetched});
+    this.setState({
+      editorValue: xmlFetched,
+      disableSaveRestartButtons: errorXMLFetched,
+      initialValue: xmlFetched,
+    });
   }
   onLoadingConfiguration(disableSaveRestartButtons) {
     this.setState({ disableSaveRestartButtons });
@@ -155,10 +162,7 @@ class WzEditConfiguration extends Component {
   async confirmRestart() {
     try {
       this.setState({ restarting: true, saving: true, infoChangesAfterRestart: false });
-      await restartNodeSelected(
-        this.props.clusterNodeSelected,
-        this.props.updateWazuhNotReadyYet
-      );
+      await restartNodeSelected(this.props.clusterNodeSelected, this.props.updateWazuhNotReadyYet);
       this.props.updateWazuhNotReadyYet('');
       this.setState({ restart: false, saving: false, restarting: false });
       await this.checkIfClusterOrManager();
@@ -169,17 +173,28 @@ class WzEditConfiguration extends Component {
               <EuiIcon type="iInCircle" />
               &nbsp;
               <span>
-                Nodes could take some time to restart, it may be necessary to
-                perform a refresh to see them all.
+                Nodes could take some time to restart, it may be necessary to perform a refresh to
+                see them all.
               </span>
             </Fragment>
           ),
-          color: 'success'
+          color: 'success',
         });
       }
     } catch (error) {
       this.props.updateWazuhNotReadyYet('');
       this.setState({ restart: false, saving: false, restarting: false });
+      const options = {
+        context: `${WzEditConfiguration.name}.confirmRestart`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   }
 
@@ -187,32 +202,26 @@ class WzEditConfiguration extends Component {
     try {
       // in case which enable/disable cluster configuration, update Redux Store
       const clusterStatus = await clusterReq();
-      if(clusterStatus.data.data.enabled === 'yes' && clusterStatus.data.data.running === 'yes'){
+      if (clusterStatus.data.data.enabled === 'yes' && clusterStatus.data.data.running === 'yes') {
         // try if it is a cluster
         const nodes = await clusterNodes();
         // set cluster nodes in Redux Store
         this.props.updateClusterNodes(nodes.data.data.affected_items);
         // set cluster node selected in Redux Store
         const existsClusterCurrentNodeSelected = nodes.data.data.affected_items.find(
-          node => node.name === this.props.clusterNodeSelected
+          (node) => node.name === this.props.clusterNodeSelected
         );
         this.props.updateClusterNodeSelected(
           existsClusterCurrentNodeSelected
             ? existsClusterCurrentNodeSelected.name
-            : nodes.data.data.affected_items.find(node => node.type === 'master').name
+            : nodes.data.data.affected_items.find((node) => node.type === 'master').name
         );
-        this.props.updateConfigurationSection(
-          'edit-configuration',
-          'Cluster configuration'
-        );
-      }else{
+        this.props.updateConfigurationSection('edit-configuration', 'Cluster configuration');
+      } else {
         // do nothing if it isn't a cluster
         this.props.updateClusterNodes(false);
         this.props.updateClusterNodeSelected(false);
-        this.props.updateConfigurationSection(
-          'edit-configuration',
-          'Manager configuration'
-        );
+        this.props.updateConfigurationSection('edit-configuration', 'Manager configuration');
       }
     } catch (error) {
       // do nothing if it isn't a cluster
@@ -222,6 +231,7 @@ class WzEditConfiguration extends Component {
         'edit-configuration',
         'Manager configuration'
       );
+      throw error;
     }
   }
   render() {
@@ -246,7 +256,14 @@ class WzEditConfiguration extends Component {
               </EuiButton>
             ) : (
               <WzButtonPermissions
-                permissions={[this.props.clusterNodeSelected ? {action: 'cluster:update_config', resource: `node:id:${this.props.clusterNodeSelected}`} : {action: 'manager:update_config', resource: "*:*:*"}]}
+                permissions={[
+                  this.props.clusterNodeSelected
+                    ? {
+                        action: 'cluster:update_config',
+                        resource: `node:id:${this.props.clusterNodeSelected}`,
+                      }
+                    : { action: 'manager:update_config', resource: '*:*:*' },
+                ]}
                 isDisabled={saving || disableSaveRestartButtons}
                 iconType="save"
                 onClick={() => this.editorSave()}
@@ -257,23 +274,30 @@ class WzEditConfiguration extends Component {
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
             <WzButtonPermissions
-              permissions={[this.props.clusterNodeSelected ? {action: 'cluster:restart', resource: `node:id:${this.props.clusterNodeSelected}`} : {action: 'manager:restart', resource: '*:*:*'}]}
+              permissions={[
+                this.props.clusterNodeSelected
+                  ? {
+                      action: 'cluster:restart',
+                      resource: `node:id:${this.props.clusterNodeSelected}`,
+                    }
+                  : { action: 'manager:restart', resource: '*:*:*' },
+              ]}
               fill
               iconType="refresh"
               onClick={() => this.toggleRestart()}
               isDisabled={disableSaveRestartButtons || restarting}
               isLoading={restarting}
             >
-              {restarting ? 'Restarting' : 'Restart' } {clusterNodeSelected || 'Manager'}
+              {restarting ? 'Restarting' : 'Restart'} {clusterNodeSelected || 'Manager'}
             </WzButtonPermissions>
           </EuiFlexItem>
         </WzConfigurationPath>
         <WzEditorConfiguration
-          onChange={value => this.onChange(value)}
+          onChange={(value) => this.onChange(value)}
           onDidMount={(xmlFetched, errorXMLFetched) => this.onDidMount(xmlFetched, errorXMLFetched)}
           toggleRestart={() => this.toggleRestart()}
           confirmRestart={() => this.confirmRestart()}
-          onLoadingConfiguration={value => this.onLoadingConfiguration(value)}
+          onLoadingConfiguration={(value) => this.onLoadingConfiguration(value)}
           {...this.state}
           agent={agent}
           xmlError={xmlError}
@@ -281,8 +305,7 @@ class WzEditConfiguration extends Component {
         {restart && !restarting && (
           <EuiOverlayMask>
             <EuiConfirmModal
-              title={`${clusterNodeSelected ||
-                'Manager'} will be restarted`}
+              title={`${clusterNodeSelected || 'Manager'} will be restarted`}
               onCancel={() => this.toggleRestart()}
               onConfirm={() => this.confirmRestart()}
               cancelButtonText="Cancel"
@@ -296,54 +319,57 @@ class WzEditConfiguration extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet,
   clusterNodes: state.configurationReducers.clusterNodes,
-  clusterNodeSelected: state.configurationReducers.clusterNodeSelected
+  clusterNodeSelected: state.configurationReducers.clusterNodeSelected,
 });
 
-const mapDispatchToProps = dispatch => ({
-  updateClusterNodes: clusterNodes =>
-    dispatch(updateClusterNodes(clusterNodes)),
-  updateClusterNodeSelected: clusterNodeSelected =>
+const mapDispatchToProps = (dispatch) => ({
+  updateClusterNodes: (clusterNodes) => dispatch(updateClusterNodes(clusterNodes)),
+  updateClusterNodeSelected: (clusterNodeSelected) =>
     dispatch(updateClusterNodeSelected(clusterNodeSelected)),
-  updateWazuhNotReadyYet: value => dispatch(updateWazuhNotReadyYet(value))
+  updateWazuhNotReadyYet: (value) => dispatch(updateWazuhNotReadyYet(value)),
 });
 
 WzEditConfiguration.propTypes = {
   wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
-  updateWazuhNotReadyYet: PropTypes.func
+  updateWazuhNotReadyYet: PropTypes.func,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WzEditConfiguration);
+export default connect(mapStateToProps, mapDispatchToProps)(WzEditConfiguration);
 
-const mapStateToPropsEditor = state => ({
+const mapStateToPropsEditor = (state) => ({
   clusterNodeSelected: state.configurationReducers.clusterNodeSelected,
   clusterNodes: state.configurationReducers.clusterNodes,
   refreshTime: state.configurationReducers.refreshTime,
-  wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet
+  wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet,
 });
 
 const WzEditorConfiguration = compose(
   connect(mapStateToPropsEditor),
-  withLoading(async props => {
-    try {
-      props.onLoadingConfiguration(true);
-      const xmlFetched = await fetchFile(props.clusterNodeSelected);
-      props.onLoadingConfiguration(false);
-      return { xmlFetched };
-    } catch (error) {
-      props.onLoadingConfiguration(false);
-      return { xmlFetched: null, errorXMLFetched: error };
-    }
-  },
-  (props, prevProps) => (props.agent.id === '000' && props.clusterNodeSelected && prevProps.clusterNodeSelected && props.clusterNodeSelected !== prevProps.clusterNodeSelected) || (props.refreshTime !== prevProps.refreshTime)
+  withLoading(
+    async (props) => {
+      try {
+        props.onLoadingConfiguration(true);
+        const xmlFetched = await fetchFile(props.clusterNodeSelected);
+        props.onLoadingConfiguration(false);
+        return { xmlFetched };
+      } catch (error) {
+        props.onLoadingConfiguration(false);
+        return { xmlFetched: null, errorXMLFetched: error };
+      }
+    },
+    (props, prevProps) =>
+      (props.agent.id === '000' &&
+        props.clusterNodeSelected &&
+        prevProps.clusterNodeSelected &&
+        props.clusterNodeSelected !== prevProps.clusterNodeSelected) ||
+      props.refreshTime !== prevProps.refreshTime
   )
 )(
   class WzEditorConfiguration extends Component {
+
     constructor(props) {
       super(props);
     }
@@ -358,13 +384,11 @@ const WzEditorConfiguration = compose(
         infoChangesAfterRestart,
         editorValue,
         onChange,
-        wazuhNotReadyYet
+        wazuhNotReadyYet,
       } = this.props;
       const existsClusterCurrentNodeSelected =
         this.props.clusterNodes &&
-        this.props.clusterNodes.find(
-          node => node.name === this.props.clusterNodeSelected
-        );
+        this.props.clusterNodes.find((node) => node.name === this.props.clusterNodeSelected);
       return (
         <Fragment>
           {!this.props.errorXMLFetched ? (
@@ -372,15 +396,10 @@ const WzEditorConfiguration = compose(
               <EuiText>
                 Edit <span style={{ fontWeight: 'bold' }}>ossec.conf</span> of{' '}
                 <span style={{ fontWeight: 'bold' }}>
-                  {(existsClusterCurrentNodeSelected && clusterNodeSelected) ||
-                    'Manager'}
-                  {existsClusterCurrentNodeSelected &&
-                  clusterNodeSelected &&
-                  clusterNodes
+                  {(existsClusterCurrentNodeSelected && clusterNodeSelected) || 'Manager'}
+                  {existsClusterCurrentNodeSelected && clusterNodeSelected && clusterNodes
                     ? ' (' +
-                      clusterNodes.find(
-                        node => node.name === clusterNodeSelected
-                      ).type +
+                      clusterNodes.find((node) => node.name === clusterNodeSelected).type +
                       ')'
                     : ''}
                 </span>
@@ -397,13 +416,10 @@ const WzEditorConfiguration = compose(
                 <WzCodeEditor
                   mode="xml"
                   value={editorValue}
-                  onChange={value => onChange(value)}
-                  minusHeight={
-                    wazuhNotReadyYet || infoChangesAfterRestart ? 320 : 270
-                  }
+                  onChange={(value) => onChange(value)}
+                  minusHeight={wazuhNotReadyYet || infoChangesAfterRestart ? 320 : 270}
                 />
               )}
-
             </Fragment>
           ) : (
             <WzWazuhAPINotReachable error={this.props.errorXMLFetched} />
@@ -413,3 +429,5 @@ const WzEditorConfiguration = compose(
     }
   }
 );
+
+

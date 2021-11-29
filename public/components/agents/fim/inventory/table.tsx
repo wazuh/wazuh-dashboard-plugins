@@ -17,11 +17,20 @@ import {
   EuiBasicTable,
   Direction,
   EuiOverlayMask,
+  EuiOutsideClickDetector,
 } from '@elastic/eui';
 import { WzRequest } from '../../../../react-services/wz-request';
 import { FlyoutDetail } from './flyout';
 import { filtersToObject, IFilter } from '../../../wz-search-bar';
 import { formatUIDate } from '../../../../react-services/time-service';
+import {
+  UI_ERROR_SEVERITIES,
+  UIErrorLog,
+  UIErrorSeverity,
+  UILogLevel,
+} from '../../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
+import { getErrorOrchestrator } from '../../../../react-services/common-services';
 
 export class InventoryTable extends Component {
   state: {
@@ -90,8 +99,8 @@ export class InventoryTable extends Component {
       })
     } else {
       const response = await WzRequest.apiReq('GET', `/syscheck/${this.props.agent.id}`, {
-        params: { 
-          'file': file 
+        params: {
+          'file': file
         }
       });
       fileData = ((response.data || {}).data || {}).affected_items || [];
@@ -112,24 +121,35 @@ export class InventoryTable extends Component {
   async getSyscheck() {
     const agentID = this.props.agent.id;
     try {
-      const syscheck = await WzRequest.apiReq(
-      'GET',
-      `/syscheck/${agentID}`,
-      { params: this.buildFilter()},
+      const syscheck = await WzRequest.apiReq('GET', `/syscheck/${agentID}`, {
+        params: this.buildFilter(),
+      });
+
+      this.props.onTotalItemsChange(
+        (((syscheck || {}).data || {}).data || {}).total_affected_items
       );
 
-      this.props.onTotalItemsChange((((syscheck || {}).data || {}).data || {}).total_affected_items);
-      
       this.setState({
         syscheck: (((syscheck || {}).data || {}).data || {}).affected_items || {},
         totalItems: (((syscheck || {}).data || {}).data || {}).total_affected_items - 1,
         isLoading: false,
-        error: undefined
+        error: undefined,
       });
     } catch (error) {
-      this.setState({error, isLoading: false})
+      this.setState({ error, isLoading: false });
+      const options: UIErrorLog = {
+        context: `${InventoryTable.name}.getSyscheck`,
+        level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+        severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
-}
+  }
 
   buildSortFilter() {
     const { sortField, sortDirection } = this.state;
@@ -214,13 +234,6 @@ export class InventoryTable extends Component {
         width: `${width}`
       },
       {
-        field: 'perm',
-        name: 'Permissions',
-        sortable: true,
-        truncateText: true,
-        width: `${width}`
-      },
-      {
         field: 'size',
         name: 'Size',
         sortable: true,
@@ -279,18 +292,20 @@ export class InventoryTable extends Component {
       <div className='wz-inventory'>
         {filesTable}
         {this.state.isFlyoutVisible &&
-          <EuiOverlayMask
-            headerZindexLocation="below"
-            onClick={() => this.closeFlyout() } >
-            <FlyoutDetail
-              fileName={this.state.currentFile}
-              agentId={this.props.agent.id}
-              item={this.state.syscheckItem}
-              closeFlyout={() => this.closeFlyout()}
-              type='file'
-              view='inventory'
-              showViewInEvents={true}
-              {...this.props} />
+          <EuiOverlayMask headerZindexLocation="below">
+            <EuiOutsideClickDetector onOutsideClick={() => this.closeFlyout()}>
+              <div>{/* EuiOutsideClickDetector needs a static first child */}
+                <FlyoutDetail
+                  fileName={this.state.currentFile}
+                  agentId={this.props.agent.id}
+                  item={this.state.syscheckItem}
+                  closeFlyout={() => this.closeFlyout()}
+                  type='file'
+                  view='inventory'
+                  showViewInEvents={true}
+                  {...this.props} />
+              </div>
+            </EuiOutsideClickDetector>
           </EuiOverlayMask>
         }
       </div>

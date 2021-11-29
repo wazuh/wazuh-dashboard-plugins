@@ -20,3 +20,6 @@ export * from './withGuard';
 export * from './withButtonOpenOnClick';
 export * from './withAgentSupportModule';
 export * from './withUserLogged';
+export * from './error-boundary/with-error-boundary';
+export * from './with_module_tab_loader';
+export * from './with_module_not_for_agent';

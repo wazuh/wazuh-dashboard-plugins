@@ -10,15 +10,15 @@
  * Find more information about this on the LICENSE file.
  */
 
-import {GenericRequest} from './generic-request';
-import {KnownFields} from '../utils/known-fields';
-import {FieldsStatistics} from '../utils/statistics-fields';
-import {FieldsMonitoring} from '../utils/monitoring-fields';
+import { GenericRequest } from './generic-request';
+import { KnownFields } from '../utils/known-fields';
+import { FieldsStatistics } from '../utils/statistics-fields';
+import { FieldsMonitoring } from '../utils/monitoring-fields';
 import {
   HEALTH_CHECK,
   WAZUH_INDEX_TYPE_ALERTS,
   WAZUH_INDEX_TYPE_MONITORING,
-  WAZUH_INDEX_TYPE_STATISTICS
+  WAZUH_INDEX_TYPE_STATISTICS,
 } from '../../common/constants';
 import { satisfyKibanaVersion } from '../../common/semver';
 
@@ -54,7 +54,7 @@ export class SavedObject {
       }
       return indexPatterns.map((indexPattern, idx) => ({...indexPattern, _fields: indexPatternsFields[idx]}));
     } catch (error) {
-      return ((error || {}).data || {}).message || false
+      throw ((error || {}).data || {}).message || false
         ? error.data.message
         : error.message || error;
     }
@@ -93,15 +93,14 @@ export class SavedObject {
   }
 
   static validateIndexPatterns(list) {
-    const requiredFields = [
-      'timestamp',
-      'rule.groups',
-      'manager.name',
-      'agent.id',
-    ];
-    return list.filter(item => {
-      if (item._fields) {
-        return requiredFields.every((reqField => item._fields.some(field => field.name === reqField)));
+    const requiredFields = ['timestamp', 'rule.groups', 'manager.name', 'agent.id'];
+
+    return list.filter((item) => {
+      if (item.attributes && item.attributes.fields) {
+        const fields = JSON.parse(item.attributes.fields);
+        return requiredFields.every((reqField) => {
+          return fields.find((field) => field.name === reqField);
+        });
       }
       return false;
     });
@@ -120,11 +119,31 @@ export class SavedObject {
         {
           attributes: {
             title: patternID,
-            timeFieldName: 'timestamp'
-          }
+            timeFieldName: 'timestamp',
+          },
         },
         fields
       );
+    }
+  }
+
+  /**
+   *
+   * Given an index pattern ID, checks if it exists
+   */
+  static async getExistingIndexPattern(patternID) {
+    try {
+      const result = await GenericRequest.request(
+        'GET',
+        `/api/saved_objects/index-pattern/${patternID}?fields=title&fields=fields`
+      );
+
+      return result.data;
+    } catch (error) {
+      if (error && error.response && error.response.status == 404) return false;
+      return ((error || {}).data || {}).message || false
+        ? error.data.message
+        : error.message || false;
     }
   }
 
@@ -148,7 +167,7 @@ export class SavedObject {
           status: true,
           statusCode: 200,
           title,
-          id
+          fields,
         };
       }
     } catch (error) {
@@ -216,20 +235,17 @@ export class SavedObject {
     try {
       // same logic as Kibana when a new index is created, you need to refresh it to see its fields
       // we force the refresh of the index by requesting its fields and the assign these fields
-      await GenericRequest.request(
-        'PUT',
-        `/api/saved_objects/index-pattern/${id}`,
-        {
-          attributes: {
-            fields: JSON.stringify(fields),
-            timeFieldName: 'timestamp',
-            title: title
-          },
-        }
-      );
+      await GenericRequest.request('PUT', `/api/saved_objects/index-pattern/${id}`, {
+        attributes: {
+          fields: JSON.stringify(fields),
+          timeFieldName: 'timestamp',
+          title: title,
+          retry_on_conflict: 4,
+        },
+      });
       return;
     } catch (error) {
-      return ((error || {}).data || {}).message || false
+      throw ((error || {}).data || {}).message || false
         ? error.data.message
         : error.message || error;
     }
@@ -243,7 +259,7 @@ export class SavedObject {
     try {
       const fields = await SavedObject.getIndicesFields(pattern.title, WAZUH_INDEX_TYPE_ALERTS);
 
-      if(newFields && typeof newFields=="object")
+      if (newFields && typeof newFields == 'object')
         Object.keys(newFields).forEach((fieldName) => {
           if (this.isValidField(newFields[fieldName])) fields.push(newFields[fieldName]);
         });
@@ -252,7 +268,6 @@ export class SavedObject {
 
       return;
     } catch (error) {
-      console.log(error)
       return ((error || {}).data || {}).message || false
         ? error.data.message
         : error.message || error;
@@ -264,12 +279,18 @@ export class SavedObject {
    * @param {index-pattern-field} field
    */
   static isValidField(field) {
+    if (field == null || typeof field != 'object') return false;
 
-    if (field == null || typeof field != "object") return false;
-
-    const isValid = ["name", "type", "esTypes", "searchable", "aggregatable", "readFromDocValues"].reduce((ok, prop) => {
+    const isValid = [
+      'name',
+      'type',
+      'esTypes',
+      'searchable',
+      'aggregatable',
+      'readFromDocValues',
+    ].reduce((ok, prop) => {
       return ok && Object.keys(field).includes(prop);
-    }, true)
+    }, true);
     return isValid;
   }
 
@@ -291,8 +312,8 @@ export class SavedObject {
               "data.vulnerability.reference":{"id":"url"},
               "data.url":{"id":"url"}
             }`,
-            sourceFilters: '[{"value":"@timestamp"}]'
-          }
+            sourceFilters: '[{"value":"@timestamp"}]',
+          },
         },
         fields
       );
@@ -304,19 +325,24 @@ export class SavedObject {
     }
   }
 
-  static getIndicesFields = async (pattern, indexType) => GenericRequest.request(
-    //we check if indices exist before creating the index pattern
-    'GET',
-    `/api/index_patterns/_fields_for_wildcard?pattern=${pattern}&meta_fields=_source&meta_fields=_id&meta_fields=_type&meta_fields=_index&meta_fields=_score`,
-    {}
-  ).then(response => response.data.fields).catch(() => {
-    switch (indexType) {
-      case WAZUH_INDEX_TYPE_MONITORING:
-        return FieldsMonitoring;
-      case WAZUH_INDEX_TYPE_STATISTICS:
-        return FieldsStatistics;
-      case WAZUH_INDEX_TYPE_ALERTS:
-        return KnownFields
+  static getIndicesFields = async (pattern, indexType) => {
+    try {
+      const response = await GenericRequest.request(
+        //we check if indices exist before creating the index pattern
+        'GET',
+        `/api/index_patterns/_fields_for_wildcard?pattern=${pattern}&meta_fields=_source&meta_fields=_id&meta_fields=_type&meta_fields=_index&meta_fields=_score`,
+        {}
+      );
+      return response.data.fields;
+    } catch {
+      switch (indexType) {
+        case WAZUH_INDEX_TYPE_MONITORING:
+          return FieldsMonitoring;
+        case WAZUH_INDEX_TYPE_STATISTICS:
+          return FieldsStatistics;
+        case WAZUH_INDEX_TYPE_ALERTS:
+          return KnownFields;
+      }
     }
-  })
+  };
 }

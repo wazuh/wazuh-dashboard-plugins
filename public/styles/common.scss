@@ -808,6 +808,13 @@ md-switch.md-checked .md-thumb {
   display: block;
 }
 
+.wz-ellipsis{
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
 /*
  * https://css-tricks.com/snippets/css/prevent-long-urls-from-breaking-out-of-container/
  * Handling long URLs on error toasts.
@@ -1160,6 +1167,10 @@ wz-xml-file-editor {
   margin-left: -10px;
 }
 
+.wz-margin-0 {
+  margin: 0px;
+}
+
 .header-global-wrapper + .app-wrapper:not(.hidden-chrome) {
   top: 48px!important;
   left: 48px!important;
@@ -1498,7 +1509,7 @@ div.euiPopover__panel.euiPopover__panel-isOpen.euiPopover__panel--bottom.wz-menu
   max-width: 60vw;
 }
 
-.wz-markdown-wapper code {
+.wz-markdown-wrapper code {
   color: #1c2226;
   background-color: #e6e6e6;
   border-radius: 3px;
@@ -1728,4 +1739,20 @@ iframe.width-changed {
 
 .wz-width-100{
   width: 100%;
+}
+
+/* Custom Searchbar styles */
+
+.application .filters-search-bar .globalQueryBar, .app-container .filters-search-bar .globalQueryBar{
+  padding: 0 !important;
+}
+
+@media only screen and (max-width: 960px){
+  .custom-kbn-search-bar .euiSuperUpdateButton .euiSuperUpdateButton__text {
+    display: none;
+  }
+
+  .custom-kbn-search-bar .euiSuperUpdateButton {
+    min-width: 0;
+  }
 }

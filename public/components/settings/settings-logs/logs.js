@@ -27,8 +27,9 @@ import {
 import { formatUIDate } from '../../../react-services/time-service';
 import store from '../../../redux/store';
 import { updateSelectedSettingsSection } from '../../../redux/actions/appStateActions';
+import { withErrorBoundary } from '../../common/hocs';
 
-export default class SettingsLogs extends Component {
+class SettingsLogs extends Component {
   constructor(props) {
     super(props);
     this.offset = 275;
@@ -138,3 +139,7 @@ export default class SettingsLogs extends Component {
     );
   }
 }
+
+export default withErrorBoundary(
+  SettingsLogs
+)

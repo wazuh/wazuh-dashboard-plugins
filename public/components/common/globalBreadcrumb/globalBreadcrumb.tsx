@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
-import { EuiBreadcrumbs, EuiToolTip, EuiSelect } from '@elastic/eui';
+import { EuiBreadcrumbs, EuiToolTip } from '@elastic/eui';
 import { connect } from 'react-redux';
 import './globalBreadcrumb.scss';
 import { AppNavigate } from '../../../react-services/app-navigate';
-import { getAngularModule, getChrome } from '../../../kibana-services';
+import { getAngularModule } from '../../../kibana-services';
 
 class WzGlobalBreadcrumb extends Component {
   props: { state: { breadcrumb: [] } };

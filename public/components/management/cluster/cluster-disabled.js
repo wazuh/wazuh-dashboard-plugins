@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import { EuiPage, EuiPageContent, EuiEmptyPrompt } from '@elastic/eui';
-
-export class ClusterDisabled extends Component {
+import { withErrorBoundary } from '../../common/hocs'
+export const ClusterDisabled = withErrorBoundary (class ClusterDisabled extends Component {
   constructor(props) {
     super(props);
     this.state = {};
@@ -43,4 +43,4 @@ export class ClusterDisabled extends Component {
       </EuiPage>
     );
   }
-}
+})

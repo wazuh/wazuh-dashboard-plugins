@@ -147,5 +147,22 @@ export const EventsSelectedFiles = {
     'rule.level',
     'rule.id'
   ],
+  office: [
+    'data.office365.Subscription',
+    'data.office365.Operation',
+    'data.office365.UserId',
+    'data.office365.ClientIP',
+    'rule.level',
+    'rule.id'
+  ],
+  github: [
+    'agent.id',
+    'data.github.repo',
+    'data.github.actor',
+    'data.github.org',
+    'rule.description',
+    'rule.level',
+    'rule.id'
+  ],
   
 };

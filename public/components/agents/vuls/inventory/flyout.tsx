@@ -21,6 +21,15 @@ import {
 } from '@elastic/eui';
 import { Details } from './detail';
 import { AppState } from '../../../../react-services/app-state';
+import {
+  UI_ERROR_SEVERITIES,
+  UIErrorLog,
+  UIErrorSeverity,
+  UILogLevel,
+} from '../../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
+import { getErrorOrchestrator } from '../../../../react-services/common-services';
+import { WzRequest } from '../../../../react-services/wz-request';
 
 export class FlyoutDetail extends Component {
   state: {
@@ -47,6 +56,15 @@ export class FlyoutDetail extends Component {
     };
   }
 
+  async getLastScan() {
+    const response = await WzRequest.apiReq(
+      'GET',
+      `/vulnerability/${this.props.agentId}/last_scan`,
+      {}
+    );
+    return ((response.data || {}).data || {}).affected_items[0] || {};
+  }
+
   async componentDidMount() {
     try {
       const isCluster = (AppState.getClusterInfo() || {}).status === 'enabled';
@@ -59,11 +77,28 @@ export class FlyoutDetail extends Component {
       if (!currentItem) {
         throw false;
       }
+
+      const lastScan = await this.getLastScan();
+      Object.assign(currentItem, { ...lastScan });
+
       this.setState({ currentItem, isLoading: false });
-    } catch (err) {
+    } catch (error) {
+      const options: UIErrorLog = {
+        context: `${FlyoutDetail.name}.componentDidMount`,
+        level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+        severity: UI_ERROR_SEVERITIES.UI as UIErrorSeverity,
+        error: {
+          error: error,
+          message: `Data could not be fetched for ${this.props.vulName}`,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
       this.setState({
         error: `Data could not be fetched for ${this.props.vulName}`,
       });
+    } finally {
+      this.setState({ isLoading: false });
     }
   }
 
@@ -71,12 +106,11 @@ export class FlyoutDetail extends Component {
     const { currentItem } = this.state;
     const title = `${currentItem.cve}`;
     const id = title.replace(/ /g, '_');
-
     const filterMap = {
       name: 'data.vulnerability.package.name',
       cve: 'data.vulnerability.cve',
       architecture: 'data.vulnerability.package.architecture',
-      version: 'data.vulnerability.package.version',
+      version: 'data.vulnerability.package.version'
     };
     const implicitFilters = [
       { 'rule.groups': 'vulnerability-detector' },

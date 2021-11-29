@@ -1,0 +1,80 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Group main component renders correctly to match the snapshot 1`] = `
+<ContextProvider
+  value={
+    Object {
+      "store": Object {
+        "clearActions": [Function],
+        "dispatch": [Function],
+        "getActions": [Function],
+        "getState": [Function],
+        "replaceReducer": [Function],
+        "subscribe": [Function],
+      },
+      "subscription": Subscription {
+        "handleChangeWrapper": [Function],
+        "listeners": Object {
+          "notify": [Function],
+        },
+        "onStateChange": [Function],
+        "parentSub": undefined,
+        "store": Object {
+          "clearActions": [Function],
+          "dispatch": [Function],
+          "getActions": [Function],
+          "getState": [Function],
+          "replaceReducer": [Function],
+          "subscribe": [Function],
+        },
+        "unsubscribe": null,
+      },
+    }
+  }
+>
+  <Connect(WzGroups)
+    clusterStatus={
+      Object {
+        "contextConfigServer": "cluster",
+        "status": true,
+      }
+    }
+    configurationProps={
+      Object {
+        "agent": Object {
+          "id": "000",
+        },
+      }
+    }
+    groupsProps={
+      Object {
+        "closeAddingAgents": false,
+        "exportConfigurationProps": Object {
+          "type": "group",
+        },
+        "items": Array [
+          Object {
+            "configSum": "ab73af41699f13fdd81903b5f23d8d00",
+            "count": 1,
+            "mergedSum": "2c45c95db2954d2c7d0ea533f09e81a5",
+            "name": "default",
+          },
+        ],
+        "selectedGroup": false,
+      }
+    }
+    logtestProps={
+      Object {
+        "onFlyout": true,
+        "showClose": true,
+      }
+    }
+    section="groups"
+    state={
+      Object {
+        "section": "",
+      }
+    }
+  />
+</ContextProvider>
+`;
