@@ -467,7 +467,6 @@ async function fetchAllAgentsFromApiHost(context, apiHost){
 
     let payload = {
       offset: 0,
-      limit: 500,
       q: 'id!=000'
     };
 

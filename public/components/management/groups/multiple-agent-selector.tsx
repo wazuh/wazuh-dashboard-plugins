@@ -130,7 +130,6 @@ export const MultipleAgentSelector = withErrorBoundary(
     async loadAllAgents(searchTerm, start) {
       try {
         const params = {
-          limit: 500,
           offset: !start ? this.state.availableAgents.offset : 0,
           select: ['id', 'name'].toString(),
         };
