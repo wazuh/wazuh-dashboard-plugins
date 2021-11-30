@@ -1088,7 +1088,6 @@ wz-xml-file-editor {
   height: 80px;
   margin-bottom: 20px;
   z-index: 1;
-  filter: brightness(0) saturate(100%) invert(24%) sepia(97%) saturate(1757%) hue-rotate(186deg) brightness(94%) contrast(101%);
   margin-left: -100px;
 }
 
@@ -1166,6 +1165,10 @@ wz-xml-file-editor {
 
 .wz-margin--10 {
   margin-left: -10px;
+}
+
+.wz-margin-0 {
+  margin: 0px;
 }
 
 .header-global-wrapper + .app-wrapper:not(.hidden-chrome) {
@@ -1736,4 +1739,20 @@ iframe.width-changed {
 
 .wz-width-100{
   width: 100%;
+}
+
+/* Custom Searchbar styles */
+
+.application .filters-search-bar .globalQueryBar, .app-container .filters-search-bar .globalQueryBar{
+  padding: 0 !important;
+}
+
+@media only screen and (max-width: 960px){
+  .custom-kbn-search-bar .euiSuperUpdateButton .euiSuperUpdateButton__text {
+    display: none;
+  }
+
+  .custom-kbn-search-bar .euiSuperUpdateButton {
+    min-width: 0;
+  }
 }

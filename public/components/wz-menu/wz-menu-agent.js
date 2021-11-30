@@ -64,13 +64,14 @@ class WzMenuAgent extends Component {
       gdpr: { id: WAZUH_MODULES_ID.GDPR, text: 'GDPR' },
       hipaa: { id: WAZUH_MODULES_ID.HIPAA, text: 'HIPAA' },
       nist: { id: WAZUH_MODULES_ID.NIST_800_53, text: 'NIST 800-53' },
-      tsc: { id: WAZUH_MODULES_ID.TSC, text: 'TSC' }
+      tsc: { id: WAZUH_MODULES_ID.TSC, text: 'TSC' },
+      github: {id: WAZUH_MODULES_ID.GITHUB, text: 'GitHub'}
     };
 
     this.securityInformationItems = [
       this.agentSections.general,
       this.agentSections.fim,
-      this.agentSections.gcp
+      this.agentSections.gcp,
     ];
     this.auditingItems = [
       this.agentSections.pm,

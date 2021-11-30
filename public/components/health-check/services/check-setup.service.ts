@@ -20,7 +20,7 @@ export const checkSetupService = appInfo => async (checkLogger: CheckLogger) => 
   if (currentApi && currentApi.id) {
     checkLogger.info(`Current API in cookie: [${currentApi.id}]`);
     checkLogger.info(`Getting API version data...`);
-    const versionData = await WzRequest.apiReq('GET', '//', {});
+    const versionData = await WzRequest.apiReq('GET', '/', {});
     const apiVersion = versionData.data.data['api_version'];
     checkLogger.info(`API version: [${apiVersion}]`);
     checkLogger.info(`Getting the app version...`);
@@ -42,7 +42,7 @@ export const checkSetupService = appInfo => async (checkLogger: CheckLogger) => 
         api.groups.version !== appSplit[0] ||
         api.groups.minor !== appSplit[1]
       ) {
-        checkLogger.error(`API and APP version mismatch. API version: ${apiVersion}. App version: ${setupData.data.data['app-version']}. At least, major and minor should match`);
+        checkLogger.error(`Wazuh API and Wazuh App version mismatch. API version: ${apiVersion}. App version: ${setupData.data.data['app-version']}. At least, major and minor should match. Check more info about upgrading Wazuh App <a target='_blank' href='https://documentation.wazuh.com/current/upgrade-guide/elasticsearch-kibana-filebeat/index.html#upgrade-elasticsearch-filebeat-kibana'>here</a>.`);
       }
     }
   }

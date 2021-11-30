@@ -207,6 +207,19 @@ export default [
         name: 'Google Cloud Pub/Sub',
         description: 'Configuration options of the Google Cloud Pub/Sub module',
         goto: 'gcp-pubsub'
+      },
+      {
+        name: 'GitHub',
+        description:
+          'Detect threats targeting GitHub organizations',
+        goto: 'github'
+      },
+      {
+        name: 'Office 365',
+        description:
+          'Configuration options of the Office 365 module',
+        goto: 'office365',
+        when: 'manager'
       }
     ]
   }

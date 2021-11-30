@@ -31,7 +31,8 @@ import {
   EuiButtonEmpty,
   EuiToolTip,
   EuiCallOut,
-  EuiPopover
+  EuiPopover,
+  EuiCard,
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
 import { formatUIDate } from '../../../react-services/time-service';
@@ -521,9 +522,9 @@ export class Inventory extends Component {
                 <EuiFlexGroup style={{ 'marginTop': 0 }}>
                   {(this.state.data || []).map((pie, idx) => (
                     <EuiFlexItem key={idx} grow={false}>
-                      <EuiPanel betaBadgeLabel={pie.name} style={{ paddingBottom: 0 }}>
+                      <EuiCard title description betaBadgeLabel={pie.name} style={{ paddingBottom: 0 }}>
                         <Pie width={325} height={130} data={pie.status} colors={['#00a69b', '#ff645c', '#5c6773']} />
-                      </EuiPanel>
+                      </EuiCard>
                     </EuiFlexItem>
                   ))}
                 </EuiFlexGroup>

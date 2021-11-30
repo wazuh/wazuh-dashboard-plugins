@@ -522,7 +522,7 @@ export class WazuhApiCtrl {
   shouldKeepArrayAsIt(method, path) {
     // Methods that we must respect a do not transform them
     const isAgentsRestart = method === 'POST' && path === '/agents/restart';
-    const isActiveResponse = method === 'PUT' && path.startsWith('/active-response/');
+    const isActiveResponse = method === 'PUT' && path.startsWith('/active-response');
     const isAddingAgentsToGroup = method === 'POST' && path.startsWith('/agents/group/');
 
     // Returns true only if one of the above conditions is true
@@ -539,6 +539,7 @@ export class WazuhApiCtrl {
    * @returns {Object} API response or ErrorResponse
    */
   async makeRequest(context, method, path, data, id, response) {
+    
     const devTools = !!(data || {}).devTools;
     try {
       const api = await this.manageHosts.getHostById(id);
@@ -629,6 +630,7 @@ export class WazuhApiCtrl {
           }
         }
       }
+
       const responseToken = await context.wazuh.api.client.asCurrentUser.request(method, path, data, options);
       const responseIsDown = this.checkResponseIsDown(responseToken);
       if (responseIsDown) {
@@ -701,6 +703,7 @@ export class WazuhApiCtrl {
    * @returns {Object} api response or ErrorResponse
    */
   requestApi(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
+
     const idApi = getCookieValueByName(request.headers.cookie, 'wz-api');
     if (idApi !== request.body.id) { // if the current token belongs to a different API id, we relogin to obtain a new token
       return ErrorResponse(
@@ -718,7 +721,7 @@ export class WazuhApiCtrl {
       return ErrorResponse('Request method is not valid.', 3015, 400, response);
     } else if (!request.body.path) {
       return ErrorResponse('Missing param: path', 3016, 400, response);
-    } else if (!request.body.path.match(/^\/.+/)) {
+    } else if (!request.body.path.startsWith('/')) {
       log('wazuh-api:makeRequest', 'Request path is not valid.');
       //Path doesn't start with '/'
       return ErrorResponse('Request path is not valid.', 3015, 400, response);
@@ -1056,13 +1059,13 @@ export class WazuhApiCtrl {
     try {
       
       const disabledRoles = ( await getConfiguration() )['disabled_roles'] || [];
-      const wazuhSecurity = SecurityObj(context.wazuh.plugins);
-      const data = (await wazuhSecurity.getCurrentUser(request, context)).authContext;
+      const logoSidebar = ( await getConfiguration() )['customization.logo.sidebar'] || 'icon_blue.png';
+      const data = (await context.wazuh.security.getCurrentUser(request, context)).authContext;
 
       const isWazuhDisabled = +(data.roles || []).some((role) => disabledRoles.includes(role));
 
       return response.ok({
-        body: { isWazuhDisabled }
+        body: { isWazuhDisabled, logoSidebar }
       });
     } catch (error) {
       log('wazuh-api:isWazuhDisabled', error.message || error);

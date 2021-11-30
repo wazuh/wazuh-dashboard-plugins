@@ -15,6 +15,7 @@ import { CheckLogger } from '../../types/check_logger';
 import { checkFieldsService } from './check-fields.service';
 import { checkIndexPatternObjectService } from './check-index-pattern-object.service';
 import { checkTemplateService } from './check-template.service';
+import { satisfyKibanaVersion } from '../../../../../common/semver';
 
 export const checkIndexPatternService = (appConfig) => async (checkLogger: CheckLogger) =>  await checkPattern(appConfig, checkLogger);
 
@@ -25,7 +26,9 @@ const checkPattern = async (appConfig, checkLogger: CheckLogger) =>  {
   }else{
     await checkIndexPatternObjectService(appConfig, checkLogger);
     await checkTemplateService(appConfig, checkLogger);
-    await checkFieldsService(appConfig, checkLogger); 
+    if(satisfyKibanaVersion('<7.11')){
+      await checkFieldsService(appConfig, checkLogger);
+    };
   }
   return;
 };

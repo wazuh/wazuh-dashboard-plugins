@@ -70,9 +70,9 @@ export class VisFactoryHandler {
       const data =
         tab !== 'sca'
           ? await GenericRequest.request(
-              'GET',
-              `/elastic/visualizations/overview-${tab}/${currentPattern}`
-            )
+            'GET',
+            `/elastic/visualizations/overview-${tab}/${currentPattern}`
+          )
           : false;
       data && rawVisualizations.assignItems(data.data.raw);
       if (!fromDiscover) {
@@ -80,17 +80,6 @@ export class VisFactoryHandler {
       }
       store.dispatch(updateVis({ update: true, raw: rawVisualizations.getList() }));
     } catch (error) {
-      const options = {
-        context: `${VisFactoryHandler.name}.buildOverviewVisualizations`,
-        level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.BUSINESS,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: error.name || error,
-        },
-      };
-      getErrorOrchestrator().handleError(options);
       throw error;
     }
   }
@@ -112,11 +101,11 @@ export class VisFactoryHandler {
 
     try {
       const data =
-        tab !== 'sca'
+        (!['sca', 'office'].includes(tab))
           ? await GenericRequest.request(
-              'GET',
-              `/elastic/visualizations/agents-${tab}/${AppState.getCurrentPattern()}`
-            )
+            'GET',
+            `/elastic/visualizations/agents-${tab}/${AppState.getCurrentPattern()}`
+          )
           : false;
       data && rawVisualizations.assignItems(data.data.raw);
       if (!fromDiscover) {
@@ -124,17 +113,6 @@ export class VisFactoryHandler {
       }
       store.dispatch(updateVis({ update: true }));
     } catch (error) {
-      const options = {
-        context: `${VisFactoryHandler.name}.buildAgentsVisualizations`,
-        level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.BUSINESS,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: error.name || error,
-        },
-      };
-      getErrorOrchestrator().handleError(options);
       throw error;
     }
   }
