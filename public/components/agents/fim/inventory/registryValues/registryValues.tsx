@@ -34,14 +34,18 @@ export const RegistryValues = (props) => {
   }, []);
 
   const getValues = async () => {
-    const { agent, currentFile } = props;
+    const { agent, currentFile, agentId } = props;
     try {
-      const values = await WzRequest.apiReq('GET', `/syscheck/${agent.id}`, {
-        params: {
-          q: `type=registry_value;file=${currentFile.file}`,
-          sort: '-date',
-        },
-      });
+      const values = await WzRequest.apiReq(
+        'GET',
+        `/syscheck/${agent.id ? agent.id : agentId}`,
+        {
+          params: {
+            q: `type=registry_value;file=${currentFile.file}`,
+            sort: '-date',
+          },
+        }
+      );
 
       setValues((((values || {}).data || {}).data || {}).affected_items || []);
     } catch (error) {
