@@ -46,8 +46,9 @@ const mainSettings = [
     label: 'Limit registration to maximum number of agents'
   },
   {
-    field: 'force_insert',
-    label: 'Force registration when using an existing IP address'
+    field: 'force',
+    label: 'Force registration when using an existing IP address',
+    render: (value) =>  value.enabled
   }
 ];
 const sslSettings = [

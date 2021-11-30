@@ -145,7 +145,6 @@ export const WzVisualize = compose(
               title: error.name || error,
             },
           };
-
           getErrorOrchestrator().handleError(options);
         }
       } else if (this.state.isRefreshing) {

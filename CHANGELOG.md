@@ -56,6 +56,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Moved the filterManager subscription to the hook useFilterManager [#3517](https://github.com/wazuh/wazuh-kibana-app/pull/3517)
 - Change filter from is to is one of in custom searchbar [#3529](https://github.com/wazuh/wazuh-kibana-app/pull/3529)
 - Refactored as module tabs and buttons are rendered [#3494](https://github.com/wazuh/wazuh-kibana-app/pull/3494)
+- Updated depracated and new references authd [#3663](https://github.com/wazuh/wazuh-kibana-app/pull/3663)
 - Added time subscription to Discover component [#3549](https://github.com/wazuh/wazuh-kibana-app/pull/3549)
 - Refactored as module tabs and buttons are rendered [#3494](https://github.com/wazuh/wazuh-kibana-app/pull/3494)
 - Testing logs using the Ruletest Test don't display the rule information if not matching a rule. [#3446](https://github.com/wazuh/wazuh-kibana-app/pull/3446)
@@ -76,7 +77,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed error when edit a rule or decoder [#3456](https://github.com/wazuh/wazuh-kibana-app/pull/3456)
 - Fixed index pattern selector doesn't display the ignored index patterns [#3458](https://github.com/wazuh/wazuh-kibana-app/pull/3458)
 - Fix the pinned filters were removed when accessing to the `Panel` tab of a module [#3565](https://github.com/wazuh/wazuh-kibana-app/pull/3565)
+- Fixed multi-select component searcher handler [#3645](https://github.com/wazuh/wazuh-kibana-app/pull/3645)
 - Fixed order logs properly in Management/Logs [#3609](https://github.com/wazuh/wazuh-kibana-app/pull/3609)
+- Fixed the Wazuh API requests to `GET //` [#3661](https://github.com/wazuh/wazuh-kibana-app/pull/3661)
+- Fixed missing mitre tactics [#3675](https://github.com/wazuh/wazuh-kibana-app/pull/3675)
 - Fix CDB list view not working with IPv6 [#3488](https://github.com/wazuh/wazuh-kibana-app/pull/3488)
 - Fixed the bad requests using Console tool to `PUT /active-response` API endpoint [#3466](https://github.com/wazuh/wazuh-kibana-app/pull/3466)
 - Fixed group agent management table does not update on error [#3605](https://github.com/wazuh/wazuh-kibana-app/pull/3605)
@@ -84,7 +88,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed wazuh token deleted twice [#3652](https://github.com/wazuh/wazuh-kibana-app/pull/3652)
 - Fixed handler of error on dev-tools [#3687](https://github.com/wazuh/wazuh-kibana-app/pull/3687)
 - Fixed compatibility wazuh 4.3 - kibana 7.13.4 [#3685](https://github.com/wazuh/wazuh-kibana-app/pull/3685)
+- Fixed registry values without agent pinned in FIM>Events [#3689](https://github.com/wazuh/wazuh-kibana-app/pull/3689)
 - Fixed breadcrumbs style compatibility for Kibana 7.14.2 [#3688](https://github.com/wazuh/wazuh-kibana-app/pull/3688)
+- Fixed security alerts table when filters change [#3682](https://github.com/wazuh/wazuh-kibana-app/pull/3682)
+- Fixed error that shows we're using X-Pack when we have Basic [#3692](https://github.com/wazuh/wazuh-kibana-app/pull/3692)
 - Fixed blank screen in Kibana 7.10.2 [#3700](https://github.com/wazuh/wazuh-kibana-app/pull/3700)
 
 ## Wazuh v4.2.4 - Kibana 7.10.2 , 7.12.1, 7.13.4, 7.14.2 - Revision 4206
@@ -96,8 +103,16 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
-- Fixed compatibility wazuh 4.2 - kibana 7.13.4 [#3653](https://github.com/wazuh/wazuh-kibana-app/pull/3653)
+- Fixed compatibility Wazuh 4.2 - Kibana 7.13.4 [#3653](https://github.com/wazuh/wazuh-kibana-app/pull/3653)
 - Fixed interative register windows agent screen error [#3654](https://github.com/wazuh/wazuh-kibana-app/pull/3654)
+- Fixed breadcrumbs style compatibility for Kibana 7.14.2 [#3668](https://github.com/wazuh/wazuh-kibana-app/pull/3668)
+- Fixed Wazuh token is not removed after logout in Kibana 7.13 [#3670](https://github.com/wazuh/wazuh-kibana-app/pull/3670)
+- Fixed Group Configuration and Management configuration error after trying to going back after you save [#3672](https://github.com/wazuh/wazuh-kibana-app/pull/3672)
+- Fixing EuiPanels in Overview Sections and disabled text in WzMenu [#3674](https://github.com/wazuh/wazuh-kibana-app/pull/3674)
+- Fixing double flyout clicking in a policy [#3676](https://github.com/wazuh/wazuh-kibana-app/pull/3676)
+- Fixed error conflict setting kibana settings from the health check [#3678](https://github.com/wazuh/wazuh-kibana-app/pull/3678)
+- Fixed compatibility to get the valid index patterns and refresh fields for Kibana 7.10.2-7.13.4 [3681](https://github.com/wazuh/wazuh-kibana-app/pull/3681)
+
 
 ## Wazuh v4.2.4 - Kibana 7.10.2, 7.11.2, 7.12.1 - Revision 4205
 

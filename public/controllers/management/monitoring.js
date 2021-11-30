@@ -266,7 +266,7 @@ export function ClusterController(
       const data = await Promise.all([
         WzRequest.apiReq('GET', '/cluster/nodes', {}),
         WzRequest.apiReq('GET', '/cluster/local/config', {}),
-        WzRequest.apiReq('GET', '//', {}),
+        WzRequest.apiReq('GET', '/', {}),
         WzRequest.apiReq('GET', '/agents', { limit: 1 }),
         WzRequest.apiReq('GET', '/cluster/healthcheck', {})
       ]);
