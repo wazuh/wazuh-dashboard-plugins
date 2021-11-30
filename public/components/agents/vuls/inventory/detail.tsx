@@ -34,7 +34,7 @@ import { AppNavigate } from '../../../../react-services/app-navigate';
 import { TruncateHorizontalComponents } from '../../../common/util';
 import { getDataPlugin, getUiSettings } from '../../../../kibana-services';
 import { FilterManager } from '../../../../../../../src/plugins/data/public/';
-
+import { formatUIDate } from '../../../../react-services/time-service';
 export class Details extends Component {
   props!: {
     currentItem: {
@@ -113,6 +113,20 @@ export class Details extends Component {
         icon: 'node',
         link: false,
       },
+      {
+        field: 'last_full_scan',
+        name: 'Last Full Scan',
+        icon: 'clock',
+        link: false,
+        transformValue: formatUIDate
+      },
+      {
+        field: 'last_partial_scan',
+        name: 'Last Partial Scan',
+        icon: 'clock',
+        link: false,
+        transformValue: formatUIDate
+      }
     ];
   }
 

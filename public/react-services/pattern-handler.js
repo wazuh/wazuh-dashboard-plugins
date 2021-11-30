@@ -14,6 +14,7 @@ import { SavedObject } from './saved-objects';
 import { getDataPlugin, getToasts, getHttp } from '../kibana-services';
 import { WazuhConfig } from '../react-services/wazuh-config';
 import { HEALTH_CHECK } from '../../common/constants';
+import { satisfyKibanaVersion } from '../../common/semver';
 
 export class PatternHandler {
   /**
@@ -31,7 +32,7 @@ export class PatternHandler {
 
       return patternList;
     } catch (error) {
-      console.error("getPatternList", error)
+      console.error('getPatternList', error);
       throw new Error('Error Pattern Handler (getPatternList)');
     }
   }
@@ -43,18 +44,19 @@ export class PatternHandler {
   static async changePattern(selectedPattern) {
     try {
       AppState.setCurrentPattern(selectedPattern);
-      await this.refreshIndexPattern();
+      if(satisfyKibanaVersion('<7.11')){
+        await this.refreshIndexPattern();
+      };
       return AppState.getCurrentPattern();
     } catch (error) {
       throw new Error('Error Pattern Handler (changePattern)');
     }
-    return;
   }
 
   /**
- * Refresh current pattern for the given pattern
- * @param {String} pattern
- */
+   * Refresh current pattern for the given pattern
+   * @param newFields
+   */
   static async refreshIndexPattern(newFields = null) {
     try {
       const currentPattern = AppState.getCurrentPattern();

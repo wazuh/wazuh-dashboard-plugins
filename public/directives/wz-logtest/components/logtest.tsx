@@ -65,34 +65,37 @@ export const Logtest = compose(
   };
 
   const formatResult = (result, alert) => {
+    let returnedDataFormatted =`**Phase 1: Completed pre-decoding. \n    ` +
+    `full event:  ${result.full_log || '-'}  \n    ` +
+    `timestamp: ${(result.predecoder || '').timestamp || '-'} \n    ` +
+    `hostname: ${(result.predecoder || '').hostname || '-'} \n    ` +
+    `program_name: ${(result.predecoder || '').program_name || '-'} \n\n` +
+    `**Phase 2: Completed decoding. \n    ` +
+    `name: ${(result.decoder || '').name || '-'} \n    ` +
+    `${(result.decoder || '').parent ? `parent: ${(result.decoder || '').parent} \n    ` : ''}` +
+    `data: ${JSON.stringify(result.data || '-', null, 6).replace('}', '    }')} \n\n` ;
+    
+    result.rule && (
+        returnedDataFormatted += `**Phase 3: Completed filtering (rules). \n    ` +
+        `id: ${(result.rule || '').id || '-'} \n    ` +
+        `level: ${(result.rule || '').level || '-'} \n    ` +
+        `description: ${(result.rule || '').description || '-'} \n    ` +
+        `groups: ${JSON.stringify((result.rule || '').groups || '-')} \n    ` +
+        `firedtimes: ${(result.rule || '').firedtimes || '-'} \n    ` +
+        `gdpr: ${JSON.stringify((result.rule || '').gdpr || '-')} \n    ` +
+        `gpg13: ${JSON.stringify((result.rule || '').gpg13 || '-')} \n    ` +
+        `hipaa: ${JSON.stringify((result.rule || '').hipaa || '-')} \n    ` +
+        `mail: ${JSON.stringify((result.rule || '').mail || '-')} \n    ` +
+        `mitre.id: ${JSON.stringify((result.rule || '').mitre || ''.id || '-')} \n    ` +
+        `mitre.technique: ${JSON.stringify((result.rule || '').mitre || ''.technique || '-')} \n    ` +
+        `nist_800_53: ${JSON.stringify((result.rule || '').nist_800_53 || '-')} \n    ` +
+        `pci_dss: ${JSON.stringify((result.rule || '').pci_dss || '-')} \n    ` +
+        `tsc: ${JSON.stringify((result.rule || '').tsc || '-')} \n` 
+      );
+
+      returnedDataFormatted += `${alert ? `**Alert to be generated. \n\n\n` : '\n\n'}`      
     return (
-      `**Phase 1: Completed pre-decoding. \n    ` +
-      `full event:  ${result.full_log || '-'}  \n    ` +
-      `timestamp: ${(result.predecoder || '').timestamp || '-'} \n    ` +
-      `hostname: ${(result.predecoder || '').hostname || '-'} \n    ` +
-      `program_name: ${(result.predecoder || '').program_name || '-'} \n\n` +
-      `**Phase 2: Completed decoding. \n    ` +
-      `name: ${(result.decoder || '').name || '-'} \n    ` +
-      `${(result.decoder || '').parent ? `parent: ${(result.decoder || '').parent} \n    ` : ''}` +
-      `data: ${JSON.stringify(result.data || '-', null, 6).replace('}', '    }')} \n\n` +
-      `**Phase 3: Completed filtering (rules). \n    ` +
-      `id: ${(result.rule || '').id || '-'} \n    ` +
-      `level: ${(result.rule || '').level || '-'} \n    ` +
-      `description: ${(result.rule || '').description || '-'} \n    ` +
-      `groups: ${JSON.stringify((result.rule || '').groups || '-')} \n    ` +
-      `firedtimes: ${(result.rule || '').firedtimes || '-'} \n    ` +
-      `gdpr: ${JSON.stringify((result.rule || '').gdpr || '-')} \n    ` +
-      `gpg13: ${JSON.stringify((result.rule || '').gpg13 || '-')} \n    ` +
-      `hipaa: ${JSON.stringify((result.rule || '').hipaa || '-')} \n    ` +
-      `mail: ${JSON.stringify((result.rule || '').mail || '-')} \n    ` +
-      `mitre.id: ${JSON.stringify((result.rule || '').mitre || ''.id || '-')} \n    ` +
-      `mitre.technique: ${JSON.stringify(
-        (result.rule || '').mitre || ''.technique || '-'
-      )} \n    ` +
-      `nist_800_53: ${JSON.stringify((result.rule || '').nist_800_53 || '-')} \n    ` +
-      `pci_dss: ${JSON.stringify((result.rule || '').pci_dss || '-')} \n    ` +
-      `tsc: ${JSON.stringify((result.rule || '').tsc || '-')} \n` +
-      `${alert ? `**Alert to be generated. \n\n\n` : '\n\n'}`
+      returnedDataFormatted
     );
   };
 
@@ -104,24 +107,24 @@ export const Logtest = compose(
     let gotToken = Boolean(token);
 
     try {
-      for (let event of events) {
+      for (let event of events) {        
         const response = await WzRequest.apiReq('PUT', '/logtest', {
           log_format: 'syslog',
           location: 'logtest',
           event,
           ...(token ? { token } : {}),
         });
+        
         token = response.data.data.token;
         !sessionToken && !gotToken && token && dispatch(updateLogtestToken(token));
         token && (gotToken = true);
         responses.push(response);
-      }
-
-      const testResults = responses.map((response) =>
-        response.data.data.output.rule || ''
-          ? formatResult(response.data.data.output, response.data.data.alert)
-          : `No result found for: ${response.data.data.output.full_log} \n\n\n`
-      );
+      };
+      const testResults = responses.map((response) => {
+        return response.data.data.output || '' 
+        ? formatResult(response.data.data.output, response.data.data.alert)
+        : `No result found for: ${response.data.data.output.full_log} \n\n\n`
+      });
       setTestResult(testResults);
     } finally {
       setTesting(false);

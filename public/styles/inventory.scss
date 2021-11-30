@@ -78,7 +78,8 @@
     padding: 0px 0px 8px 0;
   }
 
-  .events-accordion {
+  .events-accordion,
+  .euiStat .euiTitle .detail-value .euiAccordion {
     border-bottom: none !important;
   }
 

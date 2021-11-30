@@ -57,7 +57,7 @@ export const RolesMapping = () => {
       ErrorHandler.handle('There was an error loading roles');
     }
   }, [rolesLoading]);
-
+  
   const getInternalUsers = async () => {
     try {
       const wazuhSecurity = new WazuhSecurity();
@@ -113,47 +113,47 @@ export const RolesMapping = () => {
   const initData = async () => {
     setLoadingTable(true);
     await getRules();
-    if(currentPlatform){
+    if (currentPlatform) {
       await getInternalUsers();
-    };
+    }
     setLoadingTable(false);
   };
 
   const updateRoles = async () => {
     await getRules();
   };
-
+  
   let editFlyout;
   if (isEditingRule) {
     editFlyout = (
-        <RolesMappingEdit
-          rule={selectedRule}
-          closeFlyout={(isVisible) => {
-            setIsEditingRule(isVisible);
-            initData();
-          }}
-          rolesEquivalences={rolesEquivalences}
-          roles={roles}
-          internalUsers={internalUsers}
-          onSave={async () => await updateRoles()}
-          currentPlatform={currentPlatform}
-        />
+      <RolesMappingEdit
+        rule={selectedRule}
+        closeFlyout={(isVisible) => {
+          setIsEditingRule(isVisible);
+          initData();
+        }}
+        rolesEquivalences={rolesEquivalences}
+        roles={roles}
+        internalUsers={internalUsers}
+        onSave={async () => await updateRoles()}
+        currentPlatform={currentPlatform}
+      />
     );
   }
   let createFlyout;
   if (isCreatingRule) {
     editFlyout = (
-        <RolesMappingCreate
-          closeFlyout={(isVisible) => {
-            setIsCreatingRule(isVisible);
-            initData();
-          }}
-          rolesEquivalences={rolesEquivalences}
-          roles={roles}
-          internalUsers={internalUsers}
-          onSave={async () => await updateRoles()}
-          currentPlatform={currentPlatform}
-        />
+      <RolesMappingCreate
+        closeFlyout={(isVisible) => {
+          setIsCreatingRule(isVisible);
+          initData();
+        }}
+        rolesEquivalences={rolesEquivalences}
+        roles={roles}
+        internalUsers={internalUsers}
+        onSave={async () => await updateRoles()}
+        currentPlatform={currentPlatform}
+      />
     );
   }
   return (
@@ -165,15 +165,19 @@ export const RolesMapping = () => {
           </EuiTitle>
         </EuiPageContentHeaderSection>
         <EuiPageContentHeaderSection>
-          {
-            !loadingTable
-            &&
+          {!loadingTable && (
             <div>
-              <EuiButton onClick={() => {setIsCreatingRule(true)}}>Create Role mapping</EuiButton>
+              <EuiButton
+                onClick={() => {
+                  setIsCreatingRule(true);
+                }}
+              >
+                Create Role mapping
+              </EuiButton>
               {createFlyout}
               {editFlyout}
             </div>
-          }
+          )}
         </EuiPageContentHeaderSection>
       </EuiPageContentHeader>
       <EuiPageContentBody>
@@ -181,7 +185,7 @@ export const RolesMapping = () => {
           rolesEquivalences={rolesEquivalences}
           loading={loadingTable || rolesLoading}
           rules={rules}
-          editRule={item => {
+          editRule={(item) => {
             setSelectedRule(item);
             setIsEditingRule(true);
           }}

@@ -177,10 +177,11 @@ export const Events = compose(
     if (!this.state.hasRefreshedKnownFields) {
       try {
         this.setState({ hasRefreshedKnownFields: true, isRefreshing: true });
-        await PatternHandler.refreshIndexPattern();
-
+        if(satisfyKibanaVersion('<7.11')){
+          await PatternHandler.refreshIndexPattern();
+        };
         this.setState({ isRefreshing: false });
-        this.reloadToast()
+        this.reloadToast();
 
       } catch (error) {
         this.setState({ isRefreshing: false });
@@ -252,19 +253,38 @@ export const Events = compose(
   }
 
   reloadToast = () => {
-    getToasts().add({
-      color: 'success',
-      title: 'The index pattern was refreshed successfully.',
-      text: toMountPoint(<EuiFlexGroup justifyContent="flexEnd" gutterSize="s">
-        <EuiFlexItem grow={false}>
-          There were some unknown fields for the current index pattern.
-          You need to refresh the page to apply the changes.
-        </EuiFlexItem>
-        <EuiFlexItem grow={false}>
-          <EuiButton onClick={() => window.location.reload()} size="s">Reload page</EuiButton>
-        </EuiFlexItem>
-      </EuiFlexGroup>)
-    })
+    const toastLifeTimeMs = 300000;
+    if(satisfyKibanaVersion('<7.11')){
+      getToasts().add({
+        color: 'success',
+        title: 'The index pattern was refreshed successfully.',
+        text: toMountPoint(<EuiFlexGroup justifyContent="flexEnd" gutterSize="s">
+          <EuiFlexItem grow={false}>
+            There were some unknown fields for the current index pattern.
+            You need to refresh the page to apply the changes.
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiButton onClick={() => window.location.reload()} size="s">Reload page</EuiButton>
+          </EuiFlexItem>
+        </EuiFlexGroup>),
+        toastLifeTimeMs
+      });
+    }else if(satisfyKibanaVersion('>=7.11')){
+      getToasts().add({
+        color: 'warning',
+        title: 'Found unknown fields in the index pattern.',
+        text: toMountPoint(<EuiFlexGroup justifyContent="flexEnd" gutterSize="s">
+          <EuiFlexItem grow={false}>
+            There are some unknown fields for the current index pattern.
+            You need to refresh the page to update the fields.
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiButton onClick={() => window.location.reload()} size="s">Reload page</EuiButton>
+          </EuiFlexItem>
+        </EuiFlexGroup>),
+        toastLifeTimeMs
+      });
+    };
   }
 
   errorToast = (error) => {

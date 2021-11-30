@@ -103,7 +103,8 @@ export const Techniques = withWindowSize(
       const { isLoading, tacticsObject, filters } = this.props;
       if (
         JSON.stringify(prevProps.tacticsObject) !== JSON.stringify(tacticsObject) ||
-        isLoading !== prevProps.isLoading
+        isLoading !== prevProps.isLoading ||
+        JSON.stringify(prevProps.filterParams) !== JSON.stringify(this.props.filterParams)
       )
         this.getTechniquesCount();
     }
@@ -465,7 +466,7 @@ export const Techniques = withWindowSize(
           });
           const filteredTechniques = (((response || {}).data || {}).data.affected_items || []).map(
             (item) =>
-              item.references.filter((reference) => reference.source === MITRE_ATTACK)[0]
+              [item].filter((reference) => reference.source === MITRE_ATTACK)[0]
                 .external_id
           );
           this._isMount && this.setState({ filteredTechniques, isSearching: false });
@@ -552,6 +553,7 @@ export const Techniques = withWindowSize(
           <EuiSpacer size="s" />
 
           <div>{this.renderFacet()}</div>
+
           { isFlyoutVisible &&
             <EuiOverlayMask headerZindexLocation="below">
               <EuiOutsideClickDetector onOutsideClick={() => this.onChangeFlyout(false)}>

@@ -36,6 +36,7 @@ import GroupsHandler from './utils/groups-handler';
 import { getToasts } from '../../../../../kibana-services';
 import { validateXML } from '../configuration/utils/xml';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
+import { WzOverlayMask } from '../../../../../components/common/util';
 import 'brace/theme/textmate';
 import 'brace/mode/xml';
 import 'brace/snippets/xml';
@@ -119,7 +120,7 @@ class WzGroupsEditor extends Component {
           (error.title = `File ${name} saved, but there were found several error while validating the configuration.`)
         );
       }
-      this.setState({ isSaving: false });
+      this.setState({ isSaving: false, hasChanges: false });
       const textSuccess = 'File successfully edited';
       this.showToast('success', 'Success', textSuccess, 3000);
     } catch (error) {
