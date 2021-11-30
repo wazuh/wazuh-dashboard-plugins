@@ -47,6 +47,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Adding Pagination and filter to drilldown tables at Office pannel [#3544](https://github.com/wazuh/wazuh-kibana-app/pull/3544).
 - Simple filters change between panel and drilldown panel [#3568](https://github.com/wazuh/wazuh-kibana-app/pull/3568).
 - Added new fields in Inventory table and Flyout Details [#3525](https://github.com/wazuh/wazuh-kibana-app/pull/3525)
+- Added columns selector in agents table [#3691](https://github.com/wazuh/wazuh-kibana-app/pull/3691)
 
 ### Changed
 
