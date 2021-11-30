@@ -83,6 +83,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed wazuh token deleted twice [#3652](https://github.com/wazuh/wazuh-kibana-app/pull/3652)
 - Fixed handler of error on dev-tools [#3687](https://github.com/wazuh/wazuh-kibana-app/pull/3687)
 - Fixed compatibility wazuh 4.3 - kibana 7.13.4 [#3685](https://github.com/wazuh/wazuh-kibana-app/pull/3685)
+- Fixed registry values without agent pinned in FIM>Events [#3689](https://github.com/wazuh/wazuh-kibana-app/pull/3689)
 - Fixed breadcrumbs style compatibility for Kibana 7.14.2 [#3688](https://github.com/wazuh/wazuh-kibana-app/pull/3688)
 - Fixed error that shows we're using X-Pack when we have Basic [#3692](https://github.com/wazuh/wazuh-kibana-app/pull/3692)
 - Fixed blank screen in Kibana 7.10.2 [#3700](https://github.com/wazuh/wazuh-kibana-app/pull/3700)
