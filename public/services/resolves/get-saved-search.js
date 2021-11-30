@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import { healthCheck } from './health-check';
-import { createSavedSearchesLoader } from '../../../../../src/plugins/discover/public';
+import { createSavedSearchesLoader } from '../../kibana-integrations/discover/saved_searches';
 import {
   getToasts,
   getChrome,
