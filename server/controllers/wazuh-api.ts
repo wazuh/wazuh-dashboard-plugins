@@ -721,7 +721,7 @@ export class WazuhApiCtrl {
       return ErrorResponse('Request method is not valid.', 3015, 400, response);
     } else if (!request.body.path) {
       return ErrorResponse('Missing param: path', 3016, 400, response);
-    } else if (!request.body.path.match(/^\/.+/)) {
+    } else if (!request.body.path.startsWith('/')) {
       log('wazuh-api:makeRequest', 'Request path is not valid.');
       //Path doesn't start with '/'
       return ErrorResponse('Request path is not valid.', 3015, 400, response);

@@ -78,6 +78,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed index pattern selector doesn't display the ignored index patterns [#3458](https://github.com/wazuh/wazuh-kibana-app/pull/3458)
 - Fixed multi-select component searcher handler [#3645](https://github.com/wazuh/wazuh-kibana-app/pull/3645)
 - Fixed order logs properly in Management/Logs [#3609](https://github.com/wazuh/wazuh-kibana-app/pull/3609)
+- Fixed the Wazuh API requests to `GET //` [#3661](https://github.com/wazuh/wazuh-kibana-app/pull/3661)
 - Fixed missing mitre tactics [#3675](https://github.com/wazuh/wazuh-kibana-app/pull/3675)
 - Fix CDB list view not working with IPv6 [#3488](https://github.com/wazuh/wazuh-kibana-app/pull/3488)
 - Fixed the bad requests using Console tool to `PUT /active-response` API endpoint [#3466](https://github.com/wazuh/wazuh-kibana-app/pull/3466)
@@ -110,6 +111,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixing double flyout clicking in a policy [#3676](https://github.com/wazuh/wazuh-kibana-app/pull/3676)
 - Fixed error conflict setting kibana settings from the health check [#3678](https://github.com/wazuh/wazuh-kibana-app/pull/3678)
 - Fixed compatibility to get the valid index patterns and refresh fields for Kibana 7.10.2-7.13.4 [3681](https://github.com/wazuh/wazuh-kibana-app/pull/3681)
+
 
 ## Wazuh v4.2.4 - Kibana 7.10.2, 7.11.2, 7.12.1 - Revision 4205
 
