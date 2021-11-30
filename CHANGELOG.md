@@ -76,6 +76,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed error when edit a rule or decoder [#3456](https://github.com/wazuh/wazuh-kibana-app/pull/3456)
 - Fixed index pattern selector doesn't display the ignored index patterns [#3458](https://github.com/wazuh/wazuh-kibana-app/pull/3458)
 - Fixed order logs properly in Management/Logs [#3609](https://github.com/wazuh/wazuh-kibana-app/pull/3609)
+- Fixed missing mitre tactics [#3675](https://github.com/wazuh/wazuh-kibana-app/pull/3675)
 - Fix CDB list view not working with IPv6 [#3488](https://github.com/wazuh/wazuh-kibana-app/pull/3488)
 - Fixed the bad requests using Console tool to `PUT /active-response` API endpoint [#3466](https://github.com/wazuh/wazuh-kibana-app/pull/3466)
 - Fixed group agent management table does not update on error [#3605](https://github.com/wazuh/wazuh-kibana-app/pull/3605)

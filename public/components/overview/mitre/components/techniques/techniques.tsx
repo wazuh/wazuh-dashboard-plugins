@@ -466,7 +466,7 @@ export const Techniques = withWindowSize(
           });
           const filteredTechniques = (((response || {}).data || {}).data.affected_items || []).map(
             (item) =>
-              item.references.filter((reference) => reference.source === MITRE_ATTACK)[0]
+              [item].filter((reference) => reference.source === MITRE_ATTACK)[0]
                 .external_id
           );
           this._isMount && this.setState({ filteredTechniques, isSearching: false });
