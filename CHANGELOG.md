@@ -85,6 +85,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed compatibility wazuh 4.3 - kibana 7.13.4 [#3685](https://github.com/wazuh/wazuh-kibana-app/pull/3685)
 - Fixed registry values without agent pinned in FIM>Events [#3689](https://github.com/wazuh/wazuh-kibana-app/pull/3689)
 - Fixed breadcrumbs style compatibility for Kibana 7.14.2 [#3688](https://github.com/wazuh/wazuh-kibana-app/pull/3688)
+- Fixed security alerts table when filters change [#3682](https://github.com/wazuh/wazuh-kibana-app/pull/3682)
 - Fixed error that shows we're using X-Pack when we have Basic [#3692](https://github.com/wazuh/wazuh-kibana-app/pull/3692)
 - Fixed blank screen in Kibana 7.10.2 [#3700](https://github.com/wazuh/wazuh-kibana-app/pull/3700)
 
@@ -97,8 +98,15 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
-- Fixed compatibility wazuh 4.2 - kibana 7.13.4 [#3653](https://github.com/wazuh/wazuh-kibana-app/pull/3653)
+- Fixed compatibility Wazuh 4.2 - Kibana 7.13.4 [#3653](https://github.com/wazuh/wazuh-kibana-app/pull/3653)
 - Fixed interative register windows agent screen error [#3654](https://github.com/wazuh/wazuh-kibana-app/pull/3654)
+- Fixed breadcrumbs style compatibility for Kibana 7.14.2 [#3668](https://github.com/wazuh/wazuh-kibana-app/pull/3668)
+- Fixed Wazuh token is not removed after logout in Kibana 7.13 [#3670](https://github.com/wazuh/wazuh-kibana-app/pull/3670)
+- Fixed Group Configuration and Management configuration error after trying to going back after you save [#3672](https://github.com/wazuh/wazuh-kibana-app/pull/3672)
+- Fixing EuiPanels in Overview Sections and disabled text in WzMenu [#3674](https://github.com/wazuh/wazuh-kibana-app/pull/3674)
+- Fixing double flyout clicking in a policy [#3676](https://github.com/wazuh/wazuh-kibana-app/pull/3676)
+- Fixed error conflict setting kibana settings from the health check [#3678](https://github.com/wazuh/wazuh-kibana-app/pull/3678)
+- Fixed compatibility to get the valid index patterns and refresh fields for Kibana 7.10.2-7.13.4 [3681](https://github.com/wazuh/wazuh-kibana-app/pull/3681)
 
 ## Wazuh v4.2.4 - Kibana 7.10.2, 7.11.2, 7.12.1 - Revision 4205
 
