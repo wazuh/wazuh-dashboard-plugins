@@ -40,7 +40,8 @@ export class EnableModulesWrapper extends Component {
               { name: 'fim', default: true, agent: false },
               { name: 'office', default: false, agent: false },
               { name: 'aws', default: false, agent: false },
-              { name: 'gcp', default: false, agent: false }
+              { name: 'gcp', default: false, agent: false },
+              { name: 'github', default: false, agent: false }
             ]
           },
           {

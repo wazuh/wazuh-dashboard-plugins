@@ -40,6 +40,7 @@ import * as Vulnerability from './sample-data/vulnerabilities';
 import * as SSH from './sample-data/ssh';
 import * as Apache from './sample-data/apache';
 import * as Web from './sample-data/web';
+import * as GitHub from './sample-data/github';
 import * as Office from './sample-data/office';
 
 //Alert
@@ -951,6 +952,29 @@ function generateAlert(params) {
       alert.previous_output = previousOutput.join('\n');
     }
   }
+
+  if (params.github){
+    alert.location = GitHub.LOCATION;
+    alert.decoder = GitHub.DECODER;
+    const alertType = randomArrayItem(GitHub.ALERT_TYPES);
+    const actor = randomArrayItem(GitHub.ACTORS);
+    alert.data = {
+      github : { ...alertType.data.github }
+    };
+    alert.data.github.org = randomArrayItem(GitHub.ORGANIZATION_NAMES);
+    alert.data.github.repo && (alert.data.github.repo = `${alert.data.github.org}/${randomArrayItem(GitHub.REPOSITORY_NAMES)}`);
+    alert.data.github.repository && (alert.data.github.repository = `${alert.data.github.org}/${randomArrayItem(GitHub.REPOSITORY_NAMES)}`);
+    alert.data.github.actor = actor.name;
+    alert.data.github.actor_location && alert.data.github.actor_location.country_code && (alert.data.github.actor_location.country_code = actor.country_code);
+    alert.data.github.user && (alert.data.github.user = randomArrayItem(GitHub.USER_NAMES));
+    alert.data.github.config && alert.data.github.config.url && (alert.data.github.config.url = randomArrayItem(GitHub.SERVER_ADDRESS_WEBHOOK));
+    alert.data.github['@timestamp'] = alert.timestamp;
+    alert.data.github.created_at && (alert.data.github.created_at = alert.timestamp);
+    alert.rule = {
+      ...alertType.rule
+    };
+  }
+  
   return alert;
 }
 

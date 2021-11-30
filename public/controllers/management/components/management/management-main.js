@@ -77,7 +77,12 @@ class WzManagementMain extends Component {
           (section === 'statistics' && <WzStatistics />) ||
           (section === 'logs' && <WzLogs />) ||
           (section === 'configuration' && <WzConfiguration {...this.props.configurationProps} />) ||
-          (ruleset.includes(section) && <WzRuleset logtestProps={this.props.logtestProps} clusterStatus={this.props.clusterStatus} />)}
+          (ruleset.includes(section) && (
+            <WzRuleset
+              logtestProps={this.props.logtestProps}
+              clusterStatus={this.props.clusterStatus}
+            />
+          ))}
       </Fragment>
     );
   }

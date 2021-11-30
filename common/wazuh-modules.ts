@@ -123,6 +123,11 @@ export const WAZUH_MODULES = {
     description:
       'Monitor and collect the activity from Docker containers such as creation, running, starting, stopping or pausing events.'
   },
+  github: {
+    title: 'GitHub',
+    description:
+      'Monitoring events from audit logs of your GitHub organizations.'
+  },
   devTools: {
     title: 'API console',
     description: 'Test the Wazuh API endpoints.'

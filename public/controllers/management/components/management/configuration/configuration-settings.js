@@ -209,6 +209,12 @@ export default [
         goto: 'gcp-pubsub'
       },
       {
+        name: 'GitHub',
+        description:
+          'Detect threats targeting GitHub organizations',
+        goto: 'github'
+      },
+      {
         name: 'Office 365',
         description:
           'Configuration options of the Office 365 module',

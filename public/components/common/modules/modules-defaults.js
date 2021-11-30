@@ -20,6 +20,7 @@ import { ComplianceTable } from '../../overview/compliance-table';
 import ButtonModuleExploreAgent from '../../../controllers/overview/components/overview-actions/overview-actions';
 import { ButtonModuleGenerateReport } from '../modules/buttons';
 import { OfficePanel } from '../../overview/office-panel';
+import { GitHubPanel } from '../../overview/github-panel';
 import { withModuleNotForAgent } from '../hocs';
 
 const DashboardTab = {
@@ -117,6 +118,11 @@ export const ModulesDefaults = {
       { ...EventsTab, component: withModuleNotForAgent(Events) },
     ],
     availableFor: ['manager'],
+  },
+  github: {
+    init: 'dashboard',
+    tabs: [{ id: 'inventory', name: 'Panel', buttons: [ButtonModuleExploreAgent],  component: GitHubPanel }, DashboardTab, EventsTab],
+    availableFor: ['manager', 'agent']
   },
   ciscat: {
     init: 'dashboard',

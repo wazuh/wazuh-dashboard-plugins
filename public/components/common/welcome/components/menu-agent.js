@@ -38,6 +38,7 @@ class WzMenuAgent extends Component {
       this.agentSections.fim,
       this.agentSections.aws,
       this.agentSections.gcp,
+      this.agentSections.github
     ];
     this.auditingItems = [
       this.agentSections.pm,

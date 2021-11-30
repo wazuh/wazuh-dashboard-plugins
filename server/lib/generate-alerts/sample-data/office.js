@@ -69,11 +69,11 @@ export const arrayIp = [
   '140.82.113.3',
 ];
 export const arrayUserId = [
-  'ale@communities.net',
-  'samu@vacaciones.santillana',
-  'franco@stress.very',
-  'manu@draw.pile',
-  'antuan@god.net',
+  'smith@wazuh.com',
+  'williams@wazuh.com',
+  'frank@wazuh.com',
+  'jones@wazuh.com',
+  'brown@wazuh.com',
 ];
 export const arrayTargetOffice = [
   {

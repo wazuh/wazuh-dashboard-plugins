@@ -29,6 +29,7 @@ import {
 } from '../../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
+import { WzRequest } from '../../../../react-services/wz-request';
 
 export class FlyoutDetail extends Component {
   state: {
@@ -55,6 +56,15 @@ export class FlyoutDetail extends Component {
     };
   }
 
+  async getLastScan() {
+    const response = await WzRequest.apiReq(
+      'GET',
+      `/vulnerability/${this.props.agentId}/last_scan`,
+      {}
+    );
+    return ((response.data || {}).data || {}).affected_items[0] || {};
+  }
+
   async componentDidMount() {
     try {
       const isCluster = (AppState.getClusterInfo() || {}).status === 'enabled';
@@ -67,6 +77,10 @@ export class FlyoutDetail extends Component {
       if (!currentItem) {
         throw false;
       }
+
+      const lastScan = await this.getLastScan();
+      Object.assign(currentItem, { ...lastScan });
+
       this.setState({ currentItem, isLoading: false });
     } catch (error) {
       const options: UIErrorLog = {
@@ -92,6 +106,25 @@ export class FlyoutDetail extends Component {
     const { currentItem } = this.state;
     const title = `${currentItem.cve}`;
     const id = title.replace(/ /g, '_');
+    const filterMap = {
+      name: 'data.vulnerability.package.name',
+      cve: 'data.vulnerability.cve',
+      architecture: 'data.vulnerability.package.architecture',
+      version: 'data.vulnerability.package.version'
+    };
+    const implicitFilters = [
+      { 'rule.groups': 'vulnerability-detector' },
+      { 'agent.id': this.props.agentId },
+      this.state.clusterFilter,
+      ...Object.keys(filterMap)
+        .map((key) => {
+          if (currentItem[key]) {
+            return { [filterMap[key]]: currentItem[key] };
+          }
+        })
+        .filter((item) => item),
+    ];
+
     return (
       <EuiFlyout
         onClose={() => this.props.closeFlyout()}
@@ -114,20 +147,7 @@ export class FlyoutDetail extends Component {
         )}
         {currentItem && !this.state.isLoading && (
           <EuiFlyoutBody className="flyout-body">
-            <Details
-              currentItem={currentItem}
-              {...this.props}
-              implicitFilters={[
-                { 'rule.groups': 'vulnerability-detector' },
-                { 'data.vulnerability.package.name': currentItem.name },
-                { 'data.vulnerability.cve': currentItem.cve },
-                { 'data.vulnerability.type': currentItem.type },
-                { 'data.vulnerability.package.architecture': currentItem.architecture },
-                { 'data.vulnerability.package.version': currentItem.version },
-                { 'agent.id': this.props.agentId },
-                this.state.clusterFilter,
-              ]}
-            />
+            <Details currentItem={currentItem} {...this.props} implicitFilters={implicitFilters} />
           </EuiFlyoutBody>
         )}
       </EuiFlyout>

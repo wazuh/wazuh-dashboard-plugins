@@ -34,7 +34,7 @@ import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
 import { withErrorBoundary } from '../hocs';
 import office_logo from '../../../assets/office365.svg';
 
-export const OverviewWelcome = withErrorBoundary (class OverviewWelcome extends Component {
+export const OverviewWelcome = withErrorBoundary(class OverviewWelcome extends Component {
   constructor(props) {
     super(props);
     this.strtools = new StringsTools();
@@ -71,13 +71,15 @@ export const OverviewWelcome = withErrorBoundary (class OverviewWelcome extends 
 
   addAgent() {
     return (
-      <EuiFlexGroup >
-        <EuiFlexItem >
-          <EuiCallOut  style={{height:"65%"}} title="No agents were added to this manager. " color="warning" iconType="alert">
-            <EuiButtonEmpty style={{margin: "-58px 286px"}}  href='#/agents-preview?'>Add agent</EuiButtonEmpty>
-          </EuiCallOut>
-        </EuiFlexItem >
-      </EuiFlexGroup>
+      <>
+        <EuiFlexGroup >
+          <EuiFlexItem >
+            <EuiCallOut title={<>No agents were added to this manager.  <EuiButtonEmpty href='#/agents-preview?'>Add agent</EuiButtonEmpty></>} color="warning" iconType="alert">
+            </EuiCallOut>
+          </EuiFlexItem >
+        </EuiFlexGroup>
+        <EuiSpacer size="xl" />
+      </>
     );
   }
 
@@ -90,7 +92,7 @@ export const OverviewWelcome = withErrorBoundary (class OverviewWelcome extends 
               {this.props.agentsCountTotal == 0 && this.addAgent()}
               <EuiFlexGroup>
                 <EuiFlexItem>
-                  <EuiPanel betaBadgeLabel="Security Information Management">
+                  <EuiCard title description betaBadgeLabel="Security Information Management">
                     <EuiSpacer size="s" />
                     <EuiFlexGrid columns={2}>
                       {this.buildTabCard('general', 'dashboardApp')}
@@ -101,11 +103,13 @@ export const OverviewWelcome = withErrorBoundary (class OverviewWelcome extends 
                         this.buildTabCard('office', office_logo)}
                       {this.props.extensions.gcp &&
                         this.buildTabCard('gcp', 'logoGCPMono')}
+                      {this.props.extensions.github &&
+                        this.buildTabCard('github', 'logoGithub')}
                     </EuiFlexGrid>
-                  </EuiPanel>
+                  </EuiCard>
                 </EuiFlexItem>
                 <EuiFlexItem>
-                  <EuiPanel betaBadgeLabel="Auditing and Policy Monitoring">
+                  <EuiCard title description betaBadgeLabel="Auditing and Policy Monitoring">
                     <EuiSpacer size="s" />
                     <EuiFlexGrid columns={2}>
                       {this.buildTabCard('pm', 'advancedSettingsApp')}
@@ -117,14 +121,14 @@ export const OverviewWelcome = withErrorBoundary (class OverviewWelcome extends 
                         this.buildTabCard('ciscat', 'auditbeatApp')}
                       {this.buildTabCard('sca', 'securityAnalyticsApp')}
                     </EuiFlexGrid>
-                  </EuiPanel>
+                  </EuiCard>
                 </EuiFlexItem>
               </EuiFlexGroup>
 
               <EuiSpacer size="xl" />
               <EuiFlexGroup>
                 <EuiFlexItem>
-                  <EuiPanel betaBadgeLabel="Threat Detection and Response">
+                  <EuiCard title description betaBadgeLabel="Threat Detection and Response">
                     <EuiSpacer size="s" />
                     <EuiFlexGrid columns={2}>
                       {this.buildTabCard('vuls', 'securityApp')}
@@ -137,11 +141,11 @@ export const OverviewWelcome = withErrorBoundary (class OverviewWelcome extends 
                       {this.buildTabCard('mitre', 'spacesApp')}
                       {/* TODO- Change "spacesApp" icon*/}
                     </EuiFlexGrid>
-                  </EuiPanel>
+                  </EuiCard>
                 </EuiFlexItem>
 
                 <EuiFlexItem>
-                  <EuiPanel betaBadgeLabel="Regulatory Compliance">
+                  <EuiCard title description betaBadgeLabel="Regulatory Compliance">
                     <EuiSpacer size="s" />
                     {!this.props.extensions.pci &&
                       !this.props.extensions.gdpr &&
@@ -181,7 +185,7 @@ export const OverviewWelcome = withErrorBoundary (class OverviewWelcome extends 
                             this.buildTabCard('hipaa', 'emsApp')}
                         </EuiFlexGrid>
                       )}
-                  </EuiPanel>
+                  </EuiCard>
                 </EuiFlexItem>
               </EuiFlexGroup>
             </EuiFlexItem>

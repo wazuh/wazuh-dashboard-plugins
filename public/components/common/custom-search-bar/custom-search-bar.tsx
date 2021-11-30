@@ -149,6 +149,7 @@ export const CustomSearchBar = ({ filtersValues, filterDrillDownValue = { field:
           onChange={onChange}
           onRemove={onRemove}
           isDisabled={checkSelectDrillDownValue(item.key)}
+          filterDrillDownValue={filterDrillDownValue}
         />
       ),
     };

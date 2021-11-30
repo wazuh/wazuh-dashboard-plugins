@@ -21,6 +21,7 @@ This plugin for Kibana allows you to visualize and analyze Wazuh alerts stored i
         - Integrity monitoring: Alerts related to file changes, including permissions, content, ownership and attributes.
         - Amazon AWS: Security events related to your Amazon AWS services, collected directly via AWS API.
         - Office 365: Security events related to your Office 365 services.
+        - GitHub: Security events related to your GitHub organizations, collected via GitHub audit logs API.
         - Google Cloud Platform: Security events related to your Google Cloud Platform services, collected directly via GCP API.
     - Auditing and Policy Monitoring
         - Policy monitoring: Verify that your systems are configured according to your security policies baseline.
@@ -88,7 +89,7 @@ This plugin for Kibana allows you to visualize and analyze Wazuh alerts stored i
 
 ## Requisites
 
-- Wazuh HIDS 4.2.0
+- Wazuh HIDS 4.2.2
 - Kibana 7.10.2
 - Elasticsearch 7.10.2
 
@@ -106,7 +107,7 @@ Install the Wazuh app plugin for Kibana
 
 ```
 cd /usr/share/kibana
-sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.0_7.10.2-1.zip
+sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.4_7.10.2-1.zip
 ```
 
 Restart Kibana
@@ -193,7 +194,7 @@ Install the Wazuh app
 
 ```
 cd /usr/share/kibana/
-sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.0_7.10.2-1.zip
+sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.4_7.10.2-1.zip
 ```
 
 Update configuration file permissions.
@@ -222,9 +223,21 @@ service kibana restart
  
 | Wazuh app | Kibana  | Open Distro | Package                                                                    |
 | :-------: | :----:  | :---------: | :------------------------------------------------------------------------- |
+|   4.2.4   |  7.12.1 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.4_7.12.1-1.zip> |
+|   4.2.4   |  7.11.2 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.4_7.11.2-1.zip> |
+|   4.2.4   |  7.10.2 |   1.13.2    | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.4_7.10.2-1.zip> |
+|   4.2.3   |  7.12.1 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.3_7.12.1-1.zip> |
+|   4.2.3   |  7.11.2 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.3_7.11.2-1.zip> |
+|   4.2.3   |  7.10.2 |   1.13.2    | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.3_7.10.2-1.zip> |
+|   4.2.2   |  7.12.1 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.2_7.12.1-1.zip> |
+|   4.2.2   |  7.11.2 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.2_7.11.2-1.zip> |
+|   4.2.2   |  7.10.2 |   1.13.2    | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.2_7.10.2-1.zip> |
+|   4.2.1   |  7.11.2 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.1_7.11.2-1.zip> |
+|   4.2.1   |  7.10.2 |   1.13.2    | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.1_7.10.2-1.zip> |
 |   4.2.0   |  7.11.2 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.0_7.11.2-1.zip> |
 |   4.2.0   |  7.10.2 |   1.13.2    | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.0_7.10.2-1.zip> |
-|   4.1.5   |  7.10.2 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.1.5_7.10.2-1.zip> |
+|   4.1.5   |  7.11.2 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.1.5_7.11.2-1.zip> |
+|   4.1.5   |  7.10.2 |   1.13.0    | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.1.5_7.10.2-1.zip> |
 |   4.1.5   |  7.10.0 |   1.12.0    | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.1.5_7.10.0-1.zip> |
 |   4.1.4   |  7.10.2 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.1.4_7.10.2-1.zip> |
 |   4.1.4   |  7.10.0 |   1.12.0    | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.1.4_7.10.0-1.zip> |

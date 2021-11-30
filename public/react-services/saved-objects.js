@@ -153,6 +153,26 @@ export class SavedObject {
     }
   }
 
+  /**
+   *
+   * Given an index pattern ID, checks if it exists
+   */
+  static async getExistingIndexPattern(patternID) {
+    try {
+      const result = await GenericRequest.request(
+        'GET',
+        `/api/saved_objects/index-pattern/${patternID}?fields=title&fields=fields`,
+        null,
+        true
+      );
+
+      return result.data;
+    } catch (error) {
+      if (error && error.response && error.response.status == 404) return false;
+      return Promise.reject(((error || {}).data || {}).message || false ? error.data.message : error.message || `Error getting the '${patternID}' index pattern`);
+    }
+  }
+
   static async createSavedObject(type, id, params, fields = '') {
     try {
       const result = await GenericRequest.request(

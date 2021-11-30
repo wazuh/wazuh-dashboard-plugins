@@ -278,6 +278,11 @@ export const Metrics = withAllowedAgents(
           { name: "Full Access Permissions", type: "phrase", value: "91725", field: "rule.id" },
           { name: "Phishing and Malware", type: "phrases", values: ["91556", "91575", "91700"], field: "rule.id", color: "danger" },
         ],
+        github: [
+          { name: "Organizations", type: "unique-count",  field: "data.github.org"},
+          { name: "Repositories", type: "unique-count",  field: "data.github.repo", color: "secondary"},
+          { name: "Actors", type: "unique-count",  field: "data.github.actor", color: "danger"},
+        ]
       };
     }
 

@@ -70,9 +70,9 @@ export class VisFactoryHandler {
       const data =
         tab !== 'sca'
           ? await GenericRequest.request(
-              'GET',
-              `/elastic/visualizations/overview-${tab}/${currentPattern}`
-            )
+            'GET',
+            `/elastic/visualizations/overview-${tab}/${currentPattern}`
+          )
           : false;
       data && rawVisualizations.assignItems(data.data.raw);
       if (!fromDiscover) {
@@ -103,9 +103,9 @@ export class VisFactoryHandler {
       const data =
         (!['sca', 'office'].includes(tab))
           ? await GenericRequest.request(
-              'GET',
-              `/elastic/visualizations/agents-${tab}/${AppState.getCurrentPattern()}`
-            )
+            'GET',
+            `/elastic/visualizations/agents-${tab}/${AppState.getCurrentPattern()}`
+          )
           : false;
       data && rawVisualizations.assignItems(data.data.raw);
       if (!fromDiscover) {
