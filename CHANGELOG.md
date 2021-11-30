@@ -76,6 +76,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fix size api selector when name is too long [#3445](https://github.com/wazuh/wazuh-kibana-app/pull/3445)
 - Fixed error when edit a rule or decoder [#3456](https://github.com/wazuh/wazuh-kibana-app/pull/3456)
 - Fixed index pattern selector doesn't display the ignored index patterns [#3458](https://github.com/wazuh/wazuh-kibana-app/pull/3458)
+- Fix the pinned filters were removed when accessing to the `Panel` tab of a module [#3565](https://github.com/wazuh/wazuh-kibana-app/pull/3565)
 - Fixed multi-select component searcher handler [#3645](https://github.com/wazuh/wazuh-kibana-app/pull/3645)
 - Fixed order logs properly in Management/Logs [#3609](https://github.com/wazuh/wazuh-kibana-app/pull/3609)
 - Fixed the Wazuh API requests to `GET //` [#3661](https://github.com/wazuh/wazuh-kibana-app/pull/3661)
