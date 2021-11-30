@@ -56,6 +56,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Moved the filterManager subscription to the hook useFilterManager [#3517](https://github.com/wazuh/wazuh-kibana-app/pull/3517)
 - Change filter from is to is one of in custom searchbar [#3529](https://github.com/wazuh/wazuh-kibana-app/pull/3529)
 - Refactored as module tabs and buttons are rendered [#3494](https://github.com/wazuh/wazuh-kibana-app/pull/3494)
+- Updated depracated and new references authd [#3663](https://github.com/wazuh/wazuh-kibana-app/pull/3663)
 - Added time subscription to Discover component [#3549](https://github.com/wazuh/wazuh-kibana-app/pull/3549)
 - Refactored as module tabs and buttons are rendered [#3494](https://github.com/wazuh/wazuh-kibana-app/pull/3494)
 - Testing logs using the Ruletest Test don't display the rule information if not matching a rule. [#3446](https://github.com/wazuh/wazuh-kibana-app/pull/3446)
