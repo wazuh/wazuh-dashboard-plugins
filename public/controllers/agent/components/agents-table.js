@@ -29,6 +29,8 @@ import {
   EuiOverlayMask,
   EuiConfirmModal,
   EuiLoadingSpinner,
+  EuiCheckboxGroup,
+  EuiIcon,
 } from '@elastic/eui';
 import { CheckUpgrade } from './checkUpgrade';
 import { getToasts } from '../../../kibana-services';
@@ -61,6 +63,7 @@ export const AgentsTable = withErrorBoundary(
         selectedItems: [],
         allSelected: false,
         purgeModal: false,
+        isFilterColumnOpen: false,
         filters: sessionStorage.getItem('agents_preview_selected_options')
           ? JSON.parse(sessionStorage.getItem('agents_preview_selected_options'))
           : [],
@@ -446,13 +449,29 @@ export const AgentsTable = withErrorBoundary(
         .map((field) => ({ name: field, value: filters[field] }));
       this.props.downloadCsv(formatedFilters);
     };
+
+    openColumnsFilter = () => {
+      this.setState({
+        isFilterColumnOpen: !this.state.isFilterColumnOpen,
+      });
+    };
+
     formattedButton() {
       return (
-        <EuiFlexItem grow={false}>
-          <EuiButtonEmpty iconType="importAction" onClick={this.downloadCsv}>
-            Export formatted
-          </EuiButtonEmpty>
-        </EuiFlexItem>
+        <>
+          <EuiFlexItem grow={false}>
+            <EuiButtonEmpty iconType="importAction" onClick={this.downloadCsv}>
+              Export formatted
+            </EuiButtonEmpty>
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiToolTip content="Select columns table" position="left">
+              <EuiButtonEmpty onClick={this.openColumnsFilter}>
+                <EuiIcon type="managementApp" color="primary" />
+              </EuiButtonEmpty>
+            </EuiToolTip>
+          </EuiFlexItem>
+        </>
       );
     }
 
@@ -653,6 +672,14 @@ export const AgentsTable = withErrorBoundary(
       }
     }
 
+    getTableColumnsSelected() {
+      return JSON.parse(window.localStorage.getItem('columnsSelectedTableAgent')) || [];
+    }
+
+    setTableColumnsSelected(data) {
+      window.localStorage.setItem('columnsSelectedTableAgent', JSON.stringify(data));
+    }
+
     setUpgradingState(agentID) {
       const { agents } = this.state;
       agents.forEach((element) => {
@@ -762,7 +789,8 @@ export const AgentsTable = withErrorBoundary(
     };
 
     columns() {
-      return [
+      const selectedColumns = this.getTableColumnsSelected();
+      const defaultColumns = [
         {
           field: 'id',
           name: 'ID',
@@ -844,6 +872,27 @@ export const AgentsTable = withErrorBoundary(
           render: (agent) => this.actionButtonsRender(agent),
         },
       ];
+
+      if (selectedColumns.length != 0) {
+        const newSelectedColumns = [];
+        selectedColumns.forEach((item) => {
+          if (item.show) {
+            const column = defaultColumns.find((column) => column.field === item.field);
+            newSelectedColumns.push(column);
+          }
+        });
+        return newSelectedColumns;
+      } else {
+        const fieldColumns = defaultColumns.map((item) => {
+          return {
+            field: item.field,
+            name: item.name,
+            show: true,
+          };
+        });
+        this.setTableColumnsSelected(fieldColumns);
+        return defaultColumns;
+      }
     }
 
     headRender() {
@@ -897,6 +946,42 @@ export const AgentsTable = withErrorBoundary(
             </EuiButton>
           </EuiFlexItem>
         </EuiFlexGroup>
+      );
+    }
+
+    selectColumnsRender() {
+      const columnsSelected = this.getTableColumnsSelected();
+
+      const onChange = (optionId) => {
+        let item = columnsSelected.find((item) => item.field === optionId);
+        item.show = !item.show;
+        this.setTableColumnsSelected(columnsSelected);
+        this.forceUpdate();
+      };
+
+      const options = () => {
+        return columnsSelected.map((item) => {
+          return {
+            id: item.field,
+            label: item.name,
+            checked: item.show,
+          };
+        });
+      };
+
+      return this.state.isFilterColumnOpen ? (
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            <EuiCheckboxGroup
+              options={options()}
+              onChange={onChange}
+              className="columnsSelectedCheckboxs"
+              idToSelectedMap={{}}
+            />
+          </EuiFlexItem>
+        </EuiFlexGroup>
+      ) : (
+        ''
       );
     }
 
@@ -1008,6 +1093,7 @@ export const AgentsTable = withErrorBoundary(
       const { allSelected, purgeModal, selectedItems, loadingAllItem } = this.state;
       const title = this.headRender();
       const filter = this.filterBarRender();
+      const selectColumnsRender = this.selectColumnsRender();
       const upgradeButton = this.renderUpgradeButton();
       const restartButton = this.renderRestartButton();
       const purgeButton = this.renderPurgeButton();
@@ -1017,7 +1103,6 @@ export const AgentsTable = withErrorBoundary(
       const table = this.tableRender();
       const callOut = this.callOutRender();
       let renderPurgeModal, loadItems, barButtons;
-
       if (purgeModal) {
         renderPurgeModal = (
           <EuiOverlayMask>
@@ -1065,6 +1150,7 @@ export const AgentsTable = withErrorBoundary(
             {loadItems}
             {selectedItems.length > 0 && barButtons}
             {callOut}
+            {selectColumnsRender}
             {table}
             {renderPurgeModal}
           </EuiPanel>
