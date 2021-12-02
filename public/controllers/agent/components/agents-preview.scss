@@ -40,3 +40,13 @@
   text-align: center;
   padding: 30px;
 }
+
+.columnsSelectedCheckboxs {
+  display: flex;
+  align-items: baseline;
+  margin: 15px 0px;
+}
+
+.columnsSelectedCheckboxs div {
+  margin-right: 20px;
+}
