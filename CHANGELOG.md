@@ -97,6 +97,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed error that shows we're using X-Pack when we have Basic [#3692](https://github.com/wazuh/wazuh-kibana-app/pull/3692)
 - Fixed blank screen in Kibana 7.10.2 [#3700](https://github.com/wazuh/wazuh-kibana-app/pull/3700)
 - Fixed related decoder link undefined parameters error [#3704](https://github.com/wazuh/wazuh-kibana-app/pull/3704)
+- Fixing the bug of index patterns in health-check due to bad copy of a PR [#3707](https://github.com/wazuh/wazuh-kibana-app/pull/3707)
 
 ## Wazuh v4.2.4 - Kibana 7.10.2 , 7.12.1, 7.13.4, 7.14.2 - Revision 4206
 
