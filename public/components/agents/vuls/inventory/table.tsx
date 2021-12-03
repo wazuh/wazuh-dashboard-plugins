@@ -241,22 +241,17 @@ export class InventoryTable extends Component {
       <div className="wz-inventory">
         {table}
         {this.state.isFlyoutVisible && (
-          <EuiOverlayMask headerZindexLocation="below">
-            <div>
-              {/* EuiOutsideClickDetector needs a static first child */}
-              <FlyoutDetail
-                vulName={this.state.currentItem.cve}
-                agentId={this.props.agent.id}
-                item={this.state.currentItem}
-                closeFlyout={() => this.closeFlyout()}
-                type="vulnerability"
-                view="inventory"
-                showViewInEvents={true}
-                outsideClickCloses={true}
-                {...this.props}
-              />
-            </div>
-          </EuiOverlayMask>
+          <FlyoutDetail
+            vulName={this.state.currentItem.cve}
+            agentId={this.props.agent.id}
+            item={this.state.currentItem}
+            closeFlyout={() => this.closeFlyout()}
+            type="vulnerability"
+            view="inventory"
+            showViewInEvents={true}
+            outsideClickCloses={true}
+            {...this.props}
+          />
         )}
       </div>
     );

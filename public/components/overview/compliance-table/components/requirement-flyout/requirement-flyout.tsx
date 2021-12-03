@@ -32,6 +32,7 @@ import { AppState } from '../../../../../react-services/app-state';
 import { requirementGoal } from '../../requirement-goal';
 import { getUiSettings } from '../../../../../kibana-services';
 import { FilterManager } from '../../../../../../../../src/plugins/data/public/';
+import { WzFlyout } from '../../../../../components/common/flyouts';
 
 export class RequirementFlyout extends Component {
   _isMount = false;
@@ -234,18 +235,19 @@ export class RequirementFlyout extends Component {
     const { currentRequirement } = this.props;
     const { onChangeFlyout } = this.props;
     return (
-      <EuiFlyout
+      <WzFlyout
         onClose={() => onChangeFlyout(false)}
-        maxWidth="60%"
-        size="l"
-        className="flyout-no-overlap wz-inventory wzApp"
-        aria-labelledby="flyoutSmallTitle"
-        outsideClickCloses={true}
+        flyoutProps={{
+          maxWidth: '60%',
+          size: 'l',
+          className: 'flyout-no-overlap wz-inventory wzApp',
+          'aria-labelledby': 'flyoutSmallTitle',
+        }}
       >
         {currentRequirement && this.renderHeader()}
         {this.renderBody()}
         {this.state.loading && this.renderLoading()}
-      </EuiFlyout>
+      </WzFlyout>
     );
   }
 }

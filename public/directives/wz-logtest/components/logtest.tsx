@@ -45,6 +45,7 @@ import {
 } from '../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
+import { WzFlyout } from '../../../components/common/flyouts';
 
 type LogstestProps = {
   openCloseFlyout: () => {};
@@ -256,26 +257,20 @@ export const Logtest = compose(
           </EuiPanel>
         </EuiPage>
       )) || (
-        <EuiOverlayMask headerZindexLocation="below">
-          <EuiFlyout
-            className="wzApp"
-            onClose={() => props.openCloseFlyout()}
-            outsideClickCloses={true}
-          >
-            <EuiFlyoutHeader hasBorder={false}>
-              <EuiTitle size="m">
-                {props.isRuleset.includes('rules') ? <h2>Ruleset Test</h2> : <h2>Decoders Test</h2>}
-              </EuiTitle>
-            </EuiFlyoutHeader>
-            <EuiFlyoutBody style={{ margin: '20px' }}>
-              <EuiFlexGroup gutterSize="m">
-                <EuiFlexItem />
-              </EuiFlexGroup>
-              <EuiSpacer size="s" />
-              {buildLogtest()}
-            </EuiFlyoutBody>
-          </EuiFlyout>
-        </EuiOverlayMask>
+        <WzFlyout flyoutProps={{ className: 'wzApp' }} onClose={() => props.openCloseFlyout()}>
+          <EuiFlyoutHeader hasBorder={false}>
+            <EuiTitle size="m">
+              {props.isRuleset.includes('rules') ? <h2>Ruleset Test</h2> : <h2>Decoders Test</h2>}
+            </EuiTitle>
+          </EuiFlyoutHeader>
+          <EuiFlyoutBody style={{ margin: '20px' }}>
+            <EuiFlexGroup gutterSize="m">
+              <EuiFlexItem />
+            </EuiFlexGroup>
+            <EuiSpacer size="s" />
+            {buildLogtest()}
+          </EuiFlyoutBody>
+        </WzFlyout>
       )}
     </Fragment>
   );

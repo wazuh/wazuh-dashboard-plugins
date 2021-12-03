@@ -44,6 +44,7 @@ import { FilterManager } from '../../../../../../../../../../src/plugins/data/pu
 import { UI_LOGGER_LEVELS } from '../../../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../../../react-services/common-services';
+import { WzFlyout } from '../../../../../../../components/common/flyouts';
 
 export class FlyoutTechnique extends Component {
   _isMount = false;
@@ -134,8 +135,8 @@ export class FlyoutTechnique extends Component {
       const { currentTechnique } = this.props;
       const result = await WzRequest.apiReq('GET', '/mitre/techniques', {
         params: {
-          q: `external_id=${currentTechnique}`
-        }
+          q: `external_id=${currentTechnique}`,
+        },
       });
       const rawData = (((result || {}).data || {}).data || {}).affected_items;
       !!rawData && this.formatTechniqueData(rawData[0]);
@@ -160,8 +161,8 @@ export class FlyoutTechnique extends Component {
   findTacticName(tactics) {
     const { tacticsObject } = this.props;
     return tactics.map((element) => {
-      const tactic = Object.values(tacticsObject).find(obj => obj.id === element);
-      return { id:tactic.external_id, name: tactic.name};
+      const tactic = Object.values(tacticsObject).find((obj) => obj.id === element);
+      return { id: tactic.external_id, name: tactic.name };
     });
   }
 
@@ -389,17 +390,18 @@ export class FlyoutTechnique extends Component {
     const { techniqueData } = this.state;
     const { onChangeFlyout } = this.props;
     return (
-      <EuiFlyout
+      <WzFlyout
         onClose={() => onChangeFlyout(false)}
-        size="l"
-        className="flyout-no-overlap wz-inventory wzApp"
-        aria-labelledby="flyoutSmallTitle"
-        outsideClickCloses={true}
+        flyoutProps={{
+          size: 'l',
+          className: 'flyout-no-overlap wz-inventory wzApp',
+          'aria-labelledby': 'flyoutSmallTitle',
+        }}
       >
         {techniqueData && this.renderHeader()}
         {this.renderBody()}
         {this.state.loading && this.renderLoading()}
-      </EuiFlyout>
+      </WzFlyout>
     );
   }
 }

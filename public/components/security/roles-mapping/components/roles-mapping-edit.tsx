@@ -25,6 +25,7 @@ import _ from 'lodash';
 import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
+import { WzFlyout } from '../../../common/flyouts';
 
 export const RolesMappingEdit = ({
   rule,
@@ -141,68 +142,66 @@ export const RolesMappingEdit = ({
 
   return (
     <>
-      <EuiOverlayMask headerZindexLocation="below">
-        <EuiFlyout className="wzApp" onClose={onClose} outsideClickCloses={true}>
-          <EuiFlyoutHeader hasBorder={false}>
-            <EuiTitle size="m">
-              <h2>
-                Edit <strong>{rule.name}&nbsp;&nbsp;</strong>
-                {WzAPIUtils.isReservedID(rule.id) && <EuiBadge color="primary">Reserved</EuiBadge>}
-              </h2>
-            </EuiTitle>
-          </EuiFlyoutHeader>
-          <EuiFlyoutBody>
-            <EuiForm component="form" style={{ padding: 24 }}>
-              <EuiFormRow
-                label="Role name"
-                isInvalid={false}
-                error={'Please provide a role name'}
-                helpText="Introduce a name for this role mapping."
-              >
-                <EuiFieldText
-                  placeholder=""
-                  disabled={WzAPIUtils.isReservedID(rule.id)}
-                  value={ruleName}
-                  onChange={(e) => setRuleName(e.target.value)}
-                  aria-label=""
-                />
-              </EuiFormRow>
-              <EuiFormRow
-                label="Roles"
-                isInvalid={false}
-                error={'At least one role must be selected.'}
-                helpText="Assign roles to your users."
-              >
-                <EuiComboBox
-                  placeholder="Select roles"
-                  options={getRolesList(roles)}
-                  isDisabled={WzAPIUtils.isReservedID(rule.id)}
-                  selectedOptions={selectedRoles}
-                  onChange={(roles) => {
-                    setSelectedRoles(roles);
-                  }}
-                  isClearable={true}
-                  data-test-subj="demoComboBox"
-                />
-              </EuiFormRow>
-              <EuiSpacer />
-            </EuiForm>
-            <EuiFlexGroup style={{ padding: '0px 24px 24px 24px' }}>
-              <EuiFlexItem>
-                <RuleEditor
-                  save={(rule) => editRule(rule)}
-                  initialRule={rule.rule}
-                  isLoading={isLoading}
-                  isReserved={WzAPIUtils.isReservedID(rule.id)}
-                  internalUsers={internalUsers}
-                  currentPlatform={currentPlatform}
-                  onFormChange={(hasChange) => setHasChangeMappingRules(hasChange)}
-                ></RuleEditor>
-              </EuiFlexItem>
-            </EuiFlexGroup>
-          </EuiFlyoutBody>
-        </EuiFlyout>
-      </EuiOverlayMask>
+      <WzFlyout flyoutProps={{ className: 'wzApp' }} onClose={onClose}>
+        <EuiFlyoutHeader hasBorder={false}>
+          <EuiTitle size="m">
+            <h2>
+              Edit <strong>{rule.name}&nbsp;&nbsp;</strong>
+              {WzAPIUtils.isReservedID(rule.id) && <EuiBadge color="primary">Reserved</EuiBadge>}
+            </h2>
+          </EuiTitle>
+        </EuiFlyoutHeader>
+        <EuiFlyoutBody>
+          <EuiForm component="form" style={{ padding: 24 }}>
+            <EuiFormRow
+              label="Role name"
+              isInvalid={false}
+              error={'Please provide a role name'}
+              helpText="Introduce a name for this role mapping."
+            >
+              <EuiFieldText
+                placeholder=""
+                disabled={WzAPIUtils.isReservedID(rule.id)}
+                value={ruleName}
+                onChange={(e) => setRuleName(e.target.value)}
+                aria-label=""
+              />
+            </EuiFormRow>
+            <EuiFormRow
+              label="Roles"
+              isInvalid={false}
+              error={'At least one role must be selected.'}
+              helpText="Assign roles to your users."
+            >
+              <EuiComboBox
+                placeholder="Select roles"
+                options={getRolesList(roles)}
+                isDisabled={WzAPIUtils.isReservedID(rule.id)}
+                selectedOptions={selectedRoles}
+                onChange={(roles) => {
+                  setSelectedRoles(roles);
+                }}
+                isClearable={true}
+                data-test-subj="demoComboBox"
+              />
+            </EuiFormRow>
+            <EuiSpacer />
+          </EuiForm>
+          <EuiFlexGroup style={{ padding: '0px 24px 24px 24px' }}>
+            <EuiFlexItem>
+              <RuleEditor
+                save={(rule) => editRule(rule)}
+                initialRule={rule.rule}
+                isLoading={isLoading}
+                isReserved={WzAPIUtils.isReservedID(rule.id)}
+                internalUsers={internalUsers}
+                currentPlatform={currentPlatform}
+                onFormChange={(hasChange) => setHasChangeMappingRules(hasChange)}
+              ></RuleEditor>
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        </EuiFlyoutBody>
+      </WzFlyout>
       {modal}
     </>
   );

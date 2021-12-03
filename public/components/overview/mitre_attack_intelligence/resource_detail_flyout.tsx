@@ -28,6 +28,7 @@ import {
   EuiSpacer,
 } from '@elastic/eui';
 import { Markdown } from '../../common/util';
+import { WzFlyout } from '../../common/flyouts';
 
 interface DetailFlyoutType {
   details: any;
@@ -43,61 +44,59 @@ export const ModuleMitreAttackIntelligenceFlyout = ({
   const startReference = useRef(null);
 
   return (
-    <EuiOverlayMask headerZindexLocation="below">
-      <EuiFlyout onClose={closeFlyout} size="l" aria-labelledby={``} outsideClickCloses={true}>
-        <EuiFlyoutHeader hasBorder>
-          <EuiTitle size="m">
-            <h2 id="flyoutTitle">Details</h2>
-          </EuiTitle>
-        </EuiFlyoutHeader>
-        <EuiFlyoutBody>
-          <div ref={startReference}>
-            <EuiFlexGroup>
-              {MitreAttackResources[0].mitreFlyoutHeaderProperties.map((detailProperty) => (
-                <EuiFlexItem
-                  key={`mitre_att&ck_intelligence_detail_resource_property_${detailProperty.label}`}
-                >
-                  <div>
-                    <strong>{detailProperty.label}</strong>
-                  </div>
-                  <EuiText color="subdued">
-                    {detailProperty.render
-                      ? detailProperty.render(details[detailProperty.id])
-                      : details[detailProperty.id]}
-                  </EuiText>
-                </EuiFlexItem>
-              ))}
-            </EuiFlexGroup>
-          </div>
+    <WzFlyout onClose={closeFlyout} flyoutProps={{ size: 'l', 'aria-labelledby': `` }}>
+      <EuiFlyoutHeader hasBorder>
+        <EuiTitle size="m">
+          <h2 id="flyoutTitle">Details</h2>
+        </EuiTitle>
+      </EuiFlyoutHeader>
+      <EuiFlyoutBody>
+        <div ref={startReference}>
           <EuiFlexGroup>
-            <EuiFlexItem>
-              <div>
-                <strong>Description</strong>
-              </div>
-              <EuiText color="subdued">
-                {details.description ? <Markdown markdown={details.description} /> : ''}
-              </EuiText>
-            </EuiFlexItem>
+            {MitreAttackResources[0].mitreFlyoutHeaderProperties.map((detailProperty) => (
+              <EuiFlexItem
+                key={`mitre_att&ck_intelligence_detail_resource_property_${detailProperty.label}`}
+              >
+                <div>
+                  <strong>{detailProperty.label}</strong>
+                </div>
+                <EuiText color="subdued">
+                  {detailProperty.render
+                    ? detailProperty.render(details[detailProperty.id])
+                    : details[detailProperty.id]}
+                </EuiText>
+              </EuiFlexItem>
+            ))}
           </EuiFlexGroup>
-          <EuiFlexGroup>
-            <EuiFlexItem>
-              {MitreAttackResources.filter((item) => details[item.id]).map((item) => (
-                <Fragment key={`resource_${item.id}`}>
-                  <ReferencesTable
-                    referencesName={item.id}
-                    referencesArray={details[item.id]}
-                    columns={item.tableColumnsCreator(onSelectResource)}
-                    backToTop={() => {
-                      startReference.current?.scrollIntoView();
-                    }}
-                  />
-                  <EuiSpacer />
-                </Fragment>
-              ))}
-            </EuiFlexItem>
-          </EuiFlexGroup>
-        </EuiFlyoutBody>
-      </EuiFlyout>
-    </EuiOverlayMask>
+        </div>
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            <div>
+              <strong>Description</strong>
+            </div>
+            <EuiText color="subdued">
+              {details.description ? <Markdown markdown={details.description} /> : ''}
+            </EuiText>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            {MitreAttackResources.filter((item) => details[item.id]).map((item) => (
+              <Fragment key={`resource_${item.id}`}>
+                <ReferencesTable
+                  referencesName={item.id}
+                  referencesArray={details[item.id]}
+                  columns={item.tableColumnsCreator(onSelectResource)}
+                  backToTop={() => {
+                    startReference.current?.scrollIntoView();
+                  }}
+                />
+                <EuiSpacer />
+              </Fragment>
+            ))}
+          </EuiFlexItem>
+        </EuiFlexGroup>
+      </EuiFlyoutBody>
+    </WzFlyout>
   );
 };

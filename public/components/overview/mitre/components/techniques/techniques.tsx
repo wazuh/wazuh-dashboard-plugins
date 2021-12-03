@@ -552,8 +552,6 @@ export const Techniques = withWindowSize(
           <div>{this.renderFacet()}</div>
 
           {isFlyoutVisible && (
-            <EuiOverlayMask headerZindexLocation="below">
-              <div>
                 <FlyoutTechnique
                   openDashboard={(e, itemId) => this.openDashboard(e, itemId)}
                   openDiscover={(e, itemId) => this.openDiscover(e, itemId)}
@@ -565,8 +563,6 @@ export const Techniques = withWindowSize(
                   currentTechnique={currentTechnique}
                   tacticsObject={this.props.tacticsObject}
                 />
-              </div>
-            </EuiOverlayMask>
           )}
         </div>
       );

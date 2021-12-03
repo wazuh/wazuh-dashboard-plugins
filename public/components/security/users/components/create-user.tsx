@@ -30,6 +30,7 @@ import { useDebouncedEffect } from '../../../common/hooks/useDebouncedEffect';
 import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
+import { WzFlyout } from '../../../common/flyouts';
 
 export const CreateUser = ({ closeFlyout }) => {
   const [selectedRoles, setSelectedRole] = useState<any>([]);
@@ -229,8 +230,11 @@ export const CreateUser = ({ closeFlyout }) => {
 
   useEffect(() => {
     if (
-      initialSelectedRoles.length != selectedRoles.length || initialPassword != password ||
-      initialPassword != confirmPassword || initialUserName != userName || allowRunAs
+      initialSelectedRoles.length != selectedRoles.length ||
+      initialPassword != password ||
+      initialPassword != confirmPassword ||
+      initialUserName != userName ||
+      allowRunAs
     ) {
       setHasChanges(true);
     } else {
@@ -238,107 +242,107 @@ export const CreateUser = ({ closeFlyout }) => {
     }
   }, [selectedRoles, userName, password, confirmPassword, allowRunAs]);
 
-  const onClose = () => { hasChanges ? setIsModalVisible(true) : closeFlyout(false) };
+  const onClose = () => {
+    hasChanges ? setIsModalVisible(true) : closeFlyout(false);
+  };
 
   return (
     <>
-      <EuiOverlayMask headerZindexLocation="below">
-          <EuiFlyout className="wzApp" onClose={onClose} outsideClickCloses={true}>
-            <EuiFlyoutHeader hasBorder={false}>
-              <EuiTitle size="m">
-                <h2>Create new user</h2>
+      <WzFlyout onClose={onClose} flyoutProps={{ className: 'wzApp' }}>
+        <EuiFlyoutHeader hasBorder={false}>
+          <EuiTitle size="m">
+            <h2>Create new user</h2>
+          </EuiTitle>
+        </EuiFlyoutHeader>
+        <EuiFlyoutBody>
+          <EuiForm component="form" style={{ padding: 24 }}>
+            <EuiPanel>
+              <EuiTitle size="s">
+                <h2>User data</h2>
               </EuiTitle>
-            </EuiFlyoutHeader>
-            <EuiFlyoutBody>
-              <EuiForm component="form" style={{ padding: 24 }}>
-                <EuiPanel>
-                  <EuiTitle size="s">
-                    <h2>User data</h2>
-                  </EuiTitle>
-                  <EuiSpacer />
-                  <EuiFormRow
-                    label="User name"
-                    isInvalid={!!formErrors.userName}
-                    error={formErrors.userName}
-                    helpText="Introduce the user name for the user."
-                  >
-                    <EuiFieldText
-                      placeholder="User name"
-                      value={userName}
-                      onChange={(e) => onChangeUserName(e)}
-                      aria-label=""
-                      isInvalid={!!formErrors.userName}
-                    />
-                  </EuiFormRow>
-                  <EuiFormRow
-                    label="Password"
-                    isInvalid={!!formErrors.password}
-                    error={formErrors.password}
-                    helpText="Introduce a new password for the user."
-                  >
-                    <EuiFieldPassword
-                      placeholder="Password"
-                      value={password}
-                      onChange={(e) => onChangePassword(e)}
-                      aria-label=""
-                      isInvalid={!!formErrors.password}
-                    />
-                  </EuiFormRow>
-                  <EuiFormRow
-                    label="Confirm Password"
-                    isInvalid={!!formErrors.confirmPassword}
-                    error={formErrors.confirmPassword}
-                    helpText="Confirm the new password."
-                  >
-                    <EuiFieldPassword
-                      placeholder="Confirm Password"
-                      value={confirmPassword}
-                      onChange={(e) => onChangeConfirmPassword(e)}
-                      aria-label=""
-                      isInvalid={!!formErrors.confirmPassword}
-                    />
-                  </EuiFormRow>
-                  <EuiFormRow label="Allow run as" helpText="Set if the user is able to use run as">
-                    <WzButtonPermissions
-                      buttonType="switch"
-                      label="Allow run as"
-                      showLabel={false}
-                      checked={allowRunAs}
-                      permissions={[{ action: 'security:edit_run_as', resource: '*:*:*' }]}
-                      onChange={(e) => onChangeAllowRunAs(e)}
-                      aria-label=""
-                    />
-                  </EuiFormRow>
-                </EuiPanel>
-                <EuiSpacer />
-                <EuiPanel>
-                  <EuiTitle size="s">
-                    <h2>User roles</h2>
-                  </EuiTitle>
-                  <EuiFormRow label="" helpText="Assign roles to the selected user">
-                    <EuiComboBox
-                      placeholder="Select roles"
-                      options={rolesOptions}
-                      selectedOptions={selectedRoles}
-                      isLoading={rolesLoading || isLoading}
-                      onChange={onChangeRoles}
-                      isClearable={true}
-                      data-test-subj="demoComboBox"
-                    />
-                  </EuiFormRow>
-                </EuiPanel>
-                <EuiSpacer />
-                <EuiFlexGroup>
-                  <EuiFlexItem grow={false}>
-                    <EuiButton fill isLoading={isLoading} onClick={editUser} isDisabled={!showApply}>
-                      Apply
-                  </EuiButton>
-                  </EuiFlexItem>
-                </EuiFlexGroup>
-              </EuiForm>
-            </EuiFlyoutBody>
-          </EuiFlyout>
-      </EuiOverlayMask>
+              <EuiSpacer />
+              <EuiFormRow
+                label="User name"
+                isInvalid={!!formErrors.userName}
+                error={formErrors.userName}
+                helpText="Introduce the user name for the user."
+              >
+                <EuiFieldText
+                  placeholder="User name"
+                  value={userName}
+                  onChange={(e) => onChangeUserName(e)}
+                  aria-label=""
+                  isInvalid={!!formErrors.userName}
+                />
+              </EuiFormRow>
+              <EuiFormRow
+                label="Password"
+                isInvalid={!!formErrors.password}
+                error={formErrors.password}
+                helpText="Introduce a new password for the user."
+              >
+                <EuiFieldPassword
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => onChangePassword(e)}
+                  aria-label=""
+                  isInvalid={!!formErrors.password}
+                />
+              </EuiFormRow>
+              <EuiFormRow
+                label="Confirm Password"
+                isInvalid={!!formErrors.confirmPassword}
+                error={formErrors.confirmPassword}
+                helpText="Confirm the new password."
+              >
+                <EuiFieldPassword
+                  placeholder="Confirm Password"
+                  value={confirmPassword}
+                  onChange={(e) => onChangeConfirmPassword(e)}
+                  aria-label=""
+                  isInvalid={!!formErrors.confirmPassword}
+                />
+              </EuiFormRow>
+              <EuiFormRow label="Allow run as" helpText="Set if the user is able to use run as">
+                <WzButtonPermissions
+                  buttonType="switch"
+                  label="Allow run as"
+                  showLabel={false}
+                  checked={allowRunAs}
+                  permissions={[{ action: 'security:edit_run_as', resource: '*:*:*' }]}
+                  onChange={(e) => onChangeAllowRunAs(e)}
+                  aria-label=""
+                />
+              </EuiFormRow>
+            </EuiPanel>
+            <EuiSpacer />
+            <EuiPanel>
+              <EuiTitle size="s">
+                <h2>User roles</h2>
+              </EuiTitle>
+              <EuiFormRow label="" helpText="Assign roles to the selected user">
+                <EuiComboBox
+                  placeholder="Select roles"
+                  options={rolesOptions}
+                  selectedOptions={selectedRoles}
+                  isLoading={rolesLoading || isLoading}
+                  onChange={onChangeRoles}
+                  isClearable={true}
+                  data-test-subj="demoComboBox"
+                />
+              </EuiFormRow>
+            </EuiPanel>
+            <EuiSpacer />
+            <EuiFlexGroup>
+              <EuiFlexItem grow={false}>
+                <EuiButton fill isLoading={isLoading} onClick={editUser} isDisabled={!showApply}>
+                  Apply
+                </EuiButton>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiForm>
+        </EuiFlyoutBody>
+      </WzFlyout>
       {modal}
     </>
   );

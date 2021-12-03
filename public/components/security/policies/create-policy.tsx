@@ -23,6 +23,7 @@ import { ErrorHandler } from '../../../react-services/error-handler';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
+import { WzFlyout } from '../../common/flyouts';
 
 export const CreatePolicyFlyout = ({ closeFlyout }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -306,138 +307,136 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
 
   return (
     <>
-      <EuiOverlayMask headerZindexLocation="below">
-        <EuiFlyout className="wzApp" onClose={onClose} outsideClickCloses={true}>
-          <EuiFlyoutHeader hasBorder={false}>
-            <EuiTitle size="m">
-              <h2>New policy</h2>
-            </EuiTitle>
-          </EuiFlyoutHeader>
-          <EuiFlyoutBody>
-            <EuiForm component="form" style={{ padding: 24 }}>
-              <EuiFormRow label="Policy name" helpText="Introduce a name for this new policy.">
-                <EuiFieldText
-                  placeholder=""
-                  value={policyName}
-                  onChange={(e) => onChangePolicyName(e)}
-                  aria-label=""
-                />
-              </EuiFormRow>
-              <EuiSpacer></EuiSpacer>
-              <EuiFlexGroup>
-                <EuiFlexItem>
-                  <EuiFormRow
-                    label="Action"
-                    helpText="Set an action where the policy will be carried out."
+      <WzFlyout flyoutProps={{ className: 'wzApp' }} onClose={onClose}>
+        <EuiFlyoutHeader hasBorder={false}>
+          <EuiTitle size="m">
+            <h2>New policy</h2>
+          </EuiTitle>
+        </EuiFlyoutHeader>
+        <EuiFlyoutBody>
+          <EuiForm component="form" style={{ padding: 24 }}>
+            <EuiFormRow label="Policy name" helpText="Introduce a name for this new policy.">
+              <EuiFieldText
+                placeholder=""
+                value={policyName}
+                onChange={(e) => onChangePolicyName(e)}
+                aria-label=""
+              />
+            </EuiFormRow>
+            <EuiSpacer></EuiSpacer>
+            <EuiFlexGroup>
+              <EuiFlexItem>
+                <EuiFormRow
+                  label="Action"
+                  helpText="Set an action where the policy will be carried out."
+                >
+                  <EuiSuperSelect
+                    options={actions}
+                    valueOfSelected={actionValue}
+                    onChange={(value) => onChangeActionValue(value)}
+                    itemLayoutAlign="top"
+                    hasDividers
+                  />
+                </EuiFormRow>
+              </EuiFlexItem>
+              <EuiFlexItem></EuiFlexItem>
+              <EuiFlexItem grow={false}>
+                <EuiFormRow hasEmptyLabelSpace>
+                  <EuiButton
+                    onClick={() => addAction()}
+                    iconType="plusInCircle"
+                    disabled={!actionValue}
                   >
-                    <EuiSuperSelect
-                      options={actions}
-                      valueOfSelected={actionValue}
-                      onChange={(value) => onChangeActionValue(value)}
-                      itemLayoutAlign="top"
-                      hasDividers
-                    />
-                  </EuiFormRow>
-                </EuiFlexItem>
-                <EuiFlexItem></EuiFlexItem>
-                <EuiFlexItem grow={false}>
-                  <EuiFormRow hasEmptyLabelSpace>
-                    <EuiButton
-                      onClick={() => addAction()}
-                      iconType="plusInCircle"
-                      disabled={!actionValue}
-                    >
-                      Add
-                    </EuiButton>
-                  </EuiFormRow>
-                </EuiFlexItem>
-              </EuiFlexGroup>
-              {!!addedActions.length && (
-                <>
-                  <EuiSpacer size="s"></EuiSpacer>
-                  <EuiFlexGroup>
-                    <EuiFlexItem>
-                      <EuiInMemoryTable items={addedActions} columns={actions_columns} />
-                    </EuiFlexItem>
-                  </EuiFlexGroup>
-                </>
-              )}
-              <EuiSpacer></EuiSpacer>
-              <EuiFlexGroup>
-                <EuiFlexItem>
-                  <EuiFormRow
-                    label="Resource"
-                    helpText="Select the resource to which this policy is directed."
+                    Add
+                  </EuiButton>
+                </EuiFormRow>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+            {!!addedActions.length && (
+              <>
+                <EuiSpacer size="s"></EuiSpacer>
+                <EuiFlexGroup>
+                  <EuiFlexItem>
+                    <EuiInMemoryTable items={addedActions} columns={actions_columns} />
+                  </EuiFlexItem>
+                </EuiFlexGroup>
+              </>
+            )}
+            <EuiSpacer></EuiSpacer>
+            <EuiFlexGroup>
+              <EuiFlexItem>
+                <EuiFormRow
+                  label="Resource"
+                  helpText="Select the resource to which this policy is directed."
+                >
+                  <EuiSuperSelect
+                    options={resources}
+                    valueOfSelected={resourceValue}
+                    onChange={(value) => onChangeResourceValue(value)}
+                    itemLayoutAlign="top"
+                    hasDividers
+                    disabled={!addedActions.length}
+                  />
+                </EuiFormRow>
+              </EuiFlexItem>
+              <EuiFlexItem>
+                <EuiFormRow
+                  label="Resource identifier"
+                  helpText="Introduce the resource identifier. Type * for all."
+                >
+                  <EuiFieldText
+                    placeholder={getIdentifier()}
+                    value={resourceIdentifierValue}
+                    onChange={(e) => onChangeResourceIdentifierValue(e)}
+                    disabled={!resourceValue}
+                  />
+                </EuiFormRow>
+              </EuiFlexItem>
+              <EuiFlexItem grow={false}>
+                <EuiFormRow hasEmptyLabelSpace>
+                  <EuiButton
+                    onClick={() => addResource()}
+                    iconType="plusInCircle"
+                    disabled={!resourceIdentifierValue}
                   >
-                    <EuiSuperSelect
-                      options={resources}
-                      valueOfSelected={resourceValue}
-                      onChange={(value) => onChangeResourceValue(value)}
-                      itemLayoutAlign="top"
-                      hasDividers
-                      disabled={!addedActions.length}
-                    />
-                  </EuiFormRow>
-                </EuiFlexItem>
-                <EuiFlexItem>
-                  <EuiFormRow
-                    label="Resource identifier"
-                    helpText="Introduce the resource identifier. Type * for all."
-                  >
-                    <EuiFieldText
-                      placeholder={getIdentifier()}
-                      value={resourceIdentifierValue}
-                      onChange={(e) => onChangeResourceIdentifierValue(e)}
-                      disabled={!resourceValue}
-                    />
-                  </EuiFormRow>
-                </EuiFlexItem>
-                <EuiFlexItem grow={false}>
-                  <EuiFormRow hasEmptyLabelSpace>
-                    <EuiButton
-                      onClick={() => addResource()}
-                      iconType="plusInCircle"
-                      disabled={!resourceIdentifierValue}
-                    >
-                      Add
-                    </EuiButton>
-                  </EuiFormRow>
-                </EuiFlexItem>
-              </EuiFlexGroup>
-              {!!addedResources.length && (
-                <>
-                  <EuiSpacer size="s"></EuiSpacer>
-                  <EuiFlexGroup>
-                    <EuiFlexItem>
-                      <EuiInMemoryTable items={addedResources} columns={resources_columns} />
-                    </EuiFlexItem>
-                  </EuiFlexGroup>
-                </>
-              )}
-              <EuiSpacer></EuiSpacer>
-              <EuiFormRow label="Select an effect" helpText="Select an effect.">
-                <EuiSuperSelect
-                  options={effectOptions}
-                  valueOfSelected={effectValue}
-                  onChange={(value) => onEffectValueChange(value)}
-                />
-              </EuiFormRow>
-              <EuiSpacer />
-              <EuiButton
-                disabled={
-                  !policyName || !addedActions.length || !addedResources.length || !effectValue
-                }
-                onClick={() => {
-                  createPolicy();
-                }}
-                fill
-              >
-                Create policy
-              </EuiButton>
-            </EuiForm>
-          </EuiFlyoutBody>
-        </EuiFlyout>
-      </EuiOverlayMask>
+                    Add
+                  </EuiButton>
+                </EuiFormRow>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+            {!!addedResources.length && (
+              <>
+                <EuiSpacer size="s"></EuiSpacer>
+                <EuiFlexGroup>
+                  <EuiFlexItem>
+                    <EuiInMemoryTable items={addedResources} columns={resources_columns} />
+                  </EuiFlexItem>
+                </EuiFlexGroup>
+              </>
+            )}
+            <EuiSpacer></EuiSpacer>
+            <EuiFormRow label="Select an effect" helpText="Select an effect.">
+              <EuiSuperSelect
+                options={effectOptions}
+                valueOfSelected={effectValue}
+                onChange={(value) => onEffectValueChange(value)}
+              />
+            </EuiFormRow>
+            <EuiSpacer />
+            <EuiButton
+              disabled={
+                !policyName || !addedActions.length || !addedResources.length || !effectValue
+              }
+              onClick={() => {
+                createPolicy();
+              }}
+              fill
+            >
+              Create policy
+            </EuiButton>
+          </EuiForm>
+        </EuiFlyoutBody>
+      </WzFlyout>
       {modal}
     </>
   );

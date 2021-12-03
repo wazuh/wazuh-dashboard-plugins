@@ -359,16 +359,11 @@ export const Events = compose(
       return (
         <Fragment>
           {flyout && (
-            <EuiOverlayMask headerZindexLocation="below">
-              <div>
-                <FlyoutComponent
-                  closeFlyout={this.closeFlyout}
-                  outsideClickCloses={true}
-                  {...this.state.flyout.props}
-                  {...this.props}
-                />
-              </div>
-            </EuiOverlayMask>
+            <FlyoutComponent
+              closeFlyout={this.closeFlyout}
+              {...this.state.flyout.props}
+              {...this.props}
+            />
           )}
         </Fragment>
       );

@@ -304,22 +304,16 @@ export class InventoryTable extends Component {
       <div className="wz-inventory">
         {filesTable}
         {this.state.isFlyoutVisible && (
-          <EuiOverlayMask headerZindexLocation="below">
-            <div>
-              {/* EuiOutsideClickDetector needs a static first child */}
-              <FlyoutDetail
-                fileName={this.state.currentFile}
-                agentId={this.props.agent.id}
-                item={this.state.syscheckItem}
-                closeFlyout={() => this.closeFlyout()}
-                type="file"
-                view="inventory"
-                showViewInEvents={true}
-                outsideClickCloses={true}
-                {...this.props}
-              />
-            </div>
-          </EuiOverlayMask>
+          <FlyoutDetail
+            fileName={this.state.currentFile}
+            agentId={this.props.agent.id}
+            item={this.state.syscheckItem}
+            closeFlyout={() => this.closeFlyout()}
+            type="file"
+            view="inventory"
+            showViewInEvents={true}
+            {...this.props}
+          />
         )}
       </div>
     );

@@ -759,16 +759,12 @@ export const Discover = compose(
       };
       const noResultsText = `No results match for this search criteria`;
       let flyout = this.state.showMitreFlyout ? (
-        <EuiOverlayMask headerZindexLocation="below">
-          <div>
-            <FlyoutTechnique
-              openDashboard={(e, itemId) => this.openDashboard(e, itemId)}
-              openDiscover={(e, itemId) => this.openDiscover(e, itemId)}
-              onChangeFlyout={this.onMitreChangeFlyout}
-              currentTechnique={this.state.selectedTechnique}
-            />
-          </div>
-        </EuiOverlayMask>
+        <FlyoutTechnique
+          openDashboard={(e, itemId) => this.openDashboard(e, itemId)}
+          openDiscover={(e, itemId) => this.openDiscover(e, itemId)}
+          onChangeFlyout={this.onMitreChangeFlyout}
+          currentTechnique={this.state.selectedTechnique}
+        />
       ) : (
         <></>
       );

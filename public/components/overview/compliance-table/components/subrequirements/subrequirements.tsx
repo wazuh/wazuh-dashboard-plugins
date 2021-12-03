@@ -341,20 +341,16 @@ export class ComplianceSubrequirements extends Component {
         </div>
 
         {this.state.flyoutOn && (
-          <EuiOverlayMask headerZindexLocation="below">
-            <div>
-              <RequirementFlyout
-                currentRequirement={this.state.selectedRequirement}
-                onChangeFlyout={this.onChangeFlyout}
-                description={this.props.descriptions[this.state.selectedRequirement]}
-                getRequirementKey={() => {
-                  return this.getRequirementKey();
-                }}
-                openDashboard={(e, itemId) => this.openDashboard(e, itemId)}
-                openDiscover={(e, itemId) => this.openDiscover(e, itemId)}
-              />
-            </div>
-          </EuiOverlayMask>
+            <RequirementFlyout
+              currentRequirement={this.state.selectedRequirement}
+              onChangeFlyout={this.onChangeFlyout}
+              description={this.props.descriptions[this.state.selectedRequirement]}
+              getRequirementKey={() => {
+                return this.getRequirementKey();
+              }}
+              openDashboard={(e, itemId) => this.openDashboard(e, itemId)}
+              openDiscover={(e, itemId) => this.openDiscover(e, itemId)}
+            />
         )}
       </div>
     );

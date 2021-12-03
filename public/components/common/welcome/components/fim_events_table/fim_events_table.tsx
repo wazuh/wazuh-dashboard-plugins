@@ -99,17 +99,13 @@ function FimTable({ agent }) {
         noItemsMessage="No recent events"
       />
       {isOpen && (
-        <EuiOverlayMask headerZindexLocation="below">
-          <div>
-            <FlyoutDetail
-              agentId={agent.id}
-              closeFlyout={() => setIsOpen(false)}
-              fileName={file}
-              view="extern"
-              {...{ agent }}
-            />
-          </div>
-        </EuiOverlayMask>
+        <FlyoutDetail
+          agentId={agent.id}
+          closeFlyout={() => setIsOpen(false)}
+          fileName={file}
+          view="extern"
+          {...{ agent }}
+        />
       )}
     </Fragment>
   );
