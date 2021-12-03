@@ -240,6 +240,7 @@ export class RequirementFlyout extends Component {
         size="l"
         className="flyout-no-overlap wz-inventory wzApp"
         aria-labelledby="flyoutSmallTitle"
+        outsideClickCloses={true}
       >
         {currentRequirement && this.renderHeader()}
         {this.renderBody()}

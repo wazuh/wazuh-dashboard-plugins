@@ -36,17 +36,17 @@ export class MitreTopTactics extends Component {
   timefilter: any;
   indexPattern: any;
   props!: {
-      [key: string]: any
-  }
+    [key: string]: any;
+  };
   state: {
-    alertsCount: { key: string, doc_count:number }[]
-    isLoading: boolean,
-    time: any,
-    filterParams: object,
-    selectedTactic: string | undefined,
-    flyoutOn: boolean,
-    selectedTechnique: string
-  }
+    alertsCount: { key: string; doc_count: number }[];
+    isLoading: boolean;
+    time: any;
+    filterParams: object;
+    selectedTactic: string | undefined;
+    flyoutOn: boolean;
+    selectedTechnique: string;
+  };
   subscription: any;
 
   constructor(props) {
@@ -59,17 +59,21 @@ export class MitreTopTactics extends Component {
       time: this.timefilter.getTime(),
       selectedTactic: undefined,
       flyoutOn: false,
-      selectedTechnique: ''
+      selectedTechnique: '',
     };
   }
 
   async componentDidMount() {
     this._isMount = true;
-    this.subscription = this.timefilter.getTimeUpdate$().subscribe(
-      () => this._isMount && this.setState({time: this.timefilter.getTime(), isLoading: true}));
+    this.subscription = this.timefilter
+      .getTimeUpdate$()
+      .subscribe(
+        () => this._isMount && this.setState({ time: this.timefilter.getTime(), isLoading: true })
+      );
     this.indexPattern = await getIndexPattern();
-    getMitreCount(this.props.agentId, this.timefilter.getTime(), undefined)
-      .then(alertsCount => this.setState({alertsCount, isLoading: false}));
+    getMitreCount(this.props.agentId, this.timefilter.getTime(), undefined).then((alertsCount) =>
+      this.setState({ alertsCount, isLoading: false })
+    );
   }
 
   async componentWillUnmount() {
@@ -79,36 +83,34 @@ export class MitreTopTactics extends Component {
 
   shouldComponentUpdate(nextProp, nextState) {
     const { selectedTactic, isLoading, alertsCount } = this.state;
-    if (nextState.selectedTactic !== selectedTactic ) 
-      return true;
-    if (!isLoading ) 
-      return true;
-    if (JSON.stringify(nextState.alertsCount) !== JSON.stringify(alertsCount))
-      return true;
+    if (nextState.selectedTactic !== selectedTactic) return true;
+    if (!isLoading) return true;
+    if (JSON.stringify(nextState.alertsCount) !== JSON.stringify(alertsCount)) return true;
     return false;
   }
-  
-  async componentDidUpdate(){
+
+  async componentDidUpdate() {
     const { selectedTactic, isLoading } = this.state;
     if (isLoading) {
-      getMitreCount(this.props.agentId, this.timefilter.getTime(), selectedTactic)
-        .then(alertsCount => { 
+      getMitreCount(this.props.agentId, this.timefilter.getTime(), selectedTactic).then(
+        (alertsCount) => {
           if (alertsCount.length === 0) {
-            this.setState({selectedTactic: undefined, isLoading: false})  
+            this.setState({ selectedTactic: undefined, isLoading: false });
           }
-          this.setState({alertsCount, isLoading: false})
-        });
+          this.setState({ alertsCount, isLoading: false });
+        }
+      );
     }
   }
 
   renderLoadingStatus() {
     const { isLoading } = this.state;
-    if(!isLoading) return
-    return(
-      <div style={{ display: 'block' , textAlign: "center", paddingTop: 100 }}>
+    if (!isLoading) return;
+    return (
+      <div style={{ display: 'block', textAlign: 'center', paddingTop: 100 }}>
         <EuiLoadingChart size="xl" />
       </div>
-    )
+    );
   }
 
   renderTacticsTop() {
@@ -119,7 +121,7 @@ export class MitreTopTactics extends Component {
         <div className="wz-agents-mitre">
           <EuiText size="xs">
             <EuiFlexGroup>
-              <EuiFlexItem style={{margin: 0, padding: '12px 0px 0px 10px'}}>
+              <EuiFlexItem style={{ margin: 0, padding: '12px 0px 0px 10px' }}>
                 <h3>Top Tactics</h3>
               </EuiFlexItem>
             </EuiFlexGroup>
@@ -132,11 +134,10 @@ export class MitreTopTactics extends Component {
                   quantity={tactic.doc_count}
                   onClick={() => {
                     this.setState({
-                        selectedTactic: tactic.key,
-                        isLoading: true,
-                      });
-                    }
-                  }
+                      selectedTactic: tactic.key,
+                      isLoading: true,
+                    });
+                  }}
                 >
                   {tactic.key}
                 </EuiFacetButton>
@@ -152,26 +153,25 @@ export class MitreTopTactics extends Component {
     const { selectedTactic, alertsCount, isLoading } = this.state;
     if (isLoading) return;
     return (
-      <Fragment>  
+      <Fragment>
         <EuiText size="xs">
           <EuiFlexGroup>
-           <EuiFlexItem grow={false} >
-            <EuiButtonIcon
-              size={'s'}
-              color={'primary'}
-              onClick={() => {
-                this.setState({
+            <EuiFlexItem grow={false}>
+              <EuiButtonIcon
+                size={'s'}
+                color={'primary'}
+                onClick={() => {
+                  this.setState({
                     selectedTactic: undefined,
                     isLoading: true,
-                    flyoutOn: false
+                    flyoutOn: false,
                   });
-                }
-              }
-              iconType="sortLeft"
-              aria-label="Back Top Tactics"
-            />
+                }}
+                iconType="sortLeft"
+                aria-label="Back Top Tactics"
+              />
             </EuiFlexItem>
-            <EuiFlexItem >
+            <EuiFlexItem>
               <h3>{selectedTactic}</h3>
             </EuiFlexItem>
           </EuiFlexGroup>
@@ -196,24 +196,22 @@ export class MitreTopTactics extends Component {
   renderEmptyPrompt() {
     const { isLoading } = this.state;
     if (isLoading) return;
-    return(
+    return (
       <EuiEmptyPrompt
-      iconType="stats"
-      title={<h4>No results</h4>}
-      body={
-        <Fragment>
-          <p>
-          No Mitre results were found in the selected time range.
-          </p>
-        </Fragment>
-      }
+        iconType="stats"
+        title={<h4>No results</h4>}
+        body={
+          <Fragment>
+            <p>No Mitre results were found in the selected time range.</p>
+          </Fragment>
+        }
       />
-    )
+    );
   }
 
-  onChangeFlyout = (flyoutOn ) => {
+  onChangeFlyout = (flyoutOn) => {
     this.setState({ flyoutOn });
-  }
+  };
 
   closeFlyout() {
     this.setState({ flyoutOn: false });
@@ -222,16 +220,24 @@ export class MitreTopTactics extends Component {
   showFlyout(tactic) {
     this.setState({
       selectedTechnique: tactic,
-      flyoutOn: true
-    })
+      flyoutOn: true,
+    });
   }
 
-  openDiscover(e,techniqueID){
-    AppNavigate.navigateToModule(e, 'overview', {"tab": 'mitre', "tabView": "discover", filters:{ 'rule.mitre.id': techniqueID} })
+  openDiscover(e, techniqueID) {
+    AppNavigate.navigateToModule(e, 'overview', {
+      tab: 'mitre',
+      tabView: 'discover',
+      filters: { 'rule.mitre.id': techniqueID },
+    });
   }
 
-  openDashboard(e,techniqueID){
-    AppNavigate.navigateToModule(e, 'overview', {"tab": 'mitre', "tabView": "dashboard", filters :{ 'rule.mitre.id': techniqueID}  } )
+  openDashboard(e, techniqueID) {
+    AppNavigate.navigateToModule(e, 'overview', {
+      tab: 'mitre',
+      tabView: 'dashboard',
+      filters: { 'rule.mitre.id': techniqueID },
+    });
   }
 
   render() {
@@ -245,21 +251,21 @@ export class MitreTopTactics extends Component {
         {loading}
         {!selectedTactic || alertsCount.length === 0 ? tacticsTop : tecniquesTop}
         {alertsCount.length === 0 && emptyPrompt}
-        {flyoutOn &&
+        {flyoutOn && (
           <EuiOverlayMask headerZindexLocation="below">
-            <EuiOutsideClickDetector onOutsideClick={() => this.closeFlyout()}>
-              <div>{/* EuiOutsideClickDetector needs a static first child */}
-                <FlyoutTechnique
-                  openDashboard={(e, itemId) => this.openDashboard(e, itemId)}
-                  openDiscover={(e, itemId) => this.openDiscover(e, itemId)}
-                  implicitFilters={[{ "agent.id": this.props.agentId }]}
-                  agentId={this.props.agentId}
-                  onChangeFlyout={this.onChangeFlyout}
-                  currentTechnique={selectedTechnique} />
-              </div>
-            </EuiOutsideClickDetector>
-          </EuiOverlayMask>}
+            <div>
+              <FlyoutTechnique
+                openDashboard={(e, itemId) => this.openDashboard(e, itemId)}
+                openDiscover={(e, itemId) => this.openDiscover(e, itemId)}
+                implicitFilters={[{ 'agent.id': this.props.agentId }]}
+                agentId={this.props.agentId}
+                onChangeFlyout={this.onChangeFlyout}
+                currentTechnique={selectedTechnique}
+              />
+            </div>
+          </EuiOverlayMask>
+        )}
       </Fragment>
-    )
+    );
   }
 }

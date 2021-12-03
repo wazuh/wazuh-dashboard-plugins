@@ -243,8 +243,7 @@ export const CreateUser = ({ closeFlyout }) => {
   return (
     <>
       <EuiOverlayMask headerZindexLocation="below">
-        <EuiOutsideClickDetector onOutsideClick={onClose}>
-          <EuiFlyout className="wzApp" onClose={onClose}>
+          <EuiFlyout className="wzApp" onClose={onClose} outsideClickCloses={true}>
             <EuiFlyoutHeader hasBorder={false}>
               <EuiTitle size="m">
                 <h2>Create new user</h2>
@@ -339,7 +338,6 @@ export const CreateUser = ({ closeFlyout }) => {
               </EuiForm>
             </EuiFlyoutBody>
           </EuiFlyout>
-        </EuiOutsideClickDetector>
       </EuiOverlayMask>
       {modal}
     </>

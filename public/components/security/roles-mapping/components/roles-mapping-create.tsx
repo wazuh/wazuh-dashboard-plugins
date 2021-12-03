@@ -113,70 +113,70 @@ export const RolesMappingCreate = ({
     }
   }, [selectedRoles, ruleName, hasChangeMappingRules]);
 
-  const onClose = () => { hasChanges ? setIsModalVisible(true) : closeFlyout(false) };
+  const onClose = () => {
+    hasChanges ? setIsModalVisible(true) : closeFlyout(false);
+  };
 
   return (
     <>
       <EuiOverlayMask headerZindexLocation="below">
-        <EuiOutsideClickDetector onOutsideClick={onClose}>
-          <EuiFlyout className="wzApp" onClose={onClose}>
-            <EuiFlyoutHeader hasBorder={false}>
-              <EuiTitle size="m">
-                <h2>Create new role mapping &nbsp;</h2>
-              </EuiTitle>
-            </EuiFlyoutHeader>
-            <EuiFlyoutBody>
-              <EuiForm component="form" style={{ padding: 24 }}>
-                <EuiFormRow
-                  label="Role mapping name"
-                  isInvalid={false}
-                  error={'Please provide a role mapping name'}
-                  helpText="Introduce a name for this role mapping."
-                >
-                  <EuiFieldText
-                    placeholder="Role name"
-                    value={ruleName}
-                    onChange={(e) => setRuleName(e.target.value)}
-                  />
-                </EuiFormRow>
-                <EuiFormRow
-                  label="Roles"
-                  isInvalid={false}
-                  error={'At least one role must be selected.'}
-                  helpText="Assign roles to your users."
-                >
-                  <EuiComboBox
-                    placeholder="Select roles"
-                    options={getRolesList()}
-                    isDisabled={false}
-                    selectedOptions={selectedRoles}
-                    onChange={(roles) => {
-                      setSelectedRoles(roles);
-                    }}
-                    isClearable={true}
-                    data-test-subj="demoComboBox"
-                  />
-                </EuiFormRow>
-                <EuiSpacer />
-              </EuiForm>
-              <EuiFlexGroup style={{ padding: '0px 24px 24px 24px' }}>
-                <EuiFlexItem>
-                  <RuleEditor
-                    save={(rule) => createRule(rule)}
-                    initialRule={false}
-                    isReserved={false}
-                    isLoading={isLoading}
-                    internalUsers={internalUsers}
-                    currentPlatform={currentPlatform}
-                    onFormChange={(hasChange) => {
-                      setHasChangeMappingRules(hasChange);
-                    }}
-                  ></RuleEditor>
-                </EuiFlexItem>
-              </EuiFlexGroup>
-            </EuiFlyoutBody>
-          </EuiFlyout>
-        </EuiOutsideClickDetector>
+        <EuiFlyout className="wzApp" onClose={onClose} outsideClickCloses={true}>
+          <EuiFlyoutHeader hasBorder={false}>
+            <EuiTitle size="m">
+              <h2>Create new role mapping &nbsp;</h2>
+            </EuiTitle>
+          </EuiFlyoutHeader>
+          <EuiFlyoutBody>
+            <EuiForm component="form" style={{ padding: 24 }}>
+              <EuiFormRow
+                label="Role mapping name"
+                isInvalid={false}
+                error={'Please provide a role mapping name'}
+                helpText="Introduce a name for this role mapping."
+              >
+                <EuiFieldText
+                  placeholder="Role name"
+                  value={ruleName}
+                  onChange={(e) => setRuleName(e.target.value)}
+                />
+              </EuiFormRow>
+              <EuiFormRow
+                label="Roles"
+                isInvalid={false}
+                error={'At least one role must be selected.'}
+                helpText="Assign roles to your users."
+              >
+                <EuiComboBox
+                  placeholder="Select roles"
+                  options={getRolesList()}
+                  isDisabled={false}
+                  selectedOptions={selectedRoles}
+                  onChange={(roles) => {
+                    setSelectedRoles(roles);
+                  }}
+                  isClearable={true}
+                  data-test-subj="demoComboBox"
+                />
+              </EuiFormRow>
+              <EuiSpacer />
+            </EuiForm>
+            <EuiFlexGroup style={{ padding: '0px 24px 24px 24px' }}>
+              <EuiFlexItem>
+                <RuleEditor
+                  save={(rule) => createRule(rule)}
+                  initialRule={false}
+                  isReserved={false}
+                  isLoading={isLoading}
+                  internalUsers={internalUsers}
+                  currentPlatform={currentPlatform}
+                  onFormChange={(hasChange) => {
+                    setHasChangeMappingRules(hasChange);
+                  }}
+                ></RuleEditor>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiFlyoutBody>
+        </EuiFlyout>
       </EuiOverlayMask>
       {modal}
     </>

@@ -394,6 +394,7 @@ export class FlyoutTechnique extends Component {
         size="l"
         className="flyout-no-overlap wz-inventory wzApp"
         aria-labelledby="flyoutSmallTitle"
+        outsideClickCloses={true}
       >
         {techniqueData && this.renderHeader()}
         {this.renderBody()}

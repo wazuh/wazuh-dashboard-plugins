@@ -127,6 +127,7 @@ export class FlyoutDetail extends Component {
         aria-labelledby={this.state.currentFile.file}
         maxWidth="70%"
         className="wz-inventory wzApp"
+        outsideClickCloses = {true}
       >
         <EuiFlyoutHeader hasBorder className="flyout-header">
           <EuiTitle size="s">

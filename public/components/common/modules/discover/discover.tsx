@@ -391,11 +391,11 @@ export const Discover = compose(
       const range = {
         range: {
           timestamp: {
-              gte: dateParse(this.timefilter.getTime().from),
-              lte: dateParse(this.timefilter.getTime().to),
-              format: 'epoch_millis'
-            }
-          }
+            gte: dateParse(this.timefilter.getTime().from),
+            lte: dateParse(this.timefilter.getTime().to),
+            format: 'epoch_millis',
+          },
+        },
       };
       elasticQuery.bool.must.push(range);
 
@@ -760,17 +760,14 @@ export const Discover = compose(
       const noResultsText = `No results match for this search criteria`;
       let flyout = this.state.showMitreFlyout ? (
         <EuiOverlayMask headerZindexLocation="below">
-          <EuiOutsideClickDetector onOutsideClick={this.closeMitreFlyout}>
-            <div>
-              {/* EuiOutsideClickDetector needs a static first child */}
-              <FlyoutTechnique
-                openDashboard={(e, itemId) => this.openDashboard(e, itemId)}
-                openDiscover={(e, itemId) => this.openDiscover(e, itemId)}
-                onChangeFlyout={this.onMitreChangeFlyout}
-                currentTechnique={this.state.selectedTechnique}
-              />
-            </div>
-          </EuiOutsideClickDetector>
+          <div>
+            <FlyoutTechnique
+              openDashboard={(e, itemId) => this.openDashboard(e, itemId)}
+              openDiscover={(e, itemId) => this.openDiscover(e, itemId)}
+              onChangeFlyout={this.onMitreChangeFlyout}
+              currentTechnique={this.state.selectedTechnique}
+            />
+          </div>
         </EuiOverlayMask>
       ) : (
         <></>

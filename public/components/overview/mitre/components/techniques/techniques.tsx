@@ -42,7 +42,7 @@ import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 
-const MITRE_ATTACK = 'mitre-attack'
+const MITRE_ATTACK = 'mitre-attack';
 
 export const Techniques = withWindowSize(
   class Techniques extends Component {
@@ -464,9 +464,7 @@ export const Techniques = withWindowSize(
             },
           });
           const filteredTechniques = (((response || {}).data || {}).data.affected_items || []).map(
-            (item) =>
-              [item].filter((reference) => reference.source === MITRE_ATTACK)[0]
-                .external_id
+            (item) => [item].filter((reference) => reference.source === MITRE_ATTACK)[0].external_id
           );
           this._isMount && this.setState({ filteredTechniques, isSearching: false });
         } else {
@@ -553,22 +551,23 @@ export const Techniques = withWindowSize(
 
           <div>{this.renderFacet()}</div>
 
-          { isFlyoutVisible &&
+          {isFlyoutVisible && (
             <EuiOverlayMask headerZindexLocation="below">
-              <EuiOutsideClickDetector onOutsideClick={() => this.onChangeFlyout(false)}>
-                <div>{/* EuiOutsideClickDetector needs a static first child */}
-                  <FlyoutTechnique
-                    openDashboard={(e, itemId) => this.openDashboard(e, itemId)}
-                    openDiscover={(e, itemId) => this.openDiscover(e, itemId)}
-                    openIntelligence={(e, redirectTo, itemId) => this.openIntelligence(e, redirectTo, itemId)}
-                    onChangeFlyout={this.onChangeFlyout}
-                    currentTechniqueData={this.state.currentTechniqueData}
-                    currentTechnique={currentTechnique}
-                    tacticsObject={this.props.tacticsObject} />
-                </div>
-              </EuiOutsideClickDetector>
+              <div>
+                <FlyoutTechnique
+                  openDashboard={(e, itemId) => this.openDashboard(e, itemId)}
+                  openDiscover={(e, itemId) => this.openDiscover(e, itemId)}
+                  openIntelligence={(e, redirectTo, itemId) =>
+                    this.openIntelligence(e, redirectTo, itemId)
+                  }
+                  onChangeFlyout={this.onChangeFlyout}
+                  currentTechniqueData={this.state.currentTechniqueData}
+                  currentTechnique={currentTechnique}
+                  tacticsObject={this.props.tacticsObject}
+                />
+              </div>
             </EuiOverlayMask>
-          }
+          )}
         </div>
       );
     }
