@@ -8,6 +8,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Kibana 7.13.4
 - Support for Kibana 7.14.2
+- Hide the `telemetry` banner [#3709](https://github.com/wazuh/wazuh-kibana-app/pull/3709)
 
 ### Fixed
 
