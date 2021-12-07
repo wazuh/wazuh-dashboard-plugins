@@ -100,7 +100,7 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
 
     // hide the telemetry banner. Remove the banner from the UI and set the flag in the telemetry saved object as the notice was seen and dismissed
     if(plugins?.telemetry?.telemetryNotifications?.setOptedInNoticeSeen) {
-      plugins.telemetry.telemetryNotifications.setOptedInNoticeSeen()
+      plugins.telemetry.telemetryNotifications.setOptedInNoticeSeen();
     };
 
     // we need to register the application service at setup, but to render it
