@@ -92,11 +92,16 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
     return {};
   }
 
-  public async start(core: CoreStart, plugins: AppPluginStartDependencies): Promise<WazuhStart> {
+  public start(core: CoreStart, plugins: AppPluginStartDependencies): WazuhStart {
     // hide security alert
     if(plugins.securityOss) {
       plugins.securityOss.insecureCluster.hideAlert(true);
-    }
+    };
+
+    // hide the telemetry banner. Remove the banner from the UI and set the flag in the telemetry saved object as the notice was seen and dismissed
+    if(plugins?.telemetry?.telemetryNotifications?.setOptedInNoticeSeen) {
+      plugins.telemetry.telemetryNotifications.setOptedInNoticeSeen()
+    };
 
     // we need to register the application service at setup, but to render it
     // there are some start dependencies necessary, for this reason
