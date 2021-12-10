@@ -33,6 +33,7 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
   public initializeInnerAngular?: () => void;
   private innerAngularInitialized: boolean = false;
   private stateUpdater = new BehaviorSubject<AppUpdater>(() => ({}));
+  private hideTelemetryBanner?: () => void;
   
   public setup(core: CoreSetup, plugins: WazuhSetupPlugins): WazuhSetup {
     core.application.register({
@@ -43,6 +44,11 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
         if (!this.initializeInnerAngular) {
           throw Error('Wazuh plugin method initializeInnerAngular is undefined');
         }
+
+        // hide the telemetry banner. 
+        // Set the flag in the telemetry saved object as the notice was seen and dismissed
+        this.hideTelemetryBanner && await this.hideTelemetryBanner();
+        
         setScopedHistory(params.history);
         // Load application bundle
         const { renderApp } = await import('./application');
@@ -98,11 +104,10 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
       plugins.securityOss.insecureCluster.hideAlert(true);
     };
 
-    // hide the telemetry banner. Remove the banner from the UI and set the flag in the telemetry saved object as the notice was seen and dismissed
     if(plugins?.telemetry?.telemetryNotifications?.setOptedInNoticeSeen) {
-      plugins.telemetry.telemetryNotifications.setOptedInNoticeSeen();
+      // assign to a method to hide the telemetry banner used when the app is mounted
+      this.hideTelemetryBanner = () => plugins.telemetry.telemetryNotifications.setOptedInNoticeSeen();
     };
-
     // we need to register the application service at setup, but to render it
     // there are some start dependencies necessary, for this reason
     // initializeInnerAngular + initializeServices are assigned at start and used
