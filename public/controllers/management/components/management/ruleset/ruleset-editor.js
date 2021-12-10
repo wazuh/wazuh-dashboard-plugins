@@ -105,7 +105,10 @@ class WzRulesetEditor extends Component {
   async save(name, overwrite = true) {
     if (!this._isMounted) {
       return;
-    }
+    }else if(/\s/.test(name)) {
+      this.showToast('warning', 'Warning', `The ${this.props.state.section} name must not contain spaces.`, 3000);
+      return;
+    }  
     try {
       const { content } = this.state;
 
