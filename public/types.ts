@@ -7,6 +7,7 @@ import { NavigationPublicPluginStart } from '../../../src/plugins/navigation/pub
 import { UiActionsSetup } from '../../../src/plugins/ui_actions/public';
 import { SecurityOssPluginStart } from '../../../src/plugins/security_oss/public/';
 import { SavedObjectsStart } from '../../../src/plugins/saved_objects/public';
+import { TelemetryPluginStart, TelemetryPluginSetup } from '../../../src/plugins/telemetry/public';
 
 export interface AppPluginStartDependencies {
   navigation: NavigationPublicPluginStart;
@@ -15,7 +16,8 @@ export interface AppPluginStartDependencies {
   discover: DiscoverStart;
   charts: ChartsPluginStart
   securityOss: SecurityOssPluginStart,
-  savedObjects: SavedObjectsStart
+  savedObjects: SavedObjectsStart,
+  telemetry: TelemetryPluginStart
 }
 export interface AppDependencies {
   core: CoreStart;
@@ -28,6 +30,7 @@ export type WazuhSetupPlugins = {
   visualizations: VisualizationsSetup;
   data: DataPublicPluginSetup;
   navigation: NavigationPublicPluginStart;
+  telemetry: TelemetryPluginSetup;
 }
 
 export type WazuhStartPlugins = AppPluginStartDependencies;

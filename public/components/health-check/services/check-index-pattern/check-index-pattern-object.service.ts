@@ -54,7 +54,7 @@ export const checkIndexPatternObjectService =  async (appConfig, checkLogger: Ch
         // show error
         checkLogger.error(`Default index pattern not found`);
       }
-      checkLogger.info(`Getting list of valid index patterns [${patternId}]...`);
+      checkLogger.info(`Getting list of valid index patterns...`);
       listValidIndexPatterns = await SavedObject.getListOfWazuhValidIndexPatterns(defaultIndexPatterns, HEALTH_CHECK);
       checkLogger.info(`Valid index patterns found: ${listValidIndexPatterns.length || 0}`);
       if(!AppState.getCurrentPattern()){
