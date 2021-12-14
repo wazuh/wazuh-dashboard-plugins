@@ -21,6 +21,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixing double flyout clicking in a policy [#3676](https://github.com/wazuh/wazuh-kibana-app/pull/3676)
 - Fixed error conflict setting kibana settings from the health check [#3678](https://github.com/wazuh/wazuh-kibana-app/pull/3678)
 - Fixed compatibility to get the valid index patterns and refresh fields for Kibana 7.10.2-7.13.4 [3681](https://github.com/wazuh/wazuh-kibana-app/pull/3681)
+- Fixed wrong redirect after login [3701](https://github.com/wazuh/wazuh-kibana-app/pull/3701)
 - Fixed error getting the index pattern data when there is not `attributes.fields` in the saved object [3689](https://github.com/wazuh/wazuh-kibana-app/pull/3698)
 
 ## Wazuh v4.2.4 - Kibana 7.10.2, 7.11.2, 7.12.1 - Revision 4205
