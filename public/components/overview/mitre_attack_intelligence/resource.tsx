@@ -34,7 +34,7 @@ export const ModuleMitreAttackIntelligenceResource = ({
     const redirectTab = urlParams.get('tabRedirect');
     const idToRedirect = urlParams.get("idToRedirect");
     if(redirectTab && idToRedirect){
-      const endpoint = `/mitre/${redirectTab}?q=references.external_id=${idToRedirect}`;
+      const endpoint = `/mitre/${redirectTab}?q=external_id=${idToRedirect}`;
       getMitreItemToRedirect(endpoint);
       urlParams.delete('tabRedirect');
       urlParams.delete('idToRedirect');
@@ -46,12 +46,7 @@ export const ModuleMitreAttackIntelligenceResource = ({
   const getMitreItemToRedirect = async (endpoint) => {
     try {
       const res = await WzRequest.apiReq("GET", endpoint, {});
-      const data = res?.data?.data.affected_items.map((item) => ({
-        ...item,
-        ["references.external_id"]: item?.references?.find(
-          (reference) => reference.source === "mitre-attack"
-        )?.external_id,
-      }));
+      const data = res?.data?.data.affected_items;
       setDetails(data[0]); 
     } catch (error) {
       const options = {
@@ -87,7 +82,6 @@ export const ModuleMitreAttackIntelligenceResource = ({
         searchBarSuggestions={searchBarSuggestions}
         endpoint={apiEndpoint}
         tablePageSizeOptions={[10]}
-        mapResponseItem={(item) => ({...item, ['references.external_id']: item?.references?.find(reference => reference.source === 'mitre-attack')?.external_id})}
         filters={resourceFilters}
       />
       {details && (

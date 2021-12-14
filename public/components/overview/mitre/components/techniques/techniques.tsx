@@ -418,11 +418,6 @@ export const Techniques = withWindowSize(
       this.props.onSelectedTabChanged('dashboard');
     }
 
-    openIntelligence(e, redirectTo, itemId) {
-      this.props.onSelectedTabChanged('intelligence');
-      window.location.href = window.location + `&tabRedirect=${redirectTo}&idToRedirect=${itemId}`;
-    }
-
     /**
      * Adds a new filter with format { "filter_key" : "filter_value" }, e.g. {"agent.id": "001"}
      * @param filter
@@ -558,7 +553,6 @@ export const Techniques = withWindowSize(
                   <FlyoutTechnique
                     openDashboard={(e, itemId) => this.openDashboard(e, itemId)}
                     openDiscover={(e, itemId) => this.openDiscover(e, itemId)}
-                    openIntelligence={(e, redirectTo, itemId) => this.openIntelligence(e, redirectTo, itemId)}
                     onChangeFlyout={this.onChangeFlyout}
                     currentTechnique={currentTechnique}
                    />

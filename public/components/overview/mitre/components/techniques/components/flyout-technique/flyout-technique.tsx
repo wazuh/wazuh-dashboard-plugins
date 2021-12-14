@@ -207,7 +207,7 @@ export class FlyoutTechnique extends Component {
           >
             <EuiLink
               onClick={(e) => {
-                this.props.openIntelligence(e, 'techniques', currentTechnique);
+                AppNavigate.navigateToModule(e, 'overview', { "tab": 'mitre', "tabView": "intelligence", "tabRedirect": 'techniques', "idToRedirect": currentTechnique});
                 e.stopPropagation();
               }}
             >
@@ -228,7 +228,7 @@ export class FlyoutTechnique extends Component {
                   >
                     <EuiLink
                       onClick={(e) => {
-                        this.props.openIntelligence(e, 'tactics', tactic.id);
+                        AppNavigate.navigateToModule(e, 'overview', { "tab": 'mitre', "tabView": "intelligence", "tabRedirect": 'tactics', "idToRedirect": tactic.id});
                         e.stopPropagation();
                       }}
                     >
@@ -353,9 +353,6 @@ export class FlyoutTechnique extends Component {
                 implicitFilters={implicitFilters}
                 initialFilters={[]}
                 updateTotalHits={(total) => this.updateTotalHits(total)}
-                openIntelligence={(e, redirectTo, itemId) =>
-                  this.props.openIntelligence(e, redirectTo, itemId)
-                }
               />
             </EuiFlexItem>
           </EuiFlexGroup>
