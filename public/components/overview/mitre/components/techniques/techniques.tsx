@@ -58,7 +58,6 @@ export const Techniques = withWindowSize(
     state: {
       techniquesCount: { key: string; doc_count: number }[];
       isFlyoutVisible: Boolean;
-      currentTechniqueData: {};
       currentTechnique: string;
       hideAlerts: boolean;
       actionsOpen: string;
@@ -72,7 +71,6 @@ export const Techniques = withWindowSize(
 
       this.state = {
         isFlyoutVisible: false,
-        currentTechniqueData: {},
         techniquesCount: [],
         currentTechnique: '',
         hideAlerts: false,
@@ -502,7 +500,7 @@ export const Techniques = withWindowSize(
     }
 
     closeFlyout() {
-      this.setState({ isFlyoutVisible: false, currentTechniqueData: {} });
+      this.setState({ isFlyoutVisible: false });
     }
 
     onChangeFlyout = (isFlyoutVisible: boolean) => {
@@ -562,9 +560,8 @@ export const Techniques = withWindowSize(
                     openDiscover={(e, itemId) => this.openDiscover(e, itemId)}
                     openIntelligence={(e, redirectTo, itemId) => this.openIntelligence(e, redirectTo, itemId)}
                     onChangeFlyout={this.onChangeFlyout}
-                    currentTechniqueData={this.state.currentTechniqueData}
                     currentTechnique={currentTechnique}
-                    tacticsObject={this.props.tacticsObject} />
+                   />
                 </div>
               </EuiOutsideClickDetector>
             </EuiOverlayMask>
