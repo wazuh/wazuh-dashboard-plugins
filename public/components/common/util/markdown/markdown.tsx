@@ -11,6 +11,7 @@
  */
 import React from 'react';
 import MarkdownIt from 'markdown-it';
+import MarkdownItLinkAttributes from 'markdown-it-link-attributes';
 import classnames from 'classnames';
 
 const md = new MarkdownIt({
@@ -18,6 +19,10 @@ const md = new MarkdownIt({
   linkify: true,
   breaks: true,
   typographer: true
+}).use(MarkdownItLinkAttributes, {
+  attrs: {
+    target: '_blank'
+  }
 });
 
 interface MarkdownProps{
