@@ -54,7 +54,7 @@ export const ReferencesTable = ({referencesName, referencesArray, columns, backT
     try{
       const data = await Promise.all(namesConcatenated.map(async (nameConcatenated) => {
         const queryResult = await WzRequest.apiReq('GET', `/mitre/${referencesName}?${referencesName.replace(/s\s*$/, '')}_ids=${nameConcatenated}`, {});
-        return ((((queryResult || {}).data || {}).data || {}).affected_items || []).map((item) => ({...item, ['references.external_id']: item.references.find(reference => reference.source === 'mitre-attack')?.external_id}));  
+        return ((((queryResult || {}).data || {}).data || {}).affected_items || []);  
       }));
       setData(data.flat());  
     }

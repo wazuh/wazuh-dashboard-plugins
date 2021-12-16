@@ -24,10 +24,6 @@ const getMitreAttackIntelligenceSuggestions = (endpoint: string, field: string) 
   try{
     const response = await WzRequest.apiReq('GET', endpoint, {});
     return response?.data?.data.affected_items
-      .map(item => ({
-        ...item,
-        ['references.external_id']: item?.references?.find(reference => reference.source === 'mitre-attack')?.external_id
-      }))
       .map(item => item[field])
       .filter(item => item && item.toLowerCase().includes(input.toLowerCase()))
       .sort()
@@ -73,10 +69,10 @@ function buildResource(label: string, labelResource: string){
       },
       {
         type: 'q',
-        label: 'references.external_id',
+        label: 'external_id',
         description: `${labelResource} ID`,
         operators: ['=', '!='],
-        values: getMitreAttackIntelligenceSuggestions(endpoint, 'references.external_id')
+        values: getMitreAttackIntelligenceSuggestions(endpoint, 'external_id')
       }
     ],
     apiEndpoint: endpoint,
@@ -84,7 +80,7 @@ function buildResource(label: string, labelResource: string){
     initialSortingField: 'name',
     tableColumnsCreator: (openResourceDetails) => [
       {
-        field: 'references.external_id',
+        field: 'external_id',
         name: 'ID',
         width: '12%',
         render: (value, item) => <EuiLink onClick={() => openResourceDetails(item)}>{value}</EuiLink>
@@ -107,7 +103,7 @@ function buildResource(label: string, labelResource: string){
     mitreFlyoutHeaderProperties: [
       {
         label: 'ID',
-        id: 'references.external_id',
+        id: 'external_id',
       },
       {
         label: 'Name',

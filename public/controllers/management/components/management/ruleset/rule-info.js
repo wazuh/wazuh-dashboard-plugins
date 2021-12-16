@@ -412,7 +412,7 @@ class WzRuleInfo extends Component {
         compliance.map(async (i) => {
           const data = await WzRequest.apiReq('GET', '/mitre/techniques', {
             params: {
-              q: `references.external_id=${i}`,
+              q: `external_id=${i}`,
             },
           });
           const formattedData = (((data || {}).data.data || {}).affected_items || [])[0] || {};

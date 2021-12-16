@@ -36,7 +36,7 @@ All notable changes to the Wazuh app project will be documented in this file.
   [#3464](https://github.com/wazuh/wazuh-kibana-app/pull/3464)
   [#3478](https://github.com/wazuh/wazuh-kibana-app/pull/3478)
 - Added fields status and type in vulnerabilities table [#3196](https://github.com/wazuh/wazuh-kibana-app/pull/3196)
-- Added Intelligence tab to Mitre Att&ck module [#3368](https://github.com/wazuh/wazuh-kibana-app/pull/3368) [#3344](https://github.com/wazuh/wazuh-kibana-app/pull/3344)
+- Added Intelligence tab to Mitre Att&ck module [#3368](https://github.com/wazuh/wazuh-kibana-app/pull/3368) [#3344](https://github.com/wazuh/wazuh-kibana-app/pull/3344) [#3726](https://github.com/wazuh/wazuh-kibana-app/pull/3726)
 - Added sample data for office365 events [#3424](https://github.com/wazuh/wazuh-kibana-app/pull/3424)
 - Created a separate component to check for sample data [#3475](https://github.com/wazuh/wazuh-kibana-app/pull/3475)
 - Added a new hook for getting value suggestions [#3506](https://github.com/wazuh/wazuh-kibana-app/pull/3506)
@@ -98,9 +98,13 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed blank screen in Kibana 7.10.2 [#3700](https://github.com/wazuh/wazuh-kibana-app/pull/3700)
 - Fixed related decoder link undefined parameters error [#3704](https://github.com/wazuh/wazuh-kibana-app/pull/3704)
 - Fixing the bug of index patterns in health-check due to bad copy of a PR [#3707](https://github.com/wazuh/wazuh-kibana-app/pull/3707)
-- Fixing bug when create filename with spaces and throws a bad error [#3724](https://github.com/wazuh/wazuh-kibana-app/pull/3724)
 - Fixed styles and behaviour of button filter in the flyout of `Inventory` section for `Integrity monitoring` and `Vulnerabilities` modules [#3733](https://github.com/wazuh/wazuh-kibana-app/pull/3733)
 - Fixed height of `Evolution` card in the `Agents` section when has no data for the selected time range [#3733](https://github.com/wazuh/wazuh-kibana-app/pull/3733)
+- Fix clearing the query filter doesn't update the data in Office 365 and GitHub Panel tab [#3722](https://github.com/wazuh/wazuh-kibana-app/pull/3722)
+- Fix wrong deamons in filter list [#3710](https://github.com/wazuh/wazuh-kibana-app/pull/3710)
+- Fixing bug when create filename with spaces and throws a bad error [#3724](https://github.com/wazuh/wazuh-kibana-app/pull/3724)
+- Fixing bug in security User flyout nonexistant unsubmitted changes warning [#3731](https://github.com/wazuh/wazuh-kibana-app/pull/3731)
+- Fixing redirect to new tab when click in a link [#3732](https://github.com/wazuh/wazuh-kibana-app/pull/3732)
 
 ## Wazuh v4.2.4 - Kibana 7.10.2 , 7.12.1, 7.13.4, 7.14.2 - Revision 4206
 
