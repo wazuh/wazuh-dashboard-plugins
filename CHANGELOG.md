@@ -100,6 +100,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixing the bug of index patterns in health-check due to bad copy of a PR [#3707](https://github.com/wazuh/wazuh-kibana-app/pull/3707)
 - Fix wrong deamons in filter list [#3710](https://github.com/wazuh/wazuh-kibana-app/pull/3710)
 - Fixing bug when create filename with spaces and throws a bad error [#3724](https://github.com/wazuh/wazuh-kibana-app/pull/3724)
+- Fixing bug in security User flyout nonexistant unsubmitted changes warning [#3731](https://github.com/wazuh/wazuh-kibana-app/pull/3731)
 - Fixing redirect to new tab when click in a link [#3732](https://github.com/wazuh/wazuh-kibana-app/pull/3732)
 
 ## Wazuh v4.2.4 - Kibana 7.10.2 , 7.12.1, 7.13.4, 7.14.2 - Revision 4206
