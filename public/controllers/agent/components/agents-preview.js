@@ -380,7 +380,7 @@ export const AgentsPreview = compose(
                     paddingSize="none"
                     betaBadgeLabel="Evolution"
                     style={{
-                      height: 180,
+                      height: 193,
                       display: this.props.resultState === 'none' ? 'block' : 'none',
                     }}
                   >
