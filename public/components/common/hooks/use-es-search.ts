@@ -12,7 +12,7 @@
 
 import { SetStateAction, useEffect, useState } from 'react';
 import { getDataPlugin } from '../../../kibana-services';
-import { useFilterManager, useIndexPattern, useQuery } from '.';
+import { useFilterManager, useIndexPattern, useQueryManager } from '.';
 import { IndexPattern } from 'src/plugins/data/public';
 import {
   UI_ERROR_SEVERITIES,
@@ -44,7 +44,7 @@ const useEsSearch = ({ preAppliedFilters = [], preAppliedAggs = {}, size = 10 })
   const data = getDataPlugin();
   const indexPattern = useIndexPattern();
   const {filters} = useFilterManager();
-  const [query] = useQuery();
+  const [query] = useQueryManager();
   const [esResults, setEsResults] = useState<SearchResponse>({} as SearchResponse);
   const [error, setError] = useState<Error>({} as Error);
   const [isLoading, setIsLoading] = useState<boolean>(true);
