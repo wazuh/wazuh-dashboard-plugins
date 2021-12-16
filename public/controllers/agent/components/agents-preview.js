@@ -346,7 +346,7 @@ export const AgentsPreview = compose(
                   className="agents-evolution-visualization"
                   style={{
                     display: !this.state.loading ? 'block' : 'none',
-                    height: !this.state.loading ? '182px' : 0,
+                    margin: !this.state.loading ? '12px' : 0,
                   }}
                 >
                   <EuiCard
