@@ -23,7 +23,7 @@ export const ModuleMitreAttackIntelligenceAllResources = ({ results, loading }) 
   const [details, setDetails] = useState(null);
 
   const selectResource = useCallback((item) => {
-    setDetails(({...item, ['references.external_id']: item.references.find(reference => reference.source === 'mitre-attack')?.external_id}));
+    setDetails(item);
   },[]);
 
   const closeFlyout = useCallback(() => {

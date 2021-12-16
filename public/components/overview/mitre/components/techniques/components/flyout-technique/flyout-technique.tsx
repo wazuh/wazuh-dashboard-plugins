@@ -57,9 +57,7 @@ export class FlyoutTechnique extends Component {
   };
 
   props!: {
-    currentTechniqueData: any;
     currentTechnique: string;
-    tacticsObject: any;
   };
 
   filterManager: FilterManager;
@@ -132,13 +130,21 @@ export class FlyoutTechnique extends Component {
     try {
       this.setState({ loading: true, techniqueData: {} });
       const { currentTechnique } = this.props;
-      const result = await WzRequest.apiReq('GET', '/mitre/techniques', {
+      const techniqueResponse = await WzRequest.apiReq('GET', '/mitre/techniques', {
         params: {
           q: `external_id=${currentTechnique}`
         }
       });
-      const rawData = (((result || {}).data || {}).data || {}).affected_items;
-      !!rawData && this.formatTechniqueData(rawData[0]);
+      const [techniqueData] = (((techniqueResponse || {}).data || {}).data || {}).affected_items;
+      const tacticsResponse = await WzRequest.apiReq('GET', '/mitre/tactics', {});
+      const tacticsData = (((tacticsResponse || {}).data || {}).data || {}).affected_items;
+
+      techniqueData.tactics && (techniqueData.tactics = techniqueData.tactics.map(tacticID => {
+        const tactic = tacticsData.find(tacticData => tacticData.id === tacticID);
+        return { id: tactic.external_id, name: tactic.name }
+      }));
+      const { name, mitre_version, tactics } = techniqueData;
+      this._isMount &&  this.setState({ techniqueData: { name, mitre_version, tactics }, loading: false });
     } catch (error) {
       const options = {
         context: `${FlyoutTechnique.name}.getTechniqueData`,
@@ -155,20 +161,6 @@ export class FlyoutTechnique extends Component {
       getErrorOrchestrator().handleError(options);
       this.setState({ loading: false });
     }
-  }
-
-  findTacticName(tactics) {
-    const { tacticsObject } = this.props;
-    return tactics.map((element) => {
-      const tactic = Object.values(tacticsObject).find(obj => obj.id === element);
-      return { id:tactic.external_id, name: tactic.name};
-    });
-  }
-
-  formatTechniqueData(rawData) {
-    const { tactics, name, mitre_version } = rawData;
-    const tacticsObj = this.findTacticName(tactics);
-    this.setState({ techniqueData: { name, mitre_version, tacticsObj }, loading: false });
   }
 
   renderHeader() {
@@ -215,7 +207,7 @@ export class FlyoutTechnique extends Component {
           >
             <EuiLink
               onClick={(e) => {
-                this.props.openIntelligence(e, 'techniques', currentTechnique);
+                AppNavigate.navigateToModule(e, 'overview', { "tab": 'mitre', "tabView": "intelligence", "tabRedirect": 'techniques', "idToRedirect": currentTechnique});
                 e.stopPropagation();
               }}
             >
@@ -226,8 +218,8 @@ export class FlyoutTechnique extends Component {
       },
       {
         title: 'Tactics',
-        description: techniqueData.tacticsObj
-          ? techniqueData.tacticsObj.map((tactic) => {
+        description: techniqueData.tactics
+          ? techniqueData.tactics.map((tactic) => {
               return (
                 <>
                   <EuiToolTip
@@ -236,7 +228,7 @@ export class FlyoutTechnique extends Component {
                   >
                     <EuiLink
                       onClick={(e) => {
-                        this.props.openIntelligence(e, 'tactics', tactic.id);
+                        AppNavigate.navigateToModule(e, 'overview', { "tab": 'mitre', "tabView": "intelligence", "tabRedirect": 'tactics', "idToRedirect": tactic.id});
                         e.stopPropagation();
                       }}
                     >
@@ -361,9 +353,6 @@ export class FlyoutTechnique extends Component {
                 implicitFilters={implicitFilters}
                 initialFilters={[]}
                 updateTotalHits={(total) => this.updateTotalHits(total)}
-                openIntelligence={(e, redirectTo, itemId) =>
-                  this.props.openIntelligence(e, redirectTo, itemId)
-                }
               />
             </EuiFlexItem>
           </EuiFlexGroup>

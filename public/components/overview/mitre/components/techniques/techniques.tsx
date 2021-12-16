@@ -58,7 +58,6 @@ export const Techniques = withWindowSize(
     state: {
       techniquesCount: { key: string; doc_count: number }[];
       isFlyoutVisible: Boolean;
-      currentTechniqueData: {};
       currentTechnique: string;
       hideAlerts: boolean;
       actionsOpen: string;
@@ -72,7 +71,6 @@ export const Techniques = withWindowSize(
 
       this.state = {
         isFlyoutVisible: false,
-        currentTechniqueData: {},
         techniquesCount: [],
         currentTechnique: '',
         hideAlerts: false,
@@ -420,11 +418,6 @@ export const Techniques = withWindowSize(
       this.props.onSelectedTabChanged('dashboard');
     }
 
-    openIntelligence(e, redirectTo, itemId) {
-      this.props.onSelectedTabChanged('intelligence');
-      window.location.href = window.location + `&tabRedirect=${redirectTo}&idToRedirect=${itemId}`;
-    }
-
     /**
      * Adds a new filter with format { "filter_key" : "filter_value" }, e.g. {"agent.id": "001"}
      * @param filter
@@ -502,7 +495,7 @@ export const Techniques = withWindowSize(
     }
 
     closeFlyout() {
-      this.setState({ isFlyoutVisible: false, currentTechniqueData: {} });
+      this.setState({ isFlyoutVisible: false });
     }
 
     onChangeFlyout = (isFlyoutVisible: boolean) => {
@@ -560,11 +553,9 @@ export const Techniques = withWindowSize(
                   <FlyoutTechnique
                     openDashboard={(e, itemId) => this.openDashboard(e, itemId)}
                     openDiscover={(e, itemId) => this.openDiscover(e, itemId)}
-                    openIntelligence={(e, redirectTo, itemId) => this.openIntelligence(e, redirectTo, itemId)}
                     onChangeFlyout={this.onChangeFlyout}
-                    currentTechniqueData={this.state.currentTechniqueData}
                     currentTechnique={currentTechnique}
-                    tacticsObject={this.props.tacticsObject} />
+                   />
                 </div>
               </EuiOutsideClickDetector>
             </EuiOverlayMask>
