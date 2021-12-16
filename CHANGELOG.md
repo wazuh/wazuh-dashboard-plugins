@@ -36,7 +36,7 @@ All notable changes to the Wazuh app project will be documented in this file.
   [#3464](https://github.com/wazuh/wazuh-kibana-app/pull/3464)
   [#3478](https://github.com/wazuh/wazuh-kibana-app/pull/3478)
 - Added fields status and type in vulnerabilities table [#3196](https://github.com/wazuh/wazuh-kibana-app/pull/3196)
-- Added Intelligence tab to Mitre Att&ck module [#3368](https://github.com/wazuh/wazuh-kibana-app/pull/3368) [#3344](https://github.com/wazuh/wazuh-kibana-app/pull/3344)
+- Added Intelligence tab to Mitre Att&ck module [#3368](https://github.com/wazuh/wazuh-kibana-app/pull/3368) [#3344](https://github.com/wazuh/wazuh-kibana-app/pull/3344) [#3726](https://github.com/wazuh/wazuh-kibana-app/pull/3726)
 - Added sample data for office365 events [#3424](https://github.com/wazuh/wazuh-kibana-app/pull/3424)
 - Created a separate component to check for sample data [#3475](https://github.com/wazuh/wazuh-kibana-app/pull/3475)
 - Added a new hook for getting value suggestions [#3506](https://github.com/wazuh/wazuh-kibana-app/pull/3506)
