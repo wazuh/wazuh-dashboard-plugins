@@ -28,36 +28,30 @@ export class SavedObject {
    * Returns the full list of index patterns
    */
   static async getListOfIndexPatterns() {
-    try {
-      const savedObjects = await GenericRequest.request(
-        'GET',
-        `/api/saved_objects/_find?type=index-pattern&fields=title&fields=fields&per_page=9999`
+    const savedObjects = await GenericRequest.request(
+      'GET',
+      `/api/saved_objects/_find?type=index-pattern&fields=title&fields=fields&per_page=9999`
       );
       let indexPatterns = ((savedObjects || {}).data || {}).saved_objects || [];
 
-      let indexPatternsFields;
-      if(satisfyKibanaVersion('<7.11')){
-        indexPatternsFields = indexPatterns.map(indexPattern => JSON.parse(indexPattern.attributes.fields));
-      }else if(satisfyKibanaVersion('>=7.11')){
-        indexPatternsFields = await Promise.all(indexPatterns.map(async indexPattern => {
-          try{
-            const {data: {fields}} = await GenericRequest.request(
-              'GET',
-              `/api/index_patterns/_fields_for_wildcard?pattern=${indexPattern.attributes.title}`,
-              {}
-            );
-            return fields;
-          }catch(error){
-            return [];
-          }
-        }));
-      }
-      return indexPatterns.map((indexPattern, idx) => ({...indexPattern, _fields: indexPatternsFields[idx]}));
-    } catch (error) {
-      return ((error || {}).data || {}).message || false
-        ? error.data.message
-        : error.message || error;
+    let indexPatternsFields;
+    if(satisfyKibanaVersion('<7.11')){
+      indexPatternsFields = indexPatterns.map(indexPattern => indexPattern?.attributes?.fields ? JSON.parse(indexPattern.attributes.fields) : []);
+    }else if(satisfyKibanaVersion('>=7.11')){
+      indexPatternsFields = await Promise.all(indexPatterns.map(async indexPattern => {
+        try{
+          const {data: {fields}} = await GenericRequest.request(
+            'GET',
+            `/api/index_patterns/_fields_for_wildcard?pattern=${indexPattern.attributes.title}`,
+            {}
+          );
+          return fields;
+        }catch(error){
+          return [];
+        }
+      }));
     }
+    return indexPatterns.map((indexPattern, idx) => ({...indexPattern, _fields: indexPatternsFields[idx]}));
   }
 
   /**
@@ -66,30 +60,24 @@ export class SavedObject {
    * An index is valid if its fields contain at least these 4 fields: 'timestamp', 'rule.groups', 'agent.id' and 'manager.name'
    */
   static async getListOfWazuhValidIndexPatterns(defaultIndexPatterns, where) {
-    try {
-      let result = [];
-      if (where === HEALTH_CHECK) {
-        const list = await Promise.all(
-          defaultIndexPatterns.map(
-            async (pattern) => await SavedObject.getExistingIndexPattern(pattern)
-          )
-        );
-        result = this.validateIndexPatterns(list);
-      }
-
-      if (!result.length) {
-        const list = await this.getListOfIndexPatterns();
-        result = this.validateIndexPatterns(list);
-      }
-
-      return result.map((item) => {
-        return { id: item.id, title: item.attributes.title };
-      });
-    } catch (error) {
-      return ((error || {}).data || {}).message || false
-        ? error.data.message
-        : error.message || error;
+    let result = [];
+    if (where === HEALTH_CHECK) {
+      const list = await Promise.all(
+        defaultIndexPatterns.map(
+          async (pattern) => await SavedObject.getExistingIndexPattern(pattern)
+        )
+      );
+      result = this.validateIndexPatterns(list);
     }
+
+    if (!result.length) {
+      const list = await this.getListOfIndexPatterns();
+      result = this.validateIndexPatterns(list);
+    }
+
+    return result.map((item) => {
+      return { id: item.id, title: item.attributes.title };
+    });
   }
 
   static validateIndexPatterns(list) {
@@ -99,12 +87,7 @@ export class SavedObject {
       'manager.name',
       'agent.id',
     ];
-    return list.filter(item => {
-      if (item._fields) {
-        return requiredFields.every((reqField => item._fields.some(field => field.name === reqField)));
-      }
-      return false;
-    });
+    return list.filter(item => item && item._fields && requiredFields.every((reqField => item._fields.some(field => field.name === reqField))));
   }
 
   static async existsOrCreateIndexPattern(patternID) {
@@ -172,7 +155,7 @@ export class SavedObject {
       );
       let indexPatternFields;
       if(satisfyKibanaVersion('<7.11')){
-        indexPatternFields = JSON.parse(indexPatternData.data.attributes.fields);
+        indexPatternFields = indexPatternData?.data?.attributes?.fields ? JSON.parse(indexPatternData.data.attributes.fields) : [];
       }else if(satisfyKibanaVersion('>=7.11')){
         try{
           const {data: {fields}} = await GenericRequest.request(
@@ -227,7 +210,6 @@ export class SavedObject {
           },
         }
       );
-      return;
     } catch (error) {
       return ((error || {}).data || {}).message || false
         ? error.data.message
@@ -249,8 +231,6 @@ export class SavedObject {
         });
 
       await this.refreshFieldsOfIndexPattern(pattern.id, pattern.title, fields);
-
-      return;
     } catch (error) {
       console.log(error)
       return ((error || {}).data || {}).message || false

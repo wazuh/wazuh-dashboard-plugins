@@ -1,6 +1,5 @@
 {
   "id": "wazuh",
-
   "version": "4.2.5-4206-1",
   "kibanaVersion": "kibana",
   "configPath": [
@@ -18,7 +17,8 @@
     "savedObjects",
     "kibanaReact",
     "kibanaUtils",
-    "securityOss"
+    "securityOss",
+    "telemetry"
   ],
   "optionalPlugins": [
     "security",
