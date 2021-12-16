@@ -99,7 +99,7 @@ app.run([
  * Set trigger for logout
  */
 app.run(function ($rootElement) {
-  $rootElement.append(`
+    $rootElement.append(`
     <div>
       <div class="wazuhNotReadyYet"></div>
       <div ng-view class="mainView"></div>
@@ -111,6 +111,7 @@ app.run(function ($rootElement) {
   // Add plugin help links as extension to Kibana help menu
   addHelpMenuToAppChrome();
 
+  
   const urlToLogout = window.location.origin + '/logout';
 
   // Bind deleteExistentToken on Log out component.
@@ -129,7 +130,7 @@ app.run(function ($rootElement) {
           console.error('[ERROR] - User token could not be deprecated - ', err);
         })
         .finally(() => {
-          window.location.replace(urlToLogout);
+          window.location = urlToLogout;
         });
     });
   });
