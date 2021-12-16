@@ -148,7 +148,7 @@ export const AgentsPreview = compose(
             <EuiFlexItem className="agents-status-pie" grow={false}>
               <EuiCard
                 title
-                description 
+                description
                 betaBadgeLabel="Status"
                 className="eui-panel"
               >
