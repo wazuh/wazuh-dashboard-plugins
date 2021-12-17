@@ -536,7 +536,7 @@ class WzListEditor extends Component {
     const addingNew = name === false || !name;
     const listName = this.state.newListName || name;
 
-    const exportCsv = async () => {
+    const exportToCsv = async () => {
       try {
         this.setState({ generatingCsv: true });
         await exportCsv(
@@ -558,7 +558,7 @@ class WzListEditor extends Component {
         this.setState({ generatingCsv: false });
       } catch (error) {
         const options = {
-          context: `${WzListEditor.name}.exportCsv`,
+          context: `${WzListEditor.name}.exportToCsv`,
           level: UI_LOGGER_LEVELS.ERROR,
           severity: UI_ERROR_SEVERITIES.BUSINESS,
           error: {
@@ -590,7 +590,7 @@ class WzListEditor extends Component {
                       iconType="exportAction"
                       isDisabled={this.state.generatingCsv}
                       isLoading={this.state.generatingCsv}
-                      onClick={async () => exportCsv()}
+                      onClick={async () => exportToCsv()}
                     >
                       Export formatted
                     </EuiButtonEmpty>
