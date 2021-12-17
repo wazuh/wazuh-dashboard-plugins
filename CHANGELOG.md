@@ -98,6 +98,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed blank screen in Kibana 7.10.2 [#3700](https://github.com/wazuh/wazuh-kibana-app/pull/3700)
 - Fixed related decoder link undefined parameters error [#3704](https://github.com/wazuh/wazuh-kibana-app/pull/3704)
 - Fixing the bug of index patterns in health-check due to bad copy of a PR [#3707](https://github.com/wazuh/wazuh-kibana-app/pull/3707)
+- Fixed styles and behaviour of button filter in the flyout of `Inventory` section for `Integrity monitoring` and `Vulnerabilities` modules [#3733](https://github.com/wazuh/wazuh-kibana-app/pull/3733)
+- Fixed height of `Evolution` card in the `Agents` section when has no data for the selected time range [#3733](https://github.com/wazuh/wazuh-kibana-app/pull/3733)
 - Fix clearing the query filter doesn't update the data in Office 365 and GitHub Panel tab [#3722](https://github.com/wazuh/wazuh-kibana-app/pull/3722)
 - Fix wrong deamons in filter list [#3710](https://github.com/wazuh/wazuh-kibana-app/pull/3710)
 - Fixing bug when create filename with spaces and throws a bad error [#3724](https://github.com/wazuh/wazuh-kibana-app/pull/3724)
