@@ -2,7 +2,6 @@ import React, { useRef, useState, useEffect } from 'react';
 import {
   EuiButton,
   EuiTitle,
-  EuiFlyout,
   EuiFlyoutHeader,
   EuiFlyoutBody,
   EuiForm,
@@ -14,7 +13,6 @@ import {
   EuiComboBox,
   EuiFieldPassword,
   EuiOverlayMask,
-  EuiOutsideClickDetector,
   EuiConfirmModal,
   EuiPanel,
 } from '@elastic/eui';
@@ -223,10 +221,8 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
 
   useEffect(() => {
     if (
-      initialPassword != password ||
-      initialPassword != confirmPassword ||
-      !_.isEqual(userRolesFormatted, selectedRoles) ||
-      allowRunAs
+      initialPassword != password || initialPassword != confirmPassword ||
+      !_.isEqual(userRolesFormatted, selectedRoles) || allowRunAs != currentUser.allow_run_as
     ) {
       setHasChanges(true);
     } else {

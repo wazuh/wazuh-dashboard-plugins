@@ -2,7 +2,7 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v4.3.0 - Kibana 7.10.2 , 7.11.2 - Revision 4301
+## Wazuh v4.3.0 - Kibana 7.10.2 , 7.11.2, 7.13.4, 7.14.2 - Revision 4301
 
 ### Added
 
@@ -36,7 +36,7 @@ All notable changes to the Wazuh app project will be documented in this file.
   [#3464](https://github.com/wazuh/wazuh-kibana-app/pull/3464)
   [#3478](https://github.com/wazuh/wazuh-kibana-app/pull/3478)
 - Added fields status and type in vulnerabilities table [#3196](https://github.com/wazuh/wazuh-kibana-app/pull/3196)
-- Added Intelligence tab to Mitre Att&ck module [#3368](https://github.com/wazuh/wazuh-kibana-app/pull/3368) [#3344](https://github.com/wazuh/wazuh-kibana-app/pull/3344)
+- Added Intelligence tab to Mitre Att&ck module [#3368](https://github.com/wazuh/wazuh-kibana-app/pull/3368) [#3344](https://github.com/wazuh/wazuh-kibana-app/pull/3344) [#3726](https://github.com/wazuh/wazuh-kibana-app/pull/3726)
 - Added sample data for office365 events [#3424](https://github.com/wazuh/wazuh-kibana-app/pull/3424)
 - Created a separate component to check for sample data [#3475](https://github.com/wazuh/wazuh-kibana-app/pull/3475)
 - Added a new hook for getting value suggestions [#3506](https://github.com/wazuh/wazuh-kibana-app/pull/3506)
@@ -99,13 +99,19 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed related decoder link undefined parameters error [#3704](https://github.com/wazuh/wazuh-kibana-app/pull/3704)
 - Fixing Flyouts in Kibana 7.14.2 [#3708](https://github.com/wazuh/wazuh-kibana-app/pull/3708)
 - Fixing the bug of index patterns in health-check due to bad copy of a PR [#3707](https://github.com/wazuh/wazuh-kibana-app/pull/3707)
+- Fix clearing the query filter doesn't update the data in Office 365 and GitHub Panel tab [#3722](https://github.com/wazuh/wazuh-kibana-app/pull/3722)
+- Fix wrong deamons in filter list [#3710](https://github.com/wazuh/wazuh-kibana-app/pull/3710)
+- Fixing bug when create filename with spaces and throws a bad error [#3724](https://github.com/wazuh/wazuh-kibana-app/pull/3724)
+- Fixing bug in security User flyout nonexistant unsubmitted changes warning [#3731](https://github.com/wazuh/wazuh-kibana-app/pull/3731)
+- Fixing redirect to new tab when click in a link [#3732](https://github.com/wazuh/wazuh-kibana-app/pull/3732)
 
-## Wazuh v4.2.4 - Kibana 7.10.2 , 7.12.1, 7.13.4, 7.14.2 - Revision 4206
+## Wazuh v4.2.5 - Kibana 7.10.2, 7.11.2, 7.12.1, 7.13.4, 7.14.2 - Revision 4206
 
 ### Added
 
 - Support for Kibana 7.13.4
 - Support for Kibana 7.14.2
+- Hide the `telemetry` banner [#3709](https://github.com/wazuh/wazuh-kibana-app/pull/3709)
 
 ### Fixed
 
@@ -118,6 +124,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixing double flyout clicking in a policy [#3676](https://github.com/wazuh/wazuh-kibana-app/pull/3676)
 - Fixed error conflict setting kibana settings from the health check [#3678](https://github.com/wazuh/wazuh-kibana-app/pull/3678)
 - Fixed compatibility to get the valid index patterns and refresh fields for Kibana 7.10.2-7.13.4 [3681](https://github.com/wazuh/wazuh-kibana-app/pull/3681)
+- Fixed wrong redirect after login [3701](https://github.com/wazuh/wazuh-kibana-app/pull/3701)
+- Fixed error getting the index pattern data when there is not `attributes.fields` in the saved object [3689](https://github.com/wazuh/wazuh-kibana-app/pull/3698)
 
 
 ## Wazuh v4.2.4 - Kibana 7.10.2, 7.11.2, 7.12.1 - Revision 4205

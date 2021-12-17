@@ -169,11 +169,7 @@ export const ModulesDefaults = {
     tabs: [DashboardTab, EventsTab],
     availableFor: ['manager', 'agent'],
   },
-  pci: {
-    init: 'dashboard',
-    tabs: RegulatoryComplianceTabs,
-    availableFor: ['manager', 'agent'],
-  },
+
   osquery: {
     init: 'dashboard',
     tabs: [DashboardTab, EventsTab],
@@ -186,7 +182,7 @@ export const ModulesDefaults = {
   },
   pci: {
     init: 'dashboard',
-    tabs: [DashboardTab, EventsTab],
+    tabs: RegulatoryComplianceTabs,
     availableFor: ['manager', 'agent'],
   },
   hipaa: {
