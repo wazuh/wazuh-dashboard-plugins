@@ -36,8 +36,6 @@ import {
   EuiFlexItem,
   EuiFlexGroup,
   Direction,
-  EuiOverlayMask,
-  EuiOutsideClickDetector,
   EuiSpacer,
   EuiCallOut,
   EuiIcon,
@@ -388,11 +386,11 @@ export const Discover = compose(
       const range = {
         range: {
           timestamp: {
-              gte: dateParse(this.timefilter.getTime().from),
-              lte: dateParse(this.timefilter.getTime().to),
-              format: 'epoch_millis'
-            }
-          }
+            gte: dateParse(this.timefilter.getTime().from),
+            lte: dateParse(this.timefilter.getTime().to),
+            format: 'epoch_millis',
+          },
+        },
       };
       elasticQuery.bool.must.push(range);
 
