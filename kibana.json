@@ -17,14 +17,14 @@
     "savedObjects",
     "kibanaReact",
     "kibanaUtils",
-    "securityOss",
-    "telemetry"
+    "securityOss"
   ],
   "optionalPlugins": [
     "security",
     "opendistroSecurityKibana",
     "searchguard",
-    "spaces"
+    "spaces",
+    "telemetry"
   ],
   "server": true,
   "ui": true
