@@ -17,7 +17,8 @@
     "savedObjects",
     "kibanaReact",
     "kibanaUtils",
-    "securityOss"
+    "securityOss",
+    "telemetry"
   ],
   "optionalPlugins": [
     "security",

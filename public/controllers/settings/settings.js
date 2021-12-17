@@ -290,9 +290,9 @@ export class SettingsController {
   // Get settings function
   async getSettings() {
     try {
-      this.indexPatterns = await SavedObject.getListOfWazuhValidIndexPatterns();
-
-      if (!this.indexPatterns.length) {
+      try{
+        this.indexPatterns = await SavedObject.getListOfWazuhValidIndexPatterns();
+      }catch(error){
         this.wzMisc.setBlankScr('Sorry but no valid index patterns were found');
         this.$location.search('tab', null);
         this.$location.path('/blank-screen');
