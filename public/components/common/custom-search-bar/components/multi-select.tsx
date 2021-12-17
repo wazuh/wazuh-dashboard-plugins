@@ -91,7 +91,6 @@ export const MultiSelect = ({
   }, [suggestedValues, isLoading]);
 
   const setSelectedKey = (item: Item) => {
-    //fix lookahead and lookbehind for Safari browser https://github.com/wazuh/wazuh-kibana-app/issues/3740
     const label = item.label.match(/\[.+?\]/g);
     if (label) {
       return parseInt(label[0].substring(1, label[0].length - 1));
