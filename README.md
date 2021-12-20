@@ -80,7 +80,7 @@ This plugin for Kibana allows you to visualize and analyze Wazuh alerts stored i
 
 **Agent summary**
 
-![Overview](/public/asstes/app7.png)
+![Overview](/public/assets/app7.png)
 
 ## Branches
 
