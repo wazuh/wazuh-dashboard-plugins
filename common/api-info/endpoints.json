@@ -7,7 +7,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.default_controller.default_info",
         "description": "Return basic information about the API",
         "summary": "Get API info",
-        "tags": ["API Info"],
+        "tags": [
+          "API Info"
+        ],
         "query": [
           {
             "name": "pretty",
@@ -24,7 +26,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agent_controller.get_agents",
         "description": "Return information about all available agents or a list of them",
         "summary": "List agents",
-        "tags": ["Agents"],
+        "tags": [
+          "Agents"
+        ],
         "query": [
           {
             "name": "agents_list",
@@ -190,7 +194,12 @@
               "type": "array",
               "items": {
                 "type": "string",
-                "enum": ["active", "pending", "never_connected", "disconnected"]
+                "enum": [
+                  "active",
+                  "pending",
+                  "never_connected",
+                  "disconnected"
+                ]
               },
               "minItems": 1
             }
@@ -218,7 +227,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agent_controller.get_agent_config",
         "description": "Return the active configuration the agent is currently using. This can be different from the configuration present in the configuration file, if it has been modified and the agent has not been restarted yet",
         "summary": "Get active configuration",
-        "tags": ["Agents"],
+        "tags": [
+          "Agents"
+        ],
         "args": [
           {
             "name": ":agent_id",
@@ -313,7 +324,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agent_controller.get_sync_agent",
         "description": "Return whether the agent configuration has been synchronized with the agent or not. This can be useful to check after updating a group configuration",
         "summary": "Get configuration sync status",
-        "tags": ["Agents"],
+        "tags": [
+          "Agents"
+        ],
         "args": [
           {
             "name": ":agent_id",
@@ -351,7 +364,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agent_controller.get_agent_key",
         "description": "Return the key of an agent",
         "summary": "Get key",
-        "tags": ["Agents"],
+        "tags": [
+          "Agents"
+        ],
         "args": [
           {
             "name": ":agent_id",
@@ -389,7 +404,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agent_controller.get_component_stats",
         "description": "Return Wazuh's {component} statistical information from agent {agent_id}",
         "summary": "Get agent's component stats",
-        "tags": ["Agents"],
+        "tags": [
+          "Agents"
+        ],
         "args": [
           {
             "name": ":agent_id",
@@ -408,7 +425,10 @@
             "required": true,
             "schema": {
               "type": "string",
-              "enum": ["logcollector", "agent"]
+              "enum": [
+                "logcollector",
+                "agent"
+              ]
             }
           }
         ],
@@ -436,7 +456,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agent_controller.get_agent_no_group",
         "description": "Return a list with all the available agents without an assigned group",
         "summary": "List agents without group",
-        "tags": ["Agents"],
+        "tags": [
+          "Agents"
+        ],
         "query": [
           {
             "name": "limit",
@@ -516,7 +538,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agent_controller.get_agent_outdated",
         "description": "Return the list of outdated agents",
         "summary": "List outdated agents",
-        "tags": ["Agents"],
+        "tags": [
+          "Agents"
+        ],
         "query": [
           {
             "name": "limit",
@@ -585,7 +609,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agent_controller.get_agent_fields",
         "description": "Return all the different combinations that agents have for the selected fields. It also indicates the total number of agents that have each combination",
         "summary": "List agents distinct",
-        "tags": ["Agents"],
+        "tags": [
+          "Agents"
+        ],
         "query": [
           {
             "name": "fields",
@@ -665,7 +691,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agent_controller.get_agent_summary_os",
         "description": "Return a summary of the OS of available agents",
         "summary": "Summarize agents OS",
-        "tags": ["Agents"],
+        "tags": [
+          "Agents"
+        ],
         "query": [
           {
             "name": "pretty",
@@ -690,7 +718,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agent_controller.get_agent_summary_status",
         "description": "Return a summary of the status of available agents",
         "summary": "Summarize agents status",
-        "tags": ["Agents"],
+        "tags": [
+          "Agents"
+        ],
         "query": [
           {
             "name": "pretty",
@@ -715,7 +745,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agent_controller.get_agent_upgrade",
         "description": "Return the agents upgrade results",
         "summary": "Get upgrade results",
-        "tags": ["Agents"],
+        "tags": [
+          "Agents"
+        ],
         "query": [
           {
             "name": "agents_list",
@@ -731,11 +763,99 @@
             }
           },
           {
+            "name": "group",
+            "description": "Filter by group of agents",
+            "schema": {
+              "type": "string",
+              "description": "Group name",
+              "format": "group_names"
+            }
+          },
+          {
+            "name": "ip",
+            "description": "Filter by the IP used by the agent to communicate with the manager. If it's not available, it will have the same value as registerIP",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
+            "name": "manager",
+            "description": "Filter by manager hostname where agents are connected to",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
+            "name": "name",
+            "description": "Filter by name",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
+            "name": "node_name",
+            "description": "Filter by node name",
+            "schema": {
+              "type": "string",
+              "format": "names"
+            }
+          },
+          {
+            "name": "os.name",
+            "description": "Filter by OS name",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
+            "name": "os.platform",
+            "description": "Filter by OS platform",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
+            "name": "os.version",
+            "description": "Filter by OS version",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
             "name": "pretty",
             "description": "Show results in human-readable format",
             "schema": {
               "type": "boolean",
               "default": false
+            }
+          },
+          {
+            "name": "q",
+            "description": "Query to filter results by. For example q=&quot;status=active&quot;",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "registerIP",
+            "description": "Filter by the IP used when registering the agent",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
+            "name": "version",
+            "description": "Filter by agents version",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
             }
           },
           {
@@ -753,7 +873,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.ciscat_controller.get_agents_ciscat_results",
         "description": "Return the agent's ciscat results info",
         "summary": "Get results",
-        "tags": ["Ciscat"],
+        "tags": [
+          "Ciscat"
+        ],
         "args": [
           {
             "name": ":agent_id",
@@ -915,7 +1037,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_configuration_node",
         "description": "Return wazuh configuration used in node {node_id}. The 'section' and 'field' parameters will be ignored if 'raw' parameter is provided.",
         "summary": "Get node config",
-        "tags": ["Cluster"],
+        "tags": [
+          "Cluster"
+        ],
         "args": [
           {
             "name": ":node_id",
@@ -1008,7 +1132,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_node_config",
         "description": "Return the requested configuration in JSON format for the specified node",
         "summary": "Get node active configuration",
-        "tags": ["Cluster"],
+        "tags": [
+          "Cluster"
+        ],
         "args": [
           {
             "name": ":component",
@@ -1101,7 +1227,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_info_node",
         "description": "Return basic information about a specified node such as version, compilation date, installation path",
         "summary": "Get node info",
-        "tags": ["Cluster"],
+        "tags": [
+          "Cluster"
+        ],
         "args": [
           {
             "name": ":node_id",
@@ -1137,7 +1265,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_log_node",
         "description": "Return the last 2000 wazuh log entries in the specified node",
         "summary": "Get node logs",
-        "tags": ["Cluster"],
+        "tags": [
+          "Cluster"
+        ],
         "args": [
           {
             "name": ":node_id",
@@ -1155,7 +1285,14 @@
             "description": "Filter by log level",
             "schema": {
               "type": "string",
-              "enum": ["critical", "debug", "debug2", "error", "info", "warning"]
+              "enum": [
+                "critical",
+                "debug",
+                "debug2",
+                "error",
+                "info",
+                "warning"
+              ]
             }
           },
           {
@@ -1264,7 +1401,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_log_summary_node",
         "description": "Return a summary of the last 2000 wazuh log entries in the specified node",
         "summary": "Get node logs summary",
-        "tags": ["Cluster"],
+        "tags": [
+          "Cluster"
+        ],
         "args": [
           {
             "name": ":node_id",
@@ -1300,7 +1439,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_stats_node",
         "description": "Return Wazuh statistical information in node {node_id} for the current or specified date",
         "summary": "Get node stats",
-        "tags": ["Cluster"],
+        "tags": [
+          "Cluster"
+        ],
         "args": [
           {
             "name": ":node_id",
@@ -1344,7 +1485,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_stats_analysisd_node",
         "description": "Return Wazuh analysisd statistical information in node {node_id}",
         "summary": "Get node stats analysisd",
-        "tags": ["Cluster"],
+        "tags": [
+          "Cluster"
+        ],
         "args": [
           {
             "name": ":node_id",
@@ -1380,7 +1523,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_stats_hourly_node",
         "description": "Return Wazuh statistical information in node {node_id} per hour. Each number in the averages field represents the average of alerts per hour",
         "summary": "Get node stats hour",
-        "tags": ["Cluster"],
+        "tags": [
+          "Cluster"
+        ],
         "args": [
           {
             "name": ":node_id",
@@ -1416,7 +1561,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_stats_remoted_node",
         "description": "Return Wazuh remoted statistical information in node {node_id}",
         "summary": "Get node stats remoted",
-        "tags": ["Cluster"],
+        "tags": [
+          "Cluster"
+        ],
         "args": [
           {
             "name": ":node_id",
@@ -1452,7 +1599,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_stats_weekly_node",
         "description": "Return Wazuh statistical information in node {node_id} per week. Each number in the averages field represents the average of alerts per hour for that specific day",
         "summary": "Get node stats week",
-        "tags": ["Cluster"],
+        "tags": [
+          "Cluster"
+        ],
         "args": [
           {
             "name": ":node_id",
@@ -1488,7 +1637,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_status_node",
         "description": "Return the status of all Wazuh daemons in node node_id",
         "summary": "Get node status",
-        "tags": ["Cluster"],
+        "tags": [
+          "Cluster"
+        ],
         "args": [
           {
             "name": ":node_id",
@@ -1524,7 +1675,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_api_config",
         "description": "Return the API configuration of all nodes (or a list of them) in JSON format",
         "summary": "Get nodes API config",
-        "tags": ["Cluster"],
+        "tags": [
+          "Cluster"
+        ],
         "query": [
           {
             "name": "nodes_list",
@@ -1559,7 +1712,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_conf_validation",
         "description": "Return whether the Wazuh configuration is correct or not in all cluster nodes or a list of them",
         "summary": "Check nodes config",
-        "tags": ["Cluster"],
+        "tags": [
+          "Cluster"
+        ],
         "query": [
           {
             "name": "nodes_list",
@@ -1594,7 +1749,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_healthcheck",
         "description": "Return cluster healthcheck information for all nodes or a list of them. Such information includes last keep alive, last synchronization time and number of agents reporting on each node",
         "summary": "Get nodes healthcheck",
-        "tags": ["Cluster"],
+        "tags": [
+          "Cluster"
+        ],
         "query": [
           {
             "name": "nodes_list",
@@ -1629,7 +1786,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_config",
         "description": "Return the current node cluster configuration",
         "summary": "Get local node config",
-        "tags": ["Cluster"],
+        "tags": [
+          "Cluster"
+        ],
         "query": [
           {
             "name": "pretty",
@@ -1654,7 +1813,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_cluster_node",
         "description": "Return basic information about the cluster node receiving the request",
         "summary": "Get local node info",
-        "tags": ["Cluster"],
+        "tags": [
+          "Cluster"
+        ],
         "query": [
           {
             "name": "pretty",
@@ -1679,7 +1840,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_cluster_nodes",
         "description": "Get information about all nodes in the cluster or a list of them",
         "summary": "Get nodes info",
-        "tags": ["Cluster"],
+        "tags": [
+          "Cluster"
+        ],
         "query": [
           {
             "name": "limit",
@@ -1759,7 +1922,10 @@
             "description": "Filter by node type",
             "schema": {
               "type": "string",
-              "enum": ["worker", "master"]
+              "enum": [
+                "worker",
+                "master"
+              ]
             }
           },
           {
@@ -1777,7 +1943,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_status",
         "description": "Return information about the cluster status",
         "summary": "Get cluster status",
-        "tags": ["Cluster"],
+        "tags": [
+          "Cluster"
+        ],
         "query": [
           {
             "name": "pretty",
@@ -1802,7 +1970,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.decoder_controller.get_decoders",
         "description": "Return information about all decoders included in ossec.conf. This information include decoder's route, decoder's name, decoder's file among others",
         "summary": "List decoders",
-        "tags": ["Decoders"],
+        "tags": [
+          "Decoders"
+        ],
         "query": [
           {
             "name": "decoder_names",
@@ -1902,7 +2072,11 @@
             "description": "Filter by list status. Use commas to enter multiple statuses",
             "schema": {
               "type": "string",
-              "enum": ["enabled", "disabled", "all"],
+              "enum": [
+                "enabled",
+                "disabled",
+                "all"
+              ],
               "minItems": 1
             }
           },
@@ -1921,7 +2095,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.decoder_controller.get_decoders_files",
         "description": "Return information about all decoders files used in Wazuh. This information include decoder's file, decoder's route and decoder's status among others",
         "summary": "Get files",
-        "tags": ["Decoders"],
+        "tags": [
+          "Decoders"
+        ],
         "query": [
           {
             "name": "filename",
@@ -1992,7 +2168,11 @@
             "description": "Filter by list status. Use commas to enter multiple statuses",
             "schema": {
               "type": "string",
-              "enum": ["enabled", "disabled", "all"],
+              "enum": [
+                "enabled",
+                "disabled",
+                "all"
+              ],
               "minItems": 1
             }
           },
@@ -2011,7 +2191,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.decoder_controller.get_file",
         "description": "Get the content of a specified decoder file",
         "summary": "Get decoders file content",
-        "tags": ["Decoders"],
+        "tags": [
+          "Decoders"
+        ],
         "args": [
           {
             "name": ":filename",
@@ -2055,7 +2237,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.decoder_controller.get_decoders_parents",
         "description": "Return information about all parent decoders. A parent decoder is a decoder used as base of other decoders",
         "summary": "Get parent decoders",
-        "tags": ["Decoders"],
+        "tags": [
+          "Decoders"
+        ],
         "query": [
           {
             "name": "limit",
@@ -2128,7 +2312,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.experimental_controller.get_cis_cat_results",
         "description": "Return CIS-CAT results for all agents or a list of them",
         "summary": "Get agents CIS-CAT results",
-        "tags": ["Experimental"],
+        "tags": [
+          "Experimental"
+        ],
         "query": [
           {
             "name": "agents_list",
@@ -2283,7 +2469,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.experimental_controller.get_hardware_info",
         "description": "Return all agents (or a list of them) hardware info. This information include cpu, ram, scan info among others of all agents",
         "summary": "Get agents hardware",
-        "tags": ["Experimental"],
+        "tags": [
+          "Experimental"
+        ],
         "query": [
           {
             "name": "agents_list",
@@ -2420,7 +2608,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.experimental_controller.get_hotfixes_info",
         "description": "Return all agents (or a list of them) hotfixes info",
         "summary": "Get agents hotfixes",
-        "tags": ["Experimental"],
+        "tags": [
+          "Experimental"
+        ],
         "query": [
           {
             "name": "agents_list",
@@ -2513,7 +2703,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.experimental_controller.get_network_address_info",
         "description": "Return all agents (or a list of them) IPv4 and IPv6 addresses associated to their network interfaces. This information include used IP protocol, interface, and IP address among others",
         "summary": "Get agents netaddr",
-        "tags": ["Experimental"],
+        "tags": [
+          "Experimental"
+        ],
         "query": [
           {
             "name": "address",
@@ -2631,7 +2823,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.experimental_controller.get_network_interface_info",
         "description": "Return all agents (or a list of them) network interfaces. This information includes rx, scan, tx info and some network information among other",
         "summary": "Get agents netiface",
-        "tags": ["Experimental"],
+        "tags": [
+          "Experimental"
+        ],
         "query": [
           {
             "name": "adapter",
@@ -2830,7 +3024,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.experimental_controller.get_network_protocol_info",
         "description": "Return all agents (or a list of them) routing configuration for each network interface. This information includes interface, type protocol information among other",
         "summary": "Get agents netproto",
-        "tags": ["Experimental"],
+        "tags": [
+          "Experimental"
+        ],
         "query": [
           {
             "name": "agents_list",
@@ -2851,7 +3047,12 @@
             "schema": {
               "type": "string",
               "description": "DHCP status",
-              "enum": ["enabled", "disabled", "unknown", "BOOTP"]
+              "enum": [
+                "enabled",
+                "disabled",
+                "unknown",
+                "BOOTP"
+              ]
             }
           },
           {
@@ -2949,7 +3150,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.experimental_controller.get_os_info",
         "description": "Return all agents (or a list of them) OS info. This information includes os information, architecture information among other",
         "summary": "Get agents OS",
-        "tags": ["Experimental"],
+        "tags": [
+          "Experimental"
+        ],
         "query": [
           {
             "name": "agents_list",
@@ -3075,7 +3278,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.experimental_controller.get_packages_info",
         "description": "Return all agents (or a list of them) packages info. This information includes name, section, size, and priority information of all packages among other",
         "summary": "Get agents packages",
-        "tags": ["Experimental"],
+        "tags": [
+          "Experimental"
+        ],
         "query": [
           {
             "name": "agents_list",
@@ -3199,7 +3404,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.experimental_controller.get_ports_info",
         "description": "Return all agents (or a list of them) ports info. This information includes local IP, Remote IP, protocol information among other",
         "summary": "Get agents ports",
-        "tags": ["Experimental"],
+        "tags": [
+          "Experimental"
+        ],
         "query": [
           {
             "name": "agents_list",
@@ -3349,7 +3556,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.experimental_controller.get_processes_info",
         "description": "Return all agents (or a list of them) processes info",
         "summary": "Get agents processes",
-        "tags": ["Experimental"],
+        "tags": [
+          "Experimental"
+        ],
         "query": [
           {
             "name": "agents_list",
@@ -3547,7 +3756,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agent_controller.get_list_group",
         "description": "Get information about all groups or a list of them. Returns a list containing basic information about each group such as number of agents belonging to the group and the checksums of the configuration and shared files",
         "summary": "Get groups",
-        "tags": ["Groups"],
+        "tags": [
+          "Groups"
+        ],
         "query": [
           {
             "name": "groups_list",
@@ -3642,7 +3853,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agent_controller.get_agents_in_group",
         "description": "Return the list of agents that belong to the specified group",
         "summary": "Get agents in a group",
-        "tags": ["Groups"],
+        "tags": [
+          "Groups"
+        ],
         "args": [
           {
             "name": ":group_id",
@@ -3726,7 +3939,12 @@
               "type": "array",
               "items": {
                 "type": "string",
-                "enum": ["active", "pending", "never_connected", "disconnected"]
+                "enum": [
+                  "active",
+                  "pending",
+                  "never_connected",
+                  "disconnected"
+                ]
               },
               "minItems": 1
             }
@@ -3746,7 +3964,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agent_controller.get_group_config",
         "description": "Return the group configuration defined in the `agent.conf` file",
         "summary": "Get group configuration",
-        "tags": ["Groups"],
+        "tags": [
+          "Groups"
+        ],
         "args": [
           {
             "name": ":group_id",
@@ -3804,7 +4024,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agent_controller.get_group_files",
         "description": "Return the files placed under the group directory",
         "summary": "Get group files",
-        "tags": ["Groups"],
+        "tags": [
+          "Groups"
+        ],
         "args": [
           {
             "name": ":group_id",
@@ -3899,7 +4121,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agent_controller.get_group_file_json",
         "description": "Return the content of the specified group file parsed to JSON",
         "summary": "Get a file in group",
-        "tags": ["Groups"],
+        "tags": [
+          "Groups"
+        ],
         "args": [
           {
             "name": ":file_name",
@@ -3937,7 +4161,12 @@
               "type": "array",
               "items": {
                 "type": "string",
-                "enum": ["conf", "rootkit_files", "rootkit_trojans", "rcl"]
+                "enum": [
+                  "conf",
+                  "rootkit_files",
+                  "rootkit_trojans",
+                  "rcl"
+                ]
               }
             }
           },
@@ -3956,7 +4185,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agent_controller.get_group_file_xml",
         "description": "Return the contents of the specified group file parsed to XML",
         "summary": "Get a file in group",
-        "tags": ["Groups"],
+        "tags": [
+          "Groups"
+        ],
         "args": [
           {
             "name": ":file_name",
@@ -3994,7 +4225,12 @@
               "type": "array",
               "items": {
                 "type": "string",
-                "enum": ["conf", "rootkit_files", "rootkit_trojans", "rcl"]
+                "enum": [
+                  "conf",
+                  "rootkit_files",
+                  "rootkit_trojans",
+                  "rcl"
+                ]
               }
             }
           },
@@ -4013,7 +4249,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cdb_list_controller.get_lists",
         "description": "Return the contents of all CDB lists. Optionally, the result can be filtered by several criteria. See available parameters for more details",
         "summary": "Get CDB lists info",
-        "tags": ["Lists"],
+        "tags": [
+          "Lists"
+        ],
         "query": [
           {
             "name": "filename",
@@ -4105,7 +4343,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cdb_list_controller.get_lists_files",
         "description": "Return the path from all CDB lists. Use this method to know all the CDB lists and their location in the filesystem relative to Wazuh installation folder",
         "summary": "Get CDB lists files",
-        "tags": ["Lists"],
+        "tags": [
+          "Lists"
+        ],
         "query": [
           {
             "name": "filename",
@@ -4186,7 +4426,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cdb_list_controller.get_file",
         "description": "Return the content of a CDB list file. Only the filename can be specified. It will be searched recursively if not found",
         "summary": "Get CDB list file content",
-        "tags": ["Lists"],
+        "tags": [
+          "Lists"
+        ],
         "args": [
           {
             "name": ":filename",
@@ -4230,7 +4472,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.manager_controller.get_api_config",
         "description": "Return the local API configuration in JSON format",
         "summary": "Get API config",
-        "tags": ["Manager"],
+        "tags": [
+          "Manager"
+        ],
         "query": [
           {
             "name": "pretty",
@@ -4255,7 +4499,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.manager_controller.get_configuration",
         "description": "Return wazuh configuration used. The 'section' and 'field' parameters will be ignored if 'raw' parameter is provided.",
         "summary": "Get configuration",
-        "tags": ["Manager"],
+        "tags": [
+          "Manager"
+        ],
         "query": [
           {
             "name": "field",
@@ -4337,7 +4583,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.manager_controller.get_manager_config_ondemand",
         "description": "Return the requested active configuration in JSON format",
         "summary": "Get active configuration",
-        "tags": ["Manager"],
+        "tags": [
+          "Manager"
+        ],
         "args": [
           {
             "name": ":component",
@@ -4421,7 +4669,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.manager_controller.get_conf_validation",
         "description": "Return whether the Wazuh configuration is correct",
         "summary": "Check config",
-        "tags": ["Manager"],
+        "tags": [
+          "Manager"
+        ],
         "query": [
           {
             "name": "pretty",
@@ -4446,7 +4696,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.manager_controller.get_info",
         "description": "Return basic information such as version, compilation date, installation path",
         "summary": "Get information",
-        "tags": ["Manager"],
+        "tags": [
+          "Manager"
+        ],
         "query": [
           {
             "name": "pretty",
@@ -4471,14 +4723,23 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.manager_controller.get_log",
         "description": "Return the last 2000 wazuh log entries",
         "summary": "Get logs",
-        "tags": ["Manager"],
+        "tags": [
+          "Manager"
+        ],
         "query": [
           {
             "name": "level",
             "description": "Filter by log level",
             "schema": {
               "type": "string",
-              "enum": ["critical", "debug", "debug2", "error", "info", "warning"]
+              "enum": [
+                "critical",
+                "debug",
+                "debug2",
+                "error",
+                "info",
+                "warning"
+              ]
             }
           },
           {
@@ -4587,7 +4848,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.manager_controller.get_log_summary",
         "description": "Return a summary of the last 2000 wazuh log entries",
         "summary": "Get logs summary",
-        "tags": ["Manager"],
+        "tags": [
+          "Manager"
+        ],
         "query": [
           {
             "name": "pretty",
@@ -4612,7 +4875,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.manager_controller.get_stats",
         "description": "Return Wazuh statistical information for the current or specified date",
         "summary": "Get stats",
-        "tags": ["Manager"],
+        "tags": [
+          "Manager"
+        ],
         "query": [
           {
             "name": "date",
@@ -4645,7 +4910,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.manager_controller.get_stats_analysisd",
         "description": "Return Wazuh analysisd statistical information",
         "summary": "Get stats analysisd",
-        "tags": ["Manager"],
+        "tags": [
+          "Manager"
+        ],
         "query": [
           {
             "name": "pretty",
@@ -4670,7 +4937,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.manager_controller.get_stats_hourly",
         "description": "Return Wazuh statistical information per hour. Each number in the averages field represents the average of alerts per hour",
         "summary": "Get stats hour",
-        "tags": ["Manager"],
+        "tags": [
+          "Manager"
+        ],
         "query": [
           {
             "name": "pretty",
@@ -4695,7 +4964,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.manager_controller.get_stats_remoted",
         "description": "Return Wazuh remoted statistical information",
         "summary": "Get stats remoted",
-        "tags": ["Manager"],
+        "tags": [
+          "Manager"
+        ],
         "query": [
           {
             "name": "pretty",
@@ -4720,7 +4991,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.manager_controller.get_stats_weekly",
         "description": "Return Wazuh statistical information per week. Each number in the averages field represents the average of alerts per hour for that specific day",
         "summary": "Get stats week",
-        "tags": ["Manager"],
+        "tags": [
+          "Manager"
+        ],
         "query": [
           {
             "name": "pretty",
@@ -4745,7 +5018,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.manager_controller.get_status",
         "description": "Return the status of all Wazuh daemons",
         "summary": "Get status",
-        "tags": ["Manager"],
+        "tags": [
+          "Manager"
+        ],
         "query": [
           {
             "name": "pretty",
@@ -4770,7 +5045,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.mitre_controller.get_groups",
         "description": "Return the groups from MITRE database",
         "summary": "Get MITRE groups",
-        "tags": ["MITRE"],
+        "tags": [
+          "MITRE"
+        ],
         "query": [
           {
             "name": "group_ids",
@@ -4861,7 +5138,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.mitre_controller.get_metadata",
         "description": "Return the metadata from MITRE database",
         "summary": "Get MITRE metadata",
-        "tags": ["MITRE"],
+        "tags": [
+          "MITRE"
+        ],
         "query": [
           {
             "name": "pretty",
@@ -4886,7 +5165,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.mitre_controller.get_mitigations",
         "description": "Return the mitigations from MITRE database",
         "summary": "Get MITRE mitigations",
-        "tags": ["MITRE"],
+        "tags": [
+          "MITRE"
+        ],
         "query": [
           {
             "name": "limit",
@@ -4977,7 +5258,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.mitre_controller.get_references",
         "description": "Return the references from MITRE database",
         "summary": "Get MITRE references",
-        "tags": ["MITRE"],
+        "tags": [
+          "MITRE"
+        ],
         "query": [
           {
             "name": "limit",
@@ -5068,7 +5351,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.mitre_controller.get_software",
         "description": "Return the software from MITRE database",
         "summary": "Get MITRE software",
-        "tags": ["MITRE"],
+        "tags": [
+          "MITRE"
+        ],
         "query": [
           {
             "name": "limit",
@@ -5159,7 +5444,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.mitre_controller.get_tactics",
         "description": "Return the tactics from MITRE database",
         "summary": "Get MITRE tactics",
-        "tags": ["MITRE"],
+        "tags": [
+          "MITRE"
+        ],
         "query": [
           {
             "name": "limit",
@@ -5250,7 +5537,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.mitre_controller.get_techniques",
         "description": "Return the techniques from MITRE database",
         "summary": "Get MITRE techniques",
-        "tags": ["MITRE"],
+        "tags": [
+          "MITRE"
+        ],
         "query": [
           {
             "name": "limit",
@@ -5341,7 +5630,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.overview_controller.get_overview_agents",
         "description": "Return a dictionary with a full agents overview",
         "summary": "Get agents overview",
-        "tags": ["Overview"],
+        "tags": [
+          "Overview"
+        ],
         "query": [
           {
             "name": "pretty",
@@ -5366,7 +5657,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.rootcheck_controller.get_rootcheck_agent",
         "description": "Return the rootcheck database of an agent",
         "summary": "Get results",
-        "tags": ["Rootcheck"],
+        "tags": [
+          "Rootcheck"
+        ],
         "args": [
           {
             "name": ":agent_id",
@@ -5491,7 +5784,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.rootcheck_controller.get_last_scan_agent",
         "description": "Return the timestamp of the last rootcheck scan of an agent",
         "summary": "Get last scan datetime",
-        "tags": ["Rootcheck"],
+        "tags": [
+          "Rootcheck"
+        ],
         "args": [
           {
             "name": ":agent_id",
@@ -5529,7 +5824,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.rule_controller.get_rules",
         "description": "Return a list containing information about each rule such as file where it's defined, description, rule group, status, etc",
         "summary": "List rules",
-        "tags": ["Rules"],
+        "tags": [
+          "Rules"
+        ],
         "query": [
           {
             "name": "filename",
@@ -5694,7 +5991,11 @@
             "description": "Filter by list status. Use commas to enter multiple statuses",
             "schema": {
               "type": "string",
-              "enum": ["enabled", "disabled", "all"],
+              "enum": [
+                "enabled",
+                "disabled",
+                "all"
+              ],
               "minItems": 1
             }
           },
@@ -5721,7 +6022,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.rule_controller.get_rules_files",
         "description": "Return a list containing all files used to define rules and their status",
         "summary": "Get files",
-        "tags": ["Rules"],
+        "tags": [
+          "Rules"
+        ],
         "query": [
           {
             "name": "filename",
@@ -5792,7 +6095,11 @@
             "description": "Filter by list status. Use commas to enter multiple statuses",
             "schema": {
               "type": "string",
-              "enum": ["enabled", "disabled", "all"],
+              "enum": [
+                "enabled",
+                "disabled",
+                "all"
+              ],
               "minItems": 1
             }
           },
@@ -5811,7 +6118,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.rule_controller.get_file",
         "description": "Get the content of a specified rule in the ruleset",
         "summary": "Get rules file content",
-        "tags": ["Rules"],
+        "tags": [
+          "Rules"
+        ],
         "args": [
           {
             "name": ":filename",
@@ -5855,7 +6164,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.rule_controller.get_rules_groups",
         "description": "Return a list containing all rule groups names",
         "summary": "Get groups",
-        "tags": ["Rules"],
+        "tags": [
+          "Rules"
+        ],
         "query": [
           {
             "name": "limit",
@@ -5917,14 +6228,24 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.rule_controller.get_rules_requirement",
         "description": "Return all specified requirement names defined in the Wazuh ruleset",
         "summary": "Get requirements",
-        "tags": ["Rules"],
+        "tags": [
+          "Rules"
+        ],
         "args": [
           {
             "name": ":requirement",
             "required": true,
             "schema": {
               "type": "string",
-              "enum": ["pci_dss", "gdpr", "hipaa", "nist-800-53", "gpg13", "tsc", "mitre"]
+              "enum": [
+                "pci_dss",
+                "gdpr",
+                "hipaa",
+                "nist-800-53",
+                "gpg13",
+                "tsc",
+                "mitre"
+              ]
             }
           }
         ],
@@ -5989,7 +6310,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.sca_controller.get_sca_agent",
         "description": "Return the security SCA database of an agent",
         "summary": "Get results",
-        "tags": ["SCA"],
+        "tags": [
+          "SCA"
+        ],
         "args": [
           {
             "name": ":agent_id",
@@ -6093,7 +6416,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.sca_controller.get_sca_checks",
         "description": "Return the policy monitoring alerts for a given policy",
         "summary": "Get policy checks",
-        "tags": ["SCA"],
+        "tags": [
+          "SCA"
+        ],
         "args": [
           {
             "name": ":agent_id",
@@ -6293,7 +6618,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.get_rbac_actions",
         "description": "Get all RBAC actions, including the potential related resources and endpoints.",
         "summary": "List RBAC actions",
-        "tags": ["Security"],
+        "tags": [
+          "Security"
+        ],
         "query": [
           {
             "name": "endpoint",
@@ -6317,7 +6644,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.get_security_config",
         "description": "Return the security configuration in JSON format",
         "summary": "Get security config",
-        "tags": ["Security"],
+        "tags": [
+          "Security"
+        ],
         "query": [
           {
             "name": "pretty",
@@ -6342,7 +6671,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.get_policies",
         "description": "Get all policies in the system, including the administrator policy",
         "summary": "List policies",
-        "tags": ["Security"],
+        "tags": [
+          "Security"
+        ],
         "query": [
           {
             "name": "limit",
@@ -6427,7 +6758,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.get_rbac_resources",
         "description": "This method should be called to get all current defined RBAC resources.",
         "summary": "List RBAC resources",
-        "tags": ["Security"],
+        "tags": [
+          "Security"
+        ],
         "query": [
           {
             "name": "pretty",
@@ -6464,7 +6797,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.get_roles",
         "description": "For a specific list, indicate the ids separated by commas. Example: ?role_ids=1,2,3",
         "summary": "List roles",
-        "tags": ["Security"],
+        "tags": [
+          "Security"
+        ],
         "query": [
           {
             "name": "limit",
@@ -6549,7 +6884,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.get_rules",
         "description": "Get a list of security rules from the system or all of them. These rules must be mapped with roles to obtain certain access privileges. For a specific list, indicate the ids separated by commas. Example: ?rule_ids=1,2,3",
         "summary": "List security rules",
-        "tags": ["Security"],
+        "tags": [
+          "Security"
+        ],
         "query": [
           {
             "name": "limit",
@@ -6634,7 +6971,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.login_user",
         "description": "This method should be called to get an API token. This token will expire after auth_token_exp_timeout seconds (default: 900). This value can be changed using PUT /security/config",
         "summary": "Login",
-        "tags": ["Security"],
+        "tags": [
+          "Security"
+        ],
         "query": [
           {
             "name": "raw",
@@ -6651,7 +6990,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.get_users",
         "description": "Get the information of a specified user",
         "summary": "List users",
-        "tags": ["Security"],
+        "tags": [
+          "Security"
+        ],
         "query": [
           {
             "name": "limit",
@@ -6736,7 +7077,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.get_user_me",
         "description": "Get the information of the current user",
         "summary": "Get current user info",
-        "tags": ["Security"],
+        "tags": [
+          "Security"
+        ],
         "query": [
           {
             "name": "pretty",
@@ -6761,7 +7104,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.get_user_me_policies",
         "description": "Get the processed policies information for the current user",
         "summary": "Get current user processed policies",
-        "tags": ["Security"],
+        "tags": [
+          "Security"
+        ],
         "query": [
           {
             "name": "pretty",
@@ -6778,7 +7123,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.syscheck_controller.get_syscheck_agent",
         "description": "Return FIM findings in the specified agent",
         "summary": "Get results",
-        "tags": ["Syscheck"],
+        "tags": [
+          "Syscheck"
+        ],
         "args": [
           {
             "name": ":agent_id",
@@ -6798,7 +7145,10 @@
             "description": "Filter by architecture",
             "schema": {
               "type": "string",
-              "enum": ["[x32]", "[x64]"]
+              "enum": [
+                "[x32]",
+                "[x64]"
+              ]
             }
           },
           {
@@ -6925,7 +7275,11 @@
             "description": "Filter by file type. Registry_key and registry_value types are only available in Windows agents",
             "schema": {
               "type": "string",
-              "enum": ["file", "registry_key", "registry_value"]
+              "enum": [
+                "file",
+                "registry_key",
+                "registry_value"
+              ]
             }
           },
           {
@@ -6959,7 +7313,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.syscheck_controller.get_last_scan_agent",
         "description": "Return when the last syscheck scan started and ended. If the scan is still in progress the end date will be unknown",
         "summary": "Get last scan datetime",
-        "tags": ["Syscheck"],
+        "tags": [
+          "Syscheck"
+        ],
         "args": [
           {
             "name": ":agent_id",
@@ -6997,7 +7353,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.syscollector_controller.get_hardware_info",
         "description": "Return the agent's hardware info. This information include cpu, ram, scan info among others",
         "summary": "Get agent hardware",
-        "tags": ["Syscollector"],
+        "tags": [
+          "Syscollector"
+        ],
         "args": [
           {
             "name": ":agent_id",
@@ -7046,7 +7404,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.syscollector_controller.get_hotfix_info",
         "description": "Return all hotfixes installed by Microsoft(R) in Windows(R) systems (KB... fixes)",
         "summary": "Get agent hotfixes",
-        "tags": ["Syscollector"],
+        "tags": [
+          "Syscollector"
+        ],
         "args": [
           {
             "name": ":agent_id",
@@ -7146,7 +7506,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.syscollector_controller.get_network_address_info",
         "description": "Return the agent's network address info. This information include used IP protocol, interface, IP address  among others",
         "summary": "Get agent netaddr",
-        "tags": ["Syscollector"],
+        "tags": [
+          "Syscollector"
+        ],
         "args": [
           {
             "name": ":agent_id",
@@ -7279,7 +7641,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.syscollector_controller.get_network_interface_info",
         "description": "Return the agent's network interface info. This information include rx, scan, tx info and some network information among others",
         "summary": "Get agent netiface",
-        "tags": ["Syscollector"],
+        "tags": [
+          "Syscollector"
+        ],
         "args": [
           {
             "name": ":agent_id",
@@ -7484,7 +7848,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.syscollector_controller.get_network_protocol_info",
         "description": "Return the agent's routing configuration for each network interface",
         "summary": "Get agent netproto",
-        "tags": ["Syscollector"],
+        "tags": [
+          "Syscollector"
+        ],
         "args": [
           {
             "name": ":agent_id",
@@ -7505,7 +7871,12 @@
             "schema": {
               "type": "string",
               "description": "DHCP status",
-              "enum": ["enabled", "disabled", "unknown", "BOOTP"]
+              "enum": [
+                "enabled",
+                "disabled",
+                "unknown",
+                "BOOTP"
+              ]
             }
           },
           {
@@ -7610,7 +7981,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.syscollector_controller.get_os_info",
         "description": "Return the agent's OS info. This information include os information, architecture information among others of all agents",
         "summary": "Get agent OS",
-        "tags": ["Syscollector"],
+        "tags": [
+          "Syscollector"
+        ],
         "args": [
           {
             "name": ":agent_id",
@@ -7659,7 +8032,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.syscollector_controller.get_packages_info",
         "description": "Return the agent's packages info. This information include name, section, size, priority information of all packages among others",
         "summary": "Get agent packages",
-        "tags": ["Syscollector"],
+        "tags": [
+          "Syscollector"
+        ],
         "args": [
           {
             "name": ":agent_id",
@@ -7790,7 +8165,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.syscollector_controller.get_ports_info",
         "description": "Return the agent's ports info. This information include local IP, Remote IP, protocol information among others",
         "summary": "Get agent ports",
-        "tags": ["Syscollector"],
+        "tags": [
+          "Syscollector"
+        ],
         "args": [
           {
             "name": ":agent_id",
@@ -7947,7 +8324,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.syscollector_controller.get_processes_info",
         "description": "Return the agent's processes info",
         "summary": "Get agent processes",
-        "tags": ["Syscollector"],
+        "tags": [
+          "Syscollector"
+        ],
         "args": [
           {
             "name": ":agent_id",
@@ -8152,7 +8531,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.task_controller.get_tasks_status",
         "description": "Returns all available information about the specified tasks",
         "summary": "List tasks",
-        "tags": ["Tasks"],
+        "tags": [
+          "Tasks"
+        ],
         "query": [
           {
             "name": "agents_list",
@@ -8289,7 +8670,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.vulnerability_controller.get_vulnerability_agent",
         "description": "Return the vulnerabilities of an agent",
         "summary": "Get vulnerabilities",
-        "tags": ["Vulnerability"],
+        "tags": [
+          "Vulnerability"
+        ],
         "args": [
           {
             "name": ":agent_id",
@@ -8392,6 +8775,14 @@
             }
           },
           {
+            "name": "severity",
+            "description": "Filter by CVE severity",
+            "schema": {
+              "type": "string",
+              "format": "names"
+            }
+          },
+          {
             "name": "sort",
             "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
@@ -8400,11 +8791,74 @@
             }
           },
           {
+            "name": "status",
+            "description": "Filter by CVE status",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "valid",
+                "pending",
+                "obsolete"
+              ]
+            }
+          },
+          {
+            "name": "type",
+            "description": "Filter by CVE type",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "os",
+                "package"
+              ]
+            }
+          },
+          {
             "name": "version",
             "description": "Filter by CVE version",
             "schema": {
               "type": "string",
               "format": "alphanumeric_symbols"
+            }
+          },
+          {
+            "name": "wait_for_complete",
+            "description": "Disable timeout response",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ]
+      },
+      {
+        "name": "/vulnerability/:agent_id/last_scan",
+        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.vulnerability_controller.get_last_scan_agent",
+        "description": "Return when the last full and partial vulnerability scan of a specified agent ended.",
+        "summary": "Get last scan datetime",
+        "tags": [
+          "Vulnerability"
+        ],
+        "args": [
+          {
+            "name": ":agent_id",
+            "description": "Agent ID. All possible values from 000 onwards",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 3,
+              "description": "Agent ID",
+              "format": "numbers"
+            }
+          }
+        ],
+        "query": [
+          {
+            "name": "pretty",
+            "description": "Show results in human-readable format",
+            "schema": {
+              "type": "boolean",
+              "default": false
             }
           },
           {
@@ -8427,7 +8881,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.active_response_controller.run_command",
         "description": "Run an Active Response command on all agents or a list of them",
         "summary": "Run command",
-        "tags": ["Active-response"],
+        "tags": [
+          "Active-response"
+        ],
         "query": [
           {
             "name": "agents_list",
@@ -8489,7 +8945,9 @@
                 }
               }
             },
-            "required": ["command"]
+            "required": [
+              "command"
+            ]
           }
         ]
       },
@@ -8498,7 +8956,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agent_controller.put_agent_single_group",
         "description": "Assign an agent to a specified group",
         "summary": "Assign agent to group",
-        "tags": ["Agents"],
+        "tags": [
+          "Agents"
+        ],
         "args": [
           {
             "name": ":agent_id",
@@ -8553,7 +9013,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agent_controller.restart_agent",
         "description": "Restart the specified agent",
         "summary": "Restart agent",
-        "tags": ["Agents"],
+        "tags": [
+          "Agents"
+        ],
         "args": [
           {
             "name": ":agent_id",
@@ -8591,7 +9053,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agent_controller.put_multiple_agent_single_group",
         "description": "Assign all agents or a list of them to the specified group",
         "summary": "Assign agents to group",
-        "tags": ["Agents"],
+        "tags": [
+          "Agents"
+        ],
         "query": [
           {
             "name": "agents_list",
@@ -8646,7 +9110,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agent_controller.restart_agents_by_group",
         "description": "Restart all agents which belong to a given group",
         "summary": "Restart agents in group",
-        "tags": ["Agents"],
+        "tags": [
+          "Agents"
+        ],
         "args": [
           {
             "name": ":group_id",
@@ -8683,7 +9149,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agent_controller.restart_agents_by_node",
         "description": "Restart all agents which belong to a specific given node",
         "summary": "Restart agents in node",
-        "tags": ["Agents"],
+        "tags": [
+          "Agents"
+        ],
         "args": [
           {
             "name": ":node_id",
@@ -8719,7 +9187,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agent_controller.reconnect_agents",
         "description": "Force reconnect all agents or a list of them",
         "summary": "Force reconnect agents",
-        "tags": ["Agents"],
+        "tags": [
+          "Agents"
+        ],
         "query": [
           {
             "name": "agents_list",
@@ -8757,7 +9227,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agent_controller.restart_agents",
         "description": "Restart all agents or a list of them",
         "summary": "Restart agents",
-        "tags": ["Agents"],
+        "tags": [
+          "Agents"
+        ],
         "query": [
           {
             "name": "agents_list",
@@ -8793,23 +9265,24 @@
       {
         "name": "/agents/upgrade",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agent_controller.put_upgrade_agents",
-        "description": "Upgrade agents using a WPK file from online repository",
+        "description": "Upgrade agents using a WPK file from online repository. When upgrading more than 3000 agents at the same time, it's highly recommended to use the parameter `wait_for_complete` set to `true` to avoid a possible API timeout",
         "summary": "Upgrade agents",
-        "tags": ["Agents"],
+        "tags": [
+          "Agents"
+        ],
         "query": [
           {
             "name": "agents_list",
-            "description": "List of agent IDs (separated by comma), select a list of agents with size less or equal than 100",
+            "description": "List of agent IDs (separated by comma), use the keyword `all` to select all agents",
             "required": true,
             "schema": {
               "type": "array",
               "items": {
                 "type": "string",
                 "minLength": 3,
-                "description": "Agent ID",
-                "format": "numbers"
-              },
-              "maxItems": 100
+                "description": "Agent ID|all",
+                "format": "numbers_or_all"
+              }
             }
           },
           {
@@ -8821,11 +9294,99 @@
             }
           },
           {
+            "name": "group",
+            "description": "Filter by group of agents",
+            "schema": {
+              "type": "string",
+              "description": "Group name",
+              "format": "group_names"
+            }
+          },
+          {
+            "name": "ip",
+            "description": "Filter by the IP used by the agent to communicate with the manager. If it's not available, it will have the same value as registerIP",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
+            "name": "manager",
+            "description": "Filter by manager hostname where agents are connected to",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
+            "name": "name",
+            "description": "Filter by name",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
+            "name": "node_name",
+            "description": "Filter by node name",
+            "schema": {
+              "type": "string",
+              "format": "names"
+            }
+          },
+          {
+            "name": "os.name",
+            "description": "Filter by OS name",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
+            "name": "os.platform",
+            "description": "Filter by OS platform",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
+            "name": "os.version",
+            "description": "Filter by OS version",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
             "name": "pretty",
             "description": "Show results in human-readable format",
             "schema": {
               "type": "boolean",
               "default": false
+            }
+          },
+          {
+            "name": "q",
+            "description": "Query to filter results by. For example q=&quot;status=active&quot;",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "registerIP",
+            "description": "Filter by the IP used when registering the agent",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
+            "name": "upgrade_version",
+            "description": "Wazuh version to upgrade to",
+            "schema": {
+              "type": "string",
+              "format": "wazuh_version"
             }
           },
           {
@@ -8838,9 +9399,10 @@
           },
           {
             "name": "version",
-            "description": "Wazuh version to upgrade to",
+            "description": "Filter by agents version",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "alphanumeric"
             }
           },
           {
@@ -8864,23 +9426,24 @@
       {
         "name": "/agents/upgrade_custom",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agent_controller.put_upgrade_custom_agents",
-        "description": "Upgrade the agents using a local WPK file",
+        "description": "Upgrade the agents using a local WPK file. When upgrading more than 3000 agents at the same time, it's highly recommended to use the parameter `wait_for_complete` set to `true` to avoid a possible API timeout",
         "summary": "Upgrade agents custom",
-        "tags": ["Agents"],
+        "tags": [
+          "Agents"
+        ],
         "query": [
           {
             "name": "agents_list",
-            "description": "List of agent IDs (separated by comma), select a list of agents with size less or equal than 100",
+            "description": "List of agent IDs (separated by comma), use the keyword `all` to select all agents",
             "required": true,
             "schema": {
               "type": "array",
               "items": {
                 "type": "string",
                 "minLength": 3,
-                "description": "Agent ID",
-                "format": "numbers"
-              },
-              "maxItems": 100
+                "description": "Agent ID|all",
+                "format": "numbers_or_all"
+              }
             }
           },
           {
@@ -8893,8 +9456,73 @@
             }
           },
           {
+            "name": "group",
+            "description": "Filter by group of agents",
+            "schema": {
+              "type": "string",
+              "description": "Group name",
+              "format": "group_names"
+            }
+          },
+          {
             "name": "installer",
             "description": "Installation script. Default is <code>upgrade.sh</code> or <code>upgrade.bat</code> for windows agents",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
+            "name": "ip",
+            "description": "Filter by the IP used by the agent to communicate with the manager. If it's not available, it will have the same value as registerIP",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
+            "name": "manager",
+            "description": "Filter by manager hostname where agents are connected to",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
+            "name": "name",
+            "description": "Filter by name",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
+            "name": "node_name",
+            "description": "Filter by node name",
+            "schema": {
+              "type": "string",
+              "format": "names"
+            }
+          },
+          {
+            "name": "os.name",
+            "description": "Filter by OS name",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
+            "name": "os.platform",
+            "description": "Filter by OS platform",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
+            "name": "os.version",
+            "description": "Filter by OS version",
             "schema": {
               "type": "string",
               "format": "alphanumeric"
@@ -8906,6 +9534,29 @@
             "schema": {
               "type": "boolean",
               "default": false
+            }
+          },
+          {
+            "name": "q",
+            "description": "Query to filter results by. For example q=&quot;status=active&quot;",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "registerIP",
+            "description": "Filter by the IP used when registering the agent",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
+            "name": "version",
+            "description": "Filter by agents version",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
             }
           },
           {
@@ -8923,7 +9574,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.update_configuration",
         "description": "Replace wazuh configuration for the given node with the data contained in the API request",
         "summary": "Update node configuration",
-        "tags": ["Cluster"],
+        "tags": [
+          "Cluster"
+        ],
         "args": [
           {
             "name": ":node_id",
@@ -8959,7 +9612,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.put_restart",
         "description": "Restart all nodes in the cluster or a list of them",
         "summary": "Restart nodes",
-        "tags": ["Cluster"],
+        "tags": [
+          "Cluster"
+        ],
         "query": [
           {
             "name": "nodes_list",
@@ -8994,7 +9649,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.decoder_controller.put_file",
         "description": "Upload or replace a user decoder file content",
         "summary": "Update decoders file",
-        "tags": ["Decoders"],
+        "tags": [
+          "Decoders"
+        ],
         "args": [
           {
             "name": ":filename",
@@ -9038,7 +9695,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agent_controller.put_group_config",
         "description": "Update an specified group's configuration. This API call expects a full valid XML file with the shared configuration tags/syntax",
         "summary": "Update group configuration",
-        "tags": ["Groups"],
+        "tags": [
+          "Groups"
+        ],
         "args": [
           {
             "name": ":group_id",
@@ -9075,7 +9734,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cdb_list_controller.put_file",
         "description": "Replace or upload a CDB list file with the data contained in the API request",
         "summary": "Update CDB list file",
-        "tags": ["Lists"],
+        "tags": [
+          "Lists"
+        ],
         "args": [
           {
             "name": ":filename",
@@ -9119,7 +9780,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.logtest_controller.run_logtest_tool",
         "description": "Run logtest tool to check if a specified log raises any alert among other information",
         "summary": "Run logtest",
-        "tags": ["Logtest"],
+        "tags": [
+          "Logtest"
+        ],
         "query": [
           {
             "name": "pretty",
@@ -9141,7 +9804,11 @@
         "body": [
           {
             "type": "object",
-            "required": ["event", "log_format", "location"],
+            "required": [
+              "event",
+              "log_format",
+              "location"
+            ],
             "properties": {
               "token": {
                 "type": "string",
@@ -9168,7 +9835,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.manager_controller.update_configuration",
         "description": "Replace Wazuh configuration with the data contained in the API request",
         "summary": "Update Wazuh configuration",
-        "tags": ["Manager"],
+        "tags": [
+          "Manager"
+        ],
         "query": [
           {
             "name": "pretty",
@@ -9193,7 +9862,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.manager_controller.put_restart",
         "description": "Restart the wazuh manager",
         "summary": "Restart manager",
-        "tags": ["Manager"],
+        "tags": [
+          "Manager"
+        ],
         "query": [
           {
             "name": "pretty",
@@ -9218,7 +9889,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.rootcheck_controller.put_rootcheck",
         "description": "Run rootcheck scan in all agents or a list of them",
         "summary": "Run scan",
-        "tags": ["Rootcheck"],
+        "tags": [
+          "Rootcheck"
+        ],
         "query": [
           {
             "name": "agents_list",
@@ -9256,7 +9929,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.rule_controller.put_file",
         "description": "Upload or replace a user ruleset file content",
         "summary": "Update rules file",
-        "tags": ["Rules"],
+        "tags": [
+          "Rules"
+        ],
         "args": [
           {
             "name": ":filename",
@@ -9300,7 +9975,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.put_security_config",
         "description": "Update the security configuration with the data contained in the API request",
         "summary": "Update security config",
-        "tags": ["Security"],
+        "tags": [
+          "Security"
+        ],
         "query": [
           {
             "name": "pretty",
@@ -9334,7 +10011,10 @@
               "rbac_mode": {
                 "description": "RBAC mode (white/black)",
                 "type": "string",
-                "enum": ["white", "black"],
+                "enum": [
+                  "white",
+                  "black"
+                ],
                 "example": "white"
               }
             }
@@ -9346,7 +10026,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.update_policy",
         "description": "Modify a policy, at least one property must be indicated",
         "summary": "Update policy",
-        "tags": ["Security"],
+        "tags": [
+          "Security"
+        ],
         "args": [
           {
             "name": ":policy_id",
@@ -9410,7 +10092,11 @@
                     "description": "Effect of the policy"
                   }
                 },
-                "required": ["actions", "resources", "effect"]
+                "required": [
+                  "actions",
+                  "resources",
+                  "effect"
+                ]
               }
             }
           }
@@ -9421,7 +10107,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.update_role",
         "description": "Modify a role, cannot modify associated policies in this endpoint, at least one property must be indicated",
         "summary": "Update role",
-        "tags": ["Security"],
+        "tags": [
+          "Security"
+        ],
         "args": [
           {
             "name": ":role_id",
@@ -9471,7 +10159,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.update_rule",
         "description": "Modify a security rule by specifying its ID",
         "summary": "Update security rule",
-        "tags": ["Security"],
+        "tags": [
+          "Security"
+        ],
         "args": [
           {
             "name": ":rule_id",
@@ -9525,14 +10215,18 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.revoke_all_tokens",
         "description": "This method should be called to revoke all active JWT tokens",
         "summary": "Revoke JWT tokens",
-        "tags": ["Security"]
+        "tags": [
+          "Security"
+        ]
       },
       {
         "name": "/security/users/:user_id",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.update_user",
         "description": "Modify a user's password by specifying their ID",
         "summary": "Update users",
-        "tags": ["Security"],
+        "tags": [
+          "Security"
+        ],
         "args": [
           {
             "name": ":user_id",
@@ -9576,7 +10270,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.edit_run_as",
         "description": "Modify a user's allow_run_as flag by specifying their ID",
         "summary": "Enable/Disable run_as",
-        "tags": ["Security"],
+        "tags": [
+          "Security"
+        ],
         "args": [
           {
             "name": ":user_id",
@@ -9621,7 +10317,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.syscheck_controller.put_syscheck",
         "description": "Run FIM scan in all agents",
         "summary": "Run scan",
-        "tags": ["Syscheck"],
+        "tags": [
+          "Syscheck"
+        ],
         "query": [
           {
             "name": "agents_list",
@@ -9664,7 +10362,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agent_controller.add_agent",
         "description": "Add a new agent",
         "summary": "Add agent",
-        "tags": ["Agents"],
+        "tags": [
+          "Agents"
+        ],
         "query": [
           {
             "name": "pretty",
@@ -9701,9 +10401,11 @@
       {
         "name": "/agents/insert",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agent_controller.insert_agent",
-        "description": "Add an agent specifying its name, ID and IP. If an agent with the same name, the same ID or the same IP already exists, replace it using `force_time` parameter",
+        "description": "Add an agent specifying its name, ID and IP. If an agent with the same name, the same ID or the same IP already exists, replace it using the `force` parameter",
         "summary": "Add agent full",
-        "tags": ["Agents"],
+        "tags": [
+          "Agents"
+        ],
         "query": [
           {
             "name": "pretty",
@@ -9791,7 +10493,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agent_controller.post_new_agent",
         "description": "Add a new agent with name `agent_name`. This agent will use `any` as IP",
         "summary": "Add agent quick",
-        "tags": ["Agents"],
+        "tags": [
+          "Agents"
+        ],
         "query": [
           {
             "name": "agent_name",
@@ -9826,7 +10530,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agent_controller.post_group",
         "description": "Create a new group",
         "summary": "Create a group",
-        "tags": ["Groups"],
+        "tags": [
+          "Groups"
+        ],
         "query": [
           {
             "name": "pretty",
@@ -9859,7 +10565,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.add_policy",
         "description": "Add a new policy, all fields need to be specified",
         "summary": "Add policy",
-        "tags": ["Security"],
+        "tags": [
+          "Security"
+        ],
         "query": [
           {
             "name": "pretty",
@@ -9881,7 +10589,10 @@
         "body": [
           {
             "type": "object",
-            "required": ["name", "policy"],
+            "required": [
+              "name",
+              "policy"
+            ],
             "properties": {
               "name": {
                 "description": "Policy name",
@@ -9912,7 +10623,11 @@
                     "description": "Effect of the policy"
                   }
                 },
-                "required": ["actions", "resources", "effect"]
+                "required": [
+                  "actions",
+                  "resources",
+                  "effect"
+                ]
               }
             }
           }
@@ -9923,7 +10638,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.add_role",
         "description": "Add a new role, all fields need to be specified",
         "summary": "Add role",
-        "tags": ["Security"],
+        "tags": [
+          "Security"
+        ],
         "query": [
           {
             "name": "pretty",
@@ -9945,7 +10662,9 @@
         "body": [
           {
             "type": "object",
-            "required": ["name"],
+            "required": [
+              "name"
+            ],
             "properties": {
               "name": {
                 "type": "string",
@@ -9962,7 +10681,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.set_role_policy",
         "description": "Create a specified relation role-policy, one role may have multiples policies",
         "summary": "Add policies to role",
-        "tags": ["Security"],
+        "tags": [
+          "Security"
+        ],
         "args": [
           {
             "name": ":role_id",
@@ -10021,7 +10742,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.set_role_rule",
         "description": "Create a specific role-rule relation. One role may have multiple security rules",
         "summary": "Add security rules to role",
-        "tags": ["Security"],
+        "tags": [
+          "Security"
+        ],
         "args": [
           {
             "name": ":role_id",
@@ -10071,7 +10794,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.add_rule",
         "description": "Add a new security rule",
         "summary": "Add security rule",
-        "tags": ["Security"],
+        "tags": [
+          "Security"
+        ],
         "query": [
           {
             "name": "pretty",
@@ -10093,7 +10818,10 @@
         "body": [
           {
             "type": "object",
-            "required": ["name", "rule"],
+            "required": [
+              "name",
+              "rule"
+            ],
             "properties": {
               "name": {
                 "type": "string",
@@ -10114,7 +10842,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.run_as_login",
         "description": "This method should be called to get an API token using an authorization context body. This token will expire after auth_token_exp_timeout seconds (default: 900). This value can be changed using PUT /security/config",
         "summary": "Login auth_context",
-        "tags": ["Security"],
+        "tags": [
+          "Security"
+        ],
         "query": [
           {
             "name": "raw",
@@ -10137,7 +10867,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.create_user",
         "description": "Add a new API user to the system",
         "summary": "Add user",
-        "tags": ["Security"],
+        "tags": [
+          "Security"
+        ],
         "query": [
           {
             "name": "pretty",
@@ -10176,7 +10908,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.set_user_role",
         "description": "Create a specified relation role-policy, one user may have multiples roles",
         "summary": "Add roles to user",
-        "tags": ["Security"],
+        "tags": [
+          "Security"
+        ],
         "args": [
           {
             "name": ":user_id",
@@ -10240,7 +10974,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agent_controller.delete_agents",
         "description": "Delete all agents or a list of them based on optional criteria",
         "summary": "Delete agents",
-        "tags": ["Agents"],
+        "tags": [
+          "Agents"
+        ],
         "query": [
           {
             "name": "agents_list",
@@ -10369,7 +11105,13 @@
               "type": "array",
               "items": {
                 "type": "string",
-                "enum": ["all", "active", "pending", "never_connected", "disconnected"]
+                "enum": [
+                  "all",
+                  "active",
+                  "pending",
+                  "never_connected",
+                  "disconnected"
+                ]
               },
               "minItems": 1
             }
@@ -10397,7 +11139,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agent_controller.delete_single_agent_multiple_groups",
         "description": "Remove the agent from all groups or a list of them. The agent will automatically revert to the default group if it is removed from all its assigned groups",
         "summary": "Remove agent from groups",
-        "tags": ["Agents"],
+        "tags": [
+          "Agents"
+        ],
         "args": [
           {
             "name": ":agent_id",
@@ -10447,7 +11191,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agent_controller.delete_single_agent_single_group",
         "description": "Remove an agent from a specified group. If the agent belongs to several groups, only the specified group will be deleted.",
         "summary": "Remove agent from group",
-        "tags": ["Agents"],
+        "tags": [
+          "Agents"
+        ],
         "args": [
           {
             "name": ":agent_id",
@@ -10495,7 +11241,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agent_controller.delete_multiple_agent_single_group",
         "description": "Remove all agents assignment or a list of them from the specified group",
         "summary": "Remove agents from group",
-        "tags": ["Agents"],
+        "tags": [
+          "Agents"
+        ],
         "query": [
           {
             "name": "agents_list",
@@ -10544,7 +11292,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.decoder_controller.delete_file",
         "description": "Delete a specified decoder file",
         "summary": "Delete decoders file",
-        "tags": ["Decoders"],
+        "tags": [
+          "Decoders"
+        ],
         "args": [
           {
             "name": ":filename",
@@ -10621,7 +11371,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.experimental_controller.clear_syscheck_database",
         "description": "Clear the syscheck database for all agents or a list of them",
         "summary": "Clear agents FIM results",
-        "tags": ["Experimental"],
+        "tags": [
+          "Experimental"
+        ],
         "query": [
           {
             "name": "agents_list",
@@ -10660,7 +11412,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agent_controller.delete_groups",
         "description": "Delete all groups or a list of them",
         "summary": "Delete groups",
-        "tags": ["Groups"],
+        "tags": [
+          "Groups"
+        ],
         "query": [
           {
             "name": "groups_list",
@@ -10699,7 +11453,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cdb_list_controller.delete_file",
         "description": "Delete a specified CDB list file. Only the filename can be specified. It will be searched recursively if not found",
         "summary": "Delete CDB list file",
-        "tags": ["Lists"],
+        "tags": [
+          "Lists"
+        ],
         "args": [
           {
             "name": ":filename",
@@ -10735,7 +11491,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.logtest_controller.end_logtest_session",
         "description": "Delete the saved logtest session corresponding to {token}",
         "summary": "End session",
-        "tags": ["Logtest"],
+        "tags": [
+          "Logtest"
+        ],
         "args": [
           {
             "name": ":token",
@@ -10811,7 +11569,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.rule_controller.delete_file",
         "description": "Delete a specified rule file",
         "summary": "Delete rules file",
-        "tags": ["Rules"],
+        "tags": [
+          "Rules"
+        ],
         "args": [
           {
             "name": ":filename",
@@ -10847,7 +11607,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.delete_security_config",
         "description": "Replaces the security configuration with the original one",
         "summary": "Restore default security config",
-        "tags": ["Security"],
+        "tags": [
+          "Security"
+        ],
         "query": [
           {
             "name": "pretty",
@@ -10872,7 +11634,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.remove_policies",
         "description": "Delete a list of policies or all policies in the system, roles linked to policies are not going to be removed",
         "summary": "Delete policies",
-        "tags": ["Security"],
+        "tags": [
+          "Security"
+        ],
         "query": [
           {
             "name": "policy_ids",
@@ -10910,7 +11674,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.remove_roles",
         "description": "Policies linked to roles are not going to be removed",
         "summary": "Delete roles",
-        "tags": ["Security"],
+        "tags": [
+          "Security"
+        ],
         "query": [
           {
             "name": "pretty",
@@ -10948,7 +11714,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.remove_role_policy",
         "description": "Delete a specified relation role-policy",
         "summary": "Remove policies from role",
-        "tags": ["Security"],
+        "tags": [
+          "Security"
+        ],
         "args": [
           {
             "name": ":role_id",
@@ -10998,7 +11766,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.remove_role_rule",
         "description": "Delete a specific role-rule relation",
         "summary": "Remove security rules from role",
-        "tags": ["Security"],
+        "tags": [
+          "Security"
+        ],
         "args": [
           {
             "name": ":role_id",
@@ -11048,7 +11818,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.remove_rules",
         "description": "Delete a list of security rules or all security rules in the system, roles linked to rules are not going to be deleted",
         "summary": "Delete security rules",
-        "tags": ["Security"],
+        "tags": [
+          "Security"
+        ],
         "query": [
           {
             "name": "pretty",
@@ -11086,14 +11858,18 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.logout_user",
         "description": "This method should be called to invalidate all the current user's tokens",
         "summary": "Logout current user",
-        "tags": ["Security"]
+        "tags": [
+          "Security"
+        ]
       },
       {
         "name": "/security/users",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.delete_users",
         "description": "Delete a list of users by specifying their IDs",
         "summary": "Delete users",
-        "tags": ["Security"],
+        "tags": [
+          "Security"
+        ],
         "query": [
           {
             "name": "pretty",
@@ -11131,7 +11907,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.remove_user_role",
         "description": "Delete a specified relation user-roles",
         "summary": "Remove roles from user",
-        "tags": ["Security"],
+        "tags": [
+          "Security"
+        ],
         "args": [
           {
             "name": ":user_id",
@@ -11181,7 +11959,9 @@
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.syscheck_controller.delete_syscheck_agent",
         "description": "Clear file integrity monitoring scan results for a specified agent. Only available for agents < 3.12.0, it doesn't apply for more recent ones",
         "summary": "Clear results",
-        "tags": ["Syscheck"],
+        "tags": [
+          "Syscheck"
+        ],
         "args": [
           {
             "name": ":agent_id",
