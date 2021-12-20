@@ -41,3 +41,4 @@ jobs:
        with:
         name: wazuh-packages
         path: packages/*
+        
