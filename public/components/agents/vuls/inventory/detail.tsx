@@ -209,6 +209,7 @@ export class Details extends Component {
       if (!item.onlyLinux || (item.onlyLinux && this.props.agent && agentPlatform !== 'windows')) {
         let className = item.checksum ? 'detail-value detail-value-checksum' : 'detail-value';
         className += item.field === 'perm' ? ' detail-value-perm' : '';
+        className += ' wz-width-100';
         return (
           <EuiFlexItem key={idx}>
             <EuiStat
