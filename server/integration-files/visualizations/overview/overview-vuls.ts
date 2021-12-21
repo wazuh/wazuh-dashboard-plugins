@@ -156,10 +156,10 @@ export default [
             schema: 'bucket',
             params: {
               field: 'agent.id',
-              size: 1,
+              size: 100,
               order: 'desc',
               orderBy: '1',
-              otherBucket: false,
+              otherBucket: true,
               otherBucketLabel: 'Other',
               missingBucket: false,
               missingBucketLabel: 'Missing',
@@ -167,13 +167,13 @@ export default [
             },
           },
           {
-            id: '6',
+            id: '4',
             enabled: true,
             type: 'terms',
             schema: 'bucket',
             params: {
               field: 'data.vulnerability.rationale',
-              size: 1,
+              size: 10,
               order: 'desc',
               orderBy: '1',
               otherBucket: false,
@@ -200,7 +200,7 @@ export default [
               customLabel: 'Title',
             },
           },{
-            id: '7',
+            id: '6',
             enabled: true,
             type: 'terms',
             schema: 'bucket',
@@ -216,7 +216,7 @@ export default [
               customLabel: 'CVE',
             },
           },{
-            id: '8',
+            id: '7',
             enabled: true,
             type: 'terms',
             schema: 'bucket',
@@ -232,7 +232,7 @@ export default [
               customLabel: 'Name',
             },
           },{
-            id: '9',
+            id: '8',
             enabled: true,
             type: 'terms',
             schema: 'bucket',
@@ -248,7 +248,7 @@ export default [
               customLabel: 'Condition',
             },
           },{
-            id: '10',
+            id: '9',
             enabled: true,
             type: 'terms',
             schema: 'bucket',
@@ -264,7 +264,7 @@ export default [
               customLabel: 'References',
             },
           },{
-            id: '11',
+            id: '10',
             enabled: true,
             type: 'terms',
             schema: 'bucket',
