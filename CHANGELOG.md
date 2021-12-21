@@ -110,6 +110,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed missing settings in `Management/Configuration/Global configuration/Global/Main settings` [#3737](https://github.com/wazuh/wazuh-kibana-app/pull/3737)
 - Fixed `Maximum call stack size exceeded` error exporting key-value pairs of a CDB List [#3738](https://github.com/wazuh/wazuh-kibana-app/pull/3738)
 - Fixed regex lookahead and lookbehind for safari [#3741](https://github.com/wazuh/wazuh-kibana-app/pull/3741)
+- Fixed Vulnerabilities Inventory flyout details filters [#3744](https://github.com/wazuh/wazuh-kibana-app/pull/3744)
 
 ## Wazuh v4.2.5 - Kibana 7.10.2, 7.11.2, 7.12.1, 7.13.4, 7.14.2 - Revision 4206
 
