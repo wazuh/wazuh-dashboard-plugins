@@ -92,7 +92,8 @@ export class InventoryTable extends Component {
   props!: {
     filters: IFilter[];
     agent: any;
-    onTotalItemsChange: Function;
+    items: [];
+    onFiltersChange: Function;
   };
 
   constructor(props) {
@@ -216,6 +217,7 @@ export class InventoryTable extends Component {
     };
 
     const { error } = this.state;
+    const { filters, onFiltersChange } = this.props;
     const columns = this.columns();
     const selectFields =
       'select=cve,architecture,version,name,severity,cvss2_score,cvss3_score,detection_time';
@@ -231,6 +233,8 @@ export class InventoryTable extends Component {
         rowProps={getRowProps}
         error={error}
         downloadCsv={true}
+        filters={filters}
+        onFiltersChange={onFiltersChange}
       />
     );
   }
