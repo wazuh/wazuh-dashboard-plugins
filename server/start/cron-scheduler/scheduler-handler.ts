@@ -20,7 +20,7 @@ const checkKibanaStatus = async function (context) {
        'Waiting for Kibana and Elasticsearch servers to be ready...',
        'debug'
      );
- 
+
     await checkElasticsearchServer(context);
     await checkTemplate(context);
     return;
@@ -35,17 +35,17 @@ const checkKibanaStatus = async function (context) {
      }catch(error){};
   }
  }
- 
- 
+
+
  /**
   * Check Elasticsearch Server status and Kibana index presence
   */
  const checkElasticsearchServer = async function (context) {
    try {
-     const data = await context.core.elasticsearch.client.asInternalUser.indices.exists({
-       index: context.server.config.kibana.index
+     const data = await context.core.opensearch.client.asInternalUser.indices.exists({
+       index: context.server.config.opensearchDashboards.index
      });
- 
+
      return data.body;
    } catch (error) {
      log('scheduler-handler:checkElasticsearchServer', error.message || error);
@@ -72,7 +72,7 @@ const checkTemplate = async function (context) {
 
     try {
       // Check if the template already exists
-      const currentTemplate = await context.core.elasticsearch.client.asInternalUser.indices.getTemplate({
+      const currentTemplate = await context.core.opensearch.client.asInternalUser.indices.getTemplate({
         name: WAZUH_STATISTICS_TEMPLATE_NAME
       });
       // Copy already created index patterns
@@ -88,7 +88,7 @@ const checkTemplate = async function (context) {
     };
 
     // Update the statistics template
-    await context.core.elasticsearch.client.asInternalUser.indices.putTemplate({
+    await context.core.opensearch.client.asInternalUser.indices.putTemplate({
       name: WAZUH_STATISTICS_TEMPLATE_NAME,
       body: statisticsTemplate
     });

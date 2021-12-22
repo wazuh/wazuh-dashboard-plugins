@@ -7,7 +7,7 @@ const kibanaServer = process.env.KIBANA_IP || 'localhost';
 chai.should();
 
 const headers = {
-  headers: { 'kbn-xsrf': 'kibana', 'Content-Type': 'application/json' }
+  headers: { 'osd-xsrf': 'kibana', 'Content-Type': 'application/json' }
 };
 
 describe('wazuh-elastic', () => {

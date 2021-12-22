@@ -42,8 +42,8 @@ import {
   Theme,
 } from '@elastic/charts';
 
-import { i18n } from '@kbn/i18n';
-import { IUiSettingsClient } from 'kibana/public';
+import { i18n } from '@osd/i18n';
+import { IUiSettingsClient } from 'opensearch_dashboards/public';
 import { EuiChartThemeType } from '@elastic/eui/dist/eui_charts_theme';
 import { Subscription, combineLatest } from 'rxjs';
 import { getServices } from '../../../kibana_services';

@@ -20,10 +20,10 @@ export class SaveDocument {
 
   constructor(context) {
     this.context = context;
-    this.esClientInternalUser = context.core.elasticsearch.client.asInternalUser;
+    this.esClientInternalUser = context.core.opensearch.client.asInternalUser;
   }
 
-  async save(doc: object[], indexConfig: IIndexConfiguration) {    
+  async save(doc: object[], indexConfig: IIndexConfiguration) {
     const { name, creation, mapping, shards, replicas } = indexConfig;
     const index = this.addIndexPrefix(name);
     const indexCreation = `${index}-${indexDate(creation)}`;
@@ -100,7 +100,7 @@ export class SaveDocument {
       if (keys.length === 1) {
         if(key.match(/\[.*\]/)){
           return getItemArray(
-            item[key.replace(/\[.*\]/, '')], 
+            item[key.replace(/\[.*\]/, '')],
             key.match(/\[(.*)\]/)[1]
           );
         }
@@ -116,7 +116,7 @@ export class SaveDocument {
       )
       return JSON.parse(data);
     }
-    
+
     if (typeof item.data === 'object') {
       return item.data;
     }

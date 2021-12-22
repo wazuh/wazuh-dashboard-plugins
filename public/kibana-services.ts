@@ -7,8 +7,8 @@ import {
   SavedObjectsStart,
   ScopedHistory,
   ToastsStart,
-} from 'kibana/public';
-import { createGetterSetter } from '../../../src/plugins/kibana_utils/common';
+} from 'opensearch_dashboards/public';
+import { createGetterSetter } from '../../../src/plugins/opensearch_dashboards_utils/common';
 import { DataPublicPluginStart } from '../../../src/plugins/data/public';
 import { VisualizationsStart } from '../../../src/plugins/visualizations/public';
 import { NavigationPublicPluginStart } from '../../../src/plugins/navigation/public';

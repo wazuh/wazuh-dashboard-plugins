@@ -1,4 +1,4 @@
-import { PluginInitializerContext } from 'kibana/server';
+import { PluginInitializerContext } from 'opensearch_dashboards/server';
 
 import { WazuhPlugin } from './plugin';
 

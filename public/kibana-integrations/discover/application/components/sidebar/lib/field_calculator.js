@@ -18,7 +18,7 @@
  */
 
 import _ from 'lodash';
-import { i18n } from '@kbn/i18n';
+import { i18n } from '@osd/i18n';
 
 function getFieldValues(hits, field, indexPattern) {
   const name = field.name;

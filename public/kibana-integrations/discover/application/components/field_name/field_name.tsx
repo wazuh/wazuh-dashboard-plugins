@@ -19,7 +19,7 @@
 import React from 'react';
 import { EuiFlexGroup, EuiFlexItem, EuiToolTip } from '@elastic/eui';
 
-import { FieldIcon, FieldIconProps } from '../../../../../../../../src/plugins/kibana_react/public';
+import { FieldIcon, FieldIconProps } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { shortenDottedString } from '../../helpers';
 import { getFieldTypeName } from './field_type_name';
 

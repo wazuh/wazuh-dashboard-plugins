@@ -23,8 +23,8 @@ import {
   Logger,
   Plugin,
   PluginInitializerContext,
-  SharedGlobalConfig
-} from 'kibana/server';
+  SharedGlobalConfig,
+} from 'opensearch_dashboards/server';
 
 import { WazuhPluginSetup, WazuhPluginStart, PluginSetup } from './types';
 import { SecurityObj, ISecurityFactory } from './lib/security-factory';
@@ -32,11 +32,11 @@ import { setupRoutes } from './routes';
 import { jobInitializeRun, jobMonitoringRun, jobSchedulerRun, jobQueueRun } from './start';
 import { getCookieValueByName } from './lib/cookie';
 import * as ApiInterceptor  from './lib/api-interceptor';
-import { schema, TypeOf } from '@kbn/config-schema';
+import { schema, TypeOf } from '@osd/config-schema';
 import type { Observable } from 'rxjs';
 import { first } from 'rxjs/operators';
 
-declare module 'kibana/server' {
+declare module 'opensearch_dashboards/server' {
   interface RequestHandlerContext {
     wazuh: {
       logger: Logger,
@@ -68,15 +68,20 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
   public async setup(core: CoreSetup, plugins: PluginSetup) {
     this.logger.debug('Wazuh-wui: Setup');
 
+    const wazuhSecurity = await SecurityObj(plugins);
+    console.log('----------------------------------')
+    console.log('plugins: ', plugins)
+    console.log('----------------------------------')
+    console.log('----------------------------------')
+    console.log('wazuhSecurity: ', wazuhSecurity)
+    console.log('----------------------------------')
     const serverInfo = core.http.getServerInfo();
 
-    let wazuhSecurity;
-    core.http.registerRouteHandlerContext('wazuh', async(context, request) => {
-      !wazuhSecurity && (wazuhSecurity = await SecurityObj(plugins, context));
+    core.http.registerRouteHandlerContext('wazuh', (context, request) => {
       return {
         logger: this.logger,
         server: {
-          info: serverInfo, 
+          info: serverInfo,
         },
         plugins,
         security: wazuhSecurity,
@@ -127,7 +132,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
 
     // Initialize
     jobInitializeRun({
-      core, 
+      core,
       wazuh: {
         logger: this.logger.get('initialize'),
         api: wazuhApiClient
@@ -157,7 +162,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
 
     // Queue
     jobQueueRun({
-      core, 
+      core,
       wazuh: {
         logger: this.logger.get('queue'),
         api: wazuhApiClient

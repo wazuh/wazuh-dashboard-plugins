@@ -14,7 +14,7 @@
 import { ErrorResponse } from '../../lib/error-response';
 import { read } from 'read-last-lines';
 import { WAZUH_UI_LOGS_RAW_PATH } from '../../../common/constants';
-import { KibanaRequest, KibanaResponseFactory } from 'src/core/server';
+import { OpenSearchDashboardsRequest, OpenSearchDashboardsResponseFactory } from 'src/core/server';
 import uiLogger from '../../lib/ui-logger';
 
 export class UiLogsCtrl {
@@ -29,7 +29,7 @@ export class UiLogsCtrl {
    * @param {Object} response
    * @returns {Array<String>} app logs or ErrorResponse
    */
-  async getUiLogs(response: KibanaResponseFactory) {
+  async getUiLogs(response: OpenSearchDashboardsResponseFactory) {
     try {
       return uiLogger.initDirectory().then(async () => {
         if (!uiLogger.checkFileExist(WAZUH_UI_LOGS_RAW_PATH)) {
@@ -60,7 +60,7 @@ export class UiLogsCtrl {
    * @param response
    * @returns success message or ErrorResponse
    */
-  async createUiLogs(request: KibanaRequest, response: KibanaResponseFactory) {
+  async createUiLogs(request: OpenSearchDashboardsRequest, response: OpenSearchDashboardsResponseFactory) {
     try {
       const { location, message, level } = request.body;
       await uiLogger.log(location, message, level);

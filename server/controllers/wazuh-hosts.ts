@@ -15,7 +15,7 @@ import { UpdateRegistry } from '../lib/update-registry';
 import { log } from '../lib/logger';
 import { ErrorResponse } from '../lib/error-response';
 import { APIUserAllowRunAs } from '../lib/cache-api-user-has-run-as';
-import { KibanaRequest, RequestHandlerContext, KibanaResponseFactory } from 'src/core/server';
+import { OpenSearchDashboardsRequest, RequestHandlerContext, OpenSearchDashboardsResponseFactory } from 'src/core/server';
 import { WAZUH_DATA_KIBANA_BASE_ABSOLUTE_PATH } from '../../common/constants';
 
 export class WazuhHostsCtrl {
@@ -31,7 +31,7 @@ export class WazuhHostsCtrl {
    * @param {Object} response
    * API entries or ErrorResponse
    */
-  async getHostsEntries(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
+  async getHostsEntries(context: RequestHandlerContext, request: OpenSearchDashboardsRequest, response: OpenSearchDashboardsResponseFactory) {
     try {
       const removePassword = true;
       const hosts = await this.manageHosts.getHosts(removePassword);
@@ -89,7 +89,7 @@ export class WazuhHostsCtrl {
    * @param {Object} response
    * Status response or ErrorResponse
    */
-  async updateClusterInfo(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
+  async updateClusterInfo(context: RequestHandlerContext, request: OpenSearchDashboardsRequest, response: OpenSearchDashboardsResponseFactory) {
     try {
       const { id } = request.params;
       const { cluster_info } = request.body;
@@ -119,7 +119,7 @@ export class WazuhHostsCtrl {
    * @param {Object} request
    * @param {Object} response
    */
-  async removeOrphanEntries(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
+  async removeOrphanEntries(context: RequestHandlerContext, request: OpenSearchDashboardsRequest, response: OpenSearchDashboardsResponseFactory) {
     try {
       const { entries } = request.body;
       log('wazuh-hosts:cleanRegistry', 'Cleaning registry', 'debug');

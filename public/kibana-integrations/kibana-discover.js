@@ -58,7 +58,7 @@ import { Subscription, Subject, merge } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import moment from 'moment';
 import dateMath from '@elastic/datemath';
-import { i18n } from '@kbn/i18n';
+import { i18n } from '@osd/i18n';
 import { getState, splitState } from './discover/application/angular/discover_state';
 
 import { RequestAdapter } from '../../../../src/plugins/inspector/public';
@@ -83,7 +83,7 @@ import {
   search,
   UI_SETTINGS,
 } from '../../../../src/plugins/data/public';
-import { addFatalError } from '../../../../src/plugins/kibana_legacy/public';
+import { addFatalError } from '../../../../src/plugins/opensearch_dashboards_legacy/public';
 import { WAZUH_ALERTS_PATTERN } from '../../common/constants';
 import {
   DEFAULT_COLUMNS_SETTING,

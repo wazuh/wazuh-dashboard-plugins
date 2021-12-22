@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { ChromeStart, SavedObjectsClientContract, SavedObjectsFindOptions } from 'kibana/public';
+import { ChromeStart, SavedObjectsClientContract, SavedObjectsFindOptions } from 'opensearch_dashboards/public';
 import { SavedObject } from '../../../../src/plugins/saved_objects/public/types';
 import { StringsTools } from '../../utils/strings-tools';
 

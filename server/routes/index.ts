@@ -1,4 +1,4 @@
-import { IRouter } from 'kibana/server';
+import { IRouter } from 'opensearch_dashboards/server';
 import { WazuhApiRoutes } from './wazuh-api';
 import { WazuhElasticRoutes } from "./wazuh-elastic";
 import { WazuhHostsRoutes } from "./wazuh-hosts";

@@ -17,7 +17,7 @@ import { parseCron } from '../../lib/parse-cron';
 import { indexDate } from '../../lib/index-date';
 import { buildIndexSettings } from '../../lib/build-index-settings';
 import { WazuhHostsCtrl } from '../../controllers/wazuh-hosts';
-import { 
+import {
   WAZUH_MONITORING_PATTERN,
   WAZUH_INDEX_REPLICAS,
   WAZUH_MONITORING_TEMPLATE_NAME,
@@ -134,7 +134,7 @@ async function checkTemplate(context) {
 
     try {
       // Check if the template already exists
-      const currentTemplate = await context.core.elasticsearch.client.asInternalUser.indices.getTemplate({
+      const currentTemplate = await context.core.opensearch.client.asInternalUser.indices.getTemplate({
         name: WAZUH_MONITORING_TEMPLATE_NAME
       });
       // Copy already created index patterns
@@ -150,7 +150,7 @@ async function checkTemplate(context) {
     };
 
     // Update the monitoring template
-    await context.core.elasticsearch.client.asInternalUser.indices.putTemplate({
+    await context.core.opensearch.client.asInternalUser.indices.putTemplate({
       name: WAZUH_MONITORING_TEMPLATE_NAME,
       body: monitoringTemplate
     });
@@ -182,7 +182,7 @@ async function insertMonitoringDataElasticsearch(context, data) {
     };
     try {
       await tryCatchForIndexPermissionError(monitoringIndexName) (async() => {
-        const exists = await context.core.elasticsearch.client.asInternalUser.indices.exists({index: monitoringIndexName});
+        const exists = await context.core.opensearch.client.asInternalUser.indices.exists({index: monitoringIndexName});
         if(!exists.body){
           await createIndex(context, monitoringIndexName);
         };
@@ -198,7 +198,7 @@ async function insertMonitoringDataElasticsearch(context, data) {
         // To update the index settings with this client is required close the index, update the settings and open it
         // Number of shards is not dynamic so delete that setting if it's given
         delete indexConfiguration.settings.index.number_of_shards;
-        await context.core.elasticsearch.client.asInternalUser.indices.putSettings({
+        await context.core.opensearch.client.asInternalUser.indices.putSettings({
           index: monitoringIndexName,
           body: indexConfiguration
         });
@@ -236,7 +236,7 @@ async function insertDataToIndex(context, indexName: string, data: {agents: any[
         return `{ "index":  { "_index": "${indexName}" } }\n${JSON.stringify(agentInfo)}\n`;
       }).join('');
 
-      await context.core.elasticsearch.client.asInternalUser.bulk({
+      await context.core.opensearch.client.asInternalUser.bulk({
         index: indexName,
         body: bodyBulk
       });
@@ -274,7 +274,7 @@ async function createIndex(context, indexName: string) {
       }
     };
 
-    await context.core.elasticsearch.client.asInternalUser.indices.create({
+    await context.core.opensearch.client.asInternalUser.indices.create({
       index: indexName,
       body: IndexConfiguration
     });
@@ -326,8 +326,8 @@ async function checkKibanaStatus(context) {
  */
 async function checkElasticsearchServer(context) {
   try {
-    const data = await context.core.elasticsearch.client.asInternalUser.indices.exists({
-      index: context.server.config.kibana.index
+    const data = await context.core.opensearch.client.asInternalUser.indices.exists({
+      index: context.server.config.opensearchDashboards.index
     });
 
     return data.body;
@@ -380,7 +380,7 @@ async function getHostsConfiguration() {
    */
 async function cronTask(context) {
   try {
-    const templateMonitoring = await context.core.elasticsearch.client.asInternalUser.indices.getTemplate({name: WAZUH_MONITORING_TEMPLATE_NAME});
+    const templateMonitoring = await context.core.opensearch.client.asInternalUser.indices.getTemplate({name: WAZUH_MONITORING_TEMPLATE_NAME});
 
     const apiHosts = await getHostsConfiguration();
     const apiHostsUnique = (apiHosts || []).filter(
@@ -473,7 +473,7 @@ async function fetchAllAgentsFromApiHost(context, apiHost){
 
     while (agents.length < agentsCount && payload.offset < agentsCount) {
       try{
-        /* 
+        /*
         TODO: Improve the performance of request with:
           - Reduce the number of requests to the Wazuh API
           - Reduce (if possible) the quantity of data to index by document

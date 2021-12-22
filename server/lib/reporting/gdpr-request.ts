@@ -21,10 +21,10 @@ import { WAZUH_ALERTS_PATTERN } from '../../../common/constants';
  * @returns {Array<String>}
  */
 export const topGDPRRequirements = async (
-  context, 
-  gte, 
-  lte, 
-  filters, 
+  context,
+  gte,
+  lte,
+  filters,
   pattern = WAZUH_ALERTS_PATTERN
 ) => {
   if (filters.includes('rule.gdpr: exists')) {
@@ -55,7 +55,7 @@ export const topGDPRRequirements = async (
       }
     });
 
-    const response = await context.core.elasticsearch.client.asCurrentUser.search({
+    const response = await context.core.opensearch.client.asCurrentUser.search({
       index: pattern,
       body: base
     });
@@ -120,7 +120,7 @@ export const getRulesByRequirement= async (
     base.query.bool.must[0].query_string.query =
       base.query.bool.must[0].query_string.query + ` AND rule.gdpr: "${requirement}"`;
 
-    const response = await context.core.elasticsearch.client.asCurrentUser.search({
+    const response = await context.core.opensearch.client.asCurrentUser.search({
       index: pattern,
       body: base
     });

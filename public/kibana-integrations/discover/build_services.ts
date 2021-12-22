@@ -26,7 +26,7 @@ import {
   ToastsStart,
   IUiSettingsClient,
   PluginInitializerContext,
-} from 'kibana/public';
+} from 'opensearch_dashboards/public';
 import {
   FilterManager,
   TimefilterContract,
@@ -37,11 +37,11 @@ import { Start as InspectorPublicPluginStart } from '../../../../../src/plugins/
 import { SharePluginStart } from 'src/plugins/share/public';
 import { ChartsPluginStart } from 'src/plugins/charts/public';
 import { VisualizationsStart } from 'src/plugins/visualizations/public';
-import { SavedObjectKibanaServices } from 'src/plugins/saved_objects/public';
+import { SavedObjectOpenSearchDashboardsServices } from 'src/plugins/saved_objects/public';
 
 //import { createSavedSearchesLoader, SavedSearch } from './saved_searches';
 import { getHistory } from './kibana_services';
-import { KibanaLegacyStart } from '../../../../../src/plugins/kibana_legacy/public';
+import { OpenSearchDashboardsLegacyStart } from '../../../../../src/plugins/opensearch_dashboards_legacy/public';
 import { UrlForwardingStart } from '../../../../../src/plugins/url_forwarding/public';
 import { NavigationPublicPluginStart } from '../../../../../src/plugins/navigation/public';
 import { getDataPlugin, getNavigationPlugin, getVisualizationsPlugin } from '../../kibana-services';
@@ -62,7 +62,7 @@ export interface DiscoverServices {
   metadata: { branch: string };
   navigation: NavigationPublicPluginStart;
   share?: SharePluginStart;
-  kibanaLegacy: KibanaLegacyStart;
+  kibanaLegacy: OpenSearchDashboardsLegacyStart;
   urlForwarding: UrlForwardingStart;
   timefilter: TimefilterContract;
   toastNotifications: ToastsStart;
@@ -79,7 +79,7 @@ export async function buildServices(
   context: PluginInitializerContext,
   getEmbeddableInjector: any
 ): Promise<DiscoverServices> {
-/*   const services: SavedObjectKibanaServices = {
+/*   const services: SavedObjectOpenSearchDashboardsServices = {
     savedObjectsClient: core.savedObjects.client,
     indexPatterns: plugins.data.indexPatterns,
     search: plugins.data.search,

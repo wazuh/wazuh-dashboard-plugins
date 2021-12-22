@@ -1,5 +1,5 @@
 import { OpendistroFactory, XpackFactory, DefaultFactory } from './factories';
-import { KibanaRequest, RequestHandlerContext } from 'src/core/server';
+import { OpenSearchDashboardsRequest, RequestHandlerContext } from 'src/core/server';
 import { PluginSetup } from '../../types';
 
 type CurrentUser = {
@@ -9,11 +9,11 @@ type CurrentUser = {
 
 export interface ISecurityFactory {
   platform?: string;
-  getCurrentUser(request: KibanaRequest, context?: RequestHandlerContext): Promise<CurrentUser>;
+  getCurrentUser(request: OpenSearchDashboardsRequest, context?: RequestHandlerContext): Promise<CurrentUser>;
 }
 
 export async function SecurityObj(
-  { security, opendistroSecurityKibana }: PluginSetup,
+  { security, securityDashboards }: PluginSetup,
   context?: RequestHandlerContext
 ): Promise<ISecurityFactory> {
   const params = {
@@ -22,7 +22,7 @@ export async function SecurityObj(
   };
   if (!!security) {
     try {
-      const responseCurl = await context.core.elasticsearch.client.asInternalUser.transport.request(
+      const responseCurl = await context.core.opensearch.client.asInternalUser.transport.request(
         params
       );
       return new XpackFactory(security);
@@ -30,8 +30,8 @@ export async function SecurityObj(
       return new DefaultFactory();
     }
   } else {
-    return !!opendistroSecurityKibana
-      ? new OpendistroFactory(opendistroSecurityKibana)
+    return !!securityDashboards
+      ? new OpendistroFactory(securityDashboards)
       : new DefaultFactory();
   }
 }

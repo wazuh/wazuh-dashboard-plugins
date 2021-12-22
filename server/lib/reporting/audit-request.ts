@@ -69,7 +69,7 @@ export const getTop3AgentsSudoNonSuccessful = async (
       }
     });
 
-    const response = await context.core.elasticsearch.client.asCurrentUser.search({
+    const response = await context.core.opensearch.client.asCurrentUser.search({
       index: pattern,
       body: base
     });
@@ -131,7 +131,7 @@ export const getTop3AgentsFailedSyscalls = async (
       }
     });
 
-    const response = await context.core.elasticsearch.client.asCurrentUser.search({
+    const response = await context.core.opensearch.client.asCurrentUser.search({
       index: pattern,
       body: base
     });
@@ -199,7 +199,7 @@ export const getTopFailedSyscalls = async (
       }
     });
 
-    const response = await context.core.elasticsearch.client.asCurrentUser.search({
+    const response = await context.core.opensearch.client.asCurrentUser.search({
       index: pattern,
       body: base
     });

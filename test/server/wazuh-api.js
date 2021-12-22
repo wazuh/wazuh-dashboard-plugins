@@ -4,7 +4,7 @@ const needle = require('needle');
 chai.should();
 
 const headers = {
-  headers: { 'kbn-xsrf': 'kibana', 'Content-Type': 'application/json' }
+  headers: { 'osd-xsrf': 'kibana', 'Content-Type': 'application/json' }
 };
 
 let API_ID = null;

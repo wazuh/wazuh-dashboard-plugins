@@ -11,10 +11,10 @@
  */
 
 import React from 'react';
-import { I18nProvider } from '@kbn/i18n/react';
+import { I18nProvider } from '@osd/i18n/react';
 import { TimeRange, Query, Filter } from '../../../../../src/plugins/data/public';
 
-import { KibanaContextProvider } from '../../../../../src/plugins/kibana_react/public';
+import { KibanaContextProvider } from '../../../../../src/plugins/opensearch_dashboards_react/public';
 import { withKibanaContext, withKibanaContextExtendsProps } from '../common/hocs';
 import { storage } from './lib';
 import { getDataPlugin, getCore } from '../../kibana-services';

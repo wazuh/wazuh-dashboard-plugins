@@ -19,13 +19,13 @@
 
 import _ from 'lodash';
 import { createHashHistory } from 'history';
-import { ScopedHistory, AppMountParameters } from 'kibana/public';
+import { ScopedHistory, AppMountParameters } from 'opensearch_dashboards/public';
 import { UiActionsStart } from 'src/plugins/ui_actions/public';
 import { DiscoverServices } from './build_services';
-import { createGetterSetter } from '../../../../../src/plugins/kibana_utils/public';
+import { createGetterSetter } from '../../../../../src/plugins/opensearch_dashboards_utils/public';
 import { search } from '../../../../../src/plugins/data/public';
 import { DocViewsRegistry } from './application/doc_views/doc_views_registry';
-import { i18n } from '@kbn/i18n';
+import { i18n } from '@osd/i18n';
 import type { estypes } from '@elastic/elasticsearch';
 import type { ISearchSource } from 'src/plugins/data/public';
 import type { RequestStatistics } from 'src/plugins/inspector/common';
@@ -97,8 +97,8 @@ export const [getScopedHistory, setScopedHistory] = createGetterSetter<ScopedHis
 );
 
 export const { getResponseInspectorStats, tabifyAggResponse } = search;
-export { unhashUrl, redirectWhenMissing } from '../../../../../src/plugins/kibana_utils/public';
-export { formatMsg, formatStack, subscribeWithScope } from '../../../../../src/plugins/kibana_legacy/public';
+export { unhashUrl, redirectWhenMissing } from '../../../../../src/plugins/opensearch_dashboards_utils/public';
+export { formatMsg, formatStack, subscribeWithScope } from '../../../../../src/plugins/opensearch_dashboards_legacy/public';
 
 // EXPORT types
 export {
@@ -139,4 +139,4 @@ export function getRequestInspectorStats(searchSource: ISearchSource) {
   }
 
   return stats;
-} 
+}

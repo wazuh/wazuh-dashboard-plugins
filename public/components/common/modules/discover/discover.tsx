@@ -48,8 +48,8 @@ import {
   TimeRange,
   Query,
   buildPhraseFilter,
-  getEsQueryConfig,
-  buildEsQuery,
+  getOpenSearchQueryConfig,
+  buildOpenSearchQuery,
   IFieldType,
 } from '../../../../../../../src/plugins/data/common';
 import { getDataPlugin, getToasts, getUiSettings } from '../../../../kibana-services';
@@ -369,7 +369,7 @@ export const Discover = compose(
         : [];
       const previousFilters =
         (this.KibanaServices && this.KibanaServices.query.filterManager.getFilters()) || [];
-      const elasticQuery = buildEsQuery(
+      const elasticQuery = buildOpenSearchQuery(
         undefined,
         query,
         _.union(
@@ -378,7 +378,7 @@ export const Discover = compose(
           extraFilters,
           this.props.shareFilterManagerWithUserAuthorized || []
         ),
-        getEsQueryConfig(getUiSettings())
+        getOpenSearchQueryConfig(getUiSettings())
       );
 
       const { sortField, sortDirection } = this.state;

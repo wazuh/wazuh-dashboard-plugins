@@ -22,9 +22,9 @@ import { WAZUH_ALERTS_PATTERN } from '../../../common/constants';
    * @returns {Array<String>}
    */
 export const top3agents = async (
-  context, 
-  gte, 
-  lte, 
+  context,
+  gte,
+  lte,
   filters,
   pattern = WAZUH_ALERTS_PATTERN
 ) => {
@@ -54,7 +54,7 @@ export const top3agents = async (
       }
     });
 
-    const response = await context.core.elasticsearch.client.asCurrentUser.search({
+    const response = await context.core.opensearch.client.asCurrentUser.search({
       index: pattern,
       body: base
     });
@@ -108,7 +108,7 @@ export const top3Rules = async (
       }
     });
 
-    const response = await context.core.elasticsearch.client.asCurrentUser.search({
+    const response = await context.core.opensearch.client.asCurrentUser.search({
       index: pattern,
       body: base
     });
@@ -171,7 +171,7 @@ export const lastTenDeletedFiles = async (
       }
     });
 
-    const response = await context.core.elasticsearch.client.asCurrentUser.search({
+    const response = await context.core.opensearch.client.asCurrentUser.search({
       index: pattern,
       body: base
     });
@@ -224,7 +224,7 @@ export const lastTenModifiedFiles = async (
       }
     });
 
-    const response = await context.core.elasticsearch.client.asCurrentUser.search({
+    const response = await context.core.opensearch.client.asCurrentUser.search({
       index: pattern,
       body: base
     });

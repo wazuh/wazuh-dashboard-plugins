@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { ErrorToastOptions } from 'kibana/public';
+import { ErrorToastOptions } from 'opensearch_dashboards/public';
 import { WAZUH_AGENTS_OS_TYPE } from '../../common/constants';
 import { getToasts } from '../kibana-services';
 import { UnsupportedComponents } from '../utils/components-os-support';

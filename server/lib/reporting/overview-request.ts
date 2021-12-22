@@ -45,7 +45,7 @@ export const topLevel15 = async (context, gte, lte, filters, pattern = WAZUH_ALE
         }
       }
     });
-    const response = await context.core.elasticsearch.client.asCurrentUser.search({
+    const response = await context.core.opensearch.client.asCurrentUser.search({
       index: pattern,
       body: base
     });

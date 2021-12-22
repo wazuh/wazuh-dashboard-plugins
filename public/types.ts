@@ -1,4 +1,4 @@
-import { AppMountParameters, CoreStart } from 'kibana/public';
+import { AppMountParameters, CoreStart } from 'opensearch_dashboards/public';
 import { ChartsPluginStart } from '../../../src/plugins/charts/public/plugin';
 import { DiscoverStart } from '../../../src/plugins/discover/public';
 import { VisualizationsSetup, VisualizationsStart } from '../../../src/plugins/visualizations/public';
@@ -22,7 +22,7 @@ export interface AppPluginStartDependencies {
 export interface AppDependencies {
   core: CoreStart;
   plugins: AppPluginStartDependencies;
-  params: AppMountParameters;  
+  params: AppMountParameters;
 }
 
 export type WazuhSetupPlugins = {

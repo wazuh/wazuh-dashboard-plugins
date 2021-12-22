@@ -28,7 +28,7 @@ import TSC from '../integration-files/tsc-requirements-pdfmake';
 import ProcessEquivalence from '../lib/process-state-equivalence';
 import { KeyEquivalence } from '../../common/csv-key-equivalence';
 import { AgentConfiguration } from '../lib/reporting/agent-configuration';
-import { KibanaRequest, RequestHandlerContext, KibanaResponseFactory } from 'src/core/server';
+import { OpenSearchDashboardsRequest, RequestHandlerContext, OpenSearchDashboardsResponseFactory } from 'src/core/server';
 import { ReportPrinter } from '../lib/reporting/printer';
 import { log } from '../lib/logger';
 import {
@@ -77,9 +77,9 @@ export class WazuhReportingCtrl {
       str += `${
         type === 'range'
           ? `${params.gte}-${params.lt}`
-          : type === 'phrases' 
-            ? '(' + params.join(" OR ") + ')' 
-            : type === 'exists' 
+          : type === 'phrases'
+            ? '(' + params.join(" OR ") + ')'
+            : type === 'exists'
               ? '*'
               : !!value
           ? value
@@ -1129,8 +1129,8 @@ export class WazuhReportingCtrl {
    */
   async createReportsModules(
     context: RequestHandlerContext,
-    request: KibanaRequest,
-    response: KibanaResponseFactory
+    request: OpenSearchDashboardsRequest,
+    response: OpenSearchDashboardsResponseFactory
   ) {
     try {
       log('reporting:createReportsModules', `Report started`, 'info');
@@ -1214,8 +1214,8 @@ export class WazuhReportingCtrl {
    */
   async createReportsGroups(
     context: RequestHandlerContext,
-    request: KibanaRequest,
-    response: KibanaResponseFactory
+    request: OpenSearchDashboardsRequest,
+    response: OpenSearchDashboardsResponseFactory
   ) {
     try {
       log('reporting:createReportsGroups', `Report started`, 'info');
@@ -1488,8 +1488,8 @@ export class WazuhReportingCtrl {
    */
   async createReportsAgents(
     context: RequestHandlerContext,
-    request: KibanaRequest,
-    response: KibanaResponseFactory
+    request: OpenSearchDashboardsRequest,
+    response: OpenSearchDashboardsResponseFactory
   ) {
     try {
       log('reporting:createReportsAgents', `Report started`, 'info');
@@ -1739,8 +1739,8 @@ export class WazuhReportingCtrl {
    */
   async createReportsAgentsInventory(
     context: RequestHandlerContext,
-    request: KibanaRequest,
-    response: KibanaResponseFactory
+    request: OpenSearchDashboardsRequest,
+    response: OpenSearchDashboardsResponseFactory
   ) {
     try {
       log('reporting:createReportsAgentsInventory', `Report started`, 'info');
@@ -1974,8 +1974,8 @@ export class WazuhReportingCtrl {
    */
   async getReports(
     context: RequestHandlerContext,
-    request: KibanaRequest,
-    response: KibanaResponseFactory
+    request: OpenSearchDashboardsRequest,
+    response: OpenSearchDashboardsResponseFactory
   ) {
     try {
       log('reporting:getReports', `Fetching created reports`, 'info');
@@ -2023,8 +2023,8 @@ export class WazuhReportingCtrl {
    */
   async getReportByName(
     context: RequestHandlerContext,
-    request: KibanaRequest,
-    response: KibanaResponseFactory
+    request: OpenSearchDashboardsRequest,
+    response: OpenSearchDashboardsResponseFactory
   ) {
     try {
       log('reporting:getReportByName', `Getting ${request.params.name} report`, 'debug');
@@ -2051,8 +2051,8 @@ export class WazuhReportingCtrl {
    */
   async deleteReportByName(
     context: RequestHandlerContext,
-    request: KibanaRequest,
-    response: KibanaResponseFactory
+    request: OpenSearchDashboardsRequest,
+    response: OpenSearchDashboardsResponseFactory
   ) {
     try {
       log('reporting:deleteReportByName', `Deleting ${request.params.name} report`, 'debug');

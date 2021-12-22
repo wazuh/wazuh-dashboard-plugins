@@ -1,7 +1,6 @@
 {
   "id": "wazuh",
-  "version": "4.3.0-4301",
-  "kibanaVersion": "kibana",
+  "version": "1.2.0",
   "configPath": [
     "wazuh"
   ],
@@ -11,18 +10,16 @@
     "discover",
     "inspector",
     "visualizations",
-    "kibanaLegacy",
     "uiActions",
     "charts",
     "savedObjects",
-    "kibanaReact",
-    "kibanaUtils",
-    "securityOss",
-    "telemetry"
+    "opensearchDashboardsReact",
+    "opensearchDashboardsUtils",
+    "opensearchDashboardsLegacy"
   ],
   "optionalPlugins": [
     "security",
-    "opendistroSecurityKibana",
+    "securityDashboards",
     "searchguard",
     "spaces"
   ],

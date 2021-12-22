@@ -28,7 +28,7 @@ export class GenericRequest {
       const { timeout } = wazuhConfig.getConfig();
       const requestHeaders = {
         'Content-Type': 'application/json',
-        'kbn-xsrf': 'kibana'
+        'osd-xsrf': 'kibana'
       };
       const tmpUrl = getHttp().basePath.prepend(path);
 

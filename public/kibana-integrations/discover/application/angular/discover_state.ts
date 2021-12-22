@@ -18,7 +18,7 @@
  */
 import { isEqual } from 'lodash';
 import { History } from 'history';
-import { NotificationsStart } from 'kibana/public';
+import { NotificationsStart } from 'opensearch_dashboards/public';
 import {
   createStateContainer,
   createKbnUrlStateStorage,
@@ -26,7 +26,7 @@ import {
   ReduxLikeStateContainer,
   IKbnUrlStateStorage,
   withNotifyOnErrors,
-} from '../../../../../../../src/plugins/kibana_utils/public';
+} from '../../../../../../../src/plugins/opensearch_dashboards_utils/public';
 import { esFilters, Filter, Query } from '../../../../../../../src/plugins/data/public';
 import { migrateLegacyQuery } from '../helpers/migrate_legacy_query';
 

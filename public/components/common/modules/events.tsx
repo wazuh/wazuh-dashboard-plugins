@@ -24,7 +24,7 @@ import {
 } from '@elastic/eui';
 import { PatternHandler } from '../../../react-services/pattern-handler';
 import { enhanceDiscoverEventsCell } from './events-enhance-discover-fields';
-import { toMountPoint } from '../../../../../../src/plugins/kibana_react/public';
+import { toMountPoint } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { withAgentSupportModule, withModuleTabLoader } from '../hocs';
 import { compose } from 'redux';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';

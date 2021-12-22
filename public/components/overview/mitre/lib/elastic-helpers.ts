@@ -12,7 +12,7 @@
 
 import { AppState } from '../../../../react-services/app-state';
 import { GenericRequest } from '../../../../react-services/generic-request';
-import { Query, TimeRange, buildRangeFilter, buildEsQuery, getEsQueryConfig, Filter } from '../../../../../../../src/plugins/data/common';
+import { Query, TimeRange, buildRangeFilter, buildOpenSearchQuery, getOpenSearchQueryConfig, Filter } from '../../../../../../../src/plugins/data/common';
 import { SearchParams, SearchResponse } from 'elasticsearch';
 import { WazuhConfig } from '../../../../react-services/wazuh-config';
 import { getDataPlugin, getUiSettings } from '../../../../kibana-services';
@@ -85,14 +85,14 @@ export async function getElasticAlerts(indexPattern, filterParams:IFilterParams,
 function buildQuery(indexPattern, filterParams:IFilterParams) {
   const { filters, query, time } = filterParams;
   const timeFilter = buildRangeFilter(
-    {name: 'timestamp', type: 'date'}, 
+    {name: 'timestamp', type: 'date'},
     time,
     indexPattern
   );
-  return buildEsQuery(
+  return buildOpenSearchQuery(
     undefined,
     query,
     [...filters, timeFilter],
-    getEsQueryConfig(getUiSettings()) 
+    getOpenSearchQueryConfig(getUiSettings())
   );
 }

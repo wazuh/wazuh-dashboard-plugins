@@ -4,7 +4,7 @@ const elasticServer = process.env.WAZUH_ELASTIC_IP || 'localhost';
 chai.should();
 
 const headers = {
-  headers: { 'kbn-xsrf': 'kibana', 'Content-Type': 'application/json' }
+  headers: { 'osd-xsrf': 'kibana', 'Content-Type': 'application/json' }
 };
 
 const date = new Date();

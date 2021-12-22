@@ -29,7 +29,7 @@ export class ApiCheck {
       const url = getHttp().basePath.prepend('/api/check-stored-api');
       const options = {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'kbn-xsrf': 'kibana' },
+        headers: { 'Content-Type': 'application/json', 'osd-xsrf': 'kibana' },
         url: url,
         data: payload,
         timeout: timeout || 20000
@@ -72,7 +72,7 @@ export class ApiCheck {
 
       const options = {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'kbn-xsrf': 'kibana' },
+        headers: { 'Content-Type': 'application/json', 'osd-xsrf': 'kibana' },
         url: url,
         data: {...apiEntry, forceRefresh},
         timeout: timeout || 20000

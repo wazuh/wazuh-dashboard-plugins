@@ -35,7 +35,7 @@ import { Metrics } from '../overview/metrics/metrics';
 import { PatternHandler } from '../../react-services/pattern-handler';
 import { getToasts } from '../../kibana-services';
 import { SampleDataWarning, SecurityAlerts } from './components';
-import { toMountPoint } from '../../../../../src/plugins/kibana_react/public';
+import { toMountPoint } from '../../../../../src/plugins/opensearch_dashboards_react/public';
 import { withReduxProvider, withErrorBoundary } from '../common/hocs';
 import { compose } from 'redux';
 import { UI_LOGGER_LEVELS } from '../../../common/constants';

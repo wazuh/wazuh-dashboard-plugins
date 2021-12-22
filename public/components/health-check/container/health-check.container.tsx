@@ -52,7 +52,7 @@ import { CheckLogger } from '../types/check_logger';
 import { compose } from 'redux';
 
 const checks = {
-  api: {    
+  api: {
     title: 'Check Wazuh API connection',
     label: 'API connection',
     validator: checkApiService,
@@ -89,13 +89,13 @@ const checks = {
     shouldCheck: true,
     canRetry: true,
   },
-  maxBuckets: {
-    title: `Check ${KIBANA_SETTING_NAME_MAX_BUCKETS} setting`,
-    label: `${KIBANA_SETTING_NAME_MAX_BUCKETS} setting`,
-    validator: checkKibanaSettings(KIBANA_SETTING_NAME_MAX_BUCKETS, WAZUH_KIBANA_SETTING_MAX_BUCKETS),
-    awaitFor: [],
-    canRetry: true,
-  },
+  // maxBuckets: {
+  //   title: `Check ${KIBANA_SETTING_NAME_MAX_BUCKETS} setting`,
+  //   label: `${KIBANA_SETTING_NAME_MAX_BUCKETS} setting`,
+  //   validator: checkKibanaSettings(KIBANA_SETTING_NAME_MAX_BUCKETS, WAZUH_KIBANA_SETTING_MAX_BUCKETS),
+  //   awaitFor: [],
+  //   canRetry: true,
+  // },
   metaFields: {
     title: `Check ${KIBANA_SETTING_NAME_METAFIELDS} setting`,
     label: `${KIBANA_SETTING_NAME_METAFIELDS} setting`,
@@ -164,7 +164,7 @@ function HealthCheckComponent() {
     setCheckErrors({...checkErrors});
   }
 
-  const handleCheckReady = (checkID, isReady) => {    
+  const handleCheckReady = (checkID, isReady) => {
     setChecksReady(prev =>  ({...prev, [checkID]: isReady}));
   }
 
@@ -196,7 +196,7 @@ function HealthCheckComponent() {
   };
 
   const renderErrors = () => {
-    return Object.keys(checkErrors).map((checkID) => 
+    return Object.keys(checkErrors).map((checkID) =>
       checkErrors[checkID].map((error, index) => (
         <Fragment key={index}>
           <EuiCallOut
@@ -209,7 +209,7 @@ function HealthCheckComponent() {
           <EuiSpacer size="xs" />
         </Fragment>
       ))
-    ) 
+    )
   };
 
   return (

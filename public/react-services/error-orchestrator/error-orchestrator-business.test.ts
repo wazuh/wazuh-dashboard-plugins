@@ -15,7 +15,7 @@
 import { ErrorOrchestrator, UIErrorLog } from './types';
 import { getToasts } from '../../kibana-services';
 import { ErrorOrchestratorBusiness } from './error-orchestrator-business';
-import { ErrorToastOptions } from 'kibana/public';
+import { ErrorToastOptions } from 'opensearch_dashboards/public';
 
 const options: UIErrorLog = {
   context: 'unitTest',

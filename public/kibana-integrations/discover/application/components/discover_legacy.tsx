@@ -19,9 +19,9 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import classNames from 'classnames';
 import { EuiButtonEmpty, EuiButtonIcon } from '@elastic/eui';
-import { i18n } from '@kbn/i18n';
-import { FormattedMessage, I18nProvider } from '@kbn/i18n/react';
-import { IUiSettingsClient, MountPoint } from 'kibana/public';
+import { i18n } from '@osd/i18n';
+import { FormattedMessage, I18nProvider } from '@osd/i18n/react';
+import { IUiSettingsClient, MountPoint } from 'opensearch_dashboards/public';
 import { HitsCounter } from './hits_counter';
 import { TimechartHeader } from './timechart_header';
 import { DiscoverSidebar } from './sidebar';
@@ -87,7 +87,7 @@ export interface DiscoverLegacyProps {
   updateQuery: (payload: { dateRange: TimeRange; query?: Query }, isUpdate?: boolean) => void;
   updateSavedQueryId: (savedQueryId?: string) => void;
   vis?: Vis;
-  showMain?: Boolean; 
+  showMain?: Boolean;
 }
 
 export function DiscoverLegacy({

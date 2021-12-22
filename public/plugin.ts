@@ -1,5 +1,5 @@
 import { BehaviorSubject } from 'rxjs';
-import { AppMountParameters, CoreSetup, CoreStart, AppUpdater, Plugin, PluginInitializerContext } from 'kibana/public';
+import { AppMountParameters, CoreSetup, CoreStart, AppUpdater, Plugin, PluginInitializerContext } from 'opensearch_dashboards/public';
 import {
   setDataPlugin,
   setHttp,
@@ -36,7 +36,7 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
   private innerAngularInitialized: boolean = false;
   private stateUpdater = new BehaviorSubject<AppUpdater>(() => ({}));
   private hideTelemetryBanner?: () => void;
-  
+
   public setup(core: CoreSetup, plugins: WazuhSetupPlugins): WazuhSetup {
     core.application.register({
       id: `wazuh`,
@@ -47,10 +47,10 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
           throw Error('Wazuh plugin method initializeInnerAngular is undefined');
         }
 
-        // hide the telemetry banner. 
+        // hide the telemetry banner.
         // Set the flag in the telemetry saved object as the notice was seen and dismissed
         this.hideTelemetryBanner && await this.hideTelemetryBanner();
-        
+
         setScopedHistory(params.history);
         // Load application bundle
         const { renderApp } = await import('./application');

@@ -14,7 +14,7 @@ import { AxiosResponse } from 'axios';
 import _ from 'lodash';
 import { version as appVersion, revision as appRevision } from '../../package.json';
 import { getCookies, getToasts } from '../kibana-services';
-import { ErrorToastOptions } from 'kibana/public';
+import { ErrorToastOptions } from 'opensearch_dashboards/public';
 import React from 'react';
 import { ReactNode } from 'x-pack/node_modules/@types/react';
 

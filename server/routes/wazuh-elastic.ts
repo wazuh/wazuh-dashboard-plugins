@@ -10,8 +10,8 @@
  * Find more information about this on the LICENSE file.
  */
 import { WazuhElasticCtrl } from '../controllers';
-import { IRouter } from 'kibana/server';
-import { schema } from '@kbn/config-schema';
+import { IRouter } from 'opensearch_dashboards/server';
+import { schema } from '@osd/config-schema';
 import { WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY, WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING, WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION } from '../../common/constants';
 
 export function WazuhElasticRoutes(router: IRouter) {

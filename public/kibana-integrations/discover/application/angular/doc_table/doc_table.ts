@@ -18,7 +18,7 @@
  */
 
 import html from './doc_table.html';
-import { dispatchRenderComplete } from '../../../../../../../../src/plugins/kibana_utils/public';
+import { dispatchRenderComplete } from '../../../../../../../../src/plugins/opensearch_dashboards_utils/public';
 import { SAMPLE_SIZE_SETTING } from '../../../common';
 // @ts-ignore
 import { getLimitedSearchResultsMessage } from './doc_table_strings';

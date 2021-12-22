@@ -23,9 +23,9 @@
 import angular from 'angular';
 // required for `ngSanitize` angular module
 import 'angular-sanitize';
-import { i18nDirective, i18nFilter, I18nProvider } from '@kbn/i18n/angular';
-import { CoreStart, PluginInitializerContext } from 'kibana/public';
-import { Storage } from '../../../src/plugins/kibana_utils/public';
+import { i18nDirective, i18nFilter, I18nProvider } from '@osd/i18n/angular';
+import { CoreStart, PluginInitializerContext } from 'opensearch_dashboards/public';
+import { Storage } from '../../../src/plugins/opensearch_dashboards_utils/public';
 import { NavigationPublicPluginStart as NavigationStart } from '../../../src/plugins/navigation/public';
 import {
   initAngularBootstrap,
@@ -36,7 +36,7 @@ import {
   watchMultiDecorator,
   createTopNavDirective,
   createTopNavHelper,
-} from '../../../src/plugins/kibana_legacy/public';
+} from '../../../src/plugins/opensearch_dashboards_legacy/public';
 import { AppPluginStartDependencies } from './types';
 import { getScopedHistory, setDiscoverModule } from './kibana-services';
 import { createDiscoverLegacyDirective } from './kibana-integrations/discover/application/components/create_discover_legacy_directive';

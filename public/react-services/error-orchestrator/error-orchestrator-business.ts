@@ -14,7 +14,7 @@ import { ErrorOrchestratorBase } from './error-orchestrator-base';
 import { UIErrorLog } from './types';
 import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { getToasts } from '../../kibana-services';
-import { ErrorToastOptions } from 'kibana/public';
+import { ErrorToastOptions } from 'opensearch_dashboards/public';
 
 export class ErrorOrchestratorBusiness extends ErrorOrchestratorBase {
   public displayError(errorLog: UIErrorLog) {

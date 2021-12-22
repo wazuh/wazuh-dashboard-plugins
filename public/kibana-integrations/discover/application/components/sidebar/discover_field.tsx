@@ -18,9 +18,9 @@
  */
 import React, { useState } from 'react';
 import { EuiPopover, EuiPopoverTitle, EuiButtonIcon, EuiToolTip } from '@elastic/eui';
-import { i18n } from '@kbn/i18n';
+import { i18n } from '@osd/i18n';
 import { DiscoverFieldDetails } from './discover_field_details';
-import { FieldIcon, FieldButton } from '../../../../../../../../src/plugins/kibana_react/public';
+import { FieldIcon, FieldButton } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { FieldDetails } from './types';
 import { IndexPatternField, IndexPattern } from '../../../../../../../../src/plugins/data/public';
 import { shortenDottedString } from '../../helpers';

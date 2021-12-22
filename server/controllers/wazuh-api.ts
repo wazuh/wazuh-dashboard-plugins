@@ -22,7 +22,7 @@ import fs from 'fs';
 import { ManageHosts } from '../lib/manage-hosts';
 import { UpdateRegistry } from '../lib/update-registry';
 import jwtDecode from 'jwt-decode';
-import { KibanaRequest, RequestHandlerContext, KibanaResponseFactory } from 'src/core/server';
+import { OpenSearchDashboardsRequest, RequestHandlerContext, OpenSearchDashboardsResponseFactory } from 'src/core/server';
 import { APIUserAllowRunAs, CacheInMemoryAPIUserAllowRunAs, API_USER_STATUS_RUN_AS } from '../lib/cache-api-user-has-run-as';
 import { getCookieValueByName } from '../lib/cookie';
 import { SecurityObj } from '../lib/security-factory';
@@ -37,9 +37,10 @@ export class WazuhApiCtrl {
     this.updateRegistry = new UpdateRegistry();
   }
 
-  async getToken(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
+  async getToken(context: RequestHandlerContext, request: OpenSearchDashboardsRequest, response: OpenSearchDashboardsResponseFactory) {
     try {
       const { force, idHost } = request.body;
+      console.log('context1: ', context)
       const { username } = await context.wazuh.security.getCurrentUser(request, context);
       if (!force && request.headers.cookie && username === getCookieValueByName(request.headers.cookie, 'wz-user') && idHost === getCookieValueByName(request.headers.cookie,'wz-api')) {
         const wzToken = getCookieValueByName(request.headers.cookie, 'wz-token');
@@ -98,7 +99,7 @@ export class WazuhApiCtrl {
    * @param {Object} response
    * @returns {Object} status obj or ErrorResponse
    */
-  async checkStoredAPI(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
+  async checkStoredAPI(context: RequestHandlerContext, request: OpenSearchDashboardsRequest, response: OpenSearchDashboardsResponseFactory) {
     try {
       // Get config from wazuh.yml
       const id = request.body.id;
@@ -295,7 +296,7 @@ export class WazuhApiCtrl {
    * @param {Object} response
    * @returns {Object} status obj or ErrorResponse
    */
-  async checkAPI(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
+  async checkAPI(context: RequestHandlerContext, request: OpenSearchDashboardsRequest, response: OpenSearchDashboardsResponseFactory) {
     try {
       let apiAvailable = null;
       // const notValid = this.validateCheckApiParams(request.body);
@@ -539,7 +540,7 @@ export class WazuhApiCtrl {
    * @returns {Object} API response or ErrorResponse
    */
   async makeRequest(context, method, path, data, id, response) {
-    
+
     const devTools = !!(data || {}).devTools;
     try {
       const api = await this.manageHosts.getHostById(id);
@@ -702,7 +703,7 @@ export class WazuhApiCtrl {
    * @param {Object} response
    * @returns {Object} api response or ErrorResponse
    */
-  requestApi(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
+  requestApi(context: RequestHandlerContext, request: OpenSearchDashboardsRequest, response: OpenSearchDashboardsResponseFactory) {
 
     const idApi = getCookieValueByName(request.headers.cookie, 'wz-api');
     if (idApi !== request.body.id) { // if the current token belongs to a different API id, we relogin to obtain a new token
@@ -745,7 +746,7 @@ export class WazuhApiCtrl {
    * @param {Object} response
    * @returns {Object} csv or ErrorResponse
    */
-  async csv(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
+  async csv(context: RequestHandlerContext, request: OpenSearchDashboardsRequest, response: OpenSearchDashboardsResponseFactory) {
     try {
       if (!request.body || !request.body.path) throw new Error('Field path is required');
       if (!request.body.id) throw new Error('Field id is required');
@@ -878,7 +879,7 @@ export class WazuhApiCtrl {
   }
 
   // Get de list of available requests in the API
-  getRequestList(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
+  getRequestList(context: RequestHandlerContext, request: OpenSearchDashboardsRequest, response: OpenSearchDashboardsResponseFactory) {
     //Read a static JSON until the api call has implemented
     return response.ok({
       body: apiRequestList
@@ -892,7 +893,7 @@ export class WazuhApiCtrl {
    * @param {Object} response
    * @returns {Object} timestamp field or ErrorResponse
    */
-  getTimeStamp(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
+  getTimeStamp(context: RequestHandlerContext, request: OpenSearchDashboardsRequest, response: OpenSearchDashboardsResponseFactory) {
     try {
       const source = JSON.parse(fs.readFileSync(this.updateRegistry.file, 'utf8'));
       if (source.installationDate && source.lastRestart) {
@@ -928,7 +929,7 @@ export class WazuhApiCtrl {
    * @param {Object} response
    * @returns {Object} extensions object or ErrorResponse
    */
-  async setExtensions(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
+  async setExtensions(context: RequestHandlerContext, request: OpenSearchDashboardsRequest, response: OpenSearchDashboardsResponseFactory) {
     try {
       const { id, extensions } = request.body;
       // Update cluster information in the wazuh-registry.json
@@ -956,7 +957,7 @@ export class WazuhApiCtrl {
    * @param {Object} response
    * @returns {Object} extensions object or ErrorResponse
    */
-  getExtensions(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
+  getExtensions(context: RequestHandlerContext, request: OpenSearchDashboardsRequest, response: OpenSearchDashboardsResponseFactory) {
     try {
       const source = JSON.parse(
         fs.readFileSync(this.updateRegistry.file, 'utf8')
@@ -984,7 +985,7 @@ export class WazuhApiCtrl {
    * @param {Object} response
    * @returns {Object} setup info or ErrorResponse
    */
-  async getSetupInfo(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
+  async getSetupInfo(context: RequestHandlerContext, request: OpenSearchDashboardsRequest, response: OpenSearchDashboardsResponseFactory) {
     try {
       const source = JSON.parse(fs.readFileSync(this.updateRegistry.file, 'utf8'));
       return response.ok({
@@ -1011,7 +1012,7 @@ export class WazuhApiCtrl {
    * @param {Object} response
    * @returns {Object} Basic syscollector information
    */
-  async getSyscollector(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
+  async getSyscollector(context: RequestHandlerContext, request: OpenSearchDashboardsRequest, response: OpenSearchDashboardsResponseFactory) {
     try {
       const apiHostID = getCookieValueByName(request.headers.cookie,'wz-api');
       if (!request.params || !apiHostID || !request.params.agent) {
@@ -1050,16 +1051,17 @@ export class WazuhApiCtrl {
   }
   /**
    * Check if user assigned roles disable Wazuh Plugin
-   * @param context 
-   * @param request 
-   * @param response 
-   * @returns {object} Returns { isWazuhDisabled: boolean parsed integer } 
+   * @param context
+   * @param request
+   * @param response
+   * @returns {object} Returns { isWazuhDisabled: boolean parsed integer }
    */
-  async isWazuhDisabled(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
+  async isWazuhDisabled(context: RequestHandlerContext, request: OpenSearchDashboardsRequest, response: OpenSearchDashboardsResponseFactory) {
     try {
-      
+
       const disabledRoles = ( await getConfiguration() )['disabled_roles'] || [];
       const logoSidebar = ( await getConfiguration() )['customization.logo.sidebar'] || 'icon_blue.png';
+      console.log('context2: ', context)
       const data = (await context.wazuh.security.getCurrentUser(request, context)).authContext;
 
       const isWazuhDisabled = +(data.roles || []).some((role) => disabledRoles.includes(role));
@@ -1071,6 +1073,6 @@ export class WazuhApiCtrl {
       log('wazuh-api:isWazuhDisabled', error.message || error);
       return ErrorResponse(error.message || error, 3035, 500, response);
     }
-    
+
   }
 }

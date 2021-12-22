@@ -18,7 +18,7 @@ import { UpdateConfigurationFile } from '../../lib/update-configuration';
 import jwtDecode from 'jwt-decode';
 import { WAZUH_ROLE_ADMINISTRATOR_ID, WAZUH_DATA_LOGS_RAW_PATH, WAZUH_UI_LOGS_RAW_PATH } from '../../../common/constants';
 import { ManageHosts } from '../../lib/manage-hosts';
-import { KibanaRequest, RequestHandlerContext, KibanaResponseFactory } from 'src/core/server';
+import { OpenSearchDashboardsRequest, RequestHandlerContext, OpenSearchDashboardsResponseFactory } from 'src/core/server';
 import { getCookieValueByName } from '../../lib/cookie';
 
 const updateConfigurationFile = new UpdateConfigurationFile();
@@ -39,7 +39,7 @@ export class WazuhUtilsCtrl {
    * @param {Object} response
    * @returns {Object} Configuration File or ErrorResponse
    */
-  getConfigurationFile(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
+  getConfigurationFile(context: RequestHandlerContext, request: OpenSearchDashboardsRequest, response: OpenSearchDashboardsResponseFactory) {
     try {
       const configFile = getConfiguration();
 
@@ -62,7 +62,7 @@ export class WazuhUtilsCtrl {
    * @param {Object} response
    * @returns {Object} Configuration File or ErrorResponse
    */
-  async updateConfigurationFile(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
+  async updateConfigurationFile(context: RequestHandlerContext, request: OpenSearchDashboardsRequest, response: OpenSearchDashboardsResponseFactory) {
     try {
       // Check if user has administrator role in token
       const token = getCookieValueByName(request.headers.cookie,'wz-token');
@@ -100,12 +100,12 @@ export class WazuhUtilsCtrl {
 
   /**
    * Returns Wazuh app logs
-   * @param {Object} context 
+   * @param {Object} context
    * @param {Object} request
    * @param {Object} response
    * @returns {Array<String>} app logs or ErrorResponse
    */
-  async getAppLogs(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
+  async getAppLogs(context: RequestHandlerContext, request: OpenSearchDashboardsRequest, response: OpenSearchDashboardsResponseFactory) {
     try {
       const lastLogs = await read(
         WAZUH_DATA_LOGS_RAW_PATH,

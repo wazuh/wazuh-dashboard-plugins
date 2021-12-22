@@ -22,7 +22,7 @@ import { generateAlerts } from '../lib/generate-alerts/generate-alerts-script';
 import { WAZUH_MONITORING_PATTERN, WAZUH_SAMPLE_ALERT_PREFIX, WAZUH_ROLE_ADMINISTRATOR_ID, WAZUH_SAMPLE_ALERTS_INDEX_SHARDS, WAZUH_SAMPLE_ALERTS_INDEX_REPLICAS } from '../../common/constants';
 import jwtDecode from 'jwt-decode';
 import { ManageHosts } from '../lib/manage-hosts';
-import { KibanaRequest, RequestHandlerContext, KibanaResponseFactory, SavedObject, SavedObjectsFindResponse } from 'src/core/server';
+import { OpenSearchDashboardsRequest, RequestHandlerContext, OpenSearchDashboardsResponseFactory, SavedObject, SavedObjectsFindResponse } from 'src/core/server';
 import { getCookieValueByName } from '../lib/cookie';
 import { WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS, WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_ALERTS } from '../../common/constants'
 
@@ -57,9 +57,9 @@ export class WazuhElasticCtrl {
    * @param {Object} response
    * @returns {Object} template or ErrorResponse
    */
-  async getTemplate(context: RequestHandlerContext, request: KibanaRequest<{ pattern: string }>, response: KibanaResponseFactory) {
+  async getTemplate(context: RequestHandlerContext, request: OpenSearchDashboardsRequest<{ pattern: string }>, response: OpenSearchDashboardsResponseFactory) {
     try {
-      const data = await context.core.elasticsearch.client.asInternalUser.cat.templates();
+      const data = await context.core.opensearch.client.asInternalUser.cat.templates();
 
       const templates = data.body;
       if (!templates || typeof templates !== 'string') {
@@ -141,7 +141,7 @@ export class WazuhElasticCtrl {
    * @param {Object} response
    * @returns {Object} status obj or ErrorResponse
    */
-  async checkPattern(context: RequestHandlerContext, request: KibanaRequest<{ pattern: string }>, response: KibanaResponseFactory) {
+  async checkPattern(context: RequestHandlerContext, request: OpenSearchDashboardsRequest<{ pattern: string }>, response: OpenSearchDashboardsResponseFactory) {
     try {
       const data = await context.core.savedObjects.client.find<SavedObjectsFindResponse<SavedObject>>({ type: 'index-pattern' });
 
@@ -184,7 +184,7 @@ export class WazuhElasticCtrl {
    * @param {Object} response
    * @returns {Array<Object>} fields or ErrorResponse
    */
-  async getFieldTop(context: RequestHandlerContext, request: KibanaRequest<{ mode: string, cluster: string, field: string, pattern: string }, { agentsList: string }>, response: KibanaResponseFactory) {
+  async getFieldTop(context: RequestHandlerContext, request: OpenSearchDashboardsRequest<{ mode: string, cluster: string, field: string, pattern: string }, { agentsList: string }>, response: OpenSearchDashboardsResponseFactory) {
     try {
       // Top field payload
       let payload = {
@@ -238,7 +238,7 @@ export class WazuhElasticCtrl {
         );
       payload.aggs['2'].terms.field = request.params.field;
 
-      const data = await context.core.elasticsearch.client.asCurrentUser.search({
+      const data = await context.core.opensearch.client.asCurrentUser.search({
         size: 1,
         index: request.params.pattern,
         body: payload
@@ -275,7 +275,7 @@ export class WazuhElasticCtrl {
       let results = false,
         forbidden = false;
       try {
-        results = await context.core.elasticsearch.client.asCurrentUser.search({
+        results = await context.core.opensearch.client.asCurrentUser.search({
           index: item.title
         });
       } catch (error) {
@@ -323,7 +323,7 @@ export class WazuhElasticCtrl {
    * @param {Object} reply
    * @returns {String}
    */
-  async getCurrentPlatform(context: RequestHandlerContext, request: KibanaRequest<{ user: string }>, response: KibanaResponseFactory) {
+  async getCurrentPlatform(context: RequestHandlerContext, request: OpenSearchDashboardsRequest<{ user: string }>, response: OpenSearchDashboardsResponseFactory) {
     try {
       return response.ok({
         body: {
@@ -514,7 +514,7 @@ export class WazuhElasticCtrl {
    * @param {Object} response
    * @returns {Object} vis obj or ErrorResponse
    */
-  async createVis(context: RequestHandlerContext, request: KibanaRequest<{ pattern: string, tab: string }>, response: KibanaResponseFactory) {
+  async createVis(context: RequestHandlerContext, request: OpenSearchDashboardsRequest<{ pattern: string, tab: string }>, response: OpenSearchDashboardsResponseFactory) {
     try {
       if (
         (!request.params.tab.includes('overview-') &&
@@ -560,7 +560,7 @@ export class WazuhElasticCtrl {
    * @param {Object} response
    * @returns {Object} vis obj or ErrorResponse
    */
-  async createClusterVis(context: RequestHandlerContext, request: KibanaRequest<{ pattern: string, tab: string }, unknown, any>, response: KibanaResponseFactory) {
+  async createClusterVis(context: RequestHandlerContext, request: OpenSearchDashboardsRequest<{ pattern: string, tab: string }, unknown, any>, response: OpenSearchDashboardsResponseFactory) {
     try {
       if (
         !request.params.pattern ||
@@ -609,11 +609,11 @@ export class WazuhElasticCtrl {
    * @param {*} response
    * {alerts: [...]} or ErrorResponse
    */
-  async haveSampleAlerts(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
+  async haveSampleAlerts(context: RequestHandlerContext, request: OpenSearchDashboardsRequest, response: OpenSearchDashboardsResponseFactory) {
     try {
       // Check if wazuh sample alerts index exists
       const results = await Promise.all(Object.keys(WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS)
-        .map((category) => context.core.elasticsearch.client.asCurrentUser.indices.exists({
+        .map((category) => context.core.opensearch.client.asCurrentUser.indices.exists({
           index: this.buildSampleIndexByCategory(category)
         })));
       return response.ok({
@@ -631,11 +631,11 @@ export class WazuhElasticCtrl {
    * @param {*} response
    * {alerts: [...]} or ErrorResponse
    */
-  async haveSampleAlertsOfCategory(context: RequestHandlerContext, request: KibanaRequest<{ category: string }>, response: KibanaResponseFactory) {
+  async haveSampleAlertsOfCategory(context: RequestHandlerContext, request: OpenSearchDashboardsRequest<{ category: string }>, response: OpenSearchDashboardsResponseFactory) {
     try {
       const sampleAlertsIndex = this.buildSampleIndexByCategory(request.params.category);
       // Check if wazuh sample alerts index exists
-      const existsSampleIndex = await context.core.elasticsearch.client.asCurrentUser.indices.exists({
+      const existsSampleIndex = await context.core.opensearch.client.asCurrentUser.indices.exists({
         index: sampleAlertsIndex
       });
       return response.ok({
@@ -666,7 +666,7 @@ export class WazuhElasticCtrl {
    * @param {*} response
    * {index: string, alerts: [...], count: number} or ErrorResponse
    */
-  async createSampleAlerts(context: RequestHandlerContext, request: KibanaRequest<{ category: string }>, response: KibanaResponseFactory) {
+  async createSampleAlerts(context: RequestHandlerContext, request: OpenSearchDashboardsRequest<{ category: string }>, response: OpenSearchDashboardsResponseFactory) {
     const sampleAlertsIndex = this.buildSampleIndexByCategory(request.params.category);
 
     try {
@@ -705,7 +705,7 @@ export class WazuhElasticCtrl {
       // Index alerts
 
       // Check if wazuh sample alerts index exists
-      const existsSampleIndex = await context.core.elasticsearch.client.asInternalUser.indices.exists({
+      const existsSampleIndex = await context.core.opensearch.client.asInternalUser.indices.exists({
         index: sampleAlertsIndex
       });
       if (!existsSampleIndex.body) {
@@ -720,7 +720,7 @@ export class WazuhElasticCtrl {
           }
         };
 
-        await context.core.elasticsearch.client.asInternalUser.indices.create({
+        await context.core.opensearch.client.asInternalUser.indices.create({
           index: sampleAlertsIndex,
           body: configuration
         });
@@ -731,7 +731,7 @@ export class WazuhElasticCtrl {
         );
       }
 
-      await context.core.elasticsearch.client.asInternalUser.bulk({
+      await context.core.opensearch.client.asInternalUser.bulk({
         index: sampleAlertsIndex,
         body: bulk
       });
@@ -758,7 +758,7 @@ export class WazuhElasticCtrl {
    * @param {*} response
    * {result: "deleted", index: string} or ErrorResponse
    */
-  async deleteSampleAlerts(context: RequestHandlerContext, request: KibanaRequest<{ category: string }>, response: KibanaResponseFactory) {
+  async deleteSampleAlerts(context: RequestHandlerContext, request: OpenSearchDashboardsRequest<{ category: string }>, response: OpenSearchDashboardsResponseFactory) {
     // Delete Wazuh sample alert index
 
     const sampleAlertsIndex = this.buildSampleIndexByCategory(request.params.category);
@@ -787,12 +787,12 @@ export class WazuhElasticCtrl {
       };
 
       // Check if Wazuh sample alerts index exists
-      const existsSampleIndex = await context.core.elasticsearch.client.asCurrentUser.indices.exists({
+      const existsSampleIndex = await context.core.opensearch.client.asCurrentUser.indices.exists({
         index: sampleAlertsIndex
       });
       if (existsSampleIndex.body) {
         // Delete Wazuh sample alerts index
-        await context.core.elasticsearch.client.asCurrentUser.indices.delete({ index: sampleAlertsIndex });
+        await context.core.opensearch.client.asCurrentUser.indices.delete({ index: sampleAlertsIndex });
         log(
           'wazuh-elastic:deleteSampleAlerts',
           `Deleted ${sampleAlertsIndex} index`,
@@ -813,9 +813,9 @@ export class WazuhElasticCtrl {
     }
   }
 
-  async alerts(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
+  async alerts(context: RequestHandlerContext, request: OpenSearchDashboardsRequest, response: OpenSearchDashboardsResponseFactory) {
     try {
-      const data = await context.core.elasticsearch.client.asCurrentUser.search(request.body);
+      const data = await context.core.opensearch.client.asCurrentUser.search(request.body);
       return response.ok({
         body: data.body
       });
@@ -826,11 +826,11 @@ export class WazuhElasticCtrl {
   }
 
   // Check if there are indices for Statistics
-  async existStatisticsIndices(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
+  async existStatisticsIndices(context: RequestHandlerContext, request: OpenSearchDashboardsRequest, response: OpenSearchDashboardsResponseFactory) {
     try {
       const config = getConfiguration();
       const statisticsPattern = `${config['cron.prefix'] || 'wazuh'}-${config['cron.statistics.index.name'] || 'statistics'}*`; //TODO: replace by default as constants instead hardcoded ('wazuh' and 'statistics')
-      const existIndex = await context.core.elasticsearch.client.asCurrentUser.indices.exists({
+      const existIndex = await context.core.opensearch.client.asCurrentUser.indices.exists({
         index: statisticsPattern,
         allow_no_indices: false
       });
@@ -845,7 +845,7 @@ export class WazuhElasticCtrl {
 
   async usingCredentials(context) {
     try {
-      const data = await context.core.elasticsearch.client.asInternalUser.cluster.getSettings(
+      const data = await context.core.opensearch.client.asInternalUser.cluster.getSettings(
         { include_defaults: true }
       );
       return (((((data || {}).body || {}).defaults || {}).xpack || {}).security || {}).user !== null;

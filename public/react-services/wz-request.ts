@@ -45,7 +45,7 @@ export class WzRequest {
       const url = getHttp().basePath.prepend(path);
       const options = {
         method: method,
-        headers: { 'Content-Type': 'application/json', 'kbn-xsrf': 'kibana' },
+        headers: { 'Content-Type': 'application/json', 'osd-xsrf': 'kibana' },
         url: url,
         data: payload,
         timeout: customTimeout || timeout,
@@ -107,7 +107,7 @@ export class WzRequest {
     try {
       if (!method || !path || !body) {
         throw new Error('Missing parameters');
-      }      
+      }
       const id = JSON.parse(AppState.getCurrentAPI()).id;
       const requestData = { method, path, body, id };
       const response = await this.genericReq('POST', '/api/request', requestData);

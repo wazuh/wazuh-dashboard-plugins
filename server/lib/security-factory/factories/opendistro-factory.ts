@@ -1,5 +1,5 @@
 import { ISecurityFactory } from '../'
-import { KibanaRequest, RequestHandlerContext } from 'src/core/server';
+import { OpenSearchDashboardsRequest, RequestHandlerContext } from 'src/core/server';
 import { WAZUH_SECURITY_PLUGIN_OPEN_DISTRO_FOR_ELASTICSEARCH } from '../../../../common/constants';
 
 export class OpendistroFactory implements ISecurityFactory {
@@ -8,18 +8,18 @@ export class OpendistroFactory implements ISecurityFactory {
   constructor(private opendistroSecurityKibana: any) {
   }
 
-  async getCurrentUser(request: KibanaRequest, context:RequestHandlerContext) {
+  async getCurrentUser(request: OpenSearchDashboardsRequest, context:RequestHandlerContext) {
     try {
       const params = {
         path: `/_opendistro/_security/api/account`,
         method: 'GET',
       };
 
-      const {body: authContext} = await context.core.elasticsearch.client.asCurrentUser.transport.request(params);
+      const {body: authContext} = await context.core.opensearch.client.asCurrentUser.transport.request(params);
       const username = this.getUserName(authContext);
       return {username, authContext};
     } catch (error) {
-      throw error; 
+      throw error;
     }
   }
 

@@ -49,7 +49,7 @@ export const top5RootkitsDetected = async (
       base.query.bool.must[0].query_string.query +
       ' AND "rootkit" AND "detected"';
 
-    const response = await context.core.elasticsearch.client.asCurrentUser.search({
+    const response = await context.core.opensearch.client.asCurrentUser.search({
       index: pattern,
       body: base
     });
@@ -100,7 +100,7 @@ export const agentsWithHiddenPids = async (
       ' AND "process" AND "hidden"';
 
     // "aggregations": { "1": { "value": 1 } }
-    const response = await context.core.elasticsearch.client.asCurrentUser.search({
+    const response = await context.core.opensearch.client.asCurrentUser.search({
       index: pattern,
       body: base
     });
@@ -148,7 +148,7 @@ export const agentsWithHiddenPorts = async(
       base.query.bool.must[0].query_string.query + ' AND "port" AND "hidden"';
 
     // "aggregations": { "1": { "value": 1 } }
-    const response = await context.core.elasticsearch.client.asCurrentUser.search({
+    const response = await context.core.opensearch.client.asCurrentUser.search({
       index: pattern,
       body: base
     });

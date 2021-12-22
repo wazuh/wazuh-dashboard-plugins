@@ -18,7 +18,7 @@
  */
 import React from 'react';
 import { EuiCodeBlock } from '@elastic/eui';
-import { i18n } from '@kbn/i18n';
+import { i18n } from '@osd/i18n';
 import { DocViewRenderProps } from '../../doc_views/doc_views_types';
 
 export function JsonCodeBlock({ hit }: DocViewRenderProps) {

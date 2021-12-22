@@ -23,7 +23,7 @@ import { tryCatchForIndexPermissionError } from '../tryCatchForIndexPermissionEr
 const manageHosts = new ManageHosts();
 
 export function jobInitializeRun(context) {
-  const KIBANA_INDEX = context.server.config.kibana.index;
+  const KIBANA_INDEX = context.server.config.opensearchDashboards.index;
   log('initialize', `Kibana index: ${KIBANA_INDEX}`, 'info');
   log('initialize', `App revision: ${packageJSON.revision}`, 'info');
 
@@ -101,11 +101,11 @@ export function jobInitializeRun(context) {
    */
   const checkWazuhIndex = tryCatchForIndexPermissionError(WAZUH_INDEX)( async () => {
     log('initialize:checkWazuhIndex', `Checking ${WAZUH_INDEX} index.`, 'debug');
-    const result = await context.core.elasticsearch.client.asInternalUser.indices.exists({
+    const result = await context.core.opensearch.client.asInternalUser.indices.exists({
       index: WAZUH_INDEX
     });
     if (result.body) {
-      const data = await context.core.elasticsearch.client.asInternalUser.search({
+      const data = await context.core.opensearch.client.asInternalUser.search({
         index: WAZUH_INDEX,
         size: 100
       });
@@ -118,7 +118,7 @@ export function jobInitializeRun(context) {
       );
       // Check if all APIs entries were migrated properly and delete it from the .wazuh index
       await checkProperlyMigrate();
-      await context.core.elasticsearch.client.asInternalUser.indices.delete({
+      await context.core.opensearch.client.asInternalUser.indices.delete({
         index: WAZUH_INDEX
       });
     }
@@ -130,7 +130,7 @@ export function jobInitializeRun(context) {
    */
   const checkProperlyMigrate = async () => {
     try {
-      let apisIndex = await await context.core.elasticsearch.client.asInternalUser.search({
+      let apisIndex = await await context.core.opensearch.client.asInternalUser.search({
         index: WAZUH_INDEX,
         size: 100
       });
@@ -176,11 +176,11 @@ export function jobInitializeRun(context) {
         'debug'
       );
       try {
-       const exists = await context.core.elasticsearch.client.asInternalUser.indices.exists({
+       const exists = await context.core.opensearch.client.asInternalUser.indices.exists({
           index: WAZUH_VERSION_INDEX
-        });        
+        });
         if (exists.body){
-          await context.core.elasticsearch.client.asInternalUser.indices.delete({
+          await context.core.opensearch.client.asInternalUser.indices.delete({
             index: WAZUH_VERSION_INDEX
           });
           log(
@@ -218,7 +218,7 @@ export function jobInitializeRun(context) {
         const isUpgradedApp = packageJSON.revision !== source.revision || packageJSON.version !== source['app-version'];
 
         // Rebuild the registry file if revision or version fields are differents
-        if (isUpgradedApp) { 
+        if (isUpgradedApp) {
           log(
             'initialize:checkwazuhRegistry',
             'Wazuh app revision or version changed, regenerating wazuh-version registry',
@@ -257,7 +257,7 @@ export function jobInitializeRun(context) {
       );
     }
 
-    return context.core.elasticsearch.client.asInternalUser.indices.putTemplate({
+    return context.core.opensearch.client.asInternalUser.indices.putTemplate({
       name: WAZUH_KIBANA_TEMPLATE_NAME,
       order: 0,
       create: true,
@@ -272,7 +272,7 @@ export function jobInitializeRun(context) {
         `Creating ${KIBANA_INDEX} index.`,
         'info'
       );
-      await context.core.elasticsearch.client.asInternalUser.indices.create({
+      await context.core.opensearch.client.asInternalUser.indices.create({
         index: KIBANA_INDEX
       });
       log(
@@ -316,7 +316,7 @@ export function jobInitializeRun(context) {
 
   const getTemplateByName = async () => {
     try {
-      await context.core.elasticsearch.client.asInternalUser.indices.getTemplate({
+      await context.core.opensearch.client.asInternalUser.indices.getTemplate({
         name: WAZUH_KIBANA_TEMPLATE_NAME
       });
       log(
@@ -335,7 +335,7 @@ export function jobInitializeRun(context) {
   // Does Kibana index exist?
   const checkKibanaStatus = async () => {
     try {
-      const response = await context.core.elasticsearch.client.asInternalUser.indices.exists({
+      const response = await context.core.opensearch.client.asInternalUser.indices.exists({
         index: KIBANA_INDEX
       });
       if (response.body) {

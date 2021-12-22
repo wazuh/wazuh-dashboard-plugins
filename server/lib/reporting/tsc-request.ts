@@ -54,7 +54,7 @@ export const topTSCRequirements = async (
       }
     });
 
-    const response = await context.core.elasticsearch.client.asCurrentUser.search({
+    const response = await context.core.opensearch.client.asCurrentUser.search({
       index: pattern,
       body: base
     });
@@ -91,7 +91,7 @@ export const topTSCRequirements = async (
  * @returns {Array<String>}
  */
 export const getRulesByRequirement = async (
-  context, 
+  context,
   gte,
   lte,
   filters,
@@ -136,7 +136,7 @@ export const getRulesByRequirement = async (
       requirement +
       '"';
 
-    const response = await context.core.elasticsearch.client.asCurrentUser.search({
+    const response = await context.core.opensearch.client.asCurrentUser.search({
       index: pattern,
       body: base
     });

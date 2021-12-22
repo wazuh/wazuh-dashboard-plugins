@@ -10,8 +10,8 @@
  * Find more information about this on the LICENSE file.
  */
 import { UiLogsCtrl } from '../../controllers';
-import { IRouter } from 'kibana/server';
-import { schema } from '@kbn/config-schema';
+import { IRouter } from 'opensearch_dashboards/server';
+import { schema } from '@osd/config-schema';
 
 export const UiLogsRoutes = (router: IRouter) => {
   const ctrl = new UiLogsCtrl();
