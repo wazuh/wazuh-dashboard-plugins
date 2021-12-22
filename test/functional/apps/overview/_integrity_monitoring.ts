@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import expect from '@kbn/expect';
+import expect from '@osd/expect';
 import { FtrProviderContext } from '../../../../../../test/functional/ftr_provider_context';
 import { SearchParams } from 'elasticsearch';
 import { WAZUH_ALERTS_PATTERN } from '../../../../common/constants';
@@ -255,7 +255,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
       };
       const esValues: object[] = await esTableViz.getData(query, fields, ['-Count', 'Level', '-Rule ID', ]);
 
-      
+
       expect(arrayHelper.compareObjects(values, esValues))
       .to.be.ok();
     });
@@ -336,7 +336,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
                   term: {
                     "rule.groups": "syscheck"
                   }
-                },        
+                },
                 {
                   "term": {
                     "rule.level": 7
@@ -360,7 +360,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
       expect(JSON.stringify(esValues))
       .to.be.equal(JSON.stringify(values));
       await filterBar.removeAllFilters();
-      
+
     });
 
     it('should Top 5 agents values are correct when add the filter rule.level: 7', async () => {
@@ -381,7 +381,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
                   term: {
                     "rule.groups": "syscheck"
                   }
-                },        
+                },
                 {
                   "term": {
                     "rule.level": 7
@@ -425,7 +425,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
                   term: {
                     "rule.groups": "syscheck"
                   }
-                },        
+                },
                 {
                   "term": {
                     "rule.level": 7
@@ -469,7 +469,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
                   term: {
                     "rule.groups": "syscheck"
                   }
-                },        
+                },
                 {
                   "term": {
                     "rule.level": 7
@@ -513,7 +513,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
                   term: {
                     "rule.groups": "syscheck"
                   }
-                },        
+                },
                 {
                   "term": {
                     "rule.level": 7
@@ -564,7 +564,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
                   term: {
                     "rule.groups": "syscheck"
                   }
-                },        
+                },
                 {
                   "term": {
                     "rule.level": 7
@@ -626,7 +626,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
                   term: {
                     "rule.groups": "syscheck"
                   }
-                },        
+                },
                 {
                   "term": {
                     "rule.level": 7
@@ -687,7 +687,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
                   term: {
                     "rule.groups": "syscheck"
                   }
-                },        
+                },
                 {
                   "term": {
                     "rule.level": 7
@@ -712,7 +712,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
       .to.be.equal(JSON.stringify(values));
       await queryBar.setQuery('');
       await queryBar.submitQuery();
-      
+
     });
 
     it('should Top 5 agents values are correct when add to the query bar rule.level: 7', async () => {
@@ -734,7 +734,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
                   term: {
                     "rule.groups": "syscheck"
                   }
-                },        
+                },
                 {
                   "term": {
                     "rule.level": 7
@@ -780,7 +780,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
                   term: {
                     "rule.groups": "syscheck"
                   }
-                },        
+                },
                 {
                   "term": {
                     "rule.level": 7
@@ -826,7 +826,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
                   term: {
                     "rule.groups": "syscheck"
                   }
-                },        
+                },
                 {
                   "term": {
                     "rule.level": 7
@@ -872,7 +872,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
                   term: {
                     "rule.groups": "syscheck"
                   }
-                },        
+                },
                 {
                   "term": {
                     "rule.level": 7
@@ -925,7 +925,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
                   term: {
                     "rule.groups": "syscheck"
                   }
-                },        
+                },
                 {
                   "term": {
                     "rule.level": 7
@@ -989,7 +989,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
                   term: {
                     "rule.groups": "syscheck"
                   }
-                },        
+                },
                 {
                   "term": {
                     "rule.level": 7
@@ -1027,7 +1027,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
       await queryBar.setQuery('');
       await queryBar.submitQuery();
     });
-    
+
     //#endregion
   });
 }

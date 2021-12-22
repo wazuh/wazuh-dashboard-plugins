@@ -1,5 +1,5 @@
 import { resolve } from 'path';
-import { resolveKibanaPath } from '@kbn/plugin-helpers';
+import { resolveKibanaPath } from '@osd/plugin-helpers';
 
 import { pageObjects } from './page_objects';
 import { services } from './services';

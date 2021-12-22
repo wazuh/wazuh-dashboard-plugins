@@ -15,17 +15,17 @@ const LICENSE_HEADER = `
  */
 `
 
-module.exports = {	
-  root: true,	
+module.exports = {
+  root: true,
   extends: ['@elastic/eslint-config-kibana', 'plugin:@elastic/eui/recommended'],
   rules: {
-    // "@kbn/eslint/require-license-header": "off"
+    // "@osd/eslint/require-license-header": "off"
   },
   overrides: [
     {
       files: ['**/*.{js,ts,tsx}'],
       rules: {
-        '@kbn/eslint/require-license-header': [
+        'osd/eslint/require-license-header': [
           'error',
           {
             license: LICENSE_HEADER,

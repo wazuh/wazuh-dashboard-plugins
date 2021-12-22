@@ -1,4 +1,4 @@
-import expect from '@kbn/expect';
+import expect from '@osd/expect';
 
 export function ApiProvider({ getService, getPageObjects }) {
   const browser = getService('browser');

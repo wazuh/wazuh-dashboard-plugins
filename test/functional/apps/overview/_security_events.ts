@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import expect from '@kbn/expect';
+import expect from '@osd/expect';
 import { FtrProviderContext } from '../../../../../../test/functional/ftr_provider_context';
 import { SearchParams } from 'elasticsearch';
 import { WAZUH_ALERTS_PATTERN } from '../../../../common/constants';
