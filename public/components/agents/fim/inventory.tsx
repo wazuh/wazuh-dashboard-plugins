@@ -137,7 +137,6 @@ export class Inventory extends Component {
   }
 
   onFiltersChange = (filters) => {
-    // this.setStoreFilters(filters);
     this.setState({ filters });
   }
 
