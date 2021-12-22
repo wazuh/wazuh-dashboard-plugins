@@ -41,6 +41,7 @@ import { compose } from 'redux';
 import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
+import { satisfyKibanaVersion } from '../../../common/semver';
 
 const visHandler = new VisHandlers();
 
@@ -129,7 +130,9 @@ export const WzVisualize = compose(
         // Known fields are refreshed only once per dashboard loading
         try {
           this.setState({ hasRefreshedKnownFields: true, isRefreshing: true });
-          await PatternHandler.refreshIndexPattern(this.newFields);
+          if(satisfyKibanaVersion('<7.11')){
+            await PatternHandler.refreshIndexPattern(this.newFields);
+          };
           this.setState({ isRefreshing: false });
           this.reloadToast();
           this.newFields = {};
@@ -145,7 +148,6 @@ export const WzVisualize = compose(
               title: error.name || error,
             },
           };
-
           getErrorOrchestrator().handleError(options);
         }
       } else if (this.state.isRefreshing) {
@@ -154,23 +156,38 @@ export const WzVisualize = compose(
       }
     };
     reloadToast = () => {
-      getToasts().add({
-        color: 'success',
-        title: 'The index pattern was refreshed successfully.',
-        text: toMountPoint(
-          <EuiFlexGroup justifyContent="flexEnd" gutterSize="s">
+      const toastLifeTimeMs = 300000;
+      if(satisfyKibanaVersion('<7.11')){
+        getToasts().add({
+          color: 'success',
+          title: 'The index pattern was refreshed successfully.',
+          text: toMountPoint(<EuiFlexGroup justifyContent="flexEnd" gutterSize="s">
             <EuiFlexItem grow={false}>
-              There were some unknown fields for the current index pattern. You need to refresh the
-              page to apply the changes.
+              There were some unknown fields for the current index pattern.
+              You need to refresh the page to apply the changes.
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
-              <EuiButton onClick={() => window.location.reload()} size="s">
-                Reload page
-              </EuiButton>
+              <EuiButton onClick={() => window.location.reload()} size="s">Reload page</EuiButton>
             </EuiFlexItem>
-          </EuiFlexGroup>
-        ),
-      });
+          </EuiFlexGroup>),
+          toastLifeTimeMs
+        });
+      }else if(satisfyKibanaVersion('>=7.11')){
+        getToasts().add({
+          color: 'warning',
+          title: 'Found unknown fields in the index pattern.',
+          text: toMountPoint(<EuiFlexGroup justifyContent="flexEnd" gutterSize="s">
+            <EuiFlexItem grow={false}>
+              There are some unknown fields for the current index pattern.
+              You need to refresh the page to update the fields.
+            </EuiFlexItem>
+            <EuiFlexItem grow={false}>
+              <EuiButton onClick={() => window.location.reload()} size="s">Reload page</EuiButton>
+            </EuiFlexItem>
+          </EuiFlexGroup>),
+          toastLifeTimeMs
+        });
+      };
     };
     render() {
       const { visualizations } = this.state;

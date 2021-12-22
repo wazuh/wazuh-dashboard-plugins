@@ -59,14 +59,14 @@ class WzRuleInfo extends Component {
     };
     this.rulesetHandler = new RulesetHandler(RulesetResources.RULES);
 
-    const handleFileClick = async (event) => {
+    const handleFileClick = async (event, {filename, relative_dirname}) => {
       event.stopPropagation();
       try {
-        const result = await this.rulesetHandler.getFileContent(value);
+        const result = await this.rulesetHandler.getFileContent(filename);
         const file = {
-          name: value,
+          name: filename,
           content: result,
-          path: item.relative_dirname,
+          path: relative_dirname,
         };
         this.props.updateFileContent(file);
       } catch (error) {
@@ -143,7 +143,7 @@ class WzRuleInfo extends Component {
         render: (value, item) => {
           return (
             <EuiToolTip position="top" content={`Show ${value} content`}>
-              <EuiLink onClick={async (event) => handleFileClick(event)}>{value}</EuiLink>
+              <EuiLink onClick={async (event) => handleFileClick(event, item)}>{value}</EuiLink>
             </EuiToolTip>
           );
         },
@@ -412,7 +412,7 @@ class WzRuleInfo extends Component {
         compliance.map(async (i) => {
           const data = await WzRequest.apiReq('GET', '/mitre/techniques', {
             params: {
-              q: `references.external_id=${i}`,
+              q: `external_id=${i}`,
             },
           });
           const formattedData = (((data || {}).data.data || {}).affected_items || [])[0] || {};

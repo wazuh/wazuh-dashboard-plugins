@@ -93,25 +93,25 @@ export class Details extends Component {
         field: 'name',
         name: 'Name',
         icon: 'dot',
-        link: false,
+        link: true,
       },
       {
         field: 'cve',
         name: 'CVE',
         icon: 'securitySignal',
-        link: false,
+        link: true,
       },
       {
         field: 'version',
         name: 'Version',
         icon: 'package',
-        link: false,
+        link: true,
       },
       {
         field: 'architecture',
         name: 'Architecture',
         icon: 'node',
-        link: false,
+        link: true,
       },
       {
         field: 'last_full_scan',
@@ -209,6 +209,7 @@ export class Details extends Component {
       if (!item.onlyLinux || (item.onlyLinux && this.props.agent && agentPlatform !== 'windows')) {
         let className = item.checksum ? 'detail-value detail-value-checksum' : 'detail-value';
         className += item.field === 'perm' ? ' detail-value-perm' : '';
+        className += ' wz-width-100';
         return (
           <EuiFlexItem key={idx}>
             <EuiStat
@@ -219,14 +220,14 @@ export class Details extends Component {
                   <span
                     className={className}
                     onMouseEnter={() => {
-                      this.setState({ hoverAddFilter: item });
+                      this.setState({ hoverAddFilter: item.field });
                     }}
                     onMouseLeave={() => {
                       this.setState({ hoverAddFilter: '' });
                     }}
                   >
                     {value}
-                    {_.isEqual(this.state.hoverAddFilter, item) && (
+                    {this.state.hoverAddFilter === item.field && (
                       <EuiToolTip
                         position="top"
                         anchorClassName="detail-tooltip"

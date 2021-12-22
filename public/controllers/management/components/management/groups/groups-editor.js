@@ -120,7 +120,7 @@ class WzGroupsEditor extends Component {
           (error.title = `File ${name} saved, but there were found several error while validating the configuration.`)
         );
       }
-      this.setState({ isSaving: false });
+      this.setState({ isSaving: false, hasChanges: false });
       const textSuccess = 'File successfully edited';
       this.showToast('success', 'Success', textSuccess, 3000);
     } catch (error) {

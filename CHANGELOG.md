@@ -2,7 +2,7 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v4.3.0 - Kibana 7.10.2 , 7.11.2 - Revision 4301
+## Wazuh v4.3.0 - Kibana 7.10.2 , 7.11.2, 7.13.4, 7.14.2 - Revision 4301
 
 ### Added
 
@@ -36,7 +36,7 @@ All notable changes to the Wazuh app project will be documented in this file.
   [#3464](https://github.com/wazuh/wazuh-kibana-app/pull/3464)
   [#3478](https://github.com/wazuh/wazuh-kibana-app/pull/3478)
 - Added fields status and type in vulnerabilities table [#3196](https://github.com/wazuh/wazuh-kibana-app/pull/3196)
-- Added Intelligence tab to Mitre Att&ck module [#3368](https://github.com/wazuh/wazuh-kibana-app/pull/3368) [#3344](https://github.com/wazuh/wazuh-kibana-app/pull/3344)
+- Added Intelligence tab to Mitre Att&ck module [#3368](https://github.com/wazuh/wazuh-kibana-app/pull/3368) [#3344](https://github.com/wazuh/wazuh-kibana-app/pull/3344) [#3726](https://github.com/wazuh/wazuh-kibana-app/pull/3726)
 - Added sample data for office365 events [#3424](https://github.com/wazuh/wazuh-kibana-app/pull/3424)
 - Created a separate component to check for sample data [#3475](https://github.com/wazuh/wazuh-kibana-app/pull/3475)
 - Added a new hook for getting value suggestions [#3506](https://github.com/wazuh/wazuh-kibana-app/pull/3506)
@@ -47,6 +47,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Adding Pagination and filter to drilldown tables at Office pannel [#3544](https://github.com/wazuh/wazuh-kibana-app/pull/3544).
 - Simple filters change between panel and drilldown panel [#3568](https://github.com/wazuh/wazuh-kibana-app/pull/3568).
 - Added new fields in Inventory table and Flyout Details [#3525](https://github.com/wazuh/wazuh-kibana-app/pull/3525)
+- Added columns selector in agents table [#3691](https://github.com/wazuh/wazuh-kibana-app/pull/3691)
+- Added a new workflow for create wazuh packages [#3742](https://github.com/wazuh/wazuh-kibana-app/pull/3742)
 
 ### Changed
 
@@ -56,10 +58,12 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Moved the filterManager subscription to the hook useFilterManager [#3517](https://github.com/wazuh/wazuh-kibana-app/pull/3517)
 - Change filter from is to is one of in custom searchbar [#3529](https://github.com/wazuh/wazuh-kibana-app/pull/3529)
 - Refactored as module tabs and buttons are rendered [#3494](https://github.com/wazuh/wazuh-kibana-app/pull/3494)
+- Updated depracated and new references authd [#3663](https://github.com/wazuh/wazuh-kibana-app/pull/3663)
 - Added time subscription to Discover component [#3549](https://github.com/wazuh/wazuh-kibana-app/pull/3549)
 - Refactored as module tabs and buttons are rendered [#3494](https://github.com/wazuh/wazuh-kibana-app/pull/3494)
 - Testing logs using the Ruletest Test don't display the rule information if not matching a rule. [#3446](https://github.com/wazuh/wazuh-kibana-app/pull/3446)
 - Changed format permissions in FIM inventory [#3649](https://github.com/wazuh/wazuh-kibana-app/pull/3649)
+- Changed of request for one that does not return data that is not necessary to optimize times. [#3686](https://github.com/wazuh/wazuh-kibana-app/pull/3686) [#3728](https://github.com/wazuh/wazuh-kibana-app/pull/3728)
 
 ### Fixed
 
@@ -75,7 +79,12 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fix size api selector when name is too long [#3445](https://github.com/wazuh/wazuh-kibana-app/pull/3445)
 - Fixed error when edit a rule or decoder [#3456](https://github.com/wazuh/wazuh-kibana-app/pull/3456)
 - Fixed index pattern selector doesn't display the ignored index patterns [#3458](https://github.com/wazuh/wazuh-kibana-app/pull/3458)
+- Fixed error in /Management/Configuration when cluster is disabled [#3553](https://github.com/wazuh/wazuh-kibana-app/pull/3553)
+- Fix the pinned filters were removed when accessing to the `Panel` tab of a module [#3565](https://github.com/wazuh/wazuh-kibana-app/pull/3565)
+- Fixed multi-select component searcher handler [#3645](https://github.com/wazuh/wazuh-kibana-app/pull/3645)
 - Fixed order logs properly in Management/Logs [#3609](https://github.com/wazuh/wazuh-kibana-app/pull/3609)
+- Fixed the Wazuh API requests to `GET //` [#3661](https://github.com/wazuh/wazuh-kibana-app/pull/3661)
+- Fixed missing mitre tactics [#3675](https://github.com/wazuh/wazuh-kibana-app/pull/3675)
 - Fix CDB list view not working with IPv6 [#3488](https://github.com/wazuh/wazuh-kibana-app/pull/3488)
 - Fixed the bad requests using Console tool to `PUT /active-response` API endpoint [#3466](https://github.com/wazuh/wazuh-kibana-app/pull/3466)
 - Fixed group agent management table does not update on error [#3605](https://github.com/wazuh/wazuh-kibana-app/pull/3605)
@@ -83,20 +92,48 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed wazuh token deleted twice [#3652](https://github.com/wazuh/wazuh-kibana-app/pull/3652)
 - Fixed handler of error on dev-tools [#3687](https://github.com/wazuh/wazuh-kibana-app/pull/3687)
 - Fixed compatibility wazuh 4.3 - kibana 7.13.4 [#3685](https://github.com/wazuh/wazuh-kibana-app/pull/3685)
+- Fixed registry values without agent pinned in FIM>Events [#3689](https://github.com/wazuh/wazuh-kibana-app/pull/3689)
 - Fixed breadcrumbs style compatibility for Kibana 7.14.2 [#3688](https://github.com/wazuh/wazuh-kibana-app/pull/3688)
+- Fixed security alerts table when filters change [#3682](https://github.com/wazuh/wazuh-kibana-app/pull/3682)
+- Fixed error that shows we're using X-Pack when we have Basic [#3692](https://github.com/wazuh/wazuh-kibana-app/pull/3692)
 - Fixed blank screen in Kibana 7.10.2 [#3700](https://github.com/wazuh/wazuh-kibana-app/pull/3700)
+- Fixed related decoder link undefined parameters error [#3704](https://github.com/wazuh/wazuh-kibana-app/pull/3704)
+- Fixing Flyouts in Kibana 7.14.2 [#3708](https://github.com/wazuh/wazuh-kibana-app/pull/3708)
+- Fixing the bug of index patterns in health-check due to bad copy of a PR [#3707](https://github.com/wazuh/wazuh-kibana-app/pull/3707)
+- Fixed styles and behaviour of button filter in the flyout of `Inventory` section for `Integrity monitoring` and `Vulnerabilities` modules [#3733](https://github.com/wazuh/wazuh-kibana-app/pull/3733)
+- Fixed height of `Evolution` card in the `Agents` section when has no data for the selected time range [#3733](https://github.com/wazuh/wazuh-kibana-app/pull/3733)
+- Fix clearing the query filter doesn't update the data in Office 365 and GitHub Panel tab [#3722](https://github.com/wazuh/wazuh-kibana-app/pull/3722)
+- Fix wrong deamons in filter list [#3710](https://github.com/wazuh/wazuh-kibana-app/pull/3710)
+- Fixing bug when create filename with spaces and throws a bad error [#3724](https://github.com/wazuh/wazuh-kibana-app/pull/3724)
+- Fixing bug in security User flyout nonexistant unsubmitted changes warning [#3731](https://github.com/wazuh/wazuh-kibana-app/pull/3731)
+- Fixing redirect to new tab when click in a link [#3732](https://github.com/wazuh/wazuh-kibana-app/pull/3732)
+- Fixed missing settings in `Management/Configuration/Global configuration/Global/Main settings` [#3737](https://github.com/wazuh/wazuh-kibana-app/pull/3737)
+- Fixed `Maximum call stack size exceeded` error exporting key-value pairs of a CDB List [#3738](https://github.com/wazuh/wazuh-kibana-app/pull/3738)
+- Fixed regex lookahead and lookbehind for safari [#3741](https://github.com/wazuh/wazuh-kibana-app/pull/3741)
+- Fixed Vulnerabilities Inventory flyout details filters [#3744](https://github.com/wazuh/wazuh-kibana-app/pull/3744)
 
-## Wazuh v4.2.4 - Kibana 7.10.2 , 7.12.1, 7.13.4, 7.14.2 - Revision 4206
+## Wazuh v4.2.5 - Kibana 7.10.2, 7.11.2, 7.12.1, 7.13.4, 7.14.2 - Revision 4206
 
 ### Added
 
 - Support for Kibana 7.13.4
 - Support for Kibana 7.14.2
+- Hide the `telemetry` banner [#3709](https://github.com/wazuh/wazuh-kibana-app/pull/3709)
 
 ### Fixed
 
-- Fixed compatibility wazuh 4.2 - kibana 7.13.4 [#3653](https://github.com/wazuh/wazuh-kibana-app/pull/3653)
+- Fixed compatibility Wazuh 4.2 - Kibana 7.13.4 [#3653](https://github.com/wazuh/wazuh-kibana-app/pull/3653)
 - Fixed interative register windows agent screen error [#3654](https://github.com/wazuh/wazuh-kibana-app/pull/3654)
+- Fixed breadcrumbs style compatibility for Kibana 7.14.2 [#3668](https://github.com/wazuh/wazuh-kibana-app/pull/3668)
+- Fixed Wazuh token is not removed after logout in Kibana 7.13 [#3670](https://github.com/wazuh/wazuh-kibana-app/pull/3670)
+- Fixed Group Configuration and Management configuration error after trying to going back after you save [#3672](https://github.com/wazuh/wazuh-kibana-app/pull/3672)
+- Fixing EuiPanels in Overview Sections and disabled text in WzMenu [#3674](https://github.com/wazuh/wazuh-kibana-app/pull/3674)
+- Fixing double flyout clicking in a policy [#3676](https://github.com/wazuh/wazuh-kibana-app/pull/3676)
+- Fixed error conflict setting kibana settings from the health check [#3678](https://github.com/wazuh/wazuh-kibana-app/pull/3678)
+- Fixed compatibility to get the valid index patterns and refresh fields for Kibana 7.10.2-7.13.4 [3681](https://github.com/wazuh/wazuh-kibana-app/pull/3681)
+- Fixed wrong redirect after login [3701](https://github.com/wazuh/wazuh-kibana-app/pull/3701)
+- Fixed error getting the index pattern data when there is not `attributes.fields` in the saved object [3689](https://github.com/wazuh/wazuh-kibana-app/pull/3698)
+
 
 ## Wazuh v4.2.4 - Kibana 7.10.2, 7.11.2, 7.12.1 - Revision 4205
 

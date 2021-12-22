@@ -290,14 +290,14 @@ export class FileDetails extends Component {
                   <span
                     className={className}
                     onMouseEnter={() => {
-                      this.setState({ hoverAddFilter: item });
+                      this.setState({ hoverAddFilter: item.field });
                     }}
                     onMouseLeave={() => {
                       this.setState({ hoverAddFilter: '' });
                     }}
                   >
                     {value}
-                    {_.isEqual(this.state.hoverAddFilter, item) && (
+                    {this.state.hoverAddFilter === item.field && (
                       <EuiToolTip
                         position="top"
                         anchorClassName="detail-tooltip"
@@ -394,7 +394,7 @@ export class FileDetails extends Component {
   }
 
   render() {
-    const { fileName, type, implicitFilters, view, currentFile, agent } = this.props;
+    const { fileName, type, implicitFilters, view, currentFile, agent, agentId } = this.props;
     const inspectButtonText = view === 'extern' ? 'Inspect in FIM' : 'Inspect in Events';
     return (
       <Fragment>
@@ -425,7 +425,11 @@ export class FileDetails extends Component {
             >
               <EuiFlexGroup className="flyout-row">
                 <EuiFlexItem>
-                  <RegistryValues currentFile={currentFile} agent={agent} />
+                  <RegistryValues 
+                    currentFile={currentFile} 
+                    agent={agent} 
+                    agentId={agentId} 
+                  />
                 </EuiFlexItem>
               </EuiFlexGroup>
             </EuiAccordion>{' '}

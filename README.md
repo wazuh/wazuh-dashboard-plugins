@@ -80,7 +80,7 @@ This plugin for Kibana allows you to visualize and analyze Wazuh alerts stored i
 
 **Agent summary**
 
-![Overview](/public/asstes/app7.png)
+![Overview](/public/assets/app7.png)
 
 ## Branches
 
@@ -107,7 +107,7 @@ Install the Wazuh app plugin for Kibana
 
 ```
 cd /usr/share/kibana
-sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.4_7.10.2-1.zip
+sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.5_7.10.2-1.zip
 ```
 
 Restart Kibana
@@ -194,7 +194,7 @@ Install the Wazuh app
 
 ```
 cd /usr/share/kibana/
-sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.4_7.10.2-1.zip
+sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.5_7.10.2-1.zip
 ```
 
 Update configuration file permissions.
@@ -223,6 +223,28 @@ service kibana restart
  
 | Wazuh app | Kibana  | Open Distro | Package                                                                    |
 | :-------: | :----:  | :---------: | :------------------------------------------------------------------------- |
+|   4.3.0   |  7.14.2 |             | <> |
+|   4.3.0   |  7.14.1 |             | <> |
+|   4.3.0   |  7.14.0 |             | <> |
+|   4.3.0   |  7.13.4 |             | <> |
+|   4.3.0   |  7.13.3 |             | <> |
+|   4.3.0   |  7.13.2 |             | <> |
+|   4.3.0   |  7.13.1 |             | <> |
+|   4.3.0   |  7.13.0 |             | <> |
+|   4.3.0   |  7.12.1 |             | <> |
+|   4.3.0   |  7.11.2 |             | <> |
+|   4.3.0   |  7.10.2 |   1.13.2    | <> |
+|   4.2.5   |  7.14.2 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.5_7.14.2-1.zip> |
+|   4.2.5   |  7.14.1 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.5_7.14.1-1.zip> |
+|   4.2.5   |  7.14.0 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.5_7.14.0-1.zip> |
+|   4.2.5   |  7.13.4 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.5_7.13.4-1.zip> |
+|   4.2.5   |  7.13.3 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.5_7.13.3-1.zip> |
+|   4.2.5   |  7.13.2 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.5_7.13.2-1.zip> |
+|   4.2.5   |  7.13.1 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.5_7.13.1-1.zip> |
+|   4.2.5   |  7.13.0 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.5_7.13.0-1.zip> |
+|   4.2.5   |  7.12.1 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.5_7.12.1-1.zip> |
+|   4.2.5   |  7.11.2 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.5_7.11.2-1.zip> |
+|   4.2.5   |  7.10.2 |   1.13.2    | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.4_7.10.2-1.zip> |
 |   4.2.4   |  7.12.1 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.4_7.12.1-1.zip> |
 |   4.2.4   |  7.11.2 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.4_7.11.2-1.zip> |
 |   4.2.4   |  7.10.2 |   1.13.2    | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.4_7.10.2-1.zip> |

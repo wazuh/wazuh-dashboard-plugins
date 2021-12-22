@@ -241,7 +241,8 @@ export class ReportPrinter{
         this.addContent({
           text: table.title,
           style: 'h3',
-          pageBreak: 'before'
+          pageBreak: 'before',
+          pageOrientation: table.columns.length >= 9 ? 'landscape' : 'portrait',
         });
         this.addNewLine();
         const full_body = [];
@@ -256,6 +257,7 @@ export class ReportPrinter{
 
         const modifiedRows = rows.map(row => row.map(cell => ({ text: cell || '-', style: 'standard' })));
 
+        // the width of the columns is assigned
         const widths = Array(table.columns.length - 1).fill('auto');
         widths.push('*');
 

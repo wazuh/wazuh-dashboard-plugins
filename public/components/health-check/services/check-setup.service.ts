@@ -20,7 +20,7 @@ export const checkSetupService = appInfo => async (checkLogger: CheckLogger) => 
   if (currentApi && currentApi.id) {
     checkLogger.info(`Current API in cookie: [${currentApi.id}]`);
     checkLogger.info(`Getting API version data...`);
-    const versionData = await WzRequest.apiReq('GET', '//', {});
+    const versionData = await WzRequest.apiReq('GET', '/', {});
     const apiVersion = versionData.data.data['api_version'];
     checkLogger.info(`API version: [${apiVersion}]`);
     checkLogger.info(`Getting the app version...`);

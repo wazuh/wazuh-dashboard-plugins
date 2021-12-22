@@ -36,8 +36,6 @@ import {
   EuiFlexItem,
   EuiFlexGroup,
   Direction,
-  EuiOverlayMask,
-  EuiOutsideClickDetector,
   EuiSpacer,
   EuiCallOut,
   EuiIcon,
@@ -82,7 +80,6 @@ export const Discover = compose(
     state: {
       sort: object;
       selectedTechnique: string;
-      showMitreFlyout: boolean;
       alerts: { _source: {}; _id: string }[];
       total: number;
       pageIndex: number;
@@ -107,7 +104,6 @@ export const Discover = compose(
       query?: { language: 'kuery' | 'lucene'; query: string };
       type?: any;
       updateTotalHits: Function;
-      openIntelligence: Function;
       includeFilters?: string;
       initialColumns: ColumnDefinition[];
       initialAgentColumns?: ColumnDefinition[];
@@ -123,7 +119,6 @@ export const Discover = compose(
       this.state = {
         sort: {},
         selectedTechnique: '',
-        showMitreFlyout: false,
         alerts: [],
         total: 0,
         pageIndex: 0,
@@ -391,8 +386,8 @@ export const Discover = compose(
       const range = {
         range: {
           timestamp: {
-            gte: dateParse(this.state.dateRange.from),
-            lte: dateParse(this.state.dateRange.to),
+            gte: dateParse(this.timefilter.getTime().from),
+            lte: dateParse(this.timefilter.getTime().to),
             format: 'epoch_millis',
           },
         },
@@ -536,7 +531,7 @@ export const Discover = compose(
           width = '15%';
         }
         if (item === 'rule.mitre.id') {
-          link = (ev, x, e) => this.props.openIntelligence(e, 'techniques', x);
+          link = (ev, x) => this.openIntelligence(ev, 'techniques', x);
         }
         if (arrayCompilance.indexOf(item) !== -1) {
           width = '30%';
@@ -700,13 +695,6 @@ export const Discover = compose(
       this.setState({ pageIndex: 0, tsUpdated: Date.now() });
     };
 
-    closeMitreFlyout = () => {
-      this.setState({ showMitreFlyout: false });
-    };
-
-    onMitreChangeFlyout = (showMitreFlyout: boolean) => {
-      this.setState({ showMitreFlyout });
-    };
 
     openDiscover(e, techniqueID) {
       AppNavigate.navigateToModule(e, 'overview', {
@@ -722,6 +710,10 @@ export const Discover = compose(
         tabView: 'dashboard',
         filters: { 'rule.mitre.id': techniqueID },
       });
+    }
+
+    openIntelligence(e, redirectTo, itemID) {
+      AppNavigate.navigateToModule(e, 'overview', { "tab": 'mitre', "tabView": "intelligence", "tabRedirect": redirectTo, "idToRedirect": itemID});
     }
 
     render() {
@@ -758,23 +750,6 @@ export const Discover = compose(
         pageSizeOptions: [10, 25, 50],
       };
       const noResultsText = `No results match for this search criteria`;
-      let flyout = this.state.showMitreFlyout ? (
-        <EuiOverlayMask headerZindexLocation="below">
-          <EuiOutsideClickDetector onOutsideClick={this.closeMitreFlyout}>
-            <div>
-              {/* EuiOutsideClickDetector needs a static first child */}
-              <FlyoutTechnique
-                openDashboard={(e, itemId) => this.openDashboard(e, itemId)}
-                openDiscover={(e, itemId) => this.openDiscover(e, itemId)}
-                onChangeFlyout={this.onMitreChangeFlyout}
-                currentTechnique={this.state.selectedTechnique}
-              />
-            </div>
-          </EuiOutsideClickDetector>
-        </EuiOverlayMask>
-      ) : (
-        <></>
-      );
       return (
         <div className="wz-discover hide-filter-control wz-inventory">
           {this.props.kbnSearchBar && (
@@ -818,7 +793,6 @@ export const Discover = compose(
               </EuiFlexItem>
             </EuiFlexGroup>
           )}
-          {flyout}
         </div>
       );
     }

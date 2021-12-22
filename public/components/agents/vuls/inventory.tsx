@@ -27,17 +27,18 @@ import { ICustomBadges } from '../../wz-search-bar/components';
 export class Inventory extends Component {
   _isMount = false;
   state: {
+    filters: [];
     isLoading: Boolean;
     customBadges: ICustomBadges[];
   };
-
   props: any;
 
   constructor(props) {
     super(props);
     this.state = {
       isLoading: true,
-      customBadges: []
+      customBadges: [],
+      filters: [],
     }
   }
 
@@ -51,20 +52,28 @@ export class Inventory extends Component {
   }
 
   async loadAgent() {
-    if (this._isMount){
-      this.setState({  isLoading: false });
+    if (this._isMount) {
+      this.setState({ isLoading: false });
     }
   }
 
+  onFiltersChange = (filters) => {
+    this.setState({ filters });
+  }
+
   renderTable() {
+    const { filters } = this.state;
     return (
       <div>
-          <InventoryTable
-            {...this.props}/>
+        <InventoryTable
+          {...this.props}
+          filters={filters}
+          onFiltersChange={this.onFiltersChange}
+        />
       </div>
     )
   }
-  
+
   loadingInventory() {
     return <EuiPage>
       <EuiFlexGroup>
@@ -84,10 +93,9 @@ export class Inventory extends Component {
     const table = this.renderTable();
 
     return <EuiPage>
-        <EuiPanel>
-          <EuiSpacer size={(((this.props.agent || {}).os || {}).platform || false) === 'windows' ? 's' : 'm'} />
-          {table}
-        </EuiPanel>
-      </EuiPage>
+      <EuiPanel>
+        {table}
+      </EuiPanel>
+    </EuiPage>
   }
 }

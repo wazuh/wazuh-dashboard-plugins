@@ -104,7 +104,8 @@ class WzConfigurationGlobalConfigurationGlobal extends Component {
       agent.id === '000' &&
       currentConfig['analysis-global'] &&
       currentConfig['analysis-global'].global &&
-      currentConfig['analysis-global'].logging
+      currentConfig['com-logging'] &&
+      currentConfig['com-logging'].logging
         ? {
             ...currentConfig['analysis-global'].global,
             plain: currentConfig['com-logging'].logging.plain,

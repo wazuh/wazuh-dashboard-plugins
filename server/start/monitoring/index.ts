@@ -473,6 +473,20 @@ async function fetchAllAgentsFromApiHost(context, apiHost){
 
     while (agents.length < agentsCount && payload.offset < agentsCount) {
       try{
+        /* 
+        TODO: Improve the performance of request with:
+          - Reduce the number of requests to the Wazuh API
+          - Reduce (if possible) the quantity of data to index by document
+
+        Requirements:
+          - Research about the neccesary data to index.
+
+        How to do:
+          - Wazuh API request:
+            - select the required data to retrieve depending on is required to index (using the `select` query param)
+            - increase the limit of results to retrieve (currently, the requests use the recommended value: 500).
+              See the allowed values. This depends on the selected data because the response could fail if contains a lot of data
+        */
         const responseAgents = await context.wazuh.api.client.asInternalUser.request(
           'GET',
           `/agents`,

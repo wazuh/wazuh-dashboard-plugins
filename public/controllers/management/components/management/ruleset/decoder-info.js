@@ -39,7 +39,7 @@ class WzDecoderInfo extends Component {
 
     this.rulesetHandler = new RulesetHandler(RulesetResources.DECODERS);
 
-    const handleFileClick = async () => {
+    const handleFileClick = async (value, item) => {
       try {
         const result = await this.rulesetHandler.getFileContent(value);
         const file = { name: value, content: result, path: item.relative_dirname };
@@ -86,7 +86,7 @@ class WzDecoderInfo extends Component {
         render: (value, item) => {
           return (
             <EuiToolTip position="top" content={`Show ${value} content`}>
-              <EuiLink onClick={async () => handleFileClick()}>{value}</EuiLink>
+              <EuiLink onClick={async () => handleFileClick(value, item)}>{value}</EuiLink>
             </EuiToolTip>
           );
         },
