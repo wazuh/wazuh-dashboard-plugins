@@ -89,13 +89,6 @@ const checks = {
     shouldCheck: true,
     canRetry: true,
   },
-  // maxBuckets: {
-  //   title: `Check ${KIBANA_SETTING_NAME_MAX_BUCKETS} setting`,
-  //   label: `${KIBANA_SETTING_NAME_MAX_BUCKETS} setting`,
-  //   validator: checkKibanaSettings(KIBANA_SETTING_NAME_MAX_BUCKETS, WAZUH_KIBANA_SETTING_MAX_BUCKETS),
-  //   awaitFor: [],
-  //   canRetry: true,
-  // },
   metaFields: {
     title: `Check ${KIBANA_SETTING_NAME_METAFIELDS} setting`,
     label: `${KIBANA_SETTING_NAME_METAFIELDS} setting`,
