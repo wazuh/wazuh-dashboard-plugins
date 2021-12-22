@@ -31,6 +31,7 @@ export function TableWzAPI({endpoint, ...rest}){
   const [totalItems, setTotalItems] = useState(0);
   const [filters, setFilters] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const onFiltersChange = filters => typeof rest.onFiltersChange === 'function' ? rest.onFiltersChange(filters) : null;
 
   const onSearch = useCallback(async function(filters, pagination, sorting){
     try {
@@ -38,6 +39,7 @@ export function TableWzAPI({endpoint, ...rest}){
       const { field, direction } = sorting.sort;
       setIsLoading(true);
       setFilters(filters);
+      onFiltersChange(filters);
       const params = {
         ...filtersToObject(filters),
         offset: pageIndex * pageSize,
