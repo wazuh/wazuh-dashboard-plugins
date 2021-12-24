@@ -40,7 +40,6 @@ export class WazuhApiCtrl {
   async getToken(context: RequestHandlerContext, request: OpenSearchDashboardsRequest, response: OpenSearchDashboardsResponseFactory) {
     try {
       const { force, idHost } = request.body;
-      console.log('context1: ', context)
       const { username } = await context.wazuh.security.getCurrentUser(request, context);
       if (!force && request.headers.cookie && username === getCookieValueByName(request.headers.cookie, 'wz-user') && idHost === getCookieValueByName(request.headers.cookie,'wz-api')) {
         const wzToken = getCookieValueByName(request.headers.cookie, 'wz-token');
@@ -1061,7 +1060,6 @@ export class WazuhApiCtrl {
 
       const disabledRoles = ( await getConfiguration() )['disabled_roles'] || [];
       const logoSidebar = ( await getConfiguration() )['customization.logo.sidebar'] || 'icon_blue.png';
-      console.log('context2: ', context)
       const data = (await context.wazuh.security.getCurrentUser(request, context)).authContext;
 
       const isWazuhDisabled = +(data.roles || []).some((role) => disabledRoles.includes(role));
