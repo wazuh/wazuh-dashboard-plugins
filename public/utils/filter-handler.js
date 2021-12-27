@@ -31,7 +31,7 @@ export class FilterHandler {
         }
       },
       query: {
-        match: null
+        match_phrase: null
       },
       $state: {
         store: 'appState'
@@ -44,10 +44,9 @@ export class FilterHandler {
     result.meta.key = 'agent.id';
     result.meta.value = agent;
     result.meta.params.query = agent;
-    result.query.match = {
+    result.query.match_phrase = {
       'agent.id': {
-        query: agent,
-        type: 'phrase'
+        query: agent
       }
     };
     return result;
@@ -58,10 +57,9 @@ export class FilterHandler {
     result.meta.key = 'cluster.node';
     result.meta.value = node;
     result.meta.params.query = node;
-    result.query.match = {
+    result.query.match_phrase = {
       'cluster.node': {
-        query: node,
-        type: 'phrase'
+        query: node
       }
     };
     return result;
@@ -72,10 +70,9 @@ export class FilterHandler {
     result.meta.key = 'rule.groups';
     result.meta.value = group;
     result.meta.params.query = group;
-    result.query.match = {
+    result.query.match_phrase = {
       'rule.groups': {
-        query: group,
-        type: 'phrase'
+        query: group
       }
     };
     return result;
@@ -87,10 +84,9 @@ export class FilterHandler {
     result.meta.key = 'rule.id';
     result.meta.value = ruleId;
     result.meta.params.query = ruleId;
-    result.query.match = {
+    result.query.match_phrase = {
       'rule.id': {
-        query: ruleId,
-        type: 'phrase'
+        query: ruleId
       }
     };
     return result;
@@ -101,17 +97,15 @@ export class FilterHandler {
     result.meta.key = isCluster ? 'cluster.name' : 'manager.name';
     result.meta.value = manager;
     result.meta.params.query = manager;
-    result.query.match = isCluster
+    result.query.match_phrase = isCluster
       ? {
           'cluster.name': {
-            query: manager,
-            type: 'phrase'
+            query: manager
           }
         }
       : {
           'manager.name': {
-            query: manager,
-            type: 'phrase'
+            query: manager
           }
         };
     return result;

@@ -73,10 +73,9 @@ class WzAgentSelector extends Component {
             "index": AppState.getCurrentPattern() || WAZUH_ALERTS_PATTERN
           },
           "query": {
-            "match": {
+            "match_phrase": {
               'agent.id': {
-                query: agentIdList[0],
-                type: 'phrase'
+                query: agentIdList[0]
               }
             }
           },
