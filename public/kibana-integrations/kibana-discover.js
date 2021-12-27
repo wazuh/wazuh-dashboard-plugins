@@ -27,11 +27,11 @@ import {
   getServices,
   setServices,
   setDocViewsRegistry,
-  subscribeWithScope,
   tabifyAggResponse,
   getHeaderActionMenuMounter,
   setUiActions
 } from './discover/kibana_services';
+import { subscribeWithScope } from './plugins/kibana_legacy/public';
 
 import indexTemplateLegacy from './discover/application/angular/discover_legacy.html';
 
@@ -76,7 +76,6 @@ import { validateTimeRange } from './discover/application/helpers/validate_time_
 import {
   fieldFormats,
   esFilters,
-  indexPatterns as indexPatternsUtils,
   connectToQueryState,
   syncQueryStateWithUrl,
   getDefaultQuery,
@@ -128,6 +127,11 @@ appDiscover.directive('discoverApp', function () {
   };
 });
 
+const isDefaultType = (indexPattern) => {
+  // Default index patterns don't have `type` defined.
+  return !indexPattern.type;
+};
+
 function discoverController(
   $element,
   $route,
@@ -143,7 +147,6 @@ function discoverController(
   loadedVisualizations,
   discoverPendingUpdates
 ) {
-  const { isDefault: isDefaultType } = indexPatternsUtils;
   const subscriptions = new Subscription();
   const $fetchObservable = new Subject();
   let inspectorRequest;
@@ -184,7 +187,6 @@ function discoverController(
     });
     setServices(services);
   })();
-
   const {
     core,
     chrome,
@@ -230,7 +232,6 @@ function discoverController(
     data.query,
     kbnUrlStateStorage
   );
-
   // sync initial app filters from state to filterManager
   filterManager.setAppFilters(_.cloneDeep(appStateContainer.getState().filters));
   data.query.queryString.setQuery(appStateContainer.getState().query);
@@ -368,7 +369,6 @@ function discoverController(
 
   // Even when searching rollups, we want to use the default strategy so that we get back a
   // document-like response.
-  $scope.searchSource.setPreferredSearchStrategyId('default');
 
   // searchSource which applies time range
   const timeRangeSearchSource = savedSearch.searchSource.create();
@@ -380,7 +380,6 @@ function discoverController(
   }
 
   $scope.searchSource.setParent(timeRangeSearchSource);
-
   const pageTitleSuffix = savedSearch.id && savedSearch.title ? `: ${savedSearch.title}` : '';
   chrome.docTitle.change(`Wazuh${pageTitleSuffix}`);
   const discoverBreadcrumbsTitle = i18n.translate('discover.discoverBreadcrumbTitle', {

@@ -32,6 +32,7 @@ import cellTemplateHtml from '../components/table_row/cell.html';
 import truncateByHeightTemplateHtml from '../components/table_row/truncate_by_height.html';
 import { esFilters } from '../../../../../../../../../src/plugins/data/public';
 import { getServices } from '../../../../kibana_services';
+import { formatField } from '../../../../../lib/format_hit';
 
 const TAGS_WITH_WS = />\s+</g;
 
@@ -212,7 +213,7 @@ export function createTableRowDirective($compile: ng.ICompileService) {
        */
       function _displayField(row: any, fieldName: string, truncate = false) {
         const indexPattern = $scope.indexPattern;
-        const text = indexPattern.formatField(row, fieldName);
+        const text = `<span ng-non-bindable>${formatField(row, fieldName, indexPattern)}</span>`;
 
         if (truncate && text.length > MIN_LINE_LENGTH) {
           return truncateByHeightTemplate({

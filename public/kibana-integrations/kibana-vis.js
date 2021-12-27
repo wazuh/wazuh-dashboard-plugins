@@ -133,10 +133,11 @@ class KibanaVis extends Component {
         const data = await this.visHandler.handler.execution.getData();
         if (
           data &&
-          data.value &&
-          data.value.visData &&
-          data.value.visData.rows &&
-          this.props.state[this.visID] !== data.value.visData.rows['0']['col-0-1']
+          data.result &&
+          data.result.value &&
+          data.result.value.visData &&
+          data.result.value.visData.rows &&
+          this.props.state[this.visID] !== data.result.value.visData.rows['0']['col-0-1']
         ) {
           store.dispatch(
             this.updateMetric({
@@ -145,23 +146,23 @@ class KibanaVis extends Component {
             })
           );
         }
-        // This check if data.value.visData.tables exists and dispatch that value as stat
+        // This check if data.result.value.visData.tables exists and dispatch that value as stat
         // FIXME: this is correct?
         if (
           data &&
-          data.value &&
-          data.value.visData &&
-          data.value.visData.tables &&
-          data.value.visData.tables.length &&
-          data.value.visData.tables['0'] &&
-          data.value.visData.tables['0'].rows &&
-          data.value.visData.tables['0'].rows['0'] &&
-          this.props.state[this.visID] !== data.value.visData.tables['0'].rows['0']['col-0-2']
+          data.result.value &&
+          data.result.value.visData &&
+          data.result.value.visData.tables &&
+          data.result.value.visData.tables.length &&
+          data.result.value.visData.tables['0'] &&
+          data.result.value.visData.tables['0'].rows &&
+          data.result.value.visData.tables['0'].rows['0'] &&
+          this.props.state[this.visID] !== data.result.value.visData.tables['0'].rows['0']['col-0-2']
         ) {
           store.dispatch(
             this.updateMetric({
               name: this.visID,
-              value: data.value.visData.tables['0'].rows['0']['col-0-2'],
+              value: data.result.value.visData.tables['0'].rows['0']['col-0-2'],
             })
           );
         }

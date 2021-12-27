@@ -39,7 +39,7 @@ export function createTableHeaderDirective(reactDirective: any) {
     { restrict: 'A' },
     {
       hideTimeColumn: config.get(DOC_HIDE_TIME_COLUMN_SETTING, false),
-      isShortDots: config.get(UI_SETTINGS.SHORT_DOTS_ENABLE),
+      isShortDots: config.get(UI_SETTINGS.SHORT_DOTS_ENABLE, false),
       defaultSortOrder: config.get(SORT_DEFAULT_ORDER_SETTING, 'desc'),
     }
   );

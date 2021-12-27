@@ -110,7 +110,7 @@ export function DiscoverSidebar({
   );
 
   const popularLimit = services.uiSettings.get(FIELDS_LIMIT_SETTING);
-  const useShortDots = services.uiSettings.get(UI_SETTINGS.SHORT_DOTS_ENABLE);
+  const useShortDots = services.uiSettings.get(UI_SETTINGS.SHORT_DOTS_ENABLE, false);
 
   const {
     selected: selectedFields,

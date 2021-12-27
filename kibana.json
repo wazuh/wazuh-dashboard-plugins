@@ -16,8 +16,7 @@
     "charts",
     "savedObjects",
     "kibanaReact",
-    "kibanaUtils",
-    "securityOss"
+    "kibanaUtils"
   ],
   "optionalPlugins": [
     "security",
@@ -27,5 +26,8 @@
     "telemetry"
   ],
   "server": true,
-  "ui": true
+  "ui": true,
+  "owner": {
+    "name": "Wazuh, Inc"
+  }
 }

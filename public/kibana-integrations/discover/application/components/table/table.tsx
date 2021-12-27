@@ -21,6 +21,7 @@ import { escapeRegExp } from 'lodash';
 import { DocViewTableRow } from './table_row';
 import { arrayContainsObjects, trimAngularSpan } from './table_helper';
 import { DocViewRenderProps } from '../../doc_views/doc_views_types';
+import { formatHit } from '../../../../lib/format_hit';
 
 const COLLAPSE_LINE_LENGTH = 350;
 
@@ -34,7 +35,7 @@ export function DocViewTable({
 }: DocViewRenderProps) {
   const mapping = indexPattern.fields.getByName;
   const flattened = indexPattern.flattenHit(hit);
-  const formatted = indexPattern.formatHit(hit, 'html');
+  const formatted = formatHit(hit, indexPattern, 'html');
   const [fieldRowOpen, setFieldRowOpen] = useState({} as Record<string, boolean>);
 
   function toggleValueCollapse(field: string) {

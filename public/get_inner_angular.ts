@@ -23,10 +23,16 @@
 import angular from 'angular';
 // required for `ngSanitize` angular module
 import 'angular-sanitize';
-import { i18nDirective, i18nFilter, I18nProvider } from '@kbn/i18n/angular';
+import 'ngreact';
+import { i18nDirective, i18nFilter, I18nProvider } from './kibana-integrations/packages/@kbn/i18n/angular';
 import { CoreStart, PluginInitializerContext } from 'kibana/public';
 import { Storage } from '../../../src/plugins/kibana_utils/public';
 import { NavigationPublicPluginStart as NavigationStart } from '../../../src/plugins/navigation/public';
+import { AppPluginStartDependencies } from './types';
+import { getScopedHistory, setDiscoverModule } from './kibana-services';
+import { createDiscoverLegacyDirective } from './kibana-integrations/discover/application/components/create_discover_legacy_directive';
+import { createContextErrorMessageDirective } from './kibana-integrations/discover/application/components/context_error_message';
+import { EuiIcon } from '@elastic/eui';
 import {
   initAngularBootstrap,
   configureAppAngularModule,
@@ -34,15 +40,9 @@ import {
   PromiseServiceCreator,
   registerListenEventListener,
   watchMultiDecorator,
-  createTopNavDirective,
-  createTopNavHelper,
-} from '../../../src/plugins/kibana_legacy/public';
-import { AppPluginStartDependencies } from './types';
-import { getScopedHistory, setDiscoverModule } from './kibana-services';
-import { createDiscoverLegacyDirective } from './kibana-integrations/discover/application/components/create_discover_legacy_directive';
-import { createContextErrorMessageDirective } from './kibana-integrations/discover/application/components/context_error_message';
-import { EuiIcon } from '@elastic/eui';
-
+  // createTopNavDirective,
+  // createTopNavHelper,
+} from './kibana-integrations/plugins/kibana_legacy/public';
 /**
  * returns the main inner angular module, it contains all the parts of Angular Discover
  * needs to render, so in the end the current 'kibana' angular module is no longer necessary
@@ -66,7 +66,8 @@ export function initializeInnerAngularModule(name = 'app/wazuh', navigation: Nav
     createLocalI18nModule();
     createLocalPrivateModule();
     createLocalPromiseModule();
-    createLocalTopNavModule(navigation);
+    // TODO: review if this method is required
+    //createLocalTopNavModule(navigation);
     createLocalStorageModule();
     initialized = true;
   }
@@ -75,7 +76,8 @@ export function initializeInnerAngularModule(name = 'app/wazuh', navigation: Nav
     'discoverI18n',
     'discoverPrivate',
     'discoverPromise',
-    'discoverTopNav',
+    // TODO: review if this dependency is required
+    // 'discoverTopNav',
     'discoverLocalStorageProvider',
   ]);
 
@@ -109,8 +111,9 @@ function createLocalPrivateModule() {
 function createLocalTopNavModule(navigation: NavigationStart) {
   angular
     .module('discoverTopNav', ['react'])
-    .directive('kbnTopNav', createTopNavDirective)
-    .directive('kbnTopNavHelper', createTopNavHelper(navigation.ui));
+    // TODO: review if these directives are required
+    // .directive('kbnTopNav', createTopNavDirective)
+    // .directive('kbnTopNavHelper', createTopNavHelper(navigation.ui));
 }
 
 function createLocalI18nModule() {
