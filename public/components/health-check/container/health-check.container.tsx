@@ -50,9 +50,10 @@ import {
 import { getDataPlugin } from '../../../kibana-services';
 import { CheckLogger } from '../types/check_logger';
 import { compose } from 'redux';
+import './health-check.scss';
 
 const checks = {
-  api: {    
+  api: {
     title: 'Check Wazuh API connection',
     label: 'API connection',
     validator: checkApiService,
@@ -106,7 +107,7 @@ const checks = {
   timeFilter: {
     title: `Check ${KIBANA_SETTING_NAME_TIME_FILTER} setting`,
     label: `${KIBANA_SETTING_NAME_TIME_FILTER} setting`,
-    validator: checkKibanaSettings(KIBANA_SETTING_NAME_TIME_FILTER, JSON.stringify(WAZUH_KIBANA_SETTING_TIME_FILTER), (checkLogger: CheckLogger, options: {defaultAppValue: any}) => {
+    validator: checkKibanaSettings(KIBANA_SETTING_NAME_TIME_FILTER, JSON.stringify(WAZUH_KIBANA_SETTING_TIME_FILTER), (checkLogger: CheckLogger, options: { defaultAppValue: any }) => {
       getDataPlugin().query.timefilter.timefilter.setTime(WAZUH_KIBANA_SETTING_TIME_FILTER)
         && checkLogger.action(`Timefilter set to ${JSON.stringify(options.defaultAppValue)}`);
     }),
@@ -116,8 +117,8 @@ const checks = {
 };
 
 function HealthCheckComponent() {
-  const [checkErrors, setCheckErrors] = useState<{[key:string]: []}>({});
-  const [checksReady, setChecksReady] = useState<{[key: string]: boolean}>({});
+  const [checkErrors, setCheckErrors] = useState<{ [key: string]: [] }>({});
+  const [checksReady, setChecksReady] = useState<{ [key: string]: boolean }>({});
   const [isDebugMode, setIsDebugMode] = useState<boolean>(false);
   const appConfig = useAppConfig();
   const checksInitiated = useRef(false);
@@ -141,31 +142,31 @@ function HealthCheckComponent() {
     // Redirect to app when all checks are ready
     Object.keys(checks)
       .every(check => checksReady[check])
-    && !isDebugMode && (() => setTimeout(redirectionPassHealthcheck, HEALTH_CHECK_REDIRECTION_TIME)
+      && !isDebugMode && (() => setTimeout(redirectionPassHealthcheck, HEALTH_CHECK_REDIRECTION_TIME)
       )()
   }, [checksReady]);
 
   useEffect(() => {
     // Check if Health should not redirect automatically (Debug mode)
     setIsDebugMode(window.location.href.includes('debug'));
-  },[]);
+  }, []);
 
   const handleErrors = (checkID, errors, parsed) => {
     const newErrors = parsed
       ? errors.map((error) =>
-          ErrorHandler.handle(error, 'Health Check', { warning: false, silent: true })
-        )
+        ErrorHandler.handle(error, 'Health Check', { warning: false, silent: true })
+      )
       : errors;
-    setCheckErrors((prev) => ({...prev, [checkID]: newErrors}));
+    setCheckErrors((prev) => ({ ...prev, [checkID]: newErrors }));
   };
 
   const cleanErrors = (checkID: string) => {
     delete checkErrors[checkID];
-    setCheckErrors({...checkErrors});
+    setCheckErrors({ ...checkErrors });
   }
 
-  const handleCheckReady = (checkID, isReady) => {    
-    setChecksReady(prev =>  ({...prev, [checkID]: isReady}));
+  const handleCheckReady = (checkID, isReady) => {
+    setChecksReady(prev => ({ ...prev, [checkID]: isReady }));
   }
 
 
@@ -187,7 +188,7 @@ function HealthCheckComponent() {
           handleErrors={handleErrors}
           cleanErrors={cleanErrors}
           isLoading={appConfig.isLoading}
-          handleCheckReady= {handleCheckReady}
+          handleCheckReady={handleCheckReady}
           checksReady={checksReady}
           canRetry={checks[check].canRetry}
         />
@@ -196,11 +197,11 @@ function HealthCheckComponent() {
   };
 
   const renderErrors = () => {
-    return Object.keys(checkErrors).map((checkID) => 
+    return Object.keys(checkErrors).map((checkID) =>
       checkErrors[checkID].map((error, index) => (
         <Fragment key={index}>
           <EuiCallOut
-            title={(<>{`[${checks[checkID].label}]`} <span dangerouslySetInnerHTML={{__html: error}}></span></>)}
+            title={(<>{`[${checks[checkID].label}]`} <span dangerouslySetInnerHTML={{ __html: error }}></span></>)}
             color="danger"
             iconType="alert"
             style={{ textAlign: 'left' }}
@@ -209,7 +210,7 @@ function HealthCheckComponent() {
           <EuiSpacer size="xs" />
         </Fragment>
       ))
-    ) 
+    )
   };
 
   return (
@@ -253,7 +254,7 @@ function HealthCheckComponent() {
   );
 }
 
-export const HealthCheck = compose (withErrorBoundary,withReduxProvider) (HealthCheckComponent);
+export const HealthCheck = compose(withErrorBoundary, withReduxProvider)(HealthCheckComponent);
 
 export const HealthCheckTest = HealthCheckComponent;
 

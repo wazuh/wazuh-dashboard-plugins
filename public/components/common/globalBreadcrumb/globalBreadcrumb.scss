@@ -1,4 +1,7 @@
-nav.euiBreadcrumbs.wz-global-breadcrumb span.euiBreadcrumb[title=""]:first-child{
+nav.euiBreadcrumbs.wz-global-breadcrumb span.euiBreadcrumb[title=""]:first-child,
+nav.euiBreadcrumbs.wz-global-breadcrumb span.euiBreadcrumb__content:not([title]):first-child,
+nav.euiBreadcrumbs[data-test-subj="breadcrumbs"] li.euiBreadcrumb span.euiBreadcrumb__content[title="Kibana"]:first-child,
+nav.euiBreadcrumbs[data-test-subj="breadcrumbs"] li.euiBreadcrumb span.euiBreadcrumb__content[title="Wazuh"]:first-child {
   display: none;
 }
 

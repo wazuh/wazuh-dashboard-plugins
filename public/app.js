@@ -23,9 +23,6 @@ import './components';
 // angular-charts.js
 import 'angular-chart.js';
 
-// pin-wz-menu.js
-import { changeWazuhNavLogo } from './utils/wz-logo-menu';
-
 // Font Awesome, Kibana UI framework and others
 import './utils/fontawesome/scss/font-awesome.scss';
 
@@ -77,7 +74,6 @@ app.config([
 app.run([
   '$injector',
   function (_$injector) {
-    changeWazuhNavLogo();
     app.$injector = _$injector;
 
     // Set currentSecurity platform in Redux when app starts.
