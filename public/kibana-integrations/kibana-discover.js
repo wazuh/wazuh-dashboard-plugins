@@ -75,7 +75,7 @@ import { ModulesHelper } from '../components/common/modules/modules-helper';
 import { validateTimeRange } from './discover/application/helpers/validate_time_range';
 import {
   fieldFormats,
-  esFilters,
+  opensearchFilters,
   indexPatterns as indexPatternsUtils,
   connectToQueryState,
   syncQueryStateWithUrl,
@@ -239,7 +239,7 @@ function discoverController(
     data.query,
     appStateContainer,
     {
-      filters: esFilters.FilterStateStore.APP_STATE,
+      filters: opensearchFilters.FilterStateStore.APP_STATE,
       query: true,
     }
   );
@@ -923,7 +923,7 @@ function discoverController(
   $scope.filterQuery = function (field, values, operation) {
     // Commented due to https://github.com/elastic/kibana/issues/22426
     //$scope.indexPattern.popularizeField(field, 1);
-    const newFilters = esFilters.generateFilters(
+    const newFilters = opensearchFilters.generateFilters(
       filterManager,
       field,
       values,

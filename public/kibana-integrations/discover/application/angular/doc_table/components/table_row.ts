@@ -30,7 +30,7 @@ import { dispatchRenderComplete, url } from '../../../../../../../../../src/plug
 import { DOC_HIDE_TIME_COLUMN_SETTING } from '../../../../common';
 import cellTemplateHtml from '../components/table_row/cell.html';
 import truncateByHeightTemplateHtml from '../components/table_row/truncate_by_height.html';
-import { esFilters } from '../../../../../../../../../src/plugins/data/public';
+import { opensearchFilters } from '../../../../../../../../../src/plugins/data/public';
 import { getServices } from '../../../../kibana_services';
 
 const TAGS_WITH_WS = />\s+</g;
@@ -125,7 +125,7 @@ export function createTableRowDirective($compile: ng.ICompileService) {
             }),
             _a: rison.encode({
               columns: $scope.columns,
-              filters: (appFilters || []).map(esFilters.disableFilter),
+              filters: (appFilters || []).map(opensearchFilters.disableFilter),
             }),
           }),
           { encode: false, sort: false }

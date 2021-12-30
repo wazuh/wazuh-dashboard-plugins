@@ -21,13 +21,13 @@ import { History } from 'history';
 import { NotificationsStart } from 'opensearch_dashboards/public';
 import {
   createStateContainer,
-  createKbnUrlStateStorage,
+  createOsdUrlStateStorage,
   syncState,
   ReduxLikeStateContainer,
-  IKbnUrlStateStorage,
+  IOsdUrlStateStorage,
   withNotifyOnErrors,
 } from '../../../../../../../src/plugins/opensearch_dashboards_utils/public';
-import { esFilters, Filter, Query } from '../../../../../../../src/plugins/data/public';
+import { opensearchFilters, Filter, Query } from '../../../../../../../src/plugins/data/public';
 import { migrateLegacyQuery } from '../helpers/migrate_legacy_query';
 
 export interface AppState {
@@ -87,7 +87,7 @@ export interface GetStateReturn {
   /**
    * kbnUrlStateStorage
    */
-  kbnUrlStateStorage: IKbnUrlStateStorage;
+  kbnUrlStateStorage: IOsdUrlStateStorage;
   /**
    * App state, the _a part of the URL
    */
@@ -137,7 +137,7 @@ export function getState({
   history,
   toasts,
 }: GetStateParams): GetStateReturn {
-  const stateStorage = createKbnUrlStateStorage({
+  const stateStorage = createOsdUrlStateStorage({
     useHash: storeInSessionStorage,
     history,
     ...(toasts && withNotifyOnErrors(toasts)),
@@ -212,7 +212,7 @@ export function isEqualFilters(filtersA: Filter[], filtersB: Filter[]) {
   } else if (!filtersA || !filtersB) {
     return false;
   }
-  return esFilters.compareFilters(filtersA, filtersB, esFilters.COMPARE_ALL_OPTIONS);
+  return opensearchFilters.compareFilters(filtersA, filtersB, opensearchFilters.COMPARE_ALL_OPTIONS);
 }
 
 /**
