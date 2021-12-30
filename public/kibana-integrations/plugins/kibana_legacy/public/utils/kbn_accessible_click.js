@@ -21,14 +21,14 @@ import { accessibleClickKeys, keys } from '@elastic/eui';
 export function KbnAccessibleClickProvider() {
   return {
     restrict: 'A',
-    controller: ($element) => {
+    controller: ['$element', ($element) => {
       $element.on('keydown', (e) => {
         // Prevent a scroll from occurring if the user has hit space.
         if (e.key === keys.SPACE) {
           e.preventDefault();
         }
       });
-    },
+    }],
     link: (scope, element, attrs) => {
       // The whole point of this directive is to hack in functionality that native buttons provide
       // by default.

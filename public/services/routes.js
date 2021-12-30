@@ -62,6 +62,8 @@ function ip($q, $rootScope, $window, $location) {
   );
 }
 
+ip.$inject = ['$q', '$rootScope', '$window', '$location'];
+
 function nestedResolve($q, errorHandler, $rootScope, $location, $window) {
   const wzMisc = new WzMisc();
   const healthCheckStatus = $window.sessionStorage.getItem('healthCheck');
@@ -84,6 +86,8 @@ function nestedResolve($q, errorHandler, $rootScope, $location, $window) {
   );
 }
 
+nestedResolve.$inject = ['$q', 'errorHandler', '$rootScope', '$location', '$window'];
+
 function savedSearch(
   $location,
   $window,
@@ -100,11 +104,15 @@ function savedSearch(
   );
 }
 
+savedSearch.$inject = ['$location', '$window', '$rootScope', '$route'];
+
 function wzConfig($q, $rootScope, $location) {
   assignPreviousLocation($rootScope, $location);
   const wazuhConfig = new WazuhConfig();
   return getWzConfig($q, GenericRequest, wazuhConfig);
 }
+
+wzConfig.$inject = ['$q', '$rootScope', '$location'];
 
 function wzKibana($location, $window, $rootScope) {
   assignPreviousLocation($rootScope, $location);
@@ -117,10 +125,14 @@ function wzKibana($location, $window, $rootScope) {
   return goToKibana($location, $window);
 }
 
+wzKibana.$inject = ['$location', '$window', '$rootScope'];
+
 function clearRuleId(commonData) {
   commonData.removeRuleId();
   return Promise.resolve();
 }
+
+clearRuleId.$inject = ['commonData'];
 
 function enableWzMenu($rootScope, $location) {
   const location = $location.path();
@@ -130,10 +142,12 @@ function enableWzMenu($rootScope, $location) {
   }
 }
 
+enableWzMenu.$inject = ['$rootScope', '$location'];
+
 //Routes
 const app = getAngularModule();
 
-app.config(($routeProvider) => {
+app.config(['$routeProvider',($routeProvider) => {
   $routeProvider
   .when('/health-check', {
     template: healthCheckTemplate,
@@ -217,4 +231,4 @@ app.config(($routeProvider) => {
     redirectTo: '/overview',
     outerAngularWrapperRoute: true
   });
-});
+}]);

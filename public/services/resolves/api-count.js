@@ -41,6 +41,8 @@ export function apiCount($q, $location) {
   return deferred.promise;
 }
 
+apiCount.$inject = ['$q', '$location'];
+
 // Iterates the API entries in order to set one as default
 function tryToSetDefault(apis, AppState) {
   try {

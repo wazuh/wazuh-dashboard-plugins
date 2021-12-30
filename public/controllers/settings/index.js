@@ -32,7 +32,7 @@ AddApi.displayName = 'AddApi';
 ApiIsDown.displayName = 'ApiIsDown';
 
 app
-  .controller('settingsController', SettingsController)
+  .controller('settingsController', ['$scope', '$window', '$location', 'errorHandler', SettingsController])
   .value('EnableModules', EnableModules)
   .value('WzSampleDataWrapper', WzSampleDataWrapper)
   .value('WzConfigurationSettings', WzConfigurationSettings)

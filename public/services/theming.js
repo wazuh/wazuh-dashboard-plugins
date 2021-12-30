@@ -13,7 +13,7 @@ import { getAngularModule } from '../kibana-services';
 
 const app = getAngularModule();
 
-app.config(function($mdThemingProvider) {
+app.config(['$mdThemingProvider', function($mdThemingProvider) {
   let kibanaWhiteBlack = {
     '50': '#ffffff',
     '100': '#ffffff',
@@ -79,4 +79,4 @@ app.config(function($mdThemingProvider) {
       'hue-2': '600',
       'hue-3': '900'
     });
-});
+}]);

@@ -93,15 +93,15 @@ export function initializeInnerAngularModule(name = 'app/wazuh', navigation: Nav
       'ui.bootstrap',
       'app/discover',
     ])
-    .config(watchMultiDecorator)
-    .run(registerListenEventListener)
-    .directive('discoverLegacy', createDiscoverLegacyDirective)
-    .directive('icon', (reactDirective) => reactDirective(EuiIcon))
-    .directive('contextErrorMessage', createContextErrorMessageDirective);
+    .config(['$provide', watchMultiDecorator])
+    .run(['$rootScope', registerListenEventListener])
+    .directive('discoverLegacy', ['reactDirective', createDiscoverLegacyDirective])
+    .directive('icon', ['reactDirective', (reactDirective) => reactDirective(EuiIcon)])
+    .directive('contextErrorMessage', ['reactDirective', createContextErrorMessageDirective]);
 }
 
 function createLocalPromiseModule() {
-  angular.module('discoverPromise', []).service('Promise', PromiseServiceCreator);
+  angular.module('discoverPromise', []).service('Promise', ['$q','$timeout',PromiseServiceCreator]);
 }
 
 function createLocalPrivateModule() {
@@ -127,8 +127,8 @@ function createLocalI18nModule() {
 function createLocalStorageModule() {
   angular
     .module('discoverLocalStorageProvider', ['discoverPrivate'])
-    .service('localStorage', createLocalStorageService('localStorage'))
-    .service('sessionStorage', createLocalStorageService('sessionStorage'));
+    .service('localStorage', ['$window', createLocalStorageService('localStorage')])
+    .service('sessionStorage', ['$window', createLocalStorageService('sessionStorage')]);
 }
 
 const createLocalStorageService = function (type: string) {

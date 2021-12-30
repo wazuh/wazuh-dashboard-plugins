@@ -25,8 +25,8 @@ import { getAngularModule } from '../../kibana-services';
 const app = getAngularModule();
 
 app
-  .controller('agentsController', AgentsController)
-  .controller('agentsPreviewController', AgentsPreviewController)
+  .controller('agentsController', ['$scope','$location','$rootScope','errorHandler','commonData','reportingService','visFactoryService','csvReq', AgentsController])
+  .controller('agentsPreviewController', ['$scope', '$location', '$route', 'errorHandler', 'csvReq', 'commonData', '$window', AgentsPreviewController])
   .value('RegisterAgent', RegisterAgent)
   .value('ExportConfiguration', ExportConfiguration)
   .value('AgentsWelcome', AgentsWelcome)

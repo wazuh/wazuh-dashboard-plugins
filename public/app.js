@@ -94,7 +94,7 @@ app.run([
 /**
  * Set trigger for logout
  */
-app.run(function ($rootElement) {
+app.run(['$rootElement', function ($rootElement) {
     $rootElement.append(`
     <div>
       <div class="wazuhNotReadyYet"></div>
@@ -130,4 +130,4 @@ app.run(function ($rootElement) {
         });
     });
   });
-});
+}]);

@@ -124,6 +124,6 @@ export function loadKbnTopNavDirectives(navUi) {
     angular
       .module('kibana')
       .directive('kbnTopNav', createTopNavDirective)
-      .directive('kbnTopNavHelper', createTopNavHelper(navUi));
+      .directive('kbnTopNavHelper', ['reactDirective', createTopNavHelper(navUi)]);
   }
 }

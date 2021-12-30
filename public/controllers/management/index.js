@@ -25,9 +25,9 @@ ManagementWelcomeWrapper.displayName = 'ManagementWelcomeWrapper';
 WzManagementConfiguration.displayName = 'WzManagementConfiguration';
 
 app
-  .controller('managementController', ManagementController)
-  .controller('groupsPreviewController', GroupsController)
-  .controller('clusterController', ClusterController)
+  .controller('managementController', ['$scope', '$rootScope', '$location', 'configHandler', 'errorHandler', '$interval', ManagementController])
+  .controller('groupsPreviewController', ['$scope', '$location', 'errorHandler', GroupsController])
+  .controller('clusterController', ['$scope', '$rootScope', '$timeout', 'errorHandler', '$window', '$location', 'discoverPendingUpdates', 'rawVisualizations', 'loadedVisualizations', 'visHandlers', ClusterController])
   .value('ManagementWelcomeWrapper', ManagementWelcomeWrapper)
   .value('WzManagement', WzManagement)
   .value('WzManagementConfiguration', WzManagementConfiguration);

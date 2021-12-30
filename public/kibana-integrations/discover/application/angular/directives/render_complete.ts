@@ -21,10 +21,10 @@ import { RenderCompleteListener } from '../../../../../../../../src/plugins/kiba
 
 export function createRenderCompleteDirective() {
   return {
-    controller($scope: IScope, $element: JQLite) {
+    controller: ['$scope', '$element', ($scope: IScope, $element: JQLite) => {
       const el = $element[0];
       const renderCompleteListener = new RenderCompleteListener(el);
       $scope.$on('$destroy', renderCompleteListener.destroy);
-    },
+    }],
   };
 }

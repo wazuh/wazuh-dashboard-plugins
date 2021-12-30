@@ -91,15 +91,15 @@ export const configureAppAngularModule = (
     .value('buildSha', packageInfo.buildSha)
     .value('esUrl', getEsUrl(core))
     .value('uiCapabilities', core.application.capabilities)
-    .config(setupCompileProvider(newPlatform.env.mode.dev))
-    .config(setupLocationProvider())
-    .config($setupXsrfRequestInterceptor(packageInfo.version))
-    .run(capture$httpLoadingCount(core))
-    .run(digestOnHashChange(getHistory))
-    .run($setupBreadcrumbsAutoClear(core, isLocalAngular))
-    .run($setupBadgeAutoClear(core, isLocalAngular))
-    .run($setupHelpExtensionAutoClear(core, isLocalAngular))
-    .run($setupUICapabilityRedirect(core));
+    .config(['$compileProvider',setupCompileProvider(newPlatform.env.mode.dev)])
+    .config(['$locationProvider', setupLocationProvider()])
+    .config(['$httpProvider',$setupXsrfRequestInterceptor(packageInfo.version)])
+    .run(['$rootScope','$http',capture$httpLoadingCount(core)])
+    .run(['$rootScope', digestOnHashChange(getHistory)])
+    .run(['$rootScope', '$injector', $setupBreadcrumbsAutoClear(core, isLocalAngular)])
+    .run(['$rootScope', '$injector', $setupBadgeAutoClear(core, isLocalAngular)])
+    .run(['$rootScope', '$injector', $setupHelpExtensionAutoClear(core, isLocalAngular)])
+    .run(['$rootScope', '$injector', $setupUICapabilityRedirect(core)]);
 };
 
 const getEsUrl = (newPlatform: CoreStart) => {

@@ -30,7 +30,7 @@ SelectAgent.displayName = 'SelectAgent';
 RequirementCard.displayName = 'RequirementCard';
 
 app
-  .controller('overviewController', OverviewController)
+  .controller('overviewController', ['$scope', '$location', '$rootScope', 'errorHandler', 'commonData', 'reportingService', 'visFactoryService', '$route', OverviewController])
   .value('OverviewWelcome', OverviewWelcome)
   .value('WzCurrentOverviewSectionWrapper', WzCurrentOverviewSectionWrapper)
   .value('WzCurrentAgentsSectionWrapper', WzCurrentAgentsSectionWrapper)

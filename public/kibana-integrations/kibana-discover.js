@@ -123,7 +123,13 @@ appDiscover.directive('discoverApp', function () {
   return {
     restrict: 'E',
     controllerAs: 'discoverApp',
-    controller: discoverController,
+    controller: [
+      '$element', '$route', '$scope', '$timeout', '$window', 'Promise', 'localStorage', 'uiCapabilities',
+      // Wazuh requirements from here
+      '$rootScope', '$location', 'loadedVisualizations', 'discoverPendingUpdates',
+      // Controller function
+      discoverController
+    ],
   };
 });
 

@@ -20,7 +20,7 @@
 import _ from 'lodash';
 
 export function watchMultiDecorator($provide) {
-  $provide.decorator('$rootScope', function ($delegate) {
+  $provide.decorator('$rootScope', ['$delegate', function ($delegate) {
     /**
      * Watch multiple expressions with a single callback. Along
      * with making code simpler it also merges all of the watcher
@@ -144,5 +144,5 @@ export function watchMultiDecorator($provide) {
     }
 
     return $delegate;
-  });
+  }]);
 }

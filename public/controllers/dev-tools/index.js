@@ -14,4 +14,4 @@ import { getAngularModule } from '../../kibana-services';
 
 const app = getAngularModule();
 
-app.controller('devToolsController', DevToolsController);
+app.controller('devToolsController', ['$scope', '$window', 'errorHandler', '$document', DevToolsController]);

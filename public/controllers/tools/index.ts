@@ -18,6 +18,6 @@ const app = getAngularModule();
 
 Logtest.displayName = 'Logtest';
 app
-  .controller('devToolsController', DevToolsController)
-  .controller('toolsController', ToolsController)
+  .controller('devToolsController', ['$scope', '$window', 'errorHandler', '$document', DevToolsController])
+  .controller('toolsController', ['$scope', '$window', '$location', 'errorHandler', ToolsController])
   .value('Logtest', Logtest);

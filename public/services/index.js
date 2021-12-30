@@ -25,10 +25,10 @@ import { getAngularModule } from '../kibana-services';
 const app = getAngularModule();
 
 app
-  .service('errorHandler', ErrorHandler)
+  .service('errorHandler', ['$rootScope', 'checkDaemonsStatus', ErrorHandler])
   .service('csvReq', CSVRequest)
-  .service('commonData', CommonData)
-  .service('reportingService', ReportingService)
-  .service('visFactoryService', VisFactoryService)
-  .service('configHandler', ConfigHandler)
-  .service('checkDaemonsStatus', CheckDaemonsStatus);
+  .service('commonData', ['$rootScope', '$timeout', 'errorHandler', '$location', '$window', '$route', CommonData])
+  .service('reportingService', ['$rootScope', 'vis2png', 'rawVisualizations', 'visHandlers', 'errorHandler', ReportingService])
+  .service('visFactoryService', ['$rootScope', 'discoverPendingUpdates', 'rawVisualizations', 'loadedVisualizations', 'commonData', 'visHandlers', VisFactoryService])
+  .service('configHandler', ['$rootScope', 'errorHandler', ConfigHandler])
+  .service('checkDaemonsStatus', ['$rootScope', '$timeout', CheckDaemonsStatus]);

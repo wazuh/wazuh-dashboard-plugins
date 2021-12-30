@@ -15,4 +15,4 @@ import { getAngularModule } from '../../kibana-services';
 const app = getAngularModule();
 
 app
-  .controller('blankScreenController', BlankScreenController);
+  .controller('blankScreenController', ['$scope', '$location', 'errorHandler', BlankScreenController]);
