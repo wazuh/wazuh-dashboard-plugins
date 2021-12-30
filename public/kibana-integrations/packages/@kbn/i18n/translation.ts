@@ -17,22 +17,19 @@
  * under the License.
  */
 
-import * as i18n from '../core';
-import angular from 'angular';
+import { Formats } from './core/formats';
 
-export type I18nServiceType = ReturnType<I18nProvider['$get']>;
-
-export class I18nProvider implements angular.IServiceProvider {
-  public addTranslation = i18n.addTranslation;
-  public getTranslation = i18n.getTranslation;
-  public setLocale = i18n.setLocale;
-  public getLocale = i18n.getLocale;
-  public setDefaultLocale = i18n.setDefaultLocale;
-  public getDefaultLocale = i18n.getDefaultLocale;
-  public setFormats = i18n.setFormats;
-  public getFormats = i18n.getFormats;
-  public getRegisteredLocales = i18n.getRegisteredLocales;
-  public init = i18n.init;
-  public load = i18n.load;
-  public $get = () => i18n.translate;
+export interface Translation {
+  /**
+   * Actual translated messages.
+   */
+  messages: Record<string, string>;
+  /**
+   * Locale of the translated messages.
+   */
+  locale?: string;
+  /**
+   * Set of options to the underlying formatter.
+   */
+  formats?: Formats;
 }
