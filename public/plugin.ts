@@ -102,11 +102,6 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
   }
 
   public start(core: CoreStart, plugins: AppPluginStartDependencies): WazuhStart {
-    // hide security alert
-    if(plugins.securityOss) {
-      plugins.securityOss.insecureCluster.hideAlert(true);
-    };
-
     if(plugins?.telemetry?.telemetryNotifications?.setOptedInNoticeSeen) {
       // assign to a method to hide the telemetry banner used when the app is mounted
       this.hideTelemetryBanner = () => plugins.telemetry.telemetryNotifications.setOptedInNoticeSeen();
