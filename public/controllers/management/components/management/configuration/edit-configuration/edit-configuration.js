@@ -81,7 +81,7 @@ class WzEditConfiguration extends Component {
             this.props.clusterNodeSelected
           )
         : await saveFileManager(this.state.editorValue);
-      this.setState({ saving: false, infoChangesAfterRestart: true });
+      this.setState({ saving: false, infoChangesAfterRestart: true, hasChanges: false });
       this.addToast({
         title: (
           <Fragment>

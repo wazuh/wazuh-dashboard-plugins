@@ -141,7 +141,7 @@ export class WzAuthentication {
    */
   static async deleteExistentToken() {
     try {
-      const response = await WzRequest.apiReq('DELETE', '/security/user/authenticate', {});
+      const response = await WzRequest.apiReq('DELETE', '/security/user/authenticate', {delay: 5000});
 
       return ((response || {}).data || {}).data || {};
     } catch (error) {
