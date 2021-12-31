@@ -54,7 +54,7 @@ class ManagementWelcome extends Component {
         <EuiPage className="wz-welcome-page">
           <EuiFlexGroup>
             <EuiFlexItem>
-              <EuiPanel betaBadgeLabel="Administration">
+              <EuiCard title description betaBadgeLabel="Administration">
                 <EuiSpacer size="m" />
                 <EuiFlexGroup>
                   <EuiFlexItem>
@@ -139,10 +139,10 @@ class ManagementWelcome extends Component {
                   </EuiFlexItem>
                   <EuiFlexItem />
                 </EuiFlexGroup>
-              </EuiPanel>
+              </EuiCard>
             </EuiFlexItem>
             <EuiFlexItem>
-              <EuiPanel betaBadgeLabel="Status and reports">
+              <EuiCard title description betaBadgeLabel="Status and reports">
                 <EuiSpacer size="m" />
                 <EuiFlexGroup>
                   <EuiFlexItem>
@@ -220,7 +220,7 @@ class ManagementWelcome extends Component {
                   <EuiFlexItem>
                   </EuiFlexItem>
                 </EuiFlexGroup>
-              </EuiPanel>
+              </EuiCard>
             </EuiFlexItem>
           </EuiFlexGroup>
         </EuiPage>

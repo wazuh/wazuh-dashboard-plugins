@@ -25,26 +25,24 @@ class WzGlobalBreadcrumb extends Component {
     return (
       <div>
         {!!this.props.state.breadcrumb.length && (
-            <EuiBreadcrumbs
-              className='wz-global-breadcrumb'
-              responsive={false}
-              truncate={false}
-              max={6}
-              breadcrumbs={this.props.state.breadcrumb.map(breadcrumb => breadcrumb.agent ? {
-                text: (
-                  <a
-                    style={{ margin: '0px 0px -5px 0px', height: 20 }}
-                    className="euiLink euiLink--subdued euiBreadcrumb "
-                    onClick={(ev) => { ev.stopPropagation(); AppNavigate.navigateToModule(ev, 'agents', { "tab": "welcome", "agent": breadcrumb.agent.id }); this.router.reload(); }}
-                    id="breadcrumbNoTitle"
-                  >
-                    <EuiToolTip position="top" content={"View agent summary"}>
-                      <span>{breadcrumb.agent.name}</span>
-                    </EuiToolTip>
-                  </a>)
-              } : breadcrumb)}
-              aria-label="Wazuh global breadcrumbs"
-            />
+          <EuiBreadcrumbs
+            className='wz-global-breadcrumb'
+            responsive={false}
+            truncate={false}
+            max={6}
+            breadcrumbs={this.props.state.breadcrumb.map(breadcrumb => breadcrumb.agent ? {
+              className: "euiLink euiLink--subdued ",
+              onClick: (ev) => { ev.stopPropagation(); AppNavigate.navigateToModule(ev, 'agents', { "tab": "welcome", "agent": breadcrumb.agent.id }); this.router.reload(); },
+              id: "breadcrumbNoTitle",
+              truncate: true,
+              text: (
+                <EuiToolTip position="top" content={"View agent summary"}>
+                  <span>{breadcrumb.agent.name}</span>
+                </EuiToolTip>
+              )
+            } : breadcrumb)}
+            aria-label="Wazuh global breadcrumbs"
+          />
         )}
       </div>
     )

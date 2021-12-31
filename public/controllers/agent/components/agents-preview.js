@@ -23,7 +23,8 @@ import {
   EuiSpacer,
   EuiText,
   EuiEmptyPrompt,
-  EuiToolTip
+  EuiToolTip,
+  EuiCard
 } from '@elastic/eui';
 import { Pie } from "../../../components/d3/pie";
 import { ProgressChart } from "../../../components/d3/progress";
@@ -161,7 +162,9 @@ export const AgentsPreview = compose(
             ) || (
             <Fragment>
             <EuiFlexItem className="agents-status-pie" grow={false}>
-              <EuiPanel
+              <EuiCard
+                title
+                description 
                 betaBadgeLabel="Status"
                 className="eui-panel"
               >
@@ -180,11 +183,11 @@ export const AgentsPreview = compose(
                     </EuiFlexItem>
                   )}
                 </EuiFlexGroup>
-              </EuiPanel>
+              </EuiCard>
             </EuiFlexItem>
             {this.totalAgents > 0 && (
               <EuiFlexItem >
-                <EuiPanel betaBadgeLabel="Details">
+                <EuiCard title description  betaBadgeLabel="Details">
                   <EuiFlexGroup>
                     <EuiFlexItem>
                       {this.summary && (
@@ -281,14 +284,14 @@ export const AgentsPreview = compose(
                       </EuiFlexGroup>
                     </EuiFlexItem>
                   </EuiFlexGroup>
-                </EuiPanel>
+                </EuiCard>
               </EuiFlexItem>
             )}
             </Fragment>
             )}
             {this.state.showAgentsEvolutionVisualization && (
               <EuiFlexItem grow={false} className="agents-evolution-visualization" style={{ display: !this.state.loading ? 'block' : 'none', height: !this.state.loading ? '182px' : 0}}>
-                <EuiPanel paddingSize="none" betaBadgeLabel="Evolution" style={{ display: this.props.resultState === 'ready' ? 'block' : 'none'}}>
+                <EuiCard title description  paddingSize="none" betaBadgeLabel="Evolution" style={{ display: this.props.resultState === 'ready' ? 'block' : 'none'}}>
                   <EuiFlexGroup>
                     <EuiFlexItem>
                     <div style={{height: this.props.resultState === 'ready' ? '180px' : 0}}>
@@ -308,8 +311,8 @@ export const AgentsPreview = compose(
 
                     </EuiFlexItem>
                   </EuiFlexGroup>
-                </EuiPanel>
-                <EuiPanel paddingSize="none" betaBadgeLabel="Evolution" style={{ height: 180,  display: this.props.resultState === 'none' ? 'block' : 'none'}}>
+                </EuiCard>
+                <EuiCard title description  paddingSize="none" betaBadgeLabel="Evolution" style={{ height: 180,  display: this.props.resultState === 'none' ? 'block' : 'none'}}>
                   <EuiEmptyPrompt
                     className="wz-padding-21"
                     iconType="alert"
@@ -319,7 +322,7 @@ export const AgentsPreview = compose(
                       <WzDatePicker condensed={true} onTimeChange={() => { }} />
                     }
                   />
-                </EuiPanel>
+                </EuiCard>
               </EuiFlexItem>
 
             )}

@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component, Fragment } from 'react';
-import { version } from '../../../../package.json';
+import { version, kibana } from '../../../../package.json';
 import { WazuhConfig } from '../../../react-services/wazuh-config';
 import {
   EuiSteps,
@@ -127,6 +127,7 @@ export class RegisterAgent extends Component {
       neededSYS: false,
       selectedArchitecture: '',
       selectedVersion: '',
+      kibanaVersion: (kibana || {}).version || false,
       version: '',
       wazuhVersion: '',
       serverAddress: '',
@@ -361,6 +362,15 @@ export class RegisterAgent extends Component {
     }
   }
 
+  getHighlightCodeLanguage(selectedSO){
+    if(selectedSO.toLowerCase() === 'win'){
+      const iKibanaVersion = parseFloat(this.state.kibanaVersion.split('.').slice(0, 2).join('.'),2);
+      return iKibanaVersion < 7.14 ? 'ps' : 'powershell';
+    }else{
+      return 'bash';
+    }
+  }
+
   render() {
     const appVersionMajorDotMinor = this.state.wazuhVersion.split('.').slice(0, 2).join('.'); 
     const urlCheckConnectionDocumentation = `https://documentation.wazuh.com/${appVersionMajorDotMinor}/user-manual/agents/agent-connection.html`;
@@ -428,7 +438,7 @@ export class RegisterAgent extends Component {
 
     const field = `${this.state.selectedOS}Text`;
     const text = customTexts[field];
-    const language = this.state.selectedOS === 'win' ? 'ps' : 'bash';
+    const language = this.getHighlightCodeLanguage(this.state.selectedOS);
     const windowsAdvice = this.state.selectedOS === 'win' && (
       <>
         <EuiCallOut
