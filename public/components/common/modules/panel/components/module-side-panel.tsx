@@ -22,8 +22,7 @@ export const ModuleSidePanel = ({ navIsDocked = false, children, ...props }) => 
     <EuiCollapsibleNav
       isOpen={navIsOpen}
       isDocked={navIsDocked}
-      showCloseButton={true}
-      maskProps={{ headerZindexLocation: 'below', className: 'wz-no-display' }}
+      maskProps={{ headerZindexLocation: 'below' }}
       button={
         <EuiButtonEmpty
           className={'sidepanel-infoBtnStyle'}
@@ -34,11 +33,6 @@ export const ModuleSidePanel = ({ navIsDocked = false, children, ...props }) => 
       onClose={() => setNavIsOpen(false)}
     >
       <div>
-        <EuiButtonEmpty
-          style={{ position: 'absolute', right: 0 }}
-          onClick={() => setNavIsOpen(!navIsOpen)}
-          iconType={'cross'}
-        />
         <div className={'wz-padding-16'}>{children}</div>
       </div>
     </EuiCollapsibleNav>
