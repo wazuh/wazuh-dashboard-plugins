@@ -576,7 +576,7 @@ export class WazuhReportingCtrl {
             rules.length &&
             printer.addSimpleTable({
               columns: [
-                { id: 'ruleId', label: 'Rule ID' },
+                { id: 'ruleID', label: 'Rule ID' },
                 { id: 'ruleDescription', label: 'Description' },
               ],
               items: rules,
@@ -619,7 +619,7 @@ export class WazuhReportingCtrl {
             rules.length &&
             printer.addSimpleTable({
               columns: [
-                { id: 'ruleId', label: 'Rule ID' },
+                { id: 'ruleID', label: 'Rule ID' },
                 { id: 'ruleDescription', label: 'Description' },
               ],
               items: rules,
@@ -662,7 +662,7 @@ export class WazuhReportingCtrl {
             rules.length &&
             printer.addSimpleTable({
               columns: [
-                { id: 'ruleId', label: 'Rule ID' },
+                { id: 'ruleID', label: 'Rule ID' },
                 { id: 'ruleDescription', label: 'Description' },
               ],
               items: rules,
@@ -726,7 +726,7 @@ export class WazuhReportingCtrl {
         if (rules && rules.length) {
           printer.addContentWithNewLine({ text: 'Top 3 FIM rules', style: 'h2' }).addSimpleTable({
             columns: [
-              { id: 'ruleId', label: 'Rule ID' },
+              { id: 'ruleID', label: 'Rule ID' },
               { id: 'ruleDescription', label: 'Description' },
             ],
             items: rules,
