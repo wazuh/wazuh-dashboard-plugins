@@ -112,8 +112,13 @@
   pointer-events: none;
   z-index: 10000000; }
 
-[id^='echTooltipPortalMainTooltip'] .echTooltip {
-    position: unset;
+[id^='echTooltipPortalMainTooltip'] {
+  .echTooltip {
+      position: unset;
+      .echTooltip__item {
+        border-left: 0;
+      }
+  }
 }
   
 .echTooltip {
