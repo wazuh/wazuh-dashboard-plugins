@@ -49,6 +49,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added new fields in Inventory table and Flyout Details [#3525](https://github.com/wazuh/wazuh-kibana-app/pull/3525)
 - Added columns selector in agents table [#3691](https://github.com/wazuh/wazuh-kibana-app/pull/3691)
 - Added a new workflow for create wazuh packages [#3742](https://github.com/wazuh/wazuh-kibana-app/pull/3742)
+- Run `template` and `fields` checks in the health check depends on the app configuration [#3783](https://github.com/wazuh/wazuh-kibana-app/pull/3783)
 
 ### Changed
 
