@@ -83,7 +83,7 @@ export const nameEquivalence = {
   'checks.template': 'Index template',
   'checks.api': 'API connection',
   'checks.setup': 'API version',
-  'checks.fields': 'Know fields',
+  'checks.fields': 'Known fields',
   'checks.metaFields': 'Remove meta fields',
   'checks.timeFilter': 'Set time filter to 24h',
   'checks.maxBuckets': 'Set max buckets to 200000',
