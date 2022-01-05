@@ -64,7 +64,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Testing logs using the Ruletest Test don't display the rule information if not matching a rule. [#3446](https://github.com/wazuh/wazuh-kibana-app/pull/3446)
 - Changed format permissions in FIM inventory [#3649](https://github.com/wazuh/wazuh-kibana-app/pull/3649)
 - Changed of request for one that does not return data that is not necessary to optimize times. [#3686](https://github.com/wazuh/wazuh-kibana-app/pull/3686) [#3728](https://github.com/wazuh/wazuh-kibana-app/pull/3728)
-- Changed colors and images [#3666](https://github.com/wazuh/wazuh-kibana-app/pull/3666)
+- Changed colors and images [#3788](https://github.com/wazuh/wazuh-kibana-app/pull/3788)
 
 ### Fixed
 
