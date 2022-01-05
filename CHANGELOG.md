@@ -64,6 +64,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Testing logs using the Ruletest Test don't display the rule information if not matching a rule. [#3446](https://github.com/wazuh/wazuh-kibana-app/pull/3446)
 - Changed format permissions in FIM inventory [#3649](https://github.com/wazuh/wazuh-kibana-app/pull/3649)
 - Changed of request for one that does not return data that is not necessary to optimize times. [#3686](https://github.com/wazuh/wazuh-kibana-app/pull/3686) [#3728](https://github.com/wazuh/wazuh-kibana-app/pull/3728)
+- Changed colors and images [#3666](https://github.com/wazuh/wazuh-kibana-app/pull/3666)
 
 ### Fixed
 
@@ -111,7 +112,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed `Maximum call stack size exceeded` error exporting key-value pairs of a CDB List [#3738](https://github.com/wazuh/wazuh-kibana-app/pull/3738)
 - Fixed regex lookahead and lookbehind for safari [#3741](https://github.com/wazuh/wazuh-kibana-app/pull/3741)
 - Fixed Vulnerabilities Inventory flyout details filters [#3744](https://github.com/wazuh/wazuh-kibana-app/pull/3744)
-
+- Removed api selector toggle from settings menu since it performed no useful function [#3604](https://github.com/wazuh/wazuh-kibana-app/pull/3604)
+- Fixed the requests get [#3661](https://github.com/wazuh/wazuh-kibana-app/pull/3661)
 ## Wazuh v4.2.5 - Kibana 7.10.2, 7.11.2, 7.12.1, 7.13.4, 7.14.2 - Revision 4206
 
 ### Added
@@ -207,7 +209,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed Wazuh main menu and breadcrumb render issues [#3347](https://github.com/wazuh/wazuh-kibana-app/pull/3347)
 - Fixed generation of huge logs from backend errors [#3397](https://github.com/wazuh/wazuh-kibana-app/pull/3397)
 - Fixed vulnerabilities flyout not showing alerts if the vulnerability had a field missing [#3593](https://github.com/wazuh/wazuh-kibana-app/pull/3593)
-- Removed api selector toggle from settings menu since it performed no useful function [#3604](https://github.com/wazuh/wazuh-kibana-app/pull/3604)
 
 ## Wazuh v4.2.1 - Kibana 7.10.2 , 7.11.2 - Revision 4202
 
