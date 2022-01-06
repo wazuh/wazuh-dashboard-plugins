@@ -58,7 +58,7 @@ export const OverviewWelcome = withErrorBoundary(class OverviewWelcome extends C
         <EuiCard
           size="xs"
           layout="horizontal"
-          icon={<EuiIcon size="xl" type={icon} color="#5297FA" />}
+          icon={<EuiIcon size="xl" type={icon} color="#256BD1" />}
           className="homSynopsis__card"
           title={WAZUH_MODULES[tab].title}
           onClick={() => store.dispatch(updateCurrentTab(tab))}

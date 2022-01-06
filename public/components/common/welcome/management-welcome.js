@@ -65,7 +65,7 @@ class ManagementWelcome extends Component {
                         <EuiIcon
                           size="xl"
                           type="indexRollupApp"
-                          color="#5297FA"
+                          color="#256BD1"
                         />
                       }
                       title="Rules"
@@ -81,7 +81,7 @@ class ManagementWelcome extends Component {
                         <EuiIcon
                           size="xl"
                           type="indexRollupApp"
-                          color="#5297FA"
+                          color="#256BD1"
                         />
                       }
                       title="Decoders"
@@ -99,7 +99,7 @@ class ManagementWelcome extends Component {
                         <EuiIcon
                           size="xl"
                           type="indexRollupApp"
-                          color="#5297FA"
+                          color="#256BD1"
                         />
                       }
                       title="CDB lists"
@@ -115,7 +115,7 @@ class ManagementWelcome extends Component {
                         <EuiIcon
                           size="xl"
                           type="usersRolesApp"
-                          color="#5297FA"
+                          color="#256BD1"
                         />
                       }
                       title="Groups"
@@ -130,7 +130,7 @@ class ManagementWelcome extends Component {
                       layout="horizontal"
                       className="homSynopsis__card"
                       icon={
-                        <EuiIcon size="xl" type="devToolsApp" color="#5297FA" />
+                        <EuiIcon size="xl" type="devToolsApp" color="#256BD1" />
                       }
                       title="Configuration"
                       onClick={() => this.switchSection('configuration')}
@@ -150,7 +150,7 @@ class ManagementWelcome extends Component {
                       layout="horizontal"
                       className="homSynopsis__card"
                       icon={
-                        <EuiIcon size="xl" type="uptimeApp" color="#5297FA" />
+                        <EuiIcon size="xl" type="uptimeApp" color="#256BD1" />
                       }
                       title="Status"
                       onClick={() => this.switchSection('status')}
@@ -165,7 +165,7 @@ class ManagementWelcome extends Component {
                         <EuiIcon
                           size="xl"
                           type="indexPatternApp"
-                          color="#5297FA"
+                          color="#256BD1"
                         />
                       }
                       title="Cluster"
@@ -180,7 +180,7 @@ class ManagementWelcome extends Component {
                       layout="horizontal"
                       className="homSynopsis__card"
                       icon={
-                        <EuiIcon size="xl" type="filebeatApp" color="#5297FA" />
+                        <EuiIcon size="xl" type="filebeatApp" color="#256BD1" />
                       }
                       title="Logs"
                       onClick={() => this.switchSection('logs')}
@@ -195,7 +195,7 @@ class ManagementWelcome extends Component {
                         <EuiIcon
                           size="xl"
                           type="reportingApp"
-                          color="#5297FA"
+                          color="#256BD1"
                         />
                       }
                       title="Reporting"
@@ -210,7 +210,7 @@ class ManagementWelcome extends Component {
                       layout="horizontal"
                       className="homSynopsis__card"
                       icon={
-                        <EuiIcon size="xl" type="visualizeApp" color="#5297FA" />
+                        <EuiIcon size="xl" type="visualizeApp" color="#256BD1" />
                       }
                       title="Statistics"
                       onClick={() => this.switchSection('statistics')}
