@@ -24,7 +24,6 @@ import {
   EuiText,
   EuiCodeBlock,
   EuiTitle,
-  EuiButton,
   EuiButtonEmpty,
   EuiCopy,
   EuiPage,
@@ -34,6 +33,7 @@ import {
   EuiProgress,
   EuiCode,
   EuiLink,
+  EuiIcon,
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
 import { withErrorBoundary } from '../../../components/common/hocs';
@@ -477,7 +477,9 @@ export const RegisterAgent = withErrorBoundary(
           <EuiCallOut
             title="You will need administrator privileges to perform this installation."
             iconType="iInCircle"
-          />
+            >
+              <p>Keep in mind you need to run this command in a Windows powershell terminal</p>
+            </EuiCallOut>
           <EuiSpacer></EuiSpacer>
         </>
       );
@@ -523,17 +525,19 @@ export const RegisterAgent = withErrorBoundary(
                   iconType="iInCircle"
                 />
                 <EuiSpacer />
-                <EuiCodeBlock style={codeBlock} language={language}>
-                  {this.state.wazuhPassword ? this.obfuscatePassword(text) : text}
-                </EuiCodeBlock>
+                <div className="copy-codeblock-wrapper">
+                  <EuiCodeBlock style={codeBlock} language={language}>
+                    {this.state.wazuhPassword ? this.obfuscatePassword(text) : text}
+                  </EuiCodeBlock>
+                  <EuiCopy textToCopy={text}>
+                    {(copy) => (
+                      <div className="copy-overlay"  onClick={copy}>
+                        <p><EuiIcon type="copy"/> Copy command</p>
+                      </div>
+                    )}
+                  </EuiCopy>
+                </div>
                 {windowsAdvice}
-                <EuiCopy textToCopy={text}>
-                  {(copy) => (
-                    <EuiButton fill iconType="copy" onClick={copy}>
-                      Copy command
-                    </EuiButton>
-                  )}
-                </EuiCopy>
               </EuiText>
             )}
         </div>
@@ -547,16 +551,18 @@ export const RegisterAgent = withErrorBoundary(
             <Fragment>
               <EuiSpacer />
               <EuiText>
-                <EuiCodeBlock style={codeBlock} language={language}>
-                  {this.systemSelector()}
-                </EuiCodeBlock>
-                <EuiCopy textToCopy={this.systemSelector()}>
-                  {(copy) => (
-                    <EuiButton fill iconType="copy" onClick={copy}>
-                      Copy command
-                    </EuiButton>
-                  )}
-                </EuiCopy>
+                <div className="copy-codeblock-wrapper">
+                  <EuiCodeBlock style={codeBlock} language={language}>
+                    {this.systemSelector()}
+                  </EuiCodeBlock>
+                  <EuiCopy textToCopy={this.systemSelector()}>
+                    {(copy) => (
+                      <div className="copy-overlay" onClick={copy}>
+                        <p><EuiIcon type="copy" /> Copy command</p>
+                      </div>
+                    )}
+                  </EuiCopy>
+                </div>
                 {textAndLinkToCheckConnectionDocumentation}
               </EuiText>
             </Fragment>
@@ -569,16 +575,18 @@ export const RegisterAgent = withErrorBoundary(
             <Fragment>
               <EuiSpacer />
               <EuiText>
-                <EuiCodeBlock style={codeBlock} language={language}>
-                  {this.systemSelector()}
-                </EuiCodeBlock>
-                <EuiCopy textToCopy={this.systemSelector()}>
-                  {(copy) => (
-                    <EuiButton fill iconType="copy" onClick={copy}>
-                      Copy command
-                    </EuiButton>
-                  )}
-                </EuiCopy>
+                <div className="copy-codeblock-wrapper">
+                  <EuiCodeBlock style={codeBlock} language={language}>
+                    {this.systemSelector()}
+                  </EuiCodeBlock>
+                  <EuiCopy textToCopy={this.systemSelector()}>
+                    {(copy) => (
+                      <div className="copy-overlay" onClick={copy}>
+                        <p><EuiIcon type="copy" /> Copy command</p>
+                      </div>
+                    )}
+                  </EuiCopy>
+                </div>
                 {textAndLinkToCheckConnectionDocumentation}
               </EuiText>
             </Fragment>
@@ -713,16 +721,18 @@ export const RegisterAgent = withErrorBoundary(
                 : (
                   <EuiFlexGroup direction="column">
                     <EuiText>
-                      <EuiCodeBlock style={codeBlock} language={language}>
-                        {restartAgentCommand}
-                      </EuiCodeBlock>
-                      <EuiCopy textToCopy={restartAgentCommand}>
-                        {(copy) => (
-                          <EuiButton fill iconType="copy" onClick={copy}>
-                            Copy command
-                          </EuiButton>
-                        )}
-                      </EuiCopy>
+                      <div className="copy-codeblock-wrapper">
+                        <EuiCodeBlock style={codeBlock} language={language}>
+                          {restartAgentCommand}
+                        </EuiCodeBlock>
+                        <EuiCopy textToCopy={restartAgentCommand}>
+                          {(copy) => (
+                            <div className="copy-overlay" onClick={copy}>
+                              <p><EuiIcon type="copy" /> Copy command</p>
+                            </div>
+                          )}
+                        </EuiCopy>
+                      </div>
                     </EuiText>
                   </EuiFlexGroup>
                 ),
