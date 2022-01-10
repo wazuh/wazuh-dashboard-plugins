@@ -34,6 +34,7 @@ import {
   EuiCode,
   EuiLink,
   EuiIcon,
+  EuiSwitch
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
 import { withErrorBoundary } from '../../../components/common/hocs';
@@ -137,6 +138,7 @@ export const RegisterAgent = withErrorBoundary(
         groups: [],
         selectedGroup: [],
         udpProtocol: false,
+        showPassword: false,
       };
       this.restartAgentCommand = {
         rpm: this.systemSelector(),
@@ -264,6 +266,10 @@ export const RegisterAgent = withErrorBoundary(
 
     setWazuhPassword(event) {
       this.setState({ wazuhPassword: event.target.value });
+    }
+
+    setShowPassword(event) {
+      this.setState({ showPassword: event.target.checked });
     }
 
     obfuscatePassword(text) {
@@ -478,7 +484,7 @@ export const RegisterAgent = withErrorBoundary(
             title="You will need administrator privileges to perform this installation."
             iconType="iInCircle"
             >
-              <p>Keep in mind you need to run this command in a Windows powershell terminal</p>
+              <p>Keep in mind you need to run this command in a Windows PowerShell terminal</p>
             </EuiCallOut>
           <EuiSpacer></EuiSpacer>
         </>
@@ -527,7 +533,7 @@ export const RegisterAgent = withErrorBoundary(
                 <EuiSpacer />
                 <div className="copy-codeblock-wrapper">
                   <EuiCodeBlock style={codeBlock} language={language}>
-                    {this.state.wazuhPassword ? this.obfuscatePassword(text) : text}
+                    {this.state.wazuhPassword && !this.state.showPassword ? this.obfuscatePassword(text) : text}
                   </EuiCodeBlock>
                   <EuiCopy textToCopy={text}>
                     {(copy) => (
@@ -537,6 +543,12 @@ export const RegisterAgent = withErrorBoundary(
                     )}
                   </EuiCopy>
                 </div>
+                <EuiSwitch
+                  label="Show password"
+                  checked={this.state.showPassword}
+                  onChange={(active) => this.setShowPassword(active)}
+                />
+                <EuiSpacer />
                 {windowsAdvice}
               </EuiText>
             )}
@@ -563,6 +575,7 @@ export const RegisterAgent = withErrorBoundary(
                     )}
                   </EuiCopy>
                 </div>
+                <EuiSpacer />
                 {textAndLinkToCheckConnectionDocumentation}
               </EuiText>
             </Fragment>
@@ -587,6 +600,12 @@ export const RegisterAgent = withErrorBoundary(
                     )}
                   </EuiCopy>
                 </div>
+                <EuiSwitch
+                  label="Show password"
+                  checked={this.state.showPassword}
+                  onChange={(active) => this.setShowPassword(active)}
+                />
+                <EuiSpacer />
                 {textAndLinkToCheckConnectionDocumentation}
               </EuiText>
             </Fragment>
