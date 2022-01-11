@@ -747,7 +747,7 @@ function discoverController(
     const bounds = agg.params.timeRange ? timefilter.calculateBounds(agg.params.timeRange) : null;
     agg.buckets.setBounds(bounds);
 
-    const { esUnit, esValue } = agg.buckets.getInterval();
+    const { opensearchUnit, opensearchValue } = agg.buckets.getInterval();
     return {
       x: {
         accessor: 0,
@@ -755,9 +755,9 @@ function discoverController(
         format: agg.toSerializedFieldFormat(),
         params: {
           date: true,
-          interval: moment.duration(esValue, esUnit),
-          intervalESValue: esValue,
-          intervalESUnit: esUnit,
+          interval: moment.duration(opensearchValue, opensearchUnit),
+          intervalOpenSearchValue: opensearchValue,
+          intervalOpenSearchUnit: opensearchUnit,
           format: agg.buckets.getScaledDateFormat(),
           bounds: agg.buckets.getBounds(),
         },

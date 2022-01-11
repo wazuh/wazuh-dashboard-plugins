@@ -693,8 +693,8 @@ export default [
               params: {
                 date: true,
                 interval: 'PT3H',
-                intervalESValue: 3,
-                intervalESUnit: 'h',
+                intervalOpenSearchValue: 3,
+                intervalOpenSearchUnit: 'h',
                 format: 'YYYY-MM-DD HH:mm',
                 bounds: { min: '2020-04-17T12:11:35.943Z', max: '2020-04-24T12:11:35.944Z' },
               },

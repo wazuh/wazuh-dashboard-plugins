@@ -17,10 +17,10 @@
  * under the License.
  */
 import { SavedObjectLoader } from './saved_object_loader';
-import { SavedObjectOpenSearchDashboardsServices } from '../../../../src/plugins/saved_objects/public';
+import { SavedObjectOpenSearchDashboardsServices } from '../../../../../src/plugins/saved_objects/public';
 import { findListItems } from './find_list_items';
 import { createSavedVisClass } from './_saved_vis';
-import { TypesStart } from '../../../../src/plugins/visualizations/public/vis_types';
+import { TypesStart } from '../../../../../src/plugins/visualizations/public/vis_types';
 import { getVisualizationsPlugin } from '../kibana-services';
 
 export interface SavedObjectOpenSearchDashboardsServicesWithVisualizations extends SavedObjectOpenSearchDashboardsServices {
