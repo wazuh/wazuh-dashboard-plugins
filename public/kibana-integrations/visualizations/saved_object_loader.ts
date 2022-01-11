@@ -80,7 +80,7 @@ export class SavedObjectLoader {
             // just assign the defaults and be done
             _.assign(instance, instance.defaults);
             return instance.hydrateIndexPattern().then(() => {
-              return afterESResp.call(instance); // eslint-disable-line
+              return afterOpenSearchResp.call(instance); // eslint-disable-line
             });
           }
           return this.processFunc()
@@ -92,8 +92,8 @@ export class SavedObjectLoader {
                 found: raw._version ? true : false
               };
             })
-            .then(instance.applyESResp)
-            .catch(instance.applyEsResp);
+            .then(instance.applyOpenSearchResp)
+            .catch(instance.applyOpenSearchResp);
         })
         .then(() => instance);
     });
