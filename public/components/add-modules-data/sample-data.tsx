@@ -13,7 +13,7 @@
 import React, { Component, Fragment } from 'react';
 import { WzButtonPermissions } from '../../components/common/permissions/button';
 
-import { EuiFlexItem, EuiCard, EuiFlexGrid, EuiFlexGroup, EuiCallOut, EuiSpacer } from '@elastic/eui';
+import { EuiFlexItem, EuiCard, EuiFlexGrid, EuiFlexGroup } from '@elastic/eui';
 
 import { getToasts } from '../../kibana-services';
 import { WzRequest } from '../../react-services/wz-request';
@@ -70,7 +70,6 @@ export default class WzSampleData extends Component {
         exists: false,
         addDataLoading: false,
         removeDataLoading: false,
-        havePermissions: false
       };
     });
   }
@@ -128,7 +127,7 @@ export default class WzSampleData extends Component {
         error: {
           error: error,
           message: error.message || error,
-          title: 'Error checking sample data',
+          title: error.name || error,
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -176,7 +175,7 @@ export default class WzSampleData extends Component {
         error: {
           error: error,
           message: error.message || error,
-          title: `Error trying to add sample data`,
+          title: `${error.name}: Error trying to add sample data`,
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -216,7 +215,7 @@ export default class WzSampleData extends Component {
         error: {
           error: error,
           message: error.message || error,
-          title: `Error trying to delete sample data`,
+          title: `${error.name}: Error trying to delete sample data`,
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -268,16 +267,9 @@ export default class WzSampleData extends Component {
   }
   render() {
     return (
-      <>
-        <EuiCallOut
-            title="You will need privileges to perform this actions."
-            iconType="iInCircle"
-        />
-        <EuiSpacer />
-        <EuiFlexGrid columns={3}>
-          {this.categories.map((category) => this.renderCard(category))}
-        </EuiFlexGrid>
-      </>
+      <EuiFlexGrid columns={3}>
+        {this.categories.map((category) => this.renderCard(category))}
+      </EuiFlexGrid>
     );
   }
 }
@@ -300,5 +292,5 @@ const PromiseAllRecursiveObject = function (obj) {
       }
       return value;
     })
-  ).then((result) => zipObject(keys, result))
+  ).then((result) => zipObject(keys, result));
 };

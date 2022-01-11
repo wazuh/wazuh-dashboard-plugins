@@ -646,14 +646,7 @@ export class WazuhElasticCtrl {
         'wazuh-elastic:haveSampleAlertsOfCategory',
         `Error checking if there are sample alerts indices: ${error.message || error}`
       );
-
-      const statusCode = error.meta.statusCode || 500;
-
-      if(statusCode === 403){
-        error.message = 'Permission denied';
-      }
-
-      return ErrorResponse(`Error checking if there are sample alerts indices: ${error.message || error}`, 1000, statusCode, response);
+      return ErrorResponse(`Error checking if there are sample alerts indices: ${error.message || error}`, 1000, 500, response);
     }
   }
   /**
@@ -727,7 +720,7 @@ export class WazuhElasticCtrl {
           }
         };
 
-        await context.core.elasticsearch.client.asCurrentUser.indices.create({
+        await context.core.elasticsearch.client.asInternalUser.indices.create({
           index: sampleAlertsIndex,
           body: configuration
         });
@@ -738,7 +731,7 @@ export class WazuhElasticCtrl {
         );
       }
 
-      await context.core.elasticsearch.client.asCurrentUser.bulk({
+      await context.core.elasticsearch.client.asInternalUser.bulk({
         index: sampleAlertsIndex,
         body: bulk
       });
@@ -755,13 +748,7 @@ export class WazuhElasticCtrl {
         'wazuh-elastic:createSampleAlerts',
         `Error adding sample alerts to ${sampleAlertsIndex} index: ${error.message || error}`
       );
-      const statusCode = error.meta.statusCode || 500;
-
-      if(statusCode === 403){
-        error.message = 'Permission denied';
-      }
-      
-      return ErrorResponse(error.message || error, 1000, statusCode, response);
+      return ErrorResponse(error.message || error, 1000, 500, response);
     }
   }
   /**
@@ -822,13 +809,7 @@ export class WazuhElasticCtrl {
         'wazuh-elastic:deleteSampleAlerts',
         `Error deleting sample alerts of ${sampleAlertsIndex} index: ${error.message || error}`
       );
-      const statusCode = error.meta.statusCode || 500;
-
-      if(statusCode === 403){
-        error.message = 'Permission denied';
-      }
-      
-      return ErrorResponse(error.message || error, 1000, statusCode, response);
+      return ErrorResponse(error.message || error, 1000, 500, response);
     }
   }
 
