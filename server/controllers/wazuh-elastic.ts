@@ -647,13 +647,8 @@ export class WazuhElasticCtrl {
         `Error checking if there are sample alerts indices: ${error.message || error}`
       );
 
-      const statusCode = error.meta.statusCode || 500;
-
-      if(statusCode === 403){
-        error.message = 'Permission denied';
-      }
-
-      return ErrorResponse(`Error checking if there are sample alerts indices: ${error.message || error}`, 1000, statusCode, response);
+      const [statusCode, errorMessage] = this.getErrorDetails(error);
+      return ErrorResponse(`Error checking if there are sample alerts indices: ${errorMessage || error}`, 1000, statusCode, response);
     }
   }
   /**
@@ -755,13 +750,10 @@ export class WazuhElasticCtrl {
         'wazuh-elastic:createSampleAlerts',
         `Error adding sample alerts to ${sampleAlertsIndex} index: ${error.message || error}`
       );
-      const statusCode = error.meta.statusCode || 500;
-
-      if(statusCode === 403){
-        error.message = 'Permission denied';
-      }
       
-      return ErrorResponse(error.message || error, 1000, statusCode, response);
+      const [statusCode, errorMessage] = this.getErrorDetails(error);
+      
+      return ErrorResponse(errorMessage || error, 1000, statusCode, response);
     }
   }
   /**
@@ -822,13 +814,9 @@ export class WazuhElasticCtrl {
         'wazuh-elastic:deleteSampleAlerts',
         `Error deleting sample alerts of ${sampleAlertsIndex} index: ${error.message || error}`
       );
-      const statusCode = error.meta.statusCode || 500;
+      const [statusCode, errorMessage] = this.getErrorDetails(error);
 
-      if(statusCode === 403){
-        error.message = 'Permission denied';
-      }
-      
-      return ErrorResponse(error.message || error, 1000, statusCode, response);
+      return ErrorResponse(errorMessage || error, 1000, statusCode, response);
     }
   }
 
@@ -872,4 +860,15 @@ export class WazuhElasticCtrl {
       return Promise.reject(error);
     }
   };
+
+  getErrorDetails(error){
+    const statusCode = error?.meta?.statusCode || 500;
+    let errorMessage = error.message;
+
+    if(statusCode === 403){
+      errorMessage = error?.meta?.body?.error?.reason || 'Permission denied';
+    }
+
+    return [statusCode, errorMessage];
+  }
 }
