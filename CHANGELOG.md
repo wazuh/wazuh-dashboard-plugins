@@ -113,6 +113,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed regex lookahead and lookbehind for safari [#3741](https://github.com/wazuh/wazuh-kibana-app/pull/3741)
 - Fixed Vulnerabilities Inventory flyout details filters [#3744](https://github.com/wazuh/wazuh-kibana-app/pull/3744)
 - Fixed Dashboard PDF report error when switching pinned agent state [#3748](https://github.com/wazuh/wazuh-kibana-app/pull/3748)
+- Fixed the rendering of the command to deploy new Windows agent not working in some Kibana versions [#3753](https://github.com/wazuh/wazuh-kibana-app/pull/3753)
 - Fixed action buttons overlaying to the request text in Tools/API Console [#3772](https://github.com/wazuh/wazuh-kibana-app/pull/3772)
 - Fix `Rule ID` value in reporting tables related to top results [#3774](https://github.com/wazuh/wazuh-kibana-app/issues/3774)
 - Fix updating the aggregation data of Panel section when changing the time filter [#3790](https://github.com/wazuh/wazuh-kibana-app/pull/3790)

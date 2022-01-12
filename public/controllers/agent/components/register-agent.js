@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component, Fragment } from 'react';
-import { version, kibana } from '../../../../package.json';
+import { version } from '../../../../package.json';
 import { WazuhConfig } from '../../../react-services/wazuh-config';
 import {
   EuiSteps,
@@ -129,7 +129,6 @@ export const RegisterAgent = withErrorBoundary(
         neededSYS: false,
         selectedArchitecture: '',
         selectedVersion: '',
-        kibanaVersion: (kibana || {}).version || false,
         version: '',
         wazuhVersion: '',
         serverAddress: '',
@@ -382,8 +381,7 @@ export const RegisterAgent = withErrorBoundary(
 
     getHighlightCodeLanguage(selectedSO) {
       if (selectedSO.toLowerCase() === 'win') {
-        const iKibanaVersion = parseFloat(this.state.kibanaVersion.split('.').slice(0, 2).join('.'), 2);
-        return iKibanaVersion < 7.14 ? 'ps' : 'powershell';
+        return 'powershell';
       } else {
         return 'bash';
       }
