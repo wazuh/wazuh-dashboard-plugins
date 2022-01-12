@@ -345,7 +345,7 @@ export const AgentsPreview = compose(
                   grow={false}
                   className="agents-evolution-visualization"
                   style={{
-                    display: !this.state.loading ? 'block' : 'none',
+                    display: !this.state.loading ? 'inherit' : 'none',
                     margin: !this.state.loading ? '12px' : 0,
                   }}
                 >
@@ -358,7 +358,11 @@ export const AgentsPreview = compose(
                   >
                     <EuiFlexGroup>
                       <EuiFlexItem>
-                        <div style={{ height: this.props.resultState === 'ready' ? '180px' : 0 }}>
+                        <div style={{ 
+                            height: this.props.resultState === 'ready' ? '205px' : 0, 
+                            paddingTop: this.props.resultState === 'ready' ? "12px" : 0 
+                          }}
+                        >
                           <WzReduxProvider>
                             <KibanaVis
                               visID={'Wazuh-App-Overview-General-Agents-status'}
