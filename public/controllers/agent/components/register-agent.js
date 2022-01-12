@@ -543,11 +543,13 @@ export const RegisterAgent = withErrorBoundary(
                     )}
                   </EuiCopy>
                 </div>
-                <EuiSwitch
-                  label="Show password"
-                  checked={this.state.showPassword}
-                  onChange={(active) => this.setShowPassword(active)}
-                />
+                {this.state.needsPassword && (
+                  <EuiSwitch
+                    label="Show password"
+                    checked={this.state.showPassword}
+                    onChange={(active) => this.setShowPassword(active)}
+                  />
+                )}
                 <EuiSpacer />
                 {windowsAdvice}
               </EuiText>
@@ -600,11 +602,6 @@ export const RegisterAgent = withErrorBoundary(
                     )}
                   </EuiCopy>
                 </div>
-                <EuiSwitch
-                  label="Show password"
-                  checked={this.state.showPassword}
-                  onChange={(active) => this.setShowPassword(active)}
-                />
                 <EuiSpacer />
                 {textAndLinkToCheckConnectionDocumentation}
               </EuiText>
