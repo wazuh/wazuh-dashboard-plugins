@@ -69,7 +69,7 @@ export const useValueSuggestion = (
       : await data.autocomplete.getValueSuggestions({
           query,
           indexPattern: indexPattern as IIndexPattern,
-          field,
+          field: { ...field, toSpec: (options) => field },
           boolFilter: boolFilter,
         });
   };
