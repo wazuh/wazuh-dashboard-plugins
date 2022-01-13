@@ -57,7 +57,7 @@ export class ModulesHelper {
         const key = `filter-key-${objKey}`;
         const value = x.query && x.query.match_phrase
           ? `filter-value-${x.query.match_phrase[objKey].query}`
-          : `filter-value-${x.meta.value}`;
+          : `filter-value-${x.meta.value()}`;
         const data = filters[i].attributes[3];
         if (data.value.includes(key) && data.value.includes(value)) {
           found = true;
