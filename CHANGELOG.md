@@ -118,6 +118,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed the rendering of the command to deploy new Windows agent not working in some Kibana versions [#3753](https://github.com/wazuh/wazuh-kibana-app/pull/3753)
 - Fixed action buttons overlaying to the request text in Tools/API Console [#3772](https://github.com/wazuh/wazuh-kibana-app/pull/3772)
 - Fix `Rule ID` value in reporting tables related to top results [#3774](https://github.com/wazuh/wazuh-kibana-app/issues/3774)
+- Fixed github/office365 multi-select filters suggested values [#3787](https://github.com/wazuh/wazuh-kibana-app/pull/3787)
 - Fix updating the aggregation data of Panel section when changing the time filter [#3790](https://github.com/wazuh/wazuh-kibana-app/pull/3790)
 
 ## Wazuh v4.2.5 - Kibana 7.10.2, 7.11.2, 7.12.1, 7.13.4, 7.14.2 - Revision 4206
