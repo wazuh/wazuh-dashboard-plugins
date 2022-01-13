@@ -396,7 +396,8 @@ export const MultipleAgentSelector = withErrorBoundary(
     };
 
     unselectElementsOfSelectByID(containerID) {
-      document.getElementById(containerID).options.forEach((option) => {
+      const agentsSelect: HTMLSelectElement | null = document.getElementById(containerID) as HTMLSelectElement;
+      Array.prototype.forEach.call(agentsSelect?.options, (option) => {
         option.selected = false;
       });
     }
