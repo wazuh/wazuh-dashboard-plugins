@@ -707,7 +707,7 @@ export class WazuhElasticCtrl {
       // Index alerts
 
       // Check if wazuh sample alerts index exists
-      const existsSampleIndex = await context.core.elasticsearch.client.asInternalUser.indices.exists({
+      const existsSampleIndex = await context.core.elasticsearch.client.asCurrentUser.indices.exists({
         index: sampleAlertsIndex
       });
       if (!existsSampleIndex.body) {

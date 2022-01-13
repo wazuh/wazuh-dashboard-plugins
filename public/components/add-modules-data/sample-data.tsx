@@ -270,7 +270,7 @@ export default class WzSampleData extends Component {
     return (
       <>
         <EuiCallOut
-            title="You will need privileges to perform this actions."
+            title="These actions require permissions on the managed indices."
             iconType="iInCircle"
         />
         <EuiSpacer />
