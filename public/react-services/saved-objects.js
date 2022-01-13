@@ -282,6 +282,7 @@ export class SavedObject {
               "data.vulnerability.reference":{"id":"url"},
               "data.url":{"id":"url"}
             }`,
+            fields: '[]',
             sourceFilters: '[{"value":"@timestamp"}]',
           },
         },
