@@ -13,7 +13,7 @@
 import React, { Component, Fragment } from 'react';
 import { WzButtonPermissions } from '../../components/common/permissions/button';
 
-import { EuiFlexItem, EuiCard, EuiFlexGrid, EuiFlexGroup } from '@elastic/eui';
+import { EuiFlexItem, EuiCard, EuiFlexGrid, EuiFlexGroup, EuiCallOut, EuiSpacer } from '@elastic/eui';
 
 import { getToasts } from '../../kibana-services';
 import { WzRequest } from '../../react-services/wz-request';
@@ -70,6 +70,7 @@ export default class WzSampleData extends Component {
         exists: false,
         addDataLoading: false,
         removeDataLoading: false,
+        havePermissions: false
       };
     });
   }
@@ -127,7 +128,7 @@ export default class WzSampleData extends Component {
         error: {
           error: error,
           message: error.message || error,
-          title: error.name || error,
+          title: 'Error checking sample data',
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -175,7 +176,7 @@ export default class WzSampleData extends Component {
         error: {
           error: error,
           message: error.message || error,
-          title: `${error.name}: Error trying to add sample data`,
+          title: `Error trying to add sample data`,
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -215,7 +216,7 @@ export default class WzSampleData extends Component {
         error: {
           error: error,
           message: error.message || error,
-          title: `${error.name}: Error trying to delete sample data`,
+          title: `Error trying to delete sample data`,
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -267,9 +268,16 @@ export default class WzSampleData extends Component {
   }
   render() {
     return (
-      <EuiFlexGrid columns={3}>
-        {this.categories.map((category) => this.renderCard(category))}
-      </EuiFlexGrid>
+      <>
+        <EuiCallOut
+            title="These actions require permissions on the managed indices."
+            iconType="iInCircle"
+        />
+        <EuiSpacer />
+        <EuiFlexGrid columns={3}>
+          {this.categories.map((category) => this.renderCard(category))}
+        </EuiFlexGrid>
+      </>
     );
   }
 }
@@ -292,5 +300,5 @@ const PromiseAllRecursiveObject = function (obj) {
       }
       return value;
     })
-  ).then((result) => zipObject(keys, result));
+  ).then((result) => zipObject(keys, result))
 };
