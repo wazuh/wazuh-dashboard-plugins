@@ -117,6 +117,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed no wrap text in MITRE ATT&CK intelligence table [#3780](https://github.com/wazuh/wazuh-kibana-app/pull/3780)
 - Fixed visualization tooltip position [#3781](https://github.com/wazuh/wazuh-kibana-app/pull/3781)
 - Fixed github/office365 multi-select filters suggested values [#3787](https://github.com/wazuh/wazuh-kibana-app/pull/3787)
+- Fixed the styles on the evolution card [#3796](https://github.com/wazuh/wazuh-kibana-app/pull/3796)
 
 ## Wazuh v4.2.5 - Kibana 7.10.2, 7.11.2, 7.12.1, 7.13.4, 7.14.2 - Revision 4206
 
