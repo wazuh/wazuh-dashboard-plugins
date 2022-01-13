@@ -97,7 +97,6 @@ function buildResource(label: string, labelResource: string){
         name: 'Description',
         sortable: true,
         render: (value) => value ? <Markdown markdown={value} /> : '',
-        truncateText: true
       }
     ],
     mitreFlyoutHeaderProperties: [
