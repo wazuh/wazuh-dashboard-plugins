@@ -47,6 +47,7 @@ export const initialWazuhConfig: string = `---
 # step once the Wazuh app starts. Values must to be true or false.
 #checks.pattern : true
 #checks.template: true
+#checks.fields  : true
 #checks.api     : true
 #checks.setup   : true
 #checks.metaFields: true
