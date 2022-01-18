@@ -768,7 +768,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
               color="text"
               onClick={this.onClickOverviewButton.bind(this)}
             >
-              <EuiIcon type="visualizeApp" color="#256BD1" size="m" />
+              <EuiIcon type="visualizeApp" size="m" />
               <span className="wz-menu-button-title " >Modules</span>
               <span className="flex"></span>
               <span className="flex"></span>
@@ -788,7 +788,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
               color="text"
               onClick={this.onClickManagementButton.bind(this)}
             >
-              <EuiIcon type="managementApp" color="#256BD1" size="m" />
+              <EuiIcon type="managementApp" size="m" />
               <span className="wz-menu-button-title ">Management</span>
               <span className="flex"></span>
               {/*this.state.hover === 'manager' */ this.state.isManagementPopoverOpen && (
@@ -809,7 +809,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
                 this.setState({ menuOpened: false });
               }}
             >
-              <EuiIcon type="watchesApp" color="#256BD1" size="m" />
+              <EuiIcon type="watchesApp" size="m" />
               <span className="wz-menu-button-title ">Agents</span>
             </EuiButtonEmpty>
 
@@ -822,7 +822,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
               color="text"
               onClick={this.onClickToolsButton.bind(this)}
             >
-              <EuiIcon type="console" color="#256BD1" size="m" />
+              <EuiIcon type="console" size="m" />
               <span className="wz-menu-button-title ">Tools</span>
               <span className="flex"></span>
               {this.state.isToolsPopoverOpen && (
@@ -841,7 +841,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
               aria-label="Security"
               onClick={this.onClickSecurityButton.bind(this)}
             >
-              <EuiIcon type="securityApp" color="#256BD1" size="m" />
+              <EuiIcon type="securityApp" size="m" />
               <span className="wz-menu-button-title ">Security</span>
               <span className="flex"></span>
               {this.state.isSecurityPopoverOpen && (
@@ -858,7 +858,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
               aria-label="Settings"
               onClick={this.onClickSettingsButton.bind(this)}
             >
-              <EuiIcon type="advancedSettingsApp" color="#256BD1" size="m" />
+              <EuiIcon type="advancedSettingsApp" size="m" />
               <span className="wz-menu-button-title ">Settings</span>
               <span className="flex"></span>
               {this.state.isSettingsPopoverOpen && (
@@ -911,18 +911,16 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
               <EuiFlexItem grow={false} style={{ margin: "12px 0 0 0" }}>
                 <EuiToolTip position="top" content={`Open ${currentAgent.name} summary`}>
                   <EuiButtonEmpty
-                    color="#256BD1"
                     onMouseDown={(ev) => { AppNavigate.navigateToModule(ev, 'agents', { "tab": "welcome", "agent": currentAgent.id }); this.router.reload(); this.setState({ menuOpened: false }) }}>
-                    <EuiIcon type="visualizeApp" color="#256BD1" size="m" />
+                    <EuiIcon type="visualizeApp" size="m" />
                   </EuiButtonEmpty>
                 </EuiToolTip>
               </EuiFlexItem>
               <EuiFlexItem grow={false} style={{ margin: "12px 0 0 0" }}>
                 <EuiToolTip position="top" content={"Change selected agent"}>
                   <EuiButtonEmpty
-                    color="#256BD1"
                     onClick={() => { store.dispatch(showExploreAgentModalGlobal({})); this.setState({ menuOpened: false }) }}>
-                    <EuiIcon type="pencil" color="#256BD1" size="m" />
+                    <EuiIcon type="pencil" size="m" />
                   </EuiButtonEmpty>
                 </EuiToolTip>
               </EuiFlexItem>

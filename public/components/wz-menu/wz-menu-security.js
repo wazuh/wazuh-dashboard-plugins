@@ -83,7 +83,7 @@ class WzMenuSecurity extends Component {
       {
         name: 'Security',
         id: 0,
-        icon: <EuiIcon type="securityApp" color="#256BD1" />,
+        icon: <EuiIcon type="securityApp" />,
         items: renderSettings
       }
     ];

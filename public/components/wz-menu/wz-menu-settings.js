@@ -125,7 +125,7 @@ class WzMenuSettings extends Component {
         name: availableSettings.settings.text,
         id: availableSettings.settings.id,
         disabled: true,
-        icon: <EuiIcon type="gear" color="#256BD1" />,
+        icon: <EuiIcon type="gear" />,
         items: renderSettings
       }
     ];

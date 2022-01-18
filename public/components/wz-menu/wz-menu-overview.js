@@ -244,7 +244,7 @@ class WzMenuOverview extends Component {
       {
         name: this.overviewSections.securityInformation.text,
         id: this.overviewSections.securityInformation.id,
-        icon: <EuiIcon type="managementApp" color="#256BD1" />,
+        icon: <EuiIcon type="managementApp" />,
         items: this.createItems(this.securityInformationItems)
       }
     ];
@@ -253,7 +253,7 @@ class WzMenuOverview extends Component {
       {
         name: this.overviewSections.auditing.text,
         id: this.overviewSections.auditing.id,
-        icon: <EuiIcon type="managementApp" color="#256BD1" />,
+        icon: <EuiIcon type="managementApp" />,
         items: this.createItems(this.auditingItems)
       }
     ];
@@ -262,7 +262,7 @@ class WzMenuOverview extends Component {
       {
         name: this.overviewSections.threatDetection.text,
         id: this.overviewSections.threatDetection.id,
-        icon: <EuiIcon type="reportingApp" color="#256BD1" />,
+        icon: <EuiIcon type="reportingApp" />,
         items: this.createItems(this.threatDetectionItems)
       }
     ];
@@ -271,7 +271,7 @@ class WzMenuOverview extends Component {
       {
         name: this.overviewSections.regulatoryCompliance.text,
         id: this.overviewSections.regulatoryCompliance.id,
-        icon: <EuiIcon type="reportingApp" color="#256BD1" />,
+        icon: <EuiIcon type="reportingApp" />,
         items: this.createItems(this.regulatoryComplianceItems)
       }
     ];
