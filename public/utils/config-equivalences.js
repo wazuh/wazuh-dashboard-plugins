@@ -1,9 +1,11 @@
+import { ASSETS_BASE_URL_PREFIX } from "../../common/constants";
+
 export const configEquivalences = {
   pattern: 'Default index pattern to use on the app.',
-  'customization.logo.app':'Define the name of the app logo saved in the path /plugins/wazuh/assets/',
-  'customization.logo.sidebar':'Define the name of the sidebar logo saved in the path /plugins/wazuh/assets/',
-  'customization.logo.healthcheck':'Define the name of the health-check logo saved in the path /plugins/wazuh/assets/',
-  'customization.logo.reports':'Define the name of the reports logo (.png) saved in the path /plugins/wazuh/assets/',
+  'customization.logo.app':`Define the name of the app logo saved in the path ${ASSETS_BASE_URL_PREFIX}`,
+  'customization.logo.sidebar':`Define the name of the sidebar logo saved in the path ${ASSETS_BASE_URL_PREFIX}`,
+  'customization.logo.healthcheck':`Define the name of the health-check logo saved in the path ${ASSETS_BASE_URL_PREFIX}`,
+  'customization.logo.reports':`Define the name of the reports logo (.png) saved in the path ${ASSETS_BASE_URL_PREFIX}`,
   'checks.pattern':
     'Enable or disable the index pattern health check when opening the app.',
   'checks.template':

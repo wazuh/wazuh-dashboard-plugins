@@ -32,7 +32,7 @@ import store from '../../../redux/store';
 import './welcome.scss';
 import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
 import { withErrorBoundary } from '../hocs';
-import office_logo from '../../../assets/office365.svg';
+import office_logo from '../../../assets/images/icons/office365.svg';
 
 export const OverviewWelcome = withErrorBoundary(class OverviewWelcome extends Component {
   constructor(props) {

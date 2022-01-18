@@ -27,6 +27,7 @@ import { Cookies } from 'react-cookie';
 import { AppState } from './react-services/app-state';
 import { setErrorOrchestrator } from './react-services/common-services';
 import { ErrorOrchestratorService } from './react-services/error-orchestrator/error-orchestrator.service';
+import { getThemeAssetURL, getAssetURL } from './utils/assets';
 
 const innerAngularName = 'app/wazuh';
 
@@ -38,10 +39,12 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
   private hideTelemetryBanner?: () => void;
   
   public setup(core: CoreSetup, plugins: WazuhSetupPlugins): WazuhSetup {
+    const UI_THEME = core.uiSettings.get('theme:darkMode') ? 'dark' : 'light';
+
     core.application.register({
       id: `wazuh`,
       title: 'Wazuh',
-      icon: core.http.basePath.prepend('/plugins/wazuh/assets/icon_blue.png'),
+      icon: core.http.basePath.prepend(getThemeAssetURL('icon.svg', UI_THEME)),
       mount: async (params: AppMountParameters) => {
         if (!this.initializeInnerAngular) {
           throw Error('Wazuh plugin method initializeInnerAngular is undefined');
@@ -83,7 +86,7 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
               id: 'wazuh',
               label: 'Wazuh',
               order: 0,
-              euiIconType: core.http.basePath.prepend( `/plugins/wazuh/assets/${response.logoSidebar}`),
+              euiIconType: core.http.basePath.prepend(response.logoSidebar ? getAssetURL(response.logoSidebar) : getThemeAssetURL('icon.svg', UI_THEME)),
             }}
         })
         return () => {
@@ -94,7 +97,7 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
         id: 'wazuh',
         label: 'Wazuh',
         order: 0,
-        euiIconType: core.http.basePath.prepend('/plugins/wazuh/assets/icon_blue.png'),
+        euiIconType: core.http.basePath.prepend(getThemeAssetURL('icon.svg', UI_THEME)),
       },
       updater$: this.stateUpdater
     });

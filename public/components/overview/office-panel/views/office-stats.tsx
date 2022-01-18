@@ -14,7 +14,7 @@
 import React from 'react';
 import { EuiDescriptionList, EuiPanel } from '@elastic/eui';
 import { PanelModuleConfiguration } from '../../../common/modules/panel';
-import moduleLogo from '../../../../assets/office365.svg';
+import moduleLogo from '../../../../assets/images/icons/office365.svg';
 import { renderValueYesThenEnabled } from '../../../../controllers/management/components/management/configuration/utils/utils';
 
 const settings = [

@@ -10,9 +10,10 @@ import {
 import { log } from '../logger';
 import * as TimSort from 'timsort';
 import { getConfiguration } from '../get-configuration';
+import { REPORTS_PRIMARY_COLOR, REPORTS_LOGO_IMAGE_ASSETS_RELATIVE_PATH } from '../../../common/constants';
 
 const COLORS = {
-  PRIMARY: '#256BD1'
+  PRIMARY: REPORTS_PRIMARY_COLOR
 };
 
 const pageConfiguration = (nameLogo) => ({
@@ -103,23 +104,23 @@ const fonts = {
   Roboto: {
     normal: path.join(
       __dirname,
-      '../../../public/assets/opensans/OpenSans-Light.ttf'
+      '../../../public/assets/fonts/opensans/OpenSans-Light.ttf'
     ),
     bold: path.join(
       __dirname,
-      '../../../public/assets/opensans/OpenSans-Bold.ttf'
+      '../../../public/assets/fonts/opensans/OpenSans-Bold.ttf'
     ),
     italics: path.join(
       __dirname,
-      '../../../public/assets/opensans/OpenSans-Italic.ttf'
+      '../../../public/assets/fonts/opensans/OpenSans-Italic.ttf'
     ),
     bolditalics: path.join(
       __dirname,
-      '../../../public/assets/opensans/OpenSans-BoldItalic.ttf'
+      '../../../public/assets/fonts/opensans/OpenSans-BoldItalic.ttf'
     ),
     monslight: path.join(
       __dirname,
-      '../../../public/assets/opensans/Montserrat-Light.ttf'
+      '../../../public/assets/fonts/opensans/Montserrat-Light.ttf'
     )
   }
 };
@@ -613,7 +614,7 @@ export class ReportPrinter{
   }
 
   async print(reportPath: string){
-    const nameLogo = ( await getConfiguration() )['customization.logo.reports'] || 'logo.png'
+    const nameLogo = ( await getConfiguration() )['customization.logo.reports'] || REPORTS_LOGO_IMAGE_ASSETS_RELATIVE_PATH;
 
     const document = this._printer.createPdfKitDocument({...pageConfiguration(nameLogo), content: this._content});
     await document.pipe(
