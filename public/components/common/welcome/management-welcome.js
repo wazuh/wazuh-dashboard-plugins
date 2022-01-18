@@ -65,6 +65,7 @@ class ManagementWelcome extends Component {
                         <EuiIcon
                           size="xl"
                           type="indexRollupApp"
+                          color="primary"
                         />
                       }
                       title="Rules"
@@ -80,6 +81,7 @@ class ManagementWelcome extends Component {
                         <EuiIcon
                           size="xl"
                           type="indexRollupApp"
+                          color="primary"
                         />
                       }
                       title="Decoders"
@@ -97,6 +99,7 @@ class ManagementWelcome extends Component {
                         <EuiIcon
                           size="xl"
                           type="indexRollupApp"
+                          color="primary"
                         />
                       }
                       title="CDB lists"
@@ -112,6 +115,7 @@ class ManagementWelcome extends Component {
                         <EuiIcon
                           size="xl"
                           type="usersRolesApp"
+                          color="primary"
                         />
                       }
                       title="Groups"
@@ -126,7 +130,7 @@ class ManagementWelcome extends Component {
                       layout="horizontal"
                       className="homSynopsis__card"
                       icon={
-                        <EuiIcon size="xl" type="devToolsApp" />
+                        <EuiIcon size="xl" type="devToolsApp" color="primary" />
                       }
                       title="Configuration"
                       onClick={() => this.switchSection('configuration')}
@@ -146,7 +150,7 @@ class ManagementWelcome extends Component {
                       layout="horizontal"
                       className="homSynopsis__card"
                       icon={
-                        <EuiIcon size="xl" type="uptimeApp" />
+                        <EuiIcon size="xl" type="uptimeApp" color="primary" />
                       }
                       title="Status"
                       onClick={() => this.switchSection('status')}
@@ -161,6 +165,7 @@ class ManagementWelcome extends Component {
                         <EuiIcon
                           size="xl"
                           type="indexPatternApp"
+                          color="primary"
                         />
                       }
                       title="Cluster"
@@ -175,7 +180,7 @@ class ManagementWelcome extends Component {
                       layout="horizontal"
                       className="homSynopsis__card"
                       icon={
-                        <EuiIcon size="xl" type="filebeatApp" />
+                        <EuiIcon size="xl" type="filebeatApp" color="primary"/>
                       }
                       title="Logs"
                       onClick={() => this.switchSection('logs')}
@@ -190,6 +195,7 @@ class ManagementWelcome extends Component {
                         <EuiIcon
                           size="xl"
                           type="reportingApp"
+                          color="primary"
                         />
                       }
                       title="Reporting"
@@ -204,7 +210,7 @@ class ManagementWelcome extends Component {
                       layout="horizontal"
                       className="homSynopsis__card"
                       icon={
-                        <EuiIcon size="xl" type="visualizeApp" />
+                        <EuiIcon size="xl" type="visualizeApp" color="primary" />
                       }
                       title="Statistics"
                       onClick={() => this.switchSection('statistics')}
