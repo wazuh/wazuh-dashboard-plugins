@@ -46,10 +46,25 @@ const mainSettings = [
     label: 'Limit registration to maximum number of agents'
   },
   {
-    field: 'force',
-    label: 'Force registration when using an existing IP address',
-    render: (value) =>  value.enabled
-  }
+    field: 'force.enabled',
+    label: 'Force registration when using an existing IP address'
+  },
+  {
+    field: 'force.after_registration_time',
+    label: 'Specifies that the agent replacement will be performed only when the time (seconds) passed since the agent registration is greater than the value configured in the setting'
+  },
+  {
+    field: 'force.key_mismatch',
+    label: 'Avoid re-registering agents that already have valid keys'
+  },
+  {
+    field: 'force.disconnected_time.enabled',
+    label: 'Specifies that the replacement will be performed only for agents that have been disconnected longer than a certain time'
+  },
+  {
+    field: 'force.disconnected_time.value',
+    label: 'Seconds since an agent is in a disconnected state'
+  },
 ];
 const sslSettings = [
   { field: 'ssl_verify_host', label: 'Verify agents using a CA certificate' },
