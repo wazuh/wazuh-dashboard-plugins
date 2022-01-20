@@ -14,15 +14,15 @@ import React from "react";
 import { useSelector } from 'react-redux';
 import { EuiProgress, EuiText,EuiSpacer } from '@elastic/eui';
 import { getHttp } from '../../../kibana-services';
-import { getThemeAssetURL } from "../../../utils/assets";
+import { getAssetURL, getThemeAssetURL  } from "../../../utils/assets";
 
 export const withUserLogged = (WrappedComponent) => (props) => {
     const withUserLogged = useSelector((state)=> state.appStateReducers.withUserLogged);
+    const customAppLogo = useSelector((state)=> state?.appConfig?.data?.['customization.logo.app']);
     
     return withUserLogged ? <WrappedComponent {...props}/> : (
       <div className="withUserLogged">
-        {/*TODO: requires load custom icon or default icon*/ }
-        <img src={getHttp().basePath.prepend(getThemeAssetURL('logo.svg'))} className="withUserLogged-logo" alt=""></img>
+        <img src={getHttp().basePath.prepend(customAppLogo ? getAssetURL(customAppLogo) : getThemeAssetURL('logo.svg'))} className="withUserLogged-logo" alt=""></img>
         <EuiSpacer size="s" />
         <EuiText className="subdued-color">Loading ...</EuiText>
         <EuiSpacer size="s" />

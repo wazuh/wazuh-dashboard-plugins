@@ -71,7 +71,7 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
         //Check is user has Wazuh disabled
         const response = await core.http.get(`/api/check-wazuh`);
 
-        params.element.classList.add('dscAppWrapper');
+        params.element.classList.add('dscAppWrapper', 'wz-app');
         const unmount = await renderApp(innerAngularName, params.element);
 
         //Update if user has Wazuh disabled

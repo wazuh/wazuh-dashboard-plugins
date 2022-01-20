@@ -598,34 +598,6 @@ md-switch.md-checked .md-thumb {
   border: 1px solid #d3dae6;
 }
 
-/* Class for responsive images */
-.wz-responsive-img {
-  width: 100%;
-  height: auto;
-}
-
-.wz-logo-container {
-  height: 50px;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position-y: center;
-}
-
-@media (min-width: 1200px) {
-  .wz-logo {
-    background-image: url('../assets/new_logo_white.svg');
-    width: 150px;
-    max-width: 150px;
-  }
-}
-@media (max-width: 1199px) {
-  .wz-logo {
-    min-width: 28px !important;
-    margin-right: 15px !important;
-    background-image: url('../assets/new_logo_white_wolf.svg');
-  }
-}
-
 /* Unclassified but important Wazuh app component styles */
 
 .cursor-pointer {
@@ -1084,13 +1056,19 @@ wz-xml-file-editor {
 }
 
 .health-check-logo{
-  margin-bottom: 20px;
+  width: 140px;
   z-index: 1;
-  margin-left: -100px;
+  margin: 0 auto;
 }
 
-.health-check .euiDescriptionList__description{
-  text-align: left!important;
+.health-check {
+  .euiDescriptionList__title{
+    width: 60%!important;
+  }
+  .euiDescriptionList__description{
+    text-align: left!important;
+    width: 40%!important;
+  }
 }
 
 .CodeMirror-gutters {
