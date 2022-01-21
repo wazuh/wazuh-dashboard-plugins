@@ -64,7 +64,7 @@ This plugin for Kibana allows you to visualize and analyze Wazuh alerts stored i
 
 **Integrity monitoring**
 
-![Overview](assets/app3.png)
+![Overview](screenshots/app3.png)
 
 **Vulnerability detection**
 
