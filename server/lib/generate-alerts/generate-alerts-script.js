@@ -314,6 +314,11 @@ function generateAlert(params) {
   }
 
   if (params.office) {
+    alert.agent = {
+      id: '000',
+      ip: alert.agent.ip,
+      name: alert.agent.name
+    };
 
     if (params.manager && params.manager.name) {
       alert.agent.name = params.manager.name;
