@@ -206,30 +206,32 @@ class WzGroupAgentsTable extends Component {
                 }}
                 color="primary"
               />
-              <WzButtonPermissionsModalConfirm
-                buttonType="icon"
-                permissions={[
-                  [
-                    { action: 'agent:modify_group', resource: `agent:id:${item.id}` },
-                    ...(item.group || []).map((group) => ({
-                      action: 'agent:modify_group',
-                      resource: `agent:group:${group}`,
-                    })),
-                  ],
-                ]}
-                tooltip={{ position: 'top', content: 'Remove agent from this group' }}
-                aria-label="Remove agent from this group"
-                iconType="trash"
-                onConfirm={async () => {
-                  this.removeItems([item]);
-                }}
-                color="danger"
-                isDisabled={item.name === 'default'}
-                modalTitle={`Remove ${item.file || item.name} agent from this group?`}
-                modalProps={{
-                  buttonColor: 'danger',
-                }}
-              />
+              {this.props?.state?.itemDetail?.name !== 'default' && (
+                <WzButtonPermissionsModalConfirm
+                  buttonType="icon"
+                  permissions={[
+                    [
+                      { action: 'agent:modify_group', resource: `agent:id:${item.id}` },
+                      ...(item.group || []).map((group) => ({
+                        action: 'agent:modify_group',
+                        resource: `agent:group:${group}`,
+                      })),
+                    ],
+                  ]}
+                  tooltip={{ position: 'top', content: 'Remove agent from this group' }}
+                  aria-label="Remove agent from this group"
+                  iconType="trash"
+                  onConfirm={async () => {
+                    this.removeItems([item]);
+                  }}
+                  color="danger"
+                  isDisabled={item.name === 'default'}
+                  modalTitle={`Remove ${item.file || item.name} agent from this group?`}
+                  modalProps={{
+                    buttonColor: 'danger',
+                  }}
+                />
+              )}
             </div>
           );
         },

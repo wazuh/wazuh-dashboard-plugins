@@ -49,6 +49,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added new fields in Inventory table and Flyout Details [#3525](https://github.com/wazuh/wazuh-kibana-app/pull/3525)
 - Added columns selector in agents table [#3691](https://github.com/wazuh/wazuh-kibana-app/pull/3691)
 - Added a new workflow for create wazuh packages [#3742](https://github.com/wazuh/wazuh-kibana-app/pull/3742)
+- Run `template` and `fields` checks in the health check depends on the app configuration [#3783](https://github.com/wazuh/wazuh-kibana-app/pull/3783)
+- Added a toast message when there is an error creating a new group [#3804](https://github.com/wazuh/wazuh-kibana-app/pull/3804)
 
 ### Changed
 
@@ -58,13 +60,15 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Moved the filterManager subscription to the hook useFilterManager [#3517](https://github.com/wazuh/wazuh-kibana-app/pull/3517)
 - Change filter from is to is one of in custom searchbar [#3529](https://github.com/wazuh/wazuh-kibana-app/pull/3529)
 - Refactored as module tabs and buttons are rendered [#3494](https://github.com/wazuh/wazuh-kibana-app/pull/3494)
-- Updated depracated and new references authd [#3663](https://github.com/wazuh/wazuh-kibana-app/pull/3663)
+- Updated the deprecated and added new references authd [#3663](https://github.com/wazuh/wazuh-kibana-app/pull/3663) [#3806](https://github.com/wazuh/wazuh-kibana-app/pull/3806)
 - Added time subscription to Discover component [#3549](https://github.com/wazuh/wazuh-kibana-app/pull/3549)
 - Refactored as module tabs and buttons are rendered [#3494](https://github.com/wazuh/wazuh-kibana-app/pull/3494)
 - Testing logs using the Ruletest Test don't display the rule information if not matching a rule. [#3446](https://github.com/wazuh/wazuh-kibana-app/pull/3446)
 - Changed format permissions in FIM inventory [#3649](https://github.com/wazuh/wazuh-kibana-app/pull/3649)
 - Changed of request for one that does not return data that is not necessary to optimize times. [#3686](https://github.com/wazuh/wazuh-kibana-app/pull/3686) [#3728](https://github.com/wazuh/wazuh-kibana-app/pull/3728)
-- Changed colors and images [#3788](https://github.com/wazuh/wazuh-kibana-app/pull/3788)
+- Rebranding. Replaced the brand logos, set module icons with brand colors [#3788](https://github.com/wazuh/wazuh-kibana-app/pull/3788)
+- Changed user for sample data management [#3795](https://github.com/wazuh/wazuh-kibana-app/pull/3795)
+- Changed agent install codeblock copy button and powershell terminal warning [#3792](https://github.com/wazuh/wazuh-kibana-app/pull/3792)
 
 ### Fixed
 
@@ -114,6 +118,14 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed Vulnerabilities Inventory flyout details filters [#3744](https://github.com/wazuh/wazuh-kibana-app/pull/3744)
 - Removed api selector toggle from settings menu since it performed no useful function [#3604](https://github.com/wazuh/wazuh-kibana-app/pull/3604)
 - Fixed the requests get [#3661](https://github.com/wazuh/wazuh-kibana-app/pull/3661)
+- Fixed Dashboard PDF report error when switching pinned agent state [#3748](https://github.com/wazuh/wazuh-kibana-app/pull/3748)
+- Fixed the rendering of the command to deploy new Windows agent not working in some Kibana versions [#3753](https://github.com/wazuh/wazuh-kibana-app/pull/3753)
+- Fixed action buttons overlaying to the request text in Tools/API Console [#3772](https://github.com/wazuh/wazuh-kibana-app/pull/3772)
+- Fix `Rule ID` value in reporting tables related to top results [#3774](https://github.com/wazuh/wazuh-kibana-app/issues/3774)
+- Fixed github/office365 multi-select filters suggested values [#3787](https://github.com/wazuh/wazuh-kibana-app/pull/3787)
+- Fix updating the aggregation data of Panel section when changing the time filter [#3790](https://github.com/wazuh/wazuh-kibana-app/pull/3790)
+- Removed the button to remove an agent for a group in the agents' table when it is the default group [#3804](https://github.com/wazuh/wazuh-kibana-app/pull/3804)
+
 ## Wazuh v4.2.5 - Kibana 7.10.2, 7.11.2, 7.12.1, 7.13.4, 7.14.2 - Revision 4206
 
 ### Added

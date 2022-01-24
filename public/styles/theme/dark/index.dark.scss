@@ -451,4 +451,8 @@ svg .legend text {
   background: unset;
 }
 
+.copy-codeblock-wrapper .euiToolTipAnchor {
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
 @include apply_brand_color($brand_primary_color, $brand_secondary_color);

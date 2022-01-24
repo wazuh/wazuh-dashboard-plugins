@@ -12,7 +12,7 @@
 
 import { SetStateAction, useEffect, useState } from 'react';
 import { getDataPlugin } from '../../../kibana-services';
-import { useFilterManager, useIndexPattern, useQueryManager } from '.';
+import { useFilterManager, useIndexPattern, useQueryManager, useTimeFilter } from '.';
 import { IndexPattern } from 'src/plugins/data/public';
 import {
   UI_ERROR_SEVERITIES,
@@ -45,6 +45,7 @@ const useEsSearch = ({ preAppliedFilters = [], preAppliedAggs = {}, size = 10 })
   const indexPattern = useIndexPattern();
   const {filters} = useFilterManager();
   const [query] = useQueryManager();
+  const { timeFilter } = useTimeFilter();
   const [esResults, setEsResults] = useState<SearchResponse>({} as SearchResponse);
   const [error, setError] = useState<Error>({} as Error);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -72,7 +73,7 @@ const useEsSearch = ({ preAppliedFilters = [], preAppliedAggs = {}, size = 10 })
         setIsLoading(false);
       }
     })();
-  }, [indexPattern, query, filters, page, preAppliedAggs]);
+  }, [indexPattern, query, filters, timeFilter, page, preAppliedAggs]);
 
   const search = async (): Promise<SearchResponse> => {
     if (indexPattern) {
