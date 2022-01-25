@@ -223,10 +223,10 @@ export const WAZUH_DEFAULT_APP_CONFIG = {
   hideManagerAlerts: false,
   'logs.level': 'info',
   'enrollment.dns': '',
-  'customization.logo.app':'logotype.svg',
-  'customization.logo.sidebar':'icon_blue.png',
-  'customization.logo.healthcheck':'icon_blue.svg',
-  'customization.logo.reports':'logo.png'
+  'customization.logo.app': '',
+  'customization.logo.sidebar': '',
+  'customization.logo.healthcheck':'',
+  'customization.logo.reports': ''
 };
 
 // Wazuh errors
@@ -347,6 +347,13 @@ export const UI_TOAST_COLOR = {
   DANGER: 'danger',
 };
 
+// Assets
+export const ASSETS_BASE_URL_PREFIX = '/plugins/wazuh/assets/';
+
+// Reports
+export const REPORTS_LOGO_IMAGE_ASSETS_RELATIVE_PATH = 'images/logo_reports.png';
+export const REPORTS_PRIMARY_COLOR = '#256BD1';
+
 // Plugin platform
 export const PLUGIN_PLATFORM_NAME = 'Kibana';
 export const PLUGIN_PLATFORM_BASE_INSTALLATION_PATH = '/usr/share/kibana/data/wazuh/';
@@ -361,4 +368,3 @@ export const PLUGIN_PLATFORM_URL_GUIDE_TITLE = 'Elastic guide';
 export const PLUGIN_PLATFORM_REQUEST_HEADERS = {
   'kbn-xsrf': 'kibana'
 };
-

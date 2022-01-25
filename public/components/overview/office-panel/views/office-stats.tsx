@@ -14,7 +14,7 @@
 import React from 'react';
 import { EuiDescriptionList, EuiPanel } from '@elastic/eui';
 import { PanelModuleConfiguration } from '../../../common/modules/panel';
-import moduleLogo from '../../../../assets/office365.svg';
+import { LogoOffice365 } from '../../../common/logos';
 import { renderValueYesThenEnabled } from '../../../../controllers/management/components/management/configuration/utils/utils';
 
 const settings = [
@@ -46,7 +46,7 @@ const mapWModuleConfigurationToRenderProperties = (wmodules: {[key: string]: any
 
 export const ModuleConfiguration = props => <PanelModuleConfiguration 
   moduleTitle='Office 365'
-  moduleIconType={moduleLogo}
+  moduleIconType={() => <LogoOffice365 className="euiIcon--primary"/>}
   settings={settings}
   configurationAPIPartialPath='/wmodules/wmodules'
   mapResponseConfiguration={(response, type, params) => {

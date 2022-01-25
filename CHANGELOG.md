@@ -66,6 +66,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Testing logs using the Ruletest Test don't display the rule information if not matching a rule. [#3446](https://github.com/wazuh/wazuh-kibana-app/pull/3446)
 - Changed format permissions in FIM inventory [#3649](https://github.com/wazuh/wazuh-kibana-app/pull/3649)
 - Changed of request for one that does not return data that is not necessary to optimize times. [#3686](https://github.com/wazuh/wazuh-kibana-app/pull/3686) [#3728](https://github.com/wazuh/wazuh-kibana-app/pull/3728)
+- Rebranding. Replaced the brand logos, set module icons with brand colors [#3788](https://github.com/wazuh/wazuh-kibana-app/pull/3788)
 - Changed user for sample data management [#3795](https://github.com/wazuh/wazuh-kibana-app/pull/3795)
 - Changed agent install codeblock copy button and powershell terminal warning [#3792](https://github.com/wazuh/wazuh-kibana-app/pull/3792)
 - Refactored as the plugin platform name and references is managed [#3811](https://github.com/wazuh/wazuh-kibana-app/pull/3811)
@@ -116,6 +117,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed `Maximum call stack size exceeded` error exporting key-value pairs of a CDB List [#3738](https://github.com/wazuh/wazuh-kibana-app/pull/3738)
 - Fixed regex lookahead and lookbehind for safari [#3741](https://github.com/wazuh/wazuh-kibana-app/pull/3741)
 - Fixed Vulnerabilities Inventory flyout details filters [#3744](https://github.com/wazuh/wazuh-kibana-app/pull/3744)
+- Removed api selector toggle from settings menu since it performed no useful function [#3604](https://github.com/wazuh/wazuh-kibana-app/pull/3604)
+- Fixed the requests get [#3661](https://github.com/wazuh/wazuh-kibana-app/pull/3661)
 - Fixed Dashboard PDF report error when switching pinned agent state [#3748](https://github.com/wazuh/wazuh-kibana-app/pull/3748)
 - Fixed the rendering of the command to deploy new Windows agent not working in some Kibana versions [#3753](https://github.com/wazuh/wazuh-kibana-app/pull/3753)
 - Fixed action buttons overlaying to the request text in Tools/API Console [#3772](https://github.com/wazuh/wazuh-kibana-app/pull/3772)
@@ -219,7 +222,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed Wazuh main menu and breadcrumb render issues [#3347](https://github.com/wazuh/wazuh-kibana-app/pull/3347)
 - Fixed generation of huge logs from backend errors [#3397](https://github.com/wazuh/wazuh-kibana-app/pull/3397)
 - Fixed vulnerabilities flyout not showing alerts if the vulnerability had a field missing [#3593](https://github.com/wazuh/wazuh-kibana-app/pull/3593)
-- Removed api selector toggle from settings menu since it performed no useful function [#3604](https://github.com/wazuh/wazuh-kibana-app/pull/3604)
 
 ## Wazuh v4.2.1 - Kibana 7.10.2 , 7.11.2 - Revision 4202
 

@@ -1,3 +1,6 @@
+@import 'variables';
+@import '../../mixins';
+
 body.md-default-theme,
 body,
 html.md-default-theme,
@@ -444,6 +447,12 @@ svg .legend text {
   border-bottom: 1px solid #343741!important;
 }
 
+.sidepanel-infoBtnStyle {
+  background: unset;
+}
+
 .copy-codeblock-wrapper .euiToolTipAnchor {
   background-color: rgba(0, 0, 0, 0.7);
 }
+
+@include apply_brand_color($brand_primary_color, $brand_secondary_color);
