@@ -68,6 +68,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed of request for one that does not return data that is not necessary to optimize times. [#3686](https://github.com/wazuh/wazuh-kibana-app/pull/3686) [#3728](https://github.com/wazuh/wazuh-kibana-app/pull/3728)
 - Changed user for sample data management [#3795](https://github.com/wazuh/wazuh-kibana-app/pull/3795)
 - Changed agent install codeblock copy button and powershell terminal warning [#3792](https://github.com/wazuh/wazuh-kibana-app/pull/3792)
+- Refactored as the plugin platform name and references is managed [#3811](https://github.com/wazuh/wazuh-kibana-app/pull/3811)
 
 ### Fixed
 
