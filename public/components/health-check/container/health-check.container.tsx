@@ -50,6 +50,7 @@ import {
 import { getDataPlugin } from '../../../kibana-services';
 import { CheckLogger } from '../types/check_logger';
 import { compose } from 'redux';
+import { getThemeAssetURL, getAssetURL } from '../../../utils/assets';
 
 const checks = {
   api: {    
@@ -169,7 +170,7 @@ function HealthCheckComponent() {
   }
 
 
-  const logoUrl = getHttp().basePath.prepend(`/plugins/wazuh/assets/${appConfig.data['customization.logo.healthcheck']}`);
+  const logoUrl = getHttp().basePath.prepend(appConfig.data['customization.logo.healthcheck'] ? getAssetURL(appConfig.data['customization.logo.healthcheck']) : getThemeAssetURL('logo.svg'));
   const thereAreErrors = Object.keys(checkErrors).length > 0;
 
   const renderChecks = () => {

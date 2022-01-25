@@ -223,10 +223,10 @@ export const WAZUH_DEFAULT_APP_CONFIG = {
   hideManagerAlerts: false,
   'logs.level': 'info',
   'enrollment.dns': '',
-  'customization.logo.app':'logotype.svg',
-  'customization.logo.sidebar':'icon_blue.png',
-  'customization.logo.healthcheck':'icon_blue.svg',
-  'customization.logo.reports':'logo.png'
+  'customization.logo.app': '',
+  'customization.logo.sidebar': '',
+  'customization.logo.healthcheck':'',
+  'customization.logo.reports': ''
 };
 
 // Wazuh errors
@@ -346,4 +346,10 @@ export const UI_TOAST_COLOR = {
   WARNING: 'warning',
   DANGER: 'danger',
 };
+
+export const ASSETS_BASE_URL_PREFIX = '/plugins/wazuh/assets/';
+
+export const REPORTS_PRIMARY_COLOR = '#256BD1';
+
+export const REPORTS_LOGO_IMAGE_ASSETS_RELATIVE_PATH = 'images/logo_reports.png';
 
