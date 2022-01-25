@@ -23,7 +23,7 @@ import './components';
 // angular-charts.js
 import 'angular-chart.js';
 
-// Font Awesome, Kibana UI framework and others
+// Font Awesome, plugin platform framework and others
 import './utils/fontawesome/scss/font-awesome.scss';
 
 // Dev tools
@@ -104,7 +104,7 @@ app.run(['$rootElement', function ($rootElement) {
       <react-component name="ToastNotificationsModal" props=""></react-component>
     </div>`);
 
-  // Add plugin help links as extension to Kibana help menu
+  // Add plugin help links as extension to plugin platform help menu
   addHelpMenuToAppChrome();
 
   

@@ -253,7 +253,7 @@ class KibanaVis extends Component {
           vizPattern = JSON.parse(rawVis[0].attributes.kibanaSavedObjectMeta.searchSourceJSON)
             .index;
         } catch (ex) {
-          console.warn(`kibana-vis exception: ${ex.message || ex}`);
+          console.warn(`plugin platform-vis exception: ${ex.message || ex}`);
         }
 
         if (!filters.find((filter) => filter.meta.controlledBy === AUTHORIZED_AGENTS)) {

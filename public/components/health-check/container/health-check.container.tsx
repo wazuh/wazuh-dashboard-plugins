@@ -27,7 +27,7 @@ import { AppState, ErrorHandler } from '../../../react-services';
 import { useAppConfig, useRootScope } from '../../../components/common/hooks';
 import {
   checkApiService,
-  checkKibanaSettings,
+  checkPluginPlatformSettings,
   checkIndexPatternService,
   checkPatternSupportService,
   checkSetupService,
@@ -37,20 +37,21 @@ import { withErrorBoundary, withReduxProvider } from '../../common/hocs';
 import { getHttp } from '../../../kibana-services';
 import {
   HEALTH_CHECK_REDIRECTION_TIME,
-  KIBANA_SETTING_NAME_MAX_BUCKETS,
-  KIBANA_SETTING_NAME_METAFIELDS,
-  KIBANA_SETTING_NAME_TIME_FILTER,
+  PLUGIN_PLATFORM_SETTING_NAME_MAX_BUCKETS,
+  PLUGIN_PLATFORM_SETTING_NAME_METAFIELDS,
+  PLUGIN_PLATFORM_SETTING_NAME_TIME_FILTER,
   WAZUH_INDEX_TYPE_MONITORING,
   WAZUH_INDEX_TYPE_STATISTICS,
-  WAZUH_KIBANA_SETTING_MAX_BUCKETS,
-  WAZUH_KIBANA_SETTING_METAFIELDS,
-  WAZUH_KIBANA_SETTING_TIME_FILTER,
+  WAZUH_PLUGIN_PLATFORM_SETTING_MAX_BUCKETS,
+  WAZUH_PLUGIN_PLATFORM_SETTING_METAFIELDS,
+  WAZUH_PLUGIN_PLATFORM_SETTING_TIME_FILTER,
 } from '../../../../common/constants';
 
 import { getDataPlugin } from '../../../kibana-services';
 import { CheckLogger } from '../types/check_logger';
 import { compose } from 'redux';
 import './health-check.scss';
+import { getThemeAssetURL, getAssetURL } from '../../../utils/assets';
 
 const checks = {
   api: {
@@ -91,24 +92,24 @@ const checks = {
     canRetry: true,
   },
   maxBuckets: {
-    title: `Check ${KIBANA_SETTING_NAME_MAX_BUCKETS} setting`,
-    label: `${KIBANA_SETTING_NAME_MAX_BUCKETS} setting`,
-    validator: checkKibanaSettings(KIBANA_SETTING_NAME_MAX_BUCKETS, WAZUH_KIBANA_SETTING_MAX_BUCKETS),
+    title: `Check ${PLUGIN_PLATFORM_SETTING_NAME_MAX_BUCKETS} setting`,
+    label: `${PLUGIN_PLATFORM_SETTING_NAME_MAX_BUCKETS} setting`,
+    validator: checkPluginPlatformSettings(PLUGIN_PLATFORM_SETTING_NAME_MAX_BUCKETS, WAZUH_PLUGIN_PLATFORM_SETTING_MAX_BUCKETS),
     awaitFor: [],
     canRetry: true,
   },
   metaFields: {
-    title: `Check ${KIBANA_SETTING_NAME_METAFIELDS} setting`,
-    label: `${KIBANA_SETTING_NAME_METAFIELDS} setting`,
-    validator: checkKibanaSettings(KIBANA_SETTING_NAME_METAFIELDS, WAZUH_KIBANA_SETTING_METAFIELDS),
+    title: `Check ${PLUGIN_PLATFORM_SETTING_NAME_METAFIELDS} setting`,
+    label: `${PLUGIN_PLATFORM_SETTING_NAME_METAFIELDS} setting`,
+    validator: checkPluginPlatformSettings(PLUGIN_PLATFORM_SETTING_NAME_METAFIELDS, WAZUH_PLUGIN_PLATFORM_SETTING_METAFIELDS),
     awaitFor: [],
     canRetry: true,
   },
   timeFilter: {
-    title: `Check ${KIBANA_SETTING_NAME_TIME_FILTER} setting`,
-    label: `${KIBANA_SETTING_NAME_TIME_FILTER} setting`,
-    validator: checkKibanaSettings(KIBANA_SETTING_NAME_TIME_FILTER, JSON.stringify(WAZUH_KIBANA_SETTING_TIME_FILTER), (checkLogger: CheckLogger, options: { defaultAppValue: any }) => {
-      getDataPlugin().query.timefilter.timefilter.setTime(WAZUH_KIBANA_SETTING_TIME_FILTER)
+    title: `Check ${PLUGIN_PLATFORM_SETTING_NAME_TIME_FILTER} setting`,
+    label: `${PLUGIN_PLATFORM_SETTING_NAME_TIME_FILTER} setting`,
+    validator: checkPluginPlatformSettings(PLUGIN_PLATFORM_SETTING_NAME_TIME_FILTER, JSON.stringify(WAZUH_PLUGIN_PLATFORM_SETTING_TIME_FILTER), (checkLogger: CheckLogger, options: {defaultAppValue: any}) => {
+      getDataPlugin().query.timefilter.timefilter.setTime(WAZUH_PLUGIN_PLATFORM_SETTING_TIME_FILTER)
         && checkLogger.action(`Timefilter set to ${JSON.stringify(options.defaultAppValue)}`);
     }),
     awaitFor: [],
@@ -170,7 +171,7 @@ function HealthCheckComponent() {
   }
 
 
-  const logoUrl = getHttp().basePath.prepend(`/plugins/wazuh/assets/${appConfig.data['customization.logo.healthcheck']}`);
+  const logoUrl = getHttp().basePath.prepend(appConfig.data['customization.logo.healthcheck'] ? getAssetURL(appConfig.data['customization.logo.healthcheck']) : getThemeAssetURL('logo.svg'));
   const thereAreErrors = Object.keys(checkErrors).length > 0;
 
   const renderChecks = () => {

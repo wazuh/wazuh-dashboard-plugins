@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Kibana theming configuration file
+ * Wazuh app - plugin platform theming configuration file
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify

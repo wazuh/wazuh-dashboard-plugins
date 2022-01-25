@@ -10,6 +10,8 @@
  * Find more information about this on the LICENSE file.
  */
 
+import { ASSETS_BASE_URL_PREFIX } from "../../common/constants";
+
 export const initialWazuhConfig: string = `---
 #
 # Wazuh app - App configuration file
@@ -167,18 +169,17 @@ export const initialWazuhConfig: string = `---
 #
 # ------------------------------ wazuh-logo-customization -------------------------------
 #
-#Define the name of the app logo saved in the path /plugins/wazuh/assets/
-#customization.logo.app: logotype.svg
+#Define the name of the app logo saved in the path ${ASSETS_BASE_URL_PREFIX}
+#customization.logo.app: ''
 #
-#Define the name of the sideba logo saved in the path /plugins/wazuh/assets/
-#customization.logo.sidebar: icon_blue.png
+#Define the name of the sidebar logo saved in the path ${ASSETS_BASE_URL_PREFIX}
+#customization.logo.sidebar: ''
 #
-#Define the name of the health-check logo saved in the path /plugins/wazuh/assets/
-#customization.logo.healthcheck: icon_blue.svg
+#Define the name of the health-check logo saved in the path ${ASSETS_BASE_URL_PREFIX}
+#customization.logo.healthcheck: ''
 #
-#
-#Define the name of the reports logo (.png) saved in the path /plugins/wazuh/assets/
-#customization.logo.reports: logo.png
+#Define the name of the reports logo (.png) saved in the path ${ASSETS_BASE_URL_PREFIX}
+#customization.logo.reports: ''
 #
 # ---------------------------- Hide manager alerts ------------------------------
 # Hide the alerts of the manager in all dashboards and discover

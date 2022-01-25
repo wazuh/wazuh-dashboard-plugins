@@ -45,7 +45,7 @@ import {
 } from './kibana-integrations/plugins/kibana_legacy/public';
 /**
  * returns the main inner angular module, it contains all the parts of Angular Discover
- * needs to render, so in the end the current 'kibana' angular module is no longer necessary
+ * needs to render, so in the end the current plugin platform angular module is no longer necessary
  */
 export function getInnerAngularModule(
   name: string,

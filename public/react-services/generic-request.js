@@ -17,6 +17,7 @@ import { ApiCheck } from './wz-api-check';
 import { WzMisc } from '../factories/misc';
 import { OdfeUtils } from '../utils';
 import { getHttp, getDataPlugin } from '../kibana-services';
+import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../common/constants';
 
 export class GenericRequest {
   static async request(method, path, payload = null, returnError = false) {
@@ -27,8 +28,8 @@ export class GenericRequest {
       const wazuhConfig = new WazuhConfig();
       const { timeout } = wazuhConfig.getConfig();
       const requestHeaders = {
-        'Content-Type': 'application/json',
-        'kbn-xsrf': 'kibana'
+        ...PLUGIN_PLATFORM_REQUEST_HEADERS,
+        'content-type': 'application/json'
       };
       const tmpUrl = getHttp().basePath.prepend(path);
 

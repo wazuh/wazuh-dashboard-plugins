@@ -179,6 +179,19 @@ class WzGroupsActionButtons extends Component {
         this.closePopover();
       }
     } catch (error) {
+      const options = {
+        context: `${WzGroupsActionButtons.name}.createGroup`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        store: false,
+        display: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `Error creating a new group`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
       this.props.updateLoadingStatus(false);
       throw new Error(error);
     }

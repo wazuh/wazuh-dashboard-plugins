@@ -34,8 +34,9 @@ import { withErrorBoundary } from '../../common/hocs';
 import {
   UI_ERROR_SEVERITIES,
 } from '../../../react-services/error-orchestrator/types';
-import { UI_LOGGER_LEVELS } from '../../../../common/constants';
+import { UI_LOGGER_LEVELS, PLUGIN_PLATFORM_NAME } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
+import { getPluginDataPath } from '../../../../common/plugin';
 
 export const ApiIsDown = withErrorBoundary (class ApiIsDown extends Component {
   constructor(props) {
@@ -138,7 +139,7 @@ hosts:
     const checkConnectionChildren = (
       <div>
         <EuiText>
-          Check that the Kibana server can reach the configured Wazuh API(s).
+          Check that the {PLUGIN_PLATFORM_NAME} server can reach the configured Wazuh API(s).
         </EuiText>
         <EuiSpacer />
         <EuiButton
@@ -246,7 +247,7 @@ hosts:
             <EuiText>
               Review the settings in the{' '}
               <EuiCode>
-                /usr/share/kibana/data/wazuh/config/wazuh.yml
+                {getPluginDataPath('config/wazuh.yml')}
               </EuiCode>{' '}
               file.
             </EuiText>

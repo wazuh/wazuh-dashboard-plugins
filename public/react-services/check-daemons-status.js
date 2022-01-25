@@ -12,8 +12,8 @@
 import store from '../redux/store';
 import { updateWazuhNotReadyYet } from '../redux/actions/appStateActions';
 import { WzRequest } from './wz-request';
+import { delayAsPromise } from '../../common/utils';
 
-const delay = time => new Promise(res => setTimeout(res,time));
 let busy = false;
 
 export class CheckDaemonsStatus {
@@ -25,7 +25,7 @@ export class CheckDaemonsStatus {
 
       let isValid = false;
       while (tries--) {
-        await delay(1200);
+        await delayAsPromise(1200);
         const result = await WzRequest.apiReq('GET', '/ping', {});
         isValid = ((result || {}).data || {}).isValid;
         if (isValid) {
