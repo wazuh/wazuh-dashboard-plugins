@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 export * from './withWindowSize';
-export * from './withKibanaContext';
+export * from './withPluginPlatformContext';
 export * from './withUserPermissions';
 export * from './withUserRoles';
 export * from './withUserAuthorization';

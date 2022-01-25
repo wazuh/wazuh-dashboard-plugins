@@ -46,7 +46,7 @@ export const WAZUH_STATISTICS_DEFAULT_CRON_FREQ = '0 */5 * * * *';
 // Job - Wazuh initialize
 export const WAZUH_INDEX = '.wazuh';
 export const WAZUH_VERSION_INDEX = '.wazuh-version';
-export const WAZUH_KIBANA_TEMPLATE_NAME = 'wazuh-kibana';
+export const WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME = 'wazuh-kibana';
 
 // Permissions
 export const WAZUH_ROLE_ADMINISTRATOR_ID = 1;
@@ -318,21 +318,21 @@ export const HEALTH_CHECK = 'health-check';
 // Health check
 export const HEALTH_CHECK_REDIRECTION_TIME = 300; //ms
 
-// Kibana settings
+// Plugin platform settings
 // Default timeFilter set by the app
-export const WAZUH_KIBANA_SETTING_TIME_FILTER = {
+export const WAZUH_PLUGIN_PLATFORM_SETTING_TIME_FILTER = {
   from: 'now-24h',
   to: 'now',
 };
-export const KIBANA_SETTING_NAME_TIME_FILTER = 'timepicker:timeDefaults';
+export const PLUGIN_PLATFORM_SETTING_NAME_TIME_FILTER = 'timepicker:timeDefaults';
 
 // Default maxBuckets set by the app
-export const WAZUH_KIBANA_SETTING_MAX_BUCKETS = 200000;
-export const KIBANA_SETTING_NAME_MAX_BUCKETS = 'timelion:max_buckets';
+export const WAZUH_PLUGIN_PLATFORM_SETTING_MAX_BUCKETS = 200000;
+export const PLUGIN_PLATFORM_SETTING_NAME_MAX_BUCKETS = 'timelion:max_buckets';
 
-// Default metaFields Kibana setting set by the app
-export const WAZUH_KIBANA_SETTING_METAFIELDS = ['_source', '_index'];
-export const KIBANA_SETTING_NAME_METAFIELDS = 'metaFields';
+// Default metaFields set by the app
+export const WAZUH_PLUGIN_PLATFORM_SETTING_METAFIELDS = ['_source', '_index'];
+export const PLUGIN_PLATFORM_SETTING_NAME_METAFIELDS = 'metaFields';
 
 // Logger
 export const UI_LOGGER_LEVELS = {
@@ -345,5 +345,20 @@ export const UI_TOAST_COLOR = {
   SUCCESS: 'success',
   WARNING: 'warning',
   DANGER: 'danger',
+};
+
+// Plugin platform
+export const PLUGIN_PLATFORM_NAME = 'Kibana';
+export const PLUGIN_PLATFORM_BASE_INSTALLATION_PATH = '/usr/share/kibana/data/wazuh/';
+export const PLUGIN_PLATFORM_BASE_REDIRECTION_PATH = 'kibana';
+export const PLUGIN_PLATFORM_INSTALLATION_USER = 'kibana';
+export const PLUGIN_PLATFORM_INSTALLATION_USER_GROUP = 'kibana';
+export const PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_UPGRADE_PLATFORM = 'https://documentation.wazuh.com/current/upgrade-guide/elasticsearch-kibana-filebeat/index.html#upgrade-elasticsearch-filebeat-kibana';
+export const PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_TROUBLESHOOTING = 'https://documentation.wazuh.com/current/user-manual/kibana-app/troubleshooting.html';
+export const PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_APP_CONFIGURATION = 'https://documentation.wazuh.com/current/user-manual/kibana-app/reference/config-file.html';
+export const PLUGIN_PLATFORM_URL_GUIDE = 'https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html';
+export const PLUGIN_PLATFORM_URL_GUIDE_TITLE = 'Elastic guide';
+export const PLUGIN_PLATFORM_REQUEST_HEADERS = {
+  'kbn-xsrf': 'kibana'
 };
 

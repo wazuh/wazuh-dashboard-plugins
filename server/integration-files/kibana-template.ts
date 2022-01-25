@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-export const kibanaTemplate = {
+export const pluginPlatformTemplate = {
   order: 0,
   template: '.kibana*',
   settings: {

@@ -1,5 +1,5 @@
 /*
- * Wazuh app - React hook for get Kibana filter manager
+ * Wazuh app - React hook for get plugin platform filter manager
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify

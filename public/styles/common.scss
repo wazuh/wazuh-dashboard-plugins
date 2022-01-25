@@ -165,7 +165,7 @@
   background-color: rgba(0, 0, 0, 0.1);
 }
 
-/* Special fix to make Kibana search bar similar to the rest from the app */
+/* Special fix to make plugin platform search bar similar to the rest from the app */
 
 .kuiLocalSearchInput,
 .kuiLocalSearchInput:focus {
@@ -416,7 +416,7 @@ input[type="search"].euiFieldSearch{
   background: transparent !important;
 }
 
-/* Custom Kibana styles */
+/* Custom plugin plaform styles */
 
 md-content.md-default-theme, md-content{
   background: transparent!important;

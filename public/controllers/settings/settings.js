@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import { TabNames } from '../../utils/tab-names';
-import { kibana } from '../../../package.json';
+import { pluginPlatform } from '../../../package.json';
 import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { GenericRequest } from '../../react-services/generic-request';
@@ -22,7 +22,7 @@ import { formatUIDate } from '../../react-services/time-service';
 import store from '../../redux/store';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
 import { updateSelectedSettingsSection } from '../../redux/actions/appStateActions';
-import { UI_LOGGER_LEVELS } from '../../../common/constants';
+import { UI_LOGGER_LEVELS, PLUGIN_PLATFORM_NAME } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
 
@@ -35,7 +35,8 @@ export class SettingsController {
    * @param {*} errorHandler
    */
   constructor($scope, $window, $location, errorHandler) {
-    this.kibanaVersion = (kibana || {}).version || false;
+    this.pluginPlatformVersion = (pluginPlatform || {}).version || false;
+    this.pluginPlatformName = PLUGIN_PLATFORM_NAME;
     this.$scope = $scope;
     this.$window = $window;
     this.$location = $location;

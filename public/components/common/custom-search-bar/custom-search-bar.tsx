@@ -32,7 +32,7 @@ export const CustomSearchBar = ({ filtersValues, filterDrillDownValue = { field:
   const [selectReference, setSelectReference] = useState('');
 
   useEffect(() => {
-      setKibanaFilters(values, selectReference);
+      setPluginPlatformFilters(values, selectReference);
       refreshCustomSelectedFilter();
   }, [values]);
 
@@ -84,7 +84,7 @@ export const CustomSearchBar = ({ filtersValues, filterDrillDownValue = { field:
     return { meta, $state, query };
   };
 
-  const setKibanaFilters = (values: any[], selectReference: String) => {
+  const setPluginPlatformFilters = (values: any[], selectReference: String) => {
     const currentFilters = filterManager
       .getFilters()
       .filter((item) => item.meta.key != selectReference);

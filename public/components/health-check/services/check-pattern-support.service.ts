@@ -13,7 +13,7 @@
  */
 import { SavedObject } from '../../../react-services';
 import { CheckLogger } from '../types/check_logger';
-import { satisfyKibanaVersion } from '../../../../common/semver';
+import { satisfyPluginPlatformVersion } from '../../../../common/semver';
 
 export const checkPatternSupportService = (pattern: string, indexType : string) => async (checkLogger: CheckLogger) => {
   checkLogger.info(`Checking index pattern id [${pattern}] exists...`);
@@ -22,7 +22,7 @@ export const checkPatternSupportService = (pattern: string, indexType : string) 
   
   if (!result.data) {
     let fields;
-    if(satisfyKibanaVersion('<7.11')){
+    if(satisfyPluginPlatformVersion('<7.11')){
       checkLogger.info(`Getting indices fields for the index pattern id [${pattern}]...`);
       fields = await SavedObject.getIndicesFields(pattern, indexType);
       checkLogger.info(`Fields for index pattern id [${pattern}] found: ${fields.length}`);

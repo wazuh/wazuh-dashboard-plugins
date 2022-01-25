@@ -592,7 +592,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
   }
 
   switchMenuOpened = () => {
-    const kibanaMenuBlockedOrOpened = document.body.classList.contains('euiBody--collapsibleNavIsDocked') || document.body.classList.contains('euiBody--collapsibleNavIsOpen');
+    const pluginPlatformMenuBlockedOrOpened = document.body.classList.contains('euiBody--collapsibleNavIsDocked') || document.body.classList.contains('euiBody--collapsibleNavIsOpen');
     if (!this.state.menuOpened && this.state.currentMenuTab === 'manager') {
       this.managementPopoverToggle();
     } else if (this.state.currentMenuTab === 'overview') {
@@ -607,7 +607,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
       this.closeAllPopover()
     }
 
-    this.setState({ menuOpened: !this.state.menuOpened, kibanaMenuBlockedOrOpened, hover: this.state.currentMenuTab }, async () => {
+    this.setState({ menuOpened: !this.state.menuOpened, pluginPlatformMenuBlockedOrOpened, hover: this.state.currentMenuTab }, async () => {
       await this.loadApiList();
       await this.loadIndexPatternsList();
     });
@@ -994,7 +994,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
             <EuiFlexItem grow={false}>
               <EuiPopover
                 panelClassName={
-                  this.state.kibanaMenuBlockedOrOpened ?
+                  this.state.pluginPlatformMenuBlockedOrOpened ?
                     "wz-menu-popover wz-menu-popover-over" :
                     "wz-menu-popover wz-menu-popover-under"
                 }
