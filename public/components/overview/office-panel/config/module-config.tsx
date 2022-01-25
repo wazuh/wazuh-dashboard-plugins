@@ -22,7 +22,7 @@ import {
 } from './';
 
 /**
- * The length method has to count Kibana Visualizations for TabVisualizations class
+ * The length method has to count plugin platform Visualizations for TabVisualizations class
  */
 export const ModuleConfig = {
   main: {

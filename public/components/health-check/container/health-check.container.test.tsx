@@ -41,7 +41,7 @@ jest.mock('../services', () => ({
   checkApiService: (appInfo) => () => undefined,
   checkSetupService: (appInfo) => () => undefined,
   checkFieldsService: (appInfo) => () => undefined,
-  checkKibanaSettings: (appInfo) => () => undefined,
+  checkPluginPlatformSettings: (appInfo) => () => undefined,
   checkPatternSupportService: (appInfo) => () => undefined,
   checkIndexPatternService: (appInfo) => () => undefined,
 }));

@@ -24,6 +24,8 @@ import {
   EuiSearchBar,
 } from '@elastic/eui';
 import { EuiFormErrorText } from '@elastic/eui';
+import { PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_APP_CONFIGURATION } from '../../../../../common/constants';
+import { getPluginDataPath } from '../../../../../common/plugin';
 
 export const Header = ({query, setQuery}) => {
   return (
@@ -58,7 +60,7 @@ const Title = () => {
               iconSize="l"
               aria-label="Help"
               target="_blank"
-              href="https://documentation.wazuh.com/current/user-manual/kibana-app/reference/config-file.html"
+              href={PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_APP_CONFIGURATION}
             ></EuiButtonIcon>
           </EuiToolTip>
         </h2>
@@ -71,9 +73,8 @@ const SubTitle = () => {
   return (
     <EuiFlexItem >
       <EuiText color="subdued" style={{ paddingBottom: '15px' }}>
-        Configuration file located at
-        /usr/share/kibana/data/wazuh/config/wazuh.yml
-          </EuiText>
+        Configuration file located at {getPluginDataPath('config/wazuh.yml')}
+      </EuiText>
     </EuiFlexItem>
   )
 }

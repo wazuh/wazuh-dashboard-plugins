@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Add the plugin help links as extension in Kibana help menu
+ * Wazuh app - Add the plugin help links as extension in plugin platform help menu
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify

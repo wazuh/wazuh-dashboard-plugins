@@ -76,7 +76,7 @@ export const Discover = compose(
       _history: { history: { items: { from: string; to: string }[] } };
     };
 
-    KibanaServices: { [key: string]: any };
+    PluginPlatformServices: { [key: string]: any };
     state: {
       sort: object;
       selectedTechnique: string;
@@ -113,8 +113,8 @@ export const Discover = compose(
     };
     constructor(props) {
       super(props);
-      this.KibanaServices = getDataPlugin();
-      this.timefilter = this.KibanaServices.query.timefilter.timefilter;
+      this.PluginPlatformServices = getDataPlugin();
+      this.timefilter = this.PluginPlatformServices.query.timefilter.timefilter;
       this.timeSubscription = null;
       this.state = {
         sort: {},
@@ -265,7 +265,7 @@ export const Discover = compose(
 
     async getIndexPattern() {
       this.indexPattern = {
-        ...(await this.KibanaServices.indexPatterns.get(AppState.getCurrentPattern())),
+        ...(await this.PluginPlatformServices.indexPatterns.get(AppState.getCurrentPattern())),
       };
       const fields: IFieldType[] = [];
       Object.keys(this.indexPattern.fields).forEach((item) => {
@@ -368,7 +368,7 @@ export const Discover = compose(
         ? this.props.shareFilterManager.getFilters()
         : [];
       const previousFilters =
-        (this.KibanaServices && this.KibanaServices.query.filterManager.getFilters()) || [];
+        (this.PluginPlatformServices && this.PluginPlatformServices.query.filterManager.getFilters()) || [];
       const elasticQuery = buildEsQuery(
         undefined,
         query,
