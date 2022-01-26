@@ -354,7 +354,7 @@ export const REPORTS_PRIMARY_COLOR = '#256BD1';
 // Plugin platform
 export const PLUGIN_PLATFORM_NAME = 'OpenSearch Dashboards';
 export const PLUGIN_PLATFORM_BASE_INSTALLATION_PATH = '/usr/share/opensearch_dashboards/data/wazuh/';
-export const PLUGIN_PLATFORM_BASE_REDIRECTION_PATH = 'kibana';
+export const PLUGIN_PLATFORM_BASE_REDIRECTION_PATH = 'home';
 export const PLUGIN_PLATFORM_INSTALLATION_USER = 'kibana';
 export const PLUGIN_PLATFORM_INSTALLATION_USER_GROUP = 'kibana';
 export const PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_UPGRADE_PLATFORM = 'https://documentation.wazuh.com/current/upgrade-guide/elasticsearch-kibana-filebeat/index.html#upgrade-elasticsearch-filebeat-kibana';
