@@ -646,7 +646,9 @@ export class WazuhElasticCtrl {
         'wazuh-elastic:haveSampleAlertsOfCategory',
         `Error checking if there are sample alerts indices: ${error.message || error}`
       );
-      return ErrorResponse(`Error checking if there are sample alerts indices: ${error.message || error}`, 1000, 500, response);
+
+      const [statusCode, errorMessage] = this.getErrorDetails(error);
+      return ErrorResponse(`Error checking if there are sample alerts indices: ${errorMessage || error}`, 1000, statusCode, response);
     }
   }
   /**
@@ -705,7 +707,7 @@ export class WazuhElasticCtrl {
       // Index alerts
 
       // Check if wazuh sample alerts index exists
-      const existsSampleIndex = await context.core.opensearch.client.asInternalUser.indices.exists({
+      const existsSampleIndex = await context.core.elasticsearch.client.asCurrentUser.indices.exists({
         index: sampleAlertsIndex
       });
       if (!existsSampleIndex.body) {
@@ -720,7 +722,7 @@ export class WazuhElasticCtrl {
           }
         };
 
-        await context.core.opensearch.client.asInternalUser.indices.create({
+        await context.core.elasticsearch.client.asCurrentUser.indices.create({
           index: sampleAlertsIndex,
           body: configuration
         });
@@ -731,7 +733,7 @@ export class WazuhElasticCtrl {
         );
       }
 
-      await context.core.opensearch.client.asInternalUser.bulk({
+      await context.core.elasticsearch.client.asCurrentUser.bulk({
         index: sampleAlertsIndex,
         body: bulk
       });
@@ -748,7 +750,10 @@ export class WazuhElasticCtrl {
         'wazuh-elastic:createSampleAlerts',
         `Error adding sample alerts to ${sampleAlertsIndex} index: ${error.message || error}`
       );
-      return ErrorResponse(error.message || error, 1000, 500, response);
+      
+      const [statusCode, errorMessage] = this.getErrorDetails(error);
+      
+      return ErrorResponse(errorMessage || error, 1000, statusCode, response);
     }
   }
   /**
@@ -809,7 +814,9 @@ export class WazuhElasticCtrl {
         'wazuh-elastic:deleteSampleAlerts',
         `Error deleting sample alerts of ${sampleAlertsIndex} index: ${error.message || error}`
       );
-      return ErrorResponse(error.message || error, 1000, 500, response);
+      const [statusCode, errorMessage] = this.getErrorDetails(error);
+
+      return ErrorResponse(errorMessage || error, 1000, statusCode, response);
     }
   }
 
@@ -853,4 +860,15 @@ export class WazuhElasticCtrl {
       return Promise.reject(error);
     }
   };
+
+  getErrorDetails(error){
+    const statusCode = error?.meta?.statusCode || 500;
+    let errorMessage = error.message;
+
+    if(statusCode === 403){
+      errorMessage = error?.meta?.body?.error?.reason || 'Permission denied';
+    }
+
+    return [statusCode, errorMessage];
+  }
 }

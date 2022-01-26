@@ -18,6 +18,7 @@ import { WazuhConfig } from './wazuh-config';
 import { OdfeUtils } from '../utils';
 import IApiResponse from './interfaces/api-response.interface';
 import { getHttp } from '../kibana-services';
+import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../common/constants';
 export class WzRequest {
   static wazuhConfig: any;
 
@@ -45,7 +46,7 @@ export class WzRequest {
       const url = getHttp().basePath.prepend(path);
       const options = {
         method: method,
-        headers: { 'Content-Type': 'application/json', 'osd-xsrf': 'kibana' },
+        headers: { ...PLUGIN_PLATFORM_REQUEST_HEADERS, 'content-type': 'application/json' },
         url: url,
         data: payload,
         timeout: customTimeout || timeout,

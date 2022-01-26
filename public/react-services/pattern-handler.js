@@ -14,7 +14,7 @@ import { SavedObject } from './saved-objects';
 import { getDataPlugin, getToasts, getHttp } from '../kibana-services';
 import { WazuhConfig } from '../react-services/wazuh-config';
 import { HEALTH_CHECK } from '../../common/constants';
-import { satisfyKibanaVersion } from '../../common/semver';
+import { satisfyPluginPlatformVersion } from '../../common/semver';
 
 export class PatternHandler {
   /**
@@ -44,7 +44,7 @@ export class PatternHandler {
   static async changePattern(selectedPattern) {
     try {
       AppState.setCurrentPattern(selectedPattern);
-      if(satisfyKibanaVersion('<7.11')){
+      if(satisfyPluginPlatformVersion('<7.11')){
         await this.refreshIndexPattern();
       };
       return AppState.getCurrentPattern();

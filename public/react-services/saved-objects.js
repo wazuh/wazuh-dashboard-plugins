@@ -20,7 +20,7 @@ import {
   WAZUH_INDEX_TYPE_MONITORING,
   WAZUH_INDEX_TYPE_STATISTICS,
 } from '../../common/constants';
-import { satisfyKibanaVersion } from '../../common/semver';
+import { satisfyPluginPlatformVersion } from '../../common/semver';
 
 export class SavedObject {
   /**
@@ -35,9 +35,9 @@ export class SavedObject {
       let indexPatterns = ((savedObjects || {}).data || {}).saved_objects || [];
 
     let indexPatternsFields;
-    if(satisfyKibanaVersion('<7.11')){
+    if(satisfyPluginPlatformVersion('<7.11')){
       indexPatternsFields = indexPatterns.map(indexPattern => indexPattern?.attributes?.fields ? JSON.parse(indexPattern.attributes.fields) : []);
-    }else if(satisfyKibanaVersion('>=7.11')){
+    }else if(satisfyPluginPlatformVersion('>=7.11')){
       indexPatternsFields = await Promise.all(indexPatterns.map(async indexPattern => {
         try{
           const {data: {fields}} = await GenericRequest.request(
@@ -94,7 +94,7 @@ export class SavedObject {
     const result = await SavedObject.existsIndexPattern(patternID);
     if (!result.data) {
       let fields = '';
-      if (satisfyKibanaVersion('<7.11')) {
+      if (satisfyPluginPlatformVersion('<7.11')) {
         fields = await SavedObject.getIndicesFields(patternID, WAZUH_INDEX_TYPE_ALERTS);
       }
       await this.createSavedObject(
@@ -154,9 +154,9 @@ export class SavedObject {
         true
       );
       let indexPatternFields;
-      if(satisfyKibanaVersion('<7.11')){
+      if(satisfyPluginPlatformVersion('<7.11')){
         indexPatternFields = indexPatternData?.data?.attributes?.fields ? JSON.parse(indexPatternData.data.attributes.fields) : [];
-      }else if(satisfyKibanaVersion('>=7.11')){
+      }else if(satisfyPluginPlatformVersion('>=7.11')){
         try{
           const {data: {fields}} = await GenericRequest.request(
             'GET',
@@ -187,7 +187,7 @@ export class SavedObject {
         params
       );
 
-      if (satisfyKibanaVersion('<7.11') && type === 'index-pattern') {
+      if (satisfyPluginPlatformVersion('<7.11') && type === 'index-pattern') {
         await this.refreshFieldsOfIndexPattern(id, params.attributes.title, fields);
       }
 
@@ -201,7 +201,7 @@ export class SavedObject {
 
   static async refreshFieldsOfIndexPattern(id, title, fields) {
     try {
-      // same logic as Kibana when a new index is created, you need to refresh it to see its fields
+      // same logic as plugin platform when a new index is created, you need to refresh it to see its fields
       // we force the refresh of the index by requesting its fields and the assign these fields
       await GenericRequest.request(
         'PUT',
@@ -267,7 +267,7 @@ export class SavedObject {
    */
   static async createWazuhIndexPattern(pattern) {
     try {
-      const fields = satisfyKibanaVersion('<7.11')
+      const fields = satisfyPluginPlatformVersion('<7.11')
         ? await SavedObject.getIndicesFields(pattern, WAZUH_INDEX_TYPE_ALERTS)
         : '';
       await this.createSavedObject(
@@ -282,6 +282,7 @@ export class SavedObject {
               "data.vulnerability.reference":{"id":"url"},
               "data.url":{"id":"url"}
             }`,
+            fields: '[]',
             sourceFilters: '[{"value":"@timestamp"}]',
           },
         },

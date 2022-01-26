@@ -5,6 +5,7 @@ import { getConfiguration } from '../../lib/get-configuration';
 import cron from 'node-cron';
 import { WAZUH_STATISTICS_DEFAULT_PREFIX, WAZUH_STATISTICS_DEFAULT_NAME, WAZUH_STATISTICS_TEMPLATE_NAME } from '../../../common/constants';
 import { statisticsTemplate } from '../../integration-files/statistics-template';
+import { delayAsPromise } from '../../../common/utils';
 
 const blueWazuh = '\u001b[34mwazuh\u001b[39m';
 const schedulerErrorLogColors = [blueWazuh, 'scheduler', 'error'];
@@ -13,10 +14,10 @@ const schedulerJobs = [];
 /**
 * Wait until Kibana server is ready
 */
-const checkKibanaStatus = async function (context) {
+const checkPluginPlatformStatus = async function (context) {
   try {
      log(
-       'scheduler-handler:checkKibanaStatus',
+       'scheduler-handler:checkPluginPlatformStatus',
        'Waiting for Kibana and Elasticsearch servers to be ready...',
        'debug'
      );
@@ -26,12 +27,12 @@ const checkKibanaStatus = async function (context) {
     return;
   } catch (error) {
      log(
-       'scheduler-handler:checkKibanaStatus',
+       'scheduler-handler:checkPluginPlatformStatus',
        error.mesage ||error
      );
      try{
-       await delay(3000);
-       await checkKibanaStatus(context);
+       await delayAsPromise(3000);
+       await checkPluginPlatformStatus(context);
      }catch(error){};
   }
  }
@@ -110,7 +111,7 @@ const checkTemplate = async function (context) {
 
 export async function jobSchedulerRun(context){
   // Check Kibana index and if it is prepared, start the initialization of Wazuh App.
-  await checkKibanaStatus(context);
+  await checkPluginPlatformStatus(context);
   for (const job in configuredJobs({})) {
     const schedulerJob: SchedulerJob = new SchedulerJob(job, context);
     schedulerJobs.push(schedulerJob);

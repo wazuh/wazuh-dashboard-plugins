@@ -73,7 +73,7 @@ class WzMenuTools extends Component {
       {
         name: 'Tools',
         id: 0,
-        icon: <EuiIcon type="devToolsApp" color="primary" />,
+        icon: <EuiIcon type="devToolsApp" color="primary"/>,
         items: renderSettings
       }
     ];

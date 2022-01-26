@@ -11,20 +11,20 @@
  */
 import { log } from '../../lib/logger';
 import packageJSON from '../../../package.json';
-import { kibanaTemplate } from '../../integration-files/kibana-template';
+import { pluginPlatformTemplate } from '../../integration-files/kibana-template';
 import { getConfiguration } from '../../lib/get-configuration';
 import { totalmem } from 'os';
 import fs from 'fs';
 import { ManageHosts } from '../../lib/manage-hosts';
-import { WAZUH_ALERTS_PATTERN, WAZUH_DATA_CONFIG_REGISTRY_PATH, WAZUH_INDEX, WAZUH_VERSION_INDEX, WAZUH_KIBANA_TEMPLATE_NAME, WAZUH_DATA_KIBANA_BASE_ABSOLUTE_PATH } from '../../../common/constants';
+import { WAZUH_ALERTS_PATTERN, WAZUH_DATA_CONFIG_REGISTRY_PATH, WAZUH_INDEX, WAZUH_VERSION_INDEX, WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME, WAZUH_DATA_KIBANA_BASE_ABSOLUTE_PATH, PLUGIN_PLATFORM_NAME, PLUGIN_PLATFORM_INSTALLATION_USER_GROUP, PLUGIN_PLATFORM_INSTALLATION_USER } from '../../../common/constants';
 import { createDataDirectoryIfNotExists } from '../../lib/filesystem';
 import { tryCatchForIndexPermissionError } from '../tryCatchForIndexPermissionError';
 
 const manageHosts = new ManageHosts();
 
 export function jobInitializeRun(context) {
-  const KIBANA_INDEX = context.server.config.opensearchDashboards.index;
-  log('initialize', `Kibana index: ${KIBANA_INDEX}`, 'info');
+  const PLUGIN_PLATFORM_INDEX = context.server.config.opensearchDashboards.index;
+  log('initialize', `${PLUGIN_PLATFORM_NAME} index: ${PLUGIN_PLATFORM_INDEX}`, 'info');
   log('initialize', `App revision: ${packageJSON.revision}`, 'info');
 
   let configurationFile = {};
@@ -198,7 +198,7 @@ export function jobInitializeRun(context) {
       }
 
       if(!fs.existsSync(WAZUH_DATA_KIBANA_BASE_ABSOLUTE_PATH)){
-        throw new Error(`The data directory is missing in the Kibana root instalation. Create the directory in ${WAZUH_DATA_KIBANA_BASE_ABSOLUTE_PATH} and give it the required permissions (sudo mkdir ${WAZUH_DATA_KIBANA_BASE_ABSOLUTE_PATH};sudo chown -R kibana:kibana ${WAZUH_DATA_KIBANA_BASE_ABSOLUTE_PATH}). After restart the Kibana service.`);
+        throw new Error(`The data directory is missing in the ${PLUGIN_PLATFORM_NAME} root instalation. Create the directory in ${WAZUH_DATA_KIBANA_BASE_ABSOLUTE_PATH} and give it the required permissions (sudo mkdir ${WAZUH_DATA_KIBANA_BASE_ABSOLUTE_PATH};sudo chown -R ${PLUGIN_PLATFORM_INSTALLATION_USER}:${PLUGIN_PLATFORM_INSTALLATION_USER_GROUP} ${WAZUH_DATA_KIBANA_BASE_ABSOLUTE_PATH}). After restart the ${PLUGIN_PLATFORM_NAME} service.`);
       };
 
       if (!fs.existsSync(WAZUH_DATA_CONFIG_REGISTRY_PATH)) {
@@ -244,12 +244,12 @@ export function jobInitializeRun(context) {
   const createKibanaTemplate = () => {
     log(
       'initialize:createKibanaTemplate',
-      `Creating template for ${KIBANA_INDEX}`,
+      `Creating template for ${PLUGIN_PLATFORM_INDEX}`,
       'debug'
     );
 
     try {
-      kibanaTemplate.template = KIBANA_INDEX + '*';
+      pluginPlatformTemplate.template = PLUGIN_PLATFORM_INDEX + '*';
     } catch (error) {
       log('initialize:createKibanaTemplate', error.message || error);
       context.wazuh.logger.error(
@@ -258,10 +258,10 @@ export function jobInitializeRun(context) {
     }
 
     return context.core.opensearch.client.asInternalUser.indices.putTemplate({
-      name: WAZUH_KIBANA_TEMPLATE_NAME,
+      name: WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME,
       order: 0,
       create: true,
-      body: kibanaTemplate
+      body: pluginPlatformTemplate
     });
   };
 
@@ -269,15 +269,15 @@ export function jobInitializeRun(context) {
     try {
       log(
         'initialize:createEmptyKibanaIndex',
-        `Creating ${KIBANA_INDEX} index.`,
+        `Creating ${PLUGIN_PLATFORM_INDEX} index.`,
         'info'
       );
       await context.core.opensearch.client.asInternalUser.indices.create({
-        index: KIBANA_INDEX
+        index: PLUGIN_PLATFORM_INDEX
       });
       log(
         'initialize:createEmptyKibanaIndex',
-        `Successfully created ${KIBANA_INDEX} index.`,
+        `Successfully created ${PLUGIN_PLATFORM_INDEX} index.`,
         'debug'
       );
       await init();
@@ -286,7 +286,7 @@ export function jobInitializeRun(context) {
       return Promise.reject(
         new Error(
           `Error creating ${
-          KIBANA_INDEX
+          PLUGIN_PLATFORM_INDEX
           } index due to ${error.message || error}`
         )
       );
@@ -297,8 +297,8 @@ export function jobInitializeRun(context) {
     try {
       await createKibanaTemplate();
       log(
-        'initialize:checkKibanaStatus',
-        `Successfully created ${KIBANA_INDEX} template.`,
+        'initialize:fixKibanaTemplate',
+        `Successfully created ${PLUGIN_PLATFORM_INDEX} template.`,
         'debug'
       );
       await createEmptyKibanaIndex();
@@ -307,7 +307,7 @@ export function jobInitializeRun(context) {
       return Promise.reject(
         new Error(
           `Error creating template for ${
-          KIBANA_INDEX
+          PLUGIN_PLATFORM_INDEX
           } due to ${error.message || error}`
         )
       );
@@ -317,17 +317,17 @@ export function jobInitializeRun(context) {
   const getTemplateByName = async () => {
     try {
       await context.core.opensearch.client.asInternalUser.indices.getTemplate({
-        name: WAZUH_KIBANA_TEMPLATE_NAME
+        name: WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME
       });
       log(
-        'initialize:checkKibanaStatus',
-        `No need to create the ${KIBANA_INDEX} template, already exists.`,
+        'initialize:getTemplateByName',
+        `No need to create the ${PLUGIN_PLATFORM_INDEX} template, already exists.`,
         'debug'
       );
       await createEmptyKibanaIndex();
       return;
     } catch (error) {
-      log('initialize:checkKibanaStatus', error.message || error);
+      log('initialize:getTemplateByName', error.message || error);
       return fixKibanaTemplate();
     }
   };
@@ -336,7 +336,7 @@ export function jobInitializeRun(context) {
   const checkKibanaStatus = async () => {
     try {
       const response = await context.core.opensearch.client.asInternalUser.indices.exists({
-        index: KIBANA_INDEX
+        index: PLUGIN_PLATFORM_INDEX
       });
       if (response.body) {
         // It exists, initialize!
@@ -345,7 +345,7 @@ export function jobInitializeRun(context) {
         // No Kibana index created...
         log(
           'initialize:checkKibanaStatus',
-          `Not found ${KIBANA_INDEX} index`,
+          `Not found ${PLUGIN_PLATFORM_INDEX} index`,
           'info'
         );
         await getTemplateByName();
@@ -359,13 +359,13 @@ export function jobInitializeRun(context) {
   // Wait until Elasticsearch js is ready
   const checkStatus = async () => {
     try {
-      // TODO: wait until elasticsearch is ready?
-      // await server.plugins.elasticsearch.waitUntilReady();
+      // TODO: wait until opensearch is ready?
+      // await server.plugins.opensearch.waitUntilReady();
       return await checkKibanaStatus();
     } catch (error) {
       log(
         'initialize:checkStatus',
-        'Waiting for elasticsearch plugin to be ready...',
+        'Waiting for opensearch plugin to be ready...',
         'debug'
       );
       setTimeout(() => checkStatus(), 3000);

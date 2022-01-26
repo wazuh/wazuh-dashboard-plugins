@@ -45,7 +45,7 @@ getAngularModule().directive('kbnDis', [
   }
 ]);
 
-// Added dependencies (from Kibana module)
+// Added dependencies (from plugin platform module)
 import './discover_dependencies';
 //import 'ui/directives/render_directive';
 import './discover/application/angular/directives';

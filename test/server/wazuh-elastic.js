@@ -1,13 +1,13 @@
 const chai = require('chai');
 const needle = require('needle');
-const { WAZUH_ALERTS_PATTERN } = require('../../common/constants');
+const { WAZUH_ALERTS_PATTERN, PLUGIN_PLATFORM_REQUEST_HEADERS } = require('../../common/constants');
 
 const kibanaServer = process.env.KIBANA_IP || 'localhost';
 
 chai.should();
 
 const headers = {
-  headers: { 'osd-xsrf': 'kibana', 'Content-Type': 'application/json' }
+  headers: { ...PLUGIN_PLATFORM_REQUEST_HEADERS, 'content-type': 'application/json' }
 };
 
 describe('wazuh-elastic', () => {

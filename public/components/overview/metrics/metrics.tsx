@@ -38,7 +38,7 @@ export const Metrics = withAllowedAgents(
       _history: { history: { items: { from: string; to: string }[] } };
     };
 
-    KibanaServices: { [key: string]: any };
+    PluginPlatformServices: { [key: string]: any };
     filterManager: FilterManager;
     indexPattern: any;
     state: {
@@ -54,9 +54,9 @@ export const Metrics = withAllowedAgents(
 
     constructor(props) {
       super(props);
-      this.KibanaServices = getDataPlugin().query;
-      this.filterManager = this.KibanaServices.filterManager;
-      this.timefilter = this.KibanaServices.timefilter.timefilter;
+      this.PluginPlatformServices = getDataPlugin().query;
+      this.filterManager = this.PluginPlatformServices.filterManager;
+      this.timefilter = this.PluginPlatformServices.timefilter.timefilter;
       this.state = {
         resultState: '',
         results: {},

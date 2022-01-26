@@ -1,5 +1,5 @@
 /*
- * Wazuh app - React component to integrate Kibana search bar
+ * Wazuh app - React component to integrate plugin platform search bar
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -15,7 +15,7 @@ import { I18nProvider } from '@osd/i18n/react';
 import { TimeRange, Query, Filter } from '../../../../../src/plugins/data/public';
 
 import { OpenSearchDashboardsContextProvider } from '../../../../../src/plugins/opensearch_dashboards_react/public';
-import { withKibanaContext, withKibanaContextExtendsProps } from '../common/hocs';
+import { withPluginPlatformContext, withPluginPlatformContextExtendsProps } from '../common/hocs';
 import { storage } from './lib';
 import { getDataPlugin, getCore } from '../../kibana-services';
 import { AUTHORIZED_AGENTS } from '../../../common/constants';
@@ -30,13 +30,13 @@ export interface IKbnSearchBarProps {
 const SearchBar = getDataPlugin().ui.SearchBar;
 
 const KbnSearchBar: React.FunctionComponent<IKbnSearchBarProps> = (
-  props: IKbnSearchBarProps & withKibanaContextExtendsProps
+  props: IKbnSearchBarProps & withPluginPlatformContextExtendsProps
 ) => {
-  const KibanaServices = getDataPlugin();
+  const PluginPlatformServices = getDataPlugin();
   const { filterManager, indexPattern, timeFilter, timeHistory, query } = props;
   const data = {
-    ...KibanaServices,
-    query: { ...KibanaServices.query, filterManager },
+    ...PluginPlatformServices,
+    query: { ...PluginPlatformServices.query, filterManager },
   };
 
   const getFilters = () => {
@@ -95,5 +95,5 @@ KbnSearchBar.defaultProps = {
   appName: 'wazuh',
 };
 
-const hoc = withKibanaContext(KbnSearchBar);
+const hoc = withPluginPlatformContext(KbnSearchBar);
 export { hoc as KbnSearchBar };

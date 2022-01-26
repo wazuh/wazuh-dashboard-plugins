@@ -42,7 +42,7 @@ export const Mitre = withErrorBoundary (class Mitre extends Component {
     _history: { history: { items: { from: string, to: string }[] } }
   };
 
-  KibanaServices: { [key: string]: any };
+  PluginPlatformServices: { [key: string]: any };
   filterManager: FilterManager;
   indexPattern: any;
   destroyWatcher: any;
@@ -57,9 +57,9 @@ export const Mitre = withErrorBoundary (class Mitre extends Component {
 
   constructor(props) {
     super(props);
-    this.KibanaServices = getDataPlugin().query;
-    this.filterManager = this.KibanaServices.filterManager;
-    this.timefilter = this.KibanaServices.timefilter.timefilter;
+    this.PluginPlatformServices = getDataPlugin().query;
+    this.filterManager = this.PluginPlatformServices.filterManager;
+    this.timefilter = this.PluginPlatformServices.timefilter.timefilter;
     this.state = {
       tacticsObject: {},
       selectedTactics: {},

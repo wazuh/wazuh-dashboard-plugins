@@ -1,5 +1,5 @@
 /*
- * Wazuh app - React component for select time and sync with kibana discover
+ * Wazuh app - React component for select time and sync with plugin platform discover
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify

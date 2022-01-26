@@ -30,7 +30,7 @@ import { compose } from 'redux';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
-import { satisfyKibanaVersion } from '../../../../common/semver';
+import { satisfyPluginPlatformVersion } from '../../../../common/semver';
 
 export const Events = compose(
   withAgentSupportModule,
@@ -205,7 +205,7 @@ export const Events = compose(
       if (!this.state.hasRefreshedKnownFields) {
         try {
           this.setState({ hasRefreshedKnownFields: true, isRefreshing: true });
-          if (satisfyKibanaVersion('<7.11')) {
+          if (satisfyPluginPlatformVersion('<7.11')) {
             await PatternHandler.refreshIndexPattern();
           }
           this.setState({ isRefreshing: false });
@@ -304,7 +304,7 @@ export const Events = compose(
 
     reloadToast = () => {
       const toastLifeTimeMs = 300000;
-      if (satisfyKibanaVersion('<7.11')) {
+      if (satisfyPluginPlatformVersion('<7.11')) {
         getToasts().add({
           color: 'success',
           title: 'The index pattern was refreshed successfully.',
@@ -323,7 +323,7 @@ export const Events = compose(
           ),
           toastLifeTimeMs,
         });
-      } else if (satisfyKibanaVersion('>=7.11')) {
+      } else if (satisfyPluginPlatformVersion('>=7.11')) {
         getToasts().add({
           color: 'warning',
           title: 'Found unknown fields in the index pattern.',

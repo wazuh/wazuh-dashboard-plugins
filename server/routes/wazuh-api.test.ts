@@ -1,11 +1,12 @@
 // To launch this file
 // yarn test:jest --testEnvironment node --verbose server/routes/wazuh-api
 import axios from 'axios';
+import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../common/constants';
 
 function buildAxiosOptions(method: string, path: string, data: any = {}, headers: any = {}){
   return {
     method: method,
-    headers: { 'Content-Type': 'application/json', 'osd-xsrf': 'kibana', ...headers },
+    headers: { ...PLUGIN_PLATFORM_REQUEST_HEADERS, 'content-type': 'application/json', ...headers },
     url: `http://localhost:5601${path}`,
     data: data
   };
