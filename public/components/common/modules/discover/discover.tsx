@@ -369,7 +369,7 @@ export const Discover = compose(
         : [];
       const previousFilters =
         (this.PluginPlatformServices && this.PluginPlatformServices.query.filterManager.getFilters()) || [];
-      const elasticQuery = buildEsQuery(
+      const elasticQuery = buildOpenSearchQuery(
         undefined,
         query,
         _.union(
