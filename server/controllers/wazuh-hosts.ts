@@ -16,7 +16,7 @@ import { log } from '../lib/logger';
 import { ErrorResponse } from '../lib/error-response';
 import { APIUserAllowRunAs } from '../lib/cache-api-user-has-run-as';
 import { KibanaRequest, RequestHandlerContext, KibanaResponseFactory } from 'src/core/server';
-import { WAZUH_DATA_KIBANA_BASE_ABSOLUTE_PATH, PLUGIN_PLATFORM_INSTALLATION_USER, PLUGIN_PLATFORM_INSTALLATION_USER_GROUP, PLUGIN_PLATFORM_NAME } from '../../common/constants';
+import { WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH, PLUGIN_PLATFORM_INSTALLATION_USER, PLUGIN_PLATFORM_INSTALLATION_USER_GROUP, PLUGIN_PLATFORM_NAME } from '../../common/constants';
 
 export class WazuhHostsCtrl {
   constructor() {
@@ -41,11 +41,11 @@ export class WazuhHostsCtrl {
         body: result
       });
     } catch (error) {
-      if(error && error.message && ['ENOENT: no such file or directory', WAZUH_DATA_KIBANA_BASE_ABSOLUTE_PATH].every(text => error.message.includes(text))){
+      if(error && error.message && ['ENOENT: no such file or directory', WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH].every(text => error.message.includes(text))){
         return response.badRequest({
           body: {
-            message: `Error getting the hosts entries: The \'${WAZUH_DATA_KIBANA_BASE_ABSOLUTE_PATH}\' directory could not exist in your Kibana installation.
-            If this doesn't exist, create it and give the permissions 'sudo mkdir ${WAZUH_DATA_KIBANA_BASE_ABSOLUTE_PATH};sudo chown -R ${PLUGIN_PLATFORM_INSTALLATION_USER}:${PLUGIN_PLATFORM_INSTALLATION_USER_GROUP} ${WAZUH_DATA_KIBANA_BASE_ABSOLUTE_PATH}'. After, restart the ${PLUGIN_PLATFORM_NAME} service.`
+            message: `Error getting the hosts entries: The \'${WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH}\' directory could not exist in your ${PLUGIN_PLATFORM_NAME} installation.
+            If this doesn't exist, create it and give the permissions 'sudo mkdir ${WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH};sudo chown -R ${PLUGIN_PLATFORM_INSTALLATION_USER}:${PLUGIN_PLATFORM_INSTALLATION_USER_GROUP} ${WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH}'. After, restart the ${PLUGIN_PLATFORM_NAME} service.`
           }
         })
       }
