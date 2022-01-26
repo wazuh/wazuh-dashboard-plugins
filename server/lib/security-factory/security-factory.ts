@@ -1,4 +1,4 @@
-import { OpendistroFactory, XpackFactory, DefaultFactory } from './factories';
+import { OpenSearchDashboardsSecurityFactory, DefaultFactory } from './factories';
 import { OpenSearchDashboardsRequest, RequestHandlerContext } from 'src/core/server';
 import { PluginSetup } from '../../types';
 
@@ -13,25 +13,9 @@ export interface ISecurityFactory {
 }
 
 export async function SecurityObj(
-  { security, securityDashboards }: PluginSetup,
-  context?: RequestHandlerContext
+  { securityDashboards }: PluginSetup
 ): Promise<ISecurityFactory> {
-  const params = {
-    path: `/_security/user`,
-    method: 'GET',
-  };
-  if (!!security) {
-    try {
-      const responseCurl = await context.core.opensearch.client.asInternalUser.transport.request(
-        params
-      );
-      return new XpackFactory(security);
-    } catch (error) {
-      return new DefaultFactory();
-    }
-  } else {
-    return !!securityDashboards
-      ? new OpendistroFactory(securityDashboards)
-      : new DefaultFactory();
-  }
+  return !!securityDashboards
+    ? new OpenSearchDashboardsSecurityFactory(securityDashboards)
+    : new DefaultFactory();
 }

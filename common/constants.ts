@@ -89,12 +89,10 @@ export const WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS = {
 };
 
 // Security
-export const WAZUH_SECURITY_PLUGIN_XPACK_SECURITY = 'X-Pack Security';
-export const WAZUH_SECURITY_PLUGIN_OPEN_DISTRO_FOR_ELASTICSEARCH = 'Open Distro for Elasticsearch';
+export const WAZUH_SECURITY_PLUGIN_OPENSEARCH_DASHBOARDS_SECURITY = 'OpenSearch Dashboards Security';
 
 export const WAZUH_SECURITY_PLUGINS = [
-  WAZUH_SECURITY_PLUGIN_XPACK_SECURITY,
-  WAZUH_SECURITY_PLUGIN_OPEN_DISTRO_FOR_ELASTICSEARCH,
+  WAZUH_SECURITY_PLUGIN_OPENSEARCH_DASHBOARDS_SECURITY,
 ];
 
 // App configuration
@@ -204,7 +202,6 @@ export const WAZUH_DEFAULT_APP_CONFIG = {
   timeout: 20000,
   'ip.selector': true,
   'ip.ignore': [],
-  'xpack.rbac.enabled': true,
   'wazuh.monitoring.enabled': WAZUH_MONITORING_DEFAULT_ENABLED,
   'wazuh.monitoring.frequency': WAZUH_MONITORING_DEFAULT_FREQUENCY,
   'wazuh.monitoring.shards': WAZUH_MONITORING_DEFAULT_INDICES_SHARDS,

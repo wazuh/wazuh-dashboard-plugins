@@ -16,16 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { SecurityPluginSetup } from 'x-pack/plugins/security/server';
-import { SpacesPluginSetup } from 'x-pack/plugins/spaces/server';
 
 export interface WazuhPluginSetup {}
 
 export interface WazuhPluginStart {}
 
 export type PluginSetup = {
-    security?: SecurityPluginSetup,
-    opendistroSecurityKibana?: {}, // TODO: Add ODFE interface
-    spaces?: SpacesPluginSetup,
-    searchguard?: {}, // TODO: Add searchguard interface
+    securityDashboards?: {}, // TODO: Add OpenSearch Dashboards Security interface
 }

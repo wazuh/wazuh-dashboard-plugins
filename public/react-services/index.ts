@@ -19,7 +19,6 @@ export * from './wz-api-check';
 export * from './wz-authentication';
 export * from './wz-csv';
 export * from './wz-request';
-export * from './wz-security-opendistro';
-export * from './wz-security-xpack';
+export * from './wz-security-opensearch-dashboards-security';
 export * from './wz-user-permissions';
 export * from './query-config'

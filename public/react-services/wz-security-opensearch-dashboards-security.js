@@ -13,7 +13,7 @@
 import { GenericRequest } from "./generic-request";
 import { WzRequest } from './wz-request';
 
-export class WzSecurityOpendistro {
+export class WzSecurityOpenSearchDashboardsSecurity {
   static async getUsers() {
     try {
       const users = await GenericRequest.request(

@@ -1,11 +1,11 @@
-import { ISecurityFactory } from '../'
+import { ISecurityFactory } from '..'
 import { OpenSearchDashboardsRequest, RequestHandlerContext } from 'src/core/server';
-import { WAZUH_SECURITY_PLUGIN_OPEN_DISTRO_FOR_ELASTICSEARCH } from '../../../../common/constants';
+import { WAZUH_SECURITY_PLUGIN_OPENSEARCH_DASHBOARDS_SECURITY } from '../../../../common/constants';
 
-export class OpendistroFactory implements ISecurityFactory {
-  platform: string = WAZUH_SECURITY_PLUGIN_OPEN_DISTRO_FOR_ELASTICSEARCH;
+export class OpenSearchDashboardsSecurityFactory implements ISecurityFactory {
+  platform: string = WAZUH_SECURITY_PLUGIN_OPENSEARCH_DASHBOARDS_SECURITY;
 
-  constructor(private opendistroSecurityKibana: any) {
+  constructor(private securityDashboards: any) {
   }
 
   async getCurrentUser(request: OpenSearchDashboardsRequest, context:RequestHandlerContext) {

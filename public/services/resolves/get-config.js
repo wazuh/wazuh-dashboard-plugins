@@ -49,7 +49,6 @@ export async function getWzConfig($q, genericReq, wazuhConfig) {
     timeout: 20000,
     'ip.selector': true,
     'ip.ignore': [],
-    'xpack.rbac.enabled': true,
     'wazuh.monitoring.enabled': true,
     'wazuh.monitoring.frequency': 900,
     'wazuh.monitoring.shards': WAZUH_MONITORING_DEFAULT_INDICES_SHARDS,

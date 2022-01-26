@@ -26,7 +26,7 @@ import {
   decodeJsonRule,
   getSelectedUsersFromRules,
 } from '../helpers/rule-editor.helper';
-import { WAZUH_SECURITY_PLUGIN_OPEN_DISTRO_FOR_ELASTICSEARCH } from '../../../../../common/constants';
+import { WAZUH_SECURITY_PLUGIN_OPENSEARCH_DASHBOARDS_SECURITY } from '../../../../../common/constants';
 import 'brace/mode/json';
 import 'brace/snippets/json';
 import 'brace/ext/language_tools';
@@ -56,7 +56,7 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
     { value: 'MATCH', text: 'MATCH' },
     { value: 'MATCH$', text: 'MATCH$' },
   ];
-  const default_user_field = currentPlatform === WAZUH_SECURITY_PLUGIN_OPEN_DISTRO_FOR_ELASTICSEARCH ? 'user_name' : 'username';
+  const default_user_field = currentPlatform === WAZUH_SECURITY_PLUGIN_OPENSEARCH_DASHBOARDS_SECURITY ? 'user_name' : 'username';
   const default_rule = { user_field: default_user_field, searchOperation: 'FIND', value: 'wazuh' };
 
   useEffect(() => {

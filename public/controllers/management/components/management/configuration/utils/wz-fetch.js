@@ -505,7 +505,7 @@ export const clusterNodes = async () => {
 
 
 /**
- * Check the current security platform that is installed (xpack, opendistro, searchguard...)
+ * Check the current security platform that is installed (OpenSearch Dashboards Security)
  */
 export const checkCurrentSecurityPlatform = async () => {
   try {

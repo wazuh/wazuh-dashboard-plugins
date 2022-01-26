@@ -11,7 +11,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { WzSecurityOpendistro } from './wz-security-opendistro';
+import { WzSecurityOpenSearchDashboardsSecurity } from './wz-security-opensearch-dashboards-security';
 
 jest.mock('./generic-request', () => ({
   GenericRequest: {
@@ -37,7 +37,7 @@ jest.mock('./generic-request', () => ({
 }));
 describe('Wazuh Internal Users', () => {
   it('Should return the ODFE internal users', async () => {
-    const users = await WzSecurityOpendistro.getUsers();
+    const users = await WzSecurityOpenSearchDashboardsSecurity.getUsers();
     const expected_result = [
         { username: 'wazuh', email: 'wazuh@email.com', full_name: 'wazuh surname', roles: [] },
       ];

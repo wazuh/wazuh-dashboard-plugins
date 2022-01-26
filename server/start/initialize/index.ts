@@ -37,11 +37,6 @@ export function jobInitializeRun(context) {
       configurationFile && typeof configurationFile.pattern !== 'undefined'
         ? configurationFile.pattern
         : WAZUH_ALERTS_PATTERN;
-    // global.XPACK_RBAC_ENABLED =
-    //   configurationFile &&
-    //     typeof configurationFile['xpack.rbac.enabled'] !== 'undefined'
-    //     ? configurationFile['xpack.rbac.enabled']
-    //     : true;
   } catch (error) {
     log('initialize', error.message || error);
     context.wazuh.logger.error(

@@ -11,9 +11,8 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { WzSecurityXpack } from '../react-services/wz-security-xpack';
-import { WzSecurityOpendistro } from '../react-services/wz-security-opendistro';
-import { WAZUH_SECURITY_PLUGIN_XPACK_SECURITY, WAZUH_SECURITY_PLUGIN_OPEN_DISTRO_FOR_ELASTICSEARCH } from '../../common/constants';
+import { WzSecurityOpenSearchDashboardsSecurity } from '../react-services/wz-security-opensearch-dashboards-security';
+import { WAZUH_SECURITY_PLUGIN_OPENSEARCH_DASHBOARDS_SECURITY } from '../../common/constants';
 import store from '../redux/store';
 
 
@@ -26,10 +25,8 @@ export class WazuhSecurity {
       return WazuhSecurity.instance;
     }
     const platform = store.getState().appStateReducers.currentPlatform;
-    if(platform === WAZUH_SECURITY_PLUGIN_XPACK_SECURITY){
-      this.security = WzSecurityXpack;
-    }else if(platform === WAZUH_SECURITY_PLUGIN_OPEN_DISTRO_FOR_ELASTICSEARCH){
-     this.security =  WzSecurityOpendistro;
+    if(platform === WAZUH_SECURITY_PLUGIN_OPENSEARCH_DASHBOARDS_SECURITY){
+     this.security = WzSecurityOpenSearchDashboardsSecurity;
     }else{
       this.security = false;
     }

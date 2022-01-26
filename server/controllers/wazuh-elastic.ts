@@ -538,11 +538,9 @@ export class WazuhElasticCtrl {
         return response.notFound({body:{message: `Visualizations not found for ${request.params.tab}`}});
       }
       log('wazuh-elastic:createVis', `${tabPrefix}[${tabSufix}] with index pattern ${request.params.pattern}`, 'debug');
-      const namespace = context.wazuh.plugins.spaces && context.wazuh.plugins.spaces.spacesService && context.wazuh.plugins.spaces.spacesService.getSpaceId(request);
       const raw = await this.buildVisualizationsRaw(
         file,
-        request.params.pattern,
-        namespace
+        request.params.pattern
       );
       return response.ok({
         body: { acknowledge: true, raw: raw }
@@ -849,17 +847,6 @@ export class WazuhElasticCtrl {
       return ErrorResponse(error.message || error, 1000, 500, response);
     }
   }
-
-  async usingCredentials(context) {
-    try {
-      const data = await context.core.opensearch.client.asInternalUser.cluster.getSettings(
-        { include_defaults: true }
-      );
-      return (((((data || {}).body || {}).defaults || {}).xpack || {}).security || {}).user !== null;
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  };
 
   getErrorDetails(error){
     const statusCode = error?.meta?.statusCode || 500;

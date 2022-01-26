@@ -1,3 +1,2 @@
-export { OpendistroFactory } from './opendistro-factory';
-export { XpackFactory } from './xpack-factory';
+export { OpenSearchDashboardsSecurityFactory } from './opensearch-dashboards-security-factory';
 export { DefaultFactory } from './default-factory';
