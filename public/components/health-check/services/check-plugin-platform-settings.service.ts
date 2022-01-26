@@ -37,7 +37,7 @@ export const checkPluginPlatformSettings = (pluginPlatformSettingName: string, d
 
 async function updateSetting(pluginPlatformSettingName, defaultAppValue, retries = 3) {
   return await getUiSettings()
-    .set(pluginPlatformSettingName, null)
+    .set(pluginPlatformSettingName, defaultAppValue)
     .catch(async (error) => {
       if (retries > 0) {
         return await updateSetting(pluginPlatformSettingName, defaultAppValue, --retries);
