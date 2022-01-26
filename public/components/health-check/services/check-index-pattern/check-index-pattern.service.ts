@@ -15,7 +15,6 @@ import { CheckLogger } from '../../types/check_logger';
 import { checkFieldsService } from './check-fields.service';
 import { checkIndexPatternObjectService } from './check-index-pattern-object.service';
 import { checkTemplateService } from './check-template.service';
-import { satisfyPluginPlatformVersion } from '../../../../../common/semver';
 
 export const checkIndexPatternService = (appConfig) => async (checkLogger: CheckLogger) =>  await checkPattern(appConfig, checkLogger);
 
@@ -25,9 +24,7 @@ const checkPattern = async (appConfig, checkLogger: CheckLogger) =>  {
   };
   await checkIndexPatternObjectService(appConfig, checkLogger);
   await checkTemplate(appConfig, checkLogger);
-  if(satisfyPluginPlatformVersion('<7.11')){
-    await checkFields(appConfig, checkLogger);
-  };
+  await checkFields(appConfig, checkLogger);
 };
 
 const decoratorHealthCheckRunCheckEnabled = (checkKey, fn) => {

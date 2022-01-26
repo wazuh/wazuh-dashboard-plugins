@@ -12,18 +12,15 @@
 
 import React, { Component, Fragment } from 'react';
 import { EuiFlyout, EuiOverlayMask, EuiOutsideClickDetector } from '@elastic/eui';
-import { satisfyPluginPlatformVersion } from '../../../../common/semver';
 
 export const WzFlyout = ({children, flyoutProps = {}, overlayMaskProps = {}, outsideClickDetectorProps = {}, onClose}) => (
   <EuiOverlayMask headerZindexLocation="below" {...overlayMaskProps}>
     <EuiOutsideClickDetector
       onOutsideClick={onClose}
-      isDisabled={satisfyPluginPlatformVersion('>7.10')}
       {...outsideClickDetectorProps}
     >
       <EuiFlyout
         onClose={onClose}
-        {...(satisfyPluginPlatformVersion('>7.10') ? { outsideClickCloses: true } : {})}
         {...flyoutProps}
       >
         {children}

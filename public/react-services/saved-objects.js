@@ -20,7 +20,6 @@ import {
   WAZUH_INDEX_TYPE_MONITORING,
   WAZUH_INDEX_TYPE_STATISTICS,
 } from '../../common/constants';
-import { satisfyPluginPlatformVersion } from '../../common/semver';
 
 export class SavedObject {
   /**
@@ -32,26 +31,9 @@ export class SavedObject {
       'GET',
       `/api/saved_objects/_find?type=index-pattern&fields=title&fields=fields&per_page=9999`
       );
-      let indexPatterns = ((savedObjects || {}).data || {}).saved_objects || [];
+    const indexPatterns = ((savedObjects || {}).data || {}).saved_objects || [];
 
-    let indexPatternsFields;
-    if(satisfyPluginPlatformVersion('<7.11')){
-      indexPatternsFields = indexPatterns.map(indexPattern => indexPattern?.attributes?.fields ? JSON.parse(indexPattern.attributes.fields) : []);
-    }else if(satisfyPluginPlatformVersion('>=7.11')){
-      indexPatternsFields = await Promise.all(indexPatterns.map(async indexPattern => {
-        try{
-          const {data: {fields}} = await GenericRequest.request(
-            'GET',
-            `/api/index_patterns/_fields_for_wildcard?pattern=${indexPattern.attributes.title}`,
-            {}
-          );
-          return fields;
-        }catch(error){
-          return [];
-        }
-      }));
-    }
-    return indexPatterns.map((indexPattern, idx) => ({...indexPattern, _fields: indexPatternsFields[idx]}));
+    return indexPatterns.map((indexPattern) => ({...indexPattern, _fields: indexPattern?.attributes?.fields ? JSON.parse(indexPattern.attributes.fields) : []}));
   }
 
   /**
@@ -93,10 +75,7 @@ export class SavedObject {
   static async existsOrCreateIndexPattern(patternID) {
     const result = await SavedObject.existsIndexPattern(patternID);
     if (!result.data) {
-      let fields = '';
-      if (satisfyPluginPlatformVersion('<7.11')) {
-        fields = await SavedObject.getIndicesFields(patternID, WAZUH_INDEX_TYPE_ALERTS);
-      }
+      const fields = await SavedObject.getIndicesFields(patternID, WAZUH_INDEX_TYPE_ALERTS);
       await this.createSavedObject(
         'index-pattern',
         patternID,
@@ -153,21 +132,7 @@ export class SavedObject {
         null,
         true
       );
-      let indexPatternFields;
-      if(satisfyPluginPlatformVersion('<7.11')){
-        indexPatternFields = indexPatternData?.data?.attributes?.fields ? JSON.parse(indexPatternData.data.attributes.fields) : [];
-      }else if(satisfyPluginPlatformVersion('>=7.11')){
-        try{
-          const {data: {fields}} = await GenericRequest.request(
-            'GET',
-            `/api/index_patterns/_fields_for_wildcard?pattern=${indexPatternData.data.attributes.title}`,
-            {}
-          );
-          indexPatternFields = fields;
-        } catch (error) {
-          indexPatternFields = [];
-        }
-      }
+      const indexPatternFields = indexPatternData?.data?.attributes?.fields ? JSON.parse(indexPatternData.data.attributes.fields) : [];
       return { ...indexPatternData.data, ...{ _fields: indexPatternFields } };
     } catch (error) {
       if (error && error.response && error.response.status == 404) return false;
@@ -187,7 +152,7 @@ export class SavedObject {
         params
       );
 
-      if (satisfyPluginPlatformVersion('<7.11') && type === 'index-pattern') {
+      if (type === 'index-pattern') {
         await this.refreshFieldsOfIndexPattern(id, params.attributes.title, fields);
       }
 
@@ -267,9 +232,7 @@ export class SavedObject {
    */
   static async createWazuhIndexPattern(pattern) {
     try {
-      const fields = satisfyPluginPlatformVersion('<7.11')
-        ? await SavedObject.getIndicesFields(pattern, WAZUH_INDEX_TYPE_ALERTS)
-        : '';
+      const fields = await SavedObject.getIndicesFields(pattern, WAZUH_INDEX_TYPE_ALERTS);
       await this.createSavedObject(
         'index-pattern',
         pattern,

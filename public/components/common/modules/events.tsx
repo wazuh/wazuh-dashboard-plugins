@@ -30,7 +30,6 @@ import { compose } from 'redux';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
-import { satisfyPluginPlatformVersion } from '../../../../common/semver';
 
 export const Events = compose(
   withAgentSupportModule,
@@ -205,9 +204,7 @@ export const Events = compose(
       if (!this.state.hasRefreshedKnownFields) {
         try {
           this.setState({ hasRefreshedKnownFields: true, isRefreshing: true });
-          if (satisfyPluginPlatformVersion('<7.11')) {
-            await PatternHandler.refreshIndexPattern();
-          }
+          await PatternHandler.refreshIndexPattern();
           this.setState({ isRefreshing: false });
           this.reloadToast();
         } catch (error) {
@@ -304,45 +301,24 @@ export const Events = compose(
 
     reloadToast = () => {
       const toastLifeTimeMs = 300000;
-      if (satisfyPluginPlatformVersion('<7.11')) {
-        getToasts().add({
-          color: 'success',
-          title: 'The index pattern was refreshed successfully.',
-          text: toMountPoint(
-            <EuiFlexGroup justifyContent="flexEnd" gutterSize="s">
-              <EuiFlexItem grow={false}>
-                There were some unknown fields for the current index pattern. You need to refresh
-                the page to apply the changes.
-              </EuiFlexItem>
-              <EuiFlexItem grow={false}>
-                <EuiButton onClick={() => window.location.reload()} size="s">
-                  Reload page
-                </EuiButton>
-              </EuiFlexItem>
-            </EuiFlexGroup>
-          ),
-          toastLifeTimeMs,
-        });
-      } else if (satisfyPluginPlatformVersion('>=7.11')) {
-        getToasts().add({
-          color: 'warning',
-          title: 'Found unknown fields in the index pattern.',
-          text: toMountPoint(
-            <EuiFlexGroup justifyContent="flexEnd" gutterSize="s">
-              <EuiFlexItem grow={false}>
-                There are some unknown fields for the current index pattern. You need to refresh the
-                page to update the fields.
-              </EuiFlexItem>
-              <EuiFlexItem grow={false}>
-                <EuiButton onClick={() => window.location.reload()} size="s">
-                  Reload page
-                </EuiButton>
-              </EuiFlexItem>
-            </EuiFlexGroup>
-          ),
-          toastLifeTimeMs,
-        });
-      }
+      getToasts().add({
+        color: 'success',
+        title: 'The index pattern was refreshed successfully.',
+        text: toMountPoint(
+          <EuiFlexGroup justifyContent="flexEnd" gutterSize="s">
+            <EuiFlexItem grow={false}>
+              There were some unknown fields for the current index pattern. You need to refresh
+              the page to apply the changes.
+            </EuiFlexItem>
+            <EuiFlexItem grow={false}>
+              <EuiButton onClick={() => window.location.reload()} size="s">
+                Reload page
+              </EuiButton>
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        ),
+        toastLifeTimeMs,
+      });
     };
 
     errorToast = (error) => {

@@ -13,7 +13,6 @@
  */
 import { SavedObject } from '../../../react-services';
 import { CheckLogger } from '../types/check_logger';
-import { satisfyPluginPlatformVersion } from '../../../../common/semver';
 
 export const checkPatternSupportService = (pattern: string, indexType : string) => async (checkLogger: CheckLogger) => {
   checkLogger.info(`Checking index pattern id [${pattern}] exists...`);
@@ -21,12 +20,9 @@ export const checkPatternSupportService = (pattern: string, indexType : string) 
   checkLogger.info(`Exist index pattern id [${pattern}]: ${result.data ? 'yes' : 'no'}`);
   
   if (!result.data) {
-    let fields;
-    if(satisfyPluginPlatformVersion('<7.11')){
-      checkLogger.info(`Getting indices fields for the index pattern id [${pattern}]...`);
-      fields = await SavedObject.getIndicesFields(pattern, indexType);
-      checkLogger.info(`Fields for index pattern id [${pattern}] found: ${fields.length}`);
-    };
+    checkLogger.info(`Getting indices fields for the index pattern id [${pattern}]...`);
+    const fields = await SavedObject.getIndicesFields(pattern, indexType);
+    checkLogger.info(`Fields for index pattern id [${pattern}] found: ${fields.length}`);
   
     try {
       checkLogger.info(`Creating saved object for the index pattern with id [${pattern}].
