@@ -1,6 +1,7 @@
 {
   "id": "wazuh",
   "version": "1.2.0",
+  "opensearchDashboardsVersion": "opensearchDashboards",
   "configPath": [
     "wazuh"
   ],
@@ -21,7 +22,6 @@
     "security",
     "securityDashboards",
     "searchguard",
-    "spaces",
     "telemetry"
   ],
   "server": true,

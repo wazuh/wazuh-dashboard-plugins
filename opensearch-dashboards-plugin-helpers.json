@@ -1,0 +1,11 @@
+{
+  "serverSourcePatterns": [
+    "package.json",
+    "yarn.lock",
+    "opensearch_dashboards.json",
+    "LICENSE",
+    "{common,server,target}/**/*",
+    "!*test*",
+    "CHANGELOG.md"
+  ]
+}
