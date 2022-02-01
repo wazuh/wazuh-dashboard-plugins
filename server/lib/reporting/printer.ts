@@ -10,7 +10,7 @@ import {
 import { log } from '../logger';
 import * as TimSort from 'timsort';
 import { getConfiguration } from '../get-configuration';
-import { REPORTS_PRIMARY_COLOR, REPORTS_LOGO_IMAGE_ASSETS_RELATIVE_PATH } from '../../../common/constants';
+import { REPORTS_PRIMARY_COLOR, REPORTS_LOGO_IMAGE_ASSETS_RELATIVE_PATH, REPORTS_PAGE_FOOTER_TEXT, REPORTS_PAGE_HEADER_TEXT } from '../../../common/constants';
 
 const COLORS = {
   PRIMARY: REPORTS_PRIMARY_COLOR
@@ -58,7 +58,7 @@ const pageConfiguration = (nameLogo) => ({
         width: 190
       },
       {
-        text: 'info@wazuh.com\nhttps://wazuh.com',
+        text: REPORTS_PAGE_HEADER_TEXT,
         alignment: 'right',
         margin: [0, 0, 40, 0],
         color: COLORS.PRIMARY
@@ -70,7 +70,7 @@ const pageConfiguration = (nameLogo) => ({
     return {
       columns: [
         {
-          text: 'Copyright © 2021 Wazuh, Inc.',
+          text: REPORTS_PAGE_FOOTER_TEXT,
           color: COLORS.PRIMARY,
           margin: [40, 40, 0, 0]
         },
