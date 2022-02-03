@@ -45,21 +45,24 @@ const observerMainApp = new MutationObserver((mutations) => {
       $(mutation.target).find('a[href$="app/kibana_overview"]').parent().addClass('hide');
     }
     
-    let homeLink
     /**
      * Fix top-left Logo home link
      */
-    homeLink = document.querySelector('#globalHeaderBars a.euiHeaderLogo[href$="/app/home"]');
-    if (homeLink) {
-      changeHomeLink(homeLink);
+    const logoHomeLink = document.querySelector(
+      '#globalHeaderBars a.euiHeaderLogo[href$="/app/home"]'
+    )
+    if (logoHomeLink) {
+      changeHomeLink(logoHomeLink);
     }
 
     /**
      * Fix navigation drawer Home link
      */
-    homeLink = document.querySelector('nav a.euiListGroupItem__button[href$="/app/home"]');
-    if (homeLink) {
-      changeHomeLink(homeLink);
+    const menuHomeLink = document.querySelector(
+      'nav a.euiListGroupItem__button[href$="/app/home"]'
+    )
+    if (menuHomeLink) {
+      changeHomeLink(menuHomeLink);
     }
   })
 });
