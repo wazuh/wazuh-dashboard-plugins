@@ -121,5 +121,16 @@ let observer = new MutationObserver((mutations) => {
  * 
  * */
 function changeHomeLink(eLink) {
+  const parent = eLink.parentNode;
+  const wrapper = document.createElement('a');
   eLink.setAttribute('href', '/app/wazuh');
+  wrapper.setAttribute('href', '/app/wazuh');
+  wrapper.addEventListener('click', function (ev) {
+    ev.stopPropagation();
+    ev.preventDefault();
+    window.location.href = '/app/wazuh';
+    return
+  }, true);
+  parent.replaceChild(wrapper, eLink);
+  wrapper.appendChild(eLink);
 }
