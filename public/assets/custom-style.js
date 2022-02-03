@@ -44,12 +44,25 @@ const observerMainApp = new MutationObserver((mutations) => {
       mutation.target.className == 'hide-for-sharing headerGlobalNav') {
       $(mutation.target).find('a[href$="app/kibana_overview"]').parent().addClass('hide');
     }
+    
     /**
      * Fix top-left Logo home link
      */
-    const homeLink = document.querySelector('#globalHeaderBars a.euiHeaderLogo[href$="/app/home"]');
-    if (homeLink) {
-      changeHomeLink(homeLink);
+    const logoHomeLink = document.querySelector(
+      '#globalHeaderBars a.euiHeaderLogo[href$="/app/home"]'
+    )
+    if (logoHomeLink) {
+      changeHomeLink(logoHomeLink);
+    }
+
+    /**
+     * Fix navigation drawer Home link
+     */
+    const menuHomeLink = document.querySelector(
+      'nav a.euiListGroupItem__button[href$="/app/home"]'
+    )
+    if (menuHomeLink) {
+      changeHomeLink(menuHomeLink);
     }
   })
 });
@@ -111,19 +124,11 @@ let observer = new MutationObserver((mutations) => {
  * 
  * */
 function changeHomeLink(eLink) {
-
-  const parent = eLink.parentNode;
-  const wrapper = document.createElement('a');
   eLink.setAttribute('href', '/app/wazuh');
-  wrapper.setAttribute('href', '/app/wazuh');
-  wrapper.addEventListener('click', function (ev) {
+  eLink.addEventListener('click', function (ev) {
     ev.stopPropagation();
     ev.preventDefault();
     window.location.href = '/app/wazuh';
     return
   }, true);
-  parent.replaceChild(wrapper, eLink);
-  wrapper.appendChild(eLink);
-
-
 }
