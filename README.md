@@ -114,7 +114,7 @@ Install the Wazuh app plugin for OpenSearch Dashboards
 
 ```
 cd <OPENSEARCH_DASHBOARDS_INSTALLATION_PATH>
-sudo -u opensearch-dashboards bin/opensearch-dashboards-plugin install https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.3.0_7.10.2-1.zip
+sudo -u opensearch-dashboards bin/opensearch-dashboards-plugin install https://packages.wazuh.com/4.x/ui/opensearch-dashboards/wazuh_opensearch-dashboards-4.3.0_1.2.0-1.zip
 ```
 
 Restart OpenSearch Dashboards
