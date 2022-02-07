@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Utils related to Kibana and app versions
+ * Wazuh app - Utils related to plugin platform and app versions
  *
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
@@ -11,7 +11,12 @@
  * Find more information about this on the LICENSE file.
  *
  */
-import { kibana as appPackageKibana } from '../package.json';
+import { pluginPlatform as appPackagePluginPlatform } from '../package.json';
 import semver from 'semver';
 
-export const satisfyKibanaVersion = (requiredKibanaVersion: string) => semver.satisfies(appPackageKibana.version, requiredKibanaVersion);
+/**
+ * 
+ * @param requiredPluginPlatformVersion semver condition that should fulfill the plugin platform version
+ * @returns if validation is true or false
+ */
+export const satisfyPluginPlatformVersion = (requiredPluginPlatformVersion: string): boolean => semver.satisfies(appPackagePluginPlatform.version, requiredPluginPlatformVersion);

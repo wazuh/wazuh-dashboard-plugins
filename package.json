@@ -3,7 +3,7 @@
   "version": "4.3.0",
   "revision": "4301-0",
   "code": "4301-0",
-  "kibana": {
+  "pluginPlatform": {
     "version": "7.10.2"
   },
   "description": "Wazuh app",

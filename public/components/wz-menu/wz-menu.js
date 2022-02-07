@@ -49,6 +49,7 @@ import { withWindowSize } from '../../components/common/hocs/withWindowSize';
 import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services'
+import { getThemeAssetURL, getAssetURL } from '../../utils/assets';
 
 
 const sections = {
@@ -592,7 +593,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
   }
 
   switchMenuOpened = () => {
-    const kibanaMenuBlockedOrOpened = document.body.classList.contains('euiBody--collapsibleNavIsDocked') || document.body.classList.contains('euiBody--collapsibleNavIsOpen');
+    const pluginPlatformMenuBlockedOrOpened = document.body.classList.contains('euiBody--collapsibleNavIsDocked') || document.body.classList.contains('euiBody--collapsibleNavIsOpen');
     if (!this.state.menuOpened && this.state.currentMenuTab === 'manager') {
       this.managementPopoverToggle();
     } else if (this.state.currentMenuTab === 'overview') {
@@ -607,7 +608,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
       this.closeAllPopover()
     }
 
-    this.setState({ menuOpened: !this.state.menuOpened, kibanaMenuBlockedOrOpened, hover: this.state.currentMenuTab }, async () => {
+    this.setState({ menuOpened: !this.state.menuOpened, pluginPlatformMenuBlockedOrOpened, hover: this.state.currentMenuTab }, async () => {
       await this.loadApiList();
       await this.loadIndexPatternsList();
     });
@@ -948,7 +949,8 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
       </div>
     );
 
-    const logotype_url = getHttp().basePath.prepend(`/plugins/wazuh/assets/${this.wazuhConfig.getConfig()['customization.logo.app']}`);
+    
+    const logotypeURL = getHttp().basePath.prepend(this.wazuhConfig.getConfig()['customization.logo.app'] ? getAssetURL(this.wazuhConfig.getConfig()['customization.logo.app']) : getThemeAssetURL('logo.svg'));
     const mainButton = (
       <button data-test-subj='menuWazuhButton' className="eui" onClick={() => this.switchMenuOpened()}>
         <EuiFlexGroup
@@ -957,7 +959,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
           style={{ paddingTop: 2 }}
         >
           <EuiFlexItem grow={false} style={{ marginRight: 0 }}>
-            <img src={logotype_url} className="navBarLogo" alt=""></img>
+            <img src={logotypeURL} className="navBarLogo" alt=""></img>
           </EuiFlexItem>
           <EuiFlexItem grow={false} style={{ margin: '12px 6px' }}>
             {this.state.menuOpened && (
@@ -994,7 +996,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
             <EuiFlexItem grow={false}>
               <EuiPopover
                 panelClassName={
-                  this.state.kibanaMenuBlockedOrOpened ?
+                  this.state.pluginPlatformMenuBlockedOrOpened ?
                     "wz-menu-popover wz-menu-popover-over" :
                     "wz-menu-popover wz-menu-popover-under"
                 }

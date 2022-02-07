@@ -45,7 +45,7 @@ export const ButtonModuleGenerateReport = ({agent, moduleID, disabledReport}) =>
     } else {
       await reportingService.startVis2Png(moduleID, agent?.id || false)
     }
-  });
+  }, [agent]);
   
   return (
     <WzButton

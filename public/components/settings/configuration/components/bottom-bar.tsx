@@ -25,7 +25,7 @@ import {
   EuiButton
 } from '@elastic/eui';
 import { WazuhConfig } from '../../../../react-services/wazuh-config';
-import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
+import { UI_LOGGER_LEVELS, PLUGIN_PLATFORM_NAME } from '../../../../../common/constants';
 import {
   UI_ERROR_SEVERITIES,
   UIErrorLog,
@@ -172,7 +172,7 @@ const executeHealtCheck = () => {
 const restartToast = () => {
   getToasts().add({
     color: 'warning',
-    title: 'You must restart Kibana for the changes to take effect',
+    title: `You must restart ${PLUGIN_PLATFORM_NAME} for the changes to take effect`,
   });
 }
 

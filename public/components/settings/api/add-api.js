@@ -26,9 +26,10 @@ import {
   EuiPanel
 } from '@elastic/eui';
 import { withErrorBoundary } from '../../common/hocs';
-import { UI_LOGGER_LEVELS } from '../../../../common/constants';
+import { UI_LOGGER_LEVELS, PLUGIN_PLATFORM_NAME } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
+import { getPluginDataPath } from '../../../../common/plugin';
 
 export const AddApi = withErrorBoundary (class AddApi extends Component {
   constructor(props) {
@@ -135,7 +136,7 @@ export const AddApi = withErrorBoundary (class AddApi extends Component {
         {(this.state.status === 'warning' ||
           this.state.status === 'danger') && <EuiSpacer />}
         <EuiText>
-          Check that the Kibana server can reach the configured Wazuh API(s).
+          Check that the {PLUGIN_PLATFORM_NAME} server can reach the configured Wazuh API(s).
         </EuiText>
         <EuiSpacer />
         <EuiButton
@@ -157,7 +158,7 @@ export const AddApi = withErrorBoundary (class AddApi extends Component {
       <div>
         <EuiText>
           Modify{' '}
-          <EuiCode>/usr/share/kibana/data/wazuh/config/wazuh.yml</EuiCode>{' '}
+          <EuiCode>{getPluginDataPath('config/wazuh.yml')}</EuiCode>{' '}
           to set the connection information.
         </EuiText>
         <EuiSpacer />

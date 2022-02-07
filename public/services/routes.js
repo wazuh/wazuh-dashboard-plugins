@@ -18,7 +18,7 @@ import 'angular-route';
 import {
   settingsWizard,
   getSavedSearch,
-  goToKibana,
+  goToPluginPlatform,
   getIp,
   getWzConfig,
   apiCount
@@ -114,7 +114,7 @@ function wzKibana($location, $window, $rootScope) {
     // Removes ?_g
     $location.search('_g', null);
   }
-  return goToKibana($location, $window);
+  return goToPluginPlatform($location, $window);
 }
 
 function clearRuleId(commonData) {

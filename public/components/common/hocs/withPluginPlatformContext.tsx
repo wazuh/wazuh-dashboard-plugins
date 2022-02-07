@@ -1,5 +1,5 @@
 /*
- * Wazuh app - React HOC to create component with Kibana state
+ * Wazuh app - React HOC to create component with plugin platform state
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -14,14 +14,14 @@ import { useIndexPattern, useFilterManager, useTimeFilter } from '../hooks';
 import { IIndexPattern, FilterManager, Query, TimeRange } from '../../../../../../src/plugins/data/public';
 import { useQueryManager } from "../hooks/use-query";
 
-interface withKibanaContextProps {
+interface withPluginPlatformContextProps {
   indexPattern?: IIndexPattern
   filterManager?: FilterManager
   query?: Query
   timeFilter?: TimeRange
 }
 
-export interface withKibanaContextExtendsProps {
+export interface withPluginPlatformContextExtendsProps {
   indexPattern: IIndexPattern
   filterManager: FilterManager
   timeFilter: TimeRange
@@ -32,8 +32,8 @@ export interface withKibanaContextExtendsProps {
 }
 
 
-export const withKibanaContext = <T extends object>(Component:React.FunctionComponent<T>) => {
-  function hoc(props:T & withKibanaContextProps ):React.FunctionComponentElement<T & withKibanaContextExtendsProps> {
+export const withPluginPlatformContext = <T extends object>(Component:React.FunctionComponent<T>) => {
+  function hoc(props:T & withPluginPlatformContextProps ):React.FunctionComponentElement<T & withPluginPlatformContextExtendsProps> {
     const indexPattern = props.indexPattern ? props.indexPattern : useIndexPattern();
     const filterManager = props.filterManager ? props.filterManager : useFilterManager().filterManager;
     const [query, setQuery] = props.query ? useState(props.query) : useQueryManager();
@@ -48,7 +48,7 @@ export const withKibanaContext = <T extends object>(Component:React.FunctionComp
       setQuery={setQuery} />;
   }
 
-  hoc.displayName = `withKibanaContext-${Component.displayName}`;
+  hoc.displayName = `withPluginPlatformContext-${Component.displayName}`;
 
   return hoc
 }

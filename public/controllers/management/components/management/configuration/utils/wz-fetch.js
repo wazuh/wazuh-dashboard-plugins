@@ -11,9 +11,9 @@
  */
 
 import { WzRequest } from '../../../../../../react-services/wz-request';
-import { delay } from './utils';
 import { replaceIllegalXML } from './xml';
 import { getToasts }  from '../../../../../../kibana-services';
+import { delayAsPromise } from '../../../../../../../common/utils';
 
 /**
  * Get configuration for an agent/manager of request sections
@@ -196,7 +196,7 @@ export const makePing = async (updateWazuhNotReadyYet, isCluster, tries = 30) =>
   try {
     let isValid = false;
     while (tries--) {
-      await delay(2000);
+      await delayAsPromise(2000);
       try {
         isValid = await checkDaemons(isCluster);
         if (isValid) {
@@ -540,7 +540,7 @@ export const restartClusterOrManager = async (updateWazuhNotReadyYet) => {
     updateWazuhNotReadyYet(
       `Restarting ${isCluster ? 'Cluster' : 'Manager'}, please wait.`
     );
-    await delay(15000);
+    await delayAsPromise(15000);
     await makePing(updateWazuhNotReadyYet, isCluster);
     return { restarted: isCluster ? 'Cluster' : 'Manager'}
   }catch (error){

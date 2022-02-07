@@ -9,8 +9,11 @@
  *
  * Find more information about this on the LICENSE file.
  */
+
+import { PLUGIN_PLATFORM_BASE_REDIRECTION_PATH } from "../../../common/constants";
+
 // Manage leaving the app to another Kibana tab
-export function goToKibana($location, $window) {
+export function goToPluginPlatform($location, $window) {
   const url = $location.$$absUrl.substring(0, $location.$$absUrl.indexOf('#'));
   const lastSubUrl = $window.sessionStorage.getItem(`lastSubUrl:${url}`) || '';
   if (
@@ -21,5 +24,6 @@ export function goToKibana($location, $window) {
     $window.sessionStorage.setItem(`lastSubUrl:${url}`, url);
   }
 
-  $window.location.href = $location.absUrl().replace('/wazuh#', '/kibana#');
+
+  $window.location.href = $location.absUrl().replace('/wazuh#', `/${PLUGIN_PLATFORM_BASE_REDIRECTION_PATH}#`);
 }

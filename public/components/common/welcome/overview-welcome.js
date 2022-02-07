@@ -32,7 +32,7 @@ import store from '../../../redux/store';
 import './welcome.scss';
 import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
 import { withErrorBoundary } from '../hocs';
-import office_logo from '../../../assets/office365.svg';
+import { LogoDocker, LogoGitHub, LogoGoogleCloud, LogoOffice365 } from '../logos';
 
 export const OverviewWelcome = withErrorBoundary(class OverviewWelcome extends Component {
   constructor(props) {
@@ -58,7 +58,7 @@ export const OverviewWelcome = withErrorBoundary(class OverviewWelcome extends C
         <EuiCard
           size="xs"
           layout="horizontal"
-          icon={<EuiIcon size="xl" type={icon} color="primary" />}
+          icon={<EuiIcon size="xl" type={icon} color="primary"/>}
           className="homSynopsis__card"
           title={WAZUH_MODULES[tab].title}
           onClick={() => store.dispatch(updateCurrentTab(tab))}
@@ -100,11 +100,11 @@ export const OverviewWelcome = withErrorBoundary(class OverviewWelcome extends C
                       {this.props.extensions.aws &&
                         this.buildTabCard('aws', 'logoAWSMono')}
                       {this.props.extensions.office &&
-                        this.buildTabCard('office', office_logo)}
+                        this.buildTabCard('office', LogoOffice365)}
                       {this.props.extensions.gcp &&
-                        this.buildTabCard('gcp', 'logoGCPMono')}
+                        this.buildTabCard('gcp', LogoGoogleCloud)}
                       {this.props.extensions.github &&
-                        this.buildTabCard('github', 'logoGithub')}
+                        this.buildTabCard('github', LogoGitHub)}
                     </EuiFlexGrid>
                   </EuiCard>
                 </EuiFlexItem>
@@ -137,7 +137,7 @@ export const OverviewWelcome = withErrorBoundary(class OverviewWelcome extends C
                       {this.props.extensions.osquery &&
                         this.buildTabCard('osquery', 'searchProfilerApp')}
                       {this.props.extensions.docker &&
-                        this.buildTabCard('docker', 'logoDocker')}
+                        this.buildTabCard('docker', LogoDocker)}
                       {this.buildTabCard('mitre', 'spacesApp')}
                       {/* TODO- Change "spacesApp" icon*/}
                     </EuiFlexGrid>

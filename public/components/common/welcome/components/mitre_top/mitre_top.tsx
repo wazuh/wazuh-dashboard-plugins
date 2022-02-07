@@ -32,7 +32,7 @@ import { getDataPlugin } from '../../../../../kibana-services';
 export class MitreTopTactics extends Component {
   _isMount = false;
 
-  KibanaServices: { [key: string]: any };
+  PluginPlatformServices: { [key: string]: any };
   timefilter: any;
   indexPattern: any;
   props!: {
@@ -51,8 +51,8 @@ export class MitreTopTactics extends Component {
 
   constructor(props) {
     super(props);
-    this.KibanaServices = getDataPlugin().query;
-    this.timefilter = this.KibanaServices.timefilter.timefilter;
+    this.PluginPlatformServices = getDataPlugin().query;
+    this.timefilter = this.PluginPlatformServices.timefilter.timefilter;
     this.state = {
       alertsCount: [],
       isLoading: true,
