@@ -5,7 +5,7 @@ const documentTitle = $('title');
  * Set Wazuh Favicon
  */
 document.querySelectorAll('head link[rel="icon"], head link[rel="shortcut icon"]').
-  forEach((fav) => { fav.setAttribute('href', '/plugins/wazuh/assets/icon_blue.svg') });
+  forEach((fav) => { fav.setAttribute('href', '/plugins/wazuh/assets/images/themes/light/icon.svg') });
 
 documentTitle.text(documentTitle.text().replace('Wazuh - Elastic', 'Wazuh Cloud'));
 documentTitle.text(documentTitle.text().replace('Elastic', 'Wazuh Cloud'));
