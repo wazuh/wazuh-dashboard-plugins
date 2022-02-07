@@ -18,6 +18,7 @@ import { WazuhConfig } from './wazuh-config';
 import { OdfeUtils } from '../utils';
 import IApiResponse from './interfaces/api-response.interface';
 import { getHttp } from '../kibana-services';
+import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../common/constants';
 export class WzRequest {
   static wazuhConfig: any;
 
@@ -45,15 +46,18 @@ export class WzRequest {
       const url = getHttp().basePath.prepend(path);
       const options = {
         method: method,
-        headers: { 'Content-Type': 'application/json', 'kbn-xsrf': 'kibana' },
+        headers: { ...PLUGIN_PLATFORM_REQUEST_HEADERS, 'content-type': 'application/json' },
         url: url,
         data: payload,
         timeout: customTimeout || timeout,
       };
+
       const data = await axios(options);
+
       if (data['error']) {
         throw new Error(data['error']);
       }
+
       return Promise.resolve(data);
     } catch (error) {
       OdfeUtils.checkOdfeSessionExpired(error);
@@ -104,17 +108,20 @@ export class WzRequest {
     try {
       if (!method || !path || !body) {
         throw new Error('Missing parameters');
-      }
+      }      
       const id = JSON.parse(AppState.getCurrentAPI()).id;
       const requestData = { method, path, body, id };
       const response = await this.genericReq('POST', '/api/request', requestData);
+
       const hasFailed = (((response || {}).data || {}).data || {}).total_failed_items || 0;
+
       if (hasFailed) {
         const error =
           ((((response.data || {}).data || {}).failed_items || [])[0] || {}).error || {};
         const failed_ids =
           ((((response.data || {}).data || {}).failed_items || [])[0] || {}).id || {};
         const message = (response.data || {}).message || 'Unexpected error';
+
         return Promise.reject(
           `${message} (${error.code}) - ${error.message} ${
             failed_ids && failed_ids.length > 1 ? ` Affected ids: ${failed_ids} ` : ''

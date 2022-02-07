@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 export * from './withWindowSize';
-export * from './withKibanaContext';
+export * from './withPluginPlatformContext';
 export * from './withUserPermissions';
 export * from './withUserRoles';
 export * from './withUserAuthorization';
@@ -20,3 +20,6 @@ export * from './withGuard';
 export * from './withButtonOpenOnClick';
 export * from './withAgentSupportModule';
 export * from './withUserLogged';
+export * from './error-boundary/with-error-boundary';
+export * from './with_module_tab_loader';
+export * from './with_module_not_for_agent';

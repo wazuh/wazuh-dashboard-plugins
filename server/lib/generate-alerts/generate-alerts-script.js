@@ -40,6 +40,8 @@ import * as Vulnerability from './sample-data/vulnerabilities';
 import * as SSH from './sample-data/ssh';
 import * as Apache from './sample-data/apache';
 import * as Web from './sample-data/web';
+import * as GitHub from './sample-data/github';
+import * as Office from './sample-data/office';
 
 //Alert
 const alertIDMax = 6000;
@@ -59,6 +61,7 @@ const ruleMaxLevel = 14;
  * @param {any} params - params to configure the alert
  * @param {boolean} params.aws - if true, set aws fields
  * @param {boolean} params.audit - if true, set System Auditing fields
+ * @param {boolean} params.office - if true, set office fields
  * @param {boolean} params.ciscat - if true, set CIS-CAT fields
  * @param {boolean} params.gcp - if true, set GCP fields
  * @param {boolean} params.docker - if true, set Docker fields
@@ -308,6 +311,49 @@ function generateAlert(params) {
     }
     alert.input = { type: 'log' };
     alert.GeoLocation = randomArrayItem(GeoLocation);
+  }
+
+  if (params.office) {
+    alert.agent = {
+      id: '000',
+      ip: alert.agent.ip,
+      name: alert.agent.name
+    };
+
+    if (params.manager && params.manager.name) {
+      alert.agent.name = params.manager.name;
+    };
+
+    const beforeDate = new Date(new Date(alert.timestamp) - 3 * 24 * 60 * 60 * 1000);
+    const IntraID = randomArrayItem(Office.arrayUuidOffice);
+    const OrgID = randomArrayItem(Office.arrayUuidOffice);
+    const objID = randomArrayItem(Office.arrayUuidOffice);
+    const userKey = randomArrayItem(Office.arrayUuidOffice);
+    const userID = randomArrayItem(Office.arrayUserId);
+    const userType = randomArrayItem([0, 2, 4]);
+    const resultStatus = randomArrayItem(['Succeeded', 'PartiallySucceeded', 'Failed']);
+    const log = randomArrayItem(Office.arrayLogs);
+    const ruleData = Office.officeRules[log.RecordType];
+
+    alert.agent.id = '000'
+    alert.rule = ruleData.rule;
+    alert.decoder = randomArrayItem(Office.arrayDecoderOffice);
+    alert.GeoLocation = randomArrayItem(GeoLocation);
+    alert.data.integration = 'Office365';
+    alert.location = Office.arrayLocationOffice;
+    alert.data.office365 = {
+      ...log,
+      ...ruleData.data.office365,
+      Id: IntraID,
+      CreationTime: formatDate(beforeDate, 'Y-M-DTh:m:s.lZ'),
+      OrganizationId: OrgID,
+      UserType: userType,
+      UserKey: userKey,
+      ResultStatus: resultStatus,
+      ObjectId: objID,
+      UserId: userID,
+      ClientIP: randomArrayItem(Office.arrayIp),
+    };
   }
 
   if (params.gcp) {
@@ -911,6 +957,29 @@ function generateAlert(params) {
       alert.previous_output = previousOutput.join('\n');
     }
   }
+
+  if (params.github){
+    alert.location = GitHub.LOCATION;
+    alert.decoder = GitHub.DECODER;
+    const alertType = randomArrayItem(GitHub.ALERT_TYPES);
+    const actor = randomArrayItem(GitHub.ACTORS);
+    alert.data = {
+      github : { ...alertType.data.github }
+    };
+    alert.data.github.org = randomArrayItem(GitHub.ORGANIZATION_NAMES);
+    alert.data.github.repo && (alert.data.github.repo = `${alert.data.github.org}/${randomArrayItem(GitHub.REPOSITORY_NAMES)}`);
+    alert.data.github.repository && (alert.data.github.repository = `${alert.data.github.org}/${randomArrayItem(GitHub.REPOSITORY_NAMES)}`);
+    alert.data.github.actor = actor.name;
+    alert.data.github.actor_location && alert.data.github.actor_location.country_code && (alert.data.github.actor_location.country_code = actor.country_code);
+    alert.data.github.user && (alert.data.github.user = randomArrayItem(GitHub.USER_NAMES));
+    alert.data.github.config && alert.data.github.config.url && (alert.data.github.config.url = randomArrayItem(GitHub.SERVER_ADDRESS_WEBHOOK));
+    alert.data.github['@timestamp'] = alert.timestamp;
+    alert.data.github.created_at && (alert.data.github.created_at = alert.timestamp);
+    alert.rule = {
+      ...alertType.rule
+    };
+  }
+  
   return alert;
 }
 
@@ -995,17 +1064,17 @@ const dayNames = {
 function formatDate(date, format) {
   // It could use "moment" library to format strings too
   const tokens = {
-    D: d => formatterNumber(d.getDate(), 2), // 01-31
-    A: d => dayNames.long[d.getDay()], // 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'
-    E: d => dayNames.short[d.getDay()], // 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'
-    M: d => formatterNumber(d.getMonth() + 1, 2), // 01-12
-    J: d => monthNames.long[d.getMonth()], // 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
-    N: d => monthNames.short[d.getMonth()], // 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-    Y: d => d.getFullYear(), // 2020
-    h: d => formatterNumber(d.getHours(), 2), // 00-23
-    m: d => formatterNumber(d.getMinutes(), 2), // 00-59
-    s: d => formatterNumber(d.getSeconds(), 2), // 00-59
-    l: d => formatterNumber(d.getMilliseconds(), 3), // 000-999
+    D: (d) => formatterNumber(d.getDate(), 2), // 01-31
+    A: (d) => dayNames.long[d.getDay()], // 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'
+    E: (d) => dayNames.short[d.getDay()], // 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'
+    M: (d) => formatterNumber(d.getMonth() + 1, 2), // 01-12
+    J: (d) => monthNames.long[d.getMonth()], // 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
+    N: (d) => monthNames.short[d.getMonth()], // 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    Y: (d) => d.getFullYear(), // 2020
+    h: (d) => formatterNumber(d.getHours(), 2), // 00-23
+    m: (d) => formatterNumber(d.getMinutes(), 2), // 00-59
+    s: (d) => formatterNumber(d.getSeconds(), 2), // 00-59
+    l: (d) => formatterNumber(d.getMilliseconds(), 3), // 000-999
   };
 
   return format.split('').reduce((accum, token) => {

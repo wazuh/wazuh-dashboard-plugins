@@ -1,5 +1,5 @@
 /*
- * Wazuh app - React hook hidde or show the Kibana loading indicator
+ * Wazuh app - React hook hidde or show the plugin platform loading indicator
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -26,12 +26,13 @@ export const useKbnLoadingIndicator = (): [
 
   useEffect(() => {
     getHttp().addLoadingCountSource(loadingCount$);
-    getHttp()
+    const { unsubscribe } = getHttp() 
       .getLoadingCount$()
       .subscribe((count) => {
         setVisible(count);
         !count && setFlag(false);
       });
+    return unsubscribe;
   }, []);
 
   useEffect(() => {

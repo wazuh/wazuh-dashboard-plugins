@@ -32,7 +32,7 @@ jest.mock('../../../components/common/hooks', () => ({
       'checks.fields': true,
     },
   }),
-  useRootScope: () => ({})
+  useRootScope: () => ({}),
 }));
 
 jest.mock('../services', () => ({
@@ -41,8 +41,9 @@ jest.mock('../services', () => ({
   checkApiService: (appInfo) => () => undefined,
   checkSetupService: (appInfo) => () => undefined,
   checkFieldsService: (appInfo) => () => undefined,
-  checkKibanaSettings: (appInfo) => () => undefined,
-  checkPatternSupportService: (appInfo) => () => undefined
+  checkPluginPlatformSettings: (appInfo) => () => undefined,
+  checkPatternSupportService: (appInfo) => () => undefined,
+  checkIndexPatternService: (appInfo) => () => undefined,
 }));
 
 jest.mock('../components/check-result', () => ({
@@ -54,38 +55,38 @@ jest.mock('../../../react-services', () => ({
     setPatternSelector: () => {},
   },
   ErrorHandler: {
-    handle: (error) => error
-  }
+    handle: (error) => error,
+  },
 }));
 
 jest.mock('../../../kibana-services', () => ({
   getHttp: () => ({
     basePath: {
-      prepend: (str) => str
-    }
+      prepend: (str) => str,
+    },
   }),
   getDataPlugin: () => ({
     query: {
       timefilter: {
         timefilter: {
-          setTime: (time: number) => true
-        }
-      }
-    }
-  })
+          setTime: (time: number) => true,
+        },
+      },
+    },
+  }),
 }));
 
 describe('Health Check container', () => {
-  test('should render a Health check screen', () => {
+  it('should render a Health check screen', () => {
     const component = shallow(<HealthCheckTest />);
 
     expect(component).toMatchSnapshot();
   });
 
-  test('should render a Health check screen with error', () => {
+  it('should render a Health check screen with error', () => {
     const component = mount(<HealthCheckTest />);
 
-    component.find('CheckResult').at(1).invoke('handleErrors')('setup',['Test error']); // invoke is wrapped with act to await for setState
+    component.find('CheckResult').at(1).invoke('handleErrors')('setup', ['Test error']); // invoke is wrapped with act to await for setState
 
     const callOutError = component.find('EuiCallOut');
     expect(callOutError.text()).toBe('[API version] Test error');

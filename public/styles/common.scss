@@ -165,7 +165,7 @@
   background-color: rgba(0, 0, 0, 0.1);
 }
 
-/* Special fix to make Kibana search bar similar to the rest from the app */
+/* Special fix to make plugin platform search bar similar to the rest from the app */
 
 .kuiLocalSearchInput,
 .kuiLocalSearchInput:focus {
@@ -416,7 +416,7 @@ input[type="search"].euiFieldSearch{
   background: transparent !important;
 }
 
-/* Custom Kibana styles */
+/* Custom plugin plaform styles */
 
 md-content.md-default-theme, md-content{
   background: transparent!important;
@@ -596,34 +596,6 @@ md-switch.md-checked .md-thumb {
   border-radius: 0;
   box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1) !important;
   border: 1px solid #d3dae6;
-}
-
-/* Class for responsive images */
-.wz-responsive-img {
-  width: 100%;
-  height: auto;
-}
-
-.wz-logo-container {
-  height: 50px;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position-y: center;
-}
-
-@media (min-width: 1200px) {
-  .wz-logo {
-    background-image: url('../assets/new_logo_white.svg');
-    width: 150px;
-    max-width: 150px;
-  }
-}
-@media (max-width: 1199px) {
-  .wz-logo {
-    min-width: 28px !important;
-    margin-right: 15px !important;
-    background-image: url('../assets/new_logo_white_wolf.svg');
-  }
 }
 
 /* Unclassified but important Wazuh app component styles */
@@ -806,6 +778,13 @@ md-switch.md-checked .md-thumb {
   color: #0f9d58;
   padding-top: 12px;
   display: block;
+}
+
+.wz-ellipsis{
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 /*
@@ -1077,15 +1056,19 @@ wz-xml-file-editor {
 }
 
 .health-check-logo{
-  width: 80px;
-  height: 80px;
-  margin-bottom: 20px;
+  width: 140px;
   z-index: 1;
-  margin-left: -100px;
+  margin: 0 auto;
 }
 
-.health-check .euiDescriptionList__description{
-  text-align: left!important;
+.health-check {
+  .euiDescriptionList__title{
+    width: 60%!important;
+  }
+  .euiDescriptionList__description{
+    text-align: left!important;
+    width: 40%!important;
+  }
 }
 
 .CodeMirror-gutters {
@@ -1158,6 +1141,10 @@ wz-xml-file-editor {
 
 .wz-margin--10 {
   margin-left: -10px;
+}
+
+.wz-margin-0 {
+  margin: 0px;
 }
 
 .header-global-wrapper + .app-wrapper:not(.hidden-chrome) {
@@ -1498,7 +1485,7 @@ div.euiPopover__panel.euiPopover__panel-isOpen.euiPopover__panel--bottom.wz-menu
   max-width: 60vw;
 }
 
-.wz-markdown-wapper code {
+.wz-markdown-wrapper code {
   color: #1c2226;
   background-color: #e6e6e6;
   border-radius: 3px;
@@ -1710,11 +1697,8 @@ iframe.width-changed {
 }
 
 .withUserLogged-logo{
-  width: 40px;
-  height: 40px;
+  width: 140px;
   margin: 0 auto;
-
-  filter: brightness(0) saturate(100%) invert(24%) sepia(97%) saturate(1757%) hue-rotate(186deg) brightness(94%) contrast(101%);
 }
 
 .withUserLogged-loader{
@@ -1728,4 +1712,20 @@ iframe.width-changed {
 
 .wz-width-100{
   width: 100%;
+}
+
+/* Custom Searchbar styles */
+
+.application .filters-search-bar .globalQueryBar, .app-container .filters-search-bar .globalQueryBar{
+  padding: 0 !important;
+}
+
+@media only screen and (max-width: 960px){
+  .custom-kbn-search-bar .euiSuperUpdateButton .euiSuperUpdateButton__text {
+    display: none;
+  }
+
+  .custom-kbn-search-bar .euiSuperUpdateButton {
+    min-width: 0;
+  }
 }

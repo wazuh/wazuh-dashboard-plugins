@@ -10,7 +10,6 @@ import {
   EuiEmptyPrompt,
 } from '@elastic/eui';
 import { UsersTable } from './components/users-table';
-
 import { CreateUser } from './components/create-user';
 import { EditUser } from './components/edit-user';
 import UsersServices from './services';
@@ -18,6 +17,9 @@ import RolesServices from '../roles/services';
 import { User } from './types/user.type';
 import { useApiService } from '../../common/hooks/useApiService';
 import { Role } from '../roles/types/role.type';
+import { UI_LOGGER_LEVELS } from '../../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../../react-services/common-services';
 
 export const Users = () => {
   const [isEditFlyoutVisible, setIsEditFlyoutVisible] = useState(false);
@@ -29,12 +31,25 @@ export const Users = () => {
   const [rolesObject, setRolesObject] = useState({});
 
   const getUsers = async () => {
-    const _users = await UsersServices.GetUsers().catch(error => {
+    try {
+      const _users = await UsersServices.GetUsers();
+      setUsers(_users as User[]);
+    } catch (error) {
       setUsers([]);
       setSecurityError(true);
-    });
-
-    setUsers(_users as User[]);
+      const options = {
+        context: `${Users.name}.getUsers`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        store: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+    }
   };
 
   useEffect(() => {
@@ -76,31 +91,17 @@ export const Users = () => {
   }
   if (isEditFlyoutVisible) {
     editFlyout = (
-      <EuiOverlayMask
-        headerZindexLocation="below"
-        onClick={() => {
-          setIsEditFlyoutVisible(false);
-        }}
-      >
         <EditUser
           currentUser={editingUser}
           closeFlyout={closeEditFlyout}
           rolesObject={rolesObject}
         />
-      </EuiOverlayMask>
     );
   }
 
   if (isCreateFlyoutVisible) {
     createFlyout = (
-      <EuiOverlayMask
-        headerZindexLocation="below"
-        onClick={() => {
-          setIsCreateFlyoutVisible(false);
-        }}
-      >
         <CreateUser closeFlyout={closeCreateFlyout} />
-      </EuiOverlayMask>
     );
   }
 

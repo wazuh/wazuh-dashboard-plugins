@@ -26,7 +26,7 @@ import 'angular-chart.js';
 // pin-wz-menu.js
 import { changeWazuhNavLogo } from './utils/wz-logo-menu';
 
-// Font Awesome, Kibana UI framework and others
+// Font Awesome, plugin platform UI framework and others
 import './utils/fontawesome/scss/font-awesome.scss';
 
 // Dev tools
@@ -108,7 +108,7 @@ app.run(function ($rootElement) {
       <react-component name="ToastNotificationsModal" props=""></react-component>
     </div>`);
 
-  // Add plugin help links as extension to Kibana help menu
+  // Add plugin help links as extension to plugin platform help menu
   addHelpMenuToAppChrome();
 
   
@@ -117,7 +117,7 @@ app.run(function ($rootElement) {
   // Bind deleteExistentToken on Log out component.
   $('.euiHeaderSectionItem__button, .euiHeaderSectionItemButton').on('mouseleave', function () {
     // opendistro
-    $('span:contains(Log out)').on('click', function () {
+    $('button:contains(Log out)').on('click', function () {
       WzAuthentication.deleteExistentToken();
     });
     // x-pack

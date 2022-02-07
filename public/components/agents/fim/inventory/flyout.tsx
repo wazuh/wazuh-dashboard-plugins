@@ -22,6 +22,15 @@ import {
 import { WzRequest } from '../../../../react-services/wz-request';
 import { FileDetails } from './fileDetail';
 import { AppState } from '../../../../react-services/app-state';
+import {
+  UI_ERROR_SEVERITIES,
+  UIErrorLog,
+  UIErrorSeverity,
+  UILogLevel,
+} from '../../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
+import { getErrorOrchestrator } from '../../../../react-services/common-services';
+import { WzFlyout } from '../../../common/flyouts';
 
 export class FlyoutDetail extends Component {
   state: {
@@ -72,7 +81,7 @@ export class FlyoutDetail extends Component {
         }
       } else if (this.props.item) {
         currentFile = this.props.item;
-      } else {          
+      } else {
         let file = this.props.fileName;
         const data = await WzRequest.apiReq('GET', `/syscheck/${this.props.agentId}`, {
           params: {
@@ -85,11 +94,24 @@ export class FlyoutDetail extends Component {
         throw false;
       }
       this.setState({ currentFile, type: currentFile.type, isLoading: false });
-    } catch (err) {
+    } catch (error) {
       this.setState({
         error: `Data could not be fetched for ${this.props.fileName}`,
         currentFile: { file: this.props.fileName },
       });
+
+      const options: UIErrorLog = {
+        context: `${FlyoutDetail.name}.componentDidMount`,
+        level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+        severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
+        store: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   }
 
@@ -100,12 +122,14 @@ export class FlyoutDetail extends Component {
   render() {
     const { type } = this.state;
     return (
-      <EuiFlyout
+      <WzFlyout
         onClose={() => this.props.closeFlyout()}
-        size="l"
-        aria-labelledby={this.state.currentFile.file}
-        maxWidth="70%"
-        className="wz-inventory wzApp"
+        flyoutProps={{
+          size: 'l',
+          'aria-labelledby': this.state.currentFile.file,
+          maxWidth: '70%',
+          className: 'wz-inventory wzApp',
+        }}
       >
         <EuiFlyoutHeader hasBorder className="flyout-header">
           <EuiTitle size="s">
@@ -134,7 +158,7 @@ export class FlyoutDetail extends Component {
             />
           </EuiFlyoutBody>
         )}
-      </EuiFlyout>
+      </WzFlyout>
     );
   }
 }

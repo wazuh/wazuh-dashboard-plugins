@@ -22,6 +22,14 @@ import store from '../../redux/store';
 import { WzRequest } from '../../react-services/wz-request';
 import { ErrorHandler } from '../../react-services/error-handler';
 import { getUiSettings } from '../../kibana-services';
+import { UI_LOGGER_LEVELS } from '../../../common/constants';
+import {
+  UI_ERROR_SEVERITIES,
+  UIErrorLog,
+  UIErrorSeverity,
+  UILogLevel,
+} from '../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../react-services/common-services';
 
 export class DevToolsController {
   /**
@@ -231,6 +239,17 @@ export class DevToolsController {
       starts = [];
       return tmpgroups;
     } catch (error) {
+      const options: UIErrorLog = {
+        context: `${DevToolsController.name}.analyzeGroups`,
+        level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+        severity: UI_ERROR_SEVERITIES.UI as UIErrorSeverity,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
       return [];
     }
   }
@@ -330,6 +349,18 @@ export class DevToolsController {
       this.apiInputBox.model = !response.error ? response.data : [];
     } catch (error) {
       this.apiInputBox.model = [];
+
+      const options: UIErrorLog = {
+        context: `${DevToolsController.name}.getAvailableMethods`,
+        level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+        severity: UI_ERROR_SEVERITIES.UI as UIErrorSeverity,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   }
 
@@ -519,7 +550,18 @@ export class DevToolsController {
               inputBodyPreviousKeys = Object.keys((requestBodyCursorKeys || []).reduce((acumm, key) => acumm[key], JSON.parse(bodySanitizedBodyParam)));
             } catch (error) {
               inputBodyPreviousKeys = [];
-            };
+              const options: UIErrorLog = {
+                context: `${DevToolsController.name}.getDictionary`,
+                level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+                severity: UI_ERROR_SEVERITIES.UI as UIErrorSeverity,
+                error: {
+                  error: error,
+                  message: error.message || error,
+                  title: error.name,
+                },
+              };
+              getErrorOrchestrator().handleError(options);
+            }
 
             hints = paramsBody
               .filter(bodyParam => !inputBodyPreviousKeys.includes(bodyParam.name) && bodyParam.name && (inputKeyBodyParam ? bodyParam.name.includes(inputKeyBodyParam) : true))
@@ -621,10 +663,18 @@ export class DevToolsController {
         );
 
       // Place play button at first line from the selected group
-      const cords = this.apiInputBox.cursorCoords({
-        line: desiredGroup[0].start,
-        ch: 0
-      });
+      let cords;
+      try {
+        cords = this.apiInputBox.cursorCoords({
+          line: desiredGroup[0].start,
+          ch: 0
+        });
+      } catch {
+        $('#play_button').hide();
+        $('#wazuh_dev_tools_documentation').hide();
+        return null;
+      }
+
       if (!$('#play_button').is(':visible')) $('#play_button').show();
       if (!$('#wazuh_dev_tools_documentation').is(':visible')) $('#wazuh_dev_tools_documentation').show();
       const currentPlayButton = $('#play_button').offset();
@@ -657,6 +707,18 @@ export class DevToolsController {
     } catch (error) {
       $('#play_button').hide();
       $('#wazuh_dev_tools_documentation').hide();
+      const options: UIErrorLog = {
+        context: `${DevToolsController.name}.calculateWhichGroup`,
+        level: UI_LOGGER_LEVELS.WARNING as UILogLevel,
+        severity: UI_ERROR_SEVERITIES.UI as UIErrorSeverity,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+
       return null;
     }
   }
@@ -743,6 +805,7 @@ export class DevToolsController {
         if (typeof JSONraw === 'object') JSONraw.devTools = true;
         if (!firstTime) {
           const output = await this.wzRequest.apiReq(method, path, JSONraw);
+
           if (typeof output === 'string' && output.includes('3029')) {
             this.apiOutputBox.setValue('This method is not allowed without admin mode');
           }
@@ -759,6 +822,19 @@ export class DevToolsController {
 
       (firstTime || !desiredGroup) && this.apiOutputBox.setValue('Welcome!');
     } catch (error) {
+      //TODO: for the moment we will only add the new orchestrator to leave a message of this error in UI, but we have to deprecate the old ErrorHandler :)
+      const options: UIErrorLog = {
+        context: `${DevToolsController.name}.send`,
+        level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+        severity: UI_ERROR_SEVERITIES.UI as UIErrorSeverity,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+
       if ((error || {}).status === -1) {
         return this.apiOutputBox.setValue(
           'Wazuh API is not reachable. Reason: timeout.'
@@ -784,7 +860,17 @@ export class DevToolsController {
       });
       FileSaver.saveAs(blob, 'export.json');
     } catch (error) {
-      ErrorHandler.handle(error, 'Export JSON');
+      const options: UIErrorLog = {
+        context: `${DevToolsController.name}.exportOutput`,
+        level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+        severity: UI_ERROR_SEVERITIES.UI as UIErrorSeverity,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `${error.name}: Export JSON`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   }
 }

@@ -10,20 +10,8 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component } from 'react';
-import WzReduxProvider from '../../../redux/wz-redux-provider';
-import WzCurrentOverviewSection from './overview-current-section'
+import { compose } from 'redux';
+import { withErrorBoundary, withReduxProvider } from '../hocs';
+import WzCurrentOverviewSection from './overview-current-section';
 
-export class WzCurrentOverviewSectionWrapper extends Component {
- constructor(props) {
-   super(props);
- }
-
- render() {
-   return (
-     <WzReduxProvider>
-       <WzCurrentOverviewSection {...this.props}/>
-     </WzReduxProvider>
-   );
- }
-}
+export const WzCurrentOverviewSectionWrapper = compose (withErrorBoundary, withReduxProvider) (WzCurrentOverviewSection);

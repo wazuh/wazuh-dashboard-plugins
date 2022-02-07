@@ -32,9 +32,9 @@ import { getIndexPattern } from '../../../overview/mitre/lib';
 import moment from 'moment-timezone';
 import { AppNavigate } from '../../../../react-services/app-navigate';
 import { TruncateHorizontalComponents } from '../../../common/util';
-import { getDataPlugin,getUiSettings } from '../../../../kibana-services';
+import { getDataPlugin, getUiSettings } from '../../../../kibana-services';
 import { FilterManager } from '../../../../../../../src/plugins/data/public/';
-
+import { formatUIDate } from '../../../../react-services/time-service';
 export class Details extends Component {
   props!: {
     currentItem: {
@@ -93,25 +93,39 @@ export class Details extends Component {
         field: 'name',
         name: 'Name',
         icon: 'dot',
-        link: false,
+        link: true,
       },
       {
         field: 'cve',
         name: 'CVE',
         icon: 'securitySignal',
-        link: false,
+        link: true,
       },
       {
         field: 'version',
         name: 'Version',
         icon: 'package',
-        link: false,
+        link: true,
       },
       {
         field: 'architecture',
         name: 'Architecture',
         icon: 'node',
+        link: true,
+      },
+      {
+        field: 'last_full_scan',
+        name: 'Last Full Scan',
+        icon: 'clock',
         link: false,
+        transformValue: formatUIDate
+      },
+      {
+        field: 'last_partial_scan',
+        name: 'Last Partial Scan',
+        icon: 'clock',
+        link: false,
+        transformValue: formatUIDate
       }
     ];
   }
@@ -138,7 +152,11 @@ export class Details extends Component {
     const { cve } = this.props.currentItem;
     const filters = [
       {
-        ...buildPhraseFilter({ name: 'data.vulnerability.cve', type: 'text' }, cve, this.indexPattern),
+        ...buildPhraseFilter(
+          { name: 'data.vulnerability.cve', type: 'text' },
+          cve,
+          this.indexPattern
+        ),
         $state: { store: 'appState' },
       },
     ];
@@ -151,7 +169,6 @@ export class Details extends Component {
     const { filterManager } = getDataPlugin().query;
     const _filters = filterManager.getFilters();
     if (_filters && _filters.length) {
-     
       filterManager.addFilters([filters]);
       const scope = await ModulesHelper.getDiscoverScope();
       scope.updateQueryAndFetch && scope.updateQueryAndFetch({ query: null });
@@ -188,10 +205,11 @@ export class Details extends Component {
       }
       var link = (item.link && !['events', 'extern'].includes(view)) || false;
       const agentPlatform = ((this.props.agent || {}).os || {}).platform;
-      
+
       if (!item.onlyLinux || (item.onlyLinux && this.props.agent && agentPlatform !== 'windows')) {
         let className = item.checksum ? 'detail-value detail-value-checksum' : 'detail-value';
         className += item.field === 'perm' ? ' detail-value-perm' : '';
+        className += ' wz-width-100';
         return (
           <EuiFlexItem key={idx}>
             <EuiStat
@@ -202,14 +220,14 @@ export class Details extends Component {
                   <span
                     className={className}
                     onMouseEnter={() => {
-                      this.setState({ hoverAddFilter: item });
+                      this.setState({ hoverAddFilter: item.field });
                     }}
                     onMouseLeave={() => {
                       this.setState({ hoverAddFilter: '' });
                     }}
                   >
                     {value}
-                    {_.isEqual(this.state.hoverAddFilter, item) && (
+                    {this.state.hoverAddFilter === item.field && (
                       <EuiToolTip
                         position="top"
                         anchorClassName="detail-tooltip"
@@ -303,7 +321,6 @@ export class Details extends Component {
     return value;
   }
 
-
   render() {
     const { type, implicitFilters, view, currentItem, agent } = this.props;
     const id = `${currentItem.name}-${currentItem.cve}-${currentItem.architecture}-${currentItem.version}`;
@@ -359,11 +376,20 @@ export class Details extends Component {
                 kbnSearchBar
                 shareFilterManager={this.discoverFilterManager}
                 initialColumns={[
-                  'icon',
-                  'timestamp',
-                  'rule.description',
-                  'rule.level',
-                  'rule.id',
+                  { field: 'icon' },
+                  { field: 'timestamp' },
+                  { field: 'agent.id', label: 'Agent' },
+                  { field: 'agent.name', label: 'Agent name' },
+                  { field: 'rule.description', label: 'Description' },
+                  { field: 'rule.level', label: 'Level' },
+                  { field: 'rule.id', label: 'Rule ID' },
+                ]}
+                initialAgentColumns={[
+                  { field: 'icon' },
+                  { field: 'timestamp' },
+                  { field: 'rule.description', label: 'Description' },
+                  { field: 'rule.level', label: 'Level' },
+                  { field: 'rule.id', label: 'Rule ID' },
                 ]}
                 includeFilters="vulnerability"
                 implicitFilters={implicitFilters}

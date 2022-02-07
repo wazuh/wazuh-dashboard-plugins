@@ -11,7 +11,6 @@
  */
 import { AppState } from '../react-services/app-state';
 import { GenericRequest } from '../react-services/generic-request';
-import { ErrorHandler } from '../react-services/error-handler';
 import { ShareAgent } from '../factories/share-agent';
 import { ModulesHelper } from '../components/common/modules/modules-helper';
 import rison from 'rison-node';
@@ -32,7 +31,7 @@ export class CommonData {
     this.errorHandler = errorHandler;
     this.$location = $location;
     this.shareAgent = new ShareAgent();
-//    this.globalState = globalState;
+    //    this.globalState = globalState;
     this.savedTimefilter = null;
     this.$window = $window;
     this.$route = $route;
@@ -41,14 +40,14 @@ export class CommonData {
       hostMonitoringTabs: ['general', 'fim', 'aws', 'gcp'],
       systemAuditTabs: ['pm', 'audit', 'oscap', 'ciscat'],
       securityTabs: ['vuls', 'virustotal', 'osquery', 'docker', 'mitre'],
-      complianceTabs: ['pci', 'gdpr', 'hipaa', 'nist', 'tsc']
+      complianceTabs: ['pci', 'gdpr', 'hipaa', 'nist', 'tsc'],
     };
 
     this.agentTabs = {
       hostMonitoringTabs: ['general', 'fim', 'syscollector'],
       systemAuditTabs: ['pm', 'audit', 'oscap', 'ciscat', 'sca'],
       securityTabs: ['vuls', 'virustotal', 'osquery', 'docker', 'mitre'],
-      complianceTabs: ['pci', 'gdpr', 'hipaa', 'nist', 'tsc']
+      complianceTabs: ['pci', 'gdpr', 'hipaa', 'nist', 'tsc'],
     };
   }
 
@@ -78,7 +77,7 @@ export class CommonData {
    */
   removeDuplicateRuleGroups(group) {
     if (!this.globalState || !this.globalState.filters) return;
-    const globalRuleGroupFilters = this.globalState.filters.map(item => {
+    const globalRuleGroupFilters = this.globalState.filters.map((item) => {
       if (
         item.query &&
         item.query.match &&
@@ -102,7 +101,7 @@ export class CommonData {
    */
   removeDuplicateExists(condition) {
     if (!this.globalState || !this.globalState.filters) return;
-    const globalRuleExistsFilters = this.globalState.filters.map(item => {
+    const globalRuleExistsFilters = this.globalState.filters.map((item) => {
       if (item.exists && item.exists.field) {
         return item.exists.field;
       }
@@ -111,10 +110,7 @@ export class CommonData {
     });
 
     if (globalRuleExistsFilters.includes(condition)) {
-      this.globalState.filters.splice(
-        globalRuleExistsFilters.indexOf(condition),
-        1
-      );
+      this.globalState.filters.splice(globalRuleExistsFilters.indexOf(condition), 1);
     }
   }
 
@@ -143,23 +139,22 @@ export class CommonData {
         tsc: { group: 'tsc' },
         aws: { group: 'amazon' },
         gcp: { group: 'gcp' },
+        office: { group: 'office365' },
         virustotal: { group: 'virustotal' },
         osquery: { group: 'osquery' },
         sca: { group: 'sca' },
-        docker: { group: 'docker' }
+        docker: { group: 'docker' },
+        github: { group: 'github' }
       };
 
       const filters = [];
       const isCluster = AppState.getClusterInfo().status == 'enabled';
       filters.push(
         filterHandler.managerQuery(
-          isCluster
-            ? AppState.getClusterInfo().cluster
-            : AppState.getClusterInfo().manager,
+          isCluster ? AppState.getClusterInfo().cluster : AppState.getClusterInfo().manager,
           isCluster
         )
       );
-
       if (tab !== 'general' && tab !== 'welcome') {
         if (tab === 'pci') {
           this.removeDuplicateExists('rule.pci_dss');
@@ -200,31 +195,27 @@ export class CommonData {
       const discoverScope = await ModulesHelper.getDiscoverScope();
       discoverScope.loadFilters(filters, tab);
     } catch (error) {
-      ErrorHandler.handle(
-        'An error occurred while creating custom filters for visualizations',
-        agent ? 'Agents' : 'Overview',
-        { warning: true }
-      );
+      throw new Error('An error occurred while creating custom filters for visualizations');
     }
   }
 
   removeParam(key, sourceURL) {
-    var rtn = sourceURL.split("?")[0],
-        param,
-        params_arr = [],
-        queryString = (sourceURL.indexOf("?") !== -1) ? sourceURL.split("?")[1] : "";
-    if (queryString !== "") {
-        params_arr = queryString.split("&");
-        for (var i = params_arr.length - 1; i >= 0; i -= 1) {
-            param = params_arr[i].split("=")[0];
-            if (param === key) {
-                params_arr.splice(i, 1);
-            }
+    var rtn = sourceURL.split('?')[0],
+      param,
+      params_arr = [],
+      queryString = sourceURL.indexOf('?') !== -1 ? sourceURL.split('?')[1] : '';
+    if (queryString !== '') {
+      params_arr = queryString.split('&');
+      for (var i = params_arr.length - 1; i >= 0; i -= 1) {
+        param = params_arr[i].split('=')[0];
+        if (param === key) {
+          params_arr.splice(i, 1);
         }
-        rtn = rtn + "?" + params_arr.join("&");
+      }
+      rtn = rtn + '?' + params_arr.join('&');
     }
     return rtn;
-}
+  }
   /**
     Find the `_w` parameter in the url and return a list of filters if it exists
    */
@@ -232,7 +223,7 @@ export class CommonData {
     const { _w } = this.$route.current.params;
     if (!_w) return [];
     const { filters } = rison.decode(_w);
-    window.location.href = this.removeParam('_w', window.location.href)
+    window.location.href = this.removeParam('_w', window.location.href);
     return filters || [];
   }
 
@@ -340,12 +331,11 @@ export class CommonData {
       duration: '-',
       inProgress: false,
       end: data.end || false,
-      start: data.start || false
+      start: data.start || false,
     };
 
     if (result.end && result.start) {
-      result.duration =
-        (new Date(result.end) - new Date(result.start)) / 1000 / 60;
+      result.duration = (new Date(result.end) - new Date(result.start)) / 1000 / 60;
       result.duration = Math.round(result.duration * 100) / 100;
       if (result.duration <= 0) {
         result.inProgress = true;
@@ -428,24 +418,24 @@ export class CommonData {
     return target.hostMonitoringTabs.includes(tab)
       ? target.hostMonitoringTabs
       : target.systemAuditTabs.includes(tab)
-        ? target.systemAuditTabs
-        : target.securityTabs.includes(tab)
-          ? target.securityTabs
-          : target.complianceTabs.includes(tab)
-            ? target.complianceTabs
-            : false;
+      ? target.systemAuditTabs
+      : target.securityTabs.includes(tab)
+      ? target.securityTabs
+      : target.complianceTabs.includes(tab)
+      ? target.complianceTabs
+      : false;
   }
 
   getTabsFromCurrentPanel(currentPanel, extensions, tabNames) {
-    const keyExists = key => Object.keys(extensions).includes(key);
-    const keyIsTrue = key => (extensions || [])[key];
+    const keyExists = (key) => Object.keys(extensions).includes(key);
+    const keyIsTrue = (key) => (extensions || [])[key];
 
     let tabs = [];
-    currentPanel.forEach(x => {
+    currentPanel.forEach((x) => {
       if (!keyExists(x) || keyIsTrue(x)) {
         tabs.push({
           id: x,
-          name: tabNames[x]
+          name: tabNames[x],
         });
       }
     });

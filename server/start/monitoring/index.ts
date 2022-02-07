@@ -27,6 +27,7 @@ import {
   WAZUH_MONITORING_DEFAULT_FREQUENCY,
 } from '../../../common/constants';
 import { tryCatchForIndexPermissionError } from '../tryCatchForIndexPermissionError';
+import { delayAsPromise } from '../../../common/utils';
 
 const blueWazuh = '\u001b[34mwazuh\u001b[39m';
 const monitoringErrorLogColors = [blueWazuh, 'monitoring', 'error'];
@@ -35,17 +36,6 @@ const wazuhHostController = new WazuhHostsCtrl();
 let MONITORING_ENABLED, MONITORING_FREQUENCY, MONITORING_CRON_FREQ, MONITORING_CREATION, MONITORING_INDEX_PATTERN, MONITORING_INDEX_PREFIX;
 
 // Utils functions
-
-/**
- * Delay as promise
- * @param timeMs
- */
-function delay(timeMs: number) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, timeMs);
-  });
-}
-
 /**
  * Get the setting value from the configuration
  * @param setting
@@ -297,10 +287,10 @@ async function createIndex(context, indexName: string) {
 /**
 * Wait until Kibana server is ready
 */
-async function checkKibanaStatus(context) {
+async function checkPluginPlatformStatus(context) {
  try {
     log(
-      'monitoring:checkKibanaStatus',
+      'monitoring:checkPluginPlatformStatus',
       'Waiting for Kibana and Elasticsearch servers to be ready...',
       'debug'
     );
@@ -310,12 +300,12 @@ async function checkKibanaStatus(context) {
    return;
  } catch (error) {
     log(
-      'monitoring:checkKibanaStatus',
+      'monitoring:checkPluginPlatformStatus',
       error.mesage ||error
     );
     try{
-      await delay(3000);
-      await checkKibanaStatus(context);
+      await delayAsPromise(3000);
+      await checkPluginPlatformStatus(context);
     }catch(error){};
  }
 }
@@ -410,7 +400,7 @@ async function cronTask(context) {
     //     ((error || {}).status === 404 &&
     //       (error || {}).displayName === 'NotFound')
     //   ) {
-    //     await delay(1000);
+    //     await delayAsPromise(1000);
     //     return cronTask(context);
     //   }
     // } catch (error) {} //eslint-disable-line
@@ -473,6 +463,20 @@ async function fetchAllAgentsFromApiHost(context, apiHost){
 
     while (agents.length < agentsCount && payload.offset < agentsCount) {
       try{
+        /* 
+        TODO: Improve the performance of request with:
+          - Reduce the number of requests to the Wazuh API
+          - Reduce (if possible) the quantity of data to index by document
+
+        Requirements:
+          - Research about the neccesary data to index.
+
+        How to do:
+          - Wazuh API request:
+            - select the required data to retrieve depending on is required to index (using the `select` query param)
+            - increase the limit of results to retrieve (currently, the requests use the recommended value: 500).
+              See the allowed values. This depends on the selected data because the response could fail if contains a lot of data
+        */
         const responseAgents = await context.wazuh.api.client.asInternalUser.request(
           'GET',
           `/agents`,
@@ -499,7 +503,7 @@ export async function jobMonitoringRun(context) {
   // Init the monitoring variables
   initMonitoringConfiguration(context);
   // Check Kibana index and if it is prepared, start the initialization of Wazuh App.
-  await checkKibanaStatus(context);
+  await checkPluginPlatformStatus(context);
   // // Run the cron job only it it's enabled
   if (MONITORING_ENABLED) {
     cronTask(context);

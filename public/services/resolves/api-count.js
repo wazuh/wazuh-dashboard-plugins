@@ -23,10 +23,10 @@ import { GenericRequest } from '../../react-services/generic-request';
 
 export function apiCount($q, $location) {
   const deferred = $q.defer();
+
   GenericRequest.request('GET', '/hosts/apis')
-    .then(async data => {
-      if (!data || !data.data || !data.data.length)
-        throw new Error('No API entries found');
+    .then(async (data) => {
+      if (!data || !data.data || !data.data.length) throw new Error('No API entries found');
       if (!AppState.getCurrentAPI()) {
         await tryToSetDefault(data.data, AppState);
       }
@@ -50,7 +50,7 @@ function tryToSetDefault(apis, AppState) {
         AppState.setCurrentAPI(
           JSON.stringify({
             name: api.cluster_info.manager,
-            id: api.id
+            id: api.id,
           })
         );
         break;

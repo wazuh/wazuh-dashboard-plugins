@@ -1,5 +1,5 @@
 /*
- * Wazuh app - React hook for get Kibana filter manager
+ * Wazuh app - React hook for get plugin platform filter manager
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -10,10 +10,24 @@
  * Find more information about this on the LICENSE file.
  */
 import { getDataPlugin } from '../../../kibana-services';
-import { useState, useEffect} from 'react';
-
+import { useState, useEffect, useMemo } from 'react';
+import { Filter } from 'src/plugins/data/public';
+import _ from 'lodash';
 
 export const useFilterManager = () => {
-    const [filterManager, setFilterManager] = useState(getDataPlugin().query.filterManager);
-    return filterManager;
-}
+  const filterManager = useMemo(() => getDataPlugin().query.filterManager, []);
+  const [filters, setFilters] = useState<Filter[]>(filterManager.getFilters());
+
+  useEffect(() => {
+    const subscription = filterManager.getUpdates$().subscribe(() => {
+      const newFilters = filterManager.getFilters();
+      if (!_.isEqual(filters, newFilters)) {
+        setFilters(newFilters);
+      }
+    });
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+  return { filterManager, filters };
+};

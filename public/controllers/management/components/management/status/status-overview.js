@@ -20,7 +20,7 @@ import {
   EuiPage,
   EuiSpacer,
   EuiFlexGrid,
-  EuiButton
+  EuiButton,
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
@@ -33,7 +33,7 @@ import {
   updateNodeInfo,
   updateAgentInfo,
   updateClusterEnabled,
-  cleanInfo
+  cleanInfo,
 } from '../../../../../redux/actions/statusActions';
 import StatusHandler from './utils/status-handler';
 
@@ -44,11 +44,17 @@ import WzStatusStats from './status-stats';
 import WzStatusNodeInfo from './status-node-info';
 import WzStatusAgentInfo from './status-agent-info';
 
-import { getToasts }  from '../../../../../kibana-services';
+import { getToasts } from '../../../../../kibana-services';
 
-import { withUserAuthorizationPrompt, withGlobalBreadcrumb } from '../../../../../components/common/hocs';
+import {
+  withUserAuthorizationPrompt,
+  withGlobalBreadcrumb,
+} from '../../../../../components/common/hocs';
 import { compose } from 'redux';
-import { ToastNotifications } from '../../../../../react-services/toast-notifications';
+
+import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
+import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 
 export class WzStatusOverview extends Component {
   _isMounted = false;
@@ -58,7 +64,7 @@ export class WzStatusOverview extends Component {
     this.statusHandler = StatusHandler;
 
     this.state = {
-      isLoading: false
+      isLoading: false,
     };
   }
 
@@ -67,7 +73,7 @@ export class WzStatusOverview extends Component {
     this.fetchData();
   }
 
-  componentDidUpdate() { }
+  componentDidUpdate() {}
 
   componentWillUnmount() {
     this._isMounted = false;
@@ -98,9 +104,7 @@ export class WzStatusOverview extends Component {
       data.push(manInfo);
       data.push(agentsCountResponse);
 
-      const parsedData = data.map(
-        item => ((item || {}).data || {}).data || false
-      );
+      const parsedData = data.map((item) => ((item || {}).data || {}).data || false);
       const [stats, clusterStatus, managerInfo, agentsCount] = parsedData;
 
       // Once Wazuh core fixes agent 000 issues, this should be adjusted
@@ -113,22 +117,18 @@ export class WzStatusOverview extends Component {
         agentsCountDisconnected: stats.disconnected,
         agentsCountNeverConnected: stats.never_connected,
         agentsCountTotal: total,
-        agentsCoverity: total ? (active / total) * 100 : 0
+        agentsCoverity: total ? (active / total) * 100 : 0,
       });
 
-      this.props.updateClusterEnabled(
-        clusterStatus && clusterStatus.enabled === 'yes'
-      );
+      this.props.updateClusterEnabled(clusterStatus && clusterStatus.enabled === 'yes');
 
-      if (
-        clusterStatus &&
-        clusterStatus.enabled === 'yes' &&
-        clusterStatus.running === 'yes'
-      ) {
+      if (clusterStatus && clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes') {
         const nodes = await this.statusHandler.clusterNodes();
         const listNodes = nodes.data.data.affected_items;
         this.props.updateListNodes(listNodes);
-        const masterNode = nodes.data.data.affected_items.filter(item => item.type === 'master')[0];
+        const masterNode = nodes.data.data.affected_items.filter(
+          (item) => item.type === 'master'
+        )[0];
         this.props.updateSelectedNode(masterNode.name);
         const daemons = await this.statusHandler.clusterNodeStatus(masterNode.name);
         const listDaemons = this.objToArr(daemons.data.data.affected_items[0]);
@@ -136,11 +136,7 @@ export class WzStatusOverview extends Component {
         const nodeInfo = await this.statusHandler.clusterNodeInfo(masterNode.name);
         this.props.updateNodeInfo(nodeInfo.data.data.affected_items[0]);
       } else {
-        if (
-          clusterStatus &&
-          clusterStatus.enabled === 'yes' &&
-          clusterStatus.running === 'no'
-        ) {
+        if (clusterStatus && clusterStatus.enabled === 'yes' && clusterStatus.running === 'no') {
           this.showToast(
             'danger',
             `Cluster is enabled but it's not running, please check your cluster health.`,
@@ -159,7 +155,17 @@ export class WzStatusOverview extends Component {
 
       this.props.updateAgentInfo(lastAgent);
     } catch (error) {
-      getToasts().error('management:status:overview.fetchData', error);
+      const options = {
+        context: `${WzStatusOverview.name}.fetchData`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `${error.name}: management:status:overview`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
     this.props.updateLoadingStatus(false);
   }
@@ -168,18 +174,12 @@ export class WzStatusOverview extends Component {
     getToasts().add({
       color: color,
       title: text,
-      toastLifeTimeMs: time
+      toastLifeTimeMs: time,
     });
   };
 
   render() {
-    const {
-      isLoading,
-      listDaemons,
-      stats,
-      nodeInfo,
-      agentInfo
-    } = this.props.state;
+    const { isLoading, listDaemons, stats, nodeInfo, agentInfo } = this.props.state;
 
     return (
       <EuiPage style={{ background: 'transparent' }}>
@@ -225,25 +225,23 @@ export class WzStatusOverview extends Component {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
-    state: state.statusReducers
+    state: state.statusReducers,
   };
 };
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch) => {
   return {
-    updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
-    updateListNodes: listNodes => dispatch(updateListNodes(listNodes)),
-    updateSelectedNode: selectedNode =>
-      dispatch(updateSelectedNode(selectedNode)),
-    updateListDaemons: listDaemons => dispatch(updateListDaemons(listDaemons)),
-    updateStats: stats => dispatch(updateStats(stats)),
-    updateNodeInfo: nodeInfo => dispatch(updateNodeInfo(nodeInfo)),
-    updateAgentInfo: agentInfo => dispatch(updateAgentInfo(agentInfo)),
-    updateClusterEnabled: clusterEnabled =>
-      dispatch(updateClusterEnabled(clusterEnabled)),
-    cleanInfo: () => dispatch(cleanInfo())
+    updateLoadingStatus: (status) => dispatch(updateLoadingStatus(status)),
+    updateListNodes: (listNodes) => dispatch(updateListNodes(listNodes)),
+    updateSelectedNode: (selectedNode) => dispatch(updateSelectedNode(selectedNode)),
+    updateListDaemons: (listDaemons) => dispatch(updateListDaemons(listDaemons)),
+    updateStats: (stats) => dispatch(updateStats(stats)),
+    updateNodeInfo: (nodeInfo) => dispatch(updateNodeInfo(nodeInfo)),
+    updateAgentInfo: (agentInfo) => dispatch(updateAgentInfo(agentInfo)),
+    updateClusterEnabled: (clusterEnabled) => dispatch(updateClusterEnabled(clusterEnabled)),
+    cleanInfo: () => dispatch(cleanInfo()),
   };
 };
 
@@ -251,18 +249,15 @@ export default compose(
   withGlobalBreadcrumb([
     { text: '' },
     { text: 'Management', href: '#/manager' },
-    { text: 'Status' }
+    { text: 'Status' },
   ]),
   withUserAuthorizationPrompt([
     [
       { action: 'agent:read', resource: 'agent:id:*' },
-      { action: 'agent:read', resource: 'agent:group:*' }
+      { action: 'agent:read', resource: 'agent:group:*' },
     ],
     { action: 'manager:read', resource: '*:*:*' },
-    { action: 'cluster:read', resource: 'node:id:*' }
+    { action: 'cluster:read', resource: 'node:id:*' },
   ]),
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  )
+  connect(mapStateToProps, mapDispatchToProps)
 )(WzStatusOverview);

@@ -23,12 +23,9 @@ import {
   EuiFlexGrid,
   EuiButtonEmpty,
   EuiTitle,
-  EuiHealth,
-  EuiHorizontalRule,
   EuiPage,
   EuiButton,
   EuiPopover,
-  EuiSelect,
   EuiLoadingChart,
   EuiToolTip,
   EuiButtonIcon,
@@ -54,8 +51,9 @@ import { updateCurrentAgentData } from '../../../redux/actions/appStateActions';
 import WzTextWithTooltipIfTruncated from '../wz-text-with-tooltip-if-truncated';
 import { getAngularModule } from '../../../kibana-services';
 import { hasAgentSupportModule } from '../../../react-services/wz-agents';
+import { withErrorBoundary } from '../hocs';
 
-export class AgentsWelcome extends Component {
+export const AgentsWelcome = withErrorBoundary (class AgentsWelcome extends Component {
   _isMount = false;
   constructor(props) {
     super(props);
@@ -130,15 +128,15 @@ export class AgentsWelcome extends Component {
       welcome: 8
     });
     const filterHandler = new FilterHandler(AppState.getCurrentPattern());
+    const $injector = getAngularModule().$injector;
+    this.router = $injector.get('$route');
+    window.addEventListener('resize', this.updateWidth); //eslint-disable-line
     await VisFactoryHandler.buildAgentsVisualizations(
       filterHandler,
       'welcome',
       null,
       this.props.agent.id
     );
-    const $injector = getAngularModule().$injector;
-    this.router = $injector.get('$route');
-    window.addEventListener('resize', this.updateWidth); //eslint-disable-line
   }
 
   updateMenuAgents() {
@@ -330,7 +328,6 @@ export class AgentsWelcome extends Component {
           </EuiFlexItem>
         </EuiFlexGroup>
     );
-
   }
 
   buildTabCard(tab, icon) {
@@ -614,4 +611,4 @@ export class AgentsWelcome extends Component {
       </div>
     );
   }
-}
+})

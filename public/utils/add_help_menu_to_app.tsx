@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Add the plugin help links as extension in Kibana help menu
+ * Wazuh app - Add the plugin help links as extension in plugin platform help menu
  * Copyright (C) 2015-2021 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -22,6 +22,7 @@ import {
   WAZUH_LINK_GOOGLE_GROUPS,
   WAZUH_LINK_SLACK
 } from '../../common/constants';
+import { getThemeAssetURL, getAssetURL } from './assets';
 
 const appVersionMajorDotMinor = version.split('.').slice(0, 2).join('.');
 
@@ -32,7 +33,7 @@ export function addHelpMenuToAppChrome(){
       {
         linkType: 'custom',
         href: `${WAZUH_LINK_DOCUMENTATION}/${appVersionMajorDotMinor}`,
-        content: <span><EuiIcon type={getHttp().basePath.prepend('/plugins/wazuh/assets/icon_blue.svg')}></EuiIcon> Documentation</span>
+        content: <span><EuiIcon type={getHttp().basePath.prepend(getThemeAssetURL('icon.svg'))}></EuiIcon> Documentation</span>
       },
       {
         linkType: 'custom',
@@ -47,7 +48,7 @@ export function addHelpMenuToAppChrome(){
       {
         linkType: 'custom',
         href: WAZUH_LINK_GOOGLE_GROUPS,
-        content: <span><EuiIcon type={getHttp().basePath.prepend('/plugins/wazuh/assets/icon_google_groups.svg')}></EuiIcon> Google Group</span>
+        content: <span><EuiIcon type={getHttp().basePath.prepend(getAssetURL('images/icons/icon_google_groups.svg'))}></EuiIcon> Google Group</span>
       }
     ]
   });

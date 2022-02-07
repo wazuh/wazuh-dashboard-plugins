@@ -180,7 +180,7 @@ class ManagementWelcome extends Component {
                       layout="horizontal"
                       className="homSynopsis__card"
                       icon={
-                        <EuiIcon size="xl" type="filebeatApp" color="primary" />
+                        <EuiIcon size="xl" type="filebeatApp" color="primary"/>
                       }
                       title="Logs"
                       onClick={() => this.switchSection('logs')}

@@ -28,6 +28,7 @@ import osquery from './agents-osquery';
 import docker from './agents-docker';
 import welcome from './agents-welcome';
 import aws from './agents-aws';
+import github from './agents-github';
 
 export {
   audit,
@@ -48,5 +49,6 @@ export {
   mitre,
   docker,
   welcome,
-  aws
+  aws,
+  github
 };

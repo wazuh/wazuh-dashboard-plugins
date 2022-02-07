@@ -11,6 +11,6 @@
  */
 export { WazuhElasticCtrl } from './wazuh-elastic';
 export { WazuhApiCtrl } from './wazuh-api';
-export { WazuhUtilsCtrl } from './wazuh-utils';
 export { WazuhReportingCtrl } from './wazuh-reporting';
-export { WazuhHostsCtrl } from './wazuh-hosts'
+export { WazuhHostsCtrl } from './wazuh-hosts';
+export * from './wazuh-utils';

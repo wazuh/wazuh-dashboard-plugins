@@ -1,21 +1,6 @@
-import React, { Component } from 'react';
+import { compose } from 'redux';
+import { withErrorBoundary, withReduxProvider } from '../../../../components/common/hocs';
 // Redux
-import store from '../../../../redux/store';
-import WzReduxProvider from '../../../../redux/wz-redux-provider';
 import WzManagementMain from '../management/management-main';
 
-export default class WzManagement extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {};
-    this.store = store;
-  }
-
-  render() {
-    return (
-      <WzReduxProvider>
-        <WzManagementMain {...this.props} />
-      </WzReduxProvider>
-    );
-  }
-}
+export default compose(withErrorBoundary, withReduxProvider)(WzManagementMain);

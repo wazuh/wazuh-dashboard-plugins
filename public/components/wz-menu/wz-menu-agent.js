@@ -18,7 +18,9 @@ import { AppState } from '../../react-services/app-state';
 import { hasAgentSupportModule } from '../../react-services/wz-agents';
 import { AgentInfo } from './../common/welcome/agents-info';
 import { getAngularModule } from '../../kibana-services';
-import { WAZUH_MODULES_ID } from '../../../common/constants';
+import { WAZUH_MODULES_ID, UI_LOGGER_LEVELS } from '../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../react-services/common-services'
 
 class WzMenuAgent extends Component {
   constructor(props) {
@@ -62,13 +64,14 @@ class WzMenuAgent extends Component {
       gdpr: { id: WAZUH_MODULES_ID.GDPR, text: 'GDPR' },
       hipaa: { id: WAZUH_MODULES_ID.HIPAA, text: 'HIPAA' },
       nist: { id: WAZUH_MODULES_ID.NIST_800_53, text: 'NIST 800-53' },
-      tsc: { id: WAZUH_MODULES_ID.TSC, text: 'TSC' }
+      tsc: { id: WAZUH_MODULES_ID.TSC, text: 'TSC' },
+      github: {id: WAZUH_MODULES_ID.GITHUB, text: 'GitHub'}
     };
 
     this.securityInformationItems = [
       this.agentSections.general,
       this.agentSections.fim,
-      this.agentSections.gcp
+      this.agentSections.gcp,
     ];
     this.auditingItems = [
       this.agentSections.pm,
@@ -111,7 +114,19 @@ class WzMenuAgent extends Component {
       const result = await WzRequest.apiReq('GET', '/agents/' + agentId, {});
       return result;
     } catch (error) {
-      return Promise.reject(error);
+      const options = {
+        context: `${WzMenuAgent.name}.getAgentData`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        store: true,
+        display: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   }
 
