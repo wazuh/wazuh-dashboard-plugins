@@ -93,37 +93,6 @@ This plugin for OpenSearch Dashboards allows you to visualize and analyze Wazuh 
 - OpenSearch Dashboards 1.2.0
 - OpenSearch 1.2.x
 
-## Installation
-
-> Note: OpenSearch Dashboards have no a predefined installation path and owner user, by this reason, replace the placeholders depending on your case:
-```
-<OPENSEARCH_DASHBOARDS_INSTALLATION_PATH>: installation path of OpenSearch Dashboards
-<OPENSEARCH_DASHBOARDS_OWNER_USER>: owner user of OpenSearch Dashboards files
-<OPENSEARCH_DASHBOARDS_OWNER_GROUP>: owner group of OpenSearch Dashboards files
-```
-
-Ensure that the directory `<OPENSEARCH_DASHBOARDS_INSTALLATION_PATH>/data` exists
-If not create it:
-
-```
-mkdir <OPENSEARCH_DASHBOARDS_INSTALLATION_PATH>/data
-chown -R <OPENSEARCH_DASHBOARDS_OWNER_USER>:<OPENSEARCH_DASHBOARDS_OWNER_GROUP> <OPENSEARCH_DASHBOARDS_INSTALLATION_PATH>/data
-```
-
-Install the Wazuh app plugin for OpenSearch Dashboards
-
-```
-cd <OPENSEARCH_DASHBOARDS_INSTALLATION_PATH>
-sudo -u opensearch-dashboards bin/opensearch-dashboards-plugin install https://packages.wazuh.com/4.x/ui/opensearch-dashboards/wazuh_opensearch-dashboards-4.3.0_1.2.0-1.zip
-```
-
-Restart OpenSearch Dashboards
-
- 
-## Wazuh - OpenSearch Dashboards compatibility matrix
-
-The compatibility matrix is avaliable in the repository [wiki](https://github.com/wazuh/wazuh-kibana-app/wiki/Compatibility).
-
 ## Contribute
 
 If you want to contribute to our project please don't hesitate to send a pull request. You can also join our users [mailing list](https://groups.google.com/d/forum/wazuh), by sending an email to [wazuh+subscribe@googlegroups.com](mailto:wazuh+subscribe@googlegroups.com), to ask questions and participate in discussions.
