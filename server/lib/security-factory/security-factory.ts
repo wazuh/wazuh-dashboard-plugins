@@ -27,6 +27,11 @@ export async function SecurityObj(
       );
       return new XpackFactory(security);
     } catch (error) {
+
+      // In case of an forbidden resource error it's still good to know if it uses xpack
+      const validErrors: [number] = [403];
+      if (validErrors.includes(error?.meta?.statusCode)) return new XpackFactory(security);
+
       return new DefaultFactory();
     }
   } else {
