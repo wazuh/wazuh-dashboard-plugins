@@ -27,8 +27,8 @@
 
 /* Login screen */
 .wz-login {
-  background: url(/plugins/wazuh/assets/wazuh_wazuh_bg.svg) !important;
-  background-image: url(/plugins/wazuh/assets/wazuh_wazuh_bg.svg) !important;
+  background: url(/plugins/wazuh/assets/wazuh_login_background.svg) !important;
+  background-image: url(/plugins/wazuh/assets/wazuh_login_background.svg) !important;
   background-position-x: initial !important;
   background-position-y: initial !important;
   background-size: cover !important;
@@ -148,7 +148,8 @@
 .appContainer__loading .euiLoadingElastic {
   width: 32px;
   height: 32px;
-  background: url(/plugins/wazuh/assets/wazuh_logo_circle.svg)
+  background-size: cover !important;
+  background: url(/plugins/wazuh/assets/images/themes/light/icon.svg)
 }
 
 .appContainer__loading .euiLoadingElastic svg {
@@ -159,7 +160,7 @@
   content: '';
   width: 30px;
   height: 30px;
-  background: url(/plugins/wazuh/assets/wazuh_logo_circle.svg) no-repeat;
+  background: url(/plugins/wazuh/assets/images/themes/light/icon.svg) no-repeat;
   background-size: contain;
 }
 
