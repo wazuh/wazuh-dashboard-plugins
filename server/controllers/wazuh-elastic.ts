@@ -705,7 +705,7 @@ export class WazuhElasticCtrl {
       // Index alerts
 
       // Check if wazuh sample alerts index exists
-      const existsSampleIndex = await context.core.elasticsearch.client.asCurrentUser.indices.exists({
+      const existsSampleIndex = await context.core.opensearch.client.asCurrentUser.indices.exists({
         index: sampleAlertsIndex
       });
       if (!existsSampleIndex.body) {
@@ -720,7 +720,7 @@ export class WazuhElasticCtrl {
           }
         };
 
-        await context.core.elasticsearch.client.asCurrentUser.indices.create({
+        await context.core.opensearch.client.asCurrentUser.indices.create({
           index: sampleAlertsIndex,
           body: configuration
         });
@@ -731,7 +731,7 @@ export class WazuhElasticCtrl {
         );
       }
 
-      await context.core.elasticsearch.client.asCurrentUser.bulk({
+      await context.core.opensearch.client.asCurrentUser.bulk({
         index: sampleAlertsIndex,
         body: bulk
       });

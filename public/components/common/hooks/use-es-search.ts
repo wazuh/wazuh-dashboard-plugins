@@ -77,7 +77,7 @@ const useEsSearch = ({ preAppliedFilters = [], preAppliedAggs = {}, size = 10 })
 
   const search = async (): Promise<SearchResponse> => {
     if (indexPattern) {
-      const esQuery = await data.query.getEsQuery(indexPattern as IndexPattern);
+      const esQuery = await data.query.getOpenSearchQuery(indexPattern as IndexPattern);
       const searchSource = await data.search.searchSource.create();
       const combined = [...esQuery.bool.filter, ...preAppliedFilters, ...filters];
 
