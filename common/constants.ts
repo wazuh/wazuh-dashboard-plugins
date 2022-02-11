@@ -355,15 +355,15 @@ export const REPORTS_PAGE_HEADER_TEXT = 'info@wazuh.com\nhttps://wazuh.com';
 
 // Plugin platform
 export const PLUGIN_PLATFORM_NAME = 'OpenSearch Dashboards';
-export const PLUGIN_PLATFORM_BASE_INSTALLATION_PATH = '/usr/share/opensearch_dashboards/data/wazuh/';
+export const PLUGIN_PLATFORM_BASE_INSTALLATION_PATH = '<OPENSEARCH_DASHBOARDS_INSTALLATION_PATH>/data/wazuh/';
 export const PLUGIN_PLATFORM_BASE_REDIRECTION_PATH = 'home';
-export const PLUGIN_PLATFORM_INSTALLATION_USER = 'kibana';
-export const PLUGIN_PLATFORM_INSTALLATION_USER_GROUP = 'kibana';
+export const PLUGIN_PLATFORM_INSTALLATION_USER = '<OPENSEARCH_DASHBOARDS_FILES_OWNER_USER>';
+export const PLUGIN_PLATFORM_INSTALLATION_USER_GROUP = '<OPENSEARCH_DASHBOARDS_FILES_OWNER_GROUP>';
 export const PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_UPGRADE_PLATFORM = 'https://documentation.wazuh.com/current/upgrade-guide/elasticsearch-kibana-filebeat/index.html#upgrade-elasticsearch-filebeat-kibana';
 export const PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_TROUBLESHOOTING = 'https://documentation.wazuh.com/current/user-manual/kibana-app/troubleshooting.html';
 export const PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_APP_CONFIGURATION = 'https://documentation.wazuh.com/current/user-manual/kibana-app/reference/config-file.html';
-export const PLUGIN_PLATFORM_URL_GUIDE = 'https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html';
-export const PLUGIN_PLATFORM_URL_GUIDE_TITLE = 'Elastic guide';
+export const PLUGIN_PLATFORM_URL_GUIDE = 'https://opensearch.org/docs/1.2/opensearch/index/';
+export const PLUGIN_PLATFORM_URL_GUIDE_TITLE = 'OpenSearch guide';
 export const PLUGIN_PLATFORM_REQUEST_HEADERS = {
   'osd-xsrf': 'kibana'
 };
