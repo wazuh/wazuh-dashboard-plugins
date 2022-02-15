@@ -112,10 +112,6 @@ const sysButtons = [
   },
 ];
 
-const pTextCheckConnectionStyle = {
-  marginTop: '3em',
-};
-
 export const RegisterAgent = withErrorBoundary(
 
   class RegisterAgent extends Component {
@@ -398,7 +394,7 @@ export const RegisterAgent = withErrorBoundary(
       const appVersionMajorDotMinor = this.state.wazuhVersion.split('.').slice(0, 2).join('.');
       const urlCheckConnectionDocumentation = `https://documentation.wazuh.com/${appVersionMajorDotMinor}/user-manual/agents/agent-connection.html`;
       const textAndLinkToCheckConnectionDocumentation = (
-        <p style={pTextCheckConnectionStyle}>
+        <p>
           To verify the connection with the Manager, please follow this{' '}
           <a href={urlCheckConnectionDocumentation} target="_blank">
             document.
@@ -576,7 +572,7 @@ export const RegisterAgent = withErrorBoundary(
                     )}
                   </EuiCopy>
                 </div>
-                <EuiSpacer />
+                <EuiSpacer size='s'/>
                 {textAndLinkToCheckConnectionDocumentation}
               </EuiText>
             </Fragment>
@@ -601,7 +597,7 @@ export const RegisterAgent = withErrorBoundary(
                     )}
                   </EuiCopy>
                 </div>
-                <EuiSpacer />
+                <EuiSpacer size='s'/>
                 {textAndLinkToCheckConnectionDocumentation}
               </EuiText>
             </Fragment>
