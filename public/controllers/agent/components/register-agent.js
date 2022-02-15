@@ -143,6 +143,7 @@ export const RegisterAgent = withErrorBoundary(
         rpm: this.systemSelector(),
         deb: this.systemSelector(),
         macos: 'sudo /Library/Ossec/bin/wazuh-control start',
+        win: 'NET START WazuhSvc'
       };
     }
 
