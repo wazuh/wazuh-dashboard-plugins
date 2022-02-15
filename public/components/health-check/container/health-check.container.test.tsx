@@ -74,6 +74,13 @@ jest.mock('../../../kibana-services', () => ({
       },
     },
   }),
+  getUiSettings: () => ({
+    get: (setting: string): any => {
+      if(setting === 'theme:darkMode'){
+        return false
+      }
+    }
+  })
 }));
 
 describe('Health Check container', () => {
