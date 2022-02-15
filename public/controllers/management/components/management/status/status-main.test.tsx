@@ -23,6 +23,13 @@ jest.mock('../../../../../kibana-services', () => ({
       prepend: (str) => str,
     },
   }),
+  getUiSettings: () => ({
+    get: (setting: string): any => {
+      if(setting === 'theme:darkMode'){
+        return false
+      }
+    }
+  })
 }));
 
 describe('Status component', () => {
