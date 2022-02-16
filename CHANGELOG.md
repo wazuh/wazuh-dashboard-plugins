@@ -51,6 +51,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added a new workflow for create wazuh packages [#3742](https://github.com/wazuh/wazuh-kibana-app/pull/3742)
 - Run `template` and `fields` checks in the health check depends on the app configuration [#3783](https://github.com/wazuh/wazuh-kibana-app/pull/3783)
 - Added a toast message when there is an error creating a new group [#3804](https://github.com/wazuh/wazuh-kibana-app/pull/3804)
+- Added a step to start the agent to the deploy new Windowns agent guide [#3846](https://github.com/wazuh/wazuh-kibana-app/pull/3846)
 
 ### Changed
 
