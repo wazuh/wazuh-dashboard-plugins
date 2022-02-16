@@ -51,6 +51,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added a new workflow for create wazuh packages [#3742](https://github.com/wazuh/wazuh-kibana-app/pull/3742)
 - Run `template` and `fields` checks in the health check depends on the app configuration [#3783](https://github.com/wazuh/wazuh-kibana-app/pull/3783)
 - Added a toast message when there is an error creating a new group [#3804](https://github.com/wazuh/wazuh-kibana-app/pull/3804)
+- Added a step to start the agent to the deploy new Windowns agent guide [#3846](https://github.com/wazuh/wazuh-kibana-app/pull/3846)
 
 ### Changed
 
@@ -126,6 +127,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed github/office365 multi-select filters suggested values [#3787](https://github.com/wazuh/wazuh-kibana-app/pull/3787)
 - Fix updating the aggregation data of Panel section when changing the time filter [#3790](https://github.com/wazuh/wazuh-kibana-app/pull/3790)
 - Removed the button to remove an agent for a group in the agents' table when it is the default group [#3804](https://github.com/wazuh/wazuh-kibana-app/pull/3804)
+- Fixed internal user no longer needs permission to make x-pack detection request [#3831](https://github.com/wazuh/wazuh-kibana-app/pull/3831)
 
 ## Wazuh v4.2.5 - Kibana 7.10.2, 7.11.2, 7.12.1, 7.13.4, 7.14.2 - Revision 4206
 
