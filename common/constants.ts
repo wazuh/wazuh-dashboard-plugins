@@ -356,7 +356,7 @@ export const REPORTS_PAGE_HEADER_TEXT = 'info@wazuh.com\nhttps://wazuh.com';
 // Plugin platform
 export const PLUGIN_PLATFORM_NAME = 'OpenSearch Dashboards';
 export const PLUGIN_PLATFORM_BASE_INSTALLATION_PATH = '<OPENSEARCH_DASHBOARDS_INSTALLATION_PATH>/data/wazuh/';
-export const PLUGIN_PLATFORM_BASE_REDIRECTION_PATH = 'home';
+export const PLUGIN_PLATFORM_BASE_REDIRECTION_PATH = 'opensearch-dashboards';
 export const PLUGIN_PLATFORM_INSTALLATION_USER = '<OPENSEARCH_DASHBOARDS_FILES_OWNER_USER>';
 export const PLUGIN_PLATFORM_INSTALLATION_USER_GROUP = '<OPENSEARCH_DASHBOARDS_FILES_OWNER_GROUP>';
 export const PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_UPGRADE_PLATFORM = 'https://documentation.wazuh.com/current/upgrade-guide/elasticsearch-kibana-filebeat/index.html#upgrade-elasticsearch-filebeat-kibana';
