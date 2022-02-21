@@ -10,11 +10,11 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { ASSETS_BASE_URL_PREFIX } from "../../common/constants";
+import { ASSETS_BASE_URL_PREFIX, PLUGIN_APP_NAME } from "../../common/constants";
 
 export const initialWazuhConfig: string = `---
 #
-# Wazuh app - App configuration file
+# ${PLUGIN_APP_NAME} - App configuration file
 # Copyright (C) 2015-2022 Wazuh, Inc.
 #
 # This program is free software; you can redistribute it and/or modify
@@ -24,7 +24,7 @@ export const initialWazuhConfig: string = `---
 #
 # Find more information about this on the LICENSE file.
 #
-# ======================== Wazuh app configuration file ========================
+# ======================== ${PLUGIN_APP_NAME} configuration file ========================
 #
 # Please check the documentation for more information on configuration options:
 # https://documentation.wazuh.com/current/installation-guide/index.html
@@ -46,7 +46,7 @@ export const initialWazuhConfig: string = `---
 # ----------------------------------- Checks -----------------------------------
 #
 # Defines which checks must to be consider by the healthcheck
-# step once the Wazuh app starts. Values must to be true or false.
+# step once the ${PLUGIN_APP_NAME} starts. Values must to be true or false.
 #checks.pattern : true
 #checks.template: true
 #checks.fields  : true
@@ -59,7 +59,7 @@ export const initialWazuhConfig: string = `---
 # --------------------------------- Extensions ---------------------------------
 #
 # Defines which extensions should be activated when you add a new API entry.
-# You can change them after Wazuh app starts.
+# You can change them after ${PLUGIN_APP_NAME} starts.
 # Values must to be true or false.
 #extensions.pci       : true
 #extensions.gdpr      : true
@@ -77,7 +77,7 @@ export const initialWazuhConfig: string = `---
 #
 # ---------------------------------- Timeout ----------------------------------
 #
-# Defines maximum timeout to be used on the Wazuh app requests.
+# Defines maximum timeout to be used on the ${PLUGIN_APP_NAME} requests.
 # It will be ignored if it is bellow 1500.
 # It means milliseconds before we consider a request as failed.
 # Default: 20000
@@ -86,14 +86,14 @@ export const initialWazuhConfig: string = `---
 # -------------------------------- API selector --------------------------------
 #
 # Defines if the user is allowed to change the selected
-# API directly from the Wazuh app top menu.
+# API directly from the ${PLUGIN_APP_NAME} top menu.
 # Default: true
 #api.selector: true
 #
 # --------------------------- Index pattern selector ---------------------------
 #
 # Defines if the user is allowed to change the selected
-# index pattern directly from the Wazuh app top menu.
+# index pattern directly from the ${PLUGIN_APP_NAME} top menu.
 # Default: true
 #ip.selector: true
 #
@@ -180,7 +180,7 @@ export const initialWazuhConfig: string = `---
 #hideManagerAlerts: false
 #
 # ------------------------------- App logging level -----------------------------
-# Set the logging level for the Wazuh App log files.
+# Set the logging level for the ${PLUGIN_APP_NAME} log files.
 # Default value: info
 # Allowed values: info, debug
 #logs.level: info

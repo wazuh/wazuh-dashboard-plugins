@@ -22,7 +22,7 @@ import { formatUIDate } from '../../react-services/time-service';
 import store from '../../redux/store';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
 import { updateSelectedSettingsSection } from '../../redux/actions/appStateActions';
-import { UI_LOGGER_LEVELS, PLUGIN_PLATFORM_NAME } from '../../../common/constants';
+import { UI_LOGGER_LEVELS, PLUGIN_APP_NAME } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
 
@@ -36,7 +36,7 @@ export class SettingsController {
    */
   constructor($scope, $window, $location, errorHandler) {
     this.pluginPlatformVersion = (pluginPlatform || {}).version || false;
-    this.pluginPlatformName = PLUGIN_PLATFORM_NAME;
+    this.pluginAppName = PLUGIN_APP_NAME;
     this.$scope = $scope;
     this.$window = $window;
     this.$location = $location;
@@ -449,7 +449,7 @@ export class SettingsController {
         {
           date: new Date(),
           level: 'error',
-          message: 'Error when loading Wazuh app logs'
+          message: 'Error when loading logs'
         }
       ];
     }
@@ -536,7 +536,7 @@ export class SettingsController {
           };
         }
         throw {
-          message: `Some of the API entries are not reachable. You can still use the Wazuh APP but please, review your hosts configuration.`,
+          message: `Some of the API entries are not reachable. You can still use the ${PLUGIN_APP_NAME} but please, review your hosts configuration.`,
           type: 'warning',
           closedEnabled: true
         };

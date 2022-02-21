@@ -6,7 +6,7 @@
   "pluginPlatform": {
     "version": "1.2.0"
   },
-  "description": "Wazuh app",
+  "description": "Wazuh dashboard",
   "keywords": [
     "opensearch_dashboards",
     "wazuh",

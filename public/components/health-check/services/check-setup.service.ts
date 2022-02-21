@@ -14,7 +14,7 @@
 
 import { AppState, GenericRequest, WzRequest } from '../../../react-services';
 import { CheckLogger } from '../types/check_logger';
-import { PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_UPGRADE_PLATFORM } from '../../../../common/constants';
+import { PLUGIN_APP_NAME, PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_UPGRADE_PLATFORM } from '../../../../common/constants';
 
 export const checkSetupService = appInfo => async (checkLogger: CheckLogger) => {
   const currentApi = JSON.parse(AppState.getCurrentAPI() || '{}');
@@ -43,7 +43,7 @@ export const checkSetupService = appInfo => async (checkLogger: CheckLogger) => 
         api.groups.version !== appSplit[0] ||
         api.groups.minor !== appSplit[1]
       ) {
-        checkLogger.error(`Wazuh API and Wazuh App version mismatch. API version: ${apiVersion}. App version: ${setupData.data.data['app-version']}. At least, major and minor should match. Check more info about upgrading Wazuh App <a target='_blank' href='${PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_UPGRADE_PLATFORM}'>here</a>.`);
+        checkLogger.error(`Wazuh API and ${PLUGIN_APP_NAME} version mismatch. API version: ${apiVersion}. App version: ${setupData.data.data['app-version']}. At least, major and minor should match. Check more info about upgrading ${PLUGIN_PLATFORM_NAME} <a target='_blank' href='${PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_UPGRADE_PLATFORM}'>here</a>.`);
       }
     }
   }

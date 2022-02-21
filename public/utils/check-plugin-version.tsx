@@ -17,7 +17,7 @@ import { getCookies, getToasts } from '../kibana-services';
 import { ErrorToastOptions } from 'opensearch_dashboards/public';
 import React from 'react';
 import { ReactNode } from 'x-pack/node_modules/@types/react';
-import { PLUGIN_PLATFORM_NAME } from '../../common/constants';
+import { PLUGIN_PLATFORM_NAME, PLUGIN_APP_NAME } from '../../common/constants';
 
 type TAppInfo = {
   revision: string;
@@ -45,24 +45,24 @@ export const checkPluginVersion = async () => {
 const checkClientAppVersion = (appInfo: TAppInfo) => {
   if (appInfo['app-version'] !== appVersion || appInfo.revision !== appRevision) {
     const toastOptions: ErrorToastOptions = {
-      title: 'Conflict with the Wazuh app version',
+      title: `Conflict with the ${PLUGIN_APP_NAME} version`,
       toastLifeTimeMs: 50000,
-      toastMessage: `The version of the Wazuh app in your browser does not correspond with the app version installed in ${PLUGIN_PLATFORM_NAME}. Please, clear your browser cache. For more info check the full error.`,
+      toastMessage: `The version of the ${PLUGIN_APP_NAME} in your browser does not correspond with the app version installed in ${PLUGIN_PLATFORM_NAME}. Please, clear your browser cache. For more info check the full error.`,
     };
 
     const troubleshootingUrl = `https://documentation.wazuh.com/${appInfo['app-version']
       .split('.')
       .slice(0, 2)
-      .join('.')}/user-manual/kibana-app/troubleshooting.html`;
+      .join('.')}/user-manual/wazuh-dashboard/troubleshooting.html`;
 
     const message: ReactNode = (
       <>
         <p>
-          The version of the Wazuh app in your browser{' '}
+          The version of the {PLUGIN_APP_NAME} in your browser{' '}
           <b>
             {appVersion} - {appRevision}
           </b>{' '}
-          does not correspond with the app version installed in {PLUGIN_PLATFORM_NAME}{' '}
+          does not correspond with the version installed in {PLUGIN_PLATFORM_NAME}{' '}
           <b>
             {appInfo['app-version']} - {appInfo.revision}
           </b>

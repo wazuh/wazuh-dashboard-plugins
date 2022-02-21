@@ -16,7 +16,7 @@ import { getConfiguration } from '../../lib/get-configuration';
 import { totalmem } from 'os';
 import fs from 'fs';
 import { ManageHosts } from '../../lib/manage-hosts';
-import { WAZUH_ALERTS_PATTERN, WAZUH_DATA_CONFIG_REGISTRY_PATH, WAZUH_INDEX, WAZUH_VERSION_INDEX, WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME, WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH, PLUGIN_PLATFORM_NAME, PLUGIN_PLATFORM_INSTALLATION_USER_GROUP, PLUGIN_PLATFORM_INSTALLATION_USER } from '../../../common/constants';
+import { WAZUH_ALERTS_PATTERN, WAZUH_DATA_CONFIG_REGISTRY_PATH, WAZUH_INDEX, WAZUH_VERSION_INDEX, WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME, WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH, PLUGIN_APP_NAME, PLUGIN_PLATFORM_NAME, PLUGIN_PLATFORM_INSTALLATION_USER_GROUP, PLUGIN_PLATFORM_INSTALLATION_USER } from '../../../common/constants';
 import { createDataDirectoryIfNotExists } from '../../lib/filesystem';
 import { tryCatchForIndexPermissionError } from '../tryCatchForIndexPermissionError';
 
@@ -61,7 +61,7 @@ export function jobInitializeRun(context) {
       const commonDate = new Date().toISOString();
 
       const configuration = {
-        name: 'Wazuh App',
+        name: PLUGIN_APP_NAME,
         'app-version': packageJSON.version,
         revision: packageJSON.revision,
         installationDate: commonDate,
@@ -216,7 +216,7 @@ export function jobInitializeRun(context) {
         if (isUpgradedApp) {
           log(
             'initialize:checkwazuhRegistry',
-            'Wazuh app revision or version changed, regenerating wazuh-version registry',
+            `${PLUGIN_APP_NAME} revision or version changed, regenerating wazuh-version registry`,
             'info'
           );
           // Rebuild registry file in blank
