@@ -26,17 +26,12 @@ import {
   EuiCard,
 } from '@elastic/eui';
 import { Pie } from '../../../components/d3/pie';
-import { ProgressChart } from '../../../components/d3/progress';
 import { AgentsTable } from './agents-table';
 import { WzRequest } from '../../../react-services/wz-request';
-import KibanaVis from '../../../kibana-integrations/kibana-vis';
 import WzReduxProvider from '../../../redux/wz-redux-provider';
-import { VisFactoryHandler } from '../../../react-services/vis-factory-handler';
-import { AppState } from '../../../react-services/app-state';
-import { FilterHandler } from '../../../utils/filter-handler';
-import { TabVisualizations } from '../../../factories/tab-visualizations';
 import { WazuhConfig } from './../../../react-services/wazuh-config.js';
 import { WzDatePicker } from '../../../components/wz-date-picker/wz-date-picker';
+import WzKibanaVis from '../../../components/wz-kibana-vis/wz-kibana-vis';
 import {
   withReduxProvider,
   withGlobalBreadcrumb,
@@ -88,16 +83,10 @@ export const AgentsPreview = compose(
       this.getSummary();
       if (this.wazuhConfig.getConfig()['wazuh.monitoring.enabled']) {
         this._isMount && this.setState({ showAgentsEvolutionVisualization: true });
-        const tabVisualizations = new TabVisualizations();
-        tabVisualizations.removeAll();
-        tabVisualizations.setTab('general');
-        tabVisualizations.assign({
-          general: 1,
-        });
-        const filterHandler = new FilterHandler(AppState.getCurrentPattern());
-        await VisFactoryHandler.buildOverviewVisualizations(filterHandler, 'general', null);
       }
     }
+
+
 
     componentWillUnmount() {
       this._isMount = false;
@@ -117,7 +106,8 @@ export const AgentsPreview = compose(
 
     async getSummary() {
       try {
-        this.setState({ loading: true });
+        this.setState({ 
+          loading: true });
         const summaryData = await WzRequest.apiReq('GET', '/agents/summary/status', {});
         this.summary = summaryData.data.data;
         this.totalAgents = this.summary.total;
@@ -145,7 +135,10 @@ export const AgentsPreview = compose(
         for (let [key, value] of Object.entries(this.platforms)) {
           platformsModel.push({ id: key, label: key, value: value });
         }
-        this._isMount && this.setState({ platforms: platformsModel, loading: false });
+        this._isMount && this.setState({ 
+          platforms: platformsModel, 
+          loading: false
+        });
       } catch (error) {
         const options = {
           context: `${AgentsPreview.name}.getSummary`,
@@ -303,7 +296,7 @@ export const AgentsPreview = compose(
                                     title={
                                       <EuiToolTip position="top" content="View agent details">
                                         <a onClick={() => this.showLastAgent()}>
-                                          {this.lastAgent.name}
+                                          {this.lastAgent.name.substring(0,5)}
                                         </a>
                                       </EuiToolTip>
                                     }
@@ -321,7 +314,7 @@ export const AgentsPreview = compose(
                                     title={
                                       <EuiToolTip position="top" content="View agent details">
                                         <a onClick={() => this.showMostActiveAgent()}>
-                                          {this.mostActiveAgent.name || '-'}
+                                          {this.mostActiveAgent.name.substring(0,5) || '-'}
                                         </a>
                                       </EuiToolTip>
                                     }
@@ -363,12 +356,10 @@ export const AgentsPreview = compose(
                             paddingTop: this.props.resultState === 'ready' ? "12px" : 0 
                           }}
                         >
-                          <WzReduxProvider>
-                            <KibanaVis
-                              visID={'Wazuh-App-Overview-General-Agents-status'}
-                              tab={'general'}
-                            />
-                          </WzReduxProvider>
+                        <WzKibanaVis
+                          visID={'Wazuh-App-Overview-General-Agents-status'}
+                          tab={'general'}
+                        />
                         </div>
                         {this.props.resultState === 'loading' && (
                           <div className="loading-chart-xl">

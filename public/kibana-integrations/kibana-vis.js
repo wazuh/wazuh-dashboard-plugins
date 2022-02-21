@@ -121,6 +121,7 @@ class KibanaVis extends Component {
     if (this.deadField) {
       return this.renderComplete();
     }
+    
     const rawVis = this.rawVisualizations.getList();
     if (Array.isArray(rawVis) && rawVis.length) {
       this.myRender(rawVis);
@@ -295,7 +296,6 @@ class KibanaVis extends Component {
           this.setSearchSource(discoverList);
         } else if (this.rendered && !this.deadField) {
           // There's a visualization object -> just update its filters
-
           if (this.props.isMetric) {
             this.callUpdateMetric();
           }
@@ -371,6 +371,10 @@ class KibanaVis extends Component {
       const currentCompleted = Math.round((currentLoaded / totalTabVis) * 100);
       if (currentCompleted >= 100) {
         this.$rootScope.rendered = 'true';
+        if(this.visID === 'Wazuh-App-Overview-General-Agents-status'){
+          this.$rootScope.resultState = 'none';
+          this.tabVisualizations.addDeadVis();
+        }
         if (visId.includes('AWS-geo')) {
           const canvas = $('.visChart.leaflet-container .leaflet-control-zoom-in');
           setTimeout(() => {
@@ -404,7 +408,6 @@ class KibanaVis extends Component {
                 <EuiLoadingSpinner size="xl" />
               </EuiFlexItem>
               <EuiFlexItem grow={false}>Refreshing Index Pattern.</EuiFlexItem>
-
               <EuiFlexItem></EuiFlexItem>
             </EuiFlexGroup>
           </div>
