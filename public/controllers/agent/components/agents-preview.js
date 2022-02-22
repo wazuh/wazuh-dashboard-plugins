@@ -296,7 +296,7 @@ export const AgentsPreview = compose(
                                     title={
                                       <EuiToolTip position="top" content="View agent details">
                                         <a onClick={() => this.showLastAgent()}>
-                                          {this.lastAgent.name.substring(0,5)}
+                                          {this.lastAgent.name}
                                         </a>
                                       </EuiToolTip>
                                     }
@@ -314,7 +314,7 @@ export const AgentsPreview = compose(
                                     title={
                                       <EuiToolTip position="top" content="View agent details">
                                         <a onClick={() => this.showMostActiveAgent()}>
-                                          {this.mostActiveAgent.name.substring(0,5) || '-'}
+                                          {this.mostActiveAgent.name || '-'}
                                         </a>
                                       </EuiToolTip>
                                     }
