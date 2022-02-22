@@ -371,10 +371,6 @@ class KibanaVis extends Component {
       const currentCompleted = Math.round((currentLoaded / totalTabVis) * 100);
       if (currentCompleted >= 100) {
         this.$rootScope.rendered = 'true';
-        if(this.visID === 'Wazuh-App-Overview-General-Agents-status'){
-          this.$rootScope.resultState = 'none';
-          this.tabVisualizations.addDeadVis();
-        }
         if (visId.includes('AWS-geo')) {
           const canvas = $('.visChart.leaflet-container .leaflet-control-zoom-in');
           setTimeout(() => {
