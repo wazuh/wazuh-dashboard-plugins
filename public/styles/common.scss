@@ -1555,18 +1555,38 @@ div.euiPopover__panel.euiPopover__panel-isOpen.euiPopover__panel--bottom.wz-menu
   }
 }
 
+.agents-details-card {
+  .last-agents-link {
+    .euiToolTipAnchor {
+      white-space: nowrap;
+      max-width: 100%;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+  }
+}
+
+
 @media (min-width: 1600px) {
   .agents-evolution-visualization{
     width: 35vw;
   }
+
+  .agents-details-card {
+    width: 55vw;
+  }
+
 }
 
 @media (max-width: 1599px) {
   .agents-evolution-visualization{
     width: 30vw;
   }
-}
 
+  .agents-details-card {
+    width: 45vw;
+  }
+}
 
 @media (max-width: 1439px) {
   .agents-evolution-visualization{
@@ -1579,7 +1599,11 @@ div.euiPopover__panel.euiPopover__panel-isOpen.euiPopover__panel--bottom.wz-menu
     flex-wrap: wrap;
   }
   .agents-evolution-visualization{
-    width: 92vw;
+    width: 100vw;
+  }
+
+  .agents-details-card {
+    width: 100vw;
   }
   .agents-status-pie{
     flex-grow: 1 !important;
