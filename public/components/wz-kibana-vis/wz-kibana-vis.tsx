@@ -133,15 +133,7 @@ function WzKibanaVis(props: IWzKibanaVisProps) {
    * @param index
    */
   const checkVisIndexExist = async (index: string) => {
-    const MONITORING = 'monitoring';
-    const STATISTICS = 'statistics';
-    const module_name = index.includes(STATISTICS)
-      ? STATISTICS
-      : index.includes(MONITORING)
-      ? MONITORING
-      : index;
-
-    const response = await GenericRequest.request('GET', `/elastic/${module_name}`, {});
+    const response = await GenericRequest.request('GET', `/elastic/monitoring`, {});
 
     if (!response.data) {
       throw new Error(`No indices match pattern "${index}"`);
