@@ -46,15 +46,16 @@ function WzKibanaVis(props: IWzKibanaVisProps) {
   }, [currentRawVis]);
 
   /**
-   *
+   * Initializing visualization, checking if props are valid.
+   * Also, initialize all handlres required for renderize a visualization
    * @param visID
-   * @param tab
+   * @param tab 
    */
   const initializeVis = async (visID: string, tab: string) => {
     setIsLoading(true);
     try {
       if (!visID || !tab) {
-        throw new Error(`visID and tab are required`);
+        throw new Error(`"visID" and "tab" props are required`);
       }
       // assign current tab
       tabVisualizations.removeAll();
@@ -72,14 +73,14 @@ function WzKibanaVis(props: IWzKibanaVisProps) {
         await VisFactoryHandler.buildAgentsVisualizations(filterHandler, tab, null);
       } else {
         // tab doesn't exist
-        throw new Error(`tab ${tab} doesn't exist`);
+        throw new Error(`Tab "${tab}" doesn't exist`);
       }
 
       // get raw vis definition
       const rawVis = getRawVisualizationById(visID);
       setCurrentRawVis(rawVis);
       if (!rawVis) {
-        throw new Error(`id ${visID} visualization is not defined`);
+        throw new Error(`Id "${visID}" visualization is not defined`);
       }
     } catch (error) {
       const options = {
@@ -100,16 +101,16 @@ function WzKibanaVis(props: IWzKibanaVisProps) {
   };
 
   /**
-   * 
-   * @param raw 
+   *  Validate if vizualization could be rendered.
+   *  
+   * @param raw
    */
   const validateVisualization = async (raw) => {
     setIsLoading(true);
     try {
       if (!raw) {
-        throw new Error('raw must be defined');
+        throw new Error('Raw must be defined');
       }
-
       const visIndexPattern = getVisIndexPattern(raw);
       if (!visIndexPattern) {
         throw new Error('Index pattern is not defined in visualization');
@@ -121,38 +122,45 @@ function WzKibanaVis(props: IWzKibanaVisProps) {
       setIsLoading(false);
     } catch (error) {
       // visualization couldn't be rendered
-      //console.log(`Error validating visualization: ${error}`);
-      setErrorMessage(error);
+      setErrorMessage(error.message);
       setVisCouldBeRendered(false);
       setIsLoading(false);
     }
   };
 
   /**
-   *
+   * Check if index pattern received exist
    * @param index
    */
   const checkVisIndexExist = async (index: string) => {
-    let res = await GenericRequest.request(
-      'GET',
-      `/api/index_patterns/_fields_for_wildcard?pattern=${index}`,
-      {}
-    );
-    return true;
+    const MONITORING = 'monitoring';
+    const STATISTICS = 'statistics';
+    const module_name = index.includes(STATISTICS)
+      ? STATISTICS
+      : index.includes(MONITORING)
+      ? MONITORING
+      : index;
+
+    const response = await GenericRequest.request('GET', `/elastic/${module_name}`, {});
+
+    if (!response.data) {
+      throw new Error(`No indices match pattern "${index}"`);
+    }
+    return response.data;
   };
 
   /**
-   *
+   * Get raw visualizations definition from raw visualization list.
    * @param visID
    */
   const getRawVisualizationById = (visID: string) => {
     // get all visualizations definitions
     const rawVisList = rawVisualizations.getList();
-    return rawVisList ? rawVisList.filter((item) => item && item.id === visID)[0] : null;
+    return rawVisList ? rawVisList.find((item) => item && item.id === visID) : null;
   };
 
-  /**
-   *
+  /** 
+   *  Get index pattern name from raw visualization
    * @param raw
    */
   const getVisIndexPattern = (raw) => {
@@ -169,11 +177,11 @@ function WzKibanaVis(props: IWzKibanaVisProps) {
         </div>
       )}
       {!isLoading && !visCouldBeRendered && (
-          <EuiEmptyPrompt
-            iconType="securitySignalDetected"
-            title={<h4>No data found</h4>}
-            body={errorMessage}
-          />
+        <EuiEmptyPrompt
+          iconType="securitySignalDetected"
+          title={<h4>No data found</h4>}
+          body={errorMessage}
+        />
       )}
       {!isLoading && visCouldBeRendered && (
         <WzReduxProvider>
