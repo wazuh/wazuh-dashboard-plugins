@@ -53,7 +53,7 @@ const checkClientAppVersion = (appInfo: TAppInfo) => {
     const troubleshootingUrl = `https://documentation.wazuh.com/${appInfo['app-version']
       .split('.')
       .slice(0, 2)
-      .join('.')}/user-manual/kibana-app/troubleshooting.html`;
+      .join('.')}/user-manual/wazuh-dashboard/troubleshooting.html`;
 
     const message: ReactNode = (
       <>
