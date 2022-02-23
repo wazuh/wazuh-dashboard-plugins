@@ -1169,6 +1169,12 @@ wz-xml-file-editor {
   .header-global-wrapper + .app-wrapper:not(.hidden-chrome) {
       left: 0!important;
   }
+
+  .agents-details-card {
+    .agents-link-item {
+      max-width: 100% !important;
+    }
+  }
 }
 
 .flyout-no-overlap {
@@ -1556,14 +1562,20 @@ div.euiPopover__panel.euiPopover__panel-isOpen.euiPopover__panel--bottom.wz-menu
 }
 
 .agents-details-card {
-  .last-agents-link {
-    .euiToolTipAnchor {
-      white-space: nowrap;
-      max-width: 100%;
-      text-overflow: ellipsis;
-      overflow: hidden;
+  .agents-link-item {
+    max-width: 45%;
+    max-height: 100%;
+    .last-agents-link {
+      .euiToolTipAnchor {
+        white-space: nowrap;
+        max-width: 100%;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
     }
   }
+
+  
 }
 
 

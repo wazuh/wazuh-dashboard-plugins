@@ -290,7 +290,7 @@ export const AgentsPreview = compose(
                         )}
                         <EuiFlexGroup className="mt-0">
                           {this.lastAgent && (
-                            <EuiFlexItem className="flex-45">
+                            <EuiFlexItem className="agents-link-item">
                               <EuiStat
                                 className="euiStatLink last-agents-link"
                                 title={
@@ -307,7 +307,7 @@ export const AgentsPreview = compose(
                             </EuiFlexItem>
                           )}
                           {this.mostActiveAgent && (
-                            <EuiFlexItem className="flex-45">
+                            <EuiFlexItem className="agents-link-item">
                               <EuiStat
                                 className={this.mostActiveAgent.name ? 'euiStatLink' : ''}
                                 title={
