@@ -128,6 +128,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fix updating the aggregation data of Panel section when changing the time filter [#3790](https://github.com/wazuh/wazuh-kibana-app/pull/3790)
 - Removed the button to remove an agent for a group in the agents' table when it is the default group [#3804](https://github.com/wazuh/wazuh-kibana-app/pull/3804)
 - Fixed internal user no longer needs permission to make x-pack detection request [#3831](https://github.com/wazuh/wazuh-kibana-app/pull/3831)
+- Fixed agents details card style [#3845](https://github.com/wazuh/wazuh-kibana-app/pull/3845)
 
 ## Wazuh v4.2.5 - Kibana 7.10.2, 7.11.2, 7.12.1, 7.13.4, 7.14.2 - Revision 4206
 
