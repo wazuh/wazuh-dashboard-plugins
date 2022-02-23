@@ -26,7 +26,7 @@ export default class GroupsColums {
           field: 'configSum',
           name: 'Configuration checksum',
           align: 'left',
-          sortable: true
+          sortable: false
         }
       ];
       this.columns.push({
