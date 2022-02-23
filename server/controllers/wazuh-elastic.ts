@@ -850,6 +850,24 @@ export class WazuhElasticCtrl {
     }
   }
 
+  // Check if there are indices for Monitoring
+  async existMonitoringIndices(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
+    try {
+      const config = getConfiguration();
+      const monitoringIndexPattern = config['wazuh.monitoring.pattern'] || WAZUH_MONITORING_PATTERN;
+      const existIndex = await context.core.elasticsearch.client.asCurrentUser.indices.exists({
+        index: monitoringIndexPattern,
+        allow_no_indices: false
+      });
+      return response.ok({
+        body: existIndex.body
+      });
+    } catch (error) {
+      log('wazuh-elastic:existsMonitoringIndices', error.message || error);
+      return ErrorResponse(error.message || error, 1000, 500, response);
+    }
+  }
+
   async usingCredentials(context) {
     try {
       const data = await context.core.elasticsearch.client.asInternalUser.cluster.getSettings(
