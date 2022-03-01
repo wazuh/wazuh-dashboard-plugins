@@ -209,7 +209,7 @@ export const AgentsPreview = compose(
               </EuiCard>
             </EuiFlexItem>
             {this.totalAgents > 0 && (
-              <EuiFlexItem >
+              <EuiFlexItem className="agents-details-card">
                 <EuiCard title description  betaBadgeLabel="Details">
                   <EuiFlexGroup>
                     <EuiFlexItem>
@@ -231,12 +231,17 @@ export const AgentsPreview = compose(
                             </EuiFlexItem>
                             <EuiFlexItem>
                               <EuiStat
-                                title={(
-                                  <EuiToolTip
-                                  position='top'
-                                  content='Show disconnected agents'>
-                                  <a onClick={() => this.showAgentsWithFilters(FILTER_DISCONNECTED)} >{this.state.data[1].value}</a>
-                                  </EuiToolTip>)}
+                                title={
+                                  <EuiToolTip position="top" content="Show disconnected agents">
+                                    <a
+                                      onClick={() =>
+                                        this.showAgentsWithFilters(FILTER_DISCONNECTED)
+                                      }
+                                    >
+                                      {this.state.data[1].value}
+                                    </a>
+                                  </EuiToolTip>
+                                }
                                 titleSize={'s'}
                                 description="Disconnected"
                                 titleColor="danger"
@@ -245,12 +250,17 @@ export const AgentsPreview = compose(
                             </EuiFlexItem>
                             <EuiFlexItem>
                               <EuiStat
-                                title={(
-                                  <EuiToolTip
-                                  position='top'
-                                  content='Show never connected agents'>
-                                  <a onClick={() => this.showAgentsWithFilters(FILTER_NEVER_CONNECTED)} >{this.state.data[2].value}</a>
-                                  </EuiToolTip>)}
+                                title={
+                                  <EuiToolTip position="top" content="Show never connected agents">
+                                    <a
+                                      onClick={() =>
+                                        this.showAgentsWithFilters(FILTER_NEVER_CONNECTED)
+                                      }
+                                    >
+                                      {this.state.data[2].value}
+                                    </a>
+                                  </EuiToolTip>
+                                }
                                 titleSize={'s'}
                                 description="Never connected"
                                 titleColor="subdued"
@@ -265,27 +275,27 @@ export const AgentsPreview = compose(
                                 className="white-space-nowrap"
                               />
                             </EuiFlexItem>
-                        </EuiFlexGroup>
-                      )}
-                      <EuiFlexGroup className="mt-0">
-                        {this.lastAgent && (
-                          <EuiFlexItem>
-                            <EuiStat
-                              className="euiStatLink"
-                              title={
-                              <EuiToolTip
-                                position='top'
-                                content='View agent details'>
-                                <a onClick={() => this.showLastAgent()}>{this.lastAgent.name}</a>
-                              </EuiToolTip>}
-                              titleSize="s"
-                              description="Last registered agent"
-                              titleColor="primary"
-                              className="pb-12 white-space-nowrap"
-                            />
-                          </EuiFlexItem>
+                          </EuiFlexGroup>
                         )}
-                      </EuiFlexGroup>
+                        <EuiFlexGroup className="mt-0">
+                          {this.lastAgent && (
+                            <EuiFlexItem className="agents-link-item">
+                              <EuiStat
+                                className="euiStatLink last-agents-link"
+                                title={
+                                  <EuiToolTip position="top" content="View agent details">
+                                    <a onClick={() => this.showLastAgent()}>
+                                      {this.lastAgent.name}
+                                    </a>
+                                  </EuiToolTip>
+                                }
+                                titleSize="s"
+                                description="Last registered agent"
+                                titleColor="primary"
+                              />
+                            </EuiFlexItem>
+                          )}
+                        </EuiFlexGroup>
                     </EuiFlexItem>
                   </EuiFlexGroup>
                 </EuiCard>
