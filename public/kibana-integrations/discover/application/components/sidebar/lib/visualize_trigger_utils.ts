@@ -23,16 +23,16 @@ import {
   visualizeGeoFieldTrigger,
 } from '../../../../../../../../../src/plugins/ui_actions/public';
 import { getUiActions } from '../../../../kibana_services';
-import { IndexPatternField, KBN_FIELD_TYPES } from '../../../../../../../../../src/plugins/data/public';
+import { IndexPatternField, OSD_FIELD_TYPES } from '../../../../../../../../../src/plugins/data/public';
 
 function getTriggerConstant(type: string) {
-  return type === KBN_FIELD_TYPES.GEO_POINT || type === KBN_FIELD_TYPES.GEO_SHAPE
+  return type === OSD_FIELD_TYPES.GEO_POINT || type === OSD_FIELD_TYPES.GEO_SHAPE
     ? VISUALIZE_GEO_FIELD_TRIGGER
     : VISUALIZE_FIELD_TRIGGER;
 }
 
 function getTrigger(type: string) {
-  return type === KBN_FIELD_TYPES.GEO_POINT || type === KBN_FIELD_TYPES.GEO_SHAPE
+  return type === OSD_FIELD_TYPES.GEO_POINT || type === OSD_FIELD_TYPES.GEO_SHAPE
     ? visualizeGeoFieldTrigger
     : visualizeFieldTrigger;
 }
