@@ -115,25 +115,14 @@ export function createTableRowDirective($compile: ng.ICompileService) {
       };
 
       $scope.getContextAppHref = () => {
-        const globalFilters: any = getServices().filterManager.getGlobalFilters();
-        const appFilters: any = getServices().filterManager.getAppFilters();
-
-        const hash = stringify(
-          url.encodeQuery({
-            _g: rison.encode({
-              filters: globalFilters || [],
-            }),
-            _a: rison.encode({
-              columns: $scope.columns,
-              filters: (appFilters || []).map(esFilters.disableFilter),
-            }),
-          }),
-          { encode: false, sort: false }
-        );
-
-        return `#/context/${encodeURIComponent($scope.indexPattern.id)}/${encodeURIComponent(
+        const tableParams = '_a=(columns:!(_source),filters:!())';
+        return `${location.origin}${location.pathname.replace('wazuh', 'discover')}#/context/${encodeURIComponent($scope.indexPattern.id)}/${encodeURIComponent(
           $scope.row._id
-        )}?${hash}`;
+        )}?${tableParams}`;
+      };
+
+      $scope.getDocLink = (id) => {
+        return `${location.origin}${location.pathname.replace('wazuh', 'discover')}#/doc/${$scope.indexPattern.id}/${$scope.row._index}?id=${id}`;
       };
 
       // create a tr element that lists the value for each *column*
