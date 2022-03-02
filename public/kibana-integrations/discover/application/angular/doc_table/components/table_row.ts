@@ -116,26 +116,17 @@ export function createTableRowDirective($compile: ng.ICompileService) {
       };
 
       $scope.getContextAppHref = () => {
-        const globalFilters: any = getServices().filterManager.getGlobalFilters();
-        const appFilters: any = getServices().filterManager.getAppFilters();
-
-        const hash = stringify(
-          url.encodeQuery({
-            _g: rison.encode({
-              filters: globalFilters || [],
-            }),
-            _a: rison.encode({
-              columns: $scope.columns,
-              filters: (appFilters || []).map(esFilters.disableFilter),
-            }),
-          }),
-          { encode: false, sort: false }
-        );
-
-        return `#/context/${encodeURIComponent($scope.indexPattern.id)}/${encodeURIComponent(
-          $scope.row._id
-        )}?${hash}`;
+        return `${getDiscoverPath()}#/context/${encodeURIComponent($scope.indexPattern.id)}/${ encodeURIComponent($scope.row._id) }?_a=(columns:!(_source),filters:!())`
       };
+
+      $scope.getDocLink = (id) => {
+        return `${getDiscoverPath()}#/doc/${$scope.indexPattern.id}/${$scope.row._index}?id=${id}`
+      };
+
+      function getDiscoverPath(){
+        const pathName = `${location.pathname}#`;
+        return `${location.origin}${pathName.replace('wazuh#', 'discover')}`;
+      }
 
       // create a tr element that lists the value for each *column*
       function createSummaryRow(row: any) {

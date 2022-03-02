@@ -18,7 +18,6 @@ import 'angular-route';
 import {
   settingsWizard,
   getSavedSearch,
-  goToPluginPlatform,
   getIp,
   getWzConfig,
   apiCount
@@ -114,19 +113,6 @@ function wzConfig($q, $rootScope, $location) {
 
 wzConfig.$inject = ['$q', '$rootScope', '$location'];
 
-function wzKibana($location, $window, $rootScope) {
-  assignPreviousLocation($rootScope, $location);
-  if ($location.$$path !== '/visualize/create') {
-    // Sets ?_a=(columns:!(_source),filters:!())
-    $location.search('_a', '(columns:!(_source),filters:!())');
-    // Removes ?_g
-    $location.search('_g', null);
-  }
-  return goToPluginPlatform($location, $window);
-}
-
-wzKibana.$inject = ['$location', '$window', '$rootScope'];
-
 function clearRuleId(commonData) {
   commonData.removeRuleId();
   return Promise.resolve();
@@ -192,21 +178,6 @@ app.config(['$routeProvider',($routeProvider) => {
   .when('/security', {
     template: securityTemplate,
     resolve: { enableWzMenu, nestedResolve, ip, savedSearch },
-    outerAngularWrapperRoute: true
-  })
-  .when('/visualize/create?', {
-    redirectTo: function () { },
-    resolve: { wzConfig, wzKibana },
-    outerAngularWrapperRoute: true
-  })
-  .when('/context/:pattern?/:type?/:id?', {
-    redirectTo: function () { },
-    resolve: { wzKibana },
-    outerAngularWrapperRoute: true
-  })
-  .when('/doc/:pattern?/:index?/:type?/:id?', {
-    redirectTo: function () { },
-    resolve: { wzKibana },
     outerAngularWrapperRoute: true
   })
   .when('/wazuh-dev', {
