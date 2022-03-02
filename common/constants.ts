@@ -359,7 +359,6 @@ export const REPORTS_PAGE_HEADER_TEXT = 'info@wazuh.com\nhttps://wazuh.com';
 // Plugin platform
 export const PLUGIN_PLATFORM_NAME = 'Kibana';
 export const PLUGIN_PLATFORM_BASE_INSTALLATION_PATH = '/usr/share/kibana/data/wazuh/';
-export const PLUGIN_PLATFORM_BASE_REDIRECTION_PATH = 'kibana';
 export const PLUGIN_PLATFORM_INSTALLATION_USER = 'kibana';
 export const PLUGIN_PLATFORM_INSTALLATION_USER_GROUP = 'kibana';
 export const PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_UPGRADE_PLATFORM = 'https://documentation.wazuh.com/current/upgrade-guide/';
