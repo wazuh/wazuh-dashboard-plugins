@@ -85,7 +85,7 @@ let observer = new MutationObserver((mutations) => {
           subtitleText.html(`
             <span>${trimmedText}</span>
             <img 
-              src="/plugins/wazuh/assets/new_logo_white.svg" 
+              src="/plugins/wazuh/assets/wazuh_login_logo_powered_by.svg" 
               class="subtitle-logo"            
             ">
           `);
