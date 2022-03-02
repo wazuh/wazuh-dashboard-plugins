@@ -13,7 +13,6 @@ import { checkTimestamp } from './check-timestamp';
 import { healthCheck } from './health-check';
 import { settingsWizard } from './settings-wizard';
 import { getSavedSearch } from './get-saved-search';
-import { goToPluginPlatform } from './go-to-plugin-platform';
 import { getIp } from './get-ip';
 import { getWzConfig } from './get-config';
 import { apiCount } from './api-count';
@@ -23,7 +22,6 @@ export {
   healthCheck,
   settingsWizard,
   getSavedSearch,
-  goToPluginPlatform,
   getIp,
   getWzConfig,
   apiCount
