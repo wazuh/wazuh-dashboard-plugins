@@ -120,6 +120,7 @@ export const AgentsPreview = compose(
         this.setState({ loading: true });
         const summaryData = await WzRequest.apiReq('GET', '/agents/summary/status', {});
         this.summary = summaryData.data.data;
+        this.summary.synced = 1; // HARDCODED TEST
         this.totalAgents = this.summary.total;
         const model = [
           { id: 'active', label: 'Active', value: this.summary['active'] || 0 },
@@ -129,11 +130,17 @@ export const AgentsPreview = compose(
             label: 'Never connected',
             value: this.summary['never_connected'] || 0,
           },
+          { id: 'pending', label: 'Pending', value: this.summary.pending || 0 },
         ];
         this.setState({ data: model });
         this.agentsCoverity = this.totalAgents
           ? ((this.summary['active'] || 0) / this.totalAgents) * 100
           : 0;
+
+        this.agentsSynced = this.summary.synced
+          ? ((this.summary.synced || 0) / this.summary.active) * 100
+          : 0;
+
         const lastAgent = await WzRequest.apiReq('GET', '/agents', {
           params: { limit: 1, sort: '-dateAdd', q: 'id!=000' },
         });
@@ -283,6 +290,14 @@ export const AgentsPreview = compose(
                                 title={`${this.agentsCoverity.toFixed(2)}%`}
                                 titleSize={'s'}
                                 description="Agents coverage"
+                                className="white-space-nowrap"
+                              />
+                            </EuiFlexItem>
+                            <EuiFlexItem className="agents-link-item">
+                              <EuiStat
+                                title={`${this.agentsSynced.toFixed(2)}%`}
+                                titleSize={'s'}
+                                description="Agents Synced"
                                 className="white-space-nowrap"
                               />
                             </EuiFlexItem>
