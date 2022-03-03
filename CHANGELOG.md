@@ -132,6 +132,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed internal user no longer needs permission to make x-pack detection request [#3831](https://github.com/wazuh/wazuh-kibana-app/pull/3831)
 - Fixed agents details card style [#3845](https://github.com/wazuh/wazuh-kibana-app/pull/3845) [#3860](https://github.com/wazuh/wazuh-kibana-app/pull/3860)
 - Fixed routing redirection in events documents discover links [#3866](https://github.com/wazuh/wazuh-kibana-app/pull/3866)
+- Fixed health-check [#3868](https://github.com/wazuh/wazuh-kibana-app/pull/3868)
 
 ## Wazuh v4.2.5 - Kibana 7.10.2, 7.11.2, 7.12.1, 7.13.4, 7.14.2 - Revision 4206
 
