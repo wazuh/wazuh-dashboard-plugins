@@ -72,8 +72,8 @@ export const checkIndexPatternObjectService =  async (appConfig, checkLogger: Ch
   if (AppState.getCurrentPattern() && listValidIndexPatterns.length) {
     const indexPatternToSelect = listValidIndexPatterns.find(item => item.id === AppState.getCurrentPattern());
     if (!indexPatternToSelect){
-      AppState.setCurrentPattern(indexPatternToSelect.id);
-      checkLogger.action(`Set index pattern id in cookie: [${indexPatternToSelect.id}]`);
+      AppState.setCurrentPattern(listValidIndexPatterns[0].id);
+      checkLogger.action(`Set index pattern id in cookie: [${listValidIndexPatterns[0].id}]`);
     }
   }
   
