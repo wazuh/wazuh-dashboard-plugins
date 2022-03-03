@@ -139,19 +139,13 @@ export default compose(
     }
 
     async initDaemonsList(logsPath) {
-      const daemonsNotIncluded = [
-        'wazuh-modulesd:task-manager',
-        'wazuh-modulesd:agent-upgrade'
-      ]
       try {
         const path = logsPath + '/summary';
         const data = await WzRequest.apiReq('GET', path, {});
         const formattedData = (((data || {}).data || {}).data || {}).affected_items;
         const daemonsList = [...['all']];
         for (const daemon of formattedData) {
-          if(!daemonsNotIncluded.includes(Object.keys(daemon)[0])){
             daemonsList.push(Object.keys(daemon)[0]);
-          }
         }
         this.setState({ daemonsList });
       } catch (error) {
