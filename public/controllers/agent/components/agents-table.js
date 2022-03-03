@@ -78,6 +78,13 @@ export const AgentsTable = withErrorBoundary(
         },
         {
           type: 'q',
+          label: 'synced',
+          description: 'Filter by agent synced configuration status',
+          operators: ['=', '!='],
+          values: ['true', 'false'],
+        },
+        {
+          type: 'q',
           label: 'os.platform',
           description: 'Filter by OS platform',
           operators: ['=', '!='],
@@ -329,6 +336,7 @@ export const AgentsTable = withErrorBoundary(
         name: agent.name,
         ip: agent.ip,
         status: agent.status,
+        synced: true,
         group: checkField(agent.group),
         os_name: agent,
         version: agentVersion,
@@ -422,6 +430,21 @@ export const AgentsTable = withErrorBoundary(
       );
     }
 
+    addSyncedStatusRender(status) {
+      const { color, label } = {
+        true: { color: 'success', label: 'Synced' },
+        false: { color: 'subdued', label: 'Not synced' }
+      }[status.toString()];
+
+      return (
+        <EuiHealth color={color}>
+          <span className={'hide-agent-status'}>
+            {label}
+          </span>
+        </EuiHealth>
+      );
+    }
+
     reloadAgent = () => {
       this._isMount &&
         this.setState({
@@ -482,23 +505,6 @@ export const AgentsTable = withErrorBoundary(
         text: text,
         toastLifeTimeMs: time,
       });
-    };
-
-    /* MULTISELECT TABLE */
-    onSelectionChange = (selectedItems) => {
-      const { managerVersion, pageSize } = this.state;
-
-      selectedItems.forEach((item) => {
-        if (managerVersion > item.version && item.version !== '.') {
-          item.outdated = true;
-        }
-      });
-
-      selectedItems.length !== pageSize
-        ? this._isMount && this.setState({ allSelected: false })
-        : false;
-
-      this._isMount && this.setState({ selectedItems });
     };
 
     renderUpgradeButton() {
@@ -801,20 +807,20 @@ export const AgentsTable = withErrorBoundary(
           field: 'name',
           name: 'Name',
           sortable: true,
-          width: '15%',
+          width: '10%',
           truncateText: true,
         },
         {
           field: 'ip',
           name: 'IP',
-          width: '10%',
+          width: '8%',
           truncateText: true,
           sortable: true,
         },
         {
           field: 'group',
           name: 'Group(s)',
-          width: '20%',
+          width: '14%',
           truncateText: true,
           sortable: true,
           render: (groups) => (groups !== '-' ? this.renderGroups(groups) : '-'),
@@ -823,14 +829,14 @@ export const AgentsTable = withErrorBoundary(
           field: 'os_name',
           name: 'OS',
           sortable: true,
-          width: '15%',
+          width: '10%',
           truncateText: true,
           render: this.addIconPlatformRender,
         },
         {
           field: 'node_name',
           name: 'Cluster node',
-          width: '10%',
+          width: '8%',
           truncateText: true,
           sortable: true,
         },
@@ -845,14 +851,14 @@ export const AgentsTable = withErrorBoundary(
         {
           field: 'dateAdd',
           name: 'Registration date',
-          width: '10%',
+          width: '8%',
           truncateText: true,
           sortable: true,
         },
         {
           field: 'lastKeepAlive',
           name: 'Last keep alive',
-          width: '10%',
+          width: '8%',
           truncateText: true,
           sortable: true,
         },
@@ -861,8 +867,16 @@ export const AgentsTable = withErrorBoundary(
           name: 'Status',
           truncateText: true,
           sortable: true,
-          width: '15%',
+          width: '10%',
           render: this.addHealthStatusRender,
+        },
+        {
+          field: 'synced',
+          name: 'Synced',
+          truncateText: true,
+          sortable: true,
+          width: '10%',
+          render: this.addSyncedStatusRender,
         },
         {
           align: 'right',
@@ -1033,11 +1047,6 @@ export const AgentsTable = withErrorBoundary(
         },
       };
 
-      const selection = {
-        selectable: (agent) => agent.id,
-        /* onSelectionChange: this.onSelectionChange */
-      };
-
       return (
         <EuiFlexGroup>
           <EuiFlexItem>
@@ -1050,8 +1059,6 @@ export const AgentsTable = withErrorBoundary(
               loading={isLoading}
               rowProps={getRowProps}
               cellProps={getCellProps}
-              /*             isSelectable={false}
-                        selection={selection} */
               noItemsMessage="No agents found"
               {...(pagination && { pagination })}
             />
