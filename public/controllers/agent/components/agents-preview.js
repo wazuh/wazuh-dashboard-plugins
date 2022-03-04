@@ -124,13 +124,13 @@ export const AgentsPreview = compose(
         this.totalAgents = this.summary.total;
         const model = [
           { id: 'active', label: 'Active', value: this.summary['active'] || 0 },
+          { id: 'pending', label: 'Pending', value: this.summary.pending || 0 },
           { id: 'disconnected', label: 'Disconnected', value: this.summary['disconnected'] || 0 },
           {
             id: 'neverConnected',
             label: 'Never connected',
             value: this.summary['never_connected'] || 0,
           },
-          { id: 'pending', label: 'Pending', value: this.summary.pending || 0 },
         ];
         this.setState({ data: model });
         this.agentsCoverity = this.totalAgents
@@ -189,7 +189,7 @@ export const AgentsPreview = compose(
     }
 
     render() {
-      const colors = ['#017D73', '#bd271e', '#69707D'];
+      const colors = ['#017D73', '#ffc426', '#bd271e', '#69707D'];
       return (
         <EuiPage className="flex-column">
           <EuiFlexItem>
