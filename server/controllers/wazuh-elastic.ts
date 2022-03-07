@@ -613,7 +613,7 @@ export class WazuhElasticCtrl {
     try {
       // Check if wazuh sample alerts index exists
       const results = await Promise.all(Object.keys(WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS)
-        .map((category) => context.core.elasticsearch.client.asCurrentUser.indices.exists({
+        .map((category) => context.core.elasticsearch.client.asInternalUser.indices.exists({
           index: this.buildSampleIndexByCategory(category)
         })));
       return response.ok({
@@ -635,7 +635,7 @@ export class WazuhElasticCtrl {
     try {
       const sampleAlertsIndex = this.buildSampleIndexByCategory(request.params.category);
       // Check if wazuh sample alerts index exists
-      const existsSampleIndex = await context.core.elasticsearch.client.asCurrentUser.indices.exists({
+      const existsSampleIndex = await context.core.elasticsearch.client.asInternalUser.indices.exists({
         index: sampleAlertsIndex
       });
       return response.ok({
