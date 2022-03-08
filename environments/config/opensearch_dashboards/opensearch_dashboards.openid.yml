@@ -1,0 +1,21 @@
+server.host: "0.0.0.0"
+opensearch.hosts: "https://opensearch:9200"
+
+# OpenSearch security
+opensearch.ssl.verificationMode: none
+opensearch.username: kibanaserver
+opensearch.password: kibanaserver
+opensearch.requestHeadersWhitelist: ["securitytenant","Authorization"]
+opensearch_security.multitenancy.enabled: true
+opensearch_security.multitenancy.tenants.preferred: ["Private", "Global"]
+
+# OpenID Connect
+opensearch_security.auth.type: "openid"
+# The IdP metadata endpoint
+opensearch_security.openid.connect_url: "http://172.17.1.2:9000/.well-known/openid-configuration"
+
+# The ID of the OpenID Connect client in your IdP
+opensearch_security.openid.client_id: "foo"
+
+# The client secret of the OpenID Connect client
+opensearch_security.openid.client_secret: "bar"

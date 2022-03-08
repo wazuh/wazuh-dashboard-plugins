@@ -1,0 +1,36 @@
+mojave
+#!-Darwin |snaow-imac.home |18.5.0 |Darwin Kernel Version 18.5.0: Mon Mar 11 20:40:32 PDT 2019; root:xnu-4903.251.3~3/RELEASE_X86_64 |x86_64 [Mac OS X|darwin: 10.14.4 (Mojave)] - Wazuh v3.11.0 / ab73af41699f13fdd81903b5f23d8d00
+d6e3ac3e75ca0319af3e7c262776f331 merged.mg
+#"_agent_ip":172.16.5.5
+ubuntu12.04
+#!-Linux |agent-ubuntu12 |3.2.0-126-virtual |#220-Ubuntu SMP Thu May 9 12:40:49 UTC 2019 |x86_64 [Ubuntu|ubuntu: 12.04.5 LTS, Precise Pangolin] - Wazuh v3.11.3 / ab73af41699f13fdd81903b5f23d8d00
+d6e3ac3e75ca0319af3e7c262776f331 merged.mg
+#"_agent_ip":172.16.5.6
+ubuntu14.04
+#!-Linux |agent-ubuntu14 |3.13.0-170-generic |#220-Ubuntu SMP Thu May 9 12:40:49 UTC 2019 |x86_64 [Ubuntu|ubuntu: 14.04.6 LTS, Trusty Tahr] - Wazuh v3.11.3 / ab73af41699f13fdd81903b5f23d8d00
+d6e3ac3e75ca0319af3e7c262776f331 merged.mg
+#"_agent_ip":172.16.5.7
+ubuntu16.04
+#!-Linux |agent-ubuntu16 |4.4.0-173-generic |#220-Ubuntu SMP Thu May 9 12:40:49 UTC 2019 |x86_64 [Ubuntu|ubuntu: 16.04.6 LTS (Xenial Xerus)] - Wazuh v3.11.3 / ab73af41699f13fdd81903b5f23d8d00
+d6e3ac3e75ca0319af3e7c262776f331 merged.mg
+#"_agent_ip":172.16.5.8
+ubuntu18.04
+#!-Linux |agent-ubuntu18 |4.15.0-76-generic |#220-Ubuntu SMP Thu May 9 12:40:49 UTC 2019 |x86_64 [Ubuntu|ubuntu: 18.04.4 LTS (Bionic Beaver)] - Wazuh v3.11.3 / ab73af41699f13fdd81903b5f23d8d00
+d6e3ac3e75ca0319af3e7c262776f331 merged.mg
+#"_agent_ip":172.16.5.9
+debian7
+#!-Linux |agent-debian7 |3.16.0-9-amd64 |#1 SMP Debian 3.16.68-1 (2019-05-22) |x86_64 [Debian GNU/Linux|debian: 7 (wheezy)] - Wazuh v3.11.3 / ab73af41699f13fdd81903b5f23d8d00
+d6e3ac3e75ca0319af3e7c262776f331 merged.mg
+#"_agent_ip":10.0.2.15
+debian8
+#!-Linux |agent-debian8 |3.16.0-9-amd64 |#1 SMP Debian 3.16.68-1 (2019-05-22) |x86_64 [Debian GNU/Linux|debian: 8 (jessie)] - Wazuh v3.11.3 / ab73af41699f13fdd81903b5f23d8d00
+d6e3ac3e75ca0319af3e7c262776f331 merged.mg
+#"_agent_ip":10.0.2.15
+debian9
+#!-Linux |agent-debian9 |4.9.0-12-amd64 |#1 SMP Debian 4.9.210-1 (2020-01-20) |x86_64 [Debian GNU/Linux|debian: 9 (stretch)] - Wazuh v3.11.3 / ab73af41699f13fdd81903b5f23d8d00
+d6e3ac3e75ca0319af3e7c262776f331 merged.mg
+#"_agent_ip":10.0.2.15
+debian10
+#!-Linux |agent-debian10 |4.9.0-12-amd64 |#1 SMP Debian 4.9.210-1 (2020-01-20) |x86_64 [Debian GNU/Linux|debian: 10 (buster)] - Wazuh v3.11.3 / ab73af41699f13fdd81903b5f23d8d00
+d6e3ac3e75ca0319af3e7c262776f331 merged.mg
+#"_agent_ip":10.0.2.15

@@ -1,0 +1,10 @@
+server.host: "0.0.0.0"
+elasticsearch.hosts: "https://elasticsearch:9200"
+
+# Opendistro
+elasticsearch.ssl.verificationMode: none
+elasticsearch.username: kibanaserver
+elasticsearch.password: kibanaserver
+elasticsearch.requestHeadersWhitelist: ["securitytenant","Authorization"]
+opendistro_security.multitenancy.enabled: true
+opendistro_security.multitenancy.tenants.preferred: ["Private", "Global"]

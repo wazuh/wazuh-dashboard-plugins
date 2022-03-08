@@ -66,3 +66,11 @@ target/
 build/
 
 yarn.lock
+
+certs/
+custom/
+.vscode
+.idea
+.vagrant
+packages
+.DS_Store

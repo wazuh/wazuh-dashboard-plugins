@@ -1,0 +1,19 @@
+BASIC
+
+sh install_wz_plugin.sh basic wazuh_kibana-4.3.0_7.16.3-rc4.zip /Users/matiasezequielmoreno/Documents/proyectos/wazuh-app-environments/templates_elastic_prod/es_basic-wz_cluster-agent/docker-compose.yml
+
+XPACK
+
+sh install_wz_plugin.sh xpack wazuh_kibana-4.3.0_7.16.3-rc4.zip /Users/matiasezequielmoreno/Documents/proyectos/wazuh-app-environments/templates_elastic_prod/es_xpack-wz_cluster-agent/docker-compose.yml
+sh install_wz_plugin.sh xpack wazuh_kibana-4.2.5_7.14.2-1.zip /Users/matiasezequielmoreno/Documents/proyectos/wazuh-app-environments/templates_elastic_prod/es_xpack-wz_cluster-agent/docker-compose.yml
+
+
+
+ODFE
+
+sh install_wz_plugin.sh odfe wazuh_kibana-4.3.0_7.10.2-rc4.zip /Users/matiasezequielmoreno/Documents/proyectos/wazuh-app-environments/templates_elastic_prod/es_odfe-wz_cluster-agent/docker-compose.yml
+sh install_wz_plugin.sh odfe wazuh_kibana-4.2.5_7.10.2-1.zip /Users/matiasezequielmoreno/Documents/proyectos/wazuh-app-environments/templates_elastic_prod/es_odfe-wz_cluster-agent/docker-compose.yml
+
+OSFE
+
+sh install_wz_plugin.sh osfe wazuh-4.3.0-1.2.0-rc4.zip /Users/matiasezequielmoreno/Documents/proyectos/wazuh-app-environments/templates_elastic_prod/es_basic-wz_cluster-agent/docker-compose.yml

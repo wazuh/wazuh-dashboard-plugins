@@ -1,0 +1,71 @@
+---
+_meta:
+  type: "config"
+  config_version: 2
+
+config:
+  dynamic:
+    http:
+      anonymous_auth_enabled: false
+    authc:
+      internal_auth:
+        order: 0
+        description: "HTTP basic authentication using the internal user database"
+        http_enabled: true
+        transport_enabled: true
+        http_authenticator:
+          type: basic
+          challenge: false
+        authentication_backend:
+          type: internal
+      ldap_auth:
+        order: 1
+        description: "Authenticate using LDAP"
+        http_enabled: true
+        transport_enabled: true
+        http_authenticator:
+          type: basic
+          challenge: false
+        authentication_backend:
+          type: ldap
+          config:
+            enable_ssl: false
+            enable_start_tls: false
+            enable_ssl_client_auth: false
+            verify_hostnames: true
+            hosts:
+            - openldap:389
+            bind_dn: cn=readonly,dc=example,dc=org
+            password: changethistoo
+            userbase: ou=People,dc=example,dc=org
+            usersearch: (cn={0})
+            username_attribute: cn
+
+    authz:
+      ldap_roles:
+        description: "Authorize using LDAP"
+        http_enabled: true
+        transport_enabled: true
+        authorization_backend:
+          type: ldap
+          config:
+            enable_ssl: false
+            enable_start_tls: false
+            enable_ssl_client_auth: false
+            verify_hostnames: true
+            hosts:
+            - openldap:389
+            bind_dn: cn=readonly,dc=example,dc=org
+            password: changethistoo
+            userbase: ou=People,dc=example,dc=org
+            usersearch: (cn={0})
+            username_attribute: cn
+            skip_users:
+              - admin
+              - kibanaserver
+            rolebase: ou=Groups,dc=example,dc=org
+            rolesearch: (uniqueMember={0})
+            userroleattribute: null
+            userrolename: disabled
+            rolename: cn
+            resolve_nested_roles: false

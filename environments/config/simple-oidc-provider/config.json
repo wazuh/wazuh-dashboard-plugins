@@ -1,0 +1,25 @@
+{
+    "idp_name": "http://simple-oidc-provider",
+    "port": 9000,
+    "client_config": [
+      {
+        "client_id": "foo",
+        "client_secret": "bar",
+        "redirect_uris": [
+          "https://localhost:5601/auth/openid/login"
+        ],
+        "token_endpoint_auth_method": "client_secret_post"
+      }
+    ],
+    "claim_mapping": {
+      "openid": [ "sub" ],
+      "email": [ "email", "email_verified" ],
+      "profile": [ "name", "nickname" ]
+    },
+    "https": {
+      "enabled": true,
+      "port": 9443,
+      "certPath": "/certs/cert.crt",
+      "keyPath": "/certs/cert.key"
+    }
+}

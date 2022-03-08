@@ -1,0 +1,69 @@
+# --- OUs -------------------------------------
+
+dn: ou=Groups,dc=example,dc=org
+objectClass: organizationalunit
+objectClass: top
+ou: Groups
+
+dn: ou=People,dc=example,dc=org
+objectClass: organizationalunit
+objectClass: top
+ou: People
+
+
+# --- People ----------------------------------
+
+dn: cn=jroe,ou=People,dc=example,dc=org
+objectClass: person
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: top
+cn: jroe
+userpassword: password
+givenname: Jane
+sn: Roe
+mail: jroe@example.org
+uid: 1001
+
+dn: cn=jdoe,ou=People,dc=example,dc=org
+objectClass: person
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: top
+cn: jdoe
+userpassword: password
+givenname: John
+sn: Doe
+mail: jdoe@example.org
+uid: 1002
+
+dn: cn=psantos,ou=People,dc=example,dc=org
+objectClass: person
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: top
+cn: psantos
+userpassword: password
+givenname: Paulo
+sn: Santos
+mail: psantos@example.org
+uid: 1003
+
+
+# --- Groups ----------------------------------
+
+dn: cn=Administrator,ou=Groups,dc=example,dc=org
+objectClass: groupofuniquenames
+objectClass: top
+ou: Groups
+cn: Administrator
+uniquemember: cn=psantos, ou=People, dc=example,dc=org
+
+dn: cn=Developers,ou=Groups,dc=example,dc=org
+objectClass: groupofuniquenames
+objectClass: top
+ou: Groups
+cn: Developers
+uniquemember: cn=psantos, ou=People, dc=example,dc=org
+uniquemember: cn=jroe, ou=People, dc=example,dc=org
+uniquemember: cn=jdoe, ou=People, dc=example,dc=org
