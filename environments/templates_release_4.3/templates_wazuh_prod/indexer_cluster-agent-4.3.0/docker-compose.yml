@@ -1,8 +1,8 @@
 version: "3.7"
 
 services:
-  opensearch_dashboards:
-    hostname: "opensearch_dashboards"
+  wazuh_dashboard:
+    hostname: "wazuh_dashboard"
     image: wazuh/wazuh-dashboard:${WAZUH_DASHBOARD_VERSION}
     environment:
       - WAZUH_API_URL="https://wazuh-manager-master"
@@ -10,13 +10,13 @@ services:
       - "${APP_PACKAGES_PATH}:/packages"
     ports:
       - 5601:443
-  opensearch:
+  indexer:
     image: wazuh/wazuh-indexer:${WAZUH_DASHBOARD_VERSION}
     hostname: wazuh1.indexer
     environment:
-      - node.name=opensearch
+      - node.name=indexer
       - cluster.name=es-docker-cluster
-      - cluster.initial_master_nodes=opensearch
+      - cluster.initial_master_nodes=indexer
       - bootstrap.memory_lock=true
       - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
       - compatibility.override_main_response_version=true
@@ -46,7 +46,7 @@ services:
       - "1516:1516"
       - "55000:55000"
     depends_on:
-      - opensearch
+      - indexer
     environment:
       NODE_IP: wazuh-manager-master
       NODE_NAME: master-node
@@ -70,7 +70,7 @@ services:
     #   - "1516:1516"
     #   - "55000:55000"
     depends_on:
-      - opensearch
+      - indexer
     environment:
       NODE_IP: wazuh-manager-master
       NODE_NAME: worker-node
