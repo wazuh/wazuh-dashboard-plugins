@@ -11,7 +11,7 @@
  */
 import { WzRequest } from '../../../../../react-services/wz-request';
 
-export async function getSummary(agentId) {
+export async function getAggregation(agentId, field = '') {
   let summary = [
     { title: 50, description: 'Critical', titleColor: 'danger' },
     { title: 25, description: 'High', titleColor: '#FEC514' },
@@ -19,7 +19,7 @@ export async function getSummary(agentId) {
     { title: 17, description: 'Low', titleColor: 'subdued' },
   ];
   try {
-    const result = await WzRequest.apiReq('GET', `/vulnerability/${agentId}/summary`, {});
+    const result = await WzRequest.apiReq('GET', `/vulnerability/${agentId}/summary/${field}`, {});
     summary = (((result || {}).data || {}).data || {}).affected_items || {};
   } catch (e) {
 
