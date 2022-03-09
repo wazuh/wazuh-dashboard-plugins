@@ -235,6 +235,7 @@ export class InventoryTable extends Component {
         downloadCsv={true}
         filters={filters}
         onFiltersChange={onFiltersChange}
+        tablePageSizeOptions={[10, 25, 50, 100]}
       />
     );
   }

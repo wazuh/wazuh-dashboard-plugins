@@ -14,15 +14,28 @@ import React, { Component } from 'react';
 import {
   EuiPanel,
   EuiPage,
+  EuiPageBody,
   EuiSpacer,
   EuiProgress,
   EuiFlexGroup,
   EuiFlexItem,
+  EuiCard,
+  EuiStat,
+  EuiBasicTable,
+  EuiText,
+  EuiIcon
 } from '@elastic/eui';
 import {
   InventoryTable,
 } from './inventory/';
+import {
+  getSummary,
+} from './inventory/lib';
 import { ICustomBadges } from '../../wz-search-bar/components';
+import { Pie } from '../../d3/pie';
+import { formatUIDate } from '../../../react-services';
+
+interface Kpi {title: number, description: string, titleColor: string}
 
 export class Inventory extends Component {
   _isMount = false;
@@ -30,6 +43,7 @@ export class Inventory extends Component {
     filters: [];
     isLoading: Boolean;
     customBadges: ICustomBadges[];
+    stats: Kpi[]
   };
   props: any;
 
@@ -39,6 +53,7 @@ export class Inventory extends Component {
       isLoading: true,
       customBadges: [],
       filters: [],
+      stats: [],
     }
   }
 
@@ -53,7 +68,15 @@ export class Inventory extends Component {
 
   async loadAgent() {
     if (this._isMount) {
-      this.setState({ isLoading: false });
+      
+      const summary = await getSummary(this.filters);
+      const stats = summary ? summary : [
+        {title: 50, description: 'Critical', titleColor: 'danger'},
+        {title: 25, description: 'High', titleColor: '#FEC514'},
+        {title: 40, description: 'Medium', titleColor: 'primary'},
+        {title: 17, description: 'Low', titleColor: 'subdued'},
+      ]
+      this.setState({ isLoading: false, stats });
     }
   }
 
@@ -86,16 +109,88 @@ export class Inventory extends Component {
 
 
   render() {
-    const { isLoading } = this.state;
+    const { isLoading, stats } = this.state;
     if (isLoading) {
       return this.loadingInventory()
     }
+    const vulnerabilityLastScan = {
+      last_full_scan: '2022-03-08T09:49:02Z',
+      last_partial_scan: '2022-03-08T09:49:02Z',
+    };
     const table = this.renderTable();
-
     return <EuiPage>
-      <EuiPanel>
-        {table}
-      </EuiPanel>
+      <EuiPageBody>
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            <EuiCard title description betaBadgeLabel="Severity">
+              <Pie
+                width={300}
+                height={125}
+                data={[
+                  {id: 'critical', label: 'Critical', value: 50},
+                  {id: 'high', label: 'High', value: 25},
+                  {id: 'medium', label: 'Medium', value: 40},
+                  {id: 'low', label: 'Low', value: 17}
+                ]}
+                colors={['#BD271E', '#FEC514', '#0077CC', '#6a717d']}
+              />
+            </EuiCard>
+          </EuiFlexItem>
+          <EuiFlexItem>
+            <EuiCard title description betaBadgeLabel="Details">
+              <EuiFlexGroup alignItems='center'>
+                {stats.map(({description, title, titleColor}) => (
+                  <EuiFlexItem
+                    key={`module_vulnerabilities_inventory_stat_${description}`}
+                  >
+                    <EuiStat    
+                      textAlign='center'
+                      title={title}
+                      description={description}
+                      titleColor={titleColor}
+                    />
+
+                  </EuiFlexItem>
+                ))}
+                
+              </EuiFlexGroup>
+              <EuiFlexGroup style={{marginTop: 'auto'}}>
+                <EuiFlexItem>
+                  <EuiText>
+                    <EuiIcon type="calendar" color={'primary'}/> Last full scan: {formatUIDate(vulnerabilityLastScan.last_full_scan)}
+                  </EuiText>
+                </EuiFlexItem>
+                <EuiFlexItem>
+                  <EuiText>
+                    <EuiIcon type="calendar" color={'primary'}/> Last partial scan: {formatUIDate(vulnerabilityLastScan.last_partial_scan)}
+                  </EuiText>
+                </EuiFlexItem>
+              </EuiFlexGroup>
+
+            </EuiCard>
+          </EuiFlexItem>
+          <EuiFlexItem>
+            <EuiCard title description betaBadgeLabel="Top affected packages by CVEs">
+              <EuiBasicTable
+                columns={[
+                  {field: 'name', name: 'Name'},
+                  {field: 'version', name: 'Version'},
+                  {field: 'count', name: 'Count'},
+                ]}
+                items={[
+                  {name: 'bash', count: 4, version: '0.0.0'},
+                  {name: 'curl', count: 2, version: '0.0.0'},
+                  {name: 'python', count: 2, version: '0.0.0'},
+                ]}
+              />
+            </EuiCard>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+        <EuiSpacer />
+        <EuiPanel>
+          {table}
+        </EuiPanel>
+      </EuiPageBody>
     </EuiPage>
   }
 }
