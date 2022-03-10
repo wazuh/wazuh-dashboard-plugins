@@ -130,7 +130,7 @@ export const ModulesDefaults = {
     availableFor: ['manager', 'agent'],
   },
   vuls: {
-    init: 'dashboard',
+    init: 'inventory',
     tabs: [
       {
         id: 'inventory',
@@ -138,7 +138,6 @@ export const ModulesDefaults = {
         buttons: [ButtonModuleExploreAgent],
         component: MainVuls,
       },
-      DashboardTab,
       EventsTab,
     ],
     buttons: ['settings'],
