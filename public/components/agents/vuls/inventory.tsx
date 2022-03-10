@@ -29,13 +29,14 @@ import {
   InventoryTable,
 } from './inventory/';
 import {
-  getSummary,
+  getSummary, getLastScan, getAggregation
 } from './inventory/lib';
 import { ICustomBadges } from '../../wz-search-bar/components';
 import { Pie } from '../../d3/pie';
 import { formatUIDate } from '../../../react-services';
 
-interface Kpi {title: number, description: string, titleColor: string}
+interface Aggregation { title: number, description: string, titleColor: string }
+interface LastScan { last_full_scan: string, last_partial_scan: string }
 
 export class Inventory extends Component {
   _isMount = false;
@@ -43,10 +44,12 @@ export class Inventory extends Component {
     filters: [];
     isLoading: Boolean;
     customBadges: ICustomBadges[];
-    stats: Kpi[]
+    stats: Aggregation[],
+    vulnerabilityLastScan: LastScan,
+    aggregation: Aggregation[]
   };
   props: any;
-
+  
   constructor(props) {
     super(props);
     this.state = {
@@ -54,6 +57,8 @@ export class Inventory extends Component {
       customBadges: [],
       filters: [],
       stats: [],
+      vulnerabilityLastScan: { last_full_scan: '', last_partial_scan: '' },
+      aggregation: [],
     }
   }
 
@@ -67,17 +72,24 @@ export class Inventory extends Component {
   }
 
   async loadAgent() {
-    if (this._isMount) {
-      
-      const summary = await getSummary(this.filters);
+    if (this._isMount) {    
+      const { id } = this.props.agent;
+      const summary = await getSummary(id);
+      const vulnerabilityLastScan = await getLastScan(id);
+      const aggregation = await getAggregation(id);
+
       const stats = summary ? summary : [
         {title: 50, description: 'Critical', titleColor: 'danger'},
         {title: 25, description: 'High', titleColor: '#FEC514'},
         {title: 40, description: 'Medium', titleColor: 'primary'},
         {title: 17, description: 'Low', titleColor: 'subdued'},
       ]
-      this.setState({ isLoading: false, stats });
+      this.setState({ isLoading: false, stats, aggregation, vulnerabilityLastScan });
     }
+  }
+
+  onAggregationChange = (filters) => {
+    this.setState({ filters });
   }
 
   onFiltersChange = (filters) => {
@@ -109,14 +121,13 @@ export class Inventory extends Component {
 
 
   render() {
-    const { isLoading, stats } = this.state;
+    const { isLoading, stats, vulnerabilityLastScan } = this.state;
     if (isLoading) {
       return this.loadingInventory()
     }
-    const vulnerabilityLastScan = {
-      last_full_scan: '2022-03-08T09:49:02Z',
-      last_partial_scan: '2022-03-08T09:49:02Z',
-    };
+    const last_full_scan = vulnerabilityLastScan.last_full_scan ? formatUIDate(vulnerabilityLastScan.last_full_scan) : '-';
+    const last_partial_scan = vulnerabilityLastScan.last_partial_scan ? formatUIDate(vulnerabilityLastScan.last_partial_scan) : '-';
+    
     const table = this.renderTable();
     return <EuiPage>
       <EuiPageBody>
@@ -157,12 +168,12 @@ export class Inventory extends Component {
               <EuiFlexGroup style={{marginTop: 'auto'}}>
                 <EuiFlexItem>
                   <EuiText>
-                    <EuiIcon type="calendar" color={'primary'}/> Last full scan: {formatUIDate(vulnerabilityLastScan.last_full_scan)}
+                    <EuiIcon type="calendar" color={'primary'}/> Last full scan: {last_full_scan}
                   </EuiText>
                 </EuiFlexItem>
                 <EuiFlexItem>
                   <EuiText>
-                    <EuiIcon type="calendar" color={'primary'}/> Last partial scan: {formatUIDate(vulnerabilityLastScan.last_partial_scan)}
+                    <EuiIcon type="calendar" color={'primary'}/> Last partial scan: {last_partial_scan}
                   </EuiText>
                 </EuiFlexItem>
               </EuiFlexGroup>
