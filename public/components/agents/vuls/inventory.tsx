@@ -46,7 +46,8 @@ export class Inventory extends Component {
     customBadges: ICustomBadges[];
     stats: Aggregation[],
     vulnerabilityLastScan: LastScan,
-    aggregation: Aggregation[]
+    aggregation: Aggregation[],
+    aggrField: string
   };
   props: any;
   
@@ -57,8 +58,12 @@ export class Inventory extends Component {
       customBadges: [],
       filters: [],
       stats: [],
-      vulnerabilityLastScan: { last_full_scan: '', last_partial_scan: '' },
+      vulnerabilityLastScan: {
+        last_full_scan: '1970-01-01T00:00:00Z',
+        last_partial_scan: '1970-01-01T00:00:00Z'
+      },
       aggregation: [],
+      aggrField: '',
     }
   }
 
@@ -74,9 +79,10 @@ export class Inventory extends Component {
   async loadAgent() {
     if (this._isMount) {    
       const { id } = this.props.agent;
+      const { aggrField } = this.state;
       const summary = await getSummary(id);
       const vulnerabilityLastScan = await getLastScan(id);
-      const aggregation = await getAggregation(id);
+      const aggregation = await getAggregation(id, aggrField);
 
       const stats = summary ? summary : [
         {title: 50, description: 'Critical', titleColor: 'danger'},
@@ -84,12 +90,20 @@ export class Inventory extends Component {
         {title: 40, description: 'Medium', titleColor: 'primary'},
         {title: 17, description: 'Low', titleColor: 'subdued'},
       ]
-      this.setState({ isLoading: false, stats, aggregation, vulnerabilityLastScan });
+      this.setState({
+        isLoading: false,
+        stats,
+        aggregation,
+        vulnerabilityLastScan
+      });
     }
   }
 
-  onAggregationChange = (filters) => {
-    this.setState({ filters });
+
+
+  onAggregationChange = async (newField: string) => {
+    const aggregation = await getAggregation(this.props.agent.id, newField);
+    this.setState({ aggrField: newField, aggregation });
   }
 
   onFiltersChange = (filters) => {
@@ -119,14 +133,17 @@ export class Inventory extends Component {
     </EuiPage>;
   }
 
+  beautifyDate(date: string) {
+    return ['', '1970-01-01T00:00:00Z'].includes(date) ? '-' : formatUIDate(date);
+  }
 
   render() {
     const { isLoading, stats, vulnerabilityLastScan } = this.state;
     if (isLoading) {
       return this.loadingInventory()
     }
-    const last_full_scan = vulnerabilityLastScan.last_full_scan ? formatUIDate(vulnerabilityLastScan.last_full_scan) : '-';
-    const last_partial_scan = vulnerabilityLastScan.last_partial_scan ? formatUIDate(vulnerabilityLastScan.last_partial_scan) : '-';
+    const last_full_scan = this.beautifyDate(vulnerabilityLastScan.last_full_scan);
+    const last_partial_scan = this.beautifyDate(vulnerabilityLastScan.last_partial_scan);
     
     const table = this.renderTable();
     return <EuiPage>
