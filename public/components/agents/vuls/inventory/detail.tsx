@@ -126,7 +126,39 @@ export class Details extends Component {
         icon: 'clock',
         link: false,
         transformValue: formatUIDate
-      }
+      },
+      {
+        field: 'references',
+        name: 'References',
+        icon: 'clock',
+        link: false,
+      },
+      {
+        field: 'condition',
+        name: 'Condition',
+        icon: 'clock',
+        link: false,
+      },
+      {
+        field: 'title',
+        name: 'Title',
+        icon: 'clock',
+        link: false,
+      },
+      {
+        field: 'published',
+        name: 'Published',
+        icon: 'clock',
+        link: false,
+        transformValue: formatUIDate
+      },
+      {
+        field: 'updated',
+        name: 'Updated',
+        icon: 'clock',
+        link: false,
+        transformValue: formatUIDate
+      },
     ];
   }
 
