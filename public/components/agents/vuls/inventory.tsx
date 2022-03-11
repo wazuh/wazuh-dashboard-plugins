@@ -23,7 +23,8 @@ import {
   EuiStat,
   EuiBasicTable,
   EuiText,
-  EuiIcon
+  EuiIcon,
+  euiPaletteColorBlind
 } from '@elastic/eui';
 import {
   InventoryTable,
@@ -34,6 +35,7 @@ import {
 import { ICustomBadges } from '../../wz-search-bar/components';
 import { Pie } from '../../d3/pie';
 import { formatUIDate } from '../../../react-services';
+import { VisualizationBasicWidgetSelector  } from '../../common/charts/visualizations/basic';
 
 interface Aggregation { title: number, description: string, titleColor: string }
 interface LastScan { last_full_scan: string, last_partial_scan: string }
@@ -65,6 +67,8 @@ export class Inventory extends Component {
       aggregation: [],
       aggrField: '',
     }
+    this.fetchVisualizationVulnerabilitiesSummaryData = this.fetchVisualizationVulnerabilitiesSummaryData.bind(this);
+    this.colorsVisualizatioVulnerabilitiesSummaryData = euiPaletteColorBlind();
   }
 
   async componentDidMount() {
@@ -76,13 +80,22 @@ export class Inventory extends Component {
     this._isMount = false;
   }
 
+  async fetchVisualizationVulnerabilitiesSummaryData(field, agentID){
+    const results = await getAggregation(agentID, field, 3);
+    return Object.entries(results[field]).map(([key, value], index) => ({
+      label: key,
+      value,
+      color: this.colorsVisualizatioVulnerabilitiesSummaryData[index]
+    }))
+  }
+
   async loadAgent() {
     if (this._isMount) {    
       const { id } = this.props.agent;
       const { aggrField } = this.state;
-      const summary = await getSummary(id);
+      const summary = false && await getSummary(id);
       const vulnerabilityLastScan = await getLastScan(id);
-      const aggregation = await getAggregation(id, aggrField);
+      const aggregation = await getAggregation(id, 'severity');
 
       const stats = summary ? summary : [
         {title: 50, description: 'Critical', titleColor: 'danger'},
@@ -99,12 +112,6 @@ export class Inventory extends Component {
     }
   }
 
-
-
-  onAggregationChange = async (newField: string) => {
-    const aggregation = await getAggregation(this.props.agent.id, newField);
-    this.setState({ aggrField: newField, aggregation });
-  }
 
   onFiltersChange = (filters) => {
     this.setState({ filters });
@@ -199,17 +206,17 @@ export class Inventory extends Component {
           </EuiFlexItem>
           <EuiFlexItem>
             <EuiCard title description betaBadgeLabel="Top affected packages by CVEs">
-              <EuiBasicTable
-                columns={[
-                  {field: 'name', name: 'Name'},
-                  {field: 'version', name: 'Version'},
-                  {field: 'count', name: 'Count'},
+              <VisualizationBasicWidgetSelector
+                type='donut'
+                size={{width: '100%', height: '200px'}}
+                showLegend
+                selectorOptions={[
+                  { value: 'name', text: 'Program' }
                 ]}
-                items={[
-                  {name: 'bash', count: 4, version: '0.0.0'},
-                  {name: 'curl', count: 2, version: '0.0.0'},
-                  {name: 'python', count: 2, version: '0.0.0'},
-                ]}
+                onFetch={this.fetchVisualizationVulnerabilitiesSummaryData}
+                onFetchExtraDependencies={[this.props.agent.id]}
+                noDataTitle='No results'
+                noDataMessage={(_, optionRequirement) => `No ${optionRequirement.text} results were found.`}
               />
             </EuiCard>
           </EuiFlexItem>
