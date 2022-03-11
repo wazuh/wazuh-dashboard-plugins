@@ -24,13 +24,14 @@ import {
   EuiBasicTable,
   EuiText,
   EuiIcon,
-  euiPaletteColorBlind
+  euiPaletteColorBlind,
 } from '@elastic/eui';
+import { EuiPalette } from '@elastic/eui/src/services/color/eui_palettes';
 import {
   InventoryTable,
 } from './inventory/';
 import {
-  getSummary, getLastScan, getAggregation
+  getLastScan, getAggregation
 } from './inventory/lib';
 import { ICustomBadges } from '../../wz-search-bar/components';
 import { Pie } from '../../d3/pie';
@@ -38,6 +39,7 @@ import { formatUIDate } from '../../../react-services';
 import { VisualizationBasicWidgetSelector  } from '../../common/charts/visualizations/basic';
 
 interface Aggregation { title: number, description: string, titleColor: string }
+interface pieStats { id: string, label: string, value: number }
 interface LastScan { last_full_scan: string, last_partial_scan: string }
 
 export class Inventory extends Component {
@@ -47,12 +49,13 @@ export class Inventory extends Component {
     isLoading: Boolean;
     customBadges: ICustomBadges[];
     stats: Aggregation[],
+    severityPieStats: pieStats[],
     vulnerabilityLastScan: LastScan,
     aggregation: Aggregation[],
-    aggrField: string
   };
   props: any;
-  
+  colorsVisualizationVulnerabilitiesSummaryData: EuiPalette;
+
   constructor(props) {
     super(props);
     this.state = {
@@ -60,15 +63,15 @@ export class Inventory extends Component {
       customBadges: [],
       filters: [],
       stats: [],
+      severityPieStats: [],
       vulnerabilityLastScan: {
         last_full_scan: '1970-01-01T00:00:00Z',
         last_partial_scan: '1970-01-01T00:00:00Z'
       },
       aggregation: [],
-      aggrField: '',
     }
     this.fetchVisualizationVulnerabilitiesSummaryData = this.fetchVisualizationVulnerabilitiesSummaryData.bind(this);
-    this.colorsVisualizatioVulnerabilitiesSummaryData = euiPaletteColorBlind();
+    this.colorsVisualizationVulnerabilitiesSummaryData = euiPaletteColorBlind();
   }
 
   async componentDidMount() {
@@ -85,27 +88,24 @@ export class Inventory extends Component {
     return Object.entries(results[field]).map(([key, value], index) => ({
       label: key,
       value,
-      color: this.colorsVisualizatioVulnerabilitiesSummaryData[index]
+      color: this.colorsVisualizationVulnerabilitiesSummaryData[index]
     }))
   }
 
   async loadAgent() {
     if (this._isMount) {    
       const { id } = this.props.agent;
-      const { aggrField } = this.state;
-      const summary = false && await getSummary(id);
+      const { severity } = await getAggregation(id, 'severity');
       const vulnerabilityLastScan = await getLastScan(id);
-      const aggregation = await getAggregation(id, 'severity');
+      const aggregation = await getAggregation(id, 'name');
+      const titleColors = { Critical: 'danger', High: '#FEC514', Medium: 'primary', Low: 'subdued' };
 
-      const stats = summary ? summary : [
-        {title: 50, description: 'Critical', titleColor: 'danger'},
-        {title: 25, description: 'High', titleColor: '#FEC514'},
-        {title: 40, description: 'Medium', titleColor: 'primary'},
-        {title: 17, description: 'Low', titleColor: 'subdued'},
-      ]
+      const stats = Object.keys(severity).map(key => ({ titleColor: titleColors[key], description: key, title: severity[key] }));
+      const severityPieStats = Object.keys(severity).map(key => ({ id:key, label: key, value: severity[key] }));
       this.setState({
         isLoading: false,
         stats,
+        severityPieStats,
         aggregation,
         vulnerabilityLastScan
       });
@@ -145,7 +145,7 @@ export class Inventory extends Component {
   }
 
   render() {
-    const { isLoading, stats, vulnerabilityLastScan } = this.state;
+    const { isLoading, stats, vulnerabilityLastScan, severityPieStats } = this.state;
     if (isLoading) {
       return this.loadingInventory()
     }
@@ -161,12 +161,7 @@ export class Inventory extends Component {
               <Pie
                 width={300}
                 height={125}
-                data={[
-                  {id: 'critical', label: 'Critical', value: 50},
-                  {id: 'high', label: 'High', value: 25},
-                  {id: 'medium', label: 'Medium', value: 40},
-                  {id: 'low', label: 'Low', value: 17}
-                ]}
+                data={severityPieStats}
                 colors={['#BD271E', '#FEC514', '#0077CC', '#6a717d']}
               />
             </EuiCard>
@@ -208,7 +203,7 @@ export class Inventory extends Component {
             <EuiCard title description betaBadgeLabel="Top affected packages by CVEs">
               <VisualizationBasicWidgetSelector
                 type='donut'
-                size={{width: '100%', height: '200px'}}
+                size={{ width: '100%', height: '100px' }}
                 showLegend
                 selectorOptions={[
                   { value: 'name', text: 'Program' }

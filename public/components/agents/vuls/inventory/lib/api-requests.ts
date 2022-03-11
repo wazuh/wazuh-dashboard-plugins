@@ -11,8 +11,8 @@
  */
 import { WzRequest } from '../../../../../react-services/wz-request';
 
-export async function getAggregation(agentId, field, limit = null) {
-  const result = await WzRequest.apiReq('GET', `/vulnerability/${agentId}/summary/${field}`, limit ? {params: {limit}} : {});
+export async function getAggregation(agentId: string, field: string = 'severity', limit: number | null = null) {
+  const result = await WzRequest.apiReq('GET', `/vulnerability/${agentId}/summary/${field}`, limit ? { params: { limit } } : {});
   return result?.data?.data;
 }
 
@@ -31,23 +31,7 @@ export async function getFilterValues(field, value, agentId, filters = {}, forma
   return (((result || {}).data || {}).data || {}).affected_items.map((item) => { return format(item[field]) });
 }
 
-export async function getSummary(agentId = '000') {
-  let summary = [
-    { title: 50, description: 'Critical', titleColor: 'danger' },
-    { title: 25, description: 'High', titleColor: '#FEC514' },
-    { title: 40, description: 'Medium', titleColor: 'primary' },
-    { title: 17, description: 'Low', titleColor: 'subdued' },
-  ];
-  try {
-    const result = await WzRequest.apiReq('GET', `/vulnerability/${agentId}/summary`, {});
-    summary = (((result || {}).data || {}).data || {}).affected_items || {};
-  } catch (e) {
-
-  }
-  return summary;
-}
-
-export async function getLastScan(agentId = '000') {
+export async function getLastScan(agentId: string = '000') {
   const response = await WzRequest.apiReq(
     'GET',
     `/vulnerability/${agentId}/last_scan`,
