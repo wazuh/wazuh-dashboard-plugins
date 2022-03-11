@@ -76,3 +76,17 @@ services:
       JOIN_MANAGER: wazuh-manager-master
     depends_on:
       - wazuh-manager-master
+  kibana-dev:
+    build:
+      context: "../../../images/kibanaDev"
+      args:
+        KIBANA_BRANCH: v7.10.2
+        NVM_BRANCH: v0.36.0
+    hostname: kibana-dev-test:7.10.2
+    image: kibana-dev-test:7.10.2
+    ports:
+      - "5601:5601"
+    volumes:
+      - "../../../config/kibana/kibana.basic.yml:/usr/share/kibana/config/kibana.yml"
+      - "../../../../.:/usr/share/kibana/plugins/wazuh/"
+    tty: true
