@@ -23,6 +23,7 @@ import {
   EuiStat,
   EuiText,
   EuiIcon,
+  EuiToolTip,
   euiPaletteColorBlind,
 } from '@elastic/eui';
 import { EuiPalette } from '@elastic/eui/src/services/color/eui_palettes';
@@ -178,6 +179,31 @@ export class Inventory extends Component {
     return ['', '1970-01-01T00:00:00Z'].includes(date) ? '-' : formatUIDate(date);
   }
 
+  buildTitleFilter({ description, title, titleColor }) {
+    return (
+      <EuiFlexItem
+        key={`module_vulnerabilities_inventory_stat_${description}`}
+      >
+        <EuiStat
+          textAlign='center'
+          title={(
+            <EuiToolTip position="top" content={`Filter by Severity`}>
+              <span
+                className={'statWithLink wz-user-select-none'}
+                style={{ cursor: 'pointer', fontSize: '2.25rem' }}
+                onClick={() => this.onFiltersChange(this.buildFilterQuery('severity', description))}
+              >
+                {title}
+              </span>
+            </EuiToolTip>
+          )}
+          description={description}
+          titleColor={titleColor}
+        />
+      </EuiFlexItem>
+    )
+  }
+
   render() {
     const { isLoading, stats, vulnerabilityLastScan } = this.state;
     if (isLoading) {
@@ -205,20 +231,7 @@ export class Inventory extends Component {
           <EuiFlexItem>
             <EuiCard title description betaBadgeLabel="Details">
               <EuiFlexGroup alignItems='center'>
-                {stats.map(({description, title, titleColor}) => (
-                  <EuiFlexItem
-                    key={`module_vulnerabilities_inventory_stat_${description}`}
-                  >
-                    <EuiStat    
-                      textAlign='center'
-                      title={title}
-                      description={description}
-                      titleColor={titleColor}
-                    />
-
-                  </EuiFlexItem>
-                ))}
-                
+                {stats.map((stat) => this.buildTitleFilter(stat))}                
               </EuiFlexGroup>
               <EuiFlexGroup style={{marginTop: 'auto'}}>
                 <EuiFlexItem>

@@ -1738,6 +1738,13 @@ iframe.width-changed {
   width: 100%;
 }
 
+.wz-user-select-none{
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+}
+
 /* Custom Searchbar styles */
 
 .application .filters-search-bar .globalQueryBar, .app-container .filters-search-bar .globalQueryBar{
