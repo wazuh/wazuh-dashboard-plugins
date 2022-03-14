@@ -33,13 +33,13 @@ import {
   getLastScan, getAggregation
 } from './inventory/lib';
 import { ICustomBadges } from '../../wz-search-bar/components';
-import { Pie } from '../../d3/pie';
 import { formatUIDate } from '../../../react-services';
 import { VisualizationBasicWidgetSelector, VisualizationBasicWidget  } from '../../common/charts/visualizations/basic';
 
 interface Aggregation { title: number, description: string, titleColor: string }
 interface pieStats { id: string, label: string, value: number }
 interface LastScan { last_full_scan: string, last_partial_scan: string }
+interface TitleColors { Critical: string, High: string, Medium: string, Low: string }
 
 export class Inventory extends Component {
   _isMount = false;
@@ -54,6 +54,8 @@ export class Inventory extends Component {
   };
   props: any;
   colorsVisualizationVulnerabilitiesSummaryData: EuiPalette;
+  titleColors: TitleColors = { Critical: '#BD271E', High: '#FEC514', Medium: '#006BB4', Low: '#6a717d' };
+  
 
   constructor(props) {
     super(props);
@@ -95,14 +97,14 @@ export class Inventory extends Component {
   async fetchVisualizationVulnerabilitiesSeverityData(){
     const { id } = this.props.agent;
     const { severity } = await getAggregation(id, 'severity');
-    const titleColors = { Critical: 'danger', High: '#FEC514', Medium: 'primary', Low: 'subdued' };
-    const severityStats = Object.keys(severity).map(key => ({ titleColor: titleColors[key], description: key, title: severity[key] }));
+    
+    const severityStats = Object.keys(severity).map(key => ({ titleColor: this.titleColors[key], description: key, title: severity[key] }));
     this.setState({stats: severityStats});
     
     return Object.entries(severity).map(([key, value], index) => ({
       label: key,
       value,
-      color: this.colorsVisualizationVulnerabilitiesSummaryData[index]
+      color: this.titleColors[key]
     }))
   }
   
