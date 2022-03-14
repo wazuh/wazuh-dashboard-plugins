@@ -12,10 +12,9 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { IFilterParams, getElasticAlerts, getIndexPattern } from '../../../../../../../overview/mitre/lib';
-import { getWazuhFilter } from '../../../../fim_events_table';
-import { buildPhraseFilter, buildExistsFilter } from '../../../../../../../../../../../src/plugins/data/common';
-import { getToasts }  from '../../../../../../../../kibana-services';
+import { IFilterParams, getElasticAlerts, getIndexPattern } from '../../../../../overview/mitre/lib';
+import { getWazuhFilter } from '../../fim_events_table';
+import { buildPhraseFilter, buildExistsFilter } from '../../../../../../../../../src/plugins/data/common';
 
 export async function getRequirementAlerts(agentId, time, requirement) {
   const indexPattern = await getIndexPattern();

@@ -18,9 +18,8 @@ import {
   EuiPanel,
   euiPaletteColorBlind
 } from '@elastic/eui';
-import { RequirementsHead, RequirementsBody } from './components';
 import { VisualizationBasicWidgetSelector } from '../../../charts/visualizations/basic';
-import { getRequirementAlerts } from './components/requitement_body/lib';
+import { getRequirementAlerts } from './lib';
 import { useTimeFilter } from '../../../hooks';
 import { useDispatch } from 'react-redux';
 import { updateCurrentAgentData } from '../../../../../redux/actions/appStateActions';
