@@ -23,7 +23,17 @@ const chartTypes = {
  * Render a visualization. Basic component. It is a controlled component that can render
  * loading status, no data, error or the chart.
  */
-export const VisualizationBasic = ({data, showLegend, isLoading, size, type, noDataTitle = 'No data', noDataMessage, errorTitle = 'Error', errorMessage} : VisualizationBasicProps) => {
+export const VisualizationBasic = ({
+  data,
+  showLegend,
+  isLoading,
+  size,
+  type,
+  noDataTitle = 'No data',
+  noDataMessage,
+  errorTitle = 'Error',
+  errorMessage
+}: VisualizationBasicProps) => {
   const { width, height } = typeof size === 'object' ? size : { width: size, height: size };
   
   if(isLoading){
@@ -59,11 +69,13 @@ export const VisualizationBasic = ({data, showLegend, isLoading, size, type, noD
     return (
       <EuiFlexGroup>
         <EuiFlexItem>
-          <Chart data={data} />
+          <Chart data={data}/>
         </EuiFlexItem>
         {showLegend && (
           <EuiFlexItem>
-            <ChartLegend data={data.map(({color, ...rest}) => ({...rest, labelColor: color, color: 'text'}))} />
+            <ChartLegend
+              data={data.map(({ color, ...rest }) => ({ ...rest, labelColor: color, color: 'text' }))}
+            />
           </EuiFlexItem>
         )}
       </EuiFlexGroup>

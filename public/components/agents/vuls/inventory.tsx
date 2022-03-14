@@ -86,28 +86,48 @@ export class Inventory extends Component {
   }
 
   async fetchVisualizationVulnerabilitiesSummaryData(field, agentID){
-    const results = await getAggregation(agentID, field, 3);
+    const results = await getAggregation(agentID, field, 5);
     return Object.entries(results[field]).map(([key, value], index) => ({
       label: key,
       value,
-      color: this.colorsVisualizationVulnerabilitiesSummaryData[index]
+      color: this.colorsVisualizationVulnerabilitiesSummaryData[index],
+      onClick:(selectedItem, test)=>{
+        console.log([key, value, index,selectedItem, test]);
+        this.onFiltersChange(this.buildFilterQuery(field, key));
+      }
     }))
   }
 
   async fetchVisualizationVulnerabilitiesSeverityData(){
     const { id } = this.props.agent;
-    const { severity } = await getAggregation(id, 'severity');
+    const FIELD = 'severity';
+    const { severity } = await getAggregation(id, FIELD);
     
-    const severityStats = Object.keys(severity).map(key => ({ titleColor: this.titleColors[key], description: key, title: severity[key] }));
+    const severityStats = Object.keys(severity).map(key => ({ 
+      titleColor: this.titleColors[key],
+      description: key,
+      title: severity[key]
+    }));
     this.setState({stats: severityStats});
     
     return Object.entries(severity).map(([key, value], index) => ({
       label: key,
       value,
-      color: this.titleColors[key]
+      color: this.titleColors[key],
+      onClick:(selectedItem, test)=>{
+        console.log([key, value, index,selectedItem, test]);
+        this.onFiltersChange(this.buildFilterQuery(FIELD, key));
+      }
     }))
   }
-  
+  buildFilterQuery(field = '', selectedItem = '') {
+    return [
+      {
+        field: 'q',
+        value: `${field}=${selectedItem}`,
+      },
+    ]
+  }
   async loadAgent() {
     if (this._isMount) {    
       const { id } = this.props.agent;
