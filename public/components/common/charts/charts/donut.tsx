@@ -15,6 +15,9 @@ export type ChartDonutWidgetProps = ChartDonutProps & {
   fetch: () => ChartDonutDataEntry[]
 }
 
+/**
+ * Create a donut chart.
+ */
 export const ChartDonut = (props : ChartDonutProps) => {
   const pieRef: null | any = useRef();
   const cache = useRef(props.data);

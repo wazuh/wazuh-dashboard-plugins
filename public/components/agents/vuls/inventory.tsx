@@ -167,13 +167,13 @@ export class Inventory extends Component {
         <EuiFlexGroup wrap>
           <EuiFlexItem>
             <EuiCard title description betaBadgeLabel="Severity">
-            <VisualizationBasicWidget
+              <VisualizationBasicWidget
                 type='donut'
                 size={{ width: '300px', height: '125px' }}
                 showLegend
                 onFetch={this.fetchVisualizationVulnerabilitiesSeverityData}
                 noDataTitle='No results'
-                noDataMessage={`No results were found.`}
+                noDataMessage='No results were found.'
               />
             </EuiCard>
           </EuiFlexItem>
@@ -211,13 +211,18 @@ export class Inventory extends Component {
             </EuiCard>
           </EuiFlexItem>
           <EuiFlexItem>
-            <EuiCard title description betaBadgeLabel="Top affected packages by CVEs">
+            <EuiCard title description betaBadgeLabel="Summary">
               <VisualizationBasicWidgetSelector
                 type='donut'
-                size={{ width: '100%', height: '100px' }}
+                size={{ width: '100%', height: '250px' }}
                 showLegend
                 selectorOptions={[
-                  { value: 'name', text: 'Program' }
+                  { value: 'name', text: 'Name' },
+                  { value: 'severity', text: 'Severity' },
+                  { value: 'cve', text: 'CVE' },
+                  { value: 'version', text: 'Version' },
+                  { value: 'cvss2_score', text: 'CVSS2 Score' },
+                  { value: 'cvss3_score', text: 'CVSS3 Score' }
                 ]}
                 onFetch={this.fetchVisualizationVulnerabilitiesSummaryData}
                 onFetchExtraDependencies={[this.props.agent.id]}

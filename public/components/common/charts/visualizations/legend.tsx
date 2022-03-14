@@ -12,6 +12,9 @@ type ChartLegendProps = {
   }[]
 }
 
+/**
+ * Create the legend to use with charts in visualizations.
+ */
 export function ChartLegend({ data }: ChartLegendProps) {
   const list = data.map(({label, labelColor, value, ...rest}, idx) => ({
     label: `${label} (${value})`,

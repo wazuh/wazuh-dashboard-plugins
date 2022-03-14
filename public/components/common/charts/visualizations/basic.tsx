@@ -19,6 +19,10 @@ const chartTypes = {
   'donut': ChartDonut
 };
 
+/**
+ * Render a visualization. Basic component. It is a controlled component that can render
+ * loading status, no data, error or the chart.
+ */
 export const VisualizationBasic = ({data, showLegend, isLoading, size, type, noDataTitle = 'No data', noDataMessage, errorTitle = 'Error', errorMessage} : VisualizationBasicProps) => {
   const { width, height } = typeof size === 'object' ? size : { width: size, height: size };
   
@@ -30,40 +34,40 @@ export const VisualizationBasic = ({data, showLegend, isLoading, size, type, noD
     )
   };
   
-  if(!data){
-    return (
-      <EuiEmptyPrompt
-        iconType="stats"
-        title={<h4>{noDataTitle}</h4>}
-        body={typeof noDataMessage === 'function' ? noDataMessage() : noDataMessage}
-      />
-    )
-  }
+    if(errorMessage){
+      return (
+        <EuiEmptyPrompt
+          iconType="alert"
+          title={<h4>{errorTitle}</h4>}
+          body={errorMessage}
+        />
+      )
+    }
     
-  if(errorMessage){
+    if(!data || (Array.isArray(data) && !data.length)){
+      return (
+        <EuiEmptyPrompt
+          iconType="stats"
+          title={<h4>{noDataTitle}</h4>}
+          body={typeof noDataMessage === 'function' ? noDataMessage() : noDataMessage}
+        />
+      )
+    }
+
+    const Chart = chartTypes[type];
+
     return (
-      <EuiEmptyPrompt
-        iconType="alert"
-        title={<h4>{errorTitle}</h4>}
-        body={errorMessage}
-      />
-    )
-  }
-
-  const Chart = chartTypes[type];
-
-  return (
-    <EuiFlexGroup>
-      <EuiFlexItem>
-        <Chart data={data} />
-      </EuiFlexItem>
-      {showLegend && (
+      <EuiFlexGroup>
         <EuiFlexItem>
-          <ChartLegend data={data.map(({color, ...rest}) => ({...rest, labelColor: color, color: 'text'}))} />
+          <Chart data={data} />
         </EuiFlexItem>
-      )}
-    </EuiFlexGroup>
-  )
+        {showLegend && (
+          <EuiFlexItem>
+            <ChartLegend data={data.map(({color, ...rest}) => ({...rest, labelColor: color, color: 'text'}))} />
+          </EuiFlexItem>
+        )}
+      </EuiFlexGroup>
+    )
 }
 
 type VisualizationBasicWidgetProps = VisualizationBasicProps & {
@@ -71,12 +75,14 @@ type VisualizationBasicWidgetProps = VisualizationBasicProps & {
   onFetchDependencies?: any[]
 }
 
+/**
+ * Component that fetch the data and renders the visualization using the visualization basic component
+ */
 export const VisualizationBasicWidget = ({onFetch, onFetchDependencies, ...rest}: VisualizationBasicWidgetProps) => {
   const {running, ...restAsyncAction} = useAsyncActionRunOnStart(onFetch, onFetchDependencies);
 
   return <VisualizationBasic {...rest} {...restAsyncAction} isLoading={running}/>
 }
-
 
 type VisualizationBasicWidgetSelectorProps = VisualizationBasicWidgetProps & {
   selectorOptions: {value: any, text: string}[]
@@ -84,6 +90,9 @@ type VisualizationBasicWidgetSelectorProps = VisualizationBasicWidgetProps & {
   onFetchExtraDependencies?: any[]
 }
 
+/**
+ * Renders a visualization that has a selector to change the resource to fetch data and display it. Use the visualization basic. 
+ */
 export const VisualizationBasicWidgetSelector = ({selectorOptions, title, onFetchExtraDependencies, ...rest}: VisualizationBasicWidgetSelectorProps) => {
   const [selectedOption, setSelectedOption] = useState(selectorOptions[0].value);
 
