@@ -21,7 +21,6 @@ import {
   EuiFlexItem,
   EuiCard,
   EuiStat,
-  EuiBasicTable,
   EuiText,
   EuiIcon,
   euiPaletteColorBlind,
@@ -36,7 +35,7 @@ import {
 import { ICustomBadges } from '../../wz-search-bar/components';
 import { Pie } from '../../d3/pie';
 import { formatUIDate } from '../../../react-services';
-import { VisualizationBasicWidgetSelector  } from '../../common/charts/visualizations/basic';
+import { VisualizationBasicWidgetSelector, VisualizationBasicWidget  } from '../../common/charts/visualizations/basic';
 
 interface Aggregation { title: number, description: string, titleColor: string }
 interface pieStats { id: string, label: string, value: number }
@@ -71,6 +70,7 @@ export class Inventory extends Component {
       aggregation: [],
     }
     this.fetchVisualizationVulnerabilitiesSummaryData = this.fetchVisualizationVulnerabilitiesSummaryData.bind(this);
+    this.fetchVisualizationVulnerabilitiesSeverityData = this.fetchVisualizationVulnerabilitiesSeverityData.bind(this);
     this.colorsVisualizationVulnerabilitiesSummaryData = euiPaletteColorBlind();
   }
 
@@ -92,20 +92,29 @@ export class Inventory extends Component {
     }))
   }
 
+  async fetchVisualizationVulnerabilitiesSeverityData(){
+    const { id } = this.props.agent;
+    const { severity } = await getAggregation(id, 'severity');
+    const titleColors = { Critical: 'danger', High: '#FEC514', Medium: 'primary', Low: 'subdued' };
+    const severityStats = Object.keys(severity).map(key => ({ titleColor: titleColors[key], description: key, title: severity[key] }));
+    this.setState({stats: severityStats});
+    
+    return Object.entries(severity).map(([key, value], index) => ({
+      label: key,
+      value,
+      color: this.colorsVisualizationVulnerabilitiesSummaryData[index]
+    }))
+  }
+  
   async loadAgent() {
     if (this._isMount) {    
       const { id } = this.props.agent;
-      const { severity } = await getAggregation(id, 'severity');
       const vulnerabilityLastScan = await getLastScan(id);
       const aggregation = await getAggregation(id, 'name');
-      const titleColors = { Critical: 'danger', High: '#FEC514', Medium: 'primary', Low: 'subdued' };
 
-      const stats = Object.keys(severity).map(key => ({ titleColor: titleColors[key], description: key, title: severity[key] }));
-      const severityPieStats = Object.keys(severity).map(key => ({ id:key, label: key, value: severity[key] }));
+      
       this.setState({
         isLoading: false,
-        stats,
-        severityPieStats,
         aggregation,
         vulnerabilityLastScan
       });
@@ -155,14 +164,16 @@ export class Inventory extends Component {
     const table = this.renderTable();
     return <EuiPage>
       <EuiPageBody>
-        <EuiFlexGroup>
+        <EuiFlexGroup wrap>
           <EuiFlexItem>
             <EuiCard title description betaBadgeLabel="Severity">
-              <Pie
-                width={300}
-                height={125}
-                data={severityPieStats}
-                colors={['#BD271E', '#FEC514', '#0077CC', '#6a717d']}
+            <VisualizationBasicWidget
+                type='donut'
+                size={{ width: '300px', height: '125px' }}
+                showLegend
+                onFetch={this.fetchVisualizationVulnerabilitiesSeverityData}
+                noDataTitle='No results'
+                noDataMessage={`No results were found.`}
               />
             </EuiCard>
           </EuiFlexItem>
