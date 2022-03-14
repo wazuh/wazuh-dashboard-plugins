@@ -36,5 +36,11 @@ RUN . $NVM_DIR/nvm.sh \
 	&& mkdir -p $KIBANA_APP_HOME/plugins/wazuh \
 	&& yarn kbn bootstrap 
 
+# # Copy and execute preparation for install kibana dependencies
+#COPY wazuh_app_config.sh entrypoint.sh /scripts/
+#RUN chmod 700 /scripts/entrypoint.sh
+#RUN chmod 700 /scripts/wazuh_app_config.sh
+
 WORKDIR $KIBANA_APP_HOME
+#ENTRYPOINT ["/scripts/entrypoint.sh"]
 EXPOSE 5601

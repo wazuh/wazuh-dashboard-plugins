@@ -1,9 +1,0 @@
-{
-  "name": "Environments for Kibana app",
-  "dockerComposeFile": "../environments/templates_release_4.3/templates_elastic_dev/es_basic-wz_cluster-agent-7.17.0/docker-compose.yml",
-  "service": "kibana-dev",
-  "workspaceFolder": "/usr/share/kibana/plugins/wazuh",
-  "shutdownAction": "stopCompose",
-  "settings": {},
-  "extensions": []
-}

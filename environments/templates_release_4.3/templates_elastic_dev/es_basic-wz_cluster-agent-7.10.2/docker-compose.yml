@@ -19,7 +19,7 @@ services:
       - 9600:9600
   wazuh-manager-master:
     build:
-      context: ../../../images/${WAZUH_MANAGER_IMAGE}
+      context: ./images/${WAZUH_MANAGER_IMAGE}
       args: 
         WAZUH_VERSION: ${WAZUH_VERSION}
         FILEBEAT_VERSION: ${ELASTIC_VERSION}
@@ -28,7 +28,7 @@ services:
     image: ${WAZUH_MANAGER_IMAGE}:${WAZUH_VERSION}-${ELASTIC_VERSION}
     hostname: ${WAZUH_MANAGER_IMAGE}-${WAZUH_VERSION}-${ELASTIC_VERSION}
     volumes:
-      - "../../../config/filebeat/filebeat.basic.yml:/etc/filebeat/filebeat.yml"
+      - "./config/filebeat/filebeat.basic.yml:/etc/filebeat/filebeat.yml"
     ports:
       - "514:514"
       - "1514:1514"
@@ -43,7 +43,7 @@ services:
       NODE_TYPE: master
   wazuh-manager-worker:
     build:
-      context: ../../../images/${WAZUH_MANAGER_IMAGE}
+      context: ./images/${WAZUH_MANAGER_IMAGE}
       args: 
         WAZUH_VERSION: ${WAZUH_VERSION}
         FILEBEAT_VERSION: ${ELASTIC_VERSION}
@@ -52,7 +52,7 @@ services:
     image: ${WAZUH_MANAGER_IMAGE}:${WAZUH_VERSION}-${ELASTIC_VERSION}
     hostname: ${WAZUH_MANAGER_IMAGE}-worker-${WAZUH_VERSION}-${ELASTIC_VERSION}
     volumes:
-      - "../../../config/filebeat/filebeat.basic.yml:/etc/filebeat/filebeat.yml"
+      - "./config/filebeat/filebeat.basic.yml:/etc/filebeat/filebeat.yml"
     # ports:
     #   - "514:514"
     #   - "1514:1514"
@@ -67,7 +67,7 @@ services:
       NODE_TYPE: worker
   wazuh-agent:
     build:
-      context: ../../../images/${WAZUH_AGENT_IMAGE}
+      context: ./images/${WAZUH_AGENT_IMAGE}
       args: 
         WAZUH_VERSION: ${WAZUH_VERSION}
     image: ${WAZUH_AGENT_IMAGE}:${WAZUH_VERSION}
@@ -76,3 +76,18 @@ services:
       JOIN_MANAGER: wazuh-manager-master
     depends_on:
       - wazuh-manager-master
+  kibana-dev:
+    build:
+      context: "./images/${KIBANA_DEV_IMAGE}"
+      args:
+        KIBANA_BRANCH: ${KIBANA_BRANCH}
+        NVM_BRANCH: ${NVM_BRANCH}
+        WAZUH_API_URL:  ${WAZUH_API_URL}
+    image: ${KIBANA_DEV_IMAGE}:${KIBANA_BRANCH}
+    hostname: ${KIBANA_DEV_IMAGE}:${KIBANA_BRANCH}
+    ports:
+      - "5601:5601"
+    volumes:
+      - "./config/kibana/kibana.basic.yml:/usr/share/kibana/config/kibana.yml"
+      - "../../../../.:/usr/share/kibana/plugins/wazuh/"
+    tty: true
