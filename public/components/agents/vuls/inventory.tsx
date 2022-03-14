@@ -256,7 +256,6 @@ export class Inventory extends Component {
                 showLegend
                 selectorOptions={[
                   { value: 'name', text: 'Name' },
-                  { value: 'severity', text: 'Severity' },
                   { value: 'cve', text: 'CVE' },
                   { value: 'version', text: 'Version' },
                   { value: 'cvss2_score', text: 'CVSS2 Score' },
