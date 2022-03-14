@@ -54,7 +54,7 @@ export class Inventory extends Component {
   };
   props: any;
   colorsVisualizationVulnerabilitiesSummaryData: EuiPalette;
-  titleColors: TitleColors = { Critical: '#BD271E', High: '#FEC514', Medium: '#006BB4', Low: '#6a717d' };
+  titleColors: TitleColors = { Critical: '#BD271E', High: '#d5a612', Medium: '#006BB4', Low: '#6a717d' };
   
 
   constructor(props) {
@@ -85,40 +85,43 @@ export class Inventory extends Component {
     this._isMount = false;
   }
 
-  async fetchVisualizationVulnerabilitiesSummaryData(field, agentID){
+  async fetchVisualizationVulnerabilitiesSummaryData(field, agentID) {
     const results = await getAggregation(agentID, field, 5);
     return Object.entries(results[field]).map(([key, value], index) => ({
       label: key,
       value,
       color: this.colorsVisualizationVulnerabilitiesSummaryData[index],
-      onClick:(selectedItem, test)=>{
-        console.log([key, value, index,selectedItem, test]);
-        this.onFiltersChange(this.buildFilterQuery(field, key));
-      }
+      onClick: () => this.onFiltersChange(this.buildFilterQuery(field, key))
     }))
   }
 
   async fetchVisualizationVulnerabilitiesSeverityData(){
     const { id } = this.props.agent;
     const FIELD = 'severity';
+
+    //Assign a value to the severity label to be able to sort it by level
+    const severityOrder = { Critical: 12, High: 9, Medium: 6, Low: 3 };
+
     const { severity } = await getAggregation(id, FIELD);
-    
+
     const severityStats = Object.keys(severity).map(key => ({ 
       titleColor: this.titleColors[key],
       description: key,
       title: severity[key]
-    }));
+    }))
+    .sort((prev, next) => severityOrder[prev.description] > severityOrder[next.description] ? -1 : 1);
+
     this.setState({stats: severityStats});
     
-    return Object.entries(severity).map(([key, value], index) => ({
-      label: key,
-      value,
-      color: this.titleColors[key],
-      onClick:(selectedItem, test)=>{
-        console.log([key, value, index,selectedItem, test]);
-        this.onFiltersChange(this.buildFilterQuery(FIELD, key));
+    return Object.entries(severity)
+      .map(([key, value], index) => ({
+        label: key,
+        value,
+        color: this.titleColors[key],
+        onClick: () => this.onFiltersChange(this.buildFilterQuery(FIELD, key))
       }
-    }))
+      ))
+      .sort((prev, next) => severityOrder[prev.label] > severityOrder[next.label] ? -1 : 1);
   }
   buildFilterQuery(field = '', selectedItem = '') {
     return [
@@ -176,7 +179,7 @@ export class Inventory extends Component {
   }
 
   render() {
-    const { isLoading, stats, vulnerabilityLastScan, severityPieStats } = this.state;
+    const { isLoading, stats, vulnerabilityLastScan } = this.state;
     if (isLoading) {
       return this.loadingInventory()
     }
