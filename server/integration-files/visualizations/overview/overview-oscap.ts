@@ -170,9 +170,15 @@ export default [
     _source: {
       title: 'Agents',
       visState: JSON.stringify({
-        params: { isDonut: false, shareYAxis: true, addTooltip: true, addLegend: true },
         listeners: {},
         type: 'pie',
+        params: { 
+          isDonut: true, 
+          shareYAxis: true, 
+          addTooltip: true, 
+          addLegend: true,
+          labels: { show: false }
+        },
         aggs: [
           { type: 'count', enabled: true, id: '1', params: {}, schema: 'metric' },
           {
@@ -231,11 +237,12 @@ export default [
       title: 'Profiles',
       visState: JSON.stringify({
         params: {
-          isDonut: false,
+          isDonut: true,
           legendPosition: 'right',
           shareYAxis: true,
           addTooltip: true,
           addLegend: true,
+          labels: { show: false }
         },
         listeners: {},
         type: 'pie',
@@ -302,11 +309,12 @@ export default [
       title: 'Content',
       visState: JSON.stringify({
         params: {
-          isDonut: false,
+          isDonut: true,
           legendPosition: 'right',
           shareYAxis: true,
           addTooltip: true,
           addLegend: true,
+          labels: { show: false }
         },
         listeners: {},
         type: 'pie',
@@ -375,6 +383,7 @@ export default [
           addLegend: true,
           legendPosition: 'right',
           isDonut: true,
+          labels: { show: false },
         },
         aggs: [
           { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
@@ -569,6 +578,7 @@ export default [
           addLegend: true,
           legendPosition: 'right',
           isDonut: true,
+          labels: { show: false },
         },
         aggs: [
           { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
@@ -634,6 +644,7 @@ export default [
           addLegend: true,
           legendPosition: 'right',
           isDonut: true,
+          labels: { show: false },
         },
         aggs: [
           { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },

@@ -348,7 +348,8 @@ export default [
           addTooltip: true,
           addLegend: true,
           legendPosition: 'right',
-          isDonut: false,
+          isDonut: true,
+          labels: { show: false }
         },
         aggs: [
           { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
