@@ -67,7 +67,7 @@ export const VisualizationBasic = ({
     const Chart = chartTypes[type];
 
     return (
-      <EuiFlexGroup>
+      <EuiFlexGroup responsive={false}>
         <EuiFlexItem>
           <Chart data={data}/>
         </EuiFlexItem>
