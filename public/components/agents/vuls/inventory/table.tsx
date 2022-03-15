@@ -154,26 +154,6 @@ export class InventoryTable extends Component {
       : (width = '80px');
     return [
       {
-        field: 'version',
-        name: 'Version',
-        sortable: true,
-        truncateText: true,
-        width: `${width}`,
-      },
-      {
-        field: 'architecture',
-        name: 'Architecture',
-        sortable: true,
-        width: '100px',
-      },
-      {
-        field: 'cve',
-        name: 'CVE',
-        sortable: true,
-        truncateText: true,
-        width: `${width}`,
-      },
-      {
         field: 'name',
         name: 'Name',
         sortable: true,
@@ -185,6 +165,27 @@ export class InventoryTable extends Component {
         sortable: true,
         width: `${width}`,
       },
+      {
+        field: 'cve',
+        name: 'CVE',
+        sortable: true,
+        truncateText: true,
+        width: `${width}`,
+      },
+      {
+        field: 'architecture',
+        name: 'Architecture',
+        sortable: true,
+        width: '100px',
+      },
+      {
+        field: 'version',
+        name: 'Version',
+        sortable: true,
+        truncateText: true,
+        width: `${width}`,
+      },
+      
       {
         field: 'cvss2_score',
         name: 'CVSS2 Score',
