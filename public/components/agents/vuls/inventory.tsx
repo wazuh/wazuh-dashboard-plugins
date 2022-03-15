@@ -46,7 +46,8 @@ export class Inventory extends Component {
   _isMount = false;
   state: {
     filters: [];
-    isLoading: Boolean;
+    isLoading: boolean;
+    isLoadingStats: boolean;
     customBadges: ICustomBadges[];
     stats: Aggregation[],
     severityPieStats: pieStats[],
@@ -61,13 +62,19 @@ export class Inventory extends Component {
     super(props);
     this.state = {
       isLoading: true,
+      isLoadingStats: true,
       customBadges: [],
       filters: [],
-      stats: [],
+      stats: [
+        { title: 0, description: 'Critical', titleColor: this.titleColors.Critical },
+        { title: 0, description: 'High', titleColor: this.titleColors.High },
+        { title: 0, description: 'Medium', titleColor: this.titleColors.Medium },
+        { title: 0, description: 'Low', titleColor: this.titleColors.Low },
+      ],
       severityPieStats: [],
       vulnerabilityLastScan: {
-        last_full_scan: '1970-01-01T00:00:00Z',
-        last_partial_scan: '1970-01-01T00:00:00Z'
+        last_full_scan: '',
+        last_partial_scan: ''
       },
     }
     this.fetchVisualizationVulnerabilitiesSummaryData = this.fetchVisualizationVulnerabilitiesSummaryData.bind(this);
@@ -97,12 +104,11 @@ export class Inventory extends Component {
   async fetchVisualizationVulnerabilitiesSeverityData(){
     const { id } = this.props.agent;
     const FIELD = 'severity';
-
     //Assign a value to the severity label to be able to sort it by level
     const severityOrder = { Critical: 12, High: 9, Medium: 6, Low: 3 };
-
+    
     const { severity } = await getAggregation(id, FIELD);
-
+    
     const severityStats = Object.keys(severity).map(key => ({ 
       titleColor: this.titleColors[key],
       description: key,
@@ -110,10 +116,10 @@ export class Inventory extends Component {
     }))
     .sort((prev, next) => severityOrder[prev.description] > severityOrder[next.description] ? -1 : 1);
 
-    this.setState({stats: severityStats});
+    this.setState({stats: severityStats, isLoadingStats: false});
     
     return Object.entries(severity)
-      .map(([key, value], index) => ({
+      .map(([key, value]) => ({
         label: key,
         value,
         color: this.titleColors[key],
@@ -122,6 +128,7 @@ export class Inventory extends Component {
       ))
       .sort((prev, next) => severityOrder[prev.label] > severityOrder[next.label] ? -1 : 1);
   }
+
   buildFilterQuery(field = '', selectedItem = '') {
     return [
       {
@@ -130,6 +137,7 @@ export class Inventory extends Component {
       },
     ]
   }
+
   async loadAgent() {
     if (this._isMount) {    
       const { id } = this.props.agent;
@@ -141,7 +149,6 @@ export class Inventory extends Component {
       });
     }
   }
-
 
   onFiltersChange = (filters) => {
     this.setState({ filters });
@@ -175,12 +182,14 @@ export class Inventory extends Component {
   }
 
   buildTitleFilter({ description, title, titleColor }) {
+    const { isLoadingStats } = this.state;
     return (
       <EuiFlexItem
         key={`module_vulnerabilities_inventory_stat_${description}`}
       >
         <EuiStat
           textAlign='center'
+          isLoading={isLoadingStats}
           title={(
             <EuiToolTip position="top" content={`Filter by Severity`}>
               <span
