@@ -51,7 +51,6 @@ export class Inventory extends Component {
     stats: Aggregation[],
     severityPieStats: pieStats[],
     vulnerabilityLastScan: LastScan,
-    aggregation: Aggregation[],
   };
   props: any;
   colorsVisualizationVulnerabilitiesSummaryData: EuiPalette;
@@ -70,7 +69,6 @@ export class Inventory extends Component {
         last_full_scan: '1970-01-01T00:00:00Z',
         last_partial_scan: '1970-01-01T00:00:00Z'
       },
-      aggregation: [],
     }
     this.fetchVisualizationVulnerabilitiesSummaryData = this.fetchVisualizationVulnerabilitiesSummaryData.bind(this);
     this.fetchVisualizationVulnerabilitiesSeverityData = this.fetchVisualizationVulnerabilitiesSeverityData.bind(this);
@@ -93,7 +91,7 @@ export class Inventory extends Component {
       value,
       color: this.colorsVisualizationVulnerabilitiesSummaryData[index],
       onClick: () => this.onFiltersChange(this.buildFilterQuery(field, key))
-    }))
+    })).sort((firstElement, secondElement) => secondElement.value - firstElement.value)
   }
 
   async fetchVisualizationVulnerabilitiesSeverityData(){
@@ -136,12 +134,9 @@ export class Inventory extends Component {
     if (this._isMount) {    
       const { id } = this.props.agent;
       const vulnerabilityLastScan = await getLastScan(id);
-      const aggregation = await getAggregation(id, 'name');
-
       
       this.setState({
         isLoading: false,
-        aggregation,
         vulnerabilityLastScan
       });
     }

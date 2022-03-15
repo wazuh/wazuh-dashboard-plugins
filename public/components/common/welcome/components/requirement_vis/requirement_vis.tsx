@@ -28,7 +28,6 @@ import { getIndexPattern } from '../../../../overview/mitre/lib';
 import { buildPhraseFilter } from '../../../../../../../../src/plugins/data/common';
 import rison from 'rison-node';
 
-
 const selectionOptionsCompliance = [
   { value: 'pci_dss', text: 'PCI DSS' },
   { value: 'gdpr', text: 'GDPR' },
@@ -51,7 +50,6 @@ export function RequirementVis(props) {
   const colors = euiPaletteColorBlind();
   const {timeFilter} = useTimeFilter();
   const dispatch = useDispatch();
-  const [requirement, setRequirement] = useState('pci_dss');
 
   const goToDashboardWithFilter = async (requirement, key, agent) => {
     try{
@@ -78,7 +76,6 @@ export function RequirementVis(props) {
 
   const fetchData = useCallback(async (selectedOptionValue, timeFilter, agent) => {
     const buckets = await getRequirementAlerts(agent.id, timeFilter, selectedOptionValue);
-    console.log({selectedOptionValue, timeFilter, agent,buckets})
     return buckets?.length ? buckets.map(({key, doc_count}, index) => ({
         label: key,
         value: doc_count,
