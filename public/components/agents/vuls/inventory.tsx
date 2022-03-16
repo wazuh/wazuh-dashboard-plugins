@@ -223,15 +223,16 @@ export class Inventory extends Component {
         <EuiFlexGroup wrap>
           <EuiFlexItem>
             <EuiCard title description betaBadgeLabel="Severity" className="wz-euiCard-no-title">
-              <EuiSpacer size="xxl"/>
-              <VisualizationBasicWidget
-                type='donut'
-                size={{ width: '100%', height: '150px' }}
-                showLegend
-                onFetch={this.fetchVisualizationVulnerabilitiesSeverityData}
-                noDataTitle='No results'
-                noDataMessage='No results were found.'
-              />
+              <div style={{display: 'flex', alignItems: 'flex-end', height: '100%'}}>
+                <VisualizationBasicWidget
+                  type='donut'
+                  size={{ width: '100%', height: '150px' }}
+                  showLegend
+                  onFetch={this.fetchVisualizationVulnerabilitiesSeverityData}
+                  noDataTitle='No results'
+                  noDataMessage='No results were found.'
+                />
+              </div>
             </EuiCard>
           </EuiFlexItem>
           <EuiFlexItem>
