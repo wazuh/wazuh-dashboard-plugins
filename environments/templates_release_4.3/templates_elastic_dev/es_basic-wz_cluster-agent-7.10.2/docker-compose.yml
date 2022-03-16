@@ -82,7 +82,6 @@ services:
       args:
         KIBANA_BRANCH: ${KIBANA_BRANCH}
         NVM_BRANCH: ${NVM_BRANCH}
-        WAZUH_API_URL:  ${WAZUH_API_URL}
     image: ${KIBANA_DEV_IMAGE}:${KIBANA_BRANCH}
     hostname: ${KIBANA_DEV_IMAGE}:${KIBANA_BRANCH}
     ports:

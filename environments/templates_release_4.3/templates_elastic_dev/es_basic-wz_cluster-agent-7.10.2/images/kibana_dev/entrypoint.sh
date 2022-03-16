@@ -1,1 +1,0 @@
-/wazuh_app_config.sh
