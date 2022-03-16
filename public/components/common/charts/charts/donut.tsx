@@ -22,14 +22,19 @@ export const ChartDonut = (props : ChartDonutProps) => {
   const pieRef: null | any = useRef();
   const cache = useRef(props.data);
   const [ref, dms] = useChartDimensions({}, pieRef);
+  
+  const size = dms.height;
+  const outerRadius = size / 2;
+  const innerRadius = outerRadius - Math.min(20, size * 0.2);
+  
   const createPie = d3.layout
     .pie()
     .value(d => d.value)
     .sort(null);
   const createArc = d3.svg
     .arc()
-    .innerRadius((dms.width * 0.75) / 2)
-    .outerRadius(dms.width * 0.95 / 2)
+    .innerRadius(innerRadius)
+    .outerRadius(outerRadius)
     .padAngle(0.015);
   const format = d3.format(".2f");
 
@@ -41,12 +46,29 @@ export const ChartDonut = (props : ChartDonutProps) => {
 
     groupWithData.exit().remove();
 
+    let tooltip;
     groupWithData
       .enter()
       .append("g")
-      .attr("class", "arc")      
+      .attr("class", "arc")
+      .on("mouseenter", function (d) {
+        tooltip = d3.select("body")
+          .append("div")
+          .attr("class", "wz-chart-tooltip");
+      })
+      .on("mousemove", function (d) {
+        const mouseVal = d3.mouse(this);
+        tooltip.style("display", "none");
+        tooltip
+          .html("age:" + d.data.age + "</br>" + "population:" + d.data.population)
+          .style("left", (d3.event.pageX + 12) + "px")
+          .style("top", (d3.event.pageY - 10) + "px")
+          .style("opacity", 1)
+          .style("display", "block");
+      })
+      .on("mouseout", function () { d3.select("body > div.wz-chart-tooltip").html(" ").style("display", "none"); })
 
-    const path = groupWithData.append("path");
+    const path = groupWithData.select('path')[0].filter(item => item != null).length ? groupWithData.select("path") : groupWithData.append("path");
 
     const arcTween = (d, i) => {
       const interpolator = d3.interpolate(prevData[i], d);
@@ -64,12 +86,12 @@ export const ChartDonut = (props : ChartDonutProps) => {
   );
 
   return (
-    <svg width={dms.width} height={dms.width}>
+    <svg width={size} height={size}>
       <g
         ref={pieRef}
         transform={`translate(${[
-          dms.width / 2,
-          dms.width / 2
+          size / 2,
+          size / 2
         ].join(",")})`}
       />
     </svg>

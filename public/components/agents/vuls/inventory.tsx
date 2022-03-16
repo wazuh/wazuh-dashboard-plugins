@@ -36,6 +36,7 @@ import {
 import { ICustomBadges } from '../../wz-search-bar/components';
 import { formatUIDate } from '../../../react-services';
 import { VisualizationBasicWidgetSelector, VisualizationBasicWidget  } from '../../common/charts/visualizations/basic';
+import { Position } from '@elastic/charts';
 
 interface Aggregation { title: number, description: string, titleColor: string }
 interface pieStats { id: string, label: string, value: number }
@@ -221,10 +222,11 @@ export class Inventory extends Component {
       <EuiPageBody>
         <EuiFlexGroup wrap>
           <EuiFlexItem>
-            <EuiCard title description betaBadgeLabel="Severity">
+            <EuiCard title description betaBadgeLabel="Severity" className="wz-euiCard-no-title">
+              <EuiSpacer />
               <VisualizationBasicWidget
                 type='donut'
-                size={{ width: '300px', height: '125px' }}
+                size={{ width: '100%', height: '150px' }}
                 showLegend
                 onFetch={this.fetchVisualizationVulnerabilitiesSeverityData}
                 noDataTitle='No results'
@@ -253,10 +255,10 @@ export class Inventory extends Component {
             </EuiCard>
           </EuiFlexItem>
           <EuiFlexItem>
-            <EuiCard title description betaBadgeLabel="Summary">
+            <EuiCard title description betaBadgeLabel="Summary" className="wz-euiCard-no-title">
               <VisualizationBasicWidgetSelector
                 type='donut'
-                size={{ width: '100%', height: '250px' }}
+                size={{ width: '100%', height: '150px' }}
                 showLegend
                 selectorOptions={[
                   { value: 'name', text: 'Name' },

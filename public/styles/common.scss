@@ -1745,6 +1745,14 @@ iframe.width-changed {
           user-select: none;
 }
 
+.wz-euiCard-no-title{
+  .euiCard__title,
+  .euiCard__description
+  {
+    display: none;
+  }
+}
+
 /* Custom Searchbar styles */
 
 .application .filters-search-bar .globalQueryBar, .app-container .filters-search-bar .globalQueryBar{

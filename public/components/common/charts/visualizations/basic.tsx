@@ -36,43 +36,40 @@ export const VisualizationBasic = ({
 }: VisualizationBasicProps) => {
   const { width, height } = typeof size === 'object' ? size : { width: size, height: size };
   
+  let visualization = null;
+
   if(isLoading){
-    return (
+    visualization = (
       <div style={{ textAlign: "center", width, height, position: 'relative'}}>
-          <EuiLoadingChart size="xl" style={{top: '50%', transform:'translate(-50%, -50%)', position: 'absolute'}}/>
+        <EuiLoadingChart size="xl" style={{top: '50%', transform:'translate(-50%, -50%)', position: 'absolute'}}/>
       </div>
     )
-  };
-  
-    if(errorMessage){
-      return (
-        <EuiEmptyPrompt
-          iconType="alert"
-          title={<h4>{errorTitle}</h4>}
-          body={errorMessage}
-        />
-      )
-    }
-    
-    if(!data || (Array.isArray(data) && !data.length)){
-      return (
-        <EuiEmptyPrompt
-          iconType="stats"
-          title={<h4>{noDataTitle}</h4>}
-          body={typeof noDataMessage === 'function' ? noDataMessage() : noDataMessage}
-        />
-      )
-    }
-
+  }else if(errorMessage){
+    visualization = (
+      <EuiEmptyPrompt
+        iconType="alert"
+        title={<h4>{errorTitle}</h4>}
+        body={errorMessage}
+      />
+    )
+  }else if(!data || (Array.isArray(data) && !data.length)){
+    visualization = (
+      <EuiEmptyPrompt
+        iconType="stats"
+        title={<h4>{noDataTitle}</h4>}
+        body={typeof noDataMessage === 'function' ? noDataMessage() : noDataMessage}
+      />
+    )
+  }else{
     const Chart = chartTypes[type];
-
-    return (
-      <EuiFlexGroup responsive={false}>
-        <EuiFlexItem>
+  
+    visualization = (
+      <EuiFlexGroup responsive={false} style={{ height:'100%'}} gutterSize='none'>
+        <EuiFlexItem >
           <Chart data={data}/>
         </EuiFlexItem>
         {showLegend && (
-          <EuiFlexItem>
+          <EuiFlexItem style={{height:'100%'}}>
             <ChartLegend
               data={data.map(({ color, ...rest }) => ({ ...rest, labelColor: color, color: 'text' }))}
             />
@@ -80,6 +77,14 @@ export const VisualizationBasic = ({
         )}
       </EuiFlexGroup>
     )
+  }
+
+  return (
+    <div style={{ width, height}}>
+      {visualization}
+    </div>
+  )
+
 }
 
 type VisualizationBasicWidgetProps = VisualizationBasicProps & {
@@ -113,13 +118,16 @@ export const VisualizationBasicWidgetSelector = ({selectorOptions, title, onFetc
   return (
     <>
       <EuiFlexGroup
-        className="embPanel__header" >
+        className="embPanel__header" gutterSize='none'
+      >
+        <EuiFlexItem>
           {title && (
             <h2 className="embPanel__title wz-headline-title">
               <EuiText size="xs"><h2>{title}</h2></EuiText>
             </h2>
           )}
-        <div style={{ width: "auto", paddingTop: 6, paddingRight: 12 }}>
+        </EuiFlexItem>
+        <EuiFlexItem grow={false}>
           <EuiSelect
             compressed={true}
             options={selectorOptions}
@@ -127,9 +135,9 @@ export const VisualizationBasicWidgetSelector = ({selectorOptions, title, onFetc
             onChange={onChange}
             aria-label="Select options"
           />
-        </div>
+        </EuiFlexItem>
       </EuiFlexGroup>
-      <EuiSpacer />
+      <EuiSpacer size='s'/>
       <VisualizationBasicWidget
         {...rest}
         {...(rest.noDataMessage ?
