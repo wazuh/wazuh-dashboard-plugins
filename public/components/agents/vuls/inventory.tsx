@@ -36,7 +36,6 @@ import {
 import { ICustomBadges } from '../../wz-search-bar/components';
 import { formatUIDate } from '../../../react-services';
 import { VisualizationBasicWidgetSelector, VisualizationBasicWidget  } from '../../common/charts/visualizations/basic';
-import { Position } from '@elastic/charts';
 
 interface Aggregation { title: number, description: string, titleColor: string }
 interface pieStats { id: string, label: string, value: number }
@@ -105,11 +104,13 @@ export class Inventory extends Component {
   async fetchVisualizationVulnerabilitiesSeverityData(){
     const { id } = this.props.agent;
     const FIELD = 'severity';
+
     //Assign a value to the severity label to be able to sort it by level
     const severityOrder = { Critical: 12, High: 9, Medium: 6, Low: 3 };
-    
+
+    const vulnerabilityLastScan = await getLastScan(id);
     const { severity } = await getAggregation(id, FIELD);
-    
+
     const severityStats = Object.keys(severity).map(key => ({ 
       titleColor: this.titleColors[key],
       description: key,
@@ -117,7 +118,11 @@ export class Inventory extends Component {
     }))
     .sort((prev, next) => severityOrder[prev.description] > severityOrder[next.description] ? -1 : 1);
 
-    this.setState({stats: severityStats, isLoadingStats: false});
+    this.setState({
+      stats: severityStats,
+      isLoadingStats: false,
+      vulnerabilityLastScan
+    });
     
     return Object.entries(severity)
       .map(([key, value]) => ({
@@ -140,13 +145,9 @@ export class Inventory extends Component {
   }
 
   async loadAgent() {
-    if (this._isMount) {    
-      const { id } = this.props.agent;
-      const vulnerabilityLastScan = await getLastScan(id);
-      
+    if (this._isMount) {
       this.setState({
-        isLoading: false,
-        vulnerabilityLastScan
+        isLoading: false
       });
     }
   }
@@ -229,6 +230,7 @@ export class Inventory extends Component {
                   size={{ width: '100%', height: '150px' }}
                   showLegend
                   onFetch={this.fetchVisualizationVulnerabilitiesSeverityData}
+                  onFetchDependencies={[this.props.agent.id]}
                   noDataTitle='No results'
                   noDataMessage='No results were found.'
                 />
