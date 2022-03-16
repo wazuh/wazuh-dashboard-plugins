@@ -223,7 +223,7 @@ export class Inventory extends Component {
         <EuiFlexGroup wrap>
           <EuiFlexItem>
             <EuiCard title description betaBadgeLabel="Severity" className="wz-euiCard-no-title">
-              <EuiSpacer />
+              <EuiSpacer size="xxl"/>
               <VisualizationBasicWidget
                 type='donut'
                 size={{ width: '100%', height: '150px' }}
