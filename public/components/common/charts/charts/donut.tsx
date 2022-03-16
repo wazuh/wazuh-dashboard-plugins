@@ -1,4 +1,5 @@
 import React, { useEffect, useRef} from "react";
+import ReactDOM from "react-dom";
 import d3 from 'd3';
 import { useChartDimensions } from '../hooks/use_chart_dimensions';
 
@@ -38,6 +39,15 @@ export const ChartDonut = (props : ChartDonutProps) => {
     .padAngle(0.015);
   const format = d3.format(".2f");
 
+  const TooltipContent = ({ data }) => {
+    const borderStyle = { borderLeft: `2px solid ${data.color}` };
+    return (
+      <div style={borderStyle}>
+        <p style={{ marginLeft: '5px', fontSize: '0.8rem' }}>{data.label}: {data.value}</p>
+      </div>
+    )
+  }
+
   useEffect(() => {
     const pieData = createPie(props.data);
     const prevData = createPie(cache.current);
@@ -54,20 +64,22 @@ export const ChartDonut = (props : ChartDonutProps) => {
       .on("mouseenter", function (d) {
         tooltip = d3.select("body")
           .append("div")
-          .attr("class", "wz-chart-tooltip");
+          .attr("class", "wz-chart-tooltip visTooltip");
       })
       .on("mousemove", function (d) {
-        const mouseVal = d3.mouse(this);
         tooltip.style("display", "none");
         tooltip
-          .html("age:" + d.data.age + "</br>" + "population:" + d.data.population)
-          .style("left", (d3.event.pageX + 12) + "px")
-          .style("top", (d3.event.pageY - 10) + "px")
+          .style("left", `${(d3.event.pageX + 12)}px`)
+          .style('top', `${(d3.event.pageY - 10)}px`)
           .style("opacity", 1)
+          .style("padding", '5px 5px 5px 2px')
+          .style("visibility", 'visible')
+          .style("position", 'absolute')
           .style("display", "block");
+          ReactDOM.render(<TooltipContent data={d.data}/>, tooltip[0][0]);
       })
-      .on("mouseout", function () { d3.select("body > div.wz-chart-tooltip").html(" ").style("display", "none"); })
-
+      .on("mouseout", function () { d3.select("body > div.wz-chart-tooltip").remove(); })
+      
     const path = groupWithData.select('path')[0].filter(item => item != null).length ? groupWithData.select("path") : groupWithData.append("path");
 
     const arcTween = (d, i) => {
