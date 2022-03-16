@@ -62,14 +62,21 @@ export const VisualizationBasic = ({
     )
   }else{
     const Chart = chartTypes[type];
-  
+    const chartFlexStyle = {
+      alignItems: 'flex-end',
+      paddingRight: '1em'
+    }
+    const legendFlexStyle = {
+      height:'100%',
+      paddingLeft: '1em'
+    }
     visualization = (
       <EuiFlexGroup responsive={false} style={{ height:'100%'}} gutterSize='none'>
-        <EuiFlexItem >
+        <EuiFlexItem style={chartFlexStyle}>
           <Chart data={data}/>
         </EuiFlexItem>
         {showLegend && (
-          <EuiFlexItem style={{height:'100%'}}>
+          <EuiFlexItem style={legendFlexStyle}>
             <ChartLegend
               data={data.map(({ color, ...rest }) => ({ ...rest, labelColor: color, color: 'text' }))}
             />
