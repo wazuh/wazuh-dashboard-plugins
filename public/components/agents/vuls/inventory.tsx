@@ -56,7 +56,6 @@ export class Inventory extends Component {
   props: any;
   colorsVisualizationVulnerabilitiesSummaryData: EuiPalette;
   titleColors: TitleColors = { Critical: '#BD271E', High: '#d5a612', Medium: '#006BB4', Low: '#6a717d' };
-  
 
   constructor(props) {
     super(props);
@@ -111,10 +110,10 @@ export class Inventory extends Component {
     const vulnerabilityLastScan = await getLastScan(id);
     const { severity } = await getAggregation(id, FIELD);
 
-    const severityStats = Object.keys(severity).map(key => ({ 
+    const severityStats = Object.keys(severityOrder).map(key => ({ 
       titleColor: this.titleColors[key],
       description: key,
-      title: severity[key]
+      title: severity[key] ? severity[key] : 0
     }))
     .sort((prev, next) => severityOrder[prev.description] > severityOrder[next.description] ? -1 : 1);
 
