@@ -94,7 +94,7 @@ export class Details extends Component {
       {
         field: 'title',
         name: 'Title',
-        icon: 'clock',
+        icon: 'home',
         link: false,
       },
       {
@@ -124,7 +124,7 @@ export class Details extends Component {
       {
         field: 'condition',
         name: 'Condition',
-        icon: 'clock',
+        icon: 'crosshairs',
         link: false,
       },
       {
@@ -158,7 +158,7 @@ export class Details extends Component {
       {
         field: 'external_references',
         name: 'References',
-        icon: 'clock',
+        icon: 'link',
         link: false,
         transformValue: this.renderExternalReferences
       },

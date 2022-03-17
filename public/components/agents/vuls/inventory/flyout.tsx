@@ -104,7 +104,7 @@ export class FlyoutDetail extends Component {
 
   render() {
     const { currentItem } = this.state;
-    const title = `${currentItem.cve}`;
+    const title = `${currentItem.cve || ''}`;
     const id = title.replace(/ /g, '_');
     const filterMap = {
       name: 'data.vulnerability.package.name',
@@ -135,7 +135,7 @@ export class FlyoutDetail extends Component {
       >
         <EuiFlyoutHeader hasBorder className="flyout-header">
           <EuiTitle size="s">
-            <h2 id={id}>{title || ''}</h2>
+            <h2 id={id}>{title}</h2>
           </EuiTitle>
         </EuiFlyoutHeader>
         {this.state.isLoading && (
