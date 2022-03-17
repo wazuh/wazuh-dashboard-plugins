@@ -29,6 +29,7 @@ export function TableWithSearchBar({
   tableInitialSortingField = '',
   tableProps = {},
   reload,
+  endpoint,
   ...rest
 }) {
   const [loading, setLoading] = useState(false);
@@ -66,7 +67,7 @@ export function TableWithSearchBar({
     (async function () {
       try {
         setLoading(true);
-        const { items, totalItems } = await onSearch(filters, pagination, sorting);
+        const { items, totalItems } = await onSearch(endpoint, filters, pagination, sorting);
         setItems(items);
         setTotalItems(totalItems);
       } catch (error) {
@@ -86,7 +87,7 @@ export function TableWithSearchBar({
       }
       setLoading(false);
     })();
-  }, [filters, pagination, sorting, reload]);
+  }, [endpoint, filters, pagination, sorting, reload]);
 
   useEffect(() => {
     setFilters(rest.filters || []);
