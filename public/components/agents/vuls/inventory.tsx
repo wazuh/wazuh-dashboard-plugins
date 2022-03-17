@@ -91,7 +91,7 @@ export class Inventory extends Component {
   }
 
   async fetchVisualizationVulnerabilitiesSummaryData(field, agentID) {
-    const results = await getAggregation(agentID, field, 5);
+    const results = await getAggregation(agentID, field, 4);
     return Object.entries(results[field]).map(([key, value], index) => ({
       label: key,
       value,
@@ -103,7 +103,7 @@ export class Inventory extends Component {
   async fetchVisualizationVulnerabilitiesSeverityData(){
     const { id } = this.props.agent;
     const FIELD = 'severity';
-
+    this.setState({ isLoadingStats: true });
     //Assign a value to the severity label to be able to sort it by level
     const severityOrder = { Critical: 12, High: 9, Medium: 6, Low: 3 };
 
@@ -238,22 +238,25 @@ export class Inventory extends Component {
           </EuiFlexItem>
           <EuiFlexItem>
             <EuiCard title description betaBadgeLabel="Details">
-              <EuiFlexGroup alignItems='center'>
-                {stats.map((stat) => this.buildTitleFilter(stat))}                
-              </EuiFlexGroup>
-              <EuiFlexGroup style={{marginTop: 'auto'}}>
+              <EuiFlexGroup alignItems="center" className={"height-full"}>
                 <EuiFlexItem>
-                  <EuiText>
-                    <EuiIcon type="calendar" color={'primary'}/> Last full scan: {last_full_scan}
-                  </EuiText>
-                </EuiFlexItem>
-                <EuiFlexItem>
-                  <EuiText>
-                    <EuiIcon type="calendar" color={'primary'}/> Last partial scan: {last_partial_scan}
-                  </EuiText>
+                  <EuiFlexGroup alignItems="center">
+                    {stats.map((stat) => this.buildTitleFilter(stat))}
+                  </EuiFlexGroup>
+                  <EuiFlexGroup style={{ marginTop: 'auto' }}>
+                    <EuiFlexItem>
+                      <EuiText>
+                        <EuiIcon type="calendar" color={'primary'} /> Last full scan: {last_full_scan}
+                      </EuiText>
+                    </EuiFlexItem>
+                    <EuiFlexItem>
+                      <EuiText>
+                        <EuiIcon type="calendar" color={'primary'} /> Last partial scan: {last_partial_scan}
+                      </EuiText>
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
                 </EuiFlexItem>
               </EuiFlexGroup>
-
             </EuiCard>
           </EuiFlexItem>
           <EuiFlexItem>

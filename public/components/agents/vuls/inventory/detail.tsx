@@ -22,7 +22,9 @@ import {
   EuiSpacer,
   EuiStat,
   EuiToolTip,
+  EuiListGroup,
   EuiBadge,
+  EuiText,
 } from '@elastic/eui';
 import { Discover } from '../../../common/modules/discover';
 import { ModulesHelper } from '../../../common/modules/modules-helper';
@@ -90,6 +92,12 @@ export class Details extends Component {
   details() {
     return [
       {
+        field: 'title',
+        name: 'Title',
+        icon: 'clock',
+        link: false,
+      },
+      {
         field: 'name',
         name: 'Name',
         icon: 'dot',
@@ -114,6 +122,12 @@ export class Details extends Component {
         link: true,
       },
       {
+        field: 'condition',
+        name: 'Condition',
+        icon: 'clock',
+        link: false,
+      },
+      {
         field: 'last_full_scan',
         name: 'Last Full Scan',
         icon: 'clock',
@@ -128,24 +142,6 @@ export class Details extends Component {
         transformValue: formatUIDate
       },
       {
-        field: 'references',
-        name: 'References',
-        icon: 'clock',
-        link: false,
-      },
-      {
-        field: 'condition',
-        name: 'Condition',
-        icon: 'clock',
-        link: false,
-      },
-      {
-        field: 'title',
-        name: 'Title',
-        icon: 'clock',
-        link: false,
-      },
-      {
         field: 'published',
         name: 'Published',
         icon: 'clock',
@@ -158,6 +154,13 @@ export class Details extends Component {
         icon: 'clock',
         link: false,
         transformValue: formatUIDate
+      },
+      {
+        field: 'external_references',
+        name: 'References',
+        icon: 'clock',
+        link: false,
+        transformValue: this.renderExternalReferences
       },
     ];
   }
@@ -302,6 +305,32 @@ export class Details extends Component {
         <EuiFlexGrid columns={3}> {generalDetails} </EuiFlexGrid>
       </div>
     );
+  }
+
+  renderExternalReferences(references) {
+        return (
+          <EuiAccordion
+            id={Math.random().toString()}
+            paddingSize="none"
+            initialIsOpen={false}
+            arrowDisplay="none"
+            buttonContent={
+              <EuiTitle size="s">
+                  <EuiToolTip position="top" content="View external references">
+                    <EuiText >View external references <EuiIcon
+                      className="euiButtonIcon euiButtonIcon--primary"
+                      type="inspect"
+                      aria-label="show"
+                    /></EuiText>
+                  </EuiToolTip>
+              </EuiTitle>
+            }>
+            <EuiListGroup size="xs" flush={true} gutterSize="none" style={{ display: 'grid' }}
+              listItems={references.map(link => ({ label: link, href: link }))
+              }
+            />
+          </EuiAccordion>
+        );
   }
 
   updateTotalHits = (total) => {

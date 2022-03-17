@@ -219,8 +219,22 @@ export class InventoryTable extends Component {
     const { error } = this.state;
     const { filters, onFiltersChange } = this.props;
     const columns = this.columns();
-    const selectFields =
-      'select=cve,architecture,version,name,severity,cvss2_score,cvss3_score,detection_time';
+    const selectFields = `select=${[
+      'cve',
+      'architecture',
+      'version',
+      'name',
+      'severity',
+      'cvss2_score',
+      'cvss3_score',
+      'detection_time',
+      'title',
+      'condition',
+      'updated',
+      'published',
+      'external_references'
+    ].join(',')}`;
+
     return (
       <TableWzAPI
         title="Vulnerabilities"

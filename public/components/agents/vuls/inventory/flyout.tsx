@@ -135,7 +135,7 @@ export class FlyoutDetail extends Component {
       >
         <EuiFlyoutHeader hasBorder className="flyout-header">
           <EuiTitle size="s">
-            <h2 id={id}>{title}</h2>
+            <h2 id={id}>{title || ''}</h2>
           </EuiTitle>
         </EuiFlyoutHeader>
         {this.state.isLoading && (
