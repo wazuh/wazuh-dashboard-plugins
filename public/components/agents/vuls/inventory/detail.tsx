@@ -308,29 +308,29 @@ export class Details extends Component {
   }
 
   renderExternalReferences(references) {
-        return (
-          <EuiAccordion
-            id={Math.random().toString()}
-            paddingSize="none"
-            initialIsOpen={false}
-            arrowDisplay="none"
-            buttonContent={
-              <EuiTitle size="s">
-                  <EuiToolTip position="top" content="View external references">
-                    <EuiText >View external references <EuiIcon
-                      className="euiButtonIcon euiButtonIcon--primary"
-                      type="inspect"
-                      aria-label="show"
-                    /></EuiText>
-                  </EuiToolTip>
-              </EuiTitle>
-            }>
-            <EuiListGroup size="xs" flush={true} gutterSize="none" style={{ display: 'grid' }}
-              listItems={references.map(link => ({ label: link, href: link }))
-              }
-            />
-          </EuiAccordion>
-        );
+    return (
+      <EuiAccordion
+        id={Math.random().toString()}
+        paddingSize="none"
+        initialIsOpen={false}
+        arrowDisplay="none"
+        buttonContent={
+          <EuiTitle size="xs">
+            <EuiToolTip position="top" content="View external references">
+              <p className="detail-value" style={{ margin: 0 }}>View external references <EuiIcon
+                className="euiButtonIcon euiButtonIcon--primary"
+                type="inspect"
+                aria-label="show"
+              /></p>
+            </EuiToolTip>
+          </EuiTitle>
+        }>
+        <EuiListGroup size="xs" flush={true} gutterSize="none" style={{ display: 'grid' }}
+          listItems={references.map(link => ({ label: link, href: link }))
+          }
+        />
+      </EuiAccordion>
+    );
   }
 
   updateTotalHits = (total) => {
