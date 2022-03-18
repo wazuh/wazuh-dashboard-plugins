@@ -27,6 +27,7 @@ export const ChartDonut = (props : ChartDonutProps) => {
   const size = dms.height;
   const outerRadius = size / 2;
   const innerRadius = outerRadius - Math.min(20, size * 0.2);
+  let tooltip;
   
   const createPie = d3.layout
     .pie()
@@ -48,6 +49,29 @@ export const ChartDonut = (props : ChartDonutProps) => {
     )
   }
 
+  // chart mouse events
+  const onEnter = () => {
+    tooltip = d3.select("body")
+      .append("div")
+      .attr("class", "wz-chart-tooltip visTooltip");
+  }
+
+  const onMove = (d) => {
+    tooltip.style("display", "none");
+    tooltip
+      .style("left", `${(d3.event.pageX + 12)}px`)
+      .style('top', `${(d3.event.pageY - 10)}px`)
+      .style("opacity", 1)
+      .style("padding", '5px 5px 5px 2px')
+      .style("visibility", 'visible')
+      .style("position", 'absolute')
+      .style("display", "block");
+    ReactDOM.render(<TooltipContent data={d.data} />, tooltip[0][0]);
+  }
+
+  const onOut = () => d3.select("body > div.wz-chart-tooltip").remove()
+  // end of chart mouse events
+
   useEffect(() => {
     const pieData = createPie(props.data);
     const prevData = createPie(cache.current);
@@ -56,29 +80,14 @@ export const ChartDonut = (props : ChartDonutProps) => {
 
     groupWithData.exit().remove();
 
-    let tooltip;
+    
     groupWithData
       .enter()
       .append("g")
       .attr("class", "arc")
-      .on("mouseenter", function (d) {
-        tooltip = d3.select("body")
-          .append("div")
-          .attr("class", "wz-chart-tooltip visTooltip");
-      })
-      .on("mousemove", function (d) {
-        tooltip.style("display", "none");
-        tooltip
-          .style("left", `${(d3.event.pageX + 12)}px`)
-          .style('top', `${(d3.event.pageY - 10)}px`)
-          .style("opacity", 1)
-          .style("padding", '5px 5px 5px 2px')
-          .style("visibility", 'visible')
-          .style("position", 'absolute')
-          .style("display", "block");
-          ReactDOM.render(<TooltipContent data={d.data}/>, tooltip[0][0]);
-      })
-      .on("mouseout", function () { d3.select("body > div.wz-chart-tooltip").remove(); })
+      .on("mouseenter", () => onEnter())
+      .on("mousemove", (d) => onMove(d))
+      .on("mouseout", onOut)
       
     const path = groupWithData.select('path')[0].filter(item => item != null).length ? groupWithData.select("path") : groupWithData.append("path");
 
@@ -93,6 +102,7 @@ export const ChartDonut = (props : ChartDonutProps) => {
       .transition()
       .attrTween("d", arcTween);
     cache.current = props.data;
+    return onOut;
   },
     [props.data, dms]
   );

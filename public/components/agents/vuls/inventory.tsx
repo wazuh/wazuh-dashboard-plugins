@@ -121,12 +121,12 @@ export class Inventory extends Component {
       vulnerabilityLastScan
     });
     
-    return SEVERITY_KEYS.map(key => ({
+    return Object.keys(severity).length ? SEVERITY_KEYS.map(key => ({
       label: key,
-      value: severity[key],
+      value: severity[key] ? severity[key] : 0,
       color: this.titleColors[key],
       onClick: () => this.onFiltersChange(this.buildFilterQuery(FIELD, key))
-    }));
+    })) : [];
   }
 
   buildFilterQuery(field = '', selectedItem = '') {
