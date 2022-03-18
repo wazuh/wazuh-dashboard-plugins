@@ -22,6 +22,7 @@ import {
   renderValueOrNoValue
 } from '../utils/utils';
 import { settingsListBuilder } from '../utils/builders';
+import { LOGCOLLECTOR_SOCKET_PROP } from './types';
 
 const helpLinks = [
   {
@@ -57,27 +58,27 @@ class WzConfigurationLogCollectionSockets extends Component {
   }
   render() {
     const { currentConfig } = this.props;
-    const items = isArray(currentConfig['logcollector-socket'].target)
-      ? settingsListBuilder(currentConfig['logcollector-socket'].target, 'name')
+    const items = isArray(currentConfig[LOGCOLLECTOR_SOCKET_PROP].target)
+      ? settingsListBuilder(currentConfig[LOGCOLLECTOR_SOCKET_PROP].target, 'name')
       : [];
     return (
       <Fragment>
-        {currentConfig['logcollector-socket'] &&
-          isString(currentConfig['logcollector-socket']) && (
+        {currentConfig[LOGCOLLECTOR_SOCKET_PROP] &&
+          isString(currentConfig[LOGCOLLECTOR_SOCKET_PROP]) && (
             <WzNoConfig
-              error={currentConfig['logcollector-socket']}
+              error={currentConfig[LOGCOLLECTOR_SOCKET_PROP]}
               help={helpLinks}
             />
           )}
-        {currentConfig['logcollector-socket'] &&
-        !isString(currentConfig['logcollector-socket']) &&
-        !currentConfig['logcollector-socket'].target ? (
+        {currentConfig[LOGCOLLECTOR_SOCKET_PROP] &&
+        !isString(currentConfig[LOGCOLLECTOR_SOCKET_PROP]) &&
+        !currentConfig[LOGCOLLECTOR_SOCKET_PROP].target ? (
           <WzNoConfig error="not-present" help={helpLinks} />
         ) : null}
-        {currentConfig['logcollector-socket'] &&
-        !isString(currentConfig['logcollector-socket']) &&
-        currentConfig['logcollector-socket'].target &&
-        currentConfig['logcollector-socket'].target.length ? (
+        {currentConfig[LOGCOLLECTOR_SOCKET_PROP] &&
+        !isString(currentConfig[LOGCOLLECTOR_SOCKET_PROP]) &&
+        currentConfig[LOGCOLLECTOR_SOCKET_PROP].target &&
+        currentConfig[LOGCOLLECTOR_SOCKET_PROP].target.length ? (
           <WzConfigurationSettingsTabSelector
             title="Output sockets"
             description="Define custom outputs to send log data"

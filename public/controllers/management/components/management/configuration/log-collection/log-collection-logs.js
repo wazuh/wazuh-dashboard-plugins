@@ -23,6 +23,7 @@ import {
 import { settingsListBuilder } from '../utils/builders';
 
 import helpLinks from './help-links';
+import { LOGCOLLECTOR_LOCALFILE_PROP, LOCALFILE_LOGS_PROP  } from './types';
 
 const renderTargetField = item => item ? item.join(', ') : 'agent';
 
@@ -75,10 +76,10 @@ class WzConfigurationLogCollectionLogs extends Component {
   render() {
     const { currentConfig, agent } = this.props;
     const items =
-      currentConfig['logcollector-localfile'] &&
-      currentConfig['logcollector-localfile']['localfile-logs']
+      currentConfig[LOGCOLLECTOR_LOCALFILE_PROP] &&
+      currentConfig[LOGCOLLECTOR_LOCALFILE_PROP][LOCALFILE_LOGS_PROP]
         ? settingsListBuilder(
-            currentConfig['logcollector-localfile']['localfile-logs'],
+            currentConfig[LOGCOLLECTOR_LOCALFILE_PROP][LOCALFILE_LOGS_PROP],
             [
               'file',
               'alias',
@@ -89,23 +90,23 @@ class WzConfigurationLogCollectionLogs extends Component {
         : [];
     return (
       <Fragment>
-        {currentConfig['logcollector-localfile'] &&
-          isString(currentConfig['logcollector-localfile']) && (
+        {currentConfig[LOGCOLLECTOR_LOCALFILE_PROP] &&
+          isString(currentConfig[LOGCOLLECTOR_LOCALFILE_PROP]) && (
             <WzNoConfig
-              error={currentConfig['logcollector-localfile']}
+              error={currentConfig[LOGCOLLECTOR_LOCALFILE_PROP]}
               help={helpLinks}
             />
           )}
-        {currentConfig['logcollector-localfile'] &&
-        !isString(currentConfig['logcollector-localfile']) &&
-        !(currentConfig['logcollector-localfile']['localfile-logs'] || [])
+        {currentConfig[LOGCOLLECTOR_LOCALFILE_PROP] &&
+        !isString(currentConfig[LOGCOLLECTOR_LOCALFILE_PROP]) &&
+        !(currentConfig[LOGCOLLECTOR_LOCALFILE_PROP][LOCALFILE_LOGS_PROP] || [])
           .length ? (
           <WzNoConfig error="not-present" help={helpLinks} />
         ) : null}
-        {currentConfig['logcollector-localfile'] &&
-        !isString(currentConfig['logcollector-localfile']) &&
-        currentConfig['logcollector-localfile']['localfile-logs'] &&
-        currentConfig['logcollector-localfile']['localfile-logs'].length ? (
+        {currentConfig[LOGCOLLECTOR_LOCALFILE_PROP] &&
+        !isString(currentConfig[LOGCOLLECTOR_LOCALFILE_PROP]) &&
+        currentConfig[LOGCOLLECTOR_LOCALFILE_PROP][LOCALFILE_LOGS_PROP] &&
+        currentConfig[LOGCOLLECTOR_LOCALFILE_PROP][LOCALFILE_LOGS_PROP].length ? (
           <WzConfigurationSettingsTabSelector
             title="Logs files"
             description="List of log files that will be analyzed"

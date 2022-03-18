@@ -17,33 +17,65 @@ import WzConfigurationSettingsTabSelector from '../util-components/configuration
 import WzConfigurationListSelector from '../util-components/configuration-settings-list-selector';
 import {
   isString,
-  renderValueOrDefault,
   renderValueOrNoValue
 } from '../utils/utils';
 import { settingsListBuilder } from '../utils/builders';
 import helpLinks from './help-links';
-import { LOGCOLLECTOR_LOCALFILE_PROP, LOCALFILE_COMMANDS_PROP } from './types';
+import { LOGCOLLECTOR_LOCALFILE_PROP, LOCALFILE_WINDOWSEVENT_PROP } from './types'
 
+/**
+ *  Return input label based on logformat value
+ * 
+ * @param {*} value => field value
+ * @param {*} item => settings item
+ * @param {*} config => all log data
+ * @returns string => value to show in Channel label
+ */
+const channelLabel = (value, item, config) => {
+  return  config.logformat === 'eventlog' ? 'Log' :
+          config.logformat === 'eventchannel' ? 'Channel' : 'Channel';
+}
+
+/**
+ * 
+ * @param {*} data => all log data 
+ * @returns string => value to show in query input
+ */
+const queryValue = (data) => { 
+  return  typeof data === 'undefined' ? '-' : 
+          typeof data === 'object' ? data.value : data;
+}
+
+/**
+ * Returns targets array parsed in one string
+ * @param {*} item 
+ * @returns string => target
+ */
 const renderTargetField = item => item ? item.join(', ') : 'agent';
+/**
+ * Return panels title
+ * @param {*} item => log data
+ * @returns 
+ */
+const panelsLabel = (item) => !item.channel ? `${item.logformat} - ${renderTargetField(item.target)}` : `${item.channel} (${item.logformat})`;
 
 const mainSettings = [
   { field: 'logformat', label: 'Log format' },
-  { field: 'command', label: 'Run this command', render: renderValueOrNoValue },
-  { field: 'alias', label: 'Command alias', render: renderValueOrNoValue },
+  { field: 'channel', label: 'Channel', render: renderValueOrNoValue, renderLabel: channelLabel },
+  { field: 'query', label: 'Query', render: queryValue },
   {
-    field: 'frequency',
-    label: 'Interval between command executions',
+    field: 'only-future-events',
+    label: 'Only future events',
     render: renderValueOrNoValue
   },
   {
-    field: 'target',
-    label: 'Redirect output to this socket',
-    render: renderTargetField
+    field: 'reconnect_time',
+    label: 'Reconnect Time',
+    render: renderValueOrNoValue
   }
 ];
 
-
-class WzConfigurationLogCollectionCommands extends Component {
+class WzConfigurationLogCollectionWindowsEvents extends Component {
   constructor(props) {
     super(props);
   }
@@ -51,16 +83,8 @@ class WzConfigurationLogCollectionCommands extends Component {
     const { currentConfig } = this.props;
     const items =
       currentConfig[LOGCOLLECTOR_LOCALFILE_PROP] &&
-      currentConfig[LOGCOLLECTOR_LOCALFILE_PROP][LOCALFILE_COMMANDS_PROP]
-        ? settingsListBuilder(
-            currentConfig[LOGCOLLECTOR_LOCALFILE_PROP][LOCALFILE_COMMANDS_PROP],
-            [
-              'file',
-              'alias',
-              'commnad', 
-              (item) => `${item.logformat}${item.target ? ` - ${item.target.join(', ')}` : ''}`
-            ]
-          )
+      currentConfig[LOGCOLLECTOR_LOCALFILE_PROP][LOCALFILE_WINDOWSEVENT_PROP]
+        ? settingsListBuilder(currentConfig[LOGCOLLECTOR_LOCALFILE_PROP][LOCALFILE_WINDOWSEVENT_PROP], panelsLabel)
         : [];
     return (
       <Fragment>
@@ -73,17 +97,17 @@ class WzConfigurationLogCollectionCommands extends Component {
           )}
         {currentConfig[LOGCOLLECTOR_LOCALFILE_PROP] &&
         !isString(currentConfig[LOGCOLLECTOR_LOCALFILE_PROP]) &&
-        !(currentConfig[LOGCOLLECTOR_LOCALFILE_PROP][LOCALFILE_COMMANDS_PROP] || [])
+        !(currentConfig[LOGCOLLECTOR_LOCALFILE_PROP][LOCALFILE_WINDOWSEVENT_PROP] || [])
           .length ? (
           <WzNoConfig error="not-present" help={helpLinks} />
         ) : null}
         {currentConfig[LOGCOLLECTOR_LOCALFILE_PROP] &&
         !isString(currentConfig[LOGCOLLECTOR_LOCALFILE_PROP]) &&
-        currentConfig[LOGCOLLECTOR_LOCALFILE_PROP][LOCALFILE_COMMANDS_PROP] &&
-        currentConfig[LOGCOLLECTOR_LOCALFILE_PROP][LOCALFILE_COMMANDS_PROP].length ? (
+        currentConfig[LOGCOLLECTOR_LOCALFILE_PROP][LOCALFILE_WINDOWSEVENT_PROP] &&
+        currentConfig[LOGCOLLECTOR_LOCALFILE_PROP][LOCALFILE_WINDOWSEVENT_PROP].length ? (
           <WzConfigurationSettingsTabSelector
-            title="Command monitoring"
-            description="All output from these commands will be read as one or more log messages depending on whether command or full_command is used."
+            title="Windows events logs"
+            description="List of Windows logs that will be processed"
             currentConfig={currentConfig}
             minusHeight={this.props.agent.id === '000' ? 320 : 415}
             helpLinks={helpLinks}
@@ -99,8 +123,8 @@ class WzConfigurationLogCollectionCommands extends Component {
   }
 }
 
-WzConfigurationLogCollectionCommands.propTypes = {
+WzConfigurationLogCollectionWindowsEvents.propTypes = {
   // currentConfig: PropTypes.object.isRequired
 };
 
-export default WzConfigurationLogCollectionCommands;
+export default WzConfigurationLogCollectionWindowsEvents;
