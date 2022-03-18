@@ -69,7 +69,7 @@ export class VisFactoryHandler {
       const currentPattern = AppState.getCurrentPattern();
       // TODO change logic to read common/modules/module-defaults.js configuration
       const data =
-        ['sca', 'vuls'].includes(tab)
+        !['sca', 'vuls'].includes(tab)
           ? await GenericRequest.request(
             'GET',
             `/elastic/visualizations/overview-${tab}/${currentPattern}`
