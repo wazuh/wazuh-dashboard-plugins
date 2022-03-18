@@ -103,19 +103,17 @@ export class Inventory extends Component {
   async fetchVisualizationVulnerabilitiesSeverityData(){
     const { id } = this.props.agent;
     const FIELD = 'severity';
+    const SEVERITY_KEYS = ['Critical', 'High', 'Medium', 'Low'];
     this.setState({ isLoadingStats: true });
-    //Assign a value to the severity label to be able to sort it by level
-    const severityOrder = { Critical: 12, High: 9, Medium: 6, Low: 3 };
 
     const vulnerabilityLastScan = await getLastScan(id);
     const { severity } = await getAggregation(id, FIELD);
 
-    const severityStats = Object.keys(severityOrder).map(key => ({ 
+    const severityStats = SEVERITY_KEYS.map(key => ({ 
       titleColor: this.titleColors[key],
       description: key,
       title: severity[key] ? severity[key] : 0
-    }))
-    .sort((prev, next) => severityOrder[prev.description] > severityOrder[next.description] ? -1 : 1);
+    }));
 
     this.setState({
       stats: severityStats,
@@ -123,15 +121,12 @@ export class Inventory extends Component {
       vulnerabilityLastScan
     });
     
-    return Object.entries(severity)
-      .map(([key, value]) => ({
-        label: key,
-        value,
-        color: this.titleColors[key],
-        onClick: () => this.onFiltersChange(this.buildFilterQuery(FIELD, key))
-      }
-      ))
-      .sort((prev, next) => severityOrder[prev.label] > severityOrder[next.label] ? -1 : 1);
+    return SEVERITY_KEYS.map(key => ({
+      label: key,
+      value: severity[key],
+      color: this.titleColors[key],
+      onClick: () => this.onFiltersChange(this.buildFilterQuery(FIELD, key))
+    }));
   }
 
   buildFilterQuery(field = '', selectedItem = '') {
@@ -178,6 +173,9 @@ export class Inventory extends Component {
     </EuiPage>;
   }
 
+  // This method was created because Wazuh API returns 1970-01-01T00:00:00Z dates
+  // when vulnerability module is not configured
+  // its meant to render nothing when such date is received
   beautifyDate(date: string) {
     return ['', '1970-01-01T00:00:00Z'].includes(date) ? '-' : formatUIDate(date);
   }

@@ -310,7 +310,7 @@ export class Details extends Component {
   renderExternalReferences(references) {
     return (
       <EuiAccordion
-        id={Math.random().toString()}
+        id="modules_vulnerabilities_inventory_flyout_details_references"
         paddingSize="none"
         initialIsOpen={false}
         arrowDisplay="none"

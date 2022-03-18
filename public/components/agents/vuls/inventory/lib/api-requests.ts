@@ -28,7 +28,7 @@ export async function getFilterValues(field, value, agentId, filters = {}, forma
     filter['search'] = value;
   }
   const result = await WzRequest.apiReq('GET', `/vulnerability/${agentId}`, { params: filter });
-  return (((result || {}).data || {}).data || {}).affected_items.map((item) => { return format(item[field]) });
+  return result?.data?.data?.affected_items?.map((item) => { return format(item[field]) }) || [];
 }
 
 export async function getLastScan(agentId: string = '000') {
@@ -37,5 +37,5 @@ export async function getLastScan(agentId: string = '000') {
     `/vulnerability/${agentId}/last_scan`,
     {}
   );
-  return ((response.data || {}).data || {}).affected_items[0] || {};
+  return response?.data?.data?.affected_items[0] || {};
 }
