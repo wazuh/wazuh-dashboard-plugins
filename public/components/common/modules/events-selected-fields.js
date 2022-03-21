@@ -87,7 +87,8 @@ export const EventsSelectedFiles = {
     'agent.name',
     'data.vulnerability.package.name',
     'data.vulnerability.cve',
-    'data.vulnerability.severity'
+    'data.vulnerability.severity',
+    'data.vulnerability.status'
   ],
   virustotal: [
     'agent.name',
