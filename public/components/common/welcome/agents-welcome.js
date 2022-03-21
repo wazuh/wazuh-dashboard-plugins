@@ -51,9 +51,13 @@ import { updateCurrentAgentData } from '../../../redux/actions/appStateActions';
 import WzTextWithTooltipIfTruncated from '../wz-text-with-tooltip-if-truncated';
 import { getAngularModule } from '../../../kibana-services';
 import { hasAgentSupportModule } from '../../../react-services/wz-agents';
-import { withErrorBoundary } from '../hocs';
+import { withErrorBoundary, withReduxProvider } from '../hocs';
+import { compose } from 'redux';
 
-export const AgentsWelcome = withErrorBoundary (class AgentsWelcome extends Component {
+export const AgentsWelcome = compose(
+  withReduxProvider,
+  withErrorBoundary)(
+class AgentsWelcome extends Component {
   _isMount = false;
   constructor(props) {
     super(props);
