@@ -23,7 +23,6 @@ import nist from './agents-nist';
 import tsc from './agents-tsc';
 import pm from './agents-pm';
 import virustotal from './agents-virustotal';
-import vuls from './agents-vuls';
 import osquery from './agents-osquery';
 import docker from './agents-docker';
 import welcome from './agents-welcome';
@@ -44,7 +43,6 @@ export {
   tsc,
   pm,
   virustotal,
-  vuls,
   osquery,
   mitre,
   docker,
