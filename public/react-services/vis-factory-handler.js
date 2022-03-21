@@ -67,8 +67,9 @@ export class VisFactoryHandler {
 
     try {
       const currentPattern = AppState.getCurrentPattern();
+      // TODO change logic to read common/modules/module-defaults.js configuration
       const data =
-        tab !== 'sca'
+        !['sca', 'vuls'].includes(tab)
           ? await GenericRequest.request(
             'GET',
             `/elastic/visualizations/overview-${tab}/${currentPattern}`
@@ -100,8 +101,9 @@ export class VisFactoryHandler {
     const commonData = $injector.get('commonData');
 
     try {
+      // TODO change logic to read common/modules/module-defaults.js configuration
       const data =
-        (!['sca', 'office'].includes(tab))
+        (!['sca', 'office', 'vuls'].includes(tab))
           ? await GenericRequest.request(
             'GET',
             `/elastic/visualizations/agents-${tab}/${AppState.getCurrentPattern()}`

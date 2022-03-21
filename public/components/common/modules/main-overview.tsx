@@ -109,12 +109,14 @@ export const MainModuleOverview = connect(mapStateToProps)(class MainModuleOverv
   }
 
   async componentDidMount() {
+    const { module } = this.props;
     const tabView = AppNavigate.getUrlParameter('tabView') || 'panels';
     const tab = AppNavigate.getUrlParameter('tab');
+    const tabExceptions = ['sca', 'vuls'];
     if (tabView && tabView !== this.props.selectView) {
-      if (tabView === 'panels' && tab === 'sca') {
-        // SCA initial tab is inventory
-        this.props.onSelectedTabChanged('inventory');
+      if (tabView === 'panels' && tabExceptions.includes(tab)) {
+        // SCA & Vulnerabilities initial tab is inventory
+        this.props.onSelectedTabChanged(module.init);
       } else {
         this.props.onSelectedTabChanged(tabView);
       }
