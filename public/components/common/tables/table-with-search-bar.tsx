@@ -64,6 +64,12 @@ export function TableWithSearchBar({
   }
 
   useEffect(() => {
+    // Reset the page index when the endpoint changes.
+    // This will cause that onSearch function is triggered because to changes in pagination in the another effect.
+    setPagination({pageIndex: 0, pageSize: pagination.pageSize});
+  }, [endpoint]);
+
+  useEffect(() => {
     (async function () {
       try {
         setLoading(true);
@@ -87,7 +93,7 @@ export function TableWithSearchBar({
       }
       setLoading(false);
     })();
-  }, [endpoint, filters, pagination, sorting, reload]);
+  }, [filters, pagination, sorting, reload]);
 
   useEffect(() => {
     setFilters(rest.filters || []);
