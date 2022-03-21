@@ -11,7 +11,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { useRef, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const combineChartDimensions = dimensions => {
   let parsedDimensions = {
@@ -37,14 +37,14 @@ export const useChartDimensions = (passedSettings, ref) => {
 
   useEffect(() => {
     if (dimensions.width && dimensions.height) return
-    const element = ref.current.parentNode.parentNode.parentNode;
+    const element = ref.current.parentNode.parentNode;
     const resizeObserver = new ResizeObserver(entries => {
       if (!Array.isArray(entries)) return
       if (!entries.length) return
       const entry = entries[0]
 
-      if (width != entry.contentRect.width) changeWidth(entry.contentRect.width / 2)
-      if (height != entry.contentRect.height) changeHeight(entry.contentRect.height/2)
+      if (width != entry.contentRect.width) changeWidth(entry.contentRect.width)
+      if (height != entry.contentRect.height) changeHeight(entry.contentRect.height)
     })
     resizeObserver.observe(element)
 

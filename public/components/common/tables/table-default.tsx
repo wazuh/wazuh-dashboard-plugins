@@ -23,14 +23,14 @@ export function TableDefault({
   tableInitialSortingDirection = 'asc',
   tableInitialSortingField = '',
   tableProps = {},
-  reload
+  reload,
+  endpoint
 })
   {
 
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState([]);
   const [totalItems, setTotalItems] = useState(0);
-  const [filters, setFilters] = useState([]);
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: tablePageSizeOptions[0]
@@ -59,10 +59,16 @@ export function TableDefault({
   };
   
   useEffect(() => {
+    // Reset the page index when the endpoint changes.
+    // This will cause that onSearch function is triggered because to changes in pagination in the another effect.
+    setPagination({pageIndex: 0, pageSize: pagination.pageSize});
+  }, [endpoint]);
+  
+  useEffect(() => {
     (async function(){
       try{
         setLoading(true);
-        const { items, totalItems } = await onSearch(filters, pagination, sorting);
+        const { items, totalItems } = await onSearch(endpoint, [], pagination, sorting);
         setItems(items);
         setTotalItems(totalItems);
       }catch(error){
@@ -82,7 +88,7 @@ export function TableDefault({
       }
       setLoading(false);
     })()
-  }, [filters, pagination, sorting, reload]);
+  }, [endpoint, pagination, sorting, reload]);
 
   const tablePagination = {
     ...pagination,

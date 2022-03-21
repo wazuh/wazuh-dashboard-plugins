@@ -66,6 +66,7 @@ exports[`Table WZ API component renders correctly to match the snapshot 1`] = `
   </EuiFlexGroup>
   <TableDefault
     downloadCsv={false}
+    endpoint="/"
     error={false}
     onSearch={[Function]}
     searchBar={false}
