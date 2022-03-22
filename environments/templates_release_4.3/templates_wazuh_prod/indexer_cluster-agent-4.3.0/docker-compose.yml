@@ -29,7 +29,7 @@ services:
       - 9600:9600
   wazuh-manager-master:
     build:
-      context: ../../../images/${WAZUH_MANAGER_IMAGE}
+      context: ./images/${WAZUH_MANAGER_IMAGE}
       args: 
         WAZUH_VERSION: ${WAZUH_VERSION}
         FILEBEAT_VERSION: ${FILEBEAT_VERSION}
@@ -38,7 +38,7 @@ services:
     image: ${WAZUH_MANAGER_IMAGE}:${WAZUH_VERSION}-${FILEBEAT_VERSION}
     hostname: ${WAZUH_MANAGER_IMAGE}-${WAZUH_VERSION}-${FILEBEAT_VERSION}
     volumes:
-      - "../../../config/filebeat/filebeat.wazuh.dashboards.yml:/etc/filebeat/filebeat.yml"
+      - "./config/filebeat/filebeat.wazuh.dashboards.yml:/etc/filebeat/filebeat.yml"
     ports:
       - "514:514"
       - "1514:1514"
@@ -53,7 +53,7 @@ services:
       NODE_TYPE: master
   wazuh-manager-worker:
     build:
-      context: ../../../images/${WAZUH_MANAGER_IMAGE}
+      context: ./images/${WAZUH_MANAGER_IMAGE}
       args: 
         WAZUH_VERSION: ${WAZUH_VERSION}
         FILEBEAT_VERSION: ${FILEBEAT_VERSION}
@@ -62,7 +62,7 @@ services:
     image: ${WAZUH_MANAGER_IMAGE}:${WAZUH_VERSION}-${FILEBEAT_VERSION}
     hostname: ${WAZUH_MANAGER_IMAGE}-worker-${WAZUH_VERSION}-${FILEBEAT_VERSION}
     volumes:
-      - "../../../config/filebeat/filebeat.opensearch.yml:/etc/filebeat/filebeat.yml"
+      - "./config/filebeat/filebeat.opensearch.yml:/etc/filebeat/filebeat.yml"
     # ports:
     #   - "514:514"
     #   - "1514:1514"
@@ -77,7 +77,7 @@ services:
       NODE_TYPE: worker
   wazuh-agent:
     build:
-      context: ../../../images/${WAZUH_AGENT_IMAGE}
+      context: ./images/${WAZUH_AGENT_IMAGE}
       args: 
         WAZUH_VERSION: ${WAZUH_VERSION}
     image: ${WAZUH_AGENT_IMAGE}:${WAZUH_VERSION}

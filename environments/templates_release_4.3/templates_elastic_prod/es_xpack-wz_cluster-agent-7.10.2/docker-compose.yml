@@ -32,7 +32,7 @@ services:
       - 9600:9600
   wazuh-manager-master:
     build:
-      context: ../../../images/${WAZUH_MANAGER_IMAGE}
+      context: ./images/${WAZUH_MANAGER_IMAGE}
       args: 
         WAZUH_VERSION: ${WAZUH_VERSION}
         FILEBEAT_VERSION: ${ELASTIC_VERSION}
@@ -41,7 +41,7 @@ services:
     image: ${WAZUH_MANAGER_IMAGE}:${WAZUH_VERSION}-${ELASTIC_VERSION}
     hostname: wazuh-manager-master-${WAZUH_VERSION}-${ELASTIC_VERSION}
     volumes:
-      - "../../../config/filebeat/filebeat.xpack.yml:/etc/filebeat/filebeat.yml"
+      - "./config/filebeat/filebeat.xpack.yml:/etc/filebeat/filebeat.yml"
       - "./setup/certs/wazuh-manager-master/wazuh-manager-master.crt:/etc/filebeat/certs/instance.crt:ro"
       - "./setup/certs/wazuh-manager-master/wazuh-manager-master.key:/etc/filebeat/certs/instance.key:ro"
       - "./setup/certs/ca/ca.crt:/etc/filebeat/certs/ca.crt:ro"
@@ -59,7 +59,7 @@ services:
       NODE_TYPE: master
   wazuh-manager-worker:
     build:
-      context: ../../../images/${WAZUH_MANAGER_IMAGE}
+      context: ./images/${WAZUH_MANAGER_IMAGE}
       args: 
         WAZUH_VERSION: ${WAZUH_VERSION}
         FILEBEAT_VERSION: ${ELASTIC_VERSION}
@@ -68,7 +68,7 @@ services:
     image: ${WAZUH_MANAGER_IMAGE}:${WAZUH_VERSION}-${ELASTIC_VERSION}
     hostname: wazuh-manager-worker-${WAZUH_VERSION}-${ELASTIC_VERSION}
     volumes:
-      - "../../../config/filebeat/filebeat.xpack.yml:/etc/filebeat/filebeat.yml"
+      - "./config/filebeat/filebeat.xpack.yml:/etc/filebeat/filebeat.yml"
       - "./setup/certs/wazuh-manager-worker/wazuh-manager-worker.crt:/etc/filebeat/certs/instance.crt:ro"
       - "./setup/certs/wazuh-manager-worker/wazuh-manager-worker.key:/etc/filebeat/certs/instance.key:ro"
       - "./setup/certs/ca/ca.crt:/etc/filebeat/certs/ca.crt:ro"
@@ -86,7 +86,7 @@ services:
       NODE_TYPE: worker
   wazuh-agent:
     build:
-      context: ../../../images/${WAZUH_AGENT_IMAGE}
+      context: ./images/${WAZUH_AGENT_IMAGE}
       args: 
         WAZUH_VERSION: ${WAZUH_VERSION}
     image: ${WAZUH_AGENT_IMAGE}:${WAZUH_VERSION}
@@ -99,7 +99,7 @@ services:
     hostname: "kibana"
     image: docker.elastic.co/kibana/kibana:${ELASTIC_VERSION}
     volumes:
-      - "../../../config/kibana/kibana.xpack.yml:/usr/share/kibana/config/kibana.yml"
+      - "./config/kibana/kibana.xpack.yml:/usr/share/kibana/config/kibana.yml"
       - "./setup/certs:/etc/kibana/certs:ro"
       - "$APP_PACKAGES_PATH:/packages:ro"
     ports:

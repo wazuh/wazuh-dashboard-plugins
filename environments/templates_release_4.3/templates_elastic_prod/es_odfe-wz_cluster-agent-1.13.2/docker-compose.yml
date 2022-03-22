@@ -3,7 +3,7 @@ version: "3.7"
 services:
   wazuh-manager-master:
     build:
-      context: ../../../images/${WAZUH_MANAGER_IMAGE}
+      context: ./images/${WAZUH_MANAGER_IMAGE}
       args: 
         WAZUH_VERSION: ${WAZUH_VERSION}
         FILEBEAT_VERSION: ${ELASTIC_VERSION}
@@ -12,7 +12,7 @@ services:
     image: ${WAZUH_MANAGER_IMAGE}:${WAZUH_VERSION}-${ELASTIC_VERSION}
     hostname: wazuh-manager-master-${WAZUH_VERSION}-${ELASTIC_VERSION}
     volumes:
-      - "../../../config/filebeat/filebeat.odfe.yml:/etc/filebeat/filebeat.yml"
+      - "./config/filebeat/filebeat.odfe.yml:/etc/filebeat/filebeat.yml"
     ports:
       - "514:514"
       - "1514:1514"
@@ -27,7 +27,7 @@ services:
       NODE_TYPE: master
   wazuh-manager-worker:
     build:
-      context: ../../../images/${WAZUH_MANAGER_IMAGE}
+      context: ./images/${WAZUH_MANAGER_IMAGE}
       args: 
         WAZUH_VERSION: ${WAZUH_VERSION}
         FILEBEAT_VERSION: ${ELASTIC_VERSION}
@@ -36,7 +36,7 @@ services:
     image: ${WAZUH_MANAGER_IMAGE}:${WAZUH_VERSION}-${ELASTIC_VERSION}
     hostname: ${WAZUH_MANAGER_IMAGE}-worker-${WAZUH_VERSION}-${ELASTIC_VERSION}
     volumes:
-      - "../../../config/filebeat/filebeat.odfe.yml:/etc/filebeat/filebeat.yml"
+      - "./config/filebeat/filebeat.odfe.yml:/etc/filebeat/filebeat.yml"
     # ports:
     #   - "514:514"
     #   - "1514:1514"
@@ -51,7 +51,7 @@ services:
       NODE_TYPE: worker
   wazuh-agent:
     build:
-      context: ../../../images/${WAZUH_AGENT_IMAGE}
+      context: ./images/${WAZUH_AGENT_IMAGE}
       args: 
         WAZUH_VERSION: ${WAZUH_VERSION}
     image: ${WAZUH_AGENT_IMAGE}:${WAZUH_VERSION}
@@ -72,7 +72,7 @@ services:
     hostname: "kibana"
     image: "amazon/opendistro-for-elasticsearch-kibana:${ODFE_VERSION}"
     volumes:
-      - "../../../config/kibana/kibana.odfe.yml:/usr/share/kibana/config/kibana.yml"
+      - "./config/kibana/kibana.odfe.yml:/usr/share/kibana/config/kibana.yml"
       - "${APP_PACKAGES_PATH}:/packages"
     ports:
       - "5601:5601"
