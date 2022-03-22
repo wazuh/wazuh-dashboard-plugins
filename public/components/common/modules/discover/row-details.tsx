@@ -147,7 +147,6 @@ export class RowDetails extends Component {
 
 
   renderRows() {
-    this.props.showAllFields
     const fieldsToShow = this.props.showAllFields ?
       Object.keys(this.props.item)
       :
