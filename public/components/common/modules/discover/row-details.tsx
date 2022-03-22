@@ -60,6 +60,7 @@ export class RowDetails extends Component {
       },
       syscheck: Object
     }
+    showAllFields?: boolean
   }
 
   constructor(props) {
@@ -146,7 +147,11 @@ export class RowDetails extends Component {
 
 
   renderRows() {
-    const fieldsToShow = ['agent', 'cluster', 'manager', 'rule', 'decoder', 'syscheck', 'full_log', 'location'];
+    this.props.showAllFields
+    const fieldsToShow = this.props.showAllFields ?
+      Object.keys(this.props.item)
+      :
+      ['agent', 'cluster', 'manager', 'rule', 'decoder', 'syscheck', 'full_log', 'location'];
     var rows: any[] = [];
     const isString = val => typeof val === 'string';
     for (var i = 0; i < fieldsToShow.length; i++) {

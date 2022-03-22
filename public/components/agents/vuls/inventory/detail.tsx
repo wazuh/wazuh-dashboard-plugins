@@ -129,14 +129,14 @@ export class Details extends Component {
       },
       {
         field: 'last_full_scan',
-        name: 'Last Full Scan',
+        name: 'Last full scan',
         icon: 'clock',
         link: false,
         transformValue: formatUIDate
       },
       {
         field: 'last_partial_scan',
-        name: 'Last Partial Scan',
+        name: 'Last partial scan',
         icon: 'clock',
         link: false,
         transformValue: formatUIDate
@@ -435,6 +435,7 @@ export class Details extends Component {
             <EuiFlexItem>
               <Discover
                 kbnSearchBar
+                showAllFields={true}
                 shareFilterManager={this.discoverFilterManager}
                 initialColumns={[
                   { field: 'icon' },
@@ -451,6 +452,7 @@ export class Details extends Component {
                   { field: 'rule.description', label: 'Description' },
                   { field: 'rule.level', label: 'Level' },
                   { field: 'rule.id', label: 'Rule ID' },
+                  { field: 'data.vulnerability.status', label: 'Status', width: '20%' },
                 ]}
                 includeFilters="vulnerability"
                 implicitFilters={implicitFilters}
