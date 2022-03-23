@@ -103,7 +103,7 @@ export const Discover = compose(
       initialFilters: object[];
       query?: { language: 'kuery' | 'lucene'; query: string };
       type?: any;
-      showAllFields?: boolean;
+      rowDetailsFields?: string[];
       updateTotalHits: Function;
       includeFilters?: string;
       initialColumns: ColumnDefinition[];
@@ -324,7 +324,7 @@ export const Discover = compose(
 
     toggleDetails = (item) => {
       const itemIdToExpandedRowMap = { ...this.state.itemIdToExpandedRowMap };
-      const { showAllFields } = this.props;
+      const { rowDetailsFields } = this.props;
 
       if (itemIdToExpandedRowMap[item._id]) {
         delete itemIdToExpandedRowMap[item._id];
@@ -339,7 +339,7 @@ export const Discover = compose(
               addFilter={(filter) => this.addFilter(filter)}
               addFilterOut={(filter) => this.addFilterOut(filter)}
               toggleColumn={(id) => this.addColumn(id)}
-              showAllFields={showAllFields}
+              rowDetailsFields={rowDetailsFields}
             />
           </div>
         );

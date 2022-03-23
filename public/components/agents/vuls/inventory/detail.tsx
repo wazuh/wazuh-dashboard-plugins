@@ -435,7 +435,6 @@ export class Details extends Component {
             <EuiFlexItem>
               <Discover
                 kbnSearchBar
-                showAllFields={true}
                 shareFilterManager={this.discoverFilterManager}
                 initialColumns={[
                   { field: 'icon' },
