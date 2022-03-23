@@ -95,6 +95,15 @@ export class RowDetails extends Component {
 
     const paths = (obj = {}, head = '') => {
       return Object.entries(obj)
+        .sort(([keyA], [keyB]) => {
+          if (keyA > keyB) {
+            return 1;
+          } else if (keyA < keyB) {
+            return -1;
+          } else {
+            return 0;
+          };
+        })        
         .reduce((product, [key, value]) => {
           let fullPath = addDelimiter(head, key)
           return isObject(value) ?
@@ -149,7 +158,7 @@ export class RowDetails extends Component {
   renderRows() {
     // By default show all available fields, otherwise show the fields specified in rowDetailsFields string array
     const fieldsToShow = this.props.rowDetailsFields?.length ?
-      this.props.rowDetailsFields : Object.keys(this.props.item);
+      this.props.rowDetailsFields.sort() : Object.keys(this.props.item).sort();
 
     var rows: any[] = [];
     const isString = val => typeof val === 'string';
