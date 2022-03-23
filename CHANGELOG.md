@@ -137,6 +137,12 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed health-check [#3868](https://github.com/wazuh/wazuh-kibana-app/pull/3868)
 - Fixed the table of Vulnerabilities/Inventory doesn't reload when changing the selected agent [#3901](https://github.com/wazuh/wazuh-kibana-app/pull/3901)
 
+## Wazuh v4.2.5 - Kibana 7.10.2, 7.11.2, 7.12.1, 7.13.4, 7.14.2 - Revision 4207
+
+### Added
+
+- Redirect the Home link in the navigation drawer to the Wazuh App [#3709](https://github.com/wazuh/wazuh-kibana-app/pull/3709)
+
 ## Wazuh v4.2.5 - Kibana 7.10.2, 7.11.2, 7.12.1, 7.13.4, 7.14.2 - Revision 4206
 
 ### Added
@@ -158,7 +164,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed compatibility to get the valid index patterns and refresh fields for Kibana 7.10.2-7.13.4 [3681](https://github.com/wazuh/wazuh-kibana-app/pull/3681)
 - Fixed wrong redirect after login [3701](https://github.com/wazuh/wazuh-kibana-app/pull/3701)
 - Fixed error getting the index pattern data when there is not `attributes.fields` in the saved object [3689](https://github.com/wazuh/wazuh-kibana-app/pull/3698)
-
 
 ## Wazuh v4.2.4 - Kibana 7.10.2, 7.11.2, 7.12.1 - Revision 4205
 
@@ -232,6 +237,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed Wazuh main menu and breadcrumb render issues [#3347](https://github.com/wazuh/wazuh-kibana-app/pull/3347)
 - Fixed generation of huge logs from backend errors [#3397](https://github.com/wazuh/wazuh-kibana-app/pull/3397)
 - Fixed vulnerabilities flyout not showing alerts if the vulnerability had a field missing [#3593](https://github.com/wazuh/wazuh-kibana-app/pull/3593)
+- 
 
 ## Wazuh v4.2.1 - Kibana 7.10.2 , 7.11.2 - Revision 4202
 

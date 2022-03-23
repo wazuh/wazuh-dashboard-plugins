@@ -15,6 +15,7 @@ import {
   setCore,
   setPlugins,
   setCookies,
+  getUiSettings
 } from './kibana-services';
 import {
   AppPluginStartDependencies,
@@ -32,13 +33,25 @@ import { getThemeAssetURL, getAssetURL } from './utils/assets';
 const innerAngularName = 'app/wazuh';
 
 export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlugins, WazuhStartPlugins> {
-  constructor(private readonly initializerContext: PluginInitializerContext) {}
+  constructor(private readonly initializerContext: PluginInitializerContext) { }
   public initializeInnerAngular?: () => void;
   private innerAngularInitialized: boolean = false;
   private stateUpdater = new BehaviorSubject<AppUpdater>(() => ({}));
   private hideTelemetryBanner?: () => void;
 
   public setup(core: CoreSetup, plugins: WazuhSetupPlugins): WazuhSetup {
+
+    //custom styles
+    const newCSS = document.createElement('link');
+    newCSS.rel = 'stylesheet';
+    newCSS.href = core.http.basePath.prepend(`/plugins/wazuh/assets/custom-style-base.css`);
+    document.getElementsByTagName('head')[0].appendChild(newCSS);
+    
+    //custom script
+    const newJS = document.createElement('script');
+    newJS.src = core.http.basePath.prepend('/plugins/wazuh/assets/custom-style.js');
+    document.getElementsByTagName('head')[0].appendChild(newJS);
+
     const UI_THEME = core.uiSettings.get('theme:darkMode') ? 'dark' : 'light';
 
     core.application.register({
@@ -106,7 +119,7 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
 
   public start(core: CoreStart, plugins: AppPluginStartDependencies): WazuhStart {
     // hide security alert
-    if(plugins.securityOss) {
+    if (plugins.securityOss) {
       plugins.securityOss.insecureCluster.hideAlert(true);
     };
 
@@ -147,6 +160,15 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
     setSavedObjects(core.savedObjects);
     setOverlays(core.overlays);
     setErrorOrchestrator(ErrorOrchestratorService);
+
+    //custom styles    
+    const IS_DARK_THEME = getUiSettings().get('theme:darkMode');
+    const mode = IS_DARK_THEME ? 'dark' : 'light';
+    const newCSS = document.createElement('link');
+    newCSS.rel = 'stylesheet';
+    newCSS.href = core.http.basePath.prepend(`/plugins/wazuh/assets/custom-style-${mode}.css`);
+    document.getElementsByTagName('head')[0].appendChild(newCSS);
+
     return {};
   }
 }

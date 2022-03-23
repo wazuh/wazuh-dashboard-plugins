@@ -138,7 +138,7 @@ class WzMenuManagement extends Component {
         name: this.managementSections.administration.text,
         id: this.managementSections.administration.id,
         id: 0,
-        disabled: true,
+        disabled: false,
         icon: <EuiIcon type="managementApp" color="primary" />,
         items: [
           this.createItem(this.managementSections.rules),
@@ -154,7 +154,7 @@ class WzMenuManagement extends Component {
       {
         name: this.managementSections.statusReports.text,
         id: this.managementSections.statusReports.id,
-        disabled: true,
+        disabled: false,
         icon: <EuiIcon type="reportingApp" color="primary" />,
         items: [
           this.createItem(this.managementSections.status),
