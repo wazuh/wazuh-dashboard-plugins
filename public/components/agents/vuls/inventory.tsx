@@ -177,7 +177,7 @@ export class Inventory extends Component {
   // when vulnerability module is not configured
   // its meant to render nothing when such date is received
   beautifyDate(date?: string) {
-    return date && '1970-01-01T00:00:00Z' != date ? formatUIDate(date) : '-';
+    return date && !['1970-01-01T00:00:00Z', '-'].includes(date) ? formatUIDate(date) : '-';
   }
 
   buildTitleFilter({ description, title, titleColor }) {
