@@ -55,6 +55,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added a toast message when there is an error creating a new group [#3804](https://github.com/wazuh/wazuh-kibana-app/pull/3804)
 - Added a step to start the agent to the deploy new Windowns agent guide [#3846](https://github.com/wazuh/wazuh-kibana-app/pull/3846)
 - Added 3 new panels to `Vulnerabilities/Inventory` [#3893](https://github.com/wazuh/wazuh-kibana-app/pull/3893)
+- Added new fields of `Vulnerabilities` to the details flyout [#3893](https://github.com/wazuh/wazuh-kibana-app/pull/3893) [#3908](https://github.com/wazuh/wazuh-kibana-app/pull/3908)
 
 ### Changed
 
@@ -75,6 +76,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed agent install codeblock copy button and powershell terminal warning [#3792](https://github.com/wazuh/wazuh-kibana-app/pull/3792)
 - Refactored as the plugin platform name and references is managed [#3811](https://github.com/wazuh/wazuh-kibana-app/pull/3811)
 - Removed `Dashboard` tab for the `Vulnerabilities` modules [#3893](https://github.com/wazuh/wazuh-kibana-app/pull/3893)
+- Display all fields in the `Table` tab when expading an alert row in the alerts tables of flyouts and the `Modules/Security Events/Dashboard` table [#3908](https://github.com/wazuh/wazuh-kibana-app/pull/3908)
 
 ### Fixed
 
