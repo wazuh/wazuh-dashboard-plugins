@@ -132,14 +132,14 @@ export class Details extends Component {
         name: 'Last full scan',
         icon: 'clock',
         link: false,
-        transformValue: formatUIDate
+        transformValue: this.beautifyDate
       },
       {
         field: 'last_partial_scan',
         name: 'Last partial scan',
         icon: 'clock',
         link: false,
-        transformValue: formatUIDate
+        transformValue: this.beautifyDate
       },
       {
         field: 'published',
@@ -163,6 +163,13 @@ export class Details extends Component {
         transformValue: this.renderExternalReferences
       },
     ];
+  }
+
+  // This method was created because Wazuh API returns 1970-01-01T00:00:00Z dates
+  // when vulnerability module is not configured
+  // its meant to render nothing when such date is received
+  beautifyDate(date: string) {
+    return ['', '1970-01-01T00:00:00Z'].includes(date) ? '-' : formatUIDate(date);
   }
 
   viewInEvents = (ev) => {
