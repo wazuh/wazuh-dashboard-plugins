@@ -33,6 +33,7 @@ class WzConfigurationIntegrityMonitoring extends Component {
     super(props);
   }
   componentDidMount() {
+    this.props.currentConfig['syscheck-syscheck'].syscheck.disabled = 'no';
     this.props.updateBadge(this.badgeEnabled());
   }
   badgeEnabled() {
@@ -86,7 +87,7 @@ class WzConfigurationIntegrityMonitoring extends Component {
                   {...this.props}
                 />
               </WzTabSelectorTab>
-              <WzTabSelectorTab label="File limit">
+              <WzTabSelectorTab label="Entries limit">
                 <WzConfigurationIntegrityMonitoringFileLimit {...this.props} />
               </WzTabSelectorTab>
             </WzTabSelector>
