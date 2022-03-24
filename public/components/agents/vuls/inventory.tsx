@@ -173,11 +173,11 @@ export class Inventory extends Component {
     </EuiPage>;
   }
 
-  // This method was created because Wazuh API returns 1970-01-01T00:00:00Z dates
+  // This method was created because Wazuh API returns 1970-01-01T00:00:00Z dates or undefined ones
   // when vulnerability module is not configured
   // its meant to render nothing when such date is received
-  beautifyDate(date: string) {
-    return ['', '1970-01-01T00:00:00Z'].includes(date) ? '-' : formatUIDate(date);
+  beautifyDate(date?: string) {
+    return date && !['1970-01-01T00:00:00Z', '-'].includes(date) ? formatUIDate(date) : '-';
   }
 
   buildTitleFilter({ description, title, titleColor }) {
