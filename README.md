@@ -87,7 +87,7 @@ This plugin for Kibana allows you to visualize and analyze Wazuh alerts stored i
 
 ## Requisites
 
-- Wazuh HIDS 4.2.2
+- Wazuh HIDS 4.2.6
 - Kibana 7.10.2
 - Elasticsearch 7.10.2
 
@@ -105,7 +105,7 @@ Install the Wazuh app plugin for Kibana
 
 ```
 cd /usr/share/kibana
-sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.5_7.10.2-1.zip
+sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.6_7.10.2-1.zip
 ```
 
 Restart Kibana
@@ -192,7 +192,7 @@ Install the Wazuh app
 
 ```
 cd /usr/share/kibana/
-sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.5_7.10.2-1.zip
+sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.6_7.10.2-1.zip
 ```
 
 Update configuration file permissions.
@@ -221,6 +221,17 @@ service kibana restart
  
 | Wazuh app | Kibana  | Open Distro | Package                                                                    |
 | :-------: | :----:  | :---------: | :------------------------------------------------------------------------- |
+|   4.2.6   |  7.14.2 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.6_7.14.2-1.zip> |
+|   4.2.6   |  7.14.1 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.6_7.14.1-1.zip> |
+|   4.2.6   |  7.14.0 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.6_7.14.0-1.zip> |
+|   4.2.6   |  7.13.4 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.6_7.13.4-1.zip> |
+|   4.2.6   |  7.13.3 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.6_7.13.3-1.zip> |
+|   4.2.6   |  7.13.2 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.6_7.13.2-1.zip> |
+|   4.2.6   |  7.13.1 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.6_7.13.1-1.zip> |
+|   4.2.6   |  7.13.0 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.6_7.13.0-1.zip> |
+|   4.2.6   |  7.12.1 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.6_7.12.1-1.zip> |
+|   4.2.6   |  7.11.2 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.6_7.11.2-1.zip> |
+|   4.2.6   |  7.10.2 |   1.13.2    | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.6_7.10.2-1.zip> |
 |   4.2.5   |  7.14.2 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.5_7.14.2-1.zip> |
 |   4.2.5   |  7.14.1 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.5_7.14.1-1.zip> |
 |   4.2.5   |  7.14.0 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.5_7.14.0-1.zip> |
@@ -231,7 +242,7 @@ service kibana restart
 |   4.2.5   |  7.13.0 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.5_7.13.0-1.zip> |
 |   4.2.5   |  7.12.1 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.5_7.12.1-1.zip> |
 |   4.2.5   |  7.11.2 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.5_7.11.2-1.zip> |
-|   4.2.5   |  7.10.2 |   1.13.2    | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.4_7.10.2-1.zip> |
+|   4.2.5   |  7.10.2 |   1.13.2    | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.5_7.10.2-1.zip> |
 |   4.2.4   |  7.12.1 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.4_7.12.1-1.zip> |
 |   4.2.4   |  7.11.2 |             | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.4_7.11.2-1.zip> |
 |   4.2.4   |  7.10.2 |   1.13.2    | <https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.2.4_7.10.2-1.zip> |
@@ -379,7 +390,7 @@ If you want to contribute to our project please don't hesitate to send a pull re
 
 ## Copyright & License
 
-Copyright &copy; 2021 Wazuh, Inc.
+Copyright &copy; 2022 Wazuh, Inc.
 
 This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
 
