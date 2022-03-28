@@ -1753,6 +1753,13 @@ iframe.width-changed {
   }
 }
 
+.wz-euiCard-children-full-height{
+  .euiCard__children{
+    margin:0;
+    height: 100%;
+  }
+}
+
 /* Custom Searchbar styles */
 
 .application .filters-search-bar .globalQueryBar, .app-container .filters-search-bar .globalQueryBar{

@@ -220,7 +220,7 @@ export class Inventory extends Component {
       <EuiPageBody>
         <EuiFlexGroup wrap>
           <EuiFlexItem>
-            <EuiCard title description betaBadgeLabel="Severity" className="wz-euiCard-no-title">
+            <EuiCard title description betaBadgeLabel="Severity" className="wz-euiCard-no-title wz-euiCard-children-full-height">
               <div style={{display: 'flex', alignItems: 'flex-end', height: '100%'}}>
                 <VisualizationBasicWidget
                   type='donut'
