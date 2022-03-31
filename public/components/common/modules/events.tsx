@@ -172,9 +172,12 @@ export const Events = compose(
       const discoverTableRows = document.querySelectorAll(`.kbn-table tbody tr.kbnDocTable__row`);
       const rowIndex = Array.from(discoverTableRows).indexOf(rowTable);
       const rowDetailsFields = mutation.addedNodes[0].querySelectorAll('.kbnDocViewer__field');
+      let hasUnknownFields = false;
       if (rowDetailsFields) {
-        rowDetailsFields.forEach((rowDetailField) => {
-          this.checkUnknownFields(rowDetailField);
+        rowDetailsFields.forEach(async (rowDetailField, i) => {
+          //check for unknown fields until 1 unknown field is found
+          if (!hasUnknownFields && this.checkUnknownFields(rowDetailField))
+            hasUnknownFields = true;
           const fieldName = rowDetailField.childNodes[0].childNodes[1].textContent || '';
           const fieldCell =
             rowDetailField.parentNode.childNodes &&
@@ -190,15 +193,16 @@ export const Events = compose(
             options
           );
         });
+        if (hasUnknownFields) {
+          this.refreshKnownFields();
+        }
       }
     }
-
-    checkUnknownFields(rowDetailField) {
+  
+    async checkUnknownFields(rowDetailField) {
       const fieldCell =
         rowDetailField.parentNode.childNodes && rowDetailField.parentNode.childNodes[2];
-      if (fieldCell.querySelector('svg[data-test-subj="noMappingWarning"]')) {
-        this.refreshKnownFields();
-      }
+      return (fieldCell.querySelector('svg[data-test-subj="noMappingWarning"]'))
     }
 
     refreshKnownFields = async () => {
