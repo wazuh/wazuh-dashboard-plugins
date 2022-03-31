@@ -56,6 +56,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added a step to start the agent to the deploy new Windowns agent guide [#3846](https://github.com/wazuh/wazuh-kibana-app/pull/3846)
 - Added 3 new panels to `Vulnerabilities/Inventory` [#3893](https://github.com/wazuh/wazuh-kibana-app/pull/3893)
 - Added new fields of `Vulnerabilities` to the details flyout [#3893](https://github.com/wazuh/wazuh-kibana-app/pull/3893) [#3908](https://github.com/wazuh/wazuh-kibana-app/pull/3908)
+- Added missing fields used in visualizations to the known fiels related to alerts [#3924](https://github.com/wazuh/wazuh-kibana-app/pull/3924)
 
 ### Changed
 
