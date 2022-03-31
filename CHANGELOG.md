@@ -37,7 +37,6 @@ All notable changes to the Wazuh app project will be documented in this file.
   [#3465](https://github.com/wazuh/wazuh-kibana-app/pull/3465)
   [#3464](https://github.com/wazuh/wazuh-kibana-app/pull/3464)
   [#3478](https://github.com/wazuh/wazuh-kibana-app/pull/3478)
-- Added fields status and type in vulnerabilities table [#3196](https://github.com/wazuh/wazuh-kibana-app/pull/3196)
 - Added Intelligence tab to Mitre Att&ck module [#3368](https://github.com/wazuh/wazuh-kibana-app/pull/3368) [#3344](https://github.com/wazuh/wazuh-kibana-app/pull/3344) [#3726](https://github.com/wazuh/wazuh-kibana-app/pull/3726)
 - Added sample data for office365 events [#3424](https://github.com/wazuh/wazuh-kibana-app/pull/3424)
 - Created a separate component to check for sample data [#3475](https://github.com/wazuh/wazuh-kibana-app/pull/3475)
@@ -78,6 +77,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Refactored as the plugin platform name and references is managed [#3811](https://github.com/wazuh/wazuh-kibana-app/pull/3811)
 - Removed `Dashboard` tab for the `Vulnerabilities` modules [#3893](https://github.com/wazuh/wazuh-kibana-app/pull/3893)
 - Display all fields in the `Table` tab when expading an alert row in the alerts tables of flyouts and the `Modules/Security Events/Dashboard` table [#3908](https://github.com/wazuh/wazuh-kibana-app/pull/3908)
+- Refactored the table in `Vulnerabilities/Inventory` [#3196](https://github.com/wazuh/wazuh-kibana-app/pull/3196)
 
 ### Fixed
 
