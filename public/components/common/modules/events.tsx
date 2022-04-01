@@ -199,7 +199,7 @@ export const Events = compose(
       }
     }
   
-    async checkUnknownFields(rowDetailField) {
+    checkUnknownFields(rowDetailField) {
       const fieldCell =
         rowDetailField.parentNode.childNodes && rowDetailField.parentNode.childNodes[2];
       return (fieldCell.querySelector('svg[data-test-subj="noMappingWarning"]'))
