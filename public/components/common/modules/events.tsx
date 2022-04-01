@@ -39,20 +39,20 @@ export const Events = compose(
   class Events extends Component {
     intervalCheckExistsDiscoverTableTime: number = 200;
     isMount: boolean;
+    hasRefreshedKnownFields: boolean;
+    isRefreshing: boolean;
     state: {
       flyout: false | { component: any; props: any };
       discoverRowsData: any[];
-      hasRefreshedKnownFields: boolean;
-      isRefreshing: boolean;
     };
     constructor(props) {
       super(props);
       this.isMount = true;
+      this.hasRefreshedKnownFields = false;
+      this.isRefreshing = false;
       this.state = {
         flyout: false,
         discoverRowsData: [],
-        hasRefreshedKnownFields: false,
-        isRefreshing: false,
       };
     }
 
@@ -206,19 +206,21 @@ export const Events = compose(
     }
 
     refreshKnownFields = async () => {
-      if (!this.state.hasRefreshedKnownFields) {
+      if (!this.hasRefreshedKnownFields) {
         try {
-          this.setState({ hasRefreshedKnownFields: true, isRefreshing: true });
+          this.hasRefreshedKnownFields = true;
+          this.isRefreshing = true;
+          
           if (satisfyPluginPlatformVersion('<7.11')) {
             await PatternHandler.refreshIndexPattern();
           }
-          this.setState({ isRefreshing: false });
+          this.isRefreshing = false;
           this.reloadToast();
         } catch (error) {
-          this.setState({ isRefreshing: false });
+          this.isRefreshing = false;
           throw error;
         }
-      } else if (this.state.isRefreshing) {
+      } else if (this.isRefreshing) {
         await new Promise((r) => setTimeout(r, 150));
         await this.refreshKnownFields();
       }
