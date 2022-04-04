@@ -159,6 +159,11 @@ export const WzVisualize = compose(
     };
     reloadToast = () => {
       const toastLifeTimeMs = 300000;
+      const [mayor, minor] = localStorage.getItem('appInfo') ?
+        JSON.parse(localStorage.getItem('appInfo'))['app-version'].split('.')
+        : ['current'];
+      const wazuhVersion = minor ? `${mayor}.${minor}` : mayor;
+      const urlTroubleShootingDocs = `https://documentation.wazuh.com/${wazuhVersion}/user-manual/kibana-app/troubleshooting.html#no-template-found-for-the-selected-index-pattern`;
       if(satisfyPluginPlatformVersion('<7.11')){
         getToasts().add({
           color: 'success',
@@ -167,6 +172,13 @@ export const WzVisualize = compose(
             <EuiFlexItem grow={false}>
               There were some unknown fields for the current index pattern.
               You need to refresh the page to apply the changes.
+              <a
+                title="More information in Wazuh documentation"
+                href={urlTroubleShootingDocs}
+                target="documentation"
+              >
+                Troubleshooting
+                </a>
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
               <EuiButton onClick={() => window.location.reload()} size="s">Reload page</EuiButton>
@@ -182,6 +194,12 @@ export const WzVisualize = compose(
             <EuiFlexItem grow={false}>
               There are some unknown fields for the current index pattern.
               You need to refresh the page to update the fields.
+              <a
+                title="More information in Wazuh documentation"
+                href={urlTroubleShootingDocs}
+                target="documentation">
+                Troubleshooting
+                </a>
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
               <EuiButton onClick={() => window.location.reload()} size="s">Reload page</EuiButton>
