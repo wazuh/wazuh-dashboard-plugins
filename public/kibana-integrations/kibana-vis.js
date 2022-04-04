@@ -389,59 +389,45 @@ class KibanaVis extends Component {
     const isLoading = this.props.resultState === 'loading';
     return (
       this.visID && (
-        <span>
-          <div
-            style={{
-              display: this.state.visRefreshingIndex ? 'block' : 'none',
-              textAlign: 'center',
-              paddingTop: 100,
-            }}
-          >
-            <EuiFlexGroup style={{ placeItems: 'center' }}>
-              <EuiFlexItem></EuiFlexItem>
-              <EuiFlexItem grow={false}>
-                <EuiLoadingSpinner size="xl" />
-              </EuiFlexItem>
-              <EuiFlexItem grow={false}>Refreshing Index Pattern.</EuiFlexItem>
-
-              <EuiFlexItem></EuiFlexItem>
-            </EuiFlexGroup>
-          </div>
-          <div
-            style={{
-              display: isLoading && !this.state.visRefreshingIndex ? 'block' : 'none',
-              textAlign: 'center',
-              paddingTop: 100,
-            }}
-          >
-            <EuiLoadingChart size="xl" />
-          </div>
-          <div
-            style={{
-              display:
-                this.deadField && !isLoading && !this.state.visRefreshingIndex ? 'block' : 'none',
-              textAlign: 'center',
-              paddingTop: 100,
-            }}
-          >
-            No results found &nbsp;
-            <EuiToolTip
-              position="top"
-              content={
-                <span>
-                  No alerts were found with the field: <strong>{this.deadField}</strong>
-                </span>
-              }
-            >
-              <EuiIcon type="iInCircle" />
-            </EuiToolTip>
-          </div>
+        <div style={{position: 'relative', height: '100%'}}>
           <div
             id={this.visID}
             vis-id={this.visID}
-            style={{ display: isLoading ? 'none' : 'block', height: '100%' }}
+            style={{ visibility: isLoading ? 'hidden' : 'visible', height: '100%' }}
           ></div>
-        </span>
+          <div style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+              }}>
+                {(isLoading && <div><EuiLoadingChart size="xl" /></div>)
+                  || (this.deadField && !isLoading && !this.state.visRefreshingIndex && (
+                    <div>
+                      No results found &nbsp;
+                      <EuiToolTip
+                        position="top"
+                        content={
+                          <span>
+                            No alerts were found with the field: <strong>{this.deadField}</strong>
+                          </span>
+                        }
+                      >
+                        <EuiIcon type="iInCircle" />
+                      </EuiToolTip>
+                    </div>
+                  ))
+                  || (this.state.visRefreshingIndex && (
+                    <EuiFlexGroup justifyContent="center" alignItems="center">
+                      <EuiFlexItem grow={false}>
+                        <EuiLoadingSpinner size="xl" />
+                      </EuiFlexItem>
+                      <EuiFlexItem grow={false}>Refreshing Index Pattern.</EuiFlexItem>
+                    </EuiFlexGroup>
+                  ))
+                }
+          </div>
+        </div>
       )
     );
   }
