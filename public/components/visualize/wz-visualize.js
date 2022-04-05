@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component, Fragment } from 'react';
-
+import { version as appVersion} from '../../../package.json';
 import { visualizations } from './visualizations';
 import { agentVisualizations } from './agent-visualizations';
 import KibanaVis from '../../kibana-integrations/kibana-vis';
@@ -23,7 +23,6 @@ import {
   EuiButtonIcon,
   EuiDescriptionList,
   EuiCallOut,
-  EuiLink,
 } from '@elastic/eui';
 import WzReduxProvider from '../../redux/wz-redux-provider';
 import { WazuhConfig } from '../../react-services/wazuh-config';
@@ -159,11 +158,8 @@ export const WzVisualize = compose(
     };
     reloadToast = () => {
       const toastLifeTimeMs = 300000;
-      const [mayor, minor] = localStorage.getItem('appInfo') ?
-        JSON.parse(localStorage.getItem('appInfo'))['app-version'].split('.')
-        : ['current'];
-      const wazuhVersion = minor ? `${mayor}.${minor}` : mayor;
-      const urlTroubleShootingDocs = `https://documentation.wazuh.com/${wazuhVersion}/user-manual/kibana-app/troubleshooting.html#no-template-found-for-the-selected-index-pattern`;
+      const [mayor, minor] = appVersion.split('.');
+      const urlTroubleShootingDocs = `https://documentation.wazuh.com/${mayor}.${minor}/user-manual/kibana-app/troubleshooting.html#no-template-found-for-the-selected-index-pattern`;
       if(satisfyPluginPlatformVersion('<7.11')){
         getToasts().add({
           color: 'success',
