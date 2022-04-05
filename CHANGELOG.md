@@ -73,6 +73,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed user for sample data management [#3795](https://github.com/wazuh/wazuh-kibana-app/pull/3795)
 - Changed agent install codeblock copy button and powershell terminal warning [#3792](https://github.com/wazuh/wazuh-kibana-app/pull/3792)
 - Refactored as the plugin platform name and references is managed [#3811](https://github.com/wazuh/wazuh-kibana-app/pull/3811)
+- Labels removed in the pie chart [#3898](https://github.com/wazuh/wazuh-kibana-app/pull/3898)
 
 ### Fixed
 
