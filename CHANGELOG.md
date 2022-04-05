@@ -136,6 +136,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed routing redirection in events documents discover links [#3866](https://github.com/wazuh/wazuh-kibana-app/pull/3866)
 - Fixed health-check [#3868](https://github.com/wazuh/wazuh-kibana-app/pull/3868)
 - Fixed the table of Vulnerabilities/Inventory doesn't reload when changing the selected agent [#3901](https://github.com/wazuh/wazuh-kibana-app/pull/3901)
+- Fixed backslash breaking exported JSON result [#3909](https://github.com/wazuh/wazuh-kibana-app/pull/3909)
 
 ## Wazuh v4.2.5 - Kibana 7.10.2, 7.11.2, 7.12.1, 7.13.4, 7.14.2 - Revision 4206
 
