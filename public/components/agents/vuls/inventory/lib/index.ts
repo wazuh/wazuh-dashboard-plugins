@@ -1,1 +1,1 @@
-export { getFilterValues } from './getFilterValues';
+export * from './api-requests';

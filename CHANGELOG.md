@@ -54,6 +54,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Run `template` and `fields` checks in the health check depends on the app configuration [#3783](https://github.com/wazuh/wazuh-kibana-app/pull/3783)
 - Added a toast message when there is an error creating a new group [#3804](https://github.com/wazuh/wazuh-kibana-app/pull/3804)
 - Added a step to start the agent to the deploy new Windowns agent guide [#3846](https://github.com/wazuh/wazuh-kibana-app/pull/3846)
+- Added 3 new panels to `Vulnerabilities/Inventory` [#3893](https://github.com/wazuh/wazuh-kibana-app/pull/3893)
+- Added new fields of `Vulnerabilities` to the details flyout [#3893](https://github.com/wazuh/wazuh-kibana-app/pull/3893) [#3908](https://github.com/wazuh/wazuh-kibana-app/pull/3908)
 
 ### Changed
 
@@ -74,6 +76,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed agent install codeblock copy button and powershell terminal warning [#3792](https://github.com/wazuh/wazuh-kibana-app/pull/3792)
 - Refactored as the plugin platform name and references is managed [#3811](https://github.com/wazuh/wazuh-kibana-app/pull/3811)
 - Labels removed in the pie chart [#3898](https://github.com/wazuh/wazuh-kibana-app/pull/3898)
+- Removed `Dashboard` tab for the `Vulnerabilities` modules [#3893](https://github.com/wazuh/wazuh-kibana-app/pull/3893)
+- Display all fields in the `Table` tab when expading an alert row in the alerts tables of flyouts and the `Modules/Security Events/Dashboard` table [#3908](https://github.com/wazuh/wazuh-kibana-app/pull/3908)
 
 ### Fixed
 
@@ -141,8 +145,16 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed agents details card style [#3845](https://github.com/wazuh/wazuh-kibana-app/pull/3845)  [#3860](https://github.com/wazuh/wazuh-kibana-app/pull/3860)
 - Fixed agents evolutions card [#3854](https://github.com/wazuh/wazuh-kibana-app/pull/3854)
 - Fixed routing redirection in events documents discover links [#3866](https://github.com/wazuh/wazuh-kibana-app/pull/3866)
+- Fixed health-check [#3868](https://github.com/wazuh/wazuh-kibana-app/pull/3868)
+- Fixed the table of Vulnerabilities/Inventory doesn't reload when changing the selected agent [#3901](https://github.com/wazuh/wazuh-kibana-app/pull/3901)
 
-## Wazuh v4.2.5 - Kibana 7.10.2, 7.11.2, 7.12.1, 7.13.4, 7.14.2 - Revision 4206
+## Wazuh v4.2.6 - Kibana 7.10.2, 7.11.2, 7.12.1, 7.13.0, 7.13.1, 7.13.2, 7.13.3, 7.13.4, 7.14.0, 7.14.1, 7.14.2 - Revision 4207
+
+### Added
+
+- Support for Wazuh 4.2.6
+
+## Wazuh v4.2.5 - Kibana 7.10.2, 7.11.2, 7.12.1, 7.13.0, 7.13.1, 7.13.2, 7.13.3, 7.13.4, 7.14.0, 7.14.1, 7.14.2 - Revision 4206
 
 ### Added
 

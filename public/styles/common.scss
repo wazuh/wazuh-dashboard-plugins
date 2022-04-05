@@ -1738,6 +1738,28 @@ iframe.width-changed {
   width: 100%;
 }
 
+.wz-user-select-none{
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+}
+
+.wz-euiCard-no-title{
+  .euiCard__title,
+  .euiCard__description
+  {
+    display: none;
+  }
+}
+
+.wz-euiCard-children-full-height{
+  .euiCard__children{
+    margin:0;
+    height: 100%;
+  }
+}
+
 /* Custom Searchbar styles */
 
 .application .filters-search-bar .globalQueryBar, .app-container .filters-search-bar .globalQueryBar{
