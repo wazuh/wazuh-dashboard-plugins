@@ -37,7 +37,6 @@ All notable changes to the Wazuh app project will be documented in this file.
   [#3465](https://github.com/wazuh/wazuh-kibana-app/pull/3465)
   [#3464](https://github.com/wazuh/wazuh-kibana-app/pull/3464)
   [#3478](https://github.com/wazuh/wazuh-kibana-app/pull/3478)
-- Added fields status and type in vulnerabilities table [#3196](https://github.com/wazuh/wazuh-kibana-app/pull/3196)
 - Added Intelligence tab to Mitre Att&ck module [#3368](https://github.com/wazuh/wazuh-kibana-app/pull/3368) [#3344](https://github.com/wazuh/wazuh-kibana-app/pull/3344) [#3726](https://github.com/wazuh/wazuh-kibana-app/pull/3726)
 - Added sample data for office365 events [#3424](https://github.com/wazuh/wazuh-kibana-app/pull/3424)
 - Created a separate component to check for sample data [#3475](https://github.com/wazuh/wazuh-kibana-app/pull/3475)
@@ -55,6 +54,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added a toast message when there is an error creating a new group [#3804](https://github.com/wazuh/wazuh-kibana-app/pull/3804)
 - Added a step to start the agent to the deploy new Windowns agent guide [#3846](https://github.com/wazuh/wazuh-kibana-app/pull/3846)
 - Added 3 new panels to `Vulnerabilities/Inventory` [#3893](https://github.com/wazuh/wazuh-kibana-app/pull/3893)
+- Added new fields of `Vulnerabilities` to the details flyout [#3893](https://github.com/wazuh/wazuh-kibana-app/pull/3893) [#3908](https://github.com/wazuh/wazuh-kibana-app/pull/3908)
+- Added missing fields used in visualizations to the known fiels related to alerts [#3924](https://github.com/wazuh/wazuh-kibana-app/pull/3924)
 
 ### Changed
 
@@ -75,6 +76,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed agent install codeblock copy button and powershell terminal warning [#3792](https://github.com/wazuh/wazuh-kibana-app/pull/3792)
 - Refactored as the plugin platform name and references is managed [#3811](https://github.com/wazuh/wazuh-kibana-app/pull/3811)
 - Removed `Dashboard` tab for the `Vulnerabilities` modules [#3893](https://github.com/wazuh/wazuh-kibana-app/pull/3893)
+- Display all fields in the `Table` tab when expading an alert row in the alerts tables of flyouts and the `Modules/Security Events/Dashboard` table [#3908](https://github.com/wazuh/wazuh-kibana-app/pull/3908)
+- Refactored the table in `Vulnerabilities/Inventory` [#3196](https://github.com/wazuh/wazuh-kibana-app/pull/3196)
 
 ### Fixed
 
@@ -137,8 +140,16 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed health-check [#3868](https://github.com/wazuh/wazuh-kibana-app/pull/3868)
 - Fixed the table of Vulnerabilities/Inventory doesn't reload when changing the selected agent [#3901](https://github.com/wazuh/wazuh-kibana-app/pull/3901)
 - Fixed backslash breaking exported JSON result [#3909](https://github.com/wazuh/wazuh-kibana-app/pull/3909)
+- Fixed the Events view multiple "The index pattern was refreshed successfully" toast [#3937](https://github.com/wazuh/wazuh-kibana-app/pull/3937)
+- Fixed a rendering problem in the map visualizations [#3942](https://github.com/wazuh/wazuh-kibana-app/pull/3942)
 
-## Wazuh v4.2.5 - Kibana 7.10.2, 7.11.2, 7.12.1, 7.13.4, 7.14.2 - Revision 4206
+## Wazuh v4.2.6 - Kibana 7.10.2, 7.11.2, 7.12.1, 7.13.0, 7.13.1, 7.13.2, 7.13.3, 7.13.4, 7.14.0, 7.14.1, 7.14.2 - Revision 4207
+
+### Added
+
+- Support for Wazuh 4.2.6
+
+## Wazuh v4.2.5 - Kibana 7.10.2, 7.11.2, 7.12.1, 7.13.0, 7.13.1, 7.13.2, 7.13.3, 7.13.4, 7.14.0, 7.14.1, 7.14.2 - Revision 4206
 
 ### Added
 

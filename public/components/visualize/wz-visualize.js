@@ -56,10 +56,11 @@ export const WzVisualize = compose(
       this.state = {
         visualizations: !!props.isAgent ? agentVisualizations : visualizations,
         expandedVis: false,
-        hasRefreshedKnownFields: false,
         refreshingKnownFields: [],
         refreshingIndex: true,
       };
+      this.hasRefreshedKnownFields = false;
+      this.isRefreshing = false;
       this.metricValues = false;
       this.rawVisualizations = new RawVisualizations();
       this.wzReq = WzRequest;
@@ -126,18 +127,19 @@ export const WzVisualize = compose(
       if (newField && newField.name) {
         this.newFields[newField.name] = newField;
       }
-      if (!this.state.hasRefreshedKnownFields) {
+      if (!this.hasRefreshedKnownFields) {
         // Known fields are refreshed only once per dashboard loading
         try {
-          this.setState({ hasRefreshedKnownFields: true, isRefreshing: true });
+          this.hasRefreshedKnownFields = true;
+          this.isRefreshing = true;
           if(satisfyPluginPlatformVersion('<7.11')){
             await PatternHandler.refreshIndexPattern(this.newFields);
           };
-          this.setState({ isRefreshing: false });
+          this.isRefreshing = false;
           this.reloadToast();
           this.newFields = {};
         } catch (error) {
-          this.setState({ isRefreshing: false });
+          this.isRefreshing = false;
           const options = {
             context: `${WzVisualize.name}.refreshKnownFields`,
             level: UI_LOGGER_LEVELS.ERROR,
@@ -150,7 +152,7 @@ export const WzVisualize = compose(
           };
           getErrorOrchestrator().handleError(options);
         }
-      } else if (this.state.isRefreshing) {
+      } else if (this.isRefreshing) {
         await new Promise((r) => setTimeout(r, 150));
         await this.refreshKnownFields();
       }

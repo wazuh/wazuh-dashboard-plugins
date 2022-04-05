@@ -129,31 +129,31 @@ export class Details extends Component {
       },
       {
         field: 'last_full_scan',
-        name: 'Last Full Scan',
+        name: 'Last full scan',
         icon: 'clock',
         link: false,
-        transformValue: formatUIDate
+        transformValue: this.beautifyDate
       },
       {
         field: 'last_partial_scan',
-        name: 'Last Partial Scan',
+        name: 'Last partial scan',
         icon: 'clock',
         link: false,
-        transformValue: formatUIDate
+        transformValue: this.beautifyDate
       },
       {
         field: 'published',
         name: 'Published',
         icon: 'clock',
         link: false,
-        transformValue: formatUIDate
+        transformValue: this.beautifyDate
       },
       {
         field: 'updated',
         name: 'Updated',
         icon: 'clock',
         link: false,
-        transformValue: formatUIDate
+        transformValue: this.beautifyDate
       },
       {
         field: 'external_references',
@@ -163,6 +163,13 @@ export class Details extends Component {
         transformValue: this.renderExternalReferences
       },
     ];
+  }
+
+  // This method was created because Wazuh API returns 1970-01-01T00:00:00Z dates or undefined ones
+  // when vulnerability module is not configured
+  // its meant to render nothing when such date is received
+  beautifyDate(date?: string) {
+    return date && !['1970-01-01T00:00:00Z', '-'].includes(date) ? formatUIDate(date) : '-';
   }
 
   viewInEvents = (ev) => {
@@ -326,7 +333,7 @@ export class Details extends Component {
           </EuiTitle>
         }>
         <EuiListGroup size="xs" flush={true} gutterSize="none" style={{ display: 'grid' }}
-          listItems={references.map(link => ({ label: link, href: link }))
+          listItems={references.map(link => ({ label: link, href: link, target: '_blank' }))
           }
         />
       </EuiAccordion>
@@ -451,6 +458,7 @@ export class Details extends Component {
                   { field: 'rule.description', label: 'Description' },
                   { field: 'rule.level', label: 'Level' },
                   { field: 'rule.id', label: 'Rule ID' },
+                  { field: 'data.vulnerability.status', label: 'Status', width: '20%' },
                 ]}
                 includeFilters="vulnerability"
                 implicitFilters={implicitFilters}
