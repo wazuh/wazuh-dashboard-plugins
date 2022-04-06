@@ -82,6 +82,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Display all fields in the `Table` tab when expading an alert row in the alerts tables of flyouts and the `Modules/Security Events/Dashboard` table [#3908](https://github.com/wazuh/wazuh-kibana-app/pull/3908)
 - Refactored the table in `Vulnerabilities/Inventory` [#3196](https://github.com/wazuh/wazuh-kibana-app/pull/3196)
 - Changed Google Groups app icons  [#3949](https://github.com/wazuh/wazuh-kibana-app/pull/3949)
+- Removed sorting for `Agents` or `Configuration checksum` column in the table of `Management/Groups` due to this is not supported by the API [#3857](https://github.com/wazuh/wazuh-kibana-app/pull/3857)
 
 ### Fixed
 
