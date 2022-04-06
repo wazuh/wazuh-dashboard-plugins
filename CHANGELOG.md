@@ -2,6 +2,11 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.3.0 - Kibana 7.10.2 , 7.16.3, 7.17.0 - Revision 4302
+
+### Fixed
+- Parse error when using `#` character not at the beginning of the line [#3877](https://github.com/wazuh/wazuh-kibana-app/pull/3877)
+
 ## Wazuh v4.3.0 - Kibana 7.10.2 , 7.16.3, 7.17.0 - Revision 4301
 
 ### Added
