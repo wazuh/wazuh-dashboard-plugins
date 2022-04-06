@@ -16,7 +16,7 @@ import WzConfigurationSettingsGroup from '../util-components/configuration-setti
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import withWzConfig from '../util-hocs/wz-config';
 import WzNoConfig from '../util-components/no-config';
-import { isString, renderValueNoThenEnabled } from '../utils/utils';
+import { isString, renderValueNoThenEnabled, renderValueYesThenEnabled } from '../utils/utils';
 
 const helpLinks = [
   {
@@ -66,6 +66,35 @@ const mainSettings = [
     label: 'Seconds since an agent is in a disconnected state'
   },
 ];
+
+const keyRequestSettings = [
+  {
+    field: 'key_request.enabled',
+    label: 'Key request status',
+    render: renderValueYesThenEnabled
+  },
+  {
+    field: 'key_request.exec_path',
+    label: 'Full path to the executable'
+  },
+  {
+    field: 'key_request.socket',
+    label: 'Full path to the unix domain socket'
+  },
+  {
+    field: 'key_request.timeout',
+    label: 'Maximum time for waiting a response from the executable'
+  },
+  {
+    field: 'key_request.threads',
+    label: 'Number of threads for dispatching the external keys requests'
+  },
+  {
+    field: 'key_request.queue_size',
+    label: 'Indicates the maximum size of the queue for fetching external keys'
+  },
+]
+
 const sslSettings = [
   { field: 'ssl_verify_host', label: 'Verify agents using a CA certificate' },
   {
@@ -112,6 +141,12 @@ class WzRegistrationService extends Component {
               <WzConfigurationSettingsGroup
                 config={currentConfig['auth-auth'].auth}
                 items={mainSettings}
+              />
+              <WzConfigurationSettingsGroup
+                title="Key request settings"
+                description="The key request feature allows fetching the agent keys stored on an external database"
+                config={currentConfig['auth-auth'].auth}
+                items={keyRequestSettings}
               />
               <WzConfigurationSettingsGroup
                 title="SSL settings"
