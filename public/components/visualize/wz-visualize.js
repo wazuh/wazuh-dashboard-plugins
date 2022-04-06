@@ -159,7 +159,7 @@ export const WzVisualize = compose(
     reloadToast = () => {
       const toastLifeTimeMs = 300000;
       const [mayor, minor] = appVersion.split('.');
-      const urlTroubleShootingDocs = `https://documentation.wazuh.com/${mayor}.${minor}/user-manual/kibana-app/troubleshooting.html#no-template-found-for-the-selected-index-pattern`;
+      const urlTroubleShootingDocs = `https://documentation.wazuh.com/${mayor}.${minor}/user-manual/elasticsearch/elastic-tuning/troubleshooting.html#index-pattern-was-refreshed-toast-keeps-popping-up`;
       if(satisfyPluginPlatformVersion('<7.11')){
         getToasts().add({
           color: 'success',
