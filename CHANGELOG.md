@@ -2,11 +2,6 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v4.3.0 - Kibana 7.10.2 , 7.16.3, 7.17.0 - Revision 4302
-
-### Fixed
-- Parse error when using `#` character not at the beginning of the line [#3877](https://github.com/wazuh/wazuh-kibana-app/pull/3877)
-
 ## Wazuh v4.3.0 - Kibana 7.10.2 , 7.16.3, 7.17.0 - Revision 4301
 
 ### Added
@@ -147,6 +142,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed the table of Vulnerabilities/Inventory doesn't reload when changing the selected agent [#3901](https://github.com/wazuh/wazuh-kibana-app/pull/3901)
 - Fixed the Events view multiple "The index pattern was refreshed successfully" toast [#3937](https://github.com/wazuh/wazuh-kibana-app/pull/3937)
 - Fixed a rendering problem in the map visualizations [#3942](https://github.com/wazuh/wazuh-kibana-app/pull/3942)
+- Parse error when using `#` character not at the beginning of the line [#3877](https://github.com/wazuh/wazuh-kibana-app/pull/3877)
 
 ## Wazuh v4.2.6 - Kibana 7.10.2, 7.11.2, 7.12.1, 7.13.0, 7.13.1, 7.13.2, 7.13.3, 7.13.4, 7.14.0, 7.14.1, 7.14.2 - Revision 4207
 
