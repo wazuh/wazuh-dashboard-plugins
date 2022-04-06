@@ -79,6 +79,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed `Dashboard` tab for the `Vulnerabilities` modules [#3893](https://github.com/wazuh/wazuh-kibana-app/pull/3893)
 - Display all fields in the `Table` tab when expading an alert row in the alerts tables of flyouts and the `Modules/Security Events/Dashboard` table [#3908](https://github.com/wazuh/wazuh-kibana-app/pull/3908)
 - Refactored the table in `Vulnerabilities/Inventory` [#3196](https://github.com/wazuh/wazuh-kibana-app/pull/3196)
+- Changed Google Groups app icons  [#3949](https://github.com/wazuh/wazuh-kibana-app/pull/3949)
 
 ### Fixed
 
