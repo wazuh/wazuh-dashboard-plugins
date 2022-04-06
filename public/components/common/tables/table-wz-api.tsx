@@ -26,14 +26,14 @@ import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 
-export function TableWzAPI({endpoint, ...rest}){
+export function TableWzAPI({...rest}){
 
   const [totalItems, setTotalItems] = useState(0);
   const [filters, setFilters] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const onFiltersChange = filters => typeof rest.onFiltersChange === 'function' ? rest.onFiltersChange(filters) : null;
 
-  const onSearch = useCallback(async function(filters, pagination, sorting){
+  const onSearch = useCallback(async function(endpoint, filters, pagination, sorting){
     try {
       const { pageIndex, pageSize } = pagination;
       const { field, direction } = sorting.sort;
@@ -79,7 +79,7 @@ export function TableWzAPI({endpoint, ...rest}){
           </EuiTitle>
         )}
       </EuiFlexItem>
-      {rest.downloadCsv && <ExportTableCsv endpoint={endpoint} totalItems={totalItems} filters={filters} title={rest.title}/>}
+      {rest.downloadCsv && <ExportTableCsv endpoint={rest.endpoint} totalItems={totalItems} filters={filters} title={rest.title}/>}
     </EuiFlexGroup>
   )
 

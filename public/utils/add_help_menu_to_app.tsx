@@ -48,7 +48,7 @@ export function addHelpMenuToAppChrome(){
       {
         linkType: 'custom',
         href: WAZUH_LINK_GOOGLE_GROUPS,
-        content: <span><EuiIcon type={getHttp().basePath.prepend(getAssetURL('images/icons/icon_google_groups.svg'))}></EuiIcon> Google Group</span>
+        content: <span><EuiIcon type={getHttp().basePath.prepend(getAssetURL('images/icons/google_groups.svg'))}></EuiIcon> Google Group</span>
       }
     ]
   });
