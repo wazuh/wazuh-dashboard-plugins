@@ -9,7 +9,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Support for Kibana 7.16.3
 - Support for Kibana 7.17.0
 - Added GitHub and Office365 modules [#3557](https://github.com/wazuh/wazuh-kibana-app/pull/3557)
-- Added a new `Panel` module tab for GitHub and Office365 modules [#3541](https://github.com/wazuh/wazuh-kibana-app/pull/3541) [#3945](https://github.com/wazuh/wazuh-kibana-app/pull/3945)
+- Added a new `Panel` module tab for GitHub and Office365 modules 
+  [#3541](https://github.com/wazuh/wazuh-kibana-app/pull/3541) 
+  [#3945](https://github.com/wazuh/wazuh-kibana-app/pull/3945)
+  [#3952](https://github.com/wazuh/wazuh-kibana-app/pull/3952)
 - Added ability to filter the results fo the `Network Ports` table in the `Inventory data` section [#3639](https://github.com/wazuh/wazuh-kibana-app/pull/3639)
 - Added new endpoint service to collect the frontend logs into a file [#3324](https://github.com/wazuh/wazuh-kibana-app/pull/3324)
 - Improved the frontend handle errors strategy: UI, Toasts, console log and log in file 
