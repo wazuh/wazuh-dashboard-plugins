@@ -19,14 +19,12 @@ export default class GroupsColums {
         {
           field: 'count',
           name: 'Agents',
-          align: 'left',
-          sortable: true
+          align: 'left'
         },
         {
           field: 'configSum',
           name: 'Configuration checksum',
-          align: 'left',
-          sortable: false
+          align: 'left'
         }
       ];
       this.columns.push({

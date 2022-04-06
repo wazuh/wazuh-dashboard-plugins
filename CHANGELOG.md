@@ -71,6 +71,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed user for sample data management [#3795](https://github.com/wazuh/wazuh-kibana-app/pull/3795)
 - Changed agent install codeblock copy button and powershell terminal warning [#3792](https://github.com/wazuh/wazuh-kibana-app/pull/3792)
 - Refactored as the plugin platform name and references is managed [#3811](https://github.com/wazuh/wazuh-kibana-app/pull/3811)
+- Removed sorting for `Agents` or `Configuration checksum` column in the table of `Management/Groups` due to this is not supported by the API [#3857](https://github.com/wazuh/wazuh-kibana-app/pull/3857)
 
 ### Fixed
 
@@ -129,7 +130,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed the button to remove an agent for a group in the agents' table when it is the default group [#3804](https://github.com/wazuh/wazuh-kibana-app/pull/3804)
 - Fixed internal user no longer needs permission to make x-pack detection request [#3831](https://github.com/wazuh/wazuh-kibana-app/pull/3831)
 - Fixed agents details card style [#3845](https://github.com/wazuh/wazuh-kibana-app/pull/3845)
-- Disable configuration checksum sorting in groups management table [#3857](https://github.com/wazuh/wazuh-kibana-app/pull/3857)
 
 ## Wazuh v4.2.5 - Kibana 7.10.2, 7.11.2, 7.12.1, 7.13.4, 7.14.2 - Revision 4206
 
