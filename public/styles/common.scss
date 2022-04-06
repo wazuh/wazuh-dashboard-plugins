@@ -1165,12 +1165,6 @@ wz-xml-file-editor {
   text-decoration: none !important;
 }
 
-@media only screen and (max-width: 767px){
-  .header-global-wrapper + .app-wrapper:not(.hidden-chrome) {
-      left: 0!important;
-  }
-}
-
 .flyout-no-overlap {
   width: auto;
 }
@@ -1556,14 +1550,20 @@ div.euiPopover__panel.euiPopover__panel-isOpen.euiPopover__panel--bottom.wz-menu
 }
 
 .agents-details-card {
-  .last-agents-link {
-    .euiToolTipAnchor {
-      white-space: nowrap;
-      max-width: 100%;
-      text-overflow: ellipsis;
-      overflow: hidden;
+  .agents-link-item {
+    max-width: 45%;
+    max-height: 100%;
+    .last-agents-link {
+      .euiToolTipAnchor {
+        white-space: nowrap;
+        max-width: 100%;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
     }
   }
+
+  
 }
 
 
@@ -1738,6 +1738,21 @@ iframe.width-changed {
   width: 100%;
 }
 
+.wz-user-select-none{
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+}
+
+.wz-euiCard-no-title{
+  .euiCard__title,
+  .euiCard__description
+  {
+    display: none;
+  }
+}
+
 /* Custom Searchbar styles */
 
 .application .filters-search-bar .globalQueryBar, .app-container .filters-search-bar .globalQueryBar{
@@ -1751,5 +1766,17 @@ iframe.width-changed {
 
   .custom-kbn-search-bar .euiSuperUpdateButton {
     min-width: 0;
+  }
+}
+
+@media only screen and (max-width: 767px){
+  .header-global-wrapper + .app-wrapper:not(.hidden-chrome) {
+      left: 0!important;
+  }
+
+  .agents-details-card {
+    .agents-link-item {
+      max-width: 100%;
+    }
   }
 }

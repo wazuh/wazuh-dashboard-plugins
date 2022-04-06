@@ -104,7 +104,7 @@ export class FlyoutDetail extends Component {
 
   render() {
     const { currentItem } = this.state;
-    const title = `${currentItem.cve}`;
+    const title = `${currentItem.cve || ''}`;
     const id = title.replace(/ /g, '_');
     const filterMap = {
       name: 'data.vulnerability.package.name',

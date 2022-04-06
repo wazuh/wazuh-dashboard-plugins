@@ -473,69 +473,6 @@ export const agentVisualizations = {
       }
     ]
   },
-  vuls: {
-    rows: [
-      {
-        height: 400,
-        vis: [
-          {
-            title: 'Alerts severity over time',
-            id: 'Wazuh-App-Agents-vuls-Alerts-severity-over-time',
-            width: 50
-          },
-          {
-            title: 'Most common rules',
-            id: 'Wazuh-App-Agents-vuls-Most-common-rules',
-            width: 50
-          }
-        ]
-      },
-      {
-        height: 330,
-        vis: [
-          {
-            title: 'Most common CVEs',
-            id: 'Wazuh-App-Agents-vuls-Vulnerability-Most-common-CVEs',
-            width: 25
-          },
-          {
-            title: 'Alerts evolution: Commonly affected packages',
-            id: 'Wazuh-App-Agents-vuls-evolution-affected-packages',
-            width: 50
-          },
-          {
-            title: 'Most common CWEs',
-            id: 'Wazuh-App-Agents-vuls-Most-common-CWEs',
-            width: 25
-          }
-        ]
-      },
-      {
-        height: 330,
-        vis: [
-          {
-            title: 'Severity distribution',
-            id: 'Wazuh-App-Agents-vuls-Vulnerability-severity-distribution',
-            width: 25
-          },
-          {
-            title: 'Top affected packages by CVEs',
-            id: 'Wazuh-App-Agents-vuls-packages-CVEs',
-            width: 75
-          },
-        ]
-      },
-      {
-        hide: true,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Agents-vuls-Alerts-summary'
-          }
-        ]
-      }
-    ]
-  },
   virustotal: {
     rows: [
       {

@@ -154,6 +154,12 @@ export class InventoryTable extends Component {
       : (width = '80px');
     return [
       {
+        field: 'name',
+        name: 'Name',
+        sortable: true,
+        width: '100px',
+      },
+      {
         field: 'version',
         name: 'Version',
         sortable: true,
@@ -167,22 +173,16 @@ export class InventoryTable extends Component {
         width: '100px',
       },
       {
+        field: 'severity',
+        name: 'Severity',
+        sortable: true,
+        width: `${width}`,
+      },
+      {
         field: 'cve',
         name: 'CVE',
         sortable: true,
         truncateText: true,
-        width: `${width}`,
-      },
-      {
-        field: 'name',
-        name: 'Name',
-        sortable: true,
-        width: '100px',
-      },
-      {
-        field: 'severity',
-        name: 'Severity',
-        sortable: true,
         width: `${width}`,
       },
       {
@@ -219,8 +219,22 @@ export class InventoryTable extends Component {
     const { error } = this.state;
     const { filters, onFiltersChange } = this.props;
     const columns = this.columns();
-    const selectFields =
-      'select=cve,architecture,version,name,severity,cvss2_score,cvss3_score,detection_time';
+    const selectFields = `select=${[
+      'cve',
+      'architecture',
+      'version',
+      'name',
+      'severity',
+      'cvss2_score',
+      'cvss3_score',
+      'detection_time',
+      'title',
+      'condition',
+      'updated',
+      'published',
+      'external_references'
+    ].join(',')}`;
+
     return (
       <TableWzAPI
         title="Vulnerabilities"
@@ -235,6 +249,7 @@ export class InventoryTable extends Component {
         downloadCsv={true}
         filters={filters}
         onFiltersChange={onFiltersChange}
+        tablePageSizeOptions={[10, 25, 50, 100]}
       />
     );
   }
