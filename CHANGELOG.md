@@ -2,11 +2,6 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v4.3.0 - Kibana 7.10.2 , 7.16.3, 7.17.0 - Revision 4302
-
-### Fixed
-- Fixed error when generating PDF reports due to Wazuh API token expiration [#3881](https://github.com/wazuh/wazuh-kibana-app/pull/3881)
-
 ## Wazuh v4.3.0 - Kibana 7.10.2 , 7.16.3, 7.17.0 - Revision 4301
 
 ### Added
@@ -138,6 +133,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed agents details card style [#3845](https://github.com/wazuh/wazuh-kibana-app/pull/3845) [#3860](https://github.com/wazuh/wazuh-kibana-app/pull/3860)
 - Fixed routing redirection in events documents discover links [#3866](https://github.com/wazuh/wazuh-kibana-app/pull/3866)
 - Fixed health-check [#3868](https://github.com/wazuh/wazuh-kibana-app/pull/3868)
+- Fixed an error when generating PDF reports due to Wazuh API token expiration [#3881](https://github.com/wazuh/wazuh-kibana-app/pull/3881)
 
 ## Wazuh v4.2.5 - Kibana 7.10.2, 7.11.2, 7.12.1, 7.13.4, 7.14.2 - Revision 4206
 
