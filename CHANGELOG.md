@@ -143,6 +143,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed routing redirection in events documents discover links [#3866](https://github.com/wazuh/wazuh-kibana-app/pull/3866)
 - Fixed health-check [#3868](https://github.com/wazuh/wazuh-kibana-app/pull/3868)
 - Fixed the table of Vulnerabilities/Inventory doesn't reload when changing the selected agent [#3901](https://github.com/wazuh/wazuh-kibana-app/pull/3901)
+- Fixed backslash breaking exported JSON result [#3909](https://github.com/wazuh/wazuh-kibana-app/pull/3909)
 - Fixed the Events view multiple "The index pattern was refreshed successfully" toast [#3937](https://github.com/wazuh/wazuh-kibana-app/pull/3937)
 - Fixed a rendering problem in the map visualizations [#3942](https://github.com/wazuh/wazuh-kibana-app/pull/3942)
 - Parse error when using `#` character not at the beginning of the line [#3877](https://github.com/wazuh/wazuh-kibana-app/pull/3877)

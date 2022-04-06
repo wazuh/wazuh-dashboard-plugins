@@ -810,10 +810,7 @@ export class DevToolsController {
           }
           else {
             this.apiOutputBox.setValue(
-              JSON.stringify((output || {}).data || {}, null, 2).replace(
-                /\\\\/g,
-                '\\'
-              )
+              JSON.stringify((output || {}).data || {}, null, 2)
             );
           }
         }
