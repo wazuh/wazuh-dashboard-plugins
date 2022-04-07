@@ -390,8 +390,8 @@ export const Discover = compose(
       const range = {
         range: {
           timestamp: {
-            gte: dateParse(this.timefilter.getTime().from),
-            lte: dateParse(this.timefilter.getTime().to),
+            gte: this.state.dateRange.from,
+            lte: this.state.dateRange.to,
             format: 'epoch_millis',
           },
         },
