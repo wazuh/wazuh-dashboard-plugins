@@ -112,7 +112,7 @@ app.run(function ($rootElement) {
   addHelpMenuToAppChrome();
 
   
-  const urlToLogout = getHttp().basePath.prepend('/logout')
+  const urlToLogout = getHttp().basePath.prepend('/logout');
 
   // Bind deleteExistentToken on Log out component.
   $('.euiHeaderSectionItem__button, .euiHeaderSectionItemButton').on('mouseleave', function () {
