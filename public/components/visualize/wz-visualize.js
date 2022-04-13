@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component, Fragment } from 'react';
-
+import { version as appVersion} from '../../../package.json';
 import { visualizations } from './visualizations';
 import { agentVisualizations } from './agent-visualizations';
 import KibanaVis from '../../kibana-integrations/kibana-vis';
@@ -23,7 +23,6 @@ import {
   EuiButtonIcon,
   EuiDescriptionList,
   EuiCallOut,
-  EuiLink,
 } from '@elastic/eui';
 import WzReduxProvider from '../../redux/wz-redux-provider';
 import { WazuhConfig } from '../../react-services/wazuh-config';
@@ -56,10 +55,11 @@ export const WzVisualize = compose(
       this.state = {
         visualizations: !!props.isAgent ? agentVisualizations : visualizations,
         expandedVis: false,
-        hasRefreshedKnownFields: false,
         refreshingKnownFields: [],
         refreshingIndex: true,
       };
+      this.hasRefreshedKnownFields = false;
+      this.isRefreshing = false;
       this.metricValues = false;
       this.rawVisualizations = new RawVisualizations();
       this.wzReq = WzRequest;
@@ -126,18 +126,19 @@ export const WzVisualize = compose(
       if (newField && newField.name) {
         this.newFields[newField.name] = newField;
       }
-      if (!this.state.hasRefreshedKnownFields) {
+      if (!this.hasRefreshedKnownFields) {
         // Known fields are refreshed only once per dashboard loading
         try {
-          this.setState({ hasRefreshedKnownFields: true, isRefreshing: true });
+          this.hasRefreshedKnownFields = true;
+          this.isRefreshing = true;
           if(satisfyPluginPlatformVersion('<7.11')){
             await PatternHandler.refreshIndexPattern(this.newFields);
           };
-          this.setState({ isRefreshing: false });
+          this.isRefreshing = false;
           this.reloadToast();
           this.newFields = {};
         } catch (error) {
-          this.setState({ isRefreshing: false });
+          this.isRefreshing = false;
           const options = {
             context: `${WzVisualize.name}.refreshKnownFields`,
             level: UI_LOGGER_LEVELS.ERROR,
@@ -150,13 +151,15 @@ export const WzVisualize = compose(
           };
           getErrorOrchestrator().handleError(options);
         }
-      } else if (this.state.isRefreshing) {
+      } else if (this.isRefreshing) {
         await new Promise((r) => setTimeout(r, 150));
         await this.refreshKnownFields();
       }
     };
     reloadToast = () => {
       const toastLifeTimeMs = 300000;
+      const [mayor, minor] = appVersion.split('.');
+      const urlTroubleShootingDocs = `https://documentation.wazuh.com/${mayor}.${minor}/user-manual/elasticsearch/elastic-tuning/troubleshooting.html#index-pattern-was-refreshed-toast-keeps-popping-up`;
       if(satisfyPluginPlatformVersion('<7.11')){
         getToasts().add({
           color: 'success',
@@ -165,6 +168,13 @@ export const WzVisualize = compose(
             <EuiFlexItem grow={false}>
               There were some unknown fields for the current index pattern.
               You need to refresh the page to apply the changes.
+              <a
+                title="More information in Wazuh documentation"
+                href={urlTroubleShootingDocs}
+                target="documentation"
+              >
+                Troubleshooting
+                </a>
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
               <EuiButton onClick={() => window.location.reload()} size="s">Reload page</EuiButton>
@@ -180,6 +190,12 @@ export const WzVisualize = compose(
             <EuiFlexItem grow={false}>
               There are some unknown fields for the current index pattern.
               You need to refresh the page to update the fields.
+              <a
+                title="More information in Wazuh documentation"
+                href={urlTroubleShootingDocs}
+                target="documentation">
+                Troubleshooting
+                </a>
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
               <EuiButton onClick={() => window.location.reload()} size="s">Reload page</EuiButton>

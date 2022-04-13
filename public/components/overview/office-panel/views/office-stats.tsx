@@ -19,7 +19,7 @@ import { renderValueYesThenEnabled } from '../../../../controllers/management/co
 
 const settings = [
   { field: 'enabled', label: 'Service status', render: renderValueYesThenEnabled },
-  { field: 'only_future_events', label: 'Collect events generated since Wazuh agent was started'},
+  { field: 'only_future_events', label: 'Collect events generated since Wazuh manager was started'},
   { field: 'curl_max_size', label: 'Maximum size allowed for the Office 365 API response'},
   { field: 'interval', label: 'Interval between Office 365 wodle executions in seconds'},
   { field: 'api_auth', label: 'Credentials', render: (value) => value.map(v => 
