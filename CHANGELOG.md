@@ -155,6 +155,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed the `rule.mitre.id` cell enhancement that doesn't support values with sub techniques [#3944](https://github.com/wazuh/wazuh-kibana-app/pull/3944)
 - Fixed error not working the alerts displayed when changin the selected time in some flyouts [#3947](https://github.com/wazuh/wazuh-kibana-app/pull/3947)
 - Fixed the user can not logout when the Kibana server has a basepath configurated [#3957](https://github.com/wazuh/wazuh-kibana-app/pull/3957)
+- Fixed fatal cron-job error when Wazuh API is down [#3991](https://github.com/wazuh/wazuh-kibana-app/pull/3991)
 
 ## Wazuh v4.2.6 - Kibana 7.10.2, 7.11.2, 7.12.1, 7.13.0, 7.13.1, 7.13.2, 7.13.3, 7.13.4, 7.14.0, 7.14.1, 7.14.2 - Revision 4207
 
