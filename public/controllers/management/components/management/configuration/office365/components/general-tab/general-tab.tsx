@@ -25,7 +25,7 @@ const mainSettings = [
   { field: 'enabled', label: 'Service status', render: renderValueYesThenEnabled },
   {
     field: 'only_future_events',
-    label: 'Collect events generated since Wazuh is initialized',
+    label: 'Collect events generated since Wazuh manager is initialized',
   },
   {
     field: 'interval',
