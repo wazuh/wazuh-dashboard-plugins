@@ -37,10 +37,9 @@ export class SchedulerJob {
           return await this.getResponses(host);
         } catch (error) {
           ErrorHandler(error, this.logger);
-          return;
         }
       });
-      const data = (await Promise.all(jobPromises)).filter(promise => !!promise);
+      const data = (await Promise.all(jobPromises)).filter(promise => !!promise).flat();
       Array.isArray(data) && !!data.length && await this.saveDocument.save(data, index);
     } catch (error) {
       ErrorHandler(error, this.logger);
