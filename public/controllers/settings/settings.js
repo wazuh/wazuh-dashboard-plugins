@@ -25,6 +25,8 @@ import { updateSelectedSettingsSection } from '../../redux/actions/appStateActio
 import { UI_LOGGER_LEVELS, PLUGIN_APP_NAME } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
+import { getAssetURL } from '../../utils/assets';
+import { getHttp } from '../../kibana-services';
 
 export class SettingsController {
   /**
@@ -58,6 +60,7 @@ export class SettingsController {
     this.tabNames = TabNames;
     this.indexPatterns = [];
     this.apiEntries = [];
+    this.$scope.googleGroupsSVG = getHttp().basePath.prepend(getAssetURL('images/icons/google_groups.svg'));
   }
 
   /**

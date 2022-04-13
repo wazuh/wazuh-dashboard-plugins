@@ -1144,9 +1144,10 @@ export class WazuhReportingCtrl {
         tables,
         name,
         section,
+        indexPatternTitle,
+        apiId
       } = request.body;
       const { moduleID } = request.params;
-      const { id: apiId, pattern: indexPattern } = request.headers;
       const { from, to } = time || {};
       // Init
       const printer = new ReportPrinter();
@@ -1176,7 +1177,7 @@ export class WazuhReportingCtrl {
           new Date(from).getTime(),
           new Date(to).getTime(),
           sanitizedFilters,
-          indexPattern,
+          indexPatternTitle,
           agents
         );
       }
@@ -1219,10 +1220,8 @@ export class WazuhReportingCtrl {
   ) {
     try {
       log('reporting:createReportsGroups', `Report started`, 'info');
-      const { browserTimezone, searchBar, filters, time, name, components } = request.body;
+      const { name, components, apiId } = request.body;
       const { groupID } = request.params;
-      const { id: apiId, pattern: indexPattern } = request.headers;
-      const { from, to } = time || {};
       // Init
       const printer = new ReportPrinter();
 
@@ -1493,10 +1492,8 @@ export class WazuhReportingCtrl {
   ) {
     try {
       log('reporting:createReportsAgents', `Report started`, 'info');
-      const { browserTimezone, searchBar, filters, time, name, components } = request.body;
+      const { name, components, apiId } = request.body;
       const { agentID } = request.params;
-      const { id: apiId } = request.headers;
-      const { from, to } = time || {};
 
       const printer = new ReportPrinter();
 
@@ -1744,9 +1741,8 @@ export class WazuhReportingCtrl {
   ) {
     try {
       log('reporting:createReportsAgentsInventory', `Report started`, 'info');
-      const { browserTimezone, searchBar, filters, time, name } = request.body;
+      const { searchBar, filters, time, name, indexPatternTitle, apiId } = request.body;
       const { agentID } = request.params;
-      const { id: apiId, pattern: indexPattern } = request.headers;
       const { from, to } = time || {};
       // Init
       const printer = new ReportPrinter();
@@ -1940,7 +1936,7 @@ export class WazuhReportingCtrl {
           from,
           to,
           sanitizedFilters + ' AND rule.groups: "vulnerability-detector"',
-          indexPattern,
+          indexPatternTitle,
           agentID
         );
       }

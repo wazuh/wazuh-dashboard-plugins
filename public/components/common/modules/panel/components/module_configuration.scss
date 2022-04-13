@@ -17,7 +17,11 @@ h5.euiTitle.module-panel-configuration-subtitle{
   justify-content: center;
 }
 
-.module-panel-configuration-list dt.euiDescriptionList__title, .module-panel-configuration-list dd.euiDescriptionList__description {
-  border-left: 2px solid rgba(0, 0, 0, 0.3);
-  padding-left: 10px;
+.module-panel-configuration-list{
+  dt.euiDescriptionList__title,
+  dd.euiDescriptionList__description {
+    border-left: 2px solid rgba(0, 0, 0, 0.3);
+    padding-left: 10px;
+    word-break: break-word;
+  }
 }

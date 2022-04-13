@@ -55,7 +55,7 @@ import store from './redux/store';
 import { updateCurrentPlatform } from './redux/actions/appStateActions';
 import { WzAuthentication, loadAppConfig } from './react-services';
 
-import { getAngularModule } from './kibana-services';
+import { getAngularModule, getHttp } from './kibana-services';
 import { addHelpMenuToAppChrome } from './utils';
 
 const app = getAngularModule();
@@ -112,7 +112,7 @@ app.run(function ($rootElement) {
   addHelpMenuToAppChrome();
 
   
-  const urlToLogout = window.location.origin + '/logout';
+  const urlToLogout = getHttp().basePath.prepend('/logout');
 
   // Bind deleteExistentToken on Log out component.
   $('.euiHeaderSectionItem__button, .euiHeaderSectionItemButton').on('mouseleave', function () {

@@ -34,7 +34,9 @@ export function WazuhReportingRoutes(router: IRouter) {
             from: schema.string(),
             to: schema.string()
           }), schema.string()]),
-          title: schema.maybe(schema.string())
+          title: schema.maybe(schema.string()),
+          indexPatternTitle: schema.string(),
+          apiId: schema.string()
         }),
         params: schema.object({
           moduleID: schema.string()
@@ -54,6 +56,7 @@ export function WazuhReportingRoutes(router: IRouter) {
         name: schema.string(),
         section: schema.maybe(schema.string()),
         tab: schema.string(),
+        apiId: schema.string()
       }),
       params: schema.object({
         groupID: schema.string()
@@ -73,6 +76,7 @@ export function WazuhReportingRoutes(router: IRouter) {
         name: schema.string(),
         section: schema.maybe(schema.string()),
         tab: schema.string(),
+        apiId: schema.string()
       }),
       params: schema.object({
         agentID: schema.string()
@@ -100,7 +104,9 @@ export function WazuhReportingRoutes(router: IRouter) {
           from: schema.string(),
           to: schema.string()
         }), schema.string()]),
-        title: schema.maybe(schema.string())
+        title: schema.maybe(schema.string()),
+        indexPatternTitle: schema.string(),
+        apiId: schema.string()
       }),
       params: schema.object({
         agentID: schema.string()

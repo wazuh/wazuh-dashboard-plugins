@@ -333,7 +333,7 @@ export class Details extends Component {
           </EuiTitle>
         }>
         <EuiListGroup size="xs" flush={true} gutterSize="none" style={{ display: 'grid' }}
-          listItems={references.map(link => ({ label: link, href: link }))
+          listItems={references.map(link => ({ label: link, href: link, target: '_blank' }))
           }
         />
       </EuiAccordion>
