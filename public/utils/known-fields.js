@@ -957,6 +957,116 @@ export const KnownFields = [
     "readFromDocValues": true
   },
   {
+    "name": "data.cis.benchmark",
+    "type": "string",
+    "esTypes": [
+        "keyword"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "data.cis.error",
+    "type": "number",
+    "esTypes": [
+        "long"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "data.cis.fail",
+    "type": "number",
+    "esTypes": [
+        "long"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "data.cis.group",
+    "type": "string",
+    "esTypes": [
+        "keyword"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "data.cis.notchecked",
+    "type": "number",
+    "esTypes": [
+        "long"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "data.cis.pass",
+    "type": "number",
+    "esTypes": [
+        "long"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "data.cis.result",
+    "type": "string",
+    "esTypes": [
+        "keyword"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "data.cis.rule_title",
+    "type": "string",
+    "esTypes": [
+        "keyword"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "data.cis.score",
+    "type": "number",
+    "esTypes": [
+        "long"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "data.cis.timestamp",
+    "type": "string",
+    "esTypes": [
+        "keyword"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "data.cis.unknown",
+    "type": "number",
+    "esTypes": [
+        "long"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
     "name": "data.command",
     "type": "string",
     "esTypes": [
@@ -976,6 +1086,46 @@ export const KnownFields = [
     "aggregatable": true,
     "readFromDocValues": true
   },
+  {
+    "name": "data.docker.Action",
+    "type": "string",
+    "esTypes": [
+        "keyword"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "data.docker.Actor.Attributes.image",
+    "type": "string",
+    "esTypes": [
+        "keyword"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "data.docker.Actor.Attributes.name",
+    "type": "string",
+    "esTypes": [
+        "keyword"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "data.docker.Type",
+    "type": "string",
+    "esTypes": [
+        "keyword"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },  
   {
     "name": "data.dstip",
     "type": "string",
@@ -1021,6 +1171,156 @@ export const KnownFields = [
     "type": "string",
     "esTypes": [
       "keyword"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "data.gcp.jsonPayload.authAnswer",
+    "type": "string",
+    "esTypes": [
+        "keyword"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "data.gcp.jsonPayload.queryName",
+    "type": "string",
+    "esTypes": [
+        "keyword"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "data.gcp.jsonPayload.responseCode",
+    "type": "string",
+    "esTypes": [
+        "keyword"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "data.gcp.jsonPayload.vmInstanceId",
+    "type": "string",
+    "esTypes": [
+        "keyword"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "data.gcp.jsonPayload.vmInstanceName",
+    "type": "string",
+    "esTypes": [
+        "keyword"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "data.gcp.resource.labels.location",
+    "type": "string",
+    "esTypes": [
+        "keyword"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "data.gcp.resource.labels.project_id",
+    "type": "string",
+    "esTypes": [
+        "keyword"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "data.gcp.resource.labels.source_type",
+    "type": "string",
+    "esTypes": [
+        "keyword"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "data.gcp.resource.type",
+    "type": "string",
+    "esTypes": [
+        "keyword"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "data.gcp.severity",
+    "type": "string",
+    "esTypes": [
+        "keyword"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "data.github.action",
+    "type": "string",
+    "esTypes": [
+        "keyword"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "data.github.actor",
+    "type": "string",
+    "esTypes": [
+        "keyword"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "data.github.actor_location.country_code",
+    "type": "string",
+    "esTypes": [
+        "keyword"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "data.github.org",
+    "type": "string",
+    "esTypes": [
+        "keyword"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "data.github.repo",
+    "type": "string",
+    "esTypes": [
+        "keyword"
     ],
     "searchable": true,
     "aggregatable": true,
@@ -1377,6 +1677,66 @@ export const KnownFields = [
     "readFromDocValues": true
   },
   {
+    "name": "data.office365.Actor.ID",
+    "type": "string",
+    "esTypes": [
+        "keyword"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "data.office365.ClientIP",
+    "type": "string",
+    "esTypes": [
+        "keyword"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "data.office365.Operation",
+    "type": "string",
+    "esTypes": [
+        "keyword"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "data.office365.ResultStatus",
+    "type": "string",
+    "esTypes": [
+        "keyword"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "data.office365.Subscription",
+    "type": "string",
+    "esTypes": [
+        "keyword"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "data.office365.UserId",
+    "type": "string",
+    "esTypes": [
+        "keyword"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
     "name": "data.os.architecture",
     "type": "string",
     "esTypes": [
@@ -1651,6 +2011,46 @@ export const KnownFields = [
     "type": "number",
     "esTypes": [
       "double"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "data.osquery.action",
+    "type": "string",
+    "esTypes": [
+        "keyword"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "data.osquery.calendarTime",
+    "type": "string",
+    "esTypes": [
+        "keyword"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "data.osquery.name",
+    "type": "string",
+    "esTypes": [
+        "keyword"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "data.osquery.pack",
+    "type": "string",
+    "esTypes": [
+        "keyword"
     ],
     "searchable": true,
     "aggregatable": true,
