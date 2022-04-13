@@ -2,12 +2,11 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v4.3.0 - Kibana 7.10.2 , 7.16.3, 7.17.0 - Revision 4301
+## Wazuh v4.3.0 - OpenSearch Dashboards 1.2.0 - Revision 4301
 
 ### Added
 
-- Support for Kibana 7.16.3
-- Support for Kibana 7.17.0
+- Support for OpenSearch Dashboards 1.2.0
 - Added GitHub and Office365 modules [#3557](https://github.com/wazuh/wazuh-kibana-app/pull/3557)
 - Added a new `Panel` module tab for GitHub and Office365 modules 
   [#3541](https://github.com/wazuh/wazuh-kibana-app/pull/3541) 
