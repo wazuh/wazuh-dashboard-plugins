@@ -516,7 +516,7 @@ export const RegisterAgent = withErrorBoundary(
                   title={
                     <>
                       Running this command will not enroll the agent if it is doing an upgrade. See{' '}
-                      <EuiLink href="https://documentation.wazuh.com/current/user-manual/registering/index.html">
+                      <EuiLink href="https://documentation.wazuh.com/current/user-manual/registering/index.html" target="_blank">
                         Wazuh documentation
                       </EuiLink>
                       .
