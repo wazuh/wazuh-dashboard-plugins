@@ -405,8 +405,8 @@ export const RegisterAgent = withErrorBoundary(
       const ipInput = (
         <EuiText>
           <p>
-            You can predefine the Wazuh server address with the <EuiCode>enrollment.dns</EuiCode>{' '}
-            Wazuh app setting.
+          Define the Wazuh server IP address/name using the <EuiCode>enrollment.dns</EuiCode>{' '}
+          setting below.
           </p>
           <EuiFieldText
             placeholder="Server address"
@@ -515,8 +515,7 @@ export const RegisterAgent = withErrorBoundary(
                   color="warning"
                   title={
                     <>
-                      Running this command on a host with an agent already installed upgrades the
-                      agent package without enrolling the agent. To enroll it, see the{' '}
+                      Running this command will not enroll the agent if it is doing an upgrade. See{' '}
                       <EuiLink href="https://documentation.wazuh.com/current/user-manual/registering/index.html">
                         Wazuh documentation
                       </EuiLink>
