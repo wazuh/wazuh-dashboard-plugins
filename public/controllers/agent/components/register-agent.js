@@ -514,11 +514,7 @@ export const RegisterAgent = withErrorBoundary(
                   color="warning"
                   title={
                     <>
-                      Running this command will not enroll the agent if it is doing an upgrade. See{' '}
-                      <EuiLink href="https://documentation.wazuh.com/current/user-manual/registering/index.html" target="_blank">
-                        Wazuh documentation
-                      </EuiLink>
-                      .
+                      If the installer finds another Wazuh agent in the system, it will upgrade it preserving the configuration.
                     </>
                   }
                   iconType="iInCircle"
