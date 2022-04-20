@@ -23,7 +23,6 @@ import nist from './overview-nist';
 import tsc from './overview-tsc';
 import pm from './overview-pm';
 import virustotal from './overview-virustotal';
-import vuls from './overview-vuls';
 import mitre from './overview-mitre';
 import office from './overview-office';
 import osquery from './overview-osquery';
@@ -45,7 +44,6 @@ export {
   tsc,
   pm,
   virustotal,
-  vuls,
   mitre,
   office,
   osquery,
