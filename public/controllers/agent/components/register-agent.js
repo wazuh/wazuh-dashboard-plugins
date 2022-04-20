@@ -405,8 +405,7 @@ export const RegisterAgent = withErrorBoundary(
       const ipInput = (
         <EuiText>
           <p>
-          Define the Wazuh server IP address/name using the <EuiCode>enrollment.dns</EuiCode>{' '}
-          setting below.
+            This is the address the agent uses to communicate with the Wazuh server. It can be an IP address or a fully qualified domain name (FQDN).
           </p>
           <EuiFieldText
             placeholder="Server address"
