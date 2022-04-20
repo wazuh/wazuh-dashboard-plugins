@@ -344,6 +344,14 @@ export const RegisterAgent = withErrorBoundary(
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`;
         case 'centos6-armhf':
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.armv7hl.rpm`;
+        case 'redhat6-i386':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.i386.rpm`;
+        case 'redhat6-aarch64':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.aarch64.rpm`;
+        case 'redhat6-x86_64':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`;
+        case 'redhat6-armhf':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.armv7hl.rpm`;
         default:
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`;
       }
