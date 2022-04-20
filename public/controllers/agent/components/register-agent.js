@@ -60,7 +60,7 @@ const architectureButtons = [
     label: 'aarch64',
   },
 ];
-const architectureCentos5 = [
+const architectureCentos5OrRedHat5 = [
   {
     id: 'i386',
     label: 'i386',
@@ -71,7 +71,7 @@ const architectureCentos5 = [
   },
 ];
 
-const versionButtonsCentos = [
+const versionButtonsCentosOrRedHat = [
   {
     id: 'centos5',
     label: 'CentOS5',
@@ -79,6 +79,14 @@ const versionButtonsCentos = [
   {
     id: 'centos6',
     label: 'CentOS6 or higher',
+  },
+  {
+    id: 'redhat5',
+    label: 'Red Hat 5',
+  },
+  {
+    id: 'redhat6',
+    label: 'Red Hat 6 or higher',
   },
 ];
 
@@ -169,9 +177,9 @@ export const RegisterAgent = withErrorBoundary(
           serverAddress,
           needsPassword,
           hidePasswordInput,
-          versionButtonsCentos,
+          versionButtonsCentosOrRedHat,
           architectureButtons,
-          architectureCentos5,
+          architectureCentos5OrRedHat5,
           wazuhPassword,
           udpProtocol,
           wazuhVersion,
@@ -323,6 +331,10 @@ export const RegisterAgent = withErrorBoundary(
         case 'centos5-i386':
           return `https://packages.wazuh.com/4.x/yum5/i386/wazuh-agent-${this.state.wazuhVersion}-1.el5.i386.rpm`;
         case 'centos5-x86_64':
+          return `https://packages.wazuh.com/4.x/yum5/x86_64/wazuh-agent-${this.state.wazuhVersion}-1.el5.x86_64.rpm`;
+        case 'redhat5-i386':
+          return `https://packages.wazuh.com/4.x/yum5/i386/wazuh-agent-${this.state.wazuhVersion}-1.el5.i386.rpm`;
+        case 'redhat5-x86_64':
           return `https://packages.wazuh.com/4.x/yum5/x86_64/wazuh-agent-${this.state.wazuhVersion}-1.el5.x86_64.rpm`;
         case 'centos6-i386':
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.i386.rpm`;
@@ -626,7 +638,7 @@ export const RegisterAgent = withErrorBoundary(
                 <EuiButtonGroup
                   color="primary"
                   legend="Choose the version"
-                  options={versionButtonsCentos}
+                  options={versionButtonsCentosOrRedHat}
                   idSelected={this.state.selectedVersion}
                   onChange={(version) => this.setVersion(version)}
                 />
@@ -634,7 +646,7 @@ export const RegisterAgent = withErrorBoundary(
             },
           ]
           : []),
-        ...(this.state.selectedOS == 'rpm' && this.state.selectedVersion == 'centos5'
+        ...(this.state.selectedOS == 'rpm' && this.state.selectedVersion == 'centos5' || this.state.selectedVersion == 'redhat5' 
           ? [
             {
               title: 'Choose the architecture',
@@ -642,7 +654,7 @@ export const RegisterAgent = withErrorBoundary(
                 <EuiButtonGroup
                   color="primary"
                   legend="Choose the architecture"
-                  options={architectureCentos5}
+                  options={architectureCentos5OrRedHat5}
                   idSelected={this.state.selectedArchitecture}
                   onChange={(architecture) => this.setArchitecture(architecture)}
                 />
@@ -651,7 +663,7 @@ export const RegisterAgent = withErrorBoundary(
           ]
           : []),
         ...(this.state.selectedOS == 'deb' ||
-          (this.state.selectedOS == 'rpm' && this.state.selectedVersion == 'centos6')
+          (this.state.selectedOS == 'rpm' && this.state.selectedVersion == 'centos6' || this.state.selectedVersion == 'redhat6')
           ? [
             {
               title: 'Choose the architecture',
