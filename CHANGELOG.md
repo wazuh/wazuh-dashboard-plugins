@@ -144,6 +144,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed the button to remove an agent for a group in the agents' table when it is the default group [#3804](https://github.com/wazuh/wazuh-kibana-app/pull/3804)
 - Fixed internal user no longer needs permission to make x-pack detection request [#3831](https://github.com/wazuh/wazuh-kibana-app/pull/3831)
 - Fixed agents details card style [#3845](https://github.com/wazuh/wazuh-kibana-app/pull/3845) [#3860](https://github.com/wazuh/wazuh-kibana-app/pull/3860)
+- Fixed search bar query sanitizing in PDF report [#3861](https://github.com/wazuh/wazuh-kibana-app/pull/3861)
 - Fixed routing redirection in events documents discover links [#3866](https://github.com/wazuh/wazuh-kibana-app/pull/3866)
 - Fixed health-check [#3868](https://github.com/wazuh/wazuh-kibana-app/pull/3868)
 - Fixed an error when generating PDF reports due to Wazuh API token expiration [#3881](https://github.com/wazuh/wazuh-kibana-app/pull/3881)
