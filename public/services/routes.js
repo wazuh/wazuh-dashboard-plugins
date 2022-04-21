@@ -125,7 +125,7 @@ app.config(($routeProvider) => {
   $routeProvider
   .when('/health-check', {
     template: healthCheckTemplate,
-    resolve: { apiCount, wzConfig, ip },
+    resolve: { wzConfig, ip },
     outerAngularWrapperRoute: true
   })
   .when('/agents/:agent?/:tab?/:tabView?', {
@@ -175,7 +175,7 @@ app.config(($routeProvider) => {
   })
   .when('/blank-screen', {
     template: blankScreenTemplate,
-    resolve: { enableWzMenu, wzConfig },
+    resolve: { enableWzMenu },
     outerAngularWrapperRoute: true
   })
   .when('/', {

@@ -26,16 +26,13 @@ export function apiCount($q, $location) {
 
   GenericRequest.request('GET', '/hosts/apis')
     .then(async (data) => {
-      if (!data || !data.data || !data.data.length) throw new Error('No API entries found');
       if (!AppState.getCurrentAPI()) {
-        await tryToSetDefault(data.data, AppState);
+        await tryToSetDefault(data?.data, AppState);
       }
       deferred.resolve();
     })
-    .catch(() => {
-      $location.search('_a', null);
-      $location.search('tab', 'api');
-      $location.path('/settings');
+    .catch((reject) => {
+      console.log(reject);
       deferred.resolve();
     });
   return deferred.promise;
