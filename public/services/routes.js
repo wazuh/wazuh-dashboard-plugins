@@ -20,7 +20,6 @@ import {
   getSavedSearch,
   getIp,
   getWzConfig,
-  apiCount
 } from './resolves';
 
 // HTML templates
