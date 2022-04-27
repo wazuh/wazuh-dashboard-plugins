@@ -520,6 +520,7 @@ export const RegisterAgent = withErrorBoundary(
                   iconType="iInCircle"
                 />
                 <EuiSpacer />
+                {windowsAdvice}
                 <div className="copy-codeblock-wrapper">
                   <EuiCodeBlock style={codeBlock} language={language}>
                     {this.state.wazuhPassword && !this.state.showPassword ? this.obfuscatePassword(text) : text}
@@ -540,7 +541,6 @@ export const RegisterAgent = withErrorBoundary(
                   />
                 )}
                 <EuiSpacer />
-                {windowsAdvice}
               </EuiText>
             )}
         </div>
