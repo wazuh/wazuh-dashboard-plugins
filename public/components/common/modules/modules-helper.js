@@ -51,16 +51,18 @@ export class ModulesHelper {
     }
     const filters = $(`.globalFilterItem .euiBadge__childButton`);
     for (let i = 0; i < filters.length; i++) {
+      const data = filters[i].attributes[3];
       let found = false;
       (implicitFilters || []).forEach(x => {
-        const objKey = x.query && x.query.match ? Object.keys(x.query.match)[0] : x.meta.key;
-        const key = `filter-key-${objKey}`;
-        const value = x.query && x.query.match
-          ? `filter-value-${x.query.match[objKey].query}`
-          : `filter-value-${x.meta.value}`;
-        const data = filters[i].attributes[3];
-        if (data.value.includes(key) && data.value.includes(value)) {
-          found = true;
+        if(!x.used){
+          const objKey = x.query && x.query.match ? Object.keys(x.query.match)[0] : x.meta.key;
+          const objValue = x.query && x.query.match ? x.query.match[objKey].query : x.meta.value;
+          const key = `filter-key-${objKey}`;
+          const value = `filter-value-${objValue}`;
+          if (data.value.includes(key) && data.value.includes(value) && !data.value.includes('filter-pinned')) {
+            found = true;
+            x.used = true;
+          }
         }
       });
       if (!found) {
