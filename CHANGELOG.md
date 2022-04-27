@@ -62,6 +62,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added new fields of `Vulnerabilities` to the details flyout [#3893](https://github.com/wazuh/wazuh-kibana-app/pull/3893) [#3908](https://github.com/wazuh/wazuh-kibana-app/pull/3908)
 - Added missing fields used in visualizations to the known fiels related to alerts [#3924](https://github.com/wazuh/wazuh-kibana-app/pull/3924)
 - Added troubleshooting link to "index pattern was refreshed" toast [#3946](https://github.com/wazuh/wazuh-kibana-app/pull/3946)
+- Added more number options to the tables widget in Modules -> "Mitre" [#4041](https://github.com/wazuh/wazuh-kibana-app/pull/4066)
 
 ### Changed
 
