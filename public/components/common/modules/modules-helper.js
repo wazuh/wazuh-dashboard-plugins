@@ -54,11 +54,14 @@ export class ModulesHelper {
       const data = filters[i].attributes[3];
       let found = false;
       (implicitFilters || []).forEach(x => {
+        // The IF: checks if the filter is already in use
+        // Check which of the filters are from the view and which are not pinned filters
         if(!x.used){
           const objKey = x.query && x.query.match ? Object.keys(x.query.match)[0] : x.meta.key;
           const objValue = x.query && x.query.match ? x.query.match[objKey].query : x.meta.value;
           const key = `filter-key-${objKey}`;
           const value = `filter-value-${objValue}`;
+          //
           if (data.value.includes(key) && data.value.includes(value) && !data.value.includes('filter-pinned')) {
             found = true;
             x.used = true;
