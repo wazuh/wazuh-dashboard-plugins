@@ -19,12 +19,12 @@ import { buildIndexSettings } from '../../lib/build-index-settings';
 import { WazuhHostsCtrl } from '../../controllers/wazuh-hosts';
 import { 
   WAZUH_MONITORING_PATTERN,
-  WAZUH_INDEX_REPLICAS,
   WAZUH_MONITORING_TEMPLATE_NAME,
-  WAZUH_MONITORING_DEFAULT_INDICES_SHARDS,
   WAZUH_MONITORING_DEFAULT_CREATION,
   WAZUH_MONITORING_DEFAULT_ENABLED,
   WAZUH_MONITORING_DEFAULT_FREQUENCY,
+  WAZUH_MONITORING_DEFAULT_INDICES_SHARDS,
+  WAZUH_MONITORING_DEFAULT_INDICES_REPLICAS,
 } from '../../../common/constants';
 import { tryCatchForIndexPermissionError } from '../tryCatchForIndexPermissionError';
 import { delayAsPromise } from '../../../common/utils';
@@ -259,7 +259,7 @@ async function createIndex(context, indexName: string) {
       settings: {
         index: {
           number_of_shards: getAppConfigurationSetting('wazuh.monitoring.shards', appConfig, WAZUH_MONITORING_DEFAULT_INDICES_SHARDS),
-          number_of_replicas: getAppConfigurationSetting('wazuh.monitoring.replicas', appConfig, WAZUH_INDEX_REPLICAS)
+          number_of_replicas: getAppConfigurationSetting('wazuh.monitoring.replicas', appConfig, WAZUH_MONITORING_DEFAULT_INDICES_REPLICAS)
         }
       }
     };
