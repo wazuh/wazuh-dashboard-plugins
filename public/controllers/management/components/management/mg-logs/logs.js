@@ -81,7 +81,7 @@ export default compose(
 
     async componentDidMount() {
       try {
-        this.F = window.innerHeight - this.offset;
+        this.height = window.innerHeight - this.offset;
         window.addEventListener('resize', this.updateHeight);
         this.setState({ isLoading: true });
 
