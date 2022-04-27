@@ -43,11 +43,7 @@ import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchest
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 
 export default compose(
-  withGlobalBreadcrumb([
-    { text: '' },
-    { text: 'Management', href: '#/manager' },
-    { text: 'Logs' }
-  ]),
+  withGlobalBreadcrumb([{ text: '' }, { text: 'Management', href: '#/manager' }, { text: 'Logs' }]),
   withUserAuthorizationPrompt([
     { action: 'cluster:status', resource: '*:*:*' },
     { action: 'cluster:read', resource: 'node:id:*' },
@@ -112,7 +108,6 @@ export default compose(
             });
           }
         );
-
       } catch (error) {
         this.setState({
           isLoading: false,
@@ -140,17 +135,14 @@ export default compose(
     }
 
     async initDaemonsList(logsPath) {
-      const daemonsNotIncluded = [
-        'wazuh-modulesd:task-manager',
-        'wazuh-modulesd:agent-upgrade'
-      ]
+      const daemonsNotIncluded = ['wazuh-modulesd:task-manager', 'wazuh-modulesd:agent-upgrade'];
       try {
         const path = logsPath + '/summary';
         const data = await WzRequest.apiReq('GET', path, {});
         const formattedData = (((data || {}).data || {}).data || {}).affected_items;
         const daemonsList = [...['all']];
         for (const daemon of formattedData) {
-          if(!daemonsNotIncluded.includes(Object.keys(daemon)[0])){
+          if (!daemonsNotIncluded.includes(Object.keys(daemon)[0])) {
             daemonsList.push(Object.keys(daemon)[0]);
           }
         }
@@ -362,10 +354,6 @@ export default compose(
     };
 
     onSearchBarSearch = (e) => {
-      if(logsPath === '' ) {
-        initLogsPath
-      }
-
       this.setState(
         {
           appliedSearch: e,
