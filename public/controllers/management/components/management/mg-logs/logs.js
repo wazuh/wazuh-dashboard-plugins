@@ -186,9 +186,6 @@ export default compose(
       let result = '';
       let totalItems = 0;
 
-      // ---------------
-      // NOTE fix-1
-      // ---------------
       // Avoid attempts to send invalid requests if the logsPath variable
       // hasn't been intialized yet (caused by the onSearchBarSearch event).
       if (logsPath === '') {
