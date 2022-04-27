@@ -81,7 +81,7 @@ export const ModuleMitreAttackIntelligenceResource = ({
         searchBarPlaceholder={`Search in ${label}`}
         searchBarSuggestions={searchBarSuggestions}
         endpoint={apiEndpoint}
-        tablePageSizeOptions={[10]}
+        tablePageSizeOptions={[10, 15, 25, 50, 100]}
         filters={resourceFilters}
       />
       {details && (
