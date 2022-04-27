@@ -158,6 +158,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed the user can not logout when the Kibana server has a basepath configurated [#3957](https://github.com/wazuh/wazuh-kibana-app/pull/3957)
 - Fixed fatal cron-job error when Wazuh API is down [#3991](https://github.com/wazuh/wazuh-kibana-app/pull/3991)
 - Fixed agent breadcrumb routing minor error [#4101](https://github.com/wazuh/wazuh-kibana-app/pull/4101)
+- Fixed selected text not visible in API Console [#4102](https://github.com/wazuh/wazuh-kibana-app/pull/4102)
 
 ## Wazuh v4.2.6 - Kibana 7.10.2, 7.11.2, 7.12.1, 7.13.0, 7.13.1, 7.13.2, 7.13.3, 7.13.4, 7.14.0, 7.14.1, 7.14.2 - Revision 4207
 
