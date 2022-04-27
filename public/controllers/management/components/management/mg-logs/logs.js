@@ -85,7 +85,7 @@ export default compose(
 
     async componentDidMount() {
       try {
-        this.height = window.innerHeight - this.offset;
+        this.F = window.innerHeight - this.offset;
         window.addEventListener('resize', this.updateHeight);
         this.setState({ isLoading: true });
 
@@ -112,6 +112,7 @@ export default compose(
             });
           }
         );
+
       } catch (error) {
         this.setState({
           isLoading: false,
@@ -155,7 +156,7 @@ export default compose(
         }
         this.setState({ daemonsList });
       } catch (error) {
-        throw new Error(error);
+        throw new Error('Error fetching daemons list: ' + error);
       }
     }
 
@@ -192,7 +193,16 @@ export default compose(
       const { logsPath } = this.state;
       let result = '';
       let totalItems = 0;
- 
+
+      // ---------------
+      // NOTE fix-1
+      // ---------------
+      // Avoid attempts to send invalid requests if the logsPath variable
+      // hasn't been intialized yet (caused by the onSearchBarSearch event).
+      if (logsPath === '') {
+        return result;
+      }
+
       try {
         const tmpResult = await WzRequest.apiReq('GET', logsPath, {
           params: this.buildFilters(customOffset),
@@ -201,7 +211,7 @@ export default compose(
         totalItems = ((tmpResult || {}).data.data || {}).total_affected_items;
         result = this.parseLogsToText(resultItems) || '';
       } catch (error) {
-        throw new Error(error);
+        throw new Error('Error fetching logs: ' + error);
       }
 
       this.setState({ totalItems });
@@ -258,7 +268,7 @@ export default compose(
 
         return { nodeList: '', logsPath: '/manager/logs', selectedNode: '' };
       } catch (error) {
-        throw new Error(error);
+        throw new Error('Error building logs path: ' + error);
       }
     }
 
@@ -352,6 +362,10 @@ export default compose(
     };
 
     onSearchBarSearch = (e) => {
+      if(logsPath === '' ) {
+        initLogsPath
+      }
+
       this.setState(
         {
           appliedSearch: e,
