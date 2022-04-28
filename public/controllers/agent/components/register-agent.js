@@ -425,8 +425,7 @@ export const RegisterAgent = withErrorBoundary(
       const ipInput = (
         <EuiText>
           <p>
-            You can predefine the Wazuh server address with the <EuiCode>enrollment.dns</EuiCode>{' '}
-            Wazuh app setting.
+            This is the address the agent uses to communicate with the Wazuh server. It can be an IP address or a fully qualified domain name (FQDN).
           </p>
           <EuiFieldText
             placeholder="Server address"
@@ -535,17 +534,13 @@ export const RegisterAgent = withErrorBoundary(
                   color="warning"
                   title={
                     <>
-                      Running this command on a host with an agent already installed upgrades the
-                      agent package without enrolling the agent. To enroll it, see the{' '}
-                      <EuiLink href="https://documentation.wazuh.com/current/user-manual/registering/index.html">
-                        Wazuh documentation
-                      </EuiLink>
-                      .
+                      If the installer finds another Wazuh agent in the system, it will upgrade it preserving the configuration.
                     </>
                   }
                   iconType="iInCircle"
                 />
                 <EuiSpacer />
+                {windowsAdvice}
                 <div className="copy-codeblock-wrapper">
                   <EuiCodeBlock style={codeBlock} language={language}>
                     {this.state.wazuhPassword && !this.state.showPassword ? this.obfuscatePassword(text) : text}
@@ -566,7 +561,6 @@ export const RegisterAgent = withErrorBoundary(
                   />
                 )}
                 <EuiSpacer />
-                {windowsAdvice}
               </EuiText>
             )}
         </div>
