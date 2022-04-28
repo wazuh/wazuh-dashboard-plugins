@@ -5,7 +5,7 @@ export class ModulesHelper {
     const $injector = getAngularModule().$injector;
     const location = $injector.get('$location');
     const initialTab = location.search().tab;
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       const checkExist = setInterval(() => {
         const app = getAngularModule();
         if (app.discoverScope) {
@@ -21,11 +21,9 @@ export class ModulesHelper {
   }
 
   static async cleanAvailableFields() {
-    const fields = document.querySelectorAll(
-      `.dscFieldChooser .dscFieldList--unpopular li`
-    );
+    const fields = document.querySelectorAll(`.dscFieldChooser .dscFieldList--unpopular li`);
     if (fields.length) {
-      fields.forEach(field => {
+      fields.forEach((field) => {
         const attr = field.getAttribute('data-attr-field');
         if (attr.startsWith('_')) {
           field.style.display = 'none';
@@ -35,15 +33,14 @@ export class ModulesHelper {
   }
 
   static hideCloseButtons = () => {
-    this.activeNoImplicitsFilters()
+    this.activeNoImplicitsFilters();
   };
 
   static activeNoImplicitsFilters() {
     const { filterManager } = getDataPlugin().query;
     const implicitFilters = filterManager.getFilters().filter((x) => {
-      return x.$state.isImplicit
-    }
-    );
+      return x.$state.isImplicit;
+    });
     if (!(implicitFilters || []).length) {
       setTimeout(() => {
         this.activeNoImplicitsFilters();
@@ -54,30 +51,35 @@ export class ModulesHelper {
     for (let i = 0; i < allFilters.length; i++) {
       const data = allFilters[i].attributes['data-test-subj'];
       let found = false;
-      (implicitFilters || []).forEach(mooduleFilter => {
+      (implicitFilters || []).forEach((moduleFilter) => {
         // Checks if the filter is already in use
         // Check which of the filters are from the module view and which are not pinned filters
-        if(!mooduleFilter.used){
-          const objKey = mooduleFilter.query?.match ? Object.keys(mooduleFilter.query.match)[0] : mooduleFilter.meta.key;
-          const objValue = mooduleFilter.query?.match ? mooduleFilter.query.match[objKey].query : mooduleFilter.meta.value;
+        if (!moduleFilter.used) {
+          const objKey = moduleFilter.query?.match
+            ? Object.keys(moduleFilter.query.match)[0]
+            : moduleFilter.meta.key;
+          const objValue = moduleFilter.query?.match
+            ? moduleFilter.query.match[objKey].query
+            : moduleFilter.meta.value;
           const key = `filter-key-${objKey}`;
           const value = `filter-value-${objValue}`;
 
-          const noExcludedValues = !data.value.includes('filter-pinned') && !data.value.includes('filter-negated') 
-          const acceptedValues = data.value.includes(key) && data.value.includes(value)
+          const noExcludedValues =
+            !data.value.includes('filter-pinned') && !data.value.includes('filter-negated');
+          const acceptedValues = data.value.includes(key) && data.value.includes(value);
 
-          if ( acceptedValues && noExcludedValues) {
+          if (acceptedValues && noExcludedValues) {
             found = true;
-            mooduleFilter.used = true;
+            moduleFilter.used = true;
           }
         }
       });
       if (!found) {
-        $(allFilters[i]).siblings('.euiBadge__iconButton').removeClass('hide-close-button');       
-        $(allFilters[i]).off('click'); 
+        $(allFilters[i]).siblings('.euiBadge__iconButton').removeClass('hide-close-button');
+        $(allFilters[i]).off('click');
       } else {
         $(allFilters[i]).siblings('.euiBadge__iconButton').addClass('hide-close-button');
-        $(allFilters[i]).on('click', ev => {
+        $(allFilters[i]).on('click', (ev) => {
           ev.stopPropagation();
         });
       }
