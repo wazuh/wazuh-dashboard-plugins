@@ -49,31 +49,35 @@ export class ModulesHelper {
         this.activeNoImplicitsFilters();
       }, 100);
     }
-    const filters = $(`.globalFilterItem .euiBadge__childButton`);
-    for (let i = 0; i < filters.length; i++) {
-      const data = filters[i].attributes[3];
+    // With the filter classes decide if they are from the module view or not
+    const allFilters = $(`.globalFilterItem .euiBadge__childButton`);
+    for (let i = 0; i < allFilters.length; i++) {
+      const data = allFilters[i].attributes['data-test-subj'];
       let found = false;
-      (implicitFilters || []).forEach(x => {
-        // The IF: checks if the filter is already in use
-        // Check which of the filters are from the view and which are not pinned filters
-        if(!x.used){
-          const objKey = x.query && x.query.match ? Object.keys(x.query.match)[0] : x.meta.key;
-          const objValue = x.query && x.query.match ? x.query.match[objKey].query : x.meta.value;
+      (implicitFilters || []).forEach(mooduleFilter => {
+        // Checks if the filter is already in use
+        // Check which of the filters are from the module view and which are not pinned filters
+        if(!mooduleFilter.used){
+          const objKey = mooduleFilter.query?.match ? Object.keys(mooduleFilter.query.match)[0] : mooduleFilter.meta.key;
+          const objValue = mooduleFilter.query?.match ? mooduleFilter.query.match[objKey].query : mooduleFilter.meta.value;
           const key = `filter-key-${objKey}`;
           const value = `filter-value-${objValue}`;
-          //
-          if (data.value.includes(key) && data.value.includes(value) && !data.value.includes('filter-pinned')) {
+
+          const noExcludedValues = !data.value.includes('filter-pinned') && !data.value.includes('filter-negated') 
+          const acceptedValues = data.value.includes(key) && data.value.includes(value)
+
+          if ( acceptedValues && noExcludedValues) {
             found = true;
-            x.used = true;
+            mooduleFilter.used = true;
           }
         }
       });
       if (!found) {
-        $(filters[i]).siblings('.euiBadge__iconButton').removeClass('hide-close-button');       
-        $(filters[i]).off('click'); 
+        $(allFilters[i]).siblings('.euiBadge__iconButton').removeClass('hide-close-button');       
+        $(allFilters[i]).off('click'); 
       } else {
-        $(filters[i]).siblings('.euiBadge__iconButton').addClass('hide-close-button');
-        $(filters[i]).on('click', ev => {
+        $(allFilters[i]).siblings('.euiBadge__iconButton').addClass('hide-close-button');
+        $(allFilters[i]).on('click', ev => {
           ev.stopPropagation();
         });
       }
