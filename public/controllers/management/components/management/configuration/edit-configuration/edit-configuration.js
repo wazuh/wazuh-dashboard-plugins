@@ -97,10 +97,10 @@ class WzEditConfiguration extends Component {
       });
     } catch (error) {
       let errorMessage;
-      if (error.details) {
-        errorMessage = `File ossec.conf saved, but there were found several error while validating the configuration. ${error.details}`;
-      } else {
-        errorMessage = 'Error saving configuration';
+      if (error instanceof Error) {
+        errorMessage = error.details
+          ? `Configuration saved, but some validation errors were found.\n${error.details}`
+          : String(error);
       }
       this.setState({ saving: false, infoChangesAfterRestart: false });
       const options = {
@@ -109,8 +109,8 @@ class WzEditConfiguration extends Component {
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         error: {
           error: error,
-          message: errorMessage || error,
-          title: `${error.name}: Mitre alerts could not be fetched`,
+          message: errorMessage || error,
+          title: "The configuration couldn't be saved.",
         },
       };
       getErrorOrchestrator().handleError(options);
