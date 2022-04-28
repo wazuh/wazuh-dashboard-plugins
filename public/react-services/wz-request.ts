@@ -88,13 +88,13 @@ export class WzRequest {
           return this.genericReq(method, path, payload, customTimeout, false);
         } catch (error) {
           return ((error || {}).data || {}).message || false
-            ? Promise.reject(this.customErroMessage(error, error.data.message))
-            : Promise.reject(this.customErroMessage(error, error.message));
+            ? Promise.reject(error.data.message)
+            : Promise.reject(error.message || error);
         }
       }
       return errorMessage
-        ? Promise.reject(this.customErroMessage(error, errorMessage))
-        : Promise.reject(this.customErroMessage(error,'Server did not respond'));
+        ? Promise.reject(errorMessage)
+        : Promise.reject(error || 'Server did not respond');
     }
   }
 
@@ -121,14 +121,18 @@ export class WzRequest {
         const failed_ids =
           ((((response.data || {}).data || {}).failed_items || [])[0] || {}).id || {};
         const message = (response.data || {}).message || 'Unexpected error';
-        const errorMessage = `${message} (${error.code}) - ${error.message} ${failed_ids && failed_ids.length > 1 ? ` Affected ids: ${failed_ids} ` : ''}`
-        return Promise.reject(this.customErroMessage(null, errorMessage));
+
+        return Promise.reject(
+          `${message} (${error.code}) - ${error.message} ${
+            failed_ids && failed_ids.length > 1 ? ` Affected ids: ${failed_ids} ` : ''
+          }`
+        );
       }
       return Promise.resolve(response);
     } catch (error) {
       return ((error || {}).data || {}).message || false
-        ? Promise.reject(this.customErroMessage(error, error.data.message))
-        : Promise.reject(this.customErroMessage(error, error.message));
+        ? Promise.reject(error.data.message)
+        : Promise.reject(error.message || error);
     }
   }
 
@@ -151,19 +155,5 @@ export class WzRequest {
         ? Promise.reject(error.data.message)
         : Promise.reject(error.message || error);
     }
-  }
-
-  /**
-   * Customize message and return an error object
-   * @param error 
-   * @param message 
-   * @returns error
-   */
-  static customErroMessage(error, message){
-    if(!error || typeof error === 'string'){
-      return new Error(message || error);
-    }
-    error.message = message
-    return error
   }
 }
