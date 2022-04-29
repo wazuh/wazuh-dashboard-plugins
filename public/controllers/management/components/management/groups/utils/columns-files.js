@@ -11,7 +11,7 @@ export default class GroupsFilesColumns {
     const { itemDetail } = this.tableProps.state;
     this.groupsHandler = GroupsHandler;
 
-    this.showFile = async(item) => {
+    this.actionFile = async (item, edit) => {
       let result = await this.groupsHandler.getFileContent(
         `/groups/${itemDetail.name}/files/${item.filename}/xml`
       );
@@ -20,40 +20,21 @@ export default class GroupsFilesColumns {
         result = '';
       }
 
-      const data =  typeof result === 'object'
-          ? JSON.stringify(result, null, 2)
-          : result.toString()
+      const data = edit
+        ? this.autoFormat(result)
+        : typeof result === 'object'
+        ? JSON.stringify(result, null, 2)
+        : result.toString();
 
       const file = {
         name: item.filename,
         content: data,
-        isEditable: false,
-        groupName: itemDetail.name
-      };
-
-      this.tableProps.updateFileContent(file);
-    }
-
-    this.editFile = async (item) => {
-
-      let result = await this.groupsHandler.getFileContent(
-        `/groups/${itemDetail.name}/files/${item.filename}/xml`
-      );
-      if (Object.keys(result).length == 0) {
-        result = '';
-      }
-
-      const data = this.autoFormat(result);
-
-      const file = {
-        name: 'agent.conf',
-        content: data,
-        isEditable: true,
+        isEditable: edit,
         groupName: itemDetail.name,
       };
 
       this.tableProps.updateFileContent(file);
-    }
+    };
 
     this.buildColumns = () => {
       this.columns = [
@@ -80,24 +61,21 @@ export default class GroupsFilesColumns {
                 <EuiButtonIcon
                   aria-label="See file content"
                   iconType="eye"
-                  onClick={() => this.showFile(item)}
+                  onClick={() => this.actionFile(item, false)}
                   color="primary"
                 />
               </EuiToolTip>
-              {
-                item.filename === 'agent.conf' &&
+              {item.filename === 'agent.conf' && (
                 <WzButtonPermissions
                   buttonType="icon"
                   aria-label="Edit content"
                   iconType="pencil"
-                  permissions={[
-                    { action: 'group:read', resource: `group:id:${itemDetail.name}` },
-                  ]}
+                  permissions={[{ action: 'group:read', resource: `group:id:${itemDetail.name}` }]}
                   tooltip={{ position: 'top', content: `Edit ${item.filename}` }}
-                  onClick={() => this.editFile(item)}
+                  onClick={() => this.actionFile(item, true)}
                   color="primary"
                 />
-              }
+              )}
             </div>
           );
         }
