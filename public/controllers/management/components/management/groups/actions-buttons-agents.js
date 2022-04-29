@@ -238,6 +238,7 @@ class WzGroupsActionButtonsAgents extends Component {
         hideSelect
       />
     );
+    
     // Export button
     const exportCSVButton = (
       <EuiButtonEmpty
