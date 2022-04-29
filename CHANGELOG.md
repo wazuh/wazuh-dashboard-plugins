@@ -2,7 +2,7 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v4.3.0 - Kibana 7.10.2 , 7.16.3, 7.17.0, 7.17.1, 7.17.2, 7.17.3 - Revision 4301
+## Wazuh v4.3.0 - Kibana 7.10.2 , 7.16.x, 7.17.x - Revision 4301
 
 ### Added
 
@@ -62,6 +62,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added new fields of `Vulnerabilities` to the details flyout [#3893](https://github.com/wazuh/wazuh-kibana-app/pull/3893) [#3908](https://github.com/wazuh/wazuh-kibana-app/pull/3908)
 - Added missing fields used in visualizations to the known fiels related to alerts [#3924](https://github.com/wazuh/wazuh-kibana-app/pull/3924)
 - Added troubleshooting link to "index pattern was refreshed" toast [#3946](https://github.com/wazuh/wazuh-kibana-app/pull/3946)
+- Added more number options to the tables widget in Modules -> "Mitre" [#4041](https://github.com/wazuh/wazuh-kibana-app/pull/4066)
 
 ### Changed
 
