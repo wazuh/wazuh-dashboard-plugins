@@ -63,7 +63,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added missing fields used in visualizations to the known fiels related to alerts [#3924](https://github.com/wazuh/wazuh-kibana-app/pull/3924)
 - Added troubleshooting link to "index pattern was refreshed" toast [#3946](https://github.com/wazuh/wazuh-kibana-app/pull/3946)
 - Added more number options to the tables widget in Modules -> "Mitre" [#4041](https://github.com/wazuh/wazuh-kibana-app/pull/4066)
-
+- Management -> groups -> agent: Selectors appear when there are more than 3 options [#4126](https://github.com/wazuh/wazuh-kibana-app/pull/4126)
 ### Changed
 
 - Changed ossec to wazuh in sample-data [#3121](https://github.com/wazuh/wazuh-kibana-app/pull/3121)
