@@ -2,11 +2,7 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-<<<<<<< HEAD
 ## Wazuh v4.3.0 - OpenSearch Dashboards 1.2.0 - Revision 4301
-=======
-## Wazuh v4.3.0 - Kibana 7.10.2 , 7.16.x, 7.17.x - Revision 4301
->>>>>>> origin/4.3-7.10
 
 ### Added
 

@@ -425,11 +425,7 @@ export const RegisterAgent = withErrorBoundary(
       const ipInput = (
         <EuiText>
           <p>
-<<<<<<< HEAD
-            You can predefine the Wazuh server address with the <EuiCode>enrollment.dns</EuiCode> setting.
-=======
             This is the address the agent uses to communicate with the Wazuh server. It can be an IP address or a fully qualified domain name (FQDN).
->>>>>>> origin/4.3-7.10
           </p>
           <EuiFieldText
             placeholder="Server address"
