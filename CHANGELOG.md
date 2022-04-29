@@ -87,6 +87,9 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Refactored the table in `Vulnerabilities/Inventory` [#3196](https://github.com/wazuh/wazuh-kibana-app/pull/3196)
 - Changed Google Groups app icons  [#3949](https://github.com/wazuh/wazuh-kibana-app/pull/3949)
 - Removed sorting for `Agents` or `Configuration checksum` column in the table of `Management/Groups` due to this is not supported by the API [#3857](https://github.com/wazuh/wazuh-kibana-app/pull/3857)
+- Changed messages in the agent installation guide [#4040](https://github.com/wazuh/wazuh-kibana-app/pull/4040)
+- Changed the default `wazuh.statistics.shards` setting from `2` to `1` [#4055](https://github.com/wazuh/wazuh-kibana-app/pull/4055)
+- Removed the migration tasks in the `.wazuh` and `.wazuh-version` indices [#4098](https://github.com/wazuh/wazuh-kibana-app/pull/4098)
 
 ### Fixed
 
@@ -151,8 +154,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed github/office365 multi-select filters suggested values [#3787](https://github.com/wazuh/wazuh-kibana-app/pull/3787)
 - Fixed the styles on the evolution card [#3796](https://github.com/wazuh/wazuh-kibana-app/pull/3796)
 - Fixed internal user no longer needs permission to make x-pack detection request [#3831](https://github.com/wazuh/wazuh-kibana-app/pull/3831)
-- Fixed agents details card style [#3845](https://github.com/wazuh/wazuh-kibana-app/pull/3845)  [#3860](https://github.com/wazuh/wazuh-kibana-app/pull/3860)
-- Fixed agents evolutions card [#3854](https://github.com/wazuh/wazuh-kibana-app/pull/3854)
+- Fixed agents details card style [#3845](https://github.com/wazuh/wazuh-kibana-app/pull/3845) [#3860](https://github.com/wazuh/wazuh-kibana-app/pull/3860)
+- Fixed search bar query sanitizing in PDF report [#3861](https://github.com/wazuh/wazuh-kibana-app/pull/3861)
 - Fixed routing redirection in events documents discover links [#3866](https://github.com/wazuh/wazuh-kibana-app/pull/3866)
 - Fixed health-check [#3868](https://github.com/wazuh/wazuh-kibana-app/pull/3868)
 - Fixed an error when generating PDF reports due to Wazuh API token expiration [#3881](https://github.com/wazuh/wazuh-kibana-app/pull/3881)
@@ -162,9 +165,12 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed a rendering problem in the map visualizations [#3942](https://github.com/wazuh/wazuh-kibana-app/pull/3942)
 - Parse error when using `#` character not at the beginning of the line [#3877](https://github.com/wazuh/wazuh-kibana-app/pull/3877)
 - Fixed the `rule.mitre.id` cell enhancement that doesn't support values with sub techniques [#3944](https://github.com/wazuh/wazuh-kibana-app/pull/3944)
-- Fixed error not working the alerts displayed when changin the selected time in some flyouts [#3947](https://github.com/wazuh/wazuh-kibana-app/pull/3947)
+- Fixed error not working the alerts displayed when changing the selected time in some flyouts [#3947](https://github.com/wazuh/wazuh-kibana-app/pull/3947) [#4115](https://github.com/wazuh/wazuh-kibana-app/pull/4115)
 - Fixed the user can not logout when the Kibana server has a basepath configurated [#3957](https://github.com/wazuh/wazuh-kibana-app/pull/3957)
 - Fixed fatal cron-job error when Wazuh API is down [#3991](https://github.com/wazuh/wazuh-kibana-app/pull/3991)
+- Fixed agent breadcrumb routing minor error [#4101](https://github.com/wazuh/wazuh-kibana-app/pull/4101)
+- Fixed selected text not visible in API Console [#4102](https://github.com/wazuh/wazuh-kibana-app/pull/4102)
+- Fixed the 'missing parameters' error on the Manager Logs [#4110](https://github.com/wazuh/wazuh-kibana-app/pull/4110)
 
 ## Wazuh v4.2.6 - Kibana 7.10.2, 7.11.2, 7.12.1, 7.13.0, 7.13.1, 7.13.2, 7.13.3, 7.13.4, 7.14.0, 7.14.1, 7.14.2 - Revision 4207
 
