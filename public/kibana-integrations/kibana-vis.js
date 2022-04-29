@@ -466,6 +466,38 @@ class KibanaVis extends Component {
               paddingTop: '2%' 
             }}
           ></div>
+          <div style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+              }}>
+                {(isLoading && <div><EuiLoadingChart size="xl" /></div>)
+                  || (this.deadField && !isLoading && !this.state.visRefreshingIndex && (
+                    <div>
+                      No results found &nbsp;
+                      <EuiToolTip
+                        position="top"
+                        content={
+                          <span>
+                            No alerts were found with the field: <strong>{this.deadField}</strong>
+                          </span>
+                        }
+                      >
+                        <EuiIcon type="iInCircle" />
+                      </EuiToolTip>
+                    </div>
+                  ))
+                  || (this.state.visRefreshingIndex && (
+                    <EuiFlexGroup justifyContent="center" alignItems="center">
+                      <EuiFlexItem grow={false}>
+                        <EuiLoadingSpinner size="xl" />
+                      </EuiFlexItem>
+                      <EuiFlexItem grow={false}>Refreshing Index Pattern.</EuiFlexItem>
+                    </EuiFlexGroup>
+                  ))
+                }
+          </div>
         </span>
       )
     );

@@ -109,7 +109,7 @@ export const PanelModuleConfiguration : FunctionalComponent<{h: string}> = conne
           </EuiTitle>
         </EuiFlexItem>
       </EuiFlexGroup>
-      <EuiFlexGroup>
+      <EuiFlexGroup direction="column">
         <EuiFlexItem>
           <ConfigurationWrapper configurations={asyncAction.data} settings={settings} loading={asyncAction.running} error={asyncAction.error}/>
         </EuiFlexItem>

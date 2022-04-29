@@ -104,7 +104,7 @@ export const EventsEnhanceDiscoverCell = {
     },
     currentTechnique: content
   }), {
-    contentRegex: /(\w+)/g,
+    contentRegex: /(T\d+\.?(\d+)?)/g,
     element: 'span'
   }),
   'syscheck.value_name': (content, rowData, element, options) => {
