@@ -90,6 +90,7 @@ export default compose(
 
         this.setState(
           {
+            generatingCsv: false,
             selectedNode,
             selectedDaemon: 'all',
             logLevelSelect: 'all',
@@ -382,6 +383,7 @@ export default compose(
 
     exportFormatted = async () => {
       try {
+        this.setState({generatingCsv: true})
         this.showToast('success', 'Your download should begin automatically...', 3000);
         const filters = this.buildFilters();
         await exportCsv(
@@ -401,9 +403,10 @@ export default compose(
             title: error.name,
           },
         };
-
+        this.setState({generatingCsv: false})
         getErrorOrchestrator().handleError(options);
       }
+      this.setState({generatingCsv: false})
     };
 
     header() {
@@ -422,7 +425,10 @@ export default compose(
             <EuiFlexItem grow={false}>
               <EuiFlexGroup>
                 <EuiFlexItem grow={false}>
-                  <EuiButtonEmpty iconType="importAction" onClick={this.exportFormatted}>
+                  <EuiButtonEmpty 
+                    iconType="importAction" 
+                    onClick={this.exportFormatted}
+                    isLoading={this.state.generatingCsv}>
                     Export formatted
                   </EuiButtonEmpty>
                 </EuiFlexItem>
