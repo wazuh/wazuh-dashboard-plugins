@@ -403,7 +403,6 @@ export default compose(
             title: error.name,
           },
         };
-        this.setState({generatingCsv: false})
         getErrorOrchestrator().handleError(options);
       }
       this.setState({generatingCsv: false})
