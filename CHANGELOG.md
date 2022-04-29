@@ -167,6 +167,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed agent breadcrumb routing minor error [#4101](https://github.com/wazuh/wazuh-kibana-app/pull/4101)
 - Fixed selected text not visible in API Console [#4102](https://github.com/wazuh/wazuh-kibana-app/pull/4102)
 - Fixed the 'missing parameters' error on the Manager Logs [#4110](https://github.com/wazuh/wazuh-kibana-app/pull/4110)
+- Fixed "See full error" on error toast [#4119](https://github.com/wazuh/wazuh-kibana-app/pull/4119)
 - Fixed not being able to remove custom filters. [#4112](https://github.com/wazuh/wazuh-kibana-app/pull/4112)
 - Fixed spinner not showing when export button is clicked in management views [#4120](https://github.com/wazuh/wazuh-kibana-app/pull/4120)
 
