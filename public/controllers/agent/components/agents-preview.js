@@ -15,18 +15,15 @@ import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import {
   EuiPage,
-  EuiPanel,
   EuiFlexGroup,
   EuiFlexItem,
   EuiStat,
   EuiLoadingChart,
   EuiSpacer,
-  EuiEmptyPrompt,
   EuiToolTip,
   EuiCard,
 } from '@elastic/eui';
 import { Pie } from '../../../components/d3/pie';
-import { ProgressChart } from '../../../components/d3/progress';
 import { AgentsTable } from './agents-table';
 import { WzRequest } from '../../../react-services/wz-request';
 import KibanaVis from '../../../kibana-integrations/kibana-vis';
@@ -36,7 +33,6 @@ import { AppState } from '../../../react-services/app-state';
 import { FilterHandler } from '../../../utils/filter-handler';
 import { TabVisualizations } from '../../../factories/tab-visualizations';
 import { WazuhConfig } from './../../../react-services/wazuh-config.js';
-import { WzDatePicker } from '../../../components/wz-date-picker/wz-date-picker';
 import {
   withReduxProvider,
   withGlobalBreadcrumb,
@@ -73,7 +69,7 @@ export const AgentsPreview = compose(
         data: [],
         loading: false,
         showAgentsEvolutionVisualization: false,
-        agentTableFilters: [],
+        agentTableFilters: []
       };
       this.wazuhConfig = new WazuhConfig();
       this.agentStatusLabelToIDMap = {
@@ -87,7 +83,9 @@ export const AgentsPreview = compose(
       this._isMount = true;
       this.getSummary();
       if (this.wazuhConfig.getConfig()['wazuh.monitoring.enabled']) {
-        this._isMount && this.setState({ showAgentsEvolutionVisualization: true });
+        this._isMount && this.setState({ 
+          showAgentsEvolutionVisualization: true 
+        });
         const tabVisualizations = new TabVisualizations();
         tabVisualizations.removeAll();
         tabVisualizations.setTab('general');
@@ -96,6 +94,7 @@ export const AgentsPreview = compose(
         });
         const filterHandler = new FilterHandler(AppState.getCurrentPattern());
         await VisFactoryHandler.buildOverviewVisualizations(filterHandler, 'general', null);
+        
       }
     }
 
@@ -344,11 +343,11 @@ export const AgentsPreview = compose(
                     description
                     paddingSize="none"
                     betaBadgeLabel="Evolution"
-                    style={{ display: this.props.resultState === 'ready' ? 'block' : 'none' }}
+                    style={{ display: this.props.resultState !== 'loading' ? 'block' : 'none' }}
                   >
                     <EuiFlexGroup>
                       <EuiFlexItem>
-                        <div style={{ height: this.props.resultState === 'ready' ? '180px' : 0 }}>
+                        <div style={{ height: this.props.resultState !== 'loading' ? '180px' : 0 }}>
                           <WzReduxProvider>
                             <KibanaVis
                               visID={'Wazuh-App-Overview-General-Agents-status'}
@@ -363,24 +362,6 @@ export const AgentsPreview = compose(
                         )}
                       </EuiFlexItem>
                     </EuiFlexGroup>
-                  </EuiCard>
-                  <EuiCard
-                    title
-                    description
-                    paddingSize="none"
-                    betaBadgeLabel="Evolution"
-                    style={{
-                      height: 193,
-                      display: this.props.resultState === 'none' ? 'block' : 'none',
-                    }}
-                  >
-                    <EuiEmptyPrompt
-                      className="wz-padding-21"
-                      iconType="alert"
-                      titleSize="xs"
-                      title={<h3>No results found in the selected time range</h3>}
-                      actions={<WzDatePicker condensed={true} onTimeChange={() => {}} />}
-                    />
                   </EuiCard>
                 </EuiFlexItem>
               )}
