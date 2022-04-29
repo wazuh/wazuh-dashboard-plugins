@@ -88,13 +88,13 @@ export class WzRequest {
           return this.genericReq(method, path, payload, customTimeout, false);
         } catch (error) {
           return ((error || {}).data || {}).message || false
-            ? Promise.reject(this.customErroMessage(error, error.data.message))
-            : Promise.reject(this.customErroMessage(error, error.message));
+            ? Promise.reject(this.returnErrorInstance(error, error.data.message))
+            : Promise.reject(this.returnErrorInstance(error, error.message));
         }
       }
       return errorMessage
-        ? Promise.reject(this.customErroMessage(error, errorMessage))
-        : Promise.reject(this.customErroMessage(error,'Server did not respond'));
+        ? Promise.reject(this.returnErrorInstance(error, errorMessage))
+        : Promise.reject(this.returnErrorInstance(error,'Server did not respond'));
     }
   }
 
@@ -122,13 +122,13 @@ export class WzRequest {
           ((((response.data || {}).data || {}).failed_items || [])[0] || {}).id || {};
         const message = (response.data || {}).message || 'Unexpected error';
         const errorMessage = `${message} (${error.code}) - ${error.message} ${failed_ids && failed_ids.length > 1 ? ` Affected ids: ${failed_ids} ` : ''}`
-        return Promise.reject(this.customErroMessage(null, errorMessage));
+        return Promise.reject(this.returnErrorInstance(null, errorMessage));
       }
       return Promise.resolve(response);
     } catch (error) {
       return ((error || {}).data || {}).message || false
-        ? Promise.reject(this.customErroMessage(error, error.data.message))
-        : Promise.reject(this.customErroMessage(error, error.message));
+        ? Promise.reject(this.returnErrorInstance(error, error.data.message))
+        : Promise.reject(this.returnErrorInstance(error, error.message));
     }
   }
 
@@ -148,8 +148,8 @@ export class WzRequest {
       return Promise.resolve(data);
     } catch (error) {
       return ((error || {}).data || {}).message || false
-        ? Promise.reject(error.data.message)
-        : Promise.reject(error.message || error);
+        ? Promise.reject(this.returnErrorInstance(error, error.data.message))
+        : Promise.reject(this.returnErrorInstance(error, error.message));
     }
   }
 
@@ -159,7 +159,7 @@ export class WzRequest {
    * @param message 
    * @returns error
    */
-  static customErroMessage(error, message){
+  static returnErrorInstance(error, message){
     if(!error || typeof error === 'string'){
       return new Error(message || error);
     }
