@@ -74,15 +74,7 @@ export const MainModuleOverview = connect(mapStateToProps)(class MainModuleOverv
       ];
       if (currentAgent.id) {
         breadcrumb.push({
-          className: "euiLink euiLink--subdued ",
-          onClick: (ev) => { ev.stopPropagation(); AppNavigate.navigateToModule(ev, 'agents', { "tab": "welcome", "agent": currentAgent.id }); this.router.reload(); },
-          id: "breadcrumbNoTitle",
-          truncate: true,
-          text: (
-            <EuiToolTip position="bottom" content={"View agent summary"} display="inlineBlock">
-              <span>{currentAgent.name}</span>
-            </EuiToolTip>
-          ),
+          agent: currentAgent
         })
       }
       breadcrumb.push({
