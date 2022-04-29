@@ -90,6 +90,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed messages in the agent installation guide [#4040](https://github.com/wazuh/wazuh-kibana-app/pull/4040)
 - Changed the default `wazuh.statistics.shards` setting from `2` to `1` [#4055](https://github.com/wazuh/wazuh-kibana-app/pull/4055)
 - Removed the migration tasks in the `.wazuh` and `.wazuh-version` indices [#4098](https://github.com/wazuh/wazuh-kibana-app/pull/4098)
+- Removed the two selectors located in 'management' -> 'groups' -> 'Agents' -> 'export PDF' [#4123](https://github.com/wazuh/wazuh-kibana-app/pull/4123)
 
 ### Fixed
 
