@@ -162,6 +162,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed error not working the alerts displayed when changing the selected time in some flyouts [#3947](https://github.com/wazuh/wazuh-kibana-app/pull/3947) [#4115](https://github.com/wazuh/wazuh-kibana-app/pull/4115)
 - Fixed the user can not logout when the Kibana server has a basepath configurated [#3957](https://github.com/wazuh/wazuh-kibana-app/pull/3957)
 - Fixed fatal cron-job error when Wazuh API is down [#3991](https://github.com/wazuh/wazuh-kibana-app/pull/3991)
+- Fixed circular re-directions when API errors are handled [#4079](https://github.com/wazuh/wazuh-kibana-app/pull/4079)
 - Fixed agent breadcrumb routing minor error [#4101](https://github.com/wazuh/wazuh-kibana-app/pull/4101)
 - Fixed selected text not visible in API Console [#4102](https://github.com/wazuh/wazuh-kibana-app/pull/4102)
 - Fixed the 'missing parameters' error on the Manager Logs [#4110](https://github.com/wazuh/wazuh-kibana-app/pull/4110)

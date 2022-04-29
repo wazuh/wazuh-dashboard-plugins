@@ -15,7 +15,6 @@ import { settingsWizard } from './settings-wizard';
 import { getSavedSearch } from './get-saved-search';
 import { getIp } from './get-ip';
 import { getWzConfig } from './get-config';
-import { apiCount } from './api-count';
 
 export {
   checkTimestamp,
@@ -24,5 +23,4 @@ export {
   getSavedSearch,
   getIp,
   getWzConfig,
-  apiCount
 };
