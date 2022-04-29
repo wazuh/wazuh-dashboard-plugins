@@ -148,7 +148,7 @@ export const ExportConfiguration = withErrorBoundary (class ExportConfiguration 
             Select all
         </EuiButtonEmpty><EuiSpacer size="s" /><EuiButtonEmpty size="xs" onClick={() => this.selectAll(false)}>
             Unselect all
-          </EuiButtonEmpty></>}
+          </EuiButtonEmpty></> }
         <EuiSpacer size="m" />
         <EuiButton
           isDisabled={this.state.buttonDisabled}
