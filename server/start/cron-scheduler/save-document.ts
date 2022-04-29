@@ -2,8 +2,8 @@ import { BulkIndexDocumentsParams } from 'elasticsearch';
 import { getConfiguration } from '../../lib/get-configuration';
 import { log } from '../../lib/logger';
 import { indexDate } from '../../lib/index-date';
-import { WAZUH_INDEX_SHARDS, WAZUH_INDEX_REPLICAS } from '../../../common/constants'
-import { tryCatchForIndexPermissionError } from '../tryCatchForIndexPermissionError'
+import { WAZUH_STATISTICS_DEFAULT_INDICES_SHARDS, WAZUH_STATISTICS_DEFAULT_INDICES_REPLICAS } from '../../../common/constants';
+import { tryCatchForIndexPermissionError } from '../tryCatchForIndexPermissionError';
 
 export interface IIndexConfiguration {
   name: string
@@ -53,8 +53,8 @@ export class SaveDocument {
             body: {
               settings: {
                 index: {
-                  number_of_shards: shards || WAZUH_INDEX_SHARDS,
-                  number_of_replicas: replicas || WAZUH_INDEX_REPLICAS
+                  number_of_shards: shards ?? WAZUH_STATISTICS_DEFAULT_INDICES_SHARDS,
+                  number_of_replicas: replicas ?? WAZUH_STATISTICS_DEFAULT_INDICES_REPLICAS
                 }
               }
             }

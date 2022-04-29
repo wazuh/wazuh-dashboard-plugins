@@ -21,6 +21,8 @@ import { connect } from 'react-redux';
 import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
 import { getAngularModule } from '../../../kibana-services';
 
+// TODO: check if this component is deprecated, if so remove it.
+// This component is wrapped by WzCurrentAgentsSectionWrapper
 class WzCurrentAgentsSection extends Component {
   constructor(props) {
     super(props);

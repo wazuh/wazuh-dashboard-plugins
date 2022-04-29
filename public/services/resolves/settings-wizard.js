@@ -106,7 +106,8 @@ export function settingsWizard(
       wzMisc.setWizard(true);
       if (redirect) {
         AppState.setCurrentAPI(redirect);
-      } else if (!$location.path().includes('/settings')) {
+      } else if (!$location.path().includes('/settings') &&
+        !$location.path().includes('/blank-screen')) {
         $location.search('_a', null);
         $location.search('tab', 'api');
         $location.path('/settings');
