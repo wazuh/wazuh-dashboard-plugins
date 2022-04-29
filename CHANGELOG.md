@@ -166,6 +166,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed agent breadcrumb routing minor error [#4101](https://github.com/wazuh/wazuh-kibana-app/pull/4101)
 - Fixed selected text not visible in API Console [#4102](https://github.com/wazuh/wazuh-kibana-app/pull/4102)
 - Fixed the 'missing parameters' error on the Manager Logs [#4110](https://github.com/wazuh/wazuh-kibana-app/pull/4110)
+- Fixed undefined input reference when switching between rule set view and rule files view [#4125](https://github.com/wazuh/wazuh-kibana-app/pull/4125)
 
 ## Wazuh v4.2.6 - Kibana 7.10.2, 7.11.2, 7.12.1, 7.13.0, 7.13.1, 7.13.2, 7.13.3, 7.13.4, 7.14.0, 7.14.1, 7.14.2 - Revision 4207
 
