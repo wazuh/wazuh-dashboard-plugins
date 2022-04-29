@@ -235,6 +235,7 @@ class WzGroupsActionButtonsAgents extends Component {
           )
         }
         type="group"
+        hideSelect
       />
     );
     // Export button

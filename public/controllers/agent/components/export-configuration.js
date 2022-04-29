@@ -143,13 +143,12 @@ export const ExportConfiguration = withErrorBoundary (class ExportConfiguration 
           compressed
         />
         <EuiSpacer size="s" />
-        <EuiButtonEmpty size="xs" onClick={() => this.selectAll(true)}>
-          Select all
-        </EuiButtonEmpty>
-        <EuiSpacer size="s" />
-        <EuiButtonEmpty size="xs" onClick={() => this.selectAll(false)}>
-          Unselect all
-        </EuiButtonEmpty>
+        { this.props.hideSelect === false && 
+        <><EuiButtonEmpty size="xs" onClick={() => this.selectAll(true)}>
+            Select all
+        </EuiButtonEmpty><EuiSpacer size="s" /><EuiButtonEmpty size="xs" onClick={() => this.selectAll(false)}>
+            Unselect all
+          </EuiButtonEmpty></>}
         <EuiSpacer size="m" />
         <EuiButton
           isDisabled={this.state.buttonDisabled}
@@ -166,8 +165,13 @@ export const ExportConfiguration = withErrorBoundary (class ExportConfiguration 
   }
 });
 
+ExportConfiguration.defaultProps = {
+  hideSelect: false
+};
+
 ExportConfiguration.propTypes = {
   exportConfiguration: PropTypes.func,
   type: PropTypes.string,
-  agentPlatform: PropTypes.string
+  agentPlatform: PropTypes.string,
+  hideSelect: PropTypes.bool
 };
