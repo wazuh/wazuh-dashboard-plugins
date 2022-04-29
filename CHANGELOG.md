@@ -63,7 +63,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added missing fields used in visualizations to the known fiels related to alerts [#3924](https://github.com/wazuh/wazuh-kibana-app/pull/3924)
 - Added troubleshooting link to "index pattern was refreshed" toast [#3946](https://github.com/wazuh/wazuh-kibana-app/pull/3946)
 - Added more number options to the tables widget in Modules -> "Mitre" [#4041](https://github.com/wazuh/wazuh-kibana-app/pull/4066)
-
+- Management -> groups -> agent: Selectors appear when there are more than 3 options [#4126](https://github.com/wazuh/wazuh-kibana-app/pull/4126)
 ### Changed
 
 - Changed ossec to wazuh in sample-data [#3121](https://github.com/wazuh/wazuh-kibana-app/pull/3121)
@@ -152,6 +152,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed search bar query sanitizing in PDF report [#3861](https://github.com/wazuh/wazuh-kibana-app/pull/3861)
 - Fixed routing redirection in events documents discover links [#3866](https://github.com/wazuh/wazuh-kibana-app/pull/3866)
 - Fixed health-check [#3868](https://github.com/wazuh/wazuh-kibana-app/pull/3868)
+- Fixed refreshing agents evolution visualization [#3894](https://github.com/wazuh/wazuh-kibana-app/pull/3894)
 - Fixed an error when generating PDF reports due to Wazuh API token expiration [#3881](https://github.com/wazuh/wazuh-kibana-app/pull/3881)
 - Fixed the table of Vulnerabilities/Inventory doesn't reload when changing the selected agent [#3901](https://github.com/wazuh/wazuh-kibana-app/pull/3901)
 - Fixed backslash breaking exported JSON result [#3909](https://github.com/wazuh/wazuh-kibana-app/pull/3909)
@@ -167,14 +168,11 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed selected text not visible in API Console [#4102](https://github.com/wazuh/wazuh-kibana-app/pull/4102)
 - Fixed the 'missing parameters' error on the Manager Logs [#4110](https://github.com/wazuh/wazuh-kibana-app/pull/4110)
 - Fixed undefined input reference when switching between rule set view and rule files view [#4125](https://github.com/wazuh/wazuh-kibana-app/pull/4125)
+- Fixed "See full error" on error toast [#4119](https://github.com/wazuh/wazuh-kibana-app/pull/4119)
+- Fixed not being able to remove custom filters. [#4112](https://github.com/wazuh/wazuh-kibana-app/pull/4112)
+- Fixed spinner not showing when export button is clicked in management views [#4120](https://github.com/wazuh/wazuh-kibana-app/pull/4120)
 
 ## Wazuh v4.2.6 - Kibana 7.10.2, 7.11.2, 7.12.1, 7.13.0, 7.13.1, 7.13.2, 7.13.3, 7.13.4, 7.14.0, 7.14.1, 7.14.2 - Revision 4207
-
-### Added
-
-- Support for Wazuh 4.2.6
-
-## Wazuh v4.2.5 - Kibana 7.10.2, 7.11.2, 7.12.1, 7.13.0, 7.13.1, 7.13.2, 7.13.3, 7.13.4, 7.14.0, 7.14.1, 7.14.2 - Revision 4206
 
 ### Added
 
