@@ -24,6 +24,7 @@ import store from '../redux/store';
 import { updateMetric } from '../redux/actions/visualizationsActions';
 import { GenericRequest } from '../react-services/generic-request';
 import { createSavedVisLoader } from './visualizations/saved_visualizations';
+import { WzDatePicker } from '../components/wz-date-picker/wz-date-picker';
 import {
   EuiLoadingChart,
   EuiLoadingSpinner,
@@ -31,6 +32,7 @@ import {
   EuiIcon,
   EuiFlexItem,
   EuiFlexGroup,
+  EuiEmptyPrompt
 } from '@elastic/eui';
 import {
   getAngularModule,
@@ -386,15 +388,84 @@ class KibanaVis extends Component {
     }
   };
 
+  showDateRangePicker = () => {
+    return !this.deadField && !this.state.visRefreshingIndex && this.visID === 'Wazuh-App-Overview-General-Agents-status'
+  }
+
+  DateRangePickerComponent = () => {
+    return (
+      <EuiFlexItem className="agents-evolutions-dpicker">
+        <WzDatePicker
+          condensed={true} 
+          onTimeChange={() => {}} 
+        />
+      </EuiFlexItem>
+    )
+  }
+
   render() {
     const isLoading = this.props.resultState === 'loading';
     return (
       this.visID && (
-        <div style={{position: 'relative', height: '100%'}}>
+        <span>
+          <div
+            style={{
+              display: this.state.visRefreshingIndex ? 'block' : 'none',
+              textAlign: 'center',
+              paddingTop: 100,
+            }}
+          >
+            <EuiFlexGroup style={{ placeItems: 'center' }}>
+              <EuiFlexItem></EuiFlexItem>
+              <EuiFlexItem grow={false}>
+                <EuiLoadingSpinner size="xl" />
+              </EuiFlexItem>
+              <EuiFlexItem grow={false}>Refreshing Index Pattern.</EuiFlexItem>
+
+              <EuiFlexItem></EuiFlexItem>
+            </EuiFlexGroup>
+          </div>
+          <div
+            style={{
+              display: isLoading && !this.state.visRefreshingIndex ? 'block' : 'none',
+              textAlign: 'center',
+              paddingTop: 100,
+            }}
+          >
+            <EuiLoadingChart size="xl" />
+          </div>
+          <div
+            style={{
+              display:
+                this.deadField && !isLoading && !this.state.visRefreshingIndex ? 'block' : 'none',
+              textAlign: 'center',
+              paddingTop: 100,
+            }}
+          >
+            No results found &nbsp;
+            <EuiToolTip
+              position="top"
+              content={
+                <span>
+                  No alerts were found with the field: <strong>{this.deadField}</strong>
+                </span>
+              }
+            >
+              <EuiIcon type="iInCircle" />
+            </EuiToolTip>
+          </div>
+          {   
+            !this.isLoading && this.showDateRangePicker() &&
+            this.DateRangePickerComponent()
+          }
           <div
             id={this.visID}
             vis-id={this.visID}
-            style={{ visibility: isLoading ? 'hidden' : 'visible', height: '100%' }}
+            style={{ 
+              display: isLoading ? 'none' : 'block', 
+              height: '100%',
+              paddingTop: '2%' 
+            }}
           ></div>
           <div style={{
                 position: 'absolute',
@@ -428,7 +499,7 @@ class KibanaVis extends Component {
                   ))
                 }
           </div>
-        </div>
+        </span>
       )
     );
   }

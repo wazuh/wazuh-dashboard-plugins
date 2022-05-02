@@ -2,6 +2,7 @@ import React from 'react';
 import { EuiToolTip, EuiButtonIcon } from '@elastic/eui';
 import GroupsHandler from '../utils/groups-handler';
 import beautifier from '../../../../../../utils/json-beautifier';
+import { WzButtonPermissions } from '../../../../../../components/common/permissions/button';
 
 export default class GroupsFilesColumns {
   constructor(tableProps) {
@@ -9,6 +10,31 @@ export default class GroupsFilesColumns {
 
     const { itemDetail } = this.tableProps.state;
     this.groupsHandler = GroupsHandler;
+
+    this.actionFile = async (item, edit) => {
+      let result = await this.groupsHandler.getFileContent(
+        `/groups/${itemDetail.name}/files/${item.filename}/xml`
+      );
+
+      if (Object.keys(result).length == 0) {
+        result = '';
+      }
+
+      const data = edit
+        ? this.autoFormat(result)
+        : typeof result === 'object'
+        ? JSON.stringify(result, null, 2)
+        : result.toString();
+
+      const file = {
+        name: item.filename,
+        content: data,
+        isEditable: edit,
+        groupName: itemDetail.name,
+      };
+
+      this.tableProps.updateFileContent(file);
+    };
 
     this.buildColumns = () => {
       this.columns = [
@@ -35,30 +61,21 @@ export default class GroupsFilesColumns {
                 <EuiButtonIcon
                   aria-label="See file content"
                   iconType="eye"
-                  onClick={async () => {
-                    let result = await this.groupsHandler.getFileContent(
-                      `/groups/${itemDetail.name}/files/${item.filename}/xml`
-                    );
-                    if (Object.keys(result).length == 0) {
-                      result = '';
-                    }
-                    const isEditable = item.filename === 'agent.conf';
-                    const data = !isEditable
-                      ? typeof result === 'object'
-                        ? JSON.stringify(result, null, 2)
-                        : result.toString()
-                      : this.autoFormat(result);
-                    const file = {
-                      name: item.filename,
-                      content: data,
-                      isEditable: isEditable,
-                      groupName: itemDetail.name
-                    };
-                    this.tableProps.updateFileContent(file);
-                  }}
+                  onClick={() => this.actionFile(item, false)}
                   color="primary"
                 />
               </EuiToolTip>
+              {item.filename === 'agent.conf' && (
+                <WzButtonPermissions
+                  buttonType="icon"
+                  aria-label="Edit content"
+                  iconType="pencil"
+                  permissions={[{ action: 'group:read', resource: `group:id:${itemDetail.name}` }]}
+                  tooltip={{ position: 'top', content: `Edit ${item.filename}` }}
+                  onClick={() => this.actionFile(item, true)}
+                  color="primary"
+                />
+              )}
             </div>
           );
         }

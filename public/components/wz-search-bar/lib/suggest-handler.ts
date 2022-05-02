@@ -41,7 +41,7 @@ export class SuggestHandler extends BaseHandler {
     ':': 'Equals',
   };
 
-  constructor(props, setInputValue) {
+  constructor(props, setInputValue, inputRef) {
     super();
     this.props = props;
     this.filters = props.filters;
@@ -50,6 +50,8 @@ export class SuggestHandler extends BaseHandler {
     this.suggestItems = props.suggestions;
     this.searchType = 'search';
     this.lastCall = 0;
+    if (inputRef)
+      this.inputRef = inputRef;
   }
 
   combine = (...args) => (input) => args.reduceRight((acc, arg) => (acc = arg(acc)), input);

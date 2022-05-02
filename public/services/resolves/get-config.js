@@ -12,11 +12,12 @@
 
 import {
   WAZUH_ALERTS_PATTERN,
-  WAZUH_INDEX_REPLICAS,
-  WAZUH_INDEX_SHARDS,
   WAZUH_MONITORING_DEFAULT_INDICES_SHARDS,
+  WAZUH_MONITORING_DEFAULT_INDICES_REPLICAS,
   WAZUH_MONITORING_PATTERN,
-  WAZUH_SAMPLE_ALERT_PREFIX
+  WAZUH_SAMPLE_ALERT_PREFIX,
+  WAZUH_STATISTICS_DEFAULT_INDICES_SHARDS,
+  WAZUH_STATISTICS_DEFAULT_INDICES_REPLICAS,
 } from "../../../common/constants";
 
 export async function getWzConfig($q, genericReq, wazuhConfig) {
@@ -53,7 +54,7 @@ export async function getWzConfig($q, genericReq, wazuhConfig) {
     'wazuh.monitoring.enabled': true,
     'wazuh.monitoring.frequency': 900,
     'wazuh.monitoring.shards': WAZUH_MONITORING_DEFAULT_INDICES_SHARDS,
-    'wazuh.monitoring.replicas': WAZUH_INDEX_REPLICAS,
+    'wazuh.monitoring.replicas': WAZUH_MONITORING_DEFAULT_INDICES_REPLICAS,
     'wazuh.monitoring.creation': 'w',
     'wazuh.monitoring.pattern': WAZUH_MONITORING_PATTERN,
     'cron.prefix': 'wazuh',
@@ -62,8 +63,8 @@ export async function getWzConfig($q, genericReq, wazuhConfig) {
     'cron.statistics.interval': '0 */5 * * * *',
     'cron.statistics.index.name': 'statistics',
     'cron.statistics.index.creation': 'w',
-    'cron.statistics.index.shards': WAZUH_INDEX_SHARDS,
-    'cron.statistics.index.replicas': WAZUH_INDEX_REPLICAS,
+    'cron.statistics.index.shards': WAZUH_STATISTICS_DEFAULT_INDICES_SHARDS,
+    'cron.statistics.index.replicas': WAZUH_STATISTICS_DEFAULT_INDICES_REPLICAS,
     'alerts.sample.prefix': WAZUH_SAMPLE_ALERT_PREFIX,
     hideManagerAlerts: false,
     'logs.level': 'info',
