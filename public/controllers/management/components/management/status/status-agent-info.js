@@ -82,7 +82,7 @@ export class WzStatusAgentInfo extends Component {
           <EuiFlexItem style={greyStyle}>{agentInfo.ip}</EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup>
-          <EuiFlexItem>Date add</EuiFlexItem>
+          <EuiFlexItem>Date added</EuiFlexItem>
           <EuiFlexItem style={greyStyle}>{formatUIDate(agentInfo.dateAdd)}</EuiFlexItem>
         </EuiFlexGroup>
         {status !== 'never_connected' && (
