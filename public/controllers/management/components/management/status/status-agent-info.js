@@ -75,7 +75,7 @@ export class WzStatusAgentInfo extends Component {
         </EuiFlexGroup>
         <EuiFlexGroup>
           <EuiFlexItem>Status</EuiFlexItem>
-          <EuiFlexItem style={greyStyle}>{agentInfo.status.charAt(0).toUpperCase() + status.slice(1)}</EuiFlexItem>
+          <EuiFlexItem style={{...greyStyle, textTransform: 'capitalize'}}>{agentInfo.status}</EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup>
           <EuiFlexItem>IP Address</EuiFlexItem>
