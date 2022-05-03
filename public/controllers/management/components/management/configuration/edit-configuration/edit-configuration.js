@@ -106,7 +106,7 @@ class WzEditConfiguration extends Component {
         error: {
           error: error,
           message: errorMessage || error,
-          title: "The configuration couldn't be saved.",
+          title: "Error found saving the file.",
         },
       };
       getErrorOrchestrator().handleError(options);
