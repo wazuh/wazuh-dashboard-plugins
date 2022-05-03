@@ -89,7 +89,7 @@ export class WazuhReportingCtrl {
     }
 
     if (searchBar) {
-      str += ' AND ' + searchBar;
+      str += ` AND (${ searchBar})`;
     }
 
     const agentsFilterStr = agentsFilter.map((filter) => filter.meta.value).join(',');

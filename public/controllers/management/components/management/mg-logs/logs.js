@@ -43,11 +43,7 @@ import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchest
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 
 export default compose(
-  withGlobalBreadcrumb([
-    { text: '' },
-    { text: 'Management', href: '#/manager' },
-    { text: 'Logs' }
-  ]),
+  withGlobalBreadcrumb([{ text: '' }, { text: 'Management', href: '#/manager' }, { text: 'Logs' }]),
   withUserAuthorizationPrompt([
     { action: 'cluster:status', resource: '*:*:*' },
     { action: 'cluster:read', resource: 'node:id:*' },
@@ -94,6 +90,7 @@ export default compose(
 
         this.setState(
           {
+            generatingCsv: false,
             selectedNode,
             selectedDaemon: 'all',
             logLevelSelect: 'all',
@@ -139,23 +136,20 @@ export default compose(
     }
 
     async initDaemonsList(logsPath) {
-      const daemonsNotIncluded = [
-        'wazuh-modulesd:task-manager',
-        'wazuh-modulesd:agent-upgrade'
-      ]
+      const daemonsNotIncluded = ['wazuh-modulesd:task-manager', 'wazuh-modulesd:agent-upgrade'];
       try {
         const path = logsPath + '/summary';
         const data = await WzRequest.apiReq('GET', path, {});
         const formattedData = (((data || {}).data || {}).data || {}).affected_items;
         const daemonsList = [...['all']];
         for (const daemon of formattedData) {
-          if(!daemonsNotIncluded.includes(Object.keys(daemon)[0])){
+          if (!daemonsNotIncluded.includes(Object.keys(daemon)[0])) {
             daemonsList.push(Object.keys(daemon)[0]);
           }
         }
         this.setState({ daemonsList });
       } catch (error) {
-        throw new Error(error);
+        throw new Error('Error fetching daemons list: ' + error);
       }
     }
 
@@ -192,7 +186,13 @@ export default compose(
       const { logsPath } = this.state;
       let result = '';
       let totalItems = 0;
- 
+
+      // Avoid attempts to send invalid requests if the logsPath variable
+      // hasn't been intialized yet (caused by the onSearchBarSearch event).
+      if (logsPath === '') {
+        return result;
+      }
+
       try {
         const tmpResult = await WzRequest.apiReq('GET', logsPath, {
           params: this.buildFilters(customOffset),
@@ -201,7 +201,7 @@ export default compose(
         totalItems = ((tmpResult || {}).data.data || {}).total_affected_items;
         result = this.parseLogsToText(resultItems) || '';
       } catch (error) {
-        throw new Error(error);
+        throw new Error('Error fetching logs: ' + error);
       }
 
       this.setState({ totalItems });
@@ -258,7 +258,7 @@ export default compose(
 
         return { nodeList: '', logsPath: '/manager/logs', selectedNode: '' };
       } catch (error) {
-        throw new Error(error);
+        throw new Error('Error building logs path: ' + error);
       }
     }
 
@@ -383,6 +383,7 @@ export default compose(
 
     exportFormatted = async () => {
       try {
+        this.setState({generatingCsv: true})
         this.showToast('success', 'Your download should begin automatically...', 3000);
         const filters = this.buildFilters();
         await exportCsv(
@@ -402,9 +403,9 @@ export default compose(
             title: error.name,
           },
         };
-
         getErrorOrchestrator().handleError(options);
       }
+      this.setState({generatingCsv: false})
     };
 
     header() {
@@ -423,7 +424,10 @@ export default compose(
             <EuiFlexItem grow={false}>
               <EuiFlexGroup>
                 <EuiFlexItem grow={false}>
-                  <EuiButtonEmpty iconType="importAction" onClick={this.exportFormatted}>
+                  <EuiButtonEmpty 
+                    iconType="importAction" 
+                    onClick={this.exportFormatted}
+                    isLoading={this.state.generatingCsv}>
                     Export formatted
                   </EuiButtonEmpty>
                 </EuiFlexItem>

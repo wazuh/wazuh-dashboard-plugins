@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { ASSETS_BASE_URL_PREFIX, PLUGIN_APP_NAME } from "../../common/constants";
+import { ASSETS_BASE_URL_PREFIX, PLUGIN_APP_NAME, WAZUH_MONITORING_DEFAULT_INDICES_REPLICAS, WAZUH_MONITORING_DEFAULT_INDICES_SHARDS, WAZUH_STATISTICS_DEFAULT_INDICES_REPLICAS, WAZUH_STATISTICS_DEFAULT_INDICES_SHARDS } from "../../common/constants";
 
 export const initialWazuhConfig: string = `---
 #
@@ -114,8 +114,8 @@ export const initialWazuhConfig: string = `---
 #wazuh.monitoring.frequency: 900
 #
 # Configure wazuh-monitoring-* indices shards and replicas.
-#wazuh.monitoring.shards: 1
-#wazuh.monitoring.replicas: 0
+#wazuh.monitoring.shards: ${WAZUH_MONITORING_DEFAULT_INDICES_SHARDS}
+#wazuh.monitoring.replicas: ${WAZUH_MONITORING_DEFAULT_INDICES_REPLICAS}
 #
 # Configure wazuh-monitoring-* indices custom creation interval.
 # Values: h (hourly), d (daily), w (weekly), m (monthly)
@@ -158,8 +158,8 @@ export const initialWazuhConfig: string = `---
 #cron.statistics.index.creation: w
 #
 # Configure statistics indices shards and replicas.
-#cron.statistics.shards: 2
-#cron.statistics.replicas: 0
+#cron.statistics.shards: ${WAZUH_STATISTICS_DEFAULT_INDICES_SHARDS}
+#cron.statistics.replicas: ${WAZUH_STATISTICS_DEFAULT_INDICES_REPLICAS}
 #
 # ------------------------------ wazuh-logo-customization -------------------------------
 #

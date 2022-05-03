@@ -16,9 +16,8 @@ import { getConfiguration } from '../../lib/get-configuration';
 import { totalmem } from 'os';
 import fs from 'fs';
 import { ManageHosts } from '../../lib/manage-hosts';
-import { WAZUH_ALERTS_PATTERN, WAZUH_DATA_CONFIG_REGISTRY_PATH, WAZUH_INDEX, WAZUH_VERSION_INDEX, WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME, WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH, PLUGIN_APP_NAME, PLUGIN_PLATFORM_NAME, PLUGIN_PLATFORM_INSTALLATION_USER_GROUP, PLUGIN_PLATFORM_INSTALLATION_USER } from '../../../common/constants';
+import { WAZUH_ALERTS_PATTERN, WAZUH_DATA_CONFIG_REGISTRY_PATH, WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME, WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH, PLUGIN_APP_NAME, PLUGIN_PLATFORM_NAME, PLUGIN_PLATFORM_INSTALLATION_USER_GROUP, PLUGIN_PLATFORM_INSTALLATION_USER } from '../../../common/constants';
 import { createDataDirectoryIfNotExists } from '../../lib/filesystem';
-import { tryCatchForIndexPermissionError } from '../tryCatchForIndexPermissionError';
 
 const manageHosts = new ManageHosts();
 
@@ -92,75 +91,6 @@ export function jobInitializeRun(context) {
   };
 
   /**
-   * Checks if the .wazuh index exist in order to migrate to wazuh.yml
-   */
-  const checkWazuhIndex = tryCatchForIndexPermissionError(WAZUH_INDEX)( async () => {
-    log('initialize:checkWazuhIndex', `Checking ${WAZUH_INDEX} index.`, 'debug');
-    const result = await context.core.opensearch.client.asInternalUser.indices.exists({
-      index: WAZUH_INDEX
-    });
-    if (result.body) {
-      const data = await context.core.opensearch.client.asInternalUser.search({
-        index: WAZUH_INDEX,
-        size: 100
-      });
-      const apiEntries = (((data || {}).body || {}).hits || {}).hits || [];
-      await manageHosts.migrateFromIndex(apiEntries);
-      log(
-        'initialize:checkWazuhIndex',
-        `Index ${WAZUH_INDEX} will be removed and its content will be migrated to wazuh.yml`,
-        'debug'
-      );
-      // Check if all APIs entries were migrated properly and delete it from the .wazuh index
-      await checkProperlyMigrate();
-      await context.core.opensearch.client.asInternalUser.indices.delete({
-        index: WAZUH_INDEX
-      });
-    }
-  });
-
-  /**
-   * Checks if the API entries were properly migrated
-   * @param {Array} migratedApis
-   */
-  const checkProperlyMigrate = async () => {
-    try {
-      let apisIndex = await await context.core.opensearch.client.asInternalUser.search({
-        index: WAZUH_INDEX,
-        size: 100
-      });
-      const hosts = await manageHosts.getHosts();
-      apisIndex = ((apisIndex.body || {}).hits || {}).hits || [];
-
-      const apisIndexKeys = apisIndex.map(api => {
-        return api._id;
-      });
-      const hostsKeys = hosts.map(api => {
-        return Object.keys(api)[0];
-      });
-
-      // Get into an array the API entries that were not migrated, if the length is 0 then all the API entries were properly migrated.
-      const rest = apisIndexKeys.filter(k => {
-        return !hostsKeys.includes(k);
-      });
-
-      if (rest.length) {
-        throw new Error(
-          `Cannot migrate all API entries, missed entries: (${rest.toString()})`
-        );
-      }
-      log(
-        'initialize:checkProperlyMigrate',
-        'The API entries migration was successful',
-        'debug'
-      );
-    } catch (error) {
-      log('initialize:checkProperlyMigrate', `${error}`, 'error');
-      return Promise.reject(error);
-    }
-  };
-
-  /**
    * Checks if the .wazuh-version exists, in this case it will be deleted and the wazuh-registry.json will be created
    */
   const checkWazuhRegistry = async () => {
@@ -170,27 +100,6 @@ export function jobInitializeRun(context) {
         'Checking wazuh-version registry.',
         'debug'
       );
-      try {
-       const exists = await context.core.opensearch.client.asInternalUser.indices.exists({
-          index: WAZUH_VERSION_INDEX
-        });
-        if (exists.body){
-          await context.core.opensearch.client.asInternalUser.indices.delete({
-            index: WAZUH_VERSION_INDEX
-          });
-          log(
-            'initialize[checkwazuhRegistry]',
-            `Successfully deleted old ${WAZUH_VERSION_INDEX} index.`,
-            'debug'
-          );
-        };
-      } catch (error) {
-        log(
-          'initialize[checkwazuhRegistry]',
-          `No need to delete old ${WAZUH_VERSION_INDEX} index`,
-          'debug'
-        );
-      }
 
       if(!fs.existsSync(WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH)){
         throw new Error(`The data directory is missing in the ${PLUGIN_PLATFORM_NAME} root instalation. Create the directory in ${WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH} and give it the required permissions (sudo mkdir ${WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH};sudo chown -R ${PLUGIN_PLATFORM_INSTALLATION_USER}:${PLUGIN_PLATFORM_INSTALLATION_USER_GROUP} ${WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH}). After restart the ${PLUGIN_PLATFORM_NAME} service.`);
@@ -230,10 +139,7 @@ export function jobInitializeRun(context) {
 
   // Init function. Check for "wazuh-version" document existance.
   const init = async () => {
-    await Promise.all([
-      checkWazuhIndex(),
-      checkWazuhRegistry()
-    ]);
+    await checkWazuhRegistry();
   };
 
   const createKibanaTemplate = () => {
