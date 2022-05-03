@@ -64,6 +64,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added troubleshooting link to "index pattern was refreshed" toast [#3946](https://github.com/wazuh/wazuh-kibana-app/pull/3946)
 - Added more number options to the tables widget in Modules -> "Mitre" [#4041](https://github.com/wazuh/wazuh-kibana-app/pull/4066)
 - Management -> groups -> agent: Selectors appear when there are more than 3 options [#4126](https://github.com/wazuh/wazuh-kibana-app/pull/4126)
+
 ### Changed
 
 - Changed ossec to wazuh in sample-data [#3121](https://github.com/wazuh/wazuh-kibana-app/pull/3121)
@@ -172,6 +173,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed "See full error" on error toast [#4119](https://github.com/wazuh/wazuh-kibana-app/pull/4119)
 - Fixed not being able to remove custom filters. [#4112](https://github.com/wazuh/wazuh-kibana-app/pull/4112)
 - Fixed spinner not showing when export button is clicked in management views [#4120](https://github.com/wazuh/wazuh-kibana-app/pull/4120)
+- Correction of field and value in the section: last registered agent [#4127](https://github.com/wazuh/wazuh-kibana-app/pull/4127)
 
 ## Wazuh v4.2.6 - Kibana 7.10.2, 7.11.2, 7.12.1, 7.13.0, 7.13.1, 7.13.2, 7.13.3, 7.13.4, 7.14.0, 7.14.1, 7.14.2 - Revision 4207
 
@@ -1212,7 +1214,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Reviewed Osquery dashboards ([#1394](https://github.com/wazuh/wazuh-kibana-app/pull/1394))
 - Memory info is now a log ([#1400](https://github.com/wazuh/wazuh-kibana-app/pull/1400))
 - Error toasters time is now 30000ms, warning/info are still 6000ms ([#1420](https://github.com/wazuh/wazuh-kibana-app/pull/1420))
-- Correction of field and value in the section: last registered agent ([#4127](https://github.com/wazuh/wazuh-kibana-app/pull/4127))
 
 ### Fixed
 
