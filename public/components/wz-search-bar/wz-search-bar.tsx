@@ -101,7 +101,7 @@ function useSuggestHandler(
 
   useEffect(() => {
     setHandler(
-      new SuggestHandler({ ...props, status, setStatus, setInvalid, setIsOpen }, setInputValue)
+      new SuggestHandler({ ...props, status, setStatus, setInvalid, setIsOpen }, setInputValue, inputRef)
     );
     !props.noDeleteFiltersOnUpdateSuggests && props.onFiltersChange([]);
   }, [props.suggestions]);
