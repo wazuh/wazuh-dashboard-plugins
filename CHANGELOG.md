@@ -6,8 +6,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Added
 
-- Support for Kibana 7.16.3
-- Support for Kibana 7.17.0
+- Support for Kibana 7.16.x
+- Support for Kibana 7.17.x
 - Added GitHub and Office365 modules [#3557](https://github.com/wazuh/wazuh-kibana-app/pull/3557)
 - Added a new `Panel` module tab for GitHub and Office365 modules 
   [#3541](https://github.com/wazuh/wazuh-kibana-app/pull/3541) 
