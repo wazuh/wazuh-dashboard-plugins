@@ -16,11 +16,9 @@ import PropTypes from 'prop-types';
 import {
   EuiButton,
   EuiIcon,
-  EuiFlexGroup,
   EuiFlexItem,
   EuiText,
   EuiSpacer,
-  EuiLoadingSpinner,
   EuiOverlayMask,
   EuiConfirmModal,
   EuiCallOut,
@@ -50,8 +48,6 @@ import { getToasts } from '../../../../../..//kibana-services';
 
 import { connect } from 'react-redux';
 import { compose } from 'redux';
-import { AppState } from '../../../../../../react-services/app-state';
-import { ApiCheck } from '../../../../../../react-services/wz-api-check';
 
 import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
@@ -97,10 +93,10 @@ class WzEditConfiguration extends Component {
       });
     } catch (error) {
       let errorMessage;
-      if (error.details) {
-        errorMessage = `File ossec.conf saved, but there were found several error while validating the configuration. ${error.details}`;
-      } else {
-        errorMessage = 'Error saving configuration';
+      if (error instanceof Error) {
+        errorMessage = error.details
+          ? `Configuration saved, but some validation errors were found.\n${error.details}`
+          : String(error);
       }
       this.setState({ saving: false, infoChangesAfterRestart: false });
       const options = {
@@ -109,8 +105,8 @@ class WzEditConfiguration extends Component {
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         error: {
           error: error,
-          message: errorMessage || error,
-          title: `${error.name}: Mitre alerts could not be fetched`,
+          message: errorMessage || error,
+          title: "Error found saving the file.",
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -122,19 +118,19 @@ class WzEditConfiguration extends Component {
   refresh() {
     try {
       this.checkIfClusterOrManager();
-    }catch(error){
+    } catch (error) {
       const options = {
         context: `${WzEditConfiguration.name}.refresh`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         error: {
           error: error,
-          message: error.message || error,
-          title: error.name || error
+          message: error.message || error,
+          title: error.name || error,
         },
       };
       getErrorOrchestrator().handleError(options);
-    } 
+    }
   }
   toggleRestart() {
     this.setState({ restart: !this.state.restart });
@@ -190,8 +186,8 @@ class WzEditConfiguration extends Component {
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         error: {
           error: error,
-          message: error.message || error,
-          title: error.name || error
+          message: error.message || error,
+          title: error.name || error,
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -227,16 +223,12 @@ class WzEditConfiguration extends Component {
       // do nothing if it isn't a cluster
       this.props.updateClusterNodes(false);
       this.props.updateClusterNodeSelected(false);
-      this.props.updateConfigurationSection(
-        'edit-configuration',
-        'Manager configuration'
-      );
+      this.props.updateConfigurationSection('edit-configuration', 'Manager configuration');
       throw error;
     }
   }
   render() {
     const { restart, restarting, saving, editorValue, disableSaveRestartButtons } = this.state;
-    const initialValue = editorValue;
     const { clusterNodeSelected, agent } = this.props;
     const xmlError = editorValue && validateXML(editorValue);
     return (
@@ -311,7 +303,7 @@ class WzEditConfiguration extends Component {
               cancelButtonText="Cancel"
               confirmButtonText="Confirm"
               defaultFocusedButton="cancel"
-            ></EuiConfirmModal>
+            />
           </EuiOverlayMask>
         )}
       </Fragment>
@@ -368,8 +360,8 @@ const WzEditorConfiguration = compose(
       props.refreshTime !== prevProps.refreshTime
   )
 )(
+  // eslint-disable-next-line react/no-multi-comp
   class WzEditorConfiguration extends Component {
-
     constructor(props) {
       super(props);
     }
@@ -429,5 +421,3 @@ const WzEditorConfiguration = compose(
     }
   }
 );
-
-
