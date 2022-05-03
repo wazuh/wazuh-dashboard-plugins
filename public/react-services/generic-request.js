@@ -100,7 +100,9 @@ export class GenericRequest {
           const wzMisc = new WzMisc();
           wzMisc.setApiIsDown(true);
 
-          if (!window.location.hash.includes('#/settings')) {
+          if (!window.location.hash.includes('#/settings') && 
+          !window.location.hash.includes('#/health-check') &&
+          !window.location.hash.includes('#/blank-screen')) {
             window.location.href = getHttp().basePath.prepend('/app/wazuh#/health-check');
           }
         }

@@ -210,6 +210,7 @@ class WzRulesetActionButtons extends Component {
         iconType="exportAction"
         iconSide="left"
         onClick={async () => await this.generateCsv()}
+        isLoading={this.state.generatingCsv}
       >
         Export formatted
       </WzButtonPermissions>
