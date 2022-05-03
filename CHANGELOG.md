@@ -6,8 +6,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Added
 
-- Support for Kibana 7.16.3
-- Support for Kibana 7.17.0
+- Support for Kibana 7.16.x
+- Support for Kibana 7.17.x
 - Added GitHub and Office365 modules [#3557](https://github.com/wazuh/wazuh-kibana-app/pull/3557)
 - Added a new `Panel` module tab for GitHub and Office365 modules 
   [#3541](https://github.com/wazuh/wazuh-kibana-app/pull/3541) 
@@ -42,6 +42,7 @@ All notable changes to the Wazuh app project will be documented in this file.
   [#3465](https://github.com/wazuh/wazuh-kibana-app/pull/3465)
   [#3464](https://github.com/wazuh/wazuh-kibana-app/pull/3464)
   [#3478](https://github.com/wazuh/wazuh-kibana-app/pull/3478)
+  [#4116](https://github.com/wazuh/wazuh-kibana-app/pull/4116)
 - Added Intelligence tab to Mitre Att&ck module [#3368](https://github.com/wazuh/wazuh-kibana-app/pull/3368) [#3344](https://github.com/wazuh/wazuh-kibana-app/pull/3344) [#3726](https://github.com/wazuh/wazuh-kibana-app/pull/3726)
 - Added sample data for office365 events [#3424](https://github.com/wazuh/wazuh-kibana-app/pull/3424)
 - Created a separate component to check for sample data [#3475](https://github.com/wazuh/wazuh-kibana-app/pull/3475)
@@ -181,6 +182,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed "See full error" on error toast [#4119](https://github.com/wazuh/wazuh-kibana-app/pull/4119)
 - Fixed not being able to remove custom filters. [#4112](https://github.com/wazuh/wazuh-kibana-app/pull/4112)
 - Fixed spinner not showing when export button is clicked in management views [#4120](https://github.com/wazuh/wazuh-kibana-app/pull/4120)
+- Correction of field and value in the section: last registered agent [#4127](https://github.com/wazuh/wazuh-kibana-app/pull/4127)
 
 ## Wazuh v4.2.6 - Kibana 7.10.2, 7.11.2, 7.12.1, 7.13.0, 7.13.1, 7.13.2, 7.13.3, 7.13.4, 7.14.0, 7.14.1, 7.14.2 - Revision 4207
 
