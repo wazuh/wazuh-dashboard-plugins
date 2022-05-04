@@ -175,6 +175,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed not being able to remove custom filters. [#4112](https://github.com/wazuh/wazuh-kibana-app/pull/4112)
 - Fixed spinner not showing when export button is clicked in management views [#4120](https://github.com/wazuh/wazuh-kibana-app/pull/4120)
 - Correction of field and value in the section: last registered agent [#4127](https://github.com/wazuh/wazuh-kibana-app/pull/4127)
+- Fixed the download agent installer command [#4132] (https://github.com/wazuh/wazuh-kibana-app/pull/4132)
 
 ## Wazuh v4.2.6 - Kibana 7.10.2, 7.11.2, 7.12.1, 7.13.0, 7.13.1, 7.13.2, 7.13.3, 7.13.4, 7.14.0, 7.14.1, 7.14.2 - Revision 4207
 
