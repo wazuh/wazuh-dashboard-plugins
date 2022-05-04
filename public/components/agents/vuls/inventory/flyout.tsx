@@ -74,8 +74,8 @@ export class FlyoutDetail extends Component {
       this.setState({ clusterFilter });
       const currentItem = this.props.item;
 
-      if (!currentFile) {
-        throw new Error('File not found');
+      if (!currentItem) {
+        throw new Error('Vulnerability not found');
       }
 
       const lastScan = await this.getLastScan();
