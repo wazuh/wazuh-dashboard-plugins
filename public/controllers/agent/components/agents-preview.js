@@ -215,10 +215,8 @@ export const AgentsPreview = compose(
                     </EuiCard>
                   </EuiFlexItem>
                   {this.totalAgents > 0 && (
-                    <EuiFlexItem>
+                    <EuiFlexItem grow={false} className="agents-details-card">
                       <EuiCard title description betaBadgeLabel="Details">
-                        <EuiFlexGroup>
-                          <EuiFlexItem>
                             {this.summary && (
                               <EuiFlexGroup className="group-details">
                                 <EuiFlexItem>
@@ -279,6 +277,7 @@ export const AgentsPreview = compose(
                                     className="white-space-nowrap"
                                   />
                                 </EuiFlexItem>
+
                                 <EuiFlexItem>
                                   <EuiStat
                                     title={`${this.agentsCoverity.toFixed(2)}%`}
@@ -291,9 +290,9 @@ export const AgentsPreview = compose(
                             )}
                             <EuiFlexGroup className="mt-0">
                               {this.lastAgent && (
-                                <EuiFlexItem>
+                                <EuiFlexItem className="agents-link-item">
                                   <EuiStat
-                                    className="euiStatLink"
+                                    className="euiStatLink last-agents-link"
                                     title={
                                       <EuiToolTip position="top" content="View agent details">
                                         <a onClick={() => this.showLastAgent()}>
@@ -304,12 +303,11 @@ export const AgentsPreview = compose(
                                     titleSize="s"
                                     description="Last registered agent"
                                     titleColor="primary"
-                                    className="pb-12 white-space-nowrap"
                                   />
                                 </EuiFlexItem>
                               )}
                               {this.mostActiveAgent && (
-                                <EuiFlexItem>
+                                <EuiFlexItem className="agents-link-item">
                                   <EuiStat
                                     className={this.mostActiveAgent.name ? 'euiStatLink' : ''}
                                     title={
@@ -319,7 +317,7 @@ export const AgentsPreview = compose(
                                         </a>
                                       </EuiToolTip>
                                     }
-                                    className="white-space-nowrap"
+                                    className="last-agents-link"
                                     titleSize="s"
                                     description="Most active agent"
                                     titleColor="primary"
@@ -327,8 +325,6 @@ export const AgentsPreview = compose(
                                 </EuiFlexItem>
                               )}
                             </EuiFlexGroup>
-                          </EuiFlexItem>
-                        </EuiFlexGroup>
                       </EuiCard>
                     </EuiFlexItem>
                   )}
