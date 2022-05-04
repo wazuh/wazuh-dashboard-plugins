@@ -485,7 +485,7 @@ export const RegisterAgent = withErrorBoundary(
           }-1.pkg && sudo launchctl setenv ${this.optionalDeploymentVariables()}&& sudo installer -pkg ./wazuh-agent-${this.state.wazuhVersion
           }.pkg -target /`,
         winText: `Invoke-WebRequest -Uri https://packages.wazuh.com/4.x/windows/wazuh-agent-${this.state.wazuhVersion
-          }-1.msi -OutFile wazuh-agent-${this.state.wazuhVersion}.msi; ./wazuh-agent-${this.state.wazuhVersion
+          }-1.msi -OutFile \${env:tmp}\\wazuh-agent-${this.state.wazuhVersion}.msi; msiexec.exe /i \${env:tmp}\\wazuh-agent-${this.state.wazuhVersion
           }.msi /q ${this.optionalDeploymentVariables()}`,
       };
 
