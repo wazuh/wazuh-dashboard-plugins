@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for registering agents.
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,14 +19,17 @@ import {
   updateLoadingStatus,
   updateIsProcessing,
   updateShowAddAgents,
-  updateReload
+  updateReload,
 } from '../../../../../redux/actions/groupsActions';
 
 import exportCsv from '../../../../../react-services/wz-csv';
 import GroupsHandler from './utils/groups-handler';
-import { getToasts }  from '../../../../../kibana-services';
+import { getToasts } from '../../../../../kibana-services';
 import { ExportConfiguration } from '../../../../agent/components/export-configuration';
 import { ReportingService } from '../../../../../react-services/reporting';
+import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 
 class WzGroupsActionButtonsAgents extends Component {
   _isMounted = false;
@@ -38,7 +41,7 @@ class WzGroupsActionButtonsAgents extends Component {
     this.state = {
       generatingCsv: false,
       isPopoverOpen: false,
-      newGroupName: ''
+      newGroupName: '',
     };
     this.exportCsv = exportCsv;
 
@@ -59,10 +62,6 @@ class WzGroupsActionButtonsAgents extends Component {
     this._isMounted = false;
   }
 
-  // UNSAFE_componentWillReceiveProps(nextProps) {
-  //   console.log(nextProps);
-  // }
-
   /**
    * Refresh the items
    */
@@ -72,7 +71,18 @@ class WzGroupsActionButtonsAgents extends Component {
       this.props.updateIsProcessing(true);
       this.onRefreshLoading();
     } catch (error) {
-      return Promise.reject(error);
+      const options = {
+        context: `${WzGroupsActionButtonsAgents.name}.refresh`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        store: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.message || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   }
 
@@ -99,19 +109,19 @@ class WzGroupsActionButtonsAgents extends Component {
     this.setState({
       isPopoverOpen: false,
       msg: false,
-      newGroupName: ''
+      newGroupName: '',
     });
   }
 
   clearGroupName() {
     this.setState({
-      newGroupName: ''
+      newGroupName: '',
     });
   }
 
-  onChangeNewGroupName = e => {
+  onChangeNewGroupName = (e) => {
     this.setState({
-      newGroupName: e.target.value
+      newGroupName: e.target.value,
     });
   };
 
@@ -125,7 +135,7 @@ class WzGroupsActionButtonsAgents extends Component {
         if (input.length) {
           const i = input[0];
           if (!i.onkeypress) {
-            i.onkeypress = async e => {
+            i.onkeypress = async (e) => {
               if (e.which === 13) {
                 await this.createGroup();
               }
@@ -134,19 +144,27 @@ class WzGroupsActionButtonsAgents extends Component {
           clearInterval(interval);
         }
       }, 150);
-    } catch (error) {}
+    } catch (error) {
+      const options = {
+        context: `${WzGroupsActionButtonsAgents.name}.bindEnterToInput`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        store: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.message || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+    }
   }
 
   async createGroup() {
     try {
       this.props.updateLoadingStatus(true);
       await this.groupsHandler.saveGroup(this.state.newGroupName);
-      this.showToast(
-        'success',
-        'Success',
-        'The group has been created successfully',
-        2000
-      );
+      this.showToast('success', 'Success', 'The group has been created successfully', 2000);
       this.clearGroupName();
 
       this.props.updateIsProcessing(true);
@@ -154,12 +172,7 @@ class WzGroupsActionButtonsAgents extends Component {
       this.closePopover();
     } catch (error) {
       this.props.updateLoadingStatus(false);
-      this.showToast(
-        'danger',
-        'Error',
-        `An error occurred when creating the group: ${error}`,
-        2000
-      );
+      throw new Error(error);
     }
   }
 
@@ -178,12 +191,18 @@ class WzGroupsActionButtonsAgents extends Component {
         2000
       );
     } catch (error) {
-      this.showToast(
-        'danger',
-        'Error',
-        `Error when exporting the CSV file: ${error}`,
-        2000
-      );
+      const options = {
+        context: `${WzGroupsActionButtonsAgents.name}.generateCsv`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        store: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `Error when exporting the CSV file: ${error.message || error}`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
     this.setState({ generatingCsv: false });
   }
@@ -193,19 +212,14 @@ class WzGroupsActionButtonsAgents extends Component {
       color: color,
       title: title,
       text: text,
-      toastLifeTimeMs: time
+      toastLifeTimeMs: time,
     });
   };
 
   render() {
-
     // Add new group button
     const manageAgentsButton = (
-      <EuiButtonEmpty
-        iconSide="left"
-        iconType="folderOpen"
-        onClick={() => this.showManageAgents()}
-      >
+      <EuiButtonEmpty iconSide="left" iconType="folderOpen" onClick={() => this.showManageAgents()}>
         Manage agents
       </EuiButtonEmpty>
     );
@@ -213,14 +227,14 @@ class WzGroupsActionButtonsAgents extends Component {
     // Export PDF button
     const exportPDFButton = (
       <ExportConfiguration
-        exportConfiguration={enabledComponents =>
+        exportConfiguration={(enabledComponents) =>
           this.reportingService.startConfigReport(
             this.props.state.itemDetail,
             'groupConfig',
             enabledComponents
           )
         }
-        type='group'
+        type="group"
       />
     );
     // Export button
@@ -236,10 +250,7 @@ class WzGroupsActionButtonsAgents extends Component {
 
     // Refresh
     const refreshButton = (
-      <EuiButtonEmpty
-        iconType="refresh"
-        onClick={async () => await this.refresh()}
-      >
+      <EuiButtonEmpty iconType="refresh" onClick={async () => await this.refresh()}>
         Refresh
       </EuiButtonEmpty>
     );
@@ -255,24 +266,19 @@ class WzGroupsActionButtonsAgents extends Component {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
-    state: state.groupsReducers
+    state: state.groupsReducers,
   };
 };
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch) => {
   return {
-    updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
-    updateIsProcessing: isProcessing =>
-      dispatch(updateIsProcessing(isProcessing)),
-    updateShowAddAgents: showAddAgents =>
-      dispatch(updateShowAddAgents(showAddAgents)),
-    updateReload: () => dispatch(updateReload())
+    updateLoadingStatus: (status) => dispatch(updateLoadingStatus(status)),
+    updateIsProcessing: (isProcessing) => dispatch(updateIsProcessing(isProcessing)),
+    updateShowAddAgents: (showAddAgents) => dispatch(updateShowAddAgents(showAddAgents)),
+    updateReload: () => dispatch(updateReload()),
   };
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WzGroupsActionButtonsAgents);
+export default connect(mapStateToProps, mapDispatchToProps)(WzGroupsActionButtonsAgents);

@@ -1,7 +1,7 @@
 /*
  * Wazuh app - Check APIs service
  *
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,6 +41,7 @@ const trySetDefault = async (checkLogger: CheckLogger) => {
         return Promise.reject('No API available to connect');
       }
     }
+    return Promise.reject('No API configuration found');
   } catch (error) {
     checkLogger.error(`Error connecting to API: ${error}`);
     return Promise.reject(`Error connecting to API: ${error}`);
@@ -50,7 +51,13 @@ const trySetDefault = async (checkLogger: CheckLogger) => {
 export const checkApiService = (appInfo: any) => async (checkLogger: CheckLogger) => {
   let apiChanged = false;
   try {
-    const currentApi = JSON.parse(AppState.getCurrentAPI() || '{}');
+    let currentApi = JSON.parse(AppState.getCurrentAPI() || '{}');
+    if(!currentApi.id){
+      checkLogger.info(`No current API selected`);
+      currentApi.id = await trySetDefault(checkLogger);
+      apiChanged = true;
+    }
+
     checkLogger.info(`Current API id [${currentApi.id}]`);
     checkLogger.info(`Checking current API id [${currentApi.id}]...`);
     const data = await ApiCheck.checkStored(currentApi.id).catch(async (err) => {
@@ -68,7 +75,7 @@ export const checkApiService = (appInfo: any) => async (checkLogger: CheckLogger
       const api = ((data || {}).data || {}).data || {};
       const name = (api.cluster_info || {}).manager || false;
       AppState.setCurrentAPI(JSON.stringify({ name: name, id: api.id }));
-      checkLogger.info(`Set current API in cookie: id [${api.id}], name [${api.name}]`);
+      checkLogger.info(`Set current API in cookie: id [${api.id}], name [${name}]`);
       getToasts().add({
         color: 'warning',
         title: 'Selected Wazuh API has been updated',

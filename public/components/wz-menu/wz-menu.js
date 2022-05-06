@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for build q queries.
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -46,6 +46,10 @@ import { AppNavigate } from '../../react-services/app-navigate';
 import WzTextWithTooltipIfTruncated from '../../components/common/wz-text-with-tooltip-if-truncated';
 import { getDataPlugin } from '../../kibana-services';
 import { withWindowSize } from '../../components/common/hocs/withWindowSize';
+import { UI_LOGGER_LEVELS } from '../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../react-services/common-services'
+import { getThemeAssetURL, getAssetURL } from '../../utils/assets';
 
 
 const sections = {
@@ -103,8 +107,21 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
           }
         }
       }
-    } catch (err) { }
-
+    } catch (error) { 
+      const options = {
+        context: `${WzMenu.name}.componentDidMount`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.CRITICAL,
+        store: true,
+        display: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+    }
   }
 
   showToast = (color, title, text, time) => {
@@ -136,8 +153,9 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
 
   loadIndexPatternsList = async () => {
     try {
-      const list = await PatternHandler.getPatternList('api');
+      let list = await PatternHandler.getPatternList('api');
       if (!list) return;
+      this.props?.appConfig?.data?.['ip.ignore']?.length && (list = list.filter(indexPattern => !this.props?.appConfig?.data?.['ip.ignore'].includes(indexPattern.title)));
 
       // Abort if we have disabled the pattern selector
       if (!AppState.getPatternSelector()) return;
@@ -167,7 +185,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
         });
       }
     } catch (error) {
-      this.showToast('danger', 'Error', error, 4000);
+      throw error;
     }
   }
 
@@ -206,7 +224,9 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
         this.setState({ currentAPI: this.props.state.currentAPI });
       }
     }
-
+    if(!_.isEqual(prevProps?.appConfig?.data?.['ip.ignore'], this.props?.appConfig?.data?.['ip.ignore'])){
+      this.loadIndexPatternsList();
+    }
   }
 
   async load() {
@@ -222,8 +242,9 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
       if (currentTab !== this.state.currentMenuTab) {
         this.setState({ currentMenuTab: currentTab, hover: currentTab });
       }
-      const list = await PatternHandler.getPatternList('api');
+      let list = await PatternHandler.getPatternList('api');
       if (!list || (list && !list.length)) return;
+      this.props?.appConfig?.data?.['ip.ignore']?.length && (list = list.filter(indexPattern => !this.props?.appConfig?.data?.['ip.ignore'].includes(indexPattern.title)));
 
       // Abort if we have disabled the pattern selector
       if (!AppState.getPatternSelector()) return;
@@ -253,7 +274,19 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
         });
       }
     } catch (error) {
-      this.showToast('danger', 'Error', error.message || error, 4000);
+      const options = {
+        context: `${WzMenu.name}.load`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        store: true,
+        display: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
     this.isLoading = false;
   }
@@ -270,11 +303,21 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
 
       if (newPattern?.id === 'selectIndexPatternBar') {
         this.updatePatternAndApi();
-      } else {
-        this.switchMenuOpened();
       }
     } catch (error) {
-      this.showToast('danger', 'Error', error, 4000);
+      const options = {
+        context: `${WzMenu.name}.changePattern`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        store: false,
+        display: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `Error changing the Index Pattern`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   };
 
@@ -320,15 +363,22 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
       AppState.setCurrentAPI(
         JSON.stringify({ name: apiData[0].manager, id: apiId.value })
       );
-      if (apiId?.id !== 'selectAPIBar') {
-        this.switchMenuOpened();
-      }
 
       if (this.state.currentMenuTab !== 'wazuh-dev') {
         this.router.reload();
       }
     } catch (error) {
-      this.showToast('danger', 'Error', error, 4000);
+      const options = {
+        context: `${WzMenu.name}.changePattern`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `Error changing the selected API`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   };
 
@@ -543,7 +593,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
   }
 
   switchMenuOpened = () => {
-    const kibanaMenuBlockedOrOpened = document.body.classList.contains('euiBody--collapsibleNavIsDocked') || document.body.classList.contains('euiBody--collapsibleNavIsOpen');
+    const pluginPlatformMenuBlockedOrOpened = document.body.classList.contains('euiBody--collapsibleNavIsDocked') || document.body.classList.contains('euiBody--collapsibleNavIsOpen');
     if (!this.state.menuOpened && this.state.currentMenuTab === 'manager') {
       this.managementPopoverToggle();
     } else if (this.state.currentMenuTab === 'overview') {
@@ -558,7 +608,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
       this.closeAllPopover()
     }
 
-    this.setState({ menuOpened: !this.state.menuOpened, kibanaMenuBlockedOrOpened, hover: this.state.currentMenuTab }, async () => {
+    this.setState({ menuOpened: !this.state.menuOpened, pluginPlatformMenuBlockedOrOpened, hover: this.state.currentMenuTab }, async () => {
       await this.loadApiList();
       await this.loadIndexPatternsList();
     });
@@ -632,7 +682,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
   }
 
   getApiSelectorComponent() {
-    let style = { maxWidth: 100 };
+    let style = { minWidth: 100, textOverflow: 'ellipsis' };
     if (this.showSelectorsInPopover){
       style = { width: '100%', minWidth: 200 };
     }
@@ -899,7 +949,8 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
       </div>
     );
 
-    const logotype_url = getHttp().basePath.prepend(`/plugins/wazuh/assets/${this.wazuhConfig.getConfig()['customization.logo.app']}`);
+    
+    const logotypeURL = getHttp().basePath.prepend(this.wazuhConfig.getConfig()['customization.logo.app'] ? getAssetURL(this.wazuhConfig.getConfig()['customization.logo.app']) : getThemeAssetURL('logo.svg'));
     const mainButton = (
       <button data-test-subj='menuWazuhButton' className="eui" onClick={() => this.switchMenuOpened()}>
         <EuiFlexGroup
@@ -908,7 +959,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
           style={{ paddingTop: 2 }}
         >
           <EuiFlexItem grow={false} style={{ marginRight: 0 }}>
-            <img src={logotype_url} className="navBarLogo" alt=""></img>
+            <img src={logotypeURL} className="navBarLogo" alt=""></img>
           </EuiFlexItem>
           <EuiFlexItem grow={false} style={{ margin: '12px 6px' }}>
             {this.state.menuOpened && (
@@ -945,7 +996,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
             <EuiFlexItem grow={false}>
               <EuiPopover
                 panelClassName={
-                  this.state.kibanaMenuBlockedOrOpened ?
+                  this.state.pluginPlatformMenuBlockedOrOpened ?
                     "wz-menu-popover wz-menu-popover-over" :
                     "wz-menu-popover wz-menu-popover-under"
                 }
@@ -1014,7 +1065,8 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.appStateReducers
+    state: state.appStateReducers,
+    appConfig: state.appConfig
   };
 };
 

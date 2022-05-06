@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Group handler service
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,66 +14,51 @@ import { WzRequest } from './wz-request';
 export class GroupHandler {
   static async removeGroup(group) {
     try {
-      const result = await WzRequest.apiReq(
-        'DELETE',
-        `/agents/groups/${group}`,
-        {}
-      );
+      const result = await WzRequest.apiReq('DELETE', `/agents/groups/${group}`, {});
       return result;
     } catch (error) {
-      return Promise.reject(error);
+      throw error; //TODO remove 
     }
   }
 
   static async removeAgentFromGroup(group, agentId) {
     try {
-      const result = await WzRequest.apiReq(
-        'DELETE',
-        `/agents/${agentId}/group/${group}`,
-        {}
-      );
+      const result = await WzRequest.apiReq('DELETE', `/agents/${agentId}/group/${group}`, {});
       return result;
     } catch (error) {
-      return Promise.reject(error);
+      throw error; //TODO remove
     }
   }
 
   static async addAgentToGroup(group, agentId) {
     try {
-      const result = await WzRequest.apiReq(
-        'PUT',
-        `/agents/${agentId}/group/${group}`,
-        {}
-      );
+      const result = await WzRequest.apiReq('PUT', `/agents/${agentId}/group/${group}`, {});
       return result;
     } catch (error) {
-      return Promise.reject(error);
+      throw error;
     }
   }
 
   static async sendConfiguration(group, content) {
     try {
-      const result = await WzRequest.apiReq(
-        'POST',
-        `/agents/groups/${group}/files/agent.conf`,
-        { content, origin: 'xmleditor' }
-      );
+      const result = await WzRequest.apiReq('POST', `/agents/groups/${group}/files/agent.conf`, {
+        content,
+        origin: 'xmleditor',
+      });
       return result;
     } catch (error) {
-      return Promise.reject(error);
+      throw error //TODO remove
     }
   }
 
   static async createGroup(name) {
     try {
-      const result = await WzRequest.apiReq(
-        'PUT',
-        `/agents/groups`,
-        {content: {group_id: name}}
-      );
+      const result = await WzRequest.apiReq('PUT', `/agents/groups`, {
+        content: { group_id: name },
+      });
       return result;
     } catch (error) {
-      return Promise.reject(error);
+      throw error;
     }
   }
 }

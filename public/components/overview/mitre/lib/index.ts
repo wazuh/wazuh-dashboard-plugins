@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Mitre alerts components
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -11,5 +11,3 @@
  */
 
 export { IFilterParams, getElasticAlerts, getIndexPattern } from './elastic-helpers';
-
-export { mitreTechniques } from './mitre_techniques';

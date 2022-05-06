@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Module to check discover
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,9 @@ import {
   getSavedObjects,
   getPlugins,
 } from '../../kibana-services';
+import { UI_LOGGER_LEVELS } from '../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../react-services/common-services';
 
 export function getSavedSearch($location, $window, $route) {
   try {
@@ -63,6 +66,17 @@ export function getSavedSearch($location, $window, $route) {
         });
     }
   } catch (error) {
-    console.error(error);
+    const options = {
+      context: `${getSavedSearch.name}`,
+      level: UI_LOGGER_LEVELS.ERROR,
+      severity: UI_ERROR_SEVERITIES.BUSINESS,
+      store: true,
+      error: {
+        error: error,
+        message: error.message || error,
+        title: error.name || error,
+      },
+    };
+    getErrorOrchestrator().handleError(options);
   }
 }

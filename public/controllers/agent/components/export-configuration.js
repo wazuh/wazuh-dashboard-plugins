@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for exporting the configuration of a group.
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,8 +22,9 @@ import {
 import PropTypes from 'prop-types';
 import { UnsupportedComponents } from '../../../utils/components-os-support';
 import { WAZUH_AGENTS_OS_TYPE } from '../../../../common/constants';
+import { withErrorBoundary } from '../../../components/common/hocs';
 
-export class ExportConfiguration extends Component {
+export const ExportConfiguration = withErrorBoundary (class ExportConfiguration extends Component {
   constructor(props) {
     super(props);
 
@@ -142,13 +143,12 @@ export class ExportConfiguration extends Component {
           compressed
         />
         <EuiSpacer size="s" />
-        <EuiButtonEmpty size="xs" onClick={() => this.selectAll(true)}>
-          Select all
-        </EuiButtonEmpty>
-        <EuiSpacer size="s" />
-        <EuiButtonEmpty size="xs" onClick={() => this.selectAll(false)}>
-          Unselect all
-        </EuiButtonEmpty>
+        {this.options.length > 3 &&
+          <><EuiButtonEmpty size="xs" onClick={() => this.selectAll(true)}>
+            Select all
+          </EuiButtonEmpty><EuiSpacer size="s" /><EuiButtonEmpty size="xs" onClick={() => this.selectAll(false)}>
+              Unselect all
+            </EuiButtonEmpty></>}
         <EuiSpacer size="m" />
         <EuiButton
           isDisabled={this.state.buttonDisabled}
@@ -163,7 +163,7 @@ export class ExportConfiguration extends Component {
       </EuiPopover>
     );
   }
-}
+});
 
 ExportConfiguration.propTypes = {
   exportConfiguration: PropTypes.func,

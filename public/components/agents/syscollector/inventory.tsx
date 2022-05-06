@@ -1,6 +1,6 @@
 /*
- * Wazuh app - React component to integrate Kibana search bar
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Wazuh app - React component to integrate plugin platform search bar
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,6 +51,8 @@ export function SyscollectorInventory({ agent }) {
     soPlatform = 'windows';
   } else if ((agent.os || {}).platform === 'darwin') {
     soPlatform = 'apple';
+  } else if (((agent.os || {}).uname.toLowerCase() || '').includes('freebsd')) {
+    soPlatform = 'freebsd';
   }
 
   const netifaceColumns = [
@@ -103,7 +105,7 @@ export function SyscollectorInventory({ agent }) {
               title: 'Network ports',
               columns: portsColumns[soPlatform],
               icon: 'inputOutput',
-              searchBar: false,
+              searchBar: true,
               exportFormatted: false,
             }}
           />

@@ -203,14 +203,14 @@
   "group:read": {
     "description": "Access agent groups information (id, name, agents, etc)",
     "resources": [
-      "*:*","group:id"
+      "group:id"
     ],
     "example": {
       "actions": [
         "group:create"
       ],
       "resources": [
-        "*:*:*"
+        "group:id:*"
       ],
       "effect": "allow"
     },
@@ -294,6 +294,26 @@
       "PUT /cluster/restart",
       "GET /cluster/configuration/validation",
       "GET /cluster/{node_id}/configuration/{component}/{configuration}"
+    ]
+  },
+  "agent:reconnect": {
+    "description": "Force reconnect agents",
+    "resources": [
+      "agent:id",
+      "agent:group"
+    ],
+    "example": {
+      "actions": [
+        "agent:reconnect"
+      ],
+      "resources": [
+        "agent:id:050",
+        "agent:id:049"
+      ],
+      "effect": "deny"
+    },
+    "related_endpoints": [
+      "PUT /agents/reconnect"
     ]
   },
   "ciscat:read": {
@@ -552,7 +572,7 @@
     ]
   },
   "mitre:read": {
-    "description": "Access attacks information from MITRE database",
+    "description": "Access information from MITRE database",
     "resources": [
       "*:*"
     ],
@@ -566,26 +586,13 @@
       "effect": "allow"
     },
     "related_endpoints": [
-      "GET /mitre"
-    ]
-  },
-  "rootcheck:clear": {
-    "description": "Clear the agents rootcheck database",
-    "resources": [
-      "agent:id",
-      "agent:group"
-    ],
-    "example": {
-      "actions": [
-        "rootcheck:clear"
-      ],
-      "resources": [
-        "agent:id:*"
-      ],
-      "effect": "deny"
-    },
-    "related_endpoints": [
-      "DELETE /rootcheck"
+      "GET /mitre/groups",
+      "GET /mitre/metadata",
+      "GET /mitre/mitigations",
+      "GET /mitre/references",
+      "GET /mitre/software",
+      "GET /mitre/tactics",
+      "GET /mitre/techniques"
     ]
   },
   "rootcheck:run": {
@@ -625,6 +632,26 @@
     "related_endpoints": [
       "GET /rootcheck/{agent_id}",
       "GET /rootcheck/{agent_id}/last_scan"
+    ]
+  },
+  "rootcheck:clear": {
+    "description": "Clear the agents rootcheck database",
+    "resources": [
+      "agent:id",
+      "agent:group"
+    ],
+    "example": {
+      "actions": [
+        "rootcheck:clear"
+      ],
+      "resources": [
+        "agent:id:*"
+      ],
+      "effect": "deny"
+    },
+    "related_endpoints": [
+      "DELETE /rootcheck/{agent_id}",
+      "DELETE /experimental/rootcheck"
     ]
   },
   "rules:read": {
@@ -1075,7 +1102,9 @@
       "effect": "allow"
     },
     "related_endpoints": [
-      "GET /vulnerability/{agent_id}"
+      "GET /vulnerability/{agent_id}",
+      "GET /vulnerability/{agent_id}/last_scan",
+      "GET /vulnerability/{agent_id}/summary/{field}"
     ]
   }
 }

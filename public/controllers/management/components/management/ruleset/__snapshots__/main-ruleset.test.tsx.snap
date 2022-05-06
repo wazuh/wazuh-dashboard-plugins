@@ -1,0 +1,122 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Ruleset component renders correctly to match the snapshot 1`] = `
+<WzRuleset
+  clusterStatus=""
+  logtestProps=""
+>
+  <WzReduxProvider>
+    <Provider
+      store={
+        Object {
+          "dispatch": [Function],
+          "getState": [Function],
+          "replaceReducer": [Function],
+          "subscribe": [Function],
+          Symbol(observable): [Function],
+        }
+      }
+    >
+      <Connect(Component)
+        clusterStatus=""
+      >
+        <Component
+          clusterStatus=""
+          dispatch={[Function]}
+          state={
+            Object {
+              "addingRulesetFile": false,
+              "decoderInfo": false,
+              "defaultItems": Array [],
+              "error": false,
+              "fileContent": false,
+              "filters": Array [],
+              "isLoading": false,
+              "isProcessing": false,
+              "itemList": Array [],
+              "items": Array [],
+              "listInfo": false,
+              "pageIndex": 0,
+              "ruleInfo": false,
+              "section": "",
+              "showModal": false,
+              "showingFiles": false,
+              "sortDirection": "asc",
+              "sortField": "id",
+            }
+          }
+        >
+          <Component
+            clusterStatus=""
+            dispatch={[Function]}
+            state={
+              Object {
+                "addingRulesetFile": false,
+                "decoderInfo": false,
+                "defaultItems": Array [],
+                "error": false,
+                "fileContent": false,
+                "filters": Array [],
+                "isLoading": false,
+                "isProcessing": false,
+                "itemList": Array [],
+                "items": Array [],
+                "listInfo": false,
+                "pageIndex": 0,
+                "ruleInfo": false,
+                "section": "",
+                "showModal": false,
+                "showingFiles": false,
+                "sortDirection": "asc",
+                "sortField": "id",
+              }
+            }
+          >
+            <div
+              className="withUserLogged"
+            >
+              <img
+                alt=""
+                className="withUserLogged-logo"
+                src="/plugins/wazuh/assets/images/themes/light/logo.svg"
+              />
+              <EuiSpacer
+                size="s"
+              >
+                <div
+                  className="euiSpacer euiSpacer--s"
+                />
+              </EuiSpacer>
+              <EuiText
+                className="subdued-color"
+              >
+                <div
+                  className="euiText euiText--medium subdued-color"
+                >
+                  Loading ...
+                </div>
+              </EuiText>
+              <EuiSpacer
+                size="s"
+              >
+                <div
+                  className="euiSpacer euiSpacer--s"
+                />
+              </EuiSpacer>
+              <EuiProgress
+                className="withUserLogged-loader"
+                color="primary"
+                size="xs"
+              >
+                <div
+                  className="euiProgress euiProgress--indeterminate euiProgress--xs euiProgress--primary withUserLogged-loader"
+                />
+              </EuiProgress>
+            </div>
+          </Component>
+        </Component>
+      </Connect(Component)>
+    </Provider>
+  </WzReduxProvider>
+</WzRuleset>
+`;

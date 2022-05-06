@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for button that opens a modal
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -13,6 +13,7 @@ import React from 'react';
 
 import {
   EuiOverlayMask,
+  EuiOutsideClickDetector,
   EuiConfirmModal
 } from '@elastic/eui';
 
@@ -43,17 +44,19 @@ const renderModal = ({onConfirm, onCancel, modalTitle, modalConfirmText, modalCa
     onCancel && onCancel();
   };
   return (
-    <EuiOverlayMask onClick={close}>
-      <EuiConfirmModal
-        title={modalTitle}
-        onCancel={onModalCancel}
-        onConfirm={onModalConfirm}
-        cancelButtonText={modalCancelText}
-        confirmButtonText={modalConfirmText}
-        defaultFocusedButton={modalProps.defaultFocusedButton || "confirm"}
-        {...modalProps}
+    <EuiOverlayMask>
+      <EuiOutsideClickDetector onOutsideClick={close}>
+        <EuiConfirmModal
+          title={modalTitle}
+          onCancel={onModalCancel}
+          onConfirm={onModalConfirm}
+          cancelButtonText={modalCancelText}
+          confirmButtonText={modalConfirmText}
+          defaultFocusedButton={modalProps.defaultFocusedButton || "confirm"}
+          {...modalProps}
         >
-      </EuiConfirmModal>
+        </EuiConfirmModal>
+      </EuiOutsideClickDetector>
     </EuiOverlayMask>
   )
 };
@@ -72,17 +75,19 @@ export const WzButtonModalConfirm: React.FunctionComponent<WzButtonModalConfirmP
           onCancel && onCancel();
         };
         return (
-          <EuiOverlayMask onClick={close}>
-            <EuiConfirmModal
-              title={modalTitle}
-              onCancel={onModalCancel}
-              onConfirm={onModalConfirm}
-              cancelButtonText={modalCancelText}
-              confirmButtonText={modalConfirmText}
-              defaultFocusedButton={modalProps.defaultFocusedButton || "confirm"}
-              {...modalProps}
+          <EuiOverlayMask>
+            <EuiOutsideClickDetector onOutsideClick={close}>
+              <EuiConfirmModal
+                title={modalTitle}
+                onCancel={onModalCancel}
+                onConfirm={onModalConfirm}
+                cancelButtonText={modalCancelText}
+                confirmButtonText={modalConfirmText}
+                defaultFocusedButton={modalProps.defaultFocusedButton || "confirm"}
+                {...modalProps}
               >
-            </EuiConfirmModal>
+              </EuiConfirmModal>
+            </EuiOutsideClickDetector>
           </EuiOverlayMask>
         )
       }}

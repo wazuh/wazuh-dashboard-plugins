@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React HOC to show a prompt when an agent doesn't support any module
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -12,9 +12,17 @@
 import { PromptAgentNoSupportModule } from '../../agents/prompts';
 import { withGuard } from '../../common/hocs';
 import { hasAgentSupportModule } from '../../../react-services/wz-agents';
+import { compose } from 'redux';
+import { connect } from 'react-redux';
 
-export const withAgentSupportModule = WrappedComponent =>
+const mapStateToProps = (state) => ({
+  agent: state.appStateReducers.currentAgentData,
+});
+
+export const withAgentSupportModule = WrappedComponent => compose(
+  connect(mapStateToProps),
   withGuard(
-    ({agent, component}) => Object.keys(agent).length && !hasAgentSupportModule(agent, component),
+    ({agent, moduleID}) => Object.keys(agent).length && !hasAgentSupportModule(agent, moduleID),
     PromptAgentNoSupportModule
-  )(WrappedComponent)
+  )
+)(WrappedComponent)

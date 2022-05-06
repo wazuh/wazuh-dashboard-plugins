@@ -1,7 +1,7 @@
 /*
  * Wazuh app - React component for building the Overview welcome screen.
  *
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,8 @@ import { connect } from 'react-redux';
 import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
 import { getAngularModule } from '../../../kibana-services';
 
+// TODO: check if this component is deprecated, if so remove it.
+// This component is wrapped by WzCurrentAgentsSectionWrapper
 class WzCurrentAgentsSection extends Component {
   constructor(props) {
     super(props);

@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for show configuration of global configuration - global tab.
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -104,7 +104,8 @@ class WzConfigurationGlobalConfigurationGlobal extends Component {
       agent.id === '000' &&
       currentConfig['analysis-global'] &&
       currentConfig['analysis-global'].global &&
-      currentConfig['analysis-global'].logging
+      currentConfig['com-logging'] &&
+      currentConfig['com-logging'].logging
         ? {
             ...currentConfig['analysis-global'].global,
             plain: currentConfig['com-logging'].logging.plain,

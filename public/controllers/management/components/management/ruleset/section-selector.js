@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for registering agents.
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,9 @@ import {
 } from '../../../../redux/actions/rulesetActions';
 
 import { WzRequest } from '../../../../react-services/wz-request';
+import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
+import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 
 class WzSectionSelector extends Component {
   constructor(props) {
@@ -65,14 +68,29 @@ class WzSectionSelector extends Component {
       this.props.updateLoadingStatus(false);
     } catch (error) {
       this.props.updateError(error);
+      throw error;
     }
   }
 
   onChange = async e => {
-    const section = e.target.value;
-    this.props.cleanFilters();
-    this.props.updateIsProcessing(true);
-    this.fetchData(section);
+    try {
+      const section = e.target.value;
+      this.props.cleanFilters();
+      this.props.updateIsProcessing(true);
+      this.fetchData(section);
+    }catch (error){
+      const options = {
+        context: `${WzSectionSelector.name}.onChange`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `Error fetching data: ${error.message || error}`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+    }
   };
 
   render() {

@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Fetch png from visualization div
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -12,6 +12,10 @@
 
 import domtoimage from '../utils/dom-to-image';
 import { getAngularModule } from '../kibana-services';
+import { UI_ERROR_SEVERITIES } from '../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../common/constants';
+import { getErrorOrchestrator } from '../react-services/common-services';
+
 const app = getAngularModule();
 
 export class Vis2PNG {
@@ -47,7 +51,19 @@ export class Vis2PNG {
               height: tmpNode.height(),
               id: currentValue
             });
-          } catch (error) {} // eslint-disable-line
+          } catch (error) {
+            const options = {
+              context: `${Vis2PNG.name}.tmpResult`,
+              level: UI_LOGGER_LEVELS.ERROR,
+              severity: UI_ERROR_SEVERITIES.UI,
+              error: {
+                error: error,
+                message: error.message || error,
+                title: error.name,
+              },
+            };
+            getErrorOrchestrator().handleError(options);
+          }
           currentCompleted++;
           this.$rootScope.reportStatus = `Generating report...${Math.round(
             (currentCompleted / len) * 100
@@ -60,6 +76,17 @@ export class Vis2PNG {
       this.$rootScope.reportStatus = `Generating PDF document...`;
       return this.rawArray;
     } catch (error) {
+      const options = {
+        context: `${Vis2PNG.name}.checkArray`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.UI,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
       this.working = false;
       return Promise.reject(error);
     }

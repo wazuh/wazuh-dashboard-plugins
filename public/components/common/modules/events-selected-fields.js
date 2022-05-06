@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Simple description for each App tabs
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -87,7 +87,8 @@ export const EventsSelectedFiles = {
     'agent.name',
     'data.vulnerability.package.name',
     'data.vulnerability.cve',
-    'data.vulnerability.severity'
+    'data.vulnerability.severity',
+    'data.vulnerability.status'
   ],
   virustotal: [
     'agent.name',
@@ -143,6 +144,23 @@ export const EventsSelectedFiles = {
   tsc: [
     'agent.name',
     'rule.tsc',
+    'rule.description',
+    'rule.level',
+    'rule.id'
+  ],
+  office: [
+    'data.office365.Subscription',
+    'data.office365.Operation',
+    'data.office365.UserId',
+    'data.office365.ClientIP',
+    'rule.level',
+    'rule.id'
+  ],
+  github: [
+    'agent.id',
+    'data.github.repo',
+    'data.github.actor',
+    'data.github.org',
     'rule.description',
     'rule.level',
     'rule.id'

@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Prompt when an agent doesn't support some module
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -11,10 +11,8 @@
  */
 
 import React from 'react';
-import {PromptSelectAgent} from './'
+import { PromptSelectAgent } from './';
 
 export const PromptAgentNoSupportModule = () => {
-  return (
-    <PromptSelectAgent title="Module not supported by the agent" />
-  )
-}
+  return <PromptSelectAgent title="Module not supported by the agent" />;
+};

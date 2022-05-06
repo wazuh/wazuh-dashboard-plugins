@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Cluster monitoring controller
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -266,7 +266,7 @@ export function ClusterController(
       const data = await Promise.all([
         WzRequest.apiReq('GET', '/cluster/nodes', {}),
         WzRequest.apiReq('GET', '/cluster/local/config', {}),
-        WzRequest.apiReq('GET', '//', {}),
+        WzRequest.apiReq('GET', '/', {}),
         WzRequest.apiReq('GET', '/agents', { limit: 1 }),
         WzRequest.apiReq('GET', '/cluster/healthcheck', {})
       ]);

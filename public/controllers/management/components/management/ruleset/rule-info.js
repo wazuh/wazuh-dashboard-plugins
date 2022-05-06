@@ -15,7 +15,7 @@ import {
   EuiAccordion,
   EuiFlexGrid,
   EuiButtonEmpty,
-  EuiLoadingSpinner
+  EuiLoadingSpinner,
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
@@ -28,10 +28,13 @@ import {
   cleanFileContent,
   cleanInfo,
   updateFilters,
-  cleanFilters
+  cleanFilters,
 } from '../../../../../redux/actions/rulesetActions';
 
 import WzTextWithTooltipTruncated from '../../../../../components/common/wz-text-with-tooltip-if-truncated';
+import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
+import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 
 class WzRuleInfo extends Component {
   constructor(props) {
@@ -43,25 +46,51 @@ class WzRuleInfo extends Component {
       hipaa: 'HIPAA',
       'nist-800-53': 'NIST-800-53',
       tsc: 'TSC',
-      'mitreTactics': 'MITRE Tactics',
-      'mitreTechniques': 'MITRE Techniques',
-      'mitre': 'MITRE'
+      mitreTactics: 'MITRE Tactics',
+      mitreTechniques: 'MITRE Techniques',
+      mitre: 'MITRE',
     };
     this.state = {
       mitreTactics: [],
       mitreLoading: false,
       mitreTechniques: [],
-      mitreRuleId: "",
-      mitreIds: []
+      mitreRuleId: '',
+      mitreIds: [],
     };
     this.rulesetHandler = new RulesetHandler(RulesetResources.RULES);
+
+    const handleFileClick = async (event, {filename, relative_dirname}) => {
+      event.stopPropagation();
+      try {
+        const result = await this.rulesetHandler.getFileContent(filename);
+        const file = {
+          name: filename,
+          content: result,
+          path: relative_dirname,
+        };
+        this.props.updateFileContent(file);
+      } catch (error) {
+        const options = {
+          context: `${WzRuleInfo.name}.handleFileClick`,
+          level: UI_LOGGER_LEVELS.ERROR,
+          severity: UI_ERROR_SEVERITIES.BUSINESS,
+          error: {
+            error: error,
+            message: `Error updating file content: ${error.message || error}`,
+            title: error.name || error,
+          },
+        };
+        getErrorOrchestrator().handleError(options);
+      }
+    };
+
     this.columns = [
       {
         field: 'id',
         name: 'ID',
         align: 'left',
         sortable: true,
-        width: '5%'
+        width: '5%',
       },
       {
         field: 'description',
@@ -85,25 +114,25 @@ class WzRuleInfo extends Component {
               <span dangerouslySetInnerHTML={{ __html: value }} />
             </div>
           );
-        }
+        },
       },
       {
         field: 'groups',
         name: 'Groups',
         align: 'left',
         sortable: true,
-        width: '10%'
+        width: '10%',
       },
       {
         name: 'Compliance',
-        render: this.buildComplianceBadges
+        render: this.buildComplianceBadges,
       },
       {
         field: 'level',
         name: 'Level',
         align: 'left',
         sortable: true,
-        width: '5%'
+        width: '5%',
       },
       {
         field: 'filename',
@@ -114,24 +143,11 @@ class WzRuleInfo extends Component {
         render: (value, item) => {
           return (
             <EuiToolTip position="top" content={`Show ${value} content`}>
-              <EuiLink
-                onClick={async event => {
-                  event.stopPropagation();
-                  const result = await this.rulesetHandler.getFileContent(value);
-                  const file = {
-                    name: value,
-                    content: result,
-                    path: item.relative_dirname
-                  };
-                  this.props.updateFileContent(file);
-                }}
-              >
-                {value}
-              </EuiLink>
+              <EuiLink onClick={async (event) => handleFileClick(event, item)}>{value}</EuiLink>
             </EuiToolTip>
           );
-        }
-      }
+        },
+      },
     ];
   }
 
@@ -146,18 +162,9 @@ class WzRuleInfo extends Component {
    */
   buildCompliance(ruleInfo) {
     const compliance = {};
-    const complianceKeys = [
-      'gdpr',
-      'gpg13',
-      'hipaa',
-      'nist-800-53',
-      'pci',
-      'tsc',
-      'mitre'
-    ];
-    Object.keys(ruleInfo).forEach(key => {
-      if (complianceKeys.includes(key) && ruleInfo[key].length)
-        compliance[key] = ruleInfo[key];
+    const complianceKeys = ['gdpr', 'gpg13', 'hipaa', 'nist-800-53', 'pci', 'tsc', 'mitre'];
+    Object.keys(ruleInfo).forEach((key) => {
+      if (complianceKeys.includes(key) && ruleInfo[key].length) compliance[key] = ruleInfo[key];
     });
     return compliance || {};
   }
@@ -165,25 +172,16 @@ class WzRuleInfo extends Component {
   buildComplianceBadges(item) {
     const badgeList = [];
     const fields = ['pci_dss', 'gpg13', 'hipaa', 'gdpr', 'nist_800_53', 'tsc', 'mitre'];
-    const buildBadge = field => {
+    const buildBadge = (field) => {
       const idGenerator = () => {
-        return (
-          '_' +
-          Math.random()
-            .toString(36)
-            .substr(2, 9)
-        );
+        return '_' + Math.random().toString(36).substr(2, 9);
       };
 
       return (
-        <EuiToolTip
-          content={item[field].join(', ')}
-          key={idGenerator()}
-          position="bottom"
-        >
+        <EuiToolTip content={item[field].join(', ')} key={idGenerator()} position="bottom">
           <EuiBadge
             title={null}
-            onClick={ev => ev.stopPropagation()}
+            onClick={(ev) => ev.stopPropagation()}
             onClickAriaLabel={field.toUpperCase()}
             color="hollow"
             style={{ margin: '1px 2px' }}
@@ -199,7 +197,19 @@ class WzRuleInfo extends Component {
           badgeList.push(buildBadge(field));
         }
       }
-    } catch (error) { }
+    } catch (error) {
+      const options = {
+        context: `${WzRuleInfo.name}.buildComplianceBadges`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.UI,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        }
+      };
+      getErrorOrchestrator().handleError(options);
+    }
 
     return <div>{badgeList}</div>;
   }
@@ -224,18 +234,18 @@ class WzRuleInfo extends Component {
   renderInfo(id, level, file, path, groups) {
     return (
       <EuiFlexGrid columns={4}>
-      <EuiFlexItem key="rule_ids" grow={1}>
-        <b style={{ paddingBottom: 6 }}>ID</b>
-        <span>
-          <EuiToolTip position="top" content={`Filter by this rule ID: ${id}`}>
-            <EuiLink
-              onClick={async () => this.setNewFiltersAndBack([{ field: 'rule_ids', value: id }])}
-            >
-              {id}
-            </EuiLink>
-          </EuiToolTip>
-        </span>
-      </EuiFlexItem>
+        <EuiFlexItem key="rule_ids" grow={1}>
+          <b style={{ paddingBottom: 6 }}>ID</b>
+          <span>
+            <EuiToolTip position="top" content={`Filter by this rule ID: ${id}`}>
+              <EuiLink
+                onClick={async () => this.setNewFiltersAndBack([{ field: 'rule_ids', value: id }])}
+              >
+                {id}
+              </EuiLink>
+            </EuiToolTip>
+          </span>
+        </EuiFlexItem>
         <EuiFlexItem key="level" grow={1}>
           <b style={{ paddingBottom: 6 }}>Level</b>
           <span>
@@ -253,7 +263,9 @@ class WzRuleInfo extends Component {
           <span>
             <EuiToolTip position="top" content={`Filter by this file: ${file}`}>
               <EuiLink
-                onClick={async () => this.setNewFiltersAndBack([{ field: 'filename', value: file }])}
+                onClick={async () =>
+                  this.setNewFiltersAndBack([{ field: 'filename', value: file }])
+                }
               >
                 {file}
               </EuiLink>
@@ -265,14 +277,17 @@ class WzRuleInfo extends Component {
           <span>
             <EuiToolTip position="top" content={`Filter by this path: ${path}`}>
               <EuiLink
-                onClick={async () => this.setNewFiltersAndBack([{ field: 'relative_dirname', value: path }])}
+                onClick={async () =>
+                  this.setNewFiltersAndBack([{ field: 'relative_dirname', value: path }])
+                }
               >
                 {path}
               </EuiLink>
             </EuiToolTip>
           </span>
         </EuiFlexItem>
-        <EuiFlexItem key="Groups" grow={1}><b style={{ paddingBottom: 6 }}>Groups</b>
+        <EuiFlexItem key="Groups" grow={1}>
+          <b style={{ paddingBottom: 6 }}>Groups</b>
           {this.renderGroups(groups)}
         </EuiFlexItem>
         <EuiSpacer size="s" />
@@ -281,18 +296,24 @@ class WzRuleInfo extends Component {
   }
 
   getFormattedDetails(value) {
-
     if (Array.isArray(value) && value[0].type) {
-      let link = "";
-      let name = "";
+      let link = '';
+      let name = '';
 
-      value.forEach(item => {
-        if (item.type === 'cve')
-          name = item.name;
+      value.forEach((item) => {
+        if (item.type === 'cve') name = item.name;
         if (item.type === 'link')
-          link = <a href={item.name} target="_blank">{item.name}</a>
-      })
-      return <span>{name}: {link}</span>
+          link = (
+            <a href={item.name} target="_blank">
+              {item.name}
+            </a>
+          );
+      });
+      return (
+        <span>
+          {name}: {link}
+        </span>
+      );
     } else if (value && typeof value === 'object' && value.constructor === Object) {
       let list = [];
       Object.keys(value).forEach((key, idx) => {
@@ -307,17 +328,11 @@ class WzRuleInfo extends Component {
       });
       return (
         <ul>
-          <li>
-            {list}
-          </li>
+          <li>{list}</li>
         </ul>
       );
     } else {
-      return (
-        <WzTextWithTooltipTruncated position='top'>
-          {value}
-        </WzTextWithTooltipTruncated>
-      );
+      return <WzTextWithTooltipTruncated position="top">{value}</WzTextWithTooltipTruncated>;
     }
   }
 
@@ -327,15 +342,18 @@ class WzRuleInfo extends Component {
    */
   renderDetails(details) {
     const detailsToRender = [];
-    const capitalize = str => str[0].toUpperCase() + str.slice(1);
+    const capitalize = (str) => str[0].toUpperCase() + str.slice(1);
     // Exclude group key of details
-    Object.keys(details).filter(key => key !== 'group').forEach((key) => {
-      detailsToRender.push(
-        <EuiFlexItem key={key} grow={1} style={{ maxWidth: 'calc(25% - 24px)' }}>
-          <b style={{ paddingBottom: 6 }}>{capitalize(key)}</b>{details[key] === '' ? 'true' : this.getFormattedDetails(details[key])}
-        </EuiFlexItem>
-      );
-    });
+    Object.keys(details)
+      .filter((key) => key !== 'group')
+      .forEach((key) => {
+        detailsToRender.push(
+          <EuiFlexItem key={key} grow={1} style={{ maxWidth: 'calc(25% - 24px)' }}>
+            <b style={{ paddingBottom: 6 }}>{capitalize(key)}</b>
+            {details[key] === '' ? 'true' : this.getFormattedDetails(details[key])}
+          </EuiFlexItem>
+        );
+      });
     return <EuiFlexGrid columns={4}>{detailsToRender}</EuiFlexGrid>;
   }
 
@@ -351,10 +369,7 @@ class WzRuleInfo extends Component {
           <EuiLink
             onClick={async () => this.setNewFiltersAndBack([{ field: 'group', value: group }])}
           >
-            <EuiToolTip
-              position="top"
-              content={`Filter by this group: ${group}`}
-            >
+            <EuiToolTip position="top" content={`Filter by this group: ${group}`}>
               <span>{group}</span>
             </EuiToolTip>
           </EuiLink>
@@ -364,38 +379,73 @@ class WzRuleInfo extends Component {
     });
     return (
       <ul>
-        <li>
-          {listGroups}
-        </li>
+        <li>{listGroups}</li>
       </ul>
     );
   }
 
+  async getTacticsNames(tactics) {
+    try {
+      let tacticsObj = [];
+      const data = await WzRequest.apiReq('GET', '/mitre/tactics', {
+        params: {
+          tactic_ids: tactics.toString(),
+        },
+      });
+      const formattedData = ((data || {}).data.data || {}).affected_items || [] || {};
+      formattedData &&
+        formattedData.forEach((item) => {
+          tacticsObj.push(item.name);
+        });
+      return tacticsObj;
+    } catch (error) {
+      return [];
+    }
+  }
 
-  async addMitreInformation(compliance, currentRuleId){
-    try{
-      this.setState({mitreLoading: true, mitreRuleId: currentRuleId })
+  async addMitreInformation(compliance, currentRuleId) {
+    try {
+      this.setState({ mitreLoading: true, mitreRuleId: currentRuleId });
       const mitreName = [];
       const mitreIds = [];
-      const mitreTactics = await Promise.all(compliance.map(async (i) => {
-        const data = await WzRequest.apiReq('GET', '/mitre', { 
-          params: {
-            q: `id=${i}`
-          }
-        });
-        const formattedData = (((((data || {}).data).data || {}).affected_items || [])[0] || {});
-        const techniques = formattedData.phase_name || [];
-        mitreName.push(formattedData.json.name);
-        mitreIds.push(i);
-        return techniques;
-      }));
-      if(mitreTactics.length){
-        let removeDuplicates = (arr) => arr.filter((v,i) => arr.indexOf(v) === i)
+      const mitreTactics = await Promise.all(
+        compliance.map(async (i) => {
+          const data = await WzRequest.apiReq('GET', '/mitre/techniques', {
+            params: {
+              q: `external_id=${i}`,
+            },
+          });
+          const formattedData = (((data || {}).data.data || {}).affected_items || [])[0] || {};
+          const tactics = this.getTacticsNames(formattedData.tactics) || [];
+          mitreName.push(formattedData.name);
+          mitreIds.push(i);
+          return tactics;
+        })
+      );
+      if (mitreTactics.length) {
+        let removeDuplicates = (arr) => arr.filter((v, i) => arr.indexOf(v) === i);
         const uniqueTactics = removeDuplicates(mitreTactics.flat());
-        this.setState({mitreLoading: false, mitreRuleId: currentRuleId, mitreIds, mitreTactics: uniqueTactics, mitreTechniques:mitreName })
+        this.setState({
+          mitreLoading: false,
+          mitreRuleId: currentRuleId,
+          mitreIds,
+          mitreTactics: uniqueTactics,
+          mitreTechniques: mitreName,
+        });
       }
-    }catch(error){
-      this.setState({mitreLoading: false})
+    } catch (error) {
+      this.setState({ mitreLoading: false });
+      const options = {
+        context: `${WzRuleInfo.name}.addMitreInformation`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   }
 
@@ -404,14 +454,23 @@ class WzRuleInfo extends Component {
    * @param {Array} compliance
    */
   renderCompliance(compliance) {
-    const currentRuleId = (this.state && this.state.currentRuleId) ? this.state.currentRuleId : this.props.state.ruleInfo.current;
-    if(compliance.mitre && compliance.mitre.length && currentRuleId !== this.state.mitreRuleId){
+    const currentRuleId =
+      this.state && this.state.currentRuleId
+        ? this.state.currentRuleId
+        : this.props.state.ruleInfo.current;
+    if (compliance.mitre && compliance.mitre.length && currentRuleId !== this.state.mitreRuleId) {
       this.addMitreInformation(compliance.mitre, currentRuleId);
-    }else if(currentRuleId !== this.state.mitreRuleId){
-      this.setState({mitreLoading: false, mitreRuleId: currentRuleId, mitreIds: [], mitreTactics: [], mitreTechniques: [] });
+    } else if (currentRuleId !== this.state.mitreRuleId) {
+      this.setState({
+        mitreLoading: false,
+        mitreRuleId: currentRuleId,
+        mitreIds: [],
+        mitreTactics: [],
+        mitreTechniques: [],
+      });
     }
     const listCompliance = [];
-    if(compliance.mitre) delete compliance.mitre;
+    if (compliance.mitre) delete compliance.mitre;
     const keys = Object.keys(compliance);
     for (let i in Object.keys(keys)) {
       const key = keys[i];
@@ -440,13 +499,14 @@ class WzRuleInfo extends Component {
       );
     }
 
-    if(this.state.mitreTechniques && this.state.mitreTechniques.length){
-      
+    if (this.state.mitreTechniques && this.state.mitreTechniques.length) {
       const values = this.state.mitreTechniques.map((element, index) => {
         return (
           <span key={index}>
             <EuiLink
-              onClick={async () => this.setNewFiltersAndBack([{ field: 'mitre', value: this.state.mitreIds[index] }])}
+              onClick={async () =>
+                this.setNewFiltersAndBack([{ field: 'mitre', value: this.state.mitreIds[index] }])
+              }
             >
               <EuiToolTip position="top" content="Filter by this compliance">
                 <span>{element}</span>
@@ -456,20 +516,23 @@ class WzRuleInfo extends Component {
           </span>
         );
       });
-      listCompliance.push(<EuiFlexItem key={listCompliance.length} grow={1} style={{ maxWidth: 'calc(25% - 24px)' }}>
-        <b style={{ paddingBottom: 6 }}>{this.complianceEquivalences['mitreTechniques']}</b>
-        {this.state.mitreLoading && <EuiLoadingSpinner size="m" /> || <p>{values}</p>}
-        <EuiSpacer size="s" />
-      </EuiFlexItem>)
+      listCompliance.push(
+        <EuiFlexItem key={listCompliance.length} grow={1} style={{ maxWidth: 'calc(25% - 24px)' }}>
+          <b style={{ paddingBottom: 6 }}>{this.complianceEquivalences['mitreTechniques']}</b>
+          {(this.state.mitreLoading && <EuiLoadingSpinner size="m" />) || <p>{values}</p>}
+          <EuiSpacer size="s" />
+        </EuiFlexItem>
+      );
     }
 
-    if(this.state.mitreTactics && this.state.mitreTactics.length){
-      
-      listCompliance.push(<EuiFlexItem key={listCompliance.length} grow={1} style={{ maxWidth: 'calc(25% - 24px)' }}>
-        <b style={{ paddingBottom: 6 }}>{this.complianceEquivalences['mitreTactics']}</b>
-        <p>{this.state.mitreTactics.toString()}</p>
-        <EuiSpacer size="s" />
-      </EuiFlexItem>)
+    if (this.state.mitreTactics && this.state.mitreTactics.length) {
+      listCompliance.push(
+        <EuiFlexItem key={listCompliance.length} grow={1} style={{ maxWidth: 'calc(25% - 24px)' }}>
+          <b style={{ paddingBottom: 6 }}>{this.complianceEquivalences['mitreTactics']}</b>
+          <p>{this.state.mitreTactics.toString()}</p>
+          <EuiSpacer size="s" />
+        </EuiFlexItem>
+      );
     }
 
     return <EuiFlexGrid columns={4}>{listCompliance}</EuiFlexGrid>;
@@ -480,13 +543,16 @@ class WzRuleInfo extends Component {
    * @param {Number} ruleId
    */
   changeBetweenRules(ruleId) {
-    window.location.href = window.location.href.replace(new RegExp('redirectRule=' + '[^&]*'), `redirectRule=${ruleId}`);
+    window.location.href = window.location.href.replace(
+      new RegExp('redirectRule=' + '[^&]*'),
+      `redirectRule=${ruleId}`
+    );
     this.setState({ currentRuleId: ruleId });
   }
 
   /**
    * Update style for title with elements $()
-   * @param {string} value 
+   * @param {string} value
    */
   updateStyleTitle(value) {
     if (value === undefined) return '';
@@ -504,19 +570,22 @@ class WzRuleInfo extends Component {
 
   render() {
     const { ruleInfo, isLoading } = this.props.state;
-    const currentRuleId = (this.state && this.state.currentRuleId) ? this.state.currentRuleId : ruleInfo.current;
+    const currentRuleId =
+      this.state && this.state.currentRuleId ? this.state.currentRuleId : ruleInfo.current;
     const rules = ruleInfo.affected_items;
-    const currentRuleArr = rules.filter(r => { return r.id === currentRuleId });
+    const currentRuleArr = rules.filter((r) => {
+      return r.id === currentRuleId;
+    });
     const currentRuleInfo = currentRuleArr[0];
     const { description, details, filename, relative_dirname, level, id, groups } = currentRuleInfo;
     const compliance = this.buildCompliance(currentRuleInfo);
     const columns = this.columns;
 
-    const onClickRow = item => {
+    const onClickRow = (item) => {
       return {
         onClick: () => {
           this.changeBetweenRules(item.id);
-        }
+        },
       };
     };
 
@@ -536,12 +605,19 @@ class WzRuleInfo extends Component {
                         iconSize="l"
                         iconType="arrowLeft"
                         onClick={() => {
-                          window.location.href = window.location.href.replace(new RegExp('redirectRule=' + '[^&]*'), '');
+                          window.location.href = window.location.href.replace(
+                            new RegExp('redirectRule=' + '[^&]*'),
+                            ''
+                          );
                           this.props.cleanInfo();
                         }}
                       />
                     </EuiToolTip>
-                    {<span dangerouslySetInnerHTML={{ __html: this.updateStyleTitle(description) }} />}
+                    {
+                      <span
+                        dangerouslySetInnerHTML={{ __html: this.updateStyleTitle(description) }}
+                      />
+                    }
                   </span>
                 </EuiTitle>
               </EuiFlexItem>
@@ -550,7 +626,8 @@ class WzRuleInfo extends Component {
                   iconType="popout"
                   aria-label="popout"
                   href={`#/overview?tab=general&tabView=panels&addRuleFilter=${id}`}
-                  target="blank">
+                  target="blank"
+                >
                   View alerts of this Rule
                 </EuiButtonEmpty>
               </EuiFlexItem>
@@ -568,8 +645,9 @@ class WzRuleInfo extends Component {
                       </EuiTitle>
                     }
                     paddingSize="none"
-                    initialIsOpen={true}>
-                    <div className='flyout-row details-row'>
+                    initialIsOpen={true}
+                  >
+                    <div className="flyout-row details-row">
                       {this.renderInfo(id, level, filename, relative_dirname, groups)}
                     </div>
                   </EuiAccordion>
@@ -586,10 +664,9 @@ class WzRuleInfo extends Component {
                       </EuiTitle>
                     }
                     paddingSize="none"
-                    initialIsOpen={true}>
-                    <div className='flyout-row details-row'>
-                      {this.renderDetails(details)}
-                    </div>
+                    initialIsOpen={true}
+                  >
+                    <div className="flyout-row details-row">{this.renderDetails(details)}</div>
                   </EuiAccordion>
                 </EuiFlexItem>
               </EuiFlexGroup>
@@ -605,8 +682,9 @@ class WzRuleInfo extends Component {
                         </EuiTitle>
                       }
                       paddingSize="none"
-                      initialIsOpen={true}>
-                      <div className='flyout-row details-row'>
+                      initialIsOpen={true}
+                    >
+                      <div className="flyout-row details-row">
                         {this.renderCompliance(compliance)}
                       </div>
                     </EuiAccordion>
@@ -624,8 +702,9 @@ class WzRuleInfo extends Component {
                       </EuiTitle>
                     }
                     paddingSize="none"
-                    initialIsOpen={true}>
-                    <div className='flyout-row related-rules-row'>
+                    initialIsOpen={true}
+                  >
+                    <div className="flyout-row related-rules-row">
                       <EuiFlexGroup>
                         <EuiFlexItem>
                           <EuiInMemoryTable
@@ -652,23 +731,20 @@ class WzRuleInfo extends Component {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
-    state: state.rulesetReducers
+    state: state.rulesetReducers,
   };
 };
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch) => {
   return {
-    updateFileContent: content => dispatch(updateFileContent(content)),
+    updateFileContent: (content) => dispatch(updateFileContent(content)),
     cleanFileContent: () => dispatch(cleanFileContent()),
-    updateFilters: filters => dispatch(updateFilters(filters)),
+    updateFilters: (filters) => dispatch(updateFilters(filters)),
     cleanFilters: () => dispatch(cleanFilters()),
-    cleanInfo: () => dispatch(cleanInfo())
+    cleanInfo: () => dispatch(cleanInfo()),
   };
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WzRuleInfo);
+export default connect(mapStateToProps, mapDispatchToProps)(WzRuleInfo);

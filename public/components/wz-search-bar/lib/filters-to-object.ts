@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for show search and filter
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@ export interface IFilter {
 }
 
 function buildQFilter(oldQ, newQ) {
-  const parsedQ = `(${newQ})`.replace(/ and | or /gi, parseConjuntions);
+  const parsedQ = (oldQ ? `(${newQ})` : newQ).replace(/ and | or /gi, parseConjuntions);
   return `${!!oldQ ? `${oldQ};` : ''}${parsedQ}`;
 }
 

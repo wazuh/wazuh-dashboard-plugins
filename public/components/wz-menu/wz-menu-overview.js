@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for registering agents.
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@ import React, { Component } from 'react';
 import { EuiFlexGroup, EuiFlexItem, EuiFlexGrid, EuiButtonEmpty, EuiSideNav, EuiIcon } from '@elastic/eui';
 import { connect } from 'react-redux';
 import store from '../../redux/store';
-import { updateCurrentTab, updateCurrentAgentData } from '../../redux/actions/appStateActions';
+import { updateCurrentAgentData } from '../../redux/actions/appStateActions';
 import { AppState } from '../../react-services/app-state';
 import { AppNavigate } from '../../react-services/app-navigate';
 import { getAngularModule } from '../../kibana-services';
@@ -57,6 +57,11 @@ class WzMenuOverview extends Component {
         id: WAZUH_MODULES_ID.AMAZON_WEB_SERVICES,
         cyTestId: WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID.AMAZON_WEB_SERVICES,
         text: 'Amazon AWS',
+      },
+      office: {
+        id: WAZUH_MODULES_ID.OFFICE_365,
+        cyTestId: WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID.OFFICE_365,
+        text: 'Office 365',
       },
       gcp: {
         id: WAZUH_MODULES_ID.GOOGLE_CLOUD_PLATFORM,
@@ -138,13 +143,20 @@ class WzMenuOverview extends Component {
         cyTestId: WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID.TSC,
         text: 'TSC',
       },
+      github: {
+        id: WAZUH_MODULES_ID.GITHUB,
+        cyTestId: WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID.GITHUB,
+        text: 'GitHub',
+      },
     };
 
     this.securityInformationItems = [
       this.overviewSections.general,
       this.overviewSections.fim,
+      this.overviewSections.office,
       this.overviewSections.aws,
-      this.overviewSections.gcp
+      this.overviewSections.gcp,
+      this.overviewSections.github
     ];
     this.auditingItems = [
       this.overviewSections.pm,

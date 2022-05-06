@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Agent vulnerabilities table component
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,9 @@ import {
   EuiSpacer,
   EuiStat,
   EuiToolTip,
+  EuiListGroup,
   EuiBadge,
+  EuiText,
 } from '@elastic/eui';
 import { Discover } from '../../../common/modules/discover';
 import { ModulesHelper } from '../../../common/modules/modules-helper';
@@ -32,9 +34,9 @@ import { getIndexPattern } from '../../../overview/mitre/lib';
 import moment from 'moment-timezone';
 import { AppNavigate } from '../../../../react-services/app-navigate';
 import { TruncateHorizontalComponents } from '../../../common/util';
-import { getDataPlugin,getUiSettings } from '../../../../kibana-services';
+import { getDataPlugin, getUiSettings } from '../../../../kibana-services';
 import { FilterManager } from '../../../../../../../src/plugins/data/public/';
-
+import { formatUIDate } from '../../../../react-services/time-service';
 export class Details extends Component {
   props!: {
     currentItem: {
@@ -90,30 +92,84 @@ export class Details extends Component {
   details() {
     return [
       {
+        field: 'title',
+        name: 'Title',
+        icon: 'home',
+        link: false,
+      },
+      {
         field: 'name',
         name: 'Name',
         icon: 'dot',
-        link: false,
+        link: true,
       },
       {
         field: 'cve',
         name: 'CVE',
         icon: 'securitySignal',
-        link: false,
+        link: true,
       },
       {
         field: 'version',
         name: 'Version',
         icon: 'package',
-        link: false,
+        link: true,
       },
       {
         field: 'architecture',
         name: 'Architecture',
         icon: 'node',
+        link: true,
+      },
+      {
+        field: 'condition',
+        name: 'Condition',
+        icon: 'crosshairs',
         link: false,
-      }
+      },
+      {
+        field: 'last_full_scan',
+        name: 'Last full scan',
+        icon: 'clock',
+        link: false,
+        transformValue: this.beautifyDate
+      },
+      {
+        field: 'last_partial_scan',
+        name: 'Last partial scan',
+        icon: 'clock',
+        link: false,
+        transformValue: this.beautifyDate
+      },
+      {
+        field: 'published',
+        name: 'Published',
+        icon: 'clock',
+        link: false,
+        transformValue: this.beautifyDate
+      },
+      {
+        field: 'updated',
+        name: 'Updated',
+        icon: 'clock',
+        link: false,
+        transformValue: this.beautifyDate
+      },
+      {
+        field: 'external_references',
+        name: 'References',
+        icon: 'link',
+        link: false,
+        transformValue: this.renderExternalReferences
+      },
     ];
+  }
+
+  // This method was created because Wazuh API returns 1970-01-01T00:00:00Z dates or undefined ones
+  // when vulnerability module is not configured
+  // its meant to render nothing when such date is received
+  beautifyDate(date?: string) {
+    return date && !['1970-01-01T00:00:00Z', '-'].includes(date) ? formatUIDate(date) : '-';
   }
 
   viewInEvents = (ev) => {
@@ -138,7 +194,11 @@ export class Details extends Component {
     const { cve } = this.props.currentItem;
     const filters = [
       {
-        ...buildPhraseFilter({ name: 'data.vulnerability.cve', type: 'text' }, cve, this.indexPattern),
+        ...buildPhraseFilter(
+          { name: 'data.vulnerability.cve', type: 'text' },
+          cve,
+          this.indexPattern
+        ),
         $state: { store: 'appState' },
       },
     ];
@@ -151,7 +211,6 @@ export class Details extends Component {
     const { filterManager } = getDataPlugin().query;
     const _filters = filterManager.getFilters();
     if (_filters && _filters.length) {
-     
       filterManager.addFilters([filters]);
       const scope = await ModulesHelper.getDiscoverScope();
       scope.updateQueryAndFetch && scope.updateQueryAndFetch({ query: null });
@@ -188,10 +247,11 @@ export class Details extends Component {
       }
       var link = (item.link && !['events', 'extern'].includes(view)) || false;
       const agentPlatform = ((this.props.agent || {}).os || {}).platform;
-      
+
       if (!item.onlyLinux || (item.onlyLinux && this.props.agent && agentPlatform !== 'windows')) {
         let className = item.checksum ? 'detail-value detail-value-checksum' : 'detail-value';
         className += item.field === 'perm' ? ' detail-value-perm' : '';
+        className += ' wz-width-100';
         return (
           <EuiFlexItem key={idx}>
             <EuiStat
@@ -202,14 +262,14 @@ export class Details extends Component {
                   <span
                     className={className}
                     onMouseEnter={() => {
-                      this.setState({ hoverAddFilter: item });
+                      this.setState({ hoverAddFilter: item.field });
                     }}
                     onMouseLeave={() => {
                       this.setState({ hoverAddFilter: '' });
                     }}
                   >
                     {value}
-                    {_.isEqual(this.state.hoverAddFilter, item) && (
+                    {this.state.hoverAddFilter === item.field && (
                       <EuiToolTip
                         position="top"
                         anchorClassName="detail-tooltip"
@@ -251,6 +311,32 @@ export class Details extends Component {
       <div>
         <EuiFlexGrid columns={3}> {generalDetails} </EuiFlexGrid>
       </div>
+    );
+  }
+
+  renderExternalReferences(references) {
+    return (
+      <EuiAccordion
+        id="modules_vulnerabilities_inventory_flyout_details_references"
+        paddingSize="none"
+        initialIsOpen={false}
+        arrowDisplay="none"
+        buttonContent={
+          <EuiTitle size="xs">
+            <EuiToolTip position="top" content="View external references">
+              <p className="detail-value" style={{ margin: 0 }}>View external references <EuiIcon
+                className="euiButtonIcon euiButtonIcon--primary"
+                type="inspect"
+                aria-label="show"
+              /></p>
+            </EuiToolTip>
+          </EuiTitle>
+        }>
+        <EuiListGroup size="xs" flush={true} gutterSize="none" style={{ display: 'grid' }}
+          listItems={references.map(link => ({ label: link, href: link, target: '_blank' }))
+          }
+        />
+      </EuiAccordion>
     );
   }
 
@@ -302,7 +388,6 @@ export class Details extends Component {
     }
     return value;
   }
-
 
   render() {
     const { type, implicitFilters, view, currentItem, agent } = this.props;
@@ -359,11 +444,21 @@ export class Details extends Component {
                 kbnSearchBar
                 shareFilterManager={this.discoverFilterManager}
                 initialColumns={[
-                  'icon',
-                  'timestamp',
-                  'rule.description',
-                  'rule.level',
-                  'rule.id',
+                  { field: 'icon' },
+                  { field: 'timestamp' },
+                  { field: 'agent.id', label: 'Agent' },
+                  { field: 'agent.name', label: 'Agent name' },
+                  { field: 'rule.description', label: 'Description' },
+                  { field: 'rule.level', label: 'Level' },
+                  { field: 'rule.id', label: 'Rule ID' },
+                ]}
+                initialAgentColumns={[
+                  { field: 'icon' },
+                  { field: 'timestamp' },
+                  { field: 'rule.description', label: 'Description' },
+                  { field: 'rule.level', label: 'Level' },
+                  { field: 'rule.id', label: 'Rule ID' },
+                  { field: 'data.vulnerability.status', label: 'Status', width: '20%' },
                 ]}
                 includeFilters="vulnerability"
                 implicitFilters={implicitFilters}

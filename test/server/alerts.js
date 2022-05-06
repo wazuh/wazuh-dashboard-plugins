@@ -1,10 +1,11 @@
 const chai = require('chai');
 const needle = require('needle');
+const { PLUGIN_PLATFORM_REQUEST_HEADERS } = require('../../common/constants');
 const elasticServer = process.env.WAZUH_ELASTIC_IP || 'localhost';
 chai.should();
 
 const headers = {
-  headers: { 'kbn-xsrf': 'kibana', 'Content-Type': 'application/json' }
+  headers: { ...PLUGIN_PLATFORM_REQUEST_HEADERS, 'content-type': 'application/json' }
 };
 
 const date = new Date();

@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Module to export agents visualizations raw content
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,11 +23,11 @@ import nist from './agents-nist';
 import tsc from './agents-tsc';
 import pm from './agents-pm';
 import virustotal from './agents-virustotal';
-import vuls from './agents-vuls';
 import osquery from './agents-osquery';
 import docker from './agents-docker';
 import welcome from './agents-welcome';
 import aws from './agents-aws';
+import github from './agents-github';
 
 export {
   audit,
@@ -43,10 +43,10 @@ export {
   tsc,
   pm,
   virustotal,
-  vuls,
   osquery,
   mitre,
   docker,
   welcome,
-  aws
+  aws,
+  github
 };

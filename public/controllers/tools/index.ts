@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Load the Dev Tools controller.
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,6 +16,7 @@ import { DevToolsController } from '../dev-tools/dev-tools';
 
 const app = getAngularModule();
 
+Logtest.displayName = 'Logtest';
 app
   .controller('devToolsController', DevToolsController)
   .controller('toolsController', ToolsController)

@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for groups files table.
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,6 +26,10 @@ import {
 } from '../../../../../redux/actions/groupsActions';
 import GroupsFilesColumns from './utils/columns-files';
 import { WzSearchBar, filtersToObject } from '../../../../../components/wz-search-bar';
+import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../../../../react-services/common-services';
+
 
 class WzGroupFilesTable extends Component {
   _isMounted = false;
@@ -84,7 +88,18 @@ class WzGroupFilesTable extends Component {
       this.props.state.isProcessing && this.props.updateIsProcessing(false);
     } catch (error) {
       this.props.state.isProcessing && this.props.updateIsProcessing(false);
-      return Promise.reject(error);
+      const options = {
+        context: `${WzGroupFilesTable.name}.getItems`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.CRITICAL,
+        store: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `Error loading the groups: ${error.message || error}`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   }
 

@@ -1,7 +1,7 @@
 /*
  * Wazuh app - React component for building a card to be used for showing compliance requirements.
  *
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,8 +19,9 @@ import {
   EuiFlexItem,
   EuiFlexGroup
 } from '@elastic/eui';
+import { withErrorBoundary } from '../../../components/common/hocs';
 
-export class RequirementCard extends Component {
+export const RequirementCard = withErrorBoundary (class RequirementCard extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -171,7 +172,7 @@ export class RequirementCard extends Component {
       </EuiFlexGroup>
     );
   }
-}
+});
 
 RequirementCard.propTypes = {
   items: PropTypes.array,

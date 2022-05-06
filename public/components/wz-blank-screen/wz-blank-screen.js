@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for build q queries.
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -9,14 +9,10 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component, Fragment } from 'react';
-import {
-  EuiPage,
-  EuiPageContent,
-  EuiEmptyPrompt,
-  EuiButton,
-  EuiHorizontalRule
-} from '@elastic/eui';
+import React, { Component } from 'react';
+import { EuiButton, EuiHorizontalRule, EuiPage, EuiPageContent } from '@elastic/eui';
+import { ErrorComponentPrompt } from '../common/error-boundary-prompt/error-boundary-prompt';
+import { PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_TROUBLESHOOTING, PLUGIN_PLATFORM_URL_GUIDE, PLUGIN_PLATFORM_URL_GUIDE_TITLE } from '../../../common/constants';
 
 export class WzBlankScreen extends Component {
   constructor(props) {
@@ -28,29 +24,24 @@ export class WzBlankScreen extends Component {
     return (
       <EuiPage>
         <EuiPageContent horizontalPosition="center">
-          <EuiEmptyPrompt
-            iconType="alert"
-            title={<h2>{this.props.errorToShow || 'Something went wrong'}</h2>}
-            body={
-              <Fragment>
-                <EuiHorizontalRule margin="s" />
+          <ErrorComponentPrompt
+            errorTitle={this.props.errorToShow}
+            errorInfo={''}
+            action={
+              <>
                 <p>
-                  <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html">
-                    https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html
-                  </a>
+                  <a href={PLUGIN_PLATFORM_URL_GUIDE}>{PLUGIN_PLATFORM_URL_GUIDE_TITLE}</a>
                   <br />
-                  <a href="https://documentation.wazuh.com/current/installation-guide/">
-                    https://documentation.wazuh.com/current/installation-guide/
-                  </a>
+                  <br />
+                  <a href={PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_TROUBLESHOOTING}>Wazuh installation guide</a>
                 </p>
                 <EuiHorizontalRule margin="s" />
                 <p> </p>
-              </Fragment>
-            }
-            actions={
-              <EuiButton onClick={this.props.goToOverview} color="primary" fill>
-                Refresh
-              </EuiButton>
+
+                <EuiButton onClick={this.props.goToOverview} color="primary" fill>
+                  Refresh
+                </EuiButton>
+              </>
             }
           />
         </EuiPageContent>

@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for render group of settings.
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -12,6 +12,7 @@
 
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { get } from 'lodash';
 
 import {
   EuiFlexGroup,
@@ -56,6 +57,7 @@ class WzSettingsGroup extends Component {
               const keyItem = `${title || ''}-${item.label}-${
                 item.value
               }-${key}`;
+              const value = get(config, item.field);
               return (
                 <WzConfigurationSetting
                   key={keyItem}
@@ -63,8 +65,8 @@ class WzSettingsGroup extends Component {
                   label={item.label}
                   value={
                     item.render
-                      ? item.render(config[item.field])
-                      : config[item.field]
+                      ? item.render(value)
+                      : value
                   }
                 />
               );

@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Integrity monitoring components
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -10,16 +10,8 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { Component } from 'react';
-import { SyscollectorInventory } from './inventory'
+import React from 'react';
+import { withErrorBoundary } from '../../common/hocs';
+import { SyscollectorInventory } from './inventory';
 
-export class MainSyscollector extends Component {
-
-  constructor(props) {
-    super(props);
-  }
-
-  render() {
-    return (<SyscollectorInventory agent={this.props.agent}></SyscollectorInventory> )
-  }
-}
+export const MainSyscollector = withErrorBoundary(SyscollectorInventory);

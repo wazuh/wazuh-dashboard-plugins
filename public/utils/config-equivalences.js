@@ -1,9 +1,11 @@
+import { ASSETS_BASE_URL_PREFIX, PLUGIN_PLATFORM_NAME } from "../../common/constants";
+
 export const configEquivalences = {
   pattern: 'Default index pattern to use on the app.',
-  'customization.logo.app':'Define the name of the app logo saved in the path /plugins/wazuh/assets/',
-  'customization.logo.sidebar':'Define the name of the sidebar logo saved in the path /plugins/wazuh/assets/',
-  'customization.logo.healthcheck':'Define the name of the health-check logo saved in the path /plugins/wazuh/assets/',
-  'customization.logo.reports':'Define the name of the reports logo (.png) saved in the path /plugins/wazuh/assets/',
+  'customization.logo.app':`Define the name of the app logo saved in the path ${ASSETS_BASE_URL_PREFIX}`,
+  'customization.logo.sidebar':`Define the name of the sidebar logo saved in the path ${ASSETS_BASE_URL_PREFIX}`,
+  'customization.logo.healthcheck':`Define the name of the health-check logo saved in the path ${ASSETS_BASE_URL_PREFIX}`,
+  'customization.logo.reports':`Define the name of the reports logo (.png) saved in the path ${ASSETS_BASE_URL_PREFIX}`,
   'checks.pattern':
     'Enable or disable the index pattern health check when opening the app.',
   'checks.template':
@@ -14,11 +16,11 @@ export const configEquivalences = {
   'checks.fields':
     'Enable or disable the known fields health check when opening the app.',
     'checks.metaFields':
-      'Change the default value of the Kibana metaField configuration',
+      `Change the default value of the ${PLUGIN_PLATFORM_NAME} metaField configuration`,
     'checks.timeFilter':
-      'Change the default value of the Kibana timeFilter configuration',
+      `Change the default value of the ${PLUGIN_PLATFORM_NAME} timeFilter configuration`,
     'checks.maxBuckets':
-      'Change the default value of the Kibana max buckets configuration',
+      `Change the default value of the ${PLUGIN_PLATFORM_NAME} max buckets configuration`,
   'extensions.pci': 'Enable or disable the PCI DSS tab on Overview and Agents.',
   'extensions.gdpr': 'Enable or disable the GDPR tab on Overview and Agents.',
   'extensions.audit': 'Enable or disable the Audit tab on Overview and Agents.',
@@ -37,8 +39,6 @@ export const configEquivalences = {
     'Enable or disable the Docker listener tab on Overview and Agents.',
   timeout:
     'Defines the maximum time the app will wait for an API response when making requests to it.',
-  'api.selector':
-    'Defines if the user is allowed to change the selected API directly from the top menu bar.',
   'ip.selector':
     'Defines if the user is allowed to change the selected index pattern directly from the top menu bar.',
   'ip.ignore':
@@ -85,12 +85,11 @@ export const nameEquivalence = {
   'checks.template': 'Index template',
   'checks.api': 'API connection',
   'checks.setup': 'API version',
-  'checks.fields': 'Know fields',
+  'checks.fields': 'Known fields',
   'checks.metaFields': 'Remove meta fields',
   'checks.timeFilter': 'Set time filter to 24h',
   'checks.maxBuckets': 'Set max buckets to 200000',
   timeout: 'Request timeout',
-  'api.selector': 'API selector',
   'ip.selector': 'IP selector',
   'ip.ignore': 'IP ignore',
   'xpack.rbac.enabled': 'X-Pack RBAC',
@@ -137,7 +136,6 @@ export const categoriesEquivalence = {
   'checks.timeFilter': HEALTH_CHECK,
   'checks.maxBuckets': HEALTH_CHECK,
   timeout: GENERAL,
-  'api.selector': GENERAL,
   'ip.selector': GENERAL,
   'ip.ignore': GENERAL,
   'wazuh.monitoring.enabled': MONITORING,
@@ -182,7 +180,6 @@ export const formEquivalence = {
   'checks.timeFilter': { type: BOOLEAN },
   'checks.maxBuckets': { type: BOOLEAN },
   timeout: { type: NUMBER },
-  'api.selector': { type: BOOLEAN },
   'ip.selector': { type: BOOLEAN },
   'ip.ignore': { type: ARRAY },
   'xpack.rbac.enabled': { type: BOOLEAN },

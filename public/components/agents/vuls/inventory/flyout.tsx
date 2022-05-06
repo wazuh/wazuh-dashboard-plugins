@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Agent vulnerabilities components
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,15 @@ import {
 } from '@elastic/eui';
 import { Details } from './detail';
 import { AppState } from '../../../../react-services/app-state';
+import {
+  UI_ERROR_SEVERITIES,
+  UIErrorLog,
+  UIErrorSeverity,
+  UILogLevel,
+} from '../../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
+import { getErrorOrchestrator } from '../../../../react-services/common-services';
+import { WzRequest } from '../../../../react-services/wz-request';
 
 export class FlyoutDetail extends Component {
   state: {
@@ -47,6 +56,15 @@ export class FlyoutDetail extends Component {
     };
   }
 
+  async getLastScan() {
+    const response = await WzRequest.apiReq(
+      'GET',
+      `/vulnerability/${this.props.agentId}/last_scan`,
+      {}
+    );
+    return ((response.data || {}).data || {}).affected_items[0] || {};
+  }
+
   async componentDidMount() {
     try {
       const isCluster = (AppState.getClusterInfo() || {}).status === 'enabled';
@@ -57,26 +75,42 @@ export class FlyoutDetail extends Component {
       const currentItem = this.props.item;
 
       if (!currentItem) {
-        throw false;
+        throw new Error('Vulnerability not found');
       }
+
+      const lastScan = await this.getLastScan();
+      Object.assign(currentItem, { ...lastScan });
+
       this.setState({ currentItem, isLoading: false });
-    } catch (err) {
+    } catch (error) {
+      const options: UIErrorLog = {
+        context: `${FlyoutDetail.name}.componentDidMount`,
+        level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+        severity: UI_ERROR_SEVERITIES.UI as UIErrorSeverity,
+        error: {
+          error: error,
+          message: `Data could not be fetched for ${this.props.vulName}`,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
       this.setState({
         error: `Data could not be fetched for ${this.props.vulName}`,
       });
+    } finally {
+      this.setState({ isLoading: false });
     }
   }
 
   render() {
     const { currentItem } = this.state;
-    const title = `${currentItem.cve}`;
+    const title = `${currentItem.cve || ''}`;
     const id = title.replace(/ /g, '_');
-
     const filterMap = {
       name: 'data.vulnerability.package.name',
       cve: 'data.vulnerability.cve',
       architecture: 'data.vulnerability.package.architecture',
-      version: 'data.vulnerability.package.version',
+      version: 'data.vulnerability.package.version'
     };
     const implicitFilters = [
       { 'rule.groups': 'vulnerability-detector' },

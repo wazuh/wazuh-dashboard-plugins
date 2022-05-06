@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Agents visualizations
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -473,69 +473,6 @@ export const agentVisualizations = {
       }
     ]
   },
-  vuls: {
-    rows: [
-      {
-        height: 400,
-        vis: [
-          {
-            title: 'Alerts severity over time',
-            id: 'Wazuh-App-Agents-vuls-Alerts-severity-over-time',
-            width: 50
-          },
-          {
-            title: 'Most common rules',
-            id: 'Wazuh-App-Agents-vuls-Most-common-rules',
-            width: 50
-          }
-        ]
-      },
-      {
-        height: 330,
-        vis: [
-          {
-            title: 'Most common CVEs',
-            id: 'Wazuh-App-Agents-vuls-Vulnerability-Most-common-CVEs',
-            width: 25
-          },
-          {
-            title: 'Alerts evolution: Commonly affected packages',
-            id: 'Wazuh-App-Agents-vuls-evolution-affected-packages',
-            width: 50
-          },
-          {
-            title: 'Most common CWEs',
-            id: 'Wazuh-App-Agents-vuls-Most-common-CWEs',
-            width: 25
-          }
-        ]
-      },
-      {
-        height: 330,
-        vis: [
-          {
-            title: 'Severity distribution',
-            id: 'Wazuh-App-Agents-vuls-Vulnerability-severity-distribution',
-            width: 25
-          },
-          {
-            title: 'Top affected packages by CVEs',
-            id: 'Wazuh-App-Agents-vuls-packages-CVEs',
-            width: 75
-          },
-        ]
-      },
-      {
-        hide: true,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Agents-vuls-Alerts-summary'
-          }
-        ]
-      }
-    ]
-  },
   virustotal: {
     rows: [
       {
@@ -874,5 +811,48 @@ export const agentVisualizations = {
         ]
       }
     ]
-  }
+  },
+  github: {
+    rows: [
+      {
+        height: 360,
+        vis: [
+          {
+            title: 'Alerts evolution by organization',
+            id: 'Wazuh-App-Overview-GitHub-Alerts-Evolution-By-Organization',
+            width: 60
+          },
+          {
+            title: 'Top 5 organizations by alerts',
+            id: 'Wazuh-App-Overview-GitHub-Top-5-Organizations-By-Alerts',
+            width: 40
+          }
+        ]
+      },
+      {
+        height: 360,
+        vis: [
+          {
+            title: 'Top alerts by action type and organization',
+            id: 'Wazuh-App-Overview-GitHub-Alert-Action-Type-By-Organization',
+            width: 40
+          },
+          {
+            title: 'Users with more alerts',
+            id: 'Wazuh-App-Overview-GitHub-Users-With-More-Alerts',
+            width: 60
+          }
+        ]
+      },
+      {
+        hide: true,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Overview-GitHub-Alert-Summary',
+          }
+        ]
+      }
+    ]
+  },
 };

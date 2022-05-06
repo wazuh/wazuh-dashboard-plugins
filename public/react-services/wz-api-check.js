@@ -1,6 +1,6 @@
 /*
  * Wazuh app - API status check service
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,6 +14,7 @@ import axios from 'axios';
 import { AppState } from './app-state';
 import { WzMisc } from '../factories/misc';
 import { getHttp } from '../kibana-services';
+import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../common/constants';
 
 export class ApiCheck {
   static async checkStored(data, idChanged = false) {
@@ -29,7 +30,7 @@ export class ApiCheck {
       const url = getHttp().basePath.prepend('/api/check-stored-api');
       const options = {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'kbn-xsrf': 'kibana' },
+        headers: { ...PLUGIN_PLATFORM_REQUEST_HEADERS, 'content-type': 'application/json' },
         url: url,
         data: payload,
         timeout: timeout || 20000
@@ -37,7 +38,6 @@ export class ApiCheck {
 
       if (Object.keys(configuration).length) {
         AppState.setPatternSelector(configuration['ip.selector']);
-        AppState.setAPISelector(configuration['api.selector']);
       }
 
       const response = await axios(options);
@@ -73,7 +73,7 @@ export class ApiCheck {
 
       const options = {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'kbn-xsrf': 'kibana' },
+        headers: { ...PLUGIN_PLATFORM_REQUEST_HEADERS, 'content-type': 'application/json' },
         url: url,
         data: {...apiEntry, forceRefresh},
         timeout: timeout || 20000

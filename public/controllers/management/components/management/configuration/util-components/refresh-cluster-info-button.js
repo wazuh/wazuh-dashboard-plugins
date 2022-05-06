@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for render button to refresh cluster nodes info.
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +22,9 @@ import {
   updateRefreshTime
 } from '../../../../../../redux/actions/configurationActions';
 import { clusterNodes, clusterReq } from '../utils/wz-fetch';
+import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
 
 class WzRefreshClusterInfoButton extends Component {
   constructor(props) {
@@ -58,6 +61,17 @@ class WzRefreshClusterInfoButton extends Component {
       // do nothing if it isn't a cluster
       this.props.updateClusterNodes(false);
       this.props.updateClusterNodeSelected(false);
+      const options = {
+        context: `${WzRefreshClusterInfoButton.name}.checkIfClusterOrManager`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
     this.setState({isLoading: false});
     this.props.updateRefreshTime();

@@ -1,7 +1,7 @@
 /*
  * Wazuh app - React component for building the Overview welcome screen.
  *
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,8 +31,10 @@ import { updateCurrentTab } from '../../../redux/actions/appStateActions';
 import store from '../../../redux/store';
 import './welcome.scss';
 import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
+import { withErrorBoundary } from '../hocs';
+import { LogoDocker, LogoGitHub, LogoGoogleCloud, LogoOffice365 } from '../logos';
 
-export class OverviewWelcome extends Component {
+export const OverviewWelcome = withErrorBoundary(class OverviewWelcome extends Component {
   constructor(props) {
     super(props);
     this.strtools = new StringsTools();
@@ -56,7 +58,7 @@ export class OverviewWelcome extends Component {
         <EuiCard
           size="xs"
           layout="horizontal"
-          icon={<EuiIcon size="xl" type={icon} color="primary" />}
+          icon={<EuiIcon size="xl" type={icon} color="primary"/>}
           className="homSynopsis__card"
           title={WAZUH_MODULES[tab].title}
           onClick={() => store.dispatch(updateCurrentTab(tab))}
@@ -69,13 +71,15 @@ export class OverviewWelcome extends Component {
 
   addAgent() {
     return (
-      <EuiFlexGroup >
-        <EuiFlexItem >
-          <EuiCallOut  style={{height:"65%"}} title="No agents were added to this manager. " color="warning" iconType="alert">
-            <EuiButtonEmpty style={{margin: "-58px 286px"}}  href='#/agents-preview?'>Add agent</EuiButtonEmpty>
-          </EuiCallOut>
-        </EuiFlexItem >
-      </EuiFlexGroup>
+      <>
+        <EuiFlexGroup >
+          <EuiFlexItem >
+            <EuiCallOut title={<>No agents were added to this manager.  <EuiButtonEmpty href='#/agents-preview?'>Add agent</EuiButtonEmpty></>} color="warning" iconType="alert">
+            </EuiCallOut>
+          </EuiFlexItem >
+        </EuiFlexGroup>
+        <EuiSpacer size="xl" />
+      </>
     );
   }
 
@@ -95,8 +99,12 @@ export class OverviewWelcome extends Component {
                       {this.buildTabCard('fim', 'filebeatApp')}
                       {this.props.extensions.aws &&
                         this.buildTabCard('aws', 'logoAWSMono')}
+                      {this.props.extensions.office &&
+                        this.buildTabCard('office', LogoOffice365)}
                       {this.props.extensions.gcp &&
-                        this.buildTabCard('gcp', 'logoGCPMono')}
+                        this.buildTabCard('gcp', LogoGoogleCloud)}
+                      {this.props.extensions.github &&
+                        this.buildTabCard('github', LogoGitHub)}
                     </EuiFlexGrid>
                   </EuiCard>
                 </EuiFlexItem>
@@ -129,7 +137,7 @@ export class OverviewWelcome extends Component {
                       {this.props.extensions.osquery &&
                         this.buildTabCard('osquery', 'searchProfilerApp')}
                       {this.props.extensions.docker &&
-                        this.buildTabCard('docker', 'logoDocker')}
+                        this.buildTabCard('docker', LogoDocker)}
                       {this.buildTabCard('mitre', 'spacesApp')}
                       {/* TODO- Change "spacesApp" icon*/}
                     </EuiFlexGrid>
@@ -186,4 +194,4 @@ export class OverviewWelcome extends Component {
       </Fragment>
     );
   }
-}
+})

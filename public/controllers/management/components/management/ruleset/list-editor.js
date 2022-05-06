@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for registering agents.
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,19 +24,16 @@ import {
   EuiPopover,
   EuiFieldText,
   EuiSpacer,
-  EuiPanel
+  EuiPanel,
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
 
-import {
-  cleanInfo,
-  updateListContent
-} from '../../../../../redux/actions/rulesetActions';
+import { cleanInfo, updateListContent } from '../../../../../redux/actions/rulesetActions';
 
 import { resourceDictionary, RulesetHandler, RulesetResources } from './utils/ruleset-handler';
 
-import { getToasts }  from '../../../../../kibana-services';
+import { getToasts } from '../../../../../kibana-services';
 
 import exportCsv from '../../../../../react-services/wz-csv';
 
@@ -44,6 +41,9 @@ import { updateWazuhNotReadyYet } from '../../../../../redux/actions/appStateAct
 import WzRestartClusterManagerCallout from '../../../../../components/common/restart-cluster-manager-callout';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 
+import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
+import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 class WzListEditor extends Component {
   constructor(props) {
     super(props);
@@ -56,7 +56,7 @@ class WzListEditor extends Component {
       addingValue: '',
       editingValue: '',
       newListName: '',
-      showWarningRestart: false
+      showWarningRestart: false,
     };
     this.items = {};
 
@@ -92,8 +92,8 @@ class WzListEditor extends Component {
   contentToObject(content) {
     const items = {};
     const lines = content.split('\n');
-    lines.forEach(line => {
-      const split = line.split(':');
+    lines.forEach((line) => {
+      const split = line.startsWith('"') ? line.split('":') : line.split(':');
       const key = split[0];
       const value = split[1] || '';
       if (key) items[key] = value; // Prevent add empty keys
@@ -106,10 +106,8 @@ class WzListEditor extends Component {
    */
   itemsToRaw() {
     let raw = '';
-    Object.keys(this.items).forEach(key => {
-      raw = raw
-        ? `${raw}\n${key}:${this.items[key]}`
-        : `${key}:${this.items[key]}`;
+    Object.keys(this.items).forEach((key) => {
+      raw = raw ? `${raw}\n${key}:${this.items[key]}` : `${key}:${this.items[key]}`;
     });
     return raw;
   }
@@ -122,17 +120,10 @@ class WzListEditor extends Component {
   async saveList(name, path, addingNew = false) {
     try {
       if (!name) {
-        this.showToast(
-          'warning',
-          'Invalid name',
-          'CDB list name cannot be empty',
-          3000
-        );
+        this.showToast('warning', 'Invalid name', 'CDB list name cannot be empty', 3000);
         return;
       }
-      name = name.endsWith('.cdb')
-      ? name.replace('.cdb', '')
-      : name;
+      name = name.endsWith('.cdb') ? name.replace('.cdb', '') : name;
       const overwrite = addingNew; // If adding new disable the overwrite
       const raw = this.itemsToRaw();
       if (!raw) {
@@ -150,23 +141,24 @@ class WzListEditor extends Component {
         const file = { name: name, content: raw, path: path };
         this.props.updateListContent(file);
         this.setState({ showWarningRestart: true });
-        this.showToast(
-          'success',
-          'Success',
-          'CBD List successfully created',
-          3000
-        );
+        this.showToast('success', 'Success', 'CBD List successfully created', 3000);
       } else {
         this.setState({ showWarningRestart: true });
         this.showToast('success', 'Success', 'CBD List updated', 3000);
       }
     } catch (error) {
-      this.showToast(
-        'danger',
-        'Error',
-        'Error saving CDB list: ' + error,
-        3000
-      );
+      const options = {
+        context: `${WzListEditor.name}.saveList`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `Error saving list: ${error.message || error}`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+      this.setState({ isSaving: false });
     }
     this.setState({ isSaving: false });
   }
@@ -176,59 +168,63 @@ class WzListEditor extends Component {
       color: color,
       title: title,
       text: text,
-      toastLifeTimeMs: time
+      toastLifeTimeMs: time,
     });
   };
 
   openAddEntry = () => {
     this.setState({
-      isPopoverOpen: true
+      isPopoverOpen: true,
     });
   };
 
   closeAddEntry = () => {
     this.setState({
-      isPopoverOpen: false
+      isPopoverOpen: false,
     });
   };
 
-  onChangeKey = e => {
+  onChangeKey = (e) => {
     this.setState({
-      addingKey: e.target.value
+      addingKey: e.target.value,
     });
   };
 
-  onChangeValue = e => {
+  onChangeValue = (e) => {
     this.setState({
-      addingValue: e.target.value
+      addingValue: e.target.value,
     });
   };
 
-  onChangeEditingValue = e => {
+  onChangeEditingValue = (e) => {
     this.setState({
-      editingValue: e.target.value
+      editingValue: e.target.value,
     });
   };
 
-  onNewListNameChange = e => {
+  onNewListNameChange = (e) => {
     this.setState({
-      newListName: e.target.value
+      newListName: e.target.value,
     });
   };
 
   getUpdatePermissions = (name) => {
-    return [{
-      action: `${RulesetResources.LISTS}:update`,
-      resource: resourceDictionary[RulesetResources.LISTS].permissionResource(name),
-    }];
-  }
+    return [
+      {
+        action: `${RulesetResources.LISTS}:update`,
+        resource: resourceDictionary[RulesetResources.LISTS].permissionResource(name),
+      },
+    ];
+  };
 
   getDeletePermissions = (name) => {
-    return [{
-      action: `${RulesetResources.LISTS}:delete`,
-      resource: resourceDictionary[RulesetResources.LISTS].permissionResource(name),
-    }];
-  }
+    return [
+      {
+        action: `${RulesetResources.LISTS}:delete`,
+        resource: resourceDictionary[RulesetResources.LISTS].permissionResource(name),
+      },
+    ];
+  };
 
   /**
    * Append a key value to this.items and after that if everything works ok re-create the array for the table
@@ -251,7 +247,7 @@ class WzListEditor extends Component {
     this.setState({
       items: itemsArr,
       addingKey: '',
-      addingValue: ''
+      addingValue: '',
     });
   }
 
@@ -267,10 +263,9 @@ class WzListEditor extends Component {
       items: itemsArr,
       editing: false,
       editingValue: '',
-      generatingCsv: false
+      generatingCsv: false,
     });
   }
-  
 
   /**
    * Delete a item from the list
@@ -324,7 +319,6 @@ class WzListEditor extends Component {
    * @param {String} path
    */
   renderAddAndSave(name, path, newList = false, items = []) {
-
     const saveButton = (
       <WzButtonPermissions
         permissions={this.getUpdatePermissions(name)}
@@ -398,9 +392,7 @@ class WzListEditor extends Component {
                     </EuiButtonEmpty>
                   </EuiFlexItem>
                   <EuiFlexItem grow={false}>
-                    <EuiButtonEmpty onClick={() => this.closeAddEntry()}>
-                      Close
-                    </EuiButtonEmpty>
+                    <EuiButtonEmpty onClick={() => this.closeAddEntry()}>Close</EuiButtonEmpty>
                   </EuiFlexItem>
                 </EuiFlexGroup>
               </EuiFlexItem>
@@ -444,13 +436,13 @@ class WzListEditor extends Component {
     );
   }
 
-  buildTableColumns(fileName, path){
+  buildTableColumns(fileName, path) {
     return [
       {
         field: 'key',
         name: 'Key',
         align: 'left',
-        sortable: true
+        sortable: true,
       },
       {
         field: 'value',
@@ -470,12 +462,12 @@ class WzListEditor extends Component {
           } else {
             return <span>{value}</span>;
           }
-        }
+        },
       },
       {
         name: 'Actions',
         align: 'left',
-        render: item => {
+        render: (item) => {
           if (this.state.editing === item.key) {
             return (
               <Fragment>
@@ -503,33 +495,33 @@ class WzListEditor extends Component {
             return (
               <Fragment>
                 <WzButtonPermissions
-                  buttonType='icon'
+                  buttonType="icon"
                   aria-label="Edit content"
                   iconType="pencil"
                   permissions={this.getUpdatePermissions(fileName)}
-                  tooltip={{position: 'top', content: `Edit ${item.key}`}}
+                  tooltip={{ position: 'top', content: `Edit ${item.key}` }}
                   onClick={() => {
                     this.setState({
                       editing: item.key,
-                      editingValue: item.value
+                      editingValue: item.value,
                     });
                   }}
                   color="primary"
                 />
                 <WzButtonPermissions
-                  buttonType='icon'
+                  buttonType="icon"
                   aria-label="Remove content"
                   iconType="trash"
                   permissions={this.getDeletePermissions(fileName)}
-                  tooltip={{position: 'top', content: `Remove ${item.key}`}}
+                  tooltip={{ position: 'top', content: `Remove ${item.key}` }}
                   onClick={() => this.deleteItem(item.key)}
                   color="danger"
                 />
               </Fragment>
             );
           }
-        }
-      }
+        },
+      },
     ];
   }
 
@@ -543,6 +535,42 @@ class WzListEditor extends Component {
 
     const addingNew = name === false || !name;
     const listName = this.state.newListName || name;
+
+    const exportToCsv = async () => {
+      try {
+        this.setState({ generatingCsv: true });
+        await exportCsv(
+          `/lists`,
+          [
+            {
+              _isCDBList: true,
+              name: 'relative_dirname',
+              value: path,
+            },
+            {
+              _isCDBList: true,
+              name: 'filename',
+              value: name,
+            },
+          ],
+          name
+        );
+        this.setState({ generatingCsv: false });
+      } catch (error) {
+        const options = {
+          context: `${WzListEditor.name}.exportToCsv`,
+          level: UI_LOGGER_LEVELS.ERROR,
+          severity: UI_ERROR_SEVERITIES.BUSINESS,
+          error: {
+            error: error,
+            message: error.message || error,
+            title: `Error generating csv: ${error.message || error}`,
+          },
+        };
+        getErrorOrchestrator().handleError(options);
+        this.setState({ generatingCsv: false });
+      }
+    }
 
     return (
       <EuiPage style={{ background: 'transparent' }}>
@@ -562,49 +590,21 @@ class WzListEditor extends Component {
                       iconType="exportAction"
                       isDisabled={this.state.generatingCsv}
                       isLoading={this.state.generatingCsv}
-                      onClick={async () => {
-                        try {
-                          this.setState({ generatingCsv: true });
-                          await exportCsv(
-                            `/lists`,
-                            [
-                              {
-                                _isCDBList: true,
-                                name: 'relative_dirname',
-                                value: path
-                              },
-                              {
-                                _isCDBList: true,
-                                name: 'filename',
-                                value: name
-                              }
-                            ],
-                            name
-                          );
-                          this.setState({ generatingCsv: false });
-                        } catch (error) {
-                          this.setState({ generatingCsv: false });
-                        }
-                      }}
+                      onClick={async () => exportToCsv()}
                     >
                       Export formatted
                     </EuiButtonEmpty>
                   </EuiFlexItem>
                 )}
                 {!this.state.editing &&
-                  this.renderAddAndSave(
-                    listName,
-                    path,
-                    !addingNew,
-                    this.state.items
-                  )}
+                  this.renderAddAndSave(listName, path, !addingNew, this.state.items)}
               </EuiFlexGroup>
               {this.state.showWarningRestart && (
                 <Fragment>
-                  <EuiSpacer size='s'/>
+                  <EuiSpacer size="s" />
                   <WzRestartClusterManagerCallout
-                    onRestarted={() => this.setState({showWarningRestart: false})}
-                    onRestartedError={() => this.setState({showWarningRestart: true})}
+                    onRestarted={() => this.setState({ showWarningRestart: false })}
+                    onRestartedError={() => this.setState({ showWarningRestart: true })}
                   />
                 </Fragment>
               )}
@@ -635,21 +635,19 @@ class WzListEditor extends Component {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
-    state: state.rulesetReducers
+    state: state.rulesetReducers,
   };
 };
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch) => {
   return {
     cleanInfo: () => dispatch(cleanInfo()),
-    updateListContent: content => dispatch(updateListContent(content)),
-    updateWazuhNotReadyYet: wazuhNotReadyYet => dispatch(updateWazuhNotReadyYet(wazuhNotReadyYet))
+    updateListContent: (content) => dispatch(updateListContent(content)),
+    updateWazuhNotReadyYet: (wazuhNotReadyYet) =>
+      dispatch(updateWazuhNotReadyYet(wazuhNotReadyYet)),
   };
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WzListEditor);
+export default connect(mapStateToProps, mapDispatchToProps)(WzListEditor);
