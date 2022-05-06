@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Tab name equivalence
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -350,54 +350,6 @@ export const visualizations = {
           {
             title: 'Alerts summary',
             id: 'Wazuh-App-Agents-HIPAA-Last-alerts'
-          }
-        ]
-      }
-    ]
-  },
-  vuls: {
-    rows: [
-      {
-        height: 400,
-        vis: [
-          {
-            title: 'Alerts severity over time',
-            id: 'Wazuh-App-Agents-vuls-Alerts-severity-over-time',
-            width: 50
-          },
-          {
-            title: 'Most common rules',
-            id: 'Wazuh-App-Agents-vuls-Most-common-rules',
-            width: 50
-          }
-        ]
-      },
-      {
-        height: 270,
-        vis: [
-          {
-            title: 'Most common CVEs',
-            id: 'Wazuh-App-Agents-vuls-Vulnerability-Most-common-CVEs',
-            width: 33
-          },
-          {
-            title: 'Severity distribution',
-            id: 'Wazuh-App-Agents-vuls-Vulnerability-severity-distribution',
-            width: 33
-          },
-          {
-            title: 'Commonly affected packages',
-            id: 'Wazuh-App-Agents-vuls-Commonly-affected-packages',
-            width: 33
-          }
-        ]
-      },
-      {
-        height: 570,
-        vis: [
-          {
-            title: 'Alert summary',
-            id: 'Wazuh-App-Agents-vuls-Alert-summary'
           }
         ]
       }

@@ -1,7 +1,7 @@
 /*
  * Wazuh app - React component for building the status stats
  *
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -75,14 +75,14 @@ export class WzStatusAgentInfo extends Component {
         </EuiFlexGroup>
         <EuiFlexGroup>
           <EuiFlexItem>Status</EuiFlexItem>
-          <EuiFlexItem style={greyStyle}>{agentInfo.status}</EuiFlexItem>
+          <EuiFlexItem style={{...greyStyle, textTransform: 'capitalize'}}>{agentInfo.status}</EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup>
           <EuiFlexItem>IP Address</EuiFlexItem>
           <EuiFlexItem style={greyStyle}>{agentInfo.ip}</EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup>
-          <EuiFlexItem>Date add</EuiFlexItem>
+          <EuiFlexItem>Date added</EuiFlexItem>
           <EuiFlexItem style={greyStyle}>{formatUIDate(agentInfo.dateAdd)}</EuiFlexItem>
         </EuiFlexGroup>
         {status !== 'never_connected' && (

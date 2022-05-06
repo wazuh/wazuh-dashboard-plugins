@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Management groups controller
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -75,12 +75,7 @@ export class GroupsController {
       if (this.globalAgent) {
         const globalGroup = this.shareAgent.getSelectedGroup();
         // Get ALL groups
-        const data = await WzRequest.apiReq('GET',
-          '/groups', {
-            params: {
-              limit: 500
-            },
-          });
+        const data = await WzRequest.apiReq('GET', '/groups', {});
         const filtered = data.data.data.affected_items.filter(group => group.name === globalGroup);
         if (Array.isArray(filtered) && filtered.length) {
           // Load that our group
@@ -93,13 +88,7 @@ export class GroupsController {
 
         this.shareAgent.deleteAgent();
       } else {
-        const loadedGroups = await WzRequest.apiReq('GET',
-          '/groups', {
-            params: {
-              limit: 500
-            }
-          }
-        );
+        const loadedGroups = await WzRequest.apiReq('GET', '/groups', {});
         this.buildGroupsTableProps(loadedGroups.data.data.affected_items);
         this.load = false;
       }

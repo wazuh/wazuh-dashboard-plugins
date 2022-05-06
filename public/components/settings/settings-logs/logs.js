@@ -1,7 +1,7 @@
 /*
  * Wazuh app - React component building the API entries table.
  *
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,8 +27,10 @@ import {
 import { formatUIDate } from '../../../react-services/time-service';
 import store from '../../../redux/store';
 import { updateSelectedSettingsSection } from '../../../redux/actions/appStateActions';
+import { withErrorBoundary } from '../../common/hocs';
+import { getPluginDataPath } from '../../../../common/plugin';
 
-export default class SettingsLogs extends Component {
+class SettingsLogs extends Component {
   constructor(props) {
     super(props);
     this.offset = 275;
@@ -115,8 +117,7 @@ export default class SettingsLogs extends Component {
             </EuiFlexItem>
           </EuiFlexGroup>
           <EuiText color="subdued" style={{ paddingBottom: '15px' }}>
-            Log file located at
-            /usr/share/kibana/data/wazuh/logs/wazuhapp.log
+            Log file located at {getPluginDataPath('logs/wazuhapp.log')}
           </EuiText>
           {this.state.refreshingEntries && (
             <EuiProgress size="xs" color="primary" />
@@ -138,3 +139,7 @@ export default class SettingsLogs extends Component {
     );
   }
 }
+
+export default withErrorBoundary(
+  SettingsLogs
+)

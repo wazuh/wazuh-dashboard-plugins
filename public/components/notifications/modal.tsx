@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Component that renders the toast notification modal
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,14 +22,16 @@ import {
   EuiModalFooter,
   EuiButton,
   EuiOverlayMask,
+  EuiOutsideClickDetector,
   EuiCopy
 } from '@elastic/eui';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { updateToastNotificationsModal } from '../../redux/actions/appStateActions';
-import { withReduxProvider } from '../common/hocs'
+import { withReduxProvider, withErrorBoundary } from '../common/hocs';
+import { compose } from 'redux';
 
-export const ToastNotificationsModal = withReduxProvider(() => {
+export const ToastNotificationsModal = compose (withErrorBoundary, withReduxProvider)(() => {
   const [isOpen, setIsOpen] = useState(false);
   const toastNotification = useSelector(state => state.appStateReducers.toastNotification);
   const dispatch = useDispatch();
@@ -58,28 +60,30 @@ export const ToastNotificationsModal = withReduxProvider(() => {
   ${errorStack}
   \`\`\``
   return (
-    <EuiOverlayMask  onClick={() => closeModal()}>
-      <EuiModal onClose={closeModal}>
-        <EuiModalHeader>
-          <EuiModalHeaderTitle>{toastNotification.title}</EuiModalHeaderTitle>
-        </EuiModalHeader>
-        <EuiModalBody>
-          <EuiCallOut size="s" color="danger" iconType="alert" title={calloutTitle}/>
-          {errorStack && (
-            <Fragment>
-              <EuiSpacer size="s" />
-              <EuiCodeBlock /*isCopyable={true}*/ paddingSize="s">
-                {errorStack}
-              </EuiCodeBlock>
-            </Fragment>
-          )}
-        </EuiModalBody>
-        <EuiModalFooter>
-          <EuiCopy textToCopy={copyMessage}>
-            {copy => <EuiButton fill onClick={copy}>Copy error</EuiButton>}
-          </EuiCopy>
-        </EuiModalFooter>
-      </EuiModal>
+    <EuiOverlayMask>
+      <EuiOutsideClickDetector onOutsideClick={() => closeModal()}>
+        <EuiModal onClose={closeModal}>
+          <EuiModalHeader>
+            <EuiModalHeaderTitle>{toastNotification.title}</EuiModalHeaderTitle>
+          </EuiModalHeader>
+          <EuiModalBody>
+            <EuiCallOut size="s" color="danger" iconType="alert" title={calloutTitle} />
+            {errorStack && (
+              <Fragment>
+                <EuiSpacer size="s" />
+                <EuiCodeBlock /*isCopyable={true}*/ paddingSize="s">
+                  {errorStack}
+                </EuiCodeBlock>
+              </Fragment>
+            )}
+          </EuiModalBody>
+          <EuiModalFooter>
+            <EuiCopy textToCopy={copyMessage}>
+              {copy => <EuiButton fill onClick={copy}>Copy error</EuiButton>}
+            </EuiCopy>
+          </EuiModalFooter>
+        </EuiModal>
+      </EuiOutsideClickDetector>
     </EuiOverlayMask>
   )
 })

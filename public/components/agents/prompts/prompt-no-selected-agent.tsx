@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Prompt when no agent selected
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,7 +14,5 @@ import React from 'react';
 import { PromptSelectAgent } from './';
 
 export const PromptNoSelectedAgent = ({ body }) => {
-  return (
-    <PromptSelectAgent body={body} title="No agent is selected" />
-  )
-}
+  return <PromptSelectAgent body={body} title="No agent is selected" />;
+};

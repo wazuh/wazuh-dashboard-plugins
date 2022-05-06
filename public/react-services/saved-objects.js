@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Saved Objects management service
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -10,17 +10,17 @@
  * Find more information about this on the LICENSE file.
  */
 
-import {GenericRequest} from './generic-request';
-import {KnownFields} from '../utils/known-fields';
-import {FieldsStatistics} from '../utils/statistics-fields';
-import {FieldsMonitoring} from '../utils/monitoring-fields';
+import { GenericRequest } from './generic-request';
+import { KnownFields } from '../utils/known-fields';
+import { FieldsStatistics } from '../utils/statistics-fields';
+import { FieldsMonitoring } from '../utils/monitoring-fields';
 import {
   HEALTH_CHECK,
   WAZUH_INDEX_TYPE_ALERTS,
   WAZUH_INDEX_TYPE_MONITORING,
-  WAZUH_INDEX_TYPE_STATISTICS
+  WAZUH_INDEX_TYPE_STATISTICS,
 } from '../../common/constants';
-import { satisfyKibanaVersion } from '../../common/semver';
+import { satisfyPluginPlatformVersion } from '../../common/semver';
 
 export class SavedObject {
   /**
@@ -35,9 +35,9 @@ export class SavedObject {
       let indexPatterns = ((savedObjects || {}).data || {}).saved_objects || [];
 
     let indexPatternsFields;
-    if(satisfyKibanaVersion('<7.11')){
+    if(satisfyPluginPlatformVersion('<7.11')){
       indexPatternsFields = indexPatterns.map(indexPattern => indexPattern?.attributes?.fields ? JSON.parse(indexPattern.attributes.fields) : []);
-    }else if(satisfyKibanaVersion('>=7.11')){
+    }else if(satisfyPluginPlatformVersion('>=7.11')){
       indexPatternsFields = await Promise.all(indexPatterns.map(async indexPattern => {
         try{
           const {data: {fields}} = await GenericRequest.request(
@@ -94,17 +94,17 @@ export class SavedObject {
     const result = await SavedObject.existsIndexPattern(patternID);
     if (!result.data) {
       let fields = '';
-      if(satisfyKibanaVersion('<7.11')){
+      if (satisfyPluginPlatformVersion('<7.11')) {
         fields = await SavedObject.getIndicesFields(patternID, WAZUH_INDEX_TYPE_ALERTS);
-      };
+      }
       await this.createSavedObject(
         'index-pattern',
         patternID,
         {
           attributes: {
             title: patternID,
-            timeFieldName: 'timestamp'
-          }
+            timeFieldName: 'timestamp',
+          },
         },
         fields
       );
@@ -131,7 +131,7 @@ export class SavedObject {
           status: true,
           statusCode: 200,
           title,
-          id
+          id,
         };
       }
     } catch (error) {
@@ -154,9 +154,9 @@ export class SavedObject {
         true
       );
       let indexPatternFields;
-      if(satisfyKibanaVersion('<7.11')){
+      if(satisfyPluginPlatformVersion('<7.11')){
         indexPatternFields = indexPatternData?.data?.attributes?.fields ? JSON.parse(indexPatternData.data.attributes.fields) : [];
-      }else if(satisfyKibanaVersion('>=7.11')){
+      }else if(satisfyPluginPlatformVersion('>=7.11')){
         try{
           const {data: {fields}} = await GenericRequest.request(
             'GET',
@@ -164,14 +164,18 @@ export class SavedObject {
             {}
           );
           indexPatternFields = fields;
-        }catch(error){
+        } catch (error) {
           indexPatternFields = [];
-        };
-      };
-      return ({...indexPatternData.data, ...({_fields: indexPatternFields})});
+        }
+      }
+      return { ...indexPatternData.data, ...{ _fields: indexPatternFields } };
     } catch (error) {
       if (error && error.response && error.response.status == 404) return false;
-      return Promise.reject(((error || {}).data || {}).message || false ? error.data.message : error.message || `Error getting the '${patternID}' index pattern`);
+      return Promise.reject(
+        ((error || {}).data || {}).message || false
+          ? error.data.message
+          : error.message || `Error getting the '${patternID}' index pattern`
+      );
     }
   }
 
@@ -183,9 +187,9 @@ export class SavedObject {
         params
       );
 
-      if(satisfyKibanaVersion('<7.11') && type === 'index-pattern'){
+      if (satisfyPluginPlatformVersion('<7.11') && type === 'index-pattern') {
         await this.refreshFieldsOfIndexPattern(id, params.attributes.title, fields);
-      };
+      }
 
       return result;
     } catch (error) {
@@ -197,7 +201,7 @@ export class SavedObject {
 
   static async refreshFieldsOfIndexPattern(id, title, fields) {
     try {
-      // same logic as Kibana when a new index is created, you need to refresh it to see its fields
+      // same logic as plugin platform when a new index is created, you need to refresh it to see its fields
       // we force the refresh of the index by requesting its fields and the assign these fields
       await GenericRequest.request(
         'PUT',
@@ -211,7 +215,7 @@ export class SavedObject {
         }
       );
     } catch (error) {
-      return ((error || {}).data || {}).message || false
+      throw ((error || {}).data || {}).message || false
         ? error.data.message
         : error.message || error;
     }
@@ -225,14 +229,13 @@ export class SavedObject {
     try {
       const fields = await SavedObject.getIndicesFields(pattern.title, WAZUH_INDEX_TYPE_ALERTS);
 
-      if(newFields && typeof newFields=="object")
+      if (newFields && typeof newFields == 'object')
         Object.keys(newFields).forEach((fieldName) => {
           if (this.isValidField(newFields[fieldName])) fields.push(newFields[fieldName]);
         });
 
       await this.refreshFieldsOfIndexPattern(pattern.id, pattern.title, fields);
     } catch (error) {
-      console.log(error)
       return ((error || {}).data || {}).message || false
         ? error.data.message
         : error.message || error;
@@ -244,12 +247,18 @@ export class SavedObject {
    * @param {index-pattern-field} field
    */
   static isValidField(field) {
+    if (field == null || typeof field != 'object') return false;
 
-    if (field == null || typeof field != "object") return false;
-
-    const isValid = ["name", "type", "esTypes", "searchable", "aggregatable", "readFromDocValues"].reduce((ok, prop) => {
+    const isValid = [
+      'name',
+      'type',
+      'esTypes',
+      'searchable',
+      'aggregatable',
+      'readFromDocValues',
+    ].reduce((ok, prop) => {
       return ok && Object.keys(field).includes(prop);
-    }, true)
+    }, true);
     return isValid;
   }
 
@@ -258,7 +267,9 @@ export class SavedObject {
    */
   static async createWazuhIndexPattern(pattern) {
     try {
-      const fields = satisfyKibanaVersion('<7.11') ? await SavedObject.getIndicesFields(pattern, WAZUH_INDEX_TYPE_ALERTS) : '';
+      const fields = satisfyPluginPlatformVersion('<7.11')
+        ? await SavedObject.getIndicesFields(pattern, WAZUH_INDEX_TYPE_ALERTS)
+        : '';
       await this.createSavedObject(
         'index-pattern',
         pattern,
@@ -271,8 +282,9 @@ export class SavedObject {
               "data.vulnerability.reference":{"id":"url"},
               "data.url":{"id":"url"}
             }`,
-            sourceFilters: '[{"value":"@timestamp"}]'
-          }
+            fields: '[]',
+            sourceFilters: '[{"value":"@timestamp"}]',
+          },
         },
         fields
       );
@@ -284,19 +296,24 @@ export class SavedObject {
     }
   }
 
-  static getIndicesFields = async (pattern, indexType) => GenericRequest.request(
-    //we check if indices exist before creating the index pattern
-    'GET',
-    `/api/index_patterns/_fields_for_wildcard?pattern=${pattern}&meta_fields=_source&meta_fields=_id&meta_fields=_type&meta_fields=_index&meta_fields=_score`,
-    {}
-  ).then(response => response.data.fields).catch(() => {
-    switch (indexType) {
-      case WAZUH_INDEX_TYPE_MONITORING:
-        return FieldsMonitoring;
-      case WAZUH_INDEX_TYPE_STATISTICS:
-        return FieldsStatistics;
-      case WAZUH_INDEX_TYPE_ALERTS:
-        return KnownFields
+  static getIndicesFields = async (pattern, indexType) => {
+    try {
+      const response = await GenericRequest.request(
+        //we check if indices exist before creating the index pattern
+        'GET',
+        `/api/index_patterns/_fields_for_wildcard?pattern=${pattern}&meta_fields=_source&meta_fields=_id&meta_fields=_type&meta_fields=_index&meta_fields=_score`,
+        {}
+      );
+      return response.data.fields;
+    } catch {
+      switch (indexType) {
+        case WAZUH_INDEX_TYPE_MONITORING:
+          return FieldsMonitoring;
+        case WAZUH_INDEX_TYPE_STATISTICS:
+          return FieldsStatistics;
+        case WAZUH_INDEX_TYPE_ALERTS:
+          return KnownFields;
+      }
     }
-  })
+  };
 }

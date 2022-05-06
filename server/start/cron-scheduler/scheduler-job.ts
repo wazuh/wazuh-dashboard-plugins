@@ -27,23 +27,23 @@ export class SchedulerJob {
 
   public async run() {
     const { index, status } = configuredJobs({})[this.jobName];
-    if ( !status ) { return; }
+    if (!status) { return; }
     try {
       const hosts = await this.getApiObjects();
-      const data = await hosts.reduce(async (acc:Promise<object[]>, host) => {
-        const {status} = configuredJobs({host, jobName: this.jobName})[this.jobName];
-        if (!status) return acc;
-        const response = await this.getResponses(host);
-        const accResolve = await Promise.resolve(acc)
-        return [
-          ...accResolve,
-          ...response,
-        ];
-      }, Promise.resolve([]));
-      !!data.length && await this.saveDocument.save(data, index);
+      const jobPromises = hosts.map(async host => {
+        try {
+          const { status } = configuredJobs({ host, jobName: this.jobName })[this.jobName];
+          if (!status) return;
+          return await this.getResponses(host);
+        } catch (error) {
+          ErrorHandler(error, this.logger);
+        }
+      });
+      const data = (await Promise.all(jobPromises)).filter(promise => !!promise).flat();
+      Array.isArray(data) && !!data.length && await this.saveDocument.save(data, index);
     } catch (error) {
       ErrorHandler(error, this.logger);
-    } 
+    }
   }
 
   private async getApiObjects() {

@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Prompt when an agent doesn't support some module
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -11,16 +11,14 @@
  */
 
 import React from 'react';
-import { 
-  EuiEmptyPrompt
-} from '@elastic/eui'
+import { EuiEmptyPrompt } from '@elastic/eui';
 
-export const PromptAgentFeatureVersion = ({version = ''}: {version: string}) => {
+export const PromptAgentFeatureVersion = ({ version = '' }: { version: string }) => {
   return (
     <EuiEmptyPrompt
       iconType="watchesApp"
       title={<h2>{`Agent doesn't support this feature`}</h2>}
       body={`This feature is only avaliable for agents with ${version}.`}
     />
-  )
+  );
 };

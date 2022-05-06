@@ -35,6 +35,7 @@
     margin-left: 36px;
     float: left;
     white-space: break-spaces;
+    position: relative;
   }
 
   .buttonAddFilter {
@@ -53,7 +54,9 @@
   }
 
   .detail-tooltip {
-    float: right;
+    position: absolute;
+    right: 36px;
+    background-color: #fcfdfe;
   }
 
   .application .euiAccordion,
@@ -78,7 +81,8 @@
     padding: 0px 0px 8px 0;
   }
 
-  .events-accordion {
+  .events-accordion,
+  .euiStat .euiTitle .detail-value .euiAccordion {
     border-bottom: none !important;
   }
 

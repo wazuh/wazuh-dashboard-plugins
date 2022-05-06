@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Module to check cookie consistence
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,5 +28,6 @@ export async function checkTimestamp(genericReq, $location, wzMisc) {
     wzMisc.setBlankScr(error.message || error);
     $location.search('tab', null);
     $location.path('/blank-screen');
+    throw error;
   }
 }

@@ -1,7 +1,7 @@
 /*
  * Wazuh app - React component for the adding an API entry form.
  *
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,8 +30,15 @@ import {
   EuiButtonIcon,
   EuiPanel
 } from '@elastic/eui';
+import { withErrorBoundary } from '../../common/hocs';
+import {
+  UI_ERROR_SEVERITIES,
+} from '../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS, PLUGIN_PLATFORM_NAME } from '../../../../common/constants';
+import { getErrorOrchestrator } from '../../../react-services/common-services';
+import { getPluginDataPath } from '../../../../common/plugin';
 
-export class ApiIsDown extends Component {
+export const ApiIsDown = withErrorBoundary (class ApiIsDown extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -101,6 +108,20 @@ export class ApiIsDown extends Component {
       ) {
         this.setState({ error: error.data.message, status: 'danger' });
       }
+
+      const options = {
+        context: `${ApiIsDown.name}.checkConnection`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.UI,
+        store: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.message || error,
+        },
+      };
+
+      getErrorOrchestrator().handleError(options);
     }
   }
 
@@ -118,7 +139,7 @@ hosts:
     const checkConnectionChildren = (
       <div>
         <EuiText>
-          Check that the Kibana server can reach the configured Wazuh API(s).
+          Check that the {PLUGIN_PLATFORM_NAME} server can reach the configured Wazuh API(s).
         </EuiText>
         <EuiSpacer />
         <EuiButton
@@ -226,7 +247,7 @@ hosts:
             <EuiText>
               Review the settings in the{' '}
               <EuiCode>
-                /usr/share/kibana/data/wazuh/config/wazuh.yml
+                {getPluginDataPath('config/wazuh.yml')}
               </EuiCode>{' '}
               file.
             </EuiText>
@@ -257,7 +278,7 @@ hosts:
       </EuiFlexGroup>
     );
   }
-}
+});
 
 ApiIsDown.propTypes = {
   apiEntries: PropTypes.array,

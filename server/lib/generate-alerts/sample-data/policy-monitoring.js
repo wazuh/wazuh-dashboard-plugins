@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Policy monitoring sample alerts
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ export const rootkitsData = {
     "mail": false,
     "level": 7,
     "description": "Host-based anomaly detection event (rootcheck).",
-    "groups": ["ossec","rootcheck"],
+    "groups": ["wazuh","rootcheck"],
     "id": "510",
     "gdpr": ["IV_35.7.d"]
   },
@@ -74,7 +74,7 @@ export const trojansData = {
     "mail": false,
     "level": 7,
     "description": "Host-based anomaly detection event (rootcheck).",
-    "groups": ["ossec","rootcheck"],
+    "groups": ["wazuh","rootcheck"],
     "id": "510",
     "gdpr": ["IV_35.7.d"]
   },

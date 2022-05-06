@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Load all the "resolve" functions.
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -13,18 +13,14 @@ import { checkTimestamp } from './check-timestamp';
 import { healthCheck } from './health-check';
 import { settingsWizard } from './settings-wizard';
 import { getSavedSearch } from './get-saved-search';
-import { goToKibana } from './go-to-kibana';
 import { getIp } from './get-ip';
 import { getWzConfig } from './get-config';
-import { apiCount } from './api-count';
 
 export {
   checkTimestamp,
   healthCheck,
   settingsWizard,
   getSavedSearch,
-  goToKibana,
   getIp,
   getWzConfig,
-  apiCount
 };

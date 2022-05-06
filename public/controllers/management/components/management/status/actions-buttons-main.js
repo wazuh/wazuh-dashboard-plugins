@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component of actions buttons for status.
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,6 +33,10 @@ import {
 import StatusHandler from './utils/status-handler';
 import { getToasts }  from '../../../../../kibana-services';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
+
+import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
+import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 
 class WzStatusActionButtons extends Component {
   _isMounted = false;
@@ -73,7 +77,17 @@ class WzStatusActionButtons extends Component {
       );
     } catch (error) {
       this.setState({ isRestarting: false });
-      this.showToast('danger', `Error restarting cluster: ${error.message || error}`, 3000);
+      const options = {
+        context: `${WzStatusActionButtons.name}.restartCluster`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `${error.name}: Error restarting cluster`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   }
 
@@ -88,7 +102,17 @@ class WzStatusActionButtons extends Component {
       this.showToast('success', 'Restarting manager.', 3000);
     } catch (error) {
       this.setState({ isRestarting: false });
-      this.showToast('danger', `Error restarting manager: ${error.message || error}`, 3000);
+      const options = {
+        context: `${WzStatusActionButtons.name}.restartManager`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `${error.name}: Error restarting manager`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   }
 
@@ -136,9 +160,18 @@ class WzStatusActionButtons extends Component {
       this.props.updateLoadingStatus(false);
     } catch (error) {
       this.props.updateLoadingStatus(false);
-      this.showToast('danger', `Node ${node} is down`, 3000);
+      const options = {
+        context: `${WzStatusActionButtons.name}.changeNode`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `${error.name}: Node ${node} is down`
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
-
     return;
   };
 

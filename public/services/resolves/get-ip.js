@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Module to fetch index patterns
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -12,11 +12,13 @@
 
 import { healthCheck } from './health-check';
 import { AppState } from '../../react-services/app-state';
-import { ErrorHandler } from '../../react-services/error-handler';
 import { getDataPlugin, getSavedObjects } from '../../kibana-services';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { GenericRequest } from '../../react-services/generic-request';
 import { getWzConfig } from './get-config';
+import { UI_LOGGER_LEVELS } from '../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../react-services/common-services';
 
 export function getIp(
   $q,
@@ -88,10 +90,18 @@ export function getIp(
       });
     } catch (error) {
       deferred.reject(error);
-      wzMisc.setBlankScr(
-        ErrorHandler.handle(error, 'Elasticsearch', { silent: true })
-      );
-      $location.path('/blank-screen');
+      const options = {
+        context: `${getIp.name}.checkWazuhPatterns`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.CRITICAL,
+        store: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   };
 

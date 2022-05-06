@@ -1,7 +1,7 @@
 /*
  * Wazuh app - React component for building the management welcome screen.
  *
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -180,7 +180,7 @@ class ManagementWelcome extends Component {
                       layout="horizontal"
                       className="homSynopsis__card"
                       icon={
-                        <EuiIcon size="xl" type="filebeatApp" color="primary" />
+                        <EuiIcon size="xl" type="filebeatApp" color="primary"/>
                       }
                       title="Logs"
                       onClick={() => this.switchSection('logs')}

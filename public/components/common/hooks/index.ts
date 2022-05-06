@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React hooks
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,3 +23,7 @@ export * from './useAllowedAgents';
 export * from './useApiRequest';
 export * from './use-app-config';
 export * from './useRootScope';
+export * from './use_async_action';
+export * from './use_async_action_run_on_start';
+export { useEsSearch } from './use-es-search';
+export { useValueSuggestion, IValueSuggestion } from './use-value-suggestion';

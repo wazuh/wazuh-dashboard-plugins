@@ -1,7 +1,7 @@
 /*
  * Wazuh app - React component for building the reporting view
  *
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,7 +38,9 @@ import { PromptStatisticsDisabled } from './prompt-statistics-disabled';
 import { PromptStatisticsNoIndices } from './prompt-statistics-no-indices';
 import { WazuhConfig } from "../../../../../react-services/wazuh-config";
 import { WzRequest } from '../../../../../react-services/wz-request';
-
+import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
+import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 const wzConfig = new WazuhConfig();
 
 export class WzStatisticsOverview extends Component {
@@ -85,11 +87,23 @@ export class WzStatisticsOverview extends Component {
         clusterNodes: nodes,
         clusterNodeSelected: nodes[0].value,
       });
-    } catch (err) {
+    } catch (error) {
       this.setState({
         clusterNodes: [],
         clusterNodeSelected: 'all',
       });
+
+      const options = {
+        context: `${WzStatisticsOverview.name}.componentDidMount`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   }
 
@@ -253,7 +267,20 @@ export default compose(
           setLoading(true);
           const data = await WzRequest.genericReq('GET', '/elastic/statistics');
           setExistStatisticsIndices(data.data);
-        }catch(error){}
+        }catch(error){
+          setLoading(false);
+          const options = {
+            context: `${WzStatisticsOverview.name}.fetchData`,
+            level: UI_LOGGER_LEVELS.ERROR,
+            severity: UI_ERROR_SEVERITIES.BUSINESS,
+            error: {
+              error: error,
+              message: error.message || error,
+              title: `${error.name}: Error when fetching data`
+            },
+          };
+          getErrorOrchestrator().handleError(options);
+        }
         setLoading(false);
       };
   

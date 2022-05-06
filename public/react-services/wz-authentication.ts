@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Authentication service for Wazuh
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,9 +20,11 @@ import {
   updateWithUserLogged,
   updateAllowedAgents,
 } from '../redux/actions/appStateActions';
-import { WAZUH_ROLE_ADMINISTRATOR_ID, WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../common/constants';
+import { UI_LOGGER_LEVELS, WAZUH_ROLE_ADMINISTRATOR_ID, WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../common/constants';
 import { getToasts } from '../kibana-services';
 import { getAuthorizedAgents } from '../react-services/wz-agents';
+import { UI_ERROR_SEVERITIES, UIErrorLog, UIErrorSeverity, UILogLevel } from './error-orchestrator/types';
+import { getErrorOrchestrator } from './common-services';
 
 /**
  * Wazuh user authentication class
@@ -90,13 +92,18 @@ export class WzAuthentication {
         )
       );
       store.dispatch(updateWithUserLogged(true));
-    } catch (error: any) {
-      getToasts().add({
-        color: 'danger',
-        title: 'Error getting the authorization token',
-        text: error.message || error,
-        toastLifeTimeMs: 300000,
-      });
+    } catch (error) {
+      const options: UIErrorLog = {
+        context: `${WzAuthentication.name}.refresh`,
+        level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+        severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `${error.name}: Error getting the authorization token`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
       store.dispatch(updateWithUserLogged(true));
       return Promise.reject(error);
     }

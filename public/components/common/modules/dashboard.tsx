@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Integrity monitoring components
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -13,8 +13,14 @@
 import { Component } from 'react';
 import { ModulesHelper } from './modules-helper'
 import { getAngularModule } from '../../../kibana-services';
+import { withAgentSupportModule, withModuleTabLoader } from '../hocs';
+import { compose } from 'redux';
+import React from 'react';
 
-export class Dashboard extends Component {
+export const Dashboard = compose(
+  withAgentSupportModule,
+  withModuleTabLoader
+)(class Dashboard extends Component {
   _isMount = false;
   constructor(props) {
     super(props);
@@ -43,6 +49,7 @@ export class Dashboard extends Component {
   }
 
   render() {
-    return false;
+    return null;
   }
-}
+})
+

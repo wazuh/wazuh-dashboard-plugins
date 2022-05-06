@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Integrity monitoring table component
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@ import {
   EuiStat,
   EuiToolTip,
   EuiBadge,
+  EuiCodeBlock,
 } from '@elastic/eui';
 import { Discover } from '../../../common/modules/discover';
 import { ModulesHelper } from '../../../common/modules/modules-helper';
@@ -95,7 +96,7 @@ export class FileDetails extends Component {
         grow: 2,
         icon: 'clock',
         link: true,
-        transformValue: formatUIDate
+        transformValue: formatUIDate,
       },
       {
         field: 'mtime',
@@ -103,7 +104,7 @@ export class FileDetails extends Component {
         grow: 2,
         icon: 'clock',
         link: true,
-        transformValue: formatUIDate
+        transformValue: formatUIDate,
       },
       {
         field: 'uname',
@@ -130,13 +131,6 @@ export class FileDetails extends Component {
         onlyLinux: true,
         icon: 'usersRolesApp',
         link: true,
-      },
-      {
-        field: 'perm',
-        name: 'Permissions',
-        icon: 'lock',
-        link: false,
-        transformValue: (value) => this.renderFileDetailsPermissions(value),
       },
       {
         field: 'size',
@@ -173,6 +167,13 @@ export class FileDetails extends Component {
         icon: 'check',
         link: true,
       },
+      {
+        field: 'perm',
+        name: 'Permissions',
+        icon: 'lock',
+        link: false,
+        transformValue: (value) => this.renderFileDetailsPermissions(value),
+      },
     ];
   }
 
@@ -183,15 +184,15 @@ export class FileDetails extends Component {
         name: 'Last analysis',
         grow: 2,
         icon: 'clock',
-        transformValue: formatUIDate
+        transformValue: formatUIDate,
       },
       {
         field: 'mtime',
         name: 'Last modified',
         grow: 2,
         icon: 'clock',
-        transformValue: formatUIDate
-      }
+        transformValue: formatUIDate,
+      },
     ];
   }
 
@@ -264,7 +265,10 @@ export class FileDetails extends Component {
 
   getDetails() {
     const { view } = this.props;
-    const columns = this.props.type === 'registry_key' || this.props.currentFile.type === 'registry_key' ? this.registryDetails() : this.details();
+    const columns =
+      this.props.type === 'registry_key' || this.props.currentFile.type === 'registry_key'
+        ? this.registryDetails()
+        : this.details();
     const generalDetails = columns.map((item, idx) => {
       var value = this.props.currentFile[item.field] || '-';
       if (item.transformValue) {
@@ -275,6 +279,7 @@ export class FileDetails extends Component {
       if (!item.onlyLinux || (item.onlyLinux && this.props.agent && agentPlatform !== 'windows')) {
         let className = item.checksum ? 'detail-value detail-value-checksum' : 'detail-value';
         className += item.field === 'perm' ? ' detail-value-perm' : '';
+        className += ' wz-width-100';
         return (
           <EuiFlexItem key={idx}>
             <EuiStat
@@ -285,14 +290,14 @@ export class FileDetails extends Component {
                   <span
                     className={className}
                     onMouseEnter={() => {
-                      this.setState({ hoverAddFilter: item });
+                      this.setState({ hoverAddFilter: item.field });
                     }}
                     onMouseLeave={() => {
                       this.setState({ hoverAddFilter: '' });
                     }}
                   >
                     {value}
-                    {_.isEqual(this.state.hoverAddFilter, item) && (
+                    {this.state.hoverAddFilter === item.field && (
                       <EuiToolTip
                         position="top"
                         anchorClassName="detail-tooltip"
@@ -319,7 +324,7 @@ export class FileDetails extends Component {
                   ) : (
                     this.userSvg
                   )}
-                  <span className="detail-title">{item.name}</span>
+                  {item.name === 'Permissions' &&  agentPlatform === 'windows' ? '' : <span className="detail-title">{item.name}</span> }
                 </span>
               }
               textAlign="left"
@@ -329,7 +334,6 @@ export class FileDetails extends Component {
         );
       }
     });
-
     return (
       <div>
         <EuiFlexGrid columns={3}> {generalDetails} </EuiFlexGrid>
@@ -343,44 +347,32 @@ export class FileDetails extends Component {
 
   renderFileDetailsPermissions(value) {
     if (((this.props.agent || {}).os || {}).platform === 'windows' && value && value !== '-') {
-      const components = value
-        .split(', ')
-        .map((userNameAndPermissionsFullString) => {
-          const [_, username, userPermissionsString] = userNameAndPermissionsFullString.match(
-            /(\S+) \(allowed\): (\S+)/
-          );
-          const permissions = userPermissionsString.split('|').sort();
-          return { username, permissions };
-        })
-        .sort((a, b) => {
-          if (a.username > b.username) {
-            return 1;
-          } else if (a.username < b.username) {
-            return -1;
-          } else {
-            return 0;
-          }
-        })
-        .map(({ username, permissions }) => {
-          return (
-            <EuiToolTip
-              key={`permissions-windows-user-${username}`}
-              content={permissions.join(', ')}
-              title={`${username} permissions`}
-            >
-              <EuiBadge color="hollow" title={null} style={{ margin: '2px 2px' }}>
-                {username}
-              </EuiBadge>
-            </EuiToolTip>
-          );
-        });
       return (
-        <TruncateHorizontalComponents
-          components={components}
-          labelButtonHideComponents={(count) => `+${count} users`}
-          buttonProps={{ size: 'xs' }}
-          componentsWidthPercentage={0.85}
-        />
+        <EuiAccordion 
+          id={Math.random().toString()}
+          paddingSize="none" 
+          initialIsOpen={false} 
+          arrowDisplay="none"
+          buttonContent={
+          <EuiTitle size="s">
+            <h3>
+              Permissions
+                  <span style={{ marginLeft: 16 }}>
+                    <EuiToolTip position="top" content="Show">
+                      <EuiIcon
+                        className="euiButtonIcon euiButtonIcon--primary"
+                        type="inspect"
+                        aria-label="show"
+                      />
+                    </EuiToolTip>
+                  </span>
+            </h3>
+          </EuiTitle>
+        }>
+          <EuiCodeBlock language="json" paddingSize="l">
+            {JSON.stringify(value, null, 2)}
+          </EuiCodeBlock>
+        </EuiAccordion>
       );
     }
     return value;
@@ -402,7 +394,7 @@ export class FileDetails extends Component {
   }
 
   render() {
-    const { fileName, type, implicitFilters, view, currentFile, agent } = this.props;
+    const { fileName, type, implicitFilters, view, currentFile, agent, agentId } = this.props;
     const inspectButtonText = view === 'extern' ? 'Inspect in FIM' : 'Inspect in Events';
     return (
       <Fragment>
@@ -418,29 +410,31 @@ export class FileDetails extends Component {
         >
           <div className="flyout-row details-row">{this.getDetails()}</div>
         </EuiAccordion>
-        { (type === 'registry_key' || currentFile.type === 'registry_key') && <>
-        <EuiSpacer size="s" />
-        <EuiAccordion
-          id={fileName === undefined ? Math.random().toString() : `${fileName}_values`}
-          buttonContent={
-            <EuiTitle size="s">
-              <h3>
-                Registry values                
-              </h3>
-            </EuiTitle>
-          }
-          paddingSize="none"
-          initialIsOpen={true}
-        >
-          <EuiFlexGroup className="flyout-row">
-            <EuiFlexItem>
-              <RegistryValues 
-                currentFile={currentFile}
-                agent={agent}
-              />
-            </EuiFlexItem>
-          </EuiFlexGroup>
-        </EuiAccordion> </>}
+        {(type === 'registry_key' || currentFile.type === 'registry_key') && (
+          <>
+            <EuiSpacer size="s" />
+            <EuiAccordion
+              id={fileName === undefined ? Math.random().toString() : `${fileName}_values`}
+              buttonContent={
+                <EuiTitle size="s">
+                  <h3>Registry values</h3>
+                </EuiTitle>
+              }
+              paddingSize="none"
+              initialIsOpen={true}
+            >
+              <EuiFlexGroup className="flyout-row">
+                <EuiFlexItem>
+                  <RegistryValues 
+                    currentFile={currentFile} 
+                    agent={agent} 
+                    agentId={agentId} 
+                  />
+                </EuiFlexItem>
+              </EuiFlexGroup>
+            </EuiAccordion>{' '}
+          </>
+        )}
         <EuiSpacer />
         <EuiAccordion
           id={fileName === undefined ? Math.random().toString() : `${fileName}_events`}
@@ -478,12 +472,22 @@ export class FileDetails extends Component {
                 kbnSearchBar
                 shareFilterManager={this.discoverFilterManager}
                 initialColumns={[
-                  'icon',
-                  'timestamp',
-                  'syscheck.event',
-                  'rule.description',
-                  'rule.level',
-                  'rule.id',
+                  { field: 'icon' },
+                  { field: 'timestamp' },
+                  { field: 'agent.id', label: 'Agent' },
+                  { field: 'agent.name', label: 'Agent name' },
+                  { field: 'syscheck.event', label: 'Action' },
+                  { field: 'rule.description', label: 'Description' },
+                  { field: 'rule.level', label: 'Level' },
+                  { field: 'rule.id', label: 'Rule ID' },
+                ]}
+                initialAgentColumns={[
+                  { field: 'icon' },
+                  { field: 'timestamp' },
+                  { field: 'syscheck.event', label: 'Action' },
+                  { field: 'rule.description', label: 'Description' },
+                  { field: 'rule.level', label: 'Level' },
+                  { field: 'rule.id', label: 'Rule ID' },
                 ]}
                 includeFilters="syscheck"
                 implicitFilters={implicitFilters}

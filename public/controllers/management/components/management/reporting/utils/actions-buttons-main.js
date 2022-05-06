@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for reporting buttons
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,6 +16,10 @@ import { EuiFlexItem, EuiButtonEmpty } from '@elastic/eui';
 import { connect } from 'react-redux';
 
 import { updateIsProcessing } from '../../../../../../redux/actions/reportingActions';
+
+import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
+import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
 
 class WzReportingActionButtons extends Component {
   _isMounted = false;
@@ -41,7 +45,17 @@ class WzReportingActionButtons extends Component {
     try {
       this.props.updateIsProcessing(true);
     } catch (error) {
-      return Promise.reject(error);
+      const options = {
+        context: `${WzReportingActionButtons.name}.refresh`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.UI,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   }
 

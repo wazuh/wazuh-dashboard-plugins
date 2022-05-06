@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for Settings submenu.
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -124,8 +124,8 @@ class WzMenuSettings extends Component {
       {
         name: availableSettings.settings.text,
         id: availableSettings.settings.id,
-        disabled: false,
-        icon: <EuiIcon type="gear" color="primary" />,
+        disabled: true,
+        icon: <EuiIcon type="gear" color="primary"/>,
         items: renderSettings
       }
     ];

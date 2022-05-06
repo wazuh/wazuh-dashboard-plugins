@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for title and description of configuration section.
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,8 @@ import {
   EuiTitle,
   EuiText,
   EuiConfirmModal,
-  EuiIcon
+  EuiIcon,
+  EuiOverlayMask
 } from '@elastic/eui';
 
 import WzBadge from '../util-components/badge';
@@ -54,7 +55,7 @@ class WzConfigurationPath extends Component {
     let modal;
     if (this.state.isModalVisible) {
       modal = (
-        <WzOverlayMask>
+        <EuiOverlayMask>
           <EuiConfirmModal
             title="Unsubmitted changes"
             onConfirm={() => {
@@ -69,7 +70,7 @@ class WzConfigurationPath extends Component {
               There are unsaved changes. Are you sure you want to proceed?
             </p>
           </EuiConfirmModal>
-        </WzOverlayMask>
+        </EuiOverlayMask>
       );
     }
     return (

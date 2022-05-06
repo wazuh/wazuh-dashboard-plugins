@@ -1,7 +1,7 @@
 /*
  * Wazuh app - React component for showing stats about agents.
  *
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -13,8 +13,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { EuiStat, EuiFlexItem, EuiFlexGroup, EuiPage, EuiToolTip } from '@elastic/eui';
+import { withErrorBoundary } from '../../../components/common/hocs';
 
-export class Stats extends Component {
+export const Stats = withErrorBoundary (class Stats extends Component {
   constructor(props) {
     super(props);
 
@@ -123,7 +124,7 @@ export class Stats extends Component {
       </EuiPage>
     );
   }
-}
+});
 
 Stats.propTypes = {
   total: PropTypes.any,

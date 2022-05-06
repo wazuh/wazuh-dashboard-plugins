@@ -1,0 +1,27 @@
+.euiTitle.module-panel-configuration-title{
+  white-space: nowrap;
+}
+
+h5.euiTitle.module-panel-configuration-subtitle{
+  white-space: nowrap;
+  margin: 0;
+  font-weight: normal;
+}
+
+.module-panel-configuration-callout-warning{
+  margin: 0 -16px;
+  padding: 16px 38px;
+}
+
+.wz-justify-center {
+  justify-content: center;
+}
+
+.module-panel-configuration-list{
+  dt.euiDescriptionList__title,
+  dd.euiDescriptionList__description {
+    border-left: 2px solid rgba(0, 0, 0, 0.3);
+    padding-left: 10px;
+    word-break: break-word;
+  }
+}

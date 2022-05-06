@@ -1,7 +1,7 @@
 /*
  * Wazuh app - Health check services
  *
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
  */
 
 export * from './check-api.service';
-export * from './check-kibana-settings.service';
+export * from './check-plugin-platform-settings.service';
 export * from './check-index-pattern/check-index-pattern.service';
 export * from './check-pattern-support.service';
 export * from './check-setup.service';

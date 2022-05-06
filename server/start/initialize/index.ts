@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Module for app initialization
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -11,20 +11,19 @@
  */
 import { log } from '../../lib/logger';
 import packageJSON from '../../../package.json';
-import { kibanaTemplate } from '../../integration-files/kibana-template';
+import { pluginPlatformTemplate } from '../../integration-files/kibana-template';
 import { getConfiguration } from '../../lib/get-configuration';
 import { totalmem } from 'os';
 import fs from 'fs';
 import { ManageHosts } from '../../lib/manage-hosts';
-import { WAZUH_ALERTS_PATTERN, WAZUH_DATA_CONFIG_REGISTRY_PATH, WAZUH_INDEX, WAZUH_VERSION_INDEX, WAZUH_KIBANA_TEMPLATE_NAME, WAZUH_DATA_KIBANA_BASE_ABSOLUTE_PATH } from '../../../common/constants';
+import { WAZUH_ALERTS_PATTERN, WAZUH_DATA_CONFIG_REGISTRY_PATH, WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME, WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH, PLUGIN_PLATFORM_NAME, PLUGIN_PLATFORM_INSTALLATION_USER_GROUP, PLUGIN_PLATFORM_INSTALLATION_USER } from '../../../common/constants';
 import { createDataDirectoryIfNotExists } from '../../lib/filesystem';
-import { tryCatchForIndexPermissionError } from '../tryCatchForIndexPermissionError';
 
 const manageHosts = new ManageHosts();
 
 export function jobInitializeRun(context) {
-  const KIBANA_INDEX = context.server.config.kibana.index;
-  log('initialize', `Kibana index: ${KIBANA_INDEX}`, 'info');
+  const PLUGIN_PLATFORM_INDEX = context.server.config.kibana.index;
+  log('initialize', `${PLUGIN_PLATFORM_NAME} index: ${PLUGIN_PLATFORM_INDEX}`, 'info');
   log('initialize', `App revision: ${packageJSON.revision}`, 'info');
 
   let configurationFile = {};
@@ -97,75 +96,6 @@ export function jobInitializeRun(context) {
   };
 
   /**
-   * Checks if the .wazuh index exist in order to migrate to wazuh.yml
-   */
-  const checkWazuhIndex = tryCatchForIndexPermissionError(WAZUH_INDEX)( async () => {
-    log('initialize:checkWazuhIndex', `Checking ${WAZUH_INDEX} index.`, 'debug');
-    const result = await context.core.elasticsearch.client.asInternalUser.indices.exists({
-      index: WAZUH_INDEX
-    });
-    if (result.body) {
-      const data = await context.core.elasticsearch.client.asInternalUser.search({
-        index: WAZUH_INDEX,
-        size: 100
-      });
-      const apiEntries = (((data || {}).body || {}).hits || {}).hits || [];
-      await manageHosts.migrateFromIndex(apiEntries);
-      log(
-        'initialize:checkWazuhIndex',
-        `Index ${WAZUH_INDEX} will be removed and its content will be migrated to wazuh.yml`,
-        'debug'
-      );
-      // Check if all APIs entries were migrated properly and delete it from the .wazuh index
-      await checkProperlyMigrate();
-      await context.core.elasticsearch.client.asInternalUser.indices.delete({
-        index: WAZUH_INDEX
-      });
-    }
-  });
-
-  /**
-   * Checks if the API entries were properly migrated
-   * @param {Array} migratedApis
-   */
-  const checkProperlyMigrate = async () => {
-    try {
-      let apisIndex = await await context.core.elasticsearch.client.asInternalUser.search({
-        index: WAZUH_INDEX,
-        size: 100
-      });
-      const hosts = await manageHosts.getHosts();
-      apisIndex = ((apisIndex.body || {}).hits || {}).hits || [];
-
-      const apisIndexKeys = apisIndex.map(api => {
-        return api._id;
-      });
-      const hostsKeys = hosts.map(api => {
-        return Object.keys(api)[0];
-      });
-
-      // Get into an array the API entries that were not migrated, if the length is 0 then all the API entries were properly migrated.
-      const rest = apisIndexKeys.filter(k => {
-        return !hostsKeys.includes(k);
-      });
-
-      if (rest.length) {
-        throw new Error(
-          `Cannot migrate all API entries, missed entries: (${rest.toString()})`
-        );
-      }
-      log(
-        'initialize:checkProperlyMigrate',
-        'The API entries migration was successful',
-        'debug'
-      );
-    } catch (error) {
-      log('initialize:checkProperlyMigrate', `${error}`, 'error');
-      return Promise.reject(error);
-    }
-  };
-
-  /**
    * Checks if the .wazuh-version exists, in this case it will be deleted and the wazuh-registry.json will be created
    */
   const checkWazuhRegistry = async () => {
@@ -175,30 +105,9 @@ export function jobInitializeRun(context) {
         'Checking wazuh-version registry.',
         'debug'
       );
-      try {
-       const exists = await context.core.elasticsearch.client.asInternalUser.indices.exists({
-          index: WAZUH_VERSION_INDEX
-        });        
-        if (exists.body){
-          await context.core.elasticsearch.client.asInternalUser.indices.delete({
-            index: WAZUH_VERSION_INDEX
-          });
-          log(
-            'initialize[checkwazuhRegistry]',
-            `Successfully deleted old ${WAZUH_VERSION_INDEX} index.`,
-            'debug'
-          );
-        };
-      } catch (error) {
-        log(
-          'initialize[checkwazuhRegistry]',
-          `No need to delete old ${WAZUH_VERSION_INDEX} index`,
-          'debug'
-        );
-      }
 
-      if(!fs.existsSync(WAZUH_DATA_KIBANA_BASE_ABSOLUTE_PATH)){
-        throw new Error(`The data directory is missing in the Kibana root instalation. Create the directory in ${WAZUH_DATA_KIBANA_BASE_ABSOLUTE_PATH} and give it the required permissions (sudo mkdir ${WAZUH_DATA_KIBANA_BASE_ABSOLUTE_PATH};sudo chown -R kibana:kibana ${WAZUH_DATA_KIBANA_BASE_ABSOLUTE_PATH}). After restart the Kibana service.`);
+      if(!fs.existsSync(WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH)){
+        throw new Error(`The data directory is missing in the ${PLUGIN_PLATFORM_NAME} root instalation. Create the directory in ${WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH} and give it the required permissions (sudo mkdir ${WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH};sudo chown -R ${PLUGIN_PLATFORM_INSTALLATION_USER}:${PLUGIN_PLATFORM_INSTALLATION_USER_GROUP} ${WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH}). After restart the ${PLUGIN_PLATFORM_NAME} service.`);
       };
 
       if (!fs.existsSync(WAZUH_DATA_CONFIG_REGISTRY_PATH)) {
@@ -235,21 +144,18 @@ export function jobInitializeRun(context) {
 
   // Init function. Check for "wazuh-version" document existance.
   const init = async () => {
-    await Promise.all([
-      checkWazuhIndex(),
-      checkWazuhRegistry()
-    ]);
+    await checkWazuhRegistry();
   };
 
   const createKibanaTemplate = () => {
     log(
       'initialize:createKibanaTemplate',
-      `Creating template for ${KIBANA_INDEX}`,
+      `Creating template for ${PLUGIN_PLATFORM_INDEX}`,
       'debug'
     );
 
     try {
-      kibanaTemplate.template = KIBANA_INDEX + '*';
+      pluginPlatformTemplate.template = PLUGIN_PLATFORM_INDEX + '*';
     } catch (error) {
       log('initialize:createKibanaTemplate', error.message || error);
       context.wazuh.logger.error(
@@ -258,10 +164,10 @@ export function jobInitializeRun(context) {
     }
 
     return context.core.elasticsearch.client.asInternalUser.indices.putTemplate({
-      name: WAZUH_KIBANA_TEMPLATE_NAME,
+      name: WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME,
       order: 0,
       create: true,
-      body: kibanaTemplate
+      body: pluginPlatformTemplate
     });
   };
 
@@ -269,15 +175,15 @@ export function jobInitializeRun(context) {
     try {
       log(
         'initialize:createEmptyKibanaIndex',
-        `Creating ${KIBANA_INDEX} index.`,
+        `Creating ${PLUGIN_PLATFORM_INDEX} index.`,
         'info'
       );
       await context.core.elasticsearch.client.asInternalUser.indices.create({
-        index: KIBANA_INDEX
+        index: PLUGIN_PLATFORM_INDEX
       });
       log(
         'initialize:createEmptyKibanaIndex',
-        `Successfully created ${KIBANA_INDEX} index.`,
+        `Successfully created ${PLUGIN_PLATFORM_INDEX} index.`,
         'debug'
       );
       await init();
@@ -286,7 +192,7 @@ export function jobInitializeRun(context) {
       return Promise.reject(
         new Error(
           `Error creating ${
-          KIBANA_INDEX
+          PLUGIN_PLATFORM_INDEX
           } index due to ${error.message || error}`
         )
       );
@@ -297,8 +203,8 @@ export function jobInitializeRun(context) {
     try {
       await createKibanaTemplate();
       log(
-        'initialize:checkKibanaStatus',
-        `Successfully created ${KIBANA_INDEX} template.`,
+        'initialize:fixKibanaTemplate',
+        `Successfully created ${PLUGIN_PLATFORM_INDEX} template.`,
         'debug'
       );
       await createEmptyKibanaIndex();
@@ -307,7 +213,7 @@ export function jobInitializeRun(context) {
       return Promise.reject(
         new Error(
           `Error creating template for ${
-          KIBANA_INDEX
+          PLUGIN_PLATFORM_INDEX
           } due to ${error.message || error}`
         )
       );
@@ -317,17 +223,17 @@ export function jobInitializeRun(context) {
   const getTemplateByName = async () => {
     try {
       await context.core.elasticsearch.client.asInternalUser.indices.getTemplate({
-        name: WAZUH_KIBANA_TEMPLATE_NAME
+        name: WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME
       });
       log(
-        'initialize:checkKibanaStatus',
-        `No need to create the ${KIBANA_INDEX} template, already exists.`,
+        'initialize:getTemplateByName',
+        `No need to create the ${PLUGIN_PLATFORM_INDEX} template, already exists.`,
         'debug'
       );
       await createEmptyKibanaIndex();
       return;
     } catch (error) {
-      log('initialize:checkKibanaStatus', error.message || error);
+      log('initialize:getTemplateByName', error.message || error);
       return fixKibanaTemplate();
     }
   };
@@ -336,7 +242,7 @@ export function jobInitializeRun(context) {
   const checkKibanaStatus = async () => {
     try {
       const response = await context.core.elasticsearch.client.asInternalUser.indices.exists({
-        index: KIBANA_INDEX
+        index: PLUGIN_PLATFORM_INDEX
       });
       if (response.body) {
         // It exists, initialize!
@@ -345,7 +251,7 @@ export function jobInitializeRun(context) {
         // No Kibana index created...
         log(
           'initialize:checkKibanaStatus',
-          `Not found ${KIBANA_INDEX} index`,
+          `Not found ${PLUGIN_PLATFORM_INDEX} index`,
           'info'
         );
         await getTemplateByName();
