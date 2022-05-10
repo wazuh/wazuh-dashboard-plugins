@@ -75,7 +75,7 @@ export class FlyoutDetail extends Component {
       const currentItem = this.props.item;
 
       if (!currentItem) {
-        throw false;
+        throw new Error('Vulnerability not found');
       }
 
       const lastScan = await this.getLastScan();
@@ -104,7 +104,7 @@ export class FlyoutDetail extends Component {
 
   render() {
     const { currentItem } = this.state;
-    const title = `${currentItem.cve}`;
+    const title = `${currentItem.cve || ''}`;
     const id = title.replace(/ /g, '_');
     const filterMap = {
       name: 'data.vulnerability.package.name',

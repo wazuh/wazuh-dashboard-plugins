@@ -1561,11 +1561,8 @@ div.euiPopover__panel.euiPopover__panel-isOpen.euiPopover__panel--bottom.wz-menu
         overflow: hidden;
       }
     }
-  }
-
-  
+  } 
 }
-
 
 @media (min-width: 1600px) {
   .agents-evolution-visualization{
@@ -1738,6 +1735,21 @@ iframe.width-changed {
   width: 100%;
 }
 
+.wz-user-select-none{
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+}
+
+.wz-euiCard-no-title{
+  .euiCard__title,
+  .euiCard__description
+  {
+    display: none;
+  }
+}
+
 /* Custom Searchbar styles */
 
 .application .filters-search-bar .globalQueryBar, .app-container .filters-search-bar .globalQueryBar{
@@ -1765,3 +1777,14 @@ iframe.width-changed {
     }
   }
 }
+
+.agents-evolutions-dpicker {
+  height: 10%;
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 999999;
+  .euiButtonEmpty__text {
+    font-size: 0.8rem;
+  }
+} 

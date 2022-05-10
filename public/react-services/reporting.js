@@ -13,12 +13,12 @@
 import $ from 'jquery';
 import moment from 'moment';
 import { WazuhConfig } from '../react-services/wazuh-config';
-import { GenericRequest } from '../react-services/generic-request';
+import { AppState } from './app-state';
+import { WzRequest } from './wz-request';
 import { Vis2PNG } from '../factories/vis2png';
 import { RawVisualizations } from '../factories/raw-visualizations';
 import { VisHandlers } from '../factories/vis-handlers';
-import { getToasts } from '../kibana-services';
-import { getAngularModule } from '../kibana-services';
+import { getAngularModule, getDataPlugin, getToasts } from '../kibana-services';
 import { UI_LOGGER_LEVELS } from '../../common/constants';
 import { UI_ERROR_SEVERITIES } from './error-orchestrator/types';
 import { getErrorOrchestrator } from './common-services';
@@ -109,11 +109,13 @@ export class ReportingService {
         section: agents ? 'agents' : 'overview',
         agents,
         browserTimezone,
+        indexPatternTitle: (await getDataPlugin().indexPatterns.get(AppState.getCurrentPattern())).title,
+        apiId: JSON.parse(AppState.getCurrentAPI()).id
       };
 
       const apiEndpoint =
         tab === 'syscollector' ? `/reports/agents/${agents}/inventory` : `/reports/modules/${tab}`;
-      await GenericRequest.request('POST', apiEndpoint, data);
+      await WzRequest.genericReq('POST', apiEndpoint, data);
 
       this.$rootScope.reportBusy = false;
       this.$rootScope.reportStatus = false;
@@ -128,6 +130,7 @@ export class ReportingService {
     } catch (error) {
       this.$rootScope.reportBusy = false;
       this.$rootScope.reportStatus = false;
+      this.$rootScope.$applyAsync();
       const options = {
         context: `${ReportingService.name}.startVis2Png`,
         level: UI_LOGGER_LEVELS.ERROR,
@@ -160,10 +163,11 @@ export class ReportingService {
         tab: type,
         browserTimezone,
         components,
+        apiId: JSON.parse(AppState.getCurrentAPI()).id
       };
       const apiEndpoint =
         type === 'agentConfig' ? `/reports/agents/${obj.id}` : `/reports/groups/${obj.name}`;
-      await GenericRequest.request('POST', apiEndpoint, data);
+      await WzRequest.genericReq('POST', apiEndpoint, data);
 
       this.$rootScope.reportBusy = false;
       this.$rootScope.reportStatus = false;
@@ -178,6 +182,7 @@ export class ReportingService {
     } catch (error) {
       this.$rootScope.reportBusy = false;
       this.$rootScope.reportStatus = false;
+      this.$rootScope.$applyAsync();
       const options = {
         context: `${ReportingService.name}.startConfigReport`,
         level: UI_LOGGER_LEVELS.ERROR,
