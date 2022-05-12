@@ -495,11 +495,15 @@ export const RegisterAgent = withErrorBoundary(
       const windowsAdvice = this.state.selectedOS === 'win' && (
         <>
           <EuiCallOut
-            title="You will need administrator privileges to perform this installation."
+            title="Requirements"
             iconType="iInCircle"
-            >
-              <p>Keep in mind you need to run this command in a Windows PowerShell terminal</p>
-            </EuiCallOut>
+          >
+            <ul class="wz-callout-list">
+              <li><span>You will need administrator privileges to perform this installation.</span></li>
+              <li><span>PowerShell 3.0 or greater is required.</span></li>
+            </ul>
+            <p>Keep in mind you need to run this command in a Windows PowerShell terminal</p>
+          </EuiCallOut>
           <EuiSpacer></EuiSpacer>
         </>
       );
