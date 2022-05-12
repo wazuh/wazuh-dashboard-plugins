@@ -502,7 +502,7 @@ export const RegisterAgent = withErrorBoundary(
               <li><span>You will need administrator privileges to perform this installation.</span></li>
               <li><span>PowerShell 3.0 or greater is required.</span></li>
             </ul>
-            <p>Keep in mind you need to run this command in a Windows PowerShell terminal</p>
+            <p>Keep in mind you need to run this command in a Windows PowerShell terminal.</p>
           </EuiCallOut>
           <EuiSpacer></EuiSpacer>
         </>
