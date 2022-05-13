@@ -485,7 +485,7 @@ export const RegisterAgent = withErrorBoundary(
           }-1.pkg && sudo launchctl setenv ${this.optionalDeploymentVariables()}&& sudo installer -pkg ./wazuh-agent-${this.state.wazuhVersion
           }.pkg -target /`,
         winText: `Invoke-WebRequest -Uri https://packages.wazuh.com/4.x/windows/wazuh-agent-${this.state.wazuhVersion
-          }-1.msi -OutFile wazuh-agent-${this.state.wazuhVersion}.msi; ./wazuh-agent-${this.state.wazuhVersion
+          }-1.msi -OutFile \${env:tmp}\\wazuh-agent-${this.state.wazuhVersion}.msi; msiexec.exe /i \${env:tmp}\\wazuh-agent-${this.state.wazuhVersion
           }.msi /q ${this.optionalDeploymentVariables()}`,
       };
 
@@ -495,11 +495,15 @@ export const RegisterAgent = withErrorBoundary(
       const windowsAdvice = this.state.selectedOS === 'win' && (
         <>
           <EuiCallOut
-            title="You will need administrator privileges to perform this installation."
+            title="Requirements"
             iconType="iInCircle"
-            >
-              <p>Keep in mind you need to run this command in a Windows PowerShell terminal</p>
-            </EuiCallOut>
+          >
+            <ul class="wz-callout-list">
+              <li><span>You will need administrator privileges to perform this installation.</span></li>
+              <li><span>PowerShell 3.0 or greater is required.</span></li>
+            </ul>
+            <p>Keep in mind you need to run this command in a Windows PowerShell terminal.</p>
+          </EuiCallOut>
           <EuiSpacer></EuiSpacer>
         </>
       );
