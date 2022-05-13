@@ -1,8 +1,8 @@
 {
   "name": "wazuh",
   "version": "4.3.0",
-  "revision": "4301-1-ehl",
-  "code": "4301-1-ehl",
+  "revision": "4302-1-ehl",
+  "code": "4302-1-ehl",
   "pluginPlatform": {
     "version": "7.10.2"
   },
