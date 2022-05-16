@@ -8,7 +8,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Fixed the implicit filters in modules can be removed [#4146](https://github.com/wazuh/wazuh-kibana-app/pull/4146)
 
-## Wazuh v4.3.1 - Kibana 7.10.2 , 7.16.x, 7.17.x - Revision 4302
+## Wazuh v4.3.1 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4302
 
 ### Added
 
@@ -18,7 +18,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Fixed the falsy values are displayed as not defined and enhanced the output of `Ruleset Test` [#4141](https://github.com/wazuh/wazuh-kibana-app/pull/4141)
 
-## Wazuh v4.3.0 - Kibana 7.10.2 , 7.16.x, 7.17.x - Revision 4301
+## Wazuh v4.3.0 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4301
 
 ### Added
 
