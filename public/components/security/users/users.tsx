@@ -34,6 +34,9 @@ export const Users = () => {
       setSecurityError(true);
     });
 
+    console.log("_users");
+    console.log(_users);
+  
     setUsers(_users as User[]);
   };
 

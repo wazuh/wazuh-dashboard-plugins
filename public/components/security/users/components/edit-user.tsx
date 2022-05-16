@@ -22,7 +22,7 @@ import { Role } from '../../roles/types/role.type';
 import { UpdateUser } from '../types/user.type';
 import UsersServices from '../services';
 import RolesServices from '../../roles/services';
-import { ErrorHandler } from '../../../../react-services/error-handler';
+import ErrorHandler from '../../../../react-services/error-handler';
 import { WzAPIUtils } from '../../../../react-services/wz-api-utils';
 import { useDebouncedEffect } from '../../../common/hooks/useDebouncedEffect';
 
@@ -115,7 +115,7 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
 
   const editUser = async () => {
     if (!isValidForm()) {
-      ErrorHandler.warning('Please resolve the incorrect fields.');
+      ErrorHandler.warning('Please resolve the incorrect fields.','');
       return;
     }
 
@@ -131,7 +131,7 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
     try {
       await Promise.all([UsersServices.UpdateUser(currentUser.id, userData), updateRoles()]);
 
-      ErrorHandler.info('User was successfully updated');
+      ErrorHandler.info('User was successfully updated','');
       closeFlyout(true);
     } catch (error) {
       ErrorHandler.handle(error, 'There was an error');

@@ -74,7 +74,7 @@ export function WazuhApiRoutes(router: IRouter, securityObj: ISecurityFactory) {
         id: schema.string(),
         method: schema.string(),
         path: schema.string(),
-        body: schema.object({}),
+        body: schema.any(),
       })
     }
   },

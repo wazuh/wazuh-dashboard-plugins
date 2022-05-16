@@ -120,6 +120,31 @@ const warning = (message, location) => {
 };
 
 /**
+ * Fires a red toast (danger toast) using given message
+ * @param {string} message The message to be shown
+ * @param {string} location Usually means the file where this method was called
+ */
+const error = (message, location) => {
+  const toasts = getToasts();
+  if (typeof message === 'string') {
+    // Current date in milliseconds
+    const date = new Date().getTime();
+
+    // Remove errors older than 2s from the error history
+    history = filterRecentHistory(date);
+
+    // Check if the incoming error was already shown in the last two seconds
+    const recentlyShown = isErrorRecentlyShown(message);
+
+    if (!recentlyShown) {
+      message = location ? `${location}. ${message}` : message;
+      history.push({ text: message, date });
+      toasts.addDanger(message);
+    }
+  }
+};
+
+/**
  * Main method to show error, warning or info messages
  * @param {*} error
  * @param {string} location Usually means the file where this method was called
@@ -186,4 +211,5 @@ export default {
   info,
   warning,
   handle,
+  error,
 };

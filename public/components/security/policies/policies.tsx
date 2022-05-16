@@ -21,9 +21,10 @@ import {
   EuiInMemoryTable
 } from '@elastic/eui';
 import { PoliciesTable } from './policies-table';
-import { WzRequest } from '../../../react-services/wz-request';
+import WzRequest from '../../../react-services/wz-request';
 import { WazuhSecurity } from '../../../factories/wazuh-security'
-import { ErrorHandler } from '../../../react-services/error-handler';
+// import { ErrorHandler } from '../../../react-services/error-handler';
+import ErrorHandler from '../../../react-services/error-handler';
 import { EditPolicyFlyout } from './edit-policy';
 
 export const Policies = () => {
@@ -346,7 +347,7 @@ export const Policies = () => {
                   <EuiFlexGroup>
                     <EuiFlexItem>
                       <EuiInMemoryTable
-                        items={addedActions}
+                        items={addedActions || []}
                         columns={actions_columns}
                       />
                     </EuiFlexItem>
@@ -395,7 +396,7 @@ export const Policies = () => {
                   <EuiFlexGroup>
                     <EuiFlexItem>
                       <EuiInMemoryTable
-                        items={addedResources}
+                        items={addedResources || []}
                         columns={resources_columns}
                       />
                     </EuiFlexItem>
@@ -417,7 +418,7 @@ export const Policies = () => {
                 onClick={() => createPolicy()}
                 fill>
                 Create policy
-                                    </EuiButton>
+              </EuiButton>
             </EuiForm>
           </EuiFlyoutBody>
         </EuiFlyout>

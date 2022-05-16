@@ -5,8 +5,8 @@ import {
     EuiDescriptionList,
 } from '@elastic/eui';
 import { RIGHT_ALIGNMENT } from '@elastic/eui/lib/services';
-import { WzRequest } from '../../../react-services/wz-request';
-import { ErrorHandler } from '../../../react-services/error-handler';
+import WzRequest from '../../../react-services/wz-request';
+import ErrorHandler from '../../../react-services/error-handler';
 
 
 
@@ -96,7 +96,7 @@ export const EditRolesTable = ({ policies, role, onChange, isDisabled, loading})
                         setIsLoading(false);
                         return;
                     }
-                    ErrorHandler.info(`Policy was successfull removed from role ${role.name}`);
+                    ErrorHandler.info(`Policy was successfull removed from role ${role.name}`,'');
                     await onChange();
                   }catch(err){ }
                   setIsLoading(false);

@@ -27,11 +27,13 @@ const login = async (force = false) => {
     }
     const response = await WzRequest.genericReq('POST', '/api/login', { idHost, force });
     const token = ((response || {}).data || {}).token;
+
     return token as string;
   } catch (error) {
     return Promise.reject(error);
   }
 };
+
 const refresh = async (force = false) => {
   try {
     // Get user token
@@ -42,6 +44,8 @@ const refresh = async (force = false) => {
     // Decode token and get expiration time
     const jwtPayload = jwtDecode(token);
 
+    
+    
     // Get user Policies
     const userPolicies = await getUserPolicies();
     // Dispatch actions to set permissions and roles

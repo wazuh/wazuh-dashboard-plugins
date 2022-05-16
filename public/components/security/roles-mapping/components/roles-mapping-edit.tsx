@@ -13,7 +13,7 @@ import {
   EuiComboBox,
   EuiFieldText,
 } from '@elastic/eui';
-import { ErrorHandler } from '../../../../react-services/error-handler';
+import ErrorHandler from '../../../../react-services/error-handler';
 import { RuleEditor } from './rule-editor';
 import RulesServices from '../../rules/services';
 import RolesServices from '../../roles/services';
@@ -72,9 +72,9 @@ export const RolesMappingEdit = ({
         })
       );
 
-      ErrorHandler.info('Role mapping was successfully updated');
+      ErrorHandler.info('Role mapping was successfully updated', '');
     } catch (error) {
-      ErrorHandler.handle(error, 'There was an error');
+      ErrorHandler.handle(error, 'There was an error editing roles mapping');
     }
     onSave();
     setIsLoading(false);

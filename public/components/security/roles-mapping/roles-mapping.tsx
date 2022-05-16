@@ -11,7 +11,9 @@ import {
 import { RolesMappingTable } from './components/roles-mapping-table';
 import { RolesMappingEdit } from './components/roles-mapping-edit';
 import { RolesMappingCreate } from './components/roles-mapping-create';
-import { ErrorHandler } from '../../../react-services/error-handler';
+// import { ErrorHandler } from '../../../react-services/error-handler';
+// import * as ErrorHandler from '../../../react-services/error-handler';
+import ErrorHandler from '../../../react-services/error-handler';
 import { WazuhSecurity } from '../../../factories/wazuh-security';
 import { useApiService } from '../../common/hooks/useApiService';
 import { Rule } from '../rules/types/rule.type';
@@ -31,7 +33,7 @@ export const RolesMapping = () => {
   const [internalUsers, setInternalUsers] = useState([]);
   const currentPlatform = useSelector((state: any) => state.appStateReducers.currentPlatform);
 
-  useEffect(() => {
+  useEffect(() => {   
     initData();
   }, []);
 
@@ -44,26 +46,29 @@ export const RolesMapping = () => {
       setRolesEquivalences(_rolesObject);
     }
     if (rolesError) {
-      ErrorHandler.error('There was an error loading roles');
+      ErrorHandler.handle(rolesError,'There was an error loading roles');
     }
   }, [rolesLoading]);
 
   const getInternalUsers = async () => {
     try {
       const wazuhSecurity = new WazuhSecurity();
-      const users = await wazuhSecurity.security.getUsers();
-      const _users = users.map((item, idx) => {
-        return {
-          id: idx,
-          user: item.username,
-          roles: [],
-          full_name: item.full_name,
-          email: item.email,
-        };
-      }).sort((a, b) => (a.user > b.user) ? 1 : (a.user < b.user) ? -1 : 0);      
-      setInternalUsers(_users);
-    } catch (error) {
-      ErrorHandler.error('There was an error loading internal users');
+
+      if(wazuhSecurity.security){
+        const users = await wazuhSecurity.security.getUsers();     
+        const _users = users.map((item, idx) => {
+          return {
+            id: idx,
+            user: item.username,
+            roles: [],
+            full_name: item.full_name,
+            email: item.email,
+          };
+        }).sort((a, b) => (a.user > b.user) ? 1 : (a.user < b.user) ? -1 : 0);      
+        setInternalUsers(_users);
+      }
+    } catch (error) {     
+      ErrorHandler.handle(error,'There was an error loading internal users');
     }
   };
 
@@ -72,7 +77,7 @@ export const RolesMapping = () => {
       const _rules = await RulesServices.GetRules();
       setRules(_rules);
     } catch (error) {
-      ErrorHandler.error('There was an error loading rules');
+      ErrorHandler.handle(error,'There was an error loading rules');
     }
   };
 

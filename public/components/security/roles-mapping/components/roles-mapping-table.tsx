@@ -7,7 +7,7 @@ import {
   EuiBasicTableColumn,
   SortDirection,
 } from '@elastic/eui';
-import { ErrorHandler } from '../../../../react-services/error-handler';
+import ErrorHandler from '../../../../react-services/error-handler';
 import { WzButtonModalConfirm } from '../../../common/buttons';
 import { WzAPIUtils } from '../../../../react-services/wz-api-utils';
 import RulesServices from '../../rules/services';
@@ -82,10 +82,10 @@ export const RolesMappingTable = ({ rolesEquivalences, rules, loading, editRule,
             onConfirm={async () => {
               try {
                 await RulesServices.DeleteRules([item.id]);
-                ErrorHandler.info('Role mapping was successfully deleted');
+                ErrorHandler.info('Role mapping was successfully deleted','');
                 updateRules();
               } catch (err) {
-                ErrorHandler.error(err);
+                ErrorHandler.handle(error, 'There was an error deleting roles mapping');
               }
             }}
             modalProps={{ buttonColor: 'danger' }}

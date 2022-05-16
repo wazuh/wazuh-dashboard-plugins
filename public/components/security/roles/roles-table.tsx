@@ -10,20 +10,20 @@ import {
     EuiSpacer,
     EuiLoadingSpinner
 } from '@elastic/eui';
-import { WzRequest } from '../../../react-services/wz-request';
-import { ErrorHandler } from '../../../react-services/error-handler';
+import WzRequest from '../../../react-services/wz-request';
+import ErrorHandler from '../../../react-services/error-handler';
 import { WzButtonModalConfirm } from '../../common/buttons';
 import { WzAPIUtils } from '../../../react-services/wz-api-utils';
 
-export const RolesTable = ({roles, policiesData, loading, editRole, updateRoles}) => {
-   
+export const RolesTable = ({ roles, policiesData, loading, editRole, updateRoles }) => {
+
     const getRowProps = item => {
         const { id } = item;
         return {
-          'data-test-subj': `row-${id}`,
-          onClick: () => editRole(item),
+            'data-test-subj': `row-${id}`,
+            onClick: () => editRole(item),
         };
-      };
+    };
 
     const columns = [
         {
@@ -65,7 +65,7 @@ export const RolesTable = ({roles, policiesData, loading, editRole, updateRoles}
                                         <p>{(data.policy || {}).effect}</p>
                                     </div>
                                 }>
-                                <EuiBadge color="hollow" onClick={() => {}} onClickAriaLabel={`${data.name} policy`} title={null}>{
+                                <EuiBadge color="hollow" onClick={() => { }} onClickAriaLabel={`${data.name} policy`} title={null}>{
                                     data.name
                                 }</EuiBadge>
                             </EuiToolTip>
@@ -86,41 +86,41 @@ export const RolesTable = ({roles, policiesData, loading, editRole, updateRoles}
             sortable: false,
         },
         {
-          align: 'right',
-          width: '5%',
-          name: 'Actions',
-          render: item => (
-            <div onClick={ev => ev.stopPropagation()}>
-                <WzButtonModalConfirm
-                buttonType='icon'
-                tooltip={{content: WzAPIUtils.isReservedID(item.id) ? "Reserved roles can't be deleted" : 'Delete role', position: 'left'}}
-                isDisabled={WzAPIUtils.isReservedID(item.id)}
-                modalTitle={`Do you want to delete the ${item.name} role?`}
-                onConfirm={async () => {
-                    try{
-                        const response = await WzRequest.apiReq(
-                        'DELETE',
-                        `/security/roles/`,
-                        {
-                            params: {
-                                role_ids: item.id
-                            }
-                        }
-                    );                    
-                    const data = (response.data || {}).data;
-                    if (data.failed_items && data.failed_items.length){
-                        return;
-                    }
-                    ErrorHandler.info('Role was successfully deleted');
-                    await updateRoles();
-                }catch(error){}
-                }}
-                modalProps={{buttonColor: 'danger'}}
-                iconType='trash'
-                color='danger'
-                aria-label='Delete role'
-                />
-            </div>
+            align: 'right',
+            width: '5%',
+            name: 'Actions',
+            render: item => (
+                <div onClick={ev => ev.stopPropagation()}>
+                    <WzButtonModalConfirm
+                        buttonType='icon'
+                        tooltip={{ content: WzAPIUtils.isReservedID(item.id) ? "Reserved roles can't be deleted" : 'Delete role', position: 'left' }}
+                        isDisabled={WzAPIUtils.isReservedID(item.id)}
+                        modalTitle={`Do you want to delete the ${item.name} role?`}
+                        onConfirm={async () => {
+                            try {
+                                const response = await WzRequest.apiReq(
+                                    'DELETE',
+                                    `/security/roles/`,
+                                    {
+                                        params: {
+                                            role_ids: item.id
+                                        }
+                                    }
+                                );
+                                const data = (response.data || {}).data;
+                                if (data.failed_items && data.failed_items.length) {
+                                    return;
+                                }
+                                ErrorHandler.info('Role was successfully deleted','');
+                                await updateRoles();
+                            } catch (error) { }
+                        }}
+                        modalProps={{ buttonColor: 'danger' }}
+                        iconType='trash'
+                        color='danger'
+                        aria-label='Delete role'
+                    />
+                </div>
             )
         }
     ];
