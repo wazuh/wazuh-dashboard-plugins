@@ -29,7 +29,7 @@ import {
 import { Bucket, FieldDetails } from './types';
 import { IndexPatternField, IndexPattern } from '../../../../../../../../src/plugins/data/public';
 import './discover_field_details.scss';
-
+import { getDataPlugin } from '../../../../../kibana-services';
 interface DiscoverFieldDetailsProps {
   field: IndexPatternField;
   indexPattern: IndexPattern;
@@ -68,11 +68,15 @@ export function DiscoverFieldDetails({
   }, [field, indexPattern.id, details.columns]);
 
   const handleVisualizeLinkClick = (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+    const { filterManager } = getDataPlugin().query;
+    if (filterManager.getFilters() && filterManager.getFilters().length) {
+      filterManager.removeAll();
+    }
     // regular link click. let the uiActions code handle the navigation and show popup if needed
     event.preventDefault();
     triggerVisualizeActions(field, indexPattern.id, details.columns);
   };
-
+  
   return (
     <>
       <div className="dscFieldDetails">
