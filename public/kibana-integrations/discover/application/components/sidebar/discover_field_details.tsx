@@ -30,6 +30,7 @@ import { Bucket, FieldDetails } from './types';
 import { IndexPatternField, IndexPattern } from '../../../../../../../../src/plugins/data/public';
 import './discover_field_details.scss';
 import { getDataPlugin } from '../../../../../kibana-services';
+
 interface DiscoverFieldDetailsProps {
   field: IndexPatternField;
   indexPattern: IndexPattern;
