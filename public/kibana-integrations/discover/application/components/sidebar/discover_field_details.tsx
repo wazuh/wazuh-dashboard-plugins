@@ -68,6 +68,9 @@ export function DiscoverFieldDetails({
   }, [field, indexPattern.id, details.columns]);
 
   const handleVisualizeLinkClick = (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+    // In branch 7.16.3 when clicking on the visualize button the filters are eliminated, in branch 7.10.2 the filters are also eliminated but visually we never stopped seeing them since the visualize plugin added them again.
+    // When clicking on the visualize button: In the 7.16.3 branch the lens plugin is used instead in the 7.10.2 branch the visualize plugin is used.
+    // We think it is best if the 7.10.2 branch behaves like the 7.16.3 branch and the filters are removed, when we click on the visualize button.
     const { filterManager } = getDataPlugin().query;
     if (filterManager.getFilters() && filterManager.getFilters().length) {
       filterManager.removeAll();
