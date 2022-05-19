@@ -1,6 +1,11 @@
 # Change Log
 
 All notable changes to the Wazuh app project will be documented in this file.
+## Wazuh v4.3.2 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4303
+
+### Fixed
+
+- Fixed problem importing existing or empty rules or decoders
 
 ## Wazuh v4.3.1 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4302
 
@@ -27,9 +32,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added new endpoint service to collect the frontend logs into a file [#3324](https://github.com/wazuh/wazuh-kibana-app/pull/3324)
 - Improved the frontend handle errors strategy: UI, Toasts, console log and log in file 
   [#3327](https://github.com/wazuh/wazuh-kibana-app/pull/3327) 
-  [#3321](https://github.com/wazuh/wazuh-kibana-app/pull/3321) 
-  [#3367](https://github.com/wazuh/wazuh-kibana-app/pull/3367)
-  [#3373](https://github.com/wazuh/wazuh-kibana-app/pull/3373)
+  [#3321](https://github.com/wazufixed problem importing existing or empty rules or decoders
+h/wazuh-kibana-app/pull/3373)
   [#3374](https://github.com/wazuh/wazuh-kibana-app/pull/3374) 
   [#3390](https://github.com/wazuh/wazuh-kibana-app/pull/3390)  
   [#3410](https://github.com/wazuh/wazuh-kibana-app/pull/3410) 
@@ -53,7 +57,8 @@ All notable changes to the Wazuh app project will be documented in this file.
   [#3464](https://github.com/wazuh/wazuh-kibana-app/pull/3464)
   [#3478](https://github.com/wazuh/wazuh-kibana-app/pull/3478)
   [#4116](https://github.com/wazuh/wazuh-kibana-app/pull/4116)
-- Added Intelligence tab to Mitre Att&ck module [#3368](https://github.com/wazuh/wazuh-kibana-app/pull/3368) [#3344](https://github.com/wazuh/wazuh-kibana-app/pull/3344) [#3726](https://github.com/wazuh/wazuh-kibana-app/pull/3726)
+- Added Intelligence tab to Mitrefixed problem importing existing or empty rules or decoders
+ Att&ck module [#3368](https://github.com/wazuh/wazuh-kibana-app/pull/3368) [#3344](https://github.com/wazuh/wazuh-kibana-app/pull/3344) [#3726](https://github.com/wazuh/wazuh-kibana-app/pull/3726)
 - Added sample data for office365 events [#3424](https://github.com/wazuh/wazuh-kibana-app/pull/3424)
 - Created a separate component to check for sample data [#3475](https://github.com/wazuh/wazuh-kibana-app/pull/3475)
 - Added a new hook for getting value suggestions [#3506](https://github.com/wazuh/wazuh-kibana-app/pull/3506)
@@ -112,7 +117,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed rules and decoders test flyout clickout event [#3412](https://github.com/wazuh/wazuh-kibana-app/pull/3412)
 - Notify when you are registering an agent without permissions [#3430](https://github.com/wazuh/wazuh-kibana-app/pull/3430)
 - Remove not used `redirectRule` query param when clicking the row table on CDB Lists/Decoders [#3438](https://github.com/wazuh/wazuh-kibana-app/pull/3438)
-- Fixed the code overflows over the line numbers in the API Console editor [#3439](https://github.com/wazuh/wazuh-kibana-app/pull/3439)
+- Fixed the code overflows over tfixed problem importing existing or empty rules or decoders
+he line numbers in the API Console editor [#3439](https://github.com/wazuh/wazuh-kibana-app/pull/3439)
 - Don't open the main menu when changing the seleted API or index pattern [#3440](https://github.com/wazuh/wazuh-kibana-app/pull/3440)
 - Fix error message in conf managment [#3443](https://github.com/wazuh/wazuh-kibana-app/pull/3443)
 - Fix size api selector when name is too long [#3445](https://github.com/wazuh/wazuh-kibana-app/pull/3445)
