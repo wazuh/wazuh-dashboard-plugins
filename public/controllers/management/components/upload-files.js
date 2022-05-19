@@ -29,10 +29,12 @@ import {
 import { getToasts }  from '../../../kibana-services';
 import { WzButtonPermissions } from '../../../components/common/permissions/button';
 import { resourceDictionary, RulesetResources } from './management/ruleset/utils/ruleset-handler';
+import { WzRequest } from '../../../react-services';
 export class UploadFiles extends Component {
   constructor(props) {
     super(props);
 
+    this.wzReq = (...args) => WzRequest.apiReq(...args);
     this.state = {
       files: {},
       isPopoverOpen: false,
@@ -69,9 +71,26 @@ export class UploadFiles extends Component {
   async startUpload() {
     try {
       const files = [];
+      const filesSameName = [];
+
+      const {data} = await this.wzReq(
+        'GET',
+        `/${this.props.resource}/files`,
+        {}
+      )
+
+      const filesExist = data.data.affected_items
+
       for (let idx = 0; idx < this.state.files.length; idx++) {
         const reader = new FileReader();
         const file = this.state.files[idx];
+
+        const [fileOld] = filesExist.filter(file => file.filename === this.state.files[idx].name)
+
+        if(fileOld){
+          filesSameName.push({fileName: file.name})
+        }
+
         reader.readAsText(file);
         // This interval is for wait until the FileReader has read the file content
         const interval = setInterval(async () => {
@@ -81,7 +100,7 @@ export class UploadFiles extends Component {
               content: reader.result
             });
             clearInterval(interval);
-            if (files.length === this.state.files.length) {
+            if (files.length === this.state.files.length && filesSameName.length === 0 ) {
               try {
                 await this.props.upload(files, this.props.resource);
                 this.closePopover();
@@ -107,8 +126,28 @@ export class UploadFiles extends Component {
                 this.setState({ uploadErrors: error });
               }
             }
-          }
+          } 
         }, 100);
+        if(filesSameName.length !== 0 ) {
+          this.closePopover();
+          this.showToast(
+            'danger',
+            'Error',
+            <Fragment>
+              <div>A file with that name already exists</div>
+              <ul>
+                {filesSameName.map(f => (
+                  <li
+                    key={`ruleset-not-imported-file-${f.file}`}
+                    style={{ listStyle: 'circle' }}
+                  >
+                    {f.fileName}
+                  </li>
+                ))}
+              </ul>
+            </Fragment>
+          );
+        }
       }
     } catch (error) {
       console.error(error)
@@ -182,6 +221,17 @@ export class UploadFiles extends Component {
       return result.length ? false : true;
     }
     return true;
+  }
+
+  /**
+   * Validates the files size
+   */
+
+   checkValidFileSize() {
+    const result = Object.keys(this.state.files).filter(item => {
+      return this.state.files[item].size === 0;
+    });
+    return result.length;
   }
 
   /**
@@ -301,7 +351,8 @@ export class UploadFiles extends Component {
           {this.state.files.length > 0 &&
             this.state.files.length < 6 &&
             !this.checkOverSize() > 0 &&
-            this.checkValidFileExtensions() > 0 && (
+            this.checkValidFileExtensions() > 0 &&
+            !this.checkValidFileSize() > 0 && (
               <Fragment>
                 <EuiFlexItem>
                   {(!this.state.uploadErrors && this.renderFiles()) ||
@@ -348,6 +399,14 @@ export class UploadFiles extends Component {
           {!this.checkValidFileExtensions() > 0 && (
             <Fragment>
               {this.renderWarning('The files extensions are not valid.')}
+            </Fragment>
+          )}
+
+          {this.checkValidFileSize() > 0 && (
+            <Fragment>
+              {this.renderWarning(
+                `There can be no empty files`
+              )}
             </Fragment>
           )}
         </div>
