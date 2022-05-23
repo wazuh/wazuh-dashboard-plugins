@@ -6,7 +6,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
-- Fixed Wazuh Dashboard troubleshooting url [#4150](https://github.com/wazuh/wazuh-kibana-app/pull/4150)
+- Fixed Wazuh Dashboard troubleshooting url [#4151](https://github.com/wazuh/wazuh-kibana-app/pull/4151)
 
 ## Wazuh v4.3.1 - OpenSearch Dashboards 1.2.0 - Revision 4302
 
