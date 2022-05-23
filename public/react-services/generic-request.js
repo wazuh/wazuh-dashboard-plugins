@@ -84,9 +84,7 @@ export class GenericRequest {
 
       Object.assign(data, await request(options));
       if (!data) {
-        throw new Error(
-          `Error doing a request to ${tmpUrl}, method: ${method}.`,
-        );
+        throw new Error(`Error doing a request to ${tmpUrl}, method: ${method}.`);
       }
 
       return data;
@@ -105,16 +103,14 @@ export class GenericRequest {
             !window.location.hash.includes('#/health-check') &&
             !window.location.hash.includes('#/blank-screen')
           ) {
-            window.location.href = getHttp().basePath.prepend(
-              '/app/wazuh#/health-check',
-            );
+            window.location.href = getHttp().basePath.prepend('/app/wazuh#/health-check');
           }
         }
       }
       if (returnError) return Promise.reject(err);
       return (((err || {}).response || {}).data || {}).message || false
-        ? Promise.reject(err.response.data.message)
-        : Promise.reject(err || 'Server did not respond');
+        ? Promise.reject(new Error(err.response.data.message))
+        : Promise.reject(err || new Error('Server did not respond'));
     }
   }
 }
