@@ -49,6 +49,14 @@ Object.defineProperty(window, 'location', {
 });
 
 describe('Generic Request', () => {
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  afterAll(() => {
+    jest.restoreAllMocks();
+  });
+
   it('Should return data when request is successfully completed', async () => {
     const resDataMocked = { data: [] };
     (axios as jest.MockedFunction<typeof axios>).mockResolvedValue(
