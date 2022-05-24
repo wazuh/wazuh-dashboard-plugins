@@ -19,14 +19,14 @@ import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../common/constants';
 import { request } from '../services/request-handler';
 
 export class GenericRequest {
-  static async request(method, path, payload = null, returnError = false) {
+  static async request(method: RequestMethod, path: string, payload = null, returnError = false) {
     try {
       if (!method || !path) {
         throw new Error('Missing parameters');
       }
       const wazuhConfig = new WazuhConfig();
       const { timeout } = wazuhConfig.getConfig();
-      const requestHeaders = {
+      const requestHeaders: any = {
         ...PLUGIN_PLATFORM_REQUEST_HEADERS,
         'content-type': 'application/json',
       };
@@ -43,43 +43,17 @@ export class GenericRequest {
       } catch (error) {
         // Intended
       }
-      var options = {};
+      var options = {
+        method: method,
+        headers: requestHeaders,
+        url: tmpUrl,
+        timeout: timeout || 20000,
+      };
 
       const data = {};
-      if (method === 'GET') {
-        options = {
-          method: method,
-          headers: requestHeaders,
-          url: tmpUrl,
-          timeout: timeout || 20000,
-        };
-      }
-      if (method === 'PUT') {
-        options = {
-          method: method,
-          headers: requestHeaders,
-          data: payload,
-          url: tmpUrl,
-          timeout: timeout || 20000,
-        };
-      }
-      if (method === 'POST') {
-        options = {
-          method: method,
-          headers: requestHeaders,
-          data: payload,
-          url: tmpUrl,
-          timeout: timeout || 20000,
-        };
-      }
-      if (method === 'DELETE') {
-        options = {
-          method: method,
-          headers: requestHeaders,
-          data: payload,
-          url: tmpUrl,
-          timeout: timeout || 20000,
-        };
+
+      if (['PUT', 'POST', 'DELETE'].includes(method)) {
+        options['data'] = payload;
       }
 
       Object.assign(data, await request(options));
@@ -107,10 +81,9 @@ export class GenericRequest {
           }
         }
       }
-      if (returnError) return Promise.reject(err);
-      return (((err || {}).response || {}).data || {}).message || false
-        ? Promise.reject(new Error(err.response.data.message))
-        : Promise.reject(err || new Error('Server did not respond'));
+      const responseError = ErrorFactory.createError(err as Error);
+      if (returnError) return Promise.reject(responseError);
+      return Promise.reject(responseError);
     }
   }
 }
