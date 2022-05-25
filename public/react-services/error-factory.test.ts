@@ -17,7 +17,7 @@ describe('Error Factory', () => {
     const error = new Error('Error message');
     const errorCreated = ErrorFactory.createError(error);
     expect(errorCreated).toBeInstanceOf(Error);
-    expect(errorCreated.name).toBe('ResponseBaseError');
+    expect(errorCreated.name).toBe('ResponseError');
     expect(errorCreated.message).toEqual(errorMessage);
     expect(errorCreated.stack).toBeTruthy();
     expect(typeof errorCreated).not.toBe('string');
@@ -27,7 +27,7 @@ describe('Error Factory', () => {
     const errorMessage = 'String message';
     const errorCreated = ErrorFactory.createError(errorMessage);
     expect(errorCreated).toBeInstanceOf(Error);
-    expect(errorCreated.name).toBe('ResponseBaseError');
+    expect(errorCreated.name).toBe('ResponseError');
     expect(errorCreated.message).toEqual(errorMessage);
     expect(errorCreated.stack).toBeTruthy();
     expect(typeof errorCreated).not.toBe('string');
