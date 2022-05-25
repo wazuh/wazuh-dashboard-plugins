@@ -32,6 +32,7 @@ import configurationSettingsGroup from './configuration-settings';
 import { connect } from 'react-redux';
 import { isString, isFunction } from './utils/utils';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
+import { API_NAME_AGENT_STATUS } from '../../../../../../common/constants';
 
 const columns = [
   {
@@ -136,7 +137,7 @@ class WzConfigurationOverview extends Component {
                   </WzButtonPermissions>
                 </EuiFlexItem>
               )}
-              {this.props.agent.id !== '000' && this.props.agent.status === 'active' && (
+              {this.props.agent.id !== '000' && this.props.agent.status === API_NAME_AGENT_STATUS.ACTIVE && (
                 <EuiFlexItem>
                   <ExportConfiguration
                     agent={this.props.agent}

@@ -17,7 +17,9 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                   className="euiFlexItem"
                 />
               </EuiFlexItem>
-              <EuiFlexItem>
+              <EuiFlexItem
+                key="agent-status-total"
+              >
                 <div
                   className="euiFlexItem"
                 >
@@ -26,7 +28,7 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                     textAlign="center"
                     title={
                       <EuiToolTip
-                        content="Go to all agents"
+                        content="Go to total agents"
                         delay="regular"
                         position="top"
                       >
@@ -38,7 +40,9 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                               "cursor": "pointer",
                             }
                           }
-                        />
+                        >
+                          -
+                        </span>
                       </EuiToolTip>
                     }
                     titleColor="primary"
@@ -69,7 +73,7 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                           className="euiTitle euiTitle--large euiStat__title euiStat__title--primary"
                         >
                           <EuiToolTip
-                            content="Go to all agents"
+                            content="Go to total agents"
                             delay="regular"
                             position="top"
                           >
@@ -89,7 +93,9 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                                     "cursor": "pointer",
                                   }
                                 }
-                              />
+                              >
+                                -
+                              </span>
                             </span>
                           </EuiToolTip>
                         </p>
@@ -98,7 +104,9 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                   </EuiStat>
                 </div>
               </EuiFlexItem>
-              <EuiFlexItem>
+              <EuiFlexItem
+                key="agent-status-active"
+              >
                 <div
                   className="euiFlexItem"
                 >
@@ -119,10 +127,12 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                               "cursor": "pointer",
                             }
                           }
-                        />
+                        >
+                          -
+                        </span>
                       </EuiToolTip>
                     }
-                    titleColor="secondary"
+                    titleColor="#007871"
                   >
                     <div
                       className="euiStat euiStat--centerAligned"
@@ -142,12 +152,17 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                         </div>
                       </EuiText>
                       <EuiTitle
-                        className="euiStat__title euiStat__title--secondary"
+                        className="euiStat__title"
                         size="l"
                       >
                         <p
                           aria-hidden={true}
-                          className="euiTitle euiTitle--large euiStat__title euiStat__title--secondary"
+                          className="euiTitle euiTitle--large euiStat__title"
+                          style={
+                            Object {
+                              "color": "#007871",
+                            }
+                          }
                         >
                           <EuiToolTip
                             content="Go to active agents"
@@ -170,7 +185,9 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                                     "cursor": "pointer",
                                   }
                                 }
-                              />
+                              >
+                                -
+                              </span>
                             </span>
                           </EuiToolTip>
                         </p>
@@ -179,7 +196,9 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                   </EuiStat>
                 </div>
               </EuiFlexItem>
-              <EuiFlexItem>
+              <EuiFlexItem
+                key="agent-status-disconnected"
+              >
                 <div
                   className="euiFlexItem"
                 >
@@ -200,10 +219,12 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                               "cursor": "pointer",
                             }
                           }
-                        />
+                        >
+                          -
+                        </span>
                       </EuiToolTip>
                     }
-                    titleColor="danger"
+                    titleColor="#BD271E"
                   >
                     <div
                       className="euiStat euiStat--centerAligned"
@@ -223,12 +244,17 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                         </div>
                       </EuiText>
                       <EuiTitle
-                        className="euiStat__title euiStat__title--danger"
+                        className="euiStat__title"
                         size="l"
                       >
                         <p
                           aria-hidden={true}
-                          className="euiTitle euiTitle--large euiStat__title euiStat__title--danger"
+                          className="euiTitle euiTitle--large euiStat__title"
+                          style={
+                            Object {
+                              "color": "#BD271E",
+                            }
+                          }
                         >
                           <EuiToolTip
                             content="Go to disconnected agents"
@@ -251,7 +277,9 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                                     "cursor": "pointer",
                                   }
                                 }
-                              />
+                              >
+                                -
+                              </span>
                             </span>
                           </EuiToolTip>
                         </p>
@@ -260,7 +288,101 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                   </EuiStat>
                 </div>
               </EuiFlexItem>
-              <EuiFlexItem>
+              <EuiFlexItem
+                key="agent-status-pending"
+              >
+                <div
+                  className="euiFlexItem"
+                >
+                  <EuiStat
+                    description="Pending agents"
+                    textAlign="center"
+                    title={
+                      <EuiToolTip
+                        content="Go to pending agents"
+                        delay="regular"
+                        position="top"
+                      >
+                        <span
+                          className="statWithLink"
+                          onClick={[Function]}
+                          style={
+                            Object {
+                              "cursor": "pointer",
+                            }
+                          }
+                        >
+                          -
+                        </span>
+                      </EuiToolTip>
+                    }
+                    titleColor="#FEC514"
+                  >
+                    <div
+                      className="euiStat euiStat--centerAligned"
+                    >
+                      <EuiText
+                        className="euiStat__description"
+                        size="s"
+                      >
+                        <div
+                          className="euiText euiText--small euiStat__description"
+                        >
+                          <p
+                            aria-hidden={true}
+                          >
+                            Pending agents
+                          </p>
+                        </div>
+                      </EuiText>
+                      <EuiTitle
+                        className="euiStat__title"
+                        size="l"
+                      >
+                        <p
+                          aria-hidden={true}
+                          className="euiTitle euiTitle--large euiStat__title"
+                          style={
+                            Object {
+                              "color": "#FEC514",
+                            }
+                          }
+                        >
+                          <EuiToolTip
+                            content="Go to pending agents"
+                            delay="regular"
+                            position="top"
+                          >
+                            <span
+                              className="euiToolTipAnchor"
+                              onKeyUp={[Function]}
+                              onMouseOut={[Function]}
+                              onMouseOver={[Function]}
+                            >
+                              <span
+                                className="statWithLink"
+                                onBlur={[Function]}
+                                onClick={[Function]}
+                                onFocus={[Function]}
+                                style={
+                                  Object {
+                                    "cursor": "pointer",
+                                  }
+                                }
+                              >
+                                -
+                              </span>
+                            </span>
+                          </EuiToolTip>
+                        </p>
+                      </EuiTitle>
+                    </div>
+                  </EuiStat>
+                </div>
+              </EuiFlexItem>
+              <EuiFlexItem
+                key="agent-status-never_connected"
+              >
                 <div
                   className="euiFlexItem"
                 >
@@ -281,10 +403,12 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                               "cursor": "pointer",
                             }
                           }
-                        />
+                        >
+                          -
+                        </span>
                       </EuiToolTip>
                     }
-                    titleColor="subdued"
+                    titleColor="#646A77"
                   >
                     <div
                       className="euiStat euiStat--centerAligned"
@@ -304,12 +428,17 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                         </div>
                       </EuiText>
                       <EuiTitle
-                        className="euiStat__title euiStat__title--subdued"
+                        className="euiStat__title"
                         size="l"
                       >
                         <p
                           aria-hidden={true}
-                          className="euiTitle euiTitle--large euiStat__title euiStat__title--subdued"
+                          className="euiTitle euiTitle--large euiStat__title"
+                          style={
+                            Object {
+                              "color": "#646A77",
+                            }
+                          }
                         >
                           <EuiToolTip
                             content="Go to never connected agents"
@@ -332,7 +461,9 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                                     "cursor": "pointer",
                                   }
                                 }
-                              />
+                              >
+                                -
+                              </span>
                             </span>
                           </EuiToolTip>
                         </p>

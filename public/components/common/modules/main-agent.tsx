@@ -111,12 +111,6 @@ export class MainModuleAgent extends Component {
     this.setState({ showAgentInfo: !this.state.showAgentInfo });
   }
 
-  color = (status, hex = false) => {
-    if (status.toLowerCase() === 'active') { return hex ? '#017D73' : 'success'; }
-    else if (status.toLowerCase() === 'disconnected') { return hex ? '#BD271E' : 'danger'; }
-    else if (status.toLowerCase() === 'never connected') { return hex ? '#98A2B3' : 'subdued'; }
-  }
-
   async startReport() {
     this.setState({ loadingReport: true });
     const syscollectorFilters: any[] = [];

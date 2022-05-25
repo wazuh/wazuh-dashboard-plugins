@@ -66,7 +66,7 @@ import { EuiPage, EuiPanel, EuiSpacer, EuiButtonEmpty, EuiFlexItem } from '@elas
 
 import { agentIsSynchronized } from './utils/wz-fetch';
 import { WzRequest } from '../../../../../react-services/wz-request';
-import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
+import { API_NAME_AGENT_STATUS, UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 import { WzConfigurationOffice365 } from './office365/office365';
@@ -468,7 +468,7 @@ export default compose(
     {action: 'agent:read', resource: `agent:id:${props.agent.id}`},
     ...(props.agent.group || []).map(group => ({ action: 'agent:read', resource: `agent:group:${group}` }))
   ]]), //TODO: this need cluster:read permission but manager/cluster is managed in WzConfigurationSwitch component
-  withRenderIfOrWrapped((props) => props.agent.status === 'never_connected', WzAgentNeverConnectedPrompt),
+  withRenderIfOrWrapped((props) => props.agent.status === API_NAME_AGENT_STATUS.NEVER_CONNECTED, WzAgentNeverConnectedPrompt),
   connect(
     mapStateToProps,
     mapDispatchToProps
