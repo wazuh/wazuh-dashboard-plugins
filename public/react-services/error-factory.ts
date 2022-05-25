@@ -11,22 +11,39 @@
  */
 import { ErrorHandler } from './index';
 
-export class ResponseBaseError extends Error {
-  constructor(error: Error | string) {
-    super(ErrorHandler.extractMessage(error));
+class ResponseError extends Error {
+  constructor(message: string) {
+    super(message);
     this.name = this.constructor.name;
-    if (error instanceof Error) {
-      this.stack = error.stack;
-    }
   }
 }
 
 export class ErrorFactory {
-  static createError(error: Error | string): ResponseBaseError {
-    return new ResponseBaseError(error);
+  /**
+   * Create an new error instance receiving an error instance or a string
+   * Paste error stack in new error
+   * @param error
+   * @returns Error instance
+   */
+  static createError(error: Error | string): Error {
+    const errorMessage = ErrorHandler.extractMessage(error);
+    const createdError = this.errorCreator(ResponseError, errorMessage);
+    if (error instanceof Error) {
+      createdError.stack = error.stack;
+    }
+    return createdError;
   }
 
-  static extractMessage(error: Error): string {
-    return ErrorHandler.extractMessage(error);
+  /**
+   * Create an new error instance receiving a Error Type and message
+   * @param errorType Error instance to create
+   * @param message
+   * @returns Error instance depending type received
+   */
+  static errorCreator<T extends Error>(
+    ErrorType: { new (message: string): T },
+    message: string
+  ): Error {
+    return new ErrorType(message);
   }
 }
