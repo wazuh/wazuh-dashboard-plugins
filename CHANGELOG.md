@@ -2,6 +2,21 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.3.2 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4303
+
+### Added
+
+- Added the `pending` agent status to some sections that was missing [#4166](https://github.com/wazuh/wazuh-kibana-app/pull/4166)
+
+### Changed
+
+- Replaced the visualization of `Status` panel in `Agents` [#4166](https://github.com/wazuh/wazuh-kibana-app/pull/4166)
+- Replaced the visualization of policy in `Modules/Security configuration assessment/Invetory` [#4166](https://github.com/wazuh/wazuh-kibana-app/pull/4166)
+- Consistency in the colors and labels used for the agent status [#4166](https://github.com/wazuh/wazuh-kibana-app/pull/4166)
+
+### Fixed
+- Fixed the platform visualizations didn't use some definitions related to the UI on Kibana 7.10.2 [#4166](https://github.com/wazuh/wazuh-kibana-app/pull/4166)
+
 ## Wazuh v4.3.1 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4302
 
 ### Added
