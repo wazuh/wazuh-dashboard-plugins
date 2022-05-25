@@ -55,12 +55,12 @@ export class ModulesHelper {
         // Checks if the filter is already in use
         // Check which of the filters are from the module view and which are not pinned filters
         if (!moduleFilter.used) {
-          const objKey = moduleFilter.query?.match
-            ? Object.keys(moduleFilter.query.match)[0]
+          const objKey = moduleFilter.query?.match_phrase
+            ? Object.keys(moduleFilter.query.match_phrase)[0]
             : moduleFilter.meta.key;
-          const objValue = moduleFilter.query?.match
-            ? moduleFilter.query.match[objKey].query
-            : moduleFilter.meta.value;
+          const objValue = moduleFilter.query?.match_phrase
+            ? moduleFilter.query.match_phrase[objKey].query
+            : moduleFilter.meta.value();
           const key = `filter-key-${objKey}`;
           const value = `filter-value-${objValue}`;
 
