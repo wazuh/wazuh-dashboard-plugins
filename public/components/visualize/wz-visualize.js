@@ -156,7 +156,7 @@ export const WzVisualize = compose(
     reloadToast = () => {
       const toastLifeTimeMs = 300000;
       const [mayor, minor] = appVersion.split('.');
-      const urlTroubleShootingDocs = `https://documentation.wazuh.com/${mayor}.${minor}/user-manual/elasticsearch/elastic-tuning/troubleshooting.html#index-pattern-was-refreshed-toast-keeps-popping-up`;
+      const urlTroubleShootingDocs = `https://documentation.wazuh.com/${mayor}.${minor}/user-manual/elasticsearch/troubleshooting.html#index-pattern-was-refreshed-toast-keeps-popping-up`;
       getToasts().add({
         color: 'success',
         title: 'The index pattern was refreshed successfully.',
