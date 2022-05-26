@@ -15,8 +15,9 @@ import { connect } from 'react-redux';
 
 // Wazuh components
 import WzRulesetTable from './ruleset-table';
+import RulesetTable from './tables/ruleset-table';
 import WzRulesetSearchBar from './ruleset-search-bar';
-import WzRulesetActionButtons from './actions-buttons';
+// import WzRulesetActionButtons from './actions-buttons';
 import './ruleset-overview.scss';
 import { withUserAuthorizationPrompt, withGlobalBreadcrumb } from '../../../../../components/common/hocs';
 import WzRestartClusterManagerCallout from '../../../../../components/common/restart-cluster-manager-callout';
@@ -45,7 +46,7 @@ class WzRulesetOverview extends Component {
   render() {
     const { section } = this.props.state;
     const { totalItems } = this.state;
-
+    // const type = showingFiles ? 'files' : 'items';
     return (
       <EuiPage style={{ background: 'transparent' }}>
         <EuiPanel>
@@ -56,7 +57,7 @@ class WzRulesetOverview extends Component {
               </EuiTitle>
             </EuiFlexItem>
             <EuiFlexItem></EuiFlexItem>
-            <WzRulesetActionButtons clusterStatus={this.props.clusterStatus} updateRestartClusterManager={(showWarningRestart) => this.updateRestartManagers(showWarningRestart)}/>
+            {/* <WzRulesetActionButtons clusterStatus={this.props.clusterStatus} updateRestartClusterManager={(showWarningRestart) => this.updateRestartManagers(showWarningRestart)}/> */}
           </EuiFlexGroup>
           <EuiFlexGroup>
             <EuiFlexItem>
@@ -75,14 +76,20 @@ class WzRulesetOverview extends Component {
               <EuiSpacer size='s' />
             </>
           )}
-          <WzRulesetSearchBar />
+          {/* <WzRulesetSearchBar /> */}
           <EuiFlexGroup>
             <EuiFlexItem>
-              <WzRulesetTable
+            <RulesetTable
                 clusterStatus={this.props.clusterStatus}
                 request={section}
                 updateTotalItems={(totalItems) => this.setState({ totalItems })}
-              />
+                updateRestartClusterManager={(showWarningRestart) => this.updateRestartManagers(showWarningRestart)}
+            />
+              {/* <WzRulesetTable
+                clusterStatus={this.props.clusterStatus}
+                request={section}
+                updateTotalItems={(totalItems) => this.setState({ totalItems })}
+              /> */}
             </EuiFlexItem>
           </EuiFlexGroup>
         </EuiPanel>
@@ -113,5 +120,7 @@ export default compose(
       { text: sectionNames[props.state.section] }
     ];
   }),
-  withUserAuthorizationPrompt((props) => [{action: `${props.state.section}:read`, resource: resourceDictionary[props.state.section].permissionResource('*')}])
+  withUserAuthorizationPrompt((props) => [
+    { action: `${props.state.section}:read`, resource: resourceDictionary[props.state.section].permissionResource('*') }
+  ])
 )(WzRulesetOverview);

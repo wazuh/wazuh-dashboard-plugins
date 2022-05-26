@@ -16,6 +16,7 @@ import {
   EuiLoadingSpinner,
   EuiFlexGroup,
   EuiFlexItem,
+  EuiText
 } from '@elastic/eui';
 import { filtersToObject } from '../../wz-search-bar';
 import { TableWithSearchBar } from './table-with-search-bar';
@@ -78,7 +79,15 @@ export function TableWzAPI({...rest}){
             <h1>{rest.title} {isLoading ? <EuiLoadingSpinner size="s" /> : <span>({ totalItems })</span>}</h1>
           </EuiTitle>
         )}
+        {rest.description && (
+          <EuiText color="subdued">
+            {rest.description}
+          </EuiText>
+        )}
       </EuiFlexItem>
+      {/* Render optional custom action button */}
+      {Array.isArray(rest.actionButtons) && rest.actionButtons.map(button => <EuiFlexItem grow={false}>{button}</EuiFlexItem>)}
+      {/* Render optional export to CSV button */}
       {rest.downloadCsv && <ExportTableCsv endpoint={rest.endpoint} totalItems={totalItems} filters={filters} title={rest.title}/>}
     </EuiFlexGroup>
   )
