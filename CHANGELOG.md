@@ -2,7 +2,11 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v4.3.2 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4301
+## Wazuh v4.3.2 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4303
+
+### Changed
+
+- Replaced as the full and partial scan dates are displayed in the `Details` panel of `Vulnerabilities/Inventory` [#4169](https://github.com/wazuh/wazuh-kibana-app/pull/4169)
 
 ### Fixed
 
