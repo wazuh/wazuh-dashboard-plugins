@@ -13,6 +13,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Added
 
 - Added PowerShell version warning to Windows agent installation wizard [#4142](https://github.com/wazuh/wazuh-kibana-app/pull/4142)
+- A new workflow is added to perform backports to specific branches [#4149](https://github.com/wazuh/wazuh-kibana-app/pull/4149)
 
 ### Fixed
 
