@@ -248,6 +248,7 @@ export class Inventory extends Component {
                         title={last_full_scan}
                         description="Last full scan"
                         textAlign='center'
+                        titleSize='xs'
                       />
                     </EuiFlexItem>
                     <EuiFlexItem>
@@ -255,6 +256,7 @@ export class Inventory extends Component {
                         title={last_partial_scan}
                         description="Last partial scan"
                         textAlign='center'
+                        titleSize='xs'
                       />
                     </EuiFlexItem>
                   </EuiFlexGroup>
