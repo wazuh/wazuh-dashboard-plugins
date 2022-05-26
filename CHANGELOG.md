@@ -2,11 +2,12 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v4.3.2 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4301
+## Wazuh v4.3.2 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4303
 
 ### Fixed
 
 - Fixed Wazuh Dashboard troubleshooting url [#4150](https://github.com/wazuh/wazuh-kibana-app/pull/4150)
+- Fixed a toast message with a successful process appeared when removing an agent of a group in `Management/Groups` and the agent appear in the agent list after refreshing the table [#4167](https://github.com/wazuh/wazuh-kibana-app/pull/4167)
 
 ## Wazuh v4.3.1 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4302
 
