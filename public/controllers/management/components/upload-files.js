@@ -42,11 +42,46 @@ export class UploadFiles extends Component {
       errorPopover: false
     };
     this.maxSize = 10485760; // 10Mb
+    
   }
 
-  onChange = files => {
+  onChange = async files => {
+
+    let filesReady = []
+
+    let fileNameSearch = ''
+
+    for (let i = 0; i < files.length; i++){
+      files[i].exist = false
+      filesReady.push(files[i])
+      if(fileNameSearch.length === 0){
+        fileNameSearch += `${files[i].name}`
+      }else{
+        fileNameSearch += `,${files[i].name}`
+      }
+    }
+
+    const {data: {data}} = await this.wzReq(
+      'GET',
+      `/${this.props.resource}/files?filename=${fileNameSearch}`,
+      {}
+    )
+
+    if(data.total_affected_items != 0){
+      const arrayFilesExists = data.affected_items
+      filesReady.map(file => {
+        const existOrNot = arrayFilesExists.filter(fileExist => fileExist.filename === file.name)
+        if(existOrNot != 0){
+          file.exist = true
+          return file
+        }
+        return file
+      }) 
+    }
+
+    
     this.setState({
-      files: files
+      files: filesReady
     });
   };
 
@@ -66,30 +101,26 @@ export class UploadFiles extends Component {
   }
 
   /**
+   * Remove file from upload
+   */
+
+  removeFile(index) {
+    const files = this.state.files.filter( file => file.name !== this.state.files[index].name)
+
+    this.onChange(files)
+
+  }
+
+  /**
    * Creates an array of objects with the files names and their content
    */
   async startUpload() {
     try {
       const files = [];
-      const filesSameName = [];
-
-      const {data} = await this.wzReq(
-        'GET',
-        `/${this.props.resource}/files`,
-        {}
-      )
-
-      const filesExist = data.data.affected_items
-
+      
       for (let idx = 0; idx < this.state.files.length; idx++) {
         const reader = new FileReader();
         const file = this.state.files[idx];
-
-        const [fileOld] = filesExist.filter(file => file.filename === this.state.files[idx].name)
-
-        if(fileOld){
-          filesSameName.push({fileName: file.name})
-        }
 
         reader.readAsText(file);
         // This interval is for wait until the FileReader has read the file content
@@ -100,7 +131,7 @@ export class UploadFiles extends Component {
               content: reader.result
             });
             clearInterval(interval);
-            if (files.length === this.state.files.length && filesSameName.length === 0 ) {
+            if (files.length === this.state.files.length) {
               try {
                 await this.props.upload(files, this.props.resource);
                 this.closePopover();
@@ -128,26 +159,6 @@ export class UploadFiles extends Component {
             }
           } 
         }, 100);
-        if(filesSameName.length !== 0 ) {
-          this.closePopover();
-          this.showToast(
-            'danger',
-            'Error',
-            <Fragment>
-              <div>A file with that name already exists</div>
-              <ul>
-                {filesSameName.map(f => (
-                  <li
-                    key={`ruleset-not-imported-file-${f.file}`}
-                    style={{ listStyle: 'circle' }}
-                  >
-                    {f.fileName}
-                  </li>
-                ))}
-              </ul>
-            </Fragment>
-          );
-        }
       }
     } catch (error) {
       console.error(error)
@@ -242,12 +253,24 @@ export class UploadFiles extends Component {
       <Fragment>
         <EuiListGroup flush={true} className="list-of-files">
           {Object.keys(this.state.files).map(index => (
-            <EuiListGroupItem
-              id={index}
-              key={index}
-              label={`${this.state.files[index].name} (${this.formatBytes(this.state.files[index].size)})`}
-              isActive
-            />
+            <>
+              <EuiListGroupItem
+                id={index}
+                key={index}
+                label={`- ${this.state.files[index].name} (${this.formatBytes(this.state.files[index].size)}) ${this.state.files[index].exist ? '(This file will be overwritten)' : ''}`}
+                isActive
+                wrapText
+                extraAction={{
+                  color: 'text',
+                  onClick: () => this.removeFile(index),
+                  alwaysShow: true,
+                  iconType: 'trash',
+                  iconSize: 's',
+                  'aria-label': 'Remove'
+                }}
+              />
+              
+            </>
           ))}
         </EuiListGroup>
       </Fragment>
@@ -322,6 +345,7 @@ export class UploadFiles extends Component {
         Import files
       </WzButtonPermissions>
     );
+  
     return (
       <EuiPopover
         id="popover"
