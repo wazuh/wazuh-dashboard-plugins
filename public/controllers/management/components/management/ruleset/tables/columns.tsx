@@ -1,6 +1,6 @@
 import React from 'react';
 import { EuiToolTip, EuiButtonIcon, EuiLink, EuiBadge } from '@elastic/eui';
-import { resourceDictionary, RulesetHandler, RulesetResources } from './ruleset-handler';
+import { resourceDictionary, RulesetHandler, RulesetResources } from '../utils/ruleset-handler';
 import exportCsv from '../../../../../../react-services/wz-csv';
 import { WzButtonPermissions } from '../../../../../../components/common/permissions/button';
 import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
@@ -9,7 +9,7 @@ import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
 
 export default class RulesetColumns {
   constructor(tableProps) {
-    this.tableProps = tableProps;    
+    this.tableProps = tableProps;
 
     this.buildColumns = () => {
       this.columns = {
@@ -28,29 +28,29 @@ export default class RulesetColumns {
             sortable: true,
             width: '30%',
             render: (value, item) => {
-              if(value === undefined) return '';
+              if (value === undefined) return '';
               const regex = /\$(.*?)\)/g;
               let result = value.match(regex);
               let haveTooltip = false;
               let toolTipDescription = false;
-              if(result !== null) {
+              if (result !== null) {
                 haveTooltip = true;
                 toolTipDescription = value;
                 for (const oldValue of result) {
-                  let newValue = oldValue.replace('$(',`<strong style="color:#006BB4">`);
+                  let newValue = oldValue.replace('$(', `<strong style="color:#006BB4">`);
                   newValue = newValue.replace(')', ' </strong>');
                   value = value.replace(oldValue, newValue);
                 }
               }
               return (
-              <div>
-                {haveTooltip === false ?
-                <span dangerouslySetInnerHTML={{ __html: value}} /> :
-                <EuiToolTip position="bottom" content={toolTipDescription}>
-                  <span dangerouslySetInnerHTML={{ __html: value}} />
-                </EuiToolTip>
-                }
-              </div>
+                <div>
+                  {haveTooltip === false ? 
+                    <span dangerouslySetInnerHTML={{ __html: value }} /> :
+                    <EuiToolTip position="bottom" content={toolTipDescription}>
+                      <span dangerouslySetInnerHTML={{ __html: value }} />
+                    </EuiToolTip>
+                  }
+                </div>
               );
             }
           },
@@ -83,7 +83,7 @@ export default class RulesetColumns {
                 <WzButtonPermissions
                   buttonType='link'
                   permissions={getReadButtonPermissions(item)}
-                  tooltip={{position:'top', content: `Show ${value} content`}}
+                  tooltip={{ position: 'top', content: `Show ${value} content` }}
                   onClick={async (ev) => {
                     try{
                       ev.stopPropagation();
@@ -141,7 +141,7 @@ export default class RulesetColumns {
                 <WzButtonPermissions
                   buttonType='link'
                   permissions={getReadButtonPermissions(item)}
-                  tooltip={{position:'top', content: `Show ${value} content`}}
+                  tooltip={{ position: 'top', content: `Show ${value} content` }}
                   onClick={async (ev) => {
                     try{
                       ev.stopPropagation();
@@ -157,7 +157,7 @@ export default class RulesetColumns {
                       getErrorOrchestrator().handleError(options);
                     }
                   }}>
-                    {value}
+                  {value}
                 </WzButtonPermissions>
               );
             }
@@ -226,7 +226,7 @@ export default class RulesetColumns {
                     permissions={getReadButtonPermissions(item)}
                     aria-label="Show content"
                     iconType="eye"
-                    tooltip={{position: 'top', content:`View the content of ${item.filename}`}}
+                    tooltip={{ position: 'top', content: `View the content of ${item.filename}` }}
                     onClick={async ev => {
                       try{
                         ev.stopPropagation();
@@ -253,7 +253,7 @@ export default class RulesetColumns {
                       permissions={getEditButtonPermissions(item)}
                       aria-label="Edit content"
                       iconType="pencil"
-                      tooltip={{position: 'top', content:`Edit ${item.filename} content`}}
+                      tooltip={{ position: 'top', content: `Edit ${item.filename} content` }}
                       onClick={async ev => {
                         try{
                           ev.stopPropagation();
@@ -276,7 +276,7 @@ export default class RulesetColumns {
                       permissions={getDeleteButtonPermissions(item)}
                       aria-label="Delete file"
                       iconType="trash"
-                      tooltip={{position: 'top', content:`Remove ${item.filename} file`}}
+                      tooltip={{ position: 'top', content: `Remove ${item.filename} file` }}
                       onClick={ev => {
                         try{
                           ev.stopPropagation();
@@ -411,7 +411,8 @@ export default class RulesetColumns {
             )
           }
         }
-      };
+      }
+    };
 
 
     this.buildColumns();
@@ -474,7 +475,7 @@ export default class RulesetColumns {
           badgeList.push(buildBadge(field));
         }
       }
-    } catch (error) {}
+    } catch (error) { }
 
     return <div>{badgeList}</div>;
   }

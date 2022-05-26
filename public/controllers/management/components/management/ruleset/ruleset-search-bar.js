@@ -208,7 +208,7 @@ class WzRulesetSearchBar extends Component {
       list: []
     },
     files: {
-      rule: this.rulesFiles,
+      rules: this.rulesFiles,
       decoders: [],
       list: []
     }
