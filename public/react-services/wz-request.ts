@@ -29,7 +29,7 @@ export class WzRequest {
    * @param {Object} payload
    */
   static async genericReq(
-    method,
+    method: Method,
     path,
     payload: any = null,
     extraOptions: { shouldRetry?: boolean, checkCurrentApiIsUp?: boolean, overwriteHeaders?: any } = {
@@ -80,28 +80,23 @@ export class WzRequest {
             }
             throw new Error(error);
           }
+<<<<<<< HEAD
+=======
+          // maybe return promise.reject(error);
+          throw ErrorFactory.createError(error);
+>>>>>>> 2f9347a58 (Added error factory in wz-request)
         }
       }
-      const errorMessage =
-        (error && error.response && error.response.data && error.response.data.message) ||
-        (error || {}).message;
-      if (
-        typeof errorMessage === 'string' &&
-        errorMessage.includes('status code 401') &&
-        shouldRetry
-      ) {
+      const errorParsed = ErrorFactory.createError(error);
+      if (errorParsed.message.includes('status code 401') && shouldRetry) {
         try {
           await WzAuthentication.refresh(true);
           return this.genericReq(method, path, payload, { shouldRetry: false });
         } catch (error) {
-          return ((error || {}).data || {}).message || false
-            ? Promise.reject(this.returnErrorInstance(error, error.data.message))
-            : Promise.reject(this.returnErrorInstance(error, error.message));
+          return Promise.reject(ErrorFactory.createError(error));
         }
       }
-      return errorMessage
-        ? Promise.reject(this.returnErrorInstance(error, errorMessage))
-        : Promise.reject(this.returnErrorInstance(error,'Server did not respond'));
+      return Promise.reject(errorParsed);
     }
   }
 
@@ -133,14 +128,14 @@ export class WzRequest {
         const failed_ids =
           ((((response.data || {}).data || {}).failed_items || [])[0] || {}).id || {};
         const message = (response.data || {}).message || 'Unexpected error';
-        const errorMessage = `${message} (${error.code}) - ${error.message} ${failed_ids && failed_ids.length > 1 ? ` Affected ids: ${failed_ids} ` : ''}`
-        return Promise.reject(this.returnErrorInstance(null, errorMessage));
+        const errorMessage = `${message} (${error.code}) - ${error.message} ${
+          failed_ids && failed_ids.length > 1 ? ` Affected ids: ${failed_ids} ` : ''
+        }`;
+        return Promise.reject(ErrorFactory.createError(errorMessage));
       }
       return Promise.resolve(response);
     } catch (error) {
-      return ((error || {}).data || {}).message || false
-        ? Promise.reject(this.returnErrorInstance(error, error.data.message))
-        : Promise.reject(this.returnErrorInstance(error, error.message));
+      return Promise.reject(ErrorFactory.createError(error));
     }
   }
 
@@ -159,23 +154,7 @@ export class WzRequest {
       const data = await this.genericReq('POST', '/api/csv', requestData);
       return Promise.resolve(data);
     } catch (error) {
-      return ((error || {}).data || {}).message || false
-        ? Promise.reject(this.returnErrorInstance(error, error.data.message))
-        : Promise.reject(this.returnErrorInstance(error, error.message));
+      return Promise.reject(ErrorFactory.createError(error));
     }
-  }
-
-  /**
-   * Customize message and return an error object
-   * @param error 
-   * @param message 
-   * @returns error
-   */
-  static returnErrorInstance(error, message){
-    if(!error || typeof error === 'string'){
-      return new Error(message || error);
-    }
-    error.message = message
-    return error
   }
 }
