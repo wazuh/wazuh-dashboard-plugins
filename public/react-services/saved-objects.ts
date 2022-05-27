@@ -60,7 +60,7 @@ export class SavedObject {
       result = this.validateIndexPatterns(list);
     }
 
-    return result.map((item) => {
+    return result.map((item: { id: string; attributes: { title: string } }) => {
       return { id: item.id, title: item.attributes.title };
     });
   }
@@ -117,7 +117,7 @@ export class SavedObject {
         };
       }
     } catch (error) {
-      return ((error || {}).data || {}).message || false ? new Error(error.data.message) : error;
+      return Promise.reject(error);
     }
   }
 
