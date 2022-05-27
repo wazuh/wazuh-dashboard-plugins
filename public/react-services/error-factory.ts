@@ -25,8 +25,12 @@ export class ErrorFactory {
    * @param error
    * @returns Error instance
    */
-  static createError(error: Error | string): Error {
+  static createError(error: Error | string | unknown): Error {
     const errorMessage = ErrorHandler.extractMessage(error);
+    // if receive another ResponseError instance, return it, not create a new one
+    if (this.preventDuplicateError(error, errorMessage)) {
+      return error as Error;
+    }
     const createdError = this.errorCreator(ResponseError, errorMessage);
     if (error instanceof Error) {
       createdError.stack = error.stack;
@@ -35,15 +39,25 @@ export class ErrorFactory {
   }
 
   /**
+   * Validate if is necessary to create a new error instance or return the same received
+   * @param error
+   * @param errorMessage
+   * @returns
+   */
+  private static preventDuplicateError(error: Error | string | unknown, errorMessage): boolean {
+    return error instanceof ResponseError && error.message === errorMessage;
+  }
+
+  /**
    * Create an new error instance receiving a Error Type and message
    * @param errorType Error instance to create
    * @param message
    * @returns Error instance depending type received
    */
-  static errorCreator<T extends Error>(
+  static errorCreator<T extends ResponseError>(
     ErrorType: { new (message: string): T },
     message: string
-  ): Error {
+  ): ResponseError {
     return new ErrorType(message);
   }
 }

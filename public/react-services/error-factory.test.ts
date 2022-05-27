@@ -9,6 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { AxiosResponse } from 'axios';
 import { ErrorFactory } from './error-factory';
 
 describe('Error Factory', () => {
@@ -31,5 +32,41 @@ describe('Error Factory', () => {
     expect(errorCreated.message).toEqual(errorMessage);
     expect(errorCreated.stack).toBeTruthy();
     expect(typeof errorCreated).not.toBe('string');
+  });
+
+  it('Should return ERROR when receive and error with response property', () => {
+    const response: AxiosResponse = {
+      data: {
+        statusCode: 500,
+        error: 'Internal Server Error',
+        message: '3099 - ERROR3099 - Wazuh not ready yet',
+      },
+      status: 500,
+      statusText: 'Internal Server Error',
+      headers: {},
+      config: {},
+      request: {},
+    };
+
+    // creating an error with response property
+    const error = new Error('Error');
+    error['response'] = response;
+
+    const errorCreated = ErrorFactory.createError(error);
+    expect(errorCreated).toBeInstanceOf(Error);
+    expect(errorCreated.name).toBe('ResponseError');
+    expect(errorCreated.message).toEqual(response.data.message);
+    expect(errorCreated.stack).toBeTruthy();
+    expect(typeof errorCreated).not.toBe('string');
+  });
+
+  it('Should return same ERROR instance when receive ErrorResponse, dont create a new error', () => {
+    const errorResponseInstance = new Error('Error message');
+    const errorReceived = ErrorFactory.createError(errorResponseInstance);
+    const error = ErrorFactory.createError(errorReceived);
+    expect(JSON.stringify(error)).toEqual(JSON.stringify(errorReceived));
+    expect(error.message).toEqual(errorReceived.message);
+    expect(error.name).toEqual(errorReceived.name);
+    expect(error.stack).toEqual(errorReceived.stack);
   });
 });

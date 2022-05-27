@@ -40,6 +40,10 @@ export class ErrorHandler {
         origin.includes('/api/agents-unique');
       return isFromAPI ? 'Wazuh API is not reachable. Reason: timeout.' : 'Server did not respond';
     }
+
+    if ((((error || {}).response || {}).data || {}).message) {
+      return error.response.data.message;
+    }
     if ((((error || {}).data || {}).errorData || {}).message) {
       return error.data.errorData.message;
     }
