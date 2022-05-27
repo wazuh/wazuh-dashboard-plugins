@@ -33,7 +33,13 @@ import { compose } from 'redux';
 import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
-import actionButtons from './actions-buttons'
+import {
+  ManageFiles,
+  AddNewRuleButton,
+  AddNewCdbListButton,
+  UploadFilesButton,
+  RefreshButton
+} from './actions-buttons'
 
 import {
   rulesItems,
@@ -45,7 +51,6 @@ import {
 
 export const RulesetTable = (props) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
   const rulesetHandler = new RulesetHandler(props.state.section);
  
   const getColumns = () => {
@@ -126,9 +131,16 @@ export const RulesetTable = (props) => {
 
 
   const { filters } = props.state;
-  const { updateFilters } = props;
+  const { updateFilters, updateRestartClusterManager } = props;
   const columns = getColumns();
-  
+  const actionButtons = [
+    <ManageFiles/>,
+    <AddNewRuleButton/>,
+    <AddNewCdbListButton/>,
+    <UploadFilesButton onSuccess={() => { updateRestartClusterManager && updateRestartClusterManager() }} />,
+    // <RefreshButton/>
+  ];
+
   return (
     <div className="wz-inventory">
       <TableWzAPI
@@ -143,6 +155,7 @@ export const RulesetTable = (props) => {
         isExpandable={true}
         rowProps={getRowProps}
         downloadCsv={true}
+        showReload={true}
         filters={filters}
         onFiltersChange={updateFilters}
         tablePageSizeOptions={[10, 25, 50, 100]}
