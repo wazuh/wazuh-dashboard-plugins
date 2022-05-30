@@ -2,17 +2,24 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v4.3.2 - OpenSearch Dashboards 1.2.0 - Revision 4301
+## Wazuh v4.3.3 - OpenSearch Dashboards 1.2.0 - Revision 4304
 
 ### Fixed
 
 - Fixed Wazuh Dashboard troubleshooting url [#4151](https://github.com/wazuh/wazuh-kibana-app/pull/4151)
+
+## Wazuh v4.3.2 - OpenSearch Dashboards 1.2.0 - Revision 4303
+
+### Added
+
+- Support for Wazuh 4.3.2
 
 ## Wazuh v4.3.1 - OpenSearch Dashboards 1.2.0 - Revision 4302
 
 ### Added
 
 - Added PowerShell version warning to Windows agent installation wizard [#4142](https://github.com/wazuh/wazuh-kibana-app/pull/4142)
+- A new workflow is added to perform backports to specific branches [#4149](https://github.com/wazuh/wazuh-kibana-app/pull/4149)
 
 ### Fixed
 
