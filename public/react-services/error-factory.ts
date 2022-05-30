@@ -9,8 +9,14 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { ErrorHandler } from './index';
 
+import { ErrorHandler } from './error-handler';
+
+// error
+// message
+// statusCode
+// statusText
+// error-orchestrator-ui.ts:30 [request body.id]: expected value of type [string] but got [undefined] Error: Request failed with status code 400
 class ResponseError extends Error {
   constructor(message: string) {
     super(message);
@@ -25,17 +31,14 @@ export class ErrorFactory {
    * @param error
    * @returns Error instance
    */
-  static createError(error: Error | string | unknown): Error {
+  public static createError(error: Error | string | unknown): Error {
     const errorMessage = ErrorHandler.extractMessage(error);
     // if receive another ResponseError instance, return it, not create a new one
-    if (this.preventDuplicateError(error, errorMessage)) {
+    if (ErrorFactory.isResponseError(error, errorMessage)) {
       return error as Error;
     }
-    const createdError = this.errorCreator(ResponseError, errorMessage);
-    if (error instanceof Error) {
-      createdError.stack = error.stack;
-    }
-    return createdError;
+
+    return ErrorFactory.errorCreator(ResponseError, errorMessage);
   }
 
   /**
@@ -44,7 +47,7 @@ export class ErrorFactory {
    * @param errorMessage
    * @returns
    */
-  private static preventDuplicateError(error: Error | string | unknown, errorMessage): boolean {
+  private static isResponseError(error: Error | string | unknown, errorMessage: string): boolean {
     return error instanceof ResponseError && error.message === errorMessage;
   }
 
@@ -54,7 +57,8 @@ export class ErrorFactory {
    * @param message
    * @returns Error instance depending type received
    */
-  static errorCreator<T extends ResponseError>(
+
+  private static errorCreator<T extends ResponseError>(
     ErrorType: { new (message: string): T },
     message: string
   ): ResponseError {
