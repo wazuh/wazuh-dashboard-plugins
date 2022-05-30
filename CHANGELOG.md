@@ -6,7 +6,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Changed
 
-- Replaced as the full and partial scan dates are displayed in the `Details` panel of `Vulnerabilities/Inventory` [#4169](https://github.com/wazuh/wazuh-kibana-app/pull/4169)
+- Replaced how the full and partial scan dates are displayed in the `Details` panel of `Vulnerabilities/Inventory` [#4169](https://github.com/wazuh/wazuh-kibana-app/pull/4169)
 
 ### Fixed
 
