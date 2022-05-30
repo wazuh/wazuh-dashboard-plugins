@@ -26,7 +26,7 @@ import {
 import { TableWzAPI } from '../../../../../../components/common/tables';
 import { formatUIDate } from '../../../../../../react-services/time-service';
 import { RulesetHandler, RulesetResources, resourceDictionary } from '../utils/ruleset-handler';
-import RulesetColums from './columns';
+import RulesetColumns from './columns';
 import { withUserPermissions } from '../../../../../../components/common/hocs/withUserPermissions';
 import { WzUserPermissions } from '../../../../../../react-services/wz-user-permissions';
 import { compose } from 'redux';
@@ -38,7 +38,6 @@ import {
   AddNewRuleButton,
   AddNewCdbListButton,
   UploadFilesButton,
-  RefreshButton
 } from './actions-buttons'
 
 import {
@@ -55,8 +54,8 @@ export const RulesetTable = (props) => {
  
   const getColumns = () => {
     const { section, showingFiles } = props.state;
-    const rulesetColums = new RulesetColums(props).columns;
-    const columns = showingFiles ? rulesetColums.files : rulesetColums[section];
+    const rulesetColumns = new RulesetColumns(props).columns;
+    const columns = rulesetColumns[showingFiles ? 'files' : section];
     return columns;
   }
 
@@ -129,29 +128,37 @@ export const RulesetTable = (props) => {
     };
   };
 
+  const getEndpoint = () => {
+    const paths = {
+      rules: '/rules',
+      decoders: '/decoders',
+      lists: '/lists/files',
+    };
+
+    return `${paths[props.request]}${props.state.showingFiles ? '/files' : ''}`;
+  }
 
   const { filters } = props.state;
-  const { updateFilters, updateRestartClusterManager } = props;
+  const { updateFilters, updateRestartClusterManager, title } = props;
   const columns = getColumns();
   const actionButtons = [
     <ManageFiles/>,
     <AddNewRuleButton/>,
     <AddNewCdbListButton/>,
     <UploadFilesButton onSuccess={() => { updateRestartClusterManager && updateRestartClusterManager() }} />,
-    // <RefreshButton/>
   ];
 
   return (
     <div className="wz-inventory">
       <TableWzAPI
         actionButtons={actionButtons}
-        title={'Rules'}
+        title={title}
         description={'From here you can manage your rules.'}
         tableColumns={columns}
         tableInitialSortingField="id"
         searchTable={true}
         searchBarSuggestions={apiSuggestsItems.items.rules}
-        endpoint={'/rules'}
+        endpoint={getEndpoint()}
         isExpandable={true}
         rowProps={getRowProps}
         downloadCsv={true}
