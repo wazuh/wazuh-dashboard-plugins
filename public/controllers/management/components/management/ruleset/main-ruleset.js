@@ -14,12 +14,30 @@ import React, { Component } from 'react';
 import store from '../../../../../redux/store';
 import WzReduxProvider from '../../../../../redux/wz-redux-provider';
 //Wazuh ruleset tables(rules, decoder, lists)
-import WzRulesetOverview from './ruleset-overview';
+import WzRulesetOverview from './views/ruleset-overview';
+import WzDecodersOverview from './views/decoders-overview';
+import WzCDBListOverview from './views/cdblist-overview';
 //Information about rule or decoder
 import WzRuleInfo from './rule-info';
 import WzDecoderInfo from './decoder-info';
 import WzRulesetEditor from './ruleset-editor';
 import WzListEditor from './list-editor';
+import {
+  SECTION_CDBLIST_KEY,
+  SECTION_CDBLIST_NAME,
+  SECTION_DECODERS_KEY,
+  SECTION_DECODERS_NAME,
+  SECTION_RULES_KEY,
+  SECTION_RULES_NAME
+} from './utils/constants';
+
+const WzTableOverview = ({section})=>{
+  return (
+    (section == SECTION_RULES_KEY && <WzRulesetOverview clusterStatus={this.props.clusterStatus} />) ||
+    (section == SECTION_DECODERS_KEY && <WzDecodersOverview clusterStatus={this.props.clusterStatus} />) ||
+    (section == SECTION_CDBLIST_KEY && <WzCDBListOverview clusterStatus={this.props.clusterStatus} />)
+  )
+}
 
 export default class WzRuleset extends Component {
   _isMount = false;
@@ -65,7 +83,7 @@ export default class WzRuleset extends Component {
               logtestProps={this.props.logtestProps}
               clusterStatus={this.props.clusterStatus}
             />
-          )) || <WzRulesetOverview clusterStatus={this.props.clusterStatus} />}
+          )) || <WzTableOverview clusterStatus={this.props.clusterStatus} />}
       </WzReduxProvider>
     );
   }
