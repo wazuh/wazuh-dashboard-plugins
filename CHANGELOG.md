@@ -15,13 +15,15 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Consistency in the colors and labels used for the agent status [#4166](https://github.com/wazuh/wazuh-kibana-app/pull/4166)
 
 ### Fixed
-- Fixed the platform visualizations didn't use some definitions related to the UI on Kibana 7.10.2 [#4166](https://github.com/wazuh/wazuh-kibana-app/pull/4166)
+- Fixed that the platform visualizations didn't use some definitions related to the UI on Kibana 7.10.2 [#4166](https://github.com/wazuh/wazuh-kibana-app/pull/4166
+- Fixed Wazuh Dashboard troubleshooting url [#4150](https://github.com/wazuh/wazuh-kibana-app/pull/4150)
 
 ## Wazuh v4.3.1 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4302
 
 ### Added
 
 - Added PowerShell version warning to Windows agent installation wizard [#4142](https://github.com/wazuh/wazuh-kibana-app/pull/4142)
+- A new workflow is added to perform backports to specific branches [#4149](https://github.com/wazuh/wazuh-kibana-app/pull/4149)
 
 ### Fixed
 
