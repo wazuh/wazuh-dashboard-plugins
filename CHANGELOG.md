@@ -2,13 +2,25 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v4.3.2 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4301
+## Wazuh v4.3.3 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4304
 
 ### Fixed
 
 - Fixed Wazuh Dashboard troubleshooting url [#4150](https://github.com/wazuh/wazuh-kibana-app/pull/4150)
 
-## Wazuh v4.3.1 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4302
+## Wazuh v4.3.2 - Kibana 7.10.2 , 7.16.x, 7.17.x - Revision 4303
+
+### Added
+
+- Support for Wazuh 4.3.2
+
+## Wazuh v4.2.7 - Kibana 7.10.2, 7.11.2, 7.12.1, 7.13.0, 7.13.1, 7.13.2, 7.13.3, 7.13.4, 7.14.0, 7.14.1, 7.14.2 - Revision 4208
+
+### Added
+
+- Support for Wazuh 4.2.7
+
+## Wazuh v4.3.1 - Kibana 7.10.2 , 7.16.x, 7.17.x - Revision 4302
 
 ### Added
 
