@@ -20,6 +20,8 @@ import { ErrorHandler } from './error-handler';
 class ResponseError extends Error {
   constructor(message: string) {
     super(message);
+    // Because we are extending built in class
+    Object.setPrototypeOf(this, ResponseError.prototype);
     this.name = this.constructor.name;
   }
 }
