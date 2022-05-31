@@ -41,9 +41,6 @@ import {
 } from './actions-buttons'
 
 import {
-  rulesItems,
-  rulesFiles,
-  decodersItems,
   apiSuggestsItems,
   buttonOptions
 } from './ruleset-suggestions';
@@ -138,9 +135,10 @@ export const RulesetTable = (props) => {
     return `${paths[props.request]}${props.state.showingFiles ? '/files' : ''}`;
   }
 
-  const { filters } = props.state;
+  const { filters, section } = props.state;
   const { updateFilters, updateRestartClusterManager, title } = props;
   const columns = getColumns();
+  const initialSortingField = columns.find(column => column.sortable);
   const actionButtons = [
     <ManageFiles/>,
     <AddNewRuleButton/>,
@@ -153,11 +151,12 @@ export const RulesetTable = (props) => {
       <TableWzAPI
         actionButtons={actionButtons}
         title={title}
-        description={'From here you can manage your rules.'}
+        searchBarProps={{ buttonOptions: buttonOptions[section] }}
+        description={`From here you can manage your ${section}.`}
         tableColumns={columns}
-        tableInitialSortingField="id"
+        tableInitialSortingField={initialSortingField?.field}
         searchTable={true}
-        searchBarSuggestions={apiSuggestsItems.items.rules}
+        searchBarSuggestions={apiSuggestsItems.items[section]}
         endpoint={getEndpoint()}
         isExpandable={true}
         rowProps={getRowProps}

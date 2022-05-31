@@ -185,7 +185,7 @@ const apiSuggestsItems = {
     items: {
         rules: rulesItems,
         decoders: decodersItems,
-        list: []
+        lists: []
     },
     files: {
         rules: rulesFiles,
@@ -197,12 +197,9 @@ const apiSuggestsItems = {
 const buttonOptions = {
     rules: [{ label: "Custom rules", field: "relative_dirname", value: "etc/rules" },],
     decoders: [{ label: "Custom decoders", field: "relative_dirname", value: "etc/decoders" },],
-    list: []
+    lists: []
 };
 export {
-    rulesItems,
-    rulesFiles,
-    decodersItems,
     apiSuggestsItems,
     buttonOptions
 };

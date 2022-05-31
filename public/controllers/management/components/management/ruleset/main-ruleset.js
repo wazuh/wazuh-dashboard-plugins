@@ -31,11 +31,11 @@ import {
   SECTION_RULES_NAME
 } from './utils/constants';
 
-const WzTableOverview = ({section})=>{
+const WzTableOverview = ({ section, clusterStatus }) => {
   return (
-    (section == SECTION_RULES_KEY && <WzRulesetOverview clusterStatus={this.props.clusterStatus} />) ||
-    (section == SECTION_DECODERS_KEY && <WzDecodersOverview clusterStatus={this.props.clusterStatus} />) ||
-    (section == SECTION_CDBLIST_KEY && <WzCDBListOverview clusterStatus={this.props.clusterStatus} />)
+    (section == SECTION_RULES_KEY && <WzRulesetOverview clusterStatus={clusterStatus} />) ||
+    (section == SECTION_DECODERS_KEY && <WzDecodersOverview clusterStatus={clusterStatus} />) ||
+    (section == SECTION_CDBLIST_KEY && <WzCDBListOverview clusterStatus={clusterStatus} />)
   )
 }
 
@@ -71,7 +71,7 @@ export default class WzRuleset extends Component {
   }
 
   render() {
-    const { ruleInfo, decoderInfo, listInfo, fileContent, addingRulesetFile } = this.state;
+    const { ruleInfo, decoderInfo, listInfo, fileContent, addingRulesetFile, section } = this.state;
 
     return (
       <WzReduxProvider>
@@ -83,7 +83,7 @@ export default class WzRuleset extends Component {
               logtestProps={this.props.logtestProps}
               clusterStatus={this.props.clusterStatus}
             />
-          )) || <WzTableOverview clusterStatus={this.props.clusterStatus} />}
+          )) || <WzTableOverview clusterStatus={this.props.clusterStatus} section={section} />}
       </WzReduxProvider>
     );
   }

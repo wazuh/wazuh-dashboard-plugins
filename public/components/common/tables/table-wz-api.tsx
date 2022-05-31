@@ -28,6 +28,15 @@ import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 
+/**
+ * Search input custom filter button
+ */
+interface CustomFilterButton {
+  label: string
+  field: string
+  value: string
+}
+
 export function TableWzAPI({ actionButtons, ...rest }: {
   actionButtons?: ReactNode | ReactNode[]
   title?: string
@@ -35,8 +44,10 @@ export function TableWzAPI({ actionButtons, ...rest }: {
   downloadCsv?: boolean
   searchTable?: boolean
   endpoint: string
+  buttonOptions?: CustomFilterButton[]
   onFiltersChange?: Function,
   showReload?: boolean
+  searchBarProps?: any
 }) {
 
   const [totalItems, setTotalItems] = useState(0);
