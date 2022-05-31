@@ -190,7 +190,7 @@ export const cleanFileContent = () => {
   };
 };
 
-export const updteAddingRulesetFile = content => {
+export const updateAddingRulesetFile = content => {
   return {
     type: 'UPDATE_ADDING_RULESET_FILE',
     content: content
