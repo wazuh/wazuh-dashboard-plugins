@@ -17,7 +17,7 @@ import { getToasts } from '../../../../../../kibana-services';
 import {
   toggleShowFiles,
   updateLoadingStatus,
-  updteAddingRulesetFile,
+  updateAddingRulesetFile,
   updateListContent,
   updateIsProcessing,
   updatePageIndex,
@@ -33,22 +33,21 @@ import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orch
 import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
 
-const mapStateToProps = (state) => {
-  return {
-    state: state.rulesetReducers,
-  };
-};
-
-const mapDispatchToProps = (dispatch) => {
-  return {
-    toggleShowFiles: (status) => dispatch(toggleShowFiles(status)),
-    updateLoadingStatus: (status) => dispatch(updateLoadingStatus(status)),
-    updteAddingRulesetFile: (content) => dispatch(updteAddingRulesetFile(content)),
-    updateListContent: (content) => dispatch(updateListContent(content)),
-    updateIsProcessing: (isProcessing) => dispatch(updateIsProcessing(isProcessing)),
-    updatePageIndex: (pageIndex) => dispatch(updatePageIndex(pageIndex)),
-  };
-};
+// const mapStateToProps = (state) => {
+//   return {
+//     state: state.rulesetReducers,
+//   };
+// };
+// const mapDispatchToProps = (dispatch) => {
+//   return {
+//     toggleShowFiles: (status) => dispatch(toggleShowFiles(status)),
+//     updateLoadingStatus: (status) => dispatch(updateLoadingStatus(status)),
+//     updateAddingRulesetFile: (content) => dispatch(updateAddingRulesetFile(content)),
+//     updateListContent: (content) => dispatch(updateListContent(content)),
+//     updateIsProcessing: (isProcessing) => dispatch(updateIsProcessing(isProcessing)),
+//     updatePageIndex: (pageIndex) => dispatch(updatePageIndex(pageIndex)),
+//   };
+// };
 
 /**
  * Uploads the files
@@ -112,33 +111,28 @@ const getUpdatePermissionsFiles = (section) => {
 };
 
 // Add new rule button
-export const AddNewRuleButton = connect(mapStateToProps, mapDispatchToProps)(({ state, updteAddingRulesetFile }) => {
-  const { section } = state;
-
-  return (
-    <>{
-      section !== 'lists' &&
-      <WzButtonPermissions
-        permissions={getUpdatePermissionsFiles(section)}
-        buttonType="empty"
-        iconType="plusInCircle"
-        onClick={() =>
-          updteAddingRulesetFile({
-            name: '',
-            content: '<!-- Modify it at your will. -->',
-            path: `etc/${section}`,
-          })
-        }
-      >
-        {`Add new ${section} file`}
-      </WzButtonPermissions>
-    }</>
-  )
-});
+export const AddNewRuleButton = ({ section, updateAddingRulesetFile }) => (
+  <>{
+    section !== 'lists' &&
+    <WzButtonPermissions
+      permissions={getUpdatePermissionsFiles(section)}
+      buttonType="empty"
+      iconType="plusInCircle"
+      onClick={() =>
+        updateAddingRulesetFile({
+          name: '',
+          content: '<!-- Modify it at your will. -->',
+          path: `etc/${section}`,
+        })
+      }
+    >
+      {`Add new ${section} file`}
+    </WzButtonPermissions>
+  }</>
+)
 
 //Add new CDB list button
-export const AddNewCdbListButton = connect(mapStateToProps, mapDispatchToProps)(({ state, updateListContent }) => {
-  const { section, } = state;
+export const AddNewCdbListButton = (({ section, updateListContent }) => {
   return <>
     {section === 'lists' &&
       <WzButtonPermissions
@@ -159,15 +153,15 @@ export const AddNewCdbListButton = connect(mapStateToProps, mapDispatchToProps)(
 });
 
 // Manage files
-export const ManageFiles = connect(mapStateToProps, mapDispatchToProps)(({ state, ...props }) => {
-  const { section, showingFiles } = state;
+export const ManageFiles = (({ section, showingFiles, ...props }) => {
+  
   /**
  * Toggle between files and rules or decoders
  */
   const toggleFiles = async () => {
     try {
       props.updateLoadingStatus(true);
-      props.toggleShowFiles(!state.showingFiles);
+      props.toggleShowFiles(!showingFiles);
       props.updateIsProcessing(true);
       props.updatePageIndex(0);
       props.updateLoadingStatus(false);
@@ -204,7 +198,6 @@ export const ManageFiles = connect(mapStateToProps, mapDispatchToProps)(({ state
 const uploadFile = async (files, resource) => {
   try {
     await uploadFiles(files, resource);
-    // await refresh();
   } catch (error) {
     const options = {
       context: 'ActionButtons.uploadFile',
@@ -220,8 +213,8 @@ const uploadFile = async (files, resource) => {
   }
 };
 
-export const UploadFilesButton = connect(mapStateToProps, mapDispatchToProps)(({ clusterStatus, state, onSuccess, ...props }) => {
-  const { section, showingFiles } = state;
+export const UploadFilesButton = (({ clusterStatus, section, showingFiles, onSuccess, ...props }) => {
+  
   return (
     <>
       {(section === 'lists' || showingFiles) && (

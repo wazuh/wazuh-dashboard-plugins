@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import { connect } from 'react-redux';
 
 // Wazuh components
@@ -9,35 +9,16 @@ import { resourceDictionary } from '../utils/ruleset-handler';
 import { SECTION_RULES_NAME, SECTION_RULES_KEY } from '../utils/constants';
 
 
-class WzRulesetOverview extends Component {
-  // sectionNames = {
-  //   rules: 'Rules',
-  //   decoders: 'Decoders',
-  //   lists: 'CDB lists'
-  // };
+function WzRulesetOverview(props) {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      showWarningRestart: false
-    }
+  const [showWarningRestart, setShowWarningRestart] = useState(false);
+  const updateRestartManagers = (showWarningRestart) => {
+    setShowWarningRestart(showWarningRestart);
   }
 
-  updateRestartManagers(showWarningRestart){
-    this.setState({ showWarningRestart });
-  }
-
-  render() {
-    const { section } = this.props.state;
-    const { clusterStatus } = this.props;
-    return (
-      <WzLayoutOverview 
-        section={section}
-        sectionName={SECTION_RULES_NAME}
-        clusterStatus={clusterStatus}
-      />
-    );
-  }
+  const { section } = props.state;
+  const { clusterStatus } = props;
+  return <WzLayoutOverview section={ section } sectionName = { SECTION_RULES_NAME } clusterStatus = { clusterStatus } />;
 }
 
 const mapStateToProps = state => {
