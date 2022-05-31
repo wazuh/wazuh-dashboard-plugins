@@ -4,7 +4,7 @@
   "revision": "4303-1",
   "code": "4303-1",
   "pluginPlatform": {
-    "version": "7.17.2"
+    "version": "7.17.3"
   },
   "description": "Wazuh app",
   "keywords": [
