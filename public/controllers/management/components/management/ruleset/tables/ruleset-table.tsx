@@ -13,7 +13,7 @@
 import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import {
-  updateFilters,
+  // updateFilters,
   updateIsProcessing,
   updateShowModal,
   updateDefaultItems,
@@ -44,15 +44,23 @@ import {
   UploadFilesButton,
 } from './actions-buttons'
 
-import {
-  apiSuggestsItems,
-  buttonOptions
-} from './ruleset-suggestions';
+import { apiSuggestsItems } from './ruleset-suggestions';
 
 export const RulesetTable = (props) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [filters, setFilters] = useState([]);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [error, setError] = useState(false);
   const rulesetHandler = new RulesetHandler(props.state.section);
- 
+
+  // Table custom filter options
+  const buttonOptions = [{ label: "Custom rules", field: "relative_dirname", value: "etc/rules" },];
+
+  const updateFilters = (filters)=>{
+    
+    setFilters(filters);
+  }
+
   const getColumns = () => {
     const { section, showingFiles } = props.state;
     const rulesetColumns = new RulesetColumns(props).columns;
@@ -129,21 +137,10 @@ export const RulesetTable = (props) => {
     };
   };
 
-  const getEndpoint = () => {
-    const paths = {
-      rules: '/rules',
-      decoders: '/decoders',
-      lists: '/lists/files',
-    };
-
-    return `${paths[props.request]}${props.state.showingFiles ? '/files' : ''}`;
-  }
-
-  const { filters, section, showingFiles } = props.state;
-  const { updateFilters, updateRestartClusterManager, updateListContent, title } = props;
+  const { section, showingFiles } = props.state;
+  const { updateRestartClusterManager, updateListContent } = props;
   const columns = getColumns();
-  const initialSortingField = columns.find(column => column.sortable);
-  
+
   const actionButtons = [
     <ManageFiles
       section={section}
@@ -165,22 +162,22 @@ export const RulesetTable = (props) => {
       section={section}
       showingFiles={showingFiles}
       clusterStatus={props.clusterStatus}
-      onSuccess={() => { updateRestartClusterManager && updateRestartClusterManager() }} 
+      onSuccess={() => { updateRestartClusterManager && updateRestartClusterManager() }}
     />,
   ];
 
-  return (
-    <div className="wz-inventory">
+  const RenderFilesTable = () => {
+    return (
       <TableWzAPI
         actionButtons={actionButtons}
-        title={title}
-        searchBarProps={{ buttonOptions: buttonOptions[section] }}
-        description={`From here you can manage your ${section}.`}
+        title={'Rules files'}
+        searchBarProps={{ buttonOptions: buttonOptions }}
+        description={`From here you can manage your rules files.`}
         tableColumns={columns}
-        tableInitialSortingField={initialSortingField?.field}
+        tableInitialSortingField={'filename'}
         searchTable={true}
         searchBarSuggestions={apiSuggestsItems.items[section]}
-        endpoint={getEndpoint()}
+        endpoint={'/rules/files'}
         isExpandable={true}
         rowProps={getRowProps}
         downloadCsv={true}
@@ -189,6 +186,36 @@ export const RulesetTable = (props) => {
         onFiltersChange={updateFilters}
         tablePageSizeOptions={[10, 25, 50, 100]}
       />
+    )
+  };
+
+  const RenderRulesTable = () => {
+    return (
+      <TableWzAPI
+        actionButtons={actionButtons}
+        title={'Rules'}
+        searchBarProps={{ buttonOptions: buttonOptions }}
+        description={`From here you can manage your rules.`}
+        tableColumns={columns}
+        tableInitialSortingField={'id'}
+        searchTable={true}
+        searchBarSuggestions={apiSuggestsItems.items[section]}
+        endpoint={'/rules'}
+        isExpandable={true}
+        rowProps={getRowProps}
+        downloadCsv={true}
+        showReload={true}
+        filters={filters}
+        onFiltersChange={updateFilters}
+        tablePageSizeOptions={[10, 25, 50, 100]}
+      />
+    )
+  };
+
+  return (
+    <div className="wz-inventory">
+      {showingFiles ? <RenderFilesTable/>: <RenderRulesTable/>
+      }
     </div>
   );
 
@@ -202,7 +229,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    updateFilters: filters => dispatch(updateFilters(filters)),
+    // updateFilters: filters => dispatch(updateFilters(filters)),
     updateIsProcessing: isProcessing => dispatch(updateIsProcessing(isProcessing)),
     updateShowModal: (showModal) => dispatch(updateShowModal(showModal)),
     updateFileContent: (fileContent) => dispatch(updateFileContent(fileContent)),
@@ -223,4 +250,4 @@ export default compose(
     mapDispatchToProps
   ),
   withUserPermissions
-  )(RulesetTable);
+)(RulesetTable);

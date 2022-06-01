@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import { connect } from 'react-redux';
 
 // Wazuh components
@@ -9,30 +9,16 @@ import { resourceDictionary } from '../utils/ruleset-handler';
 import { SECTION_CDBLIST_NAME, SECTION_CDBLIST_KEY } from '../utils/constants';
 
 
-class WzCDBListOverview extends Component {
+function WzCDBListOverview(props) {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      showWarningRestart: false
-    }
+  const [showWarningRestart, setShowWarningRestart] = useState(false);
+  const updateRestartManagers = (showWarningRestart) => {
+    setShowWarningRestart(showWarningRestart);
   }
 
-  updateRestartManagers(showWarningRestart){
-    this.setState({ showWarningRestart });
-  }
-
-  render() {
-    const { section } = this.props.state;
-    const { clusterStatus } = this.props;
-    return (
-      <WzLayoutOverview 
-        section={section}
-        sectionName={SECTION_CDBLIST_NAME}
-        clusterStatus={clusterStatus}
-      />
-    );
-  }
+  const { section } = props.state;
+  const { clusterStatus } = props;
+  return <WzLayoutOverview section={ section } sectionName = { SECTION_CDBLIST_NAME } clusterStatus = { clusterStatus } />;
 }
 
 const mapStateToProps = state => {

@@ -18,10 +18,10 @@ import WzRulesetOverview from './views/ruleset-overview';
 import WzDecodersOverview from './views/decoders-overview';
 import WzCDBListOverview from './views/cdblist-overview';
 //Information about rule or decoder
-import WzRuleInfo from './rule-info';
-import WzDecoderInfo from './decoder-info';
-import WzRulesetEditor from './ruleset-editor';
-import WzListEditor from './list-editor';
+import WzRuleInfo from './views/rule-info';
+import WzDecoderInfo from './views/decoder-info';
+import WzRulesetEditor from './views/ruleset-editor';
+import WzListEditor from './views/list-editor';
 import {
   SECTION_CDBLIST_KEY,
   SECTION_CDBLIST_NAME,

@@ -18,8 +18,8 @@ import {
 
 import { connect } from 'react-redux';
 
-import { RulesetHandler, RulesetResources } from './utils/ruleset-handler';
-import { colors } from './utils/colors';
+import { RulesetHandler, RulesetResources } from '../utils/ruleset-handler';
+import { colors } from '../utils/colors';
 
 import {
   updateFileContent,
@@ -27,11 +27,11 @@ import {
   cleanInfo,
   updateFilters,
   cleanFilters,
-} from '../../../../../redux/actions/rulesetActions';
+} from '../../../../../../redux/actions/rulesetActions';
 
-import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
-import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
-import { getErrorOrchestrator } from '../../../../../react-services/common-services';
+import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
+import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
 
 class WzDecoderInfo extends Component {
   constructor(props) {

@@ -29,21 +29,21 @@ import {
 
 import { connect } from 'react-redux';
 
-import { cleanInfo, updateListContent } from '../../../../../redux/actions/rulesetActions';
+import { cleanInfo, updateListContent } from '../../../../../../redux/actions/rulesetActions';
 
-import { resourceDictionary, RulesetHandler, RulesetResources } from './utils/ruleset-handler';
+import { resourceDictionary, RulesetHandler, RulesetResources } from '../utils/ruleset-handler';
 
-import { getToasts } from '../../../../../kibana-services';
+import { getToasts } from '../../../../../../kibana-services';
 
-import exportCsv from '../../../../../react-services/wz-csv';
+import exportCsv from '../../../../../../react-services/wz-csv';
 
-import { updateWazuhNotReadyYet } from '../../../../../redux/actions/appStateActions';
-import WzRestartClusterManagerCallout from '../../../../../components/common/restart-cluster-manager-callout';
-import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
+import { updateWazuhNotReadyYet } from '../../../../../../redux/actions/appStateActions';
+import WzRestartClusterManagerCallout from '../../../../../../components/common/restart-cluster-manager-callout';
+import { WzButtonPermissions } from '../../../../../../components/common/permissions/button';
 
-import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
-import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
-import { getErrorOrchestrator } from '../../../../../react-services/common-services';
+import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
+import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
 class WzListEditor extends Component {
   constructor(props) {
     super(props);
