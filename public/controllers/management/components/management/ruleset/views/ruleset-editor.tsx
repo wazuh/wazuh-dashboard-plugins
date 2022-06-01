@@ -15,7 +15,7 @@ import { connect } from 'react-redux';
 import {
   cleanInfo,
   updateFileContent
-} from '../../../../../redux/actions/rulesetActions';
+} from '../../../../../../redux/actions/rulesetActions';
 
 import 'brace/theme/textmate';
 // Eui components
@@ -34,25 +34,25 @@ import {
   EuiPanel,
 } from '@elastic/eui';
 
-import { resourceDictionary, RulesetHandler, RulesetResources } from './utils/ruleset-handler';
-import validateConfigAfterSent from './utils/valid-configuration';
+import { resourceDictionary, RulesetHandler, RulesetResources } from '../utils/ruleset-handler';
+import validateConfigAfterSent from '../utils/valid-configuration';
 
-import { getToasts } from '../../../../../kibana-services';
-import { updateWazuhNotReadyYet } from '../../../../../redux/actions/appStateActions';
-import WzRestartClusterManagerCallout from '../../../../../components/common/restart-cluster-manager-callout';
-import { validateXML } from '../configuration/utils/xml';
-import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
+import { getToasts } from '../../../../../../kibana-services';
+import { updateWazuhNotReadyYet } from '../../../../../../redux/actions/appStateActions';
+import WzRestartClusterManagerCallout from '../../../../../../components/common/restart-cluster-manager-callout';
+import { validateXML } from '../../configuration/utils/xml';
+import { WzButtonPermissions } from '../../../../../../components/common/permissions/button';
 import 'brace/theme/textmate';
 import 'brace/mode/xml';
 import 'brace/snippets/xml';
 import 'brace/ext/language_tools';
 import "brace/ext/searchbox";
-import { showFlyoutLogtest } from '../../../../../redux/actions/appStateActions';
+import { showFlyoutLogtest } from '../../../../../../redux/actions/appStateActions';
 import _ from 'lodash';
 
-import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
-import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
-import { getErrorOrchestrator } from '../../../../../react-services/common-services';
+import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
+import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
 
 class WzRulesetEditor extends Component {
   _isMounted = false;

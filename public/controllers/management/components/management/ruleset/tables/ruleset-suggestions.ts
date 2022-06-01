@@ -194,12 +194,12 @@ const apiSuggestsItems = {
     }
 };
 
-const buttonOptions = {
-    rules: [{ label: "Custom rules", field: "relative_dirname", value: "etc/rules" },],
-    decoders: [{ label: "Custom decoders", field: "relative_dirname", value: "etc/decoders" },],
-    lists: []
-};
+// const buttonOptions = {
+//     rules: [{ label: "Custom rules", field: "relative_dirname", value: "etc/rules" },],
+//     decoders: [{ label: "Custom decoders", field: "relative_dirname", value: "etc/decoders" },],
+//     lists: []
+// };
 export {
     apiSuggestsItems,
-    buttonOptions
+    // buttonOptions
 };

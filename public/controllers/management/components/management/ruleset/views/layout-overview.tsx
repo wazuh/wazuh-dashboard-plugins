@@ -16,7 +16,6 @@ import WzRestartClusterManagerCallout from '../../../../../../components/common/
 
 export default function WzLayoutOverview(props) {
 
-  // const [totalItems, setTotalItems] = useState(0);
   const [showWarningRestart, setShowWarningRestart] = useState(false);
 
   const updateRestartManagers = (showWarning) => {
@@ -44,7 +43,6 @@ export default function WzLayoutOverview(props) {
               clusterStatus={clusterStatus}
               request={section}
               title={sectionName}
-              // updateTotalItems={(total) => setTotalItems(total)}
               updateRestartClusterManager={(showWarningRestart) => updateRestartManagers(showWarningRestart)}
             />
           </EuiFlexItem>

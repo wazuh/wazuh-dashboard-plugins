@@ -19,9 +19,9 @@ import {
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
-import { WzRequest } from '../../../../../react-services/wz-request';
+import { WzRequest } from '../../../../../../react-services/wz-request';
 
-import { RulesetHandler, RulesetResources } from './utils/ruleset-handler';
+import { RulesetHandler, RulesetResources } from '../utils/ruleset-handler';
 
 import {
   updateFileContent,
@@ -29,12 +29,12 @@ import {
   cleanInfo,
   updateFilters,
   cleanFilters,
-} from '../../../../../redux/actions/rulesetActions';
+} from '../../../../../../redux/actions/rulesetActions';
 
-import WzTextWithTooltipTruncated from '../../../../../components/common/wz-text-with-tooltip-if-truncated';
-import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
-import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
-import { getErrorOrchestrator } from '../../../../../react-services/common-services';
+import WzTextWithTooltipTruncated from '../../../../../../components/common/wz-text-with-tooltip-if-truncated';
+import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
+import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
 
 class WzRuleInfo extends Component {
   constructor(props) {
