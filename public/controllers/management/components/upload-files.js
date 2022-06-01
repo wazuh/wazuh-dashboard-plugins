@@ -360,7 +360,7 @@ export class UploadFiles extends Component {
                           iconType="sortUp"
                           onClick={() => this.startUpload()}
                         >
-                          Re-upload
+                          Upload
                         </EuiButton>
                       </EuiFlexItem>
                     </EuiFlexGroup>
