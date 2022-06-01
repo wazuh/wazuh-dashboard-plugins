@@ -50,19 +50,23 @@ export const RulesetTable = (props) => {
   const [isLoading, setIsLoading] = useState(false);
   const [filters, setFilters] = useState([]);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [showingFiles, setShowingFiles] = useState(false);
   const [error, setError] = useState(false);
   const rulesetHandler = new RulesetHandler(props.state.section);
 
   // Table custom filter options
   const buttonOptions = [{ label: "Custom rules", field: "relative_dirname", value: "etc/rules" },];
 
-  const updateFilters = (filters)=>{
-    
+  const updateFilters = (filters) => {
     setFilters(filters);
   }
 
+  const toggleShowFiles = () => {
+    setShowingFiles(!showingFiles);
+  }
+
   const getColumns = () => {
-    const { section, showingFiles } = props.state;
+    const { section } = props.state;
     const rulesetColumns = new RulesetColumns(props).columns;
     const columns = rulesetColumns[showingFiles ? 'files' : section];
     return columns;
@@ -137,7 +141,7 @@ export const RulesetTable = (props) => {
     };
   };
 
-  const { section, showingFiles } = props.state;
+  const { section } = props.state;
   const { updateRestartClusterManager, updateListContent } = props;
   const columns = getColumns();
 
@@ -146,7 +150,7 @@ export const RulesetTable = (props) => {
       section={section}
       showingFiles={showingFiles}
       updateLoadingStatus={props.updateLoadingStatus}
-      toggleShowFiles={props.toggleShowFiles}
+      toggleShowFiles={toggleShowFiles}
       updateIsProcessing={props.updateIsProcessing}
       updatePageIndex={props.updatePageIndex}
     />,
@@ -229,7 +233,6 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    // updateFilters: filters => dispatch(updateFilters(filters)),
     updateIsProcessing: isProcessing => dispatch(updateIsProcessing(isProcessing)),
     updateShowModal: (showModal) => dispatch(updateShowModal(showModal)),
     updateFileContent: (fileContent) => dispatch(updateFileContent(fileContent)),
@@ -238,7 +241,6 @@ const mapDispatchToProps = dispatch => {
     updateRuleInfo: (rule) => dispatch(updateRuleInfo(rule)),
     updateDecoderInfo: (rule) => dispatch(updateDecoderInfo(rule)),
     updateAddingRulesetFile: (content) => dispatch(updateAddingRulesetFile(content)),
-    toggleShowFiles: (status) => dispatch(toggleShowFiles(status)),
     updateLoadingStatus: (status) => dispatch(updateLoadingStatus(status)),
     updatePageIndex: (pageIndex) => dispatch(updatePageIndex(pageIndex)),
   };
