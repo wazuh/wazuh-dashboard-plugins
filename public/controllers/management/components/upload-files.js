@@ -95,7 +95,7 @@ export class UploadFiles extends Component {
             clearInterval(interval);
             if (files.length === this.state.files.length) {
               try {
-                const noUploaded = [];
+                const failedUploads = [];
                 const data = await this.props.upload(
                   files,
                   this.props.resource,
@@ -103,9 +103,9 @@ export class UploadFiles extends Component {
                 );
                 this.props.onSuccess && this.props.onSuccess(files);
                 for (const index in data) {
-                  !data[index].uploaded && noUploaded.push(data[index]);
+                  !data[index].uploaded && failedUploads.push(data[index]);
                 }
-                if (noUploaded.length === 0) {
+                if (failedUploads.length === 0) {
                   this.closePopover();
                   this.showToast(
                     'success',
