@@ -2,6 +2,32 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.3.4 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4305
+
+### Added
+
+- Added the `pending` agent status to some sections that was missing [#4166](https://github.com/wazuh/wazuh-kibana-app/pull/4166)
+
+### Changed
+
+- Replaced the visualization of `Status` panel in `Agents` [#4166](https://github.com/wazuh/wazuh-kibana-app/pull/4166)
+- Replaced the visualization of policy in `Modules/Security configuration assessment/Inventory` [#4166](https://github.com/wazuh/wazuh-kibana-app/pull/4166)
+- Consistency in the colors and labels used for the agent status [#4166](https://github.com/wazuh/wazuh-kibana-app/pull/4166)
+- Replaced how the full and partial scan dates are displayed in the `Details` panel of `Vulnerabilities/Inventory` [#4169](https://github.com/wazuh/wazuh-kibana-app/pull/4169)
+
+### Fixed
+
+- Fixed that the platform visualizations didn't use some definitions related to the UI on Kibana 7.10.2 [#4166](https://github.com/wazuh/wazuh-kibana-app/pull/4166)
+- Fixed a toast message with a successful process appeared when removing an agent of a group in `Management/Groups` and the agent appears in the agent list after refreshing the table [#4167](https://github.com/wazuh/wazuh-kibana-app/pull/4167)
+- Fixed import of an empty rule or decoder file [#4176](https://github.com/wazuh/wazuh-kibana-app/pull/4176)
+- Fixed overwriting of rule and decoder imports [#4180](https://github.com/wazuh/wazuh-kibana-app/pull/4180)
+
+## Wazuh v4.3.3 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4304
+
+### Fixed
+
+- Fixed Wazuh Dashboard troubleshooting url [#4150](https://github.com/wazuh/wazuh-kibana-app/pull/4150)
+
 ## Wazuh v4.3.2 - Kibana 7.10.2 , 7.16.x, 7.17.x - Revision 4303
 
 ### Added
@@ -19,6 +45,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Added
 
 - Added PowerShell version warning to Windows agent installation wizard [#4142](https://github.com/wazuh/wazuh-kibana-app/pull/4142)
+- A new workflow is added to perform backports to specific branches [#4149](https://github.com/wazuh/wazuh-kibana-app/pull/4149)
 
 ### Fixed
 
