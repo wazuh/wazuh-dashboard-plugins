@@ -366,7 +366,7 @@ export class UploadFiles extends Component {
           {this.checkValidFileSize() > 0 && (
             <Fragment>
               {this.renderWarning(
-                `There can be no empty files`
+                `Can't upload empty files`
               )}
             </Fragment>
           )}
