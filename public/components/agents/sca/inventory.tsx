@@ -11,7 +11,6 @@
  */
 
 import React, { Component, Fragment } from 'react';
-import { Pie } from "../../d3/pie";
 import {
   EuiFlexItem,
   EuiFlexGroup,
@@ -47,16 +46,16 @@ import {
   UIErrorSeverity,
   UILogLevel,
 } from '../../../react-services/error-orchestrator/types';
-import { UI_LOGGER_LEVELS } from '../../../../common/constants';
+import { API_NAME_AGENT_STATUS, UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
+import { VisualizationBasic } from '../../common/charts/visualizations/basic';
 
 export class Inventory extends Component {
   _isMount = false;
   constructor(props) {
     super(props);
     const { agent } = this.props;
-    this.state = { agent, items: [], itemIdToExpandedRowMap: {}, showMoreInfo: false, loading: false, filters: [], pageTableChecks: {pageIndex: 0} }
-    this.policies = [];
+    this.state = { agent, items: [], itemIdToExpandedRowMap: {}, showMoreInfo: false, loading: false, filters: [], pageTableChecks: {pageIndex: 0}, policies: [] }
     this.suggestions = {};
     this.columnsPolicies = [
       {
@@ -272,31 +271,14 @@ export class Inventory extends Component {
     try {
       this._isMount && this.setState({ loading: true });
       this.lookingPolicy = false;
-      const policies = await WzRequest.apiReq(
+      const {data: {data: {affected_items: policies}}} = await WzRequest.apiReq(
         'GET',
         `/sca/${this.props.agent.id}`,
         {}
       );
-      this.policies = (((policies || {}).data || {}).data || {}).affected_items || [];
-      const models = [];
-      for (let i = 0; i < this.policies.length; i++) {
-        models.push({
-          name: this.policies[i].name,
-          status: [
-            { id: 'pass', label: 'Pass', value: this.policies[i].pass },
-            { id: 'fail', label: 'Fail', value: this.policies[i].fail },
-            {
-              id: 'invalid',
-              label: 'Not applicable',
-              value: this.policies[i].invalid
-            }
-          ]
-        });
-      }
-      this._isMount && this.setState({ data: models, loading: false });
+      this._isMount && this.setState({ loading: false, policies });
     } catch (error) {
-      this.setState({ loading: false });
-      this.policies = [];
+      this.setState({ loading: false, policies: []});
 
       const options: UIErrorLog = {
         context: `${Inventory.name}.initialize`,
@@ -501,40 +483,56 @@ export class Inventory extends Component {
           )}
         </div>
         <EuiPage>
-          {((this.props.agent && (this.props.agent || {}).status !== 'never_connected' && !(this.policies || []).length && !this.state.loading) &&
+          {((this.props.agent && (this.props.agent || {}).status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED && !this.state.policies.length && !this.state.loading) &&
             <EuiCallOut title="No scans available" iconType="iInCircle">
               <EuiButton color="primary" onClick={() => this.initialize()}>
                 Refresh
-           </EuiButton>
+              </EuiButton>
             </EuiCallOut>
           )}
 
-          {((this.props.agent && (this.props.agent || {}).status === 'never_connected' && !this.state.loading) &&
+          {((this.props.agent && (this.props.agent || {}).status === API_NAME_AGENT_STATUS.NEVER_CONNECTED && !this.state.loading) &&
             <EuiCallOut title="Agent has never connected" style={{ width: "100%" }} iconType="iInCircle">
               <EuiButton color="primary" onClick={() => this.initialize()}>
                 Refresh
               </EuiButton>
             </EuiCallOut>
           )}
-          {((this.props.agent && (this.props.agent || {}).os && !this.state.lookingPolicy && (this.policies || []).length > 0 && !this.state.loading) &&
+          {((this.props.agent && (this.props.agent || {}).os && !this.state.lookingPolicy && this.state.policies.length > 0 && !this.state.loading) &&
             <div>
-              {((this.state.data || []).length &&
+              {this.state.policies.length &&
                 <EuiFlexGroup style={{ 'marginTop': 0 }}>
-                  {(this.state.data || []).map((pie, idx) => (
+                  {this.state.policies.map((policy, idx) => (
                     <EuiFlexItem key={idx} grow={false}>
-                      <EuiCard title description betaBadgeLabel={pie.name} style={{ paddingBottom: 0 }}>
-                        <Pie width={325} height={130} data={pie.status} colors={['#00a69b', '#ff645c', '#5c6773']} />
+                      <EuiCard title description betaBadgeLabel={policy.name} style={{ paddingBottom: 0 }}>
+                        <VisualizationBasic
+                          type='donut'
+                          size={{ width: '100%', height: '150px' }}
+                          data={[
+                            { label: 'Pass', value: policy.pass, color: '#00a69b' },
+                            { label: 'Fail', value: policy.fail, color: '#ff645c' },
+                            {
+                              label: 'Not applicable',
+                              value: policy.invalid,
+                              color: '#5c6773'
+                            }
+                          ]}
+                          showLegend
+                          noDataTitle='No results'
+                          noDataMessage='No results were found.'
+                        />
+                        <EuiSpacer size="m" />
                       </EuiCard>
                     </EuiFlexItem>
                   ))}
                 </EuiFlexGroup>
-              )}
+              }
               <EuiSpacer size="m" />
               <EuiPanel paddingSize="l">
                 <EuiFlexGroup>
                   <EuiFlexItem>
                     <EuiBasicTable
-                      items={this.policies}
+                      items={this.state.policies}
                       columns={this.columnsPolicies}
                       rowProps={getPoliciesRowProps}
                     />

@@ -32,7 +32,7 @@ import { getAgentFilterValues } from './get-agents-filters-values';
 import { TableWzAPI } from '../../../../../components/common/tables';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 import { WzButtonPermissionsModalConfirm } from '../../../../../components/common/buttons';
-import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
+import { UI_LOGGER_LEVELS, UI_ORDER_AGENT_STATUS } from '../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 
@@ -47,7 +47,7 @@ class WzGroupAgentsTable extends Component {
         label: 'status',
         description: 'Filter by agent connection status',
         operators: ['=', '!='],
-        values: ['active', 'disconnected', 'never_connected', 'pending'],
+        values: UI_ORDER_AGENT_STATUS,
       },
       {
         type: 'q',
