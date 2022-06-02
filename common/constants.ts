@@ -372,7 +372,7 @@ export const API_NAME_AGENT_STATUS = {
   DISCONNECTED: 'disconnected',
   PENDING: 'pending',
   NEVER_CONNECTED: 'never_connected',
-}
+} as const;
 
 export const UI_COLOR_AGENT_STATUS = {
   [API_NAME_AGENT_STATUS.ACTIVE]: '#007871',
@@ -380,7 +380,7 @@ export const UI_COLOR_AGENT_STATUS = {
   [API_NAME_AGENT_STATUS.PENDING]: '#FEC514',
   [API_NAME_AGENT_STATUS.NEVER_CONNECTED]: '#646A77',
   default: '#000000'
-}
+} as const;
 
 export const UI_LABEL_NAME_AGENT_STATUS = {
   [API_NAME_AGENT_STATUS.ACTIVE]: 'Active',
@@ -388,7 +388,7 @@ export const UI_LABEL_NAME_AGENT_STATUS = {
   [API_NAME_AGENT_STATUS.PENDING]: 'Pending',
   [API_NAME_AGENT_STATUS.NEVER_CONNECTED]: 'Never connected',
   default: 'Unknown'
-}
+} as const
 
 export const UI_ORDER_AGENT_STATUS = [
   API_NAME_AGENT_STATUS.ACTIVE,
