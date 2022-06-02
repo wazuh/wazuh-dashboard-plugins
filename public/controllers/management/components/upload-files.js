@@ -185,6 +185,17 @@ export class UploadFiles extends Component {
   }
 
   /**
+   * Validates the files size
+   */
+
+   checkValidFileSize() {
+    const result = Object.keys(this.state.files).filter(item => {
+      return this.state.files[item].size === 0;
+    });
+    return result.length;
+  }
+
+  /**
    * Renders a list with the attached files
    */
   renderFiles() {
@@ -301,7 +312,8 @@ export class UploadFiles extends Component {
           {this.state.files.length > 0 &&
             this.state.files.length < 6 &&
             !this.checkOverSize() > 0 &&
-            this.checkValidFileExtensions() > 0 && (
+            this.checkValidFileExtensions() > 0 &&
+            !this.checkValidFileSize() > 0 && (
               <Fragment>
                 <EuiFlexItem>
                   {(!this.state.uploadErrors && this.renderFiles()) ||
@@ -348,6 +360,14 @@ export class UploadFiles extends Component {
           {!this.checkValidFileExtensions() > 0 && (
             <Fragment>
               {this.renderWarning('The files extensions are not valid.')}
+            </Fragment>
+          )}
+
+          {this.checkValidFileSize() > 0 && (
+            <Fragment>
+              {this.renderWarning(
+                `Can't upload empty files`
+              )}
             </Fragment>
           )}
         </div>
