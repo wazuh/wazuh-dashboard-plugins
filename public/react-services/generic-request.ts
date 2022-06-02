@@ -19,7 +19,12 @@ import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../common/constants';
 import { request } from '../services/request-handler';
 
 export class GenericRequest {
-  static async request(method: RequestMethod, path: string, payload = null, returnError = false) {
+  static async request(
+    method: RequestMethod,
+    path: string,
+    payload: any = null,
+    returnError = false
+  ) {
     try {
       if (!method || !path) {
         throw new Error('Missing parameters');
