@@ -12,6 +12,7 @@
  *
  */
 
+import { ErrorFactory } from '../../../react-services/error-factory';
 import { getToasts } from '../../../kibana-services';
 import { ApiCheck, AppState, GenericRequest } from '../../../react-services';
 import { CheckLogger } from '../types/check_logger';
@@ -27,7 +28,7 @@ const trySetDefault = async (checkLogger: CheckLogger) => {
     const response = await GenericRequest.request('GET', '/hosts/apis');
     checkLogger.info(`API hosts found: ${response.data.length}`);
     const hosts = response.data;
-    const errors = [];
+    const errors: any[] = [];
 
     if (hosts.length) {
       for (var i = 0; i < hosts.length; i++) {
@@ -63,10 +64,10 @@ const trySetDefault = async (checkLogger: CheckLogger) => {
         return Promise.reject(new Error('No API available to connect'));
       }
     }
-    return Promise.reject(new Error('No API configuration found'));
+    return Promise.reject(ErrorFactory.createError('No API configuration found'));
   } catch (error) {
     checkLogger.error(`Error connecting to API: ${error}`);
-    return Promise.reject(new Error(`Error connecting to API: ${error}`));
+    return Promise.reject(ErrorFactory.createError(error, `Error connecting to API: ${error}`));
   }
 };
 
@@ -137,29 +138,4 @@ export const checkApiService =
       checkLogger.info('Removed [navigate] cookie');
       throw error;
     }
-<<<<<<< HEAD
   };
-=======
-    //update cluster info
-    const cluster_info = (((data || {}).data || {}).data || {}).cluster_info;
-    if (cluster_info) {
-      AppState.setClusterInfo(cluster_info);
-      checkLogger.info(`Set cluster info in cookie`);
-    }
-    if (data === 3099) {
-      checkLogger.error('Wazuh not ready yet');
-    } else if (data.data.error || data.data.data.apiIsDown) {
-      const errorMessage = data.data.data.apiIsDown
-        ? 'Wazuh API is down'
-        : `Error connecting to the API: ${
-            data.data.error && data.data.error.message ? ` ${data.data.error.message}` : ''
-          }`;
-      checkLogger.error(errorMessage);
-    }
-  } catch (error) {
-    AppState.removeNavigation();
-    checkLogger.info('Removed [navigate] cookie');
-    throw error;
-  }
-};
->>>>>>> f0c94d20f (Fixed catch error throw string instead error)

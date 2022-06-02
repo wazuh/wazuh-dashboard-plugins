@@ -117,7 +117,7 @@ export class SavedObject {
         };
       }
     } catch (error) {
-      return Promise.reject(error);
+      return Promise.reject(ErrorFactory.createError(error));
     }
   }
 
@@ -138,9 +138,9 @@ export class SavedObject {
     } catch (error) {
       if (error && error.response && error.response.status == 404) return false;
       return Promise.reject(
-        ((error || {}).data || {}).message || false
-          ? new Error(error.data.message)
-          : new Error(error.message || `Error getting the '${patternID}' index pattern`)
+        ErrorFactory.createError(
+          error.message ? error : `Error getting the '${patternID}' index pattern`
+        )
       );
     }
   }
@@ -159,7 +159,7 @@ export class SavedObject {
 
       return result;
     } catch (error) {
-      throw ((error || {}).data || {}).message || false ? new Error(error.data.message) : error;
+      throw ErrorFactory.createError(error);
     }
   }
 
@@ -175,7 +175,7 @@ export class SavedObject {
         },
       });
     } catch (error) {
-      throw ((error || {}).data || {}).message || false ? new Error(error.data.message) : error;
+      throw ErrorFactory.createError(error);
     }
   }
 
