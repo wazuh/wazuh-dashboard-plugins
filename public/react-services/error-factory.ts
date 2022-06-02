@@ -33,8 +33,8 @@ export class ErrorFactory {
    * @param error
    * @returns Error instance
    */
-  public static createError(error: Error | string | unknown): Error {
-    const errorMessage = ErrorHandler.extractMessage(error);
+  public static createError(error: Error | string | unknown, message?: string): Error {
+    const errorMessage = message || ErrorHandler.extractMessage(error);
     // if receive another ResponseError instance, return it, not create a new one
     if (ErrorFactory.isResponseError(error, errorMessage)) {
       return error as Error;
