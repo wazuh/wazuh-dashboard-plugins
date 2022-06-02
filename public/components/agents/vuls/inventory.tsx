@@ -36,6 +36,7 @@ import {
 import { ICustomBadges } from '../../wz-search-bar/components';
 import { formatUIDate } from '../../../react-services';
 import { VisualizationBasicWidgetSelector, VisualizationBasicWidget  } from '../../common/charts/visualizations/basic';
+import { WzStat } from '../../wz-stat';
 
 interface Aggregation { title: number, description: string, titleColor: string }
 interface pieStats { id: string, label: string, value: number }
@@ -243,14 +244,20 @@ export class Inventory extends Component {
                   </EuiFlexGroup>
                   <EuiFlexGroup style={{ marginTop: 'auto' }}>
                     <EuiFlexItem>
-                      <EuiText>
-                        <EuiIcon type="calendar" color={'primary'} /> Last full scan: {last_full_scan}
-                      </EuiText>
+                      <WzStat
+                        title={last_full_scan}
+                        description="Last full scan"
+                        textAlign='center'
+                        titleSize='xs'
+                      />
                     </EuiFlexItem>
                     <EuiFlexItem>
-                      <EuiText>
-                        <EuiIcon type="calendar" color={'primary'} /> Last partial scan: {last_partial_scan}
-                      </EuiText>
+                      <WzStat
+                        title={last_partial_scan}
+                        description="Last partial scan"
+                        textAlign='center'
+                        titleSize='xs'
+                      />
                     </EuiFlexItem>
                   </EuiFlexGroup>
                 </EuiFlexItem>
