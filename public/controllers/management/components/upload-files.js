@@ -23,7 +23,9 @@ import {
   EuiTitle,
   EuiText,
   EuiSpacer,
-  EuiPopover
+  EuiPopover,
+  EuiSwitch,
+  EuiFlexGroup
 } from '@elastic/eui';
 
 import { getToasts }  from '../../../kibana-services';
@@ -37,9 +39,19 @@ export class UploadFiles extends Component {
       files: {},
       isPopoverOpen: false,
       uploadErrors: false,
-      errorPopover: false
+      errorPopover: false,
+      overwrite: false
     };
     this.maxSize = 10485760; // 10Mb
+
+    this.onButtonClick = this.onButtonClick.bind(this);
+    this.setOverwrite = this.setOverwrite.bind(this);
+    this.closePopover = this.closePopover.bind(this);
+    this.startUpload = this.startUpload.bind(this);
+  }
+  
+  setOverwrite(e) {
+    this.setState({ overwrite: e.target.checked });
   }
 
   onChange = files => {
@@ -83,26 +95,38 @@ export class UploadFiles extends Component {
             clearInterval(interval);
             if (files.length === this.state.files.length) {
               try {
-                await this.props.upload(files, this.props.resource);
-                this.closePopover();
-                this.props.onSuccess && this.props.onSuccess(files);
-                this.showToast(
-                  'success',
-                  'Success',
-                  <Fragment>
-                    <div>Successfully imported</div>
-                    <ul>
-                      {files.map(f => (
-                        <li
-                          key={`ruleset-imported-file-${f.file}`}
-                          style={{ listStyle: 'circle' }}
-                        >
-                          {f.file}
-                        </li>
-                      ))}
-                    </ul>
-                  </Fragment>
+                const failedUploads = [];
+                const data = await this.props.upload(
+                  files,
+                  this.props.resource,
+                  this.state.overwrite
                 );
+                this.props.onSuccess && this.props.onSuccess(files);
+                for (const index in data) {
+                  !data[index].uploaded && failedUploads.push(data[index]);
+                }
+                if (failedUploads.length === 0) {
+                  this.closePopover();
+                  this.showToast(
+                    'success',
+                    'Success',
+                    <Fragment>
+                      <div>Successfully imported</div>
+                      <ul>
+                        {data.map((f) => (
+                          <li
+                            key={`ruleset-imported-file-${f.file}`}
+                            style={{ listStyle: 'circle' }}
+                          >
+                            {f.file}
+                          </li>
+                        ))}
+                      </ul>
+                    </Fragment>
+                  );
+                } else {
+                  this.setState({ uploadErrors: data });
+                }
               } catch (error) {
                 this.setState({ uploadErrors: error });
               }
@@ -135,11 +159,11 @@ export class UploadFiles extends Component {
           <EuiCallOut
             size="s"
             title={result.file}
-            color="danger"
+            color="warning"
             iconType="alert"
           >
             <EuiText className="list-element-bad" size="s">
-              {result.error}
+              {result.error.message}
             </EuiText>
           </EuiCallOut>
         )) || (
@@ -267,7 +291,7 @@ export class UploadFiles extends Component {
         permissions={getPermissionsImportFiles()}
         iconType="importAction"
         iconSide="left"
-        onClick={() => this.onButtonClick()}
+        onClick={this.onButtonClick}
       >
         Import files
       </WzButtonPermissions>
@@ -278,12 +302,20 @@ export class UploadFiles extends Component {
         button={button}
         isOpen={this.state.isPopoverOpen}
         anchorPosition="downRight"
-        closePopover={() => this.closePopover()}
+        closePopover={this.closePopover}
       >
         <div style={{ width: '300px' }}>
           <EuiTitle size="m">
             <h1>{`Upload ${this.props.resource}`}</h1>
           </EuiTitle>
+          <EuiSwitch
+            className='wz-margin-top-10 wz-margin-bottom-10'
+            id="overwrite"
+            label="Overwrite"
+            checked={this.state.overwrite}
+            onChange={this.setOverwrite}
+            compressed
+          />
           <EuiFlexItem>
             {!this.state.uploadErrors && (
               <EuiFilePicker
@@ -291,9 +323,7 @@ export class UploadFiles extends Component {
                 multiple
                 compressed={false}
                 initialPromptText={`Select or drag and drop your ${this.props.resource} files here`}
-                onChange={files => {
-                  this.onChange(files);
-                }}
+                onChange={files => this.onChange(files)}
               />
             )}
           </EuiFlexItem>
@@ -313,17 +343,31 @@ export class UploadFiles extends Component {
                       className="upload-files-button"
                       fill
                       iconType="sortUp"
-                      onClick={() => this.startUpload()}
+                      onClick={this.startUpload}
                     >
                       Upload
                     </EuiButton>
                   )) || (
-                    <EuiButtonEmpty
-                      className="upload-files-button"
-                      onClick={() => this.closePopover()}
-                    >
-                      Close
-                    </EuiButtonEmpty>
+                    <EuiFlexGroup gutterSize="s" alignItems="center">
+                      <EuiFlexItem>
+                        <EuiButtonEmpty
+                          className="upload-files-button"
+                          onClick={this.closePopover}
+                        >
+                          Close
+                        </EuiButtonEmpty>
+                      </EuiFlexItem>
+                      <EuiFlexItem grow={false}>
+                        <EuiButton
+                          className="upload-files-button"
+                          fill
+                          iconType="sortUp"
+                          onClick={this.startUpload}
+                        >
+                          Upload
+                        </EuiButton>
+                      </EuiFlexItem>
+                    </EuiFlexGroup>
                   )}
                 </EuiFlexItem>
               </Fragment>
