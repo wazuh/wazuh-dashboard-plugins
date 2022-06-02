@@ -24,7 +24,7 @@ import {
   EuiText,
   EuiSpacer,
   EuiPopover,
-  EuiCheckbox,
+  EuiSwitch,
   EuiFlexGroup
 } from '@elastic/eui';
 
@@ -43,9 +43,15 @@ export class UploadFiles extends Component {
       overwrite: false
     };
     this.maxSize = 10485760; // 10Mb
+
+    this.onButtonClick = this.onButtonClick.bind(this);
+    this.setOverwrite = this.setOverwrite.bind(this);
+    this.closePopover = this.closePopover.bind(this);
+    this.startUpload = this.startUpload.bind(this);
+    // this.closePopover = this.closePopover.bind(this);
   }
   
-  activeOverwrite(e) {
+  setOverwrite(e) {
     this.setState({ overwrite: e.target.checked });
   }
 
@@ -286,7 +292,7 @@ export class UploadFiles extends Component {
         permissions={getPermissionsImportFiles()}
         iconType="importAction"
         iconSide="left"
-        onClick={() => this.onButtonClick()}
+        onClick={this.onButtonClick}
       >
         Import files
       </WzButtonPermissions>
@@ -297,18 +303,19 @@ export class UploadFiles extends Component {
         button={button}
         isOpen={this.state.isPopoverOpen}
         anchorPosition="downRight"
-        closePopover={() => this.closePopover()}
+        closePopover={this.closePopover}
       >
         <div style={{ width: '300px' }}>
           <EuiTitle size="m">
             <h1>{`Upload ${this.props.resource}`}</h1>
           </EuiTitle>
-          <EuiCheckbox
+          <EuiSwitch
             className='wz-margin-top-10 wz-margin-bottom-10'
             id="overwrite"
-            label="Activate overwriting"
+            label="Overwrite"
             checked={this.state.overwrite}
-            onChange={(e) => this.activeOverwrite(e)}
+            onChange={this.setOverwrite}
+            compressed
           />
           <EuiFlexItem>
             {!this.state.uploadErrors && (
@@ -317,9 +324,7 @@ export class UploadFiles extends Component {
                 multiple
                 compressed={false}
                 initialPromptText={`Select or drag and drop your ${this.props.resource} files here`}
-                onChange={files => {
-                  this.onChange(files);
-                }}
+                onChange={files => this.onChange(files)}
               />
             )}
           </EuiFlexItem>
@@ -339,7 +344,7 @@ export class UploadFiles extends Component {
                       className="upload-files-button"
                       fill
                       iconType="sortUp"
-                      onClick={() => this.startUpload()}
+                      onClick={this.startUpload}
                     >
                       Upload
                     </EuiButton>
@@ -348,7 +353,7 @@ export class UploadFiles extends Component {
                       <EuiFlexItem>
                         <EuiButtonEmpty
                           className="upload-files-button"
-                          onClick={() => this.closePopover()}
+                          onClick={this.closePopover}
                         >
                           Close
                         </EuiButtonEmpty>
@@ -358,7 +363,7 @@ export class UploadFiles extends Component {
                           className="upload-files-button"
                           fill
                           iconType="sortUp"
-                          onClick={() => this.startUpload()}
+                          onClick={this.startUpload}
                         >
                           Upload
                         </EuiButton>

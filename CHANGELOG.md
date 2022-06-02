@@ -1,7 +1,7 @@
 # Change Log
 
 All notable changes to the Wazuh app project will be documented in this file.
-## Wazuh v4.3.4 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4303
+## Wazuh v4.3.4 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4305
 
 ### Fixed
 

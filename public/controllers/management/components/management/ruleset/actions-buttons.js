@@ -101,7 +101,7 @@ class WzRulesetActionButtons extends Component {
       for (let idx in files) {
         const { file, content } = files[idx];
         try {
-          await rulesetHandler.updateFile(file, content, overwrite); // True does not overwrite the file
+          await rulesetHandler.updateFile(file, content, overwrite);
           results.push({
             index: idx,
             uploaded: true,
