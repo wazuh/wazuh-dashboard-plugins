@@ -50,16 +50,6 @@ export const MainModuleOverview = connect(mapStateToProps)(class MainModuleOverv
     };
   }
 
-  getBadgeColor(agentStatus) {
-    if (agentStatus.toLowerCase() === 'active') {
-      return 'secondary';
-    } else if (agentStatus.toLowerCase() === 'disconnected') {
-      return '#BD271E';
-    } else if (agentStatus.toLowerCase() === 'never connected') {
-      return 'default';
-    }
-  }
-
   setGlobalBreadcrumb() {
     const currentAgent = store.getState().appStateReducers.currentAgentData;
     if (WAZUH_MODULES[this.props.section]) {

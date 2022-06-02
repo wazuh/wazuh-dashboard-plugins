@@ -132,17 +132,15 @@ class WzStatusActionButtons extends Component {
       this.props.updateLoadingStatus(true);
       this.props.updateSelectedNode(node);
 
-      const agentSummaryResponse = await this.statusHandler.agentsSummary();
-      const agentsCountResponse = await this.statusHandler.clusterAgentsCount();
+      const [agentsCount, agentsCountByManagerNodes] = (await Promise.all([
+        this.statusHandler.agentsSummary(),
+        this.statusHandler.clusterAgentsCount()
+      ])).map(response => response?.data?.data);
 
-      const { active, disconnected, never_connected, total } = agentSummaryResponse.data.data;
       this.props.updateStats({
-        agentsCount: agentsCountResponse.data.data.nodes,
-        agentsCountActive: active,
-        agentsCountDisconnected: disconnected,
-        agentsCountNeverConnected: never_connected,
-        agentsCountTotal: total,
-        agentsCoverity: total ? (active / total) * 100 : 0
+        agentsCountByManagerNodes: agentsCountByManagerNodes.nodes,
+        agentsCount,
+        agentsCoverage: agentsCount.total ? ((agentsCount.active / agentsCount.total) * 100).toFixed(2) : 0,
       });
 
       const daemons = await this.statusHandler.clusterNodeStatus(node);

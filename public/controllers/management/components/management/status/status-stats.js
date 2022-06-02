@@ -14,12 +14,24 @@ import React, { Component } from 'react';
 import { EuiStat, EuiFlexItem, EuiFlexGroup } from '@elastic/eui';
 
 import { connect } from 'react-redux';
+import { UI_ORDER_AGENT_STATUS } from '../../../../../../common/constants';
+import { agentStatusColorByAgentStatus, agentStatusLabelByAgentStatus } from '../../../../../../common/services/wz_agent_status';
 
 export class WzStatusStats extends Component {
   _isMounted = false;
   constructor(props) {
     super(props);
     this.state = {};
+    this.agentStatus = ['total', ...UI_ORDER_AGENT_STATUS].map(status => ({
+      color: status !== 'total' ? agentStatusColorByAgentStatus(status) : 'primary',
+      description: `${status === 'total' ? 'Total agents' : agentStatusLabelByAgentStatus(status)}`,
+      status
+    }));
+    this.agentStatus.push({
+      color: undefined,
+      description: 'Agents coverage',
+      status: 'coverage'
+    })
   }
 
   componentDidMount() {
@@ -34,52 +46,21 @@ export class WzStatusStats extends Component {
 
   render() {
     const { stats } = this.props.state;
-    const agentsCoverage = stats.agentsCoverity.toFixed(2) + '%';
 
     return (
       <div>
         <EuiFlexGroup>
           <EuiFlexItem />
-          <EuiFlexItem>
-            <EuiStat
-              title={stats.agentsCountTotal}
-              description="Total agents"
-              titleColor="primary"
-              textAlign="center"
-            />
-          </EuiFlexItem>
-          <EuiFlexItem>
-            <EuiStat
-              title={stats.agentsCountActive}
-              description="Active"
-              titleColor="secondary"
-              textAlign="center"
-            />
-          </EuiFlexItem>
-          <EuiFlexItem>
-            <EuiStat
-              title={stats.agentsCountDisconnected}
-              description="Disconnected"
-              titleColor="danger"
-              textAlign="center"
-            />
-          </EuiFlexItem>
-          <EuiFlexItem>
-            <EuiStat
-              title={stats.agentsCountNeverConnected}
-              description="Never connected"
-              titleColor="subdued"
-              textAlign="center"
-            />
-          </EuiFlexItem>
-          <EuiFlexItem>
-            <EuiStat
-              title={agentsCoverage}
-              description="Agents coverage"
-              titleColor="accent"
-              textAlign="center"
-            />
-          </EuiFlexItem>
+          {this.agentStatus.map(({color, description, status}) => (
+            <EuiFlexItem key={`agent-status-${status}`}>
+              <EuiStat
+                title={status === 'coverage' ? `${stats?.agentsCoverage}%` : stats?.agentsCount?.[status]}
+                description={description}
+                titleColor={color}
+                textAlign="center"
+              />
+            </EuiFlexItem>
+          ))}
           <EuiFlexItem />
         </EuiFlexGroup>
       </div>

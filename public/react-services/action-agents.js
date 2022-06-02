@@ -11,7 +11,7 @@
  */
 import { WzRequest } from './wz-request';
 import { getToasts } from '../kibana-services';
-import { UI_LOGGER_LEVELS } from '../../common/constants';
+import { API_NAME_AGENT_STATUS, UI_LOGGER_LEVELS } from '../../common/constants';
 import { UI_ERROR_SEVERITIES } from './error-orchestrator/types';
 import { getErrorOrchestrator } from './common-services';
 
@@ -57,7 +57,7 @@ export class ActionAgents {
    */
   static async upgradeAgents(selectedItems) {
     for (let item of selectedItems.filter(
-      (item) => item.outdated && item.status !== 'Disconnected'
+      (item) => item.outdated && item.status !== API_NAME_AGENT_STATUS.DISCONNECTED
     )) {
       try {
         await WzRequest.apiReq('PUT', `/agents/${item.id}/upgrade`, '1');
@@ -89,7 +89,7 @@ export class ActionAgents {
       if (
         agent.id !== '000' &&
         this.compareVersions(agent.version, managerVersion) === true &&
-        agent.status === 'active'
+        agent.status === API_NAME_AGENT_STATUS.ACTIVE
       ) {
         try {
           await WzRequest.apiReq('PUT', `/agents/${agent.id}/upgrade`, '1');
@@ -168,7 +168,7 @@ export class ActionAgents {
   static async restartAllAgents(selectedItems) {
     let idAvaibleAgents = [];
     selectedItems.forEach((agent) => {
-      if (agent.id !== '000' && agent.status === 'active') {
+      if (agent.id !== '000' && agent.status === API_NAME_AGENT_STATUS.ACTIVE) {
         idAvaibleAgents.push(agent.id);
       }
     });

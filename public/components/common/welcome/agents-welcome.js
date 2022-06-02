@@ -53,6 +53,7 @@ import { getAngularModule } from '../../../kibana-services';
 import { hasAgentSupportModule } from '../../../react-services/wz-agents';
 import { withErrorBoundary, withReduxProvider } from '../hocs';
 import { compose } from 'redux';
+import { API_NAME_AGENT_STATUS } from '../../../../common/constants';
 
 export const AgentsWelcome = compose(
   withReduxProvider,
@@ -508,7 +509,7 @@ class AgentsWelcome extends Component {
   render() {
     const title = this.renderTitle();
     const upgradeButton = this.renderUpgradeButton();
-    if (this.props.agent.status === 'never_connected') {
+    if (this.props.agent.status === API_NAME_AGENT_STATUS.NEVER_CONNECTED) {
       return (
         <EuiEmptyPrompt
           iconType="securitySignalDetected"

@@ -73,34 +73,6 @@ export const WzVisualize = compose(
       this._isMount = true;
       visHandler.removeAll();
       this.agentsStatus = false;
-      if (!this.monitoringEnabled) {
-        const data = await this.wzReq.apiReq('GET', '/agents/summary/status', {});
-        const result = ((data || {}).data || {}).data || false;
-        if (result) {
-          this.agentsStatus = [
-            {
-              title: 'Total',
-              description: result.total,
-            },
-            {
-              title: 'Active',
-              description: result.active,
-            },
-            {
-              title: 'Disconnected',
-              description: result.disconnected,
-            },
-            {
-              title: 'Never Connected',
-              description: result['never_connected'],
-            },
-            {
-              title: 'Agents coverage',
-              description: (result.total ? (result.active / result.total) * 100 : 0) + '%',
-            },
-          ];
-        }
-      }
     }
 
     async componentDidUpdate(prevProps) {
@@ -204,29 +176,15 @@ export const WzVisualize = compose(
                     aria-label="Expand"
                   />
                 </EuiFlexGroup>
-                <div style={{ height: '100%' }}>
-                  {(vis.id !== 'Wazuh-App-Overview-General-Agents-status' ||
-                    (vis.id === 'Wazuh-App-Overview-General-Agents-status' &&
-                      this.monitoringEnabled)) && (
-                    <WzReduxProvider>
-                      <KibanaVis
-                        refreshKnownFields={this.refreshKnownFields}
-                        visID={vis.id}
-                        tab={selectedTab}
-                        {...this.props}
-                      ></KibanaVis>
-                    </WzReduxProvider>
-                  )}
-                  {vis.id === 'Wazuh-App-Overview-General-Agents-status' &&
-                    !this.monitoringEnabled && (
-                      <EuiPage style={{ background: 'transparent' }}>
-                        <EuiDescriptionList
-                          type="column"
-                          listItems={this.agentsStatus}
-                          style={{ maxWidth: '400px' }}
-                        />
-                      </EuiPage>
-                    )}
+                <div style={{ height: '100%' }}>   
+                  <WzReduxProvider>
+                    <KibanaVis
+                      refreshKnownFields={this.refreshKnownFields}
+                      visID={vis.id}
+                      tab={selectedTab}
+                      {...this.props}
+                    ></KibanaVis>
+                  </WzReduxProvider>
                 </div>
               </EuiFlexItem>
             </EuiPanel>

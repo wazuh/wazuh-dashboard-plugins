@@ -93,7 +93,7 @@ class WzRulesetActionButtons extends Component {
    * @param {Array} files
    * @param {String} path
    */
-  async uploadFiles(files, resource) {
+  async uploadFiles(files, resource, overwrite) {
     try {
       let errors = false;
       let results = [];
@@ -101,7 +101,7 @@ class WzRulesetActionButtons extends Component {
       for (let idx in files) {
         const { file, content } = files[idx];
         try {
-          await rulesetHandler.updateFile(file, content, resource !== RulesetResources.LISTS); // True does not overwrite the file
+          await rulesetHandler.updateFile(file, content, overwrite);
           results.push({
             index: idx,
             uploaded: true,
@@ -119,7 +119,7 @@ class WzRulesetActionButtons extends Component {
         }
       }
       if (errors) throw results;
-      return;
+      return results;
     } catch (error) {
       throw error;
     }
@@ -271,22 +271,13 @@ class WzRulesetActionButtons extends Component {
       </EuiButtonEmpty>
     );
 
-    const uploadFile = async (files, resource) => {
+    const uploadFile = async (files, resource, overwrite) => {
       try {
-        await this.uploadFiles(files, resource);
+        const result = await this.uploadFiles(files, resource, overwrite);
         await this.refresh();
+        return result
       } catch (error) {
-        const options = {
-          context: `${WzRulesetActionButtons.name}.uploadFile`,
-          level: UI_LOGGER_LEVELS.ERROR,
-          severity: UI_ERROR_SEVERITIES.BUSINESS,
-          error: {
-            error: error,
-            message: `Error files cannot be uploaded: ${error.message || error}`,
-            title: error.name || error,
-          },
-        };
-        getErrorOrchestrator().handleError(options);
+        return error
       }
     };
 

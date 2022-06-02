@@ -13,6 +13,7 @@ export type VisualizationBasicProps = ChartDonutProps & {
   noDataMessage?: string | (() => React.node)
   errorTitle?: string
   errorMessage?: string | (() => React.node)
+  error?: {message: string}
 }
 
 const chartTypes = {
@@ -32,7 +33,8 @@ export const VisualizationBasic = ({
   noDataTitle = 'No data',
   noDataMessage,
   errorTitle = 'Error',
-  errorMessage
+  errorMessage,
+  error
 }: VisualizationBasicProps) => {
   const { width, height } = typeof size === 'object' ? size : { width: size, height: size };
   
@@ -44,12 +46,12 @@ export const VisualizationBasic = ({
         <EuiLoadingChart size="xl" style={{top: '50%', transform:'translate(-50%, -50%)', position: 'absolute'}}/>
       </div>
     )
-  }else if(errorMessage){
+  }else if(errorMessage || error?.message){
     visualization = (
       <EuiEmptyPrompt
         iconType="alert"
         title={<h4>{errorTitle}</h4>}
-        body={errorMessage}
+        body={errorMessage || error?.message}
       />
     )
   }else if(!data || (Array.isArray(data) && !data.length)){

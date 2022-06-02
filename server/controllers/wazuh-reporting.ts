@@ -36,9 +36,11 @@ import {
   WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH,
   WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH,
   AUTHORIZED_AGENTS,
+  API_NAME_AGENT_STATUS,
 } from '../../common/constants';
 import { createDirectoryIfNotExists, createDataDirectoryIfNotExists } from '../lib/filesystem';
 import moment from 'moment';
+import { agentStatusLabelByAgentStatus } from '../../common/services/wz_agent_status';
 
 export class WazuhReportingCtrl {
   constructor() {}
@@ -164,9 +166,9 @@ export class WazuhReportingCtrl {
           { apiHostID: apiId }
         );
         const agentData = agentResponse.data.data.affected_items[0];
-        if (agentData && agentData.status !== 'active') {
+        if (agentData && agentData.status !== API_NAME_AGENT_STATUS.ACTIVE) {
           printer.addContentWithNewLine({
-            text: `Warning. Agent is ${agentData.status.toLowerCase()}`,
+            text: `Warning. Agent is ${agentStatusLabelByAgentStatus(agentData.status).toLowerCase()}`,
             style: 'standard',
           });
         }
