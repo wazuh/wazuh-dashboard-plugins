@@ -2,6 +2,13 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+
+## Wazuh v4.3.4 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4305
+
+### Fixed
+
+- Maintain the filters when clicking on the `Visualize` button of a document field from `<Module>/Events` and redirects to the `lens` plugin [#4157](https://github.com/wazuh/wazuh-kibana-app/pull/4157)
+
 ## Wazuh v4.3.3 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4304
 
 ### Fixed

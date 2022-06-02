@@ -58,7 +58,14 @@ export const MainModule = compose(
 
     componentWillUnmount() {
       const { filterManager } = getDataPlugin().query;
-      if (filterManager.getFilters() && filterManager.getFilters().length) {
+      
+      // When the component is unmounted, we don't want the filters on the `filterManager` to be removed when navigating
+      // to the `lens` plugin. The same `filterManager` is used by our plugin and the `lens` one.
+      // This is related with the maintenance of the filters when clicking on the `Visualize` button in the <Module>/Events section.
+      // We use `pathname.includes` instead of the equal operator because the `window.location.pathname` could contain a prefix
+      // indicating the plugin's platform, for example using a proxy.
+      // More information: https://github.com/wazuh/wazuh-kibana-app/issues/4143#issuecomment-1129854030
+      if (filterManager.getFilters()?.length && !window.location.pathname.includes('/app/lens')) {
         filterManager.removeAll();
       }
     }
