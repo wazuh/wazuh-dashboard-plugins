@@ -123,7 +123,6 @@ export const AgentsPreview = compose(
           },
         };
         getErrorOrchestrator().handleError(options);
-        throw error;
       }
     }
 
