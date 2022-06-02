@@ -81,8 +81,6 @@ export const AgentsPreview = compose(
         this._isMount && this.setState({ 
           showAgentsEvolutionVisualization: true 
         });
-<<<<<<< HEAD
-=======
         const tabVisualizations = new TabVisualizations();
         tabVisualizations.removeAll();
         tabVisualizations.setTab('general');
@@ -91,7 +89,6 @@ export const AgentsPreview = compose(
         });
         const filterHandler = new FilterHandler(AppState.getCurrentPattern());
         await VisFactoryHandler.buildOverviewVisualizations(filterHandler, 'general', null);
->>>>>>> c1f0ea9f18676d4bd8207675267ca85194521161
       }
     }
 
@@ -112,40 +109,6 @@ export const AgentsPreview = compose(
 
     async fetchAgentStatusDetailsData(){
       try {
-<<<<<<< HEAD
-        this.setState({ 
-          loading: true });
-        const summaryData = await WzRequest.apiReq('GET', '/agents/summary/status', {});
-        this.summary = summaryData.data.data;
-        this.totalAgents = this.summary.total;
-        const model = [
-          { id: 'active', label: 'Active', value: this.summary['active'] || 0 },
-          { id: 'disconnected', label: 'Disconnected', value: this.summary['disconnected'] || 0 },
-          {
-            id: 'neverConnected',
-            label: 'Never connected',
-            value: this.summary['never_connected'] || 0,
-          },
-        ];
-        this.setState({ data: model });
-        this.agentsCoverity = this.totalAgents
-          ? ((this.summary['active'] || 0) / this.totalAgents) * 100
-          : 0;
-        const lastAgent = await WzRequest.apiReq('GET', '/agents', {
-          params: { limit: 1, sort: '-dateAdd', q: 'id!=000' },
-        });
-        this.lastAgent = lastAgent.data.data.affected_items[0];
-        this.mostActiveAgent = await this.props.tableProps.getMostActive();
-        const osresult = await WzRequest.apiReq('GET', '/agents/summary/os', {});
-        this.platforms = this.groupBy(osresult.data.data.affected_items);
-        const platformsModel = [];
-        for (let [key, value] of Object.entries(this.platforms)) {
-          platformsModel.push({ id: key, label: key, value: value });
-        }
-        this._isMount && this.setState({ 
-          platforms: platformsModel, 
-          loading: false
-=======
         this.setState({ loading: true });
         const {data: {data: agentStatusSummary}} = await WzRequest.apiReq('GET', '/agents/summary/status', {});
 
@@ -160,7 +123,6 @@ export const AgentsPreview = compose(
           agentStatusSummary,
           agentsActiveCoverage: ((agentStatusSummary.active/agentStatusSummary.total)*100).toFixed(2),
           agentMostActive
->>>>>>> c1f0ea9f18676d4bd8207675267ca85194521161
         });
       } catch (error) {
         this.setState({loading: false});
@@ -295,125 +257,7 @@ export const AgentsPreview = compose(
                       </EuiFlexGroup>
                     </EuiCard>
                   </EuiFlexItem>
-<<<<<<< HEAD
-                  {this.totalAgents > 0 && (
-                    <EuiFlexItem grow={false} className="agents-details-card">
-                      <EuiCard title description betaBadgeLabel="Details">
-                            {this.summary && (
-                              <EuiFlexGroup className="group-details">
-                                <EuiFlexItem>
-                                  <EuiStat
-                                    title={
-                                      <EuiToolTip position="top" content="Show active agents">
-                                        <a
-                                          onClick={() => this.showAgentsWithFilters(FILTER_ACTIVE)}
-                                        >
-                                          {this.state.data[0].value}
-                                        </a>
-                                      </EuiToolTip>
-                                    }
-                                    titleSize={'s'}
-                                    description="Active"
-                                    titleColor="secondary"
-                                    className="white-space-nowrap"
-                                  />
-                                </EuiFlexItem>
-                                <EuiFlexItem>
-                                  <EuiStat
-                                    title={
-                                      <EuiToolTip position="top" content="Show disconnected agents">
-                                        <a
-                                          onClick={() =>
-                                            this.showAgentsWithFilters(FILTER_DISCONNECTED)
-                                          }
-                                        >
-                                          {this.state.data[1].value}
-                                        </a>
-                                      </EuiToolTip>
-                                    }
-                                    titleSize={'s'}
-                                    description="Disconnected"
-                                    titleColor="danger"
-                                    className="white-space-nowrap"
-                                  />
-                                </EuiFlexItem>
-                                <EuiFlexItem>
-                                  <EuiStat
-                                    title={
-                                      <EuiToolTip
-                                        position="top"
-                                        content="Show never connected agents"
-                                      >
-                                        <a
-                                          onClick={() =>
-                                            this.showAgentsWithFilters(FILTER_NEVER_CONNECTED)
-                                          }
-                                        >
-                                          {this.state.data[2].value}
-                                        </a>
-                                      </EuiToolTip>
-                                    }
-                                    titleSize={'s'}
-                                    description="Never connected"
-                                    titleColor="subdued"
-                                    className="white-space-nowrap"
-                                  />
-                                </EuiFlexItem>
-
-                                <EuiFlexItem>
-                                  <EuiStat
-                                    title={`${this.agentsCoverity.toFixed(2)}%`}
-                                    titleSize={'s'}
-                                    description="Agents coverage"
-                                    className="white-space-nowrap"
-                                  />
-                                </EuiFlexItem>
-                              </EuiFlexGroup>
-                            )}
-                            <EuiFlexGroup className="mt-0">
-                              {this.lastAgent && (
-                                <EuiFlexItem className="agents-link-item">
-                                  <EuiStat
-                                    className="euiStatLink last-agents-link"
-                                    title={
-                                      <EuiToolTip position="top" content="View agent details">
-                                        <a onClick={() => this.showLastAgent()}>
-                                          {this.lastAgent.name}
-                                        </a>
-                                      </EuiToolTip>
-                                    }
-                                    titleSize="s"
-                                    description="Last registered agent"
-                                    titleColor="primary"
-                                  />
-                                </EuiFlexItem>
-                              )}
-                              {this.mostActiveAgent && (
-                                <EuiFlexItem className="agents-link-item">
-                                  <EuiStat
-                                    className={this.mostActiveAgent.name ? 'euiStatLink' : ''}
-                                    title={
-                                      <EuiToolTip position="top" content="View agent details">
-                                        <a onClick={() => this.showMostActiveAgent()}>
-                                          {this.mostActiveAgent.name || '-'}
-                                        </a>
-                                      </EuiToolTip>
-                                    }
-                                    className="last-agents-link"
-                                    titleSize="s"
-                                    description="Most active agent"
-                                    titleColor="primary"
-                                  />
-                                </EuiFlexItem>
-                              )}
-                            </EuiFlexGroup>
-                      </EuiCard>
-                    </EuiFlexItem>
-                  )}
-                </Fragment>
-=======
                 </>
->>>>>>> c1f0ea9f18676d4bd8207675267ca85194521161
               )}
               {this.state.showAgentsEvolutionVisualization && (
                 <EuiFlexItem
