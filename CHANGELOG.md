@@ -4,6 +4,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ## Wazuh v4.3.3 - OpenSearch Dashboards 1.2.0 - Revision 4304
 
+### Changed
+
+- Replaced how the full and partial scan dates are displayed in the `Details` panel of `Vulnerabilities/Inventory` [#4169](https://github.com/wazuh/wazuh-kibana-app/pull/4169)
+
 ### Fixed
 
 - Fixed Wazuh Dashboard troubleshooting url [#4151](https://github.com/wazuh/wazuh-kibana-app/pull/4151)
