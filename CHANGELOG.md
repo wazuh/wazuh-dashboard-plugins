@@ -2,18 +2,31 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v4.3.2 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4303
+## Wazuh v4.3.3 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4304
 
 ### Fixed
 
 - Fixed Wazuh Dashboard troubleshooting url [#4150](https://github.com/wazuh/wazuh-kibana-app/pull/4150)
 - Fixed a toast message with a successful process appeared when removing an agent of a group in `Management/Groups` and the agent appear in the agent list after refreshing the table [#4167](https://github.com/wazuh/wazuh-kibana-app/pull/4167)
 
-## Wazuh v4.3.1 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4302
+## Wazuh v4.3.2 - Kibana 7.10.2 , 7.16.x, 7.17.x - Revision 4303
+
+### Added
+
+- Support for Wazuh 4.3.2
+
+## Wazuh v4.2.7 - Kibana 7.10.2, 7.11.2, 7.12.1, 7.13.0, 7.13.1, 7.13.2, 7.13.3, 7.13.4, 7.14.0, 7.14.1, 7.14.2 - Revision 4208
+
+### Added
+
+- Support for Wazuh 4.2.7
+
+## Wazuh v4.3.1 - Kibana 7.10.2 , 7.16.x, 7.17.x - Revision 4302
 
 ### Added
 
 - Added PowerShell version warning to Windows agent installation wizard [#4142](https://github.com/wazuh/wazuh-kibana-app/pull/4142)
+- A new workflow is added to perform backports to specific branches [#4149](https://github.com/wazuh/wazuh-kibana-app/pull/4149)
 
 ### Fixed
 
