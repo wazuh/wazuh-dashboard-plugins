@@ -9,6 +9,8 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { UI_COLOR_AGENT_STATUS } from "../../../../common/constants";
+
 export default [
   {
     _id: 'Wazuh-App-Overview-Office-Agents-status',
@@ -96,7 +98,7 @@ export default [
         ],
       }),
       uiStateJSON: JSON.stringify({
-        vis: { colors: { never_connected: '#447EBC', active: '#E5AC0E' } },
+        vis: { colors: { active: UI_COLOR_AGENT_STATUS.active, disconnected: UI_COLOR_AGENT_STATUS.disconnected, pending: UI_COLOR_AGENT_STATUS.pending, never_connected: UI_COLOR_AGENT_STATUS.never_connected } },
       }),
       description: '',
       version: 1,
