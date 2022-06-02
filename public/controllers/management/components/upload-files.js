@@ -48,7 +48,6 @@ export class UploadFiles extends Component {
     this.setOverwrite = this.setOverwrite.bind(this);
     this.closePopover = this.closePopover.bind(this);
     this.startUpload = this.startUpload.bind(this);
-    // this.closePopover = this.closePopover.bind(this);
   }
   
   setOverwrite(e) {
