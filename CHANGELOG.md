@@ -17,6 +17,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
+- Fixed that the platform visualizations didn't use some definitions related to the UI on Kibana 7.10.2 [#4166](https://github.com/wazuh/wazuh-kibana-app/pull/4166)
 - Fixed a toast message with a successful process appeared when removing an agent of a group in `Management/Groups` and the agent appears in the agent list after refreshing the table [#4167](https://github.com/wazuh/wazuh-kibana-app/pull/4167)
 - Fixed import of an empty rule or decoder file [#4176](https://github.com/wazuh/wazuh-kibana-app/pull/4176)
 - Fixed overwriting of rule and decoder imports [#4180](https://github.com/wazuh/wazuh-kibana-app/pull/4180)
@@ -25,7 +26,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
-- Fixed that the platform visualizations didn't use some definitions related to the UI on Kibana 7.10.2 [#4166](https://github.com/wazuh/wazuh-kibana-app/pull/4166)
 - Fixed Wazuh Dashboard troubleshooting url [#4150](https://github.com/wazuh/wazuh-kibana-app/pull/4150)
 
 ## Wazuh v4.3.2 - Kibana 7.10.2 , 7.16.x, 7.17.x - Revision 4303
