@@ -6,7 +6,9 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Added
 
-- Added the `pending` agent status to some sections that was missing [#4166](https://github.com/wazuh/wazuh-kibana-app/pull/4166)
+- Added the `pending` agent status to some sections that was missing 
+[#4166](https://github.com/wazuh/wazuh-kibana-app/pull/4166)
+[#4188](https://github.com/wazuh/wazuh-kibana-app/pull/4188)
 
 ### Changed
 
