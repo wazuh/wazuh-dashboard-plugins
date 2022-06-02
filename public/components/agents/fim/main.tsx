@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import { PromptNoActiveAgent, PromptNoSelectedAgent } from '../prompts';
 import { compose } from 'redux';
 import { withAgentSupportModule, withGuard, withUserAuthorizationPrompt } from '../../common/hocs';
+import { API_NAME_AGENT_STATUS } from '../../../../common/constants';
 
 const mapStateToProps = (state) => ({
   currentAgentData: state.appStateReducers.currentAgentData,
@@ -23,7 +24,7 @@ export const MainFim = compose(
     (props) => {
       const agentData =
         props.currentAgentData && props.currentAgentData.id ? props.currentAgentData : props.agent;
-      return agentData.status !== 'active';
+      return agentData.status !== API_NAME_AGENT_STATUS.ACTIVE;
     },
     () => <PromptNoActiveAgent />
   ),

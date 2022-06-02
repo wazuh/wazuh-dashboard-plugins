@@ -365,3 +365,34 @@ export const PLUGIN_PLATFORM_URL_GUIDE_TITLE = 'Elastic guide';
 export const PLUGIN_PLATFORM_REQUEST_HEADERS = {
   'kbn-xsrf': 'kibana'
 };
+
+// UI
+export const API_NAME_AGENT_STATUS = {
+  ACTIVE: 'active',
+  DISCONNECTED: 'disconnected',
+  PENDING: 'pending',
+  NEVER_CONNECTED: 'never_connected',
+} as const;
+
+export const UI_COLOR_AGENT_STATUS = {
+  [API_NAME_AGENT_STATUS.ACTIVE]: '#007871',
+  [API_NAME_AGENT_STATUS.DISCONNECTED]: '#BD271E',
+  [API_NAME_AGENT_STATUS.PENDING]: '#FEC514',
+  [API_NAME_AGENT_STATUS.NEVER_CONNECTED]: '#646A77',
+  default: '#000000'
+} as const;
+
+export const UI_LABEL_NAME_AGENT_STATUS = {
+  [API_NAME_AGENT_STATUS.ACTIVE]: 'Active',
+  [API_NAME_AGENT_STATUS.DISCONNECTED]: 'Disconnected',
+  [API_NAME_AGENT_STATUS.PENDING]: 'Pending',
+  [API_NAME_AGENT_STATUS.NEVER_CONNECTED]: 'Never connected',
+  default: 'Unknown'
+} as const
+
+export const UI_ORDER_AGENT_STATUS = [
+  API_NAME_AGENT_STATUS.ACTIVE,
+  API_NAME_AGENT_STATUS.DISCONNECTED,
+  API_NAME_AGENT_STATUS.PENDING,
+  API_NAME_AGENT_STATUS.NEVER_CONNECTED  
+]
