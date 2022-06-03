@@ -81,14 +81,6 @@ export const AgentsPreview = compose(
         this._isMount && this.setState({ 
           showAgentsEvolutionVisualization: true 
         });
-        const tabVisualizations = new TabVisualizations();
-        tabVisualizations.removeAll();
-        tabVisualizations.setTab('general');
-        tabVisualizations.assign({
-          general: 1,
-        });
-        const filterHandler = new FilterHandler(AppState.getCurrentPattern());
-        await VisFactoryHandler.buildOverviewVisualizations(filterHandler, 'general', null);
       }
     }
 
