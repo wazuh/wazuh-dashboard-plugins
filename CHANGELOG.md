@@ -14,7 +14,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Replaced the visualization of `Status` panel in `Agents` [#4166](https://github.com/wazuh/wazuh-kibana-app/pull/4166)
 - Replaced the visualization of policy in `Modules/Security configuration assessment/Inventory` [#4166](https://github.com/wazuh/wazuh-kibana-app/pull/4166)
-- Consistency in the colors and labels used for the agent status [#4166](https://github.com/wazuh/wazuh-kibana-app/pull/4166)
+- Consistency in the colors and labels used for the agent status [#4166](https://github.com/wazuh/wazuh-kibana-app/pull/4166) [#4199](https://github.com/wazuh/wazuh-kibana-app/issues/4199)
 - Replaced how the full and partial scan dates are displayed in the `Details` panel of `Vulnerabilities/Inventory` [#4169](https://github.com/wazuh/wazuh-kibana-app/pull/4169)
 
 ### Fixed
