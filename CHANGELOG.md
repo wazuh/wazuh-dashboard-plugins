@@ -24,7 +24,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed a toast message with a successful process appeared when removing an agent of a group in `Management/Groups` and the agent appears in the agent list after refreshing the table [#4167](https://github.com/wazuh/wazuh-kibana-app/pull/4167)
 - Fixed import of an empty rule or decoder file [#4176](https://github.com/wazuh/wazuh-kibana-app/pull/4176)
 - Fixed overwriting of rule and decoder imports [#4180](https://github.com/wazuh/wazuh-kibana-app/pull/4180)
-- fixed missing background in the status graph tooltip in agents [#4198](https://github.com/wazuh/wazuh-kibana-app/pull/4198)
+- Fixed missing background in the status graph tooltip in agents [#4198](https://github.com/wazuh/wazuh-kibana-app/pull/4198)
+- Fixed the problem allowing to remove the filters from the module [#4219](https://github.com/wazuh/wazuh-kibana-app/pull/4219)
 
 ## Wazuh v4.3.3 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4304
 

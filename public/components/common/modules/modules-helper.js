@@ -60,7 +60,9 @@ export class ModulesHelper {
             : moduleFilter.meta.key;
           const objValue = moduleFilter.query?.match_phrase
             ? moduleFilter.query.match_phrase[objKey].query
-            : moduleFilter.meta.value();
+            : typeof moduleFilter.meta.value === 'function' // this check was added because sometimes it comes as a string and sometimes as a function.
+            ? moduleFilter.meta.value() //TODO see if it is used when it is a function
+            : moduleFilter.meta.value;
           const key = `filter-key-${objKey}`;
           const value = `filter-value-${objValue}`;
 
