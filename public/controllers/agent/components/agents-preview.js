@@ -78,7 +78,7 @@ export const AgentsPreview = compose(
 
   async componentDidMount() {
     this._isMount = true;
-    this.getSummary();
+    this.fetchAgentStatusDetailsData();
   }
 
     componentWillUnmount() {
@@ -173,7 +173,7 @@ export const AgentsPreview = compose(
                       </EuiFlexGroup>
                     </EuiCard>
                   </EuiFlexItem>
-                  <EuiFlexItem grow={false} className="agents-details-card">
+                  <EuiFlexItem className="agents-details-card">
                     <EuiCard title description betaBadgeLabel="Details">
                       <EuiFlexGroup className="group-details">
                         {this.agentStatus.map(({status, label, color}) => (
@@ -224,42 +224,6 @@ export const AgentsPreview = compose(
                     </EuiCard>
                   </EuiFlexItem>
                 </>
-              )}
-              {this.state.showAgentsEvolutionVisualization && (
-                <EuiFlexItem
-                  grow={false}
-                  className="agents-evolution-visualization"
-                  style={{
-                    display: !this.state.loading ? 'block' : 'none',
-                    margin: !this.state.loading ? '12px' : 0,
-                  }}
-                >
-                  <EuiCard
-                    title
-                    description
-                    paddingSize="none"
-                    betaBadgeLabel="Evolution"
-                    style={{ display: this.props.resultState !== 'loading' ? 'block' : 'none' }}
-                  >
-                    <EuiFlexGroup>
-                      <EuiFlexItem>
-                        <div style={{ height: this.props.resultState !== 'loading' ? '180px' : 0 }}>
-                          <WzReduxProvider>
-                            <KibanaVis
-                              visID={'Wazuh-App-Overview-General-Agents-status'}
-                              tab={'general'}
-                            />
-                          </WzReduxProvider>
-                        </div>
-                        {this.props.resultState === 'loading' && (
-                          <div className="loading-chart-xl">
-                            <EuiLoadingChart size="xl" />
-                          </div>
-                        )}
-                      </EuiFlexItem>
-                    </EuiFlexGroup>
-                  </EuiCard>
-                </EuiFlexItem>
               )}
             </EuiFlexGroup>
             <EuiSpacer size="m" />
