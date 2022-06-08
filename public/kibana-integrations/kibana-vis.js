@@ -109,7 +109,9 @@ class KibanaVis extends Component {
   componentWillUnmount() {
     if (this._isMounted) {
       this._isMounted = false;
-      this.updateVis();
+      if (this.deadField) {
+        return this.renderComplete();
+      }
       this.destroyAll();
     }
   }
