@@ -415,7 +415,7 @@ export const RegisterAgent = withErrorBoundary(
       const urlCheckConnectionDocumentation = `https://documentation.wazuh.com/${appVersionMajorDotMinor}/user-manual/agents/agent-connection.html`;
       const textAndLinkToCheckConnectionDocumentation = (
         <p>
-          To verify the connection with the Manager, please follow this{' '}
+          To verify the connection with the Wazuh server, please follow this{' '}
           <a href={urlCheckConnectionDocumentation} target="_blank">
             document.
           </a>
