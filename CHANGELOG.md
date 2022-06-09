@@ -10,7 +10,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
--TypeError: main view of Agents [#4233](https://github.com/wazuh/wazuh-kibana-app/pull/4233)
+- Fixed error in console when changing screen size in agents section [#4233](https://github.com/wazuh/wazuh-kibana-app/pull/4233)
 
 ## Wazuh v4.3.4 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4305
 
