@@ -87,7 +87,6 @@ export const Discover = compose(
       sortField: string;
       sortDirection: Direction;
       isLoading: boolean;
-      requestFilters: object;
       requestSize: number;
       requestOffset: number;
       query: { language: 'kuery' | 'lucene'; query: string };
@@ -127,7 +126,6 @@ export const Discover = compose(
         sortField: 'timestamp',
         sortDirection: 'desc',
         isLoading: false,
-        requestFilters: {},
         requestSize: 500,
         requestOffset: 0,
         itemIdToExpandedRowMap: {},
@@ -171,8 +169,7 @@ export const Discover = compose(
         const options = {
           context: `${Discover.name}.componentDidMount`,
           level: UI_LOGGER_LEVELS.ERROR,
-          severity: UI_ERROR_SEVERITIES.CRITICAL,
-          store: true,
+          severity: UI_ERROR_SEVERITIES.BUSINESS,
           error: {
             error: error,
             message: error.message || error,
@@ -231,8 +228,7 @@ export const Discover = compose(
           const options = {
             context: `${Discover.name}.componentDidUpdate`,
             level: UI_LOGGER_LEVELS.ERROR,
-            severity: UI_ERROR_SEVERITIES.CRITICAL,
-            store: true,
+            severity: UI_ERROR_SEVERITIES.BUSINESS,
             error: {
               error: error,
               message: error.message || error,
@@ -421,9 +417,9 @@ export const Discover = compose(
     async getAlerts() {
       if (!this.indexPattern || this.state.isLoading) return;
       //compare filters so we only make a request into Elasticsearch if needed
-      const newFilters = this.buildFilter();
       try {
         this.setState({ isLoading: true });
+        const newFilters = this.buildFilter();
         const alerts = await GenericRequest.request('POST', `/elastic/alerts`, {
           index: this.indexPattern.title,
           body: newFilters,
@@ -433,13 +429,12 @@ export const Discover = compose(
             alerts: alerts.data.hits.hits,
             total: alerts.data.hits.total.value,
             isLoading: false,
-            requestFilters: newFilters,
           });
           this.props.updateTotalHits(alerts.data.hits.total.value);
         }
       } catch (error) {
         if (this._isMount) {
-          this.setState({ alerts: [], total: 0, isLoading: false, requestFilters: newFilters });
+          this.setState({ alerts: [], total: 0, isLoading: false });
           this.props.updateTotalHits(0);
         }
         throw error;
