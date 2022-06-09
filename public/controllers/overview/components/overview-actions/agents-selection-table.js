@@ -28,9 +28,10 @@ import { GroupTruncate } from '../../../../components/common/util/agent-group-tr
 import { filtersToObject, WzSearchBar } from '../../../../components/wz-search-bar';
 import { getAgentFilterValues } from '../../../../controllers/management/components/management/groups/get-agents-filters-values';
 import _ from 'lodash';
-import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
+import { UI_LOGGER_LEVELS, UI_ORDER_AGENT_STATUS } from '../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
+import { AgentStatus } from '../../../../components/agents/agent_status';
 
 const checkField = field => {
   return field !== undefined ? field : '-';
@@ -113,11 +114,11 @@ export class AgentSelectionTable extends Component {
         },
         isSortable: true,
         width: 'auto',
-        render: status => this.addHealthStatusRender(status),
+        render: status => <AgentStatus status={status} style={{ whiteSpace: 'no-wrap' }}/>,
       },
     ];
     this.suggestions = [
-      { type: 'q', label: 'status', description: 'Filter by agent connection status', operators: ['=', '!=',], values: ['active', 'disconnected', 'never_connected', 'pending'] },
+      { type: 'q', label: 'status', description: 'Filter by agent connection status', operators: ['=', '!=',], values: UI_ORDER_AGENT_STATUS },
       { type: 'q', label: 'os.platform', description: 'Filter by OS platform', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('os.platform', value, { q: 'id!=000'})},
       { type: 'q', label: 'ip', description: 'Filter by agent IP', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('ip', value, { q: 'id!=000'})},
       { type: 'q', label: 'name', description: 'Filter by agent name', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('name', value, { q: 'id!=000'})},
@@ -215,24 +216,6 @@ export class AgentSelectionTable extends Component {
 
       getErrorOrchestrator().handleError(options);
     }
-  }
-
-  agentStatusColor(status){
-    if (status.toLowerCase() === 'active') {
-      return 'success';
-    } else if (status.toLowerCase() === 'disconnected') {
-      return 'danger';
-    } else if (status.toLowerCase() === 'never_connected') {
-      return 'subdued';
-    }
-  }
-
-  addHealthStatusRender(status) {
-    return (
-      <EuiHealth color={this.agentStatusColor(status)} style={{ whiteSpace: 'no-wrap' }}>
-        {status === 'never_connected' ? 'never connected' : status}
-      </EuiHealth>
-    );
   }
 
   buildFilter() {
@@ -650,9 +633,9 @@ export class AgentSelectionTable extends Component {
             <EuiFlexGroup responsive={false} justifyContent="flexEnd">
               {/* agent name (agent id) Unpin button right aligned, require justifyContent="flexEnd" in the EuiFlexGroup */}
               <EuiFlexItem grow={false} style={{marginRight: 0}}>
-                <EuiHealth color={this.agentStatusColor(selectedAgent.status)} style={{ whiteSpace: 'no-wrap' }}>
+                <AgentStatus status={selectedAgent.status} style={{ whiteSpace: 'no-wrap' }}>
                   {selectedAgent.name} ({selectedAgent.id})
-                </EuiHealth>
+                </AgentStatus>
               </EuiFlexItem>
               <EuiFlexItem grow={false} style={{marginTop: 10, marginLeft: 4}}>
                 <EuiToolTip position='top' content='Unpin agent'>

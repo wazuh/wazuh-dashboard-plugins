@@ -282,7 +282,7 @@ export class OverviewController {
         timefilter.setRefreshInterval(this.commonData.getRefreshInterval());
       }
 
-      if (typeof this.agentsCountTotal === 'undefined') {
+      if (typeof this.agentsCount === 'undefined') {
         await this.getSummary();
       }
 
@@ -329,22 +329,10 @@ export class OverviewController {
    */
   async getSummary() {
     try {
-      const data = await WzRequest.apiReq('GET', '/agents/summary/status', {});
-
-      const result = ((data || {}).data || {}).data || false;
-
-      if (result) {
-        const active = result.active;
-        const total = result.total;
-        this.agentsCountActive = active;
-        this.agentsCountDisconnected = result.disconnected;
-        this.agentsCountNeverConnected = result['never_connected'];
-        this.agentsCountTotal = total;
-        this.welcomeCardsProps.agentsCountTotal = total;
-        this.agentsCoverity = total ? (active / total) * 100 : 0;
-      } else {
-        throw new Error('Error fetching /agents/summary from Wazuh API');
-      }
+      const {data: { data }} = await WzRequest.apiReq('GET', '/agents/summary/status', {});
+      this.agentsCount = data;
+      this.welcomeCardsProps.agentsCountTotal = data.total;
+      this.agentsCoverity = data.total ? (data.active / data.total) * 100 : 0;
     } catch (error) {
       return Promise.reject(error);
     }

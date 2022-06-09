@@ -25,6 +25,7 @@ import { updateMetric } from '../redux/actions/visualizationsActions';
 import { GenericRequest } from '../react-services/generic-request';
 import { createSavedVisLoader } from './visualizations/saved_visualizations';
 import { WzDatePicker } from '../components/wz-date-picker/wz-date-picker';
+import { PersistedState } from '../../../../src/plugins/visualizations/public';
 import {
   EuiLoadingChart,
   EuiLoadingSpinner,
@@ -282,10 +283,24 @@ class KibanaVis extends Component {
           const visState = await getVisualizationsPlugin().convertToSerializedVis(
             this.visualization
           );
+          
+          // In Kibana 7.10.2, there is a bug when creating the visualization with `createVis` method of the Visualization plugin that doesn't pass the `visState` parameter to the `Vis` class constructor.
+          // This does the `.params`, `.uiState` and `.id` properties of the visualization are not set correctly in the `Vis` class constructor. This bug causes
+          // that the visualization, for example, doesn't use the defined colors in the `.uiStateJSON` property.
+          // `createVis` method of Visualizations plugin: https://github.com/elastic/kibana/blob/v7.10.2/src/plugins/visualizations/public/plugin.ts#L207-L211
+          // `Vis` class constructor: https://github.com/elastic/kibana/blob/v7.10.2/src/plugins/visualizations/public/vis.ts#L99-L104
+          // This problem would be fixed replicating the logic of Visualization plugin's `createVis` method and passing the expected parameters to the `Vis` class constructor
+          // but there is an error in the generated plugin package in production related to `Types was not set`.
+          // The remediation is creating the visualization with `.createVis` and set the `.params` and `.uiState` and `.id` properties
+          // as is done in the `Vis` class constructor https://github.com/elastic/kibana/blob/v7.10.2/src/plugins/visualizations/public/vis.ts#L99-L104
           const vis = await getVisualizationsPlugin().createVis(
             this.visualization.visState.type,
             visState
           );
+          vis.params = vis.getParams(visState.params);
+          vis.uiState = new PersistedState(visState.uiState);
+          vis.id = visState.id;
+          
           this.visHandler = await getVisualizationsPlugin().__LEGACY.createVisEmbeddableFromObject(
             vis,
             visInput

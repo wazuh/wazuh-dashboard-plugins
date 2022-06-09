@@ -358,10 +358,41 @@ export const PLUGIN_PLATFORM_BASE_INSTALLATION_PATH = '/usr/share/kibana/data/wa
 export const PLUGIN_PLATFORM_INSTALLATION_USER = 'kibana';
 export const PLUGIN_PLATFORM_INSTALLATION_USER_GROUP = 'kibana';
 export const PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_UPGRADE_PLATFORM = 'https://documentation.wazuh.com/current/upgrade-guide/';
-export const PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_TROUBLESHOOTING = 'https://documentation.wazuh.com/current/user-manual/kibana-app/troubleshooting.html';
-export const PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_APP_CONFIGURATION = 'https://documentation.wazuh.com/current/user-manual/kibana-app/reference/config-file.html';
+export const PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_TROUBLESHOOTING = 'https://documentation.wazuh.com/current/user-manual/elasticsearch/troubleshooting.html';
+export const PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_APP_CONFIGURATION = 'https://documentation.wazuh.com/current/user-manual/wazuh-dashboard/config-file.html';
 export const PLUGIN_PLATFORM_URL_GUIDE = 'https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html';
 export const PLUGIN_PLATFORM_URL_GUIDE_TITLE = 'Elastic guide';
 export const PLUGIN_PLATFORM_REQUEST_HEADERS = {
   'kbn-xsrf': 'kibana'
 };
+
+// UI
+export const API_NAME_AGENT_STATUS = {
+  ACTIVE: 'active',
+  DISCONNECTED: 'disconnected',
+  PENDING: 'pending',
+  NEVER_CONNECTED: 'never_connected',
+} as const;
+
+export const UI_COLOR_AGENT_STATUS = {
+  [API_NAME_AGENT_STATUS.ACTIVE]: '#007871',
+  [API_NAME_AGENT_STATUS.DISCONNECTED]: '#BD271E',
+  [API_NAME_AGENT_STATUS.PENDING]: '#FEC514',
+  [API_NAME_AGENT_STATUS.NEVER_CONNECTED]: '#646A77',
+  default: '#000000'
+} as const;
+
+export const UI_LABEL_NAME_AGENT_STATUS = {
+  [API_NAME_AGENT_STATUS.ACTIVE]: 'Active',
+  [API_NAME_AGENT_STATUS.DISCONNECTED]: 'Disconnected',
+  [API_NAME_AGENT_STATUS.PENDING]: 'Pending',
+  [API_NAME_AGENT_STATUS.NEVER_CONNECTED]: 'Never connected',
+  default: 'Unknown'
+} as const
+
+export const UI_ORDER_AGENT_STATUS = [
+  API_NAME_AGENT_STATUS.ACTIVE,
+  API_NAME_AGENT_STATUS.DISCONNECTED,
+  API_NAME_AGENT_STATUS.PENDING,
+  API_NAME_AGENT_STATUS.NEVER_CONNECTED  
+]

@@ -43,9 +43,10 @@ import { getAgentFilterValues } from '../../../controllers/management/components
 import { WzButtonPermissions } from '../../../components/common/permissions/button';
 import { formatUIDate } from '../../../react-services/time-service';
 import { withErrorBoundary } from '../../../components/common/hocs';
-import { UI_LOGGER_LEVELS } from '../../../../common/constants';
+import { API_NAME_AGENT_STATUS, UI_LOGGER_LEVELS, UI_ORDER_AGENT_STATUS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
+import { AgentStatus } from '../../../components/agents/agent_status';
 
 export const AgentsTable = withErrorBoundary(
   class AgentsTable extends Component {
@@ -74,7 +75,7 @@ export const AgentsTable = withErrorBoundary(
           label: 'status',
           description: 'Filter by agent connection status',
           operators: ['=', '!='],
-          values: ['active', 'disconnected', 'never_connected', 'pending'],
+          values: UI_ORDER_AGENT_STATUS,
         },
         {
           type: 'q',
@@ -355,7 +356,7 @@ export const AgentsTable = withErrorBoundary(
             />
           </EuiToolTip>
           &nbsp;
-          {agent.status !== 'never_connected' && (
+          {agent.status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED && (
             <EuiToolTip content="Open configuration for this agent" position="left">
               <EuiButtonIcon
                 onClick={(ev) => {
@@ -399,26 +400,6 @@ export const AgentsTable = withErrorBoundary(
           ></i>{' '}
           {os_name === '- -' ? '-' : os_name}
         </span>
-      );
-    }
-
-    addHealthStatusRender(status) {
-      const color = (status) => {
-        if (status.toLowerCase() === 'active') {
-          return 'success';
-        } else if (status.toLowerCase() === 'disconnected') {
-          return 'danger';
-        } else if (status.toLowerCase() === 'never_connected') {
-          return 'subdued';
-        }
-      };
-
-      return (
-        <EuiHealth color={color(status)}>
-          <span className={'hide-agent-status'}>
-            {status === 'never_connected' ? 'never connected' : status}
-          </span>
-        </EuiHealth>
       );
     }
 
@@ -509,11 +490,11 @@ export const AgentsTable = withErrorBoundary(
         (selectedItems.length > 0 && selectedItems.filter((item) => item.outdated).length === 0) ||
         (selectedItems.length > 0 && selectedItems.filter((item) => item.upgrading).length > 0) ||
         (selectedItems.length > 0 &&
-          selectedItems.filter((item) => item.status === 'Active').length === 0) ||
+          selectedItems.filter((item) => item.status === API_NAME_AGENT_STATUS.ACTIVE).length === 0) ||
         (selectedItems.length > 0 &&
-          selectedItems.filter((item) => item.status === 'Active').length === 0 &&
-          selectedItems.filter((item) => item.status === 'Disconnected').length > 0) ||
-        selectedItems.filter((item) => item.outdated && item.status === 'Active').length === 0
+          selectedItems.filter((item) => item.status === API_NAME_AGENT_STATUS.ACTIVE).length === 0 &&
+          selectedItems.filter((item) => item.status === API_NAME_AGENT_STATUS.DISCONNECTED).length > 0) ||
+        selectedItems.filter((item) => item.outdated && item.status === API_NAME_AGENT_STATUS.ACTIVE).length === 0
       ) {
         return;
       }
@@ -522,7 +503,7 @@ export const AgentsTable = withErrorBoundary(
         <EuiFlexItem grow={false}>
           <EuiButton color="secondary" iconType="sortUp" onClick={this.onClickUpgrade}>
             Upgrade{' '}
-            {selectedItems.filter((item) => item.outdated && item.status === 'Active').length}{' '}
+            {selectedItems.filter((item) => item.outdated && item.status === API_NAME_AGENT_STATUS.ACTIVE).length}{' '}
             agents
           </EuiButton>
         </EuiFlexItem>
@@ -535,7 +516,7 @@ export const AgentsTable = withErrorBoundary(
       if (
         selectedItems.length > 0 &&
         avaibleAgents.filter(
-          (agent) => agent.version !== 'Wazuh ' + managerVersion && agent.status === 'Active'
+          (agent) => agent.version !== 'Wazuh ' + managerVersion && agent.status === API_NAME_AGENT_STATUS.ACTIVE
         ).length === 0
       ) {
         return;
@@ -555,7 +536,7 @@ export const AgentsTable = withErrorBoundary(
 
       if (
         selectedItems.length === 0 ||
-        selectedItems.filter((item) => item.status === 'Active').length === 0
+        selectedItems.filter((item) => item.status === API_NAME_AGENT_STATUS.ACTIVE).length === 0
       ) {
         return;
       }
@@ -563,7 +544,7 @@ export const AgentsTable = withErrorBoundary(
       return (
         <EuiFlexItem grow={false}>
           <EuiButton color="primary" iconType="refresh" onClick={this.onClickRestart}>
-            Restart {selectedItems.filter((item) => item.status === 'Active').length} agents
+            Restart {selectedItems.filter((item) => item.status === API_NAME_AGENT_STATUS.ACTIVE).length} agents
           </EuiButton>
         </EuiFlexItem>
       );
@@ -574,7 +555,7 @@ export const AgentsTable = withErrorBoundary(
 
       if (
         (selectedItems.length > 0 &&
-          avaibleAgents.filter((item) => item.status === 'Active').length === 0 &&
+          avaibleAgents.filter((item) => item.status === API_NAME_AGENT_STATUS.ACTIVE).length === 0 &&
           selectedItems.length === 0) ||
         agentActive === 0
       ) {
@@ -862,7 +843,7 @@ export const AgentsTable = withErrorBoundary(
           truncateText: true,
           sortable: true,
           width: '15%',
-          render: this.addHealthStatusRender,
+          render: (status) => <AgentStatus status={status} labelProps={{className: 'hide-agent-status' }}/>,
         },
         {
           align: 'right',
