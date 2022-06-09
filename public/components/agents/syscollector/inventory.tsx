@@ -15,9 +15,10 @@ import { EuiEmptyPrompt, EuiButton, EuiFlexGroup, EuiFlexItem, EuiCallOut } from
 import { InventoryMetrics } from './components/syscollector-metrics';
 import { SyscollectorTable } from './components/syscollector-table';
 import { processColumns, portsColumns, packagesColumns } from './columns';
+import { API_NAME_AGENT_STATUS } from '../../../../common/constants';
 
 export function SyscollectorInventory({ agent }) {
-  if (agent && agent.status === 'never_connected') {
+  if (agent && agent.status === API_NAME_AGENT_STATUS.NEVER_CONNECTED) {
     return (
       <EuiEmptyPrompt
         iconType="securitySignalDetected"
@@ -72,7 +73,7 @@ export function SyscollectorInventory({ agent }) {
 
   return (
     <div style={{ overflow: 'hidden' }}>
-      {agent && agent.status === 'disconnected' && (
+      {agent && agent.status === API_NAME_AGENT_STATUS.DISCONNECTED && (
         <EuiCallOut
           style={{ margin: '8px 16px 8px 16px' }}
           title="This agent is currently disconnected, the data may be outdated."
