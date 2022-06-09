@@ -4,6 +4,12 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ## Wazuh v4.3.4 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4305
 
+### Fixed
+
+- Removed a logged error that appeared when the `statistics` tasks tried to create a index with the same name, causing that the second task failed the creation of the index because it already existed [#4235](https://github.com/wazuh/wazuh-kibana-app/pull/4235)
+
+## Wazuh v4.3.4 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4305
+
 ### Added
 
 - Added the `pending` agent status to some sections that was missing 
