@@ -47,6 +47,7 @@ import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { WzFlyout } from '../../../components/common/flyouts';
 import _ from 'lodash';
+import { getToasts } from '../../../kibana-services';
 
 type LogstestProps = {
   openCloseFlyout: () => {};
@@ -71,7 +72,7 @@ export const Logtest = compose(
   };
 
   // Format the result of the Wazuh API response to an output similar one to the `wazuh-logtest` utility
-  const formatResult = (result, alert) => {
+  const formatResult = (result, alert, messages) => {
     // How to the `wazuh-logtest` utility logs the output:
     // https://github.com/wazuh/wazuh/blob/master/framework/scripts/wazuh-logtest.py#L359-L397
 
@@ -98,6 +99,20 @@ export const Logtest = compose(
           showFieldInfo(item, field, prefix+field);
         };
       });
+    }
+
+    // Output messages
+    if(messages){
+      logging.push('**Messages:')
+
+      let message = ''
+
+      messages.map((msg) => {
+        message += '\t' + msg + '\n'
+        return message
+      })
+
+      logging.push(message)
     }
 
     // Pre-decoding phase
@@ -148,12 +163,22 @@ export const Logtest = compose(
     return logging.join('\n');
   };  
 
+  // const showToast = (color, title, text, time = 5000) => {
+  //   getToasts().add({
+  //     color: color,
+  //     title: title,
+  //     text: text,
+  //     toastLifeTimeMs: time
+  //   });
+  // }
+
   const runAllTests = async () => {
     setTestResult('');
     setTesting(true);
     let token = sessionToken;
     const responses = [];
     let gotToken = Boolean(token);
+    // let messages = []
 
     try {
       for (let event of events) {
@@ -165,13 +190,33 @@ export const Logtest = compose(
         });
 
         token = response.data.data.token;
+        // messages.push(response.data.data.messages)
         !sessionToken && !gotToken && token && dispatch(updateLogtestToken(token));
         token && (gotToken = true);
         responses.push(response);
+
+        
+        // messages && showToast(
+        //   'primary', 
+        //   'Messages',
+        //   <Fragment>
+        //     <div>{response.data.data.output.full_log}</div>
+        //     <ul>
+        //       {messages.map((message) => (
+        //         <li
+        //           key={message}
+        //           style={{ listStyle: 'circle' }}
+        //         >
+        //           {message}
+        //         </li>
+        //       ))}
+        //     </ul>
+        //   </Fragment>  
+        // );
       }
       const testResults = responses.map((response) => {
         return response.data.data.output || ''
-          ? formatResult(response.data.data.output, response.data.data.alert)
+          ? formatResult(response.data.data.output, response.data.data.alert, response.data.data.messages)
           : `No result found for: ${response.data.data.output.full_log}`;
       }).join('\n\n');
       setTestResult(testResults);
