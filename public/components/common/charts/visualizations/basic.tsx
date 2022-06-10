@@ -70,7 +70,8 @@ export const VisualizationBasic = ({
     }
     const legendFlexStyle = {
       height:'100%',
-      paddingLeft: '1em'
+      paddingLeft: '1em',
+      justifyContent: 'center'
     }
     visualization = (
       <EuiFlexGroup responsive={false} style={{ height:'100%'}} gutterSize='none'>
