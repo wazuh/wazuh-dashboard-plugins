@@ -47,7 +47,6 @@ import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { WzFlyout } from '../../../components/common/flyouts';
 import _ from 'lodash';
-import { getToasts } from '../../../kibana-services';
 
 type LogstestProps = {
   openCloseFlyout: () => {};
@@ -102,16 +101,16 @@ export const Logtest = compose(
     }
 
     // Output messages
-    if(messages){
-      logging.push('**Messages:')
+    if (messages) {
+      logging.push('**Messages:');
 
-      let message = ''
+      const initialValue = ""
+      const message = messages.reduce(
+        (previousValue, currentValue) => previousValue + '\t' + currentValue + '\n',
+        initialValue
+      );
 
-      messages.forEach((msg) => {
-        message += '\t' + msg + '\n'
-      })
-
-      logging.push(message)
+      logging.push(message);
     }
 
     // Pre-decoding phase
