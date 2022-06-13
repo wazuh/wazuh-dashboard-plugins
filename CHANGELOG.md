@@ -13,6 +13,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Changed
 
 - Changed the word Manager to Wazuh server from the phrases that appeared in "Deploy a new agent". [#4239](https://github.com/wazuh/wazuh-kibana-app/pull/4239)
+- The two graphs, the lists and the select were centered. The font size was also corrected to the same used in the table. [#4254](https://github.com/wazuh/wazuh-kibana-app/pull/4254)
 
 
 ## Wazuh v4.3.4 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4305
