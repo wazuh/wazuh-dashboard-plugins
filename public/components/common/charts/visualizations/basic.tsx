@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from "react";
+import type { ReactNode } from "react";
 import { ChartLegend } from "./legend";
 import { ChartDonut, ChartDonutProps } from '../charts/donut';
 import { EuiEmptyPrompt, EuiFlexGroup, EuiFlexItem, EuiLoadingChart, EuiText, EuiSelect } from '@elastic/eui';
@@ -10,11 +11,11 @@ export type VisualizationBasicProps = ChartDonutProps & {
   showLegend?: boolean
   isLoading?: boolean
   noDataTitle?: string
-  noDataMessage?: string | (() => React.node)
+  noDataMessage?: string | ReactNode
   errorTitle?: string
-  errorMessage?: string | (() => React.node)
+  errorMessage?: string | ReactNode
   error?: { message: string }
-  select?: () => React.node
+  select?: ReactNode
 }
 
 const chartTypes = {
