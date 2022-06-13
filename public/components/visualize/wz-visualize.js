@@ -76,17 +76,26 @@ export const WzVisualize = compose(
       this.agentsStatus = false;
     }
 
+    /**
+     * Reset the visualizations when the type of Dashboard is changed.
+     * 
+     * There are 2 kinds of Dashboards:
+     *   - General or overview   --> When to agent is pinned.
+     *   - Specific or per agent --> When there is an agent pinned.
+     * 
+     * The visualizations are reset only when the type of Dashboard changes 
+     * from a type to another, but aren't when the pinned agent changes.
+     * 
+     * More info:
+     * https://github.com/wazuh/wazuh-kibana-app/issues/4230#issuecomment-1152161434
+     * 
+     * @param {Object} prevProps 
+     */
     async componentDidUpdate(prevProps) {
-      // When in a module changing from without selected agent to selected agent or viceversa, set the visualizations
-      // and remove the visualizations handlers of the VisHandlers singleton.
-      // The visualization handlers in the VisHandlers singleton are used in the generation of the reports
-      // getting the filters. Due to some side effects, and the two types of dashboard: without selected agent
-      // or with a selected agent, we can't remove the visualization handlers when changing of the selected agent
-      // that renders the same dashboard, only changing a filter, because would cause an error when generating
-      // the module report since the visualization handlers are used to get the applied filters and send the 
-      // data to the plugin endpoint that creates the report.
-      // More info: https://github.com/wazuh/wazuh-kibana-app/issues/4230#issuecomment-1152161434
-      if ((!prevProps.isAgent && this.props.isAgent) || (prevProps.isAgent && !this.props.isAgent)) {
+      if (
+        (!prevProps.isAgent && this.props.isAgent) ||
+        (prevProps.isAgent && !this.props.isAgent)
+      ) {
         this._isMount &&
           this.setState({
             visualizations: !!this.props.isAgent ? agentVisualizations : visualizations,
