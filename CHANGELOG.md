@@ -7,10 +7,12 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Fixed
 
 - Fixed type error when changing screen size in agents section [#4233](https://github.com/wazuh/wazuh-kibana-app/pull/4233)
+- Fixed an error when generating a module report after changing the selected agent [#4240](https://github.com/wazuh/wazuh-kibana-app/pull/4240)
 
 ### Changed
 
 - Changed the word Manager to Wazuh server from the phrases that appeared in "Deploy a new agent". [#4239](https://github.com/wazuh/wazuh-kibana-app/pull/4239)
+
 
 ## Wazuh v4.3.4 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4305
 
