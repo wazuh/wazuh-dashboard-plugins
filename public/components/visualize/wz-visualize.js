@@ -76,13 +76,31 @@ export const WzVisualize = compose(
       this.agentsStatus = false;
     }
 
+    /**
+     * Reset the visualizations when the type of Dashboard is changed.
+     * 
+     * There are 2 kinds of Dashboards:
+     *   - General or overview   --> When to agent is pinned.
+     *   - Specific or per agent --> When there is an agent pinned.
+     * 
+     * The visualizations are reset only when the type of Dashboard changes 
+     * from a type to another, but aren't when the pinned agent changes.
+     * 
+     * More info:
+     * https://github.com/wazuh/wazuh-kibana-app/issues/4230#issuecomment-1152161434
+     * 
+     * @param {Object} prevProps 
+     */
     async componentDidUpdate(prevProps) {
-      if (prevProps.isAgent !== this.props.isAgent) {
+      if (
+        (!prevProps.isAgent && this.props.isAgent) ||
+        (prevProps.isAgent && !this.props.isAgent)
+      ) {
         this._isMount &&
           this.setState({
             visualizations: !!this.props.isAgent ? agentVisualizations : visualizations,
           });
-        typeof prevProps.isAgent !== 'undefined' && visHandler.removeAll();
+        visHandler.removeAll();
       }
     }
 
