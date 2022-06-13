@@ -6,6 +6,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
+- Fixed a UI crash due to a query with syntax errors in `Modules/Security events` [#4237](https://github.com/wazuh/wazuh-kibana-app/pull/4237)
 - Fixed type error when changing screen size in agents section [#4233](https://github.com/wazuh/wazuh-kibana-app/pull/4233)
 - Fixed an error when generating a module report after changing the selected agent [#4240](https://github.com/wazuh/wazuh-kibana-app/pull/4240)
 
