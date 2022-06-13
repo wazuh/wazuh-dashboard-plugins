@@ -4,9 +4,15 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ## Wazuh v4.3.5 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4306
 
+
 ### Fixed
 
 - Fixed an error when generating a module report after changing the selected agent [#4240](https://github.com/wazuh/wazuh-kibana-app/pull/4240)
+
+### Changed
+
+- Changed the word Manager to Wazuh server from the phrases that appeared in "Deploy a new agent". [#4239](https://github.com/wazuh/wazuh-kibana-app/pull/4239)
+
 
 ## Wazuh v4.3.4 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4305
 
