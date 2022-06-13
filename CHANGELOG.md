@@ -2,6 +2,12 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.3.5 - OpenSearch Dashboards 1.2.0 - Revision 4306
+
+### Changed
+
+- Changed the word Manager to Wazuh server from the phrases that appeared in "Deploy a new agent". [#4239](https://github.com/wazuh/wazuh-kibana-app/pull/4239)
+
 ## Wazuh v4.3.4 - OpenSearch Dashboards 1.2.0 - Revision 4305
 
 ### Added
