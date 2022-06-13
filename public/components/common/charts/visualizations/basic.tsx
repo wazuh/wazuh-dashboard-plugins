@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from "react";
 import { ChartLegend } from "./legend";
 import { ChartDonut, ChartDonutProps } from '../charts/donut';
-import { EuiEmptyPrompt, EuiFlexGroup, EuiFlexItem, EuiLoadingChart, EuiText, EuiSelect, EuiSpacer } from '@elastic/eui';
+import { EuiEmptyPrompt, EuiFlexGroup, EuiFlexItem, EuiLoadingChart, EuiText, EuiSelect } from '@elastic/eui';
 import { useAsyncActionRunOnStart } from "../../hooks";
 
 export type VisualizationBasicProps = ChartDonutProps & {
