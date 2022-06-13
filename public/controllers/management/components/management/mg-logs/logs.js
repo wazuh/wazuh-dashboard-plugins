@@ -52,7 +52,7 @@ export default compose(
   class WzLogs extends Component {
     constructor(props) {
       super(props);
-      this.offset = 350;
+      this.offset = 400;
       this.state = {
         isCluster: false,
         selectedDaemon: '',
@@ -383,7 +383,7 @@ export default compose(
 
     exportFormatted = async () => {
       try {
-        this.setState({generatingCsv: true})
+        this.setState({ generatingCsv: true });
         this.showToast('success', 'Your download should begin automatically...', 3000);
         const filters = this.buildFilters();
         await exportCsv(
@@ -405,7 +405,7 @@ export default compose(
         };
         getErrorOrchestrator().handleError(options);
       }
-      this.setState({generatingCsv: false})
+      this.setState({ generatingCsv: false });
     };
 
     header() {
@@ -424,10 +424,11 @@ export default compose(
             <EuiFlexItem grow={false}>
               <EuiFlexGroup>
                 <EuiFlexItem grow={false}>
-                  <EuiButtonEmpty 
-                    iconType="importAction" 
+                  <EuiButtonEmpty
+                    iconType="importAction"
                     onClick={this.exportFormatted}
-                    isLoading={this.state.generatingCsv}>
+                    isLoading={this.state.generatingCsv}
+                  >
                     Export formatted
                   </EuiButtonEmpty>
                 </EuiFlexItem>
