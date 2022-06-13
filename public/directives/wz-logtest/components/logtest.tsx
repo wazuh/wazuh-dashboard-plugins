@@ -107,9 +107,8 @@ export const Logtest = compose(
 
       let message = ''
 
-      messages.map((msg) => {
+      messages.forEach((msg) => {
         message += '\t' + msg + '\n'
-        return message
       })
 
       logging.push(message)
@@ -163,22 +162,12 @@ export const Logtest = compose(
     return logging.join('\n');
   };  
 
-  // const showToast = (color, title, text, time = 5000) => {
-  //   getToasts().add({
-  //     color: color,
-  //     title: title,
-  //     text: text,
-  //     toastLifeTimeMs: time
-  //   });
-  // }
-
   const runAllTests = async () => {
     setTestResult('');
     setTesting(true);
     let token = sessionToken;
     const responses = [];
     let gotToken = Boolean(token);
-    // let messages = []
 
     try {
       for (let event of events) {
@@ -190,29 +179,9 @@ export const Logtest = compose(
         });
 
         token = response.data.data.token;
-        // messages.push(response.data.data.messages)
         !sessionToken && !gotToken && token && dispatch(updateLogtestToken(token));
         token && (gotToken = true);
         responses.push(response);
-
-        
-        // messages && showToast(
-        //   'primary', 
-        //   'Messages',
-        //   <Fragment>
-        //     <div>{response.data.data.output.full_log}</div>
-        //     <ul>
-        //       {messages.map((message) => (
-        //         <li
-        //           key={message}
-        //           style={{ listStyle: 'circle' }}
-        //         >
-        //           {message}
-        //         </li>
-        //       ))}
-        //     </ul>
-        //   </Fragment>  
-        // );
       }
       const testResults = responses.map((response) => {
         return response.data.data.output || ''
