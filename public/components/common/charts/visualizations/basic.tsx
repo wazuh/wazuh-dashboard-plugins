@@ -1,4 +1,4 @@
-import React, { useCallback, useState} from "react";
+import React, { useCallback, useState } from "react";
 import { ChartLegend } from "./legend";
 import { ChartDonut, ChartDonutProps } from '../charts/donut';
 import { EuiEmptyPrompt, EuiFlexGroup, EuiFlexItem, EuiLoadingChart, EuiText, EuiSelect, EuiSpacer } from '@elastic/eui';
@@ -6,14 +6,15 @@ import { useAsyncActionRunOnStart } from "../../hooks";
 
 export type VisualizationBasicProps = ChartDonutProps & {
   type: 'donut',
-  size: number | string | {width: number | string, height: number | string}
+  size: number | string | { width: number | string, height: number | string }
   showLegend?: boolean
   isLoading?: boolean
   noDataTitle?: string
   noDataMessage?: string | (() => React.node)
   errorTitle?: string
   errorMessage?: string | (() => React.node)
-  error?: {message: string}
+  error?: { message: string }
+  select?: () => React.node
 }
 
 const chartTypes = {
@@ -34,19 +35,20 @@ export const VisualizationBasic = ({
   noDataMessage,
   errorTitle = 'Error',
   errorMessage,
-  error
+  error,
+  select
 }: VisualizationBasicProps) => {
   const { width, height } = typeof size === 'object' ? size : { width: size, height: size };
-  
+
   let visualization = null;
 
-  if(isLoading){
+  if (isLoading) {
     visualization = (
-      <div style={{ textAlign: "center", width, height, position: 'relative'}}>
-        <EuiLoadingChart size="xl" style={{top: '50%', transform:'translate(-50%, -50%)', position: 'absolute'}}/>
+      <div style={{ textAlign: "center", width, height, position: 'relative' }}>
+        <EuiLoadingChart size="xl" style={{ top: '50%', transform: 'translate(-50%, -50%)', position: 'absolute' }} />
       </div>
     )
-  }else if(errorMessage || error?.message){
+  } else if (errorMessage || error?.message) {
     visualization = (
       <EuiEmptyPrompt
         iconType="alert"
@@ -54,7 +56,7 @@ export const VisualizationBasic = ({
         body={errorMessage || error?.message}
       />
     )
-  }else if(!data || (Array.isArray(data) && !data.length)){
+  } else if (!data || (Array.isArray(data) && !data.length)) {
     visualization = (
       <EuiEmptyPrompt
         iconType="stats"
@@ -62,24 +64,26 @@ export const VisualizationBasic = ({
         body={typeof noDataMessage === 'function' ? noDataMessage() : noDataMessage}
       />
     )
-  }else{
+  } else {
     const Chart = chartTypes[type];
     const chartFlexStyle = {
       alignItems: 'flex-end',
       paddingRight: '1em'
     }
     const legendFlexStyle = {
-      height:'100%',
+      height: '100%',
       paddingLeft: '1em',
       justifyContent: 'center'
     }
     visualization = (
-      <EuiFlexGroup responsive={false} style={{ height:'100%'}} gutterSize='none'>
+      <EuiFlexGroup responsive={false} style={{ height: '100%' }} gutterSize='none'>
         <EuiFlexItem style={chartFlexStyle}>
-          <Chart data={data}/>
+          <Chart data={data} />
         </EuiFlexItem>
-        {showLegend && (
+        {/* Select is optional if it arrives the selector is rendered */}
+        {(showLegend || select) && (
           <EuiFlexItem style={legendFlexStyle}>
+            {select}
             <ChartLegend
               data={data.map(({ color, ...rest }) => ({ ...rest, labelColor: color, color: 'text' }))}
             />
@@ -90,7 +94,7 @@ export const VisualizationBasic = ({
   }
 
   return (
-    <div style={{ width, height}}>
+    <div style={{ width, height }}>
       {visualization}
     </div>
   )
@@ -105,14 +109,14 @@ type VisualizationBasicWidgetProps = VisualizationBasicProps & {
 /**
  * Component that fetch the data and renders the visualization using the visualization basic component
  */
-export const VisualizationBasicWidget = ({onFetch, onFetchDependencies, ...rest}: VisualizationBasicWidgetProps) => {
-  const {running, ...restAsyncAction} = useAsyncActionRunOnStart(onFetch, onFetchDependencies);
+export const VisualizationBasicWidget = ({ onFetch, onFetchDependencies, ...rest }: VisualizationBasicWidgetProps) => {
+  const { running, ...restAsyncAction } = useAsyncActionRunOnStart(onFetch, onFetchDependencies);
 
-  return <VisualizationBasic {...rest} {...restAsyncAction} isLoading={running}/>
+  return <VisualizationBasic {...rest} {...restAsyncAction} isLoading={running} />
 }
 
 type VisualizationBasicWidgetSelectorProps = VisualizationBasicWidgetProps & {
-  selectorOptions: {value: any, text: string}[]
+  selectorOptions: { value: any, text: string }[]
   title?: string
   onFetchExtraDependencies?: any[]
 }
@@ -120,11 +124,11 @@ type VisualizationBasicWidgetSelectorProps = VisualizationBasicWidgetProps & {
 /**
  * Renders a visualization that has a selector to change the resource to fetch data and display it. Use the visualization basic. 
  */
-export const VisualizationBasicWidgetSelector = ({selectorOptions, title, onFetchExtraDependencies, ...rest}: VisualizationBasicWidgetSelectorProps) => {
+export const VisualizationBasicWidgetSelector = ({ selectorOptions, title, onFetchExtraDependencies, ...rest }: VisualizationBasicWidgetSelectorProps) => {
   const [selectedOption, setSelectedOption] = useState(selectorOptions[0].value);
 
   const onChange = useCallback((e) => setSelectedOption(e.target.value));
-  
+
   return (
     <>
       <EuiFlexGroup
@@ -137,17 +141,7 @@ export const VisualizationBasicWidgetSelector = ({selectorOptions, title, onFetc
             </h2>
           )}
         </EuiFlexItem>
-        <EuiFlexItem grow={false}>
-          <EuiSelect
-            compressed={true}
-            options={selectorOptions}
-            value={selectedOption}
-            onChange={onChange}
-            aria-label="Select options"
-          />
-        </EuiFlexItem>
       </EuiFlexGroup>
-      <EuiSpacer size='s'/>
       <VisualizationBasicWidget
         {...rest}
         {...(rest.noDataMessage ?
@@ -158,8 +152,15 @@ export const VisualizationBasicWidgetSelector = ({selectorOptions, title, onFetc
           }
           : {}
         )}
-        onFetchDependencies={[selectedOption,...(onFetchExtraDependencies || [])]}
+        onFetchDependencies={[selectedOption, ...(onFetchExtraDependencies || [])]}
+        select={(<EuiSelect style={{ paddingLeft: '0.438rem' }}
+          compressed={true}
+          options={selectorOptions}
+          value={selectedOption}
+          onChange={onChange}
+          aria-label="Select options"
+        />)}
       />
     </>
-  ) 
+  )
 }
