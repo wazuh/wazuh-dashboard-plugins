@@ -4,9 +4,20 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ## Wazuh v4.3.5 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4306
 
+### Added
+
+- Added to the interface API messages in the Ruleset test module [#4244](https://github.com/wazuh/wazuh-kibana-app/pull/4244)
+
+### Changed
+
+- Changed the reference from Manager to Wazuh server in the guide to deploy a new agent [#4239](https://github.com/wazuh/wazuh-kibana-app/pull/4239)
+
 ### Fixed
 
+- Fixed a UI crash due to a query with syntax errors in `Modules/Security events` [#4237](https://github.com/wazuh/wazuh-kibana-app/pull/4237)
+- Fixed type error when changing screen size in agents section [#4233](https://github.com/wazuh/wazuh-kibana-app/pull/4233)
 - Removed a logged error that appeared when the `statistics` tasks tried to create an index with the same name, causing the second task to fail on the creation of the index because it already exists [#4235](https://github.com/wazuh/wazuh-kibana-app/pull/4235)
+- Fixed an error when generating a module report after changing the selected agent [#4240](https://github.com/wazuh/wazuh-kibana-app/pull/4240)
 
 ## Wazuh v4.3.4 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4305
 
