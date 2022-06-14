@@ -41,6 +41,7 @@ import { WzFieldSearch } from '../../../../../components/wz-field-search-bar/wz-
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
+import { WindowScroller } from 'react-virtualized';
 
 export default compose(
   withGlobalBreadcrumb([{ text: '' }, { text: 'Management', href: '#/manager' }, { text: 'Logs' }]),
@@ -52,7 +53,6 @@ export default compose(
   class WzLogs extends Component {
     constructor(props) {
       super(props);
-      //this.offset = 400;
       this.state = {
         isCluster: false,
         selectedDaemon: '',
@@ -74,8 +74,18 @@ export default compose(
       this.ITEM_STYLE = { width: '300px' };
     }
 
+    /**
+     * Calculate offset depends on screen height resolution
+     */
     get offset() {
-      const offsetHeightPercent = 49;
+      let offsetHeightPercent = 49;
+      if (window.innerHeight < 540) offsetHeightPercent = 80;
+      if (window.innerHeight >= 540 && window.innerHeight < 720) offsetHeightPercent = 60;
+      if (window.innerHeight >= 720 && window.innerHeight < 900) offsetHeightPercent = 55;
+      if (window.innerHeight >= 900 && window.innerHeight < 1080) offsetHeightPercent = 45;
+      if (window.innerHeight >= 1080 && window.innerHeight < 1260) offsetHeightPercent = 40;
+      if (window.innerHeight >= 1260 && window.innerHeight < 1440) offsetHeightPercent = 35;
+      if (window.innerHeight >= 1440) offsetHeightPercent = 30;
       return Math.round(window.innerHeight * (offsetHeightPercent / 100));
     }
 
