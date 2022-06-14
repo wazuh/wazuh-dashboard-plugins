@@ -63,7 +63,6 @@ export class SaveDocument {
         }
       })();
     } catch (error) {
-      log(this.logPath, error.message || error);
       this.checkDuplicateIndexError(error);
     }
   }
