@@ -52,7 +52,7 @@ export default compose(
   class WzLogs extends Component {
     constructor(props) {
       super(props);
-      this.offset = 400;
+      //this.offset = 400;
       this.state = {
         isCluster: false,
         selectedDaemon: '',
@@ -72,6 +72,11 @@ export default compose(
         realTime: false,
       };
       this.ITEM_STYLE = { width: '300px' };
+    }
+
+    get offset() {
+      const offsetHeightPercent = 49;
+      return Math.round(window.innerHeight * (offsetHeightPercent / 100));
     }
 
     updateHeight = () => {
