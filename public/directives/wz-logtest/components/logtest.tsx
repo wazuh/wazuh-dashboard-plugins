@@ -103,14 +103,8 @@ export const Logtest = compose(
     // Output messages
     if (messages) {
       logging.push('**Messages:');
-
-      const initialValue = ""
-      const message = messages.reduce(
-        (previousValue, currentValue) => previousValue + '\t' + currentValue + '\n',
-        initialValue
-      );
-
-      logging.push(message);
+      messages.forEach(message => logging.push(`\t${message}`));
+      logging.push('');
     }
 
     // Pre-decoding phase
