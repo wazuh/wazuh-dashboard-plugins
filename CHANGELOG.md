@@ -4,6 +4,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ## Wazuh v4.3.5 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4306
 
+### Added
+
+- Added to the interface API messages in the Ruleset test module [#4244](https://github.com/wazuh/wazuh-kibana-app/pull/4244)
+
 ### Fixed
 
 - Fixed a UI crash due to a query with syntax errors in `Modules/Security events` [#4237](https://github.com/wazuh/wazuh-kibana-app/pull/4237)

@@ -71,7 +71,7 @@ export const Logtest = compose(
   };
 
   // Format the result of the Wazuh API response to an output similar one to the `wazuh-logtest` utility
-  const formatResult = (result, alert) => {
+  const formatResult = (result, alert, messages) => {
     // How to the `wazuh-logtest` utility logs the output:
     // https://github.com/wazuh/wazuh/blob/master/framework/scripts/wazuh-logtest.py#L359-L397
 
@@ -98,6 +98,13 @@ export const Logtest = compose(
           showFieldInfo(item, field, prefix+field);
         };
       });
+    }
+
+    // Output messages
+    if (messages) {
+      logging.push('**Messages:');
+      messages.forEach(message => logging.push(`\t${message}`));
+      logging.push('');
     }
 
     // Pre-decoding phase
@@ -171,7 +178,7 @@ export const Logtest = compose(
       }
       const testResults = responses.map((response) => {
         return response.data.data.output || ''
-          ? formatResult(response.data.data.output, response.data.data.alert)
+          ? formatResult(response.data.data.output, response.data.data.alert, response.data.data.messages)
           : `No result found for: ${response.data.data.output.full_log}`;
       }).join('\n\n');
       setTestResult(testResults);
