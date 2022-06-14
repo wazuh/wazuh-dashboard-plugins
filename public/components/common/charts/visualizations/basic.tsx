@@ -11,7 +11,7 @@ export type VisualizationBasicProps = ChartDonutProps & {
   showLegend?: boolean
   isLoading?: boolean
   noDataTitle?: string
-  noDataMessage?: string | ReactNode
+  noDataMessage?: string | (() => React.node)
   errorTitle?: string
   errorMessage?: string | ReactNode
   error?: { message: string }
