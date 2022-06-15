@@ -1,8 +1,7 @@
 import React, { useCallback, useState } from "react";
-import type { ReactNode } from "react";
 import { ChartLegend } from "./legend";
 import { ChartDonut, ChartDonutProps } from '../charts/donut';
-import { EuiEmptyPrompt, EuiFlexGroup, EuiFlexItem, EuiLoadingChart, EuiText, EuiSelect } from '@elastic/eui';
+import { EuiEmptyPrompt, EuiFlexGroup, EuiFlexItem, EuiLoadingChart, EuiText, EuiSelect, EuiSpacer } from '@elastic/eui';
 import { useAsyncActionRunOnStart } from "../../hooks";
 
 export type VisualizationBasicProps = ChartDonutProps & {
@@ -13,9 +12,8 @@ export type VisualizationBasicProps = ChartDonutProps & {
   noDataTitle?: string
   noDataMessage?: string | (() => React.node)
   errorTitle?: string
-  errorMessage?: string | ReactNode
+  errorMessage?: string | (() => React.node)
   error?: { message: string }
-  select?: ReactNode
 }
 
 const chartTypes = {
@@ -36,8 +34,7 @@ export const VisualizationBasic = ({
   noDataMessage,
   errorTitle = 'Error',
   errorMessage,
-  error,
-  select
+  error
 }: VisualizationBasicProps) => {
   const { width, height } = typeof size === 'object' ? size : { width: size, height: size };
 
@@ -73,18 +70,15 @@ export const VisualizationBasic = ({
     }
     const legendFlexStyle = {
       height: '100%',
-      paddingLeft: '1em',
-      justifyContent: 'center'
+      paddingLeft: '1em'
     }
     visualization = (
       <EuiFlexGroup responsive={false} style={{ height: '100%' }} gutterSize='none'>
         <EuiFlexItem style={chartFlexStyle}>
           <Chart data={data} />
         </EuiFlexItem>
-        {/* Select is optional if it arrives the selector is rendered */}
-        {(showLegend || select) && (
+        {showLegend && (
           <EuiFlexItem style={legendFlexStyle}>
-            {select}
             <ChartLegend
               data={data.map(({ color, ...rest }) => ({ ...rest, labelColor: color, color: 'text' }))}
             />
@@ -142,7 +136,17 @@ export const VisualizationBasicWidgetSelector = ({ selectorOptions, title, onFet
             </h2>
           )}
         </EuiFlexItem>
+        <EuiFlexItem grow={false}>
+          <EuiSelect style={{ fontSize: '0.793rem' }}
+            compressed={true}
+            options={selectorOptions}
+            value={selectedOption}
+            onChange={onChange}
+            aria-label="Select options"
+          />
+        </EuiFlexItem>
       </EuiFlexGroup>
+      <EuiSpacer size='s' />
       <VisualizationBasicWidget
         {...rest}
         {...(rest.noDataMessage ?
@@ -154,13 +158,6 @@ export const VisualizationBasicWidgetSelector = ({ selectorOptions, title, onFet
           : {}
         )}
         onFetchDependencies={[selectedOption, ...(onFetchExtraDependencies || [])]}
-        select={(<EuiSelect style={{ paddingLeft: '0.438rem' }}
-          compressed={true}
-          options={selectorOptions}
-          value={selectedOption}
-          onChange={onChange}
-          aria-label="Select options"
-        />)}
       />
     </>
   )

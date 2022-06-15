@@ -17,7 +17,7 @@ type ChartLegendProps = {
  */
 export function ChartLegend({ data }: ChartLegendProps) {
   const list = data.map(({label, labelColor, value, ...rest}, idx) => ({
-    label: <div style={{fontSize: '0.875rem'}}>{`${label} (${value})`}</div>,
+    label: <div style={{fontSize: '0.793rem'}}>{`${label} (${value})`}</div>,
     icon: <EuiIcon type="dot" size='l' color={labelColor} />,
     ...rest
   }));
