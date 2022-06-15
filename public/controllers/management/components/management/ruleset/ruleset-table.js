@@ -27,7 +27,7 @@ import {
   updateDecoderInfo,
 } from '../../../../../redux/actions/rulesetActions';
 
-import RulesetColums from './tables/columns';
+import RulesetColums from './components/columns';
 import { WzRequest } from '../../../../../react-services/wz-request';
 import { filtersToObject } from '../../../../../components/wz-search-bar';
 import { withUserPermissions } from '../../../../../components/common/hocs/withUserPermissions';
@@ -36,6 +36,7 @@ import { compose } from 'redux';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
+
 class WzRulesetTable extends Component {
   _isMounted = false;
   constructor(props) {
@@ -187,7 +188,7 @@ class WzRulesetTable extends Component {
     try {
       const requestDefaultItems = await this.wzReq('GET', '/manager/configuration', {
         wait_for_complete: false,
-        section: 'ruleset',
+        section: SECTION_RULES_SECTION,
         field: 'list',
       });
 

@@ -10,7 +10,7 @@ import {
 } from '@elastic/eui';
 
 // Wazuh components
-import RulesetTable from '../tables/ruleset-table';
+import RulesetTable from '../components/ruleset-table';
 import './layout-overview.scss';
 import WzRestartClusterManagerCallout from '../../../../../../components/common/restart-cluster-manager-callout';
 
