@@ -23,7 +23,9 @@ import { PanelSplit } from '../../common/panels';
 import { withUserAuthorizationPrompt } from '../../common/hocs';
 import { compose } from 'redux';
 
-const ModuleMitreAttackIntelligenceComponent = () => {
+export const ModuleMitreAttackIntelligence = compose(
+  withUserAuthorizationPrompt([{ action: 'mitre:read', resource: '*:*:*' }])
+)(() => {
   const [selectedResource, setSelectedResource] = useState(MitreAttackResources[0].id);
   const [searchTermAllResources, setSearchTermAllResources] = useState('');
   const searchTermAllResourcesLastSearch = useRef('');
@@ -116,8 +118,4 @@ const ModuleMitreAttackIntelligenceComponent = () => {
       </EuiFlexItem>
     </EuiFlexGroup>
   );
-};
-
-export const ModuleMitreAttackIntelligence = compose(
-  withUserAuthorizationPrompt([{ action: 'mitre:read', resource: '*:*:*' }])
-)(ModuleMitreAttackIntelligenceComponent);
+});
