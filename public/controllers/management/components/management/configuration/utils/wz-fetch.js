@@ -280,6 +280,7 @@ export const restartNodeSelected = async (
       `Restarting ${isCluster ? selectedNode : 'Manager'}, please wait.`
     ); //FIXME: if it enables/disables cluster, this will show Manager instead node name
     isCluster ? await restartNode(selectedNode) : await restartManager();
+    await delayAsPromise(15000);
     return await makePing(updateWazuhNotReadyYet, isCluster);
   } catch (error) {
     throw error;
