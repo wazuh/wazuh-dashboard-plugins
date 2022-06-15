@@ -23,19 +23,16 @@ import WzDecoderInfo from './views/decoder-info';
 import WzRulesetEditor from './views/ruleset-editor';
 import WzListEditor from './views/list-editor';
 import {
-  SECTION_CDBLIST_KEY,
-  SECTION_CDBLIST_NAME,
-  SECTION_DECODERS_KEY,
-  SECTION_DECODERS_NAME,
-  SECTION_RULES_KEY,
-  SECTION_RULES_NAME
+  SECTION_CDBLIST_SECTION,
+  SECTION_DECODERS_SECTION,
+  SECTION_RULES_SECTION,
 } from './utils/constants';
 
 const WzTableOverview = ({ section, clusterStatus }) => {
   return (
-    (section == SECTION_RULES_KEY && <WzRulesetOverview clusterStatus={clusterStatus} />) ||
-    (section == SECTION_DECODERS_KEY && <WzDecodersOverview clusterStatus={clusterStatus} />) ||
-    (section == SECTION_CDBLIST_KEY && <WzCDBListOverview clusterStatus={clusterStatus} />)
+    (section == SECTION_RULES_SECTION && <WzRulesetOverview clusterStatus={clusterStatus} section={section}/>) ||
+    (section == SECTION_DECODERS_SECTION && <WzDecodersOverview clusterStatus={clusterStatus} section={section}/>) ||
+    (section == SECTION_CDBLIST_SECTION && <WzCDBListOverview clusterStatus={clusterStatus} section={section}/>)
   )
 }
 

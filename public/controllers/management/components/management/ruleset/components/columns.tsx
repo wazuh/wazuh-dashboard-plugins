@@ -5,8 +5,8 @@ import exportCsv from '../../../../../../react-services/wz-csv';
 import { WzButtonPermissions } from '../../../../../../components/common/permissions/button';
 
 export default class RulesetColumns {
-  constructor(tableProps) {
-    this.tableProps = tableProps;
+  constructor(props) {
+    this.props = props;
 
     this.buildColumns = () => {
       this.columns = {
@@ -86,7 +86,7 @@ export default class RulesetColumns {
                     const rulesetHandler = new RulesetHandler(RulesetResources.RULES);
                     const result = await rulesetHandler.getFileContent(value);
                     const file = { name: value, content: result, path: item.relative_dirname };
-                    this.tableProps.updateFileContent(file);
+                    this.props.updateFileContent(file);
                   }}>
                   {value}
                 </WzButtonPermissions>
@@ -136,7 +136,7 @@ export default class RulesetColumns {
                     const rulesetHandler = new RulesetHandler(RulesetResources.DECODERS);
                     const result = await rulesetHandler.getFileContent(value);
                     const file = { name: value, content: result, path: item.relative_dirname };
-                    this.tableProps.updateFileContent(file);
+                    this.props.updateFileContent(file);
                   }}>
                   {value}
                 </WzButtonPermissions>
@@ -202,10 +202,10 @@ export default class RulesetColumns {
                     tooltip={{ position: 'top', content: `View the content of ${item.filename}` }}
                     onClick={async ev => {
                       ev.stopPropagation();
-                      const rulesetHandler = new RulesetHandler(this.tableProps.state.section);
+                      const rulesetHandler = new RulesetHandler(this.props.state.section);
                       const result = await rulesetHandler.getFileContent(item.filename);
                       const file = { name: item.filename, content: result, path: item.relative_dirname };
-                      this.tableProps.updateFileContent(file);
+                      this.props.updateFileContent(file);
                     }}
                     color="primary"
                   />
@@ -221,10 +221,10 @@ export default class RulesetColumns {
                       tooltip={{ position: 'top', content: `Edit ${item.filename} content` }}
                       onClick={async ev => {
                         ev.stopPropagation();
-                        const rulesetHandler = new RulesetHandler(this.tableProps.state.section);
+                        const rulesetHandler = new RulesetHandler(this.props.state.section);
                         const result = await rulesetHandler.getFileContent(item.filename);
                         const file = { name: item.filename, content: result, path: item.relative_dirname };
-                        this.tableProps.updateFileContent(file);
+                        this.props.updateFileContent(file);
                       }}
                       color="primary"
                     />
@@ -236,8 +236,8 @@ export default class RulesetColumns {
                       tooltip={{ position: 'top', content: `Remove ${item.filename} file` }}
                       onClick={ev => {
                         ev.stopPropagation();
-                        this.tableProps.updateListItemsForRemove([item]);
-                        this.tableProps.updateShowModal(true);
+                        this.props.updateListItemsForRemove([item]);
+                        this.props.updateShowModal(true);
                       }}
                       color="danger"
                     />
@@ -250,7 +250,7 @@ export default class RulesetColumns {
       };
 
       const getReadButtonPermissions = (item) => {
-        const { section } = this.tableProps.state;
+        const { section } = this.props.state;
         const { permissionResource } = resourceDictionary[section];
         return [
           {
@@ -261,7 +261,7 @@ export default class RulesetColumns {
       };
 
       const getEditButtonPermissions = (item) => {
-        const { section } = this.tableProps.state;
+        const { section } = this.props.state;
         const { permissionResource } = resourceDictionary[section];
         return [
           {
@@ -273,7 +273,7 @@ export default class RulesetColumns {
       };
 
       const getDeleteButtonPermissions = (item) => {
-        const { section } = this.tableProps.state;
+        const { section } = this.props.state;
         const { permissionResource } = resourceDictionary[section];
         return [
           {
@@ -288,7 +288,7 @@ export default class RulesetColumns {
         name: 'Actions',
         align: 'left',
         render: item => {
-          const defaultItems = this.tableProps.state.defaultItems;
+          const defaultItems = this.props.state.defaultItems;
           return (
             <div>
               <WzButtonPermissions
@@ -299,10 +299,10 @@ export default class RulesetColumns {
                 tooltip={{ position: 'top', content: `Edit ${item.filename} content` }}
                 onClick={async (ev) => {
                   ev.stopPropagation();
-                  const rulesetHandler = new RulesetHandler(this.tableProps.state.section);
+                  const rulesetHandler = new RulesetHandler(this.props.state.section);
                   const result = await rulesetHandler.getFileContent(item.filename);
                   const file = { name: item.filename, content: result, path: item.relative_dirname };
-                  this.tableProps.updateListContent(file);
+                  this.props.updateListContent(file);
                 }}
                 color="primary"
               />
@@ -314,8 +314,8 @@ export default class RulesetColumns {
                 tooltip={{ position: 'top', content: (defaultItems.indexOf(`${item.relative_dirname}`) === -1) ? `Delete ${item.filename}` : `The ${item.filename} list cannot be deleted` }}
                 onClick={async (ev) => {
                   ev.stopPropagation();
-                  this.tableProps.updateListItemsForRemove([item]);
-                  this.tableProps.updateShowModal(true);
+                  this.props.updateListItemsForRemove([item]);
+                  this.props.updateShowModal(true);
                 }}
                 color="danger"
                 isDisabled={defaultItems.indexOf(`${item.relative_dirname}`) !== -1}
