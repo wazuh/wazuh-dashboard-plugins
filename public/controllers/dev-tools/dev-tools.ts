@@ -838,7 +838,7 @@ export class DevToolsController {
       } else {
         const parsedError = ErrorHandler.handle(error, '', { silent: true });
         if (typeof parsedError === 'string') {
-          return this.apiOutputBox.setValue(error);
+          return this.apiOutputBox.setValue(parsedError);
         } else if (error && error.data && typeof error.data === 'object') {
           return this.apiOutputBox.setValue(JSON.stringify(error));
         } else {
