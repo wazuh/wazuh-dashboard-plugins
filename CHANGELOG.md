@@ -18,6 +18,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed type error when changing screen size in agents section [#4233](https://github.com/wazuh/wazuh-kibana-app/pull/4233)
 - Removed a logged error that appeared when the `statistics` tasks tried to create an index with the same name, causing the second task to fail on the creation of the index because it already exists [#4235](https://github.com/wazuh/wazuh-kibana-app/pull/4235)
 - Fixed an error when generating a module report after changing the selected agent [#4240](https://github.com/wazuh/wazuh-kibana-app/pull/4240)
+- Fixed an unhandled error when a Wazuh API request failed in the dev tools [#4266](https://github.com/wazuh/wazuh-kibana-app/pull/4266)
 
 ## Wazuh v4.3.4 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4305
 
