@@ -71,6 +71,7 @@ export default compose(
         realTime: false,
       };
       this.ITEM_STYLE = { width: '300px' };
+      this.HEIGHT_WITHOUT_CODE_EDITOR = 400;
     }
 
     async componentDidMount() {
@@ -520,7 +521,7 @@ export default compose(
                   fontSize="s"
                   paddingSize="m"
                   color="dark"
-                  overflowHeight={`calc(100vh - ${400}px)`}
+                  overflowHeight={`calc(100vh - ${this.HEIGHT_WITHOUT_CODE_EDITOR}px)`}
                 >
                   {this.state.logsList}
                 </EuiCodeBlock>
