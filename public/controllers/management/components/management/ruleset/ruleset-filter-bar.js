@@ -20,7 +20,7 @@ import {
   updateError
 } from '../../../../../redux/actions/rulesetActions';
 
-import { RulesetHandler, RulesetResources } from './utils/ruleset-handler';
+import { RulesetHandler, RulesetResources } from '../common/ruleset-handler';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
@@ -125,9 +125,9 @@ class WzRulesetFilterBar extends Component {
       const { section } = this.props.state;
       let fetcher = this.rulesetHandler.getResource;
       if (section === RulesetResources.LISTS) fetcher = this.rulesetHandler.getFiles; // If the sections is lists the fetcher changes
-      this.props.updateLoadingStatus(true);
+      // this.props.updateLoadingStatus(true);
       const result = await fetcher(filters);
-      this.props.updateLoadingStatus(false);
+      // this.props.updateLoadingStatus(false);
     } catch (error) {
       this.props.updateError(error);
       throw error;

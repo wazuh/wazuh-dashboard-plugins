@@ -13,7 +13,7 @@ import React, { Component } from 'react';
 import { EuiBasicTable, EuiCallOut, EuiOverlayMask, EuiConfirmModal } from '@elastic/eui';
 
 import { connect } from 'react-redux';
-import { RulesetHandler, RulesetResources, resourceDictionary } from './utils/ruleset-handler';
+import { RulesetHandler, RulesetResources, resourceDictionary } from '../common/ruleset-handler';
 import { getToasts } from '../../../../../kibana-services';
 
 import {

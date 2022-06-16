@@ -1,4 +1,4 @@
-import { WzRequest } from '../../../../../../react-services';
+import { WzRequest } from '../../../../../react-services';
 
 type DECODERS = 'decoders';
 type LISTS = 'lists';

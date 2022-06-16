@@ -15,7 +15,7 @@ import { withUserAuthorizationPrompt, withGlobalBreadcrumb } from '../../../../.
 import { compose } from 'redux';
 import { resourceDictionary } from '../../common/ruleset-handler';
 import { SECTION_RULES_NAME, SECTION_RULES_KEY } from '../../common/constants';
-import RulesetTable from '../components/ruleset-table';
+import RulesetTable from '../components/decoders-table';
 import './layout-overview.scss';
 import WzRestartClusterManagerCallout from '../../../../../../components/common/restart-cluster-manager-callout';
 
@@ -29,7 +29,7 @@ function WzRulesetOverview(props) {
   }
   
 
-  const { clusterStatus } = props.state;
+  const { section, sectionName, clusterStatus, showingFiles } = props.state;
   return <EuiPage style={{ background: 'transparent' }}>
   <EuiPanel>
     {showWarningRestart && (
@@ -47,6 +47,7 @@ function WzRulesetOverview(props) {
       <EuiFlexItem>
         <RulesetTable
           clusterStatus={clusterStatus}
+          request={section}
           updateRestartClusterManager={(showWarningRestart) => updateRestartManagers(showWarningRestart)}
         />
       </EuiFlexItem>

@@ -10,9 +10,14 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
   EuiFlyout,
+  EuiFlyoutHeader,
+  EuiFlyoutBody,
+  EuiTitle,
+  EuiLoadingContent,
+  EuiCallOut,
 } from '@elastic/eui';
 import WzRuleInfo from '../views/rule-info';
 import './flyout-detail.scss'
