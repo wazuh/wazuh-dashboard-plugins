@@ -24,7 +24,7 @@ import {
 } from '../../../../../../redux/actions/rulesetActions';
 
 import { UploadFiles } from '../../../upload-files';
-import { resourceDictionary, RulesetHandler, RulesetResources } from '../utils/ruleset-handler';
+import { resourceDictionary, RulesetHandler, RulesetResources } from '../../common/ruleset-handler';
 import { WzButtonPermissions } from '../../../../../../components/common/permissions/button';
 
 import { connect } from 'react-redux';
@@ -160,11 +160,11 @@ export const ManageFiles = (({ section, showingFiles, ...props }) => {
  */
   const toggleFiles = async () => {
     try {
-      props.updateLoadingStatus(true);
+      // props.updateLoadingStatus(true);
       props.toggleShowFiles(!showingFiles);
-      props.updateIsProcessing(true);
-      props.updatePageIndex(0);
-      props.updateLoadingStatus(false);
+      // props.updateIsProcessing(true);
+      // props.updatePageIndex(0);
+      // props.updateLoadingStatus(false);
     } catch (error) {
       const options = {
         context: 'ActionButtons.toggleFiles',

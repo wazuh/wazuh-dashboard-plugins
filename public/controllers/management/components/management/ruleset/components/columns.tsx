@@ -1,6 +1,6 @@
 import React from 'react';
 import { EuiToolTip, EuiButtonIcon, EuiLink, EuiBadge } from '@elastic/eui';
-import { resourceDictionary, RulesetHandler, RulesetResources } from '../utils/ruleset-handler';
+import { resourceDictionary, RulesetHandler, RulesetResources } from '../../common/ruleset-handler';
 import exportCsv from '../../../../../../react-services/wz-csv';
 import { WzButtonPermissions } from '../../../../../../components/common/permissions/button';
 import { getErrorOrchestrator } from '../../../../../../react-services/common-services';

@@ -14,14 +14,17 @@ import React, { Component } from 'react';
 import store from '../../../../../redux/store';
 import WzReduxProvider from '../../../../../redux/wz-redux-provider';
 //Wazuh ruleset tables(rules, decoder, lists)
-import WzRulesetOverview from './views/ruleset-overview';
 import WzDecodersOverview from './views/decoders-overview';
-import WzCDBListOverview from './views/cdblist-overview';
 //Information about rule or decoder
 import WzRuleInfo from './views/rule-info';
 import WzDecoderInfo from './views/decoder-info';
 import WzRulesetEditor from './views/ruleset-editor';
 import WzListEditor from './views/list-editor';
+import {
+  SECTION_CDBLIST_SECTION,
+  SECTION_DECODERS_SECTION,
+  SECTION_RULES_SECTION,
+} from '../common/constants';
 
 
 export default class WzRuleset extends Component {
@@ -38,6 +41,7 @@ export default class WzRuleset extends Component {
       const state = this.store.getState().rulesetReducers;
       if (this._isMount) {
         this.setState(state);
+        this.setState({ selectedTabId: state.section });
       }
     });
   }
@@ -55,19 +59,18 @@ export default class WzRuleset extends Component {
   }
 
   render() {
-    const { ruleInfo, decoderInfo, listInfo, fileContent, addingRulesetFile } = this.state;
+    const { ruleInfo, decoderInfo, listInfo, fileContent, addingRulesetFile, section } = this.state;
 
     return (
       <WzReduxProvider>
-        {(ruleInfo && <WzRuleInfo />) ||
-          // (decoderInfo && <WzDecoderInfo />) ||
-          // (listInfo && <WzListEditor clusterStatus={this.props.clusterStatus} />) ||
+        {
+          (decoderInfo && <WzDecoderInfo />) ||
           ((fileContent || addingRulesetFile) && (
             <WzRulesetEditor
               logtestProps={this.props.logtestProps}
               clusterStatus={this.props.clusterStatus}
             />
-          )) || <WzRulesetOverview clusterStatus={this.props.clusterStatus} />}
+          )) || <WzDecodersOverview clusterStatus={this.props.clusterStatus} section={section}/>}
       </WzReduxProvider>
     );
   }

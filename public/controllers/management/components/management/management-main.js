@@ -15,6 +15,8 @@ import store from '../../../../redux/store';
 
 import { updateRulesetSection } from '../../../../redux/actions/rulesetActions';
 import WzRuleset from './ruleset/main-ruleset';
+import WzDecoders from './decoders/main-decoders';
+// import WzCDBLists from './cdblists/main-cdblists';
 import WzGroups from './groups/groups-main';
 import WzStatus from './status/status-main';
 import WzLogs from './mg-logs/logs';
@@ -68,7 +70,6 @@ class WzManagementMain extends Component {
 
   render() {
     const { section } = this.props;
-    const ruleset = ['ruleset', 'rules', 'decoders', 'lists'];
     return (
       <Fragment>
         {(section === 'groups' && <WzGroups {...this.props} />) ||
@@ -77,7 +78,15 @@ class WzManagementMain extends Component {
           (section === 'statistics' && <WzStatistics />) ||
           (section === 'logs' && <WzLogs />) ||
           (section === 'configuration' && <WzConfiguration {...this.props.configurationProps} />) ||
-          (ruleset.includes(section) && (
+          (section === 'decoders' && <WzDecoders
+            logtestProps={this.props.logtestProps}
+            clusterStatus={this.props.clusterStatus}
+          />) ||
+          (section === 'lists' && <WzRuleset
+            logtestProps={this.props.logtestProps}
+            clusterStatus={this.props.clusterStatus}
+          />) ||
+          (['ruleset', 'rules'].includes(section) && (
             <WzRuleset
               logtestProps={this.props.logtestProps}
               clusterStatus={this.props.clusterStatus}

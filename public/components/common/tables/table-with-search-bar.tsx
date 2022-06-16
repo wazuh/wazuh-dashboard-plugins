@@ -96,7 +96,8 @@ export function TableWithSearchBar({
   }, [filters, pagination, sorting]);
 
   useEffect(() => {
-    setFilters(rest.filters || []);
+    if (JSON.stringify(rest.filters) != JSON.stringify(filters))
+      setFilters(rest.filters || []);
   }, [rest.filters]);
 
   const tablePagination = {

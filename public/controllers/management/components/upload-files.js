@@ -30,7 +30,7 @@ import {
 
 import { getToasts }  from '../../../kibana-services';
 import { WzButtonPermissions } from '../../../components/common/permissions/button';
-import { resourceDictionary, RulesetResources } from './management/ruleset/utils/ruleset-handler';
+import { resourceDictionary, RulesetResources } from './management/common/ruleset-handler';
 export class UploadFiles extends Component {
   constructor(props) {
     super(props);

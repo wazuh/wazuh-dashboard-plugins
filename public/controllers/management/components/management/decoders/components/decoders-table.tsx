@@ -27,7 +27,6 @@ import {
 import { TableWzAPI } from '../../../../../../components/common/tables';
 import { formatUIDate } from '../../../../../../react-services/time-service';
 import { RulesetHandler, RulesetResources, resourceDictionary } from '../../common/ruleset-handler';
-import { SECTION_RULES_SECTION, SECTION_RULES_KEY } from '../../common/constants';
 import RulesetColumns from './columns';
 import { FlyoutDetail } from './flyout-detail';
 import { withUserPermissions } from '../../../../../../components/common/hocs/withUserPermissions';
@@ -36,16 +35,19 @@ import { compose } from 'redux';
 import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
+import { SECTION_RULES_SECTION, SECTION_RULES_KEY } from '../../common/constants';
 import {
   ManageFiles,
   AddNewRuleButton,
   AddNewCdbListButton,
   UploadFilesButton,
-} from '../../common/actions-buttons'
+} from './actions-buttons'
 
-import { apiSuggestsItems } from './ruleset-suggestions';
+import { apiSuggestsItems } from './decoders-suggestions';
 
-function RulesetTable(props) {
+export default compose(
+  withUserPermissions
+)(function DecodersTable(props) {
   const [isLoading, setIsLoading] = useState(false);
   const [filters, setFilters] = useState([]);
   const [infoContent, setInfoContent] = useState(null);
@@ -91,9 +93,11 @@ function RulesetTable(props) {
 
   const getColumns = () => {
     // const { section } = props.state;
-    const rulesetColumns = new RulesetColumns({ state: {
-      section: SECTION_RULES_KEY
-    }, ...props}).columns;
+    const rulesetColumns = new RulesetColumns({
+      state: {
+        section: SECTION_RULES_KEY
+      }, ...props
+    }).columns;
     const columns = rulesetColumns[showingFiles ? 'files' : SECTION_RULES_KEY];
     return columns;
   }
@@ -119,7 +123,9 @@ function RulesetTable(props) {
         getRequiredPermissions(item),
         props.userPermissions
       )
+        // ? (item) => updateInfo(item, id)
         ? (item) => {
+          console.log(item, id)
           setCurrentItem(id)
           setIsFlyoutVisible(true);
         }
@@ -169,7 +175,7 @@ function RulesetTable(props) {
         searchBarSuggestions={apiSuggestsItems.items[SECTION_RULES_KEY]}
         endpoint={'/rules/files'}
         isExpandable={true}
-        // rowProps={getRowProps}
+        rowProps={getRowProps}
         downloadCsv={true}
         showReload={true}
         filters={filters}
@@ -228,7 +234,7 @@ function RulesetTable(props) {
     </div>
   );
 
-}
+});
 
 // const mapStateToProps = state => {
 //   return {
@@ -251,10 +257,3 @@ function RulesetTable(props) {
 //   };
 // };
 
-export default compose(
-  // connect(
-  //   mapStateToProps,
-  //   mapDispatchToProps
-  // ),
-  withUserPermissions
-)(RulesetTable);

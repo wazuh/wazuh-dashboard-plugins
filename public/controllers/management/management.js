@@ -18,7 +18,7 @@ import { ShareAgent } from '../../factories/share-agent';
 import {
   RulesetHandler,
   RulesetResources,
-} from './components/management/ruleset/utils/ruleset-handler';
+} from './components/management/common/ruleset-handler';
 
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../common/constants';
