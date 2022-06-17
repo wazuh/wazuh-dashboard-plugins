@@ -11,7 +11,7 @@
  */
 
 import React, { Component } from 'react';
-import { Direction, EuiOverlayMask, EuiOutsideClickDetector } from '@elastic/eui';
+import { Direction } from '@elastic/eui';
 import { FlyoutDetail } from './flyout';
 import { filtersToObject, IFilter, IWzSuggestItem } from '../../../wz-search-bar';
 import { TableWzAPI } from '../../../../components/common/tables';
