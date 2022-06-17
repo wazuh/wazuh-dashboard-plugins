@@ -12,6 +12,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Changed
 
 - Changed the reference from Manager to Wazuh server in the guide to deploy a new agent [#4239](https://github.com/wazuh/wazuh-kibana-app/pull/4239)
+- Changed styles in visualizations. [#4254](https://github.com/wazuh/wazuh-kibana-app/pull/4254)
 
 ### Fixed
 
