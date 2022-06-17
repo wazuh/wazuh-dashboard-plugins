@@ -52,7 +52,6 @@ export default compose(
   class WzLogs extends Component {
     constructor(props) {
       super(props);
-      this.offset = 350;
       this.state = {
         isCluster: false,
         selectedDaemon: '',
@@ -72,17 +71,11 @@ export default compose(
         realTime: false,
       };
       this.ITEM_STYLE = { width: '300px' };
+      this.HEIGHT_WITHOUT_CODE_EDITOR = 400;
     }
-
-    updateHeight = () => {
-      this.height = window.innerHeight - this.offset;
-      this.forceUpdate();
-    };
 
     async componentDidMount() {
       try {
-        this.height = window.innerHeight - this.offset;
-        window.addEventListener('resize', this.updateHeight);
         this.setState({ isLoading: true });
 
         const { nodeList, logsPath, selectedNode } = await this.getLogsPath();
@@ -131,7 +124,6 @@ export default compose(
     }
 
     componentWillUnmount() {
-      window.removeEventListener('resize', this.updateHeight);
       clearInterval(this.realTimeInterval);
     }
 
@@ -376,7 +368,7 @@ export default compose(
 
     exportFormatted = async () => {
       try {
-        this.setState({generatingCsv: true})
+        this.setState({ generatingCsv: true });
         this.showToast('success', 'Your download should begin automatically...', 3000);
         const filters = this.buildFilters();
         await exportCsv(
@@ -398,7 +390,7 @@ export default compose(
         };
         getErrorOrchestrator().handleError(options);
       }
-      this.setState({generatingCsv: false})
+      this.setState({ generatingCsv: false });
     };
 
     header() {
@@ -417,10 +409,11 @@ export default compose(
             <EuiFlexItem grow={false}>
               <EuiFlexGroup>
                 <EuiFlexItem grow={false}>
-                  <EuiButtonEmpty 
-                    iconType="importAction" 
+                  <EuiButtonEmpty
+                    iconType="importAction"
                     onClick={this.exportFormatted}
-                    isLoading={this.state.generatingCsv}>
+                    isLoading={this.state.generatingCsv}
+                  >
                     Export formatted
                   </EuiButtonEmpty>
                 </EuiFlexItem>
@@ -521,7 +514,7 @@ export default compose(
                   fontSize="s"
                   paddingSize="m"
                   color="dark"
-                  overflowHeight={this.height}
+                  overflowHeight={`calc(100vh - ${this.HEIGHT_WITHOUT_CODE_EDITOR}px)`}
                 >
                   {this.state.logsList}
                 </EuiCodeBlock>
