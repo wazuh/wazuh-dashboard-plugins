@@ -1,0 +1,134 @@
+version: '3.9'
+
+x-logging: &logging
+  logging:
+    driver: loki
+    options:
+      loki-url: "http://host.docker.internal:3100/loki/api/v1/push"
+
+services:
+  exporter:
+    image: quay.io/prometheuscommunity/elasticsearch-exporter:latest
+    <<: *logging
+    hostname: exporter-osd-${OS_STACK}
+    networks:
+      - os-dev
+      - mon
+    command:
+      - '--es.uri=https://admin:${KIBANA_PASSWORD}@os1:9200'
+      - '--es.ssl-skip-verify'
+      - '--es.all'
+
+  imposter:
+    image: outofcoffee/imposter
+    hostname: imposter-osd-${OS_STACK}
+    networks:
+      - os-dev
+      - mon
+    <<: *logging
+    environment:
+      - JAVA_OPTS="-Xmx512m -Xss512k -Dfile.encoding=UTF-8 -XX:MaxRAM=800m -XX:MaxRAMPercentage=95 -XX:MinRAMPercentage=60A"
+      - MALLOC_ARENA_MAX=1
+    volumes:
+      - ./config/imposter:/opt/imposter/config
+
+  generator:
+    image: wazuh/wazuh-certs-generator:0.0.1
+    hostname: wazuh-certs-generator
+    volumes:
+      - ./config/wazuh_indexer_ssl_certs/:/certificates/
+      - ./config/certs.yml:/config/certs.yml
+    healthcheck:
+      test: ["CMD-SHELL", "[ -f certificates/wazuh.indexer.pem ]"]
+      interval: 1s
+      timeout: 5s
+      retries: 120
+
+
+os1:
+    depends_on:
+      generator:
+        condition: service_healthy
+    image: opensearchproject/opensearch:1.2.4
+    container_name: opensearch-node1
+    environment:
+      - cluster.name=os-dev-cluster
+      - node.name=os1
+      - discovery.seed_hosts=os1
+      - cluster.initial_master_nodes=opensearch-data1
+      - bootstrap.memory_lock=true # along with the memlock settings below, disables swapping
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m" # minimum and maximum Java heap size, recommend setting both to 50% of system RAM
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536 # maximum number of open files for the OpenSearch user, set to at least 65536 on modern systems
+        hard: 65536
+    volumes:
+      - os1-data:/usr/share/opensearch/data
+      - ./config/wazuh_indexer_ssl_certs/root-ca.pem:/usr/share/opensearch/config/certs/root-ca.pem
+      - ./config/wazuh_indexer_ssl_certs/wazuh.indexer-key.pem:/usr/share/opensearch/config/certs/wazuh.indexer.key
+      - ./config/wazuh_indexer_ssl_certs/wazuh.indexer.pem:/usr/share/opensearch/config/certs/wazuh.indexer.pem
+      - ./config/wazuh_indexer_ssl_certs/admin.pem:/usr/share/opensearch/config/certs/admin.pem
+      - ./config/wazuh_indexer_ssl_certs/admin-key.pem:/usr/share/opensearch/config/certs/admin-key.pem
+      - ./config/wazuh_indexer/wazuh.indexer.yml:/usr/share/opensearch/config/opensearch.yml
+      - ./config/wazuh_indexer/internal_users.yml:/usr/share/opensearch/plugins/opensearch-security/securityconfig/internal_users.yml
+    networks:
+      - os-dev
+
+  index-pattern:
+    image: curlimages/curl
+    depends_on:
+      - os1
+
+    command: >
+      sh -c '
+        curl -k -sS https://raw.githubusercontent.com/wazuh/wazuh/v4.3.4/extensions/elasticsearch/7.x/wazuh-template.json > /tmp/t.json
+        curl -k -sS -u admin:${KIBANA_PASSWORD} -X  PUT 'https://wazuh.indexer:9200/_template/wazuh' -H 'Content-Type: application/json' -d @/tmp/t.json 
+      '
+
+  wazuh.dashboard:
+    image: quay.io/wazuh/osd-dev:1.2
+    hostname: wazuh.dashboard
+    networks:
+      - os-dev
+    user: "1000:1000"
+    <<: *logging
+    ports:
+      - ${KIBANA_PORT}:5601
+    environment:
+      - "LOGS=/proc/1/fd/1"
+    entrypoint: ["tail", "-f", "/dev/null"]
+    volumes:
+      - "${SRC}:/home/node/kbn/plugins/wazuh"
+      - ./config/wazuh_indexer_ssl_certs/wazuh.dashboard.pem:/usr/share/wazuh-dashboard/certs/wazuh-dashboard.pem
+      - ./config/wazuh_indexer_ssl_certs/wazuh.dashboard-key.pem:/usr/share/wazuh-dashboard/certs/wazuh-dashboard-key.pem
+      - ./config/wazuh_indexer_ssl_certs/root-ca.pem:/usr/share/wazuh-dashboard/certs/root-ca.pem
+      - ./config/wazuh_dashboard/opensearch_dashboards.yml:/home/node/kbn/config/opensearch_dashboards.yml
+      - ./config/wazuh_dashboard/wazuh.yml:/home/node/kbn/data/wazuh/config/wazuh.yml
+    depends_on:
+      - wazuh.indexer
+
+networks:
+  networks:
+  os-dev:
+    name: os-dev-1
+    driver: bridge
+  mon:
+    external: true
+
+volumes:
+  wazuh_api_configuration:
+  wazuh_etc:
+  wazuh_logs:
+  wazuh_queue:
+  wazuh_var_multigroups:
+  wazuh_integrations:
+  wazuh_active_response:
+  wazuh_agentless:
+  wazuh_wodles:
+  filebeat_etc:
+  filebeat_var:
+  os1-data:
+
