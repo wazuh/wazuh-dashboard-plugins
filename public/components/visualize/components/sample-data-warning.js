@@ -22,7 +22,7 @@ export const SampleDataWarning = ({ ...props }) => {
   useEffect(() => {
     (async () => {
       try {
-        const result = (await WzRequest.genericReq('GET', '/elastic/samplealerts', {})).data
+        const result = (await WzRequest.genericReq('GET', '/elastic/samplealerts')).data
           .sampleAlertsInstalled;
         setIsSampleData(result);
       } catch (error) {
