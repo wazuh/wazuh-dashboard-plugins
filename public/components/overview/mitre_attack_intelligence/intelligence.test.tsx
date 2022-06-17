@@ -13,8 +13,17 @@
  */
 
 import React from 'react';
-import { shallow } from 'enzyme';
+import { render } from 'enzyme';
 import { ModuleMitreAttackIntelligence } from './intelligence';
+import configureMockStore from 'redux-mock-store';
+import { Provider } from 'react-redux';
+
+jest.mock(
+  '../../../../../../node_modules/@elastic/eui/lib/services/accessibility/html_id_generator',
+  () => ({
+    htmlIdGenerator: () => () => 'htmlId',
+  })
+);
 
 jest.mock('../../../react-services', () => ({
   WzRequest: () => ({
@@ -30,10 +39,48 @@ jest.mock('../../../react-services', () => ({
   }),
 }));
 
-describe('Module Mitre Att&ck intelligence container', () => {
-  it('should render the component', () => {
-    const component = shallow(<ModuleMitreAttackIntelligence />);
+// added to remove useLayoutEffect warning
+jest.mock('react', () => ({
+  ...(jest.requireActual('react') as object),
+  useLayoutEffect: jest.requireActual('react').useEffect,
+}));
 
+const mockStore = configureMockStore();
+
+describe('Module Mitre Att&ck intelligence container', () => {
+  it('should render the component if has permissions', () => {
+    const store = mockStore({
+      appStateReducers: {
+        withUserLogged: true,
+        userRoles: ['administrator'],
+        userPermissions: {
+          'mitre:read': { '*:*:*': 'allow' },
+        },
+      },
+    });
+    const component = render(
+      <Provider store={store}>
+        <ModuleMitreAttackIntelligence />
+      </Provider>
+    );
+    expect(component).toMatchSnapshot();
+  });
+
+  it('should render permissions prompt when no has permissions', () => {
+    const store = mockStore({
+      appStateReducers: {
+        withUserLogged: true,
+        userRoles: ['administrator'],
+        userPermissions: {
+          'mitre:read': { '*:*:*': 'deny' },
+        },
+      },
+    });
+    const component = render(
+      <Provider store={store}>
+        <ModuleMitreAttackIntelligence />
+      </Provider>
+    );
     expect(component).toMatchSnapshot();
   });
 });
