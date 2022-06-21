@@ -12,22 +12,26 @@ elastic_versions=(
 	"7.17.4"
 )
 
-wazuh_versions=(
-	"4.3.0"
-	"4.3.1"
-	"4.3.2"
-	"4.3.3"
-	"4.3.4"
+wazuh_api_version=(
+	"4.3.5"
+	"4.3.17"
 )
 
 usage() {
 	echo 
-	echo "./pro.sh elastic_version wazuh_manager_version action "
+	echo "./pro.sh elastic_version wazuh_api_version action "
 	echo 
 	echo "where"
 	echo "  elastic_version is one of " ${elastic_versions[*]}
-	echo "  wazuh_manager_version if one of " ${wazuh_versions[*]}
+	echo "  wazuh_api_version if the minor version of wazuh 4.3, for example " ${wazuh_versions[*]}
 	echo "  action is one of up | down" 
+	echo 
+	echo "In a minor release, the API should not change the version here bumps the API"
+	echo " string returned for testing. This script generates the file "
+	echo 
+	echo "    config/imposter/api_info.json"
+	echo
+	echo "used by the mock server"
 	exit -1
 }
 
@@ -43,14 +47,31 @@ if [[ ! " ${elastic_versions[*]} " =~ " ${1} " ]]
  	exit -1
 fi
 
-if [[ ! " ${wazuh_versions[*]} " =~ " ${2} " ]]
- then 
- 	echo "Version ${2} not found in ${wazuh_versions[*]}"
- 	exit -1
+[ -n "$2" ] && [ "$2" -eq "$2" ] 2>/dev/null
+if [ $? -ne 0 ]; then
+   echo "$2 is not number"
+   exit -1
 fi
 
+patch_version=$2
+cat << EOF > config/imposter/api_info.json
+{
+  "data": {
+    "title": "Wazuh API REST",
+    "api_version": "4.3.${patch_version}",
+    "revision": 40316,
+    "license_name": "GPL 2.0",
+    "license_url": "https://github.com/wazuh/wazuh/blob/4.3/LICENSE",
+    "hostname": "imposter",
+    "timestamp": "2022-06-13T17:20:03Z"
+  },
+  "error": 0
+}
+EOF
+
 export STACK_VERSION=$1
-export WAZUH_STACK=$2
+
+export WAZUH_STACK=4.3.${patch_version}
 
 # Password for the 'elastic' user (at least 6 characters)
 export ELASTIC_PASSWORD=SecretPassword
@@ -70,7 +91,7 @@ export ES_PORT=9200
 #ES_PORT=127.0.0.1:9200
 
 # Port to expose Kibana to the host
-export KIBANA_PORT=5601
+export KIBANA_PORT=5602
 
 # Increase or decrease based on the available host memory (in bytes)
 export MEM_LIMIT=1073741824
@@ -80,19 +101,19 @@ export COMPOSE_PROJECT_NAME=elastic-$STACK_VERSION
 case "$3" in
 	up)
 		# recreate volumes
-		docker-compose -f pro.yml up -Vd
+		docker-compose -f pre.yml up -Vd
 
 		# This installs Wazuh and integrates with a default elastic stack
 		v=$( echo -n $STACK_VERSION | sed 's/\.//g' )
-
 		echo Install Wazuh ${WAZUH_STACK} into Elastic ${STACK_VERSION} manually with:
-		echo docker exec -ti  elastic-${v}_kibana_1  /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-${WAZUH_STACK}_${STACK_VERSION}-1.zip 
+		echo docker cp wazuh_kibana-4.3.${patch_version}_${STACK_VERSION}-1.zip elastic-${v}_kibana_1:/tmp
+		echo docker exec -ti  elastic-${v}_kibana_1  /usr/share/kibana/bin/kibana-plugin install file:///tmp/wazuh_kibana-4.3.${patch_version}_${STACK_VERSION}-1.zip
 		echo docker restart elastic-${v}_kibana_1
 		echo docker cp ./config/kibana/wazuh.yml elastic-${v}_kibana_1:/usr/share/kibana/data/wazuh/config/ 
 		;;
 	down)
 		# delete volumes
-		docker-compose -f pro.yml down -v --remove-orphans
+		docker-compose -f pre.yml down -v --remove-orphans
 		;;
 	*)
 		usage

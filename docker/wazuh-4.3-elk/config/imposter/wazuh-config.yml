@@ -1,6 +1,6 @@
 ---
 plugin: openapi
-specFile: https://raw.githubusercontent.com/wazuh/wazuh/v4.3.1/api/api/spec/spec.yaml
+specFile: https://raw.githubusercontent.com/wazuh/wazuh/v4.3.4/api/api/spec/spec.yaml
 
 resources:
   - path: /security/user/authenticate
@@ -8,4 +8,9 @@ resources:
     response:
       statusCode: 200
       scriptFile: login.js
+  - path: /
+    method: get
+    response:
+      statusCode: 200
+      staticFile: api_info.json
 
