@@ -4,7 +4,7 @@
   "revision": "4306",
   "code": "4306",
   "pluginPlatform": {
-    "version": "7.16.0"
+    "version": "7.17.4"
   },
   "description": "Wazuh app",
   "keywords": [
