@@ -86,7 +86,7 @@ export default class RulesetColumns {
                     const rulesetHandler = new RulesetHandler(RulesetResources.RULES);
                     const result = await rulesetHandler.getFileContent(value);
                     const file = { name: value, content: result, path: item.relative_dirname };
-                    this.props.updateFileContent(file);
+                    this.props.setFileContent(file);
                   }}>
                   {value}
                 </WzButtonPermissions>
@@ -136,7 +136,7 @@ export default class RulesetColumns {
                     const rulesetHandler = new RulesetHandler(RulesetResources.DECODERS);
                     const result = await rulesetHandler.getFileContent(value);
                     const file = { name: value, content: result, path: item.relative_dirname };
-                    this.props.updateFileContent(file);
+                    this.props.setFileContent(file);
                   }}>
                   {value}
                 </WzButtonPermissions>

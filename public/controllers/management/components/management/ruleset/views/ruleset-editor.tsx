@@ -12,10 +12,10 @@
 import React, { Component, Fragment } from 'react';
 
 import { connect } from 'react-redux';
-import {
-  cleanInfo,
-  updateFileContent
-} from '../../../../../../redux/actions/rulesetActions';
+// import {
+//   cleanInfo,
+//   updateFileContent
+// } from '../../../../../../redux/actions/rulesetActions';
 
 import 'brace/theme/textmate';
 // Eui components
@@ -47,7 +47,6 @@ import 'brace/mode/xml';
 import 'brace/snippets/xml';
 import 'brace/ext/language_tools';
 import "brace/ext/searchbox";
-import { showFlyoutLogtest } from '../../../../../../redux/actions/appStateActions';
 import _ from 'lodash';
 
 import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
@@ -68,8 +67,8 @@ class WzRulesetEditor extends Component {
       enableSnippets: true,
       enableLiveAutocompletion: false,
     };
-    this.rulesetHandler = new RulesetHandler(this.props.state.section);
-    const { fileContent, addingRulesetFile } = this.props.state;
+    this.rulesetHandler = new RulesetHandler(this.props.section);
+    const { fileContent, addingRulesetFile } = this.props;
     const { name, content, path } = fileContent ? fileContent : addingRulesetFile;
 
     this.state = {
@@ -89,7 +88,7 @@ class WzRulesetEditor extends Component {
   componentWillUnmount() {
     // When the component is going to be unmounted its info is clear
     this._isMounted = false;
-    this.props.cleanInfo();
+    this.props.cleanEditState();
   }
 
   componentDidMount() {
@@ -106,7 +105,7 @@ class WzRulesetEditor extends Component {
     if (!this._isMounted) {
       return;
     }else if(/\s/.test(name)) {
-      this.showToast('warning', 'Warning', `The ${this.props.state.section} name must not contain spaces.`, 3000);
+      this.showToast('warning', 'Warning', `The ${this.props.section} name must not contain spaces.`, 3000);
       return;
     }  
     try {
@@ -156,6 +155,12 @@ class WzRulesetEditor extends Component {
       });
 
     } catch (error) {
+      let errorMessage;
+      if (error instanceof Error) {
+        errorMessage = error.details
+          ? error.details
+          : String(error);
+      }
       this.setState({ error, isSaving: false });
       const options = {
         context: `${WzRulesetEditor.name}.save`,
@@ -163,7 +168,7 @@ class WzRulesetEditor extends Component {
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         error: {
           error: error,
-          message: errorMessage,
+          message: errorMessage || error,
           title: error.name || error,
         },
       };
@@ -196,7 +201,7 @@ class WzRulesetEditor extends Component {
   };
 
   render() {
-    const { section, addingRulesetFile, fileContent } = this.props.state;
+    const { section, addingRulesetFile, fileContent } = this.props;
     const { wazuhNotReadyYet } = this.props;
     const { name, content, path, showWarningRestart } = this.state;
     const isRules = path.includes('rules') ? 'Ruleset Test' : 'Decoders Test';
@@ -212,7 +217,7 @@ class WzRulesetEditor extends Component {
 
     const onClickOpenLogtest = () => {
       this.props.logtestProps.openCloseFlyout();
-      this.props.showFlyoutLogtest(true);
+      // this.props.showFlyoutLogtest(true);
     };
 
     const buildLogtestButton = () => {
@@ -262,7 +267,7 @@ class WzRulesetEditor extends Component {
             title="Unsubmitted changes"
             onConfirm={() => {
               closeModal;
-              this.props.cleanInfo();
+              this.props.cleanEditState();
             }}
             onCancel={closeModal}
             cancelButtonText="No, don't do it"
@@ -300,7 +305,7 @@ class WzRulesetEditor extends Component {
                                 ) {
                                   showModal();
                                 } else {
-                                  this.props.cleanInfo();
+                                  this.props.cleanEditState();
                                 }
                               }}
                             />
@@ -332,7 +337,7 @@ class WzRulesetEditor extends Component {
                                 ) {
                                   showModal();
                                 } else {
-                                  this.props.cleanInfo();
+                                  this.props.cleanEditState();
                                 }
                               }}
                             />
@@ -416,10 +421,10 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    cleanInfo: () => dispatch(cleanInfo()),
-    updateFileContent: content => dispatch(updateFileContent(content)),
+    // cleanInfo: () => dispatch(cleanInfo()),
+    // updateFileContent: content => dispatch(updateFileContent(content)),
     updateWazuhNotReadyYet: wazuhNotReadyYet => dispatch(updateWazuhNotReadyYet(wazuhNotReadyYet)),
-    showFlyoutLogtest: showFlyout => dispatch(showFlyoutLogtest(showFlyout)),
+    // showFlyoutLogtest: showFlyout => dispatch(showFlyoutLogtest(showFlyout)),
   };
 };
 
