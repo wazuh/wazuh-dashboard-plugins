@@ -19,18 +19,9 @@ import {
   EuiLoadingSpinner,
 } from '@elastic/eui';
 
-// import { connect } from 'react-redux';
 import { WzRequest } from '../../../../../../react-services/wz-request';
 
 import { RulesetHandler, RulesetResources } from '../../common/ruleset-handler';
-
-// import {
-//   updateFileContent,
-//   cleanInfo,
-//   updateFilters,
-//   cleanFilters,
-// } from '../../../../../../redux/actions/rulesetActions';
-
 import WzTextWithTooltipTruncated from '../../../../../../components/common/wz-text-with-tooltip-if-truncated';
 import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';

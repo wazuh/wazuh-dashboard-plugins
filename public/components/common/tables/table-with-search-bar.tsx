@@ -10,8 +10,9 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useLayoutEffect } from 'react';
 import { EuiBasicTable, EuiSpacer } from '@elastic/eui';
+import _ from 'lodash';
 import { WzSearchBar } from '../../wz-search-bar/';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
@@ -40,6 +41,12 @@ export function TableWithSearchBar({
     pageIndex: 0,
     pageSize: tablePageSizeOptions[0],
   });
+  let timeoutId = 0;
+
+  function abortRequest(){
+    clearTimeout(timeoutId);
+    timeoutId = 0;
+  }
 
   const [sorting, setSorting] = useState({
     sort: {
@@ -66,38 +73,59 @@ export function TableWithSearchBar({
   useEffect(() => {
     // Reset the page index when the endpoint changes.
     // This will cause that onSearch function is triggered because to changes in pagination in the another effect.
+    
     setPagination({pageIndex: 0, pageSize: pagination.pageSize});
   }, [endpoint, reload]);
 
-  useEffect(() => {
-    (async function () {
-      try {
-        setLoading(true);
-        const { items, totalItems } = await onSearch(endpoint, filters, pagination, sorting);
-        setItems(items);
-        setTotalItems(totalItems);
-      } catch (error) {
-        setItems([]);
-        setTotalItems(0);
-        const options = {
-          context: `${TableWithSearchBar.name}.useEffect`,
-          level: UI_LOGGER_LEVELS.ERROR,
-          severity: UI_ERROR_SEVERITIES.BUSINESS,
-          error: {
-            error: error,
-            message: error.message || error,
-            title: `${error.name}: Error fetching items`,
-          },
-        };
-        getErrorOrchestrator().handleError(options);
-      }
-      setLoading(false);
-    })();
-  }, [filters, pagination, sorting]);
+  
+  const loadRecords = useCallback(async function () {
+    console.log('onSearch')
+    try {
+      setLoading(true);
+      const { items, totalItems } = await onSearch(endpoint, filters, pagination, sorting);
+      setItems(items);
+      setTotalItems(totalItems);
+    } catch (error) {
+      setItems([]);
+      setTotalItems(0);
+      const options = {
+        context: `${TableWithSearchBar.name}.useEffect`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `${error.name}: Error fetching items`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+    }
+    setLoading(false);
+  }, [filters, pagination, sorting])
 
   useEffect(() => {
-    if (JSON.stringify(rest.filters) != JSON.stringify(filters))
+    if (!timeoutId)
+      timeoutId = setTimeout((() => {
+        loadRecords()
+        timeoutId = 0;
+      }), 100);
+  }, [loadRecords]);
+
+  useEffect(() => {
+    console.log('filters', filters)
+  }, [filters])
+  useEffect(() => {
+    console.log('pagination', pagination)
+  }, [pagination])
+  useEffect(() => {
+    console.log('sorting', sorting)
+  }, [sorting])
+
+  useEffect(() => {
+    if (!_.isEqual(rest.filters, filters)){
+      console.log('rest.filters', rest.filters)
       setFilters(rest.filters || []);
+    }
   }, [rest.filters]);
 
   const tablePagination = {

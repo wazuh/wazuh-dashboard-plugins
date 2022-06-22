@@ -22,36 +22,40 @@ import WzRuleInfo from './views/rule-info';
 import WzDecoderInfo from './views/decoder-info';
 import WzRulesetEditor from './views/ruleset-editor';
 import WzListEditor from './views/list-editor';
+import { SECTION_RULES_SECTION } from '../common/constants';
 
 
 export default class WzRuleset extends Component {
   _isMount = false;
   constructor(props) {
     super(props);
-    this.state = {}; //Init state empty to avoid fails when try to read any parameter and this.state is not defined yet
+    this.state = {
+      fileContent: false,
+      addingRulesetFile: false
+    }; //Init state empty to avoid fails when try to read any parameter and this.state is not defined yet
     this.store = store;
   }
 
   UNSAFE_componentWillMount() {
     this._isMount = true;
-    this.store.subscribe(() => {
-      const state = this.store.getState().rulesetReducers;
-      if (this._isMount) {
-        this.setState(state);
-      }
-    });
+    // this.store.subscribe(() => {
+    //   const state = this.store.getState().rulesetReducers;
+    //   if (this._isMount) {
+    //     this.setState(state);
+    //   }
+    // });
   }
 
   componentWillUnmount() {
     this._isMount = false;
     // When the component is going to be unmounted the ruleset state is reset
-    const { ruleInfo, decoderInfo, listInfo, fileContent, addingRulesetFile } = this.state;
-    if (
-      !window.location.href.includes('rules?tab=rules') &&
-      (!ruleInfo && !decoderInfo && !listInfo && !fileContent, !addingRulesetFile)
-    ) {
-      this.store.dispatch({ type: 'RESET' });
-    }
+    // const { ruleInfo, decoderInfo, listInfo, fileContent, addingRulesetFile } = this.state;
+    // if (
+    //   !window.location.href.includes('rules?tab=rules') &&
+    //   (!ruleInfo && !decoderInfo && !listInfo && !fileContent, !addingRulesetFile)
+    // ) {
+    //   this.store.dispatch({ type: 'RESET' });
+    // }
   }
 
   render() {
@@ -59,15 +63,29 @@ export default class WzRuleset extends Component {
 
     return (
       <WzReduxProvider>
-        {(ruleInfo && <WzRuleInfo />) ||
+        { //(ruleInfo && <WzRuleInfo />) ||
           // (decoderInfo && <WzDecoderInfo />) ||
           // (listInfo && <WzListEditor clusterStatus={this.props.clusterStatus} />) ||
           ((fileContent || addingRulesetFile) && (
             <WzRulesetEditor
+              section={SECTION_RULES_SECTION}
+              fileContent={fileContent}
+              addingRulesetFile={addingRulesetFile}
               logtestProps={this.props.logtestProps}
               clusterStatus={this.props.clusterStatus}
+              updateFileContent={(fileContent) => { this.setState({ fileContent }) }}
+              cleanEditState={() => {
+                this.setState({
+                  fileContent: false,
+                  addingRulesetFile: false
+                })
+              }}
             />
-          )) || <WzRulesetOverview clusterStatus={this.props.clusterStatus} />}
+          )) || <WzRulesetOverview
+            clusterStatus={this.props.clusterStatus}
+            updateFileContent={(fileContent) => { this.setState({ fileContent }) }}
+            updateAddingRulesetFile={(addingRulesetFile) => { this.setState({ addingRulesetFile }) }}
+          />}
       </WzReduxProvider>
     );
   }

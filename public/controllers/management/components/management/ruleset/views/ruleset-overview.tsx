@@ -29,7 +29,7 @@ function WzRulesetOverview(props) {
   }
   
 
-  const { clusterStatus } = props.state;
+  const { clusterStatus } = props;
   return <EuiPage style={{ background: 'transparent' }}>
   <EuiPanel>
     {showWarningRestart && (
@@ -46,6 +46,7 @@ function WzRulesetOverview(props) {
     <EuiFlexGroup>
       <EuiFlexItem>
         <RulesetTable
+          {...props}
           clusterStatus={clusterStatus}
           updateRestartClusterManager={(showWarningRestart) => updateRestartManagers(showWarningRestart)}
         />
