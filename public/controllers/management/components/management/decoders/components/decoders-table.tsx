@@ -37,16 +37,6 @@ export default compose(
   const [currentItem, setCurrentItem] = useState(null);
   const [showingFiles, setShowingFiles] = useState(false);
 
-
-  useEffect(() => {
-    const regex = new RegExp('redirectRule=' + '[^&]*');
-    const match = window.location.href.match(regex);
-    if (match && match[0]) {
-      setCurrentItem(parseInt(match[0].split('=')[1]))
-      setIsFlyoutVisible(true)
-    }
-  }, [])
-
   // Table custom filter options
   const buttonOptions = [{ label: "Custom decoders", field: "relative_dirname", value: "etc/decoders" },];
 
