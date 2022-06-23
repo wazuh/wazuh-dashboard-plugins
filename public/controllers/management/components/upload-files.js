@@ -30,7 +30,9 @@ import {
 
 import { getToasts }  from '../../../kibana-services';
 import { WzButtonPermissions } from '../../../components/common/permissions/button';
-import { resourceDictionary, RulesetResources } from './management/common/ruleset-handler';
+import { resourceDictionary, ResourcesConstants } from './management/common/resources-handler';
+
+
 export class UploadFiles extends Component {
   constructor(props) {
     super(props);
@@ -198,7 +200,7 @@ export class UploadFiles extends Component {
    */
   checkValidFileExtensions() {
     const resource = this.props.resource;
-    if ([RulesetResources.RULES, RulesetResources.DECODERS].includes(resource)) {
+    if ([ResourcesConstants.RULES, ResourcesConstants.DECODERS].includes(resource)) {
       const result = Object.keys(this.state.files).filter(item => {
         const file = this.state.files[item].name;
         return file.substr(file.length - 4) !== '.xml';

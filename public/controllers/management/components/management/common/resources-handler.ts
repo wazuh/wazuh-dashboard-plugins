@@ -4,28 +4,28 @@ type DECODERS = 'decoders';
 type LISTS = 'lists';
 type RULES = 'rules';
 export type Resource = DECODERS | LISTS | RULES;
-export const RulesetResources = {
+export const ResourcesConstants = {
   DECODERS: 'decoders',
   LISTS: 'lists',
   RULES: 'rules',
 };
 
 export const resourceDictionary = {
-  [RulesetResources.DECODERS]: {    
+  [ResourcesConstants.DECODERS]: {    
     resourcePath: '/decoders',    
     permissionResource: (value) => `decoder:file:${value}`
   },
-  [RulesetResources.LISTS]: {    
+  [ResourcesConstants.LISTS]: {    
     resourcePath: '/lists',
     permissionResource: (value) => `list:file:${value}`
   },
-  [RulesetResources.RULES]: {    
+  [ResourcesConstants.RULES]: {    
     resourcePath: '/rules',
     permissionResource: (value) => `rule:file:${value}`
   },
 };
 
-export class RulesetHandler {
+export class ResourcesHandler {
   resource: Resource;
   constructor(_resource: Resource) {
     this.resource = _resource;

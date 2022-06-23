@@ -1,47 +1,39 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
+import _ from 'lodash';
 // Eui components
 import {
   EuiFlexGroup,
   EuiFlexItem,
-  EuiPanel,
-  EuiPage,
-  EuiButtonIcon,
+  EuiFlyoutHeader,
+  EuiFlyoutBody,
   EuiTitle,
   EuiToolTip,
-  EuiText,
   EuiSpacer,
-  EuiInMemoryTable,
   EuiLink,
   EuiAccordion,
   EuiFlexGrid,
 } from '@elastic/eui';
 
-import { connect } from 'react-redux';
-
-import { RulesetHandler, RulesetResources } from '../../common/ruleset-handler';
+import { ResourcesHandler, ResourcesConstants } from '../../common/resources-handler';
 import { colors } from '../../common/colors';
-
-import {
-  updateFileContent,
-  cleanFileContent,
-  cleanInfo,
-  updateFilters,
-  cleanFilters,
-} from '../../../../../../redux/actions/rulesetActions';
-
+import { TableWzAPI } from '../../../../../../components/common/tables';
 import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
 
-class WzDecoderInfo extends Component {
+export default class WzDecoderInfo extends Component {
   constructor(props) {
     super(props);
+    this.onClickRow = this.onClickRow.bind(this);
+    this.state = {
+      currentInfo: {}
+    };
 
-    this.rulesetHandler = new RulesetHandler(RulesetResources.DECODERS);
+    this.resourcesHandler = new ResourcesHandler(ResourcesConstants.DECODERS);
 
     const handleFileClick = async (value, item) => {
       try {
-        const result = await this.rulesetHandler.getFileContent(value);
+        const result = await this.resourcesHandler.getFileContent(value);
         const file = { name: value, content: result, path: item.relative_dirname };
         this.props.updateFileContent(file);
       } catch (error) {
@@ -98,6 +90,19 @@ class WzDecoderInfo extends Component {
         sortable: true,
       },
     ];
+  }
+
+  async componentDidMount() {
+    document.body.scrollTop = 0; // For Safari
+    document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+
+    this.setState({
+      currentId: this.props.item
+    });
+  }
+
+  async componentDidUpdate(prevProps, prevState) {
+    //  (!_.isEqual(prevState.currentId, this.state.currentId))
   }
 
   /**
@@ -171,7 +176,7 @@ class WzDecoderInfo extends Component {
         content = (
           <ul>
             {Object.keys(details[key]).map((k) => (
-              <li key={k} style={{ marginBottom: '4px' }} className="subdued-color">
+              <li key={k} style={{ marginBottom: '4px', wordBreak: 'break-word' }} className="subdued-color">
                 {k}:&nbsp;
                 {details[key][k]}
                 <br />
@@ -240,154 +245,107 @@ class WzDecoderInfo extends Component {
     return result;
   }
 
-  /**
-   * Changes between decoders
-   * @param {Number} name
-   */
-  changeBetweenDecoders(name) {
-    this.setState({ currentDecoder: name });
-  }
+/**
+ * Update decoder details with the selected detail row
+ * @param decoder 
+ */
+  onClickRow(decoder) {
+    return {
+      onClick: () => {
+        this.setState({ currentDecoder: decoder });
+      },
+    };
+  };
 
   render() {
-    const { decoderInfo, isLoading } = this.props.state;
     const currentDecoder =
-      this.state && this.state.currentDecoder ? this.state.currentDecoder : decoderInfo.current;
-    const decoders = decoderInfo.affected_items;
-    const currentDecoderArr = decoders.filter((r) => {
-      return r.name === currentDecoder;
-    });
-    const currentDecoderInfo = currentDecoderArr[0];
-    const { position, details, filename, name, relative_dirname } = currentDecoderInfo;
-    const columns = this.columns;
-
-    const onClickRow = (item) => {
-      return {
-        onClick: () => {
-          this.changeBetweenDecoders(item.name);
-        },
-      };
-    };
+      this.state && this.state.currentDecoder ? this.state.currentDecoder : this.props.item;
+    const { position, details, filename, name, relative_dirname } = currentDecoder;
 
     return (
-      <EuiPage style={{ background: 'transparent' }}>
-        <EuiFlexGroup>
-          <EuiFlexItem>
-            {/* Decoder description name */}
-            <EuiFlexGroup>
-              <EuiFlexItem grow={false}>
-                <EuiTitle>
-                  <span style={{ fontSize: '22px' }}>
-                    <EuiToolTip position="right" content="Back to decoders">
-                      <EuiButtonIcon
-                        aria-label="Back"
-                        color="primary"
-                        iconSize="l"
-                        iconType="arrowLeft"
-                        onClick={() => {
-                          window.location.href = window.location.href.replace(
-                            new RegExp('redirectRule=' + '[^&]*'),
-                            ''
-                          );
-                          this.props.cleanInfo();
-                        }}
-                      />
-                    </EuiToolTip>
-                    {name}
-                  </span>
-                </EuiTitle>
-              </EuiFlexItem>
-            </EuiFlexGroup>
-            {/* Cards */}
-            <EuiPanel style={{ margin: '16px 0', padding: '16px 16px 0px 16px' }}>
-              <EuiFlexGroup>
-                {/* General info */}
-                <EuiFlexItem style={{ marginBottom: 16, marginTop: 8 }}>
-                  <EuiAccordion
-                    id="Info"
-                    buttonContent={
-                      <EuiTitle size="s">
-                        <h3>Information</h3>
-                      </EuiTitle>
-                    }
-                    paddingSize="none"
-                    initialIsOpen={true}
-                  >
-                    <div className="flyout-row details-row">
-                      {this.renderInfo(position, filename, relative_dirname)}
-                    </div>
-                  </EuiAccordion>
-                </EuiFlexItem>
-              </EuiFlexGroup>
-              <EuiFlexGroup>
-                <EuiFlexItem style={{ marginTop: 8 }}>
-                  <EuiAccordion
-                    id="Details"
-                    buttonContent={
-                      <EuiTitle size="s">
-                        <h3>Details</h3>
-                      </EuiTitle>
-                    }
-                    paddingSize="none"
-                    initialIsOpen={true}
-                  >
-                    <div className="flyout-row details-row">{this.renderDetails(details)}</div>
-                  </EuiAccordion>
-                </EuiFlexItem>
-              </EuiFlexGroup>
-              {/* Table */}
-              <EuiFlexGroup>
-                <EuiFlexItem style={{ marginTop: 8 }}>
-                  <EuiAccordion
-                    id="Related"
-                    buttonContent={
-                      <EuiTitle size="s">
-                        <h3>Related decoders</h3>
-                      </EuiTitle>
-                    }
-                    paddingSize="none"
-                    initialIsOpen={true}
-                  >
-                    <div className="flyout-row related-rules-row">
-                      <EuiFlexGroup>
-                        <EuiFlexItem>
-                          <EuiInMemoryTable
-                            itemId="id"
-                            items={decoders}
-                            columns={columns}
-                            rowProps={onClickRow}
-                            pagination={true}
-                            loading={isLoading}
-                            sorting={true}
-                            message={null}
-                          />
-                        </EuiFlexItem>
-                      </EuiFlexGroup>
-                    </div>
-                  </EuiAccordion>
-                </EuiFlexItem>
-              </EuiFlexGroup>
-            </EuiPanel>
-          </EuiFlexItem>
-        </EuiFlexGroup>
-      </EuiPage>
+      <>
+        <EuiFlyoutHeader hasBorder className="flyout-header">
+          {/* Decoder description name */}
+          <EuiFlexGroup>
+            <EuiFlexItem grow={false}>
+              <EuiTitle>
+                <span style={{ fontSize: '22px' }}>
+                  {name}
+                </span>
+              </EuiTitle>
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        </EuiFlyoutHeader>
+        <EuiFlyoutBody className="flyout-body">
+        {/* Cards */}
+          <EuiFlexGroup>
+            {/* General info */}
+            <EuiFlexItem style={{ marginBottom: 16, marginTop: 8 }}>
+              <EuiAccordion
+                id="Info"
+                buttonContent={
+                  <EuiTitle size="s">
+                    <h3>Information</h3>
+                  </EuiTitle>
+                }
+                paddingSize="none"
+                initialIsOpen={true}
+              >
+                <div className="flyout-row details-row">
+                  {this.renderInfo(position, filename, relative_dirname)}
+                </div>
+              </EuiAccordion>
+            </EuiFlexItem>
+          </EuiFlexGroup>
+          <EuiFlexGroup>
+            <EuiFlexItem style={{ marginTop: 8 }}>
+              <EuiAccordion
+                id="Details"
+                buttonContent={
+                  <EuiTitle size="s">
+                    <h3>Details</h3>
+                  </EuiTitle>
+                }
+                paddingSize="none"
+                initialIsOpen={true}
+              >
+                <div className="flyout-row details-row">{this.renderDetails(details)}</div>
+              </EuiAccordion>
+            </EuiFlexItem>
+          </EuiFlexGroup>
+          {/* Table */}
+          <EuiFlexGroup>
+            <EuiFlexItem style={{ marginTop: 8 }}>
+              <EuiAccordion
+                id="Related"
+                buttonContent={
+                  <EuiTitle size="s">
+                    <h3>Related decoders</h3>
+                  </EuiTitle>
+                }
+                paddingSize="none"
+                initialIsOpen={true}
+              >
+                <div className="flyout-row related-rules-row">
+                  <EuiFlexGroup>
+                    <EuiFlexItem>
+                      {currentDecoder?.filename &&
+                        <TableWzAPI
+                          tableColumns={this.columns}
+                          tableInitialSortingField={'name'}
+                          endpoint={`/decoders?filename=${currentDecoder.filename}`}
+                          tableProps={{ rowProps: this.onClickRow }}
+                          tablePageSizeOptions={[10, 25]}
+                        />
+                      }
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
+                </div>
+              </EuiAccordion>
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        </EuiFlyoutBody>
+      </>
     );
   }
 }
-
-const mapStateToProps = (state) => {
-  return {
-    state: state.rulesetReducers,
-  };
-};
-
-const mapDispatchToProps = (dispatch) => {
-  return {
-    updateFileContent: (content) => dispatch(updateFileContent(content)),
-    cleanFileContent: () => dispatch(cleanFileContent()),
-    updateFilters: (filters) => dispatch(updateFilters(filters)),
-    cleanFilters: () => dispatch(cleanFilters()),
-    cleanInfo: () => dispatch(cleanInfo()),
-  };
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(WzDecoderInfo);

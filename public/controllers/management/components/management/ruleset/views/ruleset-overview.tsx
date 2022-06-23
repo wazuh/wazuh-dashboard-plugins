@@ -13,10 +13,10 @@ import {
 // Wazuh components
 import { withUserAuthorizationPrompt, withGlobalBreadcrumb } from '../../../../../../components/common/hocs';
 import { compose } from 'redux';
-import { resourceDictionary } from '../../common/ruleset-handler';
+import { resourceDictionary } from '../../common/resources-handler';
 import { SECTION_RULES_NAME, SECTION_RULES_KEY } from '../../common/constants';
 import RulesetTable from '../components/ruleset-table';
-import './layout-overview.scss';
+import '../../common/layout-overview.scss';
 import WzRestartClusterManagerCallout from '../../../../../../components/common/restart-cluster-manager-callout';
 
 

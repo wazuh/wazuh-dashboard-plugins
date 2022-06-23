@@ -12,10 +12,6 @@
 import React, { Component, Fragment } from 'react';
 
 import { connect } from 'react-redux';
-// import {
-//   cleanInfo,
-//   updateFileContent
-// } from '../../../../../../redux/actions/rulesetActions';
 
 import 'brace/theme/textmate';
 // Eui components
@@ -34,14 +30,14 @@ import {
   EuiPanel,
 } from '@elastic/eui';
 
-import { resourceDictionary, RulesetHandler, RulesetResources } from '../../common/ruleset-handler';
-import validateConfigAfterSent from '../../common/valid-configuration';
+import { resourceDictionary, ResourcesHandler } from './resources-handler';
+import validateConfigAfterSent from './valid-configuration';
 
-import { getToasts } from '../../../../../../kibana-services';
-import { updateWazuhNotReadyYet } from '../../../../../../redux/actions/appStateActions';
-import WzRestartClusterManagerCallout from '../../../../../../components/common/restart-cluster-manager-callout';
-import { validateXML } from '../../configuration/utils/xml';
-import { WzButtonPermissions } from '../../../../../../components/common/permissions/button';
+import { getToasts } from '../../../../../kibana-services';
+import { updateWazuhNotReadyYet } from '../../../../../redux/actions/appStateActions';
+import WzRestartClusterManagerCallout from '../../../../../components/common/restart-cluster-manager-callout';
+import { validateXML } from '../configuration/utils/xml';
+import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 import 'brace/theme/textmate';
 import 'brace/mode/xml';
 import 'brace/snippets/xml';
@@ -49,11 +45,11 @@ import 'brace/ext/language_tools';
 import "brace/ext/searchbox";
 import _ from 'lodash';
 
-import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
-import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
-import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
+import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
+import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 
-class WzRulesetEditor extends Component {
+class WzFileEditor extends Component {
   _isMounted = false;
   constructor(props) {
     super(props);
@@ -67,9 +63,9 @@ class WzRulesetEditor extends Component {
       enableSnippets: true,
       enableLiveAutocompletion: false,
     };
-    this.rulesetHandler = new RulesetHandler(this.props.section);
-    const { fileContent, addingRulesetFile } = this.props;
-    const { name, content, path } = fileContent ? fileContent : addingRulesetFile;
+    this.resourcesHandler = new ResourcesHandler(this.props.section);
+    const { fileContent, addingFile } = this.props;
+    const { name, content, path } = fileContent ? fileContent : addingFile;
 
     this.state = {
       isSaving: false,
@@ -113,12 +109,12 @@ class WzRulesetEditor extends Component {
 
       this.setState({ isSaving: true, error: false });
 
-      await this.rulesetHandler.updateFile(name, content, overwrite);
+      await this.resourcesHandler.updateFile(name, content, overwrite);
       try {
         await validateConfigAfterSent();
       } catch (error) {
         const options = {
-          context: `${WzRulesetEditor.name}.save`,
+          context: `${WzFileEditor.name}.save`,
           level: UI_LOGGER_LEVELS.ERROR,
           severity: UI_ERROR_SEVERITIES.BUSINESS,
           error: {
@@ -133,13 +129,13 @@ class WzRulesetEditor extends Component {
 
         let toastMessage;
 
-        if (this.props.state.addingRulesetFile != false) {
+        if (this.props.state.addingFile != false) {
           //remove current invalid file if the file is new.
-          await this.rulesetHandler.deleteFile(name);
+          await this.resourcesHandler.deleteFile(name);
           toastMessage = 'The new file was deleted.';
         } else {
           //restore file to previous version
-          await this.rulesetHandler.updateFile(name, this.state.initContent, overwrite);
+          await this.resourcesHandler.updateFile(name, this.state.initContent, overwrite);
           toastMessage = 'The content file was restored to previous state.';
         }
 
@@ -163,7 +159,7 @@ class WzRulesetEditor extends Component {
       }
       this.setState({ error, isSaving: false });
       const options = {
-        context: `${WzRulesetEditor.name}.save`,
+        context: `${WzFileEditor.name}.save`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         error: {
@@ -201,15 +197,15 @@ class WzRulesetEditor extends Component {
   };
 
   render() {
-    const { section, addingRulesetFile, fileContent } = this.props;
+    const { section, addingFile, fileContent } = this.props;
     const { wazuhNotReadyYet } = this.props;
     const { name, content, path, showWarningRestart } = this.state;
     const isRules = path.includes('rules') ? 'Ruleset Test' : 'Decoders Test';
 
-    const isEditable = addingRulesetFile
+    const isEditable = addingFile
       ? true
       : path !== 'ruleset/rules' && path !== 'ruleset/decoders';
-    let nameForSaving = addingRulesetFile ? this.state.inputValue : name;
+    let nameForSaving = addingFile ? this.state.inputValue : name;
     nameForSaving = nameForSaving.endsWith('.xml') ? nameForSaving : `${nameForSaving}.xml`;
     const overwrite = fileContent ? true : false;
 
@@ -431,4 +427,4 @@ const mapDispatchToProps = dispatch => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(WzRulesetEditor);
+)(WzFileEditor);

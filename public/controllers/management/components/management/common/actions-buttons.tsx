@@ -11,43 +11,14 @@
  */
 import React from 'react';
 // Eui components
-import { EuiButtonEmpty, EuiFlexItem } from '@elastic/eui';
-import { getToasts } from '../../../../../kibana-services';
-
-import {
-  toggleShowFiles,
-  updateLoadingStatus,
-  updateAddingRulesetFile,
-  updateListContent,
-  updateIsProcessing,
-  updatePageIndex,
-} from '../../../../../redux/actions/rulesetActions';
 
 import { UploadFiles } from '../../upload-files';
-import { resourceDictionary, RulesetHandler, RulesetResources } from './ruleset-handler';
+import { resourceDictionary, ResourcesHandler, ResourcesConstants } from './resources-handler';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
-
-import { connect } from 'react-redux';
 
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
-
-// const mapStateToProps = (state) => {
-//   return {
-//     state: state.rulesetReducers,
-//   };
-// };
-// const mapDispatchToProps = (dispatch) => {
-//   return {
-//     toggleShowFiles: (status) => dispatch(toggleShowFiles(status)),
-//     updateLoadingStatus: (status) => dispatch(updateLoadingStatus(status)),
-//     updateAddingRulesetFile: (content) => dispatch(updateAddingRulesetFile(content)),
-//     updateListContent: (content) => dispatch(updateListContent(content)),
-//     updateIsProcessing: (isProcessing) => dispatch(updateIsProcessing(isProcessing)),
-//     updatePageIndex: (pageIndex) => dispatch(updatePageIndex(pageIndex)),
-//   };
-// };
 
 /**
  * Uploads the files
@@ -58,11 +29,11 @@ async function uploadFiles(files, resource) {
   try {
     let errors = false;
     let results: any[] = [];
-    const rulesetHandler = new RulesetHandler(resource);
+    const resourcesHandler = new ResourcesHandler(resource);
     for (let idx in files) {
       const { file, content } = files[idx];
       try {
-        await rulesetHandler.updateFile(file, content, resource !== RulesetResources.LISTS); // True does not overwrite the file
+        await resourcesHandler.updateFile(file, content, resource !== ResourcesConstants.LISTS); // True does not overwrite the file
         results.push({
           index: idx,
           uploaded: true,
@@ -111,7 +82,7 @@ const getUpdatePermissionsFiles = (section) => {
 };
 
 // Add new rule button
-export const AddNewRuleButton = ({ section, updateAddingRulesetFile }) => (
+export const AddNewFileButton = ({ section, updateAddingFile }) => (
   <>{
     section !== 'lists' &&
     <WzButtonPermissions
@@ -119,7 +90,7 @@ export const AddNewRuleButton = ({ section, updateAddingRulesetFile }) => (
       buttonType="empty"
       iconType="plusInCircle"
       onClick={() =>
-        updateAddingRulesetFile({
+        updateAddingFile({
           name: '',
           content: '<!-- Modify it at your will. -->',
           path: `etc/${section}`,
