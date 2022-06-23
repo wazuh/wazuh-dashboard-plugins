@@ -11,37 +11,20 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { connect } from 'react-redux';
-import {
-  // updateIsProcessing,
-  // updateShowModal,
-  // updateListContent,
-  // updateFileContent,
-  // updateListItemsForRemove,
-  // updateRuleInfo,
-  // updateDecoderInfo,
-  // updateAddingRulesetFile,
-  // updateLoadingStatus,
-  // updatePageIndex,
-} from '../../../../../../redux/actions/rulesetActions';
 import { TableWzAPI } from '../../../../../../components/common/tables';
-import { formatUIDate } from '../../../../../../react-services/time-service';
-import { RulesetHandler, RulesetResources, resourceDictionary } from '../../common/ruleset-handler';
-import RulesetColumns from './columns';
+import { resourceDictionary } from '../../common/resources-handler';
+import DecodersColumns from './columns';
 import { FlyoutDetail } from './flyout-detail';
 import { withUserPermissions } from '../../../../../../components/common/hocs/withUserPermissions';
 import { WzUserPermissions } from '../../../../../../react-services/wz-user-permissions';
 import { compose } from 'redux';
-import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
-import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
-import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
-import { SECTION_RULES_SECTION, SECTION_RULES_KEY } from '../../common/constants';
+import { SECTION_DECODERS_SECTION, SECTION_DECODERS_KEY } from '../../common/constants';
 import {
   ManageFiles,
-  AddNewRuleButton,
+  AddNewFileButton,
   AddNewCdbListButton,
   UploadFilesButton,
-} from './actions-buttons'
+} from '../../common/actions-buttons'
 
 import { apiSuggestsItems } from './decoders-suggestions';
 
@@ -50,13 +33,9 @@ export default compose(
 )(function DecodersTable(props) {
   const [isLoading, setIsLoading] = useState(false);
   const [filters, setFilters] = useState([]);
-  const [infoContent, setInfoContent] = useState(null);
-  const [isProcessing, setIsProcessing] = useState(false);
   const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
   const [showingFiles, setShowingFiles] = useState(false);
-  const [error, setError] = useState(false);
-  // const rulesetHandler = new RulesetHandler(SECTION_RULES_KEY);
 
 
   useEffect(() => {
@@ -69,14 +48,10 @@ export default compose(
   }, [])
 
   // Table custom filter options
-  const buttonOptions = [{ label: "Custom rules", field: "relative_dirname", value: "etc/rules" },];
+  const buttonOptions = [{ label: "Custom decoders", field: "relative_dirname", value: "etc/decoders" },];
 
   const updateFilters = (filters) => {
     setFilters(filters);
-  }
-
-  const cleanInfo = () => {
-    setInfoContent(null);
   }
 
   const cleanFilters = () => {
@@ -92,41 +67,36 @@ export default compose(
   }
 
   const getColumns = () => {
-    // const { section } = props.state;
-    const rulesetColumns = new RulesetColumns({
+    const decodersColumns = new DecodersColumns({
       state: {
-        section: SECTION_RULES_KEY
+        section: SECTION_DECODERS_KEY
       }, ...props
     }).columns;
-    const columns = rulesetColumns[showingFiles ? 'files' : SECTION_RULES_KEY];
+    const columns = decodersColumns[showingFiles ? 'files' : SECTION_DECODERS_KEY];
     return columns;
   }
 
   const getRowProps = (item) => {
-    const { id, name } = item;
 
     const getRequiredPermissions = (item) => {
-      // const { section } = props.state;
-      const { permissionResource } = resourceDictionary[SECTION_RULES_KEY];
+      const { permissionResource } = resourceDictionary[SECTION_DECODERS_KEY];
       return [
         {
-          action: `${SECTION_RULES_KEY}:read`,
+          action: `${SECTION_DECODERS_KEY}:read`,
           resource: permissionResource(item.name),
         },
       ];
     };
 
     return {
-      'data-test-subj': `row-${id || name}`,
+      'data-test-subj': `row-${item.name}-${item.details?.order}`,
       className: 'customRowClass',
       onClick: !WzUserPermissions.checkMissingUserPermissions(
         getRequiredPermissions(item),
         props.userPermissions
       )
-        // ? (item) => updateInfo(item, id)
-        ? (item) => {
-          console.log(item, id)
-          setCurrentItem(id)
+        ? () => {
+          setCurrentItem(item)
           setIsFlyoutVisible(true);
         }
         : undefined,
@@ -139,23 +109,23 @@ export default compose(
 
   const actionButtons = [
     <ManageFiles
-      section={SECTION_RULES_SECTION}
+      section={SECTION_DECODERS_SECTION}
       showingFiles={showingFiles}
       // updateLoadingStatus={props.updateLoadingStatus}
       toggleShowFiles={toggleShowFiles}
       updateIsProcessing={props.updateIsProcessing}
       updatePageIndex={props.updatePageIndex}
     />,
-    <AddNewRuleButton
-      section={SECTION_RULES_SECTION}
-      updateAddingRulesetFile={props.updateAddingRulesetFile}
+    <AddNewFileButton
+      section={SECTION_DECODERS_SECTION}
+      updateAddingFile={props.updateAddingFile}
     />,
     <AddNewCdbListButton
-      section={SECTION_RULES_SECTION}
+      section={SECTION_DECODERS_SECTION}
       updateListContent={updateListContent}
     />,
     <UploadFilesButton
-      section={SECTION_RULES_SECTION}
+      section={SECTION_DECODERS_SECTION}
       showingFiles={showingFiles}
       clusterStatus={props.clusterStatus}
       onSuccess={() => { updateRestartClusterManager && updateRestartClusterManager() }}
@@ -166,16 +136,15 @@ export default compose(
     return (
       <TableWzAPI
         actionButtons={actionButtons}
-        title={'Rules files'}
+        title={'Decoders files'}
         searchBarProps={{ buttonOptions: buttonOptions }}
-        description={`From here you can manage your rules files.`}
+        description={`From here you can manage your decoders files.`}
         tableColumns={columns}
         tableInitialSortingField={'filename'}
         searchTable={true}
-        searchBarSuggestions={apiSuggestsItems.items[SECTION_RULES_KEY]}
-        endpoint={'/rules/files'}
+        searchBarSuggestions={apiSuggestsItems.items[SECTION_DECODERS_KEY]}
+        endpoint={'/decoders/files'}
         isExpandable={true}
-        rowProps={getRowProps}
         downloadCsv={true}
         showReload={true}
         filters={filters}
@@ -185,18 +154,18 @@ export default compose(
     )
   };
 
-  const RenderRulesTable = () => {
+  const RenderDecodersTable = () => {
     return <>
       <TableWzAPI
         actionButtons={actionButtons}
-        title={'Rules'}
+        title={'Decoders'}
         searchBarProps={{ buttonOptions: buttonOptions }}
-        description={`From here you can manage your rules.`}
+        description={`From here you can manage your decoders.`}
         tableColumns={columns}
-        tableInitialSortingField={'id'}
+        tableInitialSortingField={'filename'}
         searchTable={true}
-        searchBarSuggestions={apiSuggestsItems.items[SECTION_RULES_KEY]}
-        endpoint={'/rules'}
+        searchBarSuggestions={apiSuggestsItems.items[SECTION_DECODERS_KEY]}
+        endpoint={'/decoders'}
         isExpandable={true}
         rowProps={getRowProps}
         downloadCsv={true}
@@ -210,8 +179,6 @@ export default compose(
           isLoading={isLoading}
           item={currentItem}
           closeFlyout={closeFlyout}
-          type="vulnerability"
-          view="inventory"
           showViewInEvents={true}
           outsideClickCloses={true}
           filters={filters}
@@ -224,36 +191,11 @@ export default compose(
     </>
   };
 
-  // this.props.cleanFilters();
-  //   this.props.updateFilters(filters);
-  //   this.props.cleanInfo();
   return (
     <div className="wz-inventory">
-      {showingFiles ? <RenderFilesTable /> : <RenderRulesTable />
+      {showingFiles ? <RenderFilesTable /> : <RenderDecodersTable />
       }
     </div>
   );
 
 });
-
-// const mapStateToProps = state => {
-//   return {
-//     state: state.rulesetReducers
-//   };
-// };
-
-// const mapDispatchToProps = dispatch => {
-//   return {
-    // updateIsProcessing: isProcessing => dispatch(updateIsProcessing(isProcessing)),
-    // updateShowModal: (showModal) => dispatch(updateShowModal(showModal)),
-    // updateFileContent: (fileContent) => dispatch(updateFileContent(fileContent)),
-    // updateListContent: (content) => dispatch(updateListContent(content)),
-    // updateListItemsForRemove: (itemList) => dispatch(updateListItemsForRemove(itemList)),
-    // updateRuleInfo: (rule) => dispatch(updateRuleInfo(rule)),
-    // updateDecoderInfo: (rule) => dispatch(updateDecoderInfo(rule)),
-    // updateAddingRulesetFile: (content) => dispatch(updateAddingRulesetFile(content)),
-    // updateLoadingStatus: (status) => dispatch(updateLoadingStatus(status)),
-    // updatePageIndex: (pageIndex) => dispatch(updatePageIndex(pageIndex)),
-//   };
-// };
-

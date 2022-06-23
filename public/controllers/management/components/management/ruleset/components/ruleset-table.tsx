@@ -11,34 +11,17 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { connect } from 'react-redux';
-import {
-  // updateIsProcessing,
-  // updateShowModal,
-  // updateListContent,
-  // updateFileContent,
-  // updateListItemsForRemove,
-  // updateRuleInfo,
-  // updateDecoderInfo,
-  // updateAddingRulesetFile,
-  // updateLoadingStatus,
-  // updatePageIndex,
-} from '../../../../../../redux/actions/rulesetActions';
 import { TableWzAPI } from '../../../../../../components/common/tables';
-import { formatUIDate } from '../../../../../../react-services/time-service';
-import { RulesetHandler, RulesetResources, resourceDictionary } from '../../common/ruleset-handler';
+import {  resourceDictionary } from '../../common/resources-handler';
 import { SECTION_RULES_SECTION, SECTION_RULES_KEY } from '../../common/constants';
 import RulesetColumns from './columns';
 import { FlyoutDetail } from './flyout-detail';
 import { withUserPermissions } from '../../../../../../components/common/hocs/withUserPermissions';
 import { WzUserPermissions } from '../../../../../../react-services/wz-user-permissions';
 import { compose } from 'redux';
-import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
-import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
-import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
 import {
   ManageFiles,
-  AddNewRuleButton,
+  AddNewFileButton,
   AddNewCdbListButton,
   UploadFilesButton,
 } from '../../common/actions-buttons'
@@ -49,12 +32,9 @@ function RulesetTable(props) {
   const [isLoading, setIsLoading] = useState(false);
   const [filters, setFilters] = useState([]);
   const [infoContent, setInfoContent] = useState(null);
-  const [isProcessing, setIsProcessing] = useState(false);
   const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
   const [showingFiles, setShowingFiles] = useState(false);
-  const [error, setError] = useState(false);
-  // const rulesetHandler = new RulesetHandler(SECTION_RULES_KEY);
 
 
   useEffect(() => {
@@ -90,7 +70,6 @@ function RulesetTable(props) {
   }
 
   const getColumns = () => {
-    // const { section } = props.state;
     const rulesetColumns = new RulesetColumns({ state: {
       section: SECTION_RULES_KEY
     }, ...props}).columns;
@@ -102,7 +81,6 @@ function RulesetTable(props) {
     const { id, name } = item;
 
     const getRequiredPermissions = (item) => {
-      // const { section } = props.state;
       const { permissionResource } = resourceDictionary[SECTION_RULES_KEY];
       return [
         {
@@ -127,7 +105,6 @@ function RulesetTable(props) {
     };
   };
 
-  // const { section } = props.state;
   const { updateRestartClusterManager, updateListContent } = props;
   const columns = getColumns();
 
@@ -135,14 +112,13 @@ function RulesetTable(props) {
     <ManageFiles
       section={SECTION_RULES_SECTION}
       showingFiles={showingFiles}
-      // updateLoadingStatus={props.updateLoadingStatus}
       toggleShowFiles={toggleShowFiles}
       updateIsProcessing={props.updateIsProcessing}
       updatePageIndex={props.updatePageIndex}
     />,
-    <AddNewRuleButton
+    <AddNewFileButton
       section={SECTION_RULES_SECTION}
-      updateAddingRulesetFile={props.updateAddingRulesetFile}
+      updateAddingFile={props.updateAddingFile}
     />,
     <AddNewCdbListButton
       section={SECTION_RULES_SECTION}
@@ -169,7 +145,6 @@ function RulesetTable(props) {
         searchBarSuggestions={apiSuggestsItems.items[SECTION_RULES_KEY]}
         endpoint={'/rules/files'}
         isExpandable={true}
-        // rowProps={getRowProps}
         downloadCsv={true}
         showReload={true}
         filters={filters}
@@ -218,9 +193,6 @@ function RulesetTable(props) {
     </>
   };
 
-  // this.props.cleanFilters();
-  //   this.props.updateFilters(filters);
-  //   this.props.cleanInfo();
   return (
     <div className="wz-inventory">
       {showingFiles ? <RenderFilesTable /> : <RenderRulesTable />
@@ -230,31 +202,7 @@ function RulesetTable(props) {
 
 }
 
-// const mapStateToProps = state => {
-//   return {
-//     state: state.rulesetReducers
-//   };
-// };
-
-// const mapDispatchToProps = dispatch => {
-//   return {
-    // updateIsProcessing: isProcessing => dispatch(updateIsProcessing(isProcessing)),
-    // updateShowModal: (showModal) => dispatch(updateShowModal(showModal)),
-    // updateFileContent: (fileContent) => dispatch(updateFileContent(fileContent)),
-    // updateListContent: (content) => dispatch(updateListContent(content)),
-    // updateListItemsForRemove: (itemList) => dispatch(updateListItemsForRemove(itemList)),
-    // updateRuleInfo: (rule) => dispatch(updateRuleInfo(rule)),
-    // updateDecoderInfo: (rule) => dispatch(updateDecoderInfo(rule)),
-    // updateAddingRulesetFile: (content) => dispatch(updateAddingRulesetFile(content)),
-    // updateLoadingStatus: (status) => dispatch(updateLoadingStatus(status)),
-    // updatePageIndex: (pageIndex) => dispatch(updatePageIndex(pageIndex)),
-//   };
-// };
 
 export default compose(
-  // connect(
-  //   mapStateToProps,
-  //   mapDispatchToProps
-  // ),
   withUserPermissions
 )(RulesetTable);

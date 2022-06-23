@@ -20,7 +20,7 @@ import {
   updateError
 } from '../../../../../redux/actions/rulesetActions';
 
-import { RulesetHandler, RulesetResources } from '../common/ruleset-handler';
+import { ResourcesHandler, ResourcesConstants } from '../common/resources-handler';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
@@ -34,7 +34,7 @@ class WzRulesetFilterBar extends Component {
       selectedOptions: []
     };
 
-    this.rulesetHandler = new RulesetHandler(this.props.state.section);
+    this.resourcesHandler = new ResourcesHandler(this.props.state.section);
     this.availableOptions = {
       rules: [
         'nist-800-53',
@@ -123,8 +123,8 @@ class WzRulesetFilterBar extends Component {
   async fetchItems(filters) {
     try {
       const { section } = this.props.state;
-      let fetcher = this.rulesetHandler.getResource;
-      if (section === RulesetResources.LISTS) fetcher = this.rulesetHandler.getFiles; // If the sections is lists the fetcher changes
+      let fetcher = this.resourcesHandler.getResource;
+      if (section === ResourcesConstants.LISTS) fetcher = this.resourcesHandler.getFiles; // If the sections is lists the fetcher changes
       // this.props.updateLoadingStatus(true);
       const result = await fetcher(filters);
       // this.props.updateLoadingStatus(false);

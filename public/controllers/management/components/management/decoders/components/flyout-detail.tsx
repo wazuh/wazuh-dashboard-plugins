@@ -10,16 +10,11 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { useState } from 'react';
+import React from 'react';
 import {
   EuiFlyout,
-  EuiFlyoutHeader,
-  EuiFlyoutBody,
-  EuiTitle,
-  EuiLoadingContent,
-  EuiCallOut,
 } from '@elastic/eui';
-import WzRuleInfo from '../views/rule-info';
+import WzDecoderInfo from '../views/decoder-info';
 import './flyout-detail.scss'
 
 export const FlyoutDetail = ({ isLoading, item, title, closeFlyout, filters, ...rest }) => {
@@ -34,7 +29,7 @@ export const FlyoutDetail = ({ isLoading, item, title, closeFlyout, filters, ...
       className="wz-inventory wzApp wz-ruleset-flyout"
     >
       {item && !isLoading && <>
-          <WzRuleInfo item={item} {...rest} filters={filters} />
+          <WzDecoderInfo item={item} {...rest} filters={filters} />
       </>}
     </EuiFlyout>
   );

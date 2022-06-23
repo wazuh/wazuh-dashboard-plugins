@@ -15,13 +15,9 @@ import store from '../../../../../redux/store';
 import WzReduxProvider from '../../../../../redux/wz-redux-provider';
 //Wazuh ruleset tables(rules, decoder, lists)
 import WzRulesetOverview from './views/ruleset-overview';
-import WzDecodersOverview from './views/decoders-overview';
-import WzCDBListOverview from './views/cdblist-overview';
 //Information about rule or decoder
-import WzRuleInfo from './views/rule-info';
-import WzDecoderInfo from './views/decoder-info';
-import WzRulesetEditor from './views/ruleset-editor';
-import WzListEditor from './views/list-editor';
+
+import WzFileEditor from '../common/file-editor';
 import { SECTION_RULES_SECTION } from '../common/constants';
 
 
@@ -31,60 +27,46 @@ export default class WzRuleset extends Component {
     super(props);
     this.state = {
       fileContent: false,
-      addingRulesetFile: false
+      addingFile: false
     }; //Init state empty to avoid fails when try to read any parameter and this.state is not defined yet
     this.store = store;
   }
 
   UNSAFE_componentWillMount() {
     this._isMount = true;
-    // this.store.subscribe(() => {
-    //   const state = this.store.getState().rulesetReducers;
-    //   if (this._isMount) {
-    //     this.setState(state);
-    //   }
-    // });
   }
 
   componentWillUnmount() {
     this._isMount = false;
-    // When the component is going to be unmounted the ruleset state is reset
-    // const { ruleInfo, decoderInfo, listInfo, fileContent, addingRulesetFile } = this.state;
-    // if (
-    //   !window.location.href.includes('rules?tab=rules') &&
-    //   (!ruleInfo && !decoderInfo && !listInfo && !fileContent, !addingRulesetFile)
-    // ) {
-    //   this.store.dispatch({ type: 'RESET' });
-    // }
   }
 
   render() {
-    const { ruleInfo, decoderInfo, listInfo, fileContent, addingRulesetFile } = this.state;
+    const { fileContent, addingFile } = this.state;
 
     return (
       <WzReduxProvider>
         { //(ruleInfo && <WzRuleInfo />) ||
           // (decoderInfo && <WzDecoderInfo />) ||
           // (listInfo && <WzListEditor clusterStatus={this.props.clusterStatus} />) ||
-          ((fileContent || addingRulesetFile) && (
-            <WzRulesetEditor
+          ((fileContent || addingFile) && (
+            <WzFileEditor
               section={SECTION_RULES_SECTION}
               fileContent={fileContent}
-              addingRulesetFile={addingRulesetFile}
+              addingFile={addingFile}
               logtestProps={this.props.logtestProps}
               clusterStatus={this.props.clusterStatus}
               updateFileContent={(fileContent) => { this.setState({ fileContent }) }}
               cleanEditState={() => {
                 this.setState({
                   fileContent: false,
-                  addingRulesetFile: false
+                  addingFile: false
                 })
               }}
             />
           )) || <WzRulesetOverview
             clusterStatus={this.props.clusterStatus}
             updateFileContent={(fileContent) => { this.setState({ fileContent }) }}
-            updateAddingRulesetFile={(addingRulesetFile) => { this.setState({ addingRulesetFile }) }}
+            updateAddingFile={(addingFile) => { this.setState({ addingFile }) }}
           />}
       </WzReduxProvider>
     );

@@ -13,7 +13,7 @@ import React, { Component } from 'react';
 import { EuiBasicTable, EuiCallOut, EuiOverlayMask, EuiConfirmModal } from '@elastic/eui';
 
 import { connect } from 'react-redux';
-import { RulesetHandler, RulesetResources, resourceDictionary } from '../common/ruleset-handler';
+import { ResourcesHandler, ResourcesConstants, resourceDictionary } from '../common/resources-handler';
 import { getToasts } from '../../../../../kibana-services';
 
 import {
@@ -60,27 +60,27 @@ class WzRulesetTable extends Component {
       decoders: 'decoder:file',
       lists: 'list:file',
     };
-    this.rulesetHandler = new RulesetHandler(this.props.state.section);
+    this.resourcesHandler = new ResourcesHandler(this.props.state.section);
   }
 
   async componentDidMount() {
     this._isMounted = true;
     this.props.updateIsProcessing(true);
-    if (this.props.state.section === RulesetResources.RULES) {
+    if (this.props.state.section === ResourcesConstants.RULES) {
       const regex = new RegExp('redirectRule=' + '[^&]*');
       const match = window.location.href.match(regex);
       if (match && match[0]) {
         this._isMounted && this.setState({ isRedirect: true });
         const id = match[0].split('=')[1];
         try {
-          const result = await this.rulesetHandler.getResource({
+          const result = await this.resourcesHandler.getResource({
             params: {
               rule_ids: id,
             },
           });
           const items = result.data.affected_items || [];
           if (items.length) {
-            const info = await this.rulesetHandler.getResource({
+            const info = await this.resourcesHandler.getResource({
               params: {
                 filename: items[0].filename,
               },
@@ -287,10 +287,10 @@ class WzRulesetTable extends Component {
           if (this.isLoading) return;
           this.setState({ isLoading: true });
           const { section } = this.props.state;
-          section === RulesetResources.RULES && (window.location.href = `${window.location.href}&redirectRule=${id}`);
+          section === ResourcesConstants.RULES && (window.location.href = `${window.location.href}&redirectRule=${id}`);
           try {
-            if (section === RulesetResources.LISTS) {
-              const result = await this.rulesetHandler.getFileContent(item.filename);
+            if (section === ResourcesConstants.LISTS) {
+              const result = await this.resourcesHandler.getFileContent(item.filename);
               const file = {
                 name: item.filename,
                 content: result,
@@ -298,7 +298,7 @@ class WzRulesetTable extends Component {
               };
               this.props.updateListContent(file);
             } else {
-              const result = await this.rulesetHandler.getResource({
+              const result = await this.resourcesHandler.getResource({
                 params: {
                   filename: item.filename,
                 },
@@ -306,8 +306,8 @@ class WzRulesetTable extends Component {
               if (result.data) {
                 Object.assign(result.data, { current: id || name });
               }
-              if (section === RulesetResources.RULES) this.props.updateRuleInfo(result.data);
-              if (section === RulesetResources.DECODERS) this.props.updateDecoderInfo(result.data);
+              if (section === ResourcesConstants.RULES) this.props.updateRuleInfo(result.data);
+              if (section === ResourcesConstants.DECODERS) this.props.updateDecoderInfo(result.data);
             }
           } catch (error) {
             const options = {
@@ -394,7 +394,7 @@ class WzRulesetTable extends Component {
     try {
       this.setState({ isLoading: true });
       const results = items.map(async (item, i) => {
-        await this.rulesetHandler.deleteFile(item.filename || item.name);
+        await this.resourcesHandler.deleteFile(item.filename || item.name);
       });
 
       Promise.all(results).then((completed) => {

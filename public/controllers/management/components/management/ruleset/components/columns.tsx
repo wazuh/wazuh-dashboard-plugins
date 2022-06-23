@@ -1,6 +1,6 @@
 import React from 'react';
 import { EuiToolTip, EuiButtonIcon, EuiLink, EuiBadge } from '@elastic/eui';
-import { resourceDictionary, RulesetHandler, RulesetResources } from '../../common/ruleset-handler';
+import { resourceDictionary, ResourcesHandler, ResourcesConstants } from '../../common/resources-handler';
 import exportCsv from '../../../../../../react-services/wz-csv';
 import { WzButtonPermissions } from '../../../../../../components/common/permissions/button';
 
@@ -83,8 +83,8 @@ export default class RulesetColumns {
                   tooltip={{ position: 'top', content: `Show ${value} content` }}
                   onClick={async (ev) => {
                     ev.stopPropagation();
-                    const rulesetHandler = new RulesetHandler(RulesetResources.RULES);
-                    const result = await rulesetHandler.getFileContent(value);
+                    const resourcesHandler = new ResourcesHandler(ResourcesConstants.RULES);
+                    const result = await resourcesHandler.getFileContent(value);
                     const file = { name: value, content: result, path: item.relative_dirname };
                     this.props.setFileContent(file);
                   }}>
@@ -133,8 +133,8 @@ export default class RulesetColumns {
                   tooltip={{ position: 'top', content: `Show ${value} content` }}
                   onClick={async (ev) => {
                     ev.stopPropagation();
-                    const rulesetHandler = new RulesetHandler(RulesetResources.DECODERS);
-                    const result = await rulesetHandler.getFileContent(value);
+                    const resourcesHandler = new ResourcesHandler(ResourcesConstants.DECODERS);
+                    const result = await resourcesHandler.getFileContent(value);
                     const file = { name: value, content: result, path: item.relative_dirname };
                     this.props.setFileContent(file);
                   }}>
@@ -202,8 +202,8 @@ export default class RulesetColumns {
                     tooltip={{ position: 'top', content: `View the content of ${item.filename}` }}
                     onClick={async ev => {
                       ev.stopPropagation();
-                      const rulesetHandler = new RulesetHandler(this.props.state.section);
-                      const result = await rulesetHandler.getFileContent(item.filename);
+                      const resourcesHandler = new ResourcesHandler(this.props.state.section);
+                      const result = await resourcesHandler.getFileContent(item.filename);
                       const file = { name: item.filename, content: result, path: item.relative_dirname };
                       this.props.updateFileContent(file);
                     }}
@@ -221,8 +221,8 @@ export default class RulesetColumns {
                       tooltip={{ position: 'top', content: `Edit ${item.filename} content` }}
                       onClick={async ev => {
                         ev.stopPropagation();
-                        const rulesetHandler = new RulesetHandler(this.props.state.section);
-                        const result = await rulesetHandler.getFileContent(item.filename);
+                        const resourcesHandler = new ResourcesHandler(this.props.state.section);
+                        const result = await resourcesHandler.getFileContent(item.filename);
                         const file = { name: item.filename, content: result, path: item.relative_dirname };
                         this.props.updateFileContent(file);
                       }}
@@ -299,8 +299,8 @@ export default class RulesetColumns {
                 tooltip={{ position: 'top', content: `Edit ${item.filename} content` }}
                 onClick={async (ev) => {
                   ev.stopPropagation();
-                  const rulesetHandler = new RulesetHandler(this.props.state.section);
-                  const result = await rulesetHandler.getFileContent(item.filename);
+                  const resourcesHandler = new ResourcesHandler(this.props.state.section);
+                  const result = await resourcesHandler.getFileContent(item.filename);
                   const file = { name: item.filename, content: result, path: item.relative_dirname };
                   this.props.updateListContent(file);
                 }}

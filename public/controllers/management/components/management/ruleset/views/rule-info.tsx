@@ -21,7 +21,7 @@ import {
 
 import { WzRequest } from '../../../../../../react-services/wz-request';
 
-import { RulesetHandler, RulesetResources } from '../../common/ruleset-handler';
+import { ResourcesHandler, ResourcesConstants } from '../../common/resources-handler';
 import WzTextWithTooltipTruncated from '../../../../../../components/common/wz-text-with-tooltip-if-truncated';
 import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
@@ -51,12 +51,12 @@ export default class WzRuleInfo extends Component {
       currentRuleInfo: {},
       isLoading: true
     };
-    this.rulesetHandler = new RulesetHandler(RulesetResources.RULES);
+    this.resourcesHandler = new ResourcesHandler(ResourcesConstants.RULES);
 
     const handleFileClick = async (event, { filename, relative_dirname }) => {
       event.stopPropagation();
       try {
-        const result = await this.rulesetHandler.getFileContent(filename);
+        const result = await this.resourcesHandler.getFileContent(filename);
         const file = {
           name: filename,
           content: result,
@@ -165,7 +165,7 @@ export default class WzRuleInfo extends Component {
     const { currentRuleId, mitreRuleId } = this.state;
     try {
       let mitreState = {};
-      const result = await this.rulesetHandler.getResource({
+      const result = await this.resourcesHandler.getResource({
         params: {
           rule_ids: currentRuleId,
         },

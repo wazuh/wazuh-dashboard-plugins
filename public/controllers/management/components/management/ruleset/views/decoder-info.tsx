@@ -18,7 +18,7 @@ import {
 
 import { connect } from 'react-redux';
 
-import { RulesetHandler, RulesetResources } from '../../common/ruleset-handler';
+import { ResourcesHandler, ResourcesConstants } from '../../common/resources-handler';
 import { colors } from '../../common/colors';
 
 import {
@@ -37,11 +37,11 @@ class WzDecoderInfo extends Component {
   constructor(props) {
     super(props);
 
-    this.rulesetHandler = new RulesetHandler(RulesetResources.DECODERS);
+    this.resourcesHandler = new ResourcesHandler(ResourcesConstants.DECODERS);
 
     const handleFileClick = async (value, item) => {
       try {
-        const result = await this.rulesetHandler.getFileContent(value);
+        const result = await this.resourcesHandler.getFileContent(value);
         const file = { name: value, content: result, path: item.relative_dirname };
         this.props.updateFileContent(file);
       } catch (error) {

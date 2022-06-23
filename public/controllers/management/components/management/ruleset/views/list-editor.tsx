@@ -31,7 +31,7 @@ import { connect } from 'react-redux';
 
 import { cleanInfo, updateListContent } from '../../../../../../redux/actions/rulesetActions';
 
-import { resourceDictionary, RulesetHandler, RulesetResources } from '../../common/ruleset-handler';
+import { resourceDictionary, ResourcesHandler, ResourcesConstants } from '../../common/resources-handler';
 
 import { getToasts } from '../../../../../../kibana-services';
 
@@ -60,7 +60,7 @@ class WzListEditor extends Component {
     };
     this.items = {};
 
-    this.rulesetHandler = new RulesetHandler(RulesetResources.LISTS);
+    this.resourcesHandler = new ResourcesHandler(ResourcesConstants.LISTS);
   }
 
   componentDidMount() {
@@ -136,7 +136,7 @@ class WzListEditor extends Component {
         return;
       }
       this.setState({ isSaving: true });
-      await this.rulesetHandler.updateFile(name, raw, overwrite);
+      await this.resourcesHandler.updateFile(name, raw, overwrite);
       if (!addingNew) {
         const file = { name: name, content: raw, path: path };
         this.props.updateListContent(file);
@@ -211,8 +211,8 @@ class WzListEditor extends Component {
   getUpdatePermissions = (name) => {
     return [
       {
-        action: `${RulesetResources.LISTS}:update`,
-        resource: resourceDictionary[RulesetResources.LISTS].permissionResource(name),
+        action: `${ResourcesConstants.LISTS}:update`,
+        resource: resourceDictionary[ResourcesConstants.LISTS].permissionResource(name),
       },
     ];
   };
@@ -220,8 +220,8 @@ class WzListEditor extends Component {
   getDeletePermissions = (name) => {
     return [
       {
-        action: `${RulesetResources.LISTS}:delete`,
-        resource: resourceDictionary[RulesetResources.LISTS].permissionResource(name),
+        action: `${ResourcesConstants.LISTS}:delete`,
+        resource: resourceDictionary[ResourcesConstants.LISTS].permissionResource(name),
       },
     ];
   };
