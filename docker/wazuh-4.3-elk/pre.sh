@@ -3,7 +3,7 @@
 elastic_versions=(
 	"7.16.0"
 	"7.16.1"
-	"7.16.2" 
+	"7.16.2"
 	"7.16.3"
 	"7.17.0"
 	"7.17.1"
@@ -13,22 +13,22 @@ elastic_versions=(
 )
 
 wazuh_api_version=(
-	"4.3.5"
-	"4.3.17"
+	"5"
+	"17"
 )
 
 usage() {
-	echo 
-	echo "./pro.sh elastic_version wazuh_api_version action "
-	echo 
+	echo
+	echo "./pre.sh elastic_version wazuh_api_version action "
+	echo
 	echo "where"
 	echo "  elastic_version is one of " ${elastic_versions[*]}
-	echo "  wazuh_api_version if the minor version of wazuh 4.3, for example " ${wazuh_versions[*]}
-	echo "  action is one of up | down" 
-	echo 
+	echo "  wazuh_api_version is the minor version of wazuh 4.3, for example " ${wazuh_api_version[*]}
+	echo "  action is one of up | down"
+	echo
 	echo "In a minor release, the API should not change the version here bumps the API"
 	echo " string returned for testing. This script generates the file "
-	echo 
+	echo
 	echo "    config/imposter/api_info.json"
 	echo
 	echo "used by the mock server"
@@ -37,12 +37,12 @@ usage() {
 
 if [ $# -ne	3 ]
   then
-  	echo "Incorrect number of arguments " $# 
+  	echo "Incorrect number of arguments " $#
     usage
 fi
 
 if [[ ! " ${elastic_versions[*]} " =~ " ${1} " ]]
- then 
+ then
  	echo "Version ${1} not found in ${elastic_versions[*]}"
  	exit -1
 fi
@@ -109,7 +109,7 @@ case "$3" in
 		echo docker cp wazuh_kibana-4.3.${patch_version}_${STACK_VERSION}-1.zip elastic-${v}_kibana_1:/tmp
 		echo docker exec -ti  elastic-${v}_kibana_1  /usr/share/kibana/bin/kibana-plugin install file:///tmp/wazuh_kibana-4.3.${patch_version}_${STACK_VERSION}-1.zip
 		echo docker restart elastic-${v}_kibana_1
-		echo docker cp ./config/kibana/wazuh.yml elastic-${v}_kibana_1:/usr/share/kibana/data/wazuh/config/ 
+		echo docker cp ./config/kibana/wazuh.yml elastic-${v}_kibana_1:/usr/share/kibana/data/wazuh/config/
 		;;
 	down)
 		# delete volumes

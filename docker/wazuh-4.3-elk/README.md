@@ -1,52 +1,64 @@
 # Elastic
 
+On this folder we can find to types of environments:
+
+ * production environment, managed by the `pro.sh` script
+ * prerelease environment managed by the `pre.sh` script
+
+
+## Production environment
+
 This environment brings up a complete elastic environment with:
  - Elasticsearch cluster with a single node
  - Elasticsearch Kibana with a single node
- - Wazuh manager 
- - elastic-exporter
+ - Elasticsearch exporter
+ - Wazuh manager
 
-The environment expect the network mon to exists, either bring up the mon stack or execute the following command:
+The environment expect the network mon to exists, either bring up the
+mon stack or execute the following command:
 
-$ docker network create mon
+    $ docker network create mon
 
 This needs to be done just once.
 
-## Usage:
+### Usage:
 
 ```
-./pro.sh elastic_version wazuh_version action
+./pro.sh elastic_version wazuh_manager_version action
 
 where
   elastic_version is one of  7.16.0 7.16.1 7.16.2 7.16.3 7.17.0 7.17.1 7.17.2 7.17.3 7.17.4
-  wazuh_version if one of  4.3.0 4.3.1 4.3.2 4.3.3 4.3.4
+  wazuh_manager_version if one of  4.3.0 4.3.1 4.3.2 4.3.3 4.3.4
   action is one of up | down
 ```
 
-The version lists are defined in the pro.sh script. Edit it to add new supported versions
+The version lists are defined in the pro.sh script. Edit it to add new
+supported versions.
 
- ## Install a compatible wazuh
+ ### Install a compatible wazuh
 
-When the pro.sh script ends, it will print the commands to install a Wazuh version:
+When the `pro.sh` script ends, it will print the commands how to install the
+Wazuh application to run within Kibana:
 
-For example, the command 
+For example, the command
 
 `./pro.sh 7.16.3 4.3.4 up`
 
-Will print: 
+Will print:
 
 ```
 Install Wazuh 4.3.4 into Elastic 7.16.3 manually with:
+
 docker exec -ti elastic-7163_kibana_1 /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.3.4_7.16.3-1.zip
 docker restart elastic-7163_kibana_1
 docker cp ./config/kibana/wazuh.yml elastic-7163_kibana_1:/usr/share/kibana/data/wazuh/config/
 ```
 
-These commands are to automatically run, because waiting for kibana to be ready in a shell is fragile. The procedure is easy enough:
+This is a manual procedure which might be automated in the future. But any automatism will need
 
 1. Wait for kibana to be ready
 
-2. Execute the wazuh plugin installation command 
+2. Execute the wazuh plugin installation command
 
 `docker exec -ti elastic-7163_kibana_1 /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.3.4_7.16.3-1.zip`
 
@@ -65,7 +77,7 @@ If this command returns a `no such file or directory` message, means kibana is s
 
 The `pro.yml` file contains a docker-compose with all the set up for a 3 node cluster, read it carefully if you need to bring such a cluster.
 
-## Agent registrations 
+## Agent registrations
 
 To register an agent, we need to get the registering command from the UI and run commands like the ones below. Please pay atention to the Wazuh version in the network name.
 
@@ -84,18 +96,59 @@ For centos/8 images:
         tail -f /var/ossec/logs/ossec.log
     '
 
-For ubuntu images 
+For ubuntu images
 
     $ docker run --network es-pro-4.3.4 -d ubuntu:20.04 bash -c '
         apt update -y
-        apt install -y curl lsb-release 
-        # Change this command by the one the UI suggest to use add it tremove the sudo 
+        apt install -y curl lsb-release
+        # Change this command by the one the UI suggest to use add it tremove the sudo
         curl -so wazuh-agent-4.3.4.deb https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_4.3.4-1_amd64.deb && WAZUH_MANAGER='wazuh.manager' dpkg -i ./wazuh-agent-4.3.4.deb
 
         /etc/init.d/wazuh-agent start
         tail -f /var/ossec/logs/ossec.log
     '
 
-For non linux agents:
+For non linux agents we would need to provision virtual machines.
 
-We need to provision virtual machines.
+
+## Prerelease environment
+
+The prerelease environment help us test app releases while the rest of
+Wazuh packages haven't been generated yet.
+
+This environment will bring up:
+
+ - Elasticsearch cluster with a single node
+ - Elasticsearch Kibana with a single node
+ - Elasticsearch exporter
+ - Filebeat
+ - Imposter
+
+### Usage
+
+```
+./pre.sh elastic_version wazuh_api_version action
+
+where
+  elastic_version is one of  7.16.0 7.16.1 7.16.2 7.16.3 7.17.0 7.17.1 7.17.2 7.17.3 7.17.4
+  wazuh_api_version is the minor version of wazuh 4.3, for example
+  action is one of up | down
+
+In a minor release, the API should not change the version here bumps the API
+ string returned for testing. This script generates the file
+
+    config/imposter/api_info.json
+
+used by the mock server
+```
+
+Please take into account that the api version for this environment will always be a 4.3.X version. Also consider that our application version must be the same as the one selected here.
+
+### Install a compatible wazuh
+
+The same approach used by the production environment is used in the pre-release package.
+
+### Agent registrations
+
+Because we're not using a real wazuh-manager, we cannot registrate new agents, but the mock server wil generate data to valid API requests as i it were the real wazuh server.
+

@@ -3,7 +3,7 @@
 elastic_versions=(
 	"7.16.0"
 	"7.16.1"
-	"7.16.2" 
+	"7.16.2"
 	"7.16.3"
 	"7.17.0"
 	"7.17.1"
@@ -21,30 +21,30 @@ wazuh_versions=(
 )
 
 usage() {
-	echo 
+	echo
 	echo "./pro.sh elastic_version wazuh_manager_version action "
-	echo 
+	echo
 	echo "where"
 	echo "  elastic_version is one of " ${elastic_versions[*]}
 	echo "  wazuh_manager_version if one of " ${wazuh_versions[*]}
-	echo "  action is one of up | down" 
+	echo "  action is one of up | down"
 	exit -1
 }
 
 if [ $# -ne	3 ]
   then
-  	echo "Incorrect number of arguments " $# 
+  	echo "Incorrect number of arguments " $#
     usage
 fi
 
 if [[ ! " ${elastic_versions[*]} " =~ " ${1} " ]]
- then 
+ then
  	echo "Version ${1} not found in ${elastic_versions[*]}"
  	exit -1
 fi
 
 if [[ ! " ${wazuh_versions[*]} " =~ " ${2} " ]]
- then 
+ then
  	echo "Version ${2} not found in ${wazuh_versions[*]}"
  	exit -1
 fi
@@ -84,11 +84,12 @@ case "$3" in
 
 		# This installs Wazuh and integrates with a default elastic stack
 		v=$( echo -n $STACK_VERSION | sed 's/\.//g' )
-
+		echo
 		echo Install Wazuh ${WAZUH_STACK} into Elastic ${STACK_VERSION} manually with:
-		echo docker exec -ti  elastic-${v}_kibana_1  /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-${WAZUH_STACK}_${STACK_VERSION}-1.zip 
+		echo
+		echo docker exec -ti  elastic-${v}_kibana_1  /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-${WAZUH_STACK}_${STACK_VERSION}-1.zip
 		echo docker restart elastic-${v}_kibana_1
-		echo docker cp ./config/kibana/wazuh.yml elastic-${v}_kibana_1:/usr/share/kibana/data/wazuh/config/ 
+		echo docker cp ./config/kibana/wazuh.yml elastic-${v}_kibana_1:/usr/share/kibana/data/wazuh/config/
 		;;
 	down)
 		# delete volumes
