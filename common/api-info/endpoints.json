@@ -62,13 +62,13 @@
           },
           {
             "name": "limit",
-            "description": "Maximum number of elements to return",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 500,
               "minimum": 1,
-              "maximum": 500
+              "maximum": 100000
             }
           },
           {
@@ -162,7 +162,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
               "format": "search"
@@ -462,13 +462,13 @@
         "query": [
           {
             "name": "limit",
-            "description": "Maximum number of elements to return",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 500,
               "minimum": 1,
-              "maximum": 500
+              "maximum": 100000
             }
           },
           {
@@ -498,7 +498,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
               "format": "search"
@@ -544,13 +544,13 @@
         "query": [
           {
             "name": "limit",
-            "description": "Maximum number of elements to return",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 500,
               "minimum": 1,
-              "maximum": 500
+              "maximum": 100000
             }
           },
           {
@@ -580,7 +580,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
               "format": "search"
@@ -626,13 +626,13 @@
           },
           {
             "name": "limit",
-            "description": "Maximum number of elements to return",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 500,
               "minimum": 1,
-              "maximum": 500
+              "maximum": 100000
             }
           },
           {
@@ -662,21 +662,10 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
               "format": "search"
-            }
-          },
-          {
-            "name": "select",
-            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "format": "names"
-              }
             }
           },
           {
@@ -774,11 +763,99 @@
             }
           },
           {
+            "name": "group",
+            "description": "Filter by group of agents",
+            "schema": {
+              "type": "string",
+              "description": "Group name",
+              "format": "group_names"
+            }
+          },
+          {
+            "name": "ip",
+            "description": "Filter by the IP used by the agent to communicate with the manager. If it's not available, it will have the same value as registerIP",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
+            "name": "manager",
+            "description": "Filter by manager hostname where agents are connected to",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
+            "name": "name",
+            "description": "Filter by name",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
+            "name": "node_name",
+            "description": "Filter by node name",
+            "schema": {
+              "type": "string",
+              "format": "names"
+            }
+          },
+          {
+            "name": "os.name",
+            "description": "Filter by OS name",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
+            "name": "os.platform",
+            "description": "Filter by OS platform",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
+            "name": "os.version",
+            "description": "Filter by OS version",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
             "name": "pretty",
             "description": "Show results in human-readable format",
             "schema": {
               "type": "boolean",
               "default": false
+            }
+          },
+          {
+            "name": "q",
+            "description": "Query to filter results by. For example q=&quot;status=active&quot;",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "registerIP",
+            "description": "Filter by the IP used when registering the agent",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
+            "name": "version",
+            "description": "Filter by agents version",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
             }
           },
           {
@@ -841,13 +918,13 @@
           },
           {
             "name": "limit",
-            "description": "Maximum number of elements to return",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 500,
               "minimum": 1,
-              "maximum": 500
+              "maximum": 100000
             }
           },
           {
@@ -912,7 +989,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
               "format": "search"
@@ -1220,7 +1297,7 @@
           },
           {
             "name": "limit",
-            "description": "Maximum number of elements to return",
+            "description": "Maximum number of lines to return.",
             "schema": {
               "type": "integer",
               "format": "int32",
@@ -1256,7 +1333,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
               "format": "search"
@@ -1275,38 +1352,7 @@
             "description": "Wazuh component that logged the event",
             "schema": {
               "type": "string",
-              "enum": [
-                "wazuh-agentlessd",
-                "wazuh-analysisd",
-                "wazuh-authd",
-                "wazuh-csyslogd",
-                "wazuh-dbd",
-                "wazuh-execd",
-                "wazuh-integratord",
-                "wazuh-maild",
-                "wazuh-monitord",
-                "wazuh-logcollector",
-                "wazuh-remoted",
-                "wazuh-reportd",
-                "wazuh-rootcheck",
-                "wazuh-syscheckd",
-                "sca",
-                "wazuh-db",
-                "wazuh-modulesd",
-                "wazuh-modulesd:agent-key-polling",
-                "wazuh-modulesd:aws-s3",
-                "wazuh-modulesd:azure-logs",
-                "wazuh-modulesd:ciscat",
-                "wazuh-modulesd:control",
-                "wazuh-modulesd:command",
-                "wazuh-modulesd:database",
-                "wazuh-modulesd:docker-listener",
-                "wazuh-modulesd:download",
-                "wazuh-modulesd:oscap",
-                "wazuh-modulesd:osquery",
-                "wazuh-modulesd:syscollector",
-                "wazuh-modulesd:vulnerability-detector"
-              ]
+              "format": "alphanumeric"
             }
           },
           {
@@ -1769,13 +1815,13 @@
         "query": [
           {
             "name": "limit",
-            "description": "Maximum number of elements to return",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 500,
               "minimum": 1,
-              "maximum": 500
+              "maximum": 100000
             }
           },
           {
@@ -1815,7 +1861,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
               "format": "search"
@@ -1921,13 +1967,13 @@
           },
           {
             "name": "limit",
-            "description": "Maximum number of elements to return",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 500,
               "minimum": 1,
-              "maximum": 500
+              "maximum": 100000
             }
           },
           {
@@ -1965,7 +2011,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
               "format": "search"
@@ -2035,13 +2081,13 @@
           },
           {
             "name": "limit",
-            "description": "Maximum number of elements to return",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 500,
               "minimum": 1,
-              "maximum": 500
+              "maximum": 100000
             }
           },
           {
@@ -2072,7 +2118,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
               "format": "search"
@@ -2166,13 +2212,13 @@
         "query": [
           {
             "name": "limit",
-            "description": "Maximum number of elements to return",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 500,
               "minimum": 1,
-              "maximum": 500
+              "maximum": 100000
             }
           },
           {
@@ -2195,7 +2241,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
               "format": "search"
@@ -2280,13 +2326,13 @@
           },
           {
             "name": "limit",
-            "description": "Maximum number of elements to return",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 500,
               "minimum": 1,
-              "maximum": 500
+              "maximum": 100000
             }
           },
           {
@@ -2344,7 +2390,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
               "format": "search"
@@ -2444,13 +2490,13 @@
           },
           {
             "name": "limit",
-            "description": "Maximum number of elements to return",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 500,
               "minimum": 1,
-              "maximum": 500
+              "maximum": 100000
             }
           },
           {
@@ -2491,7 +2537,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
               "format": "search"
@@ -2557,13 +2603,13 @@
           },
           {
             "name": "limit",
-            "description": "Maximum number of elements to return",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 500,
               "minimum": 1,
-              "maximum": 500
+              "maximum": 100000
             }
           },
           {
@@ -2586,7 +2632,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
               "format": "search"
@@ -2661,13 +2707,13 @@
           },
           {
             "name": "limit",
-            "description": "Maximum number of elements to return",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 500,
               "minimum": 1,
-              "maximum": 500
+              "maximum": 100000
             }
           },
           {
@@ -2706,7 +2752,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
               "format": "search"
@@ -2773,13 +2819,13 @@
           },
           {
             "name": "limit",
-            "description": "Maximum number of elements to return",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 500,
               "minimum": 1,
-              "maximum": 500
+              "maximum": 100000
             }
           },
           {
@@ -2855,7 +2901,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
               "format": "search"
@@ -2996,13 +3042,13 @@
           },
           {
             "name": "limit",
-            "description": "Maximum number of elements to return",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 500,
               "minimum": 1,
-              "maximum": 500
+              "maximum": 100000
             }
           },
           {
@@ -3025,7 +3071,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
               "format": "search"
@@ -3100,13 +3146,13 @@
           },
           {
             "name": "limit",
-            "description": "Maximum number of elements to return",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 500,
               "minimum": 1,
-              "maximum": 500
+              "maximum": 100000
             }
           },
           {
@@ -3153,7 +3199,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
               "format": "search"
@@ -3236,13 +3282,13 @@
           },
           {
             "name": "limit",
-            "description": "Maximum number of elements to return",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 500,
               "minimum": 1,
-              "maximum": 500
+              "maximum": 100000
             }
           },
           {
@@ -3273,7 +3319,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
               "format": "search"
@@ -3307,7 +3353,7 @@
           },
           {
             "name": "version",
-            "description": "Filter by version name",
+            "description": "Filter by package version",
             "schema": {
               "type": "string"
             }
@@ -3346,13 +3392,13 @@
           },
           {
             "name": "limit",
-            "description": "Maximum number of elements to return",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 500,
               "minimum": 1,
-              "maximum": 500
+              "maximum": 100000
             }
           },
           {
@@ -3423,7 +3469,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
               "format": "search"
@@ -3522,13 +3568,13 @@
           },
           {
             "name": "limit",
-            "description": "Maximum number of elements to return",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 500,
               "minimum": 1,
-              "maximum": 500
+              "maximum": 100000
             }
           },
           {
@@ -3615,7 +3661,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
               "format": "search"
@@ -3718,13 +3764,13 @@
           },
           {
             "name": "limit",
-            "description": "Maximum number of elements to return",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 500,
               "minimum": 1,
-              "maximum": 500
+              "maximum": 100000
             }
           },
           {
@@ -3747,7 +3793,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
               "format": "search"
@@ -3794,13 +3840,13 @@
         "query": [
           {
             "name": "limit",
-            "description": "Maximum number of elements to return",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 500,
               "minimum": 1,
-              "maximum": 500
+              "maximum": 100000
             }
           },
           {
@@ -3830,7 +3876,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
               "format": "search"
@@ -3905,13 +3951,13 @@
         "query": [
           {
             "name": "limit",
-            "description": "Maximum number of elements to return",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 500,
               "minimum": 1,
-              "maximum": 500
+              "maximum": 100000
             }
           },
           {
@@ -3986,13 +4032,13 @@
           },
           {
             "name": "limit",
-            "description": "Maximum number of elements to return",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 500,
               "minimum": 1,
-              "maximum": 500
+              "maximum": 100000
             }
           },
           {
@@ -4015,7 +4061,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
               "format": "search"
@@ -4042,7 +4088,7 @@
       {
         "name": "/groups/:group_id/files/:file_name/json",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agent_controller.get_group_file_json",
-        "description": "Return the contents of the specified group file parsed to JSON",
+        "description": "Return the content of the specified group file parsed to JSON",
         "summary": "Get a file in group",
         "tags": [
           "Groups"
@@ -4189,13 +4235,13 @@
           },
           {
             "name": "limit",
-            "description": "Maximum number of elements to return",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 500,
               "minimum": 1,
-              "maximum": 500
+              "maximum": 100000
             }
           },
           {
@@ -4226,7 +4272,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
               "format": "search"
@@ -4283,13 +4329,13 @@
           },
           {
             "name": "limit",
-            "description": "Maximum number of elements to return",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 500,
               "minimum": 1,
-              "maximum": 500
+              "maximum": 100000
             }
           },
           {
@@ -4320,7 +4366,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
               "format": "search"
@@ -4667,7 +4713,7 @@
           },
           {
             "name": "limit",
-            "description": "Maximum number of elements to return",
+            "description": "Maximum number of lines to return.",
             "schema": {
               "type": "integer",
               "format": "int32",
@@ -4703,7 +4749,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
               "format": "search"
@@ -4722,38 +4768,7 @@
             "description": "Wazuh component that logged the event",
             "schema": {
               "type": "string",
-              "enum": [
-                "wazuh-agentlessd",
-                "wazuh-analysisd",
-                "wazuh-authd",
-                "wazuh-csyslogd",
-                "wazuh-dbd",
-                "wazuh-execd",
-                "wazuh-integratord",
-                "wazuh-maild",
-                "wazuh-monitord",
-                "wazuh-logcollector",
-                "wazuh-remoted",
-                "wazuh-reportd",
-                "wazuh-rootcheck",
-                "wazuh-syscheckd",
-                "sca",
-                "wazuh-db",
-                "wazuh-modulesd",
-                "wazuh-modulesd:agent-key-polling",
-                "wazuh-modulesd:aws-s3",
-                "wazuh-modulesd:azure-logs",
-                "wazuh-modulesd:ciscat",
-                "wazuh-modulesd:control",
-                "wazuh-modulesd:command",
-                "wazuh-modulesd:database",
-                "wazuh-modulesd:docker-listener",
-                "wazuh-modulesd:download",
-                "wazuh-modulesd:oscap",
-                "wazuh-modulesd:osquery",
-                "wazuh-modulesd:syscollector",
-                "wazuh-modulesd:vulnerability-detector"
-              ]
+              "format": "alphanumeric"
             }
           },
           {
@@ -4964,31 +4979,34 @@
         ]
       },
       {
-        "name": "/mitre",
-        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.mitre_controller.get_attack",
-        "description": "Return the requested attacks from MITRE database",
-        "summary": "Get MITRE attacks",
+        "name": "/mitre/groups",
+        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.mitre_controller.get_groups",
+        "description": "Return the groups from MITRE database",
+        "summary": "Get MITRE groups",
         "tags": [
-          "Mitre"
+          "MITRE"
         ],
         "query": [
           {
-            "name": "id",
-            "description": "MITRE attack ID",
+            "name": "group_ids",
+            "description": "List of MITRE's group IDs (separated by comma)",
             "schema": {
-              "type": "string",
-              "format": "alphanumeric"
+              "type": "array",
+              "items": {
+                "type": "string",
+                "description": "MITRE group ID"
+              }
             }
           },
           {
             "name": "limit",
-            "description": "Maximum number of elements to return",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 500,
               "minimum": 1,
-              "maximum": 500
+              "maximum": 100000
             }
           },
           {
@@ -4999,22 +5017,6 @@
               "format": "int32",
               "default": 0,
               "minimum": 0
-            }
-          },
-          {
-            "name": "phase_name",
-            "description": "Show results filtered by phase",
-            "schema": {
-              "type": "string",
-              "format": "alphanumeric"
-            }
-          },
-          {
-            "name": "platform_name",
-            "description": "Show results filtered by platform",
-            "schema": {
-              "type": "string",
-              "format": "alphanumeric"
             }
           },
           {
@@ -5034,7 +5036,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
               "format": "search"
@@ -5057,6 +5059,498 @@
             "schema": {
               "type": "string",
               "format": "sort"
+            }
+          },
+          {
+            "name": "wait_for_complete",
+            "description": "Disable timeout response",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ]
+      },
+      {
+        "name": "/mitre/metadata",
+        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.mitre_controller.get_metadata",
+        "description": "Return the metadata from MITRE database",
+        "summary": "Get MITRE metadata",
+        "tags": [
+          "MITRE"
+        ],
+        "query": [
+          {
+            "name": "pretty",
+            "description": "Show results in human-readable format",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "wait_for_complete",
+            "description": "Disable timeout response",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ]
+      },
+      {
+        "name": "/mitre/mitigations",
+        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.mitre_controller.get_mitigations",
+        "description": "Return the mitigations from MITRE database",
+        "summary": "Get MITRE mitigations",
+        "tags": [
+          "MITRE"
+        ],
+        "query": [
+          {
+            "name": "limit",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 500,
+              "minimum": 1,
+              "maximum": 100000
+            }
+          },
+          {
+            "name": "mitigation_ids",
+            "description": "List of MITRE's mitigations IDs (separated by comma)",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "description": "MITRE mitigation ID"
+              }
+            }
+          },
+          {
+            "name": "offset",
+            "description": "First element to return in the collection",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0,
+              "minimum": 0
+            }
+          },
+          {
+            "name": "pretty",
+            "description": "Show results in human-readable format",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "q",
+            "description": "Query to filter results by. For example q=&quot;status=active&quot;",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
+            "schema": {
+              "type": "string",
+              "format": "search"
+            }
+          },
+          {
+            "name": "select",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "names"
+              }
+            }
+          },
+          {
+            "name": "sort",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
+            "schema": {
+              "type": "string",
+              "format": "sort"
+            }
+          },
+          {
+            "name": "wait_for_complete",
+            "description": "Disable timeout response",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ]
+      },
+      {
+        "name": "/mitre/references",
+        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.mitre_controller.get_references",
+        "description": "Return the references from MITRE database",
+        "summary": "Get MITRE references",
+        "tags": [
+          "MITRE"
+        ],
+        "query": [
+          {
+            "name": "limit",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 500,
+              "minimum": 1,
+              "maximum": 100000
+            }
+          },
+          {
+            "name": "offset",
+            "description": "First element to return in the collection",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0,
+              "minimum": 0
+            }
+          },
+          {
+            "name": "pretty",
+            "description": "Show results in human-readable format",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "q",
+            "description": "Query to filter results by. For example q=&quot;status=active&quot;",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "reference_ids",
+            "description": "List of MITRE's references IDs (separated by comma)",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "description": "MITRE Reference ID"
+              }
+            }
+          },
+          {
+            "name": "search",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
+            "schema": {
+              "type": "string",
+              "format": "search"
+            }
+          },
+          {
+            "name": "select",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "names"
+              }
+            }
+          },
+          {
+            "name": "sort",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
+            "schema": {
+              "type": "string",
+              "format": "sort"
+            }
+          },
+          {
+            "name": "wait_for_complete",
+            "description": "Disable timeout response",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ]
+      },
+      {
+        "name": "/mitre/software",
+        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.mitre_controller.get_software",
+        "description": "Return the software from MITRE database",
+        "summary": "Get MITRE software",
+        "tags": [
+          "MITRE"
+        ],
+        "query": [
+          {
+            "name": "limit",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 500,
+              "minimum": 1,
+              "maximum": 100000
+            }
+          },
+          {
+            "name": "offset",
+            "description": "First element to return in the collection",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0,
+              "minimum": 0
+            }
+          },
+          {
+            "name": "pretty",
+            "description": "Show results in human-readable format",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "q",
+            "description": "Query to filter results by. For example q=&quot;status=active&quot;",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
+            "schema": {
+              "type": "string",
+              "format": "search"
+            }
+          },
+          {
+            "name": "select",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "names"
+              }
+            }
+          },
+          {
+            "name": "software_ids",
+            "description": "List of MITRE's software IDs (separated by comma)",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "description": "MITRE software ID"
+              }
+            }
+          },
+          {
+            "name": "sort",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
+            "schema": {
+              "type": "string",
+              "format": "sort"
+            }
+          },
+          {
+            "name": "wait_for_complete",
+            "description": "Disable timeout response",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ]
+      },
+      {
+        "name": "/mitre/tactics",
+        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.mitre_controller.get_tactics",
+        "description": "Return the tactics from MITRE database",
+        "summary": "Get MITRE tactics",
+        "tags": [
+          "MITRE"
+        ],
+        "query": [
+          {
+            "name": "limit",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 500,
+              "minimum": 1,
+              "maximum": 100000
+            }
+          },
+          {
+            "name": "offset",
+            "description": "First element to return in the collection",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0,
+              "minimum": 0
+            }
+          },
+          {
+            "name": "pretty",
+            "description": "Show results in human-readable format",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "q",
+            "description": "Query to filter results by. For example q=&quot;status=active&quot;",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
+            "schema": {
+              "type": "string",
+              "format": "search"
+            }
+          },
+          {
+            "name": "select",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "names"
+              }
+            }
+          },
+          {
+            "name": "sort",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
+            "schema": {
+              "type": "string",
+              "format": "sort"
+            }
+          },
+          {
+            "name": "tactic_ids",
+            "description": "List of MITRE's tactics IDs (separated by comma)",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "description": "MITRE tactic ID"
+              }
+            }
+          },
+          {
+            "name": "wait_for_complete",
+            "description": "Disable timeout response",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ]
+      },
+      {
+        "name": "/mitre/techniques",
+        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.mitre_controller.get_techniques",
+        "description": "Return the techniques from MITRE database",
+        "summary": "Get MITRE techniques",
+        "tags": [
+          "MITRE"
+        ],
+        "query": [
+          {
+            "name": "limit",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 500,
+              "minimum": 1,
+              "maximum": 100000
+            }
+          },
+          {
+            "name": "offset",
+            "description": "First element to return in the collection",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0,
+              "minimum": 0
+            }
+          },
+          {
+            "name": "pretty",
+            "description": "Show results in human-readable format",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "q",
+            "description": "Query to filter results by. For example q=&quot;status=active&quot;",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
+            "schema": {
+              "type": "string",
+              "format": "search"
+            }
+          },
+          {
+            "name": "select",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "names"
+              }
+            }
+          },
+          {
+            "name": "sort",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
+            "schema": {
+              "type": "string",
+              "format": "sort"
+            }
+          },
+          {
+            "name": "technique_ids",
+            "description": "List of MITRE's techniques IDs (separated by comma)",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "description": "MITRE technique ID"
+              }
             }
           },
           {
@@ -5136,13 +5630,13 @@
           },
           {
             "name": "limit",
-            "description": "Maximum number of elements to return",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 500,
               "minimum": 1,
-              "maximum": 500
+              "maximum": 100000
             }
           },
           {
@@ -5180,7 +5674,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
               "format": "search"
@@ -5325,18 +5819,18 @@
           },
           {
             "name": "limit",
-            "description": "Maximum number of elements to return",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 500,
               "minimum": 1,
-              "maximum": 500
+              "maximum": 100000
             }
           },
           {
             "name": "mitre",
-            "description": "Filters by MITRE attack ID",
+            "description": "Filters by MITRE technique ID",
             "schema": {
               "type": "string",
               "format": "alphanumeric"
@@ -5405,7 +5899,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
               "format": "search"
@@ -5483,13 +5977,13 @@
           },
           {
             "name": "limit",
-            "description": "Maximum number of elements to return",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 500,
               "minimum": 1,
-              "maximum": 500
+              "maximum": 100000
             }
           },
           {
@@ -5520,7 +6014,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
               "format": "search"
@@ -5614,13 +6108,13 @@
         "query": [
           {
             "name": "limit",
-            "description": "Maximum number of elements to return",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 500,
               "minimum": 1,
-              "maximum": 500
+              "maximum": 100000
             }
           },
           {
@@ -5643,7 +6137,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
               "format": "search"
@@ -5696,13 +6190,13 @@
         "query": [
           {
             "name": "limit",
-            "description": "Maximum number of elements to return",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 500,
               "minimum": 1,
-              "maximum": 500
+              "maximum": 100000
             }
           },
           {
@@ -5725,7 +6219,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
               "format": "search"
@@ -5781,13 +6275,13 @@
           },
           {
             "name": "limit",
-            "description": "Maximum number of elements to return",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 500,
               "minimum": 1,
-              "maximum": 500
+              "maximum": 100000
             }
           },
           {
@@ -5831,7 +6325,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
               "format": "search"
@@ -5891,7 +6385,7 @@
             "description": "Filter by command",
             "schema": {
               "type": "string",
-              "format": "alphanumeric"
+              "format": "symbols_alphanumeric_param"
             }
           },
           {
@@ -5926,13 +6420,13 @@
           },
           {
             "name": "limit",
-            "description": "Maximum number of elements to return",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 500,
               "minimum": 1,
-              "maximum": 500
+              "maximum": 100000
             }
           },
           {
@@ -6017,7 +6511,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
               "format": "search"
@@ -6121,13 +6615,13 @@
         "query": [
           {
             "name": "limit",
-            "description": "Maximum number of elements to return",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 500,
               "minimum": 1,
-              "maximum": 500
+              "maximum": 100000
             }
           },
           {
@@ -6162,10 +6656,21 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
               "format": "search"
+            }
+          },
+          {
+            "name": "select",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "names"
+              }
             }
           },
           {
@@ -6236,13 +6741,13 @@
         "query": [
           {
             "name": "limit",
-            "description": "Maximum number of elements to return",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 500,
               "minimum": 1,
-              "maximum": 500
+              "maximum": 100000
             }
           },
           {
@@ -6277,10 +6782,21 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
               "format": "search"
+            }
+          },
+          {
+            "name": "select",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "names"
+              }
             }
           },
           {
@@ -6312,13 +6828,13 @@
         "query": [
           {
             "name": "limit",
-            "description": "Maximum number of elements to return",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 500,
               "minimum": 1,
-              "maximum": 500
+              "maximum": 100000
             }
           },
           {
@@ -6353,10 +6869,21 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
               "format": "search"
+            }
+          },
+          {
+            "name": "select",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "names"
+              }
             }
           },
           {
@@ -6388,13 +6915,13 @@
         "query": [
           {
             "name": "limit",
-            "description": "Maximum number of elements to return",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 500,
               "minimum": 1,
-              "maximum": 500
+              "maximum": 100000
             }
           },
           {
@@ -6417,10 +6944,21 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
               "format": "search"
+            }
+          },
+          {
+            "name": "select",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "names"
+              }
             }
           },
           {
@@ -6558,13 +7096,13 @@
           },
           {
             "name": "limit",
-            "description": "Maximum number of elements to return",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 500,
               "minimum": 1,
-              "maximum": 500
+              "maximum": 100000
             }
           },
           {
@@ -6602,7 +7140,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
               "format": "search"
@@ -6811,13 +7349,13 @@
           },
           {
             "name": "limit",
-            "description": "Maximum number of elements to return",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 500,
               "minimum": 1,
-              "maximum": 500
+              "maximum": 100000
             }
           },
           {
@@ -6847,7 +7385,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
               "format": "search"
@@ -6930,13 +7468,13 @@
           },
           {
             "name": "limit",
-            "description": "Maximum number of elements to return",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 500,
               "minimum": 1,
-              "maximum": 500
+              "maximum": 100000
             }
           },
           {
@@ -6982,7 +7520,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
               "format": "search"
@@ -7049,13 +7587,13 @@
           },
           {
             "name": "limit",
-            "description": "Maximum number of elements to return",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 500,
               "minimum": 1,
-              "maximum": 500
+              "maximum": 100000
             }
           },
           {
@@ -7138,7 +7676,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
               "format": "search"
@@ -7209,7 +7747,7 @@
           },
           {
             "name": "type",
-            "description": "Type of file",
+            "description": "Type of interface",
             "schema": {
               "type": "string"
             }
@@ -7278,13 +7816,13 @@
           },
           {
             "name": "limit",
-            "description": "Maximum number of elements to return",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 500,
               "minimum": 1,
-              "maximum": 500
+              "maximum": 100000
             }
           },
           {
@@ -7314,7 +7852,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
               "format": "search"
@@ -7448,13 +7986,13 @@
           },
           {
             "name": "limit",
-            "description": "Maximum number of elements to return",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 500,
               "minimum": 1,
-              "maximum": 500
+              "maximum": 100000
             }
           },
           {
@@ -7492,7 +8030,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
               "format": "search"
@@ -7526,7 +8064,7 @@
           },
           {
             "name": "version",
-            "description": "Filter by version name",
+            "description": "Filter by package version",
             "schema": {
               "type": "string"
             }
@@ -7565,13 +8103,13 @@
         "query": [
           {
             "name": "limit",
-            "description": "Maximum number of elements to return",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 500,
               "minimum": 1,
-              "maximum": 500
+              "maximum": 100000
             }
           },
           {
@@ -7649,7 +8187,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
               "format": "search"
@@ -7748,13 +8286,13 @@
           },
           {
             "name": "limit",
-            "description": "Maximum number of elements to return",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 500,
               "minimum": 1,
-              "maximum": 500
+              "maximum": 100000
             }
           },
           {
@@ -7848,7 +8386,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
               "format": "search"
@@ -7934,18 +8472,18 @@
             "description": "Filter by command",
             "schema": {
               "type": "string",
-              "format": "alphanumeric"
+              "format": "symbols_alphanumeric_param"
             }
           },
           {
             "name": "limit",
-            "description": "Maximum number of elements to return",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 500,
               "minimum": 1,
-              "maximum": 500
+              "maximum": 100000
             }
           },
           {
@@ -7991,7 +8529,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
               "format": "search"
@@ -8094,13 +8632,13 @@
           },
           {
             "name": "limit",
-            "description": "Maximum number of elements to return",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 500,
               "minimum": 1,
-              "maximum": 500
+              "maximum": 100000
             }
           },
           {
@@ -8138,7 +8676,7 @@
           },
           {
             "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beggining",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
               "format": "search"
@@ -8156,6 +8694,14 @@
             }
           },
           {
+            "name": "severity",
+            "description": "Filter by CVE severity",
+            "schema": {
+              "type": "string",
+              "format": "names"
+            }
+          },
+          {
             "name": "sort",
             "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
             "schema": {
@@ -8164,11 +8710,150 @@
             }
           },
           {
+            "name": "status",
+            "description": "Filter by CVE status",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "valid",
+                "pending",
+                "obsolete"
+              ]
+            }
+          },
+          {
+            "name": "type",
+            "description": "Filter by CVE type",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "os",
+                "package"
+              ]
+            }
+          },
+          {
             "name": "version",
             "description": "Filter by CVE version",
             "schema": {
               "type": "string",
               "format": "alphanumeric_symbols"
+            }
+          },
+          {
+            "name": "wait_for_complete",
+            "description": "Disable timeout response",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ]
+      },
+      {
+        "name": "/vulnerability/:agent_id/last_scan",
+        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.vulnerability_controller.get_last_scan_agent",
+        "description": "Return when the last full and partial vulnerability scan of a specified agent ended.",
+        "summary": "Get last scan datetime",
+        "tags": [
+          "Vulnerability"
+        ],
+        "args": [
+          {
+            "name": ":agent_id",
+            "description": "Agent ID. All possible values from 000 onwards",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 3,
+              "description": "Agent ID",
+              "format": "numbers"
+            }
+          }
+        ],
+        "query": [
+          {
+            "name": "pretty",
+            "description": "Show results in human-readable format",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "wait_for_complete",
+            "description": "Disable timeout response",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ]
+      },
+      {
+        "name": "/vulnerability/:agent_id/summary/:field",
+        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.vulnerability_controller.get_vulnerabilities_field_summary",
+        "description": "Return a summary of the vulnerabilities' field of an agent",
+        "summary": "Get agent vulnerabilities' field summary",
+        "tags": [
+          "Vulnerability"
+        ],
+        "args": [
+          {
+            "name": ":agent_id",
+            "description": "Agent ID. All possible values from 000 onwards",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 3,
+              "description": "Agent ID",
+              "format": "numbers"
+            }
+          },
+          {
+            "name": ":field",
+            "description": "Vulnerability inventory field",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "cve",
+                "name",
+                "version",
+                "architecture",
+                "detection_time",
+                "severity",
+                "cvss2_score",
+                "cvss3_score",
+                "external_references",
+                "type",
+                "status",
+                "condition",
+                "title",
+                "published",
+                "updated"
+              ]
+            }
+          }
+        ],
+        "query": [
+          {
+            "name": "limit",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 500,
+              "minimum": 1,
+              "maximum": 100000
+            }
+          },
+          {
+            "name": "pretty",
+            "description": "Show results in human-readable format",
+            "schema": {
+              "type": "boolean",
+              "default": false
             }
           },
           {
@@ -8295,7 +8980,7 @@
         "query": [
           {
             "name": "force_single_group",
-            "description": "Whether to append the new group to current agent's multigroup or replace it",
+            "description": "Removes the agent from all groups to which it belongs and assigns it to the specified group",
             "schema": {
               "type": "boolean"
             }
@@ -8382,7 +9067,7 @@
           },
           {
             "name": "force_single_group",
-            "description": "Whether to append the new group to current agent's multigroup or replace it",
+            "description": "Removes the agent from all groups to which it belongs and assigns it to the specified group",
             "schema": {
               "type": "boolean"
             }
@@ -8493,6 +9178,46 @@
         ]
       },
       {
+        "name": "/agents/reconnect",
+        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agent_controller.reconnect_agents",
+        "description": "Force reconnect all agents or a list of them",
+        "summary": "Force reconnect agents",
+        "tags": [
+          "Agents"
+        ],
+        "query": [
+          {
+            "name": "agents_list",
+            "description": "List of agent IDs (separated by comma), all agents selected by default if not specified",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 3,
+                "description": "Agent ID",
+                "format": "numbers"
+              }
+            }
+          },
+          {
+            "name": "pretty",
+            "description": "Show results in human-readable format",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "wait_for_complete",
+            "description": "Disable timeout response",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ]
+      },
+      {
         "name": "/agents/restart",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agent_controller.restart_agents",
         "description": "Restart all agents or a list of them",
@@ -8535,7 +9260,7 @@
       {
         "name": "/agents/upgrade",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agent_controller.put_upgrade_agents",
-        "description": "Upgrade agents using a WPK file from online repository",
+        "description": "Upgrade agents using a WPK file from online repository. When upgrading more than 3000 agents at the same time, it's highly recommended to use the parameter `wait_for_complete` set to `true` to avoid a possible API timeout",
         "summary": "Upgrade agents",
         "tags": [
           "Agents"
@@ -8543,17 +9268,16 @@
         "query": [
           {
             "name": "agents_list",
-            "description": "List of agent IDs (separated by comma), select a list of agents with size less or equal than 100",
+            "description": "List of agent IDs (separated by comma), use the keyword `all` to select all agents",
             "required": true,
             "schema": {
               "type": "array",
               "items": {
                 "type": "string",
                 "minLength": 3,
-                "description": "Agent ID",
-                "format": "numbers"
-              },
-              "maxItems": 100
+                "description": "Agent ID|all",
+                "format": "numbers_or_all"
+              }
             }
           },
           {
@@ -8565,11 +9289,99 @@
             }
           },
           {
+            "name": "group",
+            "description": "Filter by group of agents",
+            "schema": {
+              "type": "string",
+              "description": "Group name",
+              "format": "group_names"
+            }
+          },
+          {
+            "name": "ip",
+            "description": "Filter by the IP used by the agent to communicate with the manager. If it's not available, it will have the same value as registerIP",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
+            "name": "manager",
+            "description": "Filter by manager hostname where agents are connected to",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
+            "name": "name",
+            "description": "Filter by name",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
+            "name": "node_name",
+            "description": "Filter by node name",
+            "schema": {
+              "type": "string",
+              "format": "names"
+            }
+          },
+          {
+            "name": "os.name",
+            "description": "Filter by OS name",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
+            "name": "os.platform",
+            "description": "Filter by OS platform",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
+            "name": "os.version",
+            "description": "Filter by OS version",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
             "name": "pretty",
             "description": "Show results in human-readable format",
             "schema": {
               "type": "boolean",
               "default": false
+            }
+          },
+          {
+            "name": "q",
+            "description": "Query to filter results by. For example q=&quot;status=active&quot;",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "registerIP",
+            "description": "Filter by the IP used when registering the agent",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
+            "name": "upgrade_version",
+            "description": "Wazuh version to upgrade to",
+            "schema": {
+              "type": "string",
+              "format": "wazuh_version"
             }
           },
           {
@@ -8582,9 +9394,10 @@
           },
           {
             "name": "version",
-            "description": "Wazuh version to upgrade to",
+            "description": "Filter by agents version",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "alphanumeric"
             }
           },
           {
@@ -8608,7 +9421,7 @@
       {
         "name": "/agents/upgrade_custom",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agent_controller.put_upgrade_custom_agents",
-        "description": "Upgrade the agents using a local WPK file",
+        "description": "Upgrade the agents using a local WPK file. When upgrading more than 3000 agents at the same time, it's highly recommended to use the parameter `wait_for_complete` set to `true` to avoid a possible API timeout",
         "summary": "Upgrade agents custom",
         "tags": [
           "Agents"
@@ -8616,17 +9429,16 @@
         "query": [
           {
             "name": "agents_list",
-            "description": "List of agent IDs (separated by comma), select a list of agents with size less or equal than 100",
+            "description": "List of agent IDs (separated by comma), use the keyword `all` to select all agents",
             "required": true,
             "schema": {
               "type": "array",
               "items": {
                 "type": "string",
                 "minLength": 3,
-                "description": "Agent ID",
-                "format": "numbers"
-              },
-              "maxItems": 100
+                "description": "Agent ID|all",
+                "format": "numbers_or_all"
+              }
             }
           },
           {
@@ -8639,8 +9451,73 @@
             }
           },
           {
+            "name": "group",
+            "description": "Filter by group of agents",
+            "schema": {
+              "type": "string",
+              "description": "Group name",
+              "format": "group_names"
+            }
+          },
+          {
             "name": "installer",
             "description": "Installation script. Default is <code>upgrade.sh</code> or <code>upgrade.bat</code> for windows agents",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
+            "name": "ip",
+            "description": "Filter by the IP used by the agent to communicate with the manager. If it's not available, it will have the same value as registerIP",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
+            "name": "manager",
+            "description": "Filter by manager hostname where agents are connected to",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
+            "name": "name",
+            "description": "Filter by name",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
+            "name": "node_name",
+            "description": "Filter by node name",
+            "schema": {
+              "type": "string",
+              "format": "names"
+            }
+          },
+          {
+            "name": "os.name",
+            "description": "Filter by OS name",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
+            "name": "os.platform",
+            "description": "Filter by OS platform",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
+            "name": "os.version",
+            "description": "Filter by OS version",
             "schema": {
               "type": "string",
               "format": "alphanumeric"
@@ -8652,6 +9529,29 @@
             "schema": {
               "type": "boolean",
               "default": false
+            }
+          },
+          {
+            "name": "q",
+            "description": "Query to filter results by. For example q=&quot;status=active&quot;",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "registerIP",
+            "description": "Filter by the IP used when registering the agent",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
+            "name": "version",
+            "description": "Filter by agents version",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
             }
           },
           {
@@ -9480,13 +10380,6 @@
         ],
         "body": [
           {
-            "name": "force_time",
-            "description": "Remove the old agent with the same IP if disconnected since <force_time> seconds",
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          {
             "name": "ip",
             "description": "If this is not included, the API will get the IP automatically. Allowed values: IP, IP/NET, ANY",
             "type": "string",
@@ -9503,7 +10396,7 @@
       {
         "name": "/agents/insert",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agent_controller.insert_agent",
-        "description": "Add an agent specifying its name, ID and IP. If an agent with the same ID already exists, replace it using `force` parameter",
+        "description": "Add an agent specifying its name, ID and IP. If an agent with the same name, the same ID or the same IP already exists, replace it using the `force` parameter",
         "summary": "Add agent full",
         "tags": [
           "Agents"
@@ -9528,11 +10421,38 @@
         ],
         "body": [
           {
-            "name": "force_time",
-            "description": "Remove the old agent with the same IP if disconnected for <force_time> seconds",
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "name": "force",
+            "type": "object",
+            "description": "Remove the old agent with the same name, ID or IP if the configuration is matched",
+            "properties": {
+              "enabled": {
+                "type": "boolean",
+                "default": true,
+                "description": "Enable force option"
+              },
+              "disconnected_time": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable force disconnected_time option"
+                  },
+                  "value": {
+                    "type": "string",
+                    "default": "1h",
+                    "description": "Time the agent must has been disconnected to force the insertion. Time in seconds, ‘[n_days]d’, ‘[n_hours]h’, ‘[n_minutes]m’ or ‘[n_seconds]s’. For example, `7d`, `10s` and `10` are valid values. If no time unit is specified, seconds are used",
+                    "format": "timeframe"
+                  }
+                }
+              },
+              "after_registration_time": {
+                "type": "string",
+                "default": "1h",
+                "description": "Time the agent must has been registered to force the insertion. Time in seconds, ‘[n_days]d’, ‘[n_hours]h’, ‘[n_minutes]m’ or ‘[n_seconds]s’. For example, `7d`, `10s` and `10` are valid values. If no time unit is specified, seconds are used",
+                "format": "timeframe"
+              }
+            }
           },
           {
             "name": "id",
@@ -9574,7 +10494,7 @@
         "query": [
           {
             "name": "agent_name",
-            "description": "Agent name",
+            "description": "Agent name. The special characters allowed are: '-','_','.' ",
             "required": true,
             "schema": {
               "type": "string",
@@ -10044,7 +10964,7 @@
               "items": {
                 "type": "string",
                 "description": "Role ID|all",
-                "format": "numbers_delete"
+                "format": "numbers_or_all"
               }
             }
           },
@@ -10082,7 +11002,7 @@
                 "type": "string",
                 "minLength": 3,
                 "description": "Agent ID|all",
-                "format": "numbers_delete"
+                "format": "numbers_or_all"
               }
             }
           },
@@ -10283,7 +11203,7 @@
       {
         "name": "/agents/:agent_id/group/:group_id",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agent_controller.delete_single_agent_single_group",
-        "description": "Remove an agent from an specified group. If the agent has multigroups, it will preserve all previous groups except the last one",
+        "description": "Remove an agent from a specified group. If the agent belongs to several groups, only the specified group will be deleted.",
         "summary": "Remove agent from group",
         "tags": [
           "Agents"
@@ -10349,7 +11269,7 @@
                 "type": "string",
                 "minLength": 3,
                 "description": "Agent ID|all",
-                "format": "numbers_delete"
+                "format": "numbers_or_all"
               }
             }
           },
@@ -10420,6 +11340,47 @@
         ]
       },
       {
+        "name": "/experimental/rootcheck",
+        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.experimental_controller.clear_rootcheck_database",
+        "description": "Clear rootcheck database for all agents or a list of them",
+        "summary": "Clear rootcheck results",
+        "tags": [
+          "Experimental"
+        ],
+        "query": [
+          {
+            "name": "agents_list",
+            "description": "List of agent IDs (separated by comma), use the keyword `all` to select all agents",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 3,
+                "description": "Agent ID|all",
+                "format": "numbers_or_all"
+              }
+            }
+          },
+          {
+            "name": "pretty",
+            "description": "Show results in human-readable format",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "wait_for_complete",
+            "description": "Disable timeout response",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ]
+      },
+      {
         "name": "/experimental/syscheck",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.experimental_controller.clear_syscheck_database",
         "description": "Clear the syscheck database for all agents or a list of them",
@@ -10438,7 +11399,7 @@
                 "type": "string",
                 "minLength": 3,
                 "description": "Agent ID|all",
-                "format": "numbers_delete"
+                "format": "numbers_or_all"
               }
             }
           },
@@ -10479,7 +11440,7 @@
                 "type": "string",
                 "minLength": 1,
                 "description": "Group name|all",
-                "format": "group_names_delete"
+                "format": "group_names_or_all"
               }
             }
           },
@@ -10578,27 +11539,27 @@
         ]
       },
       {
-        "name": "/rootcheck",
+        "name": "/rootcheck/:agent_id",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.rootcheck_controller.delete_rootcheck",
-        "description": "Clear rootcheck database for all agents or a list of them",
+        "description": "Clear an agent's rootcheck database",
         "summary": "Clear results",
         "tags": [
           "Rootcheck"
         ],
-        "query": [
+        "args": [
           {
-            "name": "agents_list",
-            "description": "List of agent IDs (separated by comma), all agents selected by default if not specified",
+            "name": ":agent_id",
+            "description": "Agent ID. All possible values from 000 onwards",
+            "required": true,
             "schema": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "minLength": 3,
-                "description": "Agent ID",
-                "format": "numbers"
-              }
+              "type": "string",
+              "minLength": 3,
+              "description": "Agent ID",
+              "format": "numbers"
             }
-          },
+          }
+        ],
+        "query": [
           {
             "name": "pretty",
             "description": "Show results in human-readable format",
@@ -10700,7 +11661,7 @@
               "items": {
                 "type": "string",
                 "description": "Policy ID|all",
-                "format": "numbers_delete"
+                "format": "numbers_or_all"
               }
             }
           },
@@ -10748,7 +11709,7 @@
               "items": {
                 "type": "string",
                 "description": "Role ID|all",
-                "format": "numbers_delete"
+                "format": "numbers_or_all"
               }
             }
           },
@@ -10792,7 +11753,7 @@
               "items": {
                 "type": "string",
                 "description": "Policy ID|all",
-                "format": "numbers_delete"
+                "format": "numbers_or_all"
               }
             }
           },
@@ -10851,7 +11812,7 @@
               "type": "array",
               "items": {
                 "type": "string",
-                "format": "numbers_delete",
+                "format": "numbers_or_all",
                 "description": "Security rule ID|all"
               }
             }
@@ -10891,7 +11852,7 @@
               "type": "array",
               "items": {
                 "type": "string",
-                "format": "numbers_delete",
+                "format": "numbers_or_all",
                 "description": "Security rule ID|all"
               }
             }
@@ -10940,7 +11901,7 @@
               "type": "array",
               "items": {
                 "type": "string",
-                "format": "numbers_delete",
+                "format": "numbers_or_all",
                 "description": "User ID|all"
               }
             }
@@ -10993,7 +11954,7 @@
               "items": {
                 "type": "string",
                 "description": "Role ID|all",
-                "format": "numbers_delete"
+                "format": "numbers_or_all"
               }
             }
           },
@@ -11010,7 +11971,7 @@
       {
         "name": "/syscheck/:agent_id",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.syscheck_controller.delete_syscheck_agent",
-        "description": "Clear file integrity monitoring scan results for a specified agent",
+        "description": "Clear file integrity monitoring scan results for a specified agent. Only available for agents < 3.12.0, it doesn't apply for more recent ones",
         "summary": "Clear results",
         "tags": [
           "Syscheck"

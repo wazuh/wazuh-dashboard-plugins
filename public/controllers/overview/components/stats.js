@@ -1,7 +1,7 @@
 /*
  * Wazuh app - React component for showing stats about agents.
  *
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -13,12 +13,21 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { EuiStat, EuiFlexItem, EuiFlexGroup, EuiPage, EuiToolTip } from '@elastic/eui';
+import { withErrorBoundary } from '../../../components/common/hocs';
+import { UI_ORDER_AGENT_STATUS } from '../../../../common/constants';
+import { agentStatusLabelByAgentStatus, agentStatusColorByAgentStatus } from '../../../../common/services/wz_agent_status';
 
-export class Stats extends Component {
+export const Stats = withErrorBoundary (class Stats extends Component {
   constructor(props) {
     super(props);
 
     this.state = {};
+    this.agentStatus = ['total', ...UI_ORDER_AGENT_STATUS].map(status => ({
+      status,
+      label: status !== 'total' ? agentStatusLabelByAgentStatus(status) : 'Total',
+      onClick: () => this.goToAgents(status !== 'total' ? status : null),
+      color: status !== 'total' ? agentStatusColorByAgentStatus(status) : 'primary'
+    }));
   }
 
   goToAgents(status) {
@@ -46,88 +55,37 @@ export class Stats extends Component {
       <EuiPage>
         <EuiFlexGroup>
           <EuiFlexItem />
-          <EuiFlexItem>
-            <EuiStat
-              title={
-                <EuiToolTip position="top" content={`Go to all agents`}>
-                  <span
-                    className={ 'statWithLink' }
-                    style={{ cursor: "pointer" }}
-                    onClick={() => this.goToAgents(null)}
-                  >
-                    {this.props.total}
-                  </span>
-                </EuiToolTip>
-              }
-              description="Total agents"
-              titleColor="primary"
-              textAlign="center"
-            />
-          </EuiFlexItem>
-          <EuiFlexItem>
-            <EuiStat
-              title={
-                <EuiToolTip position="top" content={`Go to active agents`}>
-                  <span
-                    onClick={() => this.goToAgents('active')}
-                    className={ 'statWithLink' }
-                    style={{ cursor: "pointer" }}
-                  >
-                    {this.props.active}
-                  </span>
-                </EuiToolTip>
-              }
-              description="Active agents"
-              titleColor="secondary"
-              textAlign="center"
-            />
-          </EuiFlexItem>
-          <EuiFlexItem>
-            <EuiStat
-              title={
-                <EuiToolTip position="top" content={`Go to disconnected agents`}>
-                  <span
-                    onClick={() => this.goToAgents('disconnected')}
-                    className={ 'statWithLink' }
-                    style={{ cursor: "pointer" }}
-                  >
-                    {this.props.disconnected}
-                  </span>
-                </EuiToolTip>
-              }
-              description="Disconnected agents"
-              titleColor="danger"
-              textAlign="center"
-            />
-          </EuiFlexItem>
-          <EuiFlexItem>
-            <EuiStat
-              title={
-                <EuiToolTip position="top" content={`Go to never connected agents`}>
-                  <span
-                    onClick={() => this.goToAgents('never_connected')}
-                    className={ 'statWithLink' }
-                    style={{ cursor: "pointer" }}
-                  >
-                    {this.props.neverConnected}
-                  </span>
-                </EuiToolTip>
-              }
-              description="Never connected agents"
-              titleColor="subdued"
-              textAlign="center"
-            />
-          </EuiFlexItem>
+            {this.agentStatus.map(({status, label, onClick, color}) => (
+              <EuiFlexItem key={`agent-status-${status}`}>
+                <EuiStat
+                  title={
+                    <EuiToolTip position="top" content={`Go to ${label.toLowerCase()} agents`}>
+                      <span
+                        className='statWithLink'
+                        style={{ cursor: "pointer" }}
+                        onClick={onClick}
+                      >
+                        {typeof this.props[status] !== 'undefined' ? this.props[status] : '-'}
+                      </span>
+                    </EuiToolTip>
+                  }
+                  description={`${label} agents`}
+                  titleColor={color}
+                  textAlign="center"
+                />
+              </EuiFlexItem>
+            ))}
           <EuiFlexItem />
         </EuiFlexGroup>
       </EuiPage>
     );
   }
-}
+});
 
 Stats.propTypes = {
   total: PropTypes.any,
   active: PropTypes.any,
   disconnected: PropTypes.any,
-  neverConnected: PropTypes.any
+  pending: PropTypes.any,
+  never_connected: PropTypes.any
 };

@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
-import { EuiBreadcrumbs, EuiToolTip, EuiSelect } from '@elastic/eui';
+import { EuiBreadcrumbs, EuiToolTip } from '@elastic/eui';
 import { connect } from 'react-redux';
 import './globalBreadcrumb.scss';
 import { AppNavigate } from '../../../react-services/app-navigate';
-import { getAngularModule, getChrome } from '../../../kibana-services';
+import { getAngularModule } from '../../../kibana-services';
 
 class WzGlobalBreadcrumb extends Component {
   props: { state: { breadcrumb: [] } };
@@ -32,7 +31,13 @@ class WzGlobalBreadcrumb extends Component {
             max={6}
             breadcrumbs={this.props.state.breadcrumb.map(breadcrumb => breadcrumb.agent ? {
               className: "euiLink euiLink--subdued ",
-              onClick: (ev) => { ev.stopPropagation(); AppNavigate.navigateToModule(ev, 'agents', { "tab": "welcome", "agent": breadcrumb.agent.id }); this.router.reload(); },
+              onClick: (ev) => {
+                ev.stopPropagation();
+                AppNavigate.navigateToModule(ev, 'agents', {
+                  "tab": "welcome", "agent": breadcrumb.agent.id
+                });
+                this.router.reload();
+              },
               id: "breadcrumbNoTitle",
               truncate: true,
               text: (

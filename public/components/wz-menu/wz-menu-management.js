@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for registering agents.
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -138,7 +138,7 @@ class WzMenuManagement extends Component {
         name: this.managementSections.administration.text,
         id: this.managementSections.administration.id,
         id: 0,
-        disabled: false,
+        disabled: true,
         icon: <EuiIcon type="managementApp" color="primary" />,
         items: [
           this.createItem(this.managementSections.rules),
@@ -154,7 +154,7 @@ class WzMenuManagement extends Component {
       {
         name: this.managementSections.statusReports.text,
         id: this.managementSections.statusReports.id,
-        disabled: false,
+        disabled: true,
         icon: <EuiIcon type="reportingApp" color="primary" />,
         items: [
           this.createItem(this.managementSections.status),

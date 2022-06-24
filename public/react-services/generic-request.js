@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Generic request
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@ import { ApiCheck } from './wz-api-check';
 import { WzMisc } from '../factories/misc';
 import { OdfeUtils } from '../utils';
 import { getHttp, getDataPlugin } from '../kibana-services';
+import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../common/constants';
 
 export class GenericRequest {
   static async request(method, path, payload = null, returnError = false) {
@@ -27,8 +28,8 @@ export class GenericRequest {
       const wazuhConfig = new WazuhConfig();
       const { timeout } = wazuhConfig.getConfig();
       const requestHeaders = {
-        'Content-Type': 'application/json',
-        'kbn-xsrf': 'kibana'
+        ...PLUGIN_PLATFORM_REQUEST_HEADERS,
+        'content-type': 'application/json'
       };
       const tmpUrl = getHttp().basePath.prepend(path);
 
@@ -99,7 +100,9 @@ export class GenericRequest {
           const wzMisc = new WzMisc();
           wzMisc.setApiIsDown(true);
 
-          if (!window.location.hash.includes('#/settings')) {
+          if (!window.location.hash.includes('#/settings') && 
+          !window.location.hash.includes('#/health-check') &&
+          !window.location.hash.includes('#/blank-screen')) {
             window.location.href = getHttp().basePath.prepend('/app/wazuh#/health-check');
           }
         }

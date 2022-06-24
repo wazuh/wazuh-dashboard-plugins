@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Initial basic configuration file
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -10,10 +10,12 @@
  * Find more information about this on the LICENSE file.
  */
 
+import { ASSETS_BASE_URL_PREFIX, WAZUH_MONITORING_DEFAULT_INDICES_REPLICAS, WAZUH_MONITORING_DEFAULT_INDICES_SHARDS, WAZUH_STATISTICS_DEFAULT_INDICES_REPLICAS, WAZUH_STATISTICS_DEFAULT_INDICES_SHARDS } from "../../common/constants";
+
 export const initialWazuhConfig: string = `---
 #
 # Wazuh app - App configuration file
-# Copyright (C) 2015-2021 Wazuh, Inc.
+# Copyright (C) 2015-2022 Wazuh, Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -47,6 +49,7 @@ export const initialWazuhConfig: string = `---
 # step once the Wazuh app starts. Values must to be true or false.
 #checks.pattern : true
 #checks.template: true
+#checks.fields  : true
 #checks.api     : true
 #checks.setup   : true
 #checks.metaFields: true
@@ -117,8 +120,8 @@ export const initialWazuhConfig: string = `---
 #wazuh.monitoring.frequency: 900
 #
 # Configure wazuh-monitoring-* indices shards and replicas.
-#wazuh.monitoring.shards: 1
-#wazuh.monitoring.replicas: 0
+#wazuh.monitoring.shards: ${WAZUH_MONITORING_DEFAULT_INDICES_SHARDS}
+#wazuh.monitoring.replicas: ${WAZUH_MONITORING_DEFAULT_INDICES_REPLICAS}
 #
 # Configure wazuh-monitoring-* indices custom creation interval.
 # Values: h (hourly), d (daily), w (weekly), m (monthly)
@@ -161,23 +164,22 @@ export const initialWazuhConfig: string = `---
 #cron.statistics.index.creation: w
 #
 # Configure statistics indices shards and replicas.
-#cron.statistics.shards: 2
-#cron.statistics.replicas: 0
+#cron.statistics.shards: ${WAZUH_STATISTICS_DEFAULT_INDICES_SHARDS}
+#cron.statistics.replicas: ${WAZUH_STATISTICS_DEFAULT_INDICES_REPLICAS}
 #
 # ------------------------------ wazuh-logo-customization -------------------------------
 #
-#Define the name of the app logo saved in the path /plugins/wazuh/assets/
-#customization.logo.app: logotype.svg
+#Define the name of the app logo saved in the path ${ASSETS_BASE_URL_PREFIX}
+#customization.logo.app: ''
 #
-#Define the name of the sideba logo saved in the path /plugins/wazuh/assets/
-#customization.logo.sidebar: icon_blue.png
+#Define the name of the sidebar logo saved in the path ${ASSETS_BASE_URL_PREFIX}
+#customization.logo.sidebar: ''
 #
-#Define the name of the health-check logo saved in the path /plugins/wazuh/assets/
-#customization.logo.healthcheck: icon_blue.svg
+#Define the name of the health-check logo saved in the path ${ASSETS_BASE_URL_PREFIX}
+#customization.logo.healthcheck: ''
 #
-#
-#Define the name of the reports logo (.png) saved in the path /plugins/wazuh/assets/
-#customization.logo.reports: logo.png
+#Define the name of the reports logo (.png) saved in the path ${ASSETS_BASE_URL_PREFIX}
+#customization.logo.reports: ''
 #
 # ---------------------------- Hide manager alerts ------------------------------
 # Hide the alerts of the manager in all dashboards and discover

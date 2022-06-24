@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Load all the Management controllers and related React components.
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,10 @@ import WzManagementConfiguration from './components/management/configuration/con
 import { getAngularModule } from '../../kibana-services';
 
 const app = getAngularModule();
+
+WzManagement.displayName = 'WzManagement';
+ManagementWelcomeWrapper.displayName = 'ManagementWelcomeWrapper';
+WzManagementConfiguration.displayName = 'WzManagementConfiguration';
 
 app
   .controller('managementController', ManagementController)

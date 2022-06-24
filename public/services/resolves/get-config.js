@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Resolve function to parse configuration file
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -12,11 +12,12 @@
 
 import {
   WAZUH_ALERTS_PATTERN,
-  WAZUH_INDEX_REPLICAS,
-  WAZUH_INDEX_SHARDS,
   WAZUH_MONITORING_DEFAULT_INDICES_SHARDS,
+  WAZUH_MONITORING_DEFAULT_INDICES_REPLICAS,
   WAZUH_MONITORING_PATTERN,
-  WAZUH_SAMPLE_ALERT_PREFIX
+  WAZUH_SAMPLE_ALERT_PREFIX,
+  WAZUH_STATISTICS_DEFAULT_INDICES_SHARDS,
+  WAZUH_STATISTICS_DEFAULT_INDICES_REPLICAS,
 } from "../../../common/constants";
 
 export async function getWzConfig($q, genericReq, wazuhConfig) {
@@ -44,15 +45,16 @@ export async function getWzConfig($q, genericReq, wazuhConfig) {
     'extensions.virustotal': false,
     'extensions.osquery': false,
     'extensions.docker': false,
+    'extensions.office': false,
+    'extensions.github': false,
     timeout: 20000,
-    'api.selector': true,
     'ip.selector': true,
     'ip.ignore': [],
     'xpack.rbac.enabled': true,
     'wazuh.monitoring.enabled': true,
     'wazuh.monitoring.frequency': 900,
     'wazuh.monitoring.shards': WAZUH_MONITORING_DEFAULT_INDICES_SHARDS,
-    'wazuh.monitoring.replicas': WAZUH_INDEX_REPLICAS,
+    'wazuh.monitoring.replicas': WAZUH_MONITORING_DEFAULT_INDICES_REPLICAS,
     'wazuh.monitoring.creation': 'w',
     'wazuh.monitoring.pattern': WAZUH_MONITORING_PATTERN,
     'cron.prefix': 'wazuh',
@@ -61,17 +63,17 @@ export async function getWzConfig($q, genericReq, wazuhConfig) {
     'cron.statistics.interval': '0 */5 * * * *',
     'cron.statistics.index.name': 'statistics',
     'cron.statistics.index.creation': 'w',
-    'cron.statistics.index.shards': WAZUH_INDEX_SHARDS,
-    'cron.statistics.index.replicas': WAZUH_INDEX_REPLICAS,
+    'cron.statistics.index.shards': WAZUH_STATISTICS_DEFAULT_INDICES_SHARDS,
+    'cron.statistics.index.replicas': WAZUH_STATISTICS_DEFAULT_INDICES_REPLICAS,
     'alerts.sample.prefix': WAZUH_SAMPLE_ALERT_PREFIX,
     hideManagerAlerts: false,
     'logs.level': 'info',
     'enrollment.dns': '',
     'enrollment.password': '',
-    'customization.logo.app':'logotype.svg',
-    'customization.logo.sidebar':'icon_blue.png',
-    'customization.logo.healthcheck':'icon_blue.svg',
-    'customization.logo.reports':'logo.png'
+    'customization.logo.app':'',
+    'customization.logo.sidebar':'',
+    'customization.logo.healthcheck':'',
+    'customization.logo.reports':''
   };
 
   try {

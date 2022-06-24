@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Integrity monitoring components
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,25 +26,20 @@ import {
 } from '@elastic/eui';
 import '../../common/modules/module.scss';
 import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
+
 import store from '../../../redux/store';
 import { ReportingService } from '../../../react-services/reporting';
 import { AppNavigate } from '../../../react-services/app-navigate';
 import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
-import { Events, Dashboard, Loader, Settings } from '../../common/modules';
-import OverviewActions from '../../../controllers/overview/components/overview-actions/overview-actions';
-import { MainFim } from '../../agents/fim';
 
-import { MainVuls } from '../../agents/vuls';
-import { MainSca } from '../../agents/sca';
-import { MainMitre } from './main-mitre';
-import WzReduxProvider from '../../../redux/wz-redux-provider';
-import { ComplianceTable } from '../../overview/compliance-table';
-
-import { withAgentSupportModule } from '../../../components/common/hocs';
 import { connect } from 'react-redux';
-import { compose } from 'redux';
+import { getDataPlugin } from '../../../kibana-services';
 
-export class MainModuleOverview extends Component {
+const mapStateToProps = (state) => ({
+  agent: state.appStateReducers.currentAgentData,
+});
+
+export const MainModuleOverview = connect(mapStateToProps)(class MainModuleOverview extends Component {
   constructor(props) {
     super(props);
     this.reportingService = new ReportingService();
@@ -53,16 +48,6 @@ export class MainModuleOverview extends Component {
       loadingReport: false,
       isDescPopoverOpen: false,
     };
-  }
-
-  getBadgeColor(agentStatus) {
-    if (agentStatus.toLowerCase() === 'active') {
-      return 'secondary';
-    } else if (agentStatus.toLowerCase() === 'disconnected') {
-      return '#BD271E';
-    } else if (agentStatus.toLowerCase() === 'never connected') {
-      return 'default';
-    }
   }
 
   setGlobalBreadcrumb() {
@@ -79,15 +64,7 @@ export class MainModuleOverview extends Component {
       ];
       if (currentAgent.id) {
         breadcrumb.push({
-          className: "euiLink euiLink--subdued ",
-          onClick: (ev) => { ev.stopPropagation(); AppNavigate.navigateToModule(ev, 'agents', { "tab": "welcome", "agent": currentAgent.id }); this.router.reload(); },
-          id: "breadcrumbNoTitle",
-          truncate: true,
-          text: (
-            <EuiToolTip position="bottom" content={"View agent summary"} display="inlineBlock">
-              <span>{currentAgent.name}</span>
-            </EuiToolTip>
-          ),
+          agent: currentAgent
         })
       }
       breadcrumb.push({
@@ -114,82 +91,46 @@ export class MainModuleOverview extends Component {
   }
 
   async componentDidMount() {
+    const { module } = this.props;
     const tabView = AppNavigate.getUrlParameter('tabView') || 'panels';
     const tab = AppNavigate.getUrlParameter('tab');
+    const tabExceptions = ['sca', 'vuls'];
     if (tabView && tabView !== this.props.selectView) {
-      if (tabView === 'panels' && tab === 'sca') {
-        // SCA initial tab is inventory
-        this.props.onSelectedTabChanged('inventory');
+      if (tabView === 'panels' && tabExceptions.includes(tab)) {
+        // SCA & Vulnerabilities initial tab is inventory
+        this.props.onSelectedTabChanged(module.init);
       } else {
         this.props.onSelectedTabChanged(tabView);
       }
     }
 
     this.setGlobalBreadcrumb();
+    const { filterManager } = getDataPlugin().query;
+    this.filterManager = filterManager;
   }
 
   render() {
     const { section, selectView } = this.props;
+    const ModuleTabView = (this.props.tabs ||[]).find(tab => tab.id === selectView);
     return (
       <div className={this.state.showAgentInfo ? 'wz-module wz-module-showing-agent' : 'wz-module'}>
-        <Fragment>
-          <div className={this.props.tabs && this.props.tabs.length && 'wz-module-header-nav'}>
-            {this.props.tabs && this.props.tabs.length && (
-              <div className="wz-welcome-page-agent-tabs">
-                <EuiFlexGroup>
-                  {this.props.renderTabs()}
-                  <EuiFlexItem grow={false} style={{ marginTop: 6, marginRight: 5 }}>
-                    <WzReduxProvider>
-                      <OverviewActions {...{ ...this.props, ...this.props.agentsSelectionProps }} />
-                    </WzReduxProvider>
-                  </EuiFlexItem>
-                  {selectView === 'dashboard' && this.props.renderReportButton()}
-                  {(this.props.buttons || []).includes('dashboard') &&
-                    this.props.renderDashboardButton()}
-                </EuiFlexGroup>
-              </div>
-            )}
-          </div>
-          <ModuleTabViewer component={section} {...this.props} />
-        </Fragment>
+        <div className={this.props.tabs && this.props.tabs.length && 'wz-module-header-nav'}>
+          {this.props.tabs && this.props.tabs.length && (
+            <div className="wz-welcome-page-agent-tabs">
+              <EuiFlexGroup>
+                {this.props.renderTabs()}
+                <EuiFlexItem grow={false} style={{ marginTop: 6, marginRight: 5 }}>
+                  <EuiFlexGroup>
+                    {ModuleTabView && ModuleTabView.buttons && ModuleTabView.buttons.map((ModuleViewButton, index) =>
+                      typeof ModuleViewButton !== 'string' ? <EuiFlexItem key={`module_button_${index}`}><ModuleViewButton {...{ ...this.props, ...this.props.agentsSelectionProps }} moduleID={section} /></EuiFlexItem> : null)}
+                  </EuiFlexGroup>
+                </EuiFlexItem>
+              </EuiFlexGroup>
+            </div>
+          )}
+        </div>
+        {ModuleTabView && ModuleTabView.component && <ModuleTabView.component {...this.props} moduleID={section}/> }
       </div>
     );
   }
-}
-
-const mapStateToProps = (state) => ({
-  agent: state.appStateReducers.currentAgentData,
-});
-
-const ModuleTabViewer = compose(
-  connect(mapStateToProps),
-  withAgentSupportModule
-)((props) => {
-  const { section, selectView } = props;
-  return (
-    <>
-      {selectView === 'events' && <Events {...props} />}
-      {selectView === 'loader' && (
-        <Loader
-          {...props}
-          loadSection={(section) => props.loadSection(section)}
-          redirect={props.afterLoad}
-        ></Loader>
-      )}
-      {selectView === 'dashboard' && <Dashboard {...props} />}
-      {selectView === 'settings' && <Settings {...props} />}
-
-      {/* ---------------------MODULES WITH CUSTOM PANELS--------------------------- */}
-      {section === 'fim' && selectView === 'inventory' && <MainFim {...props} />}
-      {section === 'sca' && selectView === 'inventory' && <MainSca {...props} />}
-
-      {section === 'vuls' && selectView === 'inventory' && <MainVuls {...props} />}
-
-      {section === 'mitre' && selectView === 'inventory' && <MainMitre {...props} />}
-      {['pci', 'gdpr', 'hipaa', 'nist', 'tsc'].includes(section) && selectView === 'inventory' && (
-        <ComplianceTable {...props} goToDiscover={(id) => props.onSelectedTabChanged(id)} />
-      )}
-      {/* -------------------------------------------------------------------------- */}
-    </>
-  );
-});
+})

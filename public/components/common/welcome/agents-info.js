@@ -2,7 +2,7 @@
  * Wazuh app - React component for showing agent fields such as IP, ID, name,
  * version, OS, registration date, last keep alive.
  *
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@ import { formatUIDate } from '../../../react-services/time-service';
 import WzTextWithTooltipIfTruncated from '../wz-text-with-tooltip-if-truncated';
 import { WzStat } from '../../wz-stat';
 import { GroupTruncate } from '../util/agent-group-truncate'
+import { AgentStatus } from '../../agents/agent_status';
 
 export class AgentInfo extends Component {
   constructor(props) {
@@ -34,8 +35,7 @@ export class AgentInfo extends Component {
 
   
   async componentDidMount() {
-    const managerVersion = await WzRequest.apiReq('GET', '//', {});
-
+    const managerVersion = await WzRequest.apiReq('GET', '/', {});
     this.setState({
       managerVersion: (((managerVersion || {}).data || {}).data || {}).api_version || {}
     });
@@ -77,27 +77,6 @@ export class AgentInfo extends Component {
         {this.getPlatformIcon(this.props.agent)}
         {' '}{osName}
       </WzTextWithTooltipIfTruncated>
-    )
-  }
-
-
-  color = (status, hex = false) => {
-    if (status.toLowerCase() === 'active') { return hex ? '#017D73' : 'success'; }
-    else if (status.toLowerCase() === 'disconnected') { return hex ? '#BD271E' : 'danger'; }
-    else if (status.toLowerCase() === 'never connected') { return hex ? '#98A2B3' : 'subdued'; }
-  }
-
-  addHealthRender(agent, style) {
-    // this was rendered with a EuiHealth, but EuiHealth has a div wrapper, and this section is rendered  within a <p> tag. <div> tags aren't allowed within <p> tags.
-    return (
-      <span className="euiFlexGroup euiFlexGroup--gutterExtraSmall euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow" style={{ maxWidth:style.maxWidth, fontSize: '12px' }}>
-        <span className="euiFlexItem euiFlexItem--flexGrowZero">
-          <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" className={`euiIcon euiIcon--medium euiIcon--${this.color(this.props.agent.status)}`} focusable="false" role="img" aria-hidden="true">
-            <circle cx="8" cy="8" r="4"></circle>
-          </svg>
-        </span>
-        <span className="euiFlexItem euiFlexItem--flexGrowZero">{this.props.agent.status}</span>
-      </span>
     )
   }
 
@@ -143,7 +122,7 @@ export class AgentInfo extends Component {
               ) : item.description === 'Operating system' ? (
                 this.addTextPlatformRender(this.props.agent, item.style)
               ) : item.description === 'Status' ? (
-                this.addHealthRender(this.props.agent, item.style)
+                <AgentStatus status={this.props.agent.status} style={{...item.style, fontSize: '12px'}} />
               ) : (
                 <WzTextWithTooltipIfTruncated position='bottom' tooltipProps={tooltipProps} elementStyle={{ maxWidth: item.style.maxWidth, fontSize: 12 }}>
                   {checkField(item.title)}

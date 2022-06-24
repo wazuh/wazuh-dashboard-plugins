@@ -1,13 +1,10 @@
 import React, { Component, Fragment } from 'react';
-
 import {
-  EuiBadge,
-  EuiHealth,
-  EuiButton,
+  EuiButtonIcon,
   EuiCheckbox,
-  EuiFieldSearch,
   EuiFlexGroup,
   EuiFlexItem,
+  EuiHealth,
   EuiSpacer,
   EuiTable,
   EuiTableBody,
@@ -15,29 +12,26 @@ import {
   EuiTableHeader,
   EuiTableHeaderCell,
   EuiTableHeaderCellCheckbox,
+  EuiTableHeaderMobile,
   EuiTablePagination,
   EuiTableRow,
   EuiTableRowCell,
   EuiTableRowCellCheckbox,
   EuiTableSortMobile,
-  EuiKeyPadMenu,
-  EuiKeyPadMenuItem,
-  EuiTableHeaderMobile,
-  EuiButtonIcon,
-  EuiIcon,
-  EuiPopover,
-  EuiText,
-  EuiToolTip
+  EuiToolTip,
 } from '@elastic/eui';
-
 import { WzRequest } from '../../../../react-services/wz-request';
-import { LEFT_ALIGNMENT, RIGHT_ALIGNMENT, SortableProperties } from '@elastic/eui/lib/services';
-import {  updateCurrentAgentData } from '../../../../redux/actions/appStateActions';
-import  store  from '../../../../redux/store';
-import { GroupTruncate } from '../../../../components/common/util/agent-group-truncate/'
-import { WzSearchBar, filtersToObject } from '../../../../components/wz-search-bar';
+import { LEFT_ALIGNMENT } from '@elastic/eui/lib/services';
+import { updateCurrentAgentData } from '../../../../redux/actions/appStateActions';
+import store from '../../../../redux/store';
+import { GroupTruncate } from '../../../../components/common/util/agent-group-truncate/';
+import { filtersToObject, WzSearchBar } from '../../../../components/wz-search-bar';
 import { getAgentFilterValues } from '../../../../controllers/management/components/management/groups/get-agents-filters-values';
 import _ from 'lodash';
+import { UI_LOGGER_LEVELS, UI_ORDER_AGENT_STATUS } from '../../../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../../../react-services/common-services';
+import { AgentStatus } from '../../../../components/agents/agent_status';
 
 const checkField = field => {
   return field !== undefined ? field : '-';
@@ -46,10 +40,6 @@ const checkField = field => {
 export class AgentSelectionTable extends Component {
   constructor(props) {
     super(props);
-
-    // const selectedOptions = JSON.parse(
-    //   sessionStorage.getItem('agents_preview_selected_options')
-    // );
     this.state = {
       itemIdToSelectedMap: {},
       itemIdToOpenActionsPopoverMap: {},
@@ -124,11 +114,11 @@ export class AgentSelectionTable extends Component {
         },
         isSortable: true,
         width: 'auto',
-        render: status => this.addHealthStatusRender(status),
+        render: status => <AgentStatus status={status} style={{ whiteSpace: 'no-wrap' }}/>,
       },
     ];
     this.suggestions = [
-      { type: 'q', label: 'status', description: 'Filter by agent connection status', operators: ['=', '!=',], values: ['active', 'disconnected', 'never_connected', 'pending'] },
+      { type: 'q', label: 'status', description: 'Filter by agent connection status', operators: ['=', '!=',], values: UI_ORDER_AGENT_STATUS },
       { type: 'q', label: 'os.platform', description: 'Filter by OS platform', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('os.platform', value, { q: 'id!=000'})},
       { type: 'q', label: 'ip', description: 'Filter by agent IP', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('ip', value, { q: 'id!=000'})},
       { type: 'q', label: 'name', description: 'Filter by agent name', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('name', value, { q: 'id!=000'})},
@@ -159,9 +149,7 @@ export class AgentSelectionTable extends Component {
       tmpSelectedAgents[store.getState().appStateReducers.currentAgentData.id] = true;
     }
     this._isMounted && this.setState({itemIdToSelectedMap: this.props.selectedAgents});
-    try{
-      await this.getItems();
-    }catch(error){}
+    await this.getItems();
   }
 
   componentWillUnmount(){
@@ -178,16 +166,27 @@ export class AgentSelectionTable extends Component {
     try {
       const stringText = arrayText.toString();
       const splitString = stringText.split(',');
-      const resultString = splitString.join(', ');
-      return resultString;
-    } catch (err) {
+      return splitString.join(', ');
+    } catch (error) {
+      const options = {
+        context: `${AgentSelectionTable.name}.getArrayFormatted`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.UI,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+
+      getErrorOrchestrator().handleError(options);
       return arrayText;
     }
   }
 
   async getItems() {
-    try{
-      this._isMounted && this.setState({isLoading: true});
+    try {
+      this._isMounted && this.setState({ isLoading: true });
       const rawData = await WzRequest.apiReq('GET', '/agents', { params: this.buildFilter() });
       const data = (((rawData || {}).data || {}).data || {}).affected_items;
       const totalItems = (((rawData || {}).data || {}).data || {}).total_affected_items;
@@ -202,27 +201,21 @@ export class AgentSelectionTable extends Component {
         };
       });
       this._isMounted && this.setState({ agents: formattedData, totalItems, isLoading: false });
-    }catch(err){
+    } catch (error) {
       this._isMounted && this.setState({ isLoading: false });
-    }
-  }
+      const options = {
+        context: `${AgentSelectionTable.name}.getItems`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
 
-  agentStatusColor(status){
-    if (status.toLowerCase() === 'active') {
-      return 'success';
-    } else if (status.toLowerCase() === 'disconnected') {
-      return 'danger';
-    } else if (status.toLowerCase() === 'never_connected') {
-      return 'subdued';
+      getErrorOrchestrator().handleError(options);
     }
-  }
-
-  addHealthStatusRender(status) {
-    return (
-      <EuiHealth color={this.agentStatusColor(status)} style={{ whiteSpace: 'no-wrap' }}>
-        {status === 'never_connected' ? 'never connected' : status}
-      </EuiHealth>
-    );
   }
 
   buildFilter() {
@@ -506,18 +499,11 @@ export class AgentSelectionTable extends Component {
     return undefined;
   };
 
-  async onQueryChange(result){
-    // sessionStorage.setItem(
-    //   'agents_preview_selected_options',
-    //   JSON.stringify(result.selectedOptions)
-    // );
-    this._isMounted && this.setState({ isLoading: true, ...result}, async () => {
-      try{
-        await this.getItems()
-      }catch(error){
-        this._isMounted && this.setState({ isLoading: false});
-      }
-    });
+  async onQueryChange(result) {
+    this._isMounted &&
+      this.setState({ isLoading: true, ...result }, async () => {
+        await this.getItems();
+      });
   }
 
   getSelectedItems(){
@@ -542,9 +528,21 @@ export class AgentSelectionTable extends Component {
       const formattedData = data.data.data.affected_items[0] //TODO: do it correctly
       store.dispatch(updateCurrentAgentData(formattedData));
       this.props.updateAgentSearch([agentID]);
-    }catch(error){
+    } catch(error) {
       store.dispatch(updateCurrentAgentData({}));
       this.props.removeAgentsFilter(true);
+      const options = {
+        context: `${AgentSelectionTable.name}.selectAgentAndApply`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+
+      getErrorOrchestrator().handleError(options);
     }
   }
 
@@ -635,9 +633,9 @@ export class AgentSelectionTable extends Component {
             <EuiFlexGroup responsive={false} justifyContent="flexEnd">
               {/* agent name (agent id) Unpin button right aligned, require justifyContent="flexEnd" in the EuiFlexGroup */}
               <EuiFlexItem grow={false} style={{marginRight: 0}}>
-                <EuiHealth color={this.agentStatusColor(selectedAgent.status)} style={{ whiteSpace: 'no-wrap' }}>
+                <AgentStatus status={selectedAgent.status} style={{ whiteSpace: 'no-wrap' }}>
                   {selectedAgent.name} ({selectedAgent.id})
-                </EuiHealth>
+                </AgentStatus>
               </EuiFlexItem>
               <EuiFlexItem grow={false} style={{marginTop: 10, marginLeft: 4}}>
                 <EuiToolTip position='top' content='Unpin agent'>

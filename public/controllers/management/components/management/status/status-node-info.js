@@ -1,7 +1,7 @@
 /*
  * Wazuh app - React component for building the status stats
  *
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ export class WzStatusNodeInfo extends Component {
 
   render() {
     const { stats, nodeInfo, selectedNode, clusterEnabled } = this.props.state;
-    const agentsNodeCount = clusterEnabled ? (stats.agentsCount.find(node => node.node_name === selectedNode) || {}).count || 0 : stats.agentsCountTotal;
+    const agentsNodeCount = clusterEnabled ? (stats.agentsCountByManagerNodes.find(node => node.node_name === selectedNode) || {}).count || 0 : stats.agentsCount.total;
     const title = selectedNode
       ? selectedNode + ' information'
       : 'Manager information';

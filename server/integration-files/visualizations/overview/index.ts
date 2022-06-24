@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Module to export overview visualizations raw content
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,10 +23,11 @@ import nist from './overview-nist';
 import tsc from './overview-tsc';
 import pm from './overview-pm';
 import virustotal from './overview-virustotal';
-import vuls from './overview-vuls';
 import mitre from './overview-mitre';
+import office from './overview-office';
 import osquery from './overview-osquery';
 import docker from './overview-docker';
+import github from './overview-github';
 
 export {
   audit,
@@ -43,8 +44,9 @@ export {
   tsc,
   pm,
   virustotal,
-  vuls,
   mitre,
+  office,
   osquery,
-  docker
+  docker,
+  github
 };

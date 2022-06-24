@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Error handler service
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -12,8 +12,8 @@
 import store from '../redux/store';
 import { updateWazuhNotReadyYet } from '../redux/actions/appStateActions';
 import { WzRequest } from './wz-request';
+import { delayAsPromise } from '../../common/utils';
 
-const delay = time => new Promise(res => setTimeout(res,time));
 let busy = false;
 
 export class CheckDaemonsStatus {
@@ -25,7 +25,7 @@ export class CheckDaemonsStatus {
 
       let isValid = false;
       while (tries--) {
-        await delay(1200);
+        await delayAsPromise(1200);
         const result = await WzRequest.apiReq('GET', '/ping', {});
         isValid = ((result || {}).data || {}).isValid;
         if (isValid) {
@@ -40,6 +40,7 @@ export class CheckDaemonsStatus {
       }
     } catch (error) {
       store.dispatch(updateWazuhNotReadyYet('Wazuh could not be recovered.'));
+      throw error;
     }
     busy = false;
   }

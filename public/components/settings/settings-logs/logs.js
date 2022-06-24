@@ -1,7 +1,7 @@
 /*
  * Wazuh app - React component building the API entries table.
  *
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,76 +21,62 @@ import {
   EuiButtonEmpty,
   EuiTitle,
   EuiText,
-  EuiProgress
+  EuiProgress,
 } from '@elastic/eui';
 
 import { formatUIDate } from '../../../react-services/time-service';
 import store from '../../../redux/store';
 import { updateSelectedSettingsSection } from '../../../redux/actions/appStateActions';
+import { withErrorBoundary } from '../../common/hocs';
+import { getPluginDataPath } from '../../../../common/plugin';
 
-export default class SettingsLogs extends Component {
+class SettingsLogs extends Component {
   constructor(props) {
     super(props);
-    this.offset = 275;
     this.state = {
       logs: [],
-      refreshingEntries: false
+      refreshingEntries: false,
     };
+    this.HEIGHT_WITHOUT_CODE_EDITOR = 325;
   }
-
-  updateHeight = () => {
-    this.height = window.innerHeight - this.offset; //eslint-disable-line
-    this.forceUpdate();
-  };
 
   componentDidMount() {
     store.dispatch(updateSelectedSettingsSection('logs'));
     this._isMounted = true;
     this.refresh();
-    this.height = window.innerHeight - this.offset; //eslint-disable-line
-    window.addEventListener('resize', this.updateHeight); //eslint-disable-line
   }
 
   componentWillUnmount() {
     this._isMounted = false;
-    window.removeEventListener('resize', this.updateHeight); //eslint-disable-line
   }
 
   async refresh() {
     this.setState({
-      refreshingEntries: true
+      refreshingEntries: true,
     });
     const logs = await this.props.getLogs();
-    this._isMounted && this.setState({
-      refreshingEntries: false,
-      logs
-    });
+    this._isMounted &&
+      this.setState({
+        refreshingEntries: false,
+        logs,
+      });
   }
 
   formatDate(date) {
-    return formatUIDate(date)
-      .replace('-', '/')
-      .replace('T', ' ')
-      .replace('Z', '')
-      .split('.')[0];
+    return formatUIDate(date).replace('-', '/').replace('T', ' ').replace('Z', '').split('.')[0];
   }
 
   getMessage(log) {
     const data = log.data || log.message;
     return typeof data === 'object' ? data.message || JSON.stringify(data) : data.toString();
-  } 
+  }
 
   render() {
     let text = '';
-    (this.state.logs || []).forEach(x => {
+    (this.state.logs || []).forEach((x) => {
       text =
         text +
-        (this.formatDate(x.date) +
-          '  ' +
-          x.level.toUpperCase() +
-          '  ' +
-          this.getMessage(x) +
-          '\n');
+        (this.formatDate(x.date) + '  ' + x.level.toUpperCase() + '  ' + this.getMessage(x) + '\n');
     });
     return (
       <EuiPage>
@@ -106,28 +92,22 @@ export default class SettingsLogs extends Component {
               </EuiFlexGroup>
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
-              <EuiButtonEmpty
-                iconType="refresh"
-                onClick={async () => await this.refresh()}
-              >
+              <EuiButtonEmpty iconType="refresh" onClick={async () => await this.refresh()}>
                 Refresh
               </EuiButtonEmpty>
             </EuiFlexItem>
           </EuiFlexGroup>
           <EuiText color="subdued" style={{ paddingBottom: '15px' }}>
-            Log file located at
-            /usr/share/kibana/data/wazuh/logs/wazuhapp.log
+            Log file located at {getPluginDataPath('logs/wazuhapp.log')}
           </EuiText>
-          {this.state.refreshingEntries && (
-            <EuiProgress size="xs" color="primary" />
-          )}
+          {this.state.refreshingEntries && <EuiProgress size="xs" color="primary" />}
           {!this.state.refreshingEntries && (
-            <div className='code-block-log-viewer-container'>
+            <div className="code-block-log-viewer-container">
               <EuiCodeBlock
                 fontSize="s"
                 paddingSize="m"
                 color="dark"
-                overflowHeight={this.height}
+                overflowHeight={`calc(100vh - ${this.HEIGHT_WITHOUT_CODE_EDITOR}px)`}
               >
                 {text}
               </EuiCodeBlock>
@@ -138,3 +118,5 @@ export default class SettingsLogs extends Component {
     );
   }
 }
+
+export default withErrorBoundary(SettingsLogs);

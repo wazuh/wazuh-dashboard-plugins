@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Stylesheets loader
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,9 +26,10 @@ import './inventory.scss';
 const IS_DARK_THEME = getUiSettings().get('theme:darkMode');
 /* tslint-disable no-undef */
 if (IS_DARK_THEME) {
-  import('./dark_theme/wz_theme_dark.scss').then();
+  import('./theme/dark/index.dark.scss').then();
   import('./7.9.0/index.dark.scss').then();
 }else{
+  import('./theme/light/index.light.scss').then();
   import('./7.9.0/index.light.scss').then();
 }
 /* tslint-enable no-undef */

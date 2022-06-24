@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for registering agents.
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ import {
   EuiTitle,
   EuiToolTip,
   EuiButtonIcon,
-  EuiButtonEmpty,
+  EuiOverlayMask,
   EuiFieldText,
   EuiConfirmModal,
   EuiCodeEditor,
@@ -48,8 +48,11 @@ import 'brace/snippets/xml';
 import 'brace/ext/language_tools';
 import "brace/ext/searchbox";
 import { showFlyoutLogtest } from '../../../../../redux/actions/appStateActions';
-import { WzOverlayMask } from '../../../../../components/common/util';
 import _ from 'lodash';
+
+import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
+import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 
 class WzRulesetEditor extends Component {
   _isMounted = false;
@@ -102,7 +105,10 @@ class WzRulesetEditor extends Component {
   async save(name, overwrite = true) {
     if (!this._isMounted) {
       return;
-    }
+    }else if(/\s/.test(name)) {
+      this.showToast('warning', 'Warning', `The ${this.props.state.section} name must not contain spaces.`, 3000);
+      return;
+    }  
     try {
       const { content } = this.state;
 
@@ -112,45 +118,56 @@ class WzRulesetEditor extends Component {
       try {
         await validateConfigAfterSent();
       } catch (error) {
-        const toast = {
-          title: 'File content is incorrect.',
-          toastMessage: `The content of the file ${name} is incorrect. There were found several error while validating the configuration.`,
-          toastLifeTimeMs: 5000,
+        const options = {
+          context: `${WzRulesetEditor.name}.save`,
+          level: UI_LOGGER_LEVELS.ERROR,
+          severity: UI_ERROR_SEVERITIES.BUSINESS,
+          error: {
+            error: error,
+            message:`The content of the file ${name} is incorrect. There were found several errors while validating the configuration: ${error.message || error}`,
+            title: `Error file content is incorrect: ${error.message || error}`,
+          },
         };
-
+        getErrorOrchestrator().handleError(options);
         this.setState({ isSaving: false });
         this.goToEdit(name);
+
+        let toastMessage;
 
         if (this.props.state.addingRulesetFile != false) {
           //remove current invalid file if the file is new.
           await this.rulesetHandler.deleteFile(name);
-          toast.toastMessage += '\nThe new file was deleted.';
+          toastMessage = 'The new file was deleted.';
         } else {
           //restore file to previous version
           await this.rulesetHandler.updateFile(name, this.state.initContent, overwrite);
-          toast.toastMessage += '\nThe content file was restored to previous state.';
+          toastMessage = 'The content file was restored to previous state.';
         }
 
-        getToasts().addError({ stack: error, message: toast.toastMessage }, toast);
-
+        this.showToast('success', 'Success', toastMessage, 3000);
         return;
       }
       this.setState({ isSaving: false });
       this.goToEdit(name);
-
-      let textSuccess = 'New file successfully created';
-      if (overwrite) {
-        textSuccess = 'File successfully edited';
-      }
       this.setState({
         showWarningRestart: true,
         initialInputValue: this.state.inputValue,
         initContent: content,
       });
-      this.showToast('success', 'Success', textSuccess, 3000);
+
     } catch (error) {
       this.setState({ error, isSaving: false });
-      this.showToast('danger', 'Error', 'Error saving file: ' + error, 3000);
+      const options = {
+        context: `${WzRulesetEditor.name}.save`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: errorMessage,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   }
 
@@ -240,7 +257,7 @@ class WzRulesetEditor extends Component {
     let modal;
     if (this.state.isModalVisible) {
       modal = (
-        <WzOverlayMask>
+        <EuiOverlayMask>
           <EuiConfirmModal
             title="Unsubmitted changes"
             onConfirm={() => {
@@ -255,7 +272,7 @@ class WzRulesetEditor extends Component {
               There are unsaved changes. Are you sure you want to proceed?
             </p>
           </EuiConfirmModal>
-        </WzOverlayMask>
+        </EuiOverlayMask>
       );
     }
     return (

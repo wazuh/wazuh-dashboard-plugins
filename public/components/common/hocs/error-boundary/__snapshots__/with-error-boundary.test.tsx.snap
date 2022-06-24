@@ -1,0 +1,153 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`withErrorBoundary hoc implementation renders correctly to match the snapshot 1`] = `
+<Component>
+  <ErrorBoundary>
+    <ErrorComponentPrompt
+      errorInfo={
+        Object {
+          "componentStack": "
+    in ComponentWithError (created by withErrorBoundary(UnknownComponent))
+    in withErrorBoundary(UnknownComponent)
+    in ErrorBoundary
+    in Unknown (created by WrapperComponent)
+    in WrapperComponent",
+        }
+      }
+      errorTitle={[Error: I crashed! I crash very hard]}
+      style={null}
+    >
+      <EuiEmptyPrompt
+        actions={null}
+        body={
+          <div
+            style={
+              Object {
+                "borderBottom": "1px solid #777",
+                "borderTop": "1px solid #777",
+                "padding": "12px",
+              }
+            }
+          >
+            <details
+              className="wz-error-boundary__details"
+            >
+              <span>
+                Error: I crashed! I crash very hard
+              </span>
+              <br />
+              <span>
+                
+    in ComponentWithError (created by withErrorBoundary(UnknownComponent))
+    in withErrorBoundary(UnknownComponent)
+    in ErrorBoundary
+    in Unknown (created by WrapperComponent)
+    in WrapperComponent
+              </span>
+            </details>
+          </div>
+        }
+        iconType="faceSad"
+        title={
+          <h2>
+            Something went wrong.
+          </h2>
+        }
+      >
+        <div
+          className="euiEmptyPrompt"
+        >
+          <EuiIcon
+            color="subdued"
+            size="xxl"
+            type="faceSad"
+          >
+            <EuiIconEmpty
+              aria-hidden={true}
+              className="euiIcon euiIcon--xxLarge euiIcon--subdued euiIcon-isLoading"
+              focusable="false"
+              role="img"
+              style={null}
+            >
+              <svg
+                aria-hidden={true}
+                className="euiIcon euiIcon--xxLarge euiIcon--subdued euiIcon-isLoading"
+                focusable="false"
+                height={16}
+                role="img"
+                style={null}
+                viewBox="0 0 16 16"
+                width={16}
+                xmlns="http://www.w3.org/2000/svg"
+              />
+            </EuiIconEmpty>
+          </EuiIcon>
+          <EuiSpacer
+            size="s"
+          >
+            <div
+              className="euiSpacer euiSpacer--s"
+            />
+          </EuiSpacer>
+          <EuiTextColor
+            color="subdued"
+          >
+            <span
+              className="euiTextColor euiTextColor--subdued"
+            >
+              <EuiTitle
+                size="m"
+              >
+                <h2
+                  className="euiTitle euiTitle--medium"
+                >
+                  Something went wrong.
+                </h2>
+              </EuiTitle>
+              <EuiSpacer
+                size="m"
+              >
+                <div
+                  className="euiSpacer euiSpacer--m"
+                />
+              </EuiSpacer>
+              <EuiText>
+                <div
+                  className="euiText euiText--medium"
+                >
+                  <div
+                    style={
+                      Object {
+                        "borderBottom": "1px solid #777",
+                        "borderTop": "1px solid #777",
+                        "padding": "12px",
+                      }
+                    }
+                  >
+                    <details
+                      className="wz-error-boundary__details"
+                    >
+                      <span>
+                        Error: I crashed! I crash very hard
+                      </span>
+                      <br />
+                      <span>
+                        
+    in ComponentWithError (created by withErrorBoundary(UnknownComponent))
+    in withErrorBoundary(UnknownComponent)
+    in ErrorBoundary
+    in Unknown (created by WrapperComponent)
+    in WrapperComponent
+                      </span>
+                    </details>
+                  </div>
+                </div>
+              </EuiText>
+            </span>
+          </EuiTextColor>
+        </div>
+      </EuiEmptyPrompt>
+    </ErrorComponentPrompt>
+  </ErrorBoundary>
+</Component>
+`;

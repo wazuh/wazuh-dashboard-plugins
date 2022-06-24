@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Module for Overview/General visualizations
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -9,6 +9,8 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { UI_COLOR_AGENT_STATUS } from "../../../../common/constants";
+
 export default [
   {
     _id: 'Wazuh-App-Overview-General-Agents-status',
@@ -96,7 +98,7 @@ export default [
         ],
       }),
       uiStateJSON: JSON.stringify({
-        vis: { colors: { never_connected: '#447EBC', active: '#E5AC0E' } },
+        vis: { colors: { active: UI_COLOR_AGENT_STATUS.active, disconnected: UI_COLOR_AGENT_STATUS.disconnected, pending: UI_COLOR_AGENT_STATUS.pending, never_connected: UI_COLOR_AGENT_STATUS.never_connected } },
       }),
       description: '',
       version: 1,

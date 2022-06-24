@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Component to display the Agent stats
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { useState, useEffect } from 'react';
-import { 
+import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiLoadingSpinner,
@@ -21,11 +21,19 @@ import {
   EuiText
 } from '@elastic/eui';
 
-import { withGlobalBreadcrumb, withReduxProvider, withGuard, withUserAuthorizationPrompt } from '../../common/hocs';
+import { withGlobalBreadcrumb, withReduxProvider, withGuard, withUserAuthorizationPrompt, withErrorBoundary } from '../../common/hocs';
 import { compose } from 'redux';
 import { WzRequest, formatUIDate } from '../../../react-services';
 import { AgentStatTable } from './table';
 import { PromptNoActiveAgentWithoutSelect, PromptAgentFeatureVersion } from '../prompts';
+import {
+  UIErrorLog,
+  UI_ERROR_SEVERITIES,
+  UILogLevel,
+  UIErrorSeverity,
+} from '../../../react-services/error-orchestrator/types';
+import { API_NAME_AGENT_STATUS, UI_LOGGER_LEVELS } from '../../../../common/constants';
+import { getErrorOrchestrator } from '../../../react-services/common-services';
 
 const tableColumns = [
   {
@@ -80,6 +88,7 @@ const statsAgents: {title: string, field: string, render?: (value) => any}[] = [
 ];
 
 export const MainAgentStats = compose(
+  withErrorBoundary,
   withReduxProvider,
   withGlobalBreadcrumb(({agent}) => [
     {
@@ -95,10 +104,10 @@ export const MainAgentStats = compose(
     },
   ]),
   withUserAuthorizationPrompt(({agent}) => [[
-    {action: 'agent:read', resource: `agent:id:${agent.id}`}, 
+    {action: 'agent:read', resource: `agent:id:${agent.id}`},
     ...(agent.group || []).map(group => ({ action: 'agent:read', resource: `agent:group:${group}` }))
   ]]),
-  withGuard(({agent}) => agent.status !== 'active', PromptNoActiveAgentWithoutSelect),
+  withGuard(({agent}) => agent.status !== API_NAME_AGENT_STATUS.ACTIVE, PromptNoActiveAgentWithoutSelect),
   withGuard(({agent}) => {
     const [major, minor, patch] = agent.version.replace('Wazuh v','').split('.').map(value => parseInt(value));
     return !(major >= 4 && minor >= 2 && patch >= 0)
@@ -117,10 +126,21 @@ function AgentStats({agent}){
         const responseDataStatAgent = await WzRequest.apiReq('GET', `/agents/${agent.id}/stats/agent`, {});
         setDataStatLogcollector(responseDataStatLogcollector?.data?.data?.affected_items?.[0] || {});
         setDataStatAgent(responseDataStatAgent?.data?.data?.affected_items?.[0] || undefined);
-      }catch(error){
-
+      } catch(error) {
+        const options: UIErrorLog = {
+          context: `${AgentStats.name}.useEffect`,
+          level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+          severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
+          error: {
+            error: error,
+            message: error.message || error,
+            title: error.name || error,
+          },
+        };
+        getErrorOrchestrator().handleError(options);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     })()
   }, []);
   return (

@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Tools to check the version of the plugin
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@ import { getCookies, getToasts } from '../kibana-services';
 import { ErrorToastOptions } from 'kibana/public';
 import React from 'react';
 import { ReactNode } from 'x-pack/node_modules/@types/react';
+import { PLUGIN_PLATFORM_NAME } from '../../common/constants';
 
 type TAppInfo = {
   revision: string;
@@ -46,13 +47,13 @@ const checkClientAppVersion = (appInfo: TAppInfo) => {
     const toastOptions: ErrorToastOptions = {
       title: 'Conflict with the Wazuh app version',
       toastLifeTimeMs: 50000,
-      toastMessage: `The version of the Wazuh app in your browser does not correspond with the app version installed in Kibana. Please, clear your browser cache. For more info check the full error.`,
+      toastMessage: `The version of the Wazuh app in your browser does not correspond with the app version installed in ${PLUGIN_PLATFORM_NAME}. Please, clear your browser cache. For more info check the full error.`,
     };
 
     const troubleshootingUrl = `https://documentation.wazuh.com/${appInfo['app-version']
       .split('.')
       .slice(0, 2)
-      .join('.')}/user-manual/kibana-app/troubleshooting.html`;
+      .join('.')}/user-manual/elasticsearch/troubleshooting.html`;
 
     const message: ReactNode = (
       <>
@@ -61,14 +62,14 @@ const checkClientAppVersion = (appInfo: TAppInfo) => {
           <b>
             {appVersion} - {appRevision}
           </b>{' '}
-          does not correspond with the app version installed in Kibana{' '}
+          does not correspond with the app version installed in {PLUGIN_PLATFORM_NAME}{' '}
           <b>
             {appInfo['app-version']} - {appInfo.revision}
           </b>
           .
         </p>
         <p>Please, clear your browser cache following these steps.</p>
-        <p>If the error persists, restart Kibana as well.</p>
+        <p>If the error persists, restart {PLUGIN_PLATFORM_NAME} as well.</p>
         <p>
           For more information check our troubleshooting section{' '}
           <a href={troubleshootingUrl} target="_blank">

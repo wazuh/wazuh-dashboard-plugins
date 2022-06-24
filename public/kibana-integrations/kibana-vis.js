@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for custom kibana visualizations.
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,6 +24,8 @@ import store from '../redux/store';
 import { updateMetric } from '../redux/actions/visualizationsActions';
 import { GenericRequest } from '../react-services/generic-request';
 import { createSavedVisLoader } from './visualizations/saved_visualizations';
+import { WzDatePicker } from '../components/wz-date-picker/wz-date-picker';
+import { PersistedState } from '../../../../src/plugins/visualizations/public';
 import {
   EuiLoadingChart,
   EuiLoadingSpinner,
@@ -31,6 +33,7 @@ import {
   EuiIcon,
   EuiFlexItem,
   EuiFlexGroup,
+  EuiEmptyPrompt
 } from '@elastic/eui';
 import {
   getAngularModule,
@@ -106,7 +109,17 @@ class KibanaVis extends Component {
   componentWillUnmount() {
     if (this._isMounted) {
       this._isMounted = false;
-      this.updateVis();
+      // It would be good to continue investigating if it is
+      // necessary for the renderComplete() to be in the
+      // componentWillUnmount.
+      // In the renderComplete() the value of the $rootScope
+      // is changed, which affects the entire application.
+      // 
+      // Related issue:
+      // https://github.com/wazuh/wazuh-kibana-app/issues/4158
+      if (this.deadField) {
+        return this.renderComplete();
+      }
       this.destroyAll();
     }
   }
@@ -252,7 +265,7 @@ class KibanaVis extends Component {
           vizPattern = JSON.parse(rawVis[0].attributes.kibanaSavedObjectMeta.searchSourceJSON)
             .index;
         } catch (ex) {
-          console.warn(`kibana-vis exception: ${ex.message || ex}`);
+          console.warn(`plugin platform-vis exception: ${ex.message || ex}`);
         }
 
         if (!filters.find((filter) => filter.meta.controlledBy === AUTHORIZED_AGENTS)) {
@@ -280,10 +293,24 @@ class KibanaVis extends Component {
           const visState = await getVisualizationsPlugin().convertToSerializedVis(
             this.visualization
           );
+          
+          // In Kibana 7.10.2, there is a bug when creating the visualization with `createVis` method of the Visualization plugin that doesn't pass the `visState` parameter to the `Vis` class constructor.
+          // This does the `.params`, `.uiState` and `.id` properties of the visualization are not set correctly in the `Vis` class constructor. This bug causes
+          // that the visualization, for example, doesn't use the defined colors in the `.uiStateJSON` property.
+          // `createVis` method of Visualizations plugin: https://github.com/elastic/kibana/blob/v7.10.2/src/plugins/visualizations/public/plugin.ts#L207-L211
+          // `Vis` class constructor: https://github.com/elastic/kibana/blob/v7.10.2/src/plugins/visualizations/public/vis.ts#L99-L104
+          // This problem would be fixed replicating the logic of Visualization plugin's `createVis` method and passing the expected parameters to the `Vis` class constructor
+          // but there is an error in the generated plugin package in production related to `Types was not set`.
+          // The remediation is creating the visualization with `.createVis` and set the `.params` and `.uiState` and `.id` properties
+          // as is done in the `Vis` class constructor https://github.com/elastic/kibana/blob/v7.10.2/src/plugins/visualizations/public/vis.ts#L99-L104
           const vis = await getVisualizationsPlugin().createVis(
             this.visualization.visState.type,
             visState
           );
+          vis.params = vis.getParams(visState.params);
+          vis.uiState = new PersistedState(visState.uiState);
+          vis.id = visState.id;
+          
           this.visHandler = await getVisualizationsPlugin().__LEGACY.createVisEmbeddableFromObject(
             vis,
             visInput
@@ -385,6 +412,21 @@ class KibanaVis extends Component {
     }
   };
 
+  showDateRangePicker = () => {
+    return !this.deadField && !this.state.visRefreshingIndex && this.visID === 'Wazuh-App-Overview-General-Agents-status'
+  }
+
+  DateRangePickerComponent = () => {
+    return (
+      <EuiFlexItem className="agents-evolutions-dpicker">
+        <WzDatePicker
+          condensed={true} 
+          onTimeChange={() => {}} 
+        />
+      </EuiFlexItem>
+    )
+  }
+
   render() {
     const isLoading = this.props.resultState === 'loading';
     return (
@@ -436,11 +478,51 @@ class KibanaVis extends Component {
               <EuiIcon type="iInCircle" />
             </EuiToolTip>
           </div>
+          {   
+            !this.isLoading && this.showDateRangePicker() &&
+            this.DateRangePickerComponent()
+          }
           <div
             id={this.visID}
             vis-id={this.visID}
-            style={{ display: isLoading ? 'none' : 'block', height: '100%' }}
+            style={{ 
+              display: isLoading ? 'none' : 'block', 
+              height: '100%',
+              paddingTop: '2%' 
+            }}
           ></div>
+          <div style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+              }}>
+                {(isLoading && <div><EuiLoadingChart size="xl" /></div>)
+                  || (this.deadField && !isLoading && !this.state.visRefreshingIndex && (
+                    <div>
+                      No results found &nbsp;
+                      <EuiToolTip
+                        position="top"
+                        content={
+                          <span>
+                            No alerts were found with the field: <strong>{this.deadField}</strong>
+                          </span>
+                        }
+                      >
+                        <EuiIcon type="iInCircle" />
+                      </EuiToolTip>
+                    </div>
+                  ))
+                  || (this.state.visRefreshingIndex && (
+                    <EuiFlexGroup justifyContent="center" alignItems="center">
+                      <EuiFlexItem grow={false}>
+                        <EuiLoadingSpinner size="xl" />
+                      </EuiFlexItem>
+                      <EuiFlexItem grow={false}>Refreshing Index Pattern.</EuiFlexItem>
+                    </EuiFlexGroup>
+                  ))
+                }
+          </div>
         </span>
       )
     );

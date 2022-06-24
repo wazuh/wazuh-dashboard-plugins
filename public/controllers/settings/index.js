@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Load the Settings React components.
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,16 @@ import {WzSampleDataWrapper} from '../../components/add-modules-data/WzSampleDat
 import { getAngularModule } from '../../kibana-services';
 
 const app = getAngularModule();
+
+EnableModules.displayName = 'EnableModules';
+WzSampleDataWrapper.displayName = 'WzSampleDataWrapper';
+WzConfigurationSettings.displayName = 'WzConfigurationSettings';
+SettingsLogs.displayName = 'SettingsLogs';
+SettingsMiscellaneous.displayName = 'SettingsMiscellaneous';
+ApiTable.displayName = 'ApiTable';
+AddApi.displayName = 'AddApi';
+ApiIsDown.displayName = 'ApiIsDown';
+
 app
   .controller('settingsController', SettingsController)
   .value('EnableModules', EnableModules)

@@ -1,0 +1,387 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Module Mitre Att&ck intelligence container should render permissions prompt when no has permissions 1`] = `
+<div
+  class="euiEmptyPrompt"
+>
+  <svg
+    aria-hidden="true"
+    class="euiIcon euiIcon--xxLarge euiIcon--subdued euiIcon--app euiIcon-isLoading"
+    focusable="false"
+    height="16"
+    role="img"
+    viewBox="0 0 16 16"
+    width="16"
+    xmlns="http://www.w3.org/2000/svg"
+  />
+  <div
+    class="euiSpacer euiSpacer--s"
+  />
+  <span
+    class="euiTextColor euiTextColor--subdued"
+  >
+    <h2
+      class="euiTitle euiTitle--medium"
+    >
+      You have no permissions
+    </h2>
+    <div
+      class="euiSpacer euiSpacer--m"
+    />
+    <div
+      class="euiText euiText--medium"
+    >
+      <div>
+        This section requires the permission:
+        <div>
+          <div>
+            - 
+            <strong>
+              mitre:read
+            </strong>
+             (
+            <span
+              style="text-decoration:underline"
+            >
+              *:*:*
+            </span>
+            )
+          </div>
+        </div>
+      </div>
+    </div>
+  </span>
+</div>
+`;
+
+exports[`Module Mitre Att&ck intelligence container should render the component if has permissions 1`] = `
+<div
+  class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+  style="margin:0 8px"
+>
+  <div
+    class="euiFlexItem"
+  >
+    <div
+      class="euiPanel"
+    >
+      <div
+        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+        style="margin:0"
+      >
+        <div
+          class="euiFlexItem euiFlexItem--flexGrowZero"
+          style="background-color:#80808014;margin:0;width:15%;min-width:145px;overflow-x:hidden"
+        >
+          <div
+            style="padding:10px"
+          >
+            <div
+              class="euiFormControlLayout euiFormControlLayout--fullWidth"
+            >
+              <div
+                class="euiFormControlLayout__childrenWrapper"
+              >
+                <input
+                  aria-label="Search in all resources"
+                  class="euiFieldSearch euiFieldSearch--fullWidth euiFieldSearch-isClearable"
+                  placeholder="Search in all resources"
+                  type="search"
+                  value=""
+                />
+                <div
+                  class="euiFormControlLayoutIcons"
+                >
+                  <span
+                    class="euiFormControlLayoutCustomIcon"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      class="euiIcon euiIcon--medium euiIcon-isLoading euiFormControlLayoutCustomIcon__icon"
+                      focusable="false"
+                      height="16"
+                      role="img"
+                      viewBox="0 0 16 16"
+                      width="16"
+                      xmlns="http://www.w3.org/2000/svg"
+                    />
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <button
+            class="moduleMitreAttackIntelligenceResourceButton moduleMitreAttackIntelligenceResourceButton--selected "
+          >
+            Groups
+          </button>
+          <button
+            class="moduleMitreAttackIntelligenceResourceButton  "
+          >
+            Mitigations
+          </button>
+          <button
+            class="moduleMitreAttackIntelligenceResourceButton  "
+          >
+            Software
+          </button>
+          <button
+            class="moduleMitreAttackIntelligenceResourceButton  "
+          >
+            Tactics
+          </button>
+          <button
+            class="moduleMitreAttackIntelligenceResourceButton  "
+          >
+            Techniques
+          </button>
+        </div>
+        <div
+          class="euiFlexItem"
+          style="max-height:calc(100vh - 255px);overflow-y:auto;overflow-x:hidden"
+        >
+          <div
+            class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+          >
+            <div
+              class="euiFlexItem"
+            >
+              <h1
+                class="euiTitle euiTitle--small"
+              >
+                Groups 
+                <span>
+                  (0)
+                </span>
+              </h1>
+            </div>
+          </div>
+          <div
+            class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+          >
+            <div
+              class="euiFlexItem"
+            >
+              <div>
+                <div
+                  class="euiSuggestInput"
+                >
+                  <div
+                    class="euiPopover euiPopover--anchorDownLeft euiPopover--displayBlock euiInputPopover euiInputPopover--fullWidth"
+                    id="popover"
+                  >
+                    <div
+                      class="euiPopover__anchor"
+                    >
+                      <div>
+                        <div
+                          class="euiFormControlLayout euiFormControlLayout--fullWidth euiFormControlLayout--group"
+                        >
+                          <div
+                            style="display:flex"
+                          />
+                          <div
+                            class="euiFormControlLayout__childrenWrapper"
+                          >
+                            <input
+                              class="euiFieldText euiFieldText--fullWidth euiFieldText--inGroup"
+                              placeholder="Search in Groups"
+                              type="text"
+                              value=""
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            class="euiSpacer euiSpacer--s"
+          />
+          <div
+            class="euiBasicTable"
+          >
+            <div>
+              <div
+                class="euiTableHeaderMobile"
+              >
+                <div
+                  class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsBaseline euiFlexGroup--justifyContentSpaceBetween euiFlexGroup--directionRow"
+                >
+                  <div
+                    class="euiFlexItem euiFlexItem--flexGrowZero"
+                  />
+                  <div
+                    class="euiFlexItem euiFlexItem--flexGrowZero"
+                  >
+                    <div
+                      class="euiTableSortMobile"
+                    >
+                      <div
+                        class="euiPopover euiPopover--anchorDownRight"
+                      >
+                        <div
+                          class="euiPopover__anchor"
+                        >
+                          <button
+                            class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--xSmall euiButtonEmpty--flushRight"
+                            type="button"
+                          >
+                            <span
+                              class="euiButtonContent euiButtonContent--iconRight euiButtonEmpty__content"
+                            >
+                              <svg
+                                aria-hidden="true"
+                                class="euiIcon euiIcon--medium euiIcon-isLoading euiButtonContent__icon"
+                                focusable="false"
+                                height="16"
+                                role="img"
+                                viewBox="0 0 16 16"
+                                width="16"
+                                xmlns="http://www.w3.org/2000/svg"
+                              />
+                              <span
+                                class="euiButtonEmpty__text"
+                              >
+                                Sorting
+                              </span>
+                            </span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <table
+                class="euiTable euiTable--responsive"
+                id="htmlId"
+                tabindex="-1"
+              >
+                <caption
+                  class="euiScreenReaderOnly euiTableCaption"
+                />
+                <thead>
+                  <tr>
+                    <th
+                      class="euiTableHeaderCell"
+                      data-test-subj="tableHeaderCell_external_id_0"
+                      role="columnheader"
+                      scope="col"
+                      style="width:12%"
+                    >
+                      <div
+                        class="euiTableCellContent"
+                      >
+                        <span
+                          class="euiTableCellContent__text"
+                        >
+                          ID
+                        </span>
+                      </div>
+                    </th>
+                    <th
+                      aria-live="polite"
+                      aria-sort="ascending"
+                      class="euiTableHeaderCell"
+                      data-test-subj="tableHeaderCell_name_1"
+                      role="columnheader"
+                      scope="col"
+                      style="width:30%"
+                    >
+                      <button
+                        class="euiTableHeaderButton euiTableHeaderButton-isSorted"
+                        data-test-subj="tableHeaderSortButton"
+                        type="button"
+                      >
+                        <span
+                          class="euiTableCellContent"
+                        >
+                          <span
+                            class="euiTableCellContent__text"
+                            title="[object Object]"
+                          >
+                            Name
+                          </span>
+                          <svg
+                            aria-hidden="true"
+                            aria-label="Sorted in ascending order"
+                            class="euiIcon euiIcon--medium euiIcon-isLoading euiTableSortIcon"
+                            focusable="false"
+                            height="16"
+                            role="img"
+                            viewBox="0 0 16 16"
+                            width="16"
+                            xmlns="http://www.w3.org/2000/svg"
+                          />
+                          <span
+                            class="euiScreenReaderOnly"
+                          >
+                            Click to sort in descending order
+                          </span>
+                        </span>
+                      </button>
+                    </th>
+                    <th
+                      aria-live="polite"
+                      aria-sort="none"
+                      class="euiTableHeaderCell"
+                      data-test-subj="tableHeaderCell_description_2"
+                      role="columnheader"
+                      scope="col"
+                    >
+                      <button
+                        class="euiTableHeaderButton"
+                        data-test-subj="tableHeaderSortButton"
+                        type="button"
+                      >
+                        <span
+                          class="euiTableCellContent"
+                        >
+                          <span
+                            class="euiTableCellContent__text"
+                          >
+                            Description
+                          </span>
+                          <span
+                            class="euiScreenReaderOnly"
+                          >
+                            Click to sort in ascending order
+                          </span>
+                        </span>
+                      </button>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    class="euiTableRow"
+                  >
+                    <td
+                      class="euiTableRowCell euiTableRowCell--isMobileFullWidth"
+                      colspan="3"
+                    >
+                      <div
+                        class="euiTableCellContent euiTableCellContent--alignCenter"
+                      >
+                        <span
+                          class="euiTableCellContent__text"
+                        >
+                          No items found
+                        </span>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Mitre alerts components
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,24 +24,27 @@ import {
 } from '@elastic/eui'
 import { IFilterParams, getElasticAlerts } from '../../lib';
 import { getToasts }  from '../../../../../kibana-services';
+import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 
 export class Tactics extends Component {
   _isMount = false;
   state: {
-    tacticsList: Array<any>,
-    tacticsCount: { key: string, doc_count:number }[],
-    allSelected : boolean,
-    loadingAlerts: boolean,
-    isPopoverOpen: boolean,
-    firstTime: boolean
-  }
+    tacticsList: Array<any>;
+    tacticsCount: { key: string; doc_count: number }[];
+    allSelected: boolean;
+    loadingAlerts: boolean;
+    isPopoverOpen: boolean;
+    firstTime: boolean;
+  };
 
   props!: {
-    tacticsObject: object,
-    selectedTactics: Array<any>
-    filterParams: IFilterParams
-    indexPattern: any
-    onChangeSelectedTactics(selectedTactics): void
+    tacticsObject: object;
+    selectedTactics: Array<any>;
+    filterParams: IFilterParams;
+    indexPattern: any;
+    onChangeSelectedTactics(selectedTactics): void;
   };
 
   constructor(props) {
@@ -52,63 +55,43 @@ export class Tactics extends Component {
       allSelected: false,
       loadingAlerts: true,
       isPopoverOpen: false,
-      firstTime: true
-    }
+      firstTime: true,
+    };
   }
 
-  async componentDidMount(){
+  async componentDidMount() {
     this._isMount = true;
   }
 
-  initTactics(){
+  initTactics() {
     const tacticsIds = Object.keys(this.props.tacticsObject);
-    const selectedTactics = {}
-    /*let isMax = {};
-     tacticsIds.forEach( (item,id) => {
-       if(buckets.length){ 
-         const max_doc = buckets[0].doc_count;
-         if(!Object.keys(isMax).length){
-           buckets.forEach( bucket => {
-            if(bucket.doc_count === max_doc){
-              isMax[bucket.key] = true;
-            }
-           })
-         }
-        selectedTactics[item] =  isMax[item] ? true : false; //if results are found, only the first tactic is selected
-       }else{
-        selectedTactics[item] = true;
-       }
-    });*/
-    tacticsIds.forEach( (item,id) => {
+    const selectedTactics = {};
+
+    tacticsIds.forEach((item, id) => {
       selectedTactics[item] = true;
     });
-
 
     this.props.onChangeSelectedTactics(selectedTactics);
   }
 
-
   shouldComponentUpdate(nextProps, nextState) {
     const { filterParams, indexPattern, selectedTactics, isLoading } = this.props;
     const { tacticsCount, loadingAlerts } = this.state;
-    if (nextState.loadingAlerts !== loadingAlerts)
-      return true;
-    if (nextProps.isLoading !== isLoading) 
-      return true;
-    if (JSON.stringify(nextProps.filterParams) !== JSON.stringify(filterParams))
-      return true;
-    if (JSON.stringify(nextProps.indexPattern) !== JSON.stringify(indexPattern))
-      return true;
-    if (JSON.stringify(nextState.tacticsCount) !== JSON.stringify(tacticsCount))
-      return true;
-    if (JSON.stringify(nextState.selectedTactics) !== JSON.stringify(selectedTactics))
-      return true;
+    if (nextState.loadingAlerts !== loadingAlerts) return true;
+    if (nextProps.isLoading !== isLoading) return true;
+    if (JSON.stringify(nextProps.filterParams) !== JSON.stringify(filterParams)) return true;
+    if (JSON.stringify(nextProps.indexPattern) !== JSON.stringify(indexPattern)) return true;
+    if (JSON.stringify(nextState.tacticsCount) !== JSON.stringify(tacticsCount)) return true;
+    if (JSON.stringify(nextState.selectedTactics) !== JSON.stringify(selectedTactics)) return true;
     return false;
   }
 
   async componentDidUpdate(prevProps) {
     const { isLoading, tacticsObject } = this.props;
-    if (JSON.stringify(prevProps.tacticsObject) !== JSON.stringify(tacticsObject) || isLoading !== prevProps.isLoading){
+    if (
+      JSON.stringify(prevProps.tacticsObject) !== JSON.stringify(tacticsObject) ||
+      isLoading !== prevProps.isLoading
+    ) {
       this.getTacticsCount(this.state.firstTime);
     }
   }
@@ -118,134 +101,139 @@ export class Tactics extends Component {
       color: color,
       title: title,
       text: text,
-      toastLifeTimeMs: time
+      toastLifeTimeMs: time,
     });
   };
 
   async getTacticsCount() {
-    this.setState({loadingAlerts: true});
+    this.setState({ loadingAlerts: true });
     const { firstTime } = this.state;
-    try{
-      const {indexPattern, filterParams} = this.props;
-      if ( !indexPattern ) { return; }
+    try {
+      const { indexPattern, filterParams } = this.props;
+      if (!indexPattern) {
+        return;
+      }
       const aggs = {
         tactics: {
           terms: {
-              field: "rule.mitre.tactic",
-              size: 1000,
-          }
-        }
-      }
-      
+            field: 'rule.mitre.tactic',
+            size: 1000,
+          },
+        },
+      };
+
       // TODO: use `status` and `statusText`  to show errors
       // @ts-ignore
       const { data } = await getElasticAlerts(indexPattern, filterParams, aggs);
       const { buckets } = data.aggregations.tactics;
-      if(firstTime){
+      if (firstTime) {
         this.initTactics(buckets); // top tactics are checked on component mount
       }
-      this._isMount && this.setState({tacticsCount: buckets, loadingAlerts: false, firstTime:false});
-        
-    } catch(err){
-      this.showToast(
-        'danger',
-        'Error',
-        `Mitre alerts could not be fetched: ${err}`,
-        3000
-      );
-      this.setState({loadingAlerts: false})
+      this._isMount &&
+        this.setState({ tacticsCount: buckets, loadingAlerts: false, firstTime: false });
+    } catch (error) {
+      const options = {
+        context: `${Tactics.name}.getTacticsCount`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        store: true,
+        display: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `Mitre alerts could not be fetched`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+      this.setState({ loadingAlerts: false });
     }
-    
   }
-
 
   componentWillUnmount() {
     this._isMount = false;
   }
 
-  facetClicked(id){
+  facetClicked(id) {
     const { selectedTactics: oldSelected, onChangeSelectedTactics } = this.props;
     const selectedTactics = {
       ...oldSelected,
-      [id]: !oldSelected[id]
-    }
+      [id]: !oldSelected[id],
+    };
     onChangeSelectedTactics(selectedTactics);
   }
 
-
-  getTacticsList(){
+  getTacticsList() {
     const { tacticsCount } = this.state;
     const { selectedTactics } = this.props;
     const tacticsIds = Object.keys(this.props.tacticsObject);
-    const tacticsList:Array<any> = tacticsIds.map( item => {
-      const quantity = (tacticsCount.find(tactic => tactic.key === item) || {}).doc_count || 0;
+    const tacticsList: Array<any> = tacticsIds.map((item) => {
+      const quantity = (tacticsCount.find((tactic) => tactic.key === item) || {}).doc_count || 0;
       return {
         id: item,
         label: item,
         quantity,
         onClick: (id) => this.facetClicked(id),
-      }}
-    );
-    
-    return (
-      <>
-      {tacticsList.sort((a, b) => b.quantity - a.quantity).map(facet => {
-        let iconNode;
-        return (
-          <EuiFacetButton
-            key={facet.id}
-            id={`${facet.id}`}
-            quantity={facet.quantity}
-            isSelected={selectedTactics[facet.id]}
-            isLoading={this.state.loadingAlerts}
-            icon={iconNode}
-            onClick={
-              facet.onClick ? () => facet.onClick(facet.id) : undefined
-            }>
-            {facet.label}
-          </EuiFacetButton>
-        );
-      })}
-      </>
-    );
-    
-  }
-
-  checkAllChecked(tacticList: any[]){
-    const { selectedTactics } = this.props;
-    let allSelected = true;
-    tacticList.forEach( item => {
-      if(!selectedTactics[item.id])
-        allSelected = false;
+      };
     });
 
-    if(allSelected !== this.state.allSelected){
-      this.setState({allSelected});
+    return (
+      <>
+        {tacticsList
+          .sort((a, b) => b.quantity - a.quantity)
+          .map((facet) => {
+            let iconNode;
+            return (
+              <EuiFacetButton
+                key={facet.id}
+                id={`${facet.id}`}
+                quantity={facet.quantity}
+                isSelected={selectedTactics[facet.id]}
+                isLoading={this.state.loadingAlerts}
+                icon={iconNode}
+                onClick={facet.onClick ? () => facet.onClick(facet.id) : undefined}
+              >
+                {facet.label}
+              </EuiFacetButton>
+            );
+          })}
+      </>
+    );
+  }
+
+  checkAllChecked(tacticList: any[]) {
+    const { selectedTactics } = this.props;
+    let allSelected = true;
+    tacticList.forEach((item) => {
+      if (!selectedTactics[item.id]) allSelected = false;
+    });
+
+    if (allSelected !== this.state.allSelected) {
+      this.setState({ allSelected });
     }
   }
 
-  onCheckAllClick(){
-    const allSelected = ! this.state.allSelected;
-    const {selectedTactics, onChangeSelectedTactics} = this.props;
-    Object.keys(selectedTactics).map( item => {
+  onCheckAllClick() {
+    const allSelected = !this.state.allSelected;
+    const { selectedTactics, onChangeSelectedTactics } = this.props;
+    Object.keys(selectedTactics).map((item) => {
       selectedTactics[item] = allSelected;
     });
-    
-    this.setState({allSelected});
+
+    this.setState({ allSelected });
     onChangeSelectedTactics(selectedTactics);
   }
-  
-  onGearButtonClick(){
-    this.setState({isPopoverOpen: !this.state.isPopoverOpen});
-  }
-  
-  closePopover(){
-    this.setState({isPopoverOpen: false});
+
+  onGearButtonClick() {
+    this.setState({ isPopoverOpen: !this.state.isPopoverOpen });
   }
 
-  selectAll(status){
-    const {selectedTactics, onChangeSelectedTactics} = this.props;
-    Object.keys(selectedTactics).map( item => {
+  closePopover() {
+    this.setState({ isPopoverOpen: false });
+  }
+
+  selectAll(status) {
+    const { selectedTactics, onChangeSelectedTactics } = this.props;
+    Object.keys(selectedTactics).map((item) => {
       selectedTactics[item] = status;
     });
     onChangeSelectedTactics(selectedTactics);
@@ -273,11 +261,11 @@ export class Tactics extends Component {
               this.selectAll(false);
             },
           },
-        ]
-      }
-    ]
+        ],
+      },
+    ];
     return (
-      <div style={{ backgroundColor: "#80808014", padding: "10px 10px 0 10px", height: "100%"}}>
+      <div style={{ backgroundColor: '#80808014', padding: '10px 10px 0 10px', height: '100%' }}>
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiTitle size="m">
@@ -285,23 +273,31 @@ export class Tactics extends Component {
             </EuiTitle>
           </EuiFlexItem>
 
-          <EuiFlexItem grow={false} style={{marginTop:'15px', marginRight:8}}> 
+          <EuiFlexItem grow={false} style={{ marginTop: '15px', marginRight: 8 }}>
             <EuiPopover
-              button={(<EuiButtonIcon iconType="gear" onClick={() => this.onGearButtonClick()} aria-label={'tactics options'}></EuiButtonIcon>)}
+              button={
+                <EuiButtonIcon
+                  iconType="gear"
+                  onClick={() => this.onGearButtonClick()}
+                  aria-label={'tactics options'}
+                ></EuiButtonIcon>
+              }
               isOpen={this.state.isPopoverOpen}
               panelPaddingSize="none"
-              closePopover={() => this.closePopover()}>
-                <EuiContextMenu initialPanelId={0} panels={panels} />
+              closePopover={() => this.closePopover()}
+            >
+              <EuiContextMenu initialPanelId={0} panels={panels} />
             </EuiPopover>
           </EuiFlexItem>
         </EuiFlexGroup>
-        { this.props.isLoading
-          ? <EuiFlexItem style={{  alignItems: 'center', marginTop: 50 }} ><EuiLoadingSpinner size="xl" /></EuiFlexItem>
-          : <EuiFacetGroup style={{ }}>
-              {this.getTacticsList()}
-            </EuiFacetGroup>
-        }
+        {this.props.isLoading ? (
+          <EuiFlexItem style={{ alignItems: 'center', marginTop: 50 }}>
+            <EuiLoadingSpinner size="xl" />
+          </EuiFlexItem>
+        ) : (
+          <EuiFacetGroup style={{}}>{this.getTacticsList()}</EuiFacetGroup>
+        )}
       </div>
-    )
+    );
   }
 }

@@ -17,7 +17,7 @@
  * under the License.
  */
 
-import { SavedObject, SavedObjectsStart } from '../../../../../../src/plugins/saved_objects/public';;
+import { SavedObject, SavedObjectsStart } from '../../../../../../src/plugins/saved_objects/public';
 
 export function createSavedSearchClass(savedObjects: SavedObjectsStart) {
 

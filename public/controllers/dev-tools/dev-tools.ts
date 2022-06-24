@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Dev tools controller
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +22,14 @@ import store from '../../redux/store';
 import { WzRequest } from '../../react-services/wz-request';
 import { ErrorHandler } from '../../react-services/error-handler';
 import { getUiSettings } from '../../kibana-services';
+import { UI_LOGGER_LEVELS } from '../../../common/constants';
+import {
+  UI_ERROR_SEVERITIES,
+  UIErrorLog,
+  UIErrorSeverity,
+  UILogLevel,
+} from '../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../react-services/common-services';
 
 export class DevToolsController {
   /**
@@ -74,9 +82,9 @@ export class DevToolsController {
     $(this.$document[0]).keyup(e => {
       this.multipleKeyPressed = [];
     });
-
+    const element = this.$document[0].getElementById('api_input');
     this.apiInputBox = CodeMirror.fromTextArea(
-      this.$document[0].getElementById('api_input'),
+      element,
       {
         lineNumbers: true,
         matchBrackets: true,
@@ -150,10 +158,9 @@ export class DevToolsController {
     try {
       const currentState = this.apiInputBox.getValue().toString();
       AppState.setCurrentDevTools(currentState);
-
       const tmpgroups = [];
       const splitted = currentState
-        .split(/[\r\n]+(?=(?:GET|PUT|POST|DELETE|#)\b)/gm)
+        .split(/[\r\n]+(?=(?:GET|PUT|POST|DELETE)\b)/gm)
         .filter(item => item.replace(/\s/g, '').length);
 
       let start = 0;
@@ -162,7 +169,7 @@ export class DevToolsController {
       const slen = splitted.length;
       for (let i = 0; i < slen; i++) {
         let tmp = splitted[i].split('\n');
-        if (Array.isArray(tmp)) tmp = tmp.filter(item => !item.includes('#'));
+        if (Array.isArray(tmp)) tmp = tmp.filter(item => !item.startsWith('#'));
         const cursor = this.apiInputBox.getSearchCursor(splitted[i], null, {
           multiline: true
         });
@@ -197,7 +204,7 @@ export class DevToolsController {
 
         const tmplen = tmp.length;
         for (let j = 1; j < tmplen; ++j) {
-          if (!!tmp[j] && !tmp[j].includes('#')) {
+          if (!!tmp[j] && !tmp[j].startsWith('#')) {
             tmpRequestTextJson += tmp[j];
           }
         }
@@ -231,6 +238,17 @@ export class DevToolsController {
       starts = [];
       return tmpgroups;
     } catch (error) {
+      const options: UIErrorLog = {
+        context: `${DevToolsController.name}.analyzeGroups`,
+        level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+        severity: UI_ERROR_SEVERITIES.UI as UIErrorSeverity,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
       return [];
     }
   }
@@ -330,6 +348,18 @@ export class DevToolsController {
       this.apiInputBox.model = !response.error ? response.data : [];
     } catch (error) {
       this.apiInputBox.model = [];
+
+      const options: UIErrorLog = {
+        context: `${DevToolsController.name}.getAvailableMethods`,
+        level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+        severity: UI_ERROR_SEVERITIES.UI as UIErrorSeverity,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   }
 
@@ -519,7 +549,18 @@ export class DevToolsController {
               inputBodyPreviousKeys = Object.keys((requestBodyCursorKeys || []).reduce((acumm, key) => acumm[key], JSON.parse(bodySanitizedBodyParam)));
             } catch (error) {
               inputBodyPreviousKeys = [];
-            };
+              const options: UIErrorLog = {
+                context: `${DevToolsController.name}.getDictionary`,
+                level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+                severity: UI_ERROR_SEVERITIES.UI as UIErrorSeverity,
+                error: {
+                  error: error,
+                  message: error.message || error,
+                  title: error.name,
+                },
+              };
+              getErrorOrchestrator().handleError(options);
+            }
 
             hints = paramsBody
               .filter(bodyParam => !inputBodyPreviousKeys.includes(bodyParam.name) && bodyParam.name && (inputKeyBodyParam ? bodyParam.name.includes(inputKeyBodyParam) : true))
@@ -621,10 +662,18 @@ export class DevToolsController {
         );
 
       // Place play button at first line from the selected group
-      const cords = this.apiInputBox.cursorCoords({
-        line: desiredGroup[0].start,
-        ch: 0
-      });
+      let cords;
+      try {
+        cords = this.apiInputBox.cursorCoords({
+          line: desiredGroup[0].start,
+          ch: 0
+        });
+      } catch {
+        $('#play_button').hide();
+        $('#wazuh_dev_tools_documentation').hide();
+        return null;
+      }
+
       if (!$('#play_button').is(':visible')) $('#play_button').show();
       if (!$('#wazuh_dev_tools_documentation').is(':visible')) $('#wazuh_dev_tools_documentation').show();
       const currentPlayButton = $('#play_button').offset();
@@ -657,6 +706,18 @@ export class DevToolsController {
     } catch (error) {
       $('#play_button').hide();
       $('#wazuh_dev_tools_documentation').hide();
+      const options: UIErrorLog = {
+        context: `${DevToolsController.name}.calculateWhichGroup`,
+        level: UI_LOGGER_LEVELS.WARNING as UILogLevel,
+        severity: UI_ERROR_SEVERITIES.UI as UIErrorSeverity,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+
       return null;
     }
   }
@@ -743,15 +804,13 @@ export class DevToolsController {
         if (typeof JSONraw === 'object') JSONraw.devTools = true;
         if (!firstTime) {
           const output = await this.wzRequest.apiReq(method, path, JSONraw);
+
           if (typeof output === 'string' && output.includes('3029')) {
             this.apiOutputBox.setValue('This method is not allowed without admin mode');
           }
           else {
             this.apiOutputBox.setValue(
-              JSON.stringify((output || {}).data || {}, null, 2).replace(
-                /\\\\/g,
-                '\\'
-              )
+              JSON.stringify((output || {}).data || {}, null, 2)
             );
           }
         }
@@ -759,19 +818,34 @@ export class DevToolsController {
 
       (firstTime || !desiredGroup) && this.apiOutputBox.setValue('Welcome!');
     } catch (error) {
-      if ((error || {}).status === -1) {
-        return this.apiOutputBox.setValue(
-          'Wazuh API is not reachable. Reason: timeout.'
-        );
+      //TODO: for the moment we will only add the new orchestrator to leave a message of this error in UI, but we have to deprecate the old ErrorHandler :)
+      const options: UIErrorLog = {
+        context: `${DevToolsController.name}.send`,
+        level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+        severity: UI_ERROR_SEVERITIES.UI as UIErrorSeverity,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+
+      return this.apiOutputBox.setValue(this.parseError(error));
+    }
+  }
+
+  parseError(error){
+    if ((error || {}).status === -1) {
+      return 'Wazuh API is not reachable. Reason: timeout.';
+    } else {
+      const parsedError = ErrorHandler.handle(error, '', { silent: true });
+      if (typeof parsedError === 'string') {
+        return parsedError;
+      } else if (error && error.data && typeof error.data === 'object') {
+        return JSON.stringify(error);
       } else {
-        const parsedError = ErrorHandler.handle(error, '', { silent: true });
-        if (typeof parsedError === 'string') {
-          return this.apiOutputBox.setValue(error);
-        } else if (error && error.data && typeof error.data === 'object') {
-          return this.apiOutputBox.setValue(JSON.stringify(error));
-        } else {
-          return this.apiOutputBox.setValue('Empty');
-        }
+        return 'Empty';
       }
     }
   }
@@ -784,7 +858,17 @@ export class DevToolsController {
       });
       FileSaver.saveAs(blob, 'export.json');
     } catch (error) {
-      ErrorHandler.handle(error, 'Export JSON');
+      const options: UIErrorLog = {
+        context: `${DevToolsController.name}.exportOutput`,
+        level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+        severity: UI_ERROR_SEVERITIES.UI as UIErrorSeverity,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `${error.name}: Export JSON`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   }
 }

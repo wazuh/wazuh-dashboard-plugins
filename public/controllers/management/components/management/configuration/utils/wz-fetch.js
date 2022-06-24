@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Fetch API function and utils.
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -11,9 +11,9 @@
  */
 
 import { WzRequest } from '../../../../../../react-services/wz-request';
-import { delay } from './utils';
 import { replaceIllegalXML } from './xml';
 import { getToasts }  from '../../../../../../kibana-services';
+import { delayAsPromise } from '../../../../../../../common/utils';
 
 /**
  * Get configuration for an agent/manager of request sections
@@ -79,7 +79,7 @@ export const getCurrentConfig = async (
     }
     return result;
   } catch (error) {
-    return Promise.reject(error);
+    throw error;
   }
 };
 
@@ -146,7 +146,7 @@ export const handleError = async (error, location, updateWazuhNotReadyYet, isClu
 
     return text;
   } catch (error) {
-    console.error(error);
+    throw error;
   }
 };
 
@@ -157,7 +157,7 @@ export const handleError = async (error, location, updateWazuhNotReadyYet, isClu
  */
 export const checkDaemons = async (isCluster) => {
   try {
-    const response = await WzRequest.apiReq('GET', '/manager/status', {});
+    const response = await WzRequest.apiReq('GET', '/manager/status', {}, { checkCurrentApiIsUp: false });
     const daemons = ((((response || {}).data || {}).data || {}).affected_items || [])[0] || {};
     const wazuhdbExists = typeof daemons['wazuh-db'] !== 'undefined';
 
@@ -181,7 +181,7 @@ export const checkDaemons = async (isCluster) => {
       console.warn('Wazuh not ready yet');
     }
   } catch (error) {
-    return Promise.reject(error);
+    throw error;
   }
 };
 
@@ -196,7 +196,7 @@ export const makePing = async (updateWazuhNotReadyYet, isCluster, tries = 30) =>
   try {
     let isValid = false;
     while (tries--) {
-      await delay(2000);
+      await delayAsPromise(2000);
       try {
         isValid = await checkDaemons(isCluster);
         if (isValid) {
@@ -212,7 +212,7 @@ export const makePing = async (updateWazuhNotReadyYet, isCluster, tries = 30) =>
     }
     return Promise.resolve('Wazuh is ready');
   } catch (error) {
-    return Promise.reject('Wazuh could not be recovered.');
+    throw new Error('Wazuh could not be recovered.');
   }
 };
 
@@ -258,7 +258,7 @@ export const fetchFile = async selectedNode => {
     xml = xml.replace(/..xml.+\?>/, '');
     return xml;
   } catch (error) {
-    return Promise.reject(error);
+    throw error;
   }
 };
 
@@ -267,22 +267,16 @@ export const fetchFile = async selectedNode => {
  * @param {} selectedNode Cluster Node
  * @param updateWazuhNotReadyYet
  */
-export const restartNodeSelected = async (
-  selectedNode,
-  updateWazuhNotReadyYet
-) => {
+export const restartNodeSelected = async (selectedNode, updateWazuhNotReadyYet) => {
   try {
     const clusterStatus = (((await clusterReq()) || {}).data || {}).data || {};
-
     const isCluster = clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
     // Dispatch a Redux action
-    updateWazuhNotReadyYet(
-      `Restarting ${isCluster ? selectedNode : 'Manager'}, please wait.`
-    ); //FIXME: if it enables/disables cluster, this will show Manager instead node name
+    updateWazuhNotReadyYet(`Restarting ${isCluster ? selectedNode : 'Manager'}, please wait.`); //FIXME: if it enables/disables cluster, this will show Manager instead node name
     isCluster ? await restartNode(selectedNode) : await restartManager();
     return await makePing(updateWazuhNotReadyYet, isCluster);
   } catch (error) {
-    return Promise.reject(error);
+    throw error;
   }
 };
 
@@ -304,7 +298,7 @@ export const restartManager = async () => {
     const result = await WzRequest.apiReq('PUT', `/manager/restart`, {});
     return result;
   } catch (error) {
-    return Promise.reject(error);
+    throw error;
   }
 };
 
@@ -335,7 +329,7 @@ export const restartCluster = async () => {
       }
     };
   } catch (error) {
-    return Promise.reject(error);
+    throw error;
   }
 };
 
@@ -364,7 +358,7 @@ export const restartNode = async node => {
 
     return result;
   } catch (error) {
-    return Promise.reject(error);
+    throw error;
   }
 };
 
@@ -379,7 +373,7 @@ export const saveConfiguration = async (selectedNode, xml) => {
       await saveFileManager(xml);
     }
   } catch (error) {
-    return Promise.reject(error.message || error);
+    throw error;
   }
 };
 
@@ -399,7 +393,7 @@ export const saveNodeConfiguration = async (node, content) => {
     );
     return result;
   } catch (error) {
-    return Promise.reject(error);
+    throw error;
   }
 };
 
@@ -420,7 +414,7 @@ export const saveFileCluster = async (text, node) => {
     );
     await validateAfterSent(node);
   } catch (error) {
-    return Promise.reject(error);
+    throw error;
   }
 };
 
@@ -440,7 +434,7 @@ export const saveFileManager = async text => {
     );
     await validateAfterSent(false);
   } catch (error) {
-    return Promise.reject(error);
+    throw error;
   }
 };
 
@@ -479,7 +473,7 @@ export const validateAfterSent = async (node = false) => {
     }
     return true;
   } catch (error) {
-    return Promise.reject(error);
+    throw error;
   }
 };
 
@@ -499,7 +493,7 @@ export const clusterNodes = async () => {
     const result = await WzRequest.apiReq('GET', `/cluster/nodes`, {});
     return result;
   } catch (error) {
-    return Promise.reject(error);
+    throw error;
   }
 };
 
@@ -511,14 +505,13 @@ export const checkCurrentSecurityPlatform = async () => {
   try {
     const result = await WzRequest.genericReq(
       'GET',
-      '/elastic/security/current-platform',
-      {}
+      '/elastic/security/current-platform'
     );
     const platform = (result.data || {}).platform;
 
     return platform;
   } catch (error) {
-    return Promise.reject(error);
+    throw error;
   }
 };
 
@@ -526,24 +519,22 @@ export const checkCurrentSecurityPlatform = async () => {
  * Restart cluster or Manager
  */
 export const restartClusterOrManager = async (updateWazuhNotReadyYet) => {
-  try{
+  try {
     const clusterStatus = (((await clusterReq()) || {}).data || {}).data || {};
-    const isCluster =
-      clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
-      getToasts().add({
-        color:'success',
-        title:isCluster ?'Restarting cluster, it will take up to 30 seconds.': 'Manager was restarted',
-        toastLifeTimeMs: 3000
-      });
+    const isCluster = clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
+    getToasts().add({
+      color: 'success',
+      title: isCluster
+        ? 'Restarting cluster, it will take up to 30 seconds.'
+        : 'The manager is being restarted',
+      toastLifeTimeMs: 3000,
+    });
     isCluster ? await restartCluster() : await restartManager();
     // Dispatch a Redux action
-    updateWazuhNotReadyYet(
-      `Restarting ${isCluster ? 'Cluster' : 'Manager'}, please wait.`
-    );
-    await delay(15000);
+    updateWazuhNotReadyYet(`Restarting ${isCluster ? 'Cluster' : 'Manager'}, please wait.`);
     await makePing(updateWazuhNotReadyYet, isCluster);
-    return { restarted: isCluster ? 'Cluster' : 'Manager'}
-  }catch (error){
-    return Promise.reject(error);
-  };
+    return { restarted: isCluster ? 'Cluster' : 'Manager' };
+  } catch (error) {
+    throw error;
+  }
 };

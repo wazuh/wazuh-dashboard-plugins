@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Class for Wazuh reporting controller
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,9 +36,11 @@ import {
   WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH,
   WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH,
   AUTHORIZED_AGENTS,
+  API_NAME_AGENT_STATUS,
 } from '../../common/constants';
 import { createDirectoryIfNotExists, createDataDirectoryIfNotExists } from '../lib/filesystem';
 import moment from 'moment';
+import { agentStatusLabelByAgentStatus } from '../../common/services/wz_agent_status';
 
 export class WazuhReportingCtrl {
   constructor() {}
@@ -89,7 +91,7 @@ export class WazuhReportingCtrl {
     }
 
     if (searchBar) {
-      str += ' AND ' + searchBar;
+      str += ` AND (${ searchBar})`;
     }
 
     const agentsFilterStr = agentsFilter.map((filter) => filter.meta.value).join(',');
@@ -164,9 +166,9 @@ export class WazuhReportingCtrl {
           { apiHostID: apiId }
         );
         const agentData = agentResponse.data.data.affected_items[0];
-        if (agentData && agentData.status !== 'active') {
+        if (agentData && agentData.status !== API_NAME_AGENT_STATUS.ACTIVE) {
           printer.addContentWithNewLine({
-            text: `Warning. Agent is ${agentData.status.toLowerCase()}`,
+            text: `Warning. Agent is ${agentStatusLabelByAgentStatus(agentData.status).toLowerCase()}`,
             style: 'standard',
           });
         }
@@ -576,7 +578,7 @@ export class WazuhReportingCtrl {
             rules.length &&
             printer.addSimpleTable({
               columns: [
-                { id: 'ruleId', label: 'Rule ID' },
+                { id: 'ruleID', label: 'Rule ID' },
                 { id: 'ruleDescription', label: 'Description' },
               ],
               items: rules,
@@ -619,7 +621,7 @@ export class WazuhReportingCtrl {
             rules.length &&
             printer.addSimpleTable({
               columns: [
-                { id: 'ruleId', label: 'Rule ID' },
+                { id: 'ruleID', label: 'Rule ID' },
                 { id: 'ruleDescription', label: 'Description' },
               ],
               items: rules,
@@ -662,7 +664,7 @@ export class WazuhReportingCtrl {
             rules.length &&
             printer.addSimpleTable({
               columns: [
-                { id: 'ruleId', label: 'Rule ID' },
+                { id: 'ruleID', label: 'Rule ID' },
                 { id: 'ruleDescription', label: 'Description' },
               ],
               items: rules,
@@ -726,7 +728,7 @@ export class WazuhReportingCtrl {
         if (rules && rules.length) {
           printer.addContentWithNewLine({ text: 'Top 3 FIM rules', style: 'h2' }).addSimpleTable({
             columns: [
-              { id: 'ruleId', label: 'Rule ID' },
+              { id: 'ruleID', label: 'Rule ID' },
               { id: 'ruleDescription', label: 'Description' },
             ],
             items: rules,
@@ -1144,9 +1146,10 @@ export class WazuhReportingCtrl {
         tables,
         name,
         section,
+        indexPatternTitle,
+        apiId
       } = request.body;
       const { moduleID } = request.params;
-      const { id: apiId, pattern: indexPattern } = request.headers;
       const { from, to } = time || {};
       // Init
       const printer = new ReportPrinter();
@@ -1176,7 +1179,7 @@ export class WazuhReportingCtrl {
           new Date(from).getTime(),
           new Date(to).getTime(),
           sanitizedFilters,
-          indexPattern,
+          indexPatternTitle,
           agents
         );
       }
@@ -1219,10 +1222,8 @@ export class WazuhReportingCtrl {
   ) {
     try {
       log('reporting:createReportsGroups', `Report started`, 'info');
-      const { browserTimezone, searchBar, filters, time, name, components } = request.body;
+      const { name, components, apiId } = request.body;
       const { groupID } = request.params;
-      const { id: apiId, pattern: indexPattern } = request.headers;
-      const { from, to } = time || {};
       // Init
       const printer = new ReportPrinter();
 
@@ -1493,10 +1494,8 @@ export class WazuhReportingCtrl {
   ) {
     try {
       log('reporting:createReportsAgents', `Report started`, 'info');
-      const { browserTimezone, searchBar, filters, time, name, components } = request.body;
+      const { name, components, apiId } = request.body;
       const { agentID } = request.params;
-      const { id: apiId } = request.headers;
-      const { from, to } = time || {};
 
       const printer = new ReportPrinter();
 
@@ -1744,9 +1743,8 @@ export class WazuhReportingCtrl {
   ) {
     try {
       log('reporting:createReportsAgentsInventory', `Report started`, 'info');
-      const { browserTimezone, searchBar, filters, time, name } = request.body;
+      const { searchBar, filters, time, name, indexPatternTitle, apiId } = request.body;
       const { agentID } = request.params;
-      const { id: apiId, pattern: indexPattern } = request.headers;
       const { from, to } = time || {};
       // Init
       const printer = new ReportPrinter();
@@ -1940,7 +1938,7 @@ export class WazuhReportingCtrl {
           from,
           to,
           sanitizedFilters + ' AND rule.groups: "vulnerability-detector"',
-          indexPattern,
+          indexPatternTitle,
           agentID
         );
       }

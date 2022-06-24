@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Configuration handler service
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,9 +19,6 @@ export default class ConfigurationHandler {
    */
   static async editKey(key, value) {
     try {
-      if (key === 'api.selector') {
-        AppState.setAPISelector(value);
-      }
       if (key === 'ip.selector') {
         AppState.setPatternSelector(value);
       }

@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Configuration handler class
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -11,7 +11,7 @@
  */
 import js2xmlparser from 'js2xmlparser';
 import XMLBeautifier from './xml-beautifier';
-import { queryConfig } from '../services/query-config';
+import { queryConfig } from '../react-services/query-config';
 import { objectWithoutProperties } from './remove-hash-key.js';
 import { WzRequest } from '../react-services/wz-request';
 import { ErrorHandler } from '../react-services/error-handler';
@@ -62,8 +62,6 @@ export class ConfigurationHandler {
       $scope.currentConfig = await queryConfig(
         agentId || '000',
         sections,
-        WzRequest.apiReq,
-        this.errorHandler,
         node
       );
 
@@ -133,8 +131,6 @@ export class ConfigurationHandler {
       $scope.currentConfig = await queryConfig(
         agentId || '000',
         [{ component: 'wmodules', configuration: 'wmodules' }],
-        WzRequest.apiReq,
-        this.errorHandler,
         node
       );
 
@@ -176,8 +172,6 @@ export class ConfigurationHandler {
       const wodlesConfig = await queryConfig(
         agentId || '000',
         [{ component: 'wmodules', configuration: 'wmodules' }],
-        WzRequest.apiReq,
-        this.errorHandler
       );
 
       // Filter by provided wodleName

@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for registering agents.
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,15 +18,19 @@ import { connect } from 'react-redux';
 import {
   updateLoadingStatus,
   updateIsProcessing,
-  updateFileContent
+  updateFileContent,
 } from '../../../../../redux/actions/groupsActions';
 
 import exportCsv from '../../../../../react-services/wz-csv';
 import GroupsHandler from './utils/groups-handler';
-import { getToasts }  from '../../../../../kibana-services';
+import { getToasts } from '../../../../../kibana-services';
 import { ExportConfiguration } from '../../../../agent/components/export-configuration';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 import { ReportingService } from '../../../../../react-services/reporting';
+import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../../../../react-services/common-services';
+
 
 class WzGroupsActionButtonsFiles extends Component {
   _isMounted = false;
@@ -38,7 +42,7 @@ class WzGroupsActionButtonsFiles extends Component {
     this.state = {
       generatingCsv: false,
       isPopoverOpen: false,
-      newGroupName: ''
+      newGroupName: '',
     };
     this.exportCsv = exportCsv;
 
@@ -67,7 +71,18 @@ class WzGroupsActionButtonsFiles extends Component {
       this.props.updateIsProcessing(true);
       this.onRefreshLoading();
     } catch (error) {
-      return Promise.reject(error);
+      const options = {
+        context: `${WzGroupsActionButtonsFiles.name}.refresh`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        store: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   }
 
@@ -83,14 +98,11 @@ class WzGroupsActionButtonsFiles extends Component {
     }, 100);
   }
 
-  autoFormat = xml => {
+  autoFormat = (xml) => {
     var reg = /(>)\s*(<)(\/*)/g;
     var wsexp = / *(.*) +\n/g;
     var contexp = /(<.+>)(.+\n)/g;
-    xml = xml
-      .replace(reg, '$1\n$2$3')
-      .replace(wsexp, '$1\n')
-      .replace(contexp, '$1\n$2');
+    xml = xml.replace(reg, '$1\n$2$3').replace(wsexp, '$1\n').replace(contexp, '$1\n$2');
     var formatted = '';
     var lines = xml.split('\n');
     var indent = 0;
@@ -111,7 +123,7 @@ class WzGroupsActionButtonsFiles extends Component {
       'other->single': 0,
       'other->closing': -1,
       'other->opening': 0,
-      'other->other': 0
+      'other->other': 0,
     };
 
     for (var i = 0; i < lines.length; i++) {
@@ -123,13 +135,7 @@ class WzGroupsActionButtonsFiles extends Component {
       var single = Boolean(ln.match(/<.+\/>/)); // is this line a single tag? ex. <br />
       var closing = Boolean(ln.match(/<\/.+>/)); // is this a closing tag? ex. </a>
       var opening = Boolean(ln.match(/<[^!].*>/)); // is this even a tag (that's not <!something>)
-      var type = single
-        ? 'single'
-        : closing
-        ? 'closing'
-        : opening
-        ? 'opening'
-        : 'other';
+      var type = single ? 'single' : closing ? 'closing' : opening ? 'opening' : 'other';
       var fromTo = lastType + '->' + type;
       lastType = type;
       var padding = '';
@@ -152,7 +158,7 @@ class WzGroupsActionButtonsFiles extends Component {
       `/groups/${itemDetail.name}/files/agent.conf/xml`
     );
 
-    if(Object.keys(result).length == 0){
+    if (Object.keys(result).length == 0) {
       result = '';
     }
 
@@ -162,7 +168,7 @@ class WzGroupsActionButtonsFiles extends Component {
       name: 'agent.conf',
       content: data,
       isEditable: true,
-      groupName: itemDetail.name
+      groupName: itemDetail.name,
     };
     this.props.updateFileContent(file);
   }
@@ -171,19 +177,19 @@ class WzGroupsActionButtonsFiles extends Component {
     this.setState({
       isPopoverOpen: false,
       msg: false,
-      newGroupName: ''
+      newGroupName: '',
     });
   }
 
   clearGroupName() {
     this.setState({
-      newGroupName: ''
+      newGroupName: '',
     });
   }
 
-  onChangeNewGroupName = e => {
+  onChangeNewGroupName = (e) => {
     this.setState({
-      newGroupName: e.target.value
+      newGroupName: e.target.value,
     });
   };
 
@@ -197,7 +203,7 @@ class WzGroupsActionButtonsFiles extends Component {
         if (input.length) {
           const i = input[0];
           if (!i.onkeypress) {
-            i.onkeypress = async e => {
+            i.onkeypress = async (e) => {
               if (e.which === 13) {
                 await this.createGroup();
               }
@@ -206,19 +212,27 @@ class WzGroupsActionButtonsFiles extends Component {
           clearInterval(interval);
         }
       }, 150);
-    } catch (error) {}
+    } catch (error) {
+      const options = {
+        context: `${WzGroupsActionButtonsFiles.name}.bindEnterToInput`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        store: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+    }
   }
 
   async createGroup() {
     try {
       this.props.updateLoadingStatus(true);
       await this.groupsHandler.saveGroup(this.state.newGroupName);
-      this.showToast(
-        'success',
-        'Success',
-        'The group has been created successfully',
-        2000
-      );
+      this.showToast('success', 'Success', 'The group has been created successfully', 2000);
       this.clearGroupName();
 
       this.props.updateIsProcessing(true);
@@ -226,12 +240,7 @@ class WzGroupsActionButtonsFiles extends Component {
       this.closePopover();
     } catch (error) {
       this.props.updateLoadingStatus(false);
-      this.showToast(
-        'danger',
-        'Error',
-        `An error occurred when creating the group: ${error}`,
-        2000
-      );
+      throw new Error(error);
     }
   }
 
@@ -250,12 +259,18 @@ class WzGroupsActionButtonsFiles extends Component {
         2000
       );
     } catch (error) {
-      this.showToast(
-        'danger',
-        'Error',
-        `Error when exporting the CSV file: ${error}`,
-        2000
-      );
+      const options = {
+        context: `${WzGroupsActionButtonsFiles.name}.generateCsv`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        store: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `Error when exporting the CSV file: ${error.message || error}`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
     this.setState({ generatingCsv: false });
   }
@@ -265,7 +280,7 @@ class WzGroupsActionButtonsFiles extends Component {
       color: color,
       title: title,
       text: text,
-      toastLifeTimeMs: time
+      toastLifeTimeMs: time,
     });
   };
 
@@ -273,8 +288,10 @@ class WzGroupsActionButtonsFiles extends Component {
     // Add new group button
     const groupConfigurationButton = (
       <WzButtonPermissions
-        buttonType='empty'
-        permissions={[{action: 'group:read', resource: `group:id:${this.props.state.itemDetail.name}`}]}
+        buttonType="empty"
+        permissions={[
+          { action: 'group:read', resource: `group:id:${this.props.state.itemDetail.name}` },
+        ]}
         iconSide="left"
         iconType="documentEdit"
         onClick={() => this.showGroupConfiguration()}
@@ -286,14 +303,14 @@ class WzGroupsActionButtonsFiles extends Component {
     // Export PDF button
     const exportPDFButton = (
       <ExportConfiguration
-        exportConfiguration={enabledComponents =>
+        exportConfiguration={(enabledComponents) =>
           this.reportingService.startConfigReport(
             this.props.state.itemDetail,
             'groupConfig',
             enabledComponents
           )
         }
-        type='group'
+        type="group"
       />
     );
     // Export button
@@ -309,10 +326,7 @@ class WzGroupsActionButtonsFiles extends Component {
 
     // Refresh
     const refreshButton = (
-      <EuiButtonEmpty
-        iconType="refresh"
-        onClick={async () => await this.refresh()}
-      >
+      <EuiButtonEmpty iconType="refresh" onClick={async () => await this.refresh()}>
         Refresh
       </EuiButtonEmpty>
     );
@@ -328,22 +342,18 @@ class WzGroupsActionButtonsFiles extends Component {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
-    state: state.groupsReducers
+    state: state.groupsReducers,
   };
 };
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch) => {
   return {
-    updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
-    updateIsProcessing: isProcessing =>
-      dispatch(updateIsProcessing(isProcessing)),
-    updateFileContent: content => dispatch(updateFileContent(content))
+    updateLoadingStatus: (status) => dispatch(updateLoadingStatus(status)),
+    updateIsProcessing: (isProcessing) => dispatch(updateIsProcessing(isProcessing)),
+    updateFileContent: (content) => dispatch(updateFileContent(content)),
   };
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WzGroupsActionButtonsFiles);
+export default connect(mapStateToProps, mapDispatchToProps)(WzGroupsActionButtonsFiles);

@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Reporting handler service
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,10 +19,10 @@ export default class ReportingHandler {
    */
   static async listReports() {
     try {
-      const result = await WzRequest.genericReq('GET', '/reports', {});
+      const result = await WzRequest.genericReq('GET', '/reports');
       return result;
     } catch (error) {
-      return Promise.reject(error);
+      throw error;
     }
   }
 
@@ -34,12 +34,11 @@ export default class ReportingHandler {
     try {
       const result = await WzRequest.genericReq(
         'DELETE',
-        `/reports/${name}`,
-        {}
+        `/reports/${name}`
       );
       return result;
     } catch (error) {
-      return Promise.reject(error);
+      throw error;
     }
   }
 }

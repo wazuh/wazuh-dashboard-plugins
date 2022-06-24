@@ -1,7 +1,7 @@
 /*
  * Wazuh app - React component for building the Overview welcome screen.
  *
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -11,30 +11,17 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import {
-  EuiTitle,
-  EuiBadge,
-  EuiToolTip
-} from '@elastic/eui';
 import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
 import { updateCurrentTab } from '../../../redux/actions/appStateActions';
 import store from '../../../redux/store';
 import { connect } from 'react-redux';
 import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
-import { AppNavigate } from '../../../react-services/app-navigate';
 
 class WzCurrentOverviewSection extends Component {
   constructor(props) {
     super(props);
     this.state = {
     };
-  }
-
-
-  getBadgeColor(agentStatus){
-    if (agentStatus.toLowerCase() === 'active') { return 'secondary'; }
-    else if (agentStatus.toLowerCase() === 'disconnected') { return '#BD271E'; }
-    else if (agentStatus.toLowerCase() === 'never connected') { return 'default'; }
   }
 
   setGlobalBreadcrumb() {

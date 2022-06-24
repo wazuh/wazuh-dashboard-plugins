@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Module for Wazuh reporting routes
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,7 +34,9 @@ export function WazuhReportingRoutes(router: IRouter) {
             from: schema.string(),
             to: schema.string()
           }), schema.string()]),
-          title: schema.maybe(schema.string())
+          title: schema.maybe(schema.string()),
+          indexPatternTitle: schema.string(),
+          apiId: schema.string()
         }),
         params: schema.object({
           moduleID: schema.string()
@@ -54,6 +56,7 @@ export function WazuhReportingRoutes(router: IRouter) {
         name: schema.string(),
         section: schema.maybe(schema.string()),
         tab: schema.string(),
+        apiId: schema.string()
       }),
       params: schema.object({
         groupID: schema.string()
@@ -73,6 +76,7 @@ export function WazuhReportingRoutes(router: IRouter) {
         name: schema.string(),
         section: schema.maybe(schema.string()),
         tab: schema.string(),
+        apiId: schema.string()
       }),
       params: schema.object({
         agentID: schema.string()
@@ -100,7 +104,9 @@ export function WazuhReportingRoutes(router: IRouter) {
           from: schema.string(),
           to: schema.string()
         }), schema.string()]),
-        title: schema.maybe(schema.string())
+        title: schema.maybe(schema.string()),
+        indexPatternTitle: schema.string(),
+        apiId: schema.string()
       }),
       params: schema.object({
         agentID: schema.string()

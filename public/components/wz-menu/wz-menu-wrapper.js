@@ -1,7 +1,7 @@
 /*
  * Wazuh app - React component for building the WzMenu component.
  *
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -11,22 +11,10 @@
  * Find more information about this on the LICENSE file.
  *
  */
-import React, { Component } from 'react';
+import React from 'react';
 import WzMenu from './wz-menu';
-import WzReduxProvider from '../../redux/wz-redux-provider';
 import './wz-menu.scss';
+import { compose } from 'redux';
+import { withErrorBoundary, withReduxProvider } from '../common/hocs';
 
-export class WzMenuWrapper extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
-
-  render() {
-    return (
-      <WzReduxProvider>
-        <WzMenu {...this.props} />
-      </WzReduxProvider>
-    );
-  }
-}
+export const WzMenuWrapper = compose (withErrorBoundary, withReduxProvider)(WzMenu);

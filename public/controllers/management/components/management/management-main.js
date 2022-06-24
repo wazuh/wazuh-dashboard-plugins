@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for all management section.
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -77,7 +77,12 @@ class WzManagementMain extends Component {
           (section === 'statistics' && <WzStatistics />) ||
           (section === 'logs' && <WzLogs />) ||
           (section === 'configuration' && <WzConfiguration {...this.props.configurationProps} />) ||
-          (ruleset.includes(section) && <WzRuleset logtestProps={this.props.logtestProps} clusterStatus={this.props.clusterStatus} />)}
+          (ruleset.includes(section) && (
+            <WzRuleset
+              logtestProps={this.props.logtestProps}
+              clusterStatus={this.props.clusterStatus}
+            />
+          ))}
       </Fragment>
     );
   }

@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Wazuh Constants file for Cypress
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,4 +30,6 @@ export enum WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID {
   CIS_CAT = 'menuModulesCiscatLink',
   VIRUSTOTAL = 'menuModulesVirustotalLink',
   GDPR = 'menuModulesGdprLink',
+  GITHUB = 'menuModulesGitHubLink',
+  OFFICE_365 = 'menuModulesOfficeLink'
 }

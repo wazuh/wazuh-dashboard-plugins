@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Definitions of configuration sections.
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -207,6 +207,19 @@ export default [
         name: 'Google Cloud Pub/Sub',
         description: 'Configuration options of the Google Cloud Pub/Sub module',
         goto: 'gcp-pubsub'
+      },
+      {
+        name: 'GitHub',
+        description:
+          'Detect threats targeting GitHub organizations',
+        goto: 'github'
+      },
+      {
+        name: 'Office 365',
+        description:
+          'Configuration options of the Office 365 module',
+        goto: 'office365',
+        when: 'manager'
       }
     ]
   }

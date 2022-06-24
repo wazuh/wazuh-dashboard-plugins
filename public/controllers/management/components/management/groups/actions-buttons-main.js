@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for registering agents.
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,20 +19,24 @@ import {
   EuiFieldText,
   EuiSpacer,
   EuiFlexGroup,
-  EuiButton
+  EuiButton,
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
-import { WzButtonPermissions } from '../../../../../components/common/permissions/button'
+import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 
 import {
   updateLoadingStatus,
-  updateIsProcessing
+  updateIsProcessing,
 } from '../../../../../redux/actions/groupsActions';
 
 import exportCsv from '../../../../../react-services/wz-csv';
 import GroupsHandler from './utils/groups-handler';
-import { getToasts }  from '../../../../../kibana-services';
+import { getToasts } from '../../../../../kibana-services';
+import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../../../../react-services/common-services';
+
 
 class WzGroupsActionButtons extends Component {
   _isMounted = false;
@@ -43,7 +47,7 @@ class WzGroupsActionButtons extends Component {
     this.state = {
       generatingCsv: false,
       isPopoverOpen: false,
-      newGroupName: ''
+      newGroupName: '',
     };
     this.exportCsv = exportCsv;
 
@@ -72,7 +76,18 @@ class WzGroupsActionButtons extends Component {
       this.props.updateIsProcessing(true);
       this.onRefreshLoading();
     } catch (error) {
-      return Promise.reject(error);
+      const options = {
+        context: `${WzGroupsActionButtons.name}.refresh`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        store: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.message || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   }
 
@@ -100,19 +115,19 @@ class WzGroupsActionButtons extends Component {
     this.setState({
       isPopoverOpen: false,
       msg: false,
-      newGroupName: ''
+      newGroupName: '',
     });
   }
 
   clearGroupName() {
     this.setState({
-      newGroupName: ''
+      newGroupName: '',
     });
   }
 
-  onChangeNewGroupName = e => {
+  onChangeNewGroupName = (e) => {
     this.setState({
-      newGroupName: e.target.value.split(" ").join("")
+      newGroupName: e.target.value.split(' ').join(''),
     });
   };
 
@@ -126,7 +141,7 @@ class WzGroupsActionButtons extends Component {
         if (input.length) {
           const i = input[0];
           if (!i.onkeypress) {
-            i.onkeypress = async e => {
+            i.onkeypress = async (e) => {
               if (e.which === 13) {
                 await this.createGroup();
               }
@@ -135,7 +150,20 @@ class WzGroupsActionButtons extends Component {
           clearInterval(interval);
         }
       }, 150);
-    } catch (error) {}
+    } catch (error) {
+      const options = {
+        context: `${WzGroupsActionButtons.name}.bindEnterToInput`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        store: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.message || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+    }
   }
 
   async createGroup() {
@@ -143,12 +171,7 @@ class WzGroupsActionButtons extends Component {
       if (this.isOkNameGroup(this.state.newGroupName)) {
         this.props.updateLoadingStatus(true);
         await this.groupsHandler.saveGroup(this.state.newGroupName);
-        this.showToast(
-          'success',
-          'Success',
-          'The group has been created successfully',
-          2000
-        );
+        this.showToast('success', 'Success', 'The group has been created successfully', 2000);
         this.clearGroupName();
 
         this.props.updateIsProcessing(true);
@@ -156,13 +179,21 @@ class WzGroupsActionButtons extends Component {
         this.closePopover();
       }
     } catch (error) {
+      const options = {
+        context: `${WzGroupsActionButtons.name}.createGroup`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        store: false,
+        display: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `Error creating a new group`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
       this.props.updateLoadingStatus(false);
-      this.showToast(
-        'danger',
-        'Error',
-        `An error occurred when creating the group: ${error}`,
-        2000
-      );
+      throw new Error(error);
     }
   }
 
@@ -181,12 +212,18 @@ class WzGroupsActionButtons extends Component {
         2000
       );
     } catch (error) {
-      this.showToast(
-        'danger',
-        'Error',
-        `Error when exporting the CSV file: ${error}`,
-        2000
-      );
+      const options = {
+        context: `${WzGroupsActionButtons.name}.generateCsv`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        store: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `Error when exporting the CSV file: ${error.message || error}`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
     this.setState({ generatingCsv: false });
   }
@@ -196,22 +233,22 @@ class WzGroupsActionButtons extends Component {
       color: color,
       title: title,
       text: text,
-      toastLifeTimeMs: time
+      toastLifeTimeMs: time,
     });
   };
 
   isOkNameGroup = (name) => {
-    return (name !== '' && name.trim().length > 0); 
-  }
+    return name !== '' && name.trim().length > 0;
+  };
 
   render() {
     // Add new group button
     const newGroupButton = (
       <WzButtonPermissions
-        buttonType='empty'
+        buttonType="empty"
         iconSide="left"
         iconType="plusInCircle"
-        permissions={[{action: 'group:create', resource: '*:*:*'}]}
+        permissions={[{ action: 'group:create', resource: '*:*:*' }]}
         onClick={() => this.togglePopover()}
       >
         Add new group
@@ -231,10 +268,7 @@ class WzGroupsActionButtons extends Component {
 
     // Refresh
     const refreshButton = (
-      <EuiButtonEmpty
-        iconType="refresh"
-        onClick={async () => await this.refresh()}
-      >
+      <EuiButtonEmpty iconType="refresh" onClick={async () => await this.refresh()}>
         Refresh
       </EuiButtonEmpty>
     );
@@ -248,31 +282,31 @@ class WzGroupsActionButtons extends Component {
             isOpen={this.state.isPopoverOpen}
             closePopover={() => this.closePopover()}
           >
-          <EuiFlexGroup direction={'column'}>
-            <EuiFlexItem>
-              <EuiFormRow label="Introduce the group name" id="">
-                <EuiFieldText
-                  className="groupNameInput"
-                  value={this.state.newGroupName}
-                  onChange={this.onChangeNewGroupName}
-                  aria-label=""
-                />
-              </EuiFormRow>
-            </EuiFlexItem>
-            <EuiFlexItem>
-              <WzButtonPermissions
-                permissions={[{action: 'group:create', resource: '*:*:*'}]}
-                iconType="save"
-                isDisabled={!this.isOkNameGroup(this.state.newGroupName)}
-                fill
-                onClick={async () => {
-                  await this.createGroup();
-                }}
-              >
-                Save new group
-              </WzButtonPermissions>
-            </EuiFlexItem>
-          </EuiFlexGroup>
+            <EuiFlexGroup direction={'column'}>
+              <EuiFlexItem>
+                <EuiFormRow label="Introduce the group name" id="">
+                  <EuiFieldText
+                    className="groupNameInput"
+                    value={this.state.newGroupName}
+                    onChange={this.onChangeNewGroupName}
+                    aria-label=""
+                  />
+                </EuiFormRow>
+              </EuiFlexItem>
+              <EuiFlexItem>
+                <WzButtonPermissions
+                  permissions={[{ action: 'group:create', resource: '*:*:*' }]}
+                  iconType="save"
+                  isDisabled={!this.isOkNameGroup(this.state.newGroupName)}
+                  fill
+                  onClick={async () => {
+                    await this.createGroup();
+                  }}
+                >
+                  Save new group
+                </WzButtonPermissions>
+              </EuiFlexItem>
+            </EuiFlexGroup>
           </EuiPopover>
         </EuiFlexItem>
         <EuiFlexItem grow={false}>{exportButton}</EuiFlexItem>
@@ -282,21 +316,17 @@ class WzGroupsActionButtons extends Component {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
-    state: state.groupsReducers
+    state: state.groupsReducers,
   };
 };
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch) => {
   return {
-    updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
-    updateIsProcessing: isProcessing =>
-      dispatch(updateIsProcessing(isProcessing))
+    updateLoadingStatus: (status) => dispatch(updateLoadingStatus(status)),
+    updateIsProcessing: (isProcessing) => dispatch(updateIsProcessing(isProcessing)),
   };
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WzGroupsActionButtons);
+export default connect(mapStateToProps, mapDispatchToProps)(WzGroupsActionButtons);

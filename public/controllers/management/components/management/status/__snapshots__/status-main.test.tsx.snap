@@ -1,0 +1,65 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Status component renders correctly to match the snapshot 1`] = `
+<WzStatus>
+  <WzReduxProvider>
+    <Provider
+      store={
+        Object {
+          "dispatch": [Function],
+          "getState": [Function],
+          "replaceReducer": [Function],
+          "subscribe": [Function],
+          Symbol(observable): [Function],
+        }
+      }
+    >
+      <Component>
+        <Component>
+          <div
+            className="withUserLogged"
+          >
+            <img
+              alt=""
+              className="withUserLogged-logo"
+              src="/plugins/wazuh/assets/images/themes/light/logo.svg"
+            />
+            <EuiSpacer
+              size="s"
+            >
+              <div
+                className="euiSpacer euiSpacer--s"
+              />
+            </EuiSpacer>
+            <EuiText
+              className="subdued-color"
+            >
+              <div
+                className="euiText euiText--medium subdued-color"
+              >
+                Loading ...
+              </div>
+            </EuiText>
+            <EuiSpacer
+              size="s"
+            >
+              <div
+                className="euiSpacer euiSpacer--s"
+              />
+            </EuiSpacer>
+            <EuiProgress
+              className="withUserLogged-loader"
+              color="primary"
+              size="xs"
+            >
+              <div
+                className="euiProgress euiProgress--indeterminate euiProgress--xs euiProgress--primary withUserLogged-loader"
+              />
+            </EuiProgress>
+          </div>
+        </Component>
+      </Component>
+    </Provider>
+  </WzReduxProvider>
+</WzStatus>
+`;

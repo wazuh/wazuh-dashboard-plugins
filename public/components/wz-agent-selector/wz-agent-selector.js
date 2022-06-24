@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for build q queries.
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -13,6 +13,7 @@ import React, { Component } from 'react';
 import {
   EuiButtonEmpty,
   EuiOverlayMask,
+  EuiOutsideClickDetector,
   EuiModal,
   EuiModalHeader,
   EuiModalBody,
@@ -118,24 +119,26 @@ class WzAgentSelector extends Component {
 
     if (this.props.state.showExploreAgentModalGlobal) {
       modal = (
-        <EuiOverlayMask onClick={() => this.closeAgentModal()}>
-          <EuiModal
-            className="wz-select-agent-modal"
-            onClose={() => this.closeAgentModal()}
-            initialFocus="[name=popswitch]"
-          >
-            <EuiModalHeader>
-              <EuiModalHeaderTitle>Explore agent</EuiModalHeaderTitle>
-            </EuiModalHeader>
+        <EuiOverlayMask>
+          <EuiOutsideClickDetector onOutsideClick={() => this.closeAgentModal()}>
+            <EuiModal
+              className="wz-select-agent-modal"
+              onClose={() => this.closeAgentModal()}
+              initialFocus="[name=popswitch]"
+            >
+              <EuiModalHeader>
+                <EuiModalHeaderTitle>Explore agent</EuiModalHeaderTitle>
+              </EuiModalHeader>
 
-            <EuiModalBody>
-              <AgentSelectionTable
-                updateAgentSearch={agentsIdList => this.agentTableSearch(agentsIdList)}
-                removeAgentsFilter={(shouldUpdate) => this.removeAgentsFilter(shouldUpdate)}
-                selectedAgents={this.getSelectedAgents()}
-              ></AgentSelectionTable>
-            </EuiModalBody>
-          </EuiModal>
+              <EuiModalBody>
+                <AgentSelectionTable
+                  updateAgentSearch={agentsIdList => this.agentTableSearch(agentsIdList)}
+                  removeAgentsFilter={(shouldUpdate) => this.removeAgentsFilter(shouldUpdate)}
+                  selectedAgents={this.getSelectedAgents()}
+                ></AgentSelectionTable>
+              </EuiModalBody>
+            </EuiModal>
+          </EuiOutsideClickDetector>
         </EuiOverlayMask>
       );
     }

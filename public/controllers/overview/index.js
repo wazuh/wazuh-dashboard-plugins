@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Load all the Overview controllers and related React components.
- * Copyright (C) 2015-2021 Wazuh, Inc.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +20,14 @@ import { RequirementCard } from './components/requirement-card';
 import { getAngularModule } from '../../kibana-services';
 
 const app = getAngularModule();
+
+OverviewWelcome.displayName = 'OverviewWelcome';
+WzCurrentOverviewSectionWrapper.displayName = 'WzCurrentOverviewSectionWrapper';
+WzCurrentAgentsSectionWrapper.displayName = 'WzCurrentAgentsSectionWrapper';
+Stats.displayName = 'StatsOverview';
+Mitre.displayName = 'Mitre';
+SelectAgent.displayName = 'SelectAgent';
+RequirementCard.displayName = 'RequirementCard';
 
 app
   .controller('overviewController', OverviewController)
