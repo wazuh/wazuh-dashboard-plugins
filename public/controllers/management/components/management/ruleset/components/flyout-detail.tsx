@@ -29,7 +29,7 @@ export const FlyoutDetail = ({ isLoading, item, title, closeFlyout, filters, ...
       className="wz-inventory wzApp wz-ruleset-flyout"
     >
       {item && !isLoading && <>
-          <WzRuleInfo item={item} {...rest} filters={filters} />
+          <WzRuleInfo item={item} closeFlyout={closeFlyout} {...rest} filters={filters} />
       </>}
     </EuiFlyout>
   );

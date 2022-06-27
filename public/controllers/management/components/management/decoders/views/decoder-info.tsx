@@ -101,17 +101,13 @@ export default class WzDecoderInfo extends Component {
     });
   }
 
-  async componentDidUpdate(prevProps, prevState) {
-    //  (!_.isEqual(prevState.currentId, this.state.currentId))
-  }
-
   /**
    * Clean the existing filters and sets the new ones and back to the previous section
    */
   setNewFiltersAndBack(filters) {
     this.props.cleanFilters();
-    this.props.updateFilters(filters);
-    this.props.cleanInfo();
+    this.props.onFiltersChange(filters);
+    this.props.closeFlyout();
   }
 
   /**

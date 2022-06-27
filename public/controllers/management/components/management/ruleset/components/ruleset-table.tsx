@@ -186,7 +186,6 @@ function RulesetTable(props) {
           filters={filters}
           onFiltersChange={updateFilters}
           cleanFilters={cleanFilters}
-          cleanInfo={() => setIsFlyoutVisible(false)}
           {...props}
         />
       )}
