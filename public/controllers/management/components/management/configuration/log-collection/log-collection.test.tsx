@@ -295,7 +295,7 @@ describe('Log Collection Section', () => {
       });
     });
 
-    it('should shows the correct panel sidebar items when "Windows Events" tab is selected depends on received config', () => {
+    it('should shows the correct "Windows Events" data for each command selected', () => {
       const { getByText, getByRole, getByTestId } = render(
         <Provider store={store}>
           <WzConfigurationLogCollection
