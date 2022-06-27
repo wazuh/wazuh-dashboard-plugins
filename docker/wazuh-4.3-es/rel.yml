@@ -12,7 +12,7 @@ services:
     <<: *logging
     hostname: "exporter-kbn-${STACK_VERSION}"
     networks:
-      - es-pro
+      - es-rel
       - mon
     command:
       - '--es.uri=https://kibana_system:SecretPassowrd@es01:9200'
@@ -26,7 +26,7 @@ services:
     image: wazuh/wazuh-manager:${WAZUH_STACK}
     hostname: wazuh.manager
     networks:
-      - es-pro
+      - es-rel
     <<: *logging
     restart: always
     environment:
@@ -57,7 +57,7 @@ services:
   setup:
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
     networks:
-      - es-pro
+      - es-rel
     volumes:
       - certs:/usr/share/elasticsearch/config/certs
       - ./config/wazuh_indexer_ssl_certs/:/tmp/certs
@@ -132,7 +132,7 @@ services:
         condition: service_healthy
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
     networks:
-      - es-pro
+      - es-rel
     volumes:
       - certs:/usr/share/elasticsearch/config/certs
       - esdata01:/usr/share/elasticsearch/data
@@ -179,7 +179,7 @@ services:
   #     - es01
   #   image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
   #   networks:
-  #     - es-pro
+  #     - es-rel
   #   volumes:
   #     - certs:/usr/share/elasticsearch/config/certs
   #     - esdata02:/usr/share/elasticsearch/data
@@ -223,7 +223,7 @@ services:
   #     - es02
   #   image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
   #   networks:
-  #     - es-pro
+  #     - es-rel
   #   volumes:
   #     - certs:/usr/share/elasticsearch/config/certs
   #     - esdata03:/usr/share/elasticsearch/data
@@ -263,7 +263,7 @@ services:
   kibana:
     hostname: kibana
     networks:
-      - es-pro
+      - es-rel
     <<: *logging
     depends_on:
       es01:
@@ -296,8 +296,8 @@ services:
       retries: 120
 
 networks:
-  es-pro: 
-    name: "es-pro-${STACK_VERSION}"
+  es-rel:
+    name: "es-rel-${STACK_VERSION}"
     driver: bridge
   mon:
     external: true

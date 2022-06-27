@@ -22,7 +22,7 @@ wazuh_versions=(
 
 usage() {
 	echo
-	echo "./pro.sh elastic_version wazuh_manager_version action "
+	echo "$0 elastic_version wazuh_manager_version action "
 	echo
 	echo "where"
 	echo "  elastic_version is one of " ${elastic_versions[*]}
