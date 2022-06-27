@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { TableWzAPI } from '../../../../../../components/common/tables';
 import { resourceDictionary } from '../../common/resources-handler';
 import DecodersColumns from './columns';
@@ -96,31 +96,41 @@ export default compose(
   const { updateRestartClusterManager, updateListContent } = props;
   const columns = getColumns();
 
-  const actionButtons = [
-    <ManageFiles
-      section={SECTION_DECODERS_SECTION}
-      showingFiles={showingFiles}
-      // updateLoadingStatus={props.updateLoadingStatus}
-      toggleShowFiles={toggleShowFiles}
-      updateIsProcessing={props.updateIsProcessing}
-      updatePageIndex={props.updatePageIndex}
-    />,
-    <AddNewFileButton
-      section={SECTION_DECODERS_SECTION}
-      updateAddingFile={props.updateAddingFile}
-    />,
-    <AddNewCdbListButton
-      section={SECTION_DECODERS_SECTION}
-      updateListContent={updateListContent}
-    />,
-    <UploadFilesButton
-      section={SECTION_DECODERS_SECTION}
-      showingFiles={showingFiles}
-      clusterStatus={props.clusterStatus}
-      onSuccess={() => { updateRestartClusterManager && updateRestartClusterManager() }}
-    />,
-  ];
+  /**
+   * Build table custom action buttons dynamically based on showing files state
+   */
+  const buildActionButtons = useCallback(() => {
+    const buttons = [
+      <ManageFiles
+        section={SECTION_DECODERS_SECTION}
+        showingFiles={showingFiles}
+        toggleShowFiles={toggleShowFiles}
+        updatePageIndex={props.updatePageIndex}
+      />,
+      <AddNewFileButton
+        section={SECTION_DECODERS_SECTION}
+        updateAddingFile={props.updateAddingFile}
+      />,
+      <AddNewCdbListButton
+        section={SECTION_DECODERS_SECTION}
+        updateListContent={updateListContent}
+      />,
+    ];
+    if (showingFiles)
+      buttons.push(<UploadFilesButton
+        section={SECTION_DECODERS_SECTION}
+        showingFiles={showingFiles}
+        clusterStatus={props.clusterStatus}
+        onSuccess={() => { updateRestartClusterManager && updateRestartClusterManager() }}
+      />);
+    return buttons;
+  }, [showingFiles]);
 
+  const actionButtons = buildActionButtons();
+
+  /**
+   * Render tables
+   */
   const RenderFilesTable = () => {
     return (
       <TableWzAPI

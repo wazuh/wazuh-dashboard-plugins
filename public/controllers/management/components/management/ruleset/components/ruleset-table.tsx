@@ -10,9 +10,9 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { TableWzAPI } from '../../../../../../components/common/tables';
-import {  resourceDictionary } from '../../common/resources-handler';
+import { resourceDictionary } from '../../common/resources-handler';
 import { SECTION_RULES_SECTION, SECTION_RULES_KEY } from '../../common/constants';
 import RulesetColumns from './columns';
 import { FlyoutDetail } from './flyout-detail';
@@ -70,9 +70,11 @@ function RulesetTable(props) {
   }
 
   const getColumns = () => {
-    const rulesetColumns = new RulesetColumns({ state: {
-      section: SECTION_RULES_KEY
-    }, ...props}).columns;
+    const rulesetColumns = new RulesetColumns({
+      state: {
+        section: SECTION_RULES_KEY
+      }, ...props
+    }).columns;
     const columns = rulesetColumns[showingFiles ? 'files' : SECTION_RULES_KEY];
     return columns;
   }
@@ -108,30 +110,41 @@ function RulesetTable(props) {
   const { updateRestartClusterManager, updateListContent } = props;
   const columns = getColumns();
 
-  const actionButtons = [
-    <ManageFiles
-      section={SECTION_RULES_SECTION}
-      showingFiles={showingFiles}
-      toggleShowFiles={toggleShowFiles}
-      updateIsProcessing={props.updateIsProcessing}
-      updatePageIndex={props.updatePageIndex}
-    />,
-    <AddNewFileButton
-      section={SECTION_RULES_SECTION}
-      updateAddingFile={props.updateAddingFile}
-    />,
-    <AddNewCdbListButton
-      section={SECTION_RULES_SECTION}
-      updateListContent={updateListContent}
-    />,
-    <UploadFilesButton
-      section={SECTION_RULES_SECTION}
-      showingFiles={showingFiles}
-      clusterStatus={props.clusterStatus}
-      onSuccess={() => { updateRestartClusterManager && updateRestartClusterManager() }}
-    />,
-  ];
+  /**
+   * Build table custom action buttons dynamically based on showing files state
+   */
+  const buildActionButtons = useCallback(() => {
+    const buttons = [
+      <ManageFiles
+        section={SECTION_RULES_SECTION}
+        showingFiles={showingFiles}
+        toggleShowFiles={toggleShowFiles}
+        updatePageIndex={props.updatePageIndex}
+      />,
+      <AddNewFileButton
+        section={SECTION_RULES_SECTION}
+        updateAddingFile={props.updateAddingFile}
+      />,
+      <AddNewCdbListButton
+        section={SECTION_RULES_SECTION}
+        updateListContent={updateListContent}
+      />,
+    ];
+    if (showingFiles)
+      buttons.push(<UploadFilesButton
+        section={SECTION_RULES_SECTION}
+        showingFiles={showingFiles}
+        clusterStatus={props.clusterStatus}
+        onSuccess={() => { updateRestartClusterManager && updateRestartClusterManager() }}
+      />);
+    return buttons;
+  }, [showingFiles]);
 
+  const actionButtons = buildActionButtons();
+
+  /**
+   * Render tables
+   */
   const RenderFilesTable = () => {
     return (
       <TableWzAPI
@@ -194,8 +207,7 @@ function RulesetTable(props) {
 
   return (
     <div className="wz-inventory">
-      {showingFiles ? <RenderFilesTable /> : <RenderRulesTable />
-      }
+      {showingFiles ? <RenderFilesTable /> : <RenderRulesTable />}
     </div>
   );
 

@@ -30,9 +30,6 @@ import { apiSuggestsItems } from './cdblists-suggestions';
 
 function CDBListsTable(props) {
   const [filters, setFilters] = useState([]);
-  const [infoContent, setInfoContent] = useState(null);
-  const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
-  const [currentItem, setCurrentItem] = useState(null);
   const [showingFiles, setShowingFiles] = useState(false);
 
   const updateFilters = (filters) => {

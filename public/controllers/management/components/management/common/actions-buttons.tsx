@@ -187,19 +187,14 @@ const uploadFile = async (files, resource) => {
 export const UploadFilesButton = (({ clusterStatus, section, showingFiles, onSuccess, ...props }) => {
   
   return (
-    <>
-      {(section === 'lists' || showingFiles) && (
         <UploadFiles
           clusterStatus={clusterStatus}
           resource={section}
           path={`etc/${section}`}
           upload={uploadFile}
           onSuccess={() => {
-            props.updateIsProcessing(true);
             onSuccess && onSuccess(true)
           }}
         />
-      )}
-    </>
   )
 });
