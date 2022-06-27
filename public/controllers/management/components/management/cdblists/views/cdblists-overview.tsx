@@ -57,16 +57,8 @@ function WzCDBListsOverview(props) {
 
 }
 
-// const mapStateToProps = state => {
-//   return {
-//     state: state.rulesetReducers
-//   };
-// };
 
 export default compose(
-  // connect(
-  //   mapStateToProps
-  // ),
   withGlobalBreadcrumb(props => {
     return [
       { text: '' },
