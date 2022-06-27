@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { TableWzAPI } from '../../../../../../components/common/tables';
 import { resourceDictionary } from '../../common/resources-handler';
 import DecodersColumns from './columns';
@@ -31,7 +31,6 @@ import { apiSuggestsItems } from './decoders-suggestions';
 export default compose(
   withUserPermissions
 )(function DecodersTable(props) {
-  const [isLoading, setIsLoading] = useState(false);
   const [filters, setFilters] = useState([]);
   const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
@@ -54,6 +53,7 @@ export default compose(
 
   const closeFlyout = () => {
     setIsFlyoutVisible(false);
+    setCurrentItem(null);
   }
 
   const getColumns = () => {
@@ -93,7 +93,6 @@ export default compose(
     };
   };
 
-  // const { section } = props.state;
   const { updateRestartClusterManager, updateListContent } = props;
   const columns = getColumns();
 
@@ -166,7 +165,6 @@ export default compose(
       />
       {isFlyoutVisible && (
         <FlyoutDetail
-          isLoading={isLoading}
           item={currentItem}
           closeFlyout={closeFlyout}
           showViewInEvents={true}
@@ -174,7 +172,6 @@ export default compose(
           filters={filters}
           onFiltersChange={updateFilters}
           cleanFilters={cleanFilters}
-          cleanInfo={() => setIsFlyoutVisible(false)}
           {...props}
         />
       )}
@@ -183,8 +180,7 @@ export default compose(
 
   return (
     <div className="wz-inventory">
-      {showingFiles ? <RenderFilesTable /> : <RenderDecodersTable />
-      }
+      {showingFiles ? <RenderFilesTable /> : <RenderDecodersTable />}
     </div>
   );
 

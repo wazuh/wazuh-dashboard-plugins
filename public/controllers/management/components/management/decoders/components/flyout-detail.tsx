@@ -17,7 +17,7 @@ import {
 import WzDecoderInfo from '../views/decoder-info';
 import './flyout-detail.scss'
 
-export const FlyoutDetail = ({ isLoading, item, title, closeFlyout, filters, ...rest }) => {
+export const FlyoutDetail = ({ item, title, closeFlyout, filters, ...rest }) => {
 
   
   return (
@@ -28,8 +28,8 @@ export const FlyoutDetail = ({ isLoading, item, title, closeFlyout, filters, ...
       maxWidth="70%"
       className="wz-inventory wzApp wz-ruleset-flyout"
     >
-      {item && !isLoading && <>
-          <WzDecoderInfo item={item} {...rest} filters={filters} />
+      {item && <>
+          <WzDecoderInfo item={item} closeFlyout={closeFlyout} {...rest} filters={filters} />
       </>}
     </EuiFlyout>
   );

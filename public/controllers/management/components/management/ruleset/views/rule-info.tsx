@@ -271,7 +271,7 @@ export default class WzRuleInfo extends Component {
     window.location.href = window.location.href.replace(new RegExp('redirectRule=' + '[^&]*'), '');
     this.props.cleanFilters();
     this.props.onFiltersChange(filters);
-    this.props.cleanInfo();
+    this.props.closeFlyout();
   }
 
   /**
