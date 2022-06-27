@@ -42,7 +42,7 @@ export function ExportTableCsv({ endpoint, totalItems, filters, title }) {
         [
           ...formatedFilters
         ],
-        `vuls-${(title).toLowerCase()}`
+        `${(title).toLowerCase()}`
       );
     } catch (error) {
       const options = {
