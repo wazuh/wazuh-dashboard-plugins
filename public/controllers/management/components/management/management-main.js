@@ -15,8 +15,8 @@ import store from '../../../../redux/store';
 
 import { updateRulesetSection } from '../../../../redux/actions/rulesetActions';
 import WzRuleset from './ruleset/main-ruleset';
+import WzCDBLists from './cdblists/main-cdblists';
 import WzDecoders from './decoders/main-decoders';
-// import WzCDBLists from './cdblists/main-cdblists';
 import WzGroups from './groups/groups-main';
 import WzStatus from './status/status-main';
 import WzLogs from './mg-logs/logs';
@@ -82,7 +82,7 @@ class WzManagementMain extends Component {
             logtestProps={this.props.logtestProps}
             clusterStatus={this.props.clusterStatus}
           />) ||
-          (section === 'lists' && <WzRuleset
+          (section === 'lists' && <WzCDBLists
             logtestProps={this.props.logtestProps}
             clusterStatus={this.props.clusterStatus}
           />) ||

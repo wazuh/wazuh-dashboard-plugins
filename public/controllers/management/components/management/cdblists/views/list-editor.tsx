@@ -29,8 +29,6 @@ import {
 
 import { connect } from 'react-redux';
 
-import { cleanInfo, updateListContent } from '../../../../../../redux/actions/rulesetActions';
-
 import { resourceDictionary, ResourcesHandler, ResourcesConstants } from '../../common/resources-handler';
 
 import { getToasts } from '../../../../../../kibana-services';
@@ -44,6 +42,7 @@ import { WzButtonPermissions } from '../../../../../../components/common/permiss
 import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
+
 class WzListEditor extends Component {
   constructor(props) {
     super(props);
@@ -64,8 +63,8 @@ class WzListEditor extends Component {
   }
 
   componentDidMount() {
-    const { listInfo } = this.props.state;
-    const { content } = listInfo;
+    const { listContent } = this.props;
+    const { content } = listContent;
     const obj = this.contentToObject(content);
     this.items = { ...obj };
     const items = this.contentToArray(obj);
@@ -292,7 +291,7 @@ class WzListEditor extends Component {
                   color="primary"
                   iconSize="l"
                   iconType="arrowLeft"
-                  onClick={() => this.props.cleanInfo()}
+                  onClick={() => this.props.clearContent()}
                 />
               </EuiToolTip>
               {name}
@@ -420,7 +419,7 @@ class WzListEditor extends Component {
                   color="primary"
                   iconSize="l"
                   iconType="arrowLeft"
-                  onClick={() => this.props.cleanInfo()}
+                  onClick={() => this.props.clearContent()}
                 />
               </EuiToolTip>
               {name}
@@ -525,13 +524,11 @@ class WzListEditor extends Component {
     ];
   }
 
-  //isDisabled={nameForSaving.length <= 4}
   render() {
-    const { listInfo, isLoading, error } = this.props.state;
-    const { name, path } = listInfo;
+    const { listContent, isLoading } = this.props;
+    const { name, path } = listContent;
 
     const message = isLoading ? false : 'No results...';
-    const columns = this.columns;
 
     const addingNew = name === false || !name;
     const listName = this.state.newListName || name;
@@ -643,8 +640,6 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    cleanInfo: () => dispatch(cleanInfo()),
-    updateListContent: (content) => dispatch(updateListContent(content)),
     updateWazuhNotReadyYet: (wazuhNotReadyYet) =>
       dispatch(updateWazuhNotReadyYet(wazuhNotReadyYet)),
   };
