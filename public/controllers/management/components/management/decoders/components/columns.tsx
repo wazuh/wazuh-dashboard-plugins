@@ -1,7 +1,6 @@
 import React from 'react';
-import { EuiToolTip, EuiButtonIcon, EuiLink, EuiBadge } from '@elastic/eui';
+import { EuiToolTip, EuiBadge } from '@elastic/eui';
 import { resourceDictionary, ResourcesHandler, ResourcesConstants } from '../../common/resources-handler';
-import exportCsv from '../../../../../../react-services/wz-csv';
 import { WzButtonPermissions } from '../../../../../../components/common/permissions/button';
 
 export default class DecodersColumns {

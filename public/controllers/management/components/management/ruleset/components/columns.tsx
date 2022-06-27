@@ -1,7 +1,6 @@
 import React from 'react';
-import { EuiToolTip, EuiButtonIcon, EuiLink, EuiBadge } from '@elastic/eui';
+import { EuiToolTip, EuiBadge } from '@elastic/eui';
 import { resourceDictionary, ResourcesHandler, ResourcesConstants } from '../../common/resources-handler';
-import exportCsv from '../../../../../../react-services/wz-csv';
 import { WzButtonPermissions } from '../../../../../../components/common/permissions/button';
 import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
 import { UIErrorLog, UILogLevel, UIErrorSeverity, UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
@@ -113,6 +112,7 @@ export default class RulesetColumns {
             width: '10%'
           }
         ],
+<<<<<<< HEAD
         decoders: [
           {
             field: 'name',
@@ -209,6 +209,8 @@ export default class RulesetColumns {
             )
           }
         ],
+=======
+>>>>>>> Fix CDB List row click handler
         files: [
           {
             field: 'filename',
@@ -334,6 +336,7 @@ export default class RulesetColumns {
           },
         ];
       };
+<<<<<<< HEAD
 
       this.columns.lists[2] =
       {
@@ -413,6 +416,8 @@ export default class RulesetColumns {
         }
         }
       }
+=======
+>>>>>>> Fix CDB List row click handler
     };
 
 

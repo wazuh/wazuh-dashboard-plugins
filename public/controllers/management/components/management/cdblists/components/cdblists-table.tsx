@@ -12,7 +12,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { TableWzAPI } from '../../../../../../components/common/tables';
-import {  resourceDictionary } from '../../common/resources-handler';
+import { ResourcesHandler, resourceDictionary } from '../../common/resources-handler';
 import { SECTION_CDBLIST_SECTION, SECTION_CDBLIST_KEY } from '../../common/constants';
 import CDBListsColumns from './columns';
 
@@ -31,7 +31,7 @@ import { apiSuggestsItems } from './cdblists-suggestions';
 function CDBListsTable(props) {
   const [filters, setFilters] = useState([]);
   const [showingFiles, setShowingFiles] = useState(false);
-
+  const resourcesHandler = new ResourcesHandler(SECTION_CDBLIST_SECTION);
   const updateFilters = (filters) => {
     setFilters(filters);
   }
@@ -70,8 +70,14 @@ function CDBListsTable(props) {
         getRequiredPermissions(item),
         props.userPermissions
       )
-        ? (item) => {
-          setCurrentItem(item)
+        ? async () => {
+          const result = await resourcesHandler.getFileContent(item.filename);
+          const file = {
+            name: item.filename,
+            content: result,
+            path: item.relative_dirname,
+          };
+          updateListContent(file);
         }
         : undefined,
     };
