@@ -14,20 +14,16 @@ import React, { Component } from 'react';
 import store from '../../../../../redux/store';
 import WzReduxProvider from '../../../../../redux/wz-redux-provider';
 //Wazuh ruleset tables(rules, decoder, lists)
-import WzRulesetOverview from './views/ruleset-overview';
-//Information about rule or decoder
-
-import WzFileEditor from '../common/file-editor';
-import { SECTION_RULES_SECTION } from '../common/constants';
-
+import WzCDBListsOverview from './views/cdblists-overview';
+//Information about CDBList
+import WzListEditor from './views/list-editor';
 
 export default class WzRuleset extends Component {
   _isMount = false;
   constructor(props) {
     super(props);
     this.state = {
-      fileContent: false,
-      addingFile: false
+      listContent: false
     }; //Init state empty to avoid fails when try to read any parameter and this.state is not defined yet
     this.store = store;
   }
@@ -41,31 +37,22 @@ export default class WzRuleset extends Component {
   }
 
   render() {
-    const { fileContent, addingFile } = this.state;
+    const { listContent } = this.state;
 
     return (
       <WzReduxProvider>
         {
-          ((fileContent || addingFile) && (
-            <WzFileEditor
-              section={SECTION_RULES_SECTION}
-              fileContent={fileContent}
-              addingFile={addingFile}
-              logtestProps={this.props.logtestProps}
-              clusterStatus={this.props.clusterStatus}
-              updateFileContent={(fileContent) => { this.setState({ fileContent }) }}
-              cleanEditState={() => {
-                this.setState({
-                  fileContent: false,
-                  addingFile: false
-                })
-              }}
-            />
-          )) || <WzRulesetOverview
+          (listContent && <WzListEditor
+            listContent={listContent}
             clusterStatus={this.props.clusterStatus}
-            updateFileContent={(fileContent) => { this.setState({ fileContent }) }}
-            updateAddingFile={(addingFile) => { this.setState({ addingFile }) }}
-          />}
+            clearContent={() => { this.setState({ listContent: false }) }}
+            updateListContent={(listContent) => { this.setState({ listContent }) }}
+          />) ||
+          <WzCDBListsOverview
+            clusterStatus={this.props.clusterStatus}
+            updateListContent={(listContent) => { this.setState({ listContent }) }}
+          />
+        }
       </WzReduxProvider>
     );
   }

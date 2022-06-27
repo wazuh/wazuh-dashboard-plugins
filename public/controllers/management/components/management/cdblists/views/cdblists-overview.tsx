@@ -14,13 +14,13 @@ import {
 import { withUserAuthorizationPrompt, withGlobalBreadcrumb } from '../../../../../../components/common/hocs';
 import { compose } from 'redux';
 import { resourceDictionary } from '../../common/resources-handler';
-import { SECTION_DECODERS_NAME, SECTION_DECODERS_KEY } from '../../common/constants';
+import { SECTION_CDBLIST_NAME, SECTION_CDBLIST_KEY } from '../../common/constants';
+import CDBListsTable from '../components/cdblists-table';
 import '../../common/layout-overview.scss';
-import DecodersTable from '../components/decoders-table';
 import WzRestartClusterManagerCallout from '../../../../../../components/common/restart-cluster-manager-callout';
 
 
-function WzDecodersOverview(props) {
+function WzCDBListsOverview(props) {
 
   const [showWarningRestart, setShowWarningRestart] = useState(false);
 
@@ -45,7 +45,7 @@ function WzDecodersOverview(props) {
     
     <EuiFlexGroup>
       <EuiFlexItem>
-        <DecodersTable
+        <CDBListsTable
           {...props}
           clusterStatus={clusterStatus}
           updateRestartClusterManager={(showWarningRestart) => updateRestartManagers(showWarningRestart)}
@@ -71,10 +71,10 @@ export default compose(
     return [
       { text: '' },
       { text: 'Management', href: '#/manager' },
-      { text: SECTION_DECODERS_NAME}
+      { text: SECTION_CDBLIST_NAME}
     ];
   }),
   withUserAuthorizationPrompt((props) => [
-    { action: `${SECTION_DECODERS_KEY}:read`, resource: resourceDictionary[SECTION_DECODERS_KEY].permissionResource('*') }
+    { action: `${SECTION_CDBLIST_KEY}:read`, resource: resourceDictionary[SECTION_CDBLIST_KEY].permissionResource('*') }
   ])
-)(WzDecodersOverview);
+)(WzCDBListsOverview);
