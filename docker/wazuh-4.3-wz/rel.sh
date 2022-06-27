@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 versions=(
-	"4.3.0" 
+	"4.3.0"
 	"4.3.1"
 	"4.3.2"
 	"4.3.3"
@@ -9,22 +9,22 @@ versions=(
 	)
 
 usage() {
-	echo 
-	echo "./pro.sh version action "
-	echo 
+	echo
+	echo "$0 version action "
+	echo
 	echo "where version is one of " ${versions[*]}
-	echo "acction is one of up | down" 
+	echo "acction is one of up | down"
 	exit -1
 }
 
 if [ $# -ne	2 ]
   then
-  	echo "Incorrect number of arguments " $# 
+  	echo "Incorrect number of arguments " $#
     usage
 fi
 
 if [[ ! " ${versions[*]} " =~ " ${1} " ]]
- then 
+ then
  	echo "Version ${1} not found in ${versions[*]}"
  	exit -1
 fi
@@ -36,11 +36,11 @@ export COMPOSE_PROJECT_NAME=wazuh-${WAZUH_STACK}
 case "$2" in
 	up)
 		# recreate volumes
-		docker-compose -f pro.yml up -Vd
+		docker-compose -f rel.yml up -Vd
 		;;
 	down)
 		# delete volumes
-		docker-compose -f pro.yml down -v --remove-orphans
+		docker-compose -f rel.yml down -v --remove-orphans
 		;;
 	*)
 		echo "Action must be either up or down"

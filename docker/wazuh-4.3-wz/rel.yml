@@ -28,7 +28,7 @@ services:
     image: wazuh/wazuh-manager:${WAZUH_STACK}
     hostname: wazuh.manager
     networks:
-      - wzd-pro
+      - wzd-rel
     <<: *logging
     restart: always
     environment:
@@ -65,7 +65,7 @@ services:
     image: wazuh/wazuh-indexer:${WAZUH_STACK}
     hostname: wazuh.indexer
     networks:
-      - wzd-pro
+      - wzd-rel
     <<: *logging
     restart: always
     environment:
@@ -91,7 +91,7 @@ services:
     image: wazuh/wazuh-dashboard:${WAZUH_STACK}
     hostname: wazuh.dashboard
     networks:
-      - wzd-pro
+      - wzd-rel
     <<: *logging
     restart: always
     ports:
@@ -116,7 +116,7 @@ services:
     <<: *logging
     hostname: "exporter"
     networks:
-      - wzd-pro
+      - wzd-rel
       - mon
     command:
       - '--es.uri=https://admin:SecretPassowrd@wazuh-indexer:9200'
@@ -125,8 +125,8 @@ services:
 
 networks:
   networks:
-  wzd-pro:
-    name: wzd-pro-${WAZUH_STACK}
+  wzd-rel:
+    name: wzd-rel-${WAZUH_STACK}
     driver: bridge
   mon:
     external: true
