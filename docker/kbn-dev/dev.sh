@@ -27,75 +27,58 @@ elastic_versions=(
 
 
 usage() {
-	echo 
+	echo
 	echo "./dev.sh elastic_version /wazuh_app_src action "
-	echo 
+	echo
 	echo "where"
 	echo "  elastic_version is one of " ${elastic_versions[*]}
 	echo "  wazuh_app_src is the path to the wazuh application source code"
-	echo "  action is one of up | down" 
+	echo "  action is one of up | down | stop"
 	exit -1
 }
 
 
 if [ $# -ne	3 ]
   then
-  	echo "Incorrect number of arguments " $# 
-  	echo 
+  	echo "Incorrect number of arguments " $#
+  	echo
     usage
 fi
 
 if [[ ! " ${elastic_versions[*]} " =~ " ${1} " ]]
- then 
+ then
  	echo "Version ${1} not found in ${elastic_versions[*]}"
  	echo
  	exit -1
 fi
 
-if [[ $2 != /* ]]; then 
+if [[ $2 != /* ]]; then
 	echo "Source path must be absolute, and start with /"
 	echo
 	usage
 	exit
 fi
 
-
-# Password for the 'kibana_system' user (at least 6 characters)
-export KIBANA_PASSWORD=SecretPassword
-
-# Password for the 'elastic' user (at least 6 characters)
-export ELASTIC_PASSWORD=SecretPassword
-
-# Version of Elastic products
-export STACK_VERSION=$1
-
-# Set the cluster name
-export CLUSTER_NAME=cluster
-
-# Set to 'basic' or 'trial' to automatically start the 30-day trial
-export LICENSE=basic
-#LICENSE=trial
-
-# Port to expose Elasticsearch HTTP API to the host
-export ES_PORT=9200
-#ES_PORT=127.0.0.1:9200
-
-# Port to expose Kibana to the host
-export KIBANA_PORT=5601
-
-# wazuh plugin source from parameter 2
+export KIBANA_PASSWORD=${PASSWORD:-SecretPassword}
+export ELASTIC_PASSWORD=${PASSWORD:-SecretPassword}
+export ES_VERSION=$1
+export LICENSE=basic # or trial
+export KIBANA_PORT=${PORT:-5601}
 export SRC=$2
-
+export COMPOSE_PROJECT_NAME=es-dev-${ES_VERSION}
 
 case "$3" in
 	up)
-		docker-compose  -f dev.yml up -Vd
+		docker compose  -f dev.yml up -Vd
 		;;
 	down)
-		docker-compose  -f dev.yml down -v --remove-orphans
+		docker compose  -f dev.yml down -v --remove-orphans
+		;;
+	stop)
+		docker compose  -f dev.yml stop
 		;;
 	*)
-		echo "Action must be up | down: "
+		echo "Action must be up | down | stop: "
 		echo
 		usage
 		;;

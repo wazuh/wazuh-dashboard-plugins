@@ -1,4 +1,4 @@
-version: '3.9'
+version: "2.2"
 
 x-logging: &logging
   logging:
@@ -10,7 +10,7 @@ services:
   exporter:
     image: quay.io/prometheuscommunity/elasticsearch-exporter:latest
     <<: *logging
-    hostname: "exporter-kbn-${STACK_VERSION}"
+    hostname: "exporter-kbn-${ES_VERSION}"
     networks:
       - es-dev
       - mon
@@ -21,7 +21,7 @@ services:
 
   imposter:
     image: outofcoffee/imposter
-    hostname: "imposter-kbn-${STACK_VERSION}"
+    hostname: "imposter-kbn-${ES_VERSION}"
     networks:
       - es-dev
       - mon
@@ -62,7 +62,7 @@ services:
   setup:
     hostname: setup
     user: "0"
-    image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ES_VERSION}
     volumes:
       - certs:/usr/share/elasticsearch/config/certs
     networks:
@@ -122,15 +122,13 @@ services:
     depends_on:
       setup:
         condition: service_healthy
-    image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ES_VERSION}
     networks:
       - es-dev
     <<: *logging
     volumes:
       - certs:/usr/share/elasticsearch/config/certs
       - esdata01:/usr/share/elasticsearch/data
-    ports:
-      - ${ES_PORT}:9200
     environment:
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
       - node.name=es01
@@ -172,12 +170,13 @@ services:
     depends_on:
       es01:
         condition: service_healthy
-    image: quay.io/wazuh/kbn-dev:${STACK_VERSION}
+    image: quay.io/wazuh/kbn-dev:${ES_VERSION}
     networks:
       - es-dev
     volumes:
       - "${SRC}:/home/node/kbn/plugins/wazuh"
       - certs:/home/node/kbn/config/certs
+      - kibana_cache:/home/node/.cache
       - ./config/kibana/kibana.yml://home/node/kbn/config/kibana.yml
       - ./config/kibana/wazuh.yml:/home/node/kbn/data/wazuh/config/wazuh.yml
     ports:
@@ -190,13 +189,12 @@ services:
 
 networks:
   es-dev:
-    name: es-dev-${STACK_VERSION}
+    name: es-dev-${ES_VERSION}
     driver: bridge
   mon:
     external: true
 
 volumes:
   certs:
-    driver: local
   esdata01:
-    driver: local
+  kibana_cache:
