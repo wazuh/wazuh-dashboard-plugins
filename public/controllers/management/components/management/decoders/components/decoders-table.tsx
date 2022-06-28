@@ -26,7 +26,7 @@ import {
   UploadFilesButton,
 } from '../../common/actions-buttons'
 
-import { apiSuggestsItems } from './decoders-suggestions';
+import apiSuggestsItems from './decoders-suggestions';
 
 export default compose(
   withUserPermissions
@@ -48,6 +48,7 @@ export default compose(
   }
 
   const toggleShowFiles = () => {
+    setFilters([]);
     setShowingFiles(!showingFiles);
   }
 
@@ -141,7 +142,7 @@ export default compose(
         tableColumns={columns}
         tableInitialSortingField={'filename'}
         searchTable={true}
-        searchBarSuggestions={apiSuggestsItems.items[SECTION_DECODERS_KEY]}
+        searchBarSuggestions={apiSuggestsItems.files}
         endpoint={'/decoders/files'}
         isExpandable={true}
         downloadCsv={true}
@@ -163,7 +164,7 @@ export default compose(
         tableColumns={columns}
         tableInitialSortingField={'filename'}
         searchTable={true}
-        searchBarSuggestions={apiSuggestsItems.items[SECTION_DECODERS_KEY]}
+        searchBarSuggestions={apiSuggestsItems.items}
         endpoint={'/decoders'}
         isExpandable={true}
         rowProps={getRowProps}
