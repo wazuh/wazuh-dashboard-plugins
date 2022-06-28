@@ -26,12 +26,10 @@ import {
   UploadFilesButton,
 } from '../../common/actions-buttons'
 
-import { apiSuggestsItems } from './ruleset-suggestions';
+import apiSuggestsItems from './ruleset-suggestions';
 
 function RulesetTable(props) {
-  const [isLoading, setIsLoading] = useState(false);
   const [filters, setFilters] = useState([]);
-  const [infoContent, setInfoContent] = useState(null);
   const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
   const [showingFiles, setShowingFiles] = useState(false);
@@ -53,15 +51,12 @@ function RulesetTable(props) {
     setFilters(filters);
   }
 
-  const cleanInfo = () => {
-    setInfoContent(null);
-  }
-
   const cleanFilters = () => {
     setFilters([]);
   }
 
   const toggleShowFiles = () => {
+    setFilters([]);
     setShowingFiles(!showingFiles);
   }
 
@@ -155,7 +150,7 @@ function RulesetTable(props) {
         tableColumns={columns}
         tableInitialSortingField={'filename'}
         searchTable={true}
-        searchBarSuggestions={apiSuggestsItems.items[SECTION_RULES_KEY]}
+        searchBarSuggestions={apiSuggestsItems.files}
         endpoint={'/rules/files'}
         isExpandable={true}
         downloadCsv={true}
@@ -177,7 +172,7 @@ function RulesetTable(props) {
         tableColumns={columns}
         tableInitialSortingField={'id'}
         searchTable={true}
-        searchBarSuggestions={apiSuggestsItems.items[SECTION_RULES_KEY]}
+        searchBarSuggestions={apiSuggestsItems.items}
         endpoint={'/rules'}
         isExpandable={true}
         rowProps={getRowProps}
@@ -189,7 +184,6 @@ function RulesetTable(props) {
       />
       {isFlyoutVisible && (
         <FlyoutDetail
-          isLoading={isLoading}
           item={currentItem}
           closeFlyout={closeFlyout}
           type="vulnerability"

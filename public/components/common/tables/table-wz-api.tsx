@@ -116,8 +116,8 @@ export function TableWzAPI({ actionButtons, ...rest }: {
   )
 
   const header = (
-    <EuiFlexGroup>
-      <EuiFlexItem>
+    <EuiFlexGroup wrap>
+      <EuiFlexItem className="wz-flex-basis-auto" grow={false}>
         {rest.title && (
           <EuiTitle size="s">
             <h1>{rest.title} {isLoading ? <EuiLoadingSpinner size="s" /> : <span>({totalItems})</span>}</h1>
@@ -129,12 +129,21 @@ export function TableWzAPI({ actionButtons, ...rest }: {
           </EuiText>
         )}
       </EuiFlexItem>
-      {/* Render optional custom action button */}
-      {renderActionButtons}
-      {/* Render optional reload button */}
-      {rest.showReload && <ReloadButton />}
-      {/* Render optional export to CSV button */}
-      {rest.downloadCsv && <ExportTableCsv endpoint={rest.endpoint} totalItems={totalItems} filters={filters} title={rest.title} />}
+      <EuiFlexItem>
+        <EuiFlexGroup
+          wrap
+          justifyContent={'flexEnd'}
+          alignItems={'center'}
+          // gutterSize={'s'}
+        >
+          {/* Render optional custom action button */}
+          {renderActionButtons}
+          {/* Render optional reload button */}
+          {rest.showReload && <ReloadButton />}
+          {/* Render optional export to CSV button */}
+          {rest.downloadCsv && <ExportTableCsv endpoint={rest.endpoint} totalItems={totalItems} filters={filters} title={rest.title} />}
+        </EuiFlexGroup>
+      </EuiFlexItem>
     </EuiFlexGroup>
   )
 
