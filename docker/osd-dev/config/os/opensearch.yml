@@ -1,15 +1,14 @@
 network.host: "0.0.0.0"
-node.name: "wazuh.indexer"
-path.data: /var/lib/wazuh-indexer
-path.logs: /var/log/wazuh-indexer
-discovery.type: single-node
+node.name: "os1"
+path.data: /var/lib/os1
+path.logs: /var/log/os1
 compatibility.override_main_response_version: true
-plugins.security.ssl.http.pemcert_filepath: ${OPENSEARCH_PATH_CONF}/certs/wazuh.indexer.pem
-plugins.security.ssl.http.pemkey_filepath: ${OPENSEARCH_PATH_CONF}/certs/wazuh.indexer.key
-plugins.security.ssl.http.pemtrustedcas_filepath: ${OPENSEARCH_PATH_CONF}/certs/root-ca.pem
-plugins.security.ssl.transport.pemcert_filepath: ${OPENSEARCH_PATH_CONF}/certs/wazuh.indexer.pem
-plugins.security.ssl.transport.pemkey_filepath: ${OPENSEARCH_PATH_CONF}/certs/wazuh.indexer.key
-plugins.security.ssl.transport.pemtrustedcas_filepath: ${OPENSEARCH_PATH_CONF}/certs/root-ca.pem
+plugins.security.ssl.http.pemcert_filepath: ${OPENSEARCH_PATH_CONF}/certs/os1.pem
+plugins.security.ssl.http.pemkey_filepath: ${OPENSEARCH_PATH_CONF}/certs/os1.key
+plugins.security.ssl.http.pemtrustedcas_filepath: ${OPENSEARCH_PATH_CONF}/certs/ca.pem
+plugins.security.ssl.transport.pemcert_filepath: ${OPENSEARCH_PATH_CONF}/certs/os1.pem
+plugins.security.ssl.transport.pemkey_filepath: ${OPENSEARCH_PATH_CONF}/certs/os1.key
+plugins.security.ssl.transport.pemtrustedcas_filepath: ${OPENSEARCH_PATH_CONF}/certs/ca.pem
 plugins.security.ssl.http.enabled: true
 plugins.security.ssl.transport.enforce_hostname_verification: false
 plugins.security.ssl.transport.resolve_hostname: false
@@ -18,7 +17,7 @@ plugins.security.authcz.admin_dn:
 plugins.security.check_snapshot_restore_write_privileges: true
 plugins.security.enable_snapshot_restore_privilege: true
 plugins.security.nodes_dn:
-- "CN=wazuh.indexer,OU=Wazuh,O=Wazuh,L=California,C=US"
+- "CN=os1,OU=Wazuh,O=Wazuh,L=California,C=US"
 plugins.security.restapi.roles_enabled:
 - "all_access"
 - "security_rest_api_access"
