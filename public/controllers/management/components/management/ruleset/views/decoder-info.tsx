@@ -16,18 +16,8 @@ import {
   EuiFlexGrid,
 } from '@elastic/eui';
 
-import { connect } from 'react-redux';
-
 import { ResourcesHandler, ResourcesConstants } from '../../common/resources-handler';
 import { colors } from '../../common/colors';
-
-import {
-  updateFileContent,
-  cleanFileContent,
-  cleanInfo,
-  updateFilters,
-  cleanFilters,
-} from '../../../../../../redux/actions/rulesetActions';
 
 import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
@@ -374,20 +364,4 @@ class WzDecoderInfo extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
-  return {
-    state: state.rulesetReducers,
-  };
-};
-
-const mapDispatchToProps = (dispatch) => {
-  return {
-    updateFileContent: (content) => dispatch(updateFileContent(content)),
-    cleanFileContent: () => dispatch(cleanFileContent()),
-    updateFilters: (filters) => dispatch(updateFilters(filters)),
-    cleanFilters: () => dispatch(cleanFilters()),
-    cleanInfo: () => dispatch(cleanInfo()),
-  };
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(WzDecoderInfo);
+export default WzDecoderInfo;

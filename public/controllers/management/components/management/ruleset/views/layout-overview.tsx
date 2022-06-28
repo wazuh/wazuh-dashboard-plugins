@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { connect } from 'react-redux';
 
 // Eui components
 import {
@@ -57,16 +56,7 @@ function WzRulesetOverview(props) {
 
 }
 
-const mapStateToProps = state => {
-  return {
-    state: state.rulesetReducers
-  };
-};
-
 export default compose(
-  connect(
-    mapStateToProps
-  ),
   withGlobalBreadcrumb(props => {
     return [
       { text: '' },

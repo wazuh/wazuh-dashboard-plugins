@@ -760,20 +760,3 @@ export default class WzRuleInfo extends Component {
     );
   }
 }
-
-// const mapStateToProps = (state) => {
-//   return {
-//     state: state.rulesetReducers,
-//   };
-// };
-
-// const mapDispatchToProps = (dispatch) => {
-//   return {
-//     updateFileContent: (content) => dispatch(updateFileContent(content)),
-//     updateFilters: (filters) => dispatch(updateFilters(filters)),
-//     cleanFilters: () => dispatch(cleanFilters()),
-//     cleanInfo: () => dispatch(cleanInfo()),
-//   };
-// };
-
-// export default connect(mapStateToProps, mapDispatchToProps)(WzRuleInfo);

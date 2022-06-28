@@ -12,8 +12,8 @@
 
 import React from 'react';
 import {
-  EuiFlyout,
-} from '@elastic/eui';
+  WzFlyout,
+} from '../../../../../../components/common/flyouts';
 import WzRuleInfo from '../views/rule-info';
 import './flyout-detail.scss'
 
@@ -21,7 +21,7 @@ export const FlyoutDetail = ({ isLoading, item, title, closeFlyout, filters, ...
 
   
   return (
-    <EuiFlyout
+    <WzFlyout
       onClose={() => closeFlyout()}
       size="l"
       aria-labelledby={title}
@@ -31,6 +31,6 @@ export const FlyoutDetail = ({ isLoading, item, title, closeFlyout, filters, ...
       {item && !isLoading && <>
           <WzRuleInfo item={item} closeFlyout={closeFlyout} {...rest} filters={filters} />
       </>}
-    </EuiFlyout>
+    </WzFlyout>
   );
 }
