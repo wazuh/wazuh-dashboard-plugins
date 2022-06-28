@@ -85,7 +85,7 @@ export default class RulesetColumns {
                     const resourcesHandler = new ResourcesHandler(ResourcesConstants.RULES);
                     const result = await resourcesHandler.getFileContent(value);
                     const file = { name: value, content: result, path: item.relative_dirname };
-                    this.props.setFileContent(file);
+                    this.props.updateFileContent(file);
                   }}>
                   {value}
                 </WzButtonPermissions>
@@ -121,7 +121,7 @@ export default class RulesetColumns {
                     tooltip={{ position: 'top', content: `View the content of ${item.filename}` }}
                     onClick={async ev => {
                       ev.stopPropagation();
-                      const resourcesHandler = new ResourcesHandler(this.props.state.section);
+                      const resourcesHandler = new ResourcesHandler(ResourcesConstants.RULES);
                       const result = await resourcesHandler.getFileContent(item.filename);
                       const file = { name: item.filename, content: result, path: item.relative_dirname };
                       this.props.updateFileContent(file);
@@ -140,7 +140,7 @@ export default class RulesetColumns {
                       tooltip={{ position: 'top', content: `Edit ${item.filename} content` }}
                       onClick={async ev => {
                         ev.stopPropagation();
-                        const resourcesHandler = new ResourcesHandler(this.props.state.section);
+                        const resourcesHandler = new ResourcesHandler(ResourcesConstants.RULES);
                         const result = await resourcesHandler.getFileContent(item.filename);
                         const file = { name: item.filename, content: result, path: item.relative_dirname };
                         this.props.updateFileContent(file);
@@ -169,34 +169,31 @@ export default class RulesetColumns {
       };
 
       const getReadButtonPermissions = (item) => {
-        const { section } = this.props.state;
-        const { permissionResource } = resourceDictionary[section];
+        const { permissionResource } = resourceDictionary[ResourcesConstants.RULES];
         return [
           {
-            action: `${section}:read`,
+            action: `${ResourcesConstants.RULES}:read`,
             resource: permissionResource(item.filename),
           },
         ];
       };
 
       const getEditButtonPermissions = (item) => {
-        const { section } = this.props.state;
-        const { permissionResource } = resourceDictionary[section];
+        const { permissionResource } = resourceDictionary[ResourcesConstants.RULES];
         return [
           {
-            action: `${section}:read`,
+            action: `${ResourcesConstants.RULES}:read`,
             resource: permissionResource(item.filename),
           },
-          { action: `${section}:update`, resource: permissionResource(item.filename) },
+          { action: `${ResourcesConstants.RULES}:update`, resource: permissionResource(item.filename) },
         ];
       };
 
       const getDeleteButtonPermissions = (item) => {
-        const { section } = this.props.state;
-        const { permissionResource } = resourceDictionary[section];
+        const { permissionResource } = resourceDictionary[ResourcesConstants.RULES];
         return [
           {
-            action: `${section}:delete`,
+            action: `${ResourcesConstants.RULES}:delete`,
             resource: permissionResource(item.filename),
           },
         ];

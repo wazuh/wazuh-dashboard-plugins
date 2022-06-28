@@ -1,5 +1,5 @@
 import React from 'react';
-import { EuiToolTip, EuiButtonIcon, EuiLink, EuiBadge } from '@elastic/eui';
+import { EuiToolTip, EuiButtonIcon, EuiBadge } from '@elastic/eui';
 import { resourceDictionary, ResourcesHandler, ResourcesConstants } from '../../common/resources-handler';
 import exportCsv from '../../../../../../react-services/wz-csv';
 import { WzButtonPermissions } from '../../../../../../components/common/permissions/button';
@@ -33,7 +33,10 @@ export default class CDBListsColumns {
                   iconType="exportAction"
                   onClick={async ev => {
                     ev.stopPropagation();
-                    await exportCsv(`/lists?path=${item.relative_dirname}/${item.filename}`, [{ _isCDBList: true, name: 'path', value: `${item.relative_dirname}/${item.filename}` }], item.filename)
+                    await exportCsv(`/lists?path=${item.relative_dirname}/${item.filename}`,
+                      [{ _isCDBList: true, name: 'path', value: `${item.relative_dirname}/${item.filename}` }],
+                      item.filename
+                    )
                   }}
                   color="primary"
                 />
@@ -44,34 +47,31 @@ export default class CDBListsColumns {
       };
 
       const getReadButtonPermissions = (item) => {
-        const { section } = this.props.state;
-        const { permissionResource } = resourceDictionary[section];
+        const { permissionResource } = resourceDictionary[ResourcesConstants.LISTS];
         return [
           {
-            action: `${section}:read`,
+            action: `${ResourcesConstants.LISTS}:read`,
             resource: permissionResource(item.filename),
           },
         ];
       };
 
       const getEditButtonPermissions = (item) => {
-        const { section } = this.props.state;
-        const { permissionResource } = resourceDictionary[section];
+        const { permissionResource } = resourceDictionary[ResourcesConstants.LISTS];
         return [
           {
-            action: `${section}:read`,
+            action: `${ResourcesConstants.LISTS}:read`,
             resource: permissionResource(item.filename),
           },
-          { action: `${section}:update`, resource: permissionResource(item.filename) },
+          { action: `${ResourcesConstants.LISTS}:update`, resource: permissionResource(item.filename) },
         ];
       };
 
       const getDeleteButtonPermissions = (item) => {
-        const { section } = this.props.state;
-        const { permissionResource } = resourceDictionary[section];
+        const { permissionResource } = resourceDictionary[ResourcesConstants.LISTS];
         return [
           {
-            action: `${section}:delete`,
+            action: `${ResourcesConstants.LISTS}:delete`,
             resource: permissionResource(item.filename),
           },
         ];
@@ -93,7 +93,7 @@ export default class CDBListsColumns {
                 tooltip={{ position: 'top', content: `Edit ${item.filename} content` }}
                 onClick={async (ev) => {
                   ev.stopPropagation();
-                  const resourcesHandler = new ResourcesHandler(this.props.state.section);
+                  const resourcesHandler = new ResourcesHandler(ResourcesConstants.LISTS);
                   const result = await resourcesHandler.getFileContent(item.filename);
                   const file = { name: item.filename, content: result, path: item.relative_dirname };
                   this.props.updateListContent(file);
@@ -122,7 +122,10 @@ export default class CDBListsColumns {
                 tooltip={{ position: 'top', content: `Export ${item.filename} content` }}
                 onClick={async (ev) => {
                   ev.stopPropagation();
-                  await exportCsv(`/lists`, [{ _isCDBList: true, name: 'filename', value: `${item.filename}` }], item.filename)
+                  await exportCsv(`/lists`,
+                    [{ _isCDBList: true, name: 'filename', value: `${item.filename}` }],
+                    item.filename
+                  )
                 }}
                 color="primary"
               />
