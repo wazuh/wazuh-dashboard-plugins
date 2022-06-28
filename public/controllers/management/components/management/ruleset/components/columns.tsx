@@ -112,105 +112,6 @@ export default class RulesetColumns {
             width: '10%'
           }
         ],
-<<<<<<< HEAD
-        decoders: [
-          {
-            field: 'name',
-            name: 'Name',
-            align: 'left',
-            sortable: true
-          },
-          {
-            field: 'details.program_name',
-            name: 'Program name',
-            align: 'left',
-            sortable: false
-          },
-          {
-            field: 'details.order',
-            name: 'Order',
-            align: 'left',
-            sortable: false
-          },
-          {
-            field: 'filename',
-            name: 'File',
-            align: 'left',
-            sortable: true,
-            render: (value, item) => {
-              return (
-                <WzButtonPermissions
-                  buttonType='link'
-                  permissions={getReadButtonPermissions(item)}
-                  tooltip={{ position: 'top', content: `Show ${value} content` }}
-                  onClick={async (ev) => {
-                    try{
-                      ev.stopPropagation();
-                      const rulesetHandler = new RulesetHandler(RulesetResources.DECODERS);
-                      const result = await rulesetHandler.getFileContent(value);
-                      const file = { name: value, content: result, path: item.relative_dirname };
-                      this.props.updateFileContent(file);
-                    }catch(error){
-                      const options: UIErrorLog = this.getErrorOptions(
-                        error,
-                        'Decoders.readFileContent'
-                      );
-                      getErrorOrchestrator().handleError(options);
-                    }
-                  }}>
-                  {value}
-                </WzButtonPermissions>
-              );
-            }
-          },
-          {
-            field: 'relative_dirname',
-            name: 'Path',
-            align: 'left',
-            sortable: true
-          }
-        ],
-        lists: [
-          {
-            field: 'filename',
-            name: 'Name',
-            align: 'left',
-            sortable: true
-          },
-          {
-            field: 'relative_dirname',
-            name: 'Path',
-            align: 'left',
-            sortable: true
-          },
-          {
-            name: 'Actions',
-            align: 'left',
-            render: (item) => (
-              <EuiToolTip position="top" content={`Export ${item.filename}`}>
-                <EuiButtonIcon
-                  aria-label="Export list"
-                  iconType="exportAction"
-                  onClick={async ev => {
-                    try{
-                      ev.stopPropagation();
-                      await exportCsv(`/lists?path=${item.relative_dirname}/${item.filename}`, [{_isCDBList: true, name: 'path', value: `${item.relative_dirname}/${item.filename}`}], item.filename)
-                    }catch(error){
-                      const options: UIErrorLog = this.getErrorOptions(
-                        error,
-                        'Lists.exportFile'
-                      );
-                      getErrorOrchestrator().handleError(options);
-                    }
-                  }}
-                  color="primary"
-                />
-              </EuiToolTip>
-            )
-          }
-        ],
-=======
->>>>>>> Fix CDB List row click handler
         files: [
           {
             field: 'filename',
@@ -258,13 +159,13 @@ export default class RulesetColumns {
                       iconType="pencil"
                       tooltip={{ position: 'top', content: `Edit ${item.filename} content` }}
                       onClick={async ev => {
-                        try{
+                        try {
                           ev.stopPropagation();
                           const rulesetHandler = new RulesetHandler(this.props.state.section);
                           const result = await rulesetHandler.getFileContent(item.filename);
                           const file = { name: item.filename, content: result, path: item.relative_dirname };
                           this.props.updateFileContent(file);
-                        }catch(error){
+                        } catch (error) {
                           const options: UIErrorLog = this.getErrorOptions(
                             error,
                             'Files.editFileContent'
@@ -304,120 +205,35 @@ export default class RulesetColumns {
       };
 
       const getReadButtonPermissions = (item) => {
-        const { section } = this.props.state;
-        const { permissionResource } = resourceDictionary[section];
+        const { permissionResource } = resourceDictionary[ResourcesConstants.RULES];
         return [
           {
-            action: `${section}:read`,
+            action: `${ResourcesConstants.RULES}:read`,
             resource: permissionResource(item.filename),
           },
         ];
       };
 
       const getEditButtonPermissions = (item) => {
-        const { section } = this.props.state;
-        const { permissionResource } = resourceDictionary[section];
+        const { permissionResource } = resourceDictionary[ResourcesConstants.RULES];
         return [
           {
-            action: `${section}:read`,
+            action: `${ResourcesConstants.RULES}:read`,
             resource: permissionResource(item.filename),
           },
-          { action: `${section}:update`, resource: permissionResource(item.filename) },
+          { action: `${ResourcesConstants.RULES}:update`, resource: permissionResource(item.filename) },
         ];
       };
 
       const getDeleteButtonPermissions = (item) => {
-        const { section } = this.props.state;
-        const { permissionResource } = resourceDictionary[section];
+        const { permissionResource } = resourceDictionary[ResourcesConstants.RULES];
         return [
           {
-            action: `${section}:delete`,
+            action: `${ResourcesConstants.RULES}:delete`,
             resource: permissionResource(item.filename),
           },
         ];
       };
-<<<<<<< HEAD
-
-      this.columns.lists[2] =
-      {
-        name: 'Actions',
-        align: 'left',
-        render: item => {
-          const defaultItems = this.props.state.defaultItems;
-          return (
-            <div>
-              <WzButtonPermissions
-                buttonType='icon'
-                permissions={getEditButtonPermissions(item)}
-                aria-label="Edit content"
-                iconType="pencil"
-                tooltip={{position: 'top', content: `Edit ${item.filename} content`}}
-                onClick={async (ev) => {
-                  try{
-                    ev.stopPropagation();
-                    const rulesetHandler = new RulesetHandler(this.props.state.section);
-                    const result = await rulesetHandler.getFileContent(item.filename);
-                    const file = { name: item.filename, content: result, path: item.relative_dirname };
-                    this.props.updateListContent(file);
-                  }catch(error){
-                    const options: UIErrorLog = this.getErrorOptions(
-                      error,
-                      'Lists.editFileContent'
-                    );
-                    getErrorOrchestrator().handleError(options);
-                  }
-                }}
-                color="primary"
-              />
-              <WzButtonPermissions
-                buttonType='icon'
-                permissions={getDeleteButtonPermissions(item)}
-                aria-label="Delete file"
-                iconType="trash"
-                tooltip={{position: 'top', content:(defaultItems.indexOf(`${item.relative_dirname}`) === -1) ? `Delete ${item.filename}` : `The ${item.filename} list cannot be deleted`}}
-                onClick={async (ev) => {
-                  try{
-                    ev.stopPropagation();
-                    this.props.updateListItemsForRemove([item]);
-                    this.props.updateShowModal(true);
-                  }catch(error){
-                    const options: UIErrorLog = this.getErrorOptions(
-                      error,
-                      'Lists.deleteFile'
-                    );
-                    getErrorOrchestrator().handleError(options);
-                  }
-                }}
-                color="danger"
-                isDisabled={defaultItems.indexOf(`${item.relative_dirname}`) !== -1}
-              />
-              <WzButtonPermissions
-                buttonType='icon'
-                permissions={getReadButtonPermissions(item)}
-                aria-label="Export list"
-                iconType="exportAction"
-                tooltip={{position: 'top', content: `Export ${item.filename} content`}}
-                onClick={async (ev) => {
-                  try{
-                    ev.stopPropagation();
-                    await exportCsv(`/lists`, [{_isCDBList: true, name: 'filename', value: `${item.filename}`}], item.filename)
-                  }catch(error){
-                    const options: UIErrorLog = this.getErrorOptions(
-                      error, 
-                      'Lists.exportFile'
-                    );
-                    getErrorOrchestrator().handleError(options);
-                  }
-                }}
-                color="primary"
-              />
-            </div>
-          )
-        }
-        }
-      }
-=======
->>>>>>> Fix CDB List row click handler
     };
 
 

@@ -79,7 +79,7 @@ export default class DecodersColumns {
                     tooltip={{ position: 'top', content: `View the content of ${item.filename}` }}
                     onClick={async ev => {
                       ev.stopPropagation();
-                      const resourcesHandler = new ResourcesHandler(this.props.state.section);
+                      const resourcesHandler = new ResourcesHandler(ResourcesConstants.DECODERS);
                       const result = await resourcesHandler.getFileContent(item.filename);
                       const file = { name: item.filename, content: result, path: item.relative_dirname };
                       this.props.updateFileContent(file);
@@ -98,7 +98,7 @@ export default class DecodersColumns {
                       tooltip={{ position: 'top', content: `Edit ${item.filename} content` }}
                       onClick={async ev => {
                         ev.stopPropagation();
-                        const resourcesHandler = new ResourcesHandler(this.props.state.section);
+                        const resourcesHandler = new ResourcesHandler(ResourcesConstants.DECODERS);
                         const result = await resourcesHandler.getFileContent(item.filename);
                         const file = { name: item.filename, content: result, path: item.relative_dirname };
                         this.props.updateFileContent(file);
@@ -127,34 +127,31 @@ export default class DecodersColumns {
       };
 
       const getReadButtonPermissions = (item) => {
-        const { section } = this.props.state;
-        const { permissionResource } = resourceDictionary[section];
+        const { permissionResource } = resourceDictionary[ResourcesConstants.DECODERS];
         return [
           {
-            action: `${section}:read`,
+            action: `${ResourcesConstants.DECODERS}:read`,
             resource: permissionResource(item.filename),
           },
         ];
       };
 
       const getEditButtonPermissions = (item) => {
-        const { section } = this.props.state;
-        const { permissionResource } = resourceDictionary[section];
+        const { permissionResource } = resourceDictionary[ResourcesConstants.DECODERS];
         return [
           {
-            action: `${section}:read`,
+            action: `${ResourcesConstants.DECODERS}:read`,
             resource: permissionResource(item.filename),
           },
-          { action: `${section}:update`, resource: permissionResource(item.filename) },
+          { action: `${ResourcesConstants.DECODERS}:update`, resource: permissionResource(item.filename) },
         ];
       };
 
       const getDeleteButtonPermissions = (item) => {
-        const { section } = this.props.state;
-        const { permissionResource } = resourceDictionary[section];
+        const { permissionResource } = resourceDictionary[ResourcesConstants.DECODERS];
         return [
           {
-            action: `${section}:delete`,
+            action: `${ResourcesConstants.DECODERS}:delete`,
             resource: permissionResource(item.filename),
           },
         ];
