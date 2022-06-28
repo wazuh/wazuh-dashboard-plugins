@@ -32,6 +32,33 @@ services:
     volumes:
       - ./config/imposter:/opt/imposter/config
 
+  filebeat:
+    depends_on:
+      es01:
+        condition: service_healthy
+    image: elastic/filebeat:7.10.2
+    hostname: filebeat
+    user: "0:0"
+    networks:
+      - es-dev
+    <<: *logging
+    restart: always
+    entrypoint:
+      - '/bin/bash'
+    command: >
+      -c '
+        mkdir -p /etc/filebeat
+        echo admin | filebeat keystore add username --stdin --force
+        echo ${ELASTIC_PASSWORD}| filebeat keystore add password --stdin --force
+        curl -so /etc/filebeat/wazuh-template.json https://raw.githubusercontent.com/wazuh/wazuh/4.3/extensions/elasticsearch/7.x/wazuh-template.json
+        curl -s https://packages.wazuh.com/4.x/filebeat/wazuh-filebeat-0.2.tar.gz | tar -xvz -C /usr/share/filebeat/module
+        filebeat setup -e
+        filebeat
+      '
+    volumes:
+      - certs:/etc/ssl/elastic
+      - ./config/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
+
   setup:
     hostname: setup
     user: "0"
@@ -61,6 +88,12 @@ services:
           "  - name: es01\n"\
           "    dns:\n"\
           "      - es01\n"\
+          "      - localhost\n"\
+          "    ip:\n"\
+          "      - 127.0.0.1\n"\
+          "  - name: wazuh.manager\n"\
+          "    dns:\n"\
+          "      - wazuh.manager\n"\
           "      - localhost\n"\
           "    ip:\n"\
           "      - 127.0.0.1\n"\
@@ -131,16 +164,6 @@ services:
       interval: 10s
       timeout: 10s
       retries: 120
-
-  index-pattern:
-    image: curlimages/curl
-    depends_on:
-      - es01
-    command: >
-      sh -c '
-        curl -k -sS https://raw.githubusercontent.com/wazuh/wazuh/v4.3.4/extensions/elasticsearch/7.x/wazuh-template.json > /tmp/t.json
-        curl -k -sS -u elastic:${KIBANA_PASSWORD} -X  PUT 'https://es01:9200/_template/wazuh' -H 'Content-Type: application/json' -d @/tmp/t.json 
-      '
 
   kibana:
     hostname: kibana

@@ -22,6 +22,7 @@ before bringing up the environment!**
 
 This environment will start a working deployment with:
   - imposter - a mock server
+  - fileneat - set ups indices using wazuh module
   - elasticsearch-exporter - elasticsearch metrics to prometheus adapter
   - elasticsearch single-node cluster
   - kibana development environment
