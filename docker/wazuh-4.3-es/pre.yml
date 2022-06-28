@@ -10,7 +10,7 @@ services:
   exporter:
     image: quay.io/prometheuscommunity/elasticsearch-exporter:latest
     <<: *logging
-    hostname: "exporter-kbn-${STACK_VERSION}"
+    hostname: "exporter-kbn-${ES_VERSION}"
     networks:
       - es-pre
       - mon
@@ -21,7 +21,7 @@ services:
 
   imposter:
     image: outofcoffee/imposter
-    hostname: "imposter-kbn-${STACK_VERSION}"
+    hostname: "imposter-kbn-${ES_VERSION}"
     networks:
       - es-pre
       - mon
@@ -43,7 +43,7 @@ services:
       - es-pre
     <<: *logging
     restart: always
-    entrypoint: 
+    entrypoint:
       - '/bin/bash'
     command: >
       -c '
@@ -53,12 +53,12 @@ services:
         curl -so /etc/filebeat/wazuh-template.json https://raw.githubusercontent.com/wazuh/wazuh/4.3/extensions/elasticsearch/7.x/wazuh-template.json
         curl -s https://packages.wazuh.com/4.x/filebeat/wazuh-filebeat-0.2.tar.gz | tar -xvz -C /usr/share/filebeat/module
         filebeat setup -e
-        filebeat 
+        filebeat
       '
     volumes:
       - certs:/etc/ssl/elastic
       - ./config/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
-  
+
   setup:
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
     networks:
@@ -301,7 +301,7 @@ services:
       retries: 120
 
 networks:
-  es-pre: 
+  es-pre:
     name: "es-pre-${STACK_VERSION}"
     driver: bridge
   mon:
@@ -318,15 +318,3 @@ volumes:
     driver: local
   kibanadata:
     driver: local
-  wazuh_api_configuration:
-  wazuh_etc:
-  wazuh_logs:
-  wazuh_queue:
-  wazuh_var_multigroups:
-  wazuh_integrations:
-  wazuh_active_response:
-  wazuh_agentless:
-  wazuh_wodles:
-  filebeat_etc:
-  filebeat_var:
-  wazuh-indexer-data:

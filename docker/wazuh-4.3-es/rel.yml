@@ -10,7 +10,7 @@ services:
   exporter:
     image: quay.io/prometheuscommunity/elasticsearch-exporter:latest
     <<: *logging
-    hostname: "exporter-kbn-${STACK_VERSION}"
+    hostname: "exporter-kbn-${ES_VERSION}"
     networks:
       - es-rel
       - mon
@@ -23,7 +23,7 @@ services:
     depends_on:
       setup:
         condition: service_healthy
-    image: wazuh/wazuh-manager:${WAZUH_STACK}
+    image: wazuh/wazuh-manager:${WAZUH_VERSION}
     hostname: wazuh.manager
     networks:
       - es-rel
@@ -32,7 +32,7 @@ services:
     environment:
       - INDEXER_URL=https://es01:9200
       - INDEXER_USERNAME=elastic
-      - INDEXER_PASSWORD=SecretPassword
+      - INDEXER_PASSWORD=${ELASTIC_PASSWORD}
       - FILEBEAT_SSL_VERIFICATION_MODE=full
       - SSL_CERTIFICATE_AUTHORITIES=/etc/ssl/elastic/ca/ca.crt
       - SSL_CERTIFICATE=/etc/ssl/elastic/wazuh.manager/wazuh.manager.crt
@@ -55,7 +55,7 @@ services:
       - ./config/wazuh_cluster/wazuh_manager.conf:/wazuh-config-mount/etc/ossec.conf
 
   setup:
-    image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ES_VERSION}
     networks:
       - es-rel
     volumes:
@@ -130,7 +130,7 @@ services:
     depends_on:
       setup:
         condition: service_healthy
-    image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ES_VERSION}
     networks:
       - es-rel
     volumes:
@@ -177,7 +177,7 @@ services:
   #   <<: *logging
   #   depends_on:
   #     - es01
-  #   image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
+  #   image: docker.elastic.co/elasticsearch/elasticsearch:${ES_VERSION}
   #   networks:
   #     - es-rel
   #   volumes:
@@ -221,7 +221,7 @@ services:
   #   <<: *logging
   #   depends_on:
   #     - es02
-  #   image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
+  #   image: docker.elastic.co/elasticsearch/elasticsearch:${ES_VERSION}
   #   networks:
   #     - es-rel
   #   volumes:
@@ -272,7 +272,7 @@ services:
       #   condition: service_healthy
       # es03:
       #   condition: service_healthy
-    image: docker.elastic.co/kibana/kibana:${STACK_VERSION}
+    image: docker.elastic.co/kibana/kibana:${ES_VERSION}
     volumes:
       - certs:/usr/share/kibana/config/certs
       - kibanadata:/usr/share/kibana/data
@@ -297,7 +297,7 @@ services:
 
 networks:
   es-rel:
-    name: "es-rel-${STACK_VERSION}"
+    name: "es-rel-${ES_VERSION}"
     driver: bridge
   mon:
     external: true

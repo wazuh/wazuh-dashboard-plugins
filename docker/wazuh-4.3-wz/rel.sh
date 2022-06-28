@@ -13,7 +13,7 @@ usage() {
 	echo "$0 version action "
 	echo
 	echo "where version is one of " ${versions[*]}
-	echo "acction is one of up | down"
+	echo "acction is one of up | down | stop"
 	exit -1
 }
 
@@ -31,7 +31,7 @@ fi
 
 export WAZUH_STACK=${1}
 export KIBANA_PORT=5601
-export COMPOSE_PROJECT_NAME=wazuh-${WAZUH_STACK}
+export COMPOSE_PROJECT_NAME=wazuh-rel-${WAZUH_STACK}
 
 case "$2" in
 	up)
@@ -41,6 +41,9 @@ case "$2" in
 	down)
 		# delete volumes
 		docker-compose -f rel.yml down -v --remove-orphans
+		;;
+	stop)
+		docker-compose -f rel.yml stop
 		;;
 	*)
 		echo "Action must be either up or down"

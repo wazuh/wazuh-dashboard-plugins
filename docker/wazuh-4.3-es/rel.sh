@@ -27,7 +27,7 @@ usage() {
 	echo "where"
 	echo "  elastic_version is one of " ${elastic_versions[*]}
 	echo "  wazuh_manager_version if one of " ${wazuh_versions[*]}
-	echo "  action is one of up | down"
+	echo "  action is one of up | down | stop"
 	exit -1
 }
 
@@ -49,38 +49,19 @@ if [[ ! " ${wazuh_versions[*]} " =~ " ${2} " ]]
  	exit -1
 fi
 
-export STACK_VERSION=$1
-export WAZUH_STACK=$2
-
-# Password for the 'elastic' user (at least 6 characters)
-export ELASTIC_PASSWORD=SecretPassword
-
-# Password for the 'kibana_system' user (at least 6 characters)
-export KIBANA_PASSWORD=SecretPassword
-
-# Set the cluster name
+export ES_VERSION=$1
+export WAZUH_VERSION=$2
+export ELASTIC_PASSWORD=${PASSWORD:-SecretPassword}
+export KIBANA_PASSWORD=${PASSWORD:-SecretPassword}
 export CLUSTER_NAME=cluster
-
-# Set to 'basic' or 'trial' to automatically start the 30-day trial
-export LICENSE=basic
-#LICENSE=trial
-
-# Port to expose Elasticsearch HTTP API to the host
-export ES_PORT=9200
-#ES_PORT=127.0.0.1:9200
-
-# Port to expose Kibana to the host
-export KIBANA_PORT=5601
-
-# Increase or decrease based on the available host memory (in bytes)
-export MEM_LIMIT=1073741824
-
-export COMPOSE_PROJECT_NAME=elastic-$STACK_VERSION
+export LICENSE=basic # or trial
+export KIBANA_PORT=${PORT:-5601}
+export COMPOSE_PROJECT_NAME=es-rel-$STACK_VERSION
 
 case "$3" in
 	up)
 		# recreate volumes
-		docker-compose -f pro.yml up -Vd
+		docker compose -f rel.yml up -Vd
 
 		# This installs Wazuh and integrates with a default elastic stack
 		v=$( echo -n $STACK_VERSION | sed 's/\.//g' )
@@ -93,7 +74,10 @@ case "$3" in
 		;;
 	down)
 		# delete volumes
-		docker-compose -f pro.yml down -v --remove-orphans
+		docker compose -f rel.yml down -v --remove-orphans
+		;;
+	stop)
+		docker compose -f rel.yml stop
 		;;
 	*)
 		usage

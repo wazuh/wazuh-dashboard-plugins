@@ -20,7 +20,7 @@ usage() {
 	echo "where"
 	echo "  wazuh_version is one of " ${elastic_versions[*]}
 	echo "  wazuh_api_version is the minor version of wazuh 4.3, for example " ${wazuh_api_version[*]}
-	echo "  action is one of up | down"
+	echo "  action is one of up | down | stop"
 	echo
 	echo "In a minor release, the API should not change the version here bumps the API"
 	echo " string returned for testing. This script generates the file "
@@ -67,17 +67,17 @@ EOF
 
 export WAZUH_STACK=${1}
 export KIBANA_PORT=5601
-export COMPOSE_PROJECT_NAME=wazuh-${WAZUH_STACK}
+export COMPOSE_PROJECT_NAME=wazuh-pre-${WAZUH_STACK}
 
 case "$3" in
 	up)
 		# recreate volumes
-		docker-compose -f pre.yml up -Vd
+		docker compose -f pre.yml up -Vd
 
 		# This installs Wazuh and integrates with a default elastic stack
 		v=$( echo -n $WAZUH_STACK | sed 's/\.//g' )
 		echo
-		echo Install Wazuh ${WAZUH_STACK} into Wazuh ${WAZUH_STACK} manually with:
+		echo Install Wazuh ${WAZUH_STACK}  manually with:
 		echo
 		echo 1. Uninstall current version of wazuh app
 		echo docker exec -ti wazuh-${v}_wazuh.dashboard_1  /usr/share/wazuh-dashboard/bin/opensearch-dashboards-plugin remove wazuh
@@ -102,7 +102,10 @@ case "$3" in
 		;;
 	down)
 		# delete volumes
-		docker-compose -f pre.yml down -v --remove-orphans
+		docker compose -f pre.yml down -v --remove-orphans
+		;;
+	stop)
+		docker compose -f pre.yml stop
 		;;
 	*)
 		echo "Action must be either up or down"
