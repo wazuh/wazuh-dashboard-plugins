@@ -1,7 +1,7 @@
 # Frontend development environment
 
-Install [Docker Desktop][0] as perits instructions. It works for Linux too. 
-This ensures the developmentexperience between Linux, Mac and Windows is as 
+Install [Docker Desktop][0] as perits instructions. It works for Linux too.
+This ensures the developmentexperience between Linux, Mac and Windows is as
 similar as posible.
 
 In general the environment consist of:
@@ -30,32 +30,36 @@ In general the environment consist of:
 	docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all-permissions
 	```
  4. Assign resources to [Docker Desktop][0]. The requirements for the environments are:
-	- 4 GB of RAM (minimum)
-	- Half of your system RAM (recommended)
-	
+	- 8 GB of RAM (minimum)
+	- 4 cores
+
+    The more resources the better ☺
+
 
 ## Starting up the environments
 
 Choose one of the [environments](#environments) available and use the `sh` script
-to up the environment. The script takes 3 arguments and provide help for each of
-them if wrong arguments were given.
+to up the environment. Each script will guide you on how to use it, which parameters it needs, and what values are accepted for each parameter.
+
+To see the usage of each script, just run it with no parameters.
 
 Example:
 
-This brings up a Dev environment for Kibana 7.17.4:
+This brings up a Dev environment for opensearh `1.2.4` and opensearch-dashboards `1.2.0`, with the `wazuh-kibana-app` development branch set up at `~/src/w/app`/:
+
 ```bash
-./dev.sh 7.17.4 $WZ_HOME up
+./dev.sh 1.2.4 1.2.0 ~/src/w/app/ up
 ```
 
-`$WZ_HOME` is the path to your local Wazuh Kibana App source code. You can save
-this path as an environment variable on your system.
+You can save this path as an environment variable on your system.
 
-Once the containers are up, attach a shell to the Kibana container, move to 
+Once the containers are up, attach a shell to the development container, move to
 the `kbn\plugins\wazuh` and run `yarn` to install the dependencies of the project.
 After that, move back to the root folder of the platform and run `yarn start` to
 start the App.
 
-The dependencies of the platform (Kibana \ OSD) are already installed.
+The dependencies of the platform (Kibana \ OSD) are already installed, but it might take a while to optimize all the bundles. We migh include the cache in the image in the future.
+
 
 ### Wrong user permissions
 
@@ -98,7 +102,7 @@ while developing the image.
 
 ```bash
 cd cache
-docker-compose up -d
+docker compose up -d
 cd ..
 ```
 
@@ -124,22 +128,22 @@ logs and metrics from the containers. Also this will create the `mon`
 network, which will be needed by the other environments.
 
 If you don´t want to bring up this environment, be sure to create the
-`mon` network as it is required by other docker-compose and scripts.
+`mon` network as it is required by other docker compose and scripts.
 
 
 ### **osd-dev** - OpenSearch Dashboards development environment
 
 Folder: [osd-dev](./osd-dev/)
 
-This will bring up a development environment for Wazuh using the
-opensearch-dashboards version included in Wazuh.
+This will bring up a development environment for Wazuh using the given
+opensearch and opensearch-dashboards versions.
 
 ### **knb-dev** - Kibana 7.X & Kibana 8.X development environment
 
 Folder: [kbn-dev](./kbn-dev/)
 
-This will bring up a development environment for Wazuh using the Kibana
-development container versions of the 7 series and 8 series.
+This will bring up a development environment for Wazuh using the
+Kibana development container versions of the 7 series and 8 series.
 
 ### Wazuh 4.3.X testing environment with Elastic Stack
 
@@ -147,7 +151,7 @@ Folder: [wazuh-4.3-es](./wazuh-4.3-es)
 
 Within this folder there are two scripts:
 
- - `pro.sh` brings up released versions
+ - `rel.sh` brings up released versions
  - `pre.sh` brings up unreleased versions
 
 ### Wazuh 4.3.X testing environment with wazuh-dashboard and wazuh-indexer
@@ -156,7 +160,7 @@ Folder: [wazuh-4.3-wz](./wazuh-4.3-wz)
 
 Within this folder there are two scripts:
 
- - `pro.sh` brings up released versions
+ - `rel.sh` brings up released versions
  - `pre.sh` brings up unreleased versions
 
 ### Wazuh 4.2.X testing environment with Elastic Stack
