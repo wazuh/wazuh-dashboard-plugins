@@ -64,6 +64,9 @@ function RulesetTable(props) {
     setIsFlyoutVisible(false);
   }
 
+  /**
+   * Columns and Rows properties
+   */
   const getColumns = () => {
     const rulesetColumns = new RulesetColumns({
       state: {
@@ -140,68 +143,62 @@ function RulesetTable(props) {
   /**
    * Render tables
    */
-  const RenderFilesTable = () => {
-    return (
-      <TableWzAPI
-        actionButtons={actionButtons}
-        title={'Rules files'}
-        searchBarProps={{ buttonOptions: buttonOptions }}
-        description={`From here you can manage your rules files.`}
-        tableColumns={columns}
-        tableInitialSortingField={'filename'}
-        searchTable={true}
-        searchBarSuggestions={apiSuggestsItems.files}
-        endpoint={'/rules/files'}
-        isExpandable={true}
-        downloadCsv={true}
-        showReload={true}
-        filters={filters}
-        onFiltersChange={updateFilters}
-        tablePageSizeOptions={[10, 25, 50, 100]}
-      />
-    )
-  };
+  const FilesTable = <TableWzAPI
+    actionButtons={actionButtons}
+    title={'Rules files'}
+    searchBarProps={{ buttonOptions: buttonOptions }}
+    description={`From here you can manage your rules files.`}
+    tableColumns={columns}
+    tableInitialSortingField={'filename'}
+    searchTable={true}
+    searchBarSuggestions={apiSuggestsItems.files}
+    endpoint={'/rules/files'}
+    isExpandable={true}
+    downloadCsv={true}
+    showReload={true}
+    filters={filters}
+    onFiltersChange={updateFilters}
+    tablePageSizeOptions={[10, 25, 50, 100]}
+  />
 
-  const RenderRulesTable = () => {
-    return <>
-      <TableWzAPI
-        actionButtons={actionButtons}
-        title={'Rules'}
-        searchBarProps={{ buttonOptions: buttonOptions }}
-        description={`From here you can manage your rules.`}
-        tableColumns={columns}
-        tableInitialSortingField={'id'}
-        searchTable={true}
-        searchBarSuggestions={apiSuggestsItems.items}
-        endpoint={'/rules'}
-        isExpandable={true}
-        rowProps={getRowProps}
-        downloadCsv={true}
-        showReload={true}
+  const RulesTable = <>
+    <TableWzAPI
+      actionButtons={actionButtons}
+      title={'Rules'}
+      searchBarProps={{ buttonOptions: buttonOptions }}
+      description={`From here you can manage your rules.`}
+      tableColumns={columns}
+      tableInitialSortingField={'id'}
+      searchTable={true}
+      searchBarSuggestions={apiSuggestsItems.items}
+      endpoint={'/rules'}
+      isExpandable={true}
+      rowProps={getRowProps}
+      downloadCsv={true}
+      showReload={true}
+      filters={filters}
+      onFiltersChange={updateFilters}
+      tablePageSizeOptions={[10, 25, 50, 100]}
+    />
+    {isFlyoutVisible && (
+      <FlyoutDetail
+        item={currentItem}
+        closeFlyout={closeFlyout}
+        // type="Ruleset"
+        // view="inventory"
+        showViewInEvents={true}
+        outsideClickCloses={true}
         filters={filters}
         onFiltersChange={updateFilters}
-        tablePageSizeOptions={[10, 25, 50, 100]}
+        cleanFilters={cleanFilters}
+        {...props}
       />
-      {isFlyoutVisible && (
-        <FlyoutDetail
-          item={currentItem}
-          closeFlyout={closeFlyout}
-          type="vulnerability"
-          view="inventory"
-          showViewInEvents={true}
-          outsideClickCloses={true}
-          filters={filters}
-          onFiltersChange={updateFilters}
-          cleanFilters={cleanFilters}
-          {...props}
-        />
-      )}
-    </>
-  };
+    )}
+  </>
 
   return (
     <div className="wz-inventory">
-      {showingFiles ? <RenderFilesTable /> : <RenderRulesTable />}
+      {showingFiles ? FilesTable : RulesTable}
     </div>
   );
 

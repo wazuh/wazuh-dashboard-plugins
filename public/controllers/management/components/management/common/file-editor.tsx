@@ -409,7 +409,6 @@ class WzFileEditor extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.rulesetReducers,
     wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet,
     showFlyout: state.appStateReducers.showFlyoutLogtest,
   };
@@ -417,10 +416,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    // cleanInfo: () => dispatch(cleanInfo()),
-    // updateFileContent: content => dispatch(updateFileContent(content)),
     updateWazuhNotReadyYet: wazuhNotReadyYet => dispatch(updateWazuhNotReadyYet(wazuhNotReadyYet)),
-    // showFlyoutLogtest: showFlyout => dispatch(showFlyoutLogtest(showFlyout)),
   };
 };
 
