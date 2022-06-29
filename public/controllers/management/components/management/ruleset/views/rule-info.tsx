@@ -185,7 +185,7 @@ export default class WzRuleInfo extends Component {
         }
       }
 
-      this.setState({ 
+      this.setState({
         currentRuleInfo: currentRule,
         compliance: compliance,
         isLoading: false,
@@ -392,7 +392,7 @@ export default class WzRuleInfo extends Component {
    */
   renderDetails(details = {}) {
     const detailsToRender = [];
-    
+
     // Exclude group key of details
     Object.keys(details)
       .filter((key) => key !== 'group')
@@ -454,7 +454,7 @@ export default class WzRuleInfo extends Component {
   }
 
   async addMitreInformation(compliance, currentRuleId) {
-    let newMitreState={};
+    let newMitreState = {};
     try {
       Object.assign(newMitreState, { mitreRuleId: currentRuleId });
       const mitreName = [];
@@ -511,7 +511,7 @@ export default class WzRuleInfo extends Component {
         : this.props.state.ruleInfo.current;
 
 
-    
+
     const listCompliance = [];
     if (compliance.mitre) delete compliance.mitre;
     const keys = Object.keys(compliance);
@@ -586,6 +586,9 @@ export default class WzRuleInfo extends Component {
    * @param {Number} ruleId
    */
   changeBetweenRules(ruleId) {
+    // Prevent reloading the same rule
+    if (this.state.currentRuleId == ruleId) return;
+
     window.location.href = window.location.href.replace(
       new RegExp('redirectRule=' + '[^&]*'),
       `redirectRule=${ruleId}`
@@ -671,7 +674,7 @@ export default class WzRuleInfo extends Component {
                     isLoadingMessage={''}
                   >
                     <EuiFlexItem className="flyout-row details-row">
-                      { this.renderInfo(id, level, filename, relative_dirname, groups)}
+                      {this.renderInfo(id, level, filename, relative_dirname, groups)}
                     </EuiFlexItem>
                   </EuiAccordion>
                 </EuiFlexItem>

@@ -15,7 +15,7 @@ import {
   WzFlyout,
 } from '../../../../../../components/common/flyouts';
 import WzRuleInfo from '../views/rule-info';
-import './flyout-detail.scss'
+import '../../common/flyout-detail.scss'
 
 export const FlyoutDetail = ({ isLoading, item, title, closeFlyout, filters, ...rest }) => {
 
