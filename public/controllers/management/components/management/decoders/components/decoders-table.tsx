@@ -170,7 +170,7 @@ export default compose(
     };
   };
 
-  const { updateRestartClusterManager, updateListContent } = props;
+  const { updateRestartClusterManager, updateFileContent } = props;
   const columns = getColumns();
 
   /**
@@ -187,10 +187,6 @@ export default compose(
       <AddNewFileButton
         section={SECTION_DECODERS_SECTION}
         updateAddingFile={props.updateAddingFile}
-      />,
-      <AddNewCdbListButton
-        section={SECTION_DECODERS_SECTION}
-        updateListContent={updateListContent}
       />,
     ];
     if (showingFiles)
@@ -229,6 +225,7 @@ export default compose(
             currentItem={currentItem}
             closeFlyout={closeFlyout}
             cleanFilters={cleanFilters}
+            updateFileContent={updateFileContent}
           />
         )}
     </div>

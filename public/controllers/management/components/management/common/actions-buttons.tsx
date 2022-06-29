@@ -105,7 +105,6 @@ export const AddNewFileButton = ({ section, updateAddingFile }) => (
 //Add new CDB list button
 export const AddNewCdbListButton = (({ section, updateListContent }) => {
   return <>
-    {section === 'lists' &&
       <WzButtonPermissions
         buttonType="empty"
         permissions={getUpdatePermissionsFiles(section)}
@@ -119,7 +118,7 @@ export const AddNewCdbListButton = (({ section, updateListContent }) => {
         }
       >
         {`Add new ${section} file`}
-      </WzButtonPermissions>}
+      </WzButtonPermissions>
   </>
 });
 

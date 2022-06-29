@@ -182,7 +182,7 @@ function RulesetTable(props) {
     };
   };
 
-  const { updateRestartClusterManager, updateListContent } = props;
+  const { updateRestartClusterManager, updateFileContent } = props;
   const columns = getColumns();
 
   /**
@@ -199,10 +199,6 @@ function RulesetTable(props) {
       <AddNewFileButton
         section={SECTION_RULES_SECTION}
         updateAddingFile={props.updateAddingFile}
-      />,
-      <AddNewCdbListButton
-        section={SECTION_RULES_SECTION}
-        updateListContent={updateListContent}
       />,
     ];
     if (showingFiles)
@@ -241,6 +237,7 @@ function RulesetTable(props) {
             currentItem={currentItem}
             closeFlyout={closeFlyout}
             cleanFilters={cleanFilters}
+            updateFileContent={updateFileContent}
           />
         )}
     </div>
