@@ -18,10 +18,8 @@ import {
   EuiTitle,
   EuiToolTip,
   EuiButtonIcon,
-  EuiButton,
   EuiText,
   EuiButtonEmpty,
-  EuiPopover,
   EuiFieldText,
   EuiSpacer,
   EuiPanel,
@@ -631,7 +629,6 @@ class WzListEditor extends Component {
     );
   }
 }
-
 
 const mapDispatchToProps = (dispatch) => {
   return {

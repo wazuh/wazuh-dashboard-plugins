@@ -28,6 +28,83 @@ import {
 
 import apiSuggestsItems from './ruleset-suggestions';
 
+/**
+   * Render tables
+   */
+const FilesTable = ({
+  actionButtons,
+  buttonOptions,
+  columns,
+  searchBarSuggestions,
+  filters,
+  updateFilters
+}) => <TableWzAPI
+    actionButtons={actionButtons}
+    title={'Rules files'}
+    searchBarProps={{ buttonOptions: buttonOptions }}
+    description={`From here you can manage your rules files.`}
+    tableColumns={columns}
+    tableInitialSortingField={'filename'}
+    searchTable={true}
+    searchBarSuggestions={searchBarSuggestions}
+    endpoint={'/rules/files'}
+    isExpandable={true}
+    downloadCsv={true}
+    showReload={true}
+    filters={filters}
+    onFiltersChange={updateFilters}
+    tablePageSizeOptions={[10, 25, 50, 100]}
+  />
+
+const RulesFlyoutTable = ({
+  actionButtons,
+  buttonOptions,
+  columns,
+  searchBarSuggestions,
+  filters,
+  updateFilters,
+  getRowProps,
+  isFlyoutVisible,
+  currentItem,
+  closeFlyout,
+  cleanFilters,
+  ...props
+}) => <>
+    <TableWzAPI
+      actionButtons={actionButtons}
+      title={'Rules'}
+      searchBarProps={{ buttonOptions: buttonOptions }}
+      description={`From here you can manage your rules.`}
+      tableColumns={columns}
+      tableInitialSortingField={'id'}
+      searchTable={true}
+      searchBarSuggestions={searchBarSuggestions}
+      endpoint={'/rules'}
+      isExpandable={true}
+      rowProps={getRowProps}
+      downloadCsv={true}
+      showReload={true}
+      filters={filters}
+      onFiltersChange={updateFilters}
+      tablePageSizeOptions={[10, 25, 50, 100]}
+    />
+    {isFlyoutVisible && (
+      <FlyoutDetail
+        item={currentItem}
+        closeFlyout={closeFlyout}
+        showViewInEvents={true}
+        outsideClickCloses={true}
+        filters={filters}
+        onFiltersChange={updateFilters}
+        cleanFilters={cleanFilters}
+        {...props}
+      />
+    )}
+  </>
+
+/**
+ * Main
+ */
 function RulesetTable(props) {
   const [filters, setFilters] = useState([]);
   const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
@@ -140,65 +217,32 @@ function RulesetTable(props) {
 
   const actionButtons = buildActionButtons();
 
-  /**
-   * Render tables
-   */
-  const FilesTable = <TableWzAPI
-    actionButtons={actionButtons}
-    title={'Rules files'}
-    searchBarProps={{ buttonOptions: buttonOptions }}
-    description={`From here you can manage your rules files.`}
-    tableColumns={columns}
-    tableInitialSortingField={'filename'}
-    searchTable={true}
-    searchBarSuggestions={apiSuggestsItems.files}
-    endpoint={'/rules/files'}
-    isExpandable={true}
-    downloadCsv={true}
-    showReload={true}
-    filters={filters}
-    onFiltersChange={updateFilters}
-    tablePageSizeOptions={[10, 25, 50, 100]}
-  />
-
-  const RulesTable = <>
-    <TableWzAPI
-      actionButtons={actionButtons}
-      title={'Rules'}
-      searchBarProps={{ buttonOptions: buttonOptions }}
-      description={`From here you can manage your rules.`}
-      tableColumns={columns}
-      tableInitialSortingField={'id'}
-      searchTable={true}
-      searchBarSuggestions={apiSuggestsItems.items}
-      endpoint={'/rules'}
-      isExpandable={true}
-      rowProps={getRowProps}
-      downloadCsv={true}
-      showReload={true}
-      filters={filters}
-      onFiltersChange={updateFilters}
-      tablePageSizeOptions={[10, 25, 50, 100]}
-    />
-    {isFlyoutVisible && (
-      <FlyoutDetail
-        item={currentItem}
-        closeFlyout={closeFlyout}
-        // type="Ruleset"
-        // view="inventory"
-        showViewInEvents={true}
-        outsideClickCloses={true}
-        filters={filters}
-        onFiltersChange={updateFilters}
-        cleanFilters={cleanFilters}
-        {...props}
-      />
-    )}
-  </>
-
   return (
     <div className="wz-inventory">
-      {showingFiles ? FilesTable : RulesTable}
+      {showingFiles ? (
+        <FilesTable
+          actionButtons={actionButtons}
+          buttonOptions={buttonOptions}
+          columns={columns}
+          searchBarSuggestions={apiSuggestsItems.files}
+          filters={filters}
+          updateFilters={updateFilters}
+        />
+      ) : (
+          <RulesFlyoutTable
+            actionButtons={actionButtons}
+            buttonOptions={buttonOptions}
+            columns={columns}
+            searchBarSuggestions={apiSuggestsItems.items}
+            filters={filters}
+            updateFilters={updateFilters}
+            getRowProps={getRowProps}
+            isFlyoutVisible={isFlyoutVisible}
+            currentItem={currentItem}
+            closeFlyout={closeFlyout}
+            cleanFilters={cleanFilters}
+          />
+        )}
     </div>
   );
 
