@@ -10,6 +10,7 @@ os_versions=(
 osd_versions=(
 	'1.2.0'
 	'2.0.0'
+	'2.0.1'
 )
 
 usage() {
