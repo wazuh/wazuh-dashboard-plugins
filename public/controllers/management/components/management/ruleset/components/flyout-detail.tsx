@@ -23,10 +23,12 @@ export const FlyoutDetail = ({ isLoading, item, title, closeFlyout, filters, ...
   return (
     <WzFlyout
       onClose={() => closeFlyout()}
-      size="l"
-      aria-labelledby={title}
-      maxWidth="70%"
-      className="wz-inventory wzApp wz-ruleset-flyout"
+      flyoutProps={{
+        size: "l",
+        'aria-labelledby': title,
+        maxWidth: "70%",
+        className: "wz-inventory wzApp wz-ruleset-flyout",
+      }}
     >
       {item && !isLoading && <>
           <WzRuleInfo item={item} closeFlyout={closeFlyout} {...rest} filters={filters} />
