@@ -10,6 +10,7 @@ elastic_versions=(
 	"7.17.2"
 	"7.17.3"
 	"7.17.4"
+	"7.17.5"
 )
 
 wazuh_api_version=(
@@ -76,9 +77,7 @@ export KIBANA_PASSWORD=${PASSWORD:-SecretPassword}
 export CLUSTER_NAME=cluster
 export LICENSE=basic # or trial
 export KIBANA_PORT=${PORT:-5601}
-export COMPOSE_PROJECT_NAME=es-rel-$STACK_VERSION
-
-export COMPOSE_PROJECT_NAME=es-pre-$STACK_VERSION
+export COMPOSE_PROJECT_NAME=es-pre-$ES_VERSION
 
 case "$3" in
 	up)
@@ -86,12 +85,12 @@ case "$3" in
 		docker compose -f pre.yml up -Vd
 
 		# This installs Wazuh and integrates with a default elastic stack
-		v=$( echo -n $STACK_VERSION | sed 's/\.//g' )
-		echo Install Wazuh ${WAZUH_STACK} into Elastic ${STACK_VERSION} manually with:
-		echo docker cp wazuh_kibana-4.3.${patch_version}_${STACK_VERSION}-1.zip elastic-${v}_kibana_1:/tmp
-		echo docker exec -ti  elastic-${v}_kibana_1  /usr/share/kibana/bin/kibana-plugin install file:///tmp/wazuh_kibana-4.3.${patch_version}_${STACK_VERSION}-1.zip
-		echo docker restart elastic-${v}_kibana_1
-		echo docker cp ./config/kibana/wazuh.yml elastic-${v}_kibana_1:/usr/share/kibana/data/wazuh/config/
+		v=$( echo -n $ES_VERSION | sed 's/\.//g' )
+		echo Install Wazuh ${WAZUH_STACK} into Elastic $ES_VERSION} manually with:
+		echo docker cp wazuh_kibana-4.3.${patch_version}_${ES_VERSION}-1.zip es-pre-${v}-kibana-1:/tmp
+		echo docker exec -ti  es-pre-${v}-kibana-1  /usr/share/kibana/bin/kibana-plugin install file:///tmp/wazuh_kibana-4.3.${patch_version}_${elastic}-1.zip
+		echo docker restart es-pre-${v}-kibana-1
+		echo docker cp ./config/kibana/wazuh.yml es-pre-${v}-kibana-1:/usr/share/kibana/data/wazuh/config/
 		;;
 	down)
 		# delete volumes

@@ -6,6 +6,7 @@ versions=(
 	"4.3.2"
 	"4.3.3"
 	"4.3.4"
+	"4.3.5"
 	)
 
 wazuh_api_version=(
@@ -67,7 +68,7 @@ EOF
 
 export WAZUH_STACK=${1}
 export KIBANA_PORT=5601
-export COMPOSE_PROJECT_NAME=wazuh-pre-${WAZUH_STACK}
+export COMPOSE_PROJECT_NAME=wz-pre-${WAZUH_STACK}
 
 case "$3" in
 	up)
@@ -80,22 +81,22 @@ case "$3" in
 		echo Install Wazuh ${WAZUH_STACK}  manually with:
 		echo
 		echo 1. Uninstall current version of wazuh app
-		echo docker exec -ti wazuh-${v}_wazuh.dashboard_1  /usr/share/wazuh-dashboard/bin/opensearch-dashboards-plugin remove wazuh
+		echo docker exec -ti wz-pre-${v}-wazuh.dashboard-1  /usr/share/wazuh-dashboard/bin/opensearch-dashboards-plugin remove wazuh
 		echo
 		echo 2. Restart wazuh-dashboard
-		echo docker restart wazuh-${v}_wazuh.dashboard_1
+		echo docker restart wz-pre-${v}-wazuh.dashboard-1
 		echo
 		echo 3. Copy the pre-release pacakge to the running wazuh-dashboard container
-		echo docker cp wazuh-4.3.${patch_version}-1.zip wazuh--${v}_wazuh.dashboard_1:/tmp
+		echo docker cp wazuh-4.3.${patch_version}-1.zip wz-pre-${v}-wazuh.dashboard-1:/tmp
 		echo
 		echo 4. Install the the package we have just uploaded
-		echo docker exec -ti  wazuh-${v}_wazuh.dashboard_1  /usr/share/wazuh-dashboard/bin/opensearch-dashboards-plugin install file:///tmp/wazuh--4.3.${patch_version}-1.zip
+		echo docker exec -ti  wz-pre-${v}-wazuh.dashboard-1  /usr/share/wazuh-dashboard/bin/opensearch-dashboards-plugin install file:///tmp/wazuh--4.3.${patch_version}-1.zip
 		echo
 		echo 5. Restart the wazuh-dashboard container
-		echo docker restart wazuh-${v}_wazuh.dashboard_1
+		echo docker restart wz-pre-${v}-wazuh.dashboard-1
 		echo
 		echo 6. Upload the wazuh app configuration
-		echo docker cp ./config/kibana/wazuh.yml wazuh-${v}_wazuh.dashboard_1:/usr/share/wazuh-dashboard/data/wazuh/config/
+		echo docker cp ./config/kibana/wazuh.yml wz-pre-${v}-wazuh.dashboard-1:/usr/share/wazuh-dashboard/data/wazuh/config/
 		echo
 		echo 7. Access the running instance in
 		echo http://localhost:${KIBANA_PORT}

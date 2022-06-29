@@ -10,6 +10,7 @@ elastic_versions=(
 	"7.17.2"
 	"7.17.3"
 	"7.17.4"
+	"7.17.5"
 )
 
 wazuh_versions=(
@@ -18,6 +19,7 @@ wazuh_versions=(
 	"4.3.2"
 	"4.3.3"
 	"4.3.4"
+	"4.3.5"
 )
 
 usage() {
@@ -56,7 +58,7 @@ export KIBANA_PASSWORD=${PASSWORD:-SecretPassword}
 export CLUSTER_NAME=cluster
 export LICENSE=basic # or trial
 export KIBANA_PORT=${PORT:-5601}
-export COMPOSE_PROJECT_NAME=es-rel-$STACK_VERSION
+export COMPOSE_PROJECT_NAME=es-rel-$ES_VERSION
 
 case "$3" in
 	up)
@@ -64,12 +66,15 @@ case "$3" in
 		docker compose -f rel.yml up -Vd
 
 		# This installs Wazuh and integrates with a default elastic stack
-		v=$( echo -n $STACK_VERSION | sed 's/\.//g' )
+		v=$( echo -n $ES_VERSION | sed 's/\.//g' )
 		echo
-		echo Install Wazuh ${WAZUH_STACK} into Elastic ${STACK_VERSION} manually with:
+		echo Install Wazuh ${WAZUH_VERSION} into Elastic ${ES_VERSION} manually with:
 		echo
-		echo docker exec -ti  elastic-${v}_kibana_1  /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-${WAZUH_STACK}_${STACK_VERSION}-1.zip
-		echo docker restart elastic-${v}_kibana_1
+		echo 1. Install wazuh kibana app
+		echo docker exec -ti  es-rel-${v}-kibana-1  /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-${WAZUH_VERSION}_${ES_VERSION}-1.zip
+		echo 2. Restart Kibana
+		echo docker restart elastic-${v}-kibana-1
+		echo 3. Configure kibana
 		echo docker cp ./config/kibana/wazuh.yml elastic-${v}_kibana_1:/usr/share/kibana/data/wazuh/config/
 		;;
 	down)
