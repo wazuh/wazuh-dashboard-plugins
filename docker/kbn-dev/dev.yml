@@ -1,15 +1,15 @@
 version: "2.2"
 
-# x-logging: &logging
-#   logging:
-#     driver: loki
-#     options:
-#       loki-url: "http://host.docker.internal:3100/loki/api/v1/push"
+x-logging: &logging
+  logging:
+    driver: loki
+    options:
+      loki-url: "http://host.docker.internal:3100/loki/api/v1/push"
 
 services:
   exporter:
     image: quay.io/prometheuscommunity/elasticsearch-exporter:latest
-    # <<: *logging
+    <<: *logging
     hostname: "exporter-kbn-${ES_VERSION}"
     networks:
       - es-dev
@@ -25,7 +25,7 @@ services:
     networks:
       - es-dev
       - mon
-    # <<: *logging
+    <<: *logging
     environment:
       - JAVA_OPTS="-Xmx512m -Xss512k -Dfile.encoding=UTF-8 -XX:MaxRAM=800m -XX:MaxRAMPercentage=95 -XX:MinRAMPercentage=60A"
       - MALLOC_ARENA_MAX=1
@@ -41,7 +41,7 @@ services:
     user: "0:0"
     networks:
       - es-dev
-    # <<: *logging
+    <<: *logging
     restart: always
     entrypoint:
       - '/bin/bash'
@@ -52,6 +52,7 @@ services:
         echo ${ELASTIC_PASSWORD}| filebeat keystore add password --stdin --force
         curl -so /etc/filebeat/wazuh-template.json https://raw.githubusercontent.com/wazuh/wazuh/4.3/extensions/elasticsearch/7.x/wazuh-template.json
         curl -s https://packages.wazuh.com/4.x/filebeat/wazuh-filebeat-0.2.tar.gz | tar -xvz -C /usr/share/filebeat/module
+        chmod go-w /usr/share/filebeat/filebeat.yml
         chmod go-w /usr/share/filebeat/filebeat.yml
         filebeat setup -e
         filebeat
@@ -126,7 +127,7 @@ services:
     image: docker.elastic.co/elasticsearch/elasticsearch:${ES_VERSION}
     networks:
       - es-dev
-    # <<: *logging
+    <<: *logging
     volumes:
       - certs:/usr/share/elasticsearch/config/certs
       - esdata01:/usr/share/elasticsearch/data

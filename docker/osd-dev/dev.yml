@@ -142,6 +142,7 @@ services:
         echo ${PASSWORD}| filebeat keystore add password --stdin --force
         curl -so /etc/filebeat/wazuh-template.json https://raw.githubusercontent.com/wazuh/wazuh/4.3/extensions/elasticsearch/7.x/wazuh-template.json
         curl -s https://packages.wazuh.com/4.x/filebeat/wazuh-filebeat-0.2.tar.gz | tar -xvz -C /usr/share/filebeat/module
+        chmod go-w /usr/share/filebeat/filebeat.yml
         filebeat setup -e
         filebeat
       '
@@ -170,8 +171,6 @@ services:
       - certs:/home/node/kbn/certs/
       - ./config/osd/opensearch_dashboards.yml:/home/node/kbn/config/opensearch_dashboards.yml
       - ./config/osd/wazuh.yml:/home/node/kbn/data/wazuh/config/wazuh.yml
-    depends_on:
-      - os1
 
 networks:
   networks:
