@@ -15,7 +15,7 @@ import {
   WzFlyout,
 } from '../../../../../../components/common/flyouts';
 import WzDecoderInfo from '../views/decoder-info';
-import './flyout-detail.scss'
+import '../../common/flyout-detail.scss'
 
 export const FlyoutDetail = ({ item, title, closeFlyout, filters, ...rest }) => {
   return (
