@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { connect } from 'react-redux';
 
 // Eui components
 import {
@@ -27,7 +26,6 @@ function WzCDBListsOverview(props) {
   const updateRestartManagers = (showWarningRestart) => {
     setShowWarningRestart(showWarningRestart);
   }
-  
 
   const { clusterStatus } = props;
   return <EuiPage style={{ background: 'transparent' }}>

@@ -11,7 +11,6 @@
  */
 import React, { Component } from 'react';
 // Redux
-import store from '../../../../../redux/store';
 import WzReduxProvider from '../../../../../redux/wz-redux-provider';
 //Wazuh ruleset tables(rules, decoder, lists)
 import WzRulesetOverview from './views/ruleset-overview';
@@ -22,22 +21,12 @@ import { SECTION_RULES_SECTION } from '../common/constants';
 
 
 export default class WzRuleset extends Component {
-  _isMount = false;
   constructor(props) {
     super(props);
     this.state = {
       fileContent: false,
       addingFile: false
-    }; //Init state empty to avoid fails when try to read any parameter and this.state is not defined yet
-    this.store = store;
-  }
-
-  UNSAFE_componentWillMount() {
-    this._isMount = true;
-  }
-
-  componentWillUnmount() {
-    this._isMount = false;
+    };
   }
 
   render() {

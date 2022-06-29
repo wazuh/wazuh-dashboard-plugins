@@ -134,7 +134,6 @@ export function TableWzAPI({ actionButtons, ...rest }: {
           wrap
           justifyContent={'flexEnd'}
           alignItems={'center'}
-          // gutterSize={'s'}
         >
           {/* Render optional custom action button */}
           {renderActionButtons}

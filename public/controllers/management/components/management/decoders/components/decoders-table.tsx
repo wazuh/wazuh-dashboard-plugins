@@ -28,6 +28,83 @@ import {
 
 import apiSuggestsItems from './decoders-suggestions';
 
+/**
+ * Render tables
+ */
+const FilesTable = ({
+  actionButtons,
+  buttonOptions,
+  columns,
+  searchBarSuggestions,
+  filters,
+  updateFilters,
+}) => <TableWzAPI
+    actionButtons={actionButtons}
+    title={'Decoders files'}
+    searchBarProps={{ buttonOptions: buttonOptions }}
+    description={`From here you can manage your decoders files.`}
+    tableColumns={columns}
+    tableInitialSortingField={'filename'}
+    searchTable={true}
+    searchBarSuggestions={searchBarSuggestions}
+    endpoint={'/decoders/files'}
+    isExpandable={true}
+    downloadCsv={true}
+    showReload={true}
+    filters={filters}
+    onFiltersChange={updateFilters}
+    tablePageSizeOptions={[10, 25, 50, 100]}
+  />
+
+const DecodersFlyoutTable = ({
+  actionButtons,
+  buttonOptions,
+  columns,
+  searchBarSuggestions,
+  getRowProps,
+  filters,
+  updateFilters,
+  isFlyoutVisible,
+  currentItem,
+  closeFlyout,
+  cleanFilters,
+  ...props
+}) => <>
+    <TableWzAPI
+      actionButtons={actionButtons}
+      title={'Decoders'}
+      searchBarProps={{ buttonOptions: buttonOptions }}
+      description={`From here you can manage your decoders.`}
+      tableColumns={columns}
+      tableInitialSortingField={'filename'}
+      searchTable={true}
+      searchBarSuggestions={searchBarSuggestions}
+      endpoint={'/decoders'}
+      isExpandable={true}
+      rowProps={getRowProps}
+      downloadCsv={true}
+      showReload={true}
+      filters={filters}
+      onFiltersChange={updateFilters}
+      tablePageSizeOptions={[10, 25, 50, 100]}
+    />
+    {isFlyoutVisible && (
+      <FlyoutDetail
+        item={currentItem}
+        closeFlyout={closeFlyout}
+        showViewInEvents={true}
+        outsideClickCloses={true}
+        filters={filters}
+        onFiltersChange={updateFilters}
+        cleanFilters={cleanFilters}
+        {...props}
+      />
+    )}
+  </>
+
+/**
+ * Main
+ */
 export default compose(
   withUserPermissions
 )(function DecodersTable(props) {
@@ -128,64 +205,32 @@ export default compose(
 
   const actionButtons = buildActionButtons();
 
-  /**
-   * Render tables
-   */
-  const FilesTable = <TableWzAPI
-    actionButtons={actionButtons}
-    title={'Decoders files'}
-    searchBarProps={{ buttonOptions: buttonOptions }}
-    description={`From here you can manage your decoders files.`}
-    tableColumns={columns}
-    tableInitialSortingField={'filename'}
-    searchTable={true}
-    searchBarSuggestions={apiSuggestsItems.files}
-    endpoint={'/decoders/files'}
-    isExpandable={true}
-    downloadCsv={true}
-    showReload={true}
-    filters={filters}
-    onFiltersChange={updateFilters}
-    tablePageSizeOptions={[10, 25, 50, 100]}
-  />
-
-  const DecodersTable = <>
-    <TableWzAPI
-      actionButtons={actionButtons}
-      title={'Decoders'}
-      searchBarProps={{ buttonOptions: buttonOptions }}
-      description={`From here you can manage your decoders.`}
-      tableColumns={columns}
-      tableInitialSortingField={'filename'}
-      searchTable={true}
-      searchBarSuggestions={apiSuggestsItems.items}
-      endpoint={'/decoders'}
-      isExpandable={true}
-      rowProps={getRowProps}
-      downloadCsv={true}
-      showReload={true}
-      filters={filters}
-      onFiltersChange={updateFilters}
-      tablePageSizeOptions={[10, 25, 50, 100]}
-    />
-    {isFlyoutVisible && (
-      <FlyoutDetail
-        item={currentItem}
-        closeFlyout={closeFlyout}
-        showViewInEvents={true}
-        outsideClickCloses={true}
-        filters={filters}
-        onFiltersChange={updateFilters}
-        cleanFilters={cleanFilters}
-        {...props}
-      />
-    )}
-  </>
-
   return (
     <div className="wz-inventory">
-      {showingFiles ? FilesTable : DecodersTable}
+      {showingFiles ? (
+        <FilesTable
+          actionButtons={actionButtons}
+          buttonOptions={buttonOptions}
+          columns={columns}
+          searchBarSuggestions={apiSuggestsItems.files}
+          filters={filters}
+          updateFilters={updateFilters}
+        />
+      ) : (
+          <DecodersFlyoutTable
+            actionButtons={actionButtons}
+            buttonOptions={buttonOptions}
+            columns={columns}
+            searchBarSuggestions={apiSuggestsItems.items}
+            filters={filters}
+            updateFilters={updateFilters}
+            getRowProps={getRowProps}
+            isFlyoutVisible={isFlyoutVisible}
+            currentItem={currentItem}
+            closeFlyout={closeFlyout}
+            cleanFilters={cleanFilters}
+          />
+        )}
     </div>
   );
-
 });
