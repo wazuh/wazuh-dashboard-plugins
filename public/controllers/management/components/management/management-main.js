@@ -13,7 +13,7 @@ import React, { Component, Fragment } from 'react';
 // Redux
 import store from '../../../../redux/store';
 
-import { updateRulesetSection } from '../../../../redux/actions/rulesetActions';
+import { updateManagementSection } from '../../../../redux/actions/managementActions';
 import WzRuleset from './ruleset/main-ruleset';
 import WzCDBLists from './cdblists/main-cdblists';
 import WzDecoders from './decoders/main-decoders';
@@ -34,11 +34,11 @@ class WzManagementMain extends Component {
     this.store = store;
   }
   UNSAFE_componentWillMount() {
-    this.props.updateRulesetSection(this.props.section);
+    this.props.updateManagementSection(this.props.section);
   }
 
   componentWillUnmount() {
-    store.dispatch(updateRulesetSection(''));
+    store.dispatch(updateManagementSection(''));
   }
 
   componentDidMount() {
@@ -106,7 +106,7 @@ function mapStateToProps(state) {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    updateRulesetSection: (section) => dispatch(updateRulesetSection(section)),
+    updateManagementSection: (section) => dispatch(updateManagementSection(section)),
     updateClusterStatus: (clusterStatus) => dispatch(updateClusterStatus(clusterStatus)),
   };
 };
