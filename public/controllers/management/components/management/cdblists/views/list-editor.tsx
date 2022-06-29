@@ -637,4 +637,4 @@ const mapDispatchToProps = (dispatch) => {
   };
 };
 
-export default connect(mapDispatchToProps)(WzListEditor);
+export default connect(null, mapDispatchToProps)(WzListEditor);
