@@ -1,4 +1,4 @@
-.wz-ruleset-flyout {
+.wz-decoders-flyout {
   .flyout-header {
     padding-right: 42px;
   }
@@ -9,5 +9,8 @@
 
   .euiFlyoutBody__overflow {
     padding-top: 3px;
+  }
+  .euiAccordion__children-isLoading {
+    line-height: inherit;
   }
 }

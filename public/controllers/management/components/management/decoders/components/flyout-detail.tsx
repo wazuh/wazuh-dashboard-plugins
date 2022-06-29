@@ -12,25 +12,25 @@
 
 import React from 'react';
 import {
-  EuiFlyout,
-} from '@elastic/eui';
+  WzFlyout,
+} from '../../../../../../components/common/flyouts';
 import WzDecoderInfo from '../views/decoder-info';
 import './flyout-detail.scss'
 
 export const FlyoutDetail = ({ item, title, closeFlyout, filters, ...rest }) => {
-
-  
   return (
-    <EuiFlyout
+    <WzFlyout
       onClose={() => closeFlyout()}
-      size="l"
-      aria-labelledby={title}
-      maxWidth="70%"
-      className="wz-inventory wzApp wz-ruleset-flyout"
+      flyoutProps={{
+        size: "l",
+        'aria-labelledby': title,
+        maxWidth: "70%",
+        className: "wz-inventory wzApp wz-decoders-flyout",
+      }}
     >
       {item && <>
           <WzDecoderInfo item={item} closeFlyout={closeFlyout} {...rest} filters={filters} />
       </>}
-    </EuiFlyout>
+    </WzFlyout>
   );
 }
