@@ -1,7 +1,7 @@
 # Frontend development environment
 
-Install [Docker Desktop][0] as perits instructions. It works for Linux too.
-This ensures the developmentexperience between Linux, Mac and Windows is as
+Install [Docker Desktop][0] as per its instructions. It works for Linux too.
+This ensures that the development experience between Linux, Mac and Windows is as
 similar as posible.
 
 In general the environment consist of:
@@ -39,27 +39,37 @@ In general the environment consist of:
 ## Starting up the environments
 
 Choose one of the [environments](#environments) available and use the `sh` script
-to up the environment. Each script will guide you on how to use it, which parameters it needs, and what values are accepted for each parameter.
+to up the environment. Each script will guide you on how to use it, which parameters 
+it needs, and what values are accepted for each parameter.
 
 To see the usage of each script, just run it with no parameters.
 
 Example:
 
-This brings up a Dev environment for opensearh `1.2.4` and opensearch-dashboards `1.2.0`, with the `wazuh-kibana-app` development branch set up at `~/src/w/app`/:
+This brings up a Dev environment for OpenSearch `1.2.4` and opensearch-dashboards 
+`1.2.0`, with the `wazuh-kibana-app` development branch set up at 
+`~/your/path/to/wazuh_kibana_app`:
 
 ```bash
-./dev.sh 1.2.4 1.2.0 ~/src/w/app/ up
+./dev.sh 1.2.4 1.2.0 ~/your/path/to/wazuh_kibana_app up
 ```
 
-You can save this path as an environment variable on your system.
+You can save this path as an environment variable on your system, for example, 
+by exporting this path on your `.bashrc`, `.zhsrc` or similiar.
 
-Once the containers are up, attach a shell to the development container, move to
-the `kbn\plugins\wazuh` and run `yarn` to install the dependencies of the project.
-After that, move back to the root folder of the platform and run `yarn start` to
-start the App.
+```bash
+# ./bashrc
+export WZ_HOME=~/your/path/to/wazuh_kibana_app
+```
 
-The dependencies of the platform (Kibana \ OSD) are already installed, but it might take a while to optimize all the bundles. We migh include the cache in the image in the future.
+Once the containers are up, **attach a shell to the development container**, 
+move to the `kbn\plugins\wazuh` and run `yarn` to install the dependencies of 
+the project. After that, move back to the root folder of the platform and run 
+`yarn start` to start the App.
 
+The dependencies of the platform (Kibana \ OSD) are already installed, but it 
+might take a while to optimize all the bundles. We might include the cache in the 
+image in the future.
 
 ### Wrong user permissions
 
