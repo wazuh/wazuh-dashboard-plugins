@@ -35,6 +35,7 @@ export default class WzRuleset extends Component {
             listContent={listContent}
             clusterStatus={this.props.clusterStatus}
             clearContent={() => { this.setState({ listContent: false }) }}
+            updateListContent={(listContent) => { this.setState({ listContent }) }}
           />) ||
           <WzCDBListsOverview
             clusterStatus={this.props.clusterStatus}
