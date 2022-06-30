@@ -73,9 +73,9 @@ case "$3" in
 		echo 1. Install wazuh kibana app
 		echo docker exec -ti  es-rel-${v}-kibana-1  /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-${WAZUH_VERSION}_${ES_VERSION}-1.zip
 		echo 2. Restart Kibana
-		echo docker restart elastic-${v}-kibana-1
+		echo docker restart es-rel-${v}-kibana-1
 		echo 3. Configure kibana
-		echo docker cp ./config/kibana/wazuh.yml elastic-${v}_kibana_1:/usr/share/kibana/data/wazuh/config/
+		echo docker cp ./config/kibana/wazuh.yml es-rel-${v}-kibana-1:/usr/share/kibana/data/wazuh/config/
 		;;
 	down)
 		# delete volumes
