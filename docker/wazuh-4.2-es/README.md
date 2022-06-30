@@ -162,7 +162,7 @@ Please take into account that the API version for this environment will always
 be a 4.3.X version. Also consider that our application version must be the same 
 as the one selected here.
 
-### Install a compatible wazuh
+### Install a compatible Wazuh
 
 The same approach used by the production environment is used in the pre-release 
 package.
