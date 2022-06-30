@@ -17,17 +17,16 @@ import WzConfigurationSettingsTabSelector from '../util-components/configuration
 import withWzConfig from '../util-hocs/wz-config';
 import WzNoConfig from '../util-components/no-config';
 import { isString, renderValueNoThenEnabled } from '../utils/utils';
+import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
 const helpLinks = [
   {
     text: 'How to use the registration service',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/registering/simple-registration-method.html'
+    href: webDocumentationLink('user-manual/agent-enrollment/index.html')
   },
   {
     text: 'Registration service reference',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/auth.html'
+    href: webDocumentationLink('user-manual/reference/ossec-conf/auth.html')
   }
 ];
 

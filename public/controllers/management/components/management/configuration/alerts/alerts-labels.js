@@ -22,6 +22,7 @@ import { isString, hasSize } from '../utils/utils';
 
 import { compose } from 'redux';
 import { connect } from 'react-redux';
+import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
 const columns = [
   { field: 'key', name: 'Label key' },
@@ -32,13 +33,11 @@ const columns = [
 const helpLinks = [
   {
     text: 'Labels documentation',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/capabilities/labels.html'
+    href: webDocumentationLink('user-manual/capabilities/labels.html')
   },
   {
     text: 'Labels reference',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/labels.html'
+    href: webDocumentationLink('user-manual/reference/ossec-conf/labels.html')
   }
 ];
 
