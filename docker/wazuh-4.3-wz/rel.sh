@@ -6,6 +6,7 @@ versions=(
 	"4.3.2"
 	"4.3.3"
 	"4.3.4"
+	"4.3.5"
 	)
 
 usage() {
@@ -31,19 +32,19 @@ fi
 
 export WAZUH_STACK=${1}
 export KIBANA_PORT=5601
-export COMPOSE_PROJECT_NAME=wazuh-rel-${WAZUH_STACK}
+export COMPOSE_PROJECT_NAME=wz-rel-${WAZUH_STACK}
 
 case "$2" in
 	up)
 		# recreate volumes
-		docker-compose -f rel.yml up -Vd
+		docker compose -f rel.yml up -Vd
 		;;
 	down)
 		# delete volumes
-		docker-compose -f rel.yml down -v --remove-orphans
+		docker compose -f rel.yml down -v --remove-orphans
 		;;
 	stop)
-		docker-compose -f rel.yml stop
+		docker compose -f rel.yml stop
 		;;
 	*)
 		echo "Action must be either up or down"
