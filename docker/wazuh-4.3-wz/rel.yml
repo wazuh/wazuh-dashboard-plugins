@@ -14,21 +14,15 @@ services:
     volumes:
       - ./config/wazuh_indexer_ssl_certs/:/certificates/
       - ./config/certs.yml:/config/certs.yml
-    # hack to fix permissions of the certificates
-    healthcheck:
-      test: ["CMD-SHELL", "chmod 755 /certificates && chmod 644 /certificates/* && [ -f certificates/wazuh.indexer.pem ]"]
-      interval: 1s
-      timeout: 5s
-      retries: 120
+
 
   wazuh.manager:
     depends_on:
-      generator:
-        condition: service_healthy
+      - generator
     image: wazuh/wazuh-manager:${WAZUH_STACK}
     hostname: wazuh.manager
     networks:
-      - wzd-rel
+      - wz-rel
     <<: *logging
     restart: always
     environment:
@@ -60,12 +54,11 @@ services:
 
   wazuh.indexer:
     depends_on:
-      generator:
-        condition: service_healthy
+      - generator
     image: wazuh/wazuh-indexer:${WAZUH_STACK}
     hostname: wazuh.indexer
     networks:
-      - wzd-rel
+      - wz-rel
     <<: *logging
     restart: always
     environment:
@@ -90,8 +83,10 @@ services:
   wazuh.dashboard:
     image: wazuh/wazuh-dashboard:${WAZUH_STACK}
     hostname: wazuh.dashboard
+    depends_on:
+      - generator
     networks:
-      - wzd-rel
+      - wz-rel
     <<: *logging
     restart: always
     ports:
@@ -116,7 +111,7 @@ services:
     <<: *logging
     hostname: "exporter"
     networks:
-      - wzd-rel
+      - wz-rel
       - mon
     command:
       - '--es.uri=https://admin:SecretPassowrd@wazuh-indexer:9200'
@@ -125,8 +120,8 @@ services:
 
 networks:
   networks:
-  wzd-rel:
-    name: wzd-rel-${WAZUH_STACK}
+  wz-rel:
+    name: wz-rel-${WAZUH_STACK}
     driver: bridge
   mon:
     external: true
