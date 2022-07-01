@@ -3,15 +3,12 @@ import React, { Component } from 'react';
 import {
   EuiFlexGroup,
   EuiFlexItem,
-  // EuiPanel,
   EuiFlyoutHeader,
   EuiFlyoutBody,
-  // EuiButtonIcon,
   EuiTitle,
   EuiToolTip,
   EuiBadge,
   EuiSpacer,
-  // EuiLoadingContent,
   EuiLink,
   EuiAccordion,
   EuiFlexGrid,
@@ -268,7 +265,10 @@ export default class WzRuleInfo extends Component {
    * Clean the existing filters and sets the new ones and back to the previous section
    */
   setNewFiltersAndBack(filters) {
-    window.location.href = window.location.href.replace(new RegExp('redirectRule=' + '[^&]*'), '');
+    window.history.pushState("",
+      window.document.title,
+      window.location.href.replace(new RegExp('&redirectRule=' + '[^&]*'), '')
+    );
     this.props.cleanFilters();
     this.props.onFiltersChange(filters);
     this.props.closeFlyout();
