@@ -10,9 +10,14 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { TableWzAPI } from '../../../../../../components/common/tables';
-import { ResourcesHandler, resourceDictionary } from '../../common/resources-handler';
+import { getToasts } from '../../../../../../kibana-services';
+import { resourceDictionary, ResourcesConstants, ResourcesHandler } from '../../common/resources-handler';
+import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
+import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
+
 import { SECTION_CDBLIST_SECTION, SECTION_CDBLIST_KEY } from '../../common/constants';
 import CDBListsColumns from './columns';
 
@@ -31,7 +36,10 @@ import apiSuggestsItems from './cdblists-suggestions';
 function CDBListsTable(props) {
   const [filters, setFilters] = useState([]);
   const [showingFiles, setShowingFiles] = useState(false);
-  const resourcesHandler = new ResourcesHandler(SECTION_CDBLIST_SECTION);
+  const [tableFootprint, setTableFootprint] = useState(0);
+
+  const resourcesHandler = new ResourcesHandler(ResourcesConstants.LISTS);
+
   const updateFilters = (filters) => {
     setFilters(filters);
   }
@@ -42,14 +50,20 @@ function CDBListsTable(props) {
 
 
   const getColumns = () => {
-    const cdblistsColumns = new CDBListsColumns({ state: {
-      section: SECTION_CDBLIST_KEY,
-      defaultItems: []
-    }, ...props}).columns;
+    const cdblistsColumns = new CDBListsColumns({
+      removeItems: removeItems,
+      state: {
+        section: SECTION_CDBLIST_KEY,
+        defaultItems: []
+      }, ...props
+    }).columns;
     const columns = cdblistsColumns[SECTION_CDBLIST_KEY];
     return columns;
   }
 
+  /**
+   * Columns and Rows properties
+   */
   const getRowProps = (item) => {
     const { id, name } = item;
 
@@ -70,7 +84,7 @@ function CDBListsTable(props) {
         getRequiredPermissions(item),
         props.userPermissions
       )
-        ? async () => {
+        ? async (ev) => {
           const result = await resourcesHandler.getFileContent(item.filename);
           const file = {
             name: item.filename,
@@ -83,9 +97,45 @@ function CDBListsTable(props) {
     };
   };
 
+  /**
+   * Remove files method
+   */
+  const removeItems = async (items) => {
+    try {
+      const results = items.map(async (item, i) => {
+        await resourcesHandler.deleteFile(item.filename || item.name);
+      });
+
+      Promise.all(results).then((completed) => {
+        setTableFootprint(Date.now());
+        getToasts().add({
+          color: 'success',
+          title: 'Success',
+          text: 'Deleted successfully',
+          toastLifeTimeMs: 3000,
+        });
+      });
+    } catch (error) {
+      const options = {
+        context: `${WzRulesetTable.name}.removeItems`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: `Error deleting item: ${error.message || error}`,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+    }
+  }
+
   const { updateRestartClusterManager, updateListContent } = props;
   const columns = getColumns();
 
+  /**
+   * Build table custom action buttons dynamically based on showing files state
+   */
   const actionButtons = [
     <ManageFiles
       section={SECTION_CDBLIST_SECTION}
@@ -115,6 +165,7 @@ function CDBListsTable(props) {
   return (
     <div className="wz-inventory">
       <TableWzAPI
+        reload={tableFootprint}
         actionButtons={actionButtons}
         title={'CDB Lists'}
         description={`From here you can manage your lists.`}

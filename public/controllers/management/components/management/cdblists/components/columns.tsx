@@ -3,6 +3,7 @@ import { EuiToolTip, EuiButtonIcon, EuiBadge } from '@elastic/eui';
 import { resourceDictionary, ResourcesHandler, ResourcesConstants } from '../../common/resources-handler';
 import exportCsv from '../../../../../../react-services/wz-csv';
 import { WzButtonPermissions } from '../../../../../../components/common/permissions/button';
+import { WzButtonPermissionsModalConfirm } from '../../../../../../components/common/buttons';
 
 export default class CDBListsColumns {
   constructor(props) {
@@ -100,19 +101,26 @@ export default class CDBListsColumns {
                 }}
                 color="primary"
               />
-              <WzButtonPermissions
-                buttonType='icon'
+              <WzButtonPermissionsModalConfirm
+                buttonType="icon"
                 permissions={getDeleteButtonPermissions(item)}
+                tooltip={{ position: 'top', content: (defaultItems.indexOf(`${item.relative_dirname}`) === -1) ? `Delete ${item.filename}` : `The ${item.filename} list cannot be deleted` }}
                 aria-label="Delete file"
                 iconType="trash"
-                tooltip={{ position: 'top', content: (defaultItems.indexOf(`${item.relative_dirname}`) === -1) ? `Delete ${item.filename}` : `The ${item.filename} list cannot be deleted` }}
-                onClick={async (ev) => {
-                  ev.stopPropagation();
-                  this.props.updateListItemsForRemove([item]);
-                  this.props.updateShowModal(true);
-                }}
-                color="danger"
                 isDisabled={defaultItems.indexOf(`${item.relative_dirname}`) !== -1}
+                onConfirm={async (ev) => {
+                  console.log(ev)
+                  this.props.removeItems([item]);
+                }}
+                onCancel={async (ev) => {
+                  console.log(ev)
+                }}
+                onClick={(ev) => { ev.stopPropagation() }}
+                color="danger"
+                modalTitle={'Are you sure?'}
+                modalProps={{
+                  buttonColor: 'danger',
+                }}
               />
               <WzButtonPermissions
                 buttonType='icon'

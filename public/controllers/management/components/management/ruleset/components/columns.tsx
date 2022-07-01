@@ -2,6 +2,7 @@ import React from 'react';
 import { EuiToolTip, EuiBadge } from '@elastic/eui';
 import { resourceDictionary, ResourcesHandler, ResourcesConstants } from '../../common/resources-handler';
 import { WzButtonPermissions } from '../../../../../../components/common/permissions/button';
+import { WzButtonPermissionsModalConfirm } from '../../../../../../components/common/buttons';
 
 export default class RulesetColumns {
   constructor(props) {
@@ -147,18 +148,20 @@ export default class RulesetColumns {
                       }}
                       color="primary"
                     />
-                    <WzButtonPermissions
-                      buttonType='icon'
+                    <WzButtonPermissionsModalConfirm
+                      buttonType="icon"
                       permissions={getDeleteButtonPermissions(item)}
+                      tooltip={{ position: 'top', content: `Remove ${item.filename} file` }}
                       aria-label="Delete file"
                       iconType="trash"
-                      tooltip={{ position: 'top', content: `Remove ${item.filename} file` }}
-                      onClick={ev => {
-                        ev.stopPropagation();
-                        this.props.updateListItemsForRemove([item]);
-                        this.props.updateShowModal(true);
+                      onConfirm={async () => {
+                        this.props.removeItems([item]);
                       }}
                       color="danger"
+                      modalTitle={'Are you sure?'}
+                      modalProps={{
+                        buttonColor: 'danger',
+                      }}
                     />
                   </div>
                 );

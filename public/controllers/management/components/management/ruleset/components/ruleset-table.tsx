@@ -11,8 +11,13 @@
  */
 
 import React, { useEffect, useState, useCallback } from 'react';
+import { getToasts } from '../../../../../../kibana-services';
+import { resourceDictionary, ResourcesConstants, ResourcesHandler } from '../../common/resources-handler';
+import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
+import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
+
 import { TableWzAPI } from '../../../../../../components/common/tables';
-import { resourceDictionary } from '../../common/resources-handler';
 import { SECTION_RULES_SECTION, SECTION_RULES_KEY } from '../../common/constants';
 import RulesetColumns from './columns';
 import { FlyoutDetail } from './flyout-detail';
@@ -22,23 +27,24 @@ import { compose } from 'redux';
 import {
   ManageFiles,
   AddNewFileButton,
-  AddNewCdbListButton,
   UploadFilesButton,
 } from '../../common/actions-buttons'
 
 import apiSuggestsItems from './ruleset-suggestions';
 
-/**
-   * Render tables
-   */
+/***************************************
+ * Render tables 
+ */
 const FilesTable = ({
   actionButtons,
   buttonOptions,
   columns,
   searchBarSuggestions,
   filters,
-  updateFilters
+  updateFilters,
+  reload
 }) => <TableWzAPI
+    reload={reload}
     actionButtons={actionButtons}
     title={'Rules files'}
     searchBarProps={{ buttonOptions: buttonOptions }}
@@ -102,15 +108,17 @@ const RulesFlyoutTable = ({
     )}
   </>
 
-/**
- * Main
+/***************************************
+ * Main component
  */
 function RulesetTable(props) {
   const [filters, setFilters] = useState([]);
   const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
   const [showingFiles, setShowingFiles] = useState(false);
+  const [tableFootprint, setTableFootprint] = useState(0);
 
+  const resourcesHandler = new ResourcesHandler(ResourcesConstants.RULES);
 
   useEffect(() => {
     const regex = new RegExp('redirectRule=' + '[^&]*');
@@ -141,11 +149,46 @@ function RulesetTable(props) {
     setIsFlyoutVisible(false);
   }
 
+
+  /**
+   * Remove files method
+   */
+  const removeItems = async (items) => {
+    try {
+      const results = items.map(async (item, i) => {
+        await resourcesHandler.deleteFile(item.filename || item.name);
+      });
+
+      Promise.all(results).then((completed) => {
+        setTableFootprint(Date.now());
+        getToasts().add({
+          color: 'success',
+          title: 'Success',
+          text: 'Deleted successfully',
+          toastLifeTimeMs: 3000,
+        });
+      });
+    } catch (error) {
+      const options = {
+        context: `${WzRulesetTable.name}.removeItems`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: `Error deleting item: ${error.message || error}`,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+    }
+  }
+
   /**
    * Columns and Rows properties
    */
   const getColumns = () => {
     const rulesetColumns = new RulesetColumns({
+      removeItems: removeItems,
       state: {
         section: SECTION_RULES_KEY
       }, ...props
@@ -223,6 +266,7 @@ function RulesetTable(props) {
           searchBarSuggestions={apiSuggestsItems.files}
           filters={filters}
           updateFilters={updateFilters}
+          reload={tableFootprint}
         />
       ) : (
           <RulesFlyoutTable

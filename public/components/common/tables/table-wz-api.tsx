@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { ReactNode, useCallback, useState } from 'react';
+import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 import {
   EuiTitle,
   EuiLoadingSpinner,
@@ -48,6 +48,7 @@ export function TableWzAPI({ actionButtons, ...rest }: {
   onFiltersChange?: Function,
   showReload?: boolean
   searchBarProps?: any
+  reload?: any
 }) {
 
   const [totalItems, setTotalItems] = useState(0);
@@ -55,8 +56,10 @@ export function TableWzAPI({ actionButtons, ...rest }: {
   const [isLoading, setIsLoading] = useState(false);
   const onFiltersChange = filters => typeof rest.onFiltersChange === 'function' ? rest.onFiltersChange(filters) : null;
 
-  // Changing the reloadFootprint timestamp will trigger reloading the table
-  const [reloadFootprint, setReloadFootprint] = useState(0);
+  /**
+   * Changing the reloadFootprint timestamp will trigger reloading the table
+   */
+  const [reloadFootprint, setReloadFootprint] = useState(rest.reload || 0);
 
 
   const onSearch = useCallback(async function (endpoint, filters, pagination, sorting) {
@@ -102,10 +105,17 @@ export function TableWzAPI({ actionButtons, ...rest }: {
       (typeof actionButtons === 'object') && <EuiFlexItem grow={false}>{actionButtons}</EuiFlexItem>}
   </>)
 
-  // Generate a new reload footprint
+  /**
+   *  Generate a new reload footprint
+   */
   const triggerReload = () => {
     setReloadFootprint(Date.now());
   }
+
+  useEffect(() => {
+    if (rest.reload)
+      triggerReload();
+  }, [rest.reload])
 
   const ReloadButton = () => (
     <EuiFlexItem grow={false}>
