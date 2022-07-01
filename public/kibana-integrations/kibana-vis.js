@@ -109,7 +109,17 @@ class KibanaVis extends Component {
   componentWillUnmount() {
     if (this._isMounted) {
       this._isMounted = false;
-      this.updateVis();
+      // It would be good to continue investigating if it is
+      // necessary for the renderComplete() to be in the
+      // componentWillUnmount.
+      // In the renderComplete() the value of the $rootScope
+      // is changed, which affects the entire application.
+      // 
+      // Related issue:
+      // https://github.com/wazuh/wazuh-kibana-app/issues/4158
+      if (this.deadField) {
+        return this.renderComplete();
+      }
       this.destroyAll();
     }
   }
