@@ -108,17 +108,14 @@ export default class CDBListsColumns {
                 aria-label="Delete file"
                 iconType="trash"
                 isDisabled={defaultItems.indexOf(`${item.relative_dirname}`) !== -1}
-                onConfirm={async (ev) => {
-                  this.props.removeItems([item]);
-                }}
-                onClose={async (ev) => {
-                  ev.stopPropagation();
-                }}
-                onClick={(ev) => { ev.stopPropagation() }}
+                onConfirm={async () => this.props.removeItems([item])}
+                onClose={async (ev) => ev.stopPropagation()}
+                onClick={(ev) => ev.stopPropagation()}
                 color="danger"
                 modalTitle={'Are you sure?'}
                 modalProps={{
                   buttonColor: 'danger',
+                  onClick: (ev) => ev.stopPropagation()
                 }}
               />
               <WzButtonPermissions
