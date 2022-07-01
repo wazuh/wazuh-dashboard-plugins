@@ -117,7 +117,7 @@ services:
     networks:
       - os-dev
     healthcheck:
-      test: ["CMD-SHELL", "curl -s --cacert config/certs/ca.pem https://os1:9200 | grep -q 'missing authentication credentials'"]
+      test: ["CMD-SHELL", "curl -s --cacert config/certs/ca.pem https://os1:9200 | grep -q 'Unauthorized'"]
       interval: 1s
       timeout: 5s
       retries: 120
