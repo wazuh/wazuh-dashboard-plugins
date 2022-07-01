@@ -5,6 +5,7 @@ import { WzButtonPermissions } from '../../../../../../components/common/permiss
 import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
 import { UIErrorLog, UILogLevel, UIErrorSeverity, UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
+import { WzButtonPermissionsModalConfirm } from '../../../../../../components/common/buttons';
 
 export default class RulesetColumns {
   props: any;
@@ -175,9 +176,10 @@ export default class RulesetColumns {
                       }}
                       color="primary"
                     />
-                    <WzButtonPermissions
-                      buttonType='icon'
+                    <WzButtonPermissionsModalConfirm
+                      buttonType="icon"
                       permissions={getDeleteButtonPermissions(item)}
+                      tooltip={{ position: 'top', content: `Remove ${item.filename} file` }}
                       aria-label="Delete file"
                       iconType="trash"
                       tooltip={{ position: 'top', content: `Remove ${item.filename} file` }}
@@ -194,7 +196,14 @@ export default class RulesetColumns {
                           getErrorOrchestrator().handleError(options);
                         }
                       }}
+                      onConfirm={async () => {
+                        this.props.removeItems([item]);
+                      }
                       color="danger"
+                      modalTitle={'Are you sure?'}
+                      modalProps={{
+                        buttonColor: 'danger',
+                      }}
                     />
                   </div>
                 );

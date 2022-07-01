@@ -12,7 +12,12 @@
 
 import React, { useState, useCallback } from 'react';
 import { TableWzAPI } from '../../../../../../components/common/tables';
-import { resourceDictionary } from '../../common/resources-handler';
+import { getToasts } from '../../../../../../kibana-services';
+import { resourceDictionary, ResourcesConstants, ResourcesHandler } from '../../common/resources-handler';
+import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
+import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
+
 import DecodersColumns from './columns';
 import { FlyoutDetail } from './flyout-detail';
 import { withUserPermissions } from '../../../../../../components/common/hocs/withUserPermissions';
@@ -22,14 +27,13 @@ import { SECTION_DECODERS_SECTION, SECTION_DECODERS_KEY } from '../../common/con
 import {
   ManageFiles,
   AddNewFileButton,
-  AddNewCdbListButton,
   UploadFilesButton,
 } from '../../common/actions-buttons'
 
 import apiSuggestsItems from './decoders-suggestions';
 
-/**
- * Render tables
+/***************************************
+ * Render tables 
  */
 const FilesTable = ({
   actionButtons,
@@ -38,7 +42,9 @@ const FilesTable = ({
   searchBarSuggestions,
   filters,
   updateFilters,
+  reload
 }) => <TableWzAPI
+    reload={reload}
     actionButtons={actionButtons}
     title={'Decoders files'}
     searchBarProps={{ buttonOptions: buttonOptions }}
@@ -102,8 +108,8 @@ const DecodersFlyoutTable = ({
     )}
   </>
 
-/**
- * Main
+/***************************************
+ * Main component
  */
 export default compose(
   withUserPermissions
@@ -112,6 +118,9 @@ export default compose(
   const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
   const [showingFiles, setShowingFiles] = useState(false);
+  const [tableFootprint, setTableFootprint] = useState(0);
+
+  const resourcesHandler = new ResourcesHandler(ResourcesConstants.DECODERS);
 
   // Table custom filter options
   const buttonOptions = [{ label: "Custom decoders", field: "relative_dirname", value: "etc/decoders" },];
@@ -134,8 +143,12 @@ export default compose(
     setCurrentItem(null);
   }
 
+  /**
+   * Columns and Rows properties
+   */
   const getColumns = () => {
     const decodersColumns = new DecodersColumns({
+      removeItems: removeItems,
       state: {
         section: SECTION_DECODERS_KEY
       }, ...props
@@ -169,6 +182,39 @@ export default compose(
         : undefined,
     };
   };
+
+  /**
+   * Remove files method
+   */
+  const removeItems = async (items) => {
+    try {
+      const results = items.map(async (item, i) => {
+        await resourcesHandler.deleteFile(item.filename || item.name);
+      });
+
+      Promise.all(results).then((completed) => {
+        setTableFootprint(Date.now());
+        getToasts().add({
+          color: 'success',
+          title: 'Success',
+          text: 'Deleted successfully',
+          toastLifeTimeMs: 3000,
+        });
+      });
+    } catch (error) {
+      const options = {
+        context: `${WzRulesetTable.name}.removeItems`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: `Error deleting item: ${error.message || error}`,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+    }
+  }
 
   const { updateRestartClusterManager, updateFileContent } = props;
   const columns = getColumns();
@@ -211,6 +257,7 @@ export default compose(
           searchBarSuggestions={apiSuggestsItems.files}
           filters={filters}
           updateFilters={updateFilters}
+          reload={tableFootprint}
         />
       ) : (
           <DecodersFlyoutTable
