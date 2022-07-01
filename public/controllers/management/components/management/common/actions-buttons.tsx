@@ -13,7 +13,7 @@ import React from 'react';
 // Eui components
 
 import { UploadFiles } from '../../upload-files';
-import { resourceDictionary, ResourcesHandler, ResourcesConstants } from './resources-handler';
+import { resourceDictionary, ResourcesHandler } from './resources-handler';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
@@ -25,7 +25,7 @@ import { getErrorOrchestrator } from '../../../../../react-services/common-servi
  * @param {Array} files
  * @param {String} path
  */
-async function uploadFiles(files, resource) {
+async function uploadFiles(files, resource, overwrite) {
   try {
     let errors = false;
     let results: any[] = [];
@@ -33,7 +33,7 @@ async function uploadFiles(files, resource) {
     for (let idx in files) {
       const { file, content } = files[idx];
       try {
-        await resourcesHandler.updateFile(file, content, resource !== ResourcesConstants.LISTS); // True does not overwrite the file
+        await resourcesHandler.updateFile(file, content, overwrite);
         results.push({
           index: idx,
           uploaded: true,
@@ -51,7 +51,7 @@ async function uploadFiles(files, resource) {
       }
     }
     if (errors) throw results;
-    return;
+    return results;
   } catch (error) {
     throw error;
   }
@@ -161,21 +161,12 @@ export const ManageFiles = (({ section, showingFiles, ...props }) => {
   )
 });
 
-const uploadFile = async (files, resource) => {
+const uploadFile = async (files, resource, overwrite) => {
   try {
-    await uploadFiles(files, resource);
+    const result = await uploadFiles(files, resource, overwrite);
+    return result;
   } catch (error) {
-    const options = {
-      context: 'ActionButtons.uploadFile',
-      level: UI_LOGGER_LEVELS.ERROR,
-      severity: UI_ERROR_SEVERITIES.BUSINESS,
-      error: {
-        error: error,
-        message: `Error files cannot be uploaded: ${error.message || error}`,
-        title: error.name || error,
-      },
-    };
-    getErrorOrchestrator().handleError(options);
+    return error;
   }
 };
 

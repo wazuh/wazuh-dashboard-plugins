@@ -177,6 +177,12 @@ class WzEditConfiguration extends Component {
           color: 'success',
         });
       }
+      if(!this.props.clusterNodeSelected){
+        this.addToast({
+          title: 'Manager was restarted',
+          color: 'success',
+        });
+      }
     } catch (error) {
       this.props.updateWazuhNotReadyYet('');
       this.setState({ restart: false, saving: false, restarting: false });

@@ -50,6 +50,7 @@ import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services'
 import { getThemeAssetURL, getAssetURL } from '../../utils/assets';
+import { AgentStatus } from '../agents/agent_status';
 
 
 const sections = {
@@ -614,44 +615,6 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
     });
   };
 
-  color = (status, hex = false) => {
-    if (status.toLowerCase() === 'active') { return hex ? '#017D73' : 'success'; }
-    else if (status.toLowerCase() === 'disconnected') { return hex ? '#BD271E' : 'danger'; }
-    else if (status.toLowerCase() === 'never connected') { return hex ? '#98A2B3' : 'subdued'; }
-  }
-
-  formatAgentStatus = (status) => {
-    if (status === 'active') {
-      return "Active";
-    }
-    if (status === 'disconnected') {
-      return "Disconnected";
-    }
-    if (status === 'never_connected') {
-      return "Never connected";
-    }
-  }
-
-  addHealthRender(agent) {
-    // this was rendered with a EuiHealth, but EuiHealth has a div wrapper, and this section is rendered  within a <p> tag. <div> tags aren't allowed within <p> tags.
-    return (
-      <span className="euiFlexGroup euiFlexGroup--gutterExtraSmall euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow">
-        <EuiToolTip position="top" content={this.formatAgentStatus(agent.status)}>
-          <span className="euiFlexItem euiFlexItem--flexGrowZero">
-            <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" className={`euiIcon euiIcon--medium euiIcon--${this.color(agent.status)}`} focusable="false" role="img" aria-hidden="true">
-              <circle cx="8" cy="8" r="4"></circle>
-            </svg>
-          </span>
-        </EuiToolTip>
-        <span className="euiFlexItem euiFlexItem--flexGrowZero">
-          <WzTextWithTooltipIfTruncated position='bottom' elementStyle={{ maxWidth: "400px", height: 16 }}>
-            {agent.name}
-          </WzTextWithTooltipIfTruncated>
-        </span>
-      </span>
-    )
-  }
-
   removeSelectedAgent() {
     store.dispatch(updateCurrentAgentData({}));
     if (window.location.href.includes("/agents?")) {
@@ -667,12 +630,6 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
     agentFilters.map(x => {
       filterManager.removeFilter(x);
     });
-  }
-
-  getBadgeColor(agentStatus) {
-    if (agentStatus.toLowerCase() === 'active') { return 'secondary'; }
-    else if (agentStatus.toLowerCase() === 'disconnected') { return '#BD271E'; }
-    else if (agentStatus.toLowerCase() === 'never connected') { return 'default'; }
   }
 
   thereAreSelectors() {
@@ -899,15 +856,12 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
 
           {/*this.state.hover === 'overview' */this.state.isOverviewPopoverOpen && currentAgent.id && (
             <EuiFlexGroup className="wz-menu-agent-info">
-              {/*
-               <EuiFlexItem grow={false} style={{margin: "30px 0 0 24px"}}>
-                <EuiBadge color={this.getBadgeColor(currentAgent.status)}>
-                  {currentAgent.id}
-                </EuiBadge>
-              </EuiFlexItem>
-              */}
               <EuiFlexItem style={{ margin: "16px 16px 0 16px" }}>
-                {this.addHealthRender(currentAgent)}
+                <AgentStatus status={currentAgent.status}>
+                  <WzTextWithTooltipIfTruncated position='bottom' elementStyle={{ maxWidth: "400px", height: 16 }}>
+                    {currentAgent.name}
+                  </WzTextWithTooltipIfTruncated>
+                </AgentStatus>
               </EuiFlexItem>
               <EuiFlexItem grow={false} style={{ margin: "12px 0 0 0" }}>
                 <EuiToolTip position="top" content={`Open ${currentAgent.name} summary`}>

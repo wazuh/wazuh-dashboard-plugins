@@ -32,7 +32,7 @@ export class WzStatusNodeInfo extends Component {
 
   render() {
     const { stats, nodeInfo, selectedNode, clusterEnabled } = this.props.state;
-    const agentsNodeCount = clusterEnabled ? (stats.agentsCount.find(node => node.node_name === selectedNode) || {}).count || 0 : stats.agentsCountTotal;
+    const agentsNodeCount = clusterEnabled ? (stats.agentsCountByManagerNodes.find(node => node.node_name === selectedNode) || {}).count || 0 : stats.agentsCount.total;
     const title = selectedNode
       ? selectedNode + ' information'
       : 'Manager information';
