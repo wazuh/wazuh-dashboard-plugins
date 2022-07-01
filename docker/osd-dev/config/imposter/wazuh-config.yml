@@ -13,4 +13,9 @@ resources:
     response:
       statusCode: 200
       staticFile: api_info.json
+  - path: /vulnerability/001
+    method: get
+    response:
+      statusCode: 200
+      staticFile: vuln_list.json
 
