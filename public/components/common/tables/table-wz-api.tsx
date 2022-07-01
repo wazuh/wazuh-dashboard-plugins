@@ -159,13 +159,11 @@ export function TableWzAPI({ actionButtons, ...rest }: {
   const table = rest.searchTable ?
     <TableWithSearchBar
       onSearch={onSearch}
-      reload={reloadFootprint}
-      {...rest}
+      {...{...rest, reload: reloadFootprint}}
     /> :
     <TableDefault
       onSearch={onSearch}
-      reload={reloadFootprint}
-      {...rest}
+      {...{...rest, reload: reloadFootprint}}
     />
 
   return (
