@@ -130,11 +130,7 @@ export const ManageFiles = (({ section, showingFiles, ...props }) => {
  */
   const toggleFiles = async () => {
     try {
-      // props.updateLoadingStatus(true);
       props.toggleShowFiles(!showingFiles);
-      // props.updateIsProcessing(true);
-      // props.updatePageIndex(0);
-      // props.updateLoadingStatus(false);
     } catch (error) {
       const options = {
         context: 'ActionButtons.toggleFiles',
