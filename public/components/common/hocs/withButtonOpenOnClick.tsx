@@ -12,14 +12,17 @@
 import React, { useState } from 'react';
 
 
-export const withButtonOpenOnClick = WrappedComponent => ({render, onClick, ...rest} : {render?:any, [x:string]: any}) => {
+export const withButtonOpenOnClick = WrappedComponent => ({render, onClick, onClose, ...rest} : {render?:any, [x:string]: any}) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const open = ev => {
     typeof onClick === 'function' && onClick(ev);
     setIsOpen(true);
   };
-  const close = ev => setIsOpen(false);
+  const close = ev => {
+    typeof onClose === 'function' && onClose(ev);
+    setIsOpen(false)
+  };
 
   return (
     <>

@@ -109,11 +109,10 @@ export default class CDBListsColumns {
                 iconType="trash"
                 isDisabled={defaultItems.indexOf(`${item.relative_dirname}`) !== -1}
                 onConfirm={async (ev) => {
-                  console.log(ev)
                   this.props.removeItems([item]);
                 }}
-                onCancel={async (ev) => {
-                  console.log(ev)
+                onClose={async (ev) => {
+                  ev.stopPropagation();
                 }}
                 onClick={(ev) => { ev.stopPropagation() }}
                 color="danger"
