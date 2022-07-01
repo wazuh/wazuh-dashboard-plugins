@@ -21,7 +21,7 @@ import { webDocumentationLink } from '../../../../../../../common/services/web_d
 
 const helpLinks = [
   {
-    text: 'How to agent enrollment',
+    text: 'Wazuh agent enrollment',
     href: webDocumentationLink('user-manual/agent-enrollment/index.html')
   },
   {
