@@ -32,7 +32,7 @@ const helpLinks = [
   },
   {
     text: 'Client buffer reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/agent_buffer.html')
+    href: webDocumentationLink('user-manual/reference/ossec-conf/client-buffer.html')
   }
 ];
 
