@@ -18,7 +18,7 @@ import { webDocumentationLink } from '../../../../../../../common/services/web_d
 
 const helpLinks = [
   {
-    text: 'Using Wazuh to monitor Google Cloud Pub/Sub',
+    text: 'Using Wazuh to monitor GCP services',
     href: webDocumentationLink('gcp/index.html')
   },
   {
