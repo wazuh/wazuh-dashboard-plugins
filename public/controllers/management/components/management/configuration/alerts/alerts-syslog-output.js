@@ -29,7 +29,7 @@ import { webDocumentationLink } from '../../../../../../../common/services/web_d
 
 const helpLinks = [
   {
-    text: 'How to configure the syslog output',
+    text: 'Configuring syslog output',
     href: webDocumentationLink('user-manual/manager/manual-syslog-output.html')
   },
   {

@@ -27,6 +27,10 @@ import { webDocumentationLink } from '../../../../../../../common/services/web_d
 
 const helpLinks = [
   {
+    text: 'Monitoring containers activity',
+    href: webDocumentationLink('container-security/docker-monitor/monitoring-containers-activity.html')
+  },
+  {
     text: 'Docker listener module reference',
     href: webDocumentationLink('user-manual/reference/ossec-conf/wodle-docker.html')
   }

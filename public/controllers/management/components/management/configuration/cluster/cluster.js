@@ -40,7 +40,7 @@ const mainSettings = [
 
 const helpLinks = [
   {
-    text: 'How to configure the Wazuh cluster',
+    text: 'Configuring a Wazuh cluster',
     href: webDocumentationLink('user-manual/configuring-cluster/index.html')
   },
   {

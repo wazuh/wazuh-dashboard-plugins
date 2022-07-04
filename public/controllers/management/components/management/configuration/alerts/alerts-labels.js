@@ -32,7 +32,7 @@ const columns = [
 
 const helpLinks = [
   {
-    text: 'Labels documentation',
+    text: 'Agent labels',
     href: webDocumentationLink('user-manual/capabilities/labels.html')
   },
   {

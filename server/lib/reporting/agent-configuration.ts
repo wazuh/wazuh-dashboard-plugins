@@ -62,7 +62,7 @@ export const AgentConfiguration = {
           ]
         },
         {
-          subtitle: 'Labels',
+          subtitle: 'Agent labels',
           docuLink: webDocumentationLink('user-manual/reference/ossec-conf/labels.html'),
           desc: 'User-defined information about the agent included in alerts',
           config: [{ component: 'agent', configuration: 'labels' }]

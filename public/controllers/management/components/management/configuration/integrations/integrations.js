@@ -25,11 +25,11 @@ import { webDocumentationLink } from '../../../../../../../common/services/web_d
 
 const helpLinks = [
   {
-    text: 'How to integrate Wazuh with external APIs',
+    text: 'Integration with external APIs',
     href: webDocumentationLink('user-manual/manager/manual-integration.html')
   },
   {
-    text: 'VirusTotal integration documentation',
+    text: 'VirusTotal integration',
     href: webDocumentationLink('user-manual/capabilities/virustotal-scan/index.html')
   },
   {

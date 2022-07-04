@@ -42,7 +42,7 @@ const scanSettings = [
 
 const helpLinks = [
   {
-    text: 'Syscollector module documentation',
+    text: 'System inventory',
     href: webDocumentationLink('user-manual/capabilities/syscollector.html')
   },
   {

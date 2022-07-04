@@ -14,11 +14,11 @@ import { webDocumentationLink } from "../../../../../../../common/services/web_d
 
 export default [
   {
-    text: 'Anomaly and malware detection documentation',
+    text: 'Anomaly and malware detection',
     href: webDocumentationLink('user-manual/capabilities/anomalies-detection/index.html')
   },
   {
-    text: 'Policy monitoring documentation',
+    text: 'Monitoring security policies',
     href: webDocumentationLink('user-manual/capabilities/policy-monitoring/index.html')
   },
   {

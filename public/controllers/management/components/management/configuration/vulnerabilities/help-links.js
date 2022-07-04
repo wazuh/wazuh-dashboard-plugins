@@ -14,7 +14,7 @@ import { webDocumentationLink } from "../../../../../../../common/services/web_d
 
 export default [
   {
-    text: 'Vulnerability detector documentation',
+    text: 'Vulnerability detection',
     href: webDocumentationLink('user-manual/capabilities/vulnerability-detection/index.html')
   },
   {

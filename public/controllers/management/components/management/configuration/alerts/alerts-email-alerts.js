@@ -50,11 +50,11 @@ const mainSettings = [
 
 const helpLinks = [
   {
-    text: 'How to configure email alerts',
+    text: 'Configuring email alerts',
     href: webDocumentationLink('user-manual/manager/manual-email-report/index.html')
   },
   {
-    text: 'How to configure authenticated SMTP server',
+    text: 'SMTP server with authentication',
     href: webDocumentationLink('user-manual/manager/manual-email-report/smtp-authentication.html')
   },
   {
