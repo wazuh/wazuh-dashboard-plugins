@@ -20,17 +20,16 @@ import { isString } from '../utils/utils';
 import { settingsListBuilder } from '../utils/builders';
 
 import { connect } from 'react-redux';
+import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
 const helpLinks = [
   {
-    text: 'How to generate automatic reports',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/manager/automatic-reports.html'
+    text: 'Generating automatic reports',
+    href: webDocumentationLink('user-manual/manager/automatic-reports.html')
   },
   {
     text: 'Reports reference',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/reports.html'
+    href: webDocumentationLink('user-manual/reference/ossec-conf/reports.html')
   }
 ];
 
