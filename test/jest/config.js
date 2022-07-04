@@ -6,7 +6,8 @@ export default {
   rootDir: path.resolve(__dirname, '../..'),
   roots: [
     '<rootDir>/public',
-    '<rootDir>/server'
+    '<rootDir>/server',
+    '<rootDir>/common',
   ],
   modulePaths: [
     `${kbnDir}/node_modules`

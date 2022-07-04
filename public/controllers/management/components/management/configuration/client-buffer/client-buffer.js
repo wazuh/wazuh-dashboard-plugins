@@ -23,17 +23,16 @@ import {
   renderValueNoThenEnabled,
   renderValueOrDefault
 } from '../utils/utils';
+import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
 const helpLinks = [
   {
     text: 'Anti-flooding mechanism',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/capabilities/antiflooding.html'
+    href: webDocumentationLink('user-manual/capabilities/antiflooding.html')
   },
   {
     text: 'Client buffer reference',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/agent_buffer.html'
+    href: webDocumentationLink('user-manual/reference/ossec-conf/client-buffer.html')
   }
 ];
 

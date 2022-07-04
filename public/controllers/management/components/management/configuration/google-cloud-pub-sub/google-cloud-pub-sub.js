@@ -14,16 +14,16 @@ import {
   renderValueYesThenEnabled,
   isString
 } from '../utils/utils';
+import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
 const helpLinks = [
   {
-    text: 'Using Wazuh to monitor Google Cloud Pub/Sub',
-    href: 'https://documentation.wazuh.com/current/gcp/index.html'
+    text: 'Using Wazuh to monitor GCP services',
+    href: webDocumentationLink('gcp/index.html')
   },
   {
     text: 'Google Cloud Pub/Sub module reference',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/gcp-pubsub.html'
+    href: webDocumentationLink('user-manual/reference/ossec-conf/gcp-pubsub.html')
   }
 ];
 

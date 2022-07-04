@@ -21,6 +21,7 @@ import WzNoConfig from '../util-components/no-config';
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import { isString, isArray, renderValueNoThenEnabled } from '../utils/utils';
 import { wodleBuilder } from '../utils/builders';
+import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
 const mainSettings = [
   {
@@ -38,13 +39,11 @@ const mainSettings = [
 const helpLinks = [
   {
     text: 'Osquery module documentation',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/capabilities/osquery.html'
+    href: webDocumentationLink('user-manual/capabilities/osquery.html')
   },
   {
     text: 'Osquery module reference',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-osquery.html'
+    href: webDocumentationLink('user-manual/reference/ossec-conf/wodle-osquery.html')
   }
 ];
 
