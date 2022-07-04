@@ -17,14 +17,6 @@ import { ErrorHandler } from '../error-handler';
 // statusCode
 // statusText
 // error-orchestrator-ui.ts:30 [request body.id]: expected value of type [string] but got [undefined] Error: Request failed with status code 400
-class ResponseError extends Error {
-  constructor(message: string) {
-    super(message);
-    // Because we are extending built in class
-    Object.setPrototypeOf(this, ResponseError.prototype);
-    this.name = this.constructor.name;
-  }
-}
 
 export class ErrorFactory {
   /**
@@ -33,24 +25,9 @@ export class ErrorFactory {
    * @param error
    * @returns Error instance
    */
-  public static createError(error: Error | string | unknown, message?: string): Error {
+  public static createError(error: Error | string | unknown, errorType, message?: string): Error {
     const errorMessage = message || ErrorHandler.extractMessage(error);
-    // if receive another ResponseError instance, return it, not create a new one
-    if (ErrorFactory.isResponseError(error, errorMessage)) {
-      return error as Error;
-    }
-
-    return ErrorFactory.errorCreator(ResponseError, errorMessage);
-  }
-
-  /**
-   * Validate if is necessary to create a new error instance or return the same received
-   * @param error
-   * @param errorMessage
-   * @returns
-   */
-  private static isResponseError(error: Error | string | unknown, errorMessage: string): boolean {
-    return error instanceof ResponseError && error.message === errorMessage;
+    return ErrorFactory.errorCreator(errorType, errorMessage);
   }
 
   /**
@@ -60,10 +37,10 @@ export class ErrorFactory {
    * @returns Error instance depending type received
    */
 
-  private static errorCreator<T extends ResponseError>(
+  private static errorCreator<T extends Error>(
     ErrorType: { new (message: string): T },
     message: string
-  ): ResponseError {
+  ): T {
     return new ErrorType(message);
   }
 }

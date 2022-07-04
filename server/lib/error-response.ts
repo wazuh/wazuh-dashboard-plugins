@@ -25,13 +25,10 @@
  * @param {Number} statusCode Error status code
  * @returns {Object} Error response object
  */
-export function ErrorResponse(
-  message = null,
-  code = null,
-  statusCode = null,
-  response
-) {
-  message.includes('password: ') ? message = message.split('password: ')[0] + ' password: ***' : false;
+export function ErrorResponse(message = null, code = null, statusCode = null, response) {
+  message.includes('password: ')
+    ? (message = message.split('password: ')[0] + ' password: ***')
+    : false;
   let filteredMessage = '';
   if (code) {
     const isString = typeof message === 'string';
@@ -45,16 +42,10 @@ export function ErrorResponse(
         message.includes('EAI_AGAIN')) &&
       code === 3005
     ) {
-      filteredMessage =
-        'Wazuh API is not reachable. Please check your url and port.';
+      filteredMessage = 'Wazuh API is not reachable. Please check your url and port.';
     } else if (isString && message.includes('ECONNREFUSED') && code === 3005) {
-      filteredMessage =
-        'Wazuh API is not reachable. Please check your url and port.';
-    } else if (
-      isString &&
-      message.toLowerCase().includes('not found') &&
-      code === 3002
-    ) {
+      filteredMessage = 'Wazuh API is not reachable. Please check your url and port.';
+    } else if (isString && message.toLowerCase().includes('not found') && code === 3002) {
       filteredMessage = 'It seems the selected API was deleted.';
     } else if (
       isString &&
@@ -79,8 +70,7 @@ export function ErrorResponse(
         ? `${code || 1000} - ${message}`
         : `${code || 1000} - Unexpected error`,
       code: code || 1000,
-      statusCode: statusCodeResponse
-    }
-  })
+      statusCode: statusCodeResponse,
+    },
+  });
 }
-
