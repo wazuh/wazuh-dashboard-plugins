@@ -48,11 +48,11 @@ const columns = [
 
 const helpLinks = [
   {
-    text: 'Wazuh administration documentation',
+    text: 'Wazuh server administration',
     href: webDocumentationLink('user-manual/manager/index.html')
   },
   {
-    text: 'Wazuh capabilities documentation',
+    text: 'Wazuh capabilities',
     href: webDocumentationLink('user-manual/capabilities/index.html')
   },
   {
