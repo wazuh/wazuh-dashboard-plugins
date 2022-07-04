@@ -44,7 +44,7 @@ const columns = [
 
 const helpLinks = [
   {
-    text: 'Using Wazuh to audit GitHub organizations',
+    text: 'Using Wazuh to monitor GitHub',
     href: webDocumentationLink('github/index.html')
   },
   {
