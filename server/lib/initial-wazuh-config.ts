@@ -10,7 +10,15 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { ASSETS_BASE_URL_PREFIX, PLUGIN_APP_NAME, WAZUH_MONITORING_DEFAULT_INDICES_REPLICAS, WAZUH_MONITORING_DEFAULT_INDICES_SHARDS, WAZUH_STATISTICS_DEFAULT_INDICES_REPLICAS, WAZUH_STATISTICS_DEFAULT_INDICES_SHARDS } from "../../common/constants";
+import {
+  ASSETS_BASE_URL_PREFIX,
+  PLUGIN_APP_NAME,
+  WAZUH_MONITORING_DEFAULT_INDICES_REPLICAS,
+  WAZUH_MONITORING_DEFAULT_INDICES_SHARDS,
+  WAZUH_STATISTICS_DEFAULT_INDICES_REPLICAS,
+  WAZUH_STATISTICS_DEFAULT_INDICES_SHARDS,
+} from "../../common/constants";
+import { webDocumentationLink } from "../../common/services/web_documentation";
 
 export const initialWazuhConfig: string = `---
 #
@@ -27,7 +35,7 @@ export const initialWazuhConfig: string = `---
 # ======================== ${PLUGIN_APP_NAME} configuration file ========================
 #
 # Please check the documentation for more information on configuration options:
-# https://documentation.wazuh.com/current/installation-guide/index.html
+# ${webDocumentationLink('installation-guide/index.html')}
 #
 # Also, you can check our repository:
 # https://github.com/wazuh/wazuh-kibana-app

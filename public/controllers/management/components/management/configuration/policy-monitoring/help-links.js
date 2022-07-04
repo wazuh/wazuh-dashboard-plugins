@@ -10,20 +10,19 @@
  * Find more information about this on the LICENSE file.
  */
 
+import { webDocumentationLink } from "../../../../../../../common/services/web_documentation";
+
 export default [
   {
-    text: 'Anomaly and malware detection documentation',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/capabilities/anomalies-detection/index.html'
+    text: 'Anomaly and malware detection',
+    href: webDocumentationLink('user-manual/capabilities/anomalies-detection/index.html')
   },
   {
-    text: 'Policy monitoring documentation',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/capabilities/policy-monitoring/index.html'
+    text: 'Monitoring security policies',
+    href: webDocumentationLink('user-manual/capabilities/policy-monitoring/index.html')
   },
   {
     text: 'Rootcheck reference',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/rootcheck.html'
+    href: webDocumentationLink('user-manual/reference/ossec-conf/rootcheck.html')
   }
 ];

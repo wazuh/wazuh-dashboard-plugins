@@ -9,13 +9,15 @@
 *
 * Find more information about this on the LICENSE file.
 */
+import { webDocumentationLink } from "../../../../common/services/web_documentation";
+
 export default {
   id: 'docker',
   name: 'Docker Listener',
   wodle_name: 'docker-listener',
   description: 'Configuration options of the Docker wodle.',
   category: 'Threat detection and response',
-  documentation_link: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-docker.html',
+  documentation_link: webDocumentationLink('user-manual/reference/ossec-conf/wodle-docker.html'),
   icon: 'logoDocker',
   avaliable_for_manager: true,
   avaliable_for_agent: true,
