@@ -9,13 +9,15 @@
 *
 * Find more information about this on the LICENSE file.
 */
+import { webDocumentationLink } from "../../../../common/services/web_documentation";
+
 export default {
   id: 'office',
   name: 'Office 365',
   wodle_name: 'office',
   description: 'Configuration options of the Office 365 wodle.',
   category: 'Security information management',
-  documentation_link: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-s3.html',
+  documentation_link: webDocumentationLink('user-manual/reference/ossec-conf/wodle-s3.html'),
   icon: 'logoOfficeMono',
   avaliable_for_manager: true,
   avaliable_for_agent: true,
