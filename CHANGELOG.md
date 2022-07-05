@@ -4,8 +4,19 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ## Wazuh v4.3.6 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4307
 
-### Fixed
+### Added
 
+- Added a new documentation link to the Docker Listener module [#4301](https://github.com/wazuh/wazuh-kibana-app/pull/4301)
+
+### Changed
+
+- The links to the web documentation now points to the plugin short version instead of `current` [#4301](https://github.com/wazuh/wazuh-kibana-app/pull/4301)
+- Changed some prompts that didn't match the with the current style [#4301](https://github.com/wazuh/wazuh-kibana-app/pull/4301)
+- Changed some link titles to match their documentation section title [#4301](https://github.com/wazuh/)
+
+# Fixed
+
+- Fixed some links to web documentation that didn't work [#4301](https://github.com/wazuh/wazuh-kibana-app/pull/4301)
 - Display the errors when there was a problem in the action buttons of `Rules/Decoders/CDB Lists`'s tables [#4307](https://github.com/wazuh/wazuh-kibana-app/pull/4307)
 
 ## Wazuh v4.3.5 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4306

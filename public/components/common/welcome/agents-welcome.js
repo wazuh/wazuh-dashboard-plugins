@@ -54,6 +54,7 @@ import { hasAgentSupportModule } from '../../../react-services/wz-agents';
 import { withErrorBoundary, withReduxProvider } from '../hocs';
 import { compose } from 'redux';
 import { API_NAME_AGENT_STATUS } from '../../../../common/constants';
+import { webDocumentationLink } from '../../../../common/services/web_documentation';
 
 export const AgentsWelcome = compose(
   withReduxProvider,
@@ -508,7 +509,7 @@ class AgentsWelcome extends Component {
 
   render() {
     const title = this.renderTitle();
-    const upgradeButton = this.renderUpgradeButton();
+
     if (this.props.agent.status === API_NAME_AGENT_STATUS.NEVER_CONNECTED) {
       return (
         <EuiEmptyPrompt
@@ -520,9 +521,9 @@ class AgentsWelcome extends Component {
               <p>
                 The agent has been registered but has not yet connected to the manager.
             </p>
-              <a href="https://documentation.wazuh.com/current/user-manual/agents/agent-connection.html" target="_blank">
-                https://documentation.wazuh.com/current/user-manual/agents/agent-connection.html
-            </a>
+              <a href={webDocumentationLink('user-manual/agents/agent-connection.html')} target="_blank">
+                Checking connection with the Wazuh server
+              </a>
             </Fragment>
           }
           actions={

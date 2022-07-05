@@ -9,13 +9,15 @@
 *
 * Find more information about this on the LICENSE file.
 */
+import { webDocumentationLink } from "../../../../common/services/web_documentation";
+
 export default {
   id: 'osquery',
   name: 'Osquery',
   wodle_name: 'osquery',
   description: 'Configuration options of the osquery wodle.',
   category: 'Threat detection and response',
-  documentation_link: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-osquery.html',
+  documentation_link: webDocumentationLink('user-manual/reference/ossec-conf/wodle-osquery.html'),
   icon: 'securityApp',
   callout_warning: 'Osquery is not installed by default. It is an open source software that you have to obtain for using this module.',
   avaliable_for_manager: true,

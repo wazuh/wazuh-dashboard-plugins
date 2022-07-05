@@ -41,6 +41,7 @@ import { withErrorBoundary } from '../../../components/common/hocs';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
+import { webDocumentationLink } from '../../../../common/services/web_documentation';
 
 const architectureButtons = [
   {
@@ -412,7 +413,7 @@ export const RegisterAgent = withErrorBoundary(
 
     render() {
       const appVersionMajorDotMinor = this.state.wazuhVersion.split('.').slice(0, 2).join('.');
-      const urlCheckConnectionDocumentation = `https://documentation.wazuh.com/${appVersionMajorDotMinor}/user-manual/agents/agent-connection.html`;
+      const urlCheckConnectionDocumentation = webDocumentationLink('user-manual/agents/agent-connection.html', appVersionMajorDotMinor);
       const textAndLinkToCheckConnectionDocumentation = (
         <p>
           To verify the connection with the Wazuh server, please follow this{' '}

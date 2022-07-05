@@ -18,6 +18,7 @@ import WzConfigurationSettingsGroup from '../util-components/configuration-setti
 import withWzConfig from '../util-hocs/wz-config';
 import { isString, renderValueNoThenEnabled } from '../utils/utils';
 import { wodleBuilder } from '../utils/builders';
+import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
 const mainSettings = [
   {
@@ -41,14 +42,12 @@ const scanSettings = [
 
 const helpLinks = [
   {
-    text: 'Syscollector module documentation',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/capabilities/syscollector.html'
+    text: 'System inventory',
+    href: webDocumentationLink('user-manual/capabilities/syscollector.html')
   },
   {
     text: 'Syscollector module reference',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-syscollector.html'
+    href: webDocumentationLink('user-manual/reference/ossec-conf/wodle-syscollector.html')
   }
 ];
 
