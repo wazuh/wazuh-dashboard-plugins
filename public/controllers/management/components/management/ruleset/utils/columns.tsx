@@ -3,6 +3,9 @@ import { EuiToolTip, EuiButtonIcon, EuiLink, EuiBadge } from '@elastic/eui';
 import { resourceDictionary, RulesetHandler, RulesetResources } from './ruleset-handler';
 import exportCsv from '../../../../../../react-services/wz-csv';
 import { WzButtonPermissions } from '../../../../../../components/common/permissions/button';
+import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
+import { UIErrorLog, UILogLevel, UIErrorSeverity, UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
 
 export default class RulesetColumns {
   constructor(tableProps) {
@@ -82,11 +85,25 @@ export default class RulesetColumns {
                   permissions={getReadButtonPermissions(item)}
                   tooltip={{position:'top', content: `Show ${value} content`}}
                   onClick={async (ev) => {
-                    ev.stopPropagation();
-                    const rulesetHandler = new RulesetHandler(RulesetResources.RULES);
-                    const result = await rulesetHandler.getFileContent(value);
-                    const file = { name: value, content: result, path: item.relative_dirname };
-                    this.tableProps.updateFileContent(file);
+                    try{
+                      ev.stopPropagation();
+                      const rulesetHandler = new RulesetHandler(RulesetResources.RULES);
+                      const result = await rulesetHandler.getFileContent(value);
+                      const file = { name: value, content: result, path: item.relative_dirname };
+                      this.tableProps.updateFileContent(file);
+                    }catch(error){
+                      const options: UIErrorLog = {
+                        context: 'Rules.readFileContent',
+                        level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+                        severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
+                        error: {
+                          error: error,
+                          message: error.message || error,
+                          title: error.name,
+                        },
+                      };
+                      getErrorOrchestrator().handleError(options);
+                    }
                   }}>
                   {value}
                 </WzButtonPermissions>
@@ -132,11 +149,25 @@ export default class RulesetColumns {
                   permissions={getReadButtonPermissions(item)}
                   tooltip={{position:'top', content: `Show ${value} content`}}
                   onClick={async (ev) => {
-                    ev.stopPropagation();
-                    const rulesetHandler = new RulesetHandler(RulesetResources.DECODERS);
-                    const result = await rulesetHandler.getFileContent(value);
-                    const file = { name: value, content: result, path: item.relative_dirname };
-                    this.tableProps.updateFileContent(file);
+                    try{
+                      ev.stopPropagation();
+                      const rulesetHandler = new RulesetHandler(RulesetResources.DECODERS);
+                      const result = await rulesetHandler.getFileContent(value);
+                      const file = { name: value, content: result, path: item.relative_dirname };
+                      this.tableProps.updateFileContent(file);
+                    }catch(error){
+                      const options: UIErrorLog = {
+                        context: `Decoders.readFileContent`,
+                        level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+                        severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
+                        error: {
+                          error: error,
+                          message: error.message || error,
+                          title: error.name,
+                        },
+                      };
+                      getErrorOrchestrator().handleError(options);
+                    }
                   }}>
                     {value}
                 </WzButtonPermissions>
@@ -172,8 +203,22 @@ export default class RulesetColumns {
                   aria-label="Export list"
                   iconType="exportAction"
                   onClick={async ev => {
-                    ev.stopPropagation();
-                    await exportCsv(`/lists?path=${item.relative_dirname}/${item.filename}`, [{_isCDBList: true, name: 'path', value: `${item.relative_dirname}/${item.filename}`}], item.filename)
+                    try{
+                      ev.stopPropagation();
+                      await exportCsv(`/lists?path=${item.relative_dirname}/${item.filename}`, [{_isCDBList: true, name: 'path', value: `${item.relative_dirname}/${item.filename}`}], item.filename)
+                    }catch(error){
+                      const options: UIErrorLog = {
+                        context: `Lists.exportFile`,
+                        level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+                        severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
+                        error: {
+                          error: error,
+                          message: error.message || error,
+                          title: error.name,
+                        },
+                      };
+                      getErrorOrchestrator().handleError(options);
+                    }
                   }}
                   color="primary"
                 />
@@ -201,11 +246,25 @@ export default class RulesetColumns {
                     iconType="eye"
                     tooltip={{position: 'top', content:`View the content of ${item.filename}`}}
                     onClick={async ev => {
-                      ev.stopPropagation();
-                      const rulesetHandler = new RulesetHandler(this.tableProps.state.section);
-                      const result = await rulesetHandler.getFileContent(item.filename);
-                      const file = { name: item.filename, content: result, path: item.relative_dirname };
-                      this.tableProps.updateFileContent(file);
+                      try{
+                        ev.stopPropagation();
+                        const rulesetHandler = new RulesetHandler(this.tableProps.state.section);
+                        const result = await rulesetHandler.getFileContent(item.filename);
+                        const file = { name: item.filename, content: result, path: item.relative_dirname };
+                        this.tableProps.updateFileContent(file);
+                      }catch(error){
+                        const options: UIErrorLog = {
+                          context: `Files.readFileContent`,
+                          level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+                          severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
+                          error: {
+                            error: error,
+                            message: error.message || error,
+                            title: error.name,
+                          },
+                        };
+                        getErrorOrchestrator().handleError(options);
+                      }
                     }}
                     color="primary"
                   />
@@ -220,11 +279,25 @@ export default class RulesetColumns {
                       iconType="pencil"
                       tooltip={{position: 'top', content:`Edit ${item.filename} content`}}
                       onClick={async ev => {
-                        ev.stopPropagation();
-                        const rulesetHandler = new RulesetHandler(this.tableProps.state.section);
-                        const result = await rulesetHandler.getFileContent(item.filename);
-                        const file = { name: item.filename, content: result, path: item.relative_dirname };
-                        this.tableProps.updateFileContent(file);
+                        try{
+                          ev.stopPropagation();
+                          const rulesetHandler = new RulesetHandler(this.tableProps.state.section);
+                          const result = await rulesetHandler.getFileContent(item.filename);
+                          const file = { name: item.filename, content: result, path: item.relative_dirname };
+                          this.tableProps.updateFileContent(file);
+                        }catch(error){
+                          const options: UIErrorLog = {
+                            context: `Files.editFileContent`,
+                            level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+                            severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
+                            error: {
+                              error: error,
+                              message: error.message || error,
+                              title: error.name,
+                            },
+                          };
+                          getErrorOrchestrator().handleError(options);
+                        }
                       }}
                       color="primary"
                     />
@@ -235,9 +308,23 @@ export default class RulesetColumns {
                       iconType="trash"
                       tooltip={{position: 'top', content:`Remove ${item.filename} file`}}
                       onClick={ev => {
-                        ev.stopPropagation();
-                        this.tableProps.updateListItemsForRemove([item]);
-                        this.tableProps.updateShowModal(true);
+                        try{
+                          ev.stopPropagation();
+                          this.tableProps.updateListItemsForRemove([item]);
+                          this.tableProps.updateShowModal(true);
+                        }catch(error){
+                          const options: UIErrorLog = {
+                            context: `Files.deleteFile`,
+                            level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+                            severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
+                            error: {
+                              error: error,
+                              message: error.message || error,
+                              title: error.name,
+                            },
+                          };
+                          getErrorOrchestrator().handleError(options);
+                        }
                       }}
                       color="danger"
                     />
@@ -298,11 +385,25 @@ export default class RulesetColumns {
                   iconType="pencil"
                   tooltip={{position: 'top', content: `Edit ${item.filename} content`}}
                   onClick={async (ev) => {
-                    ev.stopPropagation();
-                    const rulesetHandler = new RulesetHandler(this.tableProps.state.section);
-                    const result = await rulesetHandler.getFileContent(item.filename);
-                    const file = { name: item.filename, content: result, path: item.relative_dirname };
-                    this.tableProps.updateListContent(file);
+                    try{
+                      ev.stopPropagation();
+                      const rulesetHandler = new RulesetHandler(this.tableProps.state.section);
+                      const result = await rulesetHandler.getFileContent(item.filename);
+                      const file = { name: item.filename, content: result, path: item.relative_dirname };
+                      this.tableProps.updateListContent(file);
+                    }catch(error){
+                      const options: UIErrorLog = {
+                        context: `Lists.editFileContent`,
+                        level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+                        severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
+                        error: {
+                          error: error,
+                          message: error.message || error,
+                          title: error.name,
+                        },
+                      };
+                      getErrorOrchestrator().handleError(options);
+                    }
                   }}
                   color="primary"
                 />
@@ -313,9 +414,23 @@ export default class RulesetColumns {
                   iconType="trash"
                   tooltip={{position: 'top', content:(defaultItems.indexOf(`${item.relative_dirname}`) === -1) ? `Delete ${item.filename}` : `The ${item.filename} list cannot be deleted`}}
                   onClick={async (ev) => {
-                    ev.stopPropagation();
-                    this.tableProps.updateListItemsForRemove([item]);
-                    this.tableProps.updateShowModal(true);
+                    try{
+                      ev.stopPropagation();
+                      this.tableProps.updateListItemsForRemove([item]);
+                      this.tableProps.updateShowModal(true);
+                    }catch(error){
+                      const options: UIErrorLog = {
+                        context: `Lists.deleteFile`,
+                        level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+                        severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
+                        error: {
+                          error: error,
+                          message: error.message || error,
+                          title: error.name,
+                        },
+                      };
+                      getErrorOrchestrator().handleError(options);
+                    }
                   }}
                   color="danger"
                   isDisabled={defaultItems.indexOf(`${item.relative_dirname}`) !== -1}
@@ -327,8 +442,22 @@ export default class RulesetColumns {
                   iconType="exportAction"
                   tooltip={{position: 'top', content: `Export ${item.filename} content`}}
                   onClick={async (ev) => {
-                    ev.stopPropagation();
-                    await exportCsv(`/lists`, [{_isCDBList: true, name: 'filename', value: `${item.filename}`}], item.filename)
+                    try{
+                      ev.stopPropagation();
+                      await exportCsv(`/lists`, [{_isCDBList: true, name: 'filename', value: `${item.filename}`}], item.filename)
+                    }catch(error){
+                      const options: UIErrorLog = {
+                        context: `Lists.exportFile`,
+                        level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+                        severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
+                        error: {
+                          error: error,
+                          message: error.message || error,
+                          title: error.name,
+                        },
+                      };
+                      getErrorOrchestrator().handleError(options);
+                    }
                   }}
                   color="primary"
                 />
