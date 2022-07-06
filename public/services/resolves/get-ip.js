@@ -97,7 +97,7 @@ export function getIp(
         store: true,
         error: {
           error: error,
-          message: error.message || error,
+          message: (error?.body?.message?.includes('no permissions for') && `You have no permissions. Contact to an administrator:\n${error?.body?.message}`) || error.message || error,
           title: error.name || error,
         },
       };
