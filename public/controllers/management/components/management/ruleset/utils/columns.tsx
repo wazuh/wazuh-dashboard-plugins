@@ -92,16 +92,10 @@ export default class RulesetColumns {
                       const file = { name: value, content: result, path: item.relative_dirname };
                       this.tableProps.updateFileContent(file);
                     }catch(error){
-                      const options: UIErrorLog = {
-                        context: 'Rules.readFileContent',
-                        level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
-                        severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
-                        error: {
-                          error: error,
-                          message: error.message || error,
-                          title: error.name,
-                        },
-                      };
+                      const options: UIErrorLog = this.getErrorOptions(
+                        error,
+                        'Rules.readFileContent'
+                      );
                       getErrorOrchestrator().handleError(options);
                     }
                   }}>
@@ -156,16 +150,10 @@ export default class RulesetColumns {
                       const file = { name: value, content: result, path: item.relative_dirname };
                       this.tableProps.updateFileContent(file);
                     }catch(error){
-                      const options: UIErrorLog = {
-                        context: `Decoders.readFileContent`,
-                        level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
-                        severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
-                        error: {
-                          error: error,
-                          message: error.message || error,
-                          title: error.name,
-                        },
-                      };
+                      const options: UIErrorLog = this.getErrorOptions(
+                        error,
+                        'Decoders.readFileContent'
+                      );
                       getErrorOrchestrator().handleError(options);
                     }
                   }}>
@@ -207,16 +195,10 @@ export default class RulesetColumns {
                       ev.stopPropagation();
                       await exportCsv(`/lists?path=${item.relative_dirname}/${item.filename}`, [{_isCDBList: true, name: 'path', value: `${item.relative_dirname}/${item.filename}`}], item.filename)
                     }catch(error){
-                      const options: UIErrorLog = {
-                        context: `Lists.exportFile`,
-                        level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
-                        severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
-                        error: {
-                          error: error,
-                          message: error.message || error,
-                          title: error.name,
-                        },
-                      };
+                      const options: UIErrorLog = this.getErrorOptions(
+                        error,
+                        'Lists.exportFile'
+                      );
                       getErrorOrchestrator().handleError(options);
                     }
                   }}
@@ -253,16 +235,10 @@ export default class RulesetColumns {
                         const file = { name: item.filename, content: result, path: item.relative_dirname };
                         this.tableProps.updateFileContent(file);
                       }catch(error){
-                        const options: UIErrorLog = {
-                          context: `Files.readFileContent`,
-                          level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
-                          severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
-                          error: {
-                            error: error,
-                            message: error.message || error,
-                            title: error.name,
-                          },
-                        };
+                        const options: UIErrorLog = this.getErrorOptions(
+                          error,
+                          'Files.readFileContent'
+                        );
                         getErrorOrchestrator().handleError(options);
                       }
                     }}
@@ -286,16 +262,10 @@ export default class RulesetColumns {
                           const file = { name: item.filename, content: result, path: item.relative_dirname };
                           this.tableProps.updateFileContent(file);
                         }catch(error){
-                          const options: UIErrorLog = {
-                            context: `Files.editFileContent`,
-                            level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
-                            severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
-                            error: {
-                              error: error,
-                              message: error.message || error,
-                              title: error.name,
-                            },
-                          };
+                          const options: UIErrorLog = this.getErrorOptions(
+                            error,
+                            'Files.editFileContent'
+                          );
                           getErrorOrchestrator().handleError(options);
                         }
                       }}
@@ -313,16 +283,10 @@ export default class RulesetColumns {
                           this.tableProps.updateListItemsForRemove([item]);
                           this.tableProps.updateShowModal(true);
                         }catch(error){
-                          const options: UIErrorLog = {
-                            context: `Files.deleteFile`,
-                            level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
-                            severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
-                            error: {
-                              error: error,
-                              message: error.message || error,
-                              title: error.name,
-                            },
-                          };
+                          const options: UIErrorLog = this.getErrorOptions(
+                            error,
+                            'Files.deleteFile'
+                          );
                           getErrorOrchestrator().handleError(options);
                         }
                       }}
@@ -392,16 +356,10 @@ export default class RulesetColumns {
                       const file = { name: item.filename, content: result, path: item.relative_dirname };
                       this.tableProps.updateListContent(file);
                     }catch(error){
-                      const options: UIErrorLog = {
-                        context: `Lists.editFileContent`,
-                        level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
-                        severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
-                        error: {
-                          error: error,
-                          message: error.message || error,
-                          title: error.name,
-                        },
-                      };
+                      const options: UIErrorLog = this.getErrorOptions(
+                        error,
+                        'Lists.editFileContent'
+                      );
                       getErrorOrchestrator().handleError(options);
                     }
                   }}
@@ -419,16 +377,10 @@ export default class RulesetColumns {
                       this.tableProps.updateListItemsForRemove([item]);
                       this.tableProps.updateShowModal(true);
                     }catch(error){
-                      const options: UIErrorLog = {
-                        context: `Lists.deleteFile`,
-                        level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
-                        severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
-                        error: {
-                          error: error,
-                          message: error.message || error,
-                          title: error.name,
-                        },
-                      };
+                      const options: UIErrorLog = this.getErrorOptions(
+                        error,
+                        'Lists.deleteFile'
+                      );
                       getErrorOrchestrator().handleError(options);
                     }
                   }}
@@ -446,16 +398,10 @@ export default class RulesetColumns {
                       ev.stopPropagation();
                       await exportCsv(`/lists`, [{_isCDBList: true, name: 'filename', value: `${item.filename}`}], item.filename)
                     }catch(error){
-                      const options: UIErrorLog = {
-                        context: `Lists.exportFile`,
-                        level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
-                        severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
-                        error: {
-                          error: error,
-                          message: error.message || error,
-                          title: error.name,
-                        },
-                      };
+                      const options: UIErrorLog = this.getErrorOptions(
+                        error, 
+                        'Lists.exportFile'
+                      );
                       getErrorOrchestrator().handleError(options);
                     }
                   }}
@@ -469,6 +415,26 @@ export default class RulesetColumns {
 
 
     this.buildColumns();
+  }
+
+  /**
+   * Build and return a new error options object, based on the actual error
+   * and the context
+   * @param error raised error
+   * @param context context of the error
+   * @returns a dictionary with the error details for the ErrorOrchestator
+   */
+  private getErrorOptions(error: unknown, context: string): UIErrorLog {
+    return {
+      context: context,
+      level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+      severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
+      error: {
+        error: error,
+        message: error.message || error,
+        title: error.name,
+      },
+    };
   }
 
   buildComplianceBadges(item) {
