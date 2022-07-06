@@ -22,6 +22,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Added to the interface API messages in the Ruleset test module [#4244](https://github.com/wazuh/wazuh-kibana-app/pull/4244)
 - Added authorization prompt in Mitre > Intelligence [#4261](https://github.com/wazuh/wazuh-kibana-app/pull/4261)
+- Added a more descriptive message when there is an error related to the user permissions when getting the list of index patterns in a route resolver [#4280](https://github.com/wazuh/wazuh-kibana-app/pull/4280)
 
 ### Changed
 
