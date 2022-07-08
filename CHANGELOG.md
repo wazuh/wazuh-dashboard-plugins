@@ -17,7 +17,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 # Fixed
 
 - Fixed some links to web documentation that didn't work [#4301](https://github.com/wazuh/wazuh-kibana-app/pull/4301)
-- Display the errors when there was a problem in the action buttons of `Rules/Decoders/CDB Lists`'s tables [#4307](https://github.com/wazuh/wazuh-kibana-app/pull/4307)
+- Display errors on the action buttons of `Rules/Decoders/CDB Lists`'s tables [#4307](https://github.com/wazuh/wazuh-kibana-app/pull/4307)
 
 ## Wazuh v4.3.5 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4306
 
