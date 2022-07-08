@@ -1,6 +1,6 @@
 {
   "name": "wazuh",
-  "version": "4.4.0",
+  "version": "4.3.5",
   "revision": "4400",
   "code": "4400",
   "pluginPlatform": {
@@ -62,10 +62,19 @@
     "winston": "3.0.0"
   },
   "devDependencies": {
-    "redux-mock-store": "^1.5.4",
     "@types/node-cron": "^2.0.3",
+    "cypress": "9.5.2",
+    "cypress-cucumber-preprocessor": "4.0.3",
+    "cypress-xpath": "1.6.2",
     "eslint-plugin-async-await": "^0.0.0",
+    "mochawesome": "7.1.3",
+    "mochawesome-merge": "4.2.0",
+    "redux-mock-store": "^1.5.4",
     "tslint": "^5.11.0",
     "typescript-eslint-parser": "^18.0.0"
+  },
+  "cypress-cucumber-preprocessor": {
+    "nonGlobalStepDefinitions": false,
+    "step_definitions": "cypress/integration/step-definitions/**/"
   }
 }
