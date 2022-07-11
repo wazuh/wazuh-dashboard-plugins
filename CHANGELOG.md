@@ -1,6 +1,11 @@
 # Change Log
 
 All notable changes to the Wazuh app project will be documented in this file.
+## Wazuh v4.4.0 - OpenSearch Dashboards 1.2.0 - Revision 4400
+
+### Changed
+
+- Changed the HTTP verb from `GET` to `POST` in the requests to login to the Wazuh API [#4103](https://github.com/wazuh/wazuh-kibana-app/pull/4103)
 
 ## Wazuh v4.3.7 - OpenSearch Dashboards 1.2.0 - Revision 4308
 
@@ -33,6 +38,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed broken links to the documentation site [#4301](https://github.com/wazuh/wazuh-kibana-app/pull/4301)
 - Fix Rules, Decoders and CDB lists uploaders to show errors appropriately [#4307](https://github.com/wazuh/wazuh-kibana-app/pull/4307)
 - Sanitize report's inputs and usernames [#4330](https://github.com/wazuh/wazuh-kibana-app/pull/4330)
+
 
 ## Wazuh v4.3.5 - OpenSearch Dashboards 1.2.0 - Revision 4306
 
