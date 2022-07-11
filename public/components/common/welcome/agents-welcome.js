@@ -51,9 +51,14 @@ import { updateCurrentAgentData } from '../../../redux/actions/appStateActions';
 import WzTextWithTooltipIfTruncated from '../wz-text-with-tooltip-if-truncated';
 import { getAngularModule } from '../../../kibana-services';
 import { hasAgentSupportModule } from '../../../react-services/wz-agents';
-import { withErrorBoundary } from '../hocs';
+import { withErrorBoundary, withReduxProvider } from '../hocs';
+import { compose } from 'redux';
+import { API_NAME_AGENT_STATUS } from '../../../../common/constants';
 
-export const AgentsWelcome = withErrorBoundary (class AgentsWelcome extends Component {
+export const AgentsWelcome = compose(
+  withReduxProvider,
+  withErrorBoundary)(
+class AgentsWelcome extends Component {
   _isMount = false;
   constructor(props) {
     super(props);
@@ -504,7 +509,7 @@ export const AgentsWelcome = withErrorBoundary (class AgentsWelcome extends Comp
   render() {
     const title = this.renderTitle();
     const upgradeButton = this.renderUpgradeButton();
-    if (this.props.agent.status === 'never_connected') {
+    if (this.props.agent.status === API_NAME_AGENT_STATUS.NEVER_CONNECTED) {
       return (
         <EuiEmptyPrompt
           iconType="securitySignalDetected"

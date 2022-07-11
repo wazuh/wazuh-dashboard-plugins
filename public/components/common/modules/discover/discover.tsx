@@ -87,7 +87,6 @@ export const Discover = compose(
       sortField: string;
       sortDirection: Direction;
       isLoading: boolean;
-      requestFilters: object;
       requestSize: number;
       requestOffset: number;
       query: { language: 'kuery' | 'lucene'; query: string };
@@ -103,6 +102,7 @@ export const Discover = compose(
       initialFilters: object[];
       query?: { language: 'kuery' | 'lucene'; query: string };
       type?: any;
+      rowDetailsFields?: string[];
       updateTotalHits: Function;
       includeFilters?: string;
       initialColumns: ColumnDefinition[];
@@ -126,7 +126,6 @@ export const Discover = compose(
         sortField: 'timestamp',
         sortDirection: 'desc',
         isLoading: false,
-        requestFilters: {},
         requestSize: 500,
         requestOffset: 0,
         itemIdToExpandedRowMap: {},
@@ -170,8 +169,7 @@ export const Discover = compose(
         const options = {
           context: `${Discover.name}.componentDidMount`,
           level: UI_LOGGER_LEVELS.ERROR,
-          severity: UI_ERROR_SEVERITIES.CRITICAL,
-          store: true,
+          severity: UI_ERROR_SEVERITIES.BUSINESS,
           error: {
             error: error,
             message: error.message || error,
@@ -230,8 +228,7 @@ export const Discover = compose(
           const options = {
             context: `${Discover.name}.componentDidUpdate`,
             level: UI_LOGGER_LEVELS.ERROR,
-            severity: UI_ERROR_SEVERITIES.CRITICAL,
-            store: true,
+            severity: UI_ERROR_SEVERITIES.BUSINESS,
             error: {
               error: error,
               message: error.message || error,
@@ -323,6 +320,8 @@ export const Discover = compose(
 
     toggleDetails = (item) => {
       const itemIdToExpandedRowMap = { ...this.state.itemIdToExpandedRowMap };
+      const { rowDetailsFields } = this.props;
+
       if (itemIdToExpandedRowMap[item._id]) {
         delete itemIdToExpandedRowMap[item._id];
         this.setState({ itemIdToExpandedRowMap });
@@ -336,6 +335,7 @@ export const Discover = compose(
               addFilter={(filter) => this.addFilter(filter)}
               addFilterOut={(filter) => this.addFilterOut(filter)}
               toggleColumn={(id) => this.addColumn(id)}
+              rowDetailsFields={rowDetailsFields}
             />
           </div>
         );
@@ -386,8 +386,8 @@ export const Discover = compose(
       const range = {
         range: {
           timestamp: {
-            gte: dateParse(this.timefilter.getTime().from),
-            lte: dateParse(this.timefilter.getTime().to),
+            gte: dateParse(this.state.dateRange.from),
+            lte: dateParse(this.state.dateRange.to),
             format: 'epoch_millis',
           },
         },
@@ -417,9 +417,9 @@ export const Discover = compose(
     async getAlerts() {
       if (!this.indexPattern || this.state.isLoading) return;
       //compare filters so we only make a request into Elasticsearch if needed
-      const newFilters = this.buildFilter();
       try {
         this.setState({ isLoading: true });
+        const newFilters = this.buildFilter();
         const alerts = await GenericRequest.request('POST', `/elastic/alerts`, {
           index: this.indexPattern.title,
           body: newFilters,
@@ -429,13 +429,12 @@ export const Discover = compose(
             alerts: alerts.data.hits.hits,
             total: alerts.data.hits.total.value,
             isLoading: false,
-            requestFilters: newFilters,
           });
           this.props.updateTotalHits(alerts.data.hits.total.value);
         }
       } catch (error) {
         if (this._isMount) {
-          this.setState({ alerts: [], total: 0, isLoading: false, requestFilters: newFilters });
+          this.setState({ alerts: [], total: 0, isLoading: false });
           this.props.updateTotalHits(0);
         }
         throw error;
@@ -474,7 +473,7 @@ export const Discover = compose(
       const columns = columnsList.map((item) => {
         if (item === 'icon') {
           return {
-            width: '25px',
+            width: '2.3%',
             isExpander: true,
             render: (item) => {
               return (

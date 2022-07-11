@@ -1103,7 +1103,8 @@
     },
     "related_endpoints": [
       "GET /vulnerability/{agent_id}",
-      "GET /vulnerability/{agent_id}/last_scan"
+      "GET /vulnerability/{agent_id}/last_scan",
+      "GET /vulnerability/{agent_id}/summary/{field}"
     ]
   }
 }

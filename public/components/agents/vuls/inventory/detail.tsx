@@ -22,7 +22,9 @@ import {
   EuiSpacer,
   EuiStat,
   EuiToolTip,
+  EuiListGroup,
   EuiBadge,
+  EuiText,
 } from '@elastic/eui';
 import { Discover } from '../../../common/modules/discover';
 import { ModulesHelper } from '../../../common/modules/modules-helper';
@@ -90,6 +92,12 @@ export class Details extends Component {
   details() {
     return [
       {
+        field: 'title',
+        name: 'Title',
+        icon: 'home',
+        link: false,
+      },
+      {
         field: 'name',
         name: 'Name',
         icon: 'dot',
@@ -114,20 +122,54 @@ export class Details extends Component {
         link: true,
       },
       {
+        field: 'condition',
+        name: 'Condition',
+        icon: 'crosshairs',
+        link: false,
+      },
+      {
         field: 'last_full_scan',
-        name: 'Last Full Scan',
+        name: 'Last full scan',
         icon: 'clock',
         link: false,
-        transformValue: formatUIDate
+        transformValue: this.beautifyDate
       },
       {
         field: 'last_partial_scan',
-        name: 'Last Partial Scan',
+        name: 'Last partial scan',
         icon: 'clock',
         link: false,
-        transformValue: formatUIDate
-      }
+        transformValue: this.beautifyDate
+      },
+      {
+        field: 'published',
+        name: 'Published',
+        icon: 'clock',
+        link: false,
+        transformValue: this.beautifyDate
+      },
+      {
+        field: 'updated',
+        name: 'Updated',
+        icon: 'clock',
+        link: false,
+        transformValue: this.beautifyDate
+      },
+      {
+        field: 'external_references',
+        name: 'References',
+        icon: 'link',
+        link: false,
+        transformValue: this.renderExternalReferences
+      },
     ];
+  }
+
+  // This method was created because Wazuh API returns 1970-01-01T00:00:00Z dates or undefined ones
+  // when vulnerability module is not configured
+  // its meant to render nothing when such date is received
+  beautifyDate(date?: string) {
+    return date && !['1970-01-01T00:00:00Z', '-'].includes(date) ? formatUIDate(date) : '-';
   }
 
   viewInEvents = (ev) => {
@@ -272,6 +314,32 @@ export class Details extends Component {
     );
   }
 
+  renderExternalReferences(references) {
+    return (
+      <EuiAccordion
+        id="modules_vulnerabilities_inventory_flyout_details_references"
+        paddingSize="none"
+        initialIsOpen={false}
+        arrowDisplay="none"
+        buttonContent={
+          <EuiTitle size="xs">
+            <EuiToolTip position="top" content="View external references">
+              <p className="detail-value" style={{ margin: 0 }}>View external references <EuiIcon
+                className="euiButtonIcon euiButtonIcon--primary"
+                type="inspect"
+                aria-label="show"
+              /></p>
+            </EuiToolTip>
+          </EuiTitle>
+        }>
+        <EuiListGroup size="xs" flush={true} gutterSize="none" style={{ display: 'grid' }}
+          listItems={references.map(link => ({ label: link, href: link, target: '_blank' }))
+          }
+        />
+      </EuiAccordion>
+    );
+  }
+
   updateTotalHits = (total) => {
     this.setState({ totalHits: total });
   };
@@ -390,6 +458,7 @@ export class Details extends Component {
                   { field: 'rule.description', label: 'Description' },
                   { field: 'rule.level', label: 'Level' },
                   { field: 'rule.id', label: 'Rule ID' },
+                  { field: 'data.vulnerability.status', label: 'Status', width: '20%' },
                 ]}
                 includeFilters="vulnerability"
                 implicitFilters={implicitFilters}

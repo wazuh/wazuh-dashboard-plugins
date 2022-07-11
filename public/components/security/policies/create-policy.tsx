@@ -165,7 +165,6 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
       const result = await WzRequest.apiReq(
         'POST',
         '/security/policies',
-
         {
           name: policyName,
           policy: {

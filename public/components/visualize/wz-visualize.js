@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component, Fragment } from 'react';
-
+import { version as appVersion} from '../../../package.json';
 import { visualizations } from './visualizations';
 import { agentVisualizations } from './agent-visualizations';
 import KibanaVis from '../../kibana-integrations/kibana-vis';
@@ -23,7 +23,6 @@ import {
   EuiButtonIcon,
   EuiDescriptionList,
   EuiCallOut,
-  EuiLink,
 } from '@elastic/eui';
 import WzReduxProvider from '../../redux/wz-redux-provider';
 import { WazuhConfig } from '../../react-services/wazuh-config';
@@ -56,10 +55,11 @@ export const WzVisualize = compose(
       this.state = {
         visualizations: !!props.isAgent ? agentVisualizations : visualizations,
         expandedVis: false,
-        hasRefreshedKnownFields: false,
         refreshingKnownFields: [],
         refreshingIndex: true,
       };
+      this.hasRefreshedKnownFields = false;
+      this.isRefreshing = false;
       this.metricValues = false;
       this.rawVisualizations = new RawVisualizations();
       this.wzReq = WzRequest;
@@ -74,43 +74,33 @@ export const WzVisualize = compose(
       this._isMount = true;
       visHandler.removeAll();
       this.agentsStatus = false;
-      if (!this.monitoringEnabled) {
-        const data = await this.wzReq.apiReq('GET', '/agents/summary/status', {});
-        const result = ((data || {}).data || {}).data || false;
-        if (result) {
-          this.agentsStatus = [
-            {
-              title: 'Total',
-              description: result.total,
-            },
-            {
-              title: 'Active',
-              description: result.active,
-            },
-            {
-              title: 'Disconnected',
-              description: result.disconnected,
-            },
-            {
-              title: 'Never Connected',
-              description: result['never_connected'],
-            },
-            {
-              title: 'Agents coverage',
-              description: (result.total ? (result.active / result.total) * 100 : 0) + '%',
-            },
-          ];
-        }
-      }
     }
 
+    /**
+     * Reset the visualizations when the type of Dashboard is changed.
+     * 
+     * There are 2 kinds of Dashboards:
+     *   - General or overview   --> When to agent is pinned.
+     *   - Specific or per agent --> When there is an agent pinned.
+     * 
+     * The visualizations are reset only when the type of Dashboard changes 
+     * from a type to another, but aren't when the pinned agent changes.
+     * 
+     * More info:
+     * https://github.com/wazuh/wazuh-kibana-app/issues/4230#issuecomment-1152161434
+     * 
+     * @param {Object} prevProps 
+     */
     async componentDidUpdate(prevProps) {
-      if (prevProps.isAgent !== this.props.isAgent) {
+      if (
+        (!prevProps.isAgent && this.props.isAgent) ||
+        (prevProps.isAgent && !this.props.isAgent)
+      ) {
         this._isMount &&
           this.setState({
             visualizations: !!this.props.isAgent ? agentVisualizations : visualizations,
           });
-        typeof prevProps.isAgent !== 'undefined' && visHandler.removeAll();
+        visHandler.removeAll();
       }
     }
 
@@ -126,18 +116,19 @@ export const WzVisualize = compose(
       if (newField && newField.name) {
         this.newFields[newField.name] = newField;
       }
-      if (!this.state.hasRefreshedKnownFields) {
+      if (!this.hasRefreshedKnownFields) {
         // Known fields are refreshed only once per dashboard loading
         try {
-          this.setState({ hasRefreshedKnownFields: true, isRefreshing: true });
+          this.hasRefreshedKnownFields = true;
+          this.isRefreshing = true;
           if(satisfyPluginPlatformVersion('<7.11')){
             await PatternHandler.refreshIndexPattern(this.newFields);
           };
-          this.setState({ isRefreshing: false });
+          this.isRefreshing = false;
           this.reloadToast();
           this.newFields = {};
         } catch (error) {
-          this.setState({ isRefreshing: false });
+          this.isRefreshing = false;
           const options = {
             context: `${WzVisualize.name}.refreshKnownFields`,
             level: UI_LOGGER_LEVELS.ERROR,
@@ -150,13 +141,15 @@ export const WzVisualize = compose(
           };
           getErrorOrchestrator().handleError(options);
         }
-      } else if (this.state.isRefreshing) {
+      } else if (this.isRefreshing) {
         await new Promise((r) => setTimeout(r, 150));
         await this.refreshKnownFields();
       }
     };
     reloadToast = () => {
       const toastLifeTimeMs = 300000;
+      const [mayor, minor] = appVersion.split('.');
+      const urlTroubleShootingDocs = `https://documentation.wazuh.com/${mayor}.${minor}/user-manual/elasticsearch/troubleshooting.html#index-pattern-was-refreshed-toast-keeps-popping-up`;
       if(satisfyPluginPlatformVersion('<7.11')){
         getToasts().add({
           color: 'success',
@@ -165,6 +158,13 @@ export const WzVisualize = compose(
             <EuiFlexItem grow={false}>
               There were some unknown fields for the current index pattern.
               You need to refresh the page to apply the changes.
+              <a
+                title="More information in Wazuh documentation"
+                href={urlTroubleShootingDocs}
+                target="documentation"
+              >
+                Troubleshooting
+                </a>
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
               <EuiButton onClick={() => window.location.reload()} size="s">Reload page</EuiButton>
@@ -180,6 +180,12 @@ export const WzVisualize = compose(
             <EuiFlexItem grow={false}>
               There are some unknown fields for the current index pattern.
               You need to refresh the page to update the fields.
+              <a
+                title="More information in Wazuh documentation"
+                href={urlTroubleShootingDocs}
+                target="documentation">
+                Troubleshooting
+                </a>
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
               <EuiButton onClick={() => window.location.reload()} size="s">Reload page</EuiButton>
@@ -214,29 +220,15 @@ export const WzVisualize = compose(
                     aria-label="Expand"
                   />
                 </EuiFlexGroup>
-                <div style={{ height: '100%' }}>
-                  {(vis.id !== 'Wazuh-App-Overview-General-Agents-status' ||
-                    (vis.id === 'Wazuh-App-Overview-General-Agents-status' &&
-                      this.monitoringEnabled)) && (
-                    <WzReduxProvider>
-                      <KibanaVis
-                        refreshKnownFields={this.refreshKnownFields}
-                        visID={vis.id}
-                        tab={selectedTab}
-                        {...this.props}
-                      ></KibanaVis>
-                    </WzReduxProvider>
-                  )}
-                  {vis.id === 'Wazuh-App-Overview-General-Agents-status' &&
-                    !this.monitoringEnabled && (
-                      <EuiPage style={{ background: 'transparent' }}>
-                        <EuiDescriptionList
-                          type="column"
-                          listItems={this.agentsStatus}
-                          style={{ maxWidth: '400px' }}
-                        />
-                      </EuiPage>
-                    )}
+                <div style={{ height: '100%' }}>   
+                  <WzReduxProvider>
+                    <KibanaVis
+                      refreshKnownFields={this.refreshKnownFields}
+                      visID={vis.id}
+                      tab={selectedTab}
+                      {...this.props}
+                    ></KibanaVis>
+                  </WzReduxProvider>
                 </div>
               </EuiFlexItem>
             </EuiPanel>

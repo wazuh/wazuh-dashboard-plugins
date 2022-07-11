@@ -82,9 +82,9 @@ export class DevToolsController {
     $(this.$document[0]).keyup(e => {
       this.multipleKeyPressed = [];
     });
-
+    const element = this.$document[0].getElementById('api_input');
     this.apiInputBox = CodeMirror.fromTextArea(
-      this.$document[0].getElementById('api_input'),
+      element,
       {
         lineNumbers: true,
         matchBrackets: true,
@@ -158,10 +158,9 @@ export class DevToolsController {
     try {
       const currentState = this.apiInputBox.getValue().toString();
       AppState.setCurrentDevTools(currentState);
-
       const tmpgroups = [];
       const splitted = currentState
-        .split(/[\r\n]+(?=(?:GET|PUT|POST|DELETE|#)\b)/gm)
+        .split(/[\r\n]+(?=(?:GET|PUT|POST|DELETE)\b)/gm)
         .filter(item => item.replace(/\s/g, '').length);
 
       let start = 0;
@@ -170,7 +169,7 @@ export class DevToolsController {
       const slen = splitted.length;
       for (let i = 0; i < slen; i++) {
         let tmp = splitted[i].split('\n');
-        if (Array.isArray(tmp)) tmp = tmp.filter(item => !item.includes('#'));
+        if (Array.isArray(tmp)) tmp = tmp.filter(item => !item.startsWith('#'));
         const cursor = this.apiInputBox.getSearchCursor(splitted[i], null, {
           multiline: true
         });
@@ -205,7 +204,7 @@ export class DevToolsController {
 
         const tmplen = tmp.length;
         for (let j = 1; j < tmplen; ++j) {
-          if (!!tmp[j] && !tmp[j].includes('#')) {
+          if (!!tmp[j] && !tmp[j].startsWith('#')) {
             tmpRequestTextJson += tmp[j];
           }
         }
@@ -811,10 +810,7 @@ export class DevToolsController {
           }
           else {
             this.apiOutputBox.setValue(
-              JSON.stringify((output || {}).data || {}, null, 2).replace(
-                /\\\\/g,
-                '\\'
-              )
+              JSON.stringify((output || {}).data || {}, null, 2)
             );
           }
         }
@@ -835,19 +831,21 @@ export class DevToolsController {
       };
       getErrorOrchestrator().handleError(options);
 
-      if ((error || {}).status === -1) {
-        return this.apiOutputBox.setValue(
-          'Wazuh API is not reachable. Reason: timeout.'
-        );
+      return this.apiOutputBox.setValue(this.parseError(error));
+    }
+  }
+
+  parseError(error){
+    if ((error || {}).status === -1) {
+      return 'Wazuh API is not reachable. Reason: timeout.';
+    } else {
+      const parsedError = ErrorHandler.handle(error, '', { silent: true });
+      if (typeof parsedError === 'string') {
+        return parsedError;
+      } else if (error && error.data && typeof error.data === 'object') {
+        return JSON.stringify(error);
       } else {
-        const parsedError = ErrorHandler.handle(error, '', { silent: true });
-        if (typeof parsedError === 'string') {
-          return this.apiOutputBox.setValue(error);
-        } else if (error && error.data && typeof error.data === 'object') {
-          return this.apiOutputBox.setValue(JSON.stringify(error));
-        } else {
-          return this.apiOutputBox.setValue('Empty');
-        }
+        return 'Empty';
       }
     }
   }

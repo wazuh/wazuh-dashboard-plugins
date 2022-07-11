@@ -50,16 +50,6 @@ export const MainModuleOverview = connect(mapStateToProps)(class MainModuleOverv
     };
   }
 
-  getBadgeColor(agentStatus) {
-    if (agentStatus.toLowerCase() === 'active') {
-      return 'secondary';
-    } else if (agentStatus.toLowerCase() === 'disconnected') {
-      return '#BD271E';
-    } else if (agentStatus.toLowerCase() === 'never connected') {
-      return 'default';
-    }
-  }
-
   setGlobalBreadcrumb() {
     const currentAgent = store.getState().appStateReducers.currentAgentData;
     if (WAZUH_MODULES[this.props.section]) {
@@ -74,15 +64,7 @@ export const MainModuleOverview = connect(mapStateToProps)(class MainModuleOverv
       ];
       if (currentAgent.id) {
         breadcrumb.push({
-          className: "euiLink euiLink--subdued ",
-          onClick: (ev) => { ev.stopPropagation(); AppNavigate.navigateToModule(ev, 'agents', { "tab": "welcome", "agent": currentAgent.id }); this.router.reload(); },
-          id: "breadcrumbNoTitle",
-          truncate: true,
-          text: (
-            <EuiToolTip position="bottom" content={"View agent summary"} display="inlineBlock">
-              <span>{currentAgent.name}</span>
-            </EuiToolTip>
-          ),
+          agent: currentAgent
         })
       }
       breadcrumb.push({
@@ -109,12 +91,14 @@ export const MainModuleOverview = connect(mapStateToProps)(class MainModuleOverv
   }
 
   async componentDidMount() {
+    const { module } = this.props;
     const tabView = AppNavigate.getUrlParameter('tabView') || 'panels';
     const tab = AppNavigate.getUrlParameter('tab');
+    const tabExceptions = ['sca', 'vuls'];
     if (tabView && tabView !== this.props.selectView) {
-      if (tabView === 'panels' && tab === 'sca') {
-        // SCA initial tab is inventory
-        this.props.onSelectedTabChanged('inventory');
+      if (tabView === 'panels' && tabExceptions.includes(tab)) {
+        // SCA & Vulnerabilities initial tab is inventory
+        this.props.onSelectedTabChanged(module.init);
       } else {
         this.props.onSelectedTabChanged(tabView);
       }

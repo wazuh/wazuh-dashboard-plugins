@@ -1352,38 +1352,7 @@
             "description": "Wazuh component that logged the event",
             "schema": {
               "type": "string",
-              "enum": [
-                "wazuh-agentlessd",
-                "wazuh-analysisd",
-                "wazuh-authd",
-                "wazuh-csyslogd",
-                "wazuh-dbd",
-                "wazuh-execd",
-                "wazuh-integratord",
-                "wazuh-maild",
-                "wazuh-monitord",
-                "wazuh-logcollector",
-                "wazuh-remoted",
-                "wazuh-reportd",
-                "wazuh-rootcheck",
-                "wazuh-syscheckd",
-                "sca",
-                "wazuh-db",
-                "wazuh-modulesd",
-                "wazuh-modulesd:agent-key-polling",
-                "wazuh-modulesd:aws-s3",
-                "wazuh-modulesd:azure-logs",
-                "wazuh-modulesd:ciscat",
-                "wazuh-modulesd:control",
-                "wazuh-modulesd:command",
-                "wazuh-modulesd:database",
-                "wazuh-modulesd:docker-listener",
-                "wazuh-modulesd:download",
-                "wazuh-modulesd:oscap",
-                "wazuh-modulesd:osquery",
-                "wazuh-modulesd:syscollector",
-                "wazuh-modulesd:vulnerability-detector"
-              ]
+              "format": "alphanumeric"
             }
           },
           {
@@ -4799,38 +4768,7 @@
             "description": "Wazuh component that logged the event",
             "schema": {
               "type": "string",
-              "enum": [
-                "wazuh-agentlessd",
-                "wazuh-analysisd",
-                "wazuh-authd",
-                "wazuh-csyslogd",
-                "wazuh-dbd",
-                "wazuh-execd",
-                "wazuh-integratord",
-                "wazuh-maild",
-                "wazuh-monitord",
-                "wazuh-logcollector",
-                "wazuh-remoted",
-                "wazuh-reportd",
-                "wazuh-rootcheck",
-                "wazuh-syscheckd",
-                "sca",
-                "wazuh-db",
-                "wazuh-modulesd",
-                "wazuh-modulesd:agent-key-polling",
-                "wazuh-modulesd:aws-s3",
-                "wazuh-modulesd:azure-logs",
-                "wazuh-modulesd:ciscat",
-                "wazuh-modulesd:control",
-                "wazuh-modulesd:command",
-                "wazuh-modulesd:database",
-                "wazuh-modulesd:docker-listener",
-                "wazuh-modulesd:download",
-                "wazuh-modulesd:oscap",
-                "wazuh-modulesd:osquery",
-                "wazuh-modulesd:syscollector",
-                "wazuh-modulesd:vulnerability-detector"
-              ]
+              "format": "alphanumeric"
             }
           },
           {
@@ -6967,25 +6905,6 @@
         ]
       },
       {
-        "name": "/security/user/authenticate",
-        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.login_user",
-        "description": "This method should be called to get an API token. This token will expire after auth_token_exp_timeout seconds (default: 900). This value can be changed using PUT /security/config",
-        "summary": "Login",
-        "tags": [
-          "Security"
-        ],
-        "query": [
-          {
-            "name": "raw",
-            "description": "Format response in plain text",
-            "required": false,
-            "schema": {
-              "type": "boolean"
-            }
-          }
-        ]
-      },
-      {
         "name": "/security/users",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.get_users",
         "description": "Get the information of a specified user",
@@ -8853,6 +8772,82 @@
           }
         ],
         "query": [
+          {
+            "name": "pretty",
+            "description": "Show results in human-readable format",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "wait_for_complete",
+            "description": "Disable timeout response",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ]
+      },
+      {
+        "name": "/vulnerability/:agent_id/summary/:field",
+        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.vulnerability_controller.get_vulnerabilities_field_summary",
+        "description": "Return a summary of the vulnerabilities' field of an agent",
+        "summary": "Get agent vulnerabilities' field summary",
+        "tags": [
+          "Vulnerability"
+        ],
+        "args": [
+          {
+            "name": ":agent_id",
+            "description": "Agent ID. All possible values from 000 onwards",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 3,
+              "description": "Agent ID",
+              "format": "numbers"
+            }
+          },
+          {
+            "name": ":field",
+            "description": "Vulnerability inventory field",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "cve",
+                "name",
+                "version",
+                "architecture",
+                "detection_time",
+                "severity",
+                "cvss2_score",
+                "cvss3_score",
+                "external_references",
+                "type",
+                "status",
+                "condition",
+                "title",
+                "published",
+                "updated"
+              ]
+            }
+          }
+        ],
+        "query": [
+          {
+            "name": "limit",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 500,
+              "minimum": 1,
+              "maximum": 100000
+            }
+          },
           {
             "name": "pretty",
             "description": "Show results in human-readable format",
@@ -10833,6 +10828,25 @@
                 "type": "object",
                 "description": "Rule body"
               }
+            }
+          }
+        ]
+      },
+      {
+        "name": "/security/user/authenticate",
+        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.login_user",
+        "description": "This method should be called to get an API token. This token will expire after auth_token_exp_timeout seconds (default: 900). This value can be changed using PUT /security/config",
+        "summary": "Login",
+        "tags": [
+          "Security"
+        ],
+        "query": [
+          {
+            "name": "raw",
+            "description": "Format response in plain text",
+            "required": false,
+            "schema": {
+              "type": "boolean"
             }
           }
         ]

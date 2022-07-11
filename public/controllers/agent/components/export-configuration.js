@@ -143,13 +143,12 @@ export const ExportConfiguration = withErrorBoundary (class ExportConfiguration 
           compressed
         />
         <EuiSpacer size="s" />
-        <EuiButtonEmpty size="xs" onClick={() => this.selectAll(true)}>
-          Select all
-        </EuiButtonEmpty>
-        <EuiSpacer size="s" />
-        <EuiButtonEmpty size="xs" onClick={() => this.selectAll(false)}>
-          Unselect all
-        </EuiButtonEmpty>
+        {this.options.length > 3 &&
+          <><EuiButtonEmpty size="xs" onClick={() => this.selectAll(true)}>
+            Select all
+          </EuiButtonEmpty><EuiSpacer size="s" /><EuiButtonEmpty size="xs" onClick={() => this.selectAll(false)}>
+              Unselect all
+            </EuiButtonEmpty></>}
         <EuiSpacer size="m" />
         <EuiButton
           isDisabled={this.state.buttonDisabled}
