@@ -176,15 +176,15 @@ export const AgentsTable = withErrorBoundary(
     async UNSAFE_componentWillMount() {
       const managerVersion = await WzRequest.apiReq('GET', '/', {});
       const totalAgent = await WzRequest.apiReq('GET', '/agents', {});
-      const agentActive = await WzRequest.apiReq('GET', '/agents/summary/status', {});
+      const {data: {data: {connection: agentActive}}} = await WzRequest.apiReq('GET', '/agents/summary/status', {});
 
-      
+
       this.setState({
         managerVersion: managerVersion.data.data.api_version,
         avaibleAgents: totalAgent.data.data.affected_items,
-        agentActive: agentActive.data.data.active + agentActive.data.data.disconnected,
+        agentActive: agentActive.active + agentActive.disconnected,
       });
-    }
+    } 
 
     onTableChange = ({ page = {}, sort = {} }) => {
       const { index: pageIndex, size: pageSize } = page;

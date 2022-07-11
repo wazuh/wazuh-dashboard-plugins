@@ -76,8 +76,8 @@ export class AgentsPreviewController {
     if (loc && loc.tab) {
       this.submenuNavItem = loc.tab;
     }
-    const summaryData = await WzRequest.apiReq('GET', '/agents/summary/status', {});
-    this.summary = summaryData.data.data;
+    const {date: {data: summaryData}} = await WzRequest.apiReq('GET', '/agents/summary/status', {});
+    this.summary = summaryData.connection;
     if (this.summary.total === 0) {
       if (this.addingNewAgent === undefined) {
         this.addNewAgent(true);
