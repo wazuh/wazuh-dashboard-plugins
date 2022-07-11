@@ -94,7 +94,7 @@ export class WzStatusOverview extends Component {
       this.props.updateLoadingStatus(true);
 
 
-      const [agentsCount, clusterStatus, managerInfo, agentsCountByManagerNodes] = (await Promise.all([
+      const [{connection: agentsCount}, clusterStatus, managerInfo, agentsCountByManagerNodes] = (await Promise.all([
         this.statusHandler.agentsSummary(),
         this.statusHandler.clusterStatus(),
         this.statusHandler.managerInfo(),
