@@ -117,7 +117,7 @@ export function TableWzAPI({ actionButtons, ...rest }: {
       triggerReload();
   }, [rest.reload])
 
-  const ReloadButton = () => (
+  const ReloadButton = (
     <EuiFlexItem grow={false}>
       <EuiButtonEmpty isDisabled={(totalItems == 0)} iconType="refresh" onClick={() => triggerReload()}>
         Refresh
@@ -148,7 +148,7 @@ export function TableWzAPI({ actionButtons, ...rest }: {
           {/* Render optional custom action button */}
           {renderActionButtons}
           {/* Render optional reload button */}
-          {rest.showReload && <ReloadButton />}
+          {rest.showReload && ReloadButton}
           {/* Render optional export to CSV button */}
           {rest.downloadCsv && <ExportTableCsv endpoint={rest.endpoint} totalItems={totalItems} filters={filters} title={rest.title} />}
         </EuiFlexGroup>

@@ -50,7 +50,7 @@ const rulesItems = [
           field: 'rule_dir'
         }
       });
-      return result?.data?.data?.affected_items[0].ruleset.rule_dir;
+      return result?.data?.data?.affected_items?.[0].ruleset.rule_dir;
     }
   },
   {

@@ -230,7 +230,6 @@ export default class RulesetColumns {
       };
     };
 
-
     this.buildColumns();
   }
 
