@@ -3,6 +3,9 @@ import { EuiToolTip, EuiBadge } from '@elastic/eui';
 import { resourceDictionary, ResourcesHandler, ResourcesConstants } from '../../common/resources-handler';
 import { WzButtonPermissions } from '../../../../../../components/common/permissions/button';
 import { WzButtonPermissionsModalConfirm } from '../../../../../../components/common/buttons';
+import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
+import { UIErrorLog } from '../../../../../../react-services/error-orchestrator/types';
+import { getErrorOptions } from '../../common/error-helper';
 
 export default class RulesetColumns {
   constructor(props) {
@@ -41,7 +44,7 @@ export default class RulesetColumns {
               }
               return (
                 <div>
-                  {haveTooltip === false ? 
+                  {haveTooltip === false ?
                     <span dangerouslySetInnerHTML={{ __html: value }} /> :
                     <EuiToolTip position="bottom" content={toolTipDescription}>
                       <span dangerouslySetInnerHTML={{ __html: value }} />
@@ -82,11 +85,19 @@ export default class RulesetColumns {
                   permissions={getReadButtonPermissions(item)}
                   tooltip={{ position: 'top', content: `Show ${value} content` }}
                   onClick={async (ev) => {
-                    ev.stopPropagation();
-                    const resourcesHandler = new ResourcesHandler(ResourcesConstants.RULES);
-                    const result = await resourcesHandler.getFileContent(value);
-                    const file = { name: value, content: result, path: item.relative_dirname };
-                    this.props.updateFileContent(file);
+                    try {
+                      ev.stopPropagation();
+                      const resourcesHandler = new ResourcesHandler(ResourcesConstants.RULES);
+                      const result = await resourcesHandler.getFileContent(value);
+                      const file = { name: value, content: result, path: item.relative_dirname };
+                      this.props.updateFileContent(file);
+                    } catch (error) {
+                      const options: UIErrorLog = getErrorOptions(
+                        error,
+                        'Rules.readFileContent'
+                      );
+                      getErrorOrchestrator().handleError(options);
+                    }
                   }}>
                   {value}
                 </WzButtonPermissions>
@@ -140,11 +151,19 @@ export default class RulesetColumns {
                       iconType="pencil"
                       tooltip={{ position: 'top', content: `Edit ${item.filename} content` }}
                       onClick={async ev => {
-                        ev.stopPropagation();
-                        const resourcesHandler = new ResourcesHandler(ResourcesConstants.RULES);
-                        const result = await resourcesHandler.getFileContent(item.filename);
-                        const file = { name: item.filename, content: result, path: item.relative_dirname };
-                        this.props.updateFileContent(file);
+                        try {
+                          ev.stopPropagation();
+                          const resourcesHandler = new ResourcesHandler(ResourcesConstants.RULES);
+                          const result = await resourcesHandler.getFileContent(item.filename);
+                          const file = { name: item.filename, content: result, path: item.relative_dirname };
+                          this.props.updateFileContent(file);
+                        } catch (error) {
+                          const options: UIErrorLog = getErrorOptions(
+                            error,
+                            'Files.editFileContent'
+                          );
+                          getErrorOrchestrator().handleError(options);
+                        }
                       }}
                       color="primary"
                     />
@@ -155,7 +174,15 @@ export default class RulesetColumns {
                       aria-label="Delete file"
                       iconType="trash"
                       onConfirm={async () => {
-                        this.props.removeItems([item]);
+                        try {
+                          this.props.removeItems([item]);
+                        } catch (error) {
+                          const options: UIErrorLog = getErrorOptions(
+                            error,
+                            'Files.deleteFile'
+                          );
+                          getErrorOrchestrator().handleError(options);
+                        }
                       }}
                       color="danger"
                       modalTitle={'Are you sure?'}
