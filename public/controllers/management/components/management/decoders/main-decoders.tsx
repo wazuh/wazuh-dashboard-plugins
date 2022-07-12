@@ -9,49 +9,41 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 // Redux
 import WzReduxProvider from '../../../../../redux/wz-redux-provider';
 import WzDecodersOverview from './views/decoders-overview';
 import WzFileEditor from '../common/file-editor';
 import { SECTION_DECODERS_SECTION } from '../common/constants';
 
-export default class WzDecoder extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      fileContent: false,
-      addingFile: false
-    }; 
+export default function WzDecoder({ clusterStatus, logtestProps }) {
+
+  const [fileContent, setFileContent] = useState(false);
+  const [addingFile, setAddingFile] = useState(false);
+
+  const cleanEditState = () => {
+    setFileContent(false);
+    setAddingFile(false);
   }
 
-  render() {
-    const { fileContent, addingFile } = this.state;
-
-    return (
-      <WzReduxProvider>
-        {
-          ((fileContent || addingFile) && (
-            <WzFileEditor
-              section={SECTION_DECODERS_SECTION}
-              fileContent={fileContent}
-              addingFile={addingFile}
-              logtestProps={this.props.logtestProps}
-              clusterStatus={this.props.clusterStatus}
-              updateFileContent={(fileContent) => { this.setState({ fileContent }) }}
-              cleanEditState={() => {
-                this.setState({
-                  fileContent: false,
-                  addingFile: false
-                })
-              }}
-            />
-          )) || <WzDecodersOverview
-            clusterStatus={this.props.clusterStatus}
-            updateFileContent={(fileContent) => { this.setState({ fileContent }) }}
-            updateAddingFile={(addingFile) => { this.setState({ addingFile }) }}
-          />}
-      </WzReduxProvider>
-    );
-  }
+  return (
+    <WzReduxProvider>
+      {
+        ((fileContent || addingFile) && (
+          <WzFileEditor
+            section={SECTION_DECODERS_SECTION}
+            fileContent={fileContent}
+            addingFile={addingFile}
+            logtestProps={logtestProps}
+            clusterStatus={clusterStatus}
+            updateFileContent={(fileContent) => { setFileContent(fileContent) }}
+            cleanEditState={() => cleanEditState()}
+          />
+        )) || <WzDecodersOverview
+          clusterStatus={clusterStatus}
+          updateFileContent={(fileContent) => { setFileContent(fileContent) }}
+          updateAddingFile={(addingFile) => { setAddingFile(addingFile) }}
+        />}
+    </WzReduxProvider>
+  );
 }
