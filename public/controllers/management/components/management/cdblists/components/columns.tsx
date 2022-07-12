@@ -4,6 +4,9 @@ import { resourceDictionary, ResourcesHandler, ResourcesConstants } from '../../
 import exportCsv from '../../../../../../react-services/wz-csv';
 import { WzButtonPermissions } from '../../../../../../components/common/permissions/button';
 import { WzButtonPermissionsModalConfirm } from '../../../../../../components/common/buttons';
+import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
+import { UIErrorLog } from '../../../../../../react-services/error-orchestrator/types';
+import { getErrorOptions } from '../../common/error-helper';
 
 export default class CDBListsColumns {
   constructor(props) {
@@ -33,11 +36,19 @@ export default class CDBListsColumns {
                   aria-label="Export list"
                   iconType="exportAction"
                   onClick={async ev => {
-                    ev.stopPropagation();
-                    await exportCsv(`/lists?path=${item.relative_dirname}/${item.filename}`,
-                      [{ _isCDBList: true, name: 'path', value: `${item.relative_dirname}/${item.filename}` }],
-                      item.filename
-                    )
+                    try {
+                      ev.stopPropagation();
+                      await exportCsv(`/lists?path=${item.relative_dirname}/${item.filename}`,
+                        [{ _isCDBList: true, name: 'path', value: `${item.relative_dirname}/${item.filename}` }],
+                        item.filename
+                      )
+                    } catch (error) {
+                      const options: UIErrorLog = getErrorOptions(
+                        error,
+                        'Lists.exportFile'
+                      );
+                      getErrorOrchestrator().handleError(options);
+                    }
                   }}
                   color="primary"
                 />
@@ -93,11 +104,19 @@ export default class CDBListsColumns {
                 iconType="pencil"
                 tooltip={{ position: 'top', content: `Edit ${item.filename} content` }}
                 onClick={async (ev) => {
-                  ev.stopPropagation();
-                  const resourcesHandler = new ResourcesHandler(ResourcesConstants.LISTS);
-                  const result = await resourcesHandler.getFileContent(item.filename);
-                  const file = { name: item.filename, content: result, path: item.relative_dirname };
-                  this.props.updateListContent(file);
+                  try {
+                    ev.stopPropagation();
+                    const resourcesHandler = new ResourcesHandler(ResourcesConstants.LISTS);
+                    const result = await resourcesHandler.getFileContent(item.filename);
+                    const file = { name: item.filename, content: result, path: item.relative_dirname };
+                    this.props.updateListContent(file);
+                  } catch (error) {
+                    const options: UIErrorLog = getErrorOptions(
+                      error,
+                      'Lists.editFileContent'
+                    );
+                    getErrorOrchestrator().handleError(options);
+                  }
                 }}
                 color="primary"
               />
@@ -108,7 +127,17 @@ export default class CDBListsColumns {
                 aria-label="Delete file"
                 iconType="trash"
                 isDisabled={defaultItems.indexOf(`${item.relative_dirname}`) !== -1}
-                onConfirm={async () => this.props.removeItems([item])}
+                onConfirm={async () => {
+                  try {
+                    this.props.removeItems([item])
+                  } catch (error) {
+                    const options: UIErrorLog = getErrorOptions(
+                      error,
+                      'Lists.deleteFile'
+                    );
+                    getErrorOrchestrator().handleError(options);
+                  }
+                }}
                 onClose={async (ev) => ev.stopPropagation()}
                 onClick={(ev) => ev.stopPropagation()}
                 color="danger"
@@ -125,11 +154,19 @@ export default class CDBListsColumns {
                 iconType="exportAction"
                 tooltip={{ position: 'top', content: `Export ${item.filename} content` }}
                 onClick={async (ev) => {
-                  ev.stopPropagation();
-                  await exportCsv(`/lists`,
-                    [{ _isCDBList: true, name: 'filename', value: `${item.filename}` }],
-                    item.filename
-                  )
+                  try {
+                    ev.stopPropagation();
+                    await exportCsv(`/lists`,
+                      [{ _isCDBList: true, name: 'filename', value: `${item.filename}` }],
+                      item.filename
+                    )
+                  } catch (error) {
+                    const options: UIErrorLog = getErrorOptions(
+                      error,
+                      'Lists.exportFile'
+                    );
+                    getErrorOrchestrator().handleError(options);
+                  }
                 }}
                 color="primary"
               />

@@ -6,6 +6,9 @@ import { getErrorOrchestrator } from '../../../../../../react-services/common-se
 import { UIErrorLog, UILogLevel, UIErrorSeverity, UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
 import { WzButtonPermissionsModalConfirm } from '../../../../../../components/common/buttons';
+import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
+import { UIErrorLog } from '../../../../../../react-services/error-orchestrator/types';
+import { getErrorOptions } from '../../common/error-helper';
 
 export default class RulesetColumns {
   props: any;
@@ -45,7 +48,7 @@ export default class RulesetColumns {
               }
               return (
                 <div>
-                  {haveTooltip === false ? 
+                  {haveTooltip === false ?
                     <span dangerouslySetInnerHTML={{ __html: value }} /> :
                     <EuiToolTip position="bottom" content={toolTipDescription}>
                       <span dangerouslySetInnerHTML={{ __html: value }} />
@@ -197,8 +200,16 @@ export default class RulesetColumns {
                         }
                       }}
                       onConfirm={async () => {
-                        this.props.removeItems([item]);
-                      }
+                        try {
+                          this.props.removeItems([item]);
+                        } catch (error) {
+                          const options: UIErrorLog = this.getErrorOptions(
+                            error,
+                            'Files.deleteFile'
+                          );
+                          getErrorOrchestrator().handleError(options);
+                        }
+                      }}
                       color="danger"
                       modalTitle={'Are you sure?'}
                       modalProps={{
