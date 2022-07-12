@@ -213,7 +213,6 @@ class WzFileEditor extends Component {
 
     const onClickOpenLogtest = () => {
       this.props.logtestProps.openCloseFlyout();
-      // this.props.showFlyoutLogtest(true);
     };
 
     const buildLogtestButton = () => {

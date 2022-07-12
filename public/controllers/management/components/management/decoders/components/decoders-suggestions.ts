@@ -10,8 +10,7 @@ const decodersItems = [
       if (value) {
         filter['search'] = value;
       }
-      const wzReq = (...args) => WzRequest.apiReq(...args);
-      const result = await wzReq('GET', '/decoders/files', filter);
+      const result = await WzRequest.apiReq('GET', '/decoders/files', filter);
       return (((result || {}).data || {}).data || {}).affected_items.map((item) => { return item.filename });
     },
   },
@@ -20,8 +19,7 @@ const decodersItems = [
     label: 'relative_dirname',
     description: 'Path of the decoders files.',
     values: async () => {
-      const wzReq = (...args) => WzRequest.apiReq(...args);
-      const result = await wzReq('GET', '/manager/configuration', {
+      const result = await WzRequest.apiReq('GET', '/manager/configuration', {
         params: {
           section: 'ruleset',
           field: 'decoder_dir'

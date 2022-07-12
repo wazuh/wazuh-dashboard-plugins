@@ -31,8 +31,6 @@ import {
   UploadFilesButton,
 } from '../../common/actions-buttons'
 
-import apiSuggestsItems from './cdblists-suggestions';
-
 function CDBListsTable(props) {
   const [filters, setFilters] = useState([]);
   const [showingFiles, setShowingFiles] = useState(false);
@@ -172,7 +170,7 @@ function CDBListsTable(props) {
         tableColumns={columns}
         tableInitialSortingField={'filename'}
         searchTable={true}
-        searchBarSuggestions={apiSuggestsItems.items}
+        searchBarSuggestions={[]}
         endpoint={'/lists'}
         isExpandable={true}
         rowProps={getRowProps}

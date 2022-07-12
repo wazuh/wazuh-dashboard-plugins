@@ -179,46 +179,4 @@ export default class CDBListsColumns {
 
     this.buildColumns();
   }
-
-  buildComplianceBadges(item) {
-    const badgeList = [];
-    const fields = ['pci_dss', 'gpg13', 'hipaa', 'gdpr', 'nist_800_53', 'tsc', 'mitre'];
-    const buildBadge = field => {
-      const idGenerator = () => {
-        return (
-          '_' +
-          Math.random()
-            .toString(36)
-            .substr(2, 9)
-        );
-      };
-
-      return (
-        <EuiToolTip
-          content={item[field].join(', ')}
-          key={idGenerator()}
-          position="bottom"
-        >
-          <EuiBadge
-            title={null}
-            color="hollow"
-            onClick={ev => ev.stopPropagation()}
-            onClickAriaLabel={field.toUpperCase()}
-            style={{ margin: '1px 2px' }}
-          >
-            {field.toUpperCase()}
-          </EuiBadge>
-        </EuiToolTip>
-      );
-    };
-    try {
-      for (const field of fields) {
-        if (item[field].length) {
-          badgeList.push(buildBadge(field));
-        }
-      }
-    } catch (error) { }
-
-    return <div>{badgeList}</div>;
-  }
 }
