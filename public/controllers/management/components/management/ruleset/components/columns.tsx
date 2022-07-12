@@ -238,19 +238,11 @@ export default class RulesetColumns {
     const badgeList = [];
     const fields = ['pci_dss', 'gpg13', 'hipaa', 'gdpr', 'nist_800_53', 'tsc', 'mitre'];
     const buildBadge = field => {
-      const idGenerator = () => {
-        return (
-          '_' +
-          Math.random()
-            .toString(36)
-            .substr(2, 9)
-        );
-      };
 
       return (
         <EuiToolTip
           content={item[field].join(', ')}
-          key={idGenerator()}
+          key={`${item.id}-${field}`}
           position="bottom"
         >
           <EuiBadge
