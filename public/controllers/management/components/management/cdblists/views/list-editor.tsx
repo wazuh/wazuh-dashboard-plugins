@@ -61,8 +61,7 @@ class WzListEditor extends Component {
   }
 
   componentDidMount() {
-    const { listContent } = this.props;
-    const { content } = listContent;
+    const { listContent: { content } } = this.props;
     const obj = this.contentToObject(content);
     this.items = { ...obj };
     const items = this.contentToArray(obj);
@@ -523,8 +522,7 @@ class WzListEditor extends Component {
   }
 
   render() {
-    const { listContent, isLoading } = this.props;
-    const { name, path } = listContent;
+    const { listContent: { name, path }, isLoading } = this.props;
 
     const message = isLoading ? false : 'No results...';
 
