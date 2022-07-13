@@ -38,8 +38,8 @@ export const TEST_CASES: tQITestCases = {
         value: 'test',
       },
       {
-        conjuntion: undefined,
-        field: 'and',
+        conjuntion: 'and',
+        field: '',
         operator: undefined,
         value: undefined,
       },

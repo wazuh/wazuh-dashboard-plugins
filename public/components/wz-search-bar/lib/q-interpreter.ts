@@ -61,7 +61,7 @@ export class QInterpreter {
    */
   getQueryObject(query): queryObject {
     const descomposeRegex = new RegExp(
-      '((?<conjuntion>and |or )?(?<field>[\\w\\.\\-]+)?(?<operator>=|!=|<|>|~)?(?<value>[\\[\\]\\(\\)\\{\\}\\\\\\w\\.\\-\\:\\%\\/\\s]+)?)',
+      '((?<conjuntion>and |or |^and$|^or$)?(?<field>[\\w\\.\\-]+)?(?<operator>=|!=|<|>|~)?(?<value>[\\[\\]\\(\\)\\{\\}\\\\\\w\\.\\-\\:\\%\\/\\s]+)?)',
       'i'
     );
     const queryWithoutSpaces = query && query.trim();
