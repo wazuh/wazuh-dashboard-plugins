@@ -61,10 +61,10 @@ export class QInterpreter {
    */
   getQueryObject(query): queryObject {
     const descomposeRegex = new RegExp(
-      '((?<conjuntion>and |or |^and$|^or$)?(?<field>[\\w\\.\\-]+)?(?<operator>=|!=|<|>|~)?(?<value>[\\[\\]\\(\\)\\{\\}\\\\\\w\\.\\-\\:\\%\\/\\s]+)?)',
+      '((?<conjuntion>and |or |^and$|^or$| and$| or$| and | or )?(?<field>[\\w\\.\\-]+)?(?<operator>=|!=|<|>|~)?(?<value>[\\[\\]\\(\\)\\{\\}\\\\\\w\\.\\-\\:\\%\\/\\s]+)?)',
       'i'
     );
-    const queryWithoutSpaces = query && query.trim();
+    const queryWithoutSpaces = query;
     const descomposeQuery = query && descomposeRegex.exec(queryWithoutSpaces);
     let { conjuntion = undefined, field = '', operator = undefined, value = undefined } =
       descomposeQuery.groups || [];
@@ -200,7 +200,7 @@ export class QInterpreter {
     let query = '';
     for (const qObject of this.queryObjects) {
       const { conjuntion = '', field, operator = '', value = '' } = qObject;
-      query += (!!conjuntion ? ` ${conjuntion}` : '') + field + operator + value;
+      query += (!!conjuntion ? `${conjuntion}` : '') + field + operator + value;
     }
     this.query = query;
     return query;

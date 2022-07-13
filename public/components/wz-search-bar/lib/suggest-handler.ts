@@ -209,8 +209,8 @@ export class SuggestHandler extends BaseHandler {
   buildSuggestConjuntions(inputValue: string): suggestItem[] {
     if (this.searchType !== 'q') return [];
     const suggestions = [
-      { label: 'AND ', description: 'Requires `both arguments` to be true' },
-      { label: 'OR ', description: 'Requires `one or more arguments` to be true' },
+      { label: ' AND ', description: 'Requires `both arguments` to be true' },
+      { label: ' OR ', description: 'Requires `one or more arguments` to be true' },
     ].map((item) => {
       return {
         type: { iconType: 'kqlSelector', color: 'tint3' },

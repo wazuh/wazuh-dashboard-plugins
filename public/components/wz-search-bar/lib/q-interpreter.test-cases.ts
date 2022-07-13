@@ -38,7 +38,7 @@ export const TEST_CASES: tQITestCases = {
         value: 'test',
       },
       {
-        conjuntion: 'and',
+        conjuntion: ' and',
         field: '',
         operator: undefined,
         value: undefined,
@@ -83,7 +83,7 @@ export const TEST_CASES: tQITestCases = {
         value: 'test1 and more',
       },
       {
-        conjuntion: 'OR ',
+        conjuntion: ' OR ',
         field: 'name',
         operator: '=',
         value: 'test2',
@@ -100,13 +100,13 @@ export const TEST_CASES: tQITestCases = {
         value: undefined,
       },
       {
-        conjuntion: 'OR ',
+        conjuntion: ' OR ',
         field: 'name',
         operator: '=',
         value: 'test1 and more',
       },
       {
-        conjuntion: 'OR ',
+        conjuntion: ' OR ',
         field: 'name',
         operator: '=',
         value: 'test2',
@@ -140,7 +140,7 @@ export const TEST_CASES: tQITestCases = {
         value: undefined,
       },
       {
-        conjuntion: 'AND ',
+        conjuntion: ' AND ',
         field: 'name',
         operator: '=',
         value: 'test1 OR more',
@@ -174,7 +174,7 @@ export const TEST_CASES: tQITestCases = {
         value: undefined,
       },
       {
-        conjuntion: 'OR ',
+        conjuntion: ' OR ',
         field: 'name',
         operator: '=',
         value: 'test1 OR less',
@@ -191,7 +191,7 @@ export const TEST_CASES: tQITestCases = {
         value: undefined,
       },
       {
-        conjuntion: 'AND ',
+        conjuntion: ' AND ',
         field: 'name',
         operator: '=',
         value: 'test1 (description) OR some',
@@ -214,7 +214,7 @@ export const TEST_CASES: tQITestCases = {
         value: 'test1 (desc)',
       },
       {
-        conjuntion: 'OR ',
+        conjuntion: ' OR ',
         field: 'name',
         operator: '=',
         value: 'test2',
@@ -231,13 +231,13 @@ export const TEST_CASES: tQITestCases = {
         value: undefined,
       },
       {
-        conjuntion: 'OR ',
+        conjuntion: ' OR ',
         field: 'name',
         operator: '=',
         value: 'test1 (desc)',
       },
       {
-        conjuntion: 'OR ',
+        conjuntion: ' OR ',
         field: 'name',
         operator: '=',
         value: 'test2',
@@ -254,7 +254,7 @@ export const TEST_CASES: tQITestCases = {
         value: 'test1',
       },
       {
-        conjuntion: 'and ',
+        conjuntion: ' and ',
         field: 'field.item',
         operator: '=',
         value: 'test1',
@@ -271,7 +271,7 @@ export const TEST_CASES: tQITestCases = {
         value: 'test1',
       },
       {
-        conjuntion: 'and ',
+        conjuntion: ' and ',
         field: 'field_item',
         operator: '=',
         value: 'test1',
@@ -288,7 +288,7 @@ export const TEST_CASES: tQITestCases = {
         value: 'test1',
       },
       {
-        conjuntion: 'and ',
+        conjuntion: ' and ',
         field: 'field-item',
         operator: '=',
         value: 'test1',
@@ -350,7 +350,7 @@ export const TEST_CASES: tQITestCases = {
         value: 'wazuh-manager-master-v4.3.4-rc1-7.10.2',
       },
       {
-        conjuntion: 'and ',
+        conjuntion: ' and ',
         field: 'another',
         operator: '=',
         value: 'value',
@@ -367,7 +367,7 @@ export const TEST_CASES: tQITestCases = {
         value: 'wazuh-manager-master-v4.3.4-rc1-7.10.2',
       },
       {
-        conjuntion: 'and ',
+        conjuntion: ' and ',
         field: 'another',
         operator: '=',
         value: 'value',
