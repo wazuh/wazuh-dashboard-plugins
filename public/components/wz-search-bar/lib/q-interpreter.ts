@@ -154,7 +154,8 @@ export class QInterpreter {
       [field]: newInput,
     };
 
-    this.queryObjects[this.qNumber() === 0 ? 0 : this.qNumber() - 1] = lastQuery;
+    const qIndex = Math.max(0, this.qNumber() - 1);
+    this.queryObjects[qIndex] = lastQuery;
     return lastQuery;
   }
 
