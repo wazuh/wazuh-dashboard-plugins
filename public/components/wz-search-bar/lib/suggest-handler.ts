@@ -50,8 +50,7 @@ export class SuggestHandler extends BaseHandler {
     this.suggestItems = props.suggestions;
     this.searchType = 'search';
     this.lastCall = 0;
-    if (inputRef)
-      this.inputRef = inputRef;
+    if (inputRef) this.inputRef = inputRef;
   }
 
   combine = (...args) => (input) => args.reduceRight((acc, arg) => (acc = arg(acc)), input);
@@ -246,7 +245,7 @@ export class SuggestHandler extends BaseHandler {
 
   createQFilter(inputValue) {
     const qInterpreter = new QInterpreter(inputValue);
-    if (qInterpreter.queryObjects.some((q) => !q.value)) return;
+    if (!qInterpreter.queriesAreValid) return;
     const value = qInterpreter.toString();
     const filters = [...this.filters, { field: 'q', value }];
     this.props.onFiltersChange(filters);
