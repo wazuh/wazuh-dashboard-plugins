@@ -80,7 +80,6 @@ class WzReportingTable extends Component {
         items,
         isProcessing: false,
       });
-      this.props.onChangeUserReportsDirectoryPath(path);
       this.props.updateIsProcessing(false);
     } catch (error) {
       this.props.updateIsProcessing(false);
