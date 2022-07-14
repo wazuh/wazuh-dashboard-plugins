@@ -111,11 +111,11 @@ const RulesFlyoutTable = ({
 /***************************************
  * Main component
  */
-function RulesetTable(props) {
+function RulesetTable({ setShowingFiles, showingFiles, ...props }) {
   const [filters, setFilters] = useState([]);
   const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
-  const [showingFiles, setShowingFiles] = useState(false);
+  
   const [tableFootprint, setTableFootprint] = useState(0);
 
   const resourcesHandler = new ResourcesHandler(ResourcesConstants.RULES);

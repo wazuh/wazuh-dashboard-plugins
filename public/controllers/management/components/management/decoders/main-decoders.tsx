@@ -20,6 +20,7 @@ export default function WzDecoder({ clusterStatus, logtestProps }) {
 
   const [fileContent, setFileContent] = useState(false);
   const [addingFile, setAddingFile] = useState(false);
+  const [showingFiles, setShowingFiles] = useState(false);
 
   const cleanEditState = () => {
     setFileContent(false);
@@ -43,6 +44,8 @@ export default function WzDecoder({ clusterStatus, logtestProps }) {
           clusterStatus={clusterStatus}
           updateFileContent={(fileContent) => { setFileContent(fileContent) }}
           updateAddingFile={(addingFile) => { setAddingFile(addingFile) }}
+          setShowingFiles={() => { setShowingFiles(!showingFiles) }}
+          showingFiles={showingFiles}
         />}
     </WzReduxProvider>
   );
