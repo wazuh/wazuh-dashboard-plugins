@@ -75,11 +75,12 @@ class WzReportingTable extends Component {
   async getItems() {
     try {
       const rawItems = await this.reportingHandler.listReports();
-      const items = ((rawItems || {}).data || {}).reports || [];
+      const {reports: items = [], path} = rawItems?.data;
       this.setState({
         items,
         isProcessing: false,
       });
+      this.props.onChangeUserReportsDirectoryPath(path);
       this.props.updateIsProcessing(false);
     } catch (error) {
       this.props.updateIsProcessing(false);
