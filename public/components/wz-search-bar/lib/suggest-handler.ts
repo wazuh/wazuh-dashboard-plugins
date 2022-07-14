@@ -64,6 +64,13 @@ export class SuggestHandler extends BaseHandler {
     return input;
   };
 
+  queryEndWithField = (field): boolean => {
+    let inputValue = (this.inputRef as HTMLInputElement).value;
+    var index = inputValue.lastIndexOf(' ');
+    var endOfQuery = inputValue.substring(index + 1);
+    return this.suggestItems.some((item) => item.label === endOfQuery);
+  };
+
   checkStage = (input: string) => {
     const { searchType } = this;
     if (searchType === 'search') {
@@ -104,7 +111,8 @@ export class SuggestHandler extends BaseHandler {
         ...this.buildSuggestSearch(field),
         ...(value && inputStage === 'value' ? this.buildSuggestApply() : []),
         ...(value && inputStage === 'value' ? this.buildSuggestConjuntions(field) : []),
-        ...(this.someItem(field, 'label') && inputStage !== 'value'
+        ...((this.someItem(field, 'label') && inputStage !== 'value') ||
+        this.queryEndWithField(field)
           ? this.buildSuggestOperator(field)
           : []),
         ...(inputStage === 'field' ? this.buildSuggestFields(field) : []),
