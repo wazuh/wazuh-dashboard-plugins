@@ -27,7 +27,7 @@ export function WazuhReportingRoutes(router: IRouter) {
   });
 
   const ReportFilenameValidation = schema.string({
-    validate: (agentID: string) => /^[\w\-\.]+\.pdf$/.test(agentID) ? undefined : 'must be A-z, 0-9, _, ., and - are allowed. It must ends with .pdf.'
+    validate: (agentID: string) => /^[\w\-\.]+\.pdf$/.test(agentID) ? undefined : 'must be A-z, 0-9, _, ., and - are allowed. It must end with .pdf.'
   });
 
   const moduleIDValidation = schema.oneOf([

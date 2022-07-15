@@ -106,12 +106,12 @@ describe('[endpoint][security] GET /reports/{name} - Parameters validation', () 
   it.each`
         testTitle                   | username       | filename                                                  | responseStatusCode | responseBodyMessage
         ${'Get report by filename'} | ${'admin'}     | ${'wazuh-module-overview-general-1234.pdf'}               | ${200}             | ${null}
-        ${'Invalid parameters'}     | ${'admin'}     | ${'..%2fwazuh-module-overview-general-1234.pdf'}          | ${400}             | ${'[request params.name]: must be A-z, 0-9, _, ., and - are allowed. It must ends with .pdf.'}
-        ${'Invalid parameters'}     | ${'admin'}     | ${'custom..%2fwazuh-module-overview-general-1234.pdf'}    | ${400}             | ${'[request params.name]: must be A-z, 0-9, _, ., and - are allowed. It must ends with .pdf.'}
+        ${'Invalid parameters'}     | ${'admin'}     | ${'..%2fwazuh-module-overview-general-1234.pdf'}          | ${400}             | ${'[request params.name]: must be A-z, 0-9, _, ., and - are allowed. It must end with .pdf.'}
+        ${'Invalid parameters'}     | ${'admin'}     | ${'custom..%2fwazuh-module-overview-general-1234.pdf'}    | ${400}             | ${'[request params.name]: must be A-z, 0-9, _, ., and - are allowed. It must end with .pdf.'}
         ${'Route not found'}        | ${'admin'}     | ${'../custom..%2fwazuh-module-overview-general-1234.pdf'} | ${404}             | ${/Not Found/}
         ${'Get report by filename'} | ${'../../etc'} | ${'wazuh-module-overview-general-1234.pdf'}               | ${200}             | ${null}
-        ${'Invalid parameters'}     | ${'../../etc'} | ${'..%2fwazuh-module-overview-general-1234.pdf'}          | ${400}             | ${'[request params.name]: must be A-z, 0-9, _, ., and - are allowed. It must ends with .pdf.'}
-        ${'Invalid parameters'}     | ${'../../etc'} | ${'custom..%2fwazuh-module-overview-general-1234.pdf'}    | ${400}             | ${'[request params.name]: must be A-z, 0-9, _, ., and - are allowed. It must ends with .pdf.'}
+        ${'Invalid parameters'}     | ${'../../etc'} | ${'..%2fwazuh-module-overview-general-1234.pdf'}          | ${400}             | ${'[request params.name]: must be A-z, 0-9, _, ., and - are allowed. It must end with .pdf.'}
+        ${'Invalid parameters'}     | ${'../../etc'} | ${'custom..%2fwazuh-module-overview-general-1234.pdf'}    | ${400}             | ${'[request params.name]: must be A-z, 0-9, _, ., and - are allowed. It must end with .pdf.'}
         ${'Route not found'}        | ${'../../etc'} | ${'../custom..%2fwazuh-module-overview-general-1234.pdf'} | ${404}             | ${/Not Found/}
     `(`$testTitle: GET /reports/$filename - responseStatusCode: $responseStatusCode
         username: $username
@@ -268,12 +268,12 @@ describe('[endpoint][security] DELETE /reports/{name} - Parameters validation', 
   it.each`
         testTitle               | username       | filename                                                | responseStatusCode | responseBodyMessage
         ${'Delete report file'} | ${'admin'}     | ${'wazuh-module-overview-general-1234.pdf'}             | ${200}             | ${null}
-        ${'Invalid parameters'} | ${'admin'}     | ${'..%2fwazuh-module-overview-general-1234.pdf'}        | ${400}             | ${'[request params.name]: must be A-z, 0-9, _, ., and - are allowed. It must ends with .pdf.'}
-        ${'Invalid parameters'} | ${'admin'}     | ${'custom..%2fwazuh-module-overview-general-1234.pdf'}  | ${400}             | ${'[request params.name]: must be A-z, 0-9, _, ., and - are allowed. It must ends with .pdf.'}
+        ${'Invalid parameters'} | ${'admin'}     | ${'..%2fwazuh-module-overview-general-1234.pdf'}        | ${400}             | ${'[request params.name]: must be A-z, 0-9, _, ., and - are allowed. It must end with .pdf.'}
+        ${'Invalid parameters'} | ${'admin'}     | ${'custom..%2fwazuh-module-overview-general-1234.pdf'}  | ${400}             | ${'[request params.name]: must be A-z, 0-9, _, ., and - are allowed. It must end with .pdf.'}
         ${'Route not found'}    | ${'admin'}     | ${'../wazuh-module-overview-general-1234.pdf'}          | ${404}             | ${/Not Found/}
         ${'Delete report file'} | ${'../../etc'} | ${'wazuh-module-overview-general-1234.pdf'}             | ${200}             | ${null}   
-        ${'Invalid parameters'} | ${'../../etc'} | ${'..%2fwazuh-module-overview-general-1234.pdf'}        | ${400}             | ${'[request params.name]: must be A-z, 0-9, _, ., and - are allowed. It must ends with .pdf.'}
-        ${'Invalid parameters'} | ${'../../etc'} | ${'custom..%2fwazuh-module-overview-general-1234.pdf'}  | ${400}             | ${'[request params.name]: must be A-z, 0-9, _, ., and - are allowed. It must ends with .pdf.'}
+        ${'Invalid parameters'} | ${'../../etc'} | ${'..%2fwazuh-module-overview-general-1234.pdf'}        | ${400}             | ${'[request params.name]: must be A-z, 0-9, _, ., and - are allowed. It must end with .pdf.'}
+        ${'Invalid parameters'} | ${'../../etc'} | ${'custom..%2fwazuh-module-overview-general-1234.pdf'}  | ${400}             | ${'[request params.name]: must be A-z, 0-9, _, ., and - are allowed. It must end with .pdf.'}
         ${'Route not found'}    | ${'../../etc'} | ${'../wazuh-module-overview-general-1234.pdf'}          | ${404}             | ${/Not Found/}
     `(`$testTitle: DELETE /reports/$filename - $responseStatusCode
         username: $username
