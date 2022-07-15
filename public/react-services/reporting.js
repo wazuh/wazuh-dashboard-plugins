@@ -91,16 +91,11 @@ export class ReportingService {
       const appliedFilters = await this.visHandlers.getAppliedFilters(syscollectorFilters);
 
       const array = await this.vis2png.checkArray(visualizationIDList);
-      const name = `wazuh-${
-        agents ?  `agent-${agents}` : 'overview'
-      }-${tab}-${(Date.now() / 1000) | 0}.pdf`;
 
       const browserTimezone = moment.tz.guess(true);
 
       const data = {
         array,
-        name,
-        title: agents ? `Agents ${tab}` : `Overview ${tab}`,
         filters: appliedFilters.filters,
         time: appliedFilters.time,
         searchBar: appliedFilters.searchBar,
@@ -152,15 +147,10 @@ export class ReportingService {
       this.$rootScope.reportStatus = 'Generating PDF document...';
       this.$rootScope.$applyAsync();
 
-      const docType = type === 'agentConfig' ? `wazuh-agent-${obj.id}` : `wazuh-group-${obj.name}`;
-
-      const name = `${docType}-configuration-${(Date.now() / 1000) | 0}.pdf`;
       const browserTimezone = moment.tz.guess(true);
 
       const data = {
-        name,
         filters: [type === 'agentConfig' ? { agent: obj.id } : { group: obj.name }],
-        tab: type,
         browserTimezone,
         components,
         apiId: JSON.parse(AppState.getCurrentAPI()).id
