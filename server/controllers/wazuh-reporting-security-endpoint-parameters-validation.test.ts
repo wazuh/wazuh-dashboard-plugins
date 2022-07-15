@@ -98,7 +98,6 @@ describe('[endpoint] GET /reports', () => {
       .expect(200);
 
     expect(response.body.reports).toBeDefined();
-    expect(response.body.path).toBeDefined();
   });
 });
 

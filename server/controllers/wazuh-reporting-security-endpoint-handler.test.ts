@@ -1,7 +1,5 @@
 import md5 from 'md5';
 import fs from 'fs';
-import path from 'path';
-import { WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH } from '../../common/constants';
 import { WazuhReportingCtrl } from './wazuh-reporting';
 
 jest.mock('../lib/logger', () => ({
@@ -109,11 +107,8 @@ describe('[security] GET /reports', () => {
 	username: $username`, async ({ username }) => {
     jest.spyOn(fs, 'readdirSync').mockImplementation(() => []);
 
-    const user = getMockerUserContext(username);
-
     const response = await endpointController.getReports(mockContext(username), {}, mockResponse());
     expect(response.body.reports).toHaveLength(0);
-    expect(response.body.path).toBe(path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, user.hashUsername));
   });
 });
 

@@ -2000,7 +2000,7 @@ export class WazuhReportingCtrl {
       TimSort.sort(reports, sortReportsByDate);
       log('reporting:getReports', `Total reports: ${reports.length}`, 'debug');
       return response.ok({
-        body: { reports, path: userReportsDirectoryPath },
+        body: { reports },
       });
     } catch (error) {
       log('reporting:getReports', error.message || error);
