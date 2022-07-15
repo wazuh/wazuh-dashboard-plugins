@@ -62,7 +62,7 @@ class WzReportingTable extends Component {
   async getItems() {
     try {
       const rawItems = await this.reportingHandler.listReports();
-      const items = ((rawItems || {}).data || {}).reports || [];
+      const {reports: items = [], path} = rawItems?.data;
       this.setState({
         items,
         isProcessing: false
