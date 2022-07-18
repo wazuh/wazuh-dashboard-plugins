@@ -19,7 +19,8 @@ export default class GroupsColums {
         {
           field: 'count',
           name: 'Agents',
-          align: 'left'
+          align: 'left',
+          sortable: true
         },
         {
           field: 'configSum',
