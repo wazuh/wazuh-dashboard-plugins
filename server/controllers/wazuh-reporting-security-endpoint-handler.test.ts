@@ -173,6 +173,10 @@ describe('[security] POST /reports', () => {
       },
       params: {
         moduleID: moduleID
+      },
+      headers: {
+        id: 'default',
+        pattern: 'wazuh-alerts-*'
       }
     };
 
