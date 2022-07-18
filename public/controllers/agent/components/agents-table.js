@@ -80,10 +80,10 @@ export const AgentsTable = withErrorBoundary(
         },
         {
           type: 'q',
-          label: 'synced',
+          label: 'group_config_status',
           description: 'Filter by agent synced configuration status',
           operators: ['=', '!='],
-          values: ['true', 'false'],
+          values: ['synced', 'not synced'],
         },
         {
           type: 'q',
@@ -338,7 +338,7 @@ export const AgentsTable = withErrorBoundary(
         name: agent.name,
         ip: agent.ip,
         status: agent.status,
-        synced: agent.group_config_status,
+        group_config_status: agent.group_config_status,
         group: checkField(agent.group),
         os_name: agent,
         version: agentVersion,
@@ -855,7 +855,7 @@ export const AgentsTable = withErrorBoundary(
           render: (status) => <AgentStatus status={status} labelProps={{className: 'hide-agent-status' }}/>,
         },
         {
-          field: 'synced',
+          field: 'group_config_status',
           name: 'Synced',
           truncateText: true,
           sortable: true,

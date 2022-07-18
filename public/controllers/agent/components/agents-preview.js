@@ -223,7 +223,7 @@ export const AgentsPreview = compose(
                           <EuiStat
                             title={`${this.state.agentsSynced}%`}
                             titleSize='s'
-                            description="Agents Synced"
+                            description="Synced agents"
                             className="white-space-nowrap"
                           />
                         </EuiFlexItem>

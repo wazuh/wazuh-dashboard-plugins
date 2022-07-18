@@ -396,3 +396,8 @@ export const UI_ORDER_AGENT_STATUS = [
   API_NAME_AGENT_STATUS.PENDING,
   API_NAME_AGENT_STATUS.NEVER_CONNECTED  
 ]
+
+export const AGENT_SYNCED_STATUS = {
+  SYNCED: 'synced',
+  NOT_SYNCED: 'not synced',
+}
