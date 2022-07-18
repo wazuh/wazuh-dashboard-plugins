@@ -6,8 +6,9 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
-- Fix documentation link titles to match the documentation sections to redirect to [#4301](https://github.com/wazuh/wazuh-kibana-app/pull/4301)
-- Fix missing documentation references to the Agent's overview, Agent's Integrity monitoring, and Agent's Inventory data sections, when the agent has never connected. [#4301](https://github.com/wazuh/wazuh-kibana-app/pull/4301)
+- Fixed the search bar component to properly distinguish conjuntion operators (AND, OR) [#4326](https://github.com/wazuh/wazuh-kibana-app/pull/4326)
+- Fixed documentation link titles to match the documentation sections to redirect to [#4301](https://github.com/wazuh/wazuh-kibana-app/pull/4301)
+- Fixed missing documentation references to the Agent's overview, Agent's Integrity monitoring, and Agent's Inventory data sections, when the agent has never connected. [#4301](https://github.com/wazuh/wazuh-kibana-app/pull/4301)
 - The references to the documentation site now links to the appropriate version [#4301](https://github.com/wazuh/wazuh-kibana-app/pull/4301)
 - Fixed missing documentation link in the Docker Listener module [#4301](https://github.com/wazuh/wazuh-kibana-app/pull/4301)
 - Fixed broken links to the documentation site [#4301](https://github.com/wazuh/wazuh-kibana-app/pull/4301)
