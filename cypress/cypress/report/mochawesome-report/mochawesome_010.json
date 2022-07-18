@@ -1,0 +1,318 @@
+{
+  "stats": {
+    "suites": 1,
+    "tests": 10,
+    "passes": 0,
+    "pending": 0,
+    "failures": 10,
+    "start": "2022-06-10T18:12:53.947Z",
+    "end": "2022-06-10T18:21:14.801Z",
+    "duration": 500854,
+    "testsRegistered": 10,
+    "passPercent": 0,
+    "pendingPercent": 0,
+    "other": 0,
+    "hasOther": false,
+    "skipped": 0,
+    "hasSkipped": false
+  },
+  "results": [
+    {
+      "uuid": "b42bbaa7-e033-44d8-a049-c4ede62267f2",
+      "title": "",
+      "fullFile": "cypress/integration/features/filters/pin-filter-from-events-to-events.feature",
+      "file": "cypress/integration/features/filters/pin-filter-from-events-to-events.feature",
+      "beforeHooks": [],
+      "afterHooks": [],
+      "tests": [],
+      "suites": [
+        {
+          "uuid": "f88f225e-960e-4dec-86e3-3f22bde74d11",
+          "title": "Pin filter",
+          "fullFile": "",
+          "file": "",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "The user add and pin new filer - across the modules - from event page Security Events (example #1)",
+              "fullTitle": "Pin filter The user add and pin new filer - across the modules - from event page Security Events (example #1)",
+              "timedOut": null,
+              "duration": 66072,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": null,
+              "code": "const state = window.testState;\nreturn cy\n  .then(() => state.onStartScenario(scenario, indexedSteps))\n  .then(() =>\n    resolveAndRunBeforeHooks.call(this, scenario.tags, state.feature.name)\n  )\n  .then(() =>\n    indexedSteps.forEach((step) =>\n      stepTest.call(this, state, step, rowData)\n    )\n  )\n  .then(() => state.onFinishScenario(scenario));",
+              "err": {
+                "message": "AssertionError: Timed out retrying after 40000ms: Expected to find element: `//*[contains(@class,\"euiTabs\")]//*[contains(text(),\"Events\")]`, but never found it.",
+                "estack": "AssertionError: Timed out retrying after 40000ms: Expected to find element: `//*[contains(@class,\"euiTabs\")]//*[contains(text(),\"Events\")]`, but never found it.\n    at xpathElementIsVisible (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-events-to-events.feature:2474:43)\n    at Context.eval (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-events-to-events.feature:1403:37)\n    at Context.resolveAndRunStepDefinition (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-events-to-events.feature:13166:29)\n    at Context.eval (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-events-to-events.feature:12487:35)",
+                "diff": null
+              },
+              "uuid": "df2ee81e-16f9-4687-b056-1727756b0cdb",
+              "parentUUID": "f88f225e-960e-4dec-86e3-3f22bde74d11",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "The user add and pin new filer - across the modules - from event page Integrity Monitoring (example #2)",
+              "fullTitle": "Pin filter The user add and pin new filer - across the modules - from event page Integrity Monitoring (example #2)",
+              "timedOut": null,
+              "duration": 48451,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": null,
+              "code": "const state = window.testState;\nreturn cy\n  .then(() => state.onStartScenario(scenario, indexedSteps))\n  .then(() =>\n    resolveAndRunBeforeHooks.call(this, scenario.tags, state.feature.name)\n  )\n  .then(() =>\n    indexedSteps.forEach((step) =>\n      stepTest.call(this, state, step, rowData)\n    )\n  )\n  .then(() => state.onFinishScenario(scenario));",
+              "err": {
+                "message": "AssertionError: Timed out retrying after 40000ms: Expected to find element: `//*[contains(@class,\"euiTabs\")]//*[contains(text(),\"Events\")]`, but never found it.",
+                "estack": "AssertionError: Timed out retrying after 40000ms: Expected to find element: `//*[contains(@class,\"euiTabs\")]//*[contains(text(),\"Events\")]`, but never found it.\n    at xpathElementIsVisible (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-events-to-events.feature:2474:43)\n    at Context.eval (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-events-to-events.feature:1403:37)\n    at Context.resolveAndRunStepDefinition (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-events-to-events.feature:13166:29)\n    at Context.eval (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-events-to-events.feature:12487:35)",
+                "diff": null
+              },
+              "uuid": "86ff4240-4eaa-4e43-b950-38afc6fc23b5",
+              "parentUUID": "f88f225e-960e-4dec-86e3-3f22bde74d11",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "The user add and pin new filer - across the modules - from event page System Auditing (example #3)",
+              "fullTitle": "Pin filter The user add and pin new filer - across the modules - from event page System Auditing (example #3)",
+              "timedOut": null,
+              "duration": 47884,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": null,
+              "code": "const state = window.testState;\nreturn cy\n  .then(() => state.onStartScenario(scenario, indexedSteps))\n  .then(() =>\n    resolveAndRunBeforeHooks.call(this, scenario.tags, state.feature.name)\n  )\n  .then(() =>\n    indexedSteps.forEach((step) =>\n      stepTest.call(this, state, step, rowData)\n    )\n  )\n  .then(() => state.onFinishScenario(scenario));",
+              "err": {
+                "message": "AssertionError: Timed out retrying after 40000ms: Expected to find element: `//*[contains(@class,\"euiTabs\")]//*[contains(text(),\"Events\")]`, but never found it.",
+                "estack": "AssertionError: Timed out retrying after 40000ms: Expected to find element: `//*[contains(@class,\"euiTabs\")]//*[contains(text(),\"Events\")]`, but never found it.\n    at xpathElementIsVisible (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-events-to-events.feature:2474:43)\n    at Context.eval (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-events-to-events.feature:1403:37)\n    at Context.resolveAndRunStepDefinition (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-events-to-events.feature:13166:29)\n    at Context.eval (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-events-to-events.feature:12487:35)",
+                "diff": null
+              },
+              "uuid": "a61f8314-4128-4391-9b7e-6dae36b2d984",
+              "parentUUID": "f88f225e-960e-4dec-86e3-3f22bde74d11",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "The user add and pin new filer - across the modules - from event page Mitre & Attack (example #4)",
+              "fullTitle": "Pin filter The user add and pin new filer - across the modules - from event page Mitre & Attack (example #4)",
+              "timedOut": null,
+              "duration": 48603,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": null,
+              "code": "const state = window.testState;\nreturn cy\n  .then(() => state.onStartScenario(scenario, indexedSteps))\n  .then(() =>\n    resolveAndRunBeforeHooks.call(this, scenario.tags, state.feature.name)\n  )\n  .then(() =>\n    indexedSteps.forEach((step) =>\n      stepTest.call(this, state, step, rowData)\n    )\n  )\n  .then(() => state.onFinishScenario(scenario));",
+              "err": {
+                "message": "AssertionError: Timed out retrying after 40000ms: Expected to find element: `//*[contains(@class,\"euiTabs\")]//*[contains(text(),\"Events\")]`, but never found it.",
+                "estack": "AssertionError: Timed out retrying after 40000ms: Expected to find element: `//*[contains(@class,\"euiTabs\")]//*[contains(text(),\"Events\")]`, but never found it.\n    at xpathElementIsVisible (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-events-to-events.feature:2474:43)\n    at Context.eval (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-events-to-events.feature:1403:37)\n    at Context.resolveAndRunStepDefinition (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-events-to-events.feature:13166:29)\n    at Context.eval (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-events-to-events.feature:12487:35)",
+                "diff": null
+              },
+              "uuid": "f44a41fc-9597-4fa4-970e-36bf72186680",
+              "parentUUID": "f88f225e-960e-4dec-86e3-3f22bde74d11",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "The user add and pin new filer - across the modules - from event page GDPR (example #5)",
+              "fullTitle": "Pin filter The user add and pin new filer - across the modules - from event page GDPR (example #5)",
+              "timedOut": null,
+              "duration": 47710,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": null,
+              "code": "const state = window.testState;\nreturn cy\n  .then(() => state.onStartScenario(scenario, indexedSteps))\n  .then(() =>\n    resolveAndRunBeforeHooks.call(this, scenario.tags, state.feature.name)\n  )\n  .then(() =>\n    indexedSteps.forEach((step) =>\n      stepTest.call(this, state, step, rowData)\n    )\n  )\n  .then(() => state.onFinishScenario(scenario));",
+              "err": {
+                "message": "AssertionError: Timed out retrying after 40000ms: Expected to find element: `//*[contains(@class,\"euiTabs\")]//*[contains(text(),\"Events\")]`, but never found it.",
+                "estack": "AssertionError: Timed out retrying after 40000ms: Expected to find element: `//*[contains(@class,\"euiTabs\")]//*[contains(text(),\"Events\")]`, but never found it.\n    at xpathElementIsVisible (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-events-to-events.feature:2474:43)\n    at Context.eval (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-events-to-events.feature:1403:37)\n    at Context.resolveAndRunStepDefinition (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-events-to-events.feature:13166:29)\n    at Context.eval (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-events-to-events.feature:12487:35)",
+                "diff": null
+              },
+              "uuid": "20eace1c-4813-4b9e-8e77-2660d4da1464",
+              "parentUUID": "f88f225e-960e-4dec-86e3-3f22bde74d11",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "The user add and pin new filer - across the modules - from event page HIPAA (example #6)",
+              "fullTitle": "Pin filter The user add and pin new filer - across the modules - from event page HIPAA (example #6)",
+              "timedOut": null,
+              "duration": 48354,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": null,
+              "code": "const state = window.testState;\nreturn cy\n  .then(() => state.onStartScenario(scenario, indexedSteps))\n  .then(() =>\n    resolveAndRunBeforeHooks.call(this, scenario.tags, state.feature.name)\n  )\n  .then(() =>\n    indexedSteps.forEach((step) =>\n      stepTest.call(this, state, step, rowData)\n    )\n  )\n  .then(() => state.onFinishScenario(scenario));",
+              "err": {
+                "message": "AssertionError: Timed out retrying after 40000ms: Expected to find element: `//*[contains(@class,\"euiTabs\")]//*[contains(text(),\"Events\")]`, but never found it.",
+                "estack": "AssertionError: Timed out retrying after 40000ms: Expected to find element: `//*[contains(@class,\"euiTabs\")]//*[contains(text(),\"Events\")]`, but never found it.\n    at xpathElementIsVisible (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-events-to-events.feature:2474:43)\n    at Context.eval (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-events-to-events.feature:1403:37)\n    at Context.resolveAndRunStepDefinition (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-events-to-events.feature:13166:29)\n    at Context.eval (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-events-to-events.feature:12487:35)",
+                "diff": null
+              },
+              "uuid": "38de450f-4251-49fe-b7ec-c533adb95ab0",
+              "parentUUID": "f88f225e-960e-4dec-86e3-3f22bde74d11",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "The user add and pin new filer - across the modules - from event page NIST (example #7)",
+              "fullTitle": "Pin filter The user add and pin new filer - across the modules - from event page NIST (example #7)",
+              "timedOut": null,
+              "duration": 48447,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": null,
+              "code": "const state = window.testState;\nreturn cy\n  .then(() => state.onStartScenario(scenario, indexedSteps))\n  .then(() =>\n    resolveAndRunBeforeHooks.call(this, scenario.tags, state.feature.name)\n  )\n  .then(() =>\n    indexedSteps.forEach((step) =>\n      stepTest.call(this, state, step, rowData)\n    )\n  )\n  .then(() => state.onFinishScenario(scenario));",
+              "err": {
+                "message": "AssertionError: Timed out retrying after 40000ms: Expected to find element: `//*[contains(@class,\"euiTabs\")]//*[contains(text(),\"Events\")]`, but never found it.",
+                "estack": "AssertionError: Timed out retrying after 40000ms: Expected to find element: `//*[contains(@class,\"euiTabs\")]//*[contains(text(),\"Events\")]`, but never found it.\n    at xpathElementIsVisible (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-events-to-events.feature:2474:43)\n    at Context.eval (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-events-to-events.feature:1403:37)\n    at Context.resolveAndRunStepDefinition (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-events-to-events.feature:13166:29)\n    at Context.eval (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-events-to-events.feature:12487:35)",
+                "diff": null
+              },
+              "uuid": "26230b69-4d9c-4905-865c-0124078749f0",
+              "parentUUID": "f88f225e-960e-4dec-86e3-3f22bde74d11",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "The user add and pin new filer - across the modules - from event page TSC (example #8)",
+              "fullTitle": "Pin filter The user add and pin new filer - across the modules - from event page TSC (example #8)",
+              "timedOut": null,
+              "duration": 48386,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": null,
+              "code": "const state = window.testState;\nreturn cy\n  .then(() => state.onStartScenario(scenario, indexedSteps))\n  .then(() =>\n    resolveAndRunBeforeHooks.call(this, scenario.tags, state.feature.name)\n  )\n  .then(() =>\n    indexedSteps.forEach((step) =>\n      stepTest.call(this, state, step, rowData)\n    )\n  )\n  .then(() => state.onFinishScenario(scenario));",
+              "err": {
+                "message": "AssertionError: Timed out retrying after 40000ms: Expected to find element: `//*[contains(@class,\"euiTabs\")]//*[contains(text(),\"Events\")]`, but never found it.",
+                "estack": "AssertionError: Timed out retrying after 40000ms: Expected to find element: `//*[contains(@class,\"euiTabs\")]//*[contains(text(),\"Events\")]`, but never found it.\n    at xpathElementIsVisible (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-events-to-events.feature:2474:43)\n    at Context.eval (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-events-to-events.feature:1403:37)\n    at Context.resolveAndRunStepDefinition (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-events-to-events.feature:13166:29)\n    at Context.eval (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-events-to-events.feature:12487:35)",
+                "diff": null
+              },
+              "uuid": "479aa9c5-6f84-45e5-b6af-859f66be9f85",
+              "parentUUID": "f88f225e-960e-4dec-86e3-3f22bde74d11",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "The user add and pin new filer - across the modules - from event page Policy Monitoring (example #9)",
+              "fullTitle": "Pin filter The user add and pin new filer - across the modules - from event page Policy Monitoring (example #9)",
+              "timedOut": null,
+              "duration": 48962,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": null,
+              "code": "const state = window.testState;\nreturn cy\n  .then(() => state.onStartScenario(scenario, indexedSteps))\n  .then(() =>\n    resolveAndRunBeforeHooks.call(this, scenario.tags, state.feature.name)\n  )\n  .then(() =>\n    indexedSteps.forEach((step) =>\n      stepTest.call(this, state, step, rowData)\n    )\n  )\n  .then(() => state.onFinishScenario(scenario));",
+              "err": {
+                "message": "AssertionError: Timed out retrying after 40000ms: Expected to find element: `//*[contains(@class,\"euiTabs\")]//*[contains(text(),\"Events\")]`, but never found it.",
+                "estack": "AssertionError: Timed out retrying after 40000ms: Expected to find element: `//*[contains(@class,\"euiTabs\")]//*[contains(text(),\"Events\")]`, but never found it.\n    at xpathElementIsVisible (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-events-to-events.feature:2474:43)\n    at Context.eval (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-events-to-events.feature:1403:37)\n    at Context.resolveAndRunStepDefinition (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-events-to-events.feature:13166:29)\n    at Context.eval (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-events-to-events.feature:12487:35)",
+                "diff": null
+              },
+              "uuid": "085c0e0e-81fa-4c8e-baa6-172a6b112d78",
+              "parentUUID": "f88f225e-960e-4dec-86e3-3f22bde74d11",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "The user add and pin new filer - across the modules - from event page PCIDSS (example #10)",
+              "fullTitle": "Pin filter The user add and pin new filer - across the modules - from event page PCIDSS (example #10)",
+              "timedOut": null,
+              "duration": 46646,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": null,
+              "code": "const state = window.testState;\nreturn cy\n  .then(() => state.onStartScenario(scenario, indexedSteps))\n  .then(() =>\n    resolveAndRunBeforeHooks.call(this, scenario.tags, state.feature.name)\n  )\n  .then(() =>\n    indexedSteps.forEach((step) =>\n      stepTest.call(this, state, step, rowData)\n    )\n  )\n  .then(() => state.onFinishScenario(scenario));",
+              "err": {
+                "message": "AssertionError: Timed out retrying after 40000ms: Expected to find element: `//*[contains(@class,\"euiTabs\")]//*[contains(text(),\"Events\")]`, but never found it.",
+                "estack": "AssertionError: Timed out retrying after 40000ms: Expected to find element: `//*[contains(@class,\"euiTabs\")]//*[contains(text(),\"Events\")]`, but never found it.\n    at xpathElementIsVisible (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-events-to-events.feature:2474:43)\n    at Context.eval (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-events-to-events.feature:1403:37)\n    at Context.resolveAndRunStepDefinition (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-events-to-events.feature:13166:29)\n    at Context.eval (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-events-to-events.feature:12487:35)",
+                "diff": null
+              },
+              "uuid": "05ecf5ca-7215-4a04-9ede-ca6bf464ee97",
+              "parentUUID": "f88f225e-960e-4dec-86e3-3f22bde74d11",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [],
+          "failures": [
+            "df2ee81e-16f9-4687-b056-1727756b0cdb",
+            "86ff4240-4eaa-4e43-b950-38afc6fc23b5",
+            "a61f8314-4128-4391-9b7e-6dae36b2d984",
+            "f44a41fc-9597-4fa4-970e-36bf72186680",
+            "20eace1c-4813-4b9e-8e77-2660d4da1464",
+            "38de450f-4251-49fe-b7ec-c533adb95ab0",
+            "26230b69-4d9c-4905-865c-0124078749f0",
+            "479aa9c5-6f84-45e5-b6af-859f66be9f85",
+            "085c0e0e-81fa-4c8e-baa6-172a6b112d78",
+            "05ecf5ca-7215-4a04-9ede-ca6bf464ee97"
+          ],
+          "pending": [],
+          "skipped": [],
+          "duration": 499515,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        }
+      ],
+      "passes": [],
+      "failures": [],
+      "pending": [],
+      "skipped": [],
+      "duration": 0,
+      "root": true,
+      "rootEmpty": true,
+      "_timeout": 2000
+    }
+  ],
+  "meta": {
+    "mocha": {
+      "version": "7.0.1"
+    },
+    "mochawesome": {
+      "options": {
+        "quiet": false,
+        "reportFilename": "mochawesome",
+        "saveHtml": true,
+        "saveJson": true,
+        "consoleReporter": "spec",
+        "useInlineDiffs": false,
+        "code": true
+      },
+      "version": "7.1.3"
+    },
+    "marge": {
+      "options": {
+        "charts": true,
+        "overwrite": false,
+        "html": true,
+        "json": true,
+        "reportDir": "cypress/report/mochawesome-report",
+        "mochaFile": "cypress/report/output.html"
+      },
+      "version": "6.2.0"
+    }
+  }
+}

@@ -1,0 +1,318 @@
+{
+  "stats": {
+    "suites": 1,
+    "tests": 10,
+    "passes": 0,
+    "pending": 0,
+    "failures": 10,
+    "start": "2022-06-10T18:04:17.831Z",
+    "end": "2022-06-10T18:12:15.900Z",
+    "duration": 478069,
+    "testsRegistered": 10,
+    "passPercent": 0,
+    "pendingPercent": 0,
+    "other": 0,
+    "hasOther": false,
+    "skipped": 0,
+    "hasSkipped": false
+  },
+  "results": [
+    {
+      "uuid": "8c65d8d4-4782-4f3a-bb88-5414eab81edf",
+      "title": "",
+      "fullFile": "cypress/integration/features/filters/pin-filter-from-dashboard-to-events.feature",
+      "file": "cypress/integration/features/filters/pin-filter-from-dashboard-to-events.feature",
+      "beforeHooks": [],
+      "afterHooks": [],
+      "tests": [],
+      "suites": [
+        {
+          "uuid": "6300225e-113f-428e-8d94-fdf298f0ecda",
+          "title": "Pin filter",
+          "fullFile": "",
+          "file": "",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "The user add and pin new filer - across the modules - from dashboard to event page Security Events (example #1)",
+              "fullTitle": "Pin filter The user add and pin new filer - across the modules - from dashboard to event page Security Events (example #1)",
+              "timedOut": null,
+              "duration": 65703,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": null,
+              "code": "const state = window.testState;\nreturn cy\n  .then(() => state.onStartScenario(scenario, indexedSteps))\n  .then(() =>\n    resolveAndRunBeforeHooks.call(this, scenario.tags, state.feature.name)\n  )\n  .then(() =>\n    indexedSteps.forEach((step) =>\n      stepTest.call(this, state, step, rowData)\n    )\n  )\n  .then(() => state.onFinishScenario(scenario));",
+              "err": {
+                "message": "AssertionError: Timed out retrying after 40000ms: expected '<button.euiButtonEmpty.euiButtonEmpty--primary.euiButtonEmpty--small.globalFilterBar__addButton>' to be 'visible'\n\nThis element `<button.euiButtonEmpty.euiButtonEmpty--primary.euiButtonEmpty--small.globalFilterBar__addButton>` is not visible because its parent `<kbn-dis.hide-filter-control.ng-hide>` has CSS property: `display: none`",
+                "estack": "AssertionError: Timed out retrying after 40000ms: expected '<button.euiButtonEmpty.euiButtonEmpty--primary.euiButtonEmpty--small.globalFilterBar__addButton>' to be 'visible'\n\nThis element `<button.euiButtonEmpty.euiButtonEmpty--primary.euiButtonEmpty--small.globalFilterBar__addButton>` is not visible because its parent `<kbn-dis.hide-filter-control.ng-hide>` has CSS property: `display: none`\n    at elementIsVisible (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-dashboard-to-events.feature:2302:47)\n    at Context.eval (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-dashboard-to-events.feature:1342:32)\n    at Context.resolveAndRunStepDefinition (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-dashboard-to-events.feature:13166:29)\n    at Context.eval (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-dashboard-to-events.feature:12487:35)",
+                "diff": null
+              },
+              "uuid": "9d7e05a1-31b5-4ce8-a6cc-fe8534e7c822",
+              "parentUUID": "6300225e-113f-428e-8d94-fdf298f0ecda",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "The user add and pin new filer - across the modules - from dashboard to event page Integrity Monitoring (example #2)",
+              "fullTitle": "Pin filter The user add and pin new filer - across the modules - from dashboard to event page Integrity Monitoring (example #2)",
+              "timedOut": null,
+              "duration": 47052,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": null,
+              "code": "const state = window.testState;\nreturn cy\n  .then(() => state.onStartScenario(scenario, indexedSteps))\n  .then(() =>\n    resolveAndRunBeforeHooks.call(this, scenario.tags, state.feature.name)\n  )\n  .then(() =>\n    indexedSteps.forEach((step) =>\n      stepTest.call(this, state, step, rowData)\n    )\n  )\n  .then(() => state.onFinishScenario(scenario));",
+              "err": {
+                "message": "AssertionError: Timed out retrying after 40000ms: expected '<button.euiButtonEmpty.euiButtonEmpty--primary.euiButtonEmpty--small.globalFilterBar__addButton>' to be 'visible'\n\nThis element `<button.euiButtonEmpty.euiButtonEmpty--primary.euiButtonEmpty--small.globalFilterBar__addButton>` is not visible because its parent `<kbn-dis.hide-filter-control.ng-hide>` has CSS property: `display: none`",
+                "estack": "AssertionError: Timed out retrying after 40000ms: expected '<button.euiButtonEmpty.euiButtonEmpty--primary.euiButtonEmpty--small.globalFilterBar__addButton>' to be 'visible'\n\nThis element `<button.euiButtonEmpty.euiButtonEmpty--primary.euiButtonEmpty--small.globalFilterBar__addButton>` is not visible because its parent `<kbn-dis.hide-filter-control.ng-hide>` has CSS property: `display: none`\n    at elementIsVisible (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-dashboard-to-events.feature:2302:47)\n    at Context.eval (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-dashboard-to-events.feature:1342:32)\n    at Context.resolveAndRunStepDefinition (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-dashboard-to-events.feature:13166:29)\n    at Context.eval (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-dashboard-to-events.feature:12487:35)",
+                "diff": null
+              },
+              "uuid": "097c5e90-ea33-4cba-8829-3d12007a8aba",
+              "parentUUID": "6300225e-113f-428e-8d94-fdf298f0ecda",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "The user add and pin new filer - across the modules - from dashboard to event page System Auditing (example #3)",
+              "fullTitle": "Pin filter The user add and pin new filer - across the modules - from dashboard to event page System Auditing (example #3)",
+              "timedOut": null,
+              "duration": 44727,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": null,
+              "code": "const state = window.testState;\nreturn cy\n  .then(() => state.onStartScenario(scenario, indexedSteps))\n  .then(() =>\n    resolveAndRunBeforeHooks.call(this, scenario.tags, state.feature.name)\n  )\n  .then(() =>\n    indexedSteps.forEach((step) =>\n      stepTest.call(this, state, step, rowData)\n    )\n  )\n  .then(() => state.onFinishScenario(scenario));",
+              "err": {
+                "message": "AssertionError: Timed out retrying after 40000ms: expected '<button.euiButtonEmpty.euiButtonEmpty--primary.euiButtonEmpty--small.globalFilterBar__addButton>' to be 'visible'\n\nThis element `<button.euiButtonEmpty.euiButtonEmpty--primary.euiButtonEmpty--small.globalFilterBar__addButton>` is not visible because its parent `<kbn-dis.hide-filter-control.ng-hide>` has CSS property: `display: none`",
+                "estack": "AssertionError: Timed out retrying after 40000ms: expected '<button.euiButtonEmpty.euiButtonEmpty--primary.euiButtonEmpty--small.globalFilterBar__addButton>' to be 'visible'\n\nThis element `<button.euiButtonEmpty.euiButtonEmpty--primary.euiButtonEmpty--small.globalFilterBar__addButton>` is not visible because its parent `<kbn-dis.hide-filter-control.ng-hide>` has CSS property: `display: none`\n    at elementIsVisible (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-dashboard-to-events.feature:2302:47)\n    at Context.eval (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-dashboard-to-events.feature:1342:32)\n    at Context.resolveAndRunStepDefinition (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-dashboard-to-events.feature:13166:29)\n    at Context.eval (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-dashboard-to-events.feature:12487:35)",
+                "diff": null
+              },
+              "uuid": "36b297ec-6350-4ce6-9cd1-30f5ffd7b07b",
+              "parentUUID": "6300225e-113f-428e-8d94-fdf298f0ecda",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "The user add and pin new filer - across the modules - from dashboard to event page Mitre & Attack (example #4)",
+              "fullTitle": "Pin filter The user add and pin new filer - across the modules - from dashboard to event page Mitre & Attack (example #4)",
+              "timedOut": null,
+              "duration": 46120,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": null,
+              "code": "const state = window.testState;\nreturn cy\n  .then(() => state.onStartScenario(scenario, indexedSteps))\n  .then(() =>\n    resolveAndRunBeforeHooks.call(this, scenario.tags, state.feature.name)\n  )\n  .then(() =>\n    indexedSteps.forEach((step) =>\n      stepTest.call(this, state, step, rowData)\n    )\n  )\n  .then(() => state.onFinishScenario(scenario));",
+              "err": {
+                "message": "AssertionError: Timed out retrying after 40000ms: expected '<button.euiButtonEmpty.euiButtonEmpty--primary.euiButtonEmpty--small.globalFilterBar__addButton>' to be 'visible'\n\nThis element `<button.euiButtonEmpty.euiButtonEmpty--primary.euiButtonEmpty--small.globalFilterBar__addButton>` is not visible because its parent `<kbn-dis.hide-filter-control.ng-hide>` has CSS property: `display: none`",
+                "estack": "AssertionError: Timed out retrying after 40000ms: expected '<button.euiButtonEmpty.euiButtonEmpty--primary.euiButtonEmpty--small.globalFilterBar__addButton>' to be 'visible'\n\nThis element `<button.euiButtonEmpty.euiButtonEmpty--primary.euiButtonEmpty--small.globalFilterBar__addButton>` is not visible because its parent `<kbn-dis.hide-filter-control.ng-hide>` has CSS property: `display: none`\n    at elementIsVisible (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-dashboard-to-events.feature:2302:47)\n    at Context.eval (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-dashboard-to-events.feature:1342:32)\n    at Context.resolveAndRunStepDefinition (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-dashboard-to-events.feature:13166:29)\n    at Context.eval (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-dashboard-to-events.feature:12487:35)",
+                "diff": null
+              },
+              "uuid": "da28e7c7-f42b-4d03-8bcf-0accf3dc1d5f",
+              "parentUUID": "6300225e-113f-428e-8d94-fdf298f0ecda",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "The user add and pin new filer - across the modules - from dashboard to event page GDPR (example #5)",
+              "fullTitle": "Pin filter The user add and pin new filer - across the modules - from dashboard to event page GDPR (example #5)",
+              "timedOut": null,
+              "duration": 44669,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": null,
+              "code": "const state = window.testState;\nreturn cy\n  .then(() => state.onStartScenario(scenario, indexedSteps))\n  .then(() =>\n    resolveAndRunBeforeHooks.call(this, scenario.tags, state.feature.name)\n  )\n  .then(() =>\n    indexedSteps.forEach((step) =>\n      stepTest.call(this, state, step, rowData)\n    )\n  )\n  .then(() => state.onFinishScenario(scenario));",
+              "err": {
+                "message": "AssertionError: Timed out retrying after 40000ms: expected '<button.euiButtonEmpty.euiButtonEmpty--primary.euiButtonEmpty--small.globalFilterBar__addButton>' to be 'visible'\n\nThis element `<button.euiButtonEmpty.euiButtonEmpty--primary.euiButtonEmpty--small.globalFilterBar__addButton>` is not visible because its parent `<kbn-dis.hide-filter-control.ng-hide>` has CSS property: `display: none`",
+                "estack": "AssertionError: Timed out retrying after 40000ms: expected '<button.euiButtonEmpty.euiButtonEmpty--primary.euiButtonEmpty--small.globalFilterBar__addButton>' to be 'visible'\n\nThis element `<button.euiButtonEmpty.euiButtonEmpty--primary.euiButtonEmpty--small.globalFilterBar__addButton>` is not visible because its parent `<kbn-dis.hide-filter-control.ng-hide>` has CSS property: `display: none`\n    at elementIsVisible (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-dashboard-to-events.feature:2302:47)\n    at Context.eval (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-dashboard-to-events.feature:1342:32)\n    at Context.resolveAndRunStepDefinition (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-dashboard-to-events.feature:13166:29)\n    at Context.eval (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-dashboard-to-events.feature:12487:35)",
+                "diff": null
+              },
+              "uuid": "c9281337-fbd3-4194-b17a-604631aa9f94",
+              "parentUUID": "6300225e-113f-428e-8d94-fdf298f0ecda",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "The user add and pin new filer - across the modules - from dashboard to event page HIPAA (example #6)",
+              "fullTitle": "Pin filter The user add and pin new filer - across the modules - from dashboard to event page HIPAA (example #6)",
+              "timedOut": null,
+              "duration": 47567,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": null,
+              "code": "const state = window.testState;\nreturn cy\n  .then(() => state.onStartScenario(scenario, indexedSteps))\n  .then(() =>\n    resolveAndRunBeforeHooks.call(this, scenario.tags, state.feature.name)\n  )\n  .then(() =>\n    indexedSteps.forEach((step) =>\n      stepTest.call(this, state, step, rowData)\n    )\n  )\n  .then(() => state.onFinishScenario(scenario));",
+              "err": {
+                "message": "AssertionError: Timed out retrying after 40000ms: expected '<button.euiButtonEmpty.euiButtonEmpty--primary.euiButtonEmpty--small.globalFilterBar__addButton>' to be 'visible'\n\nThis element `<button.euiButtonEmpty.euiButtonEmpty--primary.euiButtonEmpty--small.globalFilterBar__addButton>` is not visible because its parent `<kbn-dis.hide-filter-control.ng-hide>` has CSS property: `display: none`",
+                "estack": "AssertionError: Timed out retrying after 40000ms: expected '<button.euiButtonEmpty.euiButtonEmpty--primary.euiButtonEmpty--small.globalFilterBar__addButton>' to be 'visible'\n\nThis element `<button.euiButtonEmpty.euiButtonEmpty--primary.euiButtonEmpty--small.globalFilterBar__addButton>` is not visible because its parent `<kbn-dis.hide-filter-control.ng-hide>` has CSS property: `display: none`\n    at elementIsVisible (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-dashboard-to-events.feature:2302:47)\n    at Context.eval (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-dashboard-to-events.feature:1342:32)\n    at Context.resolveAndRunStepDefinition (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-dashboard-to-events.feature:13166:29)\n    at Context.eval (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-dashboard-to-events.feature:12487:35)",
+                "diff": null
+              },
+              "uuid": "060a9607-08be-458d-ad2a-46237345d57f",
+              "parentUUID": "6300225e-113f-428e-8d94-fdf298f0ecda",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "The user add and pin new filer - across the modules - from dashboard to event page NIST (example #7)",
+              "fullTitle": "Pin filter The user add and pin new filer - across the modules - from dashboard to event page NIST (example #7)",
+              "timedOut": null,
+              "duration": 44365,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": null,
+              "code": "const state = window.testState;\nreturn cy\n  .then(() => state.onStartScenario(scenario, indexedSteps))\n  .then(() =>\n    resolveAndRunBeforeHooks.call(this, scenario.tags, state.feature.name)\n  )\n  .then(() =>\n    indexedSteps.forEach((step) =>\n      stepTest.call(this, state, step, rowData)\n    )\n  )\n  .then(() => state.onFinishScenario(scenario));",
+              "err": {
+                "message": "AssertionError: Timed out retrying after 40000ms: expected '<button.euiButtonEmpty.euiButtonEmpty--primary.euiButtonEmpty--small.globalFilterBar__addButton>' to be 'visible'\n\nThis element `<button.euiButtonEmpty.euiButtonEmpty--primary.euiButtonEmpty--small.globalFilterBar__addButton>` is not visible because its parent `<kbn-dis.hide-filter-control.ng-hide>` has CSS property: `display: none`",
+                "estack": "AssertionError: Timed out retrying after 40000ms: expected '<button.euiButtonEmpty.euiButtonEmpty--primary.euiButtonEmpty--small.globalFilterBar__addButton>' to be 'visible'\n\nThis element `<button.euiButtonEmpty.euiButtonEmpty--primary.euiButtonEmpty--small.globalFilterBar__addButton>` is not visible because its parent `<kbn-dis.hide-filter-control.ng-hide>` has CSS property: `display: none`\n    at elementIsVisible (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-dashboard-to-events.feature:2302:47)\n    at Context.eval (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-dashboard-to-events.feature:1342:32)\n    at Context.resolveAndRunStepDefinition (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-dashboard-to-events.feature:13166:29)\n    at Context.eval (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-dashboard-to-events.feature:12487:35)",
+                "diff": null
+              },
+              "uuid": "2d665f78-95f1-4884-b1c5-a3e55f2fbf95",
+              "parentUUID": "6300225e-113f-428e-8d94-fdf298f0ecda",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "The user add and pin new filer - across the modules - from dashboard to event page TSC (example #8)",
+              "fullTitle": "Pin filter The user add and pin new filer - across the modules - from dashboard to event page TSC (example #8)",
+              "timedOut": null,
+              "duration": 45097,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": null,
+              "code": "const state = window.testState;\nreturn cy\n  .then(() => state.onStartScenario(scenario, indexedSteps))\n  .then(() =>\n    resolveAndRunBeforeHooks.call(this, scenario.tags, state.feature.name)\n  )\n  .then(() =>\n    indexedSteps.forEach((step) =>\n      stepTest.call(this, state, step, rowData)\n    )\n  )\n  .then(() => state.onFinishScenario(scenario));",
+              "err": {
+                "message": "AssertionError: Timed out retrying after 40000ms: expected '<button.euiButtonEmpty.euiButtonEmpty--primary.euiButtonEmpty--small.globalFilterBar__addButton>' to be 'visible'\n\nThis element `<button.euiButtonEmpty.euiButtonEmpty--primary.euiButtonEmpty--small.globalFilterBar__addButton>` is not visible because its parent `<kbn-dis.hide-filter-control.ng-hide>` has CSS property: `display: none`",
+                "estack": "AssertionError: Timed out retrying after 40000ms: expected '<button.euiButtonEmpty.euiButtonEmpty--primary.euiButtonEmpty--small.globalFilterBar__addButton>' to be 'visible'\n\nThis element `<button.euiButtonEmpty.euiButtonEmpty--primary.euiButtonEmpty--small.globalFilterBar__addButton>` is not visible because its parent `<kbn-dis.hide-filter-control.ng-hide>` has CSS property: `display: none`\n    at elementIsVisible (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-dashboard-to-events.feature:2302:47)\n    at Context.eval (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-dashboard-to-events.feature:1342:32)\n    at Context.resolveAndRunStepDefinition (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-dashboard-to-events.feature:13166:29)\n    at Context.eval (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-dashboard-to-events.feature:12487:35)",
+                "diff": null
+              },
+              "uuid": "a70c2be0-aebf-411f-99ff-6d7836d7b820",
+              "parentUUID": "6300225e-113f-428e-8d94-fdf298f0ecda",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "The user add and pin new filer - across the modules - from dashboard to event page Policy Monitoring (example #9)",
+              "fullTitle": "Pin filter The user add and pin new filer - across the modules - from dashboard to event page Policy Monitoring (example #9)",
+              "timedOut": null,
+              "duration": 46358,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": null,
+              "code": "const state = window.testState;\nreturn cy\n  .then(() => state.onStartScenario(scenario, indexedSteps))\n  .then(() =>\n    resolveAndRunBeforeHooks.call(this, scenario.tags, state.feature.name)\n  )\n  .then(() =>\n    indexedSteps.forEach((step) =>\n      stepTest.call(this, state, step, rowData)\n    )\n  )\n  .then(() => state.onFinishScenario(scenario));",
+              "err": {
+                "message": "AssertionError: Timed out retrying after 40000ms: expected '<button.euiButtonEmpty.euiButtonEmpty--primary.euiButtonEmpty--small.globalFilterBar__addButton>' to be 'visible'\n\nThis element `<button.euiButtonEmpty.euiButtonEmpty--primary.euiButtonEmpty--small.globalFilterBar__addButton>` is not visible because its parent `<kbn-dis.hide-filter-control.ng-hide>` has CSS property: `display: none`",
+                "estack": "AssertionError: Timed out retrying after 40000ms: expected '<button.euiButtonEmpty.euiButtonEmpty--primary.euiButtonEmpty--small.globalFilterBar__addButton>' to be 'visible'\n\nThis element `<button.euiButtonEmpty.euiButtonEmpty--primary.euiButtonEmpty--small.globalFilterBar__addButton>` is not visible because its parent `<kbn-dis.hide-filter-control.ng-hide>` has CSS property: `display: none`\n    at elementIsVisible (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-dashboard-to-events.feature:2302:47)\n    at Context.eval (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-dashboard-to-events.feature:1342:32)\n    at Context.resolveAndRunStepDefinition (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-dashboard-to-events.feature:13166:29)\n    at Context.eval (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-dashboard-to-events.feature:12487:35)",
+                "diff": null
+              },
+              "uuid": "45f2cb87-dc65-49d4-a290-0d711994af97",
+              "parentUUID": "6300225e-113f-428e-8d94-fdf298f0ecda",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "The user add and pin new filer - across the modules - from dashboard to event page PCIDSS (example #10)",
+              "fullTitle": "Pin filter The user add and pin new filer - across the modules - from dashboard to event page PCIDSS (example #10)",
+              "timedOut": null,
+              "duration": 45253,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": null,
+              "code": "const state = window.testState;\nreturn cy\n  .then(() => state.onStartScenario(scenario, indexedSteps))\n  .then(() =>\n    resolveAndRunBeforeHooks.call(this, scenario.tags, state.feature.name)\n  )\n  .then(() =>\n    indexedSteps.forEach((step) =>\n      stepTest.call(this, state, step, rowData)\n    )\n  )\n  .then(() => state.onFinishScenario(scenario));",
+              "err": {
+                "message": "AssertionError: Timed out retrying after 40000ms: expected '<button.euiButtonEmpty.euiButtonEmpty--primary.euiButtonEmpty--small.globalFilterBar__addButton>' to be 'visible'\n\nThis element `<button.euiButtonEmpty.euiButtonEmpty--primary.euiButtonEmpty--small.globalFilterBar__addButton>` is not visible because its parent `<kbn-dis.hide-filter-control.ng-hide>` has CSS property: `display: none`",
+                "estack": "AssertionError: Timed out retrying after 40000ms: expected '<button.euiButtonEmpty.euiButtonEmpty--primary.euiButtonEmpty--small.globalFilterBar__addButton>' to be 'visible'\n\nThis element `<button.euiButtonEmpty.euiButtonEmpty--primary.euiButtonEmpty--small.globalFilterBar__addButton>` is not visible because its parent `<kbn-dis.hide-filter-control.ng-hide>` has CSS property: `display: none`\n    at elementIsVisible (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-dashboard-to-events.feature:2302:47)\n    at Context.eval (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-dashboard-to-events.feature:1342:32)\n    at Context.resolveAndRunStepDefinition (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-dashboard-to-events.feature:13166:29)\n    at Context.eval (https://localhost:5601/__cypress/tests?p=cypress/integration/features/filters/pin-filter-from-dashboard-to-events.feature:12487:35)",
+                "diff": null
+              },
+              "uuid": "51709db5-4c49-4e9a-a47e-5434fb829224",
+              "parentUUID": "6300225e-113f-428e-8d94-fdf298f0ecda",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [],
+          "failures": [
+            "9d7e05a1-31b5-4ce8-a6cc-fe8534e7c822",
+            "097c5e90-ea33-4cba-8829-3d12007a8aba",
+            "36b297ec-6350-4ce6-9cd1-30f5ffd7b07b",
+            "da28e7c7-f42b-4d03-8bcf-0accf3dc1d5f",
+            "c9281337-fbd3-4194-b17a-604631aa9f94",
+            "060a9607-08be-458d-ad2a-46237345d57f",
+            "2d665f78-95f1-4884-b1c5-a3e55f2fbf95",
+            "a70c2be0-aebf-411f-99ff-6d7836d7b820",
+            "45f2cb87-dc65-49d4-a290-0d711994af97",
+            "51709db5-4c49-4e9a-a47e-5434fb829224"
+          ],
+          "pending": [],
+          "skipped": [],
+          "duration": 476911,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        }
+      ],
+      "passes": [],
+      "failures": [],
+      "pending": [],
+      "skipped": [],
+      "duration": 0,
+      "root": true,
+      "rootEmpty": true,
+      "_timeout": 2000
+    }
+  ],
+  "meta": {
+    "mocha": {
+      "version": "7.0.1"
+    },
+    "mochawesome": {
+      "options": {
+        "quiet": false,
+        "reportFilename": "mochawesome",
+        "saveHtml": true,
+        "saveJson": true,
+        "consoleReporter": "spec",
+        "useInlineDiffs": false,
+        "code": true
+      },
+      "version": "7.1.3"
+    },
+    "marge": {
+      "options": {
+        "charts": true,
+        "overwrite": false,
+        "html": true,
+        "json": true,
+        "reportDir": "cypress/report/mochawesome-report",
+        "mochaFile": "cypress/report/output.html"
+      },
+      "version": "6.2.0"
+    }
+  }
+}

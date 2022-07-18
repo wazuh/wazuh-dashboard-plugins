@@ -1,0 +1,133 @@
+# This is a basic workflow that is manually triggered
+
+name: Manual workflow build and push docker image
+
+# Controls when the action will run. Workflow runs when manually triggered using the UI
+# or API.
+on:
+  workflow_dispatch:
+    # Inputs the workflow accepts.
+    inputs:
+      build-manager-image:
+        type: boolean
+        description: 'Build manager image'
+        required: false
+      wazuh-manager-version: 
+        description: 'Wazuh manager version'
+        default: 'v4.3.4-rc1'
+        required: false
+      elastic-manager-version: 
+        description: 'Elastic manager version'
+        default: '7.16.3'
+        required: false   
+     
+      build-agent-image:
+        type: boolean
+        description: 'Build agent image'
+        required: false
+      wazuh-agent-version: 
+        description: 'Wazuh agent version'
+        default: 'v4.3.4-rc1'
+        required: false
+      elastic-agent-version: 
+        description: 'Elastic manager version'
+        default: '7.16.3'
+        required: false
+
+      build-cypress-image:
+        type: boolean
+        description: 'Build cypress image'
+        required: false
+      ubuntu-cypress-branch: 
+        description: 'Ubuntu cypress branch'
+        default: 'main'
+        required: false
+      image-cypress-version: 
+        description: 'Image cypress version'
+        default: '3.0.0'
+        required: false
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  job-build-manager-image:
+    if: ${{ github.event.inputs.build-manager-image == 'true' }}
+    name: Run build and push manager image
+    runs-on: ubuntu-18.04
+    steps:
+     - name: Step 01 - Download Dockerfiles
+       uses: actions/checkout@v2
+       with:
+          path: dockerfiles
+          ref: 'main'
+     - name: Step 02 - Set up QEMU
+       uses: docker/setup-qemu-action@v2
+     - name: Step 03 - Set up Docker Buildx
+       uses: docker/setup-buildx-action@v2
+     - name: Step 04 - Login to DockerHub
+       uses: docker/login-action@v2
+       with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}  
+     - name: Step 05 - Build
+       run: |
+        cd ./dockerfiles/images/wazuh_manager_filebeat_sources_cmake
+        docker build -t matiasmoreno876/wazuh-manager-image:${{ github.event.inputs.wazuh-manager-version }}-${{ github.event.inputs.elastic-manager-version }} \
+        --build-arg WAZUH_VERSION=${{ github.event.inputs.wazuh-manager-version }} \
+        --build-arg FILEBEAT_VERSION=${{ github.event.inputs.elastic-manager-version }} \
+        --build-arg FILEBEAT_WAZUH_TEMPLATE_URL=https://raw.githubusercontent.com/wazuh/wazuh/4.0/extensions/elasticsearch/7.x/wazuh-template.json \
+        --build-arg FILEBEAT_WAZUH_MODULE_URL=https://packages.wazuh.com/4.x/filebeat/wazuh-filebeat-0.1.tar.gz .
+     - name: Step 06 - push
+       run: | 
+        docker image push matiasmoreno876/wazuh-manager-image:${{ github.event.inputs.wazuh-manager-version }}-${{ github.event.inputs.elastic-manager-version }}
+
+  job-build-agent-image:
+    if: ${{ github.event.inputs.build-agent-image == 'true' }}
+    name: Run build and push agent image
+    runs-on: ubuntu-18.04
+    steps:
+     - name: Step 01 - Download Dockerfiles
+       uses: actions/checkout@v2
+       with:
+          repository: matiasmoreno876/wazuh-build-push-dev-images
+          path: dockerfiles
+          ref: 'main'
+     - name: Step 02 - Set up Docker Buildx
+       uses: docker/setup-buildx-action@v1
+     - name: Step 03 - Login to DockerHub
+       uses: docker/login-action@v2
+       with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}        
+     - name: Step 05 - Build and push
+       uses: docker/build-push-action@v2
+       with: 
+        context: ${{ github.workspace }}/dockerfiles/images/wazuh_agent_ubuntu_sources_cmake
+        build-args: WAZUH_VERSION=${{ github.event.inputs.wazuh-agent-version }}
+        tags: matiasmoreno876/wazuh-agent-image:${{ github.event.inputs.wazuh-agent-version }}-${{ github.event.inputs.elastic-agent-version }}
+        push: true
+
+  job-build-cypress-image:
+    if: ${{ github.event.inputs.build-cypress-image == 'true' }}
+    name: Run build and push cypress image
+    runs-on: ubuntu-18.04
+    steps:
+     - name: Step 01 - Download Dockerfiles
+       uses: actions/checkout@v2
+       with:
+          repository: matiasmoreno876/wazuh-build-push-dev-images
+          path: dockerfiles
+          ref: 'main'
+     - name: Step 02 - Set up Docker Buildx
+       uses: docker/setup-buildx-action@v1
+     - name: Step 03 - Login to DockerHub
+       uses: docker/login-action@v2
+       with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}        
+     - name: Step 05 - Build and push
+       uses: docker/build-push-action@v2
+       with: 
+        context: ${{ github.workspace }}/dockerfiles/images/ubuntu-cypress
+        build-args: UBUNTU_CYPRESS_BRANCH=${{ github.event.inputs.ubuntu-cypress-branch }}
+        tags: matiasmoreno876/wazuh-ubuntu-cypress:${{ github.event.inputs.image-cypress-version }}
+        push: true

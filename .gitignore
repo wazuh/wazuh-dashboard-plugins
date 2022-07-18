@@ -66,3 +66,10 @@ target/
 build/
 
 yarn.lock
+
+cypress/node_modules/
+cypress/.idea/
+cypress/cypress.env.json
+cypress/report/
+cypress/cookies.json
+cypress/package-lock.json
