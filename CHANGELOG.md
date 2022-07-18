@@ -6,7 +6,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Added
 
-- Added the option to sort by agents in the group table. [#4323](https://github.com/wazuh/wazuh-kibana-app/pull/4323)
+- Added the option to sort by the agents count in the group table. [#4323](https://github.com/wazuh/wazuh-kibana-app/pull/4323)
 
 ### Changed
 
