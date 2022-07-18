@@ -93,16 +93,11 @@ export class ReportingService {
       );
 
       const array = await this.vis2png.checkArray(idArray);
-      const name = `wazuh-${
-        isAgents ? 'agents' : 'overview'
-      }-${tab}-${(Date.now() / 1000) | 0}.pdf`;
 
       const browserTimezone = moment.tz.guess(true);
 
       const data = {
         array,
-        name,
-        title: isAgents ? `Agents ${tab}` : `Overview ${tab}`,
         filters: appliedFilters.filters,
         time: appliedFilters.time,
         searchBar: appliedFilters.searchBar,
@@ -138,26 +133,17 @@ export class ReportingService {
       this.$rootScope.reportStatus = 'Generating PDF document...';
       this.$rootScope.$applyAsync();
 
-      const docType =
-        type === 'agentConfig'
-          ? `wazuh-agent-${obj.id}`
-          : `wazuh-group-${obj.name}`;
-
-      const name = `${docType}-configuration-${(Date.now() / 1000) | 0}.pdf`;
       const browserTimezone = moment.tz.guess(true);
 
       const data = {
         array: [],
-        name,
-        filters: [
-          type === 'agentConfig' ? { agent: obj.id } : { group: obj.name }
-        ],
         time: '',
         searchBar: '',
         tables: [],
         tab: type,
         browserTimezone,
-        components
+        components,
+        ...(type === 'agentConfig' ? { agentID: obj.id } : { groupID: obj.name })
       };
 
       await this.genericReq.request('POST', '/reports', data);
