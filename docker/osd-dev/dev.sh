@@ -9,7 +9,7 @@ os_versions=(
 
 osd_versions=(
 	'1.2.0'
-	'2.0.0'
+	'2.0'
 	'2.0.1'
 )
 
@@ -59,7 +59,7 @@ export OS_VERSION=$1
 export OSD_VERSION=$2
 export OSD_PORT=${PORT:-5601}
 export SRC=$3
-export COMPOSE_PROJECT_NAME=os-dev-${OSD_VERSION}
+export COMPOSE_PROJECT_NAME=os-dev
 
 case "$4" in
 	up)
@@ -69,7 +69,7 @@ case "$4" in
 		docker compose  -f dev.yml down -v --remove-orphans
 		;;
 	stop)
-		docker compose -f dev.yml stop
+		docker compose  -f dev.yml  -p os-dev stop
 		;;
 	*)
 		echo "Action must be up | down: "

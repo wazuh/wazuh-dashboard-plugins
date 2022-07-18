@@ -175,7 +175,7 @@ services:
 networks:
   networks:
   os-dev:
-    name: os-dev-{OS_VERSION}
+    name: os-dev-${OS_VERSION}
     driver: bridge
   mon:
     external: true
