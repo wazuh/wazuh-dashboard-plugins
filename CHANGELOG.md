@@ -3,6 +3,10 @@
 All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.4.0 - OpenSearch Dashboards 1.2.0 - Revision 4400
 
+### Added
+
+- Added the option to sort by the agents count in the group table. [#4323](https://github.com/wazuh/wazuh-kibana-app/pull/4323)
+
 ### Changed
 
 - Changed the HTTP verb from `GET` to `POST` in the requests to login to the Wazuh API [#4103](https://github.com/wazuh/wazuh-kibana-app/pull/4103)
