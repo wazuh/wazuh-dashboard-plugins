@@ -481,7 +481,7 @@ export const validateAfterSent = async (node = false) => {
 export const agentIsSynchronized = async agent => {
   const isSync = await WzRequest.apiReq(
     'GET',
-    `/agents/${agent.id}/`, {}
+    `/agents?q=id=${agent.id}&select=group_config_status`, {}
   );
   return isSync?.data?.data?.affected_items?.[0]?.group_config_status == AGENT_SYNCED_STATUS.SYNCED;
 }
