@@ -48,6 +48,7 @@
     "js2xmlparser": "^3.0.0",
     "json2csv": "^4.1.2",
     "jwt-decode": "^2.2.0",
+    "md5": "^2.3.0",
     "needle": "^2.0.1",
     "node-cron": "^1.1.2",
     "pdfmake": "0.1.65",
