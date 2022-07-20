@@ -28,7 +28,7 @@ usage() {
 
 if [ $# -lt 4 ]
   then
-  	echo "Incorrect number of arguments " $#
+  	echo "Incorrect number of arguments " $# ", got " $@
   	echo
     usage
 fi

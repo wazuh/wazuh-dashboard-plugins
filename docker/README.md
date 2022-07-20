@@ -1,16 +1,31 @@
-# Frontend development environment
+# Frontend development environments
 
-Install [Docker Desktop][0] as per its instructions. It works for Linux too.
+Install [Docker Desktop][0] as per its instructions, available for Windows, Mac 
+and Linux (Ubuntu, Debian & Fedora).
 This ensures that the development experience between Linux, Mac and Windows is as
 similar as posible.
 
+> IMPORTANT: be methodic during the installation of Docker Desktop, and proceed
+step by step as described in their documentation. Make sure that your system
+meets the system requirements before installing Docker Desktop, and read any 
+post-installation note, specially on Linux: [Differences between 
+Docker Desktop for Linux and Docker Engine](https://docs.docker.com/desktop/install/linux-install/#differences-between-docker-desktop-for-linux-and-docker-engine)
+
 In general the environment consist of:
 
-- lightweight monitoring stack based on [Grafana][1], [Loki][2] and [Prometheus][3].
-- dockerized development environments.
-- releases and pre-releases docker images for testing.
+- Lightweight monitoring stack based on [Grafana][1], [Loki][2] and [Prometheus][3].
+- Dockerized development environments.
+- Release and pre-release Docker images for testing.
 
-# Pre-requisites
+## Pre-requisites
+
+> IMPORTANT: as this folder is inside a development branch, you will need to have
+2 clones of the Wazuh Kibana App repository, one containing this folder with the
+new Docker environments and another one containing the plugin source code in the
+required branch (4.x-7.16, 4.x-wzd, ...). My recommendation is:
+> 
+>  - wazuh-kibana-docker (repo set to this branch, feature/3872-environments-docker)
+>  - wazuh-kibana-app    (repo with the source code, set to the desired branch)
 
  1. Create the `devel` network:
 
@@ -24,42 +39,79 @@ In general the environment consist of:
 	docker network create mon
 	```
 
- 3. Install the Docker driver Loki, from [Grafana][1], used to read logs from the containers:
+ 3. Install the Docker driver Loki, from [Grafana][1], used to read logs from 
+ the containers:
 
 	```bash
 	docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all-permissions
 	```
- 4. Assign resources to [Docker Desktop][0]. The requirements for the environments are:
+ 4. Assign resources to [Docker Desktop][0]. The requirements for the 
+ environments are:
 	- 8 GB of RAM (minimum)
 	- 4 cores
 
     The more resources the better ☺
+ 
+ 5. Save the path to the Wazuh App code as an environment variable, by exporting
+ this path on your `.bashrc`, `.zhsrc` or similiar.
 
+	```bash
+	# ./bashrc
+	export WZ_HOME=~/your/path/to/wazuh_kibana_app
+	```
+	Save and restart your terminal to take the changes. Check that is works with:
+
+	```bash
+	echo $WZ_HOME
+	```
+
+ 6. Set up user permissions
+
+	The Docker volumes will be created by the internal Docker user, making them
+	read-only. To prevent this, a new group named `docker-desktop` and GUID 100999 
+	needs to be created, then added to your user and the source code folder:
+
+	```bash
+	sudo groupadd -g 100999 docker-desktop
+	sudo useradd -u 100999 -g 100999 -M docker-desktop
+	sudo chown -R $USER:docker-desktop $WZ_HOME
+	sudo usermod -aG docker-desktop $USER
+	```
+
+## Understanding Docker contexts
+
+Before we beggin starting Docker containers, we need to understand the 
+differences between Docker Engine and Docker Desktop, more precisely, that the 
+use different contexts.
+
+Carefully read these two sections of the Docker documentation:
+
+- [Differences between Docker Desktop for Linux and Docker Engine](https://docs.docker.com/desktop/install/linux-install/#differences-between-docker-desktop-for-linux-and-docker-engine)
+- [Switch between Docker Desktop and Docker Engine](https://docs.docker.com/desktop/install/linux-install/#context)
+
+Docker Desktop will change to its context automatically at start, so be sure 
+that any existing Docker container using the default context is **stopped** 
+before starting Docker Desktop and any of the environments in this folder.
 
 ## Starting up the environments
 
-Choose one of the [environments](#environments) available and use the `sh` script
-to up the environment. Each script will guide you on how to use it, which parameters 
-it needs, and what values are accepted for each parameter.
+Choose any of the [environments](#environments) available and use the `sh` script
+to up the environment. Each script will guide you on how to use it, reporting 
+which parameters it needs, and the accepted values for each of them.
 
 To see the usage of each script, just run it with no parameters.
+
+Before starting the environment, check that the plugin is in the desired branch
+(4.x-7.16, 4.x-wzd, ...).
 
 Example:
 
 This brings up a Dev environment for OpenSearch `1.2.4` and opensearch-dashboards 
 `1.2.0`, with the `wazuh-kibana-app` development branch set up at 
-`~/your/path/to/wazuh_kibana_app`:
+`$WZ_HOME`:
 
 ```bash
-./dev.sh 1.2.4 1.2.0 ~/your/path/to/wazuh_kibana_app up
-```
-
-You can save this path as an environment variable on your system, for example, 
-by exporting this path on your `.bashrc`, `.zhsrc` or similiar.
-
-```bash
-# ./bashrc
-export WZ_HOME=~/your/path/to/wazuh_kibana_app
+./dev.sh 1.2.4 1.2.0 $WZ_HOME up
 ```
 
 Once the containers are up, **attach a shell to the development container**, 
@@ -70,22 +122,6 @@ the project. After that, move back to the root folder of the platform and run
 The dependencies of the platform (Kibana \ OSD) are already installed, but it 
 might take a while to optimize all the bundles. We might include the cache in the 
 image in the future.
-
-### Wrong user permissions
-
-During the installation of the dependencies, you will most likely see an error
-related to the lack of write permissions on the Docker volume `plugins/wazuh`.
-To solve this, create a new group named `docker-desktop` with the GUID 100999,
-and then add your user and the source code folder to this group:
-
-```bash
-sudo groupadd -g 100999 docker-desktop
-sudo useradd -u 100999 -g 100999 -M docker-desktop
-sudo chown -R $(whoami):docker-desktop ~/your/path/to/wazuh_kibana_app
-sudo usermod -aG docker-desktop $(whoami)
-```
-
-After this. you can install the dependencies and start the project as usual.
 
 ## Logging
 
@@ -108,7 +144,7 @@ so the download of node modules from the network only happens once
 while developing the image.
 
 
- To start the npm cache server:
+To start the npm cache server:
 
 ```bash
 cd cache
