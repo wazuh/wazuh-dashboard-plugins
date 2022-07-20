@@ -24,7 +24,7 @@ services:
     networks:
       - wz-rel
     <<: *logging
-    restart: always
+    # restart: always
     environment:
       - INDEXER_URL=https://wazuh.indexer:9200
       - INDEXER_USERNAME=admin
@@ -60,7 +60,7 @@ services:
     networks:
       - wz-rel
     <<: *logging
-    restart: always
+    # restart: always
     environment:
       - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
     ulimits:
@@ -88,7 +88,7 @@ services:
     networks:
       - wz-rel
     <<: *logging
-    restart: always
+    # restart: always
     ports:
       - ${KIBANA_PORT}:5601
     environment:

@@ -10,8 +10,9 @@ versions=(
 	)
 
 wazuh_api_version=(
-	"5"
-	"17"
+	"0"
+	"1"
+	"2"
 )
 
 usage() {
@@ -19,8 +20,8 @@ usage() {
 	echo "./pre.sh wazuh_version wazuh_api_version action "
 	echo
 	echo "where"
-	echo "  wazuh_version is one of " ${elastic_versions[*]}
-	echo "  wazuh_api_version is the minor version of wazuh 4.3, for example " ${wazuh_api_version[*]}
+	echo "  wazuh_version is one of "${versions[*]}
+	echo "  wazuh_api_version is the patch version of wazuh 4.3, for example " ${wazuh_api_version[*]}
 	echo "  action is one of up | down | stop"
 	echo
 	echo "In a minor release, the API should not change the version here bumps the API"

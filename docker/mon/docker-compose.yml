@@ -13,7 +13,7 @@ services:
     hostname: loki
     networks:
       - mon
-    restart: always
+    # restart: always
     ports:
       - 3100:3100
     volumes: 
@@ -30,7 +30,7 @@ services:
       - loki
       - cadvisor
     <<: *logging
-    restart: always
+    # restart: always
     command: --config.file=/etc/prometheus/prometheus.yml
     volumes:
       - ./config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
@@ -45,7 +45,7 @@ services:
     depends_on:
       - loki
     <<: *logging
-    restart: always
+    # restart: always
     ports:
       - 3000:3000
     volumes:

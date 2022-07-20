@@ -28,7 +28,7 @@ services:
     networks:
       - es-rel
     <<: *logging
-    restart: always
+    # restart: always
     environment:
       - INDEXER_URL=https://es01:9200
       - INDEXER_USERNAME=elastic

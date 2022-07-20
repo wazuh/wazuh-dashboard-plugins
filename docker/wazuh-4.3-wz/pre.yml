@@ -40,11 +40,11 @@ services:
       - ./config/wazuh_indexer_ssl_certs/:/certificates/
       - ./config/certs.yml:/config/certs.yml
     # hack to fix permissions of the certificates
-    healthcheck:
-      test: ["CMD-SHELL", "chmod 755 /certificates && chmod 644 /certificates/* && [ -f certificates/wazuh.indexer.pem ]"]
-      interval: 1s
-      timeout: 5s
-      retries: 120
+    # healthcheck:
+    #   test: ["CMD-SHELL", "chmod 755 /certificates && chmod 644 /certificates/* && [ -f certificates/wazuh.indexer.pem ]"]
+    #   interval: 1s
+    #   timeout: 5s
+    #   retries: 120
 
   filebeat:
     depends_on:
@@ -56,7 +56,7 @@ services:
     networks:
       - wzd-pre
     <<: *logging
-    restart: always
+    # restart: always
     entrypoint:
       - '/bin/bash'
     command: >
@@ -76,15 +76,15 @@ services:
 
 
   wazuh.indexer:
-    depends_on:
-      generator:
-        condition: service_healthy
+    # depends_on:
+    #   generator:
+    #     condition: service_healthy
     image: wazuh/wazuh-indexer:${WAZUH_STACK}
     hostname: wazuh.indexer
     networks:
       - wzd-pre
     <<: *logging
-    restart: always
+    # restart: always
     environment:
       - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
     ulimits:
@@ -107,6 +107,8 @@ services:
   wazuh.indexer.tester:
     image: curlimages/curl
     entrypoint: '/bin/sh'
+    depends_on:
+      - wazuh.indexer
     <<: *logging
     networks:
       - wzd-pre
@@ -136,7 +138,7 @@ services:
     networks:
       - wzd-pre
     <<: *logging
-    restart: always
+    # restart: always
     ports:
       - ${KIBANA_PORT}:5601
     environment:
@@ -151,8 +153,6 @@ services:
       - ./config/wazuh_indexer_ssl_certs/root-ca.pem:/usr/share/wazuh-dashboard/certs/root-ca.pem
       - ./config/wazuh_dashboard/opensearch_dashboards.yml:/usr/share/wazuh-dashboard/config/opensearch_dashboards.yml
       - ./config/wazuh_dashboard/wazuh.yml:/usr/share/wazuh-dashboard/data/wazuh/config/wazuh.yml
-    depends_on:
-      - wazuh.indexer
 
 networks:
   networks:
