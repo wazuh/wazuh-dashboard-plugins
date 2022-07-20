@@ -1,6 +1,6 @@
 ---
 plugin: openapi
-specFile: https://raw.githubusercontent.com/wazuh/wazuh/v4.3.4/api/api/spec/spec.yaml
+specFile: https://raw.githubusercontent.com/wazuh/wazuh/4.3/api/api/spec/spec.yaml
 
 resources:
   - path: /security/user/authenticate
@@ -13,4 +13,34 @@ resources:
     response:
       statusCode: 200
       staticFile: api_info.json
+  - path: /vulnerability/001
+    method: get
+    response:
+      statusCode: 200
+      staticFile: vuln_list.json
+  - path: /vulnerability/001/summary/cvss3_score
+    method: get
+    response:
+      statusCode: 200
+      staticFile: cvss3_score.json
+  - path: /vulnerability/001/summary/cvss2_score
+    method: get
+    response:
+      statusCode: 200
+      staticFile: cvss2_score.json
+  - path: /vulnerability/001/summary/name
+    method: get
+    response:
+      statusCode: 200
+      staticFile: name.json
+  - path: /vulnerability/001/summary/version
+    method: get
+    response:
+      statusCode: 200
+      staticFile: version.json
+  - path: /vulnerability/001/summary/severity
+    method: get
+    response:
+      statusCode: 200
+      staticFile: severity.json
 
