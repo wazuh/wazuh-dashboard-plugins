@@ -132,7 +132,7 @@ services:
     networks:
       - os-dev
     <<: *logging
-    restart: always
+    # restart: always
     entrypoint:
       - '/bin/bash'
     command: >
