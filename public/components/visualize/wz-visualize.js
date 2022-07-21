@@ -10,7 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component, Fragment } from 'react';
-import { version as appVersion} from '../../../package.json';
 import { visualizations } from './visualizations';
 import { agentVisualizations } from './agent-visualizations';
 import KibanaVis from '../../kibana-integrations/kibana-vis';
@@ -41,6 +40,7 @@ import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
 import { satisfyPluginPlatformVersion } from '../../../common/semver';
+import { webDocumentationLink } from '../../../common/services/web_documentation';
 
 const visHandler = new VisHandlers();
 
@@ -148,8 +148,6 @@ export const WzVisualize = compose(
     };
     reloadToast = () => {
       const toastLifeTimeMs = 300000;
-      const [mayor, minor] = appVersion.split('.');
-      const urlTroubleShootingDocs = `https://documentation.wazuh.com/${mayor}.${minor}/user-manual/elasticsearch/troubleshooting.html#index-pattern-was-refreshed-toast-keeps-popping-up`;
       if(satisfyPluginPlatformVersion('<7.11')){
         getToasts().add({
           color: 'success',
@@ -160,7 +158,7 @@ export const WzVisualize = compose(
               You need to refresh the page to apply the changes.
               <a
                 title="More information in Wazuh documentation"
-                href={urlTroubleShootingDocs}
+                href={webDocumentationLink('user-manual/elasticsearch/troubleshooting.html#index-pattern-was-refreshed-toast-keeps-popping-up')}
                 target="documentation"
               >
                 Troubleshooting

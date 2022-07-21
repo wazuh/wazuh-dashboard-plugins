@@ -18,16 +18,16 @@ import WzNoConfig from '../util-components/no-config';
 import withWzConfig from '../util-hocs/wz-config';
 import { isString, renderValueNoThenEnabled } from '../utils/utils';
 import { wodleBuilder } from '../utils/builders';
+import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
 const helpLinks = [
   {
     text: 'Using Wazuh to monitor Azure',
-    href: 'https://documentation.wazuh.com/current/azure/index.html'
+    href: webDocumentationLink('azure/index.html')
   },
   {
     text: 'Azure reference',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-azure-logs.html'
+    href: webDocumentationLink('user-manual/reference/ossec-conf/wodle-azure-logs.html')
   }
 ];
 

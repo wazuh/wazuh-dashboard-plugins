@@ -18,12 +18,12 @@ import WzConfigurationSettingsListSelector from '../util-components/configuratio
 import withWzConfig from '../util-hocs/wz-config';
 import { isString, renderValueNoThenEnabled } from '../utils/utils';
 import { settingsListBuilder } from '../utils/builders';
+import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
 const helpLinks = [
   {
     text: 'Command module reference',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-command.html'
+    href: webDocumentationLink('user-manual/reference/ossec-conf/wodle-command.html')
   }
 ];
 

@@ -1,8 +1,8 @@
 {
   "name": "wazuh",
-  "version": "4.3.5",
-  "revision": "4306",
-  "code": "4306",
+  "version": "4.3.6",
+  "revision": "4307",
+  "code": "4307",
   "pluginPlatform": {
     "version": "7.10.2"
   },
@@ -50,6 +50,7 @@
     "jwt-decode": "^2.2.0",
     "loglevel": "^1.7.1",
     "markdown-it-link-attributes": "^3.0.0",
+    "md5": "^2.3.0",
     "needle": "^2.0.1",
     "node-cron": "^1.1.2",
     "pdfmake": "0.1.65",
