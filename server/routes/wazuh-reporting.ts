@@ -16,6 +16,44 @@ import { schema } from '@kbn/config-schema';
 export function WazuhReportingRoutes(router: IRouter) {
   const ctrl = new WazuhReportingCtrl();
 
+  const agentIDValidation = schema.string({
+    minLength: 3,
+    validate: (agentID: string) => /^\d{3,}$/.test(agentID) ? undefined : 'must be 0-9 are allowed'
+  });
+
+  const groupIDValidation = schema.string({
+    minLength: 1,
+    validate: (agentID: string) => /^(?!^(\.{1,2}|all)$)[\w\.\-]+$/.test(agentID) ? undefined : 'must be A-z, 0-9, _, . are allowed. It must not be ., .. or all.'
+  });
+
+  const ReportFilenameValidation = schema.string({
+    validate: (agentID: string) => /^[\w\-\.]+\.pdf$/.test(agentID) ? undefined : 'must be A-z, 0-9, _, ., and - are allowed. It must end with .pdf.'
+  });
+
+  const moduleIDValidation = schema.oneOf([
+    schema.literal('general'),
+    schema.literal('fim'),
+    schema.literal('aws'),
+    schema.literal('gcp'),
+    schema.literal('pm'),
+    schema.literal('audit'),
+    schema.literal('sca'),
+    schema.literal('office'),
+    schema.literal('github'),
+    schema.literal('ciscat'),
+    schema.literal('vuls'),
+    schema.literal('mitre'),
+    schema.literal('virustotal'),
+    schema.literal('docker'),
+    schema.literal('osquery'),
+    schema.literal('oscap'),
+    schema.literal('pci'),
+    schema.literal('hipaa'),
+    schema.literal('nist'),
+    schema.literal('gdpr'),
+    schema.literal('tsc'),
+  ]);
+
   router.post({
       path: '/reports/modules/{moduleID}',
       validate: {
@@ -23,9 +61,8 @@ export function WazuhReportingRoutes(router: IRouter) {
           array: schema.any(),
           browserTimezone: schema.string(),
           filters: schema.maybe(schema.any()),
-          agents: schema.maybe(schema.oneOf([schema.string(), schema.boolean()])),
+          agents: schema.maybe(schema.oneOf([agentIDValidation, schema.boolean()])),
           components: schema.maybe(schema.any()),
-          name: schema.string(),
           searchBar: schema.maybe(schema.string()),
           section: schema.maybe(schema.string()),
           tab: schema.string(),
@@ -34,12 +71,11 @@ export function WazuhReportingRoutes(router: IRouter) {
             from: schema.string(),
             to: schema.string()
           }), schema.string()]),
-          title: schema.maybe(schema.string()),
           indexPatternTitle: schema.string(),
           apiId: schema.string()
         }),
         params: schema.object({
-          moduleID: schema.string()
+          moduleID: moduleIDValidation
         })
       }
     },
@@ -53,13 +89,11 @@ export function WazuhReportingRoutes(router: IRouter) {
         browserTimezone: schema.string(),
         filters: schema.maybe(schema.any()),
         components: schema.maybe(schema.any()),
-        name: schema.string(),
         section: schema.maybe(schema.string()),
-        tab: schema.string(),
         apiId: schema.string()
       }),
       params: schema.object({
-        groupID: schema.string()
+        groupID: groupIDValidation
       })
     }
   },
@@ -73,17 +107,15 @@ export function WazuhReportingRoutes(router: IRouter) {
         browserTimezone: schema.string(),
         filters: schema.any(),
         components: schema.maybe(schema.any()),
-        name: schema.string(),
         section: schema.maybe(schema.string()),
-        tab: schema.string(),
         apiId: schema.string()
       }),
       params: schema.object({
-        agentID: schema.string()
+        agentID: agentIDValidation
       })
     }
   },
-    (context, request, response) => ctrl.createReportsAgents(context, request, response)
+    (context, request, response) => ctrl.createReportsAgentsConfiguration(context, request, response)
   );
 
   router.post({
@@ -95,7 +127,6 @@ export function WazuhReportingRoutes(router: IRouter) {
         filters: schema.maybe(schema.any()),
         agents: schema.maybe(schema.oneOf([schema.string(), schema.boolean()])),
         components: schema.maybe(schema.any()),
-        name: schema.string(),
         searchBar: schema.maybe(schema.oneOf([schema.string(), schema.boolean()])),
         section: schema.maybe(schema.string()),
         tab: schema.string(),
@@ -104,12 +135,11 @@ export function WazuhReportingRoutes(router: IRouter) {
           from: schema.string(),
           to: schema.string()
         }), schema.string()]),
-        title: schema.maybe(schema.string()),
         indexPatternTitle: schema.string(),
         apiId: schema.string()
       }),
       params: schema.object({
-        agentID: schema.string()
+        agentID: agentIDValidation
       })
     }
   },
@@ -121,7 +151,7 @@ export function WazuhReportingRoutes(router: IRouter) {
       path: '/reports/{name}',
       validate: {
         params: schema.object({
-          name: schema.string()
+          name: ReportFilenameValidation
         })
       }
     },
@@ -133,7 +163,7 @@ export function WazuhReportingRoutes(router: IRouter) {
       path: '/reports/{name}',
       validate: {
         params: schema.object({
-          name: schema.string()
+          name: ReportFilenameValidation
         })
       }
     },

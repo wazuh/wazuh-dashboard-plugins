@@ -17,6 +17,7 @@ import WzConfigurationSettingsGroup from '../util-components/configuration-setti
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzNoConfig from '../util-components/no-config';
 import { isString, renderValueOrNo } from '../utils/utils';
+import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
 const mainSettings = [
   {
@@ -32,13 +33,11 @@ const mainSettings = [
 const helpLinks = [
   {
     text: 'Use cases about alerts generation',
-    href:
-      'https://documentation.wazuh.com/current/getting-started/use-cases.html'
+    href: webDocumentationLink('getting-started/use-cases/index.html')
   },
   {
     text: 'Alerts reference',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/alerts.html'
+    href: webDocumentationLink('user-manual/reference/ossec-conf/alerts.html')
   }
 ];
 
