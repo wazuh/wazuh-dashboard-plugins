@@ -2,6 +2,17 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.3.7 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4308
+
+### Fixed
+
+- Fixed an error generating a group report when an Wazuh API request failed [#4350](https://github.com/wazuh/wazuh-kibana-app/pull/4350)
+- Fixed a problem of missing agents in the agents in group's table for the group reports [#4350](https://github.com/wazuh/wazuh-kibana-app/pull/4350)
+
+# Removed
+
+- Removed the use of `manager_host` field related to agent information of Wazuh API responses [#4350](https://github.com/wazuh/wazuh-kibana-app/pull/4350)
+
 ## Wazuh v4.3.6 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4307
 
 ### Fixed
