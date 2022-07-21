@@ -107,7 +107,7 @@ jobs:
        with:
           # Slack channel id, channel name, or user id to post message.
           # See also: https://api.slack.com/methods/chat.postMessage#channels
-        channel-id: 'daily-app-team'
+        channel-id: ${{ secrets.SLACK_CHANNEL_ID }}
           # For posting a simple plain text message
         slack-message: "The following workflow was executed: ${{ github.workflow }}\nWazuh version: ${{ github.event.inputs.wazuh-version }}\nElastic version: ${{ github.event.inputs.elastic-version }}\nUbuntu Cypress version: ${{ github.event.inputs.ubuntu-cypress-version }}\nPackage used: ${{ github.event.inputs.url-package }}\n\nTest summary:\n\tTotal Test: ${{ env.TEST_TOTAL }}\n\tPassing: ${{ env.TEST_PASSING }}\n\tFailing: ${{ env.TEST_FAILING }}\n\tPending: ${{ env.TEST_PENDING }}\n\tSkipped: ${{ env.TEST_SKIPPED }}\n\tTotal Time: ${{ env.TEST_TIME }}\n\nFor more information visit: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
        env:
