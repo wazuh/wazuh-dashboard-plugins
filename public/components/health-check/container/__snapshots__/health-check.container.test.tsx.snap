@@ -7,7 +7,7 @@ exports[`Health Check container should render a Health check screen 1`] = `
   <img
     alt=""
     className="health-check-logo"
-    src="/plugins/wazuh/assets/images/themes/light/logo.svg"
+    src="/usr/share/kibana/plugins/wazuh/public/assets/images/themes/light/logo.svg"
   />
   <div
     className="margin-top-30"

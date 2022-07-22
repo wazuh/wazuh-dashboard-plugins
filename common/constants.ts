@@ -348,7 +348,8 @@ export const UI_TOAST_COLOR = {
 };
 
 // Assets
-export const ASSETS_BASE_URL_PREFIX = '/usr/share/kibana/plugins/wazuh/public/assets/';
+export const ASSETS_BASE_URL_PREFIX = '/plugins/wazuh/assets/';
+export const ASSETS_BASE_URL_PREFIX_WITH_PUBLIC = '/plugins/wazuh/public/assets/';
 
 // Reports
 export const REPORTS_LOGO_IMAGE_ASSETS_RELATIVE_PATH = 'images/logo_reports.png';

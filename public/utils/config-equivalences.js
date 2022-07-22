@@ -1,11 +1,11 @@
-import { ASSETS_BASE_URL_PREFIX, PLUGIN_PLATFORM_NAME } from "../../common/constants";
+import { ASSETS_BASE_URL_PREFIX_WITH_PUBLIC, PLUGIN_PLATFORM_NAME } from "../../common/constants";
 
 export const configEquivalences = {
   pattern: 'Default index pattern to use on the app.',
-  'customization.logo.app':`Define the name of the app logo saved in the path ${ASSETS_BASE_URL_PREFIX}`,
-  'customization.logo.sidebar':`Define the name of the sidebar logo saved in the path ${ASSETS_BASE_URL_PREFIX}`,
-  'customization.logo.healthcheck':`Define the name of the health-check logo saved in the path ${ASSETS_BASE_URL_PREFIX}`,
-  'customization.logo.reports':`Define the name of the reports logo (.png) saved in the path ${ASSETS_BASE_URL_PREFIX}`,
+  'customization.logo.app':`Define the name of the app logo saved in the path ${ASSETS_BASE_URL_PREFIX_WITH_PUBLIC}`,
+  'customization.logo.sidebar':`Define the name of the sidebar logo saved in the path ${ASSETS_BASE_URL_PREFIX_WITH_PUBLIC}`,
+  'customization.logo.healthcheck':`Define the name of the health-check logo saved in the path ${ASSETS_BASE_URL_PREFIX_WITH_PUBLIC}`,
+  'customization.logo.reports':`Define the name of the reports logo (.png) saved in the path ${ASSETS_BASE_URL_PREFIX_WITH_PUBLIC}`,
   'checks.pattern':
     'Enable or disable the index pattern health check when opening the app.',
   'checks.template':
