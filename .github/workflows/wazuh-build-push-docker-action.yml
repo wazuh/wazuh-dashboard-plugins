@@ -90,11 +90,11 @@ jobs:
      - name: Step 03 - Build image
        run: |
         cd ${{ github.workspace }}/wazuh-kibana-app/cypress/images/wazuh_agent_ubuntu_sources_cmake
-        docker build -t quay.io/wazuh/wazuh-agent-image:${{ github.event.inputs.wazuh-agent-version }}-${{ github.event.inputs.elastic-agent-version }} \
+        docker build -t quay.io/wazuh/wazuh-agent-image:${{ github.event.inputs.wazuh-agent-version }} \
         --build-arg WAZUH_VERSION=${{ github.event.inputs.wazuh-agent-version }} .
      - name: Step 04 - Push image to quay.io
        run: | 
-        docker push quay.io/wazuh/wazuh-agent-image:${{ github.event.inputs.wazuh-agent-version }}-${{ github.event.inputs.elastic-agent-version }}
+        docker push quay.io/wazuh/wazuh-agent-image:${{ github.event.inputs.wazuh-agent-version }}
 
   job-build-cypress-image:
     if: ${{ github.event.inputs.build-cypress-image == 'true' }}
