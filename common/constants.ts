@@ -281,5 +281,5 @@ export const KIBANA_SETTING_NAME_MAX_BUCKETS = 'timelion:max_buckets';
 export const WAZUH_KIBANA_SETTING_METAFIELDS = ['_source', '_index'];
 export const KIBANA_SETTING_NAME_METAFIELDS = 'metaFields';
 
-// Default Elasticsearch name
+// Default Elasticsearch user name context
 export const ELASTIC_NAME = 'elastic';
