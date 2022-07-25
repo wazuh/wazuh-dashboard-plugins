@@ -1250,18 +1250,12 @@ export class WazuhReportingCtrl {
       });
 
       if (components['0']) {
-        let configuration = {};
-        try {
-          const configurationResponse = await context.wazuh.api.client.asCurrentUser.request(
-            'GET',
-            `/groups/${groupID}/configuration`,
-            {},
-            { apiHostID: apiId }
-          );
-          configuration = configurationResponse.data.data;
-        } catch (error) {
-          log('reporting:createReportsGroups', error.message || error, 'debug');
-        }
+        const { data: { data: configuration } } = await context.wazuh.api.client.asCurrentUser.request(
+          'GET',
+          `/groups/${groupID}/configuration`,
+          {},
+          { apiHostID: apiId }
+        );
 
         if (
           configuration.affected_items.length > 0 &&
@@ -2069,6 +2063,7 @@ export class WazuhReportingCtrl {
       response: KibanaResponseFactory
     ) => {
       try{
+        const resul = await context.wazuh.security.getCurrentUser(request, context);
         const { username, hashUsername } = await context.wazuh.security.getCurrentUser(request, context);
         const userReportsDirectoryPath = path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, hashUsername);
         const filename = reportFileNameAccessor(request);
