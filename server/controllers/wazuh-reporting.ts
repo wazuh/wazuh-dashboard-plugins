@@ -146,7 +146,7 @@ export class WazuhReportingCtrl {
           printer,
           isAgents,
           apiId,
-          section === 'groupConfig' ? tab : null
+          section === 'groupConfig' ? tab : ''
         );
       }
 
@@ -191,7 +191,7 @@ export class WazuhReportingCtrl {
    * @param {Array<Strings>} ids ids of agents
    * @param {String} apiId API id
    */
-  private async buildAgentsTable(context, printer: ReportPrinter, agentIDs: string[], apiId: string, groupID: string | null = null) {
+  private async buildAgentsTable(context, printer: ReportPrinter, agentIDs: string[], apiId: string, groupID: string = '') {
     const dateFormat = await context.core.uiSettings.client.get('dateFormat');
     if ((!agentIDs || !agentIDs.length) && !groupID) return;
     log('reporting:buildAgentsTable', `${agentIDs.length} agents for API ${apiId}`, 'info');
