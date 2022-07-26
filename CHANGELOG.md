@@ -2,6 +2,12 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.3.7 - OpenSearch Dashboards 1.2.0 - Revision 4308
+
+### Fixed
+
+- Fixed path in logo customization section [#4352](https://github.com/wazuh/wazuh-kibana-app/pull/4352)
+
 ## Wazuh v4.3.6 - OpenSearch Dashboards 1.2.0 - Revision 4307
 
 ### Fixed

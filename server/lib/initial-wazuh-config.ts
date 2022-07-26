@@ -10,14 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import {
-  ASSETS_BASE_URL_PREFIX,
-  PLUGIN_APP_NAME,
-  WAZUH_MONITORING_DEFAULT_INDICES_REPLICAS,
-  WAZUH_MONITORING_DEFAULT_INDICES_SHARDS,
-  WAZUH_STATISTICS_DEFAULT_INDICES_REPLICAS,
-  WAZUH_STATISTICS_DEFAULT_INDICES_SHARDS,
-} from "../../common/constants";
+import { PLUGIN_APP_NAME, ASSETS_PUBLIC_URL, WAZUH_MONITORING_DEFAULT_INDICES_REPLICAS, WAZUH_MONITORING_DEFAULT_INDICES_SHARDS, WAZUH_STATISTICS_DEFAULT_INDICES_REPLICAS, WAZUH_STATISTICS_DEFAULT_INDICES_SHARDS } from "../../common/constants";
 import { webDocumentationLink } from "../../common/services/web_documentation";
 
 export const initialWazuhConfig: string = `---
@@ -171,16 +164,16 @@ export const initialWazuhConfig: string = `---
 #
 # ------------------------------ wazuh-logo-customization -------------------------------
 #
-#Define the name of the app logo saved in the path ${ASSETS_BASE_URL_PREFIX}
+#Define the name of the app logo saved in the path ${ASSETS_PUBLIC_URL}
 #customization.logo.app: ''
 #
-#Define the name of the sidebar logo saved in the path ${ASSETS_BASE_URL_PREFIX}
+#Define the name of the sidebar logo saved in the path ${ASSETS_PUBLIC_URL}
 #customization.logo.sidebar: ''
 #
-#Define the name of the health-check logo saved in the path ${ASSETS_BASE_URL_PREFIX}
+#Define the name of the health-check logo saved in the path ${ASSETS_PUBLIC_URL}
 #customization.logo.healthcheck: ''
 #
-#Define the name of the reports logo (.png) saved in the path ${ASSETS_BASE_URL_PREFIX}
+#Define the name of the reports logo (.png) saved in the path ${ASSETS_PUBLIC_URL}
 #customization.logo.reports: ''
 #
 # ---------------------------- Hide manager alerts ------------------------------
