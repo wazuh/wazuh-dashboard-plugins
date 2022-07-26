@@ -5,11 +5,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.3.7 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4308
 
 ### Fixed
-- Path fix in Logo Customization section [#4352](https://github.com/wazuh/wazuh-kibana-app/pull/4352)
 
-### Added
-
-### Changed
+- Fixed path in logo customization section [#4352](https://github.com/wazuh/wazuh-kibana-app/pull/4352)
 
 ## Wazuh v4.3.6 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4307
 
