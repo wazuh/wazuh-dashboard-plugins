@@ -10,7 +10,7 @@ export const DEPLOY_NEW_AGENT_PAGE = {
   macOSButton: '[data-text="MacOS"]',
 
   operationSystemTitle: "[name='RegisterAgent'] .euiStep:nth-child(1) .euiTitle",
-  operationSystemOption: "[name='RegisterAgent'] .euiStep:nth-child(1) fieldset label",
+  operationSystemOption: "[name='RegisterAgent'] .euiStep:nth-child(1) fieldset .euiButton__text",
 
   serverAddressSubTitle: "[name='RegisterAgent'] .euiStep:nth-child(2) :nth-child(1) p.euiStep__title",
   serverMessage: "[name='RegisterAgent'] .euiStep:nth-child(2) .euiStep__content p",

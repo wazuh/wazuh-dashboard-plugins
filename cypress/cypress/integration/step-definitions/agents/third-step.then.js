@@ -12,5 +12,6 @@ Then('A third step {string} with the {string} are displayed and the following dr
     elementIsVisible(agentToGroupSelector);
     checkInformationElement(agentToGroupSubTitle, title, 1);
     xpathCheckInformationElement(agentToGroupMessage, discription, 1);
-    checkInformationElement(agentToGroupSelector, information, 1);
+    //TODO: skip WZD because on this UI the "agentToGroupSelector" is disable combo-box
+    if (Cypress.env('type') != 'wzd') {checkInformationElement(agentToGroupSelector, information, 1)};
 });

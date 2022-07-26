@@ -1,4 +1,4 @@
-Feature: Should Displayes a warning modal
+Feature: Should Displayes a warning modal - Management - edit rules
 
   As a kibana user
   i want to edit a custom rule
