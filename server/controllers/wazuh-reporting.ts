@@ -264,7 +264,7 @@ export class WazuhReportingCtrl {
       }else if(!agentsData.length && groupID){
         // For group reports when there is no agents in the group
         printer.addContent({
-          text: 'There are still no agents in this group.',
+          text: 'There are no agents in this group.',
           style: { fontSize: 12, color: '#000' },
         });
       }
