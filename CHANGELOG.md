@@ -2,6 +2,12 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.3.7 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4308
+
+### Fixed
+
+- Fixed the `hosts` data stored in the registry file was lost when changing the installed plugin. Migrate the `extensions` data [#4359](https://github.com/wazuh/wazuh-kibana-app/pull/4359)
+
 ## Wazuh v4.3.6 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4307
 
 ### Fixed
