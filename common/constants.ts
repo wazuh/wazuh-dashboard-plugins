@@ -349,6 +349,7 @@ export const UI_TOAST_COLOR = {
 
 // Assets
 export const ASSETS_BASE_URL_PREFIX = '/plugins/wazuh/assets/';
+export const ASSETS_PUBLIC_URL = '/plugins/wazuh/public/assets/';
 
 // Reports
 export const REPORTS_LOGO_IMAGE_ASSETS_RELATIVE_PATH = 'images/logo_reports.png';
