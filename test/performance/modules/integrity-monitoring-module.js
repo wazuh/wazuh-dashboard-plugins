@@ -16,10 +16,7 @@ module.exports = async function (context, commands) {
     
     //Wait for an Wazuh home page component to be loaded
     await commands.wait.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"Security events")]', WAIT_TIMEOUT)
-    
-    // Click on the Wazuh menu button
-   //await commands.click.bySelectorAndWait('[data-test-subj=menuWazuhButton]', WAIT_TIMEOUT)
-    
+
     // Click on Integrity Monitoring module button
     await commands.wait.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"Integrity monitoring")]', WAIT_TIMEOUT)
     await commands.click.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"Integrity monitoring")]')
