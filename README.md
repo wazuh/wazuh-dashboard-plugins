@@ -194,7 +194,7 @@ Install the Wazuh app
 
 ```
 cd /usr/share/kibana/
-sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-6_7.10.2-1.zip
+sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.3.6_7.10.2-1.zip
 ```
 
 Update configuration file permissions.
