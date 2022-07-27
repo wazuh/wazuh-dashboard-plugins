@@ -4,8 +4,6 @@ const logger = require('../common/logger');
 module.exports = async function (context, commands) {
   // Navigate to a URL, but do not measure the URL
   await commands.navigate(SERVER_URL);
-  
-
   try {
     
     await commands.wait.bySelector('button[data-test-subj="toggleNavButton"]', WAIT_TIMEOUT)
