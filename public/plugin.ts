@@ -37,7 +37,7 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
   private innerAngularInitialized: boolean = false;
   private stateUpdater = new BehaviorSubject<AppUpdater>(() => ({}));
   private hideTelemetryBanner?: () => void;
-  
+
   public setup(core: CoreSetup, plugins: WazuhSetupPlugins): WazuhSetup {
     const UI_THEME = core.uiSettings.get('theme:darkMode') ? 'dark' : 'light';
 
@@ -46,14 +46,17 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
       title: 'Wazuh',
       icon: core.http.basePath.prepend(getThemeAssetURL('icon.svg', UI_THEME)),
       mount: async (params: AppMountParameters) => {
+        try {
+          await core.http.get(`/api/check-wazuh`);
+        
         if (!this.initializeInnerAngular) {
           throw Error('Wazuh plugin method initializeInnerAngular is undefined');
         }
 
-        // hide the telemetry banner. 
+        // hide the telemetry banner.
         // Set the flag in the telemetry saved object as the notice was seen and dismissed
         this.hideTelemetryBanner && await this.hideTelemetryBanner();
-        
+
         setScopedHistory(params.history);
         // Load application bundle
         const { renderApp } = await import('./application');
@@ -92,6 +95,9 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
         return () => {
           unmount();
         };
+      }catch(error){
+        console.debug(error);
+      }
       },
       category: {
         id: 'wazuh',
