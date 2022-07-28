@@ -14,8 +14,8 @@ module.exports = async function (context, commands) {
     await commands.wait.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"Security events")]', WAIT_TIMEOUT)
     await commands.click.bySelector('[data-test-subj=menuWazuhButton]')
     // Click on Security Events module button
-    await commands.wait.bySelector('[data-test-subj="overviewWelcomeGeneral"]', WAIT_TIMEOUT)
-    await commands.click.bySelector('[data-test-subj="overviewWelcomeGeneral"]')
+    await commands.wait.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"Security events")]', WAIT_TIMEOUT)
+    await commands.click.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"Security events")]')
     // Start collecting metrics
     logger('--- Initiate measures in dashboard module ---');
     await commands.measure.start('security-events-module')
