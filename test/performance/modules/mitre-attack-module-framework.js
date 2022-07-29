@@ -30,10 +30,7 @@ module.exports = async function (context, commands) {
     logger('Techniques Table');
     await commands.wait.bySelector('[class="euiFlexGrid euiFlexGrid--gutterSmall euiFlexGrid--fourths euiFlexGrid--responsive"]', WAIT_TIMEOUT)
 
-    /*logger('Top tactics by agent');
-    await commands.wait.bySelector('[data-render-complete="true"][data-title="Top tactics by agent"]', WAIT_TIMEOUT)
-
-    logger('--- Finish measures ---', 'info');*/
+    logger('--- Finish measures ---', 'info');
     
     // Stop and collect the metrics
     return commands.measure.stop();
