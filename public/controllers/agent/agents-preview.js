@@ -87,7 +87,7 @@ export class AgentsPreviewController {
     });
     this.registerAgentsProps = {
       addNewAgent: flag => this.addNewAgent(flag),
-      hasAgents: this.hasAgents,
+      hasAgents: () => this.hasAgents,
       reload: () => this.$route.reload(),
       getWazuhVersion: () => this.getWazuhVersion(),
       getCurrentApiAddress: () => this.getCurrentApiAddress()
