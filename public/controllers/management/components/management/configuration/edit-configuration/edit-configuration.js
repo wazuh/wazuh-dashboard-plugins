@@ -37,12 +37,12 @@ import {
 } from '../../../../../../redux/actions/configurationActions';
 import {
   fetchFile,
-  restartNodeSelected,
   saveFileManager,
   saveFileCluster,
   clusterNodes,
   clusterReq,
 } from '../utils/wz-fetch';
+import { RestartHandler } from '../../../../../../react-services/wz-restart-manager-or-cluster';
 import { validateXML } from '../utils/xml';
 import { getToasts } from '../../../../../..//kibana-services';
 
@@ -158,7 +158,7 @@ class WzEditConfiguration extends Component {
   async confirmRestart() {
     try {
       this.setState({ restarting: true, saving: true, infoChangesAfterRestart: false });
-      await restartNodeSelected(this.props.clusterNodeSelected, this.props.updateWazuhNotReadyYet);
+      await RestartHandler.restartNodeSelected(this.props.clusterNodeSelected, this.props.updateWazuhNotReadyYet);
       this.props.updateWazuhNotReadyYet('');
       this.setState({ restart: false, saving: false, restarting: false });
       await this.checkIfClusterOrManager();

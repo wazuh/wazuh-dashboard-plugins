@@ -26,7 +26,7 @@ import {
 
 import { getToasts }  from '../../kibana-services';
 import { updateWazuhNotReadyYet } from '../../redux/actions/appStateActions';
-import { clusterReq, restartClusterOrManager } from '../../controllers/management/components/management/configuration/utils/wz-fetch';
+import { RestartHandler } from '../../react-services/wz-restart-manager-or-cluster';
 import { connect } from 'react-redux';
 
 interface IWzRestartClusterManagerCalloutProps{
@@ -64,9 +64,8 @@ class WzRestartClusterManagerCallout extends Component<IWzRestartClusterManagerC
   restartClusterOrManager = async () => {
     try{
       this.setState({ warningRestarting: true, warningRestartModalVisible: false});
-      const data = await restartClusterOrManager(this.props.updateWazuhNotReadyYet);
+      await RestartHandler.restartClusterOrManager(this.props.updateWazuhNotReadyYet);
       this.props.onRestarted();
-      this.showToast('success', `${data.restarted} was restarted`);
     }catch(error){
       this.setState({ warningRestarting: false });
       this.props.updateWazuhNotReadyYet(false);
@@ -76,7 +75,7 @@ class WzRestartClusterManagerCallout extends Component<IWzRestartClusterManagerC
   };
   async componentDidMount(){
     try{
-      const clusterStatus = await clusterReq();
+      const clusterStatus = await RestartHandler.clusterReq();
       this.setState( { isCluster: clusterStatus.data.data.enabled === 'yes' && clusterStatus.data.data.running === 'yes' });
     }catch(error){}
   }

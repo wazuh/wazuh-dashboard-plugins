@@ -39,6 +39,7 @@ import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 import { RestartHandler } from '../../../../../react-services/wz-restart-manager-or-cluster';
 import { updateWazuhNotReadyYet } from '../../../../../redux/actions/appStateActions';
+
 class WzStatusActionButtons extends Component {
   _isMounted = false;
 
