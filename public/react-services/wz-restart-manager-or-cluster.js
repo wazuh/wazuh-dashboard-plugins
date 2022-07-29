@@ -194,9 +194,9 @@ export class RestartHandler {
           : 'The manager is being restarted',
         toastLifeTimeMs: 3000,
       });
-      isCluster ? await this.restartCluster() : await this.restartManager();
       // Dispatch a Redux action
       updateWazuhNotReadyYet(`Restarting ${isCluster ? 'Cluster' : 'Manager'}, please wait.`);
+      isCluster ? await this.restartCluster() : await this.restartManager();
       await this.makePing(updateWazuhNotReadyYet, isCluster);
       getToasts().add({
         color: 'success',
