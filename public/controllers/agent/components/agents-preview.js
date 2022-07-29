@@ -112,6 +112,8 @@ export const AgentsPreview = compose(
         this.setState({ loading: true });
         const {data: {data: agentStatusSummary}} = await WzRequest.apiReq('GET', '/agents/summary/status', {});
 
+        this.props.tableProps.updateSummary(agentStatusSummary);
+
         const {data: {data: {affected_items: [lastRegisteredAgent]}}} = await WzRequest.apiReq('GET', '/agents', {
           params: { limit: 1, sort: '-dateAdd', q: 'id!=000' },
         });
