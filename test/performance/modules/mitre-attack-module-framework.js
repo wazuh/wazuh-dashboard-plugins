@@ -6,8 +6,6 @@ module.exports = async function (context, commands) {
   await commands.navigate(SERVER_URL);
 
   try {
-    // Start collecting metrics
-    
     // Click on Kibana menu to access Wazuh App link
     await commands.wait.bySelector('button[data-test-subj="toggleNavButton"]', WAIT_TIMEOUT)
     await commands.click.bySelector('button[data-test-subj="toggleNavButton"]')
@@ -17,18 +15,20 @@ module.exports = async function (context, commands) {
     //Wait for an Wazuh home page component to be loaded
     await commands.wait.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"Security events")]', WAIT_TIMEOUT)
 
-    // Click on Integrity Monitoring module button
+    // Click on MITRE module button
     await commands.wait.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"MITRE")]', WAIT_TIMEOUT)
     await commands.click.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"MITRE")]')
-    
-    await commands.measure.start('MITRE ATT&CK module -dashboard')
-    logger('--- Initiate measures in dashboard module ---');
 
-    logger('Mitre techniques by agent');
-    await commands.wait.bySelector('[data-render-complete="true"][data-title="Mitre techniques by agent"]', WAIT_TIMEOUT)
+    // Accesing to Intelligence Dashboard
+    await commands.wait.byXpath('//*[contains(@class,"euiTab")]//*[contains(text(),"Framework")]', WAIT_TIMEOUT)
+    await commands.click.byXpath('//*[contains(@class,"euiTab")]//*[contains(text(),"Framework")]')
 
-    logger('Top tactics by agent');
-    await commands.wait.bySelector('[data-render-complete="true"][data-title="Top tactics by agent"]', WAIT_TIMEOUT)
+    // Start collecting metrics
+    await commands.measure.start('MITRE ATT&CK module -Intelligence Dashboard')
+    logger('--- Initiate measures in Intelligence - Sashboard module ---');
+
+    logger('Techniques Table');
+    await commands.wait.bySelector('[class="euiFlexGrid euiFlexGrid--gutterSmall euiFlexGrid--fourths euiFlexGrid--responsive"]', WAIT_TIMEOUT)
 
     logger('--- Finish measures ---', 'info');
     
