@@ -18,8 +18,16 @@ module.exports = async function (context, commands) {
     // Start collecting metrics
     logger('--- Initiate measures in dashboard module ---');
     await commands.measure.start('security-events-module')
-        logger('Alerts Evolutionn Top 5 Agent');
+    logger('Alerts level evolution');
+    await commands.wait.bySelector('[data-render-complete="true"][data-title="Alert level evolution"]', WAIT_TIMEOUT)    
+    logger('Alerts Top Mitre Att&ck');
+    await commands.wait.bySelector('[data-render-complete="true"][data-title="Alerts"]', WAIT_TIMEOUT)    
+    logger('Top 5 Agent');
+    await commands.wait.bySelector('[data-render-complete="true"][data-title="Top 5 agents"]', WAIT_TIMEOUT)
+    logger('Alerts Evolutionn Top 5 Agent');
     await commands.wait.bySelector('[data-render-complete="true"][data-title="Alerts evolution Top 5 agents"]', WAIT_TIMEOUT)
+    logger('Security Alerts Table');
+    await commands.wait.bySelector('[data-test-subj="tableHeaderCell_timestamp_1"]', WAIT_TIMEOUT)
     // Stop and collect the metrics
     logger('--- Finish measures ---', 'info');
     return commands.measure.stop();
