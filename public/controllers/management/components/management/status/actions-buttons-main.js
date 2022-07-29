@@ -37,7 +37,8 @@ import { WzButtonPermissions } from '../../../../../components/common/permission
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
-
+import { RestartHandler } from '../../../../../react-services/wz-restart-manager-or-cluster';
+import { updateWazuhNotReadyYet } from '../../../../../redux/actions/appStateActions';
 class WzStatusActionButtons extends Component {
   _isMounted = false;
 
@@ -63,53 +64,23 @@ class WzStatusActionButtons extends Component {
   }
 
   /**
-   * Restart cluster
+   * Restart cluster or manager
    */
-  async restartCluster() {
+  async restartClusterOrManager(isCluster) {
     this.setState({ isRestarting: true });
     try {
-      const result = await this.statusHandler.restartCluster();
+      await RestartHandler.restartClusterOrManager(updateWazuhNotReadyYet);
       this.setState({ isRestarting: false });
-      this.showToast(
-        'success',
-        'Restarting cluster, it will take up to 30 seconds.',
-        3000
-      );
     } catch (error) {
       this.setState({ isRestarting: false });
       const options = {
-        context: `${WzStatusActionButtons.name}.restartCluster`,
+        context: isCluster ? `${WzStatusActionButtons.name}.restartCluster` : `${WzStatusActionButtons.name}.restartManager`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         error: {
           error: error,
           message: error.message || error,
-          title: `${error.name}: Error restarting cluster`,
-        },
-      };
-      getErrorOrchestrator().handleError(options);
-    }
-  }
-
-  /**
-   * Restart manager
-   */
-  async restartManager() {
-    this.setState({ isRestarting: true });
-    try {
-      await this.statusHandler.restartManager();
-      this.setState({ isRestarting: false });
-      this.showToast('success', 'Restarting manager.', 3000);
-    } catch (error) {
-      this.setState({ isRestarting: false });
-      const options = {
-        context: `${WzStatusActionButtons.name}.restartManager`,
-        level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.BUSINESS,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: `${error.name}: Error restarting manager`,
+          title: `${error.name}: Error restarting ${isCluster ? 'cluster' : 'manager'}`,
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -259,11 +230,7 @@ class WzStatusActionButtons extends Component {
             }
             onCancel={this.closeModal}
             onConfirm={() => {
-              if (clusterEnabled) {
-                this.restartCluster();
-              } else {
-                this.restartManager();
-              }
+              this.restartClusterOrManager(clusterEnabled)
               this.setState({ isModalVisible: false });
             }}
             cancelButtonText="Cancel"

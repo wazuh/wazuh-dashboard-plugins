@@ -10,7 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 import { WzRequest } from '../react-services/wz-request';
-import { ErrorHandler } from '../react-services/error-handler';
 
 export class ConfigHandler {
   constructor($rootScope, errorHandler) {
