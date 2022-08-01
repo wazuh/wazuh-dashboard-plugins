@@ -23,12 +23,16 @@ module.exports = async function (context, commands) {
     
     await commands.measure.start('MITRE ATT&CK module -dashboard')
     logger('--- Initiate measures in dashboard module ---');
-
-    logger('Mitre techniques by agent');
-    await commands.wait.bySelector('[data-render-complete="true"][data-title="Mitre techniques by agent"]', WAIT_TIMEOUT)
-
+    logger('Alerts evolution over time');
+    await commands.wait.bySelector('[data-render-complete="true"][data-title="Mitre alerts evolution"]', WAIT_TIMEOUT)
+    logger('Top tactics');
+    await commands.wait.bySelector('[data-render-complete="true"][data-title="Top tactics"]', WAIT_TIMEOUT)
+    logger('Attacks by technique');
+    await commands.wait.bySelector('[data-render-complete="true"][data-title="Attacks by technique"]', WAIT_TIMEOUT)
     logger('Top tactics by agent');
     await commands.wait.bySelector('[data-render-complete="true"][data-title="Top tactics by agent"]', WAIT_TIMEOUT)
+    logger('Mitre techniques by agent');
+    await commands.wait.bySelector('[data-render-complete="true"][data-title="Mitre techniques by agent"]', WAIT_TIMEOUT)
 
     logger('--- Finish measures ---', 'info');
     
