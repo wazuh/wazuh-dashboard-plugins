@@ -6,6 +6,8 @@ module.exports = async function (context, commands) {
   await commands.navigate(SERVER_URL);
 
   try {
+    // Start collecting metrics
+    
     // Click on Kibana menu to access Wazuh App link
     await commands.wait.bySelector('button[data-test-subj="toggleNavButton"]', WAIT_TIMEOUT)
     await commands.click.bySelector('button[data-test-subj="toggleNavButton"]')
@@ -20,20 +22,23 @@ module.exports = async function (context, commands) {
     //Waiting for full load of the page
     await commands.wait.byCondition("!isNaN(parseInt(document.querySelector('.statWithLink').innerHTML))", WAIT_TIMEOUT)
     await commands.click.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"MITRE")]')
-    logger('END MITRE BUTTON');
-    
-    // Accesing to Framework Dashboard
-    await commands.wait.byXpath('//*[contains(@class,"euiTab")]//*[contains(text(),"Framework")]', WAIT_TIMEOUT)
-    await commands.click.byXpath('//*[contains(@class,"euiTab")]//*[contains(text(),"Framework")]')
-
-    // Start collecting metrics
-    await commands.measure.start('MITRE ATT&CK module -Intelligence Dashboard')
-    logger('--- Initiate measures in Intelligence - Dashboard module ---');
-    // Search Techniques Table
-    logger('Techniques Table');
-    //await commands.wait.bySelector('.euiBasicTable:not(.euiBasicTable-loading)', WAIT_TIMEOUT)
-    //AGREGAR VALIDACION DE FIN DE CARGA DE PAGINA
-    await commands.wait.bySelector('[class="euiFlexGrid euiFlexGrid--gutterSmall euiFlexGrid--fourths euiFlexGrid--responsive"]', WAIT_TIMEOUT)
+    await commands.measure.start('MITRE ATT&CK module -dashboard')
+    logger('--- Initiate measures in dashboard module ---');
+    // Search Alerts evolution chart
+    logger('Alerts evolution over time');
+    // Search Top tactics chart
+    await commands.wait.bySelector('[data-render-complete="true"][data-title="Mitre alerts evolution"]', WAIT_TIMEOUT)
+    logger('Top tactics');
+    // Search Attacks by technique chart
+    await commands.wait.bySelector('[data-render-complete="true"][data-title="Top tactics"]', WAIT_TIMEOUT)
+    logger('Attacks by technique');
+    // Search Top tactics by agent chart
+    await commands.wait.bySelector('[data-render-complete="true"][data-title="Attacks by technique"]', WAIT_TIMEOUT)
+    logger('Mitre techniques by agent');
+    // Search Top tactics by agent chart
+    await commands.wait.bySelector('[data-render-complete="true"][data-title="Top tactics by agent"]', WAIT_TIMEOUT)
+    logger('Mitre techniques by agent');
+    await commands.wait.bySelector('[data-render-complete="true"][data-title="Mitre techniques by agent"]', WAIT_TIMEOUT)
 
     logger('--- Finish measures ---', 'info');
     
