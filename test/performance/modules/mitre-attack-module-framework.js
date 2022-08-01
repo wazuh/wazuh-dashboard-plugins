@@ -19,7 +19,7 @@ module.exports = async function (context, commands) {
     await commands.wait.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"MITRE")]', WAIT_TIMEOUT)
     await commands.click.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"MITRE")]')
 
-    // Accesing to Intelligence Dashboard
+    // Accesing to Framework Dashboard
     await commands.wait.byXpath('//*[contains(@class,"euiTab")]//*[contains(text(),"Framework")]', WAIT_TIMEOUT)
     await commands.click.byXpath('//*[contains(@class,"euiTab")]//*[contains(text(),"Framework")]')
 
