@@ -19,6 +19,8 @@ module.exports = async function (context, commands) {
 
     // Click on Integrity Monitoring module button
     await commands.wait.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"Integrity monitoring")]', WAIT_TIMEOUT)
+    //Waiting for full load of the page
+    await commands.wait.byCondition("!isNaN(parseInt(document.querySelector('.statWithLink').innerHTML))", WAIT_TIMEOUT)
     await commands.click.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"Integrity monitoring")]')
     
     await commands.measure.start('Integrity Monitoring module -dashboard')
