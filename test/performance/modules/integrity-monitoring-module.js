@@ -23,21 +23,24 @@ module.exports = async function (context, commands) {
     
     await commands.measure.start('Integrity Monitoring module -dashboard')
     logger('--- Initiate measures in dashboard module ---');
-
+    // Search TOP 5 agent chart
     logger('--- TOP 5 agents ---');
     await commands.wait.bySelector('[id="Wazuh-App-Overview-FIM-Top-5-agents-pie"] [data-render-complete="true"][data-test-subj="visualizationLoader"]', WAIT_TIMEOUT)
+    // Search Alert by severity chart
     logger('Alerts by action over time');
     await commands.wait.bySelector('[data-render-complete="true"][data-title="Alerts by action over time"]', WAIT_TIMEOUT)
+    // Search Alert by Event summary chart
     logger('Events summary');
     await commands.wait.bySelector('[data-render-complete="true"][data-title="Events summary"]', WAIT_TIMEOUT)
+    // Search Alert by Event summary chart chart
     logger('Rule distribution');
     await commands.wait.bySelector('[data-render-complete="true"][data-title="Top 5 rules"]', WAIT_TIMEOUT)
+    // Search Common actions chart
     logger('Actions');
     await commands.wait.bySelector('[data-render-complete="true"][data-title="Common actions"]', WAIT_TIMEOUT)
+    // Search Top 5 users chart
     logger('Top 5 users');
     await commands.wait.bySelector('[data-render-complete="true"][data-title="Top users"]', WAIT_TIMEOUT)
-
-
 
     logger('--- Finish measures ---', 'info');
     
