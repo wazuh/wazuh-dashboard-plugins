@@ -29,7 +29,27 @@ module.exports = async function (context, commands) {
 
     logger('Groups Table');
     await commands.wait.bySelector('[class="euiTable euiTable--responsive"]', WAIT_TIMEOUT)
-
+    logger('Mitigations');
+    await commands.wait.byXpath('//*[contains(@class,"euiFlexItem euiFlexItem--flexGrowZero")]//*[contains(text(),"Mitigations")]', WAIT_TIMEOUT)
+    //Clicking on Mitigations
+    await commands.click.byXpath('//*[contains(@class,"euiFlexItem euiFlexItem--flexGrowZero")]//*[contains(text(),"Mitigations")]', WAIT_TIMEOUT)
+    //Searching mitigations table
+    logger('Mitigations Table');
+    await commands.wait.bySelector('[class="euiTable euiTable--responsive"]', WAIT_TIMEOUT)
+    //Clicking on Software
+    await commands.click.byXpath('//*[contains(@class,"euiFlexItem euiFlexItem--flexGrowZero")]//*[contains(text(),"Software")]', WAIT_TIMEOUT)
+    //Searching software table
+    logger('Software Table');
+     //Clicking on Tactics
+     await commands.click.byXpath('//*[contains(@class,"euiFlexItem euiFlexItem--flexGrowZero")]//*[contains(text(),"Tactics")]', WAIT_TIMEOUT)
+     //Searching tactics table
+     logger('Tactics Table');
+    await commands.wait.bySelector('[class="euiTable euiTable--responsive"]', WAIT_TIMEOUT)
+    //Clicking on Techniques
+    await commands.click.byXpath('//*[contains(@class,"euiFlexItem euiFlexItem--flexGrowZero")]//*[contains(text(),"Techniques")]', WAIT_TIMEOUT)
+    //Searching techniques table
+    logger('Techniques Table');
+   await commands.wait.bySelector('[class="euiTable euiTable--responsive"]', WAIT_TIMEOUT)
     logger('--- Finish measures ---', 'info');
     
     // Stop and collect the metrics
