@@ -27,7 +27,7 @@ module.exports = async function (context, commands) {
 
     // Start collecting metrics
     await commands.measure.start('MITRE ATT&CK module -Intelligence Dashboard')
-    logger('--- Initiate measures in Intelligence - Sashboard module ---');
+    logger('--- Initiate measures in Intelligence - Dashboard module ---');
 
     logger('Groups Table');
     await commands.wait.bySelector('[class="euiTable euiTable--responsive"]', WAIT_TIMEOUT)
