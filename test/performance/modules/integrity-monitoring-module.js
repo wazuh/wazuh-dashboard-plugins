@@ -26,6 +26,18 @@ module.exports = async function (context, commands) {
 
     logger('--- TOP 5 agents ---');
     await commands.wait.bySelector('[id="Wazuh-App-Overview-FIM-Top-5-agents-pie"] [data-render-complete="true"][data-test-subj="visualizationLoader"]', WAIT_TIMEOUT)
+    logger('Alerts by action over time');
+    await commands.wait.bySelector('[data-render-complete="true"][data-title="Alerts by action over time"]', WAIT_TIMEOUT)
+    logger('Events summary');
+    await commands.wait.bySelector('[data-render-complete="true"][data-title="Events summary"]', WAIT_TIMEOUT)
+    logger('Rule distribution');
+    await commands.wait.bySelector('[data-render-complete="true"][data-title="Top 5 rules"]', WAIT_TIMEOUT)
+    logger('Actions');
+    await commands.wait.bySelector('[data-render-complete="true"][data-title="Common actions"]', WAIT_TIMEOUT)
+    logger('Top 5 users');
+    await commands.wait.bySelector('[data-render-complete="true"][data-title="Top users"]', WAIT_TIMEOUT)
+
+
 
     logger('--- Finish measures ---', 'info');
     
