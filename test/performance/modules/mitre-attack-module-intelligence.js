@@ -30,7 +30,7 @@ module.exports = async function (context, commands) {
     logger('--- Initiate measures in Intelligence - Dashboard module ---');
 
     logger('Groups Table');
-    await commands.wait.bySelector('[class="euiTable euiTable--responsive"]', WAIT_TIMEOUT)
+    await commands.wait.bySelector('.euiBasicTable:not(.euiBasicTable-loading)', WAIT_TIMEOUT)
     logger('Mitigations');
     await commands.wait.byXpath('//*[contains(@class,"euiFlexItem euiFlexItem--flexGrowZero")]//*[contains(text(),"Mitigations")]', WAIT_TIMEOUT)
     //Clicking on Mitigations
