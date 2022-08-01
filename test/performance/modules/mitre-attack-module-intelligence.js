@@ -21,14 +21,12 @@ module.exports = async function (context, commands) {
     //Waiting for full load of the page
     await commands.click.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"MITRE")]')
 
+    
+    // Start collecting metrics
+    await commands.measure.start('Mitre - Intelligence');
     // Accesing to Intelligence Dashboard
     await commands.wait.byXpath('//*[contains(@class,"euiTab")]//*[contains(text(),"Intelligence")]', WAIT_TIMEOUT)
     await commands.click.byXpath('//*[contains(@class,"euiTab")]//*[contains(text(),"Intelligence")]')
-
-    // Start collecting metrics
-    await commands.measure.start('MITRE ATT&CK module -Intelligence Dashboard')
-    logger('--- Initiate measures in Intelligence - Dashboard module ---');
-
     logger('Groups Table');
     await commands.wait.bySelector('.euiBasicTable:not(.euiBasicTable-loading)', WAIT_TIMEOUT)
     logger('Mitigations');
@@ -57,7 +55,7 @@ module.exports = async function (context, commands) {
     logger('Techniques Table');
     await commands.wait.bySelector('.euiBasicTable:not(.euiBasicTable-loading)', WAIT_TIMEOUT)
     logger('--- Finish measures ---', 'info');
-    
+
     // Stop and collect the metrics
     return commands.measure.stop();
   } catch (e) {
