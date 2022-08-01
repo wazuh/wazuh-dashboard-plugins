@@ -37,21 +37,25 @@ module.exports = async function (context, commands) {
     await commands.click.byXpath('//*[contains(@class,"euiFlexItem euiFlexItem--flexGrowZero")]//*[contains(text(),"Mitigations")]', WAIT_TIMEOUT)
     //Searching mitigations table
     logger('Mitigations Table');
-    await commands.wait.bySelector('[class="euiTable euiTable--responsive"]', WAIT_TIMEOUT)
+    await commands.wait.bySelector('.euiBasicTable:not(.euiBasicTable-loading)', WAIT_TIMEOUT)
     //Clicking on Software
+    await commands.wait.byXpath('//*[contains(@class,"euiFlexItem euiFlexItem--flexGrowZero")]//*[contains(text(),"Software")]', WAIT_TIMEOUT)
     await commands.click.byXpath('//*[contains(@class,"euiFlexItem euiFlexItem--flexGrowZero")]//*[contains(text(),"Software")]', WAIT_TIMEOUT)
     //Searching software table
+    await commands.wait.bySelector('.euiBasicTable:not(.euiBasicTable-loading)', WAIT_TIMEOUT)
     logger('Software Table');
-     //Clicking on Tactics
-     await commands.click.byXpath('//*[contains(@class,"euiFlexItem euiFlexItem--flexGrowZero")]//*[contains(text(),"Tactics")]', WAIT_TIMEOUT)
-     //Searching tactics table
-     logger('Tactics Table');
-    await commands.wait.bySelector('[class="euiTable euiTable--responsive"]', WAIT_TIMEOUT)
+    //Clicking on Tactics
+    await commands.wait.byXpath('//*[contains(@class,"euiFlexItem euiFlexItem--flexGrowZero")]//*[contains(text(),"Tactics")]', WAIT_TIMEOUT)
+    await commands.click.byXpath('//*[contains(@class,"euiFlexItem euiFlexItem--flexGrowZero")]//*[contains(text(),"Tactics")]', WAIT_TIMEOUT)
+    //Searching tactics table
+    logger('Tactics Table');
+    await commands.wait.bySelector('.euiBasicTable:not(.euiBasicTable-loading)', WAIT_TIMEOUT)
     //Clicking on Techniques
+    await commands.wait.byXpath('//*[contains(@class,"euiFlexItem euiFlexItem--flexGrowZero")]//*[contains(text(),"Techniques")]', WAIT_TIMEOUT)
     await commands.click.byXpath('//*[contains(@class,"euiFlexItem euiFlexItem--flexGrowZero")]//*[contains(text(),"Techniques")]', WAIT_TIMEOUT)
     //Searching techniques table
     logger('Techniques Table');
-   await commands.wait.bySelector('[class="euiTable euiTable--responsive"]', WAIT_TIMEOUT)
+    await commands.wait.bySelector('.euiBasicTable:not(.euiBasicTable-loading)', WAIT_TIMEOUT)
     logger('--- Finish measures ---', 'info');
     
     // Stop and collect the metrics
