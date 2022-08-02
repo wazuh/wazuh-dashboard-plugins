@@ -1147,6 +1147,17 @@ wz-xml-file-editor {
   margin: 0px;
 }
 
+.wz-modal-restart {
+  border: 1px solid #D3DAE6;
+  box-shadow: 0 40px 64px 0 rgba(65, 78, 101, 0.1), 0 24px 32px 0 rgba(65, 78, 101, 0.1), 0 16px 16px 0 rgba(65, 78, 101, 0.1), 0 8px 8px 0 rgba(65, 78, 101, 0.1), 0 4px 4px 0 rgba(65, 78, 101, 0.1), 0 2px 2px 0 rgba(65, 78, 101, 0.1);
+  border-color: #c6cad1;
+  border-top-color: #e3e4e8;
+  border-bottom-color: #aaafba;
+  background-color: #FFF;
+  border-radius: 4px;
+  min-width: 400px;
+}
+
 .header-global-wrapper + .app-wrapper:not(.hidden-chrome) {
   top: 48px!important;
   left: 48px!important;

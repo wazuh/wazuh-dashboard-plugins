@@ -26,8 +26,9 @@ import {
 
 import { getToasts }  from '../../kibana-services';
 import { updateWazuhNotReadyYet } from '../../redux/actions/appStateActions';
-import { RestartHandler } from '../../react-services/wz-restart-manager-or-cluster';
+import { RestartHandler } from '../../react-services/wz-restart';
 import { connect } from 'react-redux';
+import { RestartModal } from './restart-modal/restart-modal';
 
 interface IWzRestartClusterManagerCalloutProps{
   updateWazuhNotReadyYet: (wazuhNotReadyYet) => void
@@ -39,6 +40,9 @@ interface IWzRestartClusterManagerCalloutState{
   warningRestarting: boolean
   warningRestartModalVisible: boolean
   isCluster: boolean
+  isRestarting: boolean
+  timeoutRestarting: boolean
+  timeRestarting: number
 };
 
 class WzRestartClusterManagerCallout extends Component<IWzRestartClusterManagerCalloutProps, IWzRestartClusterManagerCalloutState>{
@@ -47,11 +51,14 @@ class WzRestartClusterManagerCallout extends Component<IWzRestartClusterManagerC
     this.state = {
       warningRestarting: false,
       warningRestartModalVisible: false,
-      isCluster: false
+      isCluster: false,
+      isRestarting: false,
+      timeoutRestarting: false,
+      timeRestarting: 60,
     };
   }
   toggleWarningRestartModalVisible(){
-    this.setState({ warningRestartModalVisible: !this.state.warningRestartModalVisible })
+    this.setState({ warningRestartModalVisible: !this.state.warningRestartModalVisible, isRestarting: false })
   }
   showToast(color, title, text = '', time = 3000){
     getToasts().add({
@@ -61,18 +68,31 @@ class WzRestartClusterManagerCallout extends Component<IWzRestartClusterManagerC
       toastLifeTimeMs: time
     });
   }
-  restartClusterOrManager = async () => {
+  restartWazuh = async () => {
     try{
-      this.setState({ warningRestarting: true, warningRestartModalVisible: false});
-      await RestartHandler.restartClusterOrManager(this.props.updateWazuhNotReadyYet);
+      this.setState({ warningRestarting: true, warningRestartModalVisible: false, isRestarting: true, timeoutRestarting:true });
+      this.countDown(60)
+      await RestartHandler.restartWazuh(this.props.updateWazuhNotReadyYet);
+      this.setState({ isRestarting: false, timeoutRestarting:false, timeRestarting: 60 });
       this.props.onRestarted();
     }catch(error){
-      this.setState({ warningRestarting: false });
+      this.setState({ warningRestarting: false, isRestarting: false, timeRestarting: 60 });
       this.props.updateWazuhNotReadyYet(false);
       this.props.onRestartedError();
       this.showToast('danger', 'Error', error.message || error );
     }
   };
+  countDown = (time) => {
+    let countDown = time--;
+    const interval = setInterval(() => {
+      this.setState({ timeRestarting: countDown });
+      countDown--;
+      if (countDown === 0 || !this.state.isRestarting) {
+        clearInterval(interval);
+      }
+      console.log(countDown);
+    }, 1000);
+  }
   async componentDidMount(){
     try{
       const clusterStatus = await RestartHandler.clusterReq();
@@ -80,7 +100,7 @@ class WzRestartClusterManagerCallout extends Component<IWzRestartClusterManagerC
     }catch(error){}
   }
   render(){
-    const { warningRestarting, warningRestartModalVisible } = this.state;
+    const { warningRestarting, warningRestartModalVisible, isRestarting, timeRestarting, isCluster, timeoutRestarting } = this.state;
     return (
       <Fragment>
         {!warningRestarting && (
@@ -108,12 +128,16 @@ class WzRestartClusterManagerCallout extends Component<IWzRestartClusterManagerC
             <EuiConfirmModal
               title={`${this.state.isCluster ? 'Cluster' : 'Manager'} will be restarted`}
               onCancel={() => this.toggleWarningRestartModalVisible()}
-              onConfirm={() => this.restartClusterOrManager()}
+              onConfirm={() => this.restartWazuh()}
               cancelButtonText="Cancel"
               confirmButtonText="Confirm"
               defaultFocusedButton="cancel"
             ></EuiConfirmModal>
           </EuiOverlayMask>
+        )}
+        { timeoutRestarting && (
+          <RestartModal 
+          isRestarting={isRestarting} isCluster={isCluster} timeRestarting={timeRestarting}/>
         )}
       </Fragment>
       )

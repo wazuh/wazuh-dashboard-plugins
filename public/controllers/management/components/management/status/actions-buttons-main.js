@@ -13,7 +13,6 @@ import React, { Component, Fragment } from 'react';
 // Eui components
 import {
   EuiFlexItem,
-  EuiButtonEmpty,
   EuiSelect,
   EuiOverlayMask,
   EuiConfirmModal
@@ -37,8 +36,9 @@ import { WzButtonPermissions } from '../../../../../components/common/permission
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
-import { RestartHandler } from '../../../../../react-services/wz-restart-manager-or-cluster';
+import { RestartHandler } from '../../../../../react-services/wz-restart';
 import { updateWazuhNotReadyYet } from '../../../../../redux/actions/appStateActions';
+import { RestartModal } from '../../../../../components/common/restart-modal/restart-modal'
 
 class WzStatusActionButtons extends Component {
   _isMounted = false;
@@ -50,7 +50,9 @@ class WzStatusActionButtons extends Component {
     this.statusHandler = StatusHandler;
     this.state = {
       isModalVisible: false,
-      isRestarting: false
+      isRestarting: false,
+      timeoutRestarting: false,
+      timeRestarting: 60
     };
   }
 
@@ -67,13 +69,14 @@ class WzStatusActionButtons extends Component {
   /**
    * Restart cluster or manager
    */
-  async restartClusterOrManager(isCluster) {
-    this.setState({ isRestarting: true });
+  async restartWazuh(isCluster) {
+    this.setState({ isRestarting: true, timeoutRestarting: true });
+    this.countDown(60)
     try {
-      await RestartHandler.restartClusterOrManager(updateWazuhNotReadyYet);
-      this.setState({ isRestarting: false });
+      await RestartHandler.restartWazuh(updateWazuhNotReadyYet);
+      this.setState({ isRestarting: false, timeoutRestarting: false, timeRestarting: 60 });
     } catch (error) {
-      this.setState({ isRestarting: false });
+      this.setState({ isRestarting: false, timeRestarting: 60 });
       const options = {
         context: isCluster ? `${WzStatusActionButtons.name}.restartCluster` : `${WzStatusActionButtons.name}.restartManager`,
         level: UI_LOGGER_LEVELS.ERROR,
@@ -180,14 +183,31 @@ class WzStatusActionButtons extends Component {
     this.setState({ isModalVisible: false });
   };
 
+  countDown = (time) => {
+    let countDown = time;
+    const interval = setInterval(() => {
+      this.setState({ timeRestarting: countDown });
+      countDown--;
+      if (countDown === 0 || !this.state.isRestarting) {
+        clearInterval(interval);
+      }
+    }, 1000);
+  }
+
   render() {
     const {
       isLoading,
       listNodes,
       selectedNode,
       clusterEnabled,
-      isRestarting
     } = this.props.state;
+
+    const {
+      isRestarting,
+      isModalVisible,
+      timeoutRestarting,
+      timeRestarting
+    } = this.state
 
     let options = this.transforToOptions(listNodes);
 
@@ -198,7 +218,7 @@ class WzStatusActionButtons extends Component {
         options={options}
         value={selectedNode}
         onChange={this.changeNode}
-        disabled={isLoading || this.state.isRestarting}
+        disabled={isLoading || isRestarting}
         aria-label="Select node"
       />
     );
@@ -211,16 +231,15 @@ class WzStatusActionButtons extends Component {
         iconType="refresh"
         onClick={async () => this.setState({ isModalVisible: true })}
         isDisabled={isLoading}
-        isLoading={this.state.isRestarting}
+        isLoading={isRestarting}
       >
-        {clusterEnabled && 'Restart cluster'}
-        {!clusterEnabled && 'Restart manager'}
+        Restart {clusterEnabled ? 'cluster' : 'manager'}
       </WzButtonPermissions>
     );
 
     let modal;
 
-    if (this.state.isModalVisible) {
+    if (isModalVisible) {
       modal = (
         <EuiOverlayMask>
           <EuiConfirmModal
@@ -231,7 +250,7 @@ class WzStatusActionButtons extends Component {
             }
             onCancel={this.closeModal}
             onConfirm={() => {
-              this.restartClusterOrManager(clusterEnabled)
+              this.restartWazuh(clusterEnabled)
               this.setState({ isModalVisible: false });
             }}
             cancelButtonText="Cancel"
@@ -242,13 +261,21 @@ class WzStatusActionButtons extends Component {
       );
     }
 
+    let restarting
+
+    if (timeoutRestarting) {
+      restarting =(
+        <RestartModal isRestarting={isRestarting} timeRestarting={timeRestarting} isCluster={clusterEnabled} />
+    )}
+
     return (
       <Fragment>
         {selectedNode !== null && (
-          <EuiFlexItem grow={false}>{restartButton}</EuiFlexItem>
+          <EuiFlexItem grow={isRestarting}>{restartButton}</EuiFlexItem>
         )}
         {selectedNode && <EuiFlexItem grow={false}>{selectNode}</EuiFlexItem>}
         {modal}
+        {restarting}
       </Fragment>
     );
   }

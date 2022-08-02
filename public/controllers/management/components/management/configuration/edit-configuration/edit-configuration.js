@@ -42,7 +42,7 @@ import {
   clusterNodes,
   clusterReq,
 } from '../utils/wz-fetch';
-import { RestartHandler } from '../../../../../../react-services/wz-restart-manager-or-cluster';
+import { RestartHandler } from '../../../../../../react-services/wz-restart';
 import { validateXML } from '../utils/xml';
 import { getToasts } from '../../../../../..//kibana-services';
 
@@ -52,6 +52,7 @@ import { compose } from 'redux';
 import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
+import { RestartModal } from '../../../../../../components/common/restart-modal/restart-modal';
 
 class WzEditConfiguration extends Component {
   constructor(props) {
@@ -66,6 +67,8 @@ class WzEditConfiguration extends Component {
       hasChanges: false,
       infoChangesAfterRestart: false,
       disableSaveRestartButtons: false,
+      timeRestarting: 60,
+      timeoutRestarting: false
     };
   }
 
@@ -157,10 +160,11 @@ class WzEditConfiguration extends Component {
 
   async confirmRestart() {
     try {
-      this.setState({ restarting: true, saving: true, infoChangesAfterRestart: false });
+      this.countDown(60)
+      this.setState({ restarting: true, saving: true, infoChangesAfterRestart: false, timeoutRestarting:true, timeRestarting:60 });
       await RestartHandler.restartNodeSelected(this.props.clusterNodeSelected, this.props.updateWazuhNotReadyYet);
       this.props.updateWazuhNotReadyYet('');
-      this.setState({ restart: false, saving: false, restarting: false });
+      this.setState({ restart: false, saving: false, restarting: false, timeoutRestarting: false, timeRestarting: 60 });
       await this.checkIfClusterOrManager();
       if (this.props.clusterNodes) {
         this.addToast({
@@ -185,7 +189,7 @@ class WzEditConfiguration extends Component {
       }
     } catch (error) {
       this.props.updateWazuhNotReadyYet('');
-      this.setState({ restart: false, saving: false, restarting: false });
+      this.setState({ restart: false, saving: false, restarting: false, timeRestarting: 60 });
       const options = {
         context: `${WzEditConfiguration.name}.confirmRestart`,
         level: UI_LOGGER_LEVELS.ERROR,
@@ -198,6 +202,17 @@ class WzEditConfiguration extends Component {
       };
       getErrorOrchestrator().handleError(options);
     }
+  }
+
+  countDown = (time) => {
+    let countDown = time;
+    const interval = setInterval(() => {
+      this.setState({ timeRestarting: countDown });
+      countDown--;
+      if (countDown === 0 || !this.state.restarting) {
+        clearInterval(interval);
+      }
+    }, 1000);
   }
 
   async checkIfClusterOrManager() {
@@ -234,7 +249,7 @@ class WzEditConfiguration extends Component {
     }
   }
   render() {
-    const { restart, restarting, saving, editorValue, disableSaveRestartButtons } = this.state;
+    const { restart, restarting, saving, editorValue, disableSaveRestartButtons, timeoutRestarting, timeRestarting } = this.state;
     const { clusterNodeSelected, agent } = this.props;
     const xmlError = editorValue && validateXML(editorValue);
     return (
@@ -311,6 +326,10 @@ class WzEditConfiguration extends Component {
               defaultFocusedButton="cancel"
             />
           </EuiOverlayMask>
+        )}
+        {
+          timeoutRestarting && (
+          <RestartModal isRestarting={restarting} timeRestarting={timeRestarting} isCluster={clusterNodeSelected} />
         )}
       </Fragment>
     );
