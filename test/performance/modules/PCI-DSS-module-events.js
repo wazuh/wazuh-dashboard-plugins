@@ -14,6 +14,7 @@ module.exports = async function (context, commands) {
     
     //Wait for an Wazuh home page component to be loaded
     await commands.wait.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"PCI DSS")]', WAIT_TIMEOUT)
+    await commands.wait.byCondition("!isNaN(parseInt(document.querySelector('.statWithLink').innerHTML))", WAIT_TIMEOUT)
     await commands.click.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"PCI DSS")]')
 
     await commands.wait.byXpath('//*[@class="euiTabs"]//*[contains(text(),"Events")]', WAIT_TIMEOUT)

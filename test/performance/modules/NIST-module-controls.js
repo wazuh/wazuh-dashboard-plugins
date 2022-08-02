@@ -13,19 +13,19 @@ module.exports = async function (context, commands) {
     await commands.click.bySelector('a[href$="/app/wazuh"]')
     
     //Wait for an Wazuh home page component to be loaded
-    await commands.wait.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"GDPR")]', WAIT_TIMEOUT)
+    await commands.wait.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"NIST 800-53")]', WAIT_TIMEOUT)
     await commands.wait.byCondition("!isNaN(parseInt(document.querySelector('.statWithLink').innerHTML))", WAIT_TIMEOUT)
-    await commands.click.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"GDPR")]')
+    await commands.click.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"NIST 800-53")]')
 
     await commands.wait.byXpath('//*[@class="euiTabs"]//*[contains(text(),"Controls")]', WAIT_TIMEOUT)
     
     // Start collecting metrics
-    await commands.measure.start('GDPR module - Dashboard')
+    await commands.measure.start('NIST 800-53 module - Dashboard')
     logger('--- Initiate measures in Intelligence - Dashboard module ---');
     
     await commands.click.byXpath('//*[@class="euiTabs"]//*[contains(text(),"Controls")]')
     
-    logger('--- Requirements by GDPR ---')
+    logger('--- Requirements by NIST 800-53 ---')
     await commands.wait.bySelector('react-component .wz-module > div:nth-child(2) > div:nth-child(2) .euiFlexGroup--responsive .euiFlexItem .euiFlexItem button.euiFacetButton', WAIT_TIMEOUT)
 
     logger('--- Finish measures ---', 'info');

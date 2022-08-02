@@ -14,6 +14,7 @@ module.exports = async function (context, commands) {
     
     //Wait for an Wazuh home page component to be loaded
     await commands.wait.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"PCI DSS")]', WAIT_TIMEOUT)
+    await commands.wait.byCondition("!isNaN(parseInt(document.querySelector('.statWithLink').innerHTML))", WAIT_TIMEOUT)
     await commands.click.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"PCI DSS")]')
 
     await commands.wait.byXpath('//*[@class="euiTabs"]//*[contains(text(),"Controls")]', WAIT_TIMEOUT)
@@ -23,7 +24,7 @@ module.exports = async function (context, commands) {
     logger('--- Initiate measures in Intelligence - Dashboard module ---');
     
     await commands.click.byXpath('//*[@class="euiTabs"]//*[contains(text(),"Controls")]')
-    
+
     logger('--- Requirements by PCI DSS ---')
     await commands.wait.bySelector('react-component .wz-module > div:nth-child(2) > div:nth-child(2) .euiFlexGroup--responsive .euiFlexItem .euiFlexItem button.euiFacetButton', WAIT_TIMEOUT)
 

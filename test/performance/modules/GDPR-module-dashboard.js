@@ -14,6 +14,7 @@ module.exports = async function (context, commands) {
     
     //Wait for an Wazuh home page component to be loaded
     await commands.wait.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"GDPR")]', WAIT_TIMEOUT)
+    await commands.wait.byCondition("!isNaN(parseInt(document.querySelector('.statWithLink').innerHTML))", WAIT_TIMEOUT)
     await commands.click.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"GDPR")]')
 
     // Start collecting metrics
@@ -21,16 +22,19 @@ module.exports = async function (context, commands) {
     logger('--- Initiate measures in Intelligence - Dashboard module ---');
     
     logger('--- GDPR requirements ---')
-    await commands.wait.bySelector('#moduleDashboard .euiFlexItem.h-100 #Wazuh-App-Overview-PCI-DSS-requirements .visLib.visLib--legend-right', WAIT_TIMEOUT)
+    await commands.wait.bySelector('#moduleDashboard .euiFlexItem.h-100 #Wazuh-App-Overview-GDPR-requirements .visLib.visLib--legend-right', WAIT_TIMEOUT)
 
     logger('--- Top 10 agents by alerts number ---')
-    await commands.wait.bySelector('#moduleDashboard .euiFlexItem.h-100 #Wazuh-App-Overview-PCI-DSS-Agents .visLib.visLib--legend-right', WAIT_TIMEOUT)
+    await commands.wait.bySelector('#moduleDashboard .euiFlexItem.h-100 #Wazuh-App-Overview-GDPR-Agents .visLib.visLib--legend-right', WAIT_TIMEOUT)
     
     logger('--- Top requirements over time ---')
-    await commands.wait.bySelector('#moduleDashboard .euiFlexItem.h-100 #Wazuh-App-Overview-PCI-DSS-Requirements-over-time .visLib.visLib--legend-right', WAIT_TIMEOUT)
+    await commands.wait.bySelector('#moduleDashboard .euiFlexItem.h-100 #Wazuh-App-Overview-GDPR-Requirements-heatmap .visLib.visLib--legend-right', WAIT_TIMEOUT)
     
+    logger('--- Last alerts ---')
+    await commands.wait.bySelector('#moduleDashboard .euiFlexItem.h-100 #Wazuh-App-Overview-GDPR-Requirements-Agents-heatmap .visLib.visLib--legend-right', WAIT_TIMEOUT)
+
     logger('--- Requirements by agent ---')
-    await commands.wait.bySelector('#moduleDashboard .euiFlexItem.h-100 #Wazuh-App-Overview-PCI-DSS-Requirements-by-agent .visLib.visLib--legend-right', WAIT_TIMEOUT)
+    await commands.wait.bySelector('#moduleDashboard .euiFlexItem.h-100 #Wazuh-App-Overview-GDPR-Requirements-by-agent .visLib.visLib--legend-right', WAIT_TIMEOUT)
 
     logger('--- Finish measures ---', 'info');
     
