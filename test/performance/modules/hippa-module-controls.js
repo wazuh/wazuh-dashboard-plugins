@@ -16,23 +16,22 @@ module.exports = async function (context, commands) {
     await commands.wait.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"Security events")]', WAIT_TIMEOUT)
 
     // Click on MITRE module button
-    await commands.wait.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"MITRE")]', WAIT_TIMEOUT)
+    await commands.wait.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"HIPAA")]', WAIT_TIMEOUT)
     //Waiting for full load of the page
     await commands.wait.byCondition("!isNaN(parseInt(document.querySelector('.statWithLink').innerHTML))", WAIT_TIMEOUT)
-    await commands.click.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"MITRE")]')
-    logger('END MITRE BUTTON');
-    
+    await commands.click.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"HIPAA")]')
+    logger('END HIPAA BUTTON');
     
     // Start collecting metrics
-    await commands.measure.start('MITRE ATT&CK module -Intelligence Dashboard')
-    logger('--- Initiate measures in Intelligence - Dashboard module ---');
-    // Accesing to Framework Dashboard
-    await commands.wait.byXpath('//*[contains(@class,"euiTab")]//*[contains(text(),"Framework")]', WAIT_TIMEOUT)
-    await commands.click.byXpath('//*[contains(@class,"euiTab")]//*[contains(text(),"Framework")]')
+    await commands.measure.start('HIPAA module - Contols Dashboard')
+    logger('--- Initiate measures in Controls---');
 
+    // Accesing to Framework Dashboard
+    await commands.wait.byXpath('//*[contains(@class,"euiTab")]//*[contains(text(),"Controls")]', WAIT_TIMEOUT)
+    await commands.click.byXpath('//*[contains(@class,"euiTab")]//*[contains(text(),"Controls")]')
+    
     // Search Techniques Table
-    logger('Techniques Table');
-    //await commands.wait.bySelector('.euiBasicTable:not(.euiBasicTable-loading)', WAIT_TIMEOUT)
+    logger('Requirements Table');
     //AGREGAR VALIDACION DE FIN DE CARGA DE PAGINA
     await commands.wait.bySelector('[class="euiFlexGrid euiFlexGrid--gutterSmall euiFlexGrid--fourths euiFlexGrid--responsive"]', WAIT_TIMEOUT)
 
