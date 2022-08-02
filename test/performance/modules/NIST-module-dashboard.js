@@ -21,7 +21,7 @@ module.exports = async function (context, commands) {
     await commands.measure.start('NIST 800-53 module - Dashboard')
     logger('--- Initiate measures in Intelligence - Dashboard module ---');
     
-    logger('--- NIST 800-53 MOST ACTIVE AGENTS ---')
+    logger('--- Most active agents ---')
     await commands.wait.bySelector('#moduleDashboard .euiFlexItem.h-100 #Wazuh-App-Overview-NIST-Agents .visLib.visLib--legend-right', WAIT_TIMEOUT)
 
     logger('--- Top requirements over time ---')
