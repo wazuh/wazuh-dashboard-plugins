@@ -14,6 +14,7 @@ module.exports = async function (context, commands) {
     await commands.wait.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"Security configuration assessment")]', WAIT_TIMEOUT)
     // Click on Security Events module button
     await commands.wait.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"Security configuration assessment")]', WAIT_TIMEOUT)
+    await commands.wait.byCondition("!isNaN(parseInt(document.querySelector('.statWithLink').innerHTML))", WAIT_TIMEOUT)
     await commands.click.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"Security configuration assessment")]')
     await commands.wait.byXpath('//*[contains(text(),"Select agent")]')
     await commands.click.byXpath('//*[contains(text(),"Select agent")]')
@@ -23,7 +24,8 @@ module.exports = async function (context, commands) {
     await commands.wait.byXpath('//*[contains(@class,"wz-select-agent-modal")]//tbody//*[contains(@class,"uiTableRow-isClickable")][1]')
     await commands.click.byXpath('//*[contains(@class,"wz-select-agent-modal")]//tbody//*[contains(@class,"uiTableRow-isClickable")][1]')
     await commands.wait.bySelector('.euiCard__content .euiFlexItem')
-    await commands.click.bySelector('table [data-test-subj="sca-row-undefined"]')
+    await commands.click.bySelector('[data-test-subj="sca-row-undefined"]')
+    await commands.wait.bySelector('.euiTable.euiTable--responsive')
     // Stop and collect the metrics
     logger('--- Finish measures ---', 'info');
     return commands.measure.stop();
