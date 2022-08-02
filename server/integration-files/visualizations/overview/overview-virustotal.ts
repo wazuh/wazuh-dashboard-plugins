@@ -866,7 +866,7 @@ export default [
               otherBucketLabel: 'Other',
               missingBucket: false,
               missingBucketLabel: 'Missing',
-              size: 1000,
+              size: 100,
               order: 'desc',
               orderBy: '1',
               customLabel: 'Rule ID',
