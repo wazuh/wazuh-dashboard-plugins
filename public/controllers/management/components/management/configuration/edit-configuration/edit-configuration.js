@@ -67,7 +67,6 @@ class WzEditConfiguration extends Component {
       hasChanges: false,
       infoChangesAfterRestart: false,
       disableSaveRestartButtons: false,
-      timeRestarting: 60,
       timeoutRestarting: false
     };
   }
@@ -160,11 +159,10 @@ class WzEditConfiguration extends Component {
 
   async confirmRestart() {
     try {
-      this.countDown(60)
-      this.setState({ restarting: true, saving: true, infoChangesAfterRestart: false, timeoutRestarting:true, timeRestarting:60 });
+      this.setState({ restarting: true, saving: true, infoChangesAfterRestart: false, timeoutRestarting:true });
       await RestartHandler.restartNodeSelected(this.props.clusterNodeSelected, this.props.updateWazuhNotReadyYet);
       this.props.updateWazuhNotReadyYet('');
-      this.setState({ restart: false, saving: false, restarting: false, timeoutRestarting: false, timeRestarting: 60 });
+      this.setState({ restart: false, saving: false, restarting: false, timeoutRestarting: false });
       await this.checkIfClusterOrManager();
       if (this.props.clusterNodes) {
         this.addToast({
@@ -189,7 +187,7 @@ class WzEditConfiguration extends Component {
       }
     } catch (error) {
       this.props.updateWazuhNotReadyYet('');
-      this.setState({ restart: false, saving: false, restarting: false, timeRestarting: 60 });
+      this.setState({ restart: false, saving: false, restarting: false });
       const options = {
         context: `${WzEditConfiguration.name}.confirmRestart`,
         level: UI_LOGGER_LEVELS.ERROR,
@@ -204,16 +202,6 @@ class WzEditConfiguration extends Component {
     }
   }
 
-  countDown = (time) => {
-    let countDown = time;
-    const interval = setInterval(() => {
-      this.setState({ timeRestarting: countDown });
-      countDown--;
-      if (countDown === 0 || !this.state.restarting) {
-        clearInterval(interval);
-      }
-    }, 1000);
-  }
 
   async checkIfClusterOrManager() {
     try {
@@ -249,7 +237,7 @@ class WzEditConfiguration extends Component {
     }
   }
   render() {
-    const { restart, restarting, saving, editorValue, disableSaveRestartButtons, timeoutRestarting, timeRestarting } = this.state;
+    const { restart, restarting, saving, editorValue, disableSaveRestartButtons, timeoutRestarting } = this.state;
     const { clusterNodeSelected, agent } = this.props;
     const xmlError = editorValue && validateXML(editorValue);
     return (
@@ -329,7 +317,7 @@ class WzEditConfiguration extends Component {
         )}
         {
           timeoutRestarting && (
-          <RestartModal isRestarting={restarting} timeRestarting={timeRestarting} isCluster={clusterNodeSelected} />
+          <RestartModal isRestarting={restarting} isCluster={clusterNodeSelected} />
         )}
       </Fragment>
     );

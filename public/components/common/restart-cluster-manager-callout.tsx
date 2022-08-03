@@ -42,7 +42,6 @@ interface IWzRestartClusterManagerCalloutState{
   isCluster: boolean
   isRestarting: boolean
   timeoutRestarting: boolean
-  timeRestarting: number
 };
 
 class WzRestartClusterManagerCallout extends Component<IWzRestartClusterManagerCalloutProps, IWzRestartClusterManagerCalloutState>{
@@ -53,8 +52,7 @@ class WzRestartClusterManagerCallout extends Component<IWzRestartClusterManagerC
       warningRestartModalVisible: false,
       isCluster: false,
       isRestarting: false,
-      timeoutRestarting: false,
-      timeRestarting: 60,
+      timeoutRestarting: false
     };
   }
   toggleWarningRestartModalVisible(){
@@ -71,28 +69,16 @@ class WzRestartClusterManagerCallout extends Component<IWzRestartClusterManagerC
   restartWazuh = async () => {
     try{
       this.setState({ warningRestarting: true, warningRestartModalVisible: false, isRestarting: true, timeoutRestarting:true });
-      this.countDown(60)
       await RestartHandler.restartWazuh(this.props.updateWazuhNotReadyYet);
-      this.setState({ isRestarting: false, timeoutRestarting:false, timeRestarting: 60 });
+      this.setState({ isRestarting: false, timeoutRestarting:false });
       this.props.onRestarted();
     }catch(error){
-      this.setState({ warningRestarting: false, isRestarting: false, timeRestarting: 60 });
+      this.setState({ warningRestarting: false, isRestarting: false });
       this.props.updateWazuhNotReadyYet(false);
       this.props.onRestartedError();
       this.showToast('danger', 'Error', error.message || error );
     }
   };
-  countDown = (time) => {
-    let countDown = time--;
-    const interval = setInterval(() => {
-      this.setState({ timeRestarting: countDown });
-      countDown--;
-      if (countDown === 0 || !this.state.isRestarting) {
-        clearInterval(interval);
-      }
-      console.log(countDown);
-    }, 1000);
-  }
   async componentDidMount(){
     try{
       const clusterStatus = await RestartHandler.clusterReq();
@@ -100,7 +86,7 @@ class WzRestartClusterManagerCallout extends Component<IWzRestartClusterManagerC
     }catch(error){}
   }
   render(){
-    const { warningRestarting, warningRestartModalVisible, isRestarting, timeRestarting, isCluster, timeoutRestarting } = this.state;
+    const { warningRestarting, warningRestartModalVisible, isRestarting, isCluster, timeoutRestarting } = this.state;
     return (
       <Fragment>
         {!warningRestarting && (
@@ -137,7 +123,7 @@ class WzRestartClusterManagerCallout extends Component<IWzRestartClusterManagerC
         )}
         { timeoutRestarting && (
           <RestartModal 
-          isRestarting={isRestarting} isCluster={isCluster} timeRestarting={timeRestarting}/>
+          isRestarting={isRestarting} isCluster={isCluster} />
         )}
       </Fragment>
       )

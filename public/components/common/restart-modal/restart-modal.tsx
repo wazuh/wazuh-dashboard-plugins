@@ -1,11 +1,27 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { EuiOverlayMask, EuiProgress, EuiText } from '@elastic/eui';
 
 export const RestartModal = (props) => {
     
-    const { isRestarting, isCluster, timeRestarting } = props;
+    const [timeRestarting, setTimeRestarting] = useState(60)
+    const { isRestarting, isCluster } = props;
 
     const clusterOrManager = isCluster ? 'cluster' : 'manager';
+
+    useEffect(() => {
+      countDown(timeRestarting)
+    },[])
+
+    const countDown = (time) => {
+      let countDown = time;
+      const interval = setInterval(() => {
+        countDown--;
+        setTimeRestarting( countDown );
+        if (countDown === 0) {
+          clearInterval(interval);
+        }
+      }, 1000);
+    }
     
     return (
         <EuiOverlayMask>

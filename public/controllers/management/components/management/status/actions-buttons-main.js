@@ -52,7 +52,6 @@ class WzStatusActionButtons extends Component {
       isModalVisible: false,
       isRestarting: false,
       timeoutRestarting: false,
-      timeRestarting: 60
     };
   }
 
@@ -71,12 +70,11 @@ class WzStatusActionButtons extends Component {
    */
   async restartWazuh(isCluster) {
     this.setState({ isRestarting: true, timeoutRestarting: true });
-    this.countDown(60)
     try {
       await RestartHandler.restartWazuh(updateWazuhNotReadyYet);
-      this.setState({ isRestarting: false, timeoutRestarting: false, timeRestarting: 60 });
+      this.setState({ isRestarting: false, timeoutRestarting: false });
     } catch (error) {
-      this.setState({ isRestarting: false, timeRestarting: 60 });
+      this.setState({ isRestarting: false });
       const options = {
         context: isCluster ? `${WzStatusActionButtons.name}.restartCluster` : `${WzStatusActionButtons.name}.restartManager`,
         level: UI_LOGGER_LEVELS.ERROR,
@@ -183,17 +181,6 @@ class WzStatusActionButtons extends Component {
     this.setState({ isModalVisible: false });
   };
 
-  countDown = (time) => {
-    let countDown = time;
-    const interval = setInterval(() => {
-      this.setState({ timeRestarting: countDown });
-      countDown--;
-      if (countDown === 0 || !this.state.isRestarting) {
-        clearInterval(interval);
-      }
-    }, 1000);
-  }
-
   render() {
     const {
       isLoading,
@@ -206,7 +193,6 @@ class WzStatusActionButtons extends Component {
       isRestarting,
       isModalVisible,
       timeoutRestarting,
-      timeRestarting
     } = this.state
 
     let options = this.transforToOptions(listNodes);
@@ -265,7 +251,7 @@ class WzStatusActionButtons extends Component {
 
     if (timeoutRestarting) {
       restarting =(
-        <RestartModal isRestarting={isRestarting} timeRestarting={timeRestarting} isCluster={clusterEnabled} />
+        <RestartModal isRestarting={isRestarting} isCluster={clusterEnabled} />
     )}
 
     return (
