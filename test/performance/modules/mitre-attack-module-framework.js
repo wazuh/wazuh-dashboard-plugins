@@ -17,17 +17,22 @@ module.exports = async function (context, commands) {
 
     // Click on MITRE module button
     await commands.wait.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"MITRE")]', WAIT_TIMEOUT)
+    //Waiting for full load of the page
+    await commands.wait.byCondition("!isNaN(parseInt(document.querySelector('.statWithLink').innerHTML))", WAIT_TIMEOUT)
+    // Start collecting metrics
+    await commands.measure.start('MITRE ATT&CK module -Framework Dashboard')
+    logger('--- Initiate measures in framework - Dashboard module ---');
     await commands.click.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"MITRE")]')
-
-    // Accesing to Intelligence Dashboard
+    logger('END MITRE BUTTON');
+    
+    // Accesing to Framework Dashboard
     await commands.wait.byXpath('//*[contains(@class,"euiTab")]//*[contains(text(),"Framework")]', WAIT_TIMEOUT)
     await commands.click.byXpath('//*[contains(@class,"euiTab")]//*[contains(text(),"Framework")]')
 
-    // Start collecting metrics
-    await commands.measure.start('MITRE ATT&CK module -Intelligence Dashboard')
-    logger('--- Initiate measures in Intelligence - Sashboard module ---');
-
+    // Search Techniques Table
     logger('Techniques Table');
+    //await commands.wait.bySelector('.euiBasicTable:not(.euiBasicTable-loading)', WAIT_TIMEOUT)
+    //AGREGAR VALIDACION DE FIN DE CARGA DE PAGINA
     await commands.wait.bySelector('[class="euiFlexGrid euiFlexGrid--gutterSmall euiFlexGrid--fourths euiFlexGrid--responsive"]', WAIT_TIMEOUT)
 
     logger('--- Finish measures ---', 'info');
