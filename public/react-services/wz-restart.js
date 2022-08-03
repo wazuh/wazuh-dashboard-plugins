@@ -8,17 +8,6 @@ export class RestartHandler {
    * @returns {Promise}
    */
 
-   static countDown = (time) => {
-    let countDown = time;
-    const interval = setInterval(() => {
-      this.setState({ timeRestarting: countDown });
-      countDown--;
-      if (countDown === 0 || !this.state.isRestarting) {
-        clearInterval(interval);
-      }
-    }, 1000);
-  }
-
   static async clusterReq() {
     try {
       return WzRequest.apiReq('GET', '/cluster/status', {});
@@ -32,13 +21,14 @@ export class RestartHandler {
    * @returns {object|Promise}
    */
 
-  static async checkDaemons(isCluster, tries) {
+  static async checkDaemons(isCluster, goToHealthcheck) {
     try {
+      console.log('chgeck',goToHealthcheck)
       const response = await WzRequest.apiReq(
         'GET',
         '/manager/status',
         {},
-        { checkCurrentApiIsUp: tries > 1 ? false : true }
+        { checkCurrentApiIsUp: goToHealthcheck }
       );
       const daemons = ((((response || {}).data || {}).data || {}).affected_items || [])[0] || {};
       const wazuhdbExists = typeof daemons['wazuh-db'] !== 'undefined';
@@ -79,9 +69,10 @@ export class RestartHandler {
     try {
       let isValid = false;
       while (tries--) {
+        const goToHealthcheck = tries === 1
         await delayAsPromise(2000);
         try {
-          isValid = await this.checkDaemons(isCluster, tries);
+          isValid = await this.checkDaemons(isCluster, goToHealthcheck);
           if (isValid) {
             updateWazuhNotReadyYet('');
             break;

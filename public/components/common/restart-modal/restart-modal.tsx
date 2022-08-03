@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react'
 import { EuiOverlayMask, EuiProgress, EuiText } from '@elastic/eui';
 
 export const RestartModal = (props) => {
-    
-    const [timeRestarting, setTimeRestarting] = useState(60)
+  
     const { isRestarting, isCluster } = props;
+    const time = isCluster ? 80 : 70;
+    const [timeRestarting, setTimeRestarting] = useState(time);
 
     const clusterOrManager = isCluster ? 'cluster' : 'manager';
 
@@ -35,7 +36,7 @@ export const RestartModal = (props) => {
                 </p>
               }
              </EuiText>
-           <EuiProgress value={timeRestarting} max={60} size="m" color='primary'/>
+           <EuiProgress value={timeRestarting} max={isCluster ? 80 : 70} size="m" color='primary'/>
          </div>
         </EuiOverlayMask>
     )
