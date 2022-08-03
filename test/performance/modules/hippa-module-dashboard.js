@@ -16,10 +16,10 @@ module.exports = async function (context, commands) {
     await commands.wait.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"HIPAA")]', WAIT_TIMEOUT)
     //Waiting for full load of the page
     await commands.wait.byCondition("!isNaN(parseInt(document.querySelector('.statWithLink').innerHTML))", WAIT_TIMEOUT)
-    await commands.click.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"HIPAA")]')
     // Start collecting metrics
-    logger('--- Initiate measures in dashboard module ---');
+    logger('--- Initiate measures in dashboard Module Dashboard');
     await commands.measure.start('HIPAA -module')
+    await commands.click.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"HIPAA")]')
     logger('Alerts volume by agent');
     await commands.wait.bySelector('[data-render-complete="true"][data-title="Alerts volume by agent"]', WAIT_TIMEOUT)    
     logger('Most common alerts');

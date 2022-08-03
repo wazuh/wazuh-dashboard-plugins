@@ -19,13 +19,12 @@ module.exports = async function (context, commands) {
     await commands.wait.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"HIPAA")]', WAIT_TIMEOUT)
     //Waiting for full load of the page
     await commands.wait.byCondition("!isNaN(parseInt(document.querySelector('.statWithLink').innerHTML))", WAIT_TIMEOUT)
+    // Start collecting metrics
+    await commands.measure.start('HIPAA module - Contols')
+    logger('--- Initiate measures in Controls---');
     await commands.click.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"HIPAA")]')
     logger('END HIPAA BUTTON');
     
-    // Start collecting metrics
-    await commands.measure.start('HIPAA module - Contols Dashboard')
-    logger('--- Initiate measures in Controls---');
-
     // Accesing to Framework Dashboard
     await commands.wait.byXpath('//*[contains(@class,"euiTab")]//*[contains(text(),"Controls")]', WAIT_TIMEOUT)
     await commands.click.byXpath('//*[contains(@class,"euiTab")]//*[contains(text(),"Controls")]')

@@ -21,10 +21,11 @@ module.exports = async function (context, commands) {
     await commands.wait.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"Integrity monitoring")]', WAIT_TIMEOUT)
     //Waiting for full load of the page
     await commands.wait.byCondition("!isNaN(parseInt(document.querySelector('.statWithLink').innerHTML))", WAIT_TIMEOUT)
-    await commands.click.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"Integrity monitoring")]')
-    
+    // Start collecting metrics
     await commands.measure.start('Integrity Monitoring module -dashboard')
     logger('--- Initiate measures in dashboard module ---');
+    await commands.click.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"Integrity monitoring")]')
+    
     // Search TOP 5 agent chart
     logger('--- TOP 5 agents ---');
     await commands.wait.bySelector('[id="Wazuh-App-Overview-FIM-Top-5-agents-pie"] [data-render-complete="true"][data-test-subj="visualizationLoader"]', WAIT_TIMEOUT)

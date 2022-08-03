@@ -16,10 +16,11 @@ module.exports = async function (context, commands) {
     await commands.wait.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"Security events")]', WAIT_TIMEOUT)
     //Waiting for full load of the page
     await commands.wait.byCondition("!isNaN(parseInt(document.querySelector('.statWithLink').innerHTML))", WAIT_TIMEOUT)
-    await commands.click.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"Security events")]')
     // Start collecting metrics
     logger('--- Initiate measures in dashboard module ---');
     await commands.measure.start('security-events-module')
+    await commands.click.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"Security events")]')
+    
     logger('Alerts level evolution');
     await commands.wait.bySelector('[data-render-complete="true"][data-title="Alert level evolution"]', WAIT_TIMEOUT)    
     logger('Alerts Top Mitre Att&ck');

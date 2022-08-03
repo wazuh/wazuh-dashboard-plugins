@@ -17,13 +17,13 @@ module.exports = async function (context, commands) {
 
     // Click on MITRE module button
     await commands.wait.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"MITRE")]', WAIT_TIMEOUT)
+    // Start collecting metrics
+    await commands.measure.start('Mitre - Intelligence');
+    logger('--- Initiate measures in Intelligence - Dashboard module ---');
     await commands.wait.byCondition("!isNaN(parseInt(document.querySelector('.statWithLink').innerHTML))", WAIT_TIMEOUT)
     //Waiting for full load of the page
     await commands.click.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"MITRE")]')
 
-    
-    // Start collecting metrics
-    await commands.measure.start('Mitre - Intelligence');
     // Accesing to Intelligence Dashboard
     await commands.wait.byXpath('//*[contains(@class,"euiTab")]//*[contains(text(),"Intelligence")]', WAIT_TIMEOUT)
     await commands.click.byXpath('//*[contains(@class,"euiTab")]//*[contains(text(),"Intelligence")]')
