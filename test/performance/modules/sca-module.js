@@ -25,7 +25,9 @@ module.exports = async function (context, commands) {
     await commands.click.byXpath('//*[contains(@class,"wz-select-agent-modal")]//tbody//*[contains(@class,"uiTableRow-isClickable")][1]')
     await commands.wait.bySelector('.euiCard__content .euiFlexItem')
     await commands.click.bySelector('[data-test-subj="sca-row-undefined"]')
-    await commands.wait.bySelector('.euiTable.euiTable--responsive')
+    await commands.wait.byXpath('//*[contains(@class,"euiFlexGroup")]//*[@data-test-subj="sca-check-row-undefined"][1]')
+    await commands.click.byXpath('//*[contains(@class,"euiFlexGroup")]//*[@data-test-subj="sca-check-row-undefined"][1]')
+    
     // Stop and collect the metrics
     logger('--- Finish measures ---', 'info');
     return commands.measure.stop();
