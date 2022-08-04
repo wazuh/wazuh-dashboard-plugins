@@ -7,6 +7,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Fixed
 
 - Fixed path in logo customization section [#4352](https://github.com/wazuh/wazuh-kibana-app/pull/4352)
+- Fixed a routes loop when reinstalling Wazuh indexer [#4373](https://github.com/wazuh/wazuh-kibana-app/pull/4373)
 
 ## Wazuh v4.3.6 - OpenSearch Dashboards 1.2.0 - Revision 4307
 
