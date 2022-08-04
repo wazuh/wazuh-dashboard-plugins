@@ -18,12 +18,12 @@ module.exports = async function (context, commands) {
     await commands.click.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"NIST 800-53")]')
 
     await commands.wait.byXpath('//*[@class="euiTabs"]//*[contains(text(),"Events")]', WAIT_TIMEOUT)
+    // Start collecting metrics
+    await commands.measure.start('NIST 800-53 module - Events')
+    logger('--- Initiate measures in Intelligence - Events module ---');
+    
     await commands.click.byXpath('//*[@class="euiTabs"]//*[contains(text(),"Events")]')
 
-    // Start collecting metrics
-    await commands.measure.start('NIST 800-53 module - Dashboard')
-    logger('--- Initiate measures in Intelligence - Dashboard module ---');
-    
     logger('--- WAZUH ALERT LIST ---')
     await commands.wait.bySelector('.sidebar-list li', WAIT_TIMEOUT)
     

@@ -18,11 +18,12 @@ module.exports = async function (context, commands) {
     await commands.click.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"PCI DSS")]')
 
     await commands.wait.byXpath('//*[@class="euiTabs"]//*[contains(text(),"Events")]', WAIT_TIMEOUT)
-    await commands.click.byXpath('//*[@class="euiTabs"]//*[contains(text(),"Events")]')
-
+    
     // Start collecting metrics
     await commands.measure.start('PCI DSS module - Events')
     logger('--- Initiate measures in Intelligence - Events module ---');
+    
+    await commands.click.byXpath('//*[@class="euiTabs"]//*[contains(text(),"Events")]')
     
     logger('--- WAZUH ALERT LIST ---')
     await commands.wait.bySelector('.sidebar-list li', WAIT_TIMEOUT)
