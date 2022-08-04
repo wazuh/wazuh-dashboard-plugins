@@ -298,15 +298,8 @@ export class SavedObject {
       .every(indexPatternID => indexPatternsSavedObjects.savedObjects.some(savedObject => savedObject.id === indexPatternID));
 
     if (!indexPatternsSavedObjectsCanBeFound) {
-      throw new Error(`Saved object for the index pattern can not be found.
-The index that stores the saved objects could have wrong field mappings.
-Remediations:
-- Restart the ${PLUGIN_PLATFORM_NAME} service. This could generate another index with the valid field mappings.
-- Remove the used index with wrong mapping and restart the ${PLUGIN_PLATFORM_NAME} service.
-<a href="${webDocumentationLink('user-manual/wazuh-dashboard/troubleshooting.html#saved-object-for-the-index-pattern-can-not-be-found')}" target="_blank">Troubleshooting</a>
-`
+      throw new Error(`Saved object for index pattern not found.
+Restart the ${PLUGIN_PLATFORM_NAME} service to initialize the index. More information in <a href="${webDocumentationLink('user-manual/wazuh-dashboard/troubleshooting.html#saved-object-for-index-pattern-not-found')}" target="_blank">troubleshooting</a>.`
 )};
   }
 }
-
-
