@@ -11,26 +11,23 @@ module.exports = async function (context, commands) {
     await commands.wait.bySelector('a[href$="/app/wazuh"]', WAIT_TIMEOUT)
     await commands.click.bySelector('a[href$="/app/wazuh"]')
     //Wait for an Wazuh home page component to be loaded
-    await commands.wait.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"Security events")]', WAIT_TIMEOUT)
+    await commands.wait.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"Security configuration assessment")]', WAIT_TIMEOUT)
     // Click on Security Events module button
-    await commands.wait.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"Security events")]', WAIT_TIMEOUT)
-    //Waiting for full load of the page
+    await commands.wait.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"Security configuration assessment")]', WAIT_TIMEOUT)
     await commands.wait.byCondition("!isNaN(parseInt(document.querySelector('.statWithLink').innerHTML))", WAIT_TIMEOUT)
+    await commands.click.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"Security configuration assessment")]')
+    await commands.wait.byXpath('//*[contains(text(),"Select agent")]')
+    await commands.click.byXpath('//*[contains(text(),"Select agent")]')
     // Start collecting metrics
     logger('--- Initiate measures in dashboard module ---');
-    await commands.measure.start('security-events-module')
-    await commands.click.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"Security events")]')
+    await commands.measure.start('sca')
+    await commands.wait.byXpath('//*[contains(@class,"wz-select-agent-modal")]//tbody//*[contains(@class,"uiTableRow-isClickable")][1]')
+    await commands.click.byXpath('//*[contains(@class,"wz-select-agent-modal")]//tbody//*[contains(@class,"uiTableRow-isClickable")][1]')
+    await commands.wait.bySelector('.euiCard__content .euiFlexItem')
+    await commands.click.bySelector('[data-test-subj="sca-row-undefined"]')
+    await commands.wait.byXpath('//*[contains(@class,"euiFlexGroup")]//*[@data-test-subj="sca-check-row-undefined"][1]')
+    await commands.click.byXpath('//*[contains(@class,"euiFlexGroup")]//*[@data-test-subj="sca-check-row-undefined"][1]')
     
-    logger('Alerts level evolution');
-    await commands.wait.bySelector('[data-render-complete="true"][data-title="Alert level evolution"]', WAIT_TIMEOUT)    
-    logger('Alerts Top Mitre Att&ck');
-    await commands.wait.bySelector('[data-render-complete="true"][data-title="Alerts"]', WAIT_TIMEOUT)    
-    logger('Top 5 Agent');
-    await commands.wait.bySelector('[data-render-complete="true"][data-title="Top 5 agents"]', WAIT_TIMEOUT)
-    logger('Alerts Evolutionn Top 5 Agent');
-    await commands.wait.bySelector('[data-render-complete="true"][data-title="Alerts evolution Top 5 agents"]', WAIT_TIMEOUT)
-    logger('Security Alerts Table');
-    await commands.wait.bySelector('[data-test-subj="tableHeaderCell_timestamp_1"]', WAIT_TIMEOUT)
     // Stop and collect the metrics
     logger('--- Finish measures ---', 'info');
     return commands.measure.stop();

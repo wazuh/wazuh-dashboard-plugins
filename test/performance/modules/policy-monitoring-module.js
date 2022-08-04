@@ -12,25 +12,23 @@ module.exports = async function (context, commands) {
     await commands.click.bySelector('a[href$="/app/wazuh"]')
     //Wait for an Wazuh home page component to be loaded
     await commands.wait.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"Security events")]', WAIT_TIMEOUT)
-    // Click on Security Events module button
-    await commands.wait.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"Security events")]', WAIT_TIMEOUT)
+    // Click on Policy Monitoring module button
+    await commands.wait.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"Policy monitoring")]', WAIT_TIMEOUT)
     //Waiting for full load of the page
     await commands.wait.byCondition("!isNaN(parseInt(document.querySelector('.statWithLink').innerHTML))", WAIT_TIMEOUT)
     // Start collecting metrics
     logger('--- Initiate measures in dashboard module ---');
-    await commands.measure.start('security-events-module')
-    await commands.click.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"Security events")]')
+    await commands.measure.start('Policy monitoring-module')
+    await commands.click.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"Policy monitoring")]')
     
-    logger('Alerts level evolution');
-    await commands.wait.bySelector('[data-render-complete="true"][data-title="Alert level evolution"]', WAIT_TIMEOUT)    
-    logger('Alerts Top Mitre Att&ck');
-    await commands.wait.bySelector('[data-render-complete="true"][data-title="Alerts"]', WAIT_TIMEOUT)    
+    logger('Events over time');
+    await commands.wait.bySelector('[data-render-complete="true"][data-title="Events over time"]', WAIT_TIMEOUT)    
+    logger('Rule distribution');
+    await commands.wait.bySelector('[data-render-complete="true"][data-title="Top 5 rules"]', WAIT_TIMEOUT)    
     logger('Top 5 Agent');
-    await commands.wait.bySelector('[data-render-complete="true"][data-title="Top 5 agents"]', WAIT_TIMEOUT)
-    logger('Alerts Evolutionn Top 5 Agent');
-    await commands.wait.bySelector('[data-render-complete="true"][data-title="Alerts evolution Top 5 agents"]', WAIT_TIMEOUT)
-    logger('Security Alerts Table');
-    await commands.wait.bySelector('[data-test-subj="tableHeaderCell_timestamp_1"]', WAIT_TIMEOUT)
+    await commands.wait.bySelector('[data-render-complete="true"][data-title="Top 5 agents pie"]', WAIT_TIMEOUT)
+    logger('Events per control type evolution');
+    await commands.wait.bySelector('[data-render-complete="true"][data-title="Events per control type evolution"]', WAIT_TIMEOUT)
     // Stop and collect the metrics
     logger('--- Finish measures ---', 'info');
     return commands.measure.stop();
