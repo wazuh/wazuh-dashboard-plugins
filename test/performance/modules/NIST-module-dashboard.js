@@ -15,11 +15,11 @@ module.exports = async function (context, commands) {
     //Wait for an Wazuh home page component to be loaded
     await commands.wait.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"NIST 800-53")]', WAIT_TIMEOUT)
     await commands.wait.byCondition("!isNaN(parseInt(document.querySelector('.statWithLink').innerHTML))", WAIT_TIMEOUT)
-    await commands.click.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"NIST 800-53")]')
-
+    
     // Start collecting metrics
     await commands.measure.start('NIST 800-53 module - Dashboard')
     logger('--- Initiate measures in Intelligence - Dashboard module ---');
+    await commands.click.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"NIST 800-53")]')
     
     logger('--- Most active agents ---')
     await commands.wait.bySelector('#moduleDashboard .euiFlexItem.h-100 #Wazuh-App-Overview-NIST-Agents .visLib.visLib--legend-right', WAIT_TIMEOUT)

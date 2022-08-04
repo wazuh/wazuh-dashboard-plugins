@@ -15,11 +15,11 @@ module.exports = async function (context, commands) {
     //Wait for an Wazuh home page component to be loaded
     await commands.wait.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"PCI DSS")]', WAIT_TIMEOUT)
     await commands.wait.byCondition("!isNaN(parseInt(document.querySelector('.statWithLink').innerHTML))", WAIT_TIMEOUT)
-    await commands.click.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"PCI DSS")]')
-
+    
     // Start collecting metrics
     await commands.measure.start('PCI DSS module - Dashboard')
     logger('--- Initiate measures in Intelligence - Dashboard module ---');
+    await commands.click.byXpath('//*[contains(@class,"euiTitle euiTitle--small euiCard__title")]//*[contains(text(),"PCI DSS")]')
     
     logger('--- PCI DSS requirements ---')
     await commands.wait.bySelector('#moduleDashboard .euiFlexItem.h-100 #Wazuh-App-Overview-PCI-DSS-requirements .visLib.visLib--legend-right', WAIT_TIMEOUT)
