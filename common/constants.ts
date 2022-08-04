@@ -224,6 +224,7 @@ export const WAZUH_DEFAULT_APP_CONFIG = {
   hideManagerAlerts: false,
   'logs.level': 'info',
   'enrollment.dns': '',
+  'enrollment.password': '',
   'customization.logo.app': '',
   'customization.logo.sidebar': '',
   'customization.logo.healthcheck':'',
