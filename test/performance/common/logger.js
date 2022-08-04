@@ -7,5 +7,4 @@ module.exports = function (message = '', level = 'INFO') {
         default:
             console.log(`[${timestamp}] ${level.toUpperCase()}: ${message}`);
     }
-    console.log(`[${timestamp}] ${level.toUpperCase()}: ${message}`);
 }

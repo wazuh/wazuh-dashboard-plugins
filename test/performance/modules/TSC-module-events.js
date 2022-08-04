@@ -21,8 +21,8 @@ module.exports = async function (context, commands) {
     await commands.click.byXpath('//*[@class="euiTabs"]//*[contains(text(),"Events")]')
 
     // Start collecting metrics
-    await commands.measure.start('TSC module - Dashboard')
-    logger('--- Initiate measures in Intelligence - Dashboard module ---');
+    await commands.measure.start('TSC module - Events')
+    logger('--- Initiate measures in Intelligence - Events module ---');
     
     logger('--- WAZUH ALERT LIST ---')
     await commands.wait.bySelector('.sidebar-list li', WAIT_TIMEOUT)

@@ -20,8 +20,8 @@ module.exports = async function (context, commands) {
     await commands.wait.byXpath('//*[@class="euiTabs"]//*[contains(text(),"Controls")]', WAIT_TIMEOUT)
     
     // Start collecting metrics
-    await commands.measure.start('GDPR module - Dashboard')
-    logger('--- Initiate measures in Intelligence - Dashboard module ---');
+    await commands.measure.start('GDPR module - Controls')
+    logger('--- Initiate measures in Intelligence - Controls module ---');
     
     await commands.click.byXpath('//*[@class="euiTabs"]//*[contains(text(),"Controls")]')
     
