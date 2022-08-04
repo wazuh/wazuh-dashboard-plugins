@@ -404,3 +404,6 @@ export const UI_ORDER_AGENT_STATUS = [
 
 // Documentation
 export const DOCUMENTATION_WEB_BASE_URL = "https://documentation.wazuh.com";
+
+// Default Elasticsearch user name context
+export const ELASTIC_NAME = 'elastic';
