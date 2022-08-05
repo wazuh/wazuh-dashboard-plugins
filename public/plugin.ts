@@ -67,20 +67,21 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
             'GET',
             `/api/check-wazuh`,
           )
+          
           params.element.classList.add('dscAppWrapper', 'wz-app');
           const unmount = await renderApp(innerAngularName, params.element);
           //Update if user has Wazuh disabled
           this.stateUpdater.next(() => {
-            if (response.isWazuhDisabled) {
+            if (response.data.isWazuhDisabled) {
               unmount();
             }
             return {
-              status: response.isWazuhDisabled,
+              status: response.data.isWazuhDisabled,
               category: {
                 id: 'wazuh',
                 label: 'Wazuh',
                 order: 0,
-                euiIconType: core.http.basePath.prepend(response.logoSidebar ? getAssetURL(response.logoSidebar) : getThemeAssetURL('icon.svg', UI_THEME)),
+                euiIconType: core.http.basePath.prepend(response.data.logoSidebar ? getAssetURL(response.data.logoSidebar) : getThemeAssetURL('icon.svg', UI_THEME)),
               }}
           })
           return () => {
