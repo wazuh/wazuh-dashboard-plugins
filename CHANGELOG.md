@@ -7,7 +7,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Fixed
 
 - Fixed path in logo customization section [#4352](https://github.com/wazuh/wazuh-kibana-app/pull/4352)
-- Fixed a TypeError in Firefox. Change the Get request that was made with a Kibana core.http.get(/api/check-wazuh) resource to the WzRequest.genericReq resource and add a test capture to public/plugin.ts wrapping the request so that the error is detected when the navigator does not work with the V8 engine [#4362](https://github.com/wazuh/wazuh-kibana-app/pull/4362)
+- Fixed a TypeError in Firefox. Change the Get request that was made with a Kibana core.http.get(/api/check-wazuh) resource to the WzRequest.genericReq resource and it no longer fails, also add a test capture to public/plugin.ts that wraps the request and in case of failure, the error is detected when the browser does not work with the V8 engine. [#4362](https://github.com/wazuh/wazuh-kibana-app/pull/4362)
 - Fixed an error of an undefined username hash related to reporting when using Kibana with X-Pack and security was disabled [#4358](https://github.com/wazuh/wazuh-kibana-app/pull/4358)
 
 ## Wazuh v4.3.6 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4307
