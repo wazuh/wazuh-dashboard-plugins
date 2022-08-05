@@ -10,6 +10,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed a problem with the group's report, when the group has no agents [#4350](https://github.com/wazuh/wazuh-kibana-app/pull/4350)
 - Fixed path in logo customization section [#4352](https://github.com/wazuh/wazuh-kibana-app/pull/4352)
 - Fixed persistence of the plugin registry file between updates [#4359](https://github.com/wazuh/wazuh-kibana-app/pull/4359)
+- Fixed searchbar error on SCA Inventory table [#4367](https://github.com/wazuh/wazuh-kibana-app/pull/4367)
 
 # Removed
 
