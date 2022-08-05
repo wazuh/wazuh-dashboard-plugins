@@ -23,12 +23,16 @@ import {
 
 import withWzConfig from '../util-hocs/wz-config';
 import { wodleBuilder } from '../utils/builders';
+import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
 const helpLinks = [
   {
+    text: 'Monitoring containers activity',
+    href: webDocumentationLink('container-security/docker-monitor/monitoring-containers-activity.html')
+  },
+  {
     text: 'Docker listener module reference',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-docker.html'
+    href: webDocumentationLink('user-manual/reference/ossec-conf/wodle-docker.html')
   }
 ];
 

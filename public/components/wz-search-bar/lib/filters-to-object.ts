@@ -11,30 +11,46 @@
  */
 
 export interface IFilter {
-  field: string
-  value: any
+  field: string | 'q';
+  value: any;
 }
+import { QInterpreter } from './q-interpreter';
 
+/**
+ * Concatenate string filters to one and only query string
+ *
+ * @param oldQ
+ * @param newQ
+ * @returns string
+ */
 function buildQFilter(oldQ, newQ) {
-  const parsedQ = (oldQ ? `(${newQ})` : newQ).replace(/ and | or /gi, parseConjuntions);
-  return `${!!oldQ ? `${oldQ};` : ''}${parsedQ}`;
+  const queryString = new QInterpreter(newQ).queriesToString();
+  let parsedNewQ = '';
+  if (queryString) {
+    parsedNewQ = oldQ ? `(${queryString})` : queryString;
+  }
+  return `${!!oldQ ? `${oldQ};` : ''}${parsedNewQ}`;
 }
 
-const parseConjuntions =  (arg) => ((/ and /gi.test(arg)) ? ';': ','); 
-
+/**
+ * Receives a list of filters and return a query string translated
+ *
+ * @param filters
+ * @returns object with query string and filters
+ */
 export function filtersToObject(filters: IFilter[]) {
   return filters.reduce((acc, filter) => {
-    const {field, value} = filter;
+    const { field, value } = filter;
     if (field === 'q') {
       return {
         ...acc,
         q: buildQFilter(acc['q'], value),
-      }
+      };
     }
     const newAcc = {
       ...acc,
       [field]: value,
-    }
+    };
     return newAcc;
-  }, {})
+  }, {});
 }
