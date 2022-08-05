@@ -259,30 +259,30 @@ ${splitDescription(configEquivalences['enrollment.password'])}
 # The following configuration is the default structure to define a host.
 #
 # hosts:
-# # Host ID / name,
+#   # Host ID / name,
 #   - env-1:
-#     # Host URL
-#     url: https://env-1.example
-#     # Host / API port
-#     port: 55000
-#     # Host / API username
-#     username: wazuh-wui
-#     # Host / API password
-#     password: wazuh-wui
-#     # Use RBAC or not. If set to true, the username must be "wazuh-wui".
-#     run_as: true
+#       # Host URL
+#       url: https://env-1.example
+#       # Host / API port
+#       port: 55000
+#       # Host / API username
+#       username: wazuh-wui
+#       # Host / API password
+#       password: wazuh-wui
+#       # Use RBAC or not. If set to true, the username must be "wazuh-wui".
+#       run_as: true
 #   - env-2:
-#     url: https://env-2.example
-#     port: 55000
-#     username: wazuh-wui
-#     password: wazuh-wui
-#     run_as: true
+#       url: https://env-2.example
+#       port: 55000
+#       username: wazuh-wui
+#       password: wazuh-wui
+#       run_as: true
 
 hosts:
   - default:
-    url: https://localhost
-    port: 55000
-    username: wazuh-wui
-    password: wazuh-wui
-    run_as: false
+      url: https://localhost
+      port: 55000
+      username: wazuh-wui
+      password: wazuh-wui
+      run_as: false
 `;
