@@ -47,7 +47,7 @@ export class SuggestHandler extends BaseHandler {
     this.filters = props.filters;
     this.inputStage = 'field';
     this.setInputValue = setInputValue;
-    this.suggestItems = props.suggestions;
+    this.suggestItems = props.suggestions || [];
     this.searchType = 'search';
     this.lastCall = 0;
     if (inputRef) this.inputRef = inputRef;
