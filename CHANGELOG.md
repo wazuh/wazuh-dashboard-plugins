@@ -9,6 +9,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed an error during the generation of a group's report, if the request to the Wazuh API fails [#4350](https://github.com/wazuh/wazuh-kibana-app/pull/4350)
 - Fixed a problem with the group's report, when the group has no agents [#4350](https://github.com/wazuh/wazuh-kibana-app/pull/4350)
 - Fixed path in logo customization section [#4352](https://github.com/wazuh/wazuh-kibana-app/pull/4352)
+- Fixed a TypeError in Firefox. Change the Get request that was made with a Kibana core.http.get(/api/check-wazuh) resource to the WzRequest.genericReq resource and it no longer fails, also add a test capture to public/plugin.ts that wraps the request and in case of failure, the error is detected when the browser does not work with the V8 engine. [#4362](https://github.com/wazuh/wazuh-kibana-app/pull/4362)
+- Fixed an error of an undefined username hash related to reporting when using Kibana with X-Pack and security was disabled [#4358](https://github.com/wazuh/wazuh-kibana-app/pull/4358)
 - Fixed persistence of the plugin registry file between updates [#4359](https://github.com/wazuh/wazuh-kibana-app/pull/4359)
 - Fixed searchbar error on SCA Inventory table [#4367](https://github.com/wazuh/wazuh-kibana-app/pull/4367)
 
