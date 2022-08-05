@@ -134,16 +134,8 @@ export class WazuhReportingCtrl {
         } else if (section === 'groupConfig') {
           printer.addContent({
             text: 'Agents in group',
-            style: { fontSize: 14, color: '#000' },
-            margin: [0, 20, 0, 0],
+            style: 'h1',
           });
-          if (section === 'groupConfig' && !Object.keys(isAgents).length) {
-            printer.addContent({
-              text: 'There are still no agents in this group.',
-              style: { fontSize: 12, color: '#000' },
-              margin: [0, 10, 0, 0],
-            });
-          }
         }
         printer.addNewLine();
       }
@@ -154,7 +146,7 @@ export class WazuhReportingCtrl {
           printer,
           isAgents,
           apiId,
-          section === 'groupConfig' ? tab : false
+          section === 'groupConfig' ? tab : ''
         );
       }
 
@@ -188,8 +180,6 @@ export class WazuhReportingCtrl {
           style: 'standard',
         });
       }
-
-      return;
     } catch (error) {
       log('reporting:renderHeader', error.message || error);
       return Promise.reject(error);
@@ -201,57 +191,44 @@ export class WazuhReportingCtrl {
    * @param {Array<Strings>} ids ids of agents
    * @param {String} apiId API id
    */
-  private async buildAgentsTable(context, printer: ReportPrinter, agentIDs: string[], apiId: string, multi = false) {
+  private async buildAgentsTable(context, printer: ReportPrinter, agentIDs: string[], apiId: string, groupID: string = '') {
     const dateFormat = await context.core.uiSettings.client.get('dateFormat');
-    if (!agentIDs || !agentIDs.length) return;
+    if ((!agentIDs || !agentIDs.length) && !groupID) return;
     log('reporting:buildAgentsTable', `${agentIDs.length} agents for API ${apiId}`, 'info');
     try {
-      let agentRows = [];
-      if (multi) {
-        try {
-          const agentsResponse = await context.wazuh.api.client.asCurrentUser.request(
+      let agentsData = [];
+      if (groupID) {
+        let totalAgentsInGroup = null;
+        do{
+          const { data: { data: { affected_items, total_affected_items } } } = await context.wazuh.api.client.asCurrentUser.request(
             'GET',
-            `/groups/${multi}/agents`,
-            {},
+            `/groups/${groupID}/agents`,
+            {
+              params: {
+                offset: agentsData.length,
+                select: 'dateAdd,id,ip,lastKeepAlive,manager,name,os.name,os.version,version',
+              }
+            },
             { apiHostID: apiId }
           );
-          const agentsData =
-            agentsResponse &&
-            agentsResponse.data &&
-            agentsResponse.data.data &&
-            agentsResponse.data.data.affected_items;
-          agentRows = (agentsData || []).map((agent) => ({
-            ...agent,
-            manager: agent.manager || agent.manager_host,
-            os:
-              agent.os && agent.os.name && agent.os.version
-                ? `${agent.os.name} ${agent.os.version}`
-                : '',
-          }));
-        } catch (error) {
-          log(
-            'reporting:buildAgentsTable',
-            `Skip agent due to: ${error.message || error}`,
-            'debug'
-          );
-        }
+          !totalAgentsInGroup && (totalAgentsInGroup = total_affected_items);
+          agentsData = [...agentsData, ...affected_items];
+        }while(agentsData.length < totalAgentsInGroup);
       } else {
         for (const agentID of agentIDs) {
           try {
-            const agentResponse = await context.wazuh.api.client.asCurrentUser.request(
+            const { data: { data: { affected_items: [agent] } } } = await context.wazuh.api.client.asCurrentUser.request(
               'GET',
               `/agents`,
-              { params: { q: `id=${agentID}` } },
+              { 
+                params: {
+                  q: `id=${agentID}`,
+                  select: 'dateAdd,id,ip,lastKeepAlive,manager,name,os.name,os.version,version',
+                } 
+              },
               { apiHostID: apiId }
             );
-            const [agent] = agentResponse.data.data.affected_items;
-            agentRows.push({
-              ...agent,
-              manager: agent.manager || agent.manager_host,
-              os: (agent.os && agent.os.name && agent.os.version) ? `${agent.os.name} ${agent.os.version}` : '',
-              lastKeepAlive: moment(agent.lastKeepAlive).format(dateFormat),
-              dateAdd: moment(agent.dateAdd).format(dateFormat)
-            });
+            agentsData.push(agent);
           } catch (error) {
             log(
               'reporting:buildAgentsTable',
@@ -261,19 +238,37 @@ export class WazuhReportingCtrl {
           }
         }
       }
-      printer.addSimpleTable({
-        columns: [
-          { id: 'id', label: 'ID' },
-          { id: 'name', label: 'Name' },
-          { id: 'ip', label: 'IP' },
-          { id: 'version', label: 'Version' },
-          { id: 'manager', label: 'Manager' },
-          { id: 'os', label: 'OS' },
-          { id: 'dateAdd', label: 'Registration date' },
-          { id: 'lastKeepAlive', label: 'Last keep alive' },
-        ],
-        items: agentRows,
-      });
+
+      if(agentsData.length){
+        // Print a table with agent/s information
+        printer.addSimpleTable({
+          columns: [
+            { id: 'id', label: 'ID' },
+            { id: 'name', label: 'Name' },
+            { id: 'ip', label: 'IP' },
+            { id: 'version', label: 'Version' },
+            { id: 'manager', label: 'Manager' },
+            { id: 'os', label: 'OS' },
+            { id: 'dateAdd', label: 'Registration date' },
+            { id: 'lastKeepAlive', label: 'Last keep alive' },
+          ],
+          items: agentsData.map((agent) => {
+            return {
+              ...agent,
+              os: (agent.os && agent.os.name && agent.os.version) ? `${agent.os.name} ${agent.os.version}` : '',
+              lastKeepAlive: moment(agent.lastKeepAlive).format(dateFormat),
+              dateAdd: moment(agent.dateAdd).format(dateFormat)
+            }
+          }),
+        });
+      }else if(!agentsData.length && groupID){
+        // For group reports when there is no agents in the group
+        printer.addContent({
+          text: 'There are no agents in this group.',
+          style: { fontSize: 12, color: '#000' },
+        });
+      }
+      
     } catch (error) {
       log('reporting:buildAgentsTable', error.message || error);
       return Promise.reject(error);
@@ -1249,19 +1244,15 @@ export class WazuhReportingCtrl {
         style: 'h1',
       });
 
+      // Group configuration
       if (components['0']) {
-        let configuration = {};
-        try {
-          const configurationResponse = await context.wazuh.api.client.asCurrentUser.request(
-            'GET',
-            `/groups/${groupID}/configuration`,
-            {},
-            { apiHostID: apiId }
-          );
-          configuration = configurationResponse.data.data;
-        } catch (error) {
-          log('reporting:createReportsGroups', error.message || error, 'debug');
-        }
+
+        const { data: { data: configuration } } = await context.wazuh.api.client.asCurrentUser.request(
+          'GET',
+          `/groups/${groupID}/configuration`,
+          {},
+          { apiHostID: apiId }
+        );
 
         if (
           configuration.affected_items.length > 0 &&
@@ -1441,25 +1432,15 @@ export class WazuhReportingCtrl {
           });
         }
       }
+
+      // Agents in group
       if (components['1']) {
-        let agentsInGroup = [];
-        try {
-          const agentsInGroupResponse = await context.wazuh.api.client.asCurrentUser.request(
-            'GET',
-            `/groups/${groupID}/agents`,
-            {},
-            { apiHostID: apiId }
-          );
-          agentsInGroup = agentsInGroupResponse.data.data.affected_items;
-        } catch (error) {
-          log('reporting:report', error.message || error, 'debug');
-        }
         await this.renderHeader(
           context,
           printer,
           'groupConfig',
           groupID,
-          (agentsInGroup || []).map((x) => x.id),
+          [],
           apiId
         );
       }

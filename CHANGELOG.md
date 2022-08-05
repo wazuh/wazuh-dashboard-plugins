@@ -6,7 +6,13 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
+- Fixed an error during the generation of a group's report, if the request to the Wazuh API fails [#4350](https://github.com/wazuh/wazuh-kibana-app/pull/4350)
+- Fixed a problem with the group's report, when the group has no agents [#4350](https://github.com/wazuh/wazuh-kibana-app/pull/4350)
 - Fixed path in logo customization section [#4352](https://github.com/wazuh/wazuh-kibana-app/pull/4352)
+
+# Removed
+
+- Removed the use of `manager_host` field related to agent information of Wazuh API responses, which is obsolete [#4350](https://github.com/wazuh/wazuh-kibana-app/pull/4350)
 
 ## Wazuh v4.3.6 - OpenSearch Dashboards 1.2.0 - Revision 4307
 
