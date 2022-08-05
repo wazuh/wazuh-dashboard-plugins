@@ -59,8 +59,6 @@ class WzStatusActionButtons extends Component {
     this._isMounted = true;
   }
 
-  componentDidUpdate() {}
-
   componentWillUnmount() {
     this._isMounted = false;
   }

@@ -23,7 +23,6 @@ export class RestartHandler {
 
   static async checkDaemons(isCluster, goToHealthcheck) {
     try {
-      console.log('chgeck',goToHealthcheck)
       const response = await WzRequest.apiReq(
         'GET',
         '/manager/status',
@@ -137,7 +136,6 @@ export class RestartHandler {
         const str = validationError.detail;
         throw new Error(str);
       }
-      await delayAsPromise(15000);
       const result = await WzRequest.apiReq('PUT', `/cluster/restart${node_param}`, {});
       return result;
     } catch (error) {
