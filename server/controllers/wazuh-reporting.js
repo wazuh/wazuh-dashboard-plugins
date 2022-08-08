@@ -1898,7 +1898,7 @@ export class WazuhReportingCtrl {
 
         // Generate the filename of report depeding on request parameters
         const filename = tab === 'syscollector'
-          ? `wazuh-agent-inventory-${agentID}-${this.generateReportTimestamp()}.pdf`
+          ? `wazuh-agent-inventory-${isAgents}-${this.generateReportTimestamp()}.pdf`
           : (isAgentConfig
             ? `wazuh-agent-configuration-${agentID}-${this.generateReportTimestamp()}.pdf`
             : ( isGroupConfig
