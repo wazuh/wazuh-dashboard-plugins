@@ -1,11 +1,11 @@
 import { ASSETS_PUBLIC_URL, PLUGIN_PLATFORM_NAME } from "../../common/constants";
 
 export const configEquivalences = {
-  pattern: 'Default index pattern to use on the app.',
-  'customization.logo.app':`Define the name of the app logo saved in the path ${ASSETS_PUBLIC_URL}`,
-  'customization.logo.sidebar':`Define the name of the sidebar logo saved in the path ${ASSETS_PUBLIC_URL}`,
-  'customization.logo.healthcheck':`Define the name of the health-check logo saved in the path ${ASSETS_PUBLIC_URL}`,
-  'customization.logo.reports':`Define the name of the reports logo (.png) saved in the path ${ASSETS_PUBLIC_URL}`,
+  pattern: "Default index pattern to use on the app. If there's no valid index pattern, the app will automatically create one with the name indicated in this option.",
+  'customization.logo.app':`Set the name of the app logo stored at ${ASSETS_PUBLIC_URL}`,
+  'customization.logo.sidebar':`Set the name of the sidebar logo stored at ${ASSETS_PUBLIC_URL}`,
+  'customization.logo.healthcheck':`Set the name of the health-check logo stored at ${ASSETS_PUBLIC_URL}`,
+  'customization.logo.reports':`Set the name of the reports logo (.png) stored at ${ASSETS_PUBLIC_URL}`,
   'checks.pattern':
     'Enable or disable the index pattern health check when opening the app.',
   'checks.template':
@@ -23,6 +23,9 @@ export const configEquivalences = {
       `Change the default value of the ${PLUGIN_PLATFORM_NAME} max buckets configuration`,
   'extensions.pci': 'Enable or disable the PCI DSS tab on Overview and Agents.',
   'extensions.gdpr': 'Enable or disable the GDPR tab on Overview and Agents.',
+  'extensions.hipaa': 'Enable or disable the HIPAA tab on Overview and Agents.',
+  'extensions.nist': 'Enable or disable the NIST 800-53 tab on Overview and Agents.',
+  'extensions.tsc': 'Enable or disable the TSC tab on Overview and Agents.',
   'extensions.audit': 'Enable or disable the Audit tab on Overview and Agents.',
   'extensions.oscap':
     'Enable or disable the Open SCAP tab on Overview and Agents.',
@@ -38,41 +41,43 @@ export const configEquivalences = {
   'extensions.docker':
     'Enable or disable the Docker listener tab on Overview and Agents.',
   timeout:
-    'Defines the maximum time the app will wait for an API response when making requests to it.',
+    'Maximum time, in milliseconds, the app will wait for an API response when making requests to it. It will be ignored if the value is set under 1500 milliseconds.',
   'ip.selector':
-    'Defines if the user is allowed to change the selected index pattern directly from the top menu bar.',
+    'Define if the user is allowed to change the selected index pattern directly from the top menu bar.',
   'ip.ignore':
     'Disable certain index pattern names from being available in index pattern selector from the Wazuh app.',
   'wazuh.monitoring.enabled':
     'Enable or disable the wazuh-monitoring index creation and/or visualization.',
   'wazuh.monitoring.frequency':
-    'Define in seconds the frequency the app generates a new document on the wazuh-monitoring index.',
+    'Frequency, in seconds, of API requests to get the state of the agents and create a new document in the wazuh-monitoring index with this data.',
   'wazuh.monitoring.shards':
     'Define the number of shards to use for the wazuh-monitoring-* indices.',
   'wazuh.monitoring.replicas':
     'Define the number of replicas to use for the wazuh-monitoring-* indices.',
   'wazuh.monitoring.creation':
-    'Define the interval in which the wazuh-monitoring index will be created.',
+    'Define the interval in which a new wazuh-monitoring index will be created.',
   'wazuh.monitoring.pattern':
-    'Default index pattern to use on the app for Wazuh monitoring.',
+    'Default index pattern to use for Wazuh monitoring.',
   hideManagerAlerts:
-    'Hide the alerts of the manager in all dashboards.',
+    'Hide the alerts of the manager in every dashboard.',
   'logs.level':
-    'Set the app logging level, allowed values are info and debug. Default is info.',
+    'Logging level of the App.',
   'enrollment.dns':
-    'Set the Wazuh server address in the agent deployment.',
+    'Specifies the Wazuh registration server, used for the agent enrollment.',
+  'enrollment.password':
+    'Specifies the password used to authenticate during the agent enrollment.',
   'cron.prefix':
     'Define the index prefix of predefined jobs.',
   'cron.statistics.status':
     'Enable or disable the statistics tasks.',
   'cron.statistics.apis':
-    'Enter the ID of the APIs you want to save data from, leave this empty to run the task on all configured APIs.',
+    'Enter the ID of the hosts you want to save data from, leave this empty to run the task on every host.',
   'cron.statistics.interval': 'Define the frequency of task execution using cron schedule expressions.',
-  'cron.statistics.index.name': 'Define the name of the index in which the documents are to be saved.',
-  'cron.statistics.index.creation': 'Define the interval in which the index will be created.',
+  'cron.statistics.index.name': 'Define the name of the index in which the documents will be saved.',
+  'cron.statistics.index.creation': 'Define the interval in which a new index will be created.',
   'cron.statistics.index.shards': 'Define the number of shards to use for the statistics indices.',
   'cron.statistics.index.replicas': 'Define the number of replicas to use for the statistics indices.',
-  'alerts.sample.prefix': 'Define the index name prefix of sample alerts. It must match with the template used by the index pattern to avoid unknown fields in dashboards.',
+  'alerts.sample.prefix': 'Define the index name prefix of sample alerts. It must match the template used by the index pattern to avoid unknown fields in dashboards.',
 };
 
 export const nameEquivalence = {
