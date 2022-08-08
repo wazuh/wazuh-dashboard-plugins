@@ -13,7 +13,7 @@
 import { WAZUH_DEFAULT_APP_CONFIG } from '../../../common/constants';
 
 export async function getWzConfig($q, genericReq, wazuhConfig) {
-  const defaultConfig = WAZUH_DEFAULT_APP_CONFIG;
+  const defaultConfig = { ...WAZUH_DEFAULT_APP_CONFIG };
 
   try {
     const config = await genericReq.request('GET', '/utils/configuration', {});
