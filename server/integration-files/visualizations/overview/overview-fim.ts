@@ -476,7 +476,7 @@ export default [
               otherBucketLabel: 'Other',
               missingBucket: false,
               missingBucketLabel: 'Missing',
-              size: 100,
+              size: 1000,
               order: 'desc',
               orderBy: '1',
               customLabel: 'Agent',

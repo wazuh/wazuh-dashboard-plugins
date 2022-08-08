@@ -14,6 +14,7 @@ import fs from 'fs';
 import { WAZUH_MODULES } from '../../common/wazuh-modules';
 import * as TimSort from 'timsort';
 import { ErrorResponse } from '../lib/error-response';
+import AlertsSummary from '../lib/reporting/alerts-summary';
 import * as VulnerabilityRequest from '../lib/reporting/vulnerability-request';
 import * as OverviewRequest from '../lib/reporting/overview-request';
 import * as RootcheckRequest from '../lib/reporting/rootcheck-request';
@@ -463,6 +464,10 @@ export class WazuhReportingCtrl {
         log('reporting:extendedInformation', 'Fetching top 3 agents with level 15 alerts', 'debug');
 
         const level15Rank = await OverviewRequest.topLevel15(context, from, to, filters, pattern);
+
+        log('reporting:AlertsSummaryTable', 'Fetching Alerts Summary Table', 'debug');
+        const alertsSummaryTable = new AlertsSummary(context, from, to, filters, { aggs: {}, must: {} }, pattern);
+        const alertsSummaryData = await alertsSummaryTable.fetch();
 
         log('reporting:extendedInformation', 'Adding top 3 agents with level 15 alerts', 'debug');
         if (level15Rank.length) {
