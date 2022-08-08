@@ -37,7 +37,7 @@ import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchest
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 import { RestartHandler } from '../../../../../react-services/wz-restart';
-import { updateWazuhNotReadyYet } from '../../../../../redux/actions/appStateActions';
+import { updateRestartWazuhTries } from '../../../../../redux/actions/appStateActions';
 import { RestartModal } from '../../../../../components/common/restart-modal/restart-modal'
 
 class WzStatusActionButtons extends Component {
@@ -69,7 +69,7 @@ class WzStatusActionButtons extends Component {
   async restartWazuh(isCluster) {
     this.setState({ isRestarting: true, timeoutRestarting: true });
     try {
-      await RestartHandler.restartWazuh(updateWazuhNotReadyYet);
+      await RestartHandler.restartWazuh(this.props.updateRestartWazuhTries);
       this.setState({ isRestarting: false, timeoutRestarting: false });
     } catch (error) {
       this.setState({ isRestarting: false });
@@ -278,7 +278,8 @@ const mapDispatchToProps = dispatch => {
     updateNodeInfo: nodeInfo => dispatch(updateNodeInfo(nodeInfo)),
     updateSelectedNode: selectedNode => dispatch(updateSelectedNode(selectedNode)),
     updateStats: stats => dispatch(updateStats(stats)),
-    updateAgentInfo: agentInfo => dispatch(updateAgentInfo(agentInfo))
+    updateAgentInfo: agentInfo => dispatch(updateAgentInfo(agentInfo)),
+    updateRestartWazuhTries: restartWazuhTries => dispatch(updateRestartWazuhTries(restartWazuhTries)),
   };
 };
 

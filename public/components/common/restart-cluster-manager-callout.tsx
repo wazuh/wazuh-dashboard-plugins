@@ -25,13 +25,13 @@ import {
 } from '@elastic/eui';
 
 import { getToasts }  from '../../kibana-services';
-import { updateWazuhNotReadyYet } from '../../redux/actions/appStateActions';
+import { updateRestartWazuhTries } from '../../redux/actions/appStateActions';
 import { RestartHandler } from '../../react-services/wz-restart';
 import { connect } from 'react-redux';
 import { RestartModal } from './restart-modal/restart-modal';
 
 interface IWzRestartClusterManagerCalloutProps{
-  updateWazuhNotReadyYet: (wazuhNotReadyYet) => void
+  updateRestartWazuhTries: (wazuhNotReadyYet) => void
   onRestarted: () => void
   onRestartedError: () => void
 };
@@ -69,12 +69,12 @@ class WzRestartClusterManagerCallout extends Component<IWzRestartClusterManagerC
   restartWazuh = async () => {
     try{
       this.setState({ warningRestarting: true, warningRestartModalVisible: false, isRestarting: true, timeoutRestarting:true });
-      await RestartHandler.restartWazuh(this.props.updateWazuhNotReadyYet);
+      await RestartHandler.restartWazuh(this.props.updateRestartWazuhTries);
       this.setState({ isRestarting: false, timeoutRestarting:false });
       this.props.onRestarted();
     }catch(error){
       this.setState({ warningRestarting: false, isRestarting: false });
-      this.props.updateWazuhNotReadyYet(false);
+      this.props.updateRestartWazuhTries(0);
       this.props.onRestartedError();
       this.showToast('danger', 'Error', error.message || error );
     }
@@ -132,7 +132,7 @@ class WzRestartClusterManagerCallout extends Component<IWzRestartClusterManagerC
 
 const mapDispatchToProps = dispatch => {
   return {
-    updateWazuhNotReadyYet: wazuhNotReadyYet => dispatch(updateWazuhNotReadyYet(wazuhNotReadyYet))
+    updateRestartWazuhTries: restartWazuhTries => dispatch(updateRestartWazuhTries(restartWazuhTries))
   }
 };
 

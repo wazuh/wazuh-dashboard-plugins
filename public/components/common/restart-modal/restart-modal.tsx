@@ -4,21 +4,20 @@ import {
   EuiEmptyPromptProps,
   EuiOverlayMask,
   EuiProgress,
-  EuiText,
 } from '@elastic/eui';
 import { getHttp } from '../../../kibana-services';
 import { WazuhConfig } from '../../../react-services/wazuh-config';
 import { getAssetURL, getThemeAssetURL } from '../../../utils/assets';
+import store from '../../../redux/store';
 
 export const RestartModal = (props) => {
-  const [isMounted, setIsMounted] = useState(true)
-  const states = {error: "error", restarting: "restarting"};
-  const [currentState, setCurrentState] = useState(states.restarting);
-  const { isRestarting, isCluster } = props;
-  const time = isCluster ? 80 : 70;
-  const [timeRestarting, setTimeRestarting] = useState(time);
+  const { isRestarting: restarting } = props;
   const wazuhConfig = new WazuhConfig();
-  const clusterOrManager = isCluster ? 'cluster' : 'manager';
+  const states = {error: "error", restarting: "restarting", delay: "delay"};
+  const maxAttempts = 30
+  const [currentState, setCurrentState] = useState(states.restarting);
+  const [restartWazuhTries, setRestartWazuhTries] = useState(store.getState().appStateReducers.restartWazuhTries)
+  const [isRestarting, setisRestarting] = useState(restarting)
 
   const logotypeURL = getHttp().basePath.prepend(
     wazuhConfig.getConfig()['customization.logo.app']
@@ -27,28 +26,26 @@ export const RestartModal = (props) => {
   );
 
   useEffect(() => {
-    setIsMounted(true);
-    countDown(timeRestarting);
+    const interval = setInterval(() => {
+      setRestartWazuhTries(store.getState().appStateReducers.restartWazuhTries)
+      if(!isRestarting){
+        setRestartWazuhTries(0)
+        clearInterval(interval)
+      } 
+    }, 1000);
     return () => {
-      setIsMounted(false);
+      clearInterval(interval)
     }
-  }, []);
+  }, [isRestarting]);
 
   useEffect(() => {
-    isRestarting ? setCurrentState(states.restarting) : setCurrentState(states.error); 
-  }, [isRestarting])
-  
-
-  const countDown = (time) => {
-    let countDown = time;
-    const interval = setInterval(() => {
-      countDown--;
-      setTimeRestarting(countDown);
-      if (countDown === 0 || isMounted === false) {
-        clearInterval(interval);
-      }
-    }, 1000);
-  };
+    restartWazuhTries === maxAttempts && setisRestarting(false)
+    isRestarting && restartWazuhTries !== 0
+      ? setCurrentState(states.restarting)
+      : isRestarting && restartWazuhTries === 0
+      ? setCurrentState(states.delay)
+      : setCurrentState(states.error);
+  }, [restartWazuhTries]);
 
   let emptyPromptProps: Partial<EuiEmptyPromptProps>;
   switch (currentState) {
@@ -56,16 +53,16 @@ export const RestartModal = (props) => {
       emptyPromptProps = {
         title: (
           <>
-            <img src={logotypeURL} className="navBarLogo " alt=""></img>
-            <h2 className="wz-margin-16">Restarting Wazuh</h2>
+            <img src={logotypeURL} className="navBarLogo" alt=""></img>
+            <h2 className="wz-modal-restart-title">Restarting Wazuh</h2>
           </>
         ),
         body: (
           <>
             <EuiProgress
-              label={`${timeRestarting} seconds left to restart ${clusterOrManager}`}
-              value={timeRestarting}
-              max={isCluster ? 80 : 70}
+              label={`Attempt ${restartWazuhTries}/30`}
+              value={restartWazuhTries}
+              max={30}
               size="xs"
             />
           </>
@@ -74,9 +71,9 @@ export const RestartModal = (props) => {
       break;
     case states.error:
       emptyPromptProps = {
-        color: 'danger',
         iconType: 'alert',
-        title: <h2>Unable to connect to Wazuh</h2>,
+        iconColor: 'danger',
+        title: <h2 className="wz-modal-restart-title">Unable to connect to Wazuh.</h2>,
         body: (
           <p>
             There was an error restarting Wazuh. The Healthcheck will run in a few seconds. Click{' '}
@@ -84,13 +81,29 @@ export const RestartModal = (props) => {
           </p>
         ),
       };
-    default:
+      break;
+    case states.delay:
       emptyPromptProps = {
-        color: 'danger',
-        iconType: 'alert',
-        title: <h2>Unable to connect to Wazuh</h2>,
+        title: (
+          <>
+            <img src={logotypeURL} className="navBarLogo" alt=""></img>
+            <h2 className="wz-modal-restart-title">Restarting Wazuh</h2>
+          </>
+        ),
         body: (
           <p>
+            Synchronizing Wazuh. Please wait...
+          </p>
+        )
+      };
+      break;
+    default:
+      emptyPromptProps = {
+        iconType: 'alert',
+        iconColor: 'danger',
+        title: <h2 className="wz-modal-restart-title">Unable to connect to Wazuh.</h2>,
+        body: (
+          <p className="margin-16">
             There was an error restarting Wazuh. The Healthcheck will run in a few seconds. Click{' '}
             <a href="#/health-check">here</a> if you are not redirected automatically.
           </p>
@@ -100,7 +113,7 @@ export const RestartModal = (props) => {
 
   return (
     <EuiOverlayMask>
-      <div className="wz-modal-restart">
+      <div className={currentState === states.error ? 'wz-modal-restart-error' : 'wz-modal-restart' }>
         <EuiEmptyPrompt {...emptyPromptProps} />
       </div>
     </EuiOverlayMask>

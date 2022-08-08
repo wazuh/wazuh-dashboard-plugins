@@ -30,7 +30,7 @@ import WzConfigurationPath from '../util-components/configuration-path';
 import WzRefreshClusterInfoButton from '../util-components/refresh-cluster-info-button';
 import { WzButtonPermissions } from '../../../../../../components/common/permissions/button';
 import withLoading from '../util-hocs/loading';
-import { updateWazuhNotReadyYet } from '../../../../../../redux/actions/appStateActions';
+import { updateRestartWazuhTries } from '../../../../../../redux/actions/appStateActions';
 import {
   updateClusterNodes,
   updateClusterNodeSelected,
@@ -160,8 +160,7 @@ class WzEditConfiguration extends Component {
   async confirmRestart() {
     try {
       this.setState({ restarting: true, saving: true, infoChangesAfterRestart: false, timeoutRestarting:true });
-      await RestartHandler.restartNodeSelected(this.props.clusterNodeSelected, this.props.updateWazuhNotReadyYet);
-      this.props.updateWazuhNotReadyYet('');
+      await RestartHandler.restartNodeSelected(this.props.clusterNodeSelected, this.props.updateRestartWazuhTries);
       this.setState({ restart: false, saving: false, restarting: false, timeoutRestarting: false });
       await this.checkIfClusterOrManager();
       if (this.props.clusterNodes) {
@@ -186,7 +185,7 @@ class WzEditConfiguration extends Component {
         });
       }
     } catch (error) {
-      this.props.updateWazuhNotReadyYet('');
+      this.props.updateRestartWazuhTries(0);
       this.setState({ restart: false, saving: false, restarting: false });
       const options = {
         context: `${WzEditConfiguration.name}.confirmRestart`,
@@ -334,12 +333,12 @@ const mapDispatchToProps = (dispatch) => ({
   updateClusterNodes: (clusterNodes) => dispatch(updateClusterNodes(clusterNodes)),
   updateClusterNodeSelected: (clusterNodeSelected) =>
     dispatch(updateClusterNodeSelected(clusterNodeSelected)),
-  updateWazuhNotReadyYet: (value) => dispatch(updateWazuhNotReadyYet(value)),
+  updateRestartWazuhTries: (value) => dispatch(updateRestartWazuhTries(value)),
 });
 
 WzEditConfiguration.propTypes = {
   wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
-  updateWazuhNotReadyYet: PropTypes.func,
+  updateRestartWazuhTries: PropTypes.func,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(WzEditConfiguration);

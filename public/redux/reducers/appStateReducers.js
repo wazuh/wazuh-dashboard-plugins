@@ -31,6 +31,7 @@ const initialState = {
   withUserLogged: false,
   allowedAgents: [],
   logtestToken: '',
+  restartWazuhTries: 0
 };
 
 const appStateReducers = (state = initialState, action) => {
@@ -152,6 +153,13 @@ const appStateReducers = (state = initialState, action) => {
     return {
       ...state,
       logtestToken: action.logtestToken
+    };
+  }
+  
+  if (action.type === 'UPDATE_RESTART_WAZUH_TRIES') {
+    return {
+      ...state,
+      restartWazuhTries: action.restartWazuhTries
     };
   }
 

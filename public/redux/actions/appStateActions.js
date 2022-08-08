@@ -236,3 +236,14 @@ export const updateLogtestToken = (logtestToken) => {
     logtestToken: logtestToken
   };
 };
+
+/**
+ * Updates tries
+ * @param logtestToken
+ */
+export const updateRestartWazuhTries = (restartWazuhTries) => {
+  return {
+    type: 'UPDATE_RESTART_WAZUH_TRIES',
+    restartWazuhTries
+  };
+};
