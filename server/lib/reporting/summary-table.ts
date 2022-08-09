@@ -11,31 +11,40 @@
  */
 import { Base } from './base-query';
 import { WAZUH_ALERTS_PATTERN } from '../../../common/constants';
-import { raw } from 'joi';
-import { getNonExistingReferenceAsKeys } from 'src/core/server/saved_objects/import/validate_references';
 
-interface AlertsSummarySetup {
+interface SummarySetup {
   title?: string;
   aggs: any
 }
 
-export default class alertsSummary {
+export default class SummaryTable {
   constructor(
     context,
     gte,
     lte,
     filters,
-    AlertsSummarySetup: AlertsSummarySetup,
+    summarySetup: SummarySetup,
     pattern = WAZUH_ALERTS_PATTERN
   ) {
 
     this._context = context;
     this._pattern = pattern;
+    this._summarySetup = summarySetup;
     this._base = { aggs: {} };
+    this._columns = [];
+
     Object.assign(this._base, Base(pattern, filters, gte, lte));
 
-    // Object.assign(base.aggs, AlertsSummarySetup.aggs);
+    const aggs = this._parseSummarySetup(summarySetup);
+    // Object.assign(base.aggs, SummarySetup.aggs);
 
+    // base.query.bool.must.push({
+    //   match_phrase: {
+    //     'rule.level': {
+    //       query: 15
+    //     }
+    //   }
+    // });
     Object.assign(this._base.aggs, {
       "2": {
         terms: {
@@ -43,7 +52,7 @@ export default class alertsSummary {
           order: {
             _count: "desc"
           },
-          size: 100
+          size: 1000
         },
         aggs: {
           "3": {
@@ -70,14 +79,29 @@ export default class alertsSummary {
       }
     });
 
-    // base.query.bool.must.push({
-    //   match_phrase: {
-    //     'rule.level': {
-    //       query: 15
-    //     }
-    //   }
-    // });
 
+  }
+  _parseSummarySetup(summarySetup: SummarySetup) {
+    let baseAggRef = this._base.aggs;
+    const aggs = summarySetup.aggs.forEach(( agg, key) => {
+      this._columns.push(agg.customLabel);
+      this._parseAggregation(baseAggRef,agg, key);
+    },this);
+    return aggs;
+  }
+  
+  _parseAggregation(baseAggRef: any, agg: any, key: string) {
+    const { field, size, order, orderBy } = agg;
+    
+    baseAggRef[`${key + 2}`] = {
+      terms: {
+        field,
+        order: {
+          [orderBy]: order
+        },
+        size
+      }
+    };
   }
   // {
   //   title: 'Alerts summary',
@@ -89,9 +113,21 @@ export default class alertsSummary {
   // }
   rows = [];
 
+  /**
+   * Returns the response formatted to a table
+   * @description The response is an object with the following structure:{
+   *  title: 'Alerts summary',
+   *  columns: ['Rule ID','Description','Level', 'Count'],
+   *  rows: [
+   *    ['502', 'Ossec server started', 3, 22],
+   *    ['502', 'Ossec server started', 3, 22],
+   *  ]
+   * }
+   * @param rawResponse 
+   */
   _formatResponseToTable(rawResponse) {
-
     const firstKey = parseInt(Object.keys(rawResponse)[0]);
+
     const rows = rawResponse[firstKey].buckets.map(bucket => {
       const nextKey = firstKey + 1;
       const row = this._buildRow(bucket, nextKey);
@@ -103,6 +139,12 @@ export default class alertsSummary {
     }
   }
 
+/**
+ * Makes a row from the response
+ * @param bucket 
+ * @param nextAggKey 
+ * @param row 
+ */
   _buildRow(bucket: any, nextAggKey: number, row: any[] = []): any[] {
     // Push the column value to the row
     row.push(bucket.key);
@@ -118,6 +160,9 @@ export default class alertsSummary {
     return row;
   }
 
+/**
+ * Executes the query and returns the response
+ */
   async fetch() {
     try {
       const response = await this._context.core.elasticsearch.client.asCurrentUser.search({
