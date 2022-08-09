@@ -249,7 +249,7 @@ class WzStatusActionButtons extends Component {
 
     if (timeoutRestarting) {
       restarting =(
-        <RestartModal isRestarting={isRestarting} isCluster={clusterEnabled} />
+        <RestartModal isRestarting={isRestarting} needDelay={false} />
     )}
 
     return (

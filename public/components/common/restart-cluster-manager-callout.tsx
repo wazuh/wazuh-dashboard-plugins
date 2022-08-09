@@ -52,7 +52,7 @@ class WzRestartClusterManagerCallout extends Component<IWzRestartClusterManagerC
       warningRestartModalVisible: false,
       isCluster: false,
       isRestarting: false,
-      timeoutRestarting: false
+      timeoutRestarting: false,
     };
   }
   toggleWarningRestartModalVisible(){
@@ -69,7 +69,7 @@ class WzRestartClusterManagerCallout extends Component<IWzRestartClusterManagerC
   restartWazuh = async () => {
     try{
       this.setState({ warningRestarting: true, warningRestartModalVisible: false, isRestarting: true, timeoutRestarting:true });
-      await RestartHandler.restartWazuh(this.props.updateRestartWazuhTries);
+      await RestartHandler.restartWazuh(this.props.updateRestartWazuhTries, this.state.isCluster);
       this.setState({ isRestarting: false, timeoutRestarting:false });
       this.props.onRestarted();
     }catch(error){
@@ -112,7 +112,7 @@ class WzRestartClusterManagerCallout extends Component<IWzRestartClusterManagerC
         {warningRestartModalVisible && (
           <EuiOverlayMask>
             <EuiConfirmModal
-              title={`${this.state.isCluster ? 'Cluster' : 'Manager'} will be restarted`}
+              title={`${isCluster ? 'Cluster' : 'Manager'} will be restarted`}
               onCancel={() => this.toggleWarningRestartModalVisible()}
               onConfirm={() => this.restartWazuh()}
               cancelButtonText="Cancel"
@@ -122,8 +122,7 @@ class WzRestartClusterManagerCallout extends Component<IWzRestartClusterManagerC
           </EuiOverlayMask>
         )}
         { timeoutRestarting && (
-          <RestartModal 
-          isRestarting={isRestarting} isCluster={isCluster} />
+          <RestartModal isRestarting={isRestarting} needDelay={isCluster} />
         )}
       </Fragment>
       )

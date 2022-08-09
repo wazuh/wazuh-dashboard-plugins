@@ -316,7 +316,7 @@ class WzEditConfiguration extends Component {
         )}
         {
           timeoutRestarting && (
-          <RestartModal isRestarting={restarting} isCluster={clusterNodeSelected} />
+          <RestartModal isRestarting={restarting} needDelay={false} />
         )}
       </Fragment>
     );

@@ -1155,7 +1155,7 @@ wz-xml-file-editor {
   border-bottom-color: #aaafba;
   background-color: #FFF;
   border-radius: 4px;
-  min-width: 400px;
+  min-width: 500px;
 }
 
 .wz-modal-restart-error {
@@ -1176,6 +1176,10 @@ wz-xml-file-editor {
   line-height: 2.2rem;
   font-weight: 700;
   color: #1a1c21;
+}
+
+.wz-modal-restart-logo {
+  width: 50px;
 }
 
 .header-global-wrapper + .app-wrapper:not(.hidden-chrome) {
