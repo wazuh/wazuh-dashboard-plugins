@@ -115,7 +115,7 @@ class WzRestartClusterManagerCallout extends Component<IWzRestartClusterManagerC
               title={`${isCluster ? 'Cluster' : 'Manager'} will be restarted`}
               onCancel={() => this.toggleWarningRestartModalVisible()}
               onConfirm={() => this.restartWazuh()}
-              cancelButtonText="Cancel"cluster
+              cancelButtonText="Cancel"
               confirmButtonText="Confirm"
               defaultFocusedButton="cancel"
             ></EuiConfirmModal>
