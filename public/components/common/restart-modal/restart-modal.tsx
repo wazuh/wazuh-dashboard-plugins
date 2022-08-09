@@ -120,7 +120,7 @@ export const RestartModal = (props) => {
             <h2 className="wz-modal-restart-title">Restarting Wazuh</h2>
           </>
         ),
-        body: <p>Synchronizing Wazuh. Please wait {timeoutDelay} seconds.</p>,
+        body: <p>Synchronizing cluster. Please wait {timeoutDelay} seconds.</p>,
       };
       break;
     default:
