@@ -13,7 +13,7 @@ import { Base } from './base-query';
 import { WAZUH_ALERTS_PATTERN } from '../../../common/constants';
 
 interface SummarySetup {
-  title?: string;
+  title: string;
   aggs: any
 }
 
@@ -32,11 +32,12 @@ export default class SummaryTable {
     this._summarySetup = summarySetup;
     this._base = { aggs: {} };
     this._columns = [];
+    this._rows = [];
+    this._title = summarySetup.title;
 
     Object.assign(this._base, Base(pattern, filters, gte, lte));
 
-    const aggs = this._parseSummarySetup(summarySetup);
-    // Object.assign(base.aggs, SummarySetup.aggs);
+    this._parseSummarySetup(summarySetup);
 
     // base.query.bool.must.push({
     //   match_phrase: {
@@ -45,73 +46,69 @@ export default class SummaryTable {
     //     }
     //   }
     // });
-    Object.assign(this._base.aggs, {
-      "2": {
-        terms: {
-          field: "rule.id",
-          order: {
-            _count: "desc"
-          },
-          size: 1000
-        },
-        aggs: {
-          "3": {
-            terms: {
-              field: "rule.description",
-              order: {
-                _count: "desc"
-              },
-              size: 20
-            },
-            aggs: {
-              "4": {
-                terms: {
-                  field: "rule.level",
-                  order: {
-                    _count: "desc"
-                  },
-                  size: 12
-                }
-              }
-            }
-          }
-        }
-      }
-    });
-
+    // Object.assign(this._base.aggs, {
+    //   "2": {
+    //     terms: {
+    //       field: "rule.id",
+    //       order: {
+    //         _count: "desc"
+    //       },
+    //       size: 1000
+    //     },
+    //     aggs: {
+    //       "3": {
+    //         terms: {
+    //           field: "rule.description",
+    //           order: {
+    //             _count: "desc"
+    //           },
+    //           size: 20
+    //         },
+    //         aggs: {
+    //           "4": {
+    //             terms: {
+    //               field: "rule.level",
+    //               order: {
+    //                 _count: "desc"
+    //               },
+    //               size: 12
+    //             }
+    //           }
+    //         }
+    //       }
+    //     }
+    //   }
+    // });
 
   }
   _parseSummarySetup(summarySetup: SummarySetup) {
     let baseAggRef = this._base.aggs;
-    const aggs = summarySetup.aggs.forEach(( agg, key) => {
+    summarySetup.aggs.forEach(( agg, key) => {
       this._columns.push(agg.customLabel);
       this._parseAggregation(baseAggRef,agg, key);
+      
+      if (summarySetup.aggs.length > key + 1) {
+        baseAggRef[`${key + 2}`].aggs = {};
+        baseAggRef = baseAggRef[`${key + 2}`].aggs;
+      } else {
+        this._columns.push('Count');
+      }
     },this);
-    return aggs;
   }
   
   _parseAggregation(baseAggRef: any, agg: any, key: string) {
-    const { field, size, order, orderBy } = agg;
+    const { field, size, order } = agg;
     
     baseAggRef[`${key + 2}`] = {
       terms: {
         field,
         order: {
-          [orderBy]: order
+          _count: order
         },
         size
       }
     };
   }
-  // {
-  //   title: 'Alerts summary',
-  //   columns: ['Rule ID','Description','Level', 'Count'],
-  //   rows: [
-  //     ['502', 'Ossec server started', 3, 22],
-  //     ['502', 'Ossec server started', 3, 22],
-  //   ]
-  // }
-  rows = [];
 
   /**
    * Returns the response formatted to a table
@@ -128,14 +125,16 @@ export default class SummaryTable {
   _formatResponseToTable(rawResponse) {
     const firstKey = parseInt(Object.keys(rawResponse)[0]);
 
-    const rows = rawResponse[firstKey].buckets.map(bucket => {
+    this._rows = rawResponse[firstKey].buckets.map(bucket => {
       const nextKey = firstKey + 1;
       const row = this._buildRow(bucket, nextKey);
       return row;
     })
 
     return {
-      rows
+      rows: this._rows,
+      columns: this._columns,
+      title: this._title,
     }
   }
 

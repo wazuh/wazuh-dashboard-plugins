@@ -20,6 +20,13 @@ export const AggregationFields = {
         orderBy: '1',
         customLabel: 'Level',
     },
+    'rule.groups': {
+        field: 'rule.groups',
+        size: 50,
+        order: 'desc',
+        orderBy: '1',
+        customLabel: 'Groups',
+    },
     'agent.name': {
         field: 'agent.name',
         size: 1000,

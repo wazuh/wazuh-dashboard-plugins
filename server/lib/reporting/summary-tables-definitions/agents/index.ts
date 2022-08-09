@@ -1,56 +1,111 @@
+import { AggregationFields } from '../aggregation_fields';
 
-const GeneralAlertsSummary = {
+const generalAlertsSummary = {
   title: 'Alerts summary',
   aggs: [
-    {
-        field: 'rule.id',
-        size: 50,
-        order: 'desc',
-        orderBy: '1',
-        customLabel: 'Rule ID',
-    },
-    {
-        field: 'rule.description',
-        size: 1,
-        order: 'desc',
-        orderBy: '1',
-        customLabel: 'Description',
-    },
-    {
-        field: 'rule.level',
-        size: 1,
-        order: 'desc',
-        orderBy: '1',
-        customLabel: 'Level',
-    },
-  ],
+    AggregationFields['rule.id'],
+    AggregationFields['rule.description'],
+    AggregationFields['rule.level'],
+  ]
 }
 
-const GeneralGroupsSummary = {
-
+const generalGroupsSummary = {
+  title: 'Alerts summary',
+  aggs: [
+    AggregationFields['rule.groups'],
+  ]
 }
 
-const AWSAlertsSummary = {}
-const FIMAlertsSummary = {}
-const GCPAlertsSummary = {}
-const TSCAlertsSummary = {}
-const VirustotalAlertsSummary = {}
-const OsqueryAlertsSummary = {}
-const MITREAlertsSummary = {}
-const CISCATAlertsSummary = {}
-const PMAlertsSummary = {}
+const awsAlertsSummary = {
+  title: 'Alerts summary',
+  aggs: [
+    AggregationFields['rule.id'],
+    AggregationFields['rule.description'],
+    AggregationFields['rule.level'],
+  ]
+}
 
+const fimAlertsSummary = {
+  title: 'Alerts summary',
+  aggs: [
+    AggregationFields['syscheck.path'],
+    AggregationFields['rule.description'],
+  ]
+}
+const gcpAlertsSummary = {
+  title: 'Alerts summary',
+  aggs: [
+    AggregationFields['rule.id'],
+    AggregationFields['rule.description'],
+    AggregationFields['rule.level'],
+  ]
+}
+
+const virustotalAlertsSummary = {
+  title: 'Alerts summary',
+  aggs: [
+    AggregationFields['rule.id'],
+    AggregationFields['rule.description'],
+    AggregationFields['rule.level'],
+  ]
+}
+
+const osqueryAlertsSummary = {
+  title: 'Alerts summary',
+  aggs: [
+    AggregationFields['data.osquery.name'],
+    AggregationFields['data.osquery.action'],
+    AggregationFields['agent.name'],
+    AggregationFields['data.osquery.pack'],
+    AggregationFields['data.osquery.calendarTime'],
+  ]
+}
+
+const mitreAlertsSummary = {
+  itle: 'Alerts summary',
+  aggs: [
+    AggregationFields['rule.id'],
+    AggregationFields['rule.description'],
+    AggregationFields['rule.level'],
+  ]
+}
+
+const ciscatAlertsSummary = {
+  title: 'Alerts summary',
+  aggs: [
+    AggregationFields['data.cis.rule_title'],
+    AggregationFields['data.cis.group'],
+    AggregationFields['data.cis.result'],
+  ]
+}
+
+const pmAlertsSummary = {
+  title: 'Alerts summary',
+  aggs: [
+    AggregationFields['rule.description'],
+    AggregationFields['data.title'],
+  ]
+}
+
+const tscAlertsSummary = {
+  title: 'Alerts summary',
+  aggs: [
+    AggregationFields['agent.name'],
+    AggregationFields['rule.tsc'],
+    AggregationFields['rule.description'],
+  ]
+}
 
 export default {
-  GeneralAlertsSummary,
-  GeneralGroupsSummary,
-  AWSAlertsSummary,
-  FIMAlertsSummary,
-  GCPAlertsSummary,
-  TSCAlertsSummary,
-  VirustotalAlertsSummary,
-  OsqueryAlertsSummary,
-  MITREAlertsSummary,
-  CISCATAlertsSummary,
-  PMAlertsSummary,
+  generalAlertsSummary,
+  generalGroupsSummary,
+  awsAlertsSummary,
+  fimAlertsSummary,
+  gcpAlertsSummary,
+  tscAlertsSummary,
+  virustotalAlertsSummary,
+  osqueryAlertsSummary,
+  mitreAlertsSummary,
+  ciscatAlertsSummary,
+  pmAlertsSummary,
 }
