@@ -30,7 +30,7 @@ import WzConfigurationPath from '../util-components/configuration-path';
 import WzRefreshClusterInfoButton from '../util-components/refresh-cluster-info-button';
 import { WzButtonPermissions } from '../../../../../../components/common/permissions/button';
 import withLoading from '../util-hocs/loading';
-import { updateRestartWazuhTries } from '../../../../../../redux/actions/appStateActions';
+import { updateRestartAttempt } from '../../../../../../redux/actions/appStateActions';
 import {
   updateClusterNodes,
   updateClusterNodeSelected,
@@ -160,7 +160,9 @@ class WzEditConfiguration extends Component {
   async confirmRestart() {
     try {
       this.setState({ restarting: true, saving: true, infoChangesAfterRestart: false, timeoutRestarting:true });
-      await RestartHandler.restartNodeSelected(this.props.clusterNodeSelected, this.props.updateRestartWazuhTries);
+      await RestartHandler.restartSelectedNode(
+        this.props.clusterNodeSelected, this.props.updateRestartAttempt
+      );
       this.setState({ restart: false, saving: false, restarting: false, timeoutRestarting: false });
       await this.checkIfClusterOrManager();
       if (this.props.clusterNodes) {
@@ -185,7 +187,7 @@ class WzEditConfiguration extends Component {
         });
       }
     } catch (error) {
-      this.props.updateRestartWazuhTries(0);
+      this.props.updateRestartAttempt(0);
       this.setState({ restart: false, saving: false, restarting: false });
       const options = {
         context: `${WzEditConfiguration.name}.confirmRestart`,
@@ -316,7 +318,7 @@ class WzEditConfiguration extends Component {
         )}
         {
           timeoutRestarting && (
-          <RestartModal isRestarting={restarting} needDelay={false} />
+          <RestartModal isRestarting={restarting} useDelay={false} />
         )}
       </Fragment>
     );
@@ -333,12 +335,12 @@ const mapDispatchToProps = (dispatch) => ({
   updateClusterNodes: (clusterNodes) => dispatch(updateClusterNodes(clusterNodes)),
   updateClusterNodeSelected: (clusterNodeSelected) =>
     dispatch(updateClusterNodeSelected(clusterNodeSelected)),
-  updateRestartWazuhTries: (value) => dispatch(updateRestartWazuhTries(value)),
+  updateRestartAttempt: (value) => dispatch(updateRestartAttempt(value)),
 });
 
 WzEditConfiguration.propTypes = {
   wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
-  updateRestartWazuhTries: PropTypes.func,
+  updateRestartAttempt: PropTypes.func,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(WzEditConfiguration);

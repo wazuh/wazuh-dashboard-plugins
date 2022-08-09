@@ -199,7 +199,7 @@ export const showFlyoutLogtest = (showFlyout) => {
 export const updateDockedLogtest = (dockedFlyout) => {
   return {
     type: 'UPDATE_DOCKED_LOGTEST',
-    dockedFlyoutLogtest: dockedFlyout  
+    dockedFlyoutLogtest: dockedFlyout
   };
 };
 
@@ -238,12 +238,13 @@ export const updateLogtestToken = (logtestToken) => {
 };
 
 /**
- * Updates tries
- * @param logtestToken
+ * Update restart attempt
+ * @param {Number} restartAttempt
+ * @returns
  */
-export const updateRestartWazuhTries = (restartWazuhTries) => {
+export const updateRestartAttempt = (restartAttempt) => {
   return {
-    type: 'UPDATE_RESTART_WAZUH_TRIES',
-    restartWazuhTries
+    type: 'UPDATE_RESTART_ATTEMPT',
+    restartAttempt
   };
 };

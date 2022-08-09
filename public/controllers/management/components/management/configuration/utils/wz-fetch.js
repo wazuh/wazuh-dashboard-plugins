@@ -185,6 +185,7 @@ export const checkDaemons = async (isCluster) => {
 };
 
 /**
+ * @deprecated
  * Make ping to Wazuh API
  * @param updateWazuhNotReadyYet
  * @param {boolean} isCluster

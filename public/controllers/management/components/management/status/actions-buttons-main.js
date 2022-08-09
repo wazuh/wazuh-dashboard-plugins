@@ -37,7 +37,7 @@ import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchest
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 import { RestartHandler } from '../../../../../react-services/wz-restart';
-import { updateRestartWazuhTries } from '../../../../../redux/actions/appStateActions';
+import { updateRestartAttempt } from '../../../../../redux/actions/appStateActions';
 import { RestartModal } from '../../../../../components/common/restart-modal/restart-modal'
 
 class WzStatusActionButtons extends Component {
@@ -69,7 +69,7 @@ class WzStatusActionButtons extends Component {
   async restartWazuh(isCluster) {
     this.setState({ isRestarting: true, timeoutRestarting: true });
     try {
-      await RestartHandler.restartWazuh(this.props.updateRestartWazuhTries);
+      await RestartHandler.restartWazuh(this.props.updateRestartAttempt);
       this.setState({ isRestarting: false, timeoutRestarting: false });
     } catch (error) {
       this.setState({ isRestarting: false });
@@ -249,7 +249,7 @@ class WzStatusActionButtons extends Component {
 
     if (timeoutRestarting) {
       restarting =(
-        <RestartModal isRestarting={isRestarting} needDelay={false} />
+        <RestartModal isRestarting={isRestarting} useDelay={false} />
     )}
 
     return (
@@ -279,7 +279,7 @@ const mapDispatchToProps = dispatch => {
     updateSelectedNode: selectedNode => dispatch(updateSelectedNode(selectedNode)),
     updateStats: stats => dispatch(updateStats(stats)),
     updateAgentInfo: agentInfo => dispatch(updateAgentInfo(agentInfo)),
-    updateRestartWazuhTries: restartWazuhTries => dispatch(updateRestartWazuhTries(restartWazuhTries)),
+    updateRestartAttempt: restartAttempt => dispatch(updateRestartAttempt(restartAttempt)),
   };
 };
 

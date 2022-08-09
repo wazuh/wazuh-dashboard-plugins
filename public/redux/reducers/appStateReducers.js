@@ -31,7 +31,7 @@ const initialState = {
   withUserLogged: false,
   allowedAgents: [],
   logtestToken: '',
-  restartWazuhTries: 0
+  restartAttempt: 0
 };
 
 const appStateReducers = (state = initialState, action) => {
@@ -140,7 +140,7 @@ const appStateReducers = (state = initialState, action) => {
       ...state,
      withUserLogged: action.withUserLogged,
     };
-  }  
+  }
 
   if (action.type === 'GET_ALLOWED_AGENTS') {
     return {
@@ -148,18 +148,18 @@ const appStateReducers = (state = initialState, action) => {
       allowedAgents: action.allowedAgents
     };
   }
-  
+
   if (action.type === 'UPDATE_LOGTEST_TOKEN') {
     return {
       ...state,
       logtestToken: action.logtestToken
     };
   }
-  
-  if (action.type === 'UPDATE_RESTART_WAZUH_TRIES') {
+
+  if (action.type === 'UPDATE_RESTART_ATTEMPT') {
     return {
       ...state,
-      restartWazuhTries: action.restartWazuhTries
+      restartAttempt: action.restartAttempt
     };
   }
 

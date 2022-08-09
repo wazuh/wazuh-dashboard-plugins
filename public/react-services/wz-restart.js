@@ -4,8 +4,9 @@ import { getHttp, getToasts } from '../kibana-services';
 
 export class RestartHandler {
   static MAX_ATTEMPTS = 30;
-  static DELAY_POLLING = 2000;
-  static DELAY_RESTART = 20000;
+  static POLLING_DELAY = 2000;      // milliseconds
+  static SYNC_DELAY = 20000;        // milliseconds
+  static HEALTHCHECK_DELAY = 5000;  // milliseconds
 
   /**
    * Get Cluster status from Wazuh API
@@ -63,30 +64,30 @@ export class RestartHandler {
 
   /**
    * Make ping to Wazuh API
-   * @param updateRestartWazuhTries
+   * @param updateRestartAttempt
    * @param {boolean} isCluster
    * @return {Promise}
    */
-  static async makePing(updateRestartWazuhTries, isCluster) {
+  static async makePing(updateRestartAttempt, isCluster) {
     try {
       let isValid = false;
       for (let attempt = 1; attempt <= this.MAX_ATTEMPTS && !isValid; attempt++) {
-        updateRestartWazuhTries(attempt);
+        updateRestartAttempt(attempt);
         const goToHealthcheck = attempt >= this.MAX_ATTEMPTS
-        await delayAsPromise(this.DELAY_POLLING);
+        await delayAsPromise(this.POLLING_DELAY);
         try {
           isValid = await this.checkDaemons(isCluster, goToHealthcheck);
         } catch (error) {
           console.error(error);
         }
       }
-      updateRestartWazuhTries(0);
+      updateRestartAttempt(0);
       if (!isValid) {
         throw new Error('Not recovered');
       }
       return Promise.resolve('Wazuh is ready');
     } catch (error) {
-      updateRestartWazuhTries(0);
+      updateRestartAttempt(0);
       throw new Error('Wazuh could not be recovered.');
     }
   }
@@ -99,7 +100,7 @@ export class RestartHandler {
    * Restart manager (single-node API call)
    * @returns {object|Promise}
    */
-  static async restart(isCluster, needDelay) {
+  static async restart(isCluster, useDelay) {
     try {
       const clusterOrManager = isCluster ? 'cluster' : 'manager';
       const validationError = await WzRequest.apiReq(
@@ -112,7 +113,7 @@ export class RestartHandler {
         const str = validationError.detail;
         throw new Error(str);
       }
-      isCluster && needDelay && await delayAsPromise(this.DELAY_RESTART)
+      isCluster && useDelay && await delayAsPromise(this.SYNC_DELAY)
       await WzRequest.apiReq('PUT', `/${clusterOrManager}/restart`, {});
       return {
         data: {
@@ -151,15 +152,15 @@ export class RestartHandler {
   /**
    * Restart a node or manager
    * @param {} selectedNode Cluster Node
-   * @param updateRestartWazuhTries
+   * @param updateRestartAttempt
    */
-  static async restartNodeSelected(selectedNode, updateRestartWazuhTries) {
+  static async restartSelectedNode(selectedNode, updateRestartAttempt) {
     try {
       const clusterStatus = (((await this.clusterReq()) || {}).data || {}).data || {};
       const isCluster = clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
       // Dispatch a Redux action
       isCluster ? await this.restartNode(selectedNode) : await this.restart(isCluster);
-      return await this.makePing(updateRestartWazuhTries, isCluster);
+      return await this.makePing(updateRestartAttempt, isCluster);
     } catch (error) {
       throw error;
     }
@@ -167,13 +168,13 @@ export class RestartHandler {
   /**
    * Restart cluster or Manager
    */
-  static async restartWazuh(updateRestartWazuhTries, needDelay = false) {
+  static async restartWazuh(updateRestartAttempt, useDelay = false) {
     try {
       const clusterStatus = (((await this.clusterReq()) || {}).data || {}).data || {};
       const isCluster = clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
       // Dispatch a Redux action
-      await this.restart(isCluster, needDelay) 
-      await this.makePing(updateRestartWazuhTries, isCluster);
+      await this.restart(isCluster, useDelay)
+      await this.makePing(updateRestartAttempt, isCluster);
       getToasts().add({
         color: 'success',
         title: isCluster ? 'Cluster was restarted.' : 'Manager was restarted.',
