@@ -24,8 +24,9 @@ import {
   EuiSearchBar,
 } from '@elastic/eui';
 import { EuiFormErrorText } from '@elastic/eui';
-import { PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_APP_CONFIGURATION } from '../../../../../common/constants';
+import { PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_APP_CONFIGURATION } from '../../../../../common/constants';
 import { getPluginDataPath } from '../../../../../common/plugin';
+import { webDocumentationLink } from '../../../../../common/services/web_documentation';
 
 export const Header = ({query, setQuery}) => {
   return (
@@ -60,7 +61,7 @@ const Title = () => {
               iconSize="l"
               aria-label="Help"
               target="_blank"
-              href={PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_APP_CONFIGURATION}
+              href={webDocumentationLink(PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_APP_CONFIGURATION)}
             ></EuiButtonIcon>
           </EuiToolTip>
         </h2>
