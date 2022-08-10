@@ -96,11 +96,41 @@ const tscAlertsSummary = {
   ]
 }
 
+const githubAlertsSummary = {
+  title: 'Alerts summary',
+  aggs: [
+    AggregationFields['agent.name'],
+    AggregationFields['data.github.org'],
+    AggregationFields['rule.description'],
+  ]
+}
+
+const hipaaAlertsSummary = {
+  title: 'Alerts summary',
+  aggs: [
+    AggregationFields['rule.hipaa'],
+    AggregationFields['rule.level'],
+    AggregationFields['rule.description'],
+  ]
+}
+
+const nistAlertsSummary = {
+  title: 'Alerts summary',
+  aggs: [
+    AggregationFields['rule.nist_800_53'],
+    AggregationFields['rule.level'],
+    AggregationFields['rule.description'],
+  ]
+}
+
 export default {
   generalAlertsSummary,
   generalGroupsSummary,
   awsAlertsSummary,
   fimAlertsSummary,
+  githubAlertsSummary,
+  hipaaAlertsSummary,
+  nistAlertsSummary,
   gcpAlertsSummary,
   tscAlertsSummary,
   virustotalAlertsSummary,
