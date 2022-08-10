@@ -10,6 +10,11 @@
  * Find more information about this on the LICENSE file.
  */
 import path from 'path';
+import { version } from '../package.json';
+
+// Plugin
+export const PLUGIN_VERSION = version;
+export const PLUGIN_VERSION_SHORT = version.split('.').splice(0,2).join('.');
 
 // Index patterns - Wazuh alerts
 export const WAZUH_INDEX_TYPE_ALERTS = 'alerts';
@@ -216,6 +221,7 @@ export const WAZUH_DEFAULT_APP_CONFIG = {
   hideManagerAlerts: false,
   'logs.level': 'info',
   'enrollment.dns': '',
+  'enrollment.password': '',
   'customization.logo.app': '',
   'customization.logo.sidebar': '',
   'customization.logo.healthcheck':'',
@@ -301,7 +307,6 @@ export enum WAZUH_MENU_SETTINGS_SECTIONS_ID {
 export const AUTHORIZED_AGENTS = 'authorized-agents';
 
 // Wazuh links
-export const WAZUH_LINK_DOCUMENTATION = 'https://documentation.wazuh.com';
 export const WAZUH_LINK_GITHUB = 'https://github.com/wazuh';
 export const WAZUH_LINK_GOOGLE_GROUPS = 'https://groups.google.com/forum/#!forum/wazuh';
 export const WAZUH_LINK_SLACK = 'https://wazuh.com/community/join-us-on-slack';
@@ -342,6 +347,7 @@ export const UI_TOAST_COLOR = {
 
 // Assets
 export const ASSETS_BASE_URL_PREFIX = '/plugins/wazuh/assets/';
+export const ASSETS_PUBLIC_URL = '/plugins/wazuh/public/assets/';
 
 // Reports
 export const REPORTS_LOGO_IMAGE_ASSETS_RELATIVE_PATH = 'images/logo_reports.png';
@@ -354,11 +360,12 @@ export const PLUGIN_PLATFORM_NAME = 'Wazuh dashboard';
 export const PLUGIN_PLATFORM_BASE_INSTALLATION_PATH = '/usr/share/wazuh-dashboard/data/wazuh/';
 export const PLUGIN_PLATFORM_INSTALLATION_USER = 'wazuh-dashboard';
 export const PLUGIN_PLATFORM_INSTALLATION_USER_GROUP = 'wazuh-dashboard';
-export const PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_UPGRADE_PLATFORM = 'https://documentation.wazuh.com/current/upgrade-guide/';
-export const PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_TROUBLESHOOTING = 'https://documentation.wazuh.com/current/user-manual/wazuh-dashboard/troubleshooting.html';
-export const PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_APP_CONFIGURATION = 'https://documentation.wazuh.com/current/user-manual/wazuh-dashboard/config-file.html';
+export const PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_UPGRADE_PLATFORM = 'upgrade-guide';
+export const PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_TROUBLESHOOTING = 'user-manual/elasticsearch/troubleshooting.html';
+export const PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_APP_CONFIGURATION = 'user-manual/wazuh-dashboard/config-file.html';
 export const PLUGIN_PLATFORM_URL_GUIDE = 'https://opensearch.org/docs/1.2/opensearch/index/';
 export const PLUGIN_PLATFORM_URL_GUIDE_TITLE = 'OpenSearch guide';
+
 export const PLUGIN_PLATFORM_REQUEST_HEADERS = {
   'osd-xsrf': 'kibana'
 };
@@ -388,11 +395,14 @@ export const UI_LABEL_NAME_AGENT_STATUS = {
   [API_NAME_AGENT_STATUS.PENDING]: 'Pending',
   [API_NAME_AGENT_STATUS.NEVER_CONNECTED]: 'Never connected',
   default: 'Unknown'
-} as const
+} as const;
 
 export const UI_ORDER_AGENT_STATUS = [
   API_NAME_AGENT_STATUS.ACTIVE,
   API_NAME_AGENT_STATUS.DISCONNECTED,
   API_NAME_AGENT_STATUS.PENDING,
   API_NAME_AGENT_STATUS.NEVER_CONNECTED  
-]
+];
+
+// Documentation
+export const DOCUMENTATION_WEB_BASE_URL = "https://documentation.wazuh.com";

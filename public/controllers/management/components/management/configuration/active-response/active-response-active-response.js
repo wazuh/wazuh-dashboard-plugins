@@ -21,6 +21,7 @@ import { settingsListBuilder } from '../utils/builders';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 import withWzConfig from '../util-hocs/wz-config';
+import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
 const mainSettings = [
   {
@@ -40,13 +41,11 @@ const mainSettings = [
 const helpLinks = [
   {
     text: 'Active response documentation',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/capabilities/active-response/index.html'
+    href: webDocumentationLink('user-manual/capabilities/active-response/index.html')
   },
   {
     text: 'Active response reference',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/active-response.html'
+    href: webDocumentationLink('user-manual/reference/ossec-conf/active-response.html')
   }
 ];
 

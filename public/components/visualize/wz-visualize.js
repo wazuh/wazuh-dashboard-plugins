@@ -10,7 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component, Fragment } from 'react';
-import { version as appVersion} from '../../../package.json';
 import { visualizations } from './visualizations';
 import { agentVisualizations } from './agent-visualizations';
 import KibanaVis from '../../kibana-integrations/kibana-vis';
@@ -40,6 +39,7 @@ import { compose } from 'redux';
 import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
+import { webDocumentationLink } from '../../../common/services/web_documentation';
 
 const visHandler = new VisHandlers();
 
@@ -145,8 +145,9 @@ export const WzVisualize = compose(
     };
     reloadToast = () => {
       const toastLifeTimeMs = 300000;
-      const [mayor, minor] = appVersion.split('.');
-      const urlTroubleShootingDocs = `https://documentation.wazuh.com/${mayor}.${minor}/user-manual/elasticsearch/troubleshooting.html#index-pattern-was-refreshed-toast-keeps-popping-up`;
+      const urlTroubleShootingDocs = webDocumentationLink(
+        'user-manual/elasticsearch/troubleshooting.html#index-pattern-was-refreshed-toast-keeps-popping-up'
+      );
       getToasts().add({
         color: 'success',
         title: 'The index pattern was refreshed successfully.',
@@ -160,7 +161,7 @@ export const WzVisualize = compose(
               target="documentation"
             >
               Troubleshooting
-              </a>
+            </a>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
             <EuiButton onClick={() => window.location.reload()} size="s">Reload page</EuiButton>

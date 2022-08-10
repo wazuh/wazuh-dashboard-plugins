@@ -21,6 +21,7 @@ import { isString } from '../utils/utils';
 
 import { connect } from 'react-redux';
 import { compose } from 'redux';
+import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
 const mainSettings = [
   { field: 'type', label: 'Agentless monitoring type' },
@@ -33,13 +34,11 @@ const mainSettings = [
 const helpLinks = [
   {
     text: 'How to monitor agentless devices',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/capabilities/agentless-monitoring/index.html'
+    href: webDocumentationLink('user-manual/capabilities/agentless-monitoring/index.html')
   },
   {
     text: 'Agentless reference',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/agentless.html'
+    href: webDocumentationLink('user-manual/reference/ossec-conf/agentless.html')
   }
 ];
 

@@ -134,16 +134,8 @@ export class WazuhReportingCtrl {
         } else if (section === 'groupConfig') {
           printer.addContent({
             text: 'Agents in group',
-            style: { fontSize: 14, color: '#000' },
-            margin: [0, 20, 0, 0],
+            style: 'h1',
           });
-          if (section === 'groupConfig' && !Object.keys(isAgents).length) {
-            printer.addContent({
-              text: 'There are still no agents in this group.',
-              style: { fontSize: 12, color: '#000' },
-              margin: [0, 10, 0, 0],
-            });
-          }
         }
         printer.addNewLine();
       }
@@ -154,7 +146,7 @@ export class WazuhReportingCtrl {
           printer,
           isAgents,
           apiId,
-          section === 'groupConfig' ? tab : false
+          section === 'groupConfig' ? tab : ''
         );
       }
 
@@ -188,8 +180,6 @@ export class WazuhReportingCtrl {
           style: 'standard',
         });
       }
-
-      return;
     } catch (error) {
       log('reporting:renderHeader', error.message || error);
       return Promise.reject(error);
@@ -201,57 +191,44 @@ export class WazuhReportingCtrl {
    * @param {Array<Strings>} ids ids of agents
    * @param {String} apiId API id
    */
-  private async buildAgentsTable(context, printer: ReportPrinter, agentIDs: string[], apiId: string, multi = false) {
+  private async buildAgentsTable(context, printer: ReportPrinter, agentIDs: string[], apiId: string, groupID: string = '') {
     const dateFormat = await context.core.uiSettings.client.get('dateFormat');
-    if (!agentIDs || !agentIDs.length) return;
+    if ((!agentIDs || !agentIDs.length) && !groupID) return;
     log('reporting:buildAgentsTable', `${agentIDs.length} agents for API ${apiId}`, 'info');
     try {
-      let agentRows = [];
-      if (multi) {
-        try {
-          const agentsResponse = await context.wazuh.api.client.asCurrentUser.request(
+      let agentsData = [];
+      if (groupID) {
+        let totalAgentsInGroup = null;
+        do{
+          const { data: { data: { affected_items, total_affected_items } } } = await context.wazuh.api.client.asCurrentUser.request(
             'GET',
-            `/groups/${multi}/agents`,
-            {},
+            `/groups/${groupID}/agents`,
+            {
+              params: {
+                offset: agentsData.length,
+                select: 'dateAdd,id,ip,lastKeepAlive,manager,name,os.name,os.version,version',
+              }
+            },
             { apiHostID: apiId }
           );
-          const agentsData =
-            agentsResponse &&
-            agentsResponse.data &&
-            agentsResponse.data.data &&
-            agentsResponse.data.data.affected_items;
-          agentRows = (agentsData || []).map((agent) => ({
-            ...agent,
-            manager: agent.manager || agent.manager_host,
-            os:
-              agent.os && agent.os.name && agent.os.version
-                ? `${agent.os.name} ${agent.os.version}`
-                : '',
-          }));
-        } catch (error) {
-          log(
-            'reporting:buildAgentsTable',
-            `Skip agent due to: ${error.message || error}`,
-            'debug'
-          );
-        }
+          !totalAgentsInGroup && (totalAgentsInGroup = total_affected_items);
+          agentsData = [...agentsData, ...affected_items];
+        }while(agentsData.length < totalAgentsInGroup);
       } else {
         for (const agentID of agentIDs) {
           try {
-            const agentResponse = await context.wazuh.api.client.asCurrentUser.request(
+            const { data: { data: { affected_items: [agent] } } } = await context.wazuh.api.client.asCurrentUser.request(
               'GET',
               `/agents`,
-              { params: { q: `id=${agentID}` } },
+              { 
+                params: {
+                  q: `id=${agentID}`,
+                  select: 'dateAdd,id,ip,lastKeepAlive,manager,name,os.name,os.version,version',
+                } 
+              },
               { apiHostID: apiId }
             );
-            const [agent] = agentResponse.data.data.affected_items;
-            agentRows.push({
-              ...agent,
-              manager: agent.manager || agent.manager_host,
-              os: (agent.os && agent.os.name && agent.os.version) ? `${agent.os.name} ${agent.os.version}` : '',
-              lastKeepAlive: moment(agent.lastKeepAlive).format(dateFormat),
-              dateAdd: moment(agent.dateAdd).format(dateFormat)
-            });
+            agentsData.push(agent);
           } catch (error) {
             log(
               'reporting:buildAgentsTable',
@@ -261,19 +238,37 @@ export class WazuhReportingCtrl {
           }
         }
       }
-      printer.addSimpleTable({
-        columns: [
-          { id: 'id', label: 'ID' },
-          { id: 'name', label: 'Name' },
-          { id: 'ip', label: 'IP' },
-          { id: 'version', label: 'Version' },
-          { id: 'manager', label: 'Manager' },
-          { id: 'os', label: 'OS' },
-          { id: 'dateAdd', label: 'Registration date' },
-          { id: 'lastKeepAlive', label: 'Last keep alive' },
-        ],
-        items: agentRows,
-      });
+
+      if(agentsData.length){
+        // Print a table with agent/s information
+        printer.addSimpleTable({
+          columns: [
+            { id: 'id', label: 'ID' },
+            { id: 'name', label: 'Name' },
+            { id: 'ip', label: 'IP' },
+            { id: 'version', label: 'Version' },
+            { id: 'manager', label: 'Manager' },
+            { id: 'os', label: 'OS' },
+            { id: 'dateAdd', label: 'Registration date' },
+            { id: 'lastKeepAlive', label: 'Last keep alive' },
+          ],
+          items: agentsData.map((agent) => {
+            return {
+              ...agent,
+              os: (agent.os && agent.os.name && agent.os.version) ? `${agent.os.name} ${agent.os.version}` : '',
+              lastKeepAlive: moment(agent.lastKeepAlive).format(dateFormat),
+              dateAdd: moment(agent.dateAdd).format(dateFormat)
+            }
+          }),
+        });
+      }else if(!agentsData.length && groupID){
+        // For group reports when there is no agents in the group
+        printer.addContent({
+          text: 'There are no agents in this group.',
+          style: { fontSize: 12, color: '#000' },
+        });
+      }
+      
     } catch (error) {
       log('reporting:buildAgentsTable', error.message || error);
       return Promise.reject(error);
@@ -1129,11 +1124,11 @@ export class WazuhReportingCtrl {
    * @param {Object} response
    * @returns {*} reports list or ErrorResponse
    */
-  async createReportsModules(
+  createReportsModules = this.checkReportsUserDirectoryIsValidRouteDecorator(async (
     context: RequestHandlerContext,
     request: OpenSearchDashboardsRequest,
     response: OpenSearchDashboardsResponseFactory
-  ) {
+  ) => {
     try {
       log('reporting:createReportsModules', `Report started`, 'info');
       const {
@@ -1144,7 +1139,6 @@ export class WazuhReportingCtrl {
         filters,
         time,
         tables,
-        name,
         section,
         indexPatternTitle,
         apiId
@@ -1153,11 +1147,11 @@ export class WazuhReportingCtrl {
       const { from, to } = time || {};
       // Init
       const printer = new ReportPrinter();
-      const { username: userID } = await context.wazuh.security.getCurrentUser(request, context);
+
       createDataDirectoryIfNotExists();
       createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
       createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH);
-      createDirectoryIfNotExists(path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, userID));
+      createDirectoryIfNotExists(path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, context.wazuhEndpointParams.hashUsername));
 
       await this.renderHeader(context, printer, section, moduleID, agents, apiId);
 
@@ -1195,18 +1189,18 @@ export class WazuhReportingCtrl {
         printer.addAgentsFilters(agentsFilter);
       }
 
-      await printer.print(path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, userID, name));
+      await printer.print(context.wazuhEndpointParams.pathFilename);
 
       return response.ok({
         body: {
           success: true,
-          message: `Report ${name} was created`,
+          message: `Report ${context.wazuhEndpointParams.filename} was created`,
         },
       });
     } catch (error) {
       return ErrorResponse(error.message || error, 5029, 500, response);
     }
-  }
+  },({body:{ agents }, params: { moduleID }}) => `wazuh-module-${agents ? `agents-${agents}` : 'overview'}-${moduleID}-${this.generateReportTimestamp()}.pdf`)
 
   /**
    * Create a report for the groups
@@ -1215,23 +1209,22 @@ export class WazuhReportingCtrl {
    * @param {Object} response
    * @returns {*} reports list or ErrorResponse
    */
-  async createReportsGroups(
+  createReportsGroups = this.checkReportsUserDirectoryIsValidRouteDecorator(async(
     context: RequestHandlerContext,
     request: OpenSearchDashboardsRequest,
     response: OpenSearchDashboardsResponseFactory
-  ) {
+  ) => {
     try {
       log('reporting:createReportsGroups', `Report started`, 'info');
-      const { name, components, apiId } = request.body;
+      const { components, apiId } = request.body;
       const { groupID } = request.params;
       // Init
       const printer = new ReportPrinter();
 
-      const { username: userID } = await context.wazuh.security.getCurrentUser(request, context);
       createDataDirectoryIfNotExists();
       createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
       createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH);
-      createDirectoryIfNotExists(path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, userID));
+      createDirectoryIfNotExists(path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, context.wazuhEndpointParams.hashUsername));
 
       let tables = [];
       const equivalences = {
@@ -1251,19 +1244,15 @@ export class WazuhReportingCtrl {
         style: 'h1',
       });
 
+      // Group configuration
       if (components['0']) {
-        let configuration = {};
-        try {
-          const configurationResponse = await context.wazuh.api.client.asCurrentUser.request(
-            'GET',
-            `/groups/${groupID}/configuration`,
-            {},
-            { apiHostID: apiId }
-          );
-          configuration = configurationResponse.data.data;
-        } catch (error) {
-          log('reporting:createReportsGroups', error.message || error, 'debug');
-        }
+
+        const { data: { data: configuration } } = await context.wazuh.api.client.asCurrentUser.request(
+          'GET',
+          `/groups/${groupID}/configuration`,
+          {},
+          { apiHostID: apiId }
+        );
 
         if (
           configuration.affected_items.length > 0 &&
@@ -1443,42 +1432,32 @@ export class WazuhReportingCtrl {
           });
         }
       }
+
+      // Agents in group
       if (components['1']) {
-        let agentsInGroup = [];
-        try {
-          const agentsInGroupResponse = await context.wazuh.api.client.asCurrentUser.request(
-            'GET',
-            `/groups/${groupID}/agents`,
-            {},
-            { apiHostID: apiId }
-          );
-          agentsInGroup = agentsInGroupResponse.data.data.affected_items;
-        } catch (error) {
-          log('reporting:report', error.message || error, 'debug');
-        }
         await this.renderHeader(
           context,
           printer,
           'groupConfig',
           groupID,
-          (agentsInGroup || []).map((x) => x.id),
+          [],
           apiId
         );
       }
 
-      await printer.print(path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, userID, name));
+      await printer.print(context.wazuhEndpointParams.pathFilename);
 
       return response.ok({
         body: {
           success: true,
-          message: `Report ${name} was created`,
+          message: `Report ${context.wazuhEndpointParams.filename} was created`,
         },
       });
     } catch (error) {
       log('reporting:createReportsGroups', error.message || error);
       return ErrorResponse(error.message || error, 5029, 500, response);
     }
-  }
+  }, ({params: { groupID }}) => `wazuh-group-configuration-${groupID}-${this.generateReportTimestamp()}.pdf`)
 
   /**
    * Create a report for the agents
@@ -1487,23 +1466,21 @@ export class WazuhReportingCtrl {
    * @param {Object} response
    * @returns {*} reports list or ErrorResponse
    */
-  async createReportsAgents(
+  createReportsAgentsConfiguration = this.checkReportsUserDirectoryIsValidRouteDecorator( async (
     context: RequestHandlerContext,
     request: OpenSearchDashboardsRequest,
     response: OpenSearchDashboardsResponseFactory
-  ) {
+  ) => {
     try {
-      log('reporting:createReportsAgents', `Report started`, 'info');
-      const { name, components, apiId } = request.body;
+      log('reporting:createReportsAgentsConfiguration', `Report started`, 'info');
+      const { components, apiId } = request.body;
       const { agentID } = request.params;
 
       const printer = new ReportPrinter();
-
-      const { username: userID } = await context.wazuh.security.getCurrentUser(request, context);
       createDataDirectoryIfNotExists();
       createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
       createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH);
-      createDirectoryIfNotExists(path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, userID));
+      createDirectoryIfNotExists(path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, context.wazuhEndpointParams.hashUsername));
 
       let wmodulesResponse = {};
       let tables = [];
@@ -1524,7 +1501,7 @@ export class WazuhReportingCtrl {
       for (let config of AgentConfiguration.configurations) {
         let titleOfSection = false;
         log(
-          'reporting:createReportsAgents',
+          'reporting:createReportsAgentsConfiguration',
           `Iterate over ${config.sections.length} configuration sections`,
           'debug'
         );
@@ -1537,7 +1514,7 @@ export class WazuhReportingCtrl {
             let idx = 0;
             const configs = (section.config || []).concat(section.wodle || []);
             log(
-              'reporting:createReportsAgents',
+              'reporting:createReportsAgentsConfiguration',
               `Iterate over ${configs.length} configuration blocks`,
               'debug'
             );
@@ -1715,19 +1692,19 @@ export class WazuhReportingCtrl {
         }
       }
 
-      await printer.print(path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, userID, name));
+      await printer.print(context.wazuhEndpointParams.pathFilename);
 
       return response.ok({
         body: {
           success: true,
-          message: `Report ${name} was created`,
+          message: `Report ${context.wazuhEndpointParams.filename} was created`,
         },
       });
     } catch (error) {
-      log('reporting:createReportsAgents', error.message || error);
+      log('reporting:createReportsAgentsConfiguration', error.message || error);
       return ErrorResponse(error.message || error, 5029, 500, response);
     }
-  }
+  }, ({ params: { agentID }}) => `wazuh-agent-configuration-${agentID}-${this.generateReportTimestamp()}.pdf`)
 
   /**
    * Create a report for the agents
@@ -1736,24 +1713,24 @@ export class WazuhReportingCtrl {
    * @param {Object} response
    * @returns {*} reports list or ErrorResponse
    */
-  async createReportsAgentsInventory(
+  createReportsAgentsInventory = this.checkReportsUserDirectoryIsValidRouteDecorator( async (
     context: RequestHandlerContext,
     request: OpenSearchDashboardsRequest,
     response: OpenSearchDashboardsResponseFactory
-  ) {
+  ) => {
     try {
       log('reporting:createReportsAgentsInventory', `Report started`, 'info');
-      const { searchBar, filters, time, name, indexPatternTitle, apiId } = request.body;
+      const { searchBar, filters, time, indexPatternTitle, apiId } = request.body;
       const { agentID } = request.params;
       const { from, to } = time || {};
       // Init
       const printer = new ReportPrinter();
 
-      const { username: userID } = await context.wazuh.security.getCurrentUser(request, context);
+      const { hashUsername } = await context.wazuh.security.getCurrentUser(request, context);
       createDataDirectoryIfNotExists();
       createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
       createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH);
-      createDirectoryIfNotExists(path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, userID));
+      createDirectoryIfNotExists(path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, hashUsername));
 
       log('reporting:createReportsAgentsInventory', `Syscollector report`, 'debug');
       const sanitizedFilters = filters ? this.sanitizeKibanaFilters(filters, searchBar) : false;
@@ -1949,19 +1926,19 @@ export class WazuhReportingCtrl {
         .forEach((table) => printer.addSimpleTable(table));
 
       // Print the document
-      await printer.print(path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, userID, name));
+      await printer.print(context.wazuhEndpointParams.pathFilename);
 
       return response.ok({
         body: {
           success: true,
-          message: `Report ${name} was created`,
+          message: `Report ${context.wazuhEndpointParams.filename} was created`,
         },
       });
     } catch (error) {
       log('reporting:createReportsAgents', error.message || error);
       return ErrorResponse(error.message || error, 5029, 500, response);
     }
-  }
+  }, ({params: { agentID }}) => `wazuh-agent-inventory-${agentID}-${this.generateReportTimestamp()}.pdf`)
 
   /**
    * Fetch the reports list
@@ -1977,18 +1954,18 @@ export class WazuhReportingCtrl {
   ) {
     try {
       log('reporting:getReports', `Fetching created reports`, 'info');
-      const { username: userID } = await context.wazuh.security.getCurrentUser(request, context);
+      const { hashUsername } = await context.wazuh.security.getCurrentUser(request, context);
       createDataDirectoryIfNotExists();
       createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
       createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH);
-      const userReportsDirectory = path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, userID);
-      createDirectoryIfNotExists(userReportsDirectory);
-      log('reporting:getReports', `Directory: ${userReportsDirectory}`, 'debug');
+      const userReportsDirectoryPath = path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, hashUsername);
+      createDirectoryIfNotExists(userReportsDirectoryPath);
+      log('reporting:getReports', `Directory: ${userReportsDirectoryPath}`, 'debug');
 
       const sortReportsByDate = (a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0);
 
-      const reports = fs.readdirSync(userReportsDirectory).map((file) => {
-        const stats = fs.statSync(userReportsDirectory + '/' + file);
+      const reports = fs.readdirSync(userReportsDirectoryPath).map((file) => {
+        const stats = fs.statSync(userReportsDirectoryPath + '/' + file);
         // Get the file creation time (bithtime). It returns the first value that is a truthy value of next file stats: birthtime, mtime, ctime and atime.
         // This solves some OSs can have the bithtimeMs equal to 0 and returns the date like 1970-01-01
         const birthTimeField = ['birthtime', 'mtime', 'ctime', 'atime'].find(
@@ -2019,17 +1996,14 @@ export class WazuhReportingCtrl {
    * @param {Object} response
    * @returns {Object} report or ErrorResponse
    */
-  async getReportByName(
+  getReportByName = this.checkReportsUserDirectoryIsValidRouteDecorator(async (
     context: RequestHandlerContext,
     request: OpenSearchDashboardsRequest,
     response: OpenSearchDashboardsResponseFactory
-  ) {
+  ) => {
     try {
-      log('reporting:getReportByName', `Getting ${request.params.name} report`, 'debug');
-      const { username: userID } = await context.wazuh.security.getCurrentUser(request, context);
-      const reportFileBuffer = fs.readFileSync(
-        path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, userID, request.params.name)
-      );
+      log('reporting:getReportByName', `Getting ${context.wazuhEndpointParams.pathFilename} report`, 'debug');
+      const reportFileBuffer = fs.readFileSync(context.wazuhEndpointParams.pathFilename);
       return response.ok({
         headers: { 'Content-Type': 'application/pdf' },
         body: reportFileBuffer,
@@ -2038,7 +2012,7 @@ export class WazuhReportingCtrl {
       log('reporting:getReportByName', error.message || error);
       return ErrorResponse(error.message || error, 5030, 500, response);
     }
-  }
+  }, (request) => request.params.name)
 
   /**
    * Delete specific report
@@ -2047,18 +2021,15 @@ export class WazuhReportingCtrl {
    * @param {Object} response
    * @returns {Object} status obj or ErrorResponse
    */
-  async deleteReportByName(
+  deleteReportByName = this.checkReportsUserDirectoryIsValidRouteDecorator(async (
     context: RequestHandlerContext,
     request: OpenSearchDashboardsRequest,
     response: OpenSearchDashboardsResponseFactory
-  ) {
+  ) => {
     try {
-      log('reporting:deleteReportByName', `Deleting ${request.params.name} report`, 'debug');
-      const { username: userID } = await context.wazuh.security.getCurrentUser(request, context);
-      fs.unlinkSync(
-        path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, userID, request.params.name)
-      );
-      log('reporting:deleteReportByName', `${request.params.name} report was deleted`, 'info');
+      log('reporting:deleteReportByName', `Deleting ${context.wazuhEndpointParams.pathFilename} report`, 'debug');
+      fs.unlinkSync(context.wazuhEndpointParams.pathFilename);
+      log('reporting:deleteReportByName', `${context.wazuhEndpointParams.pathFilename} report was deleted`, 'info');
       return response.ok({
         body: { error: 0 },
       });
@@ -2066,5 +2037,38 @@ export class WazuhReportingCtrl {
       log('reporting:deleteReportByName', error.message || error);
       return ErrorResponse(error.message || error, 5032, 500, response);
     }
+  },(request) => request.params.name)
+
+  checkReportsUserDirectoryIsValidRouteDecorator(routeHandler, reportFileNameAccessor){
+    return (async (
+      context: RequestHandlerContext,
+      request: KibanaRequest,
+      response: KibanaResponseFactory
+    ) => {
+      try{
+        const { username, hashUsername } = await context.wazuh.security.getCurrentUser(request, context);
+        const userReportsDirectoryPath = path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, hashUsername);
+        const filename = reportFileNameAccessor(request);
+        const pathFilename = path.join(userReportsDirectoryPath, filename);
+        log('reporting:checkReportsUserDirectoryIsValidRouteDecorator', `Checking the user ${username}(${hashUsername}) can do actions in the reports file: ${pathFilename}`, 'debug');
+        if(!pathFilename.startsWith(userReportsDirectoryPath) || pathFilename.includes('../')){
+          log('security:reporting:checkReportsUserDirectoryIsValidRouteDecorator', `User ${username}(${hashUsername}) tried to access to a non user report file: ${pathFilename}`, 'warn');
+          return response.badRequest({
+            body: {
+              message: '5040 - You shall not pass!'
+            }
+          });
+        };
+        log('reporting:checkReportsUserDirectoryIsValidRouteDecorator', 'Checking the user can do actions in the reports file', 'debug');
+        return await routeHandler.bind(this)({...context, wazuhEndpointParams: { hashUsername, filename, pathFilename }}, request, response);
+      }catch(error){
+        log('reporting:checkReportsUserDirectoryIsValidRouteDecorator', error.message || error);
+        return ErrorResponse(error.message || error, 5040, 500, response);
+      }
+    })
+  }
+
+  private generateReportTimestamp(){
+    return `${(Date.now() / 1000) | 0}`;
   }
 }
