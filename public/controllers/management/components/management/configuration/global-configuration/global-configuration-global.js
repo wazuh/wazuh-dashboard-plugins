@@ -18,17 +18,16 @@ import WzConfigurationSettingsTabSelector from '../util-components/configuration
 import WzNoConfig from '../util-components/no-config';
 
 import { isString } from '../utils/utils';
+import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
 const helpLinks = [
   {
     text: 'Global reference',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/global.html'
+    href: webDocumentationLink('user-manual/reference/ossec-conf/global.html')
   },
   {
     text: 'Logging reference',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/logging.html'
+    href: webDocumentationLink('user-manual/reference/ossec-conf/logging.html')
   }
 ];
 
