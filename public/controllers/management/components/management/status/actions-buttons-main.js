@@ -66,7 +66,7 @@ class WzStatusActionButtons extends Component {
   /**
    * Restart cluster or manager
    */
-  async restartWazuh(isCluster) {
+  async restartWazuh() {
     this.setState({ isRestarting: true, timeoutRestarting: true });
     try {
       await RestartHandler.restartWazuh(this.props.updateRestartAttempt);
@@ -74,13 +74,13 @@ class WzStatusActionButtons extends Component {
     } catch (error) {
       this.setState({ isRestarting: false });
       const options = {
-        context: isCluster ? `${WzStatusActionButtons.name}.restartCluster` : `${WzStatusActionButtons.name}.restartManager`,
+        context: `${WzStatusActionButtons.name}.restartWazuh`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         error: {
           error: error,
           message: error.message || error,
-          title: `${error.name}: Error restarting ${isCluster ? 'cluster' : 'manager'}`,
+          title: `${error.name}: Error restarting Wazuh}`,
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -234,7 +234,7 @@ class WzStatusActionButtons extends Component {
             }
             onCancel={this.closeModal}
             onConfirm={() => {
-              this.restartWazuh(clusterEnabled)
+              this.restartWazuh()
               this.setState({ isModalVisible: false });
             }}
             cancelButtonText="Cancel"

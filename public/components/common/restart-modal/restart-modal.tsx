@@ -11,6 +11,7 @@ import { WazuhConfig } from '../../../react-services/wazuh-config';
 import { RestartHandler } from '../../../react-services/wz-restart';
 import { getAssetURL, getThemeAssetURL } from '../../../utils/assets';
 import store from '../../../redux/store';
+import { useSelector } from 'react-redux';
 
 /**
  * Available states of the model
@@ -35,11 +36,6 @@ export const RestartModal = (props: { isRestarting: boolean; useDelay?: boolean 
   // Modal's restart state
   const [currentState, setCurrentState] = useState(RESTART_STATES.RESTARTING);
 
-  // Restart attempt
-  const [restartAttempt, setRestartAttempt] = useState(
-    store.getState().appStateReducers.restartAttempt
-  );
-
   // TODO
   const [isRestarting, setRestart] = useState(isRestartingProp);
 
@@ -48,6 +44,9 @@ export const RestartModal = (props: { isRestarting: boolean; useDelay?: boolean 
 
   // Use default SYNC_DELAY
   const [syncDelay, setSyncDelay] = useState(RestartHandler.SYNC_DELAY / 1000);
+
+  // Restart attempt
+  const restartAttempt = useSelector(state => state.appStateReducers.restartAttempt);
 
   // Load Wazuh logo
   const wzConfig = new WazuhConfig().getConfig();
@@ -66,17 +65,7 @@ export const RestartModal = (props: { isRestarting: boolean; useDelay?: boolean 
 
   // Apply HEALTHCHECK_DELAY when the restart has failed
   useEffect(() => {
-    const intervalAttempts = setInterval(() => {
-      setRestartAttempt(store.getState().appStateReducers.restartAttempt);
-      if (!isRestarting) {
-        setRestartAttempt(0);
-        clearInterval(intervalAttempts);
-      }
-    }, 1000);
     !isRestarting && countdown(timeToHC, setCountdown);
-    return () => {
-      clearInterval(intervalAttempts);
-    };
   }, [isRestarting]);
 
   // TODO
