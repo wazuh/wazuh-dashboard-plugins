@@ -860,7 +860,7 @@ export async function extendedInformation(
 
     //--- SUMMARY TABLES
     const extraSummaryTables = [];
-    if (summaryTablesDefinitions[`${section}Summary`][`${tab}AlertsSummary`]) {
+    if (summaryTablesDefinitions?.[`${section}Summary`]?.[`${tab}AlertsSummary`]) {
       log('reporting:AlertsSummaryTable', 'Fetching Alerts Summary Table', 'debug');
       const alertsSummaryTable = new SummaryTable(
         context,
@@ -873,7 +873,7 @@ export async function extendedInformation(
       const alertsSummaryData = await alertsSummaryTable.fetch();
       extraSummaryTables.push(alertsSummaryData);
     }
-    if (summaryTablesDefinitions[`${section}Summary`][`${tab}GroupsSummary`]) {
+    if (summaryTablesDefinitions?.[`${section}Summary`]?.[`${tab}GroupsSummary`]) {
       log('reporting:GroupsSummaryTable', 'Fetching Groups Summary Table', 'debug');
       const groupsSummaryTable = new SummaryTable(
         context,

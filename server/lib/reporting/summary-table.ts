@@ -40,6 +40,11 @@ export default class SummaryTable {
     this._parseSummarySetup(summarySetup);
 
   }
+
+  /**
+   * Parse the summary table setup to build the query
+   * @param summarySetup 
+   */
   _parseSummarySetup(summarySetup: SummarySetup) {
     let baseAggRef = this._base.aggs;
     summarySetup.aggs.forEach(( agg, key) => {
@@ -55,6 +60,12 @@ export default class SummaryTable {
     },this);
   }
   
+  /**
+   * Parse each aggregation to build the query
+   * @param baseAggRef 
+   * @param agg 
+   * @param key 
+   */
   _parseAggregation(baseAggRef: any, agg: any, key: string) {
     const { field, size, order } = agg;
     
