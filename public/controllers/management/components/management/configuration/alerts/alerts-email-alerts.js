@@ -13,9 +13,6 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 
-import { EuiSpacer } from '@elastic/eui';
-
-import WzConfigurationSetting from '../util-components/configuration-setting';
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzConfigurationSettingsListSelector from '../util-components/configuration-settings-list-selector';
 import WzNoConfig from '../util-components/no-config';
@@ -23,6 +20,7 @@ import { isString, isArray } from '../utils/utils';
 import { settingsListBuilder } from '../utils/builders';
 
 import { connect } from 'react-redux';
+import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
 const mainSettings = [
   { field: 'email_to', label: 'Send alerts to this email address' },
@@ -52,19 +50,16 @@ const mainSettings = [
 
 const helpLinks = [
   {
-    text: 'How to configure email alerts',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/manager/manual-email-report/index.html'
+    text: 'Configuring email alerts',
+    href: webDocumentationLink('user-manual/manager/manual-email-report/index.html')
   },
   {
-    text: 'How to configure authenticated SMTP server',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/manager/manual-email-report/smtp_authentication.html'
+    text: 'SMTP server with authentication',
+    href: webDocumentationLink('user-manual/manager/manual-email-report/smtp-authentication.html')
   },
   {
     text: 'Email alerts reference',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/email_alerts.html'
+    href: webDocumentationLink('user-manual/reference/ossec-conf/email-alerts.html')
   }
 ];
 

@@ -12,12 +12,43 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Changed the HTTP verb from `GET` to `POST` in the requests to login to the Wazuh API [#4103](https://github.com/wazuh/wazuh-kibana-app/pull/4103)
 
+## Wazuh v4.3.7 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4308
+
+### Fixed
+
+- Wazuh.yml review: fixed link to web documentation, improved in-file documentation and fixed some grammatical errors. [#4378](https://github.com/wazuh/wazuh-kibana-app/pull/4378)
+- Fixed an error during the generation of a group's report, if the request to the Wazuh API fails [#4350](https://github.com/wazuh/wazuh-kibana-app/pull/4350)
+- Fixed a problem with the group's report, when the group has no agents [#4350](https://github.com/wazuh/wazuh-kibana-app/pull/4350)
+- Fixed path in logo customization section [#4352](https://github.com/wazuh/wazuh-kibana-app/pull/4352)
+- Fixed a TypeError in Firefox. Change the Get request that was made with a Kibana core.http.get(/api/check-wazuh) resource to the WzRequest.genericReq resource and it no longer fails, also add a test capture to public/plugin.ts that wraps the request and in case of failure, the error is detected when the browser does not work with the V8 engine. [#4362](https://github.com/wazuh/wazuh-kibana-app/pull/4362)
+- Fixed an error of an undefined username hash related to reporting when using Kibana with X-Pack and security was disabled [#4358](https://github.com/wazuh/wazuh-kibana-app/pull/4358)
+- Fixed persistence of the plugin registry file between updates [#4359](https://github.com/wazuh/wazuh-kibana-app/pull/4359)
+- Fixed searchbar error on SCA Inventory table [#4367](https://github.com/wazuh/wazuh-kibana-app/pull/4367)
+
+# Removed
+
+- Removed the use of `manager_host` field related to agent information of Wazuh API responses, which is obsolete [#4350](https://github.com/wazuh/wazuh-kibana-app/pull/4350)
+
+## Wazuh v4.3.6 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4307
+
+### Fixed
+
+- Fixed the search bar component to properly distinguish conjuntion operators (AND, OR) [#4326](https://github.com/wazuh/wazuh-kibana-app/pull/4326)
+- Fixed documentation link titles to match the documentation sections to redirect to [#4301](https://github.com/wazuh/wazuh-kibana-app/pull/4301)
+- Fixed missing documentation references to the Agent's overview, Agent's Integrity monitoring, and Agent's Inventory data sections, when the agent has never connected. [#4301](https://github.com/wazuh/wazuh-kibana-app/pull/4301)
+- The references to the documentation site now links to the appropriate version [#4301](https://github.com/wazuh/wazuh-kibana-app/pull/4301)
+- Fixed missing documentation link in the Docker Listener module [#4301](https://github.com/wazuh/wazuh-kibana-app/pull/4301)
+- Fixed broken links to the documentation site [#4301](https://github.com/wazuh/wazuh-kibana-app/pull/4301)
+- Fix Rules, Decoders and CDB lists uploaders to show errors appropriately [#4307](https://github.com/wazuh/wazuh-kibana-app/pull/4307)
+- Sanitize report's inputs and usernames [#4330](https://github.com/wazuh/wazuh-kibana-app/pull/4330)
+
 ## Wazuh v4.3.5 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4306
 
 ### Added
 
 - Added to the interface API messages in the Ruleset test module [#4244](https://github.com/wazuh/wazuh-kibana-app/pull/4244)
 - Added authorization prompt in Mitre > Intelligence [#4261](https://github.com/wazuh/wazuh-kibana-app/pull/4261)
+- Added a more descriptive message when there is an error related to the user permissions when getting the list of index patterns in a route resolver [#4280](https://github.com/wazuh/wazuh-kibana-app/pull/4280)
 
 ### Changed
 
