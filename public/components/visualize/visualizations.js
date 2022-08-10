@@ -544,15 +544,6 @@ export const visualizations = {
           }
         ]
       },
-      {
-        hide: true,
-        vis: [
-          {
-            title: 'Alert summary',
-            id: 'Wazuh-App-Overview-vuls-Alert-summary'
-          }
-        ]
-      }
     ]
   },
   virustotal: {
@@ -710,15 +701,6 @@ export const visualizations = {
           }
         ]
       },
-      {
-        hide: true,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Overview-Docker-Events-summary'
-          }
-        ]
-      }
     ]
   },
   oscap: {
@@ -772,15 +754,6 @@ export const visualizations = {
           }
         ]
       },
-      {
-        hide: true,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Overview-OSCAP-Last-alerts'
-          }
-        ]
-      }
     ]
   },
   ciscat: {
@@ -871,15 +844,6 @@ export const visualizations = {
           }
         ]
       },
-      {
-        hide: true,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Overview-Audit-Last-alerts'
-          }
-        ]
-      }
     ]
   },
   github: {
@@ -914,15 +878,6 @@ export const visualizations = {
           }
         ]
       },
-      {
-        hide: true,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Overview-GitHub-Alert-Summary',
-          }
-        ]
-      }
     ]
   },
 };

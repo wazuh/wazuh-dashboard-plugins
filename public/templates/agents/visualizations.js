@@ -127,15 +127,6 @@ export const visualizations = {
           }
         ]
       },
-      {
-        hide: true,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Agents-PCI-Last-alerts'
-          }
-        ]
-      }
     ]
   },
   gdpr: {
@@ -175,15 +166,6 @@ export const visualizations = {
           }
         ]
       },
-      {
-        hide: true,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Agents-GDPR-Last-alerts'
-          }
-        ]
-      }
     ]
   },
   nist: {
@@ -217,15 +199,6 @@ export const visualizations = {
           }
         ]
       },
-      {
-        hide: true,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Agents-NIST-Last-alerts'
-          }
-        ]
-      }
     ]
   },
   tsc: {
@@ -311,15 +284,6 @@ export const visualizations = {
           }
         ]
       },
-      {
-        hide: true,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Agents-HIPAA-Last-alerts'
-          }
-        ]
-      }
     ]
   },
   virustotal: {
@@ -415,15 +379,6 @@ export const visualizations = {
           }
         ]
       },
-      {
-        hide: true,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Agents-Docker-Events-summary'
-          }
-        ]
-      }
     ]
   },
   oscap: {
@@ -477,15 +432,6 @@ export const visualizations = {
           }
         ]
       },
-      {
-        hide: true,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Agents-OSCAP-Last-alerts'
-          }
-        ]
-      }
     ]
   },
   ciscat: {
@@ -566,15 +512,6 @@ export const visualizations = {
           }
         ]
       },
-      {
-        hide: true,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Agents-Audit-Last-alerts'
-          }
-        ]
-      }
     ]
   }
 };

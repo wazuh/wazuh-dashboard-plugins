@@ -1,6 +1,6 @@
 import { log } from '../logger';
 import SummaryTable from './summary-table';
-import SummaryTableDefinitions from './summary-tables-definitions';
+import summaryTablesDefinitions from './summary-tables-definitions';
 import * as VulnerabilityRequest from './vulnerability-request';
 import * as OverviewRequest from './overview-request';
 import * as RootcheckRequest from './rootcheck-request';
@@ -15,66 +15,53 @@ import TSC from '../../integration-files/tsc-requirements-pdfmake';
 import { WAZUH_ALERTS_PATTERN } from '../../../common/constants';
 import { ReportPrinter } from './printer';
 import moment from 'moment';
-import summaryTablesDefinitions from './summary-tables-definitions';
+
 
 
 
 /**
- * This build the agents table
- * @param {Array<Strings>} ids ids of agents
- * @param {String} apiId API id
- */
-export async function buildAgentsTable(context, printer: ReportPrinter, agentIDs: string[], apiId: string, multi = false) {
+   * This build the agents table
+   * @param {Array<Strings>} ids ids of agents
+   * @param {String} apiId API id
+   */
+ export async function buildAgentsTable(context, printer: ReportPrinter, agentIDs: string[], apiId: string, groupID: string = '') {
   const dateFormat = await context.core.uiSettings.client.get('dateFormat');
-  if (!agentIDs || !agentIDs.length) return;
+  if ((!agentIDs || !agentIDs.length) && !groupID) return;
   log('reporting:buildAgentsTable', `${agentIDs.length} agents for API ${apiId}`, 'info');
   try {
-    let agentRows = [];
-    if (multi) {
-      try {
-        const agentsResponse = await context.wazuh.api.client.asCurrentUser.request(
+    let agentsData = [];
+    if (groupID) {
+      let totalAgentsInGroup = null;
+      do{
+        const { data: { data: { affected_items, total_affected_items } } } = await context.wazuh.api.client.asCurrentUser.request(
           'GET',
-          `/groups/${multi}/agents`,
-          {},
+          `/groups/${groupID}/agents`,
+          {
+            params: {
+              offset: agentsData.length,
+              select: 'dateAdd,id,ip,lastKeepAlive,manager,name,os.name,os.version,version',
+            }
+          },
           { apiHostID: apiId }
         );
-        const agentsData =
-          agentsResponse &&
-          agentsResponse.data &&
-          agentsResponse.data.data &&
-          agentsResponse.data.data.affected_items;
-        agentRows = (agentsData || []).map((agent) => ({
-          ...agent,
-          manager: agent.manager || agent.manager_host,
-          os:
-            agent.os && agent.os.name && agent.os.version
-              ? `${agent.os.name} ${agent.os.version}`
-              : '',
-        }));
-      } catch (error) {
-        log(
-          'reporting:buildAgentsTable',
-          `Skip agent due to: ${error.message || error}`,
-          'debug'
-        );
-      }
+        !totalAgentsInGroup && (totalAgentsInGroup = total_affected_items);
+        agentsData = [...agentsData, ...affected_items];
+      }while(agentsData.length < totalAgentsInGroup);
     } else {
       for (const agentID of agentIDs) {
         try {
-          const agentResponse = await context.wazuh.api.client.asCurrentUser.request(
+          const { data: { data: { affected_items: [agent] } } } = await context.wazuh.api.client.asCurrentUser.request(
             'GET',
             `/agents`,
-            { params: { q: `id=${agentID}` } },
+            { 
+              params: {
+                q: `id=${agentID}`,
+                select: 'dateAdd,id,ip,lastKeepAlive,manager,name,os.name,os.version,version',
+              } 
+            },
             { apiHostID: apiId }
           );
-          const [agent] = agentResponse.data.data.affected_items;
-          agentRows.push({
-            ...agent,
-            manager: agent.manager || agent.manager_host,
-            os: (agent.os && agent.os.name && agent.os.version) ? `${agent.os.name} ${agent.os.version}` : '',
-            lastKeepAlive: moment(agent.lastKeepAlive).format(dateFormat),
-            dateAdd: moment(agent.dateAdd).format(dateFormat)
-          });
+          agentsData.push(agent);
         } catch (error) {
           log(
             'reporting:buildAgentsTable',
@@ -84,19 +71,37 @@ export async function buildAgentsTable(context, printer: ReportPrinter, agentIDs
         }
       }
     }
-    printer.addSimpleTable({
-      columns: [
-        { id: 'id', label: 'ID' },
-        { id: 'name', label: 'Name' },
-        { id: 'ip', label: 'IP' },
-        { id: 'version', label: 'Version' },
-        { id: 'manager', label: 'Manager' },
-        { id: 'os', label: 'OS' },
-        { id: 'dateAdd', label: 'Registration date' },
-        { id: 'lastKeepAlive', label: 'Last keep alive' },
-      ],
-      items: agentRows,
-    });
+
+    if(agentsData.length){
+      // Print a table with agent/s information
+      printer.addSimpleTable({
+        columns: [
+          { id: 'id', label: 'ID' },
+          { id: 'name', label: 'Name' },
+          { id: 'ip', label: 'IP' },
+          { id: 'version', label: 'Version' },
+          { id: 'manager', label: 'Manager' },
+          { id: 'os', label: 'OS' },
+          { id: 'dateAdd', label: 'Registration date' },
+          { id: 'lastKeepAlive', label: 'Last keep alive' },
+        ],
+        items: agentsData.map((agent) => {
+          return {
+            ...agent,
+            os: (agent.os && agent.os.name && agent.os.version) ? `${agent.os.name} ${agent.os.version}` : '',
+            lastKeepAlive: moment(agent.lastKeepAlive).format(dateFormat),
+            dateAdd: moment(agent.dateAdd).format(dateFormat)
+          }
+        }),
+      });
+    }else if(!agentsData.length && groupID){
+      // For group reports when there is no agents in the group
+      printer.addContent({
+        text: 'There are no agents in this group.',
+        style: { fontSize: 12, color: '#000' },
+      });
+    }
+    
   } catch (error) {
     log('reporting:buildAgentsTable', error.message || error);
     return Promise.reject(error);
@@ -147,6 +152,7 @@ export async function extendedInformation(
     );
 
     const totalAgents = agents.data.data.total_affected_items;
+
     //--- OVERVIEW - VULS
     if (section === 'overview' && tab === 'vuls') {
       log(
@@ -171,7 +177,7 @@ export async function extendedInformation(
               return count
                 ? `${count} of ${totalAgents} agents have ${vulnerabilitiesLevel.toLocaleLowerCase()} vulnerabilities.`
                 : undefined;
-            } catch (error) { }
+            } catch (error) {}
           })
         )
       ).filter((vulnerabilitiesResponse) => vulnerabilitiesResponse);
