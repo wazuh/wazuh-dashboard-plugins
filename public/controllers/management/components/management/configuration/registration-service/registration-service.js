@@ -16,7 +16,7 @@ import WzConfigurationSettingsGroup from '../util-components/configuration-setti
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import withWzConfig from '../util-hocs/wz-config';
 import WzNoConfig from '../util-components/no-config';
-import { isString, renderValueNoThenEnabled } from '../utils/utils';
+import { isString, renderValueNoThenEnabled, renderValueYesThenEnabled } from '../utils/utils';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
 const helpLinks = [
