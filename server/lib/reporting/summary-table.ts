@@ -39,47 +39,6 @@ export default class SummaryTable {
 
     this._parseSummarySetup(summarySetup);
 
-    // base.query.bool.must.push({
-    //   match_phrase: {
-    //     'rule.level': {
-    //       query: 15
-    //     }
-    //   }
-    // });
-    // Object.assign(this._base.aggs, {
-    //   "2": {
-    //     terms: {
-    //       field: "rule.id",
-    //       order: {
-    //         _count: "desc"
-    //       },
-    //       size: 1000
-    //     },
-    //     aggs: {
-    //       "3": {
-    //         terms: {
-    //           field: "rule.description",
-    //           order: {
-    //             _count: "desc"
-    //           },
-    //           size: 20
-    //         },
-    //         aggs: {
-    //           "4": {
-    //             terms: {
-    //               field: "rule.level",
-    //               order: {
-    //                 _count: "desc"
-    //               },
-    //               size: 12
-    //             }
-    //           }
-    //         }
-    //       }
-    //     }
-    //   }
-    // });
-
   }
   _parseSummarySetup(summarySetup: SummarySetup) {
     let baseAggRef = this._base.aggs;
