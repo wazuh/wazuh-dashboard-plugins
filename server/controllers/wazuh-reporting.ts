@@ -2042,8 +2042,8 @@ export class WazuhReportingCtrl {
   checkReportsUserDirectoryIsValidRouteDecorator(routeHandler, reportFileNameAccessor){
     return (async (
       context: RequestHandlerContext,
-      request: KibanaRequest,
-      response: KibanaResponseFactory
+      request: OpenSearchDashboardsRequest,
+      response: OpenSearchDashboardsResponseFactory
     ) => {
       try{
         const { username, hashUsername } = await context.wazuh.security.getCurrentUser(request, context);
