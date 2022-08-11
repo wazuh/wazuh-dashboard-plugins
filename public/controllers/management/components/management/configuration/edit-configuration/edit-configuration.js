@@ -30,7 +30,7 @@ import WzConfigurationPath from '../util-components/configuration-path';
 import WzRefreshClusterInfoButton from '../util-components/refresh-cluster-info-button';
 import { WzButtonPermissions } from '../../../../../../components/common/permissions/button';
 import withLoading from '../util-hocs/loading';
-import { updateRestartAttempt } from '../../../../../../redux/actions/appStateActions';
+import { updateRestartStatus, updateRestartAttempt, updateSyncCheckAttempt, updateUnsynchronizedNodes } from '../../../../../../redux/actions/appStateActions';
 import {
   updateClusterNodes,
   updateClusterNodeSelected,
@@ -160,8 +160,14 @@ class WzEditConfiguration extends Component {
   async confirmRestart() {
     try {
       this.setState({ restarting: true, saving: true, infoChangesAfterRestart: false, timeoutRestarting:true });
+      const updateRedux = {
+        updateRestartStatus: this.props.updateRestartStatus,
+        updateSyncCheckAttempt: this.props.updateSyncCheckAttempt,
+        updateUnsynchronizedNodes: this.props.updateUnsynchronizedNodes,
+        updateRestartAttempt: this.props.updateRestartAttempt,
+      }
       await RestartHandler.restartSelectedNode(
-        this.props.clusterNodeSelected, this.props.updateRestartAttempt
+        this.props.clusterNodeSelected, updateRedux
       );
       this.setState({ restart: false, saving: false, restarting: false, timeoutRestarting: false });
       await this.checkIfClusterOrManager();
@@ -336,6 +342,9 @@ const mapDispatchToProps = (dispatch) => ({
   updateClusterNodeSelected: (clusterNodeSelected) =>
     dispatch(updateClusterNodeSelected(clusterNodeSelected)),
   updateRestartAttempt: (value) => dispatch(updateRestartAttempt(value)),
+  updateRestartStatus: (value) => dispatch(updateRestartStatus(value)),
+  updateSyncCheckAttempt: (value) => dispatch(updateSyncCheckAttempt(value)),
+  updateUnsynchronizedNodes: (value) => dispatch(updateUnsynchronizedNodes(value)),
 });
 
 WzEditConfiguration.propTypes = {

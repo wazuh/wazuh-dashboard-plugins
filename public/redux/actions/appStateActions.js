@@ -248,3 +248,39 @@ export const updateRestartAttempt = (restartAttempt) => {
     restartAttempt
   };
 };
+
+/**
+ * Update sync check attempt
+ * @param {Number} syncCheckAttempt
+ * @returns
+ */
+export const updateSyncCheckAttempt = (syncCheckAttempt) => {
+  return {
+    type: 'UPDATE_SYNC_CHECK_ATTEMPT',
+    syncCheckAttempt
+  };
+}
+
+/**
+ * Update restart attempt
+ * @param {Number} restartAttempt
+ * @returns
+ */
+export const updateUnsynchronizedNodes = (unsynchronizedNodes) => {
+  return {
+    type: 'UPDATE_UNSYNCHRONIZED_NODES',
+    unsynchronizedNodes
+  };
+};
+
+/**
+ * Update restart attempt
+ * @param {Number} restartAttempt
+ * @returns
+ */
+export const updateRestartStatus = (restartStatus) => {
+  return {
+    type: 'UPDATE_RESTART_STATUS',
+    restartStatus
+  };
+};

@@ -25,15 +25,19 @@ import {
 } from '@elastic/eui';
 
 import { getToasts } from '../../kibana-services';
-import { updateRestartAttempt } from '../../redux/actions/appStateActions';
+import { updateRestartAttempt, updateSyncCheckAttempt, updateUnsynchronizedNodes, updateRestartStatus } from '../../redux/actions/appStateActions';
 import { RestartHandler } from '../../react-services/wz-restart';
 import { connect } from 'react-redux';
 import { RestartModal } from './restart-modal/restart-modal';
 
 interface IWzRestartCalloutProps {
-  updateRestartAttempt: (wazuhNotReadyYet) => void;
+  updateRestartAttempt: (restartAttempt) => void;
+  updateSyncCheckAttempt: (syncCheckAttempt) => void;
+  updateUnsynchronizedNodes: (unsynchronizedNodes) => void;
+  updateRestartStatus: (restartStatus) => void;
   onRestarted: () => void;
   onRestartedError: () => void;
+  restartStatus: string;
 }
 
 interface IWzRestartCalloutState {
@@ -77,7 +81,14 @@ class WzRestartCallout extends Component<IWzRestartCalloutProps, IWzRestartCallo
         isRestarting: true,
         timeoutRestarting: true,
       });
-      await RestartHandler.restartWazuh(this.props.updateRestartAttempt, this.state.isCluster);
+      const updateRedux = {
+        updateRestartAttempt: this.props.updateRestartAttempt,
+        updateSyncCheckAttempt: this.props.updateSyncCheckAttempt,
+        updateUnsynchronizedNodes: this.props.updateUnsynchronizedNodes,
+        updateRestartStatus: this.props.updateRestartStatus,
+      };
+      this.state.isCluster ? updateRedux.updateRestartStatus(RestartHandler.RESTART_STATES.SYNCING) : updateRedux.updateRestartStatus(RestartHandler.RESTART_STATES.RESTARTING)
+      await RestartHandler.restartWazuh(updateRedux, this.state.isCluster);
       this.setState({ isRestarting: false, timeoutRestarting: false });
       this.props.onRestarted();
     } catch (error) {
@@ -100,7 +111,6 @@ class WzRestartCallout extends Component<IWzRestartCalloutProps, IWzRestartCallo
     const {
       warningRestarting,
       warningRestartModalVisible,
-      isRestarting,
       isCluster,
       timeoutRestarting,
     } = this.state;
@@ -135,24 +145,37 @@ class WzRestartCallout extends Component<IWzRestartCalloutProps, IWzRestartCallo
             <EuiConfirmModal
               title={`${isCluster ? 'Cluster' : 'Manager'} will be restarted`}
               onCancel={() => this.toggleWarningRestartModalVisible()}
-              onConfirm={() => this.restartWazuh()}
+              onConfirm={() => {
+                isCluster ? this.props.updateRestartStatus(RestartHandler.RESTART_STATES.SYNCING) : this.props.updateRestartStatus(RestartHandler.RESTART_STATES.RESTARTING)
+                this.restartWazuh()
+              }}
               cancelButtonText="Cancel"
               confirmButtonText="Confirm"
               defaultFocusedButton="cancel"
             ></EuiConfirmModal>
           </EuiOverlayMask>
         )}
-        {timeoutRestarting && <RestartModal isRestarting={isRestarting} useDelay={isCluster} />}
+        {timeoutRestarting && this.props.restartStatus !== RestartHandler.RESTART_STATES.NEED_RESTART && this.props.restartStatus !== RestartHandler.RESTART_STATES.RESTARTED  && <RestartModal useDelay={isCluster} />}
       </Fragment>
     );
   }
 }
 
+const mapStateToProps = state => ({
+  restartStatus: state.appStateReducers.restartStatus,
+});
+
 const mapDispatchToProps = (dispatch) => {
   return {
     updateRestartAttempt: (restartAttempt) =>
       dispatch(updateRestartAttempt(restartAttempt)),
+    updateSyncCheckAttempt: (syncCheckAttempt) =>
+      dispatch(updateSyncCheckAttempt(syncCheckAttempt)),
+    updateUnsynchronizedNodes: (unsynchronizedNodes) =>
+      dispatch(updateUnsynchronizedNodes(unsynchronizedNodes)),
+    updateRestartStatus: (restartStatus) =>
+      dispatch(updateRestartStatus(restartStatus)),
   };
 };
 
-export default connect(null, mapDispatchToProps)(WzRestartCallout);
+export default connect(mapStateToProps, mapDispatchToProps)(WzRestartCallout);

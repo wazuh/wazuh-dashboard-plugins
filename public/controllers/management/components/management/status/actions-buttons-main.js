@@ -37,7 +37,7 @@ import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchest
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 import { RestartHandler } from '../../../../../react-services/wz-restart';
-import { updateRestartAttempt } from '../../../../../redux/actions/appStateActions';
+import { updateRestartAttempt, updateRestartStatus } from '../../../../../redux/actions/appStateActions';
 import { RestartModal } from '../../../../../components/common/restart-modal/restart-modal'
 
 class WzStatusActionButtons extends Component {
@@ -69,7 +69,8 @@ class WzStatusActionButtons extends Component {
   async restartWazuh() {
     this.setState({ isRestarting: true, timeoutRestarting: true });
     try {
-      await RestartHandler.restartWazuh(this.props.updateRestartAttempt);
+      const updateRedux = {updateRestartAttempt: this.props.updateRestartAttempt , updateRestartStatus: this.props.updateRestartStatus};
+      await RestartHandler.restartWazuh(updateRedux);
       this.setState({ isRestarting: false, timeoutRestarting: false });
     } catch (error) {
       this.setState({ isRestarting: false });
@@ -234,6 +235,7 @@ class WzStatusActionButtons extends Component {
             }
             onCancel={this.closeModal}
             onConfirm={() => {
+              this.props.updateRestartStatus(RestartHandler.RESTART_STATES.RESTARTING)
               this.restartWazuh()
               this.setState({ isModalVisible: false });
             }}
@@ -280,6 +282,7 @@ const mapDispatchToProps = dispatch => {
     updateStats: stats => dispatch(updateStats(stats)),
     updateAgentInfo: agentInfo => dispatch(updateAgentInfo(agentInfo)),
     updateRestartAttempt: restartAttempt => dispatch(updateRestartAttempt(restartAttempt)),
+    updateRestartStatus: restartStatus => dispatch(updateRestartStatus(restartStatus)),
   };
 };
 

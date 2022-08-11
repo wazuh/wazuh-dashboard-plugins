@@ -10,34 +10,23 @@ import { getHttp } from '../../../kibana-services';
 import { WazuhConfig } from '../../../react-services/wazuh-config';
 import { RestartHandler } from '../../../react-services/wz-restart';
 import { getAssetURL, getThemeAssetURL } from '../../../utils/assets';
-import store from '../../../redux/store';
-import { useSelector } from 'react-redux';
+import { connect, useDispatch, useSelector } from 'react-redux';
+import { updateRestartStatus, updateRestartAttempt, updateSyncCheckAttempt, updateUnsynchronizedNodes } from '../../../redux/actions/appStateActions';
 
 /**
  * Available states of the model
  * TODO the state owner must be the Restart Service, not the modal. For this,
  * TODO the restart service must be migrated to Typescript.
- */
-enum RESTART_STATES {
-  ERROR = 'error',
-  RESTARTING = 'restarting',
-  SYNCING = 'syncing',
-}
+
 
 /**
  * The restart modal to show feedback to the user.
  * @param props component's props
  * @returns components's body
  */
-export const RestartModal = (props: { isRestarting: boolean; useDelay?: boolean }) => {
+export const RestartModal = (props: { useDelay?: boolean }) => {
   // Component props
-  const { isRestarting: isRestartingProp, useDelay = false } = props;
-
-  // Modal's restart state
-  const [currentState, setCurrentState] = useState(RESTART_STATES.RESTARTING);
-
-  // TODO
-  const [isRestarting, setRestart] = useState(isRestartingProp);
+  const { useDelay = false } = props;
 
   // Use default HEALTHCHECK_DELAY
   const [timeToHC, setCountdown] = useState(RestartHandler.HEALTHCHECK_DELAY / 1000);
@@ -47,8 +36,15 @@ export const RestartModal = (props: { isRestarting: boolean; useDelay?: boolean 
 
   // Restart attempt
   const restartAttempt = useSelector(state => state.appStateReducers.restartAttempt);
+  const unsynchronizedNodes = useSelector(state => state.appStateReducers.unsynchronizedNodes);
+  const syncCheckAttempt = useSelector(state => state.appStateReducers.syncCheckAttempt);
+  const restartStatus = useSelector(state => state.appStateReducers.restartStatus);
+
+  const dispatch = useDispatch();
 
   // Load Wazuh logo
+  const maxAttempts = useDelay ? RestartHandler.MAX_ATTEMPTS_RESTART + RestartHandler.MAX_ATTEMPTS_SYNC : RestartHandler.MAX_ATTEMPTS_RESTART
+  const attempts = useDelay ? restartAttempt + syncCheckAttempt : restartAttempt;
   const wzConfig = new WazuhConfig().getConfig();
   const logotypeURL = getHttp().basePath.prepend(
     wzConfig['customization.logo.sidebar']
@@ -65,18 +61,8 @@ export const RestartModal = (props: { isRestarting: boolean; useDelay?: boolean 
 
   // Apply HEALTHCHECK_DELAY when the restart has failed
   useEffect(() => {
-    !isRestarting && countdown(timeToHC, setCountdown);
-  }, [isRestarting]);
-
-  // TODO
-  useEffect(() => {
-    restartAttempt === RestartHandler.MAX_ATTEMPTS && setRestart(false);
-    isRestarting && restartAttempt === 0 && useDelay
-      ? setCurrentState(RESTART_STATES.SYNCING)
-      : isRestarting
-      ? setCurrentState(RESTART_STATES.RESTARTING)
-      : setCurrentState(RESTART_STATES.ERROR);
-  }, [restartAttempt]);
+    restartStatus === RestartHandler.RESTART_STATES.ERROR_RESTART && countdown(timeToHC, setCountdown);
+  }, [restartStatus]);
 
   // TODO
   const countdown = (time: number, setState) => {
@@ -95,11 +81,27 @@ export const RestartModal = (props: { isRestarting: boolean; useDelay?: boolean 
     }, 1000 /* 1 second */);
   };
 
+  const updateRedux = {
+      updateRestartAttempt: (restartAttempt) =>
+        dispatch(updateRestartAttempt(restartAttempt)),
+      updateSyncCheckAttempt: (syncCheckAttempt) =>
+        dispatch(updateSyncCheckAttempt(syncCheckAttempt)),
+      updateUnsynchronizedNodes: (unsynchronizedNodes) =>
+        dispatch(updateUnsynchronizedNodes(unsynchronizedNodes)),
+      updateRestartStatus: (restartStatus) =>
+        dispatch(updateRestartStatus(restartStatus)),
+    };
+
+  const forceRestart = async () => {
+    const useDelay = false;
+    await RestartHandler.restartWazuh(updateRedux, useDelay);
+  }
+
   // Build the modal depending on the restart state.
   let emptyPromptProps: Partial<EuiEmptyPromptProps>;
-  switch (currentState) {
+  switch (restartStatus) {
     default:
-    case RESTART_STATES.RESTARTING:
+    case RestartHandler.RESTART_STATES.RESTARTING:
       emptyPromptProps = {
         title: (
           <>
@@ -110,9 +112,8 @@ export const RestartModal = (props: { isRestarting: boolean; useDelay?: boolean 
         body: (
           <>
             <EuiProgress
-              label={`Attempt ${restartAttempt}/${RestartHandler.MAX_ATTEMPTS}`}
-              value={restartAttempt}
-              max={RestartHandler.MAX_ATTEMPTS}
+              value={attempts}
+              max={maxAttempts}
               size="s"
             />
           </>
@@ -120,7 +121,7 @@ export const RestartModal = (props: { isRestarting: boolean; useDelay?: boolean 
       };
       break;
 
-    case RESTART_STATES.ERROR:
+    case RestartHandler.RESTART_STATES.ERROR_RESTART:
       emptyPromptProps = {
         iconType: 'alert',
         iconColor: 'danger',
@@ -133,16 +134,43 @@ export const RestartModal = (props: { isRestarting: boolean; useDelay?: boolean 
         ),
       };
       break;
+      
+    case RestartHandler.RESTART_STATES.ERROR_SYNC:
+      emptyPromptProps = {
+        iconType: 'alert',
+        iconColor: 'danger',
+        title: <h2 className="wz-modal-restart-title">Synchronization failed</h2>,
+        body: (
+          <p>
+            The nodes {unsynchronizedNodes.join(', ')} did not synchronize. Restarting Wazuh might
+            set the cluster into an inconsistent state.
+          </p>
+        ),
+        actions: (
+          <EuiButton color="warning" fill onClick={forceRestart}>
+            Force restart
+          </EuiButton>
+        ),
+      };
+      break;
 
-    case RESTART_STATES.SYNCING:
+    case RestartHandler.RESTART_STATES.SYNCING:
       emptyPromptProps = {
         title: (
           <>
             <img src={logotypeURL} className="wz-modal-restart-logo" alt=""></img>
-            <h2 className="wz-modal-restart-title">Restarting Wazuh</h2>
+            <h2 className="wz-modal-restart-title">Synchronizing Wazuh</h2>
           </>
         ),
-        body: <p>Synchronizing cluster. Please wait {syncDelay} seconds.</p>,
+        body: (
+          <>
+            <EuiProgress
+              value={attempts}
+              max={maxAttempts}
+              size="s"
+            />
+          </>
+        ),
       };
       break;
   }
@@ -152,7 +180,7 @@ export const RestartModal = (props: { isRestarting: boolean; useDelay?: boolean 
     <EuiOverlayMask>
       <div
         className={
-          currentState === RESTART_STATES.ERROR ? 'wz-modal-restart-error' : 'wz-modal-restart'
+          restartStatus === RestartHandler.RESTART_STATES.ERROR ? 'wz-modal-restart-error' : 'wz-modal-restart'
         }
       >
         <EuiEmptyPrompt {...emptyPromptProps} />
