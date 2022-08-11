@@ -139,3 +139,16 @@ export const xpathCheckInformationElement=  (webLocator, optionsNames, optionLen
       expect(optionsNames, 'has expected [' + optionsNames + '] text in each paragraph [' + paragraphs + ']').to.contains(paragraphs)
     })
 }
+
+export const waitWebElementDisapear = (webLocator, timeout) => {
+  cy.get(webLocator).then(($toast) => {
+    if ($toast.is(':visible')) {
+      cy.wait(timeout);
+    }
+  })
+}
+
+export const getScreenshot = (type, name,) => {
+  const currentTimeInMilliseconds = Date.now();
+  cy.screenshot('../capture/' + currentTimeInMilliseconds + '-' + type + '-' + name,'fullPage');
+}
