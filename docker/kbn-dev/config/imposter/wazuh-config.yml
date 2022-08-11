@@ -1,16 +1,84 @@
 ---
 plugin: openapi
-specFile: https://raw.githubusercontent.com/wazuh/wazuh/v4.3.4/api/api/spec/spec.yaml
+specFile: https://raw.githubusercontent.com/wazuh/wazuh/4.3/api/api/spec/spec.yaml
 
 resources:
+  # ===================================================== #
+  #   AUTHENTICATION
+  # ===================================================== #
   - path: /security/user/authenticate
     method: get
     response:
       statusCode: 200
       scriptFile: login.js
+
+  # ===================================================== #
+  #   API INFO
+  # ===================================================== #
   - path: /
     method: get
     response:
       statusCode: 200
       staticFile: api_info.json
+
+  # ===================================================== #
+  #   AGENTS
+  # ===================================================== #
+  # - path: /agents
+  
+
+  # ===================================================== #
+  #   CLUSTER
+  # ===================================================== #
+  - path: /cluster/ruleset/synchronization
+    method: get
+    response:
+      statusCode: 200
+      staticFile: cluster_sync.json
+  
+  # ===================================================== #
+  #   VULNERABILITY
+  # ===================================================== #
+  
+  # Get vulnerabilities
+  - path: /vulnerability/001
+    method: get
+    response:
+      statusCode: 200
+      staticFile: vulnerabilities.json
+  
+  # Get agent vulnerabilities' cvss3_score field summary
+  - path: /vulnerability/001/summary/cvss3_score
+    method: get
+    response:
+      statusCode: 200
+      staticFile: vulnerabilities_summary_cvss3_score.json
+  
+  # Get agent vulnerabilities' cvss2_score field summary
+  - path: /vulnerability/001/summary/cvss2_score
+    method: get
+    response:
+      statusCode: 200
+      staticFile: vulnerabilities_summary_cvss2_score.json
+  
+  # Get agent vulnerabilities' name field summary
+  - path: /vulnerability/001/summary/name
+    method: get
+    response:
+      statusCode: 200
+      staticFile: vulnerabilities_summary_name.json
+  
+  # Get agent vulnerabilities' version field summary
+  - path: /vulnerability/001/summary/version
+    method: get
+    response:
+      statusCode: 200
+      staticFile: vulnerabilities_summary_version.json
+  
+  # Get agent vulnerabilities' severity field summary
+  - path: /vulnerability/001/summary/severity
+    method: get
+    response:
+      statusCode: 200
+      staticFile: vulnerabilities_summary_severity.json
 

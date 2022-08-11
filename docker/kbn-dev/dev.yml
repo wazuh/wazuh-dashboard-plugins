@@ -31,6 +31,8 @@ services:
       - MALLOC_ARENA_MAX=1
     volumes:
       - ./config/imposter:/opt/imposter/config
+    ports:
+       - 8080:8080
 
   filebeat:
     depends_on:
@@ -120,6 +122,7 @@ services:
       retries: 120
 
   es01:
+    stop_grace_period: 1m
     hostname: es01
     depends_on:
       setup:
@@ -139,7 +142,7 @@ services:
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
       - bootstrap.memory_lock=true
       - xpack.security.enabled=true
-      - ingest.geoip.downloader.enabled=false
+      # - ingest.geoip.downloader.enabled=false # Not valid for 7.10.2
       - xpack.security.http.ssl.enabled=true
       - xpack.security.http.ssl.key=certs/es01/es01.key
       - xpack.security.http.ssl.certificate=certs/es01/es01.crt

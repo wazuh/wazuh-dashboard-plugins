@@ -2,6 +2,7 @@
 
 
 elastic_versions=(
+	'7.10.2'
 	'7.16.0'
 	'7.16.1'
 	'7.16.2'
@@ -40,7 +41,7 @@ usage() {
 
 if [ $# -ne	3 ]
   then
-  	echo "Incorrect number of arguments " $#
+  	echo "Incorrect number of arguments " $# ", got " $@
   	echo
     usage
 fi
