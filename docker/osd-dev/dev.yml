@@ -31,6 +31,8 @@ services:
       - MALLOC_ARENA_MAX=1
     volumes:
       - ./config/imposter:/opt/imposter/config
+    ports:
+       - 8080:8080
 
   generator:
     image: cfssl/cfssl

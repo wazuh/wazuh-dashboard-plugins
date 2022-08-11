@@ -35,14 +35,14 @@ fi
 
 if [[ ! " ${os_versions[*]} " =~ " ${1} " ]]
  then
- 	echo "Version ${1} not found in ${os_versions[*]}"
+ 	echo "OS version ${1} not found in ${os_versions[*]}"
  	echo
  	exit -1
 fi
 
 if [[ ! " ${osd_versions[*]} " =~ " ${2} " ]]
  then
- 	echo "Version ${1} not found in ${osd_versions[*]}"
+ 	echo "OSD version ${1} not found in ${osd_versions[*]}"
  	echo
  	exit -1
 fi
@@ -72,7 +72,7 @@ case "$4" in
 		docker compose  -f dev.yml  -p os-dev stop
 		;;
 	*)
-		echo "Action must be up | down: "
+		echo "Action must be up | down | stop: "
 		echo
 		usage
 		;;
