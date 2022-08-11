@@ -1862,6 +1862,7 @@ export class WazuhReportingCtrl {
    * @returns {Object} pdf or ErrorResponse
    */
   async report(req, reply) {
+    let pathFilename;
     try {
       log('reporting:report', `Report started`, 'info');
       // Init
@@ -1886,7 +1887,7 @@ export class WazuhReportingCtrl {
       if (req.payload && req.payload.array) {
         const payload = (req || {}).payload || {};
         const headers = (req || {}).headers || {};
-        const { name, tab, section, isAgents, browserTimezone } = payload;
+        const { tab, section, isAgents, browserTimezone, agentID, groupID } = payload;
         const apiId = headers.id || false;
         const pattern = headers.pattern || false;
         const from = (payload.time || {}).from || false;
@@ -1894,6 +1895,20 @@ export class WazuhReportingCtrl {
         let kfilters = req.payload.filters;
         const isAgentConfig = tab === 'agentConfig';
         const isGroupConfig = tab === 'groupConfig';
+
+        // Generate the filename of report depeding on request parameters
+        const filename = tab === 'syscollector'
+          ? `wazuh-agent-inventory-${isAgents}-${this.generateReportTimestamp()}.pdf`
+          : (isAgentConfig
+            ? `wazuh-agent-configuration-${agentID}-${this.generateReportTimestamp()}.pdf`
+            : ( isGroupConfig
+              ? `wazuh-group-configuration-${groupID}-${this.generateReportTimestamp()}.pdf`
+              : `wazuh-module-${isAgents ? `agents-${isAgents}` : 'overview'}-${tab}-${this.generateReportTimestamp()}.pdf`
+              )
+            );
+
+        // Generate the path to filename
+        pathFilename = path.join(__dirname, REPORTING_PATH, filename);
 
         // Pass the namespace if present to all the requesters
         if (pattern) {
@@ -1921,10 +1936,6 @@ export class WazuhReportingCtrl {
           throw new Error(
             'Reporting needs a valid Wazuh API ID in order to work properly'
           );
-        if (!name)
-          throw new Error(
-            'Reporting needs a valid file name in order to work properly'
-          );
 
         let tables = [];
         if (isGroupConfig) {
@@ -1940,11 +1951,10 @@ export class WazuhReportingCtrl {
             labels: 'Labels',
             sca: 'Security configuration assessment'
           };
-          const g_id = kfilters[0].group;
           kfilters = [];
           const enabledComponents = req.payload.components;
           this.dd.content.push({
-            text: `Group ${g_id} configuration`,
+            text: `Group ${groupID} configuration`,
             style: 'h1'
           });
           if (enabledComponents['0']) {
@@ -1952,7 +1962,7 @@ export class WazuhReportingCtrl {
             try {
               configuration = await this.apiRequest.makeGenericRequest(
                 'GET',
-                `/agents/groups/${g_id}/configuration`,
+                `/agents/groups/${groupID}/configuration`,
                 {},
                 apiId
               );
@@ -2150,7 +2160,7 @@ export class WazuhReportingCtrl {
             try {
               agentsInGroup = await this.apiRequest.makeGenericRequest(
                 'GET',
-                `/agents/groups/${g_id}`,
+                `/agents/groups/${groupID}`,
                 {},
                 apiId
               );
@@ -2159,7 +2169,7 @@ export class WazuhReportingCtrl {
             }
             await this.renderHeader(
               tab,
-              g_id,
+              groupID,
               (((agentsInGroup || []).data || []).items || []).map(x => x.id),
               apiId
             );
@@ -2168,12 +2178,11 @@ export class WazuhReportingCtrl {
         if (isAgentConfig) {
           const configurations = AgentConfiguration.configurations;
           const enabledComponents = req.payload.components;
-          const a_id = kfilters[0].agent;
           let wmodules = {};
           try {
             wmodules = await this.apiRequest.makeGenericRequest(
               'GET',
-              `/agents/${a_id}/config/wmodules/wmodules`,
+              `/agents/${agentID}/config/wmodules/wmodules`,
               {},
               apiId
             );
@@ -2182,7 +2191,7 @@ export class WazuhReportingCtrl {
           }
 
           kfilters = [];
-          await this.renderHeader(tab, tab, a_id, apiId);
+          await this.renderHeader(tab, tab, agentID, apiId);
           let idxComponent = 0;
           for (let config of configurations) {
             let titleOfSection = false;
@@ -2211,7 +2220,7 @@ export class WazuhReportingCtrl {
                     if (!conf['name']) {
                       data = await this.apiRequest.makeGenericRequest(
                         'GET',
-                        `/agents/${a_id}/config/${conf.component}/${conf.configuration}`,
+                        `/agents/${agentID}/config/${conf.component}/${conf.configuration}`,
                         {},
                         apiId
                       );
@@ -2692,9 +2701,7 @@ export class WazuhReportingCtrl {
 
         const pdfDoc = this.printer.createPdfKitDocument(this.dd);
         await pdfDoc.pipe(
-          fs.createWriteStream(
-            path.join(__dirname, REPORTING_PATH + '/' + req.payload.name)
-          )
+          fs.createWriteStream(pathFilename)
         );
         pdfDoc.end();
       }
@@ -2702,15 +2709,8 @@ export class WazuhReportingCtrl {
     } catch (error) {
       log('reporting:report', error.message || error);
       // Delete generated file if an error occurred
-      if (
-        ((req || {}).payload || {}).name &&
-        fs.existsSync(
-          path.join(__dirname, REPORTING_PATH + '/' + req.payload.name)
-        )
-      ) {
-        fs.unlinkSync(
-          path.join(__dirname, REPORTING_PATH + '/' + req.payload.name)
-        );
+      if ( pathFilename && fs.existsSync(pathFilename) ) {
+        fs.unlinkSync(pathFilename);
       }
       return ErrorResponse(error.message || error, 5029, 500, reply);
     }
@@ -2795,5 +2795,13 @@ export class WazuhReportingCtrl {
       log('reporting:deleteReportByName', error.message || error);
       return ErrorResponse(error.message || error, 5032, 500, reply);
     }
+  }
+
+  /**
+   * Generate a current timestamp in seconds
+   * @returns 
+   */
+  generateReportTimestamp(){
+    return `${(Date.now() / 1000) | 0}`;
   }
 }

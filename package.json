@@ -1,8 +1,8 @@
 {
   "name": "wazuh",
-  "version": "3.13.2",
-  "revision": "0886",
-  "code": "0886-0",
+  "version": "3.13.5",
+  "revision": "0889",
+  "code": "0889-0",
   "kibana": {
     "version": "7.9.2"
   },
@@ -37,7 +37,8 @@
     "test": "_mocha test/**/*",
     "test:ui:runner": "node ../../scripts/functional_test_runner.js",
     "test:server": "plugin-helpers test:server",
-    "test:browser": "plugin-helpers test:browser"
+    "test:browser": "plugin-helpers test:browser",
+    "test:jest": "node test/jest/jest"
   },
   "dependencies": {
     "angular-animate": "1.7.8",
