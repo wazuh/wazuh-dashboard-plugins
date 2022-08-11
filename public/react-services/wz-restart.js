@@ -2,26 +2,30 @@ import { WzRequest } from './wz-request';
 import { delayAsPromise } from '../../common/utils';
 import { getHttp, getToasts } from '../kibana-services';
 
+/**
+ * Wazuh restart wizard.
+ *
+ * Controls the Wazuh restart process.
+ */
 export class RestartHandler {
-  static MAX_ATTEMPTS_RESTART = 30;
-  static MAX_ATTEMPTS_SYNC = 10;
-  static POLLING_DELAY = 2000;      // milliseconds
-  static SYNC_DELAY = 20000;        // milliseconds
-  static HEALTHCHECK_DELAY = 5000;  // milliseconds
+  static MAX_RESTART_POLLING_ATTEMPTS = 30;
+  static MAX_SYNC_POLLING_ATTEMPTS = 10;
+  static POLLING_DELAY = 2000; // milliseconds
+  static SYNC_DELAY = 20000; // milliseconds
+  static HEALTHCHECK_DELAY = 5000; // milliseconds
   static RESTART_STATES = {
-    ERROR_RESTART: 'error_restart',
-    ERROR_SYNC: 'error_sync',
-    RESTARTING: 'restarting',
-    SYNCING: 'syncing',
-    RESTARTED: 'restarted',
-    NEED_RESTART: 'need_restart',
-  }
+    // TODO change to enum (requires TS)
+    RESTART_ERROR,
+    SYNC_ERROR,
+    RESTARTING,
+    SYNCING,
+    RESTARTED,
+  };
 
   /**
    * Get Cluster status from Wazuh API
    * @returns {Promise}
    */
-
   static async clusterReq() {
     try {
       return WzRequest.apiReq('GET', '/cluster/status', {});
@@ -29,6 +33,7 @@ export class RestartHandler {
       return Promise.reject(error);
     }
   }
+
   /**
    * Check daemons status
    * @param {Object} updateRedux - Redux update function
@@ -36,19 +41,20 @@ export class RestartHandler {
    * @param {Boolean} isCluster - Is cluster or not
    * @returns {object|Promise}
    */
-
   static async checkDaemons(updateRedux, attempt, isCluster) {
     try {
       updateRedux.updateRestartAttempt(attempt);
+
       const response = await WzRequest.apiReq(
         'GET',
         '/manager/status',
         {},
         { checkCurrentApiIsUp: false }
       );
-      const daemons = ((((response || {}).data || {}).data || {}).affected_items || [])[0] || {};
-      const wazuhdbExists = typeof daemons['wazuh-db'] !== 'undefined';
 
+      const daemons = ((((response || {}).data || {}).data || {}).affected_items || [])[0] || {};
+
+      const wazuhdbExists = typeof daemons['wazuh-db'] !== 'undefined';
       const execd = daemons['wazuh-execd'] === 'running';
       const modulesd = daemons['wazuh-modulesd'] === 'running';
       const wazuhdb = wazuhdbExists ? daemons['wazuh-db'] === 'running' : true;
@@ -66,101 +72,109 @@ export class RestartHandler {
       } else {
         updateRedux.updateRestartAttempt(0);
         console.warn('Wazuh not ready yet');
-        return false
+        return false;
       }
     } catch (error) {
       throw error;
     }
   }
- 
+
   /**
    * Check sync status
    * @param {Object} updateRedux - Redux update function
    * @param {number} attempt
    * @returns {object|Promise}
    */
-
   static async checkSync(updateRedux, attempt) {
     try {
-      const {
-        updateSyncCheckAttempt,
-        updateUnsynchronizedNodes
-      } = updateRedux
+      const { updateSyncCheckAttempt, updateUnsynchronizedNodes } = updateRedux;
       // const response = await WzRequest.apiReq('GET', '/cluster/ruleset/synchronization?nodes_list', {});
       updateSyncCheckAttempt(attempt);
-      
+
+      // TODO error handling (if response.data.data.error != 0)
+
+      // TODO remove
       const response = {
-        "data": {
-          "affected_items": [
+        data: {
+          affected_items: [
             {
-              "name": "master-node",
-              "synced": true
+              name: 'master-node',
+              synced: true,
             },
             {
-              "name": "worker1",
-              "synced": false
+              name: 'worker1',
+              synced: false,
             },
             {
-              "name": "worker2",
-              "synced": true
-            }
+              name: 'worker2',
+              synced: true,
+            },
           ],
-          "total_affected_items": 3,
-          "total_failed_items": 0,
-          "failed_items": []
+          total_affected_items: 3,
+          total_failed_items: 0,
+          failed_items: [],
         },
-        "message": "Validation was successfully checked in all nodes",
-        "error": 0
-      }
-  
+        message: 'Validation was successfully checked in all nodes',
+        error: 0,
+      };
+
       const nodes = response.data.affected_items;
-  
-      const isSync = nodes.every((node) => node.synced )
-      
-      const unsynchronizedNodes = nodes.flatMap(
-        node => node.synced ? [] : node.name
-      )
-      if (!isSync) {
-        updateUnsynchronizedNodes(unsynchronizedNodes)
-        throw new Error(`Nodes ${unsynchronizedNodes.join(', ')} not synced`);
+
+      const isSynced = nodes.every((node) => node.synced);
+
+      if (!isSynced) {
+        const unsyncedNodes = nodes.flatMap((node) => (node.synced ? [] : node.name));
+        updateUnsynchronizedNodes(unsyncedNodes);
+        throw new Error(`Nodes ${unsyncedNodes.join(', ')} are not synced`);
       }
 
-      updateSyncCheckAttempt(10);
+      updateSyncCheckAttempt(MAX_SYNC_POLLING_ATTEMPTS);
 
-      return isSync     
+      return isSynced;
     } catch (error) {
       throw error;
     }
   }
-  /**
-  * Make ping to Wazuh API
-  * @param updateRedux
-  * @param breakpoint
-  * @param {boolean} isCluster
-  * @return {Promise}
-  */
 
- static async makePingSync(updateRedux, breakpoint, isCluster = true) {
+  /**
+   * Make ping to Wazuh API
+   * @param updateRedux
+   * @param breakCondition
+   * @param {boolean} isCluster
+   * @return {Promise}
+   */
+  static async makePingSync(updateRedux, breakCondition, isCluster = true) {
     try {
       let isValid = false;
-      const maxAttempts = breakpoint === this.checkDaemons ? this.MAX_ATTEMPTS_RESTART : this.MAX_ATTEMPTS_SYNC;
+
+      const maxAttempts =
+        breakCondition === this.checkDaemons
+          ? this.MAX_RESTART_POLLING_ATTEMPTS
+          : this.MAX_SYNC_POLLING_ATTEMPTS;
+
       for (let attempt = 1; attempt <= maxAttempts && !isValid; attempt++) {
         await delayAsPromise(this.POLLING_DELAY);
         try {
-          isValid = await breakpoint(updateRedux, attempt, isCluster);
+          isValid = await breakCondition(updateRedux, attempt, isCluster);
         } catch (error) {
           console.error(error);
         }
       }
+
       if (!isValid) {
         return isValid;
       }
-      return Promise.resolve(`Wazuh is ${ breakpoint === this.checkDaemons ? 'restarted': 'synced' }`);
+      return Promise.resolve(
+        `Wazuh is ${breakCondition === this.checkDaemons ? 'restarted' : 'synced'}`
+      );
     } catch (error) {
       return false;
     }
   }
 
+  /**
+   * Healthcheck redirect
+   */
   static goToHealthcheck() {
     window.location.href = getHttp().basePath.prepend('/app/wazuh#/health-check');
   }
@@ -172,18 +186,23 @@ export class RestartHandler {
   static async restart(isCluster, updateRedux) {
     try {
       const clusterOrManager = isCluster ? 'cluster' : 'manager';
+
       const validationError = await WzRequest.apiReq(
         'GET',
         `/${clusterOrManager}/configuration/validation`,
         {}
       );
+
       const isOk = validationError.status === 'OK';
       if (!isOk && validationError.detail) {
         const str = validationError.detail;
         throw new Error(str);
       }
+
       updateRedux.updateRestartStatus(this.RESTART_STATES.RESTARTING);
+
       await WzRequest.apiReq('PUT', `/${clusterOrManager}/restart`, {});
+
       return {
         data: {
           data: `Restarting ${clusterOrManager}`,
@@ -193,6 +212,7 @@ export class RestartHandler {
       throw error;
     }
   }
+
   /**
    * Restart a cluster node
    * @returns {object|Promise}
@@ -218,6 +238,7 @@ export class RestartHandler {
       throw error;
     }
   }
+
   /**
    * Restart a node or manager
    * @param {} selectedNode Cluster Node
@@ -227,45 +248,55 @@ export class RestartHandler {
     try {
       const clusterStatus = (((await this.clusterReq()) || {}).data || {}).data || {};
       const isCluster = clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
-      // Dispatch a Redux action
+
       isCluster ? await this.restartNode(selectedNode) : await this.restart(isCluster);
+
+      // Dispatch a Redux action
       const isRestarted = await this.makePingSync(updateRedux, this.checkDaemons, isCluster);
-      if(!isRestarted){
-        updateRedux.updateRestartStatus(this.RESTART_STATES.ERROR_RESTART)
+      if (!isRestarted) {
+        updateRedux.updateRestartStatus(this.RESTART_STATES.RESTART_ERROR);
         this.restartValues(updateRedux);
-        throw new Error('Not restarted')
-      }  
+        throw new Error('Not restarted');
+      }
+
       return { restarted: isCluster ? 'Cluster' : 'Manager' };
     } catch (error) {
       throw error;
     }
   }
+
   /**
    * Restart cluster or Manager
    */
   static async restartWazuh(updateRedux, useDelay = false) {
     try {
-      if(useDelay) {
-        updateRedux.updateRestartStatus(this.RESTART_STATES.SYNCING)
-        const isSync = await this.makePingSync(updateRedux, this.checkSync)
-        if(!isSync){ 
-          updateRedux.updateRestartStatus(this.RESTART_STATES.ERROR_SYNC)
+      if (useDelay) {
+        updateRedux.updateRestartStatus(this.RESTART_STATES.SYNCING);
+
+        const isSync = await this.makePingSync(updateRedux, this.checkSync);
+        if (!isSync) {
+          updateRedux.updateRestartStatus(this.RESTART_STATES.SYNC_ERROR);
           this.restartValues(updateRedux);
-          throw new Error('Not synced')
+          throw new Error('Not synced');
         }
       }
+
       const clusterStatus = (((await this.clusterReq()) || {}).data || {}).data || {};
       const isCluster = clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
+
       // Dispatch a Redux action
-      await this.restart(isCluster, updateRedux)
+      await this.restart(isCluster, updateRedux);
       const isRestarted = await this.makePingSync(updateRedux, this.checkDaemons, isCluster);
-      if(!isRestarted){
-        updateRedux.updateRestartStatus(this.RESTART_STATES.ERROR_RESTART)
+
+      if (!isRestarted) {
+        updateRedux.updateRestartStatus(this.RESTART_STATES.RESTART_ERROR);
         this.restartValues(updateRedux);
-        throw new Error('Not restarted')
-      }  
-      updateRedux.updateRestartStatus(this.RESTART_STATES.RESTARTED)
+        throw new Error('Not restarted');
+      }
+
+      updateRedux.updateRestartStatus(this.RESTART_STATES.RESTARTED);
       this.restartValues(updateRedux);
+
       getToasts().add({
         color: 'success',
         title: isCluster ? 'Cluster was restarted.' : 'Manager was restarted.',
@@ -277,6 +308,10 @@ export class RestartHandler {
     }
   }
 
+  /**
+   * TODO
+   * @param {*} updateRedux
+   */
   static restartValues(updateRedux) {
     updateRedux.updateSyncCheckAttempt && updateRedux.updateSyncCheckAttempt(0);
     updateRedux.updateRestartAttempt(0);

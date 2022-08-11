@@ -146,8 +146,10 @@ class WzRestartCallout extends Component<IWzRestartCalloutProps, IWzRestartCallo
               title={`${isCluster ? 'Cluster' : 'Manager'} will be restarted`}
               onCancel={() => this.toggleWarningRestartModalVisible()}
               onConfirm={() => {
-                isCluster ? this.props.updateRestartStatus(RestartHandler.RESTART_STATES.SYNCING) : this.props.updateRestartStatus(RestartHandler.RESTART_STATES.RESTARTING)
-                this.restartWazuh()
+                isCluster
+                  ? this.props.updateRestartStatus(RestartHandler.RESTART_STATES.SYNCING)
+                  : this.props.updateRestartStatus(RestartHandler.RESTART_STATES.RESTARTING);
+                this.restartWazuh();
               }}
               cancelButtonText="Cancel"
               confirmButtonText="Confirm"
@@ -155,7 +157,10 @@ class WzRestartCallout extends Component<IWzRestartCalloutProps, IWzRestartCallo
             ></EuiConfirmModal>
           </EuiOverlayMask>
         )}
-        {timeoutRestarting && this.props.restartStatus !== RestartHandler.RESTART_STATES.NEED_RESTART && this.props.restartStatus !== RestartHandler.RESTART_STATES.RESTARTED  && <RestartModal useDelay={isCluster} />}
+        {timeoutRestarting &&
+          this.props.restartStatus !== RestartHandler.RESTART_STATES.RESTARTED && (
+            <RestartModal useDelay={isCluster} />
+          )}
       </Fragment>
     );
   }
