@@ -262,8 +262,8 @@ export const updateSyncCheckAttempt = (syncCheckAttempt) => {
 }
 
 /**
- * Update restart attempt
- * @param {Number} restartAttempt
+ * Update unsynchronized nodes
+ * @param {Array} unsynchronizedNodes
  * @returns
  */
 export const updateUnsynchronizedNodes = (unsynchronizedNodes) => {
@@ -274,8 +274,8 @@ export const updateUnsynchronizedNodes = (unsynchronizedNodes) => {
 };
 
 /**
- * Update restart attempt
- * @param {Number} restartAttempt
+ * Update status of the restarting process
+ * @param {string} restartStatus
  * @returns
  */
 export const updateRestartStatus = (restartStatus) => {

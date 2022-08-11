@@ -87,7 +87,6 @@ class WzRestartCallout extends Component<IWzRestartCalloutProps, IWzRestartCallo
         updateUnsynchronizedNodes: this.props.updateUnsynchronizedNodes,
         updateRestartStatus: this.props.updateRestartStatus,
       };
-      this.state.isCluster ? updateRedux.updateRestartStatus(RestartHandler.RESTART_STATES.SYNCING) : updateRedux.updateRestartStatus(RestartHandler.RESTART_STATES.RESTARTING)
       await RestartHandler.restartWazuh(updateRedux, this.state.isCluster);
       this.setState({ isRestarting: false, timeoutRestarting: false });
       this.props.onRestarted();

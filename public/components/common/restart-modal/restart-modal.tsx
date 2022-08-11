@@ -90,15 +90,16 @@ export const RestartModal = (props: { useDelay?: boolean }) => {
       countDown--;
     }, 1000 /* 1 second */);
   };
-
+  
   // TODO review if importing these functions in wz-restart work.
+  const dispatch = useDispatch();
   const updateRedux = {
-    updateRestartAttempt: (restartAttempt) => useDispatch(updateRestartAttempt(restartAttempt)),
+    updateRestartAttempt: (restartAttempt) => dispatch(updateRestartAttempt(restartAttempt)),
     updateSyncCheckAttempt: (syncCheckAttempt) =>
-      useDispatch(updateSyncCheckAttempt(syncCheckAttempt)),
+      dispatch(updateSyncCheckAttempt(syncCheckAttempt)),
     updateUnsynchronizedNodes: (unsynchronizedNodes) =>
-      useDispatch(updateUnsynchronizedNodes(unsynchronizedNodes)),
-    updateRestartStatus: (restartStatus) => useDispatch(updateRestartStatus(restartStatus)),
+      dispatch(updateUnsynchronizedNodes(unsynchronizedNodes)),
+    updateRestartStatus: (restartStatus) => dispatch(updateRestartStatus(restartStatus)),
   };
 
   const forceRestart = async () => {
@@ -139,7 +140,7 @@ export const RestartModal = (props: { useDelay?: boolean }) => {
       };
       break;
 
-    case RestartHandler.RESTART_STATES.ERROR_SYNC:
+    case RestartHandler.RESTART_STATES.SYNC_ERROR:
       emptyPromptProps = {
         iconType: 'alert',
         iconColor: 'danger',

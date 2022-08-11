@@ -15,11 +15,11 @@ export class RestartHandler {
   static HEALTHCHECK_DELAY = 5000; // milliseconds
   static RESTART_STATES = {
     // TODO change to enum (requires TS)
-    RESTART_ERROR,
-    SYNC_ERROR,
-    RESTARTING,
-    SYNCING,
-    RESTARTED,
+    RESTART_ERROR: 'restart_error',
+    SYNC_ERROR: 'sync_error',
+    RESTARTING: 'restarting',
+    SYNCING: 'syncing',
+    RESTARTED: 'restarted',
   };
 
   /**
@@ -88,47 +88,24 @@ export class RestartHandler {
   static async checkSync(updateRedux, attempt) {
     try {
       const { updateSyncCheckAttempt, updateUnsynchronizedNodes } = updateRedux;
-      // const response = await WzRequest.apiReq('GET', '/cluster/ruleset/synchronization?nodes_list', {});
       updateSyncCheckAttempt(attempt);
+      const response = await WzRequest.apiReq('GET', '/cluster/ruleset/synchronization', {});
+      
+      if (response.data.error != 0){
+        throw response.data.message
+      }
 
-      // TODO error handling (if response.data.data.error != 0)
-
-      // TODO remove
-      const response = {
-        data: {
-          affected_items: [
-            {
-              name: 'master-node',
-              synced: true,
-            },
-            {
-              name: 'worker1',
-              synced: false,
-            },
-            {
-              name: 'worker2',
-              synced: true,
-            },
-          ],
-          total_affected_items: 3,
-          total_failed_items: 0,
-          failed_items: [],
-        },
-        message: 'Validation was successfully checked in all nodes',
-        error: 0,
-      };
-
-      const nodes = response.data.affected_items;
+      const nodes = response.data.data.affected_items;
 
       const isSynced = nodes.every((node) => node.synced);
-
+      
       if (!isSynced) {
         const unsyncedNodes = nodes.flatMap((node) => (node.synced ? [] : node.name));
         updateUnsynchronizedNodes(unsyncedNodes);
         throw new Error(`Nodes ${unsyncedNodes.join(', ')} are not synced`);
       }
 
-      updateSyncCheckAttempt(MAX_SYNC_POLLING_ATTEMPTS);
+      updateSyncCheckAttempt(RestartHandler.MAX_SYNC_POLLING_ATTEMPTS);
 
       return isSynced;
     } catch (error) {
@@ -181,6 +158,8 @@ export class RestartHandler {
 
   /**
    * Restart manager (single-node API call)
+   * @param updateRedux - Redux update function
+   * @param isCluster - Is cluster or not
    * @returns {object|Promise}
    */
   static async restart(isCluster, updateRedux) {
@@ -215,6 +194,7 @@ export class RestartHandler {
 
   /**
    * Restart a cluster node
+   * @param node - Node name
    * @returns {object|Promise}
    */
   static async restartNode(node) {
@@ -242,7 +222,7 @@ export class RestartHandler {
   /**
    * Restart a node or manager
    * @param {} selectedNode Cluster Node
-   * @param updateRestartAttempt
+   * @param updateRedux Redux update function
    */
   static async restartSelectedNode(selectedNode, updateRedux) {
     try {
@@ -267,6 +247,8 @@ export class RestartHandler {
 
   /**
    * Restart cluster or Manager
+   * @param updateRedux Redux update function
+   * @param useDelay need to delay synchronization?
    */
   static async restartWazuh(updateRedux, useDelay = false) {
     try {
