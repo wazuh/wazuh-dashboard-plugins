@@ -9,13 +9,16 @@
 *
 * Find more information about this on the LICENSE file.
 */
+
+import { webDocumentationLink } from "../../../../common/services/web_documentation";
+
 export default {
   id: 'audit',
   name: 'System auditing',
   xml_tag: 'localfile',
   description: 'Configuration options of the System auditing extension.',
   category: 'Auditing and policy monitoring',
-  documentation_link: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/localfile.html',
+  documentation_link: webDocumentationLink('user-manual/reference/ossec-conf/localfile.html'),
   icon: 'securityApp',
   avaliable_for_manager: true,
   avaliable_for_agent: true,

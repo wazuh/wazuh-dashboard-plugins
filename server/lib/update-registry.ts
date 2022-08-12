@@ -14,6 +14,8 @@ import { log } from './logger';
 import { WAZUH_DATA_CONFIG_REGISTRY_PATH } from '../../common/constants';
 
 export class UpdateRegistry {
+  busy: boolean;
+  file: string;
   constructor() {
     this.busy = false;
     this.file = WAZUH_DATA_CONFIG_REGISTRY_PATH;

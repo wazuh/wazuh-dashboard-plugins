@@ -18,6 +18,7 @@ import { ErrorToastOptions } from 'kibana/public';
 import React from 'react';
 import { ReactNode } from 'x-pack/node_modules/@types/react';
 import { PLUGIN_PLATFORM_NAME } from '../../common/constants';
+import { webDocumentationLink } from '../../common/services/web_documentation';
 
 type TAppInfo = {
   revision: string;
@@ -50,10 +51,7 @@ const checkClientAppVersion = (appInfo: TAppInfo) => {
       toastMessage: `The version of the Wazuh app in your browser does not correspond with the app version installed in ${PLUGIN_PLATFORM_NAME}. Please, clear your browser cache. For more info check the full error.`,
     };
 
-    const troubleshootingUrl = `https://documentation.wazuh.com/${appInfo['app-version']
-      .split('.')
-      .slice(0, 2)
-      .join('.')}/user-manual/elasticsearch/troubleshooting.html`;
+    const troubleshootingUrl = webDocumentationLink('user-manual/elasticsearch/troubleshooting.html');
 
     const message: ReactNode = (
       <>

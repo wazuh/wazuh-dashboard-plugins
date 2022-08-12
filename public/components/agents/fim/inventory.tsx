@@ -10,13 +10,12 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import {
   EuiButtonEmpty,
   EuiEmptyPrompt,
   EuiFlexGroup,
   EuiFlexItem,
-  EuiHorizontalRule,
   EuiLink,
   EuiLoadingSpinner,
   EuiPage,
@@ -41,6 +40,7 @@ import {
   UILogLevel,
 } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
+import { webDocumentationLink } from '../../../../common/services/web_documentation';
 
 export class Inventory extends Component {
   _isMount = false;
@@ -306,17 +306,15 @@ export class Inventory extends Component {
       <EuiEmptyPrompt
         iconType="filebeatApp"
         title={<h2>Integrity monitoring is not configured for this agent</h2>}
-        body={<Fragment>
-          <EuiHorizontalRule margin='s' />
+        body={
           <EuiLink
-            href='https://documentation.wazuh.com/current/user-manual/capabilities/file-integrity/index.html'
+            href={webDocumentationLink('user-manual/capabilities/file-integrity/index.html')}
             target="_blank"
             style={{ textAlign: "center" }}
           >
-            https://documentation.wazuh.com/current/user-manual/capabilities/file-integrity/index.html
+            How to configure the module
           </EuiLink>
-          <EuiHorizontalRule margin='s' />
-        </Fragment>}
+        }
       />);
   }
 

@@ -24,6 +24,7 @@ import { isString, renderValueYesThenEnabled } from '../utils/utils';
 import { wodleBuilder, settingsListBuilder } from '../utils/builders';
 import { withGuard } from '../../../../../../components/common/hocs';
 import withWzConfig from '../util-hocs/wz-config';
+import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
 const sections = [{ component: 'wmodules', configuration: 'wmodules' }];
 
@@ -43,12 +44,12 @@ const columns = [
 
 const helpLinks = [
   {
-    text: 'Using Wazuh to audit GitHub organizations',
-    href: 'https://documentation.wazuh.com/current/github/index.html'
+    text: 'Using Wazuh to monitor GitHub',
+    href: webDocumentationLink('github/index.html')
   },
   {
     text: 'GitHub module reference',
-    href: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/github-module.html'
+    href: webDocumentationLink('user-manual/reference/ossec-conf/github-module.html')
   }
 ];
 

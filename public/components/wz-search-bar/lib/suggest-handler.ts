@@ -47,11 +47,10 @@ export class SuggestHandler extends BaseHandler {
     this.filters = props.filters;
     this.inputStage = 'field';
     this.setInputValue = setInputValue;
-    this.suggestItems = props.suggestions;
+    this.suggestItems = props.suggestions || [];
     this.searchType = 'search';
     this.lastCall = 0;
-    if (inputRef)
-      this.inputRef = inputRef;
+    if (inputRef) this.inputRef = inputRef;
   }
 
   combine = (...args) => (input) => args.reduceRight((acc, arg) => (acc = arg(acc)), input);
@@ -63,6 +62,13 @@ export class SuggestHandler extends BaseHandler {
     const operator = /:|=|!=|~|<|>/.exec(input);
     this.searchType = operator ? (operator[0] === ':' ? 'params' : 'q') : 'search';
     return input;
+  };
+
+  queryEndWithField = (field): boolean => {
+    let inputValue = (this.inputRef as HTMLInputElement).value;
+    var index = inputValue.lastIndexOf(' ');
+    var endOfQuery = inputValue.substring(index + 1);
+    return this.suggestItems.some((item) => item.label === endOfQuery);
   };
 
   checkStage = (input: string) => {
@@ -105,7 +111,8 @@ export class SuggestHandler extends BaseHandler {
         ...this.buildSuggestSearch(field),
         ...(value && inputStage === 'value' ? this.buildSuggestApply() : []),
         ...(value && inputStage === 'value' ? this.buildSuggestConjuntions(field) : []),
-        ...(this.someItem(field, 'label') && inputStage !== 'value'
+        ...((this.someItem(field, 'label') && inputStage !== 'value') ||
+        this.queryEndWithField(field)
           ? this.buildSuggestOperator(field)
           : []),
         ...(inputStage === 'field' ? this.buildSuggestFields(field) : []),
@@ -210,8 +217,8 @@ export class SuggestHandler extends BaseHandler {
   buildSuggestConjuntions(inputValue: string): suggestItem[] {
     if (this.searchType !== 'q') return [];
     const suggestions = [
-      { label: 'AND ', description: 'Requires `both arguments` to be true' },
-      { label: 'OR ', description: 'Requires `one or more arguments` to be true' },
+      { label: ' AND ', description: 'Requires `both arguments` to be true' },
+      { label: ' OR ', description: 'Requires `one or more arguments` to be true' },
     ].map((item) => {
       return {
         type: { iconType: 'kqlSelector', color: 'tint3' },
@@ -246,7 +253,7 @@ export class SuggestHandler extends BaseHandler {
 
   createQFilter(inputValue) {
     const qInterpreter = new QInterpreter(inputValue);
-    if (qInterpreter.queryObjects.some((q) => !q.value)) return;
+    if (!qInterpreter.queriesAreValid) return;
     const value = qInterpreter.toString();
     const filters = [...this.filters, { field: 'q', value }];
     this.props.onFiltersChange(filters);
