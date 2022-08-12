@@ -171,21 +171,6 @@ class WzEditConfiguration extends Component {
       );
       this.setState({ restart: false, saving: false, restarting: false });
       await this.checkIfClusterOrManager();
-      if (this.props.clusterNodes) {
-        this.addToast({
-          title: (
-            <Fragment>
-              <EuiIcon type="iInCircle" />
-              &nbsp;
-              <span>
-                Nodes could take some time to restart, it may be necessary to perform a refresh to
-                see them all.
-              </span>
-            </Fragment>
-          ),
-          color: 'success',
-        });
-      }
     } catch (error) {
       this.props.updateRestartAttempt(0);
       this.setState({ restart: false, saving: false, restarting: false });
