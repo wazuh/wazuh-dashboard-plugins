@@ -91,7 +91,6 @@ class WzRestartCallout extends Component<IWzRestartCalloutProps, IWzRestartCallo
       this.setState({ isRestarting: false });
     } catch (error) {
       this.setState({ warningRestarting: false, isRestarting: false });
-      this.props.updateRestartAttempt(0);
       this.props.onRestartedError();
       this.showToast('danger', 'Error', error.message || error);
     }

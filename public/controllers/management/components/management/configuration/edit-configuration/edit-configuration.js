@@ -172,7 +172,6 @@ class WzEditConfiguration extends Component {
       this.setState({ restart: false, saving: false, restarting: false });
       await this.checkIfClusterOrManager();
     } catch (error) {
-      this.props.updateRestartAttempt(0);
       this.setState({ restart: false, saving: false, restarting: false });
       const options = {
         context: `${WzEditConfiguration.name}.confirmRestart`,

@@ -12,7 +12,7 @@ export class RestartHandler {
   static MAX_SYNC_POLLING_ATTEMPTS = 10;
   static POLLING_DELAY = 2000; // milliseconds
   static SYNC_DELAY = 20000; // milliseconds
-  static HEALTHCHECK_DELAY = 5000; // milliseconds
+  static HEALTHCHECK_DELAY = 10000; // milliseconds
   static INFO_RESTART_SUCCESS_DELAY = 500; // seconds
   static RESTART_STATES = {
     // TODO change to enum (requires TS)
@@ -240,6 +240,7 @@ export class RestartHandler {
       updateRedux.updateRestartStatus(this.RESTART_STATES.RESTARTED_INFO);
       return { restarted: isCluster ? 'Cluster' : 'Manager' };
     } catch (error) {
+      RestartHandler.clearState(updateRedux, this.RESTART_STATES.RESTART_ERROR);
       throw error;
     }
   }
@@ -281,8 +282,15 @@ export class RestartHandler {
 
       return { restarted: isCluster ? 'Cluster' : 'Manager' };
     } catch (error) {
+      const errorType = error === 'Not synced' ? this.RESTART_STATES.SYNC_ERROR : this.RESTART_STATES.RESTART_ERROR;
+      RestartHandler.clearState(updateRedux, errorType);
       throw error;
     }
+  }
+
+  static clearState(updateRedux, errorType) {
+    updateRedux.updateRestartAttempt(0);
+    updateRedux.updateRestartStatus(errorType);
   }
 
   /**
