@@ -12,7 +12,6 @@
 
 import { WzRequest } from '../../../../../../react-services/wz-request';
 import { replaceIllegalXML } from './xml';
-import { getToasts }  from '../../../../../../kibana-services';
 import { delayAsPromise } from '../../../../../../../common/utils';
 
 /**
@@ -186,6 +185,7 @@ export const checkDaemons = async (isCluster) => {
 };
 
 /**
+ * @deprecated
  * Make ping to Wazuh API
  * @param updateWazuhNotReadyYet
  * @param {boolean} isCluster
@@ -257,106 +257,6 @@ export const fetchFile = async selectedNode => {
 
     xml = xml.replace(/..xml.+\?>/, '');
     return xml;
-  } catch (error) {
-    throw error;
-  }
-};
-
-/**
- * Restart a node or manager
- * @param {} selectedNode Cluster Node
- * @param updateWazuhNotReadyYet
- */
-export const restartNodeSelected = async (selectedNode, updateWazuhNotReadyYet) => {
-  try {
-    const clusterStatus = (((await clusterReq()) || {}).data || {}).data || {};
-    const isCluster = clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
-    // Dispatch a Redux action
-    updateWazuhNotReadyYet(`Restarting ${isCluster ? selectedNode : 'Manager'}, please wait.`); //FIXME: if it enables/disables cluster, this will show Manager instead node name
-    isCluster ? await restartNode(selectedNode) : await restartManager();
-    return await makePing(updateWazuhNotReadyYet, isCluster);
-  } catch (error) {
-    throw error;
-  }
-};
-
-/**
- * Restart manager (single-node API call)
- * @returns {object|Promise}
- */
-export const restartManager = async () => {
-  try {
-    const validationError = await WzRequest.apiReq(
-      'GET',
-      `/manager/configuration/validation`, {}
-    );
-    const isOk = validationError.status === 'OK';
-    if (!isOk && validationError.detail) {
-      const str = validationError.detail;
-      throw new Error(str);
-    }
-    const result = await WzRequest.apiReq('PUT', `/manager/restart`, {});
-    return result;
-  } catch (error) {
-    throw error;
-  }
-};
-
-/**
- * Restart cluster
- * @returns {object|Promise}
- */
-export const restartCluster = async () => {
-  try {
-    const validationError = await WzRequest.apiReq(
-      'GET',
-      `/cluster/configuration/validation`, {}
-    );
-
-    const isOk = validationError.status === 'OK';
-    if (!isOk && validationError.detail) {
-      const str = validationError.detail;
-      throw new Error(str);
-    }
-    // this.performClusterRestart(); // TODO: convert AngularJS to React
-    await WzRequest.apiReq('PUT', `/cluster/restart`, {
-      delay: 15000
-    });
-    // this.$rootScope.$broadcast('removeRestarting', {}); TODO: isRestarting: false?
-    return {
-      data: {
-        data: 'Restarting cluster'
-      }
-    };
-  } catch (error) {
-    throw error;
-  }
-};
-
-/**
- * Restart a cluster node
- * @returns {object|Promise}
- */
-export const restartNode = async node => {
-  try {
-    const node_param = node && typeof node == 'string' ? `?nodes_list=${node}` : '';
-
-    const validationError = await WzRequest.apiReq(
-      'GET',
-      `/cluster/configuration/validation`, {}
-    );
-
-    const isOk = validationError.status === 200;
-    if (!isOk && validationError.detail) {
-      const str = validationError.detail;
-      throw new Error(str);
-    }
-    const result = await WzRequest.apiReq(
-      'PUT',
-      `/cluster/restart${node_param}`, {delay: 15000}
-    );
-
-    return result;
   } catch (error) {
     throw error;
   }
@@ -510,30 +410,6 @@ export const checkCurrentSecurityPlatform = async () => {
     const platform = (result.data || {}).platform;
 
     return platform;
-  } catch (error) {
-    throw error;
-  }
-};
-
-/**
- * Restart cluster or Manager
- */
-export const restartClusterOrManager = async (updateWazuhNotReadyYet) => {
-  try {
-    const clusterStatus = (((await clusterReq()) || {}).data || {}).data || {};
-    const isCluster = clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
-    getToasts().add({
-      color: 'success',
-      title: isCluster
-        ? 'Restarting cluster, it will take up to 30 seconds.'
-        : 'The manager is being restarted',
-      toastLifeTimeMs: 3000,
-    });
-    isCluster ? await restartCluster() : await restartManager();
-    // Dispatch a Redux action
-    updateWazuhNotReadyYet(`Restarting ${isCluster ? 'Cluster' : 'Manager'}, please wait.`);
-    await makePing(updateWazuhNotReadyYet, isCluster);
-    return { restarted: isCluster ? 'Cluster' : 'Manager' };
   } catch (error) {
     throw error;
   }
