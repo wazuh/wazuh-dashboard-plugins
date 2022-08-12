@@ -39,7 +39,7 @@ import validateConfigAfterSent from './utils/valid-configuration';
 
 import { getToasts } from '../../../../../kibana-services';
 import { updateWazuhNotReadyYet } from '../../../../../redux/actions/appStateActions';
-import WzRestartClusterManagerCallout from '../../../../../components/common/restart-cluster-manager-callout';
+import WzRestartCallout from '../../../../../components/common/wz-restart-callout';
 import { validateXML } from '../configuration/utils/xml';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 import 'brace/theme/textmate';
@@ -353,7 +353,7 @@ class WzRulesetEditor extends Component {
                 <EuiSpacer size="m" />
                 {this.state.showWarningRestart && (
                   <Fragment>
-                    <WzRestartClusterManagerCallout
+                    <WzRestartCallout
                       onRestarted={() => this.setState({ showWarningRestart: false })}
                       onRestartedError={() => this.setState({ showWarningRestart: true })}
                     />
