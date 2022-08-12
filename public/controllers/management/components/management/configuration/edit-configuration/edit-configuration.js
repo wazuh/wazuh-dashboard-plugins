@@ -193,6 +193,7 @@ class WzEditConfiguration extends Component {
     }
   }
 
+
   async checkIfClusterOrManager() {
     try {
       // in case which enable/disable cluster configuration, update Redux Store
