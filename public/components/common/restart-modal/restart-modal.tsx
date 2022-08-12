@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import {
   EuiButton,
+  EuiButtonEmpty,
   EuiEmptyPrompt,
   EuiEmptyPromptProps,
+  EuiFlexGroup,
+  EuiFlexItem,
   EuiOverlayMask,
   EuiProgress,
 } from '@elastic/eui';
@@ -148,13 +151,22 @@ export const RestartModal = (props: { useDelay?: boolean }) => {
         body: (
           <p>
             The nodes {unsyncedNodes.join(', ')} did not synchronize. Restarting Wazuh might set the
-            cluster into an inconsistent state.
+            cluster into an inconsistent state. Close and try again later.
           </p>
         ),
         actions: (
-          <EuiButton color="warning" fill onClick={forceRestart}>
-            Force restart
-          </EuiButton>
+          <EuiFlexGroup justifyContent="flexEnd">
+            <EuiFlexItem grow={false}>
+              <EuiButtonEmpty color='danger' flush="both" onClick={forceRestart}>
+                Force restart
+              </EuiButtonEmpty>
+            </EuiFlexItem>
+            <EuiFlexItem grow={false}> 
+              <EuiButton color="primary" fill onClick={() => dispatch(updateRestartStatus(RestartHandler.RESTART_STATES.RESTARTED))}>
+                Close
+              </EuiButton>
+            </EuiFlexItem>
+          </EuiFlexGroup>
         ),
       };
       break;
