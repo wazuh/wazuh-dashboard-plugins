@@ -291,7 +291,7 @@ export class RestartHandler {
   }
 
   /**
-   * TODO
+   * Resets attempts to 0 in redux
    * @param {*} updateRedux
    */
   static restartValues(updateRedux) {
