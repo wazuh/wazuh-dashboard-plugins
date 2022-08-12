@@ -71,7 +71,7 @@ class WzStatusActionButtons extends Component {
     try {
       const updateRedux = {updateRestartAttempt: this.props.updateRestartAttempt , updateRestartStatus: this.props.updateRestartStatus};
       await RestartHandler.restartWazuh(updateRedux);
-      this.setState({ isRestarting: false, timeoutRestarting: false });
+      this.setState({ isRestarting: false });
     } catch (error) {
       this.setState({ isRestarting: false });
       const options = {
@@ -249,10 +249,9 @@ class WzStatusActionButtons extends Component {
 
     let restarting
 
-    if (timeoutRestarting) {
-      restarting =(
-        <RestartModal isRestarting={isRestarting} useDelay={false} />
-    )}
+    if (timeoutRestarting && this.props.restartStatus !== RestartHandler.RESTART_STATES.RESTARTED) {
+      restarting = <RestartModal isRestarting={isRestarting} useDelay={false} />;
+    }
 
     return (
       <Fragment>
@@ -269,7 +268,8 @@ class WzStatusActionButtons extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.statusReducers
+    state: state.statusReducers,
+    restartStatus: state.appStateReducers.restartStatus,
   };
 };
 

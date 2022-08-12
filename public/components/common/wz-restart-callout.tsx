@@ -88,8 +88,7 @@ class WzRestartCallout extends Component<IWzRestartCalloutProps, IWzRestartCallo
         updateRestartStatus: this.props.updateRestartStatus,
       };
       await RestartHandler.restartWazuh(updateRedux, this.state.isCluster);
-      this.setState({ isRestarting: false, timeoutRestarting: false });
-      this.props.onRestarted();
+      this.setState({ isRestarting: false });
     } catch (error) {
       this.setState({ warningRestarting: false, isRestarting: false });
       this.props.updateRestartAttempt(0);
@@ -158,7 +157,7 @@ class WzRestartCallout extends Component<IWzRestartCalloutProps, IWzRestartCallo
         )}
         {timeoutRestarting &&
           this.props.restartStatus !== RestartHandler.RESTART_STATES.RESTARTED && (
-            <RestartModal useDelay={isCluster} />
+            <RestartModal useDelay={isCluster} showWarningRestart={() => this.props.onRestarted()} />
           )}
       </Fragment>
     );

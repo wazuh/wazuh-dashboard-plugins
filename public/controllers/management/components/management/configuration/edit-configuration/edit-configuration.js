@@ -169,7 +169,7 @@ class WzEditConfiguration extends Component {
       await RestartHandler.restartSelectedNode(
         this.props.clusterNodeSelected, updateRedux
       );
-      this.setState({ restart: false, saving: false, restarting: false, timeoutRestarting: false });
+      this.setState({ restart: false, saving: false, restarting: false });
       await this.checkIfClusterOrManager();
       if (this.props.clusterNodes) {
         this.addToast({
@@ -183,12 +183,6 @@ class WzEditConfiguration extends Component {
               </span>
             </Fragment>
           ),
-          color: 'success',
-        });
-      }
-      if(!this.props.clusterNodeSelected){
-        this.addToast({
-          title: 'Manager was restarted',
           color: 'success',
         });
       }
@@ -323,7 +317,7 @@ class WzEditConfiguration extends Component {
           </EuiOverlayMask>
         )}
         {
-          timeoutRestarting && (
+          timeoutRestarting && this.props.restartStatus !== RestartHandler.RESTART_STATES.RESTARTED && (
           <RestartModal isRestarting={restarting} useDelay={false} />
         )}
       </Fragment>
@@ -335,6 +329,7 @@ const mapStateToProps = (state) => ({
   wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet,
   clusterNodes: state.configurationReducers.clusterNodes,
   clusterNodeSelected: state.configurationReducers.clusterNodeSelected,
+  restartStatus: state.appStateReducers.restartStatus,
 });
 
 const mapDispatchToProps = (dispatch) => ({

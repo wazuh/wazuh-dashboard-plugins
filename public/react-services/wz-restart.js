@@ -1,6 +1,6 @@
 import { WzRequest } from './wz-request';
 import { delayAsPromise } from '../../common/utils';
-import { getHttp, getToasts } from '../kibana-services';
+import { getHttp } from '../kibana-services';
 
 /**
  * Wazuh restart wizard.
@@ -13,6 +13,7 @@ export class RestartHandler {
   static POLLING_DELAY = 2000; // milliseconds
   static SYNC_DELAY = 20000; // milliseconds
   static HEALTHCHECK_DELAY = 5000; // milliseconds
+  static INFO_RESTART_SUCCESS_DELAY = 500; // seconds
   static RESTART_STATES = {
     // TODO change to enum (requires TS)
     RESTART_ERROR: 'restart_error',
@@ -20,6 +21,7 @@ export class RestartHandler {
     RESTARTING: 'restarting',
     SYNCING: 'syncing',
     RESTARTED: 'restarted',
+    RESTARTED_INFO: 'restarted_info',
   };
 
   /**
@@ -158,11 +160,10 @@ export class RestartHandler {
 
   /**
    * Restart manager (single-node API call)
-   * @param updateRedux - Redux update function
    * @param isCluster - Is cluster or not
    * @returns {object|Promise}
    */
-  static async restart(isCluster, updateRedux) {
+  static async restart(isCluster) {
     try {
       const clusterOrManager = isCluster ? 'cluster' : 'manager';
 
@@ -177,8 +178,6 @@ export class RestartHandler {
         const str = validationError.detail;
         throw new Error(str);
       }
-
-      updateRedux.updateRestartStatus(this.RESTART_STATES.RESTARTING);
 
       await WzRequest.apiReq('PUT', `/${clusterOrManager}/restart`, {});
 
@@ -226,19 +225,19 @@ export class RestartHandler {
    */
   static async restartSelectedNode(selectedNode, updateRedux) {
     try {
+      // Dispatch a Redux action
+      updateRedux.updateRestartStatus(this.RESTART_STATES.RESTARTING);
       const clusterStatus = (((await this.clusterReq()) || {}).data || {}).data || {};
       const isCluster = clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
-
       isCluster ? await this.restartNode(selectedNode) : await this.restart(isCluster);
 
-      // Dispatch a Redux action
       const isRestarted = await this.makePingSync(updateRedux, this.checkDaemons, isCluster);
       if (!isRestarted) {
         updateRedux.updateRestartStatus(this.RESTART_STATES.RESTART_ERROR);
         this.restartValues(updateRedux);
         throw new Error('Not restarted');
       }
-
+      updateRedux.updateRestartStatus(this.RESTART_STATES.RESTARTED_INFO);
       return { restarted: isCluster ? 'Cluster' : 'Manager' };
     } catch (error) {
       throw error;
@@ -263,11 +262,12 @@ export class RestartHandler {
         }
       }
 
+      updateRedux.updateRestartStatus(this.RESTART_STATES.RESTARTING);
+
       const clusterStatus = (((await this.clusterReq()) || {}).data || {}).data || {};
       const isCluster = clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
-
       // Dispatch a Redux action
-      await this.restart(isCluster, updateRedux);
+      await this.restart(isCluster);
       const isRestarted = await this.makePingSync(updateRedux, this.checkDaemons, isCluster);
 
       if (!isRestarted) {
@@ -276,14 +276,9 @@ export class RestartHandler {
         throw new Error('Not restarted');
       }
 
-      updateRedux.updateRestartStatus(this.RESTART_STATES.RESTARTED);
+      updateRedux.updateRestartStatus(this.RESTART_STATES.RESTARTED_INFO);
       this.restartValues(updateRedux);
 
-      getToasts().add({
-        color: 'success',
-        title: isCluster ? 'Cluster was restarted.' : 'Manager was restarted.',
-        toastLifeTimeMs: 3000,
-      });
       return { restarted: isCluster ? 'Cluster' : 'Manager' };
     } catch (error) {
       throw error;

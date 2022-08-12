@@ -26,12 +26,12 @@ import {
  * @param props component's props
  * @returns components's body
  */
-export const RestartModal = (props: { useDelay?: boolean }) => {
+export const RestartModal = (props: { useDelay?: boolean, showWarningRestart? }) => {
   // Component props
   const { useDelay = false } = props;
 
   // Use default HEALTHCHECK_DELAY
-  const [timeToHC, setCountdown] = useState(RestartHandler.HEALTHCHECK_DELAY / 1000);
+  const [timeToHC, setTimeToHC] = useState(RestartHandler.HEALTHCHECK_DELAY / 1000);
 
   // Use default SYNC_DELAY
   const [syncDelay, setSyncDelay] = useState(RestartHandler.SYNC_DELAY / 1000);
@@ -74,7 +74,10 @@ export const RestartModal = (props: { useDelay?: boolean }) => {
   // Apply HEALTHCHECK_DELAY when the restart has failed
   useEffect(() => {
     restartStatus === RestartHandler.RESTART_STATES.RESTART_ERROR &&
-      countdown(timeToHC, setCountdown);
+      countdown(timeToHC, setTimeToHC);
+
+    restartStatus === RestartHandler.RESTART_STATES.RESTARTED_INFO &&
+      restartedTimeout();
   }, [restartStatus]);
 
   // TODO
@@ -83,7 +86,7 @@ export const RestartModal = (props: { useDelay?: boolean }) => {
 
     const interval = setInterval(() => {
       setState(countDown);
-      if (countDown === 0 && setState === setCountdown) {
+      if (countDown === 0 && setState === setTimeToHC) {
         clearInterval(interval);
         RestartHandler.goToHealthcheck();
       } else if (countDown === 0) {
@@ -93,6 +96,15 @@ export const RestartModal = (props: { useDelay?: boolean }) => {
       countDown--;
     }, 1000 /* 1 second */);
   };
+
+  const restartedTimeout = () => {
+    setTimeout(() => {
+        dispatch(updateRestartStatus(RestartHandler.RESTART_STATES.RESTARTED));
+        if(props.showWarningRestart){
+          props.showWarningRestart()
+        }
+      }, RestartHandler.INFO_RESTART_SUCCESS_DELAY);
+  }
   
   // TODO review if importing these functions in wz-restart work.
   const dispatch = useDispatch();
@@ -121,6 +133,22 @@ export const RestartModal = (props: { useDelay?: boolean }) => {
   let emptyPromptProps: Partial<EuiEmptyPromptProps>;
   switch (restartStatus) {
     default:
+    case RestartHandler.RESTART_STATES.RESTARTED_INFO:
+      emptyPromptProps = {
+        title: (
+          <>
+            <img src={logotypeURL} className="wz-modal-restart-logo" alt=""></img>
+            <h2 className="wz-modal-restart-title">Wazuh restarted</h2>
+          </>
+        ),
+        body: (
+          <>
+            <EuiProgress value={maxAttempts} max={maxAttempts} size="s" />
+          </>
+        ),
+      };
+      break;
+
     case RestartHandler.RESTART_STATES.RESTARTING:
       emptyPromptProps = {
         title: (
