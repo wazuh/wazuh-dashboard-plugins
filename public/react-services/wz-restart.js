@@ -136,7 +136,8 @@ export class RestartHandler {
         try {
           isValid = await breakCondition(updateRedux, attempt, isCluster);
         } catch (error) {
-          console.error(error);
+          // console.error(error);
+          //The message in the console is disabled because the user will see the error message on the healthcheck page.
         }
       }
 
