@@ -26,7 +26,7 @@ import {
 import exportCsv from '../../../../../react-services/wz-csv';
 import { UploadFiles } from '../../upload-files';
 import columns from './utils/columns';
-import { resourceDictionary, RulesetHandler, RulesetResources } from './utils/ruleset-handler';
+import { resourceDictionary, RulesetHandler } from './utils/ruleset-handler';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 
 import { connect } from 'react-redux';
