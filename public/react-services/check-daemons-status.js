@@ -16,6 +16,9 @@ import { delayAsPromise } from '../../common/utils';
 
 let busy = false;
 
+/**
+ * @deprecated
+ */
 export class CheckDaemonsStatus {
   static async makePing(tries = 10) {
     try {
