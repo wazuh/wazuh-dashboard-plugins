@@ -2,8 +2,6 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-<<<<<<< HEAD
-=======
 ## Wazuh v4.3.7 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4308
 
 ### Fixed
@@ -15,6 +13,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed an error of an undefined username hash related to reporting when using Kibana with X-Pack and security was disabled [#4358](https://github.com/wazuh/wazuh-kibana-app/pull/4358)
 - Fixed persistence of the plugin registry file between updates [#4359](https://github.com/wazuh/wazuh-kibana-app/pull/4359)
 - Fixed searchbar error on SCA Inventory table [#4367](https://github.com/wazuh/wazuh-kibana-app/pull/4367)
+- Fixed Wazuh restart UI [#4365](https://github.com/wazuh/wazuh-kibana-app/pull/4365)
 
 # Removed
 
@@ -33,7 +32,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fix Rules, Decoders and CDB lists uploaders to show errors appropriately [#4307](https://github.com/wazuh/wazuh-kibana-app/pull/4307)
 - Sanitize report's inputs and usernames [#4330](https://github.com/wazuh/wazuh-kibana-app/pull/4330)
 
->>>>>>> 44a43cbe2... TypeError resolved (#4362)
 ## Wazuh v4.3.5 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4306
 
 ### Added
