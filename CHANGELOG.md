@@ -24,6 +24,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed an error of an undefined username hash related to reporting when using Kibana with X-Pack and security was disabled [#4358](https://github.com/wazuh/wazuh-kibana-app/pull/4358)
 - Fixed persistence of the plugin registry file between updates [#4359](https://github.com/wazuh/wazuh-kibana-app/pull/4359)
 - Fixed searchbar error on SCA Inventory table [#4367](https://github.com/wazuh/wazuh-kibana-app/pull/4367)
+- Fixed a routes loop when reinstalling Wazuh indexer [#4373](https://github.com/wazuh/wazuh-kibana-app/pull/4373)
 - Fixed Wazuh restart UI [#4365](https://github.com/wazuh/wazuh-kibana-app/pull/4365)
 
 # Removed
