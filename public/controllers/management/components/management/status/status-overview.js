@@ -20,7 +20,6 @@ import {
   EuiPage,
   EuiSpacer,
   EuiFlexGrid,
-  EuiButton,
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
