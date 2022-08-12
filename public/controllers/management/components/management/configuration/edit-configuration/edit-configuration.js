@@ -30,19 +30,19 @@ import WzConfigurationPath from '../util-components/configuration-path';
 import WzRefreshClusterInfoButton from '../util-components/refresh-cluster-info-button';
 import { WzButtonPermissions } from '../../../../../../components/common/permissions/button';
 import withLoading from '../util-hocs/loading';
-import { updateWazuhNotReadyYet } from '../../../../../../redux/actions/appStateActions';
+import { updateRestartStatus, updateRestartAttempt, updateSyncCheckAttempt, updateUnsynchronizedNodes } from '../../../../../../redux/actions/appStateActions';
 import {
   updateClusterNodes,
   updateClusterNodeSelected,
 } from '../../../../../../redux/actions/configurationActions';
 import {
   fetchFile,
-  restartNodeSelected,
   saveFileManager,
   saveFileCluster,
   clusterNodes,
   clusterReq,
 } from '../utils/wz-fetch';
+import { RestartHandler } from '../../../../../../react-services/wz-restart';
 import { validateXML } from '../utils/xml';
 import { getToasts } from '../../../../../..//kibana-services';
 
@@ -52,6 +52,7 @@ import { compose } from 'redux';
 import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
+import { RestartModal } from '../../../../../../components/common/restart-modal/restart-modal';
 
 class WzEditConfiguration extends Component {
   constructor(props) {
@@ -66,6 +67,7 @@ class WzEditConfiguration extends Component {
       hasChanges: false,
       infoChangesAfterRestart: false,
       disableSaveRestartButtons: false,
+      timeoutRestarting: false
     };
   }
 
@@ -157,34 +159,19 @@ class WzEditConfiguration extends Component {
 
   async confirmRestart() {
     try {
-      this.setState({ restarting: true, saving: true, infoChangesAfterRestart: false });
-      await restartNodeSelected(this.props.clusterNodeSelected, this.props.updateWazuhNotReadyYet);
-      this.props.updateWazuhNotReadyYet('');
+      this.setState({ restarting: true, saving: true, infoChangesAfterRestart: false, timeoutRestarting:true });
+      const updateRedux = {
+        updateRestartStatus: this.props.updateRestartStatus,
+        updateSyncCheckAttempt: this.props.updateSyncCheckAttempt,
+        updateUnsynchronizedNodes: this.props.updateUnsynchronizedNodes,
+        updateRestartAttempt: this.props.updateRestartAttempt,
+      }
+      await RestartHandler.restartSelectedNode(
+        this.props.clusterNodeSelected, updateRedux
+      );
       this.setState({ restart: false, saving: false, restarting: false });
       await this.checkIfClusterOrManager();
-      if (this.props.clusterNodes) {
-        this.addToast({
-          title: (
-            <Fragment>
-              <EuiIcon type="iInCircle" />
-              &nbsp;
-              <span>
-                Nodes could take some time to restart, it may be necessary to perform a refresh to
-                see them all.
-              </span>
-            </Fragment>
-          ),
-          color: 'success',
-        });
-      }
-      if(!this.props.clusterNodeSelected){
-        this.addToast({
-          title: 'Manager was restarted',
-          color: 'success',
-        });
-      }
     } catch (error) {
-      this.props.updateWazuhNotReadyYet('');
       this.setState({ restart: false, saving: false, restarting: false });
       const options = {
         context: `${WzEditConfiguration.name}.confirmRestart`,
@@ -199,6 +186,7 @@ class WzEditConfiguration extends Component {
       getErrorOrchestrator().handleError(options);
     }
   }
+
 
   async checkIfClusterOrManager() {
     try {
@@ -234,7 +222,7 @@ class WzEditConfiguration extends Component {
     }
   }
   render() {
-    const { restart, restarting, saving, editorValue, disableSaveRestartButtons } = this.state;
+    const { restart, restarting, saving, editorValue, disableSaveRestartButtons, timeoutRestarting } = this.state;
     const { clusterNodeSelected, agent } = this.props;
     const xmlError = editorValue && validateXML(editorValue);
     return (
@@ -312,6 +300,10 @@ class WzEditConfiguration extends Component {
             />
           </EuiOverlayMask>
         )}
+        {
+          timeoutRestarting && this.props.restartStatus !== RestartHandler.RESTART_STATES.RESTARTED && (
+          <RestartModal isRestarting={restarting} useDelay={false} />
+        )}
       </Fragment>
     );
   }
@@ -321,18 +313,22 @@ const mapStateToProps = (state) => ({
   wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet,
   clusterNodes: state.configurationReducers.clusterNodes,
   clusterNodeSelected: state.configurationReducers.clusterNodeSelected,
+  restartStatus: state.appStateReducers.restartStatus,
 });
 
 const mapDispatchToProps = (dispatch) => ({
   updateClusterNodes: (clusterNodes) => dispatch(updateClusterNodes(clusterNodes)),
   updateClusterNodeSelected: (clusterNodeSelected) =>
     dispatch(updateClusterNodeSelected(clusterNodeSelected)),
-  updateWazuhNotReadyYet: (value) => dispatch(updateWazuhNotReadyYet(value)),
+  updateRestartAttempt: (value) => dispatch(updateRestartAttempt(value)),
+  updateRestartStatus: (value) => dispatch(updateRestartStatus(value)),
+  updateSyncCheckAttempt: (value) => dispatch(updateSyncCheckAttempt(value)),
+  updateUnsynchronizedNodes: (value) => dispatch(updateUnsynchronizedNodes(value)),
 });
 
 WzEditConfiguration.propTypes = {
   wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
-  updateWazuhNotReadyYet: PropTypes.func,
+  updateRestartAttempt: PropTypes.func,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(WzEditConfiguration);
