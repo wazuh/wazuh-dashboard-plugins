@@ -109,6 +109,14 @@ export const RestartModal = (props: { useDelay?: boolean }) => {
     await RestartHandler.restartWazuh(updateRedux);
   };
 
+
+  const abort = () => {
+    dispatch(updateRestartStatus(RestartHandler.RESTART_STATES.RESTARTED));
+    dispatch(updateUnsynchronizedNodes([]));
+    dispatch(updateRestartAttempt(0));
+    dispatch(updateSyncCheckAttempt(0));
+  }
+
   // Build the modal depending on the restart state.
   let emptyPromptProps: Partial<EuiEmptyPromptProps>;
   switch (restartStatus) {
@@ -162,7 +170,7 @@ export const RestartModal = (props: { useDelay?: boolean }) => {
               </EuiButtonEmpty>
             </EuiFlexItem>
             <EuiFlexItem grow={false}> 
-              <EuiButton color="primary" fill onClick={() => dispatch(updateRestartStatus(RestartHandler.RESTART_STATES.RESTARTED))}>
+              <EuiButton color="primary" fill onClick={abort}>
                 Close
               </EuiButton>
             </EuiFlexItem>
