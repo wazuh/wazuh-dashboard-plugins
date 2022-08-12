@@ -16,10 +16,13 @@ import { FieldsStatistics } from '../utils/statistics-fields';
 import { FieldsMonitoring } from '../utils/monitoring-fields';
 import {
   HEALTH_CHECK,
+  PLUGIN_PLATFORM_NAME,
   WAZUH_INDEX_TYPE_ALERTS,
   WAZUH_INDEX_TYPE_MONITORING,
   WAZUH_INDEX_TYPE_STATISTICS,
 } from '../../common/constants';
+import { getSavedObjects } from '../kibana-services';
+import { webDocumentationLink } from '../../common/services/web_documentation';
 
 export class SavedObject {
   /**
@@ -279,4 +282,24 @@ export class SavedObject {
       }
     }
   };
+
+  /**
+   * Check if it exists the index pattern saved objects using the `GET /api/saved_objects/_find` endpoint.
+   * It is usefull to validate if the endpoint works as expected. Related issue: https://github.com/wazuh/wazuh-kibana-app/issues/4293
+   * @param {string[]} indexPatternIDs 
+   */
+  static async validateIndexPatternSavedObjectCanBeFound(indexPatternIDs){
+    const indexPatternsSavedObjects = await getSavedObjects().client.find({
+      type: 'index-pattern',
+      fields: ['title'],
+      perPage: 10000
+    });
+    const indexPatternsSavedObjectsCanBeFound = indexPatternIDs
+      .every(indexPatternID => indexPatternsSavedObjects.savedObjects.some(savedObject => savedObject.id === indexPatternID));
+
+    if (!indexPatternsSavedObjectsCanBeFound) {
+      throw new Error(`Saved object for index pattern not found.
+Restart the ${PLUGIN_PLATFORM_NAME} service to initialize the index. More information in <a href="${webDocumentationLink('user-manual/wazuh-dashboard/troubleshooting.html#saved-object-for-index-pattern-not-found')}" target="_blank">troubleshooting</a>.`
+)};
+  }
 }
