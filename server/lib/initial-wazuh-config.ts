@@ -29,7 +29,7 @@ import {
   WAZUH_STATISTICS_DEFAULT_STATUS,
 } from '../../common/constants';
 import { webDocumentationLink } from '../../common/services/web_documentation';
-import { configEquivalences } from '../../public/utils/config-equivalences';
+import { configEquivalences } from '../../common/config-equivalences';
 
 /**
  * Given a string, this function builds a multine string, each line about 70
