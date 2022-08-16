@@ -1,4 +1,4 @@
-import { ASSETS_PUBLIC_URL, PLUGIN_PLATFORM_NAME } from "../../common/constants";
+import { ASSETS_PUBLIC_URL, PLUGIN_PLATFORM_NAME } from "./constants";
 
 export const configEquivalences = {
   pattern: "Default index pattern to use on the app. If there's no valid index pattern, the app will automatically create one with the name indicated in this option.",
