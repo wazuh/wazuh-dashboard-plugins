@@ -1,8 +1,8 @@
 {
   "name": "wazuh",
   "version": "4.3.7",
-  "revision": "4307",
-  "code": "4307",
+  "revision": "4308",
+  "code": "4308",
   "pluginPlatform": {
     "version": "1.2.0"
   },
