@@ -17,7 +17,6 @@ import {
   EuiPanel,
   EuiPage,
   EuiBasicTable,
-  EuiInMemoryTable,
   EuiSpacer,
   EuiText,
   EuiProgress,
@@ -49,6 +48,7 @@ import {
 import { API_NAME_AGENT_STATUS, UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { VisualizationBasic } from '../../common/charts/visualizations/basic';
+import { TableWzAPI } from '../../common/tables';
 
 export class Inventory extends Component {
   _isMount = false;
@@ -70,32 +70,39 @@ export class Inventory extends Component {
       {
         field: 'name',
         name: 'Policy',
+        sortable: true,
       },
       {
         field: 'description',
         name: 'Description',
         truncateText: true,
+        render: formatUIDate,
+        sortable: true,
       },
       {
         field: 'end_scan',
         name: 'End scan',
         dataType: 'date',
         render: formatUIDate,
+        sortable: true,
       },
       {
         field: 'pass',
         name: 'Pass',
-        width: '100px',
+        width: "100px",
+        sortable: true,
       },
       {
         field: 'fail',
         name: 'Fail',
-        width: '100px',
+        width: "100px",
+        sortable: true,
       },
       {
         field: 'invalid',
         name: 'Not applicable',
-        width: '100px',
+        width: "100px",
+        sortable: true,
       },
       {
         field: 'score',
@@ -447,14 +454,14 @@ export class Inventory extends Component {
       this.state.filters.every((filter) =>
         filter.field === 'search'
           ? Object.keys(check).some(
-              (key) =>
-                ['string', 'number'].includes(typeof check[key]) &&
-                String(check[key]).toLowerCase().includes(filter.value.toLowerCase())
-            )
+            (key) =>
+              ['string', 'number'].includes(typeof check[key]) &&
+              String(check[key]).toLowerCase().includes(filter.value.toLowerCase())
+          )
           : typeof check[filter.field] === 'string' &&
-            (filter.value === ''
-              ? check[filter.field] === filter.value
-              : check[filter.field].toLowerCase().includes(filter.value.toLowerCase()))
+          (filter.value === ''
+            ? check[filter.field] === filter.value
+            : check[filter.field].toLowerCase().includes(filter.value.toLowerCase()))
       )
     );
 
@@ -791,17 +798,24 @@ export class Inventory extends Component {
 
                   <EuiFlexGroup>
                     <EuiFlexItem>
-                      <EuiInMemoryTable
-                        items={this.filterPolicyChecks()}
-                        columns={this.columnsChecks}
+                      <TableWzAPI
+                        title="Checks"
+                        tableColumns={this.columnsChecks}
+                        tableInitialSortingField="id"
+                        searchTable={true}
+                        searchBarSuggestions={this.suggestions[this.state.lookingPolicy.policy_id]}
+                        endpoint={`/sca/${this.props.agent.id}/checks/${this.state.lookingPolicy.policy_id}`}
                         rowProps={getChecksRowProps}
-                        itemId="id"
-                        itemIdToExpandedRowMap={this.state.itemIdToExpandedRowMap}
-                        isExpandable={true}
-                        sorting={sorting}
-                        pagination={this.state.pageTableChecks}
-                        loading={this.state.loadingPolicy}
-                        onTableChange={(change) => this.onChangeTableChecks(change)}
+                        tableProps={{
+                          isExpandable: true,
+                          itemIdToExpandedRowMap: this.state.itemIdToExpandedRowMap,
+                          itemId: 'id'
+                        }}
+                        downloadCsv
+                        showReload
+                        filters={this.state.filters}
+                        onFiltersChange={(filters) => this.setState({ filters })}
+                        tablePageSizeOptions={[10, 25, 50, 100]}
                       />
                     </EuiFlexItem>
                   </EuiFlexGroup>
