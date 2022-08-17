@@ -32,8 +32,7 @@ import {
   getLastScan, getAggregation
 } from './inventory/lib';
 import { ICustomBadges } from '../../wz-search-bar/components';
-import { formatUIDate } from '../../../react-services';
-import { VisualizationBasicWidgetSelector, VisualizationBasicWidget  } from '../../common/charts/visualizations/basic';
+import { VisualizationBasicWidgetSelector, VisualizationBasicWidget } from '../../common/charts/visualizations/basic';
 import { WzStat } from '../../wz-stat';
 
 interface Aggregation { title: number, description: string, titleColor: string }
@@ -99,7 +98,7 @@ export class Inventory extends Component {
     })).sort((firstElement, secondElement) => secondElement.value - firstElement.value)
   }
 
-  async fetchVisualizationVulnerabilitiesSeverityData(){
+  async fetchVisualizationVulnerabilitiesSeverityData() {
     const { id } = this.props.agent;
     const FIELD = 'severity';
     const SEVERITY_KEYS = ['Critical', 'High', 'Medium', 'Low'];
@@ -108,7 +107,7 @@ export class Inventory extends Component {
     const vulnerabilityLastScan = await getLastScan(id);
     const { severity } = await getAggregation(id, FIELD);
 
-    const severityStats = SEVERITY_KEYS.map(key => ({ 
+    const severityStats = SEVERITY_KEYS.map(key => ({
       titleColor: this.titleColors[key],
       description: key,
       title: severity[key] ? severity[key] : 0
@@ -119,7 +118,7 @@ export class Inventory extends Component {
       isLoadingStats: false,
       vulnerabilityLastScan
     });
-    
+
     return Object.keys(severity).length ? SEVERITY_KEYS.map(key => ({
       label: key,
       value: severity[key] ? severity[key] : 0,
@@ -173,11 +172,7 @@ export class Inventory extends Component {
   }
 
   // This method was created because Wazuh API returns 1970-01-01T00:00:00Z dates or undefined ones
-  // when vulnerability module is not configured
-  // its meant to render nothing when such date is received
-  beautifyDate(date?: string) {
-    return date && !['1970-01-01T00:00:00Z', '-'].includes(date) ? formatUIDate(date) : '-';
-  }
+  // when vulne_isMoun
 
   buildTitleFilter({ description, title, titleColor }) {
     const { isLoadingStats } = this.state;
@@ -213,14 +208,14 @@ export class Inventory extends Component {
     }
     const last_full_scan = this.beautifyDate(vulnerabilityLastScan.last_full_scan);
     const last_partial_scan = this.beautifyDate(vulnerabilityLastScan.last_partial_scan);
-    
+
     const table = this.renderTable();
     return <EuiPage>
       <EuiPageBody>
         <EuiFlexGroup wrap>
           <EuiFlexItem>
             <EuiCard title description betaBadgeLabel="Severity" className="wz-euiCard-no-title">
-              <div style={{display: 'flex', alignItems: 'flex-end', height: '100%'}}>
+              <div style={{ display: 'flex', alignItems: 'flex-end', height: '100%' }}>
                 <VisualizationBasicWidget
                   type='donut'
                   size={{ width: '100%', height: '150px' }}
