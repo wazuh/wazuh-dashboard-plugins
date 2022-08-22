@@ -30,4 +30,5 @@ app
   .service('commonData', ['$rootScope', '$timeout', 'errorHandler', '$location', '$window', '$route', CommonData])
   .service('reportingService', ['$rootScope', 'vis2png', 'rawVisualizations', 'visHandlers', 'errorHandler', ReportingService])
   .service('visFactoryService', ['$rootScope', 'discoverPendingUpdates', 'rawVisualizations', 'loadedVisualizations', 'commonData', 'visHandlers', VisFactoryService])
+  .service('configHandler', ['$rootScope', 'errorHandler', ConfigHandler])
   .service('checkDaemonsStatus', ['$rootScope', '$timeout', CheckDaemonsStatus]);
