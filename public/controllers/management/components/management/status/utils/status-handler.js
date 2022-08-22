@@ -138,4 +138,53 @@ export default class StatusHandler {
       throw error;
     }
   }
+
+  /**
+   * Restart cluster
+   */
+  static async restartCluster() {
+    try {
+      const validationError = await WzRequest.apiReq(
+        'GET',
+        `/cluster/configuration/validation`,
+        {}
+      );
+
+      const data = ((validationError || {}).data || {}).data || {};
+      const isOk = data.status === 'OK';
+      if (!isOk && Array.isArray(data.details)) {
+        const str = data.details.join();
+        throw new Error(str);
+      }
+      await WzRequest.apiReq('PUT', `/cluster/restart`, { delay: 15000 });
+      return { data: { data: 'Restarting cluster' } };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  /**
+   * Restart manager (single-node API call)
+   */
+  static async restartManager() {
+    try {
+      const validationError = await WzRequest.apiReq(
+        'GET',
+        `/manager/configuration/validation`,
+        {}
+      );
+
+      const data = ((validationError || {}).data || {}).data || {};
+      const isOk = data.status === 'OK';
+      if (!isOk && Array.isArray(data.details)) {
+        const str = data.details.join();
+        throw new Error(str);
+      }
+
+      const result = await WzRequest.apiReq('PUT', `/manager/restart`, {});
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
 }

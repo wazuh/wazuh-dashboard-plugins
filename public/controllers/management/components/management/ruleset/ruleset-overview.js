@@ -19,7 +19,7 @@ import WzRulesetSearchBar from './ruleset-search-bar';
 import WzRulesetActionButtons from './actions-buttons';
 import './ruleset-overview.scss';
 import { withUserAuthorizationPrompt, withGlobalBreadcrumb } from '../../../../../components/common/hocs';
-import WzRestartCallout from '../../../../../components/common/wz-restart-callout';
+import WzRestartClusterManagerCallout from '../../../../../components/common/restart-cluster-manager-callout';
 import { compose } from 'redux';
 import { resourceDictionary } from './utils/ruleset-handler';
 
@@ -68,7 +68,7 @@ class WzRulesetOverview extends Component {
           {this.state.showWarningRestart && (
             <>
               <EuiSpacer size='s' />
-              <WzRestartCallout
+              <WzRestartClusterManagerCallout
                 onRestarted={() => this.updateRestartManagers(false)}
                 onRestartedError={() => this.updateRestartManagers(true)}
               />

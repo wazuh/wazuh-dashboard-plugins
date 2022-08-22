@@ -31,10 +31,6 @@ const initialState = {
   withUserLogged: false,
   allowedAgents: [],
   logtestToken: '',
-  restartAttempt: 0,
-  syncCheckAttempt: 0,
-  unsynchronizedNodes: [],
-  restartStatus: ''
 };
 
 const appStateReducers = (state = initialState, action) => {
@@ -143,7 +139,7 @@ const appStateReducers = (state = initialState, action) => {
       ...state,
      withUserLogged: action.withUserLogged,
     };
-  }
+  }  
 
   if (action.type === 'GET_ALLOWED_AGENTS') {
     return {
@@ -151,39 +147,11 @@ const appStateReducers = (state = initialState, action) => {
       allowedAgents: action.allowedAgents
     };
   }
-
+  
   if (action.type === 'UPDATE_LOGTEST_TOKEN') {
     return {
       ...state,
       logtestToken: action.logtestToken
-    };
-  }
-
-  if (action.type === 'UPDATE_RESTART_ATTEMPT') {
-    return {
-      ...state,
-      restartAttempt: action.restartAttempt
-    };
-  }
-
-  if (action.type === 'UPDATE_SYNC_CHECK_ATTEMPT') {
-    return {
-      ...state,
-      syncCheckAttempt: action.syncCheckAttempt
-    };
-  }
-  
-  if (action.type === 'UPDATE_UNSYNCHRONIZED_NODES') {
-    return {
-      ...state,
-      unsynchronizedNodes: action.unsynchronizedNodes
-    };
-  }
-
-  if (action.type === 'UPDATE_RESTART_STATUS') {
-    return {
-      ...state,
-      restartStatus: action.restartStatus
     };
   }
 

@@ -2,9 +2,6 @@ import store from '../redux/store';
 import { updateWazuhNotReadyYet } from '../redux/actions/appStateActions';
 import { WzRequest } from '../react-services/wz-request';
 
-/**
- * @deprecated
- */
 export class CheckDaemonsStatus {
   constructor($rootScope, $timeout) {
     this.$rootScope = $rootScope;
