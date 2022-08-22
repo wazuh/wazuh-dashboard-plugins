@@ -23,4 +23,3 @@ export * from './wz-security-opendistro';
 export * from './wz-security-xpack';
 export * from './wz-user-permissions';
 export * from './query-config'
-export * from './wz-restart'
