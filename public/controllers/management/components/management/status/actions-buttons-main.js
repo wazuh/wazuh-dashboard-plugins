@@ -13,6 +13,7 @@ import React, { Component, Fragment } from 'react';
 // Eui components
 import {
   EuiFlexItem,
+  EuiButtonEmpty,
   EuiSelect,
   EuiOverlayMask,
   EuiConfirmModal
@@ -36,9 +37,6 @@ import { WzButtonPermissions } from '../../../../../components/common/permission
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
-import { RestartHandler } from '../../../../../react-services/wz-restart';
-import { updateRestartAttempt, updateRestartStatus } from '../../../../../redux/actions/appStateActions';
-import { RestartModal } from '../../../../../components/common/restart-modal/restart-modal'
 
 class WzStatusActionButtons extends Component {
   _isMounted = false;
@@ -50,8 +48,7 @@ class WzStatusActionButtons extends Component {
     this.statusHandler = StatusHandler;
     this.state = {
       isModalVisible: false,
-      isRestarting: false,
-      timeoutRestarting: false,
+      isRestarting: false
     };
   }
 
@@ -59,29 +56,60 @@ class WzStatusActionButtons extends Component {
     this._isMounted = true;
   }
 
+  componentDidUpdate() {}
+
   componentWillUnmount() {
     this._isMounted = false;
   }
 
   /**
-   * Restart cluster or manager
+   * Restart cluster
    */
-  async restartWazuh() {
-    this.setState({ isRestarting: true, timeoutRestarting: true });
+  async restartCluster() {
+    this.setState({ isRestarting: true });
     try {
-      const updateRedux = {updateRestartAttempt: this.props.updateRestartAttempt , updateRestartStatus: this.props.updateRestartStatus};
-      await RestartHandler.restartWazuh(updateRedux);
+      const result = await this.statusHandler.restartCluster();
       this.setState({ isRestarting: false });
+      this.showToast(
+        'success',
+        'Restarting cluster, it will take up to 30 seconds.',
+        3000
+      );
     } catch (error) {
       this.setState({ isRestarting: false });
       const options = {
-        context: `${WzStatusActionButtons.name}.restartWazuh`,
+        context: `${WzStatusActionButtons.name}.restartCluster`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         error: {
           error: error,
           message: error.message || error,
-          title: `${error.name}: Error restarting Wazuh}`,
+          title: `${error.name}: Error restarting cluster`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+    }
+  }
+
+  /**
+   * Restart manager
+   */
+  async restartManager() {
+    this.setState({ isRestarting: true });
+    try {
+      await this.statusHandler.restartManager();
+      this.setState({ isRestarting: false });
+      this.showToast('success', 'Restarting manager.', 3000);
+    } catch (error) {
+      this.setState({ isRestarting: false });
+      const options = {
+        context: `${WzStatusActionButtons.name}.restartManager`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `${error.name}: Error restarting manager`,
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -186,13 +214,8 @@ class WzStatusActionButtons extends Component {
       listNodes,
       selectedNode,
       clusterEnabled,
+      isRestarting
     } = this.props.state;
-
-    const {
-      isRestarting,
-      isModalVisible,
-      timeoutRestarting,
-    } = this.state
 
     let options = this.transforToOptions(listNodes);
 
@@ -203,7 +226,7 @@ class WzStatusActionButtons extends Component {
         options={options}
         value={selectedNode}
         onChange={this.changeNode}
-        disabled={isLoading || isRestarting}
+        disabled={isLoading || this.state.isRestarting}
         aria-label="Select node"
       />
     );
@@ -216,15 +239,16 @@ class WzStatusActionButtons extends Component {
         iconType="refresh"
         onClick={async () => this.setState({ isModalVisible: true })}
         isDisabled={isLoading}
-        isLoading={isRestarting}
+        isLoading={this.state.isRestarting}
       >
-        Restart {clusterEnabled ? 'cluster' : 'manager'}
+        {clusterEnabled && 'Restart cluster'}
+        {!clusterEnabled && 'Restart manager'}
       </WzButtonPermissions>
     );
 
     let modal;
 
-    if (isModalVisible) {
+    if (this.state.isModalVisible) {
       modal = (
         <EuiOverlayMask>
           <EuiConfirmModal
@@ -235,8 +259,11 @@ class WzStatusActionButtons extends Component {
             }
             onCancel={this.closeModal}
             onConfirm={() => {
-              this.props.updateRestartStatus(RestartHandler.RESTART_STATES.RESTARTING)
-              this.restartWazuh()
+              if (clusterEnabled) {
+                this.restartCluster();
+              } else {
+                this.restartManager();
+              }
               this.setState({ isModalVisible: false });
             }}
             cancelButtonText="Cancel"
@@ -247,20 +274,13 @@ class WzStatusActionButtons extends Component {
       );
     }
 
-    let restarting
-
-    if (timeoutRestarting && this.props.restartStatus !== RestartHandler.RESTART_STATES.RESTARTED) {
-      restarting = <RestartModal isRestarting={isRestarting} useDelay={false} />;
-    }
-
     return (
       <Fragment>
         {selectedNode !== null && (
-          <EuiFlexItem grow={isRestarting}>{restartButton}</EuiFlexItem>
+          <EuiFlexItem grow={false}>{restartButton}</EuiFlexItem>
         )}
         {selectedNode && <EuiFlexItem grow={false}>{selectNode}</EuiFlexItem>}
         {modal}
-        {restarting}
       </Fragment>
     );
   }
@@ -268,8 +288,7 @@ class WzStatusActionButtons extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.statusReducers,
-    restartStatus: state.appStateReducers.restartStatus,
+    state: state.statusReducers
   };
 };
 
@@ -280,9 +299,7 @@ const mapDispatchToProps = dispatch => {
     updateNodeInfo: nodeInfo => dispatch(updateNodeInfo(nodeInfo)),
     updateSelectedNode: selectedNode => dispatch(updateSelectedNode(selectedNode)),
     updateStats: stats => dispatch(updateStats(stats)),
-    updateAgentInfo: agentInfo => dispatch(updateAgentInfo(agentInfo)),
-    updateRestartAttempt: restartAttempt => dispatch(updateRestartAttempt(restartAttempt)),
-    updateRestartStatus: restartStatus => dispatch(updateRestartStatus(restartStatus)),
+    updateAgentInfo: agentInfo => dispatch(updateAgentInfo(agentInfo))
   };
 };
 

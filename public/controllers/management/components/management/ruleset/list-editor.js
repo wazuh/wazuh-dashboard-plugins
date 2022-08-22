@@ -18,8 +18,10 @@ import {
   EuiTitle,
   EuiToolTip,
   EuiButtonIcon,
+  EuiButton,
   EuiText,
   EuiButtonEmpty,
+  EuiPopover,
   EuiFieldText,
   EuiSpacer,
   EuiPanel,
@@ -36,7 +38,7 @@ import { getToasts } from '../../../../../kibana-services';
 import exportCsv from '../../../../../react-services/wz-csv';
 
 import { updateWazuhNotReadyYet } from '../../../../../redux/actions/appStateActions';
-import WzRestartCallout from '../../../../../components/common/wz-restart-callout';
+import WzRestartClusterManagerCallout from '../../../../../components/common/restart-cluster-manager-callout';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
@@ -600,7 +602,7 @@ class WzListEditor extends Component {
               {this.state.showWarningRestart && (
                 <Fragment>
                   <EuiSpacer size="s" />
-                  <WzRestartCallout
+                  <WzRestartClusterManagerCallout
                     onRestarted={() => this.setState({ showWarningRestart: false })}
                     onRestartedError={() => this.setState({ showWarningRestart: true })}
                   />
