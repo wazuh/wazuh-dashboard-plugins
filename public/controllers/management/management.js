@@ -30,12 +30,13 @@ export class ManagementController {
    * @param {*} $scope
    * @param {*} $location
    */
-  constructor($scope, $rootScope, $location, errorHandler, $interval) {
+  constructor($scope, $rootScope, $location, configHandler, errorHandler, $interval) {
     this.$scope = $scope;
     this.$rootScope = $rootScope;
     this.$location = $location;
     this.shareAgent = new ShareAgent();
     this.wazuhConfig = new WazuhConfig();
+    this.configHandler = configHandler;
     this.errorHandler = errorHandler;
     this.$interval = $interval;
     this.tab = 'welcome';
@@ -140,6 +141,11 @@ export class ManagementController {
       this.$scope.$applyAsync();
     });
 
+    this.$rootScope.$on('performRestart', (ev) => {
+      ev.stopPropagation();
+      this.clusterInfo.status === 'enabled' ? this.restartCluster() : this.restartManager();
+    });
+
     this.$rootScope.timeoutIsReady;
     this.$rootScope.$watch('resultState', () => {
       if (this.$rootScope.timeoutIsReady) {
@@ -240,6 +246,59 @@ export class ManagementController {
    */
   inArray(item, array) {
     return item && Array.isArray(array) && array.includes(item);
+  }
+
+  async restartManager() {
+    try {
+      if (this.isRestarting) return;
+      this.isRestarting = true;
+      await this.configHandler.restartManager();
+      this.isRestarting = false;
+      this.$scope.$applyAsync();
+      ErrorHandler.info('Restarting manager.');
+    } catch (error) {
+      this.isRestarting = false;
+      this.$scope.$applyAsync();
+
+      const errorOptions = {
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        context: `${ManagementController.name}.restartManager`,
+        error: {
+          error: error,
+          message: error?.message || '',
+          title: 'Error restarting manager',
+        },
+      };
+
+      getErrorOrchestrator().handleError(errorOptions);
+    }
+  }
+
+  async restartCluster() {
+    try {
+      if (this.isRestarting) return;
+      this.isRestarting = true;
+      await this.configHandler.restartCluster();
+      this.isRestarting = false;
+      this.$scope.$applyAsync();
+      ErrorHandler.info('Restarting cluster, it will take up to 30 seconds.');
+    } catch (error) {
+      this.isRestarting = false;
+      this.$scope.$applyAsync();
+      const errorOptions = {
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        context: `${ManagementController.name}.restartCluster`,
+        error: {
+          error: error,
+          message: error?.message || '',
+          title: 'Error restarting cluster',
+        },
+      };
+
+      getErrorOrchestrator().handleError(errorOptions);
+    }
   }
 
   setConfigTab(tab, nav = false) {
