@@ -9,3 +9,5 @@
   Scenario:Taking screenshoot for compare
     When The user is in the overview page
     Then The user can see default module list
+    When The user navigates to About settings
+    Then The user can see the wazuh information
