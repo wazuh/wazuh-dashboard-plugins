@@ -11,7 +11,6 @@ export class RestartHandler {
   static MAX_RESTART_POLLING_ATTEMPTS = 30;
   static MAX_SYNC_POLLING_ATTEMPTS = 10;
   static POLLING_DELAY = 2000; // milliseconds
-  static SYNC_DELAY = 20000; // milliseconds
   static HEALTHCHECK_DELAY = 10000; // milliseconds
   static INFO_RESTART_SUCCESS_DELAY = 500; // seconds
   static RESTART_STATES = {
@@ -72,7 +71,6 @@ export class RestartHandler {
         updateRedux.updateRestartAttempt(0);
         return isValid;
       } else {
-        updateRedux.updateRestartAttempt(0);
         console.warn('Wazuh not ready yet');
         return false;
       }
@@ -89,7 +87,7 @@ export class RestartHandler {
    */
   static async checkSync(updateRedux, attempt) {
     try {
-      const { updateSyncCheckAttempt, updateUnsynchronizedNodes } = updateRedux;
+      const { updateSyncCheckAttempt, updateUnsynchronizedNodes, updateSyncNodesInfo } = updateRedux;
       updateSyncCheckAttempt(attempt);
       const response = await WzRequest.apiReq('GET', '/cluster/ruleset/synchronization', {});
       
@@ -98,6 +96,8 @@ export class RestartHandler {
       }
 
       const nodes = response.data.data.affected_items;
+
+      updateSyncNodesInfo(nodes);
 
       const isSynced = nodes.every((node) => node.synced);
       
@@ -122,7 +122,7 @@ export class RestartHandler {
    * @param {boolean} isCluster
    * @return {Promise}
    */
-  static async makePingSync(updateRedux, breakCondition, isCluster = true) {
+  static async makePing(updateRedux, breakCondition, isCluster = true) {
     try {
       let isValid = false;
 
@@ -180,13 +180,9 @@ export class RestartHandler {
         throw new Error(str);
       }
 
-      await WzRequest.apiReq('PUT', `/${clusterOrManager}/restart`, {});
+      const nodesRestarted = await WzRequest.apiReq('PUT', `/${clusterOrManager}/restart`, {});
 
-      return {
-        data: {
-          data: `Restarting ${clusterOrManager}`,
-        },
-      };
+      return nodesRestarted.data.data
     } catch (error) {
       throw error;
     }
@@ -232,7 +228,7 @@ export class RestartHandler {
       const isCluster = clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
       isCluster ? await this.restartNode(selectedNode) : await this.restart(isCluster);
 
-      const isRestarted = await this.makePingSync(updateRedux, this.checkDaemons, isCluster);
+      const isRestarted = await this.makePing(updateRedux, this.checkDaemons, isCluster);
       if (!isRestarted) {
         updateRedux.updateRestartStatus(this.RESTART_STATES.RESTART_ERROR);
         this.restartValues(updateRedux);
@@ -256,7 +252,7 @@ export class RestartHandler {
       if (useDelay) {
         updateRedux.updateRestartStatus(this.RESTART_STATES.SYNCING);
 
-        const isSync = await this.makePingSync(updateRedux, this.checkSync);
+        const isSync = await this.makePing(updateRedux, this.checkSync);
         if (!isSync) {
           updateRedux.updateRestartStatus(this.RESTART_STATES.SYNC_ERROR);
           this.restartValues(updateRedux);
@@ -269,8 +265,9 @@ export class RestartHandler {
       const clusterStatus = (((await this.clusterReq()) || {}).data || {}).data || {};
       const isCluster = clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
       // Dispatch a Redux action
-      await this.restart(isCluster);
-      const isRestarted = await this.makePingSync(updateRedux, this.checkDaemons, isCluster);
+      const nodesRestarted = await this.restart(isCluster);
+      console.log(nodesRestarted)
+      const isRestarted = await this.makePing(updateRedux, this.checkDaemons, isCluster);
 
       if (!isRestarted) {
         updateRedux.updateRestartStatus(this.RESTART_STATES.RESTART_ERROR);
@@ -283,7 +280,7 @@ export class RestartHandler {
 
       return { restarted: isCluster ? 'Cluster' : 'Manager' };
     } catch (error) {
-      const errorType = error === 'Not synced' ? this.RESTART_STATES.SYNC_ERROR : this.RESTART_STATES.RESTART_ERROR;
+      const errorType = error.message === 'Not synced' ? this.RESTART_STATES.SYNC_ERROR : this.RESTART_STATES.RESTART_ERROR;
       RestartHandler.clearState(updateRedux, errorType);
       throw error;
     }

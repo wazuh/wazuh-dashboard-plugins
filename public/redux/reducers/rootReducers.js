@@ -23,6 +23,7 @@ import globalBreadcrumbReducers from './globalBreadcrumbReducers';
 import securityReducers from './securityReducers';
 import toolsReducers from './toolsReducers';
 import appConfig from './appConfigReducers';
+import restartWazuhReducers from './restartReducers'
 
 export default combineReducers({
   rulesetReducers,
@@ -36,5 +37,6 @@ export default combineReducers({
   globalBreadcrumbReducers,
   securityReducers,
   toolsReducers,
-  appConfig
+  appConfig,
+  restartWazuhReducers
 });
