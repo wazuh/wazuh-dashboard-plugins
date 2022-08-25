@@ -25,7 +25,7 @@ import {
 } from '@elastic/eui';
 
 import { getToasts } from '../../kibana-services';
-import { updateRestartAttempt, updateSyncCheckAttempt, updateUnsynchronizedNodes, updateRestartStatus } from '../../redux/actions/appStateActions';
+import { updateRestartAttempt, updateSyncCheckAttempt, updateUnsynchronizedNodes, updateRestartStatus, updateSyncNodesInfo } from '../../redux/actions/restartActions';
 import { RestartHandler } from '../../react-services/wz-restart';
 import { connect } from 'react-redux';
 import { RestartModal } from './restart-modal/restart-modal';
@@ -35,6 +35,7 @@ interface IWzRestartCalloutProps {
   updateSyncCheckAttempt: (syncCheckAttempt) => void;
   updateUnsynchronizedNodes: (unsynchronizedNodes) => void;
   updateRestartStatus: (restartStatus) => void;
+  updateSyncNodesInfo: (syncNodesInfo) => void;
   onRestarted: () => void;
   onRestartedError: () => void;
   restartStatus: string;
@@ -86,6 +87,7 @@ class WzRestartCallout extends Component<IWzRestartCalloutProps, IWzRestartCallo
         updateSyncCheckAttempt: this.props.updateSyncCheckAttempt,
         updateUnsynchronizedNodes: this.props.updateUnsynchronizedNodes,
         updateRestartStatus: this.props.updateRestartStatus,
+        updateSyncNodesInfo: this.props.updateSyncNodesInfo,
       };
       await RestartHandler.restartWazuh(updateRedux, this.state.isCluster);
       this.setState({ isRestarting: false });
@@ -164,7 +166,7 @@ class WzRestartCallout extends Component<IWzRestartCalloutProps, IWzRestartCallo
 }
 
 const mapStateToProps = state => ({
-  restartStatus: state.appStateReducers.restartStatus,
+  restartStatus: state.restartWazuhReducers.restartStatus,
 });
 
 const mapDispatchToProps = (dispatch) => {
@@ -177,6 +179,8 @@ const mapDispatchToProps = (dispatch) => {
       dispatch(updateUnsynchronizedNodes(unsynchronizedNodes)),
     updateRestartStatus: (restartStatus) =>
       dispatch(updateRestartStatus(restartStatus)),
+    updateSyncNodesInfo: (syncNodesInfo) =>
+        dispatch(updateSyncNodesInfo(syncNodesInfo)),
   };
 };
 

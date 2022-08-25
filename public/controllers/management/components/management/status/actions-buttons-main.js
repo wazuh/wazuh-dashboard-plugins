@@ -37,7 +37,7 @@ import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchest
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 import { RestartHandler } from '../../../../../react-services/wz-restart';
-import { updateRestartAttempt, updateRestartStatus } from '../../../../../redux/actions/appStateActions';
+import { updateRestartAttempt, updateRestartStatus } from '../../../../../redux/actions/restartActions';
 import { RestartModal } from '../../../../../components/common/restart-modal/restart-modal'
 
 class WzStatusActionButtons extends Component {
