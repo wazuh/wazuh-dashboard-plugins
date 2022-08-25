@@ -1,3 +1,15 @@
+/*
+ * Wazuh app - React component for restart Wazuh.
+ * Copyright (C) 2015-2022 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
+
 import React, { useEffect, useState } from 'react';
 import {
   EuiButton,
@@ -8,6 +20,8 @@ import {
   EuiFlexItem,
   EuiOverlayMask,
   EuiProgress,
+  EuiDescriptionList,
+  EuiLoadingSpinner,
 } from '@elastic/eui';
 import { getHttp } from '../../../kibana-services';
 import { WazuhConfig } from '../../../react-services/wazuh-config';
@@ -19,37 +33,51 @@ import {
   updateRestartAttempt,
   updateSyncCheckAttempt,
   updateUnsynchronizedNodes,
-} from '../../../redux/actions/appStateActions';
+  updateSyncNodesInfo,
+} from '../../../redux/actions/restartActions';
+import StatusHandler from '../../../controllers/management/components/management/status/utils/status-handler';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
+import { RenderStatus } from './render-status';
 
 /**
  * The restart modal to show feedback to the user.
  * @param props component's props
  * @returns components's body
  */
-export const RestartModal = (props: { useDelay?: boolean, showWarningRestart? }) => {
+export const RestartModal = (props: { useDelay?: boolean; showWarningRestart? }) => {
   // Component props
   const { useDelay = false } = props;
+  // TODO review if importing these functions in wz-restart work.
+  const dispatch = useDispatch();
+  const updateRedux = {
+    updateRestartAttempt: (restartAttempt) => dispatch(updateRestartAttempt(restartAttempt)),
+    updateSyncCheckAttempt: (syncCheckAttempt) =>
+      dispatch(updateSyncCheckAttempt(syncCheckAttempt)),
+    updateUnsynchronizedNodes: (unsynchronizedNodes) =>
+      dispatch(updateUnsynchronizedNodes(unsynchronizedNodes)),
+    updateRestartStatus: (restartStatus) => dispatch(updateRestartStatus(restartStatus)),
+    updateSyncNodesInfo: (syncNodesInfo) => dispatch(updateSyncNodesInfo(syncNodesInfo)),
+  };
 
   // Use default HEALTHCHECK_DELAY
   const [timeToHC, setTimeToHC] = useState(RestartHandler.HEALTHCHECK_DELAY / 1000);
 
-  // Use default SYNC_DELAY
-  const [syncDelay, setSyncDelay] = useState(RestartHandler.SYNC_DELAY / 1000);
-
   // Restart polling counter
-  const restartAttempt = useSelector((state) => state.appStateReducers.restartAttempt);
+  const restartAttempt = useSelector((state) => state.restartWazuhReducers.restartAttempt);
 
   // Cluster nodes that did not synced
-  const unsyncedNodes = useSelector((state) => state.appStateReducers.unsynchronizedNodes);
+  const unsyncedNodes = useSelector((state) => state.restartWazuhReducers.unsynchronizedNodes);
 
   // Sync polling counter
-  const syncPollingAttempt = useSelector((state) => state.appStateReducers.syncCheckAttempt);
+  const syncPollingAttempt = useSelector((state) => state.restartWazuhReducers.syncCheckAttempt);
 
   // Current status of the restarting process
-  const restartStatus = useSelector((state) => state.appStateReducers.restartStatus);
+  const restartStatus = useSelector((state) => state.restartWazuhReducers.restartStatus);
+
+  // Current status of the sync process
+  const syncNodesInfo = useSelector((state) => state.restartWazuhReducers.syncNodesInfo);
 
   // Max attempts = MAX_SYNC_POLLING_ATTEMPTS + MAX_RESTART_POLLING_ATTEMPTS
   const maxAttempts = useDelay
@@ -67,20 +95,27 @@ export const RestartModal = (props: { useDelay?: boolean, showWarningRestart? })
       : getThemeAssetURL('icon.svg')
   );
 
-  // Apply SYNC_DELAY if useDelay prop is enabled.
+  // Get all nodes
   useEffect(() => {
     if (useDelay) {
-      countdown(syncDelay, setSyncDelay);
+      getNodes();
     }
   }, []);
+
+  const getNodes = async () => {
+    const nodes = await StatusHandler.clusterNodes();
+    const listNodes = nodes.data.data.affected_items.map((node) => {
+      return { name: node.name, synced: false };
+    });
+    updateRedux.updateSyncNodesInfo(listNodes);
+  };
 
   // Apply HEALTHCHECK_DELAY when the restart has failed
   useEffect(() => {
     restartStatus === RestartHandler.RESTART_STATES.RESTART_ERROR &&
       countdown(timeToHC, setTimeToHC);
 
-    restartStatus === RestartHandler.RESTART_STATES.RESTARTED_INFO &&
-      restartedTimeout();
+    restartStatus === RestartHandler.RESTART_STATES.RESTARTED_INFO && restartedTimeout();
   }, [restartStatus]);
 
   // TODO
@@ -102,28 +137,17 @@ export const RestartModal = (props: { useDelay?: boolean, showWarningRestart? })
 
   const restartedTimeout = () => {
     setTimeout(() => {
-        dispatch(updateRestartStatus(RestartHandler.RESTART_STATES.RESTARTED));
-        if(props.showWarningRestart){
-          props.showWarningRestart()
-        }
-      }, RestartHandler.INFO_RESTART_SUCCESS_DELAY);
-  }
-  
-  // TODO review if importing these functions in wz-restart work.
-  const dispatch = useDispatch();
-  const updateRedux = {
-    updateRestartAttempt: (restartAttempt) => dispatch(updateRestartAttempt(restartAttempt)),
-    updateSyncCheckAttempt: (syncCheckAttempt) =>
-      dispatch(updateSyncCheckAttempt(syncCheckAttempt)),
-    updateUnsynchronizedNodes: (unsynchronizedNodes) =>
-      dispatch(updateUnsynchronizedNodes(unsynchronizedNodes)),
-    updateRestartStatus: (restartStatus) => dispatch(updateRestartStatus(restartStatus)),
+      dispatch(updateRestartStatus(RestartHandler.RESTART_STATES.RESTARTED));
+      if (props.showWarningRestart) {
+        props.showWarningRestart();
+      }
+    }, RestartHandler.INFO_RESTART_SUCCESS_DELAY);
   };
 
   const forceRestart = async () => {
-    try{
+    try {
       await RestartHandler.restartWazuh(updateRedux);
-    }catch(error){
+    } catch (error) {
       const options = {
         context: `${RestartModal.name}.forceRestart`,
         level: UI_LOGGER_LEVELS.ERROR,
@@ -138,13 +162,12 @@ export const RestartModal = (props: { useDelay?: boolean, showWarningRestart? })
     }
   };
 
-
   const abort = () => {
     dispatch(updateRestartStatus(RestartHandler.RESTART_STATES.RESTARTED));
     dispatch(updateUnsynchronizedNodes([]));
     dispatch(updateRestartAttempt(0));
     dispatch(updateSyncCheckAttempt(0));
-  }
+  };
 
   // Build the modal depending on the restart state.
   let emptyPromptProps: Partial<EuiEmptyPromptProps>;
@@ -202,19 +225,32 @@ export const RestartModal = (props: { useDelay?: boolean, showWarningRestart? })
         iconColor: 'danger',
         title: <h2 className="wz-modal-restart-title">Synchronization failed</h2>,
         body: (
-          <p>
-            The nodes {unsyncedNodes.join(', ')} did not synchronize. Restarting Wazuh might set the
-            cluster into an inconsistent state. Close and try again later.
-          </p>
+          <>
+            {syncNodesInfo.length > 0 && (
+              <EuiDescriptionList textStyle="reverse" align="center" type="column">
+                {syncNodesInfo.map((node, index) => (
+                  <RenderStatus
+                    node={node}
+                    key={index}
+                    statusRestart={RestartHandler.RESTART_STATES.SYNC_ERROR}
+                  />
+                ))}
+              </EuiDescriptionList>
+            )}
+            <p>
+              The nodes {unsyncedNodes.join(', ')} did not synchronize. Restarting Wazuh might set
+              the cluster into an inconsistent state. Close and try again later.
+            </p>
+          </>
         ),
         actions: (
           <EuiFlexGroup justifyContent="flexEnd">
             <EuiFlexItem grow={false}>
-              <EuiButtonEmpty color='danger' flush="both" onClick={forceRestart}>
+              <EuiButtonEmpty color="danger" flush="both" onClick={forceRestart}>
                 Force restart
               </EuiButtonEmpty>
             </EuiFlexItem>
-            <EuiFlexItem grow={false}> 
+            <EuiFlexItem grow={false}>
               <EuiButton color="primary" fill onClick={abort}>
                 Close
               </EuiButton>
@@ -234,7 +270,17 @@ export const RestartModal = (props: { useDelay?: boolean, showWarningRestart? })
         ),
         body: (
           <>
-            <EuiProgress value={attempts} max={maxAttempts} size="s" />
+            {syncNodesInfo.length > 0 && (
+              <EuiDescriptionList textStyle="reverse" align="center" type="column">
+                {syncNodesInfo.map((node, index) => (
+                  <RenderStatus
+                    node={node}
+                    key={index}
+                    statusRestart={RestartHandler.RESTART_STATES.SYNCING}
+                  />
+                ))}
+              </EuiDescriptionList>
+            )}
           </>
         ),
       };
