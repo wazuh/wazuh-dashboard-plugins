@@ -59,6 +59,10 @@ select{
   line-height: 40px !important;
 }
 
+.wz-text-justify {
+  text-align: justify;
+}
+
 .wz-text-center {
   text-align: center;
 }
@@ -179,6 +183,10 @@ select{
 
 .wz-text-red {
   color: rgb(255, 100, 92);
+}
+
+.wz-text-black {
+  color: black
 }
 
 b {

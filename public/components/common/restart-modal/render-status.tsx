@@ -27,7 +27,7 @@ export const RenderStatus = (props) => {
       return (
         <>
           <EuiDescriptionListTitle>{node.name}</EuiDescriptionListTitle>
-          <EuiDescriptionListDescription>
+          <EuiDescriptionListDescription className="wz-text-left">
             {node.synced ? (
               <EuiIconTip aria-label="Success" size="m" type="check" color="success" />
             ) : (
@@ -40,7 +40,7 @@ export const RenderStatus = (props) => {
       return (
         <>
           <EuiDescriptionListTitle>{node.name}</EuiDescriptionListTitle>
-          <EuiDescriptionListDescription>
+          <EuiDescriptionListDescription className="wz-text-left">
             {node.synced ? (
               <EuiIconTip aria-label="Synchronized" size="m" type="check" color="success" />
             ) : (
