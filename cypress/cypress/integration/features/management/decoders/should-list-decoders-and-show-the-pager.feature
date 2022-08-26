@@ -22,5 +22,5 @@ Feature: Should List Decoders And Show The Pager
     Given The wazuh admin user is logged
     When The user navigates to decoders
     When The user clicks the custom decoders button
-    When The user presses the edit decoders button and edits it
+    When The user presses the edit decoder button and edits it
     Then The user should see the message
