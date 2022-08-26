@@ -220,9 +220,11 @@ export const RestartModal = (props: { isSyncCanceled?: {}; cancelSync? }) => {
     case RestartHandler.RESTART_STATES.SYNCING:
       emptyPromptProps = {
         title: (
+          // <div className='wz-modal-restart-title-box'>
           <>
             <h2 className="wz-modal-restart-title">Ensuring {section} deployment</h2>
           </>
+          // </div>
         ),
         body: (
           <>
