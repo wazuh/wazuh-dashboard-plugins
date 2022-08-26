@@ -14,6 +14,7 @@ export const DECODERS_PAGE = {
   codeEditorSelector: '[data-test-subj="codeEditorContainer"]',
   backButtonSelector: '.euiFlexGroup .euiFlexItem .euiToolTipAnchor .euiButtonIcon',
   confirmModalSelector: '[data-test-subj="confirmModalTitleText"]',
+  createNewDecoderSelector:'.euiFlexGroup .euiFlexItem .euiButtonEmpty .euiButtonContent .euiButtonEmpty__text:contains("Add new decoders file")',
   decoderTitleSelector: '.euiFlexItem .euiFlexGroup .euiFormControlLayout input.euiFieldText',
   saveDecoderMessage: '.euiText span:contains("Changes will not take effect until a restart is performed.")'
 };

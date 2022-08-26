@@ -14,6 +14,8 @@ export const DECODERS_PAGE = {
   codeEditorSelector: '[data-test-subj="codeEditorContainer"]',
   backButtonSelector: '.euiFlexGroup .euiFlexItem .euiToolTipAnchor .euiButtonIcon',
   confirmModalSelector: '[data-test-subj="confirmModalTitleText"]',
+  createNewDecoderSelector:'.euiFlexGroup .euiFlexItem .euiButtonEmpty .euiButtonContent .euiButtonEmpty__text:contains("Add new decoders file")',
+    // cy.contains('react-component[name="WzManagement"] button','Add new decoders file').should('exist').should('be.visible').click();
   decoderTitleSelector: '.euiFlexItem .euiFlexGroup .euiFormControlLayout input.euiFieldText',
   saveDecoderMessage: '.euiText span:contains("Changes will not take effect until a restart is performed.")'
 };
