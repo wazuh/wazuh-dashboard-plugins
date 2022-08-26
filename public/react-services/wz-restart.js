@@ -71,7 +71,6 @@ export class RestartHandler {
         updateRedux.updateRestartAttempt(0);
         return isValid;
       } else {
-        console.warn('Wazuh not ready yet');
         return false;
       }
     } catch (error) {
@@ -87,12 +86,16 @@ export class RestartHandler {
    */
   static async checkSync(updateRedux, attempt) {
     try {
-      const { updateSyncCheckAttempt, updateUnsynchronizedNodes, updateSyncNodesInfo } = updateRedux;
+      const {
+        updateSyncCheckAttempt,
+        updateUnsynchronizedNodes,
+        updateSyncNodesInfo,
+      } = updateRedux;
       updateSyncCheckAttempt(attempt);
       const response = await WzRequest.apiReq('GET', '/cluster/ruleset/synchronization', {});
-      
-      if (response.data.error != 0){
-        throw response.data.message
+
+      if (response.data.error != 0) {
+        throw response.data.message;
       }
 
       const nodes = response.data.data.affected_items;
@@ -100,11 +103,10 @@ export class RestartHandler {
       updateSyncNodesInfo(nodes);
 
       const isSynced = nodes.every((node) => node.synced);
-      
+
       if (!isSynced) {
         const unsyncedNodes = nodes.flatMap((node) => (node.synced ? [] : node.name));
         updateUnsynchronizedNodes(unsyncedNodes);
-        throw new Error(`Nodes ${unsyncedNodes.join(', ')} are not synced`);
       }
 
       updateSyncCheckAttempt(RestartHandler.MAX_SYNC_POLLING_ATTEMPTS);
@@ -131,10 +133,14 @@ export class RestartHandler {
           ? this.MAX_RESTART_POLLING_ATTEMPTS
           : this.MAX_SYNC_POLLING_ATTEMPTS;
 
-      for (let attempt = 1; attempt <= maxAttempts && !isValid; attempt++) {
-        await delayAsPromise(this.POLLING_DELAY);
+      for (
+        let attempt = 1;
+        attempt <= maxAttempts && !isValid && !this.cancel?.isSyncCanceled;
+        attempt++
+      ) {
         try {
           isValid = await breakCondition(updateRedux, attempt, isCluster);
+          !isValid && (await delayAsPromise(this.POLLING_DELAY));
         } catch (error) {
           // console.error(error);
           //The message in the console is disabled because the user will see the error message on the healthcheck page.
@@ -182,7 +188,7 @@ export class RestartHandler {
 
       const nodesRestarted = await WzRequest.apiReq('PUT', `/${clusterOrManager}/restart`, {});
 
-      return nodesRestarted.data.data
+      return nodesRestarted.data.data;
     } catch (error) {
       throw error;
     }
@@ -246,13 +252,22 @@ export class RestartHandler {
    * Restart cluster or Manager
    * @param updateRedux Redux update function
    * @param useDelay need to delay synchronization?
+   * @param isSyncCanceled cancellation of synchronization
    */
-  static async restartWazuh(updateRedux, useDelay = false) {
+  static async restartWazuh(
+    updateRedux,
+    useDelay = false,
+    isSyncCanceled = { isSyncCanceled: false }
+  ) {
     try {
+      this.cancel = isSyncCanceled;
       if (useDelay) {
         updateRedux.updateRestartStatus(this.RESTART_STATES.SYNCING);
 
         const isSync = await this.makePing(updateRedux, this.checkSync);
+        // this return is made if the synchronization is cancelled from the interface.
+        if (isSyncCanceled?.isSyncCanceled) return;
+        // if the synchronization was not completed within the polling time, it will show the sync error modal.
         if (!isSync) {
           updateRedux.updateRestartStatus(this.RESTART_STATES.SYNC_ERROR);
           this.restartValues(updateRedux);
@@ -265,8 +280,7 @@ export class RestartHandler {
       const clusterStatus = (((await this.clusterReq()) || {}).data || {}).data || {};
       const isCluster = clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
       // Dispatch a Redux action
-      const nodesRestarted = await this.restart(isCluster);
-      console.log(nodesRestarted)
+      await this.restart(isCluster);
       const isRestarted = await this.makePing(updateRedux, this.checkDaemons, isCluster);
 
       if (!isRestarted) {
@@ -280,7 +294,10 @@ export class RestartHandler {
 
       return { restarted: isCluster ? 'Cluster' : 'Manager' };
     } catch (error) {
-      const errorType = error.message === 'Not synced' ? this.RESTART_STATES.SYNC_ERROR : this.RESTART_STATES.RESTART_ERROR;
+      const errorType =
+        error.message === 'Not synced'
+          ? this.RESTART_STATES.SYNC_ERROR
+          : this.RESTART_STATES.RESTART_ERROR;
       RestartHandler.clearState(updateRedux, errorType);
       throw error;
     }

@@ -1169,13 +1169,27 @@ wz-xml-file-editor {
   min-width: 400px;
 }
 
+.wz-modal-restart-title-box {
+  display: flex;
+  justify-content: center;
+}
+
 .wz-modal-restart-title {
   margin-top: 20px;
-  margin-bottom: 15px;
+  margin-bottom: 8px;
+  margin-left: 5px;
   font-size: 1.6rem;
-  line-height: 2.2rem;
   font-weight: 700;
   color: #1a1c21;
+}
+
+.wz-info-nodes-restart {
+  @include euiScrollBar;
+  max-height: 20vh;
+  overflow-y: auto; 
+  overflow-block: auto;
+  margin: 0 auto;
+  text-align: center;
 }
 
 .wz-modal-restart-logo {

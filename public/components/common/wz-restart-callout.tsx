@@ -25,7 +25,13 @@ import {
 } from '@elastic/eui';
 
 import { getToasts } from '../../kibana-services';
-import { updateRestartAttempt, updateSyncCheckAttempt, updateUnsynchronizedNodes, updateRestartStatus, updateSyncNodesInfo } from '../../redux/actions/restartActions';
+import {
+  updateRestartAttempt,
+  updateSyncCheckAttempt,
+  updateUnsynchronizedNodes,
+  updateRestartStatus,
+  updateSyncNodesInfo,
+} from '../../redux/actions/restartActions';
 import { RestartHandler } from '../../react-services/wz-restart';
 import { connect } from 'react-redux';
 import { RestartModal } from './restart-modal/restart-modal';
@@ -50,6 +56,7 @@ interface IWzRestartCalloutState {
 }
 
 class WzRestartCallout extends Component<IWzRestartCalloutProps, IWzRestartCalloutState> {
+  isSyncCanceled: { isSyncCanceled: boolean };
   constructor(props) {
     super(props);
     this.state = {
@@ -59,6 +66,7 @@ class WzRestartCallout extends Component<IWzRestartCalloutProps, IWzRestartCallo
       isRestarting: false,
       timeoutRestarting: false,
     };
+    this.isSyncCanceled = { isSyncCanceled: false };
   }
   toggleWarningRestartModalVisible() {
     this.setState({
@@ -89,7 +97,7 @@ class WzRestartCallout extends Component<IWzRestartCalloutProps, IWzRestartCallo
         updateRestartStatus: this.props.updateRestartStatus,
         updateSyncNodesInfo: this.props.updateSyncNodesInfo,
       };
-      await RestartHandler.restartWazuh(updateRedux, this.state.isCluster);
+      await RestartHandler.restartWazuh(updateRedux, this.state.isCluster, this.isSyncCanceled);
       this.setState({ isRestarting: false });
     } catch (error) {
       this.setState({ warningRestarting: false, isRestarting: false });
@@ -158,29 +166,31 @@ class WzRestartCallout extends Component<IWzRestartCalloutProps, IWzRestartCallo
         )}
         {timeoutRestarting &&
           this.props.restartStatus !== RestartHandler.RESTART_STATES.RESTARTED && (
-            <RestartModal useDelay={isCluster} showWarningRestart={() => this.props.onRestarted()} />
+            <RestartModal
+              useDelay={isCluster}
+              showWarningRestart={() => this.props.onRestarted()}
+              isSyncCanceled={this.isSyncCanceled}
+              cancelSync={() => (this.isSyncCanceled.isSyncCanceled = true)}
+            />
           )}
       </Fragment>
     );
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   restartStatus: state.restartWazuhReducers.restartStatus,
 });
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    updateRestartAttempt: (restartAttempt) =>
-      dispatch(updateRestartAttempt(restartAttempt)),
+    updateRestartAttempt: (restartAttempt) => dispatch(updateRestartAttempt(restartAttempt)),
     updateSyncCheckAttempt: (syncCheckAttempt) =>
       dispatch(updateSyncCheckAttempt(syncCheckAttempt)),
     updateUnsynchronizedNodes: (unsynchronizedNodes) =>
       dispatch(updateUnsynchronizedNodes(unsynchronizedNodes)),
-    updateRestartStatus: (restartStatus) =>
-      dispatch(updateRestartStatus(restartStatus)),
-    updateSyncNodesInfo: (syncNodesInfo) =>
-        dispatch(updateSyncNodesInfo(syncNodesInfo)),
+    updateRestartStatus: (restartStatus) => dispatch(updateRestartStatus(restartStatus)),
+    updateSyncNodesInfo: (syncNodesInfo) => dispatch(updateSyncNodesInfo(syncNodesInfo)),
   };
 };
 
