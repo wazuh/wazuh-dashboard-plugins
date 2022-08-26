@@ -5,11 +5,12 @@ const editDecoderButtonSelector = getSelector('editDecoderButtonSelector', pageN
 const manageDecodersFilesButtonSelector = getSelector('manageDecodersFilesButtonSelector', pageName);
 const saveDecoderButtonSelector = getSelector('saveDecoderButtonSelector', pageName);
 
-When('The user presses the edit decoder button and edits it', () => {
+When('The user presses the edit decoders button and edits it', () => {
   elementIsVisible(manageDecodersFilesButtonSelector);
   clickElement(manageDecodersFilesButtonSelector);
   elementIsVisible(editDecoderButtonSelector);
   clickElement(editDecoderButtonSelector);
   elementIsVisible(saveDecoderButtonSelector);
   clickElement(saveDecoderButtonSelector);
+  //[data-test-subj="row-local_decoder_example"]
 });

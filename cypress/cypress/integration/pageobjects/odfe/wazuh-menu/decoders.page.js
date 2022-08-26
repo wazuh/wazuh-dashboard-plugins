@@ -5,7 +5,7 @@ export const DECODERS_PAGE = {
   listPages: 'nav[class="euiPagination"]',
   customDecodersButtonSelector: '[data-test-subj="Custom decoders"]',
   manageDecodersFilesButtonSelector: ':nth-child(3) > .euiButtonEmpty > .euiButtonContent',
-  editDecoderButtonSelector: '.euiTableCellContent > div > :nth-child(1) > .euiButtonIcon',
+  editDecoderButtonSelector: 'tr.euiTableRow:nth-child(1) .euiTableCellContent > div > :nth-child(1) > .euiButtonIcon:nth-child(1)',
   saveDecoderButtonSelector: '.euiFlexItem--flexGrowZero > .euiButton > .euiButtonContent',
   messageConfirmSaveSelector: '.euiText > span',
   buttonRestartSelector: '.euiCallOut.euiCallOut--primary .euiButton.euiButton--primary',
