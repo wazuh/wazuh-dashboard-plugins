@@ -1,5 +1,5 @@
 {
-  "baseUrl": "https://localhost:5601/",
+  "baseUrl": "http://localhost:5601/",
   "testFiles": ["**/*.{feature,features}"],
   "defaultCommandTimeout": 40000,
   "viewportWidth": 1400,

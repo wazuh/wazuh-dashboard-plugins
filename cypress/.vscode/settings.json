@@ -1,6 +1,0 @@
-{
-    "cucumberautocomplete.steps": [
-        "./cypress/integration/step-definitions/*/*.js"
-    ],
-    "cucumberautocomplete.strictGherkinCompletion": true
-}
