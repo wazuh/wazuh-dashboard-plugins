@@ -142,7 +142,7 @@ export class RestartHandler {
         breakCondition === this.checkDaemons
           ? this.MAX_RESTART_POLLING_ATTEMPTS
           : this.MAX_SYNC_POLLING_ATTEMPTS;
-
+          
       for (
         let attempt = 1;
         attempt <= maxAttempts && !isValid && !this.cancel?.isSyncCanceled;
