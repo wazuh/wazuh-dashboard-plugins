@@ -26,22 +26,20 @@ import {
 
 import { getToasts } from '../../kibana-services';
 import {
-  updateRestartAttempt,
-  updateSyncCheckAttempt,
   updateUnsynchronizedNodes,
   updateRestartStatus,
   updateSyncNodesInfo,
+  updateRestartNodesInfo
 } from '../../redux/actions/restartActions';
 import { RestartHandler } from '../../react-services/wz-restart';
 import { connect } from 'react-redux';
 import { RestartModal } from './restart-modal/restart-modal';
 
 interface IWzRestartCalloutProps {
-  updateRestartAttempt: (restartAttempt) => void;
-  updateSyncCheckAttempt: (syncCheckAttempt) => void;
   updateUnsynchronizedNodes: (unsynchronizedNodes) => void;
   updateRestartStatus: (restartStatus) => void;
   updateSyncNodesInfo: (syncNodesInfo) => void;
+  updateRestartNodesInfo: (restartNodesInfo) => void;
   onRestarted: () => void;
   onRestartedError: () => void;
   restartStatus: string;
@@ -91,11 +89,10 @@ class WzRestartCallout extends Component<IWzRestartCalloutProps, IWzRestartCallo
         timeoutRestarting: true,
       });
       const updateRedux = {
-        updateRestartAttempt: this.props.updateRestartAttempt,
-        updateSyncCheckAttempt: this.props.updateSyncCheckAttempt,
         updateUnsynchronizedNodes: this.props.updateUnsynchronizedNodes,
         updateRestartStatus: this.props.updateRestartStatus,
         updateSyncNodesInfo: this.props.updateSyncNodesInfo,
+        updateRestartNodesInfo: this.props.updateRestartNodesInfo,
       };
       await RestartHandler.restartWazuh(updateRedux, this.state.isCluster, this.isSyncCanceled);
       this.setState({ isRestarting: false });
@@ -184,13 +181,12 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    updateRestartAttempt: (restartAttempt) => dispatch(updateRestartAttempt(restartAttempt)),
-    updateSyncCheckAttempt: (syncCheckAttempt) =>
-      dispatch(updateSyncCheckAttempt(syncCheckAttempt)),
     updateUnsynchronizedNodes: (unsynchronizedNodes) =>
       dispatch(updateUnsynchronizedNodes(unsynchronizedNodes)),
     updateRestartStatus: (restartStatus) => dispatch(updateRestartStatus(restartStatus)),
     updateSyncNodesInfo: (syncNodesInfo) => dispatch(updateSyncNodesInfo(syncNodesInfo)),
+    updateRestartNodesInfo: (restartNodesInfo) =>
+      dispatch(updateRestartNodesInfo(restartNodesInfo)),
   };
 };
 

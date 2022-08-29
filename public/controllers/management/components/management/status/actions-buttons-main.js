@@ -11,12 +11,7 @@
  */
 import React, { Component, Fragment } from 'react';
 // Eui components
-import {
-  EuiFlexItem,
-  EuiSelect,
-  EuiOverlayMask,
-  EuiConfirmModal
-} from '@elastic/eui';
+import { EuiFlexItem, EuiSelect, EuiOverlayMask, EuiConfirmModal } from '@elastic/eui';
 
 import { connect } from 'react-redux';
 
@@ -30,15 +25,18 @@ import {
 } from '../../../../../redux/actions/statusActions';
 
 import StatusHandler from './utils/status-handler';
-import { getToasts }  from '../../../../../kibana-services';
+import { getToasts } from '../../../../../kibana-services';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 import { RestartHandler } from '../../../../../react-services/wz-restart';
-import { updateRestartAttempt, updateRestartStatus } from '../../../../../redux/actions/restartActions';
-import { RestartModal } from '../../../../../components/common/restart-modal/restart-modal'
+import {
+  updateRestartStatus,
+  updateRestartNodesInfo,
+} from '../../../../../redux/actions/restartActions';
+import { RestartModal } from '../../../../../components/common/restart-modal/restart-modal';
 
 class WzStatusActionButtons extends Component {
   _isMounted = false;
@@ -69,7 +67,10 @@ class WzStatusActionButtons extends Component {
   async restartWazuh() {
     this.setState({ isRestarting: true, timeoutRestarting: true });
     try {
-      const updateRedux = {updateRestartAttempt: this.props.updateRestartAttempt , updateRestartStatus: this.props.updateRestartStatus};
+      const updateRedux = {
+        updateRestartStatus: this.props.updateRestartStatus,
+        updateRestartNodesInfo: this.props.updateRestartNodesInfo
+      };
       await RestartHandler.restartWazuh(updateRedux);
       this.setState({ isRestarting: false });
     } catch (error) {
@@ -98,21 +99,25 @@ class WzStatusActionButtons extends Component {
    * This change to a selected node
    * @param {String} node
    */
-  changeNode = async e => {
+  changeNode = async (e) => {
     try {
       const node = e.target.value;
       this.props.updateLoadingStatus(true);
       this.props.updateSelectedNode(node);
 
-      const [agentsCount, agentsCountByManagerNodes] = (await Promise.all([
-        this.statusHandler.agentsSummary(),
-        this.statusHandler.clusterAgentsCount()
-      ])).map(response => response?.data?.data);
+      const [agentsCount, agentsCountByManagerNodes] = (
+        await Promise.all([
+          this.statusHandler.agentsSummary(),
+          this.statusHandler.clusterAgentsCount(),
+        ])
+      ).map((response) => response?.data?.data);
 
       this.props.updateStats({
         agentsCountByManagerNodes: agentsCountByManagerNodes.nodes,
         agentsCount,
-        agentsCoverage: agentsCount.total ? ((agentsCount.active / agentsCount.total) * 100).toFixed(2) : 0,
+        agentsCoverage: agentsCount.total
+          ? ((agentsCount.active / agentsCount.total) * 100).toFixed(2)
+          : 0,
       });
 
       const daemons = await this.statusHandler.clusterNodeStatus(node);
@@ -137,7 +142,7 @@ class WzStatusActionButtons extends Component {
         error: {
           error: error,
           message: error.message || error,
-          title: `${error.name}: Node ${node} is down`
+          title: `${error.name}: Node ${node} is down`,
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -161,16 +166,16 @@ class WzStatusActionButtons extends Component {
     getToasts().add({
       color: color,
       title: text,
-      toastLifeTimeMs: time
+      toastLifeTimeMs: time,
     });
   };
 
-  transforToOptions = listNodes => {
+  transforToOptions = (listNodes) => {
     let options = [];
     for (const node of listNodes) {
       options.push({
         value: node.name,
-        text: `${node.name} (${node.type})`
+        text: `${node.name} (${node.type})`,
       });
     }
     return options;
@@ -181,18 +186,9 @@ class WzStatusActionButtons extends Component {
   };
 
   render() {
-    const {
-      isLoading,
-      listNodes,
-      selectedNode,
-      clusterEnabled,
-    } = this.props.state;
+    const { isLoading, listNodes, selectedNode, clusterEnabled } = this.props.state;
 
-    const {
-      isRestarting,
-      isModalVisible,
-      timeoutRestarting,
-    } = this.state
+    const { isRestarting, isModalVisible, timeoutRestarting } = this.state;
 
     let options = this.transforToOptions(listNodes);
 
@@ -211,8 +207,12 @@ class WzStatusActionButtons extends Component {
     // Restart button
     const restartButton = (
       <WzButtonPermissions
-        buttonType='empty'
-        permissions={[clusterEnabled ? {action: 'cluster:restart', resource: 'node:id:*'} : {action: 'manager:restart', resource: '*:*:*'}]}
+        buttonType="empty"
+        permissions={[
+          clusterEnabled
+            ? { action: 'cluster:restart', resource: 'node:id:*' }
+            : { action: 'manager:restart', resource: '*:*:*' },
+        ]}
         iconType="refresh"
         onClick={async () => this.setState({ isModalVisible: true })}
         isDisabled={isLoading}
@@ -228,15 +228,11 @@ class WzStatusActionButtons extends Component {
       modal = (
         <EuiOverlayMask>
           <EuiConfirmModal
-            title={
-              clusterEnabled
-                ? 'Cluster will be restarted'
-                : 'Manager will be restarted'
-            }
+            title={clusterEnabled ? 'Cluster will be restarted' : 'Manager will be restarted'}
             onCancel={this.closeModal}
             onConfirm={() => {
-              this.props.updateRestartStatus(RestartHandler.RESTART_STATES.RESTARTING)
-              this.restartWazuh()
+              this.props.updateRestartStatus(RestartHandler.RESTART_STATES.RESTARTING);
+              this.restartWazuh();
               this.setState({ isModalVisible: false });
             }}
             cancelButtonText="Cancel"
@@ -247,7 +243,7 @@ class WzStatusActionButtons extends Component {
       );
     }
 
-    let restarting
+    let restarting;
 
     if (timeoutRestarting && this.props.restartStatus !== RestartHandler.RESTART_STATES.RESTARTED) {
       restarting = <RestartModal isRestarting={isRestarting} useDelay={false} />;
@@ -255,9 +251,7 @@ class WzStatusActionButtons extends Component {
 
     return (
       <Fragment>
-        {selectedNode !== null && (
-          <EuiFlexItem grow={isRestarting}>{restartButton}</EuiFlexItem>
-        )}
+        {selectedNode !== null && <EuiFlexItem grow={isRestarting}>{restartButton}</EuiFlexItem>}
         {selectedNode && <EuiFlexItem grow={false}>{selectNode}</EuiFlexItem>}
         {modal}
         {restarting}
@@ -266,27 +260,25 @@ class WzStatusActionButtons extends Component {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
     state: state.statusReducers,
-    restartStatus: state.appStateReducers.restartStatus,
+    restartStatus: state.restartWazuhReducers.restartStatus,
   };
 };
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch) => {
   return {
-    updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
-    updateListDaemons: listDaemons => dispatch(updateListDaemons(listDaemons)),
-    updateNodeInfo: nodeInfo => dispatch(updateNodeInfo(nodeInfo)),
-    updateSelectedNode: selectedNode => dispatch(updateSelectedNode(selectedNode)),
-    updateStats: stats => dispatch(updateStats(stats)),
-    updateAgentInfo: agentInfo => dispatch(updateAgentInfo(agentInfo)),
-    updateRestartAttempt: restartAttempt => dispatch(updateRestartAttempt(restartAttempt)),
-    updateRestartStatus: restartStatus => dispatch(updateRestartStatus(restartStatus)),
+    updateLoadingStatus: (status) => dispatch(updateLoadingStatus(status)),
+    updateListDaemons: (listDaemons) => dispatch(updateListDaemons(listDaemons)),
+    updateNodeInfo: (nodeInfo) => dispatch(updateNodeInfo(nodeInfo)),
+    updateSelectedNode: (selectedNode) => dispatch(updateSelectedNode(selectedNode)),
+    updateStats: (stats) => dispatch(updateStats(stats)),
+    updateAgentInfo: (agentInfo) => dispatch(updateAgentInfo(agentInfo)),
+    updateRestartStatus: (restartStatus) => dispatch(updateRestartStatus(restartStatus)),
+    updateRestartNodesInfo: (restartNodesInfo) =>
+      dispatch(updateRestartNodesInfo(restartNodesInfo)),
   };
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WzStatusActionButtons);
+export default connect(mapStateToProps, mapDispatchToProps)(WzStatusActionButtons);
