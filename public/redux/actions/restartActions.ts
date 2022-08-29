@@ -13,35 +13,11 @@
 import { ResolverAction } from '../types';
 
 /**
- * Update restart attempt
- * @param {Number} restartAttempt
- * @returns
- */
-export const updateRestartAttempt = (restartAttempt): ResolverAction => {
-  return {
-    type: 'UPDATE_RESTART_ATTEMPT',
-    payload: restartAttempt,
-  };
-};
-
-/**
- * Update sync check attempt
- * @param {Number} syncCheckAttempt
- * @returns
- */
-export const updateSyncCheckAttempt = (syncCheckAttempt) => {
-  return {
-    type: 'UPDATE_SYNC_CHECK_ATTEMPT',
-    payload: syncCheckAttempt,
-  };
-};
-
-/**
  * Update unsynchronized nodes
  * @param {Array} unsynchronizedNodes
  * @returns
  */
-export const updateUnsynchronizedNodes = (unsynchronizedNodes) => {
+export const updateUnsynchronizedNodes = (unsynchronizedNodes): ResolverAction => {
   return {
     type: 'UPDATE_UNSYNCHRONIZED_NODES',
     payload: unsynchronizedNodes,
@@ -53,10 +29,18 @@ export const updateUnsynchronizedNodes = (unsynchronizedNodes) => {
    * @returns
    */
 };
-export const updateSyncNodesInfo = (syncNodesInfo) => {
+
+export const updateSyncNodesInfo = (syncNodesInfo): ResolverAction => {
   return {
     type: 'UPDATE_SYNC_NODES_INFO',
     payload: syncNodesInfo,
+  };
+};
+
+export const updateRestartNodesInfo = (restartNodesInfo): ResolverAction => {
+  return {
+    type: 'UPDATE_RESTART_NODES_INFO',
+    payload: restartNodesInfo,
   };
 };
 
@@ -65,9 +49,10 @@ export const updateSyncNodesInfo = (syncNodesInfo) => {
  * @param {string} restartStatus
  * @returns
  */
-export const updateRestartStatus = (restartStatus) => {
+export const updateRestartStatus = (restartStatus): ResolverAction => {
   return {
     type: 'UPDATE_RESTART_STATUS',
     payload: restartStatus,
   };
 };
+

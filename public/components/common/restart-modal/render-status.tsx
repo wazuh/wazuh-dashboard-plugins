@@ -49,6 +49,41 @@ export const RenderStatus = (props) => {
           </EuiDescriptionListDescription>
         </>
       );
+    case RestartHandler.RESTART_STATES.RESTARTING:
+      return (
+        <>
+          <EuiDescriptionListTitle>{node.node}</EuiDescriptionListTitle>
+          <EuiDescriptionListDescription className="wz-text-left">
+            {node.isRestarted ? (
+              <EuiIconTip aria-label="Synchronized" size="m" type="check" color="success" />
+            ) : (
+              <EuiLoadingSpinner size="m" />
+            )}
+          </EuiDescriptionListDescription>
+        </>
+      );
+    case RestartHandler.RESTART_STATES.RESTART_ERROR:
+      return (
+        <>
+          <EuiDescriptionListTitle>{node.node}</EuiDescriptionListTitle>
+          <EuiDescriptionListDescription className="wz-text-left">
+            {node.isRestarted ? (
+              <EuiIconTip aria-label="Synchronized" size="m" type="check" color="success" />
+            ) : (
+              <EuiIconTip aria-label="Unsynchronized" size="m" type="alert" color="danger" />
+            )}
+          </EuiDescriptionListDescription>
+        </>
+      );
+      case RestartHandler.RESTART_STATES.RESTARTED_INFO:
+      return (
+        <>
+          <EuiDescriptionListTitle>{node.node}</EuiDescriptionListTitle>
+          <EuiDescriptionListDescription className="wz-text-left">
+            <EuiIconTip aria-label="Synchronized" size="m" type="check" color="success" />
+          </EuiDescriptionListDescription>
+        </>
+      );
     default:
       return (
         <>
