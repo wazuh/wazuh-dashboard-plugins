@@ -18,6 +18,7 @@ const initialState: RestartWazuhState = {
   syncCheckAttempt: 0,
   unsynchronizedNodes: [],
   syncNodesInfo: [{ name: '', synced: false }],
+  restartNodesInfo: [{node: '', isRestarted: false}],
   restartStatus: 'restarted',
 };
 
@@ -51,6 +52,13 @@ const restartWazuhReducer: Reducer<RestartWazuhState, ResolverAction> = (
       return {
         ...state,
         syncNodesInfo: action.payload,
+      };
+    } 
+    
+    case 'UPDATE_RESTART_NODES_INFO': {
+      return {
+        ...state,
+        restartNodesInfo: action.payload,
       };
     }
 

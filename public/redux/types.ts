@@ -21,5 +21,6 @@ export type RestartWazuhState = {
   syncCheckAttempt: number,
   unsynchronizedNodes: [],
   syncNodesInfo: [ {name: string, synced: boolean} ],
-  restartStatus: string
+  restartNodesInfo: [ {node: string, isRestarted: boolean} ]
+  restartStatus: string,
 }
