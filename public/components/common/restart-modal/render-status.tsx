@@ -11,22 +11,28 @@
  */
 
 import React from 'react';
-import { RestartHandler } from '../../../react-services/wz-restart';
 import {
   EuiDescriptionListTitle,
   EuiDescriptionListDescription,
   EuiIconTip,
   EuiLoadingSpinner,
 } from '@elastic/eui';
+import { RestartHandler } from '../../../react-services/wz-restart';
+import WzTextWithTooltipIfTruncated from '../wz-text-with-tooltip-if-truncated';
 
-export const RenderStatus = (props) => {
+interface IRenderStatus {
+  node: { name: string; synced: boolean; isRestarted: boolean };
+  statusRestart: string;
+}
+
+export const RenderStatus = (props: IRenderStatus) => {
   const { node, statusRestart } = props;
 
+  let iconStatus;
   switch (statusRestart) {
     case RestartHandler.RESTART_STATES.SYNCING:
-      return (
+      iconStatus = (
         <>
-          <EuiDescriptionListTitle>{node.name}</EuiDescriptionListTitle>
           <EuiDescriptionListDescription className="wz-text-left">
             {node.synced ? (
               <EuiIconTip aria-label="Success" size="m" type="check" color="success" />
@@ -36,10 +42,10 @@ export const RenderStatus = (props) => {
           </EuiDescriptionListDescription>
         </>
       );
+      break;
     case RestartHandler.RESTART_STATES.SYNC_ERROR:
-      return (
+      iconStatus = (
         <>
-          <EuiDescriptionListTitle>{node.name}</EuiDescriptionListTitle>
           <EuiDescriptionListDescription className="wz-text-left">
             {node.synced ? (
               <EuiIconTip aria-label="Synchronized" size="m" type="check" color="success" />
@@ -49,10 +55,10 @@ export const RenderStatus = (props) => {
           </EuiDescriptionListDescription>
         </>
       );
+      break;
     case RestartHandler.RESTART_STATES.RESTARTING:
-      return (
+      iconStatus = (
         <>
-          <EuiDescriptionListTitle>{node.node}</EuiDescriptionListTitle>
           <EuiDescriptionListDescription className="wz-text-left">
             {node.isRestarted ? (
               <EuiIconTip aria-label="Synchronized" size="m" type="check" color="success" />
@@ -62,10 +68,10 @@ export const RenderStatus = (props) => {
           </EuiDescriptionListDescription>
         </>
       );
+      break;
     case RestartHandler.RESTART_STATES.RESTART_ERROR:
-      return (
+      iconStatus = (
         <>
-          <EuiDescriptionListTitle>{node.node}</EuiDescriptionListTitle>
           <EuiDescriptionListDescription className="wz-text-left">
             {node.isRestarted ? (
               <EuiIconTip aria-label="Synchronized" size="m" type="check" color="success" />
@@ -75,27 +81,36 @@ export const RenderStatus = (props) => {
           </EuiDescriptionListDescription>
         </>
       );
-      case RestartHandler.RESTART_STATES.RESTARTED_INFO:
-      return (
+      break;
+    case RestartHandler.RESTART_STATES.RESTARTED_INFO:
+      iconStatus = (
         <>
-          <EuiDescriptionListTitle>{node.node}</EuiDescriptionListTitle>
           <EuiDescriptionListDescription className="wz-text-left">
             <EuiIconTip aria-label="Synchronized" size="m" type="check" color="success" />
           </EuiDescriptionListDescription>
         </>
       );
+      break;
     default:
-      return (
+      iconStatus = (
         <>
-          <EuiDescriptionListTitle>{node.name}</EuiDescriptionListTitle>
           <EuiDescriptionListDescription>
-            {node.synced ? (
-              <EuiIconTip aria-label="Success" size="m" type="check" color="success" />
-            ) : (
-              <EuiLoadingSpinner size="m" />
-            )}
+            <EuiIconTip aria-label="Success" size="m" type="check" color="success" />
           </EuiDescriptionListDescription>
         </>
       );
   }
+
+  return (
+    <>
+      <EuiDescriptionListTitle>
+        <span className="euiToolTipAnchor">
+          <WzTextWithTooltipIfTruncated elementStyle={{ maxWidth: '85px' }}>
+            {node.name}
+          </WzTextWithTooltipIfTruncated>
+        </span>
+      </EuiDescriptionListTitle>
+      {iconStatus}
+    </>
+  );
 };
