@@ -1155,7 +1155,7 @@ wz-xml-file-editor {
   border-bottom-color: #aaafba;
   background-color: #FFF;
   border-radius: 4px;
-  min-width: 500px;
+  width: 600px;
 }
 
 .wz-modal-restart-error {
@@ -1166,7 +1166,7 @@ wz-xml-file-editor {
   border-bottom-color: #aaafba;
   background-color: rgb(248, 233, 233);
   border-radius: 4px;
-  min-width: 400px;
+  width: 600px;
 }
 
 .wz-modal-restart-title-box {
@@ -1184,12 +1184,14 @@ wz-xml-file-editor {
 }
 
 .wz-info-nodes-restart {
-  @include euiScrollBar;
-  max-height: 20vh;
-  overflow-y: auto; 
-  overflow-block: auto;
-  margin: 0 auto;
+  margin-top: 30px;
   text-align: center;
+}
+
+.wz-check-restart-item {
+  min-width: 11em;
+  max-width: 11em;
+  margin: 0 !important;
 }
 
 .wz-modal-restart-logo {

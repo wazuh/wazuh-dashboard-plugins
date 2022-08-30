@@ -172,7 +172,7 @@ class WzEditConfiguration extends Component {
       const updateRedux = {
         updateRestartStatus: this.props.updateRestartStatus,
         updateUnsynchronizedNodes: this.props.updateUnsynchronizedNodes,
-        updateRestartNodesInfo: this.props.updateRestartNodesInfo
+        updateRestartNodesInfo: this.props.updateRestartNodesInfo,
       };
       await RestartHandler.restartSelectedNode(this.props.clusterNodeSelected, updateRedux);
       this.setState({ restart: false, saving: false, restarting: false });
@@ -313,9 +313,7 @@ class WzEditConfiguration extends Component {
           </EuiOverlayMask>
         )}
         {timeoutRestarting &&
-          this.props.restartStatus !== RestartHandler.RESTART_STATES.RESTARTED && (
-            <RestartModal isRestarting={restarting} useDelay={false} />
-          )}
+          this.props.restartStatus !== RestartHandler.RESTART_STATES.RESTARTED && <RestartModal />}
       </Fragment>
     );
   }
