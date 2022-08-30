@@ -10,7 +10,8 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   EuiButton,
   EuiButtonEmpty,
@@ -19,36 +20,34 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiOverlayMask,
-  EuiDescriptionList,
 } from '@elastic/eui';
 import { RestartHandler } from '../../../react-services/wz-restart';
-import { useDispatch, useSelector } from 'react-redux';
 import {
   updateRestartStatus,
   updateUnsynchronizedNodes,
   updateSyncNodesInfo,
+  updateRestartNodesInfo,
 } from '../../../redux/actions/restartActions';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
-import { RenderStatus } from './render-status';
+import { RenderBodyModal } from './render-body-modal';
 
 /**
  * The restart modal to show feedback to the user.
  * @param props component's props
  * @returns components's body
  */
-export const RestartModal = (props: {
-  isSyncCanceled?: {};
-  cancelSync?;
-}) => {
+export const RestartModal = (props: { isSyncCanceled?: {}; cancelSync? }) => {
   // TODO review if importing these functions in wz-restart work.
   const dispatch = useDispatch();
   const updateRedux = {
-    updateUnsynchronizedNodes: (unsynchronizedNodes) =>
-      dispatch(updateUnsynchronizedNodes(unsynchronizedNodes)),
     updateRestartStatus: (restartStatus) => dispatch(updateRestartStatus(restartStatus)),
     updateSyncNodesInfo: (syncNodesInfo) => dispatch(updateSyncNodesInfo(syncNodesInfo)),
+    updateUnsynchronizedNodes: (unsynchronizedNodes) =>
+      dispatch(updateUnsynchronizedNodes(unsynchronizedNodes)),
+    updateRestartNodesInfo: (restartNodesInfo) =>
+      dispatch(updateRestartNodesInfo(restartNodesInfo)),
   };
 
   // Cluster nodes that did not synced
@@ -66,16 +65,25 @@ export const RestartModal = (props: {
   // Current section
   const section = useSelector((state) => state.rulesetReducers.section);
 
+  const [nodesNotRestartedState, setNodesNotRestartedState] = useState([]);
+  
+  useEffect(() => {
+    const nodesNotRestarted = restartNodesInfo.flatMap((node) =>
+      node.isRestarted ? [] : node.name
+    );
+    setNodesNotRestartedState(nodesNotRestarted);
+  }, [restartNodesInfo]);
+
   const forceRestart = async () => {
     try {
       await RestartHandler.restartWazuh(updateRedux);
-    } catch (error) {
+    } catch (error: any) {
       const options = {
         context: `${RestartModal.name}.forceRestart`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         error: {
-          error: error,
+          error: error || '',
           message: error.message || error,
           title: error.name || error,
         },
@@ -87,7 +95,9 @@ export const RestartModal = (props: {
   const abort = () => {
     dispatch(updateRestartStatus(RestartHandler.RESTART_STATES.RESTARTED));
     dispatch(updateUnsynchronizedNodes([]));
-    props.cancelSync && props.cancelSync();
+    if (props.cancelSync) {
+      props.cancelSync();
+    }
   };
 
   // Build the modal depending on the restart state.
@@ -103,23 +113,11 @@ export const RestartModal = (props: {
         ),
         body: (
           <>
-            <h4 className="wz-padding-left-16 wz">Restart completed:</h4>
-            <div className="wz-info-nodes-restart">
-              <EuiDescriptionList
-                textStyle="reverse"
-                align="center"
-                type="column"
-                style={{ maxWidth: '20000px' }}
-              >
-                {restartNodesInfo.map((node, index) => (
-                  <RenderStatus
-                    node={node}
-                    key={index}
-                    statusRestart={RestartHandler.RESTART_STATES.RESTARTED_INFO}
-                  />
-                ))}
-              </EuiDescriptionList>
-            </div>
+            <h4 className="wz-padding-left-16">Restart completed:</h4>
+            <RenderBodyModal
+              nodos={restartNodesInfo}
+              statusRestart={RestartHandler.RESTART_STATES.RESTARTED_INFO}
+            />
           </>
         ),
         actions: (
@@ -130,7 +128,7 @@ export const RestartModal = (props: {
               </EuiButton>
             </EuiFlexItem>
           </EuiFlexGroup>
-        )
+        ),
       };
       break;
 
@@ -144,22 +142,10 @@ export const RestartModal = (props: {
         body: (
           <>
             <h4 className="wz-padding-left-16">Checking restart:</h4>
-            <div className="wz-info-nodes-restart">
-              <EuiDescriptionList
-                textStyle="reverse"
-                align="center"
-                type="column"
-                style={{ maxWidth: '20000px' }}
-              >
-                {restartNodesInfo.map((node, index) => (
-                  <RenderStatus
-                    node={node}
-                    key={index}
-                    statusRestart={RestartHandler.RESTART_STATES.RESTARTING}
-                  />
-                ))}
-              </EuiDescriptionList>
-            </div>
+            <RenderBodyModal
+              nodos={restartNodesInfo}
+              statusRestart={RestartHandler.RESTART_STATES.RESTARTING}
+            />
           </>
         ),
         actions: (
@@ -170,7 +156,7 @@ export const RestartModal = (props: {
               </EuiButton>
             </EuiFlexItem>
           </EuiFlexGroup>
-        )
+        ),
       };
       break;
 
@@ -180,23 +166,14 @@ export const RestartModal = (props: {
         body: (
           <>
             <h4 className="wz-padding-left-16 wz">Restart error:</h4>
-            <div className="wz-info-nodes-restart">
-              <EuiDescriptionList
-                textStyle="reverse"
-                align="center"
-                type="column"
-                style={{ maxWidth: '20000px' }}
-              >
-                {restartNodesInfo.map((node, index) => (
-                  <RenderStatus
-                    node={node}
-                    key={index}
-                    statusRestart={RestartHandler.RESTART_STATES.RESTART_ERROR}
-                  />
-                ))}
-              </EuiDescriptionList>
-            </div>
-            <p>There was an error restarting Wazuh.</p>
+            <RenderBodyModal
+              nodos={restartNodesInfo}
+              statusRestart={RestartHandler.RESTART_STATES.RESTART_ERROR}
+            />
+            <p>
+              There was an error restarting the nodes{' '}
+              <b className="wz-text-black">{nodesNotRestartedState.join(', ')}</b>.
+            </p>
           </>
         ),
         actions: (
@@ -212,19 +189,10 @@ export const RestartModal = (props: {
         title: <h2 className="wz-modal-restart-title">Synchronization failed</h2>,
         body: (
           <>
-            {syncNodesInfo.length > 0 && (
-              <div className="wz-info-nodes-restart">
-                <EuiDescriptionList textStyle="reverse" align="center" type="column">
-                  {syncNodesInfo.map((node, index) => (
-                    <RenderStatus
-                      node={node}
-                      key={index}
-                      statusRestart={RestartHandler.RESTART_STATES.SYNC_ERROR}
-                    />
-                  ))}
-                </EuiDescriptionList>
-              </div>
-            )}
+            <RenderBodyModal
+              nodos={syncNodesInfo}
+              statusRestart={RestartHandler.RESTART_STATES.SYNC_ERROR}
+            />
             <p className="wz-text-justify">
               The nodes <b className="wz-text-black">{unsyncedNodes.join(', ')}</b> did not
               synchronize. Restarting Wazuh might set the cluster into an inconsistent state. Close
@@ -260,23 +228,11 @@ export const RestartModal = (props: {
           <>
             {syncNodesInfo.length > 0 && (
               <>
-                <h4 className="wz-padding-left-16 wz">Checking synchronization:</h4>
-                <div className="wz-info-nodes-restart">
-                  <EuiDescriptionList
-                    textStyle="reverse"
-                    align="center"
-                    type="column"
-                    style={{ maxWidth: '20000px' }}
-                  >
-                    {syncNodesInfo.map((node, index) => (
-                      <RenderStatus
-                        node={node}
-                        key={index}
-                        statusRestart={RestartHandler.RESTART_STATES.SYNCING}
-                      />
-                    ))}
-                  </EuiDescriptionList>
-                </div>
+                <h4>Checking synchronization:</h4>
+                <RenderBodyModal
+                  nodos={syncNodesInfo}
+                  statusRestart={RestartHandler.RESTART_STATES.SYNCING}
+                />
               </>
             )}
           </>
