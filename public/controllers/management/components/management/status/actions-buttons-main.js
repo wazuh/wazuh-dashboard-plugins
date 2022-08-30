@@ -238,7 +238,7 @@ class WzStatusActionButtons extends Component {
             cancelButtonText="Cancel"
             confirmButtonText="Confirm"
             defaultFocusedButton="cancel"
-          ></EuiConfirmModal>
+          />
         </EuiOverlayMask>
       );
     }
@@ -246,7 +246,7 @@ class WzStatusActionButtons extends Component {
     let restarting;
 
     if (timeoutRestarting && this.props.restartStatus !== RestartHandler.RESTART_STATES.RESTARTED) {
-      restarting = <RestartModal isRestarting={isRestarting} useDelay={false} />;
+      restarting = <RestartModal />;
     }
 
     return (
