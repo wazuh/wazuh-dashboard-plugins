@@ -13,14 +13,14 @@ export type AppConfigState = {
 };
 
 export type AppRootState = DefaultRootState & {
-  appConfig: AppConfigState,
+  appConfig: AppConfigState;
 };
 
 export type RestartWazuhState = {
-  restartAttempt: number,
-  syncCheckAttempt: number,
-  unsynchronizedNodes: [],
-  syncNodesInfo: [ {name: string, synced: boolean} ],
-  restartNodesInfo: [ {node: string, isRestarted: boolean} ]
-  restartStatus: string,
+  restartAttempt: number;
+  syncCheckAttempt: number;
+  unsynchronizedNodes: [];
+  syncNodesInfo: [{ name: string; synced: boolean }];
+  restartNodesInfo: [{ node: string; isRestarted: boolean }];
+  restartStatus: string;
 }
