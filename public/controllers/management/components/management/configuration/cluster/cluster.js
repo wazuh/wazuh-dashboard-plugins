@@ -22,6 +22,7 @@ import { isString } from '../utils/utils';
 
 import { connect } from 'react-redux';
 import { compose } from 'redux';
+import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
 const mainSettings = [
   { field: 'disabled', label: 'Cluster status' },
@@ -39,14 +40,12 @@ const mainSettings = [
 
 const helpLinks = [
   {
-    text: 'How to configure the Wazuh cluster',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/configuring-cluster/index.html'
+    text: 'Configuring a Wazuh cluster',
+    href: webDocumentationLink('user-manual/configuring-cluster/index.html')
   },
   {
     text: 'Wazuh cluster reference',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/cluster.html'
+    href: webDocumentationLink('user-manual/reference/ossec-conf/cluster.html')
   }
 ];
 

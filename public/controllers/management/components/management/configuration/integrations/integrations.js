@@ -21,22 +21,20 @@ import WzViewSelector, {
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import withWzConfig from '../util-hocs/wz-config';
 import { capitalize, isString } from '../utils/utils';
+import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
 const helpLinks = [
   {
-    text: 'How to integrate Wazuh with external APIs',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/manager/manual-integration.html'
+    text: 'Integration with external APIs',
+    href: webDocumentationLink('user-manual/manager/manual-integration.html')
   },
   {
-    text: 'VirusTotal integration documentation',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/capabilities/virustotal-scan/index.html'
+    text: 'VirusTotal integration',
+    href: webDocumentationLink('user-manual/capabilities/virustotal-scan/index.html')
   },
   {
     text: 'Integration reference',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/integration.html'
+    href: webDocumentationLink('user-manual/reference/ossec-conf/integration.html')
   }
 ];
 

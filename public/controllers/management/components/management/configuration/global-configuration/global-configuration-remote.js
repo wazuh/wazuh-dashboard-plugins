@@ -21,6 +21,7 @@ import {
   renderValueOrNoValue,
   renderValueOrDefault
 } from '../utils/utils';
+import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
 const renderAllowedDeniedIPs = (items, label) => {
   if (items) {
@@ -39,13 +40,11 @@ const renderAllowedDeniedIPs = (items, label) => {
 const helpLinks = [
   {
     text: 'Remote daemon reference',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/reference/daemons/wazuh-remoted.html'
+    href: webDocumentationLink('user-manual/reference/daemons/wazuh-remoted.html')
   },
   {
     text: 'Remote configuration reference',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/remote.html'
+    href: webDocumentationLink('user-manual/reference/ossec-conf/remote.html')
   }
 ];
 

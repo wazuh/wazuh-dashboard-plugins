@@ -23,17 +23,16 @@ import {
 } from '../utils/utils';
 import { settingsListBuilder } from '../utils/builders';
 import { LOGCOLLECTOR_SOCKET_PROP } from './types';
+import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
 const helpLinks = [
   {
     text: 'Using multiple outputs',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/capabilities/log-data-collection/log-data-configuration.html#using-multiple-outputs'
+    href: webDocumentationLink('user-manual/capabilities/log-data-collection/log-data-configuration.html#using-multiple-outputs')
   },
   {
     text: 'Socket reference',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/socket.html'
+    href: webDocumentationLink('user-manual/reference/ossec-conf/socket.html')
   }
 ];
 

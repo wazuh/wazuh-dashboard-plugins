@@ -32,9 +32,13 @@ export class WzRequest {
     method,
     path,
     payload: any = null,
-    customTimeout = false,
-    shouldRetry = true
+    extraOptions: { shouldRetry?: boolean, checkCurrentApiIsUp?: boolean } = {
+      shouldRetry: true, 
+      checkCurrentApiIsUp: true
+    }
   ) {
+    const shouldRetry = typeof extraOptions.shouldRetry === 'boolean' ? extraOptions.shouldRetry : true; 
+    const checkCurrentApiIsUp = typeof extraOptions.checkCurrentApiIsUp === 'boolean' ? extraOptions.checkCurrentApiIsUp : true; 
     try {
       if (!method || !path) {
         throw new Error('Missing parameters');
@@ -49,7 +53,7 @@ export class WzRequest {
         headers: { ...PLUGIN_PLATFORM_REQUEST_HEADERS, 'content-type': 'application/json' },
         url: url,
         data: payload,
-        timeout: customTimeout || timeout,
+        timeout: timeout,
       };
 
       const data = await axios(options);
@@ -62,17 +66,19 @@ export class WzRequest {
     } catch (error) {
       OdfeUtils.checkOdfeSessionExpired(error);
       //if the requests fails, we need to check if the API is down
-      const currentApi = JSON.parse(AppState.getCurrentAPI() || '{}');
-      if (currentApi && currentApi.id) {
-        try {
-          await ApiCheck.checkStored(currentApi.id);
-        } catch (error) {
-          const wzMisc = new WzMisc();
-          wzMisc.setApiIsDown(true);
-          if (!window.location.hash.includes('#/settings')) {
-            window.location.href = getHttp().basePath.prepend('/app/wazuh#/health-check');
+      if(checkCurrentApiIsUp){
+        const currentApi = JSON.parse(AppState.getCurrentAPI() || '{}');
+        if (currentApi && currentApi.id) {
+          try {
+            await ApiCheck.checkStored(currentApi.id);
+          } catch (error) {
+            const wzMisc = new WzMisc();
+            wzMisc.setApiIsDown(true);
+            if (!window.location.hash.includes('#/settings')) {
+              window.location.href = getHttp().basePath.prepend('/app/wazuh#/health-check');
+            }
+            throw new Error(error);
           }
-          throw new Error(error);
         }
       }
       const errorMessage =
@@ -85,7 +91,7 @@ export class WzRequest {
       ) {
         try {
           await WzAuthentication.refresh(true);
-          return this.genericReq(method, path, payload, customTimeout, false);
+          return this.genericReq(method, path, payload, { shouldRetry: false });
         } catch (error) {
           return ((error || {}).data || {}).message || false
             ? Promise.reject(this.returnErrorInstance(error, error.data.message))
@@ -104,14 +110,19 @@ export class WzRequest {
    * @param {String} path API route
    * @param {Object} body Request body
    */
-  static async apiReq(method, path, body, shouldRetry = true): Promise<IApiResponse<any>> {
+  static async apiReq(
+    method, 
+    path, 
+    body, 
+    options: { checkCurrentApiIsUp?: boolean } = { checkCurrentApiIsUp: true }
+  ): Promise<IApiResponse<any>> {
     try {
       if (!method || !path || !body) {
         throw new Error('Missing parameters');
       }      
       const id = JSON.parse(AppState.getCurrentAPI()).id;
       const requestData = { method, path, body, id };
-      const response = await this.genericReq('POST', '/api/request', requestData);
+      const response = await this.genericReq('POST', '/api/request', requestData, options);
 
       const hasFailed = (((response || {}).data || {}).data || {}).total_failed_items || 0;
 
@@ -144,7 +155,7 @@ export class WzRequest {
       }
       const id = JSON.parse(AppState.getCurrentAPI()).id;
       const requestData = { path, id, filters };
-      const data = await this.genericReq('POST', '/api/csv', requestData, false);
+      const data = await this.genericReq('POST', '/api/csv', requestData);
       return Promise.resolve(data);
     } catch (error) {
       return ((error || {}).data || {}).message || false

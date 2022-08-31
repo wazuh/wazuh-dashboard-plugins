@@ -9,13 +9,15 @@
 *
 * Find more information about this on the LICENSE file.
 */
+import { webDocumentationLink } from "../../../../common/services/web_documentation";
+
 export default {
   id: 'ciscat',
   name: 'CIS-CAT',
   wodle_name: 'cis-cat',
   description: 'Configuration options of the CIS-CAT wodle.',
   category: 'Auditing and policy monitoring',
-  documentation_link: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-ciscat.html',
+  documentation_link: webDocumentationLink('user-manual/reference/ossec-conf/wodle-ciscat.html'),
   icon: 'securityApp',
   callout_warning: `CIS-CAT is not installed by default. It is a proprietary software that you have to obtain for using this module.`,
   avaliable_for_manager: true,

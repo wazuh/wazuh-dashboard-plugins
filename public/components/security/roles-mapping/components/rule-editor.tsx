@@ -32,6 +32,7 @@ import 'brace/snippets/json';
 import 'brace/ext/language_tools';
 import "brace/ext/searchbox";
 import _ from 'lodash';
+import { webDocumentationLink } from '../../../../../common/services/web_documentation';
 
 export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalUsers, currentPlatform,onFormChange }) => {
   const [logicalOperator, setLogicalOperator] = useState('OR');
@@ -298,7 +299,7 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
             <EuiText>
               <span>Assign roles to users who match these rules. </span>
               <EuiLink
-                href="https://documentation.wazuh.com/current/user-manual/api/rbac/auth_context.html"
+                href={webDocumentationLink('user-manual/api/rbac/auth-context.html')}
                 external
                 target="_blank"
               >

@@ -14,17 +14,14 @@ import React from 'react';
 import {
   EuiIcon,
 } from '@elastic/eui';
-import { version } from '../../package.json';
 import { getChrome, getHttp} from '../kibana-services';
 import { 
-  WAZUH_LINK_DOCUMENTATION,
   WAZUH_LINK_GITHUB,
   WAZUH_LINK_GOOGLE_GROUPS,
   WAZUH_LINK_SLACK
 } from '../../common/constants';
 import { getThemeAssetURL, getAssetURL } from './assets';
-
-const appVersionMajorDotMinor = version.split('.').slice(0, 2).join('.');
+import { webDocumentationLink } from '../../common/services/web_documentation';
 
 export function addHelpMenuToAppChrome(){
   getChrome().setHelpExtension({
@@ -32,7 +29,7 @@ export function addHelpMenuToAppChrome(){
     links: [
       {
         linkType: 'custom',
-        href: `${WAZUH_LINK_DOCUMENTATION}/${appVersionMajorDotMinor}`,
+        href: webDocumentationLink(''),
         content: <span><EuiIcon type={getHttp().basePath.prepend(getThemeAssetURL('icon.svg'))}></EuiIcon> Documentation</span>
       },
       {

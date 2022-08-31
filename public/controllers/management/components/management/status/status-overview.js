@@ -93,31 +93,18 @@ export class WzStatusOverview extends Component {
     try {
       this.props.updateLoadingStatus(true);
 
-      const agSumm = await this.statusHandler.agentsSummary();
-      const clusStat = await this.statusHandler.clusterStatus();
-      const manInfo = await this.statusHandler.managerInfo();
-      const agentsCountResponse = await this.statusHandler.clusterAgentsCount();
 
-      const data = [];
-      data.push(agSumm);
-      data.push(clusStat);
-      data.push(manInfo);
-      data.push(agentsCountResponse);
-
-      const parsedData = data.map((item) => ((item || {}).data || {}).data || false);
-      const [stats, clusterStatus, managerInfo, agentsCount] = parsedData;
-
-      // Once Wazuh core fixes agent 000 issues, this should be adjusted
-      const active = stats.active;
-      const total = stats.total;
+      const [agentsCount, clusterStatus, managerInfo, agentsCountByManagerNodes] = (await Promise.all([
+        this.statusHandler.agentsSummary(),
+        this.statusHandler.clusterStatus(),
+        this.statusHandler.managerInfo(),
+        this.statusHandler.clusterAgentsCount()
+      ])).map(response => response?.data?.data);
 
       this.props.updateStats({
-        agentsCount: agentsCount.nodes,
-        agentsCountActive: active,
-        agentsCountDisconnected: stats.disconnected,
-        agentsCountNeverConnected: stats.never_connected,
-        agentsCountTotal: total,
-        agentsCoverity: total ? (active / total) * 100 : 0,
+        agentsCountByManagerNodes: agentsCountByManagerNodes.nodes,
+        agentsCount,
+        agentsCoverage: agentsCount.total ? ((agentsCount.active / agentsCount.total) * 100).toFixed(2) : 0,
       });
 
       this.props.updateClusterEnabled(clusterStatus && clusterStatus.enabled === 'yes');

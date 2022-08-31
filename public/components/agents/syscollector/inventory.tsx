@@ -15,9 +15,11 @@ import { EuiEmptyPrompt, EuiButton, EuiFlexGroup, EuiFlexItem, EuiCallOut } from
 import { InventoryMetrics } from './components/syscollector-metrics';
 import { SyscollectorTable } from './components/syscollector-table';
 import { processColumns, portsColumns, packagesColumns } from './columns';
+import { API_NAME_AGENT_STATUS } from '../../../../common/constants';
+import { webDocumentationLink } from '../../../../common/services/web_documentation';
 
 export function SyscollectorInventory({ agent }) {
-  if (agent && agent.status === 'never_connected') {
+  if (agent && agent.status === API_NAME_AGENT_STATUS.NEVER_CONNECTED) {
     return (
       <EuiEmptyPrompt
         iconType="securitySignalDetected"
@@ -27,10 +29,10 @@ export function SyscollectorInventory({ agent }) {
           <Fragment>
             <p>The agent has been registered but has not yet connected to the manager.</p>
             <a
-              href="https://documentation.wazuh.com/current/user-manual/agents/agent-connection.html"
+              href={webDocumentationLink('user-manual/agents/agent-connection.html')}
               target="_blank"
             >
-              https://documentation.wazuh.com/current/user-manual/agents/agent-connection.html
+              Checking connection with the Wazuh server
             </a>
           </Fragment>
         }
@@ -72,7 +74,7 @@ export function SyscollectorInventory({ agent }) {
 
   return (
     <div style={{ overflow: 'hidden' }}>
-      {agent && agent.status === 'disconnected' && (
+      {agent && agent.status === API_NAME_AGENT_STATUS.DISCONNECTED && (
         <EuiCallOut
           style={{ margin: '8px 16px 8px 16px' }}
           title="This agent is currently disconnected, the data may be outdated."

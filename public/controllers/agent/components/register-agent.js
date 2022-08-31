@@ -41,6 +41,7 @@ import { withErrorBoundary } from '../../../components/common/hocs';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
+import { webDocumentationLink } from '../../../../common/services/web_documentation';
 
 const architectureButtons = [
   {
@@ -412,10 +413,10 @@ export const RegisterAgent = withErrorBoundary(
 
     render() {
       const appVersionMajorDotMinor = this.state.wazuhVersion.split('.').slice(0, 2).join('.');
-      const urlCheckConnectionDocumentation = `https://documentation.wazuh.com/${appVersionMajorDotMinor}/user-manual/agents/agent-connection.html`;
+      const urlCheckConnectionDocumentation = webDocumentationLink('user-manual/agents/agent-connection.html', appVersionMajorDotMinor);
       const textAndLinkToCheckConnectionDocumentation = (
         <p>
-          To verify the connection with the Manager, please follow this{' '}
+          To verify the connection with the Wazuh server, please follow this{' '}
           <a href={urlCheckConnectionDocumentation} target="_blank">
             document.
           </a>
@@ -495,11 +496,15 @@ export const RegisterAgent = withErrorBoundary(
       const windowsAdvice = this.state.selectedOS === 'win' && (
         <>
           <EuiCallOut
-            title="You will need administrator privileges to perform this installation."
+            title="Requirements"
             iconType="iInCircle"
-            >
-              <p>Keep in mind you need to run this command in a Windows PowerShell terminal</p>
-            </EuiCallOut>
+          >
+            <ul class="wz-callout-list">
+              <li><span>You will need administrator privileges to perform this installation.</span></li>
+              <li><span>PowerShell 3.0 or greater is required.</span></li>
+            </ul>
+            <p>Keep in mind you need to run this command in a Windows PowerShell terminal.</p>
+          </EuiCallOut>
           <EuiSpacer></EuiSpacer>
         </>
       );

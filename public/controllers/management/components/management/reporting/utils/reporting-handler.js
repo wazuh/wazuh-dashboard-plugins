@@ -19,7 +19,7 @@ export default class ReportingHandler {
    */
   static async listReports() {
     try {
-      const result = await WzRequest.genericReq('GET', '/reports', {});
+      const result = await WzRequest.genericReq('GET', '/reports');
       return result;
     } catch (error) {
       throw error;
@@ -34,8 +34,7 @@ export default class ReportingHandler {
     try {
       const result = await WzRequest.genericReq(
         'DELETE',
-        `/reports/${name}`,
-        {}
+        `/reports/${name}`
       );
       return result;
     } catch (error) {
