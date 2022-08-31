@@ -6,7 +6,7 @@ export const DECODERS_PAGE = {
   customDecodersButtonSelector: '[data-test-subj="Custom decoders"]',
   // customDecodersButtonSelector: '.euiToggle__input',
   manageDecodersFilesButtonSelector: ':nth-child(3) > .euiButtonEmpty > .euiButtonContent',
-  editDecoderButtonSelector: 'tr.euiTableRow:nth-child(1) .euiTableCellContent > div > :nth-child(1) > .euiButtonIcon:nth-child(1)',
+  editDecoderButtonSelector: '.euiTableCellContent > div > :nth-child(1) > .euiButtonIcon',
   saveDecoderButtonSelector: '.euiFlexGroup .euiFlexItem button.euiButton span.euiButtonContent span.euiButton__text:contains("Save")',
   messageConfirmSaveSelector: '.euiText > span',
   buttonRestartSelector: '.euiCallOut.euiCallOut--primary .euiButton.euiButton--primary',
