@@ -30,4 +30,4 @@ RUN mkdir $NVM_DIR -p \
 	&& nvm install $(cat .nvmrc) \
 	&& npm install   
 
-WORKDIR $CYPRESS_DIR/cypress/
+WORKDIR $CYPRESS_DIR/test/cypress/
