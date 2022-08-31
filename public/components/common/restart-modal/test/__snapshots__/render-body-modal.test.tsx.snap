@@ -1,0 +1,1990 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Restart status: restart_error renders correctly to match the snapshot. 1`] = `
+<Provider
+  store={
+    Object {
+      "clearActions": [Function],
+      "dispatch": [Function],
+      "getActions": [Function],
+      "getState": [Function],
+      "replaceReducer": [Function],
+      "subscribe": [Function],
+    }
+  }
+>
+  <RenderBodyModal
+    nodos={
+      Array [
+        Object {
+          "isRestarted": true,
+          "node": "nodo-master",
+        },
+        Object {
+          "isRestarted": true,
+          "node": "worker1",
+        },
+        Object {
+          "isRestarted": false,
+          "node": "worker2",
+        },
+      ]
+    }
+    statusRestart="restart_error"
+  >
+    <div
+      className="wz-info-nodes-restart"
+    >
+      <EuiFlexGroup
+        direction="column"
+        wrap={true}
+      >
+        <div
+          className="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionColumn euiFlexGroup--responsive euiFlexGroup--wrap"
+        >
+          <EuiFlexItem
+            className=""
+            key="0"
+          >
+            <div
+              className="euiFlexItem"
+            >
+              <EuiDescriptionList
+                align="center"
+                textStyle="reverse"
+                type="column"
+              >
+                <dl
+                  className="euiDescriptionList euiDescriptionList--column euiDescriptionList--center euiDescriptionList--reverse"
+                >
+                  <RenderStatus
+                    key="0"
+                    node={
+                      Object {
+                        "isRestarted": true,
+                        "node": "nodo-master",
+                      }
+                    }
+                    statusRestart="restart_error"
+                  >
+                    <EuiDescriptionListTitle>
+                      <dt
+                        className="euiDescriptionList__title"
+                      >
+                        <span
+                          className="euiToolTipAnchor"
+                        >
+                          <WzTextWithTooltipIfTruncated
+                            elementStyle={
+                              Object {
+                                "maxWidth": "85px",
+                              }
+                            }
+                          >
+                            <span
+                              style={
+                                Object {
+                                  "display": "block",
+                                  "maxWidth": "85px",
+                                  "overflow": "hidden",
+                                  "paddingBottom": "3px",
+                                  "textOverflow": "ellipsis",
+                                  "whiteSpace": "nowrap",
+                                }
+                              }
+                            />
+                          </WzTextWithTooltipIfTruncated>
+                        </span>
+                      </dt>
+                    </EuiDescriptionListTitle>
+                    <EuiDescriptionListDescription
+                      className="wz-text-left"
+                    >
+                      <dd
+                        className="euiDescriptionList__description wz-text-left"
+                      >
+                        <EuiIconTip
+                          aria-label="Synchronized"
+                          color="success"
+                          size="m"
+                          type="check"
+                        >
+                          <EuiToolTip
+                            delay="regular"
+                            position="top"
+                          >
+                            <span
+                              className="euiToolTipAnchor"
+                              onKeyUp={[Function]}
+                              onMouseOut={[Function]}
+                              onMouseOver={[Function]}
+                            >
+                              <EuiIcon
+                                aria-label="Synchronized"
+                                color="success"
+                                onBlur={[Function]}
+                                onFocus={[Function]}
+                                size="m"
+                                tabIndex={0}
+                                type="check"
+                              >
+                                <EuiIconCheck
+                                  aria-label="Synchronized"
+                                  className="euiIcon euiIcon--medium euiIcon--success"
+                                  focusable="true"
+                                  onBlur={[Function]}
+                                  onFocus={[Function]}
+                                  role="img"
+                                  style={null}
+                                  tabIndex={0}
+                                >
+                                  <svg
+                                    aria-label="Synchronized"
+                                    className="euiIcon euiIcon--medium euiIcon--success"
+                                    focusable="true"
+                                    height={16}
+                                    onBlur={[Function]}
+                                    onFocus={[Function]}
+                                    role="img"
+                                    style={null}
+                                    tabIndex={0}
+                                    viewBox="0 0 16 16"
+                                    width={16}
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <path
+                                      d="M6.5 12a.502.502 0 01-.354-.146l-4-4a.502.502 0 01.708-.708L6.5 10.793l6.646-6.647a.502.502 0 01.708.708l-7 7A.502.502 0 016.5 12"
+                                      fillRule="evenodd"
+                                    />
+                                  </svg>
+                                </EuiIconCheck>
+                              </EuiIcon>
+                            </span>
+                          </EuiToolTip>
+                        </EuiIconTip>
+                      </dd>
+                    </EuiDescriptionListDescription>
+                  </RenderStatus>
+                </dl>
+              </EuiDescriptionList>
+            </div>
+          </EuiFlexItem>
+          <EuiFlexItem
+            className=""
+            key="1"
+          >
+            <div
+              className="euiFlexItem"
+            >
+              <EuiDescriptionList
+                align="center"
+                textStyle="reverse"
+                type="column"
+              >
+                <dl
+                  className="euiDescriptionList euiDescriptionList--column euiDescriptionList--center euiDescriptionList--reverse"
+                >
+                  <RenderStatus
+                    key="1"
+                    node={
+                      Object {
+                        "isRestarted": true,
+                        "node": "worker1",
+                      }
+                    }
+                    statusRestart="restart_error"
+                  >
+                    <EuiDescriptionListTitle>
+                      <dt
+                        className="euiDescriptionList__title"
+                      >
+                        <span
+                          className="euiToolTipAnchor"
+                        >
+                          <WzTextWithTooltipIfTruncated
+                            elementStyle={
+                              Object {
+                                "maxWidth": "85px",
+                              }
+                            }
+                          >
+                            <span
+                              style={
+                                Object {
+                                  "display": "block",
+                                  "maxWidth": "85px",
+                                  "overflow": "hidden",
+                                  "paddingBottom": "3px",
+                                  "textOverflow": "ellipsis",
+                                  "whiteSpace": "nowrap",
+                                }
+                              }
+                            />
+                          </WzTextWithTooltipIfTruncated>
+                        </span>
+                      </dt>
+                    </EuiDescriptionListTitle>
+                    <EuiDescriptionListDescription
+                      className="wz-text-left"
+                    >
+                      <dd
+                        className="euiDescriptionList__description wz-text-left"
+                      >
+                        <EuiIconTip
+                          aria-label="Synchronized"
+                          color="success"
+                          size="m"
+                          type="check"
+                        >
+                          <EuiToolTip
+                            delay="regular"
+                            position="top"
+                          >
+                            <span
+                              className="euiToolTipAnchor"
+                              onKeyUp={[Function]}
+                              onMouseOut={[Function]}
+                              onMouseOver={[Function]}
+                            >
+                              <EuiIcon
+                                aria-label="Synchronized"
+                                color="success"
+                                onBlur={[Function]}
+                                onFocus={[Function]}
+                                size="m"
+                                tabIndex={0}
+                                type="check"
+                              >
+                                <EuiIconCheck
+                                  aria-label="Synchronized"
+                                  className="euiIcon euiIcon--medium euiIcon--success"
+                                  focusable="true"
+                                  onBlur={[Function]}
+                                  onFocus={[Function]}
+                                  role="img"
+                                  style={null}
+                                  tabIndex={0}
+                                >
+                                  <svg
+                                    aria-label="Synchronized"
+                                    className="euiIcon euiIcon--medium euiIcon--success"
+                                    focusable="true"
+                                    height={16}
+                                    onBlur={[Function]}
+                                    onFocus={[Function]}
+                                    role="img"
+                                    style={null}
+                                    tabIndex={0}
+                                    viewBox="0 0 16 16"
+                                    width={16}
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <path
+                                      d="M6.5 12a.502.502 0 01-.354-.146l-4-4a.502.502 0 01.708-.708L6.5 10.793l6.646-6.647a.502.502 0 01.708.708l-7 7A.502.502 0 016.5 12"
+                                      fillRule="evenodd"
+                                    />
+                                  </svg>
+                                </EuiIconCheck>
+                              </EuiIcon>
+                            </span>
+                          </EuiToolTip>
+                        </EuiIconTip>
+                      </dd>
+                    </EuiDescriptionListDescription>
+                  </RenderStatus>
+                </dl>
+              </EuiDescriptionList>
+            </div>
+          </EuiFlexItem>
+          <EuiFlexItem
+            className=""
+            key="2"
+          >
+            <div
+              className="euiFlexItem"
+            >
+              <EuiDescriptionList
+                align="center"
+                textStyle="reverse"
+                type="column"
+              >
+                <dl
+                  className="euiDescriptionList euiDescriptionList--column euiDescriptionList--center euiDescriptionList--reverse"
+                >
+                  <RenderStatus
+                    key="2"
+                    node={
+                      Object {
+                        "isRestarted": false,
+                        "node": "worker2",
+                      }
+                    }
+                    statusRestart="restart_error"
+                  >
+                    <EuiDescriptionListTitle>
+                      <dt
+                        className="euiDescriptionList__title"
+                      >
+                        <span
+                          className="euiToolTipAnchor"
+                        >
+                          <WzTextWithTooltipIfTruncated
+                            elementStyle={
+                              Object {
+                                "maxWidth": "85px",
+                              }
+                            }
+                          >
+                            <span
+                              style={
+                                Object {
+                                  "display": "block",
+                                  "maxWidth": "85px",
+                                  "overflow": "hidden",
+                                  "paddingBottom": "3px",
+                                  "textOverflow": "ellipsis",
+                                  "whiteSpace": "nowrap",
+                                }
+                              }
+                            />
+                          </WzTextWithTooltipIfTruncated>
+                        </span>
+                      </dt>
+                    </EuiDescriptionListTitle>
+                    <EuiDescriptionListDescription
+                      className="wz-text-left"
+                    >
+                      <dd
+                        className="euiDescriptionList__description wz-text-left"
+                      >
+                        <EuiIconTip
+                          aria-label="Unsynchronized"
+                          color="danger"
+                          size="m"
+                          type="alert"
+                        >
+                          <EuiToolTip
+                            delay="regular"
+                            position="top"
+                          >
+                            <span
+                              className="euiToolTipAnchor"
+                              onKeyUp={[Function]}
+                              onMouseOut={[Function]}
+                              onMouseOver={[Function]}
+                            >
+                              <EuiIcon
+                                aria-label="Unsynchronized"
+                                color="danger"
+                                onBlur={[Function]}
+                                onFocus={[Function]}
+                                size="m"
+                                tabIndex={0}
+                                type="alert"
+                              >
+                                <EuiIconEmpty
+                                  aria-hidden={true}
+                                  aria-label="Unsynchronized"
+                                  className="euiIcon euiIcon--medium euiIcon--danger euiIcon-isLoading"
+                                  focusable="true"
+                                  onBlur={[Function]}
+                                  onFocus={[Function]}
+                                  role="img"
+                                  style={null}
+                                  tabIndex={0}
+                                >
+                                  <svg
+                                    aria-hidden={true}
+                                    aria-label="Unsynchronized"
+                                    className="euiIcon euiIcon--medium euiIcon--danger euiIcon-isLoading"
+                                    focusable="true"
+                                    height={16}
+                                    onBlur={[Function]}
+                                    onFocus={[Function]}
+                                    role="img"
+                                    style={null}
+                                    tabIndex={0}
+                                    viewBox="0 0 16 16"
+                                    width={16}
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  />
+                                </EuiIconEmpty>
+                              </EuiIcon>
+                            </span>
+                          </EuiToolTip>
+                        </EuiIconTip>
+                      </dd>
+                    </EuiDescriptionListDescription>
+                  </RenderStatus>
+                </dl>
+              </EuiDescriptionList>
+            </div>
+          </EuiFlexItem>
+        </div>
+      </EuiFlexGroup>
+    </div>
+  </RenderBodyModal>
+  ;
+</Provider>
+`;
+
+exports[`Restart status: restarted_info renders correctly to match the snapshot. 1`] = `
+<Provider
+  store={
+    Object {
+      "clearActions": [Function],
+      "dispatch": [Function],
+      "getActions": [Function],
+      "getState": [Function],
+      "replaceReducer": [Function],
+      "subscribe": [Function],
+    }
+  }
+>
+  <RenderBodyModal
+    nodos={
+      Array [
+        Object {
+          "isRestarted": true,
+          "node": "nodo-master",
+        },
+        Object {
+          "isRestarted": true,
+          "node": "worker1",
+        },
+        Object {
+          "isRestarted": true,
+          "node": "worker2",
+        },
+      ]
+    }
+    statusRestart="restarted_info"
+  >
+    <div
+      className="wz-info-nodes-restart"
+    >
+      <EuiFlexGroup
+        direction="column"
+        wrap={true}
+      >
+        <div
+          className="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionColumn euiFlexGroup--responsive euiFlexGroup--wrap"
+        >
+          <EuiFlexItem
+            className=""
+            key="0"
+          >
+            <div
+              className="euiFlexItem"
+            >
+              <EuiDescriptionList
+                align="center"
+                textStyle="reverse"
+                type="column"
+              >
+                <dl
+                  className="euiDescriptionList euiDescriptionList--column euiDescriptionList--center euiDescriptionList--reverse"
+                >
+                  <RenderStatus
+                    key="0"
+                    node={
+                      Object {
+                        "isRestarted": true,
+                        "node": "nodo-master",
+                      }
+                    }
+                    statusRestart="restarted_info"
+                  >
+                    <EuiDescriptionListTitle>
+                      <dt
+                        className="euiDescriptionList__title"
+                      >
+                        <span
+                          className="euiToolTipAnchor"
+                        >
+                          <WzTextWithTooltipIfTruncated
+                            elementStyle={
+                              Object {
+                                "maxWidth": "85px",
+                              }
+                            }
+                          >
+                            <span
+                              style={
+                                Object {
+                                  "display": "block",
+                                  "maxWidth": "85px",
+                                  "overflow": "hidden",
+                                  "paddingBottom": "3px",
+                                  "textOverflow": "ellipsis",
+                                  "whiteSpace": "nowrap",
+                                }
+                              }
+                            />
+                          </WzTextWithTooltipIfTruncated>
+                        </span>
+                      </dt>
+                    </EuiDescriptionListTitle>
+                    <EuiDescriptionListDescription
+                      className="wz-text-left"
+                    >
+                      <dd
+                        className="euiDescriptionList__description wz-text-left"
+                      >
+                        <EuiIconTip
+                          aria-label="Synchronized"
+                          color="success"
+                          size="m"
+                          type="check"
+                        >
+                          <EuiToolTip
+                            delay="regular"
+                            position="top"
+                          >
+                            <span
+                              className="euiToolTipAnchor"
+                              onKeyUp={[Function]}
+                              onMouseOut={[Function]}
+                              onMouseOver={[Function]}
+                            >
+                              <EuiIcon
+                                aria-label="Synchronized"
+                                color="success"
+                                onBlur={[Function]}
+                                onFocus={[Function]}
+                                size="m"
+                                tabIndex={0}
+                                type="check"
+                              >
+                                <EuiIconCheck
+                                  aria-label="Synchronized"
+                                  className="euiIcon euiIcon--medium euiIcon--success"
+                                  focusable="true"
+                                  onBlur={[Function]}
+                                  onFocus={[Function]}
+                                  role="img"
+                                  style={null}
+                                  tabIndex={0}
+                                >
+                                  <svg
+                                    aria-label="Synchronized"
+                                    className="euiIcon euiIcon--medium euiIcon--success"
+                                    focusable="true"
+                                    height={16}
+                                    onBlur={[Function]}
+                                    onFocus={[Function]}
+                                    role="img"
+                                    style={null}
+                                    tabIndex={0}
+                                    viewBox="0 0 16 16"
+                                    width={16}
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <path
+                                      d="M6.5 12a.502.502 0 01-.354-.146l-4-4a.502.502 0 01.708-.708L6.5 10.793l6.646-6.647a.502.502 0 01.708.708l-7 7A.502.502 0 016.5 12"
+                                      fillRule="evenodd"
+                                    />
+                                  </svg>
+                                </EuiIconCheck>
+                              </EuiIcon>
+                            </span>
+                          </EuiToolTip>
+                        </EuiIconTip>
+                      </dd>
+                    </EuiDescriptionListDescription>
+                  </RenderStatus>
+                </dl>
+              </EuiDescriptionList>
+            </div>
+          </EuiFlexItem>
+          <EuiFlexItem
+            className=""
+            key="1"
+          >
+            <div
+              className="euiFlexItem"
+            >
+              <EuiDescriptionList
+                align="center"
+                textStyle="reverse"
+                type="column"
+              >
+                <dl
+                  className="euiDescriptionList euiDescriptionList--column euiDescriptionList--center euiDescriptionList--reverse"
+                >
+                  <RenderStatus
+                    key="1"
+                    node={
+                      Object {
+                        "isRestarted": true,
+                        "node": "worker1",
+                      }
+                    }
+                    statusRestart="restarted_info"
+                  >
+                    <EuiDescriptionListTitle>
+                      <dt
+                        className="euiDescriptionList__title"
+                      >
+                        <span
+                          className="euiToolTipAnchor"
+                        >
+                          <WzTextWithTooltipIfTruncated
+                            elementStyle={
+                              Object {
+                                "maxWidth": "85px",
+                              }
+                            }
+                          >
+                            <span
+                              style={
+                                Object {
+                                  "display": "block",
+                                  "maxWidth": "85px",
+                                  "overflow": "hidden",
+                                  "paddingBottom": "3px",
+                                  "textOverflow": "ellipsis",
+                                  "whiteSpace": "nowrap",
+                                }
+                              }
+                            />
+                          </WzTextWithTooltipIfTruncated>
+                        </span>
+                      </dt>
+                    </EuiDescriptionListTitle>
+                    <EuiDescriptionListDescription
+                      className="wz-text-left"
+                    >
+                      <dd
+                        className="euiDescriptionList__description wz-text-left"
+                      >
+                        <EuiIconTip
+                          aria-label="Synchronized"
+                          color="success"
+                          size="m"
+                          type="check"
+                        >
+                          <EuiToolTip
+                            delay="regular"
+                            position="top"
+                          >
+                            <span
+                              className="euiToolTipAnchor"
+                              onKeyUp={[Function]}
+                              onMouseOut={[Function]}
+                              onMouseOver={[Function]}
+                            >
+                              <EuiIcon
+                                aria-label="Synchronized"
+                                color="success"
+                                onBlur={[Function]}
+                                onFocus={[Function]}
+                                size="m"
+                                tabIndex={0}
+                                type="check"
+                              >
+                                <EuiIconCheck
+                                  aria-label="Synchronized"
+                                  className="euiIcon euiIcon--medium euiIcon--success"
+                                  focusable="true"
+                                  onBlur={[Function]}
+                                  onFocus={[Function]}
+                                  role="img"
+                                  style={null}
+                                  tabIndex={0}
+                                >
+                                  <svg
+                                    aria-label="Synchronized"
+                                    className="euiIcon euiIcon--medium euiIcon--success"
+                                    focusable="true"
+                                    height={16}
+                                    onBlur={[Function]}
+                                    onFocus={[Function]}
+                                    role="img"
+                                    style={null}
+                                    tabIndex={0}
+                                    viewBox="0 0 16 16"
+                                    width={16}
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <path
+                                      d="M6.5 12a.502.502 0 01-.354-.146l-4-4a.502.502 0 01.708-.708L6.5 10.793l6.646-6.647a.502.502 0 01.708.708l-7 7A.502.502 0 016.5 12"
+                                      fillRule="evenodd"
+                                    />
+                                  </svg>
+                                </EuiIconCheck>
+                              </EuiIcon>
+                            </span>
+                          </EuiToolTip>
+                        </EuiIconTip>
+                      </dd>
+                    </EuiDescriptionListDescription>
+                  </RenderStatus>
+                </dl>
+              </EuiDescriptionList>
+            </div>
+          </EuiFlexItem>
+          <EuiFlexItem
+            className=""
+            key="2"
+          >
+            <div
+              className="euiFlexItem"
+            >
+              <EuiDescriptionList
+                align="center"
+                textStyle="reverse"
+                type="column"
+              >
+                <dl
+                  className="euiDescriptionList euiDescriptionList--column euiDescriptionList--center euiDescriptionList--reverse"
+                >
+                  <RenderStatus
+                    key="2"
+                    node={
+                      Object {
+                        "isRestarted": true,
+                        "node": "worker2",
+                      }
+                    }
+                    statusRestart="restarted_info"
+                  >
+                    <EuiDescriptionListTitle>
+                      <dt
+                        className="euiDescriptionList__title"
+                      >
+                        <span
+                          className="euiToolTipAnchor"
+                        >
+                          <WzTextWithTooltipIfTruncated
+                            elementStyle={
+                              Object {
+                                "maxWidth": "85px",
+                              }
+                            }
+                          >
+                            <span
+                              style={
+                                Object {
+                                  "display": "block",
+                                  "maxWidth": "85px",
+                                  "overflow": "hidden",
+                                  "paddingBottom": "3px",
+                                  "textOverflow": "ellipsis",
+                                  "whiteSpace": "nowrap",
+                                }
+                              }
+                            />
+                          </WzTextWithTooltipIfTruncated>
+                        </span>
+                      </dt>
+                    </EuiDescriptionListTitle>
+                    <EuiDescriptionListDescription
+                      className="wz-text-left"
+                    >
+                      <dd
+                        className="euiDescriptionList__description wz-text-left"
+                      >
+                        <EuiIconTip
+                          aria-label="Synchronized"
+                          color="success"
+                          size="m"
+                          type="check"
+                        >
+                          <EuiToolTip
+                            delay="regular"
+                            position="top"
+                          >
+                            <span
+                              className="euiToolTipAnchor"
+                              onKeyUp={[Function]}
+                              onMouseOut={[Function]}
+                              onMouseOver={[Function]}
+                            >
+                              <EuiIcon
+                                aria-label="Synchronized"
+                                color="success"
+                                onBlur={[Function]}
+                                onFocus={[Function]}
+                                size="m"
+                                tabIndex={0}
+                                type="check"
+                              >
+                                <EuiIconCheck
+                                  aria-label="Synchronized"
+                                  className="euiIcon euiIcon--medium euiIcon--success"
+                                  focusable="true"
+                                  onBlur={[Function]}
+                                  onFocus={[Function]}
+                                  role="img"
+                                  style={null}
+                                  tabIndex={0}
+                                >
+                                  <svg
+                                    aria-label="Synchronized"
+                                    className="euiIcon euiIcon--medium euiIcon--success"
+                                    focusable="true"
+                                    height={16}
+                                    onBlur={[Function]}
+                                    onFocus={[Function]}
+                                    role="img"
+                                    style={null}
+                                    tabIndex={0}
+                                    viewBox="0 0 16 16"
+                                    width={16}
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <path
+                                      d="M6.5 12a.502.502 0 01-.354-.146l-4-4a.502.502 0 01.708-.708L6.5 10.793l6.646-6.647a.502.502 0 01.708.708l-7 7A.502.502 0 016.5 12"
+                                      fillRule="evenodd"
+                                    />
+                                  </svg>
+                                </EuiIconCheck>
+                              </EuiIcon>
+                            </span>
+                          </EuiToolTip>
+                        </EuiIconTip>
+                      </dd>
+                    </EuiDescriptionListDescription>
+                  </RenderStatus>
+                </dl>
+              </EuiDescriptionList>
+            </div>
+          </EuiFlexItem>
+        </div>
+      </EuiFlexGroup>
+    </div>
+  </RenderBodyModal>
+  ;
+</Provider>
+`;
+
+exports[`Restart status: restarting renders correctly to match the snapshot. 1`] = `
+<Provider
+  store={
+    Object {
+      "clearActions": [Function],
+      "dispatch": [Function],
+      "getActions": [Function],
+      "getState": [Function],
+      "replaceReducer": [Function],
+      "subscribe": [Function],
+    }
+  }
+>
+  <RenderBodyModal
+    nodos={
+      Array [
+        Object {
+          "isRestarted": true,
+          "node": "nodo-master",
+        },
+        Object {
+          "isRestarted": true,
+          "node": "worker1",
+        },
+        Object {
+          "isRestarted": false,
+          "node": "worker2",
+        },
+      ]
+    }
+    statusRestart="restarting"
+  >
+    <div
+      className="wz-info-nodes-restart"
+    >
+      <EuiFlexGroup
+        direction="column"
+        wrap={true}
+      >
+        <div
+          className="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionColumn euiFlexGroup--responsive euiFlexGroup--wrap"
+        >
+          <EuiFlexItem
+            className=""
+            key="0"
+          >
+            <div
+              className="euiFlexItem"
+            >
+              <EuiDescriptionList
+                align="center"
+                textStyle="reverse"
+                type="column"
+              >
+                <dl
+                  className="euiDescriptionList euiDescriptionList--column euiDescriptionList--center euiDescriptionList--reverse"
+                >
+                  <RenderStatus
+                    key="0"
+                    node={
+                      Object {
+                        "isRestarted": true,
+                        "node": "nodo-master",
+                      }
+                    }
+                    statusRestart="restarting"
+                  >
+                    <EuiDescriptionListTitle>
+                      <dt
+                        className="euiDescriptionList__title"
+                      >
+                        <span
+                          className="euiToolTipAnchor"
+                        >
+                          <WzTextWithTooltipIfTruncated
+                            elementStyle={
+                              Object {
+                                "maxWidth": "85px",
+                              }
+                            }
+                          >
+                            <span
+                              style={
+                                Object {
+                                  "display": "block",
+                                  "maxWidth": "85px",
+                                  "overflow": "hidden",
+                                  "paddingBottom": "3px",
+                                  "textOverflow": "ellipsis",
+                                  "whiteSpace": "nowrap",
+                                }
+                              }
+                            />
+                          </WzTextWithTooltipIfTruncated>
+                        </span>
+                      </dt>
+                    </EuiDescriptionListTitle>
+                    <EuiDescriptionListDescription
+                      className="wz-text-left"
+                    >
+                      <dd
+                        className="euiDescriptionList__description wz-text-left"
+                      >
+                        <EuiIconTip
+                          aria-label="Synchronized"
+                          color="success"
+                          size="m"
+                          type="check"
+                        >
+                          <EuiToolTip
+                            delay="regular"
+                            position="top"
+                          >
+                            <span
+                              className="euiToolTipAnchor"
+                              onKeyUp={[Function]}
+                              onMouseOut={[Function]}
+                              onMouseOver={[Function]}
+                            >
+                              <EuiIcon
+                                aria-label="Synchronized"
+                                color="success"
+                                onBlur={[Function]}
+                                onFocus={[Function]}
+                                size="m"
+                                tabIndex={0}
+                                type="check"
+                              >
+                                <EuiIconEmpty
+                                  aria-hidden={true}
+                                  aria-label="Synchronized"
+                                  className="euiIcon euiIcon--medium euiIcon--success euiIcon-isLoading"
+                                  focusable="true"
+                                  onBlur={[Function]}
+                                  onFocus={[Function]}
+                                  role="img"
+                                  style={null}
+                                  tabIndex={0}
+                                >
+                                  <svg
+                                    aria-hidden={true}
+                                    aria-label="Synchronized"
+                                    className="euiIcon euiIcon--medium euiIcon--success euiIcon-isLoading"
+                                    focusable="true"
+                                    height={16}
+                                    onBlur={[Function]}
+                                    onFocus={[Function]}
+                                    role="img"
+                                    style={null}
+                                    tabIndex={0}
+                                    viewBox="0 0 16 16"
+                                    width={16}
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  />
+                                </EuiIconEmpty>
+                              </EuiIcon>
+                            </span>
+                          </EuiToolTip>
+                        </EuiIconTip>
+                      </dd>
+                    </EuiDescriptionListDescription>
+                  </RenderStatus>
+                </dl>
+              </EuiDescriptionList>
+            </div>
+          </EuiFlexItem>
+          <EuiFlexItem
+            className=""
+            key="1"
+          >
+            <div
+              className="euiFlexItem"
+            >
+              <EuiDescriptionList
+                align="center"
+                textStyle="reverse"
+                type="column"
+              >
+                <dl
+                  className="euiDescriptionList euiDescriptionList--column euiDescriptionList--center euiDescriptionList--reverse"
+                >
+                  <RenderStatus
+                    key="1"
+                    node={
+                      Object {
+                        "isRestarted": true,
+                        "node": "worker1",
+                      }
+                    }
+                    statusRestart="restarting"
+                  >
+                    <EuiDescriptionListTitle>
+                      <dt
+                        className="euiDescriptionList__title"
+                      >
+                        <span
+                          className="euiToolTipAnchor"
+                        >
+                          <WzTextWithTooltipIfTruncated
+                            elementStyle={
+                              Object {
+                                "maxWidth": "85px",
+                              }
+                            }
+                          >
+                            <span
+                              style={
+                                Object {
+                                  "display": "block",
+                                  "maxWidth": "85px",
+                                  "overflow": "hidden",
+                                  "paddingBottom": "3px",
+                                  "textOverflow": "ellipsis",
+                                  "whiteSpace": "nowrap",
+                                }
+                              }
+                            />
+                          </WzTextWithTooltipIfTruncated>
+                        </span>
+                      </dt>
+                    </EuiDescriptionListTitle>
+                    <EuiDescriptionListDescription
+                      className="wz-text-left"
+                    >
+                      <dd
+                        className="euiDescriptionList__description wz-text-left"
+                      >
+                        <EuiIconTip
+                          aria-label="Synchronized"
+                          color="success"
+                          size="m"
+                          type="check"
+                        >
+                          <EuiToolTip
+                            delay="regular"
+                            position="top"
+                          >
+                            <span
+                              className="euiToolTipAnchor"
+                              onKeyUp={[Function]}
+                              onMouseOut={[Function]}
+                              onMouseOver={[Function]}
+                            >
+                              <EuiIcon
+                                aria-label="Synchronized"
+                                color="success"
+                                onBlur={[Function]}
+                                onFocus={[Function]}
+                                size="m"
+                                tabIndex={0}
+                                type="check"
+                              >
+                                <EuiIconEmpty
+                                  aria-hidden={true}
+                                  aria-label="Synchronized"
+                                  className="euiIcon euiIcon--medium euiIcon--success euiIcon-isLoading"
+                                  focusable="true"
+                                  onBlur={[Function]}
+                                  onFocus={[Function]}
+                                  role="img"
+                                  style={null}
+                                  tabIndex={0}
+                                >
+                                  <svg
+                                    aria-hidden={true}
+                                    aria-label="Synchronized"
+                                    className="euiIcon euiIcon--medium euiIcon--success euiIcon-isLoading"
+                                    focusable="true"
+                                    height={16}
+                                    onBlur={[Function]}
+                                    onFocus={[Function]}
+                                    role="img"
+                                    style={null}
+                                    tabIndex={0}
+                                    viewBox="0 0 16 16"
+                                    width={16}
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  />
+                                </EuiIconEmpty>
+                              </EuiIcon>
+                            </span>
+                          </EuiToolTip>
+                        </EuiIconTip>
+                      </dd>
+                    </EuiDescriptionListDescription>
+                  </RenderStatus>
+                </dl>
+              </EuiDescriptionList>
+            </div>
+          </EuiFlexItem>
+          <EuiFlexItem
+            className=""
+            key="2"
+          >
+            <div
+              className="euiFlexItem"
+            >
+              <EuiDescriptionList
+                align="center"
+                textStyle="reverse"
+                type="column"
+              >
+                <dl
+                  className="euiDescriptionList euiDescriptionList--column euiDescriptionList--center euiDescriptionList--reverse"
+                >
+                  <RenderStatus
+                    key="2"
+                    node={
+                      Object {
+                        "isRestarted": false,
+                        "node": "worker2",
+                      }
+                    }
+                    statusRestart="restarting"
+                  >
+                    <EuiDescriptionListTitle>
+                      <dt
+                        className="euiDescriptionList__title"
+                      >
+                        <span
+                          className="euiToolTipAnchor"
+                        >
+                          <WzTextWithTooltipIfTruncated
+                            elementStyle={
+                              Object {
+                                "maxWidth": "85px",
+                              }
+                            }
+                          >
+                            <span
+                              style={
+                                Object {
+                                  "display": "block",
+                                  "maxWidth": "85px",
+                                  "overflow": "hidden",
+                                  "paddingBottom": "3px",
+                                  "textOverflow": "ellipsis",
+                                  "whiteSpace": "nowrap",
+                                }
+                              }
+                            />
+                          </WzTextWithTooltipIfTruncated>
+                        </span>
+                      </dt>
+                    </EuiDescriptionListTitle>
+                    <EuiDescriptionListDescription
+                      className="wz-text-left"
+                    >
+                      <dd
+                        className="euiDescriptionList__description wz-text-left"
+                      >
+                        <EuiLoadingSpinner
+                          size="m"
+                        >
+                          <span
+                            className="euiLoadingSpinner euiLoadingSpinner--medium"
+                          />
+                        </EuiLoadingSpinner>
+                      </dd>
+                    </EuiDescriptionListDescription>
+                  </RenderStatus>
+                </dl>
+              </EuiDescriptionList>
+            </div>
+          </EuiFlexItem>
+        </div>
+      </EuiFlexGroup>
+    </div>
+  </RenderBodyModal>
+  ;
+</Provider>
+`;
+
+exports[`Restart status: sync_error renders correctly to match the snapshot. 1`] = `
+<Provider
+  store={
+    Object {
+      "clearActions": [Function],
+      "dispatch": [Function],
+      "getActions": [Function],
+      "getState": [Function],
+      "replaceReducer": [Function],
+      "subscribe": [Function],
+    }
+  }
+>
+  <RenderBodyModal
+    nodos={
+      Array [
+        Object {
+          "node": "nodo-master",
+          "synced": true,
+        },
+        Object {
+          "node": "worker1",
+          "synced": false,
+        },
+        Object {
+          "node": "worker2",
+          "synced": false,
+        },
+      ]
+    }
+    statusRestart="sync_error"
+  >
+    <div
+      className="wz-info-nodes-restart"
+    >
+      <EuiFlexGroup
+        direction="column"
+        wrap={true}
+      >
+        <div
+          className="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionColumn euiFlexGroup--responsive euiFlexGroup--wrap"
+        >
+          <EuiFlexItem
+            className=""
+            key="0"
+          >
+            <div
+              className="euiFlexItem"
+            >
+              <EuiDescriptionList
+                align="center"
+                textStyle="reverse"
+                type="column"
+              >
+                <dl
+                  className="euiDescriptionList euiDescriptionList--column euiDescriptionList--center euiDescriptionList--reverse"
+                >
+                  <RenderStatus
+                    key="0"
+                    node={
+                      Object {
+                        "node": "nodo-master",
+                        "synced": true,
+                      }
+                    }
+                    statusRestart="sync_error"
+                  >
+                    <EuiDescriptionListTitle>
+                      <dt
+                        className="euiDescriptionList__title"
+                      >
+                        <span
+                          className="euiToolTipAnchor"
+                        >
+                          <WzTextWithTooltipIfTruncated
+                            elementStyle={
+                              Object {
+                                "maxWidth": "85px",
+                              }
+                            }
+                          >
+                            <span
+                              style={
+                                Object {
+                                  "display": "block",
+                                  "maxWidth": "85px",
+                                  "overflow": "hidden",
+                                  "paddingBottom": "3px",
+                                  "textOverflow": "ellipsis",
+                                  "whiteSpace": "nowrap",
+                                }
+                              }
+                            />
+                          </WzTextWithTooltipIfTruncated>
+                        </span>
+                      </dt>
+                    </EuiDescriptionListTitle>
+                    <EuiDescriptionListDescription
+                      className="wz-text-left"
+                    >
+                      <dd
+                        className="euiDescriptionList__description wz-text-left"
+                      >
+                        <EuiIconTip
+                          aria-label="Synchronized"
+                          color="success"
+                          size="m"
+                          type="check"
+                        >
+                          <EuiToolTip
+                            delay="regular"
+                            position="top"
+                          >
+                            <span
+                              className="euiToolTipAnchor"
+                              onKeyUp={[Function]}
+                              onMouseOut={[Function]}
+                              onMouseOver={[Function]}
+                            >
+                              <EuiIcon
+                                aria-label="Synchronized"
+                                color="success"
+                                onBlur={[Function]}
+                                onFocus={[Function]}
+                                size="m"
+                                tabIndex={0}
+                                type="check"
+                              >
+                                <EuiIconCheck
+                                  aria-label="Synchronized"
+                                  className="euiIcon euiIcon--medium euiIcon--success"
+                                  focusable="true"
+                                  onBlur={[Function]}
+                                  onFocus={[Function]}
+                                  role="img"
+                                  style={null}
+                                  tabIndex={0}
+                                >
+                                  <svg
+                                    aria-label="Synchronized"
+                                    className="euiIcon euiIcon--medium euiIcon--success"
+                                    focusable="true"
+                                    height={16}
+                                    onBlur={[Function]}
+                                    onFocus={[Function]}
+                                    role="img"
+                                    style={null}
+                                    tabIndex={0}
+                                    viewBox="0 0 16 16"
+                                    width={16}
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <path
+                                      d="M6.5 12a.502.502 0 01-.354-.146l-4-4a.502.502 0 01.708-.708L6.5 10.793l6.646-6.647a.502.502 0 01.708.708l-7 7A.502.502 0 016.5 12"
+                                      fillRule="evenodd"
+                                    />
+                                  </svg>
+                                </EuiIconCheck>
+                              </EuiIcon>
+                            </span>
+                          </EuiToolTip>
+                        </EuiIconTip>
+                      </dd>
+                    </EuiDescriptionListDescription>
+                  </RenderStatus>
+                </dl>
+              </EuiDescriptionList>
+            </div>
+          </EuiFlexItem>
+          <EuiFlexItem
+            className=""
+            key="1"
+          >
+            <div
+              className="euiFlexItem"
+            >
+              <EuiDescriptionList
+                align="center"
+                textStyle="reverse"
+                type="column"
+              >
+                <dl
+                  className="euiDescriptionList euiDescriptionList--column euiDescriptionList--center euiDescriptionList--reverse"
+                >
+                  <RenderStatus
+                    key="1"
+                    node={
+                      Object {
+                        "node": "worker1",
+                        "synced": false,
+                      }
+                    }
+                    statusRestart="sync_error"
+                  >
+                    <EuiDescriptionListTitle>
+                      <dt
+                        className="euiDescriptionList__title"
+                      >
+                        <span
+                          className="euiToolTipAnchor"
+                        >
+                          <WzTextWithTooltipIfTruncated
+                            elementStyle={
+                              Object {
+                                "maxWidth": "85px",
+                              }
+                            }
+                          >
+                            <span
+                              style={
+                                Object {
+                                  "display": "block",
+                                  "maxWidth": "85px",
+                                  "overflow": "hidden",
+                                  "paddingBottom": "3px",
+                                  "textOverflow": "ellipsis",
+                                  "whiteSpace": "nowrap",
+                                }
+                              }
+                            />
+                          </WzTextWithTooltipIfTruncated>
+                        </span>
+                      </dt>
+                    </EuiDescriptionListTitle>
+                    <EuiDescriptionListDescription
+                      className="wz-text-left"
+                    >
+                      <dd
+                        className="euiDescriptionList__description wz-text-left"
+                      >
+                        <EuiIconTip
+                          aria-label="Unsynchronized"
+                          color="danger"
+                          size="m"
+                          type="alert"
+                        >
+                          <EuiToolTip
+                            delay="regular"
+                            position="top"
+                          >
+                            <span
+                              className="euiToolTipAnchor"
+                              onKeyUp={[Function]}
+                              onMouseOut={[Function]}
+                              onMouseOver={[Function]}
+                            >
+                              <EuiIcon
+                                aria-label="Unsynchronized"
+                                color="danger"
+                                onBlur={[Function]}
+                                onFocus={[Function]}
+                                size="m"
+                                tabIndex={0}
+                                type="alert"
+                              >
+                                <EuiIconAlert
+                                  aria-label="Unsynchronized"
+                                  className="euiIcon euiIcon--medium euiIcon--danger"
+                                  focusable="true"
+                                  onBlur={[Function]}
+                                  onFocus={[Function]}
+                                  role="img"
+                                  style={null}
+                                  tabIndex={0}
+                                >
+                                  <svg
+                                    aria-label="Unsynchronized"
+                                    className="euiIcon euiIcon--medium euiIcon--danger"
+                                    focusable="true"
+                                    height={16}
+                                    onBlur={[Function]}
+                                    onFocus={[Function]}
+                                    role="img"
+                                    style={null}
+                                    tabIndex={0}
+                                    viewBox="0 0 16 16"
+                                    width={16}
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <path
+                                      d="M7.59 10.059L7.35 5.18h1.3L8.4 10.06h-.81zm.394 1.901a.61.61 0 01-.448-.186.606.606 0 01-.186-.444c0-.174.062-.323.186-.446a.614.614 0 01.448-.184c.169 0 .315.06.44.182.124.122.186.27.186.448a.6.6 0 01-.189.446.607.607 0 01-.437.184zM2 14a1 1 0 01-.878-1.479l6-11a1 1 0 011.756 0l6 11A1 1 0 0114 14H2zm0-1h12L8 2 2 13z"
+                                      fillRule="evenodd"
+                                    />
+                                  </svg>
+                                </EuiIconAlert>
+                              </EuiIcon>
+                            </span>
+                          </EuiToolTip>
+                        </EuiIconTip>
+                      </dd>
+                    </EuiDescriptionListDescription>
+                  </RenderStatus>
+                </dl>
+              </EuiDescriptionList>
+            </div>
+          </EuiFlexItem>
+          <EuiFlexItem
+            className=""
+            key="2"
+          >
+            <div
+              className="euiFlexItem"
+            >
+              <EuiDescriptionList
+                align="center"
+                textStyle="reverse"
+                type="column"
+              >
+                <dl
+                  className="euiDescriptionList euiDescriptionList--column euiDescriptionList--center euiDescriptionList--reverse"
+                >
+                  <RenderStatus
+                    key="2"
+                    node={
+                      Object {
+                        "node": "worker2",
+                        "synced": false,
+                      }
+                    }
+                    statusRestart="sync_error"
+                  >
+                    <EuiDescriptionListTitle>
+                      <dt
+                        className="euiDescriptionList__title"
+                      >
+                        <span
+                          className="euiToolTipAnchor"
+                        >
+                          <WzTextWithTooltipIfTruncated
+                            elementStyle={
+                              Object {
+                                "maxWidth": "85px",
+                              }
+                            }
+                          >
+                            <span
+                              style={
+                                Object {
+                                  "display": "block",
+                                  "maxWidth": "85px",
+                                  "overflow": "hidden",
+                                  "paddingBottom": "3px",
+                                  "textOverflow": "ellipsis",
+                                  "whiteSpace": "nowrap",
+                                }
+                              }
+                            />
+                          </WzTextWithTooltipIfTruncated>
+                        </span>
+                      </dt>
+                    </EuiDescriptionListTitle>
+                    <EuiDescriptionListDescription
+                      className="wz-text-left"
+                    >
+                      <dd
+                        className="euiDescriptionList__description wz-text-left"
+                      >
+                        <EuiIconTip
+                          aria-label="Unsynchronized"
+                          color="danger"
+                          size="m"
+                          type="alert"
+                        >
+                          <EuiToolTip
+                            delay="regular"
+                            position="top"
+                          >
+                            <span
+                              className="euiToolTipAnchor"
+                              onKeyUp={[Function]}
+                              onMouseOut={[Function]}
+                              onMouseOver={[Function]}
+                            >
+                              <EuiIcon
+                                aria-label="Unsynchronized"
+                                color="danger"
+                                onBlur={[Function]}
+                                onFocus={[Function]}
+                                size="m"
+                                tabIndex={0}
+                                type="alert"
+                              >
+                                <EuiIconAlert
+                                  aria-label="Unsynchronized"
+                                  className="euiIcon euiIcon--medium euiIcon--danger"
+                                  focusable="true"
+                                  onBlur={[Function]}
+                                  onFocus={[Function]}
+                                  role="img"
+                                  style={null}
+                                  tabIndex={0}
+                                >
+                                  <svg
+                                    aria-label="Unsynchronized"
+                                    className="euiIcon euiIcon--medium euiIcon--danger"
+                                    focusable="true"
+                                    height={16}
+                                    onBlur={[Function]}
+                                    onFocus={[Function]}
+                                    role="img"
+                                    style={null}
+                                    tabIndex={0}
+                                    viewBox="0 0 16 16"
+                                    width={16}
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <path
+                                      d="M7.59 10.059L7.35 5.18h1.3L8.4 10.06h-.81zm.394 1.901a.61.61 0 01-.448-.186.606.606 0 01-.186-.444c0-.174.062-.323.186-.446a.614.614 0 01.448-.184c.169 0 .315.06.44.182.124.122.186.27.186.448a.6.6 0 01-.189.446.607.607 0 01-.437.184zM2 14a1 1 0 01-.878-1.479l6-11a1 1 0 011.756 0l6 11A1 1 0 0114 14H2zm0-1h12L8 2 2 13z"
+                                      fillRule="evenodd"
+                                    />
+                                  </svg>
+                                </EuiIconAlert>
+                              </EuiIcon>
+                            </span>
+                          </EuiToolTip>
+                        </EuiIconTip>
+                      </dd>
+                    </EuiDescriptionListDescription>
+                  </RenderStatus>
+                </dl>
+              </EuiDescriptionList>
+            </div>
+          </EuiFlexItem>
+        </div>
+      </EuiFlexGroup>
+    </div>
+  </RenderBodyModal>
+  ;
+</Provider>
+`;
+
+exports[`Restart status: syncing renders correctly to match the snapshot. 1`] = `
+<Provider
+  store={
+    Object {
+      "clearActions": [Function],
+      "dispatch": [Function],
+      "getActions": [Function],
+      "getState": [Function],
+      "replaceReducer": [Function],
+      "subscribe": [Function],
+    }
+  }
+>
+  <RenderBodyModal
+    nodos={
+      Array [
+        Object {
+          "node": "nodo-master",
+          "synced": true,
+        },
+        Object {
+          "node": "worker1",
+          "synced": false,
+        },
+        Object {
+          "node": "worker2",
+          "synced": false,
+        },
+      ]
+    }
+    statusRestart="syncing"
+  >
+    <div
+      className="wz-info-nodes-restart"
+    >
+      <EuiFlexGroup
+        direction="column"
+        wrap={true}
+      >
+        <div
+          className="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionColumn euiFlexGroup--responsive euiFlexGroup--wrap"
+        >
+          <EuiFlexItem
+            className=""
+            key="0"
+          >
+            <div
+              className="euiFlexItem"
+            >
+              <EuiDescriptionList
+                align="center"
+                textStyle="reverse"
+                type="column"
+              >
+                <dl
+                  className="euiDescriptionList euiDescriptionList--column euiDescriptionList--center euiDescriptionList--reverse"
+                >
+                  <RenderStatus
+                    key="0"
+                    node={
+                      Object {
+                        "node": "nodo-master",
+                        "synced": true,
+                      }
+                    }
+                    statusRestart="syncing"
+                  >
+                    <EuiDescriptionListTitle>
+                      <dt
+                        className="euiDescriptionList__title"
+                      >
+                        <span
+                          className="euiToolTipAnchor"
+                        >
+                          <WzTextWithTooltipIfTruncated
+                            elementStyle={
+                              Object {
+                                "maxWidth": "85px",
+                              }
+                            }
+                          >
+                            <span
+                              style={
+                                Object {
+                                  "display": "block",
+                                  "maxWidth": "85px",
+                                  "overflow": "hidden",
+                                  "paddingBottom": "3px",
+                                  "textOverflow": "ellipsis",
+                                  "whiteSpace": "nowrap",
+                                }
+                              }
+                            />
+                          </WzTextWithTooltipIfTruncated>
+                        </span>
+                      </dt>
+                    </EuiDescriptionListTitle>
+                    <EuiDescriptionListDescription
+                      className="wz-text-left"
+                    >
+                      <dd
+                        className="euiDescriptionList__description wz-text-left"
+                      >
+                        <EuiIconTip
+                          aria-label="Success"
+                          color="success"
+                          size="m"
+                          type="check"
+                        >
+                          <EuiToolTip
+                            delay="regular"
+                            position="top"
+                          >
+                            <span
+                              className="euiToolTipAnchor"
+                              onKeyUp={[Function]}
+                              onMouseOut={[Function]}
+                              onMouseOver={[Function]}
+                            >
+                              <EuiIcon
+                                aria-label="Success"
+                                color="success"
+                                onBlur={[Function]}
+                                onFocus={[Function]}
+                                size="m"
+                                tabIndex={0}
+                                type="check"
+                              >
+                                <EuiIconCheck
+                                  aria-label="Success"
+                                  className="euiIcon euiIcon--medium euiIcon--success"
+                                  focusable="true"
+                                  onBlur={[Function]}
+                                  onFocus={[Function]}
+                                  role="img"
+                                  style={null}
+                                  tabIndex={0}
+                                >
+                                  <svg
+                                    aria-label="Success"
+                                    className="euiIcon euiIcon--medium euiIcon--success"
+                                    focusable="true"
+                                    height={16}
+                                    onBlur={[Function]}
+                                    onFocus={[Function]}
+                                    role="img"
+                                    style={null}
+                                    tabIndex={0}
+                                    viewBox="0 0 16 16"
+                                    width={16}
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <path
+                                      d="M6.5 12a.502.502 0 01-.354-.146l-4-4a.502.502 0 01.708-.708L6.5 10.793l6.646-6.647a.502.502 0 01.708.708l-7 7A.502.502 0 016.5 12"
+                                      fillRule="evenodd"
+                                    />
+                                  </svg>
+                                </EuiIconCheck>
+                              </EuiIcon>
+                            </span>
+                          </EuiToolTip>
+                        </EuiIconTip>
+                      </dd>
+                    </EuiDescriptionListDescription>
+                  </RenderStatus>
+                </dl>
+              </EuiDescriptionList>
+            </div>
+          </EuiFlexItem>
+          <EuiFlexItem
+            className=""
+            key="1"
+          >
+            <div
+              className="euiFlexItem"
+            >
+              <EuiDescriptionList
+                align="center"
+                textStyle="reverse"
+                type="column"
+              >
+                <dl
+                  className="euiDescriptionList euiDescriptionList--column euiDescriptionList--center euiDescriptionList--reverse"
+                >
+                  <RenderStatus
+                    key="1"
+                    node={
+                      Object {
+                        "node": "worker1",
+                        "synced": false,
+                      }
+                    }
+                    statusRestart="syncing"
+                  >
+                    <EuiDescriptionListTitle>
+                      <dt
+                        className="euiDescriptionList__title"
+                      >
+                        <span
+                          className="euiToolTipAnchor"
+                        >
+                          <WzTextWithTooltipIfTruncated
+                            elementStyle={
+                              Object {
+                                "maxWidth": "85px",
+                              }
+                            }
+                          >
+                            <span
+                              style={
+                                Object {
+                                  "display": "block",
+                                  "maxWidth": "85px",
+                                  "overflow": "hidden",
+                                  "paddingBottom": "3px",
+                                  "textOverflow": "ellipsis",
+                                  "whiteSpace": "nowrap",
+                                }
+                              }
+                            />
+                          </WzTextWithTooltipIfTruncated>
+                        </span>
+                      </dt>
+                    </EuiDescriptionListTitle>
+                    <EuiDescriptionListDescription
+                      className="wz-text-left"
+                    >
+                      <dd
+                        className="euiDescriptionList__description wz-text-left"
+                      >
+                        <EuiLoadingSpinner
+                          size="m"
+                        >
+                          <span
+                            className="euiLoadingSpinner euiLoadingSpinner--medium"
+                          />
+                        </EuiLoadingSpinner>
+                      </dd>
+                    </EuiDescriptionListDescription>
+                  </RenderStatus>
+                </dl>
+              </EuiDescriptionList>
+            </div>
+          </EuiFlexItem>
+          <EuiFlexItem
+            className=""
+            key="2"
+          >
+            <div
+              className="euiFlexItem"
+            >
+              <EuiDescriptionList
+                align="center"
+                textStyle="reverse"
+                type="column"
+              >
+                <dl
+                  className="euiDescriptionList euiDescriptionList--column euiDescriptionList--center euiDescriptionList--reverse"
+                >
+                  <RenderStatus
+                    key="2"
+                    node={
+                      Object {
+                        "node": "worker2",
+                        "synced": false,
+                      }
+                    }
+                    statusRestart="syncing"
+                  >
+                    <EuiDescriptionListTitle>
+                      <dt
+                        className="euiDescriptionList__title"
+                      >
+                        <span
+                          className="euiToolTipAnchor"
+                        >
+                          <WzTextWithTooltipIfTruncated
+                            elementStyle={
+                              Object {
+                                "maxWidth": "85px",
+                              }
+                            }
+                          >
+                            <span
+                              style={
+                                Object {
+                                  "display": "block",
+                                  "maxWidth": "85px",
+                                  "overflow": "hidden",
+                                  "paddingBottom": "3px",
+                                  "textOverflow": "ellipsis",
+                                  "whiteSpace": "nowrap",
+                                }
+                              }
+                            />
+                          </WzTextWithTooltipIfTruncated>
+                        </span>
+                      </dt>
+                    </EuiDescriptionListTitle>
+                    <EuiDescriptionListDescription
+                      className="wz-text-left"
+                    >
+                      <dd
+                        className="euiDescriptionList__description wz-text-left"
+                      >
+                        <EuiLoadingSpinner
+                          size="m"
+                        >
+                          <span
+                            className="euiLoadingSpinner euiLoadingSpinner--medium"
+                          />
+                        </EuiLoadingSpinner>
+                      </dd>
+                    </EuiDescriptionListDescription>
+                  </RenderStatus>
+                </dl>
+              </EuiDescriptionList>
+            </div>
+          </EuiFlexItem>
+        </div>
+      </EuiFlexGroup>
+    </div>
+  </RenderBodyModal>
+</Provider>
+`;
