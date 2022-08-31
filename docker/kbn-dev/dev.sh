@@ -8,22 +8,14 @@ elastic_versions=(
 	'7.16.2'
 	'7.16.3'
 	'7.17.0'
-	'7.17.1'
-	'7.17.2'
-	'7.17.3'
 	'7.17.4'
+	'7.17.5'
 	'8.0.0'
-	'8.0.1'
 	'8.1.0'
-	'8.1.1'
-	'8.1.2'
-	'8.1.3'
-	'8.2.0'
 	'8.2.1'
-	'8.2.2'
 	'8.2.3'
-	'8.2.4'
-	'8.2.5'
+	'8.3.0'
+	'8.3.1'
 )
 
 
@@ -70,13 +62,13 @@ export COMPOSE_PROJECT_NAME=es-dev-${ES_VERSION}
 
 case "$3" in
 	up)
-		docker compose  -f dev.yml up -Vd
+		docker compose -f dev.yml up -Vd
 		;;
 	down)
-		docker compose  -f dev.yml down -v --remove-orphans
+		docker compose -f dev.yml down -v --remove-orphans
 		;;
 	stop)
-		docker compose  -f dev.yml stop
+		docker compose -f dev.yml stop
 		;;
 	*)
 		echo "Action must be up | down | stop: "

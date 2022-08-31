@@ -15,7 +15,7 @@ services:
       - es-dev
       - mon
     command:
-      - '--es.uri=https://kibana_system:SecretPassowrd@es01:9200'
+      - '--es.uri=https://kibana_system:SecretPassword@es01:9200'
       - '--es.ssl-skip-verify'
       - '--es.all'
 
