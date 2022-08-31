@@ -82,7 +82,6 @@ class WzConfigurationSetting extends Component {
 WzConfigurationSetting.propTypes = {
   keyItem: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
-  // value: PropTypes.string
 };
 
 export default WzConfigurationSetting;
