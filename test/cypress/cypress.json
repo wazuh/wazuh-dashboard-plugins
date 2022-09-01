@@ -3,7 +3,7 @@
   "testFiles": ["**/*.{feature,features}"],
   "defaultCommandTimeout": 40000,
   "viewportWidth": 1400,
-  "viewportHeight": 1000,
+  "viewportHeight": 1500,
   "reporter": "mochawesome",
   "watchForFileChanges": false,
   "numTestsKeptInMemory": 0,

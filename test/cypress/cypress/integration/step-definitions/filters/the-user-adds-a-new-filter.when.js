@@ -7,18 +7,32 @@ const filterOperatorList = getSelector('filterOperatorList', pageName);
 const filterParams = getSelector('filterParams', pageName);
 const saveFilterButton = getSelector('saveFilterButton', pageName);
 const selectedOperator = getSelector('selectedOperator', pageName);
+const SelectedOperatorIs = getSelector('SelectedOperatorIs', pageName);
 const operatorList = getSelector('operatorList', pageName);
+const filterCard = getSelector('filterCard', pageName);
+const filterOperatorListObject = getSelector('filterOperatorListObject', pageName);
+
 
 When('The user adds a new filter', () => {
+  debugger
+  //+ Add Filter
   elementIsVisible(addFilterButton);
   clickElement(addFilterButton);
+
+  //Card
+  elementIsVisible(filterCard);
+
+  elementIsVisible(filterSuggestionList);
   fillField(filterSuggestionList,'rule.level');
   forceEnter(filterSuggestionList);
+  elementIsVisible(filterOperatorList);
   forceClickElement(filterOperatorList);
-  cy.wait(1000);
+  cy.wait(100);
   elementIsVisible(operatorList);
-  cy.wait(1000);
-  forceClickElement(selectedOperator);
+  elementIsVisible(filterOperatorListObject);
+  cy.wait(150);
+  // forceClickElement(SelectedOperatorIs);
+  cy.get(SelectedOperatorIs).click({force:true});
   elementIsVisible(filterParams);
   clickElement(filterParams);
   fillField(filterParams,'7')

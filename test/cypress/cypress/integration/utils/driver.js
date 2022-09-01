@@ -15,6 +15,10 @@ export const forceClickElement = (cssSelector) => {
   return this;
 };
 
+export const clickElementByContains = (selector, label) => {
+  return cy.contains(selector,label).click();
+};
+
 export const forceCheckElement = (selector) => {
   getElement(selector).check({ force: true })
   return this;

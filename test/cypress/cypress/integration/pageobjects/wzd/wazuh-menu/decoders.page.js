@@ -4,6 +4,7 @@ export const DECODERS_PAGE = {
   dropdownPaginationSelector: '[data-test-subj="tablePaginationPopoverButton"]',
   listPages: 'nav[class="euiPagination"]',
   customDecodersButtonSelector: '[data-test-subj="Custom decoders"]',
+  // customDecodersButtonSelector: '.euiToggle__input',
   manageDecodersFilesButtonSelector: ':nth-child(3) > .euiButtonEmpty > .euiButtonContent',
   editDecoderButtonSelector: '.euiTableCellContent > div > :nth-child(1) > .euiButtonIcon',
   saveDecoderButtonSelector: '.euiFlexGroup .euiFlexItem button.euiButton span.euiButtonContent span.euiButton__text:contains("Save")',
