@@ -1,0 +1,20 @@
+{
+  "CN": "HOST",
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [
+  {
+    "C": "US",
+    "L": "California",
+    "O": "Wazuh",
+    "OU": "Wazuh",
+    "ST": "United States"
+  }
+  ],
+  "hosts": [
+    "HOST",
+    "localhost"
+  ]
+}

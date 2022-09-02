@@ -17,6 +17,6 @@ output.elasticsearch:
   username: 'elastic'
   password: 'SecretPassword'
   ssl.verification_mode: full
-  ssl.certificate_authorities: ['/etc/ssl/wazuh/ca/ca.crt']
-  ssl.certificate: '/etc/ssl/wazuh/wazuh.manager.crt'
-  ssl.key: '/etc/ssl/wazuh/wazuh.manager.key'
+  ssl.certificate_authorities: ['/etc/ssl/wazuh/ca.pem']
+  ssl.certificate: '/etc/ssl/wazuh/filebeat.pem'
+  ssl.key: '/etc/ssl/wazuh/filebeat-key.pem'
