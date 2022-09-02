@@ -3,7 +3,7 @@
 Install [Docker Desktop][0] as per its instructions, available for Windows, Mac 
 and Linux (Ubuntu, Debian & Fedora).
 This ensures that the development experience between Linux, Mac and Windows is as
-similar as posible.
+similar as possible.
 
 > IMPORTANT: be methodic during the installation of Docker Desktop, and proceed
 step by step as described in their documentation. Make sure that your system
@@ -11,7 +11,7 @@ meets the system requirements before installing Docker Desktop, and read any
 post-installation note, specially on Linux: [Differences between 
 Docker Desktop for Linux and Docker Engine](https://docs.docker.com/desktop/install/linux-install/#differences-between-docker-desktop-for-linux-and-docker-engine)
 
-In general the environment consist of:
+In general, the environment consist of:
 
 - Lightweight monitoring stack based on [Grafana][1], [Loki][2] and [Prometheus][3].
 - Dockerized development environments.
@@ -29,58 +29,58 @@ required branch (4.x-7.16, 4.x-wzd, ...). My recommendation is:
 
  1. Create the `devel` network:
 
-	```bash
-	docker network create devel
-	```
+    ```bash
+    docker network create devel
+    ```
 
  2. Create the `mon` network:
 
-	```bash
-	docker network create mon
-	```
+    ```bash
+    docker network create mon
+    ```
 
  3. Install the Docker driver Loki, from [Grafana][1], used to read logs from 
  the containers:
 
-	```bash
-	docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all-permissions
-	```
+    ```bash
+    docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all-permissions
+    ```
  4. Assign resources to [Docker Desktop][0]. The requirements for the 
  environments are:
-	- 8 GB of RAM (minimum)
-	- 4 cores
+    - 8 GB of RAM (minimum)
+    - 4 cores
 
     The more resources the better ☺
  
  5. Save the path to the Wazuh App code as an environment variable, by exporting
- this path on your `.bashrc`, `.zhsrc` or similiar.
+ this path on your `.bashrc`, `.zhsrc` or similar.
 
-	```bash
-	# ./bashrc
-	export WZ_HOME=~/your/path/to/wazuh_kibana_app
-	```
-	Save and restart your terminal to take the changes. Check that is works with:
+    ```bash
+    # ./bashrc
+    export WZ_HOME=~/your/path/to/wazuh_kibana_app
+    ```
+    Save and re-login or restart your terminal to apply the changes. Test that the variable has been set with:
 
-	```bash
-	echo $WZ_HOME
-	```
+    ```bash
+    echo $WZ_HOME
+    ```
 
  6. Set up user permissions
 
-	The Docker volumes will be created by the internal Docker user, making them
-	read-only. To prevent this, a new group named `docker-desktop` and GUID 100999 
-	needs to be created, then added to your user and the source code folder:
+    The Docker volumes will be created by the internal Docker user, making them
+    read-only. To prevent this, a new group named `docker-desktop` and GUID 100999 
+    needs to be created, then added to your user and the source code folder:
 
-	```bash
-	sudo groupadd -g 100999 docker-desktop
-	sudo useradd -u 100999 -g 100999 -M docker-desktop
-	sudo chown -R $USER:docker-desktop $WZ_HOME
-	sudo usermod -aG docker-desktop $USER
-	```
+    ```bash
+    sudo groupadd -g 100999 docker-desktop
+    sudo useradd -u 100999 -g 100999 -M docker-desktop
+    sudo chown -R $USER:docker-desktop $WZ_HOME
+    sudo usermod -aG docker-desktop $USER
+    ```
 
 ## Understanding Docker contexts
 
-Before we beggin starting Docker containers, we need to understand the 
+Before we begin starting Docker containers, we need to understand the 
 differences between Docker Engine and Docker Desktop, more precisely, that the 
 use different contexts.
 
@@ -126,10 +126,10 @@ image in the future.
 ## Logging
 
 Docker can write the container logs into a [Grafana Loki][2] instance using
-the apropriate driver.
+the appropriate driver.
 
 The environments are designed to use this driver, to work with them,
-install the driver as described on the step 3 of [Pre-reqiusites](#pre-requisites).
+install the driver as described on the step 3 of [Prerequisites](#pre-requisites).
 
 ## Images
 
@@ -139,12 +139,12 @@ for Kibana and OpenSearch Dashboards.
 
 These images can be downloaded from the [quay.io/wazuh][4] registry.
 
-If you want to build an image, we recommend to use a npm cache server
+If you want to build an image, we recommend using a NPM cache server,
 so the download of node modules from the network only happens once
 while developing the image.
 
 
-To start the npm cache server:
+To start the NPM cache server:
 
 ```bash
 cd cache
@@ -170,10 +170,10 @@ in the directory, and adapt it to the new version.
 Folder: [mon/](./mon/)
 
 This will bring up a [Grafana](https://grafana.com/) stack to collect
-logs and metrics from the containers. Also this will create the `mon`
+logs and metrics from the containers. Also, this will create the `mon`
 network, which will be needed by the other environments.
 
-If you don´t want to bring up this environment, be sure to create the
+If you don't want to bring up this environment, be sure to create the
 `mon` network as it is required by other docker compose and scripts.
 
 
@@ -182,7 +182,7 @@ If you don´t want to bring up this environment, be sure to create the
 Folder: [osd-dev](./osd-dev/)
 
 This will bring up a development environment for Wazuh using the given
-opensearch and opensearch-dashboards versions.
+OpenSearch and OpenSearch-Dashboards versions.
 
 ### **knb-dev** - Kibana 7.X & Kibana 8.X development environment
 
@@ -195,7 +195,7 @@ Kibana development container versions of the 7 series and 8 series.
 
 Folder: [wazuh-4.3-es](./wazuh-4.3-es)
 
-Within this folder there are two scripts:
+Within this folder, there are two scripts:
 
  - `rel.sh` brings up released versions
  - `pre.sh` brings up unreleased versions
@@ -204,7 +204,7 @@ Within this folder there are two scripts:
 
 Folder: [wazuh-4.3-wz](./wazuh-4.3-wz)
 
-Within this folder there are two scripts:
+Within this folder, there are two scripts:
 
  - `rel.sh` brings up released versions
  - `pre.sh` brings up unreleased versions
@@ -225,6 +225,15 @@ Folder: [wazuh-3.13.X-es](./wazuh-3.13.X-es)
 
 Folder: [wazuh-3.13.X-od](./wazuh-3.13.X-od)
 
+
+## Troubleshooting
+
+1. Error pulling Docker image from Quay.io
+```
+error getting credentials - err: exit status 1, out: `error getting credentials - err: exit status 1, out: `no usernames for quay.io``
+```
+
+**Solution:** pull the image manually from [Quay][4] and try again.
 
 [0]: <https://docs.docker.com/get-docker/> "Docker Desktop"
 [1]: <https://grafana.com/> "Grafana"
