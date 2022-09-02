@@ -153,8 +153,6 @@ services:
       - certs:/usr/share/wazuh-dashboard/certs
       - ./config/wazuh_dashboard/opensearch_dashboards.yml:/usr/share/wazuh-dashboard/config/opensearch_dashboards.yml
       - ./config/wazuh_dashboard/wazuh.yml:/usr/share/wazuh-dashboard/data/wazuh/config/wazuh.yml
-    depends_on:
-      - wazuh.indexer
 
   exporter:
     image: quay.io/prometheuscommunity/elasticsearch-exporter:latest
