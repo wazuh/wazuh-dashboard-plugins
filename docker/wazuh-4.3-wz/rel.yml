@@ -77,7 +77,7 @@ services:
       - INDEXER_USERNAME=admin
       - INDEXER_PASSWORD=SecretPassword
       - FILEBEAT_SSL_VERIFICATION_MODE=full
-      - SSL_CERTIFICATE_AUTHORITIES=/etc/ssl/wazuh/root-ca.pem
+      - SSL_CERTIFICATE_AUTHORITIES=/etc/ssl/wazuh/ca.pem
       - SSL_CERTIFICATE=/etc/ssl/wazuh/filebeat.pem
       - SSL_KEY=/etc/ssl/wazuh/filebeat.key
       - API_USERNAME=wazuh-wui
