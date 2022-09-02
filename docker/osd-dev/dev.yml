@@ -113,7 +113,9 @@ services:
     volumes:
       - certs:/usr/share/opensearch/config/certs/
       - ./config/os/opensearch.yml:/usr/share/opensearch/config/opensearch.yml
-      - ./config/os/internal_users.yml:/usr/share/opensearch/config/internal_users.yml
+      - ./config/os/internal_users.yml:/usr/share/opensearch/plugins/opensearch-security/securityconfig/internal_users.yml
+      - ./config/os/roles_mapping.yml:/usr/share/opensearch/plugins/opensearch-security/securityconfig/roles_mapping.yml
+      - ./config/os/roles.yml:/usr/share/opensearch/plugins/opensearch-security/securityconfig/roles.yml  
       - os_logs:/var/log/os1
       - os_data:/var/lib/os1
     networks:

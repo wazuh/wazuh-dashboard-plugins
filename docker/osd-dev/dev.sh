@@ -1,16 +1,13 @@
 #!/bin/bash
 
-
 os_versions=(
 	'1.2.4'
 	'2.0.0'
-	'2.0.1'
 )
 
 osd_versions=(
 	'1.2.0'
 	'2.0.0'
-	'2.0.1'
 )
 
 usage() {
@@ -63,13 +60,13 @@ export COMPOSE_PROJECT_NAME=os-dev
 
 case "$4" in
 	up)
-		docker compose  -f dev.yml up -Vd
+		docker compose -f dev.yml up -Vd
 		;;
 	down)
-		docker compose  -f dev.yml down -v --remove-orphans
+		docker compose -f dev.yml down -v --remove-orphans
 		;;
 	stop)
-		docker compose  -f dev.yml  -p os-dev stop
+		docker compose -f dev.yml -p os-dev stop
 		;;
 	*)
 		echo "Action must be up | down | stop: "

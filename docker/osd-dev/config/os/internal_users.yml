@@ -8,10 +8,28 @@ _meta:
 
 # Define your internal users here
 
+wazuh_admin:
+  hash: "$2y$12$d2awHiOYvZjI88VfsDON.u6buoBol0gYPJEgdG1ArKVE0OMxViFfu"
+  reserved: true
+  hidden: false
+  backend_roles: []
+  attributes: {}
+  opendistro_security_roles: [ "wazuh_ui_admin" ]
+  static: false
+  
+wazuh_user:
+  hash: "$2y$12$BQixeoQdRubZdVf/7sq1suHwiVRnSst1.lPI2M0.GPZms4bq2D9vO"
+  reserved: true
+  hidden: false
+  backend_roles: []
+  attributes: {}
+  opendistro_security_roles: [ "wazuh_ui_user" ]
+  static: false  
+
 ## Demo users
 
 admin:
-  hash: "$2y$12$K/SpwjtB.wOHJ/Nc6GVRDuc1h0rM1DfvziFRNPtk27P.c4yDr9njO"
+  hash: "$2a$12$VcCDgh2NDk07JGN0rjGbM.Ad41qVR/YFJcgHp0UGns5JDymv..TOG"
   reserved: true
   backend_roles:
   - "admin"
