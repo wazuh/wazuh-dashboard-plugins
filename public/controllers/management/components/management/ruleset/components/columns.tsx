@@ -11,7 +11,6 @@ import { UIErrorLog } from '../../../../../../react-services/error-orchestrator/
 import { getErrorOptions } from '../../common/error-helper';
 
 export default class RulesetColumns {
-  props: any;
   constructor(props) {
     this.props = props;
 
@@ -96,7 +95,7 @@ export default class RulesetColumns {
                       const file = { name: value, content: result, path: item.relative_dirname };
                       this.props.updateFileContent(file);
                     }catch(error){
-                      const options: UIErrorLog = this.getErrorOptions(
+                      const options: UIErrorLog = getErrorOptions(
                         error,
                         'Rules.readFileContent'
                       );
@@ -143,7 +142,7 @@ export default class RulesetColumns {
                         const file = { name: item.filename, content: result, path: item.relative_dirname };
                         this.props.updateFileContent(file);
                       }catch(error){
-                        const options: UIErrorLog = this.getErrorOptions(
+                        const options: UIErrorLog = getErrorOptions(
                           error,
                           'Files.readFileContent'
                         );
@@ -165,12 +164,12 @@ export default class RulesetColumns {
                       onClick={async ev => {
                         try {
                           ev.stopPropagation();
-                          const rulesetHandler = new RulesetHandler(this.props.state.section);
-                          const result = await rulesetHandler.getFileContent(item.filename);
+                          const resourcesHandler = new ResourcesHandler(ResourcesConstants.RULES);
+                          const result = await resourcesHandler.getFileContent(item.filename);
                           const file = { name: item.filename, content: result, path: item.relative_dirname };
                           this.props.updateFileContent(file);
                         } catch (error) {
-                          const options: UIErrorLog = this.getErrorOptions(
+                          const options: UIErrorLog = getErrorOptions(
                             error,
                             'Files.editFileContent'
                           );
@@ -185,25 +184,11 @@ export default class RulesetColumns {
                       tooltip={{ position: 'top', content: `Remove ${item.filename} file` }}
                       aria-label="Delete file"
                       iconType="trash"
-                      tooltip={{ position: 'top', content: `Remove ${item.filename} file` }}
-                      onClick={ev => {
-                        try{
-                          ev.stopPropagation();
-                          this.props.updateListItemsForRemove([item]);
-                          this.props.updateShowModal(true);
-                        }catch(error){
-                          const options: UIErrorLog = this.getErrorOptions(
-                            error,
-                            'Files.deleteFile'
-                          );
-                          getErrorOrchestrator().handleError(options);
-                        }
-                      }}
                       onConfirm={async () => {
                         try {
                           this.props.removeItems([item]);
                         } catch (error) {
-                          const options: UIErrorLog = this.getErrorOptions(
+                          const options: UIErrorLog = getErrorOptions(
                             error,
                             'Files.deleteFile'
                           );
@@ -257,26 +242,6 @@ export default class RulesetColumns {
     };
 
     this.buildColumns();
-  }
-
-  /**
-   * Build and return a new error options object, based on the actual error
-   * and the context
-   * @param error raised error
-   * @param context context of the error
-   * @returns a dictionary with the error details for the ErrorOrchestator
-   */
-  private getErrorOptions(error: unknown, context: string): UIErrorLog {
-    return {
-      context: context,
-      level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
-      severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
-      error: {
-        error: error,
-        message: error.message || error,
-        title: error.name,
-      },
-    };
   }
 
   buildComplianceBadges(item) {
