@@ -16,7 +16,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
-- Wazuh.yml review: fixed link to web documentation, improved in-file documentation and fixed some grammatical errors. [#4378](https://github.com/wazuh/wazuh-kibana-app/pull/4378)
+- Wazuh.yml review: fixed link to web documentation, improved in-file documentation and fixed some grammatical errors. [#4378](https://github.com/wazuh/wazuh-kibana-app/pull/4378) [#4399](https://github.com/wazuh/wazuh-kibana-app/pull/4399) 
 - Fixed an error during the generation of a group's report, if the request to the Wazuh API fails [#4350](https://github.com/wazuh/wazuh-kibana-app/pull/4350)
 - Fixed a problem with the group's report, when the group has no agents [#4350](https://github.com/wazuh/wazuh-kibana-app/pull/4350)
 - Fixed path in logo customization section [#4352](https://github.com/wazuh/wazuh-kibana-app/pull/4352)
@@ -24,6 +24,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed an error of an undefined username hash related to reporting when using Kibana with X-Pack and security was disabled [#4358](https://github.com/wazuh/wazuh-kibana-app/pull/4358)
 - Fixed persistence of the plugin registry file between updates [#4359](https://github.com/wazuh/wazuh-kibana-app/pull/4359)
 - Fixed searchbar error on SCA Inventory table [#4367](https://github.com/wazuh/wazuh-kibana-app/pull/4367)
+- Fixed a routes loop when reinstalling Wazuh indexer [#4373](https://github.com/wazuh/wazuh-kibana-app/pull/4373)
 
 # Removed
 
@@ -78,7 +79,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Replaced the visualization of `Status` panel in `Agents` [#4166](https://github.com/wazuh/wazuh-kibana-app/pull/4166) [#4196](https://github.com/wazuh/wazuh-kibana-app/pull/4196)
 - Replaced the visualization of policy in `Modules/Security configuration assessment/Inventory` [#4166](https://github.com/wazuh/wazuh-kibana-app/pull/4166)
-- Consistency in the colors and labels used for the agent status [#4166](https://github.com/wazuh/wazuh-kibana-app/pull/4166)
+- Consistency in the colors and labels used for the agent status [#4166](https://github.com/wazuh/wazuh-kibana-app/pull/4166) [#4199](https://github.com/wazuh/wazuh-kibana-app/issues/4199)
 - Replaced how the full and partial scan dates are displayed in the `Details` panel of `Vulnerabilities/Inventory` [#4169](https://github.com/wazuh/wazuh-kibana-app/pull/4169)
 
 ### Fixed
