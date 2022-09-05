@@ -7,14 +7,14 @@ When('The user {} sample data for', (status,types) => {
   let titleStatus = 'added'
   let buttonLabel = 'Remove data'
   if(status != 'adds'){titleStatus =  'removed'; buttonLabel = 'Add data';}
-  cy.log(titleStatus)
-  cy.log(buttonLabel)
+  // cy.log(titleStatus)
+  // cy.log(buttonLabel)
   types.raw().forEach((sample) => {
-    cy.get(getSelector(sample, SAMPLE_DATA), { timeout: 9000 })
+    cy.get(getSelector(sample, SAMPLE_DATA), { timeout: 15000 })
     forceClickElement(getSelector(sample, SAMPLE_DATA));
     cy.wait(500);
-    cy.get(getSelector(sample, SAMPLE_DATA), { timeout: 9000 }).should('have.text',buttonLabel)
-    cy.get(toastLocatorTitle, { timeout: 8000 })
+    cy.get(getSelector(sample, SAMPLE_DATA), { timeout: 15000 }).should('have.text',buttonLabel)
+    cy.get(toastLocatorTitle, { timeout: 15000 })
       .then(($) => {
         const texts = $.map((i, el) => Cypress.$(el).text().replace('A new notification appears').replace('Date range for sample data is now-7 days ago'))
         const paragraphs = texts.get()
