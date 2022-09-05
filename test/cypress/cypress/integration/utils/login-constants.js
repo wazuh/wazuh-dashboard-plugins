@@ -15,5 +15,5 @@ export const ODFE_USERNAME = 'admin';
 export const OVERVIEW_URL = '/overview/';
 export const XPACK_PASSWORD = 'elastic';
 export const XPACK_USERNAME = 'elastic';
-export const WZD_PASSWORD = 'SecretPassword';
+export const WZD_PASSWORD = 'C?8*piTX5lVe*Ib+I7NhMHzpOW8UMyqp'; //'SecretPassword';
 export const WZD_USERNAME = 'admin';

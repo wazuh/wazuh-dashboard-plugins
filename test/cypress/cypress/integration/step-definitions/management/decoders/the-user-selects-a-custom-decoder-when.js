@@ -1,6 +1,6 @@
 import { When } from 'cypress-cucumber-preprocessor/steps';
 import { clickElement, elementIsVisible, getSelector } from '../../../utils/driver';
-import { DECODERS_PAGE as pageName} from '../../../utils/pages-constants';
+import { DECODERS_PAGE as pageName } from '../../../utils/pages-constants';
 const firstCustomDecoder = getSelector('firstCustomDecoder', pageName);
 const xmlDecoderFile = getSelector('xmlDecoderFile', pageName);
 
