@@ -87,8 +87,8 @@ export default class RulesetColumns {
                   onClick={async (ev) => {
                     try{
                       ev.stopPropagation();
-                      const rulesetHandler = new RulesetHandler(RulesetResources.RULES);
-                      const result = await rulesetHandler.getFileContent(value);
+                      const resourcesHandler = new ResourcesHandler(ResourcesConstants.RULES);
+                      const result = await resourcesHandler.getFileContent(value);
                       const file = { name: value, content: result, path: item.relative_dirname };
                       this.props.updateFileContent(file);
                     }catch(error){
@@ -134,8 +134,8 @@ export default class RulesetColumns {
                     onClick={async ev => {
                       try{
                         ev.stopPropagation();
-                        const rulesetHandler = new RulesetHandler(this.props.state.section);
-                        const result = await rulesetHandler.getFileContent(item.filename);
+                        const resourcesHandler = new ResourcesHandler(this.props.state.section);
+                        const result = await resourcesHandler.getFileContent(item.filename);
                         const file = { name: item.filename, content: result, path: item.relative_dirname };
                         this.props.updateFileContent(file);
                       }catch(error){
