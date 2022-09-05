@@ -17,8 +17,8 @@ import {
   EuiIconTip,
   EuiLoadingSpinner,
 } from '@elastic/eui';
-import { RestartHandler } from '../../../react-services/wz-restart';
 import WzTextWithTooltipIfTruncated from '../wz-text-with-tooltip-if-truncated';
+import { ENUM_RESTART_STATES } from '../../../react-services/interfaces/wz-restart.interface';
 
 interface IRenderStatus {
   node: { name: string; synced: boolean; isRestarted: boolean };
@@ -30,7 +30,7 @@ export const RenderStatus = (props: IRenderStatus) => {
 
   let iconStatus;
   switch (statusRestart) {
-    case RestartHandler.RESTART_STATES.SYNCING:
+    case ENUM_RESTART_STATES.SYNCING:
       iconStatus = (
         <>
           <EuiDescriptionListDescription className="wz-text-left">
@@ -43,7 +43,7 @@ export const RenderStatus = (props: IRenderStatus) => {
         </>
       );
       break;
-    case RestartHandler.RESTART_STATES.SYNC_ERROR:
+    case ENUM_RESTART_STATES.SYNC_ERROR:
       iconStatus = (
         <>
           <EuiDescriptionListDescription className="wz-text-left">
@@ -56,7 +56,7 @@ export const RenderStatus = (props: IRenderStatus) => {
         </>
       );
       break;
-    case RestartHandler.RESTART_STATES.RESTARTING:
+    case ENUM_RESTART_STATES.RESTARTING:
       iconStatus = (
         <>
           <EuiDescriptionListDescription className="wz-text-left">
@@ -69,7 +69,7 @@ export const RenderStatus = (props: IRenderStatus) => {
         </>
       );
       break;
-    case RestartHandler.RESTART_STATES.RESTART_ERROR:
+    case ENUM_RESTART_STATES.RESTART_ERROR:
       iconStatus = (
         <>
           <EuiDescriptionListDescription className="wz-text-left">
@@ -82,7 +82,7 @@ export const RenderStatus = (props: IRenderStatus) => {
         </>
       );
       break;
-    case RestartHandler.RESTART_STATES.RESTARTED_INFO:
+    case ENUM_RESTART_STATES.RESTARTED_INFO:
       iconStatus = (
         <>
           <EuiDescriptionListDescription className="wz-text-left">

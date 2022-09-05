@@ -11,6 +11,7 @@
  */
 
 import React, { Component, Fragment } from 'react';
+import { connect } from 'react-redux';
 
 // Eui components
 import {
@@ -29,11 +30,11 @@ import {
   updateUnsynchronizedNodes,
   updateRestartStatus,
   updateSyncNodesInfo,
-  updateRestartNodesInfo
+  updateRestartNodesInfo,
 } from '../../redux/actions/restartActions';
 import { RestartHandler } from '../../react-services/wz-restart';
-import { connect } from 'react-redux';
 import { RestartModal } from './restart-modal/restart-modal';
+import { ENUM_RESTART_STATES } from '../../react-services/interfaces/wz-restart.interface';
 
 interface IWzRestartCalloutProps {
   updateUnsynchronizedNodes: (unsynchronizedNodes) => void;
@@ -104,10 +105,9 @@ class WzRestartCallout extends Component<IWzRestartCalloutProps, IWzRestartCallo
   };
   async componentDidMount() {
     try {
-      const clusterStatus = await RestartHandler.clusterReq();
+      const isCluster = await RestartHandler.clusterReq();
       this.setState({
-        isCluster:
-          clusterStatus.data.data.enabled === 'yes' && clusterStatus.data.data.running === 'yes',
+        isCluster,
       });
     } catch (error) {}
   }
@@ -150,7 +150,7 @@ class WzRestartCallout extends Component<IWzRestartCalloutProps, IWzRestartCallo
               title={`${isCluster ? 'Cluster' : 'Manager'} will be restarted`}
               onCancel={() => this.toggleWarningRestartModalVisible()}
               onConfirm={() => {
-                this.props.updateRestartStatus(RestartHandler.RESTART_STATES.SYNCING);
+                this.props.updateRestartStatus(ENUM_RESTART_STATES.SYNCING);
                 this.restartWazuh();
               }}
               cancelButtonText="Cancel"
@@ -159,13 +159,12 @@ class WzRestartCallout extends Component<IWzRestartCalloutProps, IWzRestartCallo
             />
           </EuiOverlayMask>
         )}
-        {timeoutRestarting &&
-          this.props.restartStatus !== RestartHandler.RESTART_STATES.RESTARTED && (
-            <RestartModal
-              isSyncCanceled={this.isSyncCanceled}
-              cancelSync={() => (this.isSyncCanceled.isSyncCanceled = true)}
-            />
-          )}
+        {timeoutRestarting && this.props.restartStatus !== ENUM_RESTART_STATES.RESTARTED && (
+          <RestartModal
+            isSyncCanceled={this.isSyncCanceled}
+            cancelSync={() => (this.isSyncCanceled.isSyncCanceled = true)}
+          />
+        )}
       </Fragment>
     );
   }

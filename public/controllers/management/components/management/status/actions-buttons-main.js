@@ -37,6 +37,7 @@ import {
   updateRestartNodesInfo,
 } from '../../../../../redux/actions/restartActions';
 import { RestartModal } from '../../../../../components/common/restart-modal/restart-modal';
+import { ENUM_RESTART_STATES } from '../../../../../react-services/interfaces/wz-restart.interface';
 
 class WzStatusActionButtons extends Component {
   _isMounted = false;
@@ -82,7 +83,7 @@ class WzStatusActionButtons extends Component {
         error: {
           error: error,
           message: error.message || error,
-          title: `${error.name}: Error restarting Wazuh}`,
+          title: `${error.name}: Error restarting Wazuh`,
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -231,7 +232,7 @@ class WzStatusActionButtons extends Component {
             title={clusterEnabled ? 'Cluster will be restarted' : 'Manager will be restarted'}
             onCancel={this.closeModal}
             onConfirm={() => {
-              this.props.updateRestartStatus(RestartHandler.RESTART_STATES.RESTARTING);
+              this.props.updateRestartStatus(ENUM_RESTART_STATES.RESTARTING);
               this.restartWazuh();
               this.setState({ isModalVisible: false });
             }}
@@ -245,7 +246,7 @@ class WzStatusActionButtons extends Component {
 
     let restarting;
 
-    if (timeoutRestarting && this.props.restartStatus !== RestartHandler.RESTART_STATES.RESTARTED) {
+    if (timeoutRestarting && this.props.restartStatus !== ENUM_RESTART_STATES.RESTARTED) {
       restarting = <RestartModal />;
     }
 
