@@ -11,6 +11,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Changed
 
 - Changed the HTTP verb from `GET` to `POST` in the requests to login to the Wazuh API [#4103](https://github.com/wazuh/wazuh-kibana-app/pull/4103)
+- Improve alerts summary performance [#4376](https://github.com/wazuh/wazuh-kibana-app/pull/4376)
 
 ## Wazuh v4.3.7 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4308
 
