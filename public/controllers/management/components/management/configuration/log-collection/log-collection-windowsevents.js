@@ -15,7 +15,7 @@ import React, { Component, Fragment } from 'react';
 import WzNoConfig from '../util-components/no-config';
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzConfigurationListSelector from '../util-components/configuration-settings-list-selector';
-import { renderValueOrNoValue } from '../utils/utils';
+import { renderValueOrNoValue, isString } from '../utils/utils';
 import { settingsListBuilder } from '../utils/builders';
 import helpLinks from './help-links';
 import { LOGCOLLECTOR_LOCALFILE_PROP, LOCALFILE_WINDOWSEVENT_PROP } from './types';
@@ -91,7 +91,7 @@ class WzConfigurationLogCollectionWindowsEvents extends Component {
       : [];
     return (
       <Fragment>
-        {currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP] && (
+        {isString(currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]) && (
           <WzNoConfig error={currentConfig[LOGCOLLECTOR_LOCALFILE_PROP]} help={helpLinks} />
         )}
         {!currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]?.[LOCALFILE_WINDOWSEVENT_PROP]?.length ? (

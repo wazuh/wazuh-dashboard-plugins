@@ -15,12 +15,7 @@ import React, { Component, Fragment } from 'react';
 import WzNoConfig from '../util-components/no-config';
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzConfigurationListSelector from '../util-components/configuration-settings-list-selector';
-import {
-  isString,
-  isArray,
-  renderValueOrDefault,
-  renderValueOrNoValue
-} from '../utils/utils';
+import { isString, isArray, renderValueOrDefault, renderValueOrNoValue } from '../utils/utils';
 import { settingsListBuilder } from '../utils/builders';
 import { LOGCOLLECTOR_SOCKET_PROP } from './types';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
@@ -28,12 +23,14 @@ import { webDocumentationLink } from '../../../../../../../common/services/web_d
 const helpLinks = [
   {
     text: 'Using multiple outputs',
-    href: webDocumentationLink('user-manual/capabilities/log-data-collection/log-data-configuration.html#using-multiple-outputs')
+    href: webDocumentationLink(
+      'user-manual/capabilities/log-data-collection/log-data-configuration.html#using-multiple-outputs'
+    ),
   },
   {
     text: 'Socket reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/socket.html')
-  }
+    href: webDocumentationLink('user-manual/reference/ossec-conf/socket.html'),
+  },
 ];
 
 const mainSettings = [
@@ -42,13 +39,13 @@ const mainSettings = [
   {
     field: 'mode',
     label: 'UNIX socket protocol',
-    render: renderValueOrDefault('udp')
+    render: renderValueOrDefault('udp'),
   },
   {
     field: 'prefix',
     label: 'Prefix to place before the message',
-    render: renderValueOrNoValue
-  }
+    render: renderValueOrNoValue,
+  },
 ];
 
 class WzConfigurationLogCollectionSockets extends Component {
@@ -57,27 +54,20 @@ class WzConfigurationLogCollectionSockets extends Component {
   }
   render() {
     const { currentConfig } = this.props;
-    const items = isArray(currentConfig[LOGCOLLECTOR_SOCKET_PROP].target)
+    const items = isArray(currentConfig?.[LOGCOLLECTOR_SOCKET_PROP]?.target)
       ? settingsListBuilder(currentConfig[LOGCOLLECTOR_SOCKET_PROP].target, 'name')
       : [];
     return (
       <Fragment>
-        {currentConfig[LOGCOLLECTOR_SOCKET_PROP] &&
-          isString(currentConfig[LOGCOLLECTOR_SOCKET_PROP]) && (
-            <WzNoConfig
-              error={currentConfig[LOGCOLLECTOR_SOCKET_PROP]}
-              help={helpLinks}
-            />
-          )}
-        {currentConfig[LOGCOLLECTOR_SOCKET_PROP] &&
-        !isString(currentConfig[LOGCOLLECTOR_SOCKET_PROP]) &&
-        !currentConfig[LOGCOLLECTOR_SOCKET_PROP].target ? (
+        {isString(currentConfig?.[LOGCOLLECTOR_SOCKET_PROP]) && (
+          <WzNoConfig error={currentConfig[LOGCOLLECTOR_SOCKET_PROP]} help={helpLinks} />
+        )}
+        {!isString(currentConfig?.[LOGCOLLECTOR_SOCKET_PROP]) &&
+        !currentConfig?.[LOGCOLLECTOR_SOCKET_PROP]?.target?.length ? (
           <WzNoConfig error="not-present" help={helpLinks} />
         ) : null}
-        {currentConfig[LOGCOLLECTOR_SOCKET_PROP] &&
-        !isString(currentConfig[LOGCOLLECTOR_SOCKET_PROP]) &&
-        currentConfig[LOGCOLLECTOR_SOCKET_PROP].target &&
-        currentConfig[LOGCOLLECTOR_SOCKET_PROP].target.length ? (
+        {!isString(currentConfig?.[LOGCOLLECTOR_SOCKET_PROP]) &&
+        currentConfig?.[LOGCOLLECTOR_SOCKET_PROP]?.target?.length ? (
           <WzConfigurationSettingsTabSelector
             title="Output sockets"
             description="Define custom outputs to send log data"
@@ -85,19 +75,12 @@ class WzConfigurationLogCollectionSockets extends Component {
             minusHeight={this.props.agent.id === '000' ? 320 : 415}
             helpLinks={helpLinks}
           >
-            <WzConfigurationListSelector
-              items={items}
-              settings={mainSettings}
-            />
+            <WzConfigurationListSelector items={items} settings={mainSettings} />
           </WzConfigurationSettingsTabSelector>
         ) : null}
       </Fragment>
     );
   }
 }
-
-WzConfigurationLogCollectionSockets.propTypes = {
-  // currentConfig: PropTypes.object.isRequired
-};
 
 export default WzConfigurationLogCollectionSockets;
