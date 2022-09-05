@@ -32,6 +32,7 @@ import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { RenderBodyModal } from './render-body-modal';
+import { ENUM_RESTART_STATES } from '../../../react-services/interfaces/wz-restart.interface';
 
 /**
  * The restart modal to show feedback to the user.
@@ -93,7 +94,7 @@ export const RestartModal = (props: { isSyncCanceled?: {}; cancelSync? }) => {
   };
 
   const abort = () => {
-    dispatch(updateRestartStatus(RestartHandler.RESTART_STATES.RESTARTED));
+    dispatch(updateRestartStatus(ENUM_RESTART_STATES.RESTARTED));
     dispatch(updateUnsynchronizedNodes([]));
     if (props.cancelSync) {
       props.cancelSync();
@@ -104,7 +105,7 @@ export const RestartModal = (props: { isSyncCanceled?: {}; cancelSync? }) => {
   let emptyPromptProps: Partial<EuiEmptyPromptProps>;
   switch (restartStatus) {
     default:
-    case RestartHandler.RESTART_STATES.RESTARTED_INFO:
+    case ENUM_RESTART_STATES.RESTARTED_INFO:
       emptyPromptProps = {
         title: (
           <>
@@ -116,7 +117,7 @@ export const RestartModal = (props: { isSyncCanceled?: {}; cancelSync? }) => {
             <h4 className="wz-padding-left-16">Restart completed:</h4>
             <RenderBodyModal
               nodos={restartNodesInfo}
-              statusRestart={RestartHandler.RESTART_STATES.RESTARTED_INFO}
+              statusRestart={ENUM_RESTART_STATES.RESTARTED_INFO}
             />
           </>
         ),
@@ -132,7 +133,7 @@ export const RestartModal = (props: { isSyncCanceled?: {}; cancelSync? }) => {
       };
       break;
 
-    case RestartHandler.RESTART_STATES.RESTARTING:
+    case ENUM_RESTART_STATES.RESTARTING:
       emptyPromptProps = {
         title: (
           <>
@@ -144,7 +145,7 @@ export const RestartModal = (props: { isSyncCanceled?: {}; cancelSync? }) => {
             <h4 className="wz-padding-left-16">Checking restart:</h4>
             <RenderBodyModal
               nodos={restartNodesInfo}
-              statusRestart={RestartHandler.RESTART_STATES.RESTARTING}
+              statusRestart={ENUM_RESTART_STATES.RESTARTING}
             />
           </>
         ),
@@ -160,7 +161,7 @@ export const RestartModal = (props: { isSyncCanceled?: {}; cancelSync? }) => {
       };
       break;
 
-    case RestartHandler.RESTART_STATES.RESTART_ERROR:
+    case ENUM_RESTART_STATES.RESTART_ERROR:
       emptyPromptProps = {
         title: <h2 className="wz-modal-restart-title">Unable to connect to Wazuh.</h2>,
         body: (
@@ -168,7 +169,7 @@ export const RestartModal = (props: { isSyncCanceled?: {}; cancelSync? }) => {
             <h4 className="wz-padding-left-16 wz">Restart error:</h4>
             <RenderBodyModal
               nodos={restartNodesInfo}
-              statusRestart={RestartHandler.RESTART_STATES.RESTART_ERROR}
+              statusRestart={ENUM_RESTART_STATES.RESTART_ERROR}
             />
             <p>
               There was an error restarting the nodes{' '}
@@ -184,14 +185,14 @@ export const RestartModal = (props: { isSyncCanceled?: {}; cancelSync? }) => {
       };
       break;
 
-    case RestartHandler.RESTART_STATES.SYNC_ERROR:
+    case ENUM_RESTART_STATES.SYNC_ERROR:
       emptyPromptProps = {
         title: <h2 className="wz-modal-restart-title">Synchronization failed</h2>,
         body: (
           <>
             <RenderBodyModal
               nodos={syncNodesInfo}
-              statusRestart={RestartHandler.RESTART_STATES.SYNC_ERROR}
+              statusRestart={ENUM_RESTART_STATES.SYNC_ERROR}
             />
             <p className="wz-text-justify">
               The nodes <b className="wz-text-black">{unsyncedNodes.join(', ')}</b> did not
@@ -217,7 +218,7 @@ export const RestartModal = (props: { isSyncCanceled?: {}; cancelSync? }) => {
       };
       break;
 
-    case RestartHandler.RESTART_STATES.SYNCING:
+    case ENUM_RESTART_STATES.SYNCING:
       emptyPromptProps = {
         title: (
           <>
@@ -231,7 +232,7 @@ export const RestartModal = (props: { isSyncCanceled?: {}; cancelSync? }) => {
                 <h4>Checking synchronization:</h4>
                 <RenderBodyModal
                   nodos={syncNodesInfo}
-                  statusRestart={RestartHandler.RESTART_STATES.SYNCING}
+                  statusRestart={ENUM_RESTART_STATES.SYNCING}
                 />
               </>
             )}
@@ -260,7 +261,8 @@ export const RestartModal = (props: { isSyncCanceled?: {}; cancelSync? }) => {
     <EuiOverlayMask>
       <div
         className={
-          restartStatus === RestartHandler.RESTART_STATES.ERROR
+          restartStatus === ENUM_RESTART_STATES.RESTART_ERROR ||
+          restartStatus === ENUM_RESTART_STATES.SYNC_ERROR
             ? 'wz-modal-restart-error'
             : 'wz-modal-restart'
         }
