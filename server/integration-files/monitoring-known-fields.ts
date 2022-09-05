@@ -175,15 +175,6 @@ export const monitoringKnownFields = [
     readFromDocValues: false
   },
   {
-    name: 'manager_host',
-    type: 'string',
-    count: 0,
-    scripted: false,
-    searchable: true,
-    aggregatable: false,
-    readFromDocValues: false
-  },
-  {
     name: 'name',
     type: 'string',
     count: 0,

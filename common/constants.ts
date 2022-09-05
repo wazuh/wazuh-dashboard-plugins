@@ -224,6 +224,7 @@ export const WAZUH_DEFAULT_APP_CONFIG = {
   hideManagerAlerts: false,
   'logs.level': 'info',
   'enrollment.dns': '',
+  'enrollment.password': '',
   'customization.logo.app': '',
   'customization.logo.sidebar': '',
   'customization.logo.healthcheck':'',
@@ -349,6 +350,7 @@ export const UI_TOAST_COLOR = {
 
 // Assets
 export const ASSETS_BASE_URL_PREFIX = '/plugins/wazuh/assets/';
+export const ASSETS_PUBLIC_URL = '/plugins/wazuh/public/assets/';
 
 // Reports
 export const REPORTS_LOGO_IMAGE_ASSETS_RELATIVE_PATH = 'images/logo_reports.png';
@@ -403,3 +405,6 @@ export const UI_ORDER_AGENT_STATUS = [
 
 // Documentation
 export const DOCUMENTATION_WEB_BASE_URL = "https://documentation.wazuh.com";
+
+// Default Elasticsearch user name context
+export const ELASTIC_NAME = 'elastic';
