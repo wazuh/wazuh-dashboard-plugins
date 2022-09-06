@@ -2,7 +2,6 @@ import { delayAsPromise } from '../../common/utils';
 import { WzRequest } from './wz-request';
 import { getHttp } from '../kibana-services';
 import { ENUM_RESTART_STATES } from './interfaces/wz-restart.interface';
-import IApiResponse from './interfaces/api-response.interface';
 
 /**
  * Wazuh restart wizard.
@@ -20,8 +19,8 @@ export class RestartHandler {
   }
 
   /**
-   * Get Cluster status from Wazuh API
-   * @returns {Promise}
+   * Get if it is a cluster or not
+   * @returns boolean
    */
   static async clusterReq() {
     try {
@@ -37,9 +36,8 @@ export class RestartHandler {
   /**
    * Check daemons status
    * @param {Object} updateRedux - Redux update function
-   * @param {number} attempt
-   * @param {Boolean} isCluster - Is cluster or not
-   * @returns {object|Promise}
+   * @param {Object} params - with array of nodes and isCluster
+   * @returns {boolean} restarted or not
    */
   static async checkDaemons(updateRedux, params) {
     try {
@@ -93,8 +91,7 @@ export class RestartHandler {
   /**
    * Check sync status
    * @param {Object} updateRedux - Redux update function
-   * @param {number} attempt
-   * @returns {object|Promise}
+   * @returns {boolean} synced or not
    */
   static async checkSync(updateRedux) {
     try {
@@ -131,9 +128,9 @@ export class RestartHandler {
 
   /**
    * Make ping to Wazuh API
-   * @param updateRedux
-   * @param breakCondition
-   * @param {boolean} isCluster
+   * @param updateRedux - Redux update function
+   * @param breakCondition - Break condition: sync or restart
+   * @param {Object} params - with array of nodes and isCluster
    * @return {Promise}
    */
   static async makePing(updateRedux, breakCondition, params?) {
@@ -180,7 +177,7 @@ export class RestartHandler {
   /**
    * Restart manager (single-node API call)
    * @param isCluster - Is cluster or not
-   * @returns {object|Promise}
+   * @returns {object|Array}
    */
   static async restart(isCluster) {
     try {
@@ -209,7 +206,7 @@ export class RestartHandler {
   /**
    * Restart a cluster node
    * @param node - Node name
-   * @returns {object|Promise}
+   * @returns {object|Array}
    */
   static async restartNode(node) {
     try {
@@ -227,7 +224,7 @@ export class RestartHandler {
       }
 
       const result = await WzRequest.apiReq('PUT', `/cluster/restart${nodeParam}`, {});
-      return result;
+      return result.data.data.affected_items;
     } catch (error) {
       throw error;
     }
@@ -237,6 +234,7 @@ export class RestartHandler {
    * Restart a node or manager
    * @param {} selectedNode Cluster Node
    * @param updateRedux Redux update function
+   * @return {object}
    */
   static async restartSelectedNode(selectedNode, updateRedux) {
     try {
@@ -277,6 +275,7 @@ export class RestartHandler {
    * @param updateRedux Redux update function
    * @param useDelay need to delay synchronization?
    * @param isSyncCanceled cancellation of synchronization
+   * @return {object}
    */
   static async restartWazuh(
     updateRedux,

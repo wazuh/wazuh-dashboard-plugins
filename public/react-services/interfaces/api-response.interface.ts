@@ -3,6 +3,8 @@ interface IData<T> {
   failed_items: Array<any>;
   total_affected_items: number;
   total_failed_items: number;
+  enabled: string;
+  running: string;
 }
 
 interface IResponseData<T> {
