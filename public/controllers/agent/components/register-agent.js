@@ -951,7 +951,7 @@ export const RegisterAgent = withErrorBoundary(
         //     },
         //   ]
         //   : []),
-        ...(this.state.selectedOS == 'rpm' || this.state.selectedOS == 'cent' || (this.state.selectedOS == 'deb') || this.state.selectedOS == 'ubu' || this.state.selectedOS == 'win' || this.state.selectedOS == 'macos'
+        ...(this.state.selectedOS == 'rpm' || this.state.selectedOS == 'cent' || this.state.selectedOS == 'deb' || this.state.selectedOS == 'ubu' || this.state.selectedOS == 'win' || this.state.selectedOS == 'macos'
         ? [
           {
             title: 'Start the agent',
@@ -965,6 +965,23 @@ export const RegisterAgent = withErrorBoundary(
                 />
               ) : (
                 <EuiTabbedContent
+                  tabs={this.state.selectedVersion == 'redhat7' ? tabSystemD : tabSysV}
+                  selectedTab={this.selectedSYS}
+                  onTabClick={onTabClick}
+                />
+              ),
+          },
+        ]
+        : []),
+
+        ...(this.state.selectedVersion == 'redhat5' || this.state.selectedOS == 'cent' || this.state.selectedOS == 'deb'
+        ? [
+          {
+            title: 'Start the agent',
+            children: this.state.gotErrorRegistrationServiceInfo ?
+              calloutErrorRegistrationServiceInfo
+              : (
+                <EuiTabbedContent
                   tabs={tabSysV}
                   selectedTab={this.selectedSYS}
                   onTabClick={onTabClick}
@@ -973,6 +990,7 @@ export const RegisterAgent = withErrorBoundary(
           },
         ]
         : []),
+        
         // ...(this.state.selectedVersion == 'redhat7' || this.state.selectedVersion == 'centos7'
         // ? [
         //   {
