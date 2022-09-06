@@ -11,15 +11,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Changed the HTTP verb from `GET` to `POST` in the requests to login to the Wazuh API [#4103](https://github.com/wazuh/wazuh-kibana-app/pull/4103)
 
-## Wazuh v4.4.0 - OpenSearch Dashboards 1.2.0 - Revision 4400
+### Fixed
 
-### Added
+- Fixed Wazuh restart UI [#4433](https://github.com/wazuh/wazuh-kibana-app/pull/4433)
 
-- Added the option to sort by the agents count in the group table. [#4323](https://github.com/wazuh/wazuh-kibana-app/pull/4323)
-
-### Changed
-
-- Changed the HTTP verb from `GET` to `POST` in the requests to login to the Wazuh API [#4103](https://github.com/wazuh/wazuh-kibana-app/pull/4103)
 
 ## Wazuh v4.3.7 - OpenSearch Dashboards 1.2.0 - Revision 4308
 
@@ -34,9 +29,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed persistence of the plugin registry file between updates [#4359](https://github.com/wazuh/wazuh-kibana-app/pull/4359)
 - Fixed searchbar error on SCA Inventory table [#4367](https://github.com/wazuh/wazuh-kibana-app/pull/4367)
 - Fixed a routes loop when reinstalling Wazuh indexer [#4373](https://github.com/wazuh/wazuh-kibana-app/pull/4373)
-- Fixed Wazuh restart UI [#4365](https://github.com/wazuh/wazuh-kibana-app/pull/4365)
 
-# Removed
+
+
+### Removed
 
 - Removed the use of `manager_host` field related to agent information of Wazuh API responses, which is obsolete [#4350](https://github.com/wazuh/wazuh-kibana-app/pull/4350)
 
