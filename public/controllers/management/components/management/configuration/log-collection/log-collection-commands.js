@@ -15,15 +15,12 @@ import React, { Component, Fragment } from 'react';
 import WzNoConfig from '../util-components/no-config';
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzConfigurationListSelector from '../util-components/configuration-settings-list-selector';
-import {
-  isString,
-  renderValueOrDefault,
-  renderValueOrNoValue
-} from '../utils/utils';
+import { isString, renderValueOrDefault, renderValueOrNoValue } from '../utils/utils';
 import { settingsListBuilder } from '../utils/builders';
 import helpLinks from './help-links';
+import { LOGCOLLECTOR_LOCALFILE_PROP, LOCALFILE_COMMANDS_PROP } from './types';
 
-const renderTargetField = item => item ? item.join(', ') : 'agent';
+const renderTargetField = (item) => (item ? item.join(', ') : 'agent');
 
 const mainSettings = [
   { field: 'logformat', label: 'Log format' },
@@ -32,15 +29,14 @@ const mainSettings = [
   {
     field: 'frequency',
     label: 'Interval between command executions',
-    render: renderValueOrNoValue
+    render: renderValueOrNoValue,
   },
   {
     field: 'target',
     label: 'Redirect output to this socket',
-    render: renderTargetField
-  }
+    render: renderTargetField,
+  },
 ];
-
 
 class WzConfigurationLogCollectionCommands extends Component {
   constructor(props) {
@@ -48,38 +44,25 @@ class WzConfigurationLogCollectionCommands extends Component {
   }
   render() {
     const { currentConfig } = this.props;
-    const items =
-      currentConfig['logcollector-localfile'] &&
-      currentConfig['logcollector-localfile']['localfile-commands']
-        ? settingsListBuilder(
-            currentConfig['logcollector-localfile']['localfile-commands'],
-            [
-              'file',
-              'alias',
-              'commnad', 
-              (item) => `${item.logformat}${item.target ? ` - ${item.target.join(', ')}` : ''}`
-            ]
-          )
-        : [];
+    const items = currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]?.[LOCALFILE_COMMANDS_PROP]
+      ? settingsListBuilder(currentConfig[LOGCOLLECTOR_LOCALFILE_PROP][LOCALFILE_COMMANDS_PROP], [
+          'file',
+          'alias',
+          'commnad',
+          (item) => `${item.logformat}${item.target ? ` - ${item.target.join(', ')}` : ''}`,
+        ])
+      : [];
     return (
       <Fragment>
-        {currentConfig['logcollector-localfile'] &&
-          isString(currentConfig['logcollector-localfile']) && (
-            <WzNoConfig
-              error={currentConfig['logcollector-localfile']}
-              help={helpLinks}
-            />
-          )}
-        {currentConfig['logcollector-localfile'] &&
-        !isString(currentConfig['logcollector-localfile']) &&
-        !(currentConfig['logcollector-localfile']['localfile-commands'] || [])
-          .length ? (
+        {isString(currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]) && (
+          <WzNoConfig error={currentConfig[LOGCOLLECTOR_LOCALFILE_PROP]} help={helpLinks} />
+        )}
+        {!isString(currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]) &&
+        !currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]?.[LOCALFILE_COMMANDS_PROP]?.length ? (
           <WzNoConfig error="not-present" help={helpLinks} />
         ) : null}
-        {currentConfig['logcollector-localfile'] &&
-        !isString(currentConfig['logcollector-localfile']) &&
-        currentConfig['logcollector-localfile']['localfile-commands'] &&
-        currentConfig['logcollector-localfile']['localfile-commands'].length ? (
+        {!isString(currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]) &&
+        currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]?.[LOCALFILE_COMMANDS_PROP]?.length ? (
           <WzConfigurationSettingsTabSelector
             title="Command monitoring"
             description="All output from these commands will be read as one or more log messages depending on whether command or full_command is used."
@@ -87,19 +70,12 @@ class WzConfigurationLogCollectionCommands extends Component {
             minusHeight={this.props.agent.id === '000' ? 320 : 415}
             helpLinks={helpLinks}
           >
-            <WzConfigurationListSelector
-              items={items}
-              settings={mainSettings}
-            />
+            <WzConfigurationListSelector items={items} settings={mainSettings} />
           </WzConfigurationSettingsTabSelector>
         ) : null}
       </Fragment>
     );
   }
 }
-
-WzConfigurationLogCollectionCommands.propTypes = {
-  // currentConfig: PropTypes.object.isRequired
-};
 
 export default WzConfigurationLogCollectionCommands;
