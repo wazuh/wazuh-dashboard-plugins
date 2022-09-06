@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Initial basic configuration file
+ * Wazuh app - App configuration file
  * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -10,8 +10,44 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { ASSETS_PUBLIC_URL, WAZUH_MONITORING_DEFAULT_INDICES_REPLICAS, WAZUH_MONITORING_DEFAULT_INDICES_SHARDS, WAZUH_STATISTICS_DEFAULT_INDICES_REPLICAS, WAZUH_STATISTICS_DEFAULT_INDICES_SHARDS } from "../../common/constants";
-import { webDocumentationLink } from "../../common/services/web_documentation";
+import {
+  WAZUH_ALERTS_PATTERN,
+  WAZUH_DEFAULT_APP_CONFIG,
+  WAZUH_MONITORING_DEFAULT_CREATION,
+  WAZUH_MONITORING_DEFAULT_ENABLED,
+  WAZUH_MONITORING_DEFAULT_FREQUENCY,
+  WAZUH_MONITORING_DEFAULT_INDICES_REPLICAS,
+  WAZUH_MONITORING_DEFAULT_INDICES_SHARDS,
+  WAZUH_MONITORING_PATTERN,
+  WAZUH_SAMPLE_ALERT_PREFIX,
+  WAZUH_STATISTICS_DEFAULT_CREATION,
+  WAZUH_STATISTICS_DEFAULT_CRON_FREQ,
+  WAZUH_STATISTICS_DEFAULT_INDICES_REPLICAS,
+  WAZUH_STATISTICS_DEFAULT_INDICES_SHARDS,
+  WAZUH_STATISTICS_DEFAULT_NAME,
+  WAZUH_STATISTICS_DEFAULT_PREFIX,
+  WAZUH_STATISTICS_DEFAULT_STATUS,
+} from '../../common/constants';
+import { webDocumentationLink } from '../../common/services/web_documentation';
+import { configEquivalences } from '../../common/config-equivalences';
+
+/**
+ * Given a string, this function builds a multine string, each line about 70
+ * characters long, splitted at the closest whitespace character to that lentgh.
+ *
+ * This function is used to transform the settings description stored in the
+ * configEquivalences map into a multiline string to be used as the setting
+ * documentation.
+ *
+ * The # character is also appended to the beginning of each line.
+ *
+ * @param text
+ * @returns multine string
+ */
+function splitDescription(text: string = ''): string {
+  const lines = text.match(/.{1,80}(?=\s|$)/g) || [];
+  return lines.map((z) => '# ' + z.trim()).join('\n');
+}
 
 export const initialWazuhConfig: string = `---
 #
@@ -27,211 +63,226 @@ export const initialWazuhConfig: string = `---
 #
 # ======================== Wazuh app configuration file ========================
 #
-# Please check the documentation for more information on configuration options:
-# ${webDocumentationLink('installation-guide/index.html')}
+# Please check the documentation for more information about configuration options:
+# ${webDocumentationLink('user-manual/wazuh-dashboard/config-file.html')}
 #
 # Also, you can check our repository:
 # https://github.com/wazuh/wazuh-kibana-app
 #
-# ------------------------------- Disable roles -------------------------------
+# ---------------------------- Unauthorized roles ------------------------------
 #
-# Defines which Elasticsearch roles disable Wazuh
-# disabled_roles: 
-#      - wazuh_disabled
+# Disable Wazuh for the Elasticsearch / OpenSearch roles defined here.
+# disabled_roles:
+#   - wazuh_disabled
 #
 # ------------------------------- Index patterns -------------------------------
 #
-# Default index pattern to use.
-#pattern: wazuh-alerts-*
+${splitDescription(configEquivalences.pattern)}
+# pattern: ${WAZUH_ALERTS_PATTERN}
 #
 # ----------------------------------- Checks -----------------------------------
 #
-# Defines which checks must to be consider by the healthcheck
-# step once the Wazuh app starts. Values must to be true or false.
-#checks.pattern : true
-#checks.template: true
-#checks.fields  : true
-#checks.api     : true
-#checks.setup   : true
-#checks.metaFields: true
-#checks.timeFilter: true
-#checks.maxBuckets: true
+# Define which checks will be executed by the App's HealthCheck.
+# Allowed values are: true, false
+#
+${splitDescription(configEquivalences['checks.pattern'])}
+# checks.pattern: ${WAZUH_DEFAULT_APP_CONFIG['checks.pattern']}
+#
+${splitDescription(configEquivalences['checks.template'])}
+# checks.template: ${WAZUH_DEFAULT_APP_CONFIG['checks.template']}
+#
+${splitDescription(configEquivalences['checks.api'])}
+# checks.api: ${WAZUH_DEFAULT_APP_CONFIG['checks.api']}
+#
+${splitDescription(configEquivalences['checks.setup'])}
+# checks.setup: ${WAZUH_DEFAULT_APP_CONFIG['checks.setup']}
+#
+${splitDescription(configEquivalences['checks.fields'])}
+# checks.fields: ${WAZUH_DEFAULT_APP_CONFIG['checks.fields']}
+#
+${splitDescription(configEquivalences['checks.metaFields'])}
+# checks.metaFields: ${WAZUH_DEFAULT_APP_CONFIG['checks.metaFields']}
+#
+${splitDescription(configEquivalences['checks.timeFilter'])}
+# checks.timeFilter: ${WAZUH_DEFAULT_APP_CONFIG['checks.timeFilter']}
+#
+${splitDescription(configEquivalences['checks.maxBuckets'])}
+# checks.maxBuckets: ${WAZUH_DEFAULT_APP_CONFIG['checks.maxBuckets']}
 #
 # --------------------------------- Extensions ---------------------------------
 #
-# Defines which extensions should be activated when you add a new API entry.
-# You can change them after Wazuh app starts.
-# Values must to be true or false.
-#extensions.pci       : true
-#extensions.gdpr      : true
-#extensions.hipaa     : true
-#extensions.nist      : true
-#extensions.tsc       : true
-#extensions.audit     : true
-#extensions.oscap     : false
-#extensions.ciscat    : false
-#extensions.aws       : false
-#extensions.gcp       : false
-#extensions.virustotal: false
-#extensions.osquery   : false
-#extensions.docker    : false
+# Define the initial state of the extensions (enabled / disabled) for recently
+# added hosts. The extensions can be enabled or disabled anytime using the UI.
+# Allowed values are: true, false
 #
-# ---------------------------------- Timeout ----------------------------------
+${splitDescription(configEquivalences['extensions.pci'])}
+# extensions.pci: ${WAZUH_DEFAULT_APP_CONFIG['extensions.pci']}
 #
-# Defines maximum timeout to be used on the Wazuh app requests.
-# It will be ignored if it is bellow 1500.
-# It means milliseconds before we consider a request as failed.
-# Default: 20000
-#timeout: 20000
+${splitDescription(configEquivalences['extensions.gdpr'])}
+# extensions.gdpr: ${WAZUH_DEFAULT_APP_CONFIG['extensions.gdpr']}
 #
-# -------------------------------- API selector --------------------------------
+${splitDescription(configEquivalences['extensions.hipaa'])}
+# extensions.hipaa: ${WAZUH_DEFAULT_APP_CONFIG['extensions.hipaa']}
 #
-# Defines if the user is allowed to change the selected
-# API directly from the Wazuh app top menu.
-# Default: true
-#api.selector: true
+${splitDescription(configEquivalences['extensions.nist'])}
+# extensions.nist: ${WAZUH_DEFAULT_APP_CONFIG['extensions.nist']}
+#
+${splitDescription(configEquivalences['extensions.tsc'])}
+# extensions.tsc: ${WAZUH_DEFAULT_APP_CONFIG['extensions.tsc']}
+#
+${splitDescription(configEquivalences['extensions.audit'])}
+# extensions.audit: ${WAZUH_DEFAULT_APP_CONFIG['extensions.audit']}
+#
+${splitDescription(configEquivalences['extensions.oscap'])}
+# extensions.oscap: ${WAZUH_DEFAULT_APP_CONFIG['extensions.oscap']}
+#
+${splitDescription(configEquivalences['extensions.ciscat'])}
+# extensions.ciscat: ${WAZUH_DEFAULT_APP_CONFIG['extensions.ciscat']}
+#
+${splitDescription(configEquivalences['extensions.aws'])}
+# extensions.aws: ${WAZUH_DEFAULT_APP_CONFIG['extensions.aws']}
+#
+${splitDescription(configEquivalences['extensions.gcp'])}
+# extensions.gcp: ${WAZUH_DEFAULT_APP_CONFIG['extensions.gcp']}
+#
+${splitDescription(configEquivalences['extensions.virustotal'])}
+# extensions.virustotal: ${WAZUH_DEFAULT_APP_CONFIG['extensions.virustotal']}
+#
+${splitDescription(configEquivalences['extensions.osquery'])}
+# extensions.osquery: ${WAZUH_DEFAULT_APP_CONFIG['extensions.osquery']}
+#
+${splitDescription(configEquivalences['extensions.docker'])}
+# extensions.docker: ${WAZUH_DEFAULT_APP_CONFIG['extensions.docker']}
+#
+# ------------------------------- Timeout --------------------------------------
+#
+${splitDescription(configEquivalences.timeout)}
+# timeout: ${WAZUH_DEFAULT_APP_CONFIG.timeout}
 #
 # --------------------------- Index pattern selector ---------------------------
 #
-# Defines if the user is allowed to change the selected
-# index pattern directly from the Wazuh app top menu.
-# Default: true
-#ip.selector: true
+${splitDescription(configEquivalences['ip.selector'])}
+# ip.selector: ${WAZUH_DEFAULT_APP_CONFIG['ip.selector']}
 #
-# List of index patterns to be ignored
-#ip.ignore: []
+${splitDescription(configEquivalences['ip.ignore'])}
+# ip.ignore: ${WAZUH_DEFAULT_APP_CONFIG['ip.ignore']}
 #
-# -------------------------------- X-Pack RBAC ---------------------------------
+# ------------------------------ Monitoring ------------------------------------
 #
-# Custom setting to enable/disable built-in X-Pack RBAC security capabilities.
-# Default: enabled
-#xpack.rbac.enabled: true
+${splitDescription(configEquivalences['wazuh.monitoring.enabled'])}
+# wazuh.monitoring.enabled: ${WAZUH_MONITORING_DEFAULT_ENABLED}
 #
-# ------------------------------ wazuh-monitoring ------------------------------
+${splitDescription(configEquivalences['wazuh.monitoring.frequency'])}
+# wazuh.monitoring.frequency: ${WAZUH_MONITORING_DEFAULT_FREQUENCY}
 #
-# Custom setting to enable/disable wazuh-monitoring indices.
-# Values: true, false, worker
-# If worker is given as value, the app will show the Agents status
-# visualization but won't insert data on wazuh-monitoring indices.
-# Default: true
-#wazuh.monitoring.enabled: true
+${splitDescription(configEquivalences['wazuh.monitoring.shards'])}
+# wazuh.monitoring.shards: ${WAZUH_MONITORING_DEFAULT_INDICES_SHARDS}
 #
-# Custom setting to set the frequency for wazuh-monitoring indices cron task.
-# Default: 900 (s)
-#wazuh.monitoring.frequency: 900
+${splitDescription(configEquivalences['wazuh.monitoring.replicas'])}
+# wazuh.monitoring.replicas: ${WAZUH_MONITORING_DEFAULT_INDICES_REPLICAS}
 #
-# Configure wazuh-monitoring-* indices shards and replicas.
-#wazuh.monitoring.shards: ${WAZUH_MONITORING_DEFAULT_INDICES_SHARDS}
-#wazuh.monitoring.replicas: ${WAZUH_MONITORING_DEFAULT_INDICES_REPLICAS}
+${splitDescription(configEquivalences['wazuh.monitoring.creation'])}
+# Allowed values are: h (hourly), d (daily), w (weekly), m (monthly)
+# wazuh.monitoring.creation: ${WAZUH_MONITORING_DEFAULT_CREATION}
 #
-# Configure wazuh-monitoring-* indices custom creation interval.
-# Values: h (hourly), d (daily), w (weekly), m (monthly)
-# Default: w
-#wazuh.monitoring.creation: w
+${splitDescription(configEquivalences['wazuh.monitoring.pattern'])}
+# wazuh.monitoring.pattern: ${WAZUH_MONITORING_PATTERN}
 #
-# Default index pattern to use for Wazuh monitoring
-#wazuh.monitoring.pattern: wazuh-monitoring-*
+# --------------------------------- Sample data --------------------------------
 #
-# --------------------------------- wazuh-cron ----------------------------------
+${splitDescription(configEquivalences['alerts.sample.prefix'])}
+# alerts.sample.prefix: ${WAZUH_SAMPLE_ALERT_PREFIX}
 #
-# Customize the index prefix of predefined jobs
-# This change is not retroactive, if you change it new indexes will be created
-# cron.prefix: wazuh
+# ------------------------------ Background tasks ------------------------------
 #
-# --------------------------------- wazuh-sample-alerts -------------------------
+${splitDescription(configEquivalences['cron.prefix'])}
+# cron.prefix: ${WAZUH_STATISTICS_DEFAULT_PREFIX}
 #
-# Customize the index name prefix of sample alerts
-# This change is not retroactive, if you change it new indexes will be created
-# It should match with a valid index template to avoid unknown fields on
-# dashboards
-#alerts.sample.prefix: wazuh-alerts-4.x-
+# ------------------------------ Wazuh Statistics ------------------------------
 #
-# ------------------------------ wazuh-statistics -------------------------------
+${splitDescription(configEquivalences['cron.statistics.status'])}
+# cron.statistics.status: ${WAZUH_STATISTICS_DEFAULT_STATUS}
 #
-# Custom setting to enable/disable statistics tasks.
-#cron.statistics.status: true
+${splitDescription(configEquivalences['cron.statistics.apis'])}
+# cron.statistics.apis: ${WAZUH_DEFAULT_APP_CONFIG['cron.statistics.apis']}
 #
-# Enter the ID of the APIs you want to save data from, leave this empty to run
-# the task on all configured APIs
-#cron.statistics.apis: []
+${splitDescription(configEquivalences['cron.statistics.interval'])}
+# cron.statistics.interval: ${WAZUH_STATISTICS_DEFAULT_CRON_FREQ}
 #
-# Define the frequency of task execution using cron schedule expressions
-#cron.statistics.interval: 0 */5 * * * *
+${splitDescription(configEquivalences['cron.statistics.index.name'])}
+# cron.statistics.index.name: ${WAZUH_STATISTICS_DEFAULT_NAME}
 #
-# Define the name of the index in which the documents are to be saved.
-#cron.statistics.index.name: statistics
+${splitDescription(configEquivalences['cron.statistics.index.creation'])}
+# cron.statistics.index.creation: ${WAZUH_STATISTICS_DEFAULT_CREATION}
 #
-# Define the interval in which the index will be created
-#cron.statistics.index.creation: w
+${splitDescription(configEquivalences['cron.statistics.index.shards'])}
+# cron.statistics.shards: ${WAZUH_STATISTICS_DEFAULT_INDICES_SHARDS}
 #
-# Configure statistics indices shards and replicas.
-#cron.statistics.shards: ${WAZUH_STATISTICS_DEFAULT_INDICES_SHARDS}
-#cron.statistics.replicas: ${WAZUH_STATISTICS_DEFAULT_INDICES_REPLICAS}
+${splitDescription(configEquivalences['cron.statistics.index.replicas'])}
+# cron.statistics.replicas: ${WAZUH_STATISTICS_DEFAULT_INDICES_REPLICAS}
 #
-# ------------------------------ wazuh-logo-customization -------------------------------
+# ------------------------------ Logo customization ----------------------------
 #
-#Define the name of the app logo saved in the path ${ASSETS_PUBLIC_URL}
-#customization.logo.app: ''
+${splitDescription(configEquivalences['customization.logo.app'])}
+# customization.logo.app: ${WAZUH_DEFAULT_APP_CONFIG['customization.logo.app']}
 #
-#Define the name of the sidebar logo saved in the path ${ASSETS_PUBLIC_URL}
-#customization.logo.sidebar: ''
+${splitDescription(configEquivalences['customization.logo.sidebar'])}
+# customization.logo.sidebar: ${WAZUH_DEFAULT_APP_CONFIG['customization.logo.sidebar']}
 #
-#Define the name of the health-check logo saved in the path ${ASSETS_PUBLIC_URL}
-#customization.logo.healthcheck: ''
+${splitDescription(configEquivalences['customization.logo.healthcheck'])}
+# customization.logo.healthcheck: ${WAZUH_DEFAULT_APP_CONFIG['customization.logo.healthcheck']}
 #
-#Define the name of the reports logo (.png) saved in the path ${ASSETS_PUBLIC_URL}
-#customization.logo.reports: ''
+${splitDescription(configEquivalences['customization.logo.reports'])}
+# customization.logo.reports: ${WAZUH_DEFAULT_APP_CONFIG['customization.logo.reports']}
 #
-# ---------------------------- Hide manager alerts ------------------------------
-# Hide the alerts of the manager in all dashboards and discover
-#hideManagerAlerts: false
+# ---------------------------- Hide manager alerts -----------------------------
 #
-# ------------------------------- App logging level -----------------------------
-# Set the logging level for the Wazuh App log files.
-# Default value: info
-# Allowed values: info, debug
-#logs.level: info
+${splitDescription(configEquivalences.hideManagerAlerts)}
+# hideManagerAlerts: ${WAZUH_DEFAULT_APP_CONFIG.hideManagerAlerts}
 #
-# -------------------------------- Enrollment DNS -------------------------------
-# Set the variable WAZUH_REGISTRATION_SERVER in agents deployment.
-# Default value: ''
-#enrollment.dns: ''
+# ------------------------------- App logging level ----------------------------
 #
-# Wazuh registration password
-# Default value: ''
-#enrollment.password: ''
-#-------------------------------- API entries -----------------------------------
-#The following configuration is the default structure to define an API entry.
+${splitDescription(configEquivalences['logs.level'])}
+# Allowed values are: info, debug
+# logs.level: ${WAZUH_DEFAULT_APP_CONFIG['logs.level']}
 #
-#hosts:
-#  - <id>:
-      # URL
-      # API url
-      # url: http(s)://<url>
+# ------------------------------- Agent enrollment -----------------------------
+#
+${splitDescription(configEquivalences['enrollment.dns'])}
+# enrollment.dns: ${WAZUH_DEFAULT_APP_CONFIG['enrollment.dns']}
+#
+${splitDescription(configEquivalences['enrollment.password'])}
+# enrollment.password: ${WAZUH_DEFAULT_APP_CONFIG['enrollment.password']}
+#
+#-------------------------------- Wazuh hosts ----------------------------------
+#
+# The following configuration is the default structure to define a host.
+#
+# hosts:
+#   # Host ID / name,
+#   - env-1:
+#       # Host URL
+#       url: https://env-1.example
+#       # Host / API port
+#       port: 55000
+#       # Host / API username
+#       username: wazuh-wui
+#       # Host / API password
+#       password: wazuh-wui
+#       # Use RBAC or not. If set to true, the username must be "wazuh-wui".
+#       run_as: true
+#   - env-2:
+#       url: https://env-2.example
+#       port: 55000
+#       username: wazuh-wui
+#       password: wazuh-wui
+#       run_as: true
 
-      # Port
-      # API port
-      # port: <port>
-
-      # Username
-      # API user's username
-      # username: <username>
-
-      # Password
-      # API user's password
-      # password: <password>
-
-      # Run as
-      # Define how the app user gets his/her app permissions.
-      # Values:
-      #   - true: use his/her authentication context. Require Wazuh API user allows run_as.
-      #   - false or not defined: get same permissions of Wazuh API user.
-      # run_as: <true|false>
 hosts:
   - default:
-     url: https://localhost
-     port: 55000
-     username: wazuh-wui
-     password: wazuh-wui
-     run_as: false
-`
+      url: https://localhost
+      port: 55000
+      username: wazuh-wui
+      password: wazuh-wui
+      run_as: false
+`;
