@@ -22,7 +22,7 @@ export class RestartHandler {
    * Get if it is a cluster or not
    * @returns boolean
    */
-  static async clusterReq() {
+  static async clusterReq() {  // TODO rename to isCluster
     try {
       const response = await WzRequest.apiReq('GET', '/cluster/status', {});
       const isCluster =
@@ -275,7 +275,6 @@ export class RestartHandler {
    * @param updateRedux Redux update function
    * @param useDelay need to delay synchronization?
    * @param isSyncCanceled cancellation of synchronization
-   * @return {object}
    */
   static async restartWazuh(
     updateRedux,
@@ -323,7 +322,6 @@ export class RestartHandler {
 
       updateRedux.updateRestartStatus(ENUM_RESTART_STATES.RESTARTED_INFO);
 
-      return { restarted: isCluster ? 'Cluster' : 'Manager' };
     } catch (error: any) {
       let errorType;
       if (error.message === 'Not synced') {

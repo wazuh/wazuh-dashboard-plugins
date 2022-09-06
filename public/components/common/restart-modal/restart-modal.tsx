@@ -40,16 +40,7 @@ import { ENUM_RESTART_STATES } from '../../../react-services/interfaces/wz-resta
  * @returns components's body
  */
 export const RestartModal = (props: { isSyncCanceled?: {}; cancelSync? }) => {
-  // TODO review if importing these functions in wz-restart work.
-  const dispatch = useDispatch();
-  const updateRedux = {
-    updateRestartStatus: (restartStatus) => dispatch(updateRestartStatus(restartStatus)),
-    updateSyncNodesInfo: (syncNodesInfo) => dispatch(updateSyncNodesInfo(syncNodesInfo)),
-    updateUnsynchronizedNodes: (unsynchronizedNodes) =>
-      dispatch(updateUnsynchronizedNodes(unsynchronizedNodes)),
-    updateRestartNodesInfo: (restartNodesInfo) =>
-      dispatch(updateRestartNodesInfo(restartNodesInfo)),
-  };
+  const { updateRedux, dispatch } = reduxDispatchers();
 
   // Cluster nodes that did not synced
   const unsyncedNodes = useSelector((state) => state.restartWazuhReducers.unsynchronizedNodes);
@@ -272,3 +263,19 @@ export const RestartModal = (props: { isSyncCanceled?: {}; cancelSync? }) => {
     </EuiOverlayMask>
   );
 };
+
+/**
+ * TODO
+ * @returns 
+ */
+export function reduxDispatchers() {
+  const dispatch = useDispatch();
+  const updateRedux = {
+    updateRestartStatus: (restartStatus) => dispatch(updateRestartStatus(restartStatus)),
+    updateSyncNodesInfo: (syncNodesInfo) => dispatch(updateSyncNodesInfo(syncNodesInfo)),
+    updateUnsynchronizedNodes: (unsynchronizedNodes) => dispatch(updateUnsynchronizedNodes(unsynchronizedNodes)),
+    updateRestartNodesInfo: (restartNodesInfo) => dispatch(updateRestartNodesInfo(restartNodesInfo))
+  };
+  return { updateRedux, dispatch };
+}
+

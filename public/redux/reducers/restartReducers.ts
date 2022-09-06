@@ -11,6 +11,9 @@
  */
 
 import { Reducer } from 'redux';
+import { 
+  ENUM_RESTART_STATES 
+} from '../../react-services/interfaces/wz-restart.interface';
 import { RestartWazuhState, ResolverAction } from '../types';
 
 const initialState: RestartWazuhState = {
@@ -19,7 +22,7 @@ const initialState: RestartWazuhState = {
   unsynchronizedNodes: [],
   syncNodesInfo: [{ name: '', synced: false }],
   restartNodesInfo: [{ node: '', isRestarted: false }],
-  restartStatus: 'restarted',
+  restartStatus: ENUM_RESTART_STATES.RESTARTED,
 };
 
 const restartWazuhReducer: Reducer<RestartWazuhState, ResolverAction> = (
