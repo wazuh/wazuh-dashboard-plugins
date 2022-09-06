@@ -10,15 +10,22 @@
  * Find more information about this on the LICENSE file.
  */
 
+import { KibanaRequest, KibanaResponseFactory, RequestHandlerContext } from 'src/core/server';
+import {
+  PLUGIN_PLATFORM_INSTALLATION_USER,
+  PLUGIN_PLATFORM_INSTALLATION_USER_GROUP,
+  PLUGIN_PLATFORM_NAME,
+  WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH,
+} from '../../common/constants';
+import { APIUserAllowRunAs } from '../lib/cache-api-user-has-run-as';
+import { ErrorResponse } from '../lib/error-response';
+import { log } from '../lib/logger';
 import { ManageHosts } from '../lib/manage-hosts';
 import { UpdateRegistry } from '../lib/update-registry';
-import { log } from '../lib/logger';
-import { ErrorResponse } from '../lib/error-response';
-import { APIUserAllowRunAs } from '../lib/cache-api-user-has-run-as';
-import { KibanaRequest, RequestHandlerContext, KibanaResponseFactory } from 'src/core/server';
-import { WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH, PLUGIN_PLATFORM_INSTALLATION_USER, PLUGIN_PLATFORM_INSTALLATION_USER_GROUP, PLUGIN_PLATFORM_NAME } from '../../common/constants';
 
 export class WazuhHostsCtrl {
+  manageHosts: ManageHosts;
+  updateRegistry: UpdateRegistry;
   constructor() {
     this.manageHosts = new ManageHosts();
     this.updateRegistry = new UpdateRegistry();
@@ -34,7 +41,7 @@ export class WazuhHostsCtrl {
   async getHostsEntries(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
     try {
       const removePassword = true;
-      const hosts = await this.manageHosts.getHosts(removePassword);
+      const hosts = await this.manageHosts.getHosts();
       const registry = await this.updateRegistry.getHosts();
       const result = await this.joinHostRegistry(hosts, registry, removePassword);
       return response.ok({

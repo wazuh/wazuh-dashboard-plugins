@@ -9,13 +9,15 @@
 *
 * Find more information about this on the LICENSE file.
 */
+import { webDocumentationLink } from "../../../../common/services/web_documentation";
+
 export default {
   id: 'vuls',
   xml_tag: 'vulnerabilities-detector',
   name: 'Vulnerabilities',
   description: 'Configuration options for vulnerabilities.',
   category: 'Threat detection and response',
-  documentation_link: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/vuln-detector.html',
+  documentation_link: webDocumentationLink('user-manual/reference/ossec-conf/vuln-detector.html'),
   icon: 'securityApp',
   avaliable_for_manager: true,
   steps: [
@@ -146,7 +148,7 @@ export default {
                 {
                   name: 'allow',
                   description: 'Defines compatibility with unsupported systems.',
-                  info: 'You can find a guide on how to set it up https://documentation.wazuh.com/current/user-manual/capabilities/vulnerability-detection/allow_os.html',
+                  info: `You can find a guide on how to set it up ${webDocumentationLink('user-manual/capabilities/vulnerability-detection/allow_os.html')}`,
                   type: 'input',
                   validate_error_message: 'A valid operating system not supported by default.'
                 }

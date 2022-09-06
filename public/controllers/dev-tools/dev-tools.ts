@@ -30,6 +30,7 @@ import {
   UILogLevel,
 } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
+import { webDocumentationLink } from '../../../common/services/web_documentation';
 
 export class DevToolsController {
   /**
@@ -146,9 +147,7 @@ export class DevToolsController {
    * Open API reference documentation
    */
   help() {
-    this.$window.open(
-      'https://documentation.wazuh.com/current/user-manual/api/reference.html'
-    );
+    this.$window.open(webDocumentationLink('user-manual/api/reference.html'));
   }
 
   /**

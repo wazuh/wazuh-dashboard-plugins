@@ -26,7 +26,7 @@ import {
   nameEquivalence,
   categoriesEquivalence,
   formEquivalence
-} from '../../../utils/config-equivalences';
+} from '../../../../common/config-equivalences';
 import store from '../../../redux/store'
 import { updateSelectedSettingsSection } from '../../../redux/actions/appStateActions';
 import { withUserAuthorizationPrompt, withErrorBoundary, withReduxProvider } from '../../common/hocs'

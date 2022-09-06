@@ -25,6 +25,7 @@ import store from '../../redux/store';
 import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
+import { webDocumentationLink } from '../../../common/services/web_documentation';
 
 export class AgentsPreviewController {
   /**
@@ -251,8 +252,7 @@ export class AgentsPreviewController {
   }
 
   openRegistrationDocs() {
-    this.$window.open(
-      'https://documentation.wazuh.com/current/user-manual/registering/index.html',
+    this.$window.open(webDocumentationLink(user-manual/registering/index.html),
       '_blank'
     );
   }
