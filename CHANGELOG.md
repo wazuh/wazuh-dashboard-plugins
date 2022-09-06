@@ -168,6 +168,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Run `template` and `fields` checks in the health check depends on the app configuration [#3783](https://github.com/wazuh/wazuh-kibana-app/pull/3783)
 - Added a toast message when there is an error creating a new group [#3804](https://github.com/wazuh/wazuh-kibana-app/pull/3804)
 - Added a step to start the agent to the deploy new Windowns agent guide [#3846](https://github.com/wazuh/wazuh-kibana-app/pull/3846)
+- Added agents windows events config tab [#3905](https://github.com/wazuh/wazuh-kibana-app/pull/3905)
 - Added 3 new panels to `Vulnerabilities/Inventory` [#3893](https://github.com/wazuh/wazuh-kibana-app/pull/3893)
 - Added new fields of `Vulnerabilities` to the details flyout [#3893](https://github.com/wazuh/wazuh-kibana-app/pull/3893) [#3908](https://github.com/wazuh/wazuh-kibana-app/pull/3908)
 - Added missing fields used in visualizations to the known fiels related to alerts [#3924](https://github.com/wazuh/wazuh-kibana-app/pull/3924)
