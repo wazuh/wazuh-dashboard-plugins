@@ -19,6 +19,7 @@ import { WzButtonPermissions } from '../../../../../components/common/permission
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
+import { SECTION_CDBLIST_SECTION } from './constants';
 
 /**
  * Uploads the files
@@ -84,7 +85,7 @@ const getUpdatePermissionsFiles = (section) => {
 // Add new rule button
 export const AddNewFileButton = ({ section, updateAddingFile }) => (
   <>{
-    section !== 'lists' &&
+    section !== SECTION_CDBLIST_SECTION &&
     <WzButtonPermissions
       permissions={getUpdatePermissionsFiles(section)}
       buttonType="empty"
@@ -148,7 +149,7 @@ export const ManageFiles = (({ section, showingFiles, ...props }) => {
   }
   return (
     <>
-      {section !== 'lists' &&
+      {section !== SECTION_CDBLIST_SECTION &&
         <WzButtonPermissions
           buttonType="empty"
           permissions={getUpdatePermissionsFiles(section)}

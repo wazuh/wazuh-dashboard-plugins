@@ -26,6 +26,11 @@ import WzStatistics from './statistics/statistics-main';
 import { connect } from 'react-redux';
 import { clusterReq } from './configuration/utils/wz-fetch';
 import { updateClusterStatus } from '../../../../redux/actions/appStateActions';
+import {
+  SECTION_CDBLIST_SECTION,
+  SECTION_DECODERS_SECTION,
+  SECTION_RULES_SECTION
+} from './common/constants';
 
 class WzManagementMain extends Component {
   constructor(props) {
@@ -78,15 +83,15 @@ class WzManagementMain extends Component {
           (section === 'statistics' && <WzStatistics />) ||
           (section === 'logs' && <WzLogs />) ||
           (section === 'configuration' && <WzConfiguration {...this.props.configurationProps} />) ||
-          (section === 'decoders' && <WzDecoders
+          (section === SECTION_DECODERS_SECTION && <WzDecoders
             logtestProps={this.props.logtestProps}
             clusterStatus={this.props.clusterStatus}
           />) ||
-          (section === 'lists' && <WzCDBLists
+          (section === SECTION_CDBLIST_SECTION && <WzCDBLists
             logtestProps={this.props.logtestProps}
             clusterStatus={this.props.clusterStatus}
           />) ||
-          (['ruleset', 'rules'].includes(section) && (
+          (['ruleset', SECTION_RULES_SECTION].includes(section) && (
             <WzRuleset
               logtestProps={this.props.logtestProps}
               clusterStatus={this.props.clusterStatus}
