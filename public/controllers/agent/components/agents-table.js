@@ -36,10 +36,11 @@ import { getAgentFilterValues } from '../../../controllers/management/components
 import { WzButtonPermissions } from '../../../components/common/permissions/button';
 import { formatUIDate } from '../../../react-services/time-service';
 import { withErrorBoundary } from '../../../components/common/hocs';
-import { API_NAME_AGENT_STATUS, UI_LOGGER_LEVELS, UI_ORDER_AGENT_STATUS } from '../../../../common/constants';
+import { API_NAME_AGENT_STATUS, UI_LOGGER_LEVELS, UI_ORDER_AGENT_STATUS, AGENT_SYNCED_STATUS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { AgentStatus } from '../../../components/agents/agent_status';
+import { AgentSynced } from '../../../components/agents/agent-synced';
 
 export const AgentsTable = withErrorBoundary(
   class AgentsTable extends Component {
@@ -69,6 +70,13 @@ export const AgentsTable = withErrorBoundary(
           description: 'Filter by agent connection status',
           operators: ['=', '!='],
           values: UI_ORDER_AGENT_STATUS,
+        },
+        {
+          type: 'q',
+          label: 'group_config_status',
+          description: 'Filter by agent synced configuration status',
+          operators: ['=', '!='],
+          values: [AGENT_SYNCED_STATUS.SYNCED, AGENT_SYNCED_STATUS.NOT_SYNCED],
         },
         {
           type: 'q',
@@ -282,6 +290,7 @@ export const AgentsTable = withErrorBoundary(
         name: agent.name,
         ip: agent.ip,
         status: agent.status,
+        group_config_status: agent.group_config_status,
         group: checkField(agent.group),
         os_name: agent,
         version: agentVersion,
@@ -462,20 +471,20 @@ export const AgentsTable = withErrorBoundary(
         field: 'name',
         name: 'Name',
         sortable: true,
-        width: '15%',
+        width: '10%',
         truncateText: true,
       },
       {
         field: 'ip',
         name: 'IP',
-        width: '10%',
+        width: '8%',
         truncateText: true,
         sortable: true,
       },
       {
         field: 'group',
         name: 'Group(s)',
-        width: '20%',
+        width: '14%',
         truncateText: true,
         sortable: true,
         render: (groups) => (groups !== '-' ? this.renderGroups(groups) : '-'),
@@ -484,14 +493,14 @@ export const AgentsTable = withErrorBoundary(
         field: 'os_name',
         name: 'OS',
         sortable: true,
-        width: '15%',
+        width: '10%',
         truncateText: true,
         render: this.addIconPlatformRender,
       },
       {
         field: 'node_name',
         name: 'Cluster node',
-        width: '10%',
+        width: '8%',
         truncateText: true,
         sortable: true,
       },
@@ -505,14 +514,14 @@ export const AgentsTable = withErrorBoundary(
       {
         field: 'dateAdd',
         name: 'Registration date',
-        width: '10%',
+        width: '8%',
         truncateText: true,
         sortable: true,
       },
       {
         field: 'lastKeepAlive',
         name: 'Last keep alive',
-        width: '10%',
+        width: '8%',
         truncateText: true,
         sortable: true,
       },
@@ -521,8 +530,16 @@ export const AgentsTable = withErrorBoundary(
         name: 'Status',
         truncateText: true,
         sortable: true,
-        width: '15%',
+        width: '10%',
         render: (status) => <AgentStatus status={status} labelProps={{ className: 'hide-agent-status' }} />,
+      },
+      {
+        field: 'group_config_status',
+        name: 'Synced',
+        truncateText: true,
+        sortable: true,
+        width: '10%',
+        render: (synced) => <AgentSynced synced={synced}/>,
       },
       {
         align: 'right',

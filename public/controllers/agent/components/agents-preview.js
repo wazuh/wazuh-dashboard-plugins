@@ -68,6 +68,7 @@ export const AgentsPreview = compose(
         showAgentsEvolutionVisualization: true,
         agentTableFilters: [],
         agentStatusSummary: { active: '-', disconnected: '-', total: '-', pending: '-', never_connected: '-' },
+        agentConfiguration: {},
         agentsActiveCoverage: 0,
       };
       this.wazuhConfig = new WazuhConfig();
@@ -108,16 +109,17 @@ export const AgentsPreview = compose(
         return prev;
       }, {});
     };
-
     async fetchSummaryStatus() {
       this.setState({ loadingSummary: true });
-      const { data: { data: agentStatusSummary } } = await WzRequest.apiReq('GET', '/agents/summary/status', {});
+      const {data: {data: { connection: agentStatusSummary, configuration: agentConfiguration }}} = await WzRequest.apiReq('GET', '/agents/summary/status', {});
 
       this.props.tableProps.updateSummary(agentStatusSummary);
       this.setState({
         loadingSummary: false,
         agentStatusSummary,
+        agentConfiguration,
         agentsActiveCoverage: ((agentStatusSummary.active / agentStatusSummary.total) * 100).toFixed(2),
+        agentsSynced: ((agentConfiguration.synced/agentConfiguration.total)*100).toFixed(2),
       });
     }
 
@@ -133,7 +135,6 @@ export const AgentsPreview = compose(
         agentMostActive
       });
     }
-
     async fetchAgentStatusDetailsData(){
       try {
         this.fetchSummaryStatus();
@@ -234,6 +235,14 @@ export const AgentsPreview = compose(
                             title={`${this.state.agentsActiveCoverage}%`}
                             titleSize='s'
                             description="Agents coverage"
+                            className="white-space-nowrap"
+                          />
+                        </EuiFlexItem>
+                        <EuiFlexItem className="agents-link-item">
+                          <EuiStat
+                            title={`${this.state.agentsSynced}%`}
+                            titleSize='s'
+                            description="Synced agents"
                             className="white-space-nowrap"
                           />
                         </EuiFlexItem>
