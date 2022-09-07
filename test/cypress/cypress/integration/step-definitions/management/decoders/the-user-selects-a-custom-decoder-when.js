@@ -6,7 +6,7 @@ const xmlDecoderFile = getSelector('xmlDecoderFile', pageName);
 
 When('The user selects a custom decoders to edit', () => {
   elementIsVisible(firstCustomDecoder);
-  elementIsVisible(xmlDecoderFile);
   clickElement(firstCustomDecoder);
+  elementIsVisible(xmlDecoderFile);
   clickElement(xmlDecoderFile);
 });
