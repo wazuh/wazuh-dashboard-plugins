@@ -1,0 +1,83 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`RegisterAgent should match modal snapshot - mobile 1`] = `
+<DocumentFragment>
+  <div>
+    <div
+      class="euiPage euiPage--restrictWidth-custom"
+      style="background: transparent; max-width: 1000px;"
+    >
+      <main
+        class="euiPageBody"
+      >
+        <div
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+        >
+          <div
+            class="euiFlexItem"
+          >
+            <div
+              class="euiPanel euiPanel--paddingMedium"
+            >
+              <div
+                class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+              >
+                <div
+                  class="euiFlexItem"
+                >
+                  <h2
+                    class="euiTitle euiTitle--medium"
+                  >
+                    Deploy a new agent
+                  </h2>
+                </div>
+                <div
+                  class="euiFlexItem euiFlexItem--flexGrowZero"
+                >
+                  <button
+                    class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small"
+                    type="button"
+                  >
+                    <span
+                      class="euiButtonContent euiButtonEmpty__content"
+                    >
+                      <svg
+                        aria-hidden="true"
+                        class="euiIcon euiIcon--medium euiIcon-isLoading euiButtonContent__icon"
+                        focusable="false"
+                        height="16"
+                        role="img"
+                        viewBox="0 0 16 16"
+                        width="16"
+                        xmlns="http://www.w3.org/2000/svg"
+                      />
+                      <span
+                        class="euiButtonEmpty__text"
+                      >
+                        Close
+                      </span>
+                    </span>
+                  </button>
+                </div>
+              </div>
+              <div
+                class="euiSpacer euiSpacer--l"
+              />
+              <div
+                class="euiFlexItem"
+              >
+                <div
+                  class="euiProgress euiProgress--indeterminate euiProgress--xs euiProgress--primary"
+                />
+              </div>
+              <div
+                class="euiSpacer euiSpacer--l"
+              />
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+</DocumentFragment>
+`;

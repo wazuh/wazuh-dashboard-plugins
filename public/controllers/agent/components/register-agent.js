@@ -77,6 +77,7 @@ export const RegisterAgent = withErrorBoundary(
 
     async componentDidMount() {
       try {
+        console.log('holaß')
         this.setState({ loading: true });
         const wazuhVersion = await this.props.getWazuhVersion();
         let serverAddress = false;
