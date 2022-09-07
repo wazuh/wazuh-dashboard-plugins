@@ -47,6 +47,17 @@ const architectureButtons = [
     }
   ];
 
+  const architectureButtonsOpenSuse = [
+    {
+      id: 'x86_64',
+      label: 'x86_64',
+    },
+    {
+      id: 'ARM64',
+      label: 'ARM64',
+    }
+  ];
+
   const architectureButtonsAix = [
     {
       id: 'powerpc',
@@ -225,4 +236,4 @@ const architectureButtons = [
     },
   ];
 
-export { architectureButtons, architectureCentos5OrRedHat5, versionButtonsRedHat, versionButtonsCentos, osButtons, sysButtons, versionButtonsDebian, versionButtonsUbuntu, versionButtonsWindows, versionButtonsMacOS, versionButtonsOpenSuse, versionButtonsSolaris, versionButtonsAix, versionButtonsHPUX, architectureButtonsi386, architectureButtonsSolaris, architectureButtonsAix, architectureButtonsHpUx };
+export { architectureButtons, architectureCentos5OrRedHat5, versionButtonsRedHat, versionButtonsCentos, osButtons, sysButtons, versionButtonsDebian, versionButtonsUbuntu, versionButtonsWindows, versionButtonsMacOS, versionButtonsOpenSuse, versionButtonsSolaris, versionButtonsAix, versionButtonsHPUX, architectureButtonsi386, architectureButtonsSolaris, architectureButtonsAix, architectureButtonsHpUx, architectureButtonsOpenSuse };
