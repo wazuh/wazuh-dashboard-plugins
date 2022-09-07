@@ -70,6 +70,7 @@ export const AgentsPreview = compose(
         agentStatusSummary: { active: '-', disconnected: '-', total: '-', pending: '-', never_connected: '-' },
         agentConfiguration: {},
         agentsActiveCoverage: 0,
+        agentsSynced: 0,
       };
       this.wazuhConfig = new WazuhConfig();
       this.agentStatus = UI_ORDER_AGENT_STATUS.map(agentStatus => ({
@@ -236,10 +237,11 @@ export const AgentsPreview = compose(
                             titleSize='s'
                             description="Agents coverage"
                             className="white-space-nowrap"
-                          />
+                            />
                         </EuiFlexItem>
                         <EuiFlexItem className="agents-link-item">
                           <EuiStat
+                            isLoading={this.state.loadingSummary}
                             title={`${this.state.agentsSynced}%`}
                             titleSize='s'
                             description="Synced agents"
