@@ -7,8 +7,6 @@ When('The user {} sample data for', (status,types) => {
   let titleStatus = 'added'
   let buttonLabel = 'Remove data'
   if(status != 'adds'){titleStatus =  'removed'; buttonLabel = 'Add data';}
-  // cy.log(titleStatus)
-  // cy.log(buttonLabel)
   types.raw().forEach((sample) => {
     cy.get(getSelector(sample, SAMPLE_DATA), { timeout: 15000 })
     forceClickElement(getSelector(sample, SAMPLE_DATA));
