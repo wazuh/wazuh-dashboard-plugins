@@ -1022,7 +1022,6 @@ export const RegisterAgent = withErrorBoundary(
             },
           ]
           : []),
-        // ...(this.state.selectedOS == 'deb' ||
         ...(this.state.selectedVersion == 'centos6' || this.state.selectedVersion == 'centos7' || this.state.selectedVersion == 'redhat6' || this.state.selectedVersion == 'redhat7' || this.state.selectedVersion == 'debian7' || this.state.selectedVersion == 'debian8' || this.state.selectedVersion == 'debian10' || this.state.selectedVersion == 'ubuntu14' || this.state.selectedVersion == 'ubuntu15' || this.state.selectedVersion == 'ubuntu16'
           ? [
             {
