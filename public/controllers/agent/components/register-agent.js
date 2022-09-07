@@ -40,7 +40,7 @@ import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
-import { architectureButtons, architectureButtonsi386, architectureCentos5OrRedHat5, architectureButtonsSolaris, architectureButtonsOpenSuse, architectureButtonsAix, architectureButtonsHpUx, versionButtonsRedHat, versionButtonsCentos, osButtons, sysButtons, versionButtonsDebian, versionButtonsUbuntu, versionButtonsWindows, versionButtonsMacOS, versionButtonsOpenSuse, versionButtonsSolaris, versionButtonsAix, versionButtonsHPUX } from '../wazuh-config'
+import { architectureButtons, architectureButtonsi386, architectureCentos5OrRedHat5, architectureButtonsSolaris, architectureButtonsOpenSuse, architectureButtonsAix, architectureButtonsHpUx, versionButtonsRedHat, versionButtonsCentos, osButtons, versionButtonsDebian, versionButtonsUbuntu, versionButtonsWindows, versionButtonsMacOS, versionButtonsOpenSuse, versionButtonsSolaris, versionButtonsAix, versionButtonsHPUX } from '../wazuh-config'
 
 export const RegisterAgent = withErrorBoundary(
 
@@ -171,10 +171,8 @@ export const RegisterAgent = withErrorBoundary(
         selectedArchitecture: '',
         selectedSYS: '',
       });
-      console.log(os, 'HOLA')
-      console.log(this.state.selectedOS, 'HOLA')
-
     }
+
     systemSelector() {
       if (this.state.selectedVersion === 'redhat7' || this.state.selectedVersion === 'centos7' || this.state.selectedVersion === 'debian8' || this.state.selectedVersion === 'debian10' || this.state.selectedVersion === 'ubuntu15' || this.state.selectedVersion === 'ubuntu16' || this.state.selectedVersion === 'leap15') {
         return 'sudo systemctl daemon-reload\nsudo systemctl enable wazuh-agent\nsudo systemctl start wazuh-agent';
@@ -414,7 +412,6 @@ export const RegisterAgent = withErrorBoundary(
     }
 
     optionalPackages() {
-      console.log(this.state.selectedOS, 'la funcion')
       switch (this.state.selectedOS) {
         case 'rpm':
           return this.resolveRPMPackage();
@@ -898,8 +895,6 @@ export const RegisterAgent = withErrorBoundary(
         )
       }
 
-      const os = this.state.selectedOS
-      console.log(os, 'os')
       const steps = [
         {
           title: 'Choose the Operating system',
