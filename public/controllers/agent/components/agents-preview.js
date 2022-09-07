@@ -211,7 +211,7 @@ export const AgentsPreview = compose(
                   </EuiFlexItem>
                   <EuiFlexItem grow={false} className="agents-details-card">
                     <EuiCard title description betaBadgeLabel="Details">
-                      <EuiFlexGroup className="group-details">
+                      <EuiFlexGroup wrap={true} className="group-details">
                         {this.agentStatus.map(({status, label, color}) => (
                           <EuiFlexItem key={`agent-details-status-${status}`}>
                             <EuiStat
