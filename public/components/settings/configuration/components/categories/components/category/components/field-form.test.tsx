@@ -16,22 +16,22 @@ import React from 'react';
 import { FieldForm } from './field-form';
 import { ISetting } from '../../../../../configuration';
 import { mount } from 'enzyme';
+import { TPluginSettingWithKey } from '../../../../../../../../../common/constants';
 
 describe('FieldForm component', () => {
   it('renders correctly to match the snapshot', () => {
-    const item: ISetting = {
-      setting: 'string',
-      value: 'boolean',
+    const item: TPluginSettingWithKey = {
+      key: 'custom.setting',
       description: 'string',
-      category: 'string',
-      name: 'string',
-      form: { type: 'text', params: {} }
+      category: 1,
+      name: 'Custom setting',
+      type: 'text',
     };
     const updatedConfig = {};
     const setUpdatedConfig = jest.fn();
 
     const wrapper = mount(
-      <FieldForm item={item} updatedConfig={updatedConfig} setUpdatedConfig={setUpdatedConfig} />
+      <FieldForm item={item} value={''} updatedConfig={updatedConfig} setUpdatedConfig={setUpdatedConfig} />
     );
 
     expect(wrapper).toMatchSnapshot();

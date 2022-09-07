@@ -4,41 +4,35 @@ exports[`FieldForm component renders correctly to match the snapshot 1`] = `
 <FieldForm
   item={
     Object {
-      "category": "string",
+      "category": 1,
       "description": "string",
-      "form": Object {
-        "params": Object {},
-        "type": "text",
-      },
-      "name": "string",
-      "setting": "string",
-      "value": "boolean",
+      "key": "custom.setting",
+      "name": "Custom setting",
+      "type": "text",
     }
   }
   setUpdatedConfig={[MockFunction]}
   updatedConfig={Object {}}
+  value=""
 >
   <TextForm
     item={
       Object {
-        "category": "string",
+        "category": 1,
         "description": "string",
-        "form": Object {
-          "params": Object {},
-          "type": "text",
-        },
-        "name": "string",
-        "setting": "string",
-        "value": "boolean",
+        "key": "custom.setting",
+        "name": "Custom setting",
+        "type": "text",
       }
     }
     setUpdatedConfig={[MockFunction]}
     updatedConfig={Object {}}
+    value=""
   >
     <EuiFieldText
       fullWidth={true}
       onChange={[Function]}
-      value="boolean"
+      value=""
     >
       <EuiFormControlLayout
         fullWidth={true}
@@ -54,7 +48,7 @@ exports[`FieldForm component renders correctly to match the snapshot 1`] = `
                 className="euiFieldText euiFieldText--fullWidth"
                 onChange={[Function]}
                 type="text"
-                value="boolean"
+                value=""
               />
             </EuiValidatableControl>
             <EuiFormControlLayoutIcons />

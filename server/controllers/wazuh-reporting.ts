@@ -32,7 +32,6 @@ import { KibanaRequest, RequestHandlerContext, KibanaResponseFactory } from 'src
 import { ReportPrinter } from '../lib/reporting/printer';
 import { log } from '../lib/logger';
 import {
-  WAZUH_ALERTS_PATTERN,
   WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH,
   WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH,
   AUTHORIZED_AGENTS,
@@ -41,6 +40,7 @@ import {
 import { createDirectoryIfNotExists, createDataDirectoryIfNotExists } from '../lib/filesystem';
 import moment from 'moment';
 import { agentStatusLabelByAgentStatus } from '../../common/services/wz_agent_status';
+import { getSettingDefaultValue } from '../../common/services/settings';
 
 export class WazuhReportingCtrl {
   constructor() {}
@@ -298,7 +298,7 @@ export class WazuhReportingCtrl {
     from,
     to,
     filters,
-    pattern = WAZUH_ALERTS_PATTERN,
+    pattern = getSettingDefaultValue('pattern'),
     agent = null
   ) {
     try {

@@ -69,6 +69,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     this.logger.debug('Wazuh-wui: Setup');
 
     const serverInfo = core.http.getServerInfo();
+    // TODO: Research to add custom endpoint to expose the custom assets: core.http.resources
 
     let wazuhSecurity;
     core.http.registerRouteHandlerContext('wazuh', async(context, request) => {

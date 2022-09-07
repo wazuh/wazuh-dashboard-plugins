@@ -11,12 +11,13 @@ import { log } from '../logger';
 import * as TimSort from 'timsort';
 import { getConfiguration } from '../get-configuration';
 import { REPORTS_PRIMARY_COLOR, REPORTS_LOGO_IMAGE_ASSETS_RELATIVE_PATH, REPORTS_PAGE_FOOTER_TEXT, REPORTS_PAGE_HEADER_TEXT } from '../../../common/constants';
+import { getSettingDefaultValue } from '../../../common/services/settings';
 
 const COLORS = {
   PRIMARY: REPORTS_PRIMARY_COLOR
 };
 
-const pageConfiguration = (nameLogo) => ({
+const pageConfiguration = ({pathToLogo, pageHeader, pageFooter}) => ({
   styles: {
     h1: {
       fontSize: 22,
@@ -54,11 +55,11 @@ const pageConfiguration = (nameLogo) => ({
     margin: [40, 20, 0, 0],
     columns: [
       {
-        image: path.join(__dirname, `../../../public/assets/${nameLogo}`),
+        image: path.join(__dirname, `../../../public/assets/${pathToLogo}`),
         width: 190
       },
       {
-        text: REPORTS_PAGE_HEADER_TEXT,
+        text: pageHeader,
         alignment: 'right',
         margin: [0, 0, 40, 0],
         color: COLORS.PRIMARY
@@ -70,7 +71,7 @@ const pageConfiguration = (nameLogo) => ({
     return {
       columns: [
         {
-          text: REPORTS_PAGE_FOOTER_TEXT,
+          text: pageFooter,
           color: COLORS.PRIMARY,
           margin: [40, 40, 0, 0]
         },
@@ -614,9 +615,11 @@ export class ReportPrinter{
   }
 
   async print(reportPath: string){
-    const nameLogo = ( await getConfiguration() )['customization.logo.reports'] || REPORTS_LOGO_IMAGE_ASSETS_RELATIVE_PATH;
-
-    const document = this._printer.createPdfKitDocument({...pageConfiguration(nameLogo), content: this._content});
+    const configuration = await getConfiguration();
+    const pathToLogo = configuration['customization.logo.reports'] || getSettingDefaultValue('customization.logo.reports');
+    const pageHeader = configuration['customization.reports.header'] || getSettingDefaultValue('customization.reports.header');
+    const pageFooter = configuration['customization.reports.footer'] || getSettingDefaultValue('customization.reports.footer');
+    const document = this._printer.createPdfKitDocument({...pageConfiguration({pathToLogo, pageHeader, pageFooter}), content: this._content});
     await document.pipe(
       fs.createWriteStream(reportPath)
     );

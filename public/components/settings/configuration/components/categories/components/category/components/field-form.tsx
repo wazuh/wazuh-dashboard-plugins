@@ -10,166 +10,277 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { useState, useEffect } from 'react';
-import { validate } from 'node-cron';
+import React from 'react';
 import {
-  EuiFieldText,
-  EuiFieldNumber,
-  EuiSwitch,
-  EuiSelect,
   EuiCodeEditor,
-  EuiTextColor
+  EuiImage,
+  EuiFilePicker,
+  EuiFieldNumber,
+  EuiFieldText,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiFormRow,
+  EuiSelect,
+  EuiSpacer,
+  EuiSwitch,
+  EuiTextArea,
 } from '@elastic/eui';
-import { ISetting } from '../../../../../configuration';
 import 'brace/mode/javascript';
 import 'brace/snippets/javascript';
 import 'brace/ext/language_tools';
 import "brace/ext/searchbox";
 import {
   UI_ERROR_SEVERITIES,
-  UIErrorLog, UIErrorSeverity,
-  UILogLevel,
 } from '../../../../../../../../react-services/error-orchestrator/types';
-import { UI_LOGGER_LEVELS } from '../../../../../../../../../common/constants';
+import { TPluginSettingWithKey, UI_LOGGER_LEVELS } from '../../../../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../../../../react-services/common-services';
 import _ from 'lodash';
+import { WzButtonModalConfirm } from '../../../../../../../common/buttons';
+import { WzRequest } from '../../../../../../../../react-services';
+import { getAssetURL } from '../../../../../../../../utils/assets';
+import { getHttp } from '../../../../../../../../kibana-services';
+import { useDispatch } from 'react-redux';
+import { updateAppConfig } from '../../../../../../../../redux/actions/appConfigActions';
+import { useFormFieldChanged } from '../../../../../../../common/hooks';
 
 interface IFieldForm {
-  item: ISetting
-  updatedConfig: { [field: string]: string | number | boolean | [] }
-  setUpdatedConfig({ }): void
+  item: TPluginSettingWithKey
+  value: any
+  initialValue: any
+  onChange: () => void
 }
+
 export const FieldForm: React.FunctionComponent<IFieldForm> = (props) => {
   const { item } = props;
-  switch (item.form.type) {
-    case 'text':
-      return <TextForm {...props} />
-    case 'number':
-      return <NumberForm {...props} />
-    case 'boolean':
-      return <BooleanForm {...props} />
-    case 'list':
-      return <ListForm {...props} />
-    case 'array':
-      return <ArrayForm {...props} />
-    case 'interval':
-      return <IntervalForm {...props} />
-    default:
-      return null;
-  }
+  const ComponentForm = Form[item.type];
+
+  if(ComponentForm){
+    return <ComponentForm {...props}/>
+  };
+
+  return null;
 };
 
 //#region forms
-const TextForm: React.FunctionComponent<IFieldForm> = (props) => (
-  <EuiFieldText
-    fullWidth
-    value={getValue(props)}
-    onChange={e => onChange(e.target.value, props)} />);
+const TextForm: React.FunctionComponent<IFieldForm> = ({item, initialValue, onChange: onChangeFormField}) => {
+  const { value, error, onChange } = useFormFieldChanged(
+    item.key,
+    initialValue,
+    {validate: item?.validate, onChange: onChangeFormField, type: item.type}
+  );
 
-const NumberForm: React.FunctionComponent<IFieldForm> = (props) => (
-  <EuiFieldNumber
-    fullWidth
-    value={getValue(props)}
-    onChange={e => onChange(e.target.value, props)} />)
-const BooleanForm: React.FunctionComponent<IFieldForm> = (props) => (
-  <EuiSwitch
-    label={`${getValue(props)}`}
-    checked={getValue(props)}
-    onChange={(e) => onChange(e.target.checked, props)} />);
+  const isInvalid = Boolean(error);
 
-const ListForm: React.FunctionComponent<IFieldForm> = (props) => (
-  <EuiSelect
-    {...props.item.form.params}
-    value={getValue(props)}
-    onChange={(e) => onChange(e.target.value, props)} />);
-
-const IntervalForm: React.FunctionComponent<IFieldForm> = (props) => {
-  const [interval, setInterval] = useState<string>(getValue(props));
-  const [invalid, setInvalid] = useState(false);
-  useEffect(() => {
-    if (validate(interval)) {
-      setInvalid(false);
-      getValue(props) !== interval && onChange(interval, props);
-    } else {
-      setInvalid(true);
-      deleteChange(props);
-    }
-  }, [interval])
   return (
-    <>
+    <EuiFormRow label={item.key} fullWidth isInvalid={isInvalid} error={error}>
       <EuiFieldText
         fullWidth
-        value={interval}
-        isInvalid={invalid}
-        onChange={e => setInterval(e.target.value)}
-      />
-      {invalid && <EuiTextColor color='danger'>Invalid cron schedule expressions</EuiTextColor>}
-    </>
+        value={value}
+        isInvalid={isInvalid}
+        onChange={onChange} />
+    </EuiFormRow>
   );
-}
+};
 
-const ArrayForm: React.FunctionComponent<IFieldForm> = (props) => {
-  const [list, setList] = useState(JSON.stringify(getValue(props)));
+const TextAreaForm: React.FunctionComponent<IFieldForm> = ({item, initialValue, onChange: onChangeFormField}) => {
+  const { value, error, onChange } = useFormFieldChanged(
+    item.key,
+    initialValue,
+    {validate: item?.validate, onChange: onChangeFormField, type: item.type}
+  );
 
-  useEffect(() => {
-    checkErrors();
-  }, [list]);
+  const isInvalid = Boolean(error);
 
-  const checkErrors = () => {
-    try {
-      const parsed = JSON.parse(list);
-      onChange(parsed, props);
-    } catch (error) {
-      const options: UIErrorLog = {
-        context: `${FieldForm.name}.checkErrors`,
-        level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
-        severity: UI_ERROR_SEVERITIES.UI as UIErrorSeverity,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: error.message || error,
-        },
-      };
-
-      getErrorOrchestrator().handleError(options);
-    }
-  }
   return (
-    <EuiCodeEditor
-      mode='javascript'
-      height='50px'
-      width='100%'
-      value={list}
-      onChange={setList}
-   />
+    <EuiFormRow label={item.key} fullWidth isInvalid={isInvalid} error={error}>
+      <EuiTextArea
+        fullWidth
+        value={value}
+        isInvalid={isInvalid}
+        onChange={onChange} />
+    </EuiFormRow>
+  );
+};
+
+const NumberForm: React.FunctionComponent<IFieldForm> = ({item, initialValue, onChange: onChangeFormField}) => {
+  const { value, error, onChange } = useFormFieldChanged(
+    item.key,
+    initialValue,
+    {validate: item?.validate, onChange: onChangeFormField, type: item.type}
+  );
+
+  const isInvalid = Boolean(error);
+
+  return (
+    <EuiFormRow label={item.key} fullWidth isInvalid={isInvalid} error={error}>
+      <EuiFieldNumber
+        fullWidth
+        value={value}
+        onChange={onChange} />
+    </EuiFormRow>
+  );
+};
+
+  
+const BooleanForm: React.FunctionComponent<IFieldForm> = ({item, initialValue, onChange: onChangeFormField}) => {
+  const { value, error, onChange } = useFormFieldChanged(
+    item.key,
+    initialValue,
+    {validate: item?.validate, onChange: onChangeFormField, type: item.type}
+  );
+
+  const isInvalid = Boolean(error);
+
+  return (
+    <EuiFormRow label={item.key} fullWidth isInvalid={isInvalid} error={error}>
+      <EuiSwitch
+        label={String(value)}
+        checked={value}
+        onChange={onChange} />
+    </EuiFormRow>
+  );
+};
+
+const ListForm: React.FunctionComponent<IFieldForm> = ({item, initialValue, onChange: onChangeFormField}) => {
+  const { value, error, onChange } = useFormFieldChanged(
+    item.key,
+    initialValue,
+    {validate: item?.validate, onChange: onChangeFormField, type: item.type}
+  );
+
+  const isInvalid = Boolean(error);
+
+  return (
+    <EuiFormRow label={item.key} fullWidth isInvalid={isInvalid} error={error}>
+      <EuiSelect
+        options={item.options.choices}
+        value={value}
+        onChange={onChange} />
+    </EuiFormRow>
+  )
+};
+
+const IntervalForm: React.FunctionComponent<IFieldForm> = ({item, initialValue, onChange: onChangeFormField}) => {
+  const { value, error, onChange } = useFormFieldChanged(
+    item.key,
+    initialValue,
+    {validate: item?.validate, onChange: onChangeFormField, type: item.type}
+  );
+
+  const isInvalid = Boolean(error);
+
+  return (
+    <EuiFormRow label={item.key} fullWidth isInvalid={isInvalid} error={error}>
+      <EuiFieldText
+        fullWidth
+        value={value}
+        isInvalid={isInvalid}
+        onChange={onChange}
+      />
+    </EuiFormRow>
   );
 }
 
-//#endregion
+const ArrayForm: React.FunctionComponent<IFieldForm> = ({item, initialValue, onChange: onChangeFormField}) => {
+  const { value, error, onChange } = useFormFieldChanged(
+    item.key,
+    JSON.stringify(initialValue),
+    {validate: item?.validate, onChange: onChangeFormField, type: item.type}
+  );
 
-//#region Helpers
+  const isInvalid = Boolean(error);
 
-const getValue = ({ item, updatedConfig }: IFieldForm) => typeof updatedConfig[item.setting] !== 'undefined'
-  ? updatedConfig[item.setting]
-  : item.value;
-
-const onChange = (value: string | number | boolean | [], props: IFieldForm) => {
-  const { updatedConfig, setUpdatedConfig, item } = props;
-  if(!_.isEqual(item.value,value)){
-    setUpdatedConfig({
-      ...updatedConfig,
-      [item.setting]: value,
-    })
-  }else{
-    deleteChange(props);
-  }
+  return (
+    <EuiFormRow label={item.key} fullWidth isInvalid={isInvalid} error={error}>
+      <EuiCodeEditor
+        mode='json'
+        height='50px'
+        width='100%'
+        value={value}
+        onChange={onChange}
+    />
+    </EuiFormRow>
+  );
 }
 
-const deleteChange = (props: IFieldForm) => {
-  const { updatedConfig, setUpdatedConfig, item } = props;
-  const newConfig = { ...updatedConfig };
-  delete newConfig[item.setting];
-  setUpdatedConfig(newConfig);
+const FilePickerForm: React.FunctionComponent<IFieldForm> = ({item, initialValue, onChange: onChangeFormField, value: valueImage}) => {
+  const dispatch = useDispatch();
+  const filename = valueImage ? getHttp().basePath.prepend(getAssetURL(valueImage)) : null;
+
+  const { error, onChange } = useFormFieldChanged(
+    item.key,
+    JSON.stringify(initialValue),
+    {validate: item?.validate, onChange: onChangeFormField, type: item.type}
+  );
+
+  const isInvalid = Boolean(error);
+
+  return (
+    <EuiFormRow label={item.key} fullWidth isInvalid={isInvalid} error={error}>
+      <>
+        {filename && (
+          <EuiFlexGroup alignItems="center">
+            <EuiFlexItem grow={false}>
+              <EuiImage src={filename} size='s'/>
+            </EuiFlexItem>
+            <EuiFlexItem grow={false}>
+              <WzButtonModalConfirm
+                buttonType="icon"
+                tooltip={{
+                  content: 'Delete file',
+                  position: 'top',
+                }}
+                modalTitle={`Do you want to delete the ${item.key} file?`}
+                onConfirm={async () => {
+                  try{
+                    await WzRequest.genericReq('DELETE', `/utils/configuration/files/${item.key}`);
+                    dispatch(updateAppConfig({[item.key]: ''}));
+                  }catch(error){
+                    const options = {
+                      context: `${FilePickerForm.name}.confirmDeletePolicy`,
+                      level: UI_LOGGER_LEVELS.ERROR,
+                      severity: UI_ERROR_SEVERITIES.BUSINESS,
+                      store: true,
+                      error: {
+                        error: error,
+                        message: error.message || error,
+                        title: error.name || error,
+                      },
+                    };
+                    getErrorOrchestrator().handleError(options);
+                  }
+                }}
+                modalProps={{ buttonColor: 'danger' }}
+                iconType="trash"
+                color="danger"
+                aria-label="Delete file"
+              />
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        )}
+        <EuiSpacer size='s' />
+        <EuiFilePicker
+          id={''}
+          initialPromptText="Select or drag the file"
+          onChange={(fileList) => onChange(fileList?.[0])}
+          display={true ? 'large' : 'default'}
+          fullWidth
+          aria-label="Upload a file"
+        />
+      </>
+    </EuiFormRow>
+  );
+}
+
+const Form = {
+  text: TextForm,
+  number: NumberForm,
+  boolean: BooleanForm,
+  list: ListForm,
+  array: ArrayForm,
+  interval: IntervalForm,
+  filepicker: FilePickerForm,
+  textarea: TextAreaForm
 }
 
 //#endregion

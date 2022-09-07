@@ -11,8 +11,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { useState, useEffect, Fragment } from 'react';
-import {categoriesNames} from '../../../../utils/config-equivalences';
+import React, { useState, useEffect } from 'react';
 import { AppNavigate } from '../../../../react-services/app-navigate';
 import {
   EuiFlexGroup,
@@ -28,7 +27,7 @@ import { PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_APP_CONFIGURATION } from '
 import { getPluginDataPath } from '../../../../../common/plugin';
 import { webDocumentationLink } from '../../../../../common/services/web_documentation';
 
-export const Header = ({query, setQuery}) => {
+export const Header = ({query, setQuery, searchBarFilters}) => {
   return (
     <EuiFlexGroup gutterSize='none'>
       <EuiFlexItem>
@@ -39,7 +38,7 @@ export const Header = ({query, setQuery}) => {
       </EuiFlexItem>
       <EuiFlexItem>
         <EuiFlexGroup gutterSize='none' direction='column'>
-          <SearchBar query={query} setQuery={setQuery}/>
+          <SearchBar query={query} setQuery={setQuery} searchBarFilters={searchBarFilters}/>
         </EuiFlexGroup>
       </EuiFlexItem>
     </EuiFlexGroup>
@@ -80,39 +79,33 @@ const SubTitle = () => {
   )
 }
 
-const SearchBar = ({query, setQuery}) => {
-  const [categories, setCategories] = useState([]);
+const SearchBar = ({query, setQuery, searchBarFilters}) => {
   const [error, setError] = useState();
+
   useEffect(() => {
-    const cats = categoriesNames.map(item => ({value: item}));
-    setCategories(cats);
     getDefaultCategory(setQuery)
-  }, [])
+  }, []);
+
   const onChange = (args) => {
     if(args.error){
       setError(args.error);
     } else {
       setError(undefined);
       setQuery(args);
-    }
-  }
+    };
+  };
+
   return (
-    <Fragment>
+    <>
       <EuiSearchBar
-        filters={[{
-          type:'field_value_selection',
-          field:'category',
-          name:'Categories',
-          multiSelect:'or',
-          options:categories,
-        }]}
+        filters={searchBarFilters}
         query={query.query || query}
         onChange={onChange}
         />
       {!!error &&
         <EuiFormErrorText>{`${error.name}: ${error.message}`}</EuiFormErrorText >
       }
-    </Fragment>
+    </>
   )
 }
 

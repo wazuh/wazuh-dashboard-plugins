@@ -66,3 +66,6 @@ target/
 build/
 
 yarn.lock
+
+# Customization plugin assets
+public/assets/custom/*
