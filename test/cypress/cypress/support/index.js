@@ -76,9 +76,9 @@ beforeEach(() => {
     })
     cy.setSessionStorage('healthCheck', 'executed');
 
-    // if (Cypress.env('type') == 'wzd') {
-    //     navigate("/");
-    //     cy.get('nav #selectAPIBar').select('mock');
-    // }
+     if (Cypress.env('type') == 'wzd') {
+         navigate("/");
+         cy.get('nav #selectAPIBar').select('mock');
+     }
 
 })
