@@ -1,5 +1,5 @@
 /*
- * Wazuh app - React component for registering agents.
+ * Wazuh app - React component for main CDB List view.
  * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -12,9 +12,7 @@
 import React, { useState } from 'react';
 // Redux
 import WzReduxProvider from '../../../../../redux/wz-redux-provider';
-//Wazuh ruleset tables(rules, decoder, lists)
 import WzCDBListsOverview from './views/cdblists-overview';
-//Information about CDBList
 import WzListEditor from './views/list-editor';
 
 export default function WzCDBList({ clusterStatus }) {

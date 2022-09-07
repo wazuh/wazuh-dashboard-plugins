@@ -1,5 +1,5 @@
 /*
- * Wazuh app - React component for registering agents.
+ * Wazuh app - React component for main Rules view.
  * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -10,11 +10,8 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { useState } from 'react';
-// Redux
 import WzReduxProvider from '../../../../../redux/wz-redux-provider';
-//Wazuh ruleset tables(rules, decoder, lists)
 import WzRulesetOverview from './views/ruleset-overview';
-//Information about rule or decoder
 import WzFileEditor from '../common/file-editor';
 import { SECTION_RULES_SECTION } from '../common/constants';
 

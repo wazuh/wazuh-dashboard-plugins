@@ -1,5 +1,5 @@
 /*
- * Wazuh app - React component for registering agents.
+ * Wazuh app - React component for main Decoders view.
  * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify

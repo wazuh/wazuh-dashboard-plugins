@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Agent vulnerabilities table component
+ * Wazuh app - Agent ruleset table component
  * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify

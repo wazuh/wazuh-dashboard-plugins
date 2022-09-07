@@ -584,7 +584,9 @@ export default class WzRuleInfo extends Component {
    */
   changeBetweenRules(ruleId) {
     // Prevent reloading the same rule
-    if (this.state.currentRuleId == ruleId) return;
+    if (this.state.currentRuleId == ruleId) {
+      return;
+    }
 
     window.location.href = window.location.href.replace(
       new RegExp('redirectRule=' + '[^&]*'),
