@@ -31,8 +31,6 @@ import {
   EuiCallOut,
   EuiSpacer,
   EuiProgress,
-  EuiCode,
-  EuiLink,
   EuiIcon,
   EuiSwitch
 } from '@elastic/eui';
@@ -514,9 +512,6 @@ export const RegisterAgent = withErrorBoundary(
               ? ['OS architecture']
               : []),
           ];
-        // case 'deb':
-        //   return [...(!this.state.selectedArchitecture ? ['OS architecture'] : [])];
-
         default:
           return [];
       }
@@ -890,65 +885,6 @@ export const RegisterAgent = withErrorBoundary(
           ),
         },
       ];
-      // const os = this.state.selectedOS 
-      // const steps = [
-      //   {
-      //     title: 'Choose the Operating system',
-      //     children: (
-      //       <EuiButtonGroup
-      //         color="primary"
-      //         legend="Choose the Operating system"
-      //         options={osButtons}
-      //         idSelected={this.state.selectedOS}
-      //         onChange={(os) => this.selectOS(os)}
-      //       />
-      //     ),
-      //   },
-
-
-      //   os == 'rpm' && {title: 'Choose the version',
-      //                   children: (
-      //                   <EuiButtonGroup
-      //                     color="primary"
-      //                     legend="Choose the version"
-      //                     options={versionButtonsCentosOrRedHat}
-      //                     idSelected={this.state.selectedVersion}
-      //                     onChange={(version) => this.setVersion(version)}
-      //                   />
-      //                   )},
-
-
-      //   {title: 'Wazuh server address',
-      //     children: <Fragment>{ipInput}</Fragment>,
-      //   },
-      //   ...(!(!this.state.needsPassword || this.state.hidePasswordInput)
-      //     ? [
-      //       {
-      //         title: 'Wazuh password',
-      //         children: <Fragment>{passwordInput}</Fragment>,
-      //       },
-      //     ]
-      //     : []),
-      //   {
-      //     title: 'Assign the agent to a group',
-      //     children: <Fragment>{groupInput}</Fragment>,
-      //   },
-      //   {
-      //     title: 'Install and enroll the agent',
-      //     children: this.state.gotErrorRegistrationServiceInfo ?
-      //       calloutErrorRegistrationServiceInfo
-      //       : missingOSSelection.length ? (
-      //         <EuiCallOut
-      //           color="warning"
-      //           title={`Please select the ${missingOSSelection.join(', ')}.`}
-      //           iconType="iInCircle"
-      //         />
-      //       ) : (
-      //         <div>{guide}</div>
-      //       ),
-      //   },
-
-      // ]
 
       const buttonGroup = (legend, options, idSelected, onChange) => {
         return (
@@ -1172,28 +1108,6 @@ export const RegisterAgent = withErrorBoundary(
               <div>{guide}</div>
             ),
         },
-        // ...(this.state.selectedOS == 'rpm' || this.state.selectedOS == 'cent' || this.state.selectedOS == 'deb'
-        //   ? [
-        //     {
-        //       title: 'Start the agent',
-        //       children: this.state.gotErrorRegistrationServiceInfo ?
-        //         calloutErrorRegistrationServiceInfo
-        //         : missingOSSelection.length ? (
-        //           <EuiCallOut
-        //             color="warning"
-        //             title={`Please select the ${missingOSSelection.join(', ')}.`}
-        //             iconType="iInCircle"
-        //           />
-        //         ) : (
-        //           <EuiTabbedContent
-        //             tabs={tabs}
-        //             selectedTab={this.selectedSYS}
-        //             onTabClick={onTabClick}
-        //           />
-        //         ),
-        //     },
-        //   ]
-        //   : []),
         ...(this.state.selectedOS == 'rpm' || this.state.selectedOS == 'cent' || this.state.selectedOS == 'deb' || this.state.selectedOS == 'ubu' || this.state.selectedOS == 'win' || this.state.selectedOS == 'macos' || this.state.selectedOS == 'open' || this.state.selectedOS == 'sol' || this.state.selectedOS == 'aix' || this.state.selectedOS == 'hp'
           ? [
             {
@@ -1217,28 +1131,6 @@ export const RegisterAgent = withErrorBoundary(
           ]
           : []),
 
-        // ...(this.state.selectedVersion == 'redhat7' || this.state.selectedVersion == 'centos7'
-        // ? [
-        //   {
-        //     title: 'Start the agent',
-        //     children: this.state.gotErrorRegistrationServiceInfo ?
-        //       calloutErrorRegistrationServiceInfo
-        //       : missingOSSelection.length ? (
-        //         <EuiCallOut
-        //           color="warning"
-        //           title={`Please select the ${missingOSSelection.join(', ')}.`}
-        //           iconType="iInCircle"
-        //         />
-        //       ) : (
-        //         <EuiTabbedContent
-        //           tabs={tabSystemD}
-        //           selectedTab={this.selectedSYS}
-        //           onTabClick={onTabClick}
-        //         />
-        //       ),
-        //   },
-        // ]
-        // : []),
         ...(!missingOSSelection.length &&
           this.state.selectedOS !== 'rpm' &&
           this.state.selectedOS !== 'deb' &&
