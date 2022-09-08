@@ -398,6 +398,7 @@ class KibanaVis extends Component {
         this.$rootScope.rendered = 'false';
       }
     }
+    if (typeof this.props.onRenderComplete === 'function') this.props.onRenderComplete();
   };
 
   showDateRangePicker = () => {
