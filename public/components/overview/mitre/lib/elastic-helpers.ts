@@ -90,7 +90,7 @@ function buildQuery(indexPattern, filterParams:IFilterParams) {
     indexPattern
   );
   return buildEsQuery(
-    undefined,
+    indexPattern,
     query,
     [...filters, timeFilter],
     getEsQueryConfig(getUiSettings()) 
