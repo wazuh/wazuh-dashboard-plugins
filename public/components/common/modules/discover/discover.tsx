@@ -370,7 +370,7 @@ export const Discover = compose(
       const previousFilters =
         (this.PluginPlatformServices && this.PluginPlatformServices.query.filterManager.getFilters()) || [];
       const elasticQuery = buildEsQuery(
-        undefined,
+        this.indexPattern,
         query,
         _.union(
           previousFilters,
