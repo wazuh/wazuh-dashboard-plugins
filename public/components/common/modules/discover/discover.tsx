@@ -336,6 +336,7 @@ export const Discover = compose(
               addFilterOut={(filter) => this.addFilterOut(filter)}
               toggleColumn={(id) => this.addColumn(id)}
               rowDetailsFields={rowDetailsFields}
+              indexPattern={this.indexPattern}
             />
           </div>
         );
