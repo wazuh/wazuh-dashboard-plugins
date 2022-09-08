@@ -10,7 +10,7 @@ export const DECODERS_PAGE = {
   messageConfirmSaveSelector: '.euiText > span',
   buttonRestartSelector: '.euiCallOut.euiCallOut--primary .euiButton.euiButton--primary',
   firstCustomDecoder: '[data-test-subj="row-local_decoder_example"]',
-  xmlDecoderFile:':nth-child(4) .euiTableCellContent .euiToolTipAnchor .euiLink',
+  xmlDecoderFile:':nth-child(4) .euiTableCellContent .euiToolTipAnchor .euiLink:contains("local_decoder.xml")',
   codeEditorSelector: '[data-test-subj="codeEditorContainer"]',
   backButtonSelector: '.euiFlexGroup .euiFlexItem .euiToolTipAnchor .euiButtonIcon',
   confirmModalSelector: '[data-test-subj="confirmModalTitleText"]',
