@@ -10,10 +10,9 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import {
   EuiCodeBlock,
-  EuiPanel,
   EuiTitle,
   EuiSpacer,
   EuiIcon,
@@ -31,6 +30,9 @@ import {
   EuiBadge,
   EuiAccordion,
 } from '@elastic/eui';
+import classNames from 'classnames';
+import { DocViewTableRowBtnCollapse } from '../../../../kibana-integrations/discover/application/components/table/table_row_btn_collapse';
+import { arrayContainsObjects, trimAngularSpan } from '../../../../kibana-integrations/discover/application/components/table/table_helper';
 import './discover.scss';
 import { EuiFlexItem } from '@elastic/eui';
 import { WzRequest } from '../../../../react-services/wz-request';
@@ -46,7 +48,8 @@ export class RowDetails extends Component {
       items: Array<any>,
       totalItems: Number
     },
-    hover: string
+    hover: string,
+    isCollapsed: boolean,
   };
 
   complianceEquivalences: Object
@@ -72,6 +75,7 @@ export class RowDetails extends Component {
         items: [],
         totalItems: 0,
       },
+      isCollapsed: true,
       hover: ''
     }
 
@@ -153,7 +157,9 @@ export class RowDetails extends Component {
       </EuiToolTip>)
   }
 
-
+  onToggleCollapse = () => {
+    this.setState({ isCollapsed: !this.state.isCollapsed });
+  }
 
   renderRows() {
     // By default show all available fields, otherwise show the fields specified in rowDetailsFields string array
@@ -222,13 +228,34 @@ export class RowDetails extends Component {
 
           cells.push(keyCell);
 
-          const formattedValue = Array.isArray(value) ? value.join(', ') : value.toString();
+          const formattedValue = Array.isArray(value) ? this.renderArrayValue(value) : value.toString();
+          
+          // If the field is an array of objects, show the collapse button to show the nested fields
+          const showCollapseButton = Array.isArray(value) && arrayContainsObjects(value);
+
+          const valueClassName = classNames({
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            wzDocViewer__value: true,
+            'truncate-by-height': showCollapseButton && this.state.isCollapsed,
+            "hover-row": this.state.hover === key
+          });
 
           const valueCell = <EuiTableRowCell
-            className={this.state.hover === key ? "hover-row" : " "}
+            className={valueClassName}
             style={{ borderTop: 0, borderBottom: 0, padding: 0, margin: 0 }}
             key={key + "2"}>
-            {<div>{formattedValue}</div>}
+            { showCollapseButton && (
+              <DocViewTableRowBtnCollapse onClick={this.onToggleCollapse} isCollapsed={this.state.isCollapsed} />
+            )}
+            <div
+              data-test-subj={`tableDocViewRow-${key}-value`}
+              /*
+               * Justification for dangerouslySetInnerHTML:
+               * We just use values encoded by our field formatters
+               */
+              // eslint-disable-next-line react/no-danger
+              dangerouslySetInnerHTML={{ __html: formattedValue as string }}
+            />
           </EuiTableRowCell>
 
           cells.push(valueCell);
@@ -250,11 +277,22 @@ export class RowDetails extends Component {
     return rows;
   }
 
+  // Render the row value column supporting nested fields
+  renderArrayValue = (value) => {
+    if (arrayContainsObjects(value)) {
+      const formatted = this.props?.indexPattern?.formatHit({ _index: value }, 'html')?._index;
+      return trimAngularSpan(String(formatted));
+    }
+    else {
+      return value.join(', ')
+    }
+  }
+
   getTable() {
     return (
       <div>
         <div>
-          <EuiTable style={{ marginTop: 0 }}>
+          <EuiTable style={{ marginTop: 0 }} className='module-discover-table-details'>
             <EuiTableBody style={{ marginTop: 0 }}>{this.renderRows()}</EuiTableBody>
           </EuiTable>
         </div>
