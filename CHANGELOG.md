@@ -12,7 +12,12 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Changed the HTTP verb from `GET` to `POST` in the requests to login to the Wazuh API [#4103](https://github.com/wazuh/wazuh-kibana-app/pull/4103)
 
-## Wazuh v4.3.7 - OpenSearch Dashboards 1.2.0 - Revision 4308
+### Fixed
+
+- Improved Agents Overview performance [#4363](https://github.com/wazuh/wazuh-kibana-app/pull/4363)
+- Fixed nested fields filtering in dashboards tables and KPIs [#4425](https://github.com/wazuh/wazuh-kibana-app/pull/4425)
+
+## Wazuh v4.3.7 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4308
 
 ### Fixed
 

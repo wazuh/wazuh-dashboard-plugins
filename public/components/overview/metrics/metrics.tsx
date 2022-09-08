@@ -317,9 +317,7 @@ export const Metrics = withAllowedAgents(
 
     async buildMetric() {
       if (!this.metricsList[this.props.section] || !this._isMount) return <></>;
-      const newFilters = this.filterManager.getFilters();
       const searchBarQuery = this.scope.state.query;
-      const newTime = this.timefilter.getTime();
       const filterParams = {};
       filterParams['time'] = this.timefilter.getTime();
       filterParams['query'] = searchBarQuery;
