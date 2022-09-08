@@ -1,13 +1,18 @@
 import { WzRequest } from '../../../../../react-services';
+import {
+  SECTION_DECODERS_SECTION,
+  SECTION_RULES_SECTION,
+  SECTION_CDBLIST_SECTION
+} from './constants';
 
 type DECODERS = 'decoders';
 type LISTS = 'lists';
 type RULES = 'rules';
 export type Resource = DECODERS | LISTS | RULES;
 export const ResourcesConstants = {
-  DECODERS: 'decoders',
-  LISTS: 'lists',
-  RULES: 'rules',
+  DECODERS: SECTION_DECODERS_SECTION,
+  LISTS: SECTION_CDBLIST_SECTION,
+  RULES: SECTION_RULES_SECTION,
 };
 
 export const resourceDictionary = {
