@@ -12,7 +12,7 @@
  */
 
 import React, { useState, useEffect, Fragment } from 'react';
-import {categoriesNames} from '../../../../utils/config-equivalences';
+import {categoriesNames} from '../../../../../common/config-equivalences';
 import { AppNavigate } from '../../../../react-services/app-navigate';
 import {
   EuiFlexGroup,
