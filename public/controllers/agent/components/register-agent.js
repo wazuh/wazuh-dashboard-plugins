@@ -1178,7 +1178,7 @@ export const RegisterAgent = withErrorBoundary(
                         </EuiTitle>
                       </EuiFlexItem>
                       <EuiFlexItem grow={false}>
-                        {this.props.hasAgents && (
+                        {this.props.hasAgents() && (
                           <EuiButtonEmpty
                             size="s"
                             onClick={() => this.props.addNewAgent(false)}
@@ -1187,7 +1187,7 @@ export const RegisterAgent = withErrorBoundary(
                             Close
                           </EuiButtonEmpty>
                         )}
-                        {!this.props.hasAgents && (
+                        {!this.props.hasAgents() && (
                           <EuiButtonEmpty
                             size="s"
                             onClick={() => this.props.reload()}
