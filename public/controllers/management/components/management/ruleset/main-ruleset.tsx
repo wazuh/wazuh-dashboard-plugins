@@ -26,7 +26,7 @@ export default function WzRuleset({ clusterStatus, logtestProps }) {
     setFileContent(false);
     setAddingFile(false);
   }
-  
+
   return (
     <WzReduxProvider>
       {
@@ -40,13 +40,16 @@ export default function WzRuleset({ clusterStatus, logtestProps }) {
             updateFileContent={(fileContent) => { setFileContent(fileContent) }}
             cleanEditState={() => cleanEditState()}
           />
-        )) || <WzRulesetOverview
-          clusterStatus={clusterStatus}
-          updateFileContent={(fileContent) => { setFileContent(fileContent) }}
-          updateAddingFile={(addingFile) => { setAddingFile(addingFile) }}
-          setShowingFiles={() => { setShowingFiles(!showingFiles) }}
-          showingFiles={showingFiles}
-        />}
+        )) || (
+          <WzRulesetOverview
+            clusterStatus={clusterStatus}
+            updateFileContent={(fileContent) => { setFileContent(fileContent) }}
+            updateAddingFile={(addingFile) => { setAddingFile(addingFile) }}
+            setShowingFiles={() => { setShowingFiles(!showingFiles) }}
+            showingFiles={showingFiles}
+          />
+        )
+      }
     </WzReduxProvider>
   );
 }

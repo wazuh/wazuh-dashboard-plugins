@@ -29,30 +29,29 @@ function WzCDBListsOverview(props) {
 
   const { clusterStatus } = props;
   return <EuiPage style={{ background: 'transparent' }}>
-  <EuiPanel>
-    {showWarningRestart && (
-      <>
-        <EuiSpacer size='s' />
-        <WzRestartClusterManagerCallout
-          onRestarted={() => updateRestartManagers(false)}
-          onRestartedError={() => updateRestartManagers(true)}
-        />
-        <EuiSpacer size='s' />
-      </>
-    )}
-    
-    <EuiFlexGroup>
-      <EuiFlexItem>
-        <CDBListsTable
-          {...props}
-          clusterStatus={clusterStatus}
-          updateRestartClusterManager={(showWarningRestart) => updateRestartManagers(showWarningRestart)}
-        />
-      </EuiFlexItem>
-    </EuiFlexGroup>
-  </EuiPanel>
-</EuiPage>;
+    <EuiPanel>
+      {showWarningRestart && (
+        <>
+          <EuiSpacer size='s' />
+          <WzRestartClusterManagerCallout
+            onRestarted={() => updateRestartManagers(false)}
+            onRestartedError={() => updateRestartManagers(true)}
+          />
+          <EuiSpacer size='s' />
+        </>
+      )}
 
+      <EuiFlexGroup>
+        <EuiFlexItem>
+          <CDBListsTable
+            {...props}
+            clusterStatus={clusterStatus}
+            updateRestartClusterManager={(showWarningRestart) => updateRestartManagers(showWarningRestart)}
+          />
+        </EuiFlexItem>
+      </EuiFlexGroup>
+    </EuiPanel>
+  </EuiPage>;
 }
 
 

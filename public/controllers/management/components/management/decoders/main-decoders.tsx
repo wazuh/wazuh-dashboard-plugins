@@ -40,13 +40,16 @@ export default function WzDecoder({ clusterStatus, logtestProps }) {
             updateFileContent={(fileContent) => { setFileContent(fileContent) }}
             cleanEditState={() => cleanEditState()}
           />
-        )) || <WzDecodersOverview
-          clusterStatus={clusterStatus}
-          updateFileContent={(fileContent) => { setFileContent(fileContent) }}
-          updateAddingFile={(addingFile) => { setAddingFile(addingFile) }}
-          setShowingFiles={() => { setShowingFiles(!showingFiles) }}
-          showingFiles={showingFiles}
-        />}
+        )) || (
+          <WzDecodersOverview
+            clusterStatus={clusterStatus}
+            updateFileContent={(fileContent) => { setFileContent(fileContent) }}
+            updateAddingFile={(addingFile) => { setAddingFile(addingFile) }}
+            setShowingFiles={() => { setShowingFiles(!showingFiles) }}
+            showingFiles={showingFiles}
+          />
+        )
+      }
     </WzReduxProvider>
   );
 }

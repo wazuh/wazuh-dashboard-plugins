@@ -21,16 +21,19 @@ export default function WzCDBList({ clusterStatus }) {
   return (
     <WzReduxProvider>
       {
-        (listContent && <WzListEditor
-          listContent={listContent}
-          clusterStatus={clusterStatus}
-          clearContent={() => { setListContent(false) }}
-          updateListContent={(listContent) => { setListContent(listContent) }}
-        />) ||
-        <WzCDBListsOverview
-          clusterStatus={clusterStatus}
-          updateListContent={(listContent) => { setListContent(listContent) }}
-        />
+        (listContent && (
+          <WzListEditor
+            listContent={listContent}
+            clusterStatus={clusterStatus}
+            clearContent={() => { setListContent(false) }}
+            updateListContent={(listContent) => { setListContent(listContent) }}
+          />
+        )) || (
+          <WzCDBListsOverview
+            clusterStatus={clusterStatus}
+            updateListContent={(listContent) => { setListContent(listContent) }}
+          />
+        )
       }
     </WzReduxProvider>
   );
