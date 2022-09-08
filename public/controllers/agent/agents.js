@@ -306,8 +306,6 @@ export class AgentsController {
     };
 
     this.$scope.switchConfigurationTab = (configurationTab, navigate) => {
-      // Check if configuration is synced
-      this.checkSync();
       this.$scope.navigate = navigate;
       this.configurationHandler.switchConfigurationTab(configurationTab, this.$scope);
       if (!this.$scope.navigate) {
@@ -510,8 +508,11 @@ export class AgentsController {
           },
         });
         this.$scope.agent.status =
-          (((((agentInfo || {}).data || {}).data || {}).affected_items || [])[0] || {}).status ||
+          agentInfo?.data?.data?.affected_items?.[0]?.status ||
           this.$scope.agent.status;
+        this.$scope.isSynchronized = this.$scope.agent.status?.synced;
+
+    this.$scope.$applyAsync();
       } catch (error) {
         throw new Error(error);
       }
@@ -736,20 +737,6 @@ export class AgentsController {
   validateSysCheck() {
     const result = this.commonData.validateRange(this.$scope.agent.syscheck);
     this.$scope.agent.syscheck = result;
-  }
-
-  /**
-   * Checks if configuration is sync
-   */
-  async checkSync() {
-    const isSync = await WzRequest.apiReq(
-      'GET',
-      `/agents/${this.$scope.agent.id}/group/is_sync`,
-      {}
-    );
-    this.$scope.isSynchronized =
-      (((((isSync || {}).data || {}).data || {}).affected_items || [])[0] || {}).synced || false;
-    this.$scope.$applyAsync();
   }
 
   /**
