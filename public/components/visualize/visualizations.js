@@ -43,15 +43,6 @@ export const visualizations = {
           },
         ]
       },
-      {
-        hide: true,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Overview-General-Alerts-summary'
-          }
-        ]
-      }
     ]
   },
   fim: {
@@ -100,15 +91,6 @@ export const visualizations = {
           }
         ]
       },
-      {
-        hide: true,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Overview-FIM-Alerts-summary'
-          }
-        ]
-      }
     ]
   },
   office: {
@@ -162,15 +144,6 @@ export const visualizations = {
           }
         ]
       },
-      {
-        hide: true,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Overview-Office-Alerts-summary'
-          }
-        ]
-      }
     ]
   },
   aws: {
@@ -224,15 +197,6 @@ export const visualizations = {
           }
         ]
       },
-      {
-        hide: true,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Overview-AWS-Alerts-summary'
-          }
-        ]
-      }
     ]
   },
   gcp: {
@@ -277,15 +241,6 @@ export const visualizations = {
           },
         ]
       },
-      {
-        hide: true,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Overview-GCP-Alerts-summary'
-          }
-        ]
-      }
     ]
   },
   pci: {
@@ -332,15 +287,6 @@ export const visualizations = {
           }
         ]
       },
-      {
-        hide: true,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Overview-PCI-DSS-Alerts-summary'
-          }
-        ]
-      }
     ]
   },
   gdpr: {
@@ -387,15 +333,6 @@ export const visualizations = {
           }
         ]
       },
-      {
-        hide: true,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Overview-GDPR-Alerts-summary'
-          }
-        ]
-      }
     ]
   },
   nist: {
@@ -440,15 +377,6 @@ export const visualizations = {
           }
         ]
       },
-      {
-        hide: true,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Overview-NIST-Alerts-summary'
-          }
-        ]
-      }
     ]
   },
   tsc: {
@@ -495,15 +423,6 @@ export const visualizations = {
           }
         ]
       },
-      {
-        hide: true,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Overview-TSC-Alerts-summary'
-          }
-        ]
-      }
     ]
   },
   hipaa: {
@@ -571,15 +490,6 @@ export const visualizations = {
           }
         ]
       },
-      {
-        hide: true,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Overview-HIPAA-Alerts-summary'
-          }
-        ]
-      }
     ]
   },
   vuls: {
@@ -634,15 +544,6 @@ export const visualizations = {
           }
         ]
       },
-      {
-        hide: true,
-        vis: [
-          {
-            title: 'Alert summary',
-            id: 'Wazuh-App-Overview-vuls-Alert-summary'
-          }
-        ]
-      }
     ]
   },
   virustotal: {
@@ -689,15 +590,6 @@ export const visualizations = {
           }
         ]
       },
-      {
-        hide: true,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Overview-Virustotal-Alerts-summary'
-          }
-        ]
-      }
     ]
   },
   osquery: {
@@ -737,15 +629,6 @@ export const visualizations = {
           }
         ]
       },
-      {
-        hide: true,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Overview-Osquery-Alerts-summary'
-          }
-        ]
-      }
     ]
   },
   mitre: {
@@ -785,15 +668,6 @@ export const visualizations = {
           }
         ]
       },
-      {
-        hide: true,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Overview-MITRE-Alerts-summary'
-          }
-        ]
-      }
     ]
   },
   docker: {
@@ -827,15 +701,6 @@ export const visualizations = {
           }
         ]
       },
-      {
-        hide: true,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Overview-Docker-Events-summary'
-          }
-        ]
-      }
     ]
   },
   oscap: {
@@ -889,15 +754,6 @@ export const visualizations = {
           }
         ]
       },
-      {
-        hide: true,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Overview-OSCAP-Last-alerts'
-          }
-        ]
-      }
     ]
   },
   ciscat: {
@@ -917,15 +773,6 @@ export const visualizations = {
           }
         ]
       },
-      {
-        hide: true,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-app-Overview-CISCAT-alerts-summary'
-          }
-        ]
-      }
     ]
   },
   pm: {
@@ -959,15 +806,6 @@ export const visualizations = {
           }
         ]
       },
-      {
-        hide: true,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Overview-PM-Alerts-summary'
-          }
-        ]
-      }
     ]
   },
   audit: {
@@ -1006,15 +844,6 @@ export const visualizations = {
           }
         ]
       },
-      {
-        hide: true,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Overview-Audit-Last-alerts'
-          }
-        ]
-      }
     ]
   },
   github: {
@@ -1049,15 +878,6 @@ export const visualizations = {
           }
         ]
       },
-      {
-        hide: true,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Overview-GitHub-Alert-Summary',
-          }
-        ]
-      }
     ]
   },
 };

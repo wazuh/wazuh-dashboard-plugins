@@ -44,21 +44,6 @@ export const visualizations = {
           }
         ]
       },
-      {
-        hide: true,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Agents-General-Alerts-summary',
-            width: 60
-          },
-          {
-            title: 'Groups summary',
-            id: 'Wazuh-App-Agents-General-Groups-summary',
-            width: 40
-          }
-        ]
-      }
     ]
   },
   fim: {
@@ -103,15 +88,6 @@ export const visualizations = {
           }
         ]
       },
-      {
-        hide: true,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Agents-FIM-Alerts-summary'
-          }
-        ]
-      }
     ]
   },
   pci: {
@@ -151,15 +127,6 @@ export const visualizations = {
           }
         ]
       },
-      {
-        hide: true,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Agents-PCI-Last-alerts'
-          }
-        ]
-      }
     ]
   },
   gdpr: {
@@ -199,15 +166,6 @@ export const visualizations = {
           }
         ]
       },
-      {
-        hide: true,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Agents-GDPR-Last-alerts'
-          }
-        ]
-      }
     ]
   },
   nist: {
@@ -241,15 +199,6 @@ export const visualizations = {
           }
         ]
       },
-      {
-        hide: true,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Agents-NIST-Last-alerts'
-          }
-        ]
-      }
     ]
   },
   tsc: {
@@ -296,15 +245,6 @@ export const visualizations = {
           }
         ]
       },
-      {
-        hide: true,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Overview-TSC-Alerts-summary'
-          }
-        ]
-      }
     ]
   },
   hipaa: {
@@ -344,15 +284,6 @@ export const visualizations = {
           }
         ]
       },
-      {
-        hide: true,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Agents-HIPAA-Last-alerts'
-          }
-        ]
-      }
     ]
   },
   virustotal: {
@@ -381,15 +312,6 @@ export const visualizations = {
           }
         ]
       },
-      {
-        hide: true,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Agents-Virustotal-Alerts-summary'
-          }
-        ]
-      }
     ]
   },
   osquery: {
@@ -424,15 +346,6 @@ export const visualizations = {
           }
         ]
       },
-      {
-        hide: true,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Overview-Osquery-Alerts-summary'
-          }
-        ]
-      }
     ]
   },
   docker: {
@@ -466,15 +379,6 @@ export const visualizations = {
           }
         ]
       },
-      {
-        hide: true,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Agents-Docker-Events-summary'
-          }
-        ]
-      }
     ]
   },
   oscap: {
@@ -528,15 +432,6 @@ export const visualizations = {
           }
         ]
       },
-      {
-        hide: true,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Agents-OSCAP-Last-alerts'
-          }
-        ]
-      }
     ]
   },
   ciscat: {
@@ -556,15 +451,6 @@ export const visualizations = {
           }
         ]
       },
-      {
-        hide: true,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-app-Agents-CISCAT-alerts-summary'
-          }
-        ]
-      }
     ]
   },
   pm: {
@@ -593,15 +479,6 @@ export const visualizations = {
           }
         ]
       },
-      {
-        hide: true,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Agents-PM-Alerts-summary'
-          }
-        ]
-      }
     ]
   },
   audit: {
@@ -635,15 +512,6 @@ export const visualizations = {
           }
         ]
       },
-      {
-        hide: true,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Agents-Audit-Last-alerts'
-          }
-        ]
-      }
     ]
   }
 };
