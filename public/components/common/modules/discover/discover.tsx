@@ -371,7 +371,7 @@ export const Discover = compose(
       const previousFilters =
         (this.PluginPlatformServices && this.PluginPlatformServices.query.filterManager.getFilters()) || [];
       const elasticQuery = buildOpenSearchQuery(
-        undefined,
+        this.indexPattern,
         query,
         _.union(
           previousFilters,

@@ -90,7 +90,7 @@ function buildQuery(indexPattern, filterParams:IFilterParams) {
     indexPattern
   );
   return buildOpenSearchQuery(
-    undefined,
+    indexPattern,
     query,
     [...filters, timeFilter],
     getOpenSearchQueryConfig(getUiSettings())
