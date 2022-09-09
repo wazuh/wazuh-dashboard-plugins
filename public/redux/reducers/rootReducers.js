@@ -11,7 +11,6 @@
  */
 
 import { combineReducers } from 'redux';
-import rulesetReducers from './rulesetReducers';
 import groupsReducers from './groupsReducers';
 import statusReducers from './statusReducers';
 import reportingReducers from './reportingReducers';
@@ -25,7 +24,6 @@ import toolsReducers from './toolsReducers';
 import appConfig from './appConfigReducers';
 
 export default combineReducers({
-  rulesetReducers,
   groupsReducers,
   statusReducers,
   reportingReducers,
