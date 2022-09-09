@@ -89,9 +89,9 @@ This plugin for OpenSearch Dashboards allows you to visualize and analyze Wazuh 
 
 ## Requisites
 
-- Wazuh HIDS 4.3.7
-- Wazuh dashboard 4.3.7
-- Wazuh indexer 4.3.7
+- Wazuh HIDS 4.3.8
+- Wazuh dashboard 4.3.8
+- Wazuh indexer 4.3.8
 
 ## Contribute
 
