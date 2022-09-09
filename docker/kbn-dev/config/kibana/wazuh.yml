@@ -1,12 +1,18 @@
 hosts:
   - manager:
-      url: "https://wazuh.manager"
+      url: "http://wazuh-manager-master"
       port: 55000
       username: wazuh-wui
-      password: MyS3cr37P450r.*-
+      password: wazuh-wui
       run_as: false
   - mock:
       url: "http://imposter"
+      port: 8080
+      username: wazuh-wui
+      password: MyS3cr37P450r.*-
+      run_as: false
+  - imposter:
+      url: "http://<ip-local>"
       port: 8080
       username: wazuh-wui
       password: MyS3cr37P450r.*-

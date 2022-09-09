@@ -58,7 +58,7 @@ export ES_VERSION=$1
 export LICENSE=basic # or trial
 export KIBANA_PORT=${PORT:-5601}
 export SRC=$2
-export COMPOSE_PROJECT_NAME=es-dev-${ES_VERSION}
+export COMPOSE_PROJECT_NAME=es-dev
 
 case "$3" in
 	up)
@@ -68,7 +68,7 @@ case "$3" in
 		docker compose -f dev.yml down -v --remove-orphans
 		;;
 	stop)
-		docker compose -f dev.yml stop
+		docker compose -f dev.yml -p es-dev stop
 		;;
 	*)
 		echo "Action must be up | down | stop: "

@@ -11,3 +11,9 @@ hosts:
       username: wazuh-wui
       password: MyS3cr37P450r.*-
       run_as: false
+  - localImposter:
+      url: "http://<ip-local>"
+      port: 8080
+      username: wazuh-wui
+      password: MyS3cr37P450r.*-
+      run_as: false
