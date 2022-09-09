@@ -907,11 +907,11 @@ export const RegisterAgent = withErrorBoundary(
               onChange={onChange}
               className={'osButtonsStyle'}
             />
-            <EuiCallOut color="warning" className='message' iconType="iInCircle" title={ 
+            <EuiCallOut color="warning" className='message' iconType="iInCircle" title={
               <span>
                 The selected OS version reached its end of life (EOL). To install Wazuh follow our<EuiLink href="#"> guide</EuiLink>.
               </span>
-          }>
+            }>
             </EuiCallOut>
           </>
         )
@@ -1024,17 +1024,6 @@ export const RegisterAgent = withErrorBoundary(
             },
           ]
           : []),
-        // ...this.state.selectedVersion == 'redhat5' ?
-        // [{
-        //   children:  (
-        //       <EuiCallOut
-        //         color="warning"
-        //         title={`Please select the ${missingOSSelection.join(', ')}.`}
-        //       />
-        //     )
-        //   },
-        // ]
-        // : [],
         ...(this.state.selectedVersion == 'centos5' || this.state.selectedVersion == 'redhat5'
           ? [
             {
