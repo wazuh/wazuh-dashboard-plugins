@@ -1717,29 +1717,37 @@ iframe.width-changed {
   text-align: center;
 }
 
-.withUserLogged-logo{
+.withUserLogged-logo {
   width: 140px;
   margin: 0 auto;
 }
 
-.withUserLogged-loader{
+.withUserLogged-loader {
   width: 20px;
   margin: 0 auto;
 }
 
-.custom-charts-bar span.euiLoadingChart__bar{
+.custom-charts-bar span.euiLoadingChart__bar {
   width: 15px;
 }
 
-.wz-width-100{
+.wz-width-100 {
   width: 100%;
 }
 
-.wz-user-select-none{
+.wz-txt-capitalize {
+  text-transform: capitalize;
+}
+
+.wz-user-select-none {
   -webkit-user-select: none;
      -moz-user-select: none;
       -ms-user-select: none;
           user-select: none;
+}
+
+.wz-flex-basis-auto {
+  flex-basis: auto !important;
 }
 
 .wz-euiCard-no-title{
@@ -1752,11 +1760,11 @@ iframe.width-changed {
 
 /* Custom Searchbar styles */
 
-.application .filters-search-bar .globalQueryBar, .app-container .filters-search-bar .globalQueryBar{
+.application .filters-search-bar .globalQueryBar, .app-container .filters-search-bar .globalQueryBar {
   padding: 0 !important;
 }
 
-@media only screen and (max-width: 960px){
+@media only screen and (max-width: 960px) {
   .custom-kbn-search-bar .euiSuperUpdateButton .euiSuperUpdateButton__text {
     display: none;
   }
@@ -1766,7 +1774,7 @@ iframe.width-changed {
   }
 }
 
-@media only screen and (max-width: 767px){
+@media only screen and (max-width: 767px) {
   .header-global-wrapper + .app-wrapper:not(.hidden-chrome) {
       left: 0!important;
   }

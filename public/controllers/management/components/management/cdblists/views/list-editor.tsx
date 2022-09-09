@@ -18,10 +18,8 @@ import {
   EuiTitle,
   EuiToolTip,
   EuiButtonIcon,
-  EuiButton,
   EuiText,
   EuiButtonEmpty,
-  EuiPopover,
   EuiFieldText,
   EuiSpacer,
   EuiPanel,
@@ -29,21 +27,20 @@ import {
 
 import { connect } from 'react-redux';
 
-import { cleanInfo, updateListContent } from '../../../../../redux/actions/rulesetActions';
+import { resourceDictionary, ResourcesHandler, ResourcesConstants } from '../../common/resources-handler';
 
-import { resourceDictionary, RulesetHandler, RulesetResources } from './utils/ruleset-handler';
+import { getToasts } from '../../../../../../kibana-services';
 
-import { getToasts } from '../../../../../kibana-services';
+import exportCsv from '../../../../../../react-services/wz-csv';
 
-import exportCsv from '../../../../../react-services/wz-csv';
+import { updateWazuhNotReadyYet } from '../../../../../../redux/actions/appStateActions';
+import WzRestartClusterManagerCallout from '../../../../../../components/common/restart-cluster-manager-callout';
+import { WzButtonPermissions } from '../../../../../../components/common/permissions/button';
 
-import { updateWazuhNotReadyYet } from '../../../../../redux/actions/appStateActions';
-import WzRestartClusterManagerCallout from '../../../../../components/common/restart-cluster-manager-callout';
-import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
+import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
+import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
 
-import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
-import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
-import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 class WzListEditor extends Component {
   constructor(props) {
     super(props);
@@ -60,12 +57,11 @@ class WzListEditor extends Component {
     };
     this.items = {};
 
-    this.rulesetHandler = new RulesetHandler(RulesetResources.LISTS);
+    this.resourcesHandler = new ResourcesHandler(ResourcesConstants.LISTS);
   }
 
   componentDidMount() {
-    const { listInfo } = this.props.state;
-    const { content } = listInfo;
+    const { listContent: { content } } = this.props;
     const obj = this.contentToObject(content);
     this.items = { ...obj };
     const items = this.contentToArray(obj);
@@ -136,7 +132,7 @@ class WzListEditor extends Component {
         return;
       }
       this.setState({ isSaving: true });
-      await this.rulesetHandler.updateFile(name, raw, overwrite);
+      await this.resourcesHandler.updateFile(name, raw, overwrite);
       if (!addingNew) {
         const file = { name: name, content: raw, path: path };
         this.props.updateListContent(file);
@@ -211,8 +207,8 @@ class WzListEditor extends Component {
   getUpdatePermissions = (name) => {
     return [
       {
-        action: `${RulesetResources.LISTS}:update`,
-        resource: resourceDictionary[RulesetResources.LISTS].permissionResource(name),
+        action: `${ResourcesConstants.LISTS}:update`,
+        resource: resourceDictionary[ResourcesConstants.LISTS].permissionResource(name),
       },
     ];
   };
@@ -220,8 +216,8 @@ class WzListEditor extends Component {
   getDeletePermissions = (name) => {
     return [
       {
-        action: `${RulesetResources.LISTS}:delete`,
-        resource: resourceDictionary[RulesetResources.LISTS].permissionResource(name),
+        action: `${ResourcesConstants.LISTS}:delete`,
+        resource: resourceDictionary[ResourcesConstants.LISTS].permissionResource(name),
       },
     ];
   };
@@ -292,7 +288,7 @@ class WzListEditor extends Component {
                   color="primary"
                   iconSize="l"
                   iconType="arrowLeft"
-                  onClick={() => this.props.cleanInfo()}
+                  onClick={() => this.props.clearContent()}
                 />
               </EuiToolTip>
               {name}
@@ -420,7 +416,7 @@ class WzListEditor extends Component {
                   color="primary"
                   iconSize="l"
                   iconType="arrowLeft"
-                  onClick={() => this.props.cleanInfo()}
+                  onClick={() => this.props.clearContent()}
                 />
               </EuiToolTip>
               {name}
@@ -525,13 +521,10 @@ class WzListEditor extends Component {
     ];
   }
 
-  //isDisabled={nameForSaving.length <= 4}
   render() {
-    const { listInfo, isLoading, error } = this.props.state;
-    const { name, path } = listInfo;
+    const { listContent: { name, path }, isLoading } = this.props;
 
     const message = isLoading ? false : 'No results...';
-    const columns = this.columns;
 
     const addingNew = name === false || !name;
     const listName = this.state.newListName || name;
@@ -635,19 +628,11 @@ class WzListEditor extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
-  return {
-    state: state.rulesetReducers,
-  };
-};
-
 const mapDispatchToProps = (dispatch) => {
   return {
-    cleanInfo: () => dispatch(cleanInfo()),
-    updateListContent: (content) => dispatch(updateListContent(content)),
     updateWazuhNotReadyYet: (wazuhNotReadyYet) =>
       dispatch(updateWazuhNotReadyYet(wazuhNotReadyYet)),
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(WzListEditor);
+export default connect(null, mapDispatchToProps)(WzListEditor);
