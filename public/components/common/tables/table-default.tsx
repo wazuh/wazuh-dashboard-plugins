@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { EuiBasicTable } from '@elastic/eui';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
@@ -43,6 +43,8 @@ export function TableDefault({
     }
   });
   
+  const isMounted = useRef(false);
+
   function tableOnChange({ page = {}, sort = {} }){
     const { index: pageIndex, size: pageSize } = page;
     const { field, direction } = sort;
@@ -59,9 +61,14 @@ export function TableDefault({
   };
   
   useEffect(() => {
-    // Reset the page index when the endpoint changes.
-    // This will cause that onSearch function is triggered because to changes in pagination in the another effect.
+    // This effect is triggered when the component is mounted because of how to the useEffect hook works.
+    // We don't want to set the pagination state because there is another effect that has this dependency
+    // and will cause the effect is triggered (redoing the onSearch function).
+    if (isMounted.current) {
+      // Reset the page index when the endpoint changes.
+      // This will cause that onSearch function is triggered because to changes in pagination in the another effect.
     setPagination({pageIndex: 0, pageSize: pagination.pageSize});
+    }
   }, [endpoint]);
   
   useEffect(() => {
@@ -89,6 +96,14 @@ export function TableDefault({
       setLoading(false);
     })()
   }, [endpoint, pagination, sorting, reload]);
+
+
+  // It is required that this effect runs after other effects that use isMounted
+  // to avoid that these effects run when the component is mounted, only running
+  // when one of its dependencies changes.
+  useEffect(() => {
+    isMounted.current = true;
+  }, []);
 
   const tablePagination = {
     ...pagination,
