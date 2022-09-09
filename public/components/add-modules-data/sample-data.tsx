@@ -59,7 +59,7 @@ export default class WzSampleData extends Component {
       {
         title: 'Sample threat detection and response',
         description:
-          'Sample data, visualizations and dashboards for threat events of detection and response (vulnerabilities, VirustTotal, Osquery, Docker listener, MITRE).',
+          'Sample data, visualizations and dashboards for threat events of detection and response (vulnerabilities, VirusTotal, Osquery, Docker listener, MITRE).',
         image: '',
         categorySampleAlertsIndex: 'threat-detection',
       },
