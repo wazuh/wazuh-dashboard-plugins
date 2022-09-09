@@ -10,8 +10,9 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { EuiBasicTable, EuiSpacer } from '@elastic/eui';
+import _ from 'lodash';
 import { WzSearchBar } from '../../wz-search-bar/';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
@@ -48,29 +49,38 @@ export function TableWithSearchBar({
     },
   });
 
+  const isMounted = useRef(false);
+
   function tableOnChange({ page = {}, sort = {} }) {
-    const { index: pageIndex, size: pageSize } = page;
-    const { field, direction } = sort;
-    setPagination({
-      pageIndex,
-      pageSize,
-    });
-    setSorting({
-      sort: {
-        field,
-        direction,
-      },
-    });
+    if (isMounted.current) {
+      const { index: pageIndex, size: pageSize } = page;
+      const { field, direction } = sort;
+      setPagination({
+        pageIndex,
+        pageSize,
+      });
+      setSorting({
+        sort: {
+          field,
+          direction,
+        },
+      });
+    }
   }
 
   useEffect(() => {
-    // Reset the page index when the endpoint changes.
-    // This will cause that onSearch function is triggered because to changes in pagination in the another effect.
-    setPagination({pageIndex: 0, pageSize: pagination.pageSize});
-  }, [endpoint]);
+    // This effect is triggered when the component is mounted because of how to the useEffect hook works.
+    // We don't want to set the pagination state because there is another effect that has this dependency
+    // and will cause the effect is triggered (redoing the onSearch function).
+    if (isMounted.current) {
+      // Reset the page index when the endpoint changes.
+      // This will cause that onSearch function is triggered because to changes in pagination in the another effect.
+      setPagination({ pageIndex: 0, pageSize: pagination.pageSize });
+    }
+  }, [endpoint, reload]);
 
-  useEffect(() => {
-    (async function () {
+  useEffect(function () {
+    (async () => {
       try {
         setLoading(true);
         const { items, totalItems } = await onSearch(endpoint, filters, pagination, sorting);
@@ -93,11 +103,23 @@ export function TableWithSearchBar({
       }
       setLoading(false);
     })();
-  }, [filters, pagination, sorting, reload]);
+  }, [filters, pagination, sorting]);
 
   useEffect(() => {
-    setFilters(rest.filters || []);
+    // This effect is triggered when the component is mounted because of how to the useEffect hook works.
+    // We don't want to set the filters state because there is another effect that has this dependency
+    // and will cause the effect is triggered (redoing the onSearch function).
+    if (isMounted.current && !_.isEqual(rest.filters, filters)) {
+      setFilters(rest.filters || []);
+    }
   }, [rest.filters]);
+
+  // It is required that this effect runs after other effects that use isMounted
+  // to avoid that these effects run when the component is mounted, only running
+  // when one of its dependencies changes.
+  useEffect(() => {
+    isMounted.current = true;
+  }, []);
 
   const tablePagination = {
     ...pagination,
