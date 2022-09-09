@@ -32,7 +32,8 @@ import {
   EuiSpacer,
   EuiProgress,
   EuiIcon,
-  EuiSwitch
+  EuiSwitch,
+  EuiLink
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
 import { withErrorBoundary } from '../../../components/common/hocs';
@@ -891,7 +892,28 @@ export const RegisterAgent = withErrorBoundary(
             options={options}
             idSelected={idSelected}
             onChange={onChange}
-          />
+            className={'osButtonsStyle'} />
+        )
+      }
+
+      const buttonGroupWithMessage = (legend, options, idSelected, onChange) => {
+        return (
+          <>
+            <EuiButtonGroup
+              color="primary"
+              legend={legend}
+              options={options}
+              idSelected={idSelected}
+              onChange={onChange}
+              className={'osButtonsStyle'}
+            />
+            <EuiCallOut color="warning" className='message' iconType="iInCircle" title={ 
+              <span>
+                The selected OS version reached its end of life (EOL). To install Wazuh follow our<EuiLink href="#"> guide</EuiLink>.
+              </span>
+          }>
+            </EuiCallOut>
+          </>
         )
       }
 
@@ -907,7 +929,7 @@ export const RegisterAgent = withErrorBoundary(
             {
               title: 'Choose the version',
               children: (
-                buttonGroup("Choose the version", versionButtonsRedHat, this.state.selectedVersion, (version) => this.setVersion(version))
+                this.state.selectedVersion == 'redhat5' || this.state.selectedVersion == 'redhat6' ? buttonGroupWithMessage("Choose the version", versionButtonsRedHat, this.state.selectedVersion, (version) => this.setVersion(version)) : buttonGroup("Choose the version", versionButtonsRedHat, this.state.selectedVersion, (version) => this.setVersion(version))
               ),
             },
           ]
@@ -917,7 +939,7 @@ export const RegisterAgent = withErrorBoundary(
             {
               title: 'Choose the version',
               children: (
-                buttonGroup("Choose the version", versionButtonsCentos, this.state.selectedVersion, (version) => this.setVersion(version))
+                this.state.selectedVersion == 'centos5' || this.state.selectedVersion == 'centos6' ? buttonGroupWithMessage("Choose the version", versionButtonsCentos, this.state.selectedVersion, (version) => this.setVersion(version)) : buttonGroup("Choose the version", versionButtonsCentos, this.state.selectedVersion, (version) => this.setVersion(version))
               ),
             },
           ]
@@ -927,7 +949,7 @@ export const RegisterAgent = withErrorBoundary(
             {
               title: 'Choose the version',
               children: (
-                buttonGroup("Choose the version", versionButtonsDebian, this.state.selectedVersion, (version) => this.setVersion(version))
+                this.state.selectedVersion == 'debian7' || this.state.selectedVersion == 'debian8' ? buttonGroupWithMessage("Choose the version", versionButtonsDebian, this.state.selectedVersion, (version) => this.setVersion(version)) : buttonGroup("Choose the version", versionButtonsDebian, this.state.selectedVersion, (version) => this.setVersion(version))
               ),
             },
           ]
@@ -937,7 +959,7 @@ export const RegisterAgent = withErrorBoundary(
             {
               title: 'Choose the version',
               children: (
-                buttonGroup("Choose the version", versionButtonsUbuntu, this.state.selectedVersion, (version) => this.setVersion(version))
+                this.state.selectedVersion == 'ubuntu14' ? buttonGroupWithMessage("Choose the version", versionButtonsUbuntu, this.state.selectedVersion, (version) => this.setVersion(version)) : buttonGroup("Choose the version", versionButtonsUbuntu, this.state.selectedVersion, (version) => this.setVersion(version))
               ),
             },
           ]
@@ -947,7 +969,7 @@ export const RegisterAgent = withErrorBoundary(
             {
               title: 'Choose the version',
               children: (
-                buttonGroup("Choose the version", versionButtonsWindows, this.state.selectedVersion, (version) => this.setVersion(version))
+                this.state.selectedVersion == 'windowsxp' ? buttonGroupWithMessage("Choose the version", versionButtonsWindows, this.state.selectedVersion, (version) => this.setVersion(version)) : buttonGroup("Choose the version", versionButtonsWindows, this.state.selectedVersion, (version) => this.setVersion(version))
               ),
             },
           ]
@@ -1002,6 +1024,17 @@ export const RegisterAgent = withErrorBoundary(
             },
           ]
           : []),
+        // ...this.state.selectedVersion == 'redhat5' ?
+        // [{
+        //   children:  (
+        //       <EuiCallOut
+        //         color="warning"
+        //         title={`Please select the ${missingOSSelection.join(', ')}.`}
+        //       />
+        //     )
+        //   },
+        // ]
+        // : [],
         ...(this.state.selectedVersion == 'centos5' || this.state.selectedVersion == 'redhat5'
           ? [
             {
