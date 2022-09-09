@@ -917,6 +917,18 @@ export const RegisterAgent = withErrorBoundary(
         )
       }
 
+      const selectedVersionMac = (legend, options, idSelected, onChange) => {
+        return (
+          <EuiButtonGroup
+            color="primary"
+            legend={legend}
+            options={options}
+            idSelected={idSelected}
+            onChange={onChange}
+            className={'osButtonsStyleMac'} />
+        )
+      }
+
       const steps = [
         {
           title: 'Choose the Operating system',
@@ -979,7 +991,7 @@ export const RegisterAgent = withErrorBoundary(
             {
               title: 'Choose the version',
               children: (
-                buttonGroup("Choose the version", versionButtonsMacOS, this.state.selectedVersion, (version) => this.setVersion(version))
+                selectedVersionMac("Choose the version", versionButtonsMacOS, this.state.selectedVersion, (version) => this.setVersion(version))
               ),
             },
           ]
@@ -1054,7 +1066,7 @@ export const RegisterAgent = withErrorBoundary(
             },
           ]
           : []),
-        ...(this.state.selectedVersion == 'windowsxp' || this.state.selectedVersion == 'windows8' || this.state.selectedVersion == 'sierra'
+        ...(this.state.selectedVersion == 'windowsxp' || this.state.selectedVersion == 'windows8' || this.state.selectedVersion == 'sierra' || this.state.selectedVersion == 'highSierra' || this.state.selectedVersion == 'mojave' || this.state.selectedVersion == 'catalina' || this.state.selectedVersion == 'bigSur' || this.state.selectedVersion == 'monterrey'
           ? [
             {
               title: 'Choose the architecture',

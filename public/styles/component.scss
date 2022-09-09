@@ -126,6 +126,12 @@ kbn-dis doc-table .kbnDocViewer__warning {
     grid-gap: 10px;
 }
 
+.osButtonsStyleMac {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-gap: 10px;
+}
+
 .message {
     margin-top: 10px;
     display: flex;

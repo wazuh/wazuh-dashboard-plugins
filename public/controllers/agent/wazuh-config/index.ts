@@ -146,8 +146,28 @@ const versionButtonsWindows = [
 const versionButtonsMacOS = [
   {
     id: 'sierra',
-    label: 'Sierra or higher',
-  }
+    label: 'Sierra',
+  },
+  {
+    id: 'highSierra',
+    label: 'High Sierra',
+  },
+  {
+    id: 'mojave',
+    label: 'Mojave',
+  },
+  {
+    id: 'catalina',
+    label: 'Catalina',
+  },
+  {
+    id: 'bigSur',
+    label: 'Big Sur',
+  },
+  {
+    id: 'monterrey',
+    label: 'Monterrey',
+  },
 ];
 
 const versionButtonsOpenSuse = [
@@ -205,7 +225,7 @@ const osButtons = [
   },
   {
     id: 'macos',
-    label: 'MacOS',
+    label: 'macOS',
   },
   {
     id: 'open',
