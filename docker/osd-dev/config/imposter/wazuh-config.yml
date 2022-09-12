@@ -9,6 +9,9 @@ resources:
   # ===================================================== #
 
   #Get API info
+  # - method: GET
+  #   path: /
+
   - method: GET
     path: /
     response:
@@ -32,11 +35,21 @@ resources:
   #   path: /agents
 
   #List agents
+  # - method: GET
+  #   path: /agents
+  
   - method: GET
     path: /agents
     response:
       statusCode: 200
       staticFile: agents/agents.json
+
+  - method: GET
+    path: /agents
+    queryParams: {"agents_list": "001"}
+    response:
+      statusCode: 200
+      staticFile: agents/agent.json
 
   # #Add agent
   # - method: POST
@@ -156,6 +169,9 @@ resources:
   #   path: /cluster/local/info
 
   # #Get nodes info
+  # - method: GET
+  #   path: /cluster/nodes
+
   - method: GET
     path: /cluster/nodes
     response:
@@ -167,6 +183,8 @@ resources:
   #   path: /cluster/healthcheck
 
   # #Get cluster nodes ruleset synchronization status
+  # - method: GET
+  #   path: /cluster/ruleset/synchronization
   - method: GET
     path: /cluster/ruleset/synchronization
     response:
@@ -230,6 +248,9 @@ resources:
   #   path: /cluster/{node_id}/logs/summary
 
   # #Restart nodes
+  # - method: PUT
+  #   path: /cluster/restart
+
   - method: PUT
     path: /cluster/restart
     response:
@@ -237,11 +258,8 @@ resources:
       staticFile: cluster/cluster_restart.json
 
   # #Check nodes config
-  - method: GET
-    path: /cluster/configuration/validation
-    response:
-      statusCode: 200
-      staticFile: cluster/error.json
+  # - method: GET
+  #   path: /cluster/configuration/validation
 
   # #Get node active configuration
   # - method: GET
@@ -576,6 +594,8 @@ resources:
   # # ===================================================== #
 
   #Login
+  # - method: POST
+  #   path: /security/user/authenticate
   - method: POST
     path: /security/user/authenticate
     response:
@@ -790,8 +810,11 @@ resources:
   # # ===================================================== #
 
   #Get vulnerabilities
+  # - method: GET
+  #   path: /vulnerability/{agent_id}
+
   - method: GET
-    path: /vulnerability/{agent_id}
+    path: /vulnerability/000
     response:
       statusCode: 200
       staticFile: vulnerability/vulnerabilities.json
@@ -804,42 +827,37 @@ resources:
   # - method: GET
   #   path: /vulnerability/{agent_id}/summary/{field}
 
-  - path: /vulnerability/{agent_id}/summary/cvss3_score
+  - path: /vulnerability/000/summary/cvss3_score
     method: get
     response:
       statusCode: 200
       staticFile: vulnerability/vulnerabilities_summary_cvss3_score.json
   
-  # Get agent vulnerabilities' cvss2_score field summary
-  - path: /vulnerability/{agent_id}/summary/cvss2_score
+  - path: /vulnerability/000/summary/cvss2_score
     method: get
     response:
       statusCode: 200
       staticFile: vulnerability/vulnerabilities_summary_cvss2_score.json
   
-  # Get agent vulnerabilities' cve field summary
-  - path: /vulnerability/{agent_id}/summary/cve
+  - path: /vulnerability/000/summary/cve
     method: get
     response:
       statusCode: 200
       staticFile: vulnerability/vulnerabilities_summary_cve.json
   
-  # Get agent vulnerabilities' name field summary
-  - path: /vulnerability/{agent_id}/summary/name
+  - path: /vulnerability/000/summary/name
     method: get
     response:
       statusCode: 200
       staticFile: vulnerability/vulnerabilities_summary_name.json
   
-  # Get agent vulnerabilities' version field summary
-  - path: /vulnerability/{agent_id}/summary/version
+  - path: /vulnerability/000/summary/version
     method: get
     response:
       statusCode: 200
       staticFile: vulnerability/vulnerabilities_summary_version.json
   
-  # Get agent vulnerabilities' severity field summary
-  - path: /vulnerability/{agent_id}/summary/severity
+  - path: /vulnerability/000/summary/severity
     method: get
     response:
       statusCode: 200
