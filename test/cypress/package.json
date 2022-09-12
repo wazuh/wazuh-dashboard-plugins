@@ -30,12 +30,13 @@
   "license": "ISC",
   "dependencies": {
     "cosmiconfig": "^4.0.0",
-    "mocha": "^9.2.2", 
+    "mocha": "^9.2.2",
     "prettier": "^2.3.0"
   },
   "devDependencies": {
     "cypress": "^9.5.2",
     "cypress-cucumber-preprocessor": "^4.0.3",
+    "cypress-real-events": "^1.7.1",
     "cypress-xpath": "^1.6.2",
     "eslint-plugin-cypress": "^2.11.3",
     "mochawesome": "^7.1.3",
