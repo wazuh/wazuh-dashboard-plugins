@@ -77,16 +77,6 @@ export class AgentsPreviewController {
     if (loc && loc.tab) {
       this.submenuNavItem = loc.tab;
     }
-    const summaryData = await WzRequest.apiReq('GET', '/agents/summary/status', {});
-    this.summary = summaryData.data.data;
-    if (this.summary.total === 0) {
-      if (this.addingNewAgent === undefined) {
-        this.addNewAgent(true);
-      }
-      this.hasAgents = false;
-    } else {
-      this.hasAgents = true;
-    }
     // Watcher for URL params
     this.$scope.$watch('submenuNavItem', () => {
       this.$location.search('tab', this.submenuNavItem);
@@ -97,7 +87,7 @@ export class AgentsPreviewController {
     });
     this.registerAgentsProps = {
       addNewAgent: flag => this.addNewAgent(flag),
-      hasAgents: this.hasAgents,
+      hasAgents: () => this.hasAgents,
       reload: () => this.$route.reload(),
       getWazuhVersion: () => this.getWazuhVersion(),
       getCurrentApiAddress: () => this.getCurrentApiAddress()
@@ -107,6 +97,17 @@ export class AgentsPreviewController {
     const instance = new DataFactory(WzRequest.apiReq, '/agents', false, false);
     //Props
     this.tableAgentsProps = {
+      updateSummary: (summary) => {
+        this.summary = summary;
+        if (this.summary.total === 0) {
+          if (this.addingNewAgent === undefined) {
+            this.addNewAgent(true);
+          }
+          this.hasAgents = false;
+        } else {
+          this.hasAgents = true;
+        }
+      },
       wzReq: (method, path, body) => WzRequest.apiReq(method, path, body),
       addingNewAgent: () => {
         this.addNewAgent(true);

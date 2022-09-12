@@ -1,31 +1,36 @@
-import { WzRequest } from '../../../../../../react-services';
+import { WzRequest } from '../../../../../react-services';
+import {
+  SECTION_DECODERS_SECTION,
+  SECTION_RULES_SECTION,
+  SECTION_CDBLIST_SECTION
+} from './constants';
 
 type DECODERS = 'decoders';
 type LISTS = 'lists';
 type RULES = 'rules';
 export type Resource = DECODERS | LISTS | RULES;
-export const RulesetResources = {
-  DECODERS: 'decoders',
-  LISTS: 'lists',
-  RULES: 'rules',
+export const ResourcesConstants = {
+  DECODERS: SECTION_DECODERS_SECTION,
+  LISTS: SECTION_CDBLIST_SECTION,
+  RULES: SECTION_RULES_SECTION,
 };
 
 export const resourceDictionary = {
-  [RulesetResources.DECODERS]: {    
+  [ResourcesConstants.DECODERS]: {    
     resourcePath: '/decoders',    
     permissionResource: (value) => `decoder:file:${value}`
   },
-  [RulesetResources.LISTS]: {    
+  [ResourcesConstants.LISTS]: {    
     resourcePath: '/lists',
     permissionResource: (value) => `list:file:${value}`
   },
-  [RulesetResources.RULES]: {    
+  [ResourcesConstants.RULES]: {    
     resourcePath: '/rules',
     permissionResource: (value) => `rule:file:${value}`
   },
 };
 
-export class RulesetHandler {
+export class ResourcesHandler {
   resource: Resource;
   constructor(_resource: Resource) {
     this.resource = _resource;

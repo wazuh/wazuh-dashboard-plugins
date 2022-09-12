@@ -6,15 +6,21 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Added
 
 - Added the option to sort by the agents count in the group table. [#4323](https://github.com/wazuh/wazuh-kibana-app/pull/4323)
+- Added agent synchronization status in the agent module. [#3874](https://github.com/wazuh/wazuh-kibana-app/pull/3874)
 
 ### Changed
 
 - Changed the HTTP verb from `GET` to `POST` in the requests to login to the Wazuh API [#4103](https://github.com/wazuh/wazuh-kibana-app/pull/4103)
+- Improved alerts summary performance [#4376](https://github.com/wazuh/wazuh-kibana-app/pull/4376)
+- Endpoint `/agents/summary/status` response was adapted. [#3874](https://github.com/wazuh/wazuh-kibana-app/pull/3874)
+- Changed loading icons of the Agents Overview section to work independently [#4363](https://github.com/wazuh/wazuh-kibana-app/pull/4363)
 
 ### Fixed
 
+- Improved Agents Overview performance [#4363](https://github.com/wazuh/wazuh-kibana-app/pull/4363)
+- Fixed nested fields filtering in dashboards tables and KPIs [#4425](https://github.com/wazuh/wazuh-kibana-app/pull/4425)
+- Fixed nested field rendering in security alerts table details [#4428](https://github.com/wazuh/wazuh-kibana-app/pull/4428)
 - Fixed Wazuh restart UI [#4433](https://github.com/wazuh/wazuh-kibana-app/pull/4433)
-
 
 ## Wazuh v4.3.7 - OpenSearch Dashboards 1.2.0 - Revision 4308
 
@@ -175,6 +181,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Run `template` and `fields` checks in the health check depends on the app configuration [#3783](https://github.com/wazuh/wazuh-kibana-app/pull/3783)
 - Added a toast message when there is an error creating a new group [#3804](https://github.com/wazuh/wazuh-kibana-app/pull/3804)
 - Added a step to start the agent to the deploy new Windowns agent guide [#3846](https://github.com/wazuh/wazuh-kibana-app/pull/3846)
+- Added agents windows events config tab [#3905](https://github.com/wazuh/wazuh-kibana-app/pull/3905)
 - Added 3 new panels to `Vulnerabilities/Inventory` [#3893](https://github.com/wazuh/wazuh-kibana-app/pull/3893)
 - Added new fields of `Vulnerabilities` to the details flyout [#3893](https://github.com/wazuh/wazuh-kibana-app/pull/3893) [#3908](https://github.com/wazuh/wazuh-kibana-app/pull/3908)
 - Added missing fields used in visualizations to the known fiels related to alerts [#3924](https://github.com/wazuh/wazuh-kibana-app/pull/3924)

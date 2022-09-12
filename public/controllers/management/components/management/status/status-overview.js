@@ -93,7 +93,7 @@ export class WzStatusOverview extends Component {
       this.props.updateLoadingStatus(true);
 
 
-      const [agentsCount, clusterStatus, managerInfo, agentsCountByManagerNodes] = (await Promise.all([
+      const [{connection: agentsCount, configuration}, clusterStatus, managerInfo, agentsCountByManagerNodes] = (await Promise.all([
         this.statusHandler.agentsSummary(),
         this.statusHandler.clusterStatus(),
         this.statusHandler.managerInfo(),
@@ -103,6 +103,7 @@ export class WzStatusOverview extends Component {
       this.props.updateStats({
         agentsCountByManagerNodes: agentsCountByManagerNodes.nodes,
         agentsCount,
+        agentsSynced: configuration.total ? ((configuration.synced / configuration.total) * 100).toFixed(2) : 0,
         agentsCoverage: agentsCount.total ? ((agentsCount.active / agentsCount.total) * 100).toFixed(2) : 0,
       });
 
