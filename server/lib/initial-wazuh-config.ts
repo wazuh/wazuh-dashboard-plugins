@@ -40,7 +40,7 @@ const header = `---
 
 
 const pluginSettingsConfiguration = Object.entries(PLUGIN_SETTINGS_CATEGORIES).map(([pluginSettingCategoryID, pluginSettingCategoryConfiguration]) => {
-  const header = `#------------------------------- ${pluginSettingCategoryConfiguration.name} -------------------------------`;
+  const header = `#------------------------------- ${pluginSettingCategoryConfiguration.title} -------------------------------`;
   const description = pluginSettingCategoryConfiguration.description
     /*
     # category description
@@ -50,14 +50,14 @@ const pluginSettingsConfiguration = Object.entries(PLUGIN_SETTINGS_CATEGORIES).m
   : '';
 
   const pluginSettingsCategory = Object.entries(PLUGIN_SETTINGS)
-  .filter(([pluginSettingKey, {category, configurableFile}]) => configurableFile && category.toString() === pluginSettingCategoryID)
-  .map(([pluginSettingKey, {description, default: defaultValue, options = {}}] ) => 
-    /*
-    # setting description
-    # settingKey: settingValue
-    */
-    [splitDescription(getPluginSettingDescription({description, options})), `# ${pluginSettingKey}: ${printSettingValue(defaultValue)}`].join('\n')
-  ).join('\n#\n');
+    .filter(([, {category, configurableFile}]) => configurableFile && category.toString() === pluginSettingCategoryID)
+    .map(([pluginSettingKey, {description, default: defaultValue, options = {}}] ) => 
+      /*
+      # setting description
+      # settingKey: settingValue
+      */
+      [splitDescription(getPluginSettingDescription({description, options})), `# ${pluginSettingKey}: ${printSettingValue(defaultValue)}`].join('\n')
+    ).join('\n#\n');
   /*
   #------------------- category name --------------
   #

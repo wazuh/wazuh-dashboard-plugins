@@ -383,11 +383,10 @@ function discoverController(
 
   const pageTitleSuffix = savedSearch.id && savedSearch.title ? `: ${savedSearch.title}` : '';
   // Set the browser tab title with the plugin name.
-  const pluginName = store.getState().appConfig.data['customization.branding.plugin.name'] || getSettingDefaultValue('customization.branding.plugin.name')
-  chrome.docTitle.change(`${pluginName}${pageTitleSuffix}`);
+  chrome.docTitle.change(`Wazuh${pageTitleSuffix}`);
 
   const discoverBreadcrumbsTitle = i18n.translate('discover.discoverBreadcrumbTitle', {
-    defaultMessage: pluginName,
+    defaultMessage: 'Wazuh',
   });
 
   if (savedSearch.id && savedSearch.title) {

@@ -16,7 +16,7 @@ import { getConfiguration } from '../../lib/get-configuration';
 import { read } from 'read-last-lines';
 import { UpdateConfigurationFile } from '../../lib/update-configuration';
 import jwtDecode from 'jwt-decode';
-import { WAZUH_ROLE_ADMINISTRATOR_ID, WAZUH_DATA_LOGS_RAW_PATH, WAZUH_UI_LOGS_RAW_PATH, ASSETS_CUSTOM_FOLDER_NAME, ASSETS_CUSTOM_BY_TYPE, PLUGIN_SETTINGS } from '../../../common/constants';
+import { WAZUH_ROLE_ADMINISTRATOR_ID, WAZUH_DATA_LOGS_RAW_PATH, WAZUH_UI_LOGS_RAW_PATH, PLUGIN_SETTINGS } from '../../../common/constants';
 import { ManageHosts } from '../../lib/manage-hosts';
 import { KibanaRequest, RequestHandlerContext, KibanaResponseFactory } from 'src/core/server';
 import { getCookieValueByName } from '../../lib/cookie';
@@ -27,6 +27,7 @@ import glob from 'glob';
 
 const updateConfigurationFile = new UpdateConfigurationFile();
 
+// TODO: these controllers have no logs. We should include them.
 export class WazuhUtilsCtrl {
   /**
    * Constructor
@@ -71,7 +72,6 @@ export class WazuhUtilsCtrl {
           requireReload: boolean = false,
           requireRestart: boolean = false;
 
-
       // Plugin settings configurables in the configuration file.
       const pluginSettingsConfigurableFile = Object.keys(request.body)
         .filter(pluginSettingKey => PLUGIN_SETTINGS[pluginSettingKey].configurableFile)
@@ -107,7 +107,6 @@ export class WazuhUtilsCtrl {
       const { key } = request.params;
       const { file: bufferFile, extension } = request.body;
       const pluginSetting = PLUGIN_SETTINGS[key];
-      const targetDirectoryCustomTypeName = ASSETS_CUSTOM_BY_TYPE[pluginSetting.options.file.type];
 
       // Check if the extension is valid for the setting.
       if(!pluginSetting.options.file.extensions.includes(extension)){
@@ -117,28 +116,20 @@ export class WazuhUtilsCtrl {
       };
 
       const fileNamePath = `${key}${extension}`;
-      
-      // Generate the path to the target directory and create these don't exist.
 
-      // public/assets
-      const publicAssetsPath = path.join(__dirname, '../../../public/assets');
-      createDirectoryIfNotExists(publicAssetsPath);
-      // public/assets/custom
-      const publicAssetsCustomPath = path.join(publicAssetsPath, ASSETS_CUSTOM_FOLDER_NAME);
-      createDirectoryIfNotExists(publicAssetsCustomPath);
-      // public/assets/custom/<asset_type>
-      const publicAssetsCustomTypePath = path.join(publicAssetsCustomPath, targetDirectoryCustomTypeName);
-      createDirectoryIfNotExists(publicAssetsCustomTypePath);
-
-
+      // Create target directory
+      const targetDirectory = path.join(__dirname, '../../..', pluginSetting.options.file.store.relativePathFileSystem);
+      createDirectoryIfNotExists(targetDirectory);
       // Get the files related to the setting and remove them
-      const files = glob.sync(path.join(publicAssetsCustomTypePath,`${key}.*`));
+      const files = glob.sync(path.join(targetDirectory, `${key}.*`));
       files.forEach(fs.unlinkSync);
       
       // Store the file in the target directory.
-      fs.writeFileSync(path.join(publicAssetsCustomTypePath, fileNamePath), bufferFile);
+      fs.writeFileSync(path.join(targetDirectory, fileNamePath), bufferFile);
 
-      const pluginConfiguration = getConfiguration({force: true});
+      // Update the setting in the configuration cache
+      const pluginSettingValue = pluginSetting.options.file.store.resolveStaticURL(fileNamePath);
+      await updateConfigurationFile.updateConfiguration({[key]: pluginSettingValue});   
 
       return response.ok({
         body: {
@@ -147,7 +138,7 @@ export class WazuhUtilsCtrl {
             requireReload: Boolean(pluginSetting.requireReload),
             requireRestart: Boolean(pluginSetting.requireRestart),
             updatedConfiguration: {
-              [key]: pluginConfiguration[key]
+              [key]: pluginSettingValue
             }
           }
         }
@@ -167,28 +158,22 @@ export class WazuhUtilsCtrl {
     async (context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) => {
       const { key } = request.params;
       const pluginSetting = PLUGIN_SETTINGS[key];
-      const targetDirectoryCustomTypeName = ASSETS_CUSTOM_BY_TYPE[pluginSetting.options.file.type];
-      
-      // Generate the path to the target directory and create these don't exist.
-
-      // public/assets
-      const publicAssetsPath = path.join(__dirname, '../../../public/assets');
-      createDirectoryIfNotExists(publicAssetsPath);
-      // public/assets/custom
-      const publicAssetsCustomPath = path.join(publicAssetsPath, ASSETS_CUSTOM_FOLDER_NAME);
-      createDirectoryIfNotExists(publicAssetsCustomPath);
-      // public/assets/custom/<asset_type>
-      const publicAssetsCustomTypePath = path.join(publicAssetsCustomPath, targetDirectoryCustomTypeName);
-      createDirectoryIfNotExists(publicAssetsCustomTypePath);
 
       // Get the files related to the setting and remove them
-      const files = glob.sync(path.join(publicAssetsCustomTypePath,`${key}.*`));
+      const targetDirectory = path.join(__dirname, '../../..', pluginSetting.options.file.store.relativePathFileSystem);
+      const files = glob.sync(path.join(targetDirectory,`${key}.*`));
       files.forEach(fs.unlinkSync);
+
+      // Update the setting in the configuration cache
+      const pluginSettingValue = pluginSetting.default;
+      await updateConfigurationFile.updateConfiguration({[key]: pluginSettingValue}); 
 
       return response.ok({
         body: {
-          ok: true,
-          message: 'All files were removed.'
+          message: 'All files were removed.',
+          updatedConfiguration: {
+            [key]: pluginSettingValue
+          }
         }
       });
     },

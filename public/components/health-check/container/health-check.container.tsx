@@ -170,7 +170,7 @@ function HealthCheckComponent() {
   }
 
 
-  const logoUrl = getHttp().basePath.prepend(appConfig.data['customization.logo.healthcheck'] ? getAssetURL(appConfig.data['customization.logo.healthcheck']) : getThemeAssetURL('logo.svg'));
+  const logoUrl = getHttp().basePath.prepend(appConfig.data['customization.status'] && appConfig.data['customization.logo.healthcheck'] ? getAssetURL(appConfig.data['customization.logo.healthcheck']) : getThemeAssetURL('logo.svg'));
   const thereAreErrors = Object.keys(checkErrors).length > 0;
 
   const renderChecks = () => {

@@ -31,21 +31,17 @@ export function WazuhUtilsRoutes(router: IRouter) {
     {
       path: '/utils/configuration',
       validate: {
-        body: schema.object(Object.entries(PLUGIN_SETTINGS).reduce((accum, [pluginSettingKey, {validationOnSaveBackend, validate = (schema) => schema.any()}]) => ({
+        body: schema.object(Object.entries(PLUGIN_SETTINGS).filter(([, {configurableFile}]) => configurableFile).reduce((accum, [pluginSettingKey, {validateBackend}]) => ({
           ...accum,
-          [pluginSettingKey]: schema.maybe((validationOnSaveBackend || validate)(schema))
+          [pluginSettingKey]: schema.maybe(validateBackend ? (validateBackend)(schema) : schema.any())
         }), {})),
       },
-      options: {
-        output: 'stream',
-        parse: true
-      }
     },
     async (context, request, response) => ctrl.updateConfigurationFile(context, request, response)
   );
 
   const pluginSettingsTypeFilepicker = Object.entries(PLUGIN_SETTINGS)
-    .filter(([_, {type}]) => type === EpluginSettingType.filepicker);
+    .filter(([_, {type, configurableFile}]) => type === EpluginSettingType.filepicker && configurableFile);
 
   const schemaPluginSettingsTypeFilepicker = schema.oneOf(pluginSettingsTypeFilepicker.map(([pluginSettingKey]) => schema.literal(pluginSettingKey)));
 

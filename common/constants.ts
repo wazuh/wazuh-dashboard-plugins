@@ -12,7 +12,7 @@
 import path from 'path';
 import { version } from '../package.json';
 import { validate as validateNodeCronInterval } from 'node-cron';
-import { composeValidate, validateBooleanIs, validateJSONArrayOfStrings, validateLiteral, validateNumber, validateStringNoEmpty, validateStringNoSpaces } from './services/settings-validate';
+import { composeValidate, validateBooleanIs, validateFilePickerSupportedExtensions, validateJSONArrayOfStrings, validateLiteral, validateNumber, validateStringMultipleLines, validateStringNoEmpty, validateStringNoSpaces } from './services/settings-validate';
 
 // Plugin
 export const PLUGIN_VERSION = version;
@@ -58,10 +58,6 @@ export const WAZUH_ROLE_ADMINISTRATOR_NAME = 'administrator';
 // Assets
 export const ASSETS_BASE_URL_PREFIX = '/plugins/wazuh/assets/';
 export const ASSETS_PUBLIC_URL = '/plugins/wazuh/public/assets/';
-export const ASSETS_CUSTOM_FOLDER_NAME = 'custom';
-export const ASSETS_CUSTOM_BY_TYPE = {
-	image: 'images'
-};
 
 // Sample data
 export const WAZUH_SAMPLE_ALERT_PREFIX = 'wazuh-alerts-4.x-';
@@ -349,51 +345,78 @@ export enum SettingCategory{
   CUSTOMIZATION,
 };
 
-type TpluginSettingParamsListOptions = {
+type TpluginSettingOptionsChoices = {
 	choices: {text: string, value: any}[]
 };
 
-type TpluginSettingParamsFile = {
+type TpluginSettingOptionsFile = {
 	file: {
 		type: 'image'
 		extensions?: string[]
-		recommended: {
+		recommended?: {
 			dimensions?: {
 				width: number,
 				height: number,
 				unit: string
 			}
 		}
-		
+		store?: {
+			relativePathFileSystem: string
+			filename: string
+			resolveStaticURL: (filename: string) => string
+		}
 	}
 };
+
+type TpluginSettingOptionsNumber = {
+	number: {
+		min?: number
+		max?: number
+	}
+};
+
+type TpluginSettingOptionsEditor = {
+	editor: {
+		language: string
+	}
+};
+
+type TpluginSettingOptionsSwitch = {
+	switch: {
+		values: {
+			disabled: {label?: string, value: any},
+			enabled: {label?: string, value: any},
+		}
+	}
+};
+
 
 export enum EpluginSettingType{
 	text = 'text',
 	textarea = 'textarea',
-	boolean = 'boolean',
+	switch = 'switch',
 	number = 'number',
-	array = 'array',
-	list = 'list',
-	interval = 'interval',
+	editor = 'editor',
+	select = 'select',
 	filepicker = 'filepicker',
 };
 
 export type TpluginSetting = {
-	name: string
+	title: string
 	description: string
 	category: SettingCategory
 	type: EpluginSettingType
 	default: any
+	defaultHidden?: any
 	configurableFile: boolean,
 	configurableUI: boolean
-	defaultHidden?: any
-	requireRestart?: boolean
-	requireReload?: boolean
 	requireHealthCheck?: boolean
-	options?: TpluginSettingParamsListOptions | TpluginSettingParamsFile
+	requireReload?: boolean
+	requireRestart?: boolean
+	options?: TpluginSettingOptionsChoices | TpluginSettingOptionsFile | TpluginSettingOptionsNumber | TpluginSettingOptionsEditor | TpluginSettingOptionsSwitch
+	transformUIInputValue?: (value: boolean | string) => boolean
 	validate?: (value: any) => string | undefined
-	validateBackendOnSave?: (shema: any) => any
+	validateBackend?: (schema: any) => any
 };
 
 export type TPluginSettingWithKey = TpluginSetting & { key: string };
@@ -404,38 +427,39 @@ type TpluginSettings = {
 
 export const PLUGIN_SETTINGS_CATEGORIES = {
   [SettingCategory.HEALTH_CHECK]: {
-    name: 'Health check',
+    title: 'Health check',
     description: "Define which checks will be executed by the App's HealthCheck. Allowed values are: true, false"
   },
   [SettingCategory.GENERAL]: {
-    name: 'General',
+    title: 'General',
     description: "General settings."
   },
   [SettingCategory.EXTENSIONS]: {
-    name: 'Extensions',
+    title: 'Extensions',
     description: "Extensions."
   },
   [SettingCategory.SECURITY]: {
-    name: 'Security',
+    title: 'Security',
     description: "Security."
   },
   [SettingCategory.MONITORING]: {
-    name: 'Task:Monitoring',
+    title: 'Task:Monitoring',
     description: "Monitoring."
   },
   [SettingCategory.STATISTICS]: {
-    name: 'Task:Statistics',
+    title: 'Task:Statistics',
     description: "Statistics."
   },
   [SettingCategory.CUSTOMIZATION]: {
-    name: 'Customization',
+    title: 'Customization',
     description: "Customization."
   }
 };
 
+
 export const PLUGIN_SETTINGS: TpluginSettings = {
 	"alerts.sample.prefix": {
-		name: "Sample alerts prefix",
+		title: "Sample alerts prefix",
 		description: "Define the index name prefix of sample alerts. It must match the template used by the index pattern to avoid unknown fields in dashboards.",
 		category: SettingCategory.GENERAL,
 		type: EpluginSettingType.text,
@@ -444,116 +468,204 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		configurableUI: true,
 		requireHealthCheck: true,
 		validate: composeValidate(validateStringNoEmpty, validateStringNoSpaces),
-		validateBackendOnSave: function(schema){
+		validateBackend: function(schema){
 			return schema.string({minLength: 1, validate: this.validate});
 		}
 	},
 	"checks.api": {
-		name: "API connection",
+		title: "API connection",
 		description: "Enable or disable the API health check when opening the app.",
 		category: SettingCategory.HEALTH_CHECK,
-		type: EpluginSettingType.boolean,
+		type: EpluginSettingType.switch,
 		default: true,
 		configurableFile: true,
 		configurableUI: true,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
 		validate: validateBooleanIs,
-		validateBackendOnSave: function(schema){
+		validateBackend: function(schema){
 			return schema.boolean();
 		},
 	},
 	"checks.fields": {
-		name: "Known fields",
+		title: "Known fields",
 		description: "Enable or disable the known fields health check when opening the app.",
 		category: SettingCategory.HEALTH_CHECK,
-		type: EpluginSettingType.boolean,
+		type: EpluginSettingType.switch,
 		default: true,
 		configurableFile: true,
 		configurableUI: true,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
 		validate: validateBooleanIs,
-		validateBackendOnSave: function(schema){
+		validateBackend: function(schema){
 			return schema.boolean();
 		},
 	},
 	"checks.maxBuckets": {
-		name: "Set max buckets to 200000",
+		title: "Set max buckets to 200000",
 		description: "Change the default value of the plugin platform max buckets configuration.",
 		category: SettingCategory.HEALTH_CHECK,
-		type: EpluginSettingType.boolean,
+		type: EpluginSettingType.switch,
 		default: true,
 		configurableFile: true,
 		configurableUI: true,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			},
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
 		validate: validateBooleanIs,
-		validateBackendOnSave: function(schema){
+		validateBackend: function(schema){
 			return schema.boolean();
 		},
 	},
 	"checks.metaFields": {
-		name: "Remove meta fields",
+		title: "Remove meta fields",
 		description: "Change the default value of the plugin platform metaField configuration.",
 		category: SettingCategory.HEALTH_CHECK,
-		type: EpluginSettingType.boolean,
+		type: EpluginSettingType.switch,
 		default: true,
 		configurableFile: true,
 		configurableUI: true,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
 		validate: validateBooleanIs,
-		validateBackendOnSave: function(schema){
+		validateBackend: function(schema){
 			return schema.boolean();
 		},
 	},
 	"checks.pattern": {
-		name: "Index pattern",
+		title: "Index pattern",
 		description: "Enable or disable the index pattern health check when opening the app.",
 		category: SettingCategory.HEALTH_CHECK,
-		type: EpluginSettingType.boolean,
+		type: EpluginSettingType.switch,
 		default: true,
 		configurableFile: true,
 		configurableUI: true,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
 		validate: validateBooleanIs,
-		validateBackendOnSave: function(schema){
+		validateBackend: function(schema){
 			return schema.boolean();
 		},
 	},
 	"checks.setup": {
-		name: "API version",
+		title: "API version",
 		description: "Enable or disable the setup health check when opening the app.",
 		category: SettingCategory.HEALTH_CHECK,
-		type: EpluginSettingType.boolean,
+		type: EpluginSettingType.switch,
 		default: true,
 		configurableFile: true,
 		configurableUI: true,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
 		validate: validateBooleanIs,
-		validateBackendOnSave: function(schema){
+		validateBackend: function(schema){
 			return schema.boolean();
 		},
 	},
 	"checks.template": {
-		name: "Index template",
+		title: "Index template",
 		description: "Enable or disable the template health check when opening the app.",
 		category: SettingCategory.HEALTH_CHECK,
-		type: EpluginSettingType.boolean,
+		type: EpluginSettingType.switch,
 		default: true,
 		configurableFile: true,
 		configurableUI: true,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
 		validate: validateBooleanIs,
-		validateBackendOnSave: function(schema){
+		validateBackend: function(schema){
 			return schema.boolean();
 		},
 	},
 	"checks.timeFilter": {
-		name: "Set time filter to 24h",
+		title: "Set time filter to 24h",
 		description: "Change the default value of the plugin platform timeFilter configuration.",
 		category: SettingCategory.HEALTH_CHECK,
-		type: EpluginSettingType.boolean,
+		type: EpluginSettingType.switch,
 		default: true,
 		configurableFile: true,
 		configurableUI: true,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
 		validate: validateBooleanIs,
-		validateBackendOnSave: function(schema){
+		validateBackend: function(schema){
 			return schema.boolean();
 		},
 	},
 	"cron.prefix": {
-		name: "Cron prefix",
+		title: "Cron prefix",
 		description: "Define the index prefix of predefined jobs.",
 		category: SettingCategory.GENERAL,
 		type: EpluginSettingType.text,
@@ -561,28 +673,33 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		configurableFile: true,
 		configurableUI: true,
 		validate: composeValidate(validateStringNoEmpty, validateStringNoSpaces),
-		validateBackendOnSave: function(schema){
+		validateBackend: function(schema){
 			return schema.string({minLength: 1, validate: this.validate});
-		}
+		},
 	},
 	"cron.statistics.apis": {
-		name: "Includes APIs",
+		title: "Includes APIs",
 		description: "Enter the ID of the hosts you want to save data from, leave this empty to run the task on every host.",
 		category: SettingCategory.STATISTICS,
-		type: EpluginSettingType.array,
+		type: EpluginSettingType.editor,
 		default: [],
 		configurableFile: true,
 		configurableUI: true,
+		options: {
+			editor: {
+				language: 'json'
+			}
+		},
 		validate: validateJSONArrayOfStrings,
-		validateBackendOnSave: function(schema){
+		validateBackend: function(schema){
 			return schema.string(this.validate);
-		}
+		},
 	},
 	"cron.statistics.index.creation": {
-		name: "Index creation",
+		title: "Index creation",
 		description: "Define the interval in which a new index will be created.",
 		category: SettingCategory.STATISTICS,
-		type: EpluginSettingType.list,
+		type: EpluginSettingType.select,
 		options: {
 			choices: [
 				{
@@ -610,12 +727,12 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		validate: function (value){
 			return validateLiteral(this.options.choices.map(({value}) => value))(value)
 		},
-		validateBackendOnSave: function(schema){
+		validateBackend: function(schema){
 			return schema.oneOf(this.options.choices.map(({value}) => schema.literal(value)));
-		}
+		},
 	},
 	"cron.statistics.index.name": {
-		name: "Index name",
+		title: "Index name",
 		description: "Define the name of the index in which the documents will be saved.",
 		category: SettingCategory.STATISTICS,
 		type: EpluginSettingType.text,
@@ -624,12 +741,12 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		configurableUI: true,
 		requireHealthCheck: true,
 		validate: composeValidate(validateStringNoEmpty, validateStringNoSpaces),
-		validateBackendOnSave: function(schema){
+		validateBackend: function(schema){
 			return schema.string({minLength: 1, validate: this.validate});
-		}
+		},
 	},
 	"cron.statistics.index.replicas": {
-		name: "Index replicas",
+		title: "Index replicas",
 		description: "Define the number of replicas to use for the statistics indices.",
 		category: SettingCategory.STATISTICS,
 		type: EpluginSettingType.number,
@@ -637,13 +754,20 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		configurableFile: true,
 		configurableUI: true,
 		requireHealthCheck: true,
-		validate: validateNumber({min: 0}),
-		validateBackendOnSave: function(schema){
-			return schema.number({minLength: 1, validate: this.validate});
-		}
+		options: {
+			number: {
+				min: 0
+			}
+		},
+		validate: function(value){
+			return validateNumber(this.options.number)(value)
+		},
+		validateBackend: function(schema){
+			return schema.number({...this.options.number});
+		},
 	},
 	"cron.statistics.index.shards": {
-		name: "Index shards",
+		title: "Index shards",
 		description: "Define the number of shards to use for the statistics indices.",
 		category: SettingCategory.STATISTICS,
 		type: EpluginSettingType.number,
@@ -651,46 +775,87 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		configurableFile: true,
 		configurableUI: true,
 		requireHealthCheck: true,
+		options: {
+			number: {
+				min: 1
+			}
+		},
+		validate: function(value){
+			return validateNumber(this.options.number)(value)
+		},
+		validateBackend: function(schema){
+			return schema.number({...this.options.number});
+		},
 	},
 	"cron.statistics.interval": {
-		name: "Interval",
+		title: "Interval",
 		description: "Define the frequency of task execution using cron schedule expressions.",
 		category: SettingCategory.STATISTICS,
-		type: EpluginSettingType.interval,
+		type: EpluginSettingType.text,
 		default: WAZUH_STATISTICS_DEFAULT_CRON_FREQ,
 		configurableFile: true,
 		configurableUI: true,
 		requireRestart: true,
 		validate: (value: string) => validateNodeCronInterval(value) ? undefined : "Interval is not valid.",
-		validateBackendOnSave: function(schema){
+		validateBackend: function(schema){
 			return schema.string({validate: this.validate});
-		}
+		},
 	},
 	"cron.statistics.status": {
-		name: "Status",
+		title: "Status",
 		description: "Enable or disable the statistics tasks.",
 		category: SettingCategory.STATISTICS,
-		type: EpluginSettingType.boolean,
+		type: EpluginSettingType.switch,
 		default: WAZUH_STATISTICS_DEFAULT_STATUS,
 		configurableFile: true,
 		configurableUI: true,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
+		validate: validateBooleanIs,
+		validateBackend: function(schema){
+			return schema.boolean();
+		},
 	},
 	"customization.status": {
-		name: "Status",
+		title: "Status",
 		description: "Enable or disable the customization.",
 		category: SettingCategory.CUSTOMIZATION,
-		type: EpluginSettingType.boolean,
-		default: false,
+		type: EpluginSettingType.switch,
+		default: true,
 		configurableFile: true,
 		configurableUI: true,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
+		validate: validateBooleanIs,
+		validateBackend: function(schema){
+			return schema.boolean();
+		},
 	},
 	"customization.logo.app": {
-		name: "Logo App",
+		title: "Logo App",
 		description: `Customize the logo displayed in the plugin menu.`,
 		category: SettingCategory.CUSTOMIZATION,
 		type: EpluginSettingType.filepicker,
 		default: "",
-		configurableFile: false,
+		configurableFile: true,
 		configurableUI: true,
 		options: {
 			file: {
@@ -702,18 +867,25 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 						height: 70,
 						unit: 'px'
 					}
+				},
+				store: {
+					relativePathFileSystem: 'public/assets/custom/images',
+					filename: 'customization.logo.app',
+					resolveStaticURL: (filename: string) => `custom/images/${filename}`
 				}
-				
 			}
-		}
+		},
+		validate: function(value){
+			return validateFilePickerSupportedExtensions(this.options.file.extensions)(value)
+		},
 	},
 	"customization.logo.healthcheck": {
-		name: "Logo Health Check",
+		title: "Logo Health Check",
 		description: `Customize the logo displayed in the plugin health check.`,
 		category: SettingCategory.CUSTOMIZATION,
 		type: EpluginSettingType.filepicker,
 		default: "",
-		configurableFile: false,
+		configurableFile: true,
 		configurableUI: true,
 		options: {
 			file: {
@@ -725,19 +897,26 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 						height: 70,
 						unit: 'px'
 					}
-				}
-				
+				},
+				store: {
+					relativePathFileSystem: 'public/assets/custom/images',
+					filename: 'customization.logo.healthcheck',
+					resolveStaticURL: (filename: string) => `custom/images/${filename}`
+				}				
 			}
-		}
+		},
+		validate: function(value){
+			return validateFilePickerSupportedExtensions(this.options.file.extensions)(value)
+		},
 	},
 	"customization.logo.reports": {
-		name: "Logo Reports",
+		title: "Logo Reports",
 		description: `Customize the logo displayed in the PDF reports.`,
 		category: SettingCategory.CUSTOMIZATION,
 		type: EpluginSettingType.filepicker,
 		default: "",
     	defaultHidden: REPORTS_LOGO_IMAGE_ASSETS_RELATIVE_PATH,
-		configurableFile: false,
+		configurableFile: true,
 		configurableUI: true,
 		options: {
 			file: {
@@ -745,22 +924,29 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 				extensions: ['.jpeg', '.jpg', '.png'],
 				recommended: {
 					dimensions: {
-						width: 370,
-						height: 75,
+						width: 190,
+						height: 40,
 						unit: 'px'
 					}
-				}
-				
+				},
+				store: {
+					relativePathFileSystem: 'public/assets/custom/images',
+					filename: 'customization.logo.reports',
+					resolveStaticURL: (filename: string) => `custom/images/${filename}`
+				}				
 			}
-		}
+		},
+		validate: function(value){
+			return validateFilePickerSupportedExtensions(this.options.file.extensions)(value)
+		},
 	},
 	"customization.logo.sidebar": {
-		name: "Logo Sidebar",
+		title: "Logo Sidebar",
 		description: `Customize the logo of the category that belongs the plugin.`,
 		category: SettingCategory.CUSTOMIZATION,
 		type: EpluginSettingType.filepicker,
 		default: "",
-		configurableFile: false,
+		configurableFile: true,
 		configurableUI: true,
 		requireReload: true,
 		options: {
@@ -773,13 +959,20 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 						height: 80,
 						unit: 'px'
 					}
-				}
-				
+				},
+				store: {
+					relativePathFileSystem: 'public/assets/custom/images',
+					filename: 'customization.logo.sidebar',
+					resolveStaticURL: (filename: string) => `custom/images/${filename}`
+				}				
 			}
-		}
+		},
+		validate: function(value){
+			return validateFilePickerSupportedExtensions(this.options.file.extensions)(value)
+		},
 	},
 	"customization.reports.footer": {
-		name: "Reports footer",
+		title: "Reports footer",
 		description: "Set the footer of the reports.",
 		category: SettingCategory.CUSTOMIZATION,
 		type: EpluginSettingType.textarea,
@@ -787,9 +980,13 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
     	defaultHidden: REPORTS_PAGE_FOOTER_TEXT,
 		configurableFile: true,
 		configurableUI: true,
+		validate: validateStringMultipleLines({max: 2}),
+		validateBackend: function(schema){
+			return schema.string({minLength: 1, validate: this.validate});
+		},
 	},
 	"customization.reports.header": {
-		name: "Reports header",
+		title: "Reports header",
 		description: "Set the header of the reports.",
 		category: SettingCategory.CUSTOMIZATION,
 		type: EpluginSettingType.textarea,
@@ -797,193 +994,463 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
     	defaultHidden: REPORTS_PAGE_HEADER_TEXT,
 		configurableFile: true,
 		configurableUI: true,
+		validate: validateStringMultipleLines({max: 4}),
+		validateBackend: function(schema){
+			return schema.string({minLength: 1, validate: this.validate});
+		},
 	},
 	"disabled_roles": {
-		name: "Disables roles",
+		title: "Disables roles",
 		description: "Disabled the plugin visibility for users with the roles.",
 		category: SettingCategory.SECURITY,
-		type: EpluginSettingType.array,
+		type: EpluginSettingType.editor,
 		default: [],
 		configurableFile: true,
 		configurableUI: true,
+		options: {
+			editor: {
+				language: 'json'
+			}
+		},
+		validate: validateJSONArrayOfStrings,
+		validateBackend: function(schema){
+			return schema.string({validate: this.validate});
+		},
 	},
 	"enrollment.dns": {
-		name: "Enrollment DNS",
+		title: "Enrollment DNS",
 		description: "Specifies the Wazuh registration server, used for the agent enrollment.",
 		category: SettingCategory.GENERAL,
 		type: EpluginSettingType.text,
 		default: "",
 		configurableFile: true,
 		configurableUI: true,
+		validate: composeValidate(validateStringNoEmpty, validateStringNoSpaces),
+		validateBackend: function(schema){
+			return schema.string({minLenght: 1, validate: this.validate});
+		},
 	},
 	"enrollment.password": {
-		name: undefined,
+		title: "Enrollment Password",
 		description: "Specifies the password used to authenticate during the agent enrollment.",
 		category: SettingCategory.GENERAL,
 		type: EpluginSettingType.text,
 		default: "",
 		configurableFile: true,
 		configurableUI: false,
+		validate: validateStringNoEmpty,
+		validateBackend: function(schema){
+			return schema.string({minLength: 1, validate: this.validate});
+		},
 	},
 	"extensions.audit": {
-		name: "System auditing",
+		title: "System auditing",
 		description: "Enable or disable the Audit tab on Overview and Agents.",
 		category: SettingCategory.EXTENSIONS,
-		type: EpluginSettingType.boolean,
+		type: EpluginSettingType.switch,
 		default: true,
 		configurableFile: true,
 		configurableUI: false,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
+		validate: validateBooleanIs,
+		validateBackend: function(schema){
+			return schema.boolean();
+		},
 	},
 	"extensions.aws": {
-		name: "Amazon AWS",
+		title: "Amazon AWS",
 		description: "Enable or disable the Amazon (AWS) tab on Overview.",
 		category: SettingCategory.EXTENSIONS,
-		type: EpluginSettingType.boolean,
+		type: EpluginSettingType.switch,
 		default: false,
 		configurableFile: true,
 		configurableUI: false,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
+		validate: validateBooleanIs,
+		validateBackend: function(schema){
+			return schema.boolean();
+		},
 	},
 	"extensions.ciscat": {
-		name: "CIS-CAT",
+		title: "CIS-CAT",
 		description: "Enable or disable the CIS-CAT tab on Overview and Agents.",
 		category: SettingCategory.EXTENSIONS,
-		type: EpluginSettingType.boolean,
+		type: EpluginSettingType.switch,
 		default: false,
 		configurableFile: true,
 		configurableUI: false,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
+		validate: validateBooleanIs,
+		validateBackend: function(schema){
+			return schema.boolean();
+		},
 	},
 	"extensions.docker": {
-		name: "Docker Listener",
+		title: "Docker Listener",
 		description: "Enable or disable the Docker listener tab on Overview and Agents.",
 		category: SettingCategory.EXTENSIONS,
-		type: EpluginSettingType.boolean,
+		type: EpluginSettingType.switch,
 		default: false,
 		configurableFile: true,
 		configurableUI: false,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
+		validate: validateBooleanIs,
+		validateBackend: function(schema){
+			return schema.boolean();
+		},
 	},
 	"extensions.gcp": {
-		name: "Google Cloud platform",
+		title: "Google Cloud platform",
 		description: "Enable or disable the Google Cloud Platform tab on Overview.",
 		category: SettingCategory.EXTENSIONS,
-		type: EpluginSettingType.boolean,
+		type: EpluginSettingType.switch,
 		default: false,
 		configurableFile: true,
 		configurableUI: false,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
+		validate: validateBooleanIs,
+		validateBackend: function(schema){
+			return schema.boolean();
+		},
 	},
 	"extensions.gdpr": {
-		name: "GDPR",
+		title: "GDPR",
 		description: "Enable or disable the GDPR tab on Overview and Agents.",
 		category: SettingCategory.EXTENSIONS,
-		type: EpluginSettingType.boolean,
+		type: EpluginSettingType.switch,
 		default: true,
 		configurableFile: true,
 		configurableUI: false,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
+		validate: validateBooleanIs,
+		validateBackend: function(schema){
+			return schema.boolean();
+		},
 	},
 	"extensions.hipaa": {
-		name: "Hipaa",
+		title: "Hipaa",
 		description: "Enable or disable the HIPAA tab on Overview and Agents.",
 		category: SettingCategory.EXTENSIONS,
-		type: EpluginSettingType.boolean,
+		type: EpluginSettingType.switch,
 		default: true,
 		configurableFile: true,
 		configurableUI: false,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
+		validate: validateBooleanIs,
+		validateBackend: function(schema){
+			return schema.boolean();
+		},
 	},
 	"extensions.mitre": {
-		name: "MITRE ATT&CK",
+		title: "MITRE ATT&CK",
 		description: "Enable or disable the MITRE tab on Overview and Agents.",
 		category: SettingCategory.EXTENSIONS,
-		type: EpluginSettingType.boolean,
+		type: EpluginSettingType.switch,
 		default: true,
 		configurableFile: true,
 		configurableUI: false,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
+		validate: validateBooleanIs,
+		validateBackend: function(schema){
+			return schema.boolean();
+		},
 	},
 	"extensions.nist": {
-		name: "NIST",
+		title: "NIST",
 		description: "Enable or disable the NIST 800-53 tab on Overview and Agents.",
 		category: SettingCategory.EXTENSIONS,
-		type: EpluginSettingType.boolean,
+		type: EpluginSettingType.switch,
 		default: true,
 		configurableFile: true,
 		configurableUI: false,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
+		validate: validateBooleanIs,
+		validateBackend: function(schema){
+			return schema.boolean();
+		},
 	},
 	"extensions.oscap": {
-		name: "OSCAP",
+		title: "OSCAP",
 		description: "Enable or disable the Open SCAP tab on Overview and Agents.",
 		category: SettingCategory.EXTENSIONS,
-		type: EpluginSettingType.boolean,
+		type: EpluginSettingType.switch,
 		default: false,
 		configurableFile: true,
 		configurableUI: false,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
+		validate: validateBooleanIs,
+		validateBackend: function(schema){
+			return schema.boolean();
+		},
 	},
 	"extensions.osquery": {
-		name: "Osquery",
+		title: "Osquery",
 		description: "Enable or disable the Osquery tab on Overview and Agents.",
 		category: SettingCategory.EXTENSIONS,
-		type: EpluginSettingType.boolean,
+		type: EpluginSettingType.switch,
 		default: false,
 		configurableFile: true,
 		configurableUI: false,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
+		validate: validateBooleanIs,
+		validateBackend: function(schema){
+			return schema.boolean();
+		},
 	},
 	"extensions.pci": {
-		name: "PCI DSS",
+		title: "PCI DSS",
 		description: "Enable or disable the PCI DSS tab on Overview and Agents.",
 		category: SettingCategory.EXTENSIONS,
-		type: EpluginSettingType.boolean,
+		type: EpluginSettingType.switch,
 		default: true,
 		configurableFile: true,
 		configurableUI: false,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
+		validate: validateBooleanIs,
+		validateBackend: function(schema){
+			return schema.boolean();
+		},
 	},
 	"extensions.tsc": {
-		name: "TSC",
+		title: "TSC",
 		description: "Enable or disable the TSC tab on Overview and Agents.",
 		category: SettingCategory.EXTENSIONS,
-		type: EpluginSettingType.boolean,
+		type: EpluginSettingType.switch,
 		default: true,
 		configurableFile: true,
 		configurableUI: false,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
+		validate: validateBooleanIs,
+		validateBackend: function(schema){
+			return schema.boolean();
+		},
 	},
 	"extensions.virustotal": {
-		name: "Virustotal",
+		title: "Virustotal",
 		description: "Enable or disable the VirusTotal tab on Overview and Agents.",
 		category: SettingCategory.EXTENSIONS,
-		type: EpluginSettingType.boolean,
+		type: EpluginSettingType.switch,
 		default: false,
 		configurableFile: true,
 		configurableUI: false,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
+		validate: validateBooleanIs,
+		validateBackend: function(schema){
+			return schema.boolean();
+		},
 	},
 	"hideManagerAlerts": {
-		name: "Hide manager alerts",
+		title: "Hide manager alerts",
 		description: "Hide the alerts of the manager in every dashboard.",
 		category: SettingCategory.GENERAL,
-		type: EpluginSettingType.boolean,
+		type: EpluginSettingType.switch,
 		default: false,
 		configurableFile: true,
 		configurableUI: true,
 		requireReload: true,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
+		validate: validateBooleanIs,
+		validateBackend: function(schema){
+			return schema.boolean();
+		},
 	},
 	"ip.ignore": {
-		name: "Index pattern ignore",
+		title: "Index pattern ignore",
 		description: "Disable certain index pattern names from being available in index pattern selector.",
 		category: SettingCategory.GENERAL,
-		type: EpluginSettingType.array,
+		type: EpluginSettingType.editor,
 		default: [],
 		configurableFile: true,
 		configurableUI: true,
+		options: {
+			editor: {
+				language: 'json'
+			}
+		},
+		validate: validateJSONArrayOfStrings,
+		validateBackend: function(schema){
+			return schema.string({validate: this.validate})
+		}
 	},
 	"ip.selector": {
-		name: "IP selector",
+		title: "IP selector",
 		description: "Define if the user is allowed to change the selected index pattern directly from the top menu bar.",
 		category: SettingCategory.GENERAL,
-		type: EpluginSettingType.boolean,
+		type: EpluginSettingType.switch,
 		default: true,
 		configurableFile: true,
 		configurableUI: false,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
+		validate: validateBooleanIs,
+		validateBackend: function(schema){
+			return schema.boolean();
+		},
 	},
 	"logs.level": {
-		name: "Log level",
+		title: "Log level",
 		description: "Logging level of the App.",
 		category: SettingCategory.GENERAL,
-		type: EpluginSettingType.list,
+		type: EpluginSettingType.select,
 		options: {
 			choices: [
 				{
@@ -1000,9 +1467,15 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		configurableFile: true,
 		configurableUI: true,
 		requireRestart: true,
+		validate: function (value){
+			return validateLiteral(this.options.choices.map(({value}) => value))(value)
+		},
+		validateBackend: function(schema){
+			return schema.oneOf(this.options.choices.map(({value}) => schema.literal(value)));
+		},
 	},
 	"pattern": {
-		name: "Index pattern",
+		title: "Index pattern",
 		description: "Default index pattern to use on the app. If there's no valid index pattern, the app will automatically create one with the name indicated in this option.",
 		category: SettingCategory.GENERAL,
 		type: EpluginSettingType.text,
@@ -1010,21 +1483,36 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		configurableFile: true,
 		configurableUI: true,
 		requireHealthCheck: true,
+		validate: composeValidate(validateStringNoEmpty, validateStringNoSpaces),
+		validateBackend: function(schema){
+			return schema.string({minLength: 1, validate: this.validate});
+		}
 	},
 	"timeout": {
-		name: "Request timeout",
+		title: "Request timeout",
 		description: "Maximum time, in milliseconds, the app will wait for an API response when making requests to it. It will be ignored if the value is set under 1500 milliseconds.",
 		category: SettingCategory.GENERAL,
 		type: EpluginSettingType.number,
 		default: 20000,
 		configurableFile: true,
 		configurableUI: true,
+		options: {
+			number: {
+				min: 1500
+			}
+		},
+		validate: function(value){
+			return validateNumber(this.options.number)(value);
+		},
+		validateBackend: function(schema){
+			return schema.number({validate: this.validate});
+		},
 	},
 	"wazuh.monitoring.creation": {
-		name: "Index creation",
+		title: "Index creation",
 		description: "Define the interval in which a new wazuh-monitoring index will be created.",
 		category: SettingCategory.MONITORING,
-		type: EpluginSettingType.list,
+		type: EpluginSettingType.select,
 		options: {
 			choices: [
 				{
@@ -1049,19 +1537,40 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		configurableFile: true,
 		configurableUI: true,
 		requireHealthCheck: true,
+		validate: function (value){
+			return validateLiteral(this.options.choices.map(({value}) => value))(value)
+		},
+		validateBackend: function(schema){
+			return schema.oneOf(this.options.choices.map(({value}) => schema.literal(value)));
+		},
 	},
 	"wazuh.monitoring.enabled": {
-		name: "Status",
+		title: "Status",
 		description: "Enable or disable the wazuh-monitoring index creation and/or visualization.",
 		category: SettingCategory.MONITORING,
-		type: EpluginSettingType.boolean,
+		type: EpluginSettingType.switch,
 		default: WAZUH_MONITORING_DEFAULT_ENABLED,
 		configurableFile: true,
 		configurableUI: true,
 		requireRestart: true,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
+		validate: validateBooleanIs,
+		validateBackend: function(schema){
+			return schema.boolean();
+		},
 	},
 	"wazuh.monitoring.frequency": {
-		name: "Frequency",
+		title: "Frequency",
 		description: "Frequency, in seconds, of API requests to get the state of the agents and create a new document in the wazuh-monitoring index with this data.",
 		category: SettingCategory.MONITORING,
 		type: EpluginSettingType.number,
@@ -1069,9 +1578,20 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		configurableFile: true,
 		configurableUI: true,
 		requireRestart: true,
+		options: {
+			number: {
+				min: 60
+			}
+		},
+		validate: function(value){
+			return validateNumber(this.options.number)(value);
+		},
+		validateBackend: function(schema){
+			return schema.number({validate: this.validate});
+		},
 	},
 	"wazuh.monitoring.pattern": {
-		name: "Index pattern",
+		title: "Index pattern",
 		description: "Default index pattern to use for Wazuh monitoring.",
 		category: SettingCategory.MONITORING,
 		type: EpluginSettingType.text,
@@ -1079,9 +1599,13 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		configurableFile: true,
 		configurableUI: true,
 		requireHealthCheck: true,
+		validate: composeValidate(validateStringNoEmpty, validateStringNoSpaces),
+		validateBackend: function(schema){
+			return schema.string({minLength: 1, validate: this.validate});
+		},
 	},
 	"wazuh.monitoring.replicas": {
-		name: "Index replicas",
+		title: "Index replicas",
 		description: "Define the number of replicas to use for the wazuh-monitoring-* indices.",
 		category: SettingCategory.MONITORING,
 		type: EpluginSettingType.text,
@@ -1089,9 +1613,20 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		configurableFile: true,
 		configurableUI: true,
 		requireHealthCheck: true,
+		options: {
+			number: {
+				min: 0
+			}
+		},
+		validate: function(value){
+			return validateNumber(this.options.number)(value);
+		},
+		validateBackend: function(schema){
+			return schema.number({validate: this.validate});
+		},
 	},
 	"wazuh.monitoring.shards": {
-		name: "Index shards",
+		title: "Index shards",
 		description: "Define the number of shards to use for the wazuh-monitoring-* indices.",
 		category: SettingCategory.MONITORING,
 		type: EpluginSettingType.number,
@@ -1099,5 +1634,16 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		configurableFile: true,
 		configurableUI: true,
 		requireHealthCheck: true,
+		options: {
+			number: {
+				min: 1
+			}
+		},
+		validate: function(value){
+			return validateNumber(this.options.number)(value);
+		},
+		validateBackend: function(schema){
+			return schema.number({validate: this.validate});
+		},
 	}
 };

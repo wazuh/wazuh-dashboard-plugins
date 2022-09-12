@@ -12,7 +12,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Header, BottomBar } from './components';
 import { useFormChanged, useKbnLoadingIndicator} from '../../common/hooks';
 import {
@@ -51,13 +51,33 @@ export type ISetting = {
 
 const pluginSettingConfigurableUI = getSettingsDefaultList()
   .filter(categorySetting => categorySetting.configurableUI)
-  .map(setting => ({ ...setting, category: PLUGIN_SETTINGS_CATEGORIES[setting.category].name}));
+  .map(setting => ({ ...setting, category: PLUGIN_SETTINGS_CATEGORIES[setting.category].title}));
 
 const settingsCategoriesSearchBarFilters = [...new Set(pluginSettingConfigurableUI.map(({category}) => category))].sort().map(category => ({value: category}))
+
+
+const transformToSettingsByCategories = (settings) => {
+  const settingsSortedByCategories = settings.reduce((accum, pluginSettingConfiguration) => ({
+    ...accum,
+    [pluginSettingConfiguration.category]: [
+      ...(accum[pluginSettingConfiguration.category] || []),
+      {...pluginSettingConfiguration}
+    ]
+  }),{})
+  return Object.entries(settingsSortedByCategories).map(([category, categorySettings]) => {
+    return {
+      category,
+      settings: categorySettings
+    }
+  }).filter(categoryEntry => categoryEntry.settings.length);
+};
 
 const WzConfigurationSettingsProvider = (props) => {
   const [loading, setLoading ] = useKbnLoadingIndicator();
   const [query, setQuery] = useState('');
+  const [settingsByCategories, setSettingsByCategories] = useState(transformToSettingsByCategories(pluginSettingConfigurableUI));
+  const currentConfiguration = useSelector(state => state.appConfig.data);
+
   const {
     onChangeFormField,
     fieldsCount,
@@ -70,42 +90,52 @@ const WzConfigurationSettingsProvider = (props) => {
     dispatch(updateSelectedSettingsSection('configuration'));
   }, []);
 
-  // https://github.com/elastic/eui/blob/aa4cfd7b7c34c2d724405a3ecffde7fe6cf3b50f/src/components/search_bar/query/query.ts#L138-L163
-  const search = Query.execute(query.query || query, pluginSettingConfigurableUI, ['description', 'key', 'name']);
-  let settingsByCategories = [];
+  const onChangeSearchQuery = (query) => {
+    setQuery(query);
+    const search = Query.execute(query.query || query, pluginSettingConfigurableUI, ['description', 'key', 'title']);
 
-  if(search){
-    const settingsSortedByCategories = search.reduce((accum, pluginSettingConfiguration) => ({
-      ...accum,
-      [pluginSettingConfiguration.category]: [
-        ...(accum[pluginSettingConfiguration.category] || []),
-        {...pluginSettingConfiguration}
-      ]
-    }),{})
-    settingsByCategories = Object.entries(settingsSortedByCategories).map(([category, categorySettings]) => {
-      return {
-        category,
-        settings: categorySettings
-      }
-    }).filter(categoryEntry => categoryEntry.settings.length);
-  };
+    if(search){
+      const result = transformToSettingsByCategories(search);
+      setSettingsByCategories(result);      
+    };
+  }
+
+  // https://github.com/elastic/eui/blob/aa4cfd7b7c34c2d724405a3ecffde7fe6cf3b50f/src/components/search_bar/query/query.ts#L138-L163
+  // const search = Query.execute(query.query || query, pluginSettingConfigurableUI, ['description', 'key', 'title']);
+  // let settingsByCategories = [];
+
+  // if(search){
+  //   const settingsSortedByCategories = search.reduce((accum, pluginSettingConfiguration) => ({
+  //     ...accum,
+  //     [pluginSettingConfiguration.category]: [
+  //       ...(accum[pluginSettingConfiguration.category] || []),
+  //       {...pluginSettingConfiguration}
+  //     ]
+  //   }),{})
+  //   settingsByCategories = Object.entries(settingsSortedByCategories).map(([category, categorySettings]) => {
+  //     return {
+  //       category,
+  //       settings: categorySettings
+  //     }
+  //   }).filter(categoryEntry => categoryEntry.settings.length);
+  // };
 
   const onSave = async () => {
     setLoading(true);
     try {
       const settingsToUpdate = Object.entries(changedConfiguration).reduce((accum, [pluginSettingKey, {currentValue}]) => {
-        if(PLUGIN_SETTINGS[pluginSettingKey].configurableFile){
-          accum.saveOnConfigurationFile = {
-            ...accum.saveOnConfigurationFile,
-            [pluginSettingKey]: formatSettingValueFromForm(pluginSettingKey, currentValue)
-          }
-        }else if(PLUGIN_SETTINGS[pluginSettingKey].type === EpluginSettingType.filepicker){
+        if(PLUGIN_SETTINGS[pluginSettingKey].configurableFile && PLUGIN_SETTINGS[pluginSettingKey].type === EpluginSettingType.filepicker){
           accum.fileUpload = {
             ...accum.fileUpload,
             [pluginSettingKey]: {
               file: currentValue,
               extension: path.extname(currentValue.name)
             }
+          }
+        }else if(PLUGIN_SETTINGS[pluginSettingKey].configurableFile){
+          accum.saveOnConfigurationFile = {
+            ...accum.saveOnConfigurationFile,
+            [pluginSettingKey]: formatSettingValueFromForm(pluginSettingKey, currentValue)
           }
         };
         return accum;
@@ -114,31 +144,25 @@ const WzConfigurationSettingsProvider = (props) => {
       const requests = [];
 
       if(Object.keys(settingsToUpdate.saveOnConfigurationFile).length){
-        // Create the form data
-        const formData = new FormData();
-        Object.entries(settingsToUpdate.saveOnConfigurationFile)
-          .forEach(([pluginSettingKey, pluginSettingValue]) => formData.append(pluginSettingKey,pluginSettingValue));
-
         requests.push(WzRequest.genericReq(
           'PUT', '/utils/configuration',
-          formData,
-          {overwriteHeaders: {'content-type': 'multipart/form-data'}}
+          settingsToUpdate.saveOnConfigurationFile
         ));
       };
 
       if(Object.keys(settingsToUpdate.fileUpload).length){
-        // Create the form data
         requests.push(...Object.entries(settingsToUpdate.fileUpload)
           .map(([pluginSettingKey, {file, extension}]) => {
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('extension', extension);
-            return WzRequest.genericReq(
-              'PUT', `/utils/configuration/files/${pluginSettingKey}`,
-              formData,
-              {overwriteHeaders: {'content-type': 'multipart/form-data'}}
-            )
-          }));            
+              // Create the form data
+              const formData = new FormData();
+              formData.append('file', file);
+              formData.append('extension', extension);
+              return WzRequest.genericReq(
+                'PUT', `/utils/configuration/files/${pluginSettingKey}`,
+                formData,
+                {overwriteHeaders: {'content-type': 'multipart/form-data'}}
+              )
+            }));            
       };
 
       const responses = await Promise.all(requests);      
@@ -188,7 +212,7 @@ const WzConfigurationSettingsProvider = (props) => {
         <EuiPageHeader>
           <Header
             query={query}
-            setQuery={setQuery}
+            setQuery={onChangeSearchQuery}
             searchBarFilters={[{
               type: 'field_value_selection',
               field: 'category',
@@ -198,12 +222,12 @@ const WzConfigurationSettingsProvider = (props) => {
             }]}/>
         </EuiPageHeader>
         <EuiFlexGroup direction='column'>
-          {settingsByCategories.map(({category, settings}) => ( 
+          {settingsByCategories && settingsByCategories.map(({category, settings}) => ( 
             <Category 
               key={`configuration_category_${category}`}
-              name={category}
+              title={category}
               items={settings}
-              currentConfiguration={{...props.wazuhConfig.getConfig()}}
+              currentConfiguration={currentConfiguration}
               changedConfiguration={changedConfiguration} 
               onChangeFieldForm={onChangeFormField} />
             )

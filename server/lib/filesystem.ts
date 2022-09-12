@@ -3,9 +3,16 @@ import path from 'path';
 import { WAZUH_DATA_ABSOLUTE_PATH } from '../../common/constants';
 
 export const createDirectoryIfNotExists = (directory: string): void => {
-  if (!fs.existsSync(directory)) {
-    fs.mkdirSync(directory);
-  }
+  const directories = directory.split('/').reduce((accum, subPath: string) => ([
+    ...accum,
+    path.join(accum[accum.length-1] || '/', subPath)
+  ]),[]);
+
+  directories.forEach((dir: string) => {
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir);
+    };
+  });
 };
 
 export const createLogFileIfNotExists = (filePath: string): void => {

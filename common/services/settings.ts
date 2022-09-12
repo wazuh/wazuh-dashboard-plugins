@@ -47,10 +47,9 @@ const formatSettingValueFromFormType = {
 	[EpluginSettingType.text]: (value: string): string => value,
 	[EpluginSettingType.textarea]: (value: string): string => value,
 	[EpluginSettingType.number]: (value: string): number => Number(value),
-	[EpluginSettingType.boolean]: (value: string): boolean => Boolean(value),
-	[EpluginSettingType.array]: (value: any): any => value, // Array form transforms the value. It is coming a valid JSON.
-	[EpluginSettingType.list]: (value: any): any => value,
-	[EpluginSettingType.interval]: (value: string): string => value,
+	[EpluginSettingType.switch]: (value: string): boolean => Boolean(value),
+	[EpluginSettingType.editor]: (value: any): any => value, // Array form transforms the value. It is coming a valid JSON.
+	[EpluginSettingType.select]: (value: any): any => value,
 	[EpluginSettingType.filepicker]: (value: any): any => value,
 };
 
@@ -65,7 +64,7 @@ export function formatSettingValueToFile(value: any) {
 };
 
 const formatSettingValueToFileType = {
-	string: (value: string): string => `"${value.replace(/"/,'\\"')}"`, // Escape the " character
+	string: (value: string): string => `"${value.replace(/"/,'\\"').replace(/\n/g,'\\n')}"`, // Escape the " character and new line
 	object: (value: any): string => JSON.stringify(value),
 	default: (value: any): any => value
 };
@@ -76,4 +75,14 @@ export function getPluginSettingDescription({description, options}: TpluginSetti
 		...(options?.file?.extensions ? [`Supported extensions: ${options.file.extensions.join(', ')}.`] : []),
 		...(options?.file?.recommended?.dimensions ? [`Recommended dimensions: ${options.file.recommended.dimensions.width}x${options.file.recommended.dimensions.height}${options.file.recommended.dimensions.unit || ''}.`] : []),
 	].join(' ');
-}
+};
+
+export function getSettingDependOnCustomizationIsEnabled(configuration: any, settingKey: string, overwriteDefaultValue?: any){
+	const defaultValue = typeof overwriteDefaultValue !== 'undefined'
+		? overwriteDefaultValue
+		: getSettingDefaultValue(settingKey);
+
+	return configuration['customization.status']
+		? (configuration[settingKey] ?? defaultValue)
+		: defaultValue;
+};

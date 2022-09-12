@@ -1,3 +1,5 @@
+import path from 'path';
+
 // Utils
 export const composeValidate = (...functions) => value => {
     for(const fn of functions){
@@ -19,6 +21,15 @@ export const validateStringNoEmpty = (value: string): string | undefined => {
         }
     };
 };
+export const validateStringMultipleLines = (options: {min?: number, max?: number} = {}) => (value: number) => {
+    const lines = value.split(/\r\n|\r|\n/).length;
+    if(typeof options.min !== 'undefined' && lines < options.min){
+        return `The string should have more or ${options.min} line/s.`;
+    };
+    if(typeof options.max !== 'undefined' && lines > options.max){
+        return `The string should have less or ${options.max} line/s.`;
+    };
+};
 
 // Boolean
 export const validateBooleanIs = (value: string): string | undefined => typeof value === 'boolean' ? undefined : "It should be a boolean. Allowed values: true or false.";
@@ -30,6 +41,13 @@ export const validateNumber = (options: {min?: number, max?: number} = {}) => (v
     };
     if(typeof options.max !== 'undefined' && value > options.max){
         return `Value should be lower or equal than ${options.min}.`;
+    };
+};
+
+// FilePicker
+export const validateFilePickerSupportedExtensions = (extensions: string[]) => ({name}: {name: string}) => {
+    if(!extensions.includes(path.extname(name))){
+        return `File extension is invalid. Allowed file extensions: ${extensions.join(', ')}`
     };
 };
 

@@ -10,7 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 import fs from 'fs';
-import glob from 'glob';
 import path from 'path';
 import yml from 'js-yaml';
 import { WAZUH_DATA_CONFIG_APP_PATH, WAZUH_CONFIGURATION_CACHE_TIME, PLUGIN_SETTINGS, EpluginSettingType, ASSETS_CUSTOM_BY_TYPE } from '../../common/constants';
@@ -23,19 +22,12 @@ let lastAssign: number = new Date().getTime();
  * @param options.force Force to read the configuration and no use the cache .
  * @returns plugin configuration in JSON
  */
-export function getConfiguration(options: {force?: boolean}) {
+export function getConfiguration(options: {force?: boolean} = {}) {
   try {
     const now = new Date().getTime();
     const dateDiffer = now - lastAssign;
-    if (!cachedConfiguration || dateDiffer >= WAZUH_CONFIGURATION_CACHE_TIME || options.force) {
-      const fileConfiguration = obfuscateHostsConfiguration(readPluginConfigurationFile(WAZUH_DATA_CONFIG_APP_PATH), ['password']);
-      const assetsConfiguration = getPluginConfigurationCustomAssets(path.join(__dirname, '../../public/assets/custom'));
-
-      // Combine the configuration to the cache store
-      cachedConfiguration = {
-        ...fileConfiguration,
-        ...assetsConfiguration
-      };
+    if (!cachedConfiguration || dateDiffer >= WAZUH_CONFIGURATION_CACHE_TIME || options?.force) {
+      cachedConfiguration = obfuscateHostsConfiguration(readPluginConfigurationFile(WAZUH_DATA_CONFIG_APP_PATH), ['password']);
 
       lastAssign = now;
     }
@@ -73,33 +65,4 @@ function obfuscateHostsConfiguration(configuration: any, obfuscateHostConfigurat
       }}
     }, {})
   return configuration;
-};
-
-function getPluginConfigurationCustomAssets(filepath: string){
-  try{
-    const pluginSettingsTypeFilepicker = Object.entries(PLUGIN_SETTINGS)
-      .filter(([_, {type, configurableUI, configurableFile}]) => type === EpluginSettingType.filepicker && !configurableFile && configurableUI);
-
-    return pluginSettingsTypeFilepicker.reduce((accum, [pluginSettingKey, pluginSettingConfiguration]) => {
-      const globFilepath = path.join(
-        filepath,
-        ASSETS_CUSTOM_BY_TYPE[pluginSettingConfiguration.options.file.type],
-        // Search files with the allowed extensions for the plugin setting.
-        `${pluginSettingKey}@(${pluginSettingConfiguration.options.file.extensions.join('|')})`
-        );
-
-      const files = glob.sync(globFilepath);
-      files[0] && (accum[pluginSettingKey] = path.join(
-        // 'plugins/wazuh/assets/custom', //TODO: see the route where the file is exposed.
-        'custom', //TODO: see the route where the file is exposed.
-        ASSETS_CUSTOM_BY_TYPE[pluginSettingConfiguration.options.file.type],
-        files[0].split('/').pop()
-      )); // Set the first file found.
-
-      return accum;
-    }, {});
-
-  }catch{
-    return {};
-  };
 };

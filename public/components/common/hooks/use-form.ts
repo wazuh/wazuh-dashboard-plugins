@@ -6,19 +6,26 @@ function getValueFromEvent(event, type){
   return getValueFromEventType?.[type]?.(event) || getValueFromEventType.default(event)
 };
 
+type TuseFormFieldChanged = {
+  onChange?: any
+  transformUIInputValue?: (inputValue: any) => any
+  type: string
+  validate?: (currentValue: any) => string | undefined
+}
 const getValueFromEventType = {
-  [EpluginSettingType.boolean] : (event: any) => event.target.checked,
-  [EpluginSettingType.array]: (value: any) => value,
+  [EpluginSettingType.switch] : (event: any) => event.target.checked,
+  [EpluginSettingType.editor]: (value: any) => value,
   [EpluginSettingType.filepicker]: (value: any) => value,
   default: (event: any) => event.target.value,
 }
 
-export const useFormFieldChanged = (field, initialValue: any, {validate, onChange: onChangeFormField, type}: {validate?: any, onChange?: any, type: string}) => {
+export const useFormFieldChanged = (field, initialValue: any, { onChange: onChangeFormField, transformUIInputValue, type, validate }: TuseFormFieldChanged) => {
   const [value, setValue] = useState(initialValue);
   const [validationError, setValidationError] = useState(null);
 
   function onChange(event){
-    const currentValue = getValueFromEvent(event, type);
+    const inputValue = getValueFromEvent(event, type);
+    const currentValue = transformUIInputValue ? transformUIInputValue(inputValue) : inputValue;
     const error = validate ? validate(currentValue) : false;
     setValue(currentValue);
     validationError !== error && setValidationError(error);
