@@ -4,7 +4,7 @@ export const RULES_PAGE = {
   tableSelector: '[class="euiTableRow customRowClass euiTableRow-isClickable"]',
   dropdownPaginationSelector: '[data-test-subj="tablePaginationPopoverButton"]',
   listPagesSelector: 'nav[class="euiPagination"]',
-  customRulesButtonSelector: '.euiButtonGroupButton.euiButtonGroupButton--text',
+  customRulesButtonSelector: '.euiButtonGroup .euiButton.euiButton--text',
   firstCustomRule: '[data-test-subj="row-100001"]',
   xmlRuleFile:'.euiBasicTable .euiTable :nth-child(6) :nth-child(2) .euiToolTipAnchor',
   codeEditorSelector: '.euiFlexItem [data-test-subj="codeEditorContainer"]',
