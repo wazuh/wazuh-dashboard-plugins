@@ -117,6 +117,12 @@ export const xpathElementIsVisible = (xpathSelector) => {
   return getElementByXpath(xpathSelector).should('exist').should('be.visible');
 };
 
+export const generateRandomName = () => {
+  const uniqueSeed = Date.now().toString();
+  const getUniqueId = () => Cypress._.uniqueId(uniqueSeed);
+  return 'Test-'+getUniqueId();
+};
+
 export const timestampToDate = (e) => {
   let newDates = e.getDate() + "/" + (e.getMonth() + 1) + "/" + e.getFullYear() + " " + e.getHours() + ":" + e.getMinutes() + ":" + e.getSeconds();
   return newDates;
