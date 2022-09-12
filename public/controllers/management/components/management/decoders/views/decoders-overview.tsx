@@ -17,7 +17,7 @@ import { resourceDictionary } from '../../common/resources-handler';
 import { SECTION_DECODERS_NAME, SECTION_DECODERS_KEY } from '../../common/constants';
 import '../../common/layout-overview.scss';
 import DecodersTable from '../components/decoders-table';
-import WzRestartClusterManagerCallout from '../../../../../../components/common/restart-cluster-manager-callout';
+import WzRestartClusterManagerCallout from '../../../../../../components/common/wz-restart-callout';
 
 
 function WzDecodersOverview(props) {

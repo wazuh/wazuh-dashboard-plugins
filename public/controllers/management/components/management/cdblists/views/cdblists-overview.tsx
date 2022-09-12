@@ -16,7 +16,7 @@ import { resourceDictionary } from '../../common/resources-handler';
 import { SECTION_CDBLIST_NAME, SECTION_CDBLIST_KEY } from '../../common/constants';
 import CDBListsTable from '../components/cdblists-table';
 import '../../common/layout-overview.scss';
-import WzRestartClusterManagerCallout from '../../../../../../components/common/restart-cluster-manager-callout';
+import WzRestartClusterManagerCallout from '../../../../../../components/common/wz-restart-callout';
 
 
 function WzCDBListsOverview(props) {

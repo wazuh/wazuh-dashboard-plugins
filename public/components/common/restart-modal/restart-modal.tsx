@@ -54,9 +54,6 @@ export const RestartModal = (props: { isSyncCanceled?: {}; cancelSync? }) => {
   // Current status of the restart process
   const restartNodesInfo = useSelector((state) => state.restartWazuhReducers.restartNodesInfo);
 
-  // Current section
-  const section = useSelector((state) => state.rulesetReducers.section);
-
   const [nodesNotRestartedState, setNodesNotRestartedState] = useState([]);
   
   useEffect(() => {
@@ -213,7 +210,7 @@ export const RestartModal = (props: { isSyncCanceled?: {}; cancelSync? }) => {
       emptyPromptProps = {
         title: (
           <>
-            <h2 className="wz-modal-restart-title">Ensuring {section} deployment</h2>
+            <h2 className="wz-modal-restart-title">Ensuring deployment</h2>
           </>
         ),
         body: (

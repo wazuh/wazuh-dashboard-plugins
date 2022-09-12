@@ -16,7 +16,7 @@ import { resourceDictionary } from '../../common/resources-handler';
 import { SECTION_RULES_NAME, SECTION_RULES_KEY } from '../../common/constants';
 import RulesetTable from '../components/ruleset-table';
 import '../../common/layout-overview.scss';
-import WzRestartClusterManagerCallout from '../../../../../../components/common/restart-cluster-manager-callout';
+import WzRestartClusterManagerCallout from '../../../../../../components/common/wz-restart-callout';
 
 
 function WzRulesetOverview(props) {
