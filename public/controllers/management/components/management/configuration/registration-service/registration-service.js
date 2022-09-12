@@ -21,14 +21,13 @@ import { webDocumentationLink } from '../../../../../../../common/services/web_d
 
 const helpLinks = [
   {
-    text: 'How to use the registration service',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/registering/simple-registration-method.html',
+    text: 'Wazuh agent enrollment',
+    href: webDocumentationLink('user-manual/agent-enrollment/index.html')
   },
   {
     text: 'Registration service reference',
-    href: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/auth.html',
-  },
+    href: webDocumentationLink('user-manual/reference/ossec-conf/auth.html')
+  }
 ];
 
 const mainSettings = [
