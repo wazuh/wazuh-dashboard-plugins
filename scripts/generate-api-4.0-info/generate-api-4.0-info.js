@@ -55,7 +55,7 @@ const main = () => {
   if(!WAZUH_API_URL.startsWith('http') ){
     exitWithMessage(`Wazuh API url is not valid. It should start with "http". Example: https://172.16.1.2:55000`);
   };
-  
+
   // Log the configuration:
   console.log('--------------- Configuration ---------------');
   console.log(`Wazuh API url: ${WAZUH_API_URL}`);
@@ -113,6 +113,7 @@ const generateAPISecurityActionsInformation = async () => {
   const password = 'wazuh';
   try{
     const authenticationResponse = await request(`${WAZUH_API_URL}/security/user/authenticate`, {
+      method: 'POST',
       headers: {
         'Authorization': 'Basic ' + Buffer.from(username + ':' + password).toString('base64')
       }
@@ -121,7 +122,7 @@ const generateAPISecurityActionsInformation = async () => {
     const { token } = JSON.parse(authenticationResponse).data;
     const securityActionsResponse = await request(`${WAZUH_API_URL}/security/actions`, {
       headers: {
-        'Authorization': `Bearer ${token}` 
+        'Authorization': `Bearer ${token}`
       }
     });
     const securityActions = JSON.parse(securityActionsResponse).data;

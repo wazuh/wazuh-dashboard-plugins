@@ -336,6 +336,7 @@ export const Discover = compose(
               addFilterOut={(filter) => this.addFilterOut(filter)}
               toggleColumn={(id) => this.addColumn(id)}
               rowDetailsFields={rowDetailsFields}
+              indexPattern={this.indexPattern}
             />
           </div>
         );
@@ -370,7 +371,7 @@ export const Discover = compose(
       const previousFilters =
         (this.PluginPlatformServices && this.PluginPlatformServices.query.filterManager.getFilters()) || [];
       const elasticQuery = buildEsQuery(
-        undefined,
+        this.indexPattern,
         query,
         _.union(
           previousFilters,

@@ -53,6 +53,17 @@
             }
           },
           {
+            "name": "group_config_status",
+            "description": "Agent groups configuration sync status",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "synced",
+                "not synced"
+              ]
+            }
+          },
+          {
             "name": "ip",
             "description": "Filter by the IP used by the agent to communicate with the manager. If it's not available, it will have the same value as registerIP",
             "schema": {
@@ -206,7 +217,7 @@
           },
           {
             "name": "version",
-            "description": "Filter by agents version",
+            "description": "Filter by agents version using one of the following formats: 'X.Y.Z', 'vX.Y.Z', 'wazuh X.Y.Z' or 'wazuh vX.Y.Z'. For example: '4.4.0'",
             "schema": {
               "type": "string",
               "format": "alphanumeric"
@@ -852,7 +863,7 @@
           },
           {
             "name": "version",
-            "description": "Filter by agents version",
+            "description": "Filter by agents version using one of the following formats: 'X.Y.Z', 'vX.Y.Z', 'wazuh X.Y.Z' or 'wazuh vX.Y.Z'. For example: '4.4.0'",
             "schema": {
               "type": "string",
               "format": "alphanumeric"
@@ -1105,7 +1116,6 @@
                 "socket",
                 "syscheck",
                 "syslog_output",
-                "agent-key-polling",
                 "aws-s3",
                 "azure-logs",
                 "cis-cat",
@@ -3226,7 +3236,7 @@
           },
           {
             "name": "version",
-            "description": "Filter by agents version",
+            "description": "Filter by agents version using one of the following formats: 'X.Y.Z', 'vX.Y.Z', 'wazuh X.Y.Z' or 'wazuh vX.Y.Z'. For example: '4.4.0'",
             "schema": {
               "type": "string",
               "format": "alphanumeric"
@@ -4525,7 +4535,6 @@
                 "socket",
                 "syscheck",
                 "syslog_output",
-                "agent-key-polling",
                 "aws-s3",
                 "azure-logs",
                 "cis-cat",
@@ -6906,7 +6915,7 @@
       },
       {
         "name": "/security/user/authenticate",
-        "documentation": "https://documentation.wazuh.com/4.3/user-manual/api/reference.html#operation/api.controllers.security_controller.login_user",
+        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.deprecated_login_user",
         "description": "This method should be called to get an API token. This token will expire after auth_token_exp_timeout seconds (default: 900). This value can be changed using PUT /security/config",
         "summary": "Login",
         "tags": [
@@ -9413,7 +9422,7 @@
           },
           {
             "name": "version",
-            "description": "Filter by agents version",
+            "description": "Filter by agents version using one of the following formats: 'X.Y.Z', 'vX.Y.Z', 'wazuh X.Y.Z' or 'wazuh vX.Y.Z'. For example: '4.4.0'",
             "schema": {
               "type": "string",
               "format": "alphanumeric"
@@ -9567,7 +9576,7 @@
           },
           {
             "name": "version",
-            "description": "Filter by agents version",
+            "description": "Filter by agents version using one of the following formats: 'X.Y.Z', 'vX.Y.Z', 'wazuh X.Y.Z' or 'wazuh vX.Y.Z'. For example: '4.4.0'",
             "schema": {
               "type": "string",
               "format": "alphanumeric"
@@ -10568,9 +10577,10 @@
         "body": [
           {
             "name": "group_id",
-            "description": "Group name",
+            "description": "Group name. It can contain any of the characters between a-z, A-Z, 0-9, '_', '-' and '.'. Names '.' and '..' are restricted.",
             "type": "string",
-            "format": "group_names"
+            "format": "group_names",
+            "maxLength": 128
           }
         ]
       },
@@ -10847,6 +10857,25 @@
                 "type": "object",
                 "description": "Rule body"
               }
+            }
+          }
+        ]
+      },
+      {
+        "name": "/security/user/authenticate",
+        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.login_user",
+        "description": "This method should be called to get an API token. This token will expire after auth_token_exp_timeout seconds (default: 900). This value can be changed using PUT /security/config",
+        "summary": "Login",
+        "tags": [
+          "Security"
+        ],
+        "query": [
+          {
+            "name": "raw",
+            "description": "Format response in plain text",
+            "required": false,
+            "schema": {
+              "type": "boolean"
             }
           }
         ]
@@ -11132,7 +11161,7 @@
           },
           {
             "name": "version",
-            "description": "Filter by agents version",
+            "description": "Filter by agents version using one of the following formats: 'X.Y.Z', 'vX.Y.Z', 'wazuh X.Y.Z' or 'wazuh vX.Y.Z'. For example: '4.4.0'",
             "schema": {
               "type": "string",
               "format": "alphanumeric"

@@ -329,7 +329,7 @@ export class OverviewController {
    */
   async getSummary() {
     try {
-      const {data: { data }} = await WzRequest.apiReq('GET', '/agents/summary/status', {});
+      const {data: { data: {connection: data} }} = await WzRequest.apiReq('GET', '/agents/summary/status', {});
       this.agentsCount = data;
       this.welcomeCardsProps.agentsCountTotal = data.total;
       this.agentsCoverity = data.total ? (data.active / data.total) * 100 : 0;
