@@ -100,28 +100,6 @@ export const WAZUH_SECURITY_PLUGINS = [
 
 // App configuration
 export const WAZUH_CONFIGURATION_CACHE_TIME = 10000; // time in ms;
-export const WAZUH_CONFIGURATION_SETTINGS_NEED_RESTART = [
-  'wazuh.monitoring.enabled',
-  'wazuh.monitoring.frequency',
-  'cron.statistics.interval',
-  'logs.level',
-];
-export const WAZUH_CONFIGURATION_SETTINGS_NEED_HEALTH_CHECK = [
-  'pattern',
-  'wazuh.monitoring.replicas',
-  'wazuh.monitoring.creation',
-  'wazuh.monitoring.pattern',
-  'alerts.sample.prefix',
-  'cron.statistics.index.name',
-  'cron.statistics.index.creation',
-  'cron.statistics.index.shards',
-  'cron.statistics.index.replicas',
-  'wazuh.monitoring.shards',
-];
-export const WAZUH_CONFIGURATION_SETTINGS_NEED_RELOAD = [
-  'hideManagerAlerts',
-  'customization.logo.sidebar'
-];
 
 // Reserved ids for Users/Role mapping
 export const WAZUH_API_RESERVED_ID_LOWER_THAN = 100;
@@ -175,61 +153,6 @@ export const WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH = path.join(
 
 // Queue
 export const WAZUH_QUEUE_CRON_FREQ = '*/15 * * * * *'; // Every 15 seconds
-
-// Default App Config
-export const WAZUH_DEFAULT_APP_CONFIG = {
-  pattern: WAZUH_ALERTS_PATTERN,
-  'checks.pattern': true,
-  'checks.template': true,
-  'checks.api': true,
-  'checks.setup': true,
-  'checks.fields': true,
-  'checks.metaFields': true,
-  'checks.maxBuckets': true,
-  'checks.timeFilter': true,
-  'extensions.pci': true,
-  'extensions.gdpr': true,
-  'extensions.hipaa': true,
-  'extensions.nist': true,
-  'extensions.tsc': true,
-  'extensions.audit': true,
-  'extensions.oscap': false,
-  'extensions.ciscat': false,
-  'extensions.aws': false,
-  'extensions.office': false,
-  'extensions.github': false,
-  'extensions.gcp': false,
-  'extensions.virustotal': false,
-  'extensions.osquery': false,
-  'extensions.docker': false,
-  timeout: 20000,
-  'ip.selector': true,
-  'ip.ignore': [],
-  'xpack.rbac.enabled': true,
-  'wazuh.monitoring.enabled': WAZUH_MONITORING_DEFAULT_ENABLED,
-  'wazuh.monitoring.frequency': WAZUH_MONITORING_DEFAULT_FREQUENCY,
-  'wazuh.monitoring.shards': WAZUH_MONITORING_DEFAULT_INDICES_SHARDS,
-  'wazuh.monitoring.replicas': WAZUH_MONITORING_DEFAULT_INDICES_REPLICAS,
-  'wazuh.monitoring.creation': WAZUH_MONITORING_DEFAULT_CREATION,
-  'wazuh.monitoring.pattern': WAZUH_MONITORING_PATTERN,
-  'cron.prefix': WAZUH_STATISTICS_DEFAULT_PREFIX,
-  'cron.statistics.status': WAZUH_STATISTICS_DEFAULT_STATUS,
-  'cron.statistics.apis': [],
-  'cron.statistics.interval': WAZUH_STATISTICS_DEFAULT_CRON_FREQ,
-  'cron.statistics.index.name': WAZUH_STATISTICS_DEFAULT_NAME,
-  'cron.statistics.index.creation': WAZUH_STATISTICS_DEFAULT_CREATION,
-  'cron.statistics.index.shards': WAZUH_STATISTICS_DEFAULT_INDICES_SHARDS,
-  'cron.statistics.index.replicas': WAZUH_STATISTICS_DEFAULT_INDICES_REPLICAS,
-  'alerts.sample.prefix': WAZUH_SAMPLE_ALERT_PREFIX,
-  hideManagerAlerts: false,
-  'logs.level': 'info',
-  'enrollment.dns': '',
-  'enrollment.password': '',
-  'customization.logo.app': '',
-  'customization.logo.sidebar': '',
-  'customization.logo.healthcheck':'',
-  'customization.logo.reports': ''
-};
 
 // Wazuh errors
 export const WAZUH_ERROR_DAEMONS_NOT_READY = 'ERROR3099';
@@ -413,3 +336,977 @@ export const DOCUMENTATION_WEB_BASE_URL = "https://documentation.wazuh.com";
 
 // Default Elasticsearch user name context
 export const ELASTIC_NAME = 'elastic';
+
+
+// Plugin settings
+export enum SettingCategory{
+  HEALTH_CHECK,
+  GENERAL,
+  EXTENSIONS,
+  MONITORING,
+  STATISTICS,
+  SECURITY,
+  CUSTOMIZATION,
+};
+
+type TpluginSettingOptionsChoices = {
+	choices: {text: string, value: any}[]
+};
+
+type TpluginSettingOptionsFile = {
+	file: {
+		type: 'image'
+		extensions?: string[]
+		recommended?: {
+			dimensions?: {
+				width: number,
+				height: number,
+				unit: string
+			}
+		}
+		store?: {
+			relativePathFileSystem: string
+			filename: string
+			resolveStaticURL: (filename: string) => string
+		}
+	}
+};
+
+type TpluginSettingOptionsNumber = {
+	number: {
+		min?: number
+		max?: number
+	}
+};
+
+type TpluginSettingOptionsEditor = {
+	editor: {
+		language: string
+	}
+};
+
+type TpluginSettingOptionsSwitch = {
+	switch: {
+		values: {
+			disabled: {label?: string, value: any},
+			enabled: {label?: string, value: any},
+		}
+	}
+};
+
+
+export enum EpluginSettingType{
+	text = 'text',
+	textarea = 'textarea',
+	switch = 'switch',
+	number = 'number',
+	editor = 'editor',
+	select = 'select',
+};
+
+export type TpluginSetting = {
+	title: string
+	description: string
+	category: SettingCategory
+	type: EpluginSettingType
+	default: any
+	defaultHidden?: any
+	configurableFile: boolean,
+	configurableUI: boolean
+	requireHealthCheck?: boolean
+	requireReload?: boolean
+	requireRestart?: boolean
+	options?: TpluginSettingOptionsChoices | TpluginSettingOptionsNumber | TpluginSettingOptionsEditor | TpluginSettingOptionsSwitch
+	transformUIInputValue?: (value: boolean | string) => boolean
+};
+
+export type TPluginSettingWithKey = TpluginSetting & { key: string };
+
+type TpluginSettings = {
+	[key: string]: TpluginSetting
+};
+
+export const PLUGIN_SETTINGS_CATEGORIES = {
+  [SettingCategory.HEALTH_CHECK]: {
+    title: 'Health check',
+    description: "Define which checks will be executed by the App's HealthCheck. Allowed values are: true, false"
+  },
+  [SettingCategory.GENERAL]: {
+    title: 'General',
+    description: "General settings."
+  },
+  [SettingCategory.EXTENSIONS]: {
+    title: 'Extensions',
+    description: "Extensions."
+  },
+  [SettingCategory.SECURITY]: {
+    title: 'Security',
+    description: "Security."
+  },
+  [SettingCategory.MONITORING]: {
+    title: 'Task:Monitoring',
+    description: "Monitoring."
+  },
+  [SettingCategory.STATISTICS]: {
+    title: 'Task:Statistics',
+    description: "Statistics."
+  },
+  [SettingCategory.CUSTOMIZATION]: {
+    title: 'Customization',
+    description: "Customization."
+  }
+};
+
+
+export const PLUGIN_SETTINGS: TpluginSettings = {
+	"alerts.sample.prefix": {
+		title: "Sample alerts prefix",
+		description: "Define the index name prefix of sample alerts. It must match the template used by the index pattern to avoid unknown fields in dashboards.",
+		category: SettingCategory.GENERAL,
+		type: EpluginSettingType.text,
+		default: WAZUH_SAMPLE_ALERT_PREFIX,
+		configurableFile: true,
+		configurableUI: true,
+		requireHealthCheck: true,
+	},
+	"checks.api": {
+		title: "API connection",
+		description: "Enable or disable the API health check when opening the app.",
+		category: SettingCategory.HEALTH_CHECK,
+		type: EpluginSettingType.switch,
+		default: true,
+		configurableFile: true,
+		configurableUI: true,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
+	},
+	"checks.fields": {
+		title: "Known fields",
+		description: "Enable or disable the known fields health check when opening the app.",
+		category: SettingCategory.HEALTH_CHECK,
+		type: EpluginSettingType.switch,
+		default: true,
+		configurableFile: true,
+		configurableUI: true,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
+	},
+	"checks.maxBuckets": {
+		title: "Set max buckets to 200000",
+		description: "Change the default value of the plugin platform max buckets configuration.",
+		category: SettingCategory.HEALTH_CHECK,
+		type: EpluginSettingType.switch,
+		default: true,
+		configurableFile: true,
+		configurableUI: true,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			},
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
+	},
+	"checks.metaFields": {
+		title: "Remove meta fields",
+		description: "Change the default value of the plugin platform metaField configuration.",
+		category: SettingCategory.HEALTH_CHECK,
+		type: EpluginSettingType.switch,
+		default: true,
+		configurableFile: true,
+		configurableUI: true,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
+	},
+	"checks.pattern": {
+		title: "Index pattern",
+		description: "Enable or disable the index pattern health check when opening the app.",
+		category: SettingCategory.HEALTH_CHECK,
+		type: EpluginSettingType.switch,
+		default: true,
+		configurableFile: true,
+		configurableUI: true,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
+	},
+	"checks.setup": {
+		title: "API version",
+		description: "Enable or disable the setup health check when opening the app.",
+		category: SettingCategory.HEALTH_CHECK,
+		type: EpluginSettingType.switch,
+		default: true,
+		configurableFile: true,
+		configurableUI: true,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
+	},
+	"checks.template": {
+		title: "Index template",
+		description: "Enable or disable the template health check when opening the app.",
+		category: SettingCategory.HEALTH_CHECK,
+		type: EpluginSettingType.switch,
+		default: true,
+		configurableFile: true,
+		configurableUI: true,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
+	},
+	"checks.timeFilter": {
+		title: "Set time filter to 24h",
+		description: "Change the default value of the plugin platform timeFilter configuration.",
+		category: SettingCategory.HEALTH_CHECK,
+		type: EpluginSettingType.switch,
+		default: true,
+		configurableFile: true,
+		configurableUI: true,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
+	},
+	"cron.prefix": {
+		title: "Cron prefix",
+		description: "Define the index prefix of predefined jobs.",
+		category: SettingCategory.GENERAL,
+		type: EpluginSettingType.text,
+		default: WAZUH_STATISTICS_DEFAULT_PREFIX,
+		configurableFile: true,
+		configurableUI: true,
+	},
+	"cron.statistics.apis": {
+		title: "Includes APIs",
+		description: "Enter the ID of the hosts you want to save data from, leave this empty to run the task on every host.",
+		category: SettingCategory.STATISTICS,
+		type: EpluginSettingType.editor,
+		default: [],
+		configurableFile: true,
+		configurableUI: true,
+		options: {
+			editor: {
+				language: 'json'
+			}
+		},
+	},
+	"cron.statistics.index.creation": {
+		title: "Index creation",
+		description: "Define the interval in which a new index will be created.",
+		category: SettingCategory.STATISTICS,
+		type: EpluginSettingType.select,
+		options: {
+			choices: [
+				{
+					text: "Hourly",
+					value: "h"
+				},
+				{
+					text: "Daily",
+					value: "d"
+				},
+				{
+					text: "Weekly",
+					value: "w"
+				},
+				{
+					text: "Monthly",
+					value: "m"
+				}
+			]
+		},
+		default: WAZUH_STATISTICS_DEFAULT_CREATION,
+		configurableFile: true,
+		configurableUI: true,
+		requireHealthCheck: true,
+	},
+	"cron.statistics.index.name": {
+		title: "Index name",
+		description: "Define the name of the index in which the documents will be saved.",
+		category: SettingCategory.STATISTICS,
+		type: EpluginSettingType.text,
+		default: WAZUH_STATISTICS_DEFAULT_NAME,
+		configurableFile: true,
+		configurableUI: true,
+		requireHealthCheck: true,
+	},
+	"cron.statistics.index.replicas": {
+		title: "Index replicas",
+		description: "Define the number of replicas to use for the statistics indices.",
+		category: SettingCategory.STATISTICS,
+		type: EpluginSettingType.number,
+		default: WAZUH_STATISTICS_DEFAULT_INDICES_REPLICAS,
+		configurableFile: true,
+		configurableUI: true,
+		requireHealthCheck: true,
+		options: {
+			number: {
+				min: 0
+			}
+		},
+	},
+	"cron.statistics.index.shards": {
+		title: "Index shards",
+		description: "Define the number of shards to use for the statistics indices.",
+		category: SettingCategory.STATISTICS,
+		type: EpluginSettingType.number,
+		default: WAZUH_STATISTICS_DEFAULT_INDICES_SHARDS,
+		configurableFile: true,
+		configurableUI: true,
+		requireHealthCheck: true,
+		options: {
+			number: {
+				min: 1
+			}
+		},
+	},
+	"cron.statistics.interval": {
+		title: "Interval",
+		description: "Define the frequency of task execution using cron schedule expressions.",
+		category: SettingCategory.STATISTICS,
+		type: EpluginSettingType.text,
+		default: WAZUH_STATISTICS_DEFAULT_CRON_FREQ,
+		configurableFile: true,
+		configurableUI: true,
+		requireRestart: true,
+	},
+	"cron.statistics.status": {
+		title: "Status",
+		description: "Enable or disable the statistics tasks.",
+		category: SettingCategory.STATISTICS,
+		type: EpluginSettingType.switch,
+		default: WAZUH_STATISTICS_DEFAULT_STATUS,
+		configurableFile: true,
+		configurableUI: true,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
+	},
+	"customization.logo.app": {
+		title: "Logo App",
+		description: `Customize the logo displayed in the plugin menu.`,
+		category: SettingCategory.CUSTOMIZATION,
+		type: EpluginSettingType.text,
+		default: "",
+		configurableFile: true,
+		configurableUI: true,
+	},
+	"customization.logo.healthcheck": {
+		title: "Logo Health Check",
+		description: `Customize the logo displayed in the plugin health check.`,
+		category: SettingCategory.CUSTOMIZATION,
+		type: EpluginSettingType.text,
+		default: "",
+		configurableFile: true,
+		configurableUI: true,
+	},
+	"customization.logo.reports": {
+		title: "Logo Reports",
+		description: `Customize the logo displayed in the PDF reports.`,
+		category: SettingCategory.CUSTOMIZATION,
+		type: EpluginSettingType.text,
+		default: "",
+    	defaultHidden: REPORTS_LOGO_IMAGE_ASSETS_RELATIVE_PATH,
+		configurableFile: true,
+		configurableUI: true,
+	},
+	"customization.logo.sidebar": {
+		title: "Logo Sidebar",
+		description: `Customize the logo of the category that belongs the plugin.`,
+		category: SettingCategory.CUSTOMIZATION,
+		type: EpluginSettingType.text,
+		default: "",
+		configurableFile: true,
+		configurableUI: true,
+		requireReload: true,
+	},
+	"disabled_roles": {
+		title: "Disables roles",
+		description: "Disabled the plugin visibility for users with the roles.",
+		category: SettingCategory.SECURITY,
+		type: EpluginSettingType.editor,
+		default: [],
+		configurableFile: true,
+		configurableUI: true,
+		options: {
+			editor: {
+				language: 'json'
+			}
+		},
+	},
+	"enrollment.dns": {
+		title: "Enrollment DNS",
+		description: "Specifies the Wazuh registration server, used for the agent enrollment.",
+		category: SettingCategory.GENERAL,
+		type: EpluginSettingType.text,
+		default: "",
+		configurableFile: true,
+		configurableUI: true,
+	},
+	"enrollment.password": {
+		title: "Enrollment Password",
+		description: "Specifies the password used to authenticate during the agent enrollment.",
+		category: SettingCategory.GENERAL,
+		type: EpluginSettingType.text,
+		default: "",
+		configurableFile: true,
+		configurableUI: false,
+	},
+	"extensions.audit": {
+		title: "System auditing",
+		description: "Enable or disable the Audit tab on Overview and Agents.",
+		category: SettingCategory.EXTENSIONS,
+		type: EpluginSettingType.switch,
+		default: true,
+		configurableFile: true,
+		configurableUI: false,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
+	},
+	"extensions.aws": {
+		title: "Amazon AWS",
+		description: "Enable or disable the Amazon (AWS) tab on Overview.",
+		category: SettingCategory.EXTENSIONS,
+		type: EpluginSettingType.switch,
+		default: false,
+		configurableFile: true,
+		configurableUI: false,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
+	},
+	"extensions.ciscat": {
+		title: "CIS-CAT",
+		description: "Enable or disable the CIS-CAT tab on Overview and Agents.",
+		category: SettingCategory.EXTENSIONS,
+		type: EpluginSettingType.switch,
+		default: false,
+		configurableFile: true,
+		configurableUI: false,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
+	},
+	"extensions.docker": {
+		title: "Docker Listener",
+		description: "Enable or disable the Docker listener tab on Overview and Agents.",
+		category: SettingCategory.EXTENSIONS,
+		type: EpluginSettingType.switch,
+		default: false,
+		configurableFile: true,
+		configurableUI: false,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
+	},
+	"extensions.gcp": {
+		title: "Google Cloud platform",
+		description: "Enable or disable the Google Cloud Platform tab on Overview.",
+		category: SettingCategory.EXTENSIONS,
+		type: EpluginSettingType.switch,
+		default: false,
+		configurableFile: true,
+		configurableUI: false,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
+	},
+	"extensions.gdpr": {
+		title: "GDPR",
+		description: "Enable or disable the GDPR tab on Overview and Agents.",
+		category: SettingCategory.EXTENSIONS,
+		type: EpluginSettingType.switch,
+		default: true,
+		configurableFile: true,
+		configurableUI: false,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
+	},
+	"extensions.hipaa": {
+		title: "Hipaa",
+		description: "Enable or disable the HIPAA tab on Overview and Agents.",
+		category: SettingCategory.EXTENSIONS,
+		type: EpluginSettingType.switch,
+		default: true,
+		configurableFile: true,
+		configurableUI: false,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
+	},
+	"extensions.mitre": {
+		title: "MITRE ATT&CK",
+		description: "Enable or disable the MITRE tab on Overview and Agents.",
+		category: SettingCategory.EXTENSIONS,
+		type: EpluginSettingType.switch,
+		default: true,
+		configurableFile: true,
+		configurableUI: false,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
+	},
+	"extensions.nist": {
+		title: "NIST",
+		description: "Enable or disable the NIST 800-53 tab on Overview and Agents.",
+		category: SettingCategory.EXTENSIONS,
+		type: EpluginSettingType.switch,
+		default: true,
+		configurableFile: true,
+		configurableUI: false,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
+	},
+	"extensions.oscap": {
+		title: "OSCAP",
+		description: "Enable or disable the Open SCAP tab on Overview and Agents.",
+		category: SettingCategory.EXTENSIONS,
+		type: EpluginSettingType.switch,
+		default: false,
+		configurableFile: true,
+		configurableUI: false,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
+	},
+	"extensions.osquery": {
+		title: "Osquery",
+		description: "Enable or disable the Osquery tab on Overview and Agents.",
+		category: SettingCategory.EXTENSIONS,
+		type: EpluginSettingType.switch,
+		default: false,
+		configurableFile: true,
+		configurableUI: false,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
+	},
+	"extensions.pci": {
+		title: "PCI DSS",
+		description: "Enable or disable the PCI DSS tab on Overview and Agents.",
+		category: SettingCategory.EXTENSIONS,
+		type: EpluginSettingType.switch,
+		default: true,
+		configurableFile: true,
+		configurableUI: false,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
+	},
+	"extensions.tsc": {
+		title: "TSC",
+		description: "Enable or disable the TSC tab on Overview and Agents.",
+		category: SettingCategory.EXTENSIONS,
+		type: EpluginSettingType.switch,
+		default: true,
+		configurableFile: true,
+		configurableUI: false,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
+	},
+	"extensions.virustotal": {
+		title: "Virustotal",
+		description: "Enable or disable the VirusTotal tab on Overview and Agents.",
+		category: SettingCategory.EXTENSIONS,
+		type: EpluginSettingType.switch,
+		default: false,
+		configurableFile: true,
+		configurableUI: false,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
+	},
+	"hideManagerAlerts": {
+		title: "Hide manager alerts",
+		description: "Hide the alerts of the manager in every dashboard.",
+		category: SettingCategory.GENERAL,
+		type: EpluginSettingType.switch,
+		default: false,
+		configurableFile: true,
+		configurableUI: true,
+		requireReload: true,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
+	},
+	"ip.ignore": {
+		title: "Index pattern ignore",
+		description: "Disable certain index pattern names from being available in index pattern selector.",
+		category: SettingCategory.GENERAL,
+		type: EpluginSettingType.editor,
+		default: [],
+		configurableFile: true,
+		configurableUI: true,
+		options: {
+			editor: {
+				language: 'json'
+			}
+		},
+	},
+	"ip.selector": {
+		title: "IP selector",
+		description: "Define if the user is allowed to change the selected index pattern directly from the top menu bar.",
+		category: SettingCategory.GENERAL,
+		type: EpluginSettingType.switch,
+		default: true,
+		configurableFile: true,
+		configurableUI: false,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
+	},
+	"logs.level": {
+		title: "Log level",
+		description: "Logging level of the App.",
+		category: SettingCategory.GENERAL,
+		type: EpluginSettingType.select,
+		options: {
+			choices: [
+				{
+					text: "Info",
+					value: "info"
+				},
+				{
+					text: "Debug",
+					value: "debug"
+				}
+			]
+		},
+		default: "info",
+		configurableFile: true,
+		configurableUI: true,
+		requireRestart: true,
+	},
+	"pattern": {
+		title: "Index pattern",
+		description: "Default index pattern to use on the app. If there's no valid index pattern, the app will automatically create one with the name indicated in this option.",
+		category: SettingCategory.GENERAL,
+		type: EpluginSettingType.text,
+		default: WAZUH_ALERTS_PATTERN,
+		configurableFile: true,
+		configurableUI: true,
+		requireHealthCheck: true,
+	},
+	"timeout": {
+		title: "Request timeout",
+		description: "Maximum time, in milliseconds, the app will wait for an API response when making requests to it. It will be ignored if the value is set under 1500 milliseconds.",
+		category: SettingCategory.GENERAL,
+		type: EpluginSettingType.number,
+		default: 20000,
+		configurableFile: true,
+		configurableUI: true,
+		options: {
+			number: {
+				min: 1500
+			}
+		},
+	},
+	"wazuh.monitoring.creation": {
+		title: "Index creation",
+		description: "Define the interval in which a new wazuh-monitoring index will be created.",
+		category: SettingCategory.MONITORING,
+		type: EpluginSettingType.select,
+		options: {
+			choices: [
+				{
+					text: "Hourly",
+					value: "h"
+				},
+				{
+					text: "Daily",
+					value: "d"
+				},
+				{
+					text: "Weekly",
+					value: "w"
+				},
+				{
+					text: "Monthly",
+					value: "m"
+				}
+			]
+		},
+		default: WAZUH_MONITORING_DEFAULT_CREATION,
+		configurableFile: true,
+		configurableUI: true,
+		requireHealthCheck: true,
+	},
+	"wazuh.monitoring.enabled": {
+		title: "Status",
+		description: "Enable or disable the wazuh-monitoring index creation and/or visualization.",
+		category: SettingCategory.MONITORING,
+		type: EpluginSettingType.switch,
+		default: WAZUH_MONITORING_DEFAULT_ENABLED,
+		configurableFile: true,
+		configurableUI: true,
+		requireRestart: true,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
+	},
+	"wazuh.monitoring.frequency": {
+		title: "Frequency",
+		description: "Frequency, in seconds, of API requests to get the state of the agents and create a new document in the wazuh-monitoring index with this data.",
+		category: SettingCategory.MONITORING,
+		type: EpluginSettingType.number,
+		default: WAZUH_MONITORING_DEFAULT_FREQUENCY,
+		configurableFile: true,
+		configurableUI: true,
+		requireRestart: true,
+		options: {
+			number: {
+				min: 60
+			}
+		},
+	},
+	"wazuh.monitoring.pattern": {
+		title: "Index pattern",
+		description: "Default index pattern to use for Wazuh monitoring.",
+		category: SettingCategory.MONITORING,
+		type: EpluginSettingType.text,
+		default: WAZUH_MONITORING_PATTERN,
+		configurableFile: true,
+		configurableUI: true,
+		requireHealthCheck: true,
+	},
+	"wazuh.monitoring.replicas": {
+		title: "Index replicas",
+		description: "Define the number of replicas to use for the wazuh-monitoring-* indices.",
+		category: SettingCategory.MONITORING,
+		type: EpluginSettingType.text,
+		default: WAZUH_MONITORING_DEFAULT_INDICES_REPLICAS,
+		configurableFile: true,
+		configurableUI: true,
+		requireHealthCheck: true,
+		options: {
+			number: {
+				min: 0
+			}
+		},
+	},
+	"wazuh.monitoring.shards": {
+		title: "Index shards",
+		description: "Define the number of shards to use for the wazuh-monitoring-* indices.",
+		category: SettingCategory.MONITORING,
+		type: EpluginSettingType.number,
+		default: WAZUH_MONITORING_DEFAULT_INDICES_SHARDS,
+		configurableFile: true,
+		configurableUI: true,
+		requireHealthCheck: true,
+		options: {
+			number: {
+				min: 1
+			}
+		},
+	}
+};
