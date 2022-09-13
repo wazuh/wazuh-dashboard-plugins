@@ -17,6 +17,29 @@ const architectureButtons = [
   },
 ];
 
+const architectureButtonsWithPPC64LE = [
+  {
+    id: 'i386',
+    label: 'i386',
+  },
+  {
+    id: 'x86_64',
+    label: 'x86_64',
+  },
+  {
+    id: 'armhf',
+    label: 'armhf',
+  },
+  {
+    id: 'aarch64',
+    label: 'aarch64',
+  },
+  {
+    id: 'powerpc',
+    label: 'powerpc',
+  },
+];
+
 
 const architectureButtonsi386 = [
   {
@@ -25,7 +48,7 @@ const architectureButtonsi386 = [
   }
 ];
 
-const architectureCentos5OrRedHat5 = [
+const architecturei386Andx86_64 = [
   {
     id: 'i386',
     label: 'i386',
@@ -46,6 +69,17 @@ const architectureButtonsSolaris = [
     label: 'SPARC',
   }
 ];
+
+const architectureButtonsMacos = [
+  {
+    id: 'intel',
+    label: 'Intel'
+  },
+  {
+    id: 'applesilicon',
+    label: 'Apple Silicon'
+  }
+]
 
 const architectureButtonsOpenSuse = [
   {
@@ -71,6 +105,17 @@ const architectureButtonsHpUx = [
     label: 'Itanium2',
   }
 ];
+
+const versionButtonAmazonLinux = [
+  {
+    id: '1',
+    label: '1',
+  },
+  {
+    id: '2',
+    label: '2',
+  }
+]
 
 const versionButtonsRedHat = [
   {
@@ -109,13 +154,24 @@ const versionButtonsDebian = [
   },
   {
     id: 'debian8',
-    label: 'Debian 8 or higher',
+    label: 'Debian 8',
+  },
+  {
+    id: 'debian9',
+    label: 'Debian 9',
   },
   {
     id: 'debian10',
     label: 'Debian 10 or higher',
   }
 ];
+
+const versionButtonFedora = [
+  {
+    id: '22',
+    label: '22 or later'
+  }
+]
 
 const versionButtonsUbuntu = [
   {
@@ -140,6 +196,17 @@ const versionButtonsWindows = [
   {
     id: 'windows8',
     label: 'Windows 8 or higher',
+  }
+];
+
+const versionButtonsSuse = [
+  {
+    id: 'suse11',
+    label: '11',
+  },
+  {
+    id: 'suse12',
+    label: '12',
   }
 ];
 
@@ -202,10 +269,28 @@ const versionButtonsHPUX = [
   }
 ];
 
+const versionButtonsOracleLinux = [
+  {
+    id: 'oraclelinux5',
+    label: '5',
+  },
+  {
+    id: 'oraclelinux6',
+    label: '6 or later',
+  }
+];
+
+const versionButtonsRaspbian = [
+  {
+    id: 'busterorgreater',
+    label: 'Buster or greater',
+  }
+];
+
 const osButtons = [
   {
     id: 'rpm',
-    label: 'Red Hat',
+    label: 'Red Hat Enterprise Linux',
   },
   {
     id: 'cent',
@@ -239,10 +324,30 @@ const osButtons = [
     id: 'aix',
     label: 'AIX',
   },
-  {
+  {  
     id: 'hp',
     label: 'HP-UX	',
   },
+  {  
+    id: 'amazonlinux',
+    label: 'Amazon Linux',
+  },
+  {  
+    id: 'fedora',
+    label: 'Fedora',
+  },
+  {  
+    id: 'oraclelinux',
+    label: 'Oracle Linux',
+  },
+  {  
+    id: 'suse',
+    label: 'SUSE',
+  },
+  {  
+    id: 'raspbian',
+    label: 'Raspbian OS',
+  },
 ];
 
-export { architectureButtons, architectureCentos5OrRedHat5, versionButtonsRedHat, versionButtonsCentos, osButtons, versionButtonsDebian, versionButtonsUbuntu, versionButtonsWindows, versionButtonsMacOS, versionButtonsOpenSuse, versionButtonsSolaris, versionButtonsAix, versionButtonsHPUX, architectureButtonsi386, architectureButtonsSolaris, architectureButtonsAix, architectureButtonsHpUx, architectureButtonsOpenSuse };
+export { architectureButtons, architecturei386Andx86_64, versionButtonsRaspbian, versionButtonsSuse, architectureButtonsWithPPC64LE, versionButtonsOracleLinux, versionButtonFedora, versionButtonsRedHat, versionButtonsCentos, architectureButtonsMacos, osButtons, versionButtonsDebian, versionButtonsUbuntu, versionButtonAmazonLinux, versionButtonsWindows, versionButtonsMacOS, versionButtonsOpenSuse, versionButtonsSolaris, versionButtonsAix, versionButtonsHPUX, architectureButtonsi386, architectureButtonsSolaris, architectureButtonsAix, architectureButtonsHpUx, architectureButtonsOpenSuse };
