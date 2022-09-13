@@ -51,16 +51,21 @@ export const BottomBar: React.FunctionComponent<IBottomBarProps> = ({ totalCount
     </EuiBottomBar>
 );
 
-const SettingLabel = ({ count, }) => (
+const SettingLabel = ({ count, errors }) => (
   <EuiFlexItem className='mgtAdvancedSettingsForm__unsavedCount'>
     <EuiText color='ghost' className='mgtAdvancedSettingsForm__unsavedCountMessage'>
       {`${count} unsaved settings`}
     </EuiText>
+    {errors ? (
+      <EuiText color='danger' className='mgtAdvancedSettingsForm__unsavedCountMessage'>
+        {`${errors} setting with ${errors === 1 ? 'error' : 'errors'}`}
+      </EuiText>
+    ) : null}
   </EuiFlexItem>
 );
 
 
-const CancelButton = ({ onClick }) => (
+const CancelButton = ({ onClick}) => (
   <EuiFlexItem grow={false}>
     <EuiButtonEmpty
       size='s'
@@ -74,13 +79,14 @@ const CancelButton = ({ onClick }) => (
   </EuiFlexItem>
 );
 
-const SaveButton = ({ onClick }) => (
+const SaveButton = ({ onClick, isDisabled }) => (
   <EuiFlexItem grow={false}>
     <EuiButton
       fill
       size='s'
       iconSide='left'
       iconType='check'
+      isDisabled={isDisabled}
       color='secondary'
       className="mgtAdvancedSettingsForm__button"
       onClick={onClick} >

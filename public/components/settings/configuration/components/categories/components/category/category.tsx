@@ -59,17 +59,28 @@ export const Category: React.FunctionComponent<ICategoryProps> = ({ title, items
         <EuiForm>
         {items.map((item, idx) => {
             const isUpdated = changedConfiguration?.[item.key] && !changedConfiguration?.[item.key]?.error;
+            const error = changedConfiguration?.[item.key]?.error;
+            
             return (
               <EuiDescribedFormGroup
                 fullWidth
                 key={idx}
                 className={classNames('mgtAdvancedSettings__field', {
                   'mgtAdvancedSettings__field--unsaved': isUpdated,
+                  'mgtAdvancedSettings__field--invalid': error
                 })}
                 title={
                   <EuiTitle className="mgtAdvancedSettings__fieldTitle" size="s">
                     <span>
                       {item.title}
+                      {error && (
+                        <EuiIconTip
+                        anchorClassName="mgtAdvancedSettings__fieldTitleUnsavedIcon"
+                        type='alert'
+                        color='danger'
+                        aria-label={item.key}
+                        content='Invalid' />
+                      )}
                       {isUpdated && (
                         <EuiIconTip
                         anchorClassName="mgtAdvancedSettings__fieldTitleUnsavedIcon"
@@ -84,7 +95,8 @@ export const Category: React.FunctionComponent<ICategoryProps> = ({ title, items
                   <InputForm
                     field={{
                       ...item,
-                      ...(item.transformUIInputValue ? {transformInputValue: item.transformUIInputValue.bind(item)} : {})
+                      ...(item.transformUIInputValue ? {transformInputValue: item.transformUIInputValue.bind(item)} : {}),
+                      ...(item.validate ? {validate: item.validate.bind(item)} : {})
                     }}
                     label={item.key}
                     initialValue={item.type === EpluginSettingType.editor ? JSON.stringify(currentConfiguration[item.key]) : currentConfiguration[item.key]}
