@@ -19,7 +19,7 @@
                 "manager": "wazuh-manager-master-0",
                 "node_name": "master",
                 "lastKeepAlive": "9999-12-31T23:59:59Z",
-                "version": "Wazuh v4.3.7"
+                "version": "Wazuh v4.4.0"
             },{
                 "os": {
                     "arch": "x86_64",
@@ -38,7 +38,7 @@
                 "manager": "wazuh-manager-master-0",
                 "node_name": "master",
                 "lastKeepAlive": "9999-12-31T23:59:59Z",
-                "version": "Wazuh v4.3.7"
+                "version": "Wazuh v4.4.0"
             },{
                 "os": {
                     "arch": "x86_64",
@@ -57,7 +57,7 @@
                 "manager": "wazuh-manager-master-0",
                 "node_name": "master",
                 "lastKeepAlive": "9999-12-31T23:59:59Z",
-                "version": "Wazuh v4.3.7"
+                "version": "Wazuh v4.4.0"
             },{
                 "os": {
                     "arch": "x86_64",
@@ -76,10 +76,10 @@
                 "manager": "wazuh-manager-master-0",
                 "node_name": "master",
                 "lastKeepAlive": "9999-12-31T23:59:59Z",
-                "version": "Wazuh v4.3.7"
+                "version": "Wazuh v4.4.0"
             }
         ],
-        "total_affected_items": 1,
+        "total_affected_items": 4,
         "total_failed_items": 0,
         "failed_items": []
     },
