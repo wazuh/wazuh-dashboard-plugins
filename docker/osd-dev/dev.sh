@@ -59,6 +59,7 @@ export PASSWORD=${PASSWORD:-admin}
 export OS_VERSION=$1
 export OSD_VERSION=$2
 export OSD_PORT=${PORT:-5601}
+export IMPOSTER_PORT=8081
 export SRC=$3
 export COMPOSE_PROJECT_NAME=os-dev
 

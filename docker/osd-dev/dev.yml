@@ -32,7 +32,7 @@ services:
     volumes:
       - ../imposter:/opt/imposter/config
     ports:
-       - 8080:8080
+       - ${IMPOSTER_PORT}:8080
 
   generator:
     image: cfssl/cfssl
@@ -162,6 +162,7 @@ services:
     hostname: osd
     networks:
       - os-dev
+      - mon
     user: "1000:1000"
     <<: *logging
     ports:
@@ -177,7 +178,6 @@ services:
       - ./config/osd/wazuh.yml:/home/node/kbn/data/wazuh/config/wazuh.yml
 
 networks:
-  networks:
   os-dev:
     name: os-dev-${OS_VERSION}
     driver: bridge

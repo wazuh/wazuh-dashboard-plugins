@@ -32,7 +32,7 @@ services:
     volumes:
       - ../imposter:/opt/imposter/config
     ports:
-       - 8080:8080
+       - ${IMPOSTER_PORT}:8080
 
   filebeat:
     depends_on:
@@ -178,6 +178,7 @@ services:
     image: quay.io/wazuh/kbn-dev:${ES_VERSION}
     networks:
       - es-dev
+      - mon
     volumes:
       - "${SRC}:/home/node/kbn/plugins/wazuh"
       - certs:/home/node/kbn/config/certs
