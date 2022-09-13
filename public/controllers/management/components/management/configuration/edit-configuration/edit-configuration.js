@@ -57,6 +57,7 @@ import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
 import { RestartModal } from '../../../../../../components/common/restart-modal/restart-modal';
+import { ENUM_RESTART_STATES } from '../../../../../../react-services/interfaces/wz-restart.interface';
 
 class WzEditConfiguration extends Component {
   constructor(props) {
@@ -313,7 +314,7 @@ class WzEditConfiguration extends Component {
           </EuiOverlayMask>
         )}
         {timeoutRestarting &&
-          this.props.restartStatus !== RestartHandler.RESTART_STATES.RESTARTED && <RestartModal />}
+          this.props.restartStatus !== ENUM_RESTART_STATES.RESTARTED && <RestartModal />}
       </Fragment>
     );
   }

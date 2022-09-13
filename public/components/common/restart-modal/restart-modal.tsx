@@ -82,8 +82,10 @@ export const RestartModal = (props: { isSyncCanceled?: {}; cancelSync? }) => {
   };
 
   const abort = () => {
-    dispatch(updateRestartStatus(ENUM_RESTART_STATES.RESTARTED));
-    dispatch(updateUnsynchronizedNodes([]));
+    updateRedux.updateRestartStatus(ENUM_RESTART_STATES.RESTARTED);
+    updateRedux.updateUnsynchronizedNodes([]);
+    updateRedux.updateRestartNodesInfo([])
+    updateRedux.updateUnsynchronizedNodes([])
     if (props.cancelSync) {
       props.cancelSync();
     }
