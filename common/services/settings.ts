@@ -33,12 +33,12 @@ export function getSettingsDefaultList() {
 };
 
 /**
- * 
- * @param pluginSetting Plugin setting definition
- * @param fromValue value of the form
- * @returns Transform the form value to the type of the setting expected
- */
- export function formatSettingValueFromForm(pluginSettingKey: string, formValue: any) {
+* 
+* @param pluginSetting Plugin setting definition
+* @param fromValue value of the form
+* @returns Transform the form value to the type of the setting expected
+*/
+export function formatSettingValueFromForm(pluginSettingKey: string, formValue: any) {
 	const { type } = PLUGIN_SETTINGS[pluginSettingKey];
 	return formatSettingValueFromFormType[type](formValue);
 };
@@ -50,4 +50,37 @@ const formatSettingValueFromFormType = {
 	[EpluginSettingType.switch]: (value: string): boolean => Boolean(value),
 	[EpluginSettingType.editor]: (value: any): any => value, // Array form transforms the value. It is coming a valid JSON.
 	[EpluginSettingType.select]: (value: any): any => value,
+};
+/**
+* Format the plugin setting value received in the backend to store in the plugin configuration file (.yml).
+* @param value plugin setting value sent to the endpoint
+* @returns valid value to .yml
+*/
+export function formatSettingValueToFile(value: any) {
+	const formatter = formatSettingValueToFileType[typeof value] || formatSettingValueToFileType.default;
+	return formatter(value);
+};
+
+const formatSettingValueToFileType = {
+	string: (value: string): string => `"${value.replace(/"/,'\\"').replace(/\n/g,'\\n')}"`, // Escape the " character and new line
+	object: (value: any): string => JSON.stringify(value),
+	default: (value: any): any => value
+};
+
+export function getPluginSettingDescription({description, options}: TpluginSetting): string{
+	return [
+		description,
+		...(options?.file?.extensions ? [`Supported extensions: ${options.file.extensions.join(', ')}.`] : []),
+		...(options?.file?.recommended?.dimensions ? [`Recommended dimensions: ${options.file.recommended.dimensions.width}x${options.file.recommended.dimensions.height}${options.file.recommended.dimensions.unit || ''}.`] : []),
+	].join(' ');
+};
+
+export function getSettingDependOnCustomizationIsEnabled(configuration: any, settingKey: string, overwriteDefaultValue?: any){
+	const defaultValue = typeof overwriteDefaultValue !== 'undefined'
+		? overwriteDefaultValue
+		: getSettingDefaultValue(settingKey);
+
+	return configuration['customization.enabled']
+		? (configuration[settingKey] ?? defaultValue)
+		: defaultValue;
 };

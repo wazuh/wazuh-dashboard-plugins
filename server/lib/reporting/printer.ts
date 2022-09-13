@@ -11,7 +11,7 @@ import { log } from '../logger';
 import * as TimSort from 'timsort';
 import { getConfiguration } from '../get-configuration';
 import { REPORTS_PRIMARY_COLOR} from '../../../common/constants';
-import { getSettingDefaultValue } from '../../../common/services/settings';
+import { getSettingDependOnCustomizationIsEnabled } from '../../../common/services/settings';
 
 const COLORS = {
   PRIMARY: REPORTS_PRIMARY_COLOR
@@ -616,11 +616,9 @@ export class ReportPrinter{
 
   async print(reportPath: string){
     const configuration = await getConfiguration();
-    
-    const pathToLogo = configuration['customization.logo.reports'] || getSettingDefaultValue('customization.logo.reports');
-    const pageHeader = configuration['customization.reports.header'] || getSettingDefaultValue('customization.reports.header');
-    const pageFooter = configuration['customization.reports.footer'] || getSettingDefaultValue('customization.reports.footer');
-
+    const pathToLogo = getSettingDependOnCustomizationIsEnabled(configuration, 'customization.logo.reports');
+    const pageHeader = getSettingDependOnCustomizationIsEnabled(configuration, 'customization.reports.header');
+    const pageFooter = getSettingDependOnCustomizationIsEnabled(configuration, 'customization.reports.footer');
     const document = this._printer.createPdfKitDocument({...pageConfiguration({pathToLogo, pageHeader, pageFooter}), content: this._content});
     await document.pipe(
       fs.createWriteStream(reportPath)

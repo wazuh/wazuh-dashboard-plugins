@@ -811,6 +811,30 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 			return schema.boolean();
 		},
 	},
+	"customization.enabled": {
+		title: "Status",
+		description: "Enable or disable the customization.",
+		category: SettingCategory.CUSTOMIZATION,
+		type: EpluginSettingType.switch,
+		default: true,
+		configurableFile: true,
+		configurableUI: true,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		transformUIInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
+		validate: validateBooleanIs,
+		validateBackend: function(schema){
+			return schema.boolean();
+		},
+	},
 	"customization.logo.app": {
 		title: "Logo App",
 		description: `Customize the logo displayed in the plugin menu.`,
