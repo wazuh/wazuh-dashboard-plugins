@@ -12,10 +12,7 @@
  */
 
 import React from 'react';
-import ConfigurationHandler from '../utils/configuration-handler';
-//@ts-ignore
-import { getToasts } from '../../../../kibana-services';
-import { ISetting } from '../configuration'
+
 import {
   EuiBottomBar,
   EuiFlexGroup,
@@ -24,15 +21,6 @@ import {
   EuiButtonEmpty,
   EuiButton
 } from '@elastic/eui';
-import { WazuhConfig } from '../../../../react-services/wazuh-config';
-import { UI_LOGGER_LEVELS, PLUGIN_PLATFORM_NAME } from '../../../../../common/constants';
-import {
-  UI_ERROR_SEVERITIES,
-  UIErrorLog,
-  UIErrorSeverity,
-  UILogLevel,
-} from '../../../../react-services/error-orchestrator/types';
-import { getErrorOrchestrator } from '../../../../react-services/common-services';
 
 interface IBottomBarProps {
   totalCount: number
@@ -41,12 +29,12 @@ interface IBottomBarProps {
   onSave: () => void
 }
 
-export const BottomBar: React.FunctionComponent<IBottomBarProps> = ({ totalCount, errorsCount, onCancel, onSave }) => (
+export const BottomBar: React.FunctionComponent<IBottomBarProps> = ({ totalCount, onCancel, onSave }) => (
   <EuiBottomBar paddingSize="m">
       <EuiFlexGroup alignItems='center' justifyContent='spaceBetween' gutterSize='s'>
-        <SettingLabel count={totalCount} errors={errorsCount}/>
+        <SettingLabel count={totalCount}/>
         <CancelButton onClick={onCancel} />
-        <SaveButton onClick={onSave} isDisabled={Boolean(errorsCount)}/>
+        <SaveButton onClick={onSave}/>
       </EuiFlexGroup>
     </EuiBottomBar>
 );

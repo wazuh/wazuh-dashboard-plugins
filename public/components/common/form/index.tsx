@@ -32,7 +32,7 @@ export const InputForm = (props: IInputForm) => {
       value={value}
       onChange={onChange}
       isInvalid={isInvalid}
-      field={{...field, ...(field?.validate ? {validate: field.validate.bind(field)} : {})}}
+      field={field}
     />
   );
 
