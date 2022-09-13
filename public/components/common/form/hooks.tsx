@@ -15,6 +15,7 @@ type TuseFormFieldChanged = {
 const getValueFromEventType = {
   [EpluginSettingType.switch] : (event: any) => event.target.checked,
   [EpluginSettingType.editor]: (value: any) => value,
+  [EpluginSettingType.filepicker]: (value: any) => value,
   default: (event: any) => event.target.value,
 }
 

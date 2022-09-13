@@ -140,16 +140,34 @@ const WzConfigurationSettingsProvider = (props) => {
           }
         };
         return accum;
-      }, {saveOnConfigurationFile: {}});
+      }, {saveOnConfigurationFile: {}, fileUpload: {}});
 
       const requests = [];
 
+      // Update the settings that doesn't upload file
       if(Object.keys(settingsToUpdate.saveOnConfigurationFile).length){
         requests.push(WzRequest.genericReq(
           'PUT', '/utils/configuration',
           settingsToUpdate.saveOnConfigurationFile
         ));
       };
+
+      // Update the settings that doesn't upload file
+      if(Object.keys(settingsToUpdate.fileUpload).length){
+        requests.push(...Object.entries(settingsToUpdate.fileUpload)
+          .map(([pluginSettingKey, {file, extension}]) => {
+              // Create the form data
+              const formData = new FormData();
+              formData.append('file', file);
+              formData.append('extension', extension);
+              return WzRequest.genericReq(
+                'PUT', `/utils/configuration/files/${pluginSettingKey}`,
+                formData,
+                {overwriteHeaders: {'content-type': 'multipart/form-data'}}
+              )
+            }));            
+      };
+
       const responses = await Promise.all(requests);      
 
       // Show the toasts if necessary
