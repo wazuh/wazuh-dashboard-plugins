@@ -12,7 +12,7 @@
 import path from 'path';
 import { version } from '../package.json';
 import { validate as validateNodeCronInterval } from 'node-cron';
-import { composeValidate, validateBooleanIs, validateJSONArrayOfStrings, validateLiteral, validateNumber, validateStringNoEmpty, validateStringNoSpaces } from './services/settings-validate';
+import { composeValidate, validateBooleanIs, validateFilePickerSupportedExtensions, validateJSONArrayOfStrings, validateLiteral, validateNumber, validateStringNoEmpty, validateStringNoSpaces } from './services/settings-validate';
 
 // Plugin
 export const PLUGIN_VERSION = version;

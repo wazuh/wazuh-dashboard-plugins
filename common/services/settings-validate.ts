@@ -66,3 +66,10 @@ export const validateJSONArrayOfStrings = (value: string) => {
 };
 
 export const validateLiteral = (...literals) => (value: any): string | undefined => literals.includes(value) ? undefined : `Invalid value. Allowed values: ${literals.map(String).join(', ')}`;
+
+// FilePicker
+export const validateFilePickerSupportedExtensions = (extensions: string[]) => ({name}: {name: string}) => {
+    if(!extensions.includes(path.extname(name))){
+        return `File extension is invalid. Allowed file extensions: ${extensions.join(', ')}`
+    };
+};
