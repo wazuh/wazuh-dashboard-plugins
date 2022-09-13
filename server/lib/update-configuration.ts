@@ -44,9 +44,6 @@ export class UpdateConfigurationFile {
     }
   }
 
-  formatValueCachedConfiguration = (value) => typeof value === 'string'
-    ? isNaN(Number(value)) ? value : Number(value)
-    : value;
   /**
    * Updates wazuh.yml file. If it fails, it throws the error to the next function.
    * @param {Object} updatedConfiguration
@@ -74,11 +71,6 @@ export class UpdateConfigurationFile {
         'Updating configuration',
         'debug'
       );
-      return {
-        needRestart: WAZUH_CONFIGURATION_SETTINGS_NEED_RESTART.includes(key),
-        needReload: WAZUH_CONFIGURATION_SETTINGS_NEED_RELOAD.includes(key),
-        needHealtCheck: WAZUH_CONFIGURATION_SETTINGS_NEED_HEALTH_CHECK.includes(key)
-      };
     } catch (error) {
       log('update-configuration:updateConfiguration', error.message || error);
       this.busy = false;
