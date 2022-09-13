@@ -12,7 +12,7 @@
 import path from 'path';
 import { version } from '../package.json';
 import { validate as validateNodeCronInterval } from 'node-cron';
-import { composeValidate, validateBooleanIs, validateJSONArrayOfStrings, validateLiteral, validateNumber, validateStringNoEmpty, validateStringNoSpaces } from './services/settings-validate';
+import { composeValidate, validateBooleanIs, validateJSONArrayOfStrings, validateLiteral, validateNumber, validateStringMultipleLines, validateStringNoEmpty, validateStringNoSpaces } from './services/settings-validate';
 
 // Plugin
 export const PLUGIN_VERSION = version;
@@ -849,6 +849,34 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		configurableUI: true,
 		requireReload: true,
 	},
+	"customization.reports.footer": {
+		title: "Reports footer",
+		description: "Set the footer of the reports.",
+		category: SettingCategory.CUSTOMIZATION,
+		type: EpluginSettingType.textarea,
+		default: "",
+    	defaultHidden: REPORTS_PAGE_FOOTER_TEXT,
+		configurableFile: true,
+		configurableUI: true,
+		validate: validateStringMultipleLines({max: 2}),
+		validateBackend: function(schema){
+			return schema.string({minLength: 1, validate: this.validate});
+		},
+	},
+	"customization.reports.header": {
+		title: "Reports header",
+		description: "Set the header of the reports.",
+		category: SettingCategory.CUSTOMIZATION,
+		type: EpluginSettingType.textarea,
+		default: "",
+    	defaultHidden: REPORTS_PAGE_HEADER_TEXT,
+		configurableFile: true,
+		configurableUI: true,
+		validate: validateStringMultipleLines({max: 4}),
+		validateBackend: function(schema){
+			return schema.string({minLength: 1, validate: this.validate});
+		},
+	},
 	"disabled_roles": {
 		title: "Disables roles",
 		description: "Disabled the plugin visibility for users with the roles.",
@@ -1336,7 +1364,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		validate: composeValidate(validateStringNoEmpty, validateStringNoSpaces),
 		validateBackend: function(schema){
 			return schema.string({minLength: 1, validate: this.validate});
-		},
+		}
 	},
 	"timeout": {
 		title: "Request timeout",

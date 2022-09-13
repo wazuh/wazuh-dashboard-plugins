@@ -3,6 +3,7 @@ import { IInputForm } from './types';
 import { InputFormEditor } from './input_editor';
 import { InputFormNumber } from './input_number';
 import { InputFormText } from './input_text';
+import { InputFormTextArea } from './input_text_area';
 import { InputFormSwitch } from './input_switch';
 import { InputFormSelect } from './input_select';
 import { useFormFieldChanged } from './hooks';
@@ -55,4 +56,5 @@ const Input = {
   number: InputFormNumber,
   select: InputFormSelect,
   text: InputFormText,
+  textarea: InputFormTextArea,
 };
