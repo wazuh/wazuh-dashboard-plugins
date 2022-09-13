@@ -6,7 +6,7 @@
                 "type": "master",
                 "version": "4.3.0",
                 "ip": "wazuh-master",
-                "connection_date": "2020-05-27T10:50:49.175Z"
+                "connection_date": "2021-05-27T10:50:49.175Z"
             },
             {
                 "name": "worker1",

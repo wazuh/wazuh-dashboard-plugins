@@ -1,0 +1,13 @@
+{
+    "data": {
+        "affected_items":
+            [
+                "master-node"
+            ],
+        "total_affected_items": 1,
+        "total_failed_items": 0,
+        "failed_items": []
+    },
+    "message": "All selected nodes information was returned",
+    "error": 0
+}

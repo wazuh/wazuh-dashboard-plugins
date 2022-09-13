@@ -7,7 +7,7 @@
       },
       {
         "name": "workerWithLonggggname!!!!!!!",
-        "synced": true
+        "synced": false
       },
       {
         "name": "worker2",
@@ -15,11 +15,11 @@
       },
       {
         "name": "worker3",
-        "synced": true
+        "synced": false
       },
       {
         "name": "worker4",
-        "synced": true
+        "synced": false
       },
       {
         "name": "worker2",
@@ -27,11 +27,11 @@
       },
       {
         "name": "worker3",
-        "synced": true
+        "synced": false
       },
       {
         "name": "worker4",
-        "synced": true
+        "synced": false
       }
     ],
     "total_affected_items": 19,
