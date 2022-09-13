@@ -30,7 +30,7 @@ services:
       - JAVA_OPTS="-Xmx512m -Xss512k -Dfile.encoding=UTF-8 -XX:MaxRAM=800m -XX:MaxRAMPercentage=95 -XX:MinRAMPercentage=60A"
       - MALLOC_ARENA_MAX=1
     volumes:
-      - ./config/imposter:/opt/imposter/config
+      - ../imposter:/opt/imposter/config
     ports:
        - 8080:8080
 
