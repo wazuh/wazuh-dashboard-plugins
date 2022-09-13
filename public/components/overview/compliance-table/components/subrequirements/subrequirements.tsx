@@ -24,15 +24,13 @@ import {
   EuiPopover,
   EuiText,
   EuiIcon,
-  EuiOverlayMask,
-  EuiOutsideClickDetector,
   EuiLoadingSpinner,
 } from '@elastic/eui';
 import { AppNavigate } from '../../../../../react-services/app-navigate';
 import { AppState } from '../../../../../react-services/app-state';
 import { RequirementFlyout } from '../requirement-flyout/requirement-flyout';
-import { WAZUH_ALERTS_PATTERN } from '../../../../../../common/constants';
 import { getDataPlugin } from '../../../../../kibana-services';
+import { getSettingDefaultValue } from '../../../../../../common/services/settings';
 
 export class ComplianceSubrequirements extends Component {
   _isMount = false;
@@ -71,7 +69,7 @@ export class ComplianceSubrequirements extends Component {
         params: { query: filter.value },
         type: 'phrase',
         negate: filter.negate || false,
-        index: AppState.getCurrentPattern() || WAZUH_ALERTS_PATTERN,
+        index: AppState.getCurrentPattern() || getSettingDefaultValue('pattern'),
       },
       query: { match_phrase: matchPhrase },
       $state: { store: 'appState' },

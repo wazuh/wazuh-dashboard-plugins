@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import { Base } from './base-query';
-import { WAZUH_ALERTS_PATTERN } from '../../../common/constants';
+import { getSettingDefaultValue } from '../../../common/services/settings';
 
 /**
  * Returns top 5 GDPR requirements
@@ -25,7 +25,7 @@ export const topGDPRRequirements = async (
   gte, 
   lte, 
   filters, 
-  pattern = WAZUH_ALERTS_PATTERN
+  pattern = getSettingDefaultValue('pattern')
 ) => {
   if (filters.includes('rule.gdpr: exists')) {
     const [head, tail] = filters.split('AND rule.gdpr: exists');
@@ -82,7 +82,7 @@ export const getRulesByRequirement= async (
   lte,
   filters,
   requirement,
-  pattern = WAZUH_ALERTS_PATTERN
+  pattern = getSettingDefaultValue('pattern')
 ) => {
   if (filters.includes('rule.gdpr: exists')) {
     const [head, tail] = filters.split('AND rule.gdpr: exists');
