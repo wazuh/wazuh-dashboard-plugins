@@ -3,8 +3,9 @@ import { IInputForm } from './types';
 import { InputFormEditor } from './input_editor';
 import { InputFormNumber } from './input_number';
 import { InputFormText } from './input_text';
-import { InputFormSwitch } from './input_switch';
 import { InputFormSelect } from './input_select';
+import { InputFormSwitch } from './input_switch';
+import { InputFormFilePicker } from './input_filepicker';
 import { useFormFieldChanged } from './hooks';
 import {
 	EuiFormRow,
@@ -55,4 +56,5 @@ const Input = {
   number: InputFormNumber,
   select: InputFormSelect,
   text: InputFormText,
+  filepicker: InputFormFilePicker
 };

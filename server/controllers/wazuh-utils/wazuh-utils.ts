@@ -20,9 +20,14 @@ import { WAZUH_ROLE_ADMINISTRATOR_ID, WAZUH_DATA_LOGS_RAW_PATH, PLUGIN_SETTINGS 
 import { ManageHosts } from '../../lib/manage-hosts';
 import { KibanaRequest, RequestHandlerContext, KibanaResponseFactory } from 'src/core/server';
 import { getCookieValueByName } from '../../lib/cookie';
+import fs from 'fs';
+import path from 'path';
+import { createDirectoryIfNotExists } from '../../lib/filesystem';
+import glob from 'glob';
 
 const updateConfigurationFile = new UpdateConfigurationFile();
 
+// TODO: these controllers have no logs. We should include them.
 export class WazuhUtilsCtrl {
   /**
    * Constructor
@@ -121,6 +126,91 @@ export class WazuhUtilsCtrl {
     }
   }
 
+  /**
+   * Upload a file
+   * @param {Object} context
+   * @param {Object} request
+   * @param {Object} response
+   * @returns {Object} Configuration File or ErrorResponse
+   */
+   uploadFile = this.routeDecoratorProtectedAdministratorRoleValidToken(
+    async (context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) => {
+      const { key } = request.params;
+      const { file: bufferFile, extension } = request.body;
+      const pluginSetting = PLUGIN_SETTINGS[key];
+
+      // Check if the extension is valid for the setting.
+      if(!pluginSetting.options.file.extensions.includes(extension)){
+        return response.badRequest({
+          body: `File extension is not valid for this setting <${key}>. Allowed file extensions: ${pluginSetting.options.file.extensions.join(', ')}`
+        });
+      };
+
+      const fileNamePath = `${key}${extension}`;
+
+      // Create target directory
+      const targetDirectory = path.join(__dirname, '../../..', pluginSetting.options.file.store.relativePathFileSystem);
+      createDirectoryIfNotExists(targetDirectory);
+      // Get the files related to the setting and remove them
+      const files = glob.sync(path.join(targetDirectory, `${key}.*`));
+      files.forEach(fs.unlinkSync);
+
+      // Store the file in the target directory.
+      fs.writeFileSync(path.join(targetDirectory, fileNamePath), bufferFile);
+
+      // Update the setting in the configuration cache
+      const pluginSettingValue = pluginSetting.options.file.store.resolveStaticURL(fileNamePath);
+      await updateConfigurationFile.updateConfiguration({[key]: pluginSettingValue});   
+
+      return response.ok({
+        body: {
+          data: {
+            requireHealthCheck: Boolean(pluginSetting.requireHealthCheck),
+            requireReload: Boolean(pluginSetting.requireReload),
+            requireRestart: Boolean(pluginSetting.requireRestart),
+            updatedConfiguration: {
+              [key]: pluginSettingValue
+            }
+          }
+        }
+      });
+    },
+    3022
+  )
+
+  /**
+   * Upload a file
+   * @param {Object} context
+   * @param {Object} request
+   * @param {Object} response
+   * @returns {Object} Configuration File or ErrorResponse
+   */
+   deleteFile = this.routeDecoratorProtectedAdministratorRoleValidToken(
+    async (context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) => {
+      const { key } = request.params;
+      const pluginSetting = PLUGIN_SETTINGS[key];
+
+      // Get the files related to the setting and remove them
+      const targetDirectory = path.join(__dirname, '../../..', pluginSetting.options.file.store.relativePathFileSystem);
+      const files = glob.sync(path.join(targetDirectory,`${key}.*`));
+      files.forEach(fs.unlinkSync);
+
+      // Update the setting in the configuration cache
+      const pluginSettingValue = pluginSetting.default;
+      await updateConfigurationFile.updateConfiguration({[key]: pluginSettingValue}); 
+
+      return response.ok({
+        body: {
+          message: 'All files were removed.',
+          updatedConfiguration: {
+            [key]: pluginSettingValue
+          }
+        }
+      });
+    },
+    3023
+  )
+  
   private routeDecoratorProtectedAdministratorRoleValidToken(routeHandler, errorCode: number){
     return async (context, request, response) => {
       try{

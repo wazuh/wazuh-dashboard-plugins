@@ -12,7 +12,7 @@
 import { WazuhUtilsCtrl } from '../../controllers';
 import { IRouter } from 'kibana/server';
 import { schema } from '@kbn/config-schema';
-import { PLUGIN_SETTINGS } from '../../../common/constants';
+import { EpluginSettingType, PLUGIN_SETTINGS } from '../../../common/constants';
 
 export function WazuhUtilsRoutes(router: IRouter) {
   const ctrl = new WazuhUtilsCtrl();
@@ -38,6 +38,48 @@ export function WazuhUtilsRoutes(router: IRouter) {
       }
     },
     async (context, request, response) => ctrl.updateConfigurationFile(context, request, response)
+  );
+
+  const pluginSettingsTypeFilepicker = Object.entries(PLUGIN_SETTINGS)
+    .filter(([_, {type, configurableFile}]) => type === EpluginSettingType.filepicker && configurableFile);
+
+  const schemaPluginSettingsTypeFilepicker = schema.oneOf(pluginSettingsTypeFilepicker.map(([pluginSettingKey]) => schema.literal(pluginSettingKey)));
+
+  // Upload an asset
+  router.put(
+    {
+      path: '/utils/configuration/files/{key}',
+      validate: {
+        params: schema.object({
+          // key parameter should be a plugin setting of `filepicker` type
+          key: schemaPluginSettingsTypeFilepicker
+        }),
+        body: schema.object({
+          // file: buffer
+          file: schema.buffer(),
+          // extension: literal of all the extensions of plugin setting of `filepicker` type
+          extension: schema.oneOf([...new Set(
+            ...pluginSettingsTypeFilepicker
+              .map(([ , pluginSettingConfiguration]) => ([...pluginSettingConfiguration.options.file.extensions]))
+          )].map(schema.literal))
+        })
+      }
+    },
+    async (context, request, response) => ctrl.uploadFile(context, request, response)
+  );
+
+  // Remove an asset
+  router.delete(
+    {
+      path: '/utils/configuration/files/{key}',
+      validate: {
+        params: schema.object({
+          // key parameter should be a plugin setting of `filepicker` type
+          key: schemaPluginSettingsTypeFilepicker
+        })
+      }
+    },
+    async (context, request, response) => ctrl.deleteFile(context, request, response)
   );
 
   // Returns Wazuh app logs

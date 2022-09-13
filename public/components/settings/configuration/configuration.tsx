@@ -125,7 +125,15 @@ const WzConfigurationSettingsProvider = (props) => {
     setLoading(true);
     try {
       const settingsToUpdate = Object.entries(changedConfiguration).reduce((accum, [pluginSettingKey, {currentValue}]) => {
-        if(PLUGIN_SETTINGS[pluginSettingKey].configurableFile){
+        if(PLUGIN_SETTINGS[pluginSettingKey].configurableFile && PLUGIN_SETTINGS[pluginSettingKey].type === EpluginSettingType.filepicker){
+          accum.fileUpload = {
+            ...accum.fileUpload,
+            [pluginSettingKey]: {
+              file: currentValue,
+              extension: path.extname(currentValue.name)
+            }
+          }
+        }else if(PLUGIN_SETTINGS[pluginSettingKey].configurableFile){
           accum.saveOnConfigurationFile = {
             ...accum.saveOnConfigurationFile,
             [pluginSettingKey]: formatSettingValueFromForm(pluginSettingKey, currentValue)

@@ -14,13 +14,14 @@
 import React, { } from 'react';
 import {
   EuiFlexItem,
+  EuiImage,
   EuiPanel,
   EuiText,
   EuiFlexGroup,
   EuiForm,
   EuiDescribedFormGroup,
   EuiTitle,
-  EuiFormRow
+  EuiSpacer
 } from '@elastic/eui';
 import { EuiIconTip } from '@elastic/eui';
 import { EpluginSettingType, TPluginSettingWithKey, UI_LOGGER_LEVELS } from '../../../../../../../../common/constants';
@@ -91,7 +92,7 @@ export const Category: React.FunctionComponent<ICategoryProps> = ({ title, items
                       )}
                     </span>
                   </EuiTitle>}
-                description={item.description} >
+                description={getPluginSettingDescription(item)} >
                   <InputForm
                     field={{
                       ...item,
@@ -101,6 +102,17 @@ export const Category: React.FunctionComponent<ICategoryProps> = ({ title, items
                     label={item.key}
                     initialValue={item.type === EpluginSettingType.editor ? JSON.stringify(currentConfiguration[item.key]) : currentConfiguration[item.key]}
                     onChange={onChangeFieldForm}
+                    {...((item.type === EpluginSettingType.filepicker && currentConfiguration[item.key])
+                      ? {
+                          preInput: () => (
+                            <InputFormFilePickerPreInput
+                              image={getHttp().basePath.prepend(getAssetURL(currentConfiguration[item.key]))}
+                              field={item}
+                            />
+                          )
+                        }
+                      : {}
+                    )}
                   />
               </EuiDescribedFormGroup>
             )
@@ -109,4 +121,52 @@ export const Category: React.FunctionComponent<ICategoryProps> = ({ title, items
       </EuiPanel>
     </EuiFlexItem>
   )
+};
+
+const InputFormFilePickerPreInput = ({image, field}: {image: string, field: any}) => {
+  const dispatch = useDispatch();
+
+  return (
+    <>
+      <EuiFlexGroup alignItems="center" responsive={false}>
+        <EuiFlexItem grow={false}>
+          <EuiImage src={image} size='s'/>
+        </EuiFlexItem>
+        <EuiFlexItem grow={false}>
+          <WzButtonModalConfirm
+            buttonType="icon"
+            tooltip={{
+              content: 'Delete file',
+              position: 'top',
+            }}
+            modalTitle={`Do you want to delete the ${field.key} file?`}
+            onConfirm={async () => {
+              try{
+                const response = await WzRequest.genericReq('DELETE', `/utils/configuration/files/${field.key}`);
+                dispatch(updateAppConfig(response.data.updatedConfiguration));
+              }catch(error){
+                const options = {
+                  context: `${InputFormFilePickerPreInput.name}.confirmDeleteFile`,
+                  level: UI_LOGGER_LEVELS.ERROR,
+                  severity: UI_ERROR_SEVERITIES.BUSINESS,
+                  store: true,
+                  error: {
+                    error: error,
+                    message: error.message || error,
+                    title: error.name || error,
+                  },
+                };
+                getErrorOrchestrator().handleError(options);
+              }
+            }}
+            modalProps={{ buttonColor: 'danger' }}
+            iconType="trash"
+            color="danger"
+            aria-label="Delete file"
+          />
+        </EuiFlexItem>
+      </EuiFlexGroup>
+      <EuiSpacer size='s' />
+    </>
+  );
 };

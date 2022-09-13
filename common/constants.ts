@@ -355,16 +355,35 @@ type TpluginSettingOptionsChoices = {
 	choices: {text: string, value: any}[]
 };
 
+type TpluginSettingOptionsEditor = {
+	editor: {
+		language: string
+	}
+};
+
+type TpluginSettingOptionsFile = {
+	file: {
+		type: 'image'
+		extensions?: string[]
+		recommended?: {
+			dimensions?: {
+				width: number,
+				height: number,
+				unit: string
+			}
+		}
+		store?: {
+			relativePathFileSystem: string
+			filename: string
+			resolveStaticURL: (filename: string) => string
+		}
+	}
+};
+
 type TpluginSettingOptionsNumber = {
 	number: {
 		min?: number
 		max?: number
-	}
-};
-
-type TpluginSettingOptionsEditor = {
-	editor: {
-		language: string
 	}
 };
 
@@ -377,7 +396,6 @@ type TpluginSettingOptionsSwitch = {
 	}
 };
 
-
 export enum EpluginSettingType{
 	text = 'text',
 	textarea = 'textarea',
@@ -385,6 +403,7 @@ export enum EpluginSettingType{
 	number = 'number',
 	editor = 'editor',
 	select = 'select',
+	filepicker = 'filepicker',
 };
 
 export type TpluginSetting = {
@@ -399,7 +418,7 @@ export type TpluginSetting = {
 	requireHealthCheck?: boolean
 	requireReload?: boolean
 	requireRestart?: boolean
-	options?: TpluginSettingOptionsChoices | TpluginSettingOptionsNumber | TpluginSettingOptionsEditor | TpluginSettingOptionsSwitch
+	options?: TpluginSettingOptionsChoices  | TpluginSettingOptionsEditor  | TpluginSettingOptionsFile | TpluginSettingOptionsNumber | TpluginSettingOptionsSwitch
 	transformUIInputValue?: (value: boolean | string) => boolean
 	validate?: (value: any) => string | undefined
 	validateBackend?: (schema: any) => any
@@ -815,39 +834,123 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		title: "Logo App",
 		description: `Customize the logo displayed in the plugin menu.`,
 		category: SettingCategory.CUSTOMIZATION,
-		type: EpluginSettingType.text,
+		type: EpluginSettingType.filepicker,
 		default: "",
 		configurableFile: true,
 		configurableUI: true,
+		options: {
+			file: {
+				type: 'image',
+				extensions: ['.jpeg', '.jpg', '.png', '.svg'],
+				recommended: {
+					dimensions: {
+						width: 300,
+						height: 70,
+						unit: 'px'
+					}
+				},
+				store: {
+					relativePathFileSystem: 'public/assets/custom/images',
+					filename: 'customization.logo.app',
+					resolveStaticURL: (filename: string) => `custom/images/${filename}`
+				}
+			}
+		},
+		validate: function(value){
+			return validateFilePickerSupportedExtensions(this.options.file.extensions)(value)
+		},
 	},
 	"customization.logo.healthcheck": {
 		title: "Logo Health Check",
 		description: `Customize the logo displayed in the plugin health check.`,
 		category: SettingCategory.CUSTOMIZATION,
-		type: EpluginSettingType.text,
+		type: EpluginSettingType.filepicker,
 		default: "",
 		configurableFile: true,
 		configurableUI: true,
+		options: {
+			file: {
+				type: 'image',
+				extensions: ['.jpeg', '.jpg', '.png', '.svg'],
+				recommended: {
+					dimensions: {
+						width: 300,
+						height: 70,
+						unit: 'px'
+					}
+				},
+				store: {
+					relativePathFileSystem: 'public/assets/custom/images',
+					filename: 'customization.logo.healthcheck',
+					resolveStaticURL: (filename: string) => `custom/images/${filename}`
+				}				
+			}
+		},
+		validate: function(value){
+			return validateFilePickerSupportedExtensions(this.options.file.extensions)(value)
+		},
 	},
 	"customization.logo.reports": {
 		title: "Logo Reports",
 		description: `Customize the logo displayed in the PDF reports.`,
 		category: SettingCategory.CUSTOMIZATION,
-		type: EpluginSettingType.text,
+		type: EpluginSettingType.filepicker,
 		default: "",
     	defaultHidden: REPORTS_LOGO_IMAGE_ASSETS_RELATIVE_PATH,
 		configurableFile: true,
 		configurableUI: true,
+		options: {
+			file: {
+				type: 'image',
+				extensions: ['.jpeg', '.jpg', '.png'],
+				recommended: {
+					dimensions: {
+						width: 190,
+						height: 40,
+						unit: 'px'
+					}
+				},
+				store: {
+					relativePathFileSystem: 'public/assets/custom/images',
+					filename: 'customization.logo.reports',
+					resolveStaticURL: (filename: string) => `custom/images/${filename}`
+				}				
+			}
+		},
+		validate: function(value){
+			return validateFilePickerSupportedExtensions(this.options.file.extensions)(value)
+		},
 	},
 	"customization.logo.sidebar": {
 		title: "Logo Sidebar",
 		description: `Customize the logo of the category that belongs the plugin.`,
 		category: SettingCategory.CUSTOMIZATION,
-		type: EpluginSettingType.text,
+		type: EpluginSettingType.filepicker,
 		default: "",
 		configurableFile: true,
 		configurableUI: true,
 		requireReload: true,
+		options: {
+			file: {
+				type: 'image',
+				extensions: ['.jpeg', '.jpg', '.png', '.svg'],
+				recommended: {
+					dimensions: {
+						width: 80,
+						height: 80,
+						unit: 'px'
+					}
+				},
+				store: {
+					relativePathFileSystem: 'public/assets/custom/images',
+					filename: 'customization.logo.sidebar',
+					resolveStaticURL: (filename: string) => `custom/images/${filename}`
+				}				
+			}
+		},
+		validate: function(value){
+			return validateFilePickerSupportedExtensions(this.options.file.extensions)(value)
+		},
 	},
 	"disabled_roles": {
 		title: "Disables roles",

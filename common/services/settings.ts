@@ -50,4 +50,18 @@ const formatSettingValueFromFormType = {
 	[EpluginSettingType.switch]: (value: string): boolean => Boolean(value),
 	[EpluginSettingType.editor]: (value: any): any => value, // Array form transforms the value. It is coming a valid JSON.
 	[EpluginSettingType.select]: (value: any): any => value,
+	[EpluginSettingType.filepicker]: (value: any): any => value,
+};
+
+/**
+ * Get the plugin setting description composed.
+ * @param param0 
+ * @returns 
+ */
+export function getPluginSettingDescription({description, options}: TpluginSetting): string{
+	return [
+		description,
+		...(options?.file?.extensions ? [`Supported extensions: ${options.file.extensions.join(', ')}.`] : []),
+		...(options?.file?.recommended?.dimensions ? [`Recommended dimensions: ${options.file.recommended.dimensions.width}x${options.file.recommended.dimensions.height}${options.file.recommended.dimensions.unit || ''}.`] : []),
+	].join(' ');
 };

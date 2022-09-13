@@ -14,6 +14,7 @@ import {
   PLUGIN_SETTINGS,
   PLUGIN_SETTINGS_CATEGORIES,
 } from '../../common/constants';
+import { getPluginSettingDescription } from '../../common/services/settings';
 import { webDocumentationLink } from '../../common/services/web_documentation';
 
 const header: string = `---
@@ -53,7 +54,7 @@ const pluginSettingsConfiguration = Object.entries(PLUGIN_SETTINGS_CATEGORIES).m
       # setting description
       # settingKey: settingValue
       */
-      [splitDescription(description), `# ${pluginSettingKey}: ${printSettingValue(defaultValue)}`].join('\n')
+      [splitDescription(getPluginSettingDescription({description, options})), `# ${pluginSettingKey}: ${printSettingValue(defaultValue)}`].join('\n')
     ).join('\n#\n');
   /*
   #------------------- category name --------------
