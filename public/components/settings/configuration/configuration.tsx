@@ -125,22 +125,14 @@ const WzConfigurationSettingsProvider = (props) => {
     setLoading(true);
     try {
       const settingsToUpdate = Object.entries(changedConfiguration).reduce((accum, [pluginSettingKey, {currentValue}]) => {
-        if(PLUGIN_SETTINGS[pluginSettingKey].configurableFile && PLUGIN_SETTINGS[pluginSettingKey].type === EpluginSettingType.filepicker){
-          accum.fileUpload = {
-            ...accum.fileUpload,
-            [pluginSettingKey]: {
-              file: currentValue,
-              extension: path.extname(currentValue.name)
-            }
-          }
-        }else if(PLUGIN_SETTINGS[pluginSettingKey].configurableFile){
+        if(PLUGIN_SETTINGS[pluginSettingKey].configurableFile){
           accum.saveOnConfigurationFile = {
             ...accum.saveOnConfigurationFile,
             [pluginSettingKey]: formatSettingValueFromForm(pluginSettingKey, currentValue)
           }
         };
         return accum;
-      }, {saveOnConfigurationFile: {}, fileUpload: {}});
+      }, {saveOnConfigurationFile: {}});
 
       const requests = [];
 
@@ -150,22 +142,6 @@ const WzConfigurationSettingsProvider = (props) => {
           settingsToUpdate.saveOnConfigurationFile
         ));
       };
-
-      if(Object.keys(settingsToUpdate.fileUpload).length){
-        requests.push(...Object.entries(settingsToUpdate.fileUpload)
-          .map(([pluginSettingKey, {file, extension}]) => {
-              // Create the form data
-              const formData = new FormData();
-              formData.append('file', file);
-              formData.append('extension', extension);
-              return WzRequest.genericReq(
-                'PUT', `/utils/configuration/files/${pluginSettingKey}`,
-                formData,
-                {overwriteHeaders: {'content-type': 'multipart/form-data'}}
-              )
-            }));            
-      };
-
       const responses = await Promise.all(requests);      
 
       // Show the toasts if necessary
