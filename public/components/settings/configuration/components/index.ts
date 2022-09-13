@@ -11,5 +11,4 @@
  * Find more information about this on the LICENSE file.
  */
 export { Header } from './header';
-export { Categories } from './categories';
 export { BottomBar } from './bottom-bar';

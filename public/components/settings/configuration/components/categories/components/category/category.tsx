@@ -12,8 +12,6 @@
  */
 
 import React, { } from 'react';
-import { FieldForm } from './components';
-import { ISetting } from '../../../../configuration';
 import {
   EuiFlexItem,
   EuiPanel,
@@ -25,15 +23,29 @@ import {
   EuiFormRow
 } from '@elastic/eui';
 import { EuiIconTip } from '@elastic/eui';
+import { EpluginSettingType, TPluginSettingWithKey, UI_LOGGER_LEVELS } from '../../../../../../../../common/constants';
+import { getPluginSettingDescription } from '../../../../../../../../common/services/settings';
+import classNames from 'classnames';
+import { InputForm } from '../../../../../../common/form';
+import { getErrorOrchestrator } from '../../../../../../../react-services/common-services';
+import { UI_ERROR_SEVERITIES } from '../../../../../../../react-services/error-orchestrator/types';
+import { updateAppConfig } from '../../../../../../../redux/actions/appConfigActions';
+import { WzRequest } from '../../../../../../../react-services';
+import { WzButtonModalConfirm } from '../../../../../../common/buttons';
+import { useDispatch } from 'react-redux';
+import { getHttp } from '../../../../../../../kibana-services';
+import { getAssetURL } from '../../../../../../../utils/assets';
+
 
 interface ICategoryProps {
-  name: string
-  items: ISetting[]
-  updatedConfig: { [field: string]: string | number | boolean | [] }
-  setUpdatedConfig({ }): void
+  title: string
+  items: TPluginSettingWithKey[]
+  currentConfiguration: { [field: string]: any }
+  changedConfiguration: { [field: string]: any }
+  onChangeFieldForm: () => void
 }
 
-export const Category: React.FunctionComponent<ICategoryProps> = ({ name, items, updatedConfig, setUpdatedConfig }) => {
+export const Category: React.FunctionComponent<ICategoryProps> = ({ title, items, currentConfiguration, changedConfiguration, onChangeFieldForm }) => {
   return (
     <EuiFlexItem>
       <EuiPanel paddingSize="l">
@@ -45,33 +57,44 @@ export const Category: React.FunctionComponent<ICategoryProps> = ({ name, items,
           </EuiFlexGroup>
         </EuiText>
         <EuiForm>
-          {items.map((item, idx) => (
-            <EuiDescribedFormGroup
-              fullWidth
-              key={idx}
-              className={`mgtAdvancedSettings__field${isUpdated(updatedConfig, item) ? ' mgtAdvancedSettings__field--unsaved' : ''}`}
-              title={
-                <EuiTitle className="mgtAdvancedSettings__fieldTitle" size="s">
-                  <span>
-                    {item.name}
-                    {isUpdated(updatedConfig, item)
-                      && <EuiIconTip
+        {items.map((item, idx) => {
+            const isUpdated = changedConfiguration?.[item.key] && !changedConfiguration?.[item.key]?.error;
+            return (
+              <EuiDescribedFormGroup
+                fullWidth
+                key={idx}
+                className={classNames('mgtAdvancedSettings__field', {
+                  'mgtAdvancedSettings__field--unsaved': isUpdated,
+                })}
+                title={
+                  <EuiTitle className="mgtAdvancedSettings__fieldTitle" size="s">
+                    <span>
+                      {item.title}
+                      {isUpdated && (
+                        <EuiIconTip
                         anchorClassName="mgtAdvancedSettings__fieldTitleUnsavedIcon"
-                        type={'dot'}
-                        color={'warning'}
-                        aria-label={item.setting}
-                        content={`${updatedConfig[item.setting]}`} />}
-                  </span></EuiTitle>}
-              description={item.description} >
-              <EuiFormRow label={item.setting} fullWidth>
-                <FieldForm item={item} updatedConfig={updatedConfig} setUpdatedConfig={setUpdatedConfig} />
-              </EuiFormRow>
-            </EuiDescribedFormGroup>
-          ))}
+                        type='dot'
+                        color='warning'
+                        aria-label={item.key}
+                        content='Unsaved' />
+                      )}
+                    </span>
+                  </EuiTitle>}
+                description={item.description} >
+                  <InputForm
+                    field={{
+                      ...item,
+                      ...(item.transformUIInputValue ? {transformInputValue: item.transformUIInputValue.bind(item)} : {})
+                    }}
+                    label={item.key}
+                    initialValue={item.type === EpluginSettingType.editor ? JSON.stringify(currentConfiguration[item.key]) : currentConfiguration[item.key]}
+                    onChange={onChangeFieldForm}
+                  />
+              </EuiDescribedFormGroup>
+            )
+          })}
         </EuiForm>
       </EuiPanel>
     </EuiFlexItem>
   )
-}
-
-const isUpdated = (configs, item) => typeof configs[item.setting] !== 'undefined'
+};

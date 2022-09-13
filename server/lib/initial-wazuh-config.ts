@@ -15,7 +15,6 @@ import {
   PLUGIN_SETTINGS_CATEGORIES,
 } from '../../common/constants';
 import { webDocumentationLink } from '../../common/services/web_documentation';
-import { configEquivalences } from '../../common/config-equivalences';
 
 const header: string = `---
 #
