@@ -86,7 +86,7 @@
                 "type": "worker",
                 "version": "4.3.0",
                 "ip": "wazuh-worker",
-                "connection_date": "2021-05-27T10:50:51.342Z"
+                "connection_date": "2019-05-27T10:50:51.342Z"
             }
         ],
         "total_affected_items": 3,

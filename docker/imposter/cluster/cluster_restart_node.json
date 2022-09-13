@@ -2,7 +2,7 @@
     "data": {
         "affected_items":
             [
-                "master-node"
+                "worker12"
             ],
         "total_affected_items": 1,
         "total_failed_items": 0,
