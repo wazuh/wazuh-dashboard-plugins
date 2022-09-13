@@ -53,7 +53,7 @@ export const Category: React.FunctionComponent<ICategoryProps> = ({ title, items
         <EuiText>
           <EuiFlexGroup>
             <EuiFlexItem>
-              <h2>{name}</h2>
+              <h2>{title}</h2>
             </EuiFlexItem>
           </EuiFlexGroup>
         </EuiText>
