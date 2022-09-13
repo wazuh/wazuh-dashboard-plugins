@@ -11,6 +11,8 @@
  */
 import path from 'path';
 import { version } from '../package.json';
+import { validate as validateNodeCronInterval } from 'node-cron';
+import { composeValidate, validateBooleanIs, validateJSONArrayOfStrings, validateLiteral, validateNumber, validateStringNoEmpty, validateStringNoSpaces } from './services/settings-validate';
 
 // Plugin
 export const PLUGIN_VERSION = version;
@@ -353,25 +355,6 @@ type TpluginSettingOptionsChoices = {
 	choices: {text: string, value: any}[]
 };
 
-type TpluginSettingOptionsFile = {
-	file: {
-		type: 'image'
-		extensions?: string[]
-		recommended?: {
-			dimensions?: {
-				width: number,
-				height: number,
-				unit: string
-			}
-		}
-		store?: {
-			relativePathFileSystem: string
-			filename: string
-			resolveStaticURL: (filename: string) => string
-		}
-	}
-};
-
 type TpluginSettingOptionsNumber = {
 	number: {
 		min?: number
@@ -418,6 +401,8 @@ export type TpluginSetting = {
 	requireRestart?: boolean
 	options?: TpluginSettingOptionsChoices | TpluginSettingOptionsNumber | TpluginSettingOptionsEditor | TpluginSettingOptionsSwitch
 	transformUIInputValue?: (value: boolean | string) => boolean
+	validate?: (value: any) => string | undefined
+	validateBackend?: (schema: any) => any
 };
 
 export type TPluginSettingWithKey = TpluginSetting & { key: string };
@@ -468,6 +453,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		configurableFile: true,
 		configurableUI: true,
 		requireHealthCheck: true,
+		validate: composeValidate(validateStringNoEmpty, validateStringNoSpaces),
+		validateBackend: function(schema){
+			return schema.string({validate: this.validate});
+		},
 	},
 	"checks.api": {
 		title: "API connection",
@@ -487,6 +476,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		},
 		transformUIInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
+		},
+		validate: validateBooleanIs,
+		validateBackend: function(schema){
+			return schema.boolean();
 		},
 	},
 	"checks.fields": {
@@ -508,6 +501,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		transformUIInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
 		},
+		validate: validateBooleanIs,
+		validateBackend: function(schema){
+			return schema.boolean();
+		},
 	},
 	"checks.maxBuckets": {
 		title: "Set max buckets to 200000",
@@ -527,6 +524,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		},
 		transformUIInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
+		},
+		validate: validateBooleanIs,
+		validateBackend: function(schema){
+			return schema.boolean();
 		},
 	},
 	"checks.metaFields": {
@@ -548,6 +549,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		transformUIInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
 		},
+		validate: validateBooleanIs,
+		validateBackend: function(schema){
+			return schema.boolean();
+		},
 	},
 	"checks.pattern": {
 		title: "Index pattern",
@@ -567,6 +572,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		},
 		transformUIInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
+		},
+		validate: validateBooleanIs,
+		validateBackend: function(schema){
+			return schema.boolean();
 		},
 	},
 	"checks.setup": {
@@ -588,6 +597,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		transformUIInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
 		},
+		validate: validateBooleanIs,
+		validateBackend: function(schema){
+			return schema.boolean();
+		},
 	},
 	"checks.template": {
 		title: "Index template",
@@ -607,6 +620,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		},
 		transformUIInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
+		},
+		validate: validateBooleanIs,
+		validateBackend: function(schema){
+			return schema.boolean();
 		},
 	},
 	"checks.timeFilter": {
@@ -628,6 +645,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		transformUIInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
 		},
+		validate: validateBooleanIs,
+		validateBackend: function(schema){
+			return schema.boolean();
+		},
 	},
 	"cron.prefix": {
 		title: "Cron prefix",
@@ -637,6 +658,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		default: WAZUH_STATISTICS_DEFAULT_PREFIX,
 		configurableFile: true,
 		configurableUI: true,
+		validate: composeValidate(validateStringNoEmpty, validateStringNoSpaces),
+		validateBackend: function(schema){
+			return schema.string({minLength: 1, validate: this.validate});
+		},
 	},
 	"cron.statistics.apis": {
 		title: "Includes APIs",
@@ -650,6 +675,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 			editor: {
 				language: 'json'
 			}
+		},
+		validate: validateJSONArrayOfStrings,
+		validateBackend: function(schema){
+			return schema.string(this.validate);
 		},
 	},
 	"cron.statistics.index.creation": {
@@ -681,6 +710,12 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		configurableFile: true,
 		configurableUI: true,
 		requireHealthCheck: true,
+		validate: function (value){
+			return validateLiteral(this.options.choices.map(({value}) => value))(value)
+		},
+		validateBackend: function(schema){
+			return schema.oneOf(this.options.choices.map(({value}) => schema.literal(value)));
+		},
 	},
 	"cron.statistics.index.name": {
 		title: "Index name",
@@ -691,6 +726,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		configurableFile: true,
 		configurableUI: true,
 		requireHealthCheck: true,
+		validate: composeValidate(validateStringNoEmpty, validateStringNoSpaces),
+		validateBackend: function(schema){
+			return schema.string({minLength: 1, validate: this.validate});
+		},
 	},
 	"cron.statistics.index.replicas": {
 		title: "Index replicas",
@@ -705,6 +744,12 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 			number: {
 				min: 0
 			}
+		},
+		validate: function(value){
+			return validateNumber(this.options.number)(value)
+		},
+		validateBackend: function(schema){
+			return schema.number({...this.options.number});
 		},
 	},
 	"cron.statistics.index.shards": {
@@ -721,6 +766,12 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 				min: 1
 			}
 		},
+		validate: function(value){
+			return validateNumber(this.options.number)(value)
+		},
+		validateBackend: function(schema){
+			return schema.number({...this.options.number});
+		},
 	},
 	"cron.statistics.interval": {
 		title: "Interval",
@@ -731,6 +782,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		configurableFile: true,
 		configurableUI: true,
 		requireRestart: true,
+		validate: (value: string) => validateNodeCronInterval(value) ? undefined : "Interval is not valid.",
+		validateBackend: function(schema){
+			return schema.string({validate: this.validate});
+		},
 	},
 	"cron.statistics.status": {
 		title: "Status",
@@ -750,6 +805,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		},
 		transformUIInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
+		},
+		validate: validateBooleanIs,
+		validateBackend: function(schema){
+			return schema.boolean();
 		},
 	},
 	"customization.logo.app": {
@@ -803,6 +862,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 				language: 'json'
 			}
 		},
+		validate: validateJSONArrayOfStrings,
+		validateBackend: function(schema){
+			return schema.string({validate: this.validate});
+		},
 	},
 	"enrollment.dns": {
 		title: "Enrollment DNS",
@@ -812,6 +875,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		default: "",
 		configurableFile: true,
 		configurableUI: true,
+		validate: composeValidate(validateStringNoEmpty, validateStringNoSpaces),
+		validateBackend: function(schema){
+			return schema.string({minLenght: 1, validate: this.validate});
+		},
 	},
 	"enrollment.password": {
 		title: "Enrollment Password",
@@ -821,6 +888,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		default: "",
 		configurableFile: true,
 		configurableUI: false,
+		validate: validateStringNoEmpty,
+		validateBackend: function(schema){
+			return schema.string({minLength: 1, validate: this.validate});
+		},
 	},
 	"extensions.audit": {
 		title: "System auditing",
@@ -840,6 +911,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		},
 		transformUIInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
+		},
+		validate: validateBooleanIs,
+		validateBackend: function(schema){
+			return schema.boolean();
 		},
 	},
 	"extensions.aws": {
@@ -861,6 +936,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		transformUIInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
 		},
+		validate: validateBooleanIs,
+		validateBackend: function(schema){
+			return schema.boolean();
+		},
 	},
 	"extensions.ciscat": {
 		title: "CIS-CAT",
@@ -880,6 +959,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		},
 		transformUIInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
+		},
+		validate: validateBooleanIs,
+		validateBackend: function(schema){
+			return schema.boolean();
 		},
 	},
 	"extensions.docker": {
@@ -901,6 +984,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		transformUIInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
 		},
+		validate: validateBooleanIs,
+		validateBackend: function(schema){
+			return schema.boolean();
+		},
 	},
 	"extensions.gcp": {
 		title: "Google Cloud platform",
@@ -920,6 +1007,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		},
 		transformUIInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
+		},
+		validate: validateBooleanIs,
+		validateBackend: function(schema){
+			return schema.boolean();
 		},
 	},
 	"extensions.gdpr": {
@@ -941,6 +1032,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		transformUIInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
 		},
+		validate: validateBooleanIs,
+		validateBackend: function(schema){
+			return schema.boolean();
+		},
 	},
 	"extensions.hipaa": {
 		title: "Hipaa",
@@ -960,6 +1055,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		},
 		transformUIInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
+		},
+		validate: validateBooleanIs,
+		validateBackend: function(schema){
+			return schema.boolean();
 		},
 	},
 	"extensions.mitre": {
@@ -981,6 +1080,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		transformUIInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
 		},
+		validate: validateBooleanIs,
+		validateBackend: function(schema){
+			return schema.boolean();
+		},
 	},
 	"extensions.nist": {
 		title: "NIST",
@@ -1000,6 +1103,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		},
 		transformUIInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
+		},
+		validate: validateBooleanIs,
+		validateBackend: function(schema){
+			return schema.boolean();
 		},
 	},
 	"extensions.oscap": {
@@ -1021,6 +1128,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		transformUIInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
 		},
+		validate: validateBooleanIs,
+		validateBackend: function(schema){
+			return schema.boolean();
+		},
 	},
 	"extensions.osquery": {
 		title: "Osquery",
@@ -1040,6 +1151,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		},
 		transformUIInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
+		},
+		validate: validateBooleanIs,
+		validateBackend: function(schema){
+			return schema.boolean();
 		},
 	},
 	"extensions.pci": {
@@ -1061,6 +1176,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		transformUIInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
 		},
+		validate: validateBooleanIs,
+		validateBackend: function(schema){
+			return schema.boolean();
+		},
 	},
 	"extensions.tsc": {
 		title: "TSC",
@@ -1081,6 +1200,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		transformUIInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
 		},
+		validate: validateBooleanIs,
+		validateBackend: function(schema){
+			return schema.boolean();
+		},
 	},
 	"extensions.virustotal": {
 		title: "Virustotal",
@@ -1100,6 +1223,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		},
 		transformUIInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
+		},
+		validate: validateBooleanIs,
+		validateBackend: function(schema){
+			return schema.boolean();
 		},
 	},
 	"hideManagerAlerts": {
@@ -1122,6 +1249,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		transformUIInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
 		},
+		validate: validateBooleanIs,
+		validateBackend: function(schema){
+			return schema.boolean();
+		},
 	},
 	"ip.ignore": {
 		title: "Index pattern ignore",
@@ -1136,6 +1267,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 				language: 'json'
 			}
 		},
+		validate: validateJSONArrayOfStrings,
+		validateBackend: function(schema){
+			return schema.string({validate: this.validate})
+		}
 	},
 	"ip.selector": {
 		title: "IP selector",
@@ -1155,6 +1290,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		},
 		transformUIInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
+		},
+		validate: validateBooleanIs,
+		validateBackend: function(schema){
+			return schema.boolean();
 		},
 	},
 	"logs.level": {
@@ -1178,6 +1317,12 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		configurableFile: true,
 		configurableUI: true,
 		requireRestart: true,
+		validate: function (value){
+			return validateLiteral(this.options.choices.map(({value}) => value))(value)
+		},
+		validateBackend: function(schema){
+			return schema.oneOf(this.options.choices.map(({value}) => schema.literal(value)));
+		},
 	},
 	"pattern": {
 		title: "Index pattern",
@@ -1188,6 +1333,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		configurableFile: true,
 		configurableUI: true,
 		requireHealthCheck: true,
+		validate: composeValidate(validateStringNoEmpty, validateStringNoSpaces),
+		validateBackend: function(schema){
+			return schema.string({minLength: 1, validate: this.validate});
+		},
 	},
 	"timeout": {
 		title: "Request timeout",
@@ -1201,6 +1350,12 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 			number: {
 				min: 1500
 			}
+		},
+		validate: function(value){
+			return validateNumber(this.options.number)(value);
+		},
+		validateBackend: function(schema){
+			return schema.number({validate: this.validate});
 		},
 	},
 	"wazuh.monitoring.creation": {
@@ -1232,6 +1387,12 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		configurableFile: true,
 		configurableUI: true,
 		requireHealthCheck: true,
+		validate: function (value){
+			return validateLiteral(this.options.choices.map(({value}) => value))(value)
+		},
+		validateBackend: function(schema){
+			return schema.oneOf(this.options.choices.map(({value}) => schema.literal(value)));
+		},
 	},
 	"wazuh.monitoring.enabled": {
 		title: "Status",
@@ -1253,6 +1414,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		transformUIInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
 		},
+		validate: validateBooleanIs,
+		validateBackend: function(schema){
+			return schema.boolean();
+		},
 	},
 	"wazuh.monitoring.frequency": {
 		title: "Frequency",
@@ -1268,6 +1433,12 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 				min: 60
 			}
 		},
+		validate: function(value){
+			return validateNumber(this.options.number)(value);
+		},
+		validateBackend: function(schema){
+			return schema.number({validate: this.validate});
+		},
 	},
 	"wazuh.monitoring.pattern": {
 		title: "Index pattern",
@@ -1278,6 +1449,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		configurableFile: true,
 		configurableUI: true,
 		requireHealthCheck: true,
+		validate: composeValidate(validateStringNoEmpty, validateStringNoSpaces),
+		validateBackend: function(schema){
+			return schema.string({minLength: 1, validate: this.validate});
+		},
 	},
 	"wazuh.monitoring.replicas": {
 		title: "Index replicas",
@@ -1293,6 +1468,12 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 				min: 0
 			}
 		},
+		validate: function(value){
+			return validateNumber(this.options.number)(value);
+		},
+		validateBackend: function(schema){
+			return schema.number({validate: this.validate});
+		},
 	},
 	"wazuh.monitoring.shards": {
 		title: "Index shards",
@@ -1307,6 +1488,12 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 			number: {
 				min: 1
 			}
+		},
+		validate: function(value){
+			return validateNumber(this.options.number)(value);
+		},
+		validateBackend: function(schema){
+			return schema.number({validate: this.validate});
 		},
 	}
 };
