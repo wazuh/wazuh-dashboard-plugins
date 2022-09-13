@@ -12,7 +12,7 @@
 import { WazuhUtilsCtrl } from '../../controllers';
 import { IRouter } from 'kibana/server';
 import { schema } from '@kbn/config-schema';
-import { EpluginSettingType, PLUGIN_SETTINGS } from '../../../common/constants';
+import { PLUGIN_SETTINGS } from '../../../common/constants';
 
 export function WazuhUtilsRoutes(router: IRouter) {
   const ctrl = new WazuhUtilsCtrl();
