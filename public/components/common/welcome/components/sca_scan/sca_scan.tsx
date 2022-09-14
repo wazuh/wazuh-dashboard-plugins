@@ -36,7 +36,7 @@ import { formatUIDate } from '../../../../../react-services/time-service';
 import { getAngularModule } from '../../../../../kibana-services';
 import { withReduxProvider, withUserAuthorizationPrompt } from "../../../hocs";
 import { compose } from 'redux';
-
+import { Inventory } from '../../../../../components/agents/sca/index';
 export const ScaScan = compose(
   withReduxProvider,
   withUserAuthorizationPrompt([
@@ -68,6 +68,7 @@ export const ScaScan = compose(
       isLoading: true,
     };
   }
+
 
   async componentDidMount() {
     this._isMount = true;
@@ -114,34 +115,36 @@ export const ScaScan = compose(
 
   renderScanDetails() {
     const { isLoading, lastScan } = this.state;
+    const {agent} = this.props
     if (isLoading || lastScan === undefined) return;
     return (
       <Fragment>
         <EuiFlexGroup>
           <EuiFlexItem grow={false}>
             <EuiTitle size="xs">
-              <EuiLink onClick={() => {
+              {/* <EuiLink onClick={() => {
                   window.location.href = `#/overview?tab=sca&redirectPolicy=${lastScan.policy_id}`;
                   store.dispatch(updateCurrentAgentData(this.props.agent));
                   this.router.reload();
                 }
-              }>
-                <h4>{lastScan.name}</h4>
-              </EuiLink>
+              }> */}
+                {/* <h4>{lastScan.name}</h4> */}
+                <Inventory agent={agent} />
+              {/* </EuiLink> */}
             </EuiTitle>
           </EuiFlexItem>
-          <EuiFlexItem grow={false} style={{ marginTop: 12 }}>
+          {/* <EuiFlexItem grow={false} style={{ marginTop: 12 }}>
             <EuiBadge color="secondary">{lastScan.policy_id}</EuiBadge>
-          </EuiFlexItem>
+          </EuiFlexItem> */}
         </EuiFlexGroup>
-        <EuiFlexGroup>
+        {/* <EuiFlexGroup>
           <EuiFlexItem>
             <EuiText size={'s'}>
               <p>{lastScan.description}</p>
             </EuiText>
           </EuiFlexItem>
-        </EuiFlexGroup>
-        <EuiSpacer size="l" />
+        </EuiFlexGroup> */}
+        {/* <EuiSpacer size="l" />
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiStat
@@ -177,8 +180,8 @@ export const ScaScan = compose(
               description="Score"
             />
           </EuiFlexItem>
-        </EuiFlexGroup>
-        <EuiSpacer size={'l'}/>
+        </EuiFlexGroup> */}
+        {/* <EuiSpacer size={'l'}/>
         <EuiFlexGroup>
           <EuiFlexItem grow={false} style={{ marginTop: 15 }}>
             <EuiText>
@@ -190,7 +193,7 @@ export const ScaScan = compose(
               <EuiIcon type="clock" color={'primary'}/> Duration: {this.durationScan()}
             </EuiText>
           </EuiFlexItem>
-        </EuiFlexGroup>
+        </EuiFlexGroup> */}
       </Fragment>
     )
   }
@@ -227,9 +230,10 @@ export const ScaScan = compose(
           <EuiText size="xs">
             <EuiFlexGroup>
               <EuiFlexItem>
-                <h2>SCA: Last scan</h2>
+                <h2>SCA: Lastest scans</h2>
               </EuiFlexItem>
-              <EuiFlexItem grow={false}>
+              {/* <Inventory agent={agent} /> */}
+              {/* <EuiFlexItem grow={false}>
                 <EuiToolTip position="top" content="Open SCA Scans">
                   <EuiButtonIcon
                     iconType="popout"
@@ -242,7 +246,7 @@ export const ScaScan = compose(
                     }
                     aria-label="Open SCA Scans" />
                 </EuiToolTip>
-              </EuiFlexItem>
+              </EuiFlexItem> */}
             </EuiFlexGroup>
           </EuiText>
           {lastScan === undefined && emptyPrompt}
