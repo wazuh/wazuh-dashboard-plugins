@@ -130,7 +130,13 @@ const InputFormFilePickerPreInput = ({image, field}: {image: string, field: any}
     <>
       <EuiFlexGroup alignItems="center" responsive={false}>
         <EuiFlexItem grow={false}>
-          <EuiImage src={image} size='s'/>
+          <EuiImage
+            src={image}
+            size='s'
+            alt="Custom logo"
+            style={{maxWidth: '100%', maxHeight: '50px', width: 'auto', height: 'auto'}}
+            url='' // Added to prevent warnings in the browser because it is marked as required
+          />
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
           <WzButtonModalConfirm
