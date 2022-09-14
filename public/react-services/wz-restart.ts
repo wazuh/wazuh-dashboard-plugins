@@ -151,6 +151,7 @@ export class RestartHandler {
           isValid = await breakCondition(updateRedux, params);
           if (!isValid) await delayAsPromise(this.POLLING_DELAY);
         } catch (error) {
+          await delayAsPromise(this.POLLING_DELAY);
           // console.error(error);
           // The message in the console is disabled because the user will see the error message on the healthcheck page.
         }
@@ -236,8 +237,9 @@ export class RestartHandler {
    * @param updateRedux Redux update function
    * @return {object}
    */
-  static async restartSelectedNode(selectedNode, updateRedux) {
+  static async restartSelectedNode(selectedNode, updateRedux, isSyncCanceled = { isSyncCanceled: false }) {
     try {
+      this.cancel = isSyncCanceled;
       // Dispatch a Redux action
       updateRedux.updateRestartStatus(ENUM_RESTART_STATES.RESTARTING);
       const isCluster = await this.clusterReq();
@@ -265,6 +267,7 @@ export class RestartHandler {
       updateRedux.updateRestartStatus(ENUM_RESTART_STATES.RESTARTED_INFO);
       return { restarted: isCluster ? 'Cluster' : 'Manager' };
     } catch (error) {
+      console.log(error)
       RestartHandler.clearState(updateRedux, ENUM_RESTART_STATES.RESTART_ERROR);
       throw error;
     }
