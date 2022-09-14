@@ -61,26 +61,13 @@
                 "version": "4.3.0",
                 "ip": "172.26.0.6",
                 "connection_date": "2021-05-27T10:50:51.342Z"
-            },{
-                "name": "worker9",
-                "type": "worker",
-                "version": "4.3.0",
-                "ip": "wazuh-worker",
-                "connection_date": "2021-05-27T10:48:54.093Z"
-            },
-            {
-                "name": "worker10",
-                "type": "worker",
-                "version": "4.3.0",
-                "ip": "172.26.0.7",
-                "connection_date": "2021-05-27T10:50:51.342Z"
             },
             {
                 "name": "worker11",
                 "type": "worker",
                 "version": "4.3.0",
                 "ip": "172.26.0.6",
-                "connection_date": "2021-05-27T10:48:54.093Z"
+                "connection_date": "2019-05-27T10:48:54.093Z"
             },{
                 "name": "worker12",
                 "type": "worker",
