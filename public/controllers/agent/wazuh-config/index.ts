@@ -108,12 +108,16 @@ const architectureButtonsHpUx = [
 
 const versionButtonAmazonLinux = [
   {
-    id: '1',
-    label: '1',
+    id: 'amazonlinux1',
+    label: 'Amazon Linux 1',
   },
   {
-    id: '2',
-    label: '2',
+    id: 'amazonlinu2',
+    label: 'Amazon Linux 2',
+  },
+  {
+    id: 'amazonlinux2022',
+    label: 'Amazon Linux 2022',
   }
 ]
 
