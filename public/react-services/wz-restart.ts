@@ -267,7 +267,6 @@ export class RestartHandler {
       updateRedux.updateRestartStatus(ENUM_RESTART_STATES.RESTARTED_INFO);
       return { restarted: isCluster ? 'Cluster' : 'Manager' };
     } catch (error) {
-      console.log(error)
       RestartHandler.clearState(updateRedux, ENUM_RESTART_STATES.RESTART_ERROR);
       throw error;
     }
