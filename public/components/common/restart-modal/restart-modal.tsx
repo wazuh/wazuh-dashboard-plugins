@@ -40,7 +40,7 @@ import { ENUM_RESTART_STATES } from '../../../react-services/interfaces/wz-resta
  * @returns components's body
  */
 export const RestartModal = (props: { isSyncCanceled?: {}; cancelSync? }) => {
-  const { updateRedux, dispatch } = reduxDispatchers();
+  const { updateRedux } = reduxDispatchers();
 
   // Cluster nodes that did not synced
   const unsyncedNodes = useSelector((state) => state.restartWazuhReducers.unsynchronizedNodes);
@@ -153,7 +153,7 @@ export const RestartModal = (props: { isSyncCanceled?: {}; cancelSync? }) => {
 
     case ENUM_RESTART_STATES.RESTART_ERROR:
       emptyPromptProps = {
-        title: <h2 className="wz-modal-restart-title">Unable to connect to Wazuh.</h2>,
+        title: <h2 className="wz-modal-restart-title">Unsuccessful restart.</h2>,
         body: (
           <>
             <h4 className="wz-padding-left-16 wz">Restart error:</h4>
@@ -163,21 +163,30 @@ export const RestartModal = (props: { isSyncCanceled?: {}; cancelSync? }) => {
             />
             <p>
               There was an error restarting the nodes{' '}
-              <b className="wz-text-black">{nodesNotRestartedState.join(', ')}</b>.
+              <b className="wz-text-black">{nodesNotRestartedState.join(', ')}</b>.            
             </p>
           </>
         ),
         actions: (
-          <EuiButton color="primary" fill href="#/health-check">
-            Go to Healthcheck
-          </EuiButton>
+          <EuiFlexGroup justifyContent="flexEnd">
+            <EuiFlexItem grow={false}>
+              <EuiButton color="text" fill onClick={abort}>
+                Cancel
+              </EuiButton>
+            </EuiFlexItem>
+            <EuiFlexItem grow={false}>
+              <EuiButton color="primary" fill href="#/health-check" onClick={abort}>
+                Go to Healthcheck
+              </EuiButton>
+            </EuiFlexItem>
+          </EuiFlexGroup> 
         ),
       };
       break;
 
     case ENUM_RESTART_STATES.SYNC_ERROR:
       emptyPromptProps = {
-        title: <h2 className="wz-modal-restart-title">Synchronization failed</h2>,
+        title: <h2 className="wz-modal-restart-title">File deployment failure</h2>,
         body: (
           <>
             <RenderBodyModal
@@ -212,7 +221,7 @@ export const RestartModal = (props: { isSyncCanceled?: {}; cancelSync? }) => {
       emptyPromptProps = {
         title: (
           <>
-            <h2 className="wz-modal-restart-title">Ensuring deployment</h2>
+            <h2 className="wz-modal-restart-title">Ensure the deployment of files</h2>
           </>
         ),
         body: (
