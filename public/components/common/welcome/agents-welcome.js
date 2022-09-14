@@ -536,25 +536,19 @@ class AgentsWelcome extends Component {
 
     return (
       <div className="wz-module wz-module-welcome">
-        <div className='wz-module-header-agent-wrapper'>
-          <div className='wz-module-header-agent wz-module-header-agent-main'>
-            {title}
-          </div>
-        </div>
-        <div>
-          <div className='wz-module-header-nav-wrapper'>
-            <div className='wz-module-header-nav'>
-              <div style={{ margin: '0 16px' }}>
-                <EuiPanel grow paddingSize='s' className="wz-welcome-page-agent-info">
-                  <AgentInfo agent={this.props.agent} isCondensed={false} hideActions={true} {...this.props}></AgentInfo>
-                </EuiPanel>
-              </div>
-            </div>
-          </div>
-        </div>
         <div className='wz-module-body wz-module-agents-padding-responsive'>
           <EuiPage>
             <EuiPageBody component="div">
+              <div className='wz-module-header-agent wz-module-header-agent-main'>
+                  {title}
+              </div>
+              <div className='wz-module-header-nav'>
+                <div style={{ margin: '0 16px' }}>
+                  <EuiPanel grow paddingSize='s' className="wz-welcome-page-agent-info">
+                    <AgentInfo agent={this.props.agent} isCondensed={false} hideActions={true} {...this.props}></AgentInfo>
+                  </EuiPanel>
+                </div>
+              </div>
               <EuiFlexGroup>
                 <EuiFlexItem />
                 <EuiFlexItem style={{ alignItems: 'flex-end', marginTop: 6, marginBottom: 10 }}> {/* DatePicker */}
