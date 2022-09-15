@@ -24,6 +24,9 @@ export const useFormFieldChanged = (field, initialValue: any, { onChange: onChan
   const [validationError, setValidationError] = useState(null);
 
   function onChange(event){
+    if (!event) {
+      return;
+    }
     const inputValue = getValueFromEvent(event, type);
     const currentValue = transformUIInputValue ? transformUIInputValue(inputValue) : inputValue;
     const error = validate ? validate(currentValue) : false;
