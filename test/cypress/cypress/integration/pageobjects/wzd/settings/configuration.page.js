@@ -1,7 +1,7 @@
 export const CONFIGURATION_PAGE = {
   settingTitle: 'div > h2.euiTitle',
   settingToolTip: 'div > h2.euiTitle > .euiToolTipAnchor',
-  settingSubTitle: '.euiPage .euiFlexItem:nth-child(1) .euiFlexItem:nth-child(2) .euiText.euiText--medium div',
+  settingSubTitle: '.euiPage .euiPageBody .euiFlexItem .euiText .euiTextColor:contains("Configuration file located at /usr/share/kibana/data/wazuh/config/wazuh.yml") ',
   settingSearchBox: '.euiPage .euiFlexItem:nth-child(1) .euiFlexItem:nth-child(2).euiSearchBar__searchHolder',
   settingCategoriesButton: '.euiPage header .euiFlexItem .euiFilterGroup',
   settingCategotiesPanel: '.euiPageBody .euiPanel',
