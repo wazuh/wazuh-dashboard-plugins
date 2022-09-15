@@ -16,6 +16,9 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Endpoint `/agents/summary/status` response was adapted. [#3874](https://github.com/wazuh/wazuh-kibana-app/pull/3874)
 - Changed loading icons of the Agents Overview section to work independently [#4363](https://github.com/wazuh/wazuh-kibana-app/pull/4363)
 
+### Removed
+- Removed custom styles from kibana 7.9.0 [#4491](https://github.com/wazuh/wazuh-kibana-app/pull/4491)
+
 ### Fixed
 
 - Improved Agents Overview performance [#4363](https://github.com/wazuh/wazuh-kibana-app/pull/4363)
