@@ -19,8 +19,6 @@ Feature: Validate that the added filter label is remove after click remove filte
       | Integrity Monitoring |
       | System Auditing      |
       | Mitre & Attack       |
-      # | GDPR                 |
-      # | HIPAA                |
       | NIST                 |
       | TSC                  |
       | Policy Monitoring    |
