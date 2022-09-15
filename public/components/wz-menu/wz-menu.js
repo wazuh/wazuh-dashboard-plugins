@@ -912,10 +912,15 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
           responsive={false}
           style={{ paddingTop: 2 }}
         >
-          <EuiFlexItem grow={false} style={{ marginRight: 0 }}>
-            <img src={logotypeURL} className="navBarLogo" alt=""></img>
+          <EuiFlexItem grow={false} className="navBarLogo-wrapper">
+            <img src={logotypeURL} className="navBarLogo" alt="Menu logo"></img>
           </EuiFlexItem>
-          <EuiFlexItem grow={false} style={{ margin: '12px 6px' }}>
+          <EuiFlexItem grow={false} style={{
+            margin: '0 6px',
+            flexDirection: 'column',
+            justifyContent: 'center'
+          }}
+          >
             {this.state.menuOpened && (
               <EuiIcon color="subdued" type="arrowUp" size="l" />
             )}
