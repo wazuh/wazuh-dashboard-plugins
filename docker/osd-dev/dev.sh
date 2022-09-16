@@ -3,11 +3,15 @@
 os_versions=(
 	'1.2.4'
 	'2.0.0'
+	'2.1.0'
+	'2.2.1'
 )
 
 osd_versions=(
 	'1.2.0'
 	'2.0.0'
+	'2.1.0'
+	'2.2.1'
 )
 
 usage() {
@@ -55,8 +59,9 @@ export PASSWORD=${PASSWORD:-admin}
 export OS_VERSION=$1
 export OSD_VERSION=$2
 export OSD_PORT=${PORT:-5601}
+export IMPOSTER_PORT=8081
 export SRC=$3
-export COMPOSE_PROJECT_NAME=os-dev
+export COMPOSE_PROJECT_NAME=os-dev-${OS_VERSION//./}
 
 case "$4" in
 	up)

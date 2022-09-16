@@ -30,9 +30,9 @@ services:
       - JAVA_OPTS="-Xmx512m -Xss512k -Dfile.encoding=UTF-8 -XX:MaxRAM=800m -XX:MaxRAMPercentage=95 -XX:MinRAMPercentage=60A"
       - MALLOC_ARENA_MAX=1
     volumes:
-      - ./config/imposter:/opt/imposter/config
+      - ../imposter:/opt/imposter/config
     ports:
-       - 8080:8080
+       - ${IMPOSTER_PORT}:8080
 
   filebeat:
     depends_on:
@@ -178,6 +178,7 @@ services:
     image: quay.io/wazuh/kbn-dev:${ES_VERSION}
     networks:
       - es-dev
+      - mon
     volumes:
       - "${SRC}:/home/node/kbn/plugins/wazuh"
       - certs:/home/node/kbn/config/certs
