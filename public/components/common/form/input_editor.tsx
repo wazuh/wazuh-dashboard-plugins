@@ -4,10 +4,10 @@ import {
 } from '@elastic/eui';
 import { IInputFormType } from './types';
 
-export const InputFormEditor = ({field, value, onChange}: IInputFormType) => {
+export const InputFormEditor = ({options, value, onChange}: IInputFormType) => {
   return (
     <EuiCodeEditor
-      mode={field.options.editor.language}
+      mode={options.editor.language}
       height='50px'
       width='100%'
       value={value}
