@@ -45,7 +45,7 @@ interface ICategoryProps {
   onChangeFieldForm: () => void
 }
 
-export const Category: React.FunctionComponent<ICategoryProps> = ({ title, items, currentConfiguration, changedConfiguration, onChangeFieldForm }) => {
+export const Category: React.FunctionComponent<ICategoryProps> = ({ title, items }) => {
   return (
     <EuiFlexItem>
       <EuiPanel paddingSize="l">
@@ -58,7 +58,7 @@ export const Category: React.FunctionComponent<ICategoryProps> = ({ title, items
         </EuiText>
         <EuiForm>
         {items.map((item, idx) => {
-            const isUpdated = changedConfiguration?.[item.key] && !changedConfiguration?.[item.key]?.error;
+            const isUpdated = item.changed && !item.error;
             return (
               <EuiDescribedFormGroup
                 fullWidth
@@ -82,13 +82,8 @@ export const Category: React.FunctionComponent<ICategoryProps> = ({ title, items
                   </EuiTitle>}
                 description={item.description} >
                   <InputForm
-                    field={{
-                      ...item,
-                      ...(item.transformUIInputValue ? {transformInputValue: item.transformUIInputValue.bind(item)} : {})
-                    }}
                     label={item.key}
-                    initialValue={item.type === EpluginSettingType.editor ? JSON.stringify(currentConfiguration[item.key]) : currentConfiguration[item.key]}
-                    onChange={onChangeFieldForm}
+                    {...item}
                   />
               </EuiDescribedFormGroup>
             )

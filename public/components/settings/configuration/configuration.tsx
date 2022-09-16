@@ -15,7 +15,7 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Header, BottomBar } from './components';
 import { useKbnLoadingIndicator} from '../../common/hooks';
-import { useFormChanged } from '../../common/form/hooks';
+import { useForm } from '../../common/form/hooks';
 import {
   EuiButton,
   EuiFlexGroup,
@@ -31,14 +31,13 @@ import { updateSelectedSettingsSection } from '../../../redux/actions/appStateAc
 import { withUserAuthorizationPrompt, withErrorBoundary, withReduxProvider } from '../../common/hocs';
 import { EpluginSettingType, PLUGIN_PLATFORM_NAME, PLUGIN_SETTINGS, PLUGIN_SETTINGS_CATEGORIES, UI_LOGGER_LEVELS, WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../../common/constants';
 import { compose } from 'redux';
-import { formatSettingValueFromForm, getSettingsDefaultList } from '../../../../common/services/settings';
+import { formatSettingValueFromForm, getSettingDefaultValue, getSettingsDefaultList } from '../../../../common/services/settings';
 import _ from 'lodash';
 import { Category } from './components/categories/components';
 import { WzRequest } from '../../../react-services';
 import { UIErrorLog, UIErrorSeverity, UILogLevel, UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { getToasts } from '../../../kibana-services';
-import path from 'path';
 import { updateAppConfig } from '../../../redux/actions/appConfigActions';
 
 export type ISetting = {
@@ -65,26 +64,25 @@ const transformToSettingsByCategories = (settings) => {
       {...pluginSettingConfiguration}
     ]
   }),{})
-  return Object.entries(settingsSortedByCategories).map(([category, categorySettings]) => {
-    return {
-      category,
-      settings: categorySettings
-    }
-  }).filter(categoryEntry => categoryEntry.settings.length);
+  return Object.entries(settingsSortedByCategories)
+    .map(([category, settings]) => ({ category,settings }))
+    .filter(categoryEntry => categoryEntry.settings.length);
 };
+
+const pluginSettingsConfigurableUI = configuration => Object.fromEntries(
+  getSettingsDefaultList()
+    .filter(pluginSetting => pluginSetting.configurableUI)
+    .map(({key, type, validate, default: initialValue, transformUIInputValue}) => ([key, {type, validate, transformUIInputValue, initialValue: type === EpluginSettingType.editor ? JSON.stringify(configuration?.[key] ?? initialValue) : (configuration?.[key] ?? initialValue) }]))
+);
+
 
 const WzConfigurationSettingsProvider = (props) => {
   const [loading, setLoading ] = useKbnLoadingIndicator();
   const [query, setQuery] = useState('');
-  const [settingsByCategories, setSettingsByCategories] = useState(transformToSettingsByCategories(pluginSettingConfigurableUI));
+  // const [settingsByCategories, setSettingsByCategories] = useState(transformToSettingsByCategories(pluginSettingConfigurableUI));
   const currentConfiguration = useSelector(state => state.appConfig.data);
 
-  const {
-    onChangeFormField,
-    fieldsCount,
-    fieldsErrorCount,
-    fields: changedConfiguration,
-    onFormFieldReset } = useFormChanged();
+  const { fields, changed, errors, doneChanges, undoneChanges } = useForm(pluginSettingsConfigurableUI(currentConfiguration));
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -93,38 +91,28 @@ const WzConfigurationSettingsProvider = (props) => {
 
   const onChangeSearchQuery = (query) => {
     setQuery(query);
-    const search = Query.execute(query.query || query, pluginSettingConfigurableUI, ['description', 'key', 'title']);
+  };
 
-    if(search){
-      const result = transformToSettingsByCategories(search);
-      setSettingsByCategories(result);      
-    };
-  }
+  const visibleSettings = Object.entries(fields)
+    .map(([fieldKey, fieldForm]) => ({
+      ...fieldForm,
+      key: fieldKey,
+      category: PLUGIN_SETTINGS_CATEGORIES[PLUGIN_SETTINGS[fieldKey].category].title,
+      type: PLUGIN_SETTINGS[fieldKey].type,
+      options: PLUGIN_SETTINGS[fieldKey]?.options,
+      title: PLUGIN_SETTINGS[fieldKey]?.title,
+      description: PLUGIN_SETTINGS[fieldKey]?.description
+    }));
 
   // https://github.com/elastic/eui/blob/aa4cfd7b7c34c2d724405a3ecffde7fe6cf3b50f/src/components/search_bar/query/query.ts#L138-L163
-  // const search = Query.execute(query.query || query, pluginSettingConfigurableUI, ['description', 'key', 'title']);
-  // let settingsByCategories = [];
+  const search = Query.execute(query.query || query, visibleSettings, ['description', 'key', 'title']);
 
-  // if(search){
-  //   const settingsSortedByCategories = search.reduce((accum, pluginSettingConfiguration) => ({
-  //     ...accum,
-  //     [pluginSettingConfiguration.category]: [
-  //       ...(accum[pluginSettingConfiguration.category] || []),
-  //       {...pluginSettingConfiguration}
-  //     ]
-  //   }),{})
-  //   settingsByCategories = Object.entries(settingsSortedByCategories).map(([category, categorySettings]) => {
-  //     return {
-  //       category,
-  //       settings: categorySettings
-  //     }
-  //   }).filter(categoryEntry => categoryEntry.settings.length);
-  // };
+  const visibleCategories = transformToSettingsByCategories(search || visibleSettings);
 
   const onSave = async () => {
     setLoading(true);
     try {
-      const settingsToUpdate = Object.entries(changedConfiguration).reduce((accum, [pluginSettingKey, {currentValue}]) => {
+      const settingsToUpdate = Object.entries(changed).reduce((accum, [pluginSettingKey, currentValue]) => {
         if(PLUGIN_SETTINGS[pluginSettingKey].configurableFile){
           accum.saveOnConfigurationFile = {
             ...accum.saveOnConfigurationFile,
@@ -163,7 +151,7 @@ const WzConfigurationSettingsProvider = (props) => {
       successToast();
 
       // Reset the form changed configuration
-      onFormFieldReset();
+      doneChanges();
     } catch (error) {
       const options: UIErrorLog = {
         context: `${WzConfigurationSettingsProvider.name}.onSave`,
@@ -199,23 +187,21 @@ const WzConfigurationSettingsProvider = (props) => {
             }]}/>
         </EuiPageHeader>
         <EuiFlexGroup direction='column'>
-          {settingsByCategories && settingsByCategories.map(({category, settings}) => ( 
+          {visibleCategories && visibleCategories.map(({category, settings}) => ( 
             <Category 
               key={`configuration_category_${category}`}
               title={category}
               items={settings}
-              currentConfiguration={currentConfiguration}
-              changedConfiguration={changedConfiguration} 
-              onChangeFieldForm={onChangeFormField} />
+            />
             )
           )}
         </EuiFlexGroup>
         <EuiSpacer size="xxl" />
-        {fieldsCount > 0 && (
+        {Object.keys(changed).length > 0 && (
           <BottomBar
-            errorsCount={fieldsErrorCount}
-            totalCount={fieldsCount}
-            onCancel={onFormFieldReset}
+            errorsCount={Object.keys(errors).length}
+            unsavedCount={Object.keys(changed).length}
+            onCancel={undoneChanges}
             onSave={onSave}
           />
         )}
