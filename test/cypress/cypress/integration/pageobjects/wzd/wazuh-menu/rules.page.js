@@ -6,7 +6,7 @@ export const RULES_PAGE = {
   listPagesSelector: 'nav[class="euiPagination"]',
   customRulesButtonSelector: '.euiButtonGroup .euiButton.euiButton--text',
   firstCustomRule: '[data-test-subj="row-100001"]',
-  xmlRuleFile:'.euiBasicTable .euiTable :nth-child(6) :nth-child(2) .euiToolTipAnchor',
+  xmlRuleFile:'.euiBasicTable .euiTable :nth-child(6) :nth-child(2) .euiToolTipAnchor .euiLink:contains("local_rules.xml")',
   codeEditorSelector: '.euiFlexItem [data-test-subj="codeEditorContainer"]',
   backButtonSelector: '.euiFlexGroup .euiFlexItem .euiToolTipAnchor .euiButtonIcon',
   confirmModalSelector: '[data-test-subj="confirmModalTitleText"]',
