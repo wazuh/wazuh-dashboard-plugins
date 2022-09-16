@@ -195,6 +195,7 @@ function HealthCheckComponent() {
       );
     });
   };
+  
   const addTagsToUrl = (error) => {
     const words = error.split(' ');
     words.forEach((word, index) => {
@@ -217,6 +218,7 @@ function HealthCheckComponent() {
     });
     return words.join(' ');
   };
+
   const renderErrors = () => {
     return Object.keys(checkErrors).map((checkID) => 
       checkErrors[checkID].map((error, index) => (
