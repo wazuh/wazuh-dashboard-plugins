@@ -11,6 +11,7 @@ elastic_versions=(
 	"7.17.3"
 	"7.17.4"
 	"7.17.5"
+	"7.17.6"
 )
 
 wazuh_api_version=(

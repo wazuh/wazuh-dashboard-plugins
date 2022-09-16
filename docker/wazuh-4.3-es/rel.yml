@@ -28,7 +28,6 @@ services:
     networks:
       - es-rel
     <<: *logging
-    # restart: always
     environment:
       - INDEXER_URL=https://es01:9200
       - INDEXER_USERNAME=elastic
@@ -304,15 +303,10 @@ networks:
 
 volumes:
   certs:
-    driver: local
   esdata01:
-    driver: local
   esdata02:
-    driver: local
   esdata03:
-    driver: local
   kibanadata:
-    driver: local
   wazuh_api_configuration:
   wazuh_etc:
   wazuh_logs:
