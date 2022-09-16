@@ -15,6 +15,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Improve alerts summary performance [#4376](https://github.com/wazuh/wazuh-kibana-app/pull/4376)
 - Endpoint `/agents/summary/status` response was adapted. [#3874](https://github.com/wazuh/wazuh-kibana-app/pull/3874)
 - Makes Agents Overview loading icons independent [#4363](https://github.com/wazuh/wazuh-kibana-app/pull/4363)
+- Enhance the message shown when a mismatch between Wazuh API and Wazuh APP occurs [#4529](https://github.com/wazuh/wazuh-kibana-app/pull/4529)
 
 ### Fixed
 
