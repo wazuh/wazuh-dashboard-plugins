@@ -4,10 +4,10 @@ import {
 } from '@elastic/eui';
 import { IInputFormType } from './types';
 
-export const InputFormSwitch = ({ field, value, onChange }: IInputFormType) => {
+export const InputFormSwitch = ({ options, value, onChange, ...rest }: IInputFormType) => {
 	return (
 		<EuiSwitch
-			label={field.options.switch.values[value ? 'enabled': 'disabled'].label}
+			label={options.switch.values[value ? 'enabled': 'disabled'].label}
 			checked={value}
 			onChange={onChange}
 		/>

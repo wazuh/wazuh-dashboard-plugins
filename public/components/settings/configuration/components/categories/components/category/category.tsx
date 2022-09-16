@@ -20,21 +20,12 @@ import {
   EuiForm,
   EuiDescribedFormGroup,
   EuiTitle,
-  EuiFormRow
 } from '@elastic/eui';
 import { EuiIconTip } from '@elastic/eui';
-import { EpluginSettingType, TPluginSettingWithKey, UI_LOGGER_LEVELS } from '../../../../../../../../common/constants';
+import { TPluginSettingWithKey } from '../../../../../../../../common/constants';
 import { getPluginSettingDescription } from '../../../../../../../../common/services/settings';
 import classNames from 'classnames';
 import { InputForm } from '../../../../../../common/form';
-import { getErrorOrchestrator } from '../../../../../../../react-services/common-services';
-import { UI_ERROR_SEVERITIES } from '../../../../../../../react-services/error-orchestrator/types';
-import { updateAppConfig } from '../../../../../../../redux/actions/appConfigActions';
-import { WzRequest } from '../../../../../../../react-services';
-import { WzButtonModalConfirm } from '../../../../../../common/buttons';
-import { useDispatch } from 'react-redux';
-import { getHttp } from '../../../../../../../kibana-services';
-import { getAssetURL } from '../../../../../../../utils/assets';
 
 
 interface ICategoryProps {
@@ -45,7 +36,7 @@ interface ICategoryProps {
   onChangeFieldForm: () => void
 }
 
-export const Category: React.FunctionComponent<ICategoryProps> = ({ title, items, currentConfiguration, changedConfiguration, onChangeFieldForm }) => {
+export const Category: React.FunctionComponent<ICategoryProps> = ({ title, items }) => {
   return (
     <EuiFlexItem>
       <EuiPanel paddingSize="l">
@@ -58,22 +49,20 @@ export const Category: React.FunctionComponent<ICategoryProps> = ({ title, items
         </EuiText>
         <EuiForm>
         {items.map((item, idx) => {
-            const isUpdated = changedConfiguration?.[item.key] && !changedConfiguration?.[item.key]?.error;
-            const error = changedConfiguration?.[item.key]?.error;
-            
+            const isUpdated = item.changed && !item.error;
             return (
               <EuiDescribedFormGroup
                 fullWidth
                 key={idx}
                 className={classNames('mgtAdvancedSettings__field', {
                   'mgtAdvancedSettings__field--unsaved': isUpdated,
-                  'mgtAdvancedSettings__field--invalid': error
+                  'mgtAdvancedSettings__field--invalid': item.error
                 })}
                 title={
                   <EuiTitle className="mgtAdvancedSettings__fieldTitle" size="s">
                     <span>
                       {item.title}
-                      {error && (
+                      {item.error && (
                         <EuiIconTip
                         anchorClassName="mgtAdvancedSettings__fieldTitleUnsavedIcon"
                         type='alert'
@@ -93,14 +82,8 @@ export const Category: React.FunctionComponent<ICategoryProps> = ({ title, items
                   </EuiTitle>}
                 description={item.description} >
                   <InputForm
-                    field={{
-                      ...item,
-                      ...(item.transformUIInputValue ? {transformInputValue: item.transformUIInputValue.bind(item)} : {}),
-                      ...(item.validate ? {validate: item.validate.bind(item)} : {})
-                    }}
                     label={item.key}
-                    initialValue={item.type === EpluginSettingType.editor ? JSON.stringify(currentConfiguration[item.key]) : currentConfiguration[item.key]}
-                    onChange={onChangeFieldForm}
+                    {...item}
                   />
               </EuiDescribedFormGroup>
             )

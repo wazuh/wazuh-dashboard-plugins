@@ -23,16 +23,16 @@ import {
 } from '@elastic/eui';
 
 interface IBottomBarProps {
-  totalCount: number
+  unsavedCount: number
   errorsCount: number
   onCancel: () => void
   onSave: () => void
 }
 
-export const BottomBar: React.FunctionComponent<IBottomBarProps> = ({ totalCount, errorsCount, onCancel, onSave }) => (
+export const BottomBar: React.FunctionComponent<IBottomBarProps> = ({ unsavedCount, errorsCount, onCancel, onSave }) => (
   <EuiBottomBar paddingSize="m">
       <EuiFlexGroup alignItems='center' justifyContent='spaceBetween' gutterSize='s'>
-        <SettingLabel count={totalCount} errors={errorsCount}/>
+        <SettingLabel count={unsavedCount} errors={errorsCount}/>
         <CancelButton onClick={onCancel} />
         <SaveButton onClick={onSave} isDisabled={Boolean(errorsCount)}/>
       </EuiFlexGroup>
