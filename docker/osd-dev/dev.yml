@@ -38,7 +38,7 @@ services:
     image: cfssl/cfssl
     volumes:
       - certs:/certs/
-      - ./config/certs:/conf
+      - ./config/${OSD_MAJOR}/certs:/conf
       - os_logs:/logs
       - os_data:/data
     entrypoint: /bin/bash
@@ -112,10 +112,10 @@ services:
         hard: 65536
     volumes:
       - certs:/usr/share/opensearch/config/certs/
-      - ./config/os/opensearch.yml:/usr/share/opensearch/config/opensearch.yml
-      - ./config/os/internal_users.yml:/usr/share/opensearch/plugins/opensearch-security/securityconfig/internal_users.yml
-      - ./config/os/roles_mapping.yml:/usr/share/opensearch/plugins/opensearch-security/securityconfig/roles_mapping.yml
-      - ./config/os/roles.yml:/usr/share/opensearch/plugins/opensearch-security/securityconfig/roles.yml  
+      - ./config/${OSD_MAJOR}/os/opensearch.yml:/usr/share/opensearch/config/opensearch.yml
+      - ./config/${OSD_MAJOR}/os/internal_users.yml:/usr/share/opensearch/plugins/opensearch-security/securityconfig/internal_users.yml
+      - ./config/${OSD_MAJOR}/os/roles_mapping.yml:/usr/share/opensearch/plugins/opensearch-security/securityconfig/roles_mapping.yml
+      - ./config/${OSD_MAJOR}/os/roles.yml:/usr/share/opensearch/plugins/opensearch-security/securityconfig/roles.yml  
       - os_logs:/var/log/os1
       - os_data:/var/lib/os1
     networks:
@@ -152,7 +152,7 @@ services:
       '
     volumes:
       - certs:/etc/ssl/elastic
-      - ./config/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - ./config/${OSD_MAJOR}/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
 
   osd:
     depends_on:
@@ -174,8 +174,8 @@ services:
       - osd_cache:/home/node/.cache
       - "${SRC}:/home/node/kbn/plugins/wazuh"
       - certs:/home/node/kbn/certs/
-      - ./config/osd/opensearch_dashboards.yml:/home/node/kbn/config/opensearch_dashboards.yml
-      - ./config/osd/wazuh.yml:/home/node/kbn/data/wazuh/config/wazuh.yml
+      - ./config/${OSD_MAJOR}/osd/opensearch_dashboards.yml:/home/node/kbn/config/opensearch_dashboards.yml
+      - ./config/${OSD_MAJOR}/osd/wazuh.yml:/home/node/kbn/data/wazuh/config/wazuh.yml
 
 networks:
   os-dev:

@@ -59,7 +59,7 @@ export LICENSE=basic # or trial
 export KIBANA_PORT=${PORT:-5601}
 export IMPOSTER_PORT=8081
 export SRC=$2
-export COMPOSE_PROJECT_NAME=es-dev-${ES_VERSION//./} # /./ removes dots: 7.10.2 => 7102
+COMPOSE_PROJECT_NAME=es-dev-${ES_VERSION//./} # /./ removes dots: 7.10.2 => 7102
 
 case "$3" in
 	up)
