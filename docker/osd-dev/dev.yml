@@ -21,11 +21,11 @@ services:
 
   imposter:
     image: outofcoffee/imposter
+    <<: *logging
     hostname: imposter-osd-${OS_VERSION}
     networks:
       - os-dev
       - mon
-    <<: *logging
     environment:
       - JAVA_OPTS="-Xmx512m -Xss512k -Dfile.encoding=UTF-8 -XX:MaxRAM=800m -XX:MaxRAMPercentage=95 -XX:MinRAMPercentage=60A"
       - MALLOC_ARENA_MAX=1
@@ -120,6 +120,7 @@ services:
       - os_data:/var/lib/os1
     networks:
       - os-dev
+      - devel
     healthcheck:
       test: ["CMD-SHELL", "curl -s --cacert config/certs/ca.pem https://os1:9200 | grep -q 'Unauthorized'"]
       interval: 1s
@@ -141,12 +142,12 @@ services:
       - '/bin/bash'
     command: >
       -c '
-        mkdir -p /etc/filebeat
         echo admin | filebeat keystore add username --stdin --force
         echo ${PASSWORD}| filebeat keystore add password --stdin --force
         curl -so /etc/filebeat/wazuh-template.json https://raw.githubusercontent.com/wazuh/wazuh/4.3/extensions/elasticsearch/7.x/wazuh-template.json
         curl -s https://packages.wazuh.com/4.x/filebeat/wazuh-filebeat-0.2.tar.gz | tar -xvz -C /usr/share/filebeat/module
         chmod go-w /usr/share/filebeat/filebeat.yml
+        chown root:root /usr/share/filebeat/filebeat.yml
         filebeat setup -e
         filebeat
       '
@@ -182,6 +183,8 @@ networks:
     name: os-dev-${OS_VERSION}
     driver: bridge
   mon:
+    external: true
+  devel:
     external: true
 
 volumes:
