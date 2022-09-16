@@ -14,7 +14,7 @@
 
 import { AppState, GenericRequest, WzRequest } from '../../../react-services';
 import { CheckLogger } from '../types/check_logger';
-import { PLUGIN_APP_NAME, PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_TROUBLESHOOTING } from '../../../../common/constants';
+import { PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_TROUBLESHOOTING, PLUGIN_APP_NAME } from '../../../../common/constants';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
 
 export const checkSetupService = appInfo => async (checkLogger: CheckLogger) => {
