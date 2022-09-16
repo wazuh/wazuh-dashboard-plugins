@@ -29,23 +29,46 @@ import { setErrorOrchestrator } from './react-services/common-services';
 import { ErrorOrchestratorService } from './react-services/error-orchestrator/error-orchestrator.service';
 import { getThemeAssetURL, getAssetURL } from './utils/assets';
 import { WzRequest } from './react-services/wz-request';
+import store from './redux/store';
+import { updateAppConfig } from './redux/actions/appConfigActions';
+
+const SIDEBAR_LOGO = 'customization.logo.sidebar';
 const innerAngularName = 'app/wazuh';
+
 export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlugins, WazuhStartPlugins> {
   constructor(private readonly initializerContext: PluginInitializerContext) {}
   public initializeInnerAngular?: () => void;
   private innerAngularInitialized: boolean = false;
   private stateUpdater = new BehaviorSubject<AppUpdater>(() => ({}));
   private hideTelemetryBanner?: () => void;
-  public setup(core: CoreSetup, plugins: WazuhSetupPlugins): WazuhSetup {
+  public async setup(core: CoreSetup, plugins: WazuhSetupPlugins): WazuhSetup {
     const UI_THEME = core.uiSettings.get('theme:darkMode') ? 'dark' : 'light';
+    
+    //Get custom logos configuration to start up the app with the correct logos
+    let logosInitialState={};
+    try{
+      logosInitialState = await core.http.get(`/api/get-logos`);
+    }
+    catch(error){
+      console.error('plugin.ts: Error getting logos configuration', error);
+    }
+
     core.application.register({
       id: `wazuh`,
       title: 'Wazuh',
-      icon: core.http.basePath.prepend(getThemeAssetURL('icon.svg', UI_THEME)),
+      icon: core.http.basePath.prepend(
+        logosInitialState?.logos?.[SIDEBAR_LOGO] ?
+          getAssetURL(logosInitialState?.logos?.[SIDEBAR_LOGO]) :
+          getThemeAssetURL('icon.svg', UI_THEME)),
       mount: async (params: AppMountParameters) => {
         try {
           if (!this.initializeInnerAngular) {
             throw Error('Wazuh plugin method initializeInnerAngular is undefined');
+          }
+
+          // Update redux app state logos with the custom logos
+          if (logosInitialState?.logos) {
+            store.dispatch(updateAppConfig(logosInitialState.logos));
           }
           // hide the telemetry banner.
           // Set the flag in the telemetry saved object as the notice was seen and dismissed
@@ -67,7 +90,7 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
             'GET',
             `/api/check-wazuh`,
           )
-          
+
           params.element.classList.add('dscAppWrapper', 'wz-app');
           const unmount = await renderApp(innerAngularName, params.element);
           //Update if user has Wazuh disabled
@@ -81,7 +104,7 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
                 id: 'wazuh',
                 label: 'Wazuh',
                 order: 0,
-                euiIconType: core.http.basePath.prepend(response.data.logoSidebar ? getAssetURL(response.data.logoSidebar) : getThemeAssetURL('icon.svg', UI_THEME)),
+                euiIconType: core.http.basePath.prepend(logosInitialState?.logos?.[SIDEBAR_LOGO] ? getAssetURL(logosInitialState?.logos?.[SIDEBAR_LOGO]) : getThemeAssetURL('icon.svg', UI_THEME)),
               }}
           })
           return () => {
@@ -95,7 +118,7 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
         id: 'wazuh',
         label: 'Wazuh',
         order: 0,
-        euiIconType: core.http.basePath.prepend(getThemeAssetURL('icon.svg', UI_THEME)),
+        euiIconType: core.http.basePath.prepend(logosInitialState?.logos?.[SIDEBAR_LOGO] ? getAssetURL(logosInitialState?.logos?.[SIDEBAR_LOGO]) : getThemeAssetURL('icon.svg', UI_THEME)),
       },
       updater$: this.stateUpdater
     });
