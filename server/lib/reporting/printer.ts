@@ -56,7 +56,7 @@ const pageConfiguration = ({pathToLogo, pageHeader, pageFooter}) => ({
     columns: [
       {
         image: path.join(__dirname, `../../../public/assets/${pathToLogo}`),
-        width: 190
+        fit: [190,50]
       },
       {
         text: pageHeader,
