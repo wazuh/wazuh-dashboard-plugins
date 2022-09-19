@@ -151,7 +151,7 @@ const WzConfigurationSettingsProvider = (props) => {
 
       const requests = [];
 
-      // Update the settings that doesn't upload file
+      // Update the settings that doesn't upload a file
       if(Object.keys(settingsToUpdate.saveOnConfigurationFile).length){
         requests.push(WzRequest.genericReq(
           'PUT', '/utils/configuration',
@@ -159,7 +159,7 @@ const WzConfigurationSettingsProvider = (props) => {
         ));
       };
 
-      // Update the settings that doesn't upload file
+      // Update the settings that uploads a file
       if(Object.keys(settingsToUpdate.fileUpload).length){
         requests.push(...Object.entries(settingsToUpdate.fileUpload)
           .map(([pluginSettingKey, {file, extension}]) => {
@@ -191,6 +191,28 @@ const WzConfigurationSettingsProvider = (props) => {
           }
         },{})
       }));
+
+      // Remove the selected files on the file picker inputs
+      if(Object.keys(settingsToUpdate.fileUpload).length){
+        Object.keys(settingsToUpdate.fileUpload).forEach(settingKey => {
+          console.log({dsadsa: fields[settingKey].inputRef});
+          try{
+            fields[settingKey].inputRef.removeFiles(
+              // This method uses some methods of a DOM event.
+              // Because we want to remove the files when the configuration is saved,
+              // there is no event, so we create a object that contains the
+              // methods used to remove the files. Of this way, we can skip the errors
+              // due to missing methods.
+              // This workaround is based in @elastic/eui v29.3.2
+              // https://github.com/elastic/eui/blob/v29.3.2/src/components/form/file_picker/file_picker.tsx#L107-L108
+              {stopPropagation: () => {}, preventDefault: () => {}}
+            );
+          }catch(error){
+            // TODO: There is an error related to accessing to `target` of undefined
+            // that we should review it.
+          }
+        });
+      };
 
       // Show the success toast
       successToast();

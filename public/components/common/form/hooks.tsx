@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import _ from 'lodash';
 import { EpluginSettingType } from '../../../../common/constants';
 
@@ -23,6 +23,8 @@ export const useForm = (fields) => {
     }
   }), {}));
 
+  const fieldRefs = useRef({});
+
   const enhanceFields = Object.entries(formFields).filter(f => {return f}).reduce((accum, [fieldKey, fieldState]) => ({
     ...accum,
     [fieldKey]: {
@@ -31,6 +33,8 @@ export const useForm = (fields) => {
       value: fieldState.currentValue,
       changed: !_.isEqual(fieldState.initialValue, fieldState.currentValue),
       error: fields[fieldKey]?.validate?.(fieldState.currentValue),
+      setInputRef: (reference) => {fieldRefs.current[fieldKey] = reference},
+      inputRef: fieldRefs.current[fieldKey],
       onChange: (event) => {
         const inputValue = getValueFromEvent(event, fields[fieldKey].type);
         const currentValue = fields[fieldKey]?.transformInputValue?.(inputValue) ?? inputValue;
