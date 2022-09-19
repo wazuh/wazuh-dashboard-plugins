@@ -662,7 +662,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		configurableUI: true,
 		validate: composeValidate(validateStringNoEmpty, validateStringNoSpaces),
 		validateBackend: function(schema){
-			return schema.string({minLength: 1, validate: this.validate});
+			return schema.string({validate: this.validate});
 		},
 	},
 	"cron.statistics.apis": {
@@ -690,8 +690,8 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		},
 		validate: validateJSONArrayOfStrings,
 		validateBackend: function(schema){
-			return schema.string(this.validate);
-		}
+			return schema.string({validate: this.validate});
+		},
 	},
 	"cron.statistics.index.creation": {
 		title: "Index creation",
@@ -761,7 +761,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 			return validateNumber(this.options.number)(value)
 		},
 		validateBackend: function(schema){
-			return schema.number({...this.options.number});
+			return schema.number({validate: this.validate});
 		},
 	},
 	"cron.statistics.index.shards": {
@@ -782,7 +782,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 			return validateNumber(this.options.number)(value)
 		},
 		validateBackend: function(schema){
-			return schema.number({...this.options.number});
+			return schema.number({validate: this.validate});
 		},
 	},
 	"cron.statistics.interval": {
@@ -794,7 +794,9 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		configurableFile: true,
 		configurableUI: true,
 		requireRestart: true,
-		validate: (value: string) => validateNodeCronInterval(value) ? undefined : "Interval is not valid.",
+		validate: function(value: string){
+			return validateNodeCronInterval(value) ? undefined : "Interval is not valid."
+		},
 		validateBackend: function(schema){
 			return schema.string({validate: this.validate});
 		},
@@ -886,8 +888,8 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		},
 		validate: validateJSONArrayOfStrings,
 		validateBackend: function(schema){
-			return schema.string({validate: this.validate});
-		}
+			return schema.arrayOf(schema.string({minLength: 1}));
+		},
 	},
 	"enrollment.dns": {
 		title: "Enrollment DNS",
@@ -897,9 +899,9 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		default: "",
 		configurableFile: true,
 		configurableUI: true,
-		validate: composeValidate(validateStringNoEmpty, validateStringNoSpaces),
+		validate: validateStringNoSpaces,
 		validateBackend: function(schema){
-			return schema.string({minLenght: 1, validate: this.validate});
+			return schema.string({validate: this.validate});
 		},
 	},
 	"enrollment.password": {
@@ -912,7 +914,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		configurableUI: false,
 		validate: validateStringNoEmpty,
 		validateBackend: function(schema){
-			return schema.string({minLength: 1, validate: this.validate});
+			return schema.string({validate: this.validate});
 		},
 	},
 	"extensions.audit": {
