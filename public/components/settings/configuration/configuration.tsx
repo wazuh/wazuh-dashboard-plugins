@@ -72,7 +72,25 @@ const transformToSettingsByCategories = (settings) => {
 const pluginSettingsConfigurableUI = configuration => Object.fromEntries(
   getSettingsDefaultList()
     .filter(pluginSetting => pluginSetting.configurableUI)
-    .map(({key, type, validate, default: initialValue, transformUIInputValue}) => ([key, {type, validate, transformUIInputValue, initialValue: type === EpluginSettingType.editor ? JSON.stringify(configuration?.[key] ?? initialValue) : (configuration?.[key] ?? initialValue) }]))
+    .map(({
+      key,
+      type,
+      validate,
+      default: initialValue,
+      transformUIInputValue,
+      toUIInput,
+      toUIOutput,
+      ...rest
+    }) => ([
+      key, 
+      {
+        type,
+        validate: validate?.bind?.(rest),
+        transformInputValue: transformUIInputValue?.bind?.(rest),
+        transformOutputValue: toUIOutput?.bind?.(rest),
+        initialValue: toUIInput ? toUIInput.bind(rest)(configuration?.[key] ?? initialValue) : (configuration?.[key] ?? initialValue)
+      }
+    ]))
 );
 
 

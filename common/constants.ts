@@ -417,7 +417,9 @@ export type TpluginSetting = {
 	requireReload?: boolean
 	requireRestart?: boolean
 	options?: TpluginSettingOptionsChoices | TpluginSettingOptionsNumber | TpluginSettingOptionsEditor | TpluginSettingOptionsSwitch
-	transformUIInputValue?: (value: boolean | string) => boolean
+	toUIInput?: (value: any) => any
+	transformUIInputValue?: (value: any) => any
+	toUIOutput?: (value: any) => any
 };
 
 export type TPluginSettingWithKey = TpluginSetting & { key: string };
@@ -651,6 +653,16 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 				language: 'json'
 			}
 		},
+		toUIInput: function(value : any): any{
+			return JSON.stringify(value);
+		},
+		toUIOutput: function(value: string): any{
+			try{
+				return JSON.parse(value);
+			}catch(error){
+				return value;
+			};
+		},
 	},
 	"cron.statistics.index.creation": {
 		title: "Index creation",
@@ -802,6 +814,16 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 			editor: {
 				language: 'json'
 			}
+		},
+		toUIInput: function(value : any): any{
+			return JSON.stringify(value);
+		},
+		toUIOutput: function(value: string): any{
+			try{
+				return JSON.parse(value);
+			}catch(error){
+				return value;
+			};
 		},
 	},
 	"enrollment.dns": {
@@ -1135,6 +1157,16 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 			editor: {
 				language: 'json'
 			}
+		},
+		toUIInput: function(value : any): any{
+			return JSON.stringify(value);
+		},
+		toUIOutput: function(value: string): any{
+			try{
+				return JSON.parse(value);
+			}catch(error){
+				return value;
+			};
 		},
 	},
 	"ip.selector": {
