@@ -9,8 +9,7 @@
     "C": "US",
     "L": "California",
     "O": "Wazuh",
-    "OU": "Wazuh",
-    "ST": "United States"
+    "OU": "Wazuh"
   }
   ],
   "hosts": [

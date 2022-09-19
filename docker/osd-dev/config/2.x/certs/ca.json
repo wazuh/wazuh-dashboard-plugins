@@ -9,8 +9,7 @@
     "C": "US",
     "L": "San Francisco",
     "O": "Wazuh",
-    "OU": "Wazuh Root CA",
-    "ST": "United States"
+    "OU": "Wazuh Root CA"
   }
  ]
 }
