@@ -278,7 +278,6 @@ export const AgentsPreview = compose(
                                   </a>
                                 </EuiToolTip>
                               }
-                              className="last-agents-link"
                               titleSize="s"
                               description="Most active agent"
                               titleColor="primary"
