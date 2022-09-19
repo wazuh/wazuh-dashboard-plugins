@@ -37,7 +37,7 @@ export const useForm = (fields) => {
       inputRef: fieldRefs.current[fieldKey],
       onChange: (event) => {
         const inputValue = getValueFromEvent(event, fields[fieldKey].type);
-        const currentValue = fields[fieldKey]?.transformInputValue?.(inputValue) ?? inputValue;
+        const currentValue = fields[fieldKey]?.transformChangedInputValue?.(inputValue) ?? inputValue;
         setFormFields(state => ({
           ...state,
           [fieldKey]: {
@@ -50,7 +50,7 @@ export const useForm = (fields) => {
   }), {});
 
   const changed = Object.fromEntries(
-    Object.entries(enhanceFields).filter(([, {changed}]) => changed).map(([fieldKey, {value}]) => ([fieldKey, fields[fieldKey]?.transformOutputValue?.(value) ?? value]))
+    Object.entries(enhanceFields).filter(([, {changed}]) => changed).map(([fieldKey, {value}]) => ([fieldKey, fields[fieldKey]?.transformChangedOutputValue?.(value) ?? value]))
   );
 
   const errors = Object.fromEntries(
