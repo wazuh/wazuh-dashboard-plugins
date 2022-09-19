@@ -558,6 +558,9 @@ resources:
   # Get files
   - method: GET
     path: /rules/files
+    response:
+      statusCode: 200
+      staticFile: rules/get_rules.json
 
   # Get rules file content
   - method: GET
@@ -652,6 +655,9 @@ resources:
   # List roles
   - method: GET
     path: /security/roles
+    response:
+      statusCode: 200
+      staticFile: security/security_roles.json
 
   # Add role
   - method: POST
@@ -684,6 +690,9 @@ resources:
   # List policies
   - method: GET
     path: /security/policies
+    response:
+      statusCode: 200
+      staticFile: security/security_policies.json
 
   # Add policy
   - method: POST
