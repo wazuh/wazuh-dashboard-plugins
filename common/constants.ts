@@ -400,7 +400,9 @@ export type TpluginSetting = {
 	requireReload?: boolean
 	requireRestart?: boolean
 	options?: TpluginSettingOptionsChoices | TpluginSettingOptionsNumber | TpluginSettingOptionsEditor | TpluginSettingOptionsSwitch
-	transformUIInputValue?: (value: boolean | string) => boolean
+	toUIInput?: (value: any) => any
+	transformUIInputValue?: (value: any) => any
+	toUIOutput?: (value: any) => any
 	validate?: (value: any) => string | undefined
 	validateBackend?: (schema: any) => any
 };
@@ -676,10 +678,20 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 				language: 'json'
 			}
 		},
+		toUIInput: function(value : any): any{
+			return JSON.stringify(value);
+		},
+		toUIOutput: function(value: string): any{
+			try{
+				return JSON.parse(value);
+			}catch(error){
+				return value;
+			};
+		},
 		validate: validateJSONArrayOfStrings,
 		validateBackend: function(schema){
 			return schema.string(this.validate);
-		},
+		}
 	},
 	"cron.statistics.index.creation": {
 		title: "Index creation",
@@ -862,10 +874,20 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 				language: 'json'
 			}
 		},
+		toUIInput: function(value : any): any{
+			return JSON.stringify(value);
+		},
+		toUIOutput: function(value: string): any{
+			try{
+				return JSON.parse(value);
+			}catch(error){
+				return value;
+			};
+		},
 		validate: validateJSONArrayOfStrings,
 		validateBackend: function(schema){
 			return schema.string({validate: this.validate});
-		},
+		}
 	},
 	"enrollment.dns": {
 		title: "Enrollment DNS",
@@ -1266,6 +1288,16 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 			editor: {
 				language: 'json'
 			}
+		},
+		toUIInput: function(value : any): any{
+			return JSON.stringify(value);
+		},
+		toUIOutput: function(value: string): any{
+			try{
+				return JSON.parse(value);
+			}catch(error){
+				return value;
+			};
 		},
 		validate: validateJSONArrayOfStrings,
 		validateBackend: function(schema){

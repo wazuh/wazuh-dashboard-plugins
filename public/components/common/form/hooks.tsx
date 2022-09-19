@@ -32,7 +32,7 @@ export const useForm = (fields) => {
       error: fields[fieldKey]?.validate?.(fieldState.currentValue),
       onChange: (event) => {
         const inputValue = getValueFromEvent(event, fields[fieldKey].type);
-        const currentValue = fields[fieldKey]?.transformUIInputValue?.(inputValue) ?? inputValue;
+        const currentValue = fields[fieldKey]?.transformInputValue?.(inputValue) ?? inputValue;
         setFormFields(state => ({
           ...state,
           [fieldKey]: {
@@ -45,7 +45,7 @@ export const useForm = (fields) => {
   }), {});
 
   const changed = Object.fromEntries(
-    Object.entries(enhanceFields).filter(([, {changed}]) => changed).map(([fieldKey, {value}]) => ([fieldKey, value]))
+    Object.entries(enhanceFields).filter(([, {changed}]) => changed).map(([fieldKey, {value}]) => ([fieldKey, fields[fieldKey]?.transformOutputValue?.(value) ?? value]))
   );
 
   const errors = Object.fromEntries(
