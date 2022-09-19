@@ -31,8 +31,7 @@ import {
   EuiToolTip,
   EuiIcon,
   EuiFlexItem,
-  EuiFlexGroup,
-  EuiEmptyPrompt
+  EuiFlexGroup
 } from '@elastic/eui';
 import {
   getAngularModule,
