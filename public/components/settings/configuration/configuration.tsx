@@ -77,18 +77,18 @@ const pluginSettingsConfigurableUI = configuration => Object.fromEntries(
       type,
       validate,
       default: initialValue,
-      transformUIInputValue,
-      toUIInput,
-      toUIOutput,
+      uiFormTransformChangedInputValue,
+      uiFormTransformConfigurationValueToInputValue,
+      uiFormTransformInputValueToConfigurationValue,
       ...rest
     }) => ([
       key, 
       {
         type,
         validate: validate?.bind?.(rest),
-        transformInputValue: transformUIInputValue?.bind?.(rest),
-        transformOutputValue: toUIOutput?.bind?.(rest),
-        initialValue: toUIInput ? toUIInput.bind(rest)(configuration?.[key] ?? initialValue) : (configuration?.[key] ?? initialValue)
+        transformChangedInputValue: uiFormTransformChangedInputValue?.bind?.(rest),
+        transformChangedOutputValue: uiFormTransformInputValueToConfigurationValue?.bind?.(rest),
+        initialValue: uiFormTransformConfigurationValueToInputValue ? uiFormTransformConfigurationValueToInputValue.bind(rest)(configuration?.[key] ?? initialValue) : (configuration?.[key] ?? initialValue)
       }
     ]))
 );

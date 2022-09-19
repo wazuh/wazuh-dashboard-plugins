@@ -400,9 +400,9 @@ export type TpluginSetting = {
 	requireReload?: boolean
 	requireRestart?: boolean
 	options?: TpluginSettingOptionsChoices | TpluginSettingOptionsNumber | TpluginSettingOptionsEditor | TpluginSettingOptionsSwitch
-	toUIInput?: (value: any) => any
-	transformUIInputValue?: (value: any) => any
-	toUIOutput?: (value: any) => any
+	uiFormTransformChangedInputValue?: (value: any) => any
+	uiFormTransformInputValueToConfigurationValue?: (value: any) => any
+	uiFormTransformConfigurationValueToInputValue?: (value: any) => any
 	validate?: (value: any) => string | undefined
 	validateBackend?: (schema: any) => any
 };
@@ -476,7 +476,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 				}
 			}
 		},
-		transformUIInputValue: function(value: boolean | string): boolean{
+		uiFormTransformChangedInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
 		},
 		validate: validateBooleanIs,
@@ -500,7 +500,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 				}
 			}
 		},
-		transformUIInputValue: function(value: boolean | string): boolean{
+		uiFormTransformChangedInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
 		},
 		validate: validateBooleanIs,
@@ -524,7 +524,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 				}
 			},
 		},
-		transformUIInputValue: function(value: boolean | string): boolean{
+		uiFormTransformChangedInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
 		},
 		validate: validateBooleanIs,
@@ -548,7 +548,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 				}
 			}
 		},
-		transformUIInputValue: function(value: boolean | string): boolean{
+		uiFormTransformChangedInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
 		},
 		validate: validateBooleanIs,
@@ -572,7 +572,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 				}
 			}
 		},
-		transformUIInputValue: function(value: boolean | string): boolean{
+		uiFormTransformChangedInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
 		},
 		validate: validateBooleanIs,
@@ -596,7 +596,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 				}
 			}
 		},
-		transformUIInputValue: function(value: boolean | string): boolean{
+		uiFormTransformChangedInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
 		},
 		validate: validateBooleanIs,
@@ -620,7 +620,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 				}
 			}
 		},
-		transformUIInputValue: function(value: boolean | string): boolean{
+		uiFormTransformChangedInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
 		},
 		validate: validateBooleanIs,
@@ -644,7 +644,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 				}
 			}
 		},
-		transformUIInputValue: function(value: boolean | string): boolean{
+		uiFormTransformChangedInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
 		},
 		validate: validateBooleanIs,
@@ -678,10 +678,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 				language: 'json'
 			}
 		},
-		toUIInput: function(value : any): any{
+		uiFormTransformConfigurationValueToInputValue: function(value : any): any{
 			return JSON.stringify(value);
 		},
-		toUIOutput: function(value: string): any{
+		uiFormTransformInputValueToConfigurationValue: function(value: string): any{
 			try{
 				return JSON.parse(value);
 			}catch(error){
@@ -817,7 +817,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 				}
 			}
 		},
-		transformUIInputValue: function(value: boolean | string): boolean{
+		uiFormTransformChangedInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
 		},
 		validate: validateBooleanIs,
@@ -876,10 +876,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 				language: 'json'
 			}
 		},
-		toUIInput: function(value : any): any{
+		uiFormTransformConfigurationValueToInputValue: function(value : any): any{
 			return JSON.stringify(value);
 		},
-		toUIOutput: function(value: string): any{
+		uiFormTransformInputValueToConfigurationValue: function(value: string): any{
 			try{
 				return JSON.parse(value);
 			}catch(error){
@@ -933,7 +933,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 				}
 			}
 		},
-		transformUIInputValue: function(value: boolean | string): boolean{
+		uiFormTransformChangedInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
 		},
 		validate: validateBooleanIs,
@@ -957,7 +957,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 				}
 			}
 		},
-		transformUIInputValue: function(value: boolean | string): boolean{
+		uiFormTransformChangedInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
 		},
 		validate: validateBooleanIs,
@@ -981,7 +981,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 				}
 			}
 		},
-		transformUIInputValue: function(value: boolean | string): boolean{
+		uiFormTransformChangedInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
 		},
 		validate: validateBooleanIs,
@@ -1005,7 +1005,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 				}
 			}
 		},
-		transformUIInputValue: function(value: boolean | string): boolean{
+		uiFormTransformChangedInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
 		},
 		validate: validateBooleanIs,
@@ -1029,7 +1029,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 				}
 			}
 		},
-		transformUIInputValue: function(value: boolean | string): boolean{
+		uiFormTransformChangedInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
 		},
 		validate: validateBooleanIs,
@@ -1053,7 +1053,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 				}
 			}
 		},
-		transformUIInputValue: function(value: boolean | string): boolean{
+		uiFormTransformChangedInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
 		},
 		validate: validateBooleanIs,
@@ -1077,7 +1077,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 				}
 			}
 		},
-		transformUIInputValue: function(value: boolean | string): boolean{
+		uiFormTransformChangedInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
 		},
 		validate: validateBooleanIs,
@@ -1101,7 +1101,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 				}
 			}
 		},
-		transformUIInputValue: function(value: boolean | string): boolean{
+		uiFormTransformChangedInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
 		},
 		validate: validateBooleanIs,
@@ -1125,7 +1125,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 				}
 			}
 		},
-		transformUIInputValue: function(value: boolean | string): boolean{
+		uiFormTransformChangedInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
 		},
 		validate: validateBooleanIs,
@@ -1149,7 +1149,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 				}
 			}
 		},
-		transformUIInputValue: function(value: boolean | string): boolean{
+		uiFormTransformChangedInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
 		},
 		validate: validateBooleanIs,
@@ -1173,7 +1173,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 				}
 			}
 		},
-		transformUIInputValue: function(value: boolean | string): boolean{
+		uiFormTransformChangedInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
 		},
 		validate: validateBooleanIs,
@@ -1197,7 +1197,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 				}
 			}
 		},
-		transformUIInputValue: function(value: boolean | string): boolean{
+		uiFormTransformChangedInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
 		},
 		validate: validateBooleanIs,
@@ -1221,7 +1221,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 				}
 			}
 		},
-		transformUIInputValue: function(value: boolean | string): boolean{
+		uiFormTransformChangedInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
 		},
 		validate: validateBooleanIs,
@@ -1245,7 +1245,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 				}
 			}
 		},
-		transformUIInputValue: function(value: boolean | string): boolean{
+		uiFormTransformChangedInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
 		},
 		validate: validateBooleanIs,
@@ -1270,7 +1270,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 				}
 			}
 		},
-		transformUIInputValue: function(value: boolean | string): boolean{
+		uiFormTransformChangedInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
 		},
 		validate: validateBooleanIs,
@@ -1291,10 +1291,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 				language: 'json'
 			}
 		},
-		toUIInput: function(value : any): any{
+		uiFormTransformConfigurationValueToInputValue: function(value : any): any{
 			return JSON.stringify(value);
 		},
-		toUIOutput: function(value: string): any{
+		uiFormTransformInputValueToConfigurationValue: function(value: string): any{
 			try{
 				return JSON.parse(value);
 			}catch(error){
@@ -1322,7 +1322,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 				}
 			}
 		},
-		transformUIInputValue: function(value: boolean | string): boolean{
+		uiFormTransformChangedInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
 		},
 		validate: validateBooleanIs,
@@ -1445,7 +1445,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 				}
 			}
 		},
-		transformUIInputValue: function(value: boolean | string): boolean{
+		uiFormTransformChangedInputValue: function(value: boolean | string): boolean{
 			return Boolean(value);
 		},
 		validate: validateBooleanIs,
