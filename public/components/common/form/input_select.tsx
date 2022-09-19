@@ -4,10 +4,10 @@ import {
 } from '@elastic/eui';
 import { IInputFormType } from './types';
 
-export const InputFormSelect = ({ field, value, onChange }: IInputFormType) => {
+export const InputFormSelect = ({ options, value, onChange }: IInputFormType) => {
 	return (
 		<EuiSelect
-			options={field.options.choices}
+			options={options.choices}
 			value={value}
 			onChange={onChange}
 		/>

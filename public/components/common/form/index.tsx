@@ -6,20 +6,13 @@ import { InputFormText } from './input_text';
 import { InputFormSelect } from './input_select';
 import { InputFormSwitch } from './input_switch';
 import { InputFormFilePicker } from './input_filepicker';
-import { useFormFieldChanged } from './hooks';
 import {
 	EuiFormRow,
 } from '@elastic/eui';
 
-export const InputForm = (props: IInputForm) => {
-  const { field, label = null, initialValue, onChange: onChangeInputForm, preInput = null, postInput = null } = props;
-  const { value, error, onChange } = useFormFieldChanged(
-    field.key,
-    initialValue,
-    { validate: field?.validate, onChange: onChangeInputForm, type: field.type, transformUIInputValue: field?.transformUIInputValue }
-  );
+export const InputForm = ({ type, value, onChange, error, label, preInput, postInput, ...rest}) => {
 
-  const ComponentInput = Input[field.type];
+  const ComponentInput = Input[type];
 
   if(!ComponentInput){
     return null;
@@ -29,11 +22,10 @@ export const InputForm = (props: IInputForm) => {
 
   const input = (
     <ComponentInput
-      {...props}
+      {...rest}
       value={value}
       onChange={onChange}
       isInvalid={isInvalid}
-      field={field}
     />
   );
 
