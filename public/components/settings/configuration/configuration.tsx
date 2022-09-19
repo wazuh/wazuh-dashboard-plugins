@@ -31,7 +31,7 @@ import { updateSelectedSettingsSection } from '../../../redux/actions/appStateAc
 import { withUserAuthorizationPrompt, withErrorBoundary, withReduxProvider } from '../../common/hocs';
 import { EpluginSettingType, PLUGIN_PLATFORM_NAME, PLUGIN_SETTINGS, PLUGIN_SETTINGS_CATEGORIES, UI_LOGGER_LEVELS, WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../../common/constants';
 import { compose } from 'redux';
-import { formatSettingValueFromForm, getSettingDefaultValue, getSettingsDefaultList } from '../../../../common/services/settings';
+import { formatSettingValueFromForm, getPluginSettingDescription, getSettingDefaultValue, getSettingsDefaultList } from '../../../../common/services/settings';
 import _ from 'lodash';
 import { Category } from './components/categories/components';
 import { WzRequest } from '../../../react-services';
@@ -120,7 +120,7 @@ const WzConfigurationSettingsProvider = (props) => {
       type: PLUGIN_SETTINGS[fieldKey].type,
       options: PLUGIN_SETTINGS[fieldKey]?.options,
       title: PLUGIN_SETTINGS[fieldKey]?.title,
-      description: PLUGIN_SETTINGS[fieldKey]?.description,
+      description: getPluginSettingDescription(PLUGIN_SETTINGS[fieldKey]),
     }));
 
   // https://github.com/elastic/eui/blob/aa4cfd7b7c34c2d724405a3ecffde7fe6cf3b50f/src/components/search_bar/query/query.ts#L138-L163
