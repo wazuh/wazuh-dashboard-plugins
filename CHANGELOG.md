@@ -804,6 +804,16 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Reload rule detail doesn't work properly with the related rules.
 - Fix search bar filter in Manage agent of group [#2541](https://github.com/wazuh/wazuh-kibana-app/pull/2541)
 
+# Wazuh v3.13.6 - Kibana v7.9.2 - Revision 890
+
+### Added
+
+- Support for Wazuh v3.13.6
+
+## Wazuh v3.13.5 - Kibana 7.9.2 - Revision 889
+
+- Sanitize report's inputs and usernames [#4336](https://github.com/wazuh/wazuh-kibana-app/pull/4336)
+
 ## Wazuh v3.13.2 - Kibana v7.9.1 - Revision 887
 
 ### Added
