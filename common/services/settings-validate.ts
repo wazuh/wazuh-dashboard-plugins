@@ -1,5 +1,3 @@
-import path from 'path';
-
 // Utils
 export const composeValidate = (...functions) => value => {
     for(const fn of functions){
