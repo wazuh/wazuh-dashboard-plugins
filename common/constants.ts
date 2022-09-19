@@ -405,21 +405,21 @@ export enum EpluginSettingType{
 };
 
 export type TpluginSetting = {
-	title: string
-	description: string
-	category: SettingCategory
-	type: EpluginSettingType
-	default: any
-	defaultHidden?: any
-	configurableFile: boolean,
-	configurableUI: boolean
-	requireHealthCheck?: boolean
-	requireReload?: boolean
-	requireRestart?: boolean
-	options?: TpluginSettingOptionsChoices | TpluginSettingOptionsNumber | TpluginSettingOptionsEditor | TpluginSettingOptionsSwitch
-	uiFormTransformChangedInputValue?: (value: any) => any
-	uiFormTransformInputValueToConfigurationValue?: (value: any) => any
-	uiFormTransformConfigurationValueToInputValue?: (value: any) => any
+	title: string // Define the text displayed in the UI.
+	description: string // Description.
+	category: SettingCategory // Category.
+	type: EpluginSettingType // Type.
+	default: any // Default value.
+	defaultHidden?: any // Default value if it is not set. It has preference over `default`
+	configurableFile: boolean, // Configurable from the configuration file
+	configurableUI: boolean // Configurable from the UI (Settings/Configuration)
+	requireHealthCheck?: boolean // Modify the setting requires running the plugin health check (frontend)
+	requireReload?: boolean // Modify the setting requires reloading the browser tab (frontend)
+	requireRestart?: boolean // Modify the setting requires restarting the plugin platform to take effect
+	options?: TpluginSettingOptionsChoices | TpluginSettingOptionsNumber | TpluginSettingOptionsEditor | TpluginSettingOptionsSwitch // Define options related to the `type`
+	uiFormTransformChangedInputValue?: (value: any) => any // Transform the input value. The result is saved in the form global state of Settings/Configuration
+	uiFormTransformInputValueToConfigurationValue?: (value: any) => any // Transform the configuration value or default as initial value for the input in Settings/Configuration
+	uiFormTransformConfigurationValueToInputValue?: (value: any) => any // Transform the input value changed in the form of Settings/Configuration and returned in the `changed` property of the hook useForm
 };
 
 export type TPluginSettingWithKey = TpluginSetting & { key: string };
