@@ -11,7 +11,6 @@
 
 .wz-module-header-agent, .wz-module-header-nav{
     background:#fafbfd;
-    
 }
 
 .wz-module-header-agent{
@@ -80,12 +79,12 @@
 }
 
 .wz-module.wz-module-welcome{
- .wz-module-agent-body{
-    padding-top: 50px !important;
- }
- .wz-module-body{
-    padding-top: 109px !important;
-}
+    .wz-module-agent-body{
+        padding-top: 50px !important;
+    }
+    .wz-module-body{
+        padding-top: 109px !important;
+    }
 }
 
 .wz-module.wz-module-showing-agent .wz-module-body{
@@ -122,11 +121,11 @@ discover-app-w .sidebar-container {
         }
         .wz-module-header-agent{
             height: auto;
-         h1{    
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            overflow: hidden;
-        }
+            h1{    
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                overflow: hidden;
+            }
         }
         .wz-module-body {
             margin-top: -160px;
