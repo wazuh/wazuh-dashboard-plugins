@@ -44,10 +44,10 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
   public async setup(core: CoreSetup, plugins: WazuhSetupPlugins): WazuhSetup {
     const UI_THEME = core.uiSettings.get('theme:darkMode') ? 'dark' : 'light';
     
-    //Get custom logos configuration to start up the app with the correct logos
+    // Get custom logos configuration to start up the app with the correct logos
     let logosInitialState={};
     try{
-      logosInitialState = await core.http.get(`/api/get-logos`);
+      logosInitialState = await core.http.get(`/api/logos`);
     }
     catch(error){
       console.error('plugin.ts: Error getting logos configuration', error);

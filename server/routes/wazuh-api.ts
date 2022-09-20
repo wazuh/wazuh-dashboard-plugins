@@ -156,7 +156,7 @@ export function WazuhApiRoutes(router: IRouter) {
 
   // Return app logos configuration
   router.get({
-    path: '/api/get-logos',
+    path: '/api/logos',
     validate: false,
     options: { authRequired: false }
   },
