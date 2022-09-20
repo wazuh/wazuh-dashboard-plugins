@@ -19,6 +19,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Fixed
 
 - Improves Agents Overview performance [#4363](https://github.com/wazuh/wazuh-kibana-app/pull/4363)
+- Fixed a bug where the Wazuh logo was used instead of the custom one [#4539](https://github.com/wazuh/wazuh-kibana-app/pull/4539)
 
 ### Fixed
 
