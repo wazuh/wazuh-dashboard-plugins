@@ -258,6 +258,9 @@ resources:
   # Get node active configuration
   - method: GET
     path: /cluster/{node_id}/configuration/{component}/{configuration}
+    response:
+      statusCode: 200
+      scriptFile: cluster/component_configuration.js
 
   # ===================================================== #
   #   DECODERS
@@ -274,6 +277,11 @@ resources:
   # Get decoders file content
   - method: GET
     path: /decoders/files/{filename}
+    queryParams:
+      raw: true
+    response: 
+      statusCode: 200
+      staticFile: rules/get_rule_raw.txt
 
   # Update decoders file
   - method: PUT
@@ -390,6 +398,11 @@ resources:
   # Get CDB list file content
   - method: GET
     path: /lists/files/{filename}
+    queryParams:
+      raw: true
+    response: 
+      statusCode: 200
+      staticFile: lists/get_list_raw.txt
 
   # Update CDB list file
   - method: PUT
@@ -565,6 +578,11 @@ resources:
   # Get rules file content
   - method: GET
     path: /rules/files/{filename}
+    queryParams:
+      raw: true
+    response: 
+      statusCode: 200
+      staticFile: rules/get_rule_raw.txt
 
   # Update rules file
   - method: PUT
