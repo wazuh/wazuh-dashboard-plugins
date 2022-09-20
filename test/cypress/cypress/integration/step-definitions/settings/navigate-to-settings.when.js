@@ -15,6 +15,11 @@ When('The user navigates to {} settings', (menuOption) => {
   elementIsVisible(settingsButton);
   clickElement(settingsButton);
   elementIsVisible(wazuhMenuSettingRight);
-  cy.wait(800);
-  elementIsVisible(getSelector(menuOption, SETTINGS_MENU_LINKS)).click();
+  if (Cypress.env('type') == 'wzd') {
+    cy.wait(1000);
+    elementIsVisible(getSelector(menuOption, SETTINGS_MENU_LINKS)).click()
+  } else {
+    elementIsVisible(getSelector(menuOption, SETTINGS_MENU_LINKS));
+    clickElement(getSelector(menuOption, SETTINGS_MENU_LINKS));
+  };
 });
