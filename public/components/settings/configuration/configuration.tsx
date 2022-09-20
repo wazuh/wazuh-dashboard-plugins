@@ -100,7 +100,7 @@ const WzConfigurationSettingsProvider = (props) => {
   // const [settingsByCategories, setSettingsByCategories] = useState(transformToSettingsByCategories(pluginSettingConfigurableUI));
   const currentConfiguration = useSelector(state => state.appConfig.data);
 
-  const { fields, changed, errors, doneChanges, undoneChanges } = useForm(pluginSettingsConfigurableUI(currentConfiguration));
+  const { fields, changed, errors, doChanges, undoChanges } = useForm(pluginSettingsConfigurableUI(currentConfiguration));
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -169,7 +169,7 @@ const WzConfigurationSettingsProvider = (props) => {
       successToast();
 
       // Reset the form changed configuration
-      doneChanges();
+      doChanges();
     } catch (error) {
       const options: UIErrorLog = {
         context: `${WzConfigurationSettingsProvider.name}.onSave`,
@@ -219,7 +219,7 @@ const WzConfigurationSettingsProvider = (props) => {
           <BottomBar
             errorsCount={Object.keys(errors).length}
             unsavedCount={Object.keys(changed).length}
-            onCancel={undoneChanges}
+            onCancel={undoChanges}
             onSave={onSave}
           />
         )}
