@@ -56,15 +56,17 @@ export function getConfiguration(options: {force?: boolean} = {}) {
  * @returns 
  */
 function obfuscateHostsConfiguration(configuration: any, obfuscateHostConfigurationKeys: string[]){
-  configuration.hosts = Object.entries(configuration.hosts)
-    .reduce((accum, [hostID, hostConfiguration]) => {
-      return {...accum, [hostID]: {
-        ...hostConfiguration,
-        ...(obfuscateHostConfigurationKeys
-            .reduce((accumObfuscateHostConfigurationKeys, obfuscateHostConfigurationKey) => 
-              ({...accumObfuscateHostConfigurationKeys, [obfuscateHostConfigurationKey]: '*****'}), {})
-          )
-      }}
-    }, {})
+  if(configuration.hosts){
+    configuration.hosts = Object.entries(configuration.hosts)
+      .reduce((accum, [hostID, hostConfiguration]) => {
+        return {...accum, [hostID]: {
+          ...hostConfiguration,
+          ...(obfuscateHostConfigurationKeys
+              .reduce((accumObfuscateHostConfigurationKeys, obfuscateHostConfigurationKey) => 
+                ({...accumObfuscateHostConfigurationKeys, [obfuscateHostConfigurationKey]: '*****'}), {})
+            )
+        }}
+      }, {});
+  };
   return configuration;
 };
