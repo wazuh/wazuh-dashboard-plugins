@@ -688,7 +688,7 @@ export class Inventory extends Component {
                   </EuiFlexGroup>
                 )}
                 <EuiSpacer size="m" />
-                <EuiPanel paddingSize="l">
+                {/* <EuiPanel paddingSize="l"> */}
                   <EuiFlexGroup>
                     <EuiFlexItem>
                        <EuiBasicTable
@@ -698,7 +698,7 @@ export class Inventory extends Component {
                       />
                     </EuiFlexItem>
                   </EuiFlexGroup>
-                </EuiPanel>
+                {/* </EuiPanel> */}
               </div>
             )}
           {agent &&
