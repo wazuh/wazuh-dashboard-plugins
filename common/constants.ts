@@ -965,26 +965,6 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 			return Boolean(value);
 		},
 	},
-	"extensions.mitre": {
-		title: "MITRE ATT&CK",
-		description: "Enable or disable the MITRE tab on Overview and Agents.",
-		category: SettingCategory.EXTENSIONS,
-		type: EpluginSettingType.switch,
-		default: true,
-		configurableFile: true,
-		configurableUI: false,
-		options: {
-			switch: {
-				values: {
-					disabled: {label: 'false', value: false},
-					enabled: {label: 'true', value: true},
-				}
-			}
-		},
-		uiFormTransformChangedInputValue: function(value: boolean | string): boolean{
-			return Boolean(value);
-		},
-	},
 	"extensions.nist": {
 		title: "NIST",
 		description: "Enable or disable the NIST 800-53 tab on Overview and Agents.",
