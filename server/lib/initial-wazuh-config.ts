@@ -11,12 +11,13 @@
  */
 
 import {
-  PLUGIN_SETTINGS,
   PLUGIN_SETTINGS_CATEGORIES,
+  TPluginSettingWithKey,
 } from '../../common/constants';
+import { getPluginSettingDescription, getSettingsDefaultList, groupSettingsByCategory } from '../../common/services/settings';
 import { webDocumentationLink } from '../../common/services/web_documentation';
 
-const header: string = `---
+export const header: string = `---
 #
 # Wazuh app - App configuration file
 # Copyright (C) 2015-2022 Wazuh, Inc.
@@ -28,7 +29,7 @@ const header: string = `---
 #
 # Find more information about this on the LICENSE file.
 #
-# ======================== Wazuh app configuration file ========================
+${printSection('Wazuh app configuration file', {prefix: '# ', fill: '='})}
 #
 # Please check the documentation for more information about configuration options:
 # ${webDocumentationLink('user-manual/wazuh-dashboard/config-file.html')}
@@ -36,42 +37,33 @@ const header: string = `---
 # Also, you can check our repository:
 # https://github.com/wazuh/wazuh-kibana-app`;
 
-const pluginSettingsConfiguration = Object.entries(PLUGIN_SETTINGS_CATEGORIES).map(([pluginSettingCategoryID, pluginSettingCategoryConfiguration]) => {
-  const header = `#------------------------------- ${pluginSettingCategoryConfiguration.title} -------------------------------`;
-  const description = pluginSettingCategoryConfiguration.description
-    /*
-    # category description
-    #
-    */
-    ? splitDescription(pluginSettingCategoryConfiguration.description)
-  : '';
+const pluginSettingsConfigurationFile = getSettingsDefaultList().filter(({configurableFile}) => configurableFile);
 
-  const pluginSettingsCategory = Object.entries(PLUGIN_SETTINGS)
-    .filter(([, {category, configurableFile}]) => configurableFile && category.toString() === pluginSettingCategoryID)
-    .map(([pluginSettingKey, {description, default: defaultValue, options = {}}] ) => 
-      /*
-      # setting description
-      # settingKey: settingValue
-      */
-      [splitDescription(description), `# ${pluginSettingKey}: ${printSettingValue(defaultValue)}`].join('\n')
+const pluginSettingsConfigurationFileGroupByCategory = groupSettingsByCategory(pluginSettingsConfigurationFile);
+
+const pluginSettingsConfiguration = pluginSettingsConfigurationFileGroupByCategory.map(({category: categoryID, settings}) => {
+  const category = printSettingCategory(PLUGIN_SETTINGS_CATEGORIES[categoryID]);
+
+  const pluginSettingsOfCategory = settings
+    .map(setting => printSetting(setting)
     ).join('\n#\n');
   /*
-  #------------------- category name --------------
+  #------------------- {category name} --------------
   #
-  #  category description
+  #  {category description}
   #
-  # setting description
-  # settingKey: settingValue
+  # {setting description}
+  # settingKey: settingDefaultValue
   #
-  # setting description
-  # settingKey: settingValue
+  # {setting description}
+  # settingKey: settingDefaultValue
   # ...
   */
-  return [header, description, pluginSettingsCategory].join('\n#\n');
+  return [category, pluginSettingsOfCategory].join('\n#\n');
 }).join('\n#\n');
 
 
-function printSettingValue(value: any){
+export function printSettingValue(value: unknown): any{
   if(typeof value === 'object'){
     return JSON.stringify(value)
   };
@@ -83,7 +75,47 @@ function printSettingValue(value: any){
   return value;
 };
 
-const hostsConfiguration = `#-------------------------------- Wazuh hosts ----------------------------------
+export function printSetting(setting: TPluginSettingWithKey): string{
+  /*
+  # {setting description}
+  # {settingKey}: {settingDefaultValue}
+  */
+  return [
+    splitDescription(getPluginSettingDescription(setting)),
+    `# ${setting.key}: ${printSettingValue(setting.default)}`
+  ].join('\n')
+}
+
+export function printSettingCategory({title, description}){
+  /*
+  #------------------------------- {category title} -------------------------------
+  # {category description}
+  #
+  */
+  return [
+    printSection(title, {prefix: '# ', fill: '-'}),
+    ...(description ? [splitDescription(description)] : [''])
+  ].join('\n#\n')
+};
+
+export function printSection(text: string, options?: {maxLength?: number, prefix?: string,  suffix?: string, spaceAround?: number, fill?: string }){
+  const maxLength = options?.maxLength ?? 80;
+  const prefix = options?.prefix ?? '';
+  const sufix = options?.suffix ?? '';
+  const spaceAround = options?.spaceAround ?? 1;
+  const fill = options?.fill ?? ' ';
+  const fillLength = maxLength - prefix.length - sufix.length - (2 * spaceAround) - text.length;
+
+  return [
+    prefix,
+    fill.repeat(Math.floor(fillLength/2)),
+    ` ${text} `,
+    fill.repeat(Math.ceil(fillLength/2)),
+    sufix
+  ].join('');
+};
+
+export const hostsConfiguration = `${printSection('Wazuh hosts', {prefix: '# ', fill: '-'})}
 #
 # The following configuration is the default structure to define a host.
 #
@@ -128,9 +160,9 @@ hosts:
  * @param text
  * @returns multine string
  */
- function splitDescription(text: string = ''): string {
+export function splitDescription(text: string = ''): string {
   const lines = text.match(/.{1,80}(?=\s|$)/g) || [];
   return lines.map((z) => '# ' + z.trim()).join('\n');
 }
 
-export const initialWazuhConfig: string = [header, pluginSettingsConfiguration, hostsConfiguration].join('\n');
+export const initialWazuhConfig: string = [header, pluginSettingsConfiguration, hostsConfiguration].join('\n#\n');
