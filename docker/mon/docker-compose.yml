@@ -73,11 +73,22 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /etc/machine-id:/etc/machine-id:ro
       - /var/lib/dbus/machine-id:/var/lib/dbus/machine-id:ro
-
+  idp:
+    image: quay.io/keycloak/keycloak:19.0.1
+    hostname: idp
+    ports:
+      - "8082:8080"
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+    volumes:
+      - keycloak-data:/var/lib/keycloak/data
+    command: start-dev
 networks:
   mon:
     external: true
 
 volumes:
+  keycloak-data:
   lokidata:
   prometheusdata:
