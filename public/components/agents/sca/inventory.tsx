@@ -70,6 +70,7 @@ export class Inventory extends Component {
       policies: [],
       redirect: false,
       // firstTable: true
+      secondTable: false
     };
     this.suggestions = {};
     this.columnsPolicies = [
@@ -227,6 +228,13 @@ export class Inventory extends Component {
         itemIdToExpandedRowMap: {},
         pageTableChecks: { pageIndex: 0, pageSize: this.state.pageTableChecks.pageSize },
       });
+    }
+
+    const regex = new RegExp('redirectRule=' + '[^&]*');
+    const match = window.location.href.match(regex);
+    if (match && match[0] && !this.state.secondTable) {
+     this.loadScaPolicy('cis_ubuntu18-04', true)
+     console.log(match[0], 'matchi')
     }
   }
 
@@ -402,19 +410,20 @@ export class Inventory extends Component {
     }
   }
 
-  async loadScaPolicy(policy) {
+  async loadScaPolicy(policy, secondTable) {
     console.log('soy load')
     this._isMount &&
       this.setState({
         loadingPolicy: true,
         itemIdToExpandedRowMap: {},
         pageTableChecks: { pageIndex: 0 },
+        secondTable: secondTable ? secondTable : false
       });
     if (policy) {
       try {
         const policyResponse = await WzRequest.apiReq('GET', `/sca/${this.props.agent.id}`, {
           params: {
-            q: 'policy_id=' + policy.policy_id,
+            q: 'policy_id=' + policy,
           },
         });
         const [policyData] = policyResponse.data.data.affected_items;
@@ -423,7 +432,7 @@ export class Inventory extends Component {
         // due to the use of EuiInMemoryTable instead EuiTable components and do arequest with each change of filters.
         const checksResponse = await WzRequest.apiReq(
           'GET',
-          `/sca/${this.props.agent.id}/checks/${policy.policy_id}`,
+          `/sca/${this.props.agent.id}/checks/${policy}`,
           {}
         );
         const checks = (
@@ -434,7 +443,7 @@ export class Inventory extends Component {
           this.setState({ lookingPolicy: policyData, loadingPolicy: false, items: checks });
       } catch (error) {
         this.setState({ lookingPolicy: policy, loadingPolicy: false });
-
+        console.log(error, 'error')
         const options: UIErrorLog = {
           context: `${Inventory.name}.loadScaPolicy`,
           level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
@@ -563,6 +572,7 @@ export class Inventory extends Component {
     const { onClickRow } = this.props
     const handleOnClick = (policy_id) => {
       onClickRow(policy_id)
+      console.log(policy_id, 'name')
       this.setState({lookingPolicy: true , loading: false, redirect: true})
     }
 
@@ -577,7 +587,7 @@ export class Inventory extends Component {
       return {
         'data-test-subj': `sca-row-${idx}`,
         className: 'customRowClass',
-        onClick: onClickRow ? () => handleOnClick(item.policy_id) : () => this.loadScaPolicy(item),
+        onClick: onClickRow ? () => handleOnClick('nametest') : () => this.loadScaPolicy(item.policy_id),
       };
     };
     const getChecksRowProps = (item, idx) => {
@@ -742,7 +752,7 @@ export class Inventory extends Component {
                     <EuiFlexItem grow={false}>
                       <EuiButtonEmpty
                         iconType="refresh"
-                        onClick={() => this.loadScaPolicy(this.state.lookingPolicy)}
+                        onClick={() => this.loadScaPolicy(this.state.lookingPolicy.policy_id)}
                       >
                         Refresh
                       </EuiButtonEmpty>

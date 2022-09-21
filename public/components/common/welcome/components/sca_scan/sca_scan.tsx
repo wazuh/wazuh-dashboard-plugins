@@ -118,16 +118,27 @@ export const ScaScan = compose(
   }
 
   onClickRow(policy_id) {
-    window.location.href = `#/overview?tab=sca&redirectPolicy=${policy_id}`;
+    window.location.href = `#/overview?tab=sca&redirectRule=${policy_id}`;
                   store.dispatch(updateCurrentAgentData(this.props.agent));
                   this.router.reload();
                   // this.setState({firstTable:false})
+                  
   }
+  
+  // onClickRow(policy_id) {
+  //   window.location.href = window.location.href.replace(
+  //     new RegExp('redirectRule=' + '[^&]*'),
+  //     `redirectRule=${policy_id}`
+  //   );
+  //   this.setState({ currentRuleId: lastScan.policy_id, isLoading: true });
+  // }
 
   renderScanDetails() {
     const { isLoading, lastScan } = this.state;
     const {agent} = this.props
     if (isLoading || lastScan === undefined) return;
+
+
     return (
       <Fragment>
         <EuiFlexGroup>
