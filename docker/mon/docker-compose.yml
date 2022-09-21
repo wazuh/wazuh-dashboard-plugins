@@ -76,6 +76,8 @@ services:
   idp:
     image: quay.io/keycloak/keycloak:19.0.1
     hostname: idp
+    networks:
+      - mon
     ports:
       - "8082:8080"
     environment:
@@ -84,6 +86,7 @@ services:
     volumes:
       - keycloak-data:/var/lib/keycloak/data
     command: start-dev
+
 networks:
   mon:
     external: true
