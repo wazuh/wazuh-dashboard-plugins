@@ -7,7 +7,7 @@ describe('[component] InputForm', () => {
 			inputType | value | options | rest
 			${'editor'} | ${'{}'} | ${{editor: {language: 'json'}}} | ${{}}
 			${'number'} | ${4} | ${undefined} | ${{}}
-			${'select'} | ${'value1'} | ${{select: {choices: [{label: 'Label1', value: 'value1'}, {label: 'Label2', value: 'value2'}]}}} | ${{}}
+			${'select'} | ${'value1'} | ${{select: [{text: 'Label1', value: 'value1'}, {text: 'Label2', value: 'value2'}]}}} | ${{}}
 			${'switch'} | ${true} | ${{switch: {values: {enabled: {label: 'Enabled', value: true}, disabled: {label: 'Disabled', value: false}}}}} | ${{}}
 			${'text'} | ${'test'} | ${undefined} | ${{isInvalid: false}}
 		`('Renders correctly to match the snapshot: Input: $inputType', ({ inputType, value, options }) => {
