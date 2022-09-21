@@ -49,14 +49,18 @@ import {
 import { API_NAME_AGENT_STATUS, UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { VisualizationBasic } from '../../common/charts/visualizations/basic';
-
+import PropTypes from 'prop-types'
 export class Inventory extends Component {
   _isMount = false;
+  props!: {
+    [key: string]: any
+  }
   constructor(props) {
     super(props);
-    const { agent } = this.props;
+
+
     this.state = {
-      agent,
+      // agent,
       items: [],
       itemIdToExpandedRowMap: {},
       showMoreInfo: false,
@@ -64,6 +68,8 @@ export class Inventory extends Component {
       filters: [],
       pageTableChecks: { pageIndex: 0 },
       policies: [],
+      redirect: false,
+      // firstTable: true
     };
     this.suggestions = {};
     this.columnsPolicies = [
@@ -175,6 +181,7 @@ export class Inventory extends Component {
 
   async componentDidMount() {
     this._isMount = true;
+    // this.setState({withoutDashboard: withoutDashboard ? withoutDashboard : false})
     await this.initialize();
     const regex = new RegExp('redirectPolicy=' + '[^&]*');
     const match = window.location.href.match(regex);
@@ -186,10 +193,12 @@ export class Inventory extends Component {
           q: 'policy_id=' + id,
         });
         await this.loadScaPolicy(((((policy || {}).data || {}).data || {}).items || [])[0]);
+        console.log(window.location.href, 'location')
         window.location.href = window.location.href.replace(
           new RegExp('redirectPolicy=' + '[^&]*'),
           ''
         );
+        console.log('entre')
         this.setState({ loading: false });
       }
     } catch (error) {
@@ -394,6 +403,7 @@ export class Inventory extends Component {
   }
 
   async loadScaPolicy(policy) {
+    console.log('soy load')
     this._isMount &&
       this.setState({
         loadingPolicy: true,
@@ -408,6 +418,7 @@ export class Inventory extends Component {
           },
         });
         const [policyData] = policyResponse.data.data.affected_items;
+        console.log(policyData, 'pol')
         // It queries all checks without filters, because the filters are applied in the results
         // due to the use of EuiInMemoryTable instead EuiTable components and do arequest with each change of filters.
         const checksResponse = await WzRequest.apiReq(
@@ -549,11 +560,24 @@ export class Inventory extends Component {
   }
 
   render() {
+    const { onClickRow } = this.props
+    const handleOnClick = (policy_id) => {
+      onClickRow(policy_id)
+      this.setState({lookingPolicy: true , loading: false, redirect: true})
+    }
+
+    // agent &&
+    // (agent || {}).os &&
+    // this.state.lookingPolicy &&
+    // !this.state.loading && 
+
+
     const getPoliciesRowProps = (item, idx) => {
+      console.log(item, 'item')
       return {
         'data-test-subj': `sca-row-${idx}`,
         className: 'customRowClass',
-        onClick: () => this.loadScaPolicy(item),
+        onClick: onClickRow ? () => handleOnClick(item.policy_id) : () => this.loadScaPolicy(item),
       };
     };
     const getChecksRowProps = (item, idx) => {
@@ -577,6 +601,9 @@ export class Inventory extends Component {
         onClick={() => this.setState({ showMoreInfo: !this.state.showMoreInfo })}
       ></EuiButtonEmpty>
     );
+    const { agent, withoutDashboard, firstTable } = this.props;
+    console.log(agent, this.state.lookingPolicy, this.state.loading, this.state.redirect, firstTable, 'perro')
+
     return (
       <Fragment>
         <div>
@@ -588,8 +615,8 @@ export class Inventory extends Component {
           )}
         </div>
         <EuiPage>
-          {this.props.agent &&
-            (this.props.agent || {}).status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED &&
+          {agent &&
+            (agent || {}).status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED &&
             !this.state.policies.length &&
             !this.state.loading && (
               <EuiCallOut title="No scans available" iconType="iInCircle">
@@ -599,8 +626,8 @@ export class Inventory extends Component {
               </EuiCallOut>
             )}
 
-          {this.props.agent &&
-            (this.props.agent || {}).status === API_NAME_AGENT_STATUS.NEVER_CONNECTED &&
+          {agent &&
+            (agent || {}).status === API_NAME_AGENT_STATUS.NEVER_CONNECTED &&
             !this.state.loading && (
               <EuiCallOut
                 title="Agent has never connected"
@@ -612,13 +639,13 @@ export class Inventory extends Component {
                 </EuiButton>
               </EuiCallOut>
             )}
-          {this.props.agent &&
-            (this.props.agent || {}).os &&
+          {agent &&
+            (agent || {}).os &&
             !this.state.lookingPolicy &&
             this.state.policies.length > 0 &&
             !this.state.loading && (
               <div>
-                {this.state.policies.length && (
+                {this.state.policies.length && !withoutDashboard && (
                   <EuiFlexGroup style={{ marginTop: 0 }}>
                     {this.state.policies.map((policy, idx) => (
                       <EuiFlexItem key={idx} grow={false}>
@@ -654,7 +681,7 @@ export class Inventory extends Component {
                 <EuiPanel paddingSize="l">
                   <EuiFlexGroup>
                     <EuiFlexItem>
-                      <EuiBasicTable
+                       <EuiBasicTable
                         items={this.state.policies}
                         columns={this.columnsPolicies}
                         rowProps={getPoliciesRowProps}
@@ -664,9 +691,9 @@ export class Inventory extends Component {
                 </EuiPanel>
               </div>
             )}
-          {this.props.agent &&
-            (this.props.agent || {}).os &&
-            this.state.lookingPolicy &&
+          {agent &&
+            (agent || {}).os &&
+            this.state.lookingPolicy && 
             !this.state.loading && (
               <div>
                 <EuiPanel paddingSize="l">
@@ -813,3 +840,13 @@ export class Inventory extends Component {
     );
   }
 }
+
+
+Inventory.propTypes = {  
+  withoutDashboard: PropTypes.bool  
+}  
+
+Inventory.defaultProps = {  
+  withoutDashboard: false, 
+  onClickRow: undefined
+}  

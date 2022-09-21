@@ -26,7 +26,8 @@ import {
   EuiButtonIcon,
   EuiToolTip,
   EuiEmptyPrompt,
-  EuiIcon
+  EuiIcon,
+  EuiBasicTable,
 } from '@elastic/eui';
 import moment from 'moment-timezone';
 import store from '../../../../../redux/store';
@@ -37,6 +38,7 @@ import { getAngularModule } from '../../../../../kibana-services';
 import { withReduxProvider, withUserAuthorizationPrompt } from "../../../hocs";
 import { compose } from 'redux';
 import { Inventory } from '../../../../../components/agents/sca/index';
+
 export const ScaScan = compose(
   withReduxProvider,
   withUserAuthorizationPrompt([
@@ -59,6 +61,7 @@ export const ScaScan = compose(
       [key: string]: any
     },
     isLoading: Boolean,
+    firstTable: Boolean
   }
 
   constructor(props) {
@@ -66,6 +69,7 @@ export const ScaScan = compose(
     this.state = {
       lastScan: {},
       isLoading: true,
+      firstTable: true,
     };
   }
 
@@ -113,6 +117,13 @@ export const ScaScan = compose(
     }
   }
 
+  onClickRow(policy_id) {
+    window.location.href = `#/overview?tab=sca&redirectPolicy=${policy_id}`;
+                  store.dispatch(updateCurrentAgentData(this.props.agent));
+                  this.router.reload();
+                  // this.setState({firstTable:false})
+  }
+
   renderScanDetails() {
     const { isLoading, lastScan } = this.state;
     const {agent} = this.props
@@ -122,29 +133,45 @@ export const ScaScan = compose(
         <EuiFlexGroup>
           <EuiFlexItem grow={false}>
             <EuiTitle size="xs">
-              {/* <EuiLink onClick={() => {
+              <EuiLink onClick={() => {
                   window.location.href = `#/overview?tab=sca&redirectPolicy=${lastScan.policy_id}`;
                   store.dispatch(updateCurrentAgentData(this.props.agent));
                   this.router.reload();
                 }
-              }> */}
-                {/* <h4>{lastScan.name}</h4> */}
-                <Inventory agent={agent} />
-              {/* </EuiLink> */}
+              }>
+                <h4>{lastScan.name}</h4>
+                {/* <Inventory agent={agent} /> */}
+                <EuiSpacer size="m" />
+                {/* <EuiPanel paddingSize="l">
+                  <EuiFlexGroup>
+                    <EuiFlexItem>
+                      <EuiBasicTable
+                        items={this.state.policies}
+                        columns={this.columnsPolicies}
+                        rowProps={getPoliciesRowProps}
+                      />
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
+                </EuiPanel> */}
+              </EuiLink>
             </EuiTitle>
           </EuiFlexItem>
-          {/* <EuiFlexItem grow={false} style={{ marginTop: 12 }}>
+          <EuiFlexItem grow={false} style={{ marginTop: 12 }}>
             <EuiBadge color="secondary">{lastScan.policy_id}</EuiBadge>
-          </EuiFlexItem> */}
+          </EuiFlexItem>
         </EuiFlexGroup>
-        {/* <EuiFlexGroup>
+        <EuiPanel>
+
+        <Inventory agent={agent} withoutDashboard onClickRow={this.onClickRow} firstTable={this.state.firstTable} />
+        </EuiPanel>
+        <EuiFlexGroup>
           <EuiFlexItem>
             <EuiText size={'s'}>
               <p>{lastScan.description}</p>
             </EuiText>
           </EuiFlexItem>
-        </EuiFlexGroup> */}
-        {/* <EuiSpacer size="l" />
+        </EuiFlexGroup>
+        <EuiSpacer size="l" />
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiStat
@@ -180,8 +207,8 @@ export const ScaScan = compose(
               description="Score"
             />
           </EuiFlexItem>
-        </EuiFlexGroup> */}
-        {/* <EuiSpacer size={'l'}/>
+        </EuiFlexGroup>
+        <EuiSpacer size={'l'}/>
         <EuiFlexGroup>
           <EuiFlexItem grow={false} style={{ marginTop: 15 }}>
             <EuiText>
@@ -193,7 +220,7 @@ export const ScaScan = compose(
               <EuiIcon type="clock" color={'primary'}/> Duration: {this.durationScan()}
             </EuiText>
           </EuiFlexItem>
-        </EuiFlexGroup> */}
+        </EuiFlexGroup>
       </Fragment>
     )
   }
@@ -229,24 +256,37 @@ export const ScaScan = compose(
         <EuiPanel paddingSize="m">
           <EuiText size="xs">
             <EuiFlexGroup>
-              <EuiFlexItem>
+            <EuiFlexItem grow={false}>
+            <EuiTitle size="xs">
+              <EuiLink className="agents-link-item" onClick={() => {
+                  window.location.href = `#/overview?tab=sca&redirectPolicy=${lastScan.policy_id}`;
+                  store.dispatch(updateCurrentAgentData(this.props.agent));
+                  this.router.reload();
+                }
+              }>
+               <h2>SCA: Lastest scans</h2>
+                {/* <Inventory agent={agent} /> */}
+              </EuiLink>
+            </EuiTitle>
+          </EuiFlexItem>
+              {/* <EuiFlexItem>
                 <h2>SCA: Lastest scans</h2>
-              </EuiFlexItem>
+              </EuiFlexItem> */}
               {/* <Inventory agent={agent} /> */}
-              {/* <EuiFlexItem grow={false}>
+              <EuiFlexItem grow={false}>
                 <EuiToolTip position="top" content="Open SCA Scans">
                   <EuiButtonIcon
                     iconType="popout"
                     color="primary"
                     onClick={() => {
-                      window.location.href = `#/overview?tab=sca`;
-                      store.dispatch(updateCurrentAgentData(this.props.agent));
-                      this.router.reload();
-                    }
+                                        window.location.href = `#/overview?tab=sca`;
+                                        store.dispatch(updateCurrentAgentData(this.props.agent));
+                                        this.router.reload();
+                                      }
                     }
                     aria-label="Open SCA Scans" />
                 </EuiToolTip>
-              </EuiFlexItem> */}
+              </EuiFlexItem>
             </EuiFlexGroup>
           </EuiText>
           {lastScan === undefined && emptyPrompt}
