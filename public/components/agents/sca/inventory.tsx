@@ -233,7 +233,7 @@ export class Inventory extends Component {
     const regex = new RegExp('redirectRule=' + '[^&]*');
     const match = window.location.href.match(regex);
     if (match && match[0] && !this.state.secondTable) {
-     this.loadScaPolicy('cis_ubuntu18-04', true)
+     this.loadScaPolicy(match[0].split('=')[1], true)
      console.log(match[0], 'matchi')
     }
   }
@@ -587,7 +587,7 @@ export class Inventory extends Component {
       return {
         'data-test-subj': `sca-row-${idx}`,
         className: 'customRowClass',
-        onClick: onClickRow ? () => handleOnClick('nametest') : () => this.loadScaPolicy(item.policy_id),
+        onClick: onClickRow ? () => handleOnClick(item.policy_id) : () => this.loadScaPolicy(item.policy_id),
       };
     };
     const getChecksRowProps = (item, idx) => {
