@@ -1,4 +1,4 @@
-import { EpluginSettingType, PLUGIN_SETTINGS, TpluginSetting } from '../constants';
+import { EpluginSettingType, PLUGIN_SETTINGS, TpluginSetting, TPluginSettingWithKey } from '../constants';
 
 /**
  * Get the default value of the plugin setting
@@ -57,7 +57,7 @@ const formatSettingValueFromFormType = {
  * @param value plugin setting value sent to the endpoint
  * @returns valid value to .yml
  */
- export function formatSettingValueToFile(value: any) {
+export function formatSettingValueToFile(value: any) {
 	const formatter = formatSettingValueToFileType[typeof value] || formatSettingValueToFileType.default;
 	return formatter(value);
 };
@@ -66,4 +66,48 @@ const formatSettingValueToFileType = {
 	string: (value: string): string => `"${value.replace(/"/,'\\"').replace(/\n/g,'\\n')}"`, // Escape the " character and new line
 	object: (value: any): string => JSON.stringify(value),
 	default: (value: any): any => value
+};
+
+/**
+ * Group the settings by category
+ * @param settings 
+ * @returns 
+ */
+export function groupSettingsByCategory(settings: TPluginSettingWithKey[]){
+	const settingsSortedByCategories = settings.reduce((accum, pluginSettingConfiguration) => ({
+		...accum,
+		[pluginSettingConfiguration.category]: [
+		...(accum[pluginSettingConfiguration.category] || []),
+		{...pluginSettingConfiguration}
+		]
+	}),{});
+
+	return Object.entries(settingsSortedByCategories)
+		.map(([category, settings]) => ({ category, settings }))
+		.filter(categoryEntry => categoryEntry.settings.length);
+};
+
+/**
+ * Get the plugin setting description composed.
+ * @param options 
+ * @returns 
+ */
+ export function getPluginSettingDescription({description, options}: TpluginSetting): string{
+	return [
+		description,
+		...(options?.select ? [`Allowed values: ${options.select.map(({text, value}) => formatLabelValuePair(text, value)).join(', ')}.`] : []),
+		...(options?.switch ? [`Allowed values: ${['enabled', 'disabled'].map(s => formatLabelValuePair(options.switch.values[s].label, options.switch.values[s].value)).join(', ')}.`] : []),
+	].join(' ');
+};
+
+/**
+ * Format the pair value-label to display the pair. If label and the string of value are equals, only displays the value, if not, displays both.
+ * @param value 
+ * @param label 
+ * @returns 
+ */
+function formatLabelValuePair(label, value){
+	return label !== `${value}`
+		? `${value} (${label})`
+		: `${value}`
 };

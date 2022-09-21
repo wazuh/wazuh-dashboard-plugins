@@ -31,7 +31,7 @@ import { updateSelectedSettingsSection } from '../../../redux/actions/appStateAc
 import { withUserAuthorizationPrompt, withErrorBoundary, withReduxProvider } from '../../common/hocs';
 import { EpluginSettingType, PLUGIN_PLATFORM_NAME, PLUGIN_SETTINGS, PLUGIN_SETTINGS_CATEGORIES, UI_LOGGER_LEVELS, WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../../common/constants';
 import { compose } from 'redux';
-import { formatSettingValueFromForm, getSettingDefaultValue, getSettingsDefaultList } from '../../../../common/services/settings';
+import { formatSettingValueFromForm, getSettingsDefaultList, groupSettingsByCategory } from '../../../../common/services/settings';
 import _ from 'lodash';
 import { Category } from './components/categories/components';
 import { WzRequest } from '../../../react-services';
@@ -56,20 +56,7 @@ const pluginSettingConfigurableUI = getSettingsDefaultList()
 
 const settingsCategoriesSearchBarFilters = [...new Set(pluginSettingConfigurableUI.map(({category}) => category))].sort().map(category => ({value: category}))
 
-const transformToSettingsByCategories = (settings) => {
-  const settingsSortedByCategories = settings.reduce((accum, pluginSettingConfiguration) => ({
-    ...accum,
-    [pluginSettingConfiguration.category]: [
-      ...(accum[pluginSettingConfiguration.category] || []),
-      {...pluginSettingConfiguration}
-    ]
-  }),{})
-  return Object.entries(settingsSortedByCategories)
-    .map(([category, settings]) => ({ category,settings }))
-    .filter(categoryEntry => categoryEntry.settings.length);
-};
-
-const pluginSettingsConfigurableUI = configuration => Object.fromEntries(
+const trasnsfromPluginSettingsToFormFields = configuration => Object.fromEntries(
   getSettingsDefaultList()
     .filter(pluginSetting => pluginSetting.configurableUI)
     .map(({
@@ -93,14 +80,12 @@ const pluginSettingsConfigurableUI = configuration => Object.fromEntries(
     ]))
 );
 
-
 const WzConfigurationSettingsProvider = (props) => {
   const [loading, setLoading ] = useKbnLoadingIndicator();
   const [query, setQuery] = useState('');
-  // const [settingsByCategories, setSettingsByCategories] = useState(transformToSettingsByCategories(pluginSettingConfigurableUI));
   const currentConfiguration = useSelector(state => state.appConfig.data);
 
-  const { fields, changed, errors, doneChanges, undoneChanges } = useForm(pluginSettingsConfigurableUI(currentConfiguration));
+  const { fields, changed, errors, doChanges, undoChanges } = useForm(trasnsfromPluginSettingsToFormFields(currentConfiguration));
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -125,7 +110,7 @@ const WzConfigurationSettingsProvider = (props) => {
   // https://github.com/elastic/eui/blob/aa4cfd7b7c34c2d724405a3ecffde7fe6cf3b50f/src/components/search_bar/query/query.ts#L138-L163
   const search = Query.execute(query.query || query, visibleSettings, ['description', 'key', 'title']);
 
-  const visibleCategories = transformToSettingsByCategories(search || visibleSettings);
+  const visibleCategories = groupSettingsByCategory(search || visibleSettings);
 
   const onSave = async () => {
     setLoading(true);
@@ -169,7 +154,7 @@ const WzConfigurationSettingsProvider = (props) => {
       successToast();
 
       // Reset the form changed configuration
-      doneChanges();
+      doChanges();
     } catch (error) {
       const options: UIErrorLog = {
         context: `${WzConfigurationSettingsProvider.name}.onSave`,
@@ -219,7 +204,7 @@ const WzConfigurationSettingsProvider = (props) => {
           <BottomBar
             errorsCount={Object.keys(errors).length}
             unsavedCount={Object.keys(changed).length}
-            onCancel={undoneChanges}
+            onCancel={undoChanges}
             onSave={onSave}
           />
         )}

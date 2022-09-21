@@ -351,8 +351,8 @@ export enum SettingCategory{
   CUSTOMIZATION,
 };
 
-type TpluginSettingOptionsChoices = {
-	choices: {text: string, value: any}[]
+type TpluginSettingOptionsSelect = {
+	select: {text: string, value: any}[]
 };
 
 type TpluginSettingOptionsNumber = {
@@ -399,7 +399,7 @@ export type TpluginSetting = {
 	requireHealthCheck?: boolean // Modify the setting requires running the plugin health check (frontend)
 	requireReload?: boolean // Modify the setting requires reloading the browser tab (frontend)
 	requireRestart?: boolean // Modify the setting requires restarting the plugin platform to take effect
-	options?: TpluginSettingOptionsChoices | TpluginSettingOptionsNumber | TpluginSettingOptionsEditor | TpluginSettingOptionsSwitch // Define options related to the `type`
+	options?: TpluginSettingOptionsNumber | TpluginSettingOptionsEditor | TpluginSettingOptionsSelect | TpluginSettingOptionsSwitch // Define options related to the `type`
 	uiFormTransformChangedInputValue?: (value: any) => any // Transform the input value. The result is saved in the form global state of Settings/Configuration
 	uiFormTransformInputValueToConfigurationValue?: (value: any) => any // Transform the configuration value or default as initial value for the input in Settings/Configuration
 	uiFormTransformConfigurationValueToInputValue?: (value: any) => any // Transform the input value changed in the form of Settings/Configuration and returned in the `changed` property of the hook useForm
@@ -699,7 +699,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		category: SettingCategory.STATISTICS,
 		type: EpluginSettingType.select,
 		options: {
-			choices: [
+			select: [
 				{
 					text: "Hourly",
 					value: "h"
@@ -1085,30 +1085,6 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 			return schema.boolean();
 		},
 	},
-	"extensions.mitre": {
-		title: "MITRE ATT&CK",
-		description: "Enable or disable the MITRE tab on Overview and Agents.",
-		category: SettingCategory.EXTENSIONS,
-		type: EpluginSettingType.switch,
-		default: true,
-		configurableFile: true,
-		configurableUI: false,
-		options: {
-			switch: {
-				values: {
-					disabled: {label: 'false', value: false},
-					enabled: {label: 'true', value: true},
-				}
-			}
-		},
-		uiFormTransformChangedInputValue: function(value: boolean | string): boolean{
-			return Boolean(value);
-		},
-		validate: validateBooleanIs,
-		validateBackend: function(schema){
-			return schema.boolean();
-		},
-	},
 	"extensions.nist": {
 		title: "NIST",
 		description: "Enable or disable the NIST 800-53 tab on Overview and Agents.",
@@ -1336,7 +1312,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		category: SettingCategory.GENERAL,
 		type: EpluginSettingType.select,
 		options: {
-			choices: [
+			select: [
 				{
 					text: "Info",
 					value: "info"
@@ -1398,7 +1374,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		category: SettingCategory.MONITORING,
 		type: EpluginSettingType.select,
 		options: {
-			choices: [
+			select: [
 				{
 					text: "Hourly",
 					value: "h"
