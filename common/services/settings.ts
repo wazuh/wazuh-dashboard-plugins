@@ -12,8 +12,8 @@ export function getSettingDefaultValue(settingKey: string) {
 };
 
 /**
- * Get the default settings configuration. key-value par
- * @returns an object key-value with the default value
+ * Get the default settings configuration. key-value pair
+ * @returns an object with key-value pairs whose value is the default one
  */
 export function getSettingsDefault() : {[key: string]: unknown}   {
 	return Object.entries(PLUGIN_SETTINGS).reduce((accum, [pluginSettingID, pluginSettingConfiguration]) => ({
