@@ -7,11 +7,9 @@ import { ByteSizeValue } from '@kbn/config-schema';
 import supertest from 'supertest';
 import { WazuhUtilsRoutes } from './wazuh-utils';
 import { WazuhUtilsCtrl } from '../../controllers/wazuh-utils/wazuh-utils';
-import md5 from 'md5';
 import { createDataDirectoryIfNotExists, createDirectoryIfNotExists } from '../../lib/filesystem';
 import { WAZUH_DATA_ABSOLUTE_PATH, WAZUH_DATA_CONFIG_APP_PATH, WAZUH_DATA_CONFIG_DIRECTORY_PATH, WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH, WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, WAZUH_DATA_LOGS_DIRECTORY_PATH, WAZUH_DATA_LOGS_RAW_PATH } from '../../../common/constants';
 import { execSync } from 'child_process';
-import path from 'path';
 import fs from 'fs';
 
 const loggingService = loggingSystemMock.create();

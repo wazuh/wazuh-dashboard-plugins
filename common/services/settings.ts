@@ -5,27 +5,39 @@ import { EpluginSettingType, PLUGIN_SETTINGS, TpluginSetting, TPluginSettingWith
  * @param setting setting key
  * @returns setting default value
  */
-export function getSettingDefaultValue(setting: string) {
-	return typeof PLUGIN_SETTINGS[setting].defaultHidden !== 'undefined'
-		? PLUGIN_SETTINGS[setting].defaultHidden
-		: PLUGIN_SETTINGS[setting].default;
+export function getSettingDefaultValue(settingKey: string) {
+	return typeof PLUGIN_SETTINGS[settingKey].defaultHidden !== 'undefined'
+		? PLUGIN_SETTINGS[settingKey].defaultHidden
+		: PLUGIN_SETTINGS[settingKey].default;
 };
 
-export function getSettingsDefault() {
+/**
+ * Get the default settings configuration. key-value par
+ * @returns an object key-value with the default value
+ */
+export function getSettingsDefault() : {[key: string]: unknown}   {
 	return Object.entries(PLUGIN_SETTINGS).reduce((accum, [pluginSettingID, pluginSettingConfiguration]) => ({
 		...accum,
 		[pluginSettingID]: pluginSettingConfiguration.default
 	}), {});
 };
 
-export function getSettingsByCategories() {
+/**
+ * Get the settings grouped by category
+ * @returns an object whose keys are the categories and its value is an array of setting of that category
+ */
+export function getSettingsByCategories() : {[key: string]: TpluginSetting[]}  {
 	return Object.entries(PLUGIN_SETTINGS).reduce((accum, [pluginSettingID, pluginSettingConfiguration]) => ({
 		...accum,
 		[pluginSettingConfiguration.category]: [...(accum[pluginSettingConfiguration.category] || []), { ...pluginSettingConfiguration, key: pluginSettingID }]
 	}), {});
 };
 
-export function getSettingsDefaultList() {
+/**
+ * Get the plugin settings as an array
+ * @returns an array of plugin setting denifition including the key
+ */
+export function getSettingsDefaultList(): TPluginSettingWithKey[] {
 	return Object.entries(PLUGIN_SETTINGS).reduce((accum, [pluginSettingID, pluginSettingConfiguration]) => ([
 		...accum,
 		{ ...pluginSettingConfiguration, key: pluginSettingID }
@@ -106,7 +118,7 @@ export function groupSettingsByCategory(settings: TPluginSettingWithKey[]){
  * @param label 
  * @returns 
  */
-function formatLabelValuePair(label, value){
+export function formatLabelValuePair(label, value){
 	return label !== `${value}`
 		? `${value} (${label})`
 		: `${value}`
