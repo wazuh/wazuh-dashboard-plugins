@@ -1,0 +1,79 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SCA Inventory Test should render correctly 1`] = `
+<DocumentFragment>
+  <div>
+    <div
+      style="margin: 16px;"
+    >
+      <div
+        class="euiSpacer euiSpacer--m"
+      />
+      <div
+        class="euiProgress euiProgress--indeterminate euiProgress--xs euiProgress--primary"
+      />
+    </div>
+  </div>
+  <div
+    class="euiPage"
+  />
+</DocumentFragment>
+`;
+
+exports[`SCA Inventory Test should render correctly 2`] = `
+<DocumentFragment>
+  <div />
+  <div
+    class="euiPage"
+  >
+    <div
+      class="euiCallOut euiCallOut--primary"
+    >
+      <div
+        class="euiCallOutHeader"
+      >
+        <svg
+          aria-hidden="true"
+          class="euiIcon euiIcon--medium euiCallOutHeader__icon"
+          focusable="false"
+          height="16"
+          role="img"
+          viewBox="0 0 16 16"
+          width="16"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M7.5 11.508L7.468 8H6.25V7h2.401l.03 3.508H9.8v1H7.5zm-.25-6.202a.83.83 0 01.207-.577c.137-.153.334-.229.59-.229.256 0 .454.076.594.23.14.152.209.345.209.576 0 .228-.07.417-.21.568-.14.15-.337.226-.593.226-.256 0-.453-.075-.59-.226a.81.81 0 01-.207-.568zM8 13A5 5 0 108 3a5 5 0 000 10zm0 1A6 6 0 118 2a6 6 0 010 12z"
+            fill-rule="evenodd"
+          />
+        </svg>
+        <span
+          class="euiCallOutHeader__title"
+        >
+          No scans available
+        </span>
+      </div>
+      <div
+        class="euiText euiText--small"
+      >
+        <button
+          class="euiButton euiButton--primary"
+          type="button"
+        >
+          <span
+            class="euiButtonContent euiButton__content"
+          >
+            <span
+              class="euiButton__text"
+            >
+              Refresh
+            </span>
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`SCA Inventory Test should render correctly 3`] = `<DocumentFragment />`;

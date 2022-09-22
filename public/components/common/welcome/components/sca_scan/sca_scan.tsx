@@ -173,7 +173,7 @@ export const ScaScan = compose(
         </EuiFlexGroup>
         <EuiPanel>
 
-        <Inventory agent={agent} withoutDashboard onClickRow={this.onClickRow} firstTable={this.state.firstTable} />
+        <Inventory agent={agent} withoutDashboard onClickRow={this.onClickRow} />
         </EuiPanel>
         <EuiFlexGroup>
           <EuiFlexItem>

@@ -69,7 +69,6 @@ export class Inventory extends Component {
       pageTableChecks: { pageIndex: 0 },
       policies: [],
       redirect: false,
-      // firstTable: true
       secondTable: false
     };
     this.suggestions = {};
@@ -194,12 +193,12 @@ export class Inventory extends Component {
           q: 'policy_id=' + id,
         });
         await this.loadScaPolicy(((((policy || {}).data || {}).data || {}).items || [])[0]);
-        console.log(window.location.href, 'location')
+        // console.log(window.location.href, 'location')
         window.location.href = window.location.href.replace(
           new RegExp('redirectPolicy=' + '[^&]*'),
           ''
         );
-        console.log('entre')
+        // console.log('entre')
         this.setState({ loading: false });
       }
     } catch (error) {
@@ -233,8 +232,8 @@ export class Inventory extends Component {
     const regex = new RegExp('redirectRule=' + '[^&]*');
     const match = window.location.href.match(regex);
     if (match && match[0] && !this.state.secondTable) {
-     this.loadScaPolicy(match[0].split('=')[1], true)
-     console.log(match[0], 'matchi')
+      this.loadScaPolicy(match[0].split('=')[1], true)
+      // console.log(match[0], 'matchi')
     }
   }
 
@@ -411,7 +410,7 @@ export class Inventory extends Component {
   }
 
   async loadScaPolicy(policy, secondTable) {
-    console.log('soy load')
+    // console.log('soy load')
     this._isMount &&
       this.setState({
         loadingPolicy: true,
@@ -427,7 +426,7 @@ export class Inventory extends Component {
           },
         });
         const [policyData] = policyResponse.data.data.affected_items;
-        console.log(policyData, 'pol')
+        // console.log(policyData, 'pol')
         // It queries all checks without filters, because the filters are applied in the results
         // due to the use of EuiInMemoryTable instead EuiTable components and do arequest with each change of filters.
         const checksResponse = await WzRequest.apiReq(
@@ -443,7 +442,7 @@ export class Inventory extends Component {
           this.setState({ lookingPolicy: policyData, loadingPolicy: false, items: checks });
       } catch (error) {
         this.setState({ lookingPolicy: policy, loadingPolicy: false });
-        console.log(error, 'error')
+        // console.log(error, 'error')
         const options: UIErrorLog = {
           context: `${Inventory.name}.loadScaPolicy`,
           level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
@@ -467,14 +466,14 @@ export class Inventory extends Component {
       this.state.filters.every((filter) =>
         filter.field === 'search'
           ? Object.keys(check).some(
-              (key) =>
-                ['string', 'number'].includes(typeof check[key]) &&
-                String(check[key]).toLowerCase().includes(filter.value.toLowerCase())
-            )
+            (key) =>
+              ['string', 'number'].includes(typeof check[key]) &&
+              String(check[key]).toLowerCase().includes(filter.value.toLowerCase())
+          )
           : typeof check[filter.field] === 'string' &&
-            (filter.value === ''
-              ? check[filter.field] === filter.value
-              : check[filter.field].toLowerCase().includes(filter.value.toLowerCase()))
+          (filter.value === ''
+            ? check[filter.field] === filter.value
+            : check[filter.field].toLowerCase().includes(filter.value.toLowerCase()))
       )
     );
 
@@ -572,8 +571,8 @@ export class Inventory extends Component {
     const { onClickRow } = this.props
     const handleOnClick = (policy_id) => {
       onClickRow(policy_id)
-      console.log(policy_id, 'name')
-      this.setState({lookingPolicy: true , loading: false, redirect: true})
+      // console.log(policy_id, 'name')
+      this.setState({ lookingPolicy: true, loading: false, redirect: true })
     }
 
     // agent &&
@@ -583,10 +582,12 @@ export class Inventory extends Component {
 
 
     const getPoliciesRowProps = (item, idx) => {
-      console.log(item, 'item')
+      // console.log(item, 'item')
       return {
         'data-test-subj': `sca-row-${idx}`,
         className: 'customRowClass',
+        //This logic is necessary because when you click on a row in the table, it redirects you to a url that receives
+        //a parameter and displays the desired table.
         onClick: onClickRow ? () => handleOnClick(item.policy_id) : () => this.loadScaPolicy(item.policy_id),
       };
     };
@@ -611,9 +612,15 @@ export class Inventory extends Component {
         onClick={() => this.setState({ showMoreInfo: !this.state.showMoreInfo })}
       ></EuiButtonEmpty>
     );
-    const { agent, withoutDashboard, firstTable } = this.props;
-    console.log(agent, this.state.lookingPolicy, this.state.loading, this.state.redirect, firstTable, 'perro')
-
+    const { agent, withoutDashboard } = this.props;
+    // console.log(agent, this.state.lookingPolicy, this.state.loading, this.state.redirect, 'perro')
+    // const itemsMapped = this.state.policies.map((item) => {
+    //   return ({
+    //     ...item, pass: <div style={{color:'red'}}>{item.pass}</div>,
+    //     fail: <div>{item.fail}</div>
+    //   }
+    //   )
+    // })
     return (
       <Fragment>
         <div>
@@ -689,21 +696,21 @@ export class Inventory extends Component {
                 )}
                 <EuiSpacer size="m" />
                 {/* <EuiPanel paddingSize="l"> */}
-                  <EuiFlexGroup>
-                    <EuiFlexItem>
-                       <EuiBasicTable
-                        items={this.state.policies}
-                        columns={this.columnsPolicies}
-                        rowProps={getPoliciesRowProps}
-                      />
-                    </EuiFlexItem>
-                  </EuiFlexGroup>
+                <EuiFlexGroup>
+                  <EuiFlexItem>
+                    <EuiBasicTable
+                      items={this.state.policies}
+                      columns={this.columnsPolicies}
+                      rowProps={getPoliciesRowProps}
+                    />
+                  </EuiFlexItem>
+                </EuiFlexGroup>
                 {/* </EuiPanel> */}
               </div>
             )}
           {agent &&
             (agent || {}).os &&
-            this.state.lookingPolicy && 
+            this.state.lookingPolicy &&
             !this.state.loading && (
               <div>
                 <EuiPanel paddingSize="l">
@@ -852,11 +859,11 @@ export class Inventory extends Component {
 }
 
 
-Inventory.propTypes = {  
-  withoutDashboard: PropTypes.bool  
-}  
+Inventory.propTypes = {
+  withoutDashboard: PropTypes.bool
+}
 
-Inventory.defaultProps = {  
-  withoutDashboard: false, 
+Inventory.defaultProps = {
+  withoutDashboard: false,
   onClickRow: undefined
 }  
