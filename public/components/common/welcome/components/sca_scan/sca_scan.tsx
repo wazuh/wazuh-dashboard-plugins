@@ -175,7 +175,7 @@ export const ScaScan = compose(
 
         <Inventory agent={agent} withoutDashboard onClickRow={this.onClickRow} />
         </EuiPanel>
-        <EuiFlexGroup>
+        {/* <EuiFlexGroup>
           <EuiFlexItem>
             <EuiText size={'s'}>
               <p>{lastScan.description}</p>
@@ -231,7 +231,7 @@ export const ScaScan = compose(
               <EuiIcon type="clock" color={'primary'}/> Duration: {this.durationScan()}
             </EuiText>
           </EuiFlexItem>
-        </EuiFlexGroup>
+        </EuiFlexGroup> */}
       </Fragment>
     )
   }
@@ -266,7 +266,7 @@ export const ScaScan = compose(
       <EuiFlexItem>
         <EuiPanel paddingSize="m">
           <EuiText size="xs">
-            <EuiFlexGroup>
+            <EuiFlexGroup className="wz-section-sca-euiFlexGroup">
             <EuiFlexItem grow={false}>
             <EuiTitle size="xs">
               <EuiLink className="agents-link-item" onClick={() => {
@@ -289,6 +289,7 @@ export const ScaScan = compose(
                   <EuiButtonIcon
                     iconType="popout"
                     color="primary"
+                    className='EuiButtonIcon'
                     onClick={() => {
                                         window.location.href = `#/overview?tab=sca`;
                                         store.dispatch(updateCurrentAgentData(this.props.agent));
