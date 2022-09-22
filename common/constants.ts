@@ -690,7 +690,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		},
 		validate: validateJSONArrayOfStrings,
 		validateBackend: function(schema){
-			return schema.string({validate: this.validate});
+			return schema.arrayOf(schema.string({validate: composeValidate(validateStringNoEmpty, validateStringNoSpaces)}));
 		},
 	},
 	"cron.statistics.index.creation": {
@@ -723,10 +723,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		configurableUI: true,
 		requireHealthCheck: true,
 		validate: function (value){
-			return validateLiteral(this.options.choices.map(({value}) => value))(value)
+			return validateLiteral(this.options.select.map(({value}) => value))(value)
 		},
 		validateBackend: function(schema){
-			return schema.oneOf(this.options.choices.map(({value}) => schema.literal(value)));
+			return schema.oneOf(this.options.select.map(({value}) => schema.literal(value)));
 		},
 	},
 	"cron.statistics.index.name": {
@@ -740,7 +740,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		requireHealthCheck: true,
 		validate: composeValidate(validateStringNoEmpty, validateStringNoSpaces),
 		validateBackend: function(schema){
-			return schema.string({minLength: 1, validate: this.validate});
+			return schema.string({validate: this.validate});
 		},
 	},
 	"cron.statistics.index.replicas": {
@@ -761,7 +761,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 			return validateNumber(this.options.number)(value)
 		},
 		validateBackend: function(schema){
-			return schema.number({validate: this.validate});
+			return schema.number({validate: this.validate.bind(this)});
 		},
 	},
 	"cron.statistics.index.shards": {
@@ -782,7 +782,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 			return validateNumber(this.options.number)(value)
 		},
 		validateBackend: function(schema){
-			return schema.number({validate: this.validate});
+			return schema.number({validate: this.validate.bind(this)});
 		},
 	},
 	"cron.statistics.interval": {
@@ -888,7 +888,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		},
 		validate: validateJSONArrayOfStrings,
 		validateBackend: function(schema){
-			return schema.arrayOf(schema.string({minLength: 1}));
+			return schema.arrayOf(schema.string({validate: composeValidate(validateStringNoEmpty, validateStringNoSpaces)}));
 		},
 	},
 	"enrollment.dns": {
@@ -1279,7 +1279,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		},
 		validate: validateJSONArrayOfStrings,
 		validateBackend: function(schema){
-			return schema.string({validate: this.validate})
+			return schema.arrayOf(schema.string({validate: composeValidate(validateStringNoEmpty, validateStringNoSpaces)}));
 		}
 	},
 	"ip.selector": {
@@ -1328,10 +1328,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		configurableUI: true,
 		requireRestart: true,
 		validate: function (value){
-			return validateLiteral(this.options.choices.map(({value}) => value))(value)
+			return validateLiteral(this.options.select.map(({value}) => value))(value)
 		},
 		validateBackend: function(schema){
-			return schema.oneOf(this.options.choices.map(({value}) => schema.literal(value)));
+			return schema.oneOf(this.options.select.map(({value}) => schema.literal(value)));
 		},
 	},
 	"pattern": {
@@ -1345,7 +1345,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		requireHealthCheck: true,
 		validate: composeValidate(validateStringNoEmpty, validateStringNoSpaces),
 		validateBackend: function(schema){
-			return schema.string({minLength: 1, validate: this.validate});
+			return schema.string({validate: this.validate});
 		},
 	},
 	"timeout": {
@@ -1365,7 +1365,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 			return validateNumber(this.options.number)(value);
 		},
 		validateBackend: function(schema){
-			return schema.number({validate: this.validate});
+			return schema.number({validate: this.validate.bind(this)});
 		},
 	},
 	"wazuh.monitoring.creation": {
@@ -1398,10 +1398,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		configurableUI: true,
 		requireHealthCheck: true,
 		validate: function (value){
-			return validateLiteral(this.options.choices.map(({value}) => value))(value)
+			return validateLiteral(this.options.select.map(({value}) => value))(value)
 		},
 		validateBackend: function(schema){
-			return schema.oneOf(this.options.choices.map(({value}) => schema.literal(value)));
+			return schema.oneOf(this.options.select.map(({value}) => schema.literal(value)));
 		},
 	},
 	"wazuh.monitoring.enabled": {
@@ -1447,7 +1447,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 			return validateNumber(this.options.number)(value);
 		},
 		validateBackend: function(schema){
-			return schema.number({validate: this.validate});
+			return schema.number({validate: this.validate.bind(this)});
 		},
 	},
 	"wazuh.monitoring.pattern": {
@@ -1482,7 +1482,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 			return validateNumber(this.options.number)(value);
 		},
 		validateBackend: function(schema){
-			return schema.number({validate: this.validate});
+			return schema.number({validate: this.validate.bind(this)});
 		},
 	},
 	"wazuh.monitoring.shards": {
@@ -1503,7 +1503,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 			return validateNumber(this.options.number)(value);
 		},
 		validateBackend: function(schema){
-			return schema.number({validate: this.validate});
+			return schema.number({validate: this.validate.bind(this)});
 		},
 	}
 };
