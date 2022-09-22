@@ -375,7 +375,6 @@ type TpluginSettingOptionsSwitch = {
 	}
 };
 
-
 export enum EpluginSettingType{
 	text = 'text',
 	textarea = 'textarea',
@@ -386,21 +385,36 @@ export enum EpluginSettingType{
 };
 
 export type TpluginSetting = {
-	title: string // Define the text displayed in the UI.
-	description: string // Description.
-	category: SettingCategory // Category.
-	type: EpluginSettingType // Type.
-	default: any // Default value.
-	defaultHidden?: any // Default value if it is not set. It has preference over `default`
-	configurableFile: boolean, // Configurable from the configuration file
-	configurableUI: boolean // Configurable from the UI (Settings/Configuration)
-	requireHealthCheck?: boolean // Modify the setting requires running the plugin health check (frontend)
-	requireReload?: boolean // Modify the setting requires reloading the browser tab (frontend)
-	requireRestart?: boolean // Modify the setting requires restarting the plugin platform to take effect
-	options?: TpluginSettingOptionsNumber | TpluginSettingOptionsEditor | TpluginSettingOptionsSelect | TpluginSettingOptionsSwitch // Define options related to the `type`
-	uiFormTransformChangedInputValue?: (value: any) => any // Transform the input value. The result is saved in the form global state of Settings/Configuration
-	uiFormTransformInputValueToConfigurationValue?: (value: any) => any // Transform the configuration value or default as initial value for the input in Settings/Configuration
-	uiFormTransformConfigurationValueToInputValue?: (value: any) => any // Transform the input value changed in the form of Settings/Configuration and returned in the `changed` property of the hook useForm
+	// Define the text displayed in the UI.
+	title: string
+	// Description.
+	description: string
+	// Category.
+	category: SettingCategory
+	// Type.
+	type: EpluginSettingType
+	// Default value.
+	default: any
+	// Default value if it is not set. It has preference over `default`.
+	defaultHidden?: any
+	// Configurable from the configuration file.
+	configurableFile: boolean
+	// Configurable from the UI (Settings/Configuration).
+	configurableUI: boolean
+	// Modify the setting requires running the plugin health check (frontend).
+	requireHealthCheck?: boolean
+	// Modify the setting requires reloading the browser tab (frontend).
+	requireReload?: boolean
+	// Modify the setting requires restarting the plugin platform to take effect.
+	requireRestart?: boolean
+	// Define options related to the `type`.
+	options?: TpluginSettingOptionsNumber | TpluginSettingOptionsEditor | TpluginSettingOptionsSelect | TpluginSettingOptionsSwitch
+	// Transform the input value. The result is saved in the form global state of Settings/Configuration
+	uiFormTransformChangedInputValue?: (value: any) => any
+	// Transform the configuration value or default as initial value for the input in Settings/Configuration
+	uiFormTransformConfigurationValueToInputValue?: (value: any) => any
+	// Transform the input value changed in the form of Settings/Configuration and returned in the `changed` property of the hook useForm
+	uiFormTransformInputValueToConfigurationValue?: (value: any) => any
 };
 
 export type TPluginSettingWithKey = TpluginSetting & { key: string };
