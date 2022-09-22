@@ -1,6 +1,6 @@
 ---
 name: Compatibility request
-about: Suggest an idea for this project
+about: Suggest supporting a new platform version (Elastic, OpenSearch)
 title: 'Compatibility with [Elastic | OpenSearch] (version)'
 labels: compatibility
 assignees: ''
