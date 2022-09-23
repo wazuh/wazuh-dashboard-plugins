@@ -1,24 +1,24 @@
-import { EpluginSettingType, PLUGIN_SETTINGS, TpluginSetting, TPluginSettingWithKey } from '../constants';
+import { EpluginSettingType, PLUGIN_SETTINGS, TPluginSetting, TPluginSettingKey, TPluginSettingWithKey } from '../constants';
 
 /**
- * Get the default value of the plugin setting
+ * Get the default value of the plugin setting.
  * @param setting setting key
- * @returns setting default value
+ * @returns setting default value. It returns `defaultValueIfNotSet` or `defaultValue`.
  */
-export function getSettingDefaultValue(settingKey: string) {
-	return typeof PLUGIN_SETTINGS[settingKey].defaultHidden !== 'undefined'
-		? PLUGIN_SETTINGS[settingKey].defaultHidden
-		: PLUGIN_SETTINGS[settingKey].default;
+export function getSettingDefaultValue(settingKey: string): any {
+	return typeof PLUGIN_SETTINGS[settingKey].defaultValueIfNotSet !== 'undefined'
+		? PLUGIN_SETTINGS[settingKey].defaultValueIfNotSet
+		: PLUGIN_SETTINGS[settingKey].defaultValue;
 };
 
 /**
  * Get the default settings configuration. key-value pair
  * @returns an object with key-value pairs whose value is the default one
  */
-export function getSettingsDefault() : {[key: string]: unknown}   {
+export function getSettingsDefault() : {[key in TPluginSettingKey]: unknown}   {
 	return Object.entries(PLUGIN_SETTINGS).reduce((accum, [pluginSettingID, pluginSettingConfiguration]) => ({
 		...accum,
-		[pluginSettingID]: pluginSettingConfiguration.default
+		[pluginSettingID]: pluginSettingConfiguration.defaultValue
 	}), {});
 };
 
@@ -26,7 +26,7 @@ export function getSettingsDefault() : {[key: string]: unknown}   {
  * Get the settings grouped by category
  * @returns an object whose keys are the categories and its value is an array of setting of that category
  */
-export function getSettingsByCategories() : {[key: string]: TpluginSetting[]}  {
+export function getSettingsByCategories() : {[key: string]: TPluginSetting[]}  {
 	return Object.entries(PLUGIN_SETTINGS).reduce((accum, [pluginSettingID, pluginSettingConfiguration]) => ({
 		...accum,
 		[pluginSettingConfiguration.category]: [...(accum[pluginSettingConfiguration.category] || []), { ...pluginSettingConfiguration, key: pluginSettingID }]
@@ -35,7 +35,7 @@ export function getSettingsByCategories() : {[key: string]: TpluginSetting[]}  {
 
 /**
  * Get the plugin settings as an array
- * @returns an array of plugin setting denifition including the key
+ * @returns an array of plugin setting denifitions including the key
  */
 export function getSettingsDefaultList(): TPluginSettingWithKey[] {
 	return Object.entries(PLUGIN_SETTINGS).reduce((accum, [pluginSettingID, pluginSettingConfiguration]) => ([
@@ -104,7 +104,7 @@ export function groupSettingsByCategory(settings: TPluginSettingWithKey[]){
  * @param options 
  * @returns 
  */
- export function getPluginSettingDescription({description, options}: TpluginSetting): string{
+ export function getPluginSettingDescription({description, options}: TPluginSetting): string{
 	return [
 		description,
 		...(options?.select ? [`Allowed values: ${options.select.map(({text, value}) => formatLabelValuePair(text, value)).join(', ')}.`] : []),

@@ -141,9 +141,9 @@ hosts:
       .expect(responseStatusCode);
 
     expect(response.body.data.updatedConfiguration).toEqual(settings);
-    expect(response.body.data.requireHealthCheck).toBeDefined();
-    expect(response.body.data.requireReload).toBeDefined();
-    expect(response.body.data.requireRestart).toBeDefined();
+    expect(response.body.data.requiresRunningHealthCheck).toBeDefined();
+    expect(response.body.data.requiresReloadingBrowserTab).toBeDefined();
+    expect(response.body.data.requiresRestartingPluginPlatform).toBeDefined();
   });
 });
 

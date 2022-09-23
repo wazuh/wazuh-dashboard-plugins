@@ -65,27 +65,27 @@ export class WazuhUtilsCtrl {
    updateConfigurationFile = this.routeDecoratorProtectedAdministratorRoleValidToken(
     async (context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) => {
 
-      let requireHealthCheck: boolean = false,
-          requireReload: boolean = false,
-          requireRestart: boolean = false;
+      let requiresRunningHealthCheck: boolean = false,
+          requiresReloadingBrowserTab: boolean = false,
+          requiresRestartingPluginPlatform: boolean = false;
 
       // Plugin settings configurables in the configuration file.
       const pluginSettingsConfigurableFile = Object.keys(request.body)
-        .filter(pluginSettingKey => PLUGIN_SETTINGS[pluginSettingKey].configurableFile)
+        .filter(pluginSettingKey => PLUGIN_SETTINGS[pluginSettingKey].isConfigurableFromFile)
         .reduce((accum, pluginSettingKey: string) => ({...accum, [pluginSettingKey]: request.body[pluginSettingKey]}), {});
 
       if(Object.keys(pluginSettingsConfigurableFile).length){
         // Update the configuration file.
         await updateConfigurationFile.updateConfiguration(pluginSettingsConfigurableFile);
 
-        requireHealthCheck = Object.keys(pluginSettingsConfigurableFile).some((pluginSettingKey: string) => Boolean(PLUGIN_SETTINGS[pluginSettingKey].requireHealthCheck)) || requireHealthCheck;
-        requireReload = Object.keys(pluginSettingsConfigurableFile).some((pluginSettingKey: string) => Boolean(PLUGIN_SETTINGS[pluginSettingKey].requireReload)) || requireReload;
-        requireRestart = Object.keys(pluginSettingsConfigurableFile).some((pluginSettingKey: string) => Boolean(PLUGIN_SETTINGS[pluginSettingKey].requireRestart)) || requireRestart;
+        requiresRunningHealthCheck = Object.keys(pluginSettingsConfigurableFile).some((pluginSettingKey: string) => Boolean(PLUGIN_SETTINGS[pluginSettingKey].requiresRunningHealthCheck)) || requiresRunningHealthCheck;
+        requiresReloadingBrowserTab = Object.keys(pluginSettingsConfigurableFile).some((pluginSettingKey: string) => Boolean(PLUGIN_SETTINGS[pluginSettingKey].requiresReloadingBrowserTab)) || requiresReloadingBrowserTab;
+        requiresRestartingPluginPlatform = Object.keys(pluginSettingsConfigurableFile).some((pluginSettingKey: string) => Boolean(PLUGIN_SETTINGS[pluginSettingKey].requiresRestartingPluginPlatform)) || requiresRestartingPluginPlatform;
       };
 
       return response.ok({
         body: {
-          data: { requireHealthCheck, requireReload, requireRestart, updatedConfiguration: request.body }
+          data: { requiresRunningHealthCheck, requiresReloadingBrowserTab, requiresRestartingPluginPlatform, updatedConfiguration: request.body }
         }
       });
     },

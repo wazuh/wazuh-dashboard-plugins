@@ -19,7 +19,7 @@ describe('[configuration-file] Default configuration file content', () => {
 	it('Include all the expected categories and settings', () => {
 
 		const pluginSettingsConfigurationFile = getSettingsDefaultList()
-  			.filter(categorySetting => categorySetting.configurableFile);
+  			.filter(categorySetting => categorySetting.isConfigurableFromFile);
 
 		const pluginSettingsConfigurationFileGroupByCategory = groupSettingsByCategory(pluginSettingsConfigurationFile);
 
@@ -67,10 +67,10 @@ describe('[configuration-file] Methods', () => {
 
 	it.each`
 	input | expected
-	${{key: 'test', description: 'Test description', default: 0}} | ${'# Test description\n# test: 0'}
-	${{key: 'test', description: 'Test description. Test description. Test description. Test description. Test description. Test description. Test description. Test description. Test description. Test description. Test description. ', default: 0}}  | ${'# Test description. Test description. Test description. Test description. Test\n# description. Test description. Test description. Test description. Test\n# description. Test description. Test description.\n# test: 0'}
-	${{key: 'test', description: 'Test description', default: 0, options: {select: [{text: 'Option1', value: 'option'},{text: 'Option2', value: 'option2'}]}}} | ${'# Test description Allowed values: option (Option1), option2 (Option2).\n# test: 0'}
-	${{key: 'test', description: 'Test description', default: 0, options: {switch: {values: { disabled: {label: 'Enabled', value: 'disabled'}, enabled: {label: 'Enabled', value: 'enabled'}, }}}}} | ${'# Test description Allowed values: enabled (Enabled), disabled (Enabled).\n# test: 0'}
+	${{key: 'test', description: 'Test description', defaultValue: 0}} | ${'# Test description\n# test: 0'}
+	${{key: 'test', description: 'Test description. Test description. Test description. Test description. Test description. Test description. Test description. Test description. Test description. Test description. Test description. ', defaultValue: 0}}  | ${'# Test description. Test description. Test description. Test description. Test\n# description. Test description. Test description. Test description. Test\n# description. Test description. Test description.\n# test: 0'}
+	${{key: 'test', description: 'Test description', defaultValue: 0, options: {select: [{text: 'Option1', value: 'option'},{text: 'Option2', value: 'option2'}]}}} | ${'# Test description Allowed values: option (Option1), option2 (Option2).\n# test: 0'}
+	${{key: 'test', description: 'Test description', defaultValue: 0, options: {switch: {values: { disabled: {label: 'Enabled', value: 'disabled'}, enabled: {label: 'Enabled', value: 'enabled'}, }}}}} | ${'# Test description Allowed values: enabled (Enabled), disabled (Enabled).\n# test: 0'}
 	`('printSetting: input: $input , expected: $expected', ({input, expected}) => {
 		const result = printSetting(input);
 		expect(result).toMatch(expected);

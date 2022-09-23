@@ -51,19 +51,19 @@ export type ISetting = {
 };
 
 const pluginSettingConfigurableUI = getSettingsDefaultList()
-  .filter(categorySetting => categorySetting.configurableUI)
+  .filter(categorySetting => categorySetting.isConfigurableFromUI)
   .map(setting => ({ ...setting, category: PLUGIN_SETTINGS_CATEGORIES[setting.category].title}));
 
 const settingsCategoriesSearchBarFilters = [...new Set(pluginSettingConfigurableUI.map(({category}) => category))].sort().map(category => ({value: category}))
 
 const trasnsfromPluginSettingsToFormFields = configuration => Object.fromEntries(
   getSettingsDefaultList()
-    .filter(pluginSetting => pluginSetting.configurableUI)
+    .filter(pluginSetting => pluginSetting.isConfigurableFromUI)
     .map(({
       key,
       type,
       validate,
-      default: initialValue,
+      defaultValue: initialValue,
       uiFormTransformChangedInputValue,
       uiFormTransformConfigurationValueToInputValue,
       uiFormTransformInputValueToConfigurationValue,
@@ -116,7 +116,7 @@ const WzConfigurationSettingsProvider = (props) => {
     setLoading(true);
     try {
       const settingsToUpdate = Object.entries(changed).reduce((accum, [pluginSettingKey, currentValue]) => {
-        if(PLUGIN_SETTINGS[pluginSettingKey].configurableFile){
+        if(PLUGIN_SETTINGS[pluginSettingKey].isConfigurableFromFile){
           accum.saveOnConfigurationFile = {
             ...accum.saveOnConfigurationFile,
             [pluginSettingKey]: formatSettingValueFromForm(pluginSettingKey, currentValue)
@@ -136,8 +136,8 @@ const WzConfigurationSettingsProvider = (props) => {
       const responses = await Promise.all(requests);      
 
       // Show the toasts if necessary
-      responses.some(({data: { data: {requireRestart}}}) => requireRestart) && toastRequireRestart();
-      responses.some(({data: { data: {requireReload}}}) => requireReload) && toastRequireReload();
+      responses.some(({data: { data: {requiresRestartingPluginPlatform}}}) => requiresRestartingPluginPlatform) && toastRequireRestart();
+      responses.some(({data: { data: {requiresReloadingBrowserTab}}}) => requiresReloadingBrowserTab) && toastRequireReload();
       responses.some(({data: { data: {requireHealtCheck}}}) => requireHealtCheck) && toastRequireHealthcheckExecution();
 
       // Update the app configuration frontend-cached setting in memory with the new values
