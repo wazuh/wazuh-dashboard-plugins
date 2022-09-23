@@ -7,11 +7,9 @@ import { ByteSizeValue } from '@kbn/config-schema';
 import supertest from 'supertest';
 import { WazuhUtilsRoutes } from './wazuh-utils';
 import { WazuhUtilsCtrl } from '../../controllers/wazuh-utils/wazuh-utils';
-import md5 from 'md5';
 import { createDataDirectoryIfNotExists, createDirectoryIfNotExists } from '../../lib/filesystem';
 import { PLUGIN_SETTINGS, WAZUH_DATA_ABSOLUTE_PATH, WAZUH_DATA_CONFIG_APP_PATH, WAZUH_DATA_CONFIG_DIRECTORY_PATH, WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH, WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, WAZUH_DATA_LOGS_DIRECTORY_PATH, WAZUH_DATA_LOGS_RAW_PATH } from '../../../common/constants';
 import { execSync } from 'child_process';
-import path from 'path';
 import fs from 'fs';
 
 const loggingService = loggingSystemMock.create();
@@ -147,9 +145,9 @@ hosts:
       .expect(responseStatusCode);
 
       responseStatusCode === 200 && expect(response.body.data.updatedConfiguration).toEqual(settings);
-      responseStatusCode === 200 && expect(response.body.data.requireHealthCheck).toBeDefined();
-      responseStatusCode === 200 && expect(response.body.data.requireReload).toBeDefined();
-      responseStatusCode === 200 && expect(response.body.data.requireRestart).toBeDefined();
+      responseStatusCode === 200 && expect(response.body.data.requiresRunningHealthCheck).toBeDefined();
+      responseStatusCode === 200 && expect(response.body.data.requiresReloadingBrowserTab).toBeDefined();
+      responseStatusCode === 200 && expect(response.body.data.requiresRestartingPluginPlatform).toBeDefined();
       responseBodyMessage && expect(response.body.message).toMatch(responseBodyMessage);
   });
 
@@ -280,9 +278,9 @@ hosts:
       .expect(responseStatusCode);
 
       responseStatusCode === 200 && expect(response.body.data.updatedConfiguration).toEqual(body);
-      responseStatusCode === 200 && expect(response.body.data.requireHealthCheck).toBe(Boolean(PLUGIN_SETTINGS[setting].requireHealthCheck));
-      responseStatusCode === 200 && expect(response.body.data.requireReload).toBe(Boolean(PLUGIN_SETTINGS[setting].requireReload));
-      responseStatusCode === 200 && expect(response.body.data.requireRestart).toBe(Boolean(PLUGIN_SETTINGS[setting].requireRestart));
+      responseStatusCode === 200 && expect(response.body.data.requiresRunningHealthCheck).toBe(Boolean(PLUGIN_SETTINGS[setting].requiresRunningHealthCheck));
+      responseStatusCode === 200 && expect(response.body.data.requiresReloadingBrowserTab).toBe(Boolean(PLUGIN_SETTINGS[setting].requiresReloadingBrowserTab));
+      responseStatusCode === 200 && expect(response.body.data.requiresRestartingPluginPlatform).toBe(Boolean(PLUGIN_SETTINGS[setting].requiresRestartingPluginPlatform));
       responseBodyMessage && expect(response.body.message).toMatch(responseBodyMessage);
   });
 });

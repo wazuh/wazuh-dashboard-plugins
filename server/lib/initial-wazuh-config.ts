@@ -37,7 +37,7 @@ ${printSection('Wazuh app configuration file', {prefix: '# ', fill: '='})}
 # Also, you can check our repository:
 # https://github.com/wazuh/wazuh-kibana-app`;
 
-const pluginSettingsConfigurationFile = getSettingsDefaultList().filter(({configurableFile}) => configurableFile);
+const pluginSettingsConfigurationFile = getSettingsDefaultList().filter(({isConfigurableFromFile}) => isConfigurableFromFile);
 
 const pluginSettingsConfigurationFileGroupByCategory = groupSettingsByCategory(pluginSettingsConfigurationFile);
 
@@ -82,7 +82,7 @@ export function printSetting(setting: TPluginSettingWithKey): string{
   */
   return [
     splitDescription(getPluginSettingDescription(setting)),
-    `# ${setting.key}: ${printSettingValue(setting.default)}`
+    `# ${setting.key}: ${printSettingValue(setting.defaultValue)}`
   ].join('\n')
 }
 
