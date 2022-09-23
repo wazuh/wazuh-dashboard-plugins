@@ -65,7 +65,7 @@ export const fillField = (selector, text) => {
 };
 
 export const getElement = (selector) => {
-  return cy.get(selector, { timeout: 6500 });
+  return cy.get(selector, { timeout: 8000 });
 };
 
 export const getSelector = (name, page) => {

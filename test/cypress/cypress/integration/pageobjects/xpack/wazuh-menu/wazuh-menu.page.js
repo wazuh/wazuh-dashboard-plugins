@@ -70,7 +70,7 @@ export const WAZUH_MENU_PAGE = {
   //endregion
   //region Settings
   settingsApiConfigurationLink: '[data-test-subj=menuSettingsApiLink]',
-  settingsModulesLink: '[data-test-subj=menuSettingsModulesLink]',
+  settingsModulesLink: '.wz-menu-right-side .WzManagementSideMenu [data-test-subj=menuSettingsModulesLink]',
   settingsSampleDataLink: '[data-test-subj=menuSettingsSampleDataLink]',
   settingsConfigurationLink: '[data-test-subj=menuSettingsConfigurationLink]',
   settingsLogsLink: '[data-test-subj=menuSettingsLogsLink]',
