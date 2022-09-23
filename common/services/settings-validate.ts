@@ -34,11 +34,11 @@ export const validateBooleanIs = (value: string): string | undefined => typeof v
 
 // Number
 export const validateNumber = (options: {min?: number, max?: number} = {}) => (value: number) => {
-    if(typeof options.min !== 'undefined' && value < options.min){
+    if(typeof options.min !== 'undefined' && value <= options.min){
         return `Value should be greater or equal than ${options.min}.`;
     };
-    if(typeof options.max !== 'undefined' && value > options.max){
-        return `Value should be lower or equal than ${options.min}.`;
+    if(typeof options.max !== 'undefined' && value >= options.max){
+        return `Value should be lower or equal than ${options.max}.`;
     };
 };
 
@@ -64,11 +64,13 @@ export const validateJSONArrayOfStrings = (value: string) => {
 
     // Check the items are strings
     for(let element of parsed){
-        const result = composeValidate(validateStringNoEmpty, validateStringNoSpaces)(element);
+        const result = validateStringNoEmptyNoSpaces(element);
         if(result){
             return result;
         };
     };
 };
+
+export const validateStringNoEmptyNoSpaces = composeValidate(validateStringNoEmpty, validateStringNoSpaces);
 
 export const validateLiteral = (literals) => (value: any): string | undefined => literals.includes(value) ? undefined : `Invalid value. Allowed values: ${literals.map(String).join(', ')}`;
