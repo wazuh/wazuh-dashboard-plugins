@@ -78,8 +78,11 @@ export const validateStringNoEmptyNoSpaces = composeValidate(validateStringNoEmp
 export const validateLiteral = (literals) => (value: any): string | undefined => literals.includes(value) ? undefined : `Invalid value. Allowed values: ${literals.map(String).join(', ')}`;
 
 // FilePicker
-export const validateFilePickerSupportedExtensions = (extensions: string[]) => ({name}: {name: string}) => {
-    if(name && !extensions.includes(path.extname(name))){
+export const validateFilePickerSupportedExtensions = (extensions: string[]) => (options: {name: string}) => {
+    if(typeof options === 'undefined' || typeof options.name === 'undefined'){
+        return;
+    }
+    if(!extensions.includes(path.extname(options.name))){
         return `File extension is invalid. Allowed file extensions: ${extensions.join(', ')}`
     };
 };

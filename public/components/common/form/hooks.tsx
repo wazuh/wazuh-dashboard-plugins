@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { EpluginSettingType } from '../../../../common/constants';
 
 function getValueFromEvent(event, type){
-  return getValueFromEventType?.[type]?.(event) || getValueFromEventType.default(event)
+  return (getValueFromEventType[type] || getValueFromEventType.default)(event);
 };
 
 const getValueFromEventType = {

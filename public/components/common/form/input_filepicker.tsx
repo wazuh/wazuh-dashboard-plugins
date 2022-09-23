@@ -4,11 +4,15 @@ import {
 } from '@elastic/eui';
 import { IInputFormType } from './types';
 
-export const InputFormFilePicker = ({onChange, options, setInputRef, key} : IInputFormType) => (
+export const InputFormFilePicker = ({onChange, options, setInputRef, key, ...rest} : IInputFormType) => (
   <EuiFilePicker
     id={key}
     initialPromptText="Select or drag the file"
-    onChange={(fileList) => {console.log({fileList});onChange(fileList?.[0])}} //TODO: it requires fix when remove the file of the file picker
+    onChange={fileList => onChange(
+      // File was added.
+      fileList?.[0]
+      // File was removed. We set the initial value, so the useForm hook will not detect any change. */
+      || rest.initialValue)}
     display='large'
     fullWidth
     aria-label='Upload a file'
