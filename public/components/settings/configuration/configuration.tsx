@@ -136,9 +136,9 @@ const WzConfigurationSettingsProvider = (props) => {
       const responses = await Promise.all(requests);      
 
       // Show the toasts if necessary
-      responses.some(({data: { data: {requiresRestartingPluginPlatform}}}) => requiresRestartingPluginPlatform) && toastRequireRestart();
-      responses.some(({data: { data: {requiresReloadingBrowserTab}}}) => requiresReloadingBrowserTab) && toastRequireReload();
-      responses.some(({data: { data: {requireHealtCheck}}}) => requireHealtCheck) && toastRequireHealthcheckExecution();
+      responses.some(({data: { data: {requireHealtCheck}}}) => requireHealtCheck) && toastRequiresRunningHealthcheck();
+      responses.some(({data: { data: {requiresReloadingBrowserTab}}}) => requiresReloadingBrowserTab) && toastRequiresReloadingBrowserTab();
+      responses.some(({data: { data: {requiresRestartingPluginPlatform}}}) => requiresRestartingPluginPlatform) && toastRequiresRestartingPluginPlatform();
 
       // Update the app configuration frontend-cached setting in memory with the new values
       dispatch(updateAppConfig({
@@ -218,7 +218,7 @@ export const WzConfigurationSettings = compose (
   withUserAuthorizationPrompt(null, [WAZUH_ROLE_ADMINISTRATOR_NAME])
 )(WzConfigurationSettingsProvider);
 
-const toastRequireReload = () => {
+const toastRequiresReloadingBrowserTab = () => {
   getToasts().add({
     color: 'success',
     title: 'This setting require you to reload the page to take effect.',
@@ -230,7 +230,7 @@ const toastRequireReload = () => {
   });
 };
 
-const toastRequireHealthcheckExecution = () => {
+const toastRequiresRunningHealthcheck = () => {
   const toast = getToasts().add({
     color: 'warning',
     title: 'You must execute the health check for the changes to take effect',
@@ -247,7 +247,7 @@ const toastRequireHealthcheckExecution = () => {
   });
 };
 
-const toastRequireRestart = () => {
+const toastRequiresRestartingPluginPlatform = () => {
   getToasts().add({
     color: 'warning',
     title: `You must restart ${PLUGIN_PLATFORM_NAME} for the changes to take effect`,
