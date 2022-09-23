@@ -29,7 +29,7 @@ export const useForm = (fields) => {
       type: fields[fieldKey].type,
       value,
       changed: !_.isEqual(restFieldState.initialValue, value),
-      error: fields[fieldKey]?.validate?.(restFieldState.currentValue),
+      error: fields[fieldKey]?.validate?.(value),
       onChange: (event) => {
         const inputValue = getValueFromEvent(event, fields[fieldKey].type);
         const currentValue = fields[fieldKey]?.transformChangedInputValue?.(inputValue) ?? inputValue;
