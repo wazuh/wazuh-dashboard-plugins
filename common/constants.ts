@@ -12,7 +12,7 @@
 import path from 'path';
 import { version } from '../package.json';
 import { validate as validateNodeCronInterval } from 'node-cron';
-import { composeValidate, validateBooleanIs, validateFilePickerSupportedExtensions, validateJSONArrayOfStrings, validateLiteral, validateNumber, validateStringNoEmpty, validateStringNoSpaces } from './services/settings-validate';
+import { composeValidate, validateBooleanIs, validateFilePickerFileSize, validateFilePickerSupportedExtensions, validateJSONArrayOfStrings, validateLiteral, validateNumber, validateStringNoEmpty, validateStringNoSpaces } from './services/settings-validate';
 
 // Plugin
 export const PLUGIN_VERSION = version;
@@ -339,6 +339,9 @@ export const DOCUMENTATION_WEB_BASE_URL = "https://documentation.wazuh.com";
 // Default Elasticsearch user name context
 export const ELASTIC_NAME = 'elastic';
 
+// Customization
+export const CUSTOMIZATION_ENDPOINT_PAYLOAD_UPLOAD_CUSTOM_FILE_MAXIMUM_BYTES = 1048576;
+
 
 // Plugin settings
 export enum SettingCategory{
@@ -365,6 +368,10 @@ type TPluginSettingOptionsFile = {
 	file: {
 		type: 'image'
 		extensions?: string[]
+		size?: {
+			maxBytes?: number
+			minBytes?: number
+		}
 		recommended?: {
 			dimensions?: {
 				width: number,
@@ -430,7 +437,7 @@ export type TPluginSetting = {
 	// Modify the setting requires restarting the plugin platform to take effect.
 	requiresRestartingPluginPlatform?: boolean
 	// Define options related to the `type`.
-	options?: TPluginSettingOptionsNumber | TPluginSettingOptionsEditor | TPluginSettingOptionsSelect | TPluginSettingOptionsSwitch
+	options?: TPluginSettingOptionsNumber | TPluginSettingOptionsEditor | TPluginSettingOptionsFile | TPluginSettingOptionsSelect | TPluginSettingOptionsSwitch
 	// Transform the input value. The result is saved in the form global state of Settings/Configuration
 	uiFormTransformChangedInputValue?: (value: any) => any
 	// Transform the configuration value or default as initial value for the input in Settings/Configuration
@@ -869,6 +876,9 @@ export const PLUGIN_SETTINGS = {
 			file: {
 				type: 'image',
 				extensions: ['.jpeg', '.jpg', '.png', '.svg'],
+				size: {
+					maxBytes: CUSTOMIZATION_ENDPOINT_PAYLOAD_UPLOAD_CUSTOM_FILE_MAXIMUM_BYTES,
+				},
 				recommended: {
 					dimensions: {
 						width: 300,
@@ -884,7 +894,10 @@ export const PLUGIN_SETTINGS = {
 			}
 		},
 		validate: function(value){
-			return validateFilePickerSupportedExtensions(this.options.file.extensions)(value)
+			return composeValidate(
+				validateFilePickerFileSize(this.options.file.size),
+				validateFilePickerSupportedExtensions(this.options.file.extensions)
+			)(value)
 		},
 	},
 	"customization.logo.healthcheck": {
@@ -899,6 +912,9 @@ export const PLUGIN_SETTINGS = {
 			file: {
 				type: 'image',
 				extensions: ['.jpeg', '.jpg', '.png', '.svg'],
+				size: {
+					maxBytes: CUSTOMIZATION_ENDPOINT_PAYLOAD_UPLOAD_CUSTOM_FILE_MAXIMUM_BYTES,
+				},
 				recommended: {
 					dimensions: {
 						width: 300,
@@ -914,7 +930,10 @@ export const PLUGIN_SETTINGS = {
 			}
 		},
 		validate: function(value){
-			return validateFilePickerSupportedExtensions(this.options.file.extensions)(value)
+			return composeValidate(
+				validateFilePickerFileSize(this.options.file.size),
+				validateFilePickerSupportedExtensions(this.options.file.extensions)
+			)(value)
 		},
 	},
 	"customization.logo.reports": {
@@ -930,6 +949,9 @@ export const PLUGIN_SETTINGS = {
 			file: {
 				type: 'image',
 				extensions: ['.jpeg', '.jpg', '.png'],
+				size: {
+					maxBytes: CUSTOMIZATION_ENDPOINT_PAYLOAD_UPLOAD_CUSTOM_FILE_MAXIMUM_BYTES,
+				},
 				recommended: {
 					dimensions: {
 						width: 190,
@@ -945,7 +967,10 @@ export const PLUGIN_SETTINGS = {
 			}
 		},
 		validate: function(value){
-			return validateFilePickerSupportedExtensions(this.options.file.extensions)(value)
+			return composeValidate(
+				validateFilePickerFileSize(this.options.file.size),
+				validateFilePickerSupportedExtensions(this.options.file.extensions)
+			)(value)
 		},
 	},
 	"customization.logo.sidebar": {
@@ -961,6 +986,9 @@ export const PLUGIN_SETTINGS = {
 			file: {
 				type: 'image',
 				extensions: ['.jpeg', '.jpg', '.png', '.svg'],
+				size: {
+					maxBytes: CUSTOMIZATION_ENDPOINT_PAYLOAD_UPLOAD_CUSTOM_FILE_MAXIMUM_BYTES,
+				},
 				recommended: {
 					dimensions: {
 						width: 80,
@@ -976,7 +1004,10 @@ export const PLUGIN_SETTINGS = {
 			}
 		},
 		validate: function(value){
-			return validateFilePickerSupportedExtensions(this.options.file.extensions)(value)
+			return composeValidate(
+				validateFilePickerFileSize(this.options.file.size),
+				validateFilePickerSupportedExtensions(this.options.file.extensions)
+			)(value)
 		},
 	},
 	"disabled_roles": {

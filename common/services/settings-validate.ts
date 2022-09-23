@@ -81,3 +81,15 @@ export const validateFilePickerSupportedExtensions = (extensions: string[]) => (
         return `File extension is invalid. Allowed file extensions: ${extensions.join(', ')}`
     };
 };
+
+export const validateFilePickerFileSize = (options: {maxBytes?: number, minBytes?: number}) => (value: {size: number}) => {
+    if(typeof value === 'undefined' || typeof value.size === 'undefined'){
+        return;
+    };
+    if(typeof options.minBytes !== 'undefined' && value.size <= options.minBytes){
+        return `File size should be greater or equal than ${options.minBytes} bytes.`;
+    };
+    if(typeof options.maxBytes !== 'undefined' && value.size >= options.maxBytes){
+        return `File size should be lower or equal than ${options.maxBytes} bytes.`;
+    };
+};

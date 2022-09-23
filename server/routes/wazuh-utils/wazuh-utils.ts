@@ -12,7 +12,7 @@
 import { WazuhUtilsCtrl } from '../../controllers';
 import { IRouter } from 'kibana/server';
 import { schema } from '@kbn/config-schema';
-import { EpluginSettingType, PLUGIN_SETTINGS } from '../../../common/constants';
+import { CUSTOMIZATION_ENDPOINT_PAYLOAD_UPLOAD_CUSTOM_FILE_MAXIMUM_BYTES, EpluginSettingType, PLUGIN_SETTINGS } from '../../../common/constants';
 
 export function WazuhUtilsRoutes(router: IRouter) {
   const ctrl = new WazuhUtilsCtrl();
@@ -63,6 +63,11 @@ export function WazuhUtilsRoutes(router: IRouter) {
               .map(([ , pluginSettingConfiguration]) => ([...pluginSettingConfiguration.options.file.extensions]))
           )].map(schema.literal))
         })
+      },
+      options: {
+        body: {
+          maxBytes: CUSTOMIZATION_ENDPOINT_PAYLOAD_UPLOAD_CUSTOM_FILE_MAXIMUM_BYTES,
+        },
       }
     },
     async (context, request, response) => ctrl.uploadFile(context, request, response)
