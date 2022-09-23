@@ -180,7 +180,6 @@ const WzConfigurationSettingsProvider = (props) => {
       // Remove the selected files on the file picker inputs
       if(Object.keys(settingsToUpdate.fileUpload).length){
         Object.keys(settingsToUpdate.fileUpload).forEach(settingKey => {
-          console.log({dsadsa: fields[settingKey].inputRef});
           try{
             fields[settingKey].inputRef.removeFiles(
               // This method uses some methods of a DOM event.

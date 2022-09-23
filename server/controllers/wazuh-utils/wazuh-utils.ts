@@ -24,6 +24,7 @@ import fs from 'fs';
 import path from 'path';
 import { createDirectoryIfNotExists } from '../../lib/filesystem';
 import glob from 'glob';
+import { getSettingDefaultValue } from '../../../common/services/settings';
 
 const updateConfigurationFile = new UpdateConfigurationFile();
 
@@ -196,7 +197,7 @@ export class WazuhUtilsCtrl {
       files.forEach(fs.unlinkSync);
 
       // Update the setting in the configuration cache
-      const pluginSettingValue = pluginSetting.default;
+      const pluginSettingValue = getSettingDefaultValue(key);
       await updateConfigurationFile.updateConfiguration({[key]: pluginSettingValue}); 
 
       return response.ok({
