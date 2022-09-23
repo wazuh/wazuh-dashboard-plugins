@@ -6,7 +6,7 @@ let toastLocatorTitle = '[data-test-subj="globalToastList"] div';
 When('All buttons have {} status', (status) => {
   cy.wait(4000);
   let label = 'Add data';
-  if (status == 'add') label = 'Remove data';
+  if (status == 'add'){ label = 'Remove data';
   for (let i = 1; i <= 3; i++) {
     elementIsVisible('div:nth-child(' + i + ') > div > div.euiCard__footer > div > div > button')
     cy.get('div:nth-child(' + i + ') > div > div.euiCard__footer > div > div > button',{timeot:10000})
@@ -14,10 +14,8 @@ When('All buttons have {} status', (status) => {
       if($button.find(':contains("' + label + '")').length){
         return cy.get($button).click().wait(10000);
       }
-    }).then(selector =>{
-      cy.get(selector);
     })
-  }
+  }}
 });
 
 When('The user {} sample data for', (status, types) => {
