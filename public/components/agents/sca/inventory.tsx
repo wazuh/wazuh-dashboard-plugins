@@ -50,6 +50,8 @@ import { API_NAME_AGENT_STATUS, UI_LOGGER_LEVELS } from '../../../../common/cons
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { VisualizationBasic } from '../../common/charts/visualizations/basic';
 import PropTypes from 'prop-types'
+import { AppNavigate } from '../../../react-services/app-navigate';
+
 export class Inventory extends Component {
   _isMount = false;
   props!: {
@@ -69,7 +71,8 @@ export class Inventory extends Component {
       pageTableChecks: { pageIndex: 0 },
       policies: [],
       redirect: false,
-      secondTable: false
+      secondTable: false,
+      secondTableBack: false
     };
     this.suggestions = {};
     this.columnsPolicies = [
@@ -229,11 +232,12 @@ export class Inventory extends Component {
       });
     }
 
-    const regex = new RegExp('redirectRule=' + '[^&]*');
+    const regex = new RegExp('redirectPolicyTable=' + '[^&]*');
     const match = window.location.href.match(regex);
-    if (match && match[0] && !this.state.secondTable) {
+    if (match && match[0] && !this.state.secondTable && !this.state.secondTableBack) {
       this.loadScaPolicy(match[0].split('=')[1], true)
       // console.log(match[0], 'matchi')
+      this.setState({secondTableBack: true})
     }
   }
 
@@ -408,6 +412,19 @@ export class Inventory extends Component {
       getErrorOrchestrator().handleError(options);
     }
   }
+
+  handleBack (ev) {
+        AppNavigate.navigateToModule(ev, 'agents', { tab: 'welcome', agent: this.props.agent.id });
+        ev.stopPropagation();
+  };
+
+  // handleBack(e) {
+  //   console.log('enytr')
+  //   e.preventDefault()
+  //   return(
+  //     window && window.history && window.history.back()
+  //   )
+  // }
 
   async loadScaPolicy(policy, secondTable) {
     // console.log('soy load')
@@ -719,7 +736,7 @@ export class Inventory extends Component {
                       <EuiButtonIcon
                         color="primary"
                         style={{ padding: '6px 0px' }}
-                        onClick={() => this.loadScaPolicy(false)}
+                        onClick={this.state.secondTableBack ? (ev) => this.handleBack(ev) : () => this.loadScaPolicy(false)}
                         iconType="arrowLeft"
                         aria-label="Back to policies"
                         {...{ iconSize: 'l' }}

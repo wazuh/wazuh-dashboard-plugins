@@ -118,7 +118,7 @@ export const ScaScan = compose(
   }
 
   onClickRow(policy_id) {
-    window.location.href = `#/overview?tab=sca&redirectRule=${policy_id}`;
+    window.location.href = `#/overview?tab=sca&redirectPolicyTable=${policy_id}`;
                   store.dispatch(updateCurrentAgentData(this.props.agent));
                   this.router.reload();
                   // this.setState({firstTable:false})

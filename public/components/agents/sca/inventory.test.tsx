@@ -6,10 +6,12 @@ import { Inventory } from './inventory'
 import * as _ from 'lodash'
 import { createGetterSetter } from '../../../utils/create-getter-setter';
 import { ErrorOrchestratorService } from '../../../react-services/error-orchestrator/error-orchestrator.service';
+import configureMockStore from 'redux-mock-store';
+import { Provider } from 'react-redux';
+import { WzRequest } from '../../../react-services/wz-request';
 
 
-describe('SCA Inventory Test', () => {
-    // mocked getErrorOrchestrator
+
 const mockedGetErrorOrchestrator = {
     handleError: jest.fn(),
   };
@@ -19,13 +21,24 @@ const mockedGetErrorOrchestrator = {
         getErrorOrchestrator: () => mockedGetErrorOrchestrator,
     };
   });
+
+  jest.mock('../../../react-services/wz-request')
+
+describe('SCA Inventory Test', () => {
+    // mocked getErrorOrchestrator
     // const mockGet = jest.fn();
     // const mockSet = jest.fn();
     // jest.mock('../../../react-services/error-orchestrator/error-orchestrator.service');
     // jest.mock('../../../utils/create-getter-setter');
-    it('should render correctly', async () => {
-        const spyReactConsoleError = jest.spyOn(console, 'error');
-        spyReactConsoleError.mockImplementation(() => {});
+    it('should render correctly', () => {
+        const mockStore = configureMockStore();
+        const store = mockStore({policy_id:'cis_bu'});
+        const apiReqMock = jest.fn().mockReturnValue({
+            data: {
+              data: { affected_items: ['hola'] },
+            },
+          })
+        WzRequest.apiReq = apiReqMock
         const onClickRow = jest.fn()
         const props= {
             agent: {
@@ -48,20 +61,21 @@ const mockedGetErrorOrchestrator = {
             },
             onClickRow,
             withoutDashboard: true
-        } 
+        }
         // try {
 
-            const { asFragment, debug } = render(<Inventory {...props} />);
+        const { asFragment, debug } = render(<Provider store={store}><Inventory {...props} /></Provider>);
         debug()
 
-            await waitFor(() => expect(asFragment()).toMatchSnapshot());
+            // await waitFor(() => expect(asFragment()).toMatchSnapshot());
+            expect(apiReqMock).toHaveBeenCalledTimes(1)
             // await waitFor(() => expect(createGetterSetter).toHaveBeenCalledTimes(1))
             // await waitFor(() => expect(ErrorOrchestratorService).toHaveBeenCalledTimes(1))
         // } catch(error) {
         //     console.log(error)
         // }
         // expect(asFragment()).toMatchSnapshot();
-        // const { debug } = render(<Inventory {...props} />);  
+        // const { debug } = render(<Inventory {...props} />);
 
 })
 });
