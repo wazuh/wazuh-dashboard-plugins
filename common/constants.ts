@@ -351,24 +351,24 @@ export enum SettingCategory{
   CUSTOMIZATION,
 };
 
-type TpluginSettingOptionsChoices = {
-	choices: {text: string, value: any}[]
+type TPluginSettingOptionsSelect = {
+	select: {text: string, value: any}[]
 };
 
-type TpluginSettingOptionsNumber = {
+type TPluginSettingOptionsNumber = {
 	number: {
 		min?: number
 		max?: number
 	}
 };
 
-type TpluginSettingOptionsEditor = {
+type TPluginSettingOptionsEditor = {
 	editor: {
 		language: string
 	}
 };
 
-type TpluginSettingOptionsSwitch = {
+type TPluginSettingOptionsSwitch = {
 	switch: {
 		values: {
 			disabled: {label?: string, value: any},
@@ -376,7 +376,6 @@ type TpluginSettingOptionsSwitch = {
 		}
 	}
 };
-
 
 export enum EpluginSettingType{
 	text = 'text',
@@ -387,31 +386,45 @@ export enum EpluginSettingType{
 	select = 'select',
 };
 
-export type TpluginSetting = {
-	title: string // Define the text displayed in the UI.
-	description: string // Description.
-	category: SettingCategory // Category.
-	type: EpluginSettingType // Type.
-	default: any // Default value.
-	defaultHidden?: any // Default value if it is not set. It has preference over `default`
-	configurableFile: boolean, // Configurable from the configuration file
-	configurableUI: boolean // Configurable from the UI (Settings/Configuration)
-	requireHealthCheck?: boolean // Modify the setting requires running the plugin health check (frontend)
-	requireReload?: boolean // Modify the setting requires reloading the browser tab (frontend)
-	requireRestart?: boolean // Modify the setting requires restarting the plugin platform to take effect
-	options?: TpluginSettingOptionsChoices | TpluginSettingOptionsNumber | TpluginSettingOptionsEditor | TpluginSettingOptionsSwitch // Define options related to the `type`
-	uiFormTransformChangedInputValue?: (value: any) => any // Transform the input value. The result is saved in the form global state of Settings/Configuration
-	uiFormTransformInputValueToConfigurationValue?: (value: any) => any // Transform the configuration value or default as initial value for the input in Settings/Configuration
-	uiFormTransformConfigurationValueToInputValue?: (value: any) => any // Transform the input value changed in the form of Settings/Configuration and returned in the `changed` property of the hook useForm
-	validate?: (value: any) => string | undefined // Validate the value in the form of Settings/Configuration. It returns a string if there is some validation error. 
-	validateBackend?: (schema: any) => any // Validate function creator. It uses `schema` of the `@kbn/config-schema` package.
+export type TPluginSetting = {
+	// Define the text displayed in the UI.
+	title: string
+	// Description.
+	description: string
+	// Category.
+	category: SettingCategory
+	// Type.
+	type: EpluginSettingType
+	// Default value.
+	defaultValue: any
+	// Default value if it is not set. It has preference over `default`.
+	defaultValueIfNotSet?: any
+	// Configurable from the configuration file.
+	isConfigurableFromFile: boolean
+	// Configurable from the UI (Settings/Configuration).
+	isConfigurableFromUI: boolean
+	// Modify the setting requires running the plugin health check (frontend).
+	requiresRunningHealthCheck?: boolean
+	// Modify the setting requires reloading the browser tab (frontend).
+	requiresReloadingBrowserTab?: boolean
+	// Modify the setting requires restarting the plugin platform to take effect.
+	requiresRestartingPluginPlatform?: boolean
+	// Define options related to the `type`.
+	options?: TPluginSettingOptionsNumber | TPluginSettingOptionsEditor | TPluginSettingOptionsSelect | TPluginSettingOptionsSwitch
+	// Transform the input value. The result is saved in the form global state of Settings/Configuration
+	uiFormTransformChangedInputValue?: (value: any) => any
+	// Transform the configuration value or default as initial value for the input in Settings/Configuration
+	uiFormTransformConfigurationValueToInputValue?: (value: any) => any
+	// Transform the input value changed in the form of Settings/Configuration and returned in the `changed` property of the hook useForm
+	uiFormTransformInputValueToConfigurationValue?: (value: any) => any
+	// Validate the value in the form of Settings/Configuration. It returns a string if there is some validation error. 
+	validate?: (value: any) => string | undefined
+	// Validate function creator to validate the setting in the backend. It uses `schema` of the `@kbn/config-schema` package.
+	validateBackend?: (schema: any) => (value: unknown) => string | undefined
 };
 
-export type TPluginSettingWithKey = TpluginSetting & { key: string };
+export type TPluginSettingWithKey = TPluginSetting & { key: TPluginSettingKey };
 
-type TpluginSettings = {
-	[key: string]: TpluginSetting
-};
 
 export const PLUGIN_SETTINGS_CATEGORIES = {
   [SettingCategory.HEALTH_CHECK]: {
@@ -444,17 +457,16 @@ export const PLUGIN_SETTINGS_CATEGORIES = {
   }
 };
 
-
-export const PLUGIN_SETTINGS: TpluginSettings = {
+export const PLUGIN_SETTINGS = {
 	"alerts.sample.prefix": {
 		title: "Sample alerts prefix",
 		description: "Define the index name prefix of sample alerts. It must match the template used by the index pattern to avoid unknown fields in dashboards.",
 		category: SettingCategory.GENERAL,
 		type: EpluginSettingType.text,
-		default: WAZUH_SAMPLE_ALERT_PREFIX,
-		configurableFile: true,
-		configurableUI: true,
-		requireHealthCheck: true,
+		defaultValue: WAZUH_SAMPLE_ALERT_PREFIX,
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: true,
+		requiresRunningHealthCheck: true,
 		validate: composeValidate(validateStringNoEmpty, validateStringNoSpaces),
 		validateBackend: function(schema){
 			return schema.string({validate: this.validate});
@@ -465,9 +477,9 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		description: "Enable or disable the API health check when opening the app.",
 		category: SettingCategory.HEALTH_CHECK,
 		type: EpluginSettingType.switch,
-		default: true,
-		configurableFile: true,
-		configurableUI: true,
+		defaultValue: true,
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: true,
 		options: {
 			switch: {
 				values: {
@@ -489,9 +501,9 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		description: "Enable or disable the known fields health check when opening the app.",
 		category: SettingCategory.HEALTH_CHECK,
 		type: EpluginSettingType.switch,
-		default: true,
-		configurableFile: true,
-		configurableUI: true,
+		defaultValue: true,
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: true,
 		options: {
 			switch: {
 				values: {
@@ -513,9 +525,9 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		description: "Change the default value of the plugin platform max buckets configuration.",
 		category: SettingCategory.HEALTH_CHECK,
 		type: EpluginSettingType.switch,
-		default: true,
-		configurableFile: true,
-		configurableUI: true,
+		defaultValue: true,
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: true,
 		options: {
 			switch: {
 				values: {
@@ -537,9 +549,9 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		description: "Change the default value of the plugin platform metaField configuration.",
 		category: SettingCategory.HEALTH_CHECK,
 		type: EpluginSettingType.switch,
-		default: true,
-		configurableFile: true,
-		configurableUI: true,
+		defaultValue: true,
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: true,
 		options: {
 			switch: {
 				values: {
@@ -561,9 +573,9 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		description: "Enable or disable the index pattern health check when opening the app.",
 		category: SettingCategory.HEALTH_CHECK,
 		type: EpluginSettingType.switch,
-		default: true,
-		configurableFile: true,
-		configurableUI: true,
+		defaultValue: true,
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: true,
 		options: {
 			switch: {
 				values: {
@@ -585,9 +597,9 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		description: "Enable or disable the setup health check when opening the app.",
 		category: SettingCategory.HEALTH_CHECK,
 		type: EpluginSettingType.switch,
-		default: true,
-		configurableFile: true,
-		configurableUI: true,
+		defaultValue: true,
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: true,
 		options: {
 			switch: {
 				values: {
@@ -609,9 +621,9 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		description: "Enable or disable the template health check when opening the app.",
 		category: SettingCategory.HEALTH_CHECK,
 		type: EpluginSettingType.switch,
-		default: true,
-		configurableFile: true,
-		configurableUI: true,
+		defaultValue: true,
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: true,
 		options: {
 			switch: {
 				values: {
@@ -633,9 +645,9 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		description: "Change the default value of the plugin platform timeFilter configuration.",
 		category: SettingCategory.HEALTH_CHECK,
 		type: EpluginSettingType.switch,
-		default: true,
-		configurableFile: true,
-		configurableUI: true,
+		defaultValue: true,
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: true,
 		options: {
 			switch: {
 				values: {
@@ -657,9 +669,9 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		description: "Define the index prefix of predefined jobs.",
 		category: SettingCategory.GENERAL,
 		type: EpluginSettingType.text,
-		default: WAZUH_STATISTICS_DEFAULT_PREFIX,
-		configurableFile: true,
-		configurableUI: true,
+		defaultValue: WAZUH_STATISTICS_DEFAULT_PREFIX,
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: true,
 		validate: composeValidate(validateStringNoEmpty, validateStringNoSpaces),
 		validateBackend: function(schema){
 			return schema.string({validate: this.validate});
@@ -670,9 +682,9 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		description: "Enter the ID of the hosts you want to save data from, leave this empty to run the task on every host.",
 		category: SettingCategory.STATISTICS,
 		type: EpluginSettingType.editor,
-		default: [],
-		configurableFile: true,
-		configurableUI: true,
+		defaultValue: [],
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: true,
 		options: {
 			editor: {
 				language: 'json'
@@ -690,7 +702,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		},
 		validate: validateJSONArrayOfStrings,
 		validateBackend: function(schema){
-			return schema.string({validate: this.validate});
+			return schema.arrayOf(schema.string({validate: composeValidate(validateStringNoEmpty, validateStringNoSpaces)}));
 		},
 	},
 	"cron.statistics.index.creation": {
@@ -699,7 +711,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		category: SettingCategory.STATISTICS,
 		type: EpluginSettingType.select,
 		options: {
-			choices: [
+			select: [
 				{
 					text: "Hourly",
 					value: "h"
@@ -718,15 +730,15 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 				}
 			]
 		},
-		default: WAZUH_STATISTICS_DEFAULT_CREATION,
-		configurableFile: true,
-		configurableUI: true,
-		requireHealthCheck: true,
+		defaultValue: WAZUH_STATISTICS_DEFAULT_CREATION,
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: true,
+		requiresRunningHealthCheck: true,
 		validate: function (value){
-			return validateLiteral(this.options.choices.map(({value}) => value))(value)
+			return validateLiteral(this.options.select.map(({value}) => value))(value)
 		},
 		validateBackend: function(schema){
-			return schema.oneOf(this.options.choices.map(({value}) => schema.literal(value)));
+			return schema.oneOf(this.options.select.map(({value}) => schema.literal(value)));
 		},
 	},
 	"cron.statistics.index.name": {
@@ -734,13 +746,13 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		description: "Define the name of the index in which the documents will be saved.",
 		category: SettingCategory.STATISTICS,
 		type: EpluginSettingType.text,
-		default: WAZUH_STATISTICS_DEFAULT_NAME,
-		configurableFile: true,
-		configurableUI: true,
-		requireHealthCheck: true,
+		defaultValue: WAZUH_STATISTICS_DEFAULT_NAME,
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: true,
+		requiresRunningHealthCheck: true,
 		validate: composeValidate(validateStringNoEmpty, validateStringNoSpaces),
 		validateBackend: function(schema){
-			return schema.string({minLength: 1, validate: this.validate});
+			return schema.string({validate: this.validate});
 		},
 	},
 	"cron.statistics.index.replicas": {
@@ -748,10 +760,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		description: "Define the number of replicas to use for the statistics indices.",
 		category: SettingCategory.STATISTICS,
 		type: EpluginSettingType.number,
-		default: WAZUH_STATISTICS_DEFAULT_INDICES_REPLICAS,
-		configurableFile: true,
-		configurableUI: true,
-		requireHealthCheck: true,
+		defaultValue: WAZUH_STATISTICS_DEFAULT_INDICES_REPLICAS,
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: true,
+		requiresRunningHealthCheck: true,
 		options: {
 			number: {
 				min: 0
@@ -761,7 +773,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 			return validateNumber(this.options.number)(value)
 		},
 		validateBackend: function(schema){
-			return schema.number({validate: this.validate});
+			return schema.number({validate: this.validate.bind(this)});
 		},
 	},
 	"cron.statistics.index.shards": {
@@ -769,10 +781,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		description: "Define the number of shards to use for the statistics indices.",
 		category: SettingCategory.STATISTICS,
 		type: EpluginSettingType.number,
-		default: WAZUH_STATISTICS_DEFAULT_INDICES_SHARDS,
-		configurableFile: true,
-		configurableUI: true,
-		requireHealthCheck: true,
+		defaultValue: WAZUH_STATISTICS_DEFAULT_INDICES_SHARDS,
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: true,
+		requiresRunningHealthCheck: true,
 		options: {
 			number: {
 				min: 1
@@ -782,7 +794,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 			return validateNumber(this.options.number)(value)
 		},
 		validateBackend: function(schema){
-			return schema.number({validate: this.validate});
+			return schema.number({validate: this.validate.bind(this)});
 		},
 	},
 	"cron.statistics.interval": {
@@ -790,10 +802,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		description: "Define the frequency of task execution using cron schedule expressions.",
 		category: SettingCategory.STATISTICS,
 		type: EpluginSettingType.text,
-		default: WAZUH_STATISTICS_DEFAULT_CRON_FREQ,
-		configurableFile: true,
-		configurableUI: true,
-		requireRestart: true,
+		defaultValue: WAZUH_STATISTICS_DEFAULT_CRON_FREQ,
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: true,
+		requiresRestartingPluginPlatform: true,
 		validate: function(value: string){
 			return validateNodeCronInterval(value) ? undefined : "Interval is not valid."
 		},
@@ -806,9 +818,9 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		description: "Enable or disable the statistics tasks.",
 		category: SettingCategory.STATISTICS,
 		type: EpluginSettingType.switch,
-		default: WAZUH_STATISTICS_DEFAULT_STATUS,
-		configurableFile: true,
-		configurableUI: true,
+		defaultValue: WAZUH_STATISTICS_DEFAULT_STATUS,
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: true,
 		options: {
 			switch: {
 				values: {
@@ -830,38 +842,38 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		description: `Customize the logo displayed in the plugin menu.`,
 		category: SettingCategory.CUSTOMIZATION,
 		type: EpluginSettingType.text,
-		default: "",
-		configurableFile: true,
-		configurableUI: true,
+		defaultValue: "",
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: true,
 	},
 	"customization.logo.healthcheck": {
 		title: "Logo Health Check",
 		description: `Customize the logo displayed in the plugin health check.`,
 		category: SettingCategory.CUSTOMIZATION,
 		type: EpluginSettingType.text,
-		default: "",
-		configurableFile: true,
-		configurableUI: true,
+		defaultValue: "",
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: true,
 	},
 	"customization.logo.reports": {
 		title: "Logo Reports",
 		description: `Customize the logo displayed in the PDF reports.`,
 		category: SettingCategory.CUSTOMIZATION,
 		type: EpluginSettingType.text,
-		default: "",
-    	defaultHidden: REPORTS_LOGO_IMAGE_ASSETS_RELATIVE_PATH,
-		configurableFile: true,
-		configurableUI: true,
+		defaultValue: "",
+    	defaultValueIfNotSet: REPORTS_LOGO_IMAGE_ASSETS_RELATIVE_PATH,
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: true,
 	},
 	"customization.logo.sidebar": {
 		title: "Logo Sidebar",
 		description: `Customize the logo of the category that belongs the plugin.`,
 		category: SettingCategory.CUSTOMIZATION,
 		type: EpluginSettingType.text,
-		default: "",
-		configurableFile: true,
-		configurableUI: true,
-		requireReload: true,
+		defaultValue: "",
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: true,
+		requiresReloadingBrowserTab: true,
 	},
 	"customization.reports.footer": {
 		title: "Reports footer",
@@ -896,9 +908,9 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		description: "Disabled the plugin visibility for users with the roles.",
 		category: SettingCategory.SECURITY,
 		type: EpluginSettingType.editor,
-		default: [],
-		configurableFile: true,
-		configurableUI: true,
+		defaultValue: [],
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: true,
 		options: {
 			editor: {
 				language: 'json'
@@ -916,7 +928,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		},
 		validate: validateJSONArrayOfStrings,
 		validateBackend: function(schema){
-			return schema.arrayOf(schema.string({minLength: 1}));
+			return schema.arrayOf(schema.string({validate: composeValidate(validateStringNoEmpty, validateStringNoSpaces)}));
 		},
 	},
 	"enrollment.dns": {
@@ -924,9 +936,9 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		description: "Specifies the Wazuh registration server, used for the agent enrollment.",
 		category: SettingCategory.GENERAL,
 		type: EpluginSettingType.text,
-		default: "",
-		configurableFile: true,
-		configurableUI: true,
+		defaultValue: "",
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: true,
 		validate: validateStringNoSpaces,
 		validateBackend: function(schema){
 			return schema.string({validate: this.validate});
@@ -937,9 +949,9 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		description: "Specifies the password used to authenticate during the agent enrollment.",
 		category: SettingCategory.GENERAL,
 		type: EpluginSettingType.text,
-		default: "",
-		configurableFile: true,
-		configurableUI: false,
+		defaultValue: "",
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: false,
 		validate: validateStringNoEmpty,
 		validateBackend: function(schema){
 			return schema.string({validate: this.validate});
@@ -950,9 +962,9 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		description: "Enable or disable the Audit tab on Overview and Agents.",
 		category: SettingCategory.EXTENSIONS,
 		type: EpluginSettingType.switch,
-		default: true,
-		configurableFile: true,
-		configurableUI: false,
+		defaultValue: true,
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: false,
 		options: {
 			switch: {
 				values: {
@@ -974,9 +986,9 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		description: "Enable or disable the Amazon (AWS) tab on Overview.",
 		category: SettingCategory.EXTENSIONS,
 		type: EpluginSettingType.switch,
-		default: false,
-		configurableFile: true,
-		configurableUI: false,
+		defaultValue: false,
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: false,
 		options: {
 			switch: {
 				values: {
@@ -998,9 +1010,9 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		description: "Enable or disable the CIS-CAT tab on Overview and Agents.",
 		category: SettingCategory.EXTENSIONS,
 		type: EpluginSettingType.switch,
-		default: false,
-		configurableFile: true,
-		configurableUI: false,
+		defaultValue: false,
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: false,
 		options: {
 			switch: {
 				values: {
@@ -1022,9 +1034,9 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		description: "Enable or disable the Docker listener tab on Overview and Agents.",
 		category: SettingCategory.EXTENSIONS,
 		type: EpluginSettingType.switch,
-		default: false,
-		configurableFile: true,
-		configurableUI: false,
+		defaultValue: false,
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: false,
 		options: {
 			switch: {
 				values: {
@@ -1046,9 +1058,9 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		description: "Enable or disable the Google Cloud Platform tab on Overview.",
 		category: SettingCategory.EXTENSIONS,
 		type: EpluginSettingType.switch,
-		default: false,
-		configurableFile: true,
-		configurableUI: false,
+		defaultValue: false,
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: false,
 		options: {
 			switch: {
 				values: {
@@ -1070,9 +1082,9 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		description: "Enable or disable the GDPR tab on Overview and Agents.",
 		category: SettingCategory.EXTENSIONS,
 		type: EpluginSettingType.switch,
-		default: true,
-		configurableFile: true,
-		configurableUI: false,
+		defaultValue: true,
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: false,
 		options: {
 			switch: {
 				values: {
@@ -1094,33 +1106,9 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		description: "Enable or disable the HIPAA tab on Overview and Agents.",
 		category: SettingCategory.EXTENSIONS,
 		type: EpluginSettingType.switch,
-		default: true,
-		configurableFile: true,
-		configurableUI: false,
-		options: {
-			switch: {
-				values: {
-					disabled: {label: 'false', value: false},
-					enabled: {label: 'true', value: true},
-				}
-			}
-		},
-		uiFormTransformChangedInputValue: function(value: boolean | string): boolean{
-			return Boolean(value);
-		},
-		validate: validateBooleanIs,
-		validateBackend: function(schema){
-			return schema.boolean();
-		},
-	},
-	"extensions.mitre": {
-		title: "MITRE ATT&CK",
-		description: "Enable or disable the MITRE tab on Overview and Agents.",
-		category: SettingCategory.EXTENSIONS,
-		type: EpluginSettingType.switch,
-		default: true,
-		configurableFile: true,
-		configurableUI: false,
+		defaultValue: true,
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: false,
 		options: {
 			switch: {
 				values: {
@@ -1142,9 +1130,9 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		description: "Enable or disable the NIST 800-53 tab on Overview and Agents.",
 		category: SettingCategory.EXTENSIONS,
 		type: EpluginSettingType.switch,
-		default: true,
-		configurableFile: true,
-		configurableUI: false,
+		defaultValue: true,
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: false,
 		options: {
 			switch: {
 				values: {
@@ -1166,9 +1154,9 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		description: "Enable or disable the Open SCAP tab on Overview and Agents.",
 		category: SettingCategory.EXTENSIONS,
 		type: EpluginSettingType.switch,
-		default: false,
-		configurableFile: true,
-		configurableUI: false,
+		defaultValue: false,
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: false,
 		options: {
 			switch: {
 				values: {
@@ -1190,9 +1178,9 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		description: "Enable or disable the Osquery tab on Overview and Agents.",
 		category: SettingCategory.EXTENSIONS,
 		type: EpluginSettingType.switch,
-		default: false,
-		configurableFile: true,
-		configurableUI: false,
+		defaultValue: false,
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: false,
 		options: {
 			switch: {
 				values: {
@@ -1214,9 +1202,9 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		description: "Enable or disable the PCI DSS tab on Overview and Agents.",
 		category: SettingCategory.EXTENSIONS,
 		type: EpluginSettingType.switch,
-		default: true,
-		configurableFile: true,
-		configurableUI: false,
+		defaultValue: true,
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: false,
 		options: {
 			switch: {
 				values: {
@@ -1238,9 +1226,9 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		description: "Enable or disable the TSC tab on Overview and Agents.",
 		category: SettingCategory.EXTENSIONS,
 		type: EpluginSettingType.switch,
-		default: true,
-		configurableFile: true,
-		configurableUI: false,
+		defaultValue: true,
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: false,
 		options: {
 			switch: {
 				values: {
@@ -1262,9 +1250,9 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		description: "Enable or disable the VirusTotal tab on Overview and Agents.",
 		category: SettingCategory.EXTENSIONS,
 		type: EpluginSettingType.switch,
-		default: false,
-		configurableFile: true,
-		configurableUI: false,
+		defaultValue: false,
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: false,
 		options: {
 			switch: {
 				values: {
@@ -1286,10 +1274,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		description: "Hide the alerts of the manager in every dashboard.",
 		category: SettingCategory.GENERAL,
 		type: EpluginSettingType.switch,
-		default: false,
-		configurableFile: true,
-		configurableUI: true,
-		requireReload: true,
+		defaultValue: false,
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: true,
+		requiresReloadingBrowserTab: true,
 		options: {
 			switch: {
 				values: {
@@ -1311,9 +1299,9 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		description: "Disable certain index pattern names from being available in index pattern selector.",
 		category: SettingCategory.GENERAL,
 		type: EpluginSettingType.editor,
-		default: [],
-		configurableFile: true,
-		configurableUI: true,
+		defaultValue: [],
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: true,
 		options: {
 			editor: {
 				language: 'json'
@@ -1331,7 +1319,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		},
 		validate: validateJSONArrayOfStrings,
 		validateBackend: function(schema){
-			return schema.string({validate: this.validate})
+			return schema.arrayOf(schema.string({validate: composeValidate(validateStringNoEmpty, validateStringNoSpaces)}));
 		}
 	},
 	"ip.selector": {
@@ -1339,9 +1327,9 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		description: "Define if the user is allowed to change the selected index pattern directly from the top menu bar.",
 		category: SettingCategory.GENERAL,
 		type: EpluginSettingType.switch,
-		default: true,
-		configurableFile: true,
-		configurableUI: false,
+		defaultValue: true,
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: false,
 		options: {
 			switch: {
 				values: {
@@ -1364,7 +1352,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		category: SettingCategory.GENERAL,
 		type: EpluginSettingType.select,
 		options: {
-			choices: [
+			select: [
 				{
 					text: "Info",
 					value: "info"
@@ -1375,15 +1363,15 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 				}
 			]
 		},
-		default: "info",
-		configurableFile: true,
-		configurableUI: true,
-		requireRestart: true,
+		defaultValue: "info",
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: true,
+		requiresRestartingPluginPlatform: true,
 		validate: function (value){
-			return validateLiteral(this.options.choices.map(({value}) => value))(value)
+			return validateLiteral(this.options.select.map(({value}) => value))(value)
 		},
 		validateBackend: function(schema){
-			return schema.oneOf(this.options.choices.map(({value}) => schema.literal(value)));
+			return schema.oneOf(this.options.select.map(({value}) => schema.literal(value)));
 		},
 	},
 	"pattern": {
@@ -1391,23 +1379,23 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		description: "Default index pattern to use on the app. If there's no valid index pattern, the app will automatically create one with the name indicated in this option.",
 		category: SettingCategory.GENERAL,
 		type: EpluginSettingType.text,
-		default: WAZUH_ALERTS_PATTERN,
-		configurableFile: true,
-		configurableUI: true,
-		requireHealthCheck: true,
+		defaultValue: WAZUH_ALERTS_PATTERN,
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: true,
+		requiresRunningHealthCheck: true,
 		validate: composeValidate(validateStringNoEmpty, validateStringNoSpaces),
 		validateBackend: function(schema){
-			return schema.string({minLength: 1, validate: this.validate});
-		}
+			return schema.string({validate: this.validate});
+		},
 	},
 	"timeout": {
 		title: "Request timeout",
 		description: "Maximum time, in milliseconds, the app will wait for an API response when making requests to it. It will be ignored if the value is set under 1500 milliseconds.",
 		category: SettingCategory.GENERAL,
 		type: EpluginSettingType.number,
-		default: 20000,
-		configurableFile: true,
-		configurableUI: true,
+		defaultValue: 20000,
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: true,
 		options: {
 			number: {
 				min: 1500
@@ -1417,7 +1405,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 			return validateNumber(this.options.number)(value);
 		},
 		validateBackend: function(schema){
-			return schema.number({validate: this.validate});
+			return schema.number({validate: this.validate.bind(this)});
 		},
 	},
 	"wazuh.monitoring.creation": {
@@ -1426,7 +1414,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		category: SettingCategory.MONITORING,
 		type: EpluginSettingType.select,
 		options: {
-			choices: [
+			select: [
 				{
 					text: "Hourly",
 					value: "h"
@@ -1445,15 +1433,15 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 				}
 			]
 		},
-		default: WAZUH_MONITORING_DEFAULT_CREATION,
-		configurableFile: true,
-		configurableUI: true,
-		requireHealthCheck: true,
+		defaultValue: WAZUH_MONITORING_DEFAULT_CREATION,
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: true,
+		requiresRunningHealthCheck: true,
 		validate: function (value){
-			return validateLiteral(this.options.choices.map(({value}) => value))(value)
+			return validateLiteral(this.options.select.map(({value}) => value))(value)
 		},
 		validateBackend: function(schema){
-			return schema.oneOf(this.options.choices.map(({value}) => schema.literal(value)));
+			return schema.oneOf(this.options.select.map(({value}) => schema.literal(value)));
 		},
 	},
 	"wazuh.monitoring.enabled": {
@@ -1461,10 +1449,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		description: "Enable or disable the wazuh-monitoring index creation and/or visualization.",
 		category: SettingCategory.MONITORING,
 		type: EpluginSettingType.switch,
-		default: WAZUH_MONITORING_DEFAULT_ENABLED,
-		configurableFile: true,
-		configurableUI: true,
-		requireRestart: true,
+		defaultValue: WAZUH_MONITORING_DEFAULT_ENABLED,
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: true,
+		requiresRestartingPluginPlatform: true,
 		options: {
 			switch: {
 				values: {
@@ -1486,10 +1474,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		description: "Frequency, in seconds, of API requests to get the state of the agents and create a new document in the wazuh-monitoring index with this data.",
 		category: SettingCategory.MONITORING,
 		type: EpluginSettingType.number,
-		default: WAZUH_MONITORING_DEFAULT_FREQUENCY,
-		configurableFile: true,
-		configurableUI: true,
-		requireRestart: true,
+		defaultValue: WAZUH_MONITORING_DEFAULT_FREQUENCY,
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: true,
+		requiresRestartingPluginPlatform: true,
 		options: {
 			number: {
 				min: 60
@@ -1499,7 +1487,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 			return validateNumber(this.options.number)(value);
 		},
 		validateBackend: function(schema){
-			return schema.number({validate: this.validate});
+			return schema.number({validate: this.validate.bind(this)});
 		},
 	},
 	"wazuh.monitoring.pattern": {
@@ -1507,10 +1495,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		description: "Default index pattern to use for Wazuh monitoring.",
 		category: SettingCategory.MONITORING,
 		type: EpluginSettingType.text,
-		default: WAZUH_MONITORING_PATTERN,
-		configurableFile: true,
-		configurableUI: true,
-		requireHealthCheck: true,
+		defaultValue: WAZUH_MONITORING_PATTERN,
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: true,
+		requiresRunningHealthCheck: true,
 		validate: composeValidate(validateStringNoEmpty, validateStringNoSpaces),
 		validateBackend: function(schema){
 			return schema.string({minLength: 1, validate: this.validate});
@@ -1521,10 +1509,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		description: "Define the number of replicas to use for the wazuh-monitoring-* indices.",
 		category: SettingCategory.MONITORING,
 		type: EpluginSettingType.text,
-		default: WAZUH_MONITORING_DEFAULT_INDICES_REPLICAS,
-		configurableFile: true,
-		configurableUI: true,
-		requireHealthCheck: true,
+		defaultValue: WAZUH_MONITORING_DEFAULT_INDICES_REPLICAS,
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: true,
+		requiresRunningHealthCheck: true,
 		options: {
 			number: {
 				min: 0
@@ -1534,7 +1522,7 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 			return validateNumber(this.options.number)(value);
 		},
 		validateBackend: function(schema){
-			return schema.number({validate: this.validate});
+			return schema.number({validate: this.validate.bind(this)});
 		},
 	},
 	"wazuh.monitoring.shards": {
@@ -1542,10 +1530,10 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 		description: "Define the number of shards to use for the wazuh-monitoring-* indices.",
 		category: SettingCategory.MONITORING,
 		type: EpluginSettingType.number,
-		default: WAZUH_MONITORING_DEFAULT_INDICES_SHARDS,
-		configurableFile: true,
-		configurableUI: true,
-		requireHealthCheck: true,
+		defaultValue: WAZUH_MONITORING_DEFAULT_INDICES_SHARDS,
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: true,
+		requiresRunningHealthCheck: true,
 		options: {
 			number: {
 				min: 1
@@ -1555,7 +1543,9 @@ export const PLUGIN_SETTINGS: TpluginSettings = {
 			return validateNumber(this.options.number)(value);
 		},
 		validateBackend: function(schema){
-			return schema.number({validate: this.validate});
+			return schema.number({validate: this.validate.bind(this)});
 		},
 	}
 };
+
+export type TPluginSettingKey = keyof typeof PLUGIN_SETTINGS;

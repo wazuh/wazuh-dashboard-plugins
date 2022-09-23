@@ -12,7 +12,6 @@ const getValueFromEventType = {
   default: (event: any) => event.target.value,
 };
 
-
 export const useForm = (fields) => {
   const [formFields, setFormFields] = useState(Object.entries(fields).reduce((accum, [fieldKey, fieldConfiguration]) => ({
     ...accum,
@@ -22,14 +21,15 @@ export const useForm = (fields) => {
     }
   }), {}));
 
-  const enhanceFields = Object.entries(formFields).filter(f => {return f}).reduce((accum, [fieldKey, fieldState]) => ({
+  const enhanceFields = Object.entries(formFields).reduce((accum, [fieldKey, {currentValue: value, ...restFieldState}]) => ({
     ...accum,
     [fieldKey]: {
       ...fields[fieldKey],
+      ...restFieldState,
       type: fields[fieldKey].type,
-      value: fieldState.currentValue,
-      changed: !_.isEqual(fieldState.initialValue, fieldState.currentValue),
-      error: fields[fieldKey]?.validate?.(fieldState.currentValue),
+      value,
+      changed: !_.isEqual(restFieldState.initialValue, value),
+      error: fields[fieldKey]?.validate?.(value),
       onChange: (event) => {
         const inputValue = getValueFromEvent(event, fields[fieldKey].type);
         const currentValue = fields[fieldKey]?.transformChangedInputValue?.(inputValue) ?? inputValue;
@@ -52,7 +52,7 @@ export const useForm = (fields) => {
     Object.entries(enhanceFields).filter(([, {error}]) => error).map(([fieldKey, {error}]) => ([fieldKey, error]))
   );
 
-  function undoneChanges(){
+  function undoChanges(){
     setFormFields(state => Object.fromEntries(
       Object.entries(state).map(([fieldKey, fieldConfiguration]) => ([
         fieldKey,
@@ -64,7 +64,7 @@ export const useForm = (fields) => {
     ));
   };
 
-  function doneChanges(){
+  function doChanges(){
     setFormFields(state => Object.fromEntries(
       Object.entries(state).map(([fieldKey, fieldConfiguration]) => ([
         fieldKey,
@@ -80,7 +80,7 @@ export const useForm = (fields) => {
     fields: enhanceFields,
     changed,
     errors,
-    undoneChanges,
-    doneChanges
+    undoChanges,
+    doChanges
   };
 };
