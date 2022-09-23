@@ -31,7 +31,7 @@ export function WazuhUtilsRoutes(router: IRouter) {
     {
       path: '/utils/configuration',
       validate: {
-        body: schema.object(Object.entries(PLUGIN_SETTINGS).filter(([, {configurableFile}]) => configurableFile).reduce((accum, [pluginSettingKey, pluginSettingConfiguration]) => ({
+        body: schema.object(Object.entries(PLUGIN_SETTINGS).filter(([, {isConfigurableFromFile}]) => isConfigurableFromFile).reduce((accum, [pluginSettingKey, pluginSettingConfiguration]) => ({
           ...accum,
           [pluginSettingKey]: schema.maybe(pluginSettingConfiguration.validateBackend ? pluginSettingConfiguration.validateBackend(schema) : schema.any())
         }), {}))
@@ -41,7 +41,7 @@ export function WazuhUtilsRoutes(router: IRouter) {
   );
 
   const pluginSettingsTypeFilepicker = Object.entries(PLUGIN_SETTINGS)
-    .filter(([_, {type, configurableFile}]) => type === EpluginSettingType.filepicker && configurableFile);
+    .filter(([_, {type, isConfigurableFromFile}]) => type === EpluginSettingType.filepicker && isConfigurableFromFile);
 
   const schemaPluginSettingsTypeFilepicker = schema.oneOf(pluginSettingsTypeFilepicker.map(([pluginSettingKey]) => schema.literal(pluginSettingKey)));
 

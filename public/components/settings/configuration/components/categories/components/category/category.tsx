@@ -87,7 +87,7 @@ export const Category: React.FunctionComponent<ICategoryProps> = ({ currentConfi
                       )}
                     </span>
                   </EuiTitle>}
-                description={item.description} >
+                description={getPluginSettingDescription(item)} >
                   <InputForm
                     label={item.key}
                     {...item}
