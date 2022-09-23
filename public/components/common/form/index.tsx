@@ -6,7 +6,7 @@ import { InputFormText } from './input_text';
 import { InputFormTextArea } from './input_text_area';
 import { InputFormSwitch } from './input_switch';
 import { InputFormSelect } from './input_select';
-import { useFormFieldChanged } from './hooks';
+
 import {
 	EuiFormRow,
 } from '@elastic/eui';

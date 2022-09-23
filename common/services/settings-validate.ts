@@ -1,5 +1,3 @@
-import path from 'path';
-
 // Utils
 export const composeValidate = (...functions) => value => {
     for(const fn of functions){
@@ -15,7 +13,7 @@ export const validateStringNoSpaces = (value: string): string | undefined => /^\
 export const validateStringNoEmpty = (value: string): string | undefined => {
     if(typeof value === 'string'){
         if(value.length === 0){
-            return "Value can not be empty"
+            return "Value can not be empty."
         }else{
             return undefined;
         }
@@ -64,6 +62,14 @@ export const validateJSONArrayOfStrings = (value: string) => {
     if(parsed.some(value => typeof value !== 'string')){
         return 'There is a value that is not a string.';
     };
+
+    // Check the items are strings
+    for(let element of parsed){
+        const result = composeValidate(validateStringNoEmpty, validateStringNoSpaces)(element);
+        if(result){
+            return result;
+        };
+    };
 };
 
-export const validateLiteral = (...literals) => (value: any): string | undefined => literals.includes(value) ? undefined : `Invalid value. Allowed values: ${literals.map(String).join(', ')}`;
+export const validateLiteral = (literals) => (value: any): string | undefined => literals.includes(value) ? undefined : `Invalid value. Allowed values: ${literals.map(String).join(', ')}`;

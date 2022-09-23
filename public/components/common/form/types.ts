@@ -5,6 +5,7 @@ export interface IInputFormType {
 	value: any
 	onChange: (event: any) => void
 	isInvalid?: boolean
+	options: any
 };
 
 export interface IInputForm {

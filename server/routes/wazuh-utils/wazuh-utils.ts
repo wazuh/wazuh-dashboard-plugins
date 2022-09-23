@@ -31,7 +31,7 @@ export function WazuhUtilsRoutes(router: IRouter) {
     {
       path: '/utils/configuration',
       validate: {
-        body: schema.object(Object.entries(PLUGIN_SETTINGS).filter(([, {configurableFile}]) => configurableFile).reduce((accum, [pluginSettingKey, pluginSettingConfiguration]) => ({
+        body: schema.object(Object.entries(PLUGIN_SETTINGS).filter(([, {isConfigurableFromFile}]) => isConfigurableFromFile).reduce((accum, [pluginSettingKey, pluginSettingConfiguration]) => ({
           ...accum,
           [pluginSettingKey]: schema.maybe(pluginSettingConfiguration.validateBackend ? pluginSettingConfiguration.validateBackend(schema) : schema.any())
         }), {}))

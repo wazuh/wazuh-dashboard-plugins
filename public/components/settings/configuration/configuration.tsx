@@ -31,7 +31,7 @@ import { updateSelectedSettingsSection } from '../../../redux/actions/appStateAc
 import { withUserAuthorizationPrompt, withErrorBoundary, withReduxProvider } from '../../common/hocs';
 import { EpluginSettingType, PLUGIN_PLATFORM_NAME, PLUGIN_SETTINGS, PLUGIN_SETTINGS_CATEGORIES, UI_LOGGER_LEVELS, WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../../common/constants';
 import { compose } from 'redux';
-import { formatSettingValueFromForm, getSettingDefaultValue, getSettingsDefaultList } from '../../../../common/services/settings';
+import { formatSettingValueFromForm, getSettingsDefaultList, groupSettingsByCategory } from '../../../../common/services/settings';
 import _ from 'lodash';
 import { Category } from './components/categories/components';
 import { WzRequest } from '../../../react-services';
@@ -51,38 +51,41 @@ export type ISetting = {
 };
 
 const pluginSettingConfigurableUI = getSettingsDefaultList()
-  .filter(categorySetting => categorySetting.configurableUI)
+  .filter(categorySetting => categorySetting.isConfigurableFromUI)
   .map(setting => ({ ...setting, category: PLUGIN_SETTINGS_CATEGORIES[setting.category].title}));
 
 const settingsCategoriesSearchBarFilters = [...new Set(pluginSettingConfigurableUI.map(({category}) => category))].sort().map(category => ({value: category}))
 
-const transformToSettingsByCategories = (settings) => {
-  const settingsSortedByCategories = settings.reduce((accum, pluginSettingConfiguration) => ({
-    ...accum,
-    [pluginSettingConfiguration.category]: [
-      ...(accum[pluginSettingConfiguration.category] || []),
-      {...pluginSettingConfiguration}
-    ]
-  }),{})
-  return Object.entries(settingsSortedByCategories)
-    .map(([category, settings]) => ({ category,settings }))
-    .filter(categoryEntry => categoryEntry.settings.length);
-};
-
-const pluginSettingsConfigurableUI = configuration => Object.fromEntries(
+const trasnsfromPluginSettingsToFormFields = configuration => Object.fromEntries(
   getSettingsDefaultList()
-    .filter(pluginSetting => pluginSetting.configurableUI)
-    .map(({key, type, validate, default: initialValue, transformUIInputValue, ...rest}) => ([key, {type, validate: validate?.bind?.(rest), transformUIInputValue: transformUIInputValue?.bind?.(rest), initialValue: type === EpluginSettingType.editor ? JSON.stringify(configuration?.[key] ?? initialValue) : (configuration?.[key] ?? initialValue) }]))
+    .filter(pluginSetting => pluginSetting.isConfigurableFromUI)
+    .map(({
+      key,
+      type,
+      validate,
+      defaultValue: initialValue,
+      uiFormTransformChangedInputValue,
+      uiFormTransformConfigurationValueToInputValue,
+      uiFormTransformInputValueToConfigurationValue,
+      ...rest
+    }) => ([
+      key, 
+      {
+        type,
+        validate: validate?.bind?.(rest),
+        transformChangedInputValue: uiFormTransformChangedInputValue?.bind?.(rest),
+        transformChangedOutputValue: uiFormTransformInputValueToConfigurationValue?.bind?.(rest),
+        initialValue: uiFormTransformConfigurationValueToInputValue ? uiFormTransformConfigurationValueToInputValue.bind(rest)(configuration?.[key] ?? initialValue) : (configuration?.[key] ?? initialValue)
+      }
+    ]))
 );
-
 
 const WzConfigurationSettingsProvider = (props) => {
   const [loading, setLoading ] = useKbnLoadingIndicator();
   const [query, setQuery] = useState('');
-  // const [settingsByCategories, setSettingsByCategories] = useState(transformToSettingsByCategories(pluginSettingConfigurableUI));
   const currentConfiguration = useSelector(state => state.appConfig.data);
 
-  const { fields, changed, errors, doneChanges, undoneChanges } = useForm(pluginSettingsConfigurableUI(currentConfiguration));
+  const { fields, changed, errors, doChanges, undoChanges } = useForm(trasnsfromPluginSettingsToFormFields(currentConfiguration));
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -107,13 +110,13 @@ const WzConfigurationSettingsProvider = (props) => {
   // https://github.com/elastic/eui/blob/aa4cfd7b7c34c2d724405a3ecffde7fe6cf3b50f/src/components/search_bar/query/query.ts#L138-L163
   const search = Query.execute(query.query || query, visibleSettings, ['description', 'key', 'title']);
 
-  const visibleCategories = transformToSettingsByCategories(search || visibleSettings);
+  const visibleCategories = groupSettingsByCategory(search || visibleSettings);
 
   const onSave = async () => {
     setLoading(true);
     try {
       const settingsToUpdate = Object.entries(changed).reduce((accum, [pluginSettingKey, currentValue]) => {
-        if(PLUGIN_SETTINGS[pluginSettingKey].configurableFile){
+        if(PLUGIN_SETTINGS[pluginSettingKey].isConfigurableFromFile){
           accum.saveOnConfigurationFile = {
             ...accum.saveOnConfigurationFile,
             [pluginSettingKey]: formatSettingValueFromForm(pluginSettingKey, currentValue)
@@ -133,9 +136,9 @@ const WzConfigurationSettingsProvider = (props) => {
       const responses = await Promise.all(requests);      
 
       // Show the toasts if necessary
-      responses.some(({data: { data: {requireRestart}}}) => requireRestart) && toastRequireRestart();
-      responses.some(({data: { data: {requireReload}}}) => requireReload) && toastRequireReload();
-      responses.some(({data: { data: {requireHealtCheck}}}) => requireHealtCheck) && toastRequireHealthcheckExecution();
+      responses.some(({data: { data: {requireHealtCheck}}}) => requireHealtCheck) && toastRequiresRunningHealthcheck();
+      responses.some(({data: { data: {requiresReloadingBrowserTab}}}) => requiresReloadingBrowserTab) && toastRequiresReloadingBrowserTab();
+      responses.some(({data: { data: {requiresRestartingPluginPlatform}}}) => requiresRestartingPluginPlatform) && toastRequiresRestartingPluginPlatform();
 
       // Update the app configuration frontend-cached setting in memory with the new values
       dispatch(updateAppConfig({
@@ -151,7 +154,7 @@ const WzConfigurationSettingsProvider = (props) => {
       successToast();
 
       // Reset the form changed configuration
-      doneChanges();
+      doChanges();
     } catch (error) {
       const options: UIErrorLog = {
         context: `${WzConfigurationSettingsProvider.name}.onSave`,
@@ -201,7 +204,7 @@ const WzConfigurationSettingsProvider = (props) => {
           <BottomBar
             errorsCount={Object.keys(errors).length}
             unsavedCount={Object.keys(changed).length}
-            onCancel={undoneChanges}
+            onCancel={undoChanges}
             onSave={onSave}
           />
         )}
@@ -215,7 +218,7 @@ export const WzConfigurationSettings = compose (
   withUserAuthorizationPrompt(null, [WAZUH_ROLE_ADMINISTRATOR_NAME])
 )(WzConfigurationSettingsProvider);
 
-const toastRequireReload = () => {
+const toastRequiresReloadingBrowserTab = () => {
   getToasts().add({
     color: 'success',
     title: 'This setting require you to reload the page to take effect.',
@@ -227,7 +230,7 @@ const toastRequireReload = () => {
   });
 };
 
-const toastRequireHealthcheckExecution = () => {
+const toastRequiresRunningHealthcheck = () => {
   const toast = getToasts().add({
     color: 'warning',
     title: 'You must execute the health check for the changes to take effect',
@@ -244,7 +247,7 @@ const toastRequireHealthcheckExecution = () => {
   });
 };
 
-const toastRequireRestart = () => {
+const toastRequiresRestartingPluginPlatform = () => {
   getToasts().add({
     color: 'warning',
     title: `You must restart ${PLUGIN_PLATFORM_NAME} for the changes to take effect`,

@@ -7,7 +7,7 @@ import { IInputFormType } from './types';
 export const InputFormSelect = ({ options, value, onChange }: IInputFormType) => {
 	return (
 		<EuiSelect
-			options={options.choices}
+			options={options.select}
 			value={value}
 			onChange={onChange}
 		/>
