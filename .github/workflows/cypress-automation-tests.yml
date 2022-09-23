@@ -15,7 +15,7 @@ jobs:
   setup-wazuh-kibana-app:
     name: Run setup environment wazuh kibana app
     #runs-on: self-hosted
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     #container: cypress/browsers:node12.18.0-chrome83-ff77
     steps:
      - name: Step 01 - Set up environment variables
