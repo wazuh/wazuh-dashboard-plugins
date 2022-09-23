@@ -35,10 +35,10 @@ export const validateBooleanIs = (value: string): string | undefined => typeof v
 
 // Number
 export const validateNumber = (options: {min?: number, max?: number} = {}) => (value: number) => {
-    if(typeof options.min !== 'undefined' && value <= options.min){
+    if(typeof options.min !== 'undefined' && value < options.min){
         return `Value should be greater or equal than ${options.min}.`;
     };
-    if(typeof options.max !== 'undefined' && value >= options.max){
+    if(typeof options.max !== 'undefined' && value > options.max){
         return `Value should be lower or equal than ${options.max}.`;
     };
 };
