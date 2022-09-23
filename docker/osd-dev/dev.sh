@@ -2,7 +2,7 @@
 
 os_versions=(
 	'1.2.4'
-	'2.0.0'
+	# '2.0.0' # compatibility.override_main_response_version deprecated
 	'2.1.0'
 	'2.2.1'
 	'2.3.0'
@@ -10,7 +10,7 @@ os_versions=(
 
 osd_versions=(
 	'1.2.0'
-	'2.0.0'
+	# '2.0.0' # compatibility.override_main_response_version deprecated
 	'2.1.0'
 	'2.2.1'
 	'2.3.0'

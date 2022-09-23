@@ -137,7 +137,7 @@ services:
       - os_data:/var/lib/os1
     networks:
       - os-dev
-      - devel
+      - mon
     healthcheck:
       test: ["CMD-SHELL", "curl -s --cacert config/certs/ca.pem https://os1:9200 | grep -q 'Unauthorized'"]
       interval: 1s
@@ -183,6 +183,7 @@ services:
     hostname: osd
     networks:
       - os-dev
+      - devel
       - mon
     user: "1000:1000"
     <<: *logging
