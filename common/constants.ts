@@ -880,10 +880,10 @@ export const PLUGIN_SETTINGS = {
 		description: "Set the footer of the reports.",
 		category: SettingCategory.CUSTOMIZATION,
 		type: EpluginSettingType.textarea,
-		default: "",
-    	defaultHidden: REPORTS_PAGE_FOOTER_TEXT,
-		configurableFile: true,
-		configurableUI: true,
+		defaultValue: "",
+    	defaultValueIfNotSet: REPORTS_PAGE_FOOTER_TEXT,
+		isConfigurableFile: true,
+		isConfigurableFromUI: true,
 		validate: validateStringMultipleLines({max: 2}),
 		validateBackend: function(schema){
 			return schema.string({minLength: 1, validate: this.validate});
@@ -894,10 +894,10 @@ export const PLUGIN_SETTINGS = {
 		description: "Set the header of the reports.",
 		category: SettingCategory.CUSTOMIZATION,
 		type: EpluginSettingType.textarea,
-		default: "",
-    	defaultHidden: REPORTS_PAGE_HEADER_TEXT,
-		configurableFile: true,
-		configurableUI: true,
+		defaultValue: "",
+    	defaultValueIfNotSet: REPORTS_PAGE_HEADER_TEXT,
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: true,
 		validate: validateStringMultipleLines({max: 4}),
 		validateBackend: function(schema){
 			return schema.string({minLength: 1, validate: this.validate});
