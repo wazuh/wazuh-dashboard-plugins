@@ -72,7 +72,8 @@ export class Inventory extends Component {
       policies: [],
       redirect: false,
       secondTable: false,
-      secondTableBack: false
+      secondTableBack: false,
+      isLoading: false
     };
     this.suggestions = {};
     this.columnsPolicies = [
@@ -237,7 +238,7 @@ export class Inventory extends Component {
     if (match && match[0] && !this.state.secondTable && !this.state.secondTableBack) {
       this.loadScaPolicy(match[0].split('=')[1], true)
       // console.log(match[0], 'matchi')
-      this.setState({secondTableBack: true})
+      this.setState({secondTableBack: true, isLoading: true})
     }
   }
 
@@ -456,9 +457,9 @@ export class Inventory extends Component {
         ).map((item) => ({ ...item, result: item.result || 'not applicable' }));
         this.buildSuggestionSearchBar(policyData.policy_id, checks);
         this._isMount &&
-          this.setState({ lookingPolicy: policyData, loadingPolicy: false, items: checks });
+          this.setState({ lookingPolicy: policyData, loadingPolicy: false, items: checks, isLoading: false });
       } catch (error) {
-        this.setState({ lookingPolicy: policy, loadingPolicy: false });
+        this.setState({ lookingPolicy: policy, loadingPolicy: false, isLoading: false });
         // console.log(error, 'error')
         const options: UIErrorLog = {
           context: `${Inventory.name}.loadScaPolicy`,
@@ -473,7 +474,7 @@ export class Inventory extends Component {
         getErrorOrchestrator().handleError(options);
       }
     } else {
-      this._isMount && this.setState({ lookingPolicy: policy, loadingPolicy: false, items: [] });
+      this._isMount && this.setState({ lookingPolicy: policy, loadingPolicy: false, items: [], isLoading: false });
     }
   }
 
@@ -641,7 +642,7 @@ export class Inventory extends Component {
     return (
       <Fragment>
         <div>
-          {this.state.loading && (
+          {this.state.loading || this.state.isLoading && (
             <div style={{ margin: 16 }}>
               <EuiSpacer size="m" />
               <EuiProgress size="xs" color="primary" />
@@ -677,7 +678,7 @@ export class Inventory extends Component {
             (agent || {}).os &&
             !this.state.lookingPolicy &&
             this.state.policies.length > 0 &&
-            !this.state.loading && (
+            !this.state.loading && !this.state.isLoading && (
               <div>
                 {this.state.policies.length && !withoutDashboard && (
                   <EuiFlexGroup style={{ marginTop: 0 }}>
@@ -728,7 +729,7 @@ export class Inventory extends Component {
           {agent &&
             (agent || {}).os &&
             this.state.lookingPolicy &&
-            !this.state.loading && (
+            ((!this.state.loading) || (!this.state.isLoading )) && (
               <div>
                 <EuiPanel paddingSize="l">
                   <EuiFlexGroup>
