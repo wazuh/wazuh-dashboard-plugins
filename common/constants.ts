@@ -895,7 +895,7 @@ export const PLUGIN_SETTINGS = {
 		},
 		validate: function(value){
 			return composeValidate(
-				validateFilePickerFileSize(this.options.file.size),
+				validateFilePickerFileSize({...this.options.file.size, meaningfulUnit: true}),
 				validateFilePickerSupportedExtensions(this.options.file.extensions)
 			)(value)
 		},
@@ -931,7 +931,7 @@ export const PLUGIN_SETTINGS = {
 		},
 		validate: function(value){
 			return composeValidate(
-				validateFilePickerFileSize(this.options.file.size),
+				validateFilePickerFileSize({...this.options.file.size, meaningfulUnit: true}),
 				validateFilePickerSupportedExtensions(this.options.file.extensions)
 			)(value)
 		},
@@ -968,7 +968,7 @@ export const PLUGIN_SETTINGS = {
 		},
 		validate: function(value){
 			return composeValidate(
-				validateFilePickerFileSize(this.options.file.size),
+				validateFilePickerFileSize({...this.options.file.size, meaningfulUnit: true}),
 				validateFilePickerSupportedExtensions(this.options.file.extensions)
 			)(value)
 		},
@@ -1005,7 +1005,7 @@ export const PLUGIN_SETTINGS = {
 		},
 		validate: function(value){
 			return composeValidate(
-				validateFilePickerFileSize(this.options.file.size),
+				validateFilePickerFileSize({...this.options.file.size, meaningfulUnit: true}),
 				validateFilePickerSupportedExtensions(this.options.file.extensions)
 			)(value)
 		},
