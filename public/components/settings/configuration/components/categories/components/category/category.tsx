@@ -36,6 +36,7 @@ import { WzRequest } from '../../../../../../../react-services';
 import { updateAppConfig } from '../../../../../../../redux/actions/appConfigActions';
 import { getErrorOrchestrator } from '../../../../../../../react-services/common-services';
 import { WzButtonModalConfirm } from '../../../../../../common/buttons';
+import { toastRequiresReloadingBrowserTab, toastRequiresRestartingPluginPlatform, toastRequiresRunningHealthcheck, toastSuccessUpdateConfiguration } from '../show-toasts';
 
 interface ICategoryProps {
   title: string
@@ -138,7 +139,14 @@ const InputFormFilePickerPreInput = ({image, field}: {image: string, field: any}
             onConfirm={async () => {
               try{
                 const response = await WzRequest.genericReq('DELETE', `/utils/configuration/files/${field.key}`);
-                dispatch(updateAppConfig(response.data.updatedConfiguration));
+                dispatch(updateAppConfig(response.data.data.updatedConfiguration));
+                
+                // Show the toasts if necessary
+                const { requiresRunningHealthCheck, requiresReloadingBrowserTab, requiresRestartingPluginPlatform } = response.data.data;
+                requiresRunningHealthCheck && toastRequiresRunningHealthcheck();
+                requiresReloadingBrowserTab&& toastRequiresReloadingBrowserTab();
+                requiresRestartingPluginPlatform && toastRequiresRestartingPluginPlatform();
+                toastSuccessUpdateConfiguration();
               }catch(error){
                 const options = {
                   context: `${InputFormFilePickerPreInput.name}.confirmDeleteFile`,

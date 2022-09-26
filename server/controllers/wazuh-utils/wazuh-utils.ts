@@ -143,7 +143,7 @@ export class WazuhUtilsCtrl {
       // Check if the extension is valid for the setting.
       if(!pluginSetting.options.file.extensions.includes(extension)){
         return response.badRequest({
-          body: `File extension is not valid for this setting <${key}>. Allowed file extensions: ${pluginSetting.options.file.extensions.join(', ')}`
+          body: `File extension is not valid for setting [${key}] setting. Allowed file extensions: ${pluginSetting.options.file.extensions.join(', ')}`
         });
       };
 
@@ -166,9 +166,9 @@ export class WazuhUtilsCtrl {
       return response.ok({
         body: {
           data: {
-            requireHealthCheck: Boolean(pluginSetting.requireHealthCheck),
-            requireReload: Boolean(pluginSetting.requireReload),
-            requireRestart: Boolean(pluginSetting.requireRestart),
+            requiresRunningHealthCheck: Boolean(pluginSetting.requiresRunningHealthCheck),
+            requiresReloadingBrowserTab: Boolean(pluginSetting.requiresReloadingBrowserTab),
+            requiresRestartingPluginPlatform: Boolean(pluginSetting.requiresRestartingPluginPlatform),
             updatedConfiguration: {
               [key]: pluginSettingValue
             }
@@ -202,9 +202,14 @@ export class WazuhUtilsCtrl {
 
       return response.ok({
         body: {
-          message: 'All files were removed.',
-          updatedConfiguration: {
-            [key]: pluginSettingValue
+          message: 'All files were removed and the configuration file was updated.',
+          data: {
+            requiresRunningHealthCheck: Boolean(pluginSetting.requiresRunningHealthCheck),
+            requiresReloadingBrowserTab: Boolean(pluginSetting.requiresReloadingBrowserTab),
+            requiresRestartingPluginPlatform: Boolean(pluginSetting.requiresRestartingPluginPlatform),
+            updatedConfiguration: {
+              [key]: pluginSettingValue
+            }
           }
         }
       });

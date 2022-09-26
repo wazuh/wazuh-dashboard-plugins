@@ -40,6 +40,7 @@ import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { getToasts } from '../../../kibana-services';
 import { updateAppConfig } from '../../../redux/actions/appConfigActions';
 import path from 'path';
+import { toastRequiresReloadingBrowserTab, toastRequiresRestartingPluginPlatform, toastRequiresRunningHealthcheck, toastSuccessUpdateConfiguration } from './components/categories/components/show-toasts';
 
 export type ISetting = {
   key: string
@@ -163,7 +164,7 @@ const WzConfigurationSettingsProvider = (props) => {
       const responses = await Promise.all(requests);      
 
       // Show the toasts if necessary
-      responses.some(({data: { data: {requireHealtCheck}}}) => requireHealtCheck) && toastRequiresRunningHealthcheck();
+      responses.some(({data: { data: {requiresRunningHealthCheck}}}) => requiresRunningHealthCheck) && toastRequiresRunningHealthcheck();
       responses.some(({data: { data: {requiresReloadingBrowserTab}}}) => requiresReloadingBrowserTab) && toastRequiresReloadingBrowserTab();
       responses.some(({data: { data: {requiresRestartingPluginPlatform}}}) => requiresRestartingPluginPlatform) && toastRequiresRestartingPluginPlatform();
 
@@ -199,7 +200,7 @@ const WzConfigurationSettingsProvider = (props) => {
       };
 
       // Show the success toast
-      successToast();
+      toastSuccessUpdateConfiguration();
 
       // Reset the form changed configuration
       doChanges();
@@ -266,46 +267,3 @@ export const WzConfigurationSettings = compose (
   withReduxProvider,
   withUserAuthorizationPrompt(null, [WAZUH_ROLE_ADMINISTRATOR_NAME])
 )(WzConfigurationSettingsProvider);
-
-const toastRequiresReloadingBrowserTab = () => {
-  getToasts().add({
-    color: 'success',
-    title: 'This setting require you to reload the page to take effect.',
-    text: <EuiFlexGroup justifyContent="flexEnd" gutterSize="s">
-      <EuiFlexItem grow={false}>
-        <EuiButton onClick={() => window.location.reload()} size="s">Reload page</EuiButton>
-      </EuiFlexItem>
-    </EuiFlexGroup>
-  });
-};
-
-const toastRequiresRunningHealthcheck = () => {
-  const toast = getToasts().add({
-    color: 'warning',
-    title: 'You must execute the health check for the changes to take effect',
-    toastLifeTimeMs: 5000,
-    text:
-      <EuiFlexGroup alignItems="center" gutterSize="s">
-        <EuiFlexItem grow={false} >
-          <EuiButton onClick={() => {
-            getToasts().remove(toast);
-            window.location.href = '#/health-check';
-          }} size="s">Execute health check</EuiButton>
-        </EuiFlexItem>
-      </EuiFlexGroup>
-  });
-};
-
-const toastRequiresRestartingPluginPlatform = () => {
-  getToasts().add({
-    color: 'warning',
-    title: `You must restart ${PLUGIN_PLATFORM_NAME} for the changes to take effect`,
-  });
-};
-
-const successToast = () => {
-  getToasts().add({
-    color: 'success',
-    title: 'The configuration has been successfully updated',
-  });
-};
