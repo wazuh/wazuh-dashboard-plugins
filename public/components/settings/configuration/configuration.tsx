@@ -136,7 +136,7 @@ const WzConfigurationSettingsProvider = (props) => {
       const responses = await Promise.all(requests);      
 
       // Show the toasts if necessary
-      responses.some(({data: { data: {requireHealtCheck}}}) => requireHealtCheck) && toastRequiresRunningHealthcheck();
+      responses.some(({data: { data: {requiresRunningHealthCheck}}}) => requiresRunningHealthCheck) && toastRequiresRunningHealthcheck();
       responses.some(({data: { data: {requiresReloadingBrowserTab}}}) => requiresReloadingBrowserTab) && toastRequiresReloadingBrowserTab();
       responses.some(({data: { data: {requiresRestartingPluginPlatform}}}) => requiresRestartingPluginPlatform) && toastRequiresRestartingPluginPlatform();
 
