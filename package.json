@@ -63,9 +63,15 @@
     "winston": "3.0.0"
   },
   "devDependencies": {
-    "redux-mock-store": "^1.5.4",
+    "@elastic/eslint-config-kibana": "0.15.0",
+    "@elastic/eslint-plugin-eui": "0.0.2",
     "@types/node-cron": "^2.0.3",
+    "eslint": "^6.8.0",
     "eslint-plugin-async-await": "^0.0.0",
+    "eslint-plugin-node": "11.1.0",
+    "eslint-plugin-requirejs": "4.0.1",
+    "prettier": "^2.1.1",
+    "redux-mock-store": "^1.5.4",
     "tslint": "^5.11.0",
     "typescript-eslint-parser": "^18.0.0"
   }

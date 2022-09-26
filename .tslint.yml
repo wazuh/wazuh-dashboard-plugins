@@ -1,2 +1,25 @@
-extends:
-  - tslint:recommended
+extends: "tslint:recommended"
+rules:
+  max-line-length:
+    options: [100]
+  quotemark: [
+    true,
+    "single",
+    "jsx-double"
+  ]
+  semicolon: [
+    true,
+    "always"
+  ]
+linterOptions:
+  exclude: [
+    "server/**/*.test.ts",
+    "public/**/*.test.ts",
+    "public/**/*.test.tsx",
+    "server/**/*.test.ts",
+    "server/**/*.test.tsx",
+    "common/**/*.test.ts",
+    "../../src/**/*",
+    "**/request.ts",
+    "src/**/*"
+  ]

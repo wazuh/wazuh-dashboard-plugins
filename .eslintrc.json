@@ -1,0 +1,45 @@
+{
+    "env": {
+      "amd": true,
+      "browser": true,
+      "es6": true,
+      "jquery": true,
+      "mocha": true,
+      "node": true
+    },
+    "extends": [
+      "eslint:recommended",
+      "plugin:node/recommended"
+    ],
+    "parserOptions": {
+      "ecmaFeatures": {
+        "jsx": true
+      },
+      "ecmaVersion": "latest",
+      "sourceType": "module"
+    },
+    "plugins": [
+      "node",
+      "async-await"
+    ],
+    "rules": {
+      "no-cond-assign": 0,
+      "no-console": 0,
+      "no-extra-boolean-cast": 0,
+      "no-process-exit": 0,
+      "no-unused-vars": [
+        "error",
+        {
+          "argsIgnorePattern": "^_|_"
+        }
+      ],
+      "node/exports-style": [
+        "error",
+        "module.exports"
+      ],
+      "node/no-unpublished-require": 0,
+      "node/no-unsupported-features": 0,
+      "node/no-unsupported-features/es-syntax": 0,
+      "semi": 0
+    }
+  }

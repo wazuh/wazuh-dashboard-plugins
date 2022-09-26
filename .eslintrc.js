@@ -19,6 +19,7 @@ module.exports = {
   root: true,	
   extends: ['@elastic/eslint-config-kibana', 'plugin:@elastic/eui/recommended'],
   rules: {
+    'max-len': ['error', 100, 2, { ignoreComments: true, ignoreUrls: true }],
     // "@kbn/eslint/require-license-header": "off"
   },
   overrides: [
