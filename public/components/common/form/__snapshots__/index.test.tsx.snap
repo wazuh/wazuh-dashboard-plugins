@@ -1,6 +1,127 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`[component] InputForm Renders correctly to match the snapshot: Input: editor 1`] = `
+exports[`[component] InputForm Renders correctly to match the snapshot with validation errors. Input: number 1`] = `
+<div>
+  <div
+    class="euiFormRow euiFormRow--fullWidth"
+    id="generated-id-row"
+  >
+    <div
+      class="euiFormRow__labelWrapper"
+    >
+      <label
+        aria-invalid="false"
+        class="euiFormLabel euiFormRow__label"
+        for="generated-id"
+      >
+        Test
+      </label>
+    </div>
+    <div
+      class="euiFormRow__fieldWrapper"
+    >
+      <div
+        class="euiFormControlLayout euiFormControlLayout--fullWidth"
+      >
+        <div
+          class="euiFormControlLayout__childrenWrapper"
+        >
+          <input
+            class="euiFieldNumber euiFieldNumber--fullWidth"
+            type="number"
+            value="4"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`[component] InputForm Renders correctly to match the snapshot with validation errors. Input: text 1`] = `
+<div>
+  <div
+    class="euiFormRow euiFormRow--fullWidth"
+    id="generated-id-row"
+  >
+    <div
+      class="euiFormRow__labelWrapper"
+    >
+      <label
+        aria-invalid="true"
+        class="euiFormLabel euiFormRow__label euiFormLabel-isInvalid"
+        for="generated-id"
+      >
+        Test
+      </label>
+    </div>
+    <div
+      class="euiFormRow__fieldWrapper"
+    >
+      <div
+        class="euiFormControlLayout euiFormControlLayout--fullWidth"
+      >
+        <div
+          class="euiFormControlLayout__childrenWrapper"
+        >
+          <input
+            class="euiFieldText euiFieldText--fullWidth"
+            type="text"
+            value=""
+          />
+        </div>
+      </div>
+      <div
+        aria-live="polite"
+        class="euiFormErrorText euiFormRow__text"
+        id="generated-id-error-0"
+      >
+        Validation error: string can not be empty
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`[component] InputForm Renders correctly to match the snapshot with validation errors. Input: text 2`] = `
+<div>
+  <div
+    class="euiFormRow euiFormRow--fullWidth"
+    id="generated-id-row"
+  >
+    <div
+      class="euiFormRow__labelWrapper"
+    >
+      <label
+        aria-invalid="false"
+        class="euiFormLabel euiFormRow__label"
+        for="generated-id"
+      >
+        Test
+      </label>
+    </div>
+    <div
+      class="euiFormRow__fieldWrapper"
+    >
+      <div
+        class="euiFormControlLayout euiFormControlLayout--fullWidth"
+      >
+        <div
+          class="euiFormControlLayout__childrenWrapper"
+        >
+          <input
+            class="euiFieldText euiFieldText--fullWidth"
+            type="text"
+            value="test spaces"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`[component] InputForm Renders correctly to match the snapshot. Input: editor 1`] = `
 <div>
   <div
     class="euiCodeEditorWrapper"
@@ -118,7 +239,7 @@ exports[`[component] InputForm Renders correctly to match the snapshot: Input: e
 </div>
 `;
 
-exports[`[component] InputForm Renders correctly to match the snapshot: Input: number 1`] = `
+exports[`[component] InputForm Renders correctly to match the snapshot. Input: number 1`] = `
 <div>
   <div
     class="euiFormControlLayout euiFormControlLayout--fullWidth"
@@ -136,7 +257,7 @@ exports[`[component] InputForm Renders correctly to match the snapshot: Input: n
 </div>
 `;
 
-exports[`[component] InputForm Renders correctly to match the snapshot: Input: select 1`] = `
+exports[`[component] InputForm Renders correctly to match the snapshot. Input: select 1`] = `
 <div>
   <div
     class="euiFormControlLayout"
@@ -181,7 +302,7 @@ exports[`[component] InputForm Renders correctly to match the snapshot: Input: s
 </div>
 `;
 
-exports[`[component] InputForm Renders correctly to match the snapshot: Input: switch 1`] = `
+exports[`[component] InputForm Renders correctly to match the snapshot. Input: switch 1`] = `
 <div>
   <div
     class="euiSwitch"
@@ -236,7 +357,7 @@ exports[`[component] InputForm Renders correctly to match the snapshot: Input: s
 </div>
 `;
 
-exports[`[component] InputForm Renders correctly to match the snapshot: Input: text 1`] = `
+exports[`[component] InputForm Renders correctly to match the snapshot. Input: text 1`] = `
 <div>
   <div
     class="euiFormControlLayout euiFormControlLayout--fullWidth"
