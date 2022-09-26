@@ -457,7 +457,7 @@ export const PLUGIN_SETTINGS_CATEGORIES = {
   }
 };
 
-export const PLUGIN_SETTINGS = {
+export const PLUGIN_SETTINGS: {[key: string]: TPluginSetting} = {
 	"alerts.sample.prefix": {
 		title: "Sample alerts prefix",
 		description: "Define the index name prefix of sample alerts. It must match the template used by the index pattern to avoid unknown fields in dashboards.",
