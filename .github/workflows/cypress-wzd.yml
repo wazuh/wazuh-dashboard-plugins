@@ -25,7 +25,7 @@ on:
 jobs:
   setup-wazuh-dashboard-app:
     name: Run setup environment wazuh dashboard app
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
      - name: Step 01 - Set up environment variables
        run: |
