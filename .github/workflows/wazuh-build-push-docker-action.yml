@@ -12,37 +12,37 @@ on:
         type: boolean
         description: 'Build manager image'
         required: false
-      wazuh-manager-version: 
+      wazuh-manager-version:
         description: 'Wazuh manager version'
-        default: 'v4.3.4-rc1'
+        default: 'v4.3.8'
         required: false
-      elastic-manager-version: 
+      elastic-manager-version:
         description: 'Elastic manager version'
-        default: '7.16.3'
-        required: false   
-     
+        default: '7.17.0'
+        required: false
+
       build-agent-image:
         type: boolean
         description: 'Build agent image'
         required: false
-      wazuh-agent-version: 
+      wazuh-agent-version:
         description: 'Wazuh agent version'
-        default: 'v4.3.4-rc1'
+        default: 'v4.3.8'
         required: false
-      elastic-agent-version: 
+      elastic-agent-version:
         description: 'Elastic manager version'
-        default: '7.16.3'
+        default: '7.17.0'
         required: false
 
       build-cypress-image:
         type: boolean
         description: 'Build cypress image'
         required: false
-      ubuntu-cypress-branch: 
+      ubuntu-cypress-branch:
         description: 'Ubuntu cypress branch'
         default: 'main'
         required: false
-      image-cypress-version: 
+      image-cypress-version:
         description: 'Image cypress version'
         default: '3.0.0'
         required: false
@@ -52,14 +52,14 @@ jobs:
   job-build-manager-image:
     if: ${{ github.event.inputs.build-manager-image == 'true' }}
     name: Run build and push manager image
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
      - name: Step 01 - Download wazuh-kibana-app
        uses: actions/checkout@v2
        with:
           path: wazuh-kibana-app
           ref: 'master'
-     - name: Step 02 - Login to quay.io 
+     - name: Step 02 - Login to quay.io
        run: |
         docker login -u=${{ secrets.QUAYIO_USERNAME }} -p=${{ secrets.QUAYIO_TOKEN }} quay.io
      - name: Step 03 - Build image
@@ -71,13 +71,13 @@ jobs:
         --build-arg FILEBEAT_WAZUH_TEMPLATE_URL=https://raw.githubusercontent.com/wazuh/wazuh/4.0/extensions/elasticsearch/7.x/wazuh-template.json \
         --build-arg FILEBEAT_WAZUH_MODULE_URL=https://packages.wazuh.com/4.x/filebeat/wazuh-filebeat-0.1.tar.gz .
      - name: Step 04 - Push image to quay.io
-       run: | 
+       run: |
         docker push quay.io/wazuh/wazuh-manager-image:${{ github.event.inputs.wazuh-manager-version }}-${{ github.event.inputs.elastic-manager-version }}
 
   job-build-agent-image:
     if: ${{ github.event.inputs.build-agent-image == 'true' }}
     name: Run build and push agent image
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
      - name: Step 01 - Download wazuh-kibana-app
        uses: actions/checkout@v2
@@ -93,13 +93,13 @@ jobs:
         docker build -t quay.io/wazuh/wazuh-agent-image:${{ github.event.inputs.wazuh-agent-version }} \
         --build-arg WAZUH_VERSION=${{ github.event.inputs.wazuh-agent-version }} .
      - name: Step 04 - Push image to quay.io
-       run: | 
+       run: |
         docker push quay.io/wazuh/wazuh-agent-image:${{ github.event.inputs.wazuh-agent-version }}
 
   job-build-cypress-image:
     if: ${{ github.event.inputs.build-cypress-image == 'true' }}
     name: Run build and push cypress image
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
      - name: Step 01 - Download wazuh-kibana-app
        uses: actions/checkout@v2
@@ -115,5 +115,5 @@ jobs:
         docker build -t quay.io/wazuh/wazuh-ubuntu-cypress:${{ github.event.inputs.image-cypress-version }} \
         --build-arg UBUNTU_CYPRESS_BRANCH=${{ github.event.inputs.ubuntu-cypress-branch }} .
      - name: Step 04 - Push image to quay.io
-       run: | 
+       run: |
         docker push quay.io/wazuh/wazuh-ubuntu-cypress:${{ github.event.inputs.image-cypress-version }}
