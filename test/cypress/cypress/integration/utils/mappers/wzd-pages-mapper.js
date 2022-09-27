@@ -13,6 +13,7 @@ import { DECODERS_PAGE } from '../../pageobjects/wzd/wazuh-menu/decoders.page';
 import { RULES_PAGE } from '../../pageobjects/wzd/wazuh-menu/rules.page';
 import { WAZUH_MENU_PAGE } from '../../pageobjects/wzd/wazuh-menu/wazuh-menu.page';
 import { MODULES_DIRECTORY_PAGE } from '../../pageobjects/wzd/modules-directory.page';
+import { REPORTING_PAGE } from '../../pageobjects/wzd/reporting/report.page';
 
 import { AGENT_MODULES } from './wzd/agent-modules-mapper';
 import { BASIC_MODULES } from './wzd/basic-modules-mapper';
@@ -36,6 +37,7 @@ export const WZD_PAGES_MAPPER = {
   RULES_PAGE,
   WAZUH_MENU_PAGE,
   MODULES_DIRECTORY_PAGE,
+  REPORTING_PAGE,
 
   AGENT_MODULES,
   BASIC_MODULES,
