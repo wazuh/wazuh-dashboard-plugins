@@ -26,7 +26,7 @@ RUN mkdir $NVM_DIR -p \
 	&& curl https://raw.githubusercontent.com/creationix/nvm/v0.36.0/install.sh | bash \
 	&& chmod u+x $NVM_DIR/nvm.sh \
 	&& . $NVM_DIR/nvm.sh  \
-    && cd $CYPRESS_DIR/cypress/ \
+    && cd $CYPRESS_DIR/test/cypress/cypress \
 	&& nvm install $(cat .nvmrc) \
 	&& npm install   
 
