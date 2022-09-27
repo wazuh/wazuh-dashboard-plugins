@@ -882,11 +882,11 @@ export const PLUGIN_SETTINGS: {[key: string]: TPluginSetting} = {
 		type: EpluginSettingType.textarea,
 		defaultValue: "",
     	defaultValueIfNotSet: REPORTS_PAGE_FOOTER_TEXT,
-		isConfigurableFile: true,
+		isConfigurableFromFile: true,
 		isConfigurableFromUI: true,
 		validate: validateStringMultipleLines({max: 2}),
 		validateBackend: function(schema){
-			return schema.string({minLength: 1, validate: this.validate});
+			return schema.string({validate: this.validate});
 		},
 	},
 	"customization.reports.header": {
@@ -900,7 +900,7 @@ export const PLUGIN_SETTINGS: {[key: string]: TPluginSetting} = {
 		isConfigurableFromUI: true,
 		validate: validateStringMultipleLines({max: 4}),
 		validateBackend: function(schema){
-			return schema.string({minLength: 1, validate: this.validate});
+			return schema.string({validate: this.validate});
 		},
 	},
 	"disabled_roles": {

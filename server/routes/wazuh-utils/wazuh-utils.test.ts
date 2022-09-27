@@ -201,6 +201,14 @@ hosts:
     ${'cron.statistics.interval'} | ${true} | ${400} | ${"[request body.cron.statistics.interval]: expected value of type [string] but got [boolean]"}
     ${'cron.statistics.status'} | ${true} | ${200} | ${null}
     ${'cron.statistics.status'} | ${0} | ${400} | ${'[request body.cron.statistics.status]: expected value of type [boolean] but got [number]'}
+    ${'customization.reports.footer'} | ${'Test'} | ${200} | ${null}
+    ${'customization.reports.footer'} | ${'Test\nTest'} | ${200} | ${null}
+    ${'customization.reports.footer'} | ${'Test\nTest\nTest\nTest\nTest'} | ${400} | ${"[request body.customization.reports.footer]: The string should have less or equal to 2 line/s."}
+    ${'customization.reports.footer'} | ${true} | ${400} | ${'[request body.customization.reports.footer]: expected value of type [string] but got [boolean]'}
+    ${'customization.reports.header'} | ${'Test'} | ${200} | ${null}
+    ${'customization.reports.header'} | ${'Test\nTest'} | ${200} | ${null}
+    ${'customization.reports.header'} | ${'Test\nTest\nTest\nTest\nTest'} | ${400} | ${"[request body.customization.reports.header]: The string should have less or equal to 4 line/s."}
+    ${'customization.reports.header'} | ${true} | ${400} | ${'[request body.customization.reports.header]: expected value of type [string] but got [boolean]'}
     ${'disabled_roles'} | ${['test']} | ${200} | ${null}
     ${'disabled_roles'} | ${['']} | ${400} | ${'[request body.disabled_roles.0]: Value can not be empty.'}
     ${'disabled_roles'} | ${['test space']} | ${400} | ${"[request body.disabled_roles.0]: It can't contain spaces."}

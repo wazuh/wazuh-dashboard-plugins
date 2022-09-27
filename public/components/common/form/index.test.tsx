@@ -15,6 +15,7 @@ describe('[component] InputForm', () => {
 		${'select'} | ${'value1'} | ${{select: [{text: 'Label1', value: 'value1'}, {text: 'Label2', value: 'value2'}]}}} | ${{}}
 		${'switch'} | ${true} | ${{switch: {values: {enabled: {label: 'Enabled', value: true}, disabled: {label: 'Disabled', value: false}}}}} | ${{}}
 		${'text'} | ${'test'} | ${undefined} | ${{isInvalid: false}}
+		${'textarea'} | ${'test'} | ${undefined} | ${{}}
 	`('Renders correctly to match the snapshot. Input: $inputType', ({ inputType, value, options }) => {
 		const wrapper = render(
 			<InputForm
