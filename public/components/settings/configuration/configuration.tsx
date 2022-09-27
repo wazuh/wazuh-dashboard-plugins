@@ -223,6 +223,34 @@ const WzConfigurationSettingsProvider = (props) => {
     };
   };
 
+  const onCancel = () => {
+    const updatedSettingsUseFilePicker = Object.entries(changed).reduce((accum, [pluginSettingKey]) => {
+      if(PLUGIN_SETTINGS[pluginSettingKey].isConfigurableFromFile && PLUGIN_SETTINGS[pluginSettingKey].type === EpluginSettingType.filepicker){
+        accum.push(pluginSettingKey);
+      };
+      return accum;
+    }, []);
+
+    updatedSettingsUseFilePicker.forEach(settingKey => {
+      try{
+        fields[settingKey].inputRef.removeFiles(
+          // This method uses some methods of a DOM event.
+          // Because we want to remove the files when the configuration is saved,
+          // there is no event, so we create a object that contains the
+          // methods used to remove the files. Of this way, we can skip the errors
+          // due to missing methods.
+          // This workaround is based in @elastic/eui v29.3.2
+          // https://github.com/elastic/eui/blob/v29.3.2/src/components/form/file_picker/file_picker.tsx#L107-L108
+          {stopPropagation: () => {}, preventDefault: () => {}}
+        );
+      }catch(error){
+        // TODO: There is an error related to accessing to `target` of undefined
+        // that we should review it.
+      }
+    });
+    undoChanges();
+  };
+
   return (
     <EuiPage >
       <EuiPageBody className='mgtPage__body' restrictWidth>
@@ -254,7 +282,7 @@ const WzConfigurationSettingsProvider = (props) => {
           <BottomBar
             errorsCount={Object.keys(errors).length}
             unsavedCount={Object.keys(changed).length}
-            onCancel={undoChanges}
+            onCancel={onCancel}
             onSave={onSave}
           />
         )}
