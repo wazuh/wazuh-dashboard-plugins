@@ -15,7 +15,7 @@ on:
 jobs:
   setup-wazuh-kibana-app:
     name: Run setup environment wazuh kibana app
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
      - name: Step 01 - Set up environment
        run: |
