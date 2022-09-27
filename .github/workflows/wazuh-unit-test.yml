@@ -4,12 +4,10 @@
 name: Wazuh Unit Tests
 
 on:
-  push:
-    branches:
-      - 'disable'
   pull_request:
     branches:
       - '*.*-*.*'
+      - '*.*-*.*-wzd'
 
 jobs:
   setup-wazuh-app:
