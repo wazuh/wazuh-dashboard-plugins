@@ -39,7 +39,7 @@ on:
         description: 'Build cypress image'
         required: false
       ubuntu-cypress-branch: 
-        description: 'Ubuntu cypress branch'
+        description: 'Ubuntu cypress branch: Branch in which the image will be created, this branch must correspond to the wazuh-kibana-app project. It will take the tests written in the wazuh-kibana-app/test/cypress directory.'
         default: 'main'
         required: false
       image-cypress-version: 
