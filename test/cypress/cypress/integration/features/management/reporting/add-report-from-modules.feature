@@ -8,7 +8,7 @@ Feature: Generating reports from modules
 Scenario Outline: Create a report from modules
     Given The wazuh admin user is logged
     When The user goes to <Module Name>
-    #And The user generate a module report clicking on the Generate report option
+    And The user generate a module report clicking on the generate report option
     #And The user navigates to Management/Reporting
     #Then The report is displayed in the table
     Examples:
