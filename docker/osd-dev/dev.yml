@@ -47,7 +47,7 @@ services:
           export certs=/tmp/certs
           mkdir $$certs
         	cd $$certs
-         
+
         	echo "Generating CA"
         	cfssl gencert -initca /conf/ca.json | cfssljson -bare ca
 
@@ -96,7 +96,7 @@ services:
             chmod 640 /certs/wi/* /certs/wd/* /certs/wm/*
             chown -R 1000:1000 /certs/*
             ls -alR /certs/
-            
+
             chown 1000:1000 /data /logs
             chmod 775 /data /logs
             sleep 30
@@ -132,7 +132,7 @@ services:
       - ./config/${OSD_MAJOR}/os/opensearch.yml:/usr/share/opensearch/config/opensearch.yml
       - ./config/${OSD_MAJOR}/os/internal_users.yml:/usr/share/opensearch/plugins/opensearch-security/securityconfig/internal_users.yml
       - ./config/${OSD_MAJOR}/os/roles_mapping.yml:/usr/share/opensearch/plugins/opensearch-security/securityconfig/roles_mapping.yml
-      - ./config/${OSD_MAJOR}/os/roles.yml:/usr/share/opensearch/plugins/opensearch-security/securityconfig/roles.yml  
+      - ./config/${OSD_MAJOR}/os/roles.yml:/usr/share/opensearch/plugins/opensearch-security/securityconfig/roles.yml
       - os_logs:/var/log/os1
       - os_data:/var/lib/os1
     networks:
@@ -153,12 +153,14 @@ services:
     user: "0:0"
     networks:
       - os-dev
+      - mon
     <<: *logging
     # restart: always
     entrypoint:
       - '/bin/bash'
     command: >
       -c '
+        mkdir -p /etc/filebeat
         echo admin | filebeat keystore add username --stdin --force
         echo ${PASSWORD}| filebeat keystore add password --stdin --force
         curl -so /etc/filebeat/wazuh-template.json https://raw.githubusercontent.com/wazuh/wazuh/4.3/extensions/elasticsearch/7.x/wazuh-template.json
