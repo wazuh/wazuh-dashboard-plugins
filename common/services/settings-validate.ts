@@ -23,10 +23,10 @@ export const validateStringNoEmpty = (value: string): string | undefined => {
 export const validateStringMultipleLines = (options: {min?: number, max?: number} = {}) => (value: number) => {
     const lines = value.split(/\r\n|\r|\n/).length;
     if(typeof options.min !== 'undefined' && lines < options.min){
-        return `The string should have more or ${options.min} line/s.`;
+        return `The string should have more or equal to ${options.min} line/s.`;
     };
     if(typeof options.max !== 'undefined' && lines > options.max){
-        return `The string should have less or ${options.max} line/s.`;
+        return `The string should have less or equal to ${options.max} line/s.`;
     };
 };
 
