@@ -1,4 +1,5 @@
 import { EpluginSettingType, PLUGIN_SETTINGS, TPluginSetting, TPluginSettingKey, TPluginSettingWithKey } from '../constants';
+import { formatBytes } from './file-size';
 
 /**
  * Get the default value of the plugin setting.
@@ -110,8 +111,13 @@ export function groupSettingsByCategory(settings: TPluginSettingWithKey[]){
 		description,
 		...(options?.select ? [`Allowed values: ${options.select.map(({text, value}) => formatLabelValuePair(text, value)).join(', ')}.`] : []),
 		...(options?.switch ? [`Allowed values: ${['enabled', 'disabled'].map(s => formatLabelValuePair(options.switch.values[s].label, options.switch.values[s].value)).join(', ')}.`] : []),
+		// File extensions
 		...(options?.file?.extensions ? [`Supported extensions: ${options.file.extensions.join(', ')}.`] : []),
+		// File recommended dimensions
 		...(options?.file?.recommended?.dimensions ? [`Recommended dimensions: ${options.file.recommended.dimensions.width}x${options.file.recommended.dimensions.height}${options.file.recommended.dimensions.unit || ''}.`] : []),
+		// File size
+		...((options?.file?.size && typeof options.file.size.minBytes !== 'undefined') ? [`Minimum file size: ${formatBytes(options.file.size.minBytes)}.`] : []),
+		...((options?.file?.size && typeof options.file.size.maxBytes !== 'undefined') ? [`Maximum file size: ${formatBytes(options.file.size.maxBytes)}.`] : []),
 	].join(' ');
 };
 

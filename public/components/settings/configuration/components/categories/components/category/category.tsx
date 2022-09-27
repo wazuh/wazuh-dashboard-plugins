@@ -25,7 +25,6 @@ import {
 } from '@elastic/eui';
 import { EuiIconTip } from '@elastic/eui';
 import { EpluginSettingType, TPluginSettingWithKey, UI_LOGGER_LEVELS } from '../../../../../../../../common/constants';
-import { getPluginSettingDescription } from '../../../../../../../../common/services/settings';
 import classNames from 'classnames';
 import { InputForm } from '../../../../../../common/form';
 import { useDispatch } from 'react-redux';
@@ -88,7 +87,7 @@ export const Category: React.FunctionComponent<ICategoryProps> = ({ currentConfi
                       )}
                     </span>
                   </EuiTitle>}
-                description={getPluginSettingDescription(item)} >
+                description={item.description} >
                   <InputForm
                     label={item.key}
                     {...item}
