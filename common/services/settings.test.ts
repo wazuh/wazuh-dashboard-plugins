@@ -1,6 +1,7 @@
 import {
 	formatLabelValuePair,
-	formatSettingValueToFile
+	formatSettingValueToFile,
+	getSettingDependOnCustomizationIsEnabled
 } from "./settings";
 
 describe('[settings] Methods', () => {
@@ -29,6 +30,31 @@ describe('[settings] Methods', () => {
 		${['test1', 'test2']} | ${'[\"test1\",\"test2\"]'}
 		`(`input: $input | expected: $expected`, ({ input, expected }) => {
 			expect(formatSettingValueToFile(input)).toBe(expected);
+		});
+	});
+
+	describe('getSettingDependOnCustomizationIsEnabled: Get the value for the "customization." settings depending on the "customization.enabled" setting', () => {
+		it.only.each`
+		customizationEnabled | settingKey | configValue | expected
+		${true} | ${'customization.logo.app'} | ${'custom-image-app.png'} | ${'custom-image-app.png'} 
+		${true} | ${'customization.logo.app'} | ${''} | ${''}
+		${false} | ${'customization.logo.app'} | ${'custom-image-app.png'} | ${''} 
+		${false} | ${'customization.logo.app'} | ${''} | ${''}
+		${true} | ${'customization.reports.footer'} | ${'Custom footer'} | ${'Custom footer'}
+		${true} | ${'customization.reports.footer'} | ${''} | ${''}
+		${false} | ${'customization.reports.footer'} | ${'Custom footer'} | ${'Copyright © 2022 Wazuh, Inc.'}
+		${false} | ${'customization.reports.footer'} | ${''} | ${'Copyright © 2022 Wazuh, Inc.'}
+		${false} | ${'customization.reports.footer'} | ${''} | ${'Copyright © 2022 Wazuh, Inc.'}
+		${true} | ${'customization.reports.header'} | ${'Custom header'} | ${'Custom header'}
+		${true} | ${'customization.reports.header'} | ${''} | ${''}
+		${false} | ${'customization.reports.header'} | ${'Custom header'} | ${'info@wazuh.com\nhttps://wazuh.com'}
+		${false} | ${'customization.reports.header'} | ${''} | ${'info@wazuh.com\nhttps://wazuh.com'}
+		`(`customizationEnabled: $customizationEnabled | settingKey: $settingKey | configValue: $configValue | expected: $expected`, ({ configValue, customizationEnabled, expected, settingKey }) => {
+			const configuration = {
+				'customization.enabled': customizationEnabled,
+				[settingKey]: configValue
+			};
+			expect(getSettingDependOnCustomizationIsEnabled(configuration, settingKey)).toBe(expected);
 		});
 	});
 });

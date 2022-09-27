@@ -134,7 +134,7 @@ export function getSettingDependOnCustomizationIsEnabled(configuration: any, set
 		? overwriteDefaultValue
 		: getSettingDefaultValue(settingKey);
 
-	return configuration['customization.enabled']
+	return (configuration['customization.enabled'] && settingKey.startsWith('customization') && settingKey !== 'customization.enabled')
 		? (configuration[settingKey] ?? defaultValue)
 		: defaultValue;
 };
