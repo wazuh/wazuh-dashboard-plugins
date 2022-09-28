@@ -102,13 +102,15 @@ const formatSettingValueToFileType = {
  * @returns 
  */
 export function groupSettingsByCategory(settings: TPluginSettingWithKey[]){
-	const settingsSortedByCategories = settings.reduce((accum, pluginSettingConfiguration) => ({
-		...accum,
-		[pluginSettingConfiguration.category]: [
-		...(accum[pluginSettingConfiguration.category] || []),
-		{...pluginSettingConfiguration}
-		]
-	}),{});
+	const settingsSortedByCategories = settings
+		.sort((settingA, settingB) => settingA.key.localeCompare(settingB.key))
+		.reduce((accum, pluginSettingConfiguration) => ({
+			...accum,
+			[pluginSettingConfiguration.category]: [
+				...(accum[pluginSettingConfiguration.category] || []),
+				{ ...pluginSettingConfiguration }
+			]
+		}), {});
 
 	return Object.entries(settingsSortedByCategories)
 		.map(([category, settings]) => ({ category, settings }))
