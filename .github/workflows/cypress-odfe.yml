@@ -92,7 +92,6 @@ jobs:
        run: |
          cd ${{ env.PATH_TEMPLATE }}
          docker exec $(docker-compose ps -q cypress) bash -c " . /home/automation/nvm/nvm.sh && nvm use && npm run cypress:report"        
-         docker exec $(docker-compose ps -q cypress) bash -c "cp -R /home/automation/wazuh-cypress/cypress/* /home/automation/wazuh-cypress/cypress-slack"        
      - name: Step 09 - Archive reports
        uses: actions/upload-artifact@v2
        with:
