@@ -1,13 +1,11 @@
 import { Then } from 'cypress-cucumber-preprocessor/steps';
-import { clickElement, elementIsVisible, getSelector} from '../../utils/driver';
-
+import { elementIsVisible, elementTextIncludes, getSelector} from '../../utils/driver';
+import {REPORT_NAME as reportName} from '../../step-definitions/reporting/modules-report-data';
 import { REPORTING_PAGE as pageName} from '../../utils/pages-constants';
 const lastCreatedReport = getSelector('lastCreatedReport', pageName);
 
-Then('The report is displayed in the table', () => {
+Then('The report is displayed in the table {}', (moduleName) => {
   elementIsVisible(lastCreatedReport);
- /*if(lastCreatedReport.contains(""))
-     {
-
-     }*/
-  });
+  cy.wait(500);
+  elementTextIncludes(lastCreatedReport, reportName[moduleName]);
+});
