@@ -103,7 +103,7 @@ const formatSettingValueToFileType = {
  */
 export function groupSettingsByCategory(settings: TPluginSettingWithKey[]){
 	const settingsSortedByCategories = settings
-		.sort((settingA, settingB) => settingA.key.localeCompare(settingB.key))
+		.sort((settingA, settingB) => settingA.key?.localeCompare?.(settingB.key))
 		.reduce((accum, pluginSettingConfiguration) => ({
 			...accum,
 			[pluginSettingConfiguration.category]: [
