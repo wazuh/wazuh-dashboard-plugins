@@ -40,34 +40,124 @@
    extends: ['@elastic/eslint-config-kibana', 'plugin:@elastic/eui/recommended'],
  
    overrides: [
-     /**
-      * Temporarily disable some react rules for specific plugins, remove in separate PRs
-      */
+
+    /**
+     * Restricted paths
+     */
      {
-       files: ['packages/osd-ui-framework/**/*.{js,mjs,ts,tsx}'],
-       rules: {
-         'jsx-a11y/no-onchange': 'off',
-       },
-     },
-     {
-       files: ['src/plugins/eui_utils/**/*.{js,mjs,ts,tsx}'],
-       rules: {
-         'react-hooks/exhaustive-deps': 'off',
-       },
-     },
-     {
-       files: ['src/plugins/opensearch_dashboards_react/**/*.{js,mjs,ts,tsx}'],
-       rules: {
-         'react-hooks/rules-of-hooks': 'off',
-         'react-hooks/exhaustive-deps': 'off',
-       },
-     },
-     {
-       files: ['src/plugins/opensearch_dashboards_utils/**/*.{js,mjs,ts,tsx}'],
-       rules: {
-         'react-hooks/exhaustive-deps': 'off',
-       },
-     },
+      files: ['**/*.{js,mjs,ts,tsx}'],
+      rules: {
+        '@osd/eslint/no-restricted-paths': [
+          'error',
+          {
+            basePath: __dirname,
+            zones: [
+              {
+                target: ['(src)/**/*', '!src/core/**/*'],
+                from: ['src/core/utils/**/*'],
+                errorMessage: `Plugins may only import from src/core/server and src/core/public.`,
+              },
+              {
+                target: ['(src)/plugins/*/server/**/*'],
+                from: ['(src)/plugins/*/public/**/*'],
+                errorMessage: `Server code can not import from public, use a common directory.`,
+              },
+              {
+                target: ['(src)/plugins/*/common/**/*'],
+                from: ['(src)/plugins/*/(server|public)/**/*'],
+                errorMessage: `Common code can not import from server or public, use a common directory.`,
+              },
+              {
+                target: [
+                  'src/legacy/**/*',
+                  '(src)/plugins/**/(public|server)/**/*',
+                  'examples/**/*',
+                ],
+                from: [
+                  'src/core/public/**/*',
+                  '!src/core/public/index.ts', // relative import
+                  '!src/core/public/mocks{,.ts}',
+                  '!src/core/server/types{,.ts}',
+                  '!src/core/public/utils/**/*',
+                  '!src/core/public/*.test.mocks{,.ts}',
+
+                  'src/core/server/**/*',
+                  '!src/core/server/index.ts', // relative import
+                  '!src/core/server/mocks{,.ts}',
+                  '!src/core/server/types{,.ts}',
+                  '!src/core/server/test_utils{,.ts}',
+                  '!src/core/server/utils', // ts alias
+                  '!src/core/server/utils/**/*',
+                  // for absolute imports until fixed in
+                  // https://github.com/elastic/kibana/issues/36096
+                  '!src/core/server/*.test.mocks{,.ts}',
+
+                  'target/types/**',
+                ],
+                allowSameFolder: true,
+                errorMessage:
+                  'Plugins may only import from top-level public and server modules in core.',
+              },
+              {
+                target: [
+                  'src/legacy/**/*',
+                  '(src)/plugins/**/(public|server)/**/*',
+                  'examples/**/*',
+                  '!(src)/**/*.test.*',
+                ],
+                from: [
+                  '(src)/plugins/**/(public|server)/**/*',
+                  '!(src)/plugins/**/(public|server)/mocks/index.{js,mjs,ts}',
+                  '!(src)/plugins/**/(public|server)/(index|mocks).{js,mjs,ts,tsx}',
+                ],
+                allowSameFolder: true,
+                errorMessage: 'Plugins may only import from top-level public and server modules.',
+              },
+              {
+                target: [
+                  '(src)/plugins/**/*',
+                  '!(src)/plugins/**/server/**/*',
+
+                  'examples/**/*',
+                  '!examples/**/server/**/*',
+                ],
+                from: [
+                  'src/core/server',
+                  'src/core/server/**/*',
+                  '(src)/plugins/*/server/**/*',
+                  'examples/**/server/**/*',
+                ],
+                errorMessage:
+                  'Server modules cannot be imported into client modules or shared modules.',
+              },
+              {
+                target: ['src/core/**/*'],
+                from: ['plugins/**/*', 'src/plugins/**/*', 'src/legacy/ui/**/*'],
+                errorMessage: 'The core cannot depend on any plugins.',
+              },
+              {
+                target: ['(src)/plugins/*/public/**/*'],
+                from: ['ui/**/*'],
+                errorMessage: 'Plugins cannot import legacy UI code.',
+              },
+              {
+                from: ['src/legacy/ui/**/*', 'ui/**/*'],
+                target: [
+                  'test/plugin_functional/plugins/**/public/np_ready/**/*',
+                  'test/plugin_functional/plugins/**/server/np_ready/**/*',
+                ],
+                allowSameFolder: true,
+                errorMessage:
+                  'NP-ready code should not import from /src/legacy/ui/** folder. ' +
+                  'Instead of importing from /src/legacy/ui/** deeply within a np_ready folder, ' +
+                  'import those things once at the top level of your plugin and pass those down, just ' +
+                  'like you pass down `core` and `plugins` objects.',
+              },
+            ],
+          },
+        ],
+      },
+    },
  
      /**
       * Allow default exports
@@ -108,105 +198,6 @@
          },
        },
      },
-     /**
-      * Files that ARE NOT allowed to use devDependencies
-      */
-     {
-       files: ['packages/osd-ui-framework/**/*.js', 'packages/osd-interpreter/**/*.js'],
-       rules: {
-         'import/no-extraneous-dependencies': [
-           'error',
-           {
-             devDependencies: false,
-             peerDependencies: true,
-           },
-         ],
-       },
-     },
- 
-     /**
-      * Files that ARE allowed to use devDependencies
-      */
-     {
-       files: [
-         'packages/osd-ui-framework/**/*.test.js',
-         'packages/osd-ui-framework/Gruntfile.js',
-         'packages/osd-opensearch/src/**/*.js',
-         'packages/osd-interpreter/tasks/**/*.js',
-         'packages/osd-interpreter/src/plugin/**/*.js',
-       ],
-       rules: {
-         'import/no-extraneous-dependencies': [
-           'error',
-           {
-             devDependencies: true,
-             peerDependencies: true,
-           },
-         ],
-       },
-     },
- 
-     /**
-      * Files that run BEFORE node version check
-      */
-     {
-       files: ['scripts/**/*.js', 'src/setup_node_env/**/*.js'],
-       rules: {
-         'import/no-commonjs': 'off',
-         'prefer-object-spread/prefer-object-spread': 'off',
-         'no-var': 'off',
-         'prefer-const': 'off',
-         'prefer-destructuring': 'off',
-         'no-restricted-syntax': [
-           'error',
-           'ImportDeclaration',
-           'ExportNamedDeclaration',
-           'ExportDefaultDeclaration',
-           'ExportAllDeclaration',
-           'ArrowFunctionExpression',
-           'AwaitExpression',
-           'ClassDeclaration',
-           'RestElement',
-           'SpreadElement',
-           'YieldExpression',
-           'VariableDeclaration[kind="const"]',
-           'VariableDeclaration[kind="let"]',
-           'VariableDeclarator[id.type="ArrayPattern"]',
-           'VariableDeclarator[id.type="ObjectPattern"]',
-         ],
-       },
-     },
- 
-     /**
-      * Files that run in the browser with only node-level transpilation
-      */
-     {
-       files: [
-         'test/functional/services/lib/web_element_wrapper/scroll_into_view_if_necessary.js',
-         'src/legacy/ui/ui_render/bootstrap/osd_bundles_loader_source.js',
-         '**/browser_exec_scripts/**/*.js',
-       ],
-       rules: {
-         'prefer-object-spread/prefer-object-spread': 'off',
-         'no-var': 'off',
-         'prefer-const': 'off',
-         'prefer-destructuring': 'off',
-         'no-restricted-syntax': [
-           'error',
-           'ArrowFunctionExpression',
-           'AwaitExpression',
-           'ClassDeclaration',
-           'ImportDeclaration',
-           'RestElement',
-           'SpreadElement',
-           'YieldExpression',
-           'VariableDeclaration[kind="const"]',
-           'VariableDeclaration[kind="let"]',
-           'VariableDeclarator[id.type="ArrayPattern"]',
-           'VariableDeclarator[id.type="ObjectPattern"]',
-         ],
-       },
-     },
  
      /**
       * Files that run AFTER node version check
@@ -215,8 +206,6 @@
      {
        files: [
          '.eslintrc.js',
-         'packages/osd-eslint-import-resolver-opensearch-dashboards/**/*.js',
-         'packages/osd-eslint-plugin-eslint/**/*',
        ],
        excludedFiles: ['**/integration_tests/**/*'],
        rules: {
@@ -242,164 +231,7 @@
        },
      },
  
-     /**
-      * Harden specific rules
-      */
-     {
-       files: ['test/harden/*.js', 'packages/elastic-safer-lodash-set/test/*.js'],
-       rules: allMochaRulesOff,
-     },
-     {
-       files: ['**/*.{js,mjs,ts,tsx}'],
-       rules: {
-         'no-restricted-imports': [
-           2,
-           {
-             paths: [
-               {
-                 name: 'lodash',
-                 importNames: ['set', 'setWith'],
-                 message: 'Please use @elastic/safer-lodash-set instead',
-               },
-               {
-                 name: 'lodash.set',
-                 message: 'Please use @elastic/safer-lodash-set instead',
-               },
-               {
-                 name: 'lodash.setwith',
-                 message: 'Please use @elastic/safer-lodash-set instead',
-               },
-               {
-                 name: 'lodash/set',
-                 message: 'Please use @elastic/safer-lodash-set instead',
-               },
-               {
-                 name: 'lodash/setWith',
-                 message: 'Please use @elastic/safer-lodash-set instead',
-               },
-               {
-                 name: 'lodash/fp',
-                 importNames: ['set', 'setWith', 'assoc', 'assocPath'],
-                 message: 'Please use @elastic/safer-lodash-set instead',
-               },
-               {
-                 name: 'lodash/fp/set',
-                 message: 'Please use @elastic/safer-lodash-set instead',
-               },
-               {
-                 name: 'lodash/fp/setWith',
-                 message: 'Please use @elastic/safer-lodash-set instead',
-               },
-               {
-                 name: 'lodash/fp/assoc',
-                 message: 'Please use @elastic/safer-lodash-set instead',
-               },
-               {
-                 name: 'lodash/fp/assocPath',
-                 message: 'Please use @elastic/safer-lodash-set instead',
-               },
-             ],
-           },
-         ],
-         'no-restricted-modules': [
-           2,
-           {
-             paths: [
-               {
-                 name: 'lodash.set',
-                 message: 'Please use @elastic/safer-lodash-set instead',
-               },
-               {
-                 name: 'lodash.setwith',
-                 message: 'Please use @elastic/safer-lodash-set instead',
-               },
-               {
-                 name: 'lodash/set',
-                 message: 'Please use @elastic/safer-lodash-set instead',
-               },
-               {
-                 name: 'lodash/setWith',
-                 message: 'Please use @elastic/safer-lodash-set instead',
-               },
-             ],
-           },
-         ],
-         'no-restricted-properties': [
-           2,
-           {
-             object: 'lodash',
-             property: 'set',
-             message: 'Please use @elastic/safer-lodash-set instead',
-           },
-           {
-             object: '_',
-             property: 'set',
-             message: 'Please use @elastic/safer-lodash-set instead',
-           },
-           {
-             object: 'lodash',
-             property: 'setWith',
-             message: 'Please use @elastic/safer-lodash-set instead',
-           },
-           {
-             object: '_',
-             property: 'setWith',
-             message: 'Please use @elastic/safer-lodash-set instead',
-           },
-           {
-             object: 'lodash',
-             property: 'assoc',
-             message: 'Please use @elastic/safer-lodash-set instead',
-           },
-           {
-             object: '_',
-             property: 'assoc',
-             message: 'Please use @elastic/safer-lodash-set instead',
-           },
-           {
-             object: 'lodash',
-             property: 'assocPath',
-             message: 'Please use @elastic/safer-lodash-set instead',
-           },
-           {
-             object: '_',
-             property: 'assocPath',
-             message: 'Please use @elastic/safer-lodash-set instead',
-           },
-         ],
-       },
-     },
- 
-     /**
-      * disable jsx-a11y for osd-ui-framework
-      */
-     {
-       files: ['packages/osd-ui-framework/**/*.js'],
-       rules: {
-         'jsx-a11y/click-events-have-key-events': 'off',
-         'jsx-a11y/anchor-has-content': 'off',
-         'jsx-a11y/tabindex-no-positive': 'off',
-         'jsx-a11y/label-has-associated-control': 'off',
-         'jsx-a11y/aria-role': 'off',
-       },
-     },
-     {
-       files: ['packages/osd-ui-shared-deps/flot_charts/**/*.js'],
-       env: {
-         jquery: true,
-       },
-     },
- 
-     /**
-      * TSVB overrides
-      */
-     {
-       files: ['src/plugins/vis_type_timeseries/**/*.{js,mjs,ts,tsx}'],
-       rules: {
-         'import/no-default-export': 'error',
-       },
-     },
- 
+
      /**
       * Prettier disables all conflicting rules, listing as last override so it takes precedence
       */
@@ -407,26 +239,14 @@
        files: ['**/*'],
        rules: {
          ...require('eslint-config-prettier').rules,
-       },
-     },
- 
-     {
-       files: [
-         // platform-team owned code
-         'src/core/**',
-         'packages/osd-config-schema',
-         'src/plugins/status_page/**',
-         'src/plugins/saved_objects_management/**',
-       ],
-       rules: {
-         '@typescript-eslint/prefer-ts-expect-error': 'error',
+         ...require('eslint-config-prettier/react').rules,
+         ...require('eslint-config-prettier/@typescript-eslint').rules,
        },
      },
      {
        files: [
          '**/public/**/*.{js,mjs,ts,tsx}',
          '**/common/**/*.{js,mjs,ts,tsx}',
-         'packages/**/*.{js,mjs,ts,tsx}',
        ],
        rules: {
          'no-restricted-imports': [
