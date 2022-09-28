@@ -1,4 +1,20 @@
-import { EpluginSettingType, PLUGIN_SETTINGS, TPluginSetting, TPluginSettingKey, TPluginSettingWithKey } from '../constants';
+import {
+  EpluginSettingType,
+  PLUGIN_SETTINGS,
+  PLUGIN_SETTINGS_CATEGORIES,
+  TPluginSetting,
+  TPluginSettingKey,
+  TPluginSettingWithKey
+} from '../constants';
+
+/**
+ * Look for a configuration category setting by its name
+ * @param categoryTitle
+ * @returns category settings
+ */
+export function getCategorySettingByTitle(categoryTitle: string): any {
+  return Object.entries(PLUGIN_SETTINGS_CATEGORIES).find(([key, category]) => category?.title == categoryTitle)?.[1];
+}
 
 /**
  * Get the default value of the plugin setting.
@@ -109,6 +125,8 @@ export function groupSettingsByCategory(settings: TPluginSettingWithKey[]){
 		description,
 		...(options?.select ? [`Allowed values: ${options.select.map(({text, value}) => formatLabelValuePair(text, value)).join(', ')}.`] : []),
 		...(options?.switch ? [`Allowed values: ${['enabled', 'disabled'].map(s => formatLabelValuePair(options.switch.values[s].label, options.switch.values[s].value)).join(', ')}.`] : []),
+		...(options?.number?.min ? [`Minimum value: ${options.number.min}.`] : []),
+		...(options?.number?.max ? [`Maximum value: ${options.number.max}.`] : []),
 	].join(' ');
 };
 

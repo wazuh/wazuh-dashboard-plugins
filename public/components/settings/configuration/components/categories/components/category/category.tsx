@@ -20,42 +20,74 @@ import {
   EuiForm,
   EuiDescribedFormGroup,
   EuiTitle,
-  EuiFormRow
+  EuiSpacer,
+  EuiToolTip,
+  EuiButtonIcon,
 } from '@elastic/eui';
 import { EuiIconTip } from '@elastic/eui';
-import { EpluginSettingType, TPluginSettingWithKey, UI_LOGGER_LEVELS } from '../../../../../../../../common/constants';
+import { TPluginSettingWithKey } from '../../../../../../../../common/constants';
 import { getPluginSettingDescription } from '../../../../../../../../common/services/settings';
+import { webDocumentationLink } from '../../../../../../../../common/services/web_documentation';
 import classNames from 'classnames';
 import { InputForm } from '../../../../../../common/form';
-import { getErrorOrchestrator } from '../../../../../../../react-services/common-services';
-import { UI_ERROR_SEVERITIES } from '../../../../../../../react-services/error-orchestrator/types';
-import { updateAppConfig } from '../../../../../../../redux/actions/appConfigActions';
-import { WzRequest } from '../../../../../../../react-services';
-import { WzButtonModalConfirm } from '../../../../../../common/buttons';
-import { useDispatch } from 'react-redux';
-import { getHttp } from '../../../../../../../kibana-services';
-import { getAssetURL } from '../../../../../../../utils/assets';
 
 
 interface ICategoryProps {
   title: string
+  description?: string
+  documentationLink?: string
   items: TPluginSettingWithKey[]
   currentConfiguration: { [field: string]: any }
   changedConfiguration: { [field: string]: any }
   onChangeFieldForm: () => void
 }
 
-export const Category: React.FunctionComponent<ICategoryProps> = ({ title, items }) => {
+export const Category: React.FunctionComponent<ICategoryProps> = ({
+  title,
+  description,
+  documentationLink,
+  items
+}) => {
   return (
     <EuiFlexItem>
       <EuiPanel paddingSize="l">
         <EuiText>
           <EuiFlexGroup>
             <EuiFlexItem>
-              <h2>{title}</h2>
+              <h2>{title}{
+                documentationLink &&
+                <EuiToolTip
+                  position="right"
+                  content="Documentation">
+                  <>
+                    &nbsp;
+                  <EuiButtonIcon
+                      iconType="iInCircle"
+                      iconSize="l"
+                      aria-label="Help"
+                      target="_blank"
+                      href={webDocumentationLink(documentationLink)}
+                    ></EuiButtonIcon>
+                  </>
+                </EuiToolTip>
+              }
+              </h2>
             </EuiFlexItem>
           </EuiFlexGroup>
         </EuiText>
+        {
+          description &&
+          <>
+            <EuiText color="subdued">
+              <EuiFlexGroup>
+                <EuiFlexItem>
+                  <span>{description}</span>
+                </EuiFlexItem>
+              </EuiFlexGroup>
+            </EuiText>
+            <EuiSpacer />
+          </>
+        }
         <EuiForm>
         {items.map((item, idx) => {
             const isUpdated = item.changed && !item.error;
