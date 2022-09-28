@@ -422,46 +422,46 @@ export type TPluginSettingCategory = {
   title: string
   description?: string
   documentationLink?: string
-  renderOrder: number
+  renderOrder?: number
 };
 
 
-export const PLUGIN_SETTINGS_CATEGORIES = {
+export const PLUGIN_SETTINGS_CATEGORIES: { [category: number]: TPluginSettingCategory } = {
   [SettingCategory.HEALTH_CHECK]: {
     title: 'Health check',
     description: "Define which checks will be executed by the App's HealthCheck. Allowed values are: true, false",
     renderOrder: SettingCategory.HEALTH_CHECK,
-  } as TPluginSettingCategory,
+  },
   [SettingCategory.GENERAL]: {
     title: 'General',
     description: "General settings.",
     renderOrder: SettingCategory.GENERAL,
-  } as TPluginSettingCategory,
+  },
   [SettingCategory.EXTENSIONS]: {
     title: 'Extensions',
     description: "Extensions.",
-  } as TPluginSettingCategory,
+  },
   [SettingCategory.SECURITY]: {
     title: 'Security',
     description: "Security.",
     renderOrder: SettingCategory.SECURITY,
-  } as TPluginSettingCategory,
+  },
   [SettingCategory.MONITORING]: {
     title: 'Task:Monitoring',
     description: "Monitoring.",
     renderOrder: SettingCategory.MONITORING,
-  } as TPluginSettingCategory,
+  },
   [SettingCategory.STATISTICS]: {
     title: 'Task:Statistics',
     description: "Statistics.",
     renderOrder: SettingCategory.STATISTICS,
-  } as TPluginSettingCategory,
+  },
   [SettingCategory.CUSTOMIZATION]: {
     title: 'Custom branding',
     description: "By default, the Wazuh app uses the Wazuh logo, but if you  want to use custom branding elements such as logos, you can do so by editing the settings below.",
     documentationLink: 'user-manual/wazuh-dashboard/config-file.html#logo-customization',
     renderOrder: SettingCategory.CUSTOMIZATION,
-  } as TPluginSettingCategory
+  }
 };
 
 export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
