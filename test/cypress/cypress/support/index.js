@@ -23,8 +23,8 @@ import {
 const loginMethod = Cypress.env('type')
 import './commands';
 require("cypress-xpath");
-//const indexPageComp1 = 'react-component[name="StatsOverview"]';
-//const indexPageComp2 = 'react-component[name="OverviewWelcome"]';
+const indexPageComp1 = 'react-component[name="StatsOverview"]';
+const indexPageComp2 = 'react-component[name="OverviewWelcome"]';
 
 before(() => {
 
