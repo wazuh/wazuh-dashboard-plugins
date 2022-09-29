@@ -4,7 +4,6 @@ const dataAddedSuccessfullyToast = getSelector('dataAddedSuccessfullyToast', pag
 
 Then('The add data success toasts are displayed', () => {
   elementIsVisible(dataAddedSuccessfullyToast);
-  // getObject(dataAddedSuccessfullyToast).should('have.length', 3);
 
   cy.get(dataAddedSuccessfullyToast)
     .should('have.length', 3)
@@ -12,6 +11,6 @@ Then('The add data success toasts are displayed', () => {
       return 'something else'
     })
     .then(($lis) => {
-      expect($lis).to.have.length(3) // true
+      expect($lis).to.have.length(3)
     })
 });
