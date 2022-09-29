@@ -12,7 +12,6 @@ elastic_versions=(
 	"7.17.4"
 	"7.17.5"
 	"7.17.6"
-	""
 )
 
 wazuh_versions=(
@@ -73,14 +72,14 @@ case "$3" in
 		# This installs Wazuh and integrates with a default elastic stack
 		v=$( echo -n $ES_VERSION | sed 's/\.//g' )
 		echo
-		echo Install Wazuh ${WAZUH_VERSION} into Elastic ${ES_VERSION} manually with:
+		echo "Install Wazuh ${WAZUH_VERSION} into Elastic ${ES_VERSION} manually with:"
 		echo
-		echo 1. Install wazuh kibana app
-		echo docker exec -ti  es-rel-${v}-kibana-1  /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-${WAZUH_VERSION}_${ES_VERSION}-1.zip
-		echo 2. Restart Kibana
-		echo docker restart es-rel-${v}-kibana-1
-		echo 3. Configure kibana
-		echo docker cp ./config/kibana/wazuh.yml es-rel-${v}-kibana-1:/usr/share/kibana/data/wazuh/config/
+		echo "1. Install the Wazuh app for Kibana"
+		echo "docker exec -ti  es-rel-${v}-kibana-1  /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-${WAZUH_VERSION}_${ES_VERSION}-1.zip"
+		echo "2. Restart Kibana"
+		echo "docker restart es-rel-${v}-kibana-1"
+		echo "3. Configure Kibana"
+		echo "docker cp ./config/kibana/wazuh.yml es-rel-${v}-kibana-1:/usr/share/kibana/data/wazuh/config/"
 		;;
 	down)
 		# delete volumes
