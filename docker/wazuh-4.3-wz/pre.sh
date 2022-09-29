@@ -95,7 +95,7 @@ case "$3" in
 		echo docker restart wz-pre-${v}-wazuh.dashboard-1
 		echo
 		echo 6. Upload the Wazuh app configuration:
-		echo docker cp ./config/wazuh-dashboard/wazuh.yml wz-pre-${v}-wazuh.dashboard-1:/usr/share/wazuh-dashboard/data/wazuh/config/
+		echo docker cp ./config/wazuh_dashboard/wazuh.yml wz-pre-${v}-wazuh.dashboard-1:/usr/share/wazuh-dashboard/data/wazuh/config/
 		echo
 		echo 7. Access the running instance in:
 		echo https://localhost:${KIBANA_PORT}
