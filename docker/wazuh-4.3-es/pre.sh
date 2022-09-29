@@ -72,33 +72,44 @@ cat << EOF > config/imposter/api_info.json
 EOF
 
 export ES_VERSION=$1
-export WAZUH_VERSION=$2
 export ELASTIC_PASSWORD=${PASSWORD:-SecretPassword}
 export KIBANA_PASSWORD=${PASSWORD:-SecretPassword}
 export CLUSTER_NAME=cluster
 export LICENSE=basic # or trial
 export KIBANA_PORT=${PORT:-5601}
-export COMPOSE_PROJECT_NAME=es-pre-$ES_VERSION
+export COMPOSE_PROJECT_NAME=es-pre-${ES_VERSION//./}
 
 case "$3" in
 	up)
 		# recreate volumes
 		docker compose -f pre.yml up -Vd
 
-		# This installs Wazuh and integrates with a default elastic stack
-		v=$( echo -n $ES_VERSION | sed 's/\.//g' )
-		echo Install Wazuh ${WAZUH_STACK} into Elastic $ES_VERSION} manually with:
-		echo docker cp wazuh_kibana-4.3.${patch_version}_${ES_VERSION}-1.zip es-pre-${v}-kibana-1:/tmp
-		echo docker exec -ti  es-pre-${v}-kibana-1  /usr/share/kibana/bin/kibana-plugin install file:///tmp/wazuh_kibana-4.3.${patch_version}_${elastic}-1.zip
-		echo docker restart es-pre-${v}-kibana-1
-		echo docker cp ./config/kibana/wazuh.yml es-pre-${v}-kibana-1:/usr/share/kibana/data/wazuh/config/
+		# This installs Wazuh and integrates with a default Elastic stack
+		# v=$( echo -n $ES_VERSION | sed 's/\.//g' )
+    echo
+		echo Install the pre-release package manually with:
+		echo
+    echo 1. Copy the pre-release package to the running Kibana container:
+    echo docker cp wazuh_kibana-4.3.${patch_version}_${ES_VERSION}-1.zip ${COMPOSE_PROJECT_NAME}-kibana-1:/tmp
+    echo
+    echo 2. Install the pre-release package:
+    echo docker exec -ti ${COMPOSE_PROJECT_NAME}-kibana-1  /usr/share/kibana/bin/kibana-plugin install file:///tmp/wazuh_kibana-4.3.${patch_version}_${ES_VERSION}-1.zip
+    echo
+    echo 3. Restart Kibana:
+    echo docker restart ${COMPOSE_PROJECT_NAME}-kibana-1
+    echo
+    echo 4. Upload the Wazuh app configuration:
+		echo docker cp ./config/kibana/wazuh.yml ${COMPOSE_PROJECT_NAME}-kibana-1:/usr/share/kibana/data/wazuh/config/
+    echo
+    echo 5. Open Kibana in a browser:
+    echo http://localhost:${KIBANA_PORT}
 		;;
 	down)
 		# delete volumes
 		docker compose -f pre.yml down -v --remove-orphans
 		;;
 	stop)
-		docker compose -f pre.yml stop
+		docker compose -f pre.yml -p ${COMPOSE_PROJECT_NAME} stop
 		;;
 	*)
 		usage

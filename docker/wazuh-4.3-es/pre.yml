@@ -65,7 +65,7 @@ services:
       - ./config/filebeat/filebeat.yml:/tmp/filebeat.yml
 
   setup:
-    image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ES_VERSION}
     networks:
       - es-pre
     volumes:
@@ -140,7 +140,7 @@ services:
     depends_on:
       setup:
         condition: service_healthy
-    image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ES_VERSION}
     networks:
       - es-pre
     volumes:
@@ -187,7 +187,7 @@ services:
   #   <<: *logging
   #   depends_on:
   #     - es01
-  #   image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
+  #   image: docker.elastic.co/elasticsearch/elasticsearch:${ES_VERSION}
   #   networks:
   #     - es-pre
   #   volumes:
@@ -231,7 +231,7 @@ services:
   #   <<: *logging
   #   depends_on:
   #     - es02
-  #   image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
+  #   image: docker.elastic.co/elasticsearch/elasticsearch:${ES_VERSION}
   #   networks:
   #     - es-pre
   #   volumes:
@@ -282,7 +282,7 @@ services:
       #   condition: service_healthy
       # es03:
       #   condition: service_healthy
-    image: docker.elastic.co/kibana/kibana:${STACK_VERSION}
+    image: docker.elastic.co/kibana/kibana:${ES_VERSION}
     volumes:
       - certs:/usr/share/kibana/config/certs
       - kibanadata:/usr/share/kibana/data
@@ -307,7 +307,7 @@ services:
 
 networks:
   es-pre:
-    name: "es-pre-${STACK_VERSION}"
+    name: "es-pre-${ES_VERSION}"
     driver: bridge
   mon:
     external: true
