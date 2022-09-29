@@ -26,7 +26,10 @@
   "scripts": {
     "pretty": "prettier --single-quote \"{,!(node_modules)/**/}*.js\" --write",
     "tslint": "tslint -c .tslint.yml server/**/*.ts server/**/*.tsx public/**/*.ts public/**/*.tsx",
-    "lint": "eslint . --ext .js -c .eslintrc.json --color",
+    "lint": "eslint . --ext [js,ts,tsx] -c .eslintrc.json --color",
+    "lint:js": "eslint . --ext js -c .eslintrc.json --color",
+    "lint:ts": "eslint . --ext ts -c .eslintrc.json --color",
+    "lint:tsx": "eslint . --ext tsx -c .eslintrc.json --color",
     "lint:style": "node ../../scripts/stylelint",
     "kbn": "node ../../scripts/kbn",
     "es": "node ../../scripts/es",

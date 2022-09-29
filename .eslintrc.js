@@ -38,127 +38,9 @@
    root: true,
  
    extends: ['@elastic/eslint-config-kibana', 'plugin:@elastic/eui/recommended'],
- 
    overrides: [
 
-    /**
-     * Restricted paths
-     */
-     {
-      files: ['**/*.{js,mjs,ts,tsx}'],
-      rules: {
-        '@osd/eslint/no-restricted-paths': [
-          'error',
-          {
-            basePath: __dirname,
-            zones: [
-              {
-                target: ['(src)/**/*', '!src/core/**/*'],
-                from: ['src/core/utils/**/*'],
-                errorMessage: `Plugins may only import from src/core/server and src/core/public.`,
-              },
-              {
-                target: ['(src)/plugins/*/server/**/*'],
-                from: ['(src)/plugins/*/public/**/*'],
-                errorMessage: `Server code can not import from public, use a common directory.`,
-              },
-              {
-                target: ['(src)/plugins/*/common/**/*'],
-                from: ['(src)/plugins/*/(server|public)/**/*'],
-                errorMessage: `Common code can not import from server or public, use a common directory.`,
-              },
-              {
-                target: [
-                  'src/legacy/**/*',
-                  '(src)/plugins/**/(public|server)/**/*',
-                  'examples/**/*',
-                ],
-                from: [
-                  'src/core/public/**/*',
-                  '!src/core/public/index.ts', // relative import
-                  '!src/core/public/mocks{,.ts}',
-                  '!src/core/server/types{,.ts}',
-                  '!src/core/public/utils/**/*',
-                  '!src/core/public/*.test.mocks{,.ts}',
-
-                  'src/core/server/**/*',
-                  '!src/core/server/index.ts', // relative import
-                  '!src/core/server/mocks{,.ts}',
-                  '!src/core/server/types{,.ts}',
-                  '!src/core/server/test_utils{,.ts}',
-                  '!src/core/server/utils', // ts alias
-                  '!src/core/server/utils/**/*',
-                  // for absolute imports until fixed in
-                  // https://github.com/elastic/kibana/issues/36096
-                  '!src/core/server/*.test.mocks{,.ts}',
-
-                  'target/types/**',
-                ],
-                allowSameFolder: true,
-                errorMessage:
-                  'Plugins may only import from top-level public and server modules in core.',
-              },
-              {
-                target: [
-                  'src/legacy/**/*',
-                  '(src)/plugins/**/(public|server)/**/*',
-                  'examples/**/*',
-                  '!(src)/**/*.test.*',
-                ],
-                from: [
-                  '(src)/plugins/**/(public|server)/**/*',
-                  '!(src)/plugins/**/(public|server)/mocks/index.{js,mjs,ts}',
-                  '!(src)/plugins/**/(public|server)/(index|mocks).{js,mjs,ts,tsx}',
-                ],
-                allowSameFolder: true,
-                errorMessage: 'Plugins may only import from top-level public and server modules.',
-              },
-              {
-                target: [
-                  '(src)/plugins/**/*',
-                  '!(src)/plugins/**/server/**/*',
-
-                  'examples/**/*',
-                  '!examples/**/server/**/*',
-                ],
-                from: [
-                  'src/core/server',
-                  'src/core/server/**/*',
-                  '(src)/plugins/*/server/**/*',
-                  'examples/**/server/**/*',
-                ],
-                errorMessage:
-                  'Server modules cannot be imported into client modules or shared modules.',
-              },
-              {
-                target: ['src/core/**/*'],
-                from: ['plugins/**/*', 'src/plugins/**/*', 'src/legacy/ui/**/*'],
-                errorMessage: 'The core cannot depend on any plugins.',
-              },
-              {
-                target: ['(src)/plugins/*/public/**/*'],
-                from: ['ui/**/*'],
-                errorMessage: 'Plugins cannot import legacy UI code.',
-              },
-              {
-                from: ['src/legacy/ui/**/*', 'ui/**/*'],
-                target: [
-                  'test/plugin_functional/plugins/**/public/np_ready/**/*',
-                  'test/plugin_functional/plugins/**/server/np_ready/**/*',
-                ],
-                allowSameFolder: true,
-                errorMessage:
-                  'NP-ready code should not import from /src/legacy/ui/** folder. ' +
-                  'Instead of importing from /src/legacy/ui/** deeply within a np_ready folder, ' +
-                  'import those things once at the top level of your plugin and pass those down, just ' +
-                  'like you pass down `core` and `plugins` objects.',
-              },
-            ],
-          },
-        ],
-      },
-    },
- 
+    
      /**
       * Allow default exports
       */
@@ -245,10 +127,10 @@
      },
      {
        files: [
-         '**/public/**/*.{js,mjs,ts,tsx}',
-         '**/common/**/*.{js,mjs,ts,tsx}',
+         '**/**/**/*.{js,mjs,ts,tsx}',
        ],
        rules: {
+         'max-len': ['error', 100, 2, { ignoreComments: true, ignoreUrls: true }],
          'no-restricted-imports': [
            'error',
            {
