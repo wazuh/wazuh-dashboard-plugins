@@ -35,7 +35,7 @@ fi
 
 export WAZUH_STACK=${1}
 export KIBANA_PORT=5601
-export COMPOSE_PROJECT_NAME=wz-rel-${WAZUH_STACK}
+export COMPOSE_PROJECT_NAME=wz-rel-${WAZUH_STACK//./}
 
 case "$2" in
 	up)
@@ -47,7 +47,7 @@ case "$2" in
 		docker compose -f rel.yml down -v --remove-orphans
 		;;
 	stop)
-		docker compose -f rel.yml stop
+		docker compose -f rel.yml -p ${COMPOSE_PROJECT_NAME} stop
 		;;
 	*)
 		echo "Action must be either up or down"
