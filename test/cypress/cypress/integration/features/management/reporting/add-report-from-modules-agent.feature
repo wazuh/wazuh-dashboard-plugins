@@ -1,11 +1,11 @@
-Feature: Generating reports from differents agents
+Feature: Generating reports from module and agents
 
   As a Wazuh user
-  i want to generate a report from differents agents
+  i want to generate a report from modules and agents
   in order to could access to the report from management/reporting
 
 @report
-Scenario Outline: Create a report from differents agents <Module Name>
+Scenario Outline: Create a report from modules and agents <Module Name>
     Given The wazuh admin user is logged
     When The user goes to <Module Name>
     And The user generate a module report clicking on the generate report option
