@@ -46,7 +46,7 @@ services:
           export certs=/tmp/certs
           mkdir $$certs
         	cd $$certs
-         
+
         	echo "Generating CA"
         	cfssl gencert -initca /conf/ca.json | cfssljson -bare ca
 
@@ -113,11 +113,13 @@ services:
     user: "0:0"
     networks:
       - wzd-pre
+      - mon
     <<: *logging
     entrypoint:
       - '/bin/bash'
     command: >
       -c '
+        mkdir -p /etc/filebeat
         echo admin | filebeat keystore add username --stdin --force
         echo SecretPassword| filebeat keystore add password --stdin --force
         curl -so /etc/filebeat/wazuh-template.json https://raw.githubusercontent.com/wazuh/wazuh/4.3/extensions/elasticsearch/7.x/wazuh-template.json
@@ -143,6 +145,7 @@ services:
     hostname: wazuh.indexer
     networks:
       - wzd-pre
+      - mon
     <<: *logging
     environment:
       - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
@@ -179,6 +182,7 @@ services:
         condition: service_healthy
     networks:
       - wzd-pre
+      - mon
     <<: *logging
     ports:
       - ${KIBANA_PORT}:5601

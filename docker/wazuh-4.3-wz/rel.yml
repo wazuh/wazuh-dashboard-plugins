@@ -21,7 +21,7 @@ services:
           export certs=/tmp/certs
           mkdir $$certs
         	cd $$certs
-         
+
         	echo "Generating CA"
         	cfssl gencert -initca /conf/ca.json | cfssljson -bare ca
 
@@ -87,6 +87,7 @@ services:
     hostname: wazuh.manager
     networks:
       - wz-rel
+      - mon
     <<: *logging
     # restart: always
     environment:
@@ -122,6 +123,7 @@ services:
     hostname: wazuh.indexer
     networks:
       - wz-rel
+      - mon
     <<: *logging
     # restart: always
     environment:
@@ -157,6 +159,7 @@ services:
         condition: service_healthy
     networks:
       - wz-rel
+      - mon
     <<: *logging
     # restart: always
     ports:

@@ -5,7 +5,7 @@ versions=(
 	"4.3.8"
 	"4.3.9"
 	"4.4.0"
-	)
+)
 
 wazuh_api_version=(
 	"0"
@@ -74,31 +74,31 @@ case "$3" in
 		# recreate volumes
 		docker compose -f pre.yml up -Vd
 
-		# This installs Wazuh and integrates with a default elastic stack
+		# This installs Wazuh and integrates with a default Wazuh stack
 		v=$( echo -n $WAZUH_STACK | sed 's/\.//g' )
 		echo
-		echo Install Wazuh ${WAZUH_STACK}  manually with:
+		echo Install the pre-release package manually with:
 		echo
-		echo 1. Uninstall current version of wazuh app
+		echo 1. Uninstall current version of the Wazuh app:
 		echo docker exec -ti wz-pre-${v}-wazuh.dashboard-1  /usr/share/wazuh-dashboard/bin/opensearch-dashboards-plugin remove wazuh
 		echo
-		echo 2. Restart wazuh-dashboard
+		echo 2. Restart Wazuh Dashboard:
 		echo docker restart wz-pre-${v}-wazuh.dashboard-1
 		echo
-		echo 3. Copy the pre-release pacakge to the running wazuh-dashboard container
+		echo 3. Copy the pre-release package to the running Wazuh Dashboard container:
 		echo docker cp wazuh-4.3.${patch_version}-1.zip wz-pre-${v}-wazuh.dashboard-1:/tmp
 		echo
-		echo 4. Install the the package we have just uploaded
-		echo docker exec -ti  wz-pre-${v}-wazuh.dashboard-1  /usr/share/wazuh-dashboard/bin/opensearch-dashboards-plugin install file:///tmp/wazuh--4.3.${patch_version}-1.zip
+		echo 4. Install the package we have just uploaded:
+		echo docker exec -ti  wz-pre-${v}-wazuh.dashboard-1  /usr/share/wazuh-dashboard/bin/opensearch-dashboards-plugin install file:///tmp/wazuh-4.3.${patch_version}-1.zip
 		echo
-		echo 5. Restart the wazuh-dashboard container
+		echo 5. Restart the Wazuh Dashboard container:
 		echo docker restart wz-pre-${v}-wazuh.dashboard-1
 		echo
-		echo 6. Upload the wazuh app configuration
-		echo docker cp ./config/kibana/wazuh.yml wz-pre-${v}-wazuh.dashboard-1:/usr/share/wazuh-dashboard/data/wazuh/config/
+		echo 6. Upload the Wazuh app configuration:
+		echo docker cp ./config/wazuh-dashboard/wazuh.yml wz-pre-${v}-wazuh.dashboard-1:/usr/share/wazuh-dashboard/data/wazuh/config/
 		echo
-		echo 7. Access the running instance in
-		echo http://localhost:${KIBANA_PORT}
+		echo 7. Access the running instance in:
+		echo https://localhost:${KIBANA_PORT}
 		;;
 	down)
 		# delete volumes

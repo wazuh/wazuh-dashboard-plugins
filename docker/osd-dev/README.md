@@ -28,28 +28,28 @@ admin:admin
 
 ## Notes
 
-`wazuh-indexer` and `wazuh-dashboard` are both a redistribution of a
+`Wazuh Indexer` and `Wazuh Dashboard` are both a redistribution of a
 version of the OpenSearch Stack. We will only create environments for
 the versions of OpenSearch which will be included into a Wazuh
 version.
 
-`opensearch` supported versions:
+`OpenSearch` supported versions:
 - 1.2.4
-- 2.0.0
+- 2.3.0
 
-`opensearch-dashboard` supported versions:
+`OpenSearch Dashboards` supported versions:
 - 1.2.0
-- 2.0.0
+- 2.3.0
 
-We must use official `wazuh-indexer` and `wazuh-dashboard` images for
+We must use official `Wazuh Indexer` and `Wazuh Dashboard` images for
 testing!
 
 This environment will start a working deployment with:
-  - Imposter - a mock server
-  - Elasticsearch-exporter - Elasticsearch metrics to Prometheus adapter
-  - OpenSearch single-node cluster
-  - OpenSearch-Dashboards development environment
+  - Imposter - a mock server.
+  - Elasticsearch-exporter - Elasticsearch metrics to Prometheus adapter.
+  - OpenSearch single-node cluster.
+  - OpenSearch Dashboards development environment.
 
-The OpenSearch-Dashboards development environment includes an already
+The OpenSearch Dashboards development environment includes an already
 bootstrapped Kibana, with all the node modules precompiled and ready to
 use in a development session.
