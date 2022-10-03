@@ -281,6 +281,7 @@ const WzConfigurationSettingsProvider = (props) => {
                 description={description}
                 documentationLink={documentationLink}
                 items={settings}
+                currentConfiguration={currentConfiguration}
               />
             )
           }

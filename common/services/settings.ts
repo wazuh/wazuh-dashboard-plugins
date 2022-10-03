@@ -6,6 +6,7 @@ import {
   TPluginSettingKey,
   TPluginSettingWithKey
 } from '../constants';
+import { formatBytes } from './file-size';
 
 /**
  * Look for a configuration category setting by its name
