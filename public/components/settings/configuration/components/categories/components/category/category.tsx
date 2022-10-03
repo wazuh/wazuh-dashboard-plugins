@@ -21,10 +21,14 @@ import {
   EuiForm,
   EuiDescribedFormGroup,
   EuiTitle,
-  EuiSpacer
+  EuiSpacer,
+  EuiToolTip,
+  EuiButtonIcon,
 } from '@elastic/eui';
 import { EuiIconTip } from '@elastic/eui';
 import { EpluginSettingType, TPluginSettingWithKey, UI_LOGGER_LEVELS } from '../../../../../../../../common/constants';
+import { getPluginSettingDescription } from '../../../../../../../../common/services/settings';
+import { webDocumentationLink } from '../../../../../../../../common/services/web_documentation';
 import classNames from 'classnames';
 import { InputForm } from '../../../../../../common/form';
 import { useDispatch } from 'react-redux';
@@ -39,21 +43,59 @@ import { toastRequiresReloadingBrowserTab, toastRequiresRestartingPluginPlatform
 
 interface ICategoryProps {
   title: string
+  description?: string
+  documentationLink?: string
   items: TPluginSettingWithKey[]
   currentConfiguration: { [field: string]: any }
 }
 
-export const Category: React.FunctionComponent<ICategoryProps> = ({ currentConfiguration, title, items }) => {
+export const Category: React.FunctionComponent<ICategoryProps> = ({
+  title,
+  currentConfiguration,
+  description,
+  documentationLink,
+  items
+}) => {
   return (
     <EuiFlexItem>
       <EuiPanel paddingSize="l">
         <EuiText>
           <EuiFlexGroup>
             <EuiFlexItem>
-              <h2>{title}</h2>
+              <h2>{title}{
+                documentationLink &&
+                <EuiToolTip
+                  position="right"
+                  content="Documentation">
+                  <>
+                    &nbsp;
+                  <EuiButtonIcon
+                      iconType="iInCircle"
+                      iconSize="l"
+                      aria-label="Help"
+                      target="_blank"
+                      href={webDocumentationLink(documentationLink)}
+                    ></EuiButtonIcon>
+                  </>
+                </EuiToolTip>
+              }
+              </h2>
             </EuiFlexItem>
           </EuiFlexGroup>
         </EuiText>
+        {
+          description &&
+          <>
+            <EuiText color="subdued">
+              <EuiFlexGroup>
+                <EuiFlexItem>
+                  <span>{description}</span>
+                </EuiFlexItem>
+              </EuiFlexGroup>
+            </EuiText>
+            <EuiSpacer />
+          </>
+        }
         <EuiForm>
         {items.map((item, idx) => {
             const isUpdated = item.changed && !item.error;
