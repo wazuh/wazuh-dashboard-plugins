@@ -19,13 +19,11 @@ import {
   EuiFlyout,
   EuiFlyoutBody,
   EuiFlyoutHeader,
-  EuiOverlayMask,
   EuiPage,
   EuiPanel,
   EuiSpacer,
   EuiTextArea,
   EuiTitle,
-  EuiOutsideClickDetector,
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services';
 import {
@@ -45,7 +43,6 @@ import {
 } from '../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
-import { WzFlyout } from '../../../components/common/flyouts';
 import _ from 'lodash';
 
 type LogstestProps = {
@@ -283,6 +280,8 @@ export const Logtest = compose(
 
   dynamicHeight();
 
+  const flyoutProps= { className: 'wzApp' }
+
   return (
     <Fragment>
       {(!props.onFlyout && (
@@ -307,7 +306,7 @@ export const Logtest = compose(
           </EuiPanel>
         </EuiPage>
       )) || (
-        <WzFlyout flyoutProps={{ className: 'wzApp' }} onClose={() => props.openCloseFlyout()}>
+        <EuiFlyout {...flyoutProps} onClose={() => props.openCloseFlyout()}>
           <EuiFlyoutHeader hasBorder={false}>
             <EuiTitle size="m">
               {props.isRuleset.includes('rules') ? <h2>Ruleset Test</h2> : <h2>Decoders Test</h2>}
@@ -320,7 +319,7 @@ export const Logtest = compose(
             <EuiSpacer size="s" />
             {buildLogtest()}
           </EuiFlyoutBody>
-        </WzFlyout>
+        </EuiFlyout>
       )}
     </Fragment>
   );

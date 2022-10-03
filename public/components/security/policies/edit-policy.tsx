@@ -17,7 +17,6 @@ import {
   EuiFieldText,
   EuiConfirmModal,
   EuiOverlayMask,
-  EuiOutsideClickDetector,
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
 import { ErrorHandler } from '../../../react-services/error-handler';
@@ -26,7 +25,6 @@ import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import _ from 'lodash';
-import { WzFlyout } from '../../common/flyouts';
 
 export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
   const isReserved = WzAPIUtils.isReservedID(policy.id);
@@ -307,9 +305,10 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
     hasChanges ? setIsModalVisible(true) : closeFlyout(false);
   };
 
+  const flyoutProps= { className: 'wzApp' }
   return (
     <>
-      <WzFlyout flyoutProps={{ className: 'wzApp' }} onClose={onClose}>
+      <EuiFlyout {...flyoutProps}  onClose={onClose}>
         <EuiFlyoutHeader hasBorder={false}>
           <EuiTitle size="m">
             <h2>
@@ -436,7 +435,7 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
             </EuiButton>
           </EuiForm>
         </EuiFlyoutBody>
-      </WzFlyout>
+      </EuiFlyout>
       {modal}
     </>
   );

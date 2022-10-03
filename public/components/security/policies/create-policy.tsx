@@ -14,7 +14,6 @@ import {
   EuiInMemoryTable,
   EuiConfirmModal,
   EuiOverlayMask,
-  EuiOutsideClickDetector,
   EuiFieldText,
   EuiText,
 } from '@elastic/eui';
@@ -23,7 +22,6 @@ import { ErrorHandler } from '../../../react-services/error-handler';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
-import { WzFlyout } from '../../common/flyouts';
 
 export const CreatePolicyFlyout = ({ closeFlyout }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -304,9 +302,11 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
     hasChanges ? setIsModalVisible(true) : closeFlyout(false);
   };
 
+  const flyoutProps= { className: 'wzApp' } 
+
   return (
     <>
-      <WzFlyout flyoutProps={{ className: 'wzApp' }} onClose={onClose}>
+      <EuiFlyout {...flyoutProps} onClose={onClose}>
         <EuiFlyoutHeader hasBorder={false}>
           <EuiTitle size="m">
             <h2>New policy</h2>
@@ -406,37 +406,6 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
             {!!addedResources.length && (
               <>
                 <EuiSpacer size="s"></EuiSpacer>
-                <EuiFlexGroup>
-                  <EuiFlexItem>
-                    <EuiInMemoryTable items={addedResources} columns={resources_columns} />
-                  </EuiFlexItem>
-                </EuiFlexGroup>
-              </>
-            )}
-            <EuiSpacer></EuiSpacer>
-            <EuiFormRow label="Select an effect" helpText="Select an effect.">
-              <EuiSuperSelect
-                options={effectOptions}
-                valueOfSelected={effectValue}
-                onChange={(value) => onEffectValueChange(value)}
-              />
-            </EuiFormRow>
-            <EuiSpacer />
-            <EuiButton
-              disabled={
-                !policyName || !addedActions.length || !addedResources.length || !effectValue
-              }
-              onClick={() => {
-                createPolicy();
-              }}
-              fill
-            >
-              Create policy
-            </EuiButton>
-          </EuiForm>
-        </EuiFlyoutBody>
-      </WzFlyout>
-      {modal}
-    </>
+                <EuiFEuiFlyout
   );
 };

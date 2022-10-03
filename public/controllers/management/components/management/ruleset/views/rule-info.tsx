@@ -46,7 +46,7 @@ export default class WzRuleInfo extends Component {
       mitreRuleId: '',
       mitreIds: [],
       currentRuleInfo: {},
-      isLoading: true
+      isLoading: true,
     };
     this.resourcesHandler = new ResourcesHandler(ResourcesConstants.RULES);
 
@@ -154,8 +154,7 @@ export default class WzRuleInfo extends Component {
   }
 
   async componentDidUpdate(prevProps, prevState) {
-    if (prevState.currentRuleId !== this.state.currentRuleId)
-      await this.loadRule()
+    if (prevState.currentRuleId !== this.state.currentRuleId) await this.loadRule();
   }
 
   async loadRule() {
@@ -179,14 +178,14 @@ export default class WzRuleInfo extends Component {
           mitreIds: [],
           mitreTactics: [],
           mitreTechniques: [],
-        }
+        };
       }
 
       this.setState({
         currentRuleInfo: currentRule,
         compliance: compliance,
         isLoading: false,
-        ...mitreState
+        ...mitreState,
       });
     } catch (error) {
       const options = {
@@ -201,7 +200,6 @@ export default class WzRuleInfo extends Component {
       };
       getErrorOrchestrator().handleError(options);
     }
-
   }
   /**
    * Build an object with the compliance info about a rule
@@ -220,7 +218,6 @@ export default class WzRuleInfo extends Component {
     const badgeList = [];
     const fields = ['pci_dss', 'gpg13', 'hipaa', 'gdpr', 'nist_800_53', 'tsc', 'mitre'];
     const buildBadge = (field) => {
-      
       return (
         <EuiToolTip content={item[field].join(', ')} key={`${item.id}-${field}`} position="bottom">
           <EuiBadge
@@ -250,7 +247,7 @@ export default class WzRuleInfo extends Component {
           error: error,
           message: error.message || error,
           title: error.name || error,
-        }
+        },
       };
       getErrorOrchestrator().handleError(options);
     }
@@ -262,7 +259,8 @@ export default class WzRuleInfo extends Component {
    * Clean the existing filters and sets the new ones and back to the previous section
    */
   setNewFiltersAndBack(filters) {
-    window.history.pushState("",
+    window.history.pushState(
+      '',
       window.document.title,
       window.location.href.replace(new RegExp('&redirectRule=' + '[^&]*'), '')
     );
@@ -396,7 +394,9 @@ export default class WzRuleInfo extends Component {
       .forEach((key) => {
         detailsToRender.push(
           <EuiFlexItem key={key} grow={1} style={{ maxWidth: 'calc(25% - 24px)' }}>
-            <b className="wz-txt-capitalize" style={{ paddingBottom: 6 }}>{key}</b>
+            <b className="wz-txt-capitalize" style={{ paddingBottom: 6 }}>
+              {key}
+            </b>
             {details[key] === '' ? 'true' : this.getFormattedDetails(details[key])}
           </EuiFlexItem>
         );
@@ -506,8 +506,6 @@ export default class WzRuleInfo extends Component {
       this.state && this.state.currentRuleId
         ? this.state.currentRuleId
         : this.props.state.ruleInfo.current;
-
-
 
     const listCompliance = [];
     if (compliance.mitre) delete compliance.mitre;
@@ -622,7 +620,8 @@ export default class WzRuleInfo extends Component {
   };
 
   render() {
-    const { description, details, filename, relative_dirname, level, id, groups } = this.state.currentRuleInfo;
+    const { description, details, filename, relative_dirname, level, id, groups } =
+      this.state.currentRuleInfo;
     const compliance = this.buildCompliance(this.state.currentRuleInfo);
 
     return (
@@ -632,12 +631,11 @@ export default class WzRuleInfo extends Component {
             <EuiFlexItem>
               <EuiTitle>
                 <span style={{ fontSize: '22px' }}>
-                  {
-                    description && (
-                      <span
-                        dangerouslySetInnerHTML={{ __html: this.updateStyleTitle(description) }}
-                      />)
-                  }
+                  {description && (
+                    <span
+                      dangerouslySetInnerHTML={{ __html: this.updateStyleTitle(description) }}
+                    />
+                  )}
                 </span>
               </EuiTitle>
             </EuiFlexItem>
@@ -649,7 +647,7 @@ export default class WzRuleInfo extends Component {
                 target="blank"
               >
                 View alerts of this Rule
-                </EuiButtonEmpty>
+              </EuiButtonEmpty>
             </EuiFlexItem>
           </EuiFlexGroup>
         </EuiFlyoutHeader>
@@ -693,7 +691,9 @@ export default class WzRuleInfo extends Component {
                     isLoading={this.state.isLoading}
                     isLoadingMessage={''}
                   >
-                    <EuiFlexItem className="flyout-row details-row">{this.renderDetails(details)}</EuiFlexItem>
+                    <EuiFlexItem className="flyout-row details-row">
+                      {this.renderDetails(details)}
+                    </EuiFlexItem>
                   </EuiAccordion>
                 </EuiFlexItem>
               </EuiFlexGroup>
@@ -738,15 +738,18 @@ export default class WzRuleInfo extends Component {
                     <EuiFlexItem className="flyout-row related-rules-row">
                       <EuiFlexGroup>
                         <EuiFlexItem>
-                          {this.state.currentRuleInfo?.filename &&
+                          {this.state.currentRuleInfo?.filename && (
                             <TableWzAPI
                               tableColumns={this.columns}
                               tableInitialSortingField={'id'}
                               endpoint={`/rules?filename=${this.state.currentRuleInfo.filename}`}
-                              tableProps={{ rowProps: this.onClickRow, loading: this.state.isLoading }}
+                              tableProps={{
+                                rowProps: this.onClickRow,
+                                loading: this.state.isLoading,
+                              }}
                               tablePageSizeOptions={[10, 25]}
                             />
-                          }
+                          )}
                         </EuiFlexItem>
                       </EuiFlexGroup>
                     </EuiFlexItem>

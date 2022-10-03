@@ -18,8 +18,6 @@ import { ReferencesTable } from './resource_detail_references_table';
 import {
   EuiFlyout,
   EuiFlyoutHeader,
-  EuiOverlayMask,
-  EuiOutsideClickDetector,
   EuiTitle,
   EuiText,
   EuiFlexGroup,
@@ -28,7 +26,6 @@ import {
   EuiSpacer,
 } from '@elastic/eui';
 import { Markdown } from '../../common/util';
-import { WzFlyout } from '../../common/flyouts';
 
 interface DetailFlyoutType {
   details: any;
@@ -42,9 +39,9 @@ export const ModuleMitreAttackIntelligenceFlyout = ({
   onSelectResource,
 }: DetailFlyoutType) => {
   const startReference = useRef(null);
-
+  const flyoutProps= { size: 'l', 'aria-labelledby': `` }
   return (
-    <WzFlyout onClose={closeFlyout} flyoutProps={{ size: 'l', 'aria-labelledby': `` }}>
+    <EuiFlyout onClose={closeFlyout} {...flyoutProps}>
       <EuiFlyoutHeader hasBorder>
         <EuiTitle size="m">
           <h2 id="flyoutTitle">Details</h2>
@@ -97,6 +94,6 @@ export const ModuleMitreAttackIntelligenceFlyout = ({
           </EuiFlexItem>
         </EuiFlexGroup>
       </EuiFlyoutBody>
-    </WzFlyout>
+    </EuiFlyout>
   );
 };

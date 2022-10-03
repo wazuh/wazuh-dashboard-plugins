@@ -6,7 +6,6 @@ import {
   EuiFlyoutHeader,
   EuiFlyoutBody,
   EuiForm,
-  EuiFieldText,
   EuiFormRow,
   EuiSpacer,
   EuiFlexGroup,
@@ -14,7 +13,6 @@ import {
   EuiBadge,
   EuiComboBox,
   EuiOverlayMask,
-  EuiOutsideClickDetector,
   EuiConfirmModal,
 } from '@elastic/eui';
 
@@ -24,7 +22,6 @@ import { EditRolesTable } from './edit-role-table';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
-import { WzFlyout } from '../../common/flyouts';
 
 const reservedRoles = [
   'administrator',
@@ -162,9 +159,10 @@ export const EditRole = ({ role, closeFlyout }) => {
       : closeFlyout(false);
   };
 
+  const flyoutProps= {className:"wzApp"}
   return (
     <>
-      <WzFlyout flyoutProps={{className:"wzApp"}} onClose={onClose}>
+      <EuiFlyout {...flyoutProps} onClose={onClose}>
         <EuiFlyoutHeader hasBorder={false}>
           <EuiTitle size="m">
             <h2>
@@ -218,7 +216,7 @@ export const EditRole = ({ role, closeFlyout }) => {
             />
           </div>
         </EuiFlyoutBody>
-      </WzFlyout>
+      </EuiFlyout>
       {modal}
     </>
   );

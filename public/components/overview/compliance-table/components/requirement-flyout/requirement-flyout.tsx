@@ -234,20 +234,21 @@ export class RequirementFlyout extends Component {
   render() {
     const { currentRequirement } = this.props;
     const { onChangeFlyout } = this.props;
+    const flyoutProps = {
+      maxWidth: '60%',
+      size: 'l',
+      className: 'flyout-no-overlap wz-inventory wzApp',
+      'aria-labelledby': 'flyoutSmallTitle',
+    }
     return (
-      <WzFlyout
+      <EuiFlyout
         onClose={() => onChangeFlyout(false)}
-        flyoutProps={{
-          maxWidth: '60%',
-          size: 'l',
-          className: 'flyout-no-overlap wz-inventory wzApp',
-          'aria-labelledby': 'flyoutSmallTitle',
-        }}
+        {...flyoutProps }
       >
         {currentRequirement && this.renderHeader()}
         {this.renderBody()}
         {this.state.loading && this.renderLoading()}
-      </WzFlyout>
+      </EuiFlyout>
     );
   }
 }

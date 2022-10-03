@@ -44,7 +44,6 @@ import { FilterManager } from '../../../../../../../../../../src/plugins/data/pu
 import { UI_LOGGER_LEVELS } from '../../../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../../../react-services/common-services';
-import { WzFlyout } from '../../../../../../../components/common/flyouts';
 
 export class FlyoutTechnique extends Component {
   _isMount = false;
@@ -378,19 +377,20 @@ export class FlyoutTechnique extends Component {
   render() {
     const { techniqueData } = this.state;
     const { onChangeFlyout } = this.props;
+    const flyoutProps={
+      size: 'l',
+      className: 'flyout-no-overlap wz-inventory wzApp',
+      'aria-labelledby': 'flyoutSmallTitle',
+    }
     return (
-      <WzFlyout
+      <EuiFlyout
         onClose={() => onChangeFlyout(false)}
-        flyoutProps={{
-          size: 'l',
-          className: 'flyout-no-overlap wz-inventory wzApp',
-          'aria-labelledby': 'flyoutSmallTitle',
-        }}
+        {...flyoutProps}
       >
         {techniqueData && this.renderHeader()}
         {this.renderBody()}
         {this.state.loading && this.renderLoading()}
-      </WzFlyout>
+      </EuiFlyout>
     );
   }
 }
