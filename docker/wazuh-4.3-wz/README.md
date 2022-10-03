@@ -43,8 +43,8 @@ prepared.
 To register an agent, we need to get the enrollment command from the
 UI and then execute:
 
-- For CentOS/8 images:
-  ```sh
+- For `CentOS/8` images:
+  ```bash
   docker run --rm --network wz-rel-4.3.8 -d centos:8 bash -c '
     sed -i -e "s|mirrorlist=|#mirrorlist=|g" /etc/yum.repos.d/CentOS-*
     sed -i -e "s|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g" /etc/yum.repos.d/CentOS-*
@@ -57,8 +57,8 @@ UI and then execute:
   '
   ```
 
-- For Ubuntu images
-  ```sh
+- For `Ubuntu` images
+  ```bash
   docker run --network wz-rel-4.3.8 -d ubuntu:20.04 bash -c '
     apt update -y
     apt install -y curl lsb-release
@@ -71,7 +71,7 @@ UI and then execute:
   '
   ```
 
-- For non-Linux agents:
+- For `non-Linux` agents:
   
   We need to provision virtual machines.
 
@@ -99,11 +99,11 @@ scripts.
 
 Example: test a package for Wazuh 4.3.9
 
-```sh
+```bash
 ./pre.sh 4.3.8 9 up
 ```
 
-```sh
+```bash
 ./pre.sh wazuh_version wazuh_api_version action
 
 where

@@ -61,31 +61,37 @@ export KIBANA_PASSWORD=${PASSWORD:-SecretPassword}
 export CLUSTER_NAME=cluster
 export LICENSE=basic # or trial
 export KIBANA_PORT=${PORT:-5601}
-export COMPOSE_PROJECT_NAME=es-rel-$ES_VERSION
+export COMPOSE_PROJECT_NAME=es-rel-${ES_VERSION//./}
 
 case "$3" in
 	up)
 		# recreate volumes
 		docker compose -f rel.yml up -Vd
 
-		# This installs Wazuh and integrates with a default elastic stack
-		v=$( echo -n $ES_VERSION | sed 's/\.//g' )
+		# This installs Wazuh and integrates with a default Elastic stack
+		# v=$( echo -n $ES_VERSION | sed 's/\.//g' )
 		echo
-		echo Install Wazuh ${WAZUH_VERSION} into Elastic ${ES_VERSION} manually with:
+		echo "Install Wazuh ${WAZUH_VERSION} into Elastic ${ES_VERSION} manually with:"
 		echo
-		echo 1. Install wazuh kibana app
-		echo docker exec -ti  es-rel-${v}-kibana-1  /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-${WAZUH_VERSION}_${ES_VERSION}-1.zip
-		echo 2. Restart Kibana
-		echo docker restart es-rel-${v}-kibana-1
-		echo 3. Configure kibana
-		echo docker cp ./config/kibana/wazuh.yml es-rel-${v}-kibana-1:/usr/share/kibana/data/wazuh/config/
+		echo "1. Install the Wazuh app for Kibana"
+		echo "docker exec -ti ${COMPOSE_PROJECT_NAME}-kibana-1 /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-${WAZUH_VERSION}_${ES_VERSION}-1.zip"
+		echo
+    echo "2. Restart Kibana"
+		echo "docker restart ${COMPOSE_PROJECT_NAME}-kibana-1"
+		echo
+    echo "3. Configure Kibana"
+		echo "docker cp ./config/kibana/wazuh.yml ${COMPOSE_PROJECT_NAME}-kibana-1:/usr/share/kibana/data/wazuh/config/"
+    echo
+    echo "4. Open Kibana in a browser:"
+    echo "http://localhost:${KIBANA_PORT}"
+    echo
 		;;
 	down)
 		# delete volumes
 		docker compose -f rel.yml down -v --remove-orphans
 		;;
 	stop)
-		docker compose -f rel.yml stop
+		docker compose -f rel.yml -p ${COMPOSE_PROJECT_NAME} stop
 		;;
 	*)
 		usage

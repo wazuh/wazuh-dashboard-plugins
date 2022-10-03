@@ -77,28 +77,29 @@ case "$3" in
 		# This installs Wazuh and integrates with a default Wazuh stack
 		# v=$( echo -n $WAZUH_STACK | sed 's/\.//g' )
 		echo
-		echo Install the pre-release package manually with:
+		echo "Install the pre-release package manually with:"
 		echo
-		echo 1. Uninstall current version of the Wazuh app:
-		echo docker exec -ti ${COMPOSE_PROJECT_NAME}-wazuh.dashboard-1  /usr/share/wazuh-dashboard/bin/opensearch-dashboards-plugin remove wazuh
+		echo "1. Uninstall current version of the Wazuh app:"
+		echo "docker exec -ti ${COMPOSE_PROJECT_NAME}-wazuh.dashboard-1  /usr/share/wazuh-dashboard/bin/opensearch-dashboards-plugin remove wazuh"
 		echo
-		echo 2. Restart Wazuh Dashboard:
-		echo docker restart ${COMPOSE_PROJECT_NAME}-wazuh.dashboard-1
+		echo "2. Restart Wazuh Dashboard:"
+		echo "docker restart ${COMPOSE_PROJECT_NAME}-wazuh.dashboard-1"
 		echo
-		echo 3. Copy the pre-release package to the running Wazuh Dashboard container:
+		echo "3. Copy the pre-release package to the running Wazuh Dashboard container:"
 		echo docker cp wazuh-4.3.${patch_version}-1.zip ${COMPOSE_PROJECT_NAME}-wazuh.dashboard-1:/tmp
 		echo
-		echo 4. Install the package we have just uploaded:
-		echo docker exec -ti  ${COMPOSE_PROJECT_NAME}-wazuh.dashboard-1  /usr/share/wazuh-dashboard/bin/opensearch-dashboards-plugin install file:///tmp/wazuh-4.3.${patch_version}-1.zip
+		echo "4. Install the package we have just uploaded:"
+		echo "docker exec -ti  ${COMPOSE_PROJECT_NAME}-wazuh.dashboard-1  /usr/share/wazuh-dashboard/bin/opensearch-dashboards-plugin install file:///tmp/wazuh-4.3.${patch_version}-1.zip"
 		echo
-		echo 5. Restart the Wazuh Dashboard container:
-		echo docker restart ${COMPOSE_PROJECT_NAME}-wazuh.dashboard-1
+		echo "5. Restart the Wazuh Dashboard container:"
+		echo "docker restart ${COMPOSE_PROJECT_NAME}-wazuh.dashboard-1"
 		echo
-		echo 6. Upload the Wazuh app configuration:
-		echo docker cp ./config/wazuh_dashboard/wazuh.yml ${COMPOSE_PROJECT_NAME}-wazuh.dashboard-1:/usr/share/wazuh-dashboard/data/wazuh/config/
+		echo "6. Upload the Wazuh app configuration:"
+		echo "docker cp ./config/wazuh_dashboard/wazuh.yml ${COMPOSE_PROJECT_NAME}-wazuh.dashboard-1:/usr/share/wazuh-dashboard/data/wazuh/config/"
 		echo
-		echo 7. Access the running instance in:
-		echo https://localhost:${KIBANA_PORT}
+		echo "7. Access the running instance in:"
+		echo "https://localhost:${KIBANA_PORT}"
+    echo
 		;;
 	down)
 		# delete volumes

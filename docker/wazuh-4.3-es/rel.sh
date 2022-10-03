@@ -69,19 +69,23 @@ case "$3" in
 		# recreate volumes
 		docker compose -f rel.yml up -Vd
 
-		# This installs Wazuh and integrates with a default elastic stack
-		v=$( echo -n $ES_VERSION | sed 's/\.//g' )
+		# This installs Wazuh and integrates with a default Elastic stack
+		# v=$( echo -n $ES_VERSION | sed 's/\.//g' )
 		echo
 		echo "Install Wazuh ${WAZUH_VERSION} into Elastic ${ES_VERSION} manually with:"
 		echo
 		echo "1. Install the Wazuh app for Kibana"
-		echo "docker exec -ti  ${COMPOSE_PROJECT_NAME}-kibana-1  /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-${WAZUH_VERSION}_${ES_VERSION}-1.zip"
+		echo "docker exec -ti ${COMPOSE_PROJECT_NAME}-kibana-1 /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-${WAZUH_VERSION}_${ES_VERSION}-1.zip"
     echo
 		echo "2. Restart Kibana"
 		echo "docker restart ${COMPOSE_PROJECT_NAME}-kibana-1"
     echo
 		echo "3. Configure Kibana"
 		echo "docker cp ./config/kibana/wazuh.yml ${COMPOSE_PROJECT_NAME}-kibana-1:/usr/share/kibana/data/wazuh/config/"
+    echo
+    echo "4. Open Kibana in a browser:"
+    echo "http://localhost:${KIBANA_PORT}"
+    echo
 		;;
 	down)
 		# delete volumes

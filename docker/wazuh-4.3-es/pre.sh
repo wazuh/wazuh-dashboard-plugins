@@ -87,22 +87,23 @@ case "$3" in
 		# This installs Wazuh and integrates with a default Elastic stack
 		# v=$( echo -n $ES_VERSION | sed 's/\.//g' )
     echo
-		echo Install the pre-release package manually with:
+		echo "Install the pre-release package manually with:"
 		echo
-    echo 1. Copy the pre-release package to the running Kibana container:
-    echo docker cp wazuh_kibana-4.3.${patch_version}_${ES_VERSION}-1.zip ${COMPOSE_PROJECT_NAME}-kibana-1:/tmp
+    echo "1. Copy the pre-release package to the running Kibana container:"
+    echo "docker cp wazuh_kibana-4.3.${patch_version}_${ES_VERSION}-1.zip ${COMPOSE_PROJECT_NAME}-kibana-1:/tmp"
     echo
-    echo 2. Install the pre-release package:
-    echo docker exec -ti ${COMPOSE_PROJECT_NAME}-kibana-1  /usr/share/kibana/bin/kibana-plugin install file:///tmp/wazuh_kibana-4.3.${patch_version}_${ES_VERSION}-1.zip
+    echo "2. Install the pre-release package:"
+    echo "docker exec -ti ${COMPOSE_PROJECT_NAME}-kibana-1 /usr/share/kibana/bin/kibana-plugin install file:///tmp/wazuh_kibana-4.3.${patch_version}_${ES_VERSION}-1.zip"
     echo
-    echo 3. Restart Kibana:
-    echo docker restart ${COMPOSE_PROJECT_NAME}-kibana-1
+    echo "3. Restart Kibana:"
+    echo "docker restart ${COMPOSE_PROJECT_NAME}-kibana-1"
     echo
-    echo 4. Upload the Wazuh app configuration:
-		echo docker cp ./config/kibana/wazuh.yml ${COMPOSE_PROJECT_NAME}-kibana-1:/usr/share/kibana/data/wazuh/config/
+    echo "4. Upload the Wazuh app configuration:"
+		echo "docker cp ./config/kibana/wazuh.yml ${COMPOSE_PROJECT_NAME}-kibana-1:/usr/share/kibana/data/wazuh/config/"
     echo
-    echo 5. Open Kibana in a browser:
-    echo http://localhost:${KIBANA_PORT}
+    echo "5. Open Kibana in a browser:"
+    echo "http://localhost:${KIBANA_PORT}"
+    echo
 		;;
 	down)
 		# delete volumes
