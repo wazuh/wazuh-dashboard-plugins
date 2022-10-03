@@ -67,6 +67,7 @@ EOF
 
 export WAZUH_STACK=${1}
 export KIBANA_PORT=5601
+export KIBANA_PASSWORD=${PASSWORD:-SecretPassword}
 export COMPOSE_PROJECT_NAME=wz-pre-${WAZUH_STACK//./}
 
 case "$3" in
