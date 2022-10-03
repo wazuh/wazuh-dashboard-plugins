@@ -1097,7 +1097,7 @@ export class WazuhApiCtrl {
         }
       });
     } catch (error) {
-      log('wazuh-api:isWazuhDisabled', error.message || error);
+      log('wazuh-api:getAppLogos', error.message || error);
       return ErrorResponse(error.message || error, 3035, 500, response);
     }
     
