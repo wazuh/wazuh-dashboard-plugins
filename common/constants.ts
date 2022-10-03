@@ -429,36 +429,36 @@ export type TPluginSettingCategory = {
 export const PLUGIN_SETTINGS_CATEGORIES: { [category: number]: TPluginSettingCategory } = {
   [SettingCategory.HEALTH_CHECK]: {
     title: 'Health check',
-    description: "Define which checks will be executed by the App's HealthCheck. Allowed values are: true, false",
+    description: "Checks will be executed by the app's Healthcheck.",
     renderOrder: SettingCategory.HEALTH_CHECK,
   },
   [SettingCategory.GENERAL]: {
     title: 'General',
-    description: "General settings.",
+    description: "Basic app settings related to alerts index pattern, hide the manager alerts in the dashboards, logs level and more.",
     renderOrder: SettingCategory.GENERAL,
   },
   [SettingCategory.EXTENSIONS]: {
-    title: 'Extensions',
+    title: 'Initial display state of the modules of the new API host entries.',
     description: "Extensions.",
   },
   [SettingCategory.SECURITY]: {
     title: 'Security',
-    description: "Security.",
+    description: "Application security options such as unauthorized roles.",
     renderOrder: SettingCategory.SECURITY,
   },
   [SettingCategory.MONITORING]: {
     title: 'Task:Monitoring',
-    description: "Monitoring.",
+    description: "Options related to the agent status monitoring job and its storage in indexes.",
     renderOrder: SettingCategory.MONITORING,
   },
   [SettingCategory.STATISTICS]: {
     title: 'Task:Statistics',
-    description: "Statistics.",
+    description: "Options related to the daemons manager monitoring job and their storage in indexes..",
     renderOrder: SettingCategory.STATISTICS,
   },
   [SettingCategory.CUSTOMIZATION]: {
     title: 'Custom branding',
-    description: "By default, the Wazuh app uses the Wazuh logo, but if you  want to use custom branding elements such as logos, you can do so by editing the settings below.",
+    description: "If you want to use custom branding elements such as logos, you can do so by editing the settings below.",
     documentationLink: 'user-manual/wazuh-dashboard/config-file.html#logo-customization',
     renderOrder: SettingCategory.CUSTOMIZATION,
   }
