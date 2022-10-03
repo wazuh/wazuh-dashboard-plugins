@@ -899,6 +899,34 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     isConfigurableFromUI: true,
     requiresReloadingBrowserTab: true,
   },
+  "customization.reports.footer": {
+		title: "Reports footer",
+		description: "Set the footer of the reports.",
+		category: SettingCategory.CUSTOMIZATION,
+		type: EpluginSettingType.textarea,
+		defaultValue: "",
+    	defaultValueIfNotSet: REPORTS_PAGE_FOOTER_TEXT,
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: true,
+		validate: validateStringMultipleLines({max: 2}),
+		validateBackend: function(schema){
+			return schema.string({validate: this.validate});
+		},
+	},
+	"customization.reports.header": {
+		title: "Reports header",
+		description: "Set the header of the reports.",
+		category: SettingCategory.CUSTOMIZATION,
+		type: EpluginSettingType.textarea,
+		defaultValue: "",
+    	defaultValueIfNotSet: REPORTS_PAGE_HEADER_TEXT,
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: true,
+		validate: validateStringMultipleLines({max: 4}),
+		validateBackend: function(schema){
+			return schema.string({validate: this.validate});
+		},
+	},
   "disabled_roles": {
     title: "Disable roles",
     description: "Disabled the plugin visibility for users with the roles.",
