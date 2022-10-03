@@ -1299,7 +1299,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     title: "Index replicas",
     description: "Define the number of replicas to use for the wazuh-monitoring-* indices.",
     category: SettingCategory.MONITORING,
-    type: EpluginSettingType.text,
+    type: EpluginSettingType.number,
     defaultValue: WAZUH_MONITORING_DEFAULT_INDICES_REPLICAS,
     isConfigurableFromFile: true,
     isConfigurableFromUI: true,
