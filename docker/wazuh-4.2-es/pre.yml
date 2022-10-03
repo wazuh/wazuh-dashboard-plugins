@@ -50,8 +50,12 @@ services:
         mkdir -p /etc/filebeat
         echo admin | filebeat keystore add username --stdin --force
         echo ${ELASTIC_PASSWORD}| filebeat keystore add password --stdin --force
-        curl -so /etc/filebeat/wazuh-template.json https://raw.githubusercontent.com/wazuh/wazuh/4.3/extensions/elasticsearch/7.x/wazuh-template.json
+        curl -so /etc/filebeat/wazuh-template.json https://raw.githubusercontent.com/wazuh/wazuh/4.2/extensions/elasticsearch/7.x/wazuh-template.json
         curl -s https://packages.wazuh.com/4.x/filebeat/wazuh-filebeat-0.2.tar.gz | tar -xvz -C /usr/share/filebeat/module
+        # copy filebeat to preserve correct permissions without
+        # affecting host filesystem
+        cp /tmp/filebeat.yml /usr/share/filebeat/filebeat.yml
+        chown root.root /usr/share/filebeat/filebeat.yml
         chmod go-w /usr/share/filebeat/filebeat.yml
         filebeat setup -e
         filebeat
