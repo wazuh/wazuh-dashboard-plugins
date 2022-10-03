@@ -127,8 +127,8 @@ export function groupSettingsByCategory(settings: TPluginSettingWithKey[]){
 		description,
 		...(options?.select ? [`Allowed values: ${options.select.map(({text, value}) => formatLabelValuePair(text, value)).join(', ')}.`] : []),
 		...(options?.switch ? [`Allowed values: ${['enabled', 'disabled'].map(s => formatLabelValuePair(options.switch.values[s].label, options.switch.values[s].value)).join(', ')}.`] : []),
-		...(options?.number?.min ? [`Minimum value: ${options.number.min}.`] : []),
-		...(options?.number?.max ? [`Maximum value: ${options.number.max}.`] : []),
+		...(options?.number && 'min' in options.number ? [`Minimum value: ${options.number.min}.`] : []),
+		...(options?.number && 'max' in options.number ? [`Maximum value: ${options.number.max}.`] : []),
 	].join(' ');
 };
 
