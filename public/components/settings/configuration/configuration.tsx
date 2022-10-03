@@ -31,7 +31,7 @@ import { updateSelectedSettingsSection } from '../../../redux/actions/appStateAc
 import { withUserAuthorizationPrompt, withErrorBoundary, withReduxProvider } from '../../common/hocs';
 import { EpluginSettingType, PLUGIN_PLATFORM_NAME, PLUGIN_SETTINGS, PLUGIN_SETTINGS_CATEGORIES, UI_LOGGER_LEVELS, WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../../common/constants';
 import { compose } from 'redux';
-import { formatSettingValueFromForm, getSettingsDefaultList, groupSettingsByCategory } from '../../../../common/services/settings';
+import { getSettingsDefaultList, groupSettingsByCategory, getCategorySettingByTitle } from '../../../../common/services/settings';
 import _ from 'lodash';
 import { Category } from './components/categories/components';
 import { WzRequest } from '../../../react-services';
@@ -110,7 +110,12 @@ const WzConfigurationSettingsProvider = (props) => {
   // https://github.com/elastic/eui/blob/aa4cfd7b7c34c2d724405a3ecffde7fe6cf3b50f/src/components/search_bar/query/query.ts#L138-L163
   const search = Query.execute(query.query || query, visibleSettings, ['description', 'key', 'title']);
 
-  const visibleCategories = groupSettingsByCategory(search || visibleSettings);
+  const visibleCategories = groupSettingsByCategory(search || visibleSettings)
+  // Sort categories to render them in their enum definition order
+    .sort((a, b) =>
+      (getCategorySettingByTitle(a.category)?.renderOrder || 0) -
+      (getCategorySettingByTitle(b.category)?.renderOrder || 0)
+    );
 
   const onSave = async () => {
     setLoading(true);
@@ -119,7 +124,7 @@ const WzConfigurationSettingsProvider = (props) => {
         if(PLUGIN_SETTINGS[pluginSettingKey].isConfigurableFromFile){
           accum.saveOnConfigurationFile = {
             ...accum.saveOnConfigurationFile,
-            [pluginSettingKey]: formatSettingValueFromForm(pluginSettingKey, currentValue)
+            [pluginSettingKey]: currentValue
           }
         };
         return accum;
@@ -190,13 +195,18 @@ const WzConfigurationSettingsProvider = (props) => {
             }]}/>
         </EuiPageHeader>
         <EuiFlexGroup direction='column'>
-          {visibleCategories && visibleCategories.map(({category, settings}) => ( 
-            <Category 
-              key={`configuration_category_${category}`}
-              title={category}
-              items={settings}
-            />
+          {visibleCategories && visibleCategories.map(({ category, settings }) => {
+            const { description, documentationLink } = getCategorySettingByTitle(category);
+            return (
+              <Category
+                key={`configuration_category_${category}`}
+                title={category}
+                description={description}
+                documentationLink={documentationLink}
+                items={settings}
+              />
             )
+          }
           )}
         </EuiFlexGroup>
         <EuiSpacer size="xxl" />
