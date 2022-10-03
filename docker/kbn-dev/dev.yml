@@ -15,7 +15,7 @@ services:
       - es-dev
       - mon
     command:
-      - '--es.uri=https://kibana_system:SecretPassword@es01:9200'
+      - '--es.uri=https://kibana_system:${KIBANA_PASSWORD}@es01:9200'
       - '--es.ssl-skip-verify'
       - '--es.all'
 
@@ -43,6 +43,7 @@ services:
     user: "0:0"
     networks:
       - es-dev
+      - mon
     <<: *logging
     # restart: always
     entrypoint:
@@ -133,6 +134,7 @@ services:
     image: docker.elastic.co/elasticsearch/elasticsearch:${ES_VERSION}
     networks:
       - es-dev
+      - mon
     <<: *logging
     volumes:
       - certs:/usr/share/elasticsearch/config/certs
@@ -182,6 +184,7 @@ services:
     networks:
       - es-dev
       - mon
+    <<: *logging
     volumes:
       - "${SRC}:/home/node/kbn/plugins/wazuh"
       - certs:/home/node/kbn/config/certs

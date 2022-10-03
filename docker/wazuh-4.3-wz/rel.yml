@@ -183,7 +183,7 @@ services:
       - wz-rel
       - mon
     command:
-      - '--es.uri=https://admin:SecretPassowrd@wazuh-indexer:9200'
+      - '--es.uri=https://admin:${KIBANA_PASSWORD}@wazuh-indexer:9200'
       - '--es.ssl-skip-verify'
       - '--es.all'
 
