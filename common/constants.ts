@@ -722,6 +722,12 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
         min: 0
       }
     },
+    uiFormTransformConfigurationValueToInputValue: function(value: number): string {
+      return String(value);
+    },
+    uiFormTransformInputValueToConfigurationValue: function(value: string): number {
+      return Number(value);
+    },
   },
   "cron.statistics.index.shards": {
     title: "Index shards",
@@ -736,6 +742,12 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       number: {
         min: 1
       }
+    },
+    uiFormTransformConfigurationValueToInputValue: function(value: number){
+      return String(value)
+    },
+    uiFormTransformInputValueToConfigurationValue: function(value: string): number {
+      return Number(value);
     },
   },
   "cron.statistics.interval": {
@@ -1218,6 +1230,12 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
         min: 1500
       }
     },
+    uiFormTransformConfigurationValueToInputValue: function(value: number){
+      return String(value)
+    },
+    uiFormTransformInputValueToConfigurationValue: function(value: string): number {
+      return Number(value);
+    },
   },
   "wazuh.monitoring.creation": {
     title: "Index creation",
@@ -1284,6 +1302,12 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
         min: 60
       }
     },
+    uiFormTransformConfigurationValueToInputValue: function(value: number){
+      return String(value)
+    },
+    uiFormTransformInputValueToConfigurationValue: function(value: string): number {
+      return Number(value);
+    },
   },
   "wazuh.monitoring.pattern": {
     title: "Index pattern",
@@ -1309,6 +1333,12 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
         min: 0
       }
     },
+    uiFormTransformConfigurationValueToInputValue: function(value: number){
+      return String(value)
+    },
+    uiFormTransformInputValueToConfigurationValue: function(value: string): number {
+      return Number(value);
+    },
   },
   "wazuh.monitoring.shards": {
     title: "Index shards",
@@ -1323,6 +1353,12 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       number: {
         min: 1
       }
+    },
+    uiFormTransformConfigurationValueToInputValue: function(value: number){
+      return String(value)
+    },
+    uiFormTransformInputValueToConfigurationValue: function(value: string): number {
+      return Number(value);
     },
   }
 };

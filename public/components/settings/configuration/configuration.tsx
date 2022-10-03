@@ -31,7 +31,7 @@ import { updateSelectedSettingsSection } from '../../../redux/actions/appStateAc
 import { withUserAuthorizationPrompt, withErrorBoundary, withReduxProvider } from '../../common/hocs';
 import { EpluginSettingType, PLUGIN_PLATFORM_NAME, PLUGIN_SETTINGS, PLUGIN_SETTINGS_CATEGORIES, UI_LOGGER_LEVELS, WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../../common/constants';
 import { compose } from 'redux';
-import { formatSettingValueFromForm, getSettingsDefaultList, groupSettingsByCategory, getCategorySettingByTitle } from '../../../../common/services/settings';
+import { getSettingsDefaultList, groupSettingsByCategory, getCategorySettingByTitle } from '../../../../common/services/settings';
 import _ from 'lodash';
 import { Category } from './components/categories/components';
 import { WzRequest } from '../../../react-services';
@@ -124,7 +124,7 @@ const WzConfigurationSettingsProvider = (props) => {
         if(PLUGIN_SETTINGS[pluginSettingKey].isConfigurableFromFile){
           accum.saveOnConfigurationFile = {
             ...accum.saveOnConfigurationFile,
-            [pluginSettingKey]: formatSettingValueFromForm(pluginSettingKey, currentValue)
+            [pluginSettingKey]: currentValue
           }
         };
         return accum;
