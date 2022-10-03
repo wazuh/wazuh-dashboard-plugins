@@ -1,4 +1,20 @@
-import { EpluginSettingType, PLUGIN_SETTINGS, TPluginSetting, TPluginSettingKey, TPluginSettingWithKey } from '../constants';
+import {
+  EpluginSettingType,
+  PLUGIN_SETTINGS,
+  PLUGIN_SETTINGS_CATEGORIES,
+  TPluginSetting,
+  TPluginSettingKey,
+  TPluginSettingWithKey
+} from '../constants';
+
+/**
+ * Look for a configuration category setting by its name
+ * @param categoryTitle
+ * @returns category settings
+ */
+export function getCategorySettingByTitle(categoryTitle: string): any {
+  return Object.entries(PLUGIN_SETTINGS_CATEGORIES).find(([key, category]) => category?.title == categoryTitle)?.[1];
+}
 
 /**
  * Get the default value of the plugin setting.
@@ -45,26 +61,6 @@ export function getSettingsDefaultList(): TPluginSettingWithKey[] {
 };
 
 /**
-* 
-* @param pluginSetting Plugin setting definition
-* @param fromValue value of the form
-* @returns Transform the form value to the type of the setting expected
-*/
-export function formatSettingValueFromForm(pluginSettingKey: string, formValue: any) {
-	const { type } = PLUGIN_SETTINGS[pluginSettingKey];
-	return formatSettingValueFromFormType[type](formValue);
-};
-
-const formatSettingValueFromFormType = {
-	[EpluginSettingType.text]: (value: string): string => value,
-	[EpluginSettingType.textarea]: (value: string): string => value,
-	[EpluginSettingType.number]: (value: string): number => Number(value),
-	[EpluginSettingType.switch]: (value: string): boolean => Boolean(value),
-	[EpluginSettingType.editor]: (value: any): any => value, // Array form transforms the value. It is coming a valid JSON.
-	[EpluginSettingType.select]: (value: any): any => value,
-};
-
-/**
  * Format the plugin setting value received in the backend to store in the plugin configuration file (.yml).
  * @param value plugin setting value sent to the endpoint
  * @returns valid value to .yml
@@ -86,13 +82,15 @@ const formatSettingValueToFileType = {
  * @returns 
  */
 export function groupSettingsByCategory(settings: TPluginSettingWithKey[]){
-	const settingsSortedByCategories = settings.reduce((accum, pluginSettingConfiguration) => ({
-		...accum,
-		[pluginSettingConfiguration.category]: [
-		...(accum[pluginSettingConfiguration.category] || []),
-		{...pluginSettingConfiguration}
-		]
-	}),{});
+	const settingsSortedByCategories = settings
+		.sort((settingA, settingB) => settingA.key?.localeCompare?.(settingB.key))
+		.reduce((accum, pluginSettingConfiguration) => ({
+			...accum,
+			[pluginSettingConfiguration.category]: [
+				...(accum[pluginSettingConfiguration.category] || []),
+				{ ...pluginSettingConfiguration }
+			]
+		}), {});
 
 	return Object.entries(settingsSortedByCategories)
 		.map(([category, settings]) => ({ category, settings }))
@@ -109,6 +107,8 @@ export function groupSettingsByCategory(settings: TPluginSettingWithKey[]){
 		description,
 		...(options?.select ? [`Allowed values: ${options.select.map(({text, value}) => formatLabelValuePair(text, value)).join(', ')}.`] : []),
 		...(options?.switch ? [`Allowed values: ${['enabled', 'disabled'].map(s => formatLabelValuePair(options.switch.values[s].label, options.switch.values[s].value)).join(', ')}.`] : []),
+		...(options?.number && 'min' in options.number ? [`Minimum value: ${options.number.min}.`] : []),
+		...(options?.number && 'max' in options.number ? [`Maximum value: ${options.number.max}.`] : []),
 	].join(' ');
 };
 
