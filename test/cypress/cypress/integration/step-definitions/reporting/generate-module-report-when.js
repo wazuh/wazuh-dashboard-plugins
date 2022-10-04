@@ -8,6 +8,7 @@ const disableGenerateReportButton = getSelector('disableGenerateReportButton', p
 
 When('The user generate a module report clicking on the generate report option', () => {
   elementIsVisible(generateReportButton);
+  cy.wait(500);
   elementIsNotVisible(disableGenerateReportButton);
   forceClickElement(generateReportButton);
   cy.wait(500);
