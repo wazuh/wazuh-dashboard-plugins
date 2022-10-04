@@ -1,10 +1,10 @@
 export const REPORT_NAME = {
-  "Security Events":"overview-general",
-  "Integrity Monitonring":"Integrity Monitoring",
-  "System Auditing":"overview-audit",
-  "Mitre & Attack":"overview-mitre",
-  NIST:"overview-nist", 
-  TSC:"overview-tsc", 
-  "Policy Monitoring":"overview-pm",
-  PCIDSS:"overview-pci"
+  "Security Events":"general",
+  "Integrity Monitonring":"fim",
+  "System Auditing":"audit",
+  "Mitre & Attack":"mitre",
+  NIST:"nist", 
+  TSC:"tsc", 
+  "Policy Monitoring":"pm",
+  PCIDSS:"pci"
 };

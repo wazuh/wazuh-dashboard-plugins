@@ -12,7 +12,7 @@ Scenario Outline: Create a report from modules and agents <Module Name>
     And The user choose an agent to apply filter
     And The user generate a module report clicking on the generate report option
     And The user navigates to management-reporting
-    Then The agent report is displayed in the table
+    Then The agent report is displayed in the table <Module Name>
     Examples:
       | Module Name          |
       | Security Events      |

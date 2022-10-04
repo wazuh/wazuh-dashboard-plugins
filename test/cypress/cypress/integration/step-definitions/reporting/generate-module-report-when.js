@@ -9,7 +9,9 @@ const disableGenerateReportButton = getSelector('disableGenerateReportButton', p
 When('The user generate a module report clicking on the generate report option', () => {
   elementIsVisible(generateReportButton);
   cy.wait(500);
-  elementIsNotVisible(disableGenerateReportButton);
+  if (elementIsNotVisible(disableGenerateReportButton)) {
+    cy.log('The selected agent has no data for this module')
+  }
   forceClickElement(generateReportButton);
   cy.wait(500);
   elementIsVisible(reportGeneratedToast);
