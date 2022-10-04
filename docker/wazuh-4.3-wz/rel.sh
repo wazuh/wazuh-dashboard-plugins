@@ -14,10 +14,11 @@ versions=(
 
 usage() {
 	echo
-	echo "$0 version action "
+	echo "$0 version action [saml]"
 	echo
 	echo "where version is one of " ${versions[*]}
-	echo "acction is one of up | down | stop"
+	echo "action is one of up | down | stop"
+	echo "optionally add 'saml' as the last parameter to deploy a saml enabled environment"
 	exit -1
 }
 
@@ -49,7 +50,6 @@ fi
 
 case "$2" in
 	up)
-		# recreate volumes
 		docker compose --profile $profile -f rel.yml up -Vd
 		if [[ "${profile}" =~ "saml" ]]
 		then
@@ -57,7 +57,6 @@ case "$2" in
 		fi
 		;;
 	down)
-		# delete volumes
 		docker compose --profile $profile -f rel.yml down -v --remove-orphans
 		;;
 	stop)
