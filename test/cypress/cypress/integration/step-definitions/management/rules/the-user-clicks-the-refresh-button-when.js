@@ -22,7 +22,7 @@ When('The user clicks the refresh button', () => {
   elementIsVisible(buttonListPageSelector);
   cy.get(titleSelector).invoke('text').as('title');
   cy.get(rulestableSelector).then(($e) =>{
-    const agentId = $agentId.text();
+    const agentId = $e.text();
     cy.wrap(agentId).as('rulesLength');
   })
   cy.get(dropdownPaginationSelector).invoke('text').as('paginationRows');
