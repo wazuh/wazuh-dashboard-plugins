@@ -13,5 +13,14 @@ export const RULES_PAGE = {
   createNewRulesSelector: '.euiFlexGroup .euiFlexItem .euiButtonEmpty .euiButtonContent .euiButtonEmpty__text:contains("Add new rules file")',
   rulesTitleSelector:'.euiFlexItem .euiFlexGroup .euiFormControlLayout input.euiFieldText',
   saveRulesButtonSelector: '.euiFlexGroup .euiFlexItem button.euiButton span.euiButtonContent span.euiButton__text:contains("Save")',
-  saveRulesMessage: '.euiText span:contains("Changes will not take effect until a restart is performed.")'
+  saveRulesMessage: '.euiText span:contains("Changes will not take effect until a restart is performed.")',
+  refreshButtonSelector: '.euiFlexGroup .euiFlexItem .euiButtonEmpty .euiButtonContent .euiButtonEmpty__text:contains("Refresh")',
+  rulestableSelector: '[name="WzManagement"] table tr',
+  buttonListPageSelector: '[name="WzManagement"] button > span',
+  rulesFilterSelector: '.euiSuggestInput [placeholder="Filter or search"]',
+  dropdownFilterSelector: '.euiPanel.euiPopover__panel.euiPopover__panel--bottom',
+  filterLevelSelector: 'button:contains("level")',
+  filterNumberSelector: 'button:nth-child(0)',
+  filterLabelSelector: '.euiPopover.euiPopover--anchorDownLeft [data-testid="wz-search-badge-0"]',
 };
+
