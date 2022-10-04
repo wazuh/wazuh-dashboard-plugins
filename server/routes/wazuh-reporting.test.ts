@@ -9,18 +9,14 @@ import { WazuhUtilsRoutes } from './wazuh-utils';
 import { WazuhReportingRoutes } from './wazuh-reporting';
 import { WazuhUtilsCtrl } from '../controllers/wazuh-utils/wazuh-utils';
 import md5 from 'md5';
-import { ReportPrinter } from '../lib/reporting/printer';
 
 
 import { createDataDirectoryIfNotExists, createDirectoryIfNotExists } from '../lib/filesystem';
 import {
   WAZUH_DATA_CONFIG_APP_PATH,
   WAZUH_DATA_CONFIG_DIRECTORY_PATH,
-  WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH,
   WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH,
   WAZUH_DATA_LOGS_DIRECTORY_PATH,
-  WAZUH_DATA_LOGS_RAW_PATH,
-  PLUGIN_PLATFORM_REQUEST_HEADERS,
   WAZUH_DATA_ABSOLUTE_PATH
 } from '../../common/constants';
 import { execSync } from 'child_process';
@@ -29,7 +25,7 @@ import fs from 'fs';
 jest.mock('../lib/reporting/extended-information', () => ({
   extendedInformation: jest.fn()
 }));
-
+const USER_NAME = 'admin';
 const loggingService = loggingSystemMock.create();
 const logger = loggingService.get();
 const context = {
@@ -49,9 +45,11 @@ const context = {
 const enhanceWithContext = (fn: (...args: any[]) => any) => fn.bind(null, context);
 let server, innerServer;
 
+// BEFORE ALL
 beforeAll(async () => {
   // Create <PLUGIN_PLATFORM_PATH>/data/wazuh directory.
   createDataDirectoryIfNotExists();
+
   // Create <PLUGIN_PLATFORM_PATH>/data/wazuh/config directory.
   createDirectoryIfNotExists(WAZUH_DATA_CONFIG_DIRECTORY_PATH);
 
@@ -76,10 +74,9 @@ beforeAll(async () => {
   const { registerRouter, server: innerServerTest, ...rest } = await server.setup(config);
   innerServer = innerServerTest;
 
-  const spyRouteDecoratorProtectedAdministratorRoleValidToken = jest.spyOn(WazuhUtilsCtrl.prototype as any, 'routeDecoratorProtectedAdministratorRoleValidToken')
+  // Mock decorator
+  jest.spyOn(WazuhUtilsCtrl.prototype as any, 'routeDecoratorProtectedAdministratorRoleValidToken')
     .mockImplementation((handler) => async (...args) => handler(...args));
-  // const spycheckReportsUserDirectoryIsValidRouteDecorator = jest.spyOn(WazuhReportingCtrl.prototype as any, 'checkReportsUserDirectoryIsValidRouteDecorator')
-  //   .mockImplementation((handler) => async (...args) => handler(...args));
 
   // Register routes
   WazuhUtilsRoutes(router);
@@ -126,29 +123,56 @@ describe('[endpoint] PUT /utils/configuration', () => {
     fs.unlinkSync(WAZUH_DATA_CONFIG_APP_PATH);
   });
 
-  it(`Set custom report header and footer - PUT /utils/configuration - $responseStatusCode`, async () => {
-    const configurationBody = {
-      ['customization.reports.footer']: 'Test\nTest',
-      ['customization.reports.header']: 'info@company.com\nFake Avenue 123'
-    };
-    const fromDate = new Date();
-    const toDate = new Date();
+  // expectedMD5 variable is a verified md5 of a report generated with this header and footer
+  // if any of the parameters is changed this variable should be updated with the new md5
+  it.each`
+  footer | header | responseStatusCode | expectedMD5
+  ${'Custom\nFooter'} | ${'info@company.com\nFake Avenue 123'}| ${200} | ${'0acbd4ee321699791b080b45c11dfe2b'}
+`(`Set custom report header and footer - Verify PDF output`, async ({footer, header, responseStatusCode, expectedMD5}) => {
 
-    fromDate.setHours(toDate.getHours() - 1);
-    const reportBody = { "array": [], "filters": [], "time": { "from": fromDate.toISOString(), "to": toDate.toISOString() }, "searchBar": "", "tables": [], "tab": "general", "section": "overview", "agents": false, "browserTimezone": "Europe/Madrid", "indexPatternTitle": "wazuh-alerts-*", "apiId": "default" };
+      // Mock PDF report parameters
+      const reportBody = { "array": [], "filters": [], "time": { "from": '2022-10-01T09:59:40.825Z', "to": '2022-10-04T09:59:40.825Z' }, "searchBar": "", "tables": [], "tab": "general", "section": "overview", "agents": false, "browserTimezone": "Europe/Madrid", "indexPatternTitle": "wazuh-alerts-*", "apiId": "default" };
 
-    const responseConfig = await supertest(innerServer.listener)
-      .put('/utils/configuration')
-      .send(configurationBody)
-      .expect(200);
+      // Define custom configuration
+      const configurationBody = {};
 
-    expect(responseConfig.body?.data?.updatedConfiguration?.['customization.reports.footer']).toMatch(configurationBody['customization.reports.footer']);
-    expect(responseConfig.body?.data?.updatedConfiguration?.['customization.reports.header']).toMatch(configurationBody['customization.reports.header']);
+      if (typeof footer == 'string') {
+        configurationBody['customization.reports.footer'] = footer;
+      }
+      if (typeof header == 'string') {
+        configurationBody['customization.reports.header'] = header;
+      }
 
-    const responseReport = await supertest(innerServer.listener)
-      .post(`/reports/modules/general`)
-      .set('x-test-username', 'admin')
-      .send(reportBody)
-      .expect(200);
+      // Set custom report header and footer
+      if (typeof footer == 'string' || typeof header == 'string') {
+        const responseConfig = await supertest(innerServer.listener)
+          .put('/utils/configuration')
+          .send(configurationBody)
+          .expect(responseStatusCode);
+
+        if (typeof footer == 'string') {
+          expect(responseConfig.body?.data?.updatedConfiguration?.['customization.reports.footer']).toMatch(configurationBody['customization.reports.footer']);
+        }
+        if (typeof header == 'string') {
+          expect(responseConfig.body?.data?.updatedConfiguration?.['customization.reports.header']).toMatch(configurationBody['customization.reports.header']);
+        }
+      }
+
+      const responseReport = await supertest(innerServer.listener)
+        .post(`/reports/modules/general`)
+        .set('x-test-username', USER_NAME)
+        .send(reportBody)
+        .expect(200);
+      const fileName = responseReport.body?.message.match(/([A-Z-0-9]*\.pdf)/gi)[0];
+      const userPath = md5(USER_NAME);
+      const reportPath = `${WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH}/${userPath}/${fileName}`;
+      const PDFbuffer = fs.readFileSync(reportPath);
+      const PDFcontent = PDFbuffer.toString('utf8');
+      const content = PDFcontent
+        .replace(/\[<[a-z0-9].+> <[a-z0-9].+>\]/gi, '')
+        .replace(/(obj\n\(D:[0-9].+Z\)\nendobj)/gi, '');
+      const PDFmd5 = md5(content);
+
+      expect(PDFmd5).toBe(expectedMD5);
   });
 });

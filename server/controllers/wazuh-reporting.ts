@@ -66,9 +66,9 @@ export class WazuhReportingCtrl {
       str += `${
         type === 'range'
           ? `${params.gte}-${params.lt}`
-          : type === 'phrases' 
-            ? '(' + params.join(" OR ") + ')' 
-            : type === 'exists' 
+          : type === 'phrases'
+            ? '(' + params.join(" OR ") + ')'
+            : type === 'exists'
               ? '*'
               : !!value
           ? value

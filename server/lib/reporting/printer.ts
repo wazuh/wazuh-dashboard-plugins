@@ -12,6 +12,7 @@ import * as TimSort from 'timsort';
 import { getConfiguration } from '../get-configuration';
 import { REPORTS_PRIMARY_COLOR} from '../../../common/constants';
 import { getSettingDefaultValue } from '../../../common/services/settings';
+import { try } from 'bluebird';
 
 const COLORS = {
   PRIMARY: REPORTS_PRIMARY_COLOR
@@ -614,18 +615,28 @@ export class ReportPrinter{
     );
   }
 
-  async print(reportPath: string){
-    const configuration = await getConfiguration();
+  async print(reportPath: string) {
+    return new Promise((resolve, reject) => {
+      try {
+        const configuration = getConfiguration();
 
-    const pathToLogo = configuration['customization.logo.reports'] || getSettingDefaultValue('customization.logo.reports');
-    const pageHeader = configuration['customization.reports.header'] || getSettingDefaultValue('customization.reports.header');
-    const pageFooter = configuration['customization.reports.footer'] || getSettingDefaultValue('customization.reports.footer');
+        const pathToLogo = configuration['customization.logo.reports'] || getSettingDefaultValue('customization.logo.reports');
+        const pageHeader = configuration['customization.reports.header'] || getSettingDefaultValue('customization.reports.header');
+        const pageFooter = configuration['customization.reports.footer'] || getSettingDefaultValue('customization.reports.footer');
 
-    const document = this._printer.createPdfKitDocument({...pageConfiguration({pathToLogo, pageHeader, pageFooter}), content: this._content});
-    await document.pipe(
-      fs.createWriteStream(reportPath)
-    );
-    document.end();
+        const document = this._printer.createPdfKitDocument({ ...pageConfiguration({ pathToLogo, pageHeader, pageFooter }), content: this._content });
+
+        document.on('error', reject);
+        document.on('end', resolve);
+
+        document.pipe(
+          fs.createWriteStream(reportPath)
+        );
+        document.end();
+      } catch (ex) {
+        reject(ex);
+      }
+    });
   }
 
   /**
