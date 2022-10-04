@@ -157,6 +157,20 @@ hosts:
     ${'alerts.sample.prefix'} | ${''} | ${400} | ${"[request body.alerts.sample.prefix]: Value can not be empty."}
     ${'alerts.sample.prefix'} | ${'test space'} | ${400} | ${"[request body.alerts.sample.prefix]: It can't contain spaces."}
     ${'alerts.sample.prefix'} | ${4} | ${400} | ${'[request body.alerts.sample.prefix]: expected value of type [string] but got [number]'}
+    ${'alerts.sample.prefix'} | ${'-test'} | ${400} | ${"[request body.alerts.sample.prefix]: It can't start with: -, _, +, .."}
+    ${'alerts.sample.prefix'} | ${'_test'} | ${400} | ${"[request body.alerts.sample.prefix]: It can't start with: -, _, +, .."}
+    ${'alerts.sample.prefix'} | ${'+test'} | ${400} | ${"[request body.alerts.sample.prefix]: It can't start with: -, _, +, .."}
+    ${'alerts.sample.prefix'} | ${'.test'} | ${400} | ${"[request body.alerts.sample.prefix]: It can't start with: -, _, +, .."}
+    ${'alerts.sample.prefix'} | ${'test\\'}| ${400} | ${"[request body.alerts.sample.prefix]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #, *."}
+    ${'alerts.sample.prefix'} | ${'test/'} | ${400} | ${"[request body.alerts.sample.prefix]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #, *."}
+    ${'alerts.sample.prefix'} | ${'test?'} | ${400} | ${"[request body.alerts.sample.prefix]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #, *."}
+    ${'alerts.sample.prefix'} | ${'test"'} | ${400} | ${"[request body.alerts.sample.prefix]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #, *."}
+    ${'alerts.sample.prefix'} | ${'test<'} | ${400} | ${"[request body.alerts.sample.prefix]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #, *."}
+    ${'alerts.sample.prefix'} | ${'test>'} | ${400} | ${"[request body.alerts.sample.prefix]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #, *."}
+    ${'alerts.sample.prefix'} | ${'test|'} | ${400} | ${"[request body.alerts.sample.prefix]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #, *."}
+    ${'alerts.sample.prefix'} | ${'test,'} | ${400} | ${"[request body.alerts.sample.prefix]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #, *."}
+    ${'alerts.sample.prefix'} | ${'test#'} | ${400} | ${"[request body.alerts.sample.prefix]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #, *."}
+    ${'alerts.sample.prefix'} | ${'test*'} | ${400} | ${"[request body.alerts.sample.prefix]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #, *."}
     ${'checks.api'} | ${true} | ${200} | ${null}
     ${'checks.api'} | ${0} | ${400} | ${'[request body.checks.api]: expected value of type [boolean] but got [number]'}
     ${'checks.fields'} | ${true} | ${200} | ${null}
@@ -175,9 +189,24 @@ hosts:
     ${'cron.prefix'} | ${'test space'} | ${400} | ${"[request body.cron.prefix]: It can't contain spaces."}
     ${'cron.prefix'} | ${''} | ${400} | ${"[request body.cron.prefix]: Value can not be empty."}
     ${'cron.prefix'} | ${4} | ${400} | ${'[request body.cron.prefix]: expected value of type [string] but got [number]'}
+    ${'cron.prefix'} | ${'-test'} | ${400} | ${"[request body.cron.prefix]: It can't start with: -, _, +, .."}
+    ${'cron.prefix'} | ${'_test'} | ${400} | ${"[request body.cron.prefix]: It can't start with: -, _, +, .."}
+    ${'cron.prefix'} | ${'+test'} | ${400} | ${"[request body.cron.prefix]: It can't start with: -, _, +, .."}
+    ${'cron.prefix'} | ${'.test'} | ${400} | ${"[request body.cron.prefix]: It can't start with: -, _, +, .."}
+    ${'cron.prefix'} | ${'test\\'}| ${400} | ${"[request body.cron.prefix]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #, *."}
+    ${'cron.prefix'} | ${'test/'} | ${400} | ${"[request body.cron.prefix]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #, *."}
+    ${'cron.prefix'} | ${'test?'} | ${400} | ${"[request body.cron.prefix]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #, *."}
+    ${'cron.prefix'} | ${'test"'} | ${400} | ${"[request body.cron.prefix]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #, *."}
+    ${'cron.prefix'} | ${'test<'} | ${400} | ${"[request body.cron.prefix]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #, *."}
+    ${'cron.prefix'} | ${'test>'} | ${400} | ${"[request body.cron.prefix]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #, *."}
+    ${'cron.prefix'} | ${'test|'} | ${400} | ${"[request body.cron.prefix]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #, *."}
+    ${'cron.prefix'} | ${'test,'} | ${400} | ${"[request body.cron.prefix]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #, *."}
+    ${'cron.prefix'} | ${'test#'} | ${400} | ${"[request body.cron.prefix]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #, *."}
+    ${'cron.prefix'} | ${'test*'} | ${400} | ${"[request body.cron.prefix]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #, *."}
     ${'cron.statistics.apis'} | ${['test']} | ${200} | ${null}
     ${'cron.statistics.apis'} | ${['test ']} | ${400} | ${"[request body.cron.statistics.apis.0]: It can't contain spaces."}
     ${'cron.statistics.apis'} | ${['']} | ${400} | ${"[request body.cron.statistics.apis.0]: Value can not be empty."}
+    ${'cron.statistics.apis'} | ${['test', 4]} | ${400} | ${"[request body.cron.statistics.apis.1]: expected value of type [string] but got [number]"}    
     ${'cron.statistics.apis'} | ${'test space'} | ${400} | ${"[request body.cron.statistics.apis]: could not parse array value from json input"}
     ${'cron.statistics.apis'} | ${true} | ${400} | ${"[request body.cron.statistics.apis]: expected value of type [array] but got [boolean]"}
     ${'cron.statistics.index.creation'} | ${'h'} | ${200} | ${null}
@@ -189,6 +218,20 @@ hosts:
     ${'cron.statistics.index.name'} | ${''} | ${400} | ${"[request body.cron.statistics.index.name]: Value can not be empty."}
     ${'cron.statistics.index.name'} | ${'test space'} | ${400} | ${"[request body.cron.statistics.index.name]: It can't contain spaces."}
     ${'cron.statistics.index.name'} | ${true} | ${400} | ${"[request body.cron.statistics.index.name]: expected value of type [string] but got [boolean]"}
+    ${'cron.statistics.index.name'} | ${'-test'} | ${400} | ${"[request body.cron.statistics.index.name]: It can't start with: -, _, +, .."}
+    ${'cron.statistics.index.name'} | ${'_test'} | ${400} | ${"[request body.cron.statistics.index.name]: It can't start with: -, _, +, .."}
+    ${'cron.statistics.index.name'} | ${'+test'} | ${400} | ${"[request body.cron.statistics.index.name]: It can't start with: -, _, +, .."}
+    ${'cron.statistics.index.name'} | ${'.test'} | ${400} | ${"[request body.cron.statistics.index.name]: It can't start with: -, _, +, .."}
+    ${'cron.statistics.index.name'} | ${'test\\'}| ${400} | ${"[request body.cron.statistics.index.name]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #, *."}
+    ${'cron.statistics.index.name'} | ${'test/'} | ${400} | ${"[request body.cron.statistics.index.name]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #, *."}
+    ${'cron.statistics.index.name'} | ${'test?'} | ${400} | ${"[request body.cron.statistics.index.name]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #, *."}
+    ${'cron.statistics.index.name'} | ${'test"'} | ${400} | ${"[request body.cron.statistics.index.name]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #, *."}
+    ${'cron.statistics.index.name'} | ${'test<'} | ${400} | ${"[request body.cron.statistics.index.name]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #, *."}
+    ${'cron.statistics.index.name'} | ${'test>'} | ${400} | ${"[request body.cron.statistics.index.name]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #, *."}
+    ${'cron.statistics.index.name'} | ${'test|'} | ${400} | ${"[request body.cron.statistics.index.name]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #, *."}
+    ${'cron.statistics.index.name'} | ${'test,'} | ${400} | ${"[request body.cron.statistics.index.name]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #, *."}
+    ${'cron.statistics.index.name'} | ${'test#'} | ${400} | ${"[request body.cron.statistics.index.name]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #, *."}
+    ${'cron.statistics.index.name'} | ${'test*'} | ${400} | ${"[request body.cron.statistics.index.name]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #, *."}
     ${'cron.statistics.index.replicas'} | ${0} | ${200} | ${null}
     ${'cron.statistics.index.replicas'} | ${-1} | ${400} | ${"[request body.cron.statistics.index.replicas]: Value should be greater or equal than 0."}
     ${'cron.statistics.index.replicas'} | ${'custom'} | ${400} | ${"[request body.cron.statistics.index.replicas]: expected value of type [number] but got [string]"}
@@ -204,6 +247,7 @@ hosts:
     ${'disabled_roles'} | ${['test']} | ${200} | ${null}
     ${'disabled_roles'} | ${['']} | ${400} | ${'[request body.disabled_roles.0]: Value can not be empty.'}
     ${'disabled_roles'} | ${['test space']} | ${400} | ${"[request body.disabled_roles.0]: It can't contain spaces."}
+    ${'disabled_roles'} | ${['test', 4]} | ${400} | ${"[request body.disabled_roles.1]: expected value of type [string] but got [number]"}    
     ${'enrollment.dns'} | ${'test'} | ${200} | ${null}
     ${'enrollment.dns'} | ${''} | ${200} | ${null}
     ${'enrollment.dns'} | ${'test space'} | ${400} | ${"[request body.enrollment.dns]: It can't contain spaces."}
@@ -237,17 +281,47 @@ hosts:
     ${'extensions.virustotal'} | ${true} | ${200} | ${null}
     ${'extensions.virustotal'} | ${0} | ${400} | ${'[request body.extensions.virustotal]: expected value of type [boolean] but got [number]'}
     ${'ip.ignore'} | ${['test']} | ${200} | ${null}
+    ${'ip.ignore'} | ${['test*']} | ${200} | ${null}
     ${'ip.ignore'} | ${['']} | ${400} | ${'[request body.ip.ignore.0]: Value can not be empty.'}
     ${'ip.ignore'} | ${['test space']} | ${400} | ${"[request body.ip.ignore.0]: It can't contain spaces."}
+    ${'ip.ignore'} | ${true} | ${400} | ${"[request body.ip.ignore.0]: It can't contain spaces."}
+    ${'ip.ignore'} | ${['-test']} | ${400} | ${"[request body.ip.ignore.0]: It can't start with: -, _, +, .."}
+    ${'ip.ignore'} | ${['_test']} | ${400} | ${"[request body.ip.ignore.0]: It can't start with: -, _, +, .."}
+    ${'ip.ignore'} | ${['+test']} | ${400} | ${"[request body.ip.ignore.0]: It can't start with: -, _, +, .."}
+    ${'ip.ignore'} | ${['.test']} | ${400} | ${"[request body.ip.ignore.0]: It can't start with: -, _, +, .."}
+    ${'ip.ignore'} | ${['test\\']}| ${400} | ${"[request body.ip.ignore.0]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #."}
+    ${'ip.ignore'} | ${['test/']} | ${400} | ${"[request body.ip.ignore.0]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #."}
+    ${'ip.ignore'} | ${['test?']} | ${400} | ${"[request body.ip.ignore.0]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #."}
+    ${'ip.ignore'} | ${['test"']} | ${400} | ${"[request body.ip.ignore.0]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #."}
+    ${'ip.ignore'} | ${['test<']} | ${400} | ${"[request body.ip.ignore.0]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #."}
+    ${'ip.ignore'} | ${['test>']} | ${400} | ${"[request body.ip.ignore.0]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #."}
+    ${'ip.ignore'} | ${['test|']} | ${400} | ${"[request body.ip.ignore.0]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #."}
+    ${'ip.ignore'} | ${['test,']} | ${400} | ${"[request body.ip.ignore.0]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #."}
+    ${'ip.ignore'} | ${['test#']} | ${400} | ${"[request body.ip.ignore.0]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #."}
+    ${'ip.ignore'} | ${['test', 'test#']} | ${400} | ${"[request body.ip.ignore.1]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #, *."}
     ${'ip.selector'} | ${true} | ${200} | ${null}
     ${'ip.selector'} | ${''} | ${400} | ${'[request body.ip.selector]: expected value of type [boolean] but got [string]'}
     ${'logs.level'} | ${'info'} | ${200} | ${null}
     ${'logs.level'} | ${'debug'} | ${200} | ${null}
     ${'logs.level'} | ${''} | ${400} | ${'[request body.logs.level]: types that failed validation:\n- [request body.logs.level.0]: expected value to equal [info]\n- [request body.logs.level.1]: expected value to equal [debug]'}
     ${'pattern'} | ${'test'} | ${200} | ${null}
+    ${'pattern'} | ${'test*'} | ${200} | ${null}
     ${'pattern'} | ${''} | ${400} | ${'[request body.pattern]: Value can not be empty.'}
     ${'pattern'} | ${'test space'} | ${400} | ${"[request body.pattern]: It can't contain spaces."}
     ${'pattern'} | ${true} | ${400} | ${'[request body.pattern]: expected value of type [string] but got [boolean]'}
+    ${'pattern'} | ${'-test'} | ${400} | ${"[request body.pattern]: It can't start with: -, _, +, .."}
+    ${'pattern'} | ${'_test'} | ${400} | ${"[request body.pattern]: It can't start with: -, _, +, .."}
+    ${'pattern'} | ${'+test'} | ${400} | ${"[request body.pattern]: It can't start with: -, _, +, .."}
+    ${'pattern'} | ${'.test'} | ${400} | ${"[request body.pattern]: It can't start with: -, _, +, .."}
+    ${'pattern'} | ${'test\\'}| ${400} | ${"[request body.pattern]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #."}
+    ${'pattern'} | ${'test/'} | ${400} | ${"[request body.pattern]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #."}
+    ${'pattern'} | ${'test?'} | ${400} | ${"[request body.pattern]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #."}
+    ${'pattern'} | ${'test"'} | ${400} | ${"[request body.pattern]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #."}
+    ${'pattern'} | ${'test<'} | ${400} | ${"[request body.pattern]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #."}
+    ${'pattern'} | ${'test>'} | ${400} | ${"[request body.pattern]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #."}
+    ${'pattern'} | ${'test|'} | ${400} | ${"[request body.pattern]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #."}
+    ${'pattern'} | ${'test,'} | ${400} | ${"[request body.pattern]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #."}
+    ${'pattern'} | ${'test#'} | ${400} | ${"[request body.pattern]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #."}
     ${'timeout'} | ${15000} | ${200} | ${null}
     ${'timeout'} | ${1000} | ${400} | ${'[request body.timeout]: Value should be greater or equal than 1500.'}
     ${'timeout'} | ${''} | ${400} | ${'[request body.timeout]: expected value of type [number] but got [string]'}
@@ -262,8 +336,22 @@ hosts:
     ${'wazuh.monitoring.frequency'} | ${40} | ${400} | ${"[request body.wazuh.monitoring.frequency]: Value should be greater or equal than 60."}
     ${'wazuh.monitoring.frequency'} | ${''} | ${400} | ${'[request body.wazuh.monitoring.frequency]: expected value of type [number] but got [string]'}
     ${'wazuh.monitoring.pattern'} | ${'test'} | ${200} | ${null}
+    ${'wazuh.monitoring.pattern'} | ${'test*'} | ${200} | ${null}
     ${'wazuh.monitoring.pattern'} | ${''} | ${400} | ${'[request body.wazuh.monitoring.pattern]: value has length [0] but it must have a minimum length of [1].'}
     ${'wazuh.monitoring.pattern'} | ${true} | ${400} | ${'[request body.wazuh.monitoring.pattern]: expected value of type [string] but got [boolean]'}
+    ${'wazuh.monitoring.pattern'} | ${'-test'} | ${400} | ${"[request body.wazuh.monitoring.pattern]: It can't start with: -, _, +, .."}
+    ${'wazuh.monitoring.pattern'} | ${'_test'} | ${400} | ${"[request body.wazuh.monitoring.pattern]: It can't start with: -, _, +, .."}
+    ${'wazuh.monitoring.pattern'} | ${'+test'} | ${400} | ${"[request body.wazuh.monitoring.pattern]: It can't start with: -, _, +, .."}
+    ${'wazuh.monitoring.pattern'} | ${'.test'} | ${400} | ${"[request body.wazuh.monitoring.pattern]: It can't start with: -, _, +, .."}
+    ${'wazuh.monitoring.pattern'} | ${'test\\'}| ${400} | ${"[request body.wazuh.monitoring.pattern]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #."}
+    ${'wazuh.monitoring.pattern'} | ${'test/'} | ${400} | ${"[request body.wazuh.monitoring.pattern]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #."}
+    ${'wazuh.monitoring.pattern'} | ${'test?'} | ${400} | ${"[request body.wazuh.monitoring.pattern]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #."}
+    ${'wazuh.monitoring.pattern'} | ${'test"'} | ${400} | ${"[request body.wazuh.monitoring.pattern]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #."}
+    ${'wazuh.monitoring.pattern'} | ${'test<'} | ${400} | ${"[request body.wazuh.monitoring.pattern]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #."}
+    ${'wazuh.monitoring.pattern'} | ${'test>'} | ${400} | ${"[request body.wazuh.monitoring.pattern]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #."}
+    ${'wazuh.monitoring.pattern'} | ${'test|'} | ${400} | ${"[request body.wazuh.monitoring.pattern]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #."}
+    ${'wazuh.monitoring.pattern'} | ${'test,'} | ${400} | ${"[request body.wazuh.monitoring.pattern]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #."}
+    ${'wazuh.monitoring.pattern'} | ${'test#'} | ${400} | ${"[request body.wazuh.monitoring.pattern]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #."}
     ${'wazuh.monitoring.replicas'} | ${0} | ${200} | ${null}
     ${'wazuh.monitoring.replicas'} | ${-1} | ${400} | ${"[request body.wazuh.monitoring.replicas]: Value should be greater or equal than 0."}
     ${'wazuh.monitoring.replicas'} | ${'custom'} | ${400} | ${"[request body.wazuh.monitoring.replicas]: expected value of type [number] but got [string]"}

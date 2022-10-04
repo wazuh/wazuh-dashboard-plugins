@@ -12,7 +12,7 @@
 import path from 'path';
 import { version } from '../package.json';
 import { validate as validateNodeCronInterval } from 'node-cron';
-import { composeValidate, validateBooleanIs, validateJSONArrayOfStrings, validateLiteral, validateNumber, validateStringNoEmpty, validateStringNoSpaces } from './services/settings-validate';
+import { composeValidate, validateBooleanIs, validateLiteral, validateNumber, validateStringNoInvalidCharacters, validateStringNoEmpty, validateStringNoLiteral, validateStringNoSpaces, validateStringNoStartWith, validateJSON, validateObjectArray, validateStringIs } from './services/settings-validate';
 
 // Plugin
 export const PLUGIN_VERSION = version;
@@ -479,7 +479,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     isConfigurableFromFile: true,
     isConfigurableFromUI: true,
     requiresRunningHealthCheck: true,
-    validate: composeValidate(validateStringNoEmpty, validateStringNoSpaces),
+    // Validation: https://github.com/elastic/elasticsearch/blob/v7.10.2/docs/reference/indices/create-index.asciidoc
+    validate: composeValidate(
+      validateStringNoEmpty,
+      validateStringNoSpaces,
+      validateStringNoStartWith('-', '_', '+', '.'),
+      validateStringNoInvalidCharacters('\\', '/', '?', '"', '<', '>', '|', ',', '#', '*')
+    ),
 		validateBackend: function(schema){
 			return schema.string({validate: this.validate});
 		},
@@ -684,7 +690,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     defaultValue: WAZUH_STATISTICS_DEFAULT_PREFIX,
     isConfigurableFromFile: true,
     isConfigurableFromUI: true,
-    validate: composeValidate(validateStringNoEmpty, validateStringNoSpaces),
+    // Validation: https://github.com/elastic/elasticsearch/blob/v7.10.2/docs/reference/indices/create-index.asciidoc
+    validate: composeValidate(
+      validateStringNoEmpty,
+      validateStringNoSpaces,
+      validateStringNoStartWith('-', '_', '+', '.'),
+      validateStringNoInvalidCharacters('\\', '/', '?', '"', '<', '>', '|', ',', '#', '*')
+    ),
 		validateBackend: function(schema){
 			return schema.string({validate: this.validate});
 		},
@@ -712,9 +724,18 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
         return value;
       };
     },
-    validate: validateJSONArrayOfStrings,
+    validate: validateJSON(composeValidate(
+      validateObjectArray(composeValidate(
+        validateStringIs,
+        validateStringNoEmpty,
+        validateStringNoSpaces,
+      )),
+    )),
 		validateBackend: function(schema){
-			return schema.arrayOf(schema.string({validate: composeValidate(validateStringNoEmpty, validateStringNoSpaces)}));
+			return schema.arrayOf(schema.string({validate: composeValidate(
+        validateStringNoEmpty,
+        validateStringNoSpaces,
+      )}));
 		},
   },
   "cron.statistics.index.creation": {
@@ -762,7 +783,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     isConfigurableFromFile: true,
     isConfigurableFromUI: true,
     requiresRunningHealthCheck: true,
-    validate: composeValidate(validateStringNoEmpty, validateStringNoSpaces),
+    // Validation: https://github.com/elastic/elasticsearch/blob/v7.10.2/docs/reference/indices/create-index.asciidoc
+    validate: composeValidate(
+      validateStringNoEmpty,
+      validateStringNoSpaces,
+      validateStringNoStartWith('-', '_', '+', '.'),
+      validateStringNoInvalidCharacters('\\', '/', '?', '"', '<', '>', '|', ',', '#', '*')
+    ),
 		validateBackend: function(schema){
 			return schema.string({validate: this.validate});
 		},
@@ -922,9 +949,18 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
         return value;
       };
     },
-    validate: validateJSONArrayOfStrings,
+    validate: validateJSON(composeValidate(
+      validateObjectArray(composeValidate(
+        validateStringIs,
+        validateStringNoEmpty,
+        validateStringNoSpaces,
+      )),
+    )),
 		validateBackend: function(schema){
-			return schema.arrayOf(schema.string({validate: composeValidate(validateStringNoEmpty, validateStringNoSpaces)}));
+			return schema.arrayOf(schema.string({validate: composeValidate(
+        validateStringNoEmpty,
+        validateStringNoSpaces,
+      )}));
 		},
   },
   "enrollment.dns": {
@@ -1313,9 +1349,25 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
         return value;
       };
     },
-    validate: validateJSONArrayOfStrings,
+    // Validation: https://github.com/elastic/elasticsearch/blob/v7.10.2/docs/reference/indices/create-index.asciidoc
+    validate: validateJSON(composeValidate(
+      validateObjectArray(composeValidate(
+        validateStringIs,
+        validateStringNoEmpty,
+        validateStringNoSpaces,
+        validateStringNoLiteral('.', '..'),
+        validateStringNoStartWith('-', '_', '+', '.'),
+        validateStringNoInvalidCharacters('\\', '/', '?', '"', '<', '>', '|', ',', '#')
+      )),
+    )),
 		validateBackend: function(schema){
-			return schema.arrayOf(schema.string({validate: composeValidate(validateStringNoEmpty, validateStringNoSpaces)}));
+			return schema.arrayOf(schema.string({validate: composeValidate(
+        validateStringNoEmpty,
+        validateStringNoSpaces,
+        validateStringNoLiteral('.', '..'),
+        validateStringNoStartWith('-', '_', '+', '.'),
+        validateStringNoInvalidCharacters('\\', '/', '?', '"', '<', '>', '|', ',', '#')
+      )}));
 		},
   },
   "ip.selector": {
@@ -1379,7 +1431,14 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     isConfigurableFromFile: true,
     isConfigurableFromUI: true,
     requiresRunningHealthCheck: true,
-    validate: composeValidate(validateStringNoEmpty, validateStringNoSpaces),
+    // Validation: https://github.com/elastic/elasticsearch/blob/v7.10.2/docs/reference/indices/create-index.asciidoc
+    validate: composeValidate(
+      validateStringNoEmpty,
+      validateStringNoSpaces,
+      validateStringNoLiteral('.', '..'),
+      validateStringNoStartWith('-', '_', '+', '.'),
+      validateStringNoInvalidCharacters('\\', '/', '?', '"', '<', '>', '|', ',', '#')
+    ),
 		validateBackend: function(schema){
 			return schema.string({validate: this.validate});
 		},
@@ -1507,7 +1566,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     isConfigurableFromFile: true,
     isConfigurableFromUI: true,
     requiresRunningHealthCheck: true,
-    validate: composeValidate(validateStringNoEmpty, validateStringNoSpaces),
+    validate: composeValidate(
+      validateStringNoEmpty,
+      validateStringNoSpaces,
+      validateStringNoLiteral('.', '..'),
+      validateStringNoStartWith('-', '_', '+', '.'),
+      validateStringNoInvalidCharacters('\\', '/', '?', '"', '<', '>', '|', ',', '#')
+    ),
 		validateBackend: function(schema){
 			return schema.string({minLength: 1, validate: this.validate});
 		},

@@ -9,6 +9,7 @@ export const composeValidate = (...functions) => value => {
 };
 
 // String
+export const validateStringIs = (value: unknown): string | undefined => typeof value === 'string' ? undefined : "Value is not a string.";
 export const validateStringNoSpaces = (value: string): string | undefined => /^\S*$/.test(value) ? undefined : "It can't contain spaces.";
 export const validateStringNoEmpty = (value: string): string | undefined => {
     if(typeof value === 'string'){
@@ -29,6 +30,12 @@ export const validateStringMultipleLines = (options: {min?: number, max?: number
     };
 };
 
+export const validateStringNoInvalidCharacters = (...invalidCharacters: string[]) => (value: string): string | undefined => invalidCharacters.some(invalidCharacter => value.includes(invalidCharacter)) ? `It can't contain invalid characters: ${invalidCharacters.join(', ')}.` : undefined;
+
+export const validateStringNoStartWith = (...invalidStartingCharacters: string[]) => (value: string): string | undefined => invalidStartingCharacters.some(invalidStartingCharacter => value.startsWith(invalidStartingCharacter)) ? `It can't start with: ${invalidStartingCharacters.join(', ')}.` : undefined;
+
+export const validateStringNoLiteral = (...invalidLiterals: string[]) => (value: string): string | undefined => invalidLiterals.some(invalidLiteral => value === invalidLiteral) ? `It can't be: ${invalidLiterals.join(', ')}.` : undefined;
+
 // Boolean
 export const validateBooleanIs = (value: string): string | undefined => typeof value === 'boolean' ? undefined : "It should be a boolean. Allowed values: true or false.";
 
@@ -43,34 +50,36 @@ export const validateNumber = (options: {min?: number, max?: number} = {}) => (v
 };
 
 // Complex
-export const validateJSONArrayOfStrings = (value: string) => {
-    let parsed;
+export const validateJSON = (validateParsed: (object: any) => string | undefined) => (value: string) => {
+    let jsonObject;
     // Try to parse the string as JSON
     try{
-        parsed = JSON.parse(value);
+        jsonObject = JSON.parse(value);
     }catch(error){
         return "Value can't be parsed. There is some error.";
     };
 
+    return validateParsed ? validateParsed(jsonObject) : undefined;
+};
+
+export const validateObjectArray = (validationElement: (json: any) => string | undefined) => (value: unknown[]) => {
     // Check the JSON is an array
-    if(!Array.isArray(parsed)){
+    if(!Array.isArray(value)){
         return 'Value is not a valid list.';
     };
 
-    // Check the items are strings
-    if(parsed.some(value => typeof value !== 'string')){
-        return 'There is a value that is not a string.';
-    };
-
-    // Check the items are strings
-    for(let element of parsed){
-        const result = validateStringNoEmptyNoSpaces(element);
-        if(result){
-            return result;
+    return validationElement ? value.reduce((accum, elementValue) => {
+        if(accum){
+            return accum;
         };
-    };
-};
 
-export const validateStringNoEmptyNoSpaces = composeValidate(validateStringNoEmpty, validateStringNoSpaces);
+        const resultValidationElement = validationElement(elementValue);
+        if(resultValidationElement){
+            return resultValidationElement;
+        };
+
+        return accum;
+    }, undefined) : undefined;
+};
 
 export const validateLiteral = (literals) => (value: any): string | undefined => literals.includes(value) ? undefined : `Invalid value. Allowed values: ${literals.map(String).join(', ')}`;
