@@ -10,7 +10,7 @@ Then('The agent report is displayed in the table', () => {
   cy.get('@agentId').then(($agentId) => {
     expect($agentId).to.be.eq($agentId);
     const agentID = $agentId;
-    elementTextIncludes(report, "agents-"+agentID);
+    elementTextIncludes(lastCreatedReport, 'agents-' + agentID);
   });
 });
 
