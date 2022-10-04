@@ -10,10 +10,15 @@ x-logging: &logging
 services:
   generator:
     image: cfssl/cfssl
+    profiles:
+      - "saml"
+      - "standard"
+    <<: *logging
     volumes:
       - wi_certs:/certs/wi
       - wd_certs:/certs/wd
       - wm_certs:/certs/wm
+      - idp_certs:/certs/idp
       - ./config/certs:/conf
     entrypoint: /bin/bash
     command: >
@@ -40,7 +45,7 @@ services:
         	done
 
         	echo "Generating clients certificates"
-          	for i in admin filebeat; do
+          	for i in admin saml filebeat; do
           		echo "Generating cert for $$i"
         		cat /conf/host.json | \
         		sed "s/HOST/$$i/g" | \
@@ -61,6 +66,10 @@ services:
             mv $$certs/admin* /certs/wi
             mv /certs/wi/admin.key /certs/wi/admin-key.pem
             cp $$certs/*ca* /certs/wi
+
+            mv $$certs/saml* /certs/idp
+            mv /certs/idp/saml.key /certs/idp/saml-key.pem
+            cp $$certs/*ca* /certs/idp
 
             mv $$certs/wazuh.dashboard* /certs/wd
             cp $$certs/*ca* /certs/wd
@@ -84,12 +93,14 @@ services:
       generator:
         condition: service_healthy
     image: wazuh/wazuh-manager:${WAZUH_STACK}
+    profiles:
+      - "saml"
+      - "standard"
     hostname: wazuh.manager
     networks:
       - wz-rel
       - mon
     <<: *logging
-    # restart: always
     environment:
       - INDEXER_URL=https://wazuh.indexer:9200
       - INDEXER_USERNAME=admin
@@ -120,12 +131,14 @@ services:
       generator:
         condition: service_healthy
     image: wazuh/wazuh-indexer:${WAZUH_STACK}
+    profiles:
+      - "saml"
+      - "standard"
     hostname: wazuh.indexer
     networks:
       - wz-rel
       - mon
     <<: *logging
-    # restart: always
     environment:
       - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
       - "OPENSEARCH_PATH_CONF=/usr/share/wazuh-indexer/config"
@@ -139,8 +152,10 @@ services:
     volumes:
       - wazuh-indexer-data:/var/lib/wazuh-indexer
       - wi_certs:/usr/share/wazuh-indexer/config/certs/
+      - idp_certs:/usr/share/wazuh-indexer/config/idp/
       - ./config/wazuh_indexer/wazuh.indexer.yml:/usr/share/wazuh-indexer/config/opensearch.yml
       - ./config/wazuh_indexer/internal_users.yml:/usr/share/wazuh-indexer/plugins/opensearch-security/securityconfig/internal_users.yml
+      - ./config/wazuh_indexer/config.yml:/usr/share/wazuh-indexer/plugins/opensearch-security/securityconfig/config.yml
     healthcheck:
       test:
         [
@@ -153,6 +168,9 @@ services:
 
   wazuh.dashboard:
     image: wazuh/wazuh-dashboard:${WAZUH_STACK}
+    profiles:
+      - "saml"
+      - "standard"
     hostname: wazuh.dashboard
     depends_on:
       wazuh.indexer:
@@ -161,7 +179,6 @@ services:
       - wz-rel
       - mon
     <<: *logging
-    # restart: always
     ports:
       - ${KIBANA_PORT}:5601
     environment:
@@ -172,11 +189,14 @@ services:
       - API_PASSWORD=MyS3cr37P450r.*-
     volumes:
       - wd_certs:/usr/share/wazuh-dashboard/certs
-      - ./config/wazuh_dashboard/opensearch_dashboards.yml:/usr/share/wazuh-dashboard/config/opensearch_dashboards.yml
+      - ${WAZUH_DASHBOARD_CONF}:/usr/share/wazuh-dashboard/config/opensearch_dashboards.yml
       - ./config/wazuh_dashboard/wazuh.yml:/usr/share/wazuh-dashboard/data/wazuh/config/wazuh.yml
 
   exporter:
     image: quay.io/prometheuscommunity/elasticsearch-exporter:latest
+    profiles:
+      - "saml"
+      - "standard"
     <<: *logging
     hostname: "exporter"
     networks:
@@ -186,6 +206,25 @@ services:
       - '--es.uri=https://admin:${KIBANA_PASSWORD}@wazuh-indexer:9200'
       - '--es.ssl-skip-verify'
       - '--es.all'
+
+  idp:
+    image: quay.io/keycloak/keycloak:19.0.1
+    profiles:
+      - "saml"
+    hostname: idp
+    <<: *logging
+    networks:
+      - wz-rel
+      - mon
+    ports:
+      - "8080:8080"
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+    volumes:
+      - keycloak-data:/var/lib/keycloak/data
+      - idp_certs:/certs
+    command: start-dev
 
 networks:
   networks:
@@ -199,6 +238,7 @@ volumes:
   wi_certs:
   wd_certs:
   wm_certs:
+  idp_certs:
   wazuh_api_configuration:
   wazuh_etc:
   wazuh_logs:
@@ -211,4 +251,4 @@ volumes:
   filebeat_etc:
   filebeat_var:
   wazuh-indexer-data:
-
+  keycloak-data:

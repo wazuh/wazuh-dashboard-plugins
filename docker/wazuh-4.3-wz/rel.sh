@@ -9,7 +9,7 @@ versions=(
 	"4.3.5"
 	"4.3.6"
 	"4.3.7"
-  "4.3.8"
+	"4.3.8"
 )
 
 usage() {
@@ -21,7 +21,7 @@ usage() {
 	exit -1
 }
 
-if [ $# -ne	2 ]
+if [ $# -lt	2 ]
   then
   	echo "Incorrect number of arguments " $#
     usage
@@ -38,17 +38,30 @@ export KIBANA_PORT=5601
 export KIBANA_PASSWORD=${PASSWORD:-SecretPassword}
 export COMPOSE_PROJECT_NAME=wz-rel-${WAZUH_STACK//./}
 
+profile="standard"
+export WAZUH_DASHBOARD_CONF=./config/wazuh_dashboard/wazuh_dashboard.yml
+
+if [[ "$3" =~ "saml" ]]
+then
+	profile="saml"
+	export WAZUH_DASHBOARD_CONF=./config/wazuh_dashboard/wazuh_dashboard_saml.yml
+fi
+
 case "$2" in
 	up)
 		# recreate volumes
-		docker compose -f rel.yml up -Vd
+		docker compose --profile $profile -f rel.yml up -Vd
+		if [[ "${profile}" =~ "saml" ]]
+		then
+			./enable_saml.sh ${COMPOSE_PROJECT_NAME}
+		fi
 		;;
 	down)
 		# delete volumes
-		docker compose -f rel.yml down -v --remove-orphans
+		docker compose --profile $profile -f rel.yml down -v --remove-orphans
 		;;
 	stop)
-		docker compose -f rel.yml -p ${COMPOSE_PROJECT_NAME} stop
+		docker compose --profile $profile -f rel.yml -p ${COMPOSE_PROJECT_NAME} stop
 		;;
 	*)
 		echo "Action must be either up or down"
