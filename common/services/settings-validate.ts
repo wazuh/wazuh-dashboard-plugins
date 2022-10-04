@@ -82,4 +82,4 @@ export const validateObjectArray = (validationElement: (json: any) => string | u
     }, undefined) : undefined;
 };
 
-export const validateLiteral = (literals) => (value: any): string | undefined => literals.includes(value) ? undefined : `Invalid value. Allowed values: ${literals.map(String).join(', ')}`;
+export const validateLiteral = (literals) => (value: any): string | undefined => literals.includes(value) ? undefined : `Invalid value. Allowed values: ${literals.map(String).join(', ')}.`;

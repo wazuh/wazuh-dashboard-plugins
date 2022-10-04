@@ -237,7 +237,6 @@ hosts:
     ${'cron.statistics.index.replicas'} | ${'custom'} | ${400} | ${"[request body.cron.statistics.index.replicas]: expected value of type [number] but got [string]"}
     ${'cron.statistics.index.shards'} | ${1} | ${200} | ${null}
     ${'cron.statistics.index.shards'} | ${-1} | ${400} | ${"[request body.cron.statistics.index.shards]: Value should be greater or equal than 1."}
-    ${'cron.statistics.index.shards'} | ${-1} | ${400} | ${"[request body.cron.statistics.index.shards]: Value should be greater or equal than 1."}
     ${'cron.statistics.interval'} | ${'0 */5 * * * *'} | ${200} | ${null}
     ${'cron.statistics.interval'} | ${'0 */5 * * *'} | ${200} | ${null}
     ${'cron.statistics.interval'} | ${'custom'} | ${400} | ${"[request body.cron.statistics.interval]: Interval is not valid."}
@@ -284,7 +283,7 @@ hosts:
     ${'ip.ignore'} | ${['test*']} | ${200} | ${null}
     ${'ip.ignore'} | ${['']} | ${400} | ${'[request body.ip.ignore.0]: Value can not be empty.'}
     ${'ip.ignore'} | ${['test space']} | ${400} | ${"[request body.ip.ignore.0]: It can't contain spaces."}
-    ${'ip.ignore'} | ${true} | ${400} | ${"[request body.ip.ignore.0]: It can't contain spaces."}
+    ${'ip.ignore'} | ${true} | ${400} | ${"[request body.ip.ignore]: expected value of type [array] but got [boolean]"}
     ${'ip.ignore'} | ${['-test']} | ${400} | ${"[request body.ip.ignore.0]: It can't start with: -, _, +, .."}
     ${'ip.ignore'} | ${['_test']} | ${400} | ${"[request body.ip.ignore.0]: It can't start with: -, _, +, .."}
     ${'ip.ignore'} | ${['+test']} | ${400} | ${"[request body.ip.ignore.0]: It can't start with: -, _, +, .."}
@@ -298,7 +297,7 @@ hosts:
     ${'ip.ignore'} | ${['test|']} | ${400} | ${"[request body.ip.ignore.0]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #."}
     ${'ip.ignore'} | ${['test,']} | ${400} | ${"[request body.ip.ignore.0]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #."}
     ${'ip.ignore'} | ${['test#']} | ${400} | ${"[request body.ip.ignore.0]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #."}
-    ${'ip.ignore'} | ${['test', 'test#']} | ${400} | ${"[request body.ip.ignore.1]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #, *."}
+    ${'ip.ignore'} | ${['test', 'test#']} | ${400} | ${"[request body.ip.ignore.1]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #."}
     ${'ip.selector'} | ${true} | ${200} | ${null}
     ${'ip.selector'} | ${''} | ${400} | ${'[request body.ip.selector]: expected value of type [boolean] but got [string]'}
     ${'logs.level'} | ${'info'} | ${200} | ${null}
