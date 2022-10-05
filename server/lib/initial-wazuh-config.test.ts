@@ -43,7 +43,7 @@ describe('[configuration-file] Default configuration file content', () => {
 describe('[configuration-file] Methods', () => {
 
 	it.each`
-	text | options 
+	text      | options 
 	${'Test'} | ${{}}
 	${'Test'} | ${{ maxLength: 60, prefix: '# '}}
 	${'Test'} | ${{ maxLength: 60, fill: '-', prefix: '# '}}
@@ -56,8 +56,8 @@ describe('[configuration-file] Methods', () => {
 	});
 
 	it.each`
-	input | expected 
-	${{title: 'Test', description: 'Test description'}} | ${'# ------------------------------------ Test ------------------------------------\n#\n# Test description'}
+	input                                                 | expected 
+	${{title: 'Test', description: 'Test description'}}   | ${'# ------------------------------------ Test ------------------------------------\n#\n# Test description'}
 	${{title: 'Test 2', description: 'Test description'}} | ${'# ----------------------------------- Test 2 -----------------------------------\n#\n# Test description'}
 	${{title: 'Test 2', description: 'Test description'}} | ${'# ----------------------------------- Test 2 -----------------------------------\n#\n# Test description'}
 	`('printSettingValue: input: $input , expected: $expected', ({input, expected}) => {
@@ -65,25 +65,39 @@ describe('[configuration-file] Methods', () => {
 		expect(result).toBe(expected);
 	});
 
-	it.each`
-	input | expected
-	${{key: 'test', description: 'Test description', defaultValue: 0}} | ${'# Test description\n# test: 0'}
-	${{key: 'test', description: 'Test description. Test description. Test description. Test description. Test description. Test description. Test description. Test description. Test description. Test description. Test description. ', defaultValue: 0}}  | ${'# Test description. Test description. Test description. Test description. Test\n# description. Test description. Test description. Test description. Test\n# description. Test description. Test description.\n# test: 0'}
-	${{key: 'test', description: 'Test description', defaultValue: 0, options: {select: [{text: 'Option1', value: 'option'},{text: 'Option2', value: 'option2'}]}}} | ${'# Test description Allowed values: option (Option1), option2 (Option2).\n# test: 0'}
-	${{key: 'test', description: 'Test description', defaultValue: 0, options: {switch: {values: { disabled: {label: 'Enabled', value: 'disabled'}, enabled: {label: 'Enabled', value: 'enabled'}, }}}}} | ${'# Test description Allowed values: enabled (Enabled), disabled (Enabled).\n# test: 0'}
-	`('printSetting: input: $input , expected: $expected', ({input, expected}) => {
+	it.each(
+		[
+			{
+				input: {key: 'test', description: 'Test description', defaultValue: 0},
+				expected: '# Test description\n# test: 0'
+			},
+			{
+				input: {key: 'test', description: 'Test description. Test description. Test description. Test description. Test description. Test description. Test description. Test description. Test description. Test description. Test description. ', defaultValue: 0},
+				expected: '# Test description. Test description. Test description. Test description. Test\n# description. Test description. Test description. Test description. Test\n# description. Test description. Test description.\n# test: 0'
+			},
+			{
+				input: {key: 'test', description: 'Test description', defaultValue: 0, options: {select: [{text: 'Option1', value: 'option'},{text: 'Option2', value: 'option2'}]}},
+				expected: '# Test description Allowed values: option (Option1), option2 (Option2).\n# test: 0'
+			},
+			{
+				input: {key: 'test', description: 'Test description', defaultValue: 0, options: {switch: {values: { disabled: {label: 'Enabled', value: 'disabled'}, enabled: {label: 'Enabled', value: 'enabled'}, }}}},
+				expected: '# Test description Allowed values: enabled (Enabled), disabled (Enabled).\n# test: 0'
+			}
+	
+		]
+	)('printSetting: input: $input , expected: $expected', ({input, expected}) => {
 		const result = printSetting(input);
 		expect(result).toMatch(expected);
 	});
 
 	it.each`
-	input | expected 
-	${4} | ${4}
-	${''} | ${"''"}
-	${'test'} | ${'test'}
+	input             | expected 
+	${4}              | ${4}
+	${''}             | ${"''"}
+	${'test'}         | ${'test'}
 	${{key: 'value'}} | ${'{\"key\":\"value\"}'}
-	${[]} | ${"[]"}
-	${''} | ${"''"}
+	${[]}             | ${"[]"}
+	${''}             | ${"''"}
 	`('printSettingValue: input: $input , expected: $expected', ({input, expected}) => {
 		expect(printSettingValue(input)).toBe(expected);
 	});
