@@ -68,6 +68,13 @@ Then simply run the script with the `saml` flag, as follows:
 ```bash
 ./rel.sh 1.13.2 4.3.8 saml up
 ```
+####  IdP credentials
+
+The default user and password to access the UI via Keycloak are:
+
+```
+wazuh:wazuh
+```
 
 ### Install a compatible Wazuh app
 
