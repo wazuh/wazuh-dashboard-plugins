@@ -131,8 +131,8 @@ hosts:
   });
 
   it.each`
-    settings | responseStatusCode
-    ${{pattern: 'test-alerts-groupA-*'}} | ${200}
+    settings                                                   | responseStatusCode
+    ${{pattern: 'test-alerts-groupA-*'}}                       | ${200}
     ${{pattern: 'test-alerts-groupA-*','logs.level': 'debug'}} | ${200}
   `(`Update the plugin configuration: $settings. PUT /utils/configuration - $responseStatusCode`, async ({responseStatusCode, settings}) => {
     const response = await supertest(innerServer.listener)
