@@ -112,7 +112,7 @@ const versionButtonAmazonLinux = [
     label: 'Amazon Linux 1',
   },
   {
-    id: 'amazonlinu2',
+    id: 'amazonlinux2',
     label: 'Amazon Linux 2',
   },
   {
