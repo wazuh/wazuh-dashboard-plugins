@@ -28,6 +28,7 @@ exports[`[component] InputForm Renders correctly to match the snapshot with vali
         >
           <input
             class="euiFieldNumber euiFieldNumber--fullWidth"
+            min="5"
             type="number"
             value="4"
           />
@@ -121,7 +122,7 @@ exports[`[component] InputForm Renders correctly to match the snapshot with vali
 </div>
 `;
 
-exports[`[component] InputForm Renders correctly to match the snapshot. Input: editor 1`] = `
+exports[`[component] InputForm Renders correctly to match the snapshot: Input: editor 1`] = `
 <div>
   <div
     class="euiCodeEditorWrapper"
@@ -239,7 +240,7 @@ exports[`[component] InputForm Renders correctly to match the snapshot. Input: e
 </div>
 `;
 
-exports[`[component] InputForm Renders correctly to match the snapshot. Input: number 1`] = `
+exports[`[component] InputForm Renders correctly to match the snapshot: Input: number 1`] = `
 <div>
   <div
     class="euiFormControlLayout euiFormControlLayout--fullWidth"
@@ -257,7 +258,7 @@ exports[`[component] InputForm Renders correctly to match the snapshot. Input: n
 </div>
 `;
 
-exports[`[component] InputForm Renders correctly to match the snapshot. Input: select 1`] = `
+exports[`[component] InputForm Renders correctly to match the snapshot: Input: select 1`] = `
 <div>
   <div
     class="euiFormControlLayout"
@@ -302,7 +303,7 @@ exports[`[component] InputForm Renders correctly to match the snapshot. Input: s
 </div>
 `;
 
-exports[`[component] InputForm Renders correctly to match the snapshot. Input: switch 1`] = `
+exports[`[component] InputForm Renders correctly to match the snapshot: Input: switch 1`] = `
 <div>
   <div
     class="euiSwitch"
@@ -357,7 +358,7 @@ exports[`[component] InputForm Renders correctly to match the snapshot. Input: s
 </div>
 `;
 
-exports[`[component] InputForm Renders correctly to match the snapshot. Input: text 1`] = `
+exports[`[component] InputForm Renders correctly to match the snapshot: Input: text 1`] = `
 <div>
   <div
     class="euiFormControlLayout euiFormControlLayout--fullWidth"
