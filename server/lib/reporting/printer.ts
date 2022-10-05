@@ -12,7 +12,6 @@ import * as TimSort from 'timsort';
 import { getConfiguration } from '../get-configuration';
 import { REPORTS_PRIMARY_COLOR} from '../../../common/constants';
 import { getSettingDefaultValue } from '../../../common/services/settings';
-import { try } from 'bluebird';
 
 const COLORS = {
   PRIMARY: REPORTS_PRIMARY_COLOR
