@@ -12,6 +12,7 @@ import * as TimSort from 'timsort';
 import { getConfiguration } from '../get-configuration';
 import { REPORTS_PRIMARY_COLOR} from '../../../common/constants';
 import { getSettingDefaultValue } from '../../../common/services/settings';
+import { try } from 'bluebird';
 
 const COLORS = {
   PRIMARY: REPORTS_PRIMARY_COLOR
@@ -474,7 +475,7 @@ export class ReportPrinter{
       this.addContent(typeof title === 'string' ? { text: title, style: 'h4' } : title)
         .addNewLine();
     }
-  
+
     if (!items || !items.length) {
       this.addContent({
         text: 'No results match your search criteria',
@@ -495,23 +496,23 @@ export class ReportPrinter{
           style: 'standard'
         }
       })
-    }); 
+    });
 
     // 385 is the max initial width per column
     let totalLength = columns.length - 1;
     const widthColumn = 385/totalLength;
     let totalWidth = totalLength * widthColumn;
-    
+
     const widths:(number)[] = [];
-    
+
     for (let step = 0; step < columns.length - 1; step++) {
 
       let columnLength = this.getColumnWidth(columns[step], tableRows, step);
-      
+
       if (columnLength <= Math.round(totalWidth / totalLength)) {
         widths.push(columnLength);
         totalWidth -= columnLength;
-      } 
+      }
       else {
         widths.push(Math.round(totalWidth / totalLength));
         totalWidth -= Math.round((totalWidth / totalLength));
@@ -519,7 +520,7 @@ export class ReportPrinter{
       totalLength--;
     }
     widths.push('*');
-  
+
     this.addContent({
       fontSize: 8,
       table: {
@@ -563,9 +564,9 @@ export class ReportPrinter{
       `agents: ${agents}`,
       'debug'
     );
-    
+
     this.addNewLine();
-    
+
     this.addContent({
       text:
         'NOTE: This report only includes the authorized agents of the user who generated the report',
@@ -614,26 +615,36 @@ export class ReportPrinter{
     );
   }
 
-  async print(reportPath: string){
-    const configuration = await getConfiguration();
-    
-    const pathToLogo = configuration['customization.logo.reports'] || getSettingDefaultValue('customization.logo.reports');
-    const pageHeader = configuration['customization.reports.header'] || getSettingDefaultValue('customization.reports.header');
-    const pageFooter = configuration['customization.reports.footer'] || getSettingDefaultValue('customization.reports.footer');
+  async print(reportPath: string) {
+    return new Promise((resolve, reject) => {
+      try {
+        const configuration = getConfiguration();
 
-    const document = this._printer.createPdfKitDocument({...pageConfiguration({pathToLogo, pageHeader, pageFooter}), content: this._content});
-    await document.pipe(
-      fs.createWriteStream(reportPath)
-    );
-    document.end();
+        const pathToLogo = configuration['customization.logo.reports'] || getSettingDefaultValue('customization.logo.reports');
+        const pageHeader = configuration['customization.reports.header'] || getSettingDefaultValue('customization.reports.header');
+        const pageFooter = configuration['customization.reports.footer'] || getSettingDefaultValue('customization.reports.footer');
+
+        const document = this._printer.createPdfKitDocument({ ...pageConfiguration({ pathToLogo, pageHeader, pageFooter }), content: this._content });
+
+        document.on('error', reject);
+        document.on('end', resolve);
+
+        document.pipe(
+          fs.createWriteStream(reportPath)
+        );
+        document.end();
+      } catch (ex) {
+        reject(ex);
+      }
+    });
   }
 
   /**
    * Returns the width of a given column
-   * 
-   * @param column 
-   * @param tableRows 
-   * @param step 
+   *
+   * @param column
+   * @param tableRows
+   * @param step
    * @returns {number}
    */
   getColumnWidth(column, tableRows, index){
