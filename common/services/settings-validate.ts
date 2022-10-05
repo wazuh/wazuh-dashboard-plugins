@@ -91,7 +91,7 @@ export const validateFilePickerSupportedExtensions = (extensions: string[]) => (
         return;
     }
     if(!extensions.includes(path.extname(options.name))){
-        return `File extension is invalid. Allowed file extensions: ${extensions.join(', ')}`
+        return `File extension is invalid. Allowed file extensions: ${extensions.join(', ')}.`;
     };
 };
 
