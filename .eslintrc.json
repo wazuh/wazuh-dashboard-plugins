@@ -21,11 +21,17 @@
     "ecmaVersion": "latest",
     "sourceType": "module"
   },
-  "plugins": ["react", "react-hooks", "@typescript-eslint", "prettier"],
+  "plugins": [
+    "react",
+    "react-hooks",
+    "@typescript-eslint",
+    "prettier",
+    "filenames-simple"
+  ],
   "settings": {
     "import/resolver": {
       "typescript": {}
-    },
+    }
   },
   "ignorePatterns": [
     "node_modules/",
@@ -34,6 +40,7 @@
     "public/utils/jquery-ui.js"
   ],
   "rules": {
+    "filenames-simple/naming-convention": "error",
     "indent": ["error", 2, { "SwitchCase": 1 }],
     "quotes": ["error", "single"],
     "semi": ["error", "always"],
