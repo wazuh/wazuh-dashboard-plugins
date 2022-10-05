@@ -372,6 +372,9 @@ export const PLUGIN_PLATFORM_REQUEST_HEADERS = {
   'kbn-xsrf': 'kibana'
 };
 
+// Plugin app
+export const PLUGIN_APP_NAME = 'Wazuh App';
+
 // UI
 export const API_NAME_AGENT_STATUS = {
   ACTIVE: 'active',
