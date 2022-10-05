@@ -9,15 +9,15 @@ import { WazuhUtilsRoutes } from './wazuh-utils';
 import { WazuhReportingRoutes } from './wazuh-reporting';
 import { WazuhUtilsCtrl } from '../controllers/wazuh-utils/wazuh-utils';
 import md5 from 'md5';
-
-
+import path from 'path';
 import { createDataDirectoryIfNotExists, createDirectoryIfNotExists } from '../lib/filesystem';
 import {
   WAZUH_DATA_CONFIG_APP_PATH,
   WAZUH_DATA_CONFIG_DIRECTORY_PATH,
   WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH,
   WAZUH_DATA_LOGS_DIRECTORY_PATH,
-  WAZUH_DATA_ABSOLUTE_PATH
+  WAZUH_DATA_ABSOLUTE_PATH,
+  WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH
 } from '../../common/constants';
 import { execSync } from 'child_process';
 import fs from 'fs';
@@ -98,6 +98,54 @@ afterAll(async () => {
 
   // Remove <PLUGIN_PLATFORM_PATH>/data/wazuh directory.
   execSync(`rm -rf ${WAZUH_DATA_ABSOLUTE_PATH}`);
+});
+
+describe('[endpoint] GET /reports', () => {
+  const directories = [
+    { username: 'admin', files: 0 },
+    { username: '../../etc', files: 1 },
+  ];
+  beforeAll(() => {
+    // Create <PLUGIN_PLATFORM_PATH>/data/wazuh directory.
+    createDataDirectoryIfNotExists();
+
+    // Create <PLUGIN_PLATFORM_PATH>/data/wazuh/config directory.
+    createDirectoryIfNotExists(WAZUH_DATA_CONFIG_DIRECTORY_PATH);
+
+    // Create <PLUGIN_PLATFORM_PATH>/data/wazuh/logs directory.
+    createDirectoryIfNotExists(WAZUH_DATA_LOGS_DIRECTORY_PATH);
+
+    // Create <PLUGIN_PLATFORM_PATH>/data/wazuh/downloads directory.
+    createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
+    
+    // Create <PLUGIN_PLATFORM_PATH>/data/wazuh/downloads/reports directory.
+    createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH);
+
+    // Create directories and file/s within directory.
+    directories.forEach(({ username, files }) => {
+      const hashUsername = md5(username);
+      createDirectoryIfNotExists(path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, hashUsername));
+      if (files) {
+        Array.from(Array(files).keys()).forEach(indexFile => {
+          console.log('Generating', username, indexFile)
+          fs.closeSync(fs.openSync(path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, hashUsername, `report_${indexFile}.pdf`), 'w'));
+        });
+      }
+    });
+  });
+
+  afterAll(async () => {
+    // Remove <PLUGIN_PLATFORM_PATH>/data/wazuh/downloads directory.
+    execSync(`rm -rf ${WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH}`);
+  });
+
+  it.each(directories)('get reports of $username. status response: $responseStatus', async ({ username, files }) => {      
+    const response = await supertest(innerServer.listener)
+      .get(`/reports`)
+      .set('x-test-username', username)
+      .expect(200);
+    expect(response.body.reports).toHaveLength(files);
+  });
 });
 
 describe('[endpoint] PUT /utils/configuration', () => {
