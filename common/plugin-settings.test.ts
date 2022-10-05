@@ -89,6 +89,7 @@ describe('[settings] Input validation', () => {
     ${'cron.statistics.interval'}       | ${true}                           | ${"Interval is not valid."}
     ${'cron.statistics.status'}         | ${true}                           | ${undefined}
     ${'cron.statistics.status'}         | ${0}                              | ${'It should be a boolean. Allowed values: true or false.'}
+    ${'customization.enabled'}          | ${true}                           | ${undefined}
     ${'customization.reports.footer'}   | ${'Test'}                         | ${undefined}
     ${'customization.reports.footer'}   | ${'Test\nTest'}                   | ${undefined}
     ${'customization.reports.footer'}   | ${'Test\nTest\nTest\nTest\nTest'} | ${"The string should have less or equal to 2 line/s."}
