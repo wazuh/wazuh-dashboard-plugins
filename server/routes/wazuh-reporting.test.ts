@@ -149,7 +149,7 @@ describe('[endpoint] GET /reports', () => {
 });
 
 describe('[endpoint] PUT /utils/configuration', () => {
-  beforeAll(() => {
+  beforeEach(() => {
     // Create the configuration file with custom content
     const fileContent = `---
   pattern: test-alerts-*
@@ -166,20 +166,24 @@ describe('[endpoint] PUT /utils/configuration', () => {
     fs.writeFileSync(WAZUH_DATA_CONFIG_APP_PATH, fileContent, 'utf8');
   });
 
-  afterAll(() => {
+  afterEach(() => {
     // Remove the configuration file
     fs.unlinkSync(WAZUH_DATA_CONFIG_APP_PATH);
   });
 
   // expectedMD5 variable is a verified md5 of a report generated with this header and footer
-  // if any of the parameters is changed this variable should be updated with the new md5
+  // If any of the parameters is changed this variable should be updated with the new md5
   it.each`
-  footer | header | responseStatusCode | expectedMD5
-  ${'Custom\nFooter'} | ${'info@company.com\nFake Avenue 123'}| ${200} | ${'0acbd4ee321699791b080b45c11dfe2b'}
-`(`Set custom report header and footer - Verify PDF output`, async ({footer, header, responseStatusCode, expectedMD5}) => {
+  footer | header | responseStatusCode | expectedMD5 | tab
+  ${null} | ${null} | ${200} | ${'1bdc0cc05cc79fdfbb9b734a4e1cc07b'} | ${'pm'}
+  ${'Custom\nFooter'} | ${'info@company.com\nFake Avenue 123'}| ${200} | ${'0acbd4ee321699791b080b45c11dfe2b'} | ${'general'}
+  ${''} | ${''} | ${200} | ${'5f9e16540e9d8109bed75b2a8f825164'} | ${'fim'}
+  ${'Custom Footer'} | ${null} | ${200} | ${'5bd4c559419028fd0d282c5e8408ecff'} | ${'aws'}
+  ${null} | ${'Custom Header'} | ${200} | ${'f6bfca395bc3fc78105f66120f336443'} | ${'gcp'}
+`(`Set custom report header and footer - Verify PDF output`, async ({footer, header, responseStatusCode, expectedMD5, tab}) => {
 
       // Mock PDF report parameters
-      const reportBody = { "array": [], "filters": [], "time": { "from": '2022-10-01T09:59:40.825Z', "to": '2022-10-04T09:59:40.825Z' }, "searchBar": "", "tables": [], "tab": "general", "section": "overview", "agents": false, "browserTimezone": "Europe/Madrid", "indexPatternTitle": "wazuh-alerts-*", "apiId": "default" };
+      const reportBody = { "array": [], "filters": [], "time": { "from": '2022-10-01T09:59:40.825Z', "to": '2022-10-04T09:59:40.825Z' }, "searchBar": "", "tables": [], "tab": tab, "section": "overview", "agents": false, "browserTimezone": "Europe/Madrid", "indexPatternTitle": "wazuh-alerts-*", "apiId": "default" };
 
       // Define custom configuration
       const configurationBody = {};
@@ -206,8 +210,9 @@ describe('[endpoint] PUT /utils/configuration', () => {
         }
       }
 
+      // Generate PDF report
       const responseReport = await supertest(innerServer.listener)
-        .post(`/reports/modules/general`)
+        .post(`/reports/modules/${tab}`)
         .set('x-test-username', USER_NAME)
         .send(reportBody)
         .expect(200);
