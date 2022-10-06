@@ -80,5 +80,6 @@ beforeEach(() => {
          navigate("/");
          cy.get('nav #selectAPIBar').select('mock');
      }
+     
 
 })

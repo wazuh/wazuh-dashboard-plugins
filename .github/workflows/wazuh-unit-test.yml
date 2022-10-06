@@ -4,17 +4,15 @@
 name: Wazuh Unit Tests
 
 on:
-  push:
-    branches:
-      - 'disable'
   pull_request:
     branches:
-      - '4.3-7.10'
+      - '*.*-*.*'
+      - '*.*-*.*-wzd'
 
 jobs:
   setup-wazuh-app:
     name: Run setup environment wazuh app
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     env:
       NODE_10-23-1: '10.23.1'
       NODE_12-22-3: '12.22.3'

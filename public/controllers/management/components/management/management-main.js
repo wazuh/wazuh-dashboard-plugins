@@ -13,8 +13,10 @@ import React, { Component, Fragment } from 'react';
 // Redux
 import store from '../../../../redux/store';
 
-import { updateRulesetSection } from '../../../../redux/actions/rulesetActions';
+import { updateManagementSection } from '../../../../redux/actions/managementActions';
 import WzRuleset from './ruleset/main-ruleset';
+import WzCDBLists from './cdblists/main-cdblists';
+import WzDecoders from './decoders/main-decoders';
 import WzGroups from './groups/groups-main';
 import WzStatus from './status/status-main';
 import WzLogs from './mg-logs/logs';
@@ -24,6 +26,11 @@ import WzStatistics from './statistics/statistics-main';
 import { connect } from 'react-redux';
 import { clusterReq } from './configuration/utils/wz-fetch';
 import { updateClusterStatus } from '../../../../redux/actions/appStateActions';
+import {
+  SECTION_CDBLIST_SECTION,
+  SECTION_DECODERS_SECTION,
+  SECTION_RULES_SECTION
+} from './common/constants';
 
 class WzManagementMain extends Component {
   constructor(props) {
@@ -32,11 +39,11 @@ class WzManagementMain extends Component {
     this.store = store;
   }
   UNSAFE_componentWillMount() {
-    this.props.updateRulesetSection(this.props.section);
+    this.props.updateManagementSection(this.props.section);
   }
 
   componentWillUnmount() {
-    store.dispatch(updateRulesetSection(''));
+    store.dispatch(updateManagementSection(''));
   }
 
   componentDidMount() {
@@ -68,7 +75,6 @@ class WzManagementMain extends Component {
 
   render() {
     const { section } = this.props;
-    const ruleset = ['ruleset', 'rules', 'decoders', 'lists'];
     return (
       <Fragment>
         {(section === 'groups' && <WzGroups {...this.props} />) ||
@@ -77,7 +83,15 @@ class WzManagementMain extends Component {
           (section === 'statistics' && <WzStatistics />) ||
           (section === 'logs' && <WzLogs />) ||
           (section === 'configuration' && <WzConfiguration {...this.props.configurationProps} />) ||
-          (ruleset.includes(section) && (
+          (section === SECTION_DECODERS_SECTION && <WzDecoders
+            logtestProps={this.props.logtestProps}
+            clusterStatus={this.props.clusterStatus}
+          />) ||
+          (section === SECTION_CDBLIST_SECTION && <WzCDBLists
+            logtestProps={this.props.logtestProps}
+            clusterStatus={this.props.clusterStatus}
+          />) ||
+          (['ruleset', SECTION_RULES_SECTION].includes(section) && (
             <WzRuleset
               logtestProps={this.props.logtestProps}
               clusterStatus={this.props.clusterStatus}
@@ -97,7 +111,7 @@ function mapStateToProps(state) {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    updateRulesetSection: (section) => dispatch(updateRulesetSection(section)),
+    updateManagementSection: (section) => dispatch(updateManagementSection(section)),
     updateClusterStatus: (clusterStatus) => dispatch(updateClusterStatus(clusterStatus)),
   };
 };
