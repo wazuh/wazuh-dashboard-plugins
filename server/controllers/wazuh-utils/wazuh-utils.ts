@@ -91,7 +91,7 @@ export class WazuhUtilsCtrl {
 
       return response.ok({
         body: {
-          data: { requiresRunningHealthCheck, requiresReloadingBrowserTab, requiresRestartingPluginPlatform, updatedConfiguration: request.body }
+          data: { requiresRunningHealthCheck, requiresReloadingBrowserTab, requiresRestartingPluginPlatform, updatedConfiguration: pluginSettingsConfigurableFile }
         }
       });
     },

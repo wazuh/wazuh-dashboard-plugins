@@ -454,7 +454,7 @@ hosts:
     ${'customization.logo.sidebar'} | ${'fixture_image_small.png'} | ${200} | ${null}
     ${'customization.logo.sidebar'} | ${'fixture_image_small.svg'} | ${200} | ${null}
     ${'customization.logo.sidebar'} | ${'fixture_image_big.png'} | ${413} | ${'Payload content length greater than maximum allowed: 1048576'}
-  `(`$setting: $filename - PUT /utils/configuration - $responseStatusCode`, async ({responseBodyMessage, responseStatusCode, setting, filename}) => {
+  `(`$setting: $filename - PUT /utils/configuration/files/{key} - $responseStatusCode`, async ({responseBodyMessage, responseStatusCode, setting, filename}) => {
     const filePath = path.join(__dirname, 'fixtures', filename);
     const extension = path.extname(filename);
 
