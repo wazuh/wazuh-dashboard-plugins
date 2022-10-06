@@ -65,6 +65,7 @@ export const RegisterAgent = withErrorBoundary(
         selectedGroup: [],
         udpProtocol: false,
         showPassword: false,
+        showProtocol: true,
       };
       this.restartAgentCommand = {
         rpm: this.systemSelector(),
@@ -127,7 +128,6 @@ export const RegisterAgent = withErrorBoundary(
           architectureButtonsMacos,
           architectureButtonsWithPPC64LE,
           wazuhPassword,
-          udpProtocol,
           wazuhVersion,
           groups,
           loading: false,
@@ -167,7 +167,9 @@ export const RegisterAgent = withErrorBoundary(
       try {
         const result = await WzRequest.apiReq('GET', '/agents/000/config/request/remote', {});
         const remote = ((result.data || {}).data || {}).remote || {};
-        return (remote[0] || {}).protocol !== 'tcp' && (remote[0] || {}).protocol[0] !== 'TCP';
+        if (remote.length === 2) {
+          this.setState({ udpProtocol: true })
+        }
       } catch (error) {
         throw new Error(error);
       }
@@ -259,6 +261,7 @@ export const RegisterAgent = withErrorBoundary(
 
     optionalDeploymentVariables() {
       let deployment = `WAZUH_MANAGER='${this.state.serverAddress}' `;
+      const protocol = false
 
       if (this.state.selectedOS == 'win') {
         deployment += `WAZUH_REGISTRATION_SERVER='${this.state.serverAddress}' `;
@@ -268,7 +271,7 @@ export const RegisterAgent = withErrorBoundary(
         deployment += `WAZUH_REGISTRATION_PASSWORD='${this.state.wazuhPassword}' `;
       }
 
-      if (this.state.udpProtocol) {
+      if (!this.state.udpProtocol == true) {
         deployment += `WAZUH_PROTOCOL='UDP' `;
       }
 
