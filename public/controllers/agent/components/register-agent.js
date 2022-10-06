@@ -402,8 +402,8 @@ export const RegisterAgent = withErrorBoundary(
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.ppc64le.rpm`;
         default:
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.x86_64.rpm`;
+      }
     }
-  }
 
     resolveAMAZONLPackage() {
       switch (`${this.state.selectedVersion}-${this.state.selectedArchitecture}`) {
@@ -428,13 +428,13 @@ export const RegisterAgent = withErrorBoundary(
         case '2-powerpc':
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.ppc64le.rpm`;
         case 'amazonlinux2022-i386':
-            return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.i386.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.i386.rpm`;
         case 'amazonlinux2022-aarch64':
-            return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.aarch64.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.aarch64.rpm`;
         case 'amazonlinux2022-x86_64':
-            return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`;
         case 'amazonlinux2022-armhf':
-            return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.armv7hl.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.armv7hl.rpm`;
         default:
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.x86_64.rpm`;
       }
@@ -542,9 +542,9 @@ export const RegisterAgent = withErrorBoundary(
         case 'deb':
           return this.resolveDEBPackage();
         case 'ubu':
-          return this.resolveUBUNTUPackage(); 
+          return this.resolveUBUNTUPackage();
         case 'open':
-          return this.resolveOPENSUSEPackage();  
+          return this.resolveOPENSUSEPackage();
         case 'sol':
           return this.resolveSOLARISPackage();
         case 'aix':
@@ -778,8 +778,8 @@ export const RegisterAgent = withErrorBoundary(
         oraclelinuxText: `sudo ${this.optionalDeploymentVariables()}yum install -y ${this.optionalPackages()}`,
         suseText: `sudo ${this.optionalDeploymentVariables()}yum install -y ${this.optionalPackages()}`,
         raspbianText: `curl -so wazuh-agent-${this.state.wazuhVersion
-        }.deb ${this.optionalPackages()} && sudo ${this.optionalDeploymentVariables()}dpkg -i ./wazuh-agent-${this.state.wazuhVersion
-        }.deb`,
+          }.deb ${this.optionalPackages()} && sudo ${this.optionalDeploymentVariables()}dpkg -i ./wazuh-agent-${this.state.wazuhVersion
+          }.deb`,
       };
 
       const field = `${this.state.selectedOS}Text`;
@@ -1026,12 +1026,27 @@ export const RegisterAgent = withErrorBoundary(
               onChange={onChange}
               className={'osButtonsStyle'}
             />
-            <EuiCallOut color="warning" className='message' iconType="iInCircle" title={
+            {this.state.selectedVersion == 'solaris10' || this.state.selectedVersion == 'solaris11' ? <EuiCallOut color="warning" className='message' iconType="iInCircle" title={
+              <span>
+                The selected operating system version requires some extra installation steps, you can see them<EuiLink target="_blank" href="https://documentation.wazuh.com/current/installation-guide/wazuh-agent/wazuh-agent-package-solaris.html"> here</EuiLink>.
+              </span>
+            }>
+            </EuiCallOut> : this.state.selectedVersion == '6.1 TL9' ? <EuiCallOut color="warning" className='message' iconType="iInCircle" title={
+              <span>
+                The selected operating system version requires some extra installation steps, you can see them<EuiLink target="_blank" href="https://documentation.wazuh.com/current/installation-guide/wazuh-agent/wazuh-agent-package-aix.html"> here</EuiLink>.
+              </span>
+            }>
+            </EuiCallOut> : this.state.selectedVersion == '11.31' ? <EuiCallOut color="warning" className='message' iconType="iInCircle" title={
+              <span>
+                The selected operating system version requires some extra installation steps, you can see them<EuiLink target="_blank" href="https://documentation.wazuh.com/current/installation-guide/wazuh-agent/wazuh-agent-package-hpux.html"> here</EuiLink>.
+              </span>
+            }>
+            </EuiCallOut> : <EuiCallOut color="warning" className='message' iconType="iInCircle" title={
               <span>
                 The selected OS version reached its end of life (EOL). To install Wazuh follow our<EuiLink href="#"> guide</EuiLink>.
               </span>
             }>
-            </EuiCallOut>
+            </EuiCallOut>}
           </>
         )
       }
@@ -1056,35 +1071,35 @@ export const RegisterAgent = withErrorBoundary(
           ),
         },
         ...(this.state.selectedOS == 'rpm'
-        ? [
-          {
-            title: 'Choose the version',
-            children: (
-              this.state.selectedVersion == 'redhat5' || this.state.selectedVersion == 'redhat6' ? buttonGroupWithMessage("Choose the version", versionButtonsRedHat, this.state.selectedVersion, (version) => this.setVersion(version)) : buttonGroup("Choose the version", versionButtonsRedHat, this.state.selectedVersion, (version) => this.setVersion(version))
-            ),
-          },
-        ]
-        : []),
+          ? [
+            {
+              title: 'Choose the version',
+              children: (
+                this.state.selectedVersion == 'redhat5' || this.state.selectedVersion == 'redhat6' ? buttonGroupWithMessage("Choose the version", versionButtonsRedHat, this.state.selectedVersion, (version) => this.setVersion(version)) : buttonGroup("Choose the version", versionButtonsRedHat, this.state.selectedVersion, (version) => this.setVersion(version))
+              ),
+            },
+          ]
+          : []),
         ...(this.state.selectedOS == 'oraclelinux'
-        ? [
-          {
-            title: 'Choose the version',
-            children: (
-              buttonGroup("Choose the version", versionButtonsOracleLinux, this.state.selectedVersion, (version) => this.setVersion(version))
-            ),
-          },
-        ]
-        : []),
+          ? [
+            {
+              title: 'Choose the version',
+              children: (
+                buttonGroup("Choose the version", versionButtonsOracleLinux, this.state.selectedVersion, (version) => this.setVersion(version))
+              ),
+            },
+          ]
+          : []),
         ...(this.state.selectedOS == 'raspbian'
-        ? [
-          {
-            title: 'Choose the version',
-            children: (
-              buttonGroup("Choose the version", versionButtonsRaspbian, this.state.selectedVersion, (version) => this.setVersion(version))
-            ),
-          },
-        ]
-        : []),
+          ? [
+            {
+              title: 'Choose the version',
+              children: (
+                buttonGroup("Choose the version", versionButtonsRaspbian, this.state.selectedVersion, (version) => this.setVersion(version))
+              ),
+            },
+          ]
+          : []),
         ...(this.state.selectedOS == 'amazonlinux'
           ? [
             {
@@ -1105,7 +1120,7 @@ export const RegisterAgent = withErrorBoundary(
             },
           ]
           : []),
-          ...(this.state.selectedOS == 'fedora'
+        ...(this.state.selectedOS == 'fedora'
           ? [
             {
               title: 'Choose the version',
@@ -1155,7 +1170,7 @@ export const RegisterAgent = withErrorBoundary(
             },
           ]
           : []),
-          ...(this.state.selectedOS == 'suse'
+        ...(this.state.selectedOS == 'suse'
           ? [
             {
               title: 'Choose the version',
@@ -1165,7 +1180,7 @@ export const RegisterAgent = withErrorBoundary(
             },
           ]
           : []),
-        ...(this.state.selectedOS == 'open' 
+        ...(this.state.selectedOS == 'open'
           ? [
             {
               title: 'Choose the version',
@@ -1180,7 +1195,7 @@ export const RegisterAgent = withErrorBoundary(
             {
               title: 'Choose the version',
               children: (
-                buttonGroup("Choose the version", versionButtonsSolaris, this.state.selectedVersion, (version) => this.setVersion(version))
+                this.state.selectedVersion == 'solaris10' || this.state.selectedVersion == 'solaris11' ? buttonGroupWithMessage("Choose the version", versionButtonsSolaris, this.state.selectedVersion, (version) => this.setVersion(version)) : buttonGroup("Choose the version", versionButtonsSolaris, this.state.selectedVersion, (version) => this.setVersion(version))
               ),
             },
           ]
@@ -1190,7 +1205,7 @@ export const RegisterAgent = withErrorBoundary(
             {
               title: 'Choose the version',
               children: (
-                buttonGroup("Choose the version", versionButtonsAix, this.state.selectedVersion, (version) => this.setVersion(version))
+                this.state.selectedVersion == '6.1 TL9' ? buttonGroupWithMessage("Choose the version", versionButtonsAix, this.state.selectedVersion, (version) => this.setVersion(version)) : buttonGroup("Choose the version", versionButtonsAix, this.state.selectedVersion, (version) => this.setVersion(version))
               ),
             },
           ]
@@ -1200,21 +1215,12 @@ export const RegisterAgent = withErrorBoundary(
             {
               title: 'Choose the version',
               children: (
-                buttonGroup("Choose the version", versionButtonsHPUX, this.state.selectedVersion, (version) => this.setVersion(version))
+                this.state.selectedVersion == '11.31' ? buttonGroupWithMessage("Choose the version", versionButtonsHPUX, this.state.selectedVersion, (version) => this.setVersion(version)) : buttonGroup("Choose the version", versionButtonsHPUX, this.state.selectedVersion, (version) => this.setVersion(version))
+
               ),
             },
           ]
           : []),
-          // ...(this.state.selectedVersion == '1' || this.state.selectedVersion == '2'
-          // ? [
-          //   {
-          //     title: 'Choose the architecture',
-          //     children: (
-          //       buttonGroup("Choose the architecture", architectureButtonsWithPPC64LE, this.state.selectedArchitecture, (architecture) => this.setArchitecture(architecture))
-          //     ),
-          //   },
-          // ]
-          // : []),
         ...(this.state.selectedVersion == 'centos5' || this.state.selectedVersion == 'redhat5' || this.state.selectedVersion == 'oraclelinux5' || this.state.selectedVersion == 'suse11'
           ? [
             {
@@ -1245,7 +1251,7 @@ export const RegisterAgent = withErrorBoundary(
             },
           ]
           : []),
-          ...(this.state.selectedVersion == 'centos7' || this.state.selectedVersion == 'amazonlinux2' || this.state.selectedVersion == 'suse12' || this.state.selectedVersion == '22' || this.state.selectedVersion == 'debian9' || this.state.selectedVersion == 'debian10' || this.state.selectedVersion == 'busterorgreater'
+        ...(this.state.selectedVersion == 'centos7' || this.state.selectedVersion == 'amazonlinux2' || this.state.selectedVersion == 'suse12' || this.state.selectedVersion == '22' || this.state.selectedVersion == 'debian9' || this.state.selectedVersion == 'debian10' || this.state.selectedVersion == 'busterorgreater'
           ? [
             {
               title: 'Choose the architecture',
@@ -1255,17 +1261,17 @@ export const RegisterAgent = withErrorBoundary(
             },
           ]
           : []),
-        ...(this.state.selectedVersion == 'windowsxp' || this.state.selectedVersion == 'windows8' 
+        ...(this.state.selectedVersion == 'windowsxp' || this.state.selectedVersion == 'windows8'
           ? [
             {
               title: 'Choose the architecture',
               children: (
                 buttonGroup("Choose the architecture", architectureButtonsi386, this.state.selectedArchitecture, (architecture) => this.setArchitecture(architecture))
               ),
-            }, 
+            },
           ]
           : []),
-          ...(this.state.selectedVersion == 'sierra' || this.state.selectedVersion == 'highSierra' || this.state.selectedVersion == 'mojave' || this.state.selectedVersion == 'catalina' || this.state.selectedVersion == 'bigSur' || this.state.selectedVersion == 'monterrey' 
+        ...(this.state.selectedVersion == 'sierra' || this.state.selectedVersion == 'highSierra' || this.state.selectedVersion == 'mojave' || this.state.selectedVersion == 'catalina' || this.state.selectedVersion == 'bigSur' || this.state.selectedVersion == 'monterrey'
           ? [
             {
               title: 'Choose the architecture',
@@ -1369,7 +1375,7 @@ export const RegisterAgent = withErrorBoundary(
           this.state.selectedOS !== 'sol' &&
           this.state.selectedOS !== 'aix' &&
           this.state.selectedOS !== 'hp' &&
-          this.state.selectedOS !== 'amazonlinux' && 
+          this.state.selectedOS !== 'amazonlinux' &&
           this.state.selectedOS !== 'fedora' &&
           this.state.selectedOS !== 'oraclelinux' &&
           this.state.selectedOS !== 'suse' &&
