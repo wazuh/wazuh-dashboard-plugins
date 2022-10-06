@@ -231,7 +231,7 @@ export const WzConfigurationSettings = compose (
 const toastRequiresReloadingBrowserTab = () => {
   getToasts().add({
     color: 'success',
-    title: 'This setting require you to reload the page to take effect.',
+    title: 'This setting requires you to reload the page to take effect.',
     text: <EuiFlexGroup justifyContent="flexEnd" gutterSize="s">
       <EuiFlexItem grow={false}>
         <EuiButton onClick={() => window.location.reload()} size="s">Reload page</EuiButton>
