@@ -157,7 +157,6 @@ const WzConfigurationSettingsProvider = (props) => {
               // Create the form data
               const formData = new FormData();
               formData.append('file', file);
-              formData.append('extension', extension);
               return WzRequest.genericReq(
                 'PUT', `/utils/configuration/files/${pluginSettingKey}`,
                 formData,

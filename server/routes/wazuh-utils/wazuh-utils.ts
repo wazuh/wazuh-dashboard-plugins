@@ -57,11 +57,6 @@ export function WazuhUtilsRoutes(router: IRouter) {
         body: schema.object({
           // file: buffer
           file: schema.buffer(),
-          // extension: literal of all the extensions of plugin setting of `filepicker` type
-          extension: schema.oneOf([...new Set(
-            ...pluginSettingsTypeFilepicker
-              .map(([ , pluginSettingConfiguration]) => ([...pluginSettingConfiguration.options.file.extensions]))
-          )].map(schema.literal))
         })
       },
       options: {

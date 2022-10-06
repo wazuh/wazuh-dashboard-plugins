@@ -25,6 +25,7 @@ import path from 'path';
 import { createDirectoryIfNotExists } from '../../lib/filesystem';
 import glob from 'glob';
 import { getSettingDefaultValue } from '../../../common/services/settings';
+import { getFileExtensionFromBuffer } from '../../../common/services/file-extension';
 
 const updateConfigurationFile = new UpdateConfigurationFile();
 
@@ -137,17 +138,20 @@ export class WazuhUtilsCtrl {
    uploadFile = this.routeDecoratorProtectedAdministratorRoleValidToken(
     async (context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) => {
       const { key } = request.params;
-      const { file: bufferFile, extension } = request.body;
+      const { file: bufferFile } = request.body;
       const pluginSetting = PLUGIN_SETTINGS[key];
 
+      // Check file extension
+      const fileExtension = getFileExtensionFromBuffer(bufferFile);
+
       // Check if the extension is valid for the setting.
-      if(!pluginSetting.options.file.extensions.includes(extension)){
+      if(!pluginSetting.options.file.extensions.includes(`.${fileExtension}`)){
         return response.badRequest({
           body: `File extension is not valid for setting [${key}] setting. Allowed file extensions: ${pluginSetting.options.file.extensions.join(', ')}`
         });
       };
 
-      const fileNamePath = `${key}${extension}`;
+      const fileNamePath = `${key}.${fileExtension}`;
 
       // Create target directory
       const targetDirectory = path.join(__dirname, '../../..', pluginSetting.options.file.store.relativePathFileSystem);
