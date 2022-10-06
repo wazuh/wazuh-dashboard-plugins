@@ -5,6 +5,14 @@ On this folder, we can find two types of environments:
  * release environment, managed by the `rel.sh` script
  * prerelease environment managed by the `pre.sh` script
 
+###  UI Credentials
+
+The default user and password to access the UI at https://0.0.0.0:5601/ are:
+
+```
+admin:SecretPassword
+```
+
 ## Release environment
 
 This environment will start a working deployment with:
