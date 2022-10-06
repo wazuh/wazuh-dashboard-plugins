@@ -1028,17 +1028,17 @@ export const RegisterAgent = withErrorBoundary(
             />
             {this.state.selectedVersion == 'solaris10' || this.state.selectedVersion == 'solaris11' ? <EuiCallOut color="warning" className='message' iconType="iInCircle" title={
               <span>
-                The selected operating system version requires some extra installation steps, you can see them<EuiLink target="_blank" href="https://documentation.wazuh.com/current/installation-guide/wazuh-agent/wazuh-agent-package-solaris.html"> here</EuiLink>.
+                Might require some extra installation<EuiLink target="_blank" href="https://documentation.wazuh.com/current/installation-guide/wazuh-agent/wazuh-agent-package-solaris.html"> steps</EuiLink>.
               </span>
             }>
             </EuiCallOut> : this.state.selectedVersion == '6.1 TL9' ? <EuiCallOut color="warning" className='message' iconType="iInCircle" title={
               <span>
-                The selected operating system version requires some extra installation steps, you can see them<EuiLink target="_blank" href="https://documentation.wazuh.com/current/installation-guide/wazuh-agent/wazuh-agent-package-aix.html"> here</EuiLink>.
+                Might require some extra installation<EuiLink target="_blank" href="https://documentation.wazuh.com/current/installation-guide/wazuh-agent/wazuh-agent-package-aix.html"> steps</EuiLink>.
               </span>
             }>
             </EuiCallOut> : this.state.selectedVersion == '11.31' ? <EuiCallOut color="warning" className='message' iconType="iInCircle" title={
               <span>
-                The selected operating system version requires some extra installation steps, you can see them<EuiLink target="_blank" href="https://documentation.wazuh.com/current/installation-guide/wazuh-agent/wazuh-agent-package-hpux.html"> here</EuiLink>.
+                Might require some extra installation<EuiLink target="_blank" href="https://documentation.wazuh.com/current/installation-guide/wazuh-agent/wazuh-agent-package-hpux.html"> steps</EuiLink>.
               </span>
             }>
             </EuiCallOut> : <EuiCallOut color="warning" className='message' iconType="iInCircle" title={
