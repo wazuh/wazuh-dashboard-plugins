@@ -17,22 +17,24 @@ Feature: Validate paginator on Rule page
 
 
     Scenario: Rules are displayed - Select a next page
-        When The rule page is not the last available
+        When The user clicks on the second page button
+        And The rule page is not the last available
         And The user clicks on the next page button
         Then The user should be redirected to the next rule page available
 
 
     Scenario: Rules are displayed - Select a previous page
-        When The rule page is not the first available
-        And The user clicks on the previos page button
+        When The user clicks on the second page button
+        And The rule page is not the first available
+        And The user clicks on the previous page button
         Then The user should be redirected to the next rule page available
 
 
     Scenario: Rules are displayed - Last Page
-        When The rule page is the last available
+        When The rule page is the last available page
         Then The next page button should be disable
 
 
     Scenario: Rules are displayed - First Page
         When The rule page is the first available page
-        Then The previos page button should be disable
+        Then The previous page button should be disable
