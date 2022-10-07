@@ -6,6 +6,10 @@ then
   exit
 fi
 
+# idp container launches and docker-compose returns too quickly, do not wait for container to 
+# be healthy as it has no dependencies, so we wait before continuing
+sleep 7
+
 indexer="$1-odfe-node1-1"
 dashboard="$1-kibana-1"
 
@@ -56,16 +60,17 @@ PC="{
   \"description\": \"wazuh saml integration\",
   \"baseUrl\": \"https://localhost:5601\",
   \"rootUrl\": \"https://localhost:5601\",
-  \"redirectUris\": [\"https://localhost:5601/*\"],
+  \"redirectUris\": [\"https://localhost:5601*\"],
   \"attributes\" : {
     \"saml_single_logout_service_url_redirect\": \"https://localhost:5601/_opendistro/_security/saml/logout\",
     \"saml_assertion_consumer_url_post\": \"https://localhost:5601/_opendistro/_security/saml/acs/idpinitiated\",
+    \"saml_single_logout_service_url_post\": \"https://kibana:443/_opendistro/_security/saml/logout\",
     \"saml.force.post.binding\": \"false\",
     \"saml.signing.certificate\": \"$cert\",
     \"saml.signing.private.key\": \"$key\",
     \"saml.client.signature\": \"true\",
     \"saml_single_logout_service_url_redirect\": \"https://localhost:5601\",
-    \"post.logout.redirect.uris\": \"https://localhost:5601/*\" 
+    \"post.logout.redirect.uris\": \"https://localhost:5601*\" 
   }
 }"
 
@@ -144,22 +149,22 @@ CSID=$(echo $CSCOPES | jq -r '.[] | select(.name=="role_list").id ')
 CSR=$(echo $CSCOPES | jq -r '.[] | select(.name=="role_list") ')
 
 
-# Set single to true, so opensearch works
+# Set single to true, so opendistro works
 UPDATE=$(echo $CSR | jq '.protocolMappers[] | select(.name=="role list").config.single |= "true"  ')
 PMID=$(echo $CSR | jq -r '.protocolMappers[] | select(.name=="role list").id')
 
 curl -sS -L -X PUT "${B}/admin/realms/${REALM}/client-scopes/$CSID/protocol-mappers/models/$PMID" "${H[@]}" -d "$UPDATE"
 
-# Set up auth realm on opensearch
-certs="/usr/share/wazuh-indexer/config/certs"
+# Set up auth realm on opendistro
+certs="/usr/share/elasticsearch/config/certs"
 ca="$certs/ca.pem"
 cert="$certs/admin.pem"
 key="$certs/admin-key.pem"
 
-securityadmin="bash /usr/share/wazuh-indexer/plugins/opensearch-security/tools/securityadmin.sh"
-config_path="/usr/share/wazuh-indexer/plugins/opensearch-security/securityconfig/"
+securityadmin="bash /usr/share/elasticsearch/plugins/opendistro_security/tools/securityadmin.sh"
+config_path="/usr/share/elasticsearch/plugins/opendistro_security/securityconfig/"
 
 echo "To update configuration in indexer, you can run:"
-echo docker exec -e JAVA_HOME=/usr/share/wazuh-indexer/jdk $indexer $securityadmin -cacert $ca -cert $cert -key $key -cd $config_path
+echo docker exec -e JAVA_HOME=/usr/share/elasticsearch/jdk $indexer $securityadmin -icl -nhnv -cacert $ca -cert $cert -key $key -cd $config_path
 
 

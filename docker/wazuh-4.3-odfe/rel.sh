@@ -62,11 +62,10 @@ fi
 
 case "$3" in
 	up)
-		# v=$(echo -n $COMPOSE_PROJECT_NAME | sed 's/\.//g' )
 		docker compose --profile $profile -f rel.yml up -Vd
 		if [[ "${profile}" =~ "saml" ]]
 		then
-			./enable_saml.sh ${v}
+			./enable_saml.sh ${COMPOSE_PROJECT_NAME}
 		fi
 
 		# This installs Wazuh and integrates with a default ODFE stack

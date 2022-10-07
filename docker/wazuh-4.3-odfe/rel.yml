@@ -42,6 +42,7 @@ services:
         			-profile=server - | \
         		cfssljson -bare $$i
         		openssl pkcs8 -topk8 -inform pem -in $$i-key.pem -outform pem -nocrypt -out $$i.key
+            # openssl pkcs12 -export -inkey $$i-key.pem in $$i.pem -chain -CAfile $$certs/ca.pem -out $$i.p12
         	done
 
         	echo "Generating clients certificates"
@@ -56,6 +57,7 @@ services:
         			-profile=client - | \
         		cfssljson -bare $$i
         		openssl pkcs8 -topk8 -inform pem -in $$i-key.pem -outform pem -nocrypt -out $$i.key
+            # openssl pkcs12 -export -inkey $$i-key.pem in $$i.pem -chain -CAfile $$certs/ca.pem -out $$i.p12 
         	done
 
             echo "Setting up permissions"
@@ -84,6 +86,34 @@ services:
         '
     healthcheck:
       test: ["CMD-SHELL", "[ -r /certs/wm/wazuh.manager.pem ]"]
+      interval: 2s
+      timeout: 5s
+      retries: 10
+
+  idpsec:
+    image: quay.io/keycloak/keycloak:19.0.1
+    depends_on:
+      generator:
+        condition: service_healthy
+    profiles:
+      - "saml"
+    volumes:
+      - wi_certs:/certs/wi
+      - wd_certs:/certs/wd
+      - wm_certs:/certs/wm
+      - idp_certs:/certs/idp
+    entrypoint: /bin/bash
+    command: > 
+      -c '
+        # trust store
+        for i in /certs/idp/ca.pem /certs/wd/kibana.pem /certs/wi/odfe-node1.pem
+        do
+          keytool -import -alias $$(basename $$i .pem) -file $$i -keystore /certs/idp/truststore.jks -storepass SecretPassword -trustcacerts -noprompt
+        done
+        sleep 300
+      '
+    healthcheck:
+      test: ["CMD-SHELL", "[ -r /certs/idp/truststore.jks ]"]
       interval: 2s
       timeout: 5s
       retries: 10
@@ -177,8 +207,6 @@ services:
       - "standard"
     ports:
       - 5601:443
-    expose:
-      - "5603"
     environment:
       - ELASTICSEARCH_URL=https://odfe-node1:9200
       - ELASTICSEARCH_HOSTS=https://odfe-node1:9200
@@ -191,6 +219,9 @@ services:
 
   idp:
     image: quay.io/keycloak/keycloak:19.0.1
+    depends_on:
+      idpsec:
+        condition: service_healthy
     profiles:
       - "saml"
     hostname: idp
@@ -203,6 +234,8 @@ services:
     environment:
       - KEYCLOAK_ADMIN=admin
       - KEYCLOAK_ADMIN_PASSWORD=admin
+      - KC_SPI_TRUSTSTORE_FILE_PASSWORD=SecretPassword
+      - KC_SPI_TRUSTSTORE_FILE_FILE=/certs/truststore.jks
     volumes:
       - keycloak-data:/var/lib/keycloak/data
       - idp_certs:/certs
