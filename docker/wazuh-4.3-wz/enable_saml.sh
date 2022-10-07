@@ -6,6 +6,11 @@ then
   exit
 fi
 
+# idp container launches and docker-compose returns too quickly, do not wait for container to 
+# be healthy as it has no dependencies, so we wait before continuing
+sleep 7
+
+
 indexer="$1-wazuh.indexer-1"
 dashboard="$1-wazuh.dashboard-1"
 
