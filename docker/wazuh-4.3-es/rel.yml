@@ -296,7 +296,7 @@ services:
 
 networks:
   es-rel:
-    name: "es-rel-${ES_VERSION}"
+    name: "${COMPOSE_PROJECT_NAME}"
     driver: bridge
   mon:
     external: true

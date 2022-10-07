@@ -57,16 +57,16 @@ Wazuh app in Kibana:
 For example, the command
 
 ```bash
-./rel.sh 7.16.3 4.3.4 up
+./rel.sh 7.16.3 4.3.8 up
 ```
 
 Will print:
 
 ```bash
-Install Wazuh 4.3.4 into Elastic 7.16.3 manually with:
+Install Wazuh 4.3.8 into Elastic 7.16.3 manually with:
 
 1. Install the Wazuh app for Kibana
-docker exec -ti es-rel-7163-kibana-1 /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.3.4_7.16.3-1.zip
+docker exec -ti es-rel-7163-kibana-1 /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.3.8_7.16.3-1.zip
 
 2. Restart Kibana
 docker restart es-rel-7163-kibana-1
@@ -86,7 +86,7 @@ automatism will need:
 2. Execute the Wazuh plugin installation command:
 
 ```bash
-docker exec -ti es-rel-7163-kibana-1 /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.3.4_7.16.3-1.zip
+docker exec -ti es-rel-7163-kibana-1 /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.3.8_7.16.3-1.zip
 ```
 
 3. Restart the Kibana container to enable Wazuh:
@@ -117,12 +117,12 @@ the agent `ossec.log` file.
 
 - For `CentOS/8` images:
   ```bash
-  docker run --rm --network es-rel-4.3.4 -d centos:8 bash -c '
+  docker run --name es-rel-agent-4.3.8 --rm --network es-rel-4.3.8 -d centos:8 bash -c '
       sed -i -e "s|mirrorlist=|#mirrorlist=|g" /etc/yum.repos.d/CentOS-*
       sed -i -e "s|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g" /etc/yum.repos.d/CentOS-*
 
       # Change this command by the one the UI suggest to use add it the -y and remove the sudo
-      WAZUH_MANAGER='wazuh.manager' yum install -y https://packages.wazuh.com/4.x/yum5/x86_64/wazuh-agent-4.3.4-1.el5.x86_64.rpm
+      WAZUH_MANAGER='wazuh.manager' yum install -y https://packages.wazuh.com/4.x/yum5/x86_64/wazuh-agent-4.3.8-1.el5.x86_64.rpm
 
       /etc/init.d/wazuh-agent start
       tail -f /var/ossec/logs/ossec.log
@@ -131,11 +131,11 @@ the agent `ossec.log` file.
 
 - For `Ubuntu` images
   ```bash
-  docker run --network es-rel-4.3.4 -d ubuntu:20.04 bash -c '
+  docker run --name es-rel-agent-4.3.8 --network es-rel-4.3.8 -d ubuntu:20.04 bash -c '
       apt update -y
       apt install -y curl lsb-release
       # Change this command by the one the UI suggest to use add it tremove the sudo
-      curl -so wazuh-agent-4.3.4.deb https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_4.3.4-1_amd64.deb && WAZUH_MANAGER='wazuh.manager' dpkg -i ./wazuh-agent-4.3.4.deb
+      curl -so wazuh-agent-4.3.8.deb https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_4.3.8-1_amd64.deb && WAZUH_MANAGER='wazuh.manager' dpkg -i ./wazuh-agent-4.3.8.deb
 
       /etc/init.d/wazuh-agent start
       tail -f /var/ossec/logs/ossec.log
@@ -148,8 +148,8 @@ the agent `ossec.log` file.
 
 ## Prerelease environment
 
-The prerelease environment help us test app releases while the rest of
-Wazuh packages haven't been generated yet.
+The prerelease environment help us test app releases while the rest of Wazuh 
+packages haven't been generated yet.
 
 This environment will bring up:
 
