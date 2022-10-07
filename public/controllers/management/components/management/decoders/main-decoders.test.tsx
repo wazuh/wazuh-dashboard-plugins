@@ -14,7 +14,7 @@
 
 import React from 'react';
 import { mount } from 'enzyme';
-import WzRuleset from './main-ruleset';
+import WzRuleset from '../ruleset/main-ruleset';
 
 jest.mock('../../../../../kibana-services', () => ({
   getAngularModule: jest.fn(),
