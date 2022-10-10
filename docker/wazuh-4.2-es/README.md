@@ -117,28 +117,29 @@ the agent `ossec.log` file.
 
 - For `CentOS/8` images:
   ```bash
-  docker run --rm --network es-rel-4.2.6 -d centos:8 bash -c '
-      sed -i -e "s|mirrorlist=|#mirrorlist=|g" /etc/yum.repos.d/CentOS-*
-      sed -i -e "s|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g" /etc/yum.repos.d/CentOS-*
+  docker run --rm --name es-rel-7142-wazuh.agent --network es-rel-7142 --label com.docker.compose.project=es-rel-7142 -d centos:8 bash -c '
+    sed -i -e "s|mirrorlist=|#mirrorlist=|g" /etc/yum.repos.d/CentOS-*
+    sed -i -e "s|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g" /etc/yum.repos.d/CentOS-*
 
-      # Change this command by the one the UI suggest to use add it the -y and remove the sudo
-      WAZUH_MANAGER='wazuh.manager' yum install -y https://packages.wazuh.com/4.x/yum5/x86_64/wazuh-agent-4.2.6-1.el5.x86_64.rpm
+    # Change this command by the one the UI suggest to use add it the -y and remove the sudo
+    WAZUH_MANAGER='wazuh.manager' yum install -y https://packages.wazuh.com/4.x/yum5/x86_64/wazuh-agent-4.2.6-1.el5.x86_64.rpm
 
-      /etc/init.d/wazuh-agent start
-      tail -f /var/ossec/logs/ossec.log
+    /etc/init.d/wazuh-agent start
+    tail -f /var/ossec/logs/ossec.log
   '
   ```
 
 - For `Ubuntu` images:
   ```bash
-  docker run --network es-rel-4.2.6 -d ubuntu:20.04 bash -c '
-      apt update -y
-      apt install -y curl lsb-release
-      # Change this command by the one the UI suggest to use add it remove the sudo
-      curl -so wazuh-agent-4.2.6.deb https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_4.3.4-1_amd64.deb && WAZUH_MANAGER='wazuh.manager' dpkg -i ./wazuh-agent-4.2.6.deb
+  docker run --name es-rel-7142-wazuh.agent --network es-rel-7142 --label com.docker.compose.project=es-rel-7142 -d ubuntu:20.04 bash -c '
+    apt update -y
+    apt install -y curl lsb-release
+    curl -so \wazuh-agent-4.2.6.deb \
+      https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_4.2.6-1_amd64.deb \
+      && WAZUH_MANAGER='wazuh.manager' WAZUH_AGENT_GROUP='default' dpkg -i ./wazuh-agent-4.2.6.deb
 
-      /etc/init.d/wazuh-agent start
-      tail -f /var/ossec/logs/ossec.log
+    /etc/init.d/wazuh-agent start
+    tail -f /var/ossec/logs/ossec.log
   '
   ```
  

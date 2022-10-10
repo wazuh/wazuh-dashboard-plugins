@@ -85,6 +85,18 @@ case "$3" in
     echo "4. Open Kibana in a browser:"
     echo "http://localhost:${KIBANA_PORT}"
     echo
+    echo "5. (Optional) Enroll an agent (Ubuntu 20.04):"
+    echo "docker run --name ${COMPOSE_PROJECT_NAME}-wazuh.agent --network ${COMPOSE_PROJECT_NAME} --label com.docker.compose.project=${COMPOSE_PROJECT_NAME} -d ubuntu:20.04 bash -c '"
+    echo "  apt update -y"
+    echo "  apt install -y curl lsb-release"
+    echo "  curl -so \wazuh-agent-${WAZUH_VERSION}.deb \\"
+    echo "    https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${WAZUH_VERSION}-1_amd64.deb \\"
+    echo "    && WAZUH_MANAGER='wazuh.manager' WAZUH_AGENT_GROUP='default' dpkg -i ./wazuh-agent-${WAZUH_VERSION}.deb"
+    echo
+    echo "  /etc/init.d/wazuh-agent start"
+    echo "  tail -f /var/ossec/logs/ossec.log"
+    echo "'"
+    echo
 		;;
 	down)
 		# delete volumes
