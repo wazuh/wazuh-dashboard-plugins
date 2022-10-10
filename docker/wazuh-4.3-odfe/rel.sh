@@ -51,7 +51,7 @@ export WAZUH_VERSION=$2
 export ELASTIC_PASSWORD=${PASSWORD:-SecretPassword}
 export KIBANA_PASSWORD=${PASSWORD:-SecretPassword}
 export KIBANA_CONF=./config/kibana/kibana.yml
-export COMPOSE_PROJECT_NAME=odfe-rel-l-${ES_VERSION//./}
+export COMPOSE_PROJECT_NAME=odfe-rel-${ES_VERSION//./}
 
 profile="standard"
 if [[ "$4" =~ "saml" ]]

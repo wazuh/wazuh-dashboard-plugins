@@ -117,7 +117,7 @@ the agent `ossec.log` file.
 
 - For `CentOS/8` images:
   ```bash
-  docker run --name es-rel-agent-4.3.8 --rm --network es-rel-4.3.8 -d centos:8 bash -c '
+  docker run --name es-rel-7175-agent --rm --network es-rel-7175 --label com.docker.compose.project=es-rel-7175 -d centos:8 bash -c '
       sed -i -e "s|mirrorlist=|#mirrorlist=|g" /etc/yum.repos.d/CentOS-*
       sed -i -e "s|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g" /etc/yum.repos.d/CentOS-*
 
@@ -131,7 +131,7 @@ the agent `ossec.log` file.
 
 - For `Ubuntu` images
   ```bash
-  docker run --name es-rel-agent-4.3.8 --network es-rel-4.3.8 -d ubuntu:20.04 bash -c '
+  docker run --name es-rel-7175-agent --network es-rel-7175 --label com.docker.compose.project=es-rel-7175 -d ubuntu:20.04 bash -c '
       apt update -y
       apt install -y curl lsb-release
       # Change this command by the one the UI suggest to use add it tremove the sudo
