@@ -6,6 +6,11 @@ then
   exit
 fi
 
+# idp container launches and docker-compose returns too quickly, do not wait for container to 
+# be healthy as it has no dependencies, so we wait before continuing
+sleep 7
+
+
 indexer="$1-wazuh.indexer-1"
 dashboard="$1-wazuh.dashboard-1"
 
@@ -60,12 +65,13 @@ PC="{
   \"attributes\" : {
     \"saml_single_logout_service_url_redirect\": \"https://localhost:5601/_opendistro/_security/saml/logout\",
     \"saml_assertion_consumer_url_post\": \"https://localhost:5601/_opendistro/_security/saml/acs/idpinitiated\",
+    \"saml_single_logout_service_url_post\": \"https://wazuh.dashboard:5601/_opendistro/_security/saml/logout\",
     \"saml.force.post.binding\": \"false\",
     \"saml.signing.certificate\": \"$cert\",
     \"saml.signing.private.key\": \"$key\",
     \"saml.client.signature\": \"true\",
     \"saml_single_logout_service_url_redirect\": \"https://localhost:5601\",
-    \"post.logout.redirect.uris\": \"https://localhost:5601/*\" 
+    \"post.logout.redirect.uris\": \"https://localhost:5601*\" 
   }
 }"
 

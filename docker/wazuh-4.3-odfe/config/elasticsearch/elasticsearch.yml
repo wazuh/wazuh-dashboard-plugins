@@ -20,10 +20,9 @@ opendistro_security.ssl.http.pemkey_filepath: /usr/share/elasticsearch/config/ce
 opendistro_security.ssl.http.pemtrustedcas_filepath: /usr/share/elasticsearch/config/certs/ca.pem
 opendistro_security.nodes_dn:
 - CN=odfe-node1,OU=Wazuh,O=Wazuh,L=California,C=US"
-#- CN=odfe-node2,OU=Docu,O=Wazuh,L=California,C=US
 
 opendistro_security.authcz.admin_dn:
-- CN=admin,OU=Wazuh,O=Wazuh,L=California,C=US"
+  - "CN=admin,OU=Wazuh,O=Wazuh,L=California,C=US"
 
 opendistro_security.audit.type: internal_elasticsearch
 opendistro_security.enable_snapshot_restore_privilege: true
