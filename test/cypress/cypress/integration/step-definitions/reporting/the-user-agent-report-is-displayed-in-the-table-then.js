@@ -3,7 +3,7 @@ import { elementIsVisible, elementTextIncludes, getSelector} from '../../utils/d
 import {REPORT_NAME as reportName} from '../../utils/mappers/modules-mapper-report-data';
 import { REPORTING_PAGE as pageName} from '../../utils/pages-constants';
 const lastCreatedReport = getSelector('lastCreatedReport', pageName);
-//testcomment
+
 Then('The agent report is displayed in the table {}', (moduleName) => {
   elementIsVisible(lastCreatedReport);
   cy.wait(2000);
