@@ -464,7 +464,7 @@ export const PLUGIN_SETTINGS_CATEGORIES: { [category: number]: TPluginSettingCat
   [SettingCategory.CUSTOMIZATION]: {
     title: 'Custom branding',
     description: "If you want to use custom branding elements such as logos, you can do so by editing the settings below.",
-    documentationLink: 'user-manual/wazuh-dashboard/config-file.html#logo-customization',
+    documentationLink: 'user-manual/wazuh-dashboard/white-labeling.html',
     renderOrder: SettingCategory.CUSTOMIZATION,
   }
 };
