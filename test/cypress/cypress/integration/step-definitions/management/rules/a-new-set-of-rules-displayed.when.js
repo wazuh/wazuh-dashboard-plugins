@@ -5,6 +5,6 @@ const paginatorSelector = getSelector('paginatorSelector', pageName);
 
 
 When('A new set of rules it\'s displayed', () => {
-    cy.wait(1500);
+    cy.wait(2500);
     elementIsVisible(paginatorSelector);
 });

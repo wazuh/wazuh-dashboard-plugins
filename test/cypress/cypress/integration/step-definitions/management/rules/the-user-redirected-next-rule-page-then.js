@@ -4,7 +4,7 @@ import { RULES_PAGE as pageName } from '../../../utils/pages-constants';
 const rulestableSelector = getSelector('rulestableSelector', pageName);
 
 Then('The user should be redirected to the next rule page available',() => {
-    cy.wait(1500);
+    cy.wait(3000);
     cy.get(rulestableSelector).then(($rules) => {
         const rulesText = $rules.text();
         cy.log(rulesText);

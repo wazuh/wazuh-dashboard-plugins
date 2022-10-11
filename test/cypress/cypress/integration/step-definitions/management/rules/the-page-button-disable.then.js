@@ -6,6 +6,6 @@ const paginatorPreviousSelector = getSelector('paginatorPreviousSelector', pageN
 
 
 Then('The {} page button should be disable',(positionPage) => {
-    cy.wait(1500);
+    cy.wait(2000);
     (positionPage == 'next') ? cy.get(paginatorNextSelector).should('have.attr', 'disabled') : cy.get(paginatorPreviousSelector).should('have.attr', 'disabled');
 });
