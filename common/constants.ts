@@ -444,7 +444,7 @@ export type TPluginSetting = {
   uiFormTransformConfigurationValueToInputValue?: (value: any) => any
   // Transform the input value changed in the form of Settings/Configuration and returned in the `changed` property of the hook useForm
   uiFormTransformInputValueToConfigurationValue?: (value: any) => any
-  // Validate the value in the form of Settings/Configuration. It returns a string if there is some validation error. 
+  // Validate the value in the form of Settings/Configuration. It returns a string if there is some validation error.
 	validate?: (value: any) => string | undefined
 	// Validate function creator to validate the setting in the backend. It uses `schema` of the `@kbn/config-schema` package.
 	validateBackend?: (schema: any) => (value: unknown) => string | undefined
@@ -491,7 +491,7 @@ export const PLUGIN_SETTINGS_CATEGORIES: { [category: number]: TPluginSettingCat
   [SettingCategory.CUSTOMIZATION]: {
     title: 'Custom branding',
     description: "If you want to use custom branding elements such as logos, you can do so by editing the settings below.",
-    documentationLink: 'user-manual/wazuh-dashboard/config-file.html#logo-customization',
+    documentationLink: 'user-manual/wazuh-dashboard/white-labeling.html',
     renderOrder: SettingCategory.CUSTOMIZATION,
   }
 };
@@ -977,7 +977,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
 					relativePathFileSystem: 'public/assets/custom/images',
 					filename: 'customization.logo.healthcheck',
 					resolveStaticURL: (filename: string) => `custom/images/${filename}`
-				}				
+				}
 			}
 		},
 		validate: function(value){
@@ -1014,7 +1014,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
 					relativePathFileSystem: 'public/assets/custom/images',
 					filename: 'customization.logo.reports',
 					resolveStaticURL: (filename: string) => `custom/images/${filename}`
-				}				
+				}
 			}
 		},
 		validate: function(value){
@@ -1051,7 +1051,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
 					relativePathFileSystem: 'public/assets/custom/images',
 					filename: 'customization.logo.sidebar',
 					resolveStaticURL: (filename: string) => `custom/images/${filename}`
-				}				
+				}
 			}
 		},
 		validate: function(value){
