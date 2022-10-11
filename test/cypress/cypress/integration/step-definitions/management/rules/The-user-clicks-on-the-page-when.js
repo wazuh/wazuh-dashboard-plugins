@@ -26,7 +26,6 @@ When('The user clicks on the {} page button', (page) => {
         default:
             throw new Error(`The page ${page} is not defined`);
     }
-    // elementIsVisible(selector);
     clickElement(selector);
     cy.wait(1500);
 });

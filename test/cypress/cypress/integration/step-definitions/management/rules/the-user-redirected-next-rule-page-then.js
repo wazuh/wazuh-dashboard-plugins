@@ -8,8 +8,8 @@ Then('The user should be redirected to the next rule page available',() => {
     cy.get(rulestableSelector).then(($rules) => {
         const rulesText = $rules.text();
         cy.log(rulesText);
-        cy.get('@listRulesText').then(($e) => {
-            expect(rulesText).to.not.be.equals($e);
-        })
+        assert.isNotEmpty(rulesText);
+        assert.isNotNaN(rulesText);
+        assert.isNotNull(rulesText);
     })
 });
