@@ -1,6 +1,7 @@
 # Change Log
 
 All notable changes to the Wazuh app project will be documented in this file.
+
 ## Wazuh v4.4.0 - OpenSearch Dashboards 1.2.0 - Revision 4400
 
 ### Added
@@ -12,8 +13,12 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Changed the HTTP verb from `GET` to `POST` in the requests to login to the Wazuh API [#4103](https://github.com/wazuh/wazuh-kibana-app/pull/4103)
 - Improved alerts summary performance [#4376](https://github.com/wazuh/wazuh-kibana-app/pull/4376)
-- Endpoint `/agents/summary/status` response was adapted. [#3874](https://github.com/wazuh/wazuh-kibana-app/pull/3874)
+- The endpoint `/agents/summary/status` response was adapted. [#3874](https://github.com/wazuh/wazuh-kibana-app/pull/3874)
 - Changed loading icons of the Agents Overview section to work independently [#4363](https://github.com/wazuh/wazuh-kibana-app/pull/4363)
+- Enhance the message shown when a mismatch between Wazuh API and Wazuh APP occurs [#4544](https://github.com/wazuh/wazuh-kibana-app/pull/4544)
+
+### Removed
+- Removed custom styles from kibana 7.9.0 [#4491](https://github.com/wazuh/wazuh-kibana-app/pull/4491)
 
 ### Fixed
 
@@ -21,6 +26,14 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed nested fields filtering in dashboards tables and KPIs [#4425](https://github.com/wazuh/wazuh-kibana-app/pull/4425)
 - Fixed nested field rendering in security alerts table details [#4428](https://github.com/wazuh/wazuh-kibana-app/pull/4428)
 - Fixed Wazuh restart UI [#4433](https://github.com/wazuh/wazuh-kibana-app/pull/4433)
+- Fixed a bug where the Wazuh logo was used instead of the custom one [#4539](https://github.com/wazuh/wazuh-kibana-app/pull/4539)
+- Fixed rendering problems of the `Agent Overview` section in low resolutions [#4516](https://github.com/wazuh/wazuh-kibana-app/pull/4516)
+
+## Wazuh v4.3.8 - OpenSearch Dashboards 1.2.0 - Revision 4309
+
+### Added
+
+- Support for Wazuh 4.3.8
 
 ## Wazuh v4.3.7 - OpenSearch Dashboards 1.2.0 - Revision 4308
 
@@ -794,6 +807,16 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Reporting fails when agent is pinned and compliance controls are visited.
 - Reload rule detail doesn't work properly with the related rules.
 - Fix search bar filter in Manage agent of group [#2541](https://github.com/wazuh/wazuh-kibana-app/pull/2541)
+
+# Wazuh v3.13.6 - Kibana v7.9.2 - Revision 890
+
+### Added
+
+- Support for Wazuh v3.13.6
+
+## Wazuh v3.13.5 - Kibana 7.9.2 - Revision 889
+
+- Sanitize report's inputs and usernames [#4336](https://github.com/wazuh/wazuh-kibana-app/pull/4336)
 
 ## Wazuh v3.13.2 - Kibana v7.9.1 - Revision 887
 

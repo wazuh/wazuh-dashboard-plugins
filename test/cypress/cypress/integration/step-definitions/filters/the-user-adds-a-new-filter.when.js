@@ -14,14 +14,11 @@ const filterOperatorListObject = getSelector('filterOperatorListObject', pageNam
 
 
 When('The user adds a new filter', () => {
-  debugger
   //+ Add Filter
   elementIsVisible(addFilterButton);
   clickElement(addFilterButton);
-
   //Card
   elementIsVisible(filterCard);
-
   elementIsVisible(filterSuggestionList);
   fillField(filterSuggestionList,'rule.level');
   forceEnter(filterSuggestionList);
@@ -31,11 +28,9 @@ When('The user adds a new filter', () => {
   elementIsVisible(operatorList);
   elementIsVisible(filterOperatorListObject);
   cy.wait(150);
-  // forceClickElement(SelectedOperatorIs);
   cy.get(SelectedOperatorIs).click({force:true});
   elementIsVisible(filterParams);
   clickElement(filterParams);
   fillField(filterParams,'7')
   clickElement(saveFilterButton);
-
 });

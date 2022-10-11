@@ -65,7 +65,7 @@ export const fillField = (selector, text) => {
 };
 
 export const getElement = (selector) => {
-  return cy.get(selector, { timeout: 6500 });
+  return cy.get(selector, { timeout: 8000 });
 };
 
 export const getSelector = (name, page) => {
@@ -115,6 +115,12 @@ export const clickElementByXpath = (xpathSelector) => {
 
 export const xpathElementIsVisible = (xpathSelector) => {
   return getElementByXpath(xpathSelector).should('exist').should('be.visible');
+};
+
+export const generateRandomName = () => {
+  const uniqueSeed = Date.now().toString();
+  const getUniqueId = () => Cypress._.uniqueId(uniqueSeed);
+  return 'Test-'+getUniqueId();
 };
 
 export const timestampToDate = (e) => {
