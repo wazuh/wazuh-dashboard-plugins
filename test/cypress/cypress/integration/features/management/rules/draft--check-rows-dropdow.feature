@@ -1,7 +1,7 @@
 Feature: Validate row dropdown on Rule page
 
     As a wazuh user
-    i want to see the Rules pages
+    I want to see the Rules pages
     in order to manage them
 
     Scenario: Rules are displayed - Select 10 rows
