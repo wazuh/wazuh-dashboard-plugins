@@ -29,8 +29,8 @@ Feature: Validate paginator on Rule page
 
     Scenario: Rules are displayed - Last Page
         When The rule page is the last available page
-        Then The next page button should be disable
+        Then The next page button should be disabled
 
     Scenario: Rules are displayed - First Page
         When The rule page is the first available page
-        Then The previous page button should be disable
+        Then The previous page button should be disabled
