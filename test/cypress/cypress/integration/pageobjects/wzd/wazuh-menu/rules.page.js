@@ -16,6 +16,7 @@ export const RULES_PAGE = {
   saveRulesMessage: '.euiText span:contains("Changes will not take effect until a restart is performed.")',
   refreshButtonSelector: '.euiFlexGroup .euiFlexItem .euiButtonEmpty .euiButtonContent .euiButtonEmpty__text:contains("Refresh")',
   rulestableSelector: '[name="WzManagement"] table tr',
+  rulesRowTableSelector: '[name="WzManagement"] tbody tr',
   buttonListPageSelector: '[name="WzManagement"] button > span',
   rulesFilterSelector: '.euiSuggestInput [placeholder="Filter or search"]',
   dropdownFilterSelector: '.euiPanel.euiPopover__panel.euiPopover__panel--bottom',
@@ -30,5 +31,4 @@ export const RULES_PAGE = {
   paginatorthirdSelector: '.euiBasicTable .euiPagination li.euiPagination__item:nth-child(3)',
   paginatorFourthSelector: '.euiBasicTable .euiPagination li.euiPagination__item:nth-child(4)',
   paginatorLastSelector: '.euiBasicTable .euiPagination li.euiPagination__item:last-child',
-
 };
