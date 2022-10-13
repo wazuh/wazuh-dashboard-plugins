@@ -3,7 +3,7 @@ import { getSelector } from '../../../utils/driver';
 import { RULES_PAGE as pageName } from '../../../utils/pages-constants';
 const rulestableSelector = getSelector('rulestableSelector', pageName);
 
-Then('The first page of rules it displayed', () => {
+Then('The first page of rules is displayed', () => {
     cy.wait(1500);
     cy.get(rulestableSelector).then(($rules) => {
         const rulesText = $rules.text();
