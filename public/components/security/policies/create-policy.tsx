@@ -160,18 +160,14 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
 
   const createPolicy = async () => {
     try {
-      const result = await WzRequest.apiReq(
-        'POST',
-        '/security/policies',
-        {
-          name: policyName,
-          policy: {
-            actions: addedActions.map((x) => x.action),
-            resources: addedResources.map((x) => x.resource),
-            effect: effectValue,
-          },
-        }
-      );
+      const result = await WzRequest.apiReq('POST', '/security/policies', {
+        name: policyName,
+        policy: {
+          actions: addedActions.map((x) => x.action),
+          resources: addedResources.map((x) => x.resource),
+          effect: effectValue,
+        },
+      });
       const resultData = (result.data || {}).data;
       if (resultData.failed_items && resultData.failed_items.length) {
         return;
@@ -302,7 +298,7 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
     hasChanges ? setIsModalVisible(true) : closeFlyout(false);
   };
 
-  const flyoutProps= { className: 'wzApp' } 
+  const flyoutProps = { className: 'wzApp' };
 
   return (
     <>
@@ -406,6 +402,37 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
             {!!addedResources.length && (
               <>
                 <EuiSpacer size="s"></EuiSpacer>
-                <EuiFEuiFlyout
+                <EuiFlexGroup>
+                  <EuiFlexItem>
+                    <EuiInMemoryTable items={addedResources} columns={resources_columns} />
+                  </EuiFlexItem>
+                </EuiFlexGroup>
+              </>
+            )}
+            <EuiSpacer></EuiSpacer>
+            <EuiFormRow label="Select an effect" helpText="Select an effect.">
+              <EuiSuperSelect
+                options={effectOptions}
+                valueOfSelected={effectValue}
+                onChange={(value) => onEffectValueChange(value)}
+              />
+            </EuiFormRow>
+            <EuiSpacer />
+            <EuiButton
+              disabled={
+                !policyName || !addedActions.length || !addedResources.length || !effectValue
+              }
+              onClick={() => {
+                createPolicy();
+              }}
+              fill
+            >
+              Create policy
+            </EuiButton>
+          </EuiForm>
+        </EuiFlyoutBody>
+      </EuiFlyout>
+      {modal}
+    </>
   );
 };
