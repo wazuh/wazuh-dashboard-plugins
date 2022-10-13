@@ -6,7 +6,7 @@ import { AppNavigate } from '../../../react-services/app-navigate';
 import { getAngularModule } from '../../../kibana-services';
 
 class WzGlobalBreadcrumb extends Component {
-  props: { state: { breadcrumb: [] } };
+  props: { state: { breadcrumb: [{ agent; text }] } };
   constructor(props) {
     super(props);
     this.props = props;
@@ -15,46 +15,55 @@ class WzGlobalBreadcrumb extends Component {
   async componentDidMount() {
     const $injector = getAngularModule().$injector;
     this.router = $injector.get('$route');
-    $('#breadcrumbNoTitle').attr("title", "");
+    $('#breadcrumbNoTitle').attr('title', '');
   }
-  componnedDidUpdate() {
-    $('#breadcrumbNoTitle').attr("title", "");
+  componentDidUpdate() {
+    $('#breadcrumbNoTitle').attr('title', '');
   }
+
   render() {
     return (
       <div>
         {!!this.props.state.breadcrumb.length && (
           <EuiBreadcrumbs
-            className='wz-global-breadcrumb'
+            className="wz-global-breadcrumb"
             responsive={false}
             truncate={false}
             max={6}
-            breadcrumbs={this.props.state.breadcrumb.map(breadcrumb => breadcrumb.agent ? {
-              className: "euiLink euiLink--subdued ",
-              onClick: (ev) => {
-                ev.stopPropagation();
-                AppNavigate.navigateToModule(ev, 'agents', {
-                  "tab": "welcome", "agent": breadcrumb.agent.id
-                });
-                this.router.reload();
-              },
-              id: "breadcrumbNoTitle",
-              truncate: true,
-              text: (
-                <EuiToolTip position="top" content={"View agent summary"}>
-                  <span>{breadcrumb.agent.name}</span>
-                </EuiToolTip>
-              )
-            } : breadcrumb)}
+            breadcrumbs={this.props.state.breadcrumb.map((breadcrumb) =>
+              breadcrumb.agent
+                ? {
+                    className: 'euiLink euiLink--subdued osdBreadcrumbs',
+                    onClick: (ev) => {
+                      ev.stopPropagation();
+                      AppNavigate.navigateToModule(ev, 'agents', {
+                        tab: 'welcome',
+                        agent: breadcrumb.agent.id,
+                      });
+                      this.router.reload();
+                    },
+                    id: 'breadcrumbNoTitle',
+                    truncate: true,
+                    text: (
+                      <EuiToolTip position="top" content={'View agent summary'}>
+                        <span>{breadcrumb.agent.name}</span>
+                      </EuiToolTip>
+                    ),
+                  }
+                : breadcrumb.text !== '' && {
+                    ...breadcrumb,
+                    className: 'osdBreadcrumbs',
+                  }
+            )}
             aria-label="Wazuh global breadcrumbs"
           />
         )}
       </div>
-    )
+    );
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
     state: state.globalBreadcrumbReducers,
   };
