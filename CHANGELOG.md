@@ -25,6 +25,12 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed a bug where the Wazuh logo was used instead of the custom one [#4539](https://github.com/wazuh/wazuh-kibana-app/pull/4539)
 - Fixed rendering problems of the `Agent Overview` section in low resolutions [#4516](https://github.com/wazuh/wazuh-kibana-app/pull/4516)
 
+## Wazuh v4.3.9 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4310
+
+### Added
+
+- Support for Wazuh 4.3.9
+
 ## Wazuh v4.3.8 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4309
 
 ### Added
