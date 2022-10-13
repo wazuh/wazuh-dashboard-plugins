@@ -4,7 +4,7 @@ import { RULES_PAGE as pageName} from '../../../utils/pages-constants';
 const paginatorSelector = getSelector('paginatorSelector', pageName);
 const rulestableSelector = getSelector('rulestableSelector', pageName);
 
-Then('The user see that the rule list is paginated', () => {
+Then('The user sees that the rule list is paginated', () => {
   elementIsVisible(paginatorSelector);
   cy.get(rulestableSelector).then(($e) =>{
     const listRulesText = $e.text();
