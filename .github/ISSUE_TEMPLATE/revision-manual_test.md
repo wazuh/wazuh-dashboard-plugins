@@ -1,29 +1,31 @@
 Introduction
 
 ## Footprint metrics information
-|                                      |                                            |
-|--------------------------------------|--------------------------------------------|
-| **Main release candidate issue**     |                                         |
-| **Version**                          |                                            |
-| **Release candidate #**              |                                            |
-| **Tag**                              |                                        |
-| **Previous python unit tests issue** |            -                                |
+|                                      |   |
+|--------------------------------------|---|
+| **Main release candidate issue**     |   |
+| **Version**                          |   |
+| **Release candidate #**              |   |
+| **Tag**                              |   |
+| **Previous python unit tests issue** | - |
 
 ## Test report procedure
 All individual test checks must be marked as:
-|                                  |                                            |
-|---------------------------------|--------------------------------------------|
-| Pass | The test ran successfully. |
-| Xfail | The test was expected to fail and it failed. It must be properly justified and reported in an issue.  |
-| Skip | The test was not run. It must be properly justified and reported in an issue.  |
-| Fail | The test failed. A new issue must be opened to evaluate and address the problem. |
+|       |                                                                                                      |
+|-------|------------------------------------------------------------------------------------------------------|
+| Pass  | The test ran successfully.                                                                           |
+| Xfail | The test was expected to fail and it failed. It must be properly justified and reported in an issue. |
+| Skip  | The test was not run. It must be properly justified and reported in an issue.                        |
+| Fail  | The test failed. A new issue must be opened to evaluate and address the problem.                     |
+
 
 All test results must have one the following statuses: 
-|                                  |                                            |
-|---------------------------------|--------------------------------------------|
-| :green_circle:  | All checks passed. |
-| :red_circle:  | There is at least one failed check. |
-| :yellow_circle:  | There is at least one expected fail or skipped test and no failures. |
+|                 |                                                                      |
+|-----------------|----------------------------------------------------------------------|
+| :green_circle:  | All checks passed.                                                   |
+| :red_circle:    | There is at least one failed check.                                  |
+| :yellow_circle: | There is at least one expected fail or skipped test and no failures. |
+
 
 Any failing test must be properly addressed with a new issue, detailing the error and the possible cause. It must be included in the `Fixes` section of the current release candidate main issue.
 
@@ -36,9 +38,9 @@ As for the coverage results, they must be added split by modules. Test files mus
 All test coverage results must have one of the following statuses: 
 
 ## Checks
-Status | Coverage | Modules | Version |
-| :--: | :--: | -- | :--: | 
-| :green_circle:  | :green_square:  | All |  |  |  |
+| Status         | Coverage       | Modules        | Version |
+|----------------|----------------|----------------|---------|
+| :green_square: | :green_square: | :green_square: | All     |
 
 |                 |        |
 |-----------------|--------|
