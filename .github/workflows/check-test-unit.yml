@@ -1,0 +1,35 @@
+# This workflow calls to `reusable-dev-environment` workflow to run do unit tests
+
+name: Check - Test - Unit
+
+on:
+  workflow_dispatch:
+    inputs:
+      reference:
+        required: true
+        type: string
+        default: master
+        description: Branch/Tag/Commit SHA reference for the source code.
+      command:
+        required: true
+        type: choice
+        default: 'yarn test:jest'
+        description: Test. Select the test to run.
+        options:
+        - 'yarn test:jest'
+  pull_request:
+    branches:
+      - 'main'
+      - 'master'
+      - '*.*-*.*'
+      - '*.*-*.*-wzd'
+
+jobs:
+  check-test-unit:
+    uses: ./.github/workflows/reusable-dev-environment.yml
+    with:
+      reference: ${{ github.event.inputs.reference }}
+      command: ${{ github.event.inputs.command || 'yarn test:jest' }}
+      notify_jest_coverage_summary: true
+    secrets: inherit
+      
