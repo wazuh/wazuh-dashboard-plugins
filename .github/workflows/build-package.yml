@@ -13,6 +13,7 @@ on:
 
 jobs:
   build-package-on-dispatch:
+    name: Deploy a dev environment and build a package
     uses: ./.github/workflows/reusable-dev-environment.yml
     with:
       reference: ${{ github.event.inputs.reference }}

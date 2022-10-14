@@ -26,6 +26,7 @@ on:
 
 jobs:
   check-test-unit:
+    name: Deploy a dev environment and check the unit tests
     uses: ./.github/workflows/reusable-dev-environment.yml
     with:
       reference: ${{ github.event.inputs.reference }}

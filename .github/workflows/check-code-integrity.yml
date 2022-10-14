@@ -19,6 +19,7 @@ on:
 
 jobs:
   check-code-integrity:
+    name: Deploy a dev environment and check the code integrity
     uses: ./.github/workflows/reusable-dev-environment.yml
     with:
       reference: ${{ github.event.inputs.reference || github.ref }}

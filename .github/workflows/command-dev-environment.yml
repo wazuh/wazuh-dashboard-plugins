@@ -30,7 +30,7 @@ on:
 
 jobs:
   command-dev-environment-on-dispatch:
-    if: github.event_name == 'workflow_dispatch'
+    name: Deploy a dev environment and run a command
     uses: ./.github/workflows/reusable-dev-environment.yml
     with:
       reference: ${{ github.event.inputs.reference }}
