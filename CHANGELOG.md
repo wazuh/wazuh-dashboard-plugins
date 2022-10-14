@@ -16,8 +16,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 - The endpoint `/agents/summary/status` response was adapted. [#3874](https://github.com/wazuh/wazuh-kibana-app/pull/3874)
 - Changed loading icons of the Agents Overview section to work independently [#4363](https://github.com/wazuh/wazuh-kibana-app/pull/4363)
 - Enhance the message shown when a mismatch between Wazuh API and Wazuh APP occurs [#4544](https://github.com/wazuh/wazuh-kibana-app/pull/4544)
+- Changed breadcrumb styling to support OpenSearch dashboard 2.x. [#4544](https://github.com/wazuh/wazuh-kibana-app/pull/4544)
 
 ### Removed
+
 - Removed custom styles from kibana 7.9.0 [#4491](https://github.com/wazuh/wazuh-kibana-app/pull/4491)
 
 ### Fixed
@@ -26,7 +28,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed nested fields filtering in dashboards tables and KPIs [#4425](https://github.com/wazuh/wazuh-kibana-app/pull/4425)
 - Fixed nested field rendering in security alerts table details [#4428](https://github.com/wazuh/wazuh-kibana-app/pull/4428)
 - Fixed a bug where the Wazuh logo was used instead of the custom one [#4539](https://github.com/wazuh/wazuh-kibana-app/pull/4539)
-- Fixed rendering problems of the `Agent Overview` section in low resolutions [#4516](https://github.com/wazuh/wazuh-kibana-app/pull/4516)
+- Fixed rendering problems of the `Agent Overview` section in low resolutions [#4649](https://github.com/wazuh/wazuh-kibana-app/pull/4649)
 
 ## Wazuh v4.3.8 - OpenSearch Dashboards 1.2.0 - Revision 4309
 
