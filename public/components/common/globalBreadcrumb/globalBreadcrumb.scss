@@ -36,17 +36,7 @@
 
 // styles for opensearch >2.x
 
-.osdHeaderBreadcrumbs,
+.osdHeaderBreadcrumbs ,
 .osdHeaderBreadcrumbs--dark {
   filter: none;
-}
-
-.osdHeaderBreadcrumbs .euiBreadcrumb:not(.euiBreadcrumb:last-child),
-.osdHeaderBreadcrumbs--dark .euiBreadcrumb:not(.euiBreadcrumb:last-child) {
-  margin-right: 8px;
-}
-
-.osdHeaderBreadcrumbs .euiBreadcrumbSeparator,
-.osdHeaderBreadcrumbs--dark .euiBreadcrumbSeparator {
-  display: block;
 }
