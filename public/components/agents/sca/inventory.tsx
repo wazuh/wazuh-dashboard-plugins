@@ -49,7 +49,7 @@ import { API_NAME_AGENT_STATUS, UI_LOGGER_LEVELS } from '../../../../common/cons
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { VisualizationBasic } from '../../common/charts/visualizations/basic';
 import { TableWzAPI } from '../../common/tables';
-
+import { getFilterValues } from './lib/api-request';
 export class Inventory extends Component {
   _isMount = false;
   constructor(props) {
@@ -89,19 +89,19 @@ export class Inventory extends Component {
       {
         field: 'pass',
         name: 'Pass',
-        width: "100px",
+        width: '100px',
         sortable: true,
       },
       {
         field: 'fail',
         name: 'Fail',
-        width: "100px",
+        width: '100px',
         sortable: true,
       },
       {
         field: 'invalid',
         name: 'Not applicable',
-        width: "100px",
+        width: '100px',
         sortable: true,
       },
       {
@@ -273,94 +273,81 @@ export class Inventory extends Component {
     });
 
     /**
-     * Get list of values defined in distinctFields by field
-     * @param value
-     * @param field
-     * @returns
-     */
-    const getSuggestionsValues = (value, field) => {
-      if (!distinctFields[field]) return [];
-      return Object.keys(distinctFields[field]).filter(
-        (item) => item && item.toLowerCase().includes(value.toLowerCase().trim())
-      );
-    };
-
-    /**
      * Get list of suggestions.
      * This method validate if the suggestion item exists in the checks array fields
      * @returns List of suggestions
      */
-    const getSuggestionsFields = () => {
+    const getSuggestionsFields = (policy) => {
       const defaultSuggestions = [
         {
           type: 'params',
           label: 'condition',
           description: 'Filter by check condition',
           operators: ['=', '!='],
-          values: (value) => getSuggestionsValues(value, 'condition'),
+          values: (value) => getFilterValues('condition', value, this.props.agent.id, policy),
         },
         {
           type: 'params',
           label: 'file',
           description: 'Filter by check file',
           operators: ['=', '!='],
-          values: (value) => getSuggestionsValues(value, 'file'),
+          values: (value) => getFilterValues('file', value, this.props.agent.id, policy),
         },
         {
           type: 'params',
           label: 'title',
           description: 'Filter by check title',
           operators: ['=', '!='],
-          values: (value) => getSuggestionsValues(value, 'title'),
+          values: (value) => getFilterValues('title', value, this.props.agent.id, policy),
         },
         {
           type: 'params',
           label: 'result',
           description: 'Filter by check result',
           operators: ['=', '!='],
-          values: (value) => getSuggestionsValues(value, 'result'),
+          values: (value) => getFilterValues('result', value, this.props.agent.id, policy),
         },
         {
           type: 'params',
           label: 'status',
           description: 'Filter by check status',
           operators: ['=', '!='],
-          values: (value) => getSuggestionsValues(value, 'status'),
+          values: (value) => getFilterValues('status', value, this.props.agent.id, policy),
         },
         {
           type: 'params',
           label: 'rationale',
           description: 'Filter by check rationale',
           operators: ['=', '!='],
-          values: (value) => getSuggestionsValues(value, 'rationale'),
+          values: (value) => getFilterValues('rationale', value, this.props.agent.id, policy),
         },
         {
           type: 'params',
           label: 'registry',
           description: 'Filter by check registry',
           operators: ['=', '!='],
-          values: (value) => getSuggestionsValues(value, 'registry'),
+          values: (value) => getFilterValues('registry', value, this.props.agent.id, policy),
         },
         {
           type: 'params',
           label: 'description',
           description: 'Filter by check description',
           operators: ['=', '!='],
-          values: (value) => getSuggestionsValues(value, 'description'),
+          values: (value) => getFilterValues('description', value, this.props.agent.id, policy),
         },
         {
           type: 'params',
           label: 'remediation',
           description: 'Filter by check remediation',
           operators: ['=', '!='],
-          values: (value) => getSuggestionsValues(value, 'remediation'),
+          values: (value) => getFilterValues('remediation', value, this.props.agent.id, policy),
         },
         {
           type: 'params',
           label: 'reason',
           description: 'Filter by check reason',
           operators: ['=', '!='],
-          values: (value) => getSuggestionsValues(value, 'reason'),
+          values: (value) => getFilterValues('reason', value, this.props.agent.id, policy),
         },
       ];
 
@@ -370,7 +357,7 @@ export class Inventory extends Component {
       return filteresSuggestions;
     };
 
-    this.suggestions[policy] = getSuggestionsFields();
+    this.suggestions[policy] = getSuggestionsFields(policy);
   }
 
   async initialize() {
@@ -447,23 +434,6 @@ export class Inventory extends Component {
       this._isMount && this.setState({ lookingPolicy: policy, loadingPolicy: false, items: [] });
     }
   }
-
-  filterPolicyChecks = () =>
-    !!this.state.items &&
-    this.state.items.filter((check) =>
-      this.state.filters.every((filter) =>
-        filter.field === 'search'
-          ? Object.keys(check).some(
-            (key) =>
-              ['string', 'number'].includes(typeof check[key]) &&
-              String(check[key]).toLowerCase().includes(filter.value.toLowerCase())
-          )
-          : typeof check[filter.field] === 'string' &&
-          (filter.value === ''
-            ? check[filter.field] === filter.value
-            : check[filter.field].toLowerCase().includes(filter.value.toLowerCase()))
-      )
-    );
 
   toggleDetails = (item) => {
     const itemIdToExpandedRowMap = { ...this.state.itemIdToExpandedRowMap };
@@ -782,20 +752,6 @@ export class Inventory extends Component {
                     </EuiFlexItem>
                   </EuiFlexGroup>
                   <EuiSpacer size="m" />
-
-                  <EuiFlexGroup>
-                    <EuiFlexItem>
-                      <WzSearchBar
-                        filters={this.state.filters}
-                        suggestions={this.suggestions[this.state.lookingPolicy.policy_id]}
-                        placeholder="Filter or search"
-                        onFiltersChange={(filters) => {
-                          this.setState({ filters });
-                        }}
-                      />
-                    </EuiFlexItem>
-                  </EuiFlexGroup>
-
                   <EuiFlexGroup>
                     <EuiFlexItem>
                       <TableWzAPI
@@ -809,7 +765,7 @@ export class Inventory extends Component {
                         tableProps={{
                           isExpandable: true,
                           itemIdToExpandedRowMap: this.state.itemIdToExpandedRowMap,
-                          itemId: 'id'
+                          itemId: 'id',
                         }}
                         downloadCsv
                         showReload
