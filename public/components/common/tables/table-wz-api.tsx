@@ -17,7 +17,7 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiText,
-  EuiButtonEmpty,
+  EuiButtonEmpty
 } from '@elastic/eui';
 import { filtersToObject } from '../../wz-search-bar';
 import { TableWithSearchBar } from './table-with-search-bar';
@@ -32,10 +32,24 @@ import { getErrorOrchestrator } from '../../../react-services/common-services';
  * Search input custom filter button
  */
 interface CustomFilterButton {
-  label: string;
-  field: string;
-  value: string;
+  label: string
+  field: string
+  value: string
 }
+
+export function TableWzAPI({ actionButtons, ...rest }: {
+  actionButtons?: ReactNode | ReactNode[]
+  title?: string
+  description?: string
+  downloadCsv?: boolean
+  searchTable?: boolean
+  endpoint: string
+  buttonOptions?: CustomFilterButton[]
+  onFiltersChange?: Function,
+  showReload?: boolean
+  searchBarProps?: any
+  reload?: any
+}) {
 
 export function TableWzAPI({
   actionButtons,
@@ -100,74 +114,61 @@ export function TableWzAPI({
         },
       };
       getErrorOrchestrator().handleError(options);
-    }
+    };
   }, []);
 
-  const renderActionButtons = (
-    <>
-      {Array.isArray(actionButtons)
-        ? actionButtons.map((button, key) => (
-            <EuiFlexItem key={key} grow={false}>
-              {button}
-            </EuiFlexItem>
-          ))
-        : typeof actionButtons === 'object' && (
-            <EuiFlexItem grow={false}>{actionButtons}</EuiFlexItem>
-          )}
-    </>
-  );
+  const renderActionButtons = (<>
+    {Array.isArray(actionButtons) ?
+      actionButtons.map((button, key) => <EuiFlexItem key={key} grow={false}>{button}</EuiFlexItem>) :
+      (typeof actionButtons === 'object') && <EuiFlexItem grow={false}>{actionButtons}</EuiFlexItem>}
+  </>)
 
   /**
    *  Generate a new reload footprint
    */
   const triggerReload = () => {
     setReloadFootprint(Date.now());
-  };
+  }
 
   useEffect(() => {
-    if (rest.reload) triggerReload();
-  }, [rest.reload]);
+    if (rest.reload)
+      triggerReload();
+  }, [rest.reload])
 
   const ReloadButton = (
     <EuiFlexItem grow={false}>
-      <EuiButtonEmpty
-        isDisabled={totalItems == 0}
-        iconType="refresh"
-        onClick={() => triggerReload()}
-      >
+      <EuiButtonEmpty isDisabled={(totalItems == 0)} iconType="refresh" onClick={() => triggerReload()}>
         Refresh
       </EuiButtonEmpty>
     </EuiFlexItem>
-  );
+  )
 
   const header = (
     <EuiFlexGroup wrap>
       <EuiFlexItem className="wz-flex-basis-auto" grow={false}>
         {rest.title && (
           <EuiTitle size="s">
-            <h1>
-              {rest.title}{' '}
-              {isLoading ? <EuiLoadingSpinner size="s" /> : <span>({totalItems})</span>}
-            </h1>
+            <h1>{rest.title} {isLoading ? <EuiLoadingSpinner size="s" /> : <span>({totalItems})</span>}</h1>
           </EuiTitle>
         )}
-        {rest.description && <EuiText color="subdued">{rest.description}</EuiText>}
+        {rest.description && (
+          <EuiText color="subdued">
+            {rest.description}
+          </EuiText>
+        )}
       </EuiFlexItem>
       <EuiFlexItem>
-        <EuiFlexGroup wrap justifyContent={'flexEnd'} alignItems={'center'}>
+        <EuiFlexGroup
+          wrap
+          justifyContent={'flexEnd'}
+          alignItems={'center'}
+        >
           {/* Render optional custom action button */}
           {renderActionButtons}
           {/* Render optional reload button */}
           {rest.showReload && ReloadButton}
           {/* Render optional export to CSV button */}
-          {rest.downloadCsv && (
-            <ExportTableCsv
-              endpoint={rest.endpoint}
-              totalItems={totalItems}
-              filters={filters}
-              title={rest.title}
-            />
-          )}
+          {rest.downloadCsv && <ExportTableCsv endpoint={rest.endpoint} totalItems={totalItems} filters={filters} title={rest.title} />}
         </EuiFlexGroup>
       </EuiFlexItem>
     </EuiFlexGroup>
@@ -179,12 +180,21 @@ export function TableWzAPI({
     <TableDefault onSearch={onSearch} {...{ ...rest, reload: reloadFootprint }} />
   );
 
+  const table = rest.searchTable ?
+    <TableWithSearchBar
+      onSearch={onSearch}
+      {...{ ...rest, reload: reloadFootprint }}
+    /> :
+    <TableDefault
+      onSearch={onSearch}
+      {...{ ...rest, reload: reloadFootprint }}
+    />
+
   return (
     <>
       {header}
       {table}
-    </>
-  );
+    </>)
 }
 
 // Set default props
