@@ -7,13 +7,13 @@ Feature: Validate paginator on Rule page
     Background: the user navigate to the Rules page
         Given The wazuh admin user is logged
         When The user navigates to rules
-        Then The user see that the rule list is paginated
+        Then The user sees that the rule list is paginated
 
     Scenario: Rules are displayed when user clicks the first page
         When The user clicks on the second page button
         And A new set of rules it's displayed
         And The user clicks on the first page button
-        Then The first page of rules it displayed
+        Then The first page of rules is displayed
 
     Scenario: Rules are displayed - Select a previous page
         When The user clicks on the second page button
