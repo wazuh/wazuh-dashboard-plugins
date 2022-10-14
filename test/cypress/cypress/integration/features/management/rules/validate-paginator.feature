@@ -11,7 +11,7 @@ Feature: Validate paginator on Rule page
 
     Scenario: Rules are displayed when user clicks the first page
         When The user clicks on the second page button
-        And A new set of rules it's displayed
+        And A new set of rules is displayed
         And The user clicks on the first page button
         Then The first page of rules is displayed
 
