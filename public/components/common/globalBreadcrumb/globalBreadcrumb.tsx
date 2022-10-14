@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { EuiBreadcrumbs, EuiToolTip } from '@elastic/eui';
+import { EuiBreadcrumbs } from '@elastic/eui';
 import { connect } from 'react-redux';
 import './globalBreadcrumb.scss';
 import { AppNavigate } from '../../../react-services/app-navigate';
@@ -15,11 +15,37 @@ class WzGlobalBreadcrumb extends Component {
   async componentDidMount() {
     const $injector = getAngularModule().$injector;
     this.router = $injector.get('$route');
-    $('#breadcrumbNoTitle').attr('title', '');
   }
-  componentDidUpdate() {
-    $('#breadcrumbNoTitle').attr('title', '');
-  }
+
+  crumbs = () => {
+    const breadcrumbs = this.props.state.breadcrumb.map((breadcrumb) =>
+      breadcrumb.agent
+        ? {
+            className: 'euiLink euiLink--subdued osdBreadcrumbs',
+            onClick: (ev) => {
+              ev.stopPropagation();
+              AppNavigate.navigateToModule(ev, 'agents', {
+                tab: 'welcome',
+                agent: breadcrumb.agent.id,
+              });
+              this.router.reload();
+            },
+            truncate: true,
+            text: breadcrumb.agent.name,
+          }
+        : {
+            ...breadcrumb,
+            className: 'osdBreadcrumbs',
+          }
+    );
+
+    // remove frist breadcrumb if it's empty
+    if (breadcrumbs[0].text === '') {
+      breadcrumbs.shift();
+    }
+
+    return breadcrumbs;
+  };
 
   render() {
     return (
@@ -30,31 +56,7 @@ class WzGlobalBreadcrumb extends Component {
             responsive={false}
             truncate={false}
             max={6}
-            breadcrumbs={this.props.state.breadcrumb.map((breadcrumb) =>
-              breadcrumb.agent
-                ? {
-                    className: 'euiLink euiLink--subdued osdBreadcrumbs',
-                    onClick: (ev) => {
-                      ev.stopPropagation();
-                      AppNavigate.navigateToModule(ev, 'agents', {
-                        tab: 'welcome',
-                        agent: breadcrumb.agent.id,
-                      });
-                      this.router.reload();
-                    },
-                    id: 'breadcrumbNoTitle',
-                    truncate: true,
-                    text: (
-                      <EuiToolTip position="top" content={'View agent summary'}>
-                        <span>{breadcrumb.agent.name}</span>
-                      </EuiToolTip>
-                    ),
-                  }
-                : breadcrumb.text !== '' && {
-                    ...breadcrumb,
-                    className: 'osdBreadcrumbs',
-                  }
-            )}
+            breadcrumbs={this.crumbs()}
             aria-label="Wazuh global breadcrumbs"
           />
         )}
