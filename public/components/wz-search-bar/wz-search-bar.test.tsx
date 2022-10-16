@@ -152,7 +152,7 @@ describe('WzSearchBar', () => {
         });
 
         inputs.forEach((filterText, index) => {
-          // check all badgets created
+          // check all badges created
           expect(getByTestId(`${WZ_SEARCH_BADGE_NAME}-${index}`)).toHaveTextContent(filterText);
           expect(getByText(filterText)).toBeInTheDocument();
         });
