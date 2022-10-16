@@ -6,7 +6,7 @@ import React from 'react';
 import { CASES_SEARCHBAR } from './wz-search-bar.test-cases';
 
 const getSuggestionsFilters = async (field, value, filters = {}) => {
-  // here is returned filter to call api and get sugguestions
+  // here is returned filter to call api and get suggestions
   return Promise.resolve([]);
 };
 
