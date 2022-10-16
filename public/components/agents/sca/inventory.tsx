@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Iventory component
+ * Wazuh app - Inventory component
  * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
