@@ -5,8 +5,23 @@ import { IWzSuggestItem } from '../../../wz-search-bar';
 import { ComplianceText, RuleText } from '../components';
 import { getFilterValues } from './lib';
 
-export class InventoryPolicyChecksTable extends Component {
+type Props = {
+  agent: { [key: string]: any };
+  lookingPolicy: { [key: string]: any };
+};
+
+type State = {
+  agent: { [key: string]: any };
+  lookingPolicy: { [key: string]: any };
+  itemIdToExpandedRowMap: {};
+  filters: any[];
+  pageTableChecks: { pageIndex: 0 };
+};
+
+export class InventoryPolicyChecksTable extends Component<Props, State> {
   _isMount = false;
+  suggestions: IWzSuggestItem[] = [];
+  columnsChecks: any;
   constructor(props) {
     super(props);
     const { agent, lookingPolicy } = this.props;
