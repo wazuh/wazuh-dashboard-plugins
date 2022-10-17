@@ -11,4 +11,5 @@ Then('The user sees that the rule list is paginated', () => {
     cy.log(listRulesText);
     cy.wrap(listRulesText).as('listRulesText');
   })
+  cy.wait(1500);
 });
