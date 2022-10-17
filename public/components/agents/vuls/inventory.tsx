@@ -33,6 +33,7 @@ import {
   VisualizationBasicWidget,
 } from '../../common/charts/visualizations/basic';
 import { WzStat } from '../../wz-stat';
+import { formatUIDate } from '../../../react-services/time-service';
 
 interface Aggregation {
   title: number;
@@ -101,6 +102,12 @@ export class Inventory extends Component {
       this
     );
     this.colorsVisualizationVulnerabilitiesSummaryData = euiPaletteColorBlind();
+  }
+
+  // when vulnerability module is not configured
+  // its meant to render nothing when such date is received
+  beautifyDate(date?: string) {
+    return date && !['1970-01-01T00:00:00Z', '-'].includes(date) ? formatUIDate(date) : '-';
   }
 
   async componentDidMount() {
@@ -230,8 +237,8 @@ export class Inventory extends Component {
     if (isLoading) {
       return this.loadingInventory();
     }
-    const last_full_scan = vulnerabilityLastScan.last_full_scan;
-    const last_partial_scan = vulnerabilityLastScan.last_partial_scan;
+    const last_full_scan = this.beautifyDate(vulnerabilityLastScan.last_full_scan);
+    const last_partial_scan = this.beautifyDate(vulnerabilityLastScan.last_partial_scan);
 
     const table = this.renderTable();
     return (

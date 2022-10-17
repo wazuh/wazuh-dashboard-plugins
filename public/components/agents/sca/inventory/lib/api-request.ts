@@ -1,4 +1,4 @@
-import { WzRequest } from '../../../../react-services/wz-request';
+import { WzRequest } from '../../../../../react-services/wz-request';
 
 export async function getFilterValues(
   field,
