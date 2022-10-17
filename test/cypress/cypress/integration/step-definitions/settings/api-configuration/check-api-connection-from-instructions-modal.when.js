@@ -4,7 +4,6 @@ import { API_CONFIGURATION_PAGE as pageName} from '../../../utils/pages-constant
 const newConnectionModalCheckConnectionButton = getSelector('newConnectionModalCheckConnectionButton', pageName);
 
 When('The user tests the API connection from the instructions', () => {
-  debugger
     cy.get('tbody tr td').then(($e) => {
 
       let index = $e.findIndex((i, element) => {
