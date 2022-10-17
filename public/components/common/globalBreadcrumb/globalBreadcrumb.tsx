@@ -40,7 +40,7 @@ class WzGlobalBreadcrumb extends Component {
     );
 
     // remove frist breadcrumb if it's empty
-    if (breadcrumbs[0].text === '') {
+    if (breadcrumbs?.[0]?.text === '') {
       breadcrumbs.shift();
     }
 
