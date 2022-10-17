@@ -16,7 +16,6 @@ import {
   EuiFlexGroup,
   EuiPanel,
   EuiPage,
-  EuiBasicTable,
   EuiInMemoryTable,
   EuiSpacer,
   EuiText,
@@ -51,6 +50,7 @@ import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { VisualizationBasic } from '../../common/charts/visualizations/basic';
 import PropTypes from 'prop-types'
 import { AppNavigate } from '../../../react-services/app-navigate';
+import SCAPoliciesTable from './inventory/policies-table';
 
 export class Inventory extends Component {
   _isMount = false;
@@ -185,7 +185,6 @@ export class Inventory extends Component {
 
   async componentDidMount() {
     this._isMount = true;
-    // this.setState({withoutDashboard: withoutDashboard ? withoutDashboard : false})
     await this.initialize();
     const regex = new RegExp('redirectPolicy=' + '[^&]*');
     const match = window.location.href.match(regex);
@@ -197,7 +196,6 @@ export class Inventory extends Component {
           q: 'policy_id=' + id,
         });
         await this.loadScaPolicy(((((policy || {}).data || {}).data || {}).items || [])[0]);
-        // console.log(window.location.href, 'location')
         window.location.href = window.location.href.replace(
           new RegExp('redirectPolicy=' + '[^&]*'),
           ''
@@ -630,7 +628,7 @@ export class Inventory extends Component {
         onClick={() => this.setState({ showMoreInfo: !this.state.showMoreInfo })}
       ></EuiButtonEmpty>
     );
-    const { agent, withoutDashboard } = this.props;
+    const { agent } = this.props;
     // console.log(agent, this.state.lookingPolicy, this.state.loading, this.state.redirect, 'perro')
     // const itemsMapped = this.state.policies.map((item) => {
     //   return ({
@@ -680,7 +678,7 @@ export class Inventory extends Component {
             this.state.policies.length > 0 &&
             !this.state.loading && !this.state.isLoading && (
               <div>
-                {this.state.policies.length && !withoutDashboard && (
+                {this.state.policies.length && (
                   <EuiFlexGroup style={{ marginTop: 0 }}>
                     {this.state.policies.map((policy, idx) => (
                       <EuiFlexItem key={idx} grow={false}>
@@ -712,18 +710,17 @@ export class Inventory extends Component {
                     ))}
                   </EuiFlexGroup>
                 )}
-                <EuiSpacer size="m" />
-                {/* <EuiPanel paddingSize="l"> */}
+                 <EuiSpacer size="m" />
                 <EuiFlexGroup>
                   <EuiFlexItem>
-                    <EuiBasicTable
-                      items={this.state.policies}
+                    <SCAPoliciesTable
+                      loading={this.state.loading}
+                      policies={this.state.policies}
                       columns={this.columnsPolicies}
                       rowProps={getPoliciesRowProps}
                     />
                   </EuiFlexItem>
                 </EuiFlexGroup>
-                {/* </EuiPanel> */}
               </div>
             )}
           {agent &&
@@ -876,12 +873,6 @@ export class Inventory extends Component {
   }
 }
 
-
-Inventory.propTypes = {
-  withoutDashboard: PropTypes.bool
-}
-
 Inventory.defaultProps = {
-  withoutDashboard: false,
   onClickRow: undefined
 }  
