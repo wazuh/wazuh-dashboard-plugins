@@ -417,9 +417,9 @@ export default [
   {
     _id: 'Wazuh-App-Overview-GitHub-Alert-Summary',
     _source: {
-      title: 'Alert summary',
+      title: 'Alerts summary',
       visState: JSON.stringify({
-        title: 'Alert summary',
+        title: 'Alerts summary',
         type: 'table',
         aggs: [
           {

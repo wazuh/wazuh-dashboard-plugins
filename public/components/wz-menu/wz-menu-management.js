@@ -191,7 +191,7 @@ class WzMenuManagement extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.rulesetReducers,
+    state: state.managementReducers,
   };
 };
 

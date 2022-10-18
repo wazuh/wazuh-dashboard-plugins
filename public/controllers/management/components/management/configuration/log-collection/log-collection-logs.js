@@ -15,16 +15,13 @@ import React, { Component, Fragment } from 'react';
 import WzNoConfig from '../util-components/no-config';
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzConfigurationListSelector from '../util-components/configuration-settings-list-selector';
-import {
-  isString,
-  renderValueOrDefault,
-  renderValueOrNoValue
-} from '../utils/utils';
+import { isString, renderValueOrDefault, renderValueOrNoValue } from '../utils/utils';
 import { settingsListBuilder } from '../utils/builders';
 
 import helpLinks from './help-links';
+import { LOGCOLLECTOR_LOCALFILE_PROP, LOCALFILE_LOGS_PROP } from './types';
 
-const renderTargetField = item => item ? item.join(', ') : 'agent';
+const renderTargetField = (item) => (item ? item.join(', ') : 'agent');
 
 const mainSettings = [
   { field: 'logformat', label: 'Log format' },
@@ -32,41 +29,37 @@ const mainSettings = [
   {
     field: 'only-future-events',
     label: 'Only receive logs occured after start',
-    when: 'agent'
+    when: 'agent',
   },
   {
     field: 'reconnect_time',
-    label:
-      'Time in seconds to try to reconnect with Windows Event Channel when it has fallen',
-    when: 'agent'
+    label: 'Time in seconds to try to reconnect with Windows Event Channel when it has fallen',
+    when: 'agent',
   },
   {
     field: 'query',
     label: 'Filter logs using this XPATH query',
     render: renderValueOrNoValue,
-    when: 'agent'
+    when: 'agent',
   },
   {
     field: 'labels',
     label: 'Only receive logs occured after start',
     render: renderValueOrNoValue,
-    when: 'agent'
+    when: 'agent',
   },
   {
     field: 'target',
     label: 'Redirect output to this socket',
-    render: renderTargetField
-  }
+    render: renderTargetField,
+  },
 ];
 
-
-const getMainSettingsAgentOrManager = agent =>
+const getMainSettingsAgentOrManager = (agent) =>
   agent && agent.id === '000'
-    ? mainSettings.filter(setting => setting.when !== 'agent')
-    : mainSettings.filter(setting =>
-        setting.when === 'agent'
-          ? agent && agent.os && agent.os.platform === 'windows'
-          : true
+    ? mainSettings.filter((setting) => setting.when !== 'agent')
+    : mainSettings.filter((setting) =>
+        setting.when === 'agent' ? agent && agent.os && agent.os.platform === 'windows' : true
       );
 class WzConfigurationLogCollectionLogs extends Component {
   constructor(props) {
@@ -74,38 +67,25 @@ class WzConfigurationLogCollectionLogs extends Component {
   }
   render() {
     const { currentConfig, agent } = this.props;
-    const items =
-      currentConfig['logcollector-localfile'] &&
-      currentConfig['logcollector-localfile']['localfile-logs']
-        ? settingsListBuilder(
-            currentConfig['logcollector-localfile']['localfile-logs'],
-            [
-              'file',
-              'alias',
-              'commnad', 
-              (item) => `${item.logformat}${item.target ? ` - ${item.target.join(', ')}` : ''}`
-            ]
-          )
-        : [];
+    const items = currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]?.[LOCALFILE_LOGS_PROP]
+      ? settingsListBuilder(currentConfig[LOGCOLLECTOR_LOCALFILE_PROP][LOCALFILE_LOGS_PROP], [
+          'file',
+          'alias',
+          'commnad',
+          (item) => `${item.logformat}${item.target ? ` - ${item.target.join(', ')}` : ''}`,
+        ])
+      : [];
     return (
       <Fragment>
-        {currentConfig['logcollector-localfile'] &&
-          isString(currentConfig['logcollector-localfile']) && (
-            <WzNoConfig
-              error={currentConfig['logcollector-localfile']}
-              help={helpLinks}
-            />
-          )}
-        {currentConfig['logcollector-localfile'] &&
-        !isString(currentConfig['logcollector-localfile']) &&
-        !(currentConfig['logcollector-localfile']['localfile-logs'] || [])
-          .length ? (
+        {isString(currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]) && (
+          <WzNoConfig error={currentConfig[LOGCOLLECTOR_LOCALFILE_PROP]} help={helpLinks} />
+        )}
+        {!isString(currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]) &&
+        !currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]?.[LOCALFILE_LOGS_PROP]?.length ? (
           <WzNoConfig error="not-present" help={helpLinks} />
         ) : null}
-        {currentConfig['logcollector-localfile'] &&
-        !isString(currentConfig['logcollector-localfile']) &&
-        currentConfig['logcollector-localfile']['localfile-logs'] &&
-        currentConfig['logcollector-localfile']['localfile-logs'].length ? (
+        {!isString(currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]) &&
+        currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]?.[LOCALFILE_LOGS_PROP]?.length ? (
           <WzConfigurationSettingsTabSelector
             title="Logs files"
             description="List of log files that will be analyzed"
@@ -123,9 +103,5 @@ class WzConfigurationLogCollectionLogs extends Component {
     );
   }
 }
-
-WzConfigurationLogCollectionLogs.propTypes = {
-  // currentConfig: PropTypes.object.isRequired
-};
 
 export default WzConfigurationLogCollectionLogs;

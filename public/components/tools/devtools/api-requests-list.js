@@ -222,13 +222,6 @@ export const apiRequestList =
                 "documentationLink": "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-active-configuration"
             },
             {
-                "name": "agents/:agent_id/group/is_sync",
-                "value": "agents/:agent_id/group/is_sync",
-                "score": 1,
-                "meta": "endpoint",
-                "documentationLink": "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-sync-status-of-agent"
-            },
-            {
                 "name": "agents/:agent_id/key",
                 "value": "agents/:agent_id/key",
                 "score": 1,

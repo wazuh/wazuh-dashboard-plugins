@@ -372,6 +372,9 @@ export const PLUGIN_PLATFORM_REQUEST_HEADERS = {
   'kbn-xsrf': 'kibana'
 };
 
+// Plugin app
+export const PLUGIN_APP_NAME = 'Wazuh App';
+
 // UI
 export const API_NAME_AGENT_STATUS = {
   ACTIVE: 'active',
@@ -400,8 +403,13 @@ export const UI_ORDER_AGENT_STATUS = [
   API_NAME_AGENT_STATUS.ACTIVE,
   API_NAME_AGENT_STATUS.DISCONNECTED,
   API_NAME_AGENT_STATUS.PENDING,
-  API_NAME_AGENT_STATUS.NEVER_CONNECTED  
-];
+  API_NAME_AGENT_STATUS.NEVER_CONNECTED
+]
+
+export const AGENT_SYNCED_STATUS = {
+  SYNCED: 'synced',
+  NOT_SYNCED: 'not synced',
+}
 
 // Documentation
 export const DOCUMENTATION_WEB_BASE_URL = "https://documentation.wazuh.com";

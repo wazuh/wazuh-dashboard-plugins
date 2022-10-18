@@ -32,6 +32,11 @@ export class WzStatusStats extends Component {
       description: 'Agents coverage',
       status: 'coverage'
     })
+    this.agentStatus.push({
+      color: undefined,
+      description: 'Synced agents',
+      status: 'synced'
+    })
   }
 
   componentDidMount() {
@@ -44,9 +49,18 @@ export class WzStatusStats extends Component {
     this._isMounted = false;
   }
 
-  render() {
+  getTitle(status) {
     const { stats } = this.props.state;
+    const metric = {
+      [status]: stats?.agentsCount?.[status],
+      coverage: `${stats?.agentsCoverage}%`,
+      synced: `${stats?.agentsSynced}%`
+    };
+    return metric[status];
+  }
 
+  render() {
+    
     return (
       <div>
         <EuiFlexGroup>
@@ -54,7 +68,7 @@ export class WzStatusStats extends Component {
           {this.agentStatus.map(({color, description, status}) => (
             <EuiFlexItem key={`agent-status-${status}`}>
               <EuiStat
-                title={status === 'coverage' ? `${stats?.agentsCoverage}%` : stats?.agentsCount?.[status]}
+                title={this.getTitle(status)}
                 description={description}
                 titleColor={color}
                 textAlign="center"
