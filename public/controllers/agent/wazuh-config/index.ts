@@ -291,6 +291,22 @@ const versionButtonsRaspbian = [
   }
 ];
 
+/**
+ * Order the OS Buttons Alphabetically by label
+ * @param a 
+ * @param b 
+ * @returns 
+ */
+const orderOSAlphabetically = (a, b) => {
+  if (a.label.toUpperCase() < b.label.toUpperCase()) {
+    return -1;
+  }
+  if (a.label.toUpperCase() > b.label.toUpperCase()) {
+    return 1;
+  }
+  return 0;
+}
+
 const osButtons = [
   {
     id: 'rpm',
@@ -352,6 +368,6 @@ const osButtons = [
     id: 'raspbian',
     label: 'Raspbian OS',
   },
-];
+].sort(orderOSAlphabetically);
 
 export { architectureButtons, architecturei386Andx86_64, versionButtonsRaspbian, versionButtonsSuse, architectureButtonsWithPPC64LE, versionButtonsOracleLinux, versionButtonFedora, versionButtonsRedHat, versionButtonsCentos, architectureButtonsMacos, osButtons, versionButtonsDebian, versionButtonsUbuntu, versionButtonAmazonLinux, versionButtonsWindows, versionButtonsMacOS, versionButtonsOpenSuse, versionButtonsSolaris, versionButtonsAix, versionButtonsHPUX, architectureButtonsi386, architectureButtonsSolaris, architectureButtonsAix, architectureButtonsHpUx, architectureButtonsOpenSuse };
