@@ -1,13 +1,12 @@
 import { WzRequest } from '../../../../../react-services/wz-request';
 
 export async function getFilterValues(
-  field,
-  value,
-  agentId,
-  policyId,
-  filters = {},
-  format = (item) => item
-) {
+  field: string,
+  value: string,
+  agentId: string,
+  policyId: string,
+  filters: { [key: string]: string } = {},
+  format = (item) => item) {
   const filter = {
     ...filters,
     distinct: true,

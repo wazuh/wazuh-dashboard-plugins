@@ -204,9 +204,6 @@ export class Inventory extends Component {
     );
   }
 
-  // This method was created because Wazuh API returns 1970-01-01T00:00:00Z dates or undefined ones
-  // when vulne_isMoun
-
   buildTitleFilter({ description, title, titleColor }) {
     const { isLoadingStats } = this.state;
     return (

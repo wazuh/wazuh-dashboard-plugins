@@ -51,7 +51,7 @@ export function TableWzAPI({
   onFiltersChange?: Function;
   showReload?: boolean;
   searchBarProps?: any;
-  reload?: any;
+  reload?: boolean;
 }) {
   const [totalItems, setTotalItems] = useState(0);
   const [filters, setFilters] = useState([]);
