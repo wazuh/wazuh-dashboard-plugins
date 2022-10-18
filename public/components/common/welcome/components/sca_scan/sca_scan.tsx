@@ -45,6 +45,11 @@ import { compose } from 'redux';
 import { getAgentPolicies } from '../../../../../components/agents/sca/index';
 import SCAPoliciesTable from '../../../../../components/agents/sca/inventory/policies-table';
 
+type Props = {
+  agent: { [key in string]: any };
+  router: any; // its angular router
+}
+
 export const ScaScan = compose(
   withReduxProvider,
   withUserAuthorizationPrompt([
@@ -57,11 +62,9 @@ export const ScaScan = compose(
       {action: 'sca:read', resource: 'agent:group:*'}
     ]
   ])
-)(class ScaScan extends Component {
+)(class ScaScan extends Component<Props> {
   _isMount = false;
-  props!: {
-    [key: string]: any
-  }
+  router;
   state: {
     lastScan: {
       [key: string]: any
@@ -161,43 +164,41 @@ export const ScaScan = compose(
       {
         field: 'name',
         name: 'Policy',
-      },
-      {
-        field: 'description',
-        name: 'Description',
-        truncateText: true,
+        width: '40%',
       },
       {
         field: 'end_scan',
         name: 'End scan',
         dataType: 'date',
         render: formatUIDate,
+        width: '20%',
       },
       {
         field: 'pass',
         name: 'Pass',
-        width: '100px',
+        width: '10%',
       },
       {
         field: 'fail',
         name: 'Fail',
-        width: '100px',
+        width: '10%',
       },
       {
         field: 'invalid',
         name: 'Not applicable',
-        width: '100px',
+        width: '10%',
       },
       {
         field: 'score',
         name: 'Score',
+        width: '10%',
         render: (score) => {
           return `${score}%`;
-        },
-        width: '100px',
+        }
       },
     ];
 
+ 
     return (
       <Fragment>
         <EuiFlexGroup>

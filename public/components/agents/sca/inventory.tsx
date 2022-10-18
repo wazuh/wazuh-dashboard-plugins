@@ -48,7 +48,6 @@ import {
 import { API_NAME_AGENT_STATUS, UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { VisualizationBasic } from '../../common/charts/visualizations/basic';
-import PropTypes from 'prop-types'
 import { AppNavigate } from '../../../react-services/app-navigate';
 import SCAPoliciesTable from './inventory/policies-table';
 
@@ -200,7 +199,6 @@ export class Inventory extends Component {
           new RegExp('redirectPolicy=' + '[^&]*'),
           ''
         );
-        // console.log('entre')
         this.setState({ loading: false });
       }
     } catch (error) {
@@ -235,7 +233,6 @@ export class Inventory extends Component {
     const match = window.location.href.match(regex);
     if (match && match[0] && !this.state.secondTable && !this.state.secondTableBack) {
       this.loadScaPolicy(match[0].split('=')[1], true)
-      // console.log(match[0], 'matchi')
       this.setState({secondTableBack: true, isLoading: true})
     }
   }
@@ -417,16 +414,7 @@ export class Inventory extends Component {
         ev.stopPropagation();
   };
 
-  // handleBack(e) {
-  //   console.log('enytr')
-  //   e.preventDefault()
-  //   return(
-  //     window && window.history && window.history.back()
-  //   )
-  // }
-
-  async loadScaPolicy(policy, secondTable) {
-    // console.log('soy load')
+  async loadScaPolicy(policy, secondTable?) {
     this._isMount &&
       this.setState({
         loadingPolicy: true,
@@ -442,7 +430,6 @@ export class Inventory extends Component {
           },
         });
         const [policyData] = policyResponse.data.data.affected_items;
-        // console.log(policyData, 'pol')
         // It queries all checks without filters, because the filters are applied in the results
         // due to the use of EuiInMemoryTable instead EuiTable components and do arequest with each change of filters.
         const checksResponse = await WzRequest.apiReq(
@@ -458,7 +445,6 @@ export class Inventory extends Component {
           this.setState({ lookingPolicy: policyData, loadingPolicy: false, items: checks, isLoading: false });
       } catch (error) {
         this.setState({ lookingPolicy: policy, loadingPolicy: false, isLoading: false });
-        // console.log(error, 'error')
         const options: UIErrorLog = {
           context: `${Inventory.name}.loadScaPolicy`,
           level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
@@ -506,7 +492,6 @@ export class Inventory extends Component {
         item.compliance && item.compliance.length
           ? item.compliance.map((el) => `${el.key}: ${el.value}`).join('\n')
           : '';
-      const rulesText = item.rules.length ? item.rules.map((el) => el.rule).join('\n') : '';
       const listItems = [
         {
           title: 'Check not applicable due to:',
@@ -585,28 +570,12 @@ export class Inventory extends Component {
 
   render() {
     const { onClickRow } = this.props
-    const handleOnClick = (policy_id) => {
-      onClickRow(policy_id)
-      // console.log(policy_id, 'name')
+
+    const handlePoliciesTableClickRow = (policy_id) => {
+      onClickRow ? onClickRow(policy_id) : this.loadScaPolicy(policy_id)
       this.setState({ lookingPolicy: true, loading: false, redirect: true })
     }
 
-    // agent &&
-    // (agent || {}).os &&
-    // this.state.lookingPolicy &&
-    // !this.state.loading && 
-
-
-    const getPoliciesRowProps = (item, idx) => {
-      // console.log(item, 'item')
-      return {
-        'data-test-subj': `sca-row-${idx}`,
-        className: 'customRowClass',
-        //This logic is necessary because when you click on a row in the table, it redirects you to a url that receives
-        //a parameter and displays the desired table.
-        onClick: onClickRow ? () => handleOnClick(item.policy_id) : () => this.loadScaPolicy(item.policy_id),
-      };
-    };
     const getChecksRowProps = (item, idx) => {
       return {
         'data-test-subj': `sca-check-row-${idx}`,
@@ -629,14 +598,7 @@ export class Inventory extends Component {
       ></EuiButtonEmpty>
     );
     const { agent } = this.props;
-    // console.log(agent, this.state.lookingPolicy, this.state.loading, this.state.redirect, 'perro')
-    // const itemsMapped = this.state.policies.map((item) => {
-    //   return ({
-    //     ...item, pass: <div style={{color:'red'}}>{item.pass}</div>,
-    //     fail: <div>{item.fail}</div>
-    //   }
-    //   )
-    // })
+
     return (
       <Fragment>
         <div>
@@ -717,7 +679,7 @@ export class Inventory extends Component {
                       loading={this.state.loading}
                       policies={this.state.policies}
                       columns={this.columnsPolicies}
-                      rowProps={getPoliciesRowProps}
+                      rowProps={handlePoliciesTableClickRow}
                     />
                   </EuiFlexItem>
                 </EuiFlexGroup>
