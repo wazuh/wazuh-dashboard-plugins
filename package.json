@@ -4,7 +4,7 @@
   "revision": "4400",
   "code": "4400",
   "pluginPlatform": {
-    "version": "1.2.0"
+    "version": "2.3.0"
   },
   "description": "Wazuh dashboard",
   "keywords": [
