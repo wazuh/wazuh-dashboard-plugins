@@ -12,5 +12,5 @@ Then('The rule page is the {} available page', (page) => {
         elementIsVisible(paginatorLastSelector);
         clickElement(paginatorLastSelector);
     }
-    cy.wait(1500);
+    cy.wait(2000);
 });
