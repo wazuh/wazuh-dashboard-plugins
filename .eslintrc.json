@@ -2,7 +2,6 @@
   "root": true,
   "env": {
     "browser": true,
-    "es2021": true,
     "node": true,
     "jest": true
   },
@@ -49,15 +48,6 @@
     "spaced-comment": "error",
     "no-duplicate-imports": "error",
     "no-await-in-loop": "error",
-    "no-use-before-define": [
-      "error",
-      {
-        "functions": true,
-        "classes": true,
-        "variables": true,
-        "allowNamedExports": false
-      }
-    ],
     "block-scoped-var": "error",
     "curly": "error",
     "default-case": "error",
