@@ -10,11 +10,21 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React from 'react';
-import { EuiFlyout } from '@elastic/eui';
+import React, { Component, Fragment } from 'react';
+import { EuiFlyout, EuiOverlayMask, EuiOutsideClickDetector } from '@elastic/eui';
 
-export const WzFlyout = ({ children, flyoutProps = {}, onClose }) => (
-  <EuiFlyout ownFocus onClose={onClose} {...flyoutProps}>
-    {children}
-  </EuiFlyout>
+export const WzFlyout = ({children, flyoutProps = {}, overlayMaskProps = {}, outsideClickDetectorProps = {}, onClose}) => (
+  <EuiOverlayMask headerZindexLocation="below" {...overlayMaskProps}>
+    <EuiOutsideClickDetector
+      onOutsideClick={onClose}
+      {...outsideClickDetectorProps}
+    >
+      <EuiFlyout
+        onClose={onClose}
+        {...flyoutProps}
+      >
+        {children}
+      </EuiFlyout>
+    </EuiOutsideClickDetector>
+  </EuiOverlayMask>
 );

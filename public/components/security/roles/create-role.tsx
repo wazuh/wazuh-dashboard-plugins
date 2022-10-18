@@ -8,6 +8,7 @@ import {
   EuiForm,
   EuiFieldText,
   EuiOverlayMask,
+  EuiOutsideClickDetector,
   EuiFormRow,
   EuiSpacer,
   EuiComboBox,
@@ -16,6 +17,8 @@ import {
 
 import { WzRequest } from '../../../react-services/wz-request';
 import { ErrorHandler } from '../../../react-services/error-handler';
+import { WzOverlayMask } from '../../common/util';
+import { WzFlyout } from '../../common/flyouts';
 
 export const CreateRole = ({ closeFlyout }) => {
   const [policies, setPolicies] = useState([]);
@@ -131,11 +134,9 @@ export const CreateRole = ({ closeFlyout }) => {
     hasChanges ? setIsModalVisible(true) : closeFlyout(false);
   };
 
-  const flyoutProps= { className: 'wzApp' }
-
   return (
     <>
-      <EuiFlyout {...flyoutProps} onClose={onClose}>
+      <WzFlyout flyoutProps={{ className: 'wzApp' }} onClose={onClose}>
         <EuiFlyoutHeader hasBorder={false}>
           <EuiTitle size="m">
             <h2>New role</h2>
@@ -177,7 +178,7 @@ export const CreateRole = ({ closeFlyout }) => {
             </EuiButton>
           </EuiForm>
         </EuiFlyoutBody>
-      </EuiFlyout>
+      </WzFlyout>
       {modal}
     </>
   );

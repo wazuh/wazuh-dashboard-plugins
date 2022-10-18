@@ -30,6 +30,7 @@ import {
 } from '../../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
+import { WzFlyout } from '../../../common/flyouts';
 
 export class FlyoutDetail extends Component {
   state: {
@@ -120,16 +121,15 @@ export class FlyoutDetail extends Component {
 
   render() {
     const { type } = this.state;
-    const flyoutProps={
-      size: 'l',
-      'aria-labelledby': this.state.currentFile.file,
-      maxWidth: '70%',
-      className: 'wz-inventory wzApp',
-    }
     return (
-      <EuiFlyout
+      <WzFlyout
         onClose={() => this.props.closeFlyout()}
-        {...flyoutProps}
+        flyoutProps={{
+          size: 'l',
+          'aria-labelledby': this.state.currentFile.file,
+          maxWidth: '70%',
+          className: 'wz-inventory wzApp',
+        }}
       >
         <EuiFlyoutHeader hasBorder className="flyout-header">
           <EuiTitle size="s">
@@ -158,7 +158,7 @@ export class FlyoutDetail extends Component {
             />
           </EuiFlyoutBody>
         )}
-      </EuiFlyout>
+      </WzFlyout>
     );
   }
 }

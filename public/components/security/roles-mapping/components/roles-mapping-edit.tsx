@@ -12,6 +12,7 @@ import {
   EuiBadge,
   EuiComboBox,
   EuiOverlayMask,
+  EuiOutsideClickDetector,
   EuiConfirmModal,
   EuiFieldText,
 } from '@elastic/eui';
@@ -24,6 +25,7 @@ import _ from 'lodash';
 import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
+import { WzFlyout } from '../../../common/flyouts';
 
 export const RolesMappingEdit = ({
   rule,
@@ -138,11 +140,9 @@ export const RolesMappingEdit = ({
     hasChanges ? setIsModalVisible(true) : closeFlyout(false);
   };
 
-  const flyoutProps= { className: 'wzApp' }
-
   return (
     <>
-      <EuiFlyout {...flyoutProps} onClose={onClose}>
+      <WzFlyout flyoutProps={{ className: 'wzApp' }} onClose={onClose}>
         <EuiFlyoutHeader hasBorder={false}>
           <EuiTitle size="m">
             <h2>
@@ -201,7 +201,7 @@ export const RolesMappingEdit = ({
             </EuiFlexItem>
           </EuiFlexGroup>
         </EuiFlyoutBody>
-      </EuiFlyout>
+      </WzFlyout>
       {modal}
     </>
   );
