@@ -22,7 +22,14 @@ export const WzFlyout = ({ children, flyoutProps = {}, onClose }) => {
   };
 
   const closeFlyout = (ev) => {
-    if (ev && ev.path.some((element) => element.classList?.contains('euiFlyout'))) {
+    // Clicking on the flyout or on the flyout selector should not close the flyout.
+    if (
+      ev &&
+      ev.path.some(
+        (element) =>
+          element.classList?.contains('euiFlyout') || element.classList?.contains('euiPanel')
+      )
+    ) {
       return;
     }
     onClose();
