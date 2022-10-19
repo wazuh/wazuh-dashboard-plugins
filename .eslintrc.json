@@ -30,6 +30,9 @@
   "settings": {
     "import/resolver": {
       "typescript": {}
+    },
+    "react": {
+      "version": "16.12.0"
     }
   },
   "ignorePatterns": [
