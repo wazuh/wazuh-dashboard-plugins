@@ -27,6 +27,7 @@ exports[`Export Table Csv component renders correctly to match the snapshot 1`] 
           <EuiButtonContent
             className="euiButtonEmpty__content"
             iconSide="left"
+            iconSize="m"
             iconType="importAction"
             textProps={
               Object {
@@ -39,19 +40,20 @@ exports[`Export Table Csv component renders correctly to match the snapshot 1`] 
             >
               <EuiIcon
                 className="euiButtonContent__icon"
+                color="inherit"
                 size="m"
                 type="importAction"
               >
                 <EuiIconEmpty
                   aria-hidden={true}
-                  className="euiIcon euiIcon--medium euiIcon-isLoading euiButtonContent__icon"
+                  className="euiIcon euiIcon--medium euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
                   focusable="false"
                   role="img"
                   style={null}
                 >
                   <svg
                     aria-hidden={true}
-                    className="euiIcon euiIcon--medium euiIcon-isLoading euiButtonContent__icon"
+                    className="euiIcon euiIcon--medium euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
                     focusable="false"
                     height={16}
                     role="img"
