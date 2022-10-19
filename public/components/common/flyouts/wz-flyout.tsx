@@ -14,13 +14,6 @@ import React from 'react';
 import { EuiFlyout, EuiOutsideClickDetector } from '@elastic/eui';
 
 export const WzFlyout = ({ children, flyoutProps = {}, onClose }) => {
-  // As the version of Elastic EUI (v34.6.0) has a bug in the EuiOverlayMask component,
-  // This function was created to not close the overlay by the native function and close it with the following function
-  // This bug is fixed in the Elastic EUI version 36.0.0
-  const doNotCloseFlyout = () => {
-    return;
-  };
-
   const closeFlyout = (ev) => {
     // Clicking on the flyout or on the flyout selector should not close the flyout.
     if (
@@ -37,7 +30,12 @@ export const WzFlyout = ({ children, flyoutProps = {}, onClose }) => {
 
   return (
     <EuiOutsideClickDetector onOutsideClick={closeFlyout}>
-      <EuiFlyout onClose={onClose} maskProps={{ onClick: doNotCloseFlyout }} {...flyoutProps}>
+      {/*
+        As the version of Elastic EUI (v34.6.0) has a bug in the EuiOverlayMask component,
+        maskProps is added to avoid the closing of the overlay by the native function, as it contains the bug
+        This bug is fixed in the Elastic EUI version 36.0.0
+      */}
+      <EuiFlyout onClose={onClose} maskProps={{ onClick: () => {} }} {...flyoutProps}>
         {children}
       </EuiFlyout>
     </EuiOutsideClickDetector>
