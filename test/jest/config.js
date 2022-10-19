@@ -62,6 +62,7 @@ export default {
   snapshotSerializers: [
     `${kbnDir}/node_modules/enzyme-to-json/serializer`,
   ],
+  testEnvironment: 'jest-environment-jsdom',
   reporters: [
     'default',
     `${kbnDir}/src/dev/jest/junit_reporter.js`,

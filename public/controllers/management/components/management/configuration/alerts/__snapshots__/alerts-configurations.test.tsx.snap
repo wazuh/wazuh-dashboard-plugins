@@ -12,22 +12,15 @@ exports[`WzConfigurationAlerts component mount OK renders correctly to match the
         "replaceReducer": [Function],
         "subscribe": [Function],
       },
-      "subscription": Subscription {
+      "subscription": Object {
+        "addNestedSub": [Function],
+        "getListeners": [Function],
         "handleChangeWrapper": [Function],
-        "listeners": Object {
-          "notify": [Function],
-        },
+        "isSubscribed": [Function],
+        "notifyNestedSubs": [Function],
         "onStateChange": [Function],
-        "parentSub": undefined,
-        "store": Object {
-          "clearActions": [Function],
-          "dispatch": [Function],
-          "getActions": [Function],
-          "getState": [Function],
-          "replaceReducer": [Function],
-          "subscribe": [Function],
-        },
-        "unsubscribe": null,
+        "trySubscribe": [Function],
+        "tryUnsubscribe": [Function],
       },
     }
   }
