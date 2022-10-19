@@ -141,10 +141,10 @@ exports[`Module Mitre Att&ck intelligence container should render the component 
           style="max-height:calc(100vh - 255px);overflow-y:auto;overflow-x:hidden"
         >
           <div
-            class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+            class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
           >
             <div
-              class="euiFlexItem"
+              class="euiFlexItem euiFlexItem--flexGrowZero wz-flex-basis-auto"
             >
               <h1
                 class="euiTitle euiTitle--small"
@@ -154,6 +154,13 @@ exports[`Module Mitre Att&ck intelligence container should render the component 
                   (0)
                 </span>
               </h1>
+            </div>
+            <div
+              class="euiFlexItem"
+            >
+              <div
+                class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--justifyContentFlexEnd euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
+              />
             </div>
           </div>
           <div
