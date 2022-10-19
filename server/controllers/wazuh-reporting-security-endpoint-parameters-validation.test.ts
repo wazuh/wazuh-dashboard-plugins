@@ -10,6 +10,8 @@ import { WAZUH_DATA_ABSOLUTE_PATH, WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH, WAZUH_DA
 import { execSync } from 'child_process';
 import path from 'path';
 import fs from 'fs';
+import moment from 'moment';
+import { of } from 'rxjs';
 
 const loggingService = loggingSystemMock.create();
 const logger = loggingService.get();
@@ -51,7 +53,7 @@ beforeAll(async () => {
 
   // Create server
   const config = {
-    name: 'plugin_platform',
+    name: 'kibana',
     host: '127.0.0.1',
     maxPayload: new ByteSizeValue(1024),
     port: 10002,
@@ -61,8 +63,12 @@ beforeAll(async () => {
       allowFromAnyIp: true,
       ipAllowlist: [],
     },
+    cors: {
+      enabled: false,
+    },
+    shutdownTimeout: moment.duration(500, 'ms'),
   } as any;
-  server = new HttpServer(loggingService, 'tests');
+  server = new HttpServer(loggingService, 'tests', of(config.shutdownTimeout));
   const router = new Router('', logger, enhanceWithContext);
   const { registerRouter, server: innerServerTest, ...rest } = await server.setup(config);
   innerServer = innerServerTest;
