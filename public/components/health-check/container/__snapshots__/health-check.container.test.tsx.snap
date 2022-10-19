@@ -107,7 +107,7 @@ exports[`Health Check container should render a Health check screen 1`] = `
         name="maxBuckets"
         shouldCheck={true}
         showLogButton={false}
-        title="Check timelion:max_buckets setting"
+        title="Check timeline:max_buckets setting"
       />
       <CheckResult
         awaitFor={Array []}

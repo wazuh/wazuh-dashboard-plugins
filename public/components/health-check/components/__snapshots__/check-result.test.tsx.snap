@@ -51,21 +51,21 @@ exports[`Check result component should render a Check result screen 1`] = `
                 <EuiIconEmpty
                   aria-hidden={true}
                   aria-label="waiting"
-                  className="euiIcon euiIcon--medium euiIcon-isLoading"
+                  className="euiIcon euiIcon--medium euiIcon--customColor euiIcon-isLoading"
                   focusable="false"
                   onBlur={[Function]}
                   onFocus={[Function]}
                   role="img"
                   style={
                     Object {
-                      "fill": "#999999",
+                      "color": "#999999",
                     }
                   }
                 >
                   <svg
                     aria-hidden={true}
                     aria-label="waiting"
-                    className="euiIcon euiIcon--medium euiIcon-isLoading"
+                    className="euiIcon euiIcon--medium euiIcon--customColor euiIcon-isLoading"
                     focusable="false"
                     height={16}
                     onBlur={[Function]}
@@ -73,7 +73,7 @@ exports[`Check result component should render a Check result screen 1`] = `
                     role="img"
                     style={
                       Object {
-                        "fill": "#999999",
+                        "color": "#999999",
                       }
                     }
                     viewBox="0 0 16 16"

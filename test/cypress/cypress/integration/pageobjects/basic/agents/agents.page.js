@@ -16,4 +16,9 @@ export const AGENTS_PAGE = {
   statusChart: '.agents-status-pie > .euiPanel > .euiCard__content > .euiCard__children > .euiFlexGroup',
   agentDetails: 'euiFlexItem euiFlexItem--flexGrowZero agents-details-card',
   deployNewAgentButton: '//span[contains(text(),"Deploy new agent")]',
+  exploreAgentButton: '.wz-module-header-nav .euiFlexItem .euiToolTipAnchor .euiButtonEmpty .euiButtonContent .euiButtonEmpty__text:contains("Explore agent")',
+  firstAgentDisplayed: '.euiModal .euiTable .euiTableRow:nth-child(1)',
+  unPinnedAgentButton: '.wz-module-header-nav .euiFlexItem .euiToolTipAnchor .euiButtonIcon[aria-label="Unpin agent"]',
+  secundAgentDisplayed: '.euiModal .euiTable .euiTableRow:nth-child(2)',
+  agentID: '.euiModal .euiTable .euiTableRow:nth-child(1) .euiTableRowCell:nth-child(1) .euiTableCellContent__text',
 };

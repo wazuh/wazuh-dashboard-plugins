@@ -6,7 +6,7 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
     <withErrorBoundary(Stats)>
       <EuiPage>
         <div
-          className="euiPage"
+          className="euiPage euiPage--paddingMedium euiPage--grow"
         >
           <EuiFlexGroup>
             <div

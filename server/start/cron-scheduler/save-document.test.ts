@@ -4,7 +4,7 @@ import elasticsearch from 'elasticsearch';
 describe('SaveDocument', () => {
   const fakeServer = {
     core: {
-      elasticsearch: {
+      opensearch: {
         client: { asInternalUser: '' },
         getCluster: (data) => {
           return {

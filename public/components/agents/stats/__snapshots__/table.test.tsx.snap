@@ -30,7 +30,7 @@ exports[`AgentStatTable component Renders correctly to match the snapshot 1`] = 
 >
   <EuiPanel>
     <div
-      className="euiPanel euiPanel--paddingMedium"
+      className="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
     >
       <EuiFlexGroup
         justifyContent="spaceBetween"
@@ -243,18 +243,34 @@ exports[`AgentStatTable component Renders correctly to match the snapshot 1`] = 
                               }
                             }
                           >
-                            <div
+                            <CellContents
                               className="euiTableCellContent"
+                              showSortMsg={false}
                             >
-                              <EuiInnerText>
-                                <span
-                                  className="euiTableCellContent__text"
-                                  title="Location"
-                                >
-                                  Location
-                                </span>
-                              </EuiInnerText>
-                            </div>
+                              <span
+                                className="euiTableCellContent"
+                              >
+                                <EuiInnerText>
+                                  <EuiI18n
+                                    default="{innerText}; {description}"
+                                    token="euiTableHeaderCell.titleTextWithDesc"
+                                    values={
+                                      Object {
+                                        "description": undefined,
+                                        "innerText": "Location",
+                                      }
+                                    }
+                                  >
+                                    <span
+                                      className="euiTableCellContent__text"
+                                      title="Location"
+                                    >
+                                      Location
+                                    </span>
+                                  </EuiI18n>
+                                </EuiInnerText>
+                              </span>
+                            </CellContents>
                           </th>
                         </EuiTableHeaderCell>
                         <EuiTableHeaderCell
@@ -273,18 +289,34 @@ exports[`AgentStatTable component Renders correctly to match the snapshot 1`] = 
                               }
                             }
                           >
-                            <div
+                            <CellContents
                               className="euiTableCellContent"
+                              showSortMsg={false}
                             >
-                              <EuiInnerText>
-                                <span
-                                  className="euiTableCellContent__text"
-                                  title="Events"
-                                >
-                                  Events
-                                </span>
-                              </EuiInnerText>
-                            </div>
+                              <span
+                                className="euiTableCellContent"
+                              >
+                                <EuiInnerText>
+                                  <EuiI18n
+                                    default="{innerText}; {description}"
+                                    token="euiTableHeaderCell.titleTextWithDesc"
+                                    values={
+                                      Object {
+                                        "description": undefined,
+                                        "innerText": "Events",
+                                      }
+                                    }
+                                  >
+                                    <span
+                                      className="euiTableCellContent__text"
+                                      title="Events"
+                                    >
+                                      Events
+                                    </span>
+                                  </EuiI18n>
+                                </EuiInnerText>
+                              </span>
+                            </CellContents>
                           </th>
                         </EuiTableHeaderCell>
                         <EuiTableHeaderCell
@@ -303,18 +335,34 @@ exports[`AgentStatTable component Renders correctly to match the snapshot 1`] = 
                               }
                             }
                           >
-                            <div
+                            <CellContents
                               className="euiTableCellContent"
+                              showSortMsg={false}
                             >
-                              <EuiInnerText>
-                                <span
-                                  className="euiTableCellContent__text"
-                                  title="Bytes"
-                                >
-                                  Bytes
-                                </span>
-                              </EuiInnerText>
-                            </div>
+                              <span
+                                className="euiTableCellContent"
+                              >
+                                <EuiInnerText>
+                                  <EuiI18n
+                                    default="{innerText}; {description}"
+                                    token="euiTableHeaderCell.titleTextWithDesc"
+                                    values={
+                                      Object {
+                                        "description": undefined,
+                                        "innerText": "Bytes",
+                                      }
+                                    }
+                                  >
+                                    <span
+                                      className="euiTableCellContent__text"
+                                      title="Bytes"
+                                    >
+                                      Bytes
+                                    </span>
+                                  </EuiI18n>
+                                </EuiInnerText>
+                              </span>
+                            </CellContents>
                           </th>
                         </EuiTableHeaderCell>
                       </tr>
@@ -394,6 +442,7 @@ exports[`AgentStatTable component Renders correctly to match the snapshot 1`] = 
                   <EuiButtonContent
                     className="euiButtonEmpty__content"
                     iconSide="left"
+                    iconSize="m"
                     iconType="importAction"
                     textProps={
                       Object {
@@ -406,19 +455,20 @@ exports[`AgentStatTable component Renders correctly to match the snapshot 1`] = 
                     >
                       <EuiIcon
                         className="euiButtonContent__icon"
+                        color="inherit"
                         size="m"
                         type="importAction"
                       >
                         <EuiIconEmpty
                           aria-hidden={true}
-                          className="euiIcon euiIcon--medium euiIcon-isLoading euiButtonContent__icon"
+                          className="euiIcon euiIcon--medium euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
                           focusable="false"
                           role="img"
                           style={null}
                         >
                           <svg
                             aria-hidden={true}
-                            className="euiIcon euiIcon--medium euiIcon-isLoading euiButtonContent__icon"
+                            className="euiIcon euiIcon--medium euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
                             focusable="false"
                             height={16}
                             role="img"
