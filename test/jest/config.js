@@ -34,7 +34,6 @@ module.exports = {
   },
   setupFiles: [
     `${kbnDir}/node_modules/@kbn/test/target_node/jest/setup/babel_polyfill.js`,
-    `${kbnDir}/node_modules/@kbn/test/target_node/jest/setup/polyfills.jsdom.js`,
     `${kbnDir}/node_modules/@kbn/test/target_node/jest/setup/enzyme.js`,
   ],
   collectCoverage: true,
