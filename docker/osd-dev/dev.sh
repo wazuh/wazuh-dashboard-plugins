@@ -18,13 +18,14 @@ osd_versions=(
 
 usage() {
 	echo
-	echo "./dev.sh os_version osd_version /wazuh_app_src action "
+	echo "./dev.sh os_version osd_version /wazuh_app_src action [saml]"
 	echo
 	echo "where"
 	echo "  os_version is one of " ${os_versions[*]}
 	echo "  osd_version is one of " ${osd_versions[*]}
 	echo "  wazuh_app_src is the path to the wazuh application source code"
 	echo "  action is one of up | down | stop"
+	echo "  saml to deploy a saml enabled environment"
 	exit -1
 }
 
@@ -66,15 +67,23 @@ export SRC=$3
 export OSD_MAJOR=`echo $OSD_VERSION | cut -d. -f1`.x
 export COMPOSE_PROJECT_NAME=os-dev-${OSD_VERSION//./}
 
+profile="standard"
+export WAZUH_DASHBOARD_CONF=./config/${OSD_MAJOR}/osd/opensearch_dashboards.yml
+if [[ "$5" =~ "saml" ]]
+then
+	profile="saml"
+	export WAZUH_DASHBOARD_CONF=./config/${OSD_MAJOR}/osd/opensearch_dashboards_saml.yml
+fi
+
 case "$4" in
 	up)
-		docker compose -f dev.yml up -Vd
+		docker compose --profile $profile -f dev.yml up -Vd
 		;;
 	down)
-		docker compose -f dev.yml down -v --remove-orphans
+		docker compose --profile $profile -f dev.yml down -v --remove-orphans
 		;;
 	stop)
-		docker compose -f dev.yml -p ${COMPOSE_PROJECT_NAME} stop
+		docker compose --profile $profile -f dev.yml -p ${COMPOSE_PROJECT_NAME} stop
 		;;
 	*)
 		echo "Action must be up | down | stop: "
