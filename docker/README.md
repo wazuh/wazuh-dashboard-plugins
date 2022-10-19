@@ -152,12 +152,25 @@ docker compose up -d
 cd ..
 ```
 
+To setup the crendentials (**this only has to be done once**):
+
+1. Login to Quay.io and navigate to User Settings.
+2. Click on `CLI Password: Generate Encrypted Password`
+3. In the new window that opens, click on `Docker Configuration` and follow the steps.
+
+
 To build an image, use the docker build command like:
 
 ```bash
 cd images
 docker build -t quay.io/wazuh/image-name:version -f image-name-version.Dockerfile .
 cd ..
+```
+
+Push the image to Quay:
+
+```bash
+docker push quay.io/wazuh/image-name:version
 ```
 
 If you're creating a new image, copy one of the ones already present
