@@ -15,7 +15,7 @@ export default function SCAPoliciesTable(props: Props) {
     return {
       'data-test-subj': `sca-row-${idx}`,
       className: 'customRowClass',
-      onClick: rowProps ? () => rowProps(item.policy_id) : null
+      onClick: rowProps ? () => rowProps(item) : null
     }
   }
 

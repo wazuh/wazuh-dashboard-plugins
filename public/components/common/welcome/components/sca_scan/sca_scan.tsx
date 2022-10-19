@@ -43,7 +43,7 @@ import { getAngularModule } from '../../../../../kibana-services';
 import { withReduxProvider, withUserAuthorizationPrompt } from "../../../hocs";
 import { compose } from 'redux';
 import { getAgentPolicies } from '../../../../../components/agents/sca/index';
-import SCAPoliciesTable from '../../../../../components/agents/sca/inventory/policies-table';
+import SCAPoliciesTable from '../../../../agents/sca/inventory/agent-policies-table';
 
 type Props = {
   agent: { [key in string]: any };
@@ -129,8 +129,8 @@ export const ScaScan = compose(
     }
   }
 
-  onClickRow(policy_id) {
-    window.location.href = `#/overview?tab=sca&redirectPolicyTable=${policy_id}`;
+  onClickRow = (policy) => {
+    window.location.href = `#/overview?tab=sca&redirectPolicyTable=${policy.policy_id}`;
     store.dispatch(updateCurrentAgentData(this.props.agent));
     this.router.reload();                  
   }

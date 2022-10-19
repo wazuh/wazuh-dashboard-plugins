@@ -16,7 +16,6 @@ import {
   EuiFlexGroup,
   EuiPanel,
   EuiPage,
-  EuiBasicTable,
   EuiSpacer,
   EuiText,
   EuiProgress,
@@ -45,47 +44,48 @@ import { API_NAME_AGENT_STATUS, UI_LOGGER_LEVELS } from '../../../../common/cons
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { VisualizationBasic } from '../../common/charts/visualizations/basic';
 import { AppNavigate } from '../../../react-services/app-navigate';
-import SCAPoliciesTable from './inventory/policies-table';
+import SCAPoliciesTable from './inventory/agent-policies-table';
 import { InventoryPolicyChecksTable } from './inventory/checks-table';
+import { RuleText } from './components';
 
 type InventoryProps = {
   agent: { [key: string]: any };
 };
 
 type InventoryState = {
-  agent: object;
   itemIdToExpandedRowMap: object;
   showMoreInfo: boolean;
   loading: boolean;
+  checksIsLoading: boolean;
+  redirect: boolean;
   filters: object[];
   pageTableChecks: { pageIndex: number; pageSize?: number };
   policies: object[];
-  lookingPolicy: { [key: string]: any } | false;
+  checks: object[];
+  lookingPolicy: { [key: string]: any } | boolean;
   loadingPolicy: boolean;
+  secondTable: boolean;
+  secondTableBack: boolean;
 };
 export class Inventory extends Component<InventoryProps, InventoryState> {
   _isMount = false;
-  props!: {
-    [key: string]: any
-  }
+  agent: { [key: string]: any } = {};
   columnsPolicies: object[];
   lookingPolicy: { [key: string]: any } | false = false;
   constructor(props) {
     super(props);
-
-
     this.state = {
-      agent,
       itemIdToExpandedRowMap: {},
       showMoreInfo: false,
       loading: false,
       filters: [],
       pageTableChecks: { pageIndex: 0 },
       policies: [],
+      checks: [],
       redirect: false,
       secondTable: false,
       secondTableBack: false,
-      checksIsLoading: false
+      checksIsLoading: false,
       lookingPolicy: false,
       loadingPolicy: false,
     };
@@ -245,19 +245,8 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
           },
         });
         const [policyData] = policyResponse.data.data.affected_items;
-        // It queries all checks without filters, because the filters are applied in the results
-        // due to the use of EuiInMemoryTable instead EuiTable components and do arequest with each change of filters.
-        const checksResponse = await WzRequest.apiReq(
-          'GET',
-          `/sca/${this.props.agent.id}/checks/${policy}`,
-          {}
-        );
-        const checks = (
-          (((checksResponse || {}).data || {}).data || {}).affected_items || []
-        ).map((item) => ({ ...item, result: item.result || 'not applicable' }));
-        this.buildSuggestionSearchBar(policyData.policy_id, checks);
         this._isMount &&
-          this.setState({ lookingPolicy: policyData, loadingPolicy: false, items: checks, checksIsLoading: false });
+          this.setState({ lookingPolicy: policyData, loadingPolicy: false, checksIsLoading: false });
       } catch (error) {
         this.setState({ lookingPolicy: policy, loadingPolicy: false, checksIsLoading: false });
         const options: UIErrorLog = {
@@ -276,23 +265,6 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
       this._isMount && this.setState({ lookingPolicy: policy, loadingPolicy: false, items: [], checksIsLoading: false });
     }
   }
-
-  filterPolicyChecks = () =>
-    !!this.state.items &&
-    this.state.items.filter((check) =>
-      this.state.filters.every((filter) =>
-        filter.field === 'search'
-          ? Object.keys(check).some(
-            (key) =>
-              ['string', 'number'].includes(typeof check[key]) &&
-              String(check[key]).toLowerCase().includes(filter.value.toLowerCase())
-          )
-          : typeof check[filter.field] === 'string' &&
-          (filter.value === ''
-            ? check[filter.field] === filter.value
-            : check[filter.field].toLowerCase().includes(filter.value.toLowerCase()))
-      )
-    );
 
   toggleDetails = (item) => {
     const itemIdToExpandedRowMap = { ...this.state.itemIdToExpandedRowMap };
@@ -390,25 +362,10 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
   render() {
     const { onClickRow } = this.props
 
-    const handlePoliciesTableClickRow = (policy_id) => {
-      onClickRow ? onClickRow(policy_id) : this.loadScaPolicy(policy_id)
-      this.setState({ lookingPolicy: true, loading: false, redirect: true })
+    const handlePoliciesTableClickRow = async (policy) => {
+      onClickRow ? onClickRow(policy) : await this.loadScaPolicy(policy.policy_id)
+      this.setState({ loading: false, redirect: true })
     }
-
-    const getChecksRowProps = (item, idx) => {
-      return {
-        'data-test-subj': `sca-check-row-${idx}`,
-        className: 'customRowClass',
-        onClick: () => this.toggleDetails(item),
-      };
-    };
-
-    const sorting = {
-      sort: {
-        field: 'id',
-        direction: 'asc',
-      },
-    };
 
     const buttonPopover = (
       <EuiButtonEmpty
@@ -495,12 +452,14 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
                  <EuiSpacer size="m" />
                 <EuiFlexGroup>
                   <EuiFlexItem>
-                    <SCAPoliciesTable
-                      loading={this.state.loading}
-                      policies={this.state.policies}
-                      columns={this.columnsPolicies}
-                      rowProps={handlePoliciesTableClickRow}
-                    />
+                    <EuiPanel>
+                      <SCAPoliciesTable
+                        loading={this.state.loading}
+                        policies={this.state.policies}
+                        columns={this.columnsPolicies}
+                        rowProps={handlePoliciesTableClickRow}
+                      />
+                    </EuiPanel>
                   </EuiFlexItem>
                 </EuiFlexGroup>
               </div>
@@ -620,7 +579,7 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
                     <EuiFlexItem>
                       <InventoryPolicyChecksTable
                         agent={this.props.agent}
-                        lookingPolicy={this.state.lookingPolicy}
+                        lookingPolicy={this.state.lookingPolicy}              
                       />
                     </EuiFlexItem>
                   </EuiFlexGroup>
