@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import _ from 'lodash';
+import { isEqual } from 'lodash';
 import { EpluginSettingType } from '../../../../common/constants';
 
 function getValueFromEvent(event, type){
@@ -28,8 +28,8 @@ export const useForm = (fields) => {
       ...restFieldState,
       type: fields[fieldKey].type,
       value,
-      changed: !_.isEqual(restFieldState.initialValue, value),
-      error: fields[fieldKey]?.validate?.(value),
+      changed: !isEqual(restFieldState.initialValue, value),
+      error: fields[fieldKey]?.validate?.(restFieldState.currentValue),
       onChange: (event) => {
         const inputValue = getValueFromEvent(event, fields[fieldKey].type);
         const currentValue = fields[fieldKey]?.transformChangedInputValue?.(inputValue) ?? inputValue;
