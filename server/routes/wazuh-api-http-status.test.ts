@@ -1,12 +1,11 @@
 // To launch this file
-// yarn test:jest --testEnvironment node --verbose server/routes/wazuh-api
+// yarn test:jest --testEnvironment node --verbose server/routes/wazuh-api-http-status.test.ts
 import { Router } from '../../../../src/core/server/http/router/router';
 import { HttpServer } from '../../../../src/core/server/http/http_server';
 import { loggingSystemMock } from '../../../../src/core/server/logging/logging_system.mock';
 import { ByteSizeValue } from '@kbn/config-schema';
 import supertest from 'supertest';
 import { WazuhApiRoutes } from './wazuh-api';
-import { WazuhApiCtrl } from '../controllers/wazuh-api';
 import { createDataDirectoryIfNotExists, createDirectoryIfNotExists } from '../lib/filesystem';
 import {
   HTTP_STATUS_CODES,
@@ -32,6 +31,7 @@ const enhanceWithContext = (fn: (...args: any[]) => any) => fn.bind(null, contex
 let server, innerServer;
 
 beforeAll(async () => {
+
   // Create <PLUGIN_PLATFORM_PATH>/data/wazuh directory.
   createDataDirectoryIfNotExists();
   // Create <PLUGIN_PLATFORM_PATH>/data/wazuh/config directory.
@@ -57,9 +57,6 @@ beforeAll(async () => {
   const router = new Router('', logger, enhanceWithContext);
   const { registerRouter, server: innerServerTest, ...rest } = await server.setup(config);
   innerServer = innerServerTest;
-
-  // const spyRouteDecoratorProtectedAdministratorRoleValidToken = jest.spyOn(WazuhApiCtrl.prototype as any, 'routeDecoratorProtectedAdministratorRoleValidToken')
-  // .mockImplementation((handler) => async (...args) => handler(...args));
 
   // Register routes
   WazuhApiRoutes(router);
