@@ -27,4 +27,3 @@ Feature: Pin filter - from dashboard to event page
       | TSC                  |
       | Policy Monitoring    |
       | PCIDSS               |
-      

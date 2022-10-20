@@ -36,6 +36,7 @@ beforeAll(async () => {
   createDataDirectoryIfNotExists();
   // Create <PLUGIN_PLATFORM_PATH>/data/wazuh/config directory.
   createDirectoryIfNotExists(WAZUH_DATA_CONFIG_DIRECTORY_PATH);
+
   // Create <PLUGIN_PLATFORM_PATH>/data/wazuh/logs directory.
   createDirectoryIfNotExists(WAZUH_DATA_LOGS_DIRECTORY_PATH);
 
