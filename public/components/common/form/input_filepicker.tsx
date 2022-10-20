@@ -1,7 +1,5 @@
 import React from 'react';
-import {
-	EuiFilePicker,
-} from '@elastic/eui';
+import { EuiFilePicker } from '@elastic/eui';
 import { IInputFormType } from './types';
 
 export const InputFormFilePicker = ({onChange, options, setInputRef, key, ...rest} : IInputFormType) => (
