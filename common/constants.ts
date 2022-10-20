@@ -341,7 +341,7 @@ export const DOCUMENTATION_WEB_BASE_URL = "https://documentation.wazuh.com";
 export const ELASTIC_NAME = 'elastic';
 
 // Plugin settings
-export enum SettingCategory {.
+export enum SettingCategory {
   GENERAL,
   HEALTH_CHECK,
   EXTENSIONS,
