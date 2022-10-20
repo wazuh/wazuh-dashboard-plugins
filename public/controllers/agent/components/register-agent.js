@@ -33,7 +33,8 @@ import {
   EuiProgress,
   EuiIcon,
   EuiSwitch,
-  EuiLink
+  EuiLink,
+  EuiSelect
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
 import { withErrorBoundary } from '../../../components/common/hocs';
@@ -62,7 +63,9 @@ export const RegisterAgent = withErrorBoundary(
         serverAddress: '',
         wazuhPassword: '',
         groups: [],
+        nodeIPs: [],
         selectedGroup: [],
+        selectedNodeIP: '',
         udpProtocol: false,
         showPassword: false,
         showProtocol: true,
@@ -82,13 +85,12 @@ export const RegisterAgent = withErrorBoundary(
       try {
         this.setState({ loading: true });
         const wazuhVersion = await this.props.getWazuhVersion();
-        let serverAddress = false;
         let wazuhPassword = '';
         let hidePasswordInput = false;
-        serverAddress = this.configuration['enrollment.dns'] || false;
+        /*serverAddress = this.configuration['enrollment.dns'] || false;
         if (!serverAddress) {
           serverAddress = await this.props.getCurrentApiAddress();
-        }
+        }*/
         let authInfo = await this.getAuthInfo();
         const needsPassword = (authInfo.auth || {}).use_password === 'yes';
         if (needsPassword) {
@@ -100,6 +102,7 @@ export const RegisterAgent = withErrorBoundary(
 
         const udpProtocol = await this.getRemoteInfo();
         const groups = await this.getGroups();
+        const nodeIPs = await this.getNodeIPs();
         this.setState({
           serverAddress,
           needsPassword,
@@ -130,6 +133,7 @@ export const RegisterAgent = withErrorBoundary(
           wazuhPassword,
           wazuhVersion,
           groups,
+          nodeIPs,
           loading: false,
         });
       } catch (error) {
@@ -222,6 +226,11 @@ export const RegisterAgent = withErrorBoundary(
       this.setState({ selectedGroup });
     }
 
+    setNodeIp(value) {
+      console.log('select node', value)
+      this.setState({ selectedNodeIp: value });
+    }
+
     setArchitecture(selectedArchitecture) {
       this.setState({ selectedArchitecture });
     }
@@ -255,6 +264,17 @@ export const RegisterAgent = withErrorBoundary(
         const result = await WzRequest.apiReq('GET', '/groups', {});
         return result.data.data.affected_items.map((item) => ({ label: item.name, id: item.name }));
       } catch (error) {
+        throw new Error(error);
+      }
+    }
+
+    async getNodeIPs() {
+      try {
+        const result = await WzRequest.apiReq('GET', '/cluster/nodes', {});
+        console.log('nodes', result);
+        return [{ label: '', text: '' }].concat(result.data.data.affected_items.map((item) => ({ text: item.name, value: item.ip })));
+      } catch (error) {
+        // 3013 - Cluster is not running
         throw new Error(error);
       }
     }
@@ -708,11 +728,16 @@ export const RegisterAgent = withErrorBoundary(
           <p>
             This is the address the agent uses to communicate with the Wazuh server. It can be an IP address or a fully qualified domain name (FQDN).
           </p>
-          <EuiFieldText
-            placeholder="Server address"
-            value={this.state.serverAddress}
-            onChange={(event) => this.setServerAddress(event)}
-          />
+          <EuiSelect
+              placeholder="Select node IP"
+              required={false}
+              value={this.state.serverAddress}
+              options={this.state.nodeIPs}
+              onChange={(e) => {
+                this.setServerAddress(e);
+              }}
+              data-test-subj="demoComboBox"
+            />
         </EuiText>
       );
 
