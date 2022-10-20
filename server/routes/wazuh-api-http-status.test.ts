@@ -16,6 +16,8 @@ import {
 } from '../../common/constants';
 import { execSync } from 'child_process';
 import fs from 'fs';
+import moment from 'moment';
+import { of } from 'rxjs';
 
 const loggingService = loggingSystemMock.create();
 const logger = loggingService.get();
@@ -52,8 +54,12 @@ beforeAll(async () => {
       allowFromAnyIp: true,
       ipAllowlist: [],
     },
+    cors: {
+      enabled: false,
+    },
+    shutdownTimeout: moment.duration(500, 'ms'),
   } as any;
-  server = new HttpServer(loggingService, 'tests');
+  server = new HttpServer(loggingService, 'tests', of(config.shutdownTimeout));
   const router = new Router('', logger, enhanceWithContext);
   const { registerRouter, server: innerServerTest, ...rest } = await server.setup(config);
   innerServer = innerServerTest;
