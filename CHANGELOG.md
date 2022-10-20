@@ -8,7 +8,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Added the option to sort by the agents count in the group table. [#4323](https://github.com/wazuh/wazuh-kibana-app/pull/4323)
 - Added agent synchronization status in the agent module. [#3874](https://github.com/wazuh/wazuh-kibana-app/pull/3874)
-- Added agent's dashboard redesign [#4512](https://github.com/wazuh/wazuh-kibana-app/pull/4512)
+- Redesign the SCA table from agent's dashboard [#4512](https://github.com/wazuh/wazuh-kibana-app/pull/4512)
 
 ### Changed
 
