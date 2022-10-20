@@ -162,18 +162,14 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
 
   const createPolicy = async () => {
     try {
-      const result = await WzRequest.apiReq(
-        'POST',
-        '/security/policies',
-        {
-          name: policyName,
-          policy: {
-            actions: addedActions.map((x) => x.action),
-            resources: addedResources.map((x) => x.resource),
-            effect: effectValue,
-          },
-        }
-      );
+      const result = await WzRequest.apiReq('POST', '/security/policies', {
+        name: policyName,
+        policy: {
+          actions: addedActions.map((x) => x.action),
+          resources: addedResources.map((x) => x.resource),
+          effect: effectValue,
+        },
+      });
       const resultData = (result.data || {}).data;
       if (resultData.failed_items && resultData.failed_items.length) {
         return;
