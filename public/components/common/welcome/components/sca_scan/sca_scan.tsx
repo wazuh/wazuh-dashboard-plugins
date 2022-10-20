@@ -178,7 +178,7 @@ export const ScaScan = compose(
           <EuiFlexItem grow={false}>
             <EuiTitle size="xs">
               <EuiLink onClick={() => {
-                  window.location.href = `#/overview?tab=sca&redirectPolicy=${lastScan.policy_id}`;
+                  window.location.href = `#/overview?tab=sca&redirectPolicyTable=${lastScan.policy_id}`;
                   store.dispatch(updateCurrentAgentData(this.props.agent));
                   this.router.reload();
                 }
