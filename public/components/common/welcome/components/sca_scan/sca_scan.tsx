@@ -31,18 +31,9 @@ import store from '../../../../../redux/store';
 import { updateCurrentAgentData } from '../../../../../redux/actions/appStateActions';
 import { WzRequest } from '../../../../../react-services';
 import { formatUIDate } from '../../../../../react-services/time-service';
-import {
-  UI_ERROR_SEVERITIES,
-  UIErrorLog,
-  UIErrorSeverity,
-  UILogLevel,
-} from '../../../../../react-services/error-orchestrator/types';
-import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
-import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 import { getAngularModule } from '../../../../../kibana-services';
 import { withReduxProvider, withUserAuthorizationPrompt } from "../../../hocs";
 import { compose } from 'redux';
-import { getAgentPolicies } from '../../../../../components/agents/sca/index';
 import SCAPoliciesTable from '../../../../agents/sca/inventory/agent-policies-table';
 
 type Props = {
@@ -90,7 +81,6 @@ export const ScaScan = compose(
     const $injector = getAngularModule().$injector;
     this.router = $injector.get('$route');
     this.getLastScan(this.props.agent.id);
-    this.getPolicies(this.props.agent.id);
   }
 
   async getLastScan(agentId: Number) {
@@ -135,27 +125,6 @@ export const ScaScan = compose(
     this.router.reload();                  
   }
 
-  getPolicies = async (agentId) => {
-    try {
-      const policies = await getAgentPolicies(agentId);
-      this.setState({ policies,  isLoading: false });
-    }catch(error){
-      const options: UIErrorLog = {
-        context: `${ScaScan.name}.initialize`,
-        level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
-        severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: error.name,
-        },
-      };
-      getErrorOrchestrator().handleError(options);
-    }
-  }
-
-
-
   renderScanDetails() {
     const { isLoading, lastScan } = this.state;
     if (isLoading || lastScan === undefined) return;
@@ -198,6 +167,10 @@ export const ScaScan = compose(
       },
     ];
 
+    const tableProps = {
+      tablePageSizeOptions: [4],
+      hidePerPageOptions: true
+    }
  
     return (
       <Fragment>
@@ -221,9 +194,10 @@ export const ScaScan = compose(
         </EuiFlexGroup>
         <EuiPanel>
         <SCAPoliciesTable 
-          policies={this.state.policies}
+          agent={this.props.agent}
           columns={columnsPolicies}
           rowProps={this.onClickRow}
+          tableProps={tableProps}
           />
         </EuiPanel>
       </Fragment>

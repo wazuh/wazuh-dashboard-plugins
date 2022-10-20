@@ -1,17 +1,17 @@
-import { EuiBasicTable } from '@elastic/eui';
 import React from 'react';
+import { TableWzAPI } from '../../../common/tables/table-wz-api';
 
 type Props = {
-  policies: any[];
   columns: any[];
   rowProps?: any;
-  loading?: boolean;
+  agent: { [key in string]: any };
+  tableProps?: any;
 };
 
 export default function SCAPoliciesTable(props: Props) {
-  const { policies, columns, rowProps, loading = false } = props;
+  const { columns, rowProps, agent, tableProps } = props;
 
-  const getPoliciesRowProps = (item, idx) => {
+  const getPoliciesRowProps = (item: any, idx: string) => {
     return {
       'data-test-subj': `sca-row-${idx}`,
       className: 'customRowClass',
@@ -21,7 +21,13 @@ export default function SCAPoliciesTable(props: Props) {
 
   return (
     <>
-      <EuiBasicTable loading={loading} items={policies} columns={columns} rowProps={getPoliciesRowProps} />
+      <TableWzAPI 
+        tableInitialSortingField="policy_id"
+        endpoint={`/sca/${agent.id}`} 
+        tableColumns={columns} 
+        rowProps={getPoliciesRowProps}
+        { ...tableProps}
+        />
     </>
   );
 }

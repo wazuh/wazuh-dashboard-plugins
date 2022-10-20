@@ -454,8 +454,7 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
                   <EuiFlexItem>
                     <EuiPanel>
                       <SCAPoliciesTable
-                        loading={this.state.loading}
-                        policies={this.state.policies}
+                        agent={this.props.agent}
                         columns={this.columnsPolicies}
                         rowProps={handlePoliciesTableClickRow}
                       />
