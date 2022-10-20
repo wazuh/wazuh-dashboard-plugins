@@ -1,7 +1,5 @@
 import React from 'react';
-import {
-	EuiSelect,
-} from '@elastic/eui';
+import { EuiSelect } from '@elastic/eui';
 import { IInputFormType } from './types';
 
 export const InputFormSelect = ({ options, value, onChange }: IInputFormType) => {

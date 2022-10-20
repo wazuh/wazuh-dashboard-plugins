@@ -1,14 +1,10 @@
 import React from 'react';
-import { IInputForm } from './types';
 import { InputFormEditor } from './input_editor';
 import { InputFormNumber } from './input_number';
 import { InputFormText } from './input_text';
 import { InputFormSwitch } from './input_switch';
 import { InputFormSelect } from './input_select';
-
-import {
-	EuiFormRow,
-} from '@elastic/eui';
+import { EuiFormRow } from '@elastic/eui';
 
 export const InputForm = ({ type, value, onChange, error, label, preInput, postInput, ...rest}) => {
 
@@ -38,9 +34,9 @@ export const InputForm = ({ type, value, onChange, error, label, preInput, postI
           {typeof postInput === 'function' ? postInput({value, error}) : postInput}
         </>
       </EuiFormRow>)
-    : input;    
+    : input;
 
-};  
+};
 
 const Input = {
   switch: InputFormSwitch,

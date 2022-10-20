@@ -1,7 +1,5 @@
 import React from 'react';
-import {
-	EuiCodeEditor,
-} from '@elastic/eui';
+import { EuiCodeEditor } from '@elastic/eui';
 import { IInputFormType } from './types';
 
 export const InputFormEditor = ({options, value, onChange}: IInputFormType) => {
