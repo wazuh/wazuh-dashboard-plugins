@@ -33,11 +33,11 @@ exports[`Check result component should render a Check result screen 1`] = `
           <EuiToolTip
             content="On hold..."
             delay="regular"
+            display="inlineBlock"
             position="top"
           >
             <span
               className="euiToolTipAnchor"
-              onKeyUp={[Function]}
               onMouseOut={[Function]}
               onMouseOver={[Function]}
             >
@@ -48,39 +48,13 @@ exports[`Check result component should render a Check result screen 1`] = `
                 onFocus={[Function]}
                 type="clock"
               >
-                <EuiIconEmpty
-                  aria-hidden={true}
+                <span
                   aria-label="waiting"
-                  className="euiIcon euiIcon--medium euiIcon-isLoading"
-                  focusable="false"
+                  color="#999999"
+                  data-euiicon-type="clock"
                   onBlur={[Function]}
                   onFocus={[Function]}
-                  role="img"
-                  style={
-                    Object {
-                      "fill": "#999999",
-                    }
-                  }
-                >
-                  <svg
-                    aria-hidden={true}
-                    aria-label="waiting"
-                    className="euiIcon euiIcon--medium euiIcon-isLoading"
-                    focusable="false"
-                    height={16}
-                    onBlur={[Function]}
-                    onFocus={[Function]}
-                    role="img"
-                    style={
-                      Object {
-                        "fill": "#999999",
-                      }
-                    }
-                    viewBox="0 0 16 16"
-                    width={16}
-                    xmlns="http://www.w3.org/2000/svg"
-                  />
-                </EuiIconEmpty>
+                />
               </EuiIcon>
             </span>
           </EuiToolTip>

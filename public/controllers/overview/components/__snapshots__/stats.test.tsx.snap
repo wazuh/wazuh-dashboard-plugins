@@ -6,7 +6,7 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
     <withErrorBoundary(Stats)>
       <EuiPage>
         <div
-          className="euiPage"
+          className="euiPage euiPage--paddingMedium euiPage--grow"
         >
           <EuiFlexGroup>
             <div
@@ -30,6 +30,7 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                       <EuiToolTip
                         content="Go to total agents"
                         delay="regular"
+                        display="inlineBlock"
                         position="top"
                       >
                         <span
@@ -75,11 +76,11 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                           <EuiToolTip
                             content="Go to total agents"
                             delay="regular"
+                            display="inlineBlock"
                             position="top"
                           >
                             <span
                               className="euiToolTipAnchor"
-                              onKeyUp={[Function]}
                               onMouseOut={[Function]}
                               onMouseOver={[Function]}
                             >
@@ -117,6 +118,7 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                       <EuiToolTip
                         content="Go to active agents"
                         delay="regular"
+                        display="inlineBlock"
                         position="top"
                       >
                         <span
@@ -167,11 +169,11 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                           <EuiToolTip
                             content="Go to active agents"
                             delay="regular"
+                            display="inlineBlock"
                             position="top"
                           >
                             <span
                               className="euiToolTipAnchor"
-                              onKeyUp={[Function]}
                               onMouseOut={[Function]}
                               onMouseOver={[Function]}
                             >
@@ -209,6 +211,7 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                       <EuiToolTip
                         content="Go to disconnected agents"
                         delay="regular"
+                        display="inlineBlock"
                         position="top"
                       >
                         <span
@@ -259,11 +262,11 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                           <EuiToolTip
                             content="Go to disconnected agents"
                             delay="regular"
+                            display="inlineBlock"
                             position="top"
                           >
                             <span
                               className="euiToolTipAnchor"
-                              onKeyUp={[Function]}
                               onMouseOut={[Function]}
                               onMouseOver={[Function]}
                             >
@@ -301,6 +304,7 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                       <EuiToolTip
                         content="Go to pending agents"
                         delay="regular"
+                        display="inlineBlock"
                         position="top"
                       >
                         <span
@@ -351,11 +355,11 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                           <EuiToolTip
                             content="Go to pending agents"
                             delay="regular"
+                            display="inlineBlock"
                             position="top"
                           >
                             <span
                               className="euiToolTipAnchor"
-                              onKeyUp={[Function]}
                               onMouseOut={[Function]}
                               onMouseOver={[Function]}
                             >
@@ -393,6 +397,7 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                       <EuiToolTip
                         content="Go to never connected agents"
                         delay="regular"
+                        display="inlineBlock"
                         position="top"
                       >
                         <span
@@ -443,11 +448,11 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                           <EuiToolTip
                             content="Go to never connected agents"
                             delay="regular"
+                            display="inlineBlock"
                             position="top"
                           >
                             <span
                               className="euiToolTipAnchor"
-                              onKeyUp={[Function]}
                               onMouseOut={[Function]}
                               onMouseOver={[Function]}
                             >
