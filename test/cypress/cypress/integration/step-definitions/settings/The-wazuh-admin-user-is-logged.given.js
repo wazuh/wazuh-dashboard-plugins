@@ -1,4 +1,5 @@
 import { Given } from 'cypress-cucumber-preprocessor/steps';
+import { head } from 'fetch-mock';
 import { navigate, elementIsVisible, getSelector, getCookiesFromBrowser } from '../../utils/driver';
 import { WAZUH_MENU_PAGE as pageName} from '../../utils/pages-constants';
 const wazuhMenuButton = getSelector('wazuhMenuButton', pageName);
@@ -13,7 +14,8 @@ Given('The wazuh admin user is logged',  () => {
 
 Given('The sample data is loaded', () => {
     cy.readFile('cookies.json').then((cookies) => {
-        let headersFormat = {"content-type":"application/json; charset=utf-8","Cookie": getCookiesFromBrowser(cookies),"Accept":"application/json, text/plain, */*","Accept-Encoding":"gzip, deflate, br","osd-xsrf":"kibana"};
+        let headersFormat = {"content-type":"application/json; charset=utf-8","Cookie": getCookiesFromBrowser(cookies),"Accept":"application/json, text/plain, */*","Accept-Encoding":"gzip, deflate, br"};
+        (Cypress.env('type')=='xpack') ? headersFormat["kbn-xsrf"]="kibana":headersFormat["osd-xsrf"]="kibana";
         for(let i = 0; i < urlsList.length; i++){
             cy.request({
                 method: 'POST',
