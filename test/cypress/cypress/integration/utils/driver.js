@@ -149,3 +149,20 @@ export const xpathCheckInformationElement=  (webLocator, optionsNames, optionLen
       expect(optionsNames, 'has expected [' + optionsNames + '] text in each paragraph [' + paragraphs + ']').to.contains(paragraphs)
     })
 }
+
+
+export const getCookiesFromBrowser = (values) => {
+  return values.filter(item=>['wz-token', 'wz-user', 'wz-api', 'security_authentication'].includes(item.name))
+  .map(item=>{
+      return `${item.name}:${item.value}`
+  }).join(';');
+}
+
+export const retrieveInformation = (url,method,headers,bodyPost) => {
+  return cy.request({
+    method: method,
+    url: url,
+    headers: headers,
+    body: bodyPost
+  }).as('response');
+}
