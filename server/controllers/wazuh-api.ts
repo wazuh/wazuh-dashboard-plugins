@@ -728,7 +728,7 @@ export class WazuhApiCtrl {
     const idApi = getCookieValueByName(request.headers.cookie, 'wz-api');
     if (idApi !== request.body.id) { // if the current token belongs to a different API id, we relogin to obtain a new token
       return ErrorResponse(
-        'status code HTTP_STATUS_CODES.UNAUTHORIZED',
+        'status code 401',
         HTTP_STATUS_CODES.UNAUTHORIZED,
         HTTP_STATUS_CODES.UNAUTHORIZED,
         response
@@ -935,7 +935,7 @@ export class WazuhApiCtrl {
       log('wazuh-api:getTimeStamp', error.message || error);
       return ErrorResponse(
         error.message || 'Could not fetch wazuh-version registry',
-        HTTP_STATUS_CODES.BAD_REQUEST1,
+        4001,
         HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
         response
       );
@@ -963,7 +963,7 @@ export class WazuhApiCtrl {
       log('wazuh-api:setExtensions', error.message || error);
       return ErrorResponse(
         error.message || 'Could not set extensions',
-        HTTP_STATUS_CODES.BAD_REQUEST1,
+        4001,
         HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
         response
       );
@@ -991,7 +991,7 @@ export class WazuhApiCtrl {
       log('wazuh-api:getExtensions', error.message || error);
       return ErrorResponse(
         error.message || 'Could not fetch wazuh-version registry',
-        HTTP_STATUS_CODES.BAD_REQUEST1,
+        4001,
         HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
         response
       );
@@ -1018,7 +1018,7 @@ export class WazuhApiCtrl {
       log('wazuh-api:getSetupInfo', error.message || error);
       return ErrorResponse(
         `Could not get data from wazuh-version registry due to ${error.message || error}`,
-        HTTP_STATUS_CODES.BAD_REQUEST5,
+        4005,
         HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
         response
       );
