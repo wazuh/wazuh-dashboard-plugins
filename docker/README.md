@@ -176,6 +176,32 @@ docker push quay.io/wazuh/image-name:version
 If you're creating a new image, copy one of the ones already present
 in the directory, and adapt it to the new version.
 
+## [Imposter-cli](https://github.com/gatehill/imposter-cli)
+
+### Prerequisites
+
+You must have a [JVM](https://github.com/gatehill/imposter-cli/blob/main/docs/jvm_engine.md) installed.
+
+### Install
+
+If you have Homebrew installed:
+```
+brew tap gatehill/imposter
+brew install imposter
+```
+
+Or, use this one liner (macOS and Linux only):
+
+```
+curl -L https://raw.githubusercontent.com/gatehill/imposter-cli/main/install/install_imposter.sh | bash -
+```
+
+### Use
+
+```
+imposter up -t jvm -p 8088
+```
+
 ## Environments
 
 ### **mon** - monitoring environment
