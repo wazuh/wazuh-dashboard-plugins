@@ -18,7 +18,7 @@ usage() {
 	echo
 	echo "where version is one of " ${versions[*]}
 	echo "action is one of up | down | stop"
-	echo "optionally add 'saml' as the last parameter to deploy a saml enabled environment"
+	echo "saml to deploy a saml enabled environment"
 	exit -1
 }
 
