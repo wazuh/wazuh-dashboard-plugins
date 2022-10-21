@@ -729,7 +729,7 @@ export const RegisterAgent = withErrorBoundary(
             This is the address the agent uses to communicate with the Wazuh server. It can be an IP address or a fully qualified domain name (FQDN).
           </p>
           <EuiSelect
-              placeholder="Select node IP"
+              placeholder="Server Address"
               required={false}
               value={this.state.serverAddress}
               options={this.state.nodeIPs}
