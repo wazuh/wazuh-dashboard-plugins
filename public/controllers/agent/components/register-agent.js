@@ -218,8 +218,14 @@ export const RegisterAgent = withErrorBoundary(
       this.setState({ selectedSYS: sys });
     }
 
-    setServerAddress(event) {
-      this.setState({ serverAddress: event[0].value });
+    setServerAddress(selectedNodes) {
+      let allNodeIps = '';
+      if(selectedNodes.length > 1){
+        allNodeIps = selectedNodes.map(o => o.value).join(',');
+      }else if (selectedNodes.length === 1){
+        allNodeIps = selectedNodes[0].value;
+      }
+      this.setState({ serverAddress: allNodeIps });
     }
 
     setGroupName(selectedGroup) {
@@ -1314,7 +1320,7 @@ export const RegisterAgent = withErrorBoundary(
           : []),
         {
           title: 'Wazuh server address',
-          children: <Fragment><ServerAddress onChangeValue={(e) => this.setServerAddress(e) }/></Fragment>,
+          children: <Fragment><ServerAddress onChange={(e) => this.setServerAddress(e) }/></Fragment>,
         },
         ...(!(!this.state.needsPassword || this.state.hidePasswordInput)
           ? [
