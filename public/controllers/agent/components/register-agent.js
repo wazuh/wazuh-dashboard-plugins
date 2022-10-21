@@ -60,6 +60,7 @@ export const RegisterAgent = withErrorBoundary(
         version: '',
         wazuhVersion: '',
         serverAddress: '',
+        agentName: '',
         wazuhPassword: '',
         groups: [],
         selectedGroup: [],
@@ -218,6 +219,10 @@ export const RegisterAgent = withErrorBoundary(
       this.setState({ serverAddress: event.target.value });
     }
 
+    setnameInput(event) {
+      this.setState({ agentName: event.target.value });
+    }
+
     setGroupName(selectedGroup) {
       this.setState({ selectedGroup });
     }
@@ -262,7 +267,7 @@ export const RegisterAgent = withErrorBoundary(
     optionalDeploymentVariables() {
       let deployment = `WAZUH_MANAGER='${this.state.serverAddress}' `;
       const protocol = false
-
+      
       if (this.state.selectedOS == 'win') {
         deployment += `WAZUH_REGISTRATION_SERVER='${this.state.serverAddress}' `;
       }
@@ -287,6 +292,15 @@ export const RegisterAgent = withErrorBoundary(
       }
 
       return deployment;
+    }
+
+    agentNameVariable() {
+      let agentName = `WAZUH_AGENT_NAME='${this.state.agentName}' `;
+
+      if(this.state.selectedArchitecture) {
+        agentName
+      }
+      return agentName
     }
 
     resolveRPMPackage() {
@@ -716,6 +730,7 @@ export const RegisterAgent = withErrorBoundary(
         </EuiText>
       );
 
+      
       const groupInput = (
         <>
           {!this.state.groups.length && (
@@ -744,7 +759,33 @@ export const RegisterAgent = withErrorBoundary(
           </EuiText>
         </>
       );
+      
+      const agentName = (
+          <EuiFieldText
+            placeholder="Name agent"
+            value={this.state.agentName}
+            onChange={(event) => this.setnameInput(event)}
+            readOnly={!this.state.groups.length ? true : false}
+          />
+      );
 
+      const agentGroup = (
+        <EuiText style={{marginTop: '1.5rem'}}>
+        <p>Select one or more existing groups</p>
+        <EuiComboBox
+          placeholder={!this.state.groups.length ? "Default" : "Select group"}
+          options={this.state.groups}
+          selectedOptions={this.state.selectedGroup}
+          onChange={(group) => {
+            this.setGroupName(group);
+          }}
+          isDisabled={!this.state.groups.length}
+          isClearable={true}
+          data-test-subj="demoComboBox"
+        />
+      </EuiText>
+      )
+      console.log(this.state.groups.length, 'gr')
       const passwordInput = (
         <EuiFieldText
           placeholder="Wazuh password"
@@ -757,31 +798,31 @@ export const RegisterAgent = withErrorBoundary(
         zIndex: '100',
       };
       const customTexts = {
-        rpmText: `sudo ${this.optionalDeploymentVariables()}yum install -y ${this.optionalPackages()}`,
-        centText: `sudo ${this.optionalDeploymentVariables()}yum install -y ${this.optionalPackages()}`,
+        rpmText: `sudo ${this.optionalDeploymentVariables()} ${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
+        centText: `sudo ${this.optionalDeploymentVariables()} ${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
         debText: `curl -so wazuh-agent-${this.state.wazuhVersion
-          }.deb ${this.optionalPackages()} && sudo ${this.optionalDeploymentVariables()}dpkg -i ./wazuh-agent-${this.state.wazuhVersion
+          }.deb ${this.optionalPackages()} && sudo ${this.optionalDeploymentVariables()} ${this.agentNameVariable()}dpkg -i ./wazuh-agent-${this.state.wazuhVersion
           }.deb`,
         ubuText: `curl -so wazuh-agent-${this.state.wazuhVersion
-          }.deb ${this.optionalPackages()} && sudo ${this.optionalDeploymentVariables()}dpkg -i ./wazuh-agent-${this.state.wazuhVersion
+          }.deb ${this.optionalPackages()} && sudo ${this.optionalDeploymentVariables()} ${this.agentNameVariable()}dpkg -i ./wazuh-agent-${this.state.wazuhVersion
           }.deb`,
         macosText: `curl -so wazuh-agent-${this.state.wazuhVersion
           }.pkg https://packages.wazuh.com/4.x/macos/wazuh-agent-${this.state.wazuhVersion
-          }-1.pkg && sudo launchctl setenv ${this.optionalDeploymentVariables()} && sudo installer -pkg ./wazuh-agent-${this.state.wazuhVersion
+          }-1.pkg && sudo launchctl setenv ${this.optionalDeploymentVariables()} ${this.agentNameVariable()} && sudo installer -pkg ./wazuh-agent-${this.state.wazuhVersion
           }.pkg -target /`,
         winText: `Invoke-WebRequest -Uri https://packages.wazuh.com/4.x/windows/wazuh-agent-${this.state.wazuhVersion
           }-1.msi -OutFile \${env:tmp}\\wazuh-agent-${this.state.wazuhVersion}.msi; msiexec.exe /i \${env:tmp}\\wazuh-agent-${this.state.wazuhVersion
-          }.msi /q ${this.optionalDeploymentVariables()}`,
-        openText: `sudo rpm --import https://packages.wazuh.com/key/GPG-KEY-WAZUH && sudo ${this.optionalDeploymentVariables()} zypper install -y ${this.optionalPackages()}`,
-        solText: `sudo curl -so ${this.optionalPackages()} && ${this.state.selectedVersion == 'solaris11' ? 'pkg install -g wazuh-agent.p5p wazuh-agent' : 'pkgadd -d wazuh-agent.pkg'}`,
-        aixText: `sudo ${this.optionalDeploymentVariables()} rpm -ivh ${this.optionalPackages()}`,
-        hpText: `cd / && sudo curl -so ${this.optionalPackages()} && sudo groupadd wazuh && sudo useradd -G wazuh wazuh && sudo tar -xvf wazuh-agent.tar`,
-        amazonlinuxText: `sudo ${this.optionalDeploymentVariables()}yum install -y ${this.optionalPackages()}`,
-        fedoraText: `sudo ${this.optionalDeploymentVariables()}yum install -y ${this.optionalPackages()}`,
-        oraclelinuxText: `sudo ${this.optionalDeploymentVariables()}yum install -y ${this.optionalPackages()}`,
-        suseText: `sudo ${this.optionalDeploymentVariables()}yum install -y ${this.optionalPackages()}`,
+          }.msi /q ${this.optionalDeploymentVariables()} ${this.agentNameVariable()}`,
+        openText: `sudo rpm --import https://packages.wazuh.com/key/GPG-KEY-WAZUH && sudo ${this.optionalDeploymentVariables()} ${this.agentNameVariable()} zypper install -y ${this.optionalPackages()}`,
+        solText: `sudo curl -so ${this.optionalPackages()} && sudo ${this.agentNameVariable()} && ${this.state.selectedVersion == 'solaris11' ? 'pkg install -g wazuh-agent.p5p wazuh-agent' : 'pkgadd -d wazuh-agent.pkg'}`,
+        aixText: `sudo ${this.optionalDeploymentVariables()} ${this.agentNameVariable()} rpm -ivh ${this.optionalPackages()}`,
+        hpText: `cd / && sudo curl -so ${this.optionalPackages()} && sudo ${this.agentNameVariable()} groupadd wazuh && sudo useradd -G wazuh wazuh && sudo tar -xvf wazuh-agent.tar`,
+        amazonlinuxText: `sudo ${this.optionalDeploymentVariables()} ${this.agentNameVariable()} yum install -y ${this.optionalPackages()}`,
+        fedoraText: `sudo ${this.optionalDeploymentVariables()} ${this.agentNameVariable()} yum install -y ${this.optionalPackages()}`,
+        oraclelinuxText: `sudo ${this.optionalDeploymentVariables()} ${this.agentNameVariable()} yum install -y ${this.optionalPackages()}`,
+        suseText: `sudo ${this.optionalDeploymentVariables()} ${this.agentNameVariable()} yum install -y ${this.optionalPackages()}`,
         raspbianText: `curl -so wazuh-agent-${this.state.wazuhVersion
-          }.deb ${this.optionalPackages()} && sudo ${this.optionalDeploymentVariables()}dpkg -i ./wazuh-agent-${this.state.wazuhVersion
+          }.deb ${this.optionalPackages()} && sudo ${this.optionalDeploymentVariables()} ${this.agentNameVariable()} dpkg -i ./wazuh-agent-${this.state.wazuhVersion
           }.deb`,
       };
 
@@ -1327,8 +1368,8 @@ export const RegisterAgent = withErrorBoundary(
           ]
           : []),
         {
-          title: 'Assign the agent to a group',
-          children: <Fragment>{groupInput}</Fragment>,
+          title: 'Assign a name and a group to the agent',
+          children: <Fragment>{groupInput}{agentName}</Fragment>,
         },
         {
           title: 'Install and enroll the agent',
