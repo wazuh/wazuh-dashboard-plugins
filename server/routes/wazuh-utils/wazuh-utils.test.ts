@@ -264,8 +264,10 @@ hosts:
     ${'cron.statistics.index.replicas'} | ${0}                 | ${200}             | ${null}
     ${'cron.statistics.index.replicas'} | ${-1}                | ${400}             | ${"[request body.cron.statistics.index.replicas]: Value should be greater or equal than 0."}
     ${'cron.statistics.index.replicas'} | ${'custom'}          | ${400}             | ${"[request body.cron.statistics.index.replicas]: expected value of type [number] but got [string]"}
+    ${'cron.statistics.index.replicas'} | ${1.2}               | ${400}             | ${"[request body.cron.statistics.index.replicas]: Number should be an integer."}
     ${'cron.statistics.index.shards'}   | ${1}                 | ${200}             | ${null}
     ${'cron.statistics.index.shards'}   | ${-1}                | ${400}             | ${"[request body.cron.statistics.index.shards]: Value should be greater or equal than 1."}
+    ${'cron.statistics.index.shards'}   | ${1.2}               | ${400}             | ${"[request body.cron.statistics.index.shards]: Number should be an integer."}
     ${'cron.statistics.interval'}       | ${'0 */5 * * * *'}   | ${200}             | ${null}
     ${'cron.statistics.interval'}       | ${'0 */5 * * *'}     | ${200}             | ${null}
     ${'cron.statistics.interval'}       | ${'custom'}          | ${400}             | ${"[request body.cron.statistics.interval]: Interval is not valid."}
@@ -353,6 +355,7 @@ hosts:
     ${'timeout'}                        | ${15000}             | ${200}             | ${null}
     ${'timeout'}                        | ${1000}              | ${400}             | ${'[request body.timeout]: Value should be greater or equal than 1500.'}
     ${'timeout'}                        | ${''}                | ${400}             | ${'[request body.timeout]: expected value of type [number] but got [string]'}
+    ${'timeout'}                        | ${1.2}               | ${400}             | ${"[request body.timeout]: Number should be an integer."}
     ${'wazuh.monitoring.creation'}      | ${'h'}               | ${200}             | ${null}
     ${'wazuh.monitoring.creation'}      | ${'d'}               | ${200}             | ${null}
     ${'wazuh.monitoring.creation'}      | ${'w'}               | ${200}             | ${null}
@@ -362,6 +365,7 @@ hosts:
     ${'wazuh.monitoring.enabled'}       | ${0}                 | ${400}             | ${'[request body.wazuh.monitoring.enabled]: expected value of type [boolean] but got [number]'}
     ${'wazuh.monitoring.frequency'}     | ${100}               | ${200}             | ${null}
     ${'wazuh.monitoring.frequency'}     | ${40}                | ${400}             | ${"[request body.wazuh.monitoring.frequency]: Value should be greater or equal than 60."}
+    ${'wazuh.monitoring.frequency'}     | ${1.2}               | ${400}             | ${"[request body.wazuh.monitoring.frequency]: Number should be an integer."}
     ${'wazuh.monitoring.frequency'}     | ${''}                | ${400}             | ${'[request body.wazuh.monitoring.frequency]: expected value of type [number] but got [string]'}
     ${'wazuh.monitoring.pattern'}       | ${'test'}            | ${200}             | ${null}
     ${'wazuh.monitoring.pattern'}       | ${'test*'}           | ${200}             | ${null}
@@ -382,10 +386,12 @@ hosts:
     ${'wazuh.monitoring.pattern'}       | ${'test#'}           | ${400}             | ${"[request body.wazuh.monitoring.pattern]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #."}
     ${'wazuh.monitoring.replicas'}      | ${0}                 | ${200}             | ${null}
     ${'wazuh.monitoring.replicas'}      | ${-1}                | ${400}             | ${"[request body.wazuh.monitoring.replicas]: Value should be greater or equal than 0."}
+    ${'wazuh.monitoring.replicas'}      | ${1.2}               | ${400}             | ${"[request body.wazuh.monitoring.replicas]: Number should be an integer."}
     ${'wazuh.monitoring.replicas'}      | ${'custom'}          | ${400}             | ${"[request body.wazuh.monitoring.replicas]: expected value of type [number] but got [string]"}
-    ${'wazuh.monitoring.shards'}        | ${1} | ${200} | ${null}
-    ${'wazuh.monitoring.shards'}        | ${-1} | ${400} | ${"[request body.wazuh.monitoring.shards]: Value should be greater or equal than 1."}
-    ${'wazuh.monitoring.shards'}        | ${'custom'} | ${400} | ${"[request body.wazuh.monitoring.shards]: expected value of type [number] but got [string]"}
+    ${'wazuh.monitoring.shards'}        | ${1}                 | ${200}             | ${null}
+    ${'wazuh.monitoring.shards'}        | ${-1}                | ${400}             | ${"[request body.wazuh.monitoring.shards]: Value should be greater or equal than 1."}
+    ${'wazuh.monitoring.shards'}        | ${1.2}               | ${400}             | ${"[request body.wazuh.monitoring.shards]: Number should be an integer."}
+    ${'wazuh.monitoring.shards'}        | ${'custom'}          | ${400}             | ${"[request body.wazuh.monitoring.shards]: expected value of type [number] but got [string]"}
   `(`$setting: $value - PUT /utils/configuration - $responseStatusCode`, async ({responseBodyMessage, responseStatusCode, setting, value}) => {
     const body = {[setting]: value};
     const response = await supertest(innerServer.listener)

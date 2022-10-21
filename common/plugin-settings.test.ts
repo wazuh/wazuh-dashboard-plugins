@@ -81,8 +81,12 @@ describe('[settings] Input validation', () => {
     ${'cron.statistics.index.name'}     | ${'test*'}           | ${"It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #, *."}
     ${'cron.statistics.index.replicas'} | ${0}                 | ${undefined}
     ${'cron.statistics.index.replicas'} | ${-1}                | ${"Value should be greater or equal than 0."}
+    ${'cron.statistics.index.replicas'} | ${'1.2'}             | ${'Number should be an integer.'}
+    ${'cron.statistics.index.replicas'} | ${1.2}               | ${'Number should be an integer.'}
     ${'cron.statistics.index.shards'}   | ${1}                 | ${undefined}
     ${'cron.statistics.index.shards'}   | ${-1}                | ${"Value should be greater or equal than 1."}
+    ${'cron.statistics.index.shards'}   | ${'1.2'}             | ${'Number should be an integer.'}
+    ${'cron.statistics.index.shards'}   | ${1.2}               | ${'Number should be an integer.'}
     ${'cron.statistics.interval'}       | ${'0 */5 * * * *'}   | ${undefined}
     ${'cron.statistics.interval'}       | ${'0 */5 * * *'}     | ${undefined}
     ${'cron.statistics.interval'}       | ${'custom'}          | ${"Interval is not valid."}
@@ -167,6 +171,8 @@ describe('[settings] Input validation', () => {
     ${'timeout'}                        | ${15000}             | ${undefined}
     ${'timeout'}                        | ${1000}              | ${'Value should be greater or equal than 1500.'}
     ${'timeout'}                        | ${''}                | ${'Value should be greater or equal than 1500.'}
+    ${'timeout'}                        | ${'1.2'}             | ${'Number should be an integer.'}
+    ${'timeout'}                        | ${1.2}               | ${'Number should be an integer.'}
     ${'wazuh.monitoring.creation'}      | ${'h'}               | ${undefined}
     ${'wazuh.monitoring.creation'}      | ${'d'}               | ${undefined}
     ${'wazuh.monitoring.creation'}      | ${'w'}               | ${undefined}
@@ -175,6 +181,8 @@ describe('[settings] Input validation', () => {
     ${'wazuh.monitoring.enabled'}       | ${true}              | ${undefined}
     ${'wazuh.monitoring.frequency'}     | ${100}               | ${undefined}
     ${'wazuh.monitoring.frequency'}     | ${40}                | ${"Value should be greater or equal than 60."}
+    ${'wazuh.monitoring.frequency'}     | ${'1.2'}             | ${'Number should be an integer.'}
+    ${'wazuh.monitoring.frequency'}     | ${1.2}               | ${'Number should be an integer.'}
     ${'wazuh.monitoring.pattern'}       | ${'test'}            | ${undefined}
     ${'wazuh.monitoring.pattern'}       | ${'test*'}           | ${undefined}
     ${'wazuh.monitoring.pattern'}       | ${''}                | ${'Value can not be empty.'}
@@ -193,8 +201,12 @@ describe('[settings] Input validation', () => {
     ${'wazuh.monitoring.pattern'}       | ${'test#'}           | ${"It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #."}
     ${'wazuh.monitoring.replicas'}      | ${0}                 | ${undefined}
     ${'wazuh.monitoring.replicas'}      | ${-1}                | ${"Value should be greater or equal than 0."}
+    ${'wazuh.monitoring.replicas'}      | ${'1.2'}             | ${'Number should be an integer.'}
+    ${'wazuh.monitoring.replicas'}      | ${1.2}               | ${'Number should be an integer.'}
     ${'wazuh.monitoring.shards'}        | ${1}                 | ${undefined}
     ${'wazuh.monitoring.shards'}        | ${-1}                | ${"Value should be greater or equal than 1."}
+    ${'wazuh.monitoring.shards'}        | ${'1.2'}             | ${'Number should be an integer.'}
+    ${'wazuh.monitoring.shards'}        | ${1.2}               | ${'Number should be an integer.'}
     `('$setting | $value | $expectedValidation', ({ setting, value, expectedValidation }) => {
         expect(
             PLUGIN_SETTINGS[setting].validate(

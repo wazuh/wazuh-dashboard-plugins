@@ -120,14 +120,25 @@ export class SettingsValidator{
 	 * @param options 
 	 * @returns 
 	 */
-	static number(options: { min?: number, max?: number } = {}) {
+	static number(options: { min?: number, max?: number, integer?: boolean } = {}) {
 		return function (value: number){
-			if (typeof options.min !== 'undefined' && value < options.min) {
+			if (options.integer
+				&& (
+					(typeof value === 'string' ? ['.', ','].some(character => value.includes(character)) : false)
+					|| !Number.isInteger(Number(value))
+				)
+			) {
+				return 'Number should be an integer.'
+			};
+			
+			const valueNumber = typeof value === 'string' ? Number(value) : value;
+
+			if (typeof options.min !== 'undefined' && valueNumber < options.min) {
 				return `Value should be greater or equal than ${options.min}.`;
 			};
-			if (typeof options.max !== 'undefined' && value > options.max) {
+			if (typeof options.max !== 'undefined' && valueNumber > options.max) {
 				return `Value should be lower or equal than ${options.max}.`;
-			};
+			};			
 		};
 	};
 

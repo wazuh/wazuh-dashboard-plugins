@@ -359,6 +359,7 @@ type TPluginSettingOptionsNumber = {
   number: {
     min?: number
     max?: number
+    integer?: boolean
   }
 };
 
@@ -805,7 +806,8 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     requiresRunningHealthCheck: true,
     options: {
       number: {
-        min: 0
+        min: 0,
+        integer: true
       }
     },
     uiFormTransformConfigurationValueToInputValue: function(value: number): string {
@@ -832,7 +834,8 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     requiresRunningHealthCheck: true,
     options: {
       number: {
-        min: 1
+        min: 1,
+        integer: true
       }
     },
     uiFormTransformConfigurationValueToInputValue: function(value: number){
@@ -1453,7 +1456,8 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     isConfigurableFromUI: true,
     options: {
       number: {
-        min: 1500
+        min: 1500,
+        integer: true
       }
     },
     uiFormTransformConfigurationValueToInputValue: function(value: number){
@@ -1541,7 +1545,8 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     requiresRestartingPluginPlatform: true,
     options: {
       number: {
-        min: 60
+        min: 60,
+        integer: true
       }
     },
     uiFormTransformConfigurationValueToInputValue: function(value: number){
@@ -1588,7 +1593,8 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     requiresRunningHealthCheck: true,
     options: {
       number: {
-        min: 0
+        min: 0,
+        integer: true
       }
     },
     uiFormTransformConfigurationValueToInputValue: function(value: number){
@@ -1615,7 +1621,8 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     requiresRunningHealthCheck: true,
     options: {
       number: {
-        min: 1
+        min: 1,
+        integer: true
       }
     },
     uiFormTransformConfigurationValueToInputValue: function(value: number){
