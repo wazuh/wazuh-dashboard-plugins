@@ -43,6 +43,7 @@ import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
 import { architectureButtons, architectureButtonsi386, architecturei386Andx86_64, versionButtonsRaspbian, versionButtonsSuse, versionButtonsOracleLinux, versionButtonFedora, architectureButtonsSolaris, architectureButtonsWithPPC64LE, architectureButtonsOpenSuse, architectureButtonsAix, architectureButtonsHpUx, versionButtonAmazonLinux, versionButtonsRedHat, versionButtonsCentos, architectureButtonsMacos, osButtons, versionButtonsDebian, versionButtonsUbuntu, versionButtonsWindows, versionButtonsMacOS, versionButtonsOpenSuse, versionButtonsSolaris, versionButtonsAix, versionButtonsHPUX } from '../wazuh-config'
+import  ServerAddress  from '../register-agent/steps/server-address'
 
 export const RegisterAgent = withErrorBoundary(
 
@@ -102,7 +103,6 @@ export const RegisterAgent = withErrorBoundary(
 
         const udpProtocol = await this.getRemoteInfo();
         const groups = await this.getGroups();
-        const nodeIPs = await this.getNodeIPs();
         this.setState({
           serverAddress,
           needsPassword,
@@ -219,7 +219,7 @@ export const RegisterAgent = withErrorBoundary(
     }
 
     setServerAddress(event) {
-      this.setState({ serverAddress: event.target.value });
+      this.setState({ serverAddress: event[0].value });
     }
 
     setGroupName(selectedGroup) {
@@ -264,17 +264,6 @@ export const RegisterAgent = withErrorBoundary(
         const result = await WzRequest.apiReq('GET', '/groups', {});
         return result.data.data.affected_items.map((item) => ({ label: item.name, id: item.name }));
       } catch (error) {
-        throw new Error(error);
-      }
-    }
-
-    async getNodeIPs() {
-      try {
-        const result = await WzRequest.apiReq('GET', '/cluster/nodes', {});
-        console.log('nodes', result);
-        return [{ label: '', text: '' }].concat(result.data.data.affected_items.map((item) => ({ text: item.name, value: item.ip })));
-      } catch (error) {
-        // 3013 - Cluster is not running
         throw new Error(error);
       }
     }
@@ -723,23 +712,7 @@ export const RegisterAgent = withErrorBoundary(
         </p>
       );
       const missingOSSelection = this.checkMissingOSSelection();
-      const ipInput = (
-        <EuiText>
-          <p>
-            This is the address the agent uses to communicate with the Wazuh server. It can be an IP address or a fully qualified domain name (FQDN).
-          </p>
-          <EuiSelect
-              placeholder="Server Address"
-              required={false}
-              value={this.state.serverAddress}
-              options={this.state.nodeIPs}
-              onChange={(e) => {
-                this.setServerAddress(e);
-              }}
-              data-test-subj="demoComboBox"
-            />
-        </EuiText>
-      );
+      
 
       const groupInput = (
         <>
@@ -1341,7 +1314,7 @@ export const RegisterAgent = withErrorBoundary(
           : []),
         {
           title: 'Wazuh server address',
-          children: <Fragment>{ipInput}</Fragment>,
+          children: <Fragment><ServerAddress onChangeValue={(e) => this.setServerAddress(e) }/></Fragment>,
         },
         ...(!(!this.state.needsPassword || this.state.hidePasswordInput)
           ? [
