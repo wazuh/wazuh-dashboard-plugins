@@ -299,6 +299,8 @@ export const RegisterAgent = withErrorBoundary(
 
       if(this.state.selectedArchitecture && this.state.agentName !== '') {
         return agentName
+      } else {
+        return ''
       }
     }
 
@@ -729,22 +731,29 @@ export const RegisterAgent = withErrorBoundary(
         </EuiText>
       );
 
-      
+      const agentName = (
+        <EuiFieldText
+          placeholder="Name agent"
+          value={this.state.agentName}
+          onChange={(event) => this.setAgentName(event)}
+          // readOnly={!this.state.groups.length ? true : false}
+        />
+    );
       const groupInput = (
         <>
           {!this.state.groups.length && (
             <>
-              <EuiCallOut
+              <EuiCallOut style={{marginTop: '1.5rem'}}
                 color="warning"
                 title='This section could not be configured because you do not have permission to read groups.'
                 iconType="iInCircle"
               />
-              <EuiSpacer />
+              {/* <EuiSpacer /> */}
             </>
           )}
-          <EuiText>
-            <p>Select one or more existing groups</p>
-            <EuiComboBox
+          {/* <EuiText>
+            <p>Select one or more existing groups</p> */}
+            {/* <EuiComboBox
               placeholder={!this.state.groups.length ? "Default" : "Select group"}
               options={this.state.groups}
               selectedOptions={this.state.selectedGroup}
@@ -754,19 +763,12 @@ export const RegisterAgent = withErrorBoundary(
               isDisabled={!this.state.groups.length}
               isClearable={true}
               data-test-subj="demoComboBox"
-            />
-          </EuiText>
+            /> */}
+          {/* </EuiText> */}
         </>
       );
       
-      const agentName = (
-          <EuiFieldText
-            placeholder="Name agent"
-            value={this.state.agentName}
-            onChange={(event) => this.setAgentName(event)}
-            readOnly={!this.state.groups.length ? true : false}
-          />
-      );
+
 
       const agentGroup = (
         <EuiText style={{marginTop: '1.5rem'}}>
@@ -1368,7 +1370,7 @@ export const RegisterAgent = withErrorBoundary(
           : []),
         {
           title: 'Assign a name and a group to the agent',
-          children: <Fragment>{groupInput}{agentName}</Fragment>,
+          children: <Fragment>{agentName}{groupInput}{agentGroup}</Fragment>,
         },
         {
           title: 'Install and enroll the agent',
