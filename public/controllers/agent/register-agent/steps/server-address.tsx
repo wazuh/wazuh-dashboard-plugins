@@ -3,11 +3,11 @@ import React, { useEffect, useState } from 'react';
 import { WzRequest } from '../../../../react-services';
 
 type Props = {
-  onChangeValue: (value: any) => void;
+  onChange: (value: any) => void;
 }
 
 export default function ServerAddress(props: Props) {
-  const { onChangeValue } = props;
+  const { onChange } = props;
   const [serverAddress, setServerAddress] = useState('');
   const [nodeIPs, setNodeIPs] = useState<EuiComboBoxOptionOption[]>([]);
   const [selectedNodeIPs, setSelectedNodeIPs] = useState<EuiComboBoxOptionOption[]>([]);
@@ -22,6 +22,7 @@ export default function ServerAddress(props: Props) {
       const ipLists = result.data.data.affected_items.map((item) => ({ label: item.name, value: item.ip }));
       setNodeIPs(ipLists);
     } catch (error) {
+      //console.log('get NodeIPs error', error)
       // 3013 - Cluster is not running
       //throw new Error(error);
     }
@@ -29,7 +30,7 @@ export default function ServerAddress(props: Props) {
 
   const handleOnChange = (e) => {
     setSelectedNodeIPs(e);
-    onChangeValue(e);
+    onChange(e);
   }
 
   return (
