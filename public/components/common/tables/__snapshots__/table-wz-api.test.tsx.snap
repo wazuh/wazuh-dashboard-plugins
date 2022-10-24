@@ -35,13 +35,18 @@ exports[`Table WZ API component renders correctly to match the snapshot 1`] = `
   }
   title="Table"
 >
-  <EuiFlexGroup>
+  <EuiFlexGroup
+    wrap={true}
+  >
     <div
-      className="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+      className="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
     >
-      <EuiFlexItem>
+      <EuiFlexItem
+        className="wz-flex-basis-auto"
+        grow={false}
+      >
         <div
-          className="euiFlexItem"
+          className="euiFlexItem euiFlexItem--flexGrowZero wz-flex-basis-auto"
         >
           <EuiTitle
             size="s"
@@ -62,6 +67,21 @@ exports[`Table WZ API component renders correctly to match the snapshot 1`] = `
           </EuiTitle>
         </div>
       </EuiFlexItem>
+      <EuiFlexItem>
+        <div
+          className="euiFlexItem"
+        >
+          <EuiFlexGroup
+            alignItems="center"
+            justifyContent="flexEnd"
+            wrap={true}
+          >
+            <div
+              className="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--justifyContentFlexEnd euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
+            />
+          </EuiFlexGroup>
+        </div>
+      </EuiFlexItem>
     </div>
   </EuiFlexGroup>
   <TableDefault
@@ -69,6 +89,7 @@ exports[`Table WZ API component renders correctly to match the snapshot 1`] = `
     endpoint="/"
     error={false}
     onSearch={[Function]}
+    reload={0}
     searchBar={false}
     searchTable={false}
     tableColumns={
@@ -132,6 +153,7 @@ exports[`Table WZ API component renders correctly to match the snapshot 1`] = `
       onChange={[Function]}
       pagination={
         Object {
+          "hidePerPageOptions": false,
           "pageIndex": 0,
           "pageSize": 15,
           "pageSizeOptions": Array [

@@ -111,6 +111,7 @@ export const Category: React.FunctionComponent<ICategoryProps> = ({
                         aria-label={item.key}
                         content='Invalid' />
                       )}
+
                       {isUpdated && (
                         <EuiIconTip
                         anchorClassName="mgtAdvancedSettings__fieldTitleUnsavedIcon"

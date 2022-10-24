@@ -8,6 +8,7 @@ Feature: Add/Delete Sample data to modules
   Scenario: Add all sample data
     Given The wazuh admin user is logged
     When The user navigates to Sample data settings
+    And All buttons have add status
     And The user adds sample data for
       | security information            |
       | auditing and policy monitoring  |
@@ -18,6 +19,7 @@ Feature: Add/Delete Sample data to modules
   Scenario: Delete all sample data
       Given The wazuh admin user is logged
       When The user navigates to Sample data settings
+      And All buttons have remove status
       And The user removes sample data for
       | security information            |
       | auditing and policy monitoring  |
