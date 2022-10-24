@@ -1,7 +1,5 @@
 import React from 'react';
-import {
-	EuiSwitch,
-} from '@elastic/eui';
+import { EuiSwitch } from '@elastic/eui';
 import { IInputFormType } from './types';
 
 export const InputFormSwitch = ({ options, value, onChange }: IInputFormType) => {

@@ -235,7 +235,7 @@ hosts:
     ${'cron.statistics.apis'}           | ${['test']}                       | ${200}             | ${null}
     ${'cron.statistics.apis'}           | ${['test ']}                      | ${400}             | ${"[request body.cron.statistics.apis.0]: It can't contain spaces."}
     ${'cron.statistics.apis'}           | ${['']}                           | ${400}             | ${"[request body.cron.statistics.apis.0]: Value can not be empty."}
-    ${'cron.statistics.apis'}           | ${['test', 4]}                    | ${400}             | ${"[request body.cron.statistics.apis.1]: expected value of type [string] but got [number]"}    
+    ${'cron.statistics.apis'}           | ${['test', 4]}                    | ${400}             | ${"[request body.cron.statistics.apis.1]: expected value of type [string] but got [number]"}
     ${'cron.statistics.apis'}           | ${'test space'}                   | ${400}             | ${"[request body.cron.statistics.apis]: could not parse array value from json input"}
     ${'cron.statistics.apis'}           | ${true}                           | ${400}             | ${"[request body.cron.statistics.apis]: expected value of type [array] but got [boolean]"}
     ${'cron.statistics.index.creation'} | ${'h'}                            | ${200}             | ${null}
@@ -285,7 +285,7 @@ hosts:
     ${'disabled_roles'}                 | ${['test']}                       | ${200}             | ${null}
     ${'disabled_roles'}                 | ${['']}                           | ${400}             | ${'[request body.disabled_roles.0]: Value can not be empty.'}
     ${'disabled_roles'}                 | ${['test space']}                 | ${400}             | ${"[request body.disabled_roles.0]: It can't contain spaces."}
-    ${'disabled_roles'}                 | ${['test', 4]}                    | ${400}             | ${"[request body.disabled_roles.1]: expected value of type [string] but got [number]"}    
+    ${'disabled_roles'}                 | ${['test', 4]}                    | ${400}             | ${"[request body.disabled_roles.1]: expected value of type [string] but got [number]"}
     ${'enrollment.dns'}                 | ${'test'}                         | ${200}             | ${null}
     ${'enrollment.dns'}                 | ${''}                             | ${200}             | ${null}
     ${'enrollment.dns'}                 | ${'test space'}                   | ${400}             | ${"[request body.enrollment.dns]: It can't contain spaces."}

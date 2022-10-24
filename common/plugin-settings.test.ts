@@ -54,7 +54,7 @@ describe('[settings] Input validation', () => {
     ${'cron.statistics.apis'}           | ${['test']}                       | ${undefined}
     ${'cron.statistics.apis'}           | ${['test ']}                      | ${"It can't contain spaces."}
     ${'cron.statistics.apis'}           | ${['']}                           | ${"Value can not be empty."}
-    ${'cron.statistics.apis'}           | ${['test', 4]}                    | ${"Value is not a string."}    
+    ${'cron.statistics.apis'}           | ${['test', 4]}                    | ${"Value is not a string."}
     ${'cron.statistics.apis'}           | ${'test space'}                   | ${"Value is not a valid list."}
     ${'cron.statistics.apis'}           | ${true}                           | ${"Value is not a valid list."}
     ${'cron.statistics.index.creation'} | ${'h'}                            | ${undefined}
@@ -92,14 +92,14 @@ describe('[settings] Input validation', () => {
     ${'customization.enabled'}          | ${true}                           | ${undefined}
     ${'customization.reports.footer'}   | ${'Test'}                         | ${undefined}
     ${'customization.reports.footer'}   | ${'Test\nTest'}                   | ${undefined}
-    ${'customization.reports.footer'}   | ${'Test\nTest\nTest\nTest\nTest'} | ${"The string should have less or equal to 2 line/s."}
+    ${'customization.reports.footer'}   | ${'Test\nTest\nTest\nTest\nTest'} | ${"The string should have less or 2 line/s."}
     ${'customization.reports.header'}   | ${'Test'}                         | ${undefined}
     ${'customization.reports.header'}   | ${'Test\nTest'}                   | ${undefined}
-    ${'customization.reports.header'}   | ${'Test\nTest\nTest\nTest\nTest'} | ${"The string should have less or equal to 4 line/s."}
+    ${'customization.reports.header'}   | ${'Test\nTest\nTest\nTest\nTest'} | ${"The string should have less or 4 line/s."}
     ${'disabled_roles'}                 | ${['test']}                       | ${undefined}
     ${'disabled_roles'}                 | ${['']}                           | ${'Value can not be empty.'}
     ${'disabled_roles'}                 | ${['test space']}                 | ${"It can't contain spaces."}
-    ${'disabled_roles'}                 | ${['test', 4]}                    | ${"Value is not a string."}    
+    ${'disabled_roles'}                 | ${['test', 4]}                    | ${"Value is not a string."}
     ${'enrollment.dns'}                 | ${'test'}                         | ${undefined}
     ${'enrollment.dns'}                 | ${''}                             | ${undefined}
     ${'enrollment.dns'}                 | ${'test space'}                   | ${"It can't contain spaces."}
