@@ -1,5 +1,4 @@
 import {
-  EpluginSettingType,
   PLUGIN_SETTINGS,
   PLUGIN_SETTINGS_CATEGORIES,
   TPluginSetting,
@@ -79,8 +78,8 @@ const formatSettingValueToFileType = {
 
 /**
  * Group the settings by category
- * @param settings 
- * @returns 
+ * @param settings
+ * @returns
  */
 export function groupSettingsByCategory(settings: TPluginSettingWithKey[]){
 	const settingsSortedByCategories = settings
@@ -100,8 +99,8 @@ export function groupSettingsByCategory(settings: TPluginSettingWithKey[]){
 
 /**
  * Get the plugin setting description composed.
- * @param options 
- * @returns 
+ * @param options
+ * @returns
  */
  export function getPluginSettingDescription({description, options}: TPluginSetting): string{
 	return [
@@ -122,9 +121,9 @@ export function groupSettingsByCategory(settings: TPluginSettingWithKey[]){
 
 /**
  * Format the pair value-label to display the pair. If label and the string of value are equals, only displays the value, if not, displays both.
- * @param value 
- * @param label 
- * @returns 
+ * @param value
+ * @param label
+ * @returns
  */
 export function formatLabelValuePair(label, value){
 	return label !== `${value}`

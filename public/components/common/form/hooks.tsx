@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import _ from 'lodash';
+import { isEqual } from 'lodash';
 import { EpluginSettingType } from '../../../../common/constants';
 
 function getValueFromEvent(event, type){
@@ -31,7 +31,7 @@ export const useForm = (fields) => {
       ...restFieldState,
       type: fields[fieldKey].type,
       value,
-      changed: !_.isEqual(restFieldState.initialValue, value),
+      changed: !isEqual(restFieldState.initialValue, value),
       error: fields[fieldKey]?.validate?.(value),
       setInputRef: (reference) => {fieldRefs.current[fieldKey] = reference},
       inputRef: fieldRefs.current[fieldKey],

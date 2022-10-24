@@ -71,7 +71,7 @@ const trasnsfromPluginSettingsToFormFields = configuration => Object.fromEntries
       uiFormTransformInputValueToConfigurationValue,
       ...rest
     }) => ([
-      key, 
+      key,
       {
         type,
         validate: validate?.bind?.(rest),
@@ -162,10 +162,10 @@ const WzConfigurationSettingsProvider = (props) => {
                 formData,
                 {overwriteHeaders: {'content-type': 'multipart/form-data'}}
               )
-            }));            
+            }));
       };
 
-      const responses = await Promise.all(requests);      
+      const responses = await Promise.all(requests);
 
       // Show the toasts if necessary
       responses.some(({data: { data: {requiresRunningHealthCheck}}}) => requiresRunningHealthCheck) && toastRequiresRunningHealthcheck();
