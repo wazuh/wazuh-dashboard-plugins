@@ -29,10 +29,9 @@ import {
 import store from '../../../redux/store'
 import { updateSelectedSettingsSection } from '../../../redux/actions/appStateActions';
 import { withUserAuthorizationPrompt, withErrorBoundary, withReduxProvider } from '../../common/hocs';
-import { EpluginSettingType, PLUGIN_PLATFORM_NAME, PLUGIN_SETTINGS, PLUGIN_SETTINGS_CATEGORIES, UI_LOGGER_LEVELS, WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../../common/constants';
+import { PLUGIN_PLATFORM_NAME, PLUGIN_SETTINGS, PLUGIN_SETTINGS_CATEGORIES, UI_LOGGER_LEVELS, WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../../common/constants';
 import { compose } from 'redux';
 import { getSettingsDefaultList, groupSettingsByCategory, getCategorySettingByTitle } from '../../../../common/services/settings';
-import _ from 'lodash';
 import { Category } from './components/categories/components';
 import { WzRequest } from '../../../react-services';
 import { UIErrorLog, UIErrorSeverity, UILogLevel, UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
@@ -69,7 +68,7 @@ const trasnsfromPluginSettingsToFormFields = configuration => Object.fromEntries
       uiFormTransformInputValueToConfigurationValue,
       ...rest
     }) => ([
-      key, 
+      key,
       {
         type,
         validate: validate?.bind?.(rest),
@@ -138,7 +137,7 @@ const WzConfigurationSettingsProvider = (props) => {
           settingsToUpdate.saveOnConfigurationFile
         ));
       };
-      const responses = await Promise.all(requests);      
+      const responses = await Promise.all(requests);
 
       // Show the toasts if necessary
       responses.some(({data: { data: {requiresRunningHealthCheck}}}) => requiresRunningHealthCheck) && toastRequiresRunningHealthcheck();

@@ -12,7 +12,7 @@
 import path from 'path';
 import { version } from '../package.json';
 import { validate as validateNodeCronInterval } from 'node-cron';
-import { composeValidate, validateBooleanIs, validateLiteral, validateNumber, validateStringMultipleLines, validateStringNoInvalidCharacters, validateStringNoEmpty, validateStringNoLiteral, validateStringNoSpaces, validateStringNoStartWith, validateJSON, validateObjectArray, validateStringIs } from './services/settings-validate';
+import { SettingsValidator } from '../common/services/settings-validator';
 
 // Plugin
 export const PLUGIN_VERSION = version;
@@ -359,6 +359,7 @@ type TPluginSettingOptionsNumber = {
   number: {
     min?: number
     max?: number
+    integer?: boolean
   }
 };
 
@@ -464,7 +465,7 @@ export const PLUGIN_SETTINGS_CATEGORIES: { [category: number]: TPluginSettingCat
   [SettingCategory.CUSTOMIZATION]: {
     title: 'Custom branding',
     description: "If you want to use custom branding elements such as logos, you can do so by editing the settings below.",
-    documentationLink: 'user-manual/wazuh-dashboard/white-labeling.html',
+    documentationLink: 'user-manual/wazuh-dashboard/config-file.html#logo-customization',
     renderOrder: SettingCategory.CUSTOMIZATION,
   }
 };
@@ -480,11 +481,11 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     isConfigurableFromUI: true,
     requiresRunningHealthCheck: true,
     // Validation: https://github.com/elastic/elasticsearch/blob/v7.10.2/docs/reference/indices/create-index.asciidoc
-    validate: composeValidate(
-      validateStringNoEmpty,
-      validateStringNoSpaces,
-      validateStringNoStartWith('-', '_', '+', '.'),
-      validateStringNoInvalidCharacters('\\', '/', '?', '"', '<', '>', '|', ',', '#', '*')
+    validate: SettingsValidator.compose(
+      SettingsValidator.isNotEmptyString,
+      SettingsValidator.hasNoSpaces,
+      SettingsValidator.noStartsWithString('-', '_', '+', '.'),
+      SettingsValidator.hasNotInvalidCharacters('\\', '/', '?', '"', '<', '>', '|', ',', '#', '*')
     ),
 		validateBackend: function(schema){
 			return schema.string({validate: this.validate});
@@ -509,7 +510,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     uiFormTransformChangedInputValue: function (value: boolean | string): boolean {
       return Boolean(value);
     },
-    validate: validateBooleanIs,
+    validate: SettingsValidator.isBoolean,
 		validateBackend: function(schema){
 			return schema.boolean();
 		},
@@ -533,7 +534,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     uiFormTransformChangedInputValue: function (value: boolean | string): boolean {
       return Boolean(value);
     },
-    validate: validateBooleanIs,
+    validate: SettingsValidator.isBoolean,
 		validateBackend: function(schema){
 			return schema.boolean();
 		},
@@ -557,7 +558,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     uiFormTransformChangedInputValue: function (value: boolean | string): boolean {
       return Boolean(value);
     },
-    validate: validateBooleanIs,
+    validate: SettingsValidator.isBoolean,
 		validateBackend: function(schema){
 			return schema.boolean();
 		},
@@ -581,7 +582,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     uiFormTransformChangedInputValue: function (value: boolean | string): boolean {
       return Boolean(value);
     },
-    validate: validateBooleanIs,
+    validate: SettingsValidator.isBoolean,
 		validateBackend: function(schema){
 			return schema.boolean();
 		},
@@ -605,7 +606,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     uiFormTransformChangedInputValue: function (value: boolean | string): boolean {
       return Boolean(value);
     },
-    validate: validateBooleanIs,
+    validate: SettingsValidator.isBoolean,
 		validateBackend: function(schema){
 			return schema.boolean();
 		},
@@ -629,7 +630,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     uiFormTransformChangedInputValue: function (value: boolean | string): boolean {
       return Boolean(value);
     },
-    validate: validateBooleanIs,
+    validate: SettingsValidator.isBoolean,
 		validateBackend: function(schema){
 			return schema.boolean();
 		},
@@ -653,7 +654,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     uiFormTransformChangedInputValue: function (value: boolean | string): boolean {
       return Boolean(value);
     },
-    validate: validateBooleanIs,
+    validate: SettingsValidator.isBoolean,
 		validateBackend: function(schema){
 			return schema.boolean();
 		},
@@ -677,7 +678,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     uiFormTransformChangedInputValue: function (value: boolean | string): boolean {
       return Boolean(value);
     },
-    validate: validateBooleanIs,
+    validate: SettingsValidator.isBoolean,
 		validateBackend: function(schema){
 			return schema.boolean();
 		},
@@ -691,11 +692,11 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     isConfigurableFromFile: true,
     isConfigurableFromUI: true,
     // Validation: https://github.com/elastic/elasticsearch/blob/v7.10.2/docs/reference/indices/create-index.asciidoc
-    validate: composeValidate(
-      validateStringNoEmpty,
-      validateStringNoSpaces,
-      validateStringNoStartWith('-', '_', '+', '.'),
-      validateStringNoInvalidCharacters('\\', '/', '?', '"', '<', '>', '|', ',', '#', '*')
+    validate: SettingsValidator.compose(
+      SettingsValidator.isNotEmptyString,
+      SettingsValidator.hasNoSpaces,
+      SettingsValidator.noStartsWithString('-', '_', '+', '.'),
+      SettingsValidator.hasNotInvalidCharacters('\\', '/', '?', '"', '<', '>', '|', ',', '#', '*')
     ),
 		validateBackend: function(schema){
 			return schema.string({validate: this.validate});
@@ -724,17 +725,17 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
         return value;
       };
     },
-    validate: validateJSON(composeValidate(
-      validateObjectArray(composeValidate(
-        validateStringIs,
-        validateStringNoEmpty,
-        validateStringNoSpaces,
+    validate: SettingsValidator.json(SettingsValidator.compose(
+      SettingsValidator.array(SettingsValidator.compose(
+        SettingsValidator.isString,
+        SettingsValidator.isNotEmptyString,
+        SettingsValidator.hasNoSpaces,
       )),
     )),
 		validateBackend: function(schema){
-			return schema.arrayOf(schema.string({validate: composeValidate(
-        validateStringNoEmpty,
-        validateStringNoSpaces,
+			return schema.arrayOf(schema.string({validate: SettingsValidator.compose(
+        SettingsValidator.isNotEmptyString,
+        SettingsValidator.hasNoSpaces,
       )}));
 		},
   },
@@ -768,7 +769,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     isConfigurableFromUI: true,
     requiresRunningHealthCheck: true,
     validate: function (value){
-			return validateLiteral(this.options.select.map(({value}) => value))(value)
+			return SettingsValidator.literal(this.options.select.map(({value}) => value))(value)
 		},
 		validateBackend: function(schema){
 			return schema.oneOf(this.options.select.map(({value}) => schema.literal(value)));
@@ -784,11 +785,11 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     isConfigurableFromUI: true,
     requiresRunningHealthCheck: true,
     // Validation: https://github.com/elastic/elasticsearch/blob/v7.10.2/docs/reference/indices/create-index.asciidoc
-    validate: composeValidate(
-      validateStringNoEmpty,
-      validateStringNoSpaces,
-      validateStringNoStartWith('-', '_', '+', '.'),
-      validateStringNoInvalidCharacters('\\', '/', '?', '"', '<', '>', '|', ',', '#', '*')
+    validate: SettingsValidator.compose(
+      SettingsValidator.isNotEmptyString,
+      SettingsValidator.hasNoSpaces,
+      SettingsValidator.noStartsWithString('-', '_', '+', '.'),
+      SettingsValidator.hasNotInvalidCharacters('\\', '/', '?', '"', '<', '>', '|', ',', '#', '*')
     ),
 		validateBackend: function(schema){
 			return schema.string({validate: this.validate});
@@ -805,7 +806,8 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     requiresRunningHealthCheck: true,
     options: {
       number: {
-        min: 0
+        min: 0,
+        integer: true
       }
     },
     uiFormTransformConfigurationValueToInputValue: function(value: number): string {
@@ -815,7 +817,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       return Number(value);
     },
     validate: function(value){
-			return validateNumber(this.options.number)(value)
+			return SettingsValidator.number(this.options.number)(value)
 		},
 		validateBackend: function(schema){
 			return schema.number({validate: this.validate.bind(this)});
@@ -832,7 +834,8 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     requiresRunningHealthCheck: true,
     options: {
       number: {
-        min: 1
+        min: 1,
+        integer: true
       }
     },
     uiFormTransformConfigurationValueToInputValue: function(value: number){
@@ -842,7 +845,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       return Number(value);
     },
     validate: function(value){
-			return validateNumber(this.options.number)(value)
+			return SettingsValidator.number(this.options.number)(value)
 		},
 		validateBackend: function(schema){
 			return schema.number({validate: this.validate.bind(this)});
@@ -883,7 +886,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     uiFormTransformChangedInputValue: function (value: boolean | string): boolean {
       return Boolean(value);
     },
-    validate: validateBooleanIs,
+    validate: SettingsValidator.isBoolean,
 		validateBackend: function(schema){
 			return schema.boolean();
 		},
@@ -977,17 +980,17 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
         return value;
       };
     },
-    validate: validateJSON(composeValidate(
-      validateObjectArray(composeValidate(
-        validateStringIs,
-        validateStringNoEmpty,
-        validateStringNoSpaces,
+    validate: SettingsValidator.json(SettingsValidator.compose(
+      SettingsValidator.array(SettingsValidator.compose(
+        SettingsValidator.isString,
+        SettingsValidator.isNotEmptyString,
+        SettingsValidator.hasNoSpaces,
       )),
     )),
 		validateBackend: function(schema){
-			return schema.arrayOf(schema.string({validate: composeValidate(
-        validateStringNoEmpty,
-        validateStringNoSpaces,
+			return schema.arrayOf(schema.string({validate: SettingsValidator.compose(
+        SettingsValidator.isNotEmptyString,
+        SettingsValidator.hasNoSpaces,
       )}));
 		},
   },
@@ -999,7 +1002,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     defaultValue: "",
     isConfigurableFromFile: true,
     isConfigurableFromUI: true,
-    validate: validateStringNoSpaces,
+    validate: SettingsValidator.hasNoSpaces,
 		validateBackend: function(schema){
 			return schema.string({validate: this.validate});
 		},
@@ -1012,7 +1015,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     defaultValue: "",
     isConfigurableFromFile: true,
     isConfigurableFromUI: false,
-    validate: validateStringNoEmpty,
+    validate: SettingsValidator.isNotEmptyString,
 		validateBackend: function(schema){
 			return schema.string({validate: this.validate});
 		},
@@ -1036,7 +1039,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     uiFormTransformChangedInputValue: function (value: boolean | string): boolean {
       return Boolean(value);
     },
-    validate: validateBooleanIs,
+    validate: SettingsValidator.isBoolean,
 		validateBackend: function(schema){
 			return schema.boolean();
 		},
@@ -1060,7 +1063,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     uiFormTransformChangedInputValue: function (value: boolean | string): boolean {
       return Boolean(value);
     },
-    validate: validateBooleanIs,
+    validate: SettingsValidator.isBoolean,
 		validateBackend: function(schema){
 			return schema.boolean();
 		},
@@ -1084,7 +1087,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     uiFormTransformChangedInputValue: function (value: boolean | string): boolean {
       return Boolean(value);
     },
-    validate: validateBooleanIs,
+    validate: SettingsValidator.isBoolean,
 		validateBackend: function(schema){
 			return schema.boolean();
 		},
@@ -1108,7 +1111,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     uiFormTransformChangedInputValue: function (value: boolean | string): boolean {
       return Boolean(value);
     },
-    validate: validateBooleanIs,
+    validate: SettingsValidator.isBoolean,
 		validateBackend: function(schema){
 			return schema.boolean();
 		},
@@ -1132,7 +1135,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     uiFormTransformChangedInputValue: function (value: boolean | string): boolean {
       return Boolean(value);
     },
-    validate: validateBooleanIs,
+    validate: SettingsValidator.isBoolean,
 		validateBackend: function(schema){
 			return schema.boolean();
 		},
@@ -1156,7 +1159,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     uiFormTransformChangedInputValue: function (value: boolean | string): boolean {
       return Boolean(value);
     },
-    validate: validateBooleanIs,
+    validate: SettingsValidator.isBoolean,
 		validateBackend: function(schema){
 			return schema.boolean();
 		},
@@ -1180,7 +1183,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     uiFormTransformChangedInputValue: function (value: boolean | string): boolean {
       return Boolean(value);
     },
-    validate: validateBooleanIs,
+    validate: SettingsValidator.isBoolean,
 		validateBackend: function(schema){
 			return schema.boolean();
 		},
@@ -1204,7 +1207,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     uiFormTransformChangedInputValue: function (value: boolean | string): boolean {
       return Boolean(value);
     },
-    validate: validateBooleanIs,
+    validate: SettingsValidator.isBoolean,
 		validateBackend: function(schema){
 			return schema.boolean();
 		},
@@ -1228,7 +1231,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     uiFormTransformChangedInputValue: function (value: boolean | string): boolean {
       return Boolean(value);
     },
-    validate: validateBooleanIs,
+    validate: SettingsValidator.isBoolean,
 		validateBackend: function(schema){
 			return schema.boolean();
 		},
@@ -1252,7 +1255,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     uiFormTransformChangedInputValue: function (value: boolean | string): boolean {
       return Boolean(value);
     },
-    validate: validateBooleanIs,
+    validate: SettingsValidator.isBoolean,
 		validateBackend: function(schema){
 			return schema.boolean();
 		},
@@ -1276,7 +1279,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     uiFormTransformChangedInputValue: function (value: boolean | string): boolean {
       return Boolean(value);
     },
-    validate: validateBooleanIs,
+    validate: SettingsValidator.isBoolean,
 		validateBackend: function(schema){
 			return schema.boolean();
 		},
@@ -1300,7 +1303,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     uiFormTransformChangedInputValue: function (value: boolean | string): boolean {
       return Boolean(value);
     },
-    validate: validateBooleanIs,
+    validate: SettingsValidator.isBoolean,
 		validateBackend: function(schema){
 			return schema.boolean();
 		},
@@ -1324,7 +1327,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     uiFormTransformChangedInputValue: function (value: boolean | string): boolean {
       return Boolean(value);
     },
-    validate: validateBooleanIs,
+    validate: SettingsValidator.isBoolean,
 		validateBackend: function(schema){
 			return schema.boolean();
 		},
@@ -1349,7 +1352,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     uiFormTransformChangedInputValue: function (value: boolean | string): boolean {
       return Boolean(value);
     },
-    validate: validateBooleanIs,
+    validate: SettingsValidator.isBoolean,
 		validateBackend: function(schema){
 			return schema.boolean();
 		},
@@ -1378,23 +1381,23 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       };
     },
     // Validation: https://github.com/elastic/elasticsearch/blob/v7.10.2/docs/reference/indices/create-index.asciidoc
-    validate: validateJSON(composeValidate(
-      validateObjectArray(composeValidate(
-        validateStringIs,
-        validateStringNoEmpty,
-        validateStringNoSpaces,
-        validateStringNoLiteral('.', '..'),
-        validateStringNoStartWith('-', '_', '+', '.'),
-        validateStringNoInvalidCharacters('\\', '/', '?', '"', '<', '>', '|', ',', '#')
+    validate: SettingsValidator.json(SettingsValidator.compose(
+      SettingsValidator.array(SettingsValidator.compose(
+        SettingsValidator.isString,
+        SettingsValidator.isNotEmptyString,
+        SettingsValidator.hasNoSpaces,
+        SettingsValidator.noLiteralString('.', '..'),
+        SettingsValidator.noStartsWithString('-', '_', '+', '.'),
+        SettingsValidator.hasNotInvalidCharacters('\\', '/', '?', '"', '<', '>', '|', ',', '#')
       )),
     )),
 		validateBackend: function(schema){
-			return schema.arrayOf(schema.string({validate: composeValidate(
-        validateStringNoEmpty,
-        validateStringNoSpaces,
-        validateStringNoLiteral('.', '..'),
-        validateStringNoStartWith('-', '_', '+', '.'),
-        validateStringNoInvalidCharacters('\\', '/', '?', '"', '<', '>', '|', ',', '#')
+			return schema.arrayOf(schema.string({validate: SettingsValidator.compose(
+        SettingsValidator.isNotEmptyString,
+        SettingsValidator.hasNoSpaces,
+        SettingsValidator.noLiteralString('.', '..'),
+        SettingsValidator.noStartsWithString('-', '_', '+', '.'),
+        SettingsValidator.hasNotInvalidCharacters('\\', '/', '?', '"', '<', '>', '|', ',', '#')
       )}));
 		},
   },
@@ -1417,7 +1420,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     uiFormTransformChangedInputValue: function (value: boolean | string): boolean {
       return Boolean(value);
     },
-    validate: validateBooleanIs,
+    validate: SettingsValidator.isBoolean,
 		validateBackend: function(schema){
 			return schema.boolean();
 		},
@@ -1444,7 +1447,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     isConfigurableFromUI: true,
     requiresRestartingPluginPlatform: true,
     validate: function (value){
-			return validateLiteral(this.options.select.map(({value}) => value))(value)
+			return SettingsValidator.literal(this.options.select.map(({value}) => value))(value)
 		},
 		validateBackend: function(schema){
 			return schema.oneOf(this.options.select.map(({value}) => schema.literal(value)));
@@ -1460,12 +1463,12 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     isConfigurableFromUI: true,
     requiresRunningHealthCheck: true,
     // Validation: https://github.com/elastic/elasticsearch/blob/v7.10.2/docs/reference/indices/create-index.asciidoc
-    validate: composeValidate(
-      validateStringNoEmpty,
-      validateStringNoSpaces,
-      validateStringNoLiteral('.', '..'),
-      validateStringNoStartWith('-', '_', '+', '.'),
-      validateStringNoInvalidCharacters('\\', '/', '?', '"', '<', '>', '|', ',', '#')
+    validate: SettingsValidator.compose(
+      SettingsValidator.isNotEmptyString,
+      SettingsValidator.hasNoSpaces,
+      SettingsValidator.noLiteralString('.', '..'),
+      SettingsValidator.noStartsWithString('-', '_', '+', '.'),
+      SettingsValidator.hasNotInvalidCharacters('\\', '/', '?', '"', '<', '>', '|', ',', '#')
     ),
 		validateBackend: function(schema){
 			return schema.string({validate: this.validate});
@@ -1481,7 +1484,8 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     isConfigurableFromUI: true,
     options: {
       number: {
-        min: 1500
+        min: 1500,
+        integer: true
       }
     },
     uiFormTransformConfigurationValueToInputValue: function(value: number){
@@ -1491,7 +1495,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       return Number(value);
     },
     validate: function(value){
-			return validateNumber(this.options.number)(value);
+			return SettingsValidator.number(this.options.number)(value);
 		},
 		validateBackend: function(schema){
 			return schema.number({validate: this.validate.bind(this)});
@@ -1527,7 +1531,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     isConfigurableFromUI: true,
     requiresRunningHealthCheck: true,
     validate: function (value){
-			return validateLiteral(this.options.select.map(({value}) => value))(value)
+			return SettingsValidator.literal(this.options.select.map(({value}) => value))(value)
 		},
 		validateBackend: function(schema){
 			return schema.oneOf(this.options.select.map(({value}) => schema.literal(value)));
@@ -1553,7 +1557,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     uiFormTransformChangedInputValue: function (value: boolean | string): boolean {
       return Boolean(value);
     },
-    validate: validateBooleanIs,
+    validate: SettingsValidator.isBoolean,
 		validateBackend: function(schema){
 			return schema.boolean();
 		},
@@ -1569,7 +1573,8 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     requiresRestartingPluginPlatform: true,
     options: {
       number: {
-        min: 60
+        min: 60,
+        integer: true
       }
     },
     uiFormTransformConfigurationValueToInputValue: function(value: number){
@@ -1579,7 +1584,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       return Number(value);
     },
     validate: function(value){
-			return validateNumber(this.options.number)(value);
+			return SettingsValidator.number(this.options.number)(value);
 		},
 		validateBackend: function(schema){
 			return schema.number({validate: this.validate.bind(this)});
@@ -1594,12 +1599,12 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     isConfigurableFromFile: true,
     isConfigurableFromUI: true,
     requiresRunningHealthCheck: true,
-    validate: composeValidate(
-      validateStringNoEmpty,
-      validateStringNoSpaces,
-      validateStringNoLiteral('.', '..'),
-      validateStringNoStartWith('-', '_', '+', '.'),
-      validateStringNoInvalidCharacters('\\', '/', '?', '"', '<', '>', '|', ',', '#')
+    validate: SettingsValidator.compose(
+      SettingsValidator.isNotEmptyString,
+      SettingsValidator.hasNoSpaces,
+      SettingsValidator.noLiteralString('.', '..'),
+      SettingsValidator.noStartsWithString('-', '_', '+', '.'),
+      SettingsValidator.hasNotInvalidCharacters('\\', '/', '?', '"', '<', '>', '|', ',', '#')
     ),
 		validateBackend: function(schema){
 			return schema.string({minLength: 1, validate: this.validate});
@@ -1616,7 +1621,8 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     requiresRunningHealthCheck: true,
     options: {
       number: {
-        min: 0
+        min: 0,
+        integer: true
       }
     },
     uiFormTransformConfigurationValueToInputValue: function(value: number){
@@ -1626,7 +1632,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       return Number(value);
     },
     validate: function(value){
-			return validateNumber(this.options.number)(value);
+			return SettingsValidator.number(this.options.number)(value);
 		},
 		validateBackend: function(schema){
 			return schema.number({validate: this.validate.bind(this)});
@@ -1643,7 +1649,8 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     requiresRunningHealthCheck: true,
     options: {
       number: {
-        min: 1
+        min: 1,
+        integer: true
       }
     },
     uiFormTransformConfigurationValueToInputValue: function(value: number){
@@ -1653,7 +1660,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       return Number(value);
     },
     validate: function(value){
-			return validateNumber(this.options.number)(value);
+			return SettingsValidator.number(this.options.number)(value);
 		},
 		validateBackend: function(schema){
 			return schema.number({validate: this.validate.bind(this)});
