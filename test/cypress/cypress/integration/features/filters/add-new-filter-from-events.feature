@@ -5,7 +5,8 @@ Feature: Validate that the added filter label is displayed from the events page
   in order to manage them
   Background:
     Given The wazuh admin user is logged
-  @filter
+    
+  @filter @actions
   Scenario Outline: The user add a new filer from the events page <Module Name>
     When The user goes to <Module Name>
     And The user moves to events page

@@ -4,7 +4,7 @@ Feature: Run health checks
   I want to run the health check
   in order to validate everything is connected
 
-  @miscellaneous
+  @miscellaneous @actions
   Scenario: Run health check
     Given The wazuh admin user is logged
     When The user navigates to Miscellaneous settings
