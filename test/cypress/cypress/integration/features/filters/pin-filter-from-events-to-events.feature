@@ -6,7 +6,7 @@ Feature: Pin filter - from event page
   Background:
     Given The wazuh admin user is logged
 
-  @filter
+  @filter @actions
   Scenario Outline: The user add and pin new filer - across the modules - from event page <Module Name>
     When The user goes to <Module Name>
     And The user moves to events page
