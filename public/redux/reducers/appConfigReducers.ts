@@ -11,14 +11,14 @@
  */
 
 import { Reducer } from 'redux';
-import { WAZUH_DEFAULT_APP_CONFIG } from '../../../common/constants';
+import { getSettingsDefault } from '../../../common/services/settings';
 import { AppConfigState, ResolverAction } from '../types';
 
 const initialState: AppConfigState = {
   isLoading: false,
   isReady: false,
   hasError: false,
-  data: WAZUH_DEFAULT_APP_CONFIG,
+  data: getSettingsDefault(),
 };
 
 const appConfigReducer: Reducer<AppConfigState, ResolverAction> = (

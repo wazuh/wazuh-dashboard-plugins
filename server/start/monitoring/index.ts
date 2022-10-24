@@ -18,16 +18,11 @@ import { indexDate } from '../../lib/index-date';
 import { buildIndexSettings } from '../../lib/build-index-settings';
 import { WazuhHostsCtrl } from '../../controllers/wazuh-hosts';
 import { 
-  WAZUH_MONITORING_PATTERN,
   WAZUH_MONITORING_TEMPLATE_NAME,
-  WAZUH_MONITORING_DEFAULT_CREATION,
-  WAZUH_MONITORING_DEFAULT_ENABLED,
-  WAZUH_MONITORING_DEFAULT_FREQUENCY,
-  WAZUH_MONITORING_DEFAULT_INDICES_SHARDS,
-  WAZUH_MONITORING_DEFAULT_INDICES_REPLICAS,
 } from '../../../common/constants';
 import { tryCatchForIndexPermissionError } from '../tryCatchForIndexPermissionError';
 import { delayAsPromise } from '../../../common/utils';
+import { getSettingDefaultValue } from '../../../common/services/settings';
 
 const blueWazuh = '\u001b[34mwazuh\u001b[39m';
 const monitoringErrorLogColors = [blueWazuh, 'monitoring', 'error'];
@@ -56,12 +51,12 @@ function initMonitoringConfiguration(context){
     MONITORING_ENABLED = appConfig && typeof appConfig['wazuh.monitoring.enabled'] !== 'undefined'
       ? appConfig['wazuh.monitoring.enabled'] &&
         appConfig['wazuh.monitoring.enabled'] !== 'worker'
-      : WAZUH_MONITORING_DEFAULT_ENABLED;
-    MONITORING_FREQUENCY = getAppConfigurationSetting('wazuh.monitoring.frequency', appConfig, WAZUH_MONITORING_DEFAULT_FREQUENCY);
+      : getSettingDefaultValue('wazuh.monitoring.enabled');
+    MONITORING_FREQUENCY = getAppConfigurationSetting('wazuh.monitoring.frequency', appConfig, getSettingDefaultValue('wazuh.monitoring.frequency'));
     MONITORING_CRON_FREQ = parseCron(MONITORING_FREQUENCY);
-    MONITORING_CREATION = getAppConfigurationSetting('wazuh.monitoring.creation', appConfig, WAZUH_MONITORING_DEFAULT_CREATION);
+    MONITORING_CREATION = getAppConfigurationSetting('wazuh.monitoring.creation', appConfig, getSettingDefaultValue('wazuh.monitoring.creation'));
 
-    MONITORING_INDEX_PATTERN = getAppConfigurationSetting('wazuh.monitoring.pattern', appConfig, WAZUH_MONITORING_PATTERN);
+    MONITORING_INDEX_PATTERN = getAppConfigurationSetting('wazuh.monitoring.pattern', appConfig, getSettingDefaultValue('wazuh.monitoring.pattern'));
     const lastCharIndexPattern = MONITORING_INDEX_PATTERN[MONITORING_INDEX_PATTERN.length - 1];
     if (lastCharIndexPattern !== '*') {
       MONITORING_INDEX_PATTERN += '*';
@@ -131,7 +126,7 @@ async function checkTemplate(context) {
       monitoringTemplate.index_patterns = currentTemplate.body[WAZUH_MONITORING_TEMPLATE_NAME].index_patterns;
     }catch (error) {
       // Init with the default index pattern
-      monitoringTemplate.index_patterns = [WAZUH_MONITORING_PATTERN];
+      monitoringTemplate.index_patterns = [getSettingDefaultValue('wazuh.monitoring.pattern')];
     }
 
     // Check if the user is using a custom pattern and add it to the template if it does
@@ -182,7 +177,7 @@ async function insertMonitoringDataElasticsearch(context, data) {
         const indexConfiguration = buildIndexSettings(
           appConfig,
           'wazuh.monitoring',
-          WAZUH_MONITORING_DEFAULT_INDICES_SHARDS
+          getSettingDefaultValue('wazuh.monitoring.shards')
         );
 
         // To update the index settings with this client is required close the index, update the settings and open it
@@ -258,8 +253,8 @@ async function createIndex(context, indexName: string) {
     const IndexConfiguration = {
       settings: {
         index: {
-          number_of_shards: getAppConfigurationSetting('wazuh.monitoring.shards', appConfig, WAZUH_MONITORING_DEFAULT_INDICES_SHARDS),
-          number_of_replicas: getAppConfigurationSetting('wazuh.monitoring.replicas', appConfig, WAZUH_MONITORING_DEFAULT_INDICES_REPLICAS)
+          number_of_shards: getAppConfigurationSetting('wazuh.monitoring.shards', appConfig, getSettingDefaultValue('wazuh.monitoring.shards')),
+          number_of_replicas: getAppConfigurationSetting('wazuh.monitoring.replicas', appConfig, getSettingDefaultValue('wazuh.monitoring.replicas'))
         }
       }
     };
