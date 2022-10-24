@@ -17,6 +17,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Updated and added operating systems, versions, architectures commands of Install and enroll the agent and
 commands of Start the agent in the deploy new agent section [#4458](https://github.com/wazuh/wazuh-kibana-app/pull/4458)
 - Makes Agents Overview loading icons independent [#4363](https://github.com/wazuh/wazuh-kibana-app/pull/4363)
+- Changed server address input in deploy agent section [#4737](https://github.com/wazuh/wazuh-kibana-app/pull/4737)
 
 ### Fixed
 
