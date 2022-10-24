@@ -16,7 +16,6 @@ import {
   EuiFlexGroup,
   EuiPanel,
   EuiPage,
-  EuiBasicTable,
   EuiSpacer,
   EuiText,
   EuiProgress,
@@ -44,38 +43,49 @@ import {
 import { API_NAME_AGENT_STATUS, UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { VisualizationBasic } from '../../common/charts/visualizations/basic';
+import { AppNavigate } from '../../../react-services/app-navigate';
+import SCAPoliciesTable from './inventory/agent-policies-table';
 import { InventoryPolicyChecksTable } from './inventory/checks-table';
+import { RuleText } from './components';
 
 type InventoryProps = {
   agent: { [key: string]: any };
 };
 
 type InventoryState = {
-  agent: object;
   itemIdToExpandedRowMap: object;
   showMoreInfo: boolean;
   loading: boolean;
+  checksIsLoading: boolean;
+  redirect: boolean;
   filters: object[];
   pageTableChecks: { pageIndex: number; pageSize?: number };
   policies: object[];
-  lookingPolicy: { [key: string]: any } | false;
+  checks: object[];
+  lookingPolicy: { [key: string]: any } | boolean;
   loadingPolicy: boolean;
+  secondTable: boolean;
+  secondTableBack: boolean;
 };
 export class Inventory extends Component<InventoryProps, InventoryState> {
   _isMount = false;
+  agent: { [key: string]: any } = {};
   columnsPolicies: object[];
   lookingPolicy: { [key: string]: any } | false = false;
   constructor(props) {
     super(props);
-    const { agent } = this.props;
     this.state = {
-      agent,
       itemIdToExpandedRowMap: {},
       showMoreInfo: false,
       loading: false,
       filters: [],
       pageTableChecks: { pageIndex: 0 },
       policies: [],
+      checks: [],
+      redirect: false,
+      secondTable: false,
+      secondTableBack: false,
+      checksIsLoading: false,
       lookingPolicy: false,
       loadingPolicy: false,
     };
@@ -174,6 +184,13 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
         pageTableChecks: { pageIndex: 0, pageSize: this.state.pageTableChecks.pageSize },
       });
     }
+
+    const regex = new RegExp('redirectPolicyTable=' + '[^&]*');
+    const match = window.location.href.match(regex);
+    if (match && match[0] && !this.state.secondTable && !this.state.secondTableBack) {
+      this.loadScaPolicy(match[0].split('=')[1], true)
+      this.setState({secondTableBack: true, checksIsLoading: true})
+    }
   }
 
   componentWillUnmount() {
@@ -207,28 +224,31 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
     }
   }
 
-  /**
-   *
-   * @param policy
-   */
-  async loadScaPolicy(policy) {
+  handleBack (ev) {
+        AppNavigate.navigateToModule(ev, 'agents', { tab: 'welcome', agent: this.props.agent.id });
+        ev.stopPropagation();
+  };
+
+  async loadScaPolicy(policy, secondTable?) {
     this._isMount &&
       this.setState({
         loadingPolicy: true,
         itemIdToExpandedRowMap: {},
         pageTableChecks: { pageIndex: 0 },
+        secondTable: secondTable ? secondTable : false
       });
     if (policy) {
       try {
         const policyResponse = await WzRequest.apiReq('GET', `/sca/${this.props.agent.id}`, {
           params: {
-            q: 'policy_id=' + policy.policy_id,
+            q: 'policy_id=' + policy,
           },
         });
         const [policyData] = policyResponse.data.data.affected_items;
-        this._isMount && this.setState({ lookingPolicy: policyData, loadingPolicy: false });
+        this._isMount &&
+          this.setState({ lookingPolicy: policyData, loadingPolicy: false, checksIsLoading: false });
       } catch (error) {
-        this.setState({ lookingPolicy: policy, loadingPolicy: false });
+        this.setState({ lookingPolicy: policy, loadingPolicy: false, checksIsLoading: false });
         const options: UIErrorLog = {
           context: `${Inventory.name}.loadScaPolicy`,
           level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
@@ -242,16 +262,61 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
         getErrorOrchestrator().handleError(options);
       }
     } else {
-      this._isMount && this.setState({ lookingPolicy: policy, loadingPolicy: false, items: [] });
+      this._isMount && this.setState({ lookingPolicy: policy, loadingPolicy: false, items: [], checksIsLoading: false });
     }
   }
 
-  /**
-   *
-   * @param color
-   * @param title
-   * @param time
-   */
+  toggleDetails = (item) => {
+    const itemIdToExpandedRowMap = { ...this.state.itemIdToExpandedRowMap };
+
+    if (itemIdToExpandedRowMap[item.id]) {
+      delete itemIdToExpandedRowMap[item.id];
+    } else {
+      let checks = '';
+      checks += (item.rules || []).length > 1 ? 'Checks' : 'Check';
+      checks += item.condition ? ` (Condition: ${item.condition})` : '';
+      const complianceText =
+        item.compliance && item.compliance.length
+          ? item.compliance.map((el) => `${el.key}: ${el.value}`).join('\n')
+          : '';
+      const listItems = [
+        {
+          title: 'Check not applicable due to:',
+          description: item.reason,
+        },
+        {
+          title: 'Rationale',
+          description: item.rationale || '-',
+        },
+        {
+          title: 'Remediation',
+          description: item.remediation || '-',
+        },
+        {
+          title: 'Description',
+          description: item.description || '-',
+        },
+        {
+          title: (item.directory || '').includes(',') ? 'Paths' : 'Path',
+          description: item.directory,
+        },
+        {
+          title: checks,
+          description: <RuleText rules={item.rules.length ? item.rules : []} />,
+        },
+        {
+          title: 'Compliance',
+          description: <ComplianceText complianceText={complianceText} />,
+        },
+      ];
+      const itemsToShow = listItems.filter((x) => {
+        return x.description;
+      });
+      itemIdToExpandedRowMap[item.id] = <EuiDescriptionList listItems={itemsToShow} />;
+    }
+    this.setState({ itemIdToExpandedRowMap });
+  };
+
   showToast = (color, title, time) => {
     getToasts().add({
       color: color,
@@ -295,13 +360,13 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
   }
 
   render() {
-    const getPoliciesRowProps = (item, idx) => {
-      return {
-        'data-test-subj': `sca-row-${idx}`,
-        className: 'customRowClass',
-        onClick: () => this.loadScaPolicy(item),
-      };
-    };
+    const { onClickRow } = this.props
+
+    const handlePoliciesTableClickRow = async (policy) => {
+      onClickRow ? onClickRow(policy) : await this.loadScaPolicy(policy.policy_id)
+      this.setState({ loading: false, redirect: true })
+    }
+
     const buttonPopover = (
       <EuiButtonEmpty
         iconType="iInCircle"
@@ -309,10 +374,12 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
         onClick={() => this.setState({ showMoreInfo: !this.state.showMoreInfo })}
       ></EuiButtonEmpty>
     );
+    const { agent } = this.props;
+
     return (
       <Fragment>
         <div>
-          {this.state.loading && (
+          {this.state.loading || this.state.checksIsLoading && (
             <div style={{ margin: 16 }}>
               <EuiSpacer size="m" />
               <EuiProgress size="xs" color="primary" />
@@ -320,8 +387,8 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
           )}
         </div>
         <EuiPage>
-          {this.props.agent &&
-            (this.props.agent || {}).status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED &&
+          {agent &&
+            (agent || {}).status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED &&
             !this.state.policies.length &&
             !this.state.loading && (
               <EuiCallOut title="No scans available" iconType="iInCircle">
@@ -331,8 +398,8 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
               </EuiCallOut>
             )}
 
-          {this.props.agent &&
-            (this.props.agent || {}).status === API_NAME_AGENT_STATUS.NEVER_CONNECTED &&
+          {agent &&
+            (agent || {}).status === API_NAME_AGENT_STATUS.NEVER_CONNECTED &&
             !this.state.loading && (
               <EuiCallOut
                 title="Agent has never connected"
@@ -344,11 +411,11 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
                 </EuiButton>
               </EuiCallOut>
             )}
-          {this.props.agent &&
-            (this.props.agent || {}).os &&
+          {agent &&
+            (agent || {}).os &&
             !this.state.lookingPolicy &&
             this.state.policies.length > 0 &&
-            !this.state.loading && (
+            !this.state.loading && !this.state.checksIsLoading && (
               <div>
                 {this.state.policies.length && (
                   <EuiFlexGroup style={{ marginTop: 0 }}>
@@ -382,24 +449,24 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
                     ))}
                   </EuiFlexGroup>
                 )}
-                <EuiSpacer size="m" />
-                <EuiPanel paddingSize="l">
-                  <EuiFlexGroup>
-                    <EuiFlexItem>
-                      <EuiBasicTable
-                        items={this.state.policies}
+                 <EuiSpacer size="m" />
+                <EuiFlexGroup>
+                  <EuiFlexItem>
+                    <EuiPanel>
+                      <SCAPoliciesTable
+                        agent={this.props.agent}
                         columns={this.columnsPolicies}
-                        rowProps={getPoliciesRowProps}
+                        rowProps={handlePoliciesTableClickRow}
                       />
-                    </EuiFlexItem>
-                  </EuiFlexGroup>
-                </EuiPanel>
+                    </EuiPanel>
+                  </EuiFlexItem>
+                </EuiFlexGroup>
               </div>
             )}
-          {this.props.agent &&
-            (this.props.agent || {}).os &&
+          {agent &&
+            (agent || {}).os &&
             this.state.lookingPolicy &&
-            !this.state.loading && (
+            ((!this.state.loading) || (!this.state.checksIsLoading )) && (
               <div>
                 <EuiPanel paddingSize="l">
                   <EuiFlexGroup>
@@ -407,7 +474,7 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
                       <EuiButtonIcon
                         color="primary"
                         style={{ padding: '6px 0px' }}
-                        onClick={() => this.loadScaPolicy(false)}
+                        onClick={this.state.secondTableBack ? (ev) => this.handleBack(ev) : () => this.loadScaPolicy(false)}
                         iconType="arrowLeft"
                         aria-label="Back to policies"
                         {...{ iconSize: 'l' }}
@@ -435,6 +502,22 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
                           </EuiToolTip>
                         </h2>
                       </EuiTitle>
+                    </EuiFlexItem>
+                    <EuiFlexItem grow={false}>
+                      <EuiButtonEmpty
+                        iconType="importAction"
+                        onClick={async () => await this.downloadCsv()}
+                      >
+                        Export formatted
+                      </EuiButtonEmpty>
+                    </EuiFlexItem>
+                    <EuiFlexItem grow={false}>
+                      <EuiButtonEmpty
+                        iconType="refresh"
+                        onClick={() => this.loadScaPolicy(this.state.lookingPolicy.policy_id)}
+                      >
+                        Refresh
+                      </EuiButtonEmpty>
                     </EuiFlexItem>
                   </EuiFlexGroup>
                   <EuiSpacer size="m" />
@@ -495,7 +578,7 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
                     <EuiFlexItem>
                       <InventoryPolicyChecksTable
                         agent={this.props.agent}
-                        lookingPolicy={this.state.lookingPolicy}
+                        lookingPolicy={this.state.lookingPolicy}              
                       />
                     </EuiFlexItem>
                   </EuiFlexGroup>
@@ -507,3 +590,7 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
     );
   }
 }
+
+Inventory.defaultProps = {
+  onClickRow: undefined
+}  
