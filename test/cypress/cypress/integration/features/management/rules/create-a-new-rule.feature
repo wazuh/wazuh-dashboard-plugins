@@ -4,7 +4,7 @@ Feature: Should Displayes a message to restart the cluster after saves
   i want to edit a custom rule
   in order to check if the saves message its displayed
 
-@rules
+@rules @actions
 Scenario: Validate creation message is displayed after creating a new rule
     Given The wazuh admin user is logged
     When The user navigates to rules
