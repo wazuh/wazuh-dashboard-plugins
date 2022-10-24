@@ -20,6 +20,7 @@ export function TableDefault({
   onSearch,
   tableColumns,
   tablePageSizeOptions = [15, 25, 50, 100],
+  hidePerPageOptions = false,
   tableInitialSortingDirection = 'asc',
   tableInitialSortingField = '',
   tableProps = {},
@@ -107,8 +108,10 @@ export function TableDefault({
     ...pagination,
     totalItemCount: totalItems,
     pageSizeOptions: tablePageSizeOptions,
+    hidePerPageOptions
   };
   return (
+    <>
     <EuiBasicTable
       columns={tableColumns}
       items={items}
@@ -119,5 +122,6 @@ export function TableDefault({
       rowProps={rowProps}
       {...tableProps}
     />
+    </>
   );
 }

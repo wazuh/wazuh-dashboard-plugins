@@ -231,7 +231,6 @@ export class InventoryPolicyChecksTable extends Component<Props, State> {
         item.compliance && item.compliance.length
           ? item.compliance.map((el) => `${el.key}: ${el.value}`).join('\n')
           : '';
-      const rulesText = item.rules.length ? item.rules.map((el) => el.rule).join('\n') : '';
       const listItems = [
         {
           title: 'Check not applicable due to:',
