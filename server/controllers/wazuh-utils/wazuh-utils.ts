@@ -16,7 +16,7 @@ import { getConfiguration } from '../../lib/get-configuration';
 import { read } from 'read-last-lines';
 import { UpdateConfigurationFile } from '../../lib/update-configuration';
 import jwtDecode from 'jwt-decode';
-import { WAZUH_ROLE_ADMINISTRATOR_ID, WAZUH_DATA_LOGS_RAW_PATH, WAZUH_UI_LOGS_RAW_PATH } from '../../../common/constants';
+import { WAZUH_ROLE_ADMINISTRATOR_ID, WAZUH_DATA_LOGS_RAW_PATH, PLUGIN_SETTINGS } from '../../../common/constants';
 import { ManageHosts } from '../../lib/manage-hosts';
 import { OpenSearchDashboardsRequest, RequestHandlerContext, OpenSearchDashboardsResponseFactory } from 'src/core/server';
 import { getCookieValueByName } from '../../lib/cookie';
@@ -62,41 +62,35 @@ export class WazuhUtilsCtrl {
    * @param {Object} response
    * @returns {Object} Configuration File or ErrorResponse
    */
-  async updateConfigurationFile(context: RequestHandlerContext, request: OpenSearchDashboardsRequest, response: OpenSearchDashboardsResponseFactory) {
-    try {
-      // Check if user has administrator role in token
-      const token = getCookieValueByName(request.headers.cookie,'wz-token');
-      if(!token){
-        return ErrorResponse('No token provided', 401, 401, response);
+  updateConfigurationFile = this.routeDecoratorProtectedAdministratorRoleValidToken(
+    async (context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) => {
+
+      let requiresRunningHealthCheck: boolean = false,
+        requiresReloadingBrowserTab: boolean = false,
+        requiresRestartingPluginPlatform: boolean = false;
+
+      // Plugin settings configurables in the configuration file.
+      const pluginSettingsConfigurableFile = Object.keys(request.body)
+        .filter(pluginSettingKey => PLUGIN_SETTINGS[pluginSettingKey].isConfigurableFromFile)
+        .reduce((accum, pluginSettingKey: string) => ({ ...accum, [pluginSettingKey]: request.body[pluginSettingKey] }), {});
+
+      if (Object.keys(pluginSettingsConfigurableFile).length) {
+        // Update the configuration file.
+        await updateConfigurationFile.updateConfiguration(pluginSettingsConfigurableFile);
+
+        requiresRunningHealthCheck = Object.keys(pluginSettingsConfigurableFile).some((pluginSettingKey: string) => Boolean(PLUGIN_SETTINGS[pluginSettingKey].requiresRunningHealthCheck)) || requiresRunningHealthCheck;
+        requiresReloadingBrowserTab = Object.keys(pluginSettingsConfigurableFile).some((pluginSettingKey: string) => Boolean(PLUGIN_SETTINGS[pluginSettingKey].requiresReloadingBrowserTab)) || requiresReloadingBrowserTab;
+        requiresRestartingPluginPlatform = Object.keys(pluginSettingsConfigurableFile).some((pluginSettingKey: string) => Boolean(PLUGIN_SETTINGS[pluginSettingKey].requiresRestartingPluginPlatform)) || requiresRestartingPluginPlatform;
       };
-      const decodedToken = jwtDecode(token);
-      if(!decodedToken){
-        return ErrorResponse('No permissions in token', 401, 401, response);
-      };
-      if(!decodedToken.rbac_roles || !decodedToken.rbac_roles.includes(WAZUH_ROLE_ADMINISTRATOR_ID)){
-        return ErrorResponse('No administrator role', 401, 401, response);
-      };response
-      // Check the provided token is valid
-      const apiHostID = getCookieValueByName(request.headers.cookie,'wz-api');
-      if( !apiHostID ){
-        return ErrorResponse('No API id provided', 401, 401, response);
-      };
-      const responseTokenIsWorking = await context.wazuh.api.client.asCurrentUser.request('GET', '/', {}, {apiHostID});
-      if(responseTokenIsWorking.status !== 200){
-        return ErrorResponse('Token is not valid', 401, 401, response);
-      };
-      const result = await updateConfigurationFile.updateConfiguration(request);
+
       return response.ok({
         body: {
-          statusCode: 200,
-          error: 0,
-          data: result
+          data: { requiresRunningHealthCheck, requiresReloadingBrowserTab, requiresRestartingPluginPlatform, updatedConfiguration: request.body }
         }
       });
-    } catch (error) {
-      return ErrorResponse(error.message || error, 3021, 500, response);
-    }
-  }
+    },
+    3021
+  )
 
   /**
    * Returns Wazuh app logs
@@ -127,5 +121,34 @@ export class WazuhUtilsCtrl {
     }
   }
 
-
+  private routeDecoratorProtectedAdministratorRoleValidToken(routeHandler, errorCode: number) {
+    return async (context, request, response) => {
+      try {
+        // Check if user has administrator role in token
+        const token = getCookieValueByName(request.headers.cookie, 'wz-token');
+        if (!token) {
+          return ErrorResponse('No token provided', 401, 401, response);
+        };
+        const decodedToken = jwtDecode(token);
+        if (!decodedToken) {
+          return ErrorResponse('No permissions in token', 401, 401, response);
+        };
+        if (!decodedToken.rbac_roles || !decodedToken.rbac_roles.includes(WAZUH_ROLE_ADMINISTRATOR_ID)) {
+          return ErrorResponse('No administrator role', 401, 401, response);
+        };
+        // Check the provided token is valid
+        const apiHostID = getCookieValueByName(request.headers.cookie, 'wz-api');
+        if (!apiHostID) {
+          return ErrorResponse('No API id provided', 401, 401, response);
+        };
+        const responseTokenIsWorking = await context.wazuh.api.client.asCurrentUser.request('GET', '/', {}, { apiHostID });
+        if (responseTokenIsWorking.status !== 200) {
+          return ErrorResponse('Token is not valid', 401, 401, response);
+        };
+        return await routeHandler(context, request, response)
+      } catch (error) {
+        return ErrorResponse(error.message || error, errorCode, 500, response);
+      }
+    }
+  }
 }
