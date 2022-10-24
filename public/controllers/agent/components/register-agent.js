@@ -64,9 +64,7 @@ export const RegisterAgent = withErrorBoundary(
         serverAddress: '',
         wazuhPassword: '',
         groups: [],
-        nodeIPs: [],
         selectedGroup: [],
-        selectedNodeIP: '',
         udpProtocol: false,
         showPassword: false,
         showProtocol: true,
@@ -88,10 +86,6 @@ export const RegisterAgent = withErrorBoundary(
         const wazuhVersion = await this.props.getWazuhVersion();
         let wazuhPassword = '';
         let hidePasswordInput = false;
-        /*serverAddress = this.configuration['enrollment.dns'] || false;
-        if (!serverAddress) {
-          serverAddress = await this.props.getCurrentApiAddress();
-        }*/
         let authInfo = await this.getAuthInfo();
         const needsPassword = (authInfo.auth || {}).use_password === 'yes';
         if (needsPassword) {
@@ -133,7 +127,6 @@ export const RegisterAgent = withErrorBoundary(
           wazuhPassword,
           wazuhVersion,
           groups,
-          nodeIPs,
           loading: false,
         });
       } catch (error) {
@@ -218,23 +211,12 @@ export const RegisterAgent = withErrorBoundary(
       this.setState({ selectedSYS: sys });
     }
 
-    setServerAddress(selectedNodes) {
-      let allNodeIps = '';
-      if(selectedNodes.length > 1){
-        allNodeIps = selectedNodes.map(o => o.value).join(',');
-      }else if (selectedNodes.length === 1){
-        allNodeIps = selectedNodes[0].value;
-      }
-      this.setState({ serverAddress: allNodeIps });
+    setServerAddress(serverAddress) {
+      this.setState({ serverAddress });
     }
 
     setGroupName(selectedGroup) {
       this.setState({ selectedGroup });
-    }
-
-    setNodeIp(value) {
-      console.log('select node', value)
-      this.setState({ selectedNodeIp: value });
     }
 
     setArchitecture(selectedArchitecture) {
@@ -275,7 +257,7 @@ export const RegisterAgent = withErrorBoundary(
     }
 
     optionalDeploymentVariables() {
-      let deployment = `WAZUH_MANAGER='${this.state.serverAddress}' `;
+      let deployment = this.state.serverAddress && `WAZUH_MANAGER='${this.state.serverAddress}' `;
       const protocol = false
 
       if (this.state.selectedOS == 'win') {

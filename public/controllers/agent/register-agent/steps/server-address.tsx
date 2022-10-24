@@ -1,37 +1,24 @@
 import { EuiComboBox, EuiComboBoxOptionOption, EuiText } from '@elastic/eui';
 import React, { useEffect, useState } from 'react';
-import { WzRequest } from '../../../../react-services';
+import { getNodeIPs, parseNodeIPs } from '../utils';
 
 type Props = {
-  onChange: (value: any) => void;
-}
+  onChange: (value: string) => void;
+};
 
 export default function ServerAddress(props: Props) {
   const { onChange } = props;
-  const [serverAddress, setServerAddress] = useState('');
   const [nodeIPs, setNodeIPs] = useState<EuiComboBoxOptionOption[]>([]);
   const [selectedNodeIPs, setSelectedNodeIPs] = useState<EuiComboBoxOptionOption[]>([]);
 
-  useEffect(()=> {
-    getNodeIPs();
-  },[])
-
-  const getNodeIPs = async () => {
-    try {
-      const result = await WzRequest.apiReq('GET', '/cluster/nodes', {});
-      const ipLists = result.data.data.affected_items.map((item) => ({ label: item.name, value: item.ip }));
-      setNodeIPs(ipLists);
-    } catch (error) {
-      //console.log('get NodeIPs error', error)
-      // 3013 - Cluster is not running
-      //throw new Error(error);
-    }
-  };
+  useEffect(() => {
+    getNodeIPs().then((nodeIps) => setNodeIPs(nodeIps));
+  }, []);
 
   const handleOnChange = (e) => {
     setSelectedNodeIPs(e);
-    onChange(e);
-  }
+    onChange(parseNodeIPs(e));
+  };
 
   return (
     <EuiText>
