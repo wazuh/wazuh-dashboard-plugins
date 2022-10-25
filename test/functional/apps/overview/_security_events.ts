@@ -13,7 +13,7 @@
 import expect from '@osd/expect';
 import { FtrProviderContext } from '../../../../../../test/functional/ftr_provider_context';
 import { SearchParams } from 'elasticsearch';
-import { WAZUH_ALERTS_PATTERN } from '../../../../common/constants';
+import { getSettingDefaultValue } from '../../../../common/services/settings';
 
 export default function({getService, getPageObjects, }: FtrProviderContext) {
   const areaChart = getService('areaChart');
@@ -34,7 +34,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
     let es_index: string;
     before(async () => {
       await PageObjects.wazuhCommon.OpenSecurityEvents();
-      es_index = WAZUH_ALERTS_PATTERN;
+      es_index = getSettingDefaultValue('pattern');
     });
 
     beforeEach(async () => {

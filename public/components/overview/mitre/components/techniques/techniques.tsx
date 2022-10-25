@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import {
   EuiFacetButton,
   EuiFlexGroup,
@@ -31,13 +31,13 @@ import { getElasticAlerts, IFilterParams } from '../../lib';
 import { ITactic } from '../../';
 import { withWindowSize } from '../../../../../components/common/hocs/withWindowSize';
 import { WzRequest } from '../../../../../react-services/wz-request';
-import { WAZUH_ALERTS_PATTERN } from '../../../../../../common/constants';
 import { AppState } from '../../../../../react-services/app-state';
 import { WzFieldSearchDelay } from '../../../../common/search';
 import { getDataPlugin, getToasts } from '../../../../../kibana-services';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
+import { getSettingDefaultValue } from '../../../../../../common/services/settings';
 
 const MITRE_ATTACK = 'mitre-attack';
 
@@ -430,7 +430,7 @@ export const Techniques = withWindowSize(
           params: { query: filter.value },
           type: 'phrase',
           negate: filter.negate || false,
-          index: AppState.getCurrentPattern() || WAZUH_ALERTS_PATTERN,
+          index: AppState.getCurrentPattern() || getSettingDefaultValue('pattern'),
         },
         query: { match_phrase: matchPhrase },
         $state: { store: 'appState' },

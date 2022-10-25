@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import { Base } from './base-query';
-import { WAZUH_ALERTS_PATTERN } from '../../../common/constants';
+import { getSettingDefaultValue } from '../../../common/services/settings';
 
 interface SummarySetup {
   title: string;
@@ -24,7 +24,7 @@ export default class SummaryTable {
     lte,
     filters,
     summarySetup: SummarySetup,
-    pattern = WAZUH_ALERTS_PATTERN
+    pattern = getSettingDefaultValue('pattern')
   ) {
 
     this._context = context;

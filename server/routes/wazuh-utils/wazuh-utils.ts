@@ -30,10 +30,7 @@ export function WazuhUtilsRoutes(router: IRouter) {
     {
       path: '/utils/configuration',
       validate: {
-        body: schema.object({
-          key: schema.string(),
-          value: schema.any()
-        })
+        body: schema.any()
       }
     },
     async (context, request, response) => ctrl.updateConfigurationFile(context, request, response)
