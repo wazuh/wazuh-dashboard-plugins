@@ -45,7 +45,7 @@ export function WazuhUtilsRoutes(router: IRouter) {
               }),
               {}
             )
-        );
+        )
       }
     },
     async (context, request, response) => ctrl.updateConfigurationFile(context, request, response)
