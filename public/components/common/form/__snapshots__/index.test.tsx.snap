@@ -181,9 +181,7 @@ exports[`[component] InputForm Renders correctly to match the snapshot: Input: s
   >
     <button
       aria-checked="true"
-      aria-labelledby="generated-id"
       class="euiSwitch__button"
-      id="generated-id"
       role="switch"
       type="button"
     >
@@ -196,32 +194,19 @@ exports[`[component] InputForm Renders correctly to match the snapshot: Input: s
         <span
           class="euiSwitch__track"
         >
-          <svg
-            aria-hidden="true"
-            class="euiIcon euiIcon--medium euiIcon-isLoading euiSwitch__icon"
-            focusable="false"
-            height="16"
-            role="img"
-            viewBox="0 0 16 16"
-            width="16"
-            xmlns="http://www.w3.org/2000/svg"
+          <span
+            class="euiSwitch__icon"
+            data-euiicon-type="cross"
           />
-          <svg
-            aria-hidden="true"
-            class="euiIcon euiIcon--medium euiIcon-isLoading euiSwitch__icon euiSwitch__icon--checked"
-            focusable="false"
-            height="16"
-            role="img"
-            viewBox="0 0 16 16"
-            width="16"
-            xmlns="http://www.w3.org/2000/svg"
+          <span
+            class="euiSwitch__icon euiSwitch__icon--checked"
+            data-euiicon-type="check"
           />
         </span>
       </span>
     </button>
     <span
       class="euiSwitch__label"
-      id="generated-id"
     >
       Enabled
     </span>

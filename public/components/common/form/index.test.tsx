@@ -4,12 +4,13 @@ import { InputForm } from './index';
 
 jest.mock('../../../../../../node_modules/@elastic/eui/lib/services/accessibility', () => ({
 	htmlIdGenerator: () => () => 'generated-id',
+	useGeneratedHtmlId: () => () => 'generated-id',
 }));
 
 describe('[component] InputForm', () => {
-	const optionsEditor = {editor: {language: 'json'}};
-	const optionsSelect = {select: [{text: 'Label1', value: 'value1'}, {text: 'Label2', value: 'value2'}]};
-	const optionsSwitch = {switch: {values: {enabled: {label: 'Enabled', value: true}, disabled: {label: 'Disabled', value: false}}}};
+	const optionsEditor = { editor: { language: 'json' } };
+	const optionsSelect = { select: [{ text: 'Label1', value: 'value1' }, { text: 'Label2', value: 'value2' }] };
+	const optionsSwitch = { switch: { values: { enabled: { label: 'Enabled', value: true }, disabled: { label: 'Disabled', value: false } } } };
 	it.each`
 		inputType   | value       | options
 		${'editor'} | ${'{}'}     | ${optionsEditor}
@@ -22,7 +23,7 @@ describe('[component] InputForm', () => {
 			<InputForm
 				type={inputType}
 				value={value}
-				onChange={() => {}}
+				onChange={() => { }}
 				options={options}
 			/>
 		);
