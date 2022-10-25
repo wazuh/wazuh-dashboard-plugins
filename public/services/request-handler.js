@@ -4,16 +4,13 @@ let allow = true;
 
 export const request = async (info) => {
     const core = getCore();
-
     core.http.intercept({
         responseError: (httpErrorResponse, controller) => {
             if (
-                httpErrorResponse.response?.status === 401
+                httpErrorResponse.response?.status === 401 && httpErrorResponse.response?.statusText === 'Unauthorized'
             ) {
                 allow = false;
-                console.log('ERROR INTERCEPTADO', JSON.stringify(httpErrorResponse.response))
                 window.location.reload();
-
             }
         },
     });
@@ -29,7 +26,7 @@ export const request = async (info) => {
         }
     }
     else {
-        options = {
+        options = { 
             method: method,
             headers: headers,
             query: query,
@@ -39,14 +36,12 @@ export const request = async (info) => {
     if (allow) {
         try {
             const requestData = await core.http.fetch(url, options);
-            console.log("REQUESTADATA",requestData)
             return Promise.resolve({ data: requestData });
         }
         catch (e) {
             return Promise.reject(e);
-        }
+        }     
     }
-
 }
 
 
