@@ -1,15 +1,16 @@
 import { EuiComboBox, EuiComboBoxOptionOption, EuiHighlight, EuiText } from '@elastic/eui';
 import React, { useEffect, useState } from 'react';
-import { getMasterNode, getNodeIPs, parseNodeIPs } from '../utils';
+import { getMasterNode, parseNodeIPs } from '../utils';
 
 type Props = {
   onChange: (value: string) => void;
+  fetchOptions: () => Promise<EuiComboBoxOptionOption<string>[]>;
 };
 
-export type ServerAddressOptions = EuiComboBoxOptionOption<any> & { nodeType?: string };
+export type ServerAddressOptions = EuiComboBoxOptionOption<any> & { nodetype?: string };
 
 export default function ServerAddress(props: Props) {
-  const { onChange } = props;
+  const { onChange, fetchOptions } = props;
   const [nodeIPs, setNodeIPs] = useState<ServerAddressOptions[]>([]);
   const [selectedNodeIPs, setSelectedNodeIPs] = useState<ServerAddressOptions[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -22,9 +23,11 @@ export default function ServerAddress(props: Props) {
    * Fetches the node IPs (options) and sets the state
    */
   const initialize = async () => {
+    if(!fetchOptions) throw new Error('fetchOptions is required');
+    
     try {
       setIsLoading(true);
-      const nodeIps = await getNodeIPs();
+      const nodeIps = await fetchOptions();
       setNodeIPs(nodeIps);
       const defaultNode = getMasterNode(nodeIps);
       if (defaultNode.length > 0) handleOnChange(defaultNode);

@@ -33,8 +33,7 @@ import {
   EuiProgress,
   EuiIcon,
   EuiSwitch,
-  EuiLink,
-  EuiSelect
+  EuiLink
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
 import { withErrorBoundary } from '../../../components/common/hocs';
@@ -44,6 +43,7 @@ import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
 import { architectureButtons, architectureButtonsi386, architecturei386Andx86_64, versionButtonsRaspbian, versionButtonsSuse, versionButtonsOracleLinux, versionButtonFedora, architectureButtonsSolaris, architectureButtonsWithPPC64LE, architectureButtonsOpenSuse, architectureButtonsAix, architectureButtonsHpUx, versionButtonAmazonLinux, versionButtonsRedHat, versionButtonsCentos, architectureButtonsMacos, osButtons, versionButtonsDebian, versionButtonsUbuntu, versionButtonsWindows, versionButtonsMacOS, versionButtonsOpenSuse, versionButtonsSolaris, versionButtonsAix, versionButtonsHPUX } from '../wazuh-config'
 import  ServerAddress  from '../register-agent/steps/server-address'
+import { fetchClusterNodesOptions } from '../register-agent/utils'
 
 export const RegisterAgent = withErrorBoundary(
 
@@ -1302,7 +1302,7 @@ export const RegisterAgent = withErrorBoundary(
           : []),
         {
           title: 'Wazuh server address',
-          children: <Fragment><ServerAddress onChange={(e) => this.setServerAddress(e) }/></Fragment>,
+          children: <Fragment><ServerAddress onChange={(e) => this.setServerAddress(e) } fetchOptions={fetchClusterNodesOptions}/></Fragment>,
         },
         ...(!(!this.state.needsPassword || this.state.hidePasswordInput)
           ? [

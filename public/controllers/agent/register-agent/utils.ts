@@ -18,19 +18,34 @@ export const parseNodeIPs = (selectedNodes: any): string => {
 /**
  * Get the list of the cluster nodes and parse it into a list of options
  */
-export const getNodeIPs = async (): Promise<ServerAddressOptions[]> => {
-  const result = await WzRequest.apiReq('GET', '/cluster/nodes', {});
-  return result.data.data.affected_items.map((item) => ({
+export const getNodeIPs = async (): Promise<any> => {
+  return await WzRequest.apiReq('GET', '/cluster/nodes', {});
+};
+
+/**
+ * Parse the nodes list from the API response to a format that can be used by the EuiComboBox
+ * @param nodes
+ */
+export const parseNodesInOptions = (nodes: any): ServerAddressOptions[] => {
+  return nodes.data.data.affected_items.map((item) => ({
     label: item.name,
     value: item.ip,
-    nodeType: item.type,
+    nodetype: item.type,
   }));
 };
+
+/**
+ * Get the list of the cluster nodes from API and parse it into a list of options
+ */
+export const fetchClusterNodesOptions = async (): Promise<ServerAddressOptions[]> => {
+  const nodes = await getNodeIPs();
+  return parseNodesInOptions(nodes);
+}
 
 /**
  * Get the master node data from the list of cluster nodes
  * @param nodeIps
  */
 export const getMasterNode = (nodeIps: ServerAddressOptions[]): ServerAddressOptions[] => {
-  return nodeIps.filter((nodeIp) => nodeIp.nodeType === 'master');
+  return nodeIps.filter((nodeIp) => nodeIp.nodetype === 'master');
 };
