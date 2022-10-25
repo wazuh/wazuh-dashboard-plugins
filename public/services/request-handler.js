@@ -35,7 +35,7 @@ export const request = async (info) => {
                 const id = setTimeout(() => abort.abort(), timeout);
                 options = { ...options, signal: abort.signal }
                 const requestData = await core.http.fetch(url, options);
-                id && clearTimeout(id);
+                clearTimeout(id);
                 return Promise.resolve({ data: requestData });
             }
             else {
