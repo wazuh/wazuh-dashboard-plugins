@@ -11,6 +11,8 @@ import { createDataDirectoryIfNotExists, createDirectoryIfNotExists } from '../.
 import { WAZUH_DATA_ABSOLUTE_PATH, WAZUH_DATA_CONFIG_APP_PATH, WAZUH_DATA_CONFIG_DIRECTORY_PATH, WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH, WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, WAZUH_DATA_LOGS_DIRECTORY_PATH, WAZUH_DATA_LOGS_RAW_PATH } from '../../../common/constants';
 import { execSync } from 'child_process';
 import fs from 'fs';
+import moment from 'moment';
+import { of } from 'rxjs';
 
 const loggingService = loggingSystemMock.create();
 const logger = loggingService.get();
@@ -29,7 +31,7 @@ beforeAll(async () => {
   createDirectoryIfNotExists(WAZUH_DATA_CONFIG_DIRECTORY_PATH);
 
   // Create <PLUGIN_PLATFORM_PATH>/data/wazuh/logs directory.
-  createDirectoryIfNotExists(WAZUH_DATA_LOGS_DIRECTORY_PATH);  
+  createDirectoryIfNotExists(WAZUH_DATA_LOGS_DIRECTORY_PATH);
 
   // Create server
   const config = {
@@ -43,14 +45,18 @@ beforeAll(async () => {
       allowFromAnyIp: true,
       ipAllowlist: [],
     },
+    cors: {
+      enabled: false,
+    },
+    shutdownTimeout: moment.duration(500, 'ms'),
   } as any;
-  server = new HttpServer(loggingService, 'tests');
+  server = new HttpServer(loggingService, 'tests', of(config.shutdownTimeout));
   const router = new Router('', logger, enhanceWithContext);
   const { registerRouter, server: innerServerTest, ...rest } = await server.setup(config);
   innerServer = innerServerTest;
 
   const spyRouteDecoratorProtectedAdministratorRoleValidToken = jest.spyOn(WazuhUtilsCtrl.prototype as any, 'routeDecoratorProtectedAdministratorRoleValidToken')
-  .mockImplementation((handler) => async (...args) => handler(...args));
+    .mockImplementation((handler) => async (...args) => handler(...args));
 
   // Register routes
   WazuhUtilsRoutes(router);
@@ -132,9 +138,9 @@ hosts:
 
   it.each`
     settings                                                   | responseStatusCode
-    ${{pattern: 'test-alerts-groupA-*'}}                       | ${200}
-    ${{pattern: 'test-alerts-groupA-*','logs.level': 'debug'}} | ${200}
-  `(`Update the plugin configuration: $settings. PUT /utils/configuration - $responseStatusCode`, async ({responseStatusCode, settings}) => {
+    ${{ pattern: 'test-alerts-groupA-*' }}                       | ${200}
+    ${{ pattern: 'test-alerts-groupA-*', 'logs.level': 'debug' }} | ${200}
+  `(`Update the plugin configuration: $settings. PUT /utils/configuration - $responseStatusCode`, async ({ responseStatusCode, settings }) => {
     const response = await supertest(innerServer.listener)
       .put('/utils/configuration')
       .send(settings)
