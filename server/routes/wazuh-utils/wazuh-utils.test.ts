@@ -8,7 +8,16 @@ import supertest from 'supertest';
 import { WazuhUtilsRoutes } from './wazuh-utils';
 import { WazuhUtilsCtrl } from '../../controllers/wazuh-utils/wazuh-utils';
 import { createDataDirectoryIfNotExists, createDirectoryIfNotExists } from '../../lib/filesystem';
-import { PLUGIN_SETTINGS, WAZUH_DATA_ABSOLUTE_PATH, WAZUH_DATA_CONFIG_APP_PATH, WAZUH_DATA_CONFIG_DIRECTORY_PATH, WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH, WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, WAZUH_DATA_LOGS_DIRECTORY_PATH, WAZUH_DATA_LOGS_RAW_PATH } from '../../../common/constants';
+import {
+  PLUGIN_SETTINGS,
+  WAZUH_DATA_ABSOLUTE_PATH,
+  WAZUH_DATA_CONFIG_APP_PATH,
+  WAZUH_DATA_CONFIG_DIRECTORY_PATH,
+  WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH,
+  WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH,
+  WAZUH_DATA_LOGS_DIRECTORY_PATH,
+  WAZUH_DATA_LOGS_RAW_PATH,
+} from "../../../common/constants";
 import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
@@ -108,7 +117,6 @@ hosts:
   });
 });
 
-
 describe('[endpoint] PUT /utils/configuration', () => {
   beforeAll(() => {
     // Create the configuration file with custom content
@@ -130,6 +138,22 @@ hosts:
   afterAll(() => {
     // Remove the configuration file
     fs.unlinkSync(WAZUH_DATA_CONFIG_APP_PATH);
+  });
+  
+  it.each`
+    settings                                                   | responseStatusCode
+    ${{pattern: 'test-alerts-groupA-*'}}                       | ${200}
+    ${{pattern: 'test-alerts-groupA-*','logs.level': 'debug'}} | ${200}
+  `(`Update the plugin configuration: $settings. PUT /utils/configuration - $responseStatusCode`, async ({responseStatusCode, settings}) => {
+    const response = await supertest(innerServer.listener)
+      .put('/utils/configuration')
+      .send(settings)
+      .expect(responseStatusCode);
+
+    expect(response.body.data.updatedConfiguration).toEqual(settings);
+    expect(response.body.data.requiresRunningHealthCheck).toBeDefined();
+    expect(response.body.data.requiresReloadingBrowserTab).toBeDefined();
+    expect(response.body.data.requiresRestartingPluginPlatform).toBeDefined();
   });
 
   it.each([

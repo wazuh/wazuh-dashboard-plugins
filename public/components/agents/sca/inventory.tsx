@@ -16,8 +16,6 @@ import {
   EuiFlexGroup,
   EuiPanel,
   EuiPage,
-  EuiBasicTable,
-  EuiInMemoryTable,
   EuiSpacer,
   EuiText,
   EuiProgress,
@@ -25,8 +23,6 @@ import {
   EuiButton,
   EuiButtonIcon,
   EuiStat,
-  EuiHealth,
-  EuiDescriptionList,
   EuiButtonEmpty,
   EuiToolTip,
   EuiCallOut,
@@ -37,8 +33,6 @@ import { WzRequest } from '../../../react-services/wz-request';
 import { formatUIDate } from '../../../react-services/time-service';
 import exportCsv from '../../../react-services/wz-csv';
 import { getToasts } from '../../../kibana-services';
-import { WzSearchBar } from '../../../components/wz-search-bar';
-import { RuleText, ComplianceText } from './components';
 import _ from 'lodash';
 import {
   UI_ERROR_SEVERITIES,
@@ -49,53 +43,89 @@ import {
 import { API_NAME_AGENT_STATUS, UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { VisualizationBasic } from '../../common/charts/visualizations/basic';
+import { AppNavigate } from '../../../react-services/app-navigate';
+import SCAPoliciesTable from './inventory/agent-policies-table';
+import { InventoryPolicyChecksTable } from './inventory/checks-table';
+import { RuleText } from './components';
 
-export class Inventory extends Component {
+type InventoryProps = {
+  agent: { [key: string]: any };
+};
+
+type InventoryState = {
+  itemIdToExpandedRowMap: object;
+  showMoreInfo: boolean;
+  loading: boolean;
+  checksIsLoading: boolean;
+  redirect: boolean;
+  filters: object[];
+  pageTableChecks: { pageIndex: number; pageSize?: number };
+  policies: object[];
+  checks: object[];
+  lookingPolicy: { [key: string]: any } | boolean;
+  loadingPolicy: boolean;
+  secondTable: boolean;
+  secondTableBack: boolean;
+};
+export class Inventory extends Component<InventoryProps, InventoryState> {
   _isMount = false;
+  agent: { [key: string]: any } = {};
+  columnsPolicies: object[];
+  lookingPolicy: { [key: string]: any } | false = false;
   constructor(props) {
     super(props);
-    const { agent } = this.props;
     this.state = {
-      agent,
-      items: [],
       itemIdToExpandedRowMap: {},
       showMoreInfo: false,
       loading: false,
       filters: [],
       pageTableChecks: { pageIndex: 0 },
       policies: [],
+      checks: [],
+      redirect: false,
+      secondTable: false,
+      secondTableBack: false,
+      checksIsLoading: false,
+      lookingPolicy: false,
+      loadingPolicy: false,
     };
-    this.suggestions = {};
+
     this.columnsPolicies = [
       {
         field: 'name',
         name: 'Policy',
+        sortable: true,
       },
       {
         field: 'description',
         name: 'Description',
         truncateText: true,
+        sortable: true,
       },
       {
         field: 'end_scan',
         name: 'End scan',
         dataType: 'date',
         render: formatUIDate,
+        sortable: true,
       },
       {
         field: 'pass',
         name: 'Pass',
         width: '100px',
+        sortable: true,
       },
       {
         field: 'fail',
         name: 'Fail',
         width: '100px',
+        sortable: true,
       },
       {
         field: 'invalid',
         name: 'Not applicable',
         width: '100px',
+        sortable: true,
       },
       {
         field: 'score',
@@ -104,71 +134,6 @@ export class Inventory extends Component {
           return `${score}%`;
         },
         width: '100px',
-      },
-    ];
-    this.columnsChecks = [
-      {
-        field: 'id',
-        name: 'ID',
-        sortable: true,
-        width: '100px',
-      },
-      {
-        field: 'title',
-        name: 'Title',
-        sortable: true,
-        truncateText: true,
-      },
-      {
-        name: 'Target',
-        truncateText: true,
-        render: (item) => (
-          <div>
-            {item.file ? (
-              <span>
-                <b>File:</b> {item.file}
-              </span>
-            ) : item.directory ? (
-              <span>
-                <b>Directory:</b> {item.directory}
-              </span>
-            ) : item.process ? (
-              <span>
-                <b>Process: </b> {item.process}
-              </span>
-            ) : item.command ? (
-              <span>
-                <b>Command: </b> {item.command}
-              </span>
-            ) : item.registry ? (
-              <span>
-                <b>Registry: </b> {item.registry}
-              </span>
-            ) : (
-              '-'
-            )}
-          </div>
-        ),
-      },
-      {
-        field: 'result',
-        name: 'Result',
-        truncateText: true,
-        sortable: true,
-        width: '150px',
-        render: this.addHealthResultRender,
-      },
-      {
-        align: 'right',
-        width: '40px',
-        isExpander: true,
-        render: (item) => (
-          <EuiButtonIcon
-            onClick={() => this.toggleDetails(item)}
-            aria-label={this.state.itemIdToExpandedRowMap[item.id] ? 'Collapse' : 'Expand'}
-            iconType={this.state.itemIdToExpandedRowMap[item.id] ? 'arrowUp' : 'arrowDown'}
-          />
-        ),
       },
     ];
   }
@@ -219,151 +184,17 @@ export class Inventory extends Component {
         pageTableChecks: { pageIndex: 0, pageSize: this.state.pageTableChecks.pageSize },
       });
     }
+
+    const regex = new RegExp('redirectPolicyTable=' + '[^&]*');
+    const match = window.location.href.match(regex);
+    if (match && match[0] && !this.state.secondTable && !this.state.secondTableBack) {
+      this.loadScaPolicy(match[0].split('=')[1], true)
+      this.setState({secondTableBack: true, checksIsLoading: true})
+    }
   }
 
   componentWillUnmount() {
     this._isMount = false;
-  }
-
-  addHealthResultRender(result) {
-    const color = (result) => {
-      if (result.toLowerCase() === 'passed') {
-        return 'success';
-      } else if (result.toLowerCase() === 'failed') {
-        return 'danger';
-      } else {
-        return 'subdued';
-      }
-    };
-
-    return (
-      <EuiHealth color={color(result)} style={{ textTransform: 'capitalize' }}>
-        {result || 'Not applicable'}
-      </EuiHealth>
-    );
-  }
-
-  /**
-   * Generate and assign the suggestions for the searchbar
-   * @param policy
-   * @param checks
-   * @returns
-   */
-  buildSuggestionSearchBar(policy, checks) {
-    if (this.suggestions[policy]) return;
-    const distinctFields = {};
-    checks.forEach((item) => {
-      Object.keys(item).forEach((field) => {
-        if (typeof item[field] === 'string') {
-          if (!distinctFields[field]) {
-            distinctFields[field] = {};
-          }
-          if (!distinctFields[field][item[field]]) {
-            distinctFields[field][item[field]] = true;
-          }
-        }
-      });
-    });
-
-    /**
-     * Get list of values defined in distinctFields by field
-     * @param value
-     * @param field
-     * @returns
-     */
-    const getSuggestionsValues = (value, field) => {
-      if (!distinctFields[field]) return [];
-      return Object.keys(distinctFields[field]).filter(
-        (item) => item && item.toLowerCase().includes(value.toLowerCase().trim())
-      );
-    };
-
-    /**
-     * Get list of suggestions.
-     * This method validate if the suggestion item exists in the checks array fields
-     * @returns List of suggestions
-     */
-    const getSuggestionsFields = () => {
-      const defaultSuggestions = [
-        {
-          type: 'params',
-          label: 'condition',
-          description: 'Filter by check condition',
-          operators: ['=', '!='],
-          values: (value) => getSuggestionsValues(value, 'condition'),
-        },
-        {
-          type: 'params',
-          label: 'file',
-          description: 'Filter by check file',
-          operators: ['=', '!='],
-          values: (value) => getSuggestionsValues(value, 'file'),
-        },
-        {
-          type: 'params',
-          label: 'title',
-          description: 'Filter by check title',
-          operators: ['=', '!='],
-          values: (value) => getSuggestionsValues(value, 'title'),
-        },
-        {
-          type: 'params',
-          label: 'result',
-          description: 'Filter by check result',
-          operators: ['=', '!='],
-          values: (value) => getSuggestionsValues(value, 'result'),
-        },
-        {
-          type: 'params',
-          label: 'status',
-          description: 'Filter by check status',
-          operators: ['=', '!='],
-          values: (value) => getSuggestionsValues(value, 'status'),
-        },
-        {
-          type: 'params',
-          label: 'rationale',
-          description: 'Filter by check rationale',
-          operators: ['=', '!='],
-          values: (value) => getSuggestionsValues(value, 'rationale'),
-        },
-        {
-          type: 'params',
-          label: 'registry',
-          description: 'Filter by check registry',
-          operators: ['=', '!='],
-          values: (value) => getSuggestionsValues(value, 'registry'),
-        },
-        {
-          type: 'params',
-          label: 'description',
-          description: 'Filter by check description',
-          operators: ['=', '!='],
-          values: (value) => getSuggestionsValues(value, 'description'),
-        },
-        {
-          type: 'params',
-          label: 'remediation',
-          description: 'Filter by check remediation',
-          operators: ['=', '!='],
-          values: (value) => getSuggestionsValues(value, 'remediation'),
-        },
-        {
-          type: 'params',
-          label: 'reason',
-          description: 'Filter by check reason',
-          operators: ['=', '!='],
-          values: (value) => getSuggestionsValues(value, 'reason'),
-        },
-      ];
-
-      const filteresSuggestions = defaultSuggestions.filter((item) =>
-        Object.keys(distinctFields).includes(item.label)
-      );
-      return filteresSuggestions;
-    };
-
-    this.suggestions[policy] = getSuggestionsFields();
   }
 
   async initialize() {
@@ -393,37 +224,31 @@ export class Inventory extends Component {
     }
   }
 
-  async loadScaPolicy(policy) {
+  handleBack (ev) {
+        AppNavigate.navigateToModule(ev, 'agents', { tab: 'welcome', agent: this.props.agent.id });
+        ev.stopPropagation();
+  };
+
+  async loadScaPolicy(policy, secondTable?) {
     this._isMount &&
       this.setState({
         loadingPolicy: true,
         itemIdToExpandedRowMap: {},
         pageTableChecks: { pageIndex: 0 },
+        secondTable: secondTable ? secondTable : false
       });
     if (policy) {
       try {
         const policyResponse = await WzRequest.apiReq('GET', `/sca/${this.props.agent.id}`, {
           params: {
-            q: 'policy_id=' + policy.policy_id,
+            q: 'policy_id=' + policy,
           },
         });
         const [policyData] = policyResponse.data.data.affected_items;
-        // It queries all checks without filters, because the filters are applied in the results
-        // due to the use of EuiInMemoryTable instead EuiTable components and do arequest with each change of filters.
-        const checksResponse = await WzRequest.apiReq(
-          'GET',
-          `/sca/${this.props.agent.id}/checks/${policy.policy_id}`,
-          {}
-        );
-        const checks = (
-          (((checksResponse || {}).data || {}).data || {}).affected_items || []
-        ).map((item) => ({ ...item, result: item.result || 'not applicable' }));
-        this.buildSuggestionSearchBar(policyData.policy_id, checks);
         this._isMount &&
-          this.setState({ lookingPolicy: policyData, loadingPolicy: false, items: checks });
+          this.setState({ lookingPolicy: policyData, loadingPolicy: false, checksIsLoading: false });
       } catch (error) {
-        this.setState({ lookingPolicy: policy, loadingPolicy: false });
-
+        this.setState({ lookingPolicy: policy, loadingPolicy: false, checksIsLoading: false });
         const options: UIErrorLog = {
           context: `${Inventory.name}.loadScaPolicy`,
           level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
@@ -437,26 +262,9 @@ export class Inventory extends Component {
         getErrorOrchestrator().handleError(options);
       }
     } else {
-      this._isMount && this.setState({ lookingPolicy: policy, loadingPolicy: false, items: [] });
+      this._isMount && this.setState({ lookingPolicy: policy, loadingPolicy: false, items: [], checksIsLoading: false });
     }
   }
-
-  filterPolicyChecks = () =>
-    !!this.state.items &&
-    this.state.items.filter((check) =>
-      this.state.filters.every((filter) =>
-        filter.field === 'search'
-          ? Object.keys(check).some(
-              (key) =>
-                ['string', 'number'].includes(typeof check[key]) &&
-                String(check[key]).toLowerCase().includes(filter.value.toLowerCase())
-            )
-          : typeof check[filter.field] === 'string' &&
-            (filter.value === ''
-              ? check[filter.field] === filter.value
-              : check[filter.field].toLowerCase().includes(filter.value.toLowerCase()))
-      )
-    );
 
   toggleDetails = (item) => {
     const itemIdToExpandedRowMap = { ...this.state.itemIdToExpandedRowMap };
@@ -471,7 +279,6 @@ export class Inventory extends Component {
         item.compliance && item.compliance.length
           ? item.compliance.map((el) => `${el.key}: ${el.value}`).join('\n')
           : '';
-      const rulesText = item.rules.length ? item.rules.map((el) => el.rule).join('\n') : '';
       const listItems = [
         {
           title: 'Check not applicable due to:',
@@ -517,6 +324,10 @@ export class Inventory extends Component {
       toastLifeTimeMs: time,
     });
   };
+
+  /**
+   *
+   */
   async downloadCsv() {
     try {
       this.showToast('success', 'Your download should begin automatically...', 3000);
@@ -549,27 +360,13 @@ export class Inventory extends Component {
   }
 
   render() {
-    const getPoliciesRowProps = (item, idx) => {
-      return {
-        'data-test-subj': `sca-row-${idx}`,
-        className: 'customRowClass',
-        onClick: () => this.loadScaPolicy(item),
-      };
-    };
-    const getChecksRowProps = (item, idx) => {
-      return {
-        'data-test-subj': `sca-check-row-${idx}`,
-        className: 'customRowClass',
-        onClick: () => this.toggleDetails(item),
-      };
-    };
+    const { onClickRow } = this.props
 
-    const sorting = {
-      sort: {
-        field: 'id',
-        direction: 'asc',
-      },
-    };
+    const handlePoliciesTableClickRow = async (policy) => {
+      onClickRow ? onClickRow(policy) : await this.loadScaPolicy(policy.policy_id)
+      this.setState({ loading: false, redirect: true })
+    }
+
     const buttonPopover = (
       <EuiButtonEmpty
         iconType="iInCircle"
@@ -577,10 +374,12 @@ export class Inventory extends Component {
         onClick={() => this.setState({ showMoreInfo: !this.state.showMoreInfo })}
       ></EuiButtonEmpty>
     );
+    const { agent } = this.props;
+
     return (
       <Fragment>
         <div>
-          {this.state.loading && (
+          {this.state.loading || this.state.checksIsLoading && (
             <div style={{ margin: 16 }}>
               <EuiSpacer size="m" />
               <EuiProgress size="xs" color="primary" />
@@ -588,8 +387,8 @@ export class Inventory extends Component {
           )}
         </div>
         <EuiPage>
-          {this.props.agent &&
-            (this.props.agent || {}).status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED &&
+          {agent &&
+            (agent || {}).status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED &&
             !this.state.policies.length &&
             !this.state.loading && (
               <EuiCallOut title="No scans available" iconType="iInCircle">
@@ -599,8 +398,8 @@ export class Inventory extends Component {
               </EuiCallOut>
             )}
 
-          {this.props.agent &&
-            (this.props.agent || {}).status === API_NAME_AGENT_STATUS.NEVER_CONNECTED &&
+          {agent &&
+            (agent || {}).status === API_NAME_AGENT_STATUS.NEVER_CONNECTED &&
             !this.state.loading && (
               <EuiCallOut
                 title="Agent has never connected"
@@ -612,15 +411,15 @@ export class Inventory extends Component {
                 </EuiButton>
               </EuiCallOut>
             )}
-          {this.props.agent &&
-            (this.props.agent || {}).os &&
+          {agent &&
+            (agent || {}).os &&
             !this.state.lookingPolicy &&
             this.state.policies.length > 0 &&
-            !this.state.loading && (
+            !this.state.loading && !this.state.checksIsLoading && (
               <div>
                 {this.state.policies.length && (
                   <EuiFlexGroup style={{ marginTop: 0 }}>
-                    {this.state.policies.map((policy, idx) => (
+                    {this.state.policies.map((policy: any, idx) => (
                       <EuiFlexItem key={idx} grow={false}>
                         <EuiCard
                           title
@@ -650,24 +449,24 @@ export class Inventory extends Component {
                     ))}
                   </EuiFlexGroup>
                 )}
-                <EuiSpacer size="m" />
-                <EuiPanel paddingSize="l">
-                  <EuiFlexGroup>
-                    <EuiFlexItem>
-                      <EuiBasicTable
-                        items={this.state.policies}
+                 <EuiSpacer size="m" />
+                <EuiFlexGroup>
+                  <EuiFlexItem>
+                    <EuiPanel>
+                      <SCAPoliciesTable
+                        agent={this.props.agent}
                         columns={this.columnsPolicies}
-                        rowProps={getPoliciesRowProps}
+                        rowProps={handlePoliciesTableClickRow}
                       />
-                    </EuiFlexItem>
-                  </EuiFlexGroup>
-                </EuiPanel>
+                    </EuiPanel>
+                  </EuiFlexItem>
+                </EuiFlexGroup>
               </div>
             )}
-          {this.props.agent &&
-            (this.props.agent || {}).os &&
+          {agent &&
+            (agent || {}).os &&
             this.state.lookingPolicy &&
-            !this.state.loading && (
+            ((!this.state.loading) || (!this.state.checksIsLoading )) && (
               <div>
                 <EuiPanel paddingSize="l">
                   <EuiFlexGroup>
@@ -675,7 +474,7 @@ export class Inventory extends Component {
                       <EuiButtonIcon
                         color="primary"
                         style={{ padding: '6px 0px' }}
-                        onClick={() => this.loadScaPolicy(false)}
+                        onClick={this.state.secondTableBack ? (ev) => this.handleBack(ev) : () => this.loadScaPolicy(false)}
                         iconType="arrowLeft"
                         aria-label="Back to policies"
                         {...{ iconSize: 'l' }}
@@ -715,7 +514,7 @@ export class Inventory extends Component {
                     <EuiFlexItem grow={false}>
                       <EuiButtonEmpty
                         iconType="refresh"
-                        onClick={() => this.loadScaPolicy(this.state.lookingPolicy)}
+                        onClick={() => this.loadScaPolicy(this.state.lookingPolicy.policy_id)}
                       >
                         Refresh
                       </EuiButtonEmpty>
@@ -775,33 +574,11 @@ export class Inventory extends Component {
                     </EuiFlexItem>
                   </EuiFlexGroup>
                   <EuiSpacer size="m" />
-
                   <EuiFlexGroup>
                     <EuiFlexItem>
-                      <WzSearchBar
-                        filters={this.state.filters}
-                        suggestions={this.suggestions[this.state.lookingPolicy.policy_id]}
-                        placeholder="Filter or search"
-                        onFiltersChange={(filters) => {
-                          this.setState({ filters });
-                        }}
-                      />
-                    </EuiFlexItem>
-                  </EuiFlexGroup>
-
-                  <EuiFlexGroup>
-                    <EuiFlexItem>
-                      <EuiInMemoryTable
-                        items={this.filterPolicyChecks()}
-                        columns={this.columnsChecks}
-                        rowProps={getChecksRowProps}
-                        itemId="id"
-                        itemIdToExpandedRowMap={this.state.itemIdToExpandedRowMap}
-                        isExpandable={true}
-                        sorting={sorting}
-                        pagination={this.state.pageTableChecks}
-                        loading={this.state.loadingPolicy}
-                        onTableChange={(change) => this.onChangeTableChecks(change)}
+                      <InventoryPolicyChecksTable
+                        agent={this.props.agent}
+                        lookingPolicy={this.state.lookingPolicy}              
                       />
                     </EuiFlexItem>
                   </EuiFlexGroup>
@@ -813,3 +590,7 @@ export class Inventory extends Component {
     );
   }
 }
+
+Inventory.defaultProps = {
+  onClickRow: undefined
+}  

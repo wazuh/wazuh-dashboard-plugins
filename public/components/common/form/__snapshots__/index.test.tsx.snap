@@ -122,6 +122,7 @@ exports[`[component] InputForm Renders correctly to match the snapshot with vali
 </div>
 `;
 
+
 exports[`[component] InputForm Renders correctly to match the snapshot: Input: editor 1`] = `
 <div>
   <div

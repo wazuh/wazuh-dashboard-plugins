@@ -8,25 +8,38 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Added the option to sort by the agents count in the group table. [#4323](https://github.com/wazuh/wazuh-kibana-app/pull/4323)
 - Added agent synchronization status in the agent module. [#3874](https://github.com/wazuh/wazuh-kibana-app/pull/3874)
+- Redesign the SCA table from agent's dashboard [#4512](https://github.com/wazuh/wazuh-kibana-app/pull/4512)
 
 ### Changed
 
 - Changed the HTTP verb from `GET` to `POST` in the requests to login to the Wazuh API [#4103](https://github.com/wazuh/wazuh-kibana-app/pull/4103)
-- Improve alerts summary performance [#4376](https://github.com/wazuh/wazuh-kibana-app/pull/4376)
-- Endpoint `/agents/summary/status` response was adapted. [#3874](https://github.com/wazuh/wazuh-kibana-app/pull/3874)
-- Makes Agents Overview loading icons independent [#4363](https://github.com/wazuh/wazuh-kibana-app/pull/4363)
+- Improved alerts summary performance [#4376](https://github.com/wazuh/wazuh-kibana-app/pull/4376)
+- The endpoint `/agents/summary/status` response was adapted. [#3874](https://github.com/wazuh/wazuh-kibana-app/pull/3874)
+- Made Agents Overview icons load independently [#4363](https://github.com/wazuh/wazuh-kibana-app/pull/4363)
+- Improved the message displayed when there is a versions mismatch between the Wazuh API and the Wazuh APP [#4529](https://github.com/wazuh/wazuh-kibana-app/pull/4529)
 
 ### Fixed
 
-- Improves Agents Overview performance [#4363](https://github.com/wazuh/wazuh-kibana-app/pull/4363)
-
-### Fixed
-
+- Improved Agents Overview performance [#4363](https://github.com/wazuh/wazuh-kibana-app/pull/4363)
 - Fixed nested fields filtering in dashboards tables and KPIs [#4425](https://github.com/wazuh/wazuh-kibana-app/pull/4425)
-
-### Fixed
-
 - Fixed nested field rendering in security alerts table details [#4428](https://github.com/wazuh/wazuh-kibana-app/pull/4428)
+- Fixed a bug where the Wazuh logo was used instead of the custom one [#4539](https://github.com/wazuh/wazuh-kibana-app/pull/4539)
+- Fixed rendering problems of the `Agent Overview` section in low resolutions [#4516](https://github.com/wazuh/wazuh-kibana-app/pull/4516)
+- Fixed issue when logging out from Wazuh when SAML is enabled [#4595](https://github.com/wazuh/wazuh-kibana-app/issues/4595)
+- Fixed server errors with code 500 when the Wazuh API is not reachable / up. [#4710](https://github.com/wazuh/wazuh-kibana-app/pull/4710) [#4728](https://github.com/wazuh/wazuh-kibana-app/pull/4728)
+- Fixed pagination to SCA table [#4653](https://github.com/wazuh/wazuh-kibana-app/issues/4653)
+
+## Wazuh v4.3.9 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4310
+
+### Added
+
+- Support for Wazuh 4.3.9
+
+## Wazuh v4.3.8 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4309
+
+### Added
+
+- Support for Wazuh 4.3.8
 
 ## Wazuh v4.3.7 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4308
 
@@ -804,6 +817,16 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Reporting fails when agent is pinned and compliance controls are visited.
 - Reload rule detail doesn't work properly with the related rules.
 - Fix search bar filter in Manage agent of group [#2541](https://github.com/wazuh/wazuh-kibana-app/pull/2541)
+
+# Wazuh v3.13.6 - Kibana v7.9.2 - Revision 890
+
+### Added
+
+- Support for Wazuh v3.13.6
+
+## Wazuh v3.13.5 - Kibana 7.9.2 - Revision 889
+
+- Sanitize report's inputs and usernames [#4336](https://github.com/wazuh/wazuh-kibana-app/pull/4336)
 
 ## Wazuh v3.13.2 - Kibana v7.9.1 - Revision 887
 
