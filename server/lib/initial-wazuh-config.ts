@@ -11,6 +11,7 @@
  */
 
 import {
+  PLUGIN_APP_NAME,
   PLUGIN_SETTINGS_CATEGORIES,
   TPluginSettingWithKey,
 } from '../../common/constants';

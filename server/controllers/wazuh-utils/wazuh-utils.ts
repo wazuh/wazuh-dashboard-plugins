@@ -63,7 +63,7 @@ export class WazuhUtilsCtrl {
    * @returns {Object} Configuration File or ErrorResponse
    */
   updateConfigurationFile = this.routeDecoratorProtectedAdministratorRoleValidToken(
-    async (context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) => {
+    async (context: RequestHandlerContext, request: OpenSearchDashboardsRequest, response: OpenSearchDashboardsResponseFactory) => {
 
       let requiresRunningHealthCheck: boolean = false,
         requiresReloadingBrowserTab: boolean = false,

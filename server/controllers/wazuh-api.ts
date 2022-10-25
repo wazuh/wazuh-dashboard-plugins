@@ -1101,7 +1101,7 @@ export class WazuhApiCtrl {
    * @param request
    * @param response
    */
-  async getAppLogos(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
+  async getAppLogos(context: RequestHandlerContext, request: OpenSearchDashboardsRequest, response: OpenSearchDashboardsResponseFactory) {
     try {
       const configuration = getConfiguration();
       const SIDEBAR_LOGO = 'customization.logo.sidebar';
