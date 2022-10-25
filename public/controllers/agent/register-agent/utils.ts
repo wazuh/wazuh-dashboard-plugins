@@ -1,36 +1,5 @@
-const mockedClusterNodes = {
-  data: {
-    data: {
-      affected_items: [
-        {
-          name: 'master-node',
-          type: 'master',
-          version: '4.x',
-          ip: 'wazuh-master',
-        },
-        {
-          name: 'worker1',
-          type: 'worker',
-          version: '4.x',
-          ip: '172.26.0.7',
-        },
-        {
-          name: 'worker2',
-          type: 'worker',
-          version: '4.x',
-          ip: '172.26.0.6',
-        },
-      ],
-      total_affected_items: 3,
-      total_failed_items: 0,
-      failed_items: [],
-    },
-    message: 'All selected nodes information was returned',
-    error: 0,
-  },
-};
-
 import { WzRequest } from '../../../react-services';
+import { ServerAddressOptions } from './steps/server-address';
 
 /**
  * Get a list of nodes and parsed into a string separated by semicolon
@@ -47,10 +16,21 @@ export const parseNodeIPs = (selectedNodes: any): string => {
 };
 
 /**
- * Get current nodes data from cluster
+ * Get the list of the cluster nodes and parse it into a list of options
  */
-export const getNodeIPs = async () => {
-  //const result = await WzRequest.apiReq('GET', '/cluster/nodes', {});
-  const result = mockedClusterNodes;
-  return result.data.data.affected_items.map((item) => ({ label: item.name, value: item.ip, nodeType: item.type }));
+export const getNodeIPs = async (): Promise<ServerAddressOptions[]> => {
+  const result = await WzRequest.apiReq('GET', '/cluster/nodes', {});
+  return result.data.data.affected_items.map((item) => ({
+    label: item.name,
+    value: item.ip,
+    nodeType: item.type,
+  }));
+};
+
+/**
+ * Get the master node data from the list of cluster nodes
+ * @param nodeIps
+ */
+export const getMasterNode = (nodeIps: ServerAddressOptions[]): ServerAddressOptions[] => {
+  return nodeIps.filter((nodeIp) => nodeIp.nodeType === 'master');
 };

@@ -1,90 +1,99 @@
-import { EuiComboBox, EuiComboBoxOptionOption, EuiHealth, EuiHighlight, euiPaletteColorBlind, euiPaletteColorBlindBehindText, EuiText } from '@elastic/eui';
+import { EuiComboBox, EuiComboBoxOptionOption, EuiHighlight, EuiText } from '@elastic/eui';
 import React, { useEffect, useState } from 'react';
-import { getNodeIPs, parseNodeIPs } from '../utils';
+import { getMasterNode, getNodeIPs, parseNodeIPs } from '../utils';
 
 type Props = {
   onChange: (value: string) => void;
 };
 
-type ServerAddressOptions = EuiComboBoxOptionOption<any> & { nodeType?: string };
+export type ServerAddressOptions = EuiComboBoxOptionOption<any> & { nodeType?: string };
 
 export default function ServerAddress(props: Props) {
   const { onChange } = props;
   const [nodeIPs, setNodeIPs] = useState<ServerAddressOptions[]>([]);
   const [selectedNodeIPs, setSelectedNodeIPs] = useState<ServerAddressOptions[]>([]);
-
-
-  const visColors = euiPaletteColorBlind();
-  const visColorsBehindText = euiPaletteColorBlindBehindText();
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    getNodeIPs().then((nodeIps) => { 
-      setNodeIPs(nodeIps)
-      const master = nodeIps.filter((nodeIp) => nodeIp.nodeType === 'master')
-      setSelectedNodeIPs(master || [])
-    });
+    initialize();
   }, []);
 
-  const handleOnChange = (e) => {
-    setSelectedNodeIPs(e);
-    onChange(parseNodeIPs(e));
+  /**
+   * Fetches the node IPs (options) and sets the state
+   */
+  const initialize = async () => {
+    try {
+      setIsLoading(true);
+      const nodeIps = await getNodeIPs();
+      setNodeIPs(nodeIps);
+      const defaultNode = getMasterNode(nodeIps);
+      if (defaultNode.length > 0) handleOnChange(defaultNode);
+      setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+      throw new Error(`Error initializing Server Address: ${error}`);
+    }
   };
 
-  const isValidIP = (value): boolean => {
-    return value >= 0 && value <= 255
-  }
+  /**
+   * Handles the change of the selected node IP
+   * @param value
+   */
+  const handleOnChange = (value) => {
+    setSelectedNodeIPs(value);
+    onChange(parseNodeIPs(value));
+  };
 
-  const handleRenderOption = (option, searchValue, contentClassName) => {
-    const { label, value, type } = option;
-    const color =  type === 'master' ? visColorsBehindText[3] : type === 'worker' ? visColorsBehindText[4] : visColorsBehindText[1];
-    const dotColor = visColors[visColorsBehindText.indexOf(color)];
+  /**
+   * Handle the render of the custom options in the combobox list
+   * @param option
+   * @param searchValue
+   * @param contentClassName
+   */
+  const handleRenderOption = (option, inputValue, contentClassName) => {
+    const { label, value } = option;
     return (
-      <EuiHealth color={dotColor}>
-        <span className={contentClassName}>
-          <EuiHighlight search={searchValue}>{`${label}:${value}`}</EuiHighlight>
-        </span>
-      </EuiHealth>
+      <span className={contentClassName}>
+        <EuiHighlight search={inputValue}>{`${label}:${value}`}</EuiHighlight>
+      </span>
     );
   };
 
+  /**
+   * Handle the interaction when the user enter a option that is not in the list
+   * Creating new options in the list and selecting it
+   * @param inputValue
+   * @param options
+   */
+  const handleOnCreateOption = (inputValue, options: any[] = []) => {
+    if (!inputValue) return;
 
-  const handleOnCreateOption = (searchValue, flattenedOptions: any[] = []) => {
-    if (!searchValue) {
-      return;
-    }
-    const normalizedSearchValue = searchValue.trim().toLowerCase();
-
+    const normalizedSearchValue = inputValue.trim().toLowerCase();
     if (!normalizedSearchValue) {
       return;
     }
 
-    const newOption = {
-      value: searchValue,
-      label: searchValue,
-      type: 'custom',
-    };
-
+    const newOption = { value: inputValue, label: inputValue };
     // Create the option if it doesn't exist.
     if (
-      flattenedOptions.findIndex(
-        (option) => option.label.trim().toLowerCase() === normalizedSearchValue
-      ) === -1
+      options.findIndex((option) => option.label.trim().toLowerCase() === normalizedSearchValue) ===
+      -1
     ) {
       setNodeIPs([...nodeIPs, newOption]);
     }
-
     // Select the option.
-    setSelectedNodeIPs((prevSelected) => [...prevSelected, newOption]);
+    handleOnChange([...selectedNodeIPs, newOption]);
   };
 
   return (
     <EuiText>
       <p>
-        This is the address the agent uses to communicate with the Wazuh server. It can be a list or an IP
-        address or a fully qualified domain name (FQDN).
+        This is the address the agent uses to communicate with the Wazuh server. It can be a list or
+        an IP address or a fully qualified domain name (FQDN).
       </p>
       <EuiComboBox
         placeholder="Server Address"
+        isLoading={isLoading}
         selectedOptions={selectedNodeIPs}
         options={nodeIPs}
         onChange={handleOnChange}
