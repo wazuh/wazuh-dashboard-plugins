@@ -17,30 +17,35 @@ export const request = async (info) => {
     let { method, path, headers, data, timeout } = info;
     const url = path.split('?')[0]
     const query = Object.fromEntries([... new URLSearchParams(path.split('?')[1])])
-    let options
-    if (method === 'GET') {
-        options = {
-            method: method,
-            headers: headers,
-            query: query,
-        }
+
+    let options = {
+        method: method,
+        headers: headers,
+        query: query,
     }
-    else {
-        options = { 
-            method: method,
-            headers: headers,
-            query: query,
-            body: JSON.stringify(data)
-        }
+
+    if (method !== 'GET') {
+        options = { ...options, body: JSON.stringify(data) }
     }
+
     if (allow) {
         try {
-            const requestData = await core.http.fetch(url, options);
-            return Promise.resolve({ data: requestData });
+            if (timeout && timeout !== 0) {
+                const abort = new AbortController();
+                const id = setTimeout(() => abort.abort(), timeout);
+                options = { ...options, signal: abort.signal }
+                const requestData = await core.http.fetch(url, options);
+                id && clearTimeout(id);
+                return Promise.resolve({ data: requestData });
+            }
+            else {
+                const requestData = await core.http.fetch(url, options);
+                return Promise.resolve({ data: requestData });
+            }
         }
         catch (e) {
             return Promise.reject(e);
-        }     
+        }
     }
 }
 
