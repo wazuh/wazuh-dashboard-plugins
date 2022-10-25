@@ -36,7 +36,7 @@ const architectureButtonsWithPPC64LE = [
   },
   {
     id: 'powerpc',
-    label: 'powerpc',
+    label: 'PowerPC',
   },
 ];
 
@@ -346,7 +346,7 @@ const osButtons = [
   },
   {  
     id: 'hp',
-    label: 'HP-UX	',
+    label: 'HP-UX',
   },
   {  
     id: 'amazonlinux',

@@ -1068,7 +1068,7 @@ export const RegisterAgent = withErrorBoundary(
 
       const steps = [
         {
-          title: 'Choose the Operating system',
+          title: 'Choose the operating system',
           children: (
             buttonGroup("Choose the Operating system", osButtons, this.state.selectedOS, (os) => this.selectOS(os))
           ),
