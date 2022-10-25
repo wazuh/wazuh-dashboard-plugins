@@ -7,12 +7,10 @@ exports[`[component] InputForm Renders correctly to match the snapshot: Input: e
     data-test-subj="codeEditorContainer"
     style="width: 100%; height: 50px;"
   >
-    <div
+    <button
       class="euiCodeEditorKeyboardHint"
       data-test-subj="codeEditorHint"
       id="generated-id"
-      role="button"
-      tabindex="0"
     >
       <p
         class="euiText"
@@ -24,7 +22,7 @@ exports[`[component] InputForm Renders correctly to match the snapshot: Input: e
       >
         When you're done, press Escape to stop editing.
       </p>
-    </div>
+    </button>
     <div
       class=" ace_editor ace-tm"
       id="generated-id"
