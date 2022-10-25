@@ -22,10 +22,11 @@ import { updateCurrentTab, updateCurrentAgentData } from '../../redux/actions/ap
 import { VisFactoryHandler } from '../../react-services/vis-factory-handler';
 import { RawVisualizations } from '../../factories/raw-visualizations';
 import store from '../../redux/store';
-import { UI_LOGGER_LEVELS, WAZUH_ALERTS_PATTERN } from '../../../common/constants';
+import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { getDataPlugin } from '../../kibana-services';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
+import { getSettingDefaultValue } from '../../../common/services/settings';
 
 export class OverviewController {
   /**
@@ -168,7 +169,7 @@ export class OverviewController {
   }
 
   async updateSelectedAgents(agentList) {
-    try{
+    try {
       if (this.initialFilter) {
         this.initialFilter = false;
         this.agentsSelectionProps.initialFilter = false;
@@ -176,14 +177,14 @@ export class OverviewController {
       this.isAgent = agentList && agentList.length ? agentList[0] : false;
       this.$scope.isAgentText = this.isAgent && agentList.length === 1 ? ` of agent ${agentList.toString()}` : this.isAgent && agentList.length > 1 ? ` of ${agentList.length.toString()} agents` : false;
       if (agentList && agentList.length) {
-          await this.visFactoryService.buildAgentsVisualizations(
-            this.filterHandler,
-            this.tab,
-            this.tabView,
-            agentList[0],
-            (this.tabView === 'discover' || this.oldFilteredTab === this.tab)
-          );
-          this.oldFilteredTab = this.tab;
+        await this.visFactoryService.buildAgentsVisualizations(
+          this.filterHandler,
+          this.tab,
+          this.tabView,
+          agentList[0],
+          (this.tabView === 'discover' || this.oldFilteredTab === this.tab)
+        );
+        this.oldFilteredTab = this.tab;
       } else if (!agentList && this.tab !== 'welcome') {
         if (!store.getState().appStateReducers.currentAgentData.id) {
           await this.visFactoryService.buildOverviewVisualizations(
@@ -196,10 +197,10 @@ export class OverviewController {
         }
       };
       setTimeout(() => { this.$location.search('agentId', store.getState().appStateReducers.currentAgentData.id ? String(store.getState().appStateReducers.currentAgentData.id) : null) }, 1);
-  
+
       this.visualizeProps["isAgent"] = agentList ? agentList[0] : false;
       this.$rootScope.$applyAsync();
-    }catch(error){
+    } catch (error) {
       const options = {
         context: `${OverviewController.name}.updateSelectedAgents`,
         level: UI_LOGGER_LEVELS.ERROR,
@@ -329,7 +330,7 @@ export class OverviewController {
    */
   async getSummary() {
     try {
-      const {data: { data: {connection: data} }} = await WzRequest.apiReq('GET', '/agents/summary/status', {});
+      const { data: { data: { connection: data } } } = await WzRequest.apiReq('GET', '/agents/summary/status', {});
       this.agentsCount = data;
       this.welcomeCardsProps.agentsCountTotal = data.total;
       this.agentsCoverity = data.total ? (data.active / data.total) * 100 : 0;

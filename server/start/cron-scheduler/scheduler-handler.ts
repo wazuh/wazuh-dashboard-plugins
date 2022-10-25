@@ -3,9 +3,10 @@ import { configuredJobs } from './configured-jobs';
 import { log } from '../../lib/logger';
 import { getConfiguration } from '../../lib/get-configuration';
 import cron from 'node-cron';
-import { WAZUH_STATISTICS_DEFAULT_PREFIX, WAZUH_STATISTICS_DEFAULT_NAME, WAZUH_STATISTICS_TEMPLATE_NAME } from '../../../common/constants';
+import { WAZUH_STATISTICS_TEMPLATE_NAME } from '../../../common/constants';
 import { statisticsTemplate } from '../../integration-files/statistics-template';
 import { delayAsPromise } from '../../../common/utils';
+import { getSettingDefaultValue } from '../../../common/services/settings';
 
 const blueWazuh = '\u001b[34mwazuh\u001b[39m';
 const schedulerErrorLogColors = [blueWazuh, 'scheduler', 'error'];
@@ -67,8 +68,8 @@ const checkTemplate = async function (context) {
     );
 
     const appConfig = await getConfiguration();
-    const prefixTemplateName = appConfig['cron.prefix'] || WAZUH_STATISTICS_DEFAULT_PREFIX;
-    const statisticsIndicesTemplateName = appConfig['cron.statistics.index.name'] || WAZUH_STATISTICS_DEFAULT_NAME;
+    const prefixTemplateName = appConfig['cron.prefix'] || getSettingDefaultValue('cron.prefix');
+    const statisticsIndicesTemplateName = appConfig['cron.statistics.index.name'] || getSettingDefaultValue('cron.statistics.index.name');
     const pattern = `${prefixTemplateName}-${statisticsIndicesTemplateName}-*`;
 
     try {
