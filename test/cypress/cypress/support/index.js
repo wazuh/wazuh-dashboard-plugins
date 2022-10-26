@@ -74,6 +74,6 @@ beforeEach(() => {
         });
     })
     cy.setSessionStorage('healthCheck', 'executed');
-         navigate("/");
-     }
+    if(Cypress.env('type') !='wzd') navigate("/");   
+  }
     )
