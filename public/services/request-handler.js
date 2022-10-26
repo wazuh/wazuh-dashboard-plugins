@@ -2,7 +2,7 @@ import { getCore } from '../kibana-services';
 
 let allow = true;
 
-export const request = async (info) => {
+export const initializeInterceptor = () => {
     const core = getCore();
     core.http.intercept({
         responseError: (httpErrorResponse, controller) => {
@@ -14,6 +14,13 @@ export const request = async (info) => {
             }
         },
     });
+}
+
+export const request = async (info) => {
+    if (!allow) {
+        return Promise.reject();
+    }
+    const core = getCore();
     let { method, path, headers, data, timeout } = info;
     const url = path.split('?')[0]
     const query = Object.fromEntries([... new URLSearchParams(path.split('?')[1])])
