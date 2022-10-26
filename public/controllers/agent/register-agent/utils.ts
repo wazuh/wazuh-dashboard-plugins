@@ -7,7 +7,7 @@ import { ServerAddressOptions } from './steps/server-address';
  * @param osSelected
  */
 export const parseNodeIPs = (selectedNodes: any, osSelected: string): string => {
-  const delimiter = osSelected === 'win' ? ';' : ',';
+  const delimiter = osSelected === 'win' ? ';' : ','; // by default any another OS use comma as delimiter, to prevent add every OS here
   let allNodeIps = '';
   if (selectedNodes.length > 1) {
     allNodeIps = selectedNodes.map((o) => o.value).join(delimiter);

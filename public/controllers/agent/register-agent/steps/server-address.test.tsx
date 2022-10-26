@@ -4,6 +4,7 @@ import '@testing-library/jest-dom';
 import { act } from 'react-dom/test-utils';
 import ServerAddress from './server-address';
 import * as registerAgentsUtils from '../utils';
+import { parseNodeIPs } from '../utils';
 
 const mockedNodesIps = [
   {
@@ -79,8 +80,6 @@ describe('Server Address Combobox', () => {
     await act(async () => {
       await promiseFetchOptions; // waiting for the combobox items are loaded
       expect(getByText('master-node')).toBeInTheDocument();
-      expect(spy).toBeCalledTimes(1);
-      expect(spy.mock.results[0].value).toBe('wazuh-master');
       expect(container).toBeInTheDocument();
     });
   });
@@ -92,7 +91,6 @@ describe('Server Address Combobox', () => {
         fetchOptions={mockedFetchOptions}
       />
     );
-    const spy = jest.spyOn(registerAgentsUtils, 'parseNodeIPs');
     await act(async () => {
       await promiseFetchOptions; // waiting for the combobox items are loaded
       fireEvent.click(getByRole('button', { name: 'Open list of options'}));
@@ -100,15 +98,63 @@ describe('Server Address Combobox', () => {
       mockedNodesIps.splice(1,mockedNodesIps.length).forEach(nodeItem => {
         expect(getByText(`${nodeItem.name}:${nodeItem.ip}`)).toBeInTheDocument();
       })
-      expect(spy).toBeCalledTimes(1);
-      expect(spy.mock.results[0].value).toBe('wazuh-master');
     });
   });
 
-  it('should allow multiple selection and return ips delimeters by semicolon', async () => {
-    const { getByRole, getByText, container, debug } = render(
+  it('should allow multiple selection and return options selecteds', async () => {
+    const { getByRole, getByText, container } = render(
       <ServerAddress
         onChange={() => {}}
+        fetchOptions={mockedFetchOptions}
+      />
+    );
+    await act(async () => {
+      await promiseFetchOptions; // waiting for the combobox items are loaded
+      fireEvent.click(getByRole('button', { name: 'Clear input' }));      
+      fireEvent.click(getByText(`master-node:wazuh-master`));
+      fireEvent.click(getByText(`worker1:172.26.0.7`));
+      fireEvent.click(getByText(`worker2:172.26.0.6`));
+      expect(container).toBeInTheDocument();
+    });
+  });
+
+
+
+  it('should allow multiple selection and return options selecteds delimitered by COMMA when OS is NOT WINDOWS', async () => {
+
+    const onChangeMocked = (value) => {
+      parseNodeIPs(value, 'aix');
+    }
+
+    const { getByRole, getByText, container } = render(
+      <ServerAddress
+        onChange={onChangeMocked}
+        fetchOptions={mockedFetchOptions}
+      />
+    );
+    const spy = jest.spyOn(registerAgentsUtils, 'parseNodeIPs');
+    await act(async () => {
+      await promiseFetchOptions; // waiting for the combobox items are loaded
+      fireEvent.click(getByRole('button', { name: 'Clear input' }));      
+      fireEvent.click(getByText(`master-node:wazuh-master`));
+      fireEvent.click(getByText(`worker1:172.26.0.7`));
+      fireEvent.click(getByText(`worker2:172.26.0.6`));
+      expect(spy).toBeCalledTimes(5);
+      expect(spy.mock.results[4].value).toBe('wazuh-master,172.26.0.7,172.26.0.6');
+      expect(container).toBeInTheDocument();
+    });
+  });
+
+
+  it('should allow multiple selection and return options selecteds delimitered by SEMICOLON when OS is WINDOWS', async () => {
+
+    const onChangeMocked = (value) => {
+      parseNodeIPs(value, 'win');
+    }
+
+    const { getByRole, getByText, container } = render(
+      <ServerAddress
+        onChange={onChangeMocked}
         fetchOptions={mockedFetchOptions}
       />
     );
@@ -126,9 +172,14 @@ describe('Server Address Combobox', () => {
   });
 
   it('should return EMPTY parsed Node IPs when options are not selected', async () => {
+
+    const onChangeMocked = (value) => {
+      parseNodeIPs(value, 'win');
+    }
+
     const { getByRole, container } = render(
       <ServerAddress
-        onChange={() => {}}
+        onChange={onChangeMocked}
         fetchOptions={mockedFetchOptions}
       />
     );
@@ -143,9 +194,14 @@ describe('Server Address Combobox', () => {
   });
 
   it('should allow create customs options when user type and trigger enter key', async () => {
+
+    const onChangeMocked = (value) => {
+      parseNodeIPs(value, 'win');
+    }
+
     const { getByRole } = render(
       <ServerAddress
-        onChange={() => {}}
+        onChange={onChangeMocked}
         fetchOptions={mockedFetchOptions}
       />
     );
@@ -176,7 +232,10 @@ describe('Server Address Combobox', () => {
   })
 
   it('should paste only "node.name" when is selected and return "node.ip"', async () => {
-    const onChangeMocked = jest.fn();
+    const onChangeMocked = (value) => {
+      parseNodeIPs(value, 'win');
+    }
+    const spy = jest.spyOn(registerAgentsUtils, 'parseNodeIPs');
     const { getByRole, getByText } = render(
       <ServerAddress
         onChange={onChangeMocked}
@@ -189,7 +248,7 @@ describe('Server Address Combobox', () => {
       fireEvent.click(getByText(`master-node:wazuh-master`));
       fireEvent.click(getByText(`worker1:172.26.0.7`));
       fireEvent.click(getByText(`worker2:172.26.0.6`));
-      expect(onChangeMocked).lastCalledWith('wazuh-master;172.26.0.7;172.26.0.6');
+      expect(spy.mock.results[4].value).toBe('wazuh-master;172.26.0.7;172.26.0.6');
     });
   })
 });
