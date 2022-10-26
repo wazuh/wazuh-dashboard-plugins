@@ -23,14 +23,17 @@ export default function ServerAddress(props: Props) {
    * Fetches the node IPs (options) and sets the state
    */
   const initialize = async () => {
-    if(!fetchOptions) throw new Error('fetchOptions is required');
-    
+    if(!fetchOptions){
+      throw new Error('fetchOptions is required');
+    }
     try {
       setIsLoading(true);
       const nodeIps = await fetchOptions();
       setNodeIPs(nodeIps);
       const defaultNode = getMasterNode(nodeIps);
-      if (defaultNode.length > 0) handleOnChange(defaultNode);
+      if (defaultNode.length > 0){
+        handleOnChange(defaultNode);
+      }
       setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
@@ -69,7 +72,9 @@ export default function ServerAddress(props: Props) {
    * @param options
    */
   const handleOnCreateOption = (inputValue, options: any[] = []) => {
-    if (!inputValue) return;
+    if (!inputValue){
+      return;
+    }
 
     const normalizedSearchValue = inputValue.trim().toLowerCase();
     if (!normalizedSearchValue) {
