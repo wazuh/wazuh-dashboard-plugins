@@ -29,6 +29,5 @@ describe('RegisterAgent', () => {
     };
     const { debug } = render(<RegisterAgent {...props} />);  
         debug()
-        // await waitFor(() => expect( getWazuhVersion ).toHaveBeenCalled(1));
   });
 });

@@ -36,7 +36,7 @@ const architectureButtonsWithPPC64LE = [
   },
   {
     id: 'powerpc',
-    label: 'powerpc',
+    label: 'PowerPC',
   },
 ];
 
@@ -184,7 +184,7 @@ const versionButtonsUbuntu = [
   },
   {
     id: 'ubuntu15',
-    label: 'Ubuntu 15 or higher',
+    label: 'Ubuntu 15',
   },
   {
     id: 'ubuntu16',
@@ -195,7 +195,7 @@ const versionButtonsUbuntu = [
 const versionButtonsWindows = [
   {
     id: 'windowsxp',
-    label: 'Windows XP or higher',
+    label: 'Windows XP',
   },
   {
     id: 'windows8',
@@ -346,7 +346,7 @@ const osButtons = [
   },
   {  
     id: 'hp',
-    label: 'HP-UX	',
+    label: 'HP-UX',
   },
   {  
     id: 'amazonlinux',
