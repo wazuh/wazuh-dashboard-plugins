@@ -184,7 +184,7 @@ const versionButtonsUbuntu = [
   },
   {
     id: 'ubuntu15',
-    label: 'Ubuntu 15 or higher',
+    label: 'Ubuntu 15',
   },
   {
     id: 'ubuntu16',
@@ -195,7 +195,7 @@ const versionButtonsUbuntu = [
 const versionButtonsWindows = [
   {
     id: 'windowsxp',
-    label: 'Windows XP or higher',
+    label: 'Windows XP',
   },
   {
     id: 'windows8',
