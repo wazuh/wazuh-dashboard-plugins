@@ -135,11 +135,13 @@ export const Category: React.FunctionComponent<ICategoryProps> = ({
                     {...item}
                     {...((item.type === EpluginSettingType.filepicker && currentConfiguration[item.key])
                       ? {
-                          preInput: () => (
-                            <InputFormFilePickerPreInput
-                              image={getHttp().basePath.prepend(getAssetURL(currentConfiguration[item.key]))}
-                              field={item}
-                            />
+                          postInput: () => (
+                            <EuiFlexItem grow={false}>
+                              <InputFormFilePickerPreInput
+                                image={getHttp().basePath.prepend(getAssetURL(currentConfiguration[item.key]))}
+                                field={item}
+                              />
+                            </EuiFlexItem>
                           )
                         }
                       : {}
@@ -163,9 +165,8 @@ const InputFormFilePickerPreInput = ({image, field}: {image: string, field: any}
         <EuiFlexItem grow={false}>
           <EuiImage
             src={image}
-            size='s'
+            size={40}
             alt="Custom logo"
-            style={{maxWidth: '100%', maxHeight: '50px', width: 'auto', height: 'auto'}}
             url='' // Added to prevent warnings in the browser because it is marked as required
           />
         </EuiFlexItem>
@@ -210,7 +211,6 @@ const InputFormFilePickerPreInput = ({image, field}: {image: string, field: any}
           />
         </EuiFlexItem>
       </EuiFlexGroup>
-      <EuiSpacer size='s' />
     </>
   );
 };

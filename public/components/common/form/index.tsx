@@ -5,9 +5,19 @@ import { InputFormText } from './input_text';
 import { InputFormSelect } from './input_select';
 import { InputFormSwitch } from './input_switch';
 import { InputFormFilePicker } from './input_filepicker';
-import { EuiFormRow } from '@elastic/eui';
+import { EuiFlexGroup, EuiFlexItem, EuiFormRow } from '@elastic/eui';
 
-export const InputForm = ({ type, value, onChange, error, label, preInput, postInput, ...rest}) => {
+export const InputForm = ({
+  type,
+  value,
+  onChange,
+  error,
+  label,
+  header,
+  footer,
+  preInput,
+  postInput,
+...rest}) => {
 
   const ComponentInput = Input[type];
 
@@ -30,9 +40,15 @@ export const InputForm = ({ type, value, onChange, error, label, preInput, postI
     ? (
       <EuiFormRow label={label} fullWidth isInvalid={isInvalid} error={error}>
         <>
-          {typeof preInput === 'function' ? preInput({value, error}) : preInput}
-          {input}
-          {typeof postInput === 'function' ? postInput({value, error}) : postInput}
+          {typeof header === 'function' ? header({value, error}) : header}
+          <EuiFlexGroup responsive={false}>
+            {typeof preInput === 'function' ? preInput({value, error}) : preInput}
+            <EuiFlexItem>
+              {input}
+            </EuiFlexItem>
+            {typeof postInput === 'function' ? postInput({value, error}) : postInput}
+          </EuiFlexGroup>
+          {typeof footer === 'function' ? footer({value, error}) : footer}
         </>
       </EuiFormRow>)
     : input;

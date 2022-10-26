@@ -11,7 +11,7 @@ export const InputFormFilePicker = ({onChange, options, setInputRef, key, ...res
       fileList?.[0]
       // File was removed. We set the initial value, so the useForm hook will not detect any change. */
       || rest.initialValue)}
-    display='large'
+    display='default'
     fullWidth
     aria-label='Upload a file'
     accept={options.file.extensions.join(',')}
