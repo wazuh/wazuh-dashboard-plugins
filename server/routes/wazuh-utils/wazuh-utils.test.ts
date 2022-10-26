@@ -38,7 +38,7 @@ beforeAll(async () => {
   createDirectoryIfNotExists(WAZUH_DATA_CONFIG_DIRECTORY_PATH);
 
   // Create <PLUGIN_PLATFORM_PATH>/data/wazuh/logs directory.
-  createDirectoryIfNotExists(WAZUH_DATA_LOGS_DIRECTORY_PATH);  
+  createDirectoryIfNotExists(WAZUH_DATA_LOGS_DIRECTORY_PATH);
 
   // Create server
   const config = {
@@ -137,7 +137,7 @@ hosts:
     // Remove the configuration file
     fs.unlinkSync(WAZUH_DATA_CONFIG_APP_PATH);
   });
-  
+
   it.each`
     settings                                                   | responseStatusCode
     ${{pattern: 'test-alerts-groupA-*'}}                       | ${200}
@@ -208,7 +208,7 @@ hosts:
     setting                             | value                | responseStatusCode | responseBodyMessage
     ${'alerts.sample.prefix'}           | ${'test'}            | ${200}             | ${null}
     ${'alerts.sample.prefix'}           | ${''}                | ${400}             | ${"[request body.alerts.sample.prefix]: Value can not be empty."}
-    ${'alerts.sample.prefix'}           | ${'test space'}      | ${400}             | ${"[request body.alerts.sample.prefix]: It can't contain spaces."}
+    ${'alerts.sample.prefix'}           | ${'test space'}      | ${400}             | ${"[request body.alerts.sample.prefix]: No whitespaces allowed."}
     ${'alerts.sample.prefix'}           | ${4}                 | ${400}             | ${'[request body.alerts.sample.prefix]: expected value of type [string] but got [number]'}
     ${'alerts.sample.prefix'}           | ${'-test'}           | ${400}             | ${"[request body.alerts.sample.prefix]: It can't start with: -, _, +, .."}
     ${'alerts.sample.prefix'}           | ${'_test'}           | ${400}             | ${"[request body.alerts.sample.prefix]: It can't start with: -, _, +, .."}
@@ -239,7 +239,7 @@ hosts:
     ${'checks.timeFilter'}              | ${true}              | ${200}             | ${null}
     ${'checks.timeFilter'}              | ${0}                 | ${400}             | ${'[request body.checks.timeFilter]: expected value of type [boolean] but got [number]'}
     ${'cron.prefix'}                    | ${'test'}            | ${200}             | ${null}
-    ${'cron.prefix'}                    | ${'test space'}      | ${400}             | ${"[request body.cron.prefix]: It can't contain spaces."}
+    ${'cron.prefix'}                    | ${'test space'}      | ${400}             | ${"[request body.cron.prefix]: No whitespaces allowed."}
     ${'cron.prefix'}                    | ${''}                | ${400}             | ${"[request body.cron.prefix]: Value can not be empty."}
     ${'cron.prefix'}                    | ${4}                 | ${400}             | ${'[request body.cron.prefix]: expected value of type [string] but got [number]'}
     ${'cron.prefix'}                    | ${'-test'}           | ${400}             | ${"[request body.cron.prefix]: It can't start with: -, _, +, .."}
@@ -257,9 +257,9 @@ hosts:
     ${'cron.prefix'}                    | ${'test#'}           | ${400}             | ${"[request body.cron.prefix]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #, *."}
     ${'cron.prefix'}                    | ${'test*'}           | ${400}             | ${"[request body.cron.prefix]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #, *."}
     ${'cron.statistics.apis'}           | ${['test']}          | ${200}             | ${null}
-    ${'cron.statistics.apis'}           | ${['test ']}         | ${400}             | ${"[request body.cron.statistics.apis.0]: It can't contain spaces."}
+    ${'cron.statistics.apis'}           | ${['test ']}         | ${400}             | ${"[request body.cron.statistics.apis.0]: No whitespaces allowed."}
     ${'cron.statistics.apis'}           | ${['']}              | ${400}             | ${"[request body.cron.statistics.apis.0]: Value can not be empty."}
-    ${'cron.statistics.apis'}           | ${['test', 4]}       | ${400}             | ${"[request body.cron.statistics.apis.1]: expected value of type [string] but got [number]"}    
+    ${'cron.statistics.apis'}           | ${['test', 4]}       | ${400}             | ${"[request body.cron.statistics.apis.1]: expected value of type [string] but got [number]"}
     ${'cron.statistics.apis'}           | ${'test space'}      | ${400}             | ${"[request body.cron.statistics.apis]: could not parse array value from json input"}
     ${'cron.statistics.apis'}           | ${true}              | ${400}             | ${"[request body.cron.statistics.apis]: expected value of type [array] but got [boolean]"}
     ${'cron.statistics.index.creation'} | ${'h'}               | ${200}             | ${null}
@@ -269,7 +269,7 @@ hosts:
     ${'cron.statistics.index.creation'} | ${'test'}            | ${400}             | ${"[request body.cron.statistics.index.creation]: types that failed validation:\n- [request body.cron.statistics.index.creation.0]: expected value to equal [h]\n- [request body.cron.statistics.index.creation.1]: expected value to equal [d]\n- [request body.cron.statistics.index.creation.2]: expected value to equal [w]\n- [request body.cron.statistics.index.creation.3]: expected value to equal [m]"}
     ${'cron.statistics.index.name'}     | ${'test'}            | ${200}             | ${null}
     ${'cron.statistics.index.name'}     | ${''}                | ${400}             | ${"[request body.cron.statistics.index.name]: Value can not be empty."}
-    ${'cron.statistics.index.name'}     | ${'test space'}      | ${400}             | ${"[request body.cron.statistics.index.name]: It can't contain spaces."}
+    ${'cron.statistics.index.name'}     | ${'test space'}      | ${400}             | ${"[request body.cron.statistics.index.name]: No whitespaces allowed."}
     ${'cron.statistics.index.name'}     | ${true}              | ${400}             | ${"[request body.cron.statistics.index.name]: expected value of type [string] but got [boolean]"}
     ${'cron.statistics.index.name'}     | ${'-test'}           | ${400}             | ${"[request body.cron.statistics.index.name]: It can't start with: -, _, +, .."}
     ${'cron.statistics.index.name'}     | ${'_test'}           | ${400}             | ${"[request body.cron.statistics.index.name]: It can't start with: -, _, +, .."}
@@ -300,11 +300,11 @@ hosts:
     ${'cron.statistics.status'}         | ${0}                 | ${400}             | ${'[request body.cron.statistics.status]: expected value of type [boolean] but got [number]'}
     ${'disabled_roles'}                 | ${['test']}          | ${200}             | ${null}
     ${'disabled_roles'}                 | ${['']}              | ${400}             | ${'[request body.disabled_roles.0]: Value can not be empty.'}
-    ${'disabled_roles'}                 | ${['test space']}    | ${400}             | ${"[request body.disabled_roles.0]: It can't contain spaces."}
-    ${'disabled_roles'}                 | ${['test', 4]}       | ${400}             | ${"[request body.disabled_roles.1]: expected value of type [string] but got [number]"}    
+    ${'disabled_roles'}                 | ${['test space']}    | ${400}             | ${"[request body.disabled_roles.0]: No whitespaces allowed."}
+    ${'disabled_roles'}                 | ${['test', 4]}       | ${400}             | ${"[request body.disabled_roles.1]: expected value of type [string] but got [number]"}
     ${'enrollment.dns'}                 | ${'test'}            | ${200}             | ${null}
     ${'enrollment.dns'}                 | ${''}                | ${200}             | ${null}
-    ${'enrollment.dns'}                 | ${'test space'}      | ${400}             | ${"[request body.enrollment.dns]: It can't contain spaces."}
+    ${'enrollment.dns'}                 | ${'test space'}      | ${400}             | ${"[request body.enrollment.dns]: No whitespaces allowed."}
     ${'enrollment.dns'}                 | ${true}              | ${400}             | ${'[request body.enrollment.dns]: expected value of type [string] but got [boolean]'}
     ${'enrollment.password'}            | ${'test'}            | ${200}             | ${null}
     ${'enrollment.password'}            | ${''}                | ${400}             | ${"[request body.enrollment.password]: Value can not be empty."}
@@ -337,7 +337,7 @@ hosts:
     ${'ip.ignore'}                      | ${['test']}          | ${200}             | ${null}
     ${'ip.ignore'}                      | ${['test*']}         | ${200}             | ${null}
     ${'ip.ignore'}                      | ${['']}              | ${400}             | ${'[request body.ip.ignore.0]: Value can not be empty.'}
-    ${'ip.ignore'}                      | ${['test space']}    | ${400}             | ${"[request body.ip.ignore.0]: It can't contain spaces."}
+    ${'ip.ignore'}                      | ${['test space']}    | ${400}             | ${"[request body.ip.ignore.0]: No whitespaces allowed."}
     ${'ip.ignore'}                      | ${true}              | ${400}             | ${"[request body.ip.ignore]: expected value of type [array] but got [boolean]"}
     ${'ip.ignore'}                      | ${['-test']}         | ${400}             | ${"[request body.ip.ignore.0]: It can't start with: -, _, +, .."}
     ${'ip.ignore'}                      | ${['_test']}         | ${400}             | ${"[request body.ip.ignore.0]: It can't start with: -, _, +, .."}
@@ -361,7 +361,7 @@ hosts:
     ${'pattern'}                        | ${'test'}            | ${200}             | ${null}
     ${'pattern'}                        | ${'test*'}           | ${200}             | ${null}
     ${'pattern'}                        | ${''}                | ${400}             | ${'[request body.pattern]: Value can not be empty.'}
-    ${'pattern'}                        | ${'test space'}      | ${400}             | ${"[request body.pattern]: It can't contain spaces."}
+    ${'pattern'}                        | ${'test space'}      | ${400}             | ${"[request body.pattern]: No whitespaces allowed."}
     ${'pattern'}                        | ${true}              | ${400}             | ${'[request body.pattern]: expected value of type [string] but got [boolean]'}
     ${'pattern'}                        | ${'-test'}           | ${400}             | ${"[request body.pattern]: It can't start with: -, _, +, .."}
     ${'pattern'}                        | ${'_test'}           | ${400}             | ${"[request body.pattern]: It can't start with: -, _, +, .."}

@@ -17,8 +17,8 @@ export class SettingsValidator{
 
 	/**
 	 * Check the value is a string
-	 * @param value 
-	 * @returns 
+	 * @param value
+	 * @returns
 	 */
 	static isString(value: unknown): string | undefined {
 		return typeof value === 'string' ? undefined : "Value is not a string.";
@@ -26,17 +26,17 @@ export class SettingsValidator{
 
 	/**
 	 * Check the string has no spaces
-	 * @param value 
-	 * @returns 
+	 * @param value
+	 * @returns
 	 */
 	static hasNoSpaces(value: string): string | undefined {
-		return /^\S*$/.test(value) ? undefined : "It can't contain spaces.";
+		return /^\S*$/.test(value) ? undefined : "No whitespaces allowed.";
 	};
 
 	/**
 	 * Check the string has no empty
-	 * @param value 
-	 * @returns 
+	 * @param value
+	 * @returns
 	 */
 	static isNotEmptyString(value: string): string | undefined {
 		if (typeof value === 'string') {
@@ -50,8 +50,8 @@ export class SettingsValidator{
 
 	/**
 	 * Check the number of string lines is limited
-	 * @param options 
-	 * @returns 
+	 * @param options
+	 * @returns
 	 */
 	static multipleLinesString(options: { min?: number, max?: number } = {}){
 		return function (value: number){
@@ -67,8 +67,8 @@ export class SettingsValidator{
 
 	/**
 	 * Creates a function that checks the string does not contain some characters
-	 * @param invalidCharacters 
-	 * @returns 
+	 * @param invalidCharacters
+	 * @returns
 	 */
 	static hasNotInvalidCharacters(...invalidCharacters: string[]){
 		return function (value: string): string | undefined {
@@ -80,8 +80,8 @@ export class SettingsValidator{
 
 	/**
 	 * Creates a function that checks the string does not start with a substring
-	 * @param invalidStartingCharacters 
-	 * @returns 
+	 * @param invalidStartingCharacters
+	 * @returns
 	 */
 	static noStartsWithString(...invalidStartingCharacters: string[]) {
 		return function (value: string): string | undefined {
@@ -93,8 +93,8 @@ export class SettingsValidator{
 
 	/**
 	 * Creates a function that checks the string is not equals to some values
-	 * @param invalidLiterals 
-	 * @returns 
+	 * @param invalidLiterals
+	 * @returns
 	 */
 	static noLiteralString(...invalidLiterals: string[]){
 		return function (value: string): string | undefined {
@@ -106,8 +106,8 @@ export class SettingsValidator{
 
 	/**
 	 * Check the value is a boolean
-	 * @param value 
-	 * @returns 
+	 * @param value
+	 * @returns
 	 */
 	static isBoolean(value: string): string | undefined {
 		return typeof value === 'boolean'
@@ -117,8 +117,8 @@ export class SettingsValidator{
 
 	/**
 	 * Check the value is a number between some optional limits
-	 * @param options 
-	 * @returns 
+	 * @param options
+	 * @returns
 	 */
 	static number(options: { min?: number, max?: number, integer?: boolean } = {}) {
 		return function (value: number){
@@ -130,7 +130,7 @@ export class SettingsValidator{
 			) {
 				return 'Number should be an integer.'
 			};
-			
+
 			const valueNumber = typeof value === 'string' ? Number(value) : value;
 
 			if (typeof options.min !== 'undefined' && valueNumber < options.min) {
@@ -138,14 +138,14 @@ export class SettingsValidator{
 			};
 			if (typeof options.max !== 'undefined' && valueNumber > options.max) {
 				return `Value should be lower or equal than ${options.max}.`;
-			};			
+			};
 		};
 	};
 
 	/**
-	 * Creates a function that checks if the value is a json 
+	 * Creates a function that checks if the value is a json
 	 * @param validateParsed Optional parameter to validate the parsed object
-	 * @returns 
+	 * @returns
 	 */
 	static json(validateParsed: (object: any) => string | undefined) {
 		return function (value: string){
@@ -156,7 +156,7 @@ export class SettingsValidator{
 			} catch (error) {
 				return "Value can't be parsed. There is some error.";
 			};
-		
+
 			return validateParsed ? validateParsed(jsonObject) : undefined;
 		};
 	};
@@ -164,7 +164,7 @@ export class SettingsValidator{
 	/**
 	 * Creates a function that checks is the value is an array and optionally validates each element
 	 * @param validationElement Optional function to validate each element of the array
-	 * @returns 
+	 * @returns
 	 */
 	static array(validationElement: (json: any) => string | undefined) {
 		return function(value: unknown[]) {
@@ -172,18 +172,18 @@ export class SettingsValidator{
 			if (!Array.isArray(value)) {
 				return 'Value is not a valid list.';
 			};
-		
-			return validationElement 
+
+			return validationElement
 				? value.reduce((accum, elementValue) => {
 					if (accum) {
 						return accum;
 					};
-			
+
 					const resultValidationElement = validationElement(elementValue);
 					if (resultValidationElement) {
 						return resultValidationElement;
 					};
-			
+
 					return accum;
 				}, undefined)
 				: undefined;
@@ -193,7 +193,7 @@ export class SettingsValidator{
 	/**
 	 * Creates a function that checks if the value is equal to list of values
 	 * @param literals Array of values to compare
-	 * @returns 
+	 * @returns
 	 */
 	static literal(literals: unknown[]){
 		return function(value: any): string | undefined{

@@ -5,7 +5,7 @@ describe('[settings] Input validation', () => {
     setting | value | expectedValidation
     ${'alerts.sample.prefix'}           | ${'test'}            | ${undefined}
     ${'alerts.sample.prefix'}           | ${''}                | ${"Value can not be empty."}
-    ${'alerts.sample.prefix'}           | ${'test space'}      | ${"It can't contain spaces."}
+    ${'alerts.sample.prefix'}           | ${'test space'}      | ${"No whitespaces allowed."}
     ${'alerts.sample.prefix'}           | ${'-test'}           | ${"It can't start with: -, _, +, .."}
     ${'alerts.sample.prefix'}           | ${'_test'}           | ${"It can't start with: -, _, +, .."}
     ${'alerts.sample.prefix'}           | ${'+test'}           | ${"It can't start with: -, _, +, .."}
@@ -35,7 +35,7 @@ describe('[settings] Input validation', () => {
     ${'checks.timeFilter'}              | ${true}              | ${undefined}
     ${'checks.timeFilter'}              | ${0}                 | ${'It should be a boolean. Allowed values: true or false.'}
     ${'cron.prefix'}                    | ${'test'}            | ${undefined}
-    ${'cron.prefix'}                    | ${'test space'}      | ${"It can't contain spaces."}
+    ${'cron.prefix'}                    | ${'test space'}      | ${"No whitespaces allowed."}
     ${'cron.prefix'}                    | ${''}                | ${"Value can not be empty."}
     ${'cron.prefix'}                    | ${'-test'}           | ${"It can't start with: -, _, +, .."}
     ${'cron.prefix'}                    | ${'_test'}           | ${"It can't start with: -, _, +, .."}
@@ -52,9 +52,9 @@ describe('[settings] Input validation', () => {
     ${'cron.prefix'}                    | ${'test#'}           | ${"It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #, *."}
     ${'cron.prefix'}                    | ${'test*'}           | ${"It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #, *."}
     ${'cron.statistics.apis'}           | ${['test']}          | ${undefined}
-    ${'cron.statistics.apis'}           | ${['test ']}         | ${"It can't contain spaces."}
+    ${'cron.statistics.apis'}           | ${['test ']}         | ${"No whitespaces allowed."}
     ${'cron.statistics.apis'}           | ${['']}              | ${"Value can not be empty."}
-    ${'cron.statistics.apis'}           | ${['test', 4]}       | ${"Value is not a string."}    
+    ${'cron.statistics.apis'}           | ${['test', 4]}       | ${"Value is not a string."}
     ${'cron.statistics.apis'}           | ${'test space'}      | ${"Value is not a valid list."}
     ${'cron.statistics.apis'}           | ${true}              | ${"Value is not a valid list."}
     ${'cron.statistics.index.creation'} | ${'h'}               | ${undefined}
@@ -64,7 +64,7 @@ describe('[settings] Input validation', () => {
     ${'cron.statistics.index.creation'} | ${'test'}            | ${"Invalid value. Allowed values: h, d, w, m."}
     ${'cron.statistics.index.name'}     | ${'test'}            | ${undefined}
     ${'cron.statistics.index.name'}     | ${''}                | ${"Value can not be empty."}
-    ${'cron.statistics.index.name'}     | ${'test space'}      | ${"It can't contain spaces."}
+    ${'cron.statistics.index.name'}     | ${'test space'}      | ${"No whitespaces allowed."}
     ${'cron.statistics.index.name'}     | ${'-test'}           | ${"It can't start with: -, _, +, .."}
     ${'cron.statistics.index.name'}     | ${'_test'}           | ${"It can't start with: -, _, +, .."}
     ${'cron.statistics.index.name'}     | ${'+test'}           | ${"It can't start with: -, _, +, .."}
@@ -95,11 +95,11 @@ describe('[settings] Input validation', () => {
     ${'cron.statistics.status'}         | ${0}                 | ${'It should be a boolean. Allowed values: true or false.'}
     ${'disabled_roles'}                 | ${['test']}          | ${undefined}
     ${'disabled_roles'}                 | ${['']}              | ${'Value can not be empty.'}
-    ${'disabled_roles'}                 | ${['test space']}    | ${"It can't contain spaces."}
-    ${'disabled_roles'}                 | ${['test', 4]}       | ${"Value is not a string."}    
+    ${'disabled_roles'}                 | ${['test space']}    | ${"No whitespaces allowed."}
+    ${'disabled_roles'}                 | ${['test', 4]}       | ${"Value is not a string."}
     ${'enrollment.dns'}                 | ${'test'}            | ${undefined}
     ${'enrollment.dns'}                 | ${''}                | ${undefined}
-    ${'enrollment.dns'}                 | ${'test space'}      | ${"It can't contain spaces."}
+    ${'enrollment.dns'}                 | ${'test space'}      | ${"No whitespaces allowed."}
     ${'enrollment.password'}            | ${'test'}            | ${undefined}
     ${'enrollment.password'}            | ${''}                | ${"Value can not be empty."}
     ${'enrollment.password'}            | ${'test space'}      | ${undefined}
@@ -130,7 +130,7 @@ describe('[settings] Input validation', () => {
     ${'ip.ignore'}                      | ${['test']}          | ${undefined}
     ${'ip.ignore'}                      | ${['test*']}         | ${undefined}
     ${'ip.ignore'}                      | ${['']}              | ${'Value can not be empty.'}
-    ${'ip.ignore'}                      | ${['test space']}    | ${"It can't contain spaces."}
+    ${'ip.ignore'}                      | ${['test space']}    | ${"No whitespaces allowed."}
     ${'ip.ignore'}                      | ${true}              | ${"Value is not a valid list."}
     ${'ip.ignore'}                      | ${['-test']}         | ${"It can't start with: -, _, +, .."}
     ${'ip.ignore'}                      | ${['_test']}         | ${"It can't start with: -, _, +, .."}
@@ -154,7 +154,7 @@ describe('[settings] Input validation', () => {
     ${'pattern'}                        | ${'test'}            | ${undefined}
     ${'pattern'}                        | ${'test*'}           | ${undefined}
     ${'pattern'}                        | ${''}                | ${'Value can not be empty.'}
-    ${'pattern'}                        | ${'test space'}      | ${"It can't contain spaces."}
+    ${'pattern'}                        | ${'test space'}      | ${"No whitespaces allowed."}
     ${'pattern'}                        | ${'-test'}           | ${"It can't start with: -, _, +, .."}
     ${'pattern'}                        | ${'_test'}           | ${"It can't start with: -, _, +, .."}
     ${'pattern'}                        | ${'+test'}           | ${"It can't start with: -, _, +, .."}
