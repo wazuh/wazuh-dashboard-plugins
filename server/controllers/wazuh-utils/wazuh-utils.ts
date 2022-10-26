@@ -201,7 +201,7 @@ export class WazuhUtilsCtrl {
       files.forEach(fs.unlinkSync);
 
       // Update the setting in the configuration cache
-      const pluginSettingValue = getSettingDefaultValue(key);
+      const pluginSettingValue = pluginSetting.defaultValue;
       await updateConfigurationFile.updateConfiguration({[key]: pluginSettingValue}); 
 
       return response.ok({
