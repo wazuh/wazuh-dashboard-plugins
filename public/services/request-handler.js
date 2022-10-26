@@ -7,7 +7,7 @@ export const request = async (info) => {
     core.http.intercept({
         responseError: (httpErrorResponse, controller) => {
             if (
-                httpErrorResponse.response?.status === 401 && httpErrorResponse.response?.statusText === 'Unauthorized'
+                httpErrorResponse.response?.status === 401 && httpErrorResponse.body?.message === 'Unauthorized'
             ) {
                 allow = false;
                 window.location.reload();
