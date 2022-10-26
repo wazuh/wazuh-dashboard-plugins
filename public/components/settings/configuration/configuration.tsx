@@ -29,10 +29,9 @@ import {
 import store from '../../../redux/store'
 import { updateSelectedSettingsSection } from '../../../redux/actions/appStateActions';
 import { withUserAuthorizationPrompt, withErrorBoundary, withReduxProvider } from '../../common/hocs';
-import { EpluginSettingType, PLUGIN_PLATFORM_NAME, PLUGIN_SETTINGS, PLUGIN_SETTINGS_CATEGORIES, UI_LOGGER_LEVELS, WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../../common/constants';
+import { EpluginSettingType, PLUGIN_SETTINGS, PLUGIN_SETTINGS_CATEGORIES, UI_LOGGER_LEVELS, WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../../common/constants';
 import { compose } from 'redux';
 import { getPluginSettingDescription, getSettingsDefaultList, groupSettingsByCategory, getCategorySettingByTitle } from '../../../../common/services/settings';
-import _ from 'lodash';
 import { Category } from './components/categories/components';
 import { WzRequest } from '../../../react-services';
 import { UIErrorLog, UIErrorSeverity, UILogLevel, UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
@@ -196,10 +195,7 @@ const WzConfigurationSettingsProvider = (props) => {
               // https://github.com/elastic/eui/blob/v29.3.2/src/components/form/file_picker/file_picker.tsx#L107-L108
               {stopPropagation: () => {}, preventDefault: () => {}}
             );
-          }catch(error){
-            // TODO: There is an error related to accessing to `target` of undefined
-            // that we should review it.
-          }
+          }catch(error){ };
         });
       };
 
@@ -247,10 +243,7 @@ const WzConfigurationSettingsProvider = (props) => {
           // https://github.com/elastic/eui/blob/v29.3.2/src/components/form/file_picker/file_picker.tsx#L107-L108
           {stopPropagation: () => {}, preventDefault: () => {}}
         );
-      }catch(error){
-        // TODO: There is an error related to accessing to `target` of undefined
-        // that we should review it.
-      }
+      }catch(error){ };
     });
     undoChanges();
   };

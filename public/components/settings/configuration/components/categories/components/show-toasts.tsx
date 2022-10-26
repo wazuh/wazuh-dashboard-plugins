@@ -5,25 +5,24 @@ import {
 	EuiFlexItem,
 } from '@elastic/eui';
 import { PLUGIN_PLATFORM_NAME } from '../../../../../../../common/constants';
-import _ from 'lodash';
 import { getToasts } from '../../../../../../kibana-services';
 
 export const toastRequiresReloadingBrowserTab = () => {
 	getToasts().add({
 	  color: 'success',
-	  title: 'This setting requires you to reload the page to take effect.',
+	  title: 'Reload the page to apply the changes',
 	  text: <EuiFlexGroup justifyContent="flexEnd" gutterSize="s">
 		<EuiFlexItem grow={false}>
 		  <EuiButton onClick={() => window.location.reload()} size="s">Reload page</EuiButton>
 		</EuiFlexItem>
 	  </EuiFlexGroup>
 	});
-  };
+};
   
 export const toastRequiresRunningHealthcheck = () => {
 	const toast = getToasts().add({
 	  color: 'warning',
-	  title: 'You must execute the health check for the changes to take effect',
+	  title: 'Run a health check to apply the changes.',
 	  toastLifeTimeMs: 5000,
 	  text:
 		<EuiFlexGroup alignItems="center" gutterSize="s">
@@ -35,18 +34,18 @@ export const toastRequiresRunningHealthcheck = () => {
 		  </EuiFlexItem>
 		</EuiFlexGroup>
 	});
-  };
+};
   
 export const toastRequiresRestartingPluginPlatform = () => {
 	getToasts().add({
 	  color: 'warning',
-	  title: `You must restart ${PLUGIN_PLATFORM_NAME} for the changes to take effect`,
+	  title: `Restart ${PLUGIN_PLATFORM_NAME} to apply the changes`,
 	});
-  };
+};
   
 export const toastSuccessUpdateConfiguration = () => {
 	getToasts().add({
 	  color: 'success',
 	  title: 'The configuration has been successfully updated',
 	});
-  };
+};
