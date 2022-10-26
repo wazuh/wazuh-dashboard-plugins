@@ -13,8 +13,6 @@ import {
   WAZUH_DATA_ABSOLUTE_PATH,
   WAZUH_DATA_CONFIG_APP_PATH,
   WAZUH_DATA_CONFIG_DIRECTORY_PATH,
-  WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH,
-  WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH,
   WAZUH_DATA_LOGS_DIRECTORY_PATH,
   WAZUH_DATA_LOGS_RAW_PATH,
 } from "../../../common/constants";
@@ -40,7 +38,7 @@ beforeAll(async () => {
   createDirectoryIfNotExists(WAZUH_DATA_CONFIG_DIRECTORY_PATH);
 
   // Create <PLUGIN_PLATFORM_PATH>/data/wazuh/logs directory.
-  createDirectoryIfNotExists(WAZUH_DATA_LOGS_DIRECTORY_PATH);  
+  createDirectoryIfNotExists(WAZUH_DATA_LOGS_DIRECTORY_PATH);
 
   // Create server
   const config = {
@@ -61,7 +59,7 @@ beforeAll(async () => {
   innerServer = innerServerTest;
 
   const spyRouteDecoratorProtectedAdministratorRoleValidToken = jest.spyOn(WazuhUtilsCtrl.prototype as any, 'routeDecoratorProtectedAdministratorRoleValidToken')
-  .mockImplementation((handler) => async (...args) => handler(...args));
+    .mockImplementation((handler) => async (...args) => handler(...args));
 
   // Register routes
   WazuhUtilsRoutes(router);
@@ -139,12 +137,12 @@ hosts:
     // Remove the configuration file
     fs.unlinkSync(WAZUH_DATA_CONFIG_APP_PATH);
   });
-  
+
   it.each`
     settings                                                   | responseStatusCode
-    ${{pattern: 'test-alerts-groupA-*'}}                       | ${200}
-    ${{pattern: 'test-alerts-groupA-*','logs.level': 'debug'}} | ${200}
-  `(`Update the plugin configuration: $settings. PUT /utils/configuration - $responseStatusCode`, async ({responseStatusCode, settings}) => {
+    ${{ pattern: 'test-alerts-groupA-*' }}                       | ${200}
+    ${{ pattern: 'test-alerts-groupA-*', 'logs.level': 'debug' }} | ${200}
+  `(`Update the plugin configuration: $settings. PUT /utils/configuration - $responseStatusCode`, async ({ responseStatusCode, settings }) => {
     const response = await supertest(innerServer.listener)
       .put('/utils/configuration')
       .send(settings)
@@ -183,7 +181,7 @@ hosts:
     },
     {
       testTitle: 'Bad request, unknown setting',
-      settings: { 'unknown.setting': 'test-alerts-groupA-*','logs.level': 'debug' },
+      settings: { 'unknown.setting': 'test-alerts-groupA-*', 'logs.level': 'debug' },
       responseStatusCode: 400,
       responseBodyMessage: '[request body.unknown.setting]: definition for this key is missing'
     },
@@ -193,24 +191,24 @@ hosts:
       responseStatusCode: 400,
       responseBodyMessage: '[request body.cron.statistics.apis.0]: expected value of type [string] but got [number]'
     }
-  ])(`$testTitle: $settings. PUT /utils/configuration - $responseStatusCode`, async ({responseBodyMessage, responseStatusCode, settings}) => {
+  ])(`$testTitle: $settings. PUT /utils/configuration - $responseStatusCode`, async ({ responseBodyMessage, responseStatusCode, settings }) => {
     const response = await supertest(innerServer.listener)
       .put('/utils/configuration')
       .send(settings)
       .expect(responseStatusCode);
 
-      responseStatusCode === 200 && expect(response.body.data.updatedConfiguration).toEqual(settings);
-      responseStatusCode === 200 && expect(response.body.data.requiresRunningHealthCheck).toBeDefined();
-      responseStatusCode === 200 && expect(response.body.data.requiresReloadingBrowserTab).toBeDefined();
-      responseStatusCode === 200 && expect(response.body.data.requiresRestartingPluginPlatform).toBeDefined();
-      responseBodyMessage && expect(response.body.message).toMatch(responseBodyMessage);
+    responseStatusCode === 200 && expect(response.body.data.updatedConfiguration).toEqual(settings);
+    responseStatusCode === 200 && expect(response.body.data.requiresRunningHealthCheck).toBeDefined();
+    responseStatusCode === 200 && expect(response.body.data.requiresReloadingBrowserTab).toBeDefined();
+    responseStatusCode === 200 && expect(response.body.data.requiresRestartingPluginPlatform).toBeDefined();
+    responseBodyMessage && expect(response.body.message).toMatch(responseBodyMessage);
   });
 
   it.each`
     setting                             | value                | responseStatusCode | responseBodyMessage
     ${'alerts.sample.prefix'}           | ${'test'}            | ${200}             | ${null}
     ${'alerts.sample.prefix'}           | ${''}                | ${400}             | ${"[request body.alerts.sample.prefix]: Value can not be empty."}
-    ${'alerts.sample.prefix'}           | ${'test space'}      | ${400}             | ${"[request body.alerts.sample.prefix]: It can't contain spaces."}
+    ${'alerts.sample.prefix'}           | ${'test space'}      | ${400}             | ${"[request body.alerts.sample.prefix]: No whitespaces allowed."}
     ${'alerts.sample.prefix'}           | ${4}                 | ${400}             | ${'[request body.alerts.sample.prefix]: expected value of type [string] but got [number]'}
     ${'alerts.sample.prefix'}           | ${'-test'}           | ${400}             | ${"[request body.alerts.sample.prefix]: It can't start with: -, _, +, .."}
     ${'alerts.sample.prefix'}           | ${'_test'}           | ${400}             | ${"[request body.alerts.sample.prefix]: It can't start with: -, _, +, .."}
@@ -241,7 +239,7 @@ hosts:
     ${'checks.timeFilter'}              | ${true}              | ${200}             | ${null}
     ${'checks.timeFilter'}              | ${0}                 | ${400}             | ${'[request body.checks.timeFilter]: expected value of type [boolean] but got [number]'}
     ${'cron.prefix'}                    | ${'test'}            | ${200}             | ${null}
-    ${'cron.prefix'}                    | ${'test space'}      | ${400}             | ${"[request body.cron.prefix]: It can't contain spaces."}
+    ${'cron.prefix'}                    | ${'test space'}      | ${400}             | ${"[request body.cron.prefix]: No whitespaces allowed."}
     ${'cron.prefix'}                    | ${''}                | ${400}             | ${"[request body.cron.prefix]: Value can not be empty."}
     ${'cron.prefix'}                    | ${4}                 | ${400}             | ${'[request body.cron.prefix]: expected value of type [string] but got [number]'}
     ${'cron.prefix'}                    | ${'-test'}           | ${400}             | ${"[request body.cron.prefix]: It can't start with: -, _, +, .."}
@@ -259,7 +257,7 @@ hosts:
     ${'cron.prefix'}                    | ${'test#'}           | ${400}             | ${"[request body.cron.prefix]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #, *."}
     ${'cron.prefix'}                    | ${'test*'}           | ${400}             | ${"[request body.cron.prefix]: It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #, *."}
     ${'cron.statistics.apis'}           | ${['test']}          | ${200}             | ${null}
-    ${'cron.statistics.apis'}           | ${['test ']}         | ${400}             | ${"[request body.cron.statistics.apis.0]: It can't contain spaces."}
+    ${'cron.statistics.apis'}           | ${['test ']}         | ${400}             | ${"[request body.cron.statistics.apis.0]: No whitespaces allowed."}
     ${'cron.statistics.apis'}           | ${['']}              | ${400}             | ${"[request body.cron.statistics.apis.0]: Value can not be empty."}
     ${'cron.statistics.apis'}           | ${['test', 4]}       | ${400}             | ${"[request body.cron.statistics.apis.1]: expected value of type [string] but got [number]"}    
     ${'cron.statistics.apis'}           | ${'test space'}      | ${400}             | ${"[request body.cron.statistics.apis]: could not parse array value from json input"}
@@ -271,7 +269,7 @@ hosts:
     ${'cron.statistics.index.creation'} | ${'test'}            | ${400}             | ${"[request body.cron.statistics.index.creation]: types that failed validation:\n- [request body.cron.statistics.index.creation.0]: expected value to equal [h]\n- [request body.cron.statistics.index.creation.1]: expected value to equal [d]\n- [request body.cron.statistics.index.creation.2]: expected value to equal [w]\n- [request body.cron.statistics.index.creation.3]: expected value to equal [m]"}
     ${'cron.statistics.index.name'}     | ${'test'}            | ${200}             | ${null}
     ${'cron.statistics.index.name'}     | ${''}                | ${400}             | ${"[request body.cron.statistics.index.name]: Value can not be empty."}
-    ${'cron.statistics.index.name'}     | ${'test space'}      | ${400}             | ${"[request body.cron.statistics.index.name]: It can't contain spaces."}
+    ${'cron.statistics.index.name'}     | ${'test space'}      | ${400}             | ${"[request body.cron.statistics.index.name]: No whitespaces allowed."}
     ${'cron.statistics.index.name'}     | ${true}              | ${400}             | ${"[request body.cron.statistics.index.name]: expected value of type [string] but got [boolean]"}
     ${'cron.statistics.index.name'}     | ${'-test'}           | ${400}             | ${"[request body.cron.statistics.index.name]: It can't start with: -, _, +, .."}
     ${'cron.statistics.index.name'}     | ${'_test'}           | ${400}             | ${"[request body.cron.statistics.index.name]: It can't start with: -, _, +, .."}
@@ -302,11 +300,11 @@ hosts:
     ${'cron.statistics.status'}         | ${0}                 | ${400}             | ${'[request body.cron.statistics.status]: expected value of type [boolean] but got [number]'}
     ${'disabled_roles'}                 | ${['test']}          | ${200}             | ${null}
     ${'disabled_roles'}                 | ${['']}              | ${400}             | ${'[request body.disabled_roles.0]: Value can not be empty.'}
-    ${'disabled_roles'}                 | ${['test space']}    | ${400}             | ${"[request body.disabled_roles.0]: It can't contain spaces."}
+    ${'disabled_roles'}                 | ${['test space']}    | ${400}             | ${"[request body.disabled_roles.0]: No whitespaces allowed."}
     ${'disabled_roles'}                 | ${['test', 4]}       | ${400}             | ${"[request body.disabled_roles.1]: expected value of type [string] but got [number]"}    
     ${'enrollment.dns'}                 | ${'test'}            | ${200}             | ${null}
     ${'enrollment.dns'}                 | ${''}                | ${200}             | ${null}
-    ${'enrollment.dns'}                 | ${'test space'}      | ${400}             | ${"[request body.enrollment.dns]: It can't contain spaces."}
+    ${'enrollment.dns'}                 | ${'test space'}      | ${400}             | ${"[request body.enrollment.dns]: No whitespaces allowed."}
     ${'enrollment.dns'}                 | ${true}              | ${400}             | ${'[request body.enrollment.dns]: expected value of type [string] but got [boolean]'}
     ${'enrollment.password'}            | ${'test'}            | ${200}             | ${null}
     ${'enrollment.password'}            | ${''}                | ${400}             | ${"[request body.enrollment.password]: Value can not be empty."}
@@ -339,7 +337,7 @@ hosts:
     ${'ip.ignore'}                      | ${['test']}          | ${200}             | ${null}
     ${'ip.ignore'}                      | ${['test*']}         | ${200}             | ${null}
     ${'ip.ignore'}                      | ${['']}              | ${400}             | ${'[request body.ip.ignore.0]: Value can not be empty.'}
-    ${'ip.ignore'}                      | ${['test space']}    | ${400}             | ${"[request body.ip.ignore.0]: It can't contain spaces."}
+    ${'ip.ignore'}                      | ${['test space']}    | ${400}             | ${"[request body.ip.ignore.0]: No whitespaces allowed."}
     ${'ip.ignore'}                      | ${true}              | ${400}             | ${"[request body.ip.ignore]: expected value of type [array] but got [boolean]"}
     ${'ip.ignore'}                      | ${['-test']}         | ${400}             | ${"[request body.ip.ignore.0]: It can't start with: -, _, +, .."}
     ${'ip.ignore'}                      | ${['_test']}         | ${400}             | ${"[request body.ip.ignore.0]: It can't start with: -, _, +, .."}
@@ -363,7 +361,7 @@ hosts:
     ${'pattern'}                        | ${'test'}            | ${200}             | ${null}
     ${'pattern'}                        | ${'test*'}           | ${200}             | ${null}
     ${'pattern'}                        | ${''}                | ${400}             | ${'[request body.pattern]: Value can not be empty.'}
-    ${'pattern'}                        | ${'test space'}      | ${400}             | ${"[request body.pattern]: It can't contain spaces."}
+    ${'pattern'}                        | ${'test space'}      | ${400}             | ${"[request body.pattern]: No whitespaces allowed."}
     ${'pattern'}                        | ${true}              | ${400}             | ${'[request body.pattern]: expected value of type [string] but got [boolean]'}
     ${'pattern'}                        | ${'-test'}           | ${400}             | ${"[request body.pattern]: It can't start with: -, _, +, .."}
     ${'pattern'}                        | ${'_test'}           | ${400}             | ${"[request body.pattern]: It can't start with: -, _, +, .."}
@@ -418,19 +416,19 @@ hosts:
     ${'wazuh.monitoring.shards'}        | ${-1}                | ${400}             | ${"[request body.wazuh.monitoring.shards]: Value should be greater or equal than 1."}
     ${'wazuh.monitoring.shards'}        | ${1.2}               | ${400}             | ${"[request body.wazuh.monitoring.shards]: Number should be an integer."}
     ${'wazuh.monitoring.shards'}        | ${'custom'}          | ${400}             | ${"[request body.wazuh.monitoring.shards]: expected value of type [number] but got [string]"}
-  `(`$setting: $value - PUT /utils/configuration - $responseStatusCode`, async ({responseBodyMessage, responseStatusCode, setting, value}) => {
-    const body = {[setting]: value};
+  `(`$setting: $value - PUT /utils/configuration - $responseStatusCode`, async ({ responseBodyMessage, responseStatusCode, setting, value }) => {
+    const body = { [setting]: value };
     const response = await supertest(innerServer.listener)
       .put('/utils/configuration')
       .send(body)
       .expect(responseStatusCode);
 
-      responseStatusCode === 200 && expect(response.body.data.updatedConfiguration).toEqual(body);
-      responseStatusCode === 200 && expect(response.body.data.requiresRunningHealthCheck).toBe(Boolean(PLUGIN_SETTINGS[setting].requiresRunningHealthCheck));
-      responseStatusCode === 200 && expect(response.body.data.requiresReloadingBrowserTab).toBe(Boolean(PLUGIN_SETTINGS[setting].requiresReloadingBrowserTab));
-      responseStatusCode === 200 && expect(response.body.data.requiresRestartingPluginPlatform).toBe(Boolean(PLUGIN_SETTINGS[setting].requiresRestartingPluginPlatform));
-      responseBodyMessage && expect(response.body.message).toMatch(responseBodyMessage);
-  });  
+    responseStatusCode === 200 && expect(response.body.data.updatedConfiguration).toEqual(body);
+    responseStatusCode === 200 && expect(response.body.data.requiresRunningHealthCheck).toBe(Boolean(PLUGIN_SETTINGS[setting].requiresRunningHealthCheck));
+    responseStatusCode === 200 && expect(response.body.data.requiresReloadingBrowserTab).toBe(Boolean(PLUGIN_SETTINGS[setting].requiresReloadingBrowserTab));
+    responseStatusCode === 200 && expect(response.body.data.requiresRestartingPluginPlatform).toBe(Boolean(PLUGIN_SETTINGS[setting].requiresRestartingPluginPlatform));
+    responseBodyMessage && expect(response.body.message).toMatch(responseBodyMessage);
+  });
 });
 
 describe('[endpoint] PUT /utils/configuration/files/{key} - Upload file', () => {
@@ -464,7 +462,7 @@ hosts:
     // Remove the configuration file
     fs.unlinkSync(WAZUH_DATA_CONFIG_APP_PATH);
   });
-  
+
   it.each`
     setting                             | filename                     | responseStatusCode | responseBodyMessage
     ${'customization.logo.unknown'}     | ${'fixture_image_small.jpg'} | ${400}             | ${'[request params.key]: types that failed validation:\n- [request params.key.0]: expected value to equal [customization.logo.app]\n- [request params.key.1]: expected value to equal [customization.logo.healthcheck]\n- [request params.key.2]: expected value to equal [customization.logo.reports]\n- [request params.key.3]: expected value to equal [customization.logo.sidebar]'}
@@ -484,7 +482,7 @@ hosts:
     ${'customization.logo.sidebar'}     | ${'fixture_image_small.png'} | ${200}             | ${null}
     ${'customization.logo.sidebar'}     | ${'fixture_image_small.svg'} | ${200}             | ${null}
     ${'customization.logo.sidebar'}     | ${'fixture_image_big.png'}   | ${413}             | ${'Payload content length greater than maximum allowed: 1048576'}
-  `(`$setting: $filename - PUT /utils/configuration/files/{key} - $responseStatusCode`, async ({responseBodyMessage, responseStatusCode, setting, filename}) => {
+  `(`$setting: $filename - PUT /utils/configuration/files/{key} - $responseStatusCode`, async ({ responseBodyMessage, responseStatusCode, setting, filename }) => {
     const filePath = path.join(__dirname, 'fixtures', filename);
     const extension = path.extname(filename);
 
@@ -499,9 +497,9 @@ hosts:
     responseStatusCode === 200 && expect(response.body.data.requiresReloadingBrowserTab).toBe(Boolean(PLUGIN_SETTINGS[setting].requiresReloadingBrowserTab));
     responseStatusCode === 200 && expect(response.body.data.requiresRestartingPluginPlatform).toBe(Boolean(PLUGIN_SETTINGS[setting].requiresRestartingPluginPlatform));
     responseBodyMessage && expect(response.body.message).toMatch(responseBodyMessage);
-    
+
     // Check the file was created in the expected path of the file system.
-    if(response?.body?.data?.updatedConfiguration?.[setting]){
+    if (response?.body?.data?.updatedConfiguration?.[setting]) {
       const targetFilepath = path.join(__dirname, '../../../', PLUGIN_SETTINGS[setting].options.file.store.relativePathFileSystem, `${PLUGIN_SETTINGS[setting].options.file.store.filename}${extension}`);
       const files = glob.sync(path.join(targetFilepath));
       expect(files[0]).toBeDefined();
@@ -542,7 +540,7 @@ hosts:
     // Remove the configuration file
     fs.unlinkSync(WAZUH_DATA_CONFIG_APP_PATH);
   });
-  
+
   it.each`
     setting                             | expectedValue | responseStatusCode | responseBodyMessage
     ${'customization.logo.unknown'}     | ${''}         | ${400} | ${'[request params.key]: types that failed validation:\n- [request params.key.0]: expected value to equal [customization.logo.app]\n- [request params.key.1]: expected value to equal [customization.logo.healthcheck]\n- [request params.key.2]: expected value to equal [customization.logo.reports]\n- [request params.key.3]: expected value to equal [customization.logo.sidebar]'}
@@ -550,10 +548,10 @@ hosts:
     ${'customization.logo.healthcheck'} | ${''}         | ${200} | ${'All files were removed and the configuration file was updated.'}
     ${'customization.logo.reports'}     | ${''}         | ${200} | ${'All files were removed and the configuration file was updated.'}
     ${'customization.logo.sidebar'}     | ${''}         | ${200} | ${'All files were removed and the configuration file was updated.'}
-  `(`$setting - PUT /utils/configuration - $responseStatusCode`, async ({responseBodyMessage, responseStatusCode, setting, expectedValue }) => {
+  `(`$setting - PUT /utils/configuration - $responseStatusCode`, async ({ responseBodyMessage, responseStatusCode, setting, expectedValue }) => {
 
     // If the setting is defined in the plugin
-    if(PLUGIN_SETTINGS[setting]){
+    if (PLUGIN_SETTINGS[setting]) {
       // Create the directory where the asset was stored.
       createDirectoryIfNotExists(path.join(__dirname, '../../../', PLUGIN_SETTINGS[setting].options.file.store.relativePathFileSystem));
 
@@ -571,9 +569,9 @@ hosts:
     responseStatusCode === 200 && expect(response.body.data.requiresReloadingBrowserTab).toBe(Boolean(PLUGIN_SETTINGS[setting].requiresReloadingBrowserTab));
     responseStatusCode === 200 && expect(response.body.data.requiresRestartingPluginPlatform).toBe(Boolean(PLUGIN_SETTINGS[setting].requiresRestartingPluginPlatform));
     responseBodyMessage && expect(response.body.message).toMatch(responseBodyMessage);
-    
+
     // Check the file was deleted from the expected path of the file system.
-    if(response?.body?.data?.updatedConfiguration?.[setting]){
+    if (response?.body?.data?.updatedConfiguration?.[setting]) {
       const targetFilepath = path.join(__dirname, '../../../', PLUGIN_SETTINGS[setting].options.file.store.relativePathFileSystem, `${PLUGIN_SETTINGS[setting].options.file.store.filename}.*`);
       const files = glob.sync(path.join(targetFilepath));
       expect(files).toHaveLength(0);

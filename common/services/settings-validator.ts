@@ -33,7 +33,7 @@ export class SettingsValidator {
    * @returns
    */
   static hasNoSpaces(value: string): string | undefined {
-    return /^\S*$/.test(value) ? undefined : "It can't contain spaces.";
+    return /^\S*$/.test(value) ? undefined : "No whitespaces allowed.";
   };
 
   /**
