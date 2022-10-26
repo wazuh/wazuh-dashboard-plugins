@@ -1031,22 +1031,22 @@ export const RegisterAgent = withErrorBoundary(
             />
             {this.state.selectedVersion == 'solaris10' || this.state.selectedVersion == 'solaris11' ? <EuiCallOut color="warning" className='message' iconType="iInCircle" title={
               <span>
-                Might require some extra installation<EuiLink target="_blank" href="https://documentation.wazuh.com/current/installation-guide/wazuh-agent/wazuh-agent-package-solaris.html"> steps</EuiLink>.
+                Might require some extra installation <EuiLink target="_blank" href="https://documentation.wazuh.com/current/installation-guide/wazuh-agent/wazuh-agent-package-solaris.html">steps</EuiLink>.
               </span>
             }>
             </EuiCallOut> : this.state.selectedVersion == '6.1 TL9' ? <EuiCallOut color="warning" className='message' iconType="iInCircle" title={
               <span>
-                Might require some extra installation<EuiLink target="_blank" href="https://documentation.wazuh.com/current/installation-guide/wazuh-agent/wazuh-agent-package-aix.html"> steps</EuiLink>.
+                Might require some extra installation <EuiLink target="_blank" href="https://documentation.wazuh.com/current/installation-guide/wazuh-agent/wazuh-agent-package-aix.html">steps</EuiLink>.
               </span>
             }>
             </EuiCallOut> : this.state.selectedVersion == '11.31' ? <EuiCallOut color="warning" className='message' iconType="iInCircle" title={
               <span>
-                Might require some extra installation<EuiLink target="_blank" href="https://documentation.wazuh.com/current/installation-guide/wazuh-agent/wazuh-agent-package-hpux.html"> steps</EuiLink>.
+                Might require some extra installation <EuiLink target="_blank" href="https://documentation.wazuh.com/current/installation-guide/wazuh-agent/wazuh-agent-package-hpux.html">steps</EuiLink>.
               </span>
             }>
             </EuiCallOut> : <EuiCallOut color="warning" className='message' iconType="iInCircle" title={
               <span>
-                The selected OS version reached its end of life (EOL). To install Wazuh follow our<EuiLink href="#"> guide</EuiLink>.
+                The selected OS version reached its end of life (EOL). To install Wazuh follow our <EuiLink href="#">guide</EuiLink>.
               </span>
             }>
             </EuiCallOut>}
