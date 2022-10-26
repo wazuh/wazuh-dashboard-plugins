@@ -24,7 +24,6 @@ import fs from 'fs';
 import path from 'path';
 import { createDirectoryIfNotExists } from '../../lib/filesystem';
 import glob from 'glob';
-import { getSettingDefaultValue } from '../../../common/services/settings';
 import { getFileExtensionFromBuffer } from '../../../common/services/file-extension';
 
 const updateConfigurationFile = new UpdateConfigurationFile();
