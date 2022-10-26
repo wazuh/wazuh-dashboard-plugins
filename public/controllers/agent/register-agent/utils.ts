@@ -4,11 +4,13 @@ import { ServerAddressOptions } from './steps/server-address';
 /**
  * Get a list of nodes and parsed into a string separated by semicolon
  * @param selectedNodes
+ * @param osSelected
  */
-export const parseNodeIPs = (selectedNodes: any): string => {
+export const parseNodeIPs = (selectedNodes: any, osSelected: string): string => {
+  const delimiter = osSelected === 'win' ? ';' : ',';
   let allNodeIps = '';
   if (selectedNodes.length > 1) {
-    allNodeIps = selectedNodes.map((o) => o.value).join(';');
+    allNodeIps = selectedNodes.map((o) => o.value).join(delimiter);
   } else if (selectedNodes.length === 1) {
     allNodeIps = selectedNodes[0].value;
   }

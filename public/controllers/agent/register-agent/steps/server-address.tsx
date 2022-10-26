@@ -47,7 +47,7 @@ export default function ServerAddress(props: Props) {
    */
   const handleOnChange = (value) => {
     setSelectedNodeIPs(value);
-    onChange(parseNodeIPs(value));
+    onChange(value);
   };
 
   /**

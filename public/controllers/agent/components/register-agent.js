@@ -43,7 +43,7 @@ import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
 import { architectureButtons, architectureButtonsi386, architecturei386Andx86_64, versionButtonsRaspbian, versionButtonsSuse, versionButtonsOracleLinux, versionButtonFedora, architectureButtonsSolaris, architectureButtonsWithPPC64LE, architectureButtonsOpenSuse, architectureButtonsAix, architectureButtonsHpUx, versionButtonAmazonLinux, versionButtonsRedHat, versionButtonsCentos, architectureButtonsMacos, osButtons, versionButtonsDebian, versionButtonsUbuntu, versionButtonsWindows, versionButtonsMacOS, versionButtonsOpenSuse, versionButtonsSolaris, versionButtonsAix, versionButtonsHPUX } from '../wazuh-config'
 import  ServerAddress  from '../register-agent/steps/server-address'
-import { fetchClusterNodesOptions } from '../register-agent/utils'
+import { fetchClusterNodesOptions, parseNodeIPs } from '../register-agent/utils'
 
 export const RegisterAgent = withErrorBoundary(
 
@@ -1052,6 +1052,11 @@ export const RegisterAgent = withErrorBoundary(
         )
       }
 
+      const onChangeServerAddress = (value) => {
+        const nodesParsed = parseNodeIPs(value, this.state.selectedOS);
+        this.setState({ serverAddress: nodesParsed });
+      }
+
       const steps = [
         {
           title: 'Choose the operating system',
@@ -1302,7 +1307,11 @@ export const RegisterAgent = withErrorBoundary(
           : []),
         {
           title: 'Wazuh server address',
-          children: <Fragment><ServerAddress onChange={(e) => this.setServerAddress(e) } fetchOptions={fetchClusterNodesOptions}/></Fragment>,
+          children: <Fragment>
+            <ServerAddress 
+              onChange={onChangeServerAddress} 
+              fetchOptions={fetchClusterNodesOptions}/>
+            </Fragment>,
         },
         ...(!(!this.state.needsPassword || this.state.hidePasswordInput)
           ? [
