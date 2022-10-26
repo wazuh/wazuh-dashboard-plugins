@@ -14,7 +14,8 @@ export function getFileExtensionFromBuffer(buffer: Buffer): string {
 			return 'jpg'; // Also jpeg
 		case '8950':
 			return 'png';
-		case '3c3f':
+    case '3c73':
+    case '3c3f':
 			return 'svg';
 		default:
 			return 'unknown';
