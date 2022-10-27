@@ -96,8 +96,8 @@ export default function ServerAddress(props: Props) {
   return (
     <EuiText>
       <p>
-        This is the address the agent uses to communicate with the Wazuh server. It can be a list or
-        an IP address or a fully qualified domain name (FQDN).
+        This is the address the agent uses to communicate with the Wazuh server. It can be a list of one or 
+        more IP addresses or fully qualified domain names (FQDN).
       </p>
       <EuiComboBox
         placeholder="Server Address"
