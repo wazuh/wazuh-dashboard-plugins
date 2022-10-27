@@ -42,6 +42,7 @@ import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
+import { getRemoteConfiguration } from './register-agent-service'
 
 const architectureButtons = [
   {
@@ -220,26 +221,8 @@ export const RegisterAgent = withErrorBoundary(
 
     async getRemoteInfo() {
       try {
-        const result = await WzRequest.apiReq('GET', '/agents/000/config/request/remote', {});
-        const remote = ((result.data || {}).data || {}).remote || {};
-        const remoteFiltered = remote.filter((item) => {
-          return (
-            item.connection === 'secure'
-          )
-        })
-        if (remoteFiltered.length === 0) {
-          this.setState({ connectionSecure: false })
-        } else {
-        remoteFiltered.forEach((item) => {
-          if (item.connection === 'secure') {
-            if(item.protocol.length === 1 && item.protocol[0] == 'UDP') {
-              this.setState({ udpProtocol: true, connectionSecure: true});
-            }
-            if(item.protocol.length > 1 && item.protocol[0] == 'TCP') {
-              this.setState({ udpProtocol: false, connectionSecure: true});
-            }
-          }
-        })}
+        let config = await getRemoteConfiguration();
+        this.setState({ udpProtocol: config.udpProtocol, connectionSecure: config.connectionSecure });
       } catch (error) {
         throw new Error(error);
       }
