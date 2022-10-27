@@ -29,21 +29,26 @@ interface IBottomBarProps {
   onSave: () => void
 }
 
-export const BottomBar: React.FunctionComponent<IBottomBarProps> = ({ unsavedCount, onCancel, onSave }) => (
+export const BottomBar: React.FunctionComponent<IBottomBarProps> = ({ unsavedCount, errorsCount, onCancel, onSave }) => (
   <EuiBottomBar paddingSize="m">
       <EuiFlexGroup alignItems='center' justifyContent='spaceBetween' gutterSize='s'>
-        <SettingLabel count={unsavedCount}/>
+        <SettingLabel count={unsavedCount} errors={errorsCount}/>
         <CancelButton onClick={onCancel} />
-        <SaveButton onClick={onSave}/>
+        <SaveButton onClick={onSave} isDisabled={Boolean(errorsCount)}/>
       </EuiFlexGroup>
     </EuiBottomBar>
 );
 
-const SettingLabel = ({ count, }) => (
+const SettingLabel = ({ count, errors }) => (
   <EuiFlexItem className='mgtAdvancedSettingsForm__unsavedCount'>
     <EuiText color='ghost' className='mgtAdvancedSettingsForm__unsavedCountMessage'>
       {`${count} unsaved settings`}
     </EuiText>
+    {errors ? (
+      <EuiText color='danger' className='mgtAdvancedSettingsForm__unsavedCountMessage'>
+        {`${errors} setting with ${errors === 1 ? 'error' : 'errors'}`}
+      </EuiText>
+    ) : null}
   </EuiFlexItem>
 );
 
@@ -62,13 +67,14 @@ const CancelButton = ({ onClick }) => (
   </EuiFlexItem>
 );
 
-const SaveButton = ({ onClick }) => (
+const SaveButton = ({ onClick, isDisabled }) => (
   <EuiFlexItem grow={false}>
     <EuiButton
       fill
       size='s'
       iconSide='left'
       iconType='check'
+      isDisabled={isDisabled}
       color='secondary'
       className="mgtAdvancedSettingsForm__button"
       onClick={onClick} >
