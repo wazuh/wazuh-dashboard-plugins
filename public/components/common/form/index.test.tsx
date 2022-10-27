@@ -3,8 +3,8 @@ import { render, screen } from '@testing-library/react';
 import { InputForm } from './index';
 import { useForm } from './hooks';
 
-jest.mock('../../../../../../node_modules/@elastic/eui/lib/services/accessibility', () => ({
-	htmlIdGenerator: () => () => 'generated-id',
+jest.mock('../../../../../../node_modules/@elastic/eui/lib/services/accessibility/html_id_generator', () => ({
+	htmlIdGenerator: () => () => 'test-id',
 }));
 
 describe('[component] InputForm', () => {

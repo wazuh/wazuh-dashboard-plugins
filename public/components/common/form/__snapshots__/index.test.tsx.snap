@@ -4,7 +4,7 @@ exports[`[component] InputForm Renders correctly to match the snapshot with vali
 <div>
   <div
     class="euiFormRow euiFormRow--fullWidth"
-    id="generated-id-row"
+    id="test-id-row"
   >
     <div
       class="euiFormRow__labelWrapper"
@@ -12,7 +12,7 @@ exports[`[component] InputForm Renders correctly to match the snapshot with vali
       <label
         aria-invalid="false"
         class="euiFormLabel euiFormRow__label"
-        for="generated-id"
+        for="test-id"
       >
         Test
       </label>
@@ -51,7 +51,7 @@ exports[`[component] InputForm Renders correctly to match the snapshot with vali
 <div>
   <div
     class="euiFormRow euiFormRow--fullWidth"
-    id="generated-id-row"
+    id="test-id-row"
   >
     <div
       class="euiFormRow__labelWrapper"
@@ -59,7 +59,7 @@ exports[`[component] InputForm Renders correctly to match the snapshot with vali
       <label
         aria-invalid="true"
         class="euiFormLabel euiFormRow__label euiFormLabel-isInvalid"
-        for="generated-id"
+        for="test-id"
       >
         Test
       </label>
@@ -91,7 +91,7 @@ exports[`[component] InputForm Renders correctly to match the snapshot with vali
       <div
         aria-live="polite"
         class="euiFormErrorText euiFormRow__text"
-        id="generated-id-error-0"
+        id="test-id-error-0"
       >
         Validation error: string can not be empty
       </div>
@@ -104,7 +104,7 @@ exports[`[component] InputForm Renders correctly to match the snapshot with vali
 <div>
   <div
     class="euiFormRow euiFormRow--fullWidth"
-    id="generated-id-row"
+    id="test-id-row"
   >
     <div
       class="euiFormRow__labelWrapper"
@@ -112,7 +112,7 @@ exports[`[component] InputForm Renders correctly to match the snapshot with vali
       <label
         aria-invalid="false"
         class="euiFormLabel euiFormRow__label"
-        for="generated-id"
+        for="test-id"
       >
         Test
       </label>
@@ -156,7 +156,7 @@ exports[`[component] InputForm Renders correctly to match the snapshot: Input: e
     <div
       class="euiCodeEditorKeyboardHint"
       data-test-subj="codeEditorHint"
-      id="generated-id"
+      id="test-id"
       role="button"
       tabindex="0"
     >
@@ -173,7 +173,7 @@ exports[`[component] InputForm Renders correctly to match the snapshot: Input: e
     </div>
     <div
       class=" ace_editor ace-tm"
-      id="generated-id"
+      id="test-id"
       style="width: 100%; height: 50px;"
     >
       <textarea
@@ -274,14 +274,14 @@ exports[`[component] InputForm Renders correctly to match the snapshot: Input: f
     >
       <input
         accept=".jpeg,.jpg,.png,.svg"
-        aria-describedby="ie40f55a1-55c2-11ed-a345-9711d1b1ae7e"
+        aria-describedby="test-id"
         aria-label="Upload a file"
         class="euiFilePicker__input"
         type="file"
       />
       <div
         class="euiFilePicker__prompt"
-        id="ie40f55a1-55c2-11ed-a345-9711d1b1ae7e"
+        id="test-id"
       >
         <svg
           aria-hidden="true"
@@ -374,9 +374,9 @@ exports[`[component] InputForm Renders correctly to match the snapshot: Input: s
   >
     <button
       aria-checked="true"
-      aria-labelledby="generated-id"
+      aria-labelledby="test-id"
       class="euiSwitch__button"
-      id="generated-id"
+      id="test-id"
       role="switch"
       type="button"
     >
@@ -414,7 +414,7 @@ exports[`[component] InputForm Renders correctly to match the snapshot: Input: s
     </button>
     <span
       class="euiSwitch__label"
-      id="generated-id"
+      id="test-id"
     >
       Enabled
     </span>
