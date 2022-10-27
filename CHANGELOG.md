@@ -20,6 +20,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Made Agents Overview icons load independently [#4363](https://github.com/wazuh/wazuh-kibana-app/pull/4363)
 - Improved the message displayed when there is a versions mismatch between the Wazuh API and the Wazuh APP [#4529](https://github.com/wazuh/wazuh-kibana-app/pull/4529)
 - Changed the endpoint that updates the plugin configuration to support multiple settings. [#4501](https://github.com/wazuh/wazuh-kibana-app/pull/4501)
+- Allowed to upload an image for the `customization.logo.*` settings in `Settings/Configuration` [#4503](https://github.com/wazuh/wazuh-kibana-app/pull/4503)
 
 ### Fixed
 
