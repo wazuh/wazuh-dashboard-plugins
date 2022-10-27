@@ -143,6 +143,7 @@ export const RegisterAgent = withErrorBoundary(
         selectedGroup: [],
         udpProtocol: false,
         showPassword: false,
+        connectionSecure: true
       };
       this.restartAgentCommand = {
         rpm: this.systemSelector(),
@@ -172,7 +173,7 @@ export const RegisterAgent = withErrorBoundary(
           }
         }
 
-        const udpProtocol = await this.getRemoteInfo();
+        await this.getRemoteInfo();
         const groups = await this.getGroups();
         this.setState({
           serverAddress,
@@ -182,7 +183,6 @@ export const RegisterAgent = withErrorBoundary(
           architectureButtons,
           architectureCentos5OrRedHat5,
           wazuhPassword,
-          udpProtocol,
           wazuhVersion,
           groups,
           loading: false,
@@ -196,7 +196,7 @@ export const RegisterAgent = withErrorBoundary(
           context: `${RegisterAgent.name}.componentDidMount`,
           level: UI_LOGGER_LEVELS.ERROR,
           severity: UI_ERROR_SEVERITIES.BUSINESS,
-          display: false,
+          display: true,
           store: false,
           error: {
             error: error,
@@ -221,19 +221,25 @@ export const RegisterAgent = withErrorBoundary(
     async getRemoteInfo() {
       try {
         const result = await WzRequest.apiReq('GET', '/agents/000/config/request/remote', {});
-        console.log(result, 'resultt+++')
-        console.log('remoteee+')
         const remote = ((result.data || {}).data || {}).remote || {};
-        const remoteFiltered = remote.filter((item, key) => {
+        const remoteFiltered = remote.filter((item) => {
+          return (
+            item.connection === 'secure'
+          )
+        })
+        if (remoteFiltered.length === 0) {
+          this.setState({ connectionSecure: false })
+        } else {
+        remoteFiltered.forEach((item) => {
           if (item.connection === 'secure') {
             if(item.protocol.length === 1 && item.protocol[0] == 'UDP') {
-              console.log('entre')
-              this.setState({ udpProtocol: true });
+              this.setState({ udpProtocol: true, connectionSecure: true});
+            }
+            if(item.protocol.length > 1 && item.protocol[0] == 'TCP') {
+              this.setState({ udpProtocol: false, connectionSecure: true});
             }
           }
-        })
-        console.log(remoteFiltered, 'remote filter')
-        console.log(udpProtocol, 'udp')
+        })}
       } catch (error) {
         throw new Error(error);
       }
@@ -319,7 +325,6 @@ export const RegisterAgent = withErrorBoundary(
       if (this.state.needsPassword) {
         deployment += `WAZUH_REGISTRATION_PASSWORD='${this.state.wazuhPassword}' `;
       }
-
       if (this.state.udpProtocol) {
         deployment += `WAZUH_PROTOCOL='UDP' `;
       }
@@ -540,8 +545,90 @@ export const RegisterAgent = withErrorBoundary(
               title='This section could not be displayed because you do not have permission to get access to the registration service.'
               iconType="iInCircle"
             />
-          ) :
-            this.state.selectedOS && (
+          ) : (this.state.connectionSecure === true && this.state.udpProtocol === false) ? (
+            <EuiText>
+            <p>
+              You can use this command to install and enroll the Wazuh agent in one or more hosts.
+            </p>
+            <EuiCallOut
+              color="warning"
+              title={
+                <>
+                  If the installer finds another Wazuh agent in the system, it will upgrade it preserving the configuration.
+                </>
+              }
+              iconType="iInCircle"
+            />
+            <EuiSpacer />
+            {windowsAdvice}
+            <div className="copy-codeblock-wrapper">
+              <EuiCodeBlock style={codeBlock} language={language}>
+                {this.state.wazuhPassword && !this.state.showPassword ? this.obfuscatePassword(text) : text}
+              </EuiCodeBlock>
+              <EuiCopy textToCopy={text}>
+                {(copy) => (
+                  <div className="copy-overlay"  onClick={copy}>
+                    <p><EuiIcon type="copy"/> Copy command</p>
+                  </div>
+                )}
+              </EuiCopy>
+            </div>
+            {this.state.needsPassword && (
+              <EuiSwitch
+                label="Show password"
+                checked={this.state.showPassword}
+                onChange={(active) => this.setShowPassword(active)}
+              />
+            )}
+            <EuiSpacer />
+          </EuiText>) : (this.state.connectionSecure === false) ? 
+          (
+            <EuiText>
+            <p>
+              You can use this command to install and enroll the Wazuh agent in one or more hosts.
+            </p>
+            <EuiCallOut
+              color="warning"
+              title={
+                <>
+                  If the installer finds another Wazuh agent in the system, it will upgrade it preserving the configuration.
+                </>
+              }
+              iconType="iInCircle"
+            />
+            <EuiSpacer />
+            <EuiCallOut
+              color="danger"
+              title={
+                <>
+                  Warning: there's no <EuiLink target="_blank" href={webDocumentationLink('user-manual/deployment-variables/deployment-variables.html', appVersionMajorDotMinor)}>secure protocol configured</EuiLink> and agents will not be able to communicate with the manager.
+                </>
+              }
+              iconType="iInCircle"
+            />
+            <EuiSpacer />
+            {windowsAdvice}
+            <div className="copy-codeblock-wrapper">
+              <EuiCodeBlock style={codeBlock} language={language}>
+                {this.state.wazuhPassword && !this.state.showPassword ? this.obfuscatePassword(text) : text}
+              </EuiCodeBlock>
+              <EuiCopy textToCopy={text}>
+                {(copy) => (
+                  <div className="copy-overlay"  onClick={copy}>
+                    <p><EuiIcon type="copy"/> Copy command</p>
+                  </div>
+                )}
+              </EuiCopy>
+            </div>
+            {this.state.needsPassword && (
+              <EuiSwitch
+                label="Show password"
+                checked={this.state.showPassword}
+                onChange={(active) => this.setShowPassword(active)}
+              />
+            )}
+            <EuiSpacer />
+          </EuiText>) : (
               <EuiText>
                 <p>
                   You can use this command to install and enroll the Wazuh agent in one or more hosts.
