@@ -15,9 +15,10 @@ import { pluginPlatformTemplate } from '../../integration-files/kibana-template'
 import { getConfiguration } from '../../lib/get-configuration';
 import { totalmem } from 'os';
 import fs from 'fs';
-import { WAZUH_ALERTS_PATTERN, WAZUH_DATA_CONFIG_REGISTRY_PATH, WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME, WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH, PLUGIN_PLATFORM_NAME, PLUGIN_PLATFORM_INSTALLATION_USER_GROUP, PLUGIN_PLATFORM_INSTALLATION_USER, WAZUH_DEFAULT_APP_CONFIG, PLUGIN_APP_NAME } from '../../../common/constants';
+import { WAZUH_DATA_CONFIG_REGISTRY_PATH, WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME, WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH, PLUGIN_PLATFORM_NAME, PLUGIN_PLATFORM_INSTALLATION_USER_GROUP, PLUGIN_PLATFORM_INSTALLATION_USER, WAZUH_DEFAULT_APP_CONFIG, PLUGIN_APP_NAME } from '../../../common/constants';
 import { createDataDirectoryIfNotExists } from '../../lib/filesystem';
 import _ from 'lodash';
+import { getSettingDefaultValue, getSettingsDefault } from '../../../common/services/settings';
 
 
 export function jobInitializeRun(context) {
@@ -34,7 +35,7 @@ export function jobInitializeRun(context) {
     pattern =
       configurationFile && typeof configurationFile.pattern !== 'undefined'
         ? configurationFile.pattern
-        : WAZUH_ALERTS_PATTERN;
+        : getSettingDefaultValue('pattern');
   } catch (error) {
     log('initialize', error.message || error);
     context.wazuh.logger.error(
@@ -138,7 +139,7 @@ export function jobInitializeRun(context) {
         // Rebuild the registry file `wazuh-registry.json`
 
         // Get the supported extensions for the installed plugin
-        const supportedDefaultExtensionsConfiguration = Object.entries(WAZUH_DEFAULT_APP_CONFIG)
+        const supportedDefaultExtensionsConfiguration = Object.entries(getSettingsDefault())
           .filter(([setting]) => setting.startsWith('extensions.'))
           .map(([setting, settingValue]) => {
             return [setting.split('.')[1], settingValue];

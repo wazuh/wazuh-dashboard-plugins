@@ -84,7 +84,6 @@ import {
   UI_SETTINGS,
 } from '../../../../src/plugins/data/public';
 import { addFatalError } from '../../../../src/plugins/kibana_legacy/public';
-import { WAZUH_ALERTS_PATTERN } from '../../common/constants';
 import {
   DEFAULT_COLUMNS_SETTING,
   SAMPLE_SIZE_SETTING,
@@ -97,6 +96,7 @@ import { createFixedScroll } from './discover/application/angular/directives/fix
 
 import './discover/application/index.scss';
 import { getFilterWithAuthorizedAgents } from '../react-services/filter-authorization-agents';
+import { getSettingDefaultValue } from '../../common/services/settings';
 
 const fetchStatuses = {
   UNINITIALIZED: 'uninitialized',
@@ -547,7 +547,7 @@ function discoverController(
                         negate: true,
                         params: { query: '000' },
                         type: 'phrase',
-                        index: AppState.getCurrentPattern() || WAZUH_ALERTS_PATTERN
+                        index: AppState.getCurrentPattern() || getSettingDefaultValue('pattern')
                       },
                       query: { match_phrase: { 'agent.id': '000' } },
                       $state: { store: 'appState' }

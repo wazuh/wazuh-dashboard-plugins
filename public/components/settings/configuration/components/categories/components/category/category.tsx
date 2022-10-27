@@ -12,8 +12,6 @@
  */
 
 import React, { } from 'react';
-import { FieldForm } from './components';
-import { ISetting } from '../../../../configuration';
 import {
   EuiFlexItem,
   EuiPanel,
@@ -22,56 +20,118 @@ import {
   EuiForm,
   EuiDescribedFormGroup,
   EuiTitle,
-  EuiFormRow
+  EuiSpacer,
+  EuiToolTip,
+  EuiButtonIcon,
 } from '@elastic/eui';
 import { EuiIconTip } from '@elastic/eui';
+import { TPluginSettingWithKey } from '../../../../../../../../common/constants';
+import { getPluginSettingDescription } from '../../../../../../../../common/services/settings';
+import { webDocumentationLink } from '../../../../../../../../common/services/web_documentation';
+import classNames from 'classnames';
+import { InputForm } from '../../../../../../common/form';
+
 
 interface ICategoryProps {
-  name: string
-  items: ISetting[]
-  updatedConfig: { [field: string]: string | number | boolean | [] }
-  setUpdatedConfig({ }): void
+  title: string
+  description?: string
+  documentationLink?: string
+  items: TPluginSettingWithKey[]
+  currentConfiguration: { [field: string]: any }
+  changedConfiguration: { [field: string]: any }
+  onChangeFieldForm: () => void
 }
 
-export const Category: React.FunctionComponent<ICategoryProps> = ({ name, items, updatedConfig, setUpdatedConfig }) => {
+export const Category: React.FunctionComponent<ICategoryProps> = ({
+  title,
+  description,
+  documentationLink,
+  items
+}) => {
   return (
     <EuiFlexItem>
       <EuiPanel paddingSize="l">
         <EuiText>
           <EuiFlexGroup>
             <EuiFlexItem>
-              <h2>{name}</h2>
+              <h2>{title}{
+                documentationLink &&
+                <EuiToolTip
+                  position="right"
+                  content="Documentation">
+                  <>
+                    &nbsp;
+                  <EuiButtonIcon
+                      iconType="iInCircle"
+                      iconSize="l"
+                      aria-label="Help"
+                      target="_blank"
+                      href={webDocumentationLink(documentationLink)}
+                    ></EuiButtonIcon>
+                  </>
+                </EuiToolTip>
+              }
+              </h2>
             </EuiFlexItem>
           </EuiFlexGroup>
         </EuiText>
+        {
+          description &&
+          <>
+            <EuiText color="subdued">
+              <EuiFlexGroup>
+                <EuiFlexItem>
+                  <span>{description}</span>
+                </EuiFlexItem>
+              </EuiFlexGroup>
+            </EuiText>
+            <EuiSpacer />
+          </>
+        }
         <EuiForm>
-          {items.map((item, idx) => (
-            <EuiDescribedFormGroup
-              fullWidth
-              key={idx}
-              className={`mgtAdvancedSettings__field${isUpdated(updatedConfig, item) ? ' mgtAdvancedSettings__field--unsaved' : ''}`}
-              title={
-                <EuiTitle className="mgtAdvancedSettings__fieldTitle" size="s">
-                  <span>
-                    {item.name}
-                    {isUpdated(updatedConfig, item)
-                      && <EuiIconTip
+        {items.map((item, idx) => {
+            const isUpdated = item.changed && !item.error;
+            return (
+              <EuiDescribedFormGroup
+                fullWidth
+                key={idx}
+                className={classNames('mgtAdvancedSettings__field', {
+                  'mgtAdvancedSettings__field--unsaved': isUpdated,
+                  'mgtAdvancedSettings__field--invalid': item.error
+                })}
+                title={
+                  <EuiTitle className="mgtAdvancedSettings__fieldTitle" size="s">
+                    <span>
+                      {item.title}
+                      {item.error && (
+                        <EuiIconTip
                         anchorClassName="mgtAdvancedSettings__fieldTitleUnsavedIcon"
-                        type={'dot'}
-                        color={'warning'}
-                        aria-label={item.setting}
-                        content={`${updatedConfig[item.setting]}`} />}
-                  </span></EuiTitle>}
-              description={item.description} >
-              <EuiFormRow label={item.setting} fullWidth>
-                <FieldForm item={item} updatedConfig={updatedConfig} setUpdatedConfig={setUpdatedConfig} />
-              </EuiFormRow>
-            </EuiDescribedFormGroup>
-          ))}
+                        type='alert'
+                        color='danger'
+                        aria-label={item.key}
+                        content='Invalid' />
+                      )}
+
+                      {isUpdated && (
+                        <EuiIconTip
+                        anchorClassName="mgtAdvancedSettings__fieldTitleUnsavedIcon"
+                        type='dot'
+                        color='warning'
+                        aria-label={item.key}
+                        content='Unsaved' />
+                      )}
+                    </span>
+                  </EuiTitle>}
+                description={getPluginSettingDescription(item)} >
+                  <InputForm
+                    label={item.key}
+                    {...item}
+                  />
+              </EuiDescribedFormGroup>
+            )
+          })}
         </EuiForm>
       </EuiPanel>
     </EuiFlexItem>
   )
-}
-
-const isUpdated = (configs, item) => typeof configs[item.setting] !== 'undefined'
+};
