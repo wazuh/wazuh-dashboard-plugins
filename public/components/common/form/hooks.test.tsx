@@ -134,4 +134,45 @@ describe('[hook] useForm', () => {
 		expect(result.current.fields.text1.value).toBe(changedValue2);
 		expect(result.current.fields.text1.initialValue).toBe(changedValue2);
 	});
+
+	it(`[hook] useForm lifecycle. Set the initial value. Change the field value to invalid value`, async () => {
+
+		const initialFieldValue = 'test';
+		const fieldType = 'text';
+
+		const initialFields = {
+			text1: {
+				type: fieldType,
+				initialValue: initialFieldValue,
+				validate: (value: string): string | undefined => value.length ? undefined : `Validation error: string can be empty.`
+			}
+		};
+
+		const { result } = renderHook(() => useForm(initialFields));
+
+		// assert initial state
+		expect(result.current.fields.text1.changed).toBe(false);
+		expect(result.current.fields.text1.error).toBeUndefined();
+		expect(result.current.fields.text1.type).toBe(fieldType);
+		expect(result.current.fields.text1.value).toBe(initialFieldValue);
+		expect(result.current.fields.text1.initialValue).toBe(initialFieldValue);
+		expect(result.current.fields.text1.onChange).toBeDefined();
+
+		// change the input
+		const changedValue = '';
+		act(() => {
+			result.current.fields.text1.onChange({
+				target: {
+					value: changedValue
+				}
+			});
+		});
+
+		// assert changed state
+		expect(result.current.fields.text1.changed).toBe(true);
+		expect(result.current.fields.text1.error).toBeTruthy();
+		expect(result.current.fields.text1.type).toBe(fieldType);
+		expect(result.current.fields.text1.value).toBe(changedValue);
+		expect(result.current.fields.text1.initialValue).toBe(initialFieldValue);
+	});
 });
