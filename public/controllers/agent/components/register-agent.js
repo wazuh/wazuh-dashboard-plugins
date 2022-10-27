@@ -189,25 +189,25 @@ export const RegisterAgent = withErrorBoundary(
       if (this.state.selectedVersion === 'redhat7' || this.state.selectedVersion === 'amazonlinux2022' || this.state.selectedVersion === 'centos7' || this.state.selectedVersion === 'suse11' || this.state.selectedVersion === 'suse12' || this.state.selectedVersion === 'oraclelinux5' || this.state.selectedVersion === '22' || this.state.selectedVersion === 'amazonlinux2' || this.state.selectedVersion === 'debian8' || this.state.selectedVersion === 'debian9' || this.state.selectedVersion === 'debian10' || this.state.selectedVersion === 'busterorgreater' || this.state.selectedVersion === 'ubuntu15' || this.state.selectedVersion === 'ubuntu16' || this.state.selectedVersion === 'leap15') {
         return 'sudo systemctl daemon-reload\nsudo systemctl enable wazuh-agent\nsudo systemctl start wazuh-agent';
       } else if (this.state.selectedVersion === 'redhat5' || this.state.selectedVersion === 'redhat6' || this.state.selectedVersion === 'centos5' || this.state.selectedVersion === 'centos6' || this.state.selectedVersion === 'oraclelinux6' || this.state.selectedVersion === 'amazonlinux1' || this.state.selectedVersion === 'debian7' || this.state.selectedVersion === 'ubuntu14') {
-        return ('service wazuh-agent start')
+        return ('service wazuh-agent start');
       }
     }
 
     systemSelectorNet() {
       if (this.state.selectedVersion === 'windowsxp' || this.state.selectedVersion === 'windows8') {
-        return ('update-rc.d wazuh-agent defaults && service wazuh-agent start')
+        return ('update-rc.d wazuh-agent defaults && service wazuh-agent start');
       }
     }
 
     systemSelectorWazuhControlMacos() {
       if (this.state.selectedVersion == 'sierra' || this.state.selectedVersion == 'highSierra' || this.state.selectedVersion == 'mojave' || this.state.selectedVersion == 'catalina' || this.state.selectedVersion == 'bigSur' || this.state.selectedVersion == 'monterrey') {
-        return ('/Library/Ossec/bin/wazuh-control start')
+        return ('/Library/Ossec/bin/wazuh-control start');
       }
     }
 
     systemSelectorWazuhControl() {
       if (this.state.selectedVersion === 'solaris10' || this.state.selectedVersion === 'solaris11' || this.state.selectedVersion === '6.1 TL9' || this.state.selectedVersion === '11.31') {
-        return ('/var/ossec/bin/wazuh-control start')
+        return ('/var/ossec/bin/wazuh-control start');
       }
     }
 
@@ -265,9 +265,7 @@ export const RegisterAgent = withErrorBoundary(
     }
 
     optionalDeploymentVariables() {
-      let deployment = `WAZUH_MANAGER='${this.state.serverAddress}' `;
-      const protocol = false
-      
+      let deployment = `WAZUH_MANAGER='${this.state.serverAddress}' `;      
       if (this.state.selectedOS == 'win') {
         deployment += `WAZUH_REGISTRATION_SERVER='${this.state.serverAddress}' `;
       }
@@ -298,9 +296,9 @@ export const RegisterAgent = withErrorBoundary(
       let agentName = `WAZUH_AGENT_NAME='${this.state.agentName}' `;
 
       if(this.state.selectedArchitecture && this.state.agentName !== '') {
-        return agentName
+        return agentName;
       } else {
-        return ''
+        return '';
       }
     }
 
@@ -736,7 +734,6 @@ export const RegisterAgent = withErrorBoundary(
           placeholder="Name agent"
           value={this.state.agentName}
           onChange={(event) => this.setAgentName(event)}
-          // readOnly={!this.state.groups.length ? true : false}
         />
     );
       const groupInput = (
@@ -748,23 +745,8 @@ export const RegisterAgent = withErrorBoundary(
                 title='This section could not be configured because you do not have permission to read groups.'
                 iconType="iInCircle"
               />
-              {/* <EuiSpacer /> */}
             </>
           )}
-          {/* <EuiText>
-            <p>Select one or more existing groups</p> */}
-            {/* <EuiComboBox
-              placeholder={!this.state.groups.length ? "Default" : "Select group"}
-              options={this.state.groups}
-              selectedOptions={this.state.selectedGroup}
-              onChange={(group) => {
-                this.setGroupName(group);
-              }}
-              isDisabled={!this.state.groups.length}
-              isClearable={true}
-              data-test-subj="demoComboBox"
-            /> */}
-          {/* </EuiText> */}
         </>
       );
       
@@ -786,7 +768,6 @@ export const RegisterAgent = withErrorBoundary(
         />
       </EuiText>
       )
-      console.log(this.state.groups.length, 'gr')
       const passwordInput = (
         <EuiFieldText
           placeholder="Wazuh password"
