@@ -97,11 +97,21 @@ export const Category: React.FunctionComponent<ICategoryProps> = ({
                 key={idx}
                 className={classNames('mgtAdvancedSettings__field', {
                   'mgtAdvancedSettings__field--unsaved': isUpdated,
+                  'mgtAdvancedSettings__field--invalid': item.error
                 })}
                 title={
                   <EuiTitle className="mgtAdvancedSettings__fieldTitle" size="s">
                     <span>
                       {item.title}
+                      {item.error && (
+                        <EuiIconTip
+                        anchorClassName="mgtAdvancedSettings__fieldTitleUnsavedIcon"
+                        type='alert'
+                        color='danger'
+                        aria-label={item.key}
+                        content='Invalid' />
+                      )}
+
                       {isUpdated && (
                         <EuiIconTip
                         anchorClassName="mgtAdvancedSettings__fieldTitleUnsavedIcon"
