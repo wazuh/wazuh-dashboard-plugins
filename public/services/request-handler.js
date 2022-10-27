@@ -1,6 +1,20 @@
+import { arrayActorOffice } from '../../server/lib/generate-alerts/sample-data/office';
 import { getCore } from '../kibana-services';
 
 let allow = true;
+let aborts = [];
+let currentid = 0;
+
+const abortRequests = () => aborts.forEach(item => {
+    item.controller.abort();
+})
+
+const removeController = (id) => {
+    const index = aborts.findIndex(object => {
+        return object.id === id;
+    });
+    aborts.splice(index)
+}
 
 export const initializeInterceptor = () => {
     const core = getCore();
@@ -10,7 +24,7 @@ export const initializeInterceptor = () => {
                 httpErrorResponse.response?.status === 401 && httpErrorResponse.body?.message === 'Unauthorized'
             ) {
                 allow = false;
-                window.location.reload();
+                abortRequests();
             }
         },
     });
@@ -24,29 +38,33 @@ export const request = async (info) => {
     let { method, path, headers, data, timeout } = info;
     const url = path.split('?')[0]
     const query = Object.fromEntries([... new URLSearchParams(path.split('?')[1])])
-
+    const abort = new AbortController();
     let options = {
         method: method,
         headers: headers,
         query: query,
+        signal: abort.signal,
+        id: currentid
     }
+    currentid++;
 
     if (method !== 'GET') {
         options = { ...options, body: JSON.stringify(data) }
     }
 
     if (allow) {
+        aborts.push({ id: options.id, controller: abort })
         try {
             if (timeout && timeout !== 0) {
-                const abort = new AbortController();
                 const id = setTimeout(() => abort.abort(), timeout);
-                options = { ...options, signal: abort.signal }
                 const requestData = await core.http.fetch(url, options);
                 clearTimeout(id);
+                removeController(options.id);
                 return Promise.resolve({ data: requestData });
             }
             else {
                 const requestData = await core.http.fetch(url, options);
+                removeController(options.id);
                 return Promise.resolve({ data: requestData });
             }
         }
@@ -55,7 +73,3 @@ export const request = async (info) => {
         }
     }
 }
-
-
-
-
