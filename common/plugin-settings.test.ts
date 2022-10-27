@@ -225,8 +225,12 @@ describe('[settings] Input validation', () => {
     ${'wazuh.monitoring.pattern'}       | ${'test#'}           | ${"It can't contain invalid characters: \\, /, ?, \", <, >, |, ,, #."}
     ${'wazuh.monitoring.replicas'}      | ${0}                 | ${undefined}
     ${'wazuh.monitoring.replicas'}      | ${-1}                | ${"Value should be greater or equal than 0."}
+    ${'wazuh.monitoring.replicas'}      | ${'1.2'}             | ${'Number should be an integer.'}
+    ${'wazuh.monitoring.replicas'}      | ${1.2}               | ${'Number should be an integer.'}
     ${'wazuh.monitoring.shards'}        | ${1}                 | ${undefined}
     ${'wazuh.monitoring.shards'}        | ${-1}                | ${"Value should be greater or equal than 1."}
+    ${'wazuh.monitoring.shards'}        | ${'1.2'}             | ${'Number should be an integer.'}
+    ${'wazuh.monitoring.shards'}        | ${1.2}               | ${'Number should be an integer.'}
     `('$setting | $value | $expectedValidation', ({ setting, value, expectedValidation }) => {
         expect(
             PLUGIN_SETTINGS[setting].validate(
