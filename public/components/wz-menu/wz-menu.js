@@ -894,7 +894,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
             </EuiFlexGroup>
           )}
 
-          {/*this.state.hover === 'overview' */this.state.isOverviewPopoverOpen && (
+          {this.state.isOverviewPopoverOpen && (
             <Overview
               closePopover={() => this.setState({ menuOpened: false })}
             ></Overview>
