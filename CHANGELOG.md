@@ -10,7 +10,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added agent synchronization status in the agent module. [#3874](https://github.com/wazuh/wazuh-kibana-app/pull/3874)
 - Redesign the SCA table from agent's dashboard [#4512](https://github.com/wazuh/wazuh-kibana-app/pull/4512)
 - Enhanced the plugin setting description displayed in the UI and the configuration file. [#4501](https://github.com/wazuh/wazuh-kibana-app/pull/4501)
-- Added validation to the plugin settings in the form of `Settings/Configuration` and the endpoint to update the plugin configuration [#4501](https://github.com/wazuh/wazuh-kibana-app/pull/4503)
+- Added validation to the plugin settings in the form of `Settings/Configuration` and the endpoint to update the plugin configuration [#4503](https://github.com/wazuh/wazuh-kibana-app/pull/4503)
 
 ### Changed
 
@@ -20,6 +20,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Made Agents Overview icons load independently [#4363](https://github.com/wazuh/wazuh-kibana-app/pull/4363)
 - Improved the message displayed when there is a versions mismatch between the Wazuh API and the Wazuh APP [#4529](https://github.com/wazuh/wazuh-kibana-app/pull/4529)
 - Changed the endpoint that updates the plugin configuration to support multiple settings. [#4501](https://github.com/wazuh/wazuh-kibana-app/pull/4501)
+- Allowed to upload an image for the `customization.logo.*` settings in `Settings/Configuration` [#4504](https://github.com/wazuh/wazuh-kibana-app/pull/4504)
 
 ### Fixed
 
