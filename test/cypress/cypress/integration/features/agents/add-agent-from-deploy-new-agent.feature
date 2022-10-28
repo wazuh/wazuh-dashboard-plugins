@@ -4,7 +4,7 @@ Feature: Validate that the config to added new agent
     I want to add a new agent
     in order to manage them
 
-    @agent
+    @agent @actions
     Scenario Outline: Validate the information to add a new Agent
         Given The wazuh admin user is logged
         When The user navigates to the agent page

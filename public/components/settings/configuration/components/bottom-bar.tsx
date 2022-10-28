@@ -53,7 +53,7 @@ const SettingLabel = ({ count, errors }) => (
 );
 
 
-const CancelButton = ({ onClick}) => (
+const CancelButton = ({ onClick }) => (
   <EuiFlexItem grow={false}>
     <EuiButtonEmpty
       size='s'

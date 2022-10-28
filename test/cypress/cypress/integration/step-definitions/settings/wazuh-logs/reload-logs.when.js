@@ -6,4 +6,5 @@ const reloadLogsLink = getSelector('reloadLogsLink', pageName);
 When('The user reloads the logs', () => {
   interceptAs('GET', '/utils/logs', 'apiCheck');
   clickElement(reloadLogsLink);
+  cy.wait(500);
 });

@@ -29,15 +29,17 @@ import {
 import store from '../../../redux/store'
 import { updateSelectedSettingsSection } from '../../../redux/actions/appStateActions';
 import { withUserAuthorizationPrompt, withErrorBoundary, withReduxProvider } from '../../common/hocs';
-import { PLUGIN_PLATFORM_NAME, PLUGIN_SETTINGS, PLUGIN_SETTINGS_CATEGORIES, UI_LOGGER_LEVELS, WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../../common/constants';
+import { EpluginSettingType, PLUGIN_SETTINGS, PLUGIN_SETTINGS_CATEGORIES, UI_LOGGER_LEVELS, WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../../common/constants';
 import { compose } from 'redux';
-import { getSettingsDefaultList, groupSettingsByCategory, getCategorySettingByTitle } from '../../../../common/services/settings';
+import { getPluginSettingDescription, getSettingsDefaultList, groupSettingsByCategory, getCategorySettingByTitle } from '../../../../common/services/settings';
 import { Category } from './components/categories/components';
 import { WzRequest } from '../../../react-services';
 import { UIErrorLog, UIErrorSeverity, UILogLevel, UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { getToasts } from '../../../kibana-services';
 import { updateAppConfig } from '../../../redux/actions/appConfigActions';
+import path from 'path';
+import { toastRequiresReloadingBrowserTab, toastRequiresRestartingPluginPlatform, toastRequiresRunningHealthcheck, toastSuccessUpdateConfiguration } from './components/categories/components/show-toasts';
 
 export type ISetting = {
   key: string
@@ -103,7 +105,7 @@ const WzConfigurationSettingsProvider = (props) => {
       type: PLUGIN_SETTINGS[fieldKey].type,
       options: PLUGIN_SETTINGS[fieldKey]?.options,
       title: PLUGIN_SETTINGS[fieldKey]?.title,
-      description: PLUGIN_SETTINGS[fieldKey]?.description
+      description: getPluginSettingDescription(PLUGIN_SETTINGS[fieldKey]),
     }));
 
   // https://github.com/elastic/eui/blob/aa4cfd7b7c34c2d724405a3ecffde7fe6cf3b50f/src/components/search_bar/query/query.ts#L138-L163
@@ -120,23 +122,48 @@ const WzConfigurationSettingsProvider = (props) => {
     setLoading(true);
     try {
       const settingsToUpdate = Object.entries(changed).reduce((accum, [pluginSettingKey, currentValue]) => {
-        if(PLUGIN_SETTINGS[pluginSettingKey].isConfigurableFromFile){
+        if(PLUGIN_SETTINGS[pluginSettingKey].isConfigurableFromFile && PLUGIN_SETTINGS[pluginSettingKey].type === EpluginSettingType.filepicker){
+          accum.fileUpload = {
+            ...accum.fileUpload,
+            [pluginSettingKey]: {
+              file: currentValue,
+              extension: path.extname(currentValue.name)
+            }
+          }
+        }else if(PLUGIN_SETTINGS[pluginSettingKey].isConfigurableFromFile){
           accum.saveOnConfigurationFile = {
             ...accum.saveOnConfigurationFile,
             [pluginSettingKey]: currentValue
           }
         };
         return accum;
-      }, {saveOnConfigurationFile: {}});
+      }, {saveOnConfigurationFile: {}, fileUpload: {}});
 
       const requests = [];
 
+      // Update the settings that doesn't upload a file
       if(Object.keys(settingsToUpdate.saveOnConfigurationFile).length){
         requests.push(WzRequest.genericReq(
           'PUT', '/utils/configuration',
           settingsToUpdate.saveOnConfigurationFile
         ));
       };
+
+      // Update the settings that uploads a file
+      if(Object.keys(settingsToUpdate.fileUpload).length){
+        requests.push(...Object.entries(settingsToUpdate.fileUpload)
+          .map(([pluginSettingKey, {file}]) => {
+              // Create the form data
+              const formData = new FormData();
+              formData.append('file', file);
+              return WzRequest.genericReq(
+                'PUT', `/utils/configuration/files/${pluginSettingKey}`,
+                formData,
+                {overwriteHeaders: {'content-type': 'multipart/form-data'}}
+              )
+            }));
+      };
+
       const responses = await Promise.all(requests);
 
       // Show the toasts if necessary
@@ -154,8 +181,26 @@ const WzConfigurationSettingsProvider = (props) => {
         },{})
       }));
 
+      // Remove the selected files on the file picker inputs
+      if(Object.keys(settingsToUpdate.fileUpload).length){
+        Object.keys(settingsToUpdate.fileUpload).forEach(settingKey => {
+          try{
+            fields[settingKey].inputRef.removeFiles(
+              // This method uses some methods of a DOM event.
+              // Because we want to remove the files when the configuration is saved,
+              // there is no event, so we create a object that contains the
+              // methods used to remove the files. Of this way, we can skip the errors
+              // due to missing methods.
+              // This workaround is based in @elastic/eui v29.3.2
+              // https://github.com/elastic/eui/blob/v29.3.2/src/components/form/file_picker/file_picker.tsx#L107-L108
+              {stopPropagation: () => {}, preventDefault: () => {}}
+            );
+          }catch(error){ };
+        });
+      };
+
       // Show the success toast
-      successToast();
+      toastSuccessUpdateConfiguration();
 
       // Reset the form changed configuration
       doChanges();
@@ -176,6 +221,31 @@ const WzConfigurationSettingsProvider = (props) => {
     } finally {
       setLoading(false);
     };
+  };
+
+  const onCancel = () => {
+    const updatedSettingsUseFilePicker = Object.entries(changed).reduce((accum, [pluginSettingKey]) => {
+      if(PLUGIN_SETTINGS[pluginSettingKey].isConfigurableFromFile && PLUGIN_SETTINGS[pluginSettingKey].type === EpluginSettingType.filepicker){
+        accum.push(pluginSettingKey);
+      };
+      return accum;
+    }, []);
+
+    updatedSettingsUseFilePicker.forEach(settingKey => {
+      try{
+        fields[settingKey].inputRef.removeFiles(
+          // This method uses some methods of a DOM event.
+          // Because we want to remove the files when the configuration is saved,
+          // there is no event, so we create a object that contains the
+          // methods used to remove the files. Of this way, we can skip the errors
+          // due to missing methods.
+          // This workaround is based in @elastic/eui v29.3.2
+          // https://github.com/elastic/eui/blob/v29.3.2/src/components/form/file_picker/file_picker.tsx#L107-L108
+          {stopPropagation: () => {}, preventDefault: () => {}}
+        );
+      }catch(error){ };
+    });
+    undoChanges();
   };
 
   return (
@@ -203,6 +273,7 @@ const WzConfigurationSettingsProvider = (props) => {
                 description={description}
                 documentationLink={documentationLink}
                 items={settings}
+                currentConfiguration={currentConfiguration}
               />
             )
           }
@@ -213,7 +284,7 @@ const WzConfigurationSettingsProvider = (props) => {
           <BottomBar
             errorsCount={Object.keys(errors).length}
             unsavedCount={Object.keys(changed).length}
-            onCancel={undoChanges}
+            onCancel={onCancel}
             onSave={onSave}
           />
         )}
@@ -226,46 +297,3 @@ export const WzConfigurationSettings = compose (
   withReduxProvider,
   withUserAuthorizationPrompt(null, [WAZUH_ROLE_ADMINISTRATOR_NAME])
 )(WzConfigurationSettingsProvider);
-
-const toastRequiresReloadingBrowserTab = () => {
-  getToasts().add({
-    color: 'success',
-    title: 'This setting requires you to reload the page to take effect.',
-    text: <EuiFlexGroup justifyContent="flexEnd" gutterSize="s">
-      <EuiFlexItem grow={false}>
-        <EuiButton onClick={() => window.location.reload()} size="s">Reload page</EuiButton>
-      </EuiFlexItem>
-    </EuiFlexGroup>
-  });
-};
-
-const toastRequiresRunningHealthcheck = () => {
-  const toast = getToasts().add({
-    color: 'warning',
-    title: 'You must execute the health check for the changes to take effect',
-    toastLifeTimeMs: 5000,
-    text:
-      <EuiFlexGroup alignItems="center" gutterSize="s">
-        <EuiFlexItem grow={false} >
-          <EuiButton onClick={() => {
-            getToasts().remove(toast);
-            window.location.href = '#/health-check';
-          }} size="s">Execute health check</EuiButton>
-        </EuiFlexItem>
-      </EuiFlexGroup>
-  });
-};
-
-const toastRequiresRestartingPluginPlatform = () => {
-  getToasts().add({
-    color: 'warning',
-    title: `You must restart ${PLUGIN_PLATFORM_NAME} for the changes to take effect`,
-  });
-};
-
-const successToast = () => {
-  getToasts().add({
-    color: 'success',
-    title: 'The configuration has been successfully updated',
-  });
-};

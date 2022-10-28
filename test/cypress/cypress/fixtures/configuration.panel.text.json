@@ -7,17 +7,17 @@
             "items": [
                 {
                     "title": "Index pattern",
-                    "subTitle": "Default index pattern to use on the app.",
+                    "subTitle": "Default index pattern to use on the app. If there's no valid index pattern, the app will automatically create one with the name indicated in this option.",
                     "label": "pattern"
                 },
                 {
                     "title": "Request timeout",
-                    "subTitle": "Defines the maximum time the app will wait for an API response when making requests to it.",
+                    "subTitle": "Maximum time, in milliseconds, the app will wait for an API response when making requests to it. It will be ignored if the value is set under 1500 milliseconds.",
                     "label": "timeout"
                 },
                 {
                     "title": "IP selector",
-                    "subTitle": "Defines if the user is allowed to change the selected index pattern directly from the top menu bar.",
+                    "subTitle": "Define if the user is allowed to change the selected index pattern directly from the top menu bar.",
                     "label": "ip.selector"
                 },
                 {
@@ -32,22 +32,22 @@
                 },
                 {
                     "title": "Sample alerts prefix",
-                    "subTitle": "Define the index name prefix of sample alerts. It must match with the template used by the index pattern to avoid unknown fields in dashboards.",
+                    "subTitle": "Define the index name prefix of sample alerts. It must match the template used by the index pattern to avoid unknown fields in dashboards.",
                     "label": "alerts.sample.prefix"
                 },
                 {
                     "title": "Hide manager alerts",
-                    "subTitle": "Hide the alerts of the manager in all dashboards.",
+                    "subTitle": "Hide the alerts of the manager in every dashboard.",
                     "label": "hideManagerAlerts"
                 },
                 {
                     "title": "Log level",
-                    "subTitle": "Set the app logging level, allowed values are info and debug. Default is info.",
+                    "subTitle": "Logging level of the App.",
                     "label": "logs.level"
                 },
                 {
                     "title": "Enrollment DNS",
-                    "subTitle": "Set the Wazuh server address in the agent deployment.",
+                    "subTitle": "Specifies the Wazuh registration server, used for the agent enrollment.",
                     "label": "enrollment.dns"
                 }
             ]
@@ -92,7 +92,7 @@
                 },
                 {
                     "title": "Set time filter to 24h",
-                    "subTitle": "hange the default value of the Kibana timeFilter configuration",
+                    "subTitle": "Change the default value of the Kibana timeFilter configuration",
                     "label": "checks.timeFilter"
                 }
             ]
@@ -107,7 +107,7 @@
                 },
                 {
                     "title": "Frequency",
-                    "subTitle": "Define in seconds the frequency the app generates a new document on the wazuh-monitoring index.",
+                    "subTitle": "Frequency, in seconds, of API requests to get the state of the agents and create a new document in the wazuh-monitoring index with this data.",
                     "label": "wazuh.monitoring.frequency"
                 },
                 {
@@ -122,12 +122,12 @@
                 },
                 {
                     "title": "Index creation",
-                    "subTitle": "Define the interval in which the wazuh-monitoring index will be created.",
+                    "subTitle": "Define the interval in which a new wazuh-monitoring index will be created.",
                     "label": "wazuh.monitoring.creation"
                 },
                 {
                     "title": "Index pattern",
-                    "subTitle": "Default index pattern to use on the app for Wazuh monitoring.",
+                    "subTitle": "Default index pattern to use for Wazuh monitoring.",
                     "label": "wazuh.monitoring.pattern"
                 },
                 {
@@ -147,7 +147,7 @@
                 },
                 {
                     "title": "Includes apis",
-                    "subTitle": "Enter the ID of the APIs you want to save data from, leave this empty to run the task on all configured APIs.",
+                    "subTitle": "Enter the ID of the hosts you want to save data from, leave this empty to run the task on every host.",
                     "label": "cron.statistics.apis"
                 },
                 {
@@ -157,12 +157,12 @@
                 },
                 {
                     "title": "Index name",
-                    "subTitle": "Define the name of the index in which the documents are to be saved.",
+                    "subTitle": "Define the name of the index in which the documents will be saved.",
                     "label": "cron.statistics.index.name"
                 },
                 {
                     "title": "Index creation",
-                    "subTitle": "Define the interval in which the index will be created.",
+                    "subTitle": "Define the interval in which a new index will be created.",
                     "label": "cron.statistics.index.creation"
                 },
                 {
@@ -182,22 +182,22 @@
             "items": [
                 {
                     "title": "Logo App",
-                    "subTitle": "Define the name of the app logo saved in the path /plugins/wazuh/assets/",
+                    "subTitle": "Set the name of the app logo stored at /plugins/wazuh/public/assets/",
                     "label": "customization.logo.app"
                 },
                 {
                     "title": "Logo Sidebar",
-                    "subTitle": "Define the name of the sidebar logo saved in the path /plugins/wazuh/assets/",
+                    "subTitle": "Set the name of the sidebar logo stored at /plugins/wazuh/public/assets/",
                     "label": "customization.logo.sidebar"
                 },
                 {
                     "title": "Logo Health Check",
-                    "subTitle": "Define the name of the health-check logo saved in the path /plugins/wazuh/assets/",
+                    "subTitle": "Set the name of the health-check logo stored at /plugins/wazuh/public/assets/",
                     "label": "customization.logo.healthcheck"
                 },
                 {
                     "title": "Logo Reports",
-                    "subTitle": "Define the name of the reports logo (.png) saved in the path /plugins/wazuh/assets/",
+                    "subTitle": "Set the name of the reports logo (.png) stored at /plugins/wazuh/public/assets/",
                     "label": "customization.logo.reports"
                 }
             ]
