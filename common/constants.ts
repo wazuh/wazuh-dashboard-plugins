@@ -359,7 +359,8 @@ export enum SettingCategory {
 };
 
 type TPluginSettingOptionsTextArea = {
-  rowsSize: number
+  rowsSize?: number
+  maxLength?: number
 };
 
 type TPluginSettingOptionsSelect = {
@@ -1090,9 +1091,12 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     	defaultValueIfNotSet: REPORTS_PAGE_FOOTER_TEXT,
 		isConfigurableFromFile: true,
 		isConfigurableFromUI: true,
-    options: { rowsSize: 2 },
+    options: { rowsSize: 2, maxLength: 30 },
     validate: function (value) {
-      return SettingsValidator.multipleLinesString({ max: this.options.rowsSize })(value)
+      return SettingsValidator.multipleLinesString({
+        max: this.options.rowsSize,
+        maxLength: this.options.maxLength
+      })(value)
     },
     validateBackend: function (schema) {
       return schema.string({ validate: this.validate.bind(this) });
@@ -1107,9 +1111,12 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     defaultValueIfNotSet: REPORTS_PAGE_HEADER_TEXT,
     isConfigurableFromFile: true,
     isConfigurableFromUI: true,
-    options: { rowsSize: 3 },
+    options: { rowsSize: 3, maxLength: 20 },
     validate: function (value) {
-      return SettingsValidator.multipleLinesString({ max: this.options.rowsSize })(value)
+      return SettingsValidator.multipleLinesString({
+        max: this?.options?.rowsSize,
+        maxLength: this?.options?.maxLength
+      })(value)
     },
 		validateBackend: function(schema){
 			return schema.string({validate: this.validate?.bind(this)});
