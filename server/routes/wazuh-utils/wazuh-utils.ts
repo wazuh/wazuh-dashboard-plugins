@@ -12,6 +12,7 @@
 import { WazuhUtilsCtrl } from '../../controllers';
 import { IRouter } from 'kibana/server';
 import { schema } from '@kbn/config-schema';
+import { PLUGIN_SETTINGS } from '../../../common/constants';
 
 export function WazuhUtilsRoutes(router: IRouter) {
   const ctrl = new WazuhUtilsCtrl();
@@ -30,10 +31,21 @@ export function WazuhUtilsRoutes(router: IRouter) {
     {
       path: '/utils/configuration',
       validate: {
-        body: schema.object({
-          key: schema.string(),
-          value: schema.any()
-        })
+        body: schema.object(
+          Object.entries(PLUGIN_SETTINGS)
+            .filter(([, { isConfigurableFromFile }]) => isConfigurableFromFile)
+            .reduce(
+              (accum, [pluginSettingKey, pluginSettingConfiguration]) => ({
+                ...accum,
+                [pluginSettingKey]: schema.maybe(
+                  pluginSettingConfiguration.validateBackend
+                    ? pluginSettingConfiguration.validateBackend(schema)
+                    : schema.any()
+                ),
+              }),
+              {}
+            )
+        )
       }
     },
     async (context, request, response) => ctrl.updateConfigurationFile(context, request, response)
