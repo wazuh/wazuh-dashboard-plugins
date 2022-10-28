@@ -5,6 +5,7 @@ import {
   TPluginSettingKey,
   TPluginSettingWithKey
 } from '../constants';
+import { formatBytes } from './file-size';
 
 /**
  * Look for a configuration category setting by its name
@@ -108,6 +109,13 @@ export function groupSettingsByCategory(settings: TPluginSettingWithKey[]){
 		...(options?.switch ? [`Allowed values: ${['enabled', 'disabled'].map(s => formatLabelValuePair(options.switch.values[s].label, options.switch.values[s].value)).join(', ')}.`] : []),
 		...(options?.number && 'min' in options.number ? [`Minimum value: ${options.number.min}.`] : []),
 		...(options?.number && 'max' in options.number ? [`Maximum value: ${options.number.max}.`] : []),
+		// File extensions
+		...(options?.file?.extensions ? [`Supported extensions: ${options.file.extensions.join(', ')}.`] : []),
+		// File recommended dimensions
+		...(options?.file?.recommended?.dimensions ? [`Recommended dimensions: ${options.file.recommended.dimensions.width}x${options.file.recommended.dimensions.height}${options.file.recommended.dimensions.unit || ''}.`] : []),
+		// File size
+		...((options?.file?.size && typeof options.file.size.minBytes !== 'undefined') ? [`Minimum file size: ${formatBytes(options.file.size.minBytes)}.`] : []),
+		...((options?.file?.size && typeof options.file.size.maxBytes !== 'undefined') ? [`Maximum file size: ${formatBytes(options.file.size.maxBytes)}.`] : []),
 	].join(' ');
 };
 

@@ -93,6 +93,30 @@ describe('[settings] Input validation', () => {
     ${'cron.statistics.interval'}       | ${true}              | ${"Interval is not valid."}
     ${'cron.statistics.status'}         | ${true}              | ${undefined}
     ${'cron.statistics.status'}         | ${0}                 | ${'It should be a boolean. Allowed values: true or false.'}
+    ${'customization.logo.app'}         | ${{size: 124000, name: 'image.jpg'}}  | ${undefined}
+    ${'customization.logo.app'}         | ${{size: 124000, name: 'image.jpeg'}} | ${undefined}
+    ${'customization.logo.app'}         | ${{size: 124000, name: 'image.png'}}  | ${undefined}
+    ${'customization.logo.app'}         | ${{size: 124000, name: 'image.svg'}}  | ${undefined}
+    ${'customization.logo.app'}         | ${{size: 124000, name: 'image.txt'}}  | ${'File extension is invalid. Allowed file extensions: .jpeg, .jpg, .png, .svg.'}
+    ${'customization.logo.app'}         | ${{size: 1240000, name: 'image.txt'}} | ${'File size should be lower or equal than 1 MB.'}
+    ${'customization.logo.healthcheck'} | ${{size: 124000, name: 'image.jpg'}}  | ${undefined}
+    ${'customization.logo.healthcheck'} | ${{size: 124000, name: 'image.jpeg'}} | ${undefined}
+    ${'customization.logo.healthcheck'} | ${{size: 124000, name: 'image.png'}}  | ${undefined}
+    ${'customization.logo.healthcheck'} | ${{size: 124000, name: 'image.svg'}}  | ${undefined}
+    ${'customization.logo.healthcheck'} | ${{size: 124000, name: 'image.txt'}}  | ${'File extension is invalid. Allowed file extensions: .jpeg, .jpg, .png, .svg.'}
+    ${'customization.logo.healthcheck'} | ${{size: 1240000, name: 'image.txt'}} | ${'File size should be lower or equal than 1 MB.'}
+    ${'customization.logo.reports'}     | ${{size: 124000, name: 'image.jpg'}}  | ${undefined}
+    ${'customization.logo.reports'}     | ${{size: 124000, name: 'image.jpeg'}} | ${undefined}
+    ${'customization.logo.reports'}     | ${{size: 124000, name: 'image.png'}}  | ${undefined}
+    ${'customization.logo.reports'}     | ${{size: 124000, name: 'image.svg'}}  | ${'File extension is invalid. Allowed file extensions: .jpeg, .jpg, .png.'}
+    ${'customization.logo.reports'}     | ${{size: 124000, name: 'image.txt'}}  | ${'File extension is invalid. Allowed file extensions: .jpeg, .jpg, .png.'}
+    ${'customization.logo.reports'}     | ${{size: 1240000, name: 'image.txt'}} | ${'File size should be lower or equal than 1 MB.'}
+    ${'customization.logo.sidebar'}     | ${{size: 124000, name: 'image.jpg'}}  | ${undefined}
+    ${'customization.logo.sidebar'}     | ${{size: 124000, name: 'image.jpeg'}} | ${undefined}
+    ${'customization.logo.sidebar'}     | ${{size: 124000, name: 'image.png'}}  | ${undefined}
+    ${'customization.logo.sidebar'}     | ${{size: 124000, name: 'image.svg'}}  | ${undefined}
+    ${'customization.logo.sidebar'}     | ${{size: 124000, name: 'image.txt'}}  | ${'File extension is invalid. Allowed file extensions: .jpeg, .jpg, .png, .svg.'}
+    ${'customization.logo.sidebar'}     | ${{size: 1240000, name: 'image.txt'}} | ${'File size should be lower or equal than 1 MB.'}
     ${'disabled_roles'}                 | ${['test']}          | ${undefined}
     ${'disabled_roles'}                 | ${['']}              | ${'Value can not be empty.'}
     ${'disabled_roles'}                 | ${['test space']}    | ${"No whitespaces allowed."}

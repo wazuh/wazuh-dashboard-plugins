@@ -6,6 +6,7 @@ export interface IInputFormType {
 	onChange: (event: any) => void
 	isInvalid?: boolean
 	options: any
+	setInputRef: (reference: any) => void
 };
 
 export interface IInputForm {
