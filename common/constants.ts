@@ -949,6 +949,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
 					relativePathFileSystem: 'public/assets/custom/images',
 					filename: 'customization.logo.app',
 					resolveStaticURL: (filename: string) => `custom/images/${filename}?v=${Date.now()}`
+          // ?v=${Date.now()} is used to force the browser to reload the image when a new file is uploaded
 				}
 			}
 		},
@@ -985,6 +986,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
 					relativePathFileSystem: 'public/assets/custom/images',
 					filename: 'customization.logo.healthcheck',
 					resolveStaticURL: (filename: string) => `custom/images/${filename}?v=${Date.now()}`
+          // ?v=${Date.now()} is used to force the browser to reload the image when a new file is uploaded
 				}
 			}
 		},
@@ -1059,6 +1061,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
 					relativePathFileSystem: 'public/assets/custom/images',
 					filename: 'customization.logo.sidebar',
 					resolveStaticURL: (filename: string) => `custom/images/${filename}?v=${Date.now()}`
+          // ?v=${Date.now()} is used to force the browser to reload the image when a new file is uploaded
 				}
 			}
 		},
