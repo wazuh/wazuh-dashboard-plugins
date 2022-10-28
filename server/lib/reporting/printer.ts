@@ -17,7 +17,7 @@ const COLORS = {
   PRIMARY: REPORTS_PRIMARY_COLOR
 };
 
-const pageConfiguration = ({pathToLogo, pageHeader, pageFooter}) => ({
+const pageConfiguration = ({ pathToLogo, pageHeader, pageFooter }) => ({
   styles: {
     h1: {
       fontSize: 22,
@@ -56,7 +56,7 @@ const pageConfiguration = ({pathToLogo, pageHeader, pageFooter}) => ({
     columns: [
       {
         image: path.join(__dirname, `../../../public/assets/${pathToLogo}`),
-        fit: [190,50]
+        fit: [190, 50]
       },
       {
         text: pageHeader,

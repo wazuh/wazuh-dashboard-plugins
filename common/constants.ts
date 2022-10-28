@@ -358,6 +358,10 @@ export enum SettingCategory {
   CUSTOMIZATION,
 };
 
+type TPluginSettingOptionsTextArea = {
+  rowsSize: number
+};
+
 type TPluginSettingOptionsSelect = {
   select: { text: string, value: any }[]
 };
@@ -442,7 +446,13 @@ export type TPluginSetting = {
   // Modify the setting requires restarting the plugin platform to take effect.
   requiresRestartingPluginPlatform?: boolean
   // Define options related to the `type`.
-  options?: TPluginSettingOptionsEditor | TPluginSettingOptionsFile | TPluginSettingOptionsNumber | TPluginSettingOptionsSelect | TPluginSettingOptionsSwitch
+  options?:
+  TPluginSettingOptionsEditor |
+  TPluginSettingOptionsFile |
+  TPluginSettingOptionsNumber |
+  TPluginSettingOptionsSelect |
+  TPluginSettingOptionsSwitch |
+  TPluginSettingOptionsTextArea
   // Transform the input value. The result is saved in the form global state of Settings/Configuration
   uiFormTransformChangedInputValue?: (value: any) => any
   // Transform the configuration value or default as initial value for the input in Settings/Configuration
@@ -1080,23 +1090,29 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     	defaultValueIfNotSet: REPORTS_PAGE_FOOTER_TEXT,
 		isConfigurableFromFile: true,
 		isConfigurableFromUI: true,
-		validate: SettingsValidator.multipleLinesString({max: 2}),
+    options: { rowsSize: 2 },
+    validate: function (value) {
+      return SettingsValidator.multipleLinesString({ max: this.options.rowsSize })(value)
+    },
+    validateBackend: function (schema) {
+      return schema.string({ validate: this.validate.bind(this) });
+    },
+  },
+  "customization.reports.header": {
+    title: "Reports header",
+    description: "Set the header of the reports.",
+    category: SettingCategory.CUSTOMIZATION,
+    type: EpluginSettingType.textarea,
+    defaultValue: "",
+    defaultValueIfNotSet: REPORTS_PAGE_HEADER_TEXT,
+    isConfigurableFromFile: true,
+    isConfigurableFromUI: true,
+    options: { rowsSize: 3 },
+    validate: function (value) {
+      return SettingsValidator.multipleLinesString({ max: this.options.rowsSize })(value)
+    },
 		validateBackend: function(schema){
-			return schema.string({validate: this.validate});
-		},
-	},
-	"customization.reports.header": {
-		title: "Reports header",
-		description: "Set the header of the reports.",
-		category: SettingCategory.CUSTOMIZATION,
-		type: EpluginSettingType.textarea,
-		defaultValue: "",
-    	defaultValueIfNotSet: REPORTS_PAGE_HEADER_TEXT,
-		isConfigurableFromFile: true,
-		isConfigurableFromUI: true,
-		validate: SettingsValidator.multipleLinesString({max: 4}),
-		validateBackend: function(schema){
-			return schema.string({validate: this.validate});
+			return schema.string({validate: this.validate?.bind(this)});
 		},
 	},
   "disabled_roles": {
