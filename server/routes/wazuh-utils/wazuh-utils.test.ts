@@ -13,13 +13,13 @@ import {
   WAZUH_DATA_ABSOLUTE_PATH,
   WAZUH_DATA_CONFIG_APP_PATH,
   WAZUH_DATA_CONFIG_DIRECTORY_PATH,
-  WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH,
-  WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH,
   WAZUH_DATA_LOGS_DIRECTORY_PATH,
   WAZUH_DATA_LOGS_RAW_PATH,
 } from "../../../common/constants";
 import { execSync } from 'child_process';
 import fs from 'fs';
+import path from 'path';
+import glob from 'glob';
 import moment from 'moment';
 import { of } from 'rxjs';
 
@@ -187,7 +187,7 @@ hosts:
     },
     {
       testTitle: 'Bad request, unknown setting',
-      settings: { 'unknown.setting': 'test-alerts-groupA-*','logs.level': 'debug' },
+      settings: { 'unknown.setting': 'test-alerts-groupA-*', 'logs.level': 'debug' },
       responseStatusCode: 400,
       responseBodyMessage: '[request body.unknown.setting]: definition for this key is missing'
     },
@@ -197,17 +197,17 @@ hosts:
       responseStatusCode: 400,
       responseBodyMessage: '[request body.cron.statistics.apis.0]: expected value of type [string] but got [number]'
     }
-  ])(`$testTitle: $settings. PUT /utils/configuration - $responseStatusCode`, async ({responseBodyMessage, responseStatusCode, settings}) => {
+  ])(`$testTitle: $settings. PUT /utils/configuration - $responseStatusCode`, async ({ responseBodyMessage, responseStatusCode, settings }) => {
     const response = await supertest(innerServer.listener)
       .put('/utils/configuration')
       .send(settings)
       .expect(responseStatusCode);
 
-      responseStatusCode === 200 && expect(response.body.data.updatedConfiguration).toEqual(settings);
-      responseStatusCode === 200 && expect(response.body.data.requiresRunningHealthCheck).toBeDefined();
-      responseStatusCode === 200 && expect(response.body.data.requiresReloadingBrowserTab).toBeDefined();
-      responseStatusCode === 200 && expect(response.body.data.requiresRestartingPluginPlatform).toBeDefined();
-      responseBodyMessage && expect(response.body.message).toMatch(responseBodyMessage);
+    responseStatusCode === 200 && expect(response.body.data.updatedConfiguration).toEqual(settings);
+    responseStatusCode === 200 && expect(response.body.data.requiresRunningHealthCheck).toBeDefined();
+    responseStatusCode === 200 && expect(response.body.data.requiresReloadingBrowserTab).toBeDefined();
+    responseStatusCode === 200 && expect(response.body.data.requiresRestartingPluginPlatform).toBeDefined();
+    responseBodyMessage && expect(response.body.message).toMatch(responseBodyMessage);
   });
 
   it.each`
@@ -422,18 +422,166 @@ hosts:
     ${'wazuh.monitoring.shards'}        | ${-1}                | ${400}             | ${"[request body.wazuh.monitoring.shards]: Value should be greater or equal than 1."}
     ${'wazuh.monitoring.shards'}        | ${1.2}               | ${400}             | ${"[request body.wazuh.monitoring.shards]: Number should be an integer."}
     ${'wazuh.monitoring.shards'}        | ${'custom'}          | ${400}             | ${"[request body.wazuh.monitoring.shards]: expected value of type [number] but got [string]"}
-  `(`$setting: $value - PUT /utils/configuration - $responseStatusCode`, async ({responseBodyMessage, responseStatusCode, setting, value}) => {
-    const body = {[setting]: value};
+  `(`$setting: $value - PUT /utils/configuration - $responseStatusCode`, async ({ responseBodyMessage, responseStatusCode, setting, value }) => {
+    const body = { [setting]: value };
     const response = await supertest(innerServer.listener)
       .put('/utils/configuration')
       .send(body)
       .expect(responseStatusCode);
 
-      responseStatusCode === 200 && expect(response.body.data.updatedConfiguration).toEqual(body);
-      responseStatusCode === 200 && expect(response.body.data.requiresRunningHealthCheck).toBe(Boolean(PLUGIN_SETTINGS[setting].requiresRunningHealthCheck));
-      responseStatusCode === 200 && expect(response.body.data.requiresReloadingBrowserTab).toBe(Boolean(PLUGIN_SETTINGS[setting].requiresReloadingBrowserTab));
-      responseStatusCode === 200 && expect(response.body.data.requiresRestartingPluginPlatform).toBe(Boolean(PLUGIN_SETTINGS[setting].requiresRestartingPluginPlatform));
-      responseBodyMessage && expect(response.body.message).toMatch(responseBodyMessage);
+    responseStatusCode === 200 && expect(response.body.data.updatedConfiguration).toEqual(body);
+    responseStatusCode === 200 && expect(response.body.data.requiresRunningHealthCheck).toBe(Boolean(PLUGIN_SETTINGS[setting].requiresRunningHealthCheck));
+    responseStatusCode === 200 && expect(response.body.data.requiresReloadingBrowserTab).toBe(Boolean(PLUGIN_SETTINGS[setting].requiresReloadingBrowserTab));
+    responseStatusCode === 200 && expect(response.body.data.requiresRestartingPluginPlatform).toBe(Boolean(PLUGIN_SETTINGS[setting].requiresRestartingPluginPlatform));
+    responseBodyMessage && expect(response.body.message).toMatch(responseBodyMessage);
+  });
+});
+
+describe('[endpoint] PUT /utils/configuration/files/{key} - Upload file', () => {
+
+  const PUBLIC_CUSTOM_ASSETS_PATH = path.join(__dirname, '../../../', 'public/assets/custom');
+
+  beforeAll(() => {
+    // Remove <PLUGIN_PATH>/public/assets/custom directory.
+    execSync(`rm -rf ${PUBLIC_CUSTOM_ASSETS_PATH}`);
+
+    // Create the configuration file with custom content
+    const fileContent = `---
+pattern: test-alerts-*
+
+hosts:
+  - default:
+      url: https://localhost
+      port: 55000
+      username: wazuh-wui
+      password: wazuh-wui
+      run_as: false
+`;
+
+    fs.writeFileSync(WAZUH_DATA_CONFIG_APP_PATH, fileContent, 'utf8');
+  });
+
+  afterAll(() => {
+    // Remove <PLUGIN_PATH>/public/assets/custom directory.
+    execSync(`rm -rf ${PUBLIC_CUSTOM_ASSETS_PATH}`);
+
+    // Remove the configuration file
+    fs.unlinkSync(WAZUH_DATA_CONFIG_APP_PATH);
+  });
+
+  it.each`
+    setting                             | filename                     | responseStatusCode | responseBodyMessage
+    ${'customization.logo.unknown'}     | ${'fixture_image_small.jpg'} | ${400}             | ${'[request params.key]: types that failed validation:\n- [request params.key.0]: expected value to equal [customization.logo.app]\n- [request params.key.1]: expected value to equal [customization.logo.healthcheck]\n- [request params.key.2]: expected value to equal [customization.logo.reports]\n- [request params.key.3]: expected value to equal [customization.logo.sidebar]'}
+    ${'customization.logo.app'}         | ${'fixture_image_small.jpg'} | ${200}             | ${null}
+    ${'customization.logo.app'}         | ${'fixture_image_small.png'} | ${200}             | ${null}
+    ${'customization.logo.app'}         | ${'fixture_image_small.svg'} | ${200}             | ${null}
+    ${'customization.logo.app'}         | ${'fixture_image_big.png'}   | ${413}             | ${'Payload content length greater than maximum allowed: 1048576'}
+    ${'customization.logo.healthcheck'} | ${'fixture_image_small.jpg'} | ${200}             | ${null}
+    ${'customization.logo.healthcheck'} | ${'fixture_image_small.png'} | ${200}             | ${null}
+    ${'customization.logo.healthcheck'} | ${'fixture_image_small.svg'} | ${200}             | ${null}
+    ${'customization.logo.healthcheck'} | ${'fixture_image_big.png'}   | ${413}             | ${'Payload content length greater than maximum allowed: 1048576'}
+    ${'customization.logo.reports'}     | ${'fixture_image_small.jpg'} | ${200}             | ${null}
+    ${'customization.logo.reports'}     | ${'fixture_image_small.png'} | ${200}             | ${null}
+    ${'customization.logo.reports'}     | ${'fixture_image_big.png'}   | ${413}             | ${'Payload content length greater than maximum allowed: 1048576'}
+    ${'customization.logo.reports'}     | ${'fixture_image_small.svg'} | ${400}             | ${"File extension is not valid for setting [customization.logo.reports] setting. Allowed file extensions: .jpeg, .jpg, .png"}
+    ${'customization.logo.sidebar'}     | ${'fixture_image_small.jpg'} | ${200}             | ${null}
+    ${'customization.logo.sidebar'}     | ${'fixture_image_small.png'} | ${200}             | ${null}
+    ${'customization.logo.sidebar'}     | ${'fixture_image_small.svg'} | ${200}             | ${null}
+    ${'customization.logo.sidebar'}     | ${'fixture_image_big.png'}   | ${413}             | ${'Payload content length greater than maximum allowed: 1048576'}
+  `(`$setting: $filename - PUT /utils/configuration/files/{key} - $responseStatusCode`, async ({ responseBodyMessage, responseStatusCode, setting, filename }) => {
+    const filePath = path.join(__dirname, 'fixtures', filename);
+    const extension = path.extname(filename);
+
+    const response = await supertest(innerServer.listener)
+      .put(`/utils/configuration/files/${setting}`)
+      .attach('file', filePath)
+      .expect(responseStatusCode);
+
+    responseStatusCode === 200 && expect(response.body.data.updatedConfiguration[setting]).toBeDefined();
+    responseStatusCode === 200 && expect(response.body.data.updatedConfiguration[setting]).toMatch(`${setting}${extension}`);
+    responseStatusCode === 200 && expect(response.body.data.requiresRunningHealthCheck).toBe(Boolean(PLUGIN_SETTINGS[setting].requiresRunningHealthCheck));
+    responseStatusCode === 200 && expect(response.body.data.requiresReloadingBrowserTab).toBe(Boolean(PLUGIN_SETTINGS[setting].requiresReloadingBrowserTab));
+    responseStatusCode === 200 && expect(response.body.data.requiresRestartingPluginPlatform).toBe(Boolean(PLUGIN_SETTINGS[setting].requiresRestartingPluginPlatform));
+    responseBodyMessage && expect(response.body.message).toMatch(responseBodyMessage);
+
+    // Check the file was created in the expected path of the file system.
+    if (response?.body?.data?.updatedConfiguration?.[setting]) {
+      const targetFilepath = path.join(__dirname, '../../../', PLUGIN_SETTINGS[setting].options.file.store.relativePathFileSystem, `${PLUGIN_SETTINGS[setting].options.file.store.filename}${extension}`);
+      const files = glob.sync(path.join(targetFilepath));
+      expect(files[0]).toBeDefined();
+    };
+  });
+});
+
+describe('[endpoint] DELETE /utils/configuration/files/{key} - Delete file', () => {
+
+  const PUBLIC_CUSTOM_ASSETS_PATH = path.join(__dirname, '../../../', 'public/assets/custom');
+
+  beforeAll(() => {
+    // Remove <PLUGIN_PATH>/public/assets/custom directory.
+    execSync(`rm -rf ${PUBLIC_CUSTOM_ASSETS_PATH}`);
+
+    // Create the configuration file with custom content
+    const fileContent = `---
+pattern: test-alerts-*
+
+hosts:
+  - default:
+      url: https://localhost
+      port: 55000
+      username: wazuh-wui
+      password: wazuh-wui
+      run_as: false
+`;
+
+    fs.writeFileSync(WAZUH_DATA_CONFIG_APP_PATH, fileContent, 'utf8');
+
+    createDirectoryIfNotExists(PUBLIC_CUSTOM_ASSETS_PATH);
+  });
+
+  afterAll(() => {
+    // Remove <PLUGIN_PATH>/public/assets/custom directory.
+    execSync(`rm -rf ${PUBLIC_CUSTOM_ASSETS_PATH}`);
+
+    // Remove the configuration file
+    fs.unlinkSync(WAZUH_DATA_CONFIG_APP_PATH);
+  });
+
+  it.each`
+    setting                             | expectedValue | responseStatusCode | responseBodyMessage
+    ${'customization.logo.unknown'}     | ${''}         | ${400} | ${'[request params.key]: types that failed validation:\n- [request params.key.0]: expected value to equal [customization.logo.app]\n- [request params.key.1]: expected value to equal [customization.logo.healthcheck]\n- [request params.key.2]: expected value to equal [customization.logo.reports]\n- [request params.key.3]: expected value to equal [customization.logo.sidebar]'}
+    ${'customization.logo.app'}         | ${''}         | ${200} | ${'All files were removed and the configuration file was updated.'}
+    ${'customization.logo.healthcheck'} | ${''}         | ${200} | ${'All files were removed and the configuration file was updated.'}
+    ${'customization.logo.reports'}     | ${''}         | ${200} | ${'All files were removed and the configuration file was updated.'}
+    ${'customization.logo.sidebar'}     | ${''}         | ${200} | ${'All files were removed and the configuration file was updated.'}
+  `(`$setting - PUT /utils/configuration - $responseStatusCode`, async ({ responseBodyMessage, responseStatusCode, setting, expectedValue }) => {
+
+    // If the setting is defined in the plugin
+    if (PLUGIN_SETTINGS[setting]) {
+      // Create the directory where the asset was stored.
+      createDirectoryIfNotExists(path.join(__dirname, '../../../', PLUGIN_SETTINGS[setting].options.file.store.relativePathFileSystem));
+
+      // Create a empty file
+      fs.writeFileSync(path.join(__dirname, '../../../', PLUGIN_SETTINGS[setting].options.file.store.relativePathFileSystem, `${PLUGIN_SETTINGS[setting].options.file.store.filename}.jpg`), '', 'utf8');
+    };
+
+    const response = await supertest(innerServer.listener)
+      .delete(`/utils/configuration/files/${setting}`)
+      .expect(responseStatusCode);
+
+    responseStatusCode === 200 && expect(response.body.data.updatedConfiguration[setting]).toBeDefined();
+    responseStatusCode === 200 && expect(response.body.data.updatedConfiguration[setting]).toMatch(expectedValue);
+    responseStatusCode === 200 && expect(response.body.data.requiresRunningHealthCheck).toBe(Boolean(PLUGIN_SETTINGS[setting].requiresRunningHealthCheck));
+    responseStatusCode === 200 && expect(response.body.data.requiresReloadingBrowserTab).toBe(Boolean(PLUGIN_SETTINGS[setting].requiresReloadingBrowserTab));
+    responseStatusCode === 200 && expect(response.body.data.requiresRestartingPluginPlatform).toBe(Boolean(PLUGIN_SETTINGS[setting].requiresRestartingPluginPlatform));
+    responseBodyMessage && expect(response.body.message).toMatch(responseBodyMessage);
+
+    // Check the file was deleted from the expected path of the file system.
+    if (response?.body?.data?.updatedConfiguration?.[setting]) {
+      const targetFilepath = path.join(__dirname, '../../../', PLUGIN_SETTINGS[setting].options.file.store.relativePathFileSystem, `${PLUGIN_SETTINGS[setting].options.file.store.filename}.*`);
+      const files = glob.sync(path.join(targetFilepath));
+      expect(files).toHaveLength(0);
+    };
   });
 });
 
