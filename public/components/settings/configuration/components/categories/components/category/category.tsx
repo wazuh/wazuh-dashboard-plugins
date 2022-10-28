@@ -14,7 +14,6 @@
 import React, { } from 'react';
 import {
   EuiFlexItem,
-  EuiImage,
   EuiPanel,
   EuiText,
   EuiFlexGroup,
@@ -163,11 +162,10 @@ const InputFormFilePickerPreInput = ({image, field}: {image: string, field: any}
     <>
       <EuiFlexGroup alignItems="center" responsive={false}>
         <EuiFlexItem grow={false}>
-          <EuiImage
+          <img
             src={image}
-            size={40}
             alt="Custom logo"
-            url='' // Added to prevent warnings in the browser because it is marked as required
+            style={{maxWidth: '40px', maxHeight: '40px', width: '100%'}}
           />
         </EuiFlexItem>
         <EuiFlexItem grow={false}>

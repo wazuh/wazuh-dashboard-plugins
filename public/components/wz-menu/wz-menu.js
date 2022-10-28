@@ -913,7 +913,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
           style={{ paddingTop: 2 }}
         >
           <EuiFlexItem grow={false} className="navBarLogo-wrapper">
-            <img src={logotypeURL} className="navBarLogo" alt="Menu logo"></img>
+            <img src={logotypeURL} className="navBarLogo" alt="Menu logo" style={{width: '100%', height: 'auto'}}></img>
           </EuiFlexItem>
           <EuiFlexItem grow={false} style={{
             margin: '0 6px',
