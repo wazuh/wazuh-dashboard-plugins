@@ -100,7 +100,7 @@ export class WazuhUtilsCtrl {
 
   /**
    * Returns Wazuh app logs
-   * @param {Object} context 
+   * @param {Object} context
    * @param {Object} request
    * @param {Object} response
    * @returns {Array<String>} app logs or ErrorResponse
@@ -164,7 +164,7 @@ export class WazuhUtilsCtrl {
 
       // Update the setting in the configuration cache
       const pluginSettingValue = pluginSetting.options.file.store.resolveStaticURL(fileNamePath);
-      await updateConfigurationFile.updateConfiguration({[key]: pluginSettingValue});   
+      await updateConfigurationFile.updateConfiguration({[key]: pluginSettingValue});
 
       return response.ok({
         body: {
@@ -201,7 +201,7 @@ export class WazuhUtilsCtrl {
 
       // Update the setting in the configuration cache
       const pluginSettingValue = pluginSetting.defaultValue;
-      await updateConfigurationFile.updateConfiguration({[key]: pluginSettingValue}); 
+      await updateConfigurationFile.updateConfiguration({[key]: pluginSettingValue});
 
       return response.ok({
         body: {
@@ -219,7 +219,7 @@ export class WazuhUtilsCtrl {
     },
     3023
   )
-  
+
   private routeDecoratorProtectedAdministratorRoleValidToken(routeHandler, errorCode: number){
     return async (context, request, response) => {
       try{

@@ -948,7 +948,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
 				store: {
 					relativePathFileSystem: 'public/assets/custom/images',
 					filename: 'customization.logo.app',
-					resolveStaticURL: (filename: string) => `custom/images/${filename}`
+					resolveStaticURL: (filename: string) => `custom/images/${filename}?v=${Date.now()}`
 				}
 			}
 		},
@@ -984,7 +984,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
 				store: {
 					relativePathFileSystem: 'public/assets/custom/images',
 					filename: 'customization.logo.healthcheck',
-					resolveStaticURL: (filename: string) => `custom/images/${filename}`
+					resolveStaticURL: (filename: string) => `custom/images/${filename}?v=${Date.now()}`
 				}
 			}
 		},
@@ -1058,7 +1058,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
 				store: {
 					relativePathFileSystem: 'public/assets/custom/images',
 					filename: 'customization.logo.sidebar',
-					resolveStaticURL: (filename: string) => `custom/images/${filename}`
+					resolveStaticURL: (filename: string) => `custom/images/${filename}?v=${Date.now()}`
 				}
 			}
 		},
