@@ -157,8 +157,6 @@ exports[`[component] InputForm Renders correctly to match the snapshot: Input: e
       class="euiCodeEditorKeyboardHint"
       data-test-subj="codeEditorHint"
       id="test-id"
-      role="button"
-      tabindex="0"
     >
       <p
         class="euiText"
