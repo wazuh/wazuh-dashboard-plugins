@@ -31,6 +31,7 @@ import {
 import { getToasts }  from '../../../kibana-services';
 import { WzButtonPermissions } from '../../../components/common/permissions/button';
 import { resourceDictionary, ResourcesConstants } from './management/common/resources-handler';
+import { formatBytes } from '../../../../common/services/file-size';
 
 
 export class UploadFiles extends Component {
@@ -232,7 +233,7 @@ export class UploadFiles extends Component {
             <EuiListGroupItem
               id={index}
               key={index}
-              label={`${this.state.files[index].name} (${this.formatBytes(this.state.files[index].size)})`}
+              label={`${this.state.files[index].name} (${formatBytes(this.state.files[index].size)})`}
               isActive
             />
           ))}
@@ -240,11 +241,6 @@ export class UploadFiles extends Component {
       </Fragment>
     );
   }
-
-  /**
-   * Format Bytes size to largest unit
-   */
-  formatBytes(a, b = 2) { if (0 === a) return "0 Bytes"; const c = 0 > b ? 0 : b, d = Math.floor(Math.log(a) / Math.log(1024)); return parseFloat((a / Math.pow(1024, d)).toFixed(c)) + " " + ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"][d] }
 
   /**
    * Renders the errors when trying to upload files
