@@ -63,7 +63,7 @@ export class SettingsValidator {
         return `The string should have more or ${options.min} line/s.`;
       };
       if (typeof options.max !== 'undefined' && lines > options.max) {
-        return `The string should have less or ${options.max} line/s.`;
+        return `The string should have less or equal to ${options.max} line/s.`;
       };
     }
   };

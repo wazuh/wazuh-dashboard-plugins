@@ -119,10 +119,10 @@ describe('[settings] Input validation', () => {
     ${'customization.logo.sidebar'}     | ${{size: 1240000, name: 'image.txt'}} | ${'File size should be lower or equal than 1 MB.'}
     ${'customization.reports.footer'}   | ${'Test'}                             | ${undefined}
     ${'customization.reports.footer'}   | ${'Test\nTest'}                       | ${undefined}
-    ${'customization.reports.footer'}   | ${'Test\nTest\nTest\nTest\nTest'}     | ${'The string should have less or 2 line/s.'}
+    ${'customization.reports.footer'}   | ${'Test\nTest\nTest\nTest\nTest'}     | ${'The string should have less or equal to 2 line/s.'}
     ${'customization.reports.header'}   | ${'Test'}                             | ${undefined}
     ${'customization.reports.header'}   | ${'Test\nTest'}                       | ${undefined}
-    ${'customization.reports.header'}   | ${'Test\nTest\nTest\nTest\nTest'}     | ${'The string should have less or 4 line/s.'}
+    ${'customization.reports.header'}   | ${'Test\nTest\nTest\nTest\nTest'}     | ${'The string should have less or equal to 4 line/s.'}
     ${'disabled_roles'}                 | ${['test']}                           | ${undefined}
     ${'disabled_roles'}                 | ${['']}                               | ${'Value can not be empty.'}
     ${'disabled_roles'}                 | ${['test space']}                     | ${"No whitespaces allowed."}
