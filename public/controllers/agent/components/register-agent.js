@@ -42,6 +42,8 @@ import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
 import { architectureButtons, architectureButtonsi386, architecturei386Andx86_64, versionButtonsRaspbian, versionButtonsSuse, versionButtonsOracleLinux, versionButtonFedora, architectureButtonsSolaris, architectureButtonsWithPPC64LE, architectureButtonsOpenSuse, architectureButtonsAix, architectureButtonsHpUx, versionButtonAmazonLinux, versionButtonsRedHat, versionButtonsCentos, architectureButtonsMacos, osButtons, versionButtonsDebian, versionButtonsUbuntu, versionButtonsWindows, versionButtonsMacOS, versionButtonsOpenSuse, versionButtonsSolaris, versionButtonsAix, versionButtonsHPUX } from '../wazuh-config'
+import  ServerAddress  from '../register-agent/steps/server-address'
+import { fetchClusterNodesOptions, parseNodeIPs } from '../register-agent/utils'
 
 export const RegisterAgent = withErrorBoundary(
 
@@ -83,13 +85,8 @@ export const RegisterAgent = withErrorBoundary(
       try {
         this.setState({ loading: true });
         const wazuhVersion = await this.props.getWazuhVersion();
-        let serverAddress = false;
         let wazuhPassword = '';
         let hidePasswordInput = false;
-        serverAddress = this.configuration['enrollment.dns'] || false;
-        if (!serverAddress) {
-          serverAddress = await this.props.getCurrentApiAddress();
-        }
         let authInfo = await this.getAuthInfo();
         const needsPassword = (authInfo.auth || {}).use_password === 'yes';
         if (needsPassword) {
@@ -215,8 +212,8 @@ export const RegisterAgent = withErrorBoundary(
       this.setState({ selectedSYS: sys });
     }
 
-    setServerAddress(event) {
-      this.setState({ serverAddress: event.target.value });
+    setServerAddress(serverAddress) {
+      this.setState({ serverAddress });
     }
 
     setAgentName(event) {
@@ -265,7 +262,9 @@ export const RegisterAgent = withErrorBoundary(
     }
 
     optionalDeploymentVariables() {
-      let deployment = `WAZUH_MANAGER='${this.state.serverAddress}' `;      
+      let deployment = this.state.serverAddress && `WAZUH_MANAGER='${this.state.serverAddress}' `;
+      const protocol = false
+
       if (this.state.selectedOS == 'win') {
         deployment += `WAZUH_REGISTRATION_SERVER='${this.state.serverAddress}' `;
       }
@@ -716,18 +715,7 @@ export const RegisterAgent = withErrorBoundary(
         </p>
       );
       const missingOSSelection = this.checkMissingOSSelection();
-      const ipInput = (
-        <EuiText>
-          <p>
-            This is the address the agent uses to communicate with the Wazuh server. It can be an IP address or a fully qualified domain name (FQDN).
-          </p>
-          <EuiFieldText
-            placeholder="Server address"
-            value={this.state.serverAddress}
-            onChange={(event) => this.setServerAddress(event)}
-          />
-        </EuiText>
-      );
+      
 
       const agentName = (
         <EuiFieldText
@@ -1089,6 +1077,11 @@ export const RegisterAgent = withErrorBoundary(
         )
       }
 
+      const onChangeServerAddress = (value) => {
+        const nodesParsed = parseNodeIPs(value, this.state.selectedOS);
+        this.setState({ serverAddress: nodesParsed });
+      }
+
       const steps = [
         {
           title: 'Choose the operating system',
@@ -1339,7 +1332,11 @@ export const RegisterAgent = withErrorBoundary(
           : []),
         {
           title: 'Wazuh server address',
-          children: <Fragment>{ipInput}</Fragment>,
+          children: <Fragment>
+            <ServerAddress 
+              onChange={onChangeServerAddress} 
+              fetchOptions={fetchClusterNodesOptions}/>
+            </Fragment>,
         },
         ...(!(!this.state.needsPassword || this.state.hidePasswordInput)
           ? [
