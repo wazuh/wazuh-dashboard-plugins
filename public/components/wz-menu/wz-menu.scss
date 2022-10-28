@@ -75,9 +75,18 @@ wz-menu {
     max-width: 700px;
 }
 
+.navBarLogo-wrapper {
+    margin-right: 0px;
+    max-width: 100px;
+    flex-direction: column;
+    justify-content: center;
+}
+
 .navBarLogo {
-    width: 100px;
-  }
+    width: fit-content;
+    max-width: 100%;
+    max-height: 32px;
+}
 
 .wz-menu-popover{
     position: fixed;

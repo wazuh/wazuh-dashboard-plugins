@@ -1,14 +1,15 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { isEqual } from 'lodash';
 import { EpluginSettingType } from '../../../../common/constants';
 
 function getValueFromEvent(event, type){
-  return getValueFromEventType?.[type]?.(event) || getValueFromEventType.default(event)
+  return (getValueFromEventType[type] || getValueFromEventType.default)(event);
 };
 
 const getValueFromEventType = {
   [EpluginSettingType.switch] : (event: any) => event.target.checked,
   [EpluginSettingType.editor]: (value: any) => value,
+  [EpluginSettingType.filepicker]: (value: any) => value,
   default: (event: any) => event.target.value,
 };
 
@@ -21,6 +22,8 @@ export const useForm = (fields) => {
     }
   }), {}));
 
+  const fieldRefs = useRef({});
+
   const enhanceFields = Object.entries(formFields).reduce((accum, [fieldKey, {currentValue: value, ...restFieldState}]) => ({
     ...accum,
     [fieldKey]: {
@@ -30,6 +33,8 @@ export const useForm = (fields) => {
       value,
       changed: !isEqual(restFieldState.initialValue, value),
       error: fields[fieldKey]?.validate?.(value),
+      setInputRef: (reference) => {fieldRefs.current[fieldKey] = reference},
+      inputRef: fieldRefs.current[fieldKey],
       onChange: (event) => {
         const inputValue = getValueFromEvent(event, fields[fieldKey].type);
         const currentValue = fields[fieldKey]?.transformChangedInputValue?.(inputValue) ?? inputValue;
