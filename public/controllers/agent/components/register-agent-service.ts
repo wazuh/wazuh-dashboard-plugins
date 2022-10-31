@@ -12,7 +12,7 @@ type RemoteItem = {
 };
 
 /**
- * Get the remote configuration from nodes
+ * Get the remote configuration from nodes registered in the cluster
  */
 export const getRemoteConfiguration = async (): Promise<RemoteConfig> => {
   let config: RemoteConfig = {
