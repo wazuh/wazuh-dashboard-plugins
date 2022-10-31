@@ -1114,8 +1114,8 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     options: { rowsSize: 3, maxLength: 20 },
     validate: function (value) {
       return SettingsValidator.multipleLinesString({
-        max: this?.options?.rowsSize,
-        maxLength: this?.options?.maxLength
+        max: this.options.rowsSize,
+        maxLength: this.options?.maxLength
       })(value)
     },
 		validateBackend: function(schema){
