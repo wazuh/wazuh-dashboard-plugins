@@ -116,6 +116,10 @@ export function groupSettingsByCategory(settings: TPluginSettingWithKey[]){
 		// File size
 		...((options?.file?.size && typeof options.file.size.minBytes !== 'undefined') ? [`Minimum file size: ${formatBytes(options.file.size.minBytes)}.`] : []),
 		...((options?.file?.size && typeof options.file.size.maxBytes !== 'undefined') ? [`Maximum file size: ${formatBytes(options.file.size.maxBytes)}.`] : []),
+		// Multi line text
+		...((options?.maxRows && typeof options.maxRows !== 'undefined' ? [`Maximum amount of lines: ${options.maxRows}.`] : [])),
+		...((options?.minRows && typeof options.minRows !== 'undefined' ? [`Minimum amount of lines: ${options.minRows}.`] : [])),
+		...((options?.maxLength && typeof options.maxLength !== 'undefined' ? [`Maximum lines length is ${options.maxLength} characters.`] : [])),
 	].join(' ');
 };
 
