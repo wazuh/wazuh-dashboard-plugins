@@ -15,6 +15,7 @@ import {
   setCore,
   setPlugins,
   setCookies,
+  setPluginUpdater,
 } from './kibana-services';
 import {
   AppPluginStartDependencies,
@@ -43,6 +44,12 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
   private stateUpdater = new BehaviorSubject<AppUpdater>(() => ({}));
   private hideTelemetryBanner?: () => void;
   public async setup(core: CoreSetup, plugins: WazuhSetupPlugins): WazuhSetup {
+    // Set a way to update the plugin definition. This is used
+    // to update the logo displayed in the platform menu when uploading from the UI.
+    setPluginUpdater({
+      updater: (updater) => this.stateUpdater.next(updater)
+    });
+
     const UI_THEME = core.uiSettings.get('theme:darkMode') ? 'dark' : 'light';
 
     // Get custom logos configuration to start up the app with the correct logos

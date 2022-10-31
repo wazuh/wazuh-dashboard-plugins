@@ -39,6 +39,8 @@ import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { updateAppConfig } from '../../../redux/actions/appConfigActions';
 import path from 'path';
 import { toastRequiresReloadingBrowserTab, toastRequiresRestartingPluginPlatform, toastRequiresRunningHealthcheck, toastSuccessUpdateConfiguration } from './components/categories/components/show-toasts';
+import { getHttp, getPluginUpdater } from '../../../kibana-services';
+import { getAssetURL } from '../../../utils/assets';
 
 export type ISetting = {
   key: string
@@ -171,14 +173,15 @@ const WzConfigurationSettingsProvider = (props) => {
       responses.some(({data: { data: {requiresRestartingPluginPlatform}}}) => requiresRestartingPluginPlatform) && toastRequiresRestartingPluginPlatform();
 
       // Update the app configuration frontend-cached setting in memory with the new values
-      dispatch(updateAppConfig({
+      const updatedConfiguration = {
         ...responses.reduce((accum, {data: {data}}) => {
           return {
             ...accum,
             ...(data.updatedConfiguration ? {...data.updatedConfiguration} : {}),
           }
         },{})
-      }));
+      };
+      dispatch(updateAppConfig(updatedConfiguration));
 
       // Remove the selected files on the file picker inputs
       if(Object.keys(settingsToUpdate.fileUpload).length){
@@ -196,6 +199,18 @@ const WzConfigurationSettingsProvider = (props) => {
             );
           }catch(error){ };
         });
+      };
+
+      // This updates the plugin definition, updating the logo in the platform menu.
+      if ( updatedConfiguration?.['customization.logo.sidebar'] ) {
+        getPluginUpdater().updater(() => ({
+          category: {
+            id: 'wazuh',
+            label: 'Wazuh',
+            order: 0,
+            euiIconType: getHttp().basePath.prepend(getAssetURL(updatedConfiguration['customization.logo.sidebar'])),
+          }
+        }));
       };
 
       // Show the success toast
