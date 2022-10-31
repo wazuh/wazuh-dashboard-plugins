@@ -1076,7 +1076,6 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     defaultValue: "",
     isConfigurableFromFile: true,
     isConfigurableFromUI: true,
-    requiresReloadingBrowserTab: true,
     options: {
 			file: {
 				type: 'image',
