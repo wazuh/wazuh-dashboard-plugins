@@ -152,7 +152,7 @@ const WzConfigurationSettingsProvider = (props) => {
       // Update the settings that uploads a file
       if(Object.keys(settingsToUpdate.fileUpload).length){
         requests.push(...Object.entries(settingsToUpdate.fileUpload)
-          .map(([pluginSettingKey, {file, extension}]) => {
+          .map(([pluginSettingKey, {file}]) => {
               // Create the form data
               const formData = new FormData();
               formData.append('file', file);
