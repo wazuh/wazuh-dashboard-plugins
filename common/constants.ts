@@ -358,6 +358,11 @@ export enum SettingCategory {
   CUSTOMIZATION,
 };
 
+type TPluginSettingOptionsTextArea = {
+  rowsSize?: number
+  maxLength?: number
+};
+
 type TPluginSettingOptionsSelect = {
   select: { text: string, value: any }[]
 };
@@ -442,7 +447,13 @@ export type TPluginSetting = {
   // Modify the setting requires restarting the plugin platform to take effect.
   requiresRestartingPluginPlatform?: boolean
   // Define options related to the `type`.
-  options?: TPluginSettingOptionsNumber | TPluginSettingOptionsEditor | TPluginSettingOptionsFile | TPluginSettingOptionsSelect | TPluginSettingOptionsSwitch
+  options?:
+  TPluginSettingOptionsEditor |
+  TPluginSettingOptionsFile |
+  TPluginSettingOptionsNumber |
+  TPluginSettingOptionsSelect |
+  TPluginSettingOptionsSwitch |
+  TPluginSettingOptionsTextArea
   // Transform the input value. The result is saved in the form global state of Settings/Configuration
   uiFormTransformChangedInputValue?: (value: any) => any
   // Transform the configuration value or default as initial value for the input in Settings/Configuration
@@ -545,7 +556,6 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
 		validateBackend: function(schema){
 			return schema.boolean();
 		},
-
   },
   "checks.fields": {
     title: "Known fields",
@@ -1072,6 +1082,46 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
 			)(value)
 		},
   },
+  "customization.reports.footer": {
+		title: "Reports footer",
+		description: "Set the footer of the reports.",
+		category: SettingCategory.CUSTOMIZATION,
+		type: EpluginSettingType.textarea,
+		defaultValue: "",
+    	defaultValueIfNotSet: REPORTS_PAGE_FOOTER_TEXT,
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: true,
+    options: { rowsSize: 2, maxLength: 30 },
+    validate: function (value) {
+      return SettingsValidator.multipleLinesString({
+        max: this.options.rowsSize,
+        maxLength: this.options.maxLength
+      })(value)
+    },
+    validateBackend: function (schema) {
+      return schema.string({ validate: this.validate.bind(this) });
+    },
+  },
+  "customization.reports.header": {
+    title: "Reports header",
+    description: "Set the header of the reports.",
+    category: SettingCategory.CUSTOMIZATION,
+    type: EpluginSettingType.textarea,
+    defaultValue: "",
+    defaultValueIfNotSet: REPORTS_PAGE_HEADER_TEXT,
+    isConfigurableFromFile: true,
+    isConfigurableFromUI: true,
+    options: { rowsSize: 3, maxLength: 20 },
+    validate: function (value) {
+      return SettingsValidator.multipleLinesString({
+        max: this.options.rowsSize,
+        maxLength: this.options?.maxLength
+      })(value)
+    },
+		validateBackend: function(schema){
+			return schema.string({validate: this.validate?.bind(this)});
+		},
+	},
   "disabled_roles": {
     title: "Disable roles",
     description: "Disabled the plugin visibility for users with the roles.",
@@ -1784,7 +1834,6 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
 };
 
 export type TPluginSettingKey = keyof typeof PLUGIN_SETTINGS;
-
 
 export enum HTTP_STATUS_CODES {
   CONTINUE = 100,

@@ -5,6 +5,7 @@ import { InputFormText } from './input_text';
 import { InputFormSelect } from './input_select';
 import { InputFormSwitch } from './input_switch';
 import { InputFormFilePicker } from './input_filepicker';
+import { InputFormTextArea } from './input_text_area';
 import { EuiFlexGroup, EuiFlexItem, EuiFormRow } from '@elastic/eui';
 
 export const InputForm = ({
@@ -61,5 +62,6 @@ const Input = {
   number: InputFormNumber,
   select: InputFormSelect,
   text: InputFormText,
+  textarea: InputFormTextArea,
   filepicker: InputFormFilePicker
 };
