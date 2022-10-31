@@ -11,6 +11,9 @@ type RemoteItem = {
   protocol: 'TCP' | 'UDP'[];
 };
 
+/**
+ * Get the remote configuration from nodes
+ */
 export const getRemoteConfiguration = async (): Promise<RemoteConfig> => {
   let config: RemoteConfig = {
     udpProtocol: null,
