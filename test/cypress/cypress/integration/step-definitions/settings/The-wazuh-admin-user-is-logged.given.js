@@ -14,11 +14,9 @@ let urlBodys = [
 ];
 
 Given('The wazuh admin user is logged', () => {
-  if (Cypress.env('type') != 'wzd') {
+   if (Cypress.env('type') != 'wzd') {
     navigate('app/wazuh');
-  } else {
-    navigate('/');
-  }
+   }
   elementIsVisible(wazuhMenuButton);
 });
 
