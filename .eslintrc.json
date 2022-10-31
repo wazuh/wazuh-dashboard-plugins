@@ -1,0 +1,91 @@
+{
+  "root": true,
+  "env": {
+    "browser": true,
+    "node": true,
+    "jest": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:@typescript-eslint/recommended",
+    "prettier"
+  ],
+  "overrides": [],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+  "plugins": [
+    "react",
+    "react-hooks",
+    "@typescript-eslint",
+    "prettier",
+    "filenames-simple"
+  ],
+  "settings": {
+    "import/resolver": {
+      "typescript": {}
+    },
+    "react": {
+      "version": "16.12.0"
+    }
+  },
+  "ignorePatterns": [
+    "node_modules/",
+    "public/utils/codemirror/",
+    "public/kibana-integrations/",
+    "public/utils/jquery-ui.js"
+  ],
+  "rules": {
+    "filenames-simple/naming-convention": "error",
+    "indent": ["error", 2, { "SwitchCase": 1 }],
+    "quotes": ["error", "single"],
+    "semi": ["error", "always"],
+    "react/react-in-jsx-scope": "off",
+    "camelcase": "error",
+    "spaced-comment": "error",
+    "no-duplicate-imports": "error",
+    "no-await-in-loop": "error",
+    "block-scoped-var": "error",
+    "curly": "error",
+    "default-case": "error",
+    "default-param-last": "error",
+    "eqeqeq": "error",
+    "no-var": "error",
+    "require-await": "error",
+    "array-bracket-newline": ["error", "consistent"],
+    "array-bracket-spacing": [
+      "error",
+      "always",
+      {
+        "singleValue": false
+      }
+    ],
+    "array-element-newline": ["error", "always"],
+    "arrow-parens": ["error", "as-needed"],
+    "arrow-spacing": "error",
+    "block-spacing": "error",
+    "comma-spacing": [
+      "error",
+      {
+        "before": false,
+        "after": true
+      }
+    ],
+    "func-call-spacing": ["error", "never"],
+    "function-call-argument-newline": ["error", "consistent"],
+    "max-len": [
+      "error",
+      {
+        "code": 100
+      }
+    ],
+    "no-trailing-spaces": "error",
+    "semi-spacing": "error"
+  }
+}

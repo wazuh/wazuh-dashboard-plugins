@@ -1,0 +1,48 @@
+# This workflow allows you to deploy a development environment and run any
+# npm / yarn available command for testing purposes.
+# Any branch, tag or commit SHA existing in the origin can be used.
+#
+# This workflow is based on the `dev-environment` workflow.
+
+name: Playground
+
+on:
+  workflow_dispatch:
+    inputs:
+      reference:
+        required: true
+        type: string
+        default: master
+        description: Source code reference (branch, tag or commit SHA).
+      command:
+        required: true
+        type: string
+        default: 'yarn test:jest'
+        description: Command to run in the environment
+      docker_run_extra_args:
+        type: string
+        default: ''
+        description: Additional paramaters for the docker run command.
+        required: false
+      artifact_name:
+        type: string
+        default: ''
+        description: Artifact name (will be automatically suffixed with .zip)
+        required: false
+      artifact_path:
+        type: string
+        default: ''
+        description: Folder to include in the archive.
+        required: false
+
+jobs:
+  deploy_and_run_command:
+    name: Deploy and run command
+    uses: ./.github/workflows/dev-environment.yml
+    with:
+      reference: ${{ github.event.inputs.reference }}
+      command: ${{ github.event.inputs.command }}
+      docker_run_extra_args: ${{ github.event.inputs.docker_run_extra_args }}
+      artifact_name: ${{ github.event.inputs.artifact_name }}
+      artifact_path: ${{ github.event.inputs.artifact_path }}
+    secrets: inherit

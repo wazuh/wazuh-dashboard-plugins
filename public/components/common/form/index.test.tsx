@@ -3,22 +3,24 @@ import { render, screen } from '@testing-library/react';
 import { InputForm } from './index';
 import { useForm } from './hooks';
 
-jest.mock('../../../../../../node_modules/@elastic/eui/lib/services/accessibility', () => ({
-	htmlIdGenerator: () => () => 'generated-id',
+jest.mock('../../../../../../node_modules/@elastic/eui/lib/services/accessibility/html_id_generator', () => ({
+	htmlIdGenerator: () => () => 'test-id',
 }));
 
 describe('[component] InputForm', () => {
 	const optionsEditor = {editor: {language: 'json'}};
+	const optionsFilepicker = {file: {type: 'image', extensions: ['.jpeg', '.jpg', '.png', '.svg']}};
 	const optionsSelect = {select: [{text: 'Label1', value: 'value1'}, {text: 'Label2', value: 'value2'}]};
 	const optionsSwitch = {switch: {values: {enabled: {label: 'Enabled', value: true}, disabled: {label: 'Disabled', value: false}}}};
 	it.each`
-		inputType     | value       | options
-		${'editor'}   | ${'{}'}     | ${optionsEditor}
-		${'number'}   | ${4}        | ${undefined}
-		${'select'}   | ${'value1'} | ${optionsSelect}
-		${'switch'}   | ${true}     | ${optionsSwitch}
-		${'text'}     | ${'test'}   | ${undefined}
-		${'textarea'} | ${'test'}   | ${undefined}
+		inputType       | value       | options
+		${'editor'}     | ${'{}'}     | ${optionsEditor}
+		${'filepicker'} | ${'{}'}     | ${optionsFilepicker}
+		${'number'}     | ${4}        | ${undefined}
+		${'select'}     | ${'value1'} | ${optionsSelect}
+		${'switch'}     | ${true}     | ${optionsSwitch}
+		${'text'}       | ${'test'}   | ${undefined}
+		${'textarea'}   | ${'test'}   | ${undefined}
 	`('Renders correctly to match the snapshot: Input: $inputType', ({ inputType, value, options }) => {
 		const wrapper = render(
 			<InputForm
