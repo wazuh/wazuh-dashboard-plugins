@@ -1,18 +1,30 @@
-import { EuiComboBox, EuiComboBoxOptionOption, EuiHighlight, EuiText } from '@elastic/eui';
+import {
+  EuiComboBox,
+  EuiComboBoxOptionOption,
+  EuiHighlight,
+  EuiText,
+} from '@elastic/eui';
 import React, { useEffect, useState } from 'react';
 import { getMasterNode, parseNodeIPs } from '../utils';
 
+
+
+
 type Props = {
-  onChange: (value: string) => void;
+  onChange: (value: EuiComboBoxOptionOption<ServerAddressOptions>[]) => void;
   fetchOptions: () => Promise<EuiComboBoxOptionOption<string>[]>;
 };
 
-export type ServerAddressOptions = EuiComboBoxOptionOption<any> & { nodetype?: string };
+export type ServerAddressOptions = EuiComboBoxOptionOption<any> & {
+  nodetype?: string;
+};
 
-export default function ServerAddress(props: Props) {
+const ServerAddress = (props: Props) => {
   const { onChange, fetchOptions } = props;
   const [nodeIPs, setNodeIPs] = useState<ServerAddressOptions[]>([]);
-  const [selectedNodeIPs, setSelectedNodeIPs] = useState<ServerAddressOptions[]>([]);
+  const [selectedNodeIPs, setSelectedNodeIPs] = useState<
+    ServerAddressOptions[]
+  >([]);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -23,7 +35,7 @@ export default function ServerAddress(props: Props) {
    * Fetches the node IPs (options) and sets the state
    */
   const initialize = async () => {
-    if(!fetchOptions){
+    if (!fetchOptions) {
       throw new Error('fetchOptions is required');
     }
     try {
@@ -31,7 +43,7 @@ export default function ServerAddress(props: Props) {
       const nodeIps = await fetchOptions();
       setNodeIPs(nodeIps);
       const defaultNode = getMasterNode(nodeIps);
-      if (defaultNode.length > 0){
+      if (defaultNode.length > 0) {
         handleOnChange(defaultNode);
       }
       setIsLoading(false);
@@ -45,7 +57,7 @@ export default function ServerAddress(props: Props) {
    * Handles the change of the selected node IP
    * @param value
    */
-  const handleOnChange = (value) => {
+  const handleOnChange = (value: EuiComboBoxOptionOption<any>[]) => {
     setSelectedNodeIPs(value);
     onChange(value);
   };
@@ -56,7 +68,7 @@ export default function ServerAddress(props: Props) {
    * @param searchValue
    * @param contentClassName
    */
-  const handleRenderOption = (option, inputValue, contentClassName) => {
+  const handleRenderOption = (option: EuiComboBoxOptionOption<any>, inputValue: string, contentClassName: string) => {
     const { label, value } = option;
     return (
       <span className={contentClassName}>
@@ -71,8 +83,8 @@ export default function ServerAddress(props: Props) {
    * @param inputValue
    * @param options
    */
-  const handleOnCreateOption = (inputValue, options: any[] = []) => {
-    if (!inputValue){
+  const handleOnCreateOption = (inputValue:string, options: ServerAddressOptions[] = []) => {
+    if (!inputValue) {
       return;
     }
 
@@ -84,8 +96,9 @@ export default function ServerAddress(props: Props) {
     const newOption = { value: inputValue, label: inputValue };
     // Create the option if it doesn't exist.
     if (
-      options.findIndex((option) => option.label.trim().toLowerCase() === normalizedSearchValue) ===
-      -1
+      options.findIndex(
+        (option: ServerAddressOptions) => option.label.trim().toLowerCase() === normalizedSearchValue,
+      ) === -1
     ) {
       setNodeIPs([...nodeIPs, newOption]);
     }
@@ -96,19 +109,22 @@ export default function ServerAddress(props: Props) {
   return (
     <EuiText>
       <p>
-        This is the address the agent uses to communicate with the Wazuh server. It can be a list of one or 
-        more IP addresses or fully qualified domain names (FQDN).
+        This is the address the agent uses to communicate with the Wazuh server.
+        It can be a list of one or more IP addresses or fully qualified domain
+        names (FQDN).
       </p>
       <EuiComboBox
-        placeholder="Server Address"
+        placeholder='Server Address'
         isLoading={isLoading}
         selectedOptions={selectedNodeIPs}
         options={nodeIPs}
         onChange={handleOnChange}
         renderOption={handleRenderOption}
-        data-test-subj="demoComboBox"
+        data-test-subj='demoComboBox'
         onCreateOption={(sv, fo) => handleOnCreateOption(sv, fo)}
       />
     </EuiText>
   );
-}
+};
+
+export default ServerAddress;

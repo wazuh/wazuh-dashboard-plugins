@@ -1,6 +1,20 @@
 import { WzRequest } from '../../../react-services';
 import { ServerAddressOptions } from './steps/server-address';
 
+type NodeItem = {
+  name: string;
+  ip: string;
+  type: string;
+}
+
+type NodeResponse = {
+  data: {
+    data: {
+      affected_items: NodeItem[];
+    }
+  }
+}
+
 /**
  * Get a list of nodes and parsed into a string separated by semicolon
  * @param selectedNodes
@@ -10,7 +24,7 @@ export const parseNodeIPs = (selectedNodes: any, osSelected: string): string => 
   const delimiter = osSelected === 'win' ? ';' : ','; // by default any another OS use comma as delimiter, to prevent add every OS here
   let allNodeIps = '';
   if (selectedNodes.length > 1) {
-    allNodeIps = selectedNodes.map((o) => o.value).join(delimiter);
+    allNodeIps = selectedNodes.map((o: ServerAddressOptions ) => o.value).join(delimiter);
   } else if (selectedNodes.length === 1) {
     allNodeIps = selectedNodes[0].value;
   }
@@ -28,8 +42,8 @@ export const getNodeIPs = async (): Promise<any> => {
  * Parse the nodes list from the API response to a format that can be used by the EuiComboBox
  * @param nodes
  */
-export const parseNodesInOptions = (nodes: any): ServerAddressOptions[] => {
-  return nodes.data.data.affected_items.map((item) => ({
+export const parseNodesInOptions = (nodes: NodeResponse): ServerAddressOptions[] => {
+  return nodes.data.data.affected_items.map((item: NodeItem) => ({
     label: item.name,
     value: item.ip,
     nodetype: item.type,
