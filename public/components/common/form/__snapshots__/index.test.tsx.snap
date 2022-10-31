@@ -439,3 +439,14 @@ exports[`[component] InputForm Renders correctly to match the snapshot: Input: t
   </div>
 </div>
 `;
+
+exports[`[component] InputForm Renders correctly to match the snapshot: Input: textarea 1`] = `
+<div>
+  <textarea
+    class="euiTextArea euiTextArea--resizeVertical euiTextArea--fullWidth"
+    rows="6"
+  >
+    test
+  </textarea>
+</div>
+`;
