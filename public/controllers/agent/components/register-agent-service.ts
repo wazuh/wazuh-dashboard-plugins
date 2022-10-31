@@ -1,51 +1,55 @@
 import { WzRequest } from '../../../react-services/wz-request';
 
-type RemoteConfig = {
-  udpProtocol: boolean | null;
-  connectionSecure: boolean | null;
-};
+type Protocol = 'TCP' | 'UDP';
 
 type RemoteItem = {
   connection: 'syslog' | 'secure';
   ipv6: 'yes' | 'no';
-  protocol: 'TCP' | 'UDP'[];
+  protocol: Protocol[];
+  allowed_ips?: string[];
+  queue_size?: string;
+};
+
+type RemoteConfig = {
+  name: string;
+  protocols: Protocol[];
+  haveConnectionSecure: boolean | null;
 };
 
 /**
  * Get the remote configuration from nodes registered in the cluster
  */
-export const getRemoteConfiguration = async (): Promise<RemoteConfig> => {
+export const getRemoteConfiguration = async (
+  nodeName: string,
+): Promise<RemoteConfig> => {
   let config: RemoteConfig = {
-    udpProtocol: null,
-    connectionSecure: null,
+    name: nodeName,
+    protocols: [],
+    haveConnectionSecure: null,
   };
   const result = await WzRequest.apiReq(
     'GET',
-    '/agents/000/config/request/remote',
+    `/cluster/${nodeName}/configuration/request/remote`,
     {},
   );
-  const remote = ((result.data || {}).data || {}).remote || {};
-  const remoteFiltered = remote.filter((item: RemoteItem) => {
-    return item.connection === 'secure';
-  });
-  if (remoteFiltered.length === 0) {
-    config.connectionSecure = false;
-  } else {
-    remoteFiltered.forEach((item: RemoteItem) => {
-      if (item.connection === 'secure') {
-        if (item.protocol.length === 1 && item.protocol[0] == 'UDP') {
-          config = {
-            udpProtocol: true,
-            connectionSecure: true,
-          };
+  const items = ((result.data || {}).data || {}).affected_items || [];
+  const remote = items[0]?.remote;
+  if (remote) {
+    const remoteFiltered = remote.filter((item: RemoteItem) => {
+      return item.connection === 'secure';
+    });
+
+    remoteFiltered.length > 0
+      ? (config.haveConnectionSecure = true)
+      : (config.haveConnectionSecure = false);
+
+    remote.forEach((item: RemoteItem) => {
+      // get all protocols available
+      item.protocol.forEach(protocol => {
+        if (!config.protocols.includes(protocol)) {
+          config.protocols.push(protocol);
         }
-        if (item.protocol.length > 1 && item.protocol[0] == 'TCP') {
-          config = {
-            udpProtocol: false,
-            connectionSecure: true,
-          };
-        }
-      }
+      });
     });
   }
   return config;

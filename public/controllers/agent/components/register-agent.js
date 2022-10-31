@@ -70,7 +70,8 @@ export const RegisterAgent = withErrorBoundary(
         udpProtocol: false,
         showPassword: false,
         showProtocol: true,
-        connectionSecure: true
+        connectionSecure: true,
+        remoteNodesInfo: []
       };
       this.restartAgentCommand = {
         rpm: this.systemSelector(),
@@ -97,8 +98,6 @@ export const RegisterAgent = withErrorBoundary(
             hidePasswordInput = true;
           }
         }
-
-        await this.getRemoteInfo();
         const groups = await this.getGroups();
         this.setState({
           needsPassword,
@@ -158,15 +157,6 @@ export const RegisterAgent = withErrorBoundary(
         return (result.data || {}).data || {};
       } catch (error) {
         this.setState({ gotErrorRegistrationServiceInfo: true });
-        throw new Error(error);
-      }
-    }
-
-    async getRemoteInfo() {
-      try {
-        let config = await getRemoteConfiguration();
-        this.setState({ udpProtocol: config.udpProtocol, connectionSecure: config.connectionSecure });
-      } catch (error) {
         throw new Error(error);
       }
     }
@@ -1156,9 +1146,30 @@ export const RegisterAgent = withErrorBoundary(
         )
       }
 
-      const onChangeServerAddress = (value) => {
-        const nodesParsed = parseNodeIPs(value, this.state.selectedOS);
+      const getRemoteInfo = async (selectedNodes) => {
+        selectedNodes.forEach(async (node)=> {
+          const nodeName = node.label;
+          const existsNodeInfo = this.state.remoteNodesInfo.some(node => node.name === nodeName);
+          // check if the node info is already exists in state
+          if(this.state.remoteNodesInfo.length == 0 || !existsNodeInfo){
+            await getRemoteConfiguration(nodeName);
+          }
+
+        })
+      }
+
+      const suggestProtocol = (selectedNodes) => {
+
+      }
+
+      const checkConnectionSecure = (selectedNodes) => {
+
+      }
+
+      const onChangeServerAddress = async (selectedNodes) => {
+        const nodesParsed = parseNodeIPs(selectedNodes, this.state.selectedOS);
         this.setState({ serverAddress: nodesParsed });
+        await getRemoteInfo(selectedNodes);
       }
 
       const steps = [
@@ -1523,6 +1534,7 @@ export const RegisterAgent = withErrorBoundary(
                         <EuiTitle>
                           <h2>Deploy a new agent</h2>
                         </EuiTitle>
+                        { JSON.stringify(this.state.remoteNodesInfo) }
                       </EuiFlexItem>
                       <EuiFlexItem grow={false}>
                         {this.props.hasAgents() && (

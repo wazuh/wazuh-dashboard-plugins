@@ -12,7 +12,7 @@ import { getMasterNode, parseNodeIPs } from '../utils';
 
 type Props = {
   onChange: (value: EuiComboBoxOptionOption<ServerAddressOptions>[]) => void;
-  fetchOptions: () => Promise<EuiComboBoxOptionOption<string>[]>;
+  fetchOptions: () => Promise<EuiComboBoxOptionOption<ServerAddressOptions>[]>;
 };
 
 export type ServerAddressOptions = EuiComboBoxOptionOption<any> & {
