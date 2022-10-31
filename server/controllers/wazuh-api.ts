@@ -18,6 +18,7 @@ import { KeyEquivalence } from '../../common/csv-key-equivalence';
 import { ApiErrorEquivalence } from '../lib/api-errors-equivalence';
 import apiRequestList from '../../common/api-info/endpoints';
 import { HTTP_STATUS_CODES } from '../../common/constants';
+import { getSettingDependOnCustomizationIsEnabled } from '../../common/services/settings';
 import { addJobToQueue } from '../start/queue';
 import fs from 'fs';
 import { ManageHosts } from '../lib/manage-hosts';
@@ -1108,14 +1109,14 @@ export class WazuhApiCtrl {
       const APP_LOGO = 'customization.logo.app';
       const HEALTHCHECK_LOGO = 'customization.logo.healthcheck';
 
+      const logos= {
+        [SIDEBAR_LOGO]: getSettingDependOnCustomizationIsEnabled(configuration, SIDEBAR_LOGO),
+        [APP_LOGO]: getSettingDependOnCustomizationIsEnabled(configuration, APP_LOGO),
+        [HEALTHCHECK_LOGO]: getSettingDependOnCustomizationIsEnabled(configuration, HEALTHCHECK_LOGO),
+      }
+
       return response.ok({
-        body: {
-          logos: {
-            [SIDEBAR_LOGO]: configuration[SIDEBAR_LOGO],
-            [APP_LOGO]: configuration[APP_LOGO],
-            [HEALTHCHECK_LOGO]: configuration[HEALTHCHECK_LOGO],
-          }
-        }
+        body: { logos }
       });
     } catch (error) {
       log('wazuh-api:getAppLogos', error.message || error);

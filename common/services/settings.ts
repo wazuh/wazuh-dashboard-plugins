@@ -133,15 +133,18 @@ export function formatLabelValuePair(label, value){
 
 /**
  * Get the configuration value if the customization is enabled.
- * @param options 
+ * @param options
  * @returns
  */
-export function getSettingDependOnCustomizationIsEnabled(configuration: any, settingKey: string, overwriteDefaultValue?: any){
-	const defaultValue = typeof overwriteDefaultValue !== 'undefined'
-		? overwriteDefaultValue
-		: getSettingDefaultValue(settingKey);
+export function getSettingDependOnCustomizationIsEnabled(configuration: any, settingKey: string, overwriteDefaultValue?: any) {
+  const isCustomizationEnabled = typeof configuration['customization.enabled'] === 'undefined'
+    ? getSettingDefaultValue('customization.enabled')
+    : configuration['customization.enabled'];
+  const defaultValue = typeof overwriteDefaultValue !== 'undefined'
+    ? overwriteDefaultValue
+    : getSettingDefaultValue(settingKey);
 
-	return (configuration['customization.enabled'] && settingKey.startsWith('customization') && settingKey !== 'customization.enabled')
+	return ( isCustomizationEnabled && settingKey.startsWith('customization') && settingKey !== 'customization.enabled')
 		? (configuration[settingKey] ?? defaultValue)
 		: defaultValue;
 };

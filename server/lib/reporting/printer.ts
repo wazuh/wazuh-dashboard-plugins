@@ -619,23 +619,9 @@ export class ReportPrinter{
       try {
         const configuration = getConfiguration();
 
-        // The getConfiguration services only gets the configuration set in the configuration file.
-        // If the `customization.enabled` setting is not defined in the configuration file,
-        // its value will be `undefined` and could behave in a way that is not expected. So,
-        // we add its default value if this setting is not defined in the configuration file so
-        // the `getSettingDependOnCustomizationIsEnabled` could work correctly, because it is
-        // expecting the value of the `customization.enabled` setting.
-        const resolvedConfiguration = {
-          ...(typeof configuration['customization.enabled'] === 'undefined'
-            ? { 'customization.enabled': getSettingDefaultValue('customization.enabled') }
-            : {}
-          ),
-          ...configuration
-        };
-
-        const pathToLogo = getSettingDependOnCustomizationIsEnabled(resolvedConfiguration, 'customization.logo.reports');
-        const pageHeader = getSettingDependOnCustomizationIsEnabled(resolvedConfiguration, 'customization.reports.header');
-        const pageFooter = getSettingDependOnCustomizationIsEnabled(resolvedConfiguration, 'customization.reports.footer');
+        const pathToLogo = getSettingDependOnCustomizationIsEnabled(configuration, 'customization.logo.reports');
+        const pageHeader = getSettingDependOnCustomizationIsEnabled(configuration, 'customization.reports.header');
+        const pageFooter = getSettingDependOnCustomizationIsEnabled(configuration, 'customization.reports.footer');
 
         const document = this._printer.createPdfKitDocument({ ...pageConfiguration({ pathToLogo, pageHeader, pageFooter }), content: this._content });
 

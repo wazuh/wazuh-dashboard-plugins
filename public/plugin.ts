@@ -31,6 +31,7 @@ import { getThemeAssetURL, getAssetURL } from './utils/assets';
 import { WzRequest } from './react-services/wz-request';
 import store from './redux/store';
 import { updateAppConfig } from './redux/actions/appConfigActions';
+import { getSettingDefaultValue } from '../common/services/settings';
 
 const SIDEBAR_LOGO = 'customization.logo.sidebar';
 const innerAngularName = 'app/wazuh';
@@ -43,7 +44,7 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
   private hideTelemetryBanner?: () => void;
   public async setup(core: CoreSetup, plugins: WazuhSetupPlugins): WazuhSetup {
     const UI_THEME = core.uiSettings.get('theme:darkMode') ? 'dark' : 'light';
-    
+
     // Get custom logos configuration to start up the app with the correct logos
     let logosInitialState={};
     try{
@@ -57,9 +58,9 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
       id: `wazuh`,
       title: 'Wazuh',
       icon: core.http.basePath.prepend(
-        logosInitialState?.logos?.[SIDEBAR_LOGO] ?
+        logosInitialState?.logos?.[SIDEBAR_LOGO] !== getSettingDefaultValue(SIDEBAR_LOGO) ?
           getAssetURL(logosInitialState?.logos?.[SIDEBAR_LOGO]) :
-          getThemeAssetURL('icon.svg', UI_THEME)),
+          getThemeAssetURL(logosInitialState?.logos?.[SIDEBAR_LOGO], UI_THEME)),
       mount: async (params: AppMountParameters) => {
         try {
           if (!this.initializeInnerAngular) {
