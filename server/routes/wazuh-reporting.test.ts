@@ -21,6 +21,8 @@ import {
 } from '../../common/constants';
 import { execSync } from 'child_process';
 import fs from 'fs';
+import moment from 'moment';
+import { of } from 'rxjs';
 
 jest.mock('../lib/reporting/extended-information', () => ({
   extendedInformation: jest.fn()
@@ -68,8 +70,12 @@ beforeAll(async () => {
       allowFromAnyIp: true,
       ipAllowlist: [],
     },
+    cors: {
+      enabled: false,
+    },
+    shutdownTimeout: moment.duration(500, 'ms'),
   } as any;
-  server = new HttpServer(loggingService, 'tests');
+  server = new HttpServer(loggingService, 'tests', of(config.shutdownTimeout));
   const router = new Router('', logger, enhanceWithContext);
   const { registerRouter, server: innerServerTest, ...rest } = await server.setup(config);
   innerServer = innerServerTest;
@@ -117,7 +123,7 @@ describe('[endpoint] GET /reports', () => {
 
     // Create <PLUGIN_PLATFORM_PATH>/data/wazuh/downloads directory.
     createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
-    
+
     // Create <PLUGIN_PLATFORM_PATH>/data/wazuh/downloads/reports directory.
     createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH);
 
@@ -139,7 +145,7 @@ describe('[endpoint] GET /reports', () => {
     execSync(`rm -rf ${WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH}`);
   });
 
-  it.each(directories)('get reports of $username. status response: $responseStatus', async ({ username, files }) => {      
+  it.each(directories)('get reports of $username. status response: $responseStatus', async ({ username, files }) => {
     const response = await supertest(innerServer.listener)
       .get(`/reports`)
       .set('x-test-username', username)
