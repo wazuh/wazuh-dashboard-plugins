@@ -1055,6 +1055,11 @@ export const RegisterAgent = withErrorBoundary(
                 Might require some extra installation <EuiLink target="_blank" href={webDocumentationLink('installation-guide/wazuh-agent/wazuh-agent-package-hpux.html', appVersionMajorDotMinor)}>steps</EuiLink>.
               </span>
             }>
+            </EuiCallOut> : this.state.selectedVersion == 'debian7' || this.state.selectedVersion == 'debian8' || this.state.selectedVersion == 'debian9' || this.state.selectedVersion == 'debian10'? <EuiCallOut color="warning" className='message' iconType="iInCircle" title={
+              <span>
+                Might require some extra installation <EuiLink target="_blank" href={webDocumentationLink('installation-guide/wazuh-agent/wazuh-agent-package-linux.html', appVersionMajorDotMinor)}>steps</EuiLink>.
+              </span>
+            }> 
             </EuiCallOut> : <EuiCallOut color="warning" className='message' iconType="iInCircle" title={
               <span>
                 The selected OS version reached its end of life (EOL). To install Wazuh follow our <EuiLink href={webDocumentationLink('#', appVersionMajorDotMinor)}>guide</EuiLink>.
@@ -1064,6 +1069,7 @@ export const RegisterAgent = withErrorBoundary(
           </>
         )
       }
+      console.log(this.state.selectedVersion, 'ver')
 
       const selectedVersionMac = (legend, options, idSelected, onChange) => {
         return (
