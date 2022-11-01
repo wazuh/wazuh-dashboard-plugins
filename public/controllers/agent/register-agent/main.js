@@ -44,7 +44,7 @@ import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
 import { architectureButtons, architectureCentos5OrRedHat5, osButtons, versionButtonsCentosOrRedHat } from './config'
 import { optionalPackages } from './services'
-import { ServerAddress } from './steps'
+import { AgentGroup, ServerAddress } from './steps'
 
 export const RegisterAgent = withErrorBoundary(
 
@@ -182,8 +182,8 @@ export const RegisterAgent = withErrorBoundary(
       this.setState({ serverAddress: event.target.value });
     }
 
-    setGroupName(selectedGroup) {
-      this.setState({ selectedGroup });
+    setGroupName(groups) {
+      this.setState({ selectedGroup: groups });
     }
 
     setArchitecture(selectedArchitecture) {
@@ -291,36 +291,6 @@ export const RegisterAgent = withErrorBoundary(
         </p>
       );
       const missingOSSelection = this.checkMissingOSSelection();
-      
-
-      const groupInput = (
-        <>
-          {!this.state.groups.length && (
-            <>
-              <EuiCallOut
-                color="warning"
-                title='This section could not be configured because you do not have permission to read groups.'
-                iconType="iInCircle"
-              />
-              <EuiSpacer />
-            </>
-          )}
-          <EuiText>
-            <p>Select one or more existing groups</p>
-            <EuiComboBox
-              placeholder={!this.state.groups.length ? "Default" : "Select group"}
-              options={this.state.groups}
-              selectedOptions={this.state.selectedGroup}
-              onChange={(group) => {
-                this.setGroupName(group);
-              }}
-              isDisabled={!this.state.groups.length}
-              isClearable={true}
-              data-test-subj="demoComboBox"
-            />
-          </EuiText>
-        </>
-      );
 
       const passwordInput = (
         <EuiFieldText
@@ -557,7 +527,7 @@ export const RegisterAgent = withErrorBoundary(
           : []),
         {
           title: 'Assign the agent to a group',
-          children: <Fragment>{groupInput}</Fragment>,
+          children: <Fragment><AgentGroup options={this.state.groups} onChange={this.setGroupName}/></Fragment>,
         },
         {
           title: 'Install and enroll the agent',
@@ -639,6 +609,7 @@ export const RegisterAgent = withErrorBoundary(
                         <EuiTitle>
                           <h2>Deploy a new agent</h2>
                         </EuiTitle>
+                        groups = { JSON.stringify(this.state.groups) }
                       </EuiFlexItem>
                       <EuiFlexItem grow={false}>
                         {this.props.hasAgents() && (
