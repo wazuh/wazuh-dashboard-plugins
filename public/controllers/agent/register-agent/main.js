@@ -178,11 +178,11 @@ export const RegisterAgent = withErrorBoundary(
       this.setState({ selectedSYS: sys });
     }
 
-    setServerAddress(event) {
+    setServerAddress = (event) => {
       this.setState({ serverAddress: event.target.value });
     }
 
-    setGroupName(groups) {
+    setGroupName = (groups) => {
       this.setState({ selectedGroup: groups });
     }
 
