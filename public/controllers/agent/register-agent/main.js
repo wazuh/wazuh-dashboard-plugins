@@ -178,12 +178,12 @@ export const RegisterAgent = withErrorBoundary(
       this.setState({ selectedSYS: sys });
     }
 
-    setServerAddress = (event) => {
-      this.setState({ serverAddress: event.target.value });
+    setServerAddress = (serverAddress) => {
+      this.setState({ serverAddress });
     }
 
-    setGroupName = (groups) => {
-      this.setState({ selectedGroup: groups });
+    setGroupName = (selectedGroup) => {
+      this.setState({ selectedGroup });
     }
 
     setArchitecture(selectedArchitecture) {
@@ -609,7 +609,6 @@ export const RegisterAgent = withErrorBoundary(
                         <EuiTitle>
                           <h2>Deploy a new agent</h2>
                         </EuiTitle>
-                        groups = { JSON.stringify(this.state.groups) }
                       </EuiFlexItem>
                       <EuiFlexItem grow={false}>
                         {this.props.hasAgents() && (
