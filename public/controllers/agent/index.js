@@ -11,7 +11,7 @@
  */
 import { AgentsPreviewController } from './agents-preview';
 import { AgentsController } from './agents';
-import { RegisterAgent } from './components/register-agent';
+import { RegisterAgent } from './register-agent';
 import { ExportConfiguration } from './components/export-configuration';
 import { AgentsWelcome } from '../../components/common/welcome/agents-welcome';
 import { Mitre } from '../../components/overview'

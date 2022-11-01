@@ -42,84 +42,9 @@ import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
-
-const architectureButtons = [
-  {
-    id: 'i386',
-    label: 'i386',
-  },
-  {
-    id: 'x86_64',
-    label: 'x86_64',
-  },
-  {
-    id: 'armhf',
-    label: 'armhf',
-  },
-  {
-    id: 'aarch64',
-    label: 'aarch64',
-  },
-];
-const architectureCentos5OrRedHat5 = [
-  {
-    id: 'i386',
-    label: 'i386',
-  },
-  {
-    id: 'x86_64',
-    label: 'x86_64',
-  },
-];
-
-const versionButtonsCentosOrRedHat = [
-  {
-    id: 'centos5',
-    label: 'CentOS5',
-  },
-  {
-    id: 'centos6',
-    label: 'CentOS6 or higher',
-  },
-  {
-    id: 'redhat5',
-    label: 'Red Hat 5',
-  },
-  {
-    id: 'redhat6',
-    label: 'Red Hat 6 or higher',
-  },
-];
-
-const osButtons = [
-  {
-    id: 'rpm',
-    label: 'Red Hat / CentOS',
-  },
-  {
-    id: 'deb',
-    label: 'Debian / Ubuntu',
-  },
-  {
-    id: 'win',
-    label: 'Windows',
-  },
-  {
-    id: 'macos',
-    label: 'MacOS',
-  },
-];
-
-const sysButtons = [
-  {
-    id: 'systemd',
-    label: 'Systemd',
-  },
-  {
-    id: 'sysV',
-    label: 'SysV Init',
-  },
-];
+import { architectureButtons, architectureCentos5OrRedHat5, osButtons, versionButtonsCentosOrRedHat } from './config'
+import { optionalPackages } from './services'
+import { ServerAddress } from './steps'
 
 export const RegisterAgent = withErrorBoundary(
 
@@ -327,63 +252,6 @@ export const RegisterAgent = withErrorBoundary(
       return deployment;
     }
 
-    resolveRPMPackage() {
-      switch (`${this.state.selectedVersion}-${this.state.selectedArchitecture}`) {
-        case 'centos5-i386':
-          return `https://packages.wazuh.com/4.x/yum5/i386/wazuh-agent-${this.state.wazuhVersion}-1.el5.i386.rpm`;
-        case 'centos5-x86_64':
-          return `https://packages.wazuh.com/4.x/yum5/x86_64/wazuh-agent-${this.state.wazuhVersion}-1.el5.x86_64.rpm`;
-        case 'redhat5-i386':
-          return `https://packages.wazuh.com/4.x/yum5/i386/wazuh-agent-${this.state.wazuhVersion}-1.el5.i386.rpm`;
-        case 'redhat5-x86_64':
-          return `https://packages.wazuh.com/4.x/yum5/x86_64/wazuh-agent-${this.state.wazuhVersion}-1.el5.x86_64.rpm`;
-        case 'centos6-i386':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.i386.rpm`;
-        case 'centos6-aarch64':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.aarch64.rpm`;
-        case 'centos6-x86_64':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`;
-        case 'centos6-armhf':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.armv7hl.rpm`;
-        case 'redhat6-i386':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.i386.rpm`;
-        case 'redhat6-aarch64':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.aarch64.rpm`;
-        case 'redhat6-x86_64':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`;
-        case 'redhat6-armhf':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.armv7hl.rpm`;
-        default:
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`;
-      }
-    }
-
-    resolveDEBPackage() {
-      switch (`${this.state.selectedArchitecture}`) {
-        case 'i386':
-          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}-1_i386.deb`;
-        case 'aarch64':
-          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}-1_arm64.deb`;
-        case 'armhf':
-          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}-1_armhf.deb`;
-        case 'x86_64':
-          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}-1_amd64.deb`;
-        default:
-          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}-1_amd64.deb`;
-      }
-    }
-
-    optionalPackages() {
-      switch (this.state.selectedOS) {
-        case 'rpm':
-          return this.resolveRPMPackage();
-        case 'deb':
-          return this.resolveDEBPackage();
-        default:
-          return `https://packages.wazuh.com/4.x/yum5/x86_64/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`;
-      }
-    }
-
     checkMissingOSSelection() {
       if (!this.state.selectedOS) {
         return ['Operating system'];
@@ -423,18 +291,7 @@ export const RegisterAgent = withErrorBoundary(
         </p>
       );
       const missingOSSelection = this.checkMissingOSSelection();
-      const ipInput = (
-        <EuiText>
-          <p>
-            This is the address the agent uses to communicate with the Wazuh server. It can be an IP address or a fully qualified domain name (FQDN).
-          </p>
-          <EuiFieldText
-            placeholder="Server address"
-            value={this.state.serverAddress}
-            onChange={(event) => this.setServerAddress(event)}
-          />
-        </EuiText>
-      );
+      
 
       const groupInput = (
         <>
@@ -477,9 +334,9 @@ export const RegisterAgent = withErrorBoundary(
         zIndex: '100',
       };
       const customTexts = {
-        rpmText: `sudo ${this.optionalDeploymentVariables()}yum install ${this.optionalPackages()}`,
+        rpmText: `sudo ${this.optionalDeploymentVariables()}yum install ${optionalPackages(this.state.selectedOS, this.state.selectedArchitecture, this.state.wazuhVersion)}`,
         debText: `curl -so wazuh-agent-${this.state.wazuhVersion
-          }.deb ${this.optionalPackages()} && sudo ${this.optionalDeploymentVariables()}dpkg -i ./wazuh-agent-${this.state.wazuhVersion
+          }.deb ${optionalPackages(this.state.selectedOS, this.state.selectedArchitecture, this.state.wazuhVersion)} && sudo ${this.optionalDeploymentVariables()}dpkg -i ./wazuh-agent-${this.state.wazuhVersion
           }.deb`,
         macosText: `curl -so wazuh-agent-${this.state.wazuhVersion
           }.pkg https://packages.wazuh.com/4.x/macos/wazuh-agent-${this.state.wazuhVersion
@@ -688,7 +545,7 @@ export const RegisterAgent = withErrorBoundary(
           : []),
         {
           title: 'Wazuh server address',
-          children: <Fragment>{ipInput}</Fragment>,
+          children: <Fragment><ServerAddress defaultValue={this.state.serverAddress} onChange={this.setServerAddress}/></Fragment>,
         },
         ...(!(!this.state.needsPassword || this.state.hidePasswordInput)
           ? [
