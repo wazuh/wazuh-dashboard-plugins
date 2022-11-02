@@ -36,7 +36,6 @@ import { Category } from './components/categories/components';
 import { WzRequest } from '../../../react-services';
 import { UIErrorLog, UIErrorSeverity, UILogLevel, UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
-import { getToasts } from '../../../kibana-services';
 import { updateAppConfig } from '../../../redux/actions/appConfigActions';
 import path from 'path';
 import { toastRequiresReloadingBrowserTab, toastRequiresRestartingPluginPlatform, toastRequiresRunningHealthcheck, toastSuccessUpdateConfiguration } from './components/categories/components/show-toasts';
@@ -172,14 +171,15 @@ const WzConfigurationSettingsProvider = (props) => {
       responses.some(({data: { data: {requiresRestartingPluginPlatform}}}) => requiresRestartingPluginPlatform) && toastRequiresRestartingPluginPlatform();
 
       // Update the app configuration frontend-cached setting in memory with the new values
-      dispatch(updateAppConfig({
+      const updatedConfiguration = {
         ...responses.reduce((accum, {data: {data}}) => {
           return {
             ...accum,
             ...(data.updatedConfiguration ? {...data.updatedConfiguration} : {}),
           }
         },{})
-      }));
+      };
+      dispatch(updateAppConfig(updatedConfiguration));
 
       // Remove the selected files on the file picker inputs
       if(Object.keys(settingsToUpdate.fileUpload).length){

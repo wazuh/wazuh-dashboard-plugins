@@ -107,18 +107,21 @@ const checks = {
   timeFilter: {
     title: `Check ${PLUGIN_PLATFORM_SETTING_NAME_TIME_FILTER} setting`,
     label: `${PLUGIN_PLATFORM_SETTING_NAME_TIME_FILTER} setting`,
-    validator: checkPluginPlatformSettings(PLUGIN_PLATFORM_SETTING_NAME_TIME_FILTER, JSON.stringify(WAZUH_PLUGIN_PLATFORM_SETTING_TIME_FILTER), (checkLogger: CheckLogger, options: {defaultAppValue: any}) => {
-      getDataPlugin().query.timefilter.timefilter.setTime(WAZUH_PLUGIN_PLATFORM_SETTING_TIME_FILTER)
-        && checkLogger.action(`Timefilter set to ${JSON.stringify(options.defaultAppValue)}`);
-    }),
+    validator: checkPluginPlatformSettings(
+      PLUGIN_PLATFORM_SETTING_NAME_TIME_FILTER,
+      JSON.stringify(WAZUH_PLUGIN_PLATFORM_SETTING_TIME_FILTER),
+      (checkLogger: CheckLogger, options: { defaultAppValue: any }) => {
+        getDataPlugin().query.timefilter.timefilter.setTime(WAZUH_PLUGIN_PLATFORM_SETTING_TIME_FILTER)
+          && checkLogger.action(`Timefilter set to ${JSON.stringify(options.defaultAppValue)}`);
+      }),
     awaitFor: [],
     canRetry: true,
   }
 };
 
 function HealthCheckComponent() {
-  const [checkErrors, setCheckErrors] = useState<{[key:string]: []}>({});
-  const [checksReady, setChecksReady] = useState<{[key: string]: boolean}>({});
+  const [checkErrors, setCheckErrors] = useState<{ [key: string]: [] }>({});
+  const [checksReady, setChecksReady] = useState<{ [key: string]: boolean }>({});
   const [isDebugMode, setIsDebugMode] = useState<boolean>(false);
   const appConfig = useAppConfig();
   const checksInitiated = useRef(false);
@@ -142,35 +145,39 @@ function HealthCheckComponent() {
     // Redirect to app when all checks are ready
     Object.keys(checks)
       .every(check => checksReady[check])
-    && !isDebugMode && (() => setTimeout(redirectionPassHealthcheck, HEALTH_CHECK_REDIRECTION_TIME)
+      && !isDebugMode && (() => setTimeout(redirectionPassHealthcheck, HEALTH_CHECK_REDIRECTION_TIME)
       )()
   }, [checksReady]);
 
   useEffect(() => {
     // Check if Health should not redirect automatically (Debug mode)
     setIsDebugMode(window.location.href.includes('debug'));
-  },[]);
+  }, []);
 
   const handleErrors = (checkID, errors, parsed) => {
     const newErrors = parsed
       ? errors.map((error) =>
-          ErrorHandler.handle(error, 'Health Check', { warning: false, silent: true })
-        )
+        ErrorHandler.handle(error, 'Health Check', { warning: false, silent: true })
+      )
       : errors;
-    setCheckErrors((prev) => ({...prev, [checkID]: newErrors}));
+    setCheckErrors((prev) => ({ ...prev, [checkID]: newErrors }));
   };
 
   const cleanErrors = (checkID: string) => {
     delete checkErrors[checkID];
-    setCheckErrors({...checkErrors});
+    setCheckErrors({ ...checkErrors });
   }
 
   const handleCheckReady = (checkID, isReady) => {
-    setChecksReady(prev =>  ({...prev, [checkID]: isReady}));
+    setChecksReady(prev => ({ ...prev, [checkID]: isReady }));
   }
 
 
-  const logoUrl = getHttp().basePath.prepend(appConfig.data['customization.logo.healthcheck'] ? getAssetURL(appConfig.data['customization.logo.healthcheck']) : getThemeAssetURL('logo.svg'));
+  const logoUrl = getHttp().basePath.prepend(
+    appConfig.data['customization.enabled'] && appConfig.data['customization.logo.healthcheck'] ?
+      getAssetURL(appConfig.data['customization.logo.healthcheck']) :
+      getThemeAssetURL('logo.svg')
+  );
   const thereAreErrors = Object.keys(checkErrors).length > 0;
 
   const renderChecks = () => {
@@ -188,7 +195,7 @@ function HealthCheckComponent() {
           handleErrors={handleErrors}
           cleanErrors={cleanErrors}
           isLoading={appConfig.isLoading}
-          handleCheckReady= {handleCheckReady}
+          handleCheckReady={handleCheckReady}
           checksReady={checksReady}
           canRetry={checks[check].canRetry}
         />
@@ -277,7 +284,7 @@ function HealthCheckComponent() {
   );
 }
 
-export const HealthCheck = compose (withErrorBoundary,withReduxProvider) (HealthCheckComponent);
+export const HealthCheck = compose(withErrorBoundary, withReduxProvider)(HealthCheckComponent);
 
 export const HealthCheckTest = HealthCheckComponent;
 
