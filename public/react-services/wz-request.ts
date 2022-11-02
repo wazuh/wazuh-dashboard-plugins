@@ -32,13 +32,15 @@ export class WzRequest {
     method,
     path,
     payload: any = null,
-    extraOptions: { shouldRetry?: boolean, checkCurrentApiIsUp?: boolean } = {
+    extraOptions: { shouldRetry?: boolean, checkCurrentApiIsUp?: boolean, overwriteHeaders?: any } = {
       shouldRetry: true, 
-      checkCurrentApiIsUp: true
+      checkCurrentApiIsUp: true,
+      overwriteHeaders: {}
     }
   ) {
     const shouldRetry = typeof extraOptions.shouldRetry === 'boolean' ? extraOptions.shouldRetry : true; 
-    const checkCurrentApiIsUp = typeof extraOptions.checkCurrentApiIsUp === 'boolean' ? extraOptions.checkCurrentApiIsUp : true; 
+    const checkCurrentApiIsUp = typeof extraOptions.checkCurrentApiIsUp === 'boolean' ? extraOptions.checkCurrentApiIsUp : true;
+    const overwriteHeaders = typeof extraOptions.overwriteHeaders === 'object' ? extraOptions.overwriteHeaders : {};
     try {
       if (!method || !path) {
         throw new Error('Missing parameters');
@@ -50,7 +52,7 @@ export class WzRequest {
       const url = getHttp().basePath.prepend(path);
       const options = {
         method: method,
-        headers: { ...PLUGIN_PLATFORM_REQUEST_HEADERS, 'content-type': 'application/json' },
+        headers: { ...PLUGIN_PLATFORM_REQUEST_HEADERS, 'content-type': 'application/json', ...overwriteHeaders },
         url: url,
         data: payload,
         timeout: timeout,
