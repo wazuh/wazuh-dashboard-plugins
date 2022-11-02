@@ -298,6 +298,8 @@ hosts:
     ${'cron.statistics.interval'}       | ${true}                                    | ${400}             | ${"[request body.cron.statistics.interval]: expected value of type [string] but got [boolean]"}
     ${'cron.statistics.status'}         | ${true}                                    | ${200}             | ${null}
     ${'cron.statistics.status'}         | ${0}                                       | ${400}             | ${'[request body.cron.statistics.status]: expected value of type [boolean] but got [number]'}
+    ${'customization.enabled'}          | ${true}                                    | ${200}             | ${null}
+    ${'customization.enabled'}          | ${0}                                       | ${400}             | ${'[request body.customization.enabled]: expected value of type [boolean] but got [number]'}
     ${'customization.reports.footer'}   | ${'Test'}                                  | ${200}             | ${null}
     ${'customization.reports.footer'}   | ${'Test\nTest'}                            | ${200}             | ${null}
     ${'customization.reports.footer'}   | ${'Test\nTest\nTest\nTest\nTest'}          | ${400}             | ${"[request body.customization.reports.footer]: The string should have less or equal to 2 line/s."}

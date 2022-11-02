@@ -3,7 +3,7 @@
 import { Router } from '../../../../src/core/server/http/router/router';
 import { HttpServer } from '../../../../src/core/server/http/http_server';
 import { loggingSystemMock } from '../../../../src/core/server/logging/logging_system.mock';
-import { ByteSizeValue } from '@kbn/config-schema';
+import { ByteSizeValue } from '@osd/config-schema';
 import supertest from 'supertest';
 import { WazuhUtilsRoutes } from './wazuh-utils';
 import { WazuhReportingRoutes } from './wazuh-reporting';
@@ -117,7 +117,7 @@ describe('[endpoint] GET /reports', () => {
 
     // Create <PLUGIN_PLATFORM_PATH>/data/wazuh/downloads directory.
     createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
-    
+
     // Create <PLUGIN_PLATFORM_PATH>/data/wazuh/downloads/reports directory.
     createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH);
 
@@ -139,7 +139,7 @@ describe('[endpoint] GET /reports', () => {
     execSync(`rm -rf ${WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH}`);
   });
 
-  it.each(directories)('get reports of $username. status response: $responseStatus', async ({ username, files }) => {      
+  it.each(directories)('get reports of $username. status response: $responseStatus', async ({ username, files }) => {
     const response = await supertest(innerServer.listener)
       .get(`/reports`)
       .set('x-test-username', username)
@@ -175,11 +175,11 @@ describe('[endpoint] PUT /utils/configuration', () => {
   // If any of the parameters is changed this variable should be updated with the new md5
   it.each`
   footer              | header                                | responseStatusCode | expectedMD5                           | tab
-  ${null}             | ${null}                               | ${200}             | ${'1bdc0cc05cc79fdfbb9b734a4e1cc07b'} | ${'pm'}
-  ${'Custom\nFooter'} | ${'info@company.com\nFake Avenue 123'}| ${200}             | ${'0acbd4ee321699791b080b45c11dfe2b'} | ${'general'}
-  ${''}               | ${''}                                 | ${200}             | ${'5f9e16540e9d8109bed75b2a8f825164'} | ${'fim'}
-  ${'Custom Footer'}  | ${null}                               | ${200}             | ${'5bd4c559419028fd0d282c5e8408ecff'} | ${'aws'}
-  ${null}             | ${'Custom Header'}                    | ${200}             | ${'f6bfca395bc3fc78105f66120f336443'} | ${'gcp'}
+  ${null}             | ${null}                               | ${200}             | ${'9fbdebb41c6c4fe09841fc94a14de174'} | ${'pm'}
+  ${'Custom\nFooter'} | ${'info@company.com\nFake Avenue 123'}| ${200}             | ${'f01f3aa26436cca6c92e7c45da72efce'} | ${'general'}
+  ${''}               | ${''}                                 | ${200}             | ${'fa6c0527535b314aaf50d27e98fda093'} | ${'fim'}
+  ${'Custom Footer'}  | ${null}                               | ${200}             | ${'e4aba02dcb618387a4da4103ce833238'} | ${'aws'}
+  ${null}             | ${'Custom Header'}                    | ${200}             | ${'102c342384edd4796a02045e28f970cd'} | ${'gcp'}
 `(`Set custom report header and footer - Verify PDF output`, async ({footer, header, responseStatusCode, expectedMD5, tab}) => {
 
       // Mock PDF report parameters

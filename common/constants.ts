@@ -932,6 +932,31 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
 			return schema.boolean();
 		},
   },
+  "customization.enabled": {
+		title: "Status",
+		description: "Enable or disable the customization.",
+		category: SettingCategory.CUSTOMIZATION,
+		type: EpluginSettingType.switch,
+		defaultValue: true,
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: true,
+    requiresReloadingBrowserTab: true,
+		options: {
+			switch: {
+				values: {
+					disabled: {label: 'false', value: false},
+					enabled: {label: 'true', value: true},
+				}
+			}
+		},
+		uiFormTransformChangedInputValue: function(value: boolean | string): boolean{
+			return Boolean(value);
+		},
+		validate: SettingsValidator.isBoolean,
+		validateBackend: function(schema){
+			return schema.boolean();
+		},
+	},
   "customization.logo.app": {
     title: "App main logo",
     description: `This logo is used in the app main menu, at the top left corner.`,
@@ -1087,7 +1112,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
 		category: SettingCategory.CUSTOMIZATION,
 		type: EpluginSettingType.textarea,
 		defaultValue: "",
-    	defaultValueIfNotSet: REPORTS_PAGE_FOOTER_TEXT,
+    defaultValueIfNotSet: REPORTS_PAGE_FOOTER_TEXT,
 		isConfigurableFromFile: true,
 		isConfigurableFromUI: true,
     options: { rowsSize: 2, maxLength: 30 },
@@ -1118,7 +1143,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       })(value)
     },
 		validateBackend: function(schema){
-			return schema.string({validate: this.validate?.bind(this)});
+			return schema.string({validate: this.validate.bind(this)});
 		},
 	},
   "disabled_roles": {

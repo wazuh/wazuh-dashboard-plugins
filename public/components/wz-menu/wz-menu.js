@@ -17,9 +17,7 @@ import {
   EuiPopover,
   EuiIcon,
   EuiButtonEmpty,
-  EuiText,
   EuiCallOut,
-  EuiPageHeader,
   EuiToolTip,
   EuiLoadingSpinner,
   EuiFormRow,
@@ -904,7 +902,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
     );
 
     
-    const logotypeURL = getHttp().basePath.prepend(this.wazuhConfig.getConfig()['customization.logo.app'] ? getAssetURL(this.wazuhConfig.getConfig()['customization.logo.app']) : getThemeAssetURL('logo.svg'));
+    const logotypeURL = getHttp().basePath.prepend(this.wazuhConfig.getConfig()['customization.enabled'] && this.wazuhConfig.getConfig()['customization.logo.app'] ? getAssetURL(this.wazuhConfig.getConfig()['customization.logo.app']) : getThemeAssetURL('logo.svg'));
     const mainButton = (
       <button data-test-subj='menuWazuhButton' className="eui" onClick={() => this.switchMenuOpened()}>
         <EuiFlexGroup
