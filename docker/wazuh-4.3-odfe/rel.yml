@@ -20,6 +20,9 @@ services:
       - wm_certs:/certs/wm
       - idp_certs:/certs/idp
       - ./config/certs:/conf
+    # Included to avoid docker from creating duplicated networks
+    networks:
+      - odfe-rel
     entrypoint: /bin/bash
     command: >
         -c '
@@ -57,7 +60,7 @@ services:
         			-profile=client - | \
         		cfssljson -bare $$i
         		openssl pkcs8 -topk8 -inform pem -in $$i-key.pem -outform pem -nocrypt -out $$i.key
-            # openssl pkcs12 -export -inkey $$i-key.pem in $$i.pem -chain -CAfile $$certs/ca.pem -out $$i.p12 
+            # openssl pkcs12 -export -inkey $$i-key.pem in $$i.pem -chain -CAfile $$certs/ca.pem -out $$i.p12
         	done
 
             echo "Setting up permissions"
@@ -103,7 +106,7 @@ services:
       - wm_certs:/certs/wm
       - idp_certs:/certs/idp
     entrypoint: /bin/bash
-    command: > 
+    command: >
       -c '
         # trust store
         for i in /certs/idp/ca.pem /certs/wd/kibana.pem /certs/wi/odfe-node1.pem
@@ -269,5 +272,6 @@ volumes:
 
 networks:
   odfe-rel:
+    name: "${COMPOSE_PROJECT_NAME}"
   mon:
     external: true

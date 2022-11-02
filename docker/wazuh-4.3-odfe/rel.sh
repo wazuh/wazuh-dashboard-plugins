@@ -14,6 +14,7 @@ wazuh_versions=(
 	"4.3.6"
 	"4.3.7"
 	"4.3.8"
+  "4.3.9"
 )
 
 usage() {
@@ -83,6 +84,18 @@ case "$3" in
     echo
     echo "4. Open Kibana in a browser:"
     echo "https://localhost:${KIBANA_PORT:-5601}"
+    echo
+    echo "5. (Optional) Enroll an agent (Ubuntu 20.04):"
+    echo "docker run --name ${COMPOSE_PROJECT_NAME}-agent --network ${COMPOSE_PROJECT_NAME} --label com.docker.compose.project=${COMPOSE_PROJECT_NAME} -d ubuntu:20.04 bash -c '"
+    echo "  apt update -y"
+    echo "  apt install -y curl lsb-release"
+    echo "  curl -so \wazuh-agent-${WAZUH_VERSION}.deb \\"
+    echo "    https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${WAZUH_VERSION}-1_amd64.deb \\"
+    echo "    && WAZUH_MANAGER='wazuh.manager' WAZUH_AGENT_GROUP='default' dpkg -i ./wazuh-agent-${WAZUH_VERSION}.deb"
+    echo
+    echo "  /etc/init.d/wazuh-agent start"
+    echo "  tail -f /var/ossec/logs/ossec.log"
+    echo "'"
     echo
 		;;
 	down)

@@ -13,11 +13,6 @@ The default user and password to access the UI at https://0.0.0.0:5601/ are:
 admin:SecretPassword
 ```
 
-<!-- ## Multi-node cluster
-
-The `rel.yml` and `pre.yml` files contain a docker-compose with all the set 
-up for a 3 node cluster, read it carefully if you need to bring such a cluster. -->
-
 ## Release environment
 
 This environment brings up a complete ODFE environment with:
@@ -144,12 +139,12 @@ the agent `ossec.log` file.
 
 - For `CentOS/8` images:
   ```bash
-  docker run --rm --network es-rel-4.3.4 -d centos:8 bash -c '
+  docker run --name odfe-rel-1132-agent --network odfe-rel-1132 --label com.docker.compose.project=odfe-rel-1132 -d centos:8 bash -c '
       sed -i -e "s|mirrorlist=|#mirrorlist=|g" /etc/yum.repos.d/CentOS-*
       sed -i -e "s|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g" /etc/yum.repos.d/CentOS-*
 
       # Change this command by the one the UI suggest to use add it the -y and remove the sudo
-      WAZUH_MANAGER='wazuh.manager' yum install -y https://packages.wazuh.com/4.x/yum5/x86_64/wazuh-agent-4.3.4-1.el5.x86_64.rpm
+      WAZUH_MANAGER='wazuh.manager' yum install -y https://packages.wazuh.com/4.x/yum5/x86_64/wazuh-agent-4.3.8-1.el5.x86_64.rpm
 
       /etc/init.d/wazuh-agent start
       tail -f /var/ossec/logs/ossec.log
@@ -158,62 +153,18 @@ the agent `ossec.log` file.
 
 - For `Ubuntu` images
   ```bash
-  docker run --network es-rel-4.3.4 -d ubuntu:20.04 bash -c '
-      apt update -y
-      apt install -y curl lsb-release
-      # Change this command by the one the UI suggest to use add it tremove the sudo
-      curl -so wazuh-agent-4.3.4.deb https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_4.3.4-1_amd64.deb && WAZUH_MANAGER='wazuh.manager' dpkg -i ./wazuh-agent-4.3.4.deb
+  docker run --name odfe-rel-1132-agent --network odfe-rel-1132 --label com.docker.compose.project=odfe-rel-1132 -d ubuntu:20.04 bash -c '
+    apt update -y
+    apt install -y curl lsb-release
+    curl -so \wazuh-agent-4.3.8.deb \
+      https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_4.3.8-1_amd64.deb \
+      && WAZUH_MANAGER='wazuh.manager' WAZUH_AGENT_GROUP='default' dpkg -i ./wazuh-agent-4.3.8.deb
 
-      /etc/init.d/wazuh-agent start
-      tail -f /var/ossec/logs/ossec.log
+    /etc/init.d/wazuh-agent start
+    tail -f /var/ossec/logs/ossec.log
   '
   ```
 
 - For `non-Linux` agents:
   
   We need to provision virtual machines.
-
-<!-- ## Prerelease environment
-
-The prerelease environment help us test app releases while the rest of
-Wazuh packages haven't been generated yet.
-
-This environment will bring up:
-
- - Elasticsearch cluster with a single node
- - Elasticsearch Kibana with a single node
- - Elasticsearch exporter
- - Filebeat
- - Imposter
-
-### Usage
-
-```bash
-./pre.sh elastic_version wazuh_api_version action 
-
-where
-  elastic_version is one of  7.16.0 7.16.1 7.16.2 7.16.3 7.17.0 7.17.1 7.17.2 7.17.3 7.17.4 7.17.5 7.17.6
-  wazuh_api_version is the minor version of wazuh 4.3, for example  5 17
-  action is one of up | down | stop
-
-In a minor release, the API should not change the version here bumps the API
- string returned for testing. This script generates the file 
-
-    config/imposter/api_info.json
-
-used by the mock server
-```
-
-Please take into account that the API version for this environment will always 
-be a 4.3.X version. Also consider that our application version must be the same 
-as the one selected here.
-
-### Install a compatible Wazuh app
-
-Follow the instructions provided by the `pre.sh` script. 
-
-### Agent enrollment
-
-Because we're not using a real Wazuh Manager, we cannot register new agents. 
-Instead, Imposter (the mock server) will provide mocked responds to valid API 
-requests, as if it were the real Wazuh server. -->
