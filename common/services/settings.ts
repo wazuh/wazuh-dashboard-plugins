@@ -145,6 +145,18 @@ export function getSettingDependOnCustomizationIsEnabled(configuration: any, set
     : getSettingDefaultValue(settingKey);
 
 	return ( isCustomizationEnabled && settingKey.startsWith('customization') && settingKey !== 'customization.enabled')
-		? (configuration[settingKey] ?? defaultValue)
+		? (typeof configuration[settingKey] !== 'undefined' ? resolveEmptySetting(settingKey, configuration[settingKey]) : defaultValue)
 		: defaultValue;
+};
+
+/**
+ * Returns the default value if not set when the setting is an empty string
+ * @param settingKey plugin setting
+ * @param value value of the plugin setting
+ * @returns 
+ */
+function resolveEmptySetting(settingKey: string, value : unknown){
+	return typeof value === 'string' && value.length === 0 && PLUGIN_SETTINGS[settingKey].defaultValueIfNotSet
+		? getSettingDefaultValue(settingKey)
+		: value;
 };
