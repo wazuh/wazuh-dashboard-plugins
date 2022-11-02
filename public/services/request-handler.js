@@ -1,13 +1,8 @@
-import { arrayActorOffice } from '../../server/lib/generate-alerts/sample-data/office';
 import { getCore } from '../kibana-services';
 
 let allow = true;
 let aborts = [];
 let currentid = 0;
-
-const abortRequests = () => aborts.forEach(item => {
-    item.controller.abort();
-})
 
 const removeController = (id) => {
     const index = aborts.findIndex(object => {
@@ -16,15 +11,21 @@ const removeController = (id) => {
     aborts.splice(index)
 }
 
+export const disableRequests = () => {
+    allow = false;
+    aborts.forEach(item => {
+    item.controller.abort();})
+    return;
+}
+
 export const initializeInterceptor = () => {
     const core = getCore();
     core.http.intercept({
         responseError: (httpErrorResponse, controller) => {
             if (
-                httpErrorResponse.response?.status === 401 && httpErrorResponse.body?.message === 'Unauthorized'
+                httpErrorResponse.response?.status === 401
             ) {
-                allow = false;
-                abortRequests();
+                disableRequests();
             }
         },
     });
