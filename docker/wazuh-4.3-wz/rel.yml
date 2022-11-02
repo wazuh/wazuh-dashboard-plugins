@@ -101,7 +101,7 @@ services:
       - wm_certs:/certs/wm
       - idp_certs:/certs/idp
     entrypoint: /bin/bash
-    command: > 
+    command: >
       -c '
         # trust store
         for i in /certs/idp/ca.pem /certs/wd/wazuh.dashboard.pem /certs/wi/wazuh.indexer.pem
@@ -115,7 +115,7 @@ services:
       interval: 2s
       timeout: 5s
       retries: 10
-      
+
   wazuh.manager:
     depends_on:
       generator:
@@ -265,9 +265,8 @@ services:
       retries: 6
 
 networks:
-  networks:
   wz-rel:
-    name: wz-rel-${WAZUH_STACK}
+    name: ${COMPOSE_PROJECT_NAME}
     driver: bridge
   mon:
     external: true

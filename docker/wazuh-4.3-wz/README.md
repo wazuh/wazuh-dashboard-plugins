@@ -64,7 +64,7 @@ UI and then execute:
 
 - For `Ubuntu` images
   ```bash
-  docker run --name wz-rel-agent-4.3.8 --network wz-rel-4.3.8 -d ubuntu:20.04 bash -c '
+  docker run --name wz-rel-agent-4.3.8 --network wz-rel-4.3.8 --label com.docker.compose.project=wz-rel-4.3.8 -d ubuntu:20.04 bash -c '
     apt update -y
     apt install -y curl lsb-release
 
