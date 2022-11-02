@@ -14,12 +14,10 @@ import { version } from '../../../../package.json';
 import { WazuhConfig } from '../../../react-services/wazuh-config';
 import {
   EuiSteps,
-  EuiTabbedContent,
   EuiFlexGroup,
   EuiFlexItem,
   EuiPanel,
   EuiButtonGroup,
-  EuiFieldText,
   EuiText,
   EuiCodeBlock,
   EuiTitle,
@@ -30,34 +28,62 @@ import {
   EuiCallOut,
   EuiSpacer,
   EuiProgress,
-  EuiIcon,
-  EuiSwitch
+  EuiIcon
 } from '@elastic/eui';
 import { withErrorBoundary } from '../../../components/common/hocs';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
-import { webDocumentationLink } from '../../../../common/services/web_documentation';
 import { 
   architectureButtons, 
   architectureCentos5OrRedHat5, 
   osButtons, 
-  versionButtonsCentosOrRedHat,
-  codeBlock } from './config'
-import { AgentGroup, ServerAddress } from './steps'
+  versionButtonsCentosOrRedHat} from './config'
+import { AgentGroup, InstallEnrollAgent, ServerAddress, StartAgentTabs, WazuhPassword } from './steps'
 import { getGroups, 
   getAuthInfo, 
-  getHighlightCodeLanguage, 
-  obfuscatePassword, 
   systemSelector,
   checkMissingOSSelection,
-  getCommandText } from './register-agent-service'
-import { WindowsAdvice } from './components';
+  getCommandText,
+  getHighlightCodeLanguage } from './register-agent-service'
+
+
+type Props = {
+  hasAgents(): boolean;
+  addNewAgent(agent: any): void;
+  reload: () => void;
+  getCurrentApiAddress(): string;
+  getWazuhVersion(): string;
+}
+
+type State = {
+  status: string;
+  selectedOS: string;
+  selectedSYS: string;
+  selectedArchitecture: string;
+  selectedVersion: string;
+  serverAddress: string | false;
+  groups: { label: string, id: string }[];
+  selectedGroup: { label: string, id: string }[];
+  udpProtocol: boolean;
+  showPassword: boolean;
+  wazuhVersion: string;
+  wazuhPassword: string;
+  version: string;
+  loading: boolean;
+  gotErrorRegistrationServiceInfo?: boolean;
+  needsPassword?: boolean;
+  hidePasswordInput?: boolean;
+}
+
+type OSSystems = 'rpm' | 'deb' | 'macos' | 'win';
 
 export const RegisterAgent = withErrorBoundary(
-
-  class RegisterAgent extends Component {
-    constructor(props) {
+  class RegisterAgent extends Component<Props, State> {
+    wazuhConfig: any;
+    configuration: any;
+    restartAgentCommand: { [key: string]: string };
+    constructor(props: Props) {
       super(props);
       this.wazuhConfig = new WazuhConfig();
       this.configuration = this.wazuhConfig.getConfig();
@@ -65,7 +91,6 @@ export const RegisterAgent = withErrorBoundary(
         status: 'incomplete',
         selectedOS: '',
         selectedSYS: '',
-        neededSYS: false,
         selectedArchitecture: '',
         selectedVersion: '',
         version: '',
@@ -76,6 +101,7 @@ export const RegisterAgent = withErrorBoundary(
         selectedGroup: [],
         udpProtocol: false,
         showPassword: false,
+        loading: false
       };
       this.restartAgentCommand = {
         rpm: systemSelector(this.state.selectedOS, this.state.selectedSYS),
@@ -141,7 +167,7 @@ export const RegisterAgent = withErrorBoundary(
       }
     }
 
-    selectOS(os) {
+    selectOS(os: string) {
       this.setState({
         selectedOS: os,
         selectedVersion: '',
@@ -150,58 +176,41 @@ export const RegisterAgent = withErrorBoundary(
       });
     }
 
-    selectSYS(sys) {
+    selectSYS(sys: string) {
       this.setState({ selectedSYS: sys });
     }
 
-    setServerAddress = (serverAddress) => {
+    setServerAddress = (serverAddress: string) => {
       this.setState({ serverAddress });
     }
 
-    setGroupName = (selectedGroup) => {
+    setGroupName = (selectedGroup: {label: string, id: string}[]) => {
       this.setState({ selectedGroup });
     }
 
-    setArchitecture(selectedArchitecture) {
+    setArchitecture(selectedArchitecture: string) {
       this.setState({ selectedArchitecture });
     }
 
-    setVersion(selectedVersion) {
+    setVersion(selectedVersion: string) {
       this.setState({ selectedVersion, selectedArchitecture: '' });
     }
 
-    setWazuhPassword(event) {
+    setWazuhPassword(event: any) {
       this.setState({ wazuhPassword: event.target.value });
     }
 
-    setShowPassword(event) {
+    setShowPassword(event: any) {
       this.setState({ showPassword: event.target.checked });
     }
 
     render() {
-      const appVersionMajorDotMinor = this.state.wazuhVersion.split('.').slice(0, 2).join('.');
-      const urlCheckConnectionDocumentation = webDocumentationLink('user-manual/agents/agent-connection.html', appVersionMajorDotMinor);
-      const textAndLinkToCheckConnectionDocumentation = (
-        <p>
-          To verify the connection with the Wazuh server, please follow this{' '}
-          <a href={urlCheckConnectionDocumentation} target="_blank">
-            document.
-          </a>
-        </p>
-      );
       const missingOSSelection = checkMissingOSSelection(this.state.selectedOS, this.state.selectedVersion, this.state.selectedArchitecture);
-      const passwordInput = (
-        <EuiFieldText
-          placeholder="Wazuh password"
-          value={this.state.wazuhPassword}
-          onChange={(event) => this.setWazuhPassword(event)}
-        />
-      );
-
-      const text = getCommandText({ ...this.state });
       const language = getHighlightCodeLanguage(this.state.selectedOS);
+
+      const Commandtext = getCommandText({ ...this.state });
       const restartAgentCommand = this.restartAgentCommand[this.state.selectedOS];
-      const onTabClick = (selectedTab) => {
+      const onTabClick = (selectedTab: {label: string, id: string}) => {
         this.selectSYS(selectedTab.id);
       };
 
@@ -213,108 +222,6 @@ export const RegisterAgent = withErrorBoundary(
         />
       ) : null;
 
-      const guide = (
-        <div>
-          {(this.state.gotErrorRegistrationServiceInfo) ? (
-            <EuiCallOut
-              color="danger"
-              title='This section could not be displayed because you do not have permission to get access to the registration service.'
-              iconType="iInCircle"
-            />
-          ) :
-            this.state.selectedOS && (
-              <EuiText>
-                <p>
-                  You can use this command to install and enroll the Wazuh agent in one or more hosts.
-                </p>
-                <EuiCallOut
-                  color="warning"
-                  title={
-                    <>
-                      If the installer finds another Wazuh agent in the system, it will upgrade it preserving the configuration.
-                    </>
-                  }
-                  iconType="iInCircle"
-                />
-                <EuiSpacer />
-                { this.state.selectedOS === 'win' && <WindowsAdvice /> }
-                <div className="copy-codeblock-wrapper">
-                  <EuiCodeBlock style={codeBlock} language={language}>
-                    {this.state.wazuhPassword && !this.state.showPassword ? obfuscatePassword(text) : text}
-                  </EuiCodeBlock>
-                  <EuiCopy textToCopy={text}>
-                    {(copy) => (
-                      <div className="copy-overlay"  onClick={copy}>
-                        <p><EuiIcon type="copy"/> Copy command</p>
-                      </div>
-                    )}
-                  </EuiCopy>
-                </div>
-                {this.state.needsPassword && (
-                  <EuiSwitch
-                    label="Show password"
-                    checked={this.state.showPassword}
-                    onChange={(active) => this.setShowPassword(active)}
-                  />
-                )}
-                <EuiSpacer />
-              </EuiText>
-            )}
-        </div>
-      );
-
-      const tabs = [
-        {
-          id: 'systemd',
-          name: 'Systemd',
-          content: (
-            <Fragment>
-              <EuiSpacer />
-              <EuiText>
-                <div className="copy-codeblock-wrapper">
-                  <EuiCodeBlock style={codeBlock} language={language}>
-                    {systemSelector(this.state.selectedOS, this.state.selectedSYS)}
-                  </EuiCodeBlock>
-                  <EuiCopy textToCopy={systemSelector(this.state.selectedOS, this.state.selectedSYS)}>
-                    {(copy) => (
-                      <div className="copy-overlay" onClick={copy}>
-                        <p><EuiIcon type="copy" /> Copy command</p>
-                      </div>
-                    )}
-                  </EuiCopy>
-                </div>
-                <EuiSpacer size='s'/>
-                {textAndLinkToCheckConnectionDocumentation}
-              </EuiText>
-            </Fragment>
-          ),
-        },
-        {
-          id: 'sysV',
-          name: 'SysV Init',
-          content: (
-            <Fragment>
-              <EuiSpacer />
-              <EuiText>
-                <div className="copy-codeblock-wrapper">
-                  <EuiCodeBlock style={codeBlock} language={language}>
-                    {systemSelector(this.state.selectedOS, this.state.selectedSYS)}
-                  </EuiCodeBlock>
-                  <EuiCopy textToCopy={systemSelector(this.state.selectedOS, this.state.selectedSYS)}>
-                    {(copy) => (
-                      <div className="copy-overlay" onClick={copy}>
-                        <p><EuiIcon type="copy" /> Copy command</p>
-                      </div>
-                    )}
-                  </EuiCopy>
-                </div>
-                <EuiSpacer size='s'/>
-                {textAndLinkToCheckConnectionDocumentation}
-              </EuiText>
-            </Fragment>
-          ),
-        },
-      ];
 
       const steps = [
         {
@@ -386,7 +293,12 @@ export const RegisterAgent = withErrorBoundary(
           ? [
             {
               title: 'Wazuh password',
-              children: <Fragment>{passwordInput}</Fragment>,
+              children: 
+                <Fragment>
+                  <WazuhPassword 
+                    defaultValue={this.state.wazuhPassword}
+                    onChange={ (value: string) => this.setWazuhPassword(value) }/>
+                </Fragment>,
             },
           ]
           : []),
@@ -405,7 +317,14 @@ export const RegisterAgent = withErrorBoundary(
                 iconType="iInCircle"
               />
             ) : (
-              <div>{guide}</div>
+              <div>
+                <InstallEnrollAgent 
+                  language={language}
+                  commandText={Commandtext}
+                  {...this.state}
+                  onSetShowPassword={this.setShowPassword}
+                />
+              </div>
             ),
         },
         ...(this.state.selectedOS == 'rpm' || this.state.selectedOS == 'deb'
@@ -421,10 +340,9 @@ export const RegisterAgent = withErrorBoundary(
                     iconType="iInCircle"
                   />
                 ) : (
-                  <EuiTabbedContent
-                    tabs={tabs}
-                    selectedTab={this.selectedSYS}
+                  <StartAgentTabs
                     onTabClick={onTabClick}
+                    { ...this.state }
                   />
                 ),
             },
@@ -444,7 +362,7 @@ export const RegisterAgent = withErrorBoundary(
                   <EuiFlexGroup direction="column">
                     <EuiText>
                       <div className="copy-codeblock-wrapper">
-                        <EuiCodeBlock style={codeBlock} language={language}>
+                        <EuiCodeBlock language={language}>
                           {restartAgentCommand}
                         </EuiCodeBlock>
                         <EuiCopy textToCopy={restartAgentCommand}>
