@@ -1113,7 +1113,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
 		category: SettingCategory.CUSTOMIZATION,
 		type: EpluginSettingType.textarea,
 		defaultValue: "",
-    	defaultValueIfNotSet: REPORTS_PAGE_FOOTER_TEXT,
+    defaultValueIfNotSet: REPORTS_PAGE_FOOTER_TEXT,
 		isConfigurableFromFile: true,
 		isConfigurableFromUI: true,
     options: { rowsSize: 2, maxLength: 30 },

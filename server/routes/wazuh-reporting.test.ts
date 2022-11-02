@@ -97,7 +97,7 @@ afterAll(async () => {
   jest.clearAllMocks();
 
   // Remove <PLUGIN_PLATFORM_PATH>/data/wazuh directory.
-  execSync(`rm -rf ${WAZUH_DATA_ABSOLUTE_PATH}`);
+  // execSync(`rm -rf ${WAZUH_DATA_ABSOLUTE_PATH}`);
 });
 
 describe('[endpoint] GET /reports', () => {
@@ -148,7 +148,7 @@ describe('[endpoint] GET /reports', () => {
   });
 });
 
-describe('[endpoint] PUT /utils/configuration', () => {
+describe.only('[endpoint] PUT /utils/configuration', () => {
   beforeEach(() => {
     // Create the configuration file with custom content
     const fileContent = `---
@@ -168,18 +168,14 @@ describe('[endpoint] PUT /utils/configuration', () => {
 
   afterEach(() => {
     // Remove the configuration file
-    fs.unlinkSync(WAZUH_DATA_CONFIG_APP_PATH);
+    // fs.unlinkSync(WAZUH_DATA_CONFIG_APP_PATH);
   });
 
   // expectedMD5 variable is a verified md5 of a report generated with this header and footer
   // If any of the parameters is changed this variable should be updated with the new md5
   it.each`
   footer              | header                                | responseStatusCode | expectedMD5                           | tab
-  ${null}             | ${null}                               | ${200}             | ${'1bdc0cc05cc79fdfbb9b734a4e1cc07b'} | ${'pm'}
-  ${'Custom\nFooter'} | ${'info@company.com\nFake Avenue 123'}| ${200}             | ${'0acbd4ee321699791b080b45c11dfe2b'} | ${'general'}
   ${''}               | ${''}                                 | ${200}             | ${'5f9e16540e9d8109bed75b2a8f825164'} | ${'fim'}
-  ${'Custom Footer'}  | ${null}                               | ${200}             | ${'5bd4c559419028fd0d282c5e8408ecff'} | ${'aws'}
-  ${null}             | ${'Custom Header'}                    | ${200}             | ${'f6bfca395bc3fc78105f66120f336443'} | ${'gcp'}
 `(`Set custom report header and footer - Verify PDF output`, async ({footer, header, responseStatusCode, expectedMD5, tab}) => {
 
       // Mock PDF report parameters
