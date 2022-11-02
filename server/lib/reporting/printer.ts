@@ -11,7 +11,7 @@ import { log } from '../logger';
 import * as TimSort from 'timsort';
 import { getConfiguration } from '../get-configuration';
 import { REPORTS_PRIMARY_COLOR} from '../../../common/constants';
-import { getSettingDefaultValue, getSettingDependOnCustomizationIsEnabled } from '../../../common/services/settings';
+import { getCustomizationSetting } from '../../../common/services/settings';
 
 const COLORS = {
   PRIMARY: REPORTS_PRIMARY_COLOR
@@ -619,9 +619,9 @@ export class ReportPrinter{
       try {
         const configuration = getConfiguration();
 
-        const pathToLogo = getSettingDependOnCustomizationIsEnabled(configuration, 'customization.logo.reports');
-        const pageHeader = getSettingDependOnCustomizationIsEnabled(configuration, 'customization.reports.header');
-        const pageFooter = getSettingDependOnCustomizationIsEnabled(configuration, 'customization.reports.footer');
+        const pathToLogo = getCustomizationSetting(configuration, 'customization.logo.reports');
+        const pageHeader = getCustomizationSetting(configuration, 'customization.reports.header');
+        const pageFooter = getCustomizationSetting(configuration, 'customization.reports.footer');
 
         const document = this._printer.createPdfKitDocument({ ...pageConfiguration({ pathToLogo, pageHeader, pageFooter }), content: this._content });
 

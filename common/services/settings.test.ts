@@ -1,7 +1,7 @@
 import {
 	formatLabelValuePair,
 	formatSettingValueToFile,
-	getSettingDependOnCustomizationIsEnabled
+	getCustomizationSetting
 } from "./settings";
 
 describe('[settings] Methods', () => {
@@ -33,7 +33,7 @@ describe('[settings] Methods', () => {
 		});
 	});
 
-	describe('getSettingDependOnCustomizationIsEnabled: Get the value for the "customization." settings depending on the "customization.enabled" setting', () => {
+	describe('getCustomizationSetting: Get the value for the "customization." settings depending on the "customization.enabled" setting', () => {
 		it.only.each`
 		customizationEnabled | settingKey | configValue | expected
 		${true} | ${'customization.logo.app'} | ${'custom-image-app.png'} | ${'custom-image-app.png'} 
@@ -54,7 +54,7 @@ describe('[settings] Methods', () => {
 				'customization.enabled': customizationEnabled,
 				[settingKey]: configValue
 			};
-			expect(getSettingDependOnCustomizationIsEnabled(configuration, settingKey)).toBe(expected);
+			expect(getCustomizationSetting(configuration, settingKey)).toBe(expected);
 		});
 	});
 });

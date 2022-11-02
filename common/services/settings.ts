@@ -133,20 +133,21 @@ export function formatLabelValuePair(label, value){
 
 /**
  * Get the configuration value if the customization is enabled.
- * @param options
- * @returns
+ * @param configuration JSON object from `wazuh.yml`
+ * @param settingKey key of the setting
+ * @returns 
  */
-export function getSettingDependOnCustomizationIsEnabled(configuration: any, settingKey: string, overwriteDefaultValue?: any) {
+export function getCustomizationSetting(configuration: {[key: string]: any }, settingKey: string): any {
   const isCustomizationEnabled = typeof configuration['customization.enabled'] === 'undefined'
     ? getSettingDefaultValue('customization.enabled')
     : configuration['customization.enabled'];
-  const defaultValue = typeof overwriteDefaultValue !== 'undefined'
-    ? overwriteDefaultValue
-    : getSettingDefaultValue(settingKey);
+  const defaultValue = getSettingDefaultValue(settingKey);
 
-	return ( isCustomizationEnabled && settingKey.startsWith('customization') && settingKey !== 'customization.enabled')
-		? (typeof configuration[settingKey] !== 'undefined' ? resolveEmptySetting(settingKey, configuration[settingKey]) : defaultValue)
-		: defaultValue;
+	if ( isCustomizationEnabled && settingKey.startsWith('customization') && settingKey !== 'customization.enabled'){
+		return (typeof configuration[settingKey] !== 'undefined' ? resolveEmptySetting(settingKey, configuration[settingKey]) : defaultValue);
+	}else{
+		return defaultValue;
+	};
 };
 
 /**
