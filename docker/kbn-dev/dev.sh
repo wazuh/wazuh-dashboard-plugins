@@ -60,16 +60,16 @@ export ELASTIC_PASSWORD=${PASSWORD:-SecretPassword}
 export ES_VERSION=$1
 export LICENSE=basic # or trial
 export KIBANA_PORT=${PORT:-5601}
-export IMPOSTER_PORT=8081
+export IMPOSTER_PORT=8080
 export SRC=$2
-COMPOSE_PROJECT_NAME=es-dev-${ES_VERSION//./} # /./ removes dots: 7.10.2 => 7102
+export COMPOSE_PROJECT_NAME=es-dev-${ES_VERSION//./} # /./ removes dots: 7.10.2 => 7102
 
 case "$3" in
 	up)
-		docker compose -f dev.yml up -Vd
+		docker compose -f dev.yml -p ${COMPOSE_PROJECT_NAME} up -Vd
 		;;
 	down)
-		docker compose -f dev.yml down -v --remove-orphans
+		docker compose -f dev.yml -p ${COMPOSE_PROJECT_NAME} down -v --remove-orphans
 		;;
 	stop)
 		docker compose -f dev.yml -p ${COMPOSE_PROJECT_NAME} stop
