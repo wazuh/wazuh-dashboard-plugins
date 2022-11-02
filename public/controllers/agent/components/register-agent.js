@@ -42,7 +42,7 @@ import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
 import { architectureButtons, architectureButtonsi386, architecturei386Andx86_64, versionButtonsRaspbian, versionButtonsSuse, versionButtonsOracleLinux, versionButtonFedora, architectureButtonsSolaris, architectureButtonsWithPPC64LE, architectureButtonsOpenSuse, architectureButtonsAix, architectureButtonsHpUx, versionButtonAmazonLinux, versionButtonsRedHat, versionButtonsCentos, architectureButtonsMacos, osButtons, versionButtonsDebian, versionButtonsUbuntu, versionButtonsWindows, versionButtonsMacOS, versionButtonsOpenSuse, versionButtonsSolaris, versionButtonsAix, versionButtonsHPUX } from '../wazuh-config'
-import  ServerAddress  from '../register-agent/steps/server-address'
+import ServerAddress from '../register-agent/steps/server-address'
 import { fetchClusterNodesOptions, parseNodeIPs } from '../register-agent/utils'
 
 export const RegisterAgent = withErrorBoundary(
@@ -294,7 +294,7 @@ export const RegisterAgent = withErrorBoundary(
     agentNameVariable() {
       let agentName = `WAZUH_AGENT_NAME='${this.state.agentName}' `;
 
-      if(this.state.selectedArchitecture && this.state.agentName !== '') {
+      if (this.state.selectedArchitecture && this.state.agentName !== '') {
         return agentName;
       } else {
         return '';
@@ -715,7 +715,7 @@ export const RegisterAgent = withErrorBoundary(
         </p>
       );
       const missingOSSelection = this.checkMissingOSSelection();
-      
+
 
       const agentName = (
         <EuiFieldText
@@ -723,12 +723,12 @@ export const RegisterAgent = withErrorBoundary(
           value={this.state.agentName}
           onChange={(event) => this.setAgentName(event)}
         />
-    );
+      );
       const groupInput = (
         <>
           {!this.state.groups.length && (
             <>
-              <EuiCallOut style={{marginTop: '1.5rem'}}
+              <EuiCallOut style={{ marginTop: '1.5rem' }}
                 color="warning"
                 title='This section could not be configured because you do not have permission to read groups.'
                 iconType="iInCircle"
@@ -737,24 +737,24 @@ export const RegisterAgent = withErrorBoundary(
           )}
         </>
       );
-      
+
 
 
       const agentGroup = (
-        <EuiText style={{marginTop: '1.5rem'}}>
-        <p>Select one or more existing groups</p>
-        <EuiComboBox
-          placeholder={!this.state.groups.length ? "Default" : "Select group"}
-          options={this.state.groups}
-          selectedOptions={this.state.selectedGroup}
-          onChange={(group) => {
-            this.setGroupName(group);
-          }}
-          isDisabled={!this.state.groups.length}
-          isClearable={true}
-          data-test-subj="demoComboBox"
-        />
-      </EuiText>
+        <EuiText style={{ marginTop: '1.5rem' }}>
+          <p>Select one or more existing groups</p>
+          <EuiComboBox
+            placeholder={!this.state.groups.length ? "Default" : "Select group"}
+            options={this.state.groups}
+            selectedOptions={this.state.selectedGroup}
+            onChange={(group) => {
+              this.setGroupName(group);
+            }}
+            isDisabled={!this.state.groups.length}
+            isClearable={true}
+            data-test-subj="demoComboBox"
+          />
+        </EuiText>
       )
       const passwordInput = (
         <EuiFieldText
@@ -1055,21 +1055,20 @@ export const RegisterAgent = withErrorBoundary(
                 Might require some extra installation <EuiLink target="_blank" href={webDocumentationLink('installation-guide/wazuh-agent/wazuh-agent-package-hpux.html', appVersionMajorDotMinor)}>steps</EuiLink>.
               </span>
             }>
-            </EuiCallOut> : this.state.selectedVersion == 'debian7' || this.state.selectedVersion == 'debian8' || this.state.selectedVersion == 'debian9' || this.state.selectedVersion == 'debian10'? <EuiCallOut color="warning" className='message' iconType="iInCircle" title={
+            </EuiCallOut> : this.state.selectedVersion == 'debian7' || this.state.selectedVersion == 'debian8' || this.state.selectedVersion == 'debian9' || this.state.selectedVersion == 'debian10' ? <EuiCallOut color="warning" className='message' iconType="iInCircle" title={
               <span>
                 Might require some extra installation <EuiLink target="_blank" href={webDocumentationLink('installation-guide/wazuh-agent/wazuh-agent-package-linux.html', appVersionMajorDotMinor)}>steps</EuiLink>.
               </span>
-            }> 
-            </EuiCallOut> : <EuiCallOut color="warning" className='message' iconType="iInCircle" title={
+            }>
+            </EuiCallOut> : this.state.selectedVersion == 'centos5' ? <EuiCallOut color="warning" className='message' iconType="iInCircle" title={
               <span>
-                The selected OS version reached its end of life (EOL). To install Wazuh follow our <EuiLink href={webDocumentationLink('#', appVersionMajorDotMinor)}>guide</EuiLink>.
+                Might require some extra installation <EuiLink target="_blank" href={webDocumentationLink('installation-guide/wazuh-agent/wazuh-agent-package-linux.html', appVersionMajorDotMinor)}>steps</EuiLink>.
               </span>
             }>
-            </EuiCallOut>}
+            </EuiCallOut> : ''}
           </>
         )
       }
-      console.log(this.state.selectedVersion, 'ver')
 
       const selectedVersionMac = (legend, options, idSelected, onChange) => {
         return (
@@ -1160,7 +1159,7 @@ export const RegisterAgent = withErrorBoundary(
             {
               title: 'Choose the version',
               children: (
-                this.state.selectedVersion == 'debian7' || this.state.selectedVersion == 'debian8' ? buttonGroupWithMessage("Choose the version", versionButtonsDebian, this.state.selectedVersion, (version) => this.setVersion(version)) : buttonGroup("Choose the version", versionButtonsDebian, this.state.selectedVersion, (version) => this.setVersion(version))
+                this.state.selectedVersion == 'debian7' || this.state.selectedVersion == 'debian8' || this.state.selectedVersion == 'debian9' || this.state.selectedVersion == 'debian10' ? buttonGroupWithMessage("Choose the version", versionButtonsDebian, this.state.selectedVersion, (version) => this.setVersion(version)) : buttonGroup("Choose the version", versionButtonsDebian, this.state.selectedVersion, (version) => this.setVersion(version))
               ),
             },
           ]
@@ -1276,6 +1275,16 @@ export const RegisterAgent = withErrorBoundary(
             },
           ]
           : []),
+        ...(this.state.selectedVersion == 'debian7' || this.state.selectedVersion == 'debian8' || this.state.selectedVersion == 'debian9'
+          ? [
+            {
+              title: 'Choose the architecture',
+              children: (
+                buttonGroup("Choose the architecture", architectureButtons, this.state.selectedArchitecture, (architecture) => this.setArchitecture(architecture))
+              ),
+            },
+          ]
+          : []),
         ...(this.state.selectedVersion == 'centos7' || this.state.selectedVersion == 'amazonlinux2' || this.state.selectedVersion == 'suse12' || this.state.selectedVersion == '22' || this.state.selectedVersion == 'debian9' || this.state.selectedVersion == 'debian10' || this.state.selectedVersion == 'busterorgreater'
           ? [
             {
@@ -1339,10 +1348,10 @@ export const RegisterAgent = withErrorBoundary(
         {
           title: 'Wazuh server address',
           children: <Fragment>
-            <ServerAddress 
-              onChange={onChangeServerAddress} 
-              fetchOptions={fetchClusterNodesOptions}/>
-            </Fragment>,
+            <ServerAddress
+              onChange={onChangeServerAddress}
+              fetchOptions={fetchClusterNodesOptions} />
+          </Fragment>,
         },
         ...(!(!this.state.needsPassword || this.state.hidePasswordInput)
           ? [
