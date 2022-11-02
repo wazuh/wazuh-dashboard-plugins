@@ -25,12 +25,19 @@ import {
   EuiButtonIcon,
 } from '@elastic/eui';
 import { EuiIconTip } from '@elastic/eui';
-import { TPluginSettingWithKey } from '../../../../../../../../common/constants';
-import { getPluginSettingDescription } from '../../../../../../../../common/services/settings';
+import { EpluginSettingType, TPluginSettingWithKey, UI_LOGGER_LEVELS } from '../../../../../../../../common/constants';
 import { webDocumentationLink } from '../../../../../../../../common/services/web_documentation';
 import classNames from 'classnames';
 import { InputForm } from '../../../../../../common/form';
-
+import { useDispatch } from 'react-redux';
+import { getHttp } from '../../../../../../../kibana-services';
+import { getAssetURL } from '../../../../../../../utils/assets';
+import { UI_ERROR_SEVERITIES } from '../../../../../../../react-services/error-orchestrator/types';
+import { WzRequest } from '../../../../../../../react-services';
+import { updateAppConfig } from '../../../../../../../redux/actions/appConfigActions';
+import { getErrorOrchestrator } from '../../../../../../../react-services/common-services';
+import { WzButtonModalConfirm } from '../../../../../../common/buttons';
+import { toastRequiresReloadingBrowserTab, toastRequiresRestartingPluginPlatform, toastRequiresRunningHealthcheck, toastSuccessUpdateConfiguration } from '../show-toasts';
 
 interface ICategoryProps {
   title: string
@@ -38,12 +45,11 @@ interface ICategoryProps {
   documentationLink?: string
   items: TPluginSettingWithKey[]
   currentConfiguration: { [field: string]: any }
-  changedConfiguration: { [field: string]: any }
-  onChangeFieldForm: () => void
 }
 
 export const Category: React.FunctionComponent<ICategoryProps> = ({
   title,
+  currentConfiguration,
   description,
   documentationLink,
   items
@@ -111,7 +117,6 @@ export const Category: React.FunctionComponent<ICategoryProps> = ({
                         aria-label={item.key}
                         content='Invalid' />
                       )}
-
                       {isUpdated && (
                         <EuiIconTip
                         anchorClassName="mgtAdvancedSettings__fieldTitleUnsavedIcon"
@@ -122,10 +127,23 @@ export const Category: React.FunctionComponent<ICategoryProps> = ({
                       )}
                     </span>
                   </EuiTitle>}
-                description={getPluginSettingDescription(item)} >
+                description={item.description} >
                   <InputForm
                     label={item.key}
                     {...item}
+                    {...((item.type === EpluginSettingType.filepicker && currentConfiguration[item.key])
+                      ? {
+                          postInput: () => (
+                            <EuiFlexItem grow={false}>
+                              <InputFormFilePickerPreInput
+                                image={getHttp().basePath.prepend(getAssetURL(currentConfiguration[item.key]))}
+                                field={item}
+                              />
+                            </EuiFlexItem>
+                          )
+                        }
+                      : {}
+                    )}
                   />
               </EuiDescribedFormGroup>
             )
@@ -134,4 +152,62 @@ export const Category: React.FunctionComponent<ICategoryProps> = ({
       </EuiPanel>
     </EuiFlexItem>
   )
+};
+
+const InputFormFilePickerPreInput = ({image, field}: {image: string, field: any}) => {
+  const dispatch = useDispatch();
+
+  return (
+    <>
+      <EuiFlexGroup alignItems="center" responsive={false}>
+        <EuiFlexItem grow={false}>
+          <img
+            src={image}
+            alt="Custom logo"
+            style={{maxWidth: '40px', maxHeight: '40px', width: '100%'}}
+          />
+        </EuiFlexItem>
+        <EuiFlexItem grow={false}>
+          <WzButtonModalConfirm
+            buttonType="icon"
+            tooltip={{
+              content: 'Delete file',
+              position: 'top',
+            }}
+            modalTitle={`Do you want to delete the ${field.key} file?`}
+            onConfirm={async () => {
+              try{
+                const response = await WzRequest.genericReq('DELETE', `/utils/configuration/files/${field.key}`);
+                dispatch(updateAppConfig(response.data.data.updatedConfiguration));
+                
+                // Show the toasts if necessary
+                const { requiresRunningHealthCheck, requiresReloadingBrowserTab, requiresRestartingPluginPlatform } = response.data.data;
+                requiresRunningHealthCheck && toastRequiresRunningHealthcheck();
+                requiresReloadingBrowserTab&& toastRequiresReloadingBrowserTab();
+                requiresRestartingPluginPlatform && toastRequiresRestartingPluginPlatform();
+                toastSuccessUpdateConfiguration();
+              }catch(error){
+                const options = {
+                  context: `${InputFormFilePickerPreInput.name}.confirmDeleteFile`,
+                  level: UI_LOGGER_LEVELS.ERROR,
+                  severity: UI_ERROR_SEVERITIES.BUSINESS,
+                  store: true,
+                  error: {
+                    error: error,
+                    message: error.message || error,
+                    title: error.name || error,
+                  },
+                };
+                getErrorOrchestrator().handleError(options);
+              }
+            }}
+            modalProps={{ buttonColor: 'danger' }}
+            iconType="trash"
+            color="danger"
+            aria-label="Delete file"
+          />
+        </EuiFlexItem>
+      </EuiFlexGroup>
+    </>
+  );
 };

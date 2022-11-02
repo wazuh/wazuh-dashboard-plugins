@@ -342,6 +342,11 @@ export const DOCUMENTATION_WEB_BASE_URL = "https://documentation.wazuh.com";
 // Default Elasticsearch user name context
 export const ELASTIC_NAME = 'elastic';
 
+
+// Customization
+export const CUSTOMIZATION_ENDPOINT_PAYLOAD_UPLOAD_CUSTOM_FILE_MAXIMUM_BYTES = 1048576;
+
+
 // Plugin settings
 export enum SettingCategory {
   GENERAL,
@@ -353,8 +358,42 @@ export enum SettingCategory {
   CUSTOMIZATION,
 };
 
+type TPluginSettingOptionsTextArea = {
+  rowsSize?: number
+  maxLength?: number
+};
+
 type TPluginSettingOptionsSelect = {
   select: { text: string, value: any }[]
+};
+
+type TPluginSettingOptionsEditor = {
+	editor: {
+		language: string
+	}
+};
+
+type TPluginSettingOptionsFile = {
+	file: {
+		type: 'image'
+		extensions?: string[]
+		size?: {
+			maxBytes?: number
+			minBytes?: number
+		}
+		recommended?: {
+			dimensions?: {
+				width: number,
+				height: number,
+				unit: string
+			}
+		}
+		store?: {
+			relativePathFileSystem: string
+			filename: string
+			resolveStaticURL: (filename: string) => string
+		}
+	}
 };
 
 type TPluginSettingOptionsNumber = {
@@ -362,12 +401,6 @@ type TPluginSettingOptionsNumber = {
     min?: number
     max?: number
     integer?: boolean
-  }
-};
-
-type TPluginSettingOptionsEditor = {
-  editor: {
-    language: string
   }
 };
 
@@ -387,6 +420,7 @@ export enum EpluginSettingType {
   number = 'number',
   editor = 'editor',
   select = 'select',
+  filepicker = 'filepicker'
 };
 
 export type TPluginSetting = {
@@ -413,14 +447,20 @@ export type TPluginSetting = {
   // Modify the setting requires restarting the plugin platform to take effect.
   requiresRestartingPluginPlatform?: boolean
   // Define options related to the `type`.
-  options?: TPluginSettingOptionsNumber | TPluginSettingOptionsEditor | TPluginSettingOptionsSelect | TPluginSettingOptionsSwitch
+  options?:
+  TPluginSettingOptionsEditor |
+  TPluginSettingOptionsFile |
+  TPluginSettingOptionsNumber |
+  TPluginSettingOptionsSelect |
+  TPluginSettingOptionsSwitch |
+  TPluginSettingOptionsTextArea
   // Transform the input value. The result is saved in the form global state of Settings/Configuration
   uiFormTransformChangedInputValue?: (value: any) => any
   // Transform the configuration value or default as initial value for the input in Settings/Configuration
   uiFormTransformConfigurationValueToInputValue?: (value: any) => any
   // Transform the input value changed in the form of Settings/Configuration and returned in the `changed` property of the hook useForm
   uiFormTransformInputValueToConfigurationValue?: (value: any) => any
-  // Validate the value in the form of Settings/Configuration. It returns a string if there is some validation error. 
+  // Validate the value in the form of Settings/Configuration. It returns a string if there is some validation error.
 	validate?: (value: any) => string | undefined
 	// Validate function creator to validate the setting in the backend. It uses `schema` of the `@kbn/config-schema` package.
 	validateBackend?: (schema: any) => (value: unknown) => string | undefined
@@ -516,7 +556,6 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
 		validateBackend: function(schema){
 			return schema.boolean();
 		},
-
   },
   "checks.fields": {
     title: "Known fields",
@@ -898,40 +937,191 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     title: "App main logo",
     description: `This logo is used in the app main menu, at the top left corner.`,
     category: SettingCategory.CUSTOMIZATION,
-    type: EpluginSettingType.text,
+    type: EpluginSettingType.filepicker,
     defaultValue: "",
     isConfigurableFromFile: true,
     isConfigurableFromUI: true,
+    options: {
+			file: {
+				type: 'image',
+				extensions: ['.jpeg', '.jpg', '.png', '.svg'],
+				size: {
+					maxBytes: CUSTOMIZATION_ENDPOINT_PAYLOAD_UPLOAD_CUSTOM_FILE_MAXIMUM_BYTES,
+				},
+				recommended: {
+					dimensions: {
+						width: 300,
+						height: 70,
+						unit: 'px'
+					}
+				},
+				store: {
+					relativePathFileSystem: 'public/assets/custom/images',
+					filename: 'customization.logo.app',
+					resolveStaticURL: (filename: string) => `custom/images/${filename}?v=${Date.now()}`
+          // ?v=${Date.now()} is used to force the browser to reload the image when a new file is uploaded
+				}
+			}
+		},
+		validate: function(value){
+			return SettingsValidator.compose(
+				SettingsValidator.filePickerFileSize({...this.options.file.size, meaningfulUnit: true}),
+				SettingsValidator.filePickerSupportedExtensions(this.options.file.extensions)
+			)(value)
+		},
   },
   "customization.logo.healthcheck": {
     title: "Healthcheck logo",
     description: `This logo is displayed during the Healthcheck routine of the app.`,
     category: SettingCategory.CUSTOMIZATION,
-    type: EpluginSettingType.text,
+    type: EpluginSettingType.filepicker,
     defaultValue: "",
     isConfigurableFromFile: true,
     isConfigurableFromUI: true,
+    options: {
+			file: {
+				type: 'image',
+				extensions: ['.jpeg', '.jpg', '.png', '.svg'],
+				size: {
+					maxBytes: CUSTOMIZATION_ENDPOINT_PAYLOAD_UPLOAD_CUSTOM_FILE_MAXIMUM_BYTES,
+				},
+				recommended: {
+					dimensions: {
+						width: 300,
+						height: 70,
+						unit: 'px'
+					}
+				},
+				store: {
+					relativePathFileSystem: 'public/assets/custom/images',
+					filename: 'customization.logo.healthcheck',
+					resolveStaticURL: (filename: string) => `custom/images/${filename}?v=${Date.now()}`
+          // ?v=${Date.now()} is used to force the browser to reload the image when a new file is uploaded
+				}
+			}
+		},
+		validate: function(value){
+			return SettingsValidator.compose(
+				SettingsValidator.filePickerFileSize({...this.options.file.size, meaningfulUnit: true}),
+				SettingsValidator.filePickerSupportedExtensions(this.options.file.extensions)
+			)(value)
+		},
   },
   "customization.logo.reports": {
     title: "PDF reports logo",
     description: `This logo is used in the PDF reports generated by the app. It's placed at the top left corner of every page of the PDF.`,
     category: SettingCategory.CUSTOMIZATION,
-    type: EpluginSettingType.text,
+    type: EpluginSettingType.filepicker,
     defaultValue: "",
     defaultValueIfNotSet: REPORTS_LOGO_IMAGE_ASSETS_RELATIVE_PATH,
     isConfigurableFromFile: true,
     isConfigurableFromUI: true,
+    options: {
+			file: {
+				type: 'image',
+				extensions: ['.jpeg', '.jpg', '.png'],
+				size: {
+					maxBytes: CUSTOMIZATION_ENDPOINT_PAYLOAD_UPLOAD_CUSTOM_FILE_MAXIMUM_BYTES,
+				},
+				recommended: {
+					dimensions: {
+						width: 190,
+						height: 40,
+						unit: 'px'
+					}
+				},
+				store: {
+					relativePathFileSystem: 'public/assets/custom/images',
+					filename: 'customization.logo.reports',
+					resolveStaticURL: (filename: string) => `custom/images/${filename}`
+				}
+			}
+		},
+		validate: function(value){
+			return SettingsValidator.compose(
+				SettingsValidator.filePickerFileSize({...this.options.file.size, meaningfulUnit: true}),
+				SettingsValidator.filePickerSupportedExtensions(this.options.file.extensions)
+			)(value)
+		},
   },
   "customization.logo.sidebar": {
     title: "Navigation drawer logo",
     description: `This is the logo for the app to display in the platform's navigation drawer, this is, the main sidebar collapsible menu.`,
     category: SettingCategory.CUSTOMIZATION,
-    type: EpluginSettingType.text,
+    type: EpluginSettingType.filepicker,
     defaultValue: "",
     isConfigurableFromFile: true,
     isConfigurableFromUI: true,
     requiresReloadingBrowserTab: true,
+    options: {
+			file: {
+				type: 'image',
+				extensions: ['.jpeg', '.jpg', '.png', '.svg'],
+				size: {
+					maxBytes: CUSTOMIZATION_ENDPOINT_PAYLOAD_UPLOAD_CUSTOM_FILE_MAXIMUM_BYTES,
+				},
+				recommended: {
+					dimensions: {
+						width: 80,
+						height: 80,
+						unit: 'px'
+					}
+				},
+				store: {
+					relativePathFileSystem: 'public/assets/custom/images',
+					filename: 'customization.logo.sidebar',
+					resolveStaticURL: (filename: string) => `custom/images/${filename}?v=${Date.now()}`
+          // ?v=${Date.now()} is used to force the browser to reload the image when a new file is uploaded
+				}
+			}
+		},
+		validate: function(value){
+			return SettingsValidator.compose(
+				SettingsValidator.filePickerFileSize({...this.options.file.size, meaningfulUnit: true}),
+				SettingsValidator.filePickerSupportedExtensions(this.options.file.extensions)
+			)(value)
+		},
   },
+  "customization.reports.footer": {
+		title: "Reports footer",
+		description: "Set the footer of the reports.",
+		category: SettingCategory.CUSTOMIZATION,
+		type: EpluginSettingType.textarea,
+		defaultValue: "",
+    	defaultValueIfNotSet: REPORTS_PAGE_FOOTER_TEXT,
+		isConfigurableFromFile: true,
+		isConfigurableFromUI: true,
+    options: { rowsSize: 2, maxLength: 30 },
+    validate: function (value) {
+      return SettingsValidator.multipleLinesString({
+        max: this.options.rowsSize,
+        maxLength: this.options.maxLength
+      })(value)
+    },
+    validateBackend: function (schema) {
+      return schema.string({ validate: this.validate.bind(this) });
+    },
+  },
+  "customization.reports.header": {
+    title: "Reports header",
+    description: "Set the header of the reports.",
+    category: SettingCategory.CUSTOMIZATION,
+    type: EpluginSettingType.textarea,
+    defaultValue: "",
+    defaultValueIfNotSet: REPORTS_PAGE_HEADER_TEXT,
+    isConfigurableFromFile: true,
+    isConfigurableFromUI: true,
+    options: { rowsSize: 3, maxLength: 20 },
+    validate: function (value) {
+      return SettingsValidator.multipleLinesString({
+        max: this.options.rowsSize,
+        maxLength: this.options?.maxLength
+      })(value)
+    },
+		validateBackend: function(schema){
+			return schema.string({validate: this.validate?.bind(this)});
+		},
+	},
   "disabled_roles": {
     title: "Disable roles",
     description: "Disabled the plugin visibility for users with the roles.",
@@ -1361,7 +1551,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
         SettingsValidator.isString,
         SettingsValidator.isNotEmptyString,
         SettingsValidator.hasNoSpaces,
-        SettingsValidator.noLiteralString('.', '..'),        
+        SettingsValidator.noLiteralString('.', '..'),
         SettingsValidator.noStartsWithString('-', '_', '+', '.'),
         SettingsValidator.hasNotInvalidCharacters('\\', '/', '?', '"', '<', '>', '|', ',', '#')
       )),
@@ -1644,7 +1834,6 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
 };
 
 export type TPluginSettingKey = keyof typeof PLUGIN_SETTINGS;
-
 
 export enum HTTP_STATUS_CODES {
   CONTINUE = 100,
